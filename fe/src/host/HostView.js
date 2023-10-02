@@ -2,12 +2,16 @@ import React, { useState, useEffect } from "react";
 import { Typography, List, ListItem, Button, TextField } from "@mui/material";
 import '../style/animation.scss'; 
 import { generateRandomTable } from "../utils/utils"
+import { useWebSocket } from "../utils/WebSocketContext";
+
 
 const HostScreen = ({ gameCode, users }) => {
+  const ws = useWebSocket();
   const [tableData, setTableData] = useState(generateRandomTable());
   const [timerValue, setTimerValue] = useState('');
   const [remainingTime, setRemainingTime] = useState(null);
   const [gameStarted, setGameStarted] = useState(false);
+
 
   useEffect(() => {
     let timer;
@@ -15,7 +19,10 @@ const HostScreen = ({ gameCode, users }) => {
       timer = setInterval(() => {
         setRemainingTime((prevTime) => Math.max(prevTime - 1, 0));
       }, 1000);
-    } else if (remainingTime === 0) {
+    } else if (gameStarted && remainingTime === 0) {
+      console.log("Game Over!");
+      ws.send(JSON.stringify({ action: "endGame", gameCode }));
+
       // Emit a message to end the game through WebSocket
       // For example: socket.emit("endGame");
       clearInterval(timer);

@@ -3,9 +3,21 @@ import { Typography, Button, TextField, List, ListItem, IconButton } from '@mui/
 import DeleteIcon from '@mui/icons-material/Delete';
 import '../style/animation.scss';
 
+import { useWebSocket } from "../utils/WebSocketContext";
+
+
 const PlayerView = () => {
+
+  const ws = useWebSocket();
   const [word, setWord] = useState('');
   const [foundWords, setFoundWords] = useState([]);
+
+  ws.onmessage = (event) => {
+    const { action } = JSON.parse(event.data);
+    if (action === "endGame") {
+      ws.send(JSON.stringify({ action: "sendAnswer",foundWords }));
+    }
+  };
 
   const addWord = () => {
     if (word) {
@@ -25,6 +37,10 @@ const PlayerView = () => {
   };
   // Add this in a useEffect in your PlayerView.js
 useEffect(() => {
+
+  // Listen for the 'endGame' message from the server
+
+
     // Listen for the 'endGame' message from the server
     // socket.on("endGame", () => {
       alert("Game Over! Navigating to score page...");

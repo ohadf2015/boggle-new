@@ -7,43 +7,45 @@ const app = express();
 const server = http.createServer(app);
 const wss = new WebSocket.Server({ server });
 
-const games = {}; // { gameCode: { users: { username1: ws1, username2: ws2, ... }, host: wsHost } }
+const {
+  setNewGame,
+  handleEndGame,
+  handleStartGame,
+  addUserToGame,
+} = require("./handlers");
 
 wss.on("connection", (ws) => {
   ws.on("message", (message) => {
-    const { action, gameCode, username } = JSON.parse(message);
+    const message = JSON.parse(message);
+    const { action } = message;
 
-    if (action === "join") {
-      if (!games[gameCode]) {
-        games[gameCode] = { users: {}, host: ws };
-        console.log(`Created game ${gameCode}`);
+    switch (action) {
+      case "createGame": {
+        const { gameCode } = message;
+        setNewGame(gameCode, ws);
+        break;
       }
-      
-      games[gameCode].users[username] = ws;
+      case "join": {
+        const { gameCode, username } = message;
+        addUserToGame(gameCode, username, ws);
+      }
 
-      const isHost = games[gameCode].host === ws;
-      ws.send(JSON.stringify({ action: "joined", gameCode, username, isHost }));
+      case "startGame": {
+        handleStartGame(ws);
+        break;
+      }
 
-      if (!isHost) {
-        // Update only the host about the new user
-        games[gameCode].host.send(
-          JSON.stringify({
-            action: "updateUsers",
-            users: Object.keys(games[gameCode].users),
-          })
-        );
+      case "endGame": {
+        handleEndGame(ws);
+        break;
+      }
+
+      case "sendAnswer": {
+        const { foundWords } = message;
+        handleSendAnswer(ws, foundWords);
       }
     }
-    if (action === "endGame") {
-        if (games[gameCode]) {
-          // Broadcast the "endGame" message to all users and the host
-          Object.values(games[gameCode].users).forEach((userWs) => {
-            userWs.send(JSON.stringify({ action: "endGame" }));
-          });
-          games[gameCode].host.send(JSON.stringify({ action: "endGame" }));
-        }
-      }
-  }); 
+  });
 });
 
 server.listen(3001, () => {
