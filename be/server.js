@@ -12,11 +12,12 @@ const {
   handleEndGame,
   handleStartGame,
   addUserToGame,
+  handleGetActiveGames
 } = require("./handlers");
 
 wss.on("connection", (ws) => {
   ws.on("message", (message) => {
-    const message = JSON.parse(message);
+    message = JSON.parse(message);
     const { action } = message;
 
     switch (action) {
@@ -43,6 +44,11 @@ wss.on("connection", (ws) => {
       case "sendAnswer": {
         const { foundWords } = message;
         handleSendAnswer(ws, foundWords);
+      }
+
+      case "getActiveGames": {
+
+        handleGetActiveGames(ws);
       }
     }
   });

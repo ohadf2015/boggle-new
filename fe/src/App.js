@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from "react";
-import { Container } from "@mui/material";
+import { Routes, Route, Navigate } from "react-router-dom";
 import HostView from "./host/HostView";
 import PlayerView from "./player/PlayerView";
-import JoinView from "./JoinView";
-import ScorePage from './host/ScorePage';
+import JoinView from "./main/JoinView";
+import CreateGameView from "./main/CreateGameView"
+import JoinGameView from "main/JoinGameView";
 
 import { WebSocketContext } from "utils/WebSocketContext";
 const ws = new WebSocket("ws://localhost:3001");
@@ -12,21 +13,26 @@ function App() {
   const [gameCode, setGameCode] = useState("");
   const [username, setUsername] = useState("");
   const [isActive, setIsActive] = useState(false);
-
   const [isHost, setIsHost] = useState(false);
-
   const [users, setUsers] = useState([]);
+  const [activeGames, setActiveGames] = useState([]);
 
   useEffect(() => {
     ws.onmessage = (event) => {
-      const { action, users, isHost } = JSON.parse(event.data);
+      const { action, users, isHost, activeGames } = JSON.parse(event.data);
       if (action === "updateUsers") {
         setUsers(users);
       }
       if (action === "joined") {
         setIsHost(isHost);
         setIsActive(true);
-        
+
+      }
+      if (action === "activeGames") {
+        // Handle the list of active games received from the server
+        console.log("Active Games:", activeGames);
+        // Update your component's state with the list of active games
+        setActiveGames(activeGames);
       }
     };
   }, []);
@@ -35,39 +41,19 @@ function App() {
     ws.send(JSON.stringify({ action: "join", gameCode, username }));
   };
 
-  // Sample scores data
-  const scores = [
-    { username: 'Alice', points: 100 },
-    { username: 'Bob', points: 90 },
-    { username: 'Charlie', points: 85 },
-  ];
   return (
     <WebSocketContext.Provider value={ws}>
 
-    <Container>
-
-      {
-        (!isActive) ? (
-          <JoinView
-            handleJoin={handleJoin}
-            gameCode={gameCode}
-            username={username}
-            setGameCode={setGameCode}
-            setUsername={setUsername}
-          />
-        ) : 
-          isHost ? (<HostView gameCode={gameCode} users={users} />) : 
-          (
-            <PlayerView
-              handleJoin={handleJoin}
-              gameCode={gameCode}
-              username={username}
-              setGameCode={setGameCode}
-              setUsername={setUsername}
-            />
-            )}
-            <ScorePage scores={scores} />
-    </Container>
+      <>
+        <Routes>
+          <Route path="/" element={<Navigate replace to="/join-view" />} />
+          <Route path="/join-view" element={<JoinView />} />
+          <Route path="/create-game" element={<CreateGameView handleJoin={handleJoin} gameCode={gameCode} username={username} setGameCode={setGameCode} setUsername={setUsername} />} />
+          <Route path="/join-game" element={<JoinGameView />} />
+          <Route path="/host-game/:gameCode/:username" element={<HostView gameCode={gameCode} users={users} />} />
+          <Route path="/play-game/:gameCode/:username" element={<PlayerView handleJoin={handleJoin} gameCode={gameCode} username={username} setGameCode={setGameCode} setUsername={setUsername} />} />
+        </Routes>
+      </>
     </WebSocketContext.Provider>
   );
 }

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Typography, List, ListItem, Button, TextField } from "@mui/material";
-import '../style/animation.scss'; 
+import '../style/animation.scss';
 import { generateRandomTable } from "../utils/utils"
 import { useWebSocket } from "../utils/WebSocketContext";
 
@@ -26,14 +26,13 @@ const HostScreen = ({ gameCode, users }) => {
       // Emit a message to end the game through WebSocket
       // For example: socket.emit("endGame");
       clearInterval(timer);
-      // Show a popup and then navigate to the score page
       alert("Game Over! Navigating to score page...");
       // Navigate to the score page (assuming the route is '/score')
       // history.push('/score');
     }
-  
+
     return () => clearInterval(timer);
-  }, [remainingTime]);
+  }, [remainingTime, gameStarted]);
 
   const startGame = () => {
     setTableData(generateRandomTable());
@@ -48,9 +47,9 @@ const HostScreen = ({ gameCode, users }) => {
 
   return (
     <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", height: "100vh", backgroundColor: "#f2f2f2" }}>
-           <div className="animated-title">  
-      <span className="text">Boggle</span>
-    </div>
+      <div className="animated-title">
+        <span className="text">Boggle</span>
+      </div>
       <div style={{ display: "flex", flexDirection: "row", alignItems: "center", flexWrap: 'wrap' }}>
         <div style={{ backgroundColor: "#ffffff", borderRadius: "8px", padding: "16px", marginRight: "16px" }}>
           <Typography variant="h6">Game Code: {gameCode}</Typography>
@@ -62,7 +61,7 @@ const HostScreen = ({ gameCode, users }) => {
           </List>
         </div>
         <div style={{ display: "flex", flexDirection: "column", alignItems: "center", backgroundColor: "#ffffff", borderRadius: "8px", padding: "16px" }}>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(7, 70px)", gap: "20px", borderRadius: "12px"}}>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(7, 70px)", gap: "20px", borderRadius: "12px" }}>
             {tableData.map((row, i) =>
               row.map((cell, j) => (
                 <div
@@ -89,17 +88,17 @@ const HostScreen = ({ gameCode, users }) => {
         <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", marginLeft: "16px" }}>
           {!gameStarted ? (
             <>
-              <TextField 
-                label="Timer (min)" 
-                variant="outlined" 
-                type="number" 
+              <TextField
+                label="Timer (min)"
+                variant="outlined"
+                type="number"
                 value={timerValue}
                 onChange={(e) => setTimerValue(e.target.value)}
               />
-              <Button 
-                variant="contained" 
-                color="primary" 
-                disabled={!timerValue} 
+              <Button
+                variant="contained"
+                color="primary"
+                disabled={!timerValue}
                 onClick={startGame}
                 style={{ marginTop: "16px" }}
               >
@@ -107,9 +106,9 @@ const HostScreen = ({ gameCode, users }) => {
               </Button>
             </>
           ) : (
-            <Button 
-              variant="contained" 
-              color="secondary" 
+            <Button
+              variant="contained"
+              color="secondary"
               onClick={stopGame}
               style={{ marginTop: "16px" }}
             >
