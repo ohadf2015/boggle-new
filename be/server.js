@@ -12,7 +12,9 @@ const {
   handleEndGame,
   handleStartGame,
   addUserToGame,
-  handleGetActiveGames
+  handleSendAnswer,
+  handleGetActiveGames,
+  handleGetUsers
 } = require("./handlers");
 
 wss.on("connection", (ws) => {
@@ -37,18 +39,27 @@ wss.on("connection", (ws) => {
       }
 
       case "endGame": {
-        handleEndGame(ws);
+        const { gameCode } = message;
+        handleEndGame(gameCode);
         break;
       }
 
       case "sendAnswer": {
-        const { foundWords } = message;
-        handleSendAnswer(ws, foundWords);
+        const { foundWords, gameCode, username } = message;
+        handleSendAnswer(ws, foundWords, gameCode, username);
       }
 
       case "getActiveGames": {
 
         handleGetActiveGames(ws);
+      }
+
+      case "getUsers": {
+        const { gameCode } = message;
+        if (!gameCode) {
+          return;
+        }
+        handleGetUsers(ws, gameCode);
       }
     }
   });

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import { Button, Typography, Box, Paper, TextField } from "@mui/material";
 import { useParams, useNavigate } from "react-router-dom";
 import GameList from "components/GameList";
@@ -7,46 +7,32 @@ import { WebSocketContext } from "utils/WebSocketContext";
 
 const JoinGameView = () => {
     const navigate = useNavigate();
-    const { gameCode } = useParams();
     const [username, setUsername] = useState("");
     const [activeGamesData, setActiveGamesData] = useState([]);
     const [selectedGame, setSelectedGame] = useState("");
 
     const ws = useContext(WebSocketContext);
-
+    
 
     useEffect(() => {
-        const fetchData = async () => {
-            // Wait for the WebSocket connection to be established
-            await new Promise((resolve) => {
-                if (ws.readyState === WebSocket.OPEN) {
-                    resolve();
-                } else {
-                    // Listen for the WebSocket's "open" event to know when it's ready
-                    ws.addEventListener("open", () => {
-                        resolve();
-                    });
-                }
-            });
-
+        const handleOpen = () => {
             ws.send(JSON.stringify({ action: "getActiveGames" }));
-
-            // Listen for messages from the server
             ws.onmessage = (event) => {
                 const { action, activeGames } = JSON.parse(event.data);
                 if (action === "activeGames") {
-                    setActiveGamesData((activeGames) => {
-                        // // Merge the new data with the previous state
-                        // return [...prevActiveGamesData, ...activeGames];
-                    });
+                    setActiveGamesData(activeGames);
                 }
-                console.log(activeGamesData, 'active');
             };
         };
-
-        fetchData();
+    
+        if (ws.readyState === WebSocket.OPEN) {
+            handleOpen();
+        } else {
+            ws.onopen = handleOpen;
+        }
     }, [ws]);
-
+    
+  
 
     const handleSelectGame = (game) => {
         setSelectedGame(game);
@@ -55,6 +41,7 @@ const JoinGameView = () => {
     const handleStartGame = () => {
         if (username && selectedGame) {
             navigate(`/play-game/${selectedGame}/${username}`);
+            ws.send(JSON.stringify({ action: "join", gameCode: selectedGame, username }));
         } else {
             alert("Please enter your name and select a game.");
         }
@@ -79,9 +66,6 @@ const JoinGameView = () => {
                     value={username}
                     onChange={(e) => setUsername(e.target.value)}
                 />
-                <Typography variant="h6" align="center" gutterBottom>
-                    Choose a Game to Join:
-                </Typography>
                 {/* Use the GameList component to display active games */}
                 <GameList games={activeGamesData} selectedGame={selectedGame} onSelectGame={handleSelectGame} />
                 <Button

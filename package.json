@@ -6,7 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "npm run be && npm run fe",
-    "be": "cd be && npm start",
+    "be": "cd be && npm run dev",
     "fe": "cd fe && npm start"
   },
   "author": "",

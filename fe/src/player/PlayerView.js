@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Typography, Button, TextField, List, ListItem, IconButton } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import '../style/animation.scss';
@@ -12,10 +12,13 @@ const PlayerView = () => {
   const [word, setWord] = useState('');
   const [foundWords, setFoundWords] = useState([]);
 
+  const gameCode = window.location.pathname.split("/")[2];
+  const username = window.location.pathname.split("/")[3];
+
   ws.onmessage = (event) => {
     const { action } = JSON.parse(event.data);
     if (action === "endGame") {
-      ws.send(JSON.stringify({ action: "sendAnswer", foundWords }));
+      ws.send(JSON.stringify({ action: "sendAnswer", foundWords, gameCode, username }));
     }
   };
 
@@ -35,27 +38,7 @@ const PlayerView = () => {
       addWord();
     }
   };
-  // Add this in a useEffect in your PlayerView.js
-  useEffect(() => {
 
-    // Listen for the 'endGame' message from the server
-
-
-    // Listen for the 'endGame' message from the server
-    // Replace the alert with your logic to navigate to the score page
-    const handleEndGame = () => {
-      alert("Game Over! Navigating to score page...");
-      // Navigate to the score page (assuming the route is '/score')
-      // history.push('/score');
-    };
-
-    // Simulate receiving the 'endGame' event (you can replace this with your actual WebSocket code)
-    // For example: socket.on("endGame", handleEndGame);
-
-    // Cleanup by removing the event listener when the component unmounts
-    // Replace this with your actual WebSocket cleanup logic
-    // return () => socket.off("endGame", handleEndGame);
-  }, []);
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', height: '100vh', backgroundColor: '#f2f2f2' }}>

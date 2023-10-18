@@ -5,15 +5,33 @@ import { generateRandomTable } from "../utils/utils"
 import { useWebSocket } from "../utils/WebSocketContext";
 
 
-const HostScreen = ({ gameCode, users }) => {
+const HostScreen = () => {
   const ws = useWebSocket();
   const [tableData, setTableData] = useState(generateRandomTable());
   const [timerValue, setTimerValue] = useState('');
   const [remainingTime, setRemainingTime] = useState(null);
   const [gameStarted, setGameStarted] = useState(false);
+  const [usersInRoom, setUsersInRoom] = useState([]);
 
+  // get gameCode and timer from URL
+  const gameCode = window.location.pathname.split("/")[2];
+  // const timer = window.location.state.timer;
+  ws.onopen = () => {
+    ws.send(JSON.stringify({ action: "getUsers", gameCode }));
+  };
 
+  ws.onmessage = (event) => {
+    const { action, users } = JSON.parse(event.data);
+    if (action === "updateUsers") {
+      setUsersInRoom(users);
+    }
+  };
   useEffect(() => {
+
+    window.onbeforeunload = function () {
+      return "Are you sure you want to leave?";
+    };
+
     let timer;
     if (remainingTime !== null && remainingTime > 0) {
       timer = setInterval(() => {
@@ -55,7 +73,7 @@ const HostScreen = ({ gameCode, users }) => {
           <Typography variant="h6">Game Code: {gameCode}</Typography>
           <Typography variant="h6">Players in Room:</Typography>
           <List>
-            {users.map((user, index) => (
+            {usersInRoom.map((user, index) => (
               <ListItem key={index}>{user}</ListItem>
             ))}
           </List>

@@ -10,7 +10,6 @@ const CreateGameView = ({ gameCode, setGameCode }) => {
 
     const [timer, setTimer] = useState(5);
     const [numPlayers, setNumPlayers] = useState("");
-    const hostUsername = "host";
 
     const navigate = useNavigate();
 
@@ -24,7 +23,7 @@ const CreateGameView = ({ gameCode, setGameCode }) => {
         // Validate game code and other settings if needed
         if (gameCode && timer > 0) {
             // Navigate to the HostView page with the appropriate URL
-            navigate(`/host-game/${gameCode}/${hostUsername}`);
+            navigate(`/host-game/${gameCode}`, { state: { timer, numPlayers } });
 
             ws.send(JSON.stringify({ action: "createGame", gameCode }));
 

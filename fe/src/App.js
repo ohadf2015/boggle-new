@@ -50,7 +50,7 @@ function App() {
           <Route path="/join-view" element={<JoinView />} />
           <Route path="/create-game" element={<CreateGameView handleJoin={handleJoin} gameCode={gameCode} username={username} setGameCode={setGameCode} setUsername={setUsername} />} />
           <Route path="/join-game" element={<JoinGameView />} />
-          <Route path="/host-game/:gameCode/:username" element={<HostView gameCode={gameCode} users={users} />} />
+          <Route path="/host-game/:gameCode" element={<HostView/>} />
           <Route path="/play-game/:gameCode/:username" element={<PlayerView handleJoin={handleJoin} gameCode={gameCode} username={username} setGameCode={setGameCode} setUsername={setUsername} />} />
         </Routes>
       </>
