@@ -15,6 +15,7 @@ const {
   handleWordSubmission,
   handleSendAnswer,
   handleValidateWords,
+  getActiveRooms,
 } = require("./handlers");
 
 wss.on("connection", (ws) => {
@@ -55,6 +56,11 @@ wss.on("connection", (ws) => {
       case "validateWords": {
         const { validations } = message;
         handleValidateWords(ws, validations);
+        break;
+      }
+      case "getActiveRooms": {
+        const rooms = getActiveRooms();
+        ws.send(JSON.stringify({ action: "activeRooms", rooms }));
         break;
       }
     }

@@ -2,6 +2,15 @@ const games = {};
 const gameWs = {};
 const wsUsername = {};
 
+// Function to get active rooms
+const getActiveRooms = () => {
+  return Object.keys(games).map(gameCode => ({
+    gameCode,
+    playerCount: Object.keys(games[gameCode].users).length,
+    gameState: games[gameCode].gameState,
+  })).filter(room => room.gameState === 'waiting'); // Only show rooms waiting for players
+};
+
 // Achievement definitions
 const ACHIEVEMENTS = {
   FIRST_BLOOD: { name: 'First Blood', description: 'First to find a word', icon: '🎯' },
@@ -348,4 +357,5 @@ module.exports = {
   getWsHostFromGameCode,
   getWsFromUsername,
   getGameCodeFromUsername,
+  getActiveRooms,
 };

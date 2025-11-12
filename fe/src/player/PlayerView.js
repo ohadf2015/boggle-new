@@ -241,7 +241,8 @@ const PlayerView = () => {
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
-        padding: 3,
+        padding: { xs: 2, sm: 3 },
+        overflow: 'auto',
       }}
     >
       <Toaster position="top-center" />
@@ -260,7 +261,7 @@ const PlayerView = () => {
             alignItems: 'center',
             justifyContent: 'center',
             zIndex: 9999,
-            padding: 3,
+            padding: { xs: 2, sm: 3 },
           }}
         >
           <motion.div
@@ -271,7 +272,7 @@ const PlayerView = () => {
             <Paper
               elevation={24}
               sx={{
-                padding: 4,
+                padding: { xs: 2, sm: 4 },
                 maxWidth: 600,
                 width: '100%',
                 maxHeight: '80vh',
@@ -279,7 +280,15 @@ const PlayerView = () => {
                 borderRadius: 3,
               }}
             >
-              <Typography variant="h3" align="center" gutterBottom sx={{ color: '#FFD700' }}>
+              <Typography
+                variant="h3"
+                align="center"
+                gutterBottom
+                sx={{
+                  color: '#FFD700',
+                  fontSize: { xs: '1.75rem', sm: '2.5rem' }
+                }}
+              >
                 <FaTrophy /> Final Results
               </Typography>
 
@@ -362,7 +371,7 @@ const PlayerView = () => {
         className="animated-title"
         style={{ marginBottom: '20px' }}
       >
-        <span className="text">Boggle</span>
+        <span className="text" style={{ fontSize: 'clamp(2rem, 8vw, 4rem)' }}>Boggle</span>
       </motion.div>
 
       {/* Score Display */}
@@ -370,26 +379,32 @@ const PlayerView = () => {
         initial={{ scale: 0 }}
         animate={{ scale: 1 }}
         transition={{ type: 'spring', stiffness: 260, damping: 20 }}
+        style={{ width: '100%', maxWidth: '400px' }}
       >
         <Paper
           elevation={6}
           sx={{
-            padding: 3,
+            padding: { xs: 2, sm: 3 },
             marginBottom: 3,
             background: 'linear-gradient(45deg, #FE6B8B 30%, #FF8E53 90%)',
             color: 'white',
-            minWidth: 200,
             textAlign: 'center',
           }}
         >
-          <Typography variant="h3" fontWeight="bold">
+          <Typography
+            variant="h3"
+            fontWeight="bold"
+            sx={{ fontSize: { xs: '2rem', sm: '3rem' } }}
+          >
             {score}
           </Typography>
           <Typography variant="body2">POINTS</Typography>
           {combo > 2 && (
             <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', mt: 1 }}>
               <FaFire style={{ color: '#FFD700', marginRight: 5 }} />
-              <Typography variant="h6">{combo}x COMBO!</Typography>
+              <Typography variant="h6" sx={{ fontSize: { xs: '1rem', sm: '1.25rem' } }}>
+                {combo}x COMBO!
+              </Typography>
             </Box>
           )}
         </Paper>
@@ -400,10 +415,16 @@ const PlayerView = () => {
         <motion.div
           initial={{ y: -20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
-          style={{ marginBottom: 16 }}
+          style={{ marginBottom: 16, width: '100%', maxWidth: '800px' }}
         >
-          <Paper elevation={6} sx={{ padding: 2, background: 'rgba(255, 255, 255, 0.95)' }}>
-            <Typography variant="h6" gutterBottom fontWeight="bold" color="primary">
+          <Paper elevation={6} sx={{ padding: { xs: 1.5, sm: 2 }, background: 'rgba(255, 255, 255, 0.95)' }}>
+            <Typography
+              variant="h6"
+              gutterBottom
+              fontWeight="bold"
+              color="primary"
+              sx={{ fontSize: { xs: '1rem', sm: '1.25rem' } }}
+            >
               🏆 Your Achievements
             </Typography>
             <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
@@ -415,7 +436,7 @@ const PlayerView = () => {
                     background: 'linear-gradient(45deg, #FE6B8B 30%, #FF8E53 90%)',
                     color: 'white',
                     fontWeight: 'bold',
-                    fontSize: '0.9rem',
+                    fontSize: { xs: '0.7rem', sm: '0.9rem' },
                   }}
                 />
               ))}
@@ -424,18 +445,43 @@ const PlayerView = () => {
         </motion.div>
       )}
 
-      <Box sx={{ display: 'flex', gap: 3, width: '100%', maxWidth: 1400, flexWrap: 'wrap' }}>
+      <Box sx={{
+        display: 'flex',
+        flexDirection: { xs: 'column', lg: 'row' },
+        gap: 3,
+        width: '100%',
+        maxWidth: 1400,
+        alignItems: 'stretch'
+      }}>
         {/* Letter Grid */}
         {letterGrid && (
-          <Paper elevation={6} sx={{ padding: 3, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-            <Typography variant="h6" gutterBottom fontWeight="bold" color="primary">
+          <Paper elevation={6} sx={{
+            padding: { xs: 2, sm: 3 },
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            minWidth: { xs: '100%', sm: 'auto' }
+          }}>
+            <Typography
+              variant="h6"
+              gutterBottom
+              fontWeight="bold"
+              color="primary"
+              sx={{ fontSize: { xs: '1rem', sm: '1.25rem' } }}
+            >
               Letter Grid
             </Typography>
             <Box
               sx={{
                 display: 'grid',
-                gridTemplateColumns: 'repeat(7, 50px)',
-                gap: '8px',
+                gridTemplateColumns: {
+                  xs: 'repeat(7, minmax(35px, 1fr))',
+                  sm: 'repeat(7, 50px)',
+                  md: 'repeat(7, 60px)',
+                },
+                gap: { xs: '6px', sm: '8px' },
+                width: '100%',
+                maxWidth: { xs: '100%', sm: '400px', md: '480px' },
               }}
             >
               {letterGrid.map((row, i) =>
@@ -446,16 +492,16 @@ const PlayerView = () => {
                   >
                     <Box
                       sx={{
-                        width: '50px',
-                        height: '50px',
+                        width: '100%',
+                        aspectRatio: '1',
                         display: 'flex',
                         justifyContent: 'center',
                         alignItems: 'center',
-                        fontSize: '24px',
+                        fontSize: { xs: '1.2rem', sm: '1.5rem' },
                         fontWeight: 'bold',
                         background: `linear-gradient(135deg, ${getLetterColor(i, j)} 0%, ${getLetterColor(i + 1, j + 1)} 100%)`,
                         color: 'white',
-                        borderRadius: '8px',
+                        borderRadius: { xs: '6px', sm: '8px' },
                         boxShadow: '0 2px 4px rgba(0,0,0,0.2)',
                       }}
                     >
@@ -469,8 +515,20 @@ const PlayerView = () => {
         )}
 
         {/* Word Input and List */}
-        <Paper elevation={6} sx={{ flex: 1, padding: 3, maxHeight: '70vh', overflow: 'auto', minWidth: 300 }}>
-          <Typography variant="h5" gutterBottom fontWeight="bold" color="primary">
+        <Paper elevation={6} sx={{
+          flex: 1,
+          padding: { xs: 2, sm: 3 },
+          maxHeight: '70vh',
+          overflow: 'auto',
+          minWidth: { xs: '100%', sm: 300 }
+        }}>
+          <Typography
+            variant="h5"
+            gutterBottom
+            fontWeight="bold"
+            color="primary"
+            sx={{ fontSize: { xs: '1.25rem', sm: '1.5rem' } }}
+          >
             Found Words ({foundWords.length})
           </Typography>
 
@@ -540,8 +598,17 @@ const PlayerView = () => {
         </Paper>
 
         {/* Live Leaderboard */}
-        <Paper elevation={6} sx={{ width: 300, padding: 3 }}>
-          <Typography variant="h5" gutterBottom fontWeight="bold" color="primary">
+        <Paper elevation={6} sx={{
+          width: { xs: '100%', sm: 300 },
+          padding: { xs: 2, sm: 3 }
+        }}>
+          <Typography
+            variant="h5"
+            gutterBottom
+            fontWeight="bold"
+            color="primary"
+            sx={{ fontSize: { xs: '1.25rem', sm: '1.5rem' } }}
+          >
             <FaTrophy style={{ marginRight: 8, color: '#FFD700' }} />
             Leaderboard
           </Typography>
