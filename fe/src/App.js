@@ -4,6 +4,7 @@ import HostView from "./host/HostView";
 import PlayerView from "./player/PlayerView";
 import JoinView from "./JoinView";
 import ScorePage from './host/ScorePage';
+import ResultsPage from './ResultsPage';
 
 import { WebSocketContext } from "utils/WebSocketContext";
 const ws = new WebSocket("ws://localhost:3001");
@@ -18,6 +19,8 @@ function App() {
   const [users, setUsers] = useState([]);
   const [error, setError] = useState("");
   const [activeRooms, setActiveRooms] = useState([]);
+  const [showResults, setShowResults] = useState(false);
+  const [resultsData, setResultsData] = useState(null);
 
   useEffect(() => {
     ws.onmessage = (event) => {
@@ -80,6 +83,11 @@ function App() {
     ws.send(JSON.stringify({ action: "getActiveRooms" }));
   };
 
+  const handleReturnToRoom = () => {
+    setShowResults(false);
+    setResultsData(null);
+  };
+
   // Sample scores data
   const scores = [
     { username: 'Alice', points: 100 },
@@ -88,7 +96,14 @@ function App() {
   ];
   return (
     <WebSocketContext.Provider value={ws}>
-      {(!isActive) ? (
+      {showResults ? (
+        <ResultsPage
+          finalScores={resultsData?.scores}
+          letterGrid={resultsData?.letterGrid}
+          gameCode={gameCode}
+          onReturnToRoom={handleReturnToRoom}
+        />
+      ) : (!isActive) ? (
         <JoinView
           handleJoin={handleJoin}
           gameCode={gameCode}
@@ -108,6 +123,10 @@ function App() {
             username={username}
             setGameCode={setGameCode}
             setUsername={setUsername}
+            onShowResults={(data) => {
+              setResultsData(data);
+              setShowResults(true);
+            }}
           />
         )
       }

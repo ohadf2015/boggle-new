@@ -1,14 +1,15 @@
 const games = {};
-const gameWs = {};
-const wsUsername = {};
+// Use Map instead of plain objects to properly store WebSocket as keys
+const gameWs = new Map();
+const wsUsername = new Map();
 
-// Function to get active rooms
+// Function to get active rooms (show all rooms while host is present)
 const getActiveRooms = () => {
   return Object.keys(games).map(gameCode => ({
     gameCode,
     playerCount: Object.keys(games[gameCode].users).length,
     gameState: games[gameCode].gameState,
-  })).filter(room => room.gameState === 'waiting'); // Only show rooms waiting for players
+  })); // Show all rooms as long as they exist (host hasn't left)
 };
 
 // Achievement definitions (Hebrew) - Expanded
@@ -56,7 +57,7 @@ const setNewGame = (gameCode, host) => {
         };
         // Send confirmation to host
         host.send(JSON.stringify({ action: "joined", isHost: true }));
-        gameWs[host] = gameCode;
+        gameWs.set(host, gameCode);
     } else {
         host.send(JSON.stringify({ action: "gameExists" }));
         return;
@@ -78,8 +79,8 @@ const addUserToGame = (gameCode, username, ws) => {
     games[gameCode].playerWords[username] = [];
     games[gameCode].playerAchievements[username] = [];
     games[gameCode].playerWordDetails[username] = [];
-    gameWs[ws] = gameCode;
-    wsUsername[ws] = username;
+    gameWs.set(ws, gameCode);
+    wsUsername.set(ws, username);
 
     // Send confirmation to the player who just joined
     ws.send(JSON.stringify({ action: "joined", isHost: false }));
@@ -89,7 +90,7 @@ const addUserToGame = (gameCode, username, ws) => {
 }
 
 const handleStartGame = (host, letterGrid, timerSeconds) => {
-  const gameCode = gameWs[host];
+  const gameCode = gameWs.get(host);
   games[gameCode].gameState = 'playing';
   games[gameCode].startTime = Date.now();
   games[gameCode].letterGrid = letterGrid;
@@ -109,7 +110,7 @@ const handleStartGame = (host, letterGrid, timerSeconds) => {
 }
 
 const handleEndGame = (host) => {
-  const gameCode = gameWs[host];
+  const gameCode = gameWs.get(host);
   games[gameCode].gameState = 'ended';
 
   // Calculate final scores with detailed stats
@@ -144,8 +145,8 @@ const handleEndGame = (host) => {
 }
 
 const handleSendAnswer = (ws, foundWords) => {
-  const gameCode = gameWs[ws];
-  const username = wsUsername[ws];
+  const gameCode = gameWs.get(ws);
+  const username = wsUsername.get(ws);
   const wsHost = getWsHostFromGameCode(gameCode);
   console.log("sendAnswer", username, gameCode, wsHost, foundWords);
   sendHostAMessage(gameCode, { action: "updateScores", username, foundWords });
@@ -230,8 +231,8 @@ const checkLiveAchievements = (gameCode, username, word, timeSinceStart) => {
 
 // New function: Handle real-time word submission
 const handleWordSubmission = (ws, word) => {
-  const gameCode = gameWs[ws];
-  const username = wsUsername[ws];
+  const gameCode = gameWs.get(ws);
+  const username = wsUsername.get(ws);
 
   if (!games[gameCode] || games[gameCode].gameState !== 'playing') {
     return;
@@ -314,7 +315,7 @@ const sendHostAMessage = (gameCode, message) => {
 
 const getGame = (gameCode) => games[gameCode];
 
-const getUsernameFromWs = (ws) => wsUsername[ws];
+const getUsernameFromWs = (ws) => wsUsername.get(ws);
 
 const getWsHostFromGameCode = (gameCode) => games[gameCode].host;
 
@@ -329,9 +330,42 @@ const getGameCodeFromUsername = (username) => {
   return null;
 }
 
+// Cleanup when a connection closes
+const handleDisconnect = (ws) => {
+  const gameCode = gameWs.get(ws);
+  const username = wsUsername.get(ws);
+
+  if (gameCode && games[gameCode]) {
+    // Check if this was the host
+    if (games[gameCode].host === ws) {
+      // Host left - delete the entire game
+      console.log(`Host left game ${gameCode}, deleting game`);
+      delete games[gameCode];
+    } else if (username && games[gameCode].users[username]) {
+      // Player left - remove them from the game
+      console.log(`Player ${username} left game ${gameCode}`);
+      delete games[gameCode].users[username];
+      delete games[gameCode].playerScores[username];
+      delete games[gameCode].playerWords[username];
+      delete games[gameCode].playerAchievements[username];
+      delete games[gameCode].playerWordDetails[username];
+
+      // Notify host of updated user list
+      sendHostAMessage(gameCode, {
+        action: "updateUsers",
+        users: Object.keys(games[gameCode].users)
+      });
+    }
+  }
+
+  // Clean up the mappings
+  gameWs.delete(ws);
+  wsUsername.delete(ws);
+};
+
 // Handle word validation by host - THIS IS WHERE SCORING HAPPENS
 const handleValidateWords = (host, validations, letterGrid) => {
-  const gameCode = gameWs[host];
+  const gameCode = gameWs.get(host);
   if (!games[gameCode]) return;
 
   // Reset all scores before calculating
@@ -507,4 +541,5 @@ module.exports = {
   getWsFromUsername,
   getGameCodeFromUsername,
   getActiveRooms,
+  handleDisconnect,
 };

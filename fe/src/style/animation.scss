@@ -1,27 +1,81 @@
 .animated-title {
     font-size: 48px;
-    font-weight: bold;
+    font-weight: 900;
     text-align: center;
     margin-bottom: 20px;
-    color: purple;
-    animation: titleAnimation 3s infinite alternate;
+    perspective: 1000px;
+    position: relative;
   }
-  
+
   .text {
     display: inline-block;
     transform-origin: 50% 50%;
+    background: linear-gradient(135deg,
+      #667eea 0%,
+      #764ba2 25%,
+      #f093fb 50%,
+      #4facfe 75%,
+      #667eea 100%
+    );
+    background-size: 300% 300%;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-shadow: 0 0 20px rgba(102, 126, 234, 0.5);
+    animation: gradientFlow 4s ease infinite, titleBounce 2s ease-in-out infinite, textGlow 3s ease-in-out infinite;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    position: relative;
+
+    &::before {
+      content: 'Boggle';
+      position: absolute;
+      left: 0;
+      top: 0;
+      z-index: -1;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      filter: blur(10px);
+      opacity: 0.6;
+    }
   }
-  
-  @keyframes titleAnimation {
+
+  @keyframes gradientFlow {
     0% {
-      transform: scale(1);
+      background-position: 0% 50%;
     }
     50% {
-      transform: scale(1.1);
-      color: #993399;  /* A different shade of purple */
+      background-position: 100% 50%;
     }
     100% {
-      transform: scale(1);
+      background-position: 0% 50%;
+    }
+  }
+
+  @keyframes titleBounce {
+    0%, 100% {
+      transform: translateY(0) rotateX(0deg);
+    }
+    25% {
+      transform: translateY(-10px) rotateX(5deg);
+    }
+    50% {
+      transform: translateY(0) rotateX(0deg);
+    }
+    75% {
+      transform: translateY(-5px) rotateX(-5deg);
+    }
+  }
+
+  @keyframes textGlow {
+    0%, 100% {
+      filter: drop-shadow(0 0 5px rgba(102, 126, 234, 0.5));
+    }
+    50% {
+      filter: drop-shadow(0 0 20px rgba(118, 75, 162, 0.8))
+              drop-shadow(0 0 30px rgba(240, 147, 251, 0.6));
     }
   }
   
