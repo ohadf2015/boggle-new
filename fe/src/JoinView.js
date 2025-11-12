@@ -15,14 +15,21 @@ import {
   ListItemText,
   Chip,
   Divider,
-  Tooltip
+  Tooltip,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
 } from '@mui/material';
 import { motion } from 'framer-motion';
-import { FaGamepad, FaCrown, FaUser, FaDice, FaSync } from 'react-icons/fa';
+import { FaGamepad, FaCrown, FaUser, FaDice, FaSync, FaQrcode } from 'react-icons/fa';
+import { QRCodeSVG } from 'qrcode.react';
 import './style/animation.scss';
 
 const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, error, activeRooms, refreshRooms }) => {
   const [mode, setMode] = useState('join'); // 'join' or 'host'
+  const [showQR, setShowQR] = useState(false);
+  const [usernameError, setUsernameError] = useState(false);
 
   const handleModeChange = (event, newMode) => {
     if (newMode !== null) {
@@ -41,11 +48,24 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
 
   const handleSubmit = (e) => {
     e.preventDefault();
+
+    // Check if username is filled
+    if (!username || !username.trim()) {
+      setUsernameError(true);
+      setTimeout(() => setUsernameError(false), 2000);
+      return;
+    }
+
     handleJoin(mode === 'host');
   };
 
   const handleRoomSelect = (roomCode) => {
     setGameCode(roomCode);
+  };
+
+  // Get the join URL for QR code
+  const getJoinUrl = () => {
+    return `${window.location.origin}?room=${gameCode}`;
   };
 
   return (
@@ -304,18 +324,33 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
                   </motion.div>
                 )}
 
-                <TextField
-                  fullWidth
-                  label="Username"
-                  variant="outlined"
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
-                  required
-                  placeholder="Enter your name"
-                  inputProps={{
-                    maxLength: 20,
-                  }}
-                />
+                <motion.div
+                  animate={usernameError ? { x: [-10, 10, -10, 10, 0] } : {}}
+                  transition={{ duration: 0.4 }}
+                >
+                  <TextField
+                    fullWidth
+                    label="Username"
+                    variant="outlined"
+                    value={username}
+                    onChange={(e) => {
+                      setUsername(e.target.value);
+                      if (usernameError) setUsernameError(false);
+                    }}
+                    required
+                    error={usernameError}
+                    helperText={usernameError ? "שם משתמש נדרש! אנא מלא את השדה" : ""}
+                    placeholder="Enter your name"
+                    inputProps={{
+                      maxLength: 20,
+                    }}
+                    sx={{
+                      '& .MuiOutlinedInput-root': {
+                        backgroundColor: usernameError ? 'rgba(255, 0, 0, 0.05)' : 'inherit',
+                      },
+                    }}
+                  />
+                </motion.div>
 
                 <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                   <Button
@@ -361,10 +396,75 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
                   ? 'Host a game and share the code with friends!'
                   : 'Enter the game code shared by your host'}
               </Typography>
+
+              {/* QR Code Button for Hosts */}
+              {mode === 'host' && gameCode && (
+                <Box sx={{ mt: 2 }}>
+                  <Button
+                    variant="outlined"
+                    size="small"
+                    startIcon={<FaQrcode />}
+                    onClick={() => setShowQR(true)}
+                    sx={{
+                      borderColor: '#667eea',
+                      color: '#667eea',
+                      '&:hover': {
+                        borderColor: '#764ba2',
+                        backgroundColor: 'rgba(102, 126, 234, 0.04)',
+                      },
+                    }}
+                  >
+                    הצג קוד QR
+                  </Button>
+                </Box>
+              )}
             </Box>
           </Paper>
         </motion.div>
       </Box>
+
+      {/* QR Code Dialog */}
+      <Dialog
+        open={showQR}
+        onClose={() => setShowQR(false)}
+        maxWidth="sm"
+        fullWidth
+      >
+        <DialogTitle sx={{ textAlign: 'center', fontWeight: 'bold', color: '#667eea' }}>
+          <FaQrcode style={{ marginLeft: 8 }} />
+          קוד QR להצטרפות
+        </DialogTitle>
+        <DialogContent sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2, py: 4 }}>
+          <Box
+            sx={{
+              padding: 3,
+              background: 'white',
+              borderRadius: 2,
+              boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+            }}
+          >
+            <QRCodeSVG value={getJoinUrl()} size={250} level="H" includeMargin />
+          </Box>
+          <Typography variant="h4" fontWeight="bold" color="primary">
+            {gameCode}
+          </Typography>
+          <Typography variant="body2" color="text.secondary" textAlign="center">
+            סרוק את הקוד כדי להצטרף למשחק או השתמש בקוד {gameCode}
+          </Typography>
+        </DialogContent>
+        <DialogActions sx={{ justifyContent: 'center', pb: 3 }}>
+          <Button
+            onClick={() => setShowQR(false)}
+            variant="contained"
+            sx={{
+              background: 'linear-gradient(45deg, #667eea 30%, #764ba2 90%)',
+              color: 'white',
+            }}
+          >
+            סגור
+          </Button>
+        </DialogActions>
+      </Dialog>
 
       {/* Floating particles effect */}
       <Box
