@@ -218,7 +218,8 @@ const HostView = ({ gameCode, users }) => {
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
-        padding: 3,
+        padding: { xs: 2, sm: 3 },
+        overflow: 'auto',
       }}
     >
       <Toaster position="top-center" />
@@ -237,7 +238,7 @@ const HostView = ({ gameCode, users }) => {
             alignItems: 'center',
             justifyContent: 'center',
             zIndex: 9999,
-            padding: 3,
+            padding: { xs: 2, sm: 3 },
             overflow: 'auto',
           }}
         >
@@ -250,13 +251,22 @@ const HostView = ({ gameCode, users }) => {
             <Paper
               elevation={24}
               sx={{
-                padding: 4,
+                padding: { xs: 2, sm: 4 },
                 maxHeight: '90vh',
                 overflow: 'auto',
                 borderRadius: 3,
               }}
             >
-              <Typography variant="h4" align="center" gutterBottom sx={{ color: '#667eea', fontWeight: 'bold' }}>
+              <Typography
+                variant="h4"
+                align="center"
+                gutterBottom
+                sx={{
+                  color: '#667eea',
+                  fontWeight: 'bold',
+                  fontSize: { xs: '1.5rem', sm: '2rem' }
+                }}
+              >
                 ✅ Validate Words
               </Typography>
               <Typography variant="body1" align="center" gutterBottom sx={{ mb: 3, color: 'text.secondary' }}>
@@ -273,12 +283,18 @@ const HostView = ({ gameCode, users }) => {
                   <Paper
                     elevation={4}
                     sx={{
-                      padding: 3,
+                      padding: { xs: 2, sm: 3 },
                       marginBottom: 3,
                       background: 'linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)',
                     }}
                   >
-                    <Typography variant="h6" fontWeight="bold" gutterBottom color="primary">
+                    <Typography
+                      variant="h6"
+                      fontWeight="bold"
+                      gutterBottom
+                      color="primary"
+                      sx={{ fontSize: { xs: '1rem', sm: '1.25rem' } }}
+                    >
                       {player.username} ({player.words.length} words)
                     </Typography>
 
@@ -301,8 +317,8 @@ const HostView = ({ gameCode, users }) => {
                                   : 'linear-gradient(45deg, #f44336 30%, #e91e63 90%)',
                                 color: 'white',
                                 fontWeight: 'bold',
-                                fontSize: '1rem',
-                                padding: '20px 12px',
+                                fontSize: { xs: '0.8rem', sm: '1rem' },
+                                padding: { xs: '16px 8px', sm: '20px 12px' },
                                 cursor: 'pointer',
                                 transition: 'all 0.3s ease',
                                 '&:hover': {
@@ -355,7 +371,7 @@ const HostView = ({ gameCode, users }) => {
             alignItems: 'center',
             justifyContent: 'center',
             zIndex: 9999,
-            padding: 3,
+            padding: { xs: 2, sm: 3 },
           }}
         >
           <motion.div
@@ -366,7 +382,7 @@ const HostView = ({ gameCode, users }) => {
             <Paper
               elevation={24}
               sx={{
-                padding: 4,
+                padding: { xs: 2, sm: 4 },
                 maxWidth: 700,
                 width: '100%',
                 maxHeight: '80vh',
@@ -374,7 +390,15 @@ const HostView = ({ gameCode, users }) => {
                 borderRadius: 3,
               }}
             >
-              <Typography variant="h3" align="center" gutterBottom sx={{ color: '#FFD700' }}>
+              <Typography
+                variant="h3"
+                align="center"
+                gutterBottom
+                sx={{
+                  color: '#FFD700',
+                  fontSize: { xs: '1.75rem', sm: '2.5rem' }
+                }}
+              >
                 <FaTrophy /> Final Results
               </Typography>
 
@@ -466,7 +490,7 @@ const HostView = ({ gameCode, users }) => {
         className="animated-title"
         style={{ marginBottom: '20px' }}
       >
-        <span className="text">Boggle</span>
+        <span className="text" style={{ fontSize: 'clamp(2rem, 8vw, 4rem)' }}>Boggle</span>
       </motion.div>
 
       {/* Game Code Display */}
@@ -474,26 +498,37 @@ const HostView = ({ gameCode, users }) => {
         initial={{ scale: 0 }}
         animate={{ scale: 1 }}
         transition={{ type: 'spring', stiffness: 260, damping: 20 }}
+        style={{ width: '100%', maxWidth: '600px', marginBottom: '24px' }}
       >
         <Paper
           elevation={6}
           sx={{
-            padding: 2,
-            marginBottom: 3,
+            padding: { xs: 1.5, sm: 2 },
             background: 'linear-gradient(45deg, #2196F3 30%, #21CBF3 90%)',
             color: 'white',
             textAlign: 'center',
           }}
         >
-          <Typography variant="h4" fontWeight="bold">
+          <Typography
+            variant="h4"
+            fontWeight="bold"
+            sx={{ fontSize: { xs: '1.5rem', sm: '2rem' } }}
+          >
             Game Code: {gameCode}
           </Typography>
         </Paper>
       </motion.div>
 
-      <Box sx={{ display: 'flex', gap: 3, width: '100%', maxWidth: 1400, flexWrap: 'wrap' }}>
+      <Box sx={{
+        display: 'flex',
+        flexDirection: { xs: 'column', lg: 'row' },
+        gap: 3,
+        width: '100%',
+        maxWidth: 1400,
+        alignItems: 'stretch'
+      }}>
         {/* Players Section */}
-        <Paper elevation={6} sx={{ minWidth: 250, padding: 3 }}>
+        <Paper elevation={6} sx={{ minWidth: { xs: '100%', sm: 250 }, padding: { xs: 2, sm: 3 } }}>
           <Typography variant="h6" gutterBottom fontWeight="bold" color="primary">
             <FaUsers style={{ marginRight: 8 }} />
             Players ({playersReady.length})
@@ -529,7 +564,13 @@ const HostView = ({ gameCode, users }) => {
         </Paper>
 
         {/* Game Board */}
-        <Paper elevation={6} sx={{ flex: 1, padding: 3, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+        <Paper elevation={6} sx={{
+          flex: 1,
+          padding: { xs: 2, sm: 3 },
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center'
+        }}>
           {/* Timer */}
           {remainingTime !== null && (
             <motion.div
@@ -539,7 +580,7 @@ const HostView = ({ gameCode, users }) => {
             >
               <Box
                 sx={{
-                  padding: 2,
+                  padding: { xs: 1.5, sm: 2 },
                   marginBottom: 3,
                   background:
                     remainingTime < 30
@@ -553,7 +594,11 @@ const HostView = ({ gameCode, users }) => {
                 }}
               >
                 <FaClock />
-                <Typography variant="h4" fontWeight="bold">
+                <Typography
+                  variant="h4"
+                  fontWeight="bold"
+                  sx={{ fontSize: { xs: '1.5rem', sm: '2rem' } }}
+                >
                   {formatTime(remainingTime)}
                 </Typography>
               </Box>
@@ -564,9 +609,15 @@ const HostView = ({ gameCode, users }) => {
           <Box
             sx={{
               display: 'grid',
-              gridTemplateColumns: 'repeat(7, 70px)',
-              gap: '12px',
+              gridTemplateColumns: {
+                xs: 'repeat(7, minmax(35px, 1fr))',
+                sm: 'repeat(7, 60px)',
+                md: 'repeat(7, 70px)',
+              },
+              gap: { xs: '6px', sm: '10px', md: '12px' },
               marginBottom: 3,
+              width: '100%',
+              maxWidth: { xs: '100%', sm: '500px', md: '580px' },
             }}
           >
             {tableData.map((row, i) =>
@@ -585,16 +636,16 @@ const HostView = ({ gameCode, users }) => {
                 >
                   <Box
                     sx={{
-                      width: '70px',
-                      height: '70px',
+                      width: '100%',
+                      aspectRatio: '1',
                       display: 'flex',
                       justifyContent: 'center',
                       alignItems: 'center',
-                      fontSize: '32px',
+                      fontSize: { xs: '1.2rem', sm: '1.8rem', md: '2rem' },
                       fontWeight: 'bold',
                       background: `linear-gradient(135deg, ${getLetterColor(i, j)} 0%, ${getLetterColor(i + 1, j + 1)} 100%)`,
                       color: 'white',
-                      borderRadius: '12px',
+                      borderRadius: { xs: '8px', sm: '10px', md: '12px' },
                       boxShadow: '0 4px 8px rgba(0,0,0,0.2)',
                       cursor: 'pointer',
                       transition: 'all 0.3s ease',
@@ -650,8 +701,14 @@ const HostView = ({ gameCode, users }) => {
         </Paper>
 
         {/* Live Leaderboard */}
-        <Paper elevation={6} sx={{ minWidth: 300, padding: 3 }}>
-          <Typography variant="h6" gutterBottom fontWeight="bold" color="primary">
+        <Paper elevation={6} sx={{ minWidth: { xs: '100%', sm: 300 }, padding: { xs: 2, sm: 3 } }}>
+          <Typography
+            variant="h6"
+            gutterBottom
+            fontWeight="bold"
+            color="primary"
+            sx={{ fontSize: { xs: '1rem', sm: '1.25rem' } }}
+          >
             <FaTrophy style={{ marginRight: 8, color: '#FFD700' }} />
             Live Scores
           </Typography>

@@ -1,21 +1,51 @@
 import React, { useState } from 'react';
-import { TextField, Button, Typography, Paper, Box, ToggleButton, ToggleButtonGroup } from '@mui/material';
+import {
+  TextField,
+  Button,
+  Typography,
+  Paper,
+  Box,
+  ToggleButton,
+  ToggleButtonGroup,
+  Alert,
+  IconButton,
+  List,
+  ListItem,
+  ListItemButton,
+  ListItemText,
+  Chip,
+  Divider,
+  Tooltip
+} from '@mui/material';
 import { motion } from 'framer-motion';
-import { FaGamepad, FaCrown, FaUser } from 'react-icons/fa';
+import { FaGamepad, FaCrown, FaUser, FaDice, FaSync } from 'react-icons/fa';
 import './style/animation.scss';
 
-const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername }) => {
+const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, error, activeRooms, refreshRooms }) => {
   const [mode, setMode] = useState('join'); // 'join' or 'host'
 
   const handleModeChange = (event, newMode) => {
     if (newMode !== null) {
       setMode(newMode);
+      // Auto-generate code when switching to host mode
+      if (newMode === 'host') {
+        generateRoomCode();
+      }
     }
+  };
+
+  const generateRoomCode = () => {
+    const code = Math.floor(1000 + Math.random() * 9000).toString();
+    setGameCode(code);
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
     handleJoin(mode === 'host');
+  };
+
+  const handleRoomSelect = (roomCode) => {
+    setGameCode(roomCode);
   };
 
   return (
@@ -27,7 +57,8 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername }) 
         flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'center',
-        padding: 3,
+        padding: { xs: 2, sm: 3 },
+        overflow: 'auto',
       }}
     >
       {/* Animated Title */}
@@ -36,146 +67,304 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername }) 
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.5 }}
         className="animated-title"
-        style={{ marginBottom: '40px' }}
+        style={{ marginBottom: '30px' }}
       >
-        <span className="text">Boggle</span>
+        <span className="text" style={{ fontSize: 'clamp(2rem, 8vw, 4rem)' }}>Boggle</span>
       </motion.div>
 
-      <motion.div
-        initial={{ scale: 0, rotate: -10 }}
-        animate={{ scale: 1, rotate: 0 }}
-        transition={{ type: 'spring', stiffness: 260, damping: 20 }}
+      <Box
+        sx={{
+          display: 'flex',
+          flexDirection: { xs: 'column', md: 'row' },
+          gap: 3,
+          width: '100%',
+          maxWidth: '1200px',
+          alignItems: { xs: 'stretch', md: 'flex-start' },
+        }}
       >
-        <Paper
-          elevation={12}
-          sx={{
-            padding: 4,
-            minWidth: 400,
-            borderRadius: 4,
-            background: 'rgba(255, 255, 255, 0.95)',
-            backdropFilter: 'blur(10px)',
-          }}
-        >
-          <Box sx={{ textAlign: 'center', marginBottom: 3 }}>
-            <FaGamepad size={48} color="#667eea" />
-            <Typography variant="h4" fontWeight="bold" sx={{ marginTop: 2, color: '#667eea' }}>
-              Welcome to Boggle!
-            </Typography>
-            <Typography variant="body2" color="text.secondary" sx={{ marginTop: 1 }}>
-              Choose your role to get started
-            </Typography>
-          </Box>
-
-          {/* Mode Selection */}
-          <Box sx={{ marginBottom: 3, display: 'flex', justifyContent: 'center' }}>
-            <ToggleButtonGroup
-              value={mode}
-              exclusive
-              onChange={handleModeChange}
-              aria-label="game mode"
-              fullWidth
+        {/* Active Rooms Panel */}
+        {mode === 'join' && (
+          <motion.div
+            initial={{ x: -50, opacity: 0 }}
+            animate={{ x: 0, opacity: 1 }}
+            transition={{ duration: 0.5 }}
+            style={{ flex: 1, minWidth: 0 }}
+          >
+            <Paper
+              elevation={8}
+              sx={{
+                padding: { xs: 2, sm: 3 },
+                borderRadius: 4,
+                background: 'rgba(255, 255, 255, 0.95)',
+                backdropFilter: 'blur(10px)',
+                height: '100%',
+                maxHeight: { xs: '300px', md: '500px' },
+                display: 'flex',
+                flexDirection: 'column',
+              }}
             >
-              <ToggleButton value="join" aria-label="join game">
-                <FaUser style={{ marginRight: 8 }} />
-                Join Game
-              </ToggleButton>
-              <ToggleButton value="host" aria-label="host game">
-                <FaCrown style={{ marginRight: 8 }} />
-                Host Game
-              </ToggleButton>
-            </ToggleButtonGroup>
-          </Box>
+              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+                <Typography variant="h6" fontWeight="bold" color="#667eea">
+                  Active Rooms
+                </Typography>
+                <Tooltip title="Refresh">
+                  <IconButton onClick={refreshRooms} size="small" sx={{ color: '#667eea' }}>
+                    <FaSync />
+                  </IconButton>
+                </Tooltip>
+              </Box>
 
-          <form onSubmit={handleSubmit}>
-            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-              {mode === 'join' ? (
-                <motion.div
-                  initial={{ x: -50, opacity: 0 }}
-                  animate={{ x: 0, opacity: 1 }}
-                  transition={{ duration: 0.3 }}
-                >
-                  <TextField
-                    fullWidth
-                    label="Game Code"
-                    variant="outlined"
-                    value={gameCode}
-                    onChange={(e) => setGameCode(e.target.value)}
-                    required
-                    placeholder="Enter 4-digit code"
-                  />
-                </motion.div>
+              <Divider sx={{ mb: 2 }} />
+
+              {activeRooms.length === 0 ? (
+                <Box sx={{ textAlign: 'center', py: 4, color: 'text.secondary' }}>
+                  <Typography variant="body2">No active rooms</Typography>
+                  <Typography variant="caption">Create one to get started!</Typography>
+                </Box>
               ) : (
-                <motion.div
-                  initial={{ x: 50, opacity: 0 }}
-                  animate={{ x: 0, opacity: 1 }}
-                  transition={{ duration: 0.3 }}
-                >
-                  <TextField
-                    fullWidth
-                    label="Game Code"
-                    variant="outlined"
-                    value={gameCode}
-                    onChange={(e) => setGameCode(e.target.value)}
-                    required
-                    placeholder="Create 4-digit code"
-                    helperText="Create a unique code for your game"
-                  />
-                </motion.div>
+                <List sx={{ overflow: 'auto', flex: 1 }}>
+                  {activeRooms.map((room) => (
+                    <ListItem key={room.gameCode} disablePadding sx={{ mb: 1 }}>
+                      <ListItemButton
+                        onClick={() => handleRoomSelect(room.gameCode)}
+                        selected={gameCode === room.gameCode}
+                        sx={{
+                          borderRadius: 2,
+                          '&.Mui-selected': {
+                            backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                            '&:hover': {
+                              backgroundColor: 'rgba(102, 126, 234, 0.2)',
+                            },
+                          },
+                        }}
+                      >
+                        <ListItemText
+                          primary={
+                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                              <Typography variant="body1" fontWeight="bold">
+                                {room.gameCode}
+                              </Typography>
+                              <Chip
+                                label={`${room.playerCount} player${room.playerCount !== 1 ? 's' : ''}`}
+                                size="small"
+                                color="primary"
+                                sx={{ height: 20, fontSize: '0.7rem' }}
+                              />
+                            </Box>
+                          }
+                          secondary="Waiting for players"
+                        />
+                      </ListItemButton>
+                    </ListItem>
+                  ))}
+                </List>
               )}
+            </Paper>
+          </motion.div>
+        )}
 
-              <TextField
-                fullWidth
-                label="Username"
-                variant="outlined"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                required
-                placeholder="Enter your name"
-              />
-
-              <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                <Button
-                  fullWidth
-                  variant="contained"
-                  size="large"
-                  type="submit"
-                  disabled={!gameCode || !username}
-                  sx={{
-                    background: 'linear-gradient(45deg, #667eea 30%, #764ba2 90%)',
-                    color: 'white',
-                    padding: '12px',
-                    fontSize: '1.1rem',
-                    fontWeight: 'bold',
-                    '&:hover': {
-                      background: 'linear-gradient(45deg, #764ba2 30%, #667eea 90%)',
-                    },
-                  }}
-                >
-                  {mode === 'host' ? (
-                    <>
-                      <FaCrown style={{ marginRight: 8 }} />
-                      Create Game
-                    </>
-                  ) : (
-                    <>
-                      <FaUser style={{ marginRight: 8 }} />
-                      Join Game
-                    </>
-                  )}
-                </Button>
-              </motion.div>
+        {/* Main Join/Host Form */}
+        <motion.div
+          initial={{ scale: 0, rotate: -10 }}
+          animate={{ scale: 1, rotate: 0 }}
+          transition={{ type: 'spring', stiffness: 260, damping: 20 }}
+          style={{ flex: 1, minWidth: 0 }}
+        >
+          <Paper
+            elevation={12}
+            sx={{
+              padding: { xs: 3, sm: 4 },
+              minWidth: { xs: '100%', sm: '400px' },
+              borderRadius: 4,
+              background: 'rgba(255, 255, 255, 0.95)',
+              backdropFilter: 'blur(10px)',
+            }}
+          >
+            <Box sx={{ textAlign: 'center', marginBottom: 3 }}>
+              <FaGamepad size={48} color="#667eea" />
+              <Typography
+                variant="h4"
+                fontWeight="bold"
+                sx={{
+                  marginTop: 2,
+                  color: '#667eea',
+                  fontSize: { xs: '1.5rem', sm: '2rem' }
+                }}
+              >
+                Welcome to Boggle!
+              </Typography>
+              <Typography
+                variant="body2"
+                color="text.secondary"
+                sx={{ marginTop: 1, fontSize: { xs: '0.8rem', sm: '0.875rem' } }}
+              >
+                Choose your role to get started
+              </Typography>
             </Box>
-          </form>
 
-          <Box sx={{ marginTop: 3, textAlign: 'center' }}>
-            <Typography variant="caption" color="text.secondary">
-              {mode === 'host'
-                ? 'Host a game and share the code with friends!'
-                : 'Enter the game code shared by your host'}
-            </Typography>
-          </Box>
-        </Paper>
-      </motion.div>
+            {/* Error Alert */}
+            {error && (
+              <motion.div
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3 }}
+              >
+                <Alert severity="error" sx={{ mb: 2 }}>
+                  {error}
+                </Alert>
+              </motion.div>
+            )}
+
+            {/* Mode Selection */}
+            <Box sx={{ marginBottom: 3, display: 'flex', justifyContent: 'center' }}>
+              <ToggleButtonGroup
+                value={mode}
+                exclusive
+                onChange={handleModeChange}
+                aria-label="game mode"
+                fullWidth
+                sx={{
+                  '& .MuiToggleButton-root': {
+                    fontSize: { xs: '0.8rem', sm: '0.875rem' },
+                    padding: { xs: '8px', sm: '11px' },
+                  },
+                }}
+              >
+                <ToggleButton value="join" aria-label="join game">
+                  <FaUser style={{ marginRight: 8 }} />
+                  Join Game
+                </ToggleButton>
+                <ToggleButton value="host" aria-label="host game">
+                  <FaCrown style={{ marginRight: 8 }} />
+                  Host Game
+                </ToggleButton>
+              </ToggleButtonGroup>
+            </Box>
+
+            <form onSubmit={handleSubmit}>
+              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                {mode === 'join' ? (
+                  <motion.div
+                    initial={{ x: -50, opacity: 0 }}
+                    animate={{ x: 0, opacity: 1 }}
+                    transition={{ duration: 0.3 }}
+                  >
+                    <TextField
+                      fullWidth
+                      label="Game Code"
+                      variant="outlined"
+                      value={gameCode}
+                      onChange={(e) => setGameCode(e.target.value)}
+                      required
+                      placeholder="Enter 4-digit code"
+                      inputProps={{
+                        maxLength: 4,
+                        pattern: '[0-9]*',
+                        inputMode: 'numeric',
+                      }}
+                    />
+                  </motion.div>
+                ) : (
+                  <motion.div
+                    initial={{ x: 50, opacity: 0 }}
+                    animate={{ x: 0, opacity: 1 }}
+                    transition={{ duration: 0.3 }}
+                  >
+                    <Box sx={{ display: 'flex', gap: 1 }}>
+                      <TextField
+                        fullWidth
+                        label="Game Code"
+                        variant="outlined"
+                        value={gameCode}
+                        onChange={(e) => setGameCode(e.target.value)}
+                        required
+                        placeholder="4-digit code"
+                        helperText="Auto-generated code (click dice to regenerate)"
+                        inputProps={{
+                          maxLength: 4,
+                          pattern: '[0-9]*',
+                          inputMode: 'numeric',
+                        }}
+                      />
+                      <Tooltip title="Generate new code">
+                        <IconButton
+                          onClick={generateRoomCode}
+                          sx={{
+                            background: 'linear-gradient(45deg, #667eea 30%, #764ba2 90%)',
+                            color: 'white',
+                            '&:hover': {
+                              background: 'linear-gradient(45deg, #764ba2 30%, #667eea 90%)',
+                            },
+                          }}
+                        >
+                          <FaDice />
+                        </IconButton>
+                      </Tooltip>
+                    </Box>
+                  </motion.div>
+                )}
+
+                <TextField
+                  fullWidth
+                  label="Username"
+                  variant="outlined"
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                  required
+                  placeholder="Enter your name"
+                  inputProps={{
+                    maxLength: 20,
+                  }}
+                />
+
+                <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                  <Button
+                    fullWidth
+                    variant="contained"
+                    size="large"
+                    type="submit"
+                    disabled={!gameCode || !username}
+                    sx={{
+                      background: 'linear-gradient(45deg, #667eea 30%, #764ba2 90%)',
+                      color: 'white',
+                      padding: { xs: '10px', sm: '12px' },
+                      fontSize: { xs: '1rem', sm: '1.1rem' },
+                      fontWeight: 'bold',
+                      '&:hover': {
+                        background: 'linear-gradient(45deg, #764ba2 30%, #667eea 90%)',
+                      },
+                      '&:disabled': {
+                        background: '#ccc',
+                        color: '#999',
+                      },
+                    }}
+                  >
+                    {mode === 'host' ? (
+                      <>
+                        <FaCrown style={{ marginRight: 8 }} />
+                        Create Game
+                      </>
+                    ) : (
+                      <>
+                        <FaUser style={{ marginRight: 8 }} />
+                        Join Game
+                      </>
+                    )}
+                  </Button>
+                </motion.div>
+              </Box>
+            </form>
+
+            <Box sx={{ marginTop: 3, textAlign: 'center' }}>
+              <Typography variant="caption" color="text.secondary">
+                {mode === 'host'
+                  ? 'Host a game and share the code with friends!'
+                  : 'Enter the game code shared by your host'}
+              </Typography>
+            </Box>
+          </Paper>
+        </motion.div>
+      </Box>
 
       {/* Floating particles effect */}
       <Box
@@ -194,12 +383,12 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername }) 
           <motion.div
             key={i}
             initial={{
-              x: Math.random() * window.innerWidth,
-              y: Math.random() * window.innerHeight,
+              x: Math.random() * (typeof window !== 'undefined' ? window.innerWidth : 1000),
+              y: Math.random() * (typeof window !== 'undefined' ? window.innerHeight : 1000),
             }}
             animate={{
-              y: [null, Math.random() * window.innerHeight],
-              x: [null, Math.random() * window.innerWidth],
+              y: [null, Math.random() * (typeof window !== 'undefined' ? window.innerHeight : 1000)],
+              x: [null, Math.random() * (typeof window !== 'undefined' ? window.innerWidth : 1000)],
             }}
             transition={{
               duration: Math.random() * 10 + 10,
