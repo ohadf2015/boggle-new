@@ -49,7 +49,7 @@ const HostView = ({ gameCode, users }) => {
           break;
 
         case 'playerFoundWord':
-          toast(`${message.username} found "${message.word}"! +${message.score}`, {
+          toast(`${message.username} מצא "${message.word}"!`, {
             icon: '🎯',
             duration: 2000,
           });
@@ -67,7 +67,7 @@ const HostView = ({ gameCode, users }) => {
             });
           });
           setValidations(initialValidations);
-          toast.success('Review and validate all words', {
+          toast.success('סקור ואשר את כל המילים', {
             icon: '✅',
             duration: 5000,
           });
@@ -76,7 +76,7 @@ const HostView = ({ gameCode, users }) => {
         case 'validationComplete':
           setFinalScores(message.scores);
           setShowValidation(false);
-          toast.success('Validation complete!', {
+          toast.success('האימות הושלם!', {
             icon: '🎉',
             duration: 3000,
           });
@@ -132,18 +132,20 @@ const HostView = ({ gameCode, users }) => {
   const startGame = () => {
     const newTable = generateRandomTable();
     setTableData(newTable);
-    setRemainingTime(timerValue * 60);
+    const seconds = timerValue * 60;
+    setRemainingTime(seconds);
     setGameStarted(true);
 
-    // Send start game message with letter grid
+    // Send start game message with letter grid and timer
     ws.send(
       JSON.stringify({
         action: 'startGame',
         letterGrid: newTable,
+        timerSeconds: seconds,
       })
     );
 
-    toast.success('Game Started!', {
+    toast.success('המשחק התחיל!', {
       icon: '🎮',
       duration: 3000,
     });
@@ -197,17 +199,9 @@ const HostView = ({ gameCode, users }) => {
     }));
   };
 
-  const getLetterColor = (i, j) => {
-    const colors = [
-      '#FF6B6B',
-      '#4ECDC4',
-      '#45B7D1',
-      '#FFA07A',
-      '#98D8C8',
-      '#F7DC6F',
-      '#BB8FCE',
-    ];
-    return colors[(i + j) % colors.length];
+  const getLetterColor = () => {
+    // Single color for all tiles during gameplay
+    return '#667eea';
   };
 
   return (
@@ -267,10 +261,10 @@ const HostView = ({ gameCode, users }) => {
                   fontSize: { xs: '1.5rem', sm: '2rem' }
                 }}
               >
-                ✅ Validate Words
+                ✅ אימות מילים
               </Typography>
               <Typography variant="body1" align="center" gutterBottom sx={{ mb: 3, color: 'text.secondary' }}>
-                Click on words to mark them as invalid (red). Green words are valid.
+                לחץ על מילים כדי לסמן אותן כלא תקינות (אדום). מילים ירוקות תקינות.
               </Typography>
 
               {playerWords.map((player, index) => (
@@ -295,7 +289,7 @@ const HostView = ({ gameCode, users }) => {
                       color="primary"
                       sx={{ fontSize: { xs: '1rem', sm: '1.25rem' } }}
                     >
-                      {player.username} ({player.words.length} words)
+                      {player.username} ({player.words.length} מילים)
                     </Typography>
 
                     <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
@@ -349,7 +343,7 @@ const HostView = ({ gameCode, users }) => {
                     fontWeight: 'bold',
                   }}
                 >
-                  Submit Validation
+                  שלח אימות
                 </Button>
               </Box>
             </Paper>
@@ -399,7 +393,7 @@ const HostView = ({ gameCode, users }) => {
                   fontSize: { xs: '1.75rem', sm: '2.5rem' }
                 }}
               >
-                <FaTrophy /> Final Results
+                <FaTrophy /> תוצאות סופיות
               </Typography>
 
               {finalScores.map((player, index) => (
@@ -435,19 +429,45 @@ const HostView = ({ gameCode, users }) => {
                     </Box>
 
                     <Typography variant="body2" sx={{ mb: 1 }}>
-                      Words: {player.wordCount} {player.validWordCount !== undefined && `(${player.validWordCount} valid)`}
+                      מילים: {player.wordCount} {player.validWordCount !== undefined && `(${player.validWordCount} תקינות)`}
                     </Typography>
 
                     {player.longestWord && (
                       <Typography variant="body2" sx={{ mb: 1 }}>
-                        Longest: <strong>{player.longestWord}</strong>
+                        הארוכה ביותר: <strong>{player.longestWord}</strong>
                       </Typography>
+                    )}
+
+                    {/* Word Visualization with colors */}
+                    {player.allWords && player.allWords.length > 0 && (
+                      <Box sx={{ mt: 2 }}>
+                        <Typography variant="body2" fontWeight="bold" gutterBottom>
+                          מילים:
+                        </Typography>
+                        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
+                          {player.allWords.map((wordObj, i) => (
+                            <Chip
+                              key={i}
+                              label={`${wordObj.word} ${wordObj.validated ? `(${wordObj.score})` : '(✗)'}`}
+                              size="small"
+                              sx={{
+                                background: wordObj.validated
+                                  ? ['#FF6B6B', '#4ECDC4', '#45B7D1', '#FFA07A', '#98D8C8', '#F7DC6F', '#BB8FCE'][i % 7]
+                                  : '#9e9e9e',
+                                color: 'white',
+                                fontWeight: 'bold',
+                                opacity: wordObj.validated ? 1 : 0.6,
+                              }}
+                            />
+                          ))}
+                        </Box>
+                      </Box>
                     )}
 
                     {player.achievements && player.achievements.length > 0 && (
                       <Box sx={{ mt: 2 }}>
                         <Typography variant="body2" fontWeight="bold" gutterBottom>
-                          Achievements:
+                          הישגים:
                         </Typography>
                         <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
                           {player.achievements.map((ach, i) => (
@@ -475,7 +495,7 @@ const HostView = ({ gameCode, users }) => {
                 onClick={() => setFinalScores(null)}
                 sx={{ marginTop: 3 }}
               >
-                Close
+                סגור
               </Button>
             </Paper>
           </motion.div>
@@ -514,7 +534,7 @@ const HostView = ({ gameCode, users }) => {
             fontWeight="bold"
             sx={{ fontSize: { xs: '1.5rem', sm: '2rem' } }}
           >
-            Game Code: {gameCode}
+            קוד משחק: {gameCode}
           </Typography>
         </Paper>
       </motion.div>
@@ -531,7 +551,7 @@ const HostView = ({ gameCode, users }) => {
         <Paper elevation={6} sx={{ minWidth: { xs: '100%', sm: 250 }, padding: { xs: 2, sm: 3 } }}>
           <Typography variant="h6" gutterBottom fontWeight="bold" color="primary">
             <FaUsers style={{ marginRight: 8 }} />
-            Players ({playersReady.length})
+            שחקנים ({playersReady.length})
           </Typography>
           <List>
             <AnimatePresence>
@@ -558,7 +578,7 @@ const HostView = ({ gameCode, users }) => {
           </List>
           {playersReady.length === 0 && (
             <Typography variant="body2" color="text.secondary" sx={{ textAlign: 'center', mt: 2 }}>
-              Waiting for players...
+              ממתין לשחקנים...
             </Typography>
           )}
         </Paper>
@@ -643,12 +663,16 @@ const HostView = ({ gameCode, users }) => {
                       alignItems: 'center',
                       fontSize: { xs: '1.2rem', sm: '1.8rem', md: '2rem' },
                       fontWeight: 'bold',
-                      background: `linear-gradient(135deg, ${getLetterColor(i, j)} 0%, ${getLetterColor(i + 1, j + 1)} 100%)`,
+                      background: getLetterColor(),
                       color: 'white',
                       borderRadius: { xs: '8px', sm: '10px', md: '12px' },
                       boxShadow: '0 4px 8px rgba(0,0,0,0.2)',
                       cursor: 'pointer',
                       transition: 'all 0.3s ease',
+                      '&:hover': {
+                        transform: 'scale(1.05)',
+                        boxShadow: '0 6px 12px rgba(0,0,0,0.3)',
+                      }
                     }}
                   >
                     {cell}
@@ -663,7 +687,7 @@ const HostView = ({ gameCode, users }) => {
             {!gameStarted ? (
               <>
                 <TextField
-                  label="Timer (minutes)"
+                  label="טיימר (דקות)"
                   variant="outlined"
                   type="number"
                   value={timerValue}
@@ -678,11 +702,11 @@ const HostView = ({ gameCode, users }) => {
                   size="large"
                   fullWidth
                 >
-                  Start Game
+                  התחל משחק
                 </Button>
                 {playersReady.length === 0 && (
                   <Typography variant="caption" color="error" sx={{ textAlign: 'center' }}>
-                    Waiting for players to join...
+                    ממתין לשחקנים להצטרף...
                   </Typography>
                 )}
               </>
@@ -694,7 +718,7 @@ const HostView = ({ gameCode, users }) => {
                 size="large"
                 fullWidth
               >
-                Stop Game
+                עצור משחק
               </Button>
             )}
           </Box>
@@ -710,13 +734,13 @@ const HostView = ({ gameCode, users }) => {
             sx={{ fontSize: { xs: '1rem', sm: '1.25rem' } }}
           >
             <FaTrophy style={{ marginRight: 8, color: '#FFD700' }} />
-            Live Scores
+            ציונים חיים
           </Typography>
           {gameStarted && leaderboard.length === 0 && (
             <Box sx={{ marginY: 2 }}>
               <LinearProgress />
               <Typography variant="body2" color="text.secondary" sx={{ mt: 1, textAlign: 'center' }}>
-                Waiting for first words...
+                ממתין למילים ראשונות...
               </Typography>
             </Box>
           )}
@@ -754,7 +778,7 @@ const HostView = ({ gameCode, users }) => {
                       <Box sx={{ flex: 1 }}>
                         <Typography fontWeight="bold">{player.username}</Typography>
                         <Typography variant="caption">
-                          {player.wordCount} words
+                          {player.wordCount} מילים
                         </Typography>
                       </Box>
                       <Typography variant="h5" fontWeight="bold">
@@ -768,7 +792,7 @@ const HostView = ({ gameCode, users }) => {
           </List>
           {!gameStarted && leaderboard.length === 0 && (
             <Typography variant="body2" color="text.secondary" sx={{ textAlign: 'center', mt: 2 }}>
-              Scores will appear here during the game
+              הציונים יופיעו כאן במהלך המשחק
             </Typography>
           )}
         </Paper>
