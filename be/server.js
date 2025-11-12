@@ -12,11 +12,13 @@ const {
   handleEndGame,
   handleStartGame,
   addUserToGame,
+  handleWordSubmission,
+  handleSendAnswer,
 } = require("./handlers");
 
 wss.on("connection", (ws) => {
-  ws.on("message", (message) => {
-    const message = JSON.parse(message);
+  ws.on("message", (data) => {
+    const message = JSON.parse(data);
     const { action } = message;
 
     switch (action) {
@@ -28,23 +30,32 @@ wss.on("connection", (ws) => {
       case "join": {
         const { gameCode, username } = message;
         addUserToGame(gameCode, username, ws);
-      }
-
-      case "startGame": {
-        handleStartGame(ws);
         break;
       }
-
+      case "startGame": {
+        const { letterGrid } = message;
+        handleStartGame(ws, letterGrid);
+        break;
+      }
       case "endGame": {
         handleEndGame(ws);
         break;
       }
-
       case "sendAnswer": {
         const { foundWords } = message;
         handleSendAnswer(ws, foundWords);
+        break;
+      }
+      case "submitWord": {
+        const { word } = message;
+        handleWordSubmission(ws, word);
+        break;
       }
     }
+  });
+
+  ws.on("close", () => {
+    console.log("Client disconnected");
   });
 });
 

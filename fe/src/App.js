@@ -31,8 +31,14 @@ function App() {
     };
   }, []);
 
-  const handleJoin = () => {
-    ws.send(JSON.stringify({ action: "join", gameCode, username }));
+  const handleJoin = (isHostMode) => {
+    if (isHostMode) {
+      ws.send(JSON.stringify({ action: "createGame", gameCode }));
+      setIsHost(true);
+      setIsActive(true);
+    } else {
+      ws.send(JSON.stringify({ action: "join", gameCode, username }));
+    }
   };
 
   // Sample scores data
@@ -43,31 +49,26 @@ function App() {
   ];
   return (
     <WebSocketContext.Provider value={ws}>
-
-    <Container>
-
-      {
-        (!isActive) ? (
-          <JoinView
+      {(!isActive) ? (
+        <JoinView
+          handleJoin={handleJoin}
+          gameCode={gameCode}
+          username={username}
+          setGameCode={setGameCode}
+          setUsername={setUsername}
+        />
+      ) :
+        isHost ? (<HostView gameCode={gameCode} users={users} />) :
+        (
+          <PlayerView
             handleJoin={handleJoin}
             gameCode={gameCode}
             username={username}
             setGameCode={setGameCode}
             setUsername={setUsername}
           />
-        ) : 
-          isHost ? (<HostView gameCode={gameCode} users={users} />) : 
-          (
-            <PlayerView
-              handleJoin={handleJoin}
-              gameCode={gameCode}
-              username={username}
-              setGameCode={setGameCode}
-              setUsername={setUsername}
-            />
-            )}
-            <ScorePage scores={scores} />
-    </Container>
+        )
+      }
     </WebSocketContext.Provider>
   );
 }
