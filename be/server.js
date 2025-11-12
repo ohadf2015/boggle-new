@@ -14,6 +14,7 @@ const {
   addUserToGame,
   handleWordSubmission,
   handleSendAnswer,
+  handleValidateWords,
 } = require("./handlers");
 
 wss.on("connection", (ws) => {
@@ -49,6 +50,11 @@ wss.on("connection", (ws) => {
       case "submitWord": {
         const { word } = message;
         handleWordSubmission(ws, word);
+        break;
+      }
+      case "validateWords": {
+        const { validations } = message;
+        handleValidateWords(ws, validations);
         break;
       }
     }
