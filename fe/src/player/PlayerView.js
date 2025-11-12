@@ -104,17 +104,45 @@ const PlayerView = () => {
           break;
 
         case 'playerFoundWord':
-          // Just notify without score
-          toast(`${message.username} מצא "${message.word}"!`, {
-            icon: '👀',
-            duration: 2000,
+          // Display blurred word notification
+          const displayWord = message.word; // Already blurred by server
+          const wordInfo = message.wordLength ? ` (${message.wordLength} אותיות)` : '';
+          toast(`${message.username} מצא מילה: "${displayWord}"${wordInfo}`, {
+            icon: '🔍',
+            duration: 2500,
           });
+          break;
+
+        case 'liveAchievementUnlocked':
+          // Show live achievement notification
+          message.achievements.forEach(achievement => {
+            toast.success(`🎉 הישג חדש: ${achievement.icon} ${achievement.name}!`, {
+              duration: 4000,
+              style: {
+                background: 'linear-gradient(45deg, #FE6B8B 30%, #FF8E53 90%)',
+                color: 'white',
+                fontWeight: 'bold',
+              },
+            });
+            confetti({
+              particleCount: 50,
+              spread: 60,
+              origin: { y: 0.7 },
+            });
+          });
+          // Add to achievements list
+          setAchievements(prev => [...prev, ...message.achievements]);
           break;
 
         case 'validatedScores':
           const { scores: validatedScores, winner: finalWinner, letterGrid: validationGrid } = message;
           setFinalScores(validatedScores);
           setShowScores(true);
+
+          // Store the letter grid for display in final scores
+          if (validationGrid) {
+            setLetterGrid(validationGrid);
+          }
 
           // Set achievements and scores from validated results
           const myUsername = validatedScores.find(s => s.username)?.username; // Get current player's username
@@ -264,6 +292,46 @@ const PlayerView = () => {
                 <FaTrophy /> תוצאות סופיות
               </Typography>
 
+              {/* Game Board Display */}
+              {letterGrid && (
+                <Box sx={{ mb: 3, textAlign: 'center' }}>
+                  <Typography variant="h6" fontWeight="bold" gutterBottom sx={{ color: '#667eea' }}>
+                    לוח המשחק
+                  </Typography>
+                  <Box
+                    sx={{
+                      display: 'grid',
+                      gridTemplateColumns: 'repeat(7, minmax(30px, 1fr))',
+                      gap: '4px',
+                      maxWidth: '300px',
+                      margin: '0 auto',
+                    }}
+                  >
+                    {letterGrid.map((row, i) =>
+                      row.map((cell, j) => (
+                        <Box
+                          key={`${i}-${j}`}
+                          sx={{
+                            aspectRatio: '1',
+                            display: 'flex',
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                            fontSize: { xs: '0.9rem', sm: '1rem' },
+                            fontWeight: 'bold',
+                            background: '#667eea',
+                            color: 'white',
+                            borderRadius: '6px',
+                            boxShadow: '0 2px 4px rgba(0,0,0,0.2)',
+                          }}
+                        >
+                          {cell}
+                        </Box>
+                      ))
+                    )}
+                  </Box>
+                </Box>
+              )}
+
               {finalScores.map((player, index) => (
                 <motion.div
                   key={player.username}
@@ -306,28 +374,39 @@ const PlayerView = () => {
                       </Typography>
                     )}
 
-                    {/* Word Visualization with colors */}
+                    {/* Word Visualization with colors and duplicate indicators */}
                     {player.allWords && player.allWords.length > 0 && (
                       <Box sx={{ mt: 2 }}>
                         <Typography variant="body2" fontWeight="bold" gutterBottom>
                           מילים:
                         </Typography>
                         <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
-                          {player.allWords.map((wordObj, i) => (
-                            <Chip
-                              key={i}
-                              label={`${wordObj.word} ${wordObj.validated ? `(${wordObj.score})` : '(✗)'}`}
-                              size="small"
-                              sx={{
-                                background: wordObj.validated
-                                  ? ['#FF6B6B', '#4ECDC4', '#45B7D1', '#FFA07A', '#98D8C8', '#F7DC6F', '#BB8FCE'][i % 7]
-                                  : '#9e9e9e',
-                                color: 'white',
-                                fontWeight: 'bold',
-                                opacity: wordObj.validated ? 1 : 0.6,
-                              }}
-                            />
-                          ))}
+                          {player.allWords.map((wordObj, i) => {
+                            const isDuplicate = wordObj.isDuplicate;
+                            const isValid = wordObj.validated;
+                            const label = isDuplicate
+                              ? `${wordObj.word} (כפול ❌)`
+                              : `${wordObj.word} ${isValid ? `(${wordObj.score})` : '(✗)'}`;
+
+                            return (
+                              <Chip
+                                key={i}
+                                label={label}
+                                size="small"
+                                sx={{
+                                  background: isDuplicate
+                                    ? '#ff9800'
+                                    : isValid
+                                    ? ['#FF6B6B', '#4ECDC4', '#45B7D1', '#FFA07A', '#98D8C8', '#F7DC6F', '#BB8FCE'][i % 7]
+                                    : '#9e9e9e',
+                                  color: 'white',
+                                  fontWeight: 'bold',
+                                  opacity: isValid && !isDuplicate ? 1 : 0.7,
+                                  textDecoration: isDuplicate ? 'line-through' : 'none',
+                                }}
+                              />
+                            );
+                          })}
                         </Box>
                       </Box>
                     )}
@@ -435,8 +514,8 @@ const PlayerView = () => {
         </motion.div>
       )}
 
-      {/* Achievements Bar (Only after validation) */}
-      {achievements.length > 0 && showScores && (
+      {/* Achievements Bar (Show during game if unlocked live) */}
+      {achievements.length > 0 && (
         <motion.div
           initial={{ y: -20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
