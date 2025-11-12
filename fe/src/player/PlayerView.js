@@ -28,6 +28,9 @@ const PlayerView = () => {
   const [gameActive, setGameActive] = useState(false);
   const [combo, setCombo] = useState(0);
   const [lastWordScore, setLastWordScore] = useState(0);
+  const [achievements, setAchievements] = useState([]);
+  const [letterGrid, setLetterGrid] = useState(null);
+  const [finalScores, setFinalScores] = useState(null);
 
   // Handle WebSocket messages
   useEffect(() => {
@@ -43,6 +46,11 @@ const PlayerView = () => {
           setFoundWords([]);
           setScore(0);
           setCombo(0);
+          setAchievements([]);
+          setFinalScores(null);
+          if (message.letterGrid) {
+            setLetterGrid(message.letterGrid);
+          }
           toast.success('Game Started! Find as many words as you can!', {
             icon: '🎮',
             duration: 3000,
@@ -58,10 +66,13 @@ const PlayerView = () => {
           break;
 
         case 'wordAccepted':
-          const { word: acceptedWord, score: wordScore, totalScore } = message;
+          const { word: acceptedWord, score: wordScore, totalScore, achievements: playerAch } = message;
           setScore(totalScore);
           setCombo(prev => prev + 1);
           setLastWordScore(wordScore);
+          if (playerAch) {
+            setAchievements(playerAch);
+          }
 
           // Celebration effects based on word score
           if (wordScore >= 5) {
@@ -109,8 +120,36 @@ const PlayerView = () => {
           }
           break;
 
+        case 'achievementUnlocked':
+          if (message.achievements && message.achievements.length > 0) {
+            message.achievements.forEach(ach => {
+              toast(
+                <div>
+                  <strong>{ach.icon} {ach.name}</strong>
+                  <br />
+                  <small>{ach.description}</small>
+                </div>,
+                {
+                  icon: '🎉',
+                  duration: 4000,
+                  style: {
+                    background: 'linear-gradient(45deg, #FF6B6B 30%, #4ECDC4 90%)',
+                    color: 'white',
+                  },
+                }
+              );
+            });
+            confetti({
+              particleCount: 30,
+              spread: 50,
+              origin: { y: 0.6 },
+            });
+          }
+          break;
+
         case 'finalScores':
           const { scores, winner } = message;
+          setFinalScores(scores);
           toast(
             <div>
               <strong>🏆 Winner: {winner}</strong>
@@ -132,6 +171,15 @@ const PlayerView = () => {
               origin: { y: 0.6 },
             });
           }
+          break;
+
+        case 'validatedScores':
+          const { scores: validatedScores, winner: finalWinner } = message;
+          setFinalScores(validatedScores);
+          toast.success('Final validated scores are in!', {
+            icon: '✅',
+            duration: 4000,
+          });
           break;
 
         default:
@@ -178,6 +226,13 @@ const PlayerView = () => {
     return null;
   };
 
+  const getLetterColor = (i, j) => {
+    const colors = [
+      '#FF6B6B', '#4ECDC4', '#45B7D1', '#FFA07A', '#98D8C8', '#F7DC6F', '#BB8FCE',
+    ];
+    return colors[(i + j) % colors.length];
+  };
+
   return (
     <Box
       sx={{
@@ -190,6 +245,114 @@ const PlayerView = () => {
       }}
     >
       <Toaster position="top-center" />
+
+      {/* Final Scores Modal */}
+      {finalScores && (
+        <Box
+          sx={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            background: 'rgba(0, 0, 0, 0.8)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 9999,
+            padding: 3,
+          }}
+        >
+          <motion.div
+            initial={{ scale: 0, rotate: -10 }}
+            animate={{ scale: 1, rotate: 0 }}
+            transition={{ type: 'spring', stiffness: 200, damping: 20 }}
+          >
+            <Paper
+              elevation={24}
+              sx={{
+                padding: 4,
+                maxWidth: 600,
+                width: '100%',
+                maxHeight: '80vh',
+                overflow: 'auto',
+                borderRadius: 3,
+              }}
+            >
+              <Typography variant="h3" align="center" gutterBottom sx={{ color: '#FFD700' }}>
+                <FaTrophy /> Final Results
+              </Typography>
+
+              {finalScores.map((player, index) => (
+                <motion.div
+                  key={player.username}
+                  initial={{ x: -50, opacity: 0 }}
+                  animate={{ x: 0, opacity: 1 }}
+                  transition={{ delay: index * 0.2 }}
+                >
+                  <Paper
+                    elevation={index === 0 ? 12 : 4}
+                    sx={{
+                      padding: 3,
+                      marginBottom: 2,
+                      background: index === 0
+                        ? 'linear-gradient(45deg, #FFD700 30%, #FFA500 90%)'
+                        : index === 1
+                        ? 'linear-gradient(45deg, #C0C0C0 30%, #E8E8E8 90%)'
+                        : index === 2
+                        ? 'linear-gradient(45deg, #CD7F32 30%, #D4A76A 90%)'
+                        : 'white',
+                      color: index < 3 ? 'white' : 'inherit',
+                      transform: index === 0 ? 'scale(1.05)' : 'scale(1)',
+                    }}
+                  >
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+                      <Typography variant="h5" fontWeight="bold">
+                        {index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : `#${index + 1}`} {player.username}
+                      </Typography>
+                      <Typography variant="h4" fontWeight="bold">
+                        {player.score}
+                      </Typography>
+                    </Box>
+
+                    <Typography variant="body2" sx={{ mb: 1 }}>
+                      Words found: {player.wordCount} {player.validWordCount !== undefined && `(${player.validWordCount} valid)`}
+                    </Typography>
+
+                    {player.longestWord && (
+                      <Typography variant="body2" sx={{ mb: 1 }}>
+                        Longest word: <strong>{player.longestWord}</strong>
+                      </Typography>
+                    )}
+
+                    {player.achievements && player.achievements.length > 0 && (
+                      <Box sx={{ mt: 2 }}>
+                        <Typography variant="body2" fontWeight="bold" gutterBottom>
+                          Achievements:
+                        </Typography>
+                        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
+                          {player.achievements.map((ach, i) => (
+                            <Chip
+                              key={i}
+                              label={`${ach.icon} ${ach.name}`}
+                              size="small"
+                              sx={{
+                                background: 'linear-gradient(45deg, #667eea 30%, #764ba2 90%)',
+                                color: 'white',
+                                fontWeight: 'bold',
+                              }}
+                            />
+                          ))}
+                        </Box>
+                      </Box>
+                    )}
+                  </Paper>
+                </motion.div>
+              ))}
+            </Paper>
+          </motion.div>
+        </Box>
+      )}
 
       {/* Animated Title */}
       <motion.div
@@ -232,9 +395,81 @@ const PlayerView = () => {
         </Paper>
       </motion.div>
 
-      <Box sx={{ display: 'flex', gap: 3, width: '100%', maxWidth: 1200 }}>
+      {/* Achievements Bar */}
+      {achievements.length > 0 && (
+        <motion.div
+          initial={{ y: -20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          style={{ marginBottom: 16 }}
+        >
+          <Paper elevation={6} sx={{ padding: 2, background: 'rgba(255, 255, 255, 0.95)' }}>
+            <Typography variant="h6" gutterBottom fontWeight="bold" color="primary">
+              🏆 Your Achievements
+            </Typography>
+            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
+              {achievements.map((ach, index) => (
+                <Chip
+                  key={index}
+                  label={`${ach} ${ach}`}
+                  sx={{
+                    background: 'linear-gradient(45deg, #FE6B8B 30%, #FF8E53 90%)',
+                    color: 'white',
+                    fontWeight: 'bold',
+                    fontSize: '0.9rem',
+                  }}
+                />
+              ))}
+            </Box>
+          </Paper>
+        </motion.div>
+      )}
+
+      <Box sx={{ display: 'flex', gap: 3, width: '100%', maxWidth: 1400, flexWrap: 'wrap' }}>
+        {/* Letter Grid */}
+        {letterGrid && (
+          <Paper elevation={6} sx={{ padding: 3, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+            <Typography variant="h6" gutterBottom fontWeight="bold" color="primary">
+              Letter Grid
+            </Typography>
+            <Box
+              sx={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(7, 50px)',
+                gap: '8px',
+              }}
+            >
+              {letterGrid.map((row, i) =>
+                row.map((cell, j) => (
+                  <motion.div
+                    key={`${i}-${j}`}
+                    whileHover={{ scale: 1.1 }}
+                  >
+                    <Box
+                      sx={{
+                        width: '50px',
+                        height: '50px',
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        fontSize: '24px',
+                        fontWeight: 'bold',
+                        background: `linear-gradient(135deg, ${getLetterColor(i, j)} 0%, ${getLetterColor(i + 1, j + 1)} 100%)`,
+                        color: 'white',
+                        borderRadius: '8px',
+                        boxShadow: '0 2px 4px rgba(0,0,0,0.2)',
+                      }}
+                    >
+                      {cell}
+                    </Box>
+                  </motion.div>
+                ))
+              )}
+            </Box>
+          </Paper>
+        )}
+
         {/* Word Input and List */}
-        <Paper elevation={6} sx={{ flex: 1, padding: 3, maxHeight: '70vh', overflow: 'auto' }}>
+        <Paper elevation={6} sx={{ flex: 1, padding: 3, maxHeight: '70vh', overflow: 'auto', minWidth: 300 }}>
           <Typography variant="h5" gutterBottom fontWeight="bold" color="primary">
             Found Words ({foundWords.length})
           </Typography>

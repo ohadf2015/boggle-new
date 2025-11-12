@@ -26,6 +26,10 @@ const HostView = ({ gameCode, users }) => {
   const [gameStarted, setGameStarted] = useState(false);
   const [leaderboard, setLeaderboard] = useState([]);
   const [playersReady, setPlayersReady] = useState(users || []);
+  const [showValidation, setShowValidation] = useState(false);
+  const [playerWords, setPlayerWords] = useState([]);
+  const [validations, setValidations] = useState({});
+  const [finalScores, setFinalScores] = useState(null);
 
   // Handle WebSocket messages
   useEffect(() => {
@@ -48,6 +52,38 @@ const HostView = ({ gameCode, users }) => {
           toast(`${message.username} found "${message.word}"! +${message.score}`, {
             icon: '🎯',
             duration: 2000,
+          });
+          break;
+
+        case 'showValidation':
+          setPlayerWords(message.playerWords);
+          setShowValidation(true);
+          // Initialize validations object
+          const initialValidations = {};
+          message.playerWords.forEach(player => {
+            player.words.forEach(wordObj => {
+              const key = `${player.username}-${wordObj.word}`;
+              initialValidations[key] = true; // Default to valid
+            });
+          });
+          setValidations(initialValidations);
+          toast.success('Review and validate all words', {
+            icon: '✅',
+            duration: 5000,
+          });
+          break;
+
+        case 'validationComplete':
+          setFinalScores(message.scores);
+          setShowValidation(false);
+          toast.success('Validation complete!', {
+            icon: '🎉',
+            duration: 3000,
+          });
+          confetti({
+            particleCount: 150,
+            spread: 80,
+            origin: { y: 0.6 },
           });
           break;
 
@@ -129,6 +165,38 @@ const HostView = ({ gameCode, users }) => {
     return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
 
+  const submitValidation = () => {
+    // Convert validations object to array for backend
+    const validationArray = [];
+    playerWords.forEach(player => {
+      player.words.forEach(wordObj => {
+        const key = `${player.username}-${wordObj.word}`;
+        validationArray.push({
+          username: player.username,
+          word: wordObj.word,
+          isValid: validations[key],
+        });
+      });
+    });
+
+    ws.send(JSON.stringify({
+      action: 'validateWords',
+      validations: validationArray,
+    }));
+
+    toast.loading('Validating words...', {
+      duration: 2000,
+    });
+  };
+
+  const toggleWordValidation = (username, word) => {
+    const key = `${username}-${word}`;
+    setValidations(prev => ({
+      ...prev,
+      [key]: !prev[key],
+    }));
+  };
+
   const getLetterColor = (i, j) => {
     const colors = [
       '#FF6B6B',
@@ -154,6 +222,241 @@ const HostView = ({ gameCode, users }) => {
       }}
     >
       <Toaster position="top-center" />
+
+      {/* Validation Modal */}
+      {showValidation && (
+        <Box
+          sx={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            background: 'rgba(0, 0, 0, 0.85)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 9999,
+            padding: 3,
+            overflow: 'auto',
+          }}
+        >
+          <motion.div
+            initial={{ scale: 0, rotate: -10 }}
+            animate={{ scale: 1, rotate: 0 }}
+            transition={{ type: 'spring', stiffness: 200, damping: 20 }}
+            style={{ width: '100%', maxWidth: 900 }}
+          >
+            <Paper
+              elevation={24}
+              sx={{
+                padding: 4,
+                maxHeight: '90vh',
+                overflow: 'auto',
+                borderRadius: 3,
+              }}
+            >
+              <Typography variant="h4" align="center" gutterBottom sx={{ color: '#667eea', fontWeight: 'bold' }}>
+                ✅ Validate Words
+              </Typography>
+              <Typography variant="body1" align="center" gutterBottom sx={{ mb: 3, color: 'text.secondary' }}>
+                Click on words to mark them as invalid (red). Green words are valid.
+              </Typography>
+
+              {playerWords.map((player, index) => (
+                <motion.div
+                  key={player.username}
+                  initial={{ x: -50, opacity: 0 }}
+                  animate={{ x: 0, opacity: 1 }}
+                  transition={{ delay: index * 0.1 }}
+                >
+                  <Paper
+                    elevation={4}
+                    sx={{
+                      padding: 3,
+                      marginBottom: 3,
+                      background: 'linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)',
+                    }}
+                  >
+                    <Typography variant="h6" fontWeight="bold" gutterBottom color="primary">
+                      {player.username} ({player.words.length} words)
+                    </Typography>
+
+                    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
+                      {player.words.map((wordObj, wordIndex) => {
+                        const key = `${player.username}-${wordObj.word}`;
+                        const isValid = validations[key];
+                        return (
+                          <motion.div
+                            key={wordIndex}
+                            whileHover={{ scale: 1.1 }}
+                            whileTap={{ scale: 0.95 }}
+                          >
+                            <Chip
+                              label={`${wordObj.word} (${wordObj.score}pts)`}
+                              onClick={() => toggleWordValidation(player.username, wordObj.word)}
+                              sx={{
+                                background: isValid
+                                  ? 'linear-gradient(45deg, #4CAF50 30%, #8BC34A 90%)'
+                                  : 'linear-gradient(45deg, #f44336 30%, #e91e63 90%)',
+                                color: 'white',
+                                fontWeight: 'bold',
+                                fontSize: '1rem',
+                                padding: '20px 12px',
+                                cursor: 'pointer',
+                                transition: 'all 0.3s ease',
+                                '&:hover': {
+                                  boxShadow: '0 4px 8px rgba(0,0,0,0.3)',
+                                },
+                              }}
+                              icon={isValid ? <span>✓</span> : <span>✗</span>}
+                            />
+                          </motion.div>
+                        );
+                      })}
+                    </Box>
+                  </Paper>
+                </motion.div>
+              ))}
+
+              <Box sx={{ display: 'flex', gap: 2, marginTop: 3 }}>
+                <Button
+                  fullWidth
+                  variant="contained"
+                  size="large"
+                  onClick={submitValidation}
+                  sx={{
+                    background: 'linear-gradient(45deg, #667eea 30%, #764ba2 90%)',
+                    color: 'white',
+                    padding: '12px',
+                    fontSize: '1.1rem',
+                    fontWeight: 'bold',
+                  }}
+                >
+                  Submit Validation
+                </Button>
+              </Box>
+            </Paper>
+          </motion.div>
+        </Box>
+      )}
+
+      {/* Final Scores Modal */}
+      {finalScores && (
+        <Box
+          sx={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            background: 'rgba(0, 0, 0, 0.8)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 9999,
+            padding: 3,
+          }}
+        >
+          <motion.div
+            initial={{ scale: 0, rotate: -10 }}
+            animate={{ scale: 1, rotate: 0 }}
+            transition={{ type: 'spring', stiffness: 200, damping: 20 }}
+          >
+            <Paper
+              elevation={24}
+              sx={{
+                padding: 4,
+                maxWidth: 700,
+                width: '100%',
+                maxHeight: '80vh',
+                overflow: 'auto',
+                borderRadius: 3,
+              }}
+            >
+              <Typography variant="h3" align="center" gutterBottom sx={{ color: '#FFD700' }}>
+                <FaTrophy /> Final Results
+              </Typography>
+
+              {finalScores.map((player, index) => (
+                <motion.div
+                  key={player.username}
+                  initial={{ x: -50, opacity: 0 }}
+                  animate={{ x: 0, opacity: 1 }}
+                  transition={{ delay: index * 0.2 }}
+                >
+                  <Paper
+                    elevation={index === 0 ? 12 : 4}
+                    sx={{
+                      padding: 3,
+                      marginBottom: 2,
+                      background: index === 0
+                        ? 'linear-gradient(45deg, #FFD700 30%, #FFA500 90%)'
+                        : index === 1
+                        ? 'linear-gradient(45deg, #C0C0C0 30%, #E8E8E8 90%)'
+                        : index === 2
+                        ? 'linear-gradient(45deg, #CD7F32 30%, #D4A76A 90%)'
+                        : 'white',
+                      color: index < 3 ? 'white' : 'inherit',
+                      transform: index === 0 ? 'scale(1.05)' : 'scale(1)',
+                    }}
+                  >
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+                      <Typography variant="h5" fontWeight="bold">
+                        {index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : `#${index + 1}`} {player.username}
+                      </Typography>
+                      <Typography variant="h4" fontWeight="bold">
+                        {player.score}
+                      </Typography>
+                    </Box>
+
+                    <Typography variant="body2" sx={{ mb: 1 }}>
+                      Words: {player.wordCount} {player.validWordCount !== undefined && `(${player.validWordCount} valid)`}
+                    </Typography>
+
+                    {player.longestWord && (
+                      <Typography variant="body2" sx={{ mb: 1 }}>
+                        Longest: <strong>{player.longestWord}</strong>
+                      </Typography>
+                    )}
+
+                    {player.achievements && player.achievements.length > 0 && (
+                      <Box sx={{ mt: 2 }}>
+                        <Typography variant="body2" fontWeight="bold" gutterBottom>
+                          Achievements:
+                        </Typography>
+                        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
+                          {player.achievements.map((ach, i) => (
+                            <Chip
+                              key={i}
+                              label={`${ach.icon} ${ach.name}`}
+                              size="small"
+                              sx={{
+                                background: 'linear-gradient(45deg, #667eea 30%, #764ba2 90%)',
+                                color: 'white',
+                                fontWeight: 'bold',
+                              }}
+                            />
+                          ))}
+                        </Box>
+                      </Box>
+                    )}
+                  </Paper>
+                </motion.div>
+              ))}
+
+              <Button
+                fullWidth
+                variant="contained"
+                onClick={() => setFinalScores(null)}
+                sx={{ marginTop: 3 }}
+              >
+                Close
+              </Button>
+            </Paper>
+          </motion.div>
+        </Box>
+      )}
 
       {/* Animated Title */}
       <motion.div
