@@ -35,8 +35,8 @@ wss.on("connection", (ws) => {
         break;
       }
       case "startGame": {
-        const { letterGrid } = message;
-        handleStartGame(ws, letterGrid);
+        const { letterGrid, timerSeconds } = message;
+        handleStartGame(ws, letterGrid, timerSeconds);
         break;
       }
       case "endGame": {

@@ -11,14 +11,14 @@ const getActiveRooms = () => {
   })).filter(room => room.gameState === 'waiting'); // Only show rooms waiting for players
 };
 
-// Achievement definitions
+// Achievement definitions (Hebrew)
 const ACHIEVEMENTS = {
-  FIRST_BLOOD: { name: 'First Blood', description: 'First to find a word', icon: '🎯' },
-  SPEED_DEMON: { name: 'Speed Demon', description: 'Found 10 words in 2 minutes', icon: '⚡' },
-  WORD_MASTER: { name: 'Word Master', description: 'Found a 7+ letter word', icon: '📚' },
-  COMBO_KING: { name: 'Combo King', description: '5 words in a row', icon: '🔥' },
-  PERFECTIONIST: { name: 'Perfectionist', description: 'All words valid', icon: '✨' },
-  LEXICON: { name: 'Lexicon', description: 'Found 20+ words', icon: '🏆' },
+  FIRST_BLOOD: { name: 'דם ראשון', description: 'ראשון למצוא מילה', icon: '🎯' },
+  SPEED_DEMON: { name: 'שד המהירות', description: 'מצא 10 מילים ב-2 דקות', icon: '⚡' },
+  WORD_MASTER: { name: 'אדון המילים', description: 'מצא מילה בת 7+ אותיות', icon: '📚' },
+  COMBO_KING: { name: 'מלך הקומבו', description: '5 מילים ברצף', icon: '🔥' },
+  PERFECTIONIST: { name: 'פרפקציוניסט', description: 'כל המילים תקינות', icon: '✨' },
+  LEXICON: { name: 'לקסיקון', description: 'מצא 20+ מילים', icon: '🏆' },
 };
 
 // Calculate score based on word length with bonus for longer words
@@ -81,12 +81,13 @@ const addUserToGame = (gameCode, username, ws) => {
     broadcastLeaderboard(gameCode);
 }
 
-const handleStartGame = (host, letterGrid) => {
+const handleStartGame = (host, letterGrid, timerSeconds) => {
   const gameCode = gameWs[host];
   games[gameCode].gameState = 'playing';
   games[gameCode].startTime = Date.now();
   games[gameCode].letterGrid = letterGrid;
   games[gameCode].firstWordFound = false;
+  games[gameCode].timerSeconds = timerSeconds;
 
   // Reset all player scores, words, and achievements
   Object.keys(games[gameCode].users).forEach(username => {
@@ -96,7 +97,7 @@ const handleStartGame = (host, letterGrid) => {
     games[gameCode].playerWordDetails[username] = [];
   });
 
-  sendAllPlayerAMessage(gameCode, { action: "startGame", letterGrid });
+  sendAllPlayerAMessage(gameCode, { action: "startGame", letterGrid, timerSeconds });
   broadcastLeaderboard(gameCode);
 }
 
@@ -210,42 +211,31 @@ const handleWordSubmission = (ws, word) => {
   const currentTime = Date.now();
   const timeSinceStart = (currentTime - games[gameCode].startTime) / 1000; // in seconds
 
-  // Calculate score and add word
-  const score = calculateWordScore(word);
+  // Just store the word without calculating score yet
   games[gameCode].playerWords[username].push(word);
   games[gameCode].playerWordDetails[username].push({
     word,
-    score,
+    score: 0, // Will be calculated after validation
     timestamp: currentTime,
+    timeSinceStart,
     validated: null, // Will be set by host later
   });
-  games[gameCode].playerScores[username] += score;
 
-  // Check for achievements
-  checkAndAwardAchievements(gameCode, username, word, timeSinceStart);
-
-  // Send confirmation to player with any new achievements
+  // Send confirmation to player (no score yet)
   ws.send(JSON.stringify({
     action: "wordAccepted",
     word,
-    score,
-    totalScore: games[gameCode].playerScores[username],
-    achievements: games[gameCode].playerAchievements[username]
   }));
 
-  // Broadcast updated leaderboard to all players
-  broadcastLeaderboard(gameCode);
-
-  // Notify all players that someone found a word (for animations)
+  // Notify all players that someone found a word (no score shown)
   sendAllPlayerAMessage(gameCode, {
     action: "playerFoundWord",
     username,
     word,
-    score
   });
 }
 
-// Broadcast live leaderboard
+// Broadcast live leaderboard (word count only during game, scores after validation)
 const broadcastLeaderboard = (gameCode) => {
   if (!games[gameCode]) return;
 
@@ -253,7 +243,7 @@ const broadcastLeaderboard = (gameCode) => {
     username,
     score: games[gameCode].playerScores[username],
     wordCount: games[gameCode].playerWords[username].length
-  })).sort((a, b) => b.score - a.score);
+  })).sort((a, b) => b.wordCount - a.wordCount); // Sort by word count during game
 
   sendAllPlayerAMessage(gameCode, { action: "updateLeaderboard", leaderboard });
   sendHostAMessage(gameCode, { action: "updateLeaderboard", leaderboard });
@@ -290,51 +280,100 @@ const getGameCodeFromUsername = (username) => {
   return null;
 }
 
-// Handle word validation by host
-const handleValidateWords = (host, validations) => {
+// Handle word validation by host - THIS IS WHERE SCORING HAPPENS
+const handleValidateWords = (host, validations, letterGrid) => {
   const gameCode = gameWs[host];
   if (!games[gameCode]) return;
 
-  // Update scores based on validation
+  // Reset all scores before calculating
+  Object.keys(games[gameCode].users).forEach(username => {
+    games[gameCode].playerScores[username] = 0;
+    games[gameCode].playerAchievements[username] = [];
+  });
+
+  // Update validation status and calculate scores ONLY for valid words
   validations.forEach(({ username, word, isValid }) => {
     const wordDetail = games[gameCode].playerWordDetails[username].find(w => w.word === word);
     if (wordDetail) {
       wordDetail.validated = isValid;
 
-      // Deduct points if invalid
-      if (!isValid) {
-        games[gameCode].playerScores[username] -= wordDetail.score;
+      // Calculate and add score ONLY if valid
+      if (isValid) {
+        const score = calculateWordScore(word);
+        wordDetail.score = score;
+        games[gameCode].playerScores[username] += score;
+      } else {
+        wordDetail.score = 0;
       }
     }
   });
 
-  // Check for Perfectionist achievement (all words valid)
+  // NOW check and award achievements based on validated words
   Object.keys(games[gameCode].users).forEach(username => {
     const allWords = games[gameCode].playerWordDetails[username];
-    const allValid = allWords.length > 0 && allWords.every(w => w.validated === true);
+    const validWords = allWords.filter(w => w.validated === true);
 
-    if (allValid && !games[gameCode].playerAchievements[username].includes('PERFECTIONIST')) {
+    // First Blood - first word in the game
+    if (validWords.length > 0 && !games[gameCode].firstWordFound) {
+      const firstWordEver = Object.keys(games[gameCode].users)
+        .map(u => games[gameCode].playerWordDetails[u])
+        .flat()
+        .filter(w => w.validated === true)
+        .sort((a, b) => a.timestamp - b.timestamp)[0];
+
+      if (firstWordEver && allWords.includes(firstWordEver)) {
+        games[gameCode].playerAchievements[username].push('FIRST_BLOOD');
+        games[gameCode].firstWordFound = true;
+      }
+    }
+
+    // Word Master - 7+ letter word
+    if (validWords.some(w => w.word.length >= 7)) {
+      games[gameCode].playerAchievements[username].push('WORD_MASTER');
+    }
+
+    // Speed Demon - 10 valid words in 2 minutes
+    const wordsIn2Min = validWords.filter(w => w.timeSinceStart <= 120);
+    if (wordsIn2Min.length >= 10) {
+      games[gameCode].playerAchievements[username].push('SPEED_DEMON');
+    }
+
+    // Lexicon - 20+ valid words
+    if (validWords.length >= 20) {
+      games[gameCode].playerAchievements[username].push('LEXICON');
+    }
+
+    // Combo King - 5+ valid words
+    if (validWords.length >= 5 && validWords.length % 5 === 0) {
+      games[gameCode].playerAchievements[username].push('COMBO_KING');
+    }
+
+    // Perfectionist - all words valid
+    if (allWords.length > 0 && allWords.every(w => w.validated === true)) {
       games[gameCode].playerAchievements[username].push('PERFECTIONIST');
     }
   });
 
-  // Recalculate final scores
+  // Calculate final scores with all validated data
   const finalScores = Object.keys(games[gameCode].playerScores).map(username => ({
     username,
     score: games[gameCode].playerScores[username],
-    words: games[gameCode].playerWords[username],
+    words: games[gameCode].playerWordDetails[username].filter(w => w.validated === true).map(w => w.word),
+    allWords: games[gameCode].playerWordDetails[username], // For visualization
     wordCount: games[gameCode].playerWords[username].length,
     validWordCount: games[gameCode].playerWordDetails[username].filter(w => w.validated === true).length,
     achievements: games[gameCode].playerAchievements[username].map(ach => ACHIEVEMENTS[ach]),
-    longestWord: games[gameCode].playerWords[username].reduce((longest, word) =>
-      word.length > longest.length ? word : longest, ''),
+    longestWord: games[gameCode].playerWordDetails[username]
+      .filter(w => w.validated === true)
+      .reduce((longest, wordObj) => wordObj.word.length > longest.length ? wordObj.word : longest, ''),
   })).sort((a, b) => b.score - a.score);
 
-  // Send updated scores to all players
+  // Send validated scores with word validation visualization to all players
   sendAllPlayerAMessage(gameCode, {
     action: "validatedScores",
     scores: finalScores,
-    winner: finalScores[0]?.username
+    winner: finalScores[0]?.username,
+    letterGrid: games[gameCode].letterGrid // Send grid for word path visualization
   });
 
   sendHostAMessage(gameCode, {

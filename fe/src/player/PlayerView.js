@@ -31,6 +31,19 @@ const PlayerView = () => {
   const [achievements, setAchievements] = useState([]);
   const [letterGrid, setLetterGrid] = useState(null);
   const [finalScores, setFinalScores] = useState(null);
+  const [remainingTime, setRemainingTime] = useState(null);
+  const [showScores, setShowScores] = useState(false); // Only show after validation
+
+  // Timer countdown
+  useEffect(() => {
+    let timer;
+    if (remainingTime !== null && remainingTime > 0 && gameActive) {
+      timer = setInterval(() => {
+        setRemainingTime((prevTime) => Math.max(prevTime - 1, 0));
+      }, 1000);
+    }
+    return () => clearInterval(timer);
+  }, [remainingTime, gameActive]);
 
   // Handle WebSocket messages
   useEffect(() => {
@@ -48,10 +61,14 @@ const PlayerView = () => {
           setCombo(0);
           setAchievements([]);
           setFinalScores(null);
+          setShowScores(false);
           if (message.letterGrid) {
             setLetterGrid(message.letterGrid);
           }
-          toast.success('Game Started! Find as many words as you can!', {
+          if (message.timerSeconds) {
+            setRemainingTime(message.timerSeconds);
+          }
+          toast.success('המשחק התחיל! מצא כמה שיותר מילים!', {
             icon: '🎮',
             duration: 3000,
           });
@@ -59,50 +76,25 @@ const PlayerView = () => {
 
         case 'endGame':
           setGameActive(false);
-          toast('Game Over! Check the final scores', {
+          setRemainingTime(null);
+          toast('המשחק נגמר! ממתין לאימות המנהל', {
             icon: '🏁',
             duration: 4000,
           });
           break;
 
         case 'wordAccepted':
-          const { word: acceptedWord, score: wordScore, totalScore, achievements: playerAch } = message;
-          setScore(totalScore);
+          const { word: acceptedWord } = message;
           setCombo(prev => prev + 1);
-          setLastWordScore(wordScore);
-          if (playerAch) {
-            setAchievements(playerAch);
-          }
 
-          // Celebration effects based on word score
-          if (wordScore >= 5) {
-            confetti({
-              particleCount: 50,
-              spread: 60,
-              origin: { y: 0.6 },
-              colors: ['#FFD700', '#FFA500', '#FF6347'],
-            });
-            toast.success(`Amazing! +${wordScore} points!`, {
-              icon: '🔥',
-              style: {
-                background: '#FFD700',
-                color: '#000',
-                fontWeight: 'bold',
-              },
-            });
-          } else if (wordScore >= 3) {
-            toast.success(`Great word! +${wordScore} points`, {
-              icon: '⭐',
-            });
-          } else {
-            toast.success(`+${wordScore} point${wordScore !== 1 ? 's' : ''}`, {
-              icon: '✓',
-            });
-          }
+          // Simple confirmation without score
+          toast.success(`המילה "${acceptedWord}" נוספה!`, {
+            icon: '✓',
+          });
           break;
 
         case 'wordAlreadyFound':
-          toast.error('You already found this word!', {
+          toast.error('כבר מצאת את המילה הזו!', {
             icon: '❌',
           });
           break;
@@ -112,74 +104,50 @@ const PlayerView = () => {
           break;
 
         case 'playerFoundWord':
-          if (message.score >= 5) {
-            toast(`${message.username} found "${message.word}"!`, {
-              icon: '👀',
-              duration: 2000,
-            });
-          }
+          // Just notify without score
+          toast(`${message.username} מצא "${message.word}"!`, {
+            icon: '👀',
+            duration: 2000,
+          });
           break;
 
-        case 'achievementUnlocked':
-          if (message.achievements && message.achievements.length > 0) {
-            message.achievements.forEach(ach => {
-              toast(
-                <div>
-                  <strong>{ach.icon} {ach.name}</strong>
-                  <br />
-                  <small>{ach.description}</small>
-                </div>,
-                {
-                  icon: '🎉',
-                  duration: 4000,
-                  style: {
-                    background: 'linear-gradient(45deg, #FF6B6B 30%, #4ECDC4 90%)',
-                    color: 'white',
-                  },
-                }
-              );
-            });
-            confetti({
-              particleCount: 30,
-              spread: 50,
-              origin: { y: 0.6 },
-            });
-          }
-          break;
+        case 'validatedScores':
+          const { scores: validatedScores, winner: finalWinner, letterGrid: validationGrid } = message;
+          setFinalScores(validatedScores);
+          setShowScores(true);
 
-        case 'finalScores':
-          const { scores, winner } = message;
-          setFinalScores(scores);
-          toast(
-            <div>
-              <strong>🏆 Winner: {winner}</strong>
-              <br />
-              Final Scores Available!
-            </div>,
-            {
-              duration: 5000,
-              style: {
-                background: '#4CAF50',
-                color: 'white',
-              },
-            }
-          );
-          if (winner) {
+          // Set achievements and scores from validated results
+          const myUsername = validatedScores.find(s => s.username)?.username; // Get current player's username
+          const myScore = validatedScores.find(s => s.username === myUsername);
+          if (myScore) {
+            setScore(myScore.score);
+            setAchievements(myScore.achievements || []);
+          }
+
+          toast.success('הציונים המאומתים הגיעו!', {
+            icon: '✅',
+            duration: 4000,
+          });
+
+          if (finalWinner) {
             confetti({
               particleCount: 100,
               spread: 70,
               origin: { y: 0.6 },
             });
+            toast(
+              <div>
+                <strong>🏆 המנצח: {finalWinner}</strong>
+              </div>,
+              {
+                duration: 5000,
+                style: {
+                  background: '#4CAF50',
+                  color: 'white',
+                },
+              }
+            );
           }
-          break;
-
-        case 'validatedScores':
-          const { scores: validatedScores, winner: finalWinner } = message;
-          setFinalScores(validatedScores);
-          toast.success('Final validated scores are in!', {
-            icon: '✅',
-            duration: 4000,
-          });
           break;
 
         default:
@@ -226,11 +194,15 @@ const PlayerView = () => {
     return null;
   };
 
-  const getLetterColor = (i, j) => {
-    const colors = [
-      '#FF6B6B', '#4ECDC4', '#45B7D1', '#FFA07A', '#98D8C8', '#F7DC6F', '#BB8FCE',
-    ];
-    return colors[(i + j) % colors.length];
+  const getLetterColor = () => {
+    // Single color for all tiles during gameplay
+    return '#667eea';
+  };
+
+  const formatTime = (seconds) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
 
   return (
@@ -289,7 +261,7 @@ const PlayerView = () => {
                   fontSize: { xs: '1.75rem', sm: '2.5rem' }
                 }}
               >
-                <FaTrophy /> Final Results
+                <FaTrophy /> תוצאות סופיות
               </Typography>
 
               {finalScores.map((player, index) => (
@@ -325,19 +297,45 @@ const PlayerView = () => {
                     </Box>
 
                     <Typography variant="body2" sx={{ mb: 1 }}>
-                      Words found: {player.wordCount} {player.validWordCount !== undefined && `(${player.validWordCount} valid)`}
+                      מילים שנמצאו: {player.wordCount} {player.validWordCount !== undefined && `(${player.validWordCount} תקינות)`}
                     </Typography>
 
                     {player.longestWord && (
                       <Typography variant="body2" sx={{ mb: 1 }}>
-                        Longest word: <strong>{player.longestWord}</strong>
+                        המילה הארוכה ביותר: <strong>{player.longestWord}</strong>
                       </Typography>
+                    )}
+
+                    {/* Word Visualization with colors */}
+                    {player.allWords && player.allWords.length > 0 && (
+                      <Box sx={{ mt: 2 }}>
+                        <Typography variant="body2" fontWeight="bold" gutterBottom>
+                          מילים:
+                        </Typography>
+                        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
+                          {player.allWords.map((wordObj, i) => (
+                            <Chip
+                              key={i}
+                              label={`${wordObj.word} ${wordObj.validated ? `(${wordObj.score})` : '(✗)'}`}
+                              size="small"
+                              sx={{
+                                background: wordObj.validated
+                                  ? ['#FF6B6B', '#4ECDC4', '#45B7D1', '#FFA07A', '#98D8C8', '#F7DC6F', '#BB8FCE'][i % 7]
+                                  : '#9e9e9e',
+                                color: 'white',
+                                fontWeight: 'bold',
+                                opacity: wordObj.validated ? 1 : 0.6,
+                              }}
+                            />
+                          ))}
+                        </Box>
+                      </Box>
                     )}
 
                     {player.achievements && player.achievements.length > 0 && (
                       <Box sx={{ mt: 2 }}>
                         <Typography variant="body2" fontWeight="bold" gutterBottom>
-                          Achievements:
+                          הישגים:
                         </Typography>
                         <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
                           {player.achievements.map((ach, i) => (
@@ -374,44 +372,71 @@ const PlayerView = () => {
         <span className="text" style={{ fontSize: 'clamp(2rem, 8vw, 4rem)' }}>Boggle</span>
       </motion.div>
 
-      {/* Score Display */}
-      <motion.div
-        initial={{ scale: 0 }}
-        animate={{ scale: 1 }}
-        transition={{ type: 'spring', stiffness: 260, damping: 20 }}
-        style={{ width: '100%', maxWidth: '400px' }}
-      >
-        <Paper
-          elevation={6}
-          sx={{
-            padding: { xs: 2, sm: 3 },
-            marginBottom: 3,
-            background: 'linear-gradient(45deg, #FE6B8B 30%, #FF8E53 90%)',
-            color: 'white',
-            textAlign: 'center',
-          }}
+      {/* Timer Display */}
+      {remainingTime !== null && gameActive && (
+        <motion.div
+          initial={{ scale: 0 }}
+          animate={{ scale: 1 }}
+          transition={{ type: 'spring', stiffness: 260, damping: 20 }}
+          style={{ width: '100%', maxWidth: '400px' }}
         >
-          <Typography
-            variant="h3"
-            fontWeight="bold"
-            sx={{ fontSize: { xs: '2rem', sm: '3rem' } }}
+          <Paper
+            elevation={6}
+            sx={{
+              padding: { xs: 2, sm: 3 },
+              marginBottom: 3,
+              background:
+                remainingTime < 30
+                  ? 'linear-gradient(45deg, #FF6B6B 30%, #FF8E53 90%)'
+                  : 'linear-gradient(45deg, #4CAF50 30%, #8BC34A 90%)',
+              color: 'white',
+              textAlign: 'center',
+            }}
           >
-            {score}
-          </Typography>
-          <Typography variant="body2">POINTS</Typography>
-          {combo > 2 && (
-            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', mt: 1 }}>
-              <FaFire style={{ color: '#FFD700', marginRight: 5 }} />
-              <Typography variant="h6" sx={{ fontSize: { xs: '1rem', sm: '1.25rem' } }}>
-                {combo}x COMBO!
-              </Typography>
-            </Box>
-          )}
-        </Paper>
-      </motion.div>
+            <Typography
+              variant="h3"
+              fontWeight="bold"
+              sx={{ fontSize: { xs: '2rem', sm: '3rem' } }}
+            >
+              {formatTime(remainingTime)}
+            </Typography>
+            <Typography variant="body2">זמן נותר</Typography>
+          </Paper>
+        </motion.div>
+      )}
 
-      {/* Achievements Bar */}
-      {achievements.length > 0 && (
+      {/* Score Display (Only after validation) */}
+      {showScores && (
+        <motion.div
+          initial={{ scale: 0 }}
+          animate={{ scale: 1 }}
+          transition={{ type: 'spring', stiffness: 260, damping: 20 }}
+          style={{ width: '100%', maxWidth: '400px' }}
+        >
+          <Paper
+            elevation={6}
+            sx={{
+              padding: { xs: 2, sm: 3 },
+              marginBottom: 3,
+              background: 'linear-gradient(45deg, #FE6B8B 30%, #FF8E53 90%)',
+              color: 'white',
+              textAlign: 'center',
+            }}
+          >
+            <Typography
+              variant="h3"
+              fontWeight="bold"
+              sx={{ fontSize: { xs: '2rem', sm: '3rem' } }}
+            >
+              {score}
+            </Typography>
+            <Typography variant="body2">נקודות</Typography>
+          </Paper>
+        </motion.div>
+      )}
+
+      {/* Achievements Bar (Only after validation) */}
+      {achievements.length > 0 && showScores && (
         <motion.div
           initial={{ y: -20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
@@ -425,13 +450,13 @@ const PlayerView = () => {
               color="primary"
               sx={{ fontSize: { xs: '1rem', sm: '1.25rem' } }}
             >
-              🏆 Your Achievements
+              🏆 ההישגים שלך
             </Typography>
             <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
               {achievements.map((ach, index) => (
                 <Chip
                   key={index}
-                  label={`${ach} ${ach}`}
+                  label={`${ach.icon} ${ach.name}`}
                   sx={{
                     background: 'linear-gradient(45deg, #FE6B8B 30%, #FF8E53 90%)',
                     color: 'white',
@@ -469,7 +494,7 @@ const PlayerView = () => {
               color="primary"
               sx={{ fontSize: { xs: '1rem', sm: '1.25rem' } }}
             >
-              Letter Grid
+              לוח האותיות
             </Typography>
             <Box
               sx={{
@@ -499,10 +524,15 @@ const PlayerView = () => {
                         alignItems: 'center',
                         fontSize: { xs: '1.2rem', sm: '1.5rem' },
                         fontWeight: 'bold',
-                        background: `linear-gradient(135deg, ${getLetterColor(i, j)} 0%, ${getLetterColor(i + 1, j + 1)} 100%)`,
+                        background: getLetterColor(),
                         color: 'white',
                         borderRadius: { xs: '6px', sm: '8px' },
                         boxShadow: '0 2px 4px rgba(0,0,0,0.2)',
+                        transition: 'all 0.3s ease',
+                        '&:hover': {
+                          transform: 'scale(1.05)',
+                          boxShadow: '0 4px 8px rgba(0,0,0,0.3)',
+                        }
                       }}
                     >
                       {cell}
@@ -529,13 +559,13 @@ const PlayerView = () => {
             color="primary"
             sx={{ fontSize: { xs: '1.25rem', sm: '1.5rem' } }}
           >
-            Found Words ({foundWords.length})
+            מילים שנמצאו ({foundWords.length})
           </Typography>
 
           <Box sx={{ marginBottom: 3 }}>
             <TextField
               fullWidth
-              label="Enter word"
+              label="הזן מילה"
               variant="outlined"
               value={word}
               onChange={(e) => setWord(e.target.value)}
@@ -552,7 +582,7 @@ const PlayerView = () => {
               disabled={!gameActive || !word.trim()}
               size="large"
             >
-              Submit Word
+              הוסף מילה
             </Button>
           </Box>
 
@@ -560,7 +590,7 @@ const PlayerView = () => {
             <Box sx={{ marginY: 2 }}>
               <LinearProgress />
               <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-                Waiting for game to start...
+                ממתין להתחלת המשחק...
               </Typography>
             </Box>
           )}
@@ -610,7 +640,7 @@ const PlayerView = () => {
             sx={{ fontSize: { xs: '1.25rem', sm: '1.5rem' } }}
           >
             <FaTrophy style={{ marginRight: 8, color: '#FFD700' }} />
-            Leaderboard
+            טבלת המובילים
           </Typography>
           <List>
             {leaderboard.map((player, index) => (
@@ -642,11 +672,11 @@ const PlayerView = () => {
                     <Box sx={{ flex: 1 }}>
                       <Typography fontWeight="bold">{player.username}</Typography>
                       <Typography variant="caption">
-                        {player.wordCount} words
+                        {player.wordCount} מילים
                       </Typography>
                     </Box>
                     <Typography variant="h6" fontWeight="bold">
-                      {player.score}
+                      {showScores ? player.score : player.wordCount}
                     </Typography>
                   </Box>
                 </ListItem>
@@ -655,7 +685,7 @@ const PlayerView = () => {
           </List>
           {leaderboard.length === 0 && (
             <Typography variant="body2" color="text.secondary" sx={{ textAlign: 'center', mt: 2 }}>
-              No players yet
+              אין שחקנים עדיין
             </Typography>
           )}
         </Paper>
