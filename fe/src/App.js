@@ -27,7 +27,11 @@ const getWebSocketURL = () => {
 const ws = new WebSocket(getWebSocketURL());
 
 function App() {
-  const [gameCode, setGameCode] = useState("");
+  // Check for room code in URL parameters
+  const urlParams = new URLSearchParams(window.location.search);
+  const roomFromUrl = urlParams.get('room');
+
+  const [gameCode, setGameCode] = useState(roomFromUrl || "");
   const [username, setUsername] = useState("");
   const [isActive, setIsActive] = useState(false);
 
@@ -134,6 +138,7 @@ function App() {
           error={error}
           activeRooms={activeRooms}
           refreshRooms={refreshRooms}
+          prefilledRoom={roomFromUrl}
         />
       ) :
         isHost ? (<HostView gameCode={gameCode} users={users} />) :
