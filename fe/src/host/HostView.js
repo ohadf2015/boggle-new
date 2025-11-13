@@ -57,6 +57,13 @@ const HostView = ({ gameCode, users }) => {
           setPlayersReady(message.users);
           break;
 
+        case 'playerJoinedLate':
+          toast.success(`${message.username} הצטרף למשחק באמצע! ⏰`, {
+            icon: '🚀',
+            duration: 4000,
+          });
+          break;
+
         case 'updateLeaderboard':
           setLeaderboard(message.leaderboard);
           break;
@@ -71,13 +78,16 @@ const HostView = ({ gameCode, users }) => {
         case 'showValidation':
           setPlayerWords(message.playerWords);
           setShowValidation(true);
-          // Initialize validations object
+          // Initialize validations object with unique words only
           const initialValidations = {};
+          const uniqueWords = new Set();
           message.playerWords.forEach(player => {
             player.words.forEach(wordObj => {
-              const key = `${player.username}-${wordObj.word}`;
-              initialValidations[key] = true; // Default to valid
+              uniqueWords.add(wordObj.word);
             });
+          });
+          uniqueWords.forEach(word => {
+            initialValidations[word] = true; // Default to valid
           });
           setValidations(initialValidations);
           toast.success('סקור ואשר את כל המילים', {
@@ -181,16 +191,12 @@ const HostView = ({ gameCode, users }) => {
   };
 
   const submitValidation = () => {
-    // Convert validations object to array for backend
+    // Convert validations object to array with unique words only
     const validationArray = [];
-    playerWords.forEach(player => {
-      player.words.forEach(wordObj => {
-        const key = `${player.username}-${wordObj.word}`;
-        validationArray.push({
-          username: player.username,
-          word: wordObj.word,
-          isValid: validations[key],
-        });
+    Object.keys(validations).forEach(word => {
+      validationArray.push({
+        word: word,
+        isValid: validations[word],
       });
     });
 
@@ -205,10 +211,10 @@ const HostView = ({ gameCode, users }) => {
   };
 
   const toggleWordValidation = (username, word) => {
-    const key = `${username}-${word}`;
+    // username is not used anymore - we validate by word only
     setValidations(prev => ({
       ...prev,
-      [key]: !prev[key],
+      [word]: !prev[word],
     }));
   };
 
@@ -285,41 +291,100 @@ const HostView = ({ gameCode, users }) => {
               <Typography variant="body1" align="center" gutterBottom sx={{ mb: 1, color: 'text.secondary' }}>
                 לחץ על מילים כדי לסמן אותן כלא תקינות (אדום). מילים ירוקות תקינות.
               </Typography>
-              <Typography variant="body2" align="center" gutterBottom sx={{ mb: 3, color: 'text.secondary' }}>
+              <Typography variant="body2" align="center" gutterBottom sx={{ mb: 1, color: 'text.secondary' }}>
                 כל המילים כבר עברו אימות על הלוח - עכשיו אשר שהן מילים אמיתיות במילון
               </Typography>
+              <Typography variant="body2" align="center" gutterBottom sx={{ mb: 2, color: 'info.main', fontStyle: 'italic' }}>
+                המילים מוצגות מצונזרות (א•••ת) כדי לשמור על הוגנות. מילים כתומות עם ⚠ נמצאו על ידי יותר משחקן אחד.
+              </Typography>
 
-              {/* Collect all words into a single list */}
+              {/* Legend */}
+              <Box sx={{ display: 'flex', justifyContent: 'center', gap: 2, mb: 3, flexWrap: 'wrap' }}>
+                <Chip
+                  icon={<span>✓</span>}
+                  label="מילה תקינה"
+                  sx={{
+                    background: 'linear-gradient(45deg, #4CAF50 30%, #8BC34A 90%)',
+                    color: 'white',
+                    fontWeight: 'bold',
+                  }}
+                />
+                <Chip
+                  icon={<span>✗</span>}
+                  label="מילה לא תקינה"
+                  sx={{
+                    background: 'linear-gradient(45deg, #f44336 30%, #e91e63 90%)',
+                    color: 'white',
+                    fontWeight: 'bold',
+                  }}
+                />
+                <Chip
+                  icon={<span>⚠</span>}
+                  label="כפילות (אוטומטית לא תקינה)"
+                  sx={{
+                    background: 'linear-gradient(45deg, #FF9800 30%, #FFC107 90%)',
+                    color: 'white',
+                    fontWeight: 'bold',
+                    border: '2px solid #F57C00',
+                  }}
+                />
+              </Box>
+
+              {/* Collect unique words only */}
               {(() => {
-                const allWords = [];
+                // Collect unique words and count how many players found each
+                const uniqueWordsMap = new Map();
                 playerWords.forEach(player => {
                   player.words.forEach(wordObj => {
-                    allWords.push({
-                      word: wordObj.word,
-                      score: wordObj.score,
-                      username: player.username,
-                    });
+                    const word = wordObj.word;
+                    if (!uniqueWordsMap.has(word)) {
+                      uniqueWordsMap.set(word, {
+                        word: word,
+                        score: wordObj.score,
+                        playerCount: 1,
+                        players: [player.username]
+                      });
+                    } else {
+                      const existing = uniqueWordsMap.get(word);
+                      existing.playerCount++;
+                      existing.players.push(player.username);
+                    }
                   });
                 });
 
-                // Sort alphabetically for easier review
-                allWords.sort((a, b) => a.word.localeCompare(b.word));
+                // Convert to array and sort alphabetically
+                const uniqueWords = Array.from(uniqueWordsMap.values());
+                uniqueWords.sort((a, b) => a.word.localeCompare(b.word));
 
-                // Group by first letter for better organization
+                // Censor the words (show first and last letter only)
+                const censorWord = (word) => {
+                  if (word.length <= 2) return word;
+                  return word.charAt(0) + '•'.repeat(word.length - 2) + word.charAt(word.length - 1);
+                };
+
+                // Group by word length for better organization
                 const groupedWords = {};
-                allWords.forEach(item => {
-                  const firstLetter = item.word[0].toUpperCase();
-                  if (!groupedWords[firstLetter]) {
-                    groupedWords[firstLetter] = [];
+                uniqueWords.forEach(item => {
+                  const length = item.word.length;
+                  const groupKey = `${length} אותיות`;
+                  if (!groupedWords[groupKey]) {
+                    groupedWords[groupKey] = [];
                   }
-                  groupedWords[firstLetter].push(item);
+                  groupedWords[groupKey].push(item);
                 });
 
                 return (
                   <Box sx={{ mb: 3 }}>
-                    {Object.keys(groupedWords).sort().map((letter, groupIndex) => (
+                    <Typography variant="body2" align="center" sx={{ mb: 2, color: 'text.secondary', fontStyle: 'italic' }}>
+                      סה"כ {uniqueWords.length} מילים ייחודיות למאמת
+                    </Typography>
+                    {Object.keys(groupedWords).sort((a, b) => {
+                      const lenA = parseInt(a.split(' ')[0]);
+                      const lenB = parseInt(b.split(' ')[0]);
+                      return lenA - lenB;
+                    }).map((groupKey, groupIndex) => (
                       <motion.div
-                        key={letter}
+                        key={groupKey}
                         initial={{ x: -50, opacity: 0 }}
                         animate={{ x: 0, opacity: 1 }}
                         transition={{ delay: groupIndex * 0.05 }}
@@ -339,13 +404,16 @@ const HostView = ({ gameCode, users }) => {
                             color="primary"
                             sx={{ fontSize: { xs: '1rem', sm: '1.2rem' }, mb: 1.5 }}
                           >
-                            {letter}
+                            {groupKey} ({groupedWords[groupKey].length} מילים)
                           </Typography>
 
                           <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
-                            {groupedWords[letter].map((item, wordIndex) => {
-                              const key = `${item.username}-${item.word}`;
-                              const isValid = validations[key];
+                            {groupedWords[groupKey].map((item, wordIndex) => {
+                              // Use only the word for validation key (not username)
+                              const key = item.word;
+                              const isValid = validations[key] !== undefined ? validations[key] : true;
+                              const isDuplicate = item.playerCount > 1;
+
                               return (
                                 <motion.div
                                   key={`${key}-${wordIndex}`}
@@ -356,16 +424,18 @@ const HostView = ({ gameCode, users }) => {
                                     label={
                                       <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                                         <Typography sx={{ fontWeight: 'bold', fontSize: { xs: '0.85rem', sm: '1rem' } }}>
-                                          {item.word}
+                                          {censorWord(item.word)}
                                         </Typography>
                                         <Typography sx={{ fontSize: { xs: '0.65rem', sm: '0.75rem' }, opacity: 0.9 }}>
-                                          {item.username}
+                                          {isDuplicate ? `${item.playerCount} שחקנים` : `1 שחקן`}
                                         </Typography>
                                       </Box>
                                     }
-                                    onClick={() => toggleWordValidation(item.username, item.word)}
+                                    onClick={() => toggleWordValidation(null, item.word)}
                                     sx={{
-                                      background: isValid
+                                      background: isDuplicate
+                                        ? 'linear-gradient(45deg, #FF9800 30%, #FFC107 90%)'
+                                        : isValid
                                         ? 'linear-gradient(45deg, #4CAF50 30%, #8BC34A 90%)'
                                         : 'linear-gradient(45deg, #f44336 30%, #e91e63 90%)',
                                       color: 'white',
@@ -375,11 +445,12 @@ const HostView = ({ gameCode, users }) => {
                                       padding: { xs: '8px 10px', sm: '10px 12px' },
                                       cursor: 'pointer',
                                       transition: 'all 0.3s ease',
+                                      border: isDuplicate ? '2px solid #F57C00' : 'none',
                                       '&:hover': {
                                         boxShadow: '0 4px 8px rgba(0,0,0,0.3)',
                                       },
                                     }}
-                                    icon={<span style={{ fontSize: '1.2rem' }}>{isValid ? '✓' : '✗'}</span>}
+                                    icon={<span style={{ fontSize: '1.2rem' }}>{isDuplicate ? '⚠' : (isValid ? '✓' : '✗')}</span>}
                                   />
                                 </motion.div>
                               );
@@ -770,14 +841,15 @@ const HostView = ({ gameCode, users }) => {
             sx={{
               display: 'grid',
               gridTemplateColumns: {
-                xs: `repeat(${tableData[0]?.length || 7}, minmax(35px, 1fr))`,
-                sm: `repeat(${tableData[0]?.length || 7}, minmax(40px, 60px))`,
-                md: `repeat(${tableData[0]?.length || 7}, minmax(50px, 70px))`,
+                xs: `repeat(${tableData[0]?.length || 7}, minmax(28px, 1fr))`,
+                sm: `repeat(${tableData[0]?.length || 7}, minmax(40px, 55px))`,
+                md: `repeat(${tableData[0]?.length || 7}, minmax(50px, 65px))`,
               },
-              gap: { xs: '6px', sm: '10px', md: '12px' },
+              gap: { xs: '4px', sm: '8px', md: '12px' },
               marginBottom: 3,
               width: '100%',
-              maxWidth: '100%',
+              maxWidth: { xs: '320px', sm: '450px', md: '100%' },
+              margin: '0 auto 24px',
             }}
           >
             {tableData.map((row, i) =>
@@ -801,11 +873,11 @@ const HostView = ({ gameCode, users }) => {
                       display: 'flex',
                       justifyContent: 'center',
                       alignItems: 'center',
-                      fontSize: { xs: '1.2rem', sm: '1.8rem', md: '2rem' },
+                      fontSize: { xs: '1rem', sm: '1.5rem', md: '2rem' },
                       fontWeight: 'bold',
                       background: getLetterColor(),
                       color: 'white',
-                      borderRadius: { xs: '8px', sm: '10px', md: '12px' },
+                      borderRadius: { xs: '4px', sm: '8px', md: '12px' },
                       boxShadow: '0 4px 8px rgba(0,0,0,0.2)',
                       cursor: 'pointer',
                       transition: 'all 0.3s ease',

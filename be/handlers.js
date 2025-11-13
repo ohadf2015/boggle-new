@@ -3,19 +3,38 @@ const games = {};
 const gameWs = new Map();
 const wsUsername = new Map();
 
+// Normalize Hebrew letters - convert final forms to regular forms
+function normalizeHebrewLetter(letter) {
+  const finalToRegular = {
+    'ץ': 'צ',
+    'ך': 'כ',
+    'ם': 'מ',
+    'ן': 'נ',
+    'ף': 'פ'
+  };
+  return finalToRegular[letter] || letter;
+}
+
+// Normalize an entire Hebrew word
+function normalizeHebrewWord(word) {
+  return word.split('').map(normalizeHebrewLetter).join('');
+}
+
 // Word validation: Check if a word exists on the board as a valid path
 function isWordOnBoard(word, board) {
   if (!word || !board || board.length === 0) return false;
 
   const rows = board.length;
   const cols = board[0].length;
-  const wordLower = word.toLowerCase();
+  // Normalize and lowercase the word for comparison
+  const wordNormalized = normalizeHebrewWord(word.toLowerCase());
 
   // Find all starting positions (cells with the first letter)
   const startPositions = [];
   for (let i = 0; i < rows; i++) {
     for (let j = 0; j < cols; j++) {
-      if (board[i][j].toLowerCase() === wordLower[0]) {
+      const cellNormalized = normalizeHebrewLetter(board[i][j].toLowerCase());
+      if (cellNormalized === wordNormalized[0]) {
         startPositions.push([i, j]);
       }
     }
@@ -23,7 +42,7 @@ function isWordOnBoard(word, board) {
 
   // Try to find the word starting from each position
   for (const [startRow, startCol] of startPositions) {
-    if (searchWord(board, wordLower, startRow, startCol, 0, new Set())) {
+    if (searchWord(board, wordNormalized, startRow, startCol, 0, new Set())) {
       return true;
     }
   }
@@ -49,8 +68,9 @@ function searchWord(board, word, row, col, index, visited) {
     return false;
   }
 
-  // Check if current cell matches current letter
-  if (board[row][col].toLowerCase() !== word[index]) {
+  // Check if current cell matches current letter (with normalization)
+  const cellNormalized = normalizeHebrewLetter(board[row][col].toLowerCase());
+  if (cellNormalized !== word[index]) {
     return false;
   }
 
@@ -98,17 +118,17 @@ const ACHIEVEMENTS = {
   TREASURE_HUNTER: { name: 'צייד אוצרות', description: 'מצא מילה נדירה (8+ אותיות)', icon: '💎' },
 };
 
-// Calculate score based on word length with bonus for longer words
+// Calculate score based on word length with bonus for longer words (whole numbers)
 const calculateWordScore = (word) => {
     const length = word.length;
     if (length === 1) return 0; // Single letters not allowed
-    if (length === 2) return 0.5; // 2-letter words allowed but lowest rank
-    if (length === 3) return 1;
-    if (length === 4) return 1;
-    if (length === 5) return 2;
-    if (length === 6) return 3;
-    if (length === 7) return 5;
-    return 8 + (length - 8) * 2; // 8+ letters get extra bonus
+    if (length === 2) return 1; // 2-letter words: 1 point
+    if (length === 3) return 1; // 3-letter words: 1 point
+    if (length === 4) return 2; // 4-letter words: 2 points
+    if (length === 5) return 3; // 5-letter words: 3 points
+    if (length === 6) return 5; // 6-letter words: 5 points
+    if (length === 7) return 7; // 7-letter words: 7 points
+    return 10 + (length - 8) * 3; // 8+ letters: 10, 13, 16, 19...
 };
 
 const setNewGame = (gameCode, host, username) => {
@@ -150,16 +170,44 @@ const addUserToGame = (gameCode, username, ws) => {
     } else {
         console.log(`User ${username} joined game ${gameCode}`);
     }
-    games[gameCode].users[username] = ws;
-    games[gameCode].playerScores[username] = 0;
-    games[gameCode].playerWords[username] = [];
-    games[gameCode].playerAchievements[username] = [];
-    games[gameCode].playerWordDetails[username] = [];
+
+    const game = games[gameCode];
+    game.users[username] = ws;
+    game.playerScores[username] = 0;
+    game.playerWords[username] = [];
+    game.playerAchievements[username] = [];
+    game.playerWordDetails[username] = [];
     gameWs.set(ws, gameCode);
     wsUsername.set(ws, username);
 
     // Send confirmation to the player who just joined
     ws.send(JSON.stringify({ action: "joined", isHost: false }));
+
+    // If game is already in progress, sync the current game state to the new player
+    if (game.gameState === 'playing') {
+      const remainingTime = Math.max(0, Math.floor((game.endTime - Date.now()) / 1000));
+      ws.send(JSON.stringify({
+        action: "startGame",
+        letterGrid: game.letterGrid,
+        timerSeconds: remainingTime,
+        isLateJoin: true
+      }));
+
+      // Send current remaining time
+      ws.send(JSON.stringify({
+        action: "timeUpdate",
+        remainingTime: remainingTime
+      }));
+
+      // Notify host about late join
+      sendHostAMessage(gameCode, {
+        action: "playerJoinedLate",
+        username: username,
+        remainingTime: remainingTime
+      });
+
+      console.log(`Late join: ${username} joined active game ${gameCode} with ${remainingTime}s remaining`);
+    }
 
     sendHostAMessage(gameCode, { action: "updateUsers", users: Object.keys(games[gameCode].users) });
     broadcastLeaderboard(gameCode);
@@ -597,36 +645,52 @@ const handleValidateWords = (host, validations, letterGrid) => {
     });
   });
 
-  // Update validation status and calculate scores ONLY for valid words
-  validations.forEach(({ username, word, isValid }) => {
-    // Safety check: ensure player still exists in game
-    if (!games[gameCode].playerWordDetails[username]) {
-      console.warn(`Player ${username} not found in game ${gameCode} during validation`);
-      return;
+  // Create a map of unique words with their validation status
+  const wordValidationMap = {};
+  validations.forEach(({ word, isValid }) => {
+    // Only store unique words - the first validation for each word wins
+    if (!wordValidationMap[word]) {
+      wordValidationMap[word] = isValid;
     }
+  });
 
-    const wordDetail = games[gameCode].playerWordDetails[username].find(w => w.word === word);
-    if (wordDetail) {
-      // Check if this word is a duplicate (found by 2+ players)
-      const isDuplicate = wordCounts[word] && wordCounts[word] >= 2;
+  // Apply validations to all players who have each word
+  Object.keys(wordValidationMap).forEach(word => {
+    const isValid = wordValidationMap[word];
+    const isDuplicate = wordCounts[word] && wordCounts[word] >= 2;
 
-      // If word is duplicate, mark as invalid for everyone
-      if (isDuplicate) {
-        wordDetail.validated = false;
-        wordDetail.score = 0;
-        wordDetail.isDuplicate = true; // Flag for UI display
-      } else {
-        wordDetail.validated = isValid;
-
-        // Calculate and add score ONLY if valid and not duplicate
-        if (isValid) {
-          const score = calculateWordScore(word);
-          wordDetail.score = score;
-          games[gameCode].playerScores[username] += score;
-        } else {
-          wordDetail.score = 0;
+    // Apply validation to all players who submitted this word
+    if (wordsByUser[word]) {
+      wordsByUser[word].forEach(username => {
+        // Check if player still exists (may have disconnected)
+        if (!games[gameCode].playerWordDetails[username]) {
+          return; // Skip players who disconnected
         }
-      }
+
+        const wordDetail = games[gameCode].playerWordDetails[username].find(w => w.word === word);
+        if (wordDetail) {
+          // If word is duplicate, mark as invalid for everyone
+          if (isDuplicate) {
+            wordDetail.validated = false;
+            wordDetail.score = 0;
+            wordDetail.isDuplicate = true;
+          } else {
+            wordDetail.validated = isValid;
+
+            // Calculate and add score ONLY if valid and not duplicate
+            if (isValid) {
+              const score = calculateWordScore(word);
+              wordDetail.score = score;
+              // Only add score if player is still connected
+              if (games[gameCode].playerScores[username] !== undefined) {
+                games[gameCode].playerScores[username] += score;
+              }
+            } else {
+              wordDetail.score = 0;
+            }
+          }
+        }
+      });
     }
   });
 

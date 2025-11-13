@@ -1,5 +1,22 @@
 import { hebrewLetters, DIFFICULTIES, DEFAULT_DIFFICULTY } from "./consts";
 
+// Normalize Hebrew letters - convert final forms to regular forms
+export function normalizeHebrewLetter(letter) {
+  const finalToRegular = {
+    'ץ': 'צ',
+    'ך': 'כ',
+    'ם': 'מ',
+    'ן': 'נ',
+    'ף': 'פ'
+  };
+  return finalToRegular[letter] || letter;
+}
+
+// Normalize an entire Hebrew word
+export function normalizeHebrewWord(word) {
+  return word.split('').map(normalizeHebrewLetter).join('');
+}
+
 export function generateRandomTable(rows = null, cols = null) {
     // Use default difficulty if no rows/cols specified
     if (rows === null || cols === null) {
@@ -25,13 +42,15 @@ export function isWordOnBoard(word, board) {
 
   const rows = board.length;
   const cols = board[0].length;
-  const wordLower = word.toLowerCase();
+  // Normalize and lowercase the word for comparison
+  const wordNormalized = normalizeHebrewWord(word.toLowerCase());
 
   // Find all starting positions (cells with the first letter)
   const startPositions = [];
   for (let i = 0; i < rows; i++) {
     for (let j = 0; j < cols; j++) {
-      if (board[i][j].toLowerCase() === wordLower[0]) {
+      const cellNormalized = normalizeHebrewLetter(board[i][j].toLowerCase());
+      if (cellNormalized === wordNormalized[0]) {
         startPositions.push([i, j]);
       }
     }
@@ -39,7 +58,7 @@ export function isWordOnBoard(word, board) {
 
   // Try to find the word starting from each position
   for (const [startRow, startCol] of startPositions) {
-    if (searchWord(board, wordLower, startRow, startCol, 0, new Set())) {
+    if (searchWord(board, wordNormalized, startRow, startCol, 0, new Set())) {
       return true;
     }
   }
@@ -65,8 +84,9 @@ function searchWord(board, word, row, col, index, visited) {
     return false;
   }
 
-  // Check if current cell matches current letter
-  if (board[row][col].toLowerCase() !== word[index]) {
+  // Check if current cell matches current letter (with normalization)
+  const cellNormalized = normalizeHebrewLetter(board[row][col].toLowerCase());
+  if (cellNormalized !== word[index]) {
     return false;
   }
 

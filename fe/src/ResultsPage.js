@@ -5,6 +5,7 @@ import {
   Paper,
   Box,
   Chip,
+  Tooltip,
 } from '@mui/material';
 import { motion } from 'framer-motion';
 import { FaTrophy } from 'react-icons/fa';
@@ -210,16 +211,39 @@ const ResultsPage = ({ finalScores, letterGrid, gameCode, onReturnToRoom }) => {
                     </Typography>
                     <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
                       {player.achievements.map((ach, i) => (
-                        <Chip
+                        <Tooltip
                           key={i}
-                          label={`${ach.icon} ${ach.name}`}
-                          size="small"
-                          sx={{
-                            background: 'linear-gradient(45deg, #667eea 30%, #764ba2 90%)',
-                            color: 'white',
-                            fontWeight: 'bold',
-                          }}
-                        />
+                          title={
+                            <Box sx={{ p: 0.5 }}>
+                              <Typography variant="body2" fontWeight="bold">
+                                {ach.name}
+                              </Typography>
+                              <Typography variant="caption">
+                                {ach.description}
+                              </Typography>
+                            </Box>
+                          }
+                          arrow
+                          placement="top"
+                        >
+                          <Chip
+                            label={`${ach.icon} ${ach.name}`}
+                            size="small"
+                            sx={{
+                              background: '#f5f5f5',
+                              border: '2px solid #4CAF50',
+                              color: '#2E7D32',
+                              fontWeight: '600',
+                              cursor: 'help',
+                              '&:hover': {
+                                background: '#e8f5e9',
+                                transform: 'translateY(-2px)',
+                                boxShadow: '0 4px 12px rgba(76, 175, 80, 0.3)',
+                              },
+                              transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                            }}
+                          />
+                        </Tooltip>
                       ))}
                     </Box>
                   </Box>

@@ -31,8 +31,11 @@ function App() {
   const urlParams = new URLSearchParams(window.location.search);
   const roomFromUrl = urlParams.get('room');
 
+  // Load saved username from localStorage
+  const savedUsername = localStorage.getItem('boggle_username') || "";
+
   const [gameCode, setGameCode] = useState(roomFromUrl || "");
-  const [username, setUsername] = useState("");
+  const [username, setUsername] = useState(savedUsername);
   const [isActive, setIsActive] = useState(false);
 
   const [isHost, setIsHost] = useState(false);
@@ -67,6 +70,8 @@ function App() {
         setIsHost(isHost);
         setIsActive(true);
         setError("");
+        // Save username to localStorage on successful join
+        localStorage.setItem('boggle_username', username);
       }
 
       if (action === "gameDoesNotExist") {

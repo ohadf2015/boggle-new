@@ -10,6 +10,7 @@ import {
   Box,
   Chip,
   LinearProgress,
+  Tooltip,
 } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import ExitToAppIcon from '@mui/icons-material/ExitToApp';
@@ -36,6 +37,39 @@ const PlayerView = ({ onShowResults }) => {
   const [showScores, setShowScores] = useState(false); // Only show after validation
   const [waitingForResults, setWaitingForResults] = useState(false);
 
+  // Load game state from localStorage on mount
+  useEffect(() => {
+    const savedState = localStorage.getItem('boggle_player_state');
+    if (savedState) {
+      try {
+        const state = JSON.parse(savedState);
+        if (state.foundWords) setFoundWords(state.foundWords);
+        if (state.achievements) setAchievements(state.achievements);
+      } catch (e) {
+        console.error('Failed to load saved state:', e);
+      }
+    }
+  }, []);
+
+  // Save game state to localStorage whenever it changes
+  useEffect(() => {
+    if (foundWords.length > 0 || achievements.length > 0) {
+      const state = {
+        foundWords,
+        achievements,
+        timestamp: Date.now()
+      };
+      localStorage.setItem('boggle_player_state', JSON.stringify(state));
+    }
+  }, [foundWords, achievements]);
+
+  // Clear saved state when game ends
+  useEffect(() => {
+    if (!gameActive && foundWords.length === 0) {
+      localStorage.removeItem('boggle_player_state');
+    }
+  }, [gameActive, foundWords]);
+
   // Timer countdown - now synced from server, no local countdown needed
 
   // Handle WebSocket messages
@@ -61,10 +95,19 @@ const PlayerView = ({ onShowResults }) => {
           if (message.timerSeconds) {
             setRemainingTime(message.timerSeconds);
           }
-          toast.success('המשחק התחיל! מצא כמה שיותר מילים!', {
-            icon: '🎮',
-            duration: 3000,
-          });
+
+          // Show different message for late joins
+          if (message.isLateJoin) {
+            toast.success('הצטרפת למשחק פעיל! בהצלחה!', {
+              icon: '🚀',
+              duration: 4000,
+            });
+          } else {
+            toast.success('המשחק התחיל! מצא כמה שיותר מילים!', {
+              icon: '🎮',
+              duration: 3000,
+            });
+          }
           break;
 
         case 'endGame':
@@ -219,8 +262,8 @@ const PlayerView = ({ onShowResults }) => {
   };
 
   const getLetterColor = () => {
-    // Single color for all tiles during gameplay
-    return '#667eea';
+    // Modern cyan/teal color for tiles
+    return 'linear-gradient(135deg, #0EA5E9 0%, #14B8A6 100%)';
   };
 
   const formatTime = (seconds) => {
@@ -242,7 +285,7 @@ const PlayerView = ({ onShowResults }) => {
     <Box
       sx={{
         minHeight: '100vh',
-        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+        background: 'linear-gradient(135deg, #0EA5E9 0%, #06B6D4 50%, #14B8A6 100%)',
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
@@ -360,16 +403,39 @@ const PlayerView = ({ onShowResults }) => {
             </Typography>
             <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
               {achievements.map((ach, index) => (
-                <Chip
+                <Tooltip
                   key={index}
-                  label={`${ach.icon} ${ach.name}`}
-                  sx={{
-                    background: 'linear-gradient(45deg, #FE6B8B 30%, #FF8E53 90%)',
-                    color: 'white',
-                    fontWeight: 'bold',
-                    fontSize: { xs: '0.7rem', sm: '0.9rem' },
-                  }}
-                />
+                  title={
+                    <Box sx={{ p: 0.5 }}>
+                      <Typography variant="body2" fontWeight="bold">
+                        {ach.name}
+                      </Typography>
+                      <Typography variant="caption">
+                        {ach.description}
+                      </Typography>
+                    </Box>
+                  }
+                  arrow
+                  placement="top"
+                >
+                  <Chip
+                    label={`${ach.icon} ${ach.name}`}
+                    sx={{
+                      background: '#f5f5f5',
+                      border: '2px solid #4CAF50',
+                      color: '#2E7D32',
+                      fontWeight: '600',
+                      fontSize: { xs: '0.7rem', sm: '0.9rem' },
+                      cursor: 'help',
+                      '&:hover': {
+                        background: '#e8f5e9',
+                        transform: 'translateY(-2px)',
+                        boxShadow: '0 4px 12px rgba(76, 175, 80, 0.3)',
+                      },
+                      transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                    }}
+                  />
+                </Tooltip>
               ))}
             </Box>
           </Paper>
@@ -387,18 +453,19 @@ const PlayerView = ({ onShowResults }) => {
         {/* Letter Grid */}
         {letterGrid && (
           <Paper elevation={6} sx={{
-            padding: { xs: 2, sm: 3 },
+            padding: { xs: 1, sm: 2, md: 3 },
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
-            minWidth: { xs: '100%', sm: 'auto' }
+            minWidth: { xs: '100%', sm: 'auto' },
+            maxWidth: { xs: '100%', sm: 'fit-content' }
           }}>
             <Typography
               variant="h6"
               gutterBottom
               fontWeight="bold"
               color="primary"
-              sx={{ fontSize: { xs: '1rem', sm: '1.25rem' } }}
+              sx={{ fontSize: { xs: '0.9rem', sm: '1rem', md: '1.25rem' }, mb: { xs: 1, sm: 2 } }}
             >
               לוח האותיות
             </Typography>
@@ -406,13 +473,13 @@ const PlayerView = ({ onShowResults }) => {
               sx={{
                 display: 'grid',
                 gridTemplateColumns: {
-                  xs: `repeat(${letterGrid[0]?.length || 7}, minmax(35px, 1fr))`,
-                  sm: `repeat(${letterGrid[0]?.length || 7}, minmax(40px, 50px))`,
-                  md: `repeat(${letterGrid[0]?.length || 7}, minmax(45px, 60px))`,
+                  xs: `repeat(${letterGrid[0]?.length || 7}, minmax(28px, 1fr))`,
+                  sm: `repeat(${letterGrid[0]?.length || 7}, minmax(38px, 45px))`,
+                  md: `repeat(${letterGrid[0]?.length || 7}, minmax(45px, 55px))`,
                 },
-                gap: { xs: '6px', sm: '8px' },
+                gap: { xs: '4px', sm: '6px', md: '8px' },
                 width: '100%',
-                maxWidth: '100%',
+                maxWidth: { xs: '320px', sm: '400px', md: '500px' },
               }}
             >
               {letterGrid.map((row, i) =>
@@ -428,11 +495,11 @@ const PlayerView = ({ onShowResults }) => {
                         display: 'flex',
                         justifyContent: 'center',
                         alignItems: 'center',
-                        fontSize: { xs: '1.2rem', sm: '1.5rem' },
+                        fontSize: { xs: '1rem', sm: '1.3rem', md: '1.5rem' },
                         fontWeight: 'bold',
                         background: getLetterColor(),
                         color: 'white',
-                        borderRadius: { xs: '6px', sm: '8px' },
+                        borderRadius: { xs: '4px', sm: '6px', md: '8px' },
                         boxShadow: '0 2px 4px rgba(0,0,0,0.2)',
                         transition: 'all 0.3s ease',
                         '&:hover': {
@@ -585,19 +652,34 @@ const PlayerView = ({ onShowResults }) => {
                     color: index < 3 ? 'white' : 'inherit',
                   }}
                 >
-                  <Box sx={{ display: 'flex', alignItems: 'center', width: '100%' }}>
-                    <Box sx={{ marginRight: 2, minWidth: 30 }}>
-                      {getRankIcon(index) || `#${index + 1}`}
+                  <Box sx={{ display: 'flex', alignItems: 'center', width: '100%', gap: 2 }}>
+                    <Box sx={{ minWidth: { xs: 40, sm: 50 }, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      {getRankIcon(index) ? (
+                        <Box sx={{ fontSize: { xs: '1.8rem', sm: '2rem' } }}>
+                          {getRankIcon(index)}
+                        </Box>
+                      ) : (
+                        <Typography variant="h4" fontWeight="bold" sx={{ fontSize: { xs: '1.8rem', sm: '2rem' } }}>
+                          #{index + 1}
+                        </Typography>
+                      )}
                     </Box>
                     <Box sx={{ flex: 1 }}>
-                      <Typography fontWeight="bold">{player.username}</Typography>
-                      <Typography variant="caption">
+                      <Typography fontWeight="bold" sx={{ fontSize: { xs: '1rem', sm: '1.1rem' } }}>
+                        {player.username}
+                      </Typography>
+                      <Typography variant="caption" sx={{ fontSize: { xs: '0.75rem', sm: '0.8rem' } }}>
                         {player.wordCount} מילים
                       </Typography>
                     </Box>
-                    <Typography variant="h6" fontWeight="bold">
-                      {showScores ? player.score : player.wordCount}
-                    </Typography>
+                    <Box sx={{ textAlign: 'center' }}>
+                      <Typography variant="h5" fontWeight="bold" sx={{ fontSize: { xs: '1.3rem', sm: '1.5rem' } }}>
+                        {showScores ? player.score : player.wordCount}
+                      </Typography>
+                      <Typography variant="caption" sx={{ fontSize: '0.7rem', opacity: 0.8 }}>
+                        {showScores ? 'נקודות' : 'מילים'}
+                      </Typography>
+                    </Box>
                   </Box>
                 </ListItem>
               </motion.div>
