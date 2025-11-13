@@ -23,6 +23,7 @@ import { useWebSocket } from '../utils/WebSocketContext';
 
 const PlayerView = ({ onShowResults }) => {
   const ws = useWebSocket();
+  const inputRef = React.useRef(null);
   const [word, setWord] = useState('');
   const [foundWords, setFoundWords] = useState([]);
   const [score, setScore] = useState(0);
@@ -156,10 +157,9 @@ const PlayerView = ({ onShowResults }) => {
           break;
 
         case 'playerFoundWord':
-          // Display blurred word notification
-          const displayWord = message.word; // Already blurred by server
-          const wordInfo = message.wordLength ? ` (${message.wordLength} אותיות)` : '';
-          toast(`${message.username} מצא מילה: "${displayWord}"${wordInfo}`, {
+          // Display psychological hint instead of actual word
+          const hint = message.hint || '✨ מילה חדשה!';
+          toast(`${message.username}: ${hint}`, {
             icon: '🔍',
             duration: 2500,
           });
@@ -215,6 +215,27 @@ const PlayerView = ({ onShowResults }) => {
           }, 2000);
           break;
 
+        case 'hostLeftRoomClosing':
+          // Host disconnected, room is closing
+          setGameActive(false);
+          setWaitingForResults(false);
+          toast.error(message.message || 'המנחה עזב את החדר. החדר נסגר.', {
+            icon: '🚪',
+            duration: 5000,
+          });
+
+          // Clear local state and redirect after delay
+          setTimeout(() => {
+            setFoundWords([]);
+            setScore(0);
+            setAchievements([]);
+            setLetterGrid(null);
+            setFinalScores(null);
+            localStorage.removeItem('boggle_player_state');
+            // Could redirect to home or show a "room closed" message
+          }, 2000);
+          break;
+
         default:
           break;
       }
@@ -240,6 +261,13 @@ const PlayerView = ({ onShowResults }) => {
 
     setFoundWords(prev => [...prev, word.trim()]);
     setWord('');
+    
+    // Refocus the input after submit
+    setTimeout(() => {
+      if (inputRef.current) {
+        inputRef.current.focus();
+      }
+    }, 0);
   }, [word, gameActive, ws]);
 
   const removeWord = (index) => {
@@ -535,7 +563,7 @@ const PlayerView = ({ onShowResults }) => {
             מילים שנמצאו ({foundWords.length})
           </Typography>
 
-          <Box sx={{ marginBottom: 3 }}>
+          <Box sx={{ marginBottom: 3, display: 'flex', gap: 1 }}>
             <TextField
               fullWidth
               label="הזן מילה"
@@ -545,17 +573,17 @@ const PlayerView = ({ onShowResults }) => {
               onKeyDown={handleKeyDown}
               disabled={!gameActive}
               autoFocus
-              sx={{ marginBottom: 2 }}
+              inputRef={inputRef}
             />
             <Button
-              fullWidth
               variant="contained"
               color="primary"
               onClick={submitWord}
               disabled={!gameActive || !word.trim()}
               size="large"
+              sx={{ minWidth: '120px' }}
             >
-              הוסף מילה
+              הוסף
             </Button>
           </Box>
 

@@ -37,11 +37,27 @@ const {
   handleDisconnect,
 } = require("./handlers");
 
+// Heartbeat mechanism to keep connections alive
+const heartbeatInterval = 30000; // 30 seconds
+const connectionTimeout = 60000; // 60 seconds
+
 wss.on("connection", (ws) => {
+  // Set up heartbeat
+  ws.isAlive = true;
+  ws.on('pong', () => {
+    ws.isAlive = true;
+  });
+
   ws.on("message", (data) => {
     try {
       const message = JSON.parse(data);
       const { action } = message;
+
+      // Handle pong responses
+      if (action === "pong") {
+        ws.isAlive = true;
+        return;
+      }
 
       switch (action) {
         case "createGame": {
@@ -102,6 +118,22 @@ wss.on("connection", (ws) => {
   });
 });
 
+// Heartbeat ping interval to keep connections alive
+const pingInterval = setInterval(() => {
+  wss.clients.forEach((ws) => {
+    if (ws.isAlive === false) {
+      console.log("Client connection timeout, terminating...");
+      return ws.terminate();
+    }
+    ws.isAlive = false;
+    ws.ping();
+  });
+}, heartbeatInterval);
+
+wss.on('close', () => {
+  clearInterval(pingInterval);
+});
+
 // Catch-all route for React SPA
 app.get("*", (req, res) => {
   res.sendFile(path.join(__dirname, "../fe/build/index.html"));
@@ -110,4 +142,5 @@ app.get("*", (req, res) => {
 server.listen(PORT, HOST, () => {
   console.log(`Server started on http://${HOST}:${PORT}/`);
   console.log(`WebSocket server running on ws://${HOST}:${PORT}/`);
+  console.log(`Heartbeat interval: ${heartbeatInterval}ms`);
 });

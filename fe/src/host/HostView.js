@@ -17,6 +17,8 @@ import {
   MenuItem,
   FormControl,
   InputLabel,
+  Checkbox,
+  FormControlLabel,
 } from '@mui/material';
 import { motion, AnimatePresence } from 'framer-motion';
 import confetti from 'canvas-confetti';
@@ -288,51 +290,16 @@ const HostView = ({ gameCode, users }) => {
               >
                 ✅ אימות מילים
               </Typography>
-              <Typography variant="body1" align="center" gutterBottom sx={{ mb: 1, color: 'text.secondary' }}>
-                לחץ על מילים כדי לסמן אותן כלא תקינות (אדום). מילים ירוקות תקינות.
+              <Typography variant="body1" align="center" gutterBottom sx={{ mb: 2, color: 'text.secondary' }}>
+                סמן את המילים התקינות. מילים לא מסומנות יוסרו מהציון הסופי.
               </Typography>
-              <Typography variant="body2" align="center" gutterBottom sx={{ mb: 1, color: 'text.secondary' }}>
-                כל המילים כבר עברו אימות על הלוח - עכשיו אשר שהן מילים אמיתיות במילון
-              </Typography>
-              <Typography variant="body2" align="center" gutterBottom sx={{ mb: 2, color: 'info.main', fontStyle: 'italic' }}>
-                המילים מוצגות מצונזרות (א•••ת) כדי לשמור על הוגנות. מילים כתומות עם ⚠ נמצאו על ידי יותר משחקן אחד.
+              <Typography variant="body2" align="center" gutterBottom sx={{ mb: 3, color: 'warning.main', fontWeight: 'bold' }}>
+                ⚠ מילים שמופיעות אצל יותר משחקן אחד יוסרו אוטומטית
               </Typography>
 
-              {/* Legend */}
-              <Box sx={{ display: 'flex', justifyContent: 'center', gap: 2, mb: 3, flexWrap: 'wrap' }}>
-                <Chip
-                  icon={<span>✓</span>}
-                  label="מילה תקינה"
-                  sx={{
-                    background: 'linear-gradient(45deg, #4CAF50 30%, #8BC34A 90%)',
-                    color: 'white',
-                    fontWeight: 'bold',
-                  }}
-                />
-                <Chip
-                  icon={<span>✗</span>}
-                  label="מילה לא תקינה"
-                  sx={{
-                    background: 'linear-gradient(45deg, #f44336 30%, #e91e63 90%)',
-                    color: 'white',
-                    fontWeight: 'bold',
-                  }}
-                />
-                <Chip
-                  icon={<span>⚠</span>}
-                  label="כפילות (אוטומטית לא תקינה)"
-                  sx={{
-                    background: 'linear-gradient(45deg, #FF9800 30%, #FFC107 90%)',
-                    color: 'white',
-                    fontWeight: 'bold',
-                    border: '2px solid #F57C00',
-                  }}
-                />
-              </Box>
-
-              {/* Collect unique words only */}
+              {/* Simple checkbox list of unique words */}
               {(() => {
-                // Collect unique words and count how many players found each
+                // Collect unique words and count duplicates
                 const uniqueWordsMap = new Map();
                 playerWords.forEach(player => {
                   player.words.forEach(wordObj => {
@@ -340,7 +307,6 @@ const HostView = ({ gameCode, users }) => {
                     if (!uniqueWordsMap.has(word)) {
                       uniqueWordsMap.set(word, {
                         word: word,
-                        score: wordObj.score,
                         playerCount: 1,
                         players: [player.username]
                       });
@@ -356,109 +322,77 @@ const HostView = ({ gameCode, users }) => {
                 const uniqueWords = Array.from(uniqueWordsMap.values());
                 uniqueWords.sort((a, b) => a.word.localeCompare(b.word));
 
-                // Censor the words (show first and last letter only)
-                const censorWord = (word) => {
-                  if (word.length <= 2) return word;
-                  return word.charAt(0) + '•'.repeat(word.length - 2) + word.charAt(word.length - 1);
-                };
-
-                // Group by word length for better organization
-                const groupedWords = {};
-                uniqueWords.forEach(item => {
-                  const length = item.word.length;
-                  const groupKey = `${length} אותיות`;
-                  if (!groupedWords[groupKey]) {
-                    groupedWords[groupKey] = [];
-                  }
-                  groupedWords[groupKey].push(item);
-                });
-
                 return (
                   <Box sx={{ mb: 3 }}>
-                    <Typography variant="body2" align="center" sx={{ mb: 2, color: 'text.secondary', fontStyle: 'italic' }}>
-                      סה"כ {uniqueWords.length} מילים ייחודיות למאמת
+                    <Typography variant="body2" align="center" sx={{ mb: 2, color: 'text.secondary' }}>
+                      סה"כ {uniqueWords.length} מילים למאמת
                     </Typography>
-                    {Object.keys(groupedWords).sort((a, b) => {
-                      const lenA = parseInt(a.split(' ')[0]);
-                      const lenB = parseInt(b.split(' ')[0]);
-                      return lenA - lenB;
-                    }).map((groupKey, groupIndex) => (
-                      <motion.div
-                        key={groupKey}
-                        initial={{ x: -50, opacity: 0 }}
-                        animate={{ x: 0, opacity: 1 }}
-                        transition={{ delay: groupIndex * 0.05 }}
-                      >
-                        <Paper
-                          elevation={2}
-                          sx={{
-                            padding: { xs: 1.5, sm: 2 },
-                            marginBottom: 2,
-                            background: 'linear-gradient(135deg, #f5f7fa 0%, #e8eef5 100%)',
-                          }}
-                        >
-                          <Typography
-                            variant="h6"
-                            fontWeight="bold"
-                            gutterBottom
-                            color="primary"
-                            sx={{ fontSize: { xs: '1rem', sm: '1.2rem' }, mb: 1.5 }}
+
+                    <List sx={{ maxHeight: '50vh', overflow: 'auto' }}>
+                      {uniqueWords.map((item, index) => {
+                        const isDuplicate = item.playerCount > 1;
+                        const isValid = validations[item.word] !== undefined ? validations[item.word] : true;
+
+                        return (
+                          <ListItem
+                            key={index}
+                            sx={{
+                              py: 1,
+                              px: 2,
+                              borderBottom: '1px solid #eee',
+                              backgroundColor: isDuplicate ? '#FFF3E0' : 'transparent',
+                              '&:hover': {
+                                backgroundColor: isDuplicate ? '#FFE0B2' : '#f5f5f5',
+                              },
+                            }}
                           >
-                            {groupKey} ({groupedWords[groupKey].length} מילים)
-                          </Typography>
-
-                          <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
-                            {groupedWords[groupKey].map((item, wordIndex) => {
-                              // Use only the word for validation key (not username)
-                              const key = item.word;
-                              const isValid = validations[key] !== undefined ? validations[key] : true;
-                              const isDuplicate = item.playerCount > 1;
-
-                              return (
-                                <motion.div
-                                  key={`${key}-${wordIndex}`}
-                                  whileHover={{ scale: 1.05 }}
-                                  whileTap={{ scale: 0.95 }}
-                                >
-                                  <Chip
-                                    label={
-                                      <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                                        <Typography sx={{ fontWeight: 'bold', fontSize: { xs: '0.85rem', sm: '1rem' } }}>
-                                          {censorWord(item.word)}
-                                        </Typography>
-                                        <Typography sx={{ fontSize: { xs: '0.65rem', sm: '0.75rem' }, opacity: 0.9 }}>
-                                          {isDuplicate ? `${item.playerCount} שחקנים` : `1 שחקן`}
-                                        </Typography>
-                                      </Box>
-                                    }
-                                    onClick={() => toggleWordValidation(null, item.word)}
+                            <FormControlLabel
+                              control={
+                                <Checkbox
+                                  checked={isValid}
+                                  onChange={() => toggleWordValidation(null, item.word)}
+                                  disabled={isDuplicate}
+                                  sx={{
+                                    color: isDuplicate ? '#FF9800' : 'primary.main',
+                                  }}
+                                />
+                              }
+                              label={
+                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, width: '100%' }}>
+                                  <Typography
                                     sx={{
-                                      background: isDuplicate
-                                        ? 'linear-gradient(45deg, #FF9800 30%, #FFC107 90%)'
-                                        : isValid
-                                        ? 'linear-gradient(45deg, #4CAF50 30%, #8BC34A 90%)'
-                                        : 'linear-gradient(45deg, #f44336 30%, #e91e63 90%)',
-                                      color: 'white',
-                                      fontWeight: 'bold',
-                                      minWidth: { xs: '70px', sm: '90px' },
-                                      height: 'auto',
-                                      padding: { xs: '8px 10px', sm: '10px 12px' },
-                                      cursor: 'pointer',
-                                      transition: 'all 0.3s ease',
-                                      border: isDuplicate ? '2px solid #F57C00' : 'none',
-                                      '&:hover': {
-                                        boxShadow: '0 4px 8px rgba(0,0,0,0.3)',
-                                      },
+                                      fontWeight: '500',
+                                      fontSize: '1.1rem',
+                                      textDecoration: isDuplicate ? 'line-through' : 'none',
+                                      color: isDuplicate ? '#666' : 'inherit',
                                     }}
-                                    icon={<span style={{ fontSize: '1.2rem' }}>{isDuplicate ? '⚠' : (isValid ? '✓' : '✗')}</span>}
-                                  />
-                                </motion.div>
-                              );
-                            })}
-                          </Box>
-                        </Paper>
-                      </motion.div>
-                    ))}
+                                  >
+                                    {item.word}
+                                  </Typography>
+                                  {isDuplicate && (
+                                    <Chip
+                                      label={`⚠ ${item.playerCount} שחקנים`}
+                                      size="small"
+                                      sx={{
+                                        backgroundColor: '#FF9800',
+                                        color: 'white',
+                                        fontWeight: 'bold',
+                                      }}
+                                    />
+                                  )}
+                                  {item.playerCount === 1 && (
+                                    <Typography variant="caption" sx={{ color: 'text.secondary', ml: 'auto' }}>
+                                      {item.players[0]}
+                                    </Typography>
+                                  )}
+                                </Box>
+                              }
+                              sx={{ width: '100%', m: 0 }}
+                            />
+                          </ListItem>
+                        );
+                      })}
+                    </List>
                   </Box>
                 );
               })()}

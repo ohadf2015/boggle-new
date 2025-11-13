@@ -476,20 +476,37 @@ const handleWordSubmission = (ws, word) => {
     }
   }
 
-  // Notify OTHER players that someone found a word (word is blurred/censored)
-  // Do NOT notify the host/manager
-  const blurredWord = word.charAt(0) + '•'.repeat(Math.max(0, word.length - 2)) + (word.length > 1 ? word.charAt(word.length - 1) : '');
+  // Notify OTHER players with psychological hints (no actual words shown!)
+  // Generate hint based on word characteristics and player streak
+  const wordCount = games[gameCode].playerWords[username].length;
+  const recentWords = games[gameCode].playerWordDetails[username].slice(-3);
+  const isOnStreak = recentWords.length >= 3 &&
+    recentWords.every((w, i) => i === 0 || w.timestamp - recentWords[i-1].timestamp < 10000);
+
+  let hint = '';
+  if (word.length >= 8) {
+    hint = '📏 מילה ארוכה!';
+  } else if (word.length >= 6) {
+    hint = '💪 מילה חזקה!';
+  } else if (isOnStreak) {
+    hint = '🔥 במסע!';
+  } else if (wordCount % 5 === 0 && wordCount > 0) {
+    hint = '⭐ רצף מדהים!';
+  } else if (timeSinceStart < 30) {
+    hint = '⚡ התחלה מהירה!';
+  } else {
+    hint = '✨ מילה חדשה!';
+  }
 
   Object.keys(games[gameCode].users).forEach(otherUsername => {
     if (otherUsername !== username) {
       const otherWs = games[gameCode].users[otherUsername];
-      if (otherWs && otherWs.readyState === 1) { // Check connection is open
+      if (otherWs && otherWs.readyState === 1) {
         try {
           otherWs.send(JSON.stringify({
             action: "playerFoundWord",
             username,
-            word: blurredWord, // Send blurred version
-            wordLength: word.length,
+            hint, // Psychological hint instead of word
           }));
         } catch (error) {
           console.error(`Error notifying player ${otherUsername}:`, error);
@@ -575,12 +592,24 @@ const handleDisconnect = (ws) => {
   if (gameCode && games[gameCode]) {
     // Check if this was the host
     if (games[gameCode].host === ws) {
-      // Host left - clear timer and delete the entire game
-      console.log(`Host left game ${gameCode}, deleting game`);
+      // Host left - notify all players that room is closing
+      console.log(`Host left game ${gameCode}, closing room and notifying players`);
+
+      // Notify all players before closing
+      sendAllPlayerAMessage(gameCode, {
+        action: "hostLeftRoomClosing",
+        message: "המנחה עזב את החדר. החדר נסגר."
+      });
+
+      // Clear timer if exists
       if (games[gameCode].timerInterval) {
         clearInterval(games[gameCode].timerInterval);
       }
-      delete games[gameCode];
+
+      // Give players a brief moment to receive the message before cleanup
+      setTimeout(() => {
+        delete games[gameCode];
+      }, 500);
     } else if (username && games[gameCode].users[username]) {
       // Player left - remove them from the game
       console.log(`Player ${username} left game ${gameCode}`);
@@ -595,6 +624,9 @@ const handleDisconnect = (ws) => {
         action: "updateUsers",
         users: Object.keys(games[gameCode].users)
       });
+
+      // Broadcast updated leaderboard after player leaves
+      broadcastLeaderboard(gameCode);
     }
   }
 
