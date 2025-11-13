@@ -115,6 +115,7 @@ const setNewGame = (gameCode, host, username) => {
     if (!getGame(gameCode)) {
         games[gameCode] = {
             host,
+            hostUsername: username, // Store host username separately
             users: {},
             playerScores: {},
             playerWords: {},
@@ -126,13 +127,8 @@ const setNewGame = (gameCode, host, username) => {
             letterGrid: null,
         };
 
-        // Add the host as a user with their username
+        // Store host username mapping but DON'T add to users list
         if (username) {
-            games[gameCode].users[username] = host;
-            games[gameCode].playerScores[username] = 0;
-            games[gameCode].playerWords[username] = [];
-            games[gameCode].playerAchievements[username] = [];
-            games[gameCode].playerWordDetails[username] = [];
             wsUsername.set(host, username);
         }
 
@@ -148,7 +144,7 @@ const addUserToGame = (gameCode, username, ws) => {
     if(!getGame(gameCode)) {
       ws.send(JSON.stringify({ action: "gameDoesNotExist" }));
       return;
-    } else if(getGame(gameCode).users[username]) {
+    } else if(getGame(gameCode).users[username] || getGame(gameCode).hostUsername === username) {
       ws.send(JSON.stringify({ action: "usernameTaken" }));
       return;
     } else {
@@ -402,6 +398,7 @@ const handleWordSubmission = (ws, word) => {
   }));
 
   // Notify OTHER players that someone found a word (word is blurred/censored)
+  // Do NOT notify the host/manager
   const blurredWord = word.charAt(0) + '•'.repeat(Math.max(0, word.length - 2)) + (word.length > 1 ? word.charAt(word.length - 1) : '');
 
   Object.keys(games[gameCode].users).forEach(otherUsername => {
@@ -415,6 +412,7 @@ const handleWordSubmission = (ws, word) => {
       }));
     }
   });
+  // Note: Host is not in users list, so they won't receive any word notifications
 
   // Check for live achievements
   checkLiveAchievements(gameCode, username, word, timeSinceStart);
@@ -427,11 +425,15 @@ const handleWordSubmission = (ws, word) => {
 const broadcastLeaderboard = (gameCode) => {
   if (!games[gameCode]) return;
 
-  const leaderboard = Object.keys(games[gameCode].playerScores).map(username => ({
-    username,
-    score: games[gameCode].playerScores[username],
-    wordCount: games[gameCode].playerWords[username].length
-  })).sort((a, b) => b.wordCount - a.wordCount); // Sort by word count during game
+  // Exclude host from leaderboard - only show actual players
+  const leaderboard = Object.keys(games[gameCode].playerScores)
+    .filter(username => username !== games[gameCode].hostUsername)
+    .map(username => ({
+      username,
+      score: games[gameCode].playerScores[username],
+      wordCount: games[gameCode].playerWords[username] ? games[gameCode].playerWords[username].length : 0
+    }))
+    .sort((a, b) => b.wordCount - a.wordCount); // Sort by word count during game
 
   sendAllPlayerAMessage(gameCode, { action: "updateLeaderboard", leaderboard });
   sendHostAMessage(gameCode, { action: "updateLeaderboard", leaderboard });

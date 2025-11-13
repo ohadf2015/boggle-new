@@ -26,10 +26,11 @@ import { FaGamepad, FaCrown, FaUser, FaDice, FaSync, FaQrcode } from 'react-icon
 import { QRCodeSVG } from 'qrcode.react';
 import './style/animation.scss';
 
-const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, error, activeRooms, refreshRooms }) => {
+const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, error, activeRooms, refreshRooms, prefilledRoom }) => {
   const [mode, setMode] = useState('join'); // 'join' or 'host'
   const [showQR, setShowQR] = useState(false);
   const [usernameError, setUsernameError] = useState(false);
+  const [showFullForm, setShowFullForm] = useState(!prefilledRoom); // Show simplified form if room is prefilled
 
   const handleModeChange = (event, newMode) => {
     if (newMode !== null) {
@@ -63,10 +64,189 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
     setGameCode(roomCode);
   };
 
+  const handleQuickJoin = (e) => {
+    e.preventDefault();
+    if (!username || !username.trim()) {
+      setUsernameError(true);
+      setTimeout(() => setUsernameError(false), 2000);
+      return;
+    }
+    handleJoin(false); // Always join mode for quick join
+  };
+
   // Get the join URL for QR code
   const getJoinUrl = () => {
     return `${window.location.origin}?room=${gameCode}`;
   };
+
+  // Show simplified quick join interface when room is prefilled
+  if (prefilledRoom && !showFullForm) {
+    return (
+      <Box
+        sx={{
+          minHeight: '100vh',
+          background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          padding: { xs: 2, sm: 3 },
+        }}
+      >
+        {/* Animated Title */}
+        <motion.div
+          initial={{ y: -50, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ duration: 0.5 }}
+          className="animated-title"
+          style={{ marginBottom: '30px' }}
+        >
+          <span className="text" style={{ fontSize: 'clamp(2rem, 8vw, 4rem)' }}>Boggle</span>
+        </motion.div>
+
+        {/* Quick Join Form */}
+        <motion.div
+          initial={{ scale: 0, rotate: -10 }}
+          animate={{ scale: 1, rotate: 0 }}
+          transition={{ type: 'spring', stiffness: 260, damping: 20 }}
+        >
+          <Paper
+            elevation={12}
+            sx={{
+              padding: { xs: 3, sm: 4 },
+              minWidth: { xs: '100%', sm: '400px' },
+              maxWidth: '500px',
+              borderRadius: 4,
+              background: 'rgba(255, 255, 255, 0.95)',
+              backdropFilter: 'blur(10px)',
+            }}
+          >
+            <Box sx={{ textAlign: 'center', marginBottom: 3 }}>
+              <FaGamepad size={48} color="#667eea" />
+              <Typography
+                variant="h4"
+                fontWeight="bold"
+                sx={{
+                  marginTop: 2,
+                  color: '#667eea',
+                  fontSize: { xs: '1.5rem', sm: '2rem' }
+                }}
+              >
+                Join Game
+              </Typography>
+              <Typography
+                variant="body2"
+                color="text.secondary"
+                sx={{ marginTop: 1, fontSize: { xs: '0.8rem', sm: '0.875rem' } }}
+              >
+                You're joining room <strong>{gameCode}</strong>
+              </Typography>
+            </Box>
+
+            {/* Error Alert */}
+            {error && (
+              <motion.div
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3 }}
+              >
+                <Alert severity="error" sx={{ mb: 2 }}>
+                  {error}
+                </Alert>
+              </motion.div>
+            )}
+
+            {/* Room Code Display */}
+            <Box sx={{ mb: 3, textAlign: 'center' }}>
+              <Chip
+                label={`Room: ${gameCode}`}
+                color="primary"
+                sx={{
+                  fontSize: '1.2rem',
+                  padding: '20px 10px',
+                  fontWeight: 'bold',
+                }}
+              />
+            </Box>
+
+            <form onSubmit={handleQuickJoin}>
+              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                <motion.div
+                  animate={usernameError ? { x: [-10, 10, -10, 10, 0] } : {}}
+                  transition={{ duration: 0.4 }}
+                >
+                  <TextField
+                    fullWidth
+                    label="Username"
+                    variant="outlined"
+                    value={username}
+                    onChange={(e) => {
+                      setUsername(e.target.value);
+                      if (usernameError) setUsernameError(false);
+                    }}
+                    required
+                    autoFocus
+                    error={usernameError}
+                    helperText={usernameError ? "שם משתמש נדרש! אנא מלא את השדה" : "Enter your name to join"}
+                    placeholder="Enter your name"
+                    inputProps={{
+                      maxLength: 20,
+                    }}
+                    sx={{
+                      '& .MuiOutlinedInput-root': {
+                        backgroundColor: usernameError ? 'rgba(255, 0, 0, 0.05)' : 'inherit',
+                      },
+                    }}
+                  />
+                </motion.div>
+
+                <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                  <Button
+                    fullWidth
+                    variant="contained"
+                    size="large"
+                    type="submit"
+                    disabled={!username}
+                    sx={{
+                      background: 'linear-gradient(45deg, #667eea 30%, #764ba2 90%)',
+                      color: 'white',
+                      padding: { xs: '12px', sm: '15px' },
+                      fontSize: { xs: '1.1rem', sm: '1.2rem' },
+                      fontWeight: 'bold',
+                      '&:hover': {
+                        background: 'linear-gradient(45deg, #764ba2 30%, #667eea 90%)',
+                      },
+                      '&:disabled': {
+                        background: '#ccc',
+                        color: '#999',
+                      },
+                    }}
+                  >
+                    <FaUser style={{ marginRight: 8 }} />
+                    Join Game
+                  </Button>
+                </motion.div>
+
+                {/* Switch to full form */}
+                <Button
+                  variant="text"
+                  size="small"
+                  onClick={() => setShowFullForm(true)}
+                  sx={{
+                    color: '#667eea',
+                    textTransform: 'none',
+                    fontSize: '0.875rem',
+                  }}
+                >
+                  Want to host or join a different room?
+                </Button>
+              </Box>
+            </form>
+          </Paper>
+        </motion.div>
+      </Box>
+    );
+  }
 
   return (
     <Box
