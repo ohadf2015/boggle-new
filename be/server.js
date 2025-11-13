@@ -1,11 +1,29 @@
 // server.js
+require("dotenv").config();
 const express = require("express");
 const http = require("http");
 const WebSocket = require("ws");
+const path = require("path");
+const cors = require("cors");
 
 const app = express();
 const server = http.createServer(app);
 const wss = new WebSocket.Server({ server });
+
+// Configuration
+const PORT = process.env.PORT || 3001;
+const HOST = process.env.HOST || "0.0.0.0";
+const CORS_ORIGIN = process.env.CORS_ORIGIN || "*";
+
+// Middleware
+app.use(cors({
+  origin: CORS_ORIGIN,
+  credentials: true
+}));
+app.use(express.json());
+
+// Serve static files from React build
+app.use(express.static(path.join(__dirname, "../fe/build")));
 
 const {
   setNewGame,
@@ -73,6 +91,12 @@ wss.on("connection", (ws) => {
   });
 });
 
-server.listen(3001, () => {
-  console.log("Server started on http://localhost:3001/");
+// Catch-all route for React SPA
+app.get("*", (req, res) => {
+  res.sendFile(path.join(__dirname, "../fe/build/index.html"));
+});
+
+server.listen(PORT, HOST, () => {
+  console.log(`Server started on http://${HOST}:${PORT}/`);
+  console.log(`WebSocket server running on ws://${HOST}:${PORT}/`);
 });
