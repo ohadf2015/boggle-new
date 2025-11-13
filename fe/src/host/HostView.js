@@ -13,6 +13,10 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
+  Select,
+  MenuItem,
+  FormControl,
+  InputLabel,
 } from '@mui/material';
 import { motion, AnimatePresence } from 'framer-motion';
 import confetti from 'canvas-confetti';
@@ -23,9 +27,11 @@ import { QRCodeSVG } from 'qrcode.react';
 import '../style/animation.scss';
 import { generateRandomTable } from '../utils/utils';
 import { useWebSocket } from '../utils/WebSocketContext';
+import { DIFFICULTIES, DEFAULT_DIFFICULTY } from '../utils/consts';
 
 const HostView = ({ gameCode, users }) => {
   const ws = useWebSocket();
+  const [difficulty, setDifficulty] = useState(DEFAULT_DIFFICULTY);
   const [tableData, setTableData] = useState(generateRandomTable());
   const [timerValue, setTimerValue] = useState('');
   const [remainingTime, setRemainingTime] = useState(null);
@@ -127,7 +133,8 @@ const HostView = ({ gameCode, users }) => {
   // Timer countdown - now synced from server, no local countdown needed
 
   const startGame = () => {
-    const newTable = generateRandomTable();
+    const difficultyConfig = DIFFICULTIES[difficulty];
+    const newTable = generateRandomTable(difficultyConfig.rows, difficultyConfig.cols);
     setTableData(newTable);
     const seconds = timerValue * 60;
     setRemainingTime(seconds);
@@ -763,14 +770,14 @@ const HostView = ({ gameCode, users }) => {
             sx={{
               display: 'grid',
               gridTemplateColumns: {
-                xs: 'repeat(7, minmax(35px, 1fr))',
-                sm: 'repeat(7, 60px)',
-                md: 'repeat(7, 70px)',
+                xs: `repeat(${tableData[0]?.length || 7}, minmax(35px, 1fr))`,
+                sm: `repeat(${tableData[0]?.length || 7}, minmax(40px, 60px))`,
+                md: `repeat(${tableData[0]?.length || 7}, minmax(50px, 70px))`,
               },
               gap: { xs: '6px', sm: '10px', md: '12px' },
               marginBottom: 3,
               width: '100%',
-              maxWidth: { xs: '100%', sm: '500px', md: '580px' },
+              maxWidth: '100%',
             }}
           >
             {tableData.map((row, i) =>
@@ -783,7 +790,7 @@ const HostView = ({ gameCode, users }) => {
                     type: 'spring',
                     stiffness: 260,
                     damping: 20,
-                    delay: (i * 7 + j) * 0.02,
+                    delay: (i * row.length + j) * 0.02,
                   }}
                   whileHover={{ scale: 1.1, rotate: 5 }}
                 >
@@ -819,6 +826,20 @@ const HostView = ({ gameCode, users }) => {
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, minWidth: 200 }}>
             {!gameStarted ? (
               <>
+                <FormControl fullWidth>
+                  <InputLabel>רמת קושי</InputLabel>
+                  <Select
+                    value={difficulty}
+                    label="רמת קושי"
+                    onChange={(e) => setDifficulty(e.target.value)}
+                  >
+                    {Object.keys(DIFFICULTIES).map((key) => (
+                      <MenuItem key={key} value={key}>
+                        {DIFFICULTIES[key].name} ({DIFFICULTIES[key].rows}x{DIFFICULTIES[key].cols})
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
                 <TextField
                   label="טיימר (דקות)"
                   variant="outlined"

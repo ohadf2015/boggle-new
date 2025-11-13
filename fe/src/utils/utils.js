@@ -1,10 +1,16 @@
-import { hebrewLetters } from "./consts";
+import { hebrewLetters, DIFFICULTIES, DEFAULT_DIFFICULTY } from "./consts";
 
-export function generateRandomTable() {
+export function generateRandomTable(rows = null, cols = null) {
+    // Use default difficulty if no rows/cols specified
+    if (rows === null || cols === null) {
+      rows = DIFFICULTIES[DEFAULT_DIFFICULTY].rows;
+      cols = DIFFICULTIES[DEFAULT_DIFFICULTY].cols;
+    }
+
     const newTable = [];
-    for (let i = 0; i < 7; i++) {
+    for (let i = 0; i < rows; i++) {
       const row = [];
-      for (let j = 0; j < 7; j++) {
+      for (let j = 0; j < cols; j++) {
         const randomLetter = hebrewLetters[Math.floor(Math.random() * hebrewLetters.length)];
         row.push(randomLetter);
       }
