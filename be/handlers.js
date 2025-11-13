@@ -341,10 +341,16 @@ const checkLiveAchievements = (gameCode, username, word, timeSinceStart) => {
   // Broadcast new achievements to the player who unlocked them
   if (newAchievements.length > 0) {
     const playerWs = game.users[username];
-    playerWs.send(JSON.stringify({
-      action: "liveAchievementUnlocked",
-      achievements: newAchievements
-    }));
+    if (playerWs && playerWs.readyState === 1) { // Check connection is open
+      try {
+        playerWs.send(JSON.stringify({
+          action: "liveAchievementUnlocked",
+          achievements: newAchievements
+        }));
+      } catch (error) {
+        console.error(`Error sending achievements to ${username}:`, error);
+      }
+    }
   }
 };
 
@@ -354,12 +360,25 @@ const handleWordSubmission = (ws, word) => {
   const username = wsUsername.get(ws);
 
   if (!games[gameCode] || games[gameCode].gameState !== 'playing') {
+    console.warn(`Invalid game state for word submission: ${gameCode}`);
+    return;
+  }
+
+  // Safety check: ensure player exists in game
+  if (!games[gameCode].playerWords[username] || !games[gameCode].playerWordDetails[username]) {
+    console.error(`Player ${username} data missing in game ${gameCode}`);
     return;
   }
 
   // Check if word was already found by this player
   if (games[gameCode].playerWords[username].includes(word)) {
-    ws.send(JSON.stringify({ action: "wordAlreadyFound", word }));
+    if (ws.readyState === 1) {
+      try {
+        ws.send(JSON.stringify({ action: "wordAlreadyFound", word }));
+      } catch (error) {
+        console.error("Error sending wordAlreadyFound:", error);
+      }
+    }
     return;
   }
 
@@ -369,11 +388,17 @@ const handleWordSubmission = (ws, word) => {
 
   if (!isValidOnBoard) {
     // Word doesn't exist on the board - reject it
-    ws.send(JSON.stringify({
-      action: "wordNotOnBoard",
-      word,
-      message: "המילה לא נמצאת על הלוח"
-    }));
+    if (ws.readyState === 1) {
+      try {
+        ws.send(JSON.stringify({
+          action: "wordNotOnBoard",
+          word,
+          message: "המילה לא נמצאת על הלוח"
+        }));
+      } catch (error) {
+        console.error("Error sending wordNotOnBoard:", error);
+      }
+    }
     return;
   }
 
@@ -392,10 +417,16 @@ const handleWordSubmission = (ws, word) => {
   });
 
   // Send confirmation to player (no score yet)
-  ws.send(JSON.stringify({
-    action: "wordAccepted",
-    word,
-  }));
+  if (ws && ws.readyState === 1) { // Check connection is open
+    try {
+      ws.send(JSON.stringify({
+        action: "wordAccepted",
+        word,
+      }));
+    } catch (error) {
+      console.error(`Error confirming word to ${username}:`, error);
+    }
+  }
 
   // Notify OTHER players that someone found a word (word is blurred/censored)
   // Do NOT notify the host/manager
@@ -404,12 +435,18 @@ const handleWordSubmission = (ws, word) => {
   Object.keys(games[gameCode].users).forEach(otherUsername => {
     if (otherUsername !== username) {
       const otherWs = games[gameCode].users[otherUsername];
-      otherWs.send(JSON.stringify({
-        action: "playerFoundWord",
-        username,
-        word: blurredWord, // Send blurred version
-        wordLength: word.length,
-      }));
+      if (otherWs && otherWs.readyState === 1) { // Check connection is open
+        try {
+          otherWs.send(JSON.stringify({
+            action: "playerFoundWord",
+            username,
+            word: blurredWord, // Send blurred version
+            wordLength: word.length,
+          }));
+        } catch (error) {
+          console.error(`Error notifying player ${otherUsername}:`, error);
+        }
+      }
     }
   });
   // Note: Host is not in users list, so they won't receive any word notifications
@@ -442,14 +479,26 @@ const broadcastLeaderboard = (gameCode) => {
 const sendAllPlayerAMessage = (gameCode, message) => {
   if (games[gameCode]) {
     Object.values(games[gameCode].users).forEach((userWs) => {
-      userWs.send(JSON.stringify(message));
+      if (userWs.readyState === 1) { // 1 = OPEN
+        try {
+          userWs.send(JSON.stringify(message));
+        } catch (error) {
+          console.error("Error sending message to player:", error);
+        }
+      }
     });
   }
 }
 
 const sendHostAMessage = (gameCode, message) => {
-  if (games[gameCode]) {
-    games[gameCode].host.send(JSON.stringify(message));
+  if (games[gameCode] && games[gameCode].host) {
+    if (games[gameCode].host.readyState === 1) { // 1 = OPEN
+      try {
+        games[gameCode].host.send(JSON.stringify(message));
+      } catch (error) {
+        console.error("Error sending message to host:", error);
+      }
+    }
   }
 }
 
@@ -509,12 +558,21 @@ const handleDisconnect = (ws) => {
 // Handle word validation by host - THIS IS WHERE SCORING HAPPENS
 const handleValidateWords = (host, validations, letterGrid) => {
   const gameCode = gameWs.get(host);
-  if (!games[gameCode]) return;
+  if (!games[gameCode]) {
+    console.error("Game not found for validation");
+    return;
+  }
 
-  // Reset all scores before calculating
+  console.log(`Validating words for game ${gameCode}, ${validations.length} validations received`);
+
+  // Reset all scores before calculating - only for existing players
   Object.keys(games[gameCode].users).forEach(username => {
-    games[gameCode].playerScores[username] = 0;
-    games[gameCode].playerAchievements[username] = [];
+    if (games[gameCode].playerScores[username] !== undefined) {
+      games[gameCode].playerScores[username] = 0;
+    }
+    if (games[gameCode].playerAchievements[username] !== undefined) {
+      games[gameCode].playerAchievements[username] = [];
+    }
   });
 
   // First, detect duplicate words across all players
@@ -522,6 +580,12 @@ const handleValidateWords = (host, validations, letterGrid) => {
   const wordsByUser = {}; // Track which user has which words
 
   Object.keys(games[gameCode].users).forEach(username => {
+    // Safety check: ensure player word details exist
+    if (!games[gameCode].playerWordDetails[username]) {
+      console.warn(`Player ${username} missing word details, skipping...`);
+      return;
+    }
+
     games[gameCode].playerWordDetails[username].forEach(wordDetail => {
       const word = wordDetail.word;
       if (!wordCounts[word]) {
@@ -535,6 +599,12 @@ const handleValidateWords = (host, validations, letterGrid) => {
 
   // Update validation status and calculate scores ONLY for valid words
   validations.forEach(({ username, word, isValid }) => {
+    // Safety check: ensure player still exists in game
+    if (!games[gameCode].playerWordDetails[username]) {
+      console.warn(`Player ${username} not found in game ${gameCode} during validation`);
+      return;
+    }
+
     const wordDetail = games[gameCode].playerWordDetails[username].find(w => w.word === word);
     if (wordDetail) {
       // Check if this word is a duplicate (found by 2+ players)
@@ -562,6 +632,12 @@ const handleValidateWords = (host, validations, letterGrid) => {
 
   // NOW check and award achievements based on validated words
   Object.keys(games[gameCode].users).forEach(username => {
+    // Safety check: ensure player data exists
+    if (!games[gameCode].playerWordDetails[username]) {
+      console.warn(`Player ${username} missing word details during achievement calculation`);
+      return;
+    }
+
     const allWords = games[gameCode].playerWordDetails[username];
     const validWords = allWords.filter(w => w.validated === true);
 
@@ -641,19 +717,29 @@ const handleValidateWords = (host, validations, letterGrid) => {
     }
   });
 
-  // Calculate final scores with all validated data
-  const finalScores = Object.keys(games[gameCode].playerScores).map(username => ({
-    username,
-    score: games[gameCode].playerScores[username],
-    words: games[gameCode].playerWordDetails[username].filter(w => w.validated === true).map(w => w.word),
-    allWords: games[gameCode].playerWordDetails[username], // For visualization
-    wordCount: games[gameCode].playerWords[username].length,
-    validWordCount: games[gameCode].playerWordDetails[username].filter(w => w.validated === true).length,
-    achievements: games[gameCode].playerAchievements[username].map(ach => ACHIEVEMENTS[ach]),
-    longestWord: games[gameCode].playerWordDetails[username]
-      .filter(w => w.validated === true)
-      .reduce((longest, wordObj) => wordObj.word.length > longest.length ? wordObj.word : longest, ''),
-  })).sort((a, b) => b.score - a.score);
+  // Calculate final scores with all validated data - only for existing players
+  const finalScores = Object.keys(games[gameCode].playerScores)
+    .filter(username => games[gameCode].users[username]) // Only include players still in game
+    .map(username => {
+      // Safety checks for all data
+      const playerWordDetails = games[gameCode].playerWordDetails[username] || [];
+      const playerWords = games[gameCode].playerWords[username] || [];
+      const playerAchievements = games[gameCode].playerAchievements[username] || [];
+
+      return {
+        username,
+        score: games[gameCode].playerScores[username] || 0,
+        words: playerWordDetails.filter(w => w.validated === true).map(w => w.word),
+        allWords: playerWordDetails, // For visualization
+        wordCount: playerWords.length,
+        validWordCount: playerWordDetails.filter(w => w.validated === true).length,
+        achievements: playerAchievements.map(ach => ACHIEVEMENTS[ach]),
+        longestWord: playerWordDetails
+          .filter(w => w.validated === true)
+          .reduce((longest, wordObj) => wordObj.word.length > longest.length ? wordObj.word : longest, ''),
+      };
+    })
+    .sort((a, b) => b.score - a.score);
 
   // Send validated scores with word validation visualization to all players
   sendAllPlayerAMessage(gameCode, {

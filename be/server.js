@@ -39,55 +39,66 @@ const {
 
 wss.on("connection", (ws) => {
   ws.on("message", (data) => {
-    const message = JSON.parse(data);
-    const { action } = message;
+    try {
+      const message = JSON.parse(data);
+      const { action } = message;
 
-    switch (action) {
-      case "createGame": {
-        const { gameCode, username } = message;
-        setNewGame(gameCode, ws, username);
-        break;
+      switch (action) {
+        case "createGame": {
+          const { gameCode, username } = message;
+          setNewGame(gameCode, ws, username);
+          break;
+        }
+        case "join": {
+          const { gameCode, username } = message;
+          addUserToGame(gameCode, username, ws);
+          break;
+        }
+        case "startGame": {
+          const { letterGrid, timerSeconds } = message;
+          handleStartGame(ws, letterGrid, timerSeconds);
+          break;
+        }
+        case "endGame": {
+          handleEndGame(ws);
+          break;
+        }
+        case "sendAnswer": {
+          const { foundWords } = message;
+          handleSendAnswer(ws, foundWords);
+          break;
+        }
+        case "submitWord": {
+          const { word } = message;
+          handleWordSubmission(ws, word);
+          break;
+        }
+        case "validateWords": {
+          const { validations } = message;
+          handleValidateWords(ws, validations);
+          break;
+        }
+        case "getActiveRooms": {
+          const rooms = getActiveRooms();
+          ws.send(JSON.stringify({ action: "activeRooms", rooms }));
+          break;
+        }
+        default:
+          console.warn(`Unknown action: ${action}`);
       }
-      case "join": {
-        const { gameCode, username } = message;
-        addUserToGame(gameCode, username, ws);
-        break;
-      }
-      case "startGame": {
-        const { letterGrid, timerSeconds } = message;
-        handleStartGame(ws, letterGrid, timerSeconds);
-        break;
-      }
-      case "endGame": {
-        handleEndGame(ws);
-        break;
-      }
-      case "sendAnswer": {
-        const { foundWords } = message;
-        handleSendAnswer(ws, foundWords);
-        break;
-      }
-      case "submitWord": {
-        const { word } = message;
-        handleWordSubmission(ws, word);
-        break;
-      }
-      case "validateWords": {
-        const { validations } = message;
-        handleValidateWords(ws, validations);
-        break;
-      }
-      case "getActiveRooms": {
-        const rooms = getActiveRooms();
-        ws.send(JSON.stringify({ action: "activeRooms", rooms }));
-        break;
-      }
+    } catch (error) {
+      console.error("Error processing message:", error);
+      console.error("Message data:", data.toString());
     }
   });
 
   ws.on("close", () => {
     console.log("Client disconnected");
     handleDisconnect(ws);
+  });
+
+  ws.on("error", (error) => {
+    console.error("WebSocket error:", error);
   });
 });
 
