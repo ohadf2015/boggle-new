@@ -1,9 +1,7 @@
 import React, { useState, useEffect } from "react";
-import { Container } from "@mui/material";
 import HostView from "./host/HostView";
 import PlayerView from "./player/PlayerView";
 import JoinView from "./JoinView";
-import ScorePage from './host/ScorePage';
 import ResultsPage from './ResultsPage';
 
 import { WebSocketContext } from "utils/WebSocketContext";
@@ -15,7 +13,12 @@ const getWebSocketURL = () => {
     return process.env.REACT_APP_WS_URL;
   }
 
-  // Otherwise, construct URL based on current location
+  // Development mode: connect to backend on port 3001
+  if (process.env.NODE_ENV === 'development') {
+    return 'ws://localhost:3001';
+  }
+
+  // Production: construct URL based on current location
   const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
   const host = window.location.host;
   return `${protocol}//${host}`;
@@ -35,6 +38,18 @@ function App() {
   const [activeRooms, setActiveRooms] = useState([]);
   const [showResults, setShowResults] = useState(false);
   const [resultsData, setResultsData] = useState(null);
+
+  const sendMessage = (message) => {
+    if (ws.readyState === WebSocket.OPEN) {
+      ws.send(JSON.stringify(message));
+    } else if (ws.readyState === WebSocket.CONNECTING) {
+      const onOpen = () => {
+        ws.send(JSON.stringify(message));
+        ws.removeEventListener('open', onOpen);
+      };
+      ws.addEventListener('open', onOpen);
+    }
+  };
 
   useEffect(() => {
     ws.onmessage = (event) => {
@@ -73,28 +88,26 @@ function App() {
 
     // Request active rooms when app loads
     ws.onopen = () => {
-      ws.send(JSON.stringify({ action: "getActiveRooms" }));
+      sendMessage({ action: "getActiveRooms" });
     };
 
     if (ws.readyState === WebSocket.OPEN) {
-      ws.send(JSON.stringify({ action: "getActiveRooms" }));
+      sendMessage({ action: "getActiveRooms" });
     }
   }, []);
 
   const handleJoin = (isHostMode) => {
-    setError(""); // Clear any previous errors
+    setError("");
 
     if (isHostMode) {
-      ws.send(JSON.stringify({ action: "createGame", gameCode }));
-      // Don't set state here - wait for server confirmation
+      sendMessage({ action: "createGame", gameCode, username });
     } else {
-      ws.send(JSON.stringify({ action: "join", gameCode, username }));
-      // Don't set state here - wait for server confirmation
+      sendMessage({ action: "join", gameCode, username });
     }
   };
 
   const refreshRooms = () => {
-    ws.send(JSON.stringify({ action: "getActiveRooms" }));
+    sendMessage({ action: "getActiveRooms" });
   };
 
   const handleReturnToRoom = () => {
@@ -102,12 +115,6 @@ function App() {
     setResultsData(null);
   };
 
-  // Sample scores data
-  const scores = [
-    { username: 'Alice', points: 100 },
-    { username: 'Bob', points: 90 },
-    { username: 'Charlie', points: 85 },
-  ];
   return (
     <WebSocketContext.Provider value={ws}>
       {showResults ? (

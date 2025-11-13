@@ -111,7 +111,7 @@ const calculateWordScore = (word) => {
     return 8 + (length - 8) * 2; // 8+ letters get extra bonus
 };
 
-const setNewGame = (gameCode, host) => {
+const setNewGame = (gameCode, host, username) => {
     if (!getGame(gameCode)) {
         games[gameCode] = {
             host,
@@ -119,15 +119,25 @@ const setNewGame = (gameCode, host) => {
             playerScores: {},
             playerWords: {},
             playerAchievements: {},
-            playerWordDetails: {}, // Store word details with timestamps
+            playerWordDetails: {},
             firstWordFound: false,
-            gameState: 'waiting', // waiting, playing, ended
+            gameState: 'waiting',
             startTime: null,
             letterGrid: null,
         };
-        // Send confirmation to host
-        host.send(JSON.stringify({ action: "joined", isHost: true }));
+
+        // Add the host as a user with their username
+        if (username) {
+            games[gameCode].users[username] = host;
+            games[gameCode].playerScores[username] = 0;
+            games[gameCode].playerWords[username] = [];
+            games[gameCode].playerAchievements[username] = [];
+            games[gameCode].playerWordDetails[username] = [];
+            wsUsername.set(host, username);
+        }
+
         gameWs.set(host, gameCode);
+        host.send(JSON.stringify({ action: "joined", isHost: true }));
     } else {
         host.send(JSON.stringify({ action: "gameExists" }));
         return;

@@ -44,8 +44,8 @@ wss.on("connection", (ws) => {
 
     switch (action) {
       case "createGame": {
-        const { gameCode } = message;
-        setNewGame(gameCode, ws);
+        const { gameCode, username } = message;
+        setNewGame(gameCode, ws, username);
         break;
       }
       case "join": {
