@@ -7,7 +7,21 @@ import ScorePage from './host/ScorePage';
 import ResultsPage from './ResultsPage';
 
 import { WebSocketContext } from "utils/WebSocketContext";
-const ws = new WebSocket("ws://localhost:3001");
+
+// Dynamically determine WebSocket URL based on environment
+const getWebSocketURL = () => {
+  // If REACT_APP_WS_URL is set, use it
+  if (process.env.REACT_APP_WS_URL) {
+    return process.env.REACT_APP_WS_URL;
+  }
+
+  // Otherwise, construct URL based on current location
+  const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
+  const host = window.location.host;
+  return `${protocol}//${host}`;
+};
+
+const ws = new WebSocket(getWebSocketURL());
 
 function App() {
   const [gameCode, setGameCode] = useState("");
