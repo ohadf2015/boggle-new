@@ -1,20 +1,8 @@
-import { hebrewLetters } from "./consts";
+// Test script for word validation algorithm
+// Run with: node test-validation.js
 
-export function generateRandomTable() {
-    const newTable = [];
-    for (let i = 0; i < 7; i++) {
-      const row = [];
-      for (let j = 0; j < 7; j++) {
-        const randomLetter = hebrewLetters[Math.floor(Math.random() * hebrewLetters.length)];
-        row.push(randomLetter);
-      }
-      newTable.push(row);
-    }
-    return newTable;
-  }
-
-// Check if a word exists on the board as a valid path
-export function isWordOnBoard(word, board) {
+// Word validation: Check if a word exists on the board as a valid path
+function isWordOnBoard(word, board) {
   if (!word || !board || board.length === 0) return false;
 
   const rows = board.length;
@@ -80,8 +68,58 @@ function searchWord(board, word, row, col, index, visited) {
     }
   }
 
-  // Backtrack: unmark as visited (not needed since we pass new Set, but good practice)
-  visited.delete(cellKey);
-
   return false;
+}
+
+// Test cases
+console.log('Testing word validation algorithm...\n');
+
+const testBoard = [
+  ['ק', 'ל', 'ב'],
+  ['מ', 'ש', 'ת'],
+  ['ר', 'ח', 'ן']
+];
+
+console.log('Test Board:');
+testBoard.forEach(row => console.log(row.join(' ')));
+console.log('');
+
+// Test cases
+const tests = [
+  { word: 'קלב', expected: true, description: 'horizontal word (right)' },
+  { word: 'קמר', expected: true, description: 'vertical word (down)' },
+  { word: 'קשח', expected: true, description: 'diagonal word' },
+  { word: 'לשר', expected: true, description: 'diagonal path' },
+  { word: 'אבג', expected: false, description: 'word not on board' },
+  { word: 'קקק', expected: false, description: 'reusing same cell' },
+  { word: 'קשן', expected: true, description: 'diagonal path from corner to corner' }, // ק->ש->ן is valid
+];
+
+let passed = 0;
+let failed = 0;
+
+tests.forEach((test, index) => {
+  const result = isWordOnBoard(test.word, testBoard);
+  const status = result === test.expected ? '✓ PASS' : '✗ FAIL';
+
+  if (result === test.expected) {
+    passed++;
+  } else {
+    failed++;
+  }
+
+  console.log(`Test ${index + 1}: ${status}`);
+  console.log(`  Word: "${test.word}" (${test.description})`);
+  console.log(`  Expected: ${test.expected}, Got: ${result}`);
+  console.log('');
+});
+
+console.log(`\nResults: ${passed} passed, ${failed} failed`);
+
+if (failed === 0) {
+  console.log('✓ All tests passed!');
+  process.exit(0);
+} else {
+  console.log('✗ Some tests failed');
+  process.exit(1);
 }
