@@ -14,6 +14,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import confetti from 'canvas-confetti';
 import toast, { Toaster } from 'react-hot-toast';
 import { FaTrophy, FaClock, FaUsers } from 'react-icons/fa';
+import ExitToAppIcon from '@mui/icons-material/ExitToApp';
 import '../style/animation.scss';
 import { generateRandomTable } from '../utils/utils';
 import { useWebSocket } from '../utils/WebSocketContext';
@@ -165,6 +166,15 @@ const HostView = ({ gameCode, users }) => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
     return `${mins}:${secs.toString().padStart(2, '0')}`;
+  };
+
+  const handleExitRoom = () => {
+    if (window.confirm('האם אתה בטוח שברצונך לצאת? זה יסגור את החדר לכל השחקנים.')) {
+      // Close the WebSocket connection which will trigger cleanup
+      ws.close();
+      // Reload the page to reset the app state
+      window.location.reload();
+    }
   };
 
   const submitValidation = () => {
@@ -501,6 +511,21 @@ const HostView = ({ gameCode, users }) => {
           </motion.div>
         </Box>
       )}
+
+      {/* Exit Button */}
+      <Box sx={{ position: 'absolute', top: 20, right: 20 }}>
+        <Button
+          variant="contained"
+          color="error"
+          startIcon={<ExitToAppIcon />}
+          onClick={handleExitRoom}
+          sx={{
+            fontWeight: 'bold',
+          }}
+        >
+          יציאה מהחדר
+        </Button>
+      </Box>
 
       {/* Animated Title */}
       <motion.div
