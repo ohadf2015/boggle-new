@@ -1,0 +1,16 @@
+services:
+  - type: web
+    name: boggle-game
+    env: node
+    buildCommand: |
+      npm install --prefix fe &&
+      npm run build --prefix fe &&
+      npm install --prefix be --production
+    startCommand: cd be && node server.js
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: HOST
+        value: 0.0.0.0
