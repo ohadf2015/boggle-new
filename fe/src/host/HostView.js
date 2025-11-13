@@ -9,12 +9,17 @@ import {
   Box,
   Chip,
   LinearProgress,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
 } from '@mui/material';
 import { motion, AnimatePresence } from 'framer-motion';
 import confetti from 'canvas-confetti';
 import toast, { Toaster } from 'react-hot-toast';
-import { FaTrophy, FaClock, FaUsers } from 'react-icons/fa';
+import { FaTrophy, FaClock, FaUsers, FaQrcode } from 'react-icons/fa';
 import ExitToAppIcon from '@mui/icons-material/ExitToApp';
+import { QRCodeSVG } from 'qrcode.react';
 import '../style/animation.scss';
 import { generateRandomTable } from '../utils/utils';
 import { useWebSocket } from '../utils/WebSocketContext';
@@ -31,6 +36,7 @@ const HostView = ({ gameCode, users }) => {
   const [playerWords, setPlayerWords] = useState([]);
   const [validations, setValidations] = useState({});
   const [finalScores, setFinalScores] = useState(null);
+  const [showQR, setShowQR] = useState(false);
 
   // Handle WebSocket messages
   useEffect(() => {
@@ -88,6 +94,24 @@ const HostView = ({ gameCode, users }) => {
           });
           break;
 
+        case 'timeUpdate':
+          // Server-synced timer update
+          setRemainingTime(message.remainingTime);
+          // Check if game just ended
+          if (message.remainingTime === 0 && gameStarted) {
+            setGameStarted(false);
+            confetti({
+              particleCount: 150,
+              spread: 80,
+              origin: { y: 0.6 },
+            });
+            toast.success('Game Over! Check final scores', {
+              icon: '🏁',
+              duration: 5000,
+            });
+          }
+          break;
+
         default:
           break;
       }
@@ -100,35 +124,7 @@ const HostView = ({ gameCode, users }) => {
     };
   }, [ws]);
 
-  // Timer countdown
-  useEffect(() => {
-    let timer;
-    if (remainingTime !== null && remainingTime > 0) {
-      timer = setInterval(() => {
-        setRemainingTime((prevTime) => Math.max(prevTime - 1, 0));
-      }, 1000);
-    } else if (gameStarted && remainingTime === 0) {
-      console.log('Game Over!');
-      ws.send(JSON.stringify({ action: 'endGame', gameCode }));
-      clearInterval(timer);
-
-      // Celebration
-      confetti({
-        particleCount: 150,
-        spread: 80,
-        origin: { y: 0.6 },
-      });
-
-      toast.success('Game Over! Check final scores', {
-        icon: '🏁',
-        duration: 5000,
-      });
-
-      setGameStarted(false);
-    }
-
-    return () => clearInterval(timer);
-  }, [remainingTime, gameStarted, ws, gameCode]);
+  // Timer countdown - now synced from server, no local countdown needed
 
   const startGame = () => {
     const newTable = generateRandomTable();
@@ -214,6 +210,12 @@ const HostView = ({ gameCode, users }) => {
     return '#667eea';
   };
 
+  // Get the join URL for QR code - use public URL if available
+  const getJoinUrl = () => {
+    const publicUrl = process.env.REACT_APP_PUBLIC_URL || window.location.origin;
+    return `${publicUrl}?room=${gameCode}`;
+  };
+
   return (
     <Box
       sx={{
@@ -228,7 +230,7 @@ const HostView = ({ gameCode, users }) => {
     >
       <Toaster position="top-center" />
 
-      {/* Validation Modal */}
+      {/* Validation Modal - Improved UI */}
       {showValidation && (
         <Box
           sx={{
@@ -250,7 +252,7 @@ const HostView = ({ gameCode, users }) => {
             initial={{ scale: 0, rotate: -10 }}
             animate={{ scale: 1, rotate: 0 }}
             transition={{ type: 'spring', stiffness: 200, damping: 20 }}
-            style={{ width: '100%', maxWidth: 900 }}
+            style={{ width: '100%', maxWidth: 1100 }}
           >
             <Paper
               elevation={24}
@@ -273,71 +275,115 @@ const HostView = ({ gameCode, users }) => {
               >
                 ✅ אימות מילים
               </Typography>
-              <Typography variant="body1" align="center" gutterBottom sx={{ mb: 3, color: 'text.secondary' }}>
+              <Typography variant="body1" align="center" gutterBottom sx={{ mb: 1, color: 'text.secondary' }}>
                 לחץ על מילים כדי לסמן אותן כלא תקינות (אדום). מילים ירוקות תקינות.
               </Typography>
+              <Typography variant="body2" align="center" gutterBottom sx={{ mb: 3, color: 'text.secondary' }}>
+                כל המילים כבר עברו אימות על הלוח - עכשיו אשר שהן מילים אמיתיות במילון
+              </Typography>
 
-              {playerWords.map((player, index) => (
-                <motion.div
-                  key={player.username}
-                  initial={{ x: -50, opacity: 0 }}
-                  animate={{ x: 0, opacity: 1 }}
-                  transition={{ delay: index * 0.1 }}
-                >
-                  <Paper
-                    elevation={4}
-                    sx={{
-                      padding: { xs: 2, sm: 3 },
-                      marginBottom: 3,
-                      background: 'linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)',
-                    }}
-                  >
-                    <Typography
-                      variant="h6"
-                      fontWeight="bold"
-                      gutterBottom
-                      color="primary"
-                      sx={{ fontSize: { xs: '1rem', sm: '1.25rem' } }}
-                    >
-                      {player.username} ({player.words.length} מילים)
-                    </Typography>
+              {/* Collect all words into a single list */}
+              {(() => {
+                const allWords = [];
+                playerWords.forEach(player => {
+                  player.words.forEach(wordObj => {
+                    allWords.push({
+                      word: wordObj.word,
+                      score: wordObj.score,
+                      username: player.username,
+                    });
+                  });
+                });
 
-                    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
-                      {player.words.map((wordObj, wordIndex) => {
-                        const key = `${player.username}-${wordObj.word}`;
-                        const isValid = validations[key];
-                        return (
-                          <motion.div
-                            key={wordIndex}
-                            whileHover={{ scale: 1.1 }}
-                            whileTap={{ scale: 0.95 }}
+                // Sort alphabetically for easier review
+                allWords.sort((a, b) => a.word.localeCompare(b.word));
+
+                // Group by first letter for better organization
+                const groupedWords = {};
+                allWords.forEach(item => {
+                  const firstLetter = item.word[0].toUpperCase();
+                  if (!groupedWords[firstLetter]) {
+                    groupedWords[firstLetter] = [];
+                  }
+                  groupedWords[firstLetter].push(item);
+                });
+
+                return (
+                  <Box sx={{ mb: 3 }}>
+                    {Object.keys(groupedWords).sort().map((letter, groupIndex) => (
+                      <motion.div
+                        key={letter}
+                        initial={{ x: -50, opacity: 0 }}
+                        animate={{ x: 0, opacity: 1 }}
+                        transition={{ delay: groupIndex * 0.05 }}
+                      >
+                        <Paper
+                          elevation={2}
+                          sx={{
+                            padding: { xs: 1.5, sm: 2 },
+                            marginBottom: 2,
+                            background: 'linear-gradient(135deg, #f5f7fa 0%, #e8eef5 100%)',
+                          }}
+                        >
+                          <Typography
+                            variant="h6"
+                            fontWeight="bold"
+                            gutterBottom
+                            color="primary"
+                            sx={{ fontSize: { xs: '1rem', sm: '1.2rem' }, mb: 1.5 }}
                           >
-                            <Chip
-                              label={`${wordObj.word} (${wordObj.score}pts)`}
-                              onClick={() => toggleWordValidation(player.username, wordObj.word)}
-                              sx={{
-                                background: isValid
-                                  ? 'linear-gradient(45deg, #4CAF50 30%, #8BC34A 90%)'
-                                  : 'linear-gradient(45deg, #f44336 30%, #e91e63 90%)',
-                                color: 'white',
-                                fontWeight: 'bold',
-                                fontSize: { xs: '0.8rem', sm: '1rem' },
-                                padding: { xs: '16px 8px', sm: '20px 12px' },
-                                cursor: 'pointer',
-                                transition: 'all 0.3s ease',
-                                '&:hover': {
-                                  boxShadow: '0 4px 8px rgba(0,0,0,0.3)',
-                                },
-                              }}
-                              icon={isValid ? <span>✓</span> : <span>✗</span>}
-                            />
-                          </motion.div>
-                        );
-                      })}
-                    </Box>
-                  </Paper>
-                </motion.div>
-              ))}
+                            {letter}
+                          </Typography>
+
+                          <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
+                            {groupedWords[letter].map((item, wordIndex) => {
+                              const key = `${item.username}-${item.word}`;
+                              const isValid = validations[key];
+                              return (
+                                <motion.div
+                                  key={`${key}-${wordIndex}`}
+                                  whileHover={{ scale: 1.05 }}
+                                  whileTap={{ scale: 0.95 }}
+                                >
+                                  <Chip
+                                    label={
+                                      <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                                        <Typography sx={{ fontWeight: 'bold', fontSize: { xs: '0.85rem', sm: '1rem' } }}>
+                                          {item.word}
+                                        </Typography>
+                                        <Typography sx={{ fontSize: { xs: '0.65rem', sm: '0.75rem' }, opacity: 0.9 }}>
+                                          {item.username}
+                                        </Typography>
+                                      </Box>
+                                    }
+                                    onClick={() => toggleWordValidation(item.username, item.word)}
+                                    sx={{
+                                      background: isValid
+                                        ? 'linear-gradient(45deg, #4CAF50 30%, #8BC34A 90%)'
+                                        : 'linear-gradient(45deg, #f44336 30%, #e91e63 90%)',
+                                      color: 'white',
+                                      fontWeight: 'bold',
+                                      minWidth: { xs: '70px', sm: '90px' },
+                                      height: 'auto',
+                                      padding: { xs: '8px 10px', sm: '10px 12px' },
+                                      cursor: 'pointer',
+                                      transition: 'all 0.3s ease',
+                                      '&:hover': {
+                                        boxShadow: '0 4px 8px rgba(0,0,0,0.3)',
+                                      },
+                                    }}
+                                    icon={<span style={{ fontSize: '1.2rem' }}>{isValid ? '✓' : '✗'}</span>}
+                                  />
+                                </motion.div>
+                              );
+                            })}
+                          </Box>
+                        </Paper>
+                      </motion.div>
+                    ))}
+                  </Box>
+                );
+              })()}
 
               <Box sx={{ display: 'flex', gap: 2, marginTop: 3 }}>
                 <Button
@@ -538,7 +584,7 @@ const HostView = ({ gameCode, users }) => {
         <span className="text" style={{ fontSize: 'clamp(2rem, 8vw, 4rem)' }}>Boggle</span>
       </motion.div>
 
-      {/* Game Code Display */}
+      {/* Game Code Display with QR Code Button */}
       <motion.div
         initial={{ scale: 0 }}
         animate={{ scale: 1 }}
@@ -557,12 +603,74 @@ const HostView = ({ gameCode, users }) => {
           <Typography
             variant="h4"
             fontWeight="bold"
-            sx={{ fontSize: { xs: '1.5rem', sm: '2rem' } }}
+            sx={{ fontSize: { xs: '1.5rem', sm: '2rem' }, mb: 1 }}
           >
             קוד משחק: {gameCode}
           </Typography>
+          <Button
+            variant="outlined"
+            size="small"
+            startIcon={<FaQrcode />}
+            onClick={() => setShowQR(true)}
+            sx={{
+              borderColor: 'white',
+              color: 'white',
+              '&:hover': {
+                borderColor: 'white',
+                backgroundColor: 'rgba(255, 255, 255, 0.1)',
+              },
+            }}
+          >
+            הצג קוד QR
+          </Button>
         </Paper>
       </motion.div>
+
+      {/* QR Code Dialog */}
+      <Dialog
+        open={showQR}
+        onClose={() => setShowQR(false)}
+        maxWidth="sm"
+        fullWidth
+      >
+        <DialogTitle sx={{ textAlign: 'center', fontWeight: 'bold', color: '#667eea' }}>
+          <FaQrcode style={{ marginLeft: 8 }} />
+          קוד QR להצטרפות
+        </DialogTitle>
+        <DialogContent sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2, py: 4 }}>
+          <Box
+            sx={{
+              padding: 3,
+              background: 'white',
+              borderRadius: 2,
+              boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+            }}
+          >
+            <QRCodeSVG value={getJoinUrl()} size={250} level="H" includeMargin />
+          </Box>
+          <Typography variant="h4" fontWeight="bold" color="primary">
+            {gameCode}
+          </Typography>
+          <Typography variant="body2" color="text.secondary" textAlign="center">
+            סרוק את הקוד כדי להצטרף למשחק או השתמש בקוד {gameCode}
+          </Typography>
+          <Typography variant="caption" color="text.secondary" textAlign="center" sx={{ mt: 1 }}>
+            {getJoinUrl()}
+          </Typography>
+        </DialogContent>
+        <DialogActions sx={{ justifyContent: 'center', pb: 3 }}>
+          <Button
+            onClick={() => setShowQR(false)}
+            variant="contained"
+            sx={{
+              background: 'linear-gradient(45deg, #667eea 30%, #764ba2 90%)',
+              color: 'white',
+            }}
+          >
+            סגור
+          </Button>
+        </DialogActions>
+      </Dialog>
 
       <Box sx={{
         display: 'flex',

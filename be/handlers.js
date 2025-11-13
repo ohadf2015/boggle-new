@@ -3,6 +3,76 @@ const games = {};
 const gameWs = new Map();
 const wsUsername = new Map();
 
+// Word validation: Check if a word exists on the board as a valid path
+function isWordOnBoard(word, board) {
+  if (!word || !board || board.length === 0) return false;
+
+  const rows = board.length;
+  const cols = board[0].length;
+  const wordLower = word.toLowerCase();
+
+  // Find all starting positions (cells with the first letter)
+  const startPositions = [];
+  for (let i = 0; i < rows; i++) {
+    for (let j = 0; j < cols; j++) {
+      if (board[i][j].toLowerCase() === wordLower[0]) {
+        startPositions.push([i, j]);
+      }
+    }
+  }
+
+  // Try to find the word starting from each position
+  for (const [startRow, startCol] of startPositions) {
+    if (searchWord(board, wordLower, startRow, startCol, 0, new Set())) {
+      return true;
+    }
+  }
+
+  return false;
+}
+
+// Helper function to search for word using DFS
+function searchWord(board, word, row, col, index, visited) {
+  // Base case: found the entire word
+  if (index === word.length) {
+    return true;
+  }
+
+  // Check bounds
+  if (row < 0 || row >= board.length || col < 0 || col >= board[0].length) {
+    return false;
+  }
+
+  // Check if already visited this cell
+  const cellKey = `${row},${col}`;
+  if (visited.has(cellKey)) {
+    return false;
+  }
+
+  // Check if current cell matches current letter
+  if (board[row][col].toLowerCase() !== word[index]) {
+    return false;
+  }
+
+  // Mark as visited
+  visited.add(cellKey);
+
+  // Search in all 8 directions (horizontal, vertical, diagonal)
+  const directions = [
+    [-1, -1], [-1, 0], [-1, 1],  // top-left, top, top-right
+    [0, -1],           [0, 1],   // left, right
+    [1, -1],  [1, 0],  [1, 1]    // bottom-left, bottom, bottom-right
+  ];
+
+  for (const [dx, dy] of directions) {
+    if (searchWord(board, word, row + dx, col + dy, index + 1, new Set(visited))) {
+      return true;
+    }
+  }
+
+  return false;
+}
+
 // Function to get active rooms (show all rooms while host is present)
 const getActiveRooms = () => {
   return Object.keys(games).map(gameCode => ({
@@ -93,6 +163,7 @@ const handleStartGame = (host, letterGrid, timerSeconds) => {
   const gameCode = gameWs.get(host);
   games[gameCode].gameState = 'playing';
   games[gameCode].startTime = Date.now();
+  games[gameCode].endTime = Date.now() + (timerSeconds * 1000);
   games[gameCode].letterGrid = letterGrid;
   games[gameCode].firstWordFound = false;
   games[gameCode].timerSeconds = timerSeconds;
@@ -107,11 +178,53 @@ const handleStartGame = (host, letterGrid, timerSeconds) => {
 
   sendAllPlayerAMessage(gameCode, { action: "startGame", letterGrid, timerSeconds });
   broadcastLeaderboard(gameCode);
+
+  // Start server-side timer with broadcasts every second
+  startServerTimer(gameCode, timerSeconds);
+}
+
+// Server-side timer that broadcasts remaining time to all clients
+const startServerTimer = (gameCode, totalSeconds) => {
+  if (games[gameCode].timerInterval) {
+    clearInterval(games[gameCode].timerInterval);
+  }
+
+  games[gameCode].timerInterval = setInterval(() => {
+    if (!games[gameCode] || games[gameCode].gameState !== 'playing') {
+      clearInterval(games[gameCode].timerInterval);
+      return;
+    }
+
+    const now = Date.now();
+    const remainingMs = games[gameCode].endTime - now;
+    const remainingSeconds = Math.max(0, Math.floor(remainingMs / 1000));
+
+    // Broadcast time update to all players and host
+    const timeUpdate = {
+      action: "timeUpdate",
+      remainingTime: remainingSeconds
+    };
+
+    sendAllPlayerAMessage(gameCode, timeUpdate);
+    sendHostAMessage(gameCode, timeUpdate);
+
+    // Auto end game when time runs out
+    if (remainingSeconds <= 0) {
+      clearInterval(games[gameCode].timerInterval);
+      handleEndGame(games[gameCode].host);
+    }
+  }, 1000); // Broadcast every second
 }
 
 const handleEndGame = (host) => {
   const gameCode = gameWs.get(host);
   games[gameCode].gameState = 'ended';
+
+  // Clear the timer interval
+  if (games[gameCode].timerInterval) {
+    clearInterval(games[gameCode].timerInterval);
+    games[gameCode].timerInterval = null;
+  }
 
   // Calculate final scores with detailed stats
   const finalScores = Object.keys(games[gameCode].playerScores).map(username => ({
@@ -229,7 +342,7 @@ const checkLiveAchievements = (gameCode, username, word, timeSinceStart) => {
   }
 };
 
-// New function: Handle real-time word submission
+// New function: Handle real-time word submission with board validation
 const handleWordSubmission = (ws, word) => {
   const gameCode = gameWs.get(ws);
   const username = wsUsername.get(ws);
@@ -244,17 +357,32 @@ const handleWordSubmission = (ws, word) => {
     return;
   }
 
+  // VALIDATE WORD AGAINST THE BOARD
+  const letterGrid = games[gameCode].letterGrid;
+  const isValidOnBoard = isWordOnBoard(word, letterGrid);
+
+  if (!isValidOnBoard) {
+    // Word doesn't exist on the board - reject it
+    ws.send(JSON.stringify({
+      action: "wordNotOnBoard",
+      word,
+      message: "המילה לא נמצאת על הלוח"
+    }));
+    return;
+  }
+
   const currentTime = Date.now();
   const timeSinceStart = (currentTime - games[gameCode].startTime) / 1000; // in seconds
 
-  // Just store the word without calculating score yet
+  // Store the word (it passed board validation)
   games[gameCode].playerWords[username].push(word);
   games[gameCode].playerWordDetails[username].push({
     word,
     score: 0, // Will be calculated after validation
     timestamp: currentTime,
     timeSinceStart,
-    validated: null, // Will be set by host later
+    validated: null, // Will be set by host later (for dictionary/semantic validation)
+    onBoard: true, // Passed board validation
   });
 
   // Send confirmation to player (no score yet)
@@ -338,8 +466,11 @@ const handleDisconnect = (ws) => {
   if (gameCode && games[gameCode]) {
     // Check if this was the host
     if (games[gameCode].host === ws) {
-      // Host left - delete the entire game
+      // Host left - clear timer and delete the entire game
       console.log(`Host left game ${gameCode}, deleting game`);
+      if (games[gameCode].timerInterval) {
+        clearInterval(games[gameCode].timerInterval);
+      }
       delete games[gameCode];
     } else if (username && games[gameCode].users[username]) {
       // Player left - remove them from the game
