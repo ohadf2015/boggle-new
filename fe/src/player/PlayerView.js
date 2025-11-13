@@ -406,13 +406,13 @@ const PlayerView = ({ onShowResults }) => {
               sx={{
                 display: 'grid',
                 gridTemplateColumns: {
-                  xs: 'repeat(7, minmax(35px, 1fr))',
-                  sm: 'repeat(7, 50px)',
-                  md: 'repeat(7, 60px)',
+                  xs: `repeat(${letterGrid[0]?.length || 7}, minmax(35px, 1fr))`,
+                  sm: `repeat(${letterGrid[0]?.length || 7}, minmax(40px, 50px))`,
+                  md: `repeat(${letterGrid[0]?.length || 7}, minmax(45px, 60px))`,
                 },
                 gap: { xs: '6px', sm: '8px' },
                 width: '100%',
-                maxWidth: { xs: '100%', sm: '400px', md: '480px' },
+                maxWidth: '100%',
               }}
             >
               {letterGrid.map((row, i) =>
