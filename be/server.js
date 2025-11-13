@@ -16,6 +16,7 @@ const {
   handleSendAnswer,
   handleValidateWords,
   getActiveRooms,
+  handleDisconnect,
 } = require("./handlers");
 
 wss.on("connection", (ws) => {
@@ -68,6 +69,7 @@ wss.on("connection", (ws) => {
 
   ws.on("close", () => {
     console.log("Client disconnected");
+    handleDisconnect(ws);
   });
 });
 
