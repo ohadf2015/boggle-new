@@ -24,6 +24,7 @@ import { useWebSocket } from '../utils/WebSocketContext';
 const PlayerView = ({ onShowResults }) => {
   const ws = useWebSocket();
   const inputRef = React.useRef(null);
+  const wordsContainerRef = React.useRef(null);
   const [word, setWord] = useState('');
   const [foundWords, setFoundWords] = useState([]);
   const [score, setScore] = useState(0);
@@ -251,6 +252,9 @@ const PlayerView = ({ onShowResults }) => {
   const submitWord = useCallback(() => {
     if (!word.trim() || !gameActive) return;
 
+    // Save current scroll position before adding the word
+    const currentScrollTop = wordsContainerRef.current?.scrollTop || 0;
+
     // Send word immediately to server for real-time validation
     ws.send(
       JSON.stringify({
@@ -261,9 +265,12 @@ const PlayerView = ({ onShowResults }) => {
 
     setFoundWords(prev => [...prev, word.trim()]);
     setWord('');
-    
-    // Refocus the input after submit
+
+    // Restore scroll position and refocus the input after submit
     setTimeout(() => {
+      if (wordsContainerRef.current) {
+        wordsContainerRef.current.scrollTop = currentScrollTop;
+      }
       if (inputRef.current) {
         inputRef.current.focus();
       }
@@ -546,7 +553,7 @@ const PlayerView = ({ onShowResults }) => {
         )}
 
         {/* Word Input and List */}
-        <Paper elevation={6} sx={{
+        <Paper ref={wordsContainerRef} elevation={6} sx={{
           flex: 1,
           padding: { xs: 2, sm: 3 },
           maxHeight: '70vh',
