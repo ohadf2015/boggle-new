@@ -36,16 +36,7 @@ const PlayerView = ({ onShowResults }) => {
   const [showScores, setShowScores] = useState(false); // Only show after validation
   const [waitingForResults, setWaitingForResults] = useState(false);
 
-  // Timer countdown
-  useEffect(() => {
-    let timer;
-    if (remainingTime !== null && remainingTime > 0 && gameActive) {
-      timer = setInterval(() => {
-        setRemainingTime((prevTime) => Math.max(prevTime - 1, 0));
-      }, 1000);
-    }
-    return () => clearInterval(timer);
-  }, [remainingTime, gameActive]);
+  // Timer countdown - now synced from server, no local countdown needed
 
   // Handle WebSocket messages
   useEffect(() => {
@@ -100,6 +91,21 @@ const PlayerView = ({ onShowResults }) => {
           toast.error('כבר מצאת את המילה הזו!', {
             icon: '❌',
           });
+          break;
+
+        case 'wordNotOnBoard':
+          // Word doesn't exist on the board
+          toast.error(message.message || 'המילה לא נמצאת על הלוח!', {
+            icon: '🚫',
+            duration: 3000,
+          });
+          // Remove the word from found words list
+          setFoundWords(prev => prev.filter(w => w !== message.word));
+          break;
+
+        case 'timeUpdate':
+          // Server-synced timer update
+          setRemainingTime(message.remainingTime);
           break;
 
         case 'updateLeaderboard':
