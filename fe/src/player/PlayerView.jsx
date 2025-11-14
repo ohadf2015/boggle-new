@@ -220,7 +220,11 @@ const PlayerView = ({ onShowResults }) => {
     setFoundWords(prev => [...prev, word.trim()]);
     setWord('');
 
-    setTimeout(() => inputRef.current?.focus(), 0);
+    // Keep focus on input and prevent scroll
+    if (inputRef.current) {
+      inputRef.current.focus();
+      inputRef.current.scrollIntoView({ behavior: 'instant', block: 'nearest' });
+    }
   }, [word, gameActive, ws]);
 
   const removeWord = (index) => {
