@@ -11,21 +11,27 @@
     display: inline-block;
     transform-origin: 50% 50%;
     background: linear-gradient(135deg,
-      #667eea 0%,
-      #764ba2 25%,
-      #f093fb 50%,
-      #4facfe 75%,
-      #667eea 100%
+      #a0b5ff 0%,
+      #c89aff 25%,
+      #ffb3fc 50%,
+      #7dd9ff 75%,
+      #a0b5ff 100%
     );
     background-size: 300% 300%;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
-    text-shadow: 0 0 20px rgba(102, 126, 234, 0.5);
+    text-shadow: 0 0 8px rgba(160, 181, 255, 0.6);
     animation: gradientFlow 4s ease infinite, titleBounce 2s ease-in-out infinite, textGlow 3s ease-in-out infinite;
     letter-spacing: 0.1em;
     text-transform: uppercase;
     position: relative;
+    cursor: pointer;
+    transition: transform 0.3s ease;
+
+    &:hover {
+      transform: scale(1.05);
+    }
 
     &::before {
       content: 'Boggle';
@@ -33,12 +39,12 @@
       left: 0;
       top: 0;
       z-index: -1;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      background: linear-gradient(135deg, #a0b5ff 0%, #c89aff 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
-      filter: blur(10px);
-      opacity: 0.6;
+      filter: blur(4px);
+      opacity: 0.5;
     }
   }
 
@@ -71,11 +77,11 @@
 
   @keyframes textGlow {
     0%, 100% {
-      filter: drop-shadow(0 0 5px rgba(102, 126, 234, 0.5));
+      filter: drop-shadow(0 0 5px rgba(160, 181, 255, 0.6));
     }
     50% {
-      filter: drop-shadow(0 0 20px rgba(118, 75, 162, 0.8))
-              drop-shadow(0 0 30px rgba(240, 147, 251, 0.6));
+      filter: drop-shadow(0 0 12px rgba(200, 154, 255, 0.8))
+              drop-shadow(0 0 15px rgba(255, 179, 252, 0.6));
     }
   }
   

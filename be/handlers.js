@@ -1,3 +1,5 @@
+const { saveGameState, deleteGameState } = require('./redisClient');
+
 const games = {};
 // Use Map instead of plain objects to properly store WebSocket as keys
 const gameWs = new Map();
@@ -97,6 +99,7 @@ function searchWord(board, word, row, col, index, visited) {
 const getActiveRooms = () => {
   return Object.keys(games).map(gameCode => ({
     gameCode,
+    roomName: games[gameCode].roomName || `Room ${gameCode}`,
     playerCount: Object.keys(games[gameCode].users).length,
     gameState: games[gameCode].gameState,
   })); // Show all rooms as long as they exist (host hasn't left)
@@ -131,11 +134,16 @@ const calculateWordScore = (word) => {
     return 10 + (length - 8) * 3; // 8+ letters: 10, 13, 16, 19...
 };
 
-const setNewGame = (gameCode, host, username) => {
-    if (!getGame(gameCode)) {
+const setNewGame = (gameCode, host, roomName) => {
+    console.log(`[CREATE] Creating game - gameCode: ${gameCode}, roomName: ${roomName}`);
+
+    const existingGame = getGame(gameCode);
+
+    if (!existingGame) {
+        // Create new game
         games[gameCode] = {
             host,
-            hostUsername: username, // Store host username separately
+            roomName: roomName || `Room ${gameCode}`,
             users: {},
             playerScores: {},
             playerWords: {},
@@ -147,74 +155,150 @@ const setNewGame = (gameCode, host, username) => {
             letterGrid: null,
         };
 
-        // Store host username mapping but DON'T add to users list
-        if (username) {
-            wsUsername.set(host, username);
+        gameWs.set(host, gameCode);
+        wsUsername.set(host, '__HOST__'); // Mark as host in the username map
+        console.log(`[CREATE] Game ${gameCode} ("${roomName}") created successfully. Available games:`, Object.keys(games));
+
+        // Save game state to Redis (async, non-blocking)
+        saveGameState(gameCode, games[gameCode]).catch(err =>
+          console.error('[REDIS] Error saving game state:', err)
+        );
+
+        host.send(JSON.stringify({ action: "joined", isHost: true }));
+    } else if (existingGame.hostDisconnected) {
+        // Host is reconnecting - update the WebSocket and clear disconnect timeout
+        console.log(`[CREATE] Host reconnecting to game ${gameCode}`);
+
+        // Clear the disconnect timeout
+        if (existingGame.hostDisconnectTimeout) {
+            clearTimeout(existingGame.hostDisconnectTimeout);
+            existingGame.hostDisconnectTimeout = null;
         }
 
+        // Update host WebSocket reference
+        existingGame.host = host;
+        existingGame.hostDisconnected = false;
+
+        // Update mappings
         gameWs.set(host, gameCode);
+        wsUsername.set(host, '__HOST__'); // Mark as host in the username map
+
+        console.log(`[CREATE] Host reconnected to game ${gameCode}`);
         host.send(JSON.stringify({ action: "joined", isHost: true }));
+
+        // Send current user list
+        host.send(JSON.stringify({
+            action: "updateUsers",
+            users: Object.keys(existingGame.users)
+        }));
     } else {
+        console.log(`[CREATE] Game ${gameCode} already exists (not a reconnect)`);
         host.send(JSON.stringify({ action: "gameExists" }));
         return;
     }
 }
 
 const addUserToGame = (gameCode, username, ws) => {
+    console.log(`[JOIN] Attempting to join - gameCode: ${gameCode}, username: ${username}`);
+    console.log(`[JOIN] Available games:`, Object.keys(games));
+
     if(!getGame(gameCode)) {
+      console.log(`[JOIN] Game ${gameCode} does not exist`);
       ws.send(JSON.stringify({ action: "gameDoesNotExist" }));
       return;
-    } else if(getGame(gameCode).users[username] || getGame(gameCode).hostUsername === username) {
-      ws.send(JSON.stringify({ action: "usernameTaken" }));
-      return;
-    } else {
-        console.log(`User ${username} joined game ${gameCode}`);
     }
 
     const game = games[gameCode];
-    game.users[username] = ws;
-    game.playerScores[username] = 0;
-    game.playerWords[username] = [];
-    game.playerAchievements[username] = [];
-    game.playerWordDetails[username] = [];
-    gameWs.set(ws, gameCode);
-    wsUsername.set(ws, username);
+
+    // Check if this username exists and is in the disconnected players list (reconnection)
+    if(game.users[username] && game.disconnectedPlayers && game.disconnectedPlayers[username]) {
+      console.log(`[JOIN] Player ${username} reconnecting to game ${gameCode}`);
+
+      // Clear the disconnect timeout
+      if (game.disconnectedPlayers[username].timeout) {
+        clearTimeout(game.disconnectedPlayers[username].timeout);
+      }
+
+      // Update WebSocket (data is already in game.users, etc.)
+      game.users[username] = ws;
+      gameWs.set(ws, gameCode);
+      wsUsername.set(ws, username);
+
+      // Remove from disconnected players
+      delete game.disconnectedPlayers[username];
+
+      console.log(`[JOIN] Player ${username} successfully reconnected to game ${gameCode}`);
+    } else if(game.users[username]) {
+      // Username exists but NOT in disconnected list - truly taken by someone else
+      console.log(`[JOIN] Username ${username} already taken in game ${gameCode}`);
+      ws.send(JSON.stringify({ action: "usernameTaken" }));
+      return;
+    } else {
+      console.log(`[JOIN] User ${username} successfully joined game ${gameCode}`);
+
+      // New player joining
+      game.users[username] = ws;
+      game.playerScores[username] = 0;
+      game.playerWords[username] = [];
+      game.playerAchievements[username] = [];
+      game.playerWordDetails[username] = [];
+      gameWs.set(ws, gameCode);
+      wsUsername.set(ws, username);
+    }
 
     // Send confirmation to the player who just joined
     ws.send(JSON.stringify({ action: "joined", isHost: false }));
 
     // If game is already in progress, sync the current game state to the new player
-    if (game.gameState === 'playing') {
-      const remainingTime = Math.max(0, Math.floor((game.endTime - Date.now()) / 1000));
-      ws.send(JSON.stringify({
-        action: "startGame",
-        letterGrid: game.letterGrid,
-        timerSeconds: remainingTime,
-        isLateJoin: true
-      }));
+    // Add a small delay to ensure frontend is ready to receive game messages
+    setTimeout(() => {
+      if (game.gameState === 'playing') {
+        const remainingTime = Math.max(0, Math.floor((game.endTime - Date.now()) / 1000));
+        ws.send(JSON.stringify({
+          action: "startGame",
+          letterGrid: game.letterGrid,
+          timerSeconds: remainingTime,
+          isLateJoin: true
+        }));
 
-      // Send current remaining time
-      ws.send(JSON.stringify({
-        action: "timeUpdate",
-        remainingTime: remainingTime
-      }));
+        // Send current remaining time
+        ws.send(JSON.stringify({
+          action: "timeUpdate",
+          remainingTime: remainingTime
+        }));
 
-      // Notify host about late join
-      sendHostAMessage(gameCode, {
-        action: "playerJoinedLate",
-        username: username,
-        remainingTime: remainingTime
-      });
+        // Notify host about late join
+        sendHostAMessage(gameCode, {
+          action: "playerJoinedLate",
+          username: username,
+          remainingTime: remainingTime
+        });
 
-      console.log(`Late join: ${username} joined active game ${gameCode} with ${remainingTime}s remaining`);
-    }
+        console.log(`Late join: ${username} joined active game ${gameCode} with ${remainingTime}s remaining`);
+      }
+    }, 200); // 200ms delay to allow frontend to mount PlayerView
 
-    sendHostAMessage(gameCode, { action: "updateUsers", users: Object.keys(games[gameCode].users) });
+    const usersList = Object.keys(game.users);
+    console.log(`[JOIN] Notifying host about updated users:`, usersList);
+    sendHostAMessage(gameCode, { action: "updateUsers", users: usersList });
     broadcastLeaderboard(gameCode);
+
+    // Save updated game state to Redis
+    saveGameState(gameCode, games[gameCode]).catch(err =>
+      console.error('[REDIS] Error saving game state:', err)
+    );
 }
 
 const handleStartGame = (host, letterGrid, timerSeconds) => {
   const gameCode = gameWs.get(host);
+
+  if (!gameCode || !games[gameCode]) {
+    console.error(`[START_GAME] Invalid game - gameCode: ${gameCode}`);
+    return;
+  }
+
+  console.log(`[START_GAME] Starting game ${gameCode}`);
+
   games[gameCode].gameState = 'playing';
   games[gameCode].startTime = Date.now();
   games[gameCode].endTime = Date.now() + (timerSeconds * 1000);
@@ -230,11 +314,17 @@ const handleStartGame = (host, letterGrid, timerSeconds) => {
     games[gameCode].playerWordDetails[username] = [];
   });
 
-  sendAllPlayerAMessage(gameCode, { action: "startGame", letterGrid, timerSeconds });
-  broadcastLeaderboard(gameCode);
-
-  // Start server-side timer with broadcasts every second
-  startServerTimer(gameCode, timerSeconds);
+  const startMessage = { action: "startGame", letterGrid, timerSeconds };
+  console.log(`[START_GAME] Broadcasting to ${Object.keys(games[gameCode].users).length} players:`, Object.keys(games[gameCode].users));
+  
+  // Add a small delay to ensure all players are ready to receive game messages
+  setTimeout(() => {
+    sendAllPlayerAMessage(gameCode, startMessage);
+    broadcastLeaderboard(gameCode);
+    
+    // Start server-side timer with broadcasts every second
+    startServerTimer(gameCode, timerSeconds);
+  }, 150); // 150ms delay to allow frontend components to be ready
 }
 
 // Server-side timer that broadcasts remaining time to all clients
@@ -272,6 +362,13 @@ const startServerTimer = (gameCode, totalSeconds) => {
 
 const handleEndGame = (host) => {
   const gameCode = gameWs.get(host);
+
+  // Safety check: ensure game still exists
+  if (!games[gameCode]) {
+    console.warn(`[END_GAME] Game ${gameCode} no longer exists, skipping end game`);
+    return;
+  }
+
   games[gameCode].gameState = 'ended';
 
   // Clear the timer interval
@@ -527,9 +624,8 @@ const handleWordSubmission = (ws, word) => {
 const broadcastLeaderboard = (gameCode) => {
   if (!games[gameCode]) return;
 
-  // Exclude host from leaderboard - only show actual players
+  // Show all players in leaderboard (host is not in the players list)
   const leaderboard = Object.keys(games[gameCode].playerScores)
-    .filter(username => username !== games[gameCode].hostUsername)
     .map(username => ({
       username,
       score: games[gameCode].playerScores[username],
@@ -543,15 +639,23 @@ const broadcastLeaderboard = (gameCode) => {
 
 const sendAllPlayerAMessage = (gameCode, message) => {
   if (games[gameCode]) {
-    Object.values(games[gameCode].users).forEach((userWs) => {
+    const players = Object.keys(games[gameCode].users);
+    console.log(`[BROADCAST] Sending ${message.action} to ${players.length} players in game ${gameCode}:`, players);
+
+    Object.entries(games[gameCode].users).forEach(([username, userWs]) => {
       if (userWs.readyState === 1) { // 1 = OPEN
         try {
           userWs.send(JSON.stringify(message));
+          console.log(`[BROADCAST] ✓ Sent ${message.action} to ${username}`);
         } catch (error) {
-          console.error("Error sending message to player:", error);
+          console.error(`[BROADCAST] ✗ Error sending ${message.action} to ${username}:`, error);
         }
+      } else {
+        console.warn(`[BROADCAST] ✗ WebSocket not open for ${username}, state: ${userWs.readyState}`);
       }
     });
+  } else {
+    console.warn(`[BROADCAST] No game found for ${gameCode}`);
   }
 }
 
@@ -560,10 +664,15 @@ const sendHostAMessage = (gameCode, message) => {
     if (games[gameCode].host.readyState === 1) { // 1 = OPEN
       try {
         games[gameCode].host.send(JSON.stringify(message));
+        console.log(`[HOST_MSG] ✓ Sent ${message.action} to host in game ${gameCode}`);
       } catch (error) {
-        console.error("Error sending message to host:", error);
+        console.error(`[HOST_MSG] ✗ Error sending ${message.action} to host in game ${gameCode}:`, error);
       }
+    } else {
+      console.warn(`[HOST_MSG] ✗ Host WebSocket not open for game ${gameCode}, state: ${games[gameCode].host.readyState}`);
     }
+  } else {
+    console.warn(`[HOST_MSG] ✗ No host found for game ${gameCode}`);
   }
 }
 
@@ -589,44 +698,103 @@ const handleDisconnect = (ws) => {
   const gameCode = gameWs.get(ws);
   const username = wsUsername.get(ws);
 
+  // Only log if there's actual game data to clean up
+  if (gameCode || username) {
+    console.log(`[DISCONNECT] ws disconnected - gameCode: ${gameCode}, username: ${username}`);
+  }
+
   if (gameCode && games[gameCode]) {
     // Check if this was the host
     if (games[gameCode].host === ws) {
-      // Host left - notify all players that room is closing
-      console.log(`Host left game ${gameCode}, closing room and notifying players`);
+      // Host disconnected - give them time to reconnect (30 seconds grace period)
+      console.log(`[DISCONNECT] Host disconnected from game ${gameCode}, starting grace period`);
 
-      // Notify all players before closing
-      sendAllPlayerAMessage(gameCode, {
-        action: "hostLeftRoomClosing",
-        message: "המנחה עזב את החדר. החדר נסגר."
-      });
+      // Mark the host as disconnected but don't delete the game yet
+      if (!games[gameCode].hostDisconnectTimeout) {
+        games[gameCode].hostDisconnected = true;
+        games[gameCode].hostDisconnectTimeout = setTimeout(() => {
+          // Only delete if the game still exists and host hasn't reconnected
+          if (games[gameCode] && games[gameCode].hostDisconnected) {
+            console.log(`[DISCONNECT] Host reconnect grace period expired for game ${gameCode}, closing room`);
 
-      // Clear timer if exists
-      if (games[gameCode].timerInterval) {
-        clearInterval(games[gameCode].timerInterval);
+            // Notify all players before closing
+            sendAllPlayerAMessage(gameCode, {
+              action: "hostLeftRoomClosing",
+              message: "המנחה עזב את החדר. החדר נסגר."
+            });
+
+            // Clear timer if exists
+            if (games[gameCode].timerInterval) {
+              clearInterval(games[gameCode].timerInterval);
+            }
+
+            // Clear all player disconnect timeouts
+            if (games[gameCode].disconnectedPlayers) {
+              Object.values(games[gameCode].disconnectedPlayers).forEach(player => {
+                if (player.timeout) {
+                  clearTimeout(player.timeout);
+                }
+              });
+            }
+
+            // Cleanup after notification
+            setTimeout(() => {
+              if (games[gameCode]) {
+                delete games[gameCode];
+                console.log(`[DISCONNECT] Game ${gameCode} deleted`);
+
+                // Delete from Redis
+                deleteGameState(gameCode).catch(err =>
+                  console.error('[REDIS] Error deleting game state:', err)
+                );
+              }
+            }, 500);
+          }
+        }, 300000); // 5 minute grace period (300000ms)
+      }
+    } else if (username && games[gameCode].users[username]) {
+      // Player disconnected - give them a grace period to reconnect (30 seconds)
+      console.log(`[DISCONNECT] Player ${username} disconnected from game ${gameCode}, starting grace period`);
+
+      // Store the player data temporarily
+      if (!games[gameCode].disconnectedPlayers) {
+        games[gameCode].disconnectedPlayers = {};
       }
 
-      // Give players a brief moment to receive the message before cleanup
-      setTimeout(() => {
-        delete games[gameCode];
-      }, 500);
-    } else if (username && games[gameCode].users[username]) {
-      // Player left - remove them from the game
-      console.log(`Player ${username} left game ${gameCode}`);
-      delete games[gameCode].users[username];
-      delete games[gameCode].playerScores[username];
-      delete games[gameCode].playerWords[username];
-      delete games[gameCode].playerAchievements[username];
-      delete games[gameCode].playerWordDetails[username];
+      // Mark player as disconnected but keep them in the game
+      games[gameCode].disconnectedPlayers[username] = {
+        disconnectedAt: Date.now(),
+        timeout: setTimeout(() => {
+          // Only remove if game still exists and player hasn't reconnected
+          if (games[gameCode] && games[gameCode].disconnectedPlayers?.[username]) {
+            console.log(`[DISCONNECT] Player ${username} reconnect grace period expired, removing from game ${gameCode}`);
 
-      // Notify host of updated user list
-      sendHostAMessage(gameCode, {
-        action: "updateUsers",
-        users: Object.keys(games[gameCode].users)
-      });
+            // Remove from disconnected players
+            delete games[gameCode].disconnectedPlayers[username];
 
-      // Broadcast updated leaderboard after player leaves
-      broadcastLeaderboard(gameCode);
+            // Remove from game
+            if (games[gameCode].users[username]) {
+              delete games[gameCode].users[username];
+              delete games[gameCode].playerScores[username];
+              delete games[gameCode].playerWords[username];
+              delete games[gameCode].playerAchievements[username];
+              delete games[gameCode].playerWordDetails[username];
+
+              // Notify host of updated user list
+              sendHostAMessage(gameCode, {
+                action: "updateUsers",
+                users: Object.keys(games[gameCode].users)
+              });
+
+              // Broadcast updated leaderboard after player leaves
+              broadcastLeaderboard(gameCode);
+            }
+          }
+        }, 30000) // 30 second grace period
+      };
+
+      // Don't immediately remove from game - they might reconnect
+      // We keep them in users{} but with a stale WebSocket
     }
   }
 
@@ -851,6 +1019,103 @@ const handleValidateWords = (host, validations, letterGrid) => {
   });
 };
 
+// Handle host manually closing the room
+const handleCloseRoom = (host, gameCode) => {
+  console.log(`[CLOSE_ROOM] Host manually closing room ${gameCode}`);
+
+  if (!games[gameCode]) {
+    console.warn(`[CLOSE_ROOM] Game ${gameCode} not found`);
+    return;
+  }
+
+  // Notify all players that the room is closing
+  sendAllPlayerAMessage(gameCode, {
+    action: "hostLeftRoomClosing",
+    message: "המנחה עזב את החדר. החדר נסגר."
+  });
+
+  // Clear timer if exists
+  if (games[gameCode].timerInterval) {
+    clearInterval(games[gameCode].timerInterval);
+  }
+
+  // Clear any disconnect timeout
+  if (games[gameCode].hostDisconnectTimeout) {
+    clearTimeout(games[gameCode].hostDisconnectTimeout);
+  }
+
+  // Clear all player disconnect timeouts
+  if (games[gameCode].disconnectedPlayers) {
+    Object.values(games[gameCode].disconnectedPlayers).forEach(player => {
+      if (player.timeout) {
+        clearTimeout(player.timeout);
+      }
+    });
+  }
+
+  // Delete the game after a short delay to ensure messages are sent
+  setTimeout(() => {
+    if (games[gameCode]) {
+      delete games[gameCode];
+      console.log(`[CLOSE_ROOM] Game ${gameCode} deleted`);
+
+      // Delete from Redis
+      deleteGameState(gameCode).catch(err =>
+        console.error('[REDIS] Error deleting game state:', err)
+      );
+    }
+  }, 500);
+};
+
+// Handle resetting game for a new round
+const handleResetGame = (host) => {
+  const gameCode = gameWs.get(host);
+
+  if (!gameCode || !games[gameCode]) {
+    console.error(`[RESET_GAME] Invalid game - gameCode: ${gameCode}`);
+    return;
+  }
+
+  console.log(`[RESET_GAME] Resetting game ${gameCode} for new round`);
+
+  // Clear timer if exists
+  if (games[gameCode].timerInterval) {
+    clearInterval(games[gameCode].timerInterval);
+    games[gameCode].timerInterval = null;
+  }
+
+  // Reset game state
+  games[gameCode].gameState = 'waiting';
+  games[gameCode].startTime = null;
+  games[gameCode].endTime = null;
+  games[gameCode].letterGrid = null;
+  games[gameCode].firstWordFound = false;
+
+  // Reset all player scores, words, and achievements
+  Object.keys(games[gameCode].users).forEach(username => {
+    games[gameCode].playerScores[username] = 0;
+    games[gameCode].playerWords[username] = [];
+    games[gameCode].playerAchievements[username] = [];
+    games[gameCode].playerWordDetails[username] = [];
+  });
+
+  // Notify all players to reset their state
+  sendAllPlayerAMessage(gameCode, {
+    action: "resetGame",
+    message: "המארח מתחיל משחק חדש"
+  });
+
+  // Update leaderboard (will be empty)
+  broadcastLeaderboard(gameCode);
+
+  // Save updated game state to Redis
+  saveGameState(gameCode, games[gameCode]).catch(err =>
+    console.error('[REDIS] Error saving game state:', err)
+  );
+
+  console.log(`[RESET_GAME] Game ${gameCode} reset complete`);
+};
+
 // Export all functions
 module.exports = {
   setNewGame,
@@ -867,4 +1132,6 @@ module.exports = {
   getGameCodeFromUsername,
   getActiveRooms,
   handleDisconnect,
+  handleCloseRoom,
+  handleResetGame,
 };

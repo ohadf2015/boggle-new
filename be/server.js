@@ -5,6 +5,7 @@ const http = require("http");
 const WebSocket = require("ws");
 const path = require("path");
 const cors = require("cors");
+const { initRedis, closeRedis } = require("./redisClient");
 
 const app = express();
 const server = http.createServer(app);
@@ -35,6 +36,8 @@ const {
   handleValidateWords,
   getActiveRooms,
   handleDisconnect,
+  handleCloseRoom,
+  handleResetGame,
 } = require("./handlers");
 
 // Heartbeat mechanism to keep connections alive
@@ -53,16 +56,20 @@ wss.on("connection", (ws) => {
       const message = JSON.parse(data);
       const { action } = message;
 
-      // Handle pong responses
-      if (action === "pong") {
+      // Handle ping/pong responses
+      if (action === "pong" || action === "ping") {
         ws.isAlive = true;
+        // Respond to ping with pong
+        if (action === "ping") {
+          ws.send(JSON.stringify({ action: "pong" }));
+        }
         return;
       }
 
       switch (action) {
         case "createGame": {
-          const { gameCode, username } = message;
-          setNewGame(gameCode, ws, username);
+          const { gameCode, roomName } = message;
+          setNewGame(gameCode, ws, roomName);
           break;
         }
         case "join": {
@@ -97,6 +104,15 @@ wss.on("connection", (ws) => {
         case "getActiveRooms": {
           const rooms = getActiveRooms();
           ws.send(JSON.stringify({ action: "activeRooms", rooms }));
+          break;
+        }
+        case "closeRoom": {
+          const { gameCode } = message;
+          handleCloseRoom(ws, gameCode);
+          break;
+        }
+        case "resetGame": {
+          handleResetGame(ws);
           break;
         }
         default:
@@ -139,8 +155,35 @@ app.get("*", (req, res) => {
   res.sendFile(path.join(__dirname, "../fe/build/index.html"));
 });
 
-server.listen(PORT, HOST, () => {
-  console.log(`Server started on http://${HOST}:${PORT}/`);
-  console.log(`WebSocket server running on ws://${HOST}:${PORT}/`);
-  console.log(`Heartbeat interval: ${heartbeatInterval}ms`);
+// Initialize Redis and start server
+async function startServer() {
+  // Try to initialize Redis (non-blocking)
+  await initRedis();
+
+  server.listen(PORT, HOST, () => {
+    console.log(`Server started on http://${HOST}:${PORT}/`);
+    console.log(`WebSocket server running on ws://${HOST}:${PORT}/`);
+    console.log(`Heartbeat interval: ${heartbeatInterval}ms`);
+  });
+}
+
+// Graceful shutdown
+process.on('SIGTERM', async () => {
+  console.log('SIGTERM received, closing server gracefully...');
+  await closeRedis();
+  server.close(() => {
+    console.log('Server closed');
+    process.exit(0);
+  });
 });
+
+process.on('SIGINT', async () => {
+  console.log('SIGINT received, closing server gracefully...');
+  await closeRedis();
+  server.close(() => {
+    console.log('Server closed');
+    process.exit(0);
+  });
+});
+
+startServer();
