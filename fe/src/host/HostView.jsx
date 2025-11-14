@@ -58,18 +58,17 @@ const HostView = ({ gameCode }) => {
 
   // Handle WebSocket messages
   useEffect(() => {
-    if (!ws) return;
+    if (!ws) {
+      return;
+    }
 
     const handleMessage = (event) => {
       const message = JSON.parse(event.data);
       const { action } = message;
 
-      console.log('[HOST] Received message:', action, message);
-
       switch (action) {
         case 'updateUsers':
-          console.log('[HOST] Updating players:', message.users);
-          setPlayersReady(message.users);
+          setPlayersReady(message.users || []);
           break;
 
         case 'playerJoinedLate':
@@ -148,10 +147,26 @@ const HostView = ({ gameCode }) => {
       }
     };
 
-    ws.onmessage = handleMessage;
+    // Store the original handler to chain them (don't overwrite App-level handler)
+    const originalHandler = ws.onmessage;
+
+    const chainedHandler = (event) => {
+      // First let HostView handle its messages
+      handleMessage(event);
+      
+      // Then let the original App handler process any messages it needs
+      if (originalHandler && typeof originalHandler === 'function') {
+        originalHandler(event);
+      }
+    };
+
+    ws.onmessage = chainedHandler;
 
     return () => {
-      ws.onmessage = null;
+      // Restore the original handler when component unmounts
+      if (originalHandler) {
+        ws.onmessage = originalHandler;
+      }
     };
   }, [ws, gameStarted]);
 

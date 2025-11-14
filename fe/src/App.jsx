@@ -14,6 +14,12 @@ const WS_CONFIG = {
   HEARTBEAT_INTERVAL: 25000,
 };
 
+// Global flag to prevent multiple WebSocket instances (for React StrictMode)
+// eslint-disable-next-line no-unused-vars
+let globalWsInstance = null;
+// eslint-disable-next-line no-unused-vars
+let globalWsInitialized = false;
+
 const getWebSocketURL = () => {
   if (process.env.REACT_APP_WS_URL) {
     return process.env.REACT_APP_WS_URL;
@@ -28,47 +34,14 @@ const getWebSocketURL = () => {
   return `${protocol}//${host}`;
 };
 
-// Create a WebSocket wrapper that supports multiple message handlers
-const createWebSocketWrapper = (ws) => {
-  const handlers = new Set();
-  
-  const addHandler = (handler) => {
-    handlers.add(handler);
-    return () => handlers.delete(handler);
-  };
-
-  // Override the original onmessage to dispatch to all handlers
-  const originalOnMessage = ws.onmessage;
-  ws.onmessage = (event) => {
-    // First call original handler if it exists
-    if (originalOnMessage) {
-      originalOnMessage(event);
-    }
-    
-    // Then call all registered handlers
-    handlers.forEach(handler => {
-      try {
-        handler(event);
-      } catch (error) {
-        console.error('Error in message handler:', error);
-      }
-    });
-  };
-
-  return {
-    ...ws,
-    addMessageHandler: addHandler,
-    send: ws.send.bind(ws),
-    close: ws.close.bind(ws),
-    readyState: ws.readyState
-  };
-};
-
 const useWebSocketConnection = () => {
   const wsRef = useRef(null);
   const reconnectTimeoutRef = useRef(null);
   const reconnectAttemptsRef = useRef(0);
   const heartbeatIntervalRef = useRef(null);
+  const isConnectingRef = useRef(false);
+  const messageHandlerRef = useRef(null);
+  const hasInitializedRef = useRef(false);
   const [connectionError, setConnectionError] = useState('');
 
   const startHeartbeat = useCallback((ws) => {
@@ -89,14 +62,45 @@ const useWebSocketConnection = () => {
     }
   }, []);
 
-  const connectWebSocket = useCallback((messageHandler) => {
+  const connectWebSocket = useCallback(() => {
+    // Check global flag first (prevents React StrictMode duplicates)
+    if (globalWsInitialized && globalWsInstance && globalWsInstance.readyState <= 1) {
+      wsRef.current = globalWsInstance;
+      isConnectingRef.current = false;
+      hasInitializedRef.current = true;
+      return;
+    }
+
+    // Prevent multiple concurrent connection attempts
+    if (isConnectingRef.current) {
+      return;
+    }
+
+    // Check if we have a valid existing connection
+    if (wsRef.current) {
+      const state = wsRef.current.readyState;
+      if (state === WebSocket.OPEN || state === WebSocket.CONNECTING) {
+        return;
+      }
+    }
+
+    // Prevent duplicate initialization in React StrictMode
+    if (hasInitializedRef.current && wsRef.current && wsRef.current.readyState <= 1) {
+      return;
+    }
+
+    hasInitializedRef.current = true;
+    globalWsInitialized = true;
+    isConnectingRef.current = true;
+
     try {
       const ws = new WebSocket(getWebSocketURL());
-      const wrappedWs = createWebSocketWrapper(ws);
-      wsRef.current = wrappedWs;
+      wsRef.current = ws;
+      globalWsInstance = ws;
 
       ws.onopen = () => {
-        console.log('WebSocket connected');
+        console.log('[WS] Connected');
+        isConnectingRef.current = false;
         reconnectAttemptsRef.current = 0;
         setConnectionError('');
 
@@ -105,22 +109,29 @@ const useWebSocketConnection = () => {
         if (ws.readyState === WebSocket.OPEN) {
           ws.send(JSON.stringify({ action: 'getActiveRooms' }));
         }
-
-        // ONLY reconnect if we were previously in an active game
-        // This prevents creating duplicate connections on state changes
-        // We use refs here to get the latest values without triggering reconnects
       };
 
-      // Add the App-level message handler
-      wrappedWs.addMessageHandler(messageHandler);
+      ws.onmessage = (event) => {
+        if (messageHandlerRef.current) {
+          messageHandlerRef.current(event);
+        }
+      };
 
       ws.onerror = (error) => {
-        console.error('WebSocket error:', error);
+        console.error('[WS] Error:', error);
+        isConnectingRef.current = false;
+        hasInitializedRef.current = false;
       };
 
       ws.onclose = (event) => {
-        console.log('WebSocket disconnected', event.code, event.reason);
+        isConnectingRef.current = false;
         stopHeartbeat();
+        
+        // Reset global flags if this was the global instance
+        if (ws === globalWsInstance) {
+          globalWsInstance = null;
+          globalWsInitialized = false;
+        }
 
         // Only auto-reconnect on unexpected disconnects, not manual closes
         if (event.code !== 1000 && reconnectAttemptsRef.current < WS_CONFIG.MAX_RECONNECT_ATTEMPTS) {
@@ -129,38 +140,49 @@ const useWebSocketConnection = () => {
             WS_CONFIG.MAX_RECONNECT_DELAY
           );
 
-          console.log(`Reconnecting in ${delay}ms (attempt ${reconnectAttemptsRef.current + 1}/${WS_CONFIG.MAX_RECONNECT_ATTEMPTS})`);
+          console.log(`[WS] Reconnecting... (attempt ${reconnectAttemptsRef.current + 1}/${WS_CONFIG.MAX_RECONNECT_ATTEMPTS})`);
 
           reconnectTimeoutRef.current = setTimeout(() => {
             reconnectAttemptsRef.current += 1;
-            connectWebSocket(messageHandler);
+            hasInitializedRef.current = false;
+            connectWebSocket();
           }, delay);
-        } else if (event.code === 1000) {
-          console.log('WebSocket closed normally');
-        } else {
-          console.error('Max reconnection attempts reached');
+        } else if (event.code !== 1000) {
+          console.error('[WS] Connection lost');
           setConnectionError('Connection lost. Please refresh the page.');
         }
       };
     } catch (error) {
-      console.error('Error creating WebSocket:', error);
+      console.error('[WS] Error creating WebSocket:', error);
+      isConnectingRef.current = false;
       setConnectionError('Failed to connect. Please refresh the page.');
     }
-    // Only depend on functions that don't change
   }, [startHeartbeat, stopHeartbeat]);
+
+  const setMessageHandler = useCallback((handler) => {
+    messageHandlerRef.current = handler;
+  }, []);
 
   const cleanup = useCallback(() => {
     if (reconnectTimeoutRef.current) {
       clearTimeout(reconnectTimeoutRef.current);
     }
     stopHeartbeat();
-    if (wsRef.current) {
-      wsRef.current.close();
+    
+    // Only close if this is the global instance
+    if (wsRef.current && wsRef.current === globalWsInstance) {
+      if (wsRef.current.readyState !== WebSocket.CLOSED) {
+        wsRef.current.close();
+      }
+      globalWsInstance = null;
+      globalWsInitialized = false;
     }
+    
+    hasInitializedRef.current = false;
+    isConnectingRef.current = false;
   }, [stopHeartbeat]);
 
-  return { wsRef, connectWebSocket, cleanup, connectionError };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+  return { wsRef, connectWebSocket, setMessageHandler, cleanup, connectionError };
 };
 
 const App = () => {
@@ -182,7 +204,7 @@ const App = () => {
   const [resultsData, setResultsData] = useState(null);
   const [attemptingReconnect, setAttemptingReconnect] = useState(!!savedSession);
 
-  const { wsRef, connectWebSocket, cleanup, connectionError } = useWebSocketConnection();
+  const { wsRef, connectWebSocket, setMessageHandler, cleanup, connectionError } = useWebSocketConnection();
   const [ws, setWs] = useState(null);
 
   const attemptingReconnectRef = useRef(attemptingReconnect);
@@ -190,37 +212,38 @@ const App = () => {
     attemptingReconnectRef.current = attemptingReconnect;
   }, [attemptingReconnect]);
 
-  // Update ws state when wsRef changes
+  // Update ws state when wsRef changes - use a polling approach to detect state changes
   useEffect(() => {
-    const checkConnection = setInterval(() => {
+    const interval = setInterval(() => {
       if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN && wsRef.current !== ws) {
         setWs(wsRef.current);
       }
-    }, 100); // Check every 100ms for a connected WebSocket
+    }, 100);
 
-    return () => clearInterval(checkConnection);
-  }, [wsRef, ws]);
+    return () => clearInterval(interval);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [ws]);
 
   const handleWebSocketMessage = useCallback((event) => {
     try {
       const message = JSON.parse(event.data);
       const { action, isHost: isHostResponse, rooms } = message;
 
-      console.log('[APP] Received WebSocket message:', action);
-
       switch (action) {
         case 'updateUsers':
           // HostView handles this directly via its own WebSocket listener
-          console.log('[APP] Passing updateUsers to HostView');
           break;
 
         case 'joined':
-          console.log('[APP] User joined successfully, setting active state');
           setIsHost(isHostResponse);
           setIsActive(true);
           setError('');
           setAttemptingReconnect(false);
-          localStorage.setItem('boggle_username', username);
+          
+          // Save username only if it's a player (not host)
+          if (!isHostResponse && username) {
+            localStorage.setItem('boggle_username', username);
+          }
 
           // Save session to cookie
           saveSession({
@@ -229,11 +252,6 @@ const App = () => {
             isHost: isHostResponse,
             roomName: isHostResponse ? roomName : '',
           });
-          
-          // Add a small delay to ensure component mounting
-          setTimeout(() => {
-            console.log('[APP] Ready to receive game messages');
-          }, 100);
           break;
 
         case 'gameDoesNotExist':
@@ -276,24 +294,6 @@ const App = () => {
         case 'pong':
           break;
 
-        // Pass through game messages that should be handled by PlayerView/HostView
-        case 'startGame':
-        case 'endGame':
-        case 'timeUpdate':
-        case 'updateLeaderboard':
-        case 'wordAccepted':
-        case 'wordAlreadyFound':
-        case 'wordNotOnBoard':
-        case 'playerFoundWord':
-        case 'liveAchievementUnlocked':
-        case 'validatedScores':
-        case 'hostLeftRoomClosing':
-        case 'resetGame':
-          // These messages will be handled by PlayerView/HostView components
-          // We don't handle them here to avoid duplication
-          console.log('[APP] Passing game message to components:', action);
-          break;
-
         default:
           break;
       }
@@ -303,9 +303,17 @@ const App = () => {
   }, [username, gameCode, roomName]);
 
   useEffect(() => {
-    connectWebSocket(handleWebSocketMessage);
-    return cleanup;
-  }, [connectWebSocket, handleWebSocketMessage, cleanup]);
+    connectWebSocket();
+    return () => {
+      cleanup();
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Set the message handler
+  useEffect(() => {
+    setMessageHandler(handleWebSocketMessage);
+  }, [handleWebSocketMessage, setMessageHandler]);
 
   useEffect(() => {
     if (connectionError) {

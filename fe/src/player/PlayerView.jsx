@@ -55,21 +55,15 @@ const PlayerView = ({ onShowResults }) => {
   // WebSocket message handler
   useEffect(() => {
     if (!ws) {
-      console.warn('[PLAYER] WebSocket not available yet');
       return;
     }
-
-    console.log('[PLAYER] Setting up message handler, WS state:', ws.readyState);
 
     const handleMessage = (event) => {
       const message = JSON.parse(event.data);
       const { action } = message;
 
-      console.log('[PLAYER] Received message:', action, message);
-
       switch (action) {
         case 'startGame':
-          console.log('[PLAYER] Processing startGame message');
           setGameActive(true);
           setFoundWords([]);
           setAchievements([]);
@@ -87,7 +81,6 @@ const PlayerView = ({ onShowResults }) => {
           break;
 
         case 'endGame':
-          console.log('[PLAYER] Processing endGame message');
           setGameActive(false);
           setRemainingTime(0);
           setWaitingForResults(true);
@@ -112,16 +105,13 @@ const PlayerView = ({ onShowResults }) => {
           break;
 
         case 'timeUpdate':
-          console.log('[PLAYER] Processing timeUpdate message, remaining:', message.remainingTime);
           setRemainingTime(message.remainingTime);
-          // Disable game when time reaches 0
           if (message.remainingTime === 0) {
             setGameActive(false);
           }
           break;
 
         case 'updateLeaderboard':
-          console.log('[PLAYER] Processing updateLeaderboard message');
           setLeaderboard(message.leaderboard);
           break;
 

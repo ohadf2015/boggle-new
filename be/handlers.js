@@ -250,33 +250,30 @@ const addUserToGame = (gameCode, username, ws) => {
     ws.send(JSON.stringify({ action: "joined", isHost: false }));
 
     // If game is already in progress, sync the current game state to the new player
-    // Add a small delay to ensure frontend is ready to receive game messages
-    setTimeout(() => {
-      if (game.gameState === 'playing') {
-        const remainingTime = Math.max(0, Math.floor((game.endTime - Date.now()) / 1000));
-        ws.send(JSON.stringify({
-          action: "startGame",
-          letterGrid: game.letterGrid,
-          timerSeconds: remainingTime,
-          isLateJoin: true
-        }));
+    if (game.gameState === 'playing') {
+      const remainingTime = Math.max(0, Math.floor((game.endTime - Date.now()) / 1000));
+      ws.send(JSON.stringify({
+        action: "startGame",
+        letterGrid: game.letterGrid,
+        timerSeconds: remainingTime,
+        isLateJoin: true
+      }));
 
-        // Send current remaining time
-        ws.send(JSON.stringify({
-          action: "timeUpdate",
-          remainingTime: remainingTime
-        }));
+      // Send current remaining time
+      ws.send(JSON.stringify({
+        action: "timeUpdate",
+        remainingTime: remainingTime
+      }));
 
-        // Notify host about late join
-        sendHostAMessage(gameCode, {
-          action: "playerJoinedLate",
-          username: username,
-          remainingTime: remainingTime
-        });
+      // Notify host about late join
+      sendHostAMessage(gameCode, {
+        action: "playerJoinedLate",
+        username: username,
+        remainingTime: remainingTime
+      });
 
-        console.log(`Late join: ${username} joined active game ${gameCode} with ${remainingTime}s remaining`);
-      }
-    }, 200); // 200ms delay to allow frontend to mount PlayerView
+      console.log(`Late join: ${username} joined active game ${gameCode} with ${remainingTime}s remaining`);
+    }
 
     const usersList = Object.keys(game.users);
     console.log(`[JOIN] Notifying host about updated users:`, usersList);
@@ -316,15 +313,11 @@ const handleStartGame = (host, letterGrid, timerSeconds) => {
 
   const startMessage = { action: "startGame", letterGrid, timerSeconds };
   console.log(`[START_GAME] Broadcasting to ${Object.keys(games[gameCode].users).length} players:`, Object.keys(games[gameCode].users));
-  
-  // Add a small delay to ensure all players are ready to receive game messages
-  setTimeout(() => {
-    sendAllPlayerAMessage(gameCode, startMessage);
-    broadcastLeaderboard(gameCode);
-    
-    // Start server-side timer with broadcasts every second
-    startServerTimer(gameCode, timerSeconds);
-  }, 150); // 150ms delay to allow frontend components to be ready
+  sendAllPlayerAMessage(gameCode, startMessage);
+  broadcastLeaderboard(gameCode);
+
+  // Start server-side timer with broadcasts every second
+  startServerTimer(gameCode, timerSeconds);
 }
 
 // Server-side timer that broadcasts remaining time to all clients
