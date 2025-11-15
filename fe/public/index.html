@@ -1,31 +1,72 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="he" dir="rtl">
   <head>
     <meta charset="utf-8" />
     <link rel="icon" type="image/svg+xml" href="%PUBLIC_URL%/favicon.svg" />
     <link rel="alternate icon" href="%PUBLIC_URL%/favicon.ico" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="theme-color" content="#000000" />
+    <meta name="theme-color" content="#667eea" />
+
+    <!-- Primary Meta Tags -->
+    <title>בוגל אונליין - משחק מילים רב משתתפים למשפחות | Boggle Online</title>
+    <meta name="title" content="בוגל אונליין - משחק מילים רב משתתפים למשפחות | Boggle Online" />
     <meta
       name="description"
-      content="Boggle - Word game challenge with friends"
+      content="משחק בוגל אונליין חוויתי בעברית! משחק מילים רב משתתפים למשפחות וחברים. שחקו ביחד בזמן אמת, מצאו מילים, צברו נקודות והשיגו הישגים. חינמי לחלוטין!"
     />
-    <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo192.png" />
-    <!--
-      manifest.json provides metadata used when your web app is installed on a
-      user's mobile device or desktop. See https://developers.google.com/web/fundamentals/web-app-manifest/
-    -->
-    <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
-    <!--
-      Notice the use of %PUBLIC_URL% in the tags above.
-      It will be replaced with the URL of the `public` folder during the build.
-      Only files inside the `public` folder can be referenced from the HTML.
+    <meta name="keywords" content="בוגל, בוגל אונליין, משחק מילים, משחק רב משתתפים, משחק למשפחות, משחק חוויתי, משחק עברית, Boggle, משחקי מילים, משחק אונליין, משחק בזמן אמת, משחק חינמי" />
+    <meta name="author" content="Boggle Online" />
+    <meta name="language" content="Hebrew" />
 
-      Unlike "/favicon.ico" or "favicon.ico", "%PUBLIC_URL%/favicon.ico" will
-      work correctly both with client-side routing and a non-root public URL.
-      Learn how to configure a non-root public URL by running `npm run build`.
-    -->
-    <title>Boggle Game</title>
+    <!-- Robots Meta Tags - Make it indexable -->
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
+    <meta name="googlebot" content="index, follow" />
+    <meta name="bingbot" content="index, follow" />
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="he_IL" />
+    <meta property="og:title" content="בוגל אונליין - משחק מילים רב משתתפים למשפחות" />
+    <meta property="og:description" content="משחק בוגל חוויתי בעברית! שחקו עם המשפחה והחברים, מצאו מילים, צברו נקודות והשיגו הישגים. חינמי ומהנה!" />
+    <meta property="og:site_name" content="Boggle Online" />
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="בוגל אונליין - משחק מילים רב משתתפים למשפחות" />
+    <meta name="twitter:description" content="משחק בוגל חוויתי בעברית! שחקו עם המשפחה והחברים, מצאו מילים וצברו נקודות" />
+
+    <!-- Mobile App Capable -->
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="בוגל אונליין" />
+
+    <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo192.png" />
+    <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
+
+    <!-- Structured Data for SEO -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "בוגל אונליין - Boggle Online",
+      "description": "משחק בוגל רב משתתפים חוויתי בעברית למשפחות וחברים",
+      "url": "https://boggle.online",
+      "applicationCategory": "GameApplication",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "ILS"
+      },
+      "operatingSystem": "Web Browser",
+      "inLanguage": "he",
+      "gameFeatures": ["משחק רב משתתפים", "משחק בזמן אמת", "הישגים", "לוח תוצאות"],
+      "audience": {
+        "@type": "Audience",
+        "audienceType": "משפחות וחברים"
+      }
+    }
+    </script>
   </head>
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>

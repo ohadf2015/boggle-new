@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { FaGamepad, FaCrown, FaUser, FaDice, FaSync, FaQrcode, FaWhatsapp, FaLink } from 'react-icons/fa';
+import { FaGamepad, FaCrown, FaUser, FaDice, FaSync, FaQrcode, FaWhatsapp, FaLink, FaQuestionCircle } from 'react-icons/fa';
 import { QRCodeSVG } from 'qrcode.react';
 import { Button } from './components/ui/button';
 import { Input } from './components/ui/input';
@@ -11,6 +11,7 @@ import { Alert, AlertDescription } from './components/ui/alert';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from './components/ui/dialog';
 import { ToggleGroup, ToggleGroupItem } from './components/ui/toggle-group';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './components/ui/tooltip';
+import HowToPlay from './components/HowToPlay';
 import './style/animation.scss';
 import { cn } from './lib/utils';
 import { copyJoinUrl, shareViaWhatsApp, getJoinUrl } from './utils/share';
@@ -18,6 +19,7 @@ import { copyJoinUrl, shareViaWhatsApp, getJoinUrl } from './utils/share';
 const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, error, activeRooms, refreshRooms, prefilledRoom, roomName, setRoomName }) => {
   const [mode, setMode] = useState('join'); // 'join' or 'host'
   const [showQR, setShowQR] = useState(false);
+  const [showHowToPlay, setShowHowToPlay] = useState(false);
   const [usernameError, setUsernameError] = useState(false);
   const [roomNameError, setRoomNameError] = useState(false);
   const [showFullForm, setShowFullForm] = useState(!prefilledRoom); // Show simplified form if room is prefilled
@@ -543,6 +545,47 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
           </Card>
         </motion.div>
       </div>
+
+      {/* Floating How to Play Button */}
+      <motion.div
+        initial={{ opacity: 0, scale: 0 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ delay: 0.5, type: 'spring' }}
+        className="fixed bottom-6 left-6 z-50"
+      >
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                onClick={() => setShowHowToPlay(true)}
+                size="lg"
+                className="rounded-full w-16 h-16 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-emerald-600 hover:to-green-500 shadow-2xl"
+              >
+                <FaQuestionCircle size={28} />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent side="right">איך משחקים?</TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+      </motion.div>
+
+      {/* How to Play Dialog */}
+      <Dialog open={showHowToPlay} onOpenChange={setShowHowToPlay}>
+        <DialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="sr-only">איך משחקים בבוגל</DialogTitle>
+          </DialogHeader>
+          <HowToPlay />
+          <DialogFooter className="sm:justify-center">
+            <Button
+              onClick={() => setShowHowToPlay(false)}
+              className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-purple-600 hover:to-indigo-600 text-lg px-8"
+            >
+              הבנתי, בוא נשחק! 🎮
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       {/* QR Code Dialog */}
       <Dialog open={showQR} onOpenChange={setShowQR}>

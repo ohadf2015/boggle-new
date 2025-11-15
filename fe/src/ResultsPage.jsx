@@ -1,10 +1,11 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { FaTrophy, FaSignOutAlt } from 'react-icons/fa';
+import { FaTrophy, FaSignOutAlt, FaCrown, FaMedal } from 'react-icons/fa';
 import { Button } from './components/ui/button';
 import { Card } from './components/ui/card';
 import { Badge } from './components/ui/badge';
 import { AchievementBadge } from './components/AchievementBadge';
+import confetti from 'canvas-confetti';
 import './style/animation.scss';
 import { cn } from './lib/utils';
 
@@ -146,6 +147,41 @@ const ResultsPage = ({ finalScores, letterGrid, gameCode, onReturnToRoom }) => {
     return finalScores ? [...finalScores].sort((a, b) => b.score - a.score) : [];
   }, [finalScores]);
 
+  const winner = sortedScores[0];
+
+  // Celebration effect when results load
+  useEffect(() => {
+    if (winner) {
+      // Initial confetti burst
+      confetti({
+        particleCount: 150,
+        spread: 100,
+        origin: { y: 0.6 },
+        colors: ['#FFD700', '#FFA500', '#FF6B6B', '#4ECDC4']
+      });
+
+      // Continuous celebration for winner
+      const interval = setInterval(() => {
+        confetti({
+          particleCount: 50,
+          angle: 60,
+          spread: 55,
+          origin: { x: 0, y: 0.8 },
+          colors: ['#FFD700', '#FFA500']
+        });
+        confetti({
+          particleCount: 50,
+          angle: 120,
+          spread: 55,
+          origin: { x: 1, y: 0.8 },
+          colors: ['#FFD700', '#FFA500']
+        });
+      }, 3000);
+
+      return () => clearInterval(interval);
+    }
+  }, [winner]);
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-500 via-purple-600 to-purple-700 flex flex-col items-center p-4 sm:p-6 overflow-auto">
       <div className="absolute top-5 right-5">
@@ -167,6 +203,61 @@ const ResultsPage = ({ finalScores, letterGrid, gameCode, onReturnToRoom }) => {
       >
         <span className="text text-5xl sm:text-6xl md:text-7xl">Boggle</span>
       </motion.div>
+
+      {/* Winner Announcement Banner */}
+      {winner && (
+        <motion.div
+          initial={{ scale: 0, rotateY: 180 }}
+          animate={{ scale: 1, rotateY: 0 }}
+          transition={{ type: 'spring', stiffness: 200, damping: 15, delay: 0.3 }}
+          className="mb-6"
+        >
+          <Card className="bg-gradient-to-r from-yellow-400 via-yellow-500 to-orange-500 border-4 border-yellow-300 shadow-2xl">
+            <div className="p-6 text-center">
+              <motion.div
+                animate={{
+                  rotate: [0, -10, 10, -10, 10, 0],
+                  scale: [1, 1.1, 1, 1.1, 1]
+                }}
+                transition={{
+                  duration: 2,
+                  repeat: Infinity,
+                  repeatDelay: 3
+                }}
+                className="inline-block"
+              >
+                <FaCrown className="text-6xl text-white drop-shadow-lg mb-2" />
+              </motion.div>
+              <h2 className="text-4xl md:text-5xl font-black text-white drop-shadow-lg mb-2">
+                🎉 המנצח: {winner.username}! 🎉
+              </h2>
+              <p className="text-2xl font-bold text-white/90">
+                {winner.score} נקודות
+              </p>
+              <div className="flex justify-center gap-2 mt-3">
+                <motion.div
+                  animate={{ y: [0, -10, 0] }}
+                  transition={{ duration: 1, repeat: Infinity }}
+                >
+                  <FaTrophy className="text-3xl text-white" />
+                </motion.div>
+                <motion.div
+                  animate={{ y: [0, -10, 0] }}
+                  transition={{ duration: 1, repeat: Infinity, delay: 0.2 }}
+                >
+                  <FaMedal className="text-3xl text-white" />
+                </motion.div>
+                <motion.div
+                  animate={{ y: [0, -10, 0] }}
+                  transition={{ duration: 1, repeat: Infinity, delay: 0.4 }}
+                >
+                  <FaTrophy className="text-3xl text-white" />
+                </motion.div>
+              </div>
+            </div>
+          </Card>
+        </motion.div>
+      )}
 
       <motion.div
         initial={{ scale: 0, rotate: -10 }}
