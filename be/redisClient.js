@@ -2,9 +2,10 @@
 const Redis = require('ioredis');
 
 // Redis connection configuration
+// Support both Railway's env vars (REDISHOST, REDISPORT) and standard naming (REDIS_HOST, REDIS_PORT)
 const redisConfig = {
-  host: process.env.REDIS_HOST || '127.0.0.1',
-  port: process.env.REDIS_PORT || 6379,
+  host: process.env.REDIS_HOST || process.env.REDISHOST || '127.0.0.1',
+  port: process.env.REDIS_PORT || process.env.REDISPORT || 6379,
   password: process.env.REDIS_PASSWORD || undefined,
   retryStrategy(times) {
     const delay = Math.min(times * 50, 2000);
@@ -21,7 +22,23 @@ let isRedisAvailable = false;
 // Initialize Redis client
 async function initRedis() {
   try {
-    redisClient = new Redis(redisConfig);
+    // If REDIS_URL is provided (e.g., from Railway), use it directly
+    // Otherwise, use individual config params
+    if (process.env.REDIS_URL) {
+      console.log('[REDIS] Connecting using REDIS_URL');
+      redisClient = new Redis(process.env.REDIS_URL, {
+        retryStrategy(times) {
+          const delay = Math.min(times * 50, 2000);
+          return delay;
+        },
+        maxRetriesPerRequest: 3,
+        enableReadyCheck: true,
+        lazyConnect: true,
+      });
+    } else {
+      console.log('[REDIS] Connecting using individual config params');
+      redisClient = new Redis(redisConfig);
+    }
 
     redisClient.on('connect', () => {
       console.log('[REDIS] Connected to Redis server');
