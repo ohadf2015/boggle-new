@@ -587,18 +587,17 @@ const HostView = ({ gameCode }) => {
       <div className="flex flex-col gap-6 w-full max-w-6xl">
         {/* Game Settings - TOP (below Game Code) */}
         <Card className="bg-white/90 backdrop-blur-md p-4 sm:p-5 rounded-lg shadow-md border border-gray-200/50">
-          <h3 className="text-base font-bold text-gray-700 mb-3 flex items-center gap-2">
+          <h3 className="text-base font-bold text-gray-700 mb-4 flex items-center gap-2">
             <FaCog className="text-cyan-600 text-sm" />
             הגדרות משחק
           </h3>
-          <div className="w-full max-w-5xl mx-auto">
+          <div className="w-full max-w-5xl mx-auto space-y-4">
             {!gameStarted ? (
               <>
-                {/* Difficulty Selection + Timer - Inline Layout */}
-                <div className="space-y-2">
-                  <Label className="text-sm font-medium text-gray-700">רמת קושי וטיימר</Label>
-                  <div className="flex flex-wrap gap-2 items-end">
-                    {/* Difficulty Buttons */}
+                {/* Difficulty Selection + Timer - Inline Layout with Separator */}
+                <div className="flex flex-wrap gap-4 items-center">
+                  {/* Difficulty Buttons Group */}
+                  <div className="flex flex-wrap gap-2">
                     {Object.keys(DIFFICULTIES).map((key) => {
                       const isSelected = difficulty === key;
                       return (
@@ -623,36 +622,41 @@ const HostView = ({ gameCode }) => {
                         </motion.button>
                       );
                     })}
+                  </div>
 
-                    {/* Timer Input - Adjacent to difficulty buttons */}
-                    <div className="flex items-center gap-2 bg-gradient-to-r from-purple-100 to-pink-100 px-3 py-1.5 rounded-md">
-                      <FaClock className="text-purple-600 text-sm" />
-                      <Input
-                        id="timer"
-                        type="number"
-                        value={timerValue}
-                        onChange={(e) => setTimerValue(e.target.value)}
-                        className="h-8 w-16 text-sm border-purple-300 bg-white/80"
-                        placeholder="1"
-                      />
-                      <span className="text-xs text-purple-700 font-medium">דקות</span>
-                    </div>
+                  {/* Vertical Separator */}
+                  <div className="hidden sm:block w-px h-12 bg-gradient-to-b from-transparent via-gray-300 to-transparent"></div>
 
-                    {/* Start Button */}
-                    <Button
-                      onClick={startGame}
-                      disabled={!timerValue || playersReady.length === 0}
-                      className="h-10 px-6 bg-gradient-to-r from-emerald-500 to-green-500 hover:from-emerald-600 hover:to-green-600 text-base font-bold text-white shadow-md whitespace-nowrap"
-                    >
-                      התחל משחק
-                    </Button>
+                  {/* Timer Input - Adjacent to difficulty buttons */}
+                  <div className="flex items-center gap-2 bg-gradient-to-r from-purple-100 to-pink-100 px-3 py-2 rounded-md">
+                    <FaClock className="text-purple-600 text-sm" />
+                    <Input
+                      id="timer"
+                      type="number"
+                      value={timerValue}
+                      onChange={(e) => setTimerValue(e.target.value)}
+                      className="h-8 w-16 text-sm border-purple-300 bg-white/80"
+                      placeholder="1"
+                    />
+                    <span className="text-xs text-purple-700 font-medium">דקות</span>
                   </div>
                 </div>
-                {playersReady.length === 0 && (
-                  <p className="text-xs text-center text-rose-600 font-medium mt-3">
-                    ממתין לשחקנים להצטרף...
-                  </p>
-                )}
+
+                {/* Start Button - Below difficulty and timer */}
+                <div className="pt-2">
+                  <Button
+                    onClick={startGame}
+                    disabled={!timerValue || playersReady.length === 0}
+                    className="w-full h-11 bg-gradient-to-r from-emerald-500 to-green-500 hover:from-emerald-600 hover:to-green-600 text-base font-bold text-white shadow-md"
+                  >
+                    התחל משחק
+                  </Button>
+                  {playersReady.length === 0 && (
+                    <p className="text-xs text-center text-rose-600 font-medium mt-2">
+                      ממתין לשחקנים להצטרף...
+                    </p>
+                  )}
+                </div>
               </>
             ) : (
               <Button
@@ -666,9 +670,39 @@ const HostView = ({ gameCode }) => {
           </div>
         </Card>
 
-        {/* Main Content Area: Boggle Grid (LEFT) + Player List (RIGHT) */}
+        {/* Main Content Area: Player List (LEFT) + Boggle Grid (RIGHT) */}
         <div className="flex flex-col lg:flex-row gap-6">
-          {/* Boggle Letter Grid - LEFT */}
+          {/* Players Section - LEFT */}
+          <Card className="bg-white/90 backdrop-blur-md p-4 sm:p-6 rounded-lg shadow-md border border-purple-200/30 lg:min-w-[280px]">
+            <h3 className="text-lg font-bold text-gray-700 mb-4 flex items-center gap-2">
+              <FaUsers className="text-purple-600" />
+              שחקנים ({playersReady.length})
+            </h3>
+            <div className="flex flex-col gap-2">
+              <AnimatePresence>
+                {playersReady.map((user, index) => (
+                  <motion.div
+                    key={user}
+                    initial={{ scale: 0, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    exit={{ scale: 0, opacity: 0 }}
+                    transition={{ delay: index * 0.05 }}
+                  >
+                    <Badge className="bg-gradient-to-r from-indigo-500 to-purple-500 font-bold text-white px-3 py-1.5 text-base w-full justify-center shadow-sm">
+                      {user}
+                    </Badge>
+                  </motion.div>
+                ))}
+              </AnimatePresence>
+            </div>
+            {playersReady.length === 0 && (
+              <p className="text-sm text-center text-gray-500 mt-2">
+                ממתין לשחקנים...
+              </p>
+            )}
+          </Card>
+
+          {/* Boggle Letter Grid - RIGHT */}
           <Card className="flex-1 bg-white/90 backdrop-blur-md p-4 sm:p-6 rounded-lg shadow-md border border-blue-200/30 flex flex-col items-center">
             <h3 className="text-xl font-bold text-gray-700 mb-4">לוח האותיות</h3>
 
@@ -720,36 +754,6 @@ const HostView = ({ gameCode }) => {
                 ))
               )}
             </div>
-          </Card>
-
-          {/* Players Section - RIGHT */}
-          <Card className="bg-white/90 backdrop-blur-md p-4 sm:p-6 rounded-lg shadow-md border border-purple-200/30 lg:min-w-[280px]">
-            <h3 className="text-lg font-bold text-gray-700 mb-4 flex items-center gap-2">
-              <FaUsers className="text-purple-600" />
-              שחקנים ({playersReady.length})
-            </h3>
-            <div className="flex flex-col gap-2">
-              <AnimatePresence>
-                {playersReady.map((user, index) => (
-                  <motion.div
-                    key={user}
-                    initial={{ scale: 0, opacity: 0 }}
-                    animate={{ scale: 1, opacity: 1 }}
-                    exit={{ scale: 0, opacity: 0 }}
-                    transition={{ delay: index * 0.05 }}
-                  >
-                    <Badge className="bg-gradient-to-r from-indigo-500 to-purple-500 font-bold text-white px-3 py-1.5 text-base w-full justify-center shadow-sm">
-                      {user}
-                    </Badge>
-                  </motion.div>
-                ))}
-              </AnimatePresence>
-            </div>
-            {playersReady.length === 0 && (
-              <p className="text-sm text-center text-gray-500 mt-2">
-                ממתין לשחקנים...
-              </p>
-            )}
           </Card>
         </div>
       </div>
