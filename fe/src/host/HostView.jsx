@@ -487,9 +487,9 @@ const HostView = ({ gameCode }) => {
       {/* Exit Button */}
       <div className="absolute top-5 right-5">
         <Button
-          variant="destructive"
+          variant="outline"
           onClick={handleExitRoom}
-          className="font-bold"
+          className="font-medium bg-rose-400/80 text-white border-rose-500/60 hover:bg-rose-500/80 hover:border-rose-600"
         >
           <FaSignOutAlt className="mr-2" />
           יציאה מהחדר
@@ -514,16 +514,17 @@ const HostView = ({ gameCode }) => {
         transition={{ type: 'spring', stiffness: 260, damping: 20 }}
         className="w-full max-w-2xl mb-6"
       >
-        <Card className="bg-gradient-to-r from-blue-500 to-cyan-500 text-white text-center p-4 sm:p-6">
-          <h2 className="text-2xl sm:text-3xl font-bold mb-4">
-            קוד משחק: {gameCode}
+        <Card className="bg-slate-500/80 backdrop-blur-sm text-white text-center p-4 sm:p-6 rounded-lg shadow-sm">
+          <p className="text-sm text-gray-200 mb-2">קוד משחק:</p>
+          <h2 className="text-4xl sm:text-5xl font-bold mb-4 tracking-wide">
+            {gameCode}
           </h2>
           <div className="flex flex-wrap gap-2 justify-center">
             <Button
               variant="outline"
               size="sm"
               onClick={() => copyJoinUrl(gameCode)}
-              className="bg-white text-indigo-600 border-white hover:bg-white/90 font-bold"
+              className="bg-transparent text-white border-white/60 hover:bg-white/20 hover:border-white font-medium"
             >
               <FaLink className="mr-2" />
               העתק קישור
@@ -532,7 +533,7 @@ const HostView = ({ gameCode }) => {
               variant="outline"
               size="sm"
               onClick={() => shareViaWhatsApp(gameCode)}
-              className="bg-white text-green-600 border-white hover:bg-white/90 font-bold"
+              className="bg-transparent text-white border-white/60 hover:bg-white/20 hover:border-white font-medium"
             >
               <FaWhatsapp className="mr-2" />
               שתף בוואטסאפ
@@ -541,7 +542,7 @@ const HostView = ({ gameCode }) => {
               variant="outline"
               size="sm"
               onClick={() => setShowQR(true)}
-              className="bg-white text-indigo-600 border-white hover:bg-white/90 font-bold"
+              className="bg-transparent text-white border-white/60 hover:bg-white/20 hover:border-white font-medium"
             >
               <FaQrcode className="mr-2" />
               ברקוד
@@ -582,106 +583,109 @@ const HostView = ({ gameCode }) => {
         </DialogContent>
       </Dialog>
 
-      {/* New Vertical Layout */}
-      <div className="flex flex-col gap-6 w-full max-w-3xl">
-        {/* Players Section - TOP */}
-        <Card className="bg-white/95 backdrop-blur-sm p-4 sm:p-6 rounded-lg shadow-lg">
-          <h3 className="text-lg font-bold text-indigo-600 mb-4 flex items-center gap-2">
-            <FaUsers />
-            שחקנים ({playersReady.length})
-          </h3>
-          <div className="flex flex-wrap gap-2">
-            <AnimatePresence>
-              {playersReady.map((user, index) => (
-                <motion.div
-                  key={user}
-                  initial={{ scale: 0, opacity: 0 }}
-                  animate={{ scale: 1, opacity: 1 }}
-                  exit={{ scale: 0, opacity: 0 }}
-                  transition={{ delay: index * 0.05 }}
-                >
-                  <Badge className="bg-indigo-600 font-bold text-white px-3 py-1 text-base">
-                    {user}
-                  </Badge>
-                </motion.div>
-              ))}
-            </AnimatePresence>
-          </div>
-          {playersReady.length === 0 && (
-            <p className="text-sm text-center text-muted-foreground mt-2">
-              ממתין לשחקנים...
-            </p>
-          )}
-        </Card>
-
-        {/* Boggle Letter Grid - MIDDLE */}
-        <Card className="bg-white/95 backdrop-blur-sm p-4 sm:p-6 rounded-lg shadow-lg flex flex-col items-center">
-          <h3 className="text-xl font-bold text-indigo-600 mb-4">לוח האותיות</h3>
-
-          {/* Timer */}
-          {remainingTime !== null && (
-            <motion.div
-              initial={{ scale: 0 }}
-              animate={{ scale: 1 }}
-              transition={{ type: 'spring' }}
-              className="mb-6"
-            >
-              <div className={cn(
-                "flex items-center gap-2 px-4 py-3 sm:px-6 sm:py-4 rounded-lg text-white font-bold text-2xl sm:text-3xl",
-                remainingTime < 30
-                  ? "bg-gradient-to-r from-red-500 to-orange-500"
-                  : "bg-gradient-to-r from-green-500 to-lime-500"
-              )}>
-                <FaClock />
-                <span>{formatTime(remainingTime)}</span>
-              </div>
-            </motion.div>
-          )}
-
-          {/* Letter Grid */}
-          <div
-            className="grid gap-1 sm:gap-2 md:gap-3 w-full max-w-md mx-auto"
-            style={{
-              gridTemplateColumns: `repeat(${tableData[0]?.length || 7}, minmax(28px, 1fr))`,
-            }}
-          >
-            {tableData.map((row, i) =>
-              row.map((cell, j) => (
-                <motion.div
-                  key={`${i}-${j}`}
-                  initial={{ scale: 0, rotate: -180 }}
-                  animate={{ scale: 1, rotate: 0 }}
-                  transition={{
-                    type: 'spring',
-                    stiffness: 260,
-                    damping: 20,
-                    delay: (i * row.length + j) * 0.02,
-                  }}
-                  whileHover={{ scale: 1.1, rotate: 5 }}
-                  className="aspect-square flex items-center justify-center text-base sm:text-2xl md:text-3xl font-bold bg-indigo-600 text-white rounded-lg shadow-md cursor-pointer hover:shadow-lg transition-all"
-                  style={{ backgroundColor: getLetterColor() }}
-                >
-                  {cell}
-                </motion.div>
-              ))
+      {/* Refined Layout */}
+      <div className="flex flex-col gap-6 w-full max-w-6xl">
+        {/* Main Content Area: Player List (LEFT) + Boggle Grid (RIGHT) */}
+        <div className="flex flex-col lg:flex-row gap-6">
+          {/* Players Section - LEFT */}
+          <Card className="bg-gray-50/80 backdrop-blur-sm p-4 sm:p-6 rounded-lg shadow-sm lg:min-w-[280px]">
+            <h3 className="text-lg font-bold text-gray-700 mb-4 flex items-center gap-2">
+              <FaUsers className="text-gray-600" />
+              שחקנים ({playersReady.length})
+            </h3>
+            <div className="flex flex-col gap-2">
+              <AnimatePresence>
+                {playersReady.map((user, index) => (
+                  <motion.div
+                    key={user}
+                    initial={{ scale: 0, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    exit={{ scale: 0, opacity: 0 }}
+                    transition={{ delay: index * 0.05 }}
+                  >
+                    <Badge className="bg-slate-500/80 font-bold text-white px-3 py-1.5 text-base w-full justify-center">
+                      {user}
+                    </Badge>
+                  </motion.div>
+                ))}
+              </AnimatePresence>
+            </div>
+            {playersReady.length === 0 && (
+              <p className="text-sm text-center text-muted-foreground mt-2">
+                ממתין לשחקנים...
+              </p>
             )}
-          </div>
-        </Card>
+          </Card>
+
+          {/* Boggle Letter Grid - RIGHT */}
+          <Card className="flex-1 bg-gray-50/80 backdrop-blur-sm p-4 sm:p-6 rounded-lg shadow-sm flex flex-col items-center">
+            <h3 className="text-xl font-bold text-gray-700 mb-4">לוח האותיות</h3>
+
+            {/* Timer */}
+            {remainingTime !== null && (
+              <motion.div
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                transition={{ type: 'spring' }}
+                className="mb-6"
+              >
+                <div className={cn(
+                  "flex items-center gap-2 px-4 py-3 sm:px-6 sm:py-4 rounded-lg text-white font-bold text-2xl sm:text-3xl shadow-sm",
+                  remainingTime < 30
+                    ? "bg-rose-400/90"
+                    : "bg-emerald-400/90"
+                )}>
+                  <FaClock />
+                  <span>{formatTime(remainingTime)}</span>
+                </div>
+              </motion.div>
+            )}
+
+            {/* Letter Grid - Compact with larger letters */}
+            <div
+              className="grid gap-0.5 sm:gap-1 w-full max-w-lg mx-auto"
+              style={{
+                gridTemplateColumns: `repeat(${tableData[0]?.length || 7}, minmax(32px, 1fr))`,
+              }}
+            >
+              {tableData.map((row, i) =>
+                row.map((cell, j) => (
+                  <motion.div
+                    key={`${i}-${j}`}
+                    initial={{ scale: 0, rotate: -180 }}
+                    animate={{ scale: 1, rotate: 0 }}
+                    transition={{
+                      type: 'spring',
+                      stiffness: 260,
+                      damping: 20,
+                      delay: (i * row.length + j) * 0.02,
+                    }}
+                    whileHover={{ scale: 1.05, rotate: 3 }}
+                    className="aspect-square flex items-center justify-center text-2xl sm:text-3xl md:text-4xl font-bold text-white rounded shadow-sm cursor-pointer hover:shadow-md transition-all"
+                    style={{ backgroundColor: '#7C93C3' }}
+                  >
+                    {cell}
+                  </motion.div>
+                ))
+              )}
+            </div>
+          </Card>
+        </div>
 
         {/* Game Settings - BOTTOM */}
-        <Card className="bg-white/95 backdrop-blur-sm p-4 sm:p-6 rounded-lg shadow-lg">
-          <h3 className="text-lg font-bold text-indigo-600 mb-4 flex items-center gap-2">
-            <FaCog />
+        <Card className="bg-gray-50/80 backdrop-blur-sm p-4 sm:p-6 rounded-lg shadow-sm">
+          <h3 className="text-lg font-bold text-gray-700 mb-4 flex items-center gap-2">
+            <FaCog className="text-gray-600" />
             הגדרות משחק
           </h3>
-          <div className="w-full max-w-2xl mx-auto space-y-4">
+          <div className="w-full max-w-3xl mx-auto space-y-4">
             {!gameStarted ? (
               <>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label htmlFor="difficulty" className="text-base font-medium">רמת קושי</Label>
+                    <Label htmlFor="difficulty" className="text-base font-medium text-gray-700">רמת קושי</Label>
                     <Select value={difficulty} onValueChange={setDifficulty}>
-                      <SelectTrigger id="difficulty" className="h-12">
+                      <SelectTrigger id="difficulty" className="h-12 border-gray-300">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
@@ -694,13 +698,13 @@ const HostView = ({ gameCode }) => {
                     </Select>
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="timer" className="text-base font-medium">טיימר (דקות)</Label>
+                    <Label htmlFor="timer" className="text-base font-medium text-gray-700">טיימר (דקות)</Label>
                     <Input
                       id="timer"
                       type="number"
                       value={timerValue}
                       onChange={(e) => setTimerValue(e.target.value)}
-                      className="h-12 text-base"
+                      className="h-12 text-base border-gray-300"
                       placeholder="1"
                     />
                   </div>
@@ -708,12 +712,12 @@ const HostView = ({ gameCode }) => {
                 <Button
                   onClick={startGame}
                   disabled={!timerValue || playersReady.length === 0}
-                  className="w-full h-14 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-lg font-bold text-white shadow-lg"
+                  className="w-full h-14 bg-teal-400/90 hover:bg-teal-500/90 text-lg font-bold text-white shadow-sm"
                 >
                   התחל משחק
                 </Button>
                 {playersReady.length === 0 && (
-                  <p className="text-sm text-center text-red-500 font-medium">
+                  <p className="text-sm text-center text-rose-500/90 font-medium">
                     ממתין לשחקנים להצטרף...
                   </p>
                 )}
@@ -722,7 +726,7 @@ const HostView = ({ gameCode }) => {
               <Button
                 onClick={stopGame}
                 variant="destructive"
-                className="w-full h-14 text-lg font-bold shadow-lg"
+                className="w-full h-14 text-lg font-bold shadow-sm bg-rose-400/90 hover:bg-rose-500/90"
               >
                 עצור משחק
               </Button>
