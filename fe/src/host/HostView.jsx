@@ -678,37 +678,54 @@ const HostView = ({ gameCode }) => {
             <FaCog className="text-gray-600" />
             הגדרות משחק
           </h3>
-          <div className="w-full max-w-3xl mx-auto space-y-4">
+          <div className="w-full max-w-4xl mx-auto space-y-5">
             {!gameStarted ? (
               <>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="difficulty" className="text-base font-medium text-gray-700">רמת קושי</Label>
-                    <Select value={difficulty} onValueChange={setDifficulty}>
-                      <SelectTrigger id="difficulty" className="h-12 border-gray-300">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {Object.keys(DIFFICULTIES).map((key) => (
-                          <SelectItem key={key} value={key}>
-                            {DIFFICULTIES[key].name} ({DIFFICULTIES[key].rows}x{DIFFICULTIES[key].cols})
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="timer" className="text-base font-medium text-gray-700">טיימר (דקות)</Label>
-                    <Input
-                      id="timer"
-                      type="number"
-                      value={timerValue}
-                      onChange={(e) => setTimerValue(e.target.value)}
-                      className="h-12 text-base border-gray-300"
-                      placeholder="1"
-                    />
+                {/* Difficulty Selection - Button Group */}
+                <div className="space-y-3">
+                  <Label className="text-base font-medium text-gray-700">רמת קושי</Label>
+                  <div className="flex flex-wrap gap-2 sm:gap-3">
+                    {Object.keys(DIFFICULTIES).map((key) => {
+                      const isSelected = difficulty === key;
+                      return (
+                        <motion.button
+                          key={key}
+                          onClick={() => setDifficulty(key)}
+                          whileHover={{ scale: 1.03 }}
+                          whileTap={{ scale: 0.98 }}
+                          className={cn(
+                            "px-4 py-3 rounded-lg font-medium transition-all shadow-sm",
+                            isSelected
+                              ? "bg-teal-400/90 text-white text-base sm:text-lg scale-105"
+                              : "bg-gray-200/80 text-gray-600 text-sm sm:text-base hover:bg-gray-300/80"
+                          )}
+                        >
+                          <div className="flex flex-col items-center gap-1">
+                            <span className="font-bold">{DIFFICULTIES[key].name}</span>
+                            <span className="text-xs opacity-90">
+                              ({DIFFICULTIES[key].rows}x{DIFFICULTIES[key].cols})
+                            </span>
+                          </div>
+                        </motion.button>
+                      );
+                    })}
                   </div>
                 </div>
+
+                {/* Timer Input */}
+                <div className="space-y-2">
+                  <Label htmlFor="timer" className="text-base font-medium text-gray-700">טיימר (דקות)</Label>
+                  <Input
+                    id="timer"
+                    type="number"
+                    value={timerValue}
+                    onChange={(e) => setTimerValue(e.target.value)}
+                    className="h-12 text-base border-gray-300 max-w-xs"
+                    placeholder="1"
+                  />
+                </div>
+
+                {/* Start Game Button */}
                 <Button
                   onClick={startGame}
                   disabled={!timerValue || playersReady.length === 0}
