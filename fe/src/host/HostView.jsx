@@ -289,7 +289,7 @@ const HostView = ({ gameCode }) => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-500 via-purple-600 to-purple-700 flex flex-col items-center p-4 sm:p-6 overflow-auto">
+    <div className="min-h-screen bg-gradient-to-b from-indigo-600 via-purple-600 to-pink-600 flex flex-col items-center p-4 sm:p-6 overflow-auto">
       <Toaster position="top-center" />
 
       {/* Validation Modal */}
