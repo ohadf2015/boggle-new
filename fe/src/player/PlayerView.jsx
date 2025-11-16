@@ -252,16 +252,15 @@ const PlayerView = ({ onShowResults }) => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-cyan-500 via-blue-500 to-teal-500 p-4 md:p-8">
+    <div className="min-h-screen bg-gradient-to-br from-blue-900 via-purple-900 to-purple-950 p-4 md:p-8">
       <Toaster position="top-center" />
 
       {/* Exit Button */}
       <div className="absolute top-4 right-4 z-50">
         <Button
           onClick={handleExitRoom}
-          variant="destructive"
           size="sm"
-          className="shadow-lg hover:scale-105 transition-transform"
+          className="bg-slate-700 hover:bg-slate-600 text-white font-bold rounded-md shadow-lg hover:scale-105 transition-transform"
         >
           <FaDoorOpen className="mr-2" />
           יציאה
@@ -289,13 +288,13 @@ const PlayerView = ({ onShowResults }) => {
           className="max-w-md mx-auto mb-6"
         >
           <Card className={`${remainingTime < 30 ? 'bg-gradient-to-r from-red-500 to-orange-500' :
-                                   'bg-gradient-to-r from-green-500 to-emerald-500'}
-                          border-none shadow-2xl`}>
+                                   'bg-teal-500'}
+                          border-none shadow-lg rounded-lg`}>
             <CardContent className="p-6 text-center">
               <div className="text-5xl font-bold text-white">
                 {formatTime(remainingTime)}
               </div>
-              <div className="text-white/80 text-sm mt-2">זמן נותר</div>
+              <div className="text-white/90 text-sm mt-2 font-semibold">זמן נותר</div>
             </CardContent>
           </Card>
         </motion.div>
@@ -308,9 +307,9 @@ const PlayerView = ({ onShowResults }) => {
           animate={{ y: 0, opacity: 1 }}
           className="max-w-4xl mx-auto mb-6"
         >
-          <Card className="bg-white/95 backdrop-blur shadow-xl">
+          <Card className="bg-white backdrop-blur shadow-lg rounded-lg">
             <CardHeader>
-              <CardTitle className="text-xl flex items-center gap-2">
+              <CardTitle className="text-xl flex items-center gap-2 text-slate-700">
                 🏆 ההישגים שלך
               </CardTitle>
             </CardHeader>
@@ -328,12 +327,12 @@ const PlayerView = ({ onShowResults }) => {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 max-w-7xl mx-auto">
         {/* Letter Grid */}
         {letterGrid && (
-          <Card className="bg-white/95 backdrop-blur shadow-2xl lg:col-span-1">
+          <Card className="bg-white shadow-lg lg:col-span-1 rounded-lg">
             <CardHeader>
-              <CardTitle className="text-center">לוח האותיות</CardTitle>
+              <CardTitle className="text-center text-slate-700">לוח האותיות</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className={`grid gap-2 mx-auto max-w-sm`}
+              <div className={`grid gap-3 mx-auto max-w-sm`}
                    style={{
                      gridTemplateColumns: `repeat(${letterGrid[0]?.length || 7}, minmax(0, 1fr))`
                    }}>
@@ -344,10 +343,13 @@ const PlayerView = ({ onShowResults }) => {
                       initial={{ scale: 0, rotate: -180 }}
                       animate={{ scale: 1, rotate: 0 }}
                       transition={{ delay: (i * row.length + j) * 0.02 }}
-                      whileHover={{ scale: 1.1, rotate: 5 }}
+                      whileHover={{ scale: 1.05 }}
                       className="aspect-square flex items-center justify-center text-2xl font-bold
-                               bg-gradient-to-br from-cyan-400 to-blue-500 text-white rounded-lg
-                               shadow-lg hover:shadow-2xl transition-all cursor-pointer"
+                               text-white rounded cursor-pointer transition-all"
+                      style={{
+                        boxShadow: '0 2px 8px rgba(0, 0, 0, 0.15)',
+                        backgroundColor: '#1e40af'
+                      }}
                     >
                       {cell}
                     </motion.div>
@@ -359,20 +361,12 @@ const PlayerView = ({ onShowResults }) => {
         )}
 
         {/* Word Input & List */}
-        <Card className="bg-white/95 backdrop-blur shadow-2xl lg:col-span-1">
+        <Card className="bg-white shadow-lg lg:col-span-1 rounded-lg">
           <CardHeader>
-            <CardTitle>מילים שנמצאו ({foundWords.length})</CardTitle>
+            <CardTitle className="text-slate-700">מילים שנמצאו ({foundWords.length})</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="flex gap-2">
-              <Button
-                onClick={submitWord}
-                disabled={!gameActive || !word.trim()}
-                className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600
-                         hover:to-pink-600 text-white font-bold shadow-lg"
-              >
-                הוסף
-              </Button>
               <Input
                 ref={inputRef}
                 value={word}
@@ -380,9 +374,16 @@ const PlayerView = ({ onShowResults }) => {
                 onKeyDown={handleKeyDown}
                 disabled={!gameActive}
                 placeholder="הזן מילה..."
-                className="text-lg"
+                className="text-lg rounded-md border-gray-300"
                 autoFocus
               />
+              <Button
+                onClick={submitWord}
+                disabled={!gameActive || !word.trim()}
+                className="bg-teal-500 hover:bg-teal-600 text-white font-bold shadow-lg rounded-md"
+              >
+                שגור
+              </Button>
             </div>
 
             {!gameActive && !waitingForResults && (
@@ -407,13 +408,13 @@ const PlayerView = ({ onShowResults }) => {
                     initial={{ x: -50, opacity: 0 }}
                     animate={{ x: 0, opacity: 1 }}
                     exit={{ x: 50, opacity: 0 }}
-                    className={`flex items-center justify-between p-3 rounded-lg
+                    className={`flex items-center justify-between p-3 rounded-md
                               ${index === foundWords.length - 1 ?
-                                'bg-gradient-to-r from-blue-100 to-cyan-100 font-bold' :
+                                'bg-teal-50 font-bold border border-teal-200' :
                                 'bg-gray-50'}
-                              hover:bg-blue-50 transition-colors`}
+                              hover:bg-gray-100 transition-colors`}
                   >
-                    <span>{foundWord}</span>
+                    <span className="text-slate-700">{foundWord}</span>
                     <Button
                       size="sm"
                       variant="ghost"
@@ -431,29 +432,29 @@ const PlayerView = ({ onShowResults }) => {
         </Card>
 
         {/* Leaderboard */}
-        <Card className="bg-white/95 backdrop-blur shadow-2xl lg:col-span-1">
+        <Card className="bg-white shadow-lg lg:col-span-1 rounded-lg">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
+            <CardTitle className="flex items-center gap-2 text-slate-700">
               <FaTrophy className="text-yellow-500" />
               טבלת המובילים
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="space-y-3">
+            <div className="space-y-2">
               {leaderboard.map((player, index) => (
                 <motion.div
                   key={player.username}
                   initial={{ x: 50, opacity: 0 }}
                   animate={{ x: 0, opacity: 1 }}
                   transition={{ delay: index * 0.1 }}
-                  className={`flex items-center justify-between p-4 rounded-lg
-                            ${index === 0 ? 'bg-gradient-to-r from-yellow-400 to-orange-500 text-white shadow-lg' :
-                              index === 1 ? 'bg-gradient-to-r from-gray-300 to-gray-400 text-gray-800 shadow-md' :
-                              index === 2 ? 'bg-gradient-to-r from-orange-400 to-orange-500 text-white shadow-md' :
-                              'bg-gray-100'}`}
+                  className={`flex items-center justify-between p-3 rounded-md shadow-sm
+                            ${index === 0 ? 'bg-gradient-to-r from-yellow-300 to-orange-400 text-gray-900 font-bold' :
+                              index === 1 ? 'bg-gradient-to-r from-gray-200 to-gray-300 text-gray-900' :
+                              index === 2 ? 'bg-gradient-to-r from-orange-300 to-orange-400 text-gray-900' :
+                              'bg-gray-100 text-gray-900'}`}
                 >
                   <div className="flex items-center gap-3">
-                    <div className="text-2xl font-bold min-w-[40px] text-center">
+                    <div className="text-lg font-bold min-w-[30px] text-center">
                       {index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : `#${index + 1}`}
                     </div>
                     <div>

@@ -289,7 +289,7 @@ const HostView = ({ gameCode }) => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-500 via-purple-600 to-purple-700 flex flex-col items-center p-4 sm:p-6 overflow-auto">
+    <div className="min-h-screen bg-gradient-to-br from-blue-900 via-purple-900 to-purple-950 flex flex-col items-center p-4 sm:p-6 overflow-auto">
       <Toaster position="top-center" />
 
       {/* Validation Modal */}
@@ -487,9 +487,8 @@ const HostView = ({ gameCode }) => {
       {/* Exit Button */}
       <div className="absolute top-5 right-5">
         <Button
-          variant="destructive"
           onClick={handleExitRoom}
-          className="font-bold"
+          className="bg-slate-700 hover:bg-slate-600 text-white font-bold rounded-md shadow-lg"
         >
           <FaSignOutAlt className="mr-2" />
           יציאה מהחדר
@@ -514,34 +513,32 @@ const HostView = ({ gameCode }) => {
         transition={{ type: 'spring', stiffness: 260, damping: 20 }}
         className="w-full max-w-2xl mb-6"
       >
-        <Card className="bg-gradient-to-r from-blue-500 to-cyan-500 text-white text-center p-4 sm:p-6">
-          <h2 className="text-2xl sm:text-3xl font-bold mb-4">
-            קוד משחק: {gameCode}
+        <Card className="bg-gradient-to-r from-blue-700 via-blue-800 to-purple-800 text-white text-center p-6 sm:p-8 rounded-lg shadow-lg border-none">
+          <p className="text-sm text-gray-300 mb-2">קוד משחק:</p>
+          <h2 className="text-4xl sm:text-5xl font-bold mb-6">
+            {gameCode}
           </h2>
           <div className="flex flex-wrap gap-2 justify-center">
             <Button
-              variant="outline"
               size="sm"
               onClick={() => copyJoinUrl(gameCode)}
-              className="bg-white text-indigo-600 border-white hover:bg-white/90 font-bold"
+              className="bg-transparent hover:bg-white/10 text-teal-300 border border-teal-300 font-bold rounded-md"
             >
               <FaLink className="mr-2" />
               העתק קישור
             </Button>
             <Button
-              variant="outline"
               size="sm"
               onClick={() => shareViaWhatsApp(gameCode)}
-              className="bg-white text-green-600 border-white hover:bg-white/90 font-bold"
+              className="bg-transparent hover:bg-white/10 text-teal-300 border border-teal-300 font-bold rounded-md"
             >
               <FaWhatsapp className="mr-2" />
               שתף בוואטסאפ
             </Button>
             <Button
-              variant="outline"
               size="sm"
               onClick={() => setShowQR(true)}
-              className="bg-white text-indigo-600 border-white hover:bg-white/90 font-bold"
+              className="bg-transparent hover:bg-white/10 text-teal-300 border border-teal-300 font-bold rounded-md"
             >
               <FaQrcode className="mr-2" />
               ברקוד
@@ -584,8 +581,8 @@ const HostView = ({ gameCode }) => {
 
       <div className="flex flex-col lg:flex-row gap-6 w-full max-w-7xl">
         {/* Players Section */}
-        <Card className="lg:min-w-[250px] p-4 sm:p-6">
-          <h3 className="text-lg font-bold text-indigo-600 mb-4 flex items-center gap-2">
+        <Card className="lg:min-w-[250px] p-4 sm:p-6 bg-white rounded-lg shadow-lg">
+          <h3 className="text-lg font-bold text-slate-700 mb-4 flex items-center gap-2">
             <FaUsers />
             שחקנים ({playersReady.length})
           </h3>
@@ -598,9 +595,9 @@ const HostView = ({ gameCode }) => {
                   animate={{ x: 0, opacity: 1 }}
                   exit={{ x: -50, opacity: 0 }}
                   transition={{ delay: index * 0.1 }}
-                  className="bg-blue-50 p-2 rounded-lg"
+                  className="bg-gray-50 p-3 rounded-md"
                 >
-                  <Badge className="bg-indigo-600 font-bold">{user}</Badge>
+                  <Badge className="bg-slate-600 font-bold text-white">{user}</Badge>
                 </motion.div>
               ))}
             </AnimatePresence>
@@ -613,7 +610,7 @@ const HostView = ({ gameCode }) => {
         </Card>
 
         {/* Game Board */}
-        <Card className="flex-1 p-4 sm:p-6 flex flex-col items-center">
+        <Card className="flex-1 p-4 sm:p-6 flex flex-col items-center bg-slate-900 rounded-lg shadow-lg border-none">
           {/* Timer */}
           {remainingTime !== null && (
             <motion.div
@@ -623,10 +620,10 @@ const HostView = ({ gameCode }) => {
               className="mb-6"
             >
               <div className={cn(
-                "flex items-center gap-2 px-4 py-3 sm:px-6 sm:py-4 rounded-lg text-white font-bold text-2xl sm:text-3xl",
+                "flex items-center gap-2 px-4 py-3 sm:px-6 sm:py-4 rounded-lg text-white font-bold text-2xl sm:text-3xl shadow-lg",
                 remainingTime < 30
                   ? "bg-gradient-to-r from-red-500 to-orange-500"
-                  : "bg-gradient-to-r from-green-500 to-lime-500"
+                  : "bg-teal-500"
               )}>
                 <FaClock />
                 <span>{formatTime(remainingTime)}</span>
@@ -636,7 +633,7 @@ const HostView = ({ gameCode }) => {
 
           {/* Letter Grid */}
           <div
-            className="grid gap-1 sm:gap-2 md:gap-3 mb-6 w-full max-w-md mx-auto"
+            className="grid gap-2 sm:gap-3 md:gap-3 mb-6 w-full max-w-md mx-auto"
             style={{
               gridTemplateColumns: `repeat(${tableData[0]?.length || 7}, minmax(28px, 1fr))`,
             }}
@@ -653,9 +650,12 @@ const HostView = ({ gameCode }) => {
                     damping: 20,
                     delay: (i * row.length + j) * 0.02,
                   }}
-                  whileHover={{ scale: 1.1, rotate: 5 }}
-                  className="aspect-square flex items-center justify-center text-base sm:text-2xl md:text-3xl font-bold bg-indigo-600 text-white rounded-lg shadow-md cursor-pointer hover:shadow-lg transition-all"
-                  style={{ backgroundColor: getLetterColor() }}
+                  whileHover={{ scale: 1.05 }}
+                  className="aspect-square flex items-center justify-center text-base sm:text-2xl md:text-3xl font-bold bg-blue-700 text-white rounded cursor-pointer transition-all"
+                  style={{
+                    boxShadow: '0 2px 8px rgba(0, 0, 0, 0.15)',
+                    backgroundColor: '#1e40af'
+                  }}
                 >
                   {cell}
                 </motion.div>
@@ -664,13 +664,13 @@ const HostView = ({ gameCode }) => {
           </div>
 
           {/* Game Controls */}
-          <div className="w-full max-w-sm space-y-3">
+          <div className="w-full max-w-sm space-y-4 bg-white p-4 rounded-lg shadow-lg">
             {!gameStarted ? (
               <>
                 <div className="space-y-2">
-                  <Label htmlFor="difficulty">רמת קושי</Label>
+                  <Label htmlFor="difficulty" className="text-slate-700 font-bold">רמת קושי</Label>
                   <Select value={difficulty} onValueChange={setDifficulty}>
-                    <SelectTrigger id="difficulty">
+                    <SelectTrigger id="difficulty" className="rounded-md border-gray-300">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
@@ -683,18 +683,19 @@ const HostView = ({ gameCode }) => {
                   </Select>
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="timer">טיימר (דקות)</Label>
+                  <Label htmlFor="timer" className="text-slate-700 font-bold">טיימר (דקות)</Label>
                   <Input
                     id="timer"
                     type="number"
                     value={timerValue}
                     onChange={(e) => setTimerValue(e.target.value)}
+                    className="rounded-md border-gray-300"
                   />
                 </div>
                 <Button
                   onClick={startGame}
                   disabled={!timerValue || playersReady.length === 0}
-                  className="w-full h-12 bg-green-600 hover:bg-green-700 text-lg font-bold"
+                  className="w-full h-12 bg-teal-500 hover:bg-teal-600 text-white text-lg font-bold rounded-md shadow-lg"
                 >
                   התחל משחק
                 </Button>
@@ -707,8 +708,7 @@ const HostView = ({ gameCode }) => {
             ) : (
               <Button
                 onClick={stopGame}
-                variant="destructive"
-                className="w-full h-12 text-lg font-bold"
+                className="w-full h-12 text-lg font-bold bg-red-600 hover:bg-red-700 text-white rounded-md shadow-lg"
               >
                 עצור משחק
               </Button>
@@ -717,8 +717,8 @@ const HostView = ({ gameCode }) => {
         </Card>
 
         {/* Live Leaderboard */}
-        <Card className="lg:min-w-[300px] p-4 sm:p-6">
-          <h3 className="text-lg font-bold text-indigo-600 mb-4 flex items-center gap-2">
+        <Card className="lg:min-w-[300px] p-4 sm:p-6 bg-white rounded-lg shadow-lg">
+          <h3 className="text-lg font-bold text-slate-700 mb-4 flex items-center gap-2">
             <FaTrophy className="text-yellow-500" />
             ציונים חיים
           </h3>
@@ -741,11 +741,11 @@ const HostView = ({ gameCode }) => {
                   transition={{ delay: index * 0.05 }}
                   layout
                   className={cn(
-                    "p-3 rounded-lg",
-                    index === 0 && "bg-gradient-to-r from-yellow-400 to-orange-500 text-white shadow-lg",
-                    index === 1 && "bg-gradient-to-r from-gray-300 to-gray-400 shadow-md",
-                    index === 2 && "bg-gradient-to-r from-orange-400 to-orange-600 text-white shadow-md",
-                    index > 2 && "bg-gray-100"
+                    "p-3 rounded-md shadow-sm",
+                    index === 0 && "bg-gradient-to-r from-yellow-300 to-orange-400 text-gray-900 font-bold",
+                    index === 1 && "bg-gradient-to-r from-gray-200 to-gray-300 text-gray-900",
+                    index === 2 && "bg-gradient-to-r from-orange-300 to-orange-400 text-gray-900",
+                    index > 2 && "bg-gray-100 text-gray-900"
                   )}
                 >
                   <div className="flex items-center gap-3">
@@ -754,7 +754,7 @@ const HostView = ({ gameCode }) => {
                     </span>
                     <div className="flex-1">
                       <p className="font-bold">{player.username}</p>
-                      <p className="text-xs opacity-90">
+                      <p className="text-xs opacity-75">
                         {player.wordCount} מילים
                       </p>
                     </div>
