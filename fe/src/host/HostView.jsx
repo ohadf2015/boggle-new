@@ -585,6 +585,85 @@ const HostView = ({ gameCode }) => {
 
       {/* Refined Layout */}
       <div className="flex flex-col gap-6 w-full max-w-6xl">
+        {/* Game Settings - TOP (below Game Code) */}
+        <Card className="bg-gray-50/80 backdrop-blur-sm p-4 sm:p-5 rounded-lg shadow-sm">
+          <h3 className="text-base font-bold text-gray-700 mb-3 flex items-center gap-2">
+            <FaCog className="text-gray-600 text-sm" />
+            הגדרות משחק
+          </h3>
+          <div className="w-full max-w-4xl mx-auto space-y-4">
+            {!gameStarted ? (
+              <>
+                {/* Difficulty Selection - Compact Button Group */}
+                <div className="space-y-2">
+                  <Label className="text-sm font-medium text-gray-700">רמת קושי</Label>
+                  <div className="flex flex-wrap gap-2">
+                    {Object.keys(DIFFICULTIES).map((key) => {
+                      const isSelected = difficulty === key;
+                      return (
+                        <motion.button
+                          key={key}
+                          onClick={() => setDifficulty(key)}
+                          whileHover={{ scale: 1.02 }}
+                          whileTap={{ scale: 0.98 }}
+                          className={cn(
+                            "px-3 py-2 rounded-md font-medium transition-all shadow-sm",
+                            isSelected
+                              ? "bg-teal-400/90 text-white text-sm"
+                              : "bg-gray-200/80 text-gray-600 text-xs hover:bg-gray-300/80"
+                          )}
+                        >
+                          <div className="flex flex-col items-center gap-0.5">
+                            <span className="font-bold">{DIFFICULTIES[key].name}</span>
+                            <span className="text-xs opacity-90">
+                              ({DIFFICULTIES[key].rows}x{DIFFICULTIES[key].cols})
+                            </span>
+                          </div>
+                        </motion.button>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* Timer and Start Button - Inline Layout */}
+                <div className="flex flex-col sm:flex-row gap-3 items-end">
+                  <div className="space-y-1.5 flex-1">
+                    <Label htmlFor="timer" className="text-sm font-medium text-gray-700">טיימר (דקות)</Label>
+                    <Input
+                      id="timer"
+                      type="number"
+                      value={timerValue}
+                      onChange={(e) => setTimerValue(e.target.value)}
+                      className="h-10 text-sm border-gray-300"
+                      placeholder="1"
+                    />
+                  </div>
+                  <Button
+                    onClick={startGame}
+                    disabled={!timerValue || playersReady.length === 0}
+                    className="h-10 px-6 bg-teal-400/90 hover:bg-teal-500/90 text-base font-bold text-white shadow-sm whitespace-nowrap"
+                  >
+                    התחל משחק
+                  </Button>
+                </div>
+                {playersReady.length === 0 && (
+                  <p className="text-xs text-center text-rose-500/90 font-medium">
+                    ממתין לשחקנים להצטרף...
+                  </p>
+                )}
+              </>
+            ) : (
+              <Button
+                onClick={stopGame}
+                variant="destructive"
+                className="w-full h-12 text-base font-bold shadow-sm bg-rose-400/90 hover:bg-rose-500/90"
+              >
+                עצור משחק
+              </Button>
+            )}
+          </div>
+        </Card>
+
         {/* Main Content Area: Player List (LEFT) + Boggle Grid (RIGHT) */}
         <div className="flex flex-col lg:flex-row gap-6">
           {/* Players Section - LEFT */}
@@ -671,85 +750,6 @@ const HostView = ({ gameCode }) => {
             </div>
           </Card>
         </div>
-
-        {/* Game Settings - BOTTOM */}
-        <Card className="bg-gray-50/80 backdrop-blur-sm p-4 sm:p-6 rounded-lg shadow-sm">
-          <h3 className="text-lg font-bold text-gray-700 mb-4 flex items-center gap-2">
-            <FaCog className="text-gray-600" />
-            הגדרות משחק
-          </h3>
-          <div className="w-full max-w-4xl mx-auto space-y-5">
-            {!gameStarted ? (
-              <>
-                {/* Difficulty Selection - Button Group */}
-                <div className="space-y-3">
-                  <Label className="text-base font-medium text-gray-700">רמת קושי</Label>
-                  <div className="flex flex-wrap gap-2 sm:gap-3">
-                    {Object.keys(DIFFICULTIES).map((key) => {
-                      const isSelected = difficulty === key;
-                      return (
-                        <motion.button
-                          key={key}
-                          onClick={() => setDifficulty(key)}
-                          whileHover={{ scale: 1.03 }}
-                          whileTap={{ scale: 0.98 }}
-                          className={cn(
-                            "px-4 py-3 rounded-lg font-medium transition-all shadow-sm",
-                            isSelected
-                              ? "bg-teal-400/90 text-white text-base sm:text-lg scale-105"
-                              : "bg-gray-200/80 text-gray-600 text-sm sm:text-base hover:bg-gray-300/80"
-                          )}
-                        >
-                          <div className="flex flex-col items-center gap-1">
-                            <span className="font-bold">{DIFFICULTIES[key].name}</span>
-                            <span className="text-xs opacity-90">
-                              ({DIFFICULTIES[key].rows}x{DIFFICULTIES[key].cols})
-                            </span>
-                          </div>
-                        </motion.button>
-                      );
-                    })}
-                  </div>
-                </div>
-
-                {/* Timer Input */}
-                <div className="space-y-2">
-                  <Label htmlFor="timer" className="text-base font-medium text-gray-700">טיימר (דקות)</Label>
-                  <Input
-                    id="timer"
-                    type="number"
-                    value={timerValue}
-                    onChange={(e) => setTimerValue(e.target.value)}
-                    className="h-12 text-base border-gray-300 max-w-xs"
-                    placeholder="1"
-                  />
-                </div>
-
-                {/* Start Game Button */}
-                <Button
-                  onClick={startGame}
-                  disabled={!timerValue || playersReady.length === 0}
-                  className="w-full h-14 bg-teal-400/90 hover:bg-teal-500/90 text-lg font-bold text-white shadow-sm"
-                >
-                  התחל משחק
-                </Button>
-                {playersReady.length === 0 && (
-                  <p className="text-sm text-center text-rose-500/90 font-medium">
-                    ממתין לשחקנים להצטרף...
-                  </p>
-                )}
-              </>
-            ) : (
-              <Button
-                onClick={stopGame}
-                variant="destructive"
-                className="w-full h-14 text-lg font-bold shadow-sm bg-rose-400/90 hover:bg-rose-500/90"
-              >
-                עצור משחק
-              </Button>
-            )}
-          </div>
-        </Card>
       </div>
     </div>
   );
