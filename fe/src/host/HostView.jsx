@@ -514,7 +514,7 @@ const HostView = ({ gameCode }) => {
         transition={{ type: 'spring', stiffness: 260, damping: 20 }}
         className="w-full max-w-2xl mb-6"
       >
-        <Card className="bg-gradient-to-r from-blue-600 to-cyan-600 backdrop-blur-sm text-white text-center p-4 sm:p-6 rounded-lg shadow-md">
+        <Card className="bg-gradient-to-r from-blue-500/80 to-cyan-500/80 backdrop-blur-md text-white text-center p-4 sm:p-6 rounded-lg shadow-md border border-cyan-300/30">
           <p className="text-sm text-blue-100 mb-2">קוד משחק:</p>
           <h2 className="text-4xl sm:text-5xl font-bold mb-4 tracking-wide">
             {gameCode}
@@ -586,7 +586,7 @@ const HostView = ({ gameCode }) => {
       {/* Refined Layout */}
       <div className="flex flex-col gap-6 w-full max-w-6xl">
         {/* Game Settings - TOP (below Game Code) */}
-        <Card className="bg-white/90 backdrop-blur-md p-4 sm:p-5 rounded-lg shadow-md border border-gray-200/50">
+        <Card className="bg-purple-50/90 backdrop-blur-md p-4 sm:p-5 rounded-lg shadow-md border border-purple-200/40">
           <h3 className="text-base font-bold text-gray-700 mb-4 flex items-center gap-2">
             <FaCog className="text-cyan-600 text-sm" />
             הגדרות משחק
@@ -651,11 +651,6 @@ const HostView = ({ gameCode }) => {
                   >
                     התחל משחק
                   </Button>
-                  {playersReady.length === 0 && (
-                    <p className="text-xs text-center text-rose-600 font-medium mt-2">
-                      ממתין לשחקנים להצטרף...
-                    </p>
-                  )}
                 </div>
               </>
             ) : (
@@ -673,7 +668,7 @@ const HostView = ({ gameCode }) => {
         {/* Main Content Area: Player List (LEFT) + Boggle Grid (RIGHT) */}
         <div className="flex flex-col lg:flex-row gap-6">
           {/* Players Section - LEFT */}
-          <Card className="bg-white/90 backdrop-blur-md p-4 sm:p-6 rounded-lg shadow-md border border-purple-200/30 lg:min-w-[280px]">
+          <Card className="bg-purple-50/85 backdrop-blur-md p-4 sm:p-6 rounded-lg shadow-md border border-purple-300/40 lg:min-w-[280px]">
             <h3 className="text-lg font-bold text-gray-700 mb-4 flex items-center gap-2">
               <FaUsers className="text-purple-600" />
               שחקנים ({playersReady.length})
@@ -703,7 +698,7 @@ const HostView = ({ gameCode }) => {
           </Card>
 
           {/* Boggle Letter Grid - RIGHT */}
-          <Card className="flex-1 bg-white/90 backdrop-blur-md p-4 sm:p-6 rounded-lg shadow-md border border-blue-200/30 flex flex-col items-center">
+          <Card className="flex-1 bg-blue-50/85 backdrop-blur-md p-4 sm:p-6 rounded-lg shadow-md border border-blue-300/40 flex flex-col items-center">
             <h3 className="text-xl font-bold text-gray-700 mb-4">לוח האותיות</h3>
 
             {/* Timer */}
