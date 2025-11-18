@@ -14,6 +14,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select';
 import { Progress } from '../components/ui/progress';
 import { AchievementBadge } from '../components/AchievementBadge';
+import GameHeader from '../components/GameHeader';
 import '../style/animation.scss';
 import { generateRandomTable } from '../utils/utils';
 import { useWebSocket } from '../utils/WebSocketContext';
@@ -484,28 +485,21 @@ const HostView = ({ gameCode }) => {
         </DialogContent>
       </Dialog>
 
-      {/* Exit Button - Neon Style */}
-      <div className="absolute top-5 right-5">
-        <Button
-          variant="outline"
-          onClick={handleExitRoom}
-          className="font-medium bg-slate-800/80 text-cyan-300 border border-cyan-500/50 hover:border-cyan-400 hover:text-cyan-200 hover:shadow-[0_0_15px_rgba(6,182,212,0.3)] shadow-md backdrop-blur-sm transition-all duration-300"
-        >
-          <FaSignOutAlt className="mr-2" />
-          יציאה מהחדר
-        </Button>
-      </div>
-
-      {/* Animated Title */}
-      <motion.div
-        initial={{ y: -50, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ duration: 0.5 }}
-        className="animated-title mb-5"
-        onClick={() => window.location.href = '/'}
-      >
-        <span className="text text-5xl sm:text-6xl md:text-7xl">Boggle</span>
-      </motion.div>
+      {/* Game Header with Exit Button */}
+      <GameHeader
+        darkMode={true}
+        onLogoClick={() => window.location.href = '/'}
+        rightContent={
+          <Button
+            variant="outline"
+            onClick={handleExitRoom}
+            className="font-medium bg-slate-800/80 text-cyan-300 border border-cyan-500/50 hover:border-cyan-400 hover:text-cyan-200 hover:shadow-[0_0_15px_rgba(6,182,212,0.3)] shadow-md backdrop-blur-sm transition-all duration-300"
+          >
+            <FaSignOutAlt className="mr-2" />
+            יציאה מהחדר
+          </Button>
+        }
+      />
 
       {/* Game Code Display with Share Buttons */}
       <motion.div
