@@ -289,7 +289,7 @@ const HostView = ({ gameCode }) => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-indigo-600 via-purple-600 to-pink-600 flex flex-col items-center p-4 sm:p-6 overflow-auto">
+    <div className="min-h-screen bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 flex flex-col items-center p-4 sm:p-6 overflow-auto">
       <Toaster position="top-center" />
 
       {/* Validation Modal */}
@@ -484,12 +484,12 @@ const HostView = ({ gameCode }) => {
         </DialogContent>
       </Dialog>
 
-      {/* Exit Button */}
+      {/* Exit Button - Neon Style */}
       <div className="absolute top-5 right-5">
         <Button
           variant="outline"
           onClick={handleExitRoom}
-          className="font-medium bg-gradient-to-r from-rose-500 to-pink-500 text-white border-rose-400/60 hover:from-rose-600 hover:to-pink-600 shadow-md backdrop-blur-sm"
+          className="font-medium bg-slate-800/80 text-cyan-300 border border-cyan-500/50 hover:border-cyan-400 hover:text-cyan-200 hover:shadow-[0_0_15px_rgba(6,182,212,0.3)] shadow-md backdrop-blur-sm transition-all duration-300"
         >
           <FaSignOutAlt className="mr-2" />
           יציאה מהחדר
@@ -514,9 +514,9 @@ const HostView = ({ gameCode }) => {
         transition={{ type: 'spring', stiffness: 260, damping: 20 }}
         className="w-full max-w-2xl mb-6"
       >
-        <Card className="bg-gradient-to-r from-blue-500/80 to-cyan-500/80 backdrop-blur-md text-white text-center p-4 sm:p-6 rounded-lg shadow-md border border-cyan-300/30">
-          <p className="text-sm text-blue-100 mb-2">קוד משחק:</p>
-          <h2 className="text-4xl sm:text-5xl font-bold mb-4 tracking-wide">
+        <Card className="bg-slate-800/90 backdrop-blur-md text-white text-center p-4 sm:p-6 rounded-lg shadow-lg border border-cyan-500/30 shadow-[0_0_20px_rgba(6,182,212,0.15)]">
+          <p className="text-sm text-cyan-300 mb-2">קוד משחק:</p>
+          <h2 className="text-4xl sm:text-5xl font-bold mb-4 tracking-wide text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-400">
             {gameCode}
           </h2>
           <div className="flex flex-wrap gap-2 justify-center">
@@ -524,7 +524,7 @@ const HostView = ({ gameCode }) => {
               variant="outline"
               size="sm"
               onClick={() => copyJoinUrl(gameCode)}
-              className="bg-white/20 text-white border-white/60 hover:bg-white/30 hover:border-white font-medium backdrop-blur-sm"
+              className="bg-slate-700/50 text-cyan-300 border-cyan-500/40 hover:border-cyan-400 hover:bg-cyan-500/10 hover:shadow-[0_0_10px_rgba(6,182,212,0.3)] font-medium backdrop-blur-sm transition-all duration-300"
             >
               <FaLink className="mr-2" />
               העתק קישור
@@ -533,7 +533,7 @@ const HostView = ({ gameCode }) => {
               variant="outline"
               size="sm"
               onClick={() => shareViaWhatsApp(gameCode)}
-              className="bg-white/20 text-white border-white/60 hover:bg-white/30 hover:border-white font-medium backdrop-blur-sm"
+              className="bg-slate-700/50 text-green-300 border-green-500/40 hover:border-green-400 hover:bg-green-500/10 hover:shadow-[0_0_10px_rgba(34,197,94,0.3)] font-medium backdrop-blur-sm transition-all duration-300"
             >
               <FaWhatsapp className="mr-2" />
               שתף בוואטסאפ
@@ -542,7 +542,7 @@ const HostView = ({ gameCode }) => {
               variant="outline"
               size="sm"
               onClick={() => setShowQR(true)}
-              className="bg-white/20 text-white border-white/60 hover:bg-white/30 hover:border-white font-medium backdrop-blur-sm"
+              className="bg-slate-700/50 text-purple-300 border-purple-500/40 hover:border-purple-400 hover:bg-purple-500/10 hover:shadow-[0_0_10px_rgba(168,85,247,0.3)] font-medium backdrop-blur-sm transition-all duration-300"
             >
               <FaQrcode className="mr-2" />
               ברקוד
@@ -585,10 +585,10 @@ const HostView = ({ gameCode }) => {
 
       {/* Refined Layout */}
       <div className="flex flex-col gap-6 w-full max-w-6xl">
-        {/* Game Settings - TOP (below Game Code) */}
-        <Card className="bg-purple-50/90 backdrop-blur-md p-4 sm:p-5 rounded-lg shadow-md border border-purple-200/40">
-          <h3 className="text-base font-bold text-gray-700 mb-4 flex items-center gap-2">
-            <FaCog className="text-cyan-600 text-sm" />
+        {/* Game Settings - TOP (below Game Code) - Neon Style */}
+        <Card className="bg-slate-800/80 backdrop-blur-md p-4 sm:p-5 rounded-lg shadow-lg border border-purple-500/30 shadow-[0_0_15px_rgba(168,85,247,0.1)]">
+          <h3 className="text-base font-bold text-purple-300 mb-4 flex items-center gap-2">
+            <FaCog className="text-cyan-400 text-sm" />
             הגדרות משחק
           </h3>
           <div className="w-full max-w-5xl mx-auto space-y-4">
@@ -607,10 +607,10 @@ const HostView = ({ gameCode }) => {
                           whileHover={{ scale: 1.02 }}
                           whileTap={{ scale: 0.98 }}
                           className={cn(
-                            "px-3 py-2 rounded-md font-medium transition-all shadow-sm",
+                            "px-3 py-2 rounded-md font-medium transition-all duration-300",
                             isSelected
-                              ? "bg-gradient-to-r from-cyan-500 to-teal-500 text-white text-sm"
-                              : "bg-gray-200 text-gray-600 text-xs hover:bg-gray-300"
+                              ? "bg-gradient-to-r from-cyan-500 to-teal-500 text-white text-sm shadow-[0_0_15px_rgba(6,182,212,0.4)]"
+                              : "bg-slate-700/60 text-slate-300 text-xs hover:bg-slate-600/60 border border-slate-600/50 hover:border-cyan-500/30"
                           )}
                         >
                           <div className="flex flex-col items-center gap-0.5">
@@ -624,30 +624,30 @@ const HostView = ({ gameCode }) => {
                     })}
                   </div>
 
-                  {/* Vertical Separator */}
-                  <div className="hidden sm:block w-px h-12 bg-gradient-to-b from-transparent via-gray-300 to-transparent"></div>
+                  {/* Vertical Separator - Neon */}
+                  <div className="hidden sm:block w-px h-12 bg-gradient-to-b from-transparent via-cyan-500/50 to-transparent"></div>
 
-                  {/* Timer Input - Adjacent to difficulty buttons */}
-                  <div className="flex items-center gap-2 bg-gradient-to-r from-purple-100 to-pink-100 px-3 py-2 rounded-md">
-                    <FaClock className="text-purple-600 text-sm" />
+                  {/* Timer Input - Neon Style */}
+                  <div className="flex items-center gap-2 bg-slate-700/50 border border-purple-500/30 px-3 py-2 rounded-md">
+                    <FaClock className="text-purple-400 text-sm" />
                     <Input
                       id="timer"
                       type="number"
                       value={timerValue}
                       onChange={(e) => setTimerValue(e.target.value)}
-                      className="h-8 w-16 text-sm border-purple-300 bg-white/80"
+                      className="h-8 w-16 text-sm border-purple-500/30 bg-slate-800/80 text-white placeholder:text-slate-500"
                       placeholder="1"
                     />
-                    <span className="text-xs text-purple-700 font-medium">דקות</span>
+                    <span className="text-xs text-purple-300 font-medium">דקות</span>
                   </div>
                 </div>
 
-                {/* Start Button - Below difficulty and timer */}
+                {/* Start Button - Neon Glow */}
                 <div className="pt-2">
                   <Button
                     onClick={startGame}
                     disabled={!timerValue || playersReady.length === 0}
-                    className="w-full h-11 bg-gradient-to-r from-emerald-500 to-green-500 hover:from-emerald-600 hover:to-green-600 text-base font-bold text-white shadow-md"
+                    className="w-full h-11 bg-gradient-to-r from-cyan-500 to-teal-500 hover:from-cyan-400 hover:to-teal-400 text-base font-bold text-white shadow-lg hover:shadow-[0_0_25px_rgba(6,182,212,0.5)] transition-all duration-300 disabled:opacity-50 disabled:hover:shadow-none"
                   >
                     התחל משחק
                   </Button>
@@ -657,7 +657,7 @@ const HostView = ({ gameCode }) => {
               <Button
                 onClick={stopGame}
                 variant="destructive"
-                className="w-full h-12 text-base font-bold shadow-md bg-gradient-to-r from-rose-500 to-pink-500 hover:from-rose-600 hover:to-pink-600"
+                className="w-full h-12 text-base font-bold shadow-lg bg-gradient-to-r from-rose-500 to-pink-500 hover:from-rose-400 hover:to-pink-400 hover:shadow-[0_0_25px_rgba(244,63,94,0.5)] transition-all duration-300"
               >
                 עצור משחק
               </Button>
@@ -667,10 +667,10 @@ const HostView = ({ gameCode }) => {
 
         {/* Main Content Area: Player List (LEFT) + Boggle Grid (RIGHT) */}
         <div className="flex flex-col lg:flex-row gap-6">
-          {/* Players Section - LEFT */}
-          <Card className="bg-purple-50/85 backdrop-blur-md p-4 sm:p-6 rounded-lg shadow-md border border-purple-300/40 lg:min-w-[280px]">
-            <h3 className="text-lg font-bold text-gray-700 mb-4 flex items-center gap-2">
-              <FaUsers className="text-purple-600" />
+          {/* Players Section - LEFT - Neon Style */}
+          <Card className="bg-slate-800/80 backdrop-blur-md p-4 sm:p-6 rounded-lg shadow-lg border border-purple-500/30 shadow-[0_0_15px_rgba(168,85,247,0.1)] lg:min-w-[280px]">
+            <h3 className="text-lg font-bold text-purple-300 mb-4 flex items-center gap-2">
+              <FaUsers className="text-purple-400" />
               שחקנים ({playersReady.length})
             </h3>
             <div className="flex flex-col gap-2">
@@ -683,7 +683,7 @@ const HostView = ({ gameCode }) => {
                     exit={{ scale: 0, opacity: 0 }}
                     transition={{ delay: index * 0.05 }}
                   >
-                    <Badge className="bg-gradient-to-r from-indigo-500 to-purple-500 font-bold text-white px-3 py-1.5 text-base w-full justify-center shadow-sm">
+                    <Badge className="bg-gradient-to-r from-purple-500 to-pink-500 font-bold text-white px-3 py-1.5 text-base w-full justify-center shadow-[0_0_10px_rgba(168,85,247,0.3)]">
                       {user}
                     </Badge>
                   </motion.div>
@@ -691,17 +691,17 @@ const HostView = ({ gameCode }) => {
               </AnimatePresence>
             </div>
             {playersReady.length === 0 && (
-              <p className="text-sm text-center text-gray-500 mt-2">
+              <p className="text-sm text-center text-slate-500 mt-2">
                 ממתין לשחקנים...
               </p>
             )}
           </Card>
 
-          {/* Boggle Letter Grid - RIGHT */}
-          <Card className="flex-1 bg-blue-50/85 backdrop-blur-md p-4 sm:p-6 rounded-lg shadow-md border border-blue-300/40 flex flex-col items-center">
-            <h3 className="text-xl font-bold text-gray-700 mb-4">לוח האותיות</h3>
+          {/* Boggle Letter Grid - RIGHT - Neon Style */}
+          <Card className="flex-1 bg-slate-800/80 backdrop-blur-md p-4 sm:p-6 rounded-lg shadow-lg border border-cyan-500/30 shadow-[0_0_15px_rgba(6,182,212,0.1)] flex flex-col items-center">
+            <h3 className="text-xl font-bold text-cyan-300 mb-4">לוח האותיות</h3>
 
-            {/* Timer */}
+            {/* Timer - Neon Style */}
             {remainingTime !== null && (
               <motion.div
                 initial={{ scale: 0 }}
@@ -710,10 +710,10 @@ const HostView = ({ gameCode }) => {
                 className="mb-6"
               >
                 <div className={cn(
-                  "flex items-center gap-2 px-4 py-3 sm:px-6 sm:py-4 rounded-lg text-white font-bold text-2xl sm:text-3xl shadow-md backdrop-blur-sm",
+                  "flex items-center gap-2 px-4 py-3 sm:px-6 sm:py-4 rounded-lg text-white font-bold text-2xl sm:text-3xl backdrop-blur-sm transition-all duration-300",
                   remainingTime < 30
-                    ? "bg-gradient-to-r from-rose-500 to-pink-500"
-                    : "bg-gradient-to-r from-emerald-500 to-green-500"
+                    ? "bg-gradient-to-r from-rose-500 to-pink-500 shadow-[0_0_20px_rgba(244,63,94,0.5)]"
+                    : "bg-gradient-to-r from-cyan-500 to-teal-500 shadow-[0_0_20px_rgba(6,182,212,0.5)]"
                 )}>
                   <FaClock />
                   <span>{formatTime(remainingTime)}</span>
@@ -721,9 +721,9 @@ const HostView = ({ gameCode }) => {
               </motion.div>
             )}
 
-            {/* Letter Grid - Compact with larger letters */}
+            {/* Letter Grid - Neon Glow on tiles */}
             <div
-              className="grid gap-0.5 sm:gap-1 w-full max-w-lg mx-auto"
+              className="grid gap-1 sm:gap-1.5 w-full max-w-lg mx-auto"
               style={{
                 gridTemplateColumns: `repeat(${tableData[0]?.length || 7}, minmax(32px, 1fr))`,
               }}
@@ -740,9 +740,8 @@ const HostView = ({ gameCode }) => {
                       damping: 20,
                       delay: (i * row.length + j) * 0.02,
                     }}
-                    whileHover={{ scale: 1.05, rotate: 3 }}
-                    className="aspect-square flex items-center justify-center text-2xl sm:text-3xl md:text-4xl font-bold text-white rounded shadow-md cursor-pointer hover:shadow-lg transition-all"
-                    style={{ background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' }}
+                    whileHover={{ scale: 1.08 }}
+                    className="aspect-square flex items-center justify-center text-2xl sm:text-3xl md:text-4xl font-bold text-white rounded-md cursor-pointer transition-all duration-200 bg-gradient-to-br from-cyan-500 to-purple-600 border border-cyan-400/30 shadow-[0_0_8px_rgba(6,182,212,0.3)] hover:shadow-[0_0_20px_rgba(6,182,212,0.6)] hover:border-cyan-300/60"
                   >
                     {cell}
                   </motion.div>
