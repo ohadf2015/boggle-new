@@ -252,16 +252,15 @@ const PlayerView = ({ onShowResults }) => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-cyan-500 via-blue-500 to-teal-500 p-4 md:p-8">
+    <div className="min-h-screen bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 p-4 md:p-8">
       <Toaster position="top-center" />
 
       {/* Exit Button */}
       <div className="absolute top-4 right-4 z-50">
         <Button
           onClick={handleExitRoom}
-          variant="destructive"
           size="sm"
-          className="shadow-lg hover:scale-105 transition-transform"
+          className="shadow-lg hover:scale-105 transition-transform bg-red-500/80 hover:bg-red-500 border border-red-400/30 hover:shadow-[0_0_15px_rgba(239,68,68,0.5)]"
         >
           <FaDoorOpen className="mr-2" />
           יציאה
@@ -274,10 +273,8 @@ const PlayerView = ({ onShowResults }) => {
         animate={{ y: 0, opacity: 1 }}
         className="text-center mb-8"
       >
-        <h1 className="text-6xl md:text-8xl font-black text-white drop-shadow-2xl
-                       bg-gradient-to-r from-yellow-300 via-pink-300 to-purple-300
-                       bg-clip-text text-transparent animate-pulse">
-          Boggle
+        <h1 className="text-6xl md:text-8xl font-black text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-teal-300 to-purple-400">
+          BOGGLE
         </h1>
       </motion.div>
 
@@ -288,9 +285,10 @@ const PlayerView = ({ onShowResults }) => {
           animate={{ scale: 1 }}
           className="max-w-md mx-auto mb-6"
         >
-          <Card className={`${remainingTime < 30 ? 'bg-gradient-to-r from-red-500 to-orange-500' :
-                                   'bg-gradient-to-r from-green-500 to-emerald-500'}
-                          border-none shadow-2xl`}>
+          <Card className={`${remainingTime < 30
+            ? 'bg-gradient-to-r from-red-500/80 to-orange-500/80 border-red-400/50 shadow-[0_0_20px_rgba(239,68,68,0.3)]'
+            : 'bg-gradient-to-r from-teal-500/80 to-cyan-500/80 border-teal-400/50 shadow-[0_0_20px_rgba(20,184,166,0.3)]'}
+                          border backdrop-blur-md shadow-2xl`}>
             <CardContent className="p-6 text-center">
               <div className="text-5xl font-bold text-white">
                 {formatTime(remainingTime)}
@@ -308,9 +306,9 @@ const PlayerView = ({ onShowResults }) => {
           animate={{ y: 0, opacity: 1 }}
           className="max-w-4xl mx-auto mb-6"
         >
-          <Card className="bg-white/95 backdrop-blur shadow-xl">
+          <Card className="bg-slate-800/90 backdrop-blur-md shadow-xl border border-purple-500/30 shadow-[0_0_15px_rgba(168,85,247,0.1)]">
             <CardHeader>
-              <CardTitle className="text-xl flex items-center gap-2">
+              <CardTitle className="text-xl flex items-center gap-2 text-purple-300">
                 🏆 ההישגים שלך
               </CardTitle>
             </CardHeader>
@@ -328,9 +326,9 @@ const PlayerView = ({ onShowResults }) => {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 max-w-7xl mx-auto">
         {/* Letter Grid */}
         {letterGrid && (
-          <Card className="bg-white/95 backdrop-blur shadow-2xl lg:col-span-1">
+          <Card className="bg-slate-800/90 backdrop-blur-md shadow-2xl lg:col-span-1 border border-cyan-500/30 shadow-[0_0_15px_rgba(6,182,212,0.1)]">
             <CardHeader>
-              <CardTitle className="text-center">לוח האותיות</CardTitle>
+              <CardTitle className="text-center text-cyan-300">לוח האותיות</CardTitle>
             </CardHeader>
             <CardContent>
               <div className={`grid gap-2 mx-auto max-w-sm`}
@@ -346,8 +344,10 @@ const PlayerView = ({ onShowResults }) => {
                       transition={{ delay: (i * row.length + j) * 0.02 }}
                       whileHover={{ scale: 1.1, rotate: 5 }}
                       className="aspect-square flex items-center justify-center text-2xl font-bold
-                               bg-gradient-to-br from-cyan-400 to-blue-500 text-white rounded-lg
-                               shadow-lg hover:shadow-2xl transition-all cursor-pointer"
+                               bg-gradient-to-br from-cyan-500 to-purple-600 text-white rounded-lg
+                               border border-cyan-400/30 shadow-[0_0_8px_rgba(6,182,212,0.3)]
+                               hover:shadow-[0_0_20px_rgba(6,182,212,0.6)] hover:border-cyan-300/60
+                               transition-all cursor-pointer"
                     >
                       {cell}
                     </motion.div>
@@ -359,17 +359,17 @@ const PlayerView = ({ onShowResults }) => {
         )}
 
         {/* Word Input & List */}
-        <Card className="bg-white/95 backdrop-blur shadow-2xl lg:col-span-1">
+        <Card className="bg-slate-800/90 backdrop-blur-md shadow-2xl lg:col-span-1 border border-teal-500/30 shadow-[0_0_15px_rgba(20,184,166,0.1)]">
           <CardHeader>
-            <CardTitle>מילים שנמצאו ({foundWords.length})</CardTitle>
+            <CardTitle className="text-teal-300">מילים שנמצאו ({foundWords.length})</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="flex gap-2">
               <Button
                 onClick={submitWord}
                 disabled={!gameActive || !word.trim()}
-                className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600
-                         hover:to-pink-600 text-white font-bold shadow-lg"
+                className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-400
+                         hover:to-pink-400 text-white font-bold shadow-lg hover:shadow-[0_0_15px_rgba(168,85,247,0.5)]"
               >
                 הוסף
               </Button>
@@ -380,7 +380,7 @@ const PlayerView = ({ onShowResults }) => {
                 onKeyDown={handleKeyDown}
                 disabled={!gameActive}
                 placeholder="הזן מילה..."
-                className="text-lg"
+                className="text-lg bg-slate-700/50 border-slate-600 text-white placeholder:text-gray-400"
                 autoFocus
               />
             </div>
@@ -388,14 +388,14 @@ const PlayerView = ({ onShowResults }) => {
             {!gameActive && !waitingForResults && (
               <div className="text-center py-4">
                 <Progress value={50} className="mb-2" />
-                <p className="text-sm text-gray-600">ממתין להתחלת המשחק...</p>
+                <p className="text-sm text-gray-400">ממתין להתחלת המשחק...</p>
               </div>
             )}
 
             {waitingForResults && (
               <div className="text-center py-4">
                 <Progress value={75} className="mb-2" />
-                <p className="text-sm text-gray-600">ממתין לתוצאות...</p>
+                <p className="text-sm text-gray-400">ממתין לתוצאות...</p>
               </div>
             )}
 
@@ -409,9 +409,9 @@ const PlayerView = ({ onShowResults }) => {
                     exit={{ x: 50, opacity: 0 }}
                     className={`flex items-center justify-between p-3 rounded-lg
                               ${index === foundWords.length - 1 ?
-                                'bg-gradient-to-r from-blue-100 to-cyan-100 font-bold' :
-                                'bg-gray-50'}
-                              hover:bg-blue-50 transition-colors`}
+                                'bg-gradient-to-r from-cyan-500/20 to-teal-500/20 font-bold border border-cyan-500/30' :
+                                'bg-slate-700/50'}
+                              hover:bg-slate-700 transition-colors text-white`}
                   >
                     <span>{foundWord}</span>
                     <Button
@@ -419,7 +419,7 @@ const PlayerView = ({ onShowResults }) => {
                       variant="ghost"
                       onClick={() => removeWord(index)}
                       disabled={!gameActive}
-                      className="hover:bg-red-100 hover:text-red-600"
+                      className="hover:bg-red-500/20 hover:text-red-400 text-gray-400"
                     >
                       <FaTrash />
                     </Button>
@@ -431,10 +431,10 @@ const PlayerView = ({ onShowResults }) => {
         </Card>
 
         {/* Leaderboard */}
-        <Card className="bg-white/95 backdrop-blur shadow-2xl lg:col-span-1">
+        <Card className="bg-slate-800/90 backdrop-blur-md shadow-2xl lg:col-span-1 border border-purple-500/30 shadow-[0_0_15px_rgba(168,85,247,0.1)]">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <FaTrophy className="text-yellow-500" />
+            <CardTitle className="flex items-center gap-2 text-purple-300">
+              <FaTrophy className="text-yellow-400" />
               טבלת המובילים
             </CardTitle>
           </CardHeader>
@@ -447,10 +447,10 @@ const PlayerView = ({ onShowResults }) => {
                   animate={{ x: 0, opacity: 1 }}
                   transition={{ delay: index * 0.1 }}
                   className={`flex items-center justify-between p-4 rounded-lg
-                            ${index === 0 ? 'bg-gradient-to-r from-yellow-400 to-orange-500 text-white shadow-lg' :
-                              index === 1 ? 'bg-gradient-to-r from-gray-300 to-gray-400 text-gray-800 shadow-md' :
-                              index === 2 ? 'bg-gradient-to-r from-orange-400 to-orange-500 text-white shadow-md' :
-                              'bg-gray-100'}`}
+                            ${index === 0 ? 'bg-gradient-to-r from-yellow-500/80 to-orange-500/80 text-white shadow-lg border border-yellow-400/50 shadow-[0_0_15px_rgba(234,179,8,0.3)]' :
+                              index === 1 ? 'bg-gradient-to-r from-gray-400/80 to-gray-500/80 text-white shadow-md border border-gray-400/50' :
+                              index === 2 ? 'bg-gradient-to-r from-orange-500/80 to-orange-600/80 text-white shadow-md border border-orange-400/50' :
+                              'bg-slate-700/50 text-white'}`}
                 >
                   <div className="flex items-center gap-3">
                     <div className="text-2xl font-bold min-w-[40px] text-center">
@@ -467,7 +467,7 @@ const PlayerView = ({ onShowResults }) => {
                 </motion.div>
               ))}
               {leaderboard.length === 0 && (
-                <p className="text-center text-gray-500 py-8">אין שחקנים עדיין</p>
+                <p className="text-center text-gray-400 py-8">אין שחקנים עדיין</p>
               )}
             </div>
           </CardContent>
