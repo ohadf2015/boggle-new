@@ -501,55 +501,11 @@ const HostView = ({ gameCode }) => {
         }
       />
 
-      {/* Game Code Display with Share Buttons */}
-      <motion.div
-        initial={{ scale: 0 }}
-        animate={{ scale: 1 }}
-        transition={{ type: 'spring', stiffness: 260, damping: 20 }}
-        className="w-full max-w-2xl mb-6"
-      >
-        <Card className="bg-slate-800/90 backdrop-blur-md text-white text-center p-4 sm:p-6 rounded-lg shadow-lg border border-cyan-500/30 shadow-[0_0_20px_rgba(6,182,212,0.15)]">
-          <p className="text-sm text-cyan-300 mb-2">קוד משחק:</p>
-          <h2 className="text-4xl sm:text-5xl font-bold mb-4 tracking-wide text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-400">
-            {gameCode}
-          </h2>
-          <div className="flex flex-wrap gap-2 justify-center">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => copyJoinUrl(gameCode)}
-              className="bg-slate-700/50 text-cyan-300 border-cyan-500/40 hover:border-cyan-400 hover:bg-cyan-500/10 hover:shadow-[0_0_10px_rgba(6,182,212,0.3)] font-medium backdrop-blur-sm transition-all duration-300"
-            >
-              <FaLink className="mr-2" />
-              העתק קישור
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => shareViaWhatsApp(gameCode)}
-              className="bg-slate-700/50 text-green-300 border-green-500/40 hover:border-green-400 hover:bg-green-500/10 hover:shadow-[0_0_10px_rgba(34,197,94,0.3)] font-medium backdrop-blur-sm transition-all duration-300"
-            >
-              <FaWhatsapp className="mr-2" />
-              שתף בוואטסאפ
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setShowQR(true)}
-              className="bg-slate-700/50 text-purple-300 border-purple-500/40 hover:border-purple-400 hover:bg-purple-500/10 hover:shadow-[0_0_10px_rgba(168,85,247,0.3)] font-medium backdrop-blur-sm transition-all duration-300"
-            >
-              <FaQrcode className="mr-2" />
-              ברקוד
-            </Button>
-          </div>
-        </Card>
-      </motion.div>
-
       {/* QR Code Dialog */}
       <Dialog open={showQR} onOpenChange={setShowQR}>
-        <DialogContent className="sm:max-w-md">
+        <DialogContent className="sm:max-w-md bg-slate-800 border-cyan-500/30">
           <DialogHeader>
-            <DialogTitle className="text-center text-indigo-600 flex items-center justify-center gap-2">
+            <DialogTitle className="text-center text-cyan-300 flex items-center justify-center gap-2">
               <FaQrcode />
               קוד QR להצטרפות
             </DialogTitle>
@@ -558,18 +514,18 @@ const HostView = ({ gameCode }) => {
             <div className="p-6 bg-white rounded-lg shadow-md">
               <QRCodeSVG value={getJoinUrl()} size={250} level="H" />
             </div>
-            <h4 className="text-3xl font-bold text-indigo-600">{gameCode}</h4>
-            <p className="text-sm text-center text-muted-foreground">
+            <h4 className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-400">{gameCode}</h4>
+            <p className="text-sm text-center text-slate-400">
               סרוק את הקוד כדי להצטרף למשחק או השתמש בקוד {gameCode}
             </p>
-            <p className="text-xs text-center text-muted-foreground">
+            <p className="text-xs text-center text-slate-500">
               {getJoinUrl()}
             </p>
           </div>
           <DialogFooter>
             <Button
               onClick={() => setShowQR(false)}
-              className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-purple-600 hover:to-indigo-600"
+              className="w-full bg-gradient-to-r from-cyan-500 to-teal-500 hover:from-cyan-400 hover:to-teal-400 hover:shadow-[0_0_15px_rgba(6,182,212,0.5)]"
             >
               סגור
             </Button>
@@ -579,85 +535,125 @@ const HostView = ({ gameCode }) => {
 
       {/* Refined Layout */}
       <div className="flex flex-col gap-6 w-full max-w-6xl">
-        {/* Game Settings - TOP (below Game Code) - Neon Style */}
-        <Card className="bg-slate-800/80 backdrop-blur-md p-4 sm:p-5 rounded-lg shadow-lg border border-purple-500/30 shadow-[0_0_15px_rgba(168,85,247,0.1)]">
-          <h3 className="text-base font-bold text-purple-300 mb-4 flex items-center gap-2">
-            <FaCog className="text-cyan-400 text-sm" />
-            הגדרות משחק
-          </h3>
-          <div className="w-full max-w-5xl mx-auto space-y-4">
-            {!gameStarted ? (
-              <>
-                {/* Difficulty Selection + Timer - Inline Layout with Separator */}
-                <div className="flex flex-wrap gap-4 items-center">
-                  {/* Difficulty Buttons Group */}
-                  <div className="flex flex-wrap gap-2">
-                    {Object.keys(DIFFICULTIES).map((key) => {
-                      const isSelected = difficulty === key;
-                      return (
-                        <motion.button
-                          key={key}
-                          onClick={() => setDifficulty(key)}
-                          whileHover={{ scale: 1.02 }}
-                          whileTap={{ scale: 0.98 }}
-                          className={cn(
-                            "px-3 py-2 rounded-md font-medium transition-all duration-300",
-                            isSelected
-                              ? "bg-gradient-to-r from-cyan-500 to-teal-500 text-white text-sm shadow-[0_0_15px_rgba(6,182,212,0.4)]"
-                              : "bg-slate-700/60 text-slate-300 text-xs hover:bg-slate-600/60 border border-slate-600/50 hover:border-cyan-500/30"
-                          )}
-                        >
-                          <div className="flex flex-col items-center gap-0.5">
-                            <span className="font-bold">{DIFFICULTIES[key].name}</span>
-                            <span className="text-xs opacity-90">
-                              ({DIFFICULTIES[key].rows}x{DIFFICULTIES[key].cols})
-                            </span>
-                          </div>
-                        </motion.button>
-                      );
-                    })}
+        {/* Top Row: Game Settings (LEFT) + Game Code (RIGHT) */}
+        <div className="flex flex-col lg:flex-row gap-6">
+          {/* Game Settings - LEFT - Neon Style */}
+          <Card className="flex-1 bg-slate-800/80 backdrop-blur-md p-4 sm:p-5 rounded-lg shadow-lg border border-purple-500/30 shadow-[0_0_15px_rgba(168,85,247,0.1)]">
+            <h3 className="text-base font-bold text-purple-300 mb-4 flex items-center gap-2">
+              <FaCog className="text-cyan-400 text-sm" />
+              הגדרות משחק
+            </h3>
+            <div className="w-full space-y-4">
+              {!gameStarted ? (
+                <>
+                  {/* Difficulty Selection + Timer - Inline Layout with Separator */}
+                  <div className="flex flex-wrap gap-4 items-center">
+                    {/* Difficulty Buttons Group */}
+                    <div className="flex flex-wrap gap-2">
+                      {Object.keys(DIFFICULTIES).map((key) => {
+                        const isSelected = difficulty === key;
+                        return (
+                          <motion.button
+                            key={key}
+                            onClick={() => setDifficulty(key)}
+                            whileHover={{ scale: 1.02 }}
+                            whileTap={{ scale: 0.98 }}
+                            className={cn(
+                              "px-3 py-2 rounded-md font-medium transition-all duration-300",
+                              isSelected
+                                ? "bg-gradient-to-r from-cyan-500 to-teal-500 text-white text-sm shadow-[0_0_15px_rgba(6,182,212,0.4)]"
+                                : "bg-slate-700/60 text-slate-300 text-xs hover:bg-slate-600/60 border border-slate-600/50 hover:border-cyan-500/30"
+                            )}
+                          >
+                            <div className="flex flex-col items-center gap-0.5">
+                              <span className="font-bold">{DIFFICULTIES[key].name}</span>
+                              <span className="text-xs opacity-90">
+                                ({DIFFICULTIES[key].rows}x{DIFFICULTIES[key].cols})
+                              </span>
+                            </div>
+                          </motion.button>
+                        );
+                      })}
+                    </div>
+
+                    {/* Vertical Separator - Neon */}
+                    <div className="hidden sm:block w-px h-12 bg-gradient-to-b from-transparent via-cyan-500/50 to-transparent"></div>
+
+                    {/* Timer Input - Neon Style */}
+                    <div className="flex items-center gap-2 bg-slate-700/50 border border-purple-500/30 px-3 py-2 rounded-md">
+                      <FaClock className="text-purple-400 text-sm" />
+                      <Input
+                        id="timer"
+                        type="number"
+                        value={timerValue}
+                        onChange={(e) => setTimerValue(e.target.value)}
+                        className="h-8 w-16 text-sm border-purple-500/30 bg-slate-800/80 text-white placeholder:text-slate-500"
+                        placeholder="1"
+                      />
+                      <span className="text-xs text-purple-300 font-medium">דקות</span>
+                    </div>
                   </div>
 
-                  {/* Vertical Separator - Neon */}
-                  <div className="hidden sm:block w-px h-12 bg-gradient-to-b from-transparent via-cyan-500/50 to-transparent"></div>
-
-                  {/* Timer Input - Neon Style */}
-                  <div className="flex items-center gap-2 bg-slate-700/50 border border-purple-500/30 px-3 py-2 rounded-md">
-                    <FaClock className="text-purple-400 text-sm" />
-                    <Input
-                      id="timer"
-                      type="number"
-                      value={timerValue}
-                      onChange={(e) => setTimerValue(e.target.value)}
-                      className="h-8 w-16 text-sm border-purple-500/30 bg-slate-800/80 text-white placeholder:text-slate-500"
-                      placeholder="1"
-                    />
-                    <span className="text-xs text-purple-300 font-medium">דקות</span>
+                  {/* Start Button - Neon Glow */}
+                  <div className="pt-2">
+                    <Button
+                      onClick={startGame}
+                      disabled={!timerValue || playersReady.length === 0}
+                      className="w-full h-11 bg-gradient-to-r from-cyan-500 to-teal-500 hover:from-cyan-400 hover:to-teal-400 text-base font-bold text-white shadow-lg hover:shadow-[0_0_25px_rgba(6,182,212,0.5)] transition-all duration-300 disabled:opacity-50 disabled:hover:shadow-none"
+                    >
+                      התחל משחק
+                    </Button>
                   </div>
-                </div>
+                </>
+              ) : (
+                <Button
+                  onClick={stopGame}
+                  variant="destructive"
+                  className="w-full h-12 text-base font-bold shadow-lg bg-gradient-to-r from-rose-500 to-pink-500 hover:from-rose-400 hover:to-pink-400 hover:shadow-[0_0_25px_rgba(244,63,94,0.5)] transition-all duration-300"
+                >
+                  עצור משחק
+                </Button>
+              )}
+            </div>
+          </Card>
 
-                {/* Start Button - Neon Glow */}
-                <div className="pt-2">
-                  <Button
-                    onClick={startGame}
-                    disabled={!timerValue || playersReady.length === 0}
-                    className="w-full h-11 bg-gradient-to-r from-cyan-500 to-teal-500 hover:from-cyan-400 hover:to-teal-400 text-base font-bold text-white shadow-lg hover:shadow-[0_0_25px_rgba(6,182,212,0.5)] transition-all duration-300 disabled:opacity-50 disabled:hover:shadow-none"
-                  >
-                    התחל משחק
-                  </Button>
-                </div>
-              </>
-            ) : (
+          {/* Game Code - RIGHT - Neon Style */}
+          <Card className="lg:min-w-[320px] bg-slate-800/90 backdrop-blur-md text-white text-center p-4 sm:p-6 rounded-lg shadow-lg border border-cyan-500/30 shadow-[0_0_20px_rgba(6,182,212,0.15)] flex flex-col justify-center">
+            <p className="text-sm text-cyan-300 mb-2">קוד משחק:</p>
+            <h2 className="text-4xl sm:text-5xl font-bold mb-4 tracking-wide text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-400">
+              {gameCode}
+            </h2>
+            <div className="flex flex-wrap gap-2 justify-center">
               <Button
-                onClick={stopGame}
-                variant="destructive"
-                className="w-full h-12 text-base font-bold shadow-lg bg-gradient-to-r from-rose-500 to-pink-500 hover:from-rose-400 hover:to-pink-400 hover:shadow-[0_0_25px_rgba(244,63,94,0.5)] transition-all duration-300"
+                variant="outline"
+                size="sm"
+                onClick={() => copyJoinUrl(gameCode)}
+                className="bg-slate-700/50 text-cyan-300 border-cyan-500/40 hover:border-cyan-400 hover:bg-cyan-500/10 hover:shadow-[0_0_10px_rgba(6,182,212,0.3)] font-medium backdrop-blur-sm transition-all duration-300"
               >
-                עצור משחק
+                <FaLink className="mr-2" />
+                העתק קישור
               </Button>
-            )}
-          </div>
-        </Card>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => shareViaWhatsApp(gameCode)}
+                className="bg-slate-700/50 text-green-300 border-green-500/40 hover:border-green-400 hover:bg-green-500/10 hover:shadow-[0_0_10px_rgba(34,197,94,0.3)] font-medium backdrop-blur-sm transition-all duration-300"
+              >
+                <FaWhatsapp className="mr-2" />
+                שתף בוואטסאפ
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setShowQR(true)}
+                className="bg-slate-700/50 text-purple-300 border-purple-500/40 hover:border-purple-400 hover:bg-purple-500/10 hover:shadow-[0_0_10px_rgba(168,85,247,0.3)] font-medium backdrop-blur-sm transition-all duration-300"
+              >
+                <FaQrcode className="mr-2" />
+                ברקוד
+              </Button>
+            </div>
+          </Card>
+        </div>
 
         {/* Main Content Area: Player List (LEFT) + Boggle Grid (RIGHT) */}
         <div className="flex flex-col lg:flex-row gap-6">
