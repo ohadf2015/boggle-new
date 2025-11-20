@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import confetti from 'canvas-confetti';
 import toast, { Toaster } from 'react-hot-toast';
-import { FaTrophy, FaClock, FaUsers, FaQrcode, FaSignOutAlt, FaWhatsapp, FaLink, FaCog } from 'react-icons/fa';
+import { FaTrophy, FaClock, FaUsers, FaQrcode, FaSignOutAlt, FaWhatsapp, FaLink, FaCog, FaPlus, FaMinus } from 'react-icons/fa';
 import { QRCodeSVG } from 'qrcode.react';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
@@ -583,6 +583,20 @@ const HostView = ({ gameCode }) => {
                     {/* Timer Input - Neon Style */}
                     <div className="flex items-center gap-2 bg-slate-700/50 border border-purple-500/30 px-3 py-2 rounded-md">
                       <FaClock className="text-purple-400 text-sm" />
+
+                      {/* Minus Button */}
+                      <button
+                        type="button"
+                        onClick={() => setTimerValue(prev => {
+                          const current = parseInt(prev) || 0;
+                          return Math.max(1, current - 1).toString();
+                        })}
+                        disabled={gameStarted}
+                        className="text-purple-300 hover:text-white transition-colors duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        <FaMinus />
+                      </button>
+
                       <Input
                         id="timer"
                         type="number"
@@ -591,6 +605,20 @@ const HostView = ({ gameCode }) => {
                         className="h-8 w-16 text-sm border-purple-500/30 bg-slate-800/80 text-white placeholder:text-slate-500"
                         placeholder="1"
                       />
+
+                      {/* Plus Button */}
+                      <button
+                        type="button"
+                        onClick={() => setTimerValue(prev => {
+                          const current = parseInt(prev) || 0;
+                          return (current + 1).toString();
+                        })}
+                        disabled={gameStarted}
+                        className="text-purple-300 hover:text-white transition-colors duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        <FaPlus />
+                      </button>
+
                       <span className="text-xs text-purple-300 font-medium">דקות</span>
                     </div>
                   </div>
