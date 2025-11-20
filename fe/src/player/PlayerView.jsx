@@ -219,12 +219,30 @@ const PlayerView = ({ onShowResults }) => {
   const submitWord = useCallback(() => {
     if (!word.trim() || !gameActive) return;
 
+    // Hebrew-only validation (Hebrew Unicode range: \u0590-\u05FF)
+    const hebrewRegex = /^[\u0590-\u05FF]+$/;
+    const trimmedWord = word.trim();
+
+    if (!hebrewRegex.test(trimmedWord)) {
+      toast.error('רק מילים בעברית! 🚫', {
+        duration: 2500,
+        icon: '❌'
+      });
+      setWord('');
+
+      // Keep focus on input
+      if (inputRef.current) {
+        inputRef.current.focus();
+      }
+      return;
+    }
+
     ws.send(JSON.stringify({
       action: 'submitWord',
-      word: word.trim().toLowerCase(),
+      word: trimmedWord.toLowerCase(),
     }));
 
-    setFoundWords(prev => [...prev, word.trim()]);
+    setFoundWords(prev => [...prev, trimmedWord]);
     setWord('');
 
     // Keep focus on input and prevent scroll
