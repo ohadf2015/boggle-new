@@ -144,16 +144,6 @@ const HostView = ({ gameCode }) => {
           }
           break;
 
-        case 'allPlayersLeft':
-          // All players have left during active gameplay
-          setGameStarted(false);
-          setRemainingTime(null);
-          toast.error(message.message || 'כל השחקנים עזבו את המשחק', {
-            icon: '👥',
-            duration: 5000,
-          });
-          break;
-
         default:
           break;
       }

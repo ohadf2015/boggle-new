@@ -784,27 +784,28 @@ const handleDisconnect = (ws) => {
               // Broadcast updated leaderboard after player leaves
               broadcastLeaderboard(gameCode);
 
-              // IMPORTANT: Game continues even with 1 player remaining
+              // IMPORTANT: Game automatically ends when 1 or 0 players remain
               // Game ONLY ends when:
               // 1. Host manually stops it
               // 2. Timer runs out
-              // 3. (Optional) ALL players leave (players.length === 0)
+              // 3. After a disconnect, 1 or fewer players remain
 
-              // Optional: End game if ALL players have left during active gameplay
-              if (remainingPlayers.length === 0 && games[gameCode].gameState === 'playing') {
-                console.log(`[DISCONNECT] All players left game ${gameCode} during active gameplay, ending game`);
+              // Auto-end game if 1 or 0 players remain during active gameplay
+              if (remainingPlayers.length <= 1 && games[gameCode].gameState === 'playing') {
+                console.log(`[DISCONNECT] ${remainingPlayers.length} player(s) remain in game ${gameCode}, ending game automatically`);
+
                 // Clear the timer
                 if (games[gameCode].timerInterval) {
                   clearInterval(games[gameCode].timerInterval);
                   games[gameCode].timerInterval = null;
                 }
+
                 // Set game state to ended
                 games[gameCode].gameState = 'ended';
-                // Notify host
-                sendHostAMessage(gameCode, {
-                  action: "allPlayersLeft",
-                  message: "כל השחקנים עזבו את המשחק"
-                });
+
+                // End the game and trigger validation/final scores
+                // This will send 'showValidation' to host and 'endGame' + 'finalScores' to players
+                handleEndGame(games[gameCode].host);
               }
             }
           }
