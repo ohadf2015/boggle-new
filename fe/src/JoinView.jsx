@@ -221,78 +221,12 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
         </h1>
       </motion.div>
 
-      <div className="flex flex-col md:flex-row gap-6 w-full max-w-6xl">
-        {/* Active Rooms Panel */}
-        {mode === 'join' && (
-          <motion.div
-            initial={{ x: -50, opacity: 0 }}
-            animate={{ x: 0, opacity: 1 }}
-            transition={{ duration: 0.5 }}
-            className="flex-1"
-          >
-            <Card className="backdrop-blur-md bg-slate-800/90 shadow-xl h-full max-h-[500px] flex flex-col border border-teal-500/30 shadow-[0_0_15px_rgba(20,184,166,0.1)]">
-              <CardHeader>
-                <div className="flex justify-between items-center">
-                  <CardTitle className="text-teal-400">חדרים פעילים</CardTitle>
-                  <TooltipProvider>
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={refreshRooms}
-                          className="text-teal-400 hover:text-teal-300 hover:bg-slate-700/50"
-                        >
-                          <FaSync />
-                        </Button>
-                      </TooltipTrigger>
-                      <TooltipContent>רענן</TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
-                </div>
-              </CardHeader>
-              <CardContent className="flex-1 overflow-auto">
-                {activeRooms.length === 0 ? (
-                  <div className="text-center py-8 text-gray-400">
-                    <p className="text-sm">אין חדרים פעילים</p>
-                    <p className="text-xs mt-1">צור חדר חדש כדי להתחיל!</p>
-                  </div>
-                ) : (
-                  <div className="space-y-2">
-                    {activeRooms.map((room) => (
-                      <button
-                        key={room.gameCode}
-                        onClick={() => handleRoomSelect(room.gameCode)}
-                        className={cn(
-                          "w-full p-3 rounded-lg text-left transition-colors",
-                          gameCode === room.gameCode
-                            ? "bg-cyan-500/20 hover:bg-cyan-500/30 border border-cyan-500/50"
-                            : "hover:bg-slate-700/50"
-                        )}
-                      >
-                        <div className="flex items-center justify-between gap-2">
-                          <div>
-                            <p className="font-bold text-cyan-400">{room.roomName || room.gameCode}</p>
-                            <p className="text-sm text-gray-400">קוד: {room.gameCode}</p>
-                          </div>
-                          <Badge variant="secondary" className="h-5 text-xs bg-slate-700 text-gray-300">
-                            {room.playerCount} player{room.playerCount !== 1 ? 's' : ''}
-                          </Badge>
-                        </div>
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          </motion.div>
-        )}
-
+      <div className="flex flex-col-reverse md:flex-row gap-6 w-full max-w-6xl">
         {/* Main Join/Host Form */}
         <motion.div
-          initial={{ scale: 0, rotate: -10 }}
-          animate={{ scale: 1, rotate: 0 }}
-          transition={{ type: 'spring', stiffness: 260, damping: 20 }}
+          initial={{ x: 50, opacity: 0 }}
+          animate={{ x: 0, opacity: 1 }}
+          transition={{ duration: 0.5 }}
           className="flex-1"
         >
           <Card className="backdrop-blur-md bg-slate-800/90 shadow-2xl border border-purple-500/30 shadow-[0_0_20px_rgba(168,85,247,0.15)]">
@@ -551,6 +485,72 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
             </CardContent>
           </Card>
         </motion.div>
+
+        {/* Active Rooms Panel */}
+        {mode === 'join' && (
+          <motion.div
+            initial={{ x: -50, opacity: 0 }}
+            animate={{ x: 0, opacity: 1 }}
+            transition={{ duration: 0.5 }}
+            className="flex-1"
+          >
+            <Card className="backdrop-blur-md bg-slate-800/90 shadow-xl h-full max-h-[500px] flex flex-col border border-teal-500/30 shadow-[0_0_15px_rgba(20,184,166,0.1)]">
+              <CardHeader>
+                <div className="flex justify-between items-center">
+                  <CardTitle className="text-teal-400">חדרים פעילים</CardTitle>
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={refreshRooms}
+                          className="text-teal-400 hover:text-teal-300 hover:bg-slate-700/50"
+                        >
+                          <FaSync />
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent>רענן</TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                </div>
+              </CardHeader>
+              <CardContent className="flex-1 overflow-auto">
+                {activeRooms.length === 0 ? (
+                  <div className="text-center py-8 text-gray-400">
+                    <p className="text-sm">אין חדרים פעילים</p>
+                    <p className="text-xs mt-1">צור חדר חדש כדי להתחיל!</p>
+                  </div>
+                ) : (
+                  <div className="space-y-2">
+                    {activeRooms.map((room) => (
+                      <button
+                        key={room.gameCode}
+                        onClick={() => handleRoomSelect(room.gameCode)}
+                        className={cn(
+                          "w-full p-3 rounded-lg text-left transition-colors",
+                          gameCode === room.gameCode
+                            ? "bg-cyan-500/20 hover:bg-cyan-500/30 border border-cyan-500/50"
+                            : "hover:bg-slate-700/50"
+                        )}
+                      >
+                        <div className="flex items-center justify-between gap-2">
+                          <div>
+                            <p className="font-bold text-cyan-400">{room.roomName || room.gameCode}</p>
+                            <p className="text-sm text-gray-400">קוד: {room.gameCode}</p>
+                          </div>
+                          <Badge variant="secondary" className="h-5 text-xs bg-slate-700 text-gray-300">
+                            {room.playerCount} player{room.playerCount !== 1 ? 's' : ''}
+                          </Badge>
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </motion.div>
+        )}
       </div>
 
       {/* Floating How to Play Button */}
