@@ -15,6 +15,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import { Progress } from '../components/ui/progress';
 import { AchievementBadge } from '../components/AchievementBadge';
 import GameHeader from '../components/GameHeader';
+import ShareButton from '../components/ShareButton';
 import '../style/animation.scss';
 import { generateRandomTable } from '../utils/utils';
 import { useWebSocket } from '../utils/WebSocketContext';
@@ -624,33 +625,27 @@ const HostView = ({ gameCode }) => {
               {gameCode}
             </h2>
             <div className="flex flex-wrap gap-2 justify-center">
-              <Button
-                variant="outline"
-                size="sm"
+              <ShareButton
+                variant="link"
                 onClick={() => copyJoinUrl(gameCode)}
-                className="bg-slate-700/50 text-cyan-300 border-cyan-500/40 hover:border-cyan-400 hover:bg-cyan-500/10 hover:shadow-[0_0_10px_rgba(6,182,212,0.3)] font-medium backdrop-blur-sm transition-all duration-300"
+                icon={<FaLink />}
               >
-                <FaLink className="mr-2" />
                 העתק קישור
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
+              </ShareButton>
+              <ShareButton
+                variant="whatsapp"
                 onClick={() => shareViaWhatsApp(gameCode)}
-                className="bg-slate-700/50 text-green-300 border-green-500/40 hover:border-green-400 hover:bg-green-500/10 hover:shadow-[0_0_10px_rgba(34,197,94,0.3)] font-medium backdrop-blur-sm transition-all duration-300"
+                icon={<FaWhatsapp />}
               >
-                <FaWhatsapp className="mr-2" />
                 שתף בוואטסאפ
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
+              </ShareButton>
+              <ShareButton
+                variant="qr"
                 onClick={() => setShowQR(true)}
-                className="bg-slate-700/50 text-purple-300 border-purple-500/40 hover:border-purple-400 hover:bg-purple-500/10 hover:shadow-[0_0_10px_rgba(168,85,247,0.3)] font-medium backdrop-blur-sm transition-all duration-300"
+                icon={<FaQrcode />}
               >
-                <FaQrcode className="mr-2" />
                 ברקוד
-              </Button>
+              </ShareButton>
             </div>
           </Card>
         </div>

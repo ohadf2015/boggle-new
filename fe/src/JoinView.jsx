@@ -12,6 +12,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '
 import { ToggleGroup, ToggleGroupItem } from './components/ui/toggle-group';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './components/ui/tooltip';
 import HowToPlay from './components/HowToPlay';
+import ShareButton from './components/ShareButton';
 import './style/animation.scss';
 import { cn } from './lib/utils';
 import { copyJoinUrl, shareViaWhatsApp, getJoinUrl } from './utils/share';
@@ -449,36 +450,27 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
                 {/* Share Buttons for Hosts */}
                 {mode === 'host' && gameCode && (
                   <div className="flex flex-wrap gap-2 justify-center">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      type="button"
+                    <ShareButton
+                      variant="link"
                       onClick={() => copyJoinUrl(gameCode)}
-                      className="border-cyan-500/50 text-cyan-400 hover:bg-cyan-500/20 hover:text-cyan-300"
+                      icon={<FaLink />}
                     >
-                      <FaLink className="mr-2" />
                       העתק קישור
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      type="button"
+                    </ShareButton>
+                    <ShareButton
+                      variant="whatsapp"
                       onClick={() => shareViaWhatsApp(gameCode, roomName)}
-                      className="border-green-500/50 text-green-400 hover:bg-green-500/20 hover:text-green-300"
+                      icon={<FaWhatsapp />}
                     >
-                      <FaWhatsapp className="mr-2" />
                       שתף בוואטסאפ
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      type="button"
+                    </ShareButton>
+                    <ShareButton
+                      variant="qr"
                       onClick={() => setShowQR(true)}
-                      className="border-purple-500/50 text-purple-400 hover:bg-purple-500/20 hover:text-purple-300"
+                      icon={<FaQrcode />}
                     >
-                      <FaQrcode className="mr-2" />
                       ברקוד
-                    </Button>
+                    </ShareButton>
                   </div>
                 )}
               </div>
