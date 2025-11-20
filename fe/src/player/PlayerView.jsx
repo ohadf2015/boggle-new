@@ -7,7 +7,7 @@ import { AchievementBadge } from '../components/AchievementBadge';
 import { motion, AnimatePresence } from 'framer-motion';
 import confetti from 'canvas-confetti';
 import toast, { Toaster } from 'react-hot-toast';
-import { FaTrophy, FaTrash, FaDoorOpen } from 'react-icons/fa';
+import { FaTrophy, FaTrash, FaDoorOpen, FaUsers } from 'react-icons/fa';
 import { useWebSocket } from '../utils/WebSocketContext';
 import { clearSession } from '../utils/session';
 import gsap from 'gsap';
@@ -25,6 +25,7 @@ const PlayerView = ({ onShowResults }) => {
   const [letterGrid, setLetterGrid] = useState(null);
   const [remainingTime, setRemainingTime] = useState(null);
   const [waitingForResults, setWaitingForResults] = useState(false);
+  const [playersReady, setPlayersReady] = useState([]);
 
   // Clear game state when entering
   useEffect(() => {
@@ -63,6 +64,10 @@ const PlayerView = ({ onShowResults }) => {
       const { action } = message;
 
       switch (action) {
+        case 'updateUsers':
+          setPlayersReady(message.users || []);
+          break;
+
         case 'startGame':
           setGameActive(true);
           setFoundWords([]);
@@ -176,6 +181,7 @@ const PlayerView = ({ onShowResults }) => {
           setRemainingTime(null);
           setWaitingForResults(false);
           setLetterGrid(null);
+          setPlayersReady([]);
           toast.success(message.message || 'מתחיל משחק חדש!', {
             icon: '🔄',
             duration: 3000,
@@ -251,6 +257,105 @@ const PlayerView = ({ onShowResults }) => {
     }
   };
 
+  // Show waiting screen if game hasn't started yet
+  if (!gameActive && !waitingForResults) {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 p-4 md:p-8 flex flex-col">
+        <Toaster position="top-center" />
+
+        {/* Exit Button */}
+        <div className="absolute top-4 right-4 z-50">
+          <Button
+            onClick={handleExitRoom}
+            size="sm"
+            className="shadow-lg hover:scale-105 transition-transform bg-red-500/80 hover:bg-red-500 border border-red-400/30 hover:shadow-[0_0_15px_rgba(239,68,68,0.5)]"
+          >
+            <FaDoorOpen className="mr-2" />
+            יציאה
+          </Button>
+        </div>
+
+        {/* Title */}
+        <motion.div
+          initial={{ y: -50, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          className="text-center mb-8 mt-8"
+        >
+          <h1 className="text-6xl md:text-8xl font-black text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-teal-300 to-purple-400">
+            BOGGLE
+          </h1>
+        </motion.div>
+
+        {/* Centered Waiting Content */}
+        <div className="flex-1 flex items-center justify-center">
+          <div className="max-w-md w-full space-y-6">
+            {/* Waiting Message */}
+            <motion.div
+              initial={{ scale: 0, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ type: 'spring', stiffness: 200, damping: 15 }}
+              className="text-center"
+            >
+              <Card className="bg-slate-800/90 backdrop-blur-md shadow-2xl border border-cyan-500/30 shadow-[0_0_20px_rgba(6,182,212,0.2)] p-8">
+                <motion.h2
+                  animate={{
+                    scale: [1, 1.05, 1],
+                    opacity: [0.8, 1, 0.8],
+                  }}
+                  transition={{
+                    duration: 2,
+                    repeat: Infinity,
+                    ease: "easeInOut"
+                  }}
+                  className="text-3xl md:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-teal-300 to-purple-400"
+                >
+                  המתן לתחילת המשחק
+                </motion.h2>
+              </Card>
+            </motion.div>
+
+            {/* Players List */}
+            <motion.div
+              initial={{ y: 20, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ delay: 0.2 }}
+            >
+              <Card className="bg-slate-800/90 backdrop-blur-md shadow-xl border border-purple-500/30 shadow-[0_0_15px_rgba(168,85,247,0.1)] p-6">
+                <h3 className="text-lg font-bold text-purple-300 mb-4 flex items-center gap-2 justify-center">
+                  <FaUsers className="text-purple-400" />
+                  שחקנים ({playersReady.length})
+                </h3>
+                <div className="flex flex-col gap-2">
+                  <AnimatePresence>
+                    {playersReady.map((user, index) => (
+                      <motion.div
+                        key={user}
+                        initial={{ scale: 0, opacity: 0 }}
+                        animate={{ scale: 1, opacity: 1 }}
+                        exit={{ scale: 0, opacity: 0 }}
+                        transition={{ delay: index * 0.05 }}
+                      >
+                        <Badge className="bg-gradient-to-r from-purple-500 to-pink-500 font-bold text-white px-3 py-2 text-base w-full justify-center shadow-[0_0_10px_rgba(168,85,247,0.3)]">
+                          {user}
+                        </Badge>
+                      </motion.div>
+                    ))}
+                  </AnimatePresence>
+                </div>
+                {playersReady.length === 0 && (
+                  <p className="text-sm text-center text-gray-400 mt-2">
+                    ממתין לשחקנים...
+                  </p>
+                )}
+              </Card>
+            </motion.div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Normal game UI (when game is active or waiting for results)
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 p-4 md:p-8">
       <Toaster position="top-center" />
