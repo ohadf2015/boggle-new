@@ -773,14 +773,39 @@ const handleDisconnect = (ws) => {
               delete games[gameCode].playerAchievements[username];
               delete games[gameCode].playerWordDetails[username];
 
+              const remainingPlayers = Object.keys(games[gameCode].users);
+
               // Notify host of updated user list
               sendHostAMessage(gameCode, {
                 action: "updateUsers",
-                users: Object.keys(games[gameCode].users)
+                users: remainingPlayers
               });
 
               // Broadcast updated leaderboard after player leaves
               broadcastLeaderboard(gameCode);
+
+              // IMPORTANT: Game continues even with 1 player remaining
+              // Game ONLY ends when:
+              // 1. Host manually stops it
+              // 2. Timer runs out
+              // 3. (Optional) ALL players leave (players.length === 0)
+
+              // Optional: End game if ALL players have left during active gameplay
+              if (remainingPlayers.length === 0 && games[gameCode].gameState === 'playing') {
+                console.log(`[DISCONNECT] All players left game ${gameCode} during active gameplay, ending game`);
+                // Clear the timer
+                if (games[gameCode].timerInterval) {
+                  clearInterval(games[gameCode].timerInterval);
+                  games[gameCode].timerInterval = null;
+                }
+                // Set game state to ended
+                games[gameCode].gameState = 'ended';
+                // Notify host
+                sendHostAMessage(gameCode, {
+                  action: "allPlayersLeft",
+                  message: "כל השחקנים עזבו את המשחק"
+                });
+              }
             }
           }
         }, 30000) // 30 second grace period
