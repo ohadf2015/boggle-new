@@ -773,14 +773,40 @@ const handleDisconnect = (ws) => {
               delete games[gameCode].playerAchievements[username];
               delete games[gameCode].playerWordDetails[username];
 
+              const remainingPlayers = Object.keys(games[gameCode].users);
+
               // Notify host of updated user list
               sendHostAMessage(gameCode, {
                 action: "updateUsers",
-                users: Object.keys(games[gameCode].users)
+                users: remainingPlayers
               });
 
               // Broadcast updated leaderboard after player leaves
               broadcastLeaderboard(gameCode);
+
+              // IMPORTANT: Game automatically ends when 1 or 0 players remain
+              // Game ONLY ends when:
+              // 1. Host manually stops it
+              // 2. Timer runs out
+              // 3. After a disconnect, 1 or fewer players remain
+
+              // Auto-end game if 1 or 0 players remain during active gameplay
+              if (remainingPlayers.length <= 1 && games[gameCode].gameState === 'playing') {
+                console.log(`[DISCONNECT] ${remainingPlayers.length} player(s) remain in game ${gameCode}, ending game automatically`);
+
+                // Clear the timer
+                if (games[gameCode].timerInterval) {
+                  clearInterval(games[gameCode].timerInterval);
+                  games[gameCode].timerInterval = null;
+                }
+
+                // Set game state to ended
+                games[gameCode].gameState = 'ended';
+
+                // End the game and trigger validation/final scores
+                // This will send 'showValidation' to host and 'endGame' + 'finalScores' to players
+                handleEndGame(games[gameCode].host);
+              }
             }
           }
         }, 30000) // 30 second grace period

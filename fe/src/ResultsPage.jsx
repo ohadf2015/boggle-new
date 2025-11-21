@@ -19,7 +19,7 @@ const WORD_COLORS = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#FFA07A', '#98D8C8', '#F7
 
 const LetterGrid = ({ letterGrid }) => (
   <div className="mb-6 text-center">
-    <h3 className="text-lg font-bold text-indigo-600 mb-3">
+    <h3 className="text-lg font-bold text-cyan-400 mb-3">
       לוח המשחק
     </h3>
     <div
@@ -32,7 +32,7 @@ const LetterGrid = ({ letterGrid }) => (
         row.map((cell, j) => (
           <div
             key={`${i}-${j}`}
-            className="aspect-square flex items-center justify-center text-sm sm:text-base font-bold bg-indigo-600 text-white rounded-md shadow-sm"
+            className="aspect-square flex items-center justify-center text-sm sm:text-base font-bold bg-gradient-to-br from-cyan-500 to-purple-600 text-white rounded-md shadow-sm border border-cyan-400/30"
           >
             {cell}
           </div>
@@ -77,6 +77,13 @@ const PlayerScore = ({ player, index }) => {
   const isPodium = index < 3;
   const podiumIcon = ['🥇', '🥈', '🥉'][index] || `#${index + 1}`;
 
+  const getNeonPodiumStyle = (idx) => {
+    if (idx === 0) return 'bg-gradient-to-r from-yellow-500/80 to-orange-500/80 border-yellow-400/50 shadow-[0_0_15px_rgba(234,179,8,0.3)]';
+    if (idx === 1) return 'bg-gradient-to-r from-gray-400/80 to-gray-500/80 border-gray-400/50';
+    if (idx === 2) return 'bg-gradient-to-r from-orange-500/80 to-orange-600/80 border-orange-400/50';
+    return 'bg-slate-700/50 border-slate-600/50';
+  };
+
   return (
     <motion.div
       initial={{ x: -50, opacity: 0 }}
@@ -85,13 +92,10 @@ const PlayerScore = ({ player, index }) => {
     >
       <Card
         className={cn(
-          "p-4 mb-3",
+          "p-4 mb-3 border backdrop-blur-md text-white",
           index === 0 && "scale-105",
-          isPodium && "text-white"
+          getNeonPodiumStyle(index)
         )}
-        style={{
-          background: isPodium ? PODIUM_COLORS[index] : 'white',
-        }}
       >
         <div className="flex justify-between items-center mb-3">
           <h3 className="text-xl font-bold">
@@ -100,19 +104,19 @@ const PlayerScore = ({ player, index }) => {
           <span className="text-3xl font-bold">{player.score}</span>
         </div>
 
-        <p className="text-sm mb-1">
+        <p className="text-sm mb-1 text-white/80">
           מילים שנמצאו: {player.wordCount} {player.validWordCount !== undefined && `(${player.validWordCount} תקינות)`}
         </p>
 
         {player.longestWord && (
-          <p className="text-sm mb-2">
-            המילה הארוכה ביותר: <strong>{player.longestWord}</strong>
+          <p className="text-sm mb-2 text-white/80">
+            המילה הארוכה ביותר: <strong className="text-cyan-300">{player.longestWord}</strong>
           </p>
         )}
 
         {player.allWords && player.allWords.length > 0 && (
           <div className="mt-3">
-            <p className="text-sm font-bold mb-2">מילים:</p>
+            <p className="text-sm font-bold mb-2 text-white/90">מילים:</p>
             <div className="flex flex-wrap gap-2">
               {player.allWords.map((wordObj, i) => (
                 <WordChip key={i} wordObj={wordObj} index={i} />
@@ -123,7 +127,7 @@ const PlayerScore = ({ player, index }) => {
 
         {player.achievements && player.achievements.length > 0 && (
           <div className="mt-3">
-            <p className="text-sm font-bold mb-2">הישגים:</p>
+            <p className="text-sm font-bold mb-2 text-white/90">הישגים:</p>
             <div className="flex flex-wrap gap-2">
               {player.achievements.map((ach, i) => (
                 <AchievementChip key={i} achievement={ach} index={i} />
@@ -157,7 +161,7 @@ const ResultsPage = ({ finalScores, letterGrid, gameCode, onReturnToRoom }) => {
         particleCount: 150,
         spread: 100,
         origin: { y: 0.6 },
-        colors: ['#FFD700', '#FFA500', '#FF6B6B', '#4ECDC4']
+        colors: ['#22d3ee', '#a78bfa', '#2dd4bf', '#FFD700']
       });
 
       // Continuous celebration for winner
@@ -167,14 +171,14 @@ const ResultsPage = ({ finalScores, letterGrid, gameCode, onReturnToRoom }) => {
           angle: 60,
           spread: 55,
           origin: { x: 0, y: 0.8 },
-          colors: ['#FFD700', '#FFA500']
+          colors: ['#22d3ee', '#a78bfa']
         });
         confetti({
           particleCount: 50,
           angle: 120,
           spread: 55,
           origin: { x: 1, y: 0.8 },
-          colors: ['#FFD700', '#FFA500']
+          colors: ['#2dd4bf', '#FFD700']
         });
       }, 3000);
 
@@ -183,12 +187,11 @@ const ResultsPage = ({ finalScores, letterGrid, gameCode, onReturnToRoom }) => {
   }, [winner]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-500 via-purple-600 to-purple-700 flex flex-col items-center p-4 sm:p-6 overflow-auto">
+    <div className="min-h-screen bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 flex flex-col items-center p-4 sm:p-6 overflow-auto">
       <div className="absolute top-5 right-5">
         <Button
-          variant="destructive"
           onClick={handleExitRoom}
-          className="font-bold"
+          className="font-bold bg-red-500/80 hover:bg-red-500 border border-red-400/30 hover:shadow-[0_0_15px_rgba(239,68,68,0.5)]"
         >
           <FaSignOutAlt className="mr-2" />
           יציאה מהחדר
@@ -199,9 +202,11 @@ const ResultsPage = ({ finalScores, letterGrid, gameCode, onReturnToRoom }) => {
         initial={{ y: -50, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.5 }}
-        className="animated-title mb-5"
+        className="mb-5"
       >
-        <span className="text text-5xl sm:text-6xl md:text-7xl">Boggle</span>
+        <h1 className="text-5xl sm:text-6xl md:text-7xl font-bold tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-teal-300 to-purple-400">
+          BOGGLE
+        </h1>
       </motion.div>
 
       {/* Winner Announcement Banner */}
@@ -212,7 +217,7 @@ const ResultsPage = ({ finalScores, letterGrid, gameCode, onReturnToRoom }) => {
           transition={{ type: 'spring', stiffness: 200, damping: 15, delay: 0.3 }}
           className="mb-6"
         >
-          <Card className="bg-gradient-to-r from-yellow-400 via-yellow-500 to-orange-500 border-4 border-yellow-300 shadow-2xl">
+          <Card className="bg-gradient-to-r from-yellow-500/90 via-yellow-600/90 to-orange-500/90 border-2 border-yellow-400/50 shadow-2xl shadow-[0_0_30px_rgba(234,179,8,0.4)] backdrop-blur-md">
             <div className="p-6 text-center">
               <motion.div
                 animate={{
@@ -229,7 +234,7 @@ const ResultsPage = ({ finalScores, letterGrid, gameCode, onReturnToRoom }) => {
                 <FaCrown className="text-6xl text-white drop-shadow-lg mb-2" />
               </motion.div>
               <h2 className="text-4xl md:text-5xl font-black text-white drop-shadow-lg mb-2">
-                🎉 המנצח: {winner.username}! 🎉
+                המנצח: {winner.username}!
               </h2>
               <p className="text-2xl font-bold text-white/90">
                 {winner.score} נקודות
@@ -265,8 +270,8 @@ const ResultsPage = ({ finalScores, letterGrid, gameCode, onReturnToRoom }) => {
         transition={{ type: 'spring', stiffness: 200, damping: 20 }}
         className="w-full max-w-4xl"
       >
-        <Card className="p-4 sm:p-6 max-h-[85vh] overflow-auto">
-          <h2 className="text-3xl sm:text-4xl font-bold text-yellow-500 text-center mb-6 flex items-center justify-center gap-2">
+        <Card className="p-4 sm:p-6 max-h-[85vh] overflow-auto bg-slate-800/90 backdrop-blur-md border border-purple-500/30 shadow-[0_0_20px_rgba(168,85,247,0.15)]">
+          <h2 className="text-3xl sm:text-4xl font-bold text-yellow-400 text-center mb-6 flex items-center justify-center gap-2">
             <FaTrophy /> תוצאות סופיות
           </h2>
 
@@ -281,7 +286,7 @@ const ResultsPage = ({ finalScores, letterGrid, gameCode, onReturnToRoom }) => {
               <Button
                 onClick={onReturnToRoom}
                 size="lg"
-                className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-purple-600 hover:to-indigo-600 font-bold text-lg px-8"
+                className="bg-gradient-to-r from-cyan-500 to-purple-600 hover:from-cyan-400 hover:to-purple-500 hover:shadow-[0_0_20px_rgba(6,182,212,0.5)] font-bold text-lg px-8"
               >
                 חזור לחדר הפעיל
               </Button>
