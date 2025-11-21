@@ -6,14 +6,12 @@ import { FaTrophy, FaClock, FaUsers, FaQrcode, FaSignOutAlt, FaWhatsapp, FaLink,
 import { QRCodeSVG } from 'qrcode.react';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
-import { Label } from '../components/ui/label';
 import { Card } from '../components/ui/card';
 import { Badge } from '../components/ui/badge';
 import { Checkbox } from '../components/ui/checkbox';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '../components/ui/dialog';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select';
-import { Progress } from '../components/ui/progress';
 import { AchievementBadge } from '../components/AchievementBadge';
+import GridComponent from '../components/GridComponent';
 import GameHeader from '../components/GameHeader';
 import ShareButton from '../components/ShareButton';
 import '../style/animation.scss';
@@ -28,16 +26,17 @@ const HostView = ({ gameCode }) => {
   const ws = useWebSocket();
   const [difficulty, setDifficulty] = useState(DEFAULT_DIFFICULTY);
   const [tableData, setTableData] = useState(generateRandomTable());
-  const [timerValue, setTimerValue] = useState('');
+  const [timerValue, setTimerValue] = useState('1');
   const [remainingTime, setRemainingTime] = useState(null);
   const [gameStarted, setGameStarted] = useState(false);
-  const [leaderboard, setLeaderboard] = useState([]);
+
   const [playersReady, setPlayersReady] = useState([]);
   const [showValidation, setShowValidation] = useState(false);
   const [playerWords, setPlayerWords] = useState([]);
   const [validations, setValidations] = useState({});
   const [finalScores, setFinalScores] = useState(null);
   const [showQR, setShowQR] = useState(false);
+  const [playerWordCounts, setPlayerWordCounts] = useState({});
 
   // Prevent accidental page refresh/close only when there are players or game is active
   useEffect(() => {
@@ -80,15 +79,17 @@ const HostView = ({ gameCode }) => {
           });
           break;
 
-        case 'updateLeaderboard':
-          setLeaderboard(message.leaderboard);
-          break;
+
 
         case 'playerFoundWord':
           toast(`${message.username} מצא "${message.word}"!`, {
             icon: '🎯',
             duration: 2000,
           });
+          setPlayerWordCounts(prev => ({
+            ...prev,
+            [message.username]: (prev[message.username] || 0) + 1
+          }));
           break;
 
         case 'showValidation':
@@ -155,7 +156,7 @@ const HostView = ({ gameCode }) => {
     const chainedHandler = (event) => {
       // First let HostView handle its messages
       handleMessage(event);
-      
+
       // Then let the original App handler process any messages it needs
       if (originalHandler && typeof originalHandler === 'function') {
         originalHandler(event);
@@ -179,6 +180,7 @@ const HostView = ({ gameCode }) => {
     const seconds = timerValue * 60;
     setRemainingTime(seconds);
     setGameStarted(true);
+    setPlayerWordCounts({}); // Reset counts
 
     // Send start game message with letter grid and timer
     ws.send(
@@ -253,10 +255,7 @@ const HostView = ({ gameCode }) => {
     }));
   };
 
-  const getLetterColor = () => {
-    // Single color for all tiles during gameplay
-    return '#667eea';
-  };
+
 
   // Get the join URL for QR code - use public URL if available
   const getJoinUrl = () => {
@@ -291,7 +290,7 @@ const HostView = ({ gameCode }) => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 flex flex-col items-center p-4 sm:p-6 overflow-auto">
+    <div className="min-h-screen bg-gradient-to-b from-slate-50 via-slate-100 to-slate-200 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 flex flex-col items-center p-2 sm:p-4 overflow-auto transition-colors duration-300">
       <Toaster position="top-center" />
 
       {/* Validation Modal */}
@@ -403,18 +402,19 @@ const HostView = ({ gameCode }) => {
                     <h3 className="text-xl font-bold">
                       {index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : `#${index + 1}`} {player.username}
                     </h3>
-                    <span className="text-3xl font-bold">{player.score}</span>
-                  </div>
-
-                  <p className="text-sm mb-1">
-                    מילים: {player.wordCount} {player.validWordCount !== undefined && `(${player.validWordCount} תקינות)`}
-                  </p>
-
-                  {player.longestWord && (
-                    <p className="text-sm mb-2">
-                      הארוכה ביותר: <strong>{player.longestWord}</strong>
+                    <div className="text-3xl font-bold text-white mb-2">
+                      {player.score}
+                    </div>
+                    <p className="text-sm mb-1 text-white/80">
+                      מילים: {player.wordCount} {player.validWordCount !== undefined && `(${player.validWordCount} תקינות)`}
                     </p>
-                  )}
+
+                    {player.longestWord && (
+                      <p className="text-sm mb-2">
+                        הארוכה ביותר: <strong>{player.longestWord}</strong>
+                      </p>
+                    )}
+                  </div>
 
                   {/* Word Visualization with colors */}
                   {player.allWords && player.allWords.length > 0 && (
@@ -467,7 +467,7 @@ const HostView = ({ gameCode }) => {
                 setFinalScores(null);
                 setGameStarted(false);
                 setRemainingTime(null);
-                setLeaderboard([]);
+
                 setTimerValue('');
 
                 toast.success('מוכן למשחק חדש! 🎮', {
@@ -488,13 +488,12 @@ const HostView = ({ gameCode }) => {
 
       {/* Game Header with Exit Button */}
       <GameHeader
-        darkMode={true}
         onLogoClick={() => window.location.href = '/'}
         rightContent={
           <Button
             variant="outline"
             onClick={handleExitRoom}
-            className="font-medium bg-slate-800/80 text-cyan-300 border border-cyan-500/50 hover:border-cyan-400 hover:text-cyan-200 hover:shadow-[0_0_15px_rgba(6,182,212,0.3)] shadow-md backdrop-blur-sm transition-all duration-300"
+            className="font-medium bg-white/80 dark:bg-slate-800/80 text-cyan-600 dark:text-cyan-300 border border-cyan-500/50 hover:border-cyan-400 hover:text-cyan-700 dark:hover:text-cyan-200 hover:shadow-[0_0_15px_rgba(6,182,212,0.3)] shadow-md backdrop-blur-sm transition-all duration-300"
           >
             <FaSignOutAlt className="mr-2" />
             יציאה מהחדר
@@ -504,9 +503,9 @@ const HostView = ({ gameCode }) => {
 
       {/* QR Code Dialog */}
       <Dialog open={showQR} onOpenChange={setShowQR}>
-        <DialogContent className="sm:max-w-md bg-slate-800 border-cyan-500/30">
+        <DialogContent className="sm:max-w-md bg-white dark:bg-slate-800 border-cyan-500/30">
           <DialogHeader>
-            <DialogTitle className="text-center text-cyan-300 flex items-center justify-center gap-2">
+            <DialogTitle className="text-center text-cyan-600 dark:text-cyan-300 flex items-center justify-center gap-2">
               <FaQrcode />
               קוד QR להצטרפות
             </DialogTitle>
@@ -516,7 +515,7 @@ const HostView = ({ gameCode }) => {
               <QRCodeSVG value={getJoinUrl()} size={250} level="H" />
             </div>
             <h4 className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-400">{gameCode}</h4>
-            <p className="text-sm text-center text-slate-400">
+            <p className="text-sm text-center text-slate-500 dark:text-slate-400">
               סרוק את הקוד כדי להצטרף למשחק או השתמש בקוד {gameCode}
             </p>
             <p className="text-xs text-center text-slate-500">
@@ -537,11 +536,11 @@ const HostView = ({ gameCode }) => {
       {/* Refined Layout */}
       <div className="flex flex-col gap-6 w-full max-w-6xl">
         {/* Top Row: Game Settings (LEFT) + Game Code (RIGHT) */}
-        <div className="flex flex-col lg:flex-row gap-6">
+        <div className={cn("flex flex-col lg:flex-row gap-6", gameStarted && "hidden")}>
           {/* Game Settings - LEFT - Neon Style */}
-          <Card className="flex-1 bg-slate-800/80 backdrop-blur-md p-4 sm:p-5 rounded-lg shadow-lg border border-purple-500/30 shadow-[0_0_15px_rgba(168,85,247,0.1)]">
-            <h3 className="text-base font-bold text-purple-300 mb-4 flex items-center gap-2">
-              <FaCog className="text-cyan-400 text-sm" />
+          <Card className="flex-1 bg-white/80 dark:bg-slate-800/80 backdrop-blur-md p-4 sm:p-5 rounded-lg shadow-lg border border-purple-500/30 shadow-[0_0_15px_rgba(168,85,247,0.1)]">
+            <h3 className="text-base font-bold text-purple-600 dark:text-purple-300 mb-4 flex items-center gap-2">
+              <FaCog className="text-cyan-600 dark:text-cyan-400 text-sm" />
               הגדרות משחק
             </h3>
             <div className="w-full space-y-4">
@@ -563,7 +562,7 @@ const HostView = ({ gameCode }) => {
                               "px-3 py-2 rounded-md font-medium transition-all duration-300",
                               isSelected
                                 ? "bg-gradient-to-r from-cyan-500 to-teal-500 text-white text-sm shadow-[0_0_15px_rgba(6,182,212,0.4)]"
-                                : "bg-slate-700/60 text-slate-300 text-xs hover:bg-slate-600/60 border border-slate-600/50 hover:border-cyan-500/30"
+                                : "bg-slate-100 dark:bg-slate-700/60 text-slate-600 dark:text-slate-300 text-xs hover:bg-slate-200 dark:hover:bg-slate-600/60 border border-slate-200 dark:border-slate-600/50 hover:border-cyan-500/30"
                             )}
                           >
                             <div className="flex flex-col items-center gap-0.5">
@@ -581,8 +580,8 @@ const HostView = ({ gameCode }) => {
                     <div className="hidden sm:block w-px h-12 bg-gradient-to-b from-transparent via-cyan-500/50 to-transparent"></div>
 
                     {/* Timer Input - Neon Style */}
-                    <div className="flex items-center gap-2 bg-slate-700/50 border border-purple-500/30 px-3 py-2 rounded-md">
-                      <FaClock className="text-purple-400 text-sm" />
+                    <div className="flex items-center gap-2 bg-slate-100 dark:bg-slate-700/50 border border-purple-500/30 px-3 py-2 rounded-md">
+                      <FaClock className="text-purple-600 dark:text-purple-400 text-sm" />
 
                       {/* Minus Button */}
                       <button
@@ -592,9 +591,9 @@ const HostView = ({ gameCode }) => {
                           return Math.max(1, current - 1).toString();
                         })}
                         disabled={gameStarted}
-                        className="text-purple-300 hover:text-white transition-colors duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="w-8 h-8 flex items-center justify-center rounded-full bg-white dark:bg-slate-800 border border-purple-500/50 text-purple-600 dark:text-purple-300 hover:bg-purple-50 dark:hover:bg-purple-500/20 hover:border-purple-400 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
                       >
-                        <FaMinus />
+                        <FaMinus size={12} />
                       </button>
 
                       <Input
@@ -602,7 +601,7 @@ const HostView = ({ gameCode }) => {
                         type="number"
                         value={timerValue}
                         onChange={(e) => setTimerValue(e.target.value)}
-                        className="h-8 w-16 text-sm border-purple-500/30 bg-slate-800/80 text-white placeholder:text-slate-500"
+                        className="h-10 w-16 text-center text-lg font-bold border-none bg-transparent text-slate-900 dark:text-white placeholder:text-slate-500 focus-visible:ring-0 p-0"
                         placeholder="1"
                       />
 
@@ -614,21 +613,21 @@ const HostView = ({ gameCode }) => {
                           return (current + 1).toString();
                         })}
                         disabled={gameStarted}
-                        className="text-purple-300 hover:text-white transition-colors duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="w-8 h-8 flex items-center justify-center rounded-full bg-white dark:bg-slate-800 border border-purple-500/50 text-purple-600 dark:text-purple-300 hover:bg-purple-50 dark:hover:bg-purple-500/20 hover:border-purple-400 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
                       >
-                        <FaPlus />
+                        <FaPlus size={12} />
                       </button>
 
-                      <span className="text-xs text-purple-300 font-medium">דקות</span>
+                      <span className="text-sm text-purple-600 dark:text-purple-300 font-medium mr-2">דקות</span>
                     </div>
                   </div>
 
                   {/* Start Button - Neon Glow */}
-                  <div className="pt-2">
+                  <div className="pt-2 flex justify-center">
                     <Button
                       onClick={startGame}
                       disabled={!timerValue || playersReady.length === 0}
-                      className="w-full h-11 bg-gradient-to-r from-cyan-500 to-teal-500 hover:from-cyan-400 hover:to-teal-400 text-base font-bold text-white shadow-lg hover:shadow-[0_0_25px_rgba(6,182,212,0.5)] transition-all duration-300 disabled:opacity-50 disabled:hover:shadow-none"
+                      className="w-full max-w-xs h-11 bg-gradient-to-r from-cyan-500 to-teal-500 hover:from-cyan-400 hover:to-teal-400 text-base font-bold text-white shadow-lg hover:shadow-[0_0_25px_rgba(6,182,212,0.5)] transition-all duration-300 disabled:opacity-50 disabled:hover:shadow-none"
                     >
                       התחל משחק
                     </Button>
@@ -638,7 +637,7 @@ const HostView = ({ gameCode }) => {
                 <Button
                   onClick={stopGame}
                   variant="destructive"
-                  className="w-full h-12 text-base font-bold shadow-lg bg-gradient-to-r from-rose-500 to-pink-500 hover:from-rose-400 hover:to-pink-400 hover:shadow-[0_0_25px_rgba(244,63,94,0.5)] transition-all duration-300"
+                  className="w-full max-w-xs h-12 text-base font-bold shadow-lg bg-gradient-to-r from-rose-500 to-pink-500 hover:from-rose-400 hover:to-pink-400 hover:shadow-[0_0_25px_rgba(244,63,94,0.5)] transition-all duration-300"
                 >
                   עצור משחק
                 </Button>
@@ -647,8 +646,8 @@ const HostView = ({ gameCode }) => {
           </Card>
 
           {/* Game Code - RIGHT - Neon Style */}
-          <Card className="lg:min-w-[320px] bg-slate-800/90 backdrop-blur-md text-white text-center p-4 sm:p-6 rounded-lg shadow-lg border border-cyan-500/30 shadow-[0_0_20px_rgba(6,182,212,0.15)] flex flex-col justify-center">
-            <p className="text-sm text-cyan-300 mb-2">קוד משחק:</p>
+          <Card className="lg:min-w-[320px] bg-white/90 dark:bg-slate-800/90 backdrop-blur-md text-slate-900 dark:text-white text-center p-4 sm:p-6 rounded-lg shadow-lg border border-cyan-500/30 shadow-[0_0_20px_rgba(6,182,212,0.15)] flex flex-col justify-center">
+            <p className="text-sm text-cyan-600 dark:text-cyan-300 mb-2">קוד משחק:</p>
             <h2 className="text-4xl sm:text-5xl font-bold mb-4 tracking-wide text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-400">
               {gameCode}
             </h2>
@@ -679,11 +678,14 @@ const HostView = ({ gameCode }) => {
         </div>
 
         {/* Main Content Area: Player List (LEFT) + Boggle Grid (RIGHT) */}
-        <div className="flex flex-col lg:flex-row gap-6">
+        <div className="flex flex-col lg:flex-row gap-6 transition-all duration-500 ease-in-out">
           {/* Players Section - LEFT - Neon Style */}
-          <Card className="bg-slate-800/80 backdrop-blur-md p-4 sm:p-6 rounded-lg shadow-lg border border-purple-500/30 shadow-[0_0_15px_rgba(168,85,247,0.1)] lg:min-w-[280px]">
-            <h3 className="text-lg font-bold text-purple-300 mb-4 flex items-center gap-2">
-              <FaUsers className="text-purple-400" />
+          <Card className={cn(
+            "bg-white/80 dark:bg-slate-800/80 backdrop-blur-md p-4 sm:p-6 rounded-lg shadow-lg border border-purple-500/30 shadow-[0_0_15px_rgba(168,85,247,0.1)] lg:min-w-[280px] transition-all duration-500 ease-in-out overflow-hidden",
+            gameStarted ? "lg:w-[300px]" : "w-full lg:w-auto"
+          )}>
+            <h3 className="text-lg font-bold text-purple-600 dark:text-purple-300 mb-4 flex items-center gap-2">
+              <FaUsers className="text-purple-500 dark:text-purple-400" />
               שחקנים ({playersReady.length})
             </h3>
             <div className="flex flex-col gap-2">
@@ -696,8 +698,13 @@ const HostView = ({ gameCode }) => {
                     exit={{ scale: 0, opacity: 0 }}
                     transition={{ delay: index * 0.05 }}
                   >
-                    <Badge className="bg-gradient-to-r from-purple-500 to-pink-500 font-bold text-white px-3 py-1.5 text-base w-full justify-center shadow-[0_0_10px_rgba(168,85,247,0.3)]">
-                      {user}
+                    <Badge className="bg-gradient-to-r from-purple-500 to-pink-500 font-bold text-white px-3 py-2 text-base w-full justify-between shadow-[0_0_10px_rgba(168,85,247,0.3)]">
+                      <span>{user}</span>
+                      {gameStarted && (
+                        <span className="bg-white/20 px-2 py-0.5 rounded-full text-sm">
+                          {playerWordCounts[user] || 0}
+                        </span>
+                      )}
                     </Badge>
                   </motion.div>
                 ))}
@@ -711,11 +718,13 @@ const HostView = ({ gameCode }) => {
           </Card>
 
           {/* Boggle Letter Grid - RIGHT - Neon Style */}
-          <Card className="flex-1 bg-slate-800/80 backdrop-blur-md p-4 sm:p-6 rounded-lg shadow-lg border border-cyan-500/30 shadow-[0_0_15px_rgba(6,182,212,0.1)] flex flex-col items-center">
-            <h3 className="text-xl font-bold text-cyan-300 mb-4">לוח האותיות</h3>
+          <Card className={cn(
+            "flex-1 bg-white/80 dark:bg-slate-800/80 backdrop-blur-md p-2 sm:p-4 rounded-lg shadow-lg border border-cyan-500/30 shadow-[0_0_15px_rgba(6,182,212,0.1)] flex flex-col items-center transition-all duration-500 ease-in-out",
+          )}>
+            <h3 className={cn("text-xl font-bold text-cyan-600 dark:text-cyan-300 mb-4", gameStarted && "text-3xl mb-8")}>לוח האותיות</h3>
 
             {/* Timer - Neon Style */}
-            {remainingTime !== null && (
+            {remainingTime !== null && gameStarted && (
               <motion.div
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }}
@@ -735,32 +744,11 @@ const HostView = ({ gameCode }) => {
             )}
 
             {/* Letter Grid - Neon Glow on tiles */}
-            <div
-              className="grid gap-1 sm:gap-1.5 w-full max-w-lg mx-auto"
-              style={{
-                gridTemplateColumns: `repeat(${tableData[0]?.length || 7}, minmax(32px, 1fr))`,
-              }}
-            >
-              {tableData.map((row, i) =>
-                row.map((cell, j) => (
-                  <motion.div
-                    key={`${i}-${j}`}
-                    initial={{ scale: 0, rotate: -180 }}
-                    animate={{ scale: 1, rotate: 0 }}
-                    transition={{
-                      type: 'spring',
-                      stiffness: 260,
-                      damping: 20,
-                      delay: (i * row.length + j) * 0.02,
-                    }}
-                    whileHover={{ scale: 1.08 }}
-                    className="aspect-square flex items-center justify-center text-2xl sm:text-3xl md:text-4xl font-bold text-white rounded-md cursor-pointer transition-all duration-200 bg-gradient-to-br from-cyan-500 to-purple-600 border border-cyan-400/30 shadow-[0_0_8px_rgba(6,182,212,0.3)] hover:shadow-[0_0_20px_rgba(6,182,212,0.6)] hover:border-cyan-300/60"
-                  >
-                    {cell}
-                  </motion.div>
-                ))
-              )}
-            </div>
+            <GridComponent
+              grid={tableData}
+              interactive={false}
+              className={cn("w-full mx-auto transition-all duration-500", gameStarted ? "max-w-full" : "max-w-lg")}
+            />
           </Card>
         </div>
       </div>

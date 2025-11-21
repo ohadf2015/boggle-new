@@ -1,5 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
+import { useTheme } from '../utils/ThemeContext';
 
 /**
  * GameHeader - A reusable Modern Neon styled header component for the Boggle game
@@ -16,6 +17,9 @@ const GameHeader = ({
   onLogoClick = null,
   className = ''
 }) => {
+  const { theme, toggleTheme } = useTheme();
+  const isDarkMode = darkMode ?? (theme === 'dark');
+
   // Neon Dice Icon SVG
   const DiceIcon = () => (
     <svg
@@ -33,7 +37,7 @@ const GameHeader = ({
         width="18"
         height="18"
         rx="3"
-        className={darkMode
+        className={isDarkMode
           ? "stroke-cyan-400 fill-slate-800/50"
           : "stroke-cyan-600 fill-gray-100/50"
         }
@@ -44,45 +48,45 @@ const GameHeader = ({
         cx="8"
         cy="8"
         r="1.5"
-        className={darkMode ? "fill-cyan-400" : "fill-cyan-600"}
+        className={isDarkMode ? "fill-cyan-400" : "fill-cyan-600"}
       />
       <circle
         cx="16"
         cy="8"
         r="1.5"
-        className={darkMode ? "fill-purple-400" : "fill-purple-600"}
+        className={isDarkMode ? "fill-purple-400" : "fill-purple-600"}
       />
       <circle
         cx="8"
         cy="16"
         r="1.5"
-        className={darkMode ? "fill-purple-400" : "fill-purple-600"}
+        className={isDarkMode ? "fill-purple-400" : "fill-purple-600"}
       />
       <circle
         cx="16"
         cy="16"
         r="1.5"
-        className={darkMode ? "fill-cyan-400" : "fill-cyan-600"}
+        className={isDarkMode ? "fill-cyan-400" : "fill-cyan-600"}
       />
       <circle
         cx="12"
         cy="12"
         r="1.5"
-        className={darkMode ? "fill-teal-400" : "fill-teal-600"}
+        className={isDarkMode ? "fill-teal-400" : "fill-teal-600"}
       />
     </svg>
   );
 
   // Theme-based styles
-  const containerStyles = darkMode
+  const containerStyles = isDarkMode
     ? "bg-slate-800/90 border-cyan-500/30 shadow-[0_0_20px_rgba(6,182,212,0.15)]"
-    : "bg-gray-50/90 border-cyan-400/40 shadow-[0_4px_20px_rgba(6,182,212,0.1)]";
+    : "bg-white/90 border-cyan-400/40 shadow-[0_4px_20px_rgba(6,182,212,0.1)]";
 
-  const textStyles = darkMode
+  const textStyles = isDarkMode
     ? "text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-teal-300 to-purple-400"
     : "text-transparent bg-clip-text bg-gradient-to-r from-cyan-600 via-teal-500 to-purple-600";
 
-  const glowStyles = darkMode
+  const glowStyles = isDarkMode
     ? "drop-shadow-[0_0_10px_rgba(6,182,212,0.5)]"
     : "drop-shadow-[0_0_8px_rgba(6,182,212,0.3)]";
 
@@ -114,7 +118,7 @@ const GameHeader = ({
           <motion.div
             className={`${glowStyles}`}
             whileHover={{
-              filter: darkMode
+              filter: isDarkMode
                 ? "drop-shadow(0 0 15px rgba(6,182,212,0.7))"
                 : "drop-shadow(0 0 12px rgba(6,182,212,0.5))"
             }}
@@ -136,16 +140,39 @@ const GameHeader = ({
         </motion.div>
 
         {/* Right side - Optional actions container */}
-        {rightContent && (
-          <div className="flex items-center gap-2">
-            {rightContent}
-          </div>
-        )}
+        <div className="flex items-center gap-2">
+          <button
+            onClick={toggleTheme}
+            className={`
+              p-2 rounded-full transition-all duration-300
+              ${isDarkMode
+                ? "bg-slate-700 text-yellow-400 hover:bg-slate-600 hover:shadow-[0_0_10px_rgba(250,204,21,0.5)]"
+                : "bg-indigo-100 text-indigo-600 hover:bg-indigo-200 hover:shadow-[0_0_10px_rgba(79,70,229,0.3)]"
+              }
+            `}
+            aria-label="Toggle theme"
+          >
+            {isDarkMode ? (
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="12" cy="12" r="5"></circle>
+                <line x1="12" y1="1" x2="12" y2="3"></line>
+                <line x1="12" y1="21" x2="12" y2="23"></line>
+                <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                <line x1="1" y1="12" x2="3" y2="12"></line>
+                <line x1="21" y1="12" x2="23" y2="12"></line>
+                <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+              </svg>
+            ) : (
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+              </svg>
+            )}
+          </button>
 
-        {/* Empty placeholder for future actions if no rightContent */}
-        {!rightContent && (
-          <div className="w-8 h-8" />
-        )}
+          {rightContent}
+        </div>
       </div>
     </motion.header>
   );

@@ -65,6 +65,12 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
 
   const handleRoomSelect = (roomCode) => {
     setGameCode(roomCode);
+    // If we are in "join" mode, we want to show the username input now
+    // If the user clicked a room from the list, they likely want to join it
+    // We can simulate this by ensuring we are in 'join' mode and maybe focusing the username input
+    setMode('join');
+    // If we were in a "prefilled" state or just browsing, we want to ensure the form is visible and ready
+    setShowFullForm(true);
   };
 
   const handleQuickJoin = (e) => {
@@ -91,7 +97,7 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
   // Show simplified quick join interface when room is prefilled
   if (prefilledRoom && !showFullForm) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 flex flex-col items-center justify-center p-4 sm:p-6">
+      <div className="min-h-screen bg-gradient-to-b from-slate-50 via-slate-100 to-slate-200 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 flex flex-col items-center justify-center p-4 sm:p-6 transition-colors duration-300">
         {/* Animated Title */}
         <motion.div
           initial={{ y: -50, opacity: 0 }}
@@ -113,7 +119,7 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
           transition={{ type: 'spring', stiffness: 260, damping: 20 }}
           className="w-full max-w-md"
         >
-          <Card className="backdrop-blur-md bg-slate-800/90 shadow-2xl border border-cyan-500/30 shadow-[0_0_20px_rgba(6,182,212,0.15)]">
+          <Card className="backdrop-blur-md bg-white/90 dark:bg-slate-800/90 shadow-2xl border border-cyan-500/30 shadow-[0_0_20px_rgba(6,182,212,0.15)]">
             <CardHeader className="text-center space-y-4">
               <div className="flex justify-center">
                 <FaGamepad size={48} className="text-cyan-400" />
@@ -122,7 +128,7 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
                 הצטרפות למשחק
               </CardTitle>
               <CardDescription className="text-sm sm:text-base text-gray-300">
-                אתה מצטרף לחדר <strong className="text-purple-400">{gameCode}</strong>
+                אתה מצטרף לחדר <strong className="text-purple-600 dark:text-purple-400">{gameCode}</strong>
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -152,7 +158,7 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
                   transition={{ duration: 0.4 }}
                   className="space-y-2"
                 >
-                  <Label htmlFor="username" className="text-gray-300">Username</Label>
+                  <Label htmlFor="username" className="text-slate-700 dark:text-gray-300">שם משתמש</Label>
                   <Input
                     id="username"
                     value={username}
@@ -163,17 +169,17 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
                     required
                     autoFocus
                     className={cn(
-                      "h-11 bg-slate-700/50 border-slate-600 text-white placeholder:text-gray-400",
+                      "h-11 bg-slate-100 dark:bg-slate-700/50 border-slate-200 dark:border-slate-600 text-slate-900 dark:text-white placeholder:text-slate-500 dark:placeholder:text-gray-400",
                       usernameError && "border-red-500 bg-red-900/30 focus-visible:ring-red-500"
                     )}
-                    placeholder="Enter your name"
+                    placeholder="הזן את שמך"
                     maxLength={20}
                   />
                   {usernameError && (
                     <p className="text-sm text-red-400">שם משתמש נדרש! אנא מלא את השדה</p>
                   )}
                   {!usernameError && (
-                    <p className="text-sm text-gray-400">Enter your name to join</p>
+                    <p className="text-sm text-slate-500 dark:text-gray-400">הזן שם כדי להצטרף</p>
                   )}
                 </motion.div>
 
@@ -184,7 +190,7 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
                     className="w-full h-12 text-lg font-bold bg-gradient-to-r from-cyan-500 to-purple-600 hover:from-cyan-400 hover:to-purple-500 hover:shadow-[0_0_20px_rgba(6,182,212,0.5)]"
                   >
                     <FaUser className="mr-2" />
-                    Join Game
+                    הצטרף למשחק
                   </Button>
                 </motion.div>
 
@@ -194,9 +200,9 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
                   size="sm"
                   type="button"
                   onClick={() => setShowFullForm(true)}
-                  className="w-full text-cyan-400 hover:text-cyan-300 hover:bg-slate-700/50"
+                  className="w-full text-cyan-600 dark:text-cyan-400 hover:text-cyan-500 dark:hover:text-cyan-300 hover:bg-slate-200 dark:hover:bg-slate-700/50"
                 >
-                  Want to host or join a different room?
+                  רוצה לארח או להצטרף לחדר אחר?
                 </Button>
               </form>
             </CardContent>
@@ -207,7 +213,7 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 flex flex-col items-center justify-center p-4 sm:p-6 overflow-auto">
+    <div className="min-h-screen bg-gradient-to-b from-slate-50 via-slate-100 to-slate-200 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 flex flex-col items-center justify-center p-4 sm:p-6 overflow-auto transition-colors duration-300">
       {/* Animated Title */}
       <motion.div
         initial={{ y: -50, opacity: 0 }}
@@ -230,15 +236,15 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
           transition={{ duration: 0.5 }}
           className="flex-1"
         >
-          <Card className="backdrop-blur-md bg-slate-800/90 shadow-2xl border border-purple-500/30 shadow-[0_0_20px_rgba(168,85,247,0.15)]">
+          <Card className="backdrop-blur-md bg-white/90 dark:bg-slate-800/90 shadow-2xl border border-purple-500/30 shadow-[0_0_20px_rgba(168,85,247,0.15)]">
             <CardHeader className="text-center space-y-4">
               <div className="flex justify-center">
                 <FaGamepad size={48} className="text-purple-400" />
               </div>
               <CardTitle className="text-2xl sm:text-3xl text-purple-300">
-                Welcome to Boggle!
+                ברוכים הבאים לבוגל!
               </CardTitle>
-              <CardDescription className="text-sm sm:text-base text-gray-300">
+              <CardDescription className="text-sm sm:text-base text-slate-600 dark:text-gray-300">
                 בחר את התפקיד שלך כדי להתחיל
               </CardDescription>
             </CardHeader>
@@ -301,7 +307,7 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
                     transition={{ duration: 0.3 }}
                     className="space-y-2"
                   >
-                    <Label htmlFor="gameCode" className="text-gray-300">קוד משחק</Label>
+                    <Label htmlFor="gameCode" className="text-slate-700 dark:text-gray-300">קוד משחק</Label>
                     <Input
                       id="gameCode"
                       value={gameCode}
@@ -311,7 +317,7 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
                       maxLength={4}
                       pattern="[0-9]*"
                       inputMode="numeric"
-                      className="bg-slate-700/50 border-slate-600 text-white placeholder:text-gray-400"
+                      className="bg-slate-100 dark:bg-slate-700/50 border-slate-200 dark:border-slate-600 text-slate-900 dark:text-white placeholder:text-slate-500 dark:placeholder:text-gray-400"
                     />
                   </motion.div>
                 ) : (
@@ -323,7 +329,7 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
                       transition={{ duration: 0.3 }}
                       className="space-y-2"
                     >
-                      <Label htmlFor="roomName" className="text-gray-300">שם החדר</Label>
+                      <Label htmlFor="roomName" className="text-slate-700 dark:text-gray-300">שם החדר</Label>
                       <Input
                         id="roomName"
                         value={roomName}
@@ -333,7 +339,7 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
                         }}
                         required
                         className={cn(
-                          "bg-slate-700/50 border-slate-600 text-white placeholder:text-gray-400",
+                          "bg-slate-100 dark:bg-slate-700/50 border-slate-200 dark:border-slate-600 text-slate-900 dark:text-white placeholder:text-slate-500 dark:placeholder:text-gray-400",
                           roomNameError && "border-red-500 bg-red-900/30 focus-visible:ring-red-500"
                         )}
                         placeholder="הזן שם לחדר (לדוגמה: משחק שישי)"
@@ -343,7 +349,7 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
                         <p className="text-sm text-red-400">שם חדר נדרש! אנא מלא את השדה</p>
                       )}
                       {!roomNameError && (
-                        <p className="text-sm text-gray-400">שם לזיהוי החדר שלך</p>
+                        <p className="text-sm text-slate-500 dark:text-gray-400">שם לזיהוי החדר שלך</p>
                       )}
                     </motion.div>
 
@@ -354,7 +360,7 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
                       transition={{ duration: 0.3, delay: 0.1 }}
                       className="space-y-2"
                     >
-                      <Label htmlFor="gameCode" className="text-gray-300">קוד משחק</Label>
+                      <Label htmlFor="gameCode" className="text-slate-700 dark:text-gray-300">קוד משחק</Label>
                       <div className="flex gap-2">
                         <Input
                           id="gameCode"
@@ -365,7 +371,7 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
                           maxLength={4}
                           pattern="[0-9]*"
                           inputMode="numeric"
-                          className="flex-1 bg-slate-700/50 border-slate-600 text-white placeholder:text-gray-400"
+                          className="flex-1 bg-slate-100 dark:bg-slate-700/50 border-slate-200 dark:border-slate-600 text-slate-900 dark:text-white placeholder:text-slate-500 dark:placeholder:text-gray-400"
                         />
                         <TooltipProvider>
                           <Tooltip>
@@ -383,7 +389,7 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
                           </Tooltip>
                         </TooltipProvider>
                       </div>
-                      <p className="text-sm text-gray-400">
+                      <p className="text-sm text-slate-500 dark:text-gray-400">
                         קוד שישתפו השחקנים כדי להצטרף
                       </p>
                     </motion.div>
@@ -397,7 +403,7 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
                     transition={{ duration: 0.4 }}
                     className="space-y-2"
                   >
-                    <Label htmlFor="username-main" className="text-gray-300">Username</Label>
+                    <Label htmlFor="username-main" className="text-slate-700 dark:text-gray-300">שם משתמש</Label>
                     <Input
                       id="username-main"
                       value={username}
@@ -407,10 +413,10 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
                       }}
                       required
                       className={cn(
-                        "bg-slate-700/50 border-slate-600 text-white placeholder:text-gray-400",
+                        "bg-slate-100 dark:bg-slate-700/50 border-slate-200 dark:border-slate-600 text-slate-900 dark:text-white placeholder:text-slate-500 dark:placeholder:text-gray-400",
                         usernameError && "border-red-500 bg-red-900/30 focus-visible:ring-red-500"
                       )}
-                      placeholder="Enter your name"
+                      placeholder="הזן את שמך"
                       maxLength={20}
                     />
                     {usernameError && (
@@ -441,7 +447,7 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
               </form>
 
               <div className="text-center space-y-3">
-                <p className="text-sm text-gray-400">
+                <p className="text-sm text-slate-600 dark:text-gray-400">
                   {mode === 'host'
                     ? 'צור משחק ושתף את הקוד עם חברים!'
                     : 'הזן את קוד המשחק ששותף על ידי המארח'}
@@ -486,7 +492,7 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
             transition={{ duration: 0.5 }}
             className="flex-1"
           >
-            <Card className="backdrop-blur-md bg-slate-800/90 shadow-xl h-full max-h-[500px] flex flex-col border border-teal-500/30 shadow-[0_0_15px_rgba(20,184,166,0.1)]">
+            <Card className="backdrop-blur-md bg-white/90 dark:bg-slate-800/90 shadow-xl h-full max-h-[500px] flex flex-col border border-teal-500/30 shadow-[0_0_15px_rgba(20,184,166,0.1)]">
               <CardHeader>
                 <div className="flex justify-between items-center">
                   <CardTitle className="text-teal-400">חדרים פעילים</CardTitle>
@@ -509,7 +515,7 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
               </CardHeader>
               <CardContent className="flex-1 overflow-auto">
                 {activeRooms.length === 0 ? (
-                  <div className="text-center py-8 text-gray-400">
+                  <div className="text-center py-8 text-slate-500 dark:text-gray-400">
                     <p className="text-sm">אין חדרים פעילים</p>
                     <p className="text-xs mt-1">צור חדר חדש כדי להתחיל!</p>
                   </div>
@@ -570,7 +576,7 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
 
       {/* How to Play Dialog */}
       <Dialog open={showHowToPlay} onOpenChange={setShowHowToPlay}>
-        <DialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto bg-slate-800 border-cyan-500/30">
+        <DialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto bg-white dark:bg-slate-800 border-cyan-500/30">
           <DialogHeader>
             <DialogTitle className="sr-only">איך משחקים בבוגל</DialogTitle>
           </DialogHeader>
@@ -588,7 +594,7 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
 
       {/* QR Code Dialog */}
       <Dialog open={showQR} onOpenChange={setShowQR}>
-        <DialogContent className="sm:max-w-md bg-slate-800 border-cyan-500/30">
+        <DialogContent className="sm:max-w-md bg-white dark:bg-slate-800 border-cyan-500/30">
           <DialogHeader>
             <DialogTitle className="text-center text-cyan-300 flex items-center justify-center gap-2">
               <FaQrcode />
@@ -600,10 +606,10 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
               <QRCodeSVG value={getJoinUrl()} size={250} level="H" includeMargin />
             </div>
             <h4 className="text-3xl font-bold text-cyan-400">{gameCode}</h4>
-            <p className="text-sm text-center text-gray-300">
+            <p className="text-sm text-center text-slate-600 dark:text-gray-300">
               סרוק את הקוד כדי להצטרף למשחק או השתמש בקוד {gameCode}
             </p>
-            <p className="text-xs text-center text-gray-400 mt-2">
+            <p className="text-xs text-center text-slate-500 dark:text-gray-400 mt-2">
               {getJoinUrl()}
             </p>
           </div>

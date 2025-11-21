@@ -12,6 +12,7 @@ import { FaTrophy, FaTrash, FaDoorOpen, FaUsers } from 'react-icons/fa';
 import { useWebSocket } from '../utils/WebSocketContext';
 import { clearSession } from '../utils/session';
 import gsap from 'gsap';
+import GridComponent from '../components/GridComponent';
 
 const PlayerView = ({ onShowResults }) => {
   const ws = useWebSocket();
@@ -26,7 +27,33 @@ const PlayerView = ({ onShowResults }) => {
   const [letterGrid, setLetterGrid] = useState(null);
   const [remainingTime, setRemainingTime] = useState(null);
   const [waitingForResults, setWaitingForResults] = useState(false);
+
   const [playersReady, setPlayersReady] = useState([]);
+  const [shufflingGrid, setShufflingGrid] = useState(null);
+
+
+  // Pre-game shuffling animation
+  useEffect(() => {
+    if (gameActive) {
+      setShufflingGrid(null);
+      return;
+    }
+
+    const hebrewLetters = 'אבגדהוזחטיכלמנסעפצקרשת';
+    const rows = 4;
+    const cols = 4;
+
+    const interval = setInterval(() => {
+      const newGrid = Array(rows).fill(null).map(() =>
+        Array(cols).fill(null).map(() =>
+          hebrewLetters[Math.floor(Math.random() * hebrewLetters.length)]
+        )
+      );
+      setShufflingGrid(newGrid);
+    }, 2000); // Shuffle every 2 seconds
+
+    return () => clearInterval(interval);
+  }, [gameActive]);
 
   // Clear game state when entering
   useEffect(() => {
@@ -53,6 +80,13 @@ const PlayerView = ({ onShowResults }) => {
       window.removeEventListener('beforeunload', handleBeforeUnload);
     };
   }, [gameActive, foundWords.length, waitingForResults]);
+
+  // Auto-focus on input when game becomes active
+  useEffect(() => {
+    if (gameActive && inputRef.current) {
+      inputRef.current.focus();
+    }
+  }, [gameActive]);
 
   // WebSocket message handler
   useEffect(() => {
@@ -201,7 +235,7 @@ const PlayerView = ({ onShowResults }) => {
     const chainedHandler = (event) => {
       // First let PlayerView handle its messages
       handleMessage(event);
-      
+
       // Then let the original App handler process any messages it needs
       if (originalHandler) {
         originalHandler(event);
@@ -209,10 +243,10 @@ const PlayerView = ({ onShowResults }) => {
     };
 
     ws.onmessage = chainedHandler;
-    
-    return () => { 
+
+    return () => {
       // Restore the original handler when component unmounts
-      ws.onmessage = originalHandler; 
+      ws.onmessage = originalHandler;
     };
   }, [ws, onShowResults]);
 
@@ -249,6 +283,8 @@ const PlayerView = ({ onShowResults }) => {
     if (inputRef.current) {
       inputRef.current.focus();
       inputRef.current.scrollIntoView({ behavior: 'instant', block: 'nearest' });
+
+
     }
   }, [word, gameActive, ws]);
 
@@ -279,7 +315,7 @@ const PlayerView = ({ onShowResults }) => {
   // Show waiting screen if game hasn't started yet
   if (!gameActive && !waitingForResults) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 p-4 md:p-8 flex flex-col">
+      <div className="min-h-screen bg-gradient-to-b from-slate-50 via-slate-100 to-slate-200 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 p-4 md:p-8 flex flex-col transition-colors duration-300">
         <Toaster position="top-center" />
 
         {/* Exit Button */}
@@ -315,7 +351,7 @@ const PlayerView = ({ onShowResults }) => {
               transition={{ type: 'spring', stiffness: 200, damping: 15 }}
               className="text-center"
             >
-              <Card className="bg-slate-800/90 backdrop-blur-md shadow-2xl border border-cyan-500/30 shadow-[0_0_20px_rgba(6,182,212,0.2)] p-8">
+              <Card className="bg-white/90 dark:bg-slate-800/90 backdrop-blur-md shadow-2xl border border-cyan-500/30 shadow-[0_0_20px_rgba(6,182,212,0.2)] p-8">
                 <motion.h2
                   animate={{
                     scale: [1, 1.05, 1],
@@ -339,9 +375,9 @@ const PlayerView = ({ onShowResults }) => {
               animate={{ y: 0, opacity: 1 }}
               transition={{ delay: 0.2 }}
             >
-              <Card className="bg-slate-800/90 backdrop-blur-md shadow-xl border border-purple-500/30 shadow-[0_0_15px_rgba(168,85,247,0.1)] p-6">
-                <h3 className="text-lg font-bold text-purple-300 mb-4 flex items-center gap-2 justify-center">
-                  <FaUsers className="text-purple-400" />
+              <Card className="bg-white/90 dark:bg-slate-800/90 backdrop-blur-md shadow-xl border border-purple-500/30 shadow-[0_0_15px_rgba(168,85,247,0.1)] p-6">
+                <h3 className="text-lg font-bold text-purple-600 dark:text-purple-300 mb-4 flex items-center gap-2 justify-center">
+                  <FaUsers className="text-purple-500 dark:text-purple-400" />
                   שחקנים ({playersReady.length})
                 </h3>
                 <div className="flex flex-col gap-2">
@@ -362,7 +398,7 @@ const PlayerView = ({ onShowResults }) => {
                   </AnimatePresence>
                 </div>
                 {playersReady.length === 0 && (
-                  <p className="text-sm text-center text-gray-400 mt-2">
+                  <p className="text-sm text-center text-slate-500 dark:text-gray-400 mt-2">
                     ממתין לשחקנים...
                   </p>
                 )}
@@ -376,7 +412,7 @@ const PlayerView = ({ onShowResults }) => {
 
   // Normal game UI (when game is active or waiting for results)
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 p-4 md:p-8">
+    <div className="min-h-screen bg-gradient-to-b from-slate-50 via-slate-100 to-slate-200 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 p-4 md:p-8 flex flex-col transition-colors duration-300">
       <Toaster position="top-center" />
 
       {/* Exit Button */}
@@ -391,16 +427,18 @@ const PlayerView = ({ onShowResults }) => {
         </Button>
       </div>
 
-      {/* Title */}
-      <motion.div
-        initial={{ y: -50, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        className="text-center mb-8"
-      >
-        <h1 className="text-6xl md:text-8xl font-black text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-teal-300 to-purple-400">
-          BOGGLE
-        </h1>
-      </motion.div>
+      {/* Title - Only show when game is NOT active to save space */}
+      {!gameActive && (
+        <motion.div
+          initial={{ y: -50, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          className="text-center mb-8"
+        >
+          <h1 className="text-6xl md:text-8xl font-black text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-teal-300 to-purple-400">
+            BOGGLE
+          </h1>
+        </motion.div>
+      )}
 
       {/* Timer */}
       {remainingTime !== null && gameActive && (
@@ -430,9 +468,9 @@ const PlayerView = ({ onShowResults }) => {
           animate={{ y: 0, opacity: 1 }}
           className="max-w-4xl mx-auto mb-6"
         >
-          <Card className="bg-slate-800/90 backdrop-blur-md shadow-xl border border-purple-500/30 shadow-[0_0_15px_rgba(168,85,247,0.1)]">
+          <Card className="bg-white/90 dark:bg-slate-800/90 backdrop-blur-md shadow-xl border border-purple-500/30 shadow-[0_0_15px_rgba(168,85,247,0.1)]">
             <CardHeader>
-              <CardTitle className="text-xl flex items-center gap-2 text-purple-300">
+              <CardTitle className="text-xl flex items-center gap-2 text-purple-600 dark:text-purple-300">
                 🏆 ההישגים שלך
               </CardTitle>
             </CardHeader>
@@ -447,157 +485,163 @@ const PlayerView = ({ onShowResults }) => {
         </motion.div>
       )}
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 max-w-7xl mx-auto">
-        {/* Letter Grid */}
-        {letterGrid && (
-          <Card className="bg-slate-800/90 backdrop-blur-md shadow-2xl lg:col-span-1 border border-cyan-500/30 shadow-[0_0_15px_rgba(6,182,212,0.1)]">
-            <CardHeader>
-              <CardTitle className="text-center text-cyan-300">לוח האותיות</CardTitle>
+      <div className="flex flex-col lg:flex-row gap-6 max-w-7xl mx-auto h-full flex-grow">
+        {/* Letter Grid - Takes maximum space */}
+        {(letterGrid || shufflingGrid) && (
+          <Card className="bg-white/90 dark:bg-slate-800/90 backdrop-blur-md shadow-2xl flex-grow lg:flex-[2] border border-cyan-500/30 shadow-[0_0_15px_rgba(6,182,212,0.1)] flex flex-col">
+            <CardHeader className="py-3">
+              <CardTitle className="text-center text-cyan-600 dark:text-cyan-300">
+                {gameActive ? 'לוח האותיות' : 'ממתין למשחק...'}
+              </CardTitle>
             </CardHeader>
-            <CardContent>
-              <div className={`grid gap-2 mx-auto max-w-sm`}
-                   style={{
-                     gridTemplateColumns: `repeat(${letterGrid[0]?.length || 7}, minmax(0, 1fr))`
-                   }}>
-                {letterGrid.map((row, i) =>
-                  row.map((cell, j) => (
-                    <motion.div
-                      key={`${i}-${j}`}
-                      initial={{ scale: 0, rotate: -180 }}
-                      animate={{ scale: 1, rotate: 0 }}
-                      transition={{ delay: (i * row.length + j) * 0.02 }}
-                      whileHover={{ scale: 1.1, rotate: 5 }}
-                      className="aspect-square flex items-center justify-center text-2xl font-bold
-                               bg-gradient-to-br from-cyan-500 to-purple-600 text-white rounded-lg
-                               border border-cyan-400/30 shadow-[0_0_8px_rgba(6,182,212,0.3)]
-                               hover:shadow-[0_0_20px_rgba(6,182,212,0.6)] hover:border-cyan-300/60
-                               transition-all cursor-pointer"
-                    >
-                      {cell}
-                    </motion.div>
-                  ))
-                )}
-              </div>
+            <CardContent className="flex-grow flex items-center justify-center p-4">
+              <GridComponent
+                grid={letterGrid || shufflingGrid}
+                interactive={gameActive}
+                onWordSubmit={(formedWord) => {
+                  // Direct submission logic to avoid state update delay issues
+                  const hebrewRegex = /^[\u0590-\u05FF]+$/;
+                  if (hebrewRegex.test(formedWord)) {
+                    ws.send(JSON.stringify({
+                      action: 'submitWord',
+                      word: formedWord.toLowerCase(),
+                    }));
+                    setFoundWords(prev => [...prev, formedWord]);
+                    toast.success(`נשלח: ${formedWord}`, { duration: 1000, icon: '📤' });
+                  } else {
+                    toast.error('רק מילים בעברית!', { duration: 1000 });
+                  }
+                  setWord(''); // Clear input
+                }}
+
+                className="w-full max-w-2xl"
+              />
             </CardContent>
           </Card>
         )}
 
-        {/* Word Input & List */}
-        <Card className="bg-slate-800/90 backdrop-blur-md shadow-2xl lg:col-span-1 border border-teal-500/30 shadow-[0_0_15px_rgba(20,184,166,0.1)]">
-          <CardHeader>
-            <CardTitle className="text-teal-300">מילים שנמצאו ({foundWords.length})</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="flex gap-2">
-              <Button
-                onClick={submitWord}
-                disabled={!gameActive || !word.trim()}
-                className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-400
+        {/* Right Column: Word Input, List & Leaderboard */}
+        <div className="flex flex-col gap-4 lg:flex-1 lg:max-w-md">
+          {/* Word Input & List */}
+          <Card className="bg-white/90 dark:bg-slate-800/90 backdrop-blur-md shadow-2xl border border-teal-500/30 shadow-[0_0_15px_rgba(20,184,166,0.1)] flex flex-col max-h-[50vh] lg:max-h-[60vh]">
+            <CardHeader>
+              <CardTitle className="text-teal-600 dark:text-teal-300">מילים שנמצאו ({foundWords.length})</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="flex gap-2 flex-row-reverse">
+                <Button
+                  onClick={submitWord}
+                  disabled={!gameActive || !word.trim()}
+                  className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-400
                          hover:to-pink-400 text-white font-bold shadow-lg hover:shadow-[0_0_15px_rgba(168,85,247,0.5)]"
-              >
-                הוסף
-              </Button>
-              <Input
-                ref={inputRef}
-                value={word}
-                onChange={(e) => setWord(e.target.value)}
-                onKeyDown={handleKeyDown}
-                disabled={!gameActive}
-                placeholder="הזן מילה..."
-                className="text-lg bg-slate-700/50 border-slate-600 text-white placeholder:text-gray-400"
-                autoFocus
-              />
-            </div>
-
-            {!gameActive && !waitingForResults && (
-              <div className="text-center py-4">
-                <Progress value={50} className="mb-2" />
-                <p className="text-sm text-gray-400">ממתין להתחלת המשחק...</p>
+                >
+                  הוסף
+                </Button>
+                <Input
+                  ref={inputRef}
+                  value={word}
+                  onChange={(e) => setWord(e.target.value)}
+                  onKeyDown={handleKeyDown}
+                  disabled={!gameActive}
+                  placeholder="הזן מילה..."
+                  className="text-lg bg-slate-100 dark:bg-slate-700/50 border-slate-200 dark:border-slate-600 text-slate-900 dark:text-white placeholder:text-slate-500 dark:placeholder:text-gray-400 text-right"
+                  autoFocus
+                />
               </div>
-            )}
 
-            {waitingForResults && (
-              <div className="text-center py-4">
-                <Progress value={75} className="mb-2" />
-                <p className="text-sm text-gray-400">ממתין לתוצאות...</p>
-              </div>
-            )}
+              {!gameActive && !waitingForResults && (
+                <div className="text-center py-4">
+                  <Progress value={50} className="mb-2" />
+                  <p className="text-sm text-slate-500 dark:text-gray-400">ממתין להתחלת המשחק...</p>
+                </div>
+              )}
 
-            <div ref={wordListRef} className="max-h-96 overflow-y-auto space-y-2">
-              <AnimatePresence>
-                {foundWords.map((foundWord, index) => (
-                  <motion.div
-                    key={index}
-                    initial={{ x: -50, opacity: 0 }}
-                    animate={{ x: 0, opacity: 1 }}
-                    exit={{ x: 50, opacity: 0 }}
-                    className={`flex items-center justify-between p-3 rounded-lg
+              {waitingForResults && (
+                <div className="text-center py-4">
+                  <Progress value={75} className="mb-2" />
+                  <p className="text-sm text-slate-500 dark:text-gray-400">ממתין לתוצאות...</p>
+                </div>
+              )}
+
+              <div ref={wordListRef} className="max-h-96 overflow-y-auto space-y-2">
+                <AnimatePresence>
+                  {foundWords.map((foundWord, index) => (
+                    <motion.div
+                      key={index}
+                      initial={{ x: -50, opacity: 0 }}
+                      animate={{ x: 0, opacity: 1 }}
+                      exit={{ x: 50, opacity: 0 }}
+                      className={`flex items-center justify-between p-3 rounded-lg
                               ${index === foundWords.length - 1 ?
-                                'bg-gradient-to-r from-cyan-500/20 to-teal-500/20 font-bold border border-cyan-500/30' :
-                                'bg-slate-700/50'}
-                              hover:bg-slate-700 transition-colors text-white`}
-                  >
-                    <span>{foundWord}</span>
-                    <Button
-                      size="sm"
-                      variant="ghost"
-                      onClick={() => removeWord(index)}
-                      disabled={!gameActive}
-                      className="hover:bg-red-500/20 hover:text-red-400 text-gray-400"
+                          'bg-gradient-to-r from-cyan-500/20 to-teal-500/20 font-bold border border-cyan-500/30' :
+                          'bg-slate-100 dark:bg-slate-700/50'}
+                              hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors text-slate-900 dark:text-white`}
                     >
-                      <FaTrash />
-                    </Button>
+                      <span>{foundWord}</span>
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={() => removeWord(index)}
+                        disabled={!gameActive}
+                        className="hover:bg-red-500/20 hover:text-red-400 text-slate-400 dark:text-gray-400"
+                      >
+                        <FaTrash />
+                      </Button>
+                    </motion.div>
+                  ))}
+                </AnimatePresence>
+              </div>
+            </CardContent>
+          </Card>
+
+
+
+          {/* Leaderboard */}
+          <Card className="bg-white/90 dark:bg-slate-800/90 backdrop-blur-md shadow-2xl border border-purple-500/30 shadow-[0_0_15px_rgba(168,85,247,0.1)] flex-1 overflow-hidden flex flex-col">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-purple-600 dark:text-purple-300">
+                <FaTrophy className="text-yellow-500 dark:text-yellow-400" />
+                טבלת המובילים
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="overflow-y-auto flex-1">
+              <div className="space-y-3">
+                {leaderboard.map((player, index) => (
+                  <motion.div
+                    key={player.username}
+                    initial={{ x: 50, opacity: 0 }}
+                    animate={{ x: 0, opacity: 1 }}
+                    transition={{ delay: index * 0.1 }}
+                    className={`flex items-center justify-between p-4 rounded-lg
+                            ${index === 0 ? 'bg-gradient-to-r from-yellow-500/80 to-orange-500/80 text-white shadow-lg border border-yellow-400/50 shadow-[0_0_15px_rgba(234,179,8,0.3)]' :
+                        index === 1 ? 'bg-gradient-to-r from-gray-400/80 to-gray-500/80 text-white shadow-md border border-gray-400/50' :
+                          index === 2 ? 'bg-gradient-to-r from-orange-500/80 to-orange-600/80 text-white shadow-md border border-orange-400/50' :
+                            'bg-slate-100 dark:bg-slate-700/50 text-slate-900 dark:text-white'}`}
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="text-2xl font-bold min-w-[40px] text-center">
+                        {index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : `#${index + 1}`}
+                      </div>
+                      <div>
+                        <div className="font-bold">{player.username}</div>
+                        <div className="text-sm opacity-75">{player.wordCount} מילים</div>
+                      </div>
+                    </div>
+                    <div className="text-2xl font-bold">
+                      {player.score}
+                    </div>
                   </motion.div>
                 ))}
-              </AnimatePresence>
-            </div>
-          </CardContent>
-        </Card>
+                {leaderboard.length === 0 && (
+                  <p className="text-center text-slate-500 dark:text-gray-400 py-8">אין שחקנים עדיין</p>
+                )}
+              </div>
+            </CardContent>
+          </Card>
 
-        {/* Leaderboard */}
-        <Card className="bg-slate-800/90 backdrop-blur-md shadow-2xl lg:col-span-1 border border-purple-500/30 shadow-[0_0_15px_rgba(168,85,247,0.1)]">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-purple-300">
-              <FaTrophy className="text-yellow-400" />
-              טבלת המובילים
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-3">
-              {leaderboard.map((player, index) => (
-                <motion.div
-                  key={player.username}
-                  initial={{ x: 50, opacity: 0 }}
-                  animate={{ x: 0, opacity: 1 }}
-                  transition={{ delay: index * 0.1 }}
-                  className={`flex items-center justify-between p-4 rounded-lg
-                            ${index === 0 ? 'bg-gradient-to-r from-yellow-500/80 to-orange-500/80 text-white shadow-lg border border-yellow-400/50 shadow-[0_0_15px_rgba(234,179,8,0.3)]' :
-                              index === 1 ? 'bg-gradient-to-r from-gray-400/80 to-gray-500/80 text-white shadow-md border border-gray-400/50' :
-                              index === 2 ? 'bg-gradient-to-r from-orange-500/80 to-orange-600/80 text-white shadow-md border border-orange-400/50' :
-                              'bg-slate-700/50 text-white'}`}
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="text-2xl font-bold min-w-[40px] text-center">
-                      {index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : `#${index + 1}`}
-                    </div>
-                    <div>
-                      <div className="font-bold">{player.username}</div>
-                      <div className="text-sm opacity-75">{player.wordCount} מילים</div>
-                    </div>
-                  </div>
-                  <div className="text-2xl font-bold">
-                    {player.score}
-                  </div>
-                </motion.div>
-              ))}
-              {leaderboard.length === 0 && (
-                <p className="text-center text-gray-400 py-8">אין שחקנים עדיין</p>
-              )}
-            </div>
-          </CardContent>
-        </Card>
+        </div>
       </div>
-    </div>
+    </div >
   );
 };
 

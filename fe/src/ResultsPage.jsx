@@ -5,15 +5,12 @@ import { Button } from './components/ui/button';
 import { Card } from './components/ui/card';
 import { Badge } from './components/ui/badge';
 import { AchievementBadge } from './components/AchievementBadge';
+import GridComponent from './components/GridComponent';
 import confetti from 'canvas-confetti';
 import './style/animation.scss';
 import { cn } from './lib/utils';
 
-const PODIUM_COLORS = [
-  'linear-gradient(45deg, #FFD700 30%, #FFA500 90%)',
-  'linear-gradient(45deg, #C0C0C0 30%, #E8E8E8 90%)',
-  'linear-gradient(45deg, #CD7F32 30%, #D4A76A 90%)',
-];
+
 
 const WORD_COLORS = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#FFA07A', '#98D8C8', '#F7DC6F', '#BB8FCE'];
 
@@ -22,23 +19,11 @@ const LetterGrid = ({ letterGrid }) => (
     <h3 className="text-lg font-bold text-cyan-400 mb-3">
       לוח המשחק
     </h3>
-    <div
-      className="grid gap-1 max-w-xs mx-auto"
-      style={{
-        gridTemplateColumns: `repeat(${letterGrid[0]?.length || 7}, minmax(30px, 1fr))`,
-      }}
-    >
-      {letterGrid.map((row, i) =>
-        row.map((cell, j) => (
-          <div
-            key={`${i}-${j}`}
-            className="aspect-square flex items-center justify-center text-sm sm:text-base font-bold bg-gradient-to-br from-cyan-500 to-purple-600 text-white rounded-md shadow-sm border border-cyan-400/30"
-          >
-            {cell}
-          </div>
-        ))
-      )}
-    </div>
+    <GridComponent
+      grid={letterGrid}
+      interactive={false}
+      className="max-w-xs mx-auto"
+    />
   </div>
 );
 
@@ -74,32 +59,31 @@ const AchievementChip = ({ achievement, index }) => (
 );
 
 const PlayerScore = ({ player, index }) => {
-  const isPodium = index < 3;
-  const podiumIcon = ['🥇', '🥈', '🥉'][index] || `#${index + 1}`;
-
-  const getNeonPodiumStyle = (idx) => {
-    if (idx === 0) return 'bg-gradient-to-r from-yellow-500/80 to-orange-500/80 border-yellow-400/50 shadow-[0_0_15px_rgba(234,179,8,0.3)]';
-    if (idx === 1) return 'bg-gradient-to-r from-gray-400/80 to-gray-500/80 border-gray-400/50';
-    if (idx === 2) return 'bg-gradient-to-r from-orange-500/80 to-orange-600/80 border-orange-400/50';
-    return 'bg-slate-700/50 border-slate-600/50';
-  };
+  // Only show detailed card for non-podium players OR if we want to show details for everyone below the podium
+  // But the request was for a podium and then list.
+  // Let's make the list items simpler for everyone, or just keep the cards but maybe less emphasized for non-winners.
+  // Actually, the previous implementation had special styles for top 3.
+  // Let's keep the cards but remove the "Podium" styling from the card itself since they are now visually on a podium.
+  // Wait, if I render ALL players in the list below, it duplicates the top 3.
+  // I should filter the list to show only index >= 3.
+  // However, the user might want to see the DETAILS (words found) for the top 3 as well.
+  // So I will keep them in the list but maybe with a different style or just standard.
 
   return (
     <motion.div
       initial={{ x: -50, opacity: 0 }}
       animate={{ x: 0, opacity: 1 }}
-      transition={{ delay: index * 0.2 }}
+      transition={{ delay: index * 0.1 }}
     >
       <Card
         className={cn(
-          "p-4 mb-3 border backdrop-blur-md text-white",
-          index === 0 && "scale-105",
-          getNeonPodiumStyle(index)
+          "p-4 mb-3 border backdrop-blur-md text-slate-900 dark:text-white",
+          "bg-slate-100 dark:bg-slate-700/50 border-slate-200 dark:border-slate-600/50"
         )}
       >
         <div className="flex justify-between items-center mb-3">
           <h3 className="text-xl font-bold">
-            {podiumIcon} {player.username}
+            #{index + 1} {player.username}
           </h3>
           <span className="text-3xl font-bold">{player.score}</span>
         </div>
@@ -141,11 +125,30 @@ const PlayerScore = ({ player, index }) => {
 };
 
 const ResultsPage = ({ finalScores, letterGrid, gameCode, onReturnToRoom }) => {
+  const [autoReplayCountdown, setAutoReplayCountdown] = React.useState(10);
+  const [isAutoReplayCancelled, setIsAutoReplayCancelled] = React.useState(false);
+
   const handleExitRoom = () => {
     if (window.confirm('האם אתה בטוח שברצונך לצאת מהחדר?')) {
       window.location.reload();
     }
   };
+
+  // Auto-replay countdown
+  useEffect(() => {
+    if (isAutoReplayCancelled || !onReturnToRoom) return;
+
+    if (autoReplayCountdown <= 0) {
+      onReturnToRoom();
+      return;
+    }
+
+    const timer = setInterval(() => {
+      setAutoReplayCountdown((prev) => prev - 1);
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [autoReplayCountdown, isAutoReplayCancelled, onReturnToRoom]);
 
   const sortedScores = useMemo(() => {
     return finalScores ? [...finalScores].sort((a, b) => b.score - a.score) : [];
@@ -187,7 +190,7 @@ const ResultsPage = ({ finalScores, letterGrid, gameCode, onReturnToRoom }) => {
   }, [winner]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 flex flex-col items-center p-4 sm:p-6 overflow-auto">
+    <div className="min-h-screen bg-gradient-to-b from-slate-50 via-slate-100 to-slate-200 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 flex flex-col items-center p-4 sm:p-6 overflow-auto transition-colors duration-300">
       <div className="absolute top-5 right-5">
         <Button
           onClick={handleExitRoom}
@@ -270,26 +273,96 @@ const ResultsPage = ({ finalScores, letterGrid, gameCode, onReturnToRoom }) => {
         transition={{ type: 'spring', stiffness: 200, damping: 20 }}
         className="w-full max-w-4xl"
       >
-        <Card className="p-4 sm:p-6 max-h-[85vh] overflow-auto bg-slate-800/90 backdrop-blur-md border border-purple-500/30 shadow-[0_0_20px_rgba(168,85,247,0.15)]">
+        <Card className="p-4 sm:p-6 max-h-[85vh] overflow-auto bg-white/90 dark:bg-slate-800/90 backdrop-blur-md border border-purple-500/30 shadow-[0_0_20px_rgba(168,85,247,0.15)]">
           <h2 className="text-3xl sm:text-4xl font-bold text-yellow-400 text-center mb-6 flex items-center justify-center gap-2">
             <FaTrophy /> תוצאות סופיות
           </h2>
 
           {letterGrid && <LetterGrid letterGrid={letterGrid} />}
 
-          {sortedScores.map((player, index) => (
-            <PlayerScore key={player.username} player={player} index={index} />
-          ))}
+          {/* Podium for Top 3 */}
+          <div className="flex justify-center items-end gap-4 mb-8 min-h-[200px]">
+            {/* 2nd Place */}
+            {sortedScores[1] && (
+              <motion.div
+                initial={{ y: 50, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ delay: 0.2 }}
+                className="flex flex-col items-center"
+              >
+                <div className="mb-2 text-center">
+                  <span className="text-2xl font-bold text-gray-300">🥈 {sortedScores[1].username}</span>
+                  <div className="text-lg font-bold text-white">{sortedScores[1].score} נק'</div>
+                </div>
+                <div className="w-24 h-32 bg-gradient-to-t from-gray-400 to-gray-300 rounded-t-lg shadow-lg flex items-end justify-center pb-2 border-t border-gray-200">
+                  <span className="text-4xl font-black text-white/50">2</span>
+                </div>
+              </motion.div>
+            )}
+
+            {/* 1st Place */}
+            {sortedScores[0] && (
+              <motion.div
+                initial={{ y: 50, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                className="flex flex-col items-center z-10"
+              >
+                <FaCrown className="text-4xl text-yellow-400 mb-2 animate-bounce" />
+                <div className="mb-2 text-center">
+                  <span className="text-3xl font-bold text-yellow-300">🥇 {sortedScores[0].username}</span>
+                  <div className="text-xl font-bold text-white">{sortedScores[0].score} נק'</div>
+                </div>
+                <div className="w-28 h-40 bg-gradient-to-t from-yellow-500 to-yellow-300 rounded-t-lg shadow-xl flex items-end justify-center pb-2 border-t border-yellow-200 shadow-[0_0_20px_rgba(234,179,8,0.5)]">
+                  <span className="text-5xl font-black text-white/50">1</span>
+                </div>
+              </motion.div>
+            )}
+
+            {/* 3rd Place */}
+            {sortedScores[2] && (
+              <motion.div
+                initial={{ y: 50, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ delay: 0.4 }}
+                className="flex flex-col items-center"
+              >
+                <div className="mb-2 text-center">
+                  <span className="text-2xl font-bold text-orange-300">🥉 {sortedScores[2].username}</span>
+                  <div className="text-lg font-bold text-white">{sortedScores[2].score} נק'</div>
+                </div>
+                <div className="w-24 h-24 bg-gradient-to-t from-orange-600 to-orange-400 rounded-t-lg shadow-lg flex items-end justify-center pb-2 border-t border-orange-300">
+                  <span className="text-4xl font-black text-white/50">3</span>
+                </div>
+              </motion.div>
+            )}
+          </div>
+
+          {/* List for remaining players */}
+          <div className="space-y-3">
+            {sortedScores.map((player, index) => (
+              <PlayerScore key={player.username} player={player} index={index} />
+            ))}
+          </div>
 
           {gameCode && onReturnToRoom && (
-            <div className="mt-6 flex justify-center">
+            <div className="mt-6 flex flex-col items-center gap-3">
               <Button
                 onClick={onReturnToRoom}
                 size="lg"
-                className="bg-gradient-to-r from-cyan-500 to-purple-600 hover:from-cyan-400 hover:to-purple-500 hover:shadow-[0_0_20px_rgba(6,182,212,0.5)] font-bold text-lg px-8"
+                className="bg-gradient-to-r from-cyan-500 to-purple-600 hover:from-cyan-400 hover:to-purple-500 hover:shadow-[0_0_20px_rgba(6,182,212,0.5)] font-bold text-lg px-8 w-full sm:w-auto"
               >
-                חזור לחדר הפעיל
+                חזור לחדר הפעיל {isAutoReplayCancelled ? '' : `(${autoReplayCountdown})`}
               </Button>
+
+              {!isAutoReplayCancelled && (
+                <Button
+                  variant="ghost"
+                  onClick={() => setIsAutoReplayCancelled(true)}
+                  className="text-gray-400 hover:text-white"
+                >
+                  בטל מעבר אוטומטי
+                </Button>
+              )}
             </div>
           )}
         </Card>

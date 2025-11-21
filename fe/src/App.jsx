@@ -6,6 +6,7 @@ import JoinView from './JoinView';
 import ResultsPage from './ResultsPage.jsx';
 import { WebSocketContext } from './utils/WebSocketContext';
 import { saveSession, getSession, clearSession } from './utils/session';
+import { ThemeProvider } from './utils/ThemeContext';
 
 const WS_CONFIG = {
   MAX_RECONNECT_ATTEMPTS: 10,
@@ -126,7 +127,7 @@ const useWebSocketConnection = () => {
       ws.onclose = (event) => {
         isConnectingRef.current = false;
         stopHeartbeat();
-        
+
         // Reset global flags if this was the global instance
         if (ws === globalWsInstance) {
           globalWsInstance = null;
@@ -168,7 +169,7 @@ const useWebSocketConnection = () => {
       clearTimeout(reconnectTimeoutRef.current);
     }
     stopHeartbeat();
-    
+
     // Only close if this is the global instance
     if (wsRef.current && wsRef.current === globalWsInstance) {
       if (wsRef.current.readyState !== WebSocket.CLOSED) {
@@ -177,13 +178,15 @@ const useWebSocketConnection = () => {
       globalWsInstance = null;
       globalWsInitialized = false;
     }
-    
+
     hasInitializedRef.current = false;
     isConnectingRef.current = false;
   }, [stopHeartbeat]);
 
   return { wsRef, connectWebSocket, setMessageHandler, cleanup, connectionError };
 };
+
+
 
 const App = () => {
   const urlParams = new URLSearchParams(window.location.search);
@@ -239,7 +242,7 @@ const App = () => {
           setIsActive(true);
           setError('');
           setAttemptingReconnect(false);
-          
+
           // Save username only if it's a player (not host)
           if (!isHostResponse && username) {
             localStorage.setItem('boggle_username', username);
@@ -460,9 +463,11 @@ const App = () => {
   };
 
   return (
-    <WebSocketContext.Provider value={ws}>
-      {renderView()}
-    </WebSocketContext.Provider>
+    <ThemeProvider>
+      <WebSocketContext.Provider value={ws}>
+        {renderView()}
+      </WebSocketContext.Provider>
+    </ThemeProvider>
   );
 };
 
