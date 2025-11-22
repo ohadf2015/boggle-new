@@ -278,8 +278,9 @@ const addUserToGame = (gameCode, username, ws) => {
     }
 
     const usersList = Object.keys(game.users);
-    console.log(`[JOIN] Notifying host about updated users:`, usersList);
+    console.log(`[JOIN] Notifying host and players about updated users:`, usersList);
     sendHostAMessage(gameCode, { action: "updateUsers", users: usersList });
+    sendAllPlayerAMessage(gameCode, { action: "updateUsers", users: usersList });
     broadcastLeaderboard(gameCode);
 
     // Save updated game state to Redis
@@ -795,9 +796,13 @@ const handleDisconnect = (ws) => {
       // Remove from active users immediately so they disappear from the list
       delete games[gameCode].users[username];
 
-      // Notify host of updated user list immediately
+      // Notify host and all players of updated user list immediately
       const remainingPlayers = Object.keys(games[gameCode].users);
       sendHostAMessage(gameCode, {
+        action: "updateUsers",
+        users: remainingPlayers
+      });
+      sendAllPlayerAMessage(gameCode, {
         action: "updateUsers",
         users: remainingPlayers
       });
