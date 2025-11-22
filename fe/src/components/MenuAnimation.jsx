@@ -35,7 +35,7 @@ const MenuAnimation = ({ className = '' }) => {
         <div
             className={`fixed inset-0 pointer-events-none overflow-hidden ${className}`}
             style={{
-                zIndex: -1,
+                zIndex: 0,
                 direction: 'ltr' // Force LTR to prevent RTL interference with positioning
             }}
         >

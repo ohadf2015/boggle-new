@@ -341,7 +341,7 @@ const PlayerView = ({ onShowResults }) => {
           <Button
             onClick={handleExitRoom}
             size="sm"
-            className="shadow-lg hover:scale-105 transition-transform bg-red-500/80 hover:bg-red-500 border border-red-400/30 hover:shadow-[0_0_15px_rgba(239,68,68,0.5)]"
+            className="shadow-lg hover:scale-105 transition-transform bg-red-500 hover:bg-red-600 border border-red-400/30 hover:shadow-[0_0_15px_rgba(239,68,68,0.5)]"
           >
             <FaDoorOpen className="mr-2" />
             {t('playerView.exit')}
@@ -429,7 +429,7 @@ const PlayerView = ({ onShowResults }) => {
         <Button
           onClick={handleExitRoom}
           size="sm"
-          className="shadow-lg hover:scale-105 transition-transform bg-red-500/80 hover:bg-red-500 border border-red-400/30 hover:shadow-[0_0_15px_rgba(239,68,68,0.5)]"
+          className="shadow-lg hover:scale-105 transition-transform bg-red-500 hover:bg-red-600 border border-red-400/30 hover:shadow-[0_0_15px_rgba(239,68,68,0.5)]"
         >
           <FaDoorOpen className="mr-2" />
           {t('playerView.exit')}
@@ -446,8 +446,8 @@ const PlayerView = ({ onShowResults }) => {
           className="max-w-md mx-auto mb-4"
         >
           <Card className={`${remainingTime < 30
-            ? 'bg-gradient-to-r from-red-500/80 to-orange-500/80 border-red-400/50 shadow-[0_0_20px_rgba(239,68,68,0.3)]'
-            : 'bg-gradient-to-r from-teal-500/80 to-cyan-500/80 border-teal-400/50 shadow-[0_0_20px_rgba(20,184,166,0.3)]'}
+            ? 'bg-gradient-to-r from-red-500 to-orange-500 border-red-400/50 shadow-[0_0_20px_rgba(239,68,68,0.3)]'
+            : 'bg-gradient-to-r from-teal-500 to-cyan-500 border-teal-400/50 shadow-[0_0_20px_rgba(20,184,166,0.3)]'}
                           border backdrop-blur-md shadow-2xl`}
           >
             <CardContent className="p-4 text-center">

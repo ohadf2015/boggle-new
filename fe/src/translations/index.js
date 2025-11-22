@@ -99,6 +99,7 @@ export const translations = {
       shareWhatsapp: 'Share WhatsApp',
       qrCode: 'QR Code',
       scanQr: 'Scan QR code to join or use code',
+      autoValidated: 'Auto-validated',
     },
     playerView: {
       waitingForHost: 'Waiting for host to start...',
@@ -297,6 +298,7 @@ export const translations = {
       shareWhatsapp: 'שתף בוואטסאפ',
       qrCode: 'ברקוד',
       scanQr: 'סרוק את הקוד כדי להצטרף למשחק או השתמש בקוד',
+      autoValidated: 'אומתה אוטומטית',
     },
     playerView: {
       waitingForHost: 'ממתין למארח שיתחיל...',
