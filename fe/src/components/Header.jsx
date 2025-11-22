@@ -3,6 +3,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useTheme } from '../utils/ThemeContext';
 import { useLanguage } from '../contexts/LanguageContext';
 import { FaSun, FaMoon, FaGlobe, FaChevronDown } from 'react-icons/fa';
+import { Button } from './ui/button';
+import { cn } from '../lib/utils';
 
 const Header = ({ className = '' }) => {
     const { theme, toggleTheme } = useTheme();
@@ -87,22 +89,23 @@ const Header = ({ className = '' }) => {
                 <div className="flex items-center gap-3">
                     {/* Language Selector */}
                     <div className="relative">
-                        <button
+                        <Button
+                            variant="outline"
+                            size="sm"
                             onClick={() => setShowLanguageMenu(!showLanguageMenu)}
                             onBlur={() => setTimeout(() => setShowLanguageMenu(false), 200)}
-                            className={`
-                                flex items-center gap-2 px-3 py-2 rounded-full transition-all duration-300
-                                ${isDarkMode
-                                    ? "bg-slate-800 text-cyan-300 hover:bg-slate-700 hover:shadow-[0_0_15px_rgba(6,182,212,0.3)] border border-slate-700"
-                                    : "bg-white text-cyan-600 hover:bg-gray-50 hover:shadow-[0_0_15px_rgba(6,182,212,0.2)] border border-gray-200"
-                                }
-                            `}
+                            className={cn(
+                                "flex items-center gap-2 rounded-full transition-all duration-300",
+                                isDarkMode
+                                    ? "bg-slate-800 text-cyan-300 hover:bg-slate-700 hover:shadow-[0_0_15px_rgba(6,182,212,0.3)] border-slate-700"
+                                    : "bg-white text-cyan-600 hover:bg-gray-50 hover:shadow-[0_0_15px_rgba(6,182,212,0.2)] border-gray-200"
+                            )}
                             aria-label={t('common.selectUILanguage')}
                         >
                             <FaGlobe size={18} />
                             <span className="text-xl">{currentLang.flag}</span>
                             <FaChevronDown size={12} className={showLanguageMenu ? 'rotate-180 transition-transform' : 'transition-transform'} />
-                        </button>
+                        </Button>
 
                         {/* Language Dropdown */}
                         <AnimatePresence>
@@ -121,29 +124,29 @@ const Header = ({ className = '' }) => {
                                     `}
                                 >
                                     {languages.map((lang) => (
-                                        <button
+                                        <Button
                                             key={lang.code}
+                                            variant="ghost"
                                             onClick={() => {
                                                 setLanguage(lang.code);
                                                 setShowLanguageMenu(false);
                                             }}
-                                            className={`
-                                                w-full flex items-center gap-3 px-4 py-3 transition-colors
-                                                ${language === lang.code
+                                            className={cn(
+                                                "w-full justify-start gap-3 transition-colors",
+                                                language === lang.code
                                                     ? isDarkMode
                                                         ? "bg-cyan-500/20 text-cyan-300"
                                                         : "bg-cyan-50 text-cyan-700"
                                                     : isDarkMode
-                                                        ? "text-gray-300 hover:bg-slate-700"
-                                                        : "text-gray-700 hover:bg-gray-50"
-                                                }
-                                                ${lang.code === languages[0].code ? 'rounded-t-lg' : ''}
-                                                ${lang.code === languages[languages.length - 1].code ? 'rounded-b-lg' : ''}
-                                            `}
+                                                        ? "text-gray-300 hover:bg-slate-700 hover:text-gray-300"
+                                                        : "text-gray-700 hover:bg-gray-50 hover:text-gray-700",
+                                                lang.code === languages[0].code ? 'rounded-t-lg' : '',
+                                                lang.code === languages[languages.length - 1].code ? 'rounded-b-lg' : ''
+                                            )}
                                         >
                                             <span className="text-2xl">{lang.flag}</span>
                                             <span className="font-medium">{lang.name}</span>
-                                        </button>
+                                        </Button>
                                     ))}
                                 </motion.div>
                             )}
@@ -151,19 +154,20 @@ const Header = ({ className = '' }) => {
                     </div>
 
                     {/* Theme Toggle */}
-                    <button
+                    <Button
+                        variant="outline"
+                        size="icon"
                         onClick={toggleTheme}
-                        className={`
-                            p-3 rounded-full transition-all duration-300
-                            ${isDarkMode
-                                ? "bg-slate-800 text-yellow-400 hover:bg-slate-700 hover:shadow-[0_0_15px_rgba(250,204,21,0.4)] border border-slate-700"
-                                : "bg-white text-orange-500 hover:bg-gray-50 hover:shadow-[0_0_15px_rgba(249,115,22,0.3)] border border-gray-200"
-                            }
-                        `}
+                        className={cn(
+                            "rounded-full transition-all duration-300",
+                            isDarkMode
+                                ? "bg-slate-800 text-yellow-400 hover:bg-slate-700 hover:shadow-[0_0_15px_rgba(250,204,21,0.4)] border-slate-700"
+                                : "bg-white text-orange-500 hover:bg-gray-50 hover:shadow-[0_0_15px_rgba(249,115,22,0.3)] border-gray-200"
+                        )}
                         aria-label="Toggle theme"
                     >
                         {isDarkMode ? <FaMoon size={20} /> : <FaSun size={20} />}
-                    </button>
+                    </Button>
                 </div>
             </div>
         </motion.header>
