@@ -156,6 +156,8 @@ const PlayerView = ({ onShowResults }) => {
           setRemainingTime(message.remainingTime);
           if (message.remainingTime === 0) {
             setGameActive(false);
+            setWaitingForResults(true);
+            toast(t('playerView.gameOver'), { icon: '⏱️', duration: 4000 });
           }
           break;
 

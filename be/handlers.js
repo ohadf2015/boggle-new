@@ -1,140 +1,9 @@
 const { saveGameState, deleteGameState } = require('./redisClient');
 const dictionary = require('./dictionary');
-
-const games = {};
-// Use Map instead of plain objects to properly store WebSocket as keys
-const gameWs = new Map();
-const wsUsername = new Map();
-
-// Normalize Hebrew letters - convert final forms to regular forms
-function normalizeHebrewLetter(letter) {
-  const finalToRegular = {
-    'ץ': 'צ',
-    'ך': 'כ',
-    'ם': 'מ',
-    'ן': 'נ',
-    'ף': 'פ'
-  };
-  return finalToRegular[letter] || letter;
-}
-
-// Normalize an entire Hebrew word
-function normalizeHebrewWord(word) {
-  return word.split('').map(normalizeHebrewLetter).join('');
-}
-
-// Word validation: Check if a word exists on the board as a valid path
-function isWordOnBoard(word, board) {
-  if (!word || !board || board.length === 0) return false;
-
-  const rows = board.length;
-  const cols = board[0].length;
-  // Normalize and lowercase the word for comparison
-  const wordNormalized = normalizeHebrewWord(word.toLowerCase());
-
-  // Find all starting positions (cells with the first letter)
-  const startPositions = [];
-  for (let i = 0; i < rows; i++) {
-    for (let j = 0; j < cols; j++) {
-      const cellNormalized = normalizeHebrewLetter(board[i][j].toLowerCase());
-      if (cellNormalized === wordNormalized[0]) {
-        startPositions.push([i, j]);
-      }
-    }
-  }
-
-  // Try to find the word starting from each position
-  for (const [startRow, startCol] of startPositions) {
-    if (searchWord(board, wordNormalized, startRow, startCol, 0, new Set())) {
-      return true;
-    }
-  }
-
-  return false;
-}
-
-// Helper function to search for word using DFS
-function searchWord(board, word, row, col, index, visited) {
-  // Base case: found the entire word
-  if (index === word.length) {
-    return true;
-  }
-
-  // Check bounds
-  if (row < 0 || row >= board.length || col < 0 || col >= board[0].length) {
-    return false;
-  }
-
-  // Check if already visited this cell
-  const cellKey = `${row},${col}`;
-  if (visited.has(cellKey)) {
-    return false;
-  }
-
-  // Check if current cell matches current letter (with normalization)
-  const cellNormalized = normalizeHebrewLetter(board[row][col].toLowerCase());
-  if (cellNormalized !== word[index]) {
-    return false;
-  }
-
-  // Mark as visited
-  visited.add(cellKey);
-
-  // Search in all 8 directions (horizontal, vertical, diagonal)
-  const directions = [
-    [-1, -1], [-1, 0], [-1, 1],  // top-left, top, top-right
-    [0, -1],           [0, 1],   // left, right
-    [1, -1],  [1, 0],  [1, 1]    // bottom-left, bottom, bottom-right
-  ];
-
-  for (const [dx, dy] of directions) {
-    if (searchWord(board, word, row + dx, col + dy, index + 1, new Set(visited))) {
-      return true;
-    }
-  }
-
-  return false;
-}
-
-// Function to get active rooms (show all rooms while host is present)
-const getActiveRooms = () => {
-  return Object.keys(games).map(gameCode => ({
-    gameCode,
-    roomName: games[gameCode].roomName || `Room ${gameCode}`,
-    playerCount: Object.keys(games[gameCode].users).length,
-    gameState: games[gameCode].gameState,
-    language: games[gameCode].language || 'en', // Default to English if not set
-  })); // Show all rooms as long as they exist (host hasn't left)
-};
-
-// Achievement definitions (Hebrew) - Expanded
-const ACHIEVEMENTS = {
-  FIRST_BLOOD: { name: 'דם ראשון', description: 'ראשון למצוא מילה', icon: '🎯' },
-  SPEED_DEMON: { name: 'שד המהירות', description: 'מצא 10 מילים ב-2 דקות', icon: '⚡' },
-  WORD_MASTER: { name: 'אדון המילים', description: 'מצא מילה בת 7+ אותיות', icon: '📚' },
-  COMBO_KING: { name: 'מלך הקומבו', description: '5 מילים ברצף', icon: '🔥' },
-  PERFECTIONIST: { name: 'פרפקציוניסט', description: 'כל המילים תקינות', icon: '✨' },
-  LEXICON: { name: 'לקסיקון', description: 'מצא 20+ מילים', icon: '🏆' },
-  WORDSMITH: { name: 'צורף מילים', description: 'מצא 15 מילים תקינות', icon: '🎓' },
-  QUICK_THINKER: { name: 'חושב מהיר', description: 'מצא מילה בתוך 10 שניות', icon: '💨' },
-  LONG_HAULER: { name: 'מרתונאי', description: 'מצא מילה בדקה האחרונה', icon: '🏃' },
-  DIVERSE_VOCABULARY: { name: 'אוצר מילים מגוון', description: 'מצא מילים באורכים שונים', icon: '🌈' },
-  DOUBLE_TROUBLE: { name: 'צמד מנצח', description: 'מצא 2 מילים בתוך 5 שניות', icon: '⚡⚡' },
-  TREASURE_HUNTER: { name: 'צייד אוצרות', description: 'מצא מילה נדירה (8+ אותיות)', icon: '💎' },
-};
-
-// Calculate score based on word length with bonus for longer words (whole numbers)
-const calculateWordScore = (word) => {
-    const length = word.length;
-    if (length === 1) return 0; // Single letters not allowed
-    if (length === 2) return 1; // 2-letter words: 1 point
-    if (length === 3) return 1; // 3-letter words: 1 point
-    if (length === 4) return 2; // 4-letter words: 2 points
-    if (length === 5) return 3; // 5-letter words: 3 points
-    if (length === 6) return 5; // 6-letter words: 5 points
-    if (length === 7) return 7; // 7-letter words: 7 points
-    return 10 + (length - 8) * 3; // 8+ letters: 10, 13, 16, 19...
-};
+const { isWordOnBoard } = require('./modules/wordValidator');
+const { calculateWordScore } = require('./modules/scoringEngine');
+const { ACHIEVEMENTS, checkLiveAchievements, awardFinalAchievements } = require('./modules/achievementManager');
+const { games, gameWs, wsUsername, getActiveRooms, getGame, getUsernameFromWs, getWsHostFromGameCode, getWsFromUsername, getGameCodeFromUsername, deleteGame: deleteGameFromState } = require('./modules/gameStateManager');
 
 const setNewGame = (gameCode, host, roomName, language = 'en') => {
     console.log(`[CREATE] Creating game - gameCode: ${gameCode}, roomName: ${roomName}, language: ${language}`);
@@ -509,72 +378,10 @@ const handleSendAnswer = (ws, foundWords) => {
   sendHostAMessage(gameCode, { action: "updateScores", username, foundWords });
 }
 
-// Check and award LIVE achievements during gameplay (selective achievements only)
-const checkLiveAchievements = (gameCode, username, word, timeSinceStart) => {
+// Check and award LIVE achievements during gameplay - using module
+const checkAndBroadcastLiveAchievements = (gameCode, username, word, timeSinceStart) => {
   const game = games[gameCode];
-  const achievements = game.playerAchievements[username];
-  const newAchievements = [];
-
-  // First Blood - first word in the game (LIVE)
-  if (!game.firstWordFound && !achievements.includes('FIRST_BLOOD')) {
-    game.firstWordFound = true;
-    achievements.push('FIRST_BLOOD');
-    newAchievements.push(ACHIEVEMENTS.FIRST_BLOOD);
-  }
-
-  // Word Master - 7+ letter word (LIVE)
-  if (word.length >= 7 && !achievements.includes('WORD_MASTER')) {
-    achievements.push('WORD_MASTER');
-    newAchievements.push(ACHIEVEMENTS.WORD_MASTER);
-  }
-
-  // Treasure Hunter - 8+ letter word (LIVE)
-  if (word.length >= 8 && !achievements.includes('TREASURE_HUNTER')) {
-    achievements.push('TREASURE_HUNTER');
-    newAchievements.push(ACHIEVEMENTS.TREASURE_HUNTER);
-  }
-
-  // Quick Thinker - word within 10 seconds (LIVE)
-  if (timeSinceStart <= 10 && !achievements.includes('QUICK_THINKER')) {
-    achievements.push('QUICK_THINKER');
-    newAchievements.push(ACHIEVEMENTS.QUICK_THINKER);
-  }
-
-  // Speed Demon - 10 words in 2 minutes (LIVE)
-  if (game.playerWords[username].length >= 10 && timeSinceStart <= 120 && !achievements.includes('SPEED_DEMON')) {
-    achievements.push('SPEED_DEMON');
-    newAchievements.push(ACHIEVEMENTS.SPEED_DEMON);
-  }
-
-  // Combo King - multiples of 5 words (LIVE)
-  if (game.playerWords[username].length >= 5 &&
-      game.playerWords[username].length % 5 === 0 &&
-      !achievements.includes('COMBO_KING')) {
-    achievements.push('COMBO_KING');
-    newAchievements.push(ACHIEVEMENTS.COMBO_KING);
-  }
-
-  // Wordsmith - 15 words (LIVE)
-  if (game.playerWords[username].length >= 15 && !achievements.includes('WORDSMITH')) {
-    achievements.push('WORDSMITH');
-    newAchievements.push(ACHIEVEMENTS.WORDSMITH);
-  }
-
-  // Lexicon - 20+ words (LIVE)
-  if (game.playerWords[username].length >= 20 && !achievements.includes('LEXICON')) {
-    achievements.push('LEXICON');
-    newAchievements.push(ACHIEVEMENTS.LEXICON);
-  }
-
-  // Double Trouble - 2 words within 5 seconds (LIVE)
-  const playerWordDetails = game.playerWordDetails[username];
-  if (playerWordDetails.length >= 2 && !achievements.includes('DOUBLE_TROUBLE')) {
-    const lastTwo = playerWordDetails.slice(-2);
-    if (lastTwo[1].timeSinceStart - lastTwo[0].timeSinceStart <= 5) {
-      achievements.push('DOUBLE_TROUBLE');
-      newAchievements.push(ACHIEVEMENTS.DOUBLE_TROUBLE);
-    }
-  }
+  const newAchievements = checkLiveAchievements(game, username, word, timeSinceStart);
 
   // Broadcast new achievements to the player who unlocked them
   if (newAchievements.length > 0) {
@@ -700,7 +507,7 @@ const handleWordSubmission = (ws, word) => {
   }
 
   // Check for live achievements
-  checkLiveAchievements(gameCode, username, word, timeSinceStart);
+  checkAndBroadcastLiveAchievements(gameCode, username, word, timeSinceStart);
 
   // Update leaderboard for everyone
   broadcastLeaderboard(gameCode);
@@ -762,22 +569,6 @@ const sendHostAMessage = (gameCode, message) => {
   }
 }
 
-const getGame = (gameCode) => games[gameCode];
-
-const getUsernameFromWs = (ws) => wsUsername.get(ws);
-
-const getWsHostFromGameCode = (gameCode) => games[gameCode].host;
-
-const getWsFromUsername = (gameCode, username) => games[gameCode].users[username];
-
-const getGameCodeFromUsername = (username) => {
-  for (const gameCode in games) {
-    if (games[gameCode].users[username]) {
-      return gameCode;
-    }
-  }
-  return null;
-}
 
 // Cleanup when a connection closes
 const handleDisconnect = (ws) => {
@@ -1025,92 +816,8 @@ const handleValidateWords = (host, validations, letterGrid) => {
     }
   });
 
-  // NOW check and award achievements based on validated words
-  Object.keys(games[gameCode].users).forEach(username => {
-    // Safety check: ensure player data exists
-    if (!games[gameCode].playerWordDetails[username]) {
-      console.warn(`Player ${username} missing word details during achievement calculation`);
-      return;
-    }
-
-    const allWords = games[gameCode].playerWordDetails[username];
-    const validWords = allWords.filter(w => w.validated === true);
-
-    // First Blood - first word in the game
-    if (validWords.length > 0 && !games[gameCode].firstWordFound) {
-      const firstWordEver = Object.keys(games[gameCode].users)
-        .map(u => games[gameCode].playerWordDetails[u])
-        .flat()
-        .filter(w => w.validated === true)
-        .sort((a, b) => a.timestamp - b.timestamp)[0];
-
-      if (firstWordEver && allWords.includes(firstWordEver)) {
-        games[gameCode].playerAchievements[username].push('FIRST_BLOOD');
-        games[gameCode].firstWordFound = true;
-      }
-    }
-
-    // Word Master - 7+ letter word
-    if (validWords.some(w => w.word.length >= 7)) {
-      games[gameCode].playerAchievements[username].push('WORD_MASTER');
-    }
-
-    // Speed Demon - 10 valid words in 2 minutes
-    const wordsIn2Min = validWords.filter(w => w.timeSinceStart <= 120);
-    if (wordsIn2Min.length >= 10) {
-      games[gameCode].playerAchievements[username].push('SPEED_DEMON');
-    }
-
-    // Lexicon - 20+ valid words
-    if (validWords.length >= 20) {
-      games[gameCode].playerAchievements[username].push('LEXICON');
-    }
-
-    // Combo King - 5+ valid words (multiples of 5)
-    if (validWords.length >= 5 && validWords.length % 5 === 0) {
-      games[gameCode].playerAchievements[username].push('COMBO_KING');
-    }
-
-    // Perfectionist - all words valid
-    if (allWords.length > 0 && allWords.every(w => w.validated === true)) {
-      games[gameCode].playerAchievements[username].push('PERFECTIONIST');
-    }
-
-    // Wordsmith - 15+ valid words
-    if (validWords.length >= 15) {
-      games[gameCode].playerAchievements[username].push('WORDSMITH');
-    }
-
-    // Quick Thinker - found a word within 10 seconds of game start
-    if (validWords.some(w => w.timeSinceStart <= 10)) {
-      games[gameCode].playerAchievements[username].push('QUICK_THINKER');
-    }
-
-    // Long Hauler - found a word in the last minute
-    const gameTimerSeconds = games[gameCode].timerSeconds || 180;
-    if (validWords.some(w => w.timeSinceStart >= gameTimerSeconds - 60)) {
-      games[gameCode].playerAchievements[username].push('LONG_HAULER');
-    }
-
-    // Diverse Vocabulary - found words of at least 4 different lengths
-    const uniqueLengths = new Set(validWords.map(w => w.word.length));
-    if (uniqueLengths.size >= 4) {
-      games[gameCode].playerAchievements[username].push('DIVERSE_VOCABULARY');
-    }
-
-    // Double Trouble - found 2 words within 5 seconds of each other
-    for (let i = 1; i < validWords.length; i++) {
-      if (validWords[i].timeSinceStart - validWords[i-1].timeSinceStart <= 5) {
-        games[gameCode].playerAchievements[username].push('DOUBLE_TROUBLE');
-        break;
-      }
-    }
-
-    // Treasure Hunter - found an 8+ letter word
-    if (validWords.some(w => w.word.length >= 8)) {
-      games[gameCode].playerAchievements[username].push('TREASURE_HUNTER');
-    }
-  });
+  // Award final achievements based on validated words - using module
+  awardFinalAchievements(games[gameCode], Object.keys(games[gameCode].users));
 
   // Calculate final scores with all validated data - only for existing players
   const finalScores = Object.keys(games[gameCode].playerScores)

@@ -14,6 +14,8 @@ import { AchievementBadge } from '../components/AchievementBadge';
 import GridComponent from '../components/GridComponent';
 import ShareButton from '../components/ShareButton';
 import SlotMachineText from '../components/SlotMachineText';
+import ResultsPodium from '../components/results/ResultsPodium';
+import ResultsPlayerCard from '../components/results/ResultsPlayerCard';
 import '../style/animation.scss';
 import { generateRandomTable, embedWordInGrid } from '../utils/utils';
 import { useWebSocket } from '../utils/WebSocketContext';
@@ -427,8 +429,8 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp }) => {
                           <Checkbox
                             checked={isValid}
                             onCheckedChange={() => toggleWordValidation(null, item.word)}
-                            disabled={isDuplicate || isAutoValidated}
-                            className={cn((isDuplicate || isAutoValidated) && "opacity-50")}
+                            disabled={isDuplicate}
+                            className={cn(isDuplicate && "opacity-50")}
                           />
                           <div className="flex items-center gap-2 flex-1">
                             <span className={cn(
@@ -444,7 +446,7 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp }) => {
                             )}
                             {isAutoValidated && !isDuplicate && (
                               <Badge variant="success" className="bg-green-500 text-white">
-                                ✓ אומת
+                                ✓ {t('hostView.autoValidated') || 'Auto-validated'}
                               </Badge>
                             )}
                             {item.playerCount === 1 && (
@@ -474,84 +476,27 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp }) => {
 
       {/* Final Scores Modal */}
       <Dialog open={!!finalScores} onOpenChange={() => setFinalScores(null)}>
-        <DialogContent className="max-w-3xl max-h-[80vh] overflow-auto">
+        <DialogContent className="max-w-5xl max-h-[90vh] overflow-auto bg-gradient-to-b from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800">
           <DialogHeader>
-            <DialogTitle className="text-center text-3xl sm:text-4xl text-yellow-500 font-bold flex items-center justify-center gap-2">
-              <FaTrophy /> {t('hostView.finalScores')}
+            <DialogTitle className="text-center text-3xl sm:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 to-orange-500 flex items-center justify-center gap-3">
+              <FaTrophy className="text-yellow-500" />
+              {t('hostView.finalScores')}
+              <FaTrophy className="text-yellow-500" />
             </DialogTitle>
           </DialogHeader>
-          <div className="space-y-3">
-            {finalScores && finalScores.map((player, index) => (
-              <motion.div
-                key={player.username}
-                initial={{ x: -50, opacity: 0 }}
-                animate={{ x: 0, opacity: 1 }}
-                transition={{ delay: index * 0.2 }}
-              >
-                <Card className={cn(
-                  "p-4",
-                  index === 0 && "bg-gradient-to-r from-yellow-400 to-orange-500 text-white scale-105 shadow-xl",
-                  index === 1 && "bg-gradient-to-r from-gray-300 to-gray-400 shadow-lg",
-                  index === 2 && "bg-gradient-to-r from-orange-400 to-orange-600 text-white shadow-lg"
-                )}>
-                  <div className="flex justify-between items-center mb-3">
-                    <h3 className="text-xl font-bold">
-                      {index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : `#${index + 1}`} {player.username}
-                    </h3>
-                    <div className="text-3xl font-bold text-white mb-2">
-                      {player.score}
-                    </div>
-                    <p className="text-sm mb-1 text-white/80">
-                      {t('hostView.words')}: {player.wordCount} {player.validWordCount !== undefined && `(${player.validWordCount} valid)`}
-                    </p>
 
-                    {player.longestWord && (
-                      <p className="text-sm mb-2">
-                        {t('playerView.longestWord')}: <strong>{player.longestWord}</strong>
-                      </p>
-                    )}
-                  </div>
+          <div className="space-y-6">
+            {/* Podium */}
+            {finalScores && finalScores.length > 0 && (
+              <ResultsPodium sortedScores={finalScores} />
+            )}
 
-                  {/* Word Visualization with colors */}
-                  {player.allWords && player.allWords.length > 0 && (
-                    <div className="mt-3">
-                      <p className="text-sm font-bold mb-2">{t('hostView.words')}:</p>
-                      <div className="flex flex-wrap gap-2">
-                        {player.allWords.map((wordObj, i) => (
-                          <Badge
-                            key={i}
-                            className={cn(
-                              "font-bold",
-                              wordObj.validated
-                                ? "text-white"
-                                : "bg-gray-400 text-white opacity-60"
-                            )}
-                            style={{
-                              backgroundColor: wordObj.validated
-                                ? ['#FF6B6B', '#4ECDC4', '#45B7D1', '#FFA07A', '#98D8C8', '#F7DC6F', '#BB8FCE'][i % 7]
-                                : undefined
-                            }}
-                          >
-                            {wordObj.word} {wordObj.validated ? `(${wordObj.score})` : '(✗)'}
-                          </Badge>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-
-                  {player.achievements && player.achievements.length > 0 && (
-                    <div className="mt-3">
-                      <p className="text-sm font-bold mb-2">{t('hostView.achievements')}:</p>
-                      <div className="flex flex-wrap gap-2">
-                        {player.achievements.map((ach, i) => (
-                          <AchievementBadge key={i} achievement={ach} index={i} />
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                </Card>
-              </motion.div>
-            ))}
+            {/* Detailed Player Cards */}
+            <div className="space-y-3 max-w-3xl mx-auto">
+              {finalScores && finalScores.map((player, index) => (
+                <ResultsPlayerCard key={player.username} player={player} index={index} />
+              ))}
+            </div>
           </div>
           <DialogFooter className="flex-col sm:flex-row gap-2">
             <Button
