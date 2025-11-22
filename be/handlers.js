@@ -404,6 +404,39 @@ const handleEndGame = (host) => {
     action: "showValidation",
     playerWords: allPlayerWords
   });
+
+  // Start auto-validation timeout in case host is AFK (60 seconds)
+  games[gameCode].validationTimeout = setTimeout(() => {
+    // Check if game still exists and hasn't been validated yet
+    if (games[gameCode] && games[gameCode].gameState === 'ended') {
+      console.log(`[AUTO_VALIDATION] Host AFK for game ${gameCode}, auto-validating all words as valid`);
+
+      // Auto-validate all words as true
+      const autoValidations = [];
+      const uniqueWords = new Set();
+
+      Object.keys(games[gameCode].users).forEach(username => {
+        if (games[gameCode].playerWordDetails[username]) {
+          games[gameCode].playerWordDetails[username].forEach(wordDetail => {
+            uniqueWords.add(wordDetail.word);
+          });
+        }
+      });
+
+      uniqueWords.forEach(word => {
+        autoValidations.push({ word, isValid: true });
+      });
+
+      // Call the validation handler with all words marked as valid
+      handleValidateWords(games[gameCode].host, autoValidations, games[gameCode].letterGrid);
+
+      // Notify host that auto-validation occurred
+      sendHostAMessage(gameCode, {
+        action: "autoValidationOccurred",
+        message: "Auto-validation completed due to inactivity"
+      });
+    }
+  }, 60000); // 60 seconds
 }
 
 const handleSendAnswer = (ws, foundWords) => {
@@ -571,45 +604,20 @@ const handleWordSubmission = (ws, word) => {
     }
   }
 
-  // Notify OTHER players with psychological hints (no actual words shown!)
-  // Generate hint based on word characteristics and player streak
+  // Send general notification to host (without showing the actual word)
   const wordCount = games[gameCode].playerWords[username].length;
-  const recentWords = games[gameCode].playerWordDetails[username].slice(-3);
-  const isOnStreak = recentWords.length >= 3 &&
-    recentWords.every((w, i) => i === 0 || w.timestamp - recentWords[i-1].timestamp < 10000);
-
-  let hint = '';
-  if (word.length >= 8) {
-    hint = '📏 מילה ארוכה!';
-  } else if (word.length >= 6) {
-    hint = '💪 מילה חזקה!';
-  } else if (isOnStreak) {
-    hint = '🔥 במסע!';
-  } else if (wordCount % 5 === 0 && wordCount > 0) {
-    hint = '⭐ רצף מדהים!';
-  } else if (timeSinceStart < 30) {
-    hint = '⚡ התחלה מהירה!';
-  } else {
-    hint = '✨ מילה חדשה!';
-  }
-
-  Object.keys(games[gameCode].users).forEach(otherUsername => {
-    if (otherUsername !== username) {
-      const otherWs = games[gameCode].users[otherUsername];
-      if (otherWs && otherWs.readyState === 1) {
-        try {
-          otherWs.send(JSON.stringify({
-            action: "playerFoundWord",
-            username,
-            hint, // Psychological hint instead of word
-          }));
-        } catch (error) {
-          console.error(`Error notifying player ${otherUsername}:`, error);
-        }
-      }
+  const hostWs = games[gameCode].host;
+  if (hostWs && hostWs.readyState === 1) {
+    try {
+      hostWs.send(JSON.stringify({
+        action: "playerFoundWord",
+        username,
+        wordCount
+      }));
+    } catch (error) {
+      console.error(`Error notifying host:`, error);
     }
-  });
-  // Note: Host is not in users list, so they won't receive any word notifications
+  }
 
   // Check for live achievements
   checkLiveAchievements(gameCode, username, word, timeSinceStart);
@@ -830,6 +838,12 @@ const handleValidateWords = (host, validations, letterGrid) => {
   }
 
   console.log(`Validating words for game ${gameCode}, ${validations.length} validations received`);
+
+  // Clear auto-validation timeout since host is validating manually
+  if (games[gameCode].validationTimeout) {
+    clearTimeout(games[gameCode].validationTimeout);
+    games[gameCode].validationTimeout = null;
+  }
 
   // Reset all scores before calculating - only for existing players
   Object.keys(games[gameCode].users).forEach(username => {
@@ -1062,6 +1076,11 @@ const handleCloseRoom = (host, gameCode) => {
     clearTimeout(games[gameCode].hostDisconnectTimeout);
   }
 
+  // Clear validation timeout if exists
+  if (games[gameCode].validationTimeout) {
+    clearTimeout(games[gameCode].validationTimeout);
+  }
+
   // Clear all player disconnect timeouts
   if (games[gameCode].disconnectedPlayers) {
     Object.values(games[gameCode].disconnectedPlayers).forEach(player => {
@@ -1100,6 +1119,12 @@ const handleResetGame = (host) => {
   if (games[gameCode].timerInterval) {
     clearInterval(games[gameCode].timerInterval);
     games[gameCode].timerInterval = null;
+  }
+
+  // Clear validation timeout if exists
+  if (games[gameCode].validationTimeout) {
+    clearTimeout(games[gameCode].validationTimeout);
+    games[gameCode].validationTimeout = null;
   }
 
   // Reset game state
