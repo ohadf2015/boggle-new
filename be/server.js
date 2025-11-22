@@ -7,6 +7,7 @@ const path = require("path");
 const cors = require("cors");
 const { initRedis, closeRedis } = require("./redisClient");
 const dictionary = require("./dictionary");
+const RateLimiter = require("./utils/rateLimiter");
 
 const app = express();
 const server = http.createServer(app);
@@ -67,7 +68,6 @@ const {
   handleCloseRoom,
   handleResetGame,
 } = require("./handlers");
-const RateLimiter = require("./utils/rateLimiter");
 
 // Heartbeat mechanism to keep connections alive
 const heartbeatInterval = 30000; // 30 seconds
