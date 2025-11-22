@@ -995,6 +995,30 @@ const broadcastActiveRooms = (wss) => {
   console.log(`[BROADCAST] Active rooms sent to ${sentCount} clients`);
 };
 
+// Handle chat messages in a room
+const handleChatMessage = (ws, gameCode, username, message, isHost) => {
+  if (!games[gameCode]) {
+    console.warn(`[CHAT] No game found for ${gameCode}`);
+    return;
+  }
+
+  console.log(`[CHAT] Message from ${username} in game ${gameCode}: ${message}`);
+
+  const chatMessage = {
+    action: 'chatMessage',
+    username,
+    message,
+    timestamp: Date.now(),
+    isHost: isHost || false
+  };
+
+  // Broadcast to all players
+  sendAllPlayerAMessage(gameCode, chatMessage);
+
+  // Send to host as well
+  sendHostAMessage(gameCode, chatMessage);
+};
+
 module.exports = {
   setNewGame,
   addUserToGame,
@@ -1013,4 +1037,5 @@ module.exports = {
   handleCloseRoom,
   handleResetGame,
   broadcastActiveRooms,
+  handleChatMessage,
 };
