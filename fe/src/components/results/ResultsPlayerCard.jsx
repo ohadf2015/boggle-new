@@ -5,16 +5,18 @@ import { Card } from '../ui/card';
 import { AchievementBadge } from '../AchievementBadge';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { cn } from '../../lib/utils';
+import { applyHebrewFinalLetters } from '../../utils/utils';
 
 const WORD_COLORS = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#FFA07A', '#98D8C8', '#F7DC6F', '#BB8FCE'];
 
 const WordChip = ({ wordObj, index }) => {
   const isDuplicate = wordObj.isDuplicate;
   const isValid = wordObj.validated;
+  const displayWord = applyHebrewFinalLetters(wordObj.word);
 
   const label = isDuplicate
-    ? `${wordObj.word} (כפול ❌)`
-    : `${wordObj.word} ${isValid ? `(${wordObj.score})` : '(✗)'}`;
+    ? `${displayWord} (כפול ❌)`
+    : `${displayWord} ${isValid ? `(${wordObj.score})` : '(✗)'}`;
 
   return (
     <Badge
@@ -106,7 +108,7 @@ const ResultsPlayerCard = ({ player, index }) => {
           <div className="mb-3 p-2 rounded-lg bg-gradient-to-r from-cyan-500/10 to-teal-500/10 border border-cyan-500/20">
             <p className="text-sm text-slate-700 dark:text-slate-300">
               <span className="font-bold text-cyan-600 dark:text-cyan-400">{t('playerView.longestWord')}:</span>
-              <span className="ml-2 text-lg font-bold text-cyan-700 dark:text-cyan-300">{player.longestWord}</span>
+              <span className="ml-2 text-lg font-bold text-cyan-700 dark:text-cyan-300">{applyHebrewFinalLetters(player.longestWord)}</span>
             </p>
           </div>
         )}

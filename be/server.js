@@ -67,6 +67,7 @@ const {
   handleDisconnect,
   handleCloseRoom,
   handleResetGame,
+  broadcastActiveRooms,
 } = require("./handlers");
 
 // Heartbeat mechanism to keep connections alive
@@ -123,11 +124,15 @@ wss.on("connection", (ws) => {
         case "createGame": {
           const { gameCode, roomName, language } = message;
           setNewGame(gameCode, ws, roomName, language);
+          // Broadcast updated rooms list to all clients
+          broadcastActiveRooms(wss);
           break;
         }
         case "join": {
           const { gameCode, username } = message;
           addUserToGame(gameCode, username, ws);
+          // Broadcast updated rooms list to all clients
+          broadcastActiveRooms(wss);
           break;
         }
         case "startGame": {
@@ -161,7 +166,8 @@ wss.on("connection", (ws) => {
         }
         case "closeRoom": {
           const { gameCode } = message;
-          handleCloseRoom(ws, gameCode);
+          handleCloseRoom(ws, gameCode, wss);
+          // Broadcast will happen inside handleCloseRoom after deletion
           break;
         }
         case "resetGame": {
@@ -183,7 +189,8 @@ wss.on("connection", (ws) => {
     if (ws.clientId) {
       rateLimiter.removeClient(ws.clientId);
     }
-    handleDisconnect(ws);
+    handleDisconnect(ws, wss);
+    // Broadcast will happen inside handleDisconnect if a game is deleted
   });
 
   ws.on("error", (error) => {

@@ -14,8 +14,9 @@ import { clearSession } from '../utils/session';
 import { useLanguage } from '../contexts/LanguageContext';
 import gsap from 'gsap';
 import GridComponent from '../components/GridComponent';
+import { applyHebrewFinalLetters } from '../utils/utils';
 
-const PlayerView = ({ onShowResults }) => {
+const PlayerView = ({ onShowResults, initialPlayers = [] }) => {
   const { t } = useLanguage();
   const ws = useWebSocket();
   const inputRef = useRef(null);
@@ -30,7 +31,7 @@ const PlayerView = ({ onShowResults }) => {
   const [remainingTime, setRemainingTime] = useState(null);
   const [waitingForResults, setWaitingForResults] = useState(false);
 
-  const [playersReady, setPlayersReady] = useState([]);
+  const [playersReady, setPlayersReady] = useState(initialPlayers);
   const [shufflingGrid, setShufflingGrid] = useState(null);
   const [gameLanguage, setGameLanguage] = useState(null);
 
@@ -585,7 +586,7 @@ const PlayerView = ({ onShowResults }) => {
                           'bg-slate-100 dark:bg-slate-700/50'}
                               hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors text-slate-900 dark:text-white`}
                     >
-                      <span>{foundWord}</span>
+                      <span>{applyHebrewFinalLetters(foundWord)}</span>
                       <Button
                         size="sm"
                         variant="ghost"

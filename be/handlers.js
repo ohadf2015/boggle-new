@@ -601,7 +601,7 @@ const sendHostAMessage = (gameCode, message) => {
 
 
 // Cleanup when a connection closes
-const handleDisconnect = (ws) => {
+const handleDisconnect = (ws, wss) => {
   const gameCode = gameWs.get(ws);
   const username = wsUsername.get(ws);
 
@@ -643,6 +643,9 @@ const handleDisconnect = (ws) => {
                 deleteGameState(gameCode).catch(err =>
                   console.error('[REDIS] Error deleting game state:', err)
                 );
+
+                // Broadcast updated rooms list
+                if (wss) broadcastActiveRooms(wss);
               }
             }, 500);
           }
@@ -881,7 +884,7 @@ const handleValidateWords = (host, validations, letterGrid) => {
 };
 
 // Handle host manually closing the room
-const handleCloseRoom = (host, gameCode) => {
+const handleCloseRoom = (host, gameCode, wss) => {
   console.log(`[CLOSE_ROOM] Host manually closing room ${gameCode}`);
 
   if (!games[gameCode]) {
@@ -908,6 +911,9 @@ const handleCloseRoom = (host, gameCode) => {
       deleteGameState(gameCode).catch(err =>
         console.error('[REDIS] Error deleting game state:', err)
       );
+
+      // Broadcast updated rooms list
+      if (wss) broadcastActiveRooms(wss);
     }
   }, 500);
 };
@@ -967,6 +973,28 @@ const handleResetGame = async (host) => {
 };
 
 // Export all functions
+// Broadcast active rooms to all connected clients
+const broadcastActiveRooms = (wss) => {
+  if (!wss || !wss.clients) return;
+
+  const rooms = getActiveRooms();
+  const message = JSON.stringify({ action: 'activeRooms', rooms });
+
+  let sentCount = 0;
+  wss.clients.forEach((client) => {
+    if (client.readyState === 1) { // WebSocket.OPEN
+      try {
+        client.send(message);
+        sentCount++;
+      } catch (error) {
+        console.error('[BROADCAST] Error sending active rooms:', error.message);
+      }
+    }
+  });
+
+  console.log(`[BROADCAST] Active rooms sent to ${sentCount} clients`);
+};
+
 module.exports = {
   setNewGame,
   addUserToGame,
@@ -984,4 +1012,5 @@ module.exports = {
   handleDisconnect,
   handleCloseRoom,
   handleResetGame,
+  broadcastActiveRooms,
 };

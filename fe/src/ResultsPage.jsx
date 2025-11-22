@@ -30,7 +30,7 @@ const LetterGrid = ({ letterGrid }) => {
   );
 };
 
-const ResultsPage = ({ finalScores, letterGrid, gameCode, onReturnToRoom }) => {
+const ResultsPage = ({ finalScores, letterGrid, gameCode, onReturnToRoom, isHost = false }) => {
   const { t } = useLanguage();
 
   const handleExitRoom = () => {
@@ -103,8 +103,8 @@ const ResultsPage = ({ finalScores, letterGrid, gameCode, onReturnToRoom }) => {
         </h1>
       </motion.div>
 
-      {/* Winner Announcement Banner */}
-      {winner && <ResultsWinnerBanner winner={winner} />}
+      {/* Winner Announcement Banner - Only show for host */}
+      {isHost && winner && <ResultsWinnerBanner winner={winner} />}
 
       {/* Main Results Card */}
       <motion.div
