@@ -130,7 +130,7 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
                 {t('joinView.joinRoom')}
               </CardTitle>
               <CardDescription className="text-sm sm:text-base text-gray-300">
-                {language === 'he' ? `אתה מצטרף לחדר ` : `You are joining room `}
+                {t('joinView.joiningRoom')}{' '}
                 <strong className="text-purple-600 dark:text-purple-400">{gameCode}</strong>
               </CardDescription>
             </CardHeader>
@@ -151,7 +151,7 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
               {/* Room Code Display */}
               <div className="flex justify-center">
                 <Badge className="text-xl px-6 py-3 bg-gradient-to-r from-cyan-500 to-purple-600 hover:from-cyan-400 hover:to-purple-500">
-                  Room: {gameCode}
+                  {t('joinView.roomLabel')}: {gameCode}
                 </Badge>
               </div>
 
@@ -179,10 +179,10 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
                     maxLength={20}
                   />
                   {usernameError && (
-                    <p className="text-sm text-red-400">שם משתמש נדרש! אנא מלא את השדה</p>
+                    <p className="text-sm text-red-400">{t('validation.usernameRequired')}</p>
                   )}
                   {!usernameError && (
-                    <p className="text-sm text-slate-500 dark:text-gray-400">הזן שם כדי להצטרף</p>
+                    <p className="text-sm text-slate-500 dark:text-gray-400">{t('validation.enterNameToJoin')}</p>
                   )}
                 </motion.div>
 
@@ -205,7 +205,7 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
                   onClick={() => setShowFullForm(true)}
                   className="w-full text-cyan-600 dark:text-cyan-400 hover:text-cyan-500 dark:hover:text-cyan-300 hover:bg-slate-200 dark:hover:bg-slate-700/50"
                 >
-                  רוצה לארח או להצטרף לחדר אחר?
+                  {t('joinView.wantToHostOrJoinOther')}
                 </Button>
               </form>
             </CardContent>
@@ -268,7 +268,7 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
                   <Alert variant="destructive">
                     <AlertDescription>
                       {error}
-                      {error.includes('הסשן הקודם') && (
+                      {error.includes(t('errors.sessionExpired').substring(0, 10)) && (
                         <div className="mt-2">
                           <Button
                             size="sm"
@@ -279,7 +279,7 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
                             }}
                             className="border-white text-white hover:bg-white/20"
                           >
-                            נקה והתחל מחדש
+                            {t('joinView.clearAndRestart')}
                           </Button>
                         </div>
                       )}
@@ -327,7 +327,7 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
                       <span className={cn(
                         "font-medium text-xs",
                         roomLanguage === 'en' ? "text-cyan-600 dark:text-cyan-300" : "text-slate-600 dark:text-gray-400"
-                      )}>English</span>
+                      )}>{t('joinView.english')}</span>
                     </button>
                     <button
                       type="button"
@@ -343,7 +343,7 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
                       <span className={cn(
                         "font-medium text-xs",
                         roomLanguage === 'he' ? "text-cyan-600 dark:text-cyan-300" : "text-slate-600 dark:text-gray-400"
-                      )}>עברית</span>
+                      )}>{t('joinView.hebrew')}</span>
                     </button>
                   </div>
                 </div>
@@ -363,7 +363,7 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
                       value={gameCode}
                       onChange={(e) => setGameCode(e.target.value)}
                       required
-                      placeholder="הזן קוד בן 4 ספרות"
+                      placeholder={t('validation.enterFourDigitCode')}
                       maxLength={4}
                       pattern="[0-9]*"
                       inputMode="numeric"
@@ -396,10 +396,10 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
                         maxLength={30}
                       />
                       {roomNameError && (
-                        <p className="text-sm text-red-400">שם חדר נדרש! אנא מלא את השדה</p>
+                        <p className="text-sm text-red-400">{t('validation.roomNameRequired')}</p>
                       )}
                       {!roomNameError && (
-                        <p className="text-sm text-slate-500 dark:text-gray-400">שם לזיהוי החדר שלך</p>
+                        <p className="text-sm text-slate-500 dark:text-gray-400">{t('validation.enterRoomName')}</p>
                       )}
                     </motion.div>
 
@@ -417,7 +417,7 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
                           value={gameCode}
                           onChange={(e) => setGameCode(e.target.value)}
                           required
-                          placeholder="קוד בן 4 ספרות"
+                          placeholder={t('validation.fourDigitCode')}
                           maxLength={4}
                           pattern="[0-9]*"
                           inputMode="numeric"
@@ -435,12 +435,12 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
                                 <FaDice />
                               </Button>
                             </TooltipTrigger>
-                            <TooltipContent>צור קוד חדש</TooltipContent>
+                            <TooltipContent>{t('joinView.generateNewCode')}</TooltipContent>
                           </Tooltip>
                         </TooltipProvider>
                       </div>
                       <p className="text-sm text-slate-500 dark:text-gray-400">
-                        קוד שישתפו השחקנים כדי להצטרף
+                        {t('validation.codeHelper')}
                       </p>
                     </motion.div>
                   </>
@@ -470,7 +470,7 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
                       maxLength={20}
                     />
                     {usernameError && (
-                      <p className="text-sm text-red-400">שם משתמש נדרש! אנא מלא את השדה</p>
+                      <p className="text-sm text-red-400">{t('validation.usernameRequired')}</p>
                     )}
                   </motion.div>
                 )}
@@ -499,8 +499,8 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
               <div className="text-center space-y-3">
                 <p className="text-sm text-slate-600 dark:text-gray-400">
                   {mode === 'host'
-                    ? 'צור משחק ושתף את הקוד עם חברים!'
-                    : 'הזן את קוד המשחק ששותף על ידי המארח'}
+                    ? t('joinView.createGameInstructions')
+                    : t('validation.enterGameCode')}
                 </p>
 
                 {/* Share Buttons for Hosts */}
@@ -511,21 +511,21 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
                       onClick={() => copyJoinUrl(gameCode)}
                       icon={<FaLink />}
                     >
-                      העתק קישור
+                      {t('joinView.copyLink')}
                     </ShareButton>
                     <ShareButton
                       variant="whatsapp"
                       onClick={() => shareViaWhatsApp(gameCode, roomName)}
                       icon={<FaWhatsapp />}
                     >
-                      שתף בוואטסאפ
+                      {t('joinView.shareWhatsapp')}
                     </ShareButton>
                     <ShareButton
                       variant="qr"
                       onClick={() => setShowQR(true)}
                       icon={<FaQrcode />}
                     >
-                      ברקוד
+                      {t('hostView.qrCode')}
                     </ShareButton>
                   </div>
                 )}
@@ -567,7 +567,7 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
                 {activeRooms.length === 0 ? (
                   <div className="text-center py-8 text-slate-500 dark:text-gray-400">
                     <p className="text-sm">{t('joinView.noRooms')}</p>
-                    <p className="text-xs mt-1">צור חדר חדש כדי להתחיל!</p>
+                    <p className="text-xs mt-1">{t('joinView.createNewRoom')}</p>
                   </div>
                 ) : (
                   <div className="space-y-2">
@@ -584,7 +584,7 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
                       >
                         <div className="flex items-center justify-between gap-2">
                           <div className="flex items-center gap-2">
-                            <span className="text-2xl" title={room.language === 'he' ? 'Hebrew' : 'English'}>
+                            <span className="text-2xl" title={room.language === 'he' ? t('joinView.hebrew') : t('joinView.english')}>
                               {room.language === 'he' ? '🇮🇱' : '🇺🇸'}
                             </span>
                             <div>
@@ -626,7 +626,7 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
                 <FaQuestionCircle size={28} />
               </Button>
             </TooltipTrigger>
-            <TooltipContent side="right">איך משחקים?</TooltipContent>
+            <TooltipContent side="right">{t('joinView.howToPlay')}</TooltipContent>
           </Tooltip>
         </TooltipProvider>
       </motion.div>
@@ -635,7 +635,7 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
       <Dialog open={showHowToPlay} onOpenChange={setShowHowToPlay}>
         <DialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto bg-white dark:bg-slate-800 border-cyan-500/30">
           <DialogHeader>
-            <DialogTitle className="sr-only">איך משחקים בבוגל</DialogTitle>
+            <DialogTitle className="sr-only">{t('joinView.howToPlayTitle')}</DialogTitle>
           </DialogHeader>
           <HowToPlay />
           <DialogFooter className="sm:justify-center">
@@ -643,7 +643,7 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
               onClick={() => setShowHowToPlay(false)}
               className="bg-gradient-to-r from-cyan-500 to-purple-600 hover:from-cyan-400 hover:to-purple-500 hover:shadow-[0_0_15px_rgba(6,182,212,0.5)] text-lg px-8"
             >
-              הבנתי, בוא נשחק!
+              {t('common.understood')}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -655,7 +655,7 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
           <DialogHeader>
             <DialogTitle className="text-center text-cyan-300 flex items-center justify-center gap-2">
               <FaQrcode />
-              קוד QR להצטרפות
+              {t('joinView.qrCodeTitle')}
             </DialogTitle>
           </DialogHeader>
           <div className="flex flex-col items-center gap-4 py-4">
@@ -664,7 +664,7 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
             </div>
             <h4 className="text-3xl font-bold text-cyan-400">{gameCode}</h4>
             <p className="text-sm text-center text-slate-600 dark:text-gray-300">
-              סרוק את הקוד כדי להצטרף למשחק או השתמש בקוד {gameCode}
+              {t('joinView.scanToJoin')} {gameCode}
             </p>
             <p className="text-xs text-center text-slate-500 dark:text-gray-400 mt-2">
               {getJoinUrl()}
@@ -675,7 +675,7 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
               onClick={() => setShowQR(false)}
               className="w-full bg-gradient-to-r from-cyan-500 to-teal-500 hover:from-cyan-400 hover:to-teal-400 hover:shadow-[0_0_15px_rgba(6,182,212,0.5)]"
             >
-              סגור
+              {t('common.close')}
             </Button>
           </DialogFooter>
         </DialogContent>

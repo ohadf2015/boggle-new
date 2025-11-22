@@ -3,8 +3,11 @@ import { Card, CardHeader, CardTitle, CardContent } from '../components/ui/card'
 import { Badge } from '../components/ui/badge';
 import { motion } from 'framer-motion';
 import { FaTrophy, FaMedal, FaStar } from 'react-icons/fa';
+import { useLanguage } from '../contexts/LanguageContext';
 
 const ScorePage = ({ scores }) => {
+  const { t } = useLanguage();
+
   return (
     <div className="flex flex-col items-center min-h-screen bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 p-4">
       <motion.h2
@@ -13,14 +16,14 @@ const ScorePage = ({ scores }) => {
         transition={{ type: "spring", stiffness: 300 }}
         className="text-5xl font-bold my-8 text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-teal-300 to-purple-400"
       >
-        🏆 תוצאות המשחק
+        {t('scorePage.title')}
       </motion.h2>
 
       <Card className="w-full max-w-2xl bg-slate-800/90 backdrop-blur-md shadow-2xl border border-purple-500/30 shadow-[0_0_20px_rgba(168,85,247,0.15)]">
         <CardHeader className="bg-gradient-to-r from-yellow-500/80 to-orange-500/80 text-white rounded-t-lg border-b border-yellow-400/30">
           <CardTitle className="flex items-center justify-center gap-3 text-2xl">
             <FaTrophy className="text-3xl" />
-            טבלת המובילים
+            {t('scorePage.leaderboard')}
           </CardTitle>
         </CardHeader>
         <CardContent className="p-6">
@@ -50,7 +53,7 @@ const ScorePage = ({ scores }) => {
                     <div className="text-xl font-bold">{score.username}</div>
                     <div className="text-sm opacity-80 flex items-center gap-2">
                       <FaStar className="text-yellow-300" />
-                      {score.points} נקודות
+                      {score.points} {t('scorePage.points')}
                     </div>
                   </div>
                 </div>
@@ -80,7 +83,7 @@ const ScorePage = ({ scores }) => {
           className="mt-8 text-center"
         >
           <p className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-400 text-2xl font-bold">
-            מזל טוב {scores[0]?.username}!
+            {t('scorePage.congratulations')} {scores[0]?.username}!
           </p>
         </motion.div>
       )}

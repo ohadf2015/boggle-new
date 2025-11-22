@@ -165,7 +165,7 @@ const ResultsPage = ({ finalScores, letterGrid, gameCode, onReturnToRoom }) => {
                 size="lg"
                 className="bg-gradient-to-r from-cyan-500 to-purple-600 hover:from-cyan-400 hover:to-purple-500 hover:shadow-[0_0_25px_rgba(6,182,212,0.6)] font-bold text-lg px-10 w-full sm:w-auto transition-all duration-300"
               >
-                חזור לחדר הפעיל {isAutoReplayCancelled ? '' : `(${autoReplayCountdown})`}
+                {t('results.returnToRoom')} {isAutoReplayCancelled ? '' : `(${autoReplayCountdown})`}
               </Button>
 
               {!isAutoReplayCancelled && (
