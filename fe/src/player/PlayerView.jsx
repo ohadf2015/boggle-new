@@ -163,14 +163,6 @@ const PlayerView = ({ onShowResults }) => {
           setLeaderboard(message.leaderboard);
           break;
 
-        case 'playerFoundWord':
-          const hint = message.hint || `✨ ${t('playerView.newWord')}`;
-          toast(`${message.username}: ${hint}`, {
-            icon: '🔍',
-            duration: 2500,
-          });
-          break;
-
         case 'liveAchievementUnlocked':
           message.achievements.forEach(achievement => {
             toast.success(`🎉 ${achievement.icon} ${achievement.name}!`, {

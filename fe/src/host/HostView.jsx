@@ -141,13 +141,13 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp }) => {
 
 
         case 'playerFoundWord':
-          toast(`${message.username} ${t('hostView.playerFoundWord')} "${message.word}"!`, {
+          toast(`${message.username} ${t('hostView.playerFoundWord')} (${message.wordCount} ${t('hostView.words')})`, {
             icon: '🎯',
             duration: 2000,
           });
           setPlayerWordCounts(prev => ({
             ...prev,
-            [message.username]: (prev[message.username] || 0) + 1
+            [message.username]: message.wordCount
           }));
           break;
 
@@ -183,6 +183,13 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp }) => {
             particleCount: 150,
             spread: 80,
             origin: { y: 0.6 },
+          });
+          break;
+
+        case 'autoValidationOccurred':
+          toast(message.message || 'Auto-validation completed', {
+            icon: '⏱️',
+            duration: 4000,
           });
           break;
 
