@@ -197,6 +197,19 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
           }, 2000);
           break;
 
+        case 'finalScores':
+          setWaitingForResults(false);
+          toast.success(t('playerView.scoresReady'), { duration: 2000 });
+          setTimeout(() => {
+            if (onShowResults) {
+              onShowResults({
+                scores: message.scores,
+                letterGrid: letterGrid,
+              });
+            }
+          }, 2000);
+          break;
+
         case 'hostLeftRoomClosing':
           clearSession();
           toast.error(message.message || t('playerView.roomClosed'), {
