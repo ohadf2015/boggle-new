@@ -3,6 +3,10 @@ export const translations = {
     flag: '🇺🇸',
     name: 'English',
     direction: 'ltr',
+    logo: {
+      lexi: 'Lexi',
+      clash: 'Clash',
+    },
     common: {
       loading: 'Loading...',
       error: 'Error',
@@ -39,7 +43,7 @@ export const translations = {
       master: 'Master',
     },
     joinView: {
-      title: 'Boggle',
+      title: 'LexiClash',
       createRoom: 'Create Room',
       joinRoom: 'Join Room',
       roomNamePlaceholder: 'Enter room name',
@@ -59,7 +63,7 @@ export const translations = {
       createGameInstructions: 'Create a game and share the code with friends!',
       createNewRoom: 'Create a new room to get started!',
       howToPlay: 'How to play?',
-      howToPlayTitle: 'How to Play Boggle',
+      howToPlayTitle: 'How to Play LexiClash',
       qrCodeTitle: 'QR Code to Join',
       scanToJoin: 'Scan the code to join the game or use code',
       copyLink: 'Copy Link',
@@ -152,6 +156,10 @@ export const translations = {
       returnToRoom: 'Return to Active Room',
       cancelAutoReturn: 'Cancel Auto Return',
       valid: 'valid',
+      playAgainQuestion: '🎮 Ready for Another Round?',
+      playAgainDescription: 'Stay in the room and wait for the host to start a new game',
+      stayInRoom: 'Yes, Stay in Room',
+      leaveRoom: 'No, Leave Room',
     },
     scorePage: {
       title: '🏆 Game Results',
@@ -160,8 +168,8 @@ export const translations = {
       congratulations: 'Congratulations',
     },
     howToPlay: {
-      title: 'How to Play Boggle?',
-      description: 'Boggle is a fast-paced word game where you race against time to find as many words as possible on a grid of letters. The longer the word, the more points you earn!',
+      title: 'How to Play LexiClash?',
+      description: 'LexiClash is a fast-paced word game where you race against time to find as many words as possible on a grid of letters. The longer the word, the more points you earn!',
       descriptionNote: 'Words must be at least 2 letters long and must be in the selected game language.',
       createOrJoinTitle: 'Create or Join a Game',
       createOrJoinDesc: 'The host creates a room and shares the code. Players join using the code.',
@@ -209,6 +217,10 @@ export const translations = {
     flag: '🇮🇱',
     name: 'עברית',
     direction: 'rtl',
+    logo: {
+      lexi: 'לקסי',
+      clash: 'קלאש',
+    },
     common: {
       loading: 'טוען...',
       error: 'שגיאה',
@@ -245,7 +257,7 @@ export const translations = {
       master: 'אמן',
     },
     joinView: {
-      title: 'בּוֹגֶל',
+      title: 'לקסיקלאש',
       createRoom: 'צור חדר',
       joinRoom: 'הצטרף לחדר',
       roomNamePlaceholder: 'הכנס שם חדר',
@@ -265,7 +277,7 @@ export const translations = {
       createGameInstructions: 'צור משחק ושתף את הקוד עם חברים!',
       createNewRoom: 'צור חדר חדש כדי להתחיל!',
       howToPlay: 'איך משחקים?',
-      howToPlayTitle: 'איך משחקים בבוגל',
+      howToPlayTitle: 'איך משחקים בלקסיקלאש',
       qrCodeTitle: 'קוד QR להצטרפות',
       scanToJoin: 'סרוק את הקוד כדי להצטרף למשחק או השתמש בקוד',
       copyLink: 'העתק קישור',
@@ -358,6 +370,10 @@ export const translations = {
       returnToRoom: 'חזור לחדר הפעיל',
       cancelAutoReturn: 'בטל מעבר אוטומטי',
       valid: 'תקינות',
+      playAgainQuestion: '🎮 מוכנים לסיבוב נוסף?',
+      playAgainDescription: 'הישארו בחדר והמתינו למארח שיתחיל משחק חדש',
+      stayInRoom: 'כן, הישאר בחדר',
+      leaveRoom: 'לא, צא מהחדר',
     },
     scorePage: {
       title: '🏆 תוצאות המשחק',
@@ -366,8 +382,8 @@ export const translations = {
       congratulations: 'מזל טוב',
     },
     howToPlay: {
-      title: 'איך משחקים בוגל?',
-      description: 'בוגל הוא משחק מילים מהיר בו אתם מתחרים בזמן כדי למצוא כמה שיותר מילים על לוח אותיות. ככל שהמילה ארוכה יותר, כך תקבלו יותר נקודות!',
+      title: 'איך משחקים בלקסיקלאש?',
+      description: 'לקסיקלאש הוא משחק מילים מהיר בו אתם מתחרים בזמן כדי למצוא כמה שיותר מילים על לוח אותיות. ככל שהמילה ארוכה יותר, כך תקבלו יותר נקודות!',
       descriptionNote: 'מילים חייבות להיות לפחות בנות 2 אותיות וחייבות להיות בשפת המשחק הנבחרת.',
       createOrJoinTitle: 'צרו או הצטרפו למשחק',
       createOrJoinDesc: 'המארח יוצר חדר ומשתף את הקוד. השחקנים מצטרפים באמצעות הקוד.',

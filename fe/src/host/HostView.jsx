@@ -10,13 +10,13 @@ import { Card } from '../components/ui/card';
 import { Badge } from '../components/ui/badge';
 import { Checkbox } from '../components/ui/checkbox';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '../components/ui/dialog';
-import { AchievementBadge } from '../components/AchievementBadge';
 import GridComponent from '../components/GridComponent';
 import ShareButton from '../components/ShareButton';
 import SlotMachineText from '../components/SlotMachineText';
 import ResultsPodium from '../components/results/ResultsPodium';
 import ResultsPlayerCard from '../components/results/ResultsPlayerCard';
 import RoomChat from '../components/RoomChat';
+import CubeCrashAnimation from '../components/CubeCrashAnimation';
 import '../style/animation.scss';
 import { generateRandomTable, embedWordInGrid, applyHebrewFinalLetters } from '../utils/utils';
 import { useWebSocket } from '../utils/WebSocketContext';
@@ -43,6 +43,7 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
   const [finalScores, setFinalScores] = useState(null);
   const [showQR, setShowQR] = useState(false);
   const [playerWordCounts, setPlayerWordCounts] = useState({});
+  const [showStartAnimation, setShowStartAnimation] = useState(false);
 
   // Animation states
   const [shufflingGrid, setShufflingGrid] = useState(null);
@@ -240,26 +241,11 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
       }
     };
 
-    // Store the original handler to chain them (don't overwrite App-level handler)
-    const originalHandler = ws.onmessage;
 
-    const chainedHandler = (event) => {
-      // First let HostView handle its messages
-      handleMessage(event);
-
-      // Then let the original App handler process any messages it needs
-      if (originalHandler && typeof originalHandler === 'function') {
-        originalHandler(event);
-      }
-    };
-
-    ws.onmessage = chainedHandler;
+    ws.addEventListener('message', handleMessage);
 
     return () => {
-      // Restore the original handler when component unmounts
-      if (originalHandler) {
-        ws.onmessage = originalHandler;
-      }
+      ws.removeEventListener('message', handleMessage);
     };
   }, [ws, gameStarted, t]);
 
@@ -273,6 +259,7 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
     const seconds = timerValue * 60;
     setRemainingTime(seconds);
     setGameStarted(true);
+    setShowStartAnimation(true);
     setPlayerWordCounts({}); // Reset counts
 
     // Send start game message with letter grid and timer
@@ -389,6 +376,11 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
     <div className="min-h-screen bg-gradient-to-b from-slate-50 via-slate-100 to-slate-200 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 flex flex-col items-center p-4 sm:p-6 md:p-8 overflow-auto transition-colors duration-300">
       <Toaster position="top-center" limit={3} />
 
+      {/* Start Game Animation */}
+      {showStartAnimation && (
+        <CubeCrashAnimation onComplete={() => setShowStartAnimation(false)} />
+      )}
+
       {/* Validation Modal */}
       <Dialog open={showValidation} onOpenChange={setShowValidation}>
         <DialogContent className="max-w-4xl max-h-[90vh] overflow-auto">
@@ -428,8 +420,8 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
                             isDuplicate
                               ? "bg-orange-50 dark:bg-orange-900/20 hover:bg-orange-100 dark:hover:bg-orange-900/30 border-orange-200 dark:border-orange-700"
                               : isAutoValidated
-                              ? "bg-cyan-50 dark:bg-cyan-900/20 border-cyan-200 dark:border-cyan-700"
-                              : "hover:bg-gray-50 dark:hover:bg-slate-700 border-gray-200 dark:border-slate-600"
+                                ? "bg-cyan-50 dark:bg-cyan-900/20 border-cyan-200 dark:border-cyan-700"
+                                : "hover:bg-gray-50 dark:hover:bg-slate-700 border-gray-200 dark:border-slate-600"
                           )}
                         >
                           <Checkbox
@@ -771,7 +763,7 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
             )}
           </Card>
 
-          {/* Boggle Letter Grid - RIGHT - Neon Style */}
+          {/* Letter Grid - RIGHT - Neon Style */}
           <Card className={cn(
             "flex-1 bg-white/80 dark:bg-slate-800/80 backdrop-blur-md p-2 sm:p-4 rounded-lg shadow-lg border border-cyan-500/30 shadow-[0_0_15px_rgba(6,182,212,0.1)] flex flex-col items-center transition-all duration-500 ease-in-out overflow-hidden",
             gameStarted && "fixed inset-0 z-50 m-0 max-w-none h-screen w-screen justify-center bg-slate-900/95 dark:bg-slate-900/95 border-cyan-500/50 p-4"

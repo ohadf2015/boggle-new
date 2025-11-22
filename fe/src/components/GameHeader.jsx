@@ -1,11 +1,12 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { useTheme } from '../utils/ThemeContext';
+import { useLanguage } from '../contexts/LanguageContext';
 import { Button } from './ui/button';
 import { cn } from '../lib/utils';
 
 /**
- * GameHeader - A reusable Modern Neon styled header component for the Boggle game
+ * GameHeader - A reusable Modern Neon styled header component for the LexiClash game
  *
  * @param {Object} props
  * @param {boolean} props.darkMode - Whether to use dark mode styling (default: true)
@@ -20,64 +21,10 @@ const GameHeader = ({
   className = ''
 }) => {
   const { theme, toggleTheme } = useTheme();
+  const { t } = useLanguage();
   const isDarkMode = darkMode ?? (theme === 'dark');
 
-  // Neon Dice Icon SVG
-  const DiceIcon = () => (
-    <svg
-      width="32"
-      height="32"
-      viewBox="0 0 24 24"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-      className="transition-all duration-300"
-    >
-      {/* Dice body */}
-      <rect
-        x="3"
-        y="3"
-        width="18"
-        height="18"
-        rx="3"
-        className={isDarkMode
-          ? "stroke-cyan-400 fill-slate-800/50"
-          : "stroke-cyan-600 fill-gray-100/50"
-        }
-        strokeWidth="1.5"
-      />
-      {/* Dice dots */}
-      <circle
-        cx="8"
-        cy="8"
-        r="1.5"
-        className={isDarkMode ? "fill-cyan-400" : "fill-cyan-600"}
-      />
-      <circle
-        cx="16"
-        cy="8"
-        r="1.5"
-        className={isDarkMode ? "fill-purple-400" : "fill-purple-600"}
-      />
-      <circle
-        cx="8"
-        cy="16"
-        r="1.5"
-        className={isDarkMode ? "fill-purple-400" : "fill-purple-600"}
-      />
-      <circle
-        cx="16"
-        cy="16"
-        r="1.5"
-        className={isDarkMode ? "fill-cyan-400" : "fill-cyan-600"}
-      />
-      <circle
-        cx="12"
-        cy="12"
-        r="1.5"
-        className={isDarkMode ? "fill-teal-400" : "fill-teal-600"}
-      />
-    </svg>
-  );
+
 
   // Theme-based styles
   const containerStyles = isDarkMode
@@ -109,36 +56,50 @@ const GameHeader = ({
           ${containerStyles}
         `}
       >
-        {/* Left side - Logo and Title */}
+        {/* Left side - Title */}
         <motion.div
           className="flex items-center gap-3 cursor-pointer"
           onClick={onLogoClick}
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
         >
-          {/* Neon Dice Icon */}
-          <motion.div
-            className={`${glowStyles}`}
-            whileHover={{
-              filter: isDarkMode
-                ? "drop-shadow(0 0 15px rgba(6,182,212,0.7))"
-                : "drop-shadow(0 0 12px rgba(6,182,212,0.5))"
-            }}
-          >
-            <DiceIcon />
-          </motion.div>
-
           {/* Title */}
-          <h1
-            className={`
-              text-2xl sm:text-3xl font-bold tracking-wider
-              ${textStyles}
-              ${glowStyles}
-            `}
-            style={{ fontFamily: "'Rubik', 'Inter', sans-serif" }}
+          <motion.h1
+            className="text-3xl sm:text-4xl font-bold tracking-wider flex items-center gap-1"
+            style={{ fontFamily: t('direction') === 'rtl' ? "'Fredoka', sans-serif" : "'Outfit', 'Rubik', sans-serif" }}
+            whileHover={{ scale: 1.05 }}
+            transition={{ type: "spring", stiffness: 400, damping: 10 }}
           >
-            BOGGLE
-          </h1>
+            <span className={cn(
+              "bg-clip-text text-transparent bg-gradient-to-r",
+              isDarkMode
+                ? "from-cyan-400 to-blue-500 drop-shadow-[0_0_10px_rgba(34,211,238,0.5)]"
+                : "from-cyan-600 to-blue-600"
+            )}>
+              {t('logo.lexi')}
+            </span>
+            <motion.span
+              animate={{
+                rotate: [0, -10, 10, -10, 10, 0],
+                scale: [1, 1.2, 1]
+              }}
+              transition={{ duration: 0.5, delay: 1, repeat: Infinity, repeatDelay: 5 }}
+              className="text-3xl filter drop-shadow-[0_0_8px_rgba(250,204,21,0.6)]"
+            >
+              ⚡
+            </motion.span>
+            <span
+              className={cn(
+                "italic bg-clip-text text-transparent bg-gradient-to-r",
+                isDarkMode
+                  ? "from-purple-400 to-pink-500 drop-shadow-[0_0_10px_rgba(168,85,247,0.5)]"
+                  : "from-purple-600 to-pink-600"
+              )}
+              style={{ transform: 'skewX(-10deg)' }}
+            >
+              {t('logo.clash')}
+            </span>
+          </motion.h1>
         </motion.div>
 
         {/* Right side - Optional actions container */}

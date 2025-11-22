@@ -150,10 +150,10 @@ const ResultsPage = ({ finalScores, letterGrid, gameCode, onReturnToRoom, isHost
               <Card className="p-6 bg-gradient-to-r from-cyan-500/10 to-purple-600/10 dark:from-cyan-500/20 dark:to-purple-600/20 border-2 border-cyan-500/30 shadow-lg">
                 <div className="text-center space-y-4">
                   <h3 className="text-2xl font-bold text-slate-800 dark:text-white">
-                    {t('results.playAgainQuestion') || '🎮 Ready for Another Round?'}
+                    {t('results.playAgainQuestion')}
                   </h3>
                   <p className="text-slate-600 dark:text-slate-300 text-sm">
-                    {t('results.playAgainDescription') || 'Stay in the room and wait for the host to start a new game'}
+                    {t('results.playAgainDescription')}
                   </p>
                   <div className="flex flex-col sm:flex-row gap-3 justify-center mt-4">
                     <Button
@@ -161,7 +161,7 @@ const ResultsPage = ({ finalScores, letterGrid, gameCode, onReturnToRoom, isHost
                       size="lg"
                       className="bg-gradient-to-r from-cyan-500 to-purple-600 hover:from-cyan-400 hover:to-purple-500 hover:shadow-[0_0_25px_rgba(6,182,212,0.6)] font-bold text-lg px-10 transition-all duration-300"
                     >
-                      ✓ {t('results.stayInRoom') || 'Yes, Stay in Room'}
+                      ✓ {t('results.stayInRoom')}
                     </Button>
                     <Button
                       onClick={handleExitRoom}
@@ -169,7 +169,7 @@ const ResultsPage = ({ finalScores, letterGrid, gameCode, onReturnToRoom, isHost
                       variant="outline"
                       className="font-bold text-lg px-10 border-2 hover:bg-red-50 dark:hover:bg-red-950 transition-all duration-300"
                     >
-                      ✗ {t('results.leaveRoom') || 'No, Leave Room'}
+                      ✗ {t('results.leaveRoom')}
                     </Button>
                   </div>
                 </div>

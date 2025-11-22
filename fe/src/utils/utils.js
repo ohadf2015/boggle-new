@@ -1,5 +1,7 @@
 import { hebrewLetters, DIFFICULTIES, DEFAULT_DIFFICULTY } from "./consts";
 
+// Utilities for LexiClash game
+
 // Normalize Hebrew letters - convert final forms to regular forms
 export function normalizeHebrewLetter(letter) {
   const finalToRegular = {

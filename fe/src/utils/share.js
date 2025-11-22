@@ -42,7 +42,7 @@ export const copyJoinUrl = async (gameCode) => {
 export const shareViaWhatsApp = (gameCode, roomName = '') => {
   const url = getJoinUrl(gameCode);
   const roomText = roomName ? `"${roomName}"` : '';
-  const message = `🎮 בואו לשחק Boggle איתי!\n\n` +
+  const message = `🎮 בואו לשחק LexiClash איתי!\n\n` +
     `${roomText ? `חדר: ${roomText}\n` : ''}` +
     `קוד: ${gameCode}\n\n` +
     `הצטרפו דרך הקישור:\n${url}`;

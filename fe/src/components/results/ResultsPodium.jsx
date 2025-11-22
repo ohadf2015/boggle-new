@@ -36,12 +36,6 @@ const PodiumPlace = ({ player, place, delay }) => {
     3: 'shadow-[0_0_20px_rgba(249,115,22,0.4)]'
   };
 
-  const textColors = {
-    1: 'text-yellow-300',
-    2: 'text-gray-300',
-    3: 'text-orange-300'
-  };
-
   const icons = {
     1: <FaCrown className="text-5xl text-yellow-300 drop-shadow-lg" />,
     2: <FaMedal className="text-4xl text-gray-300 drop-shadow-md" />,
@@ -176,7 +170,6 @@ const PodiumPlace = ({ player, place, delay }) => {
 };
 
 const ResultsPodium = ({ sortedScores }) => {
-  const { t } = useLanguage();
 
   return (
     <div className="mb-12 relative">

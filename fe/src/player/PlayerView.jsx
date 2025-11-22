@@ -16,6 +16,7 @@ import gsap from 'gsap';
 import GridComponent from '../components/GridComponent';
 import { applyHebrewFinalLetters } from '../utils/utils';
 import RoomChat from '../components/RoomChat';
+import CubeCrashAnimation from '../components/CubeCrashAnimation';
 
 const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) => {
   const { t } = useLanguage();
@@ -31,6 +32,7 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
   const [letterGrid, setLetterGrid] = useState(null);
   const [remainingTime, setRemainingTime] = useState(null);
   const [waitingForResults, setWaitingForResults] = useState(false);
+  const [showStartAnimation, setShowStartAnimation] = useState(false);
 
   const [playersReady, setPlayersReady] = useState(initialPlayers);
   const [shufflingGrid, setShufflingGrid] = useState(null);
@@ -117,6 +119,7 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
           if (message.letterGrid) setLetterGrid(message.letterGrid);
           if (message.timerSeconds) setRemainingTime(message.timerSeconds);
           if (message.language) setGameLanguage(message.language);
+          setShowStartAnimation(true);
 
           toast.success(t('playerView.gameStarted'), {
             icon: '🚀',
@@ -185,29 +188,31 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
           break;
 
         case 'validatedScores':
-          setWaitingForResults(false);
-          toast.success(t('playerView.scoresReady'), { duration: 2000 });
+          // Delay showing results to ensure waiting screen is seen
           setTimeout(() => {
+            setWaitingForResults(false);
+            toast.success(t('playerView.scoresReady'), { duration: 2000 });
             if (onShowResults) {
               onShowResults({
                 scores: message.scores,
                 letterGrid: message.letterGrid,
               });
             }
-          }, 2000);
+          }, 10000);
           break;
 
         case 'finalScores':
-          setWaitingForResults(false);
-          toast.success(t('playerView.scoresReady'), { duration: 2000 });
+          // Delay showing results to ensure waiting screen is seen
           setTimeout(() => {
+            setWaitingForResults(false);
+            toast.success(t('playerView.scoresReady'), { duration: 2000 });
             if (onShowResults) {
               onShowResults({
                 scores: message.scores,
                 letterGrid: letterGrid,
               });
             }
-          }, 2000);
+          }, 10000);
           break;
 
         case 'hostLeftRoomClosing':
@@ -244,26 +249,12 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
       }
     };
 
-    // Store the original handler to chain them
-    const originalHandler = ws.onmessage;
-
-    const chainedHandler = (event) => {
-      // First let PlayerView handle its messages
-      handleMessage(event);
-
-      // Then let the original App handler process any messages it needs
-      if (originalHandler) {
-        originalHandler(event);
-      }
-    };
-
-    ws.onmessage = chainedHandler;
+    ws.addEventListener('message', handleMessage);
 
     return () => {
-      // Restore the original handler when component unmounts
-      ws.onmessage = originalHandler;
+      ws.removeEventListener('message', handleMessage);
     };
-  }, [ws, onShowResults, t]);
+  }, [ws, onShowResults, t, letterGrid]);
 
   const submitWord = useCallback(() => {
     if (!word.trim() || !gameActive) return;
@@ -573,6 +564,11 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
     <div className="min-h-screen bg-gradient-to-b from-slate-50 via-slate-100 to-slate-200 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 p-4 md:p-8 flex flex-col transition-colors duration-300">
       <Toaster position="top-center" toastOptions={{ limit: 3 }} />
 
+      {/* Start Game Animation */}
+      {showStartAnimation && (
+        <CubeCrashAnimation onComplete={() => setShowStartAnimation(false)} />
+      )}
+
       {/* Top Bar with Exit Button */}
       <div className="w-full max-w-7xl mx-auto flex justify-end mb-4">
         <Button
@@ -744,7 +740,7 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
                 </motion.div>
               )}
 
-              <div ref={wordListRef} className="max-h-96 overflow-y-auto space-y-2">
+              <div ref={wordListRef} className="flex-1 min-h-0 overflow-y-auto space-y-2">
                 <AnimatePresence>
                   {foundWords.map((foundWord, index) => (
                     <motion.div

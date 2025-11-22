@@ -249,7 +249,7 @@ const App = () => {
   const [roomLanguage, setRoomLanguage] = useState(null); // Language of the room/game
   const [playersInRoom, setPlayersInRoom] = useState([]); // Players in current room
 
-  const { wsRef, connectWebSocket, setMessageHandler, cleanup, connectionError, checkLatency, lastPingTimeRef, connectionQuality } = useWebSocketConnection();
+  const { wsRef, connectWebSocket, setMessageHandler, cleanup, connectionError, checkLatency, lastPingTimeRef } = useWebSocketConnection();
   const [ws, setWs] = useState(null);
   const { t } = useLanguage();
 
@@ -357,7 +357,7 @@ const App = () => {
     } catch (error) {
       console.error('Error parsing WebSocket message:', error);
     }
-  }, [username, gameCode, roomName, checkLatency, lastPingTimeRef]);
+  }, [username, gameCode, roomName, checkLatency, lastPingTimeRef, t]);
 
   useEffect(() => {
     connectWebSocket();

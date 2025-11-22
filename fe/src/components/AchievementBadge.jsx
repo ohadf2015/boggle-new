@@ -14,9 +14,9 @@ export const AchievementBadge = ({ achievement, index = 0 }) => (
           whileHover={{ scale: 1.1, rotate: 5 }}
           whileTap={{ scale: 1.1 }}
         >
-          <Badge className="px-4 py-2 text-sm bg-gradient-to-r from-green-500 to-emerald-600
-                          hover:from-green-600 hover:to-emerald-700
-                          active:from-green-600 active:to-emerald-700
+          <Badge className="px-4 py-2 text-sm text-white bg-gradient-to-r from-cyan-400 to-purple-500
+                          hover:from-cyan-500 hover:to-purple-600
+                          active:from-cyan-500 active:to-purple-600
                           transition-all cursor-pointer shadow-lg touch-manipulation">
             {achievement.icon} {achievement.name}
           </Badge>

@@ -19,35 +19,7 @@ const Header = ({ className = '' }) => {
 
     const currentLang = languages.find(l => l.code === language) || languages[0];
 
-    // Neon Dice Icon SVG
-    const DiceIcon = () => (
-        <svg
-            width="32"
-            height="32"
-            viewBox="0 0 24 24"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-            className="transition-all duration-300"
-        >
-            <rect
-                x="3"
-                y="3"
-                width="18"
-                height="18"
-                rx="3"
-                className={isDarkMode
-                    ? "stroke-cyan-400 fill-slate-800/50"
-                    : "stroke-cyan-600 fill-gray-100/50"
-                }
-                strokeWidth="1.5"
-            />
-            <circle cx="8" cy="8" r="1.5" className={isDarkMode ? "fill-cyan-400" : "fill-cyan-600"} />
-            <circle cx="16" cy="8" r="1.5" className={isDarkMode ? "fill-purple-400" : "fill-purple-600"} />
-            <circle cx="8" cy="16" r="1.5" className={isDarkMode ? "fill-purple-400" : "fill-purple-600"} />
-            <circle cx="16" cy="16" r="1.5" className={isDarkMode ? "fill-cyan-400" : "fill-cyan-600"} />
-            <circle cx="12" cy="12" r="1.5" className={isDarkMode ? "fill-teal-400" : "fill-teal-600"} />
-        </svg>
-    );
+
 
     return (
         <motion.header
@@ -62,27 +34,42 @@ const Header = ({ className = '' }) => {
                     className="flex items-center gap-3 cursor-pointer"
                     onClick={() => window.location.href = '/'}
                 >
-                    <motion.div
-                        whileHover={{
-                            filter: isDarkMode
-                                ? "drop-shadow(0 0 15px rgba(6,182,212,0.7))"
-                                : "drop-shadow(0 0 12px rgba(6,182,212,0.5))"
-                        }}
+                    <motion.h1
+                        className="text-4xl sm:text-5xl font-black tracking-wider flex items-center gap-2"
+                        style={{ fontFamily: language === 'he' ? "'Fredoka', sans-serif" : "'Outfit', 'Rubik', sans-serif" }}
+                        whileHover={{ scale: 1.05 }}
+                        transition={{ type: "spring", stiffness: 400, damping: 10 }}
                     >
-                        <DiceIcon />
-                    </motion.div>
-                    <h1
-                        className={`
-              text-2xl sm:text-3xl font-bold tracking-wider
-              ${isDarkMode
-                                ? "text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-teal-300 to-purple-400 drop-shadow-[0_0_10px_rgba(6,182,212,0.5)]"
-                                : "text-transparent bg-clip-text bg-gradient-to-r from-cyan-600 via-teal-500 to-purple-600 drop-shadow-[0_0_8px_rgba(6,182,212,0.3)]"
-                            }
-            `}
-                        style={{ fontFamily: "'Rubik', 'Inter', sans-serif" }}
-                    >
-                        {t('joinView.title')}
-                    </h1>
+                        <span className={cn(
+                            "bg-clip-text text-transparent bg-gradient-to-r",
+                            isDarkMode
+                                ? "from-cyan-400 to-blue-500 drop-shadow-[0_0_10px_rgba(34,211,238,0.5)]"
+                                : "from-cyan-600 to-blue-600"
+                        )}>
+                            {t('logo.lexi')}
+                        </span>
+                        <motion.span
+                            animate={{
+                                rotate: [0, -10, 10, -10, 10, 0],
+                                scale: [1, 1.2, 1]
+                            }}
+                            transition={{ duration: 0.5, delay: 1, repeat: Infinity, repeatDelay: 5 }}
+                            className="text-3xl filter drop-shadow-[0_0_8px_rgba(250,204,21,0.6)]"
+                        >
+                            ⚡
+                        </motion.span>
+                        <span
+                            className={cn(
+                                "italic bg-clip-text text-transparent bg-gradient-to-r",
+                                isDarkMode
+                                    ? "from-purple-400 to-pink-500 drop-shadow-[0_0_10px_rgba(168,85,247,0.5)]"
+                                    : "from-purple-600 to-pink-600"
+                            )}
+                            style={{ transform: 'skewX(-10deg)' }}
+                        >
+                            {t('logo.clash')}
+                        </span>
+                    </motion.h1>
                 </div>
 
                 {/* Controls: Language Selector + Theme Toggle */}

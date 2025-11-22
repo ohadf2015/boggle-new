@@ -295,7 +295,7 @@ const handleEndGame = (host) => {
     username,
     score: games[gameCode].playerScores[username],
     words: games[gameCode].playerWords[username],
-    wordCount: games[gameCode].playerWords[username].length,
+    wordCount: (games[gameCode].playerWordDetails[username] || []).length,
     achievements: games[gameCode].playerAchievements[username].map(ach => ACHIEVEMENTS[ach]),
     longestWord: games[gameCode].playerWords[username].reduce((longest, word) =>
       word.length > longest.length ? word : longest, ''),
@@ -363,11 +363,7 @@ const handleEndGame = (host) => {
   });
 
   sendAllPlayerAMessage(gameCode, { action: "endGame" });
-  sendAllPlayerAMessage(gameCode, {
-    action: "finalScores",
-    scores: finalScores,
-    winner: finalScores[0]?.username
-  });
+  // finalScores will be sent after validation is complete
 
   // Send validation interface data to host
   sendHostAMessage(gameCode, {
@@ -380,29 +376,33 @@ const handleEndGame = (host) => {
   // Log dictionary validation stats
   console.log(`[Dictionary] Auto-validated ${autoValidatedCount} words, ${wordsNeedingValidation.size} words need host validation`);
 
-  // Start auto-validation timeout in case host is AFK (60 seconds)
+  // Start auto-validation timeout in case host is AFK (15 seconds)
   games[gameCode].validationTimeout = setTimeout(() => {
     // Check if game still exists and hasn't been validated yet
     if (games[gameCode] && games[gameCode].gameState === 'ended') {
-      console.log(`[AUTO_VALIDATION] Host AFK for game ${gameCode}, auto-validating all words as valid`);
+      console.log(`[AUTO_VALIDATION] Host AFK for game ${gameCode}, auto-validating dictionary words only`);
 
-      // Auto-validate all words as true
+      // Auto-validate only words that were found in the dictionary
       const autoValidations = [];
-      const uniqueWords = new Set();
+      const processedWords = new Set();
 
       Object.keys(games[gameCode].users).forEach(username => {
         if (games[gameCode].playerWordDetails[username]) {
           games[gameCode].playerWordDetails[username].forEach(wordDetail => {
-            uniqueWords.add(wordDetail.word);
+            // Only validate words that were auto-validated (in dictionary)
+            if (wordDetail.autoValidated && !processedWords.has(wordDetail.word)) {
+              autoValidations.push({ word: wordDetail.word, isValid: true });
+              processedWords.add(wordDetail.word);
+            } else if (!wordDetail.autoValidated && !processedWords.has(wordDetail.word)) {
+              // Words not in dictionary are marked as invalid
+              autoValidations.push({ word: wordDetail.word, isValid: false });
+              processedWords.add(wordDetail.word);
+            }
           });
         }
       });
 
-      uniqueWords.forEach(word => {
-        autoValidations.push({ word, isValid: true });
-      });
-
-      // Call the validation handler with all words marked as valid
+      // Call the validation handler
       handleValidateWords(games[gameCode].host, autoValidations, games[gameCode].letterGrid);
 
       // Notify host that auto-validation occurred
@@ -411,7 +411,7 @@ const handleEndGame = (host) => {
         message: "Auto-validation completed due to inactivity"
       });
     }
-  }, 60000); // 60 seconds
+  }, 15000); // 15 seconds
 }
 
 const handleSendAnswer = (ws, foundWords) => {
@@ -801,11 +801,8 @@ const handleValidateWords = (host, validations, letterGrid) => {
 
   // Then, apply host validations (for words not in dictionary)
   validations.forEach(({ word, isValid }) => {
-    // Only store unique words - the first validation for each word wins
-    // Host validations override auto-validations if present
-    if (!wordValidationMap[word] || !wordValidationMap[word].autoValidated) {
-      wordValidationMap[word] = isValid;
-    }
+    // Host validations can override or add to the validation map
+    wordValidationMap[word] = isValid;
   });
 
   // Apply validations to all players who have each word
@@ -865,7 +862,7 @@ const handleValidateWords = (host, validations, letterGrid) => {
         score: games[gameCode].playerScores[username] || 0,
         words: playerWordDetails.filter(w => w.validated === true).map(w => w.word),
         allWords: playerWordDetails, // For visualization
-        wordCount: playerWords.length,
+        wordCount: playerWordDetails.length,
         validWordCount: playerWordDetails.filter(w => w.validated === true).length,
         achievements: playerAchievements.map(ach => ACHIEVEMENTS[ach]),
         longestWord: playerWordDetails

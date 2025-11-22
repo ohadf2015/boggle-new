@@ -87,21 +87,14 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
     handleJoin(false); // Always join mode for quick join
   };
 
-  // Handle logo click to clear room params
-  const handleLogoClick = () => {
-    const url = new URL(window.location);
-    url.searchParams.delete('room');
-    window.history.replaceState({}, '', url.pathname);
-    setShowFullForm(true);
-    setGameCode('');
-  };
+
 
   // Removed - now using utility function from utils/share
 
   // Show simplified quick join interface when room is prefilled
   if (prefilledRoom && !showFullForm) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-slate-50 via-slate-100 to-slate-200 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 flex flex-col items-center justify-center p-4 sm:p-6 transition-colors duration-300">
+      <div className="min-h-screen bg-gradient-to-b pt-4 from-slate-50 via-slate-100 to-slate-200 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 flex flex-col items-center justify-start p-4 sm:p-6 transition-colors duration-300">
         {/* Animated Title - Removed as it is now in global header */}
         <motion.div
           initial={{ y: -50, opacity: 0 }}
@@ -219,23 +212,9 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-50 via-slate-100 to-slate-200 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 flex flex-col items-center justify-center p-4 sm:p-6 overflow-auto transition-colors duration-300">
+    <div className="min-h-screen bg-gradient-to-b from-slate-50 via-slate-100 to-slate-200 pt-4 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 flex flex-col items-center justify-start p-4 sm:p-6 overflow-auto transition-colors duration-300">
       {/* Animated Title */}
-      <motion.div
-        initial={{ y: -50, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ duration: 0.5 }}
-        className="mb-8 flex flex-col items-center"
-        onClick={handleLogoClick}
-        style={{ cursor: 'pointer' }}
-      >
-        <h1 className="text-5xl sm:text-6xl md:text-7xl font-bold tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-teal-300 to-purple-400 pb-2">
-          {t('joinView.title')}
-        </h1>
-        <div className="mt-4">
-          {/* Language selector moved to Create Room form */}
-        </div>
-      </motion.div>
+
 
       <div className="flex flex-col-reverse md:flex-row gap-6 w-full max-w-6xl relative z-10">
         {/* Main Join/Host Form */}
@@ -247,12 +226,7 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
         >
           <Card className="backdrop-blur-md bg-white/90 dark:bg-slate-800/90 shadow-2xl border border-purple-500/30 shadow-[0_0_20px_rgba(168,85,247,0.15)]">
             <CardHeader className="text-center space-y-4">
-              <div className="flex justify-center">
-                <FaGamepad size={48} className="text-purple-400" />
-              </div>
-              <CardTitle className="text-2xl sm:text-3xl text-purple-300">
-                {t('joinView.title')}
-              </CardTitle>
+
               <CardDescription className="text-sm sm:text-base text-slate-600 dark:text-gray-300">
                 {t('joinView.selectLanguage')}
               </CardDescription>
@@ -582,7 +556,7 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
                             : "hover:bg-slate-700/50"
                         )}
                       >
-                        <div className="flex items-center justify-between gap-2">
+                        <div className="flex items-center justify-between gap-3">
                           <div className="flex items-center gap-2">
                             <span className="text-2xl" title={room.language === 'he' ? t('joinView.hebrew') : t('joinView.english')}>
                               {room.language === 'he' ? '🇮🇱' : '🇺🇸'}
