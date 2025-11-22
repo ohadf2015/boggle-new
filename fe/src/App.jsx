@@ -4,9 +4,11 @@ import HostView from './host/HostView';
 import PlayerView from './player/PlayerView';
 import JoinView from './JoinView';
 import ResultsPage from './ResultsPage.jsx';
+import Header from './components/Header';
 import { WebSocketContext } from './utils/WebSocketContext';
 import { saveSession, getSession, clearSession } from './utils/session';
 import { ThemeProvider } from './utils/ThemeContext';
+import { useLanguage } from './contexts/LanguageContext';
 
 const WS_CONFIG = {
   MAX_RECONNECT_ATTEMPTS: 10,
@@ -206,6 +208,7 @@ const App = () => {
   const [showResults, setShowResults] = useState(false);
   const [resultsData, setResultsData] = useState(null);
   const [attemptingReconnect, setAttemptingReconnect] = useState(!!savedSession);
+  const [roomLanguage, setRoomLanguage] = useState(null); // Language of the room/game
 
   const { wsRef, connectWebSocket, setMessageHandler, cleanup, connectionError } = useWebSocketConnection();
   const [ws, setWs] = useState(null);
@@ -230,7 +233,7 @@ const App = () => {
   const handleWebSocketMessage = useCallback((event) => {
     try {
       const message = JSON.parse(event.data);
-      const { action, isHost: isHostResponse, rooms } = message;
+      const { action, isHost: isHostResponse, rooms, language: roomLang } = message;
 
       switch (action) {
         case 'updateUsers':
@@ -242,6 +245,10 @@ const App = () => {
           setIsActive(true);
           setError('');
           setAttemptingReconnect(false);
+          // Store room language if provided (for hosts)
+          if (roomLang) {
+            setRoomLanguage(roomLang);
+          }
 
           // Save username only if it's a player (not host)
           if (!isHostResponse && username) {
@@ -390,17 +397,19 @@ const App = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [wsRef.current?.readyState, attemptingReconnect, isActive, sendMessage]);
 
-  const handleJoin = useCallback((isHostMode) => {
+  const { language } = useLanguage();
+
+  const handleJoin = useCallback((isHostMode, roomLanguage) => {
     setError('');
 
     if (isHostMode) {
-      // Host needs game code and room name
-      sendMessage({ action: 'createGame', gameCode, roomName });
+      // Host needs game code, room name, and room language
+      sendMessage({ action: 'createGame', gameCode, roomName, language: roomLanguage || language });
     } else {
       // Players need both game code and username
       sendMessage({ action: 'join', gameCode, username });
     }
-  }, [sendMessage, gameCode, username, roomName]);
+  }, [sendMessage, gameCode, username, roomName, language]);
 
   const refreshRooms = useCallback(() => {
     sendMessage({ action: 'getActiveRooms' });
@@ -447,7 +456,7 @@ const App = () => {
     }
 
     if (isHost) {
-      return <HostView gameCode={gameCode} />;
+      return <HostView gameCode={gameCode} roomLanguage={roomLanguage} />;
     }
 
     return (
@@ -465,6 +474,7 @@ const App = () => {
   return (
     <ThemeProvider>
       <WebSocketContext.Provider value={ws}>
+        <Header />
         {renderView()}
       </WebSocketContext.Provider>
     </ThemeProvider>

@@ -23,12 +23,14 @@ export const hebrewLetters = [
     "ת",
   ];
 
+export const englishLetters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
+
 export const DIFFICULTIES = {
-  EASY: { name: 'קל', rows: 4, cols: 4, label: 'Easy (4x4)' },
-  MEDIUM: { name: 'בינוני', rows: 5, cols: 5, label: 'Medium (5x5)' },
-  HARD: { name: 'קשה', rows: 7, cols: 7, label: 'Hard (7x7)' },
-  EXPERT: { name: 'מומחה', rows: 9, cols: 9, label: 'Expert (9x9)' },
-  MASTER: { name: 'אמן', rows: 11, cols: 11, label: 'Master (11x11)' },
+  EASY: { nameKey: 'difficulty.easy', rows: 4, cols: 4 },
+  MEDIUM: { nameKey: 'difficulty.medium', rows: 5, cols: 5 },
+  HARD: { nameKey: 'difficulty.hard', rows: 7, cols: 7 },
+  EXPERT: { nameKey: 'difficulty.expert', rows: 9, cols: 9 },
+  MASTER: { nameKey: 'difficulty.master', rows: 11, cols: 11 },
 };
 
 export const DEFAULT_DIFFICULTY = 'HARD';

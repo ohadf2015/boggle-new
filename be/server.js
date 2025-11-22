@@ -68,8 +68,8 @@ wss.on("connection", (ws) => {
 
       switch (action) {
         case "createGame": {
-          const { gameCode, roomName } = message;
-          setNewGame(gameCode, ws, roomName);
+          const { gameCode, roomName, language } = message;
+          setNewGame(gameCode, ws, roomName, language);
           break;
         }
         case "join": {
@@ -78,8 +78,8 @@ wss.on("connection", (ws) => {
           break;
         }
         case "startGame": {
-          const { letterGrid, timerSeconds } = message;
-          handleStartGame(ws, letterGrid, timerSeconds);
+          const { letterGrid, timerSeconds, language } = message;
+          handleStartGame(ws, letterGrid, timerSeconds, language);
           break;
         }
         case "endGame": {

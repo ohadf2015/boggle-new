@@ -4,7 +4,7 @@
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
+    --background: 210 40% 98%;
     --foreground: 222.2 84% 4.9%;
 
     --card: 0 0% 100%;
@@ -14,6 +14,7 @@
     --popover-foreground: 222.2 84% 4.9%;
 
     --primary: 254 88% 68%;
+    /* Matching dark mode primary for consistency */
     --primary-foreground: 210 40% 98%;
 
     --secondary: 210 40% 96.1%;
@@ -70,6 +71,7 @@
   * {
     @apply border-border;
   }
+
   body {
     @apply bg-background text-foreground;
     margin: 0;

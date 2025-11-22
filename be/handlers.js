@@ -102,6 +102,7 @@ const getActiveRooms = () => {
     roomName: games[gameCode].roomName || `Room ${gameCode}`,
     playerCount: Object.keys(games[gameCode].users).length,
     gameState: games[gameCode].gameState,
+    language: games[gameCode].language || 'en', // Default to English if not set
   })); // Show all rooms as long as they exist (host hasn't left)
 };
 
@@ -134,8 +135,8 @@ const calculateWordScore = (word) => {
     return 10 + (length - 8) * 3; // 8+ letters: 10, 13, 16, 19...
 };
 
-const setNewGame = (gameCode, host, roomName) => {
-    console.log(`[CREATE] Creating game - gameCode: ${gameCode}, roomName: ${roomName}`);
+const setNewGame = (gameCode, host, roomName, language = 'en') => {
+    console.log(`[CREATE] Creating game - gameCode: ${gameCode}, roomName: ${roomName}, language: ${language}`);
 
     const existingGame = getGame(gameCode);
 
@@ -153,6 +154,7 @@ const setNewGame = (gameCode, host, roomName) => {
             gameState: 'waiting',
             startTime: null,
             letterGrid: null,
+            language: language,
         };
 
         gameWs.set(host, gameCode);
@@ -164,7 +166,7 @@ const setNewGame = (gameCode, host, roomName) => {
           console.error('[REDIS] Error saving game state:', err)
         );
 
-        host.send(JSON.stringify({ action: "joined", isHost: true }));
+        host.send(JSON.stringify({ action: "joined", isHost: true, language: language }));
     } else if (existingGame.hostDisconnected) {
         // Host is reconnecting - update the WebSocket and clear disconnect timeout
         console.log(`[CREATE] Host reconnecting to game ${gameCode}`);
@@ -184,7 +186,7 @@ const setNewGame = (gameCode, host, roomName) => {
         wsUsername.set(host, '__HOST__'); // Mark as host in the username map
 
         console.log(`[CREATE] Host reconnected to game ${gameCode}`);
-        host.send(JSON.stringify({ action: "joined", isHost: true }));
+        host.send(JSON.stringify({ action: "joined", isHost: true, language: existingGame.language }));
 
         // Send current user list
         host.send(JSON.stringify({
@@ -286,7 +288,7 @@ const addUserToGame = (gameCode, username, ws) => {
     );
 }
 
-const handleStartGame = (host, letterGrid, timerSeconds) => {
+const handleStartGame = (host, letterGrid, timerSeconds, language) => {
   const gameCode = gameWs.get(host);
 
   if (!gameCode || !games[gameCode]) {
@@ -302,6 +304,9 @@ const handleStartGame = (host, letterGrid, timerSeconds) => {
   games[gameCode].letterGrid = letterGrid;
   games[gameCode].firstWordFound = false;
   games[gameCode].timerSeconds = timerSeconds;
+  if (language) {
+    games[gameCode].language = language;
+  }
 
   // Reset all player scores, words, and achievements
   Object.keys(games[gameCode].users).forEach(username => {
@@ -311,7 +316,7 @@ const handleStartGame = (host, letterGrid, timerSeconds) => {
     games[gameCode].playerWordDetails[username] = [];
   });
 
-  const startMessage = { action: "startGame", letterGrid, timerSeconds };
+  const startMessage = { action: "startGame", letterGrid, timerSeconds, language: games[gameCode].language };
   console.log(`[START_GAME] Broadcasting to ${Object.keys(games[gameCode].users).length} players:`, Object.keys(games[gameCode].users));
   sendAllPlayerAMessage(gameCode, startMessage);
   broadcastLeaderboard(gameCode);
@@ -755,66 +760,60 @@ const handleDisconnect = (ws) => {
       }
 
       // Mark player as disconnected but keep them in the game
-      games[gameCode].disconnectedPlayers[username] = {
+        games[gameCode].disconnectedPlayers[username] = {
         disconnectedAt: Date.now(),
         timeout: setTimeout(() => {
           // Only remove if game still exists and player hasn't reconnected
           if (games[gameCode] && games[gameCode].disconnectedPlayers?.[username]) {
-            console.log(`[DISCONNECT] Player ${username} reconnect grace period expired, removing from game ${gameCode}`);
-
+            console.log(`[DISCONNECT] Player ${username} reconnect grace period expired, removing data from game ${gameCode}`);
+            
             // Remove from disconnected players
             delete games[gameCode].disconnectedPlayers[username];
-
-            // Remove from game
-            if (games[gameCode].users[username]) {
-              delete games[gameCode].users[username];
-              delete games[gameCode].playerScores[username];
-              delete games[gameCode].playerWords[username];
-              delete games[gameCode].playerAchievements[username];
-              delete games[gameCode].playerWordDetails[username];
-
-              const remainingPlayers = Object.keys(games[gameCode].users);
-
-              // Notify host of updated user list
-              sendHostAMessage(gameCode, {
-                action: "updateUsers",
-                users: remainingPlayers
-              });
-
-              // Broadcast updated leaderboard after player leaves
-              broadcastLeaderboard(gameCode);
-
-              // IMPORTANT: Game automatically ends when 1 or 0 players remain
-              // Game ONLY ends when:
-              // 1. Host manually stops it
-              // 2. Timer runs out
-              // 3. After a disconnect, 1 or fewer players remain
-
-              // Auto-end game if 1 or 0 players remain during active gameplay
-              if (remainingPlayers.length <= 1 && games[gameCode].gameState === 'playing') {
-                console.log(`[DISCONNECT] ${remainingPlayers.length} player(s) remain in game ${gameCode}, ending game automatically`);
-
-                // Clear the timer
-                if (games[gameCode].timerInterval) {
-                  clearInterval(games[gameCode].timerInterval);
-                  games[gameCode].timerInterval = null;
-                }
-
-                // Set game state to ended
-                games[gameCode].gameState = 'ended';
-
-                // End the game and trigger validation/final scores
-                // This will send 'showValidation' to host and 'endGame' + 'finalScores' to players
-                handleEndGame(games[gameCode].host);
-              }
+            
+            // Data cleanup is done here (scores etc)
+            if (games[gameCode].playerScores[username]) {
+               delete games[gameCode].playerScores[username];
+               delete games[gameCode].playerWords[username];
+               delete games[gameCode].playerAchievements[username];
+               delete games[gameCode].playerWordDetails[username];
             }
+            
+            // Broadcast updated leaderboard (to remove them from there too)
+            broadcastLeaderboard(gameCode);
           }
-        }, 30000) // 30 second grace period
+        }, 30000) // 30 seconds grace period
       };
 
-      // Don't immediately remove from game - they might reconnect
-      // We keep them in users{} but with a stale WebSocket
-    }
+      // Remove from active users immediately so they disappear from the list
+      delete games[gameCode].users[username];
+
+      // Notify host of updated user list immediately
+      const remainingPlayers = Object.keys(games[gameCode].users);
+      sendHostAMessage(gameCode, {
+        action: "updateUsers",
+        users: remainingPlayers
+      });
+      
+      // Broadcast updated leaderboard
+      broadcastLeaderboard(gameCode);
+
+      // Check if game should end (if 0 players left, or 1 player left and game is playing)
+      // If 0 players, always end/delete.
+      // If 1 player and playing, end game.
+      if (remainingPlayers.length === 0) {
+         console.log(`[DISCONNECT] No players left in game ${gameCode}, closing room.`);
+         // Clear host disconnect timeout if exists
+         if (games[gameCode].hostDisconnectTimeout) clearTimeout(games[gameCode].hostDisconnectTimeout);
+         // Delete game
+         delete games[gameCode];
+         deleteGameState(gameCode).catch(e => console.error(e));
+      } else if (remainingPlayers.length <= 1 && games[gameCode].gameState === 'playing') {
+         console.log(`[DISCONNECT] ${remainingPlayers.length} player(s) remain in game ${gameCode}, ending game automatically`);
+         if (games[gameCode].timerInterval) clearInterval(games[gameCode].timerInterval);
+         handleEndGame(games[gameCode].host);
+      }
+
+  }
   }
 
   // Clean up the mappings

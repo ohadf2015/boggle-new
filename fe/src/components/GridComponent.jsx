@@ -7,7 +7,9 @@ const GridComponent = ({
     interactive = false,
     onWordSubmit,
     selectedCells: externalSelectedCells,
-    className
+    className,
+    largeText = false,
+    playerView = false
 }) => {
     const [internalSelectedCells, setInternalSelectedCells] = useState([]);
     const isTouchingRef = useRef(false);
@@ -189,7 +191,9 @@ const GridComponent = ({
                             transition={{ duration: 0.2 }}
                             className={cn(
                                 "aspect-square flex items-center justify-center font-bold shadow-sm cursor-pointer transition-colors border",
-                                isLargeGrid ? "text-lg sm:text-xl rounded-md" : "text-2xl sm:text-3xl rounded-lg",
+                                isLargeGrid
+                                    ? (largeText ? "text-2xl sm:text-3xl rounded-md" : "text-lg sm:text-xl rounded-md")
+                                    : (largeText || playerView ? "text-4xl sm:text-6xl rounded-xl" : "text-2xl sm:text-3xl rounded-lg"),
                                 isSelected
                                     ? "bg-gradient-to-br from-yellow-400 to-orange-500 text-white border-yellow-300 z-10 shadow-lg"
                                     : "bg-gradient-to-br from-white to-slate-100 dark:from-slate-800 dark:to-slate-900 text-slate-900 dark:text-white border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700/80"

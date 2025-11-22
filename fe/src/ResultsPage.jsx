@@ -7,6 +7,7 @@ import { Badge } from './components/ui/badge';
 import { AchievementBadge } from './components/AchievementBadge';
 import GridComponent from './components/GridComponent';
 import confetti from 'canvas-confetti';
+import { useLanguage } from './contexts/LanguageContext';
 import './style/animation.scss';
 import { cn } from './lib/utils';
 
@@ -14,18 +15,21 @@ import { cn } from './lib/utils';
 
 const WORD_COLORS = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#FFA07A', '#98D8C8', '#F7DC6F', '#BB8FCE'];
 
-const LetterGrid = ({ letterGrid }) => (
-  <div className="mb-6 text-center">
-    <h3 className="text-lg font-bold text-cyan-400 mb-3">
-      לוח המשחק
-    </h3>
-    <GridComponent
-      grid={letterGrid}
-      interactive={false}
-      className="max-w-xs mx-auto"
-    />
-  </div>
-);
+const LetterGrid = ({ letterGrid }) => {
+  const { t } = useLanguage();
+  return (
+    <div className="mb-6 text-center">
+      <h3 className="text-lg font-bold text-cyan-400 mb-3">
+        {t('playerView.letterGrid')}
+      </h3>
+      <GridComponent
+        grid={letterGrid}
+        interactive={false}
+        className="max-w-xs mx-auto"
+      />
+    </div>
+  );
+};
 
 const WordChip = ({ wordObj, index }) => {
   const isDuplicate = wordObj.isDuplicate;
@@ -59,6 +63,7 @@ const AchievementChip = ({ achievement, index }) => (
 );
 
 const PlayerScore = ({ player, index }) => {
+  const { t } = useLanguage();
   // Only show detailed card for non-podium players OR if we want to show details for everyone below the podium
   // But the request was for a podium and then list.
   // Let's make the list items simpler for everyone, or just keep the cards but maybe less emphasized for non-winners.
@@ -89,18 +94,18 @@ const PlayerScore = ({ player, index }) => {
         </div>
 
         <p className="text-sm mb-1 text-white/80">
-          מילים שנמצאו: {player.wordCount} {player.validWordCount !== undefined && `(${player.validWordCount} תקינות)`}
+          {t('hostView.words')}: {player.wordCount} {player.validWordCount !== undefined && `(${player.validWordCount} ${t('results.valid')})`}
         </p>
 
         {player.longestWord && (
           <p className="text-sm mb-2 text-white/80">
-            המילה הארוכה ביותר: <strong className="text-cyan-300">{player.longestWord}</strong>
+            {t('playerView.longestWord')}: <strong className="text-cyan-300">{player.longestWord}</strong>
           </p>
         )}
 
         {player.allWords && player.allWords.length > 0 && (
           <div className="mt-3">
-            <p className="text-sm font-bold mb-2 text-white/90">מילים:</p>
+            <p className="text-sm font-bold mb-2 text-white/90">{t('hostView.words')}:</p>
             <div className="flex flex-wrap gap-2">
               {player.allWords.map((wordObj, i) => (
                 <WordChip key={i} wordObj={wordObj} index={i} />
@@ -111,7 +116,7 @@ const PlayerScore = ({ player, index }) => {
 
         {player.achievements && player.achievements.length > 0 && (
           <div className="mt-3">
-            <p className="text-sm font-bold mb-2 text-white/90">הישגים:</p>
+            <p className="text-sm font-bold mb-2 text-slate-900 dark:text-white/90">הישגים:</p>
             <div className="flex flex-wrap gap-2">
               {player.achievements.map((ach, i) => (
                 <AchievementChip key={i} achievement={ach} index={i} />
@@ -125,11 +130,12 @@ const PlayerScore = ({ player, index }) => {
 };
 
 const ResultsPage = ({ finalScores, letterGrid, gameCode, onReturnToRoom }) => {
+  const { t } = useLanguage();
   const [autoReplayCountdown, setAutoReplayCountdown] = React.useState(10);
   const [isAutoReplayCancelled, setIsAutoReplayCancelled] = React.useState(false);
 
   const handleExitRoom = () => {
-    if (window.confirm('האם אתה בטוח שברצונך לצאת מהחדר?')) {
+    if (window.confirm(t('playerView.exitConfirmation'))) {
       window.location.reload();
     }
   };
@@ -197,7 +203,7 @@ const ResultsPage = ({ finalScores, letterGrid, gameCode, onReturnToRoom }) => {
           className="font-bold bg-red-500/80 hover:bg-red-500 border border-red-400/30 hover:shadow-[0_0_15px_rgba(239,68,68,0.5)]"
         >
           <FaSignOutAlt className="mr-2" />
-          יציאה מהחדר
+          {t('results.exitRoom')}
         </Button>
       </div>
 
@@ -208,7 +214,7 @@ const ResultsPage = ({ finalScores, letterGrid, gameCode, onReturnToRoom }) => {
         className="mb-5"
       >
         <h1 className="text-5xl sm:text-6xl md:text-7xl font-bold tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-teal-300 to-purple-400">
-          BOGGLE
+          {t('joinView.title')}
         </h1>
       </motion.div>
 
@@ -237,10 +243,10 @@ const ResultsPage = ({ finalScores, letterGrid, gameCode, onReturnToRoom }) => {
                 <FaCrown className="text-6xl text-white drop-shadow-lg mb-2" />
               </motion.div>
               <h2 className="text-4xl md:text-5xl font-black text-white drop-shadow-lg mb-2">
-                המנצח: {winner.username}!
+                {t('results.winnerAnnouncement')}: {winner.username}!
               </h2>
               <p className="text-2xl font-bold text-white/90">
-                {winner.score} נקודות
+                {winner.score} {t('results.points')}
               </p>
               <div className="flex justify-center gap-2 mt-3">
                 <motion.div
@@ -275,7 +281,7 @@ const ResultsPage = ({ finalScores, letterGrid, gameCode, onReturnToRoom }) => {
       >
         <Card className="p-4 sm:p-6 max-h-[85vh] overflow-auto bg-white/90 dark:bg-slate-800/90 backdrop-blur-md border border-purple-500/30 shadow-[0_0_20px_rgba(168,85,247,0.15)]">
           <h2 className="text-3xl sm:text-4xl font-bold text-yellow-400 text-center mb-6 flex items-center justify-center gap-2">
-            <FaTrophy /> תוצאות סופיות
+            <FaTrophy /> {t('results.finalScores')}
           </h2>
 
           {letterGrid && <LetterGrid letterGrid={letterGrid} />}
@@ -292,7 +298,7 @@ const ResultsPage = ({ finalScores, letterGrid, gameCode, onReturnToRoom }) => {
               >
                 <div className="mb-2 text-center">
                   <span className="text-2xl font-bold text-gray-300">🥈 {sortedScores[1].username}</span>
-                  <div className="text-lg font-bold text-white">{sortedScores[1].score} נק'</div>
+                  <div className="text-lg font-bold text-white">{sortedScores[1].score} {t('results.points').slice(0, 3)}</div>
                 </div>
                 <div className="w-24 h-32 bg-gradient-to-t from-gray-400 to-gray-300 rounded-t-lg shadow-lg flex items-end justify-center pb-2 border-t border-gray-200">
                   <span className="text-4xl font-black text-white/50">2</span>
@@ -310,7 +316,7 @@ const ResultsPage = ({ finalScores, letterGrid, gameCode, onReturnToRoom }) => {
                 <FaCrown className="text-4xl text-yellow-400 mb-2 animate-bounce" />
                 <div className="mb-2 text-center">
                   <span className="text-3xl font-bold text-yellow-300">🥇 {sortedScores[0].username}</span>
-                  <div className="text-xl font-bold text-white">{sortedScores[0].score} נק'</div>
+                  <div className="text-xl font-bold text-white">{sortedScores[0].score} {t('results.points').slice(0, 3)}</div>
                 </div>
                 <div className="w-28 h-40 bg-gradient-to-t from-yellow-500 to-yellow-300 rounded-t-lg shadow-xl flex items-end justify-center pb-2 border-t border-yellow-200 shadow-[0_0_20px_rgba(234,179,8,0.5)]">
                   <span className="text-5xl font-black text-white/50">1</span>
@@ -328,7 +334,7 @@ const ResultsPage = ({ finalScores, letterGrid, gameCode, onReturnToRoom }) => {
               >
                 <div className="mb-2 text-center">
                   <span className="text-2xl font-bold text-orange-300">🥉 {sortedScores[2].username}</span>
-                  <div className="text-lg font-bold text-white">{sortedScores[2].score} נק'</div>
+                  <div className="text-lg font-bold text-white">{sortedScores[2].score} {t('results.points').slice(0, 3)}</div>
                 </div>
                 <div className="w-24 h-24 bg-gradient-to-t from-orange-600 to-orange-400 rounded-t-lg shadow-lg flex items-end justify-center pb-2 border-t border-orange-300">
                   <span className="text-4xl font-black text-white/50">3</span>
@@ -360,7 +366,7 @@ const ResultsPage = ({ finalScores, letterGrid, gameCode, onReturnToRoom }) => {
                   onClick={() => setIsAutoReplayCancelled(true)}
                   className="text-gray-400 hover:text-white"
                 >
-                  בטל מעבר אוטומטי
+                  {t('results.cancelAutoReturn')}
                 </Button>
               )}
             </div>

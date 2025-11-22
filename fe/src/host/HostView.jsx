@@ -12,23 +12,26 @@ import { Checkbox } from '../components/ui/checkbox';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '../components/ui/dialog';
 import { AchievementBadge } from '../components/AchievementBadge';
 import GridComponent from '../components/GridComponent';
-import GameHeader from '../components/GameHeader';
 import ShareButton from '../components/ShareButton';
+import SlotMachineText from '../components/SlotMachineText';
 import '../style/animation.scss';
-import { generateRandomTable } from '../utils/utils';
+import { generateRandomTable, embedWordInGrid } from '../utils/utils';
 import { useWebSocket } from '../utils/WebSocketContext';
 import { clearSession } from '../utils/session';
 import { copyJoinUrl, shareViaWhatsApp } from '../utils/share';
+import { useLanguage } from '../contexts/LanguageContext';
 import { DIFFICULTIES, DEFAULT_DIFFICULTY } from '../utils/consts';
 import { cn } from '../lib/utils';
 
-const HostView = ({ gameCode }) => {
+const HostView = ({ gameCode, roomLanguage: roomLanguageProp }) => {
+  const { t, language } = useLanguage();
   const ws = useWebSocket();
   const [difficulty, setDifficulty] = useState(DEFAULT_DIFFICULTY);
   const [tableData, setTableData] = useState(generateRandomTable());
   const [timerValue, setTimerValue] = useState('1');
   const [remainingTime, setRemainingTime] = useState(null);
   const [gameStarted, setGameStarted] = useState(false);
+  const [roomLanguage] = useState(roomLanguageProp || language); // Use prop if available, fallback to user's language
 
   const [playersReady, setPlayersReady] = useState([]);
   const [showValidation, setShowValidation] = useState(false);
@@ -37,6 +40,62 @@ const HostView = ({ gameCode }) => {
   const [finalScores, setFinalScores] = useState(null);
   const [showQR, setShowQR] = useState(false);
   const [playerWordCounts, setPlayerWordCounts] = useState({});
+
+  // Animation states
+  const [shufflingGrid, setShufflingGrid] = useState(null);
+  const [highlightedCells, setHighlightedCells] = useState([]);
+
+  // Pre-game shuffling animation with player names
+  useEffect(() => {
+    if (gameStarted) {
+      setShufflingGrid(null);
+      setHighlightedCells([]);
+      return;
+    }
+
+    const currentLang = roomLanguage || language;
+    const rows = DIFFICULTIES[difficulty].rows;
+    const cols = DIFFICULTIES[difficulty].cols;
+
+    const interval = setInterval(() => {
+      // 30% chance to show a player name if players exist
+      const showPlayerName = playersReady.length > 0 && Math.random() < 0.3;
+
+      if (showPlayerName) {
+        const randomPlayer = playersReady[Math.floor(Math.random() * playersReady.length)];
+        const result = embedWordInGrid(rows, cols, randomPlayer, currentLang);
+
+        if (result.path && result.path.length > 0) {
+          setShufflingGrid(result.grid);
+
+          // Animate letter-by-letter selection
+          let currentIndex = 0;
+          const animateSelection = () => {
+            if (currentIndex < result.path.length) {
+              setHighlightedCells(result.path.slice(0, currentIndex + 1));
+              currentIndex++;
+              setTimeout(animateSelection, 100); // 100ms per letter
+            } else {
+              // Clear highlight after completing the word
+              setTimeout(() => {
+                setHighlightedCells([]);
+              }, 500);
+            }
+          };
+          animateSelection();
+        } else {
+          // Fallback to random grid if name couldn't be placed
+          setShufflingGrid(generateRandomTable(rows, cols, currentLang));
+          setHighlightedCells([]);
+        }
+      } else {
+        setShufflingGrid(generateRandomTable(rows, cols, currentLang));
+        setHighlightedCells([]);
+      }
+    }, 2000);
+
+    return () => clearInterval(interval);
+  }, [gameStarted, difficulty, roomLanguage, language, playersReady]);
 
   // Prevent accidental page refresh/close only when there are players or game is active
   useEffect(() => {
@@ -73,7 +132,7 @@ const HostView = ({ gameCode }) => {
           break;
 
         case 'playerJoinedLate':
-          toast.success(`${message.username} הצטרף למשחק באמצע! ⏰`, {
+          toast.success(`${message.username} ${t('hostView.playerJoinedLate')} ⏰`, {
             icon: '🚀',
             duration: 4000,
           });
@@ -82,7 +141,7 @@ const HostView = ({ gameCode }) => {
 
 
         case 'playerFoundWord':
-          toast(`${message.username} מצא "${message.word}"!`, {
+          toast(`${message.username} ${t('hostView.playerFoundWord')} "${message.word}"!`, {
             icon: '🎯',
             duration: 2000,
           });
@@ -107,7 +166,7 @@ const HostView = ({ gameCode }) => {
             initialValidations[word] = true; // Default to valid
           });
           setValidations(initialValidations);
-          toast.success('סקור ואשר את כל המילים', {
+          toast.success(t('hostView.validateWords'), {
             icon: '✅',
             duration: 5000,
           });
@@ -116,7 +175,7 @@ const HostView = ({ gameCode }) => {
         case 'validationComplete':
           setFinalScores(message.scores);
           setShowValidation(false);
-          toast.success('האימות הושלם!', {
+          toast.success(t('hostView.validationComplete'), {
             icon: '🎉',
             duration: 3000,
           });
@@ -171,11 +230,14 @@ const HostView = ({ gameCode }) => {
         ws.onmessage = originalHandler;
       }
     };
-  }, [ws, gameStarted]);
+  }, [ws, gameStarted, t]);
 
   const startGame = () => {
+    if (playersReady.length === 0) return;
+
+    // Actually start the game
     const difficultyConfig = DIFFICULTIES[difficulty];
-    const newTable = generateRandomTable(difficultyConfig.rows, difficultyConfig.cols);
+    const newTable = generateRandomTable(difficultyConfig.rows, difficultyConfig.cols, roomLanguage);
     setTableData(newTable);
     const seconds = timerValue * 60;
     setRemainingTime(seconds);
@@ -188,10 +250,11 @@ const HostView = ({ gameCode }) => {
         action: 'startGame',
         letterGrid: newTable,
         timerSeconds: seconds,
+        language: roomLanguage
       })
     );
 
-    toast.success('המשחק התחיל!', {
+    toast.success(t('hostView.gameStarted'), {
       icon: '🎮',
       duration: 3000,
     });
@@ -202,7 +265,7 @@ const HostView = ({ gameCode }) => {
     setRemainingTime(null);
     setGameStarted(false);
 
-    toast('Game Stopped', {
+    toast(t('hostView.gameStopped'), {
       icon: '⏹️',
     });
   };
@@ -214,7 +277,7 @@ const HostView = ({ gameCode }) => {
   };
 
   const handleExitRoom = () => {
-    if (window.confirm('האם אתה בטוח שברצונך לצאת? זה יסגור את החדר לכל השחקנים.')) {
+    if (window.confirm(t('hostView.confirmExit'))) {
       // Clear session cookie
       clearSession();
       // Send close room message to server first
@@ -290,7 +353,7 @@ const HostView = ({ gameCode }) => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-50 via-slate-100 to-slate-200 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 flex flex-col items-center p-2 sm:p-4 overflow-auto transition-colors duration-300">
+    <div className="min-h-screen bg-gradient-to-b from-slate-50 via-slate-100 to-slate-200 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 flex flex-col items-center p-4 sm:p-6 md:p-8 overflow-auto transition-colors duration-300">
       <Toaster position="top-center" />
 
       {/* Validation Modal */}
@@ -298,15 +361,15 @@ const HostView = ({ gameCode }) => {
         <DialogContent className="max-w-4xl max-h-[90vh] overflow-auto">
           <DialogHeader>
             <DialogTitle className="text-center text-2xl sm:text-3xl text-indigo-600 font-bold">
-              ✅ אימות מילים
+              ✅ {t('hostView.validation')}
             </DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
             <p className="text-center text-muted-foreground">
-              סמן את המילים התקינות. מילים לא מסומנות יוסרו מהציון הסופי.
+              {t('hostView.validateIntro')}
             </p>
             <p className="text-center text-sm text-orange-600 font-bold">
-              ⚠ מילים שמופיעות אצל יותר משחקן אחד יוסרו אוטומטית
+              ⚠ {t('hostView.duplicateWarning')}
             </p>
 
             {showValidation && (() => {
@@ -315,7 +378,7 @@ const HostView = ({ gameCode }) => {
               return (
                 <div className="space-y-3">
                   <p className="text-center text-sm text-muted-foreground">
-                    סה"כ {uniqueWords.length} מילים למאמת
+                    {t('hostView.totalWords')} {uniqueWords.length}
                   </p>
 
                   <div className="max-h-[50vh] overflow-auto space-y-2">
@@ -348,7 +411,7 @@ const HostView = ({ gameCode }) => {
                             </span>
                             {isDuplicate && (
                               <Badge variant="destructive" className="bg-orange-500">
-                                ⚠ {item.playerCount} שחקנים
+                                ⚠ {item.playerCount} {t('joinView.players')}
                               </Badge>
                             )}
                             {item.playerCount === 1 && (
@@ -370,7 +433,7 @@ const HostView = ({ gameCode }) => {
               onClick={submitValidation}
               className="w-full h-12 text-lg font-bold bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-purple-600 hover:to-indigo-600"
             >
-              שלח אימות
+              {t('hostView.submitValidation')}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -381,7 +444,7 @@ const HostView = ({ gameCode }) => {
         <DialogContent className="max-w-3xl max-h-[80vh] overflow-auto">
           <DialogHeader>
             <DialogTitle className="text-center text-3xl sm:text-4xl text-yellow-500 font-bold flex items-center justify-center gap-2">
-              <FaTrophy /> תוצאות סופיות
+              <FaTrophy /> {t('hostView.finalScores')}
             </DialogTitle>
           </DialogHeader>
           <div className="space-y-3">
@@ -406,12 +469,12 @@ const HostView = ({ gameCode }) => {
                       {player.score}
                     </div>
                     <p className="text-sm mb-1 text-white/80">
-                      מילים: {player.wordCount} {player.validWordCount !== undefined && `(${player.validWordCount} תקינות)`}
+                      {t('hostView.words')}: {player.wordCount} {player.validWordCount !== undefined && `(${player.validWordCount} valid)`}
                     </p>
 
                     {player.longestWord && (
                       <p className="text-sm mb-2">
-                        הארוכה ביותר: <strong>{player.longestWord}</strong>
+                        {t('playerView.longestWord')}: <strong>{player.longestWord}</strong>
                       </p>
                     )}
                   </div>
@@ -419,7 +482,7 @@ const HostView = ({ gameCode }) => {
                   {/* Word Visualization with colors */}
                   {player.allWords && player.allWords.length > 0 && (
                     <div className="mt-3">
-                      <p className="text-sm font-bold mb-2">מילים:</p>
+                      <p className="text-sm font-bold mb-2">{t('hostView.words')}:</p>
                       <div className="flex flex-wrap gap-2">
                         {player.allWords.map((wordObj, i) => (
                           <Badge
@@ -445,7 +508,7 @@ const HostView = ({ gameCode }) => {
 
                   {player.achievements && player.achievements.length > 0 && (
                     <div className="mt-3">
-                      <p className="text-sm font-bold mb-2">הישגים:</p>
+                      <p className="text-sm font-bold mb-2">{t('hostView.achievements')}:</p>
                       <div className="flex flex-wrap gap-2">
                         {player.achievements.map((ach, i) => (
                           <AchievementBadge key={i} achievement={ach} index={i} />
@@ -470,36 +533,33 @@ const HostView = ({ gameCode }) => {
 
                 setTimerValue('');
 
-                toast.success('מוכן למשחק חדש! 🎮', {
+                toast.success(`${t('hostView.newGameReady')} 🎮`, {
                   icon: '🔄',
                   duration: 2000,
                 });
               }}
               className="w-full bg-green-600 hover:bg-green-700"
             >
-              🎮 התחל משחק חדש
+              🎮 {t('hostView.startNewGame')}
             </Button>
             <Button onClick={() => setFinalScores(null)} variant="outline" className="w-full">
-              סגור
+              {t('hostView.close')}
             </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
 
-      {/* Game Header with Exit Button */}
-      <GameHeader
-        onLogoClick={() => window.location.href = '/'}
-        rightContent={
-          <Button
-            variant="outline"
-            onClick={handleExitRoom}
-            className="font-medium bg-white/80 dark:bg-slate-800/80 text-cyan-600 dark:text-cyan-300 border border-cyan-500/50 hover:border-cyan-400 hover:text-cyan-700 dark:hover:text-cyan-200 hover:shadow-[0_0_15px_rgba(6,182,212,0.3)] shadow-md backdrop-blur-sm transition-all duration-300"
-          >
-            <FaSignOutAlt className="mr-2" />
-            יציאה מהחדר
-          </Button>
-        }
-      />
+      {/* Top Bar with Exit Button */}
+      <div className="w-full max-w-6xl flex justify-end mb-4">
+        <Button
+          variant="outline"
+          onClick={handleExitRoom}
+          className="font-medium bg-white/80 dark:bg-slate-800/80 text-cyan-600 dark:text-cyan-300 border border-cyan-500/50 hover:border-cyan-400 hover:text-cyan-700 dark:hover:text-cyan-200 hover:shadow-[0_0_15px_rgba(6,182,212,0.3)] shadow-md backdrop-blur-sm transition-all duration-300"
+        >
+          <FaSignOutAlt className="mr-2" />
+          {t('hostView.exitRoom')}
+        </Button>
+      </div>
 
       {/* QR Code Dialog */}
       <Dialog open={showQR} onOpenChange={setShowQR}>
@@ -507,7 +567,7 @@ const HostView = ({ gameCode }) => {
           <DialogHeader>
             <DialogTitle className="text-center text-cyan-600 dark:text-cyan-300 flex items-center justify-center gap-2">
               <FaQrcode />
-              קוד QR להצטרפות
+              {t('hostView.qrCode')}
             </DialogTitle>
           </DialogHeader>
           <div className="flex flex-col items-center gap-4 py-4">
@@ -516,7 +576,7 @@ const HostView = ({ gameCode }) => {
             </div>
             <h4 className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-400">{gameCode}</h4>
             <p className="text-sm text-center text-slate-500 dark:text-slate-400">
-              סרוק את הקוד כדי להצטרף למשחק או השתמש בקוד {gameCode}
+              {t('hostView.scanQr')} {gameCode}
             </p>
             <p className="text-xs text-center text-slate-500">
               {getJoinUrl()}
@@ -527,7 +587,7 @@ const HostView = ({ gameCode }) => {
               onClick={() => setShowQR(false)}
               className="w-full bg-gradient-to-r from-cyan-500 to-teal-500 hover:from-cyan-400 hover:to-teal-400 hover:shadow-[0_0_15px_rgba(6,182,212,0.5)]"
             >
-              סגור
+              {t('hostView.close')}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -541,7 +601,7 @@ const HostView = ({ gameCode }) => {
           <Card className="flex-1 bg-white/80 dark:bg-slate-800/80 backdrop-blur-md p-4 sm:p-5 rounded-lg shadow-lg border border-purple-500/30 shadow-[0_0_15px_rgba(168,85,247,0.1)]">
             <h3 className="text-base font-bold text-purple-600 dark:text-purple-300 mb-4 flex items-center gap-2">
               <FaCog className="text-cyan-600 dark:text-cyan-400 text-sm" />
-              הגדרות משחק
+              {t('hostView.gameSettings')}
             </h3>
             <div className="w-full space-y-4">
               {!gameStarted ? (
@@ -566,7 +626,7 @@ const HostView = ({ gameCode }) => {
                             )}
                           >
                             <div className="flex flex-col items-center gap-0.5">
-                              <span className="font-bold">{DIFFICULTIES[key].name}</span>
+                              <span className="font-bold">{t(DIFFICULTIES[key].nameKey)}</span>
                               <span className="text-xs opacity-90">
                                 ({DIFFICULTIES[key].rows}x{DIFFICULTIES[key].cols})
                               </span>
@@ -618,7 +678,7 @@ const HostView = ({ gameCode }) => {
                         <FaPlus size={12} />
                       </button>
 
-                      <span className="text-sm text-purple-600 dark:text-purple-300 font-medium mr-2">דקות</span>
+                      <span className="text-sm text-purple-600 dark:text-purple-300 font-medium mr-2">{t('hostView.minutes')}</span>
                     </div>
                   </div>
 
@@ -629,7 +689,7 @@ const HostView = ({ gameCode }) => {
                       disabled={!timerValue || playersReady.length === 0}
                       className="w-full max-w-xs h-11 bg-gradient-to-r from-cyan-500 to-teal-500 hover:from-cyan-400 hover:to-teal-400 text-base font-bold text-white shadow-lg hover:shadow-[0_0_25px_rgba(6,182,212,0.5)] transition-all duration-300 disabled:opacity-50 disabled:hover:shadow-none"
                     >
-                      התחל משחק
+                      {t('hostView.startGame')}
                     </Button>
                   </div>
                 </>
@@ -639,7 +699,7 @@ const HostView = ({ gameCode }) => {
                   variant="destructive"
                   className="w-full max-w-xs h-12 text-base font-bold shadow-lg bg-gradient-to-r from-rose-500 to-pink-500 hover:from-rose-400 hover:to-pink-400 hover:shadow-[0_0_25px_rgba(244,63,94,0.5)] transition-all duration-300"
                 >
-                  עצור משחק
+                  {t('hostView.stopGame')}
                 </Button>
               )}
             </div>
@@ -647,31 +707,41 @@ const HostView = ({ gameCode }) => {
 
           {/* Game Code - RIGHT - Neon Style */}
           <Card className="lg:min-w-[320px] bg-white/90 dark:bg-slate-800/90 backdrop-blur-md text-slate-900 dark:text-white text-center p-4 sm:p-6 rounded-lg shadow-lg border border-cyan-500/30 shadow-[0_0_20px_rgba(6,182,212,0.15)] flex flex-col justify-center">
-            <p className="text-sm text-cyan-600 dark:text-cyan-300 mb-2">קוד משחק:</p>
+            <p className="text-sm text-cyan-600 dark:text-cyan-300 mb-2">{t('hostView.roomCode')}:</p>
             <h2 className="text-4xl sm:text-5xl font-bold mb-4 tracking-wide text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-400">
               {gameCode}
             </h2>
+
+            {/* Language Badge (Static) */}
+            {!gameStarted && (
+              <div className="mb-4 flex justify-center">
+                <Badge variant="outline" className="text-lg px-4 py-1 border-cyan-500/50 text-cyan-600 dark:text-cyan-300">
+                  {roomLanguage === 'he' ? '🇮🇱 עברית' : '🇺🇸 English'}
+                </Badge>
+              </div>
+            )}
+
             <div className="flex flex-wrap gap-2 justify-center">
               <ShareButton
                 variant="link"
                 onClick={() => copyJoinUrl(gameCode)}
                 icon={<FaLink />}
               >
-                העתק קישור
+                {t('hostView.copyLink')}
               </ShareButton>
               <ShareButton
                 variant="whatsapp"
                 onClick={() => shareViaWhatsApp(gameCode)}
                 icon={<FaWhatsapp />}
               >
-                שתף בוואטסאפ
+                {t('hostView.shareWhatsapp')}
               </ShareButton>
               <ShareButton
                 variant="qr"
                 onClick={() => setShowQR(true)}
                 icon={<FaQrcode />}
               >
-                ברקוד
+                {t('hostView.qrCode')}
               </ShareButton>
             </div>
           </Card>
@@ -686,7 +756,7 @@ const HostView = ({ gameCode }) => {
           )}>
             <h3 className="text-lg font-bold text-purple-600 dark:text-purple-300 mb-4 flex items-center gap-2">
               <FaUsers className="text-purple-500 dark:text-purple-400" />
-              שחקנים ({playersReady.length})
+              {t('hostView.playersJoined')} ({playersReady.length})
             </h3>
             <div className="flex flex-col gap-2">
               <AnimatePresence>
@@ -699,7 +769,7 @@ const HostView = ({ gameCode }) => {
                     transition={{ delay: index * 0.05 }}
                   >
                     <Badge className="bg-gradient-to-r from-purple-500 to-pink-500 font-bold text-white px-3 py-2 text-base w-full justify-between shadow-[0_0_10px_rgba(168,85,247,0.3)]">
-                      <span>{user}</span>
+                      <SlotMachineText text={user} />
                       {gameStarted && (
                         <span className="bg-white/20 px-2 py-0.5 rounded-full text-sm">
                           {playerWordCounts[user] || 0}
@@ -712,16 +782,17 @@ const HostView = ({ gameCode }) => {
             </div>
             {playersReady.length === 0 && (
               <p className="text-sm text-center text-slate-500 mt-2">
-                ממתין לשחקנים...
+                {t('hostView.waitingForPlayers')}
               </p>
             )}
           </Card>
 
           {/* Boggle Letter Grid - RIGHT - Neon Style */}
           <Card className={cn(
-            "flex-1 bg-white/80 dark:bg-slate-800/80 backdrop-blur-md p-2 sm:p-4 rounded-lg shadow-lg border border-cyan-500/30 shadow-[0_0_15px_rgba(6,182,212,0.1)] flex flex-col items-center transition-all duration-500 ease-in-out",
+            "flex-1 bg-white/80 dark:bg-slate-800/80 backdrop-blur-md p-2 sm:p-4 rounded-lg shadow-lg border border-cyan-500/30 shadow-[0_0_15px_rgba(6,182,212,0.1)] flex flex-col items-center transition-all duration-500 ease-in-out overflow-hidden",
+            gameStarted && "fixed inset-0 z-50 m-0 max-w-none h-screen w-screen justify-center bg-slate-900/95 dark:bg-slate-900/95 border-cyan-500/50 p-4"
           )}>
-            <h3 className={cn("text-xl font-bold text-cyan-600 dark:text-cyan-300 mb-4", gameStarted && "text-3xl mb-8")}>לוח האותיות</h3>
+            <h3 className={cn("text-xl font-bold text-cyan-600 dark:text-cyan-300 mb-4", gameStarted && "text-3xl mb-4")}>לוח האותיות</h3>
 
             {/* Timer - Neon Style */}
             {remainingTime !== null && gameStarted && (
@@ -729,26 +800,40 @@ const HostView = ({ gameCode }) => {
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }}
                 transition={{ type: 'spring' }}
-                className="mb-6"
+                className="mb-4"
               >
                 <div className={cn(
-                  "flex items-center gap-2 px-4 py-3 sm:px-6 sm:py-4 rounded-lg text-white font-bold text-2xl sm:text-3xl backdrop-blur-sm transition-all duration-300",
+                  "text-5xl font-mono font-bold px-6 py-2 rounded-lg shadow-[0_0_20px_rgba(0,0,0,0.3)] border-2 backdrop-blur-md",
                   remainingTime < 30
-                    ? "bg-gradient-to-r from-rose-500 to-pink-500 shadow-[0_0_20px_rgba(244,63,94,0.5)]"
-                    : "bg-gradient-to-r from-cyan-500 to-teal-500 shadow-[0_0_20px_rgba(6,182,212,0.5)]"
+                    ? "text-red-500 border-red-500/50 bg-red-500/10 shadow-[0_0_30px_rgba(239,68,68,0.4)] animate-pulse"
+                    : "text-cyan-400 border-cyan-500/50 bg-cyan-500/10 shadow-[0_0_30px_rgba(6,182,212,0.4)]"
                 )}>
-                  <FaClock />
-                  <span>{formatTime(remainingTime)}</span>
+                  {formatTime(remainingTime)}
                 </div>
               </motion.div>
             )}
 
-            {/* Letter Grid - Neon Glow on tiles */}
-            <GridComponent
-              grid={tableData}
-              interactive={false}
-              className={cn("w-full mx-auto transition-all duration-500", gameStarted ? "max-w-full" : "max-w-lg")}
-            />
+            {/* Grid Container - Responsive Sizing */}
+            <div className={cn(
+              "w-full flex justify-center items-center transition-all duration-500",
+              gameStarted ? "flex-grow p-4" : "aspect-square max-w-[500px]"
+            )}>
+              <div className={cn(
+                "w-full h-full flex items-center justify-center",
+                gameStarted && "max-w-[min(90vh,90vw)] max-h-[min(90vh,90vw)]"
+              )}>
+                <GridComponent
+                  grid={gameStarted ? tableData : (shufflingGrid || tableData)}
+                  interactive={false}
+                  largeText={gameStarted}
+                  selectedCells={highlightedCells}
+                  className={cn(
+                    "w-full h-full",
+                    gameStarted && "aspect-square max-w-full max-h-full"
+                  )}
+                />
+              </div>
+            </div>
           </Card>
         </div>
       </div>

@@ -13,17 +13,21 @@ import { ToggleGroup, ToggleGroupItem } from './components/ui/toggle-group';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './components/ui/tooltip';
 import HowToPlay from './components/HowToPlay';
 import ShareButton from './components/ShareButton';
+import MenuAnimation from './components/MenuAnimation';
 import './style/animation.scss';
 import { cn } from './lib/utils';
 import { copyJoinUrl, shareViaWhatsApp, getJoinUrl } from './utils/share';
+import { useLanguage } from './contexts/LanguageContext';
 
 const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, error, activeRooms, refreshRooms, prefilledRoom, roomName, setRoomName }) => {
+  const { t, language } = useLanguage();
   const [mode, setMode] = useState('join'); // 'join' or 'host'
   const [showQR, setShowQR] = useState(false);
   const [showHowToPlay, setShowHowToPlay] = useState(false);
   const [usernameError, setUsernameError] = useState(false);
   const [roomNameError, setRoomNameError] = useState(false);
   const [showFullForm, setShowFullForm] = useState(!prefilledRoom); // Show simplified form if room is prefilled
+  const [roomLanguage, setRoomLanguage] = useState(language); // Separate state for room/game language
 
   const handleModeChange = (newMode) => {
     if (newMode) {
@@ -60,7 +64,7 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
       }
     }
 
-    handleJoin(mode === 'host');
+    handleJoin(mode === 'host', roomLanguage);
   };
 
   const handleRoomSelect = (roomCode) => {
@@ -98,18 +102,16 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
   if (prefilledRoom && !showFullForm) {
     return (
       <div className="min-h-screen bg-gradient-to-b from-slate-50 via-slate-100 to-slate-200 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 flex flex-col items-center justify-center p-4 sm:p-6 transition-colors duration-300">
-        {/* Animated Title */}
+        {/* Animated Title - Removed as it is now in global header */}
         <motion.div
           initial={{ y: -50, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ duration: 0.5 }}
-          className="mb-8"
-          onClick={handleLogoClick}
-          style={{ cursor: 'pointer' }}
+          className="mb-8 flex flex-col items-center"
         >
-          <h1 className="text-5xl sm:text-6xl md:text-7xl font-bold tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-teal-300 to-purple-400">
-            BOGGLE
-          </h1>
+          <div className="mt-4">
+            {/* Language selector moved to Create Room form */}
+          </div>
         </motion.div>
 
         {/* Quick Join Form */}
@@ -125,10 +127,11 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
                 <FaGamepad size={48} className="text-cyan-400" />
               </div>
               <CardTitle className="text-2xl sm:text-3xl text-cyan-300">
-                הצטרפות למשחק
+                {t('joinView.joinRoom')}
               </CardTitle>
               <CardDescription className="text-sm sm:text-base text-gray-300">
-                אתה מצטרף לחדר <strong className="text-purple-600 dark:text-purple-400">{gameCode}</strong>
+                {language === 'he' ? `אתה מצטרף לחדר ` : `You are joining room `}
+                <strong className="text-purple-600 dark:text-purple-400">{gameCode}</strong>
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -158,7 +161,7 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
                   transition={{ duration: 0.4 }}
                   className="space-y-2"
                 >
-                  <Label htmlFor="username" className="text-slate-700 dark:text-gray-300">שם משתמש</Label>
+                  <Label htmlFor="username" className="text-slate-700 dark:text-gray-300">{t('joinView.playerNamePlaceholder')}</Label>
                   <Input
                     id="username"
                     value={username}
@@ -172,7 +175,7 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
                       "h-11 bg-slate-100 dark:bg-slate-700/50 border-slate-200 dark:border-slate-600 text-slate-900 dark:text-white placeholder:text-slate-500 dark:placeholder:text-gray-400",
                       usernameError && "border-red-500 bg-red-900/30 focus-visible:ring-red-500"
                     )}
-                    placeholder="הזן את שמך"
+                    placeholder={t('joinView.playerNamePlaceholder')}
                     maxLength={20}
                   />
                   {usernameError && (
@@ -190,7 +193,7 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
                     className="w-full h-12 text-lg font-bold bg-gradient-to-r from-cyan-500 to-purple-600 hover:from-cyan-400 hover:to-purple-500 hover:shadow-[0_0_20px_rgba(6,182,212,0.5)]"
                   >
                     <FaUser className="mr-2" />
-                    הצטרף למשחק
+                    {t('joinView.joinRoom')}
                   </Button>
                 </motion.div>
 
@@ -208,6 +211,9 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
             </CardContent>
           </Card>
         </motion.div>
+
+        {/* MenuAnimation - Flying Letters Background */}
+        <MenuAnimation />
       </div>
     );
   }
@@ -219,22 +225,25 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
         initial={{ y: -50, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.5 }}
-        className="mb-8"
+        className="mb-8 flex flex-col items-center"
         onClick={handleLogoClick}
         style={{ cursor: 'pointer' }}
       >
-        <h1 className="text-5xl sm:text-6xl md:text-7xl font-bold tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-teal-300 to-purple-400">
-          BOGGLE
+        <h1 className="text-5xl sm:text-6xl md:text-7xl font-bold tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-teal-300 to-purple-400 pb-2">
+          {t('joinView.title')}
         </h1>
+        <div className="mt-4">
+          {/* Language selector moved to Create Room form */}
+        </div>
       </motion.div>
 
-      <div className="flex flex-col-reverse md:flex-row gap-6 w-full max-w-6xl">
+      <div className="flex flex-col-reverse md:flex-row gap-6 w-full max-w-6xl relative z-10">
         {/* Main Join/Host Form */}
         <motion.div
           initial={{ x: 50, opacity: 0 }}
           animate={{ x: 0, opacity: 1 }}
           transition={{ duration: 0.5 }}
-          className="flex-1"
+          className="flex-1 max-w-md mx-auto"
         >
           <Card className="backdrop-blur-md bg-white/90 dark:bg-slate-800/90 shadow-2xl border border-purple-500/30 shadow-[0_0_20px_rgba(168,85,247,0.15)]">
             <CardHeader className="text-center space-y-4">
@@ -242,10 +251,10 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
                 <FaGamepad size={48} className="text-purple-400" />
               </div>
               <CardTitle className="text-2xl sm:text-3xl text-purple-300">
-                ברוכים הבאים לבוגל!
+                {t('joinView.title')}
               </CardTitle>
               <CardDescription className="text-sm sm:text-base text-slate-600 dark:text-gray-300">
-                בחר את התפקיד שלך כדי להתחיל
+                {t('joinView.selectLanguage')}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
@@ -290,14 +299,55 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
                 >
                   <ToggleGroupItem value="join" className="flex-1 border-slate-600 text-gray-300 data-[state=on]:bg-gradient-to-r data-[state=on]:from-cyan-500 data-[state=on]:to-teal-500 data-[state=on]:text-white data-[state=on]:border-transparent">
                     <FaUser className="mr-2" />
-                    הצטרף למשחק
+                    {t('joinView.joinRoom')}
                   </ToggleGroupItem>
                   <ToggleGroupItem value="host" className="flex-1 border-slate-600 text-gray-300 data-[state=on]:bg-gradient-to-r data-[state=on]:from-purple-500 data-[state=on]:to-pink-500 data-[state=on]:text-white data-[state=on]:border-transparent">
                     <FaCrown className="mr-2" />
-                    צור משחק
+                    {t('joinView.createRoom')}
                   </ToggleGroupItem>
                 </ToggleGroup>
               </div>
+
+              {/* Language Selection (Only for Host) - Button Style */}
+              {mode === 'host' && (
+                <div className="space-y-2">
+                  <Label className="text-slate-700 dark:text-gray-300 text-center block font-medium text-sm">{t('joinView.selectLanguage')}</Label>
+                  <div className="grid grid-cols-2 gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setRoomLanguage('en')}
+                      className={cn(
+                        "flex flex-col items-center gap-1 p-2 rounded-lg border-2 transition-all duration-300",
+                        roomLanguage === 'en'
+                          ? "border-cyan-500 bg-cyan-500/20 shadow-lg shadow-cyan-500/30"
+                          : "border-slate-300 dark:border-slate-600 hover:border-cyan-400 dark:hover:border-cyan-500"
+                      )}
+                    >
+                      <span className="text-2xl">🇺🇸</span>
+                      <span className={cn(
+                        "font-medium text-xs",
+                        roomLanguage === 'en' ? "text-cyan-600 dark:text-cyan-300" : "text-slate-600 dark:text-gray-400"
+                      )}>English</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setRoomLanguage('he')}
+                      className={cn(
+                        "flex flex-col items-center gap-1 p-2 rounded-lg border-2 transition-all duration-300",
+                        roomLanguage === 'he'
+                          ? "border-cyan-500 bg-cyan-500/20 shadow-lg shadow-cyan-500/30"
+                          : "border-slate-300 dark:border-slate-600 hover:border-cyan-400 dark:hover:border-cyan-500"
+                      )}
+                    >
+                      <span className="text-2xl">🇮🇱</span>
+                      <span className={cn(
+                        "font-medium text-xs",
+                        roomLanguage === 'he' ? "text-cyan-600 dark:text-cyan-300" : "text-slate-600 dark:text-gray-400"
+                      )}>עברית</span>
+                    </button>
+                  </div>
+                </div>
+              )}
 
               <form onSubmit={handleSubmit} className="space-y-4">
                 {mode === 'join' ? (
@@ -307,7 +357,7 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
                     transition={{ duration: 0.3 }}
                     className="space-y-2"
                   >
-                    <Label htmlFor="gameCode" className="text-slate-700 dark:text-gray-300">קוד משחק</Label>
+                    <Label htmlFor="gameCode" className="text-slate-700 dark:text-gray-300">{t('hostView.roomCode')}</Label>
                     <Input
                       id="gameCode"
                       value={gameCode}
@@ -329,7 +379,7 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
                       transition={{ duration: 0.3 }}
                       className="space-y-2"
                     >
-                      <Label htmlFor="roomName" className="text-slate-700 dark:text-gray-300">שם החדר</Label>
+                      <Label htmlFor="roomName" className="text-slate-700 dark:text-gray-300">{t('joinView.roomNamePlaceholder')}</Label>
                       <Input
                         id="roomName"
                         value={roomName}
@@ -342,7 +392,7 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
                           "bg-slate-100 dark:bg-slate-700/50 border-slate-200 dark:border-slate-600 text-slate-900 dark:text-white placeholder:text-slate-500 dark:placeholder:text-gray-400",
                           roomNameError && "border-red-500 bg-red-900/30 focus-visible:ring-red-500"
                         )}
-                        placeholder="הזן שם לחדר (לדוגמה: משחק שישי)"
+                        placeholder={t('joinView.roomNamePlaceholder')}
                         maxLength={30}
                       />
                       {roomNameError && (
@@ -360,7 +410,7 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
                       transition={{ duration: 0.3, delay: 0.1 }}
                       className="space-y-2"
                     >
-                      <Label htmlFor="gameCode" className="text-slate-700 dark:text-gray-300">קוד משחק</Label>
+                      <Label htmlFor="gameCode" className="text-slate-700 dark:text-gray-300">{t('hostView.roomCode')}</Label>
                       <div className="flex gap-2">
                         <Input
                           id="gameCode"
@@ -403,7 +453,7 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
                     transition={{ duration: 0.4 }}
                     className="space-y-2"
                   >
-                    <Label htmlFor="username-main" className="text-slate-700 dark:text-gray-300">שם משתמש</Label>
+                    <Label htmlFor="username-main" className="text-slate-700 dark:text-gray-300">{t('joinView.playerNamePlaceholder')}</Label>
                     <Input
                       id="username-main"
                       value={username}
@@ -416,7 +466,7 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
                         "bg-slate-100 dark:bg-slate-700/50 border-slate-200 dark:border-slate-600 text-slate-900 dark:text-white placeholder:text-slate-500 dark:placeholder:text-gray-400",
                         usernameError && "border-red-500 bg-red-900/30 focus-visible:ring-red-500"
                       )}
-                      placeholder="הזן את שמך"
+                      placeholder={t('joinView.playerNamePlaceholder')}
                       maxLength={20}
                     />
                     {usernameError && (
@@ -434,12 +484,12 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
                     {mode === 'host' ? (
                       <>
                         <FaCrown className="mr-2" />
-                        צור חדר
+                        {t('joinView.createRoom')}
                       </>
                     ) : (
                       <>
                         <FaUser className="mr-2" />
-                        הצטרף למשחק
+                        {t('joinView.joinRoom')}
                       </>
                     )}
                   </Button>
@@ -490,12 +540,12 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
             initial={{ x: -50, opacity: 0 }}
             animate={{ x: 0, opacity: 1 }}
             transition={{ duration: 0.5 }}
-            className="flex-1"
+            className="flex-1 relative z-10"
           >
             <Card className="backdrop-blur-md bg-white/90 dark:bg-slate-800/90 shadow-xl h-full max-h-[500px] flex flex-col border border-teal-500/30 shadow-[0_0_15px_rgba(20,184,166,0.1)]">
               <CardHeader>
                 <div className="flex justify-between items-center">
-                  <CardTitle className="text-teal-400">חדרים פעילים</CardTitle>
+                  <CardTitle className="text-teal-400">{t('joinView.roomsList')}</CardTitle>
                   <TooltipProvider>
                     <Tooltip>
                       <TooltipTrigger asChild>
@@ -516,7 +566,7 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
               <CardContent className="flex-1 overflow-auto">
                 {activeRooms.length === 0 ? (
                   <div className="text-center py-8 text-slate-500 dark:text-gray-400">
-                    <p className="text-sm">אין חדרים פעילים</p>
+                    <p className="text-sm">{t('joinView.noRooms')}</p>
                     <p className="text-xs mt-1">צור חדר חדש כדי להתחיל!</p>
                   </div>
                 ) : (
@@ -533,12 +583,19 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
                         )}
                       >
                         <div className="flex items-center justify-between gap-2">
-                          <div>
-                            <p className="font-bold text-cyan-400">{room.roomName || room.gameCode}</p>
-                            <p className="text-sm text-gray-400">קוד: {room.gameCode}</p>
+                          <div className="flex items-center gap-2">
+                            <span className="text-2xl" title={room.language === 'he' ? 'Hebrew' : 'English'}>
+                              {room.language === 'he' ? '🇮🇱' : '🇺🇸'}
+                            </span>
+                            <div>
+                              <div className="font-bold text-lg text-cyan-400">{room.roomName || room.gameCode}</div>
+                              <div className="text-xs text-slate-500 dark:text-slate-400">
+                                {t('joinView.host')}: {room.gameCode}
+                              </div>
+                            </div>
                           </div>
                           <Badge variant="secondary" className="h-5 text-xs bg-slate-700 text-gray-300">
-                            {room.playerCount} player{room.playerCount !== 1 ? 's' : ''}
+                            {room.playerCount} {t('joinView.players')}
                           </Badge>
                         </div>
                       </button>
@@ -650,6 +707,8 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
           />
         ))}
       </div>
+      {/* MenuAnimation - Flying Letters Background */}
+      <MenuAnimation />
     </div>
   );
 };
