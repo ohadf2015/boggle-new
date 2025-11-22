@@ -10,12 +10,39 @@ const dictionary = require("./dictionary");
 
 const app = express();
 const server = http.createServer(app);
-const wss = new WebSocket.Server({ server });
+
+// WebSocket server with compression and configuration
+const wss = new WebSocket.Server({
+  server,
+  perMessageDeflate: {
+    zlibDeflateOptions: {
+      chunkSize: 1024,
+      memLevel: 7,
+      level: 3
+    },
+    zlibInflateOptions: {
+      chunkSize: 10 * 1024
+    },
+    clientNoContextTakeover: true,
+    serverNoContextTakeover: true,
+    serverMaxWindowBits: 10,
+    concurrencyLimit: 10,
+    threshold: 1024 // Only compress messages > 1KB
+  },
+  maxPayload: 100 * 1024 // 100KB max message size
+});
 
 // Configuration
 const PORT = process.env.PORT || 3001;
 const HOST = process.env.HOST || "0.0.0.0";
 const CORS_ORIGIN = process.env.CORS_ORIGIN || "*";
+
+// Rate limiting configuration
+const MESSAGE_RATE_LIMIT = parseInt(process.env.MESSAGE_RATE_LIMIT) || 50; // messages per interval
+const RATE_LIMIT_WINDOW = parseInt(process.env.RATE_LIMIT_WINDOW) || 10000; // 10 seconds
+
+// Initialize rate limiter
+const rateLimiter = new RateLimiter(MESSAGE_RATE_LIMIT, RATE_LIMIT_WINDOW);
 
 // Middleware
 app.use(cors({
@@ -40,6 +67,7 @@ const {
   handleCloseRoom,
   handleResetGame,
 } = require("./handlers");
+const RateLimiter = require("./utils/rateLimiter");
 
 // Heartbeat mechanism to keep connections alive
 const heartbeatInterval = 30000; // 30 seconds
@@ -52,8 +80,32 @@ wss.on("connection", (ws) => {
     ws.isAlive = true;
   });
 
+  // Initialize rate limiting for this connection
+  const clientId = Math.random().toString(36).substring(7);
+  ws.clientId = clientId;
+  rateLimiter.initClient(clientId);
+
   ws.on("message", (data) => {
     try {
+      // Rate limiting check
+      if (rateLimiter.isRateLimited(ws.clientId)) {
+        ws.send(JSON.stringify({
+          action: "error",
+          message: "Rate limit exceeded. Please slow down."
+        }));
+        return;
+      }
+
+      // Validate message size (should be caught by maxPayload, but double check)
+      if (data.length > 100 * 1024) {
+        console.warn(`[WS] Message too large: ${data.length} bytes`);
+        ws.send(JSON.stringify({
+          action: "error",
+          message: "Message too large"
+        }));
+        return;
+      }
+
       const message = JSON.parse(data);
       const { action } = message;
 
@@ -127,6 +179,10 @@ wss.on("connection", (ws) => {
 
   ws.on("close", () => {
     console.log("Client disconnected");
+    // Clean up rate limiting
+    if (ws.clientId) {
+      rateLimiter.removeClient(ws.clientId);
+    }
     handleDisconnect(ws);
   });
 

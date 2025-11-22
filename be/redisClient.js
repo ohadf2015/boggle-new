@@ -14,7 +14,14 @@ const redisConfig = {
   maxRetriesPerRequest: 3,
   enableReadyCheck: true,
   lazyConnect: true, // Don't connect immediately
+  enableOfflineQueue: true, // Queue commands when disconnected
+  connectTimeout: 10000, // 10 seconds connection timeout
+  keepAlive: 30000, // Keep connection alive
 };
+
+// Configuration constants
+const GAME_STATE_TTL = parseInt(process.env.REDIS_GAME_TTL) || 3600; // 1 hour default
+const MAX_RETRY_ATTEMPTS = 3;
 
 let redisClient = null;
 let isRedisAvailable = false;
@@ -79,33 +86,46 @@ async function initRedis() {
   }
 }
 
-// Save game state to Redis (async, non-blocking)
+// Save game state to Redis with retry logic
 async function saveGameState(gameCode, gameData) {
   if (!isRedisAvailable || !redisClient) {
     return; // Skip if Redis is not available
   }
 
-  try {
-    const key = `game:${gameCode}`;
-    // Convert game data to JSON, excluding WebSocket objects
-    const sanitizedData = {
-      roomName: gameData.roomName,
-      users: Object.keys(gameData.users),
-      playerScores: gameData.playerScores,
-      playerWords: gameData.playerWords,
-      playerAchievements: gameData.playerAchievements,
-      playerWordDetails: gameData.playerWordDetails,
-      firstWordFound: gameData.firstWordFound,
-      gameState: gameData.gameState,
-      startTime: gameData.startTime,
-      endTime: gameData.endTime,
-      letterGrid: gameData.letterGrid,
-      timerSeconds: gameData.timerSeconds,
-    };
+  const key = `game:${gameCode}`;
 
-    await redisClient.setex(key, 3600, JSON.stringify(sanitizedData)); // TTL 1 hour
-  } catch (error) {
-    console.error('[REDIS] Error saving game state:', error.message);
+  // Convert game data to JSON, excluding WebSocket objects
+  const sanitizedData = {
+    roomName: gameData.roomName,
+    users: Object.keys(gameData.users),
+    playerScores: gameData.playerScores,
+    playerWords: gameData.playerWords,
+    playerAchievements: gameData.playerAchievements,
+    playerWordDetails: gameData.playerWordDetails,
+    firstWordFound: gameData.firstWordFound,
+    gameState: gameData.gameState,
+    startTime: gameData.startTime,
+    endTime: gameData.endTime,
+    letterGrid: gameData.letterGrid,
+    timerSeconds: gameData.timerSeconds,
+    language: gameData.language,
+  };
+
+  // Retry logic for critical save operations
+  for (let attempt = 1; attempt <= MAX_RETRY_ATTEMPTS; attempt++) {
+    try {
+      await redisClient.setex(key, GAME_STATE_TTL, JSON.stringify(sanitizedData));
+      return; // Success
+    } catch (error) {
+      console.error(`[REDIS] Error saving game state (attempt ${attempt}/${MAX_RETRY_ATTEMPTS}):`, error.message);
+      if (attempt === MAX_RETRY_ATTEMPTS) {
+        console.error('[REDIS] Failed to save game state after all retry attempts');
+        isRedisAvailable = false; // Mark Redis as unavailable
+      } else {
+        // Wait before retry with exponential backoff
+        await new Promise(resolve => setTimeout(resolve, attempt * 100));
+      }
+    }
   }
 }
 
@@ -139,15 +159,29 @@ async function deleteGameState(gameCode) {
   }
 }
 
-// Get all active game codes
+// Get all active game codes using SCAN instead of KEYS (non-blocking)
 async function getAllGameCodes() {
   if (!isRedisAvailable || !redisClient) {
     return [];
   }
 
   try {
-    const keys = await redisClient.keys('game:*');
-    return keys.map(key => key.replace('game:', ''));
+    const gameCodes = [];
+    let cursor = '0';
+
+    // Use SCAN instead of KEYS to avoid blocking Redis
+    do {
+      const result = await redisClient.scan(cursor, 'MATCH', 'game:*', 'COUNT', 100);
+      cursor = result[0];
+      const keys = result[1];
+
+      // Extract game codes from keys
+      keys.forEach(key => {
+        gameCodes.push(key.replace('game:', ''));
+      });
+    } while (cursor !== '0');
+
+    return gameCodes;
   } catch (error) {
     console.error('[REDIS] Error getting game codes:', error.message);
     return [];
