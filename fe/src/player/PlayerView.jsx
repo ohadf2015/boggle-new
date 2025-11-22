@@ -332,7 +332,7 @@ const PlayerView = ({ onShowResults }) => {
   if (!gameActive && !waitingForResults) {
     return (
       <div className="min-h-screen bg-gradient-to-b from-slate-50 via-slate-100 to-slate-200 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 p-4 md:p-8 flex flex-col transition-colors duration-300">
-        <Toaster position="top-center" />
+        <Toaster position="top-center" limit={3} />
 
         {/* Exit Button */}
         <div className="w-full max-w-md mx-auto flex justify-end mb-4 relative z-50">
@@ -420,7 +420,7 @@ const PlayerView = ({ onShowResults }) => {
   // Normal game UI (when game is active or waiting for results)
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-50 via-slate-100 to-slate-200 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 p-4 md:p-8 flex flex-col transition-colors duration-300">
-      <Toaster position="top-center" />
+      <Toaster position="top-center" toastOptions={{ limit: 3 }} />
 
       {/* Top Bar with Exit Button */}
       <div className="w-full max-w-7xl mx-auto flex justify-end mb-4">

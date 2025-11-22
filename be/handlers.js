@@ -1,4 +1,5 @@
 const { saveGameState, deleteGameState } = require('./redisClient');
+const dictionary = require('./dictionary');
 
 const games = {};
 // Use Map instead of plain objects to properly store WebSocket as keys
@@ -212,8 +213,8 @@ const addUserToGame = (gameCode, username, ws) => {
 
     const game = games[gameCode];
 
-    // Check if this username exists and is in the disconnected players list (reconnection)
-    if(game.users[username] && game.disconnectedPlayers && game.disconnectedPlayers[username]) {
+    // Check if this username exists in the disconnected players list (reconnection)
+    if(game.disconnectedPlayers && game.disconnectedPlayers[username]) {
       console.log(`[JOIN] Player ${username} reconnecting to game ${gameCode}`);
 
       // Clear the disconnect timeout
@@ -221,7 +222,7 @@ const addUserToGame = (gameCode, username, ws) => {
         clearTimeout(game.disconnectedPlayers[username].timeout);
       }
 
-      // Update WebSocket (data is already in game.users, etc.)
+      // Re-add user to active users
       game.users[username] = ws;
       gameWs.set(ws, gameCode);
       wsUsername.set(ws, username);
@@ -231,7 +232,7 @@ const addUserToGame = (gameCode, username, ws) => {
 
       console.log(`[JOIN] Player ${username} successfully reconnected to game ${gameCode}`);
     } else if(game.users[username]) {
-      // Username exists but NOT in disconnected list - truly taken by someone else
+      // Username exists in active users - truly taken by someone else
       console.log(`[JOIN] Username ${username} already taken in game ${gameCode}`);
       ws.send(JSON.stringify({ action: "usernameTaken" }));
       return;
@@ -251,8 +252,9 @@ const addUserToGame = (gameCode, username, ws) => {
     // Send confirmation to the player who just joined
     ws.send(JSON.stringify({ action: "joined", isHost: false }));
 
-    // If game is already in progress, sync the current game state to the new player
+    // Sync the current game state to the player
     if (game.gameState === 'playing') {
+      // Game is active - send current state
       const remainingTime = Math.max(0, Math.floor((game.endTime - Date.now()) / 1000));
       ws.send(JSON.stringify({
         action: "startGame",
@@ -275,6 +277,11 @@ const addUserToGame = (gameCode, username, ws) => {
       });
 
       console.log(`Late join: ${username} joined active game ${gameCode} with ${remainingTime}s remaining`);
+    } else if (game.gameState === 'ended') {
+      // Game has ended - send end game state
+      ws.send(JSON.stringify({ action: "endGame" }));
+      ws.send(JSON.stringify({ action: "timeUpdate", remainingTime: 0 }));
+      console.log(`Player ${username} rejoined after game ended in ${gameCode}`);
     }
 
     const usersList = Object.keys(game.users);
@@ -387,7 +394,56 @@ const handleEndGame = (host) => {
       word.length > longest.length ? word : longest, ''),
   })).sort((a, b) => b.score - a.score);
 
-  // Send all words to host for validation
+  // Auto-validate words using dictionary
+  const gameLanguage = games[gameCode].language || 'en';
+  const wordsNeedingValidation = new Set();
+  let autoValidatedCount = 0;
+
+  // Collect all unique words and validate them against the dictionary
+  const uniqueWords = new Set();
+  Object.keys(games[gameCode].users).forEach(username => {
+    if (games[gameCode].playerWordDetails[username]) {
+      games[gameCode].playerWordDetails[username].forEach(wordDetail => {
+        uniqueWords.add(wordDetail.word);
+      });
+    }
+  });
+
+  // Validate each unique word against the dictionary
+  uniqueWords.forEach(word => {
+    const isValidInDictionary = dictionary.isValidWord(word, gameLanguage);
+
+    if (isValidInDictionary === true) {
+      // Word found in dictionary - auto-validate as true
+      autoValidatedCount++;
+      // Mark the word as auto-validated in all players' word details
+      Object.keys(games[gameCode].users).forEach(username => {
+        if (games[gameCode].playerWordDetails[username]) {
+          const wordDetail = games[gameCode].playerWordDetails[username].find(w => w.word === word);
+          if (wordDetail) {
+            wordDetail.autoValidated = true;
+            wordDetail.inDictionary = true;
+          }
+        }
+      });
+    } else if (isValidInDictionary === false) {
+      // Word NOT in dictionary - mark for host validation
+      wordsNeedingValidation.add(word);
+      Object.keys(games[gameCode].users).forEach(username => {
+        if (games[gameCode].playerWordDetails[username]) {
+          const wordDetail = games[gameCode].playerWordDetails[username].find(w => w.word === word);
+          if (wordDetail) {
+            wordDetail.inDictionary = false;
+          }
+        }
+      });
+    } else {
+      // Dictionary not loaded or word couldn't be validated - send to host
+      wordsNeedingValidation.add(word);
+    }
+  });
+
+  // Send all words to host for validation (only words not in dictionary)
   const allPlayerWords = Object.keys(games[gameCode].users).map(username => ({
     username,
     words: games[gameCode].playerWordDetails[username]
@@ -403,8 +459,13 @@ const handleEndGame = (host) => {
   // Send validation interface data to host
   sendHostAMessage(gameCode, {
     action: "showValidation",
-    playerWords: allPlayerWords
+    playerWords: allPlayerWords,
+    autoValidatedCount,
+    totalWords: uniqueWords.size
   });
+
+  // Log dictionary validation stats
+  console.log(`[Dictionary] Auto-validated ${autoValidatedCount} words, ${wordsNeedingValidation.size} words need host validation`);
 
   // Start auto-validation timeout in case host is AFK (60 seconds)
   games[gameCode].validationTimeout = setTimeout(() => {
@@ -536,8 +597,26 @@ const handleWordSubmission = (ws, word) => {
   const gameCode = gameWs.get(ws);
   const username = wsUsername.get(ws);
 
-  if (!games[gameCode] || games[gameCode].gameState !== 'playing') {
-    console.warn(`Invalid game state for word submission: ${gameCode}`);
+  if (!games[gameCode]) {
+    console.warn(`Invalid game code for word submission: ${gameCode}`);
+    return;
+  }
+
+  // If game is not in 'playing' state, sync the client with current state
+  if (games[gameCode].gameState !== 'playing') {
+    console.warn(`Player ${username} tried to submit word during game state: ${games[gameCode].gameState}`);
+
+    // If game has ended, notify the player
+    if (games[gameCode].gameState === 'ended') {
+      if (ws.readyState === 1) {
+        try {
+          ws.send(JSON.stringify({ action: "endGame" }));
+          ws.send(JSON.stringify({ action: "timeUpdate", remainingTime: 0 }));
+        } catch (error) {
+          console.error("Error syncing game end state:", error);
+        }
+      }
+    }
     return;
   }
 
@@ -883,10 +962,25 @@ const handleValidateWords = (host, validations, letterGrid) => {
   });
 
   // Create a map of unique words with their validation status
+  // Combine auto-validated words (from dictionary) with host validations
   const wordValidationMap = {};
+
+  // First, add auto-validated words (words found in dictionary)
+  Object.keys(games[gameCode].users).forEach(username => {
+    if (games[gameCode].playerWordDetails[username]) {
+      games[gameCode].playerWordDetails[username].forEach(wordDetail => {
+        if (wordDetail.autoValidated && !wordValidationMap[wordDetail.word]) {
+          wordValidationMap[wordDetail.word] = true; // Auto-validated words are valid
+        }
+      });
+    }
+  });
+
+  // Then, apply host validations (for words not in dictionary)
   validations.forEach(({ word, isValid }) => {
     // Only store unique words - the first validation for each word wins
-    if (!wordValidationMap[word]) {
+    // Host validations override auto-validations if present
+    if (!wordValidationMap[word] || !wordValidationMap[word].autoValidated) {
       wordValidationMap[word] = isValid;
     }
   });
