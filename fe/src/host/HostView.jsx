@@ -429,8 +429,8 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp }) => {
                           <Checkbox
                             checked={isValid}
                             onCheckedChange={() => toggleWordValidation(null, item.word)}
-                            disabled={isDuplicate || isAutoValidated}
-                            className={cn((isDuplicate || isAutoValidated) && "opacity-50")}
+                            disabled={isDuplicate}
+                            className={cn(isDuplicate && "opacity-50")}
                           />
                           <div className="flex items-center gap-2 flex-1">
                             <span className={cn(
@@ -446,7 +446,7 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp }) => {
                             )}
                             {isAutoValidated && !isDuplicate && (
                               <Badge variant="success" className="bg-green-500 text-white">
-                                ✓ אומת
+                                ✓ {t('hostView.autoValidated') || 'Auto-validated'}
                               </Badge>
                             )}
                             {item.playerCount === 1 && (
