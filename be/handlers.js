@@ -356,6 +356,12 @@ const handleEndGame = (host) => {
     words: games[gameCode].playerWordDetails[username]
   }));
 
+  // Send final time update to ensure all clients show 0:00
+  sendAllPlayerAMessage(gameCode, {
+    action: "timeUpdate",
+    remainingTime: 0
+  });
+
   sendAllPlayerAMessage(gameCode, { action: "endGame" });
   sendAllPlayerAMessage(gameCode, {
     action: "finalScores",
