@@ -133,6 +133,13 @@ export const translations = {
       wordTooShort: 'Word too short! (min 2 letters)',
       wordCount: 'words',
       longestWord: 'Longest',
+      hostValidating: 'Host is validating words...',
+      clickToSelect: 'Click letters to select words',
+    },
+    chat: {
+      title: 'Room Chat',
+      placeholder: 'Type a message...',
+      noMessages: 'No messages yet. Start chatting!',
     },
     results: {
       gameOver: 'Game Over',
@@ -332,6 +339,13 @@ export const translations = {
       wordTooShort: 'מילה קצרה מדי! (מינימום 2 אותיות)',
       wordCount: 'מילים',
       longestWord: 'הארוכה ביותר',
+      hostValidating: 'המארח מאמת מילים...',
+      clickToSelect: 'לחץ על אותיות כדי לבחור מילים',
+    },
+    chat: {
+      title: 'צ\'אט החדר',
+      placeholder: 'הקלד הודעה...',
+      noMessages: 'אין הודעות עדיין. התחל לשוחח!',
     },
     results: {
       gameOver: 'המשחק נגמר',

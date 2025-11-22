@@ -16,6 +16,7 @@ import ShareButton from '../components/ShareButton';
 import SlotMachineText from '../components/SlotMachineText';
 import ResultsPodium from '../components/results/ResultsPodium';
 import ResultsPlayerCard from '../components/results/ResultsPlayerCard';
+import RoomChat from '../components/RoomChat';
 import '../style/animation.scss';
 import { generateRandomTable, embedWordInGrid, applyHebrewFinalLetters } from '../utils/utils';
 import { useWebSocket } from '../utils/WebSocketContext';
@@ -46,6 +47,11 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
   // Animation states
   const [shufflingGrid, setShufflingGrid] = useState(null);
   const [highlightedCells, setHighlightedCells] = useState([]);
+
+  // Update players list when initialPlayers prop changes
+  useEffect(() => {
+    setPlayersReady(initialPlayers);
+  }, [initialPlayers]);
 
   // Pre-game shuffling animation with player names
   useEffect(() => {
@@ -814,6 +820,18 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
             </div>
           </Card>
         </div>
+
+        {/* Chat Section */}
+        {!gameStarted && (
+          <div className="w-full">
+            <RoomChat
+              username="Host"
+              isHost={true}
+              gameCode={gameCode}
+              className="max-w-2xl mx-auto min-h-[400px]"
+            />
+          </div>
+        )}
       </div>
     </div>
   );

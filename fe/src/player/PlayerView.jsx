@@ -8,15 +8,16 @@ import { AchievementBadge } from '../components/AchievementBadge';
 import { motion, AnimatePresence } from 'framer-motion';
 import confetti from 'canvas-confetti';
 import toast, { Toaster } from 'react-hot-toast';
-import { FaTrophy, FaTrash, FaDoorOpen, FaUsers } from 'react-icons/fa';
+import { FaTrophy, FaTrash, FaDoorOpen, FaUsers, FaMousePointer } from 'react-icons/fa';
 import { useWebSocket } from '../utils/WebSocketContext';
 import { clearSession } from '../utils/session';
 import { useLanguage } from '../contexts/LanguageContext';
 import gsap from 'gsap';
 import GridComponent from '../components/GridComponent';
 import { applyHebrewFinalLetters } from '../utils/utils';
+import RoomChat from '../components/RoomChat';
 
-const PlayerView = ({ onShowResults, initialPlayers = [] }) => {
+const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) => {
   const { t } = useLanguage();
   const ws = useWebSocket();
   const inputRef = useRef(null);
@@ -70,6 +71,11 @@ const PlayerView = ({ onShowResults, initialPlayers = [] }) => {
     setAchievements([]);
   }, []);
 
+  // Update players list when initialPlayers prop changes
+  useEffect(() => {
+    setPlayersReady(initialPlayers);
+  }, [initialPlayers]);
+
   // Prevent accidental page refresh/close only when game is active or has data
   useEffect(() => {
     const shouldWarn = gameActive || foundWords.length > 0 || waitingForResults;
@@ -88,13 +94,6 @@ const PlayerView = ({ onShowResults, initialPlayers = [] }) => {
       window.removeEventListener('beforeunload', handleBeforeUnload);
     };
   }, [gameActive, foundWords.length, waitingForResults]);
-
-  // Auto-focus on input when game becomes active
-  useEffect(() => {
-    if (gameActive && inputRef.current) {
-      inputRef.current.focus();
-    }
-  }, [gameActive]);
 
   // WebSocket message handler
   useEffect(() => {
@@ -490,8 +489,15 @@ const PlayerView = ({ onShowResults, initialPlayers = [] }) => {
         {(letterGrid || shufflingGrid) && (
           <Card className="bg-white/90 dark:bg-slate-800/90 backdrop-blur-md shadow-2xl flex-grow lg:flex-[3] border border-cyan-500/30 shadow-[0_0_15px_rgba(6,182,212,0.1)] flex flex-col">
             <CardHeader className="py-2">
-              <CardTitle className="text-center text-cyan-600 dark:text-cyan-300 text-lg">
-                {gameActive ? t('playerView.letterGrid') : t('playerView.waitingForGame')}
+              <CardTitle className="text-center text-cyan-600 dark:text-cyan-300 text-lg flex items-center justify-center gap-2">
+                {gameActive ? (
+                  <>
+                    <FaMousePointer className="text-sm" />
+                    {t('playerView.clickToSelect') || 'Click letters to select words'}
+                  </>
+                ) : (
+                  t('playerView.waitingForGame')
+                )}
               </CardTitle>
             </CardHeader>
             <CardContent className="flex-grow flex items-center justify-center p-2">
@@ -554,7 +560,6 @@ const PlayerView = ({ onShowResults, initialPlayers = [] }) => {
                   disabled={!gameActive}
                   placeholder={t('playerView.enterWord')}
                   className="text-lg bg-slate-100 dark:bg-slate-700/50 border-slate-200 dark:border-slate-600 text-slate-900 dark:text-white placeholder:text-slate-500 dark:placeholder:text-gray-400 text-right"
-                  autoFocus
                 />
               </div>
 
@@ -566,10 +571,28 @@ const PlayerView = ({ onShowResults, initialPlayers = [] }) => {
               )}
 
               {waitingForResults && (
-                <div className="text-center py-4">
-                  <Progress value={75} className="mb-2" />
-                  <p className="text-sm text-slate-500 dark:text-gray-400">{t('playerView.waitingForResults')}</p>
-                </div>
+                <motion.div
+                  initial={{ scale: 0.9, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  className="text-center py-6 px-4"
+                >
+                  <div className="mb-4">
+                    <motion.div
+                      animate={{ rotate: 360 }}
+                      transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+                      className="inline-block text-4xl mb-2"
+                    >
+                      ⏳
+                    </motion.div>
+                  </div>
+                  <Progress value={75} className="mb-3" />
+                  <p className="text-lg font-bold text-slate-700 dark:text-slate-300 mb-2">
+                    {t('playerView.waitingForResults')}
+                  </p>
+                  <p className="text-xs text-slate-500 dark:text-slate-400">
+                    {t('playerView.hostValidating') || 'Host is validating words...'}
+                  </p>
+                </motion.div>
               )}
 
               <div ref={wordListRef} className="max-h-96 overflow-y-auto space-y-2">
@@ -606,7 +629,7 @@ const PlayerView = ({ onShowResults, initialPlayers = [] }) => {
 
 
           {/* Leaderboard */}
-          <Card className="bg-white/90 dark:bg-slate-800/90 backdrop-blur-md shadow-2xl border border-purple-500/30 shadow-[0_0_15px_rgba(168,85,247,0.1)] flex-1 overflow-hidden flex flex-col">
+          <Card className="bg-white/90 dark:bg-slate-800/90 backdrop-blur-md shadow-2xl border border-purple-500/30 shadow-[0_0_15px_rgba(168,85,247,0.1)] overflow-hidden flex flex-col max-h-[35vh]">
             <CardHeader className="py-2">
               <CardTitle className="flex items-center gap-2 text-purple-600 dark:text-purple-300 text-base">
                 <FaTrophy className="text-yellow-500 dark:text-yellow-400" />
@@ -647,6 +670,14 @@ const PlayerView = ({ onShowResults, initialPlayers = [] }) => {
               </div>
             </CardContent>
           </Card>
+
+          {/* Chat Component */}
+          <RoomChat
+            username={username}
+            isHost={false}
+            gameCode={gameCode}
+            className="flex-1 min-h-[250px]"
+          />
 
         </div>
       </div>

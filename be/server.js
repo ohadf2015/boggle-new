@@ -68,6 +68,7 @@ const {
   handleCloseRoom,
   handleResetGame,
   broadcastActiveRooms,
+  handleChatMessage,
 } = require("./handlers");
 
 // Heartbeat mechanism to keep connections alive
@@ -172,6 +173,11 @@ wss.on("connection", (ws) => {
         }
         case "resetGame": {
           handleResetGame(ws);
+          break;
+        }
+        case "chatMessage": {
+          const { gameCode, username, message: chatMessage, isHost } = message;
+          handleChatMessage(ws, gameCode, username, chatMessage, isHost);
           break;
         }
         default:
