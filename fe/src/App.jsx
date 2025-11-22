@@ -51,12 +51,13 @@ const useWebSocketConnection = () => {
   const lastPingTimeRef = useRef(null);
   const [connectionQuality, setConnectionQuality] = useState('good'); // 'good', 'unstable', 'poor'
   const highLatencyWarningShownRef = useRef(false);
+  const { t } = useLanguage();
 
   const checkLatency = useCallback((latency) => {
     if (latency > WS_CONFIG.VERY_HIGH_LATENCY_THRESHOLD) {
       setConnectionQuality('poor');
       if (!highLatencyWarningShownRef.current) {
-        toast.error('חיבור האינטרנט לא יציב - ייתכנו בעיות במשחק', {
+        toast.error(t('errors.unstableConnection'), {
           duration: 5000,
           icon: '⚠️',
         });
@@ -69,7 +70,7 @@ const useWebSocketConnection = () => {
     } else if (latency > WS_CONFIG.HIGH_LATENCY_THRESHOLD) {
       setConnectionQuality('unstable');
       if (!highLatencyWarningShownRef.current) {
-        toast.warning('חיבור האינטרנט איטי', {
+        toast.warning(t('errors.slowConnection'), {
           duration: 3000,
           icon: '⚠️',
         });
@@ -81,7 +82,7 @@ const useWebSocketConnection = () => {
     } else {
       setConnectionQuality('good');
     }
-  }, []);
+  }, [t]);
 
   const startHeartbeat = useCallback((ws) => {
     if (heartbeatIntervalRef.current) {
@@ -249,6 +250,7 @@ const App = () => {
 
   const { wsRef, connectWebSocket, setMessageHandler, cleanup, connectionError, checkLatency, lastPingTimeRef, connectionQuality } = useWebSocketConnection();
   const [ws, setWs] = useState(null);
+  const { t } = useLanguage();
 
   const attemptingReconnectRef = useRef(attemptingReconnect);
   useEffect(() => {
@@ -304,14 +306,14 @@ const App = () => {
         case 'gameDoesNotExist':
           // Check if this was an auto-reconnect attempt
           if (attemptingReconnectRef.current) {
-            setError('הסשן הקודם פג תוקף. אנא הצטרף לחדר חדש.');
-            toast.error('החדר הקודם כבר לא זמין', {
+            setError(t('errors.sessionExpired'));
+            toast.error(t('errors.sessionExpired'), {
               duration: 3000,
               icon: '⚠️',
             });
             setGameCode('');
           } else {
-            setError('Game code does not exist. Please check and try again.');
+            setError(t('errors.gameCodeNotExist'));
           }
           setIsActive(false);
           setAttemptingReconnect(false);
@@ -320,7 +322,7 @@ const App = () => {
           break;
 
         case 'usernameTaken':
-          setError('Username is already taken in this game. Please choose another.');
+          setError(t('errors.usernameTaken'));
           setIsActive(false);
           setAttemptingReconnect(false);
           // Clear invalid session
@@ -328,7 +330,7 @@ const App = () => {
           break;
 
         case 'gameExists':
-          setError('Game code already exists. Please choose a different code.');
+          setError(t('errors.gameCodeExists'));
           setIsActive(false);
           setIsHost(false);
           setAttemptingReconnect(false);
