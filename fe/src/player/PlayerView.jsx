@@ -330,6 +330,128 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
     }
   };
 
+  // Show waiting for results screen after game ends
+  if (waitingForResults) {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-slate-50 via-slate-100 to-slate-200 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 p-4 md:p-8 flex flex-col transition-colors duration-300">
+        <Toaster position="top-center" limit={3} />
+
+        {/* Exit Button */}
+        <div className="w-full max-w-md mx-auto flex justify-end mb-4 relative z-50">
+          <Button
+            onClick={handleExitRoom}
+            size="sm"
+            className="shadow-lg hover:scale-105 transition-transform bg-red-500 hover:bg-red-600 border border-red-400/30 hover:shadow-[0_0_15px_rgba(239,68,68,0.5)]"
+          >
+            <FaDoorOpen className="mr-2" />
+            {t('playerView.exit')}
+          </Button>
+        </div>
+
+        {/* Centered Content */}
+        <div className="flex-1 flex items-center justify-center">
+          <div className="max-w-2xl w-full space-y-6">
+            {/* Waiting for Results Message */}
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              className="text-center"
+            >
+              <Card className="bg-white/90 dark:bg-slate-800/90 backdrop-blur-md shadow-2xl border border-cyan-500/30 shadow-[0_0_20px_rgba(6,182,212,0.2)] p-8">
+                <div className="mb-4">
+                  <motion.div
+                    animate={{ rotate: 360 }}
+                    transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+                    className="inline-block text-5xl mb-4"
+                  >
+                    ⏳
+                  </motion.div>
+                </div>
+                <motion.h2
+                  animate={{
+                    scale: [1, 1.05, 1],
+                    opacity: [0.8, 1, 0.8],
+                  }}
+                  transition={{
+                    duration: 2,
+                    repeat: Infinity,
+                    ease: "easeInOut"
+                  }}
+                  className="text-3xl md:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-teal-300 to-purple-400 mb-2"
+                >
+                  {t('playerView.waitingForResults')}
+                </motion.h2>
+                <p className="text-sm text-slate-600 dark:text-slate-400 mt-4">
+                  {t('playerView.hostValidating') || 'Host is validating words...'}
+                </p>
+              </Card>
+            </motion.div>
+
+            {/* Leaderboard */}
+            {leaderboard.length > 0 && (
+              <motion.div
+                initial={{ y: 20, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ delay: 0.2 }}
+              >
+                <Card className="bg-white/90 dark:bg-slate-800/90 backdrop-blur-md shadow-xl border border-purple-500/30 shadow-[0_0_15px_rgba(168,85,247,0.1)]">
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2 text-purple-600 dark:text-purple-300 text-xl">
+                      <FaTrophy className="text-yellow-500 dark:text-yellow-400" />
+                      {t('playerView.leaderboard')}
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-2 max-h-[300px] overflow-y-auto">
+                    {leaderboard.map((player, index) => (
+                      <motion.div
+                        key={player.username}
+                        initial={{ x: 50, opacity: 0 }}
+                        animate={{ x: 0, opacity: 1 }}
+                        transition={{ delay: index * 0.1 }}
+                        className={`flex items-center justify-between p-4 rounded-lg
+                                ${index === 0 ? 'bg-gradient-to-r from-yellow-500/80 to-orange-500/80 text-white shadow-lg border border-yellow-400/50' :
+                            index === 1 ? 'bg-gradient-to-r from-gray-400/80 to-gray-500/80 text-white shadow-md border border-gray-400/50' :
+                              index === 2 ? 'bg-gradient-to-r from-orange-500/80 to-orange-600/80 text-white shadow-md border border-orange-400/50' :
+                                'bg-slate-100 dark:bg-slate-700/50 text-slate-900 dark:text-white'}`}
+                      >
+                        <div className="flex items-center gap-3">
+                          <div className="text-2xl font-bold min-w-[40px] text-center">
+                            {index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : `#${index + 1}`}
+                          </div>
+                          <div>
+                            <div className="font-bold">{player.username}</div>
+                            <div className="text-sm opacity-75">{player.wordCount} {t('playerView.wordCount')}</div>
+                          </div>
+                        </div>
+                        <div className="text-2xl font-bold">
+                          {player.score}
+                        </div>
+                      </motion.div>
+                    ))}
+                  </CardContent>
+                </Card>
+              </motion.div>
+            )}
+
+            {/* Chat Section */}
+            <motion.div
+              initial={{ y: 20, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ delay: 0.3 }}
+            >
+              <RoomChat
+                username={username}
+                isHost={false}
+                gameCode={gameCode}
+                className="min-h-[300px]"
+              />
+            </motion.div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   // Show waiting screen if game hasn't started yet
   if (!gameActive && !waitingForResults) {
     return (
@@ -412,6 +534,20 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
                   </p>
                 )}
               </Card>
+            </motion.div>
+
+            {/* Chat Section */}
+            <motion.div
+              initial={{ y: 20, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ delay: 0.3 }}
+            >
+              <RoomChat
+                username={username}
+                isHost={false}
+                gameCode={gameCode}
+                className="min-h-[300px]"
+              />
             </motion.div>
           </div>
         </div>

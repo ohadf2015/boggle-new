@@ -139,17 +139,42 @@ const ResultsPage = ({ finalScores, letterGrid, gameCode, onReturnToRoom, isHost
             ))}
           </div>
 
-          {/* Return Button */}
+          {/* Play Again Prompt */}
           {gameCode && onReturnToRoom && (
-            <div className="mt-8 flex flex-col items-center gap-3">
-              <Button
-                onClick={onReturnToRoom}
-                size="lg"
-                className="bg-gradient-to-r from-cyan-500 to-purple-600 hover:from-cyan-400 hover:to-purple-500 hover:shadow-[0_0_25px_rgba(6,182,212,0.6)] font-bold text-lg px-10 w-full sm:w-auto transition-all duration-300"
-              >
-                {t('results.returnToRoom')}
-              </Button>
-            </div>
+            <motion.div
+              initial={{ y: 20, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ delay: 0.5 }}
+              className="mt-8"
+            >
+              <Card className="p-6 bg-gradient-to-r from-cyan-500/10 to-purple-600/10 dark:from-cyan-500/20 dark:to-purple-600/20 border-2 border-cyan-500/30 shadow-lg">
+                <div className="text-center space-y-4">
+                  <h3 className="text-2xl font-bold text-slate-800 dark:text-white">
+                    {t('results.playAgainQuestion') || '🎮 Ready for Another Round?'}
+                  </h3>
+                  <p className="text-slate-600 dark:text-slate-300 text-sm">
+                    {t('results.playAgainDescription') || 'Stay in the room and wait for the host to start a new game'}
+                  </p>
+                  <div className="flex flex-col sm:flex-row gap-3 justify-center mt-4">
+                    <Button
+                      onClick={onReturnToRoom}
+                      size="lg"
+                      className="bg-gradient-to-r from-cyan-500 to-purple-600 hover:from-cyan-400 hover:to-purple-500 hover:shadow-[0_0_25px_rgba(6,182,212,0.6)] font-bold text-lg px-10 transition-all duration-300"
+                    >
+                      ✓ {t('results.stayInRoom') || 'Yes, Stay in Room'}
+                    </Button>
+                    <Button
+                      onClick={handleExitRoom}
+                      size="lg"
+                      variant="outline"
+                      className="font-bold text-lg px-10 border-2 hover:bg-red-50 dark:hover:bg-red-950 transition-all duration-300"
+                    >
+                      ✗ {t('results.leaveRoom') || 'No, Leave Room'}
+                    </Button>
+                  </div>
+                </div>
+              </Card>
+            </motion.div>
           )}
         </Card>
       </motion.div>
