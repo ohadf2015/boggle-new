@@ -17,6 +17,30 @@ export function normalizeHebrewWord(word) {
   return word.split('').map(normalizeHebrewLetter).join('');
 }
 
+// Convert regular Hebrew letters to final forms when at end of word
+export function applyHebrewFinalLetters(word) {
+  if (!word || word.length === 0) return word;
+
+  const regularToFinal = {
+    'צ': 'ץ',
+    'כ': 'ך',
+    'מ': 'ם',
+    'נ': 'ן',
+    'פ': 'ף'
+  };
+
+  // Split word into array of characters
+  const chars = word.split('');
+
+  // Replace last character if it has a final form
+  const lastChar = chars[chars.length - 1];
+  if (regularToFinal[lastChar]) {
+    chars[chars.length - 1] = regularToFinal[lastChar];
+  }
+
+  return chars.join('');
+}
+
 export function generateRandomTable(rows = null, cols = null, language = 'he') {
     // Use default difficulty if no rows/cols specified
     if (rows === null || cols === null) {

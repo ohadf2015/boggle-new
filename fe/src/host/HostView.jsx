@@ -17,7 +17,7 @@ import SlotMachineText from '../components/SlotMachineText';
 import ResultsPodium from '../components/results/ResultsPodium';
 import ResultsPlayerCard from '../components/results/ResultsPlayerCard';
 import '../style/animation.scss';
-import { generateRandomTable, embedWordInGrid } from '../utils/utils';
+import { generateRandomTable, embedWordInGrid, applyHebrewFinalLetters } from '../utils/utils';
 import { useWebSocket } from '../utils/WebSocketContext';
 import { clearSession } from '../utils/session';
 import { copyJoinUrl, shareViaWhatsApp } from '../utils/share';
@@ -25,7 +25,7 @@ import { useLanguage } from '../contexts/LanguageContext';
 import { DIFFICULTIES, DEFAULT_DIFFICULTY } from '../utils/consts';
 import { cn } from '../lib/utils';
 
-const HostView = ({ gameCode, roomLanguage: roomLanguageProp }) => {
+const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [] }) => {
   const { t, language } = useLanguage();
   const ws = useWebSocket();
   const [difficulty, setDifficulty] = useState(DEFAULT_DIFFICULTY);
@@ -35,7 +35,7 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp }) => {
   const [gameStarted, setGameStarted] = useState(false);
   const [roomLanguage] = useState(roomLanguageProp || language); // Use prop if available, fallback to user's language
 
-  const [playersReady, setPlayersReady] = useState([]);
+  const [playersReady, setPlayersReady] = useState(initialPlayers);
   const [showValidation, setShowValidation] = useState(false);
   const [playerWords, setPlayerWords] = useState([]);
   const [validations, setValidations] = useState({});
@@ -437,7 +437,7 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp }) => {
                               "text-lg font-medium",
                               isDuplicate && "line-through text-gray-500"
                             )}>
-                              {item.word}
+                              {applyHebrewFinalLetters(item.word)}
                             </span>
                             {isDuplicate && (
                               <Badge variant="destructive" className="bg-orange-500">

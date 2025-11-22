@@ -247,6 +247,7 @@ const App = () => {
   const [resultsData, setResultsData] = useState(null);
   const [attemptingReconnect, setAttemptingReconnect] = useState(!!savedSession);
   const [roomLanguage, setRoomLanguage] = useState(null); // Language of the room/game
+  const [playersInRoom, setPlayersInRoom] = useState([]); // Players in current room
 
   const { wsRef, connectWebSocket, setMessageHandler, cleanup, connectionError, checkLatency, lastPingTimeRef, connectionQuality } = useWebSocketConnection();
   const [ws, setWs] = useState(null);
@@ -276,7 +277,10 @@ const App = () => {
 
       switch (action) {
         case 'updateUsers':
-          // HostView handles this directly via its own WebSocket listener
+          // Store player list in App state to ensure it's always available
+          if (message.users) {
+            setPlayersInRoom(message.users);
+          }
           break;
 
         case 'joined':
@@ -476,6 +480,7 @@ const App = () => {
           letterGrid={resultsData?.letterGrid}
           gameCode={gameCode}
           onReturnToRoom={handleReturnToRoom}
+          isHost={isHost}
         />
       );
     }
@@ -499,7 +504,7 @@ const App = () => {
     }
 
     if (isHost) {
-      return <HostView gameCode={gameCode} roomLanguage={roomLanguage} />;
+      return <HostView gameCode={gameCode} roomLanguage={roomLanguage} initialPlayers={playersInRoom} />;
     }
 
     return (
@@ -510,6 +515,7 @@ const App = () => {
         setGameCode={setGameCode}
         setUsername={setUsername}
         onShowResults={handleShowResults}
+        initialPlayers={playersInRoom}
       />
     );
   };
