@@ -6,15 +6,44 @@ const WebSocket = require("ws");
 const path = require("path");
 const cors = require("cors");
 const { initRedis, closeRedis } = require("./redisClient");
+const dictionary = require("./dictionary");
+const RateLimiter = require("./utils/rateLimiter");
 
 const app = express();
 const server = http.createServer(app);
-const wss = new WebSocket.Server({ server });
+
+// WebSocket server with compression and configuration
+const wss = new WebSocket.Server({
+  server,
+  perMessageDeflate: {
+    zlibDeflateOptions: {
+      chunkSize: 1024,
+      memLevel: 7,
+      level: 3
+    },
+    zlibInflateOptions: {
+      chunkSize: 10 * 1024
+    },
+    clientNoContextTakeover: true,
+    serverNoContextTakeover: true,
+    serverMaxWindowBits: 10,
+    concurrencyLimit: 10,
+    threshold: 1024 // Only compress messages > 1KB
+  },
+  maxPayload: 100 * 1024 // 100KB max message size
+});
 
 // Configuration
 const PORT = process.env.PORT || 3001;
 const HOST = process.env.HOST || "0.0.0.0";
 const CORS_ORIGIN = process.env.CORS_ORIGIN || "*";
+
+// Rate limiting configuration
+const MESSAGE_RATE_LIMIT = parseInt(process.env.MESSAGE_RATE_LIMIT) || 50; // messages per interval
+const RATE_LIMIT_WINDOW = parseInt(process.env.RATE_LIMIT_WINDOW) || 10000; // 10 seconds
+
+// Initialize rate limiter
+const rateLimiter = new RateLimiter(MESSAGE_RATE_LIMIT, RATE_LIMIT_WINDOW);
 
 // Middleware
 app.use(cors({
@@ -38,6 +67,8 @@ const {
   handleDisconnect,
   handleCloseRoom,
   handleResetGame,
+  broadcastActiveRooms,
+  handleChatMessage,
 } = require("./handlers");
 
 // Heartbeat mechanism to keep connections alive
@@ -51,8 +82,32 @@ wss.on("connection", (ws) => {
     ws.isAlive = true;
   });
 
+  // Initialize rate limiting for this connection
+  const clientId = Math.random().toString(36).substring(7);
+  ws.clientId = clientId;
+  rateLimiter.initClient(clientId);
+
   ws.on("message", (data) => {
     try {
+      // Rate limiting check
+      if (rateLimiter.isRateLimited(ws.clientId)) {
+        ws.send(JSON.stringify({
+          action: "error",
+          message: "Rate limit exceeded. Please slow down."
+        }));
+        return;
+      }
+
+      // Validate message size (should be caught by maxPayload, but double check)
+      if (data.length > 100 * 1024) {
+        console.warn(`[WS] Message too large: ${data.length} bytes`);
+        ws.send(JSON.stringify({
+          action: "error",
+          message: "Message too large"
+        }));
+        return;
+      }
+
       const message = JSON.parse(data);
       const { action } = message;
 
@@ -70,11 +125,15 @@ wss.on("connection", (ws) => {
         case "createGame": {
           const { gameCode, roomName, language } = message;
           setNewGame(gameCode, ws, roomName, language);
+          // Broadcast updated rooms list to all clients
+          broadcastActiveRooms(wss);
           break;
         }
         case "join": {
           const { gameCode, username } = message;
           addUserToGame(gameCode, username, ws);
+          // Broadcast updated rooms list to all clients
+          broadcastActiveRooms(wss);
           break;
         }
         case "startGame": {
@@ -108,11 +167,17 @@ wss.on("connection", (ws) => {
         }
         case "closeRoom": {
           const { gameCode } = message;
-          handleCloseRoom(ws, gameCode);
+          handleCloseRoom(ws, gameCode, wss);
+          // Broadcast will happen inside handleCloseRoom after deletion
           break;
         }
         case "resetGame": {
           handleResetGame(ws);
+          break;
+        }
+        case "chatMessage": {
+          const { gameCode, username, message: chatMessage, isHost } = message;
+          handleChatMessage(ws, gameCode, username, chatMessage, isHost);
           break;
         }
         default:
@@ -126,7 +191,12 @@ wss.on("connection", (ws) => {
 
   ws.on("close", () => {
     console.log("Client disconnected");
-    handleDisconnect(ws);
+    // Clean up rate limiting
+    if (ws.clientId) {
+      rateLimiter.removeClient(ws.clientId);
+    }
+    handleDisconnect(ws, wss);
+    // Broadcast will happen inside handleDisconnect if a game is deleted
   });
 
   ws.on("error", (error) => {
@@ -159,6 +229,13 @@ app.get("*", (req, res) => {
 async function startServer() {
   // Try to initialize Redis (non-blocking)
   await initRedis();
+
+  // Load dictionaries (non-blocking)
+  try {
+    await dictionary.load();
+  } catch (error) {
+    console.error('Failed to load dictionaries, continuing without dictionary validation:', error);
+  }
 
   server.listen(PORT, HOST, () => {
     console.log(`Server started on http://${HOST}:${PORT}/`);

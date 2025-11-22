@@ -15,6 +15,8 @@ const WS_CONFIG = {
   BASE_RECONNECT_DELAY: 1000,
   MAX_RECONNECT_DELAY: 30000,
   HEARTBEAT_INTERVAL: 25000,
+  HIGH_LATENCY_THRESHOLD: 1000, // 1 second
+  VERY_HIGH_LATENCY_THRESHOLD: 3000, // 3 seconds
 };
 
 // Global flag to prevent multiple WebSocket instances (for React StrictMode)
@@ -46,6 +48,41 @@ const useWebSocketConnection = () => {
   const messageHandlerRef = useRef(null);
   const hasInitializedRef = useRef(false);
   const [connectionError, setConnectionError] = useState('');
+  const lastPingTimeRef = useRef(null);
+  const [connectionQuality, setConnectionQuality] = useState('good'); // 'good', 'unstable', 'poor'
+  const highLatencyWarningShownRef = useRef(false);
+  const { t } = useLanguage();
+
+  const checkLatency = useCallback((latency) => {
+    if (latency > WS_CONFIG.VERY_HIGH_LATENCY_THRESHOLD) {
+      setConnectionQuality('poor');
+      if (!highLatencyWarningShownRef.current) {
+        toast.error(t('errors.unstableConnection'), {
+          duration: 5000,
+          icon: '⚠️',
+        });
+        highLatencyWarningShownRef.current = true;
+        // Reset warning flag after 30 seconds
+        setTimeout(() => {
+          highLatencyWarningShownRef.current = false;
+        }, 30000);
+      }
+    } else if (latency > WS_CONFIG.HIGH_LATENCY_THRESHOLD) {
+      setConnectionQuality('unstable');
+      if (!highLatencyWarningShownRef.current) {
+        toast.warning(t('errors.slowConnection'), {
+          duration: 3000,
+          icon: '⚠️',
+        });
+        highLatencyWarningShownRef.current = true;
+        setTimeout(() => {
+          highLatencyWarningShownRef.current = false;
+        }, 30000);
+      }
+    } else {
+      setConnectionQuality('good');
+    }
+  }, [t]);
 
   const startHeartbeat = useCallback((ws) => {
     if (heartbeatIntervalRef.current) {
@@ -53,6 +90,7 @@ const useWebSocketConnection = () => {
     }
     heartbeatIntervalRef.current = setInterval(() => {
       if (ws.readyState === WebSocket.OPEN) {
+        lastPingTimeRef.current = Date.now();
         ws.send(JSON.stringify({ action: 'ping' }));
       }
     }, WS_CONFIG.HEARTBEAT_INTERVAL);
@@ -185,7 +223,7 @@ const useWebSocketConnection = () => {
     isConnectingRef.current = false;
   }, [stopHeartbeat]);
 
-  return { wsRef, connectWebSocket, setMessageHandler, cleanup, connectionError };
+  return { wsRef, connectWebSocket, setMessageHandler, cleanup, connectionError, checkLatency, lastPingTimeRef, connectionQuality };
 };
 
 
@@ -209,9 +247,11 @@ const App = () => {
   const [resultsData, setResultsData] = useState(null);
   const [attemptingReconnect, setAttemptingReconnect] = useState(!!savedSession);
   const [roomLanguage, setRoomLanguage] = useState(null); // Language of the room/game
+  const [playersInRoom, setPlayersInRoom] = useState([]); // Players in current room
 
-  const { wsRef, connectWebSocket, setMessageHandler, cleanup, connectionError } = useWebSocketConnection();
+  const { wsRef, connectWebSocket, setMessageHandler, cleanup, connectionError, checkLatency, lastPingTimeRef, connectionQuality } = useWebSocketConnection();
   const [ws, setWs] = useState(null);
+  const { t } = useLanguage();
 
   const attemptingReconnectRef = useRef(attemptingReconnect);
   useEffect(() => {
@@ -237,7 +277,10 @@ const App = () => {
 
       switch (action) {
         case 'updateUsers':
-          // HostView handles this directly via its own WebSocket listener
+          // Store player list in App state to ensure it's always available
+          if (message.users) {
+            setPlayersInRoom(message.users);
+          }
           break;
 
         case 'joined':
@@ -267,14 +310,14 @@ const App = () => {
         case 'gameDoesNotExist':
           // Check if this was an auto-reconnect attempt
           if (attemptingReconnectRef.current) {
-            setError('הסשן הקודם פג תוקף. אנא הצטרף לחדר חדש.');
-            toast.error('החדר הקודם כבר לא זמין', {
+            setError(t('errors.sessionExpired'));
+            toast.error(t('errors.sessionExpired'), {
               duration: 3000,
               icon: '⚠️',
             });
             setGameCode('');
           } else {
-            setError('Game code does not exist. Please check and try again.');
+            setError(t('errors.gameCodeNotExist'));
           }
           setIsActive(false);
           setAttemptingReconnect(false);
@@ -283,7 +326,7 @@ const App = () => {
           break;
 
         case 'usernameTaken':
-          setError('Username is already taken in this game. Please choose another.');
+          setError(t('errors.usernameTaken'));
           setIsActive(false);
           setAttemptingReconnect(false);
           // Clear invalid session
@@ -291,7 +334,7 @@ const App = () => {
           break;
 
         case 'gameExists':
-          setError('Game code already exists. Please choose a different code.');
+          setError(t('errors.gameCodeExists'));
           setIsActive(false);
           setIsHost(false);
           setAttemptingReconnect(false);
@@ -302,6 +345,10 @@ const App = () => {
           break;
 
         case 'pong':
+          if (lastPingTimeRef.current) {
+            const latency = Date.now() - lastPingTimeRef.current;
+            checkLatency(latency);
+          }
           break;
 
         default:
@@ -310,7 +357,7 @@ const App = () => {
     } catch (error) {
       console.error('Error parsing WebSocket message:', error);
     }
-  }, [username, gameCode, roomName]);
+  }, [username, gameCode, roomName, checkLatency, lastPingTimeRef]);
 
   useEffect(() => {
     connectWebSocket();
@@ -433,6 +480,7 @@ const App = () => {
           letterGrid={resultsData?.letterGrid}
           gameCode={gameCode}
           onReturnToRoom={handleReturnToRoom}
+          isHost={isHost}
         />
       );
     }
@@ -456,7 +504,7 @@ const App = () => {
     }
 
     if (isHost) {
-      return <HostView gameCode={gameCode} roomLanguage={roomLanguage} />;
+      return <HostView gameCode={gameCode} roomLanguage={roomLanguage} initialPlayers={playersInRoom} />;
     }
 
     return (
@@ -467,6 +515,7 @@ const App = () => {
         setGameCode={setGameCode}
         setUsername={setUsername}
         onShowResults={handleShowResults}
+        initialPlayers={playersInRoom}
       />
     );
   };

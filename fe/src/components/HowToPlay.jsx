@@ -3,8 +3,11 @@ import { motion } from 'framer-motion';
 import { FaGamepad, FaUsers, FaTrophy, FaClock, FaStar } from 'react-icons/fa';
 import { Card } from './ui/card';
 import { Badge } from './ui/badge';
+import { useLanguage } from '../contexts/LanguageContext';
 
 const HowToPlay = () => {
+  const { t } = useLanguage();
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -14,15 +17,15 @@ const HowToPlay = () => {
       <Card className="p-6 bg-white/95 backdrop-blur-sm shadow-2xl">
         <h2 className="text-3xl font-bold text-center mb-6 text-indigo-700 flex items-center justify-center gap-3">
           <FaGamepad className="text-4xl" />
-          איך משחקים בוגל?
+          {t('howToPlay.title')}
         </h2>
 
         {/* Main Description */}
         <div className="mb-8 text-center">
           <p className="text-lg text-gray-700 leading-relaxed">
-            <strong>בוגל</strong> הוא משחק מילים רב משתתפים חוויתי בעברית, מושלם למשפחות וחברים!
+            {t('howToPlay.description')}
             <br />
-            מצאו כמה שיותר מילים בזמן המוגבל וצברו נקודות להשגת המקום הראשון! 🏆
+            <span className="text-sm text-gray-600 mt-2 block">{t('howToPlay.descriptionNote')}</span>
           </p>
         </div>
 
@@ -40,11 +43,10 @@ const HowToPlay = () => {
             <div>
               <h3 className="text-xl font-bold text-gray-800 mb-2 flex items-center gap-2">
                 <FaUsers className="text-indigo-600" />
-                צרו או הצטרפו למשחק
+                {t('howToPlay.createOrJoinTitle')}
               </h3>
               <p className="text-gray-600 leading-relaxed">
-                המארח יוצר חדר משחק חדש ושולח את קוד החדר לשחקנים.
-                שחקנים מצטרפים באמצעות הקוד או סריקת QR.
+                {t('howToPlay.createOrJoinDesc')}
               </p>
             </div>
           </motion.div>
@@ -61,11 +63,10 @@ const HowToPlay = () => {
             <div>
               <h3 className="text-xl font-bold text-gray-800 mb-2 flex items-center gap-2">
                 <FaClock className="text-indigo-600" />
-                המארח מתחיל את המשחק
+                {t('howToPlay.hostStartsTitle')}
               </h3>
               <p className="text-gray-600 leading-relaxed">
-                המארח בוחר רמת קושי (גודל הלוח) ומגדיר את משך המשחק.
-                לחיצה על "התחל משחק" מתחילה את הספירה לאחור!
+                {t('howToPlay.hostStartsDesc')}
               </p>
             </div>
           </motion.div>
@@ -82,13 +83,12 @@ const HowToPlay = () => {
             <div>
               <h3 className="text-xl font-bold text-gray-800 mb-2 flex items-center gap-2">
                 <FaStar className="text-indigo-600" />
-                מצאו מילים על הלוח
+                {t('howToPlay.findWordsTitle')}
               </h3>
               <p className="text-gray-600 leading-relaxed">
-                חפשו מילים בעברית על לוח האותיות.
-                מילים צריכות להיות רצופות (אופקית, אנכית או אלכסונית).
+                {t('howToPlay.findWordsDesc')}
                 <br />
-                <strong className="text-indigo-700">שימו לב:</strong> לא ניתן להשתמש באותה משבצת פעמיים באותה מילה!
+                {t('howToPlay.findWordsNote')}
               </p>
             </div>
           </motion.div>
@@ -105,12 +105,12 @@ const HowToPlay = () => {
             <div>
               <h3 className="text-xl font-bold text-gray-800 mb-2 flex items-center gap-2">
                 <FaTrophy className="text-indigo-600" />
-                צברו נקודות והשיגו הישגים
+                {t('howToPlay.earnPointsTitle')}
               </h3>
               <p className="text-gray-600 leading-relaxed">
-                מילים ארוכות יותר = יותר נקודות!
+                {t('howToPlay.earnPointsDesc')}
                 <br />
-                השיגו הישגים מיוחדים במהלך המשחק ותראו אותם בזמן אמת.
+                {t('howToPlay.earnPointsNote')}
               </p>
             </div>
           </motion.div>
@@ -119,65 +119,59 @@ const HowToPlay = () => {
         {/* Scoring System */}
         <div className="bg-gradient-to-br from-indigo-50 to-purple-50 rounded-lg p-6 mb-6">
           <h3 className="text-2xl font-bold text-center mb-4 text-indigo-700">
-            מערכת ניקוד 🎯
+            {t('howToPlay.scoringSystemTitle')}
           </h3>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
             <Badge className="py-3 px-4 text-center bg-gradient-to-r from-gray-400 to-gray-500 text-white">
-              2-3 אותיות: 1 נקודה
+              {t('howToPlay.scoringTable.letters2_3')}
             </Badge>
             <Badge className="py-3 px-4 text-center bg-gradient-to-r from-blue-400 to-blue-500 text-white">
-              4 אותיות: 2 נקודות
+              {t('howToPlay.scoringTable.letters4')}
             </Badge>
             <Badge className="py-3 px-4 text-center bg-gradient-to-r from-green-400 to-green-500 text-white">
-              5 אותיות: 3 נקודות
+              {t('howToPlay.scoringTable.letters5')}
             </Badge>
             <Badge className="py-3 px-4 text-center bg-gradient-to-r from-yellow-400 to-yellow-500 text-white">
-              6 אותיות: 5 נקודות
+              {t('howToPlay.scoringTable.letters6')}
             </Badge>
             <Badge className="py-3 px-4 text-center bg-gradient-to-r from-orange-400 to-orange-500 text-white">
-              7 אותיות: 7 נקודות
+              {t('howToPlay.scoringTable.letters7')}
             </Badge>
             <Badge className="py-3 px-4 text-center bg-gradient-to-r from-red-400 to-red-500 text-white">
-              8 אותיות: 10 נקודות
+              {t('howToPlay.scoringTable.letters8')}
             </Badge>
             <Badge className="py-3 px-4 text-center bg-gradient-to-r from-purple-400 to-purple-500 text-white col-span-2">
-              9+ אותיות: 10+ נקודות
+              {t('howToPlay.scoringTable.letters9plus')}
             </Badge>
           </div>
           <p className="text-sm text-gray-600 mt-4 text-center">
-            ⚠️ <strong>שימו לב:</strong> מילים כפולות (שמצאו כמה שחקנים) לא מקבלות נקודות!
+            {t('howToPlay.duplicateWarning')}
           </p>
         </div>
 
         {/* Achievements */}
         <div className="bg-gradient-to-br from-yellow-50 to-orange-50 rounded-lg p-6 mb-6">
           <h3 className="text-2xl font-bold text-center mb-4 text-orange-700">
-            הישגים מיוחדים 🏆
+            {t('howToPlay.achievementsTitle')}
           </h3>
           <div className="grid md:grid-cols-2 gap-3 text-sm">
             <div className="flex items-center gap-2">
-              <span className="text-2xl">🎯</span>
-              <span><strong>דם ראשון:</strong> ראשון למצוא מילה</span>
+              <span>{t('howToPlay.achievements.speedDemon')}</span>
             </div>
             <div className="flex items-center gap-2">
-              <span className="text-2xl">⚡</span>
-              <span><strong>שד המהירות:</strong> 10 מילים ב-2 דקות</span>
+              <span>{t('howToPlay.achievements.wordWizard')}</span>
             </div>
             <div className="flex items-center gap-2">
-              <span className="text-2xl">📚</span>
-              <span><strong>אדון המילים:</strong> מילה בת 7+ אותיות</span>
+              <span>{t('howToPlay.achievements.vocabularyKing')}</span>
             </div>
             <div className="flex items-center gap-2">
-              <span className="text-2xl">🔥</span>
-              <span><strong>מלך הקומבו:</strong> 5 מילים ברצף</span>
+              <span>{t('howToPlay.achievements.longWordMaster')}</span>
             </div>
             <div className="flex items-center gap-2">
-              <span className="text-2xl">✨</span>
-              <span><strong>פרפקציוניסט:</strong> כל המילים תקינות</span>
+              <span>{t('howToPlay.achievements.perfectionist')}</span>
             </div>
             <div className="flex items-center gap-2">
-              <span className="text-2xl">💎</span>
-              <span><strong>צייד אוצרות:</strong> מילה בת 8+ אותיות</span>
+              <span>{t('howToPlay.achievements.earlyBird')}</span>
             </div>
           </div>
         </div>
@@ -185,28 +179,28 @@ const HowToPlay = () => {
         {/* Tips */}
         <div className="bg-gradient-to-br from-green-50 to-teal-50 rounded-lg p-6">
           <h3 className="text-2xl font-bold text-center mb-4 text-green-700">
-            טיפים למשחק מנצח 💡
+            {t('howToPlay.tipsTitle')}
           </h3>
           <ul className="space-y-2 text-gray-700">
             <li className="flex items-start gap-2">
               <span className="text-green-600 font-bold">✓</span>
-              <span>התחילו עם מילים קצרות כדי לצבור מהר נקודות ראשונות</span>
+              <span>{t('howToPlay.tips.tip1')}</span>
             </li>
             <li className="flex items-start gap-2">
               <span className="text-green-600 font-bold">✓</span>
-              <span>חפשו מילים ארוכות - הן שוות הרבה יותר נקודות!</span>
+              <span>{t('howToPlay.tips.tip2')}</span>
             </li>
             <li className="flex items-start gap-2">
               <span className="text-green-600 font-bold">✓</span>
-              <span>שימו לב לאותיות נדירות כמו ט, ץ, ע - יכולות ליצור מילים ייחודיות</span>
+              <span>{t('howToPlay.tips.tip3')}</span>
             </li>
             <li className="flex items-start gap-2">
               <span className="text-green-600 font-bold">✓</span>
-              <span>אל תפחדו לנסות - מילים שגויות לא מורידות נקודות</span>
+              <span>{t('howToPlay.tips.tip4')}</span>
             </li>
             <li className="flex items-start gap-2">
               <span className="text-green-600 font-bold">✓</span>
-              <span>עקבו אחרי הרמזים על שחקנים אחרים כדי לדעת מה המצב</span>
+              <span>{t('howToPlay.tips.tip5')}</span>
             </li>
           </ul>
         </div>
@@ -214,10 +208,10 @@ const HowToPlay = () => {
         {/* Ready to Play */}
         <div className="mt-8 text-center">
           <p className="text-xl font-bold text-indigo-700 mb-2">
-            מוכנים? בואו נתחיל לשחק! 🎮
+            {t('howToPlay.readyToPlay')}
           </p>
           <p className="text-gray-600">
-            משחק חוויתי ומהנה לכל המשפחה - חינמי לחלוטין!
+            {t('howToPlay.funForFamily')}
           </p>
         </div>
       </Card>

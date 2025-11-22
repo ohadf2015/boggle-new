@@ -1,141 +1,49 @@
 const { saveGameState, deleteGameState } = require('./redisClient');
+const dictionary = require('./dictionary');
+const { isWordOnBoard } = require('./modules/wordValidator');
+const { calculateWordScore } = require('./modules/scoringEngine');
+const { ACHIEVEMENTS, checkLiveAchievements, awardFinalAchievements } = require('./modules/achievementManager');
+const { games, gameWs, wsUsername, getActiveRooms, getGame, getUsernameFromWs, getWsHostFromGameCode, getWsFromUsername, getGameCodeFromUsername, deleteGame: deleteGameFromState } = require('./modules/gameStateManager');
+const { safeSend, broadcast } = require('./utils/websocketHelpers');
 
-const games = {};
-// Use Map instead of plain objects to properly store WebSocket as keys
-const gameWs = new Map();
-const wsUsername = new Map();
+// Comprehensive cleanup function to prevent memory leaks
+const cleanupGameTimers = (gameCode) => {
+  if (!games[gameCode]) {
+    return;
+  }
 
-// Normalize Hebrew letters - convert final forms to regular forms
-function normalizeHebrewLetter(letter) {
-  const finalToRegular = {
-    'ץ': 'צ',
-    'ך': 'כ',
-    'ם': 'מ',
-    'ן': 'נ',
-    'ף': 'פ'
-  };
-  return finalToRegular[letter] || letter;
-}
+  const game = games[gameCode];
 
-// Normalize an entire Hebrew word
-function normalizeHebrewWord(word) {
-  return word.split('').map(normalizeHebrewLetter).join('');
-}
+  // Clear game timer interval
+  if (game.timerInterval) {
+    clearInterval(game.timerInterval);
+    game.timerInterval = null;
+  }
 
-// Word validation: Check if a word exists on the board as a valid path
-function isWordOnBoard(word, board) {
-  if (!word || !board || board.length === 0) return false;
+  // Clear validation timeout
+  if (game.validationTimeout) {
+    clearTimeout(game.validationTimeout);
+    game.validationTimeout = null;
+  }
 
-  const rows = board.length;
-  const cols = board[0].length;
-  // Normalize and lowercase the word for comparison
-  const wordNormalized = normalizeHebrewWord(word.toLowerCase());
+  // Clear host disconnect timeout
+  if (game.hostDisconnectTimeout) {
+    clearTimeout(game.hostDisconnectTimeout);
+    game.hostDisconnectTimeout = null;
+  }
 
-  // Find all starting positions (cells with the first letter)
-  const startPositions = [];
-  for (let i = 0; i < rows; i++) {
-    for (let j = 0; j < cols; j++) {
-      const cellNormalized = normalizeHebrewLetter(board[i][j].toLowerCase());
-      if (cellNormalized === wordNormalized[0]) {
-        startPositions.push([i, j]);
+  // Clear all player disconnect timeouts
+  if (game.disconnectedPlayers) {
+    Object.values(game.disconnectedPlayers).forEach(player => {
+      if (player.timeout) {
+        clearTimeout(player.timeout);
       }
-    }
+    });
+    game.disconnectedPlayers = {};
   }
-
-  // Try to find the word starting from each position
-  for (const [startRow, startCol] of startPositions) {
-    if (searchWord(board, wordNormalized, startRow, startCol, 0, new Set())) {
-      return true;
-    }
-  }
-
-  return false;
-}
-
-// Helper function to search for word using DFS
-function searchWord(board, word, row, col, index, visited) {
-  // Base case: found the entire word
-  if (index === word.length) {
-    return true;
-  }
-
-  // Check bounds
-  if (row < 0 || row >= board.length || col < 0 || col >= board[0].length) {
-    return false;
-  }
-
-  // Check if already visited this cell
-  const cellKey = `${row},${col}`;
-  if (visited.has(cellKey)) {
-    return false;
-  }
-
-  // Check if current cell matches current letter (with normalization)
-  const cellNormalized = normalizeHebrewLetter(board[row][col].toLowerCase());
-  if (cellNormalized !== word[index]) {
-    return false;
-  }
-
-  // Mark as visited
-  visited.add(cellKey);
-
-  // Search in all 8 directions (horizontal, vertical, diagonal)
-  const directions = [
-    [-1, -1], [-1, 0], [-1, 1],  // top-left, top, top-right
-    [0, -1],           [0, 1],   // left, right
-    [1, -1],  [1, 0],  [1, 1]    // bottom-left, bottom, bottom-right
-  ];
-
-  for (const [dx, dy] of directions) {
-    if (searchWord(board, word, row + dx, col + dy, index + 1, new Set(visited))) {
-      return true;
-    }
-  }
-
-  return false;
-}
-
-// Function to get active rooms (show all rooms while host is present)
-const getActiveRooms = () => {
-  return Object.keys(games).map(gameCode => ({
-    gameCode,
-    roomName: games[gameCode].roomName || `Room ${gameCode}`,
-    playerCount: Object.keys(games[gameCode].users).length,
-    gameState: games[gameCode].gameState,
-    language: games[gameCode].language || 'en', // Default to English if not set
-  })); // Show all rooms as long as they exist (host hasn't left)
 };
 
-// Achievement definitions (Hebrew) - Expanded
-const ACHIEVEMENTS = {
-  FIRST_BLOOD: { name: 'דם ראשון', description: 'ראשון למצוא מילה', icon: '🎯' },
-  SPEED_DEMON: { name: 'שד המהירות', description: 'מצא 10 מילים ב-2 דקות', icon: '⚡' },
-  WORD_MASTER: { name: 'אדון המילים', description: 'מצא מילה בת 7+ אותיות', icon: '📚' },
-  COMBO_KING: { name: 'מלך הקומבו', description: '5 מילים ברצף', icon: '🔥' },
-  PERFECTIONIST: { name: 'פרפקציוניסט', description: 'כל המילים תקינות', icon: '✨' },
-  LEXICON: { name: 'לקסיקון', description: 'מצא 20+ מילים', icon: '🏆' },
-  WORDSMITH: { name: 'צורף מילים', description: 'מצא 15 מילים תקינות', icon: '🎓' },
-  QUICK_THINKER: { name: 'חושב מהיר', description: 'מצא מילה בתוך 10 שניות', icon: '💨' },
-  LONG_HAULER: { name: 'מרתונאי', description: 'מצא מילה בדקה האחרונה', icon: '🏃' },
-  DIVERSE_VOCABULARY: { name: 'אוצר מילים מגוון', description: 'מצא מילים באורכים שונים', icon: '🌈' },
-  DOUBLE_TROUBLE: { name: 'צמד מנצח', description: 'מצא 2 מילים בתוך 5 שניות', icon: '⚡⚡' },
-  TREASURE_HUNTER: { name: 'צייד אוצרות', description: 'מצא מילה נדירה (8+ אותיות)', icon: '💎' },
-};
-
-// Calculate score based on word length with bonus for longer words (whole numbers)
-const calculateWordScore = (word) => {
-    const length = word.length;
-    if (length === 1) return 0; // Single letters not allowed
-    if (length === 2) return 1; // 2-letter words: 1 point
-    if (length === 3) return 1; // 3-letter words: 1 point
-    if (length === 4) return 2; // 4-letter words: 2 points
-    if (length === 5) return 3; // 5-letter words: 3 points
-    if (length === 6) return 5; // 6-letter words: 5 points
-    if (length === 7) return 7; // 7-letter words: 7 points
-    return 10 + (length - 8) * 3; // 8+ letters: 10, 13, 16, 19...
-};
-
-const setNewGame = (gameCode, host, roomName, language = 'en') => {
+const setNewGame = async (gameCode, host, roomName, language = 'en') => {
     console.log(`[CREATE] Creating game - gameCode: ${gameCode}, roomName: ${roomName}, language: ${language}`);
 
     const existingGame = getGame(gameCode);
@@ -161,7 +69,7 @@ const setNewGame = (gameCode, host, roomName, language = 'en') => {
         wsUsername.set(host, '__HOST__'); // Mark as host in the username map
         console.log(`[CREATE] Game ${gameCode} ("${roomName}") created successfully. Available games:`, Object.keys(games));
 
-        // Save game state to Redis (async, non-blocking)
+        // Save game state to Redis (non-blocking but logged)
         saveGameState(gameCode, games[gameCode]).catch(err =>
           console.error('[REDIS] Error saving game state:', err)
         );
@@ -200,7 +108,7 @@ const setNewGame = (gameCode, host, roomName, language = 'en') => {
     }
 }
 
-const addUserToGame = (gameCode, username, ws) => {
+const addUserToGame = async (gameCode, username, ws) => {
     console.log(`[JOIN] Attempting to join - gameCode: ${gameCode}, username: ${username}`);
     console.log(`[JOIN] Available games:`, Object.keys(games));
 
@@ -212,8 +120,8 @@ const addUserToGame = (gameCode, username, ws) => {
 
     const game = games[gameCode];
 
-    // Check if this username exists and is in the disconnected players list (reconnection)
-    if(game.users[username] && game.disconnectedPlayers && game.disconnectedPlayers[username]) {
+    // Check if this username exists in the disconnected players list (reconnection)
+    if(game.disconnectedPlayers && game.disconnectedPlayers[username]) {
       console.log(`[JOIN] Player ${username} reconnecting to game ${gameCode}`);
 
       // Clear the disconnect timeout
@@ -221,7 +129,7 @@ const addUserToGame = (gameCode, username, ws) => {
         clearTimeout(game.disconnectedPlayers[username].timeout);
       }
 
-      // Update WebSocket (data is already in game.users, etc.)
+      // Re-add user to active users
       game.users[username] = ws;
       gameWs.set(ws, gameCode);
       wsUsername.set(ws, username);
@@ -231,7 +139,7 @@ const addUserToGame = (gameCode, username, ws) => {
 
       console.log(`[JOIN] Player ${username} successfully reconnected to game ${gameCode}`);
     } else if(game.users[username]) {
-      // Username exists but NOT in disconnected list - truly taken by someone else
+      // Username exists in active users - truly taken by someone else
       console.log(`[JOIN] Username ${username} already taken in game ${gameCode}`);
       ws.send(JSON.stringify({ action: "usernameTaken" }));
       return;
@@ -251,8 +159,9 @@ const addUserToGame = (gameCode, username, ws) => {
     // Send confirmation to the player who just joined
     ws.send(JSON.stringify({ action: "joined", isHost: false }));
 
-    // If game is already in progress, sync the current game state to the new player
+    // Sync the current game state to the player
     if (game.gameState === 'playing') {
+      // Game is active - send current state
       const remainingTime = Math.max(0, Math.floor((game.endTime - Date.now()) / 1000));
       ws.send(JSON.stringify({
         action: "startGame",
@@ -275,11 +184,17 @@ const addUserToGame = (gameCode, username, ws) => {
       });
 
       console.log(`Late join: ${username} joined active game ${gameCode} with ${remainingTime}s remaining`);
+    } else if (game.gameState === 'ended') {
+      // Game has ended - send end game state
+      ws.send(JSON.stringify({ action: "endGame" }));
+      ws.send(JSON.stringify({ action: "timeUpdate", remainingTime: 0 }));
+      console.log(`Player ${username} rejoined after game ended in ${gameCode}`);
     }
 
     const usersList = Object.keys(game.users);
-    console.log(`[JOIN] Notifying host about updated users:`, usersList);
+    console.log(`[JOIN] Notifying host and players about updated users:`, usersList);
     sendHostAMessage(gameCode, { action: "updateUsers", users: usersList });
+    sendAllPlayerAMessage(gameCode, { action: "updateUsers", users: usersList });
     broadcastLeaderboard(gameCode);
 
     // Save updated game state to Redis
@@ -288,7 +203,7 @@ const addUserToGame = (gameCode, username, ws) => {
     );
 }
 
-const handleStartGame = (host, letterGrid, timerSeconds, language) => {
+const handleStartGame = async (host, letterGrid, timerSeconds, language) => {
   const gameCode = gameWs.get(host);
 
   if (!gameCode || !games[gameCode]) {
@@ -386,11 +301,66 @@ const handleEndGame = (host) => {
       word.length > longest.length ? word : longest, ''),
   })).sort((a, b) => b.score - a.score);
 
-  // Send all words to host for validation
+  // Auto-validate words using dictionary
+  const gameLanguage = games[gameCode].language || 'en';
+  const wordsNeedingValidation = new Set();
+  let autoValidatedCount = 0;
+
+  // Collect all unique words and validate them against the dictionary
+  const uniqueWords = new Set();
+  Object.keys(games[gameCode].users).forEach(username => {
+    if (games[gameCode].playerWordDetails[username]) {
+      games[gameCode].playerWordDetails[username].forEach(wordDetail => {
+        uniqueWords.add(wordDetail.word);
+      });
+    }
+  });
+
+  // Validate each unique word against the dictionary
+  uniqueWords.forEach(word => {
+    const isValidInDictionary = dictionary.isValidWord(word, gameLanguage);
+
+    if (isValidInDictionary === true) {
+      // Word found in dictionary - auto-validate as true
+      autoValidatedCount++;
+      // Mark the word as auto-validated in all players' word details
+      Object.keys(games[gameCode].users).forEach(username => {
+        if (games[gameCode].playerWordDetails[username]) {
+          const wordDetail = games[gameCode].playerWordDetails[username].find(w => w.word === word);
+          if (wordDetail) {
+            wordDetail.autoValidated = true;
+            wordDetail.inDictionary = true;
+          }
+        }
+      });
+    } else if (isValidInDictionary === false) {
+      // Word NOT in dictionary - mark for host validation
+      wordsNeedingValidation.add(word);
+      Object.keys(games[gameCode].users).forEach(username => {
+        if (games[gameCode].playerWordDetails[username]) {
+          const wordDetail = games[gameCode].playerWordDetails[username].find(w => w.word === word);
+          if (wordDetail) {
+            wordDetail.inDictionary = false;
+          }
+        }
+      });
+    } else {
+      // Dictionary not loaded or word couldn't be validated - send to host
+      wordsNeedingValidation.add(word);
+    }
+  });
+
+  // Send all words to host for validation (only words not in dictionary)
   const allPlayerWords = Object.keys(games[gameCode].users).map(username => ({
     username,
     words: games[gameCode].playerWordDetails[username]
   }));
+
+  // Send final time update to ensure all clients show 0:00
+  sendAllPlayerAMessage(gameCode, {
+    action: "timeUpdate",
+    remainingTime: 0
+  });
 
   sendAllPlayerAMessage(gameCode, { action: "endGame" });
   sendAllPlayerAMessage(gameCode, {
@@ -402,8 +372,46 @@ const handleEndGame = (host) => {
   // Send validation interface data to host
   sendHostAMessage(gameCode, {
     action: "showValidation",
-    playerWords: allPlayerWords
+    playerWords: allPlayerWords,
+    autoValidatedCount,
+    totalWords: uniqueWords.size
   });
+
+  // Log dictionary validation stats
+  console.log(`[Dictionary] Auto-validated ${autoValidatedCount} words, ${wordsNeedingValidation.size} words need host validation`);
+
+  // Start auto-validation timeout in case host is AFK (60 seconds)
+  games[gameCode].validationTimeout = setTimeout(() => {
+    // Check if game still exists and hasn't been validated yet
+    if (games[gameCode] && games[gameCode].gameState === 'ended') {
+      console.log(`[AUTO_VALIDATION] Host AFK for game ${gameCode}, auto-validating all words as valid`);
+
+      // Auto-validate all words as true
+      const autoValidations = [];
+      const uniqueWords = new Set();
+
+      Object.keys(games[gameCode].users).forEach(username => {
+        if (games[gameCode].playerWordDetails[username]) {
+          games[gameCode].playerWordDetails[username].forEach(wordDetail => {
+            uniqueWords.add(wordDetail.word);
+          });
+        }
+      });
+
+      uniqueWords.forEach(word => {
+        autoValidations.push({ word, isValid: true });
+      });
+
+      // Call the validation handler with all words marked as valid
+      handleValidateWords(games[gameCode].host, autoValidations, games[gameCode].letterGrid);
+
+      // Notify host that auto-validation occurred
+      sendHostAMessage(gameCode, {
+        action: "autoValidationOccurred",
+        message: "Auto-validation completed due to inactivity"
+      });
+    }
+  }, 60000); // 60 seconds
 }
 
 const handleSendAnswer = (ws, foundWords) => {
@@ -414,72 +422,10 @@ const handleSendAnswer = (ws, foundWords) => {
   sendHostAMessage(gameCode, { action: "updateScores", username, foundWords });
 }
 
-// Check and award LIVE achievements during gameplay (selective achievements only)
-const checkLiveAchievements = (gameCode, username, word, timeSinceStart) => {
+// Check and award LIVE achievements during gameplay - using module
+const checkAndBroadcastLiveAchievements = (gameCode, username, word, timeSinceStart) => {
   const game = games[gameCode];
-  const achievements = game.playerAchievements[username];
-  const newAchievements = [];
-
-  // First Blood - first word in the game (LIVE)
-  if (!game.firstWordFound && !achievements.includes('FIRST_BLOOD')) {
-    game.firstWordFound = true;
-    achievements.push('FIRST_BLOOD');
-    newAchievements.push(ACHIEVEMENTS.FIRST_BLOOD);
-  }
-
-  // Word Master - 7+ letter word (LIVE)
-  if (word.length >= 7 && !achievements.includes('WORD_MASTER')) {
-    achievements.push('WORD_MASTER');
-    newAchievements.push(ACHIEVEMENTS.WORD_MASTER);
-  }
-
-  // Treasure Hunter - 8+ letter word (LIVE)
-  if (word.length >= 8 && !achievements.includes('TREASURE_HUNTER')) {
-    achievements.push('TREASURE_HUNTER');
-    newAchievements.push(ACHIEVEMENTS.TREASURE_HUNTER);
-  }
-
-  // Quick Thinker - word within 10 seconds (LIVE)
-  if (timeSinceStart <= 10 && !achievements.includes('QUICK_THINKER')) {
-    achievements.push('QUICK_THINKER');
-    newAchievements.push(ACHIEVEMENTS.QUICK_THINKER);
-  }
-
-  // Speed Demon - 10 words in 2 minutes (LIVE)
-  if (game.playerWords[username].length >= 10 && timeSinceStart <= 120 && !achievements.includes('SPEED_DEMON')) {
-    achievements.push('SPEED_DEMON');
-    newAchievements.push(ACHIEVEMENTS.SPEED_DEMON);
-  }
-
-  // Combo King - multiples of 5 words (LIVE)
-  if (game.playerWords[username].length >= 5 &&
-      game.playerWords[username].length % 5 === 0 &&
-      !achievements.includes('COMBO_KING')) {
-    achievements.push('COMBO_KING');
-    newAchievements.push(ACHIEVEMENTS.COMBO_KING);
-  }
-
-  // Wordsmith - 15 words (LIVE)
-  if (game.playerWords[username].length >= 15 && !achievements.includes('WORDSMITH')) {
-    achievements.push('WORDSMITH');
-    newAchievements.push(ACHIEVEMENTS.WORDSMITH);
-  }
-
-  // Lexicon - 20+ words (LIVE)
-  if (game.playerWords[username].length >= 20 && !achievements.includes('LEXICON')) {
-    achievements.push('LEXICON');
-    newAchievements.push(ACHIEVEMENTS.LEXICON);
-  }
-
-  // Double Trouble - 2 words within 5 seconds (LIVE)
-  const playerWordDetails = game.playerWordDetails[username];
-  if (playerWordDetails.length >= 2 && !achievements.includes('DOUBLE_TROUBLE')) {
-    const lastTwo = playerWordDetails.slice(-2);
-    if (lastTwo[1].timeSinceStart - lastTwo[0].timeSinceStart <= 5) {
-      achievements.push('DOUBLE_TROUBLE');
-      newAchievements.push(ACHIEVEMENTS.DOUBLE_TROUBLE);
-    }
-  }
+  const newAchievements = checkLiveAchievements(game, username, word, timeSinceStart);
 
   // Broadcast new achievements to the player who unlocked them
   if (newAchievements.length > 0) {
@@ -502,8 +448,26 @@ const handleWordSubmission = (ws, word) => {
   const gameCode = gameWs.get(ws);
   const username = wsUsername.get(ws);
 
-  if (!games[gameCode] || games[gameCode].gameState !== 'playing') {
-    console.warn(`Invalid game state for word submission: ${gameCode}`);
+  if (!games[gameCode]) {
+    console.warn(`Invalid game code for word submission: ${gameCode}`);
+    return;
+  }
+
+  // If game is not in 'playing' state, sync the client with current state
+  if (games[gameCode].gameState !== 'playing') {
+    console.warn(`Player ${username} tried to submit word during game state: ${games[gameCode].gameState}`);
+
+    // If game has ended, notify the player
+    if (games[gameCode].gameState === 'ended') {
+      if (ws.readyState === 1) {
+        try {
+          ws.send(JSON.stringify({ action: "endGame" }));
+          ws.send(JSON.stringify({ action: "timeUpdate", remainingTime: 0 }));
+        } catch (error) {
+          console.error("Error syncing game end state:", error);
+        }
+      }
+    }
     return;
   }
 
@@ -571,48 +535,23 @@ const handleWordSubmission = (ws, word) => {
     }
   }
 
-  // Notify OTHER players with psychological hints (no actual words shown!)
-  // Generate hint based on word characteristics and player streak
+  // Send general notification to host (without showing the actual word)
   const wordCount = games[gameCode].playerWords[username].length;
-  const recentWords = games[gameCode].playerWordDetails[username].slice(-3);
-  const isOnStreak = recentWords.length >= 3 &&
-    recentWords.every((w, i) => i === 0 || w.timestamp - recentWords[i-1].timestamp < 10000);
-
-  let hint = '';
-  if (word.length >= 8) {
-    hint = '📏 מילה ארוכה!';
-  } else if (word.length >= 6) {
-    hint = '💪 מילה חזקה!';
-  } else if (isOnStreak) {
-    hint = '🔥 במסע!';
-  } else if (wordCount % 5 === 0 && wordCount > 0) {
-    hint = '⭐ רצף מדהים!';
-  } else if (timeSinceStart < 30) {
-    hint = '⚡ התחלה מהירה!';
-  } else {
-    hint = '✨ מילה חדשה!';
+  const hostWs = games[gameCode].host;
+  if (hostWs && hostWs.readyState === 1) {
+    try {
+      hostWs.send(JSON.stringify({
+        action: "playerFoundWord",
+        username,
+        wordCount
+      }));
+    } catch (error) {
+      console.error(`Error notifying host:`, error);
+    }
   }
 
-  Object.keys(games[gameCode].users).forEach(otherUsername => {
-    if (otherUsername !== username) {
-      const otherWs = games[gameCode].users[otherUsername];
-      if (otherWs && otherWs.readyState === 1) {
-        try {
-          otherWs.send(JSON.stringify({
-            action: "playerFoundWord",
-            username,
-            hint, // Psychological hint instead of word
-          }));
-        } catch (error) {
-          console.error(`Error notifying player ${otherUsername}:`, error);
-        }
-      }
-    }
-  });
-  // Note: Host is not in users list, so they won't receive any word notifications
-
   // Check for live achievements
-  checkLiveAchievements(gameCode, username, word, timeSinceStart);
+  checkAndBroadcastLiveAchievements(gameCode, username, word, timeSinceStart);
 
   // Update leaderboard for everyone
   broadcastLeaderboard(gameCode);
@@ -636,63 +575,39 @@ const broadcastLeaderboard = (gameCode) => {
 }
 
 const sendAllPlayerAMessage = (gameCode, message) => {
-  if (games[gameCode]) {
-    const players = Object.keys(games[gameCode].users);
-    console.log(`[BROADCAST] Sending ${message.action} to ${players.length} players in game ${gameCode}:`, players);
-
-    Object.entries(games[gameCode].users).forEach(([username, userWs]) => {
-      if (userWs.readyState === 1) { // 1 = OPEN
-        try {
-          userWs.send(JSON.stringify(message));
-          console.log(`[BROADCAST] ✓ Sent ${message.action} to ${username}`);
-        } catch (error) {
-          console.error(`[BROADCAST] ✗ Error sending ${message.action} to ${username}:`, error);
-        }
-      } else {
-        console.warn(`[BROADCAST] ✗ WebSocket not open for ${username}, state: ${userWs.readyState}`);
-      }
-    });
-  } else {
+  if (!games[gameCode]) {
     console.warn(`[BROADCAST] No game found for ${gameCode}`);
+    return;
   }
+
+  const game = games[gameCode];
+  if (Object.keys(game.users).length === 0) {
+    return; // No players to send to
+  }
+
+  // Use broadcast helper for efficient sending
+  broadcast(game.users, message, `BROADCAST-${gameCode}`);
 }
 
 const sendHostAMessage = (gameCode, message) => {
-  if (games[gameCode] && games[gameCode].host) {
-    if (games[gameCode].host.readyState === 1) { // 1 = OPEN
-      try {
-        games[gameCode].host.send(JSON.stringify(message));
-        console.log(`[HOST_MSG] ✓ Sent ${message.action} to host in game ${gameCode}`);
-      } catch (error) {
-        console.error(`[HOST_MSG] ✗ Error sending ${message.action} to host in game ${gameCode}:`, error);
-      }
-    } else {
-      console.warn(`[HOST_MSG] ✗ Host WebSocket not open for game ${gameCode}, state: ${games[gameCode].host.readyState}`);
-    }
-  } else {
-    console.warn(`[HOST_MSG] ✗ No host found for game ${gameCode}`);
+  if (!games[gameCode]) {
+    console.warn(`[HOST_MSG] No game found for ${gameCode}`);
+    return;
   }
+
+  const host = games[gameCode].host;
+  if (!host) {
+    console.warn(`[HOST_MSG] No host found for game ${gameCode}`);
+    return;
+  }
+
+  // Use safeSend helper
+  safeSend(host, message, `host-${gameCode}`);
 }
 
-const getGame = (gameCode) => games[gameCode];
-
-const getUsernameFromWs = (ws) => wsUsername.get(ws);
-
-const getWsHostFromGameCode = (gameCode) => games[gameCode].host;
-
-const getWsFromUsername = (gameCode, username) => games[gameCode].users[username];
-
-const getGameCodeFromUsername = (username) => {
-  for (const gameCode in games) {
-    if (games[gameCode].users[username]) {
-      return gameCode;
-    }
-  }
-  return null;
-}
 
 // Cleanup when a connection closes
-const handleDisconnect = (ws) => {
+const handleDisconnect = (ws, wss) => {
   const gameCode = gameWs.get(ws);
   const username = wsUsername.get(ws);
 
@@ -721,19 +636,8 @@ const handleDisconnect = (ws) => {
               message: "המנחה עזב את החדר. החדר נסגר."
             });
 
-            // Clear timer if exists
-            if (games[gameCode].timerInterval) {
-              clearInterval(games[gameCode].timerInterval);
-            }
-
-            // Clear all player disconnect timeouts
-            if (games[gameCode].disconnectedPlayers) {
-              Object.values(games[gameCode].disconnectedPlayers).forEach(player => {
-                if (player.timeout) {
-                  clearTimeout(player.timeout);
-                }
-              });
-            }
+            // Clean up all timers and timeouts
+            cleanupGameTimers(gameCode);
 
             // Cleanup after notification
             setTimeout(() => {
@@ -745,6 +649,9 @@ const handleDisconnect = (ws) => {
                 deleteGameState(gameCode).catch(err =>
                   console.error('[REDIS] Error deleting game state:', err)
                 );
+
+                // Broadcast updated rooms list
+                if (wss) broadcastActiveRooms(wss);
               }
             }, 500);
           }
@@ -787,9 +694,13 @@ const handleDisconnect = (ws) => {
       // Remove from active users immediately so they disappear from the list
       delete games[gameCode].users[username];
 
-      // Notify host of updated user list immediately
+      // Notify host and all players of updated user list immediately
       const remainingPlayers = Object.keys(games[gameCode].users);
       sendHostAMessage(gameCode, {
+        action: "updateUsers",
+        users: remainingPlayers
+      });
+      sendAllPlayerAMessage(gameCode, {
         action: "updateUsers",
         users: remainingPlayers
       });
@@ -802,14 +713,18 @@ const handleDisconnect = (ws) => {
       // If 1 player and playing, end game.
       if (remainingPlayers.length === 0) {
          console.log(`[DISCONNECT] No players left in game ${gameCode}, closing room.`);
-         // Clear host disconnect timeout if exists
-         if (games[gameCode].hostDisconnectTimeout) clearTimeout(games[gameCode].hostDisconnectTimeout);
+         // Clean up all timers and timeouts
+         cleanupGameTimers(gameCode);
          // Delete game
          delete games[gameCode];
          deleteGameState(gameCode).catch(e => console.error(e));
       } else if (remainingPlayers.length <= 1 && games[gameCode].gameState === 'playing') {
          console.log(`[DISCONNECT] ${remainingPlayers.length} player(s) remain in game ${gameCode}, ending game automatically`);
-         if (games[gameCode].timerInterval) clearInterval(games[gameCode].timerInterval);
+         // Clear timer before ending game
+         if (games[gameCode].timerInterval) {
+           clearInterval(games[gameCode].timerInterval);
+           games[gameCode].timerInterval = null;
+         }
          handleEndGame(games[gameCode].host);
       }
 
@@ -830,6 +745,12 @@ const handleValidateWords = (host, validations, letterGrid) => {
   }
 
   console.log(`Validating words for game ${gameCode}, ${validations.length} validations received`);
+
+  // Clear auto-validation timeout since host is validating manually
+  if (games[gameCode].validationTimeout) {
+    clearTimeout(games[gameCode].validationTimeout);
+    games[gameCode].validationTimeout = null;
+  }
 
   // Reset all scores before calculating - only for existing players
   Object.keys(games[gameCode].users).forEach(username => {
@@ -864,10 +785,25 @@ const handleValidateWords = (host, validations, letterGrid) => {
   });
 
   // Create a map of unique words with their validation status
+  // Combine auto-validated words (from dictionary) with host validations
   const wordValidationMap = {};
+
+  // First, add auto-validated words (words found in dictionary)
+  Object.keys(games[gameCode].users).forEach(username => {
+    if (games[gameCode].playerWordDetails[username]) {
+      games[gameCode].playerWordDetails[username].forEach(wordDetail => {
+        if (wordDetail.autoValidated && !wordValidationMap[wordDetail.word]) {
+          wordValidationMap[wordDetail.word] = true; // Auto-validated words are valid
+        }
+      });
+    }
+  });
+
+  // Then, apply host validations (for words not in dictionary)
   validations.forEach(({ word, isValid }) => {
     // Only store unique words - the first validation for each word wins
-    if (!wordValidationMap[word]) {
+    // Host validations override auto-validations if present
+    if (!wordValidationMap[word] || !wordValidationMap[word].autoValidated) {
       wordValidationMap[word] = isValid;
     }
   });
@@ -912,92 +848,8 @@ const handleValidateWords = (host, validations, letterGrid) => {
     }
   });
 
-  // NOW check and award achievements based on validated words
-  Object.keys(games[gameCode].users).forEach(username => {
-    // Safety check: ensure player data exists
-    if (!games[gameCode].playerWordDetails[username]) {
-      console.warn(`Player ${username} missing word details during achievement calculation`);
-      return;
-    }
-
-    const allWords = games[gameCode].playerWordDetails[username];
-    const validWords = allWords.filter(w => w.validated === true);
-
-    // First Blood - first word in the game
-    if (validWords.length > 0 && !games[gameCode].firstWordFound) {
-      const firstWordEver = Object.keys(games[gameCode].users)
-        .map(u => games[gameCode].playerWordDetails[u])
-        .flat()
-        .filter(w => w.validated === true)
-        .sort((a, b) => a.timestamp - b.timestamp)[0];
-
-      if (firstWordEver && allWords.includes(firstWordEver)) {
-        games[gameCode].playerAchievements[username].push('FIRST_BLOOD');
-        games[gameCode].firstWordFound = true;
-      }
-    }
-
-    // Word Master - 7+ letter word
-    if (validWords.some(w => w.word.length >= 7)) {
-      games[gameCode].playerAchievements[username].push('WORD_MASTER');
-    }
-
-    // Speed Demon - 10 valid words in 2 minutes
-    const wordsIn2Min = validWords.filter(w => w.timeSinceStart <= 120);
-    if (wordsIn2Min.length >= 10) {
-      games[gameCode].playerAchievements[username].push('SPEED_DEMON');
-    }
-
-    // Lexicon - 20+ valid words
-    if (validWords.length >= 20) {
-      games[gameCode].playerAchievements[username].push('LEXICON');
-    }
-
-    // Combo King - 5+ valid words (multiples of 5)
-    if (validWords.length >= 5 && validWords.length % 5 === 0) {
-      games[gameCode].playerAchievements[username].push('COMBO_KING');
-    }
-
-    // Perfectionist - all words valid
-    if (allWords.length > 0 && allWords.every(w => w.validated === true)) {
-      games[gameCode].playerAchievements[username].push('PERFECTIONIST');
-    }
-
-    // Wordsmith - 15+ valid words
-    if (validWords.length >= 15) {
-      games[gameCode].playerAchievements[username].push('WORDSMITH');
-    }
-
-    // Quick Thinker - found a word within 10 seconds of game start
-    if (validWords.some(w => w.timeSinceStart <= 10)) {
-      games[gameCode].playerAchievements[username].push('QUICK_THINKER');
-    }
-
-    // Long Hauler - found a word in the last minute
-    const gameTimerSeconds = games[gameCode].timerSeconds || 180;
-    if (validWords.some(w => w.timeSinceStart >= gameTimerSeconds - 60)) {
-      games[gameCode].playerAchievements[username].push('LONG_HAULER');
-    }
-
-    // Diverse Vocabulary - found words of at least 4 different lengths
-    const uniqueLengths = new Set(validWords.map(w => w.word.length));
-    if (uniqueLengths.size >= 4) {
-      games[gameCode].playerAchievements[username].push('DIVERSE_VOCABULARY');
-    }
-
-    // Double Trouble - found 2 words within 5 seconds of each other
-    for (let i = 1; i < validWords.length; i++) {
-      if (validWords[i].timeSinceStart - validWords[i-1].timeSinceStart <= 5) {
-        games[gameCode].playerAchievements[username].push('DOUBLE_TROUBLE');
-        break;
-      }
-    }
-
-    // Treasure Hunter - found an 8+ letter word
-    if (validWords.some(w => w.word.length >= 8)) {
-      games[gameCode].playerAchievements[username].push('TREASURE_HUNTER');
-    }
-  });
+  // Award final achievements based on validated words - using module
+  awardFinalAchievements(games[gameCode], Object.keys(games[gameCode].users));
 
   // Calculate final scores with all validated data - only for existing players
   const finalScores = Object.keys(games[gameCode].playerScores)
@@ -1038,7 +890,7 @@ const handleValidateWords = (host, validations, letterGrid) => {
 };
 
 // Handle host manually closing the room
-const handleCloseRoom = (host, gameCode) => {
+const handleCloseRoom = (host, gameCode, wss) => {
   console.log(`[CLOSE_ROOM] Host manually closing room ${gameCode}`);
 
   if (!games[gameCode]) {
@@ -1052,24 +904,8 @@ const handleCloseRoom = (host, gameCode) => {
     message: "המנחה עזב את החדר. החדר נסגר."
   });
 
-  // Clear timer if exists
-  if (games[gameCode].timerInterval) {
-    clearInterval(games[gameCode].timerInterval);
-  }
-
-  // Clear any disconnect timeout
-  if (games[gameCode].hostDisconnectTimeout) {
-    clearTimeout(games[gameCode].hostDisconnectTimeout);
-  }
-
-  // Clear all player disconnect timeouts
-  if (games[gameCode].disconnectedPlayers) {
-    Object.values(games[gameCode].disconnectedPlayers).forEach(player => {
-      if (player.timeout) {
-        clearTimeout(player.timeout);
-      }
-    });
-  }
+  // Clean up all timers and timeouts
+  cleanupGameTimers(gameCode);
 
   // Delete the game after a short delay to ensure messages are sent
   setTimeout(() => {
@@ -1081,12 +917,15 @@ const handleCloseRoom = (host, gameCode) => {
       deleteGameState(gameCode).catch(err =>
         console.error('[REDIS] Error deleting game state:', err)
       );
+
+      // Broadcast updated rooms list
+      if (wss) broadcastActiveRooms(wss);
     }
   }, 500);
 };
 
 // Handle resetting game for a new round
-const handleResetGame = (host) => {
+const handleResetGame = async (host) => {
   const gameCode = gameWs.get(host);
 
   if (!gameCode || !games[gameCode]) {
@@ -1096,10 +935,15 @@ const handleResetGame = (host) => {
 
   console.log(`[RESET_GAME] Resetting game ${gameCode} for new round`);
 
-  // Clear timer if exists
+  // Clean up all timers and timeouts (except host/player disconnect timeouts)
   if (games[gameCode].timerInterval) {
     clearInterval(games[gameCode].timerInterval);
     games[gameCode].timerInterval = null;
+  }
+
+  if (games[gameCode].validationTimeout) {
+    clearTimeout(games[gameCode].validationTimeout);
+    games[gameCode].validationTimeout = null;
   }
 
   // Reset game state
@@ -1135,6 +979,52 @@ const handleResetGame = (host) => {
 };
 
 // Export all functions
+// Broadcast active rooms to all connected clients
+const broadcastActiveRooms = (wss) => {
+  if (!wss || !wss.clients) return;
+
+  const rooms = getActiveRooms();
+  const message = JSON.stringify({ action: 'activeRooms', rooms });
+
+  let sentCount = 0;
+  wss.clients.forEach((client) => {
+    if (client.readyState === 1) { // WebSocket.OPEN
+      try {
+        client.send(message);
+        sentCount++;
+      } catch (error) {
+        console.error('[BROADCAST] Error sending active rooms:', error.message);
+      }
+    }
+  });
+
+  console.log(`[BROADCAST] Active rooms sent to ${sentCount} clients`);
+};
+
+// Handle chat messages in a room
+const handleChatMessage = (ws, gameCode, username, message, isHost) => {
+  if (!games[gameCode]) {
+    console.warn(`[CHAT] No game found for ${gameCode}`);
+    return;
+  }
+
+  console.log(`[CHAT] Message from ${username} in game ${gameCode}: ${message}`);
+
+  const chatMessage = {
+    action: 'chatMessage',
+    username,
+    message,
+    timestamp: Date.now(),
+    isHost: isHost || false
+  };
+
+  // Broadcast to all players
+  sendAllPlayerAMessage(gameCode, chatMessage);
+
+  // Send to host as well
+  sendHostAMessage(gameCode, chatMessage);
+};
+
 module.exports = {
   setNewGame,
   addUserToGame,
@@ -1152,4 +1042,6 @@ module.exports = {
   handleDisconnect,
   handleCloseRoom,
   handleResetGame,
+  broadcastActiveRooms,
+  handleChatMessage,
 };

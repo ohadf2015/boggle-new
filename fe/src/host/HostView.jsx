@@ -14,8 +14,11 @@ import { AchievementBadge } from '../components/AchievementBadge';
 import GridComponent from '../components/GridComponent';
 import ShareButton from '../components/ShareButton';
 import SlotMachineText from '../components/SlotMachineText';
+import ResultsPodium from '../components/results/ResultsPodium';
+import ResultsPlayerCard from '../components/results/ResultsPlayerCard';
+import RoomChat from '../components/RoomChat';
 import '../style/animation.scss';
-import { generateRandomTable, embedWordInGrid } from '../utils/utils';
+import { generateRandomTable, embedWordInGrid, applyHebrewFinalLetters } from '../utils/utils';
 import { useWebSocket } from '../utils/WebSocketContext';
 import { clearSession } from '../utils/session';
 import { copyJoinUrl, shareViaWhatsApp } from '../utils/share';
@@ -23,7 +26,7 @@ import { useLanguage } from '../contexts/LanguageContext';
 import { DIFFICULTIES, DEFAULT_DIFFICULTY } from '../utils/consts';
 import { cn } from '../lib/utils';
 
-const HostView = ({ gameCode, roomLanguage: roomLanguageProp }) => {
+const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [] }) => {
   const { t, language } = useLanguage();
   const ws = useWebSocket();
   const [difficulty, setDifficulty] = useState(DEFAULT_DIFFICULTY);
@@ -33,7 +36,7 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp }) => {
   const [gameStarted, setGameStarted] = useState(false);
   const [roomLanguage] = useState(roomLanguageProp || language); // Use prop if available, fallback to user's language
 
-  const [playersReady, setPlayersReady] = useState([]);
+  const [playersReady, setPlayersReady] = useState(initialPlayers);
   const [showValidation, setShowValidation] = useState(false);
   const [playerWords, setPlayerWords] = useState([]);
   const [validations, setValidations] = useState({});
@@ -44,6 +47,11 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp }) => {
   // Animation states
   const [shufflingGrid, setShufflingGrid] = useState(null);
   const [highlightedCells, setHighlightedCells] = useState([]);
+
+  // Update players list when initialPlayers prop changes
+  useEffect(() => {
+    setPlayersReady(initialPlayers);
+  }, [initialPlayers]);
 
   // Pre-game shuffling animation with player names
   useEffect(() => {
@@ -141,13 +149,13 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp }) => {
 
 
         case 'playerFoundWord':
-          toast(`${message.username} ${t('hostView.playerFoundWord')} "${message.word}"!`, {
+          toast(`${message.username} ${t('hostView.playerFoundWord')} (${message.wordCount} ${t('hostView.words')})`, {
             icon: '🎯',
             duration: 2000,
           });
           setPlayerWordCounts(prev => ({
             ...prev,
-            [message.username]: (prev[message.username] || 0) + 1
+            [message.username]: message.wordCount
           }));
           break;
 
@@ -155,17 +163,33 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp }) => {
           setPlayerWords(message.playerWords);
           setShowValidation(true);
           // Initialize validations object with unique words only
+          // Auto-validated words are already validated and don't need host input
           const initialValidations = {};
           const uniqueWords = new Set();
           message.playerWords.forEach(player => {
             player.words.forEach(wordObj => {
               uniqueWords.add(wordObj.word);
+              // Auto-validated words are pre-set to true and locked
+              if (wordObj.autoValidated) {
+                initialValidations[wordObj.word] = true;
+              }
             });
           });
           uniqueWords.forEach(word => {
-            initialValidations[word] = true; // Default to valid
+            if (initialValidations[word] === undefined) {
+              initialValidations[word] = true; // Default to valid
+            }
           });
           setValidations(initialValidations);
+
+          // Show notification about auto-validated words
+          if (message.autoValidatedCount > 0) {
+            toast.success(`${message.autoValidatedCount} מילים אומתו אוטומטית`, {
+              duration: 5000,
+              icon: '✅',
+            });
+          }
+
           toast.success(t('hostView.validateWords'), {
             icon: '✅',
             duration: 5000,
@@ -183,6 +207,13 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp }) => {
             particleCount: 150,
             spread: 80,
             origin: { y: 0.6 },
+          });
+          break;
+
+        case 'autoValidationOccurred':
+          toast(message.message || 'Auto-validation completed', {
+            icon: '⏱️',
+            duration: 4000,
           });
           break;
 
@@ -336,7 +367,9 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp }) => {
           uniqueWordsMap.set(word, {
             word: word,
             playerCount: 1,
-            players: [player.username]
+            players: [player.username],
+            autoValidated: wordObj.autoValidated || false,
+            inDictionary: wordObj.inDictionary
           });
         } else {
           const existing = uniqueWordsMap.get(word);
@@ -354,7 +387,7 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp }) => {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-50 via-slate-100 to-slate-200 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 flex flex-col items-center p-4 sm:p-6 md:p-8 overflow-auto transition-colors duration-300">
-      <Toaster position="top-center" />
+      <Toaster position="top-center" limit={3} />
 
       {/* Validation Modal */}
       <Dialog open={showValidation} onOpenChange={setShowValidation}>
@@ -384,6 +417,7 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp }) => {
                   <div className="max-h-[50vh] overflow-auto space-y-2">
                     {uniqueWords.map((item, index) => {
                       const isDuplicate = item.playerCount > 1;
+                      const isAutoValidated = item.autoValidated;
                       const isValid = validations[item.word] !== undefined ? validations[item.word] : true;
 
                       return (
@@ -392,8 +426,10 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp }) => {
                           className={cn(
                             "flex items-center gap-3 p-3 rounded-lg transition-colors border",
                             isDuplicate
-                              ? "bg-orange-50 hover:bg-orange-100 border-orange-200"
-                              : "hover:bg-gray-50 border-gray-200"
+                              ? "bg-orange-50 dark:bg-orange-900/20 hover:bg-orange-100 dark:hover:bg-orange-900/30 border-orange-200 dark:border-orange-700"
+                              : isAutoValidated
+                              ? "bg-cyan-50 dark:bg-cyan-900/20 border-cyan-200 dark:border-cyan-700"
+                              : "hover:bg-gray-50 dark:hover:bg-slate-700 border-gray-200 dark:border-slate-600"
                           )}
                         >
                           <Checkbox
@@ -407,11 +443,16 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp }) => {
                               "text-lg font-medium",
                               isDuplicate && "line-through text-gray-500"
                             )}>
-                              {item.word}
+                              {applyHebrewFinalLetters(item.word)}
                             </span>
                             {isDuplicate && (
                               <Badge variant="destructive" className="bg-orange-500">
                                 ⚠ {item.playerCount} {t('joinView.players')}
+                              </Badge>
+                            )}
+                            {isAutoValidated && !isDuplicate && (
+                              <Badge variant="success" className="bg-cyan-500 text-white">
+                                ✓ {t('hostView.autoValidated')}
                               </Badge>
                             )}
                             {item.playerCount === 1 && (
@@ -441,84 +482,27 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp }) => {
 
       {/* Final Scores Modal */}
       <Dialog open={!!finalScores} onOpenChange={() => setFinalScores(null)}>
-        <DialogContent className="max-w-3xl max-h-[80vh] overflow-auto">
+        <DialogContent className="max-w-5xl max-h-[90vh] overflow-auto bg-gradient-to-b from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800">
           <DialogHeader>
-            <DialogTitle className="text-center text-3xl sm:text-4xl text-yellow-500 font-bold flex items-center justify-center gap-2">
-              <FaTrophy /> {t('hostView.finalScores')}
+            <DialogTitle className="text-center text-3xl sm:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 to-orange-500 flex items-center justify-center gap-3">
+              <FaTrophy className="text-yellow-500" />
+              {t('hostView.finalScores')}
+              <FaTrophy className="text-yellow-500" />
             </DialogTitle>
           </DialogHeader>
-          <div className="space-y-3">
-            {finalScores && finalScores.map((player, index) => (
-              <motion.div
-                key={player.username}
-                initial={{ x: -50, opacity: 0 }}
-                animate={{ x: 0, opacity: 1 }}
-                transition={{ delay: index * 0.2 }}
-              >
-                <Card className={cn(
-                  "p-4",
-                  index === 0 && "bg-gradient-to-r from-yellow-400 to-orange-500 text-white scale-105 shadow-xl",
-                  index === 1 && "bg-gradient-to-r from-gray-300 to-gray-400 shadow-lg",
-                  index === 2 && "bg-gradient-to-r from-orange-400 to-orange-600 text-white shadow-lg"
-                )}>
-                  <div className="flex justify-between items-center mb-3">
-                    <h3 className="text-xl font-bold">
-                      {index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : `#${index + 1}`} {player.username}
-                    </h3>
-                    <div className="text-3xl font-bold text-white mb-2">
-                      {player.score}
-                    </div>
-                    <p className="text-sm mb-1 text-white/80">
-                      {t('hostView.words')}: {player.wordCount} {player.validWordCount !== undefined && `(${player.validWordCount} valid)`}
-                    </p>
 
-                    {player.longestWord && (
-                      <p className="text-sm mb-2">
-                        {t('playerView.longestWord')}: <strong>{player.longestWord}</strong>
-                      </p>
-                    )}
-                  </div>
+          <div className="space-y-6">
+            {/* Podium */}
+            {finalScores && finalScores.length > 0 && (
+              <ResultsPodium sortedScores={finalScores} />
+            )}
 
-                  {/* Word Visualization with colors */}
-                  {player.allWords && player.allWords.length > 0 && (
-                    <div className="mt-3">
-                      <p className="text-sm font-bold mb-2">{t('hostView.words')}:</p>
-                      <div className="flex flex-wrap gap-2">
-                        {player.allWords.map((wordObj, i) => (
-                          <Badge
-                            key={i}
-                            className={cn(
-                              "font-bold",
-                              wordObj.validated
-                                ? "text-white"
-                                : "bg-gray-400 text-white opacity-60"
-                            )}
-                            style={{
-                              backgroundColor: wordObj.validated
-                                ? ['#FF6B6B', '#4ECDC4', '#45B7D1', '#FFA07A', '#98D8C8', '#F7DC6F', '#BB8FCE'][i % 7]
-                                : undefined
-                            }}
-                          >
-                            {wordObj.word} {wordObj.validated ? `(${wordObj.score})` : '(✗)'}
-                          </Badge>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-
-                  {player.achievements && player.achievements.length > 0 && (
-                    <div className="mt-3">
-                      <p className="text-sm font-bold mb-2">{t('hostView.achievements')}:</p>
-                      <div className="flex flex-wrap gap-2">
-                        {player.achievements.map((ach, i) => (
-                          <AchievementBadge key={i} achievement={ach} index={i} />
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                </Card>
-              </motion.div>
-            ))}
+            {/* Detailed Player Cards */}
+            <div className="space-y-3 max-w-3xl mx-auto">
+              {finalScores && finalScores.map((player, index) => (
+                <ResultsPlayerCard key={player.username} player={player} index={index} />
+              ))}
+            </div>
           </div>
           <DialogFooter className="flex-col sm:flex-row gap-2">
             <Button
@@ -538,7 +522,7 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp }) => {
                   duration: 2000,
                 });
               }}
-              className="w-full bg-green-600 hover:bg-green-700"
+              className="w-full bg-gradient-to-r from-cyan-500 to-purple-600 hover:from-cyan-400 hover:to-purple-500"
             >
               🎮 {t('hostView.startNewGame')}
             </Button>
@@ -836,6 +820,18 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp }) => {
             </div>
           </Card>
         </div>
+
+        {/* Chat Section */}
+        {!gameStarted && (
+          <div className="w-full">
+            <RoomChat
+              username="Host"
+              isHost={true}
+              gameCode={gameCode}
+              className="max-w-2xl mx-auto min-h-[400px]"
+            />
+          </div>
+        )}
       </div>
     </div>
   );

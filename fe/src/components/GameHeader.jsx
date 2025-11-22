@@ -1,6 +1,8 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { useTheme } from '../utils/ThemeContext';
+import { Button } from './ui/button';
+import { cn } from '../lib/utils';
 
 /**
  * GameHeader - A reusable Modern Neon styled header component for the Boggle game
@@ -141,15 +143,16 @@ const GameHeader = ({
 
         {/* Right side - Optional actions container */}
         <div className="flex items-center gap-2">
-          <button
+          <Button
+            variant="ghost"
+            size="icon"
             onClick={toggleTheme}
-            className={`
-              p-2 rounded-full transition-all duration-300
-              ${isDarkMode
-                ? "bg-slate-700 text-yellow-400 hover:bg-slate-600 hover:shadow-[0_0_10px_rgba(250,204,21,0.5)]"
-                : "bg-indigo-100 text-indigo-600 hover:bg-indigo-200 hover:shadow-[0_0_10px_rgba(79,70,229,0.3)]"
-              }
-            `}
+            className={cn(
+              "rounded-full transition-all duration-300",
+              isDarkMode
+                ? "bg-slate-700 text-yellow-400 hover:bg-slate-600 hover:shadow-[0_0_10px_rgba(250,204,21,0.5)] hover:text-yellow-400"
+                : "bg-indigo-100 text-indigo-600 hover:bg-indigo-200 hover:shadow-[0_0_10px_rgba(79,70,229,0.3)] hover:text-indigo-600"
+            )}
             aria-label="Toggle theme"
           >
             {isDarkMode ? (
@@ -169,7 +172,7 @@ const GameHeader = ({
                 <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
               </svg>
             )}
-          </button>
+          </Button>
 
           {rightContent}
         </div>
