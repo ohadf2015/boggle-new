@@ -155,17 +155,33 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp }) => {
           setPlayerWords(message.playerWords);
           setShowValidation(true);
           // Initialize validations object with unique words only
+          // Auto-validated words are already validated and don't need host input
           const initialValidations = {};
           const uniqueWords = new Set();
           message.playerWords.forEach(player => {
             player.words.forEach(wordObj => {
               uniqueWords.add(wordObj.word);
+              // Auto-validated words are pre-set to true and locked
+              if (wordObj.autoValidated) {
+                initialValidations[wordObj.word] = true;
+              }
             });
           });
           uniqueWords.forEach(word => {
-            initialValidations[word] = true; // Default to valid
+            if (initialValidations[word] === undefined) {
+              initialValidations[word] = true; // Default to valid
+            }
           });
           setValidations(initialValidations);
+
+          // Show notification about auto-validated words
+          if (message.autoValidatedCount > 0) {
+            toast.success(`${message.autoValidatedCount} מילים אומתו אוטומטית`, {
+              duration: 5000,
+              icon: '✅',
+            });
+          }
+
           toast.success(t('hostView.validateWords'), {
             icon: '✅',
             duration: 5000,
@@ -343,7 +359,9 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp }) => {
           uniqueWordsMap.set(word, {
             word: word,
             playerCount: 1,
-            players: [player.username]
+            players: [player.username],
+            autoValidated: wordObj.autoValidated || false,
+            inDictionary: wordObj.inDictionary
           });
         } else {
           const existing = uniqueWordsMap.get(word);
@@ -361,7 +379,7 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp }) => {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-50 via-slate-100 to-slate-200 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 flex flex-col items-center p-4 sm:p-6 md:p-8 overflow-auto transition-colors duration-300">
-      <Toaster position="top-center" />
+      <Toaster position="top-center" limit={3} />
 
       {/* Validation Modal */}
       <Dialog open={showValidation} onOpenChange={setShowValidation}>
@@ -391,6 +409,7 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp }) => {
                   <div className="max-h-[50vh] overflow-auto space-y-2">
                     {uniqueWords.map((item, index) => {
                       const isDuplicate = item.playerCount > 1;
+                      const isAutoValidated = item.autoValidated;
                       const isValid = validations[item.word] !== undefined ? validations[item.word] : true;
 
                       return (
@@ -400,14 +419,16 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp }) => {
                             "flex items-center gap-3 p-3 rounded-lg transition-colors border",
                             isDuplicate
                               ? "bg-orange-50 hover:bg-orange-100 border-orange-200"
+                              : isAutoValidated
+                              ? "bg-green-50 border-green-200"
                               : "hover:bg-gray-50 border-gray-200"
                           )}
                         >
                           <Checkbox
                             checked={isValid}
                             onCheckedChange={() => toggleWordValidation(null, item.word)}
-                            disabled={isDuplicate}
-                            className={cn(isDuplicate && "opacity-50")}
+                            disabled={isDuplicate || isAutoValidated}
+                            className={cn((isDuplicate || isAutoValidated) && "opacity-50")}
                           />
                           <div className="flex items-center gap-2 flex-1">
                             <span className={cn(
@@ -419,6 +440,11 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp }) => {
                             {isDuplicate && (
                               <Badge variant="destructive" className="bg-orange-500">
                                 ⚠ {item.playerCount} {t('joinView.players')}
+                              </Badge>
+                            )}
+                            {isAutoValidated && !isDuplicate && (
+                              <Badge variant="success" className="bg-green-500 text-white">
+                                ✓ אומת
                               </Badge>
                             )}
                             {item.playerCount === 1 && (

@@ -15,6 +15,8 @@ const WS_CONFIG = {
   BASE_RECONNECT_DELAY: 1000,
   MAX_RECONNECT_DELAY: 30000,
   HEARTBEAT_INTERVAL: 25000,
+  HIGH_LATENCY_THRESHOLD: 1000, // 1 second
+  VERY_HIGH_LATENCY_THRESHOLD: 3000, // 3 seconds
 };
 
 // Global flag to prevent multiple WebSocket instances (for React StrictMode)
@@ -46,6 +48,40 @@ const useWebSocketConnection = () => {
   const messageHandlerRef = useRef(null);
   const hasInitializedRef = useRef(false);
   const [connectionError, setConnectionError] = useState('');
+  const lastPingTimeRef = useRef(null);
+  const [connectionQuality, setConnectionQuality] = useState('good'); // 'good', 'unstable', 'poor'
+  const highLatencyWarningShownRef = useRef(false);
+
+  const checkLatency = useCallback((latency) => {
+    if (latency > WS_CONFIG.VERY_HIGH_LATENCY_THRESHOLD) {
+      setConnectionQuality('poor');
+      if (!highLatencyWarningShownRef.current) {
+        toast.error('חיבור האינטרנט לא יציב - ייתכנו בעיות במשחק', {
+          duration: 5000,
+          icon: '⚠️',
+        });
+        highLatencyWarningShownRef.current = true;
+        // Reset warning flag after 30 seconds
+        setTimeout(() => {
+          highLatencyWarningShownRef.current = false;
+        }, 30000);
+      }
+    } else if (latency > WS_CONFIG.HIGH_LATENCY_THRESHOLD) {
+      setConnectionQuality('unstable');
+      if (!highLatencyWarningShownRef.current) {
+        toast.warning('חיבור האינטרנט איטי', {
+          duration: 3000,
+          icon: '⚠️',
+        });
+        highLatencyWarningShownRef.current = true;
+        setTimeout(() => {
+          highLatencyWarningShownRef.current = false;
+        }, 30000);
+      }
+    } else {
+      setConnectionQuality('good');
+    }
+  }, []);
 
   const startHeartbeat = useCallback((ws) => {
     if (heartbeatIntervalRef.current) {
@@ -53,6 +89,7 @@ const useWebSocketConnection = () => {
     }
     heartbeatIntervalRef.current = setInterval(() => {
       if (ws.readyState === WebSocket.OPEN) {
+        lastPingTimeRef.current = Date.now();
         ws.send(JSON.stringify({ action: 'ping' }));
       }
     }, WS_CONFIG.HEARTBEAT_INTERVAL);
@@ -185,7 +222,7 @@ const useWebSocketConnection = () => {
     isConnectingRef.current = false;
   }, [stopHeartbeat]);
 
-  return { wsRef, connectWebSocket, setMessageHandler, cleanup, connectionError };
+  return { wsRef, connectWebSocket, setMessageHandler, cleanup, connectionError, checkLatency, lastPingTimeRef, connectionQuality };
 };
 
 
@@ -210,7 +247,7 @@ const App = () => {
   const [attemptingReconnect, setAttemptingReconnect] = useState(!!savedSession);
   const [roomLanguage, setRoomLanguage] = useState(null); // Language of the room/game
 
-  const { wsRef, connectWebSocket, setMessageHandler, cleanup, connectionError } = useWebSocketConnection();
+  const { wsRef, connectWebSocket, setMessageHandler, cleanup, connectionError, checkLatency, lastPingTimeRef, connectionQuality } = useWebSocketConnection();
   const [ws, setWs] = useState(null);
 
   const attemptingReconnectRef = useRef(attemptingReconnect);
@@ -302,6 +339,10 @@ const App = () => {
           break;
 
         case 'pong':
+          if (lastPingTimeRef.current) {
+            const latency = Date.now() - lastPingTimeRef.current;
+            checkLatency(latency);
+          }
           break;
 
         default:
@@ -310,7 +351,7 @@ const App = () => {
     } catch (error) {
       console.error('Error parsing WebSocket message:', error);
     }
-  }, [username, gameCode, roomName]);
+  }, [username, gameCode, roomName, checkLatency, lastPingTimeRef]);
 
   useEffect(() => {
     connectWebSocket();

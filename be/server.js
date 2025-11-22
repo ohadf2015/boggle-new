@@ -6,6 +6,7 @@ const WebSocket = require("ws");
 const path = require("path");
 const cors = require("cors");
 const { initRedis, closeRedis } = require("./redisClient");
+const dictionary = require("./dictionary");
 
 const app = express();
 const server = http.createServer(app);
@@ -159,6 +160,13 @@ app.get("*", (req, res) => {
 async function startServer() {
   // Try to initialize Redis (non-blocking)
   await initRedis();
+
+  // Load dictionaries (non-blocking)
+  try {
+    await dictionary.load();
+  } catch (error) {
+    console.error('Failed to load dictionaries, continuing without dictionary validation:', error);
+  }
 
   server.listen(PORT, HOST, () => {
     console.log(`Server started on http://${HOST}:${PORT}/`);
