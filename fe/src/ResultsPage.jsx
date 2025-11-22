@@ -32,30 +32,12 @@ const LetterGrid = ({ letterGrid }) => {
 
 const ResultsPage = ({ finalScores, letterGrid, gameCode, onReturnToRoom }) => {
   const { t } = useLanguage();
-  const [autoReplayCountdown, setAutoReplayCountdown] = React.useState(10);
-  const [isAutoReplayCancelled, setIsAutoReplayCancelled] = React.useState(false);
 
   const handleExitRoom = () => {
     if (window.confirm(t('playerView.exitConfirmation'))) {
       window.location.reload();
     }
   };
-
-  // Auto-replay countdown
-  useEffect(() => {
-    if (isAutoReplayCancelled || !onReturnToRoom) return;
-
-    if (autoReplayCountdown <= 0) {
-      onReturnToRoom();
-      return;
-    }
-
-    const timer = setInterval(() => {
-      setAutoReplayCountdown((prev) => prev - 1);
-    }, 1000);
-
-    return () => clearInterval(timer);
-  }, [autoReplayCountdown, isAutoReplayCancelled, onReturnToRoom]);
 
   const sortedScores = useMemo(() => {
     return finalScores ? [...finalScores].sort((a, b) => b.score - a.score) : [];
@@ -102,7 +84,7 @@ const ResultsPage = ({ finalScores, letterGrid, gameCode, onReturnToRoom }) => {
       <div className="absolute top-5 right-5 z-50">
         <Button
           onClick={handleExitRoom}
-          className="font-bold bg-red-500/80 hover:bg-red-500 border border-red-400/30 hover:shadow-[0_0_15px_rgba(239,68,68,0.5)] transition-all duration-300"
+          className="font-bold bg-red-500 hover:bg-red-600 border border-red-400/30 hover:shadow-[0_0_15px_rgba(239,68,68,0.5)] transition-all duration-300"
         >
           <FaSignOutAlt className="mr-2" />
           {t('results.exitRoom')}
@@ -165,18 +147,8 @@ const ResultsPage = ({ finalScores, letterGrid, gameCode, onReturnToRoom }) => {
                 size="lg"
                 className="bg-gradient-to-r from-cyan-500 to-purple-600 hover:from-cyan-400 hover:to-purple-500 hover:shadow-[0_0_25px_rgba(6,182,212,0.6)] font-bold text-lg px-10 w-full sm:w-auto transition-all duration-300"
               >
-                {t('results.returnToRoom')} {isAutoReplayCancelled ? '' : `(${autoReplayCountdown})`}
+                {t('results.returnToRoom')}
               </Button>
-
-              {!isAutoReplayCancelled && (
-                <Button
-                  variant="ghost"
-                  onClick={() => setIsAutoReplayCancelled(true)}
-                  className="text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200"
-                >
-                  {t('results.cancelAutoReturn')}
-                </Button>
-              )}
             </div>
           )}
         </Card>

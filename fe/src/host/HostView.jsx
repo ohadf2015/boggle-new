@@ -420,10 +420,10 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp }) => {
                           className={cn(
                             "flex items-center gap-3 p-3 rounded-lg transition-colors border",
                             isDuplicate
-                              ? "bg-orange-50 hover:bg-orange-100 border-orange-200"
+                              ? "bg-orange-50 dark:bg-orange-900/20 hover:bg-orange-100 dark:hover:bg-orange-900/30 border-orange-200 dark:border-orange-700"
                               : isAutoValidated
-                              ? "bg-green-50 border-green-200"
-                              : "hover:bg-gray-50 border-gray-200"
+                              ? "bg-cyan-50 dark:bg-cyan-900/20 border-cyan-200 dark:border-cyan-700"
+                              : "hover:bg-gray-50 dark:hover:bg-slate-700 border-gray-200 dark:border-slate-600"
                           )}
                         >
                           <Checkbox
@@ -445,8 +445,8 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp }) => {
                               </Badge>
                             )}
                             {isAutoValidated && !isDuplicate && (
-                              <Badge variant="success" className="bg-green-500 text-white">
-                                ✓ {t('hostView.autoValidated') || 'Auto-validated'}
+                              <Badge variant="success" className="bg-cyan-500 text-white">
+                                ✓ {t('hostView.autoValidated')}
                               </Badge>
                             )}
                             {item.playerCount === 1 && (
@@ -516,7 +516,7 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp }) => {
                   duration: 2000,
                 });
               }}
-              className="w-full bg-green-600 hover:bg-green-700"
+              className="w-full bg-gradient-to-r from-cyan-500 to-purple-600 hover:from-cyan-400 hover:to-purple-500"
             >
               🎮 {t('hostView.startNewGame')}
             </Button>
