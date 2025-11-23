@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import confetti from 'canvas-confetti';
 import toast, { Toaster } from 'react-hot-toast';
-import { FaTrophy, FaClock, FaUsers, FaQrcode, FaSignOutAlt, FaWhatsapp, FaLink, FaCog, FaPlus, FaMinus, FaCrown } from 'react-icons/fa';
+import { FaTrophy, FaClock, FaUsers, FaQrcode, FaSignOutAlt, FaWhatsapp, FaLink, FaCog, FaPlus, FaMinus, FaCrown, FaTrash } from 'react-icons/fa';
 import { QRCodeSVG } from 'qrcode.react';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
@@ -44,6 +44,12 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
   const [showQR, setShowQR] = useState(false);
   const [playerWordCounts, setPlayerWordCounts] = useState({});
   const [showStartAnimation, setShowStartAnimation] = useState(false);
+
+  // Host playing states
+  const [hostPlaying, setHostPlaying] = useState(true); // Default: host plays
+  const [hostFoundWords, setHostFoundWords] = useState([]);
+  const inputRef = useRef(null);
+  const [word, setWord] = useState('');
 
   // Animation states
   const [shufflingGrid, setShufflingGrid] = useState(null);
@@ -250,6 +256,25 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
           }
           break;
 
+        case 'wordAccepted':
+          if (hostPlaying) {
+            toast.success(`✓ ${message.word}`, { duration: 2000 });
+          }
+          break;
+
+        case 'wordAlreadyFound':
+          if (hostPlaying) {
+            toast.error(t('playerView.wordAlreadyFound'), { duration: 2000 });
+          }
+          break;
+
+        case 'wordNotOnBoard':
+          if (hostPlaying) {
+            toast.error(t('playerView.wordNotOnBoard'), { duration: 3000 });
+            setHostFoundWords(prev => prev.filter(w => w !== message.word));
+          }
+          break;
+
         default:
           break;
       }
@@ -261,7 +286,7 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
     return () => {
       ws.removeEventListener('message', handleMessage);
     };
-  }, [ws, gameStarted, t]);
+  }, [ws, gameStarted, t, hostPlaying]);
 
   const startGame = () => {
     if (playersReady.length === 0) return;
@@ -275,6 +300,7 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
     setGameStarted(true);
     setShowStartAnimation(true);
     setPlayerWordCounts({}); // Reset counts
+    setHostFoundWords([]); // Reset host words
 
     // Send start game message with letter grid and timer
     ws.send(
@@ -348,6 +374,59 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
       ...prev,
       [word]: !prev[word],
     }));
+  };
+
+  // Host word submission when playing
+  const submitHostWord = useCallback(() => {
+    if (!word.trim() || !gameStarted || !hostPlaying) return;
+
+    const currentLang = roomLanguage;
+    const regex = currentLang === 'he' ? /^[\u0590-\u05FF]+$/ : /^[a-zA-Z]+$/;
+    const trimmedWord = word.trim();
+
+    // Min length validation
+    if (trimmedWord.length < 2) {
+      toast.error(t('playerView.wordTooShort'), {
+        duration: 2000,
+        icon: '⚠️'
+      });
+      return;
+    }
+
+    if (!regex.test(trimmedWord)) {
+      toast.error(t('playerView.onlyLanguageWords'), {
+        duration: 2500,
+        icon: '❌'
+      });
+      setWord('');
+      if (inputRef.current) {
+        inputRef.current.focus();
+      }
+      return;
+    }
+
+    // Send word to server just like a regular player
+    ws.send(JSON.stringify({
+      action: 'submitWord',
+      word: trimmedWord.toLowerCase(),
+    }));
+
+    setHostFoundWords(prev => [...prev, trimmedWord]);
+    setWord('');
+
+    // Keep focus on input
+    if (inputRef.current) {
+      inputRef.current.focus();
+    }
+  }, [word, gameStarted, hostPlaying, ws, t, roomLanguage]);
+
+  const removeHostWord = (index) => {
+    if (!gameStarted) return;
+    setHostFoundWords(prev => prev.filter((_, i) => i !== index));
+  };
+
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter') submitHostWord();
   };
 
 
@@ -596,6 +675,19 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
             <div className="w-full space-y-4">
               {!gameStarted ? (
                 <>
+                  {/* Host Play Option */}
+                  <div className="flex items-center gap-2 p-3 bg-slate-100 dark:bg-slate-700/50 rounded-md border border-purple-500/30">
+                    <Checkbox
+                      id="hostPlays"
+                      checked={hostPlaying}
+                      onCheckedChange={setHostPlaying}
+                      className="border-purple-500/50"
+                    />
+                    <label htmlFor="hostPlays" className="text-sm font-medium text-purple-600 dark:text-purple-300 cursor-pointer">
+                      {t('hostView.hostPlays')}
+                    </label>
+                  </div>
+
                   {/* Difficulty Selection + Timer - Inline Layout with Separator */}
                   <div className="flex flex-wrap gap-4 items-center">
                     {/* Difficulty Buttons Group */}
@@ -791,54 +883,139 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
             )}
           </Card>
 
-          {/* Letter Grid - RIGHT - Neon Style */}
-          <Card className={cn(
-            "flex-1 bg-white/80 dark:bg-slate-800/80 backdrop-blur-md p-2 sm:p-4 rounded-lg shadow-lg border border-cyan-500/30 shadow-[0_0_15px_rgba(6,182,212,0.1)] flex flex-col items-center transition-all duration-500 ease-in-out overflow-hidden",
-            gameStarted && "fixed inset-0 z-50 m-0 max-w-none h-screen w-screen justify-center bg-slate-900/95 dark:bg-slate-900/95 border-cyan-500/50 p-4"
-          )}>
-            <h3 className={cn("text-xl font-bold text-cyan-600 dark:text-cyan-300 mb-4", gameStarted && "text-3xl mb-4")}>לוח האותיות</h3>
+          {/* Letter Grid - RIGHT - Conditional rendering based on host playing */}
+          {gameStarted && !hostPlaying ? (
+            /* Spectator Mode - Large Grid View */
+            <Card className="fixed inset-0 z-50 m-0 max-w-none h-screen w-screen justify-center bg-slate-900/95 dark:bg-slate-900/95 border-cyan-500/50 p-4 flex-1 bg-white/80 dark:bg-slate-800/80 backdrop-blur-md rounded-lg shadow-lg border border-cyan-500/30 shadow-[0_0_15px_rgba(6,182,212,0.1)] flex flex-col items-center transition-all duration-500 ease-in-out overflow-hidden">
+              <h3 className="text-3xl font-bold text-cyan-600 dark:text-cyan-300 mb-4">לוח האותיות</h3>
 
-            {/* Timer - Neon Style */}
-            {remainingTime !== null && gameStarted && (
-              <motion.div
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
-                transition={{ type: 'spring' }}
-                className="mb-4"
-              >
-                <div className={cn(
-                  "text-5xl font-mono font-bold px-6 py-2 rounded-lg shadow-[0_0_20px_rgba(0,0,0,0.3)] border-2 backdrop-blur-md",
-                  remainingTime < 30
-                    ? "text-red-500 border-red-500/50 bg-red-500/10 shadow-[0_0_30px_rgba(239,68,68,0.4)] animate-pulse"
-                    : "text-cyan-400 border-cyan-500/50 bg-cyan-500/10 shadow-[0_0_30px_rgba(6,182,212,0.4)]"
-                )}>
-                  {formatTime(remainingTime)}
+              {/* Timer - Neon Style */}
+              {remainingTime !== null && (
+                <motion.div
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  transition={{ type: 'spring' }}
+                  className="mb-4"
+                >
+                  <div className={cn(
+                    "text-5xl font-mono font-bold px-6 py-2 rounded-lg shadow-[0_0_20px_rgba(0,0,0,0.3)] border-2 backdrop-blur-md",
+                    remainingTime < 30
+                      ? "text-red-500 border-red-500/50 bg-red-500/10 shadow-[0_0_30px_rgba(239,68,68,0.4)] animate-pulse"
+                      : "text-cyan-400 border-cyan-500/50 bg-cyan-500/10 shadow-[0_0_30px_rgba(6,182,212,0.4)]"
+                  )}>
+                    {formatTime(remainingTime)}
+                  </div>
+                </motion.div>
+              )}
+
+              {/* Grid Container - Responsive Sizing */}
+              <div className="flex-grow p-4 w-full flex justify-center items-center transition-all duration-500">
+                <div className="max-w-[min(90vh,90vw)] max-h-[min(90vh,90vw)] w-full h-full flex items-center justify-center">
+                  <GridComponent
+                    grid={tableData}
+                    interactive={false}
+                    largeText={true}
+                    selectedCells={highlightedCells}
+                    className="w-full h-full aspect-square max-w-full max-h-full"
+                  />
                 </div>
-              </motion.div>
-            )}
-
-            {/* Grid Container - Responsive Sizing */}
-            <div className={cn(
-              "w-full flex justify-center items-center transition-all duration-500",
-              gameStarted ? "flex-grow p-4" : "aspect-square max-w-[500px]"
-            )}>
-              <div className={cn(
-                "w-full h-full flex items-center justify-center",
-                gameStarted && "max-w-[min(90vh,90vw)] max-h-[min(90vh,90vw)]"
-              )}>
-                <GridComponent
-                  grid={gameStarted ? tableData : (shufflingGrid || tableData)}
-                  interactive={false}
-                  largeText={gameStarted}
-                  selectedCells={highlightedCells}
-                  className={cn(
-                    "w-full h-full",
-                    gameStarted && "aspect-square max-w-full max-h-full"
-                  )}
-                />
               </div>
-            </div>
-          </Card>
+            </Card>
+          ) : (
+            /* Playing Mode or Pre-Game - Interactive Grid */
+            <Card className="flex-1 bg-white/80 dark:bg-slate-800/80 backdrop-blur-md p-2 sm:p-4 rounded-lg shadow-lg border border-cyan-500/30 shadow-[0_0_15px_rgba(6,182,212,0.1)] flex flex-col items-center transition-all duration-500 ease-in-out overflow-hidden">
+              <h3 className="text-xl font-bold text-cyan-600 dark:text-cyan-300 mb-4">לוח האותיות</h3>
+
+              {/* Grid Container */}
+              <div className="w-full flex justify-center items-center transition-all duration-500 aspect-square max-w-[500px]">
+                <div className="w-full h-full flex items-center justify-center">
+                  <GridComponent
+                    grid={gameStarted ? tableData : (shufflingGrid || tableData)}
+                    interactive={gameStarted && hostPlaying}
+                    onWordSubmit={(formedWord) => {
+                      if (!hostPlaying) return;
+
+                      const regex = roomLanguage === 'he' ? /^[\u0590-\u05FF]+$/ : /^[a-zA-Z]+$/;
+
+                      if (formedWord.length < 2) {
+                        toast.error(t('playerView.wordTooShort'), { duration: 1000, icon: '⚠️' });
+                        return;
+                      }
+
+                      if (regex.test(formedWord)) {
+                        ws.send(JSON.stringify({
+                          action: 'submitWord',
+                          word: formedWord.toLowerCase(),
+                        }));
+                        setHostFoundWords(prev => [...prev, formedWord]);
+                        toast.success(`${t('playerView.wordSubmitted')}: ${formedWord}`, { duration: 1000, icon: '📤' });
+                      } else {
+                        toast.error(t('playerView.onlyLanguageWords'), { duration: 1000 });
+                      }
+                    }}
+                    selectedCells={highlightedCells}
+                    className="w-full h-full"
+                    playerView={hostPlaying}
+                  />
+                </div>
+              </div>
+
+              {/* Host Word Input - Only show when playing */}
+              {gameStarted && hostPlaying && (
+                <div className="w-full mt-4 space-y-2">
+                  <div className="flex gap-2">
+                    <Input
+                      ref={inputRef}
+                      value={word}
+                      onChange={(e) => setWord(e.target.value)}
+                      onKeyDown={handleKeyDown}
+                      placeholder={t('playerView.enterWord')}
+                      className="flex-1 text-lg bg-slate-100 dark:bg-slate-700/50 border-slate-200 dark:border-slate-600 text-slate-900 dark:text-white placeholder:text-slate-500 dark:placeholder:text-gray-400 text-right"
+                    />
+                    <Button
+                      onClick={submitHostWord}
+                      disabled={!word.trim()}
+                      className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-400 hover:to-pink-400 text-white font-bold shadow-lg hover:shadow-[0_0_15px_rgba(168,85,247,0.5)]"
+                    >
+                      {t('playerView.add')}
+                    </Button>
+                  </div>
+
+                  {/* Host Found Words List */}
+                  <div className="max-h-40 overflow-y-auto space-y-1">
+                    <p className="text-sm text-slate-600 dark:text-slate-400">{t('playerView.wordsFound')} ({hostFoundWords.length})</p>
+                    <AnimatePresence>
+                      {hostFoundWords.map((foundWord, index) => (
+                        <motion.div
+                          key={index}
+                          initial={{ x: -50, opacity: 0 }}
+                          animate={{ x: 0, opacity: 1 }}
+                          exit={{ x: 50, opacity: 0 }}
+                          className={cn(
+                            "flex items-center justify-between p-2 rounded-lg",
+                            index === hostFoundWords.length - 1
+                              ? 'bg-gradient-to-r from-cyan-500/20 to-teal-500/20 font-bold border border-cyan-500/30'
+                              : 'bg-slate-100 dark:bg-slate-700/50',
+                            'hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors text-slate-900 dark:text-white'
+                          )}
+                        >
+                          <span>{applyHebrewFinalLetters(foundWord)}</span>
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            onClick={() => removeHostWord(index)}
+                            className="hover:bg-red-500/20 hover:text-red-400 text-slate-400 dark:text-gray-400"
+                          >
+                            <FaTrash />
+                          </Button>
+                        </motion.div>
+                      ))}
+                    </AnimatePresence>
+                  </div>
+                </div>
+              )}
+            </Card>
+          )}
         </div>
 
         {/* Chat Section */}

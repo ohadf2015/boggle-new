@@ -38,19 +38,10 @@ const RoomChat = ({ username, isHost, gameCode, className = '' }) => {
       }
     };
 
-    const originalHandler = ws.onmessage;
-
-    const chainedHandler = (event) => {
-      handleMessage(event);
-      if (originalHandler) {
-        originalHandler(event);
-      }
-    };
-
-    ws.onmessage = chainedHandler;
+    ws.addEventListener('message', handleMessage);
 
     return () => {
-      ws.onmessage = originalHandler;
+      ws.removeEventListener('message', handleMessage);
     };
   }, [ws]);
 
