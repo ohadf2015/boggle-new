@@ -39,7 +39,7 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
   const [gameLanguage, setGameLanguage] = useState(null);
 
 
-  // Pre-game shuffling animation
+  // Pre-game shuffling animation with player names
   useEffect(() => {
     if (gameActive) {
       setShufflingGrid(null);
@@ -55,16 +55,47 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
     const cols = 4;
 
     const interval = setInterval(() => {
-      const newGrid = Array(rows).fill(null).map(() =>
-        Array(cols).fill(null).map(() =>
-          letters[Math.floor(Math.random() * letters.length)]
-        )
-      );
-      setShufflingGrid(newGrid);
+      // 30% chance to show a player name if players exist
+      const showPlayerName = playersReady.length > 0 && Math.random() < 0.3;
+
+      if (showPlayerName) {
+        const randomPlayerEntry = playersReady[Math.floor(Math.random() * playersReady.length)];
+        const randomPlayer = typeof randomPlayerEntry === 'string' ? randomPlayerEntry : randomPlayerEntry.username;
+
+        // Simple embed function for player view
+        const embedWordInGrid = (rows, cols, word) => {
+          const grid = Array(rows).fill(null).map(() =>
+            Array(cols).fill(null).map(() =>
+              letters[Math.floor(Math.random() * letters.length)]
+            )
+          );
+
+          // Try to place word horizontally in a random row
+          const wordLength = Math.min(word.length, cols);
+          const row = Math.floor(Math.random() * rows);
+          const maxStartCol = cols - wordLength;
+          const startCol = maxStartCol > 0 ? Math.floor(Math.random() * maxStartCol) : 0;
+
+          for (let i = 0; i < wordLength; i++) {
+            grid[row][startCol + i] = word[i];
+          }
+
+          return grid;
+        };
+
+        setShufflingGrid(embedWordInGrid(rows, cols, randomPlayer));
+      } else {
+        const newGrid = Array(rows).fill(null).map(() =>
+          Array(cols).fill(null).map(() =>
+            letters[Math.floor(Math.random() * letters.length)]
+          )
+        );
+        setShufflingGrid(newGrid);
+      }
     }, 2000); // Shuffle every 2 seconds
 
     return () => clearInterval(interval);
-  }, [gameActive, gameLanguage]);
+  }, [gameActive, gameLanguage, playersReady]);
 
   // Clear game state when entering
   useEffect(() => {
