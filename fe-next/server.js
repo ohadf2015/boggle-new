@@ -62,6 +62,7 @@ app.prepare().then(() => {
   });
 
   // Middleware
+  server.disable('x-powered-by');
   server.use(cors({ origin: CORS_ORIGIN, credentials: true }));
   server.use(express.json());
 
