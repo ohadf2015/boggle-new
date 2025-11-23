@@ -161,12 +161,35 @@ app.prepare().then(() => {
   // Next.js handler for all other routes
   server.use(async (req, res) => {
     try {
-      const parsedUrl = new URL(req.url, `http://${req.headers.host}`);
-      const { pathname } = parsedUrl;
+      const parsedUrl = require('url').parse(req.url, true);
+      const { pathname, query } = parsedUrl;
       
+      console.log(`[SERVER] Request: ${req.method} ${pathname}`);
+
+      // Manual redirect for root path (since middleware might be skipped in custom server)
+      if (pathname === '/') {
+        const acceptLanguage = req.headers['accept-language'];
+        let locale = 'he'; // Default
+        
+        if (acceptLanguage) {
+          const browserLang = acceptLanguage.split(',')[0].split('-')[0];
+          if (['en', 'he'].includes(browserLang)) {
+            locale = browserLang;
+          }
+        }
+        
+        console.log(`[SERVER] Redirecting / to /${locale}`);
+        res.writeHead(307, { Location: `/${locale}` });
+        res.end();
+        return;
+      }
+
       if (pathname === '/sitemap.xml' || pathname === '/robots.txt') {
         console.log(`[SERVER] Serving static file: ${pathname}`);
       }
+      
+      // Set x-powered-by to Next.js to reassure user
+      res.setHeader('X-Powered-By', 'Next.js');
 
       await handle(req, res, parsedUrl);
     } catch (err) {
