@@ -2,10 +2,15 @@
 nixPkgs = ['nodejs_20']
 
 [phases.install]
-cmds = ['cd fe-next && npm install']
+dependsOn = ['setup']
+cmds = ['npm install']
 
 [phases.build]
-cmds = ['cd fe-next && npm run build']
+dependsOn = ['install']
+cmds = ['npm run build']
 
 [start]
-cmd = 'cd fe-next && npm start'
+cmd = 'npm start'
+
+[variables]
+NIXPACKS_BUILD_DIR = 'fe-next'
