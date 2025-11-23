@@ -14,6 +14,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './comp
 import HowToPlay from './components/HowToPlay';
 import ShareButton from './components/ShareButton';
 import MenuAnimation from './components/MenuAnimation';
+import Particles from './components/Particles';
 import { cn } from './lib/utils';
 import { copyJoinUrl, shareViaWhatsApp, getJoinUrl } from './utils/share';
 import { useLanguage } from './contexts/LanguageContext';
@@ -656,29 +657,7 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
 
       {/* Floating particles effect */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden z-0">
-        {[...Array(20)].map((_, i) => (
-          <motion.div
-            key={i}
-            initial={{
-              x: Math.random() * (typeof window !== 'undefined' ? window.innerWidth : 1000),
-              y: Math.random() * (typeof window !== 'undefined' ? window.innerHeight : 1000),
-            }}
-            animate={{
-              y: [null, Math.random() * (typeof window !== 'undefined' ? window.innerHeight : 1000)],
-              x: [null, Math.random() * (typeof window !== 'undefined' ? window.innerWidth : 1000)],
-            }}
-            transition={{
-              duration: Math.random() * 10 + 10,
-              repeat: Infinity,
-              repeatType: 'reverse',
-            }}
-            className="absolute rounded-full bg-cyan-400/20"
-            style={{
-              width: Math.random() * 10 + 5,
-              height: Math.random() * 10 + 5,
-            }}
-          />
-        ))}
+        <Particles />
       </div>
       {/* MenuAnimation - Flying Letters Background */}
       <MenuAnimation />
