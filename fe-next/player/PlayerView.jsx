@@ -8,7 +8,7 @@ import { AchievementBadge } from '../components/AchievementBadge';
 import { motion, AnimatePresence } from 'framer-motion';
 import confetti from 'canvas-confetti';
 import toast, { Toaster } from 'react-hot-toast';
-import { FaTrophy, FaTrash, FaDoorOpen, FaUsers, FaMousePointer } from 'react-icons/fa';
+import { FaTrophy, FaTrash, FaDoorOpen, FaUsers, FaMousePointer, FaCrown } from 'react-icons/fa';
 import { useWebSocket } from '../utils/WebSocketContext';
 import { clearSession } from '../utils/session';
 import { useLanguage } from '../contexts/LanguageContext';
@@ -515,19 +515,33 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
                 </h3>
                 <div className="flex flex-col gap-2">
                   <AnimatePresence>
-                    {playersReady.map((user, index) => (
-                      <motion.div
-                        key={user}
-                        initial={{ scale: 0, opacity: 0 }}
-                        animate={{ scale: 1, opacity: 1 }}
-                        exit={{ scale: 0, opacity: 0 }}
-                        transition={{ delay: index * 0.05 }}
-                      >
-                        <Badge className="bg-gradient-to-r from-purple-500 to-pink-500 font-bold text-white px-3 py-2 text-base w-full justify-center shadow-[0_0_10px_rgba(168,85,247,0.3)]">
-                          {user}
-                        </Badge>
-                      </motion.div>
-                    ))}
+                    {playersReady.map((player, index) => {
+                      // Handle both old format (string) and new format (object)
+                      const username = typeof player === 'string' ? player : player.username;
+                      const avatar = typeof player === 'object' ? player.avatar : null;
+                      const isHost = typeof player === 'object' ? player.isHost : false;
+
+                      return (
+                        <motion.div
+                          key={username}
+                          initial={{ scale: 0, opacity: 0 }}
+                          animate={{ scale: 1, opacity: 1 }}
+                          exit={{ scale: 0, opacity: 0 }}
+                          transition={{ delay: index * 0.05 }}
+                        >
+                          <Badge
+                            className="bg-gradient-to-r from-purple-500 to-pink-500 font-bold text-white px-3 py-2 text-base w-full justify-center shadow-[0_0_10px_rgba(168,85,247,0.3)]"
+                            style={avatar?.color ? { background: `linear-gradient(to right, ${avatar.color}, ${avatar.color}dd)` } : {}}
+                          >
+                            <div className="flex items-center gap-2">
+                              {avatar?.emoji && <span className="text-lg">{avatar.emoji}</span>}
+                              {isHost && <FaCrown className="text-yellow-300" />}
+                              <span>{username}</span>
+                            </div>
+                          </Badge>
+                        </motion.div>
+                      );
+                    })}
                   </AnimatePresence>
                 </div>
                 {playersReady.length === 0 && (

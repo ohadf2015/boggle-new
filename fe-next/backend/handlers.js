@@ -6,6 +6,27 @@ const { ACHIEVEMENTS, checkLiveAchievements, awardFinalAchievements } = require(
 const { games, gameWs, wsUsername, getActiveRooms, getGame, getUsernameFromWs, getWsHostFromGameCode, getWsFromUsername, getGameCodeFromUsername, deleteGame: deleteGameFromState } = require('./modules/gameStateManager');
 const { safeSend, broadcast } = require('./utils/websocketHelpers');
 
+// Avatar generation
+const AVATAR_COLORS = [
+  '#FF6B6B', '#4ECDC4', '#45B7D1', '#FFA07A', '#98D8C8',
+  '#F7DC6F', '#BB8FCE', '#85C1E2', '#F8B739', '#52B788',
+  '#FF8FAB', '#6BCF7F', '#FFB347', '#9D84B7', '#FF6F61'
+];
+
+const AVATAR_EMOJIS = [
+  '🐶', '🐱', '🐭', '🐹', '🐰', '🦊', '🐻', '🐼',
+  '🐨', '🐯', '🦁', '🐮', '🐷', '🐸', '🐵', '🐔',
+  '🐧', '🐦', '🐤', '🦆', '🦅', '🦉', '🦇', '🐺',
+  '🐗', '🐴', '🦄', '🐝', '🐛', '🦋', '🐌', '🐞'
+];
+
+const generateRandomAvatar = () => {
+  return {
+    color: AVATAR_COLORS[Math.floor(Math.random() * AVATAR_COLORS.length)],
+    emoji: AVATAR_EMOJIS[Math.floor(Math.random() * AVATAR_EMOJIS.length)]
+  };
+};
+
 // Comprehensive cleanup function to prevent memory leaks
 const cleanupGameTimers = (gameCode) => {
   if (!games[gameCode]) {
@@ -43,21 +64,40 @@ const cleanupGameTimers = (gameCode) => {
   }
 };
 
-const setNewGame = async (gameCode, host, roomName, language = 'en') => {
-    console.log(`[CREATE] Creating game - gameCode: ${gameCode}, roomName: ${roomName}, language: ${language}`);
+const setNewGame = async (gameCode, host, roomName, language = 'en', hostUsername = null) => {
+    const finalHostUsername = hostUsername || 'Host';
+    const finalRoomName = roomName || finalHostUsername;
+    console.log(`[CREATE] Creating game - gameCode: ${gameCode}, hostUsername: ${finalHostUsername}, roomName: ${finalRoomName}, language: ${language}`);
 
     const existingGame = getGame(gameCode);
 
     if (!existingGame) {
-        // Create new game
+        // Generate avatar for host
+        const hostAvatar = generateRandomAvatar();
+
+        // Create new game with host as a player
         games[gameCode] = {
             host,
-            roomName: roomName || `Room ${gameCode}`,
-            users: {},
-            playerScores: {},
-            playerWords: {},
-            playerAchievements: {},
-            playerWordDetails: {},
+            hostUsername: finalHostUsername,
+            roomName: finalRoomName,
+            users: {
+                [finalHostUsername]: host  // Add host as a player
+            },
+            playerScores: {
+                [finalHostUsername]: 0
+            },
+            playerWords: {
+                [finalHostUsername]: []
+            },
+            playerAchievements: {
+                [finalHostUsername]: []
+            },
+            playerWordDetails: {
+                [finalHostUsername]: []
+            },
+            playerAvatars: {
+                [finalHostUsername]: hostAvatar
+            },
             firstWordFound: false,
             gameState: 'waiting',
             startTime: null,
@@ -66,15 +106,33 @@ const setNewGame = async (gameCode, host, roomName, language = 'en') => {
         };
 
         gameWs.set(host, gameCode);
-        wsUsername.set(host, '__HOST__'); // Mark as host in the username map
-        console.log(`[CREATE] Game ${gameCode} ("${roomName}") created successfully. Available games:`, Object.keys(games));
+        wsUsername.set(host, finalHostUsername); // Use actual username instead of __HOST__
+        console.log(`[CREATE] Game ${gameCode} ("${finalRoomName}") created with host ${finalHostUsername}. Available games:`, Object.keys(games));
 
         // Save game state to Redis (non-blocking but logged)
         saveGameState(gameCode, games[gameCode]).catch(err =>
           console.error('[REDIS] Error saving game state:', err)
         );
 
-        host.send(JSON.stringify({ action: "joined", isHost: true, language: language }));
+        host.send(JSON.stringify({
+            action: "joined",
+            isHost: true,
+            language: language,
+            username: finalHostUsername,
+            avatar: hostAvatar
+        }));
+
+        // Send initial user list (just the host for now)
+        const playerList = Object.keys(existingGame?.users || games[gameCode].users).map(username => ({
+            username,
+            avatar: games[gameCode].playerAvatars[username],
+            isHost: username === finalHostUsername
+        }));
+        host.send(JSON.stringify({
+            action: "updateUsers",
+            users: playerList,
+            hostUsername: finalHostUsername
+        }));
     } else if (existingGame.hostDisconnected) {
         // Host is reconnecting - update the WebSocket and clear disconnect timeout
         console.log(`[CREATE] Host reconnecting to game ${gameCode}`);
@@ -91,15 +149,27 @@ const setNewGame = async (gameCode, host, roomName, language = 'en') => {
 
         // Update mappings
         gameWs.set(host, gameCode);
-        wsUsername.set(host, '__HOST__'); // Mark as host in the username map
+        wsUsername.set(host, existingGame.hostUsername);
 
         console.log(`[CREATE] Host reconnected to game ${gameCode}`);
-        host.send(JSON.stringify({ action: "joined", isHost: true, language: existingGame.language }));
+        host.send(JSON.stringify({
+            action: "joined",
+            isHost: true,
+            language: existingGame.language,
+            username: existingGame.hostUsername,
+            avatar: existingGame.playerAvatars[existingGame.hostUsername]
+        }));
 
-        // Send current user list
+        // Send current user list with avatar info
+        const playerList = Object.keys(existingGame.users).map(username => ({
+            username,
+            avatar: existingGame.playerAvatars[username],
+            isHost: username === existingGame.hostUsername
+        }));
         host.send(JSON.stringify({
             action: "updateUsers",
-            users: Object.keys(existingGame.users)
+            users: playerList,
+            hostUsername: existingGame.hostUsername
         }));
     } else {
         console.log(`[CREATE] Game ${gameCode} already exists (not a reconnect)`);
@@ -146,18 +216,27 @@ const addUserToGame = async (gameCode, username, ws) => {
     } else {
       console.log(`[JOIN] User ${username} successfully joined game ${gameCode}`);
 
+      // Generate avatar for new player
+      const playerAvatar = generateRandomAvatar();
+
       // New player joining
       game.users[username] = ws;
       game.playerScores[username] = 0;
       game.playerWords[username] = [];
       game.playerAchievements[username] = [];
       game.playerWordDetails[username] = [];
+      game.playerAvatars[username] = playerAvatar;
       gameWs.set(ws, gameCode);
       wsUsername.set(ws, username);
     }
 
     // Send confirmation to the player who just joined
-    ws.send(JSON.stringify({ action: "joined", isHost: false }));
+    ws.send(JSON.stringify({
+        action: "joined",
+        isHost: false,
+        username: username,
+        avatar: game.playerAvatars[username]
+    }));
 
     // Sync the current game state to the player
     if (game.gameState === 'playing') {
@@ -191,10 +270,14 @@ const addUserToGame = async (gameCode, username, ws) => {
       console.log(`Player ${username} rejoined after game ended in ${gameCode}`);
     }
 
-    const usersList = Object.keys(game.users);
-    console.log(`[JOIN] Notifying host and players about updated users:`, usersList);
-    sendHostAMessage(gameCode, { action: "updateUsers", users: usersList });
-    sendAllPlayerAMessage(gameCode, { action: "updateUsers", users: usersList });
+    // Broadcast updated user list with avatar info
+    const playerList = Object.keys(game.users).map(username => ({
+        username,
+        avatar: game.playerAvatars[username],
+        isHost: username === game.hostUsername
+    }));
+    console.log(`[JOIN] Notifying host and players about updated users:`, playerList.map(p => p.username));
+    broadcastPlayerList(gameCode);
     broadcastLeaderboard(gameCode);
 
     // Save updated game state to Redis
@@ -557,11 +640,32 @@ const handleWordSubmission = (ws, word) => {
   broadcastLeaderboard(gameCode);
 }
 
+// Broadcast player list with avatars and host info
+const broadcastPlayerList = (gameCode) => {
+  if (!games[gameCode]) return;
+
+  const game = games[gameCode];
+  const playerList = Object.keys(game.users).map(username => ({
+    username,
+    avatar: game.playerAvatars[username],
+    isHost: username === game.hostUsername
+  }));
+
+  const message = {
+    action: "updateUsers",
+    users: playerList,
+    hostUsername: game.hostUsername
+  };
+
+  // Send to all players (including host since host is now a player)
+  sendAllPlayerAMessage(gameCode, message);
+};
+
 // Broadcast live leaderboard (word count only during game, scores after validation)
 const broadcastLeaderboard = (gameCode) => {
   if (!games[gameCode]) return;
 
-  // Show all players in leaderboard (host is not in the players list)
+  // Show all players in leaderboard (including host)
   const leaderboard = Object.keys(games[gameCode].playerScores)
     .map(username => ({
       username,
@@ -571,7 +675,6 @@ const broadcastLeaderboard = (gameCode) => {
     .sort((a, b) => b.wordCount - a.wordCount); // Sort by word count during game
 
   sendAllPlayerAMessage(gameCode, { action: "updateLeaderboard", leaderboard });
-  sendHostAMessage(gameCode, { action: "updateLeaderboard", leaderboard });
 }
 
 const sendAllPlayerAMessage = (gameCode, message) => {
@@ -617,46 +720,84 @@ const handleDisconnect = (ws, wss) => {
   }
 
   if (gameCode && games[gameCode]) {
+    const game = games[gameCode];
+    const isHost = game.host === ws;
+
     // Check if this was the host
-    if (games[gameCode].host === ws) {
-      // Host disconnected - give them time to reconnect (30 seconds grace period)
-      console.log(`[DISCONNECT] Host disconnected from game ${gameCode}, starting grace period`);
+    if (isHost) {
+      console.log(`[DISCONNECT] Host ${username} disconnected from game ${gameCode}, starting grace period`);
 
-      // Mark the host as disconnected but don't delete the game yet
-      if (!games[gameCode].hostDisconnectTimeout) {
-        games[gameCode].hostDisconnected = true;
-        games[gameCode].hostDisconnectTimeout = setTimeout(() => {
-          // Only delete if the game still exists and host hasn't reconnected
-          if (games[gameCode] && games[gameCode].hostDisconnected) {
-            console.log(`[DISCONNECT] Host reconnect grace period expired for game ${gameCode}, closing room`);
-
-            // Notify all players before closing
-            sendAllPlayerAMessage(gameCode, {
-              action: "hostLeftRoomClosing",
-              message: "המנחה עזב את החדר. החדר נסגר."
-            });
-
-            // Clean up all timers and timeouts
-            cleanupGameTimers(gameCode);
-
-            // Cleanup after notification
-            setTimeout(() => {
-              if (games[gameCode]) {
-                delete games[gameCode];
-                console.log(`[DISCONNECT] Game ${gameCode} deleted`);
-
-                // Delete from Redis
-                deleteGameState(gameCode).catch(err =>
-                  console.error('[REDIS] Error deleting game state:', err)
-                );
-
-                // Broadcast updated rooms list
-                if (wss) broadcastActiveRooms(wss);
-              }
-            }, 500);
-          }
-        }, 300000); // 5 minute grace period (300000ms)
+      // Store the host in disconnected players
+      if (!game.disconnectedPlayers) {
+        game.disconnectedPlayers = {};
       }
+
+      // Mark host as disconnected
+      game.hostDisconnected = true;
+      game.disconnectedPlayers[username] = {
+        disconnectedAt: Date.now(),
+        isHost: true,
+        timeout: setTimeout(() => {
+          // Only transfer/close if game still exists and host hasn't reconnected
+          if (games[gameCode] && games[gameCode].hostDisconnected) {
+            console.log(`[DISCONNECT] Host reconnect grace period expired for game ${gameCode}`);
+
+            // Remove from disconnected players
+            delete games[gameCode].disconnectedPlayers[username];
+
+            // Get remaining players (excluding the disconnected host)
+            const remainingPlayers = Object.keys(games[gameCode].users).filter(u => u !== username);
+
+            if (remainingPlayers.length > 0) {
+              // Transfer host to the first remaining player
+              const newHostUsername = remainingPlayers[0];
+              const newHostWs = games[gameCode].users[newHostUsername];
+
+              console.log(`[DISCONNECT] Transferring host from ${username} to ${newHostUsername}`);
+
+              games[gameCode].host = newHostWs;
+              games[gameCode].hostUsername = newHostUsername;
+              games[gameCode].hostDisconnected = false;
+              games[gameCode].hostDisconnectTimeout = null;
+
+              // Notify all players about the new host
+              sendAllPlayerAMessage(gameCode, {
+                action: "hostTransferred",
+                newHost: newHostUsername,
+                message: `${newHostUsername} is now the host`
+              });
+
+              // Update player list with new host info
+              broadcastPlayerList(gameCode);
+
+              // Save to Redis
+              saveGameState(gameCode, games[gameCode]).catch(err =>
+                console.error('[REDIS] Error saving game state:', err)
+              );
+            } else {
+              // No players left, close the room
+              console.log(`[DISCONNECT] No players left in game ${gameCode}, closing room`);
+              cleanupGameTimers(gameCode);
+              delete games[gameCode];
+
+              // Delete from Redis
+              deleteGameState(gameCode).catch(err =>
+                console.error('[REDIS] Error deleting game state:', err)
+              );
+
+              // Broadcast updated rooms list
+              if (wss) broadcastActiveRooms(wss);
+            }
+          }
+        }, 300000) // 5 minute grace period (300000ms)
+      };
+
+      // Remove host from active users immediately
+      delete game.users[username];
+
+      // Notify remaining players
+      broadcastPlayerList(gameCode);
+      broadcastLeaderboard(gameCode);
     } else if (username && games[gameCode].users[username]) {
       // Player disconnected - give them a grace period to reconnect (30 seconds)
       console.log(`[DISCONNECT] Player ${username} disconnected from game ${gameCode}, starting grace period`);
@@ -694,17 +835,9 @@ const handleDisconnect = (ws, wss) => {
       // Remove from active users immediately so they disappear from the list
       delete games[gameCode].users[username];
 
-      // Notify host and all players of updated user list immediately
-      const remainingPlayers = Object.keys(games[gameCode].users);
-      sendHostAMessage(gameCode, {
-        action: "updateUsers",
-        users: remainingPlayers
-      });
-      sendAllPlayerAMessage(gameCode, {
-        action: "updateUsers",
-        users: remainingPlayers
-      });
-      
+      // Notify all players of updated user list immediately
+      broadcastPlayerList(gameCode);
+
       // Broadcast updated leaderboard
       broadcastLeaderboard(gameCode);
 

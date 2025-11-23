@@ -301,16 +301,36 @@ export default function GamePage() {
                         setRoomLanguage(roomLang);
                     }
 
-                    if (!isHostResponse && username) {
+                    // Host now also has a username
+                    const joinedUsername = message.username || username;
+                    if (isHostResponse) {
+                        setUsername(joinedUsername);
+                        localStorage.setItem('boggle_username', joinedUsername);
+                    } else if (username) {
                         localStorage.setItem('boggle_username', username);
                     }
 
                     saveSession({
                         gameCode,
-                        username: isHostResponse ? '' : username,
+                        username: joinedUsername,
                         isHost: isHostResponse,
                         roomName: isHostResponse ? roomName : '',
                     });
+                    break;
+
+                case 'hostTransferred':
+                    // Handle host transfer - check if we're the new host
+                    if (message.newHost === username) {
+                        setIsHost(true);
+                        toast.success('You are now the host!', {
+                            duration: 5000,
+                            icon: '👑',
+                        });
+                    } else {
+                        toast.info(message.message || `${message.newHost} is now the host`, {
+                            duration: 3000,
+                        });
+                    }
                     break;
 
                 case 'gameDoesNotExist':
@@ -438,7 +458,8 @@ export default function GamePage() {
         setError('');
 
         if (isHostMode) {
-            sendMessage({ action: 'createGame', gameCode, roomName, language: roomLanguage || language });
+            // Use roomName as both the room name and host's username
+            sendMessage({ action: 'createGame', gameCode, roomName, hostUsername: roomName, language: roomLanguage || language });
         } else {
             sendMessage({ action: 'join', gameCode, username });
         }
