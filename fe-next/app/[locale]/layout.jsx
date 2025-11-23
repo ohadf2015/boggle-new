@@ -19,7 +19,7 @@ export async function generateMetadata({ params }) {
             siteName: 'LexiClash',
             images: [
                 {
-                    url: '/lexiclash.jpg',
+                    url: 'https://www.lexiclash.live/lexiclash.jpg',
                     width: 1200,
                     height: 630,
                     alt: 'LexiClash - Multiplayer Word Game',
@@ -30,7 +30,11 @@ export async function generateMetadata({ params }) {
             card: 'summary_large_image',
             title: seo.twitterTitle,
             description: seo.twitterDescription,
-            images: ['/lexiclash.jpg'],
+            images: ['https://www.lexiclash.live/lexiclash.jpg'],
+        },
+        icons: {
+            icon: '/favicon.ico',
+            apple: '/lexiclash.jpg',
         },
         alternates: {
             canonical: `https://www.lexiclash.live${locale === 'en' ? '/en' : ''}`,
