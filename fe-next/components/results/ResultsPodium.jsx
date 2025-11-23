@@ -127,9 +127,13 @@ const PodiumPlace = ({ player, place, delay }) => {
         {/* Podium Number */}
         <motion.span
           initial={{ opacity: 0 }}
-          animate={{ opacity: 0.3 }}
+          animate={{ opacity: 1 }}
           transition={{ delay: delay + 0.5 }}
-          className="text-7xl font-black text-white/30 absolute bottom-2"
+          className="text-8xl font-black text-white absolute bottom-2"
+          style={{
+            textShadow: '0 4px 8px rgba(0, 0, 0, 0.5), 0 2px 4px rgba(0, 0, 0, 0.3)',
+            WebkitTextStroke: '2px rgba(0, 0, 0, 0.2)'
+          }}
         >
           {place}
         </motion.span>
