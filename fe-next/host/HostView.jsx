@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import confetti from 'canvas-confetti';
 import toast, { Toaster } from 'react-hot-toast';
-import { FaTrophy, FaClock, FaUsers, FaQrcode, FaSignOutAlt, FaWhatsapp, FaLink, FaCog, FaPlus, FaMinus } from 'react-icons/fa';
+import { FaTrophy, FaClock, FaUsers, FaQrcode, FaSignOutAlt, FaWhatsapp, FaLink, FaCog, FaPlus, FaMinus, FaCrown } from 'react-icons/fa';
 import { QRCodeSVG } from 'qrcode.react';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
@@ -71,7 +71,8 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
       const showPlayerName = playersReady.length > 0 && Math.random() < 0.3;
 
       if (showPlayerName) {
-        const randomPlayer = playersReady[Math.floor(Math.random() * playersReady.length)];
+        const randomPlayerEntry = playersReady[Math.floor(Math.random() * playersReady.length)];
+        const randomPlayer = typeof randomPlayerEntry === 'string' ? randomPlayerEntry : randomPlayerEntry.username;
         const result = embedWordInGrid(rows, cols, randomPlayer, currentLang);
 
         if (result.path && result.path.length > 0) {
@@ -749,24 +750,38 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
             </h3>
             <div className="flex flex-col gap-2">
               <AnimatePresence>
-                {playersReady.map((user, index) => (
-                  <motion.div
-                    key={user}
-                    initial={{ scale: 0, opacity: 0 }}
-                    animate={{ scale: 1, opacity: 1 }}
-                    exit={{ scale: 0, opacity: 0 }}
-                    transition={{ delay: index * 0.05 }}
-                  >
-                    <Badge className="bg-gradient-to-r from-purple-500 to-pink-500 font-bold text-white px-3 py-2 text-base w-full justify-between shadow-[0_0_10px_rgba(168,85,247,0.3)]">
-                      <SlotMachineText text={user} />
-                      {gameStarted && (
-                        <span className="bg-white/20 px-2 py-0.5 rounded-full text-sm">
-                          {playerWordCounts[user] || 0}
-                        </span>
-                      )}
-                    </Badge>
-                  </motion.div>
-                ))}
+                {playersReady.map((player, index) => {
+                  // Handle both old format (string) and new format (object)
+                  const username = typeof player === 'string' ? player : player.username;
+                  const avatar = typeof player === 'object' ? player.avatar : null;
+                  const isHost = typeof player === 'object' ? player.isHost : false;
+
+                  return (
+                    <motion.div
+                      key={username}
+                      initial={{ scale: 0, opacity: 0 }}
+                      animate={{ scale: 1, opacity: 1 }}
+                      exit={{ scale: 0, opacity: 0 }}
+                      transition={{ delay: index * 0.05 }}
+                    >
+                      <Badge
+                        className="bg-gradient-to-r from-purple-500 to-pink-500 font-bold text-white px-3 py-2 text-base w-full justify-between shadow-[0_0_10px_rgba(168,85,247,0.3)]"
+                        style={avatar?.color ? { background: `linear-gradient(to right, ${avatar.color}, ${avatar.color}dd)` } : {}}
+                      >
+                        <div className="flex items-center gap-2">
+                          {avatar?.emoji && <span className="text-lg">{avatar.emoji}</span>}
+                          {isHost && <FaCrown className="text-yellow-300" />}
+                          <SlotMachineText text={username} />
+                        </div>
+                        {gameStarted && (
+                          <span className="bg-white/20 px-2 py-0.5 rounded-full text-sm">
+                            {playerWordCounts[username] || 0}
+                          </span>
+                        )}
+                      </Badge>
+                    </motion.div>
+                  );
+                })}
               </AnimatePresence>
             </div>
             {playersReady.length === 0 && (

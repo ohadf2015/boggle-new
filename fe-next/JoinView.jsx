@@ -346,14 +346,14 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
                   </motion.div>
                 ) : (
                   <>
-                    {/* Room Name */}
+                    {/* Host Player Name */}
                     <motion.div
                       initial={{ x: 50, opacity: 0 }}
                       animate={{ x: 0, opacity: 1 }}
                       transition={{ duration: 0.3 }}
                       className="space-y-2"
                     >
-                      <Label htmlFor="roomName" className="text-slate-700 dark:text-gray-300">{t('joinView.roomNamePlaceholder')}</Label>
+                      <Label htmlFor="roomName" className="text-slate-700 dark:text-gray-300">Your Name</Label>
                       <Input
                         id="roomName"
                         value={roomName}
@@ -366,14 +366,14 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
                           "bg-slate-100 dark:bg-slate-700/50 border-slate-200 dark:border-slate-600 text-slate-900 dark:text-white placeholder:text-slate-500 dark:placeholder:text-gray-400",
                           roomNameError && "border-red-500 bg-red-900/30 focus-visible:ring-red-500"
                         )}
-                        placeholder={t('joinView.roomNamePlaceholder')}
+                        placeholder="Enter your name"
                         maxLength={30}
                       />
                       {roomNameError && (
-                        <p className="text-sm text-red-400">{t('validation.roomNameRequired')}</p>
+                        <p className="text-sm text-red-400">Please enter your name</p>
                       )}
                       {!roomNameError && (
-                        <p className="text-sm text-slate-500 dark:text-gray-400">{t('validation.enterRoomName')}</p>
+                        <p className="text-sm text-slate-500 dark:text-gray-400">This will be your player name and room name</p>
                       )}
                     </motion.div>
 

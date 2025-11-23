@@ -98,7 +98,7 @@ app.prepare().then(() => {
 
         switch (action) {
           case "createGame":
-            setNewGame(message.gameCode, ws, message.roomName, message.language);
+            setNewGame(message.gameCode, ws, message.roomName, message.language, message.hostUsername);
             broadcastActiveRooms(wss);
             break;
           case "join":

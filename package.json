@@ -7,8 +7,6 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "cd fe-next && npm start",
     "dev": "cd fe-next && npm run dev",
-    "be": "cd be && npm start",
-    "fe": "cd fe && npm start",
     "build": "cd fe-next && npm install && npm run build"
   },
   "author": "",
