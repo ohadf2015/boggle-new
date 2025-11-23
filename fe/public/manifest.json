@@ -1,7 +1,7 @@
 {
-  "short_name": "בוגל",
-  "name": "בוגל אונליין - משחק מילים רב משתתפים",
-  "description": "משחק בוגל חוויתי בעברית למשפחות וחברים",
+  "short_name": "LexiClash",
+  "name": "LexiClash - משחק מילים מהיר לקבוצות",
+  "description": "משחק מילים מהיר וממכר לקבוצות. מושלם למסיבות, ימי גיבוש ומשפחה",
   "lang": "he",
   "dir": "rtl",
   "icons": [
@@ -28,5 +28,8 @@
   "orientation": "any",
   "theme_color": "#667eea",
   "background_color": "#ffffff",
-  "categories": ["games", "entertainment"]
+  "categories": [
+    "games",
+    "entertainment"
+  ]
 }

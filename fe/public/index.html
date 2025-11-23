@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="he" dir="rtl">
+<html lang="auto" dir="auto">
   <head>
     <meta charset="utf-8" />
     <link rel="icon" type="image/svg+xml" href="%PUBLIC_URL%/favicon.svg" />
@@ -7,16 +7,25 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#667eea" />
 
+    <!-- Security Headers -->
+    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+    <meta http-equiv="X-Content-Type-Options" content="nosniff">
+    <meta http-equiv="X-Frame-Options" content="SAMEORIGIN">
+    <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin">
+
+
     <!-- Primary Meta Tags -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@300..700&family=Rubik:ital,wght@0,300..900;1,300..900&display=swap" rel="stylesheet">
-    <title>LexiClash - Multiplayer Word Game | לקסיקלאש</title>
-    <meta name="title" content="LexiClash - Multiplayer Word Game | לקסיקלאש" />
-    <meta name="description" content="LexiClash (לקסיקלאש) - Alias game online - משחק אליאס אונליין - משחק מילים רב משתתפים ומשחק מסיבה (party game) מהיר וממכר. חברו אותיות, מצאו מילים והתחרו בחברים. דומה למשחק אליאס (Alias/Elias) וקהוט (Kahoot)!" />
-    <meta name="keywords" content="LexiClash, לקסיקלאש, Alias, Elias, Kahoot, alias game online, משחק אליאס אונליין, party game, משחק מסיבה, משחק מילים, משחק חברה, משחק רב משתתפים, משחק אונליין, משחק בעברית, משחק משפחתי, Word Game, Multiplayer" />
+    
+    <!-- Dynamic meta tags - will be updated by script below -->
+    <title id="page-title">LexiClash - Multiplayer Word Game | לקסיקלאש</title>
+    <meta name="title" id="meta-title" content="LexiClash - Multiplayer Word Game | לקסיקלאש" />
+    <meta name="description" id="meta-description" content="LexiClash - משחק מילים מהיר וממכר לקבוצות! חברו אותיות, מצאו מילים והתחרו בזמן אמת. מושלם למסיבות, ימי גיבוש ומשפחה. משחק בסגנון Alias ו-Kahoot בעברית ואנגלית - חינם ללא התקנה!" />
+    <meta name="keywords" id="meta-keywords" content="LexiClash, לקסיקלאש, Alias, Elias, Kahoot, alias game online, משחק אליאס אונליין, party game, משחק מסיבה, משחק מילים, משחק חברה, משחק רב משתתפים, משחק אונליין, משחק בעברית, משחק משפחתי, Word Game, Multiplayer" />
     <meta name="author" content="LexiClash" />
-    <meta name="language" content="Hebrew" />
+    <meta name="language" id="meta-language" content="Hebrew" />
 
     <!-- Robots Meta Tags - Make it indexable -->
     <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
@@ -28,16 +37,16 @@
 
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website" />
-    <meta property="og:locale" content="he_IL" />
-    <meta property="og:title" content="LexiClash (לקסיקלאש) - משחק מילים בסגנון אליאס וקהוט" />
-    <meta property="og:description" content="LexiClash - Alias game online - משחק אליאס אונליין - משחק מילים ומשחק מסיבה (party game) מהיר וממכר! חברו אותיות, מצאו מילים והתחרו בחברים בזמן אמת. מזכיר את המשחקים האהובים אליאס (Alias) וקהוט (Kahoot)!" />
+    <meta property="og:locale" id="og-locale" content="he_IL" />
+    <meta property="og:title" id="og-title" content="LexiClash (לקסיקלאש) - משחק מילים בסגנון אליאס וקהוט" />
+    <meta property="og:description" id="og-description" content="LexiClash - משחק מילים מהיר וממכר לקבוצות! חברו אותיות, מצאו מילים והתחרו בזמן אמת. מושלם למסיבות, ימי גיבוש ומשפחה. משחק בסגנון Alias ו-Kahoot בעברית ואנגלית - חינם ללא התקנה!" />
     <meta property="og:site_name" content="LexiClash" />
     <meta property="og:image" content="%PUBLIC_URL%/lexiclash.jpg" />
 
     <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="LexiClash (לקסיקלאש) - משחק מילים בסגנון אליאס וקהוט" />
-    <meta name="twitter:description" content="LexiClash - Alias game online - משחק אליאס אונליין - משחק מילים ומשחק מסיבה (party game) מהיר וממכר! חברו אותיות, מצאו מילים והתחרו בחברים בזמן אמת. מזכיר את המשחקים האהובים אליאס (Alias) וקהוט (Kahoot)!" />
+    <meta name="twitter:title" id="twitter-title" content="LexiClash (לקסיקלאש) - משחק מילים בסגנון אליאס וקהוט" />
+    <meta name="twitter:description" id="twitter-description" content="LexiClash - משחק מילים מהיר וממכר לקבוצות! חברו אותיות, מצאו מילים והתחרו בזמן אמת. מושלם למסיבות, ימי גיבוש ומשפחה. משחק בסגנון Alias ו-Kahoot בעברית ואנגלית - חינם ללא התקנה!" />
     <meta name="twitter:image" content="%PUBLIC_URL%/lexiclash.jpg" />
 
     <!-- Mobile App Capable -->
@@ -57,7 +66,7 @@
         {
           "@type": "WebApplication",
           "name": "LexiClash - לקסיקלאש",
-          "description": "Alias game online - משחק אליאס אונליין - משחק מילים רב משתתפים ומשחק מסיבה (party game) חוויתי בעברית למשפחות וחברים, בסגנון אליאס וקהוט",
+          "description": "משחק מילים מהיר וממכר לקבוצות! חברו אותיות, מצאו מילים והתחרו בזמן אמת. מושלם למסיבות, ימי גיבוש ומשפחה. משחק בסגנון Alias ו-Kahoot בעברית ואנגלית - חינם ללא התקנה",
           "url": "https://lexiclash.live",
           "applicationCategory": "GameApplication",
           "offers": {
@@ -111,6 +120,91 @@
         }
       ]
     }
+    </script>
+
+    <!-- Dynamic SEO Meta Tags Script -->
+    <script>
+      // SEO metadata for each language
+      const seoTranslations = {
+        en: {
+          title: 'LexiClash - Multiplayer Word Game Online | Play Free Now',
+          description: 'LexiClash - Fast-paced multiplayer word game perfect for parties, team building, and family fun! Find words, compete in real-time. Free online game inspired by Alias and Kahoot - no download required!',
+          keywords: 'LexiClash, word game, multiplayer game, online game, party game, Alias game, Kahoot alternative, team building game, family game, word puzzle, free online game, real-time multiplayer',
+          ogTitle: 'LexiClash - Multiplayer Word Game like Alias & Kahoot',
+          ogDescription: 'LexiClash - Fast-paced multiplayer word game perfect for parties, team building, and family fun! Find words, compete in real-time. Free online game - no download required!',
+          twitterTitle: 'LexiClash - Multiplayer Word Game like Alias & Kahoot',
+          twitterDescription: 'LexiClash - Fast-paced multiplayer word game perfect for parties, team building, and family fun! Find words, compete in real-time. Free online game - no download required!',
+          locale: 'en_US',
+          language: 'English',
+          direction: 'ltr',
+          htmlLang: 'en'
+        },
+        he: {
+          title: 'LexiClash - Multiplayer Word Game | לקסיקלאש - משחק מילים אונליין',
+          description: 'LexiClash - משחק מילים מהיר וממכר לקבוצות! חברו אותיות, מצאו מילים והתחרו בזמן אמת. מושלם למסיבות, ימי גיבוש ומשפחה. משחק בסגנון Alias ו-Kahoot בעברית ואנגלית - חינם ללא התקנה!',
+          keywords: 'LexiClash, לקסיקלאש, Alias, Elias, Kahoot, alias game online, משחק אליאס אונליין, party game, משחק מסיבה, משחק מילים, משחק חברה, משחק רב משתתפים, משחק אונליין, משחק בעברית, משחק משפחתי, Word Game, Multiplayer',
+          ogTitle: 'LexiClash (לקסיקלאש) - משחק מילים בסגנון אליאס וקהוט',
+          ogDescription: 'LexiClash - משחק מילים מהיר וממכר לקבוצות! חברו אותיות, מצאו מילים והתחרו בזמן אמת. מושלם למסיבות, ימי גיבוש ומשפחה. משחק בסגנון Alias ו-Kahoot בעברית ואנגלית - חינם ללא התקנה!',
+          twitterTitle: 'LexiClash (לקסיקלאש) - משחק מילים בסגנון אליאס וקהוט',
+          twitterDescription: 'LexiClash - משחק מילים מהיר וממכר לקבוצות! חברו אותיות, מצאו מילים והתחרו בזמן אמת. מושלם למסיבות, ימי גיבוש ומשפחה. משחק בסגנון Alias ו-Kahoot בעברית ואנגלית - חינם ללא התקנה!',
+          locale: 'he_IL',
+          language: 'Hebrew',
+          direction: 'rtl',
+          htmlLang: 'he'
+        }
+      };
+
+      // Function to update meta tags based on language
+      function updateMetaTags(lang) {
+        const seo = seoTranslations[lang] || seoTranslations.he; // Default to Hebrew
+        
+        // Update HTML lang and dir attributes
+        document.documentElement.lang = seo.htmlLang;
+        document.documentElement.dir = seo.direction;
+        
+        // Update page title
+        document.getElementById('page-title').textContent = seo.title;
+        
+        // Update meta tags
+        document.getElementById('meta-title').setAttribute('content', seo.title);
+        document.getElementById('meta-description').setAttribute('content', seo.description);
+        document.getElementById('meta-keywords').setAttribute('content', seo.keywords);
+        document.getElementById('meta-language').setAttribute('content', seo.language);
+        
+        // Update Open Graph tags
+        document.getElementById('og-locale').setAttribute('content', seo.locale);
+        document.getElementById('og-title').setAttribute('content', seo.ogTitle);
+        document.getElementById('og-description').setAttribute('content', seo.ogDescription);
+        
+        // Update Twitter tags
+        document.getElementById('twitter-title').setAttribute('content', seo.twitterTitle);
+        document.getElementById('twitter-description').setAttribute('content', seo.twitterDescription);
+      }
+
+      // Detect language from localStorage or browser
+      function detectLanguage() {
+        const savedLang = localStorage.getItem('boggle_language');
+        if (savedLang && seoTranslations[savedLang]) {
+          return savedLang;
+        }
+        
+        const browserLang = navigator.language.split('-')[0];
+        return seoTranslations[browserLang] ? browserLang : 'he'; // Default to Hebrew
+      }
+
+      // Update meta tags on page load
+      const detectedLang = detectLanguage();
+      updateMetaTags(detectedLang);
+
+      // Listen for language changes
+      window.addEventListener('storage', function(e) {
+        if (e.key === 'boggle_language' && e.newValue) {
+          updateMetaTags(e.newValue);
+        }
+      });
+
+      // Make the function available globally for the React app to call
+      window.updateSEOMetaTags = updateMetaTags;
     </script>
   </head>
   <body>

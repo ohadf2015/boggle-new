@@ -26,7 +26,7 @@ const Header = ({ className = '' }) => {
             initial={{ y: -20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ duration: 0.5, ease: "easeOut" }}
-            className={`w-full max-w-6xl mx-auto mb-6 px-4 pt-4 ${className}`}
+            className={`w-full max-w-6xl mx-auto mb-2 sm:mb-6 px-4 pt-4 ${className}`}
         >
             <div className="flex items-center justify-between">
                 {/* Logo */}
@@ -35,7 +35,7 @@ const Header = ({ className = '' }) => {
                     onClick={() => window.location.href = '/'}
                 >
                     <motion.h1
-                        className="text-4xl sm:text-5xl font-black tracking-wider flex items-center gap-2"
+                        className="text-3xl sm:text-5xl font-black tracking-wider flex items-center gap-2"
                         style={{ fontFamily: language === 'he' ? "'Fredoka', sans-serif" : "'Outfit', 'Rubik', sans-serif" }}
                         whileHover={{ scale: 1.05 }}
                         transition={{ type: "spring", stiffness: 400, damping: 10 }}

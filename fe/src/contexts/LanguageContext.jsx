@@ -14,6 +14,11 @@ export const LanguageProvider = ({ children }) => {
 
     useEffect(() => {
         localStorage.setItem('boggle_language', language);
+
+        // Update SEO meta tags when language changes
+        if (window.updateSEOMetaTags) {
+            window.updateSEOMetaTags(language);
+        }
     }, [language]);
 
     const t = (path) => {

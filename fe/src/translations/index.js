@@ -7,6 +7,17 @@ export const translations = {
       lexi: 'Lexi',
       clash: 'Clash',
     },
+    seo: {
+      title: 'LexiClash - Multiplayer Word Game Online | Play Free Now',
+      description: 'LexiClash - Fast-paced multiplayer word game perfect for parties, team building, and family fun! Find words, compete in real-time. Free online game inspired by Alias and Kahoot - no download required!',
+      keywords: 'LexiClash, word game, multiplayer game, online game, party game, Alias game, Kahoot alternative, team building game, family game, word puzzle, free online game, real-time multiplayer',
+      ogTitle: 'LexiClash - Multiplayer Word Game like Alias & Kahoot',
+      ogDescription: 'LexiClash - Fast-paced multiplayer word game perfect for parties, team building, and family fun! Find words, compete in real-time. Free online game - no download required!',
+      twitterTitle: 'LexiClash - Multiplayer Word Game like Alias & Kahoot',
+      twitterDescription: 'LexiClash - Fast-paced multiplayer word game perfect for parties, team building, and family fun! Find words, compete in real-time. Free online game - no download required!',
+      locale: 'en_US',
+      language: 'English',
+    },
     common: {
       loading: 'Loading...',
       error: 'Error',
@@ -220,6 +231,17 @@ export const translations = {
     logo: {
       lexi: 'לקסי',
       clash: 'קלאש',
+    },
+    seo: {
+      title: 'LexiClash - Multiplayer Word Game | לקסיקלאש - משחק מילים אונליין',
+      description: 'LexiClash - משחק מילים מהיר וממכר לקבוצות! חברו אותיות, מצאו מילים והתחרו בזמן אמת. מושלם למסיבות, ימי גיבוש ומשפחה. משחק בסגנון Alias ו-Kahoot בעברית ואנגלית - חינם ללא התקנה!',
+      keywords: 'LexiClash, לקסיקלאש, Alias, Elias, Kahoot, alias game online, משחק אליאס אונליין, party game, משחק מסיבה, משחק מילים, משחק חברה, משחק רב משתתפים, משחק אונליין, משחק בעברית, משחק משפחתי, Word Game, Multiplayer',
+      ogTitle: 'LexiClash (לקסיקלאש) - משחק מילים בסגנון אליאס וקהוט',
+      ogDescription: 'LexiClash - משחק מילים מהיר וממכר לקבוצות! חברו אותיות, מצאו מילים והתחרו בזמן אמת. מושלם למסיבות, ימי גיבוש ומשפחה. משחק בסגנון Alias ו-Kahoot בעברית ואנגלית - חינם ללא התקנה!',
+      twitterTitle: 'LexiClash (לקסיקלאש) - משחק מילים בסגנון אליאס וקהוט',
+      twitterDescription: 'LexiClash - משחק מילים מהיר וממכר לקבוצות! חברו אותיות, מצאו מילים והתחרו בזמן אמת. מושלם למסיבות, ימי גיבוש ומשפחה. משחק בסגנון Alias ו-Kahoot בעברית ואנגלית - חינם ללא התקנה!',
+      locale: 'he_IL',
+      language: 'Hebrew',
     },
     common: {
       loading: 'טוען...',

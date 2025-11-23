@@ -1,8 +1,8 @@
 #!/bin/bash
 
-# Boggle Game Startup Script
+# Boggle Game Startup Script (Next.js Version)
 
-echo "🎮 Starting Boggle Multiplayer Game..."
+echo "🎮 Starting Boggle Multiplayer Game (Next.js)..."
 echo ""
 
 # Check if Redis is running
@@ -35,5 +35,5 @@ echo ""
 echo "----------------------------------------"
 echo ""
 
-cd "$(dirname "$0")/be"
-node server.js
+cd "$(dirname "$0")/fe-next"
+npm start
