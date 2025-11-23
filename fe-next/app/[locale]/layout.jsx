@@ -90,7 +90,6 @@ export default async function LocaleLayout({ children, params }) {
                 <link rel="apple-touch-icon" href="/lexiclash.jpg" />
                 <meta name="viewport" content="width=device-width, initial-scale=1" />
                 <meta name="theme-color" content="#667eea" />
-                <meta httpEquiv="Content-Security-Policy" content="upgrade-insecure-requests" />
                 <script
                     type="application/ld+json"
                     dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
