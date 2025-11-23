@@ -594,9 +594,9 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
               <Button
                 onClick={() => setShowHowToPlay(true)}
                 size="lg"
-                className="rounded-full w-16 h-16 bg-gradient-to-r from-teal-500 to-cyan-500 hover:from-teal-400 hover:to-cyan-400 shadow-2xl hover:shadow-[0_0_25px_rgba(20,184,166,0.6)]"
+                className="rounded-full w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-r from-teal-500 to-cyan-500 hover:from-teal-400 hover:to-cyan-400 shadow-2xl hover:shadow-[0_0_25px_rgba(20,184,166,0.6)] p-0"
               >
-                <FaQuestionCircle size={28} />
+                <FaQuestionCircle className="text-xl sm:text-2xl" />
               </Button>
             </TooltipTrigger>
             <TooltipContent side="right">{t('joinView.howToPlay')}</TooltipContent>

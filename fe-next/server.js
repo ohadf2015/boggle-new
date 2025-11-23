@@ -159,8 +159,21 @@ app.prepare().then(() => {
   wss.on('close', () => clearInterval(pingInterval));
 
   // Next.js handler for all other routes
-  server.all(/(.*)/, (req, res) => {
-    return handle(req, res);
+  server.use(async (req, res) => {
+    try {
+      const parsedUrl = new URL(req.url, `http://${req.headers.host}`);
+      const { pathname } = parsedUrl;
+      
+      if (pathname === '/sitemap.xml' || pathname === '/robots.txt') {
+        console.log(`[SERVER] Serving static file: ${pathname}`);
+      }
+
+      await handle(req, res, parsedUrl);
+    } catch (err) {
+      console.error('Error occurred handling', req.url, err);
+      res.statusCode = 500;
+      res.end('internal server error');
+    }
   });
 
   // Start server
