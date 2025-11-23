@@ -107,7 +107,7 @@ const setNewGame = async (gameCode, host, roomName, language = 'en', hostUsernam
 
         gameWs.set(host, gameCode);
         wsUsername.set(host, finalHostUsername); // Use actual username instead of __HOST__
-        console.log(`[CREATE] Game ${gameCode} ("${finalRoomName}") created with host ${finalHostUsername}. Available games:`, Object.keys(games));
+        console.log(`[CREATE] Game ${gameCode} ("${finalRoomName}") created with host ${finalHostUsername}`);
 
         // Save game state to Redis (non-blocking but logged)
         saveGameState(gameCode, games[gameCode]).catch(err =>
@@ -179,9 +179,6 @@ const setNewGame = async (gameCode, host, roomName, language = 'en', hostUsernam
 }
 
 const addUserToGame = async (gameCode, username, ws) => {
-    console.log(`[JOIN] Attempting to join - gameCode: ${gameCode}, username: ${username}`);
-    console.log(`[JOIN] Available games:`, Object.keys(games));
-
     if(!getGame(gameCode)) {
       console.log(`[JOIN] Game ${gameCode} does not exist`);
       ws.send(JSON.stringify({ action: "gameDoesNotExist" }));
@@ -192,8 +189,6 @@ const addUserToGame = async (gameCode, username, ws) => {
 
     // Check if this username exists in the disconnected players list (reconnection)
     if(game.disconnectedPlayers && game.disconnectedPlayers[username]) {
-      console.log(`[JOIN] Player ${username} reconnecting to game ${gameCode}`);
-
       // Clear the disconnect timeout
       if (game.disconnectedPlayers[username].timeout) {
         clearTimeout(game.disconnectedPlayers[username].timeout);
@@ -207,14 +202,13 @@ const addUserToGame = async (gameCode, username, ws) => {
       // Remove from disconnected players
       delete game.disconnectedPlayers[username];
 
-      console.log(`[JOIN] Player ${username} successfully reconnected to game ${gameCode}`);
+      console.log(`[JOIN] Player ${username} reconnected to game ${gameCode}`);
     } else if(game.users[username]) {
       // Username exists in active users - truly taken by someone else
-      console.log(`[JOIN] Username ${username} already taken in game ${gameCode}`);
       ws.send(JSON.stringify({ action: "usernameTaken" }));
       return;
     } else {
-      console.log(`[JOIN] User ${username} successfully joined game ${gameCode}`);
+      console.log(`[JOIN] User ${username} joined game ${gameCode}`);
 
       // Generate avatar for new player
       const playerAvatar = generateRandomAvatar();
@@ -276,7 +270,6 @@ const addUserToGame = async (gameCode, username, ws) => {
         avatar: game.playerAvatars[username],
         isHost: username === game.hostUsername
     }));
-    console.log(`[JOIN] Notifying host and players about updated users:`, playerList.map(p => p.username));
     broadcastPlayerList(gameCode);
     broadcastLeaderboard(gameCode);
 
@@ -315,7 +308,6 @@ const handleStartGame = async (host, letterGrid, timerSeconds, language) => {
   });
 
   const startMessage = { action: "startGame", letterGrid, timerSeconds, language: games[gameCode].language };
-  console.log(`[START_GAME] Broadcasting to ${Object.keys(games[gameCode].users).length} players:`, Object.keys(games[gameCode].users));
   sendAllPlayerAMessage(gameCode, startMessage);
   broadcastLeaderboard(gameCode);
 
@@ -501,7 +493,6 @@ const handleSendAnswer = (ws, foundWords) => {
   const gameCode = gameWs.get(ws);
   const username = wsUsername.get(ws);
   const wsHost = getWsHostFromGameCode(gameCode);
-  console.log("sendAnswer", username, gameCode, wsHost, foundWords);
   sendHostAMessage(gameCode, { action: "updateScores", username, foundWords });
 }
 
@@ -1127,8 +1118,6 @@ const broadcastActiveRooms = (wss) => {
       }
     }
   });
-
-  console.log(`[BROADCAST] Active rooms sent to ${sentCount} clients`);
 };
 
 // Handle chat messages in a room
@@ -1137,8 +1126,6 @@ const handleChatMessage = (ws, gameCode, username, message, isHost) => {
     console.warn(`[CHAT] No game found for ${gameCode}`);
     return;
   }
-
-  console.log(`[CHAT] Message from ${username} in game ${gameCode}: ${message}`);
 
   const chatMessage = {
     action: 'chatMessage',

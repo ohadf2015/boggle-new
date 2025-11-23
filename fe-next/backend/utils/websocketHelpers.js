@@ -60,9 +60,6 @@ function broadcast(connections, message, context = 'broadcast') {
   });
 
   // Log summary
-  if (sentCount > 0) {
-    console.log(`[${context}] ${message.action} sent to ${sentCount}/${totalCount} connections`);
-  }
   if (failedCount > 0) {
     console.warn(`[${context}] Failed to send ${message.action} to ${failedCount} connections`);
   }

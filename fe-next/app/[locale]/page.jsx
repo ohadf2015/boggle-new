@@ -137,7 +137,6 @@ const useWebSocketConnection = () => {
             globalWsInstance = ws;
 
             ws.onopen = () => {
-                console.log('[WS] Connected');
                 isConnectingRef.current = false;
                 reconnectAttemptsRef.current = 0;
                 setConnectionError('');
@@ -175,8 +174,6 @@ const useWebSocketConnection = () => {
                         WS_CONFIG.BASE_RECONNECT_DELAY * Math.pow(2, reconnectAttemptsRef.current),
                         WS_CONFIG.MAX_RECONNECT_DELAY
                     );
-
-                    console.log(`[WS] Reconnecting... (attempt ${reconnectAttemptsRef.current + 1}/${WS_CONFIG.MAX_RECONNECT_ATTEMPTS})`);
 
                     reconnectTimeoutRef.current = setTimeout(() => {
                         reconnectAttemptsRef.current += 1;
@@ -411,8 +408,6 @@ export default function GamePage() {
                 ws.removeEventListener('open', onOpen);
             };
             ws.addEventListener('open', onOpen);
-        } else {
-            console.warn('WebSocket is not open. Current state:', ws.readyState);
         }
     }, [wsRef]);
 
@@ -426,8 +421,6 @@ export default function GamePage() {
             setAttemptingReconnect(false);
             return;
         }
-
-        console.log('Attempting to restore session:', savedSession);
 
         if (savedSession.isHost) {
             if (!savedSession.roomName) {
