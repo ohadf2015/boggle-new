@@ -188,17 +188,15 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
           break;
 
         case 'validatedScores':
-          // Delay showing results to ensure waiting screen is seen
-          setTimeout(() => {
-            setWaitingForResults(false);
-            toast.success(t('playerView.scoresReady'), { duration: 2000 });
-            if (onShowResults) {
-              onShowResults({
-                scores: message.scores,
-                letterGrid: message.letterGrid,
-              });
-            }
-          }, 10000);
+          // Show results immediately after host validation
+          setWaitingForResults(false);
+          toast.success(t('playerView.scoresReady'), { duration: 2000 });
+          if (onShowResults) {
+            onShowResults({
+              scores: message.scores,
+              letterGrid: message.letterGrid,
+            });
+          }
           break;
 
         case 'finalScores':

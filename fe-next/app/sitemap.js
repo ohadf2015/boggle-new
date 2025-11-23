@@ -1,5 +1,5 @@
 export default function sitemap() {
-  const baseUrl = 'https://lexiclash.live';
+  const baseUrl = 'https://www.lexiclash.live';
 
   return [
     {
@@ -9,6 +9,7 @@ export default function sitemap() {
       priority: 1,
       alternates: {
         languages: {
+          'x-default': baseUrl,
           he: baseUrl,
           en: `${baseUrl}/en`,
         },
@@ -21,6 +22,7 @@ export default function sitemap() {
       priority: 1,
       alternates: {
         languages: {
+          'x-default': baseUrl,
           he: baseUrl,
           en: `${baseUrl}/en`,
         },

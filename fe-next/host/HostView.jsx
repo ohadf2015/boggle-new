@@ -178,7 +178,7 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
           });
           uniqueWords.forEach(word => {
             if (initialValidations[word] === undefined) {
-              initialValidations[word] = true; // Default to valid
+              initialValidations[word] = false; // Default to invalid for manual validation
             }
           });
           setValidations(initialValidations);
@@ -216,6 +216,19 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
             icon: '⏱️',
             duration: 4000,
           });
+          break;
+
+        case 'roomClosedDueToInactivity':
+          toast.error(message.message || 'החדר נסגר עקב חוסר פעילות', {
+            icon: '⏰',
+            duration: 5000,
+          });
+          // Close connection and reload after a short delay
+          setTimeout(() => {
+            clearSession();
+            ws.close();
+            window.location.reload();
+          }, 2000);
           break;
 
         case 'timeUpdate':

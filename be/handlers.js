@@ -41,6 +41,12 @@ const cleanupGameTimers = (gameCode) => {
     });
     game.disconnectedPlayers = {};
   }
+
+  // Clear AFK timeout
+  if (game.afkTimeout) {
+    clearTimeout(game.afkTimeout);
+    game.afkTimeout = null;
+  }
 };
 
 const setNewGame = async (gameCode, host, roomName, language = 'en') => {
@@ -154,6 +160,13 @@ const addUserToGame = async (gameCode, username, ws) => {
       game.playerWordDetails[username] = [];
       gameWs.set(ws, gameCode);
       wsUsername.set(ws, username);
+    }
+
+    // Clear AFK timeout when a player joins
+    if (game.afkTimeout) {
+      clearTimeout(game.afkTimeout);
+      game.afkTimeout = null;
+      console.log(`[JOIN] AFK timeout cleared for game ${gameCode} - player ${username} joined`);
     }
 
     // Send confirmation to the player who just joined
@@ -709,15 +722,34 @@ const handleDisconnect = (ws, wss) => {
       broadcastLeaderboard(gameCode);
 
       // Check if game should end (if 0 players left, or 1 player left and game is playing)
-      // If 0 players, always end/delete.
-      // If 1 player and playing, end game.
+      // Keep room active if host is still connected, even with 0 players
       if (remainingPlayers.length === 0) {
-         console.log(`[DISCONNECT] No players left in game ${gameCode}, closing room.`);
-         // Clean up all timers and timeouts
-         cleanupGameTimers(gameCode);
-         // Delete game
-         delete games[gameCode];
-         deleteGameState(gameCode).catch(e => console.error(e));
+         console.log(`[DISCONNECT] No players left in game ${gameCode}, but keeping room active for host`);
+
+         // Start AFK timeout - close room after 1 minute if no activity
+         if (!games[gameCode].afkTimeout) {
+           games[gameCode].lastActivity = Date.now();
+           games[gameCode].afkTimeout = setTimeout(() => {
+             if (games[gameCode] && games[gameCode].users && Object.keys(games[gameCode].users).length === 0) {
+               console.log(`[AFK_TIMEOUT] Host AFK for 1 minute with no players in game ${gameCode}, closing room`);
+
+               // Notify host that room is closing due to inactivity
+               sendHostAMessage(gameCode, {
+                 action: "roomClosedDueToInactivity",
+                 message: "החדר נסגר עקב חוסר פעילות"
+               });
+
+               // Clean up and delete game after a short delay
+               setTimeout(() => {
+                 if (games[gameCode]) {
+                   cleanupGameTimers(gameCode);
+                   delete games[gameCode];
+                   deleteGameState(gameCode).catch(e => console.error(e));
+                 }
+               }, 500);
+             }
+           }, 60000); // 1 minute (60000ms)
+         }
       } else if (remainingPlayers.length <= 1 && games[gameCode].gameState === 'playing') {
          console.log(`[DISCONNECT] ${remainingPlayers.length} player(s) remain in game ${gameCode}, ending game automatically`);
          // Clear timer before ending game
@@ -726,6 +758,12 @@ const handleDisconnect = (ws, wss) => {
            games[gameCode].timerInterval = null;
          }
          handleEndGame(games[gameCode].host);
+      }
+
+      // Clear AFK timeout if players join back
+      if (remainingPlayers.length > 0 && games[gameCode].afkTimeout) {
+        clearTimeout(games[gameCode].afkTimeout);
+        games[gameCode].afkTimeout = null;
       }
 
   }

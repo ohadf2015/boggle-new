@@ -1,7 +1,7 @@
 import './globals.css';
 
 export const metadata = {
-    metadataBase: new URL('https://lexiclash.live'),
+    metadataBase: new URL('https://www.lexiclash.live'),
     title: {
         default: 'LexiClash - Multiplayer Word Game | לקסיקלאש',
         template: '%s | LexiClash',

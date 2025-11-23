@@ -5,6 +5,6 @@ export default function robots() {
       allow: '/',
       disallow: ['/api/', '/_next/'],
     },
-    sitemap: 'https://lexiclash.live/sitemap.xml',
+    sitemap: 'https://www.lexiclash.live/sitemap.xml',
   };
 }
