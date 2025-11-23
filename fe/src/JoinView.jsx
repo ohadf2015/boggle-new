@@ -94,7 +94,7 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
   // Show simplified quick join interface when room is prefilled
   if (prefilledRoom && !showFullForm) {
     return (
-      <div className="min-h-screen bg-gradient-to-b pt-4 from-slate-50 via-slate-100 to-slate-200 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 flex flex-col items-center justify-start p-4 sm:p-6 transition-colors duration-300">
+      <div className="min-h-screen bg-gradient-to-b pt-4 from-slate-50 via-slate-100 to-slate-200 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 flex flex-col items-center justify-center p-4 sm:p-6 transition-colors duration-300">
         {/* Animated Title - Removed as it is now in global header */}
         <motion.div
           initial={{ y: -50, opacity: 0 }}
@@ -212,7 +212,7 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-50 via-slate-100 to-slate-200 pt-4 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 flex flex-col items-center justify-start p-4 sm:p-6 overflow-auto transition-colors duration-300">
+    <div className="min-h-screen bg-gradient-to-b from-slate-50 via-slate-100 to-slate-200 pt-4 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 flex flex-col items-center justify-center p-4 sm:p-6 overflow-auto transition-colors duration-300">
       {/* Animated Title */}
 
 
