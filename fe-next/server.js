@@ -159,7 +159,7 @@ app.prepare().then(() => {
   wss.on('close', () => clearInterval(pingInterval));
 
   // Next.js handler for all other routes
-  server.all("*", (req, res) => {
+  server.all(/(.*)/, (req, res) => {
     return handle(req, res);
   });
 

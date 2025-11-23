@@ -12,6 +12,12 @@ export const LanguageProvider = ({ children, initialLanguage }) => {
     const [language, setLanguageState] = useState(initialLanguage || 'he');
 
     useEffect(() => {
+        if (initialLanguage && initialLanguage !== language) {
+            setLanguageState(initialLanguage);
+        }
+    }, [initialLanguage]);
+
+    useEffect(() => {
         // Save to localStorage
         if (typeof window !== 'undefined') {
             localStorage.setItem('boggle_language', language);
