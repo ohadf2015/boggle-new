@@ -184,29 +184,54 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
             { scale: 1.1, borderColor: '#4ade80' },
             { scale: 1, borderColor: '', duration: 0.3 }
           );
-          toast.success(`✓ ${message.word}`, { duration: 2000 });
 
-          // Combo system: only increase combo for validated words
-          const now = Date.now();
-          if (lastWordTime && (now - lastWordTime) < 5000) {
-            // Within 5 seconds - increase combo!
-            setComboLevel(prev => Math.min(prev + 1, 4)); // Max combo level 4
+          // Only increase combo if word was auto-validated
+          if (message.autoValidated) {
+            toast.success(`✓ ${message.word}`, { duration: 2000, icon: '✅' });
+
+            // Combo system: only increase combo for auto-validated words
+            const now = Date.now();
+            if (lastWordTime && (now - lastWordTime) < 5000) {
+              // Within 5 seconds - increase combo!
+              setComboLevel(prev => Math.min(prev + 1, 4)); // Max combo level 4
+            } else {
+              // Too slow, reset combo
+              setComboLevel(0);
+            }
+            setLastWordTime(now);
+
+            // Clear any existing combo timeout
+            if (comboTimeoutRef.current) {
+              clearTimeout(comboTimeoutRef.current);
+            }
+
+            // Reset combo after 5 seconds of inactivity
+            comboTimeoutRef.current = setTimeout(() => {
+              setComboLevel(0);
+              setLastWordTime(null);
+            }, 5000);
           } else {
-            // Too slow, reset combo
-            setComboLevel(0);
+            toast.success(`✓ ${message.word}`, { duration: 2000 });
           }
-          setLastWordTime(now);
+          break;
 
-          // Clear any existing combo timeout
+        case 'wordNeedsValidation':
+          // Word needs host validation - show notification and reset combo
+          toast(message.message || `⏳ ${message.word} - Needs host validation`, {
+            duration: 3000,
+            icon: '⏳',
+            style: {
+              background: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
+              color: 'white',
+            },
+          });
+
+          // Reset combo for non-auto-validated words
+          setComboLevel(0);
+          setLastWordTime(null);
           if (comboTimeoutRef.current) {
             clearTimeout(comboTimeoutRef.current);
           }
-
-          // Reset combo after 5 seconds of inactivity
-          comboTimeoutRef.current = setTimeout(() => {
-            setComboLevel(0);
-            setLastWordTime(null);
-          }, 5000);
           break;
 
         case 'wordAlreadyFound':
@@ -763,10 +788,10 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
         </div>
 
         {/* Center Column: Letter Grid */}
-        <div className="flex-1 flex flex-col gap-2 min-w-0">
+        <div className="flex-1 flex flex-col gap-2 min-w-0 min-h-0">
           {(letterGrid || shufflingGrid) && (
             <Card className="bg-slate-900/95 dark:bg-slate-900/95 backdrop-blur-md shadow-2xl border border-cyan-500/40 shadow-[0_0_25px_rgba(6,182,212,0.2)] flex flex-col flex-grow overflow-hidden">
-              <CardContent className="flex-grow flex flex-col items-center justify-center p-1 md:p-3 bg-slate-900/90">
+              <CardContent className="flex-grow flex flex-col items-center justify-center p-1 md:p-2 bg-slate-900/90">
                 <GridComponent
                   grid={letterGrid || shufflingGrid}
                   interactive={gameActive}

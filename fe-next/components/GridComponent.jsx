@@ -15,6 +15,9 @@ const GridComponent = ({
     const [internalSelectedCells, setInternalSelectedCells] = useState([]);
     const isTouchingRef = useRef(false);
     const gridRef = useRef(null);
+    const startPosRef = useRef({ x: 0, y: 0 });
+    const hasMovedRef = useRef(false);
+    const MOVEMENT_THRESHOLD = 10; // pixels - minimum movement to register as intentional
 
     // Use external control if provided, otherwise internal state
     const selectedCells = externalSelectedCells || internalSelectedCells;
@@ -27,9 +30,18 @@ const GridComponent = ({
         }
     }, [interactive]);
 
-    const handleTouchStart = (rowIndex, colIndex, letter) => {
+    const handleTouchStart = (rowIndex, colIndex, letter, event) => {
         if (!interactive) return;
         isTouchingRef.current = true;
+        hasMovedRef.current = false;
+
+        // Store initial touch position for misclick prevention
+        if (event.touches && event.touches[0]) {
+            startPosRef.current = { x: event.touches[0].clientX, y: event.touches[0].clientY };
+        } else if (event.clientX !== undefined) {
+            startPosRef.current = { x: event.clientX, y: event.clientY };
+        }
+
         setSelectedCells([{ row: rowIndex, col: colIndex, letter }]);
         // Enhanced haptic feedback - medium vibration on start
         if (window.navigator && window.navigator.vibrate) {
@@ -42,6 +54,21 @@ const GridComponent = ({
         if (e.cancelable) e.preventDefault();
 
         const touch = e.touches[0];
+
+        // Misclick prevention: check if user has moved enough from start position
+        if (!hasMovedRef.current) {
+            const deltaX = Math.abs(touch.clientX - startPosRef.current.x);
+            const deltaY = Math.abs(touch.clientY - startPosRef.current.y);
+            const totalMovement = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+
+            if (totalMovement < MOVEMENT_THRESHOLD) {
+                // User hasn't moved enough yet - don't register as intentional movement
+                return;
+            }
+            // User has moved enough - mark as intentional
+            hasMovedRef.current = true;
+        }
+
         const element = document.elementFromPoint(touch.clientX, touch.clientY);
 
         if (element && element.dataset.row !== undefined) {
@@ -94,7 +121,9 @@ const GridComponent = ({
         if (!interactive || !isTouchingRef.current) return;
         isTouchingRef.current = false;
 
-        if (selectedCells.length > 0) {
+        // Misclick prevention: only submit if user has moved OR selected multiple letters
+        // This prevents accidental single-letter submissions from taps
+        if (selectedCells.length > 0 && (hasMovedRef.current || selectedCells.length >= 2)) {
             const formedWord = selectedCells.map(c => c.letter).join('');
             if (onWordSubmit) {
                 onWordSubmit(formedWord);
@@ -122,12 +151,18 @@ const GridComponent = ({
             setTimeout(() => {
                 setSelectedCells([]);
             }, clearDelay);
+        } else {
+            // Clear selection immediately if it was a misclick
+            setSelectedCells([]);
         }
+
+        // Reset movement tracking
+        hasMovedRef.current = false;
     };
 
     // Mouse support for desktop testing
-    const handleMouseDown = (rowIndex, colIndex, letter) => {
-        handleTouchStart(rowIndex, colIndex, letter);
+    const handleMouseDown = (rowIndex, colIndex, letter, event) => {
+        handleTouchStart(rowIndex, colIndex, letter, event);
     };
 
     const handleMouseEnter = (rowIndex, colIndex, letter) => {
@@ -248,7 +283,7 @@ const GridComponent = ({
     };
 
     return (
-        <div className="relative">
+        <div className="relative w-full h-full flex items-center justify-center">
             {/* Combo Indicator - Modern, compact, doesn't hide board */}
             <AnimatePresence mode="wait">
                 {comboLevel > 0 && comboColors.text && (
@@ -334,12 +369,14 @@ const GridComponent = ({
             <div
                 ref={gridRef}
                 className={cn(
-                    "grid touch-none select-none relative",
-                    isLargeGrid ? "gap-0.5 sm:gap-1" : "gap-1 sm:gap-1.5",
+                    "grid touch-none select-none relative rounded-2xl p-2 sm:p-3 md:p-4 aspect-square w-full max-w-[min(90vh,90vw)]",
+                    isLargeGrid ? "gap-1 sm:gap-1.5" : "gap-2 sm:gap-3",
                     className
                 )}
                 style={{
-                    gridTemplateColumns: `repeat(${grid[0]?.length || 4}, minmax(0, 1fr))`
+                    gridTemplateColumns: `repeat(${grid[0]?.length || 4}, minmax(0, 1fr))`,
+                    background: 'linear-gradient(135deg, rgba(15, 23, 42, 0.95) 0%, rgba(30, 41, 59, 0.95) 100%)',
+                    boxShadow: '0 0 60px rgba(6, 182, 212, 0.4), inset 0 0 40px rgba(6, 182, 212, 0.1)'
                 }}
                 tabIndex={interactive ? 0 : -1}
                 onTouchMove={handleTouchMove}
@@ -354,8 +391,8 @@ const GridComponent = ({
                             data-row={i}
                             data-col={j}
                             data-letter={cell}
-                            onTouchStart={() => handleTouchStart(i, j, cell)}
-                            onMouseDown={() => handleMouseDown(i, j, cell)}
+                            onTouchStart={(e) => handleTouchStart(i, j, cell, e)}
+                            onMouseDown={(e) => handleMouseDown(i, j, cell, e)}
                             onMouseEnter={() => handleMouseEnter(i, j, cell)}
                             initial={{ scale: 0.8, opacity: 0 }}
                             animate={{
@@ -371,27 +408,76 @@ const GridComponent = ({
                                 scale: { type: "spring", stiffness: 300, damping: 20 }
                             }}
                             className={cn(
-                                "aspect-square flex items-center justify-center font-bold shadow-sm cursor-pointer transition-all duration-200 border relative overflow-hidden",
+                                "aspect-square flex items-center justify-center font-bold shadow-lg cursor-pointer transition-all duration-200 border-2 relative overflow-hidden",
                                 isLargeGrid
-                                    ? (largeText ? "text-2xl sm:text-3xl rounded-md" : "text-lg sm:text-xl rounded-md")
-                                    : (largeText || playerView ? "text-4xl sm:text-6xl rounded-xl" : "text-2xl sm:text-3xl rounded-lg"),
+                                    ? (largeText ? "text-2xl sm:text-3xl rounded-lg" : "text-lg sm:text-xl rounded-lg")
+                                    : (largeText || playerView ? "text-4xl sm:text-5xl md:text-6xl rounded-2xl" : "text-2xl sm:text-3xl rounded-xl"),
                                 isSelected
-                                    ? `bg-gradient-to-br ${comboColors.gradient} text-white ${comboColors.border} z-10 ${comboColors.shadow}`
-                                    : "bg-gradient-to-br from-white to-slate-100 dark:from-slate-800 dark:to-slate-900 text-slate-900 dark:text-white border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700/80 active:scale-95"
+                                    ? `bg-gradient-to-br ${comboColors.gradient} text-white ${comboColors.border} z-10 ${comboColors.shadow} border-white/40`
+                                    : "bg-gradient-to-br from-slate-100 via-white to-slate-100 dark:from-slate-700 dark:via-slate-800 dark:to-slate-900 text-slate-900 dark:text-white border-slate-300/60 dark:border-slate-600/60 hover:scale-105 hover:shadow-xl dark:hover:bg-slate-700/80 active:scale-95 shadow-[0_4px_12px_rgba(0,0,0,0.1)]"
                             )}
                         >
                             {/* Ripple effect on selection */}
                             {isSelected && (
                                 <>
+                                    {/* Main ripple effect */}
                                     <motion.div
-                                        className="absolute inset-0 bg-white/30 rounded-full"
-                                        initial={{ scale: 0, opacity: 0.5 }}
-                                        animate={{ scale: 2, opacity: 0 }}
-                                        transition={{ duration: 0.5 }}
+                                        className="absolute inset-0 bg-white/40 rounded-2xl"
+                                        initial={{ scale: 0.5, opacity: 0.8 }}
+                                        animate={{ scale: 2.5, opacity: 0 }}
+                                        transition={{ duration: 0.6, ease: "easeOut" }}
                                     />
 
-                                    {/* Fire particles for combo */}
-                                    {comboLevel > 0 && (
+                                    {/* Bright flare effect - always visible on click */}
+                                    <motion.div
+                                        className="absolute inset-0 rounded-2xl pointer-events-none"
+                                        style={{
+                                            background: 'radial-gradient(circle at center, rgba(255, 255, 255, 0.9), transparent 70%)',
+                                            filter: 'blur(2px)'
+                                        }}
+                                        initial={{ scale: 0, opacity: 1 }}
+                                        animate={{ scale: [0, 1.5, 0], opacity: [1, 0.5, 0] }}
+                                        transition={{ duration: 0.8, ease: "easeOut" }}
+                                    />
+
+                                    {/* Fire particles - enhanced and always visible */}
+                                    <>
+                                        {/* Center burst particles */}
+                                        {[...Array(8)].map((_, idx) => {
+                                            const angle = (idx * 45) * (Math.PI / 180);
+                                            const distance = 15 + (comboLevel * 3);
+                                            return (
+                                                <motion.div
+                                                    key={`burst-${idx}`}
+                                                    className="absolute w-2 h-2 rounded-full pointer-events-none"
+                                                    style={{
+                                                        background: comboLevel > 0
+                                                            ? 'radial-gradient(circle, #ff6b00, #ff0000)'
+                                                            : 'radial-gradient(circle, #fbbf24, #f97316)',
+                                                        filter: 'blur(1px)',
+                                                        left: '50%',
+                                                        top: '50%',
+                                                        marginLeft: '-4px',
+                                                        marginTop: '-4px'
+                                                    }}
+                                                    initial={{ scale: 0, opacity: 1, x: 0, y: 0 }}
+                                                    animate={{
+                                                        scale: [0.5, 1.5, 0],
+                                                        opacity: [1, 0.8, 0],
+                                                        x: Math.cos(angle) * distance,
+                                                        y: Math.sin(angle) * distance
+                                                    }}
+                                                    transition={{
+                                                        duration: 0.6,
+                                                        ease: "easeOut",
+                                                        delay: idx * 0.02
+                                                    }}
+                                                />
+                                            );
+                                        })}
+
+                                        {/* Corner fire particles for combo */}
+                                        {comboLevel > 0 && (
                                         <>
                                             {/* Top-right fire particle */}
                                             <motion.div

@@ -812,6 +812,11 @@ const handleWordSubmission = (ws, word) => {
   const currentTime = Date.now();
   const timeSinceStart = (currentTime - games[gameCode].startTime) / 1000; // in seconds
 
+  // Auto-validate using dictionary
+  const gameLanguage = games[gameCode].language || 'he';
+  const isValidInDictionary = dictionary.isValidWord(word, gameLanguage);
+  const autoValidated = isValidInDictionary === true;
+
   // Store the word (it passed board validation)
   games[gameCode].playerWords[username].push(word);
   games[gameCode].playerWordDetails[username].push({
@@ -819,17 +824,29 @@ const handleWordSubmission = (ws, word) => {
     score: 0, // Will be calculated after validation
     timestamp: currentTime,
     timeSinceStart,
-    validated: null, // Will be set by host later (for dictionary/semantic validation)
+    validated: autoValidated ? true : null, // Auto-validate if in dictionary, otherwise needs host validation
+    autoValidated: autoValidated, // Track if word was auto-validated
     onBoard: true, // Passed board validation
   });
 
-  // Send confirmation to player (no score yet)
+  // Send confirmation to player with auto-validation status
   if (ws && ws.readyState === 1) { // Check connection is open
     try {
-      ws.send(JSON.stringify({
-        action: "wordAccepted",
-        word,
-      }));
+      if (autoValidated) {
+        // Word is auto-validated - normal flow
+        ws.send(JSON.stringify({
+          action: "wordAccepted",
+          word,
+          autoValidated: true
+        }));
+      } else {
+        // Word needs host validation - notify player
+        ws.send(JSON.stringify({
+          action: "wordNeedsValidation",
+          word,
+          message: "Word needs host validation - won't count towards combo until validated"
+        }));
+      }
     } catch (error) {
       console.error(`Error confirming word to ${username}:`, error);
     }
