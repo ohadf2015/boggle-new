@@ -120,80 +120,59 @@ const awardFinalAchievements = (game, users) => {
 
     const allWords = game.playerWordDetails[username];
     const validWords = allWords.filter(w => w.validated === true);
+    const currentAchievements = game.playerAchievements[username];
 
-    // First Blood - first word in the game
-    if (validWords.length > 0 && !game.firstWordFound) {
-      const firstWordEver = Object.keys(game.users)
-        .map(u => game.playerWordDetails[u])
-        .flat()
-        .filter(w => w.validated === true)
-        .sort((a, b) => a.timestamp - b.timestamp)[0];
-
-      if (firstWordEver && allWords.includes(firstWordEver)) {
-        game.playerAchievements[username].push('FIRST_BLOOD');
-        game.firstWordFound = true;
+    // Helper function to add achievement if not already present
+    const addAchievement = (achievementKey) => {
+      if (!currentAchievements.includes(achievementKey)) {
+        currentAchievements.push(achievementKey);
       }
-    }
+    };
 
-    // Word Master - 7+ letter word
+    // Note: FIRST_BLOOD, QUICK_THINKER, LONG_HAULER, and DOUBLE_TROUBLE are
+    // timing-based achievements awarded during live gameplay and are preserved
+    // during validation. They are NOT recalculated here.
+
+    // Word Master - 7+ letter word (validated)
     if (validWords.some(w => w.word.length >= 7)) {
-      game.playerAchievements[username].push('WORD_MASTER');
+      addAchievement('WORD_MASTER');
     }
 
     // Speed Demon - 10 valid words in 2 minutes
     const wordsIn2Min = validWords.filter(w => w.timeSinceStart <= 120);
     if (wordsIn2Min.length >= 10) {
-      game.playerAchievements[username].push('SPEED_DEMON');
+      addAchievement('SPEED_DEMON');
     }
 
     // Lexicon - 20+ valid words
     if (validWords.length >= 20) {
-      game.playerAchievements[username].push('LEXICON');
+      addAchievement('LEXICON');
     }
 
     // Combo King - 5+ valid words (multiples of 5)
     if (validWords.length >= 5 && validWords.length % 5 === 0) {
-      game.playerAchievements[username].push('COMBO_KING');
+      addAchievement('COMBO_KING');
     }
 
     // Perfectionist - all words valid
     if (allWords.length > 0 && allWords.every(w => w.validated === true)) {
-      game.playerAchievements[username].push('PERFECTIONIST');
+      addAchievement('PERFECTIONIST');
     }
 
     // Wordsmith - 15+ valid words
     if (validWords.length >= 15) {
-      game.playerAchievements[username].push('WORDSMITH');
-    }
-
-    // Quick Thinker - found a word within 10 seconds of game start
-    if (validWords.some(w => w.timeSinceStart <= 10)) {
-      game.playerAchievements[username].push('QUICK_THINKER');
-    }
-
-    // Long Hauler - found a word in the last minute
-    const gameTimerSeconds = game.timerSeconds || 180;
-    if (validWords.some(w => w.timeSinceStart >= gameTimerSeconds - 60)) {
-      game.playerAchievements[username].push('LONG_HAULER');
+      addAchievement('WORDSMITH');
     }
 
     // Diverse Vocabulary - found words of at least 4 different lengths
     const uniqueLengths = new Set(validWords.map(w => w.word.length));
     if (uniqueLengths.size >= 4) {
-      game.playerAchievements[username].push('DIVERSE_VOCABULARY');
+      addAchievement('DIVERSE_VOCABULARY');
     }
 
-    // Double Trouble - found 2 words within 5 seconds of each other
-    for (let i = 1; i < validWords.length; i++) {
-      if (validWords[i].timeSinceStart - validWords[i-1].timeSinceStart <= 5) {
-        game.playerAchievements[username].push('DOUBLE_TROUBLE');
-        break;
-      }
-    }
-
-    // Treasure Hunter - found an 8+ letter word
+    // Treasure Hunter - found an 8+ letter word (validated)
     if (validWords.some(w => w.word.length >= 8)) {
-      game.playerAchievements[username].push('TREASURE_HUNTER');
+      addAchievement('TREASURE_HUNTER');
     }
   });
 };

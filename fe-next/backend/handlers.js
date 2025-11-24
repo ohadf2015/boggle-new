@@ -904,13 +904,18 @@ const handleValidateWords = (host, validations, letterGrid) => {
     games[gameCode].validationTimeout = null;
   }
 
+  // Timing-based achievements that should be preserved (not affected by validation)
+  const TIMING_BASED_ACHIEVEMENTS = ['FIRST_BLOOD', 'QUICK_THINKER', 'LONG_HAULER', 'DOUBLE_TROUBLE'];
+
   // Reset all scores before calculating - only for existing players
   Object.keys(games[gameCode].users).forEach(username => {
     if (games[gameCode].playerScores[username] !== undefined) {
       games[gameCode].playerScores[username] = 0;
     }
     if (games[gameCode].playerAchievements[username] !== undefined) {
-      games[gameCode].playerAchievements[username] = [];
+      // Preserve timing-based achievements, reset others
+      games[gameCode].playerAchievements[username] = games[gameCode].playerAchievements[username]
+        .filter(ach => TIMING_BASED_ACHIEVEMENTS.includes(ach));
     }
   });
 
