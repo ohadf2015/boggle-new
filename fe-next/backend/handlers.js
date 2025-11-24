@@ -250,10 +250,26 @@ const addUserToGame = async (gameCode, username, ws) => {
       wsUsername.set(ws, username);
     }
 
+    // Check if this player is joining an empty room (should become host)
+    const activeUsers = Object.keys(game.users);
+    const isNowHost = activeUsers.length === 1 && activeUsers[0] === username;
+
+    if (isNowHost && game.hostUsername !== username) {
+      console.log(`[JOIN] Player ${username} is joining empty room ${gameCode}, promoting to host`);
+      game.host = ws;
+      game.hostUsername = username;
+      game.hostPlayerId = game.playerIds[username];
+
+      // Save the host promotion to Redis immediately
+      saveGameState(gameCode, games[gameCode]).catch(err =>
+        console.error('[REDIS] Error saving host promotion:', err)
+      );
+    }
+
     // Send confirmation to the player who just joined
     ws.send(JSON.stringify({
         action: "joined",
-        isHost: false,
+        isHost: isNowHost,
         username: username,
         playerId: game.playerIds[username], // Send unique player ID
         avatar: game.playerAvatars[username]
