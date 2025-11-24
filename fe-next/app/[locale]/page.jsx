@@ -182,13 +182,13 @@ const useWebSocketConnection = () => {
                     }, delay);
                 } else if (event.code !== 1000) {
                     console.error('[WS] Connection lost');
-                    setConnectionError('Connection lost. Please refresh the page.');
+                    setConnectionError(t('errors.unstableConnection'));
                 }
             };
         } catch (error) {
             console.error('[WS] Error creating WebSocket:', error);
             isConnectingRef.current = false;
-            setConnectionError('Failed to connect. Please refresh the page.');
+            setConnectionError(t('errors.unstableConnection'));
         }
     }, [startHeartbeat, stopHeartbeat]);
 

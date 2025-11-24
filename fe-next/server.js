@@ -63,8 +63,49 @@ app.prepare().then(() => {
 
   // Middleware
   server.disable('x-powered-by');
-  server.use(cors({ origin: CORS_ORIGIN, credentials: true }));
+
+  // SECURITY: Configure CORS properly for production
+  const corsOptions = {
+    origin: CORS_ORIGIN === '*' && !dev
+      ? false // Reject wildcard in production
+      : CORS_ORIGIN,
+    credentials: true
+  };
+
+  if (!dev && CORS_ORIGIN === '*') {
+    console.warn('WARNING: CORS is set to wildcard (*) in production. This is insecure!');
+    console.warn('Please set CORS_ORIGIN environment variable to your production domain.');
+  }
+
+  server.use(cors(corsOptions));
   server.use(express.json());
+
+  // SECURITY: Add security headers
+  server.use((req, res, next) => {
+    // Content Security Policy
+    res.setHeader('Content-Security-Policy',
+      "default-src 'self'; " +
+      "script-src 'self' 'unsafe-inline' 'unsafe-eval'; " +
+      "style-src 'self' 'unsafe-inline'; " +
+      "img-src 'self' data: https:; " +
+      "font-src 'self' data:; " +
+      "connect-src 'self' ws: wss:; " +
+      "frame-ancestors 'none';"
+    );
+
+    // Additional security headers
+    res.setHeader('X-Content-Type-Options', 'nosniff');
+    res.setHeader('X-Frame-Options', 'DENY');
+    res.setHeader('X-XSS-Protection', '1; mode=block');
+    res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+
+    // HSTS for production
+    if (!dev) {
+      res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
+    }
+
+    next();
+  });
 
   // WebSocket logic
   wss.on("connection", (ws) => {

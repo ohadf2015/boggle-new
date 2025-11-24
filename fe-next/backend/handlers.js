@@ -40,6 +40,8 @@ const cleanupGameTimers = (gameCode) => {
 
   const game = games[gameCode];
 
+  console.log(`[CLEANUP] Cleaning up game ${gameCode} timers and references`);
+
   // Clear game timer interval
   if (game.timerInterval) {
     clearInterval(game.timerInterval);
@@ -73,11 +75,37 @@ const cleanupGameTimers = (gameCode) => {
     clearTimeout(game.emptyRoomTimeout);
     game.emptyRoomTimeout = null;
   }
+
+  // MEMORY LEAK FIX: Clean up WebSocket references from Maps
+  // Remove host WebSocket from Maps
+  if (game.host) {
+    gameWs.delete(game.host);
+    wsUsername.delete(game.host);
+  }
+
+  // Remove all player WebSockets from Maps
+  if (game.users) {
+    Object.values(game.users).forEach(ws => {
+      if (ws) {
+        gameWs.delete(ws);
+        wsUsername.delete(ws);
+      }
+    });
+  }
+
+  console.log(`[CLEANUP] Game ${gameCode} cleanup complete`);
 };
 
 const setNewGame = async (gameCode, host, roomName, language = 'en', hostUsername = null) => {
-    const finalHostUsername = hostUsername || 'Host';
-    const finalRoomName = roomName || finalHostUsername;
+    // SECURITY: Validate and sanitize inputs
+    if (!gameCode || typeof gameCode !== 'string' || !/^\d{4}$/.test(gameCode)) {
+        console.warn(`[CREATE] Invalid game code format: ${gameCode}`);
+        safeSend(host, { action: "error", message: "Invalid game code format" });
+        return;
+    }
+
+    const finalHostUsername = sanitizeInput(hostUsername || 'Host', 20);
+    const finalRoomName = sanitizeInput(roomName || finalHostUsername, 50);
     const hostPlayerId = generatePlayerId(); // Generate unique ID for host
     console.log(`[CREATE] Creating game - gameCode: ${gameCode}, hostUsername: ${finalHostUsername}, hostId: ${hostPlayerId}, roomName: ${finalRoomName}, language: ${language}`);
 
@@ -190,13 +218,72 @@ const setNewGame = async (gameCode, host, roomName, language = 'en', hostUsernam
             hostUsername: existingGame.hostUsername
         }));
     } else {
-        console.log(`[CREATE] Game ${gameCode} already exists (not a reconnect)`);
+        // Game already exists but host is not marked as disconnected
+        // This can happen if the host's WebSocket reconnected quickly
+        // Check if this is actually the host trying to reconnect
+        console.log(`[CREATE] Game ${gameCode} already exists (not a reconnect), checking if this is the host...`);
+
+        // If this WebSocket is from the host, update the mapping
+        if (existingGame.hostUsername === finalHostUsername) {
+            console.log(`[CREATE] Detected host ${finalHostUsername} attempting to reconnect with existing game`);
+
+            // Update host WebSocket reference and mappings
+            existingGame.host = host;
+            gameWs.set(host, gameCode);
+            wsUsername.set(host, existingGame.hostUsername);
+
+            host.send(JSON.stringify({
+                action: "joined",
+                isHost: true,
+                language: existingGame.language,
+                username: existingGame.hostUsername,
+                playerId: existingGame.hostPlayerId || existingGame.playerIds?.[existingGame.hostUsername],
+                avatar: existingGame.playerAvatars[existingGame.hostUsername]
+            }));
+
+            // Send current user list
+            const playerList = Object.keys(existingGame.users).map(username => ({
+                username,
+                avatar: existingGame.playerAvatars[username],
+                isHost: username === existingGame.hostUsername
+            }));
+            host.send(JSON.stringify({
+                action: "updateUsers",
+                users: playerList,
+                hostUsername: existingGame.hostUsername
+            }));
+
+            // Re-add host to users if they're not there
+            if (!existingGame.users[existingGame.hostUsername]) {
+                existingGame.users[existingGame.hostUsername] = host;
+            }
+
+            return;
+        }
+
+        // Not the host, game truly already exists
         host.send(JSON.stringify({ action: "gameExists" }));
         return;
     }
 }
 
 const addUserToGame = async (gameCode, username, ws) => {
+    // SECURITY: Validate and sanitize inputs
+    if (!gameCode || typeof gameCode !== 'string' || !/^\d{4}$/.test(gameCode)) {
+        console.warn(`[JOIN] Invalid game code format: ${gameCode}`);
+        safeSend(ws, { action: "error", message: "Invalid game code format" });
+        return;
+    }
+
+    if (!username || typeof username !== 'string' || username.length > 20) {
+        console.warn(`[JOIN] Invalid username: ${username}`);
+        safeSend(ws, { action: "error", message: "Invalid username" });
+        return;
+    }
+
+    // Sanitize username for security
+    username = sanitizeInput(username, 20);
+
     if(!getGame(gameCode)) {
       console.log(`[JOIN] Game ${gameCode} does not exist`);
       ws.send(JSON.stringify({ action: "gameDoesNotExist" }));
@@ -371,13 +458,31 @@ const handleStartGame = async (host, letterGrid, timerSeconds, language) => {
 
 // Server-side timer that broadcasts remaining time to all clients
 const startServerTimer = (gameCode, totalSeconds) => {
+  // RACE CONDITION FIX: Safety check before accessing game
+  if (!games[gameCode]) {
+    console.warn(`[TIMER] Cannot start timer for non-existent game ${gameCode}`);
+    return;
+  }
+
+  // Clear any existing timer to prevent multiple timers
   if (games[gameCode].timerInterval) {
     clearInterval(games[gameCode].timerInterval);
+    games[gameCode].timerInterval = null;
   }
 
   games[gameCode].timerInterval = setInterval(() => {
-    if (!games[gameCode] || games[gameCode].gameState !== 'playing') {
+    // RACE CONDITION FIX: Check if game still exists at the start of each tick
+    if (!games[gameCode]) {
+      console.warn(`[TIMER] Game ${gameCode} no longer exists, stopping timer`);
+      // Can't clear the interval from games[gameCode] since it doesn't exist
+      // The interval will be cleared by the garbage collector
+      return;
+    }
+
+    if (games[gameCode].gameState !== 'playing') {
+      console.log(`[TIMER] Game ${gameCode} is no longer playing, stopping timer`);
       clearInterval(games[gameCode].timerInterval);
+      games[gameCode].timerInterval = null;
       return;
     }
 
@@ -396,8 +501,18 @@ const startServerTimer = (gameCode, totalSeconds) => {
 
     // Auto end game when time runs out
     if (remainingSeconds <= 0) {
-      clearInterval(games[gameCode].timerInterval);
-      handleEndGame(games[gameCode].host);
+      console.log(`[TIMER] Time expired for game ${gameCode}, ending game`);
+      // Store interval reference before clearing
+      const intervalId = games[gameCode].timerInterval;
+      games[gameCode].timerInterval = null;
+      clearInterval(intervalId);
+
+      // RACE CONDITION FIX: Check host still exists before calling handleEndGame
+      if (games[gameCode].host) {
+        handleEndGame(games[gameCode].host);
+      } else {
+        console.warn(`[TIMER] No host found for game ${gameCode}, cannot end game`);
+      }
     }
   }, 1000); // Broadcast every second
 }
@@ -573,6 +688,13 @@ const checkAndBroadcastLiveAchievements = (gameCode, username, word, timeSinceSt
   }
 };
 
+// Input validation and sanitization helper
+const sanitizeInput = (input, maxLength = 100) => {
+  if (typeof input !== 'string') return '';
+  // Remove any potential XSS characters and limit length
+  return input.trim().slice(0, maxLength).replace(/[<>'"]/g, '');
+};
+
 // New function: Handle real-time word submission with board validation
 const handleWordSubmission = (ws, word) => {
   const gameCode = gameWs.get(ws);
@@ -582,6 +704,25 @@ const handleWordSubmission = (ws, word) => {
     console.warn(`Invalid game code for word submission: ${gameCode}`);
     return;
   }
+
+  // SECURITY: Validate word length to prevent DoS attacks
+  if (!word || typeof word !== 'string' || word.length > 50) {
+    console.warn(`Invalid word length from ${username}: ${word?.length || 0} characters`);
+    if (ws.readyState === 1) {
+      try {
+        ws.send(JSON.stringify({
+          action: "error",
+          message: "Invalid word format"
+        }));
+      } catch (error) {
+        console.error("Error sending validation error:", error);
+      }
+    }
+    return;
+  }
+
+  // Sanitize the word to prevent XSS
+  word = sanitizeInput(word, 50);
 
   // If game is not in 'playing' state, sync the client with current state
   if (games[gameCode].gameState !== 'playing') {
@@ -1237,10 +1378,18 @@ const handleChatMessage = (ws, gameCode, username, message, isHost) => {
     return;
   }
 
+  // SECURITY: Validate and sanitize chat message
+  if (!message || typeof message !== 'string' || message.length > 500) {
+    console.warn(`[CHAT] Invalid message length from ${username}`);
+    return;
+  }
+
+  const sanitizedMessage = sanitizeInput(message, 500);
+
   const chatMessage = {
     action: 'chatMessage',
-    username,
-    message,
+    username: sanitizeInput(username, 20),
+    message: sanitizedMessage,
     timestamp: Date.now(),
     isHost: isHost || false
   };

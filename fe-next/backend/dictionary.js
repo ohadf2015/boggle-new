@@ -53,9 +53,23 @@ class Dictionary {
       console.log(`[Dictionary] Loaded ${this.hebrewWords.size} Hebrew words`);
 
       // Load Swedish words
-      const { swedish_words } = require('@arvidbt/swedish-words/out/index.js');
-      this.swedishWords = new Set(swedish_words.map(w => w.toLowerCase()));
-      console.log(`[Dictionary] Loaded ${this.swedishWords.size} Swedish words`);
+      try {
+        const swedishWordsModule = require('@arvidbt/swedish-words');
+        // Try different possible export formats
+        const swedishWordsArray = swedishWordsModule.swedish_words
+          || swedishWordsModule.default
+          || swedishWordsModule;
+
+        if (Array.isArray(swedishWordsArray)) {
+          this.swedishWords = new Set(swedishWordsArray.map(w => w.toLowerCase()));
+          console.log(`[Dictionary] Loaded ${this.swedishWords.size} Swedish words`);
+        } else {
+          console.log('[Dictionary] Swedish dictionary has unexpected format - using fallback validation');
+        }
+      } catch (swedishError) {
+        console.error('[Dictionary] Error loading Swedish dictionary:', swedishError.message);
+        console.log('[Dictionary] Continuing without Swedish dictionary - words will require manual validation');
+      }
 
       // Load Japanese words
       try {

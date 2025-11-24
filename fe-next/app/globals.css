@@ -92,6 +92,25 @@ body {
   .text-balance {
     text-wrap: balance;
   }
+
+  /* Screen reader only utility class */
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+  }
+
+  /* Focus visible styles for keyboard navigation */
+  .focus-visible-ring:focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
+  }
 }
 
 /* Slot Machine Text Animations */
@@ -107,6 +126,18 @@ body {
 
 .slot-machine-text.complete {
   animation: final-shine 1s ease-out;
+}
+
+/* Respect prefers-reduced-motion */
+@media (prefers-reduced-motion: reduce) {
+  .slot-machine-text {
+    transition: none;
+  }
+
+  .slot-machine-text.animating,
+  .slot-machine-text.complete {
+    animation: none;
+  }
 }
 
 @keyframes pulse-glow {
@@ -190,6 +221,17 @@ body {
 
 .animated-title .text:hover {
   transform: scale(1.05);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animated-title .text {
+    animation: none;
+    transition: none;
+  }
+
+  .animated-title .text:hover {
+    transform: none;
+  }
 }
 
 .animated-title .text::before {
