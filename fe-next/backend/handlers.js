@@ -67,6 +67,12 @@ const cleanupGameTimers = (gameCode) => {
     });
     game.disconnectedPlayers = {};
   }
+
+  // Clear empty room timeout
+  if (game.emptyRoomTimeout) {
+    clearTimeout(game.emptyRoomTimeout);
+    game.emptyRoomTimeout = null;
+  }
 };
 
 const setNewGame = async (gameCode, host, roomName, language = 'en', hostUsername = null) => {
@@ -244,10 +250,26 @@ const addUserToGame = async (gameCode, username, ws) => {
       wsUsername.set(ws, username);
     }
 
+    // Check if this player is joining an empty room (should become host)
+    const activeUsers = Object.keys(game.users);
+    const isNowHost = activeUsers.length === 1 && activeUsers[0] === username;
+
+    if (isNowHost && game.hostUsername !== username) {
+      console.log(`[JOIN] Player ${username} is joining empty room ${gameCode}, promoting to host`);
+      game.host = ws;
+      game.hostUsername = username;
+      game.hostPlayerId = game.playerIds[username];
+
+      // Save the host promotion to Redis immediately
+      saveGameState(gameCode, games[gameCode]).catch(err =>
+        console.error('[REDIS] Error saving host promotion:', err)
+      );
+    }
+
     // Send confirmation to the player who just joined
     ws.send(JSON.stringify({
         action: "joined",
-        isHost: false,
+        isHost: isNowHost,
         username: username,
         playerId: game.playerIds[username], // Send unique player ID
         avatar: game.playerAvatars[username]
@@ -287,6 +309,13 @@ const addUserToGame = async (gameCode, username, ws) => {
     } else if (game.gameState === 'waiting') {
       // Game is waiting - send waiting state
       console.log(`Player ${username} joined game ${gameCode} in waiting state`);
+    }
+
+    // Clear empty room timeout if it exists (room is no longer empty)
+    if (game.emptyRoomTimeout) {
+      console.log(`[JOIN] Clearing empty room timeout for game ${gameCode}`);
+      clearTimeout(game.emptyRoomTimeout);
+      game.emptyRoomTimeout = null;
     }
 
     // Broadcast updated user list with avatar info
@@ -743,79 +772,112 @@ const handleDisconnect = (ws, wss) => {
 
     // Check if this was the host
     if (isHost) {
-      console.log(`[DISCONNECT] Host ${username} disconnected from game ${gameCode}, starting grace period`);
-
-      // Store the host in disconnected players
-      if (!game.disconnectedPlayers) {
-        game.disconnectedPlayers = {};
-      }
-
-      // Mark host as disconnected
-      game.hostDisconnected = true;
-      game.disconnectedPlayers[username] = {
-        disconnectedAt: Date.now(),
-        isHost: true,
-        timeout: setTimeout(() => {
-          // Only transfer/close if game still exists and host hasn't reconnected
-          if (games[gameCode] && games[gameCode].hostDisconnected) {
-            console.log(`[DISCONNECT] Host reconnect grace period expired for game ${gameCode}`);
-
-            // Remove from disconnected players
-            delete games[gameCode].disconnectedPlayers[username];
-
-            // Get remaining players (excluding the disconnected host)
-            const remainingPlayers = Object.keys(games[gameCode].users).filter(u => u !== username);
-
-            if (remainingPlayers.length > 0) {
-              // Transfer host to the first remaining player
-              const newHostUsername = remainingPlayers[0];
-              const newHostWs = games[gameCode].users[newHostUsername];
-
-              console.log(`[DISCONNECT] Transferring host from ${username} to ${newHostUsername}`);
-
-              games[gameCode].host = newHostWs;
-              games[gameCode].hostUsername = newHostUsername;
-              games[gameCode].hostDisconnected = false;
-              games[gameCode].hostDisconnectTimeout = null;
-
-              // Notify all players about the new host
-              sendAllPlayerAMessage(gameCode, {
-                action: "hostTransferred",
-                newHost: newHostUsername,
-                message: `${newHostUsername} is now the host`
-              });
-
-              // Update player list with new host info
-              broadcastPlayerList(gameCode);
-
-              // Save to Redis
-              saveGameState(gameCode, games[gameCode]).catch(err =>
-                console.error('[REDIS] Error saving game state:', err)
-              );
-            } else {
-              // No players left, close the room
-              console.log(`[DISCONNECT] No players left in game ${gameCode}, closing room`);
-              cleanupGameTimers(gameCode);
-              delete games[gameCode];
-
-              // Delete from Redis
-              deleteGameState(gameCode).catch(err =>
-                console.error('[REDIS] Error deleting game state:', err)
-              );
-
-              // Broadcast updated rooms list
-              if (wss) broadcastActiveRooms(wss);
-            }
-          }
-        }, 300000) // 5 minute grace period (300000ms)
-      };
+      console.log(`[DISCONNECT] Host ${username} disconnected from game ${gameCode}`);
 
       // Remove host from active users immediately
       delete game.users[username];
 
-      // Notify remaining players
-      broadcastPlayerList(gameCode);
-      broadcastLeaderboard(gameCode);
+      // Get remaining players (excluding the disconnected host)
+      const remainingPlayers = Object.keys(game.users);
+
+      if (remainingPlayers.length === 0) {
+        // No players left, start 20-second auto-close timer
+        console.log(`[DISCONNECT] No players left in game ${gameCode}, starting 20-second auto-close timer`);
+
+        // Clear any existing empty room timeout
+        if (game.emptyRoomTimeout) {
+          clearTimeout(game.emptyRoomTimeout);
+        }
+
+        // Start new 20-second timer to close the room
+        game.emptyRoomTimeout = setTimeout(() => {
+          if (games[gameCode] && Object.keys(games[gameCode].users).length === 0) {
+            console.log(`[AUTO-CLOSE] Empty room timer expired for ${gameCode}, closing room`);
+            cleanupGameTimers(gameCode);
+            delete games[gameCode];
+
+            // Delete from Redis
+            deleteGameState(gameCode).catch(err =>
+              console.error('[REDIS] Error deleting game state:', err)
+            );
+
+            // Broadcast updated rooms list
+            if (wss) broadcastActiveRooms(wss);
+          }
+        }, 20000); // 20 seconds
+      } else {
+        // There are remaining players, start grace period
+        console.log(`[DISCONNECT] ${remainingPlayers.length} player(s) remaining, starting grace period`);
+
+        // Store the host in disconnected players
+        if (!game.disconnectedPlayers) {
+          game.disconnectedPlayers = {};
+        }
+
+        // Mark host as disconnected
+        game.hostDisconnected = true;
+        game.disconnectedPlayers[username] = {
+          disconnectedAt: Date.now(),
+          isHost: true,
+          timeout: setTimeout(() => {
+            // Only transfer/close if game still exists and host hasn't reconnected
+            if (games[gameCode] && games[gameCode].hostDisconnected) {
+              console.log(`[DISCONNECT] Host reconnect grace period expired for game ${gameCode}`);
+
+              // Remove from disconnected players
+              delete games[gameCode].disconnectedPlayers[username];
+
+              // Get remaining players (excluding the disconnected host)
+              const remainingPlayers = Object.keys(games[gameCode].users).filter(u => u !== username);
+
+              if (remainingPlayers.length > 0) {
+                // Transfer host to the first remaining player
+                const newHostUsername = remainingPlayers[0];
+                const newHostWs = games[gameCode].users[newHostUsername];
+
+                console.log(`[DISCONNECT] Transferring host from ${username} to ${newHostUsername}`);
+
+                games[gameCode].host = newHostWs;
+                games[gameCode].hostUsername = newHostUsername;
+                games[gameCode].hostDisconnected = false;
+                games[gameCode].hostDisconnectTimeout = null;
+
+                // Notify all players about the new host
+                sendAllPlayerAMessage(gameCode, {
+                  action: "hostTransferred",
+                  newHost: newHostUsername,
+                  message: `${newHostUsername} is now the host`
+                });
+
+                // Update player list with new host info
+                broadcastPlayerList(gameCode);
+
+                // Save to Redis
+                saveGameState(gameCode, games[gameCode]).catch(err =>
+                  console.error('[REDIS] Error saving game state:', err)
+                );
+              } else {
+                // No players left, close the room
+                console.log(`[DISCONNECT] No players left in game ${gameCode}, closing room`);
+                cleanupGameTimers(gameCode);
+                delete games[gameCode];
+
+                // Delete from Redis
+                deleteGameState(gameCode).catch(err =>
+                  console.error('[REDIS] Error deleting game state:', err)
+                );
+
+                // Broadcast updated rooms list
+                if (wss) broadcastActiveRooms(wss);
+              }
+            }
+          }, 300000) // 5 minute grace period (300000ms)
+        };
+
+        // Notify remaining players
+        broadcastPlayerList(gameCode);
+        broadcastLeaderboard(gameCode);
+      }
     } else if (username && games[gameCode].users[username]) {
       // Player disconnected - give them a grace period to reconnect (30 seconds)
       console.log(`[DISCONNECT] Player ${username} disconnected from game ${gameCode}, starting grace period`);
@@ -861,18 +923,28 @@ const handleDisconnect = (ws, wss) => {
       broadcastLeaderboard(gameCode);
 
       // Check if game should end (if 0 players left, or 1 player left and game is playing)
-      // If 0 players, always end/delete.
+      // If 0 players, start 20-second auto-close timer.
       // If 1 player and playing, end game.
       const remainingPlayers = Object.keys(games[gameCode].users);
       if (remainingPlayers.length === 0) {
-         console.log(`[DISCONNECT] No players left in game ${gameCode}, closing room.`);
-         // Clean up all timers and timeouts
-         cleanupGameTimers(gameCode);
-         // Delete game
-         delete games[gameCode];
-         deleteGameState(gameCode).catch(e => console.error(e));
-         // Broadcast updated rooms list
-         if (wss) broadcastActiveRooms(wss);
+         console.log(`[DISCONNECT] No players left in game ${gameCode}, starting 20-second auto-close timer`);
+
+         // Clear any existing empty room timeout
+         if (games[gameCode].emptyRoomTimeout) {
+           clearTimeout(games[gameCode].emptyRoomTimeout);
+         }
+
+         // Start new 20-second timer to close the room
+         games[gameCode].emptyRoomTimeout = setTimeout(() => {
+           if (games[gameCode] && Object.keys(games[gameCode].users).length === 0) {
+             console.log(`[AUTO-CLOSE] Empty room timer expired for ${gameCode}, closing room`);
+             cleanupGameTimers(gameCode);
+             delete games[gameCode];
+             deleteGameState(gameCode).catch(e => console.error(e));
+             // Broadcast updated rooms list
+             if (wss) broadcastActiveRooms(wss);
+           }
+         }, 20000); // 20 seconds
       } else if (remainingPlayers.length <= 1 && games[gameCode].gameState === 'playing') {
          console.log(`[DISCONNECT] ${remainingPlayers.length} player(s) remain in game ${gameCode}, ending game automatically`);
          // Clear timer before ending game
