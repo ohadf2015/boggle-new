@@ -285,15 +285,15 @@ const GridComponent = ({
             </AnimatePresence>
 
             {/* Trail connector overlay */}
-            {selectedCells.length > 1 && (
+            {selectedCells.length > 1 && gridRef.current && (
                 <svg
                     className="absolute inset-0 pointer-events-none z-0"
                     style={{ width: '100%', height: '100%' }}
                 >
                     <defs>
                         <linearGradient id="trailGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                            <stop offset="0%" stopColor={comboLevel > 0 ? "#ff6b00" : "#fbbf24"} stopOpacity="0.8" />
-                            <stop offset="100%" stopColor={comboLevel > 0 ? "#ff0000" : "#f97316"} stopOpacity="0.8" />
+                            <stop offset="0%" stopColor={comboLevel > 0 ? "#ff6b00" : "#fbbf24"} stopOpacity={0.8} />
+                            <stop offset="100%" stopColor={comboLevel > 0 ? "#ff0000" : "#f97316"} stopOpacity={0.8} />
                         </linearGradient>
                         <filter id="glow">
                             <feGaussianBlur stdDeviation={comboLevel > 0 ? "3" : "2"} result="coloredBlur" />
@@ -319,11 +319,11 @@ const GridComponent = ({
                                 x2={end.x}
                                 y2={end.y}
                                 stroke="url(#trailGradient)"
-                                strokeWidth={comboLevel > 0 ? "4" : "3"}
+                                strokeWidth={comboLevel > 0 ? 4 : 3}
                                 strokeLinecap="round"
                                 filter="url(#glow)"
-                                initial={{ pathLength: 0, opacity: 0 }}
-                                animate={{ pathLength: 1, opacity: 1 }}
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
                                 transition={{ duration: 0.2, ease: "easeOut" }}
                             />
                         );
