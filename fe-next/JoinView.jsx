@@ -590,8 +590,8 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
                       >
                         <div className="flex items-center justify-between gap-3">
                           <div className="flex items-center gap-2">
-                            <span className="text-2xl" title={room.language === 'he' ? t('joinView.hebrew') : room.language === 'sv' ? t('joinView.swedish') : t('joinView.english')}>
-                              {room.language === 'he' ? '🇮🇱' : room.language === 'sv' ? '🇸🇪' : '🇺🇸'}
+                            <span className="text-2xl" title={room.language === 'he' ? t('joinView.hebrew') : room.language === 'sv' ? t('joinView.swedish') : room.language === 'ja' ? t('joinView.japanese') : t('joinView.english')}>
+                              {room.language === 'he' ? '🇮🇱' : room.language === 'sv' ? '🇸🇪' : room.language === 'ja' ? '🇯🇵' : '🇺🇸'}
                             </span>
                             <div>
                               <div className="font-bold text-lg text-cyan-400">{room.roomName || room.gameCode}</div>

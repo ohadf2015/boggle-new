@@ -804,7 +804,7 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
             {!gameStarted && (
               <div className="mb-4 flex justify-center">
                 <Badge variant="outline" className="text-lg px-4 py-1 border-cyan-500/50 text-cyan-600 dark:text-cyan-300">
-                  {roomLanguage === 'he' ? '🇮🇱 עברית' : roomLanguage === 'sv' ? '🇸🇪 Svenska' : '🇺🇸 English'}
+                  {roomLanguage === 'he' ? '🇮🇱 עברית' : roomLanguage === 'sv' ? '🇸🇪 Svenska' : roomLanguage === 'ja' ? '🇯🇵 日本語' : '🇺🇸 English'}
                 </Badge>
               </div>
             )}
