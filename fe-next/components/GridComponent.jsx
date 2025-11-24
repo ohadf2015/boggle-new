@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '../lib/utils';
 
 const GridComponent = ({
@@ -195,23 +195,40 @@ const GridComponent = ({
 
     return (
         <div className="relative">
-            {/* Combo Indicator */}
-            {comboLevel > 0 && comboColors.text && (
-                <motion.div
-                    initial={{ scale: 0, y: 20 }}
-                    animate={{ scale: 1, y: 0 }}
-                    exit={{ scale: 0, y: 20 }}
-                    className="absolute -top-12 left-1/2 transform -translate-x-1/2 z-20"
-                >
-                    <div className={cn(
-                        "px-6 py-2 rounded-full font-bold text-2xl text-white shadow-2xl",
-                        `bg-gradient-to-r ${comboColors.gradient}`,
-                        comboColors.shadow
-                    )}>
-                        {comboColors.text} COMBO!
-                    </div>
-                </motion.div>
-            )}
+            {/* Combo Indicator - Modern, compact, doesn't hide board */}
+            <AnimatePresence mode="wait">
+                {comboLevel > 0 && comboColors.text && (
+                    <motion.div
+                        key={`combo-${comboLevel}`}
+                        initial={{ scale: 0, opacity: 0, y: 10 }}
+                        animate={{
+                            scale: [0, 1.2, 1],
+                            opacity: 1,
+                            y: 0,
+                        }}
+                        exit={{
+                            scale: 0.8,
+                            opacity: 0,
+                            y: -10,
+                            transition: { duration: 0.2 }
+                        }}
+                        transition={{
+                            duration: 0.4,
+                            ease: "easeOut"
+                        }}
+                        className="absolute -top-8 right-0 z-50 pointer-events-none"
+                    >
+                        <div className={cn(
+                            "px-3 py-1 rounded-full font-extrabold text-sm text-white backdrop-blur-sm",
+                            `bg-gradient-to-r ${comboColors.gradient}`,
+                            comboColors.shadow,
+                            "border-2 border-white/30"
+                        )}>
+                            🔥 {comboColors.text}
+                        </div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
 
             <div
                 ref={gridRef}
