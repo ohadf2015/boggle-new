@@ -126,8 +126,14 @@ const GridComponent = ({
             if (onWordSubmit) {
                 onWordSubmit(formedWord);
             }
-            setSelectedCells([]);
-            setDirection(null); // Reset direction after word submission
+
+            // Delay clearing the selection to keep the trail visible longer
+            // Longer delay for combos to showcase the achievement
+            const clearDelay = comboLevel > 0 ? 800 : 500;
+            setTimeout(() => {
+                setSelectedCells([]);
+                setDirection(null); // Reset direction after word submission
+            }, clearDelay);
         }
     };
 
@@ -314,7 +320,10 @@ const GridComponent = ({
                                 opacity: 1,
                                 rotate: isSelected ? [0, -5, 5, 0] : 0
                             }}
-                            transition={{ duration: 0.2 }}
+                            transition={{
+                                duration: isSelected ? 0.3 : 0.6,
+                                ease: "easeOut"
+                            }}
                             className={cn(
                                 "aspect-square flex items-center justify-center font-bold shadow-sm cursor-pointer transition-all duration-200 border",
                                 isLargeGrid
