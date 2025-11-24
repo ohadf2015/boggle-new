@@ -13,7 +13,7 @@ export async function generateMetadata({ params }) {
         openGraph: {
             type: 'website',
             locale: seo.locale,
-            url: `https://www.lexiclash.live${locale === 'en' ? '/en' : ''}`,
+            url: `https://www.lexiclash.live${locale === 'en' ? '/en' : locale === 'sv' ? '/sv' : ''}`,
             title: seo.ogTitle,
             description: seo.ogDescription,
             siteName: 'LexiClash',
@@ -37,11 +37,12 @@ export async function generateMetadata({ params }) {
             apple: '/lexiclash.jpg',
         },
         alternates: {
-            canonical: `https://www.lexiclash.live${locale === 'en' ? '/en' : ''}`,
+            canonical: `https://www.lexiclash.live${locale === 'en' ? '/en' : locale === 'sv' ? '/sv' : ''}`,
             languages: {
                 'x-default': 'https://www.lexiclash.live',
                 he: 'https://www.lexiclash.live',
                 en: 'https://www.lexiclash.live/en',
+                sv: 'https://www.lexiclash.live/sv',
             },
         },
         other: {
@@ -51,7 +52,7 @@ export async function generateMetadata({ params }) {
 }
 
 export async function generateStaticParams() {
-    return [{ locale: 'he' }, { locale: 'en' }];
+    return [{ locale: 'he' }, { locale: 'en' }, { locale: 'sv' }];
 }
 
 export default async function LocaleLayout({ children, params }) {
@@ -77,9 +78,9 @@ export default async function LocaleLayout({ children, params }) {
             ratingCount: '150',
         },
         description: seo.description,
-        url: `https://www.lexiclash.live${locale === 'en' ? '/en' : ''}`,
+        url: `https://www.lexiclash.live${locale === 'en' ? '/en' : locale === 'sv' ? '/sv' : ''}`,
         image: 'https://www.lexiclash.live/lexiclash.jpg',
-        inLanguage: locale === 'en' ? 'en' : 'he',
+        inLanguage: locale === 'en' ? 'en' : locale === 'sv' ? 'sv' : 'he',
     };
 
     return (

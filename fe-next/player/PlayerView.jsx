@@ -296,7 +296,14 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
       return;
     }
 
-    const regex = currentLang === 'he' ? /^[\u0590-\u05FF]+$/ : /^[a-zA-Z]+$/;
+    let regex;
+    if (currentLang === 'he') {
+      regex = /^[\u0590-\u05FF]+$/;
+    } else if (currentLang === 'sv') {
+      regex = /^[a-zA-ZåäöÅÄÖ]+$/;
+    } else {
+      regex = /^[a-zA-Z]+$/;
+    }
     const trimmedWord = word.trim();
 
     // Min length validation
@@ -697,7 +704,14 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
                   const currentLang = gameLanguage;
                   if (!currentLang) return; // Game hasn't started
 
-                  const regex = currentLang === 'he' ? /^[\u0590-\u05FF]+$/ : /^[a-zA-Z]+$/;
+                  let regex;
+                  if (currentLang === 'he') {
+                    regex = /^[\u0590-\u05FF]+$/;
+                  } else if (currentLang === 'sv') {
+                    regex = /^[a-zA-ZåäöÅÄÖ]+$/;
+                  } else {
+                    regex = /^[a-zA-Z]+$/;
+                  }
 
                   if (formedWord.length < 2) {
                     toast.error(t('playerView.wordTooShort'), { duration: 1000, icon: '⚠️' });
