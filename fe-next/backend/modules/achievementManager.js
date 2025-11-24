@@ -19,7 +19,7 @@ const ACHIEVEMENT_ICONS = {
 
 // Get localized achievements based on locale
 const getLocalizedAchievements = (locale = 'he') => {
-  const supportedLocale = ['he', 'en', 'sv'].includes(locale) ? locale : 'he';
+  const supportedLocale = ['he', 'en', 'sv', 'ja'].includes(locale) ? locale : 'he';
   const t = translations[supportedLocale].achievements;
 
   const achievements = {};
