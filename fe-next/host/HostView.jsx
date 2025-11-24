@@ -518,9 +518,9 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
 
       {/* Validation Modal */}
       <Dialog open={showValidation} onOpenChange={setShowValidation}>
-        <DialogContent className="max-w-4xl max-h-[90vh] overflow-auto">
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-auto bg-white dark:bg-slate-800 border-indigo-500/30">
           <DialogHeader>
-            <DialogTitle className="text-center text-2xl sm:text-3xl text-indigo-600 font-bold">
+            <DialogTitle className="text-center text-2xl sm:text-3xl text-indigo-600 dark:text-indigo-400 font-bold">
               ✅ {t('hostView.validation')}
             </DialogTitle>
           </DialogHeader>
