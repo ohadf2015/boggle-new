@@ -436,6 +436,21 @@ export default function GamePage() {
         };
     }, [connectWebSocket, cleanup]);
 
+    const sendMessage = useCallback((message) => {
+        const ws = wsRef.current;
+        if (!ws) return;
+
+        if (ws.readyState === WebSocket.OPEN) {
+            ws.send(JSON.stringify(message));
+        } else if (ws.readyState === WebSocket.CONNECTING) {
+            const onOpen = () => {
+                ws.send(JSON.stringify(message));
+                ws.removeEventListener('open', onOpen);
+            };
+            ws.addEventListener('open', onOpen);
+        }
+    }, [wsRef]);
+
     // Host visibility change handler - reactivate room when host returns to the browser
     useEffect(() => {
         if (typeof window === 'undefined' || !isActive || !isHost) return;
@@ -508,21 +523,6 @@ export default function GamePage() {
             });
         }
     }, [connectionError]);
-
-    const sendMessage = useCallback((message) => {
-        const ws = wsRef.current;
-        if (!ws) return;
-
-        if (ws.readyState === WebSocket.OPEN) {
-            ws.send(JSON.stringify(message));
-        } else if (ws.readyState === WebSocket.CONNECTING) {
-            const onOpen = () => {
-                ws.send(JSON.stringify(message));
-                ws.removeEventListener('open', onOpen);
-            };
-            ws.addEventListener('open', onOpen);
-        }
-    }, [wsRef]);
 
     // Auto-join effect for players coming via invitation link with existing username
     useEffect(() => {
