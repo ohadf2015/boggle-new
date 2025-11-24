@@ -13,7 +13,6 @@ const GridComponent = ({
     comboLevel = 0
 }) => {
     const [internalSelectedCells, setInternalSelectedCells] = useState([]);
-    const [direction, setDirection] = useState(null); // Track the direction of movement
     const isTouchingRef = useRef(false);
     const gridRef = useRef(null);
 
@@ -28,32 +27,10 @@ const GridComponent = ({
         }
     }, [interactive]);
 
-    // Helper function to normalize direction to unit vector
-    const normalizeDirection = (rowDiff, colDiff) => {
-        // Return the direction as a unit vector (sign of the differences)
-        return {
-            row: rowDiff === 0 ? 0 : (rowDiff > 0 ? 1 : -1),
-            col: colDiff === 0 ? 0 : (colDiff > 0 ? 1 : -1)
-        };
-    };
-
-    // Helper function to check if a move continues in the same direction
-    const isValidDirection = (rowDiff, colDiff, currentDirection) => {
-        // If no direction set yet (first move), any adjacent cell is valid
-        if (!currentDirection) return true;
-
-        // Normalize the new direction
-        const newDir = normalizeDirection(rowDiff, colDiff);
-
-        // Check if the new direction matches the established direction
-        return newDir.row === currentDirection.row && newDir.col === currentDirection.col;
-    };
-
     const handleTouchStart = (rowIndex, colIndex, letter) => {
         if (!interactive) return;
         isTouchingRef.current = true;
         setSelectedCells([{ row: rowIndex, col: colIndex, letter }]);
-        setDirection(null); // Reset direction for new selection
         // Enhanced haptic feedback - medium vibration on start
         if (window.navigator && window.navigator.vibrate) {
             window.navigator.vibrate(30);
@@ -85,18 +62,13 @@ const GridComponent = ({
                 if (existingIndex === selectedCells.length - 2) {
                     setSelectedCells(prev => prev.slice(0, -1));
 
-                    // Reset direction if we're back to one cell (no direction established yet)
-                    if (selectedCells.length - 1 === 1) {
-                        setDirection(null);
-                    }
-
                     // Light vibration for backtracking
                     if (window.navigator && window.navigator.vibrate) window.navigator.vibrate(15);
                 }
                 return;
             }
 
-            // Validation Logic - only allow straight or diagonal lines
+            // Validation Logic - allow any adjacent cell (multi-directional)
             if (lastCell) {
                 const rowDiff = rowIndex - lastCell.row;
                 const colDiff = colIndex - lastCell.col;
@@ -104,14 +76,9 @@ const GridComponent = ({
                 // Must be adjacent (within 1 cell) but NOT the same cell
                 const isAdjacent = Math.abs(rowDiff) <= 1 && Math.abs(colDiff) <= 1 && !(rowDiff === 0 && colDiff === 0);
 
-                // Check if move continues in the same direction
-                if (isAdjacent && isValidDirection(rowDiff, colDiff, direction)) {
+                // Allow any adjacent cell - no direction restriction
+                if (isAdjacent) {
                     setSelectedCells(prev => [...prev, { row: rowIndex, col: colIndex, letter }]);
-
-                    // Set direction on the first move (when direction is null)
-                    if (!direction) {
-                        setDirection(normalizeDirection(rowDiff, colDiff));
-                    }
 
                     // Progressive vibration - longer word = more intense feedback
                     const vibrationIntensity = Math.min(20 + selectedCells.length * 3, 40);
@@ -154,7 +121,6 @@ const GridComponent = ({
             const clearDelay = comboLevel > 0 ? 800 : 500;
             setTimeout(() => {
                 setSelectedCells([]);
-                setDirection(null); // Reset direction after word submission
             }, clearDelay);
         }
     };
@@ -181,11 +147,6 @@ const GridComponent = ({
         if (existingIndex !== -1) {
             if (existingIndex === selectedCells.length - 2) {
                 setSelectedCells(prev => prev.slice(0, -1));
-
-                // Reset direction if we're back to one cell (no direction established yet)
-                if (selectedCells.length - 1 === 1) {
-                    setDirection(null);
-                }
             }
             return;
         }
@@ -197,14 +158,9 @@ const GridComponent = ({
             // Must be adjacent (within 1 cell) but NOT the same cell
             const isAdjacent = Math.abs(rowDiff) <= 1 && Math.abs(colDiff) <= 1 && !(rowDiff === 0 && colDiff === 0);
 
-            // Check if move continues in the same direction
-            if (isAdjacent && isValidDirection(rowDiff, colDiff, direction)) {
+            // Allow any adjacent cell - no direction restriction
+            if (isAdjacent) {
                 setSelectedCells(prev => [...prev, { row: rowIndex, col: colIndex, letter }]);
-
-                // Set direction on the first move (when direction is null)
-                if (!direction) {
-                    setDirection(normalizeDirection(rowDiff, colDiff));
-                }
             }
         }
     };
@@ -273,6 +229,24 @@ const GridComponent = ({
 
     const comboColors = getComboColors(comboLevel);
 
+    // Calculate cell positions for drawing trails
+    const getCellCenter = (rowIndex, colIndex) => {
+        if (!gridRef.current) return null;
+        const gridElement = gridRef.current;
+        const cells = gridElement.children;
+        const cellIndex = rowIndex * (grid[0]?.length || 4) + colIndex;
+        const cell = cells[cellIndex];
+        if (!cell) return null;
+
+        const cellRect = cell.getBoundingClientRect();
+        const gridRect = gridElement.getBoundingClientRect();
+
+        return {
+            x: cellRect.left - gridRect.left + cellRect.width / 2,
+            y: cellRect.top - gridRect.top + cellRect.height / 2
+        };
+    };
+
     return (
         <div className="relative">
             {/* Combo Indicator - Modern, compact, doesn't hide board */}
@@ -310,10 +284,57 @@ const GridComponent = ({
                 )}
             </AnimatePresence>
 
+            {/* Trail connector overlay */}
+            {selectedCells.length > 1 && (
+                <svg
+                    className="absolute inset-0 pointer-events-none z-0"
+                    style={{ width: '100%', height: '100%' }}
+                >
+                    <defs>
+                        <linearGradient id="trailGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" stopColor={comboLevel > 0 ? "#ff6b00" : "#fbbf24"} stopOpacity="0.8" />
+                            <stop offset="100%" stopColor={comboLevel > 0 ? "#ff0000" : "#f97316"} stopOpacity="0.8" />
+                        </linearGradient>
+                        <filter id="glow">
+                            <feGaussianBlur stdDeviation={comboLevel > 0 ? "3" : "2"} result="coloredBlur" />
+                            <feMerge>
+                                <feMergeNode in="coloredBlur" />
+                                <feMergeNode in="SourceGraphic" />
+                            </feMerge>
+                        </filter>
+                    </defs>
+                    {selectedCells.map((cell, index) => {
+                        if (index === 0) return null;
+                        const prevCell = selectedCells[index - 1];
+                        const start = getCellCenter(prevCell.row, prevCell.col);
+                        const end = getCellCenter(cell.row, cell.col);
+
+                        if (!start || !end) return null;
+
+                        return (
+                            <motion.line
+                                key={`trail-${index}`}
+                                x1={start.x}
+                                y1={start.y}
+                                x2={end.x}
+                                y2={end.y}
+                                stroke="url(#trailGradient)"
+                                strokeWidth={comboLevel > 0 ? "4" : "3"}
+                                strokeLinecap="round"
+                                filter="url(#glow)"
+                                initial={{ pathLength: 0, opacity: 0 }}
+                                animate={{ pathLength: 1, opacity: 1 }}
+                                transition={{ duration: 0.2, ease: "easeOut" }}
+                            />
+                        );
+                    })}
+                </svg>
+            )}
+
             <div
                 ref={gridRef}
                 className={cn(
-                    "grid touch-none select-none",
+                    "grid touch-none select-none relative",
                     isLargeGrid ? "gap-0.5 sm:gap-1" : "gap-1 sm:gap-1.5",
                     className
                 )}
@@ -361,12 +382,122 @@ const GridComponent = ({
                         >
                             {/* Ripple effect on selection */}
                             {isSelected && (
-                                <motion.div
-                                    className="absolute inset-0 bg-white/30 rounded-full"
-                                    initial={{ scale: 0, opacity: 0.5 }}
-                                    animate={{ scale: 2, opacity: 0 }}
-                                    transition={{ duration: 0.5 }}
-                                />
+                                <>
+                                    <motion.div
+                                        className="absolute inset-0 bg-white/30 rounded-full"
+                                        initial={{ scale: 0, opacity: 0.5 }}
+                                        animate={{ scale: 2, opacity: 0 }}
+                                        transition={{ duration: 0.5 }}
+                                    />
+
+                                    {/* Fire particles for combo */}
+                                    {comboLevel > 0 && (
+                                        <>
+                                            {/* Top-right fire particle */}
+                                            <motion.div
+                                                className="absolute -top-1 -right-1 w-2 h-2 rounded-full pointer-events-none"
+                                                style={{
+                                                    background: 'radial-gradient(circle, #ff6b00, #ff0000)',
+                                                    filter: 'blur(1px)'
+                                                }}
+                                                initial={{ scale: 0, opacity: 0 }}
+                                                animate={{
+                                                    scale: [1, 1.5, 1],
+                                                    opacity: [0.8, 1, 0.8],
+                                                    y: [-2, -4, -2],
+                                                }}
+                                                transition={{
+                                                    duration: 0.6,
+                                                    repeat: Infinity,
+                                                    ease: "easeInOut"
+                                                }}
+                                            />
+
+                                            {/* Top-left fire particle */}
+                                            <motion.div
+                                                className="absolute -top-1 -left-1 w-2 h-2 rounded-full pointer-events-none"
+                                                style={{
+                                                    background: 'radial-gradient(circle, #ffaa00, #ff6b00)',
+                                                    filter: 'blur(1px)'
+                                                }}
+                                                initial={{ scale: 0, opacity: 0 }}
+                                                animate={{
+                                                    scale: [1, 1.3, 1],
+                                                    opacity: [0.7, 1, 0.7],
+                                                    y: [-3, -5, -3],
+                                                }}
+                                                transition={{
+                                                    duration: 0.7,
+                                                    repeat: Infinity,
+                                                    ease: "easeInOut",
+                                                    delay: 0.1
+                                                }}
+                                            />
+
+                                            {/* Bottom-right fire particle */}
+                                            <motion.div
+                                                className="absolute -bottom-1 -right-1 w-2 h-2 rounded-full pointer-events-none"
+                                                style={{
+                                                    background: 'radial-gradient(circle, #ff9500, #ff5500)',
+                                                    filter: 'blur(1px)'
+                                                }}
+                                                initial={{ scale: 0, opacity: 0 }}
+                                                animate={{
+                                                    scale: [1, 1.4, 1],
+                                                    opacity: [0.6, 0.9, 0.6],
+                                                    y: [2, 4, 2],
+                                                }}
+                                                transition={{
+                                                    duration: 0.65,
+                                                    repeat: Infinity,
+                                                    ease: "easeInOut",
+                                                    delay: 0.2
+                                                }}
+                                            />
+
+                                            {/* Bottom-left fire particle */}
+                                            <motion.div
+                                                className="absolute -bottom-1 -left-1 w-2 h-2 rounded-full pointer-events-none"
+                                                style={{
+                                                    background: 'radial-gradient(circle, #ffcc00, #ff8800)',
+                                                    filter: 'blur(1px)'
+                                                }}
+                                                initial={{ scale: 0, opacity: 0 }}
+                                                animate={{
+                                                    scale: [1, 1.2, 1],
+                                                    opacity: [0.75, 1, 0.75],
+                                                    y: [3, 5, 3],
+                                                }}
+                                                transition={{
+                                                    duration: 0.8,
+                                                    repeat: Infinity,
+                                                    ease: "easeInOut",
+                                                    delay: 0.3
+                                                }}
+                                            />
+
+                                            {/* Pulsing glow effect for high combos */}
+                                            {comboLevel >= 2 && (
+                                                <motion.div
+                                                    className="absolute inset-0 rounded-lg pointer-events-none"
+                                                    style={{
+                                                        background: `radial-gradient(circle, ${comboLevel >= 4 ? 'rgba(168,85,247,0.4)' : 'rgba(255,107,0,0.3)'}, transparent)`,
+                                                        filter: 'blur(3px)'
+                                                    }}
+                                                    animate={{
+                                                        scale: [1, 1.3, 1],
+                                                        opacity: [0.5, 0.8, 0.5],
+                                                    }}
+                                                    transition={{
+                                                        duration: 1,
+                                                        repeat: Infinity,
+                                                        ease: "easeInOut"
+                                                    }}
+                                                />
+                                            )}
+                                        </>
+                                    )}
+                                </>
                             )}
                             {cell}
                         </motion.div>
