@@ -75,6 +75,8 @@ export const translations = {
       clearAndRestart: 'Clear and start over',
       english: 'English',
       hebrew: 'Hebrew',
+      swedish: 'Swedish',
+      japanese: 'Japanese',
       generateNewCode: 'Generate new code',
       createGameInstructions: 'Create a game and share the code with friends!',
       createNewRoom: 'Create a new room to get started!',
@@ -123,6 +125,10 @@ export const translations = {
       hostPlays: 'I want to play',
       spectatorMode: 'Spectator mode - watch the board',
       advancedSettings: 'Advanced Settings',
+      autoValidatedCount: 'words auto-validated',
+      roomClosedInactivity: 'Room closed due to inactivity',
+      gameOverCheckScores: 'Game Over! Check final scores',
+      validatingWords: 'Validating words...',
     },
     playerView: {
       waitingForHost: 'Waiting for host to start...',
@@ -158,6 +164,8 @@ export const translations = {
       longestWord: 'Longest',
       hostValidating: 'Host is validating words...',
       clickToSelect: 'Click letters to select words',
+      noWordsYet: 'No words found yet',
+      shuffle: 'Shuffle',
     },
     chat: {
       title: 'Room Chat',
@@ -408,6 +416,10 @@ export const translations = {
       hostPlays: 'אני רוצה לשחק',
       spectatorMode: 'מצב צפייה - צפה בלוח',
       advancedSettings: 'הגדרות מתקדמות',
+      autoValidatedCount: 'מילים אומתו אוטומטית',
+      roomClosedInactivity: 'החדר נסגר עקב חוסר פעילות',
+      gameOverCheckScores: 'המשחק נגמר! בדוק את התוצאות הסופיות',
+      validatingWords: 'מאמת מילים...',
     },
     playerView: {
       waitingForHost: 'ממתין למארח שיתחיל...',
@@ -443,6 +455,8 @@ export const translations = {
       longestWord: 'הארוכה ביותר',
       hostValidating: 'המארח מאמת מילים...',
       clickToSelect: 'לחץ על אותיות כדי לבחור מילים',
+      noWordsYet: 'לא נמצאו מילים עדיין',
+      shuffle: 'ערבב',
     },
     chat: {
       title: 'צ\'אט החדר',
@@ -693,6 +707,10 @@ export const translations = {
       hostPlays: 'Jag vill spela',
       spectatorMode: 'Åskådarläge - titta på brädet',
       advancedSettings: 'Avancerade inställningar',
+      autoValidatedCount: 'ord automatiskt validerade',
+      roomClosedInactivity: 'Rummet stängt på grund av inaktivitet',
+      gameOverCheckScores: 'Spelet slut! Kolla slutresultaten',
+      validatingWords: 'Validerar ord...',
     },
     playerView: {
       waitingForHost: 'Väntar på att värden ska starta...',
@@ -728,6 +746,8 @@ export const translations = {
       longestWord: 'Längsta',
       hostValidating: 'Värden validerar ord...',
       clickToSelect: 'Klicka på bokstäver för att välja ord',
+      noWordsYet: 'Inga ord hittade ännu',
+      shuffle: 'Blanda',
     },
     chat: {
       title: 'Rumschatt',
@@ -978,6 +998,10 @@ export const translations = {
       hostPlays: 'プレイしたい',
       spectatorMode: '観戦モード - ボードを見る',
       advancedSettings: '詳細設定',
+      autoValidatedCount: '単語が自動検証されました',
+      roomClosedInactivity: '非アクティブのためルームが閉じられました',
+      gameOverCheckScores: 'ゲームオーバー！最終スコアを確認してください',
+      validatingWords: '単語を検証しています...',
     },
     playerView: {
       waitingForHost: 'ホストが開始するのを待っています...',
@@ -1013,6 +1037,8 @@ export const translations = {
       longestWord: '最長',
       hostValidating: 'ホストが単語を検証しています...',
       clickToSelect: '文字をクリックして単語を選択',
+      noWordsYet: 'まだ単語が見つかりません',
+      shuffle: 'シャッフル',
     },
     chat: {
       title: 'ルームチャット',

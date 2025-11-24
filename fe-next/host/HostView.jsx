@@ -200,7 +200,7 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
 
           // Show notification about auto-validated words
           if (message.autoValidatedCount > 0) {
-            toast.success(`${message.autoValidatedCount} מילים אומתו אוטומטית`, {
+            toast.success(`${message.autoValidatedCount} ${t('hostView.autoValidatedCount')}`, {
               duration: 5000,
               icon: '✅',
             });
@@ -235,7 +235,7 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
 
         case 'roomClosedDueToInactivity':
           intentionalExitRef.current = true;
-          toast.error(message.message || 'החדר נסגר עקב חוסר פעילות', {
+          toast.error(message.message || t('hostView.roomClosedInactivity'), {
             icon: '⏰',
             duration: 5000,
           });
@@ -258,7 +258,7 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
               spread: 80,
               origin: { y: 0.6 },
             });
-            toast.success('Game Over! Check final scores', {
+            toast.success(t('hostView.gameOverCheckScores'), {
               icon: '🏁',
               duration: 5000,
             });
@@ -407,7 +407,7 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
       validations: validationArray,
     }));
 
-    toast.loading('Validating words...', {
+    toast.loading(t('hostView.validatingWords'), {
       duration: 2000,
     });
   };
