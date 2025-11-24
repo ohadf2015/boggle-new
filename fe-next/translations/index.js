@@ -122,6 +122,7 @@ export const translations = {
       autoValidated: 'Auto-validated',
       hostPlays: 'I want to play',
       spectatorMode: 'Spectator mode - watch the board',
+      advancedSettings: 'Advanced Settings',
     },
     playerView: {
       waitingForHost: 'Waiting for host to start...',
@@ -406,6 +407,7 @@ export const translations = {
       autoValidated: 'אומתה אוטומטית',
       hostPlays: 'אני רוצה לשחק',
       spectatorMode: 'מצב צפייה - צפה בלוח',
+      advancedSettings: 'הגדרות מתקדמות',
     },
     playerView: {
       waitingForHost: 'ממתין למארח שיתחיל...',
@@ -690,6 +692,7 @@ export const translations = {
       autoValidated: 'Automatiskt validerat',
       hostPlays: 'Jag vill spela',
       spectatorMode: 'Åskådarläge - titta på brädet',
+      advancedSettings: 'Avancerade inställningar',
     },
     playerView: {
       waitingForHost: 'Väntar på att värden ska starta...',
@@ -974,6 +977,7 @@ export const translations = {
       autoValidated: '自動検証済み',
       hostPlays: 'プレイしたい',
       spectatorMode: '観戦モード - ボードを見る',
+      advancedSettings: '詳細設定',
     },
     playerView: {
       waitingForHost: 'ホストが開始するのを待っています...',

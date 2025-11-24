@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import confetti from 'canvas-confetti';
 import toast, { Toaster } from 'react-hot-toast';
-import { FaTrophy, FaClock, FaUsers, FaQrcode, FaSignOutAlt, FaWhatsapp, FaLink, FaCog, FaPlus, FaMinus, FaCrown, FaTrash } from 'react-icons/fa';
+import { FaTrophy, FaClock, FaUsers, FaQrcode, FaSignOutAlt, FaWhatsapp, FaLink, FaCog, FaPlus, FaMinus, FaCrown, FaTrash, FaChevronDown, FaChevronUp } from 'react-icons/fa';
 import { QRCodeSVG } from 'qrcode.react';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
@@ -46,6 +46,7 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
   const [showQR, setShowQR] = useState(false);
   const [playerWordCounts, setPlayerWordCounts] = useState({});
   const [showStartAnimation, setShowStartAnimation] = useState(false);
+  const [showAdvancedSettings, setShowAdvancedSettings] = useState(false);
 
   // Host playing states
   const [hostPlaying, setHostPlaying] = useState(true); // Default: host plays
@@ -270,8 +271,8 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
 
             // Combo system: only increase combo for validated words
             const now = Date.now();
-            if (lastWordTime && (now - lastWordTime) < 3000) {
-              // Within 3 seconds - increase combo!
+            if (lastWordTime && (now - lastWordTime) < 5000) {
+              // Within 5 seconds - increase combo!
               setComboLevel(prev => Math.min(prev + 1, 4)); // Max combo level 4
             } else {
               // Too slow, reset combo
@@ -284,11 +285,11 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
               clearTimeout(comboTimeoutRef.current);
             }
 
-            // Reset combo after 3 seconds of inactivity
+            // Reset combo after 5 seconds of inactivity
             comboTimeoutRef.current = setTimeout(() => {
               setComboLevel(0);
               setLastWordTime(null);
-            }, 3000);
+            }, 5000);
           }
           break;
 
@@ -721,54 +722,8 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
             <div className="w-full space-y-4">
               {!gameStarted ? (
                 <>
-                  {/* Host Play Option */}
-                  <div className="flex items-center gap-2 p-3 bg-slate-100 dark:bg-slate-700/50 rounded-md border border-purple-500/30">
-                    <Checkbox
-                      id="hostPlays"
-                      checked={hostPlaying}
-                      onCheckedChange={setHostPlaying}
-                      className="border-purple-500/50"
-                    />
-                    <label htmlFor="hostPlays" className="text-sm font-medium text-purple-600 dark:text-purple-300 cursor-pointer">
-                      {t('hostView.hostPlays')}
-                    </label>
-                  </div>
-
-                  {/* Difficulty Selection + Timer - Inline Layout with Separator */}
-                  <div className="flex flex-wrap gap-4 items-center">
-                    {/* Difficulty Buttons Group */}
-                    <div className="flex flex-wrap gap-2">
-                      {Object.keys(DIFFICULTIES).map((key) => {
-                        const isSelected = difficulty === key;
-                        return (
-                          <motion.button
-                            key={key}
-                            onClick={() => setDifficulty(key)}
-                            whileHover={{ scale: 1.02 }}
-                            whileTap={{ scale: 0.98 }}
-                            className={cn(
-                              "px-3 py-2 rounded-md font-medium transition-all duration-300",
-                              isSelected
-                                ? "bg-gradient-to-r from-cyan-500 to-teal-500 text-white text-sm shadow-[0_0_15px_rgba(6,182,212,0.4)]"
-                                : "bg-slate-100 dark:bg-slate-700/60 text-slate-600 dark:text-slate-300 text-xs hover:bg-slate-200 dark:hover:bg-slate-600/60 border border-slate-200 dark:border-slate-600/50 hover:border-cyan-500/30"
-                            )}
-                          >
-                            <div className="flex flex-col items-center gap-0.5">
-                              <span className="font-bold">{t(DIFFICULTIES[key].nameKey)}</span>
-                              <span className="text-xs opacity-90">
-                                ({DIFFICULTIES[key].rows}x{DIFFICULTIES[key].cols})
-                              </span>
-                            </div>
-                          </motion.button>
-                        );
-                      })}
-                    </div>
-
-                    {/* Vertical Separator - Neon */}
-                    <div className="hidden sm:block w-px h-12 bg-gradient-to-b from-transparent via-cyan-500/50 to-transparent"></div>
-
-                    {/* Timer Input - Neon Style */}
-                    <div className="flex items-center gap-2 bg-slate-100 dark:bg-slate-700/50 border border-purple-500/30 px-3 py-2 rounded-md">
+                  {/* Timer Input - Neon Style */}
+                  <div className="flex items-center gap-2 bg-slate-100 dark:bg-slate-700/50 border border-purple-500/30 px-3 py-2 rounded-md">
                       <FaClock className="text-purple-600 dark:text-purple-400 text-sm" />
 
                       {/* Minus Button */}
@@ -808,7 +763,77 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
 
                       <span className="text-sm text-purple-600 dark:text-purple-300 font-medium mr-2">{t('hostView.minutes')}</span>
                     </div>
-                  </div>
+
+                  {/* Advanced Settings Toggle */}
+                  <button
+                    type="button"
+                    onClick={() => setShowAdvancedSettings(!showAdvancedSettings)}
+                    className="w-full flex items-center justify-between p-3 bg-slate-100 dark:bg-slate-700/50 rounded-md border border-purple-500/30 hover:bg-slate-200 dark:hover:bg-slate-600/50 transition-all"
+                  >
+                    <span className="text-sm font-medium text-purple-600 dark:text-purple-300">
+                      {t('hostView.advancedSettings')}
+                    </span>
+                    {showAdvancedSettings ? <FaChevronUp className="text-purple-600 dark:text-purple-400" /> : <FaChevronDown className="text-purple-600 dark:text-purple-400" />}
+                  </button>
+
+                  {/* Collapsible Advanced Settings */}
+                  <AnimatePresence>
+                    {showAdvancedSettings && (
+                      <motion.div
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: 'auto', opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        transition={{ duration: 0.3 }}
+                        className="overflow-hidden space-y-4"
+                      >
+                        {/* Host Play Option */}
+                        <div className="flex items-center gap-2 p-3 bg-slate-100 dark:bg-slate-700/50 rounded-md border border-purple-500/30">
+                          <Checkbox
+                            id="hostPlays"
+                            checked={hostPlaying}
+                            onCheckedChange={setHostPlaying}
+                            className="border-purple-500/50"
+                          />
+                          <label htmlFor="hostPlays" className="text-sm font-medium text-purple-600 dark:text-purple-300 cursor-pointer">
+                            {t('hostView.hostPlays')}
+                          </label>
+                        </div>
+
+                        {/* Difficulty Selection */}
+                        <div className="space-y-2">
+                          <label className="text-sm font-medium text-purple-600 dark:text-purple-300">
+                            {t('hostView.difficulty')}
+                          </label>
+                          <div className="flex flex-wrap gap-2">
+                            {Object.keys(DIFFICULTIES).map((key) => {
+                              const isSelected = difficulty === key;
+                              return (
+                                <motion.button
+                                  key={key}
+                                  onClick={() => setDifficulty(key)}
+                                  whileHover={{ scale: 1.02 }}
+                                  whileTap={{ scale: 0.98 }}
+                                  className={cn(
+                                    "px-3 py-2 rounded-md font-medium transition-all duration-300",
+                                    isSelected
+                                      ? "bg-gradient-to-r from-cyan-500 to-teal-500 text-white text-sm shadow-[0_0_15px_rgba(6,182,212,0.4)]"
+                                      : "bg-slate-100 dark:bg-slate-700/60 text-slate-600 dark:text-slate-300 text-xs hover:bg-slate-200 dark:hover:bg-slate-600/60 border border-slate-200 dark:border-slate-600/50 hover:border-cyan-500/30"
+                                  )}
+                                >
+                                  <div className="flex flex-col items-center gap-0.5">
+                                    <span className="font-bold">{t(DIFFICULTIES[key].nameKey)}</span>
+                                    <span className="text-xs opacity-90">
+                                      ({DIFFICULTIES[key].rows}x{DIFFICULTIES[key].cols})
+                                    </span>
+                                  </div>
+                                </motion.button>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
 
                   {/* Start Button - Neon Glow */}
                   <div className="pt-2 flex justify-center">
@@ -998,7 +1023,6 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
                           word: formedWord.toLowerCase(),
                         }));
                         setHostFoundWords(prev => [...prev, formedWord]);
-                        toast.success(`${t('playerView.wordSubmitted')}: ${formedWord}`, { duration: 1000, icon: '📤' });
                       } else {
                         toast.error(t('playerView.onlyLanguageWords'), { duration: 1000 });
                       }
