@@ -69,12 +69,16 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
 
   const handleRoomSelect = (roomCode) => {
     setGameCode(roomCode);
-    // If we are in "join" mode, we want to show the username input now
-    // If the user clicked a room from the list, they likely want to join it
-    // We can simulate this by ensuring we are in 'join' mode and maybe focusing the username input
     setMode('join');
-    // If we were in a "prefilled" state or just browsing, we want to ensure the form is visible and ready
     setShowFullForm(true);
+
+    // Auto-join if username is already set
+    if (username && username.trim()) {
+      // Small delay to let state update, then auto-join
+      setTimeout(() => {
+        handleJoin(false);
+      }, 100);
+    }
   };
 
   const handleQuickJoin = (e) => {
