@@ -29,6 +29,14 @@ export const translations = {
       understood: 'Got it, let\'s play!',
       refresh: 'Refresh',
     },
+    share: {
+      linkCopied: 'Link copied! 📋',
+      copyError: 'Error copying link',
+      inviteMessage: 'Join me to play LexiClash!',
+      room: 'Room',
+      code: 'Code',
+      joinViaLink: 'Join via this link',
+    },
     errors: {
       unstableConnection: 'Internet connection is unstable - you may experience issues during the game',
       slowConnection: 'Internet connection is slow',
@@ -334,6 +342,14 @@ export const translations = {
       close: 'סגור',
       understood: 'הבנתי, בוא נשחק!',
       refresh: 'רענן',
+    },
+    share: {
+      linkCopied: 'הקישור הועתק ללוח! 📋',
+      copyError: 'שגיאה בהעתקת הקישור',
+      inviteMessage: 'בואו לשחק LexiClash איתי!',
+      room: 'חדר',
+      code: 'קוד',
+      joinViaLink: 'הצטרפו דרך הקישור',
     },
     errors: {
       unstableConnection: 'חיבור האינטרנט לא יציב - ייתכנו בעיות במשחק',
@@ -641,6 +657,14 @@ export const translations = {
       understood: 'Förstått, låt oss spela!',
       refresh: 'Uppdatera',
     },
+    share: {
+      linkCopied: 'Länk kopierad! 📋',
+      copyError: 'Fel vid kopiering av länk',
+      inviteMessage: 'Gå med mig för att spela LexiClash!',
+      room: 'Rum',
+      code: 'Kod',
+      joinViaLink: 'Gå med via denna länk',
+    },
     errors: {
       unstableConnection: 'Internetanslutningen är instabil - du kan uppleva problem under spelet',
       slowConnection: 'Långsam internetanslutning',
@@ -946,6 +970,14 @@ export const translations = {
       close: '閉じる',
       understood: 'わかりました、プレイしましょう！',
       refresh: '更新',
+    },
+    share: {
+      linkCopied: 'リンクをコピーしました！📋',
+      copyError: 'リンクのコピーエラー',
+      inviteMessage: '私と一緒にLexiClashをプレイしましょう！',
+      room: 'ルーム',
+      code: 'コード',
+      joinViaLink: 'このリンクから参加',
     },
     errors: {
       unstableConnection: 'インターネット接続が不安定です - ゲーム中に問題が発生する可能性があります',

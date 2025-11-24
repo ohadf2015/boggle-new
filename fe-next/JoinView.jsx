@@ -513,14 +513,14 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
                   <div className="flex flex-wrap gap-2 justify-center">
                     <ShareButton
                       variant="link"
-                      onClick={() => copyJoinUrl(gameCode)}
+                      onClick={() => copyJoinUrl(gameCode, t)}
                       icon={<FaLink />}
                     >
                       {t('joinView.copyLink')}
                     </ShareButton>
                     <ShareButton
                       variant="whatsapp"
-                      onClick={() => shareViaWhatsApp(gameCode, roomName)}
+                      onClick={() => shareViaWhatsApp(gameCode, roomName, t)}
                       icon={<FaWhatsapp />}
                     >
                       {t('joinView.shareWhatsapp')}
@@ -665,14 +665,14 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
           </DialogHeader>
           <div className="flex flex-col items-center gap-4 py-4">
             <div className="p-6 bg-white rounded-lg shadow-md">
-              <QRCodeSVG value={getJoinUrl()} size={250} level="H" includeMargin />
+              <QRCodeSVG value={getJoinUrl(gameCode)} size={250} level="H" includeMargin />
             </div>
             <h4 className="text-3xl font-bold text-cyan-400">{gameCode}</h4>
             <p className="text-sm text-center text-slate-600 dark:text-gray-300">
               {t('joinView.scanToJoin')} {gameCode}
             </p>
             <p className="text-xs text-center text-slate-500 dark:text-gray-400 mt-2">
-              {getJoinUrl()}
+              {getJoinUrl(gameCode)}
             </p>
           </div>
           <DialogFooter className="sm:justify-center">
