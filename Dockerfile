@@ -1,33 +1,35 @@
 # Multi-stage build for production
-FROM node:18-alpine AS builder
+FROM node:20-alpine AS builder
 
 WORKDIR /app
 
 # Copy package files
-COPY fe/package*.json ./fe/
-COPY be/package*.json ./be/
+COPY fe-next/package*.json ./
 
-# Install frontend dependencies and build
-WORKDIR /app/fe
+# Install dependencies
 RUN npm install
-COPY fe/ .
+
+# Copy application files
+COPY fe-next/ ./
+
+# Build Next.js app
 RUN npm run build
 
-# Install backend dependencies
-WORKDIR /app/be
-RUN npm install --production
-COPY be/ .
-
 # Production stage
-FROM node:18-alpine
+FROM node:20-alpine
 
 WORKDIR /app
 
-# Copy backend and built frontend
-COPY --from=builder /app/be ./be
-COPY --from=builder /app/fe/build ./fe/build
-
-WORKDIR /app/be
+# Copy built app and dependencies
+COPY --from=builder /app/package*.json ./
+COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/.next ./.next
+COPY --from=builder /app/public ./public
+COPY --from=builder /app/server.js ./
+COPY --from=builder /app/backend ./backend
+COPY --from=builder /app/utils ./utils
+COPY --from=builder /app/contexts ./contexts
+COPY --from=builder /app/lib ./lib
 
 # Expose port
 EXPOSE 3001
