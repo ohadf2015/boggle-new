@@ -25,6 +25,8 @@ const {
   handleResetGame,
   broadcastActiveRooms,
   handleChatMessage,
+  handleHostReactivate,
+  handleHostKeepAlive,
 } = require("./backend/handlers");
 
 const dev = process.env.NODE_ENV !== "production";
@@ -172,6 +174,12 @@ app.prepare().then(() => {
             break;
           case "chatMessage":
             handleChatMessage(ws, message.gameCode, message.username, message.message, message.isHost);
+            break;
+          case "hostReactivate":
+            handleHostReactivate(ws, message.gameCode, wss);
+            break;
+          case "hostKeepAlive":
+            handleHostKeepAlive(ws, message.gameCode, wss);
             break;
           default:
             console.warn(`Unknown action: ${action}`);

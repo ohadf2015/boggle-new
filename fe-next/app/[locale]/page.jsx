@@ -21,6 +21,7 @@ const WS_CONFIG = {
     HEARTBEAT_INTERVAL: 25000,
     HIGH_LATENCY_THRESHOLD: 1000,
     VERY_HIGH_LATENCY_THRESHOLD: 3000,
+    HOST_REACTIVATION_INTERVAL: 30000, // Send reactivation signal every 30 seconds when visible
 };
 
 let globalWsInstance = null;
@@ -254,6 +255,10 @@ export default function GamePage() {
     const [shouldAutoJoin, setShouldAutoJoin] = useState(false);
     const [prefilledRoomCode, setPrefilledRoomCode] = useState('');
 
+    // Track host reactivation
+    const hostReactivationIntervalRef = useRef(null);
+    const lastVisibilityChangeRef = useRef(Date.now());
+
     useEffect(() => {
         if (typeof window === 'undefined') return;
 
@@ -431,6 +436,66 @@ export default function GamePage() {
         };
     }, [connectWebSocket, cleanup]);
 
+    // Host visibility change handler - reactivate room when host returns to the browser
+    useEffect(() => {
+        if (typeof window === 'undefined' || !isActive || !isHost) return;
+
+        const handleVisibilityChange = () => {
+            if (document.visibilityState === 'visible') {
+                lastVisibilityChangeRef.current = Date.now();
+
+                // Send reactivation signal immediately when host returns
+                if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN && gameCode) {
+                    sendMessage({
+                        action: 'hostReactivate',
+                        gameCode,
+                        timestamp: Date.now()
+                    });
+                }
+            }
+        };
+
+        // Set up periodic keep-alive when host is active and visible
+        const startKeepAlive = () => {
+            if (hostReactivationIntervalRef.current) {
+                clearInterval(hostReactivationIntervalRef.current);
+            }
+
+            hostReactivationIntervalRef.current = setInterval(() => {
+                if (document.visibilityState === 'visible' &&
+                    wsRef.current &&
+                    wsRef.current.readyState === WebSocket.OPEN &&
+                    gameCode) {
+                    sendMessage({
+                        action: 'hostKeepAlive',
+                        gameCode,
+                        timestamp: Date.now()
+                    });
+                }
+            }, WS_CONFIG.HOST_REACTIVATION_INTERVAL);
+        };
+
+        document.addEventListener('visibilitychange', handleVisibilityChange);
+        startKeepAlive();
+
+        // Send initial reactivation signal
+        if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN && gameCode) {
+            sendMessage({
+                action: 'hostReactivate',
+                gameCode,
+                timestamp: Date.now()
+            });
+        }
+
+        return () => {
+            document.removeEventListener('visibilitychange', handleVisibilityChange);
+            if (hostReactivationIntervalRef.current) {
+                clearInterval(hostReactivationIntervalRef.current);
+                hostReactivationIntervalRef.current = null;
+            }
+        };
+    }, [isActive, isHost, gameCode, sendMessage, wsRef]);
+
     useEffect(() => {
         setMessageHandler(handleWebSocketMessage);
     }, [handleWebSocketMessage, setMessageHandler]);
@@ -461,7 +526,8 @@ export default function GamePage() {
 
     // Auto-join effect for players coming via invitation link with existing username
     useEffect(() => {
-        if (!shouldAutoJoin || !wsRef.current || wsRef.current.readyState !== WebSocket.OPEN || isActive || attemptingReconnect) {
+        // Use `ws` state variable which updates when WebSocket becomes ready
+        if (!shouldAutoJoin || !ws || ws.readyState !== WebSocket.OPEN || isActive || attemptingReconnect) {
             return;
         }
 
@@ -470,10 +536,11 @@ export default function GamePage() {
             sendMessage({ action: 'join', gameCode: prefilledRoomCode, username });
             setShouldAutoJoin(false); // Prevent re-triggering
         }
-    }, [shouldAutoJoin, prefilledRoomCode, username, isActive, attemptingReconnect, wsRef, sendMessage]);
+    }, [shouldAutoJoin, prefilledRoomCode, username, isActive, attemptingReconnect, ws, sendMessage]);
 
     useEffect(() => {
-        if (!attemptingReconnect || !wsRef.current || wsRef.current.readyState !== WebSocket.OPEN || isActive) {
+        // Use `ws` state variable which updates when WebSocket becomes ready
+        if (!attemptingReconnect || !ws || ws.readyState !== WebSocket.OPEN || isActive) {
             return;
         }
 
@@ -517,7 +584,7 @@ export default function GamePage() {
         }, 1000); // 1 second delay to allow disconnect to process
 
         return () => clearTimeout(reconnectTimeout);
-    }, [attemptingReconnect, isActive, sendMessage, wsRef, language]);
+    }, [attemptingReconnect, isActive, sendMessage, ws, language]);
 
     const handleJoin = useCallback((isHostMode, roomLanguage) => {
         setError('');
