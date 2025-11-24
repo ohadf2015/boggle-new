@@ -1,55 +1,79 @@
 // Achievement definitions and checking logic
+const { translations } = require('../../translations/index.js');
 
-// Achievement definitions (Hebrew) - Expanded
-const ACHIEVEMENTS = {
-  FIRST_BLOOD: { name: 'דם ראשון', description: 'ראשון למצוא מילה', icon: '🎯' },
-  SPEED_DEMON: { name: 'שד המהירות', description: 'מצא 10 מילים ב-2 דקות', icon: '⚡' },
-  WORD_MASTER: { name: 'אדון המילים', description: 'מצא מילה בת 7+ אותיות', icon: '📚' },
-  COMBO_KING: { name: 'מלך הקומבו', description: '5 מילים ברצף', icon: '🔥' },
-  PERFECTIONIST: { name: 'פרפקציוניסט', description: 'כל המילים תקינות', icon: '✨' },
-  LEXICON: { name: 'לקסיקון', description: 'מצא 20+ מילים', icon: '🏆' },
-  WORDSMITH: { name: 'צורף מילים', description: 'מצא 15 מילים תקינות', icon: '🎓' },
-  QUICK_THINKER: { name: 'חושב מהיר', description: 'מצא מילה בתוך 10 שניות', icon: '💨' },
-  LONG_HAULER: { name: 'מרתונאי', description: 'מצא מילה בדקה האחרונה', icon: '🏃' },
-  DIVERSE_VOCABULARY: { name: 'אוצר מילים מגוון', description: 'מצא מילים באורכים שונים', icon: '🌈' },
-  DOUBLE_TROUBLE: { name: 'צמד מנצח', description: 'מצא 2 מילים בתוך 5 שניות', icon: '⚡⚡' },
-  TREASURE_HUNTER: { name: 'צייד אוצרות', description: 'מצא מילה נדירה (8+ אותיות)', icon: '💎' },
+// Achievement icons (language-independent)
+const ACHIEVEMENT_ICONS = {
+  FIRST_BLOOD: '🎯',
+  SPEED_DEMON: '⚡',
+  WORD_MASTER: '📚',
+  COMBO_KING: '🔥',
+  PERFECTIONIST: '✨',
+  LEXICON: '🏆',
+  WORDSMITH: '🎓',
+  QUICK_THINKER: '💨',
+  LONG_HAULER: '🏃',
+  DIVERSE_VOCABULARY: '🌈',
+  DOUBLE_TROUBLE: '⚡⚡',
+  TREASURE_HUNTER: '💎',
 };
+
+// Get localized achievements based on locale
+const getLocalizedAchievements = (locale = 'he') => {
+  const supportedLocale = ['he', 'en', 'sv'].includes(locale) ? locale : 'he';
+  const t = translations[supportedLocale].achievements;
+
+  const achievements = {};
+  Object.keys(ACHIEVEMENT_ICONS).forEach(key => {
+    achievements[key] = {
+      name: t[key].name,
+      description: t[key].description,
+      icon: ACHIEVEMENT_ICONS[key]
+    };
+  });
+
+  return achievements;
+};
+
+// Legacy support - default to Hebrew
+const ACHIEVEMENTS = getLocalizedAchievements('he');
 
 // Check and award LIVE achievements during gameplay (selective achievements only)
 const checkLiveAchievements = (game, username, word, timeSinceStart) => {
   const achievements = game.playerAchievements[username];
   const newAchievements = [];
 
+  // Get localized achievements based on game language
+  const localizedAchievements = getLocalizedAchievements(game.language || 'he');
+
   // First Blood - first word in the game (LIVE)
   if (!game.firstWordFound && !achievements.includes('FIRST_BLOOD')) {
     game.firstWordFound = true;
     achievements.push('FIRST_BLOOD');
-    newAchievements.push(ACHIEVEMENTS.FIRST_BLOOD);
+    newAchievements.push(localizedAchievements.FIRST_BLOOD);
   }
 
   // Word Master - 7+ letter word (LIVE)
   if (word.length >= 7 && !achievements.includes('WORD_MASTER')) {
     achievements.push('WORD_MASTER');
-    newAchievements.push(ACHIEVEMENTS.WORD_MASTER);
+    newAchievements.push(localizedAchievements.WORD_MASTER);
   }
 
   // Treasure Hunter - 8+ letter word (LIVE)
   if (word.length >= 8 && !achievements.includes('TREASURE_HUNTER')) {
     achievements.push('TREASURE_HUNTER');
-    newAchievements.push(ACHIEVEMENTS.TREASURE_HUNTER);
+    newAchievements.push(localizedAchievements.TREASURE_HUNTER);
   }
 
   // Quick Thinker - word within 10 seconds (LIVE)
   if (timeSinceStart <= 10 && !achievements.includes('QUICK_THINKER')) {
     achievements.push('QUICK_THINKER');
-    newAchievements.push(ACHIEVEMENTS.QUICK_THINKER);
+    newAchievements.push(localizedAchievements.QUICK_THINKER);
   }
 
   // Speed Demon - 10 words in 2 minutes (LIVE)
   if (game.playerWords[username].length >= 10 && timeSinceStart <= 120 && !achievements.includes('SPEED_DEMON')) {
     achievements.push('SPEED_DEMON');
-    newAchievements.push(ACHIEVEMENTS.SPEED_DEMON);
+    newAchievements.push(localizedAchievements.SPEED_DEMON);
   }
 
   // Combo King - multiples of 5 words (LIVE)
@@ -57,19 +81,19 @@ const checkLiveAchievements = (game, username, word, timeSinceStart) => {
       game.playerWords[username].length % 5 === 0 &&
       !achievements.includes('COMBO_KING')) {
     achievements.push('COMBO_KING');
-    newAchievements.push(ACHIEVEMENTS.COMBO_KING);
+    newAchievements.push(localizedAchievements.COMBO_KING);
   }
 
   // Wordsmith - 15 words (LIVE)
   if (game.playerWords[username].length >= 15 && !achievements.includes('WORDSMITH')) {
     achievements.push('WORDSMITH');
-    newAchievements.push(ACHIEVEMENTS.WORDSMITH);
+    newAchievements.push(localizedAchievements.WORDSMITH);
   }
 
   // Lexicon - 20+ words (LIVE)
   if (game.playerWords[username].length >= 20 && !achievements.includes('LEXICON')) {
     achievements.push('LEXICON');
-    newAchievements.push(ACHIEVEMENTS.LEXICON);
+    newAchievements.push(localizedAchievements.LEXICON);
   }
 
   // Double Trouble - 2 words within 5 seconds (LIVE)
@@ -78,7 +102,7 @@ const checkLiveAchievements = (game, username, word, timeSinceStart) => {
     const lastTwo = playerWordDetails.slice(-2);
     if (lastTwo[1].timeSinceStart - lastTwo[0].timeSinceStart <= 5) {
       achievements.push('DOUBLE_TROUBLE');
-      newAchievements.push(ACHIEVEMENTS.DOUBLE_TROUBLE);
+      newAchievements.push(localizedAchievements.DOUBLE_TROUBLE);
     }
   }
 
@@ -176,6 +200,7 @@ const awardFinalAchievements = (game, users) => {
 
 module.exports = {
   ACHIEVEMENTS,
+  getLocalizedAchievements,
   checkLiveAchievements,
   awardFinalAchievements
 };

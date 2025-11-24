@@ -2,7 +2,7 @@ const { saveGameState, deleteGameState } = require('./redisClient');
 const dictionary = require('./dictionary');
 const { isWordOnBoard } = require('./modules/wordValidator');
 const { calculateWordScore } = require('./modules/scoringEngine');
-const { ACHIEVEMENTS, checkLiveAchievements, awardFinalAchievements } = require('./modules/achievementManager');
+const { ACHIEVEMENTS, checkLiveAchievements, awardFinalAchievements, getLocalizedAchievements } = require('./modules/achievementManager');
 const { games, gameWs, wsUsername, getActiveRooms, getGame, getUsernameFromWs, getWsHostFromGameCode, getWsFromUsername, getGameCodeFromUsername, deleteGame: deleteGameFromState } = require('./modules/gameStateManager');
 const { safeSend, broadcast } = require('./utils/websocketHelpers');
 
@@ -391,18 +391,20 @@ const handleEndGame = (host) => {
   }
 
   // Calculate final scores with detailed stats
+  const gameLanguage = games[gameCode].language || 'he';
+  const localizedAchievements = getLocalizedAchievements(gameLanguage);
+
   const finalScores = Object.keys(games[gameCode].playerScores).map(username => ({
     username,
     score: games[gameCode].playerScores[username],
     words: games[gameCode].playerWords[username],
     wordCount: (games[gameCode].playerWordDetails[username] || []).length,
-    achievements: games[gameCode].playerAchievements[username].map(ach => ACHIEVEMENTS[ach]),
+    achievements: games[gameCode].playerAchievements[username].map(ach => localizedAchievements[ach]),
     longestWord: games[gameCode].playerWords[username].reduce((longest, word) =>
       word.length > longest.length ? word : longest, ''),
   })).sort((a, b) => b.score - a.score);
 
   // Auto-validate words using dictionary
-  const gameLanguage = games[gameCode].language || 'en';
   const wordsNeedingValidation = new Set();
   let autoValidatedCount = 0;
 
@@ -998,6 +1000,10 @@ const handleValidateWords = (host, validations, letterGrid) => {
   // Award final achievements based on validated words - using module
   awardFinalAchievements(games[gameCode], Object.keys(games[gameCode].users));
 
+  // Get localized achievements
+  const gameLanguage = games[gameCode].language || 'he';
+  const localizedAchievements = getLocalizedAchievements(gameLanguage);
+
   // Calculate final scores with all validated data - only for existing players
   const finalScores = Object.keys(games[gameCode].playerScores)
     .filter(username => games[gameCode].users[username]) // Only include players still in game
@@ -1014,7 +1020,7 @@ const handleValidateWords = (host, validations, letterGrid) => {
         allWords: playerWordDetails, // For visualization
         wordCount: playerWordDetails.length,
         validWordCount: playerWordDetails.filter(w => w.validated === true).length,
-        achievements: playerAchievements.map(ach => ACHIEVEMENTS[ach]),
+        achievements: playerAchievements.map(ach => localizedAchievements[ach]),
         longestWord: playerWordDetails
           .filter(w => w.validated === true)
           .reduce((longest, wordObj) => wordObj.word.length > longest.length ? wordObj.word : longest, ''),

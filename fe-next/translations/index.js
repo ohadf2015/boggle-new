@@ -228,6 +228,56 @@ export const translations = {
       },
       readyToPlay: 'Ready? Let\'s start playing! 🎮',
       funForFamily: 'An engaging and fun game for the whole family - completely free!',
+    },
+    achievements: {
+      FIRST_BLOOD: {
+        name: 'First Blood',
+        description: 'First to find a word'
+      },
+      SPEED_DEMON: {
+        name: 'Speed Demon',
+        description: 'Found 10 words in 2 minutes'
+      },
+      WORD_MASTER: {
+        name: 'Word Master',
+        description: 'Found a word with 7+ letters'
+      },
+      COMBO_KING: {
+        name: 'Combo King',
+        description: '5 words in a row'
+      },
+      PERFECTIONIST: {
+        name: 'Perfectionist',
+        description: 'All words are valid'
+      },
+      LEXICON: {
+        name: 'Lexicon',
+        description: 'Found 20+ words'
+      },
+      WORDSMITH: {
+        name: 'Wordsmith',
+        description: 'Found 15 valid words'
+      },
+      QUICK_THINKER: {
+        name: 'Quick Thinker',
+        description: 'Found a word within 10 seconds'
+      },
+      LONG_HAULER: {
+        name: 'Marathon Runner',
+        description: 'Found a word in the last minute'
+      },
+      DIVERSE_VOCABULARY: {
+        name: 'Diverse Vocabulary',
+        description: 'Found words of different lengths'
+      },
+      DOUBLE_TROUBLE: {
+        name: 'Winning Duo',
+        description: 'Found 2 words within 5 seconds'
+      },
+      TREASURE_HUNTER: {
+        name: 'Treasure Hunter',
+        description: 'Found a rare word (8+ letters)'
+      }
     }
   },
   he: {
@@ -459,6 +509,56 @@ export const translations = {
       },
       readyToPlay: 'מוכנים? בואו נתחיל לשחק! 🎮',
       funForFamily: 'משחק חוויתי ומהנה לכל המשפחה - חינמי לחלוטין!',
+    },
+    achievements: {
+      FIRST_BLOOD: {
+        name: 'דם ראשון',
+        description: 'ראשון למצוא מילה'
+      },
+      SPEED_DEMON: {
+        name: 'שד המהירות',
+        description: 'מצא 10 מילים ב-2 דקות'
+      },
+      WORD_MASTER: {
+        name: 'אדון המילים',
+        description: 'מצא מילה בת 7+ אותיות'
+      },
+      COMBO_KING: {
+        name: 'מלך הקומבו',
+        description: '5 מילים ברצף'
+      },
+      PERFECTIONIST: {
+        name: 'פרפקציוניסט',
+        description: 'כל המילים תקינות'
+      },
+      LEXICON: {
+        name: 'לקסיקון',
+        description: 'מצא 20+ מילים'
+      },
+      WORDSMITH: {
+        name: 'צורף מילים',
+        description: 'מצא 15 מילים תקינות'
+      },
+      QUICK_THINKER: {
+        name: 'חושב מהיר',
+        description: 'מצא מילה בתוך 10 שניות'
+      },
+      LONG_HAULER: {
+        name: 'מרתונאי',
+        description: 'מצא מילה בדקה האחרונה'
+      },
+      DIVERSE_VOCABULARY: {
+        name: 'אוצר מילים מגוון',
+        description: 'מצא מילים באורכים שונים'
+      },
+      DOUBLE_TROUBLE: {
+        name: 'צמד מנצח',
+        description: 'מצא 2 מילים בתוך 5 שניות'
+      },
+      TREASURE_HUNTER: {
+        name: 'צייד אוצרות',
+        description: 'מצא מילה נדירה (8+ אותיות)'
+      }
     }
   },
   sv: {
@@ -691,6 +791,56 @@ export const translations = {
       },
       readyToPlay: 'Redo? Låt oss börja spela! 🎮',
       funForFamily: 'Ett engagerande och roligt spel för hela familjen - helt gratis!',
+    },
+    achievements: {
+      FIRST_BLOOD: {
+        name: 'Första Blodet',
+        description: 'Först att hitta ett ord'
+      },
+      SPEED_DEMON: {
+        name: 'Hastighetsdemon',
+        description: 'Hittade 10 ord på 2 minuter'
+      },
+      WORD_MASTER: {
+        name: 'Ordmästare',
+        description: 'Hittade ett ord med 7+ bokstäver'
+      },
+      COMBO_KING: {
+        name: 'Kombokung',
+        description: '5 ord i rad'
+      },
+      PERFECTIONIST: {
+        name: 'Perfektionist',
+        description: 'Alla ord är giltiga'
+      },
+      LEXICON: {
+        name: 'Lexikon',
+        description: 'Hittade 20+ ord'
+      },
+      WORDSMITH: {
+        name: 'Ordsmed',
+        description: 'Hittade 15 giltiga ord'
+      },
+      QUICK_THINKER: {
+        name: 'Snabbtänkare',
+        description: 'Hittade ett ord inom 10 sekunder'
+      },
+      LONG_HAULER: {
+        name: 'Maratonlöpare',
+        description: 'Hittade ett ord i sista minuten'
+      },
+      DIVERSE_VOCABULARY: {
+        name: 'Varierat Ordförråd',
+        description: 'Hittade ord av olika längder'
+      },
+      DOUBLE_TROUBLE: {
+        name: 'Vinnande Duo',
+        description: 'Hittade 2 ord inom 5 sekunder'
+      },
+      TREASURE_HUNTER: {
+        name: 'Skattjägare',
+        description: 'Hittade ett sällsynt ord (8+ bokstäver)'
+      }
     }
   }
 };
