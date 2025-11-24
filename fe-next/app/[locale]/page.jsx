@@ -250,6 +250,10 @@ export default function GamePage() {
 
     const attemptingReconnectRef = useRef(attemptingReconnect);
 
+    // Track if we should auto-join (prefilled room + existing username)
+    const [shouldAutoJoin, setShouldAutoJoin] = useState(false);
+    const [prefilledRoomCode, setPrefilledRoomCode] = useState('');
+
     useEffect(() => {
         if (typeof window === 'undefined') return;
 
@@ -265,6 +269,11 @@ export default function GamePage() {
                 setAttemptingReconnect(true);
             } else if (roomFromUrl) {
                 setGameCode(roomFromUrl);
+                setPrefilledRoomCode(roomFromUrl);
+                // If player has saved username and comes via invitation link, mark for auto-join
+                if (savedUsername && savedUsername.trim()) {
+                    setShouldAutoJoin(true);
+                }
             }
 
             if (savedSession?.username) {
@@ -447,6 +456,19 @@ export default function GamePage() {
             ws.addEventListener('open', onOpen);
         }
     }, [wsRef]);
+
+    // Auto-join effect for players coming via invitation link with existing username
+    useEffect(() => {
+        if (!shouldAutoJoin || !wsRef.current || wsRef.current.readyState !== WebSocket.OPEN || isActive || attemptingReconnect) {
+            return;
+        }
+
+        // Player has prefilled room code and saved username - auto-join
+        if (prefilledRoomCode && username && username.trim()) {
+            sendMessage({ action: 'join', gameCode: prefilledRoomCode, username });
+            setShouldAutoJoin(false); // Prevent re-triggering
+        }
+    }, [shouldAutoJoin, prefilledRoomCode, username, isActive, attemptingReconnect, wsRef, sendMessage]);
 
     useEffect(() => {
         if (!attemptingReconnect || !wsRef.current || wsRef.current.readyState !== WebSocket.OPEN || isActive) {

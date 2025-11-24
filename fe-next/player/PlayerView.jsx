@@ -45,6 +45,9 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
   const [gameLanguage, setGameLanguage] = useState(null);
   const [showQR, setShowQR] = useState(false);
 
+  // Track if player was in an active game session (to distinguish late joiners after game ended)
+  const [wasInActiveGame, setWasInActiveGame] = useState(false);
+
   // Combo system state
   const [comboLevel, setComboLevel] = useState(0);
   const [lastWordTime, setLastWordTime] = useState(null);
@@ -160,6 +163,7 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
 
         case 'startGame':
           setGameActive(true);
+          setWasInActiveGame(true); // Mark that player participated in this game session
           setFoundWords([]);
           setAchievements([]);
           if (message.letterGrid) setLetterGrid(message.letterGrid);
@@ -180,8 +184,13 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
         case 'endGame':
           setGameActive(false);
           setRemainingTime(0);
-          setWaitingForResults(true);
-          toast(t('playerView.gameOver'), { icon: '⏱️', duration: 4000 });
+          // Only show "waiting for results" if player participated in the game
+          // If they just joined after the game ended, they shouldn't see the calculating scores screen
+          if (wasInActiveGame) {
+            setWaitingForResults(true);
+            toast(t('playerView.gameOver'), { icon: '⏱️', duration: 4000 });
+          }
+          // else: player joined after game ended, they'll see "waiting for new game" screen
           break;
 
         case 'wordAccepted':
@@ -332,6 +341,7 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
         case 'resetGame':
           // Reset player state for new game
           setGameActive(false);
+          setWasInActiveGame(false); // Reset for new game session
           setFoundWords([]);
           setAchievements([]);
           setLeaderboard([]);
@@ -356,7 +366,7 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
     return () => {
       ws.removeEventListener('message', handleMessage);
     };
-  }, [ws, onShowResults, t, letterGrid, lastWordTime]);
+  }, [ws, onShowResults, t, letterGrid, lastWordTime, wasInActiveGame]);
 
   const submitWord = useCallback(() => {
     if (!word.trim() || !gameActive) return;
