@@ -14,9 +14,12 @@ export const LanguageProvider = ({ children, initialLanguage }) => {
 
     useEffect(() => {
         if (initialLanguage && initialLanguage !== language) {
-            setLanguageState(initialLanguage);
+            // Defer state update to avoid synchronous setState
+            Promise.resolve().then(() => {
+                setLanguageState(initialLanguage);
+            });
         }
-    }, [initialLanguage]);
+    }, [initialLanguage, language]);
 
     useEffect(() => {
         // Save to localStorage

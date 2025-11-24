@@ -11,7 +11,10 @@ const SlotMachineText = ({ text, duration = 1000 }) => {
     useEffect(() => {
         let startTime = Date.now();
         let animationFrame;
-        setIsAnimating(true);
+        // Defer state update to avoid synchronous setState
+        Promise.resolve().then(() => {
+            setIsAnimating(true);
+        });
 
         const animate = () => {
             const now = Date.now();

@@ -328,7 +328,7 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
     return () => {
       ws.removeEventListener('message', handleMessage);
     };
-  }, [ws, onShowResults, t, letterGrid]);
+  }, [ws, onShowResults, t, letterGrid, lastWordTime]);
 
   const submitWord = useCallback(() => {
     if (!word.trim() || !gameActive) return;
@@ -391,7 +391,7 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
 
 
     }
-  }, [word, gameActive, ws, t, gameLanguage, lastWordTime]);
+  }, [word, gameActive, ws, t, gameLanguage]);
 
   const removeWord = (index) => {
     if (!gameActive) return;

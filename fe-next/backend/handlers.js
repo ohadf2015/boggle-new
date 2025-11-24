@@ -470,12 +470,12 @@ const startServerTimer = (gameCode, totalSeconds) => {
     games[gameCode].timerInterval = null;
   }
 
-  games[gameCode].timerInterval = setInterval(() => {
+  const intervalId = setInterval(() => {
     // RACE CONDITION FIX: Check if game still exists at the start of each tick
     if (!games[gameCode]) {
       console.warn(`[TIMER] Game ${gameCode} no longer exists, stopping timer`);
-      // Can't clear the interval from games[gameCode] since it doesn't exist
-      // The interval will be cleared by the garbage collector
+      // Clear the interval to prevent memory leak
+      clearInterval(intervalId);
       return;
     }
 
@@ -515,6 +515,9 @@ const startServerTimer = (gameCode, totalSeconds) => {
       }
     }
   }, 1000); // Broadcast every second
+
+  // Store the interval reference
+  games[gameCode].timerInterval = intervalId;
 }
 
 const handleEndGame = (host) => {

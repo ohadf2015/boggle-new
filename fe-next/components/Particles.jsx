@@ -5,17 +5,20 @@ const Particles = () => {
     const [particles, setParticles] = useState([]);
 
     useEffect(() => {
-        const newParticles = [...Array(20)].map((_, i) => ({
-            id: i,
-            initialX: Math.random() * window.innerWidth,
-            initialY: Math.random() * window.innerHeight,
-            targetX: Math.random() * window.innerWidth,
-            targetY: Math.random() * window.innerHeight,
-            duration: Math.random() * 10 + 10,
-            width: Math.random() * 10 + 5,
-            height: Math.random() * 10 + 5,
-        }));
-        setParticles(newParticles);
+        // Defer state update to avoid synchronous setState
+        Promise.resolve().then(() => {
+            const newParticles = [...Array(20)].map((_, i) => ({
+                id: i,
+                initialX: Math.random() * window.innerWidth,
+                initialY: Math.random() * window.innerHeight,
+                targetX: Math.random() * window.innerWidth,
+                targetY: Math.random() * window.innerHeight,
+                duration: Math.random() * 10 + 10,
+                width: Math.random() * 10 + 5,
+                height: Math.random() * 10 + 5,
+            }));
+            setParticles(newParticles);
+        });
     }, []);
 
     if (particles.length === 0) return null;

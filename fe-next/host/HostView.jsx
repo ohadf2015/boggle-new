@@ -329,7 +329,7 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
     return () => {
       ws.removeEventListener('message', handleMessage);
     };
-  }, [ws, gameStarted, t, hostPlaying]);
+  }, [ws, gameStarted, t, hostPlaying, lastWordTime]);
 
   const startGame = () => {
     if (playersReady.length === 0) return;
@@ -465,7 +465,7 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
     if (inputRef.current) {
       inputRef.current.focus();
     }
-  }, [word, gameStarted, hostPlaying, ws, t, roomLanguage, lastWordTime]);
+  }, [word, gameStarted, hostPlaying, ws, t, roomLanguage]);
 
   const removeHostWord = (index) => {
     if (!gameStarted) return;

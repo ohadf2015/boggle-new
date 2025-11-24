@@ -37,13 +37,18 @@ const MenuAnimation = ({ className = '' }) => {
             char: letterSet[Math.floor(Math.random() * letterSet.length)],
             x: Math.random() * (typeof window !== 'undefined' ? window.innerWidth : 1000),
             y: Math.random() * (typeof window !== 'undefined' ? window.innerHeight : 1000),
+            targetX: Math.random() * (typeof window !== 'undefined' ? window.innerWidth : 1000),
+            targetY: Math.random() * (typeof window !== 'undefined' ? window.innerHeight : 1000),
             size: Math.random() * 30 + 30, // 30-60px
             duration: Math.random() * 20 + 15,
             delay: Math.random() * 5,
             color: ['#06b6d4', '#8b5cf6', '#ec4899', '#14b8a6', '#f59e0b'][Math.floor(Math.random() * 5)],
         }));
 
-        setLetters(newLetters);
+        // Defer state update to avoid synchronous setState
+        Promise.resolve().then(() => {
+            setLetters(newLetters);
+        });
     }, [language]);
 
     return (
@@ -68,11 +73,11 @@ const MenuAnimation = ({ className = '' }) => {
                             animate={{
                                 x: [
                                     letter.x,
-                                    Math.random() * (typeof window !== 'undefined' ? window.innerWidth : 1000),
+                                    letter.targetX,
                                 ],
                                 y: [
                                     letter.y,
-                                    Math.random() * (typeof window !== 'undefined' ? window.innerHeight : 1000),
+                                    letter.targetY,
                                 ],
                                 opacity: [0, 0.25, 0.3, 0],
                                 scale: [0, 1, 1],

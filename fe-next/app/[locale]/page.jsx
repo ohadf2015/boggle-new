@@ -11,6 +11,9 @@ import { WebSocketContext } from '@/utils/WebSocketContext';
 import { saveSession, getSession, clearSession } from '@/utils/session';
 import { useLanguage } from '@/contexts/LanguageContext';
 
+// Force dynamic rendering to prevent static generation issues
+export const dynamic = 'force-dynamic';
+
 const WS_CONFIG = {
     MAX_RECONNECT_ATTEMPTS: 10,
     BASE_RECONNECT_DELAY: 1000,
@@ -102,6 +105,8 @@ const useWebSocketConnection = () => {
         }
     }, []);
 
+    const connectWebSocketRef = useRef(null);
+
     const connectWebSocket = useCallback(() => {
         if (typeof window === 'undefined') return;
 
@@ -178,7 +183,10 @@ const useWebSocketConnection = () => {
                     reconnectTimeoutRef.current = setTimeout(() => {
                         reconnectAttemptsRef.current += 1;
                         hasInitializedRef.current = false;
-                        connectWebSocket();
+                        // Use ref to call the function recursively
+                        if (connectWebSocketRef.current) {
+                            connectWebSocketRef.current();
+                        }
                     }, delay);
                 } else if (event.code !== 1000) {
                     console.error('[WS] Connection lost');
@@ -190,7 +198,12 @@ const useWebSocketConnection = () => {
             isConnectingRef.current = false;
             setConnectionError(t('errors.unstableConnection'));
         }
-    }, [startHeartbeat, stopHeartbeat]);
+    }, [startHeartbeat, stopHeartbeat, t]);
+
+    // Store the function in ref for recursive calls
+    useEffect(() => {
+        connectWebSocketRef.current = connectWebSocket;
+    }, [connectWebSocket]);
 
     const setMessageHandler = useCallback((handler) => {
         messageHandlerRef.current = handler;
@@ -240,27 +253,33 @@ export default function GamePage() {
     useEffect(() => {
         if (typeof window === 'undefined') return;
 
-        const urlParams = new URLSearchParams(window.location.search);
-        const roomFromUrl = urlParams.get('room');
-        const savedUsername = localStorage.getItem('boggle_username') || '';
-        const savedSession = getSession();
+        // Defer state updates to avoid synchronous setState in effect
+        const initializeState = () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const roomFromUrl = urlParams.get('room');
+            const savedUsername = localStorage.getItem('boggle_username') || '';
+            const savedSession = getSession();
 
-        if (savedSession?.gameCode) {
-            setGameCode(savedSession.gameCode);
-            setAttemptingReconnect(true);
-        } else if (roomFromUrl) {
-            setGameCode(roomFromUrl);
-        }
+            if (savedSession?.gameCode) {
+                setGameCode(savedSession.gameCode);
+                setAttemptingReconnect(true);
+            } else if (roomFromUrl) {
+                setGameCode(roomFromUrl);
+            }
 
-        if (savedSession?.username) {
-            setUsername(savedSession.username);
-        } else if (savedUsername) {
-            setUsername(savedUsername);
-        }
+            if (savedSession?.username) {
+                setUsername(savedSession.username);
+            } else if (savedUsername) {
+                setUsername(savedUsername);
+            }
 
-        if (savedSession?.roomName) {
-            setRoomName(savedSession.roomName);
-        }
+            if (savedSession?.roomName) {
+                setRoomName(savedSession.roomName);
+            }
+        };
+
+        // Use Promise.resolve().then() to defer execution
+        Promise.resolve().then(initializeState);
     }, []);
 
     useEffect(() => {
@@ -378,7 +397,7 @@ export default function GamePage() {
         } catch (error) {
             console.error('Error parsing WebSocket message:', error);
         }
-    }, [username, gameCode, roomName, checkLatency, lastPingTimeRef, t]);
+    }, [username, gameCode, roomName, checkLatency, lastPingTimeRef, t, roomLanguage]);
 
     useEffect(() => {
         connectWebSocket();
@@ -393,7 +412,10 @@ export default function GamePage() {
 
     useEffect(() => {
         if (connectionError) {
-            setError(connectionError);
+            // Defer state update to avoid synchronous setState
+            Promise.resolve().then(() => {
+                setError(connectionError);
+            });
         }
     }, [connectionError]);
 
@@ -419,7 +441,10 @@ export default function GamePage() {
 
         const savedSession = getSession();
         if (!savedSession?.gameCode) {
-            setAttemptingReconnect(false);
+            // Defer state update to avoid synchronous setState
+            Promise.resolve().then(() => {
+                setAttemptingReconnect(false);
+            });
             return;
         }
 

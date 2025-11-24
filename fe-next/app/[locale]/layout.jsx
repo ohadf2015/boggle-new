@@ -1,6 +1,10 @@
 import { translations } from '@/translations';
 import { Providers } from '../providers';
 
+// Force dynamic rendering - prevent static generation
+export const dynamic = 'force-dynamic';
+export const dynamicParams = true;
+
 // Helper function to get locale-specific URL path
 function getLocalePath(locale) {
     switch (locale) {
@@ -83,9 +87,8 @@ export async function generateMetadata({ params }) {
     };
 }
 
-export async function generateStaticParams() {
-    return [{ locale: 'he' }, { locale: 'en' }, { locale: 'sv' }, { locale: 'ja' }];
-}
+// Removed generateStaticParams to prevent static generation
+// The app uses dynamic rendering with WebSocket connections
 
 export default async function LocaleLayout({ children, params }) {
     const { locale } = await params;
