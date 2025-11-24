@@ -30,7 +30,7 @@ const MenuAnimation = ({ className = '' }) => {
                 letterSet = englishLetters;
                 break;
         }
-        const numberOfLetters = 20;
+        const numberOfLetters = 10; // Reduced from 20 for better performance
 
         const newLetters = Array(numberOfLetters).fill(null).map((_, index) => ({
             id: `letter-${index}`,
@@ -69,16 +69,14 @@ const MenuAnimation = ({ className = '' }) => {
                                 x: [
                                     letter.x,
                                     Math.random() * (typeof window !== 'undefined' ? window.innerWidth : 1000),
-                                    Math.random() * (typeof window !== 'undefined' ? window.innerWidth : 1000),
                                 ],
                                 y: [
                                     letter.y,
                                     Math.random() * (typeof window !== 'undefined' ? window.innerHeight : 1000),
-                                    Math.random() * (typeof window !== 'undefined' ? window.innerHeight : 1000),
                                 ],
-                                opacity: [0, 0.3, 0.4, 0.3, 0],
-                                scale: [0, 1, 1.1, 1, 0.8],
-                                rotate: [0, 180, 360, 540, 720],
+                                opacity: [0, 0.25, 0.3, 0],
+                                scale: [0, 1, 1],
+                                rotate: [0, 180],
                             }}
                             exit={{
                                 opacity: 0,
@@ -107,12 +105,10 @@ const MenuAnimation = ({ className = '' }) => {
                                 })(),
                                 color: letter.color,
                                 textShadow: `
-                                    0 0 8px ${letter.color}66,
-                                    0 0 16px ${letter.color}44,
-                                    0 0 24px ${letter.color}22,
-                                    2px 2px 4px rgba(0, 0, 0, 0.2)
+                                    0 0 10px ${letter.color}55,
+                                    2px 2px 4px rgba(0, 0, 0, 0.3)
                                 `,
-                                filter: 'brightness(1.2) saturate(1.2)',
+                                filter: 'brightness(1.1)',
                                 fontWeight: 700,
                                 letterSpacing: '0.05em',
                                 WebkitFontSmoothing: 'antialiased',
