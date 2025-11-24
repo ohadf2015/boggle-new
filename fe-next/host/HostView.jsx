@@ -57,6 +57,11 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
   const [shufflingGrid, setShufflingGrid] = useState(null);
   const [highlightedCells, setHighlightedCells] = useState([]);
 
+  // Combo system state
+  const [comboLevel, setComboLevel] = useState(0);
+  const [lastWordTime, setLastWordTime] = useState(null);
+  const comboTimeoutRef = useRef(null);
+
   // Update players list when initialPlayers prop changes
   useEffect(() => {
     setPlayersReady(initialPlayers);
@@ -385,7 +390,10 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
     if (!word.trim() || !gameStarted || !hostPlaying) return;
 
     const currentLang = roomLanguage;
-    const regex = currentLang === 'he' ? /^[\u0590-\u05FF]+$/ : currentLang === 'sv' ? /^[a-zA-ZåäöÅÄÖ]+$/ : /^[a-zA-Z]+$/;
+    const regex = currentLang === 'he' ? /^[\u0590-\u05FF]+$/ :
+                  currentLang === 'sv' ? /^[a-zA-ZåäöÅÄÖ]+$/ :
+                  currentLang === 'ja' ? /^[\u3040-\u309F\u30A0-\u30FF\u4E00-\u9FAF]+$/ :
+                  /^[a-zA-Z]+$/;
     const trimmedWord = word.trim();
 
     // Min length validation
@@ -418,11 +426,28 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
     setHostFoundWords(prev => [...prev, trimmedWord]);
     setWord('');
 
+    // Combo system: track word submission timing
+    const now = Date.now();
+    if (lastWordTime && (now - lastWordTime) < 3000) {
+      setComboLevel(prev => Math.min(prev + 1, 4));
+    } else {
+      setComboLevel(0);
+    }
+    setLastWordTime(now);
+
+    if (comboTimeoutRef.current) {
+      clearTimeout(comboTimeoutRef.current);
+    }
+    comboTimeoutRef.current = setTimeout(() => {
+      setComboLevel(0);
+      setLastWordTime(null);
+    }, 4000);
+
     // Keep focus on input
     if (inputRef.current) {
       inputRef.current.focus();
     }
-  }, [word, gameStarted, hostPlaying, ws, t, roomLanguage]);
+  }, [word, gameStarted, hostPlaying, ws, t, roomLanguage, lastWordTime]);
 
   const removeHostWord = (index) => {
     if (!gameStarted) return;
@@ -957,6 +982,23 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
                         }));
                         setHostFoundWords(prev => [...prev, formedWord]);
                         toast.success(`${t('playerView.wordSubmitted')}: ${formedWord}`, { duration: 1000, icon: '📤' });
+
+                        // Combo system for grid submissions
+                        const now = Date.now();
+                        if (lastWordTime && (now - lastWordTime) < 3000) {
+                          setComboLevel(prev => Math.min(prev + 1, 4));
+                        } else {
+                          setComboLevel(0);
+                        }
+                        setLastWordTime(now);
+
+                        if (comboTimeoutRef.current) {
+                          clearTimeout(comboTimeoutRef.current);
+                        }
+                        comboTimeoutRef.current = setTimeout(() => {
+                          setComboLevel(0);
+                          setLastWordTime(null);
+                        }, 4000);
                       } else {
                         toast.error(t('playerView.onlyLanguageWords'), { duration: 1000 });
                       }
@@ -964,6 +1006,7 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
                     selectedCells={gameStarted && hostPlaying ? undefined : highlightedCells}
                     className="w-full h-full"
                     playerView={hostPlaying}
+                    comboLevel={comboLevel}
                   />
                 </div>
               </div>

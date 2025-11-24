@@ -40,6 +40,11 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
   const [shufflingGrid, setShufflingGrid] = useState(null);
   const [gameLanguage, setGameLanguage] = useState(null);
 
+  // Combo system state
+  const [comboLevel, setComboLevel] = useState(0);
+  const [lastWordTime, setLastWordTime] = useState(null);
+  const comboTimeoutRef = useRef(null);
+
 
   // Pre-game shuffling animation with player names
   useEffect(() => {
@@ -345,6 +350,28 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
     setFoundWords(prev => [...prev, trimmedWord]);
     setWord('');
 
+    // Combo system: track word submission timing
+    const now = Date.now();
+    if (lastWordTime && (now - lastWordTime) < 3000) {
+      // Within 3 seconds - increase combo!
+      setComboLevel(prev => Math.min(prev + 1, 4)); // Max combo level 4
+    } else {
+      // Too slow, reset combo
+      setComboLevel(0);
+    }
+    setLastWordTime(now);
+
+    // Clear any existing combo timeout
+    if (comboTimeoutRef.current) {
+      clearTimeout(comboTimeoutRef.current);
+    }
+
+    // Reset combo after 4 seconds of inactivity
+    comboTimeoutRef.current = setTimeout(() => {
+      setComboLevel(0);
+      setLastWordTime(null);
+    }, 4000);
+
     // Keep focus on input and prevent scroll
     if (inputRef.current) {
       inputRef.current.focus();
@@ -352,7 +379,7 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
 
 
     }
-  }, [word, gameActive, ws, t, gameLanguage]);
+  }, [word, gameActive, ws, t, gameLanguage, lastWordTime]);
 
   const removeWord = (index) => {
     if (!gameActive) return;
@@ -764,12 +791,30 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
                       }));
                       setFoundWords(prev => [...prev, formedWord]);
                       toast.success(`${t('playerView.wordSubmitted')}: ${formedWord}`, { duration: 1000, icon: '📤' });
+
+                      // Combo system for grid submissions
+                      const now = Date.now();
+                      if (lastWordTime && (now - lastWordTime) < 3000) {
+                        setComboLevel(prev => Math.min(prev + 1, 4));
+                      } else {
+                        setComboLevel(0);
+                      }
+                      setLastWordTime(now);
+
+                      if (comboTimeoutRef.current) {
+                        clearTimeout(comboTimeoutRef.current);
+                      }
+                      comboTimeoutRef.current = setTimeout(() => {
+                        setComboLevel(0);
+                        setLastWordTime(null);
+                      }, 4000);
                     } else {
                       toast.error(t('playerView.onlyLanguageWords'), { duration: 1000 });
                     }
                     setWord(''); // Clear input
                   }}
                   playerView={true}
+                  comboLevel={comboLevel}
                   className="w-full max-w-2xl"
                 />
 

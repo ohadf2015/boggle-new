@@ -9,7 +9,8 @@ const GridComponent = ({
     selectedCells: externalSelectedCells,
     className,
     largeText = false,
-    playerView = false
+    playerView = false,
+    comboLevel = 0
 }) => {
     const [internalSelectedCells, setInternalSelectedCells] = useState([]);
     const isTouchingRef = useRef(false);
@@ -64,29 +65,15 @@ const GridComponent = ({
                 return;
             }
 
-            // Validation Logic
+            // Validation Logic - allow any adjacent cell (easier diagonal selection)
             if (lastCell) {
                 const rowDiff = rowIndex - lastCell.row;
                 const colDiff = colIndex - lastCell.col;
 
-                // Must be adjacent
+                // Must be adjacent (allows free movement in any direction)
                 if (Math.abs(rowDiff) <= 1 && Math.abs(colDiff) <= 1) {
-
-                    // If we have more than 1 cell, enforce direction
-                    if (selectedCells.length >= 2) {
-                        const secondLastCell = selectedCells[selectedCells.length - 2];
-                        const initialRowDiff = lastCell.row - secondLastCell.row;
-                        const initialColDiff = lastCell.col - secondLastCell.col;
-
-                        if (rowDiff === initialRowDiff && colDiff === initialColDiff) {
-                            setSelectedCells(prev => [...prev, { row: rowIndex, col: colIndex, letter }]);
-                            if (window.navigator && window.navigator.vibrate) window.navigator.vibrate(50);
-                        }
-                    } else {
-                        // First move defines direction
-                        setSelectedCells(prev => [...prev, { row: rowIndex, col: colIndex, letter }]);
-                        if (window.navigator && window.navigator.vibrate) window.navigator.vibrate(50);
-                    }
+                    setSelectedCells(prev => [...prev, { row: rowIndex, col: colIndex, letter }]);
+                    if (window.navigator && window.navigator.vibrate) window.navigator.vibrate(50);
                 }
             }
         }
@@ -135,18 +122,9 @@ const GridComponent = ({
             const rowDiff = rowIndex - lastCell.row;
             const colDiff = colIndex - lastCell.col;
 
+            // Must be adjacent (allows free movement in any direction)
             if (Math.abs(rowDiff) <= 1 && Math.abs(colDiff) <= 1) {
-                if (selectedCells.length >= 2) {
-                    const secondLastCell = selectedCells[selectedCells.length - 2];
-                    const initialRowDiff = lastCell.row - secondLastCell.row;
-                    const initialColDiff = lastCell.col - secondLastCell.col;
-
-                    if (rowDiff === initialRowDiff && colDiff === initialColDiff) {
-                        setSelectedCells(prev => [...prev, { row: rowIndex, col: colIndex, letter }]);
-                    }
-                } else {
-                    setSelectedCells(prev => [...prev, { row: rowIndex, col: colIndex, letter }]);
-                }
+                setSelectedCells(prev => [...prev, { row: rowIndex, col: colIndex, letter }]);
             }
         }
     };
@@ -164,6 +142,44 @@ const GridComponent = ({
 
 
     const isLargeGrid = (grid[0]?.length || 0) > 8;
+
+    // Get combo colors based on level (escalating colors for gamification)
+    const getComboColors = (level) => {
+        if (level === 0) {
+            return {
+                gradient: 'from-yellow-400 to-orange-500',
+                border: 'border-yellow-300',
+                shadow: 'shadow-lg'
+            };
+        } else if (level === 1) {
+            return {
+                gradient: 'from-orange-400 to-red-500',
+                border: 'border-orange-300',
+                shadow: 'shadow-[0_0_15px_rgba(251,146,60,0.6)]'
+            };
+        } else if (level === 2) {
+            return {
+                gradient: 'from-red-400 to-pink-500',
+                border: 'border-red-300',
+                shadow: 'shadow-[0_0_20px_rgba(239,68,68,0.7)]'
+            };
+        } else if (level === 3) {
+            return {
+                gradient: 'from-pink-400 to-purple-500',
+                border: 'border-pink-300',
+                shadow: 'shadow-[0_0_25px_rgba(236,72,153,0.8)]'
+            };
+        } else {
+            // Level 4+: Epic rainbow/fire combo
+            return {
+                gradient: 'from-purple-400 via-pink-500 to-yellow-400',
+                border: 'border-purple-300',
+                shadow: 'shadow-[0_0_30px_rgba(168,85,247,0.9)]'
+            };
+        }
+    };
+
+    const comboColors = getComboColors(comboLevel);
 
     return (
         <div
@@ -200,12 +216,12 @@ const GridComponent = ({
                             }}
                             transition={{ duration: 0.2 }}
                             className={cn(
-                                "aspect-square flex items-center justify-center font-bold shadow-sm cursor-pointer transition-colors border",
+                                "aspect-square flex items-center justify-center font-bold shadow-sm cursor-pointer transition-all duration-200 border",
                                 isLargeGrid
                                     ? (largeText ? "text-2xl sm:text-3xl rounded-md" : "text-lg sm:text-xl rounded-md")
                                     : (largeText || playerView ? "text-4xl sm:text-6xl rounded-xl" : "text-2xl sm:text-3xl rounded-lg"),
                                 isSelected
-                                    ? "bg-gradient-to-br from-yellow-400 to-orange-500 text-white border-yellow-300 z-10 shadow-lg"
+                                    ? `bg-gradient-to-br ${comboColors.gradient} text-white ${comboColors.border} z-10 ${comboColors.shadow}`
                                     : "bg-gradient-to-br from-white to-slate-100 dark:from-slate-800 dark:to-slate-900 text-slate-900 dark:text-white border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700/80"
                             )}
                         >
