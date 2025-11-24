@@ -42,16 +42,16 @@ const Header = ({ className = '' }) => {
             initial={{ y: -20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ duration: 0.5, ease: "easeOut" }}
-            className={`w-full max-w-6xl mx-auto mb-2 sm:mb-6 px-4 pt-4 ${className}`}
+            className={`w-full max-w-6xl mx-auto mb-1 sm:mb-4 px-4 pt-2 sm:pt-3 ${className}`}
         >
             <div className="flex items-center justify-between">
                 {/* Logo */}
                 <div
-                    className="flex items-center gap-3 cursor-pointer"
+                    className="flex items-center gap-2 sm:gap-3 cursor-pointer"
                     onClick={() => window.location.href = '/'}
                 >
                     <motion.h1
-                        className="text-3xl sm:text-5xl font-black tracking-wider flex items-center gap-2"
+                        className="text-2xl sm:text-4xl font-black tracking-wider flex items-center gap-1 sm:gap-2"
                         style={{ fontFamily: getFontFamily(language) }}
                         whileHover={{ scale: 1.05 }}
                         transition={{ type: "spring", stiffness: 400, damping: 10 }}
@@ -70,7 +70,7 @@ const Header = ({ className = '' }) => {
                                 scale: [1, 1.2, 1]
                             }}
                             transition={{ duration: 0.5, delay: 1, repeat: Infinity, repeatDelay: 5 }}
-                            className="text-3xl filter drop-shadow-[0_0_8px_rgba(250,204,21,0.6)]"
+                            className="text-xl sm:text-3xl filter drop-shadow-[0_0_8px_rgba(250,204,21,0.6)]"
                         >
                             ⚡
                         </motion.span>

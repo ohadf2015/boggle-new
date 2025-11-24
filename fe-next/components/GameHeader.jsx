@@ -44,12 +44,12 @@ const GameHeader = ({
       initial={{ y: -20, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       transition={{ duration: 0.5, ease: "easeOut" }}
-      className={`w-full max-w-6xl mx-auto mb-6 ${className}`}
+      className={`w-full max-w-6xl mx-auto mb-3 sm:mb-4 ${className}`}
     >
       <div
         className={`
           flex items-center justify-between
-          px-4 sm:px-6 py-3 sm:py-4
+          px-3 sm:px-6 py-2 sm:py-3
           rounded-xl sm:rounded-2xl
           border backdrop-blur-md
           transition-all duration-300
@@ -58,14 +58,14 @@ const GameHeader = ({
       >
         {/* Left side - Title */}
         <motion.div
-          className="flex items-center gap-3 cursor-pointer"
+          className="flex items-center gap-2 sm:gap-3 cursor-pointer"
           onClick={onLogoClick}
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
         >
           {/* Title */}
           <motion.h1
-            className="text-3xl sm:text-4xl font-bold tracking-wider flex items-center gap-1"
+            className="text-xl sm:text-3xl font-bold tracking-wider flex items-center gap-1"
             style={{ fontFamily: t('direction') === 'rtl' ? "'Fredoka', sans-serif" : "'Outfit', 'Rubik', sans-serif" }}
             whileHover={{ scale: 1.05 }}
             transition={{ type: "spring", stiffness: 400, damping: 10 }}
@@ -84,7 +84,7 @@ const GameHeader = ({
                 scale: [1, 1.2, 1]
               }}
               transition={{ duration: 0.5, delay: 1, repeat: Infinity, repeatDelay: 5 }}
-              className="text-3xl filter drop-shadow-[0_0_8px_rgba(250,204,21,0.6)]"
+              className="text-lg sm:text-2xl filter drop-shadow-[0_0_8px_rgba(250,204,21,0.6)]"
             >
               ⚡
             </motion.span>

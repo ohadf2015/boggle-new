@@ -188,8 +188,8 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
 
           // Combo system: only increase combo for validated words
           const now = Date.now();
-          if (lastWordTime && (now - lastWordTime) < 3000) {
-            // Within 3 seconds - increase combo!
+          if (lastWordTime && (now - lastWordTime) < 5000) {
+            // Within 5 seconds - increase combo!
             setComboLevel(prev => Math.min(prev + 1, 4)); // Max combo level 4
           } else {
             // Too slow, reset combo
@@ -202,11 +202,11 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
             clearTimeout(comboTimeoutRef.current);
           }
 
-          // Reset combo after 3 seconds of inactivity
+          // Reset combo after 5 seconds of inactivity
           comboTimeoutRef.current = setTimeout(() => {
             setComboLevel(0);
             setLastWordTime(null);
-          }, 3000);
+          }, 5000);
           break;
 
         case 'wordAlreadyFound':
@@ -802,7 +802,6 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
                         word: formedWord.toLowerCase(),
                       }));
                       setFoundWords(prev => [...prev, formedWord]);
-                      toast.success(`${t('playerView.wordSubmitted')}: ${formedWord}`, { duration: 1000, icon: '📤' });
                     } else {
                       toast.error(t('playerView.onlyLanguageWords'), { duration: 1000 });
                     }
