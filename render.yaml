@@ -1,16 +1,28 @@
 services:
   - type: web
     name: boggle-game
-    env: node
-    buildCommand: |
-      npm install --prefix fe &&
-      npm run build --prefix fe &&
-      npm install --prefix be --production
-    startCommand: cd be && node server.js
+    env: docker
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
     envVars:
       - key: NODE_ENV
         value: production
       - key: PORT
-        value: 10000
+        value: 3001
       - key: HOST
         value: 0.0.0.0
+
+  # Alternative: Node.js environment (without Docker)
+  # Uncomment this and comment out the docker service above if Docker builds fail
+  # - type: web
+  #   name: boggle-game
+  #   env: node
+  #   buildCommand: npm install && npm run build
+  #   startCommand: npm start
+  #   envVars:
+  #     - key: NODE_ENV
+  #       value: production
+  #     - key: PORT
+  #       value: 3001
+  #     - key: HOST
+  #       value: 0.0.0.0
