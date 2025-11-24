@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Input } from './ui/input';
 import { Button } from './ui/button';
@@ -17,33 +17,34 @@ const RoomChat = ({ username, isHost, gameCode, className = '' }) => {
   const scrollRef = useRef(null);
   const inputRef = useRef(null);
 
+  // Use useCallback to ensure handleMessage has a stable reference
+  const handleMessage = useCallback((event) => {
+    try {
+      const message = JSON.parse(event.data);
+
+      if (message.action === 'chatMessage') {
+        setMessages(prev => [...prev, {
+          id: Date.now() + Math.random(),
+          username: message.username,
+          message: message.message,
+          timestamp: message.timestamp || Date.now(),
+          isHost: message.isHost || false
+        }]);
+      }
+    } catch (error) {
+      console.error('Error parsing chat message:', error);
+    }
+  }, []);
+
   useEffect(() => {
     if (!ws) return;
-
-    const handleMessage = (event) => {
-      try {
-        const message = JSON.parse(event.data);
-
-        if (message.action === 'chatMessage') {
-          setMessages(prev => [...prev, {
-            id: Date.now() + Math.random(),
-            username: message.username,
-            message: message.message,
-            timestamp: message.timestamp || Date.now(),
-            isHost: message.isHost || false
-          }]);
-        }
-      } catch (error) {
-        console.error('Error parsing chat message:', error);
-      }
-    };
 
     ws.addEventListener('message', handleMessage);
 
     return () => {
       ws.removeEventListener('message', handleMessage);
     };
-  }, [ws]);
+  }, [ws, handleMessage]);
 
   // Auto-scroll to bottom when new messages arrive
   useEffect(() => {

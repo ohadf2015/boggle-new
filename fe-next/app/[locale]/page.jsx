@@ -354,12 +354,17 @@ export default function GamePage() {
                     if (attemptingReconnectRef.current) {
                         setError(t('errors.sessionExpired'));
                         toast.error(t('errors.sessionExpired'), {
-                            duration: 3000,
+                            duration: 4000,
                             icon: '⚠️',
                         });
                         setGameCode('');
                     } else {
                         setError(t('errors.gameCodeNotExist'));
+                        toast.error(t('errors.gameCodeNotExist'), {
+                            duration: 4000,
+                            icon: '❌',
+                        });
+                        setGameCode('');
                     }
                     setIsActive(false);
                     setAttemptingReconnect(false);
