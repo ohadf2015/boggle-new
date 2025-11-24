@@ -2,13 +2,17 @@
 
 ## Fixing BuildKit Connection Errors
 
-If you encounter the error:
+If you encounter errors like:
+```
+bc.Build: failed to solve: frontend grpc server closed unexpectedly
+```
+or
 ```
 bc.Build: listing workers for Build: failed to list workers: Unavailable: connection error:
 desc = "error reading server preface: read unix @->/run/buildkit/buildkitd.sock: use of closed network connection"
 ```
 
-This indicates Docker is trying to connect to a BuildKit daemon that's unavailable. Use the solutions below.
+These indicate Docker/BuildKit is experiencing gRPC server crashes or daemon connection issues. Use the solutions below.
 
 ---
 
@@ -139,17 +143,20 @@ export DOCKER_BUILDKIT=0
 
 ### Render.com
 
-The `render.yaml` is configured to use Docker builds by default:
+**Current Configuration:** The `render.yaml` is now configured to use Node.js environment directly to avoid BuildKit gRPC server crashes:
 
 ```yaml
 services:
   - type: web
     name: boggle-game
-    env: docker
-    dockerfilePath: ./Dockerfile
+    env: node
+    buildCommand: npm install && npm run build
+    startCommand: npm start
 ```
 
-If Docker builds fail on Render, uncomment the Node.js alternative in `render.yaml`.
+**Why this works:** This bypasses Docker/BuildKit entirely and builds the application directly with npm, which is more reliable and faster for Node.js applications on Render.
+
+**Alternative:** If you want to use Docker builds (commented out in `render.yaml`), uncomment the Docker service and comment out the Node.js service. However, this may be prone to BuildKit gRPC errors.
 
 ### Railway.app
 
