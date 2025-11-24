@@ -1,4 +1,4 @@
-import { hebrewLetters, DIFFICULTIES, DEFAULT_DIFFICULTY } from "./consts";
+import { hebrewLetters, swedishLetters, DIFFICULTIES, DEFAULT_DIFFICULTY } from "./consts";
 
 // Utilities for LexiClash game
 
@@ -50,9 +50,14 @@ export function generateRandomTable(rows = null, cols = null, language = 'he') {
       cols = DIFFICULTIES[DEFAULT_DIFFICULTY].cols;
     }
 
-    const letters = language === 'en' 
-      ? 'ABCDEFGHIJKLMNOPQRSTUVWXYZ' 
-      : hebrewLetters;
+    let letters;
+    if (language === 'en') {
+      letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    } else if (language === 'sv') {
+      letters = swedishLetters;
+    } else {
+      letters = hebrewLetters;
+    }
 
     const newTable = [];
     for (let i = 0; i < rows; i++) {

@@ -286,7 +286,7 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
               {mode === 'host' && (
                 <div className="space-y-2">
                   <Label className="text-slate-700 dark:text-gray-300 text-center block font-medium text-sm">{t('joinView.selectLanguage')}</Label>
-                  <div className="grid grid-cols-2 gap-2">
+                  <div className="grid grid-cols-3 gap-2">
                     <button
                       type="button"
                       onClick={() => setRoomLanguage('en')}
@@ -318,6 +318,22 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
                         "font-medium text-xs",
                         roomLanguage === 'he' ? "text-cyan-600 dark:text-cyan-300" : "text-slate-600 dark:text-gray-400"
                       )}>{t('joinView.hebrew')}</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setRoomLanguage('sv')}
+                      className={cn(
+                        "flex flex-col items-center gap-1 p-2 rounded-lg border-2 transition-all duration-300",
+                        roomLanguage === 'sv'
+                          ? "border-cyan-500 bg-cyan-500/20 shadow-lg shadow-cyan-500/30"
+                          : "border-slate-300 dark:border-slate-600 hover:border-cyan-400 dark:hover:border-cyan-500"
+                      )}
+                    >
+                      <span className="text-2xl">🇸🇪</span>
+                      <span className={cn(
+                        "font-medium text-xs",
+                        roomLanguage === 'sv' ? "text-cyan-600 dark:text-cyan-300" : "text-slate-600 dark:text-gray-400"
+                      )}>{t('joinView.swedish')}</span>
                     </button>
                   </div>
                 </div>
@@ -558,8 +574,8 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
                       >
                         <div className="flex items-center justify-between gap-3">
                           <div className="flex items-center gap-2">
-                            <span className="text-2xl" title={room.language === 'he' ? t('joinView.hebrew') : t('joinView.english')}>
-                              {room.language === 'he' ? '🇮🇱' : '🇺🇸'}
+                            <span className="text-2xl" title={room.language === 'he' ? t('joinView.hebrew') : room.language === 'sv' ? t('joinView.swedish') : t('joinView.english')}>
+                              {room.language === 'he' ? '🇮🇱' : room.language === 'sv' ? '🇸🇪' : '🇺🇸'}
                             </span>
                             <div>
                               <div className="font-bold text-lg text-cyan-400">{room.roomName || room.gameCode}</div>

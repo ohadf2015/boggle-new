@@ -22,6 +22,7 @@ class Dictionary {
   constructor() {
     this.englishWords = new Set();
     this.hebrewWords = new Set();
+    this.swedishWords = new Set();
     this.loaded = false;
   }
 
@@ -50,6 +51,11 @@ class Dictionary {
       this.hebrewWords = new Set(hebrewWords);
       console.log(`[Dictionary] Loaded ${this.hebrewWords.size} Hebrew words`);
 
+      // Load Swedish words
+      const { swedish_words } = require('@arvidbt/swedish-words/out/index.js');
+      this.swedishWords = new Set(swedish_words.map(w => w.toLowerCase()));
+      console.log(`[Dictionary] Loaded ${this.swedishWords.size} Swedish words`);
+
       this.loaded = true;
     } catch (error) {
       console.error('[Dictionary] Error loading dictionaries:', error);
@@ -67,7 +73,14 @@ class Dictionary {
       ? normalizeHebrewWord(word)
       : word.toLowerCase();
 
-    const dictionary = language === 'he' ? this.hebrewWords : this.englishWords;
+    let dictionary;
+    if (language === 'he') {
+      dictionary = this.hebrewWords;
+    } else if (language === 'sv') {
+      dictionary = this.swedishWords;
+    } else {
+      dictionary = this.englishWords;
+    }
 
     return dictionary.has(normalizedWord);
   }
@@ -78,6 +91,10 @@ class Dictionary {
 
   isValidHebrewWord(word) {
     return this.isValidWord(word, 'he');
+  }
+
+  isValidSwedishWord(word) {
+    return this.isValidWord(word, 'sv');
   }
 }
 

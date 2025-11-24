@@ -25,6 +25,8 @@ export const hebrewLetters = [
 
 export const englishLetters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
 
+export const swedishLetters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZÅÄÖ'.split('');
+
 export const DIFFICULTIES = {
   EASY: { nameKey: 'difficulty.easy', rows: 4, cols: 4 },
   MEDIUM: { nameKey: 'difficulty.medium', rows: 5, cols: 5 },
