@@ -381,7 +381,7 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
     if (!word.trim() || !gameStarted || !hostPlaying) return;
 
     const currentLang = roomLanguage;
-    const regex = currentLang === 'he' ? /^[\u0590-\u05FF]+$/ : /^[a-zA-Z]+$/;
+    const regex = currentLang === 'he' ? /^[\u0590-\u05FF]+$/ : currentLang === 'sv' ? /^[a-zA-ZåäöÅÄÖ]+$/ : /^[a-zA-Z]+$/;
     const trimmedWord = word.trim();
 
     // Min length validation
@@ -798,7 +798,7 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
             {!gameStarted && (
               <div className="mb-4 flex justify-center">
                 <Badge variant="outline" className="text-lg px-4 py-1 border-cyan-500/50 text-cyan-600 dark:text-cyan-300">
-                  {roomLanguage === 'he' ? '🇮🇱 עברית' : '🇺🇸 English'}
+                  {roomLanguage === 'he' ? '🇮🇱 עברית' : roomLanguage === 'sv' ? '🇸🇪 Svenska' : '🇺🇸 English'}
                 </Badge>
               </div>
             )}
@@ -935,7 +935,7 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
                     onWordSubmit={(formedWord) => {
                       if (!hostPlaying) return;
 
-                      const regex = roomLanguage === 'he' ? /^[\u0590-\u05FF]+$/ : /^[a-zA-Z]+$/;
+                      const regex = roomLanguage === 'he' ? /^[\u0590-\u05FF]+$/ : roomLanguage === 'sv' ? /^[a-zA-ZåäöÅÄÖ]+$/ : /^[a-zA-Z]+$/;
 
                       if (formedWord.length < 2) {
                         toast.error(t('playerView.wordTooShort'), { duration: 1000, icon: '⚠️' });

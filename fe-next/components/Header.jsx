@@ -14,7 +14,8 @@ const Header = ({ className = '' }) => {
 
     const languages = [
         { code: 'en', name: 'English', flag: '🇺🇸' },
-        { code: 'he', name: 'עברית', flag: '🇮🇱' }
+        { code: 'he', name: 'עברית', flag: '🇮🇱' },
+        { code: 'sv', name: 'Svenska', flag: '🇸🇪' }
     ];
 
     const currentLang = languages.find(l => l.code === language) || languages[0];
