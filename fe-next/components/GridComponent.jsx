@@ -375,7 +375,7 @@ const GridComponent = ({
                 ref={gridRef}
                 className={cn(
                     "grid touch-none select-none relative rounded-2xl p-2 sm:p-3 md:p-4 aspect-square w-full max-w-[min(90vh,90vw)]",
-                    isLargeGrid ? "gap-1 sm:gap-1.5" : "gap-2 sm:gap-3",
+                    isLargeGrid ? "gap-0.5 sm:gap-1" : "gap-1 sm:gap-1.5",
                     className
                 )}
                 style={{
@@ -422,7 +422,7 @@ const GridComponent = ({
                                     ? `bg-gradient-to-br ${comboColors.gradient} text-white ${comboColors.border} z-10 ${comboColors.shadow} border-white/40`
                                     : "bg-gradient-to-br from-slate-100 via-white to-slate-100 dark:from-slate-700 dark:via-slate-800 dark:to-slate-900 text-slate-900 dark:text-white border-slate-300/60 dark:border-slate-600/60 hover:scale-105 hover:shadow-xl dark:hover:bg-slate-700/80 active:scale-95 shadow-[0_4px_12px_rgba(0,0,0,0.1)]"
                             )}
-                            style={{ borderRadius: '12px' }}
+                            style={{ borderRadius: '8px' }}
                         >
                             {/* Ripple effect on selection */}
                             {isSelected && (
@@ -430,7 +430,7 @@ const GridComponent = ({
                                     {/* Main ripple effect */}
                                     <motion.div
                                         className="absolute inset-0 bg-white/40"
-                                        style={{ borderRadius: '12px' }}
+                                        style={{ borderRadius: '8px' }}
                                         initial={{ scale: 0.5, opacity: 0.8 }}
                                         animate={{ scale: 2.5, opacity: 0 }}
                                         transition={{ duration: 0.4, ease: "easeOut" }}
@@ -442,7 +442,7 @@ const GridComponent = ({
                                         style={{
                                             background: 'radial-gradient(circle at center, rgba(255, 255, 255, 0.9), transparent 70%)',
                                             filter: 'blur(2px)',
-                                            borderRadius: '12px'
+                                            borderRadius: '8px'
                                         }}
                                         initial={{ scale: 0, opacity: 1 }}
                                         animate={{ scale: [0, 1.5, 0], opacity: [1, 0.5, 0] }}
@@ -495,7 +495,7 @@ const GridComponent = ({
                                                 style={{
                                                     background: 'radial-gradient(circle, rgba(255,107,0,0.6), transparent 60%)',
                                                     filter: 'blur(8px)',
-                                                    borderRadius: '12px'
+                                                    borderRadius: '8px'
                                                 }}
                                                 animate={{
                                                     scale: [1, 1.8, 1],
@@ -670,7 +670,7 @@ const GridComponent = ({
                                                     style={{
                                                         background: `radial-gradient(circle, ${comboLevel >= 4 ? 'rgba(168,85,247,0.4)' : 'rgba(255,107,0,0.3)'}, transparent)`,
                                                         filter: 'blur(3px)',
-                                                        borderRadius: '12px'
+                                                        borderRadius: '8px'
                                                     }}
                                                     animate={{
                                                         scale: [1, 1.3, 1],
