@@ -107,8 +107,10 @@ const GridComponent = ({
                 if (isAdjacent) {
                     setSelectedCells(prev => [...prev, { row: rowIndex, col: colIndex, letter }]);
 
-                    // Progressive vibration - longer word = more intense feedback
-                    const vibrationIntensity = Math.min(20 + selectedCells.length * 3, 40);
+                    // Progressive vibration - longer word and combo level = more intense feedback
+                    const baseIntensity = 20 + selectedCells.length * 3;
+                    const comboBonus = comboLevel * 5; // Add extra intensity for combo streaks
+                    const vibrationIntensity = Math.min(baseIntensity + comboBonus, 60);
                     if (window.navigator && window.navigator.vibrate) {
                         window.navigator.vibrate(vibrationIntensity);
                     }
@@ -134,8 +136,21 @@ const GridComponent = ({
             if (window.navigator && window.navigator.vibrate) {
                 const wordLength = selectedCells.length;
                 if (comboLevel > 0) {
-                    // Combo celebration - multiple short bursts
-                    window.navigator.vibrate([50, 50, 50, 50, 80]);
+                    // Combo celebration - intensity scales with combo level
+                    // Higher combos = longer and more intense vibrations
+                    if (comboLevel >= 7) {
+                        // x8+ Epic rainbow combo - extreme celebration
+                        window.navigator.vibrate([100, 50, 100, 50, 100, 50, 150]);
+                    } else if (comboLevel >= 5) {
+                        // x6-x7 High combo - very intense
+                        window.navigator.vibrate([80, 40, 80, 40, 120]);
+                    } else if (comboLevel >= 3) {
+                        // x4-x5 Medium combo - intense
+                        window.navigator.vibrate([60, 40, 60, 40, 100]);
+                    } else if (comboLevel >= 1) {
+                        // x2-x3 Low combo - moderate
+                        window.navigator.vibrate([50, 30, 50, 30, 80]);
+                    }
                 } else if (wordLength >= 6) {
                     // Long word - double vibration
                     window.navigator.vibrate([40, 30, 60]);
@@ -216,48 +231,72 @@ const GridComponent = ({
 
     // Get combo colors based on level (escalating colors for gamification)
     const getComboColors = (level) => {
+        // Always show combo multiplier text, even for level 0
+        const multiplier = `x${level + 1}`;
+
         if (level === 0) {
             return {
                 gradient: 'from-yellow-400 to-orange-500',
                 border: 'border-yellow-300',
                 shadow: 'shadow-lg',
-                text: null
+                text: null // Don't show x1
             };
         } else if (level === 1) {
             return {
                 gradient: 'from-orange-400 to-red-500',
                 border: 'border-orange-300',
                 shadow: 'shadow-[0_0_15px_rgba(251,146,60,0.6)]',
-                text: 'x2'
+                text: multiplier
             };
         } else if (level === 2) {
             return {
                 gradient: 'from-red-400 to-pink-500',
                 border: 'border-red-300',
                 shadow: 'shadow-[0_0_20px_rgba(239,68,68,0.7)]',
-                text: 'x3'
+                text: multiplier
             };
         } else if (level === 3) {
             return {
                 gradient: 'from-pink-400 to-purple-500',
                 border: 'border-pink-300',
                 shadow: 'shadow-[0_0_25px_rgba(236,72,153,0.8)]',
-                text: 'x4'
+                text: multiplier
             };
         } else if (level === 4) {
             return {
                 gradient: 'from-purple-400 via-pink-500 to-red-500',
                 border: 'border-purple-300',
                 shadow: 'shadow-[0_0_30px_rgba(168,85,247,0.9)]',
-                text: 'x5'
+                text: multiplier
+            };
+        } else if (level === 5) {
+            return {
+                gradient: 'from-purple-400 via-blue-500 to-cyan-400',
+                border: 'border-cyan-300',
+                shadow: 'shadow-[0_0_35px_rgba(34,211,238,1)]',
+                text: multiplier
+            };
+        } else if (level === 6) {
+            return {
+                gradient: 'from-blue-400 via-green-500 to-yellow-400',
+                border: 'border-green-300',
+                shadow: 'shadow-[0_0_40px_rgba(34,197,94,1)]',
+                text: multiplier
+            };
+        } else if (level === 7) {
+            return {
+                gradient: 'from-green-400 via-yellow-500 to-orange-400',
+                border: 'border-yellow-300',
+                shadow: 'shadow-[0_0_45px_rgba(250,204,21,1)]',
+                text: multiplier
             };
         } else {
-            // Level 5+: Epic rainbow/fire combo
+            // Level 8+: Full rainbow gradient that animates
             return {
-                gradient: 'from-purple-400 via-pink-500 to-yellow-400 animate-gradient-x',
-                border: 'border-yellow-300',
-                shadow: 'shadow-[0_0_35px_rgba(250,204,21,1)]',
-                text: `x${level + 1}`
+                gradient: 'from-red-500 via-yellow-500 via-green-500 via-blue-500 via-indigo-500 to-purple-500 bg-[length:200%_200%] animate-gradient-xy',
+                border: 'border-white',
+                shadow: 'shadow-[0_0_50px_rgba(255,255,255,1)]',
+                text: multiplier
             };
         }
     };
@@ -375,7 +414,7 @@ const GridComponent = ({
                 ref={gridRef}
                 className={cn(
                     "grid touch-none select-none relative rounded-2xl p-2 sm:p-3 md:p-4 aspect-square w-full max-w-[min(90vh,90vw)]",
-                    isLargeGrid ? "gap-1 sm:gap-1.5" : "gap-2 sm:gap-3",
+                    isLargeGrid ? "gap-0.5 sm:gap-1" : "gap-1 sm:gap-1.5",
                     className
                 )}
                 style={{
@@ -422,7 +461,7 @@ const GridComponent = ({
                                     ? `bg-gradient-to-br ${comboColors.gradient} text-white ${comboColors.border} z-10 ${comboColors.shadow} border-white/40`
                                     : "bg-gradient-to-br from-slate-100 via-white to-slate-100 dark:from-slate-700 dark:via-slate-800 dark:to-slate-900 text-slate-900 dark:text-white border-slate-300/60 dark:border-slate-600/60 hover:scale-105 hover:shadow-xl dark:hover:bg-slate-700/80 active:scale-95 shadow-[0_4px_12px_rgba(0,0,0,0.1)]"
                             )}
-                            style={{ borderRadius: '12px' }}
+                            style={{ borderRadius: '8px' }}
                         >
                             {/* Ripple effect on selection */}
                             {isSelected && (
@@ -430,7 +469,7 @@ const GridComponent = ({
                                     {/* Main ripple effect */}
                                     <motion.div
                                         className="absolute inset-0 bg-white/40"
-                                        style={{ borderRadius: '12px' }}
+                                        style={{ borderRadius: '8px' }}
                                         initial={{ scale: 0.5, opacity: 0.8 }}
                                         animate={{ scale: 2.5, opacity: 0 }}
                                         transition={{ duration: 0.4, ease: "easeOut" }}
@@ -442,7 +481,7 @@ const GridComponent = ({
                                         style={{
                                             background: 'radial-gradient(circle at center, rgba(255, 255, 255, 0.9), transparent 70%)',
                                             filter: 'blur(2px)',
-                                            borderRadius: '12px'
+                                            borderRadius: '8px'
                                         }}
                                         initial={{ scale: 0, opacity: 1 }}
                                         animate={{ scale: [0, 1.5, 0], opacity: [1, 0.5, 0] }}
@@ -495,7 +534,7 @@ const GridComponent = ({
                                                 style={{
                                                     background: 'radial-gradient(circle, rgba(255,107,0,0.6), transparent 60%)',
                                                     filter: 'blur(8px)',
-                                                    borderRadius: '12px'
+                                                    borderRadius: '8px'
                                                 }}
                                                 animate={{
                                                     scale: [1, 1.8, 1],
@@ -670,7 +709,7 @@ const GridComponent = ({
                                                     style={{
                                                         background: `radial-gradient(circle, ${comboLevel >= 4 ? 'rgba(168,85,247,0.4)' : 'rgba(255,107,0,0.3)'}, transparent)`,
                                                         filter: 'blur(3px)',
-                                                        borderRadius: '12px'
+                                                        borderRadius: '8px'
                                                     }}
                                                     animate={{
                                                         scale: [1, 1.3, 1],

@@ -69,12 +69,16 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
 
   const handleRoomSelect = (roomCode) => {
     setGameCode(roomCode);
-    // If we are in "join" mode, we want to show the username input now
-    // If the user clicked a room from the list, they likely want to join it
-    // We can simulate this by ensuring we are in 'join' mode and maybe focusing the username input
     setMode('join');
-    // If we were in a "prefilled" state or just browsing, we want to ensure the form is visible and ready
     setShowFullForm(true);
+
+    // Auto-join if username is already set
+    if (username && username.trim()) {
+      // Small delay to let state update, then auto-join
+      setTimeout(() => {
+        handleJoin(false);
+      }, 100);
+    }
   };
 
   const handleQuickJoin = (e) => {
@@ -513,14 +517,14 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
                   <div className="flex flex-wrap gap-2 justify-center">
                     <ShareButton
                       variant="link"
-                      onClick={() => copyJoinUrl(gameCode)}
+                      onClick={() => copyJoinUrl(gameCode, t)}
                       icon={<FaLink />}
                     >
                       {t('joinView.copyLink')}
                     </ShareButton>
                     <ShareButton
                       variant="whatsapp"
-                      onClick={() => shareViaWhatsApp(gameCode, roomName)}
+                      onClick={() => shareViaWhatsApp(gameCode, roomName, t)}
                       icon={<FaWhatsapp />}
                     >
                       {t('joinView.shareWhatsapp')}
@@ -665,14 +669,14 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
           </DialogHeader>
           <div className="flex flex-col items-center gap-4 py-4">
             <div className="p-6 bg-white rounded-lg shadow-md">
-              <QRCodeSVG value={getJoinUrl()} size={250} level="H" includeMargin />
+              <QRCodeSVG value={getJoinUrl(gameCode)} size={250} level="H" includeMargin />
             </div>
             <h4 className="text-3xl font-bold text-cyan-400">{gameCode}</h4>
             <p className="text-sm text-center text-slate-600 dark:text-gray-300">
               {t('joinView.scanToJoin')} {gameCode}
             </p>
             <p className="text-xs text-center text-slate-500 dark:text-gray-400 mt-2">
-              {getJoinUrl()}
+              {getJoinUrl(gameCode)}
             </p>
           </div>
           <DialogFooter className="sm:justify-center">

@@ -22,7 +22,7 @@ import '../style/animation.scss';
 import { generateRandomTable, embedWordInGrid, applyHebrewFinalLetters } from '../utils/utils';
 import { useWebSocket } from '../utils/WebSocketContext';
 import { clearSession } from '../utils/session';
-import { copyJoinUrl, shareViaWhatsApp } from '../utils/share';
+import { copyJoinUrl, shareViaWhatsApp, getJoinUrl } from '../utils/share';
 import { useLanguage } from '../contexts/LanguageContext';
 import { DIFFICULTIES, DEFAULT_DIFFICULTY } from '../utils/consts';
 import { cn } from '../lib/utils';
@@ -478,11 +478,7 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
 
 
 
-  // Get the join URL for QR code - use public URL if available
-  const getJoinUrl = () => {
-    const publicUrl = process.env.REACT_APP_PUBLIC_URL || window.location.origin;
-    return `${publicUrl}?room=${gameCode}`;
-  };
+  // Note: getJoinUrl is now imported from utils/share
 
   // Collect unique words and count duplicates for validation modal
   const getUniqueWords = () => {
@@ -687,14 +683,14 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
           </DialogHeader>
           <div className="flex flex-col items-center gap-4 py-4">
             <div className="p-6 bg-white rounded-lg shadow-md">
-              <QRCodeSVG value={getJoinUrl()} size={250} level="H" />
+              <QRCodeSVG value={getJoinUrl(gameCode)} size={250} level="H" />
             </div>
             <h4 className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-400">{gameCode}</h4>
             <p className="text-sm text-center text-slate-500 dark:text-slate-400">
               {t('hostView.scanQr')} {gameCode}
             </p>
             <p className="text-xs text-center text-slate-500">
-              {getJoinUrl()}
+              {getJoinUrl(gameCode)}
             </p>
           </div>
           <DialogFooter>
@@ -733,14 +729,14 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
               <div className="flex flex-wrap gap-2 justify-center">
                 <ShareButton
                   variant="link"
-                  onClick={() => copyJoinUrl(gameCode)}
+                  onClick={() => copyJoinUrl(gameCode, t)}
                   icon={<FaLink />}
                 >
                   {t('hostView.copyLink')}
                 </ShareButton>
                 <ShareButton
                   variant="whatsapp"
-                  onClick={() => shareViaWhatsApp(gameCode)}
+                  onClick={() => shareViaWhatsApp(gameCode, '', t)}
                   icon={<FaWhatsapp />}
                 >
                   {t('hostView.shareWhatsapp')}

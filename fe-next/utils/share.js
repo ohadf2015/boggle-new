@@ -7,6 +7,7 @@ import toast from 'react-hot-toast';
  */
 export const getJoinUrl = (gameCode) => {
   if (typeof window === 'undefined') return '';
+  if (!gameCode) return '';
   const publicUrl = process.env.REACT_APP_PUBLIC_URL || window.location.origin;
   return `${publicUrl}?room=${gameCode}`;
 };
@@ -14,21 +15,24 @@ export const getJoinUrl = (gameCode) => {
 /**
  * Copy the join URL to clipboard
  * @param {string} gameCode - The game code
+ * @param {function} t - Translation function (optional for backward compatibility)
  * @returns {Promise<boolean>} Success status
  */
-export const copyJoinUrl = async (gameCode) => {
+export const copyJoinUrl = async (gameCode, t = null) => {
   const url = getJoinUrl(gameCode);
 
   try {
     await navigator.clipboard.writeText(url);
-    toast.success('הקישור הועתק ללוח! 📋', {
+    const successMessage = t ? t('share.linkCopied') : 'Link copied! 📋';
+    toast.success(successMessage, {
       duration: 2000,
       icon: '✅',
     });
     return true;
   } catch (error) {
     console.error('Failed to copy URL:', error);
-    toast.error('שגיאה בהעתקת הקישור', {
+    const errorMessage = t ? t('share.copyError') : 'Error copying link';
+    toast.error(errorMessage, {
       duration: 2000,
     });
     return false;
@@ -39,14 +43,23 @@ export const copyJoinUrl = async (gameCode) => {
  * Share game via WhatsApp
  * @param {string} gameCode - The game code
  * @param {string} roomName - The room name (optional)
+ * @param {function} t - Translation function (optional for backward compatibility)
  */
-export const shareViaWhatsApp = (gameCode, roomName = '') => {
+export const shareViaWhatsApp = (gameCode, roomName = '', t = null) => {
   const url = getJoinUrl(gameCode);
-  const roomText = roomName ? `"${roomName}"` : '';
-  const message = `🎮 בואו לשחק LexiClash איתי!\n\n` +
-    `${roomText ? `חדר: ${roomText}\n` : ''}` +
-    `קוד: ${gameCode}\n\n` +
-    `הצטרפו דרך הקישור:\n${url}`;
+
+  let message;
+  if (t) {
+    const roomText = roomName ? `\n${t('share.room')}: ${roomName}` : '';
+    message = `🎮 ${t('share.inviteMessage')}\n${roomText}\n${t('share.code')}: ${gameCode}\n\n${t('share.joinViaLink')}:\n${url}`;
+  } else {
+    // Fallback for backward compatibility
+    const roomText = roomName ? `"${roomName}"` : '';
+    message = `🎮 בואו לשחק LexiClash איתי!\n\n` +
+      `${roomText ? `חדר: ${roomText}\n` : ''}` +
+      `קוד: ${gameCode}\n\n` +
+      `הצטרפו דרך הקישור:\n${url}`;
+  }
 
   const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(message)}`;
   window.open(whatsappUrl, '_blank');

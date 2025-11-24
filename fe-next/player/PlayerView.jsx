@@ -8,7 +8,7 @@ import { AchievementBadge } from '../components/AchievementBadge';
 import { motion, AnimatePresence } from 'framer-motion';
 import confetti from 'canvas-confetti';
 import toast, { Toaster } from 'react-hot-toast';
-import { FaTrophy, FaTrash, FaDoorOpen, FaUsers, FaMousePointer, FaCrown, FaRandom } from 'react-icons/fa';
+import { FaTrophy, FaTrash, FaDoorOpen, FaUsers, FaMousePointer, FaCrown, FaRandom, FaLink, FaWhatsapp, FaQrcode } from 'react-icons/fa';
 import { useWebSocket } from '../utils/WebSocketContext';
 import { clearSession } from '../utils/session';
 import { useLanguage } from '../contexts/LanguageContext';
@@ -18,6 +18,10 @@ import { applyHebrewFinalLetters } from '../utils/utils';
 import RoomChat from '../components/RoomChat';
 import CubeCrashAnimation from '../components/CubeCrashAnimation';
 import CircularTimer from '../components/CircularTimer';
+import { copyJoinUrl, shareViaWhatsApp, getJoinUrl } from '../utils/share';
+import ShareButton from '../components/ShareButton';
+import { QRCodeSVG } from 'qrcode.react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '../components/ui/dialog';
 
 const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) => {
   const { t } = useLanguage();
@@ -39,6 +43,7 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
   const [playersReady, setPlayersReady] = useState(initialPlayers);
   const [shufflingGrid, setShufflingGrid] = useState(null);
   const [gameLanguage, setGameLanguage] = useState(null);
+  const [showQR, setShowQR] = useState(false);
 
   // Combo system state
   const [comboLevel, setComboLevel] = useState(0);
@@ -659,6 +664,47 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
               </Card>
             </motion.div>
 
+            {/* Share Game Section */}
+            <motion.div
+              initial={{ y: 20, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ delay: 0.25 }}
+            >
+              <Card className="bg-white/90 dark:bg-slate-800/90 backdrop-blur-md shadow-xl border border-teal-500/30 shadow-[0_0_15px_rgba(20,184,166,0.1)] p-4">
+                <h3 className="text-sm font-bold text-teal-600 dark:text-teal-300 mb-3 text-center">
+                  {t('playerView.inviteFriends') || 'Invite Friends'}
+                </h3>
+                <div className="flex flex-wrap gap-2 justify-center">
+                  <ShareButton
+                    variant="link"
+                    onClick={() => copyJoinUrl(gameCode, t)}
+                    icon={<FaLink />}
+                  >
+                    {t('joinView.copyLink')}
+                  </ShareButton>
+                  <ShareButton
+                    variant="whatsapp"
+                    onClick={() => shareViaWhatsApp(gameCode, '', t)}
+                    icon={<FaWhatsapp />}
+                  >
+                    {t('joinView.shareWhatsapp')}
+                  </ShareButton>
+                  <ShareButton
+                    variant="qr"
+                    onClick={() => setShowQR(true)}
+                    icon={<FaQrcode />}
+                  >
+                    {t('hostView.qrCode')}
+                  </ShareButton>
+                </div>
+                <div className="mt-3 text-center">
+                  <Badge className="bg-gradient-to-r from-teal-500 to-cyan-500 text-white px-3 py-1">
+                    {t('hostView.roomCode')}: {gameCode}
+                  </Badge>
+                </div>
+              </Card>
+            </motion.div>
+
             {/* Chat Section */}
             <motion.div
               initial={{ y: 20, opacity: 0 }}
@@ -674,6 +720,38 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
             </motion.div>
           </div>
         </div>
+
+        {/* QR Code Dialog */}
+        <Dialog open={showQR} onOpenChange={setShowQR}>
+          <DialogContent className="sm:max-w-md bg-white dark:bg-slate-800 border-cyan-500/30">
+            <DialogHeader>
+              <DialogTitle className="text-center text-cyan-300 flex items-center justify-center gap-2">
+                <FaQrcode />
+                {t('joinView.qrCodeTitle')}
+              </DialogTitle>
+            </DialogHeader>
+            <div className="flex flex-col items-center gap-4 py-4">
+              <div className="p-6 bg-white rounded-lg shadow-md">
+                <QRCodeSVG value={getJoinUrl(gameCode)} size={250} level="H" includeMargin />
+              </div>
+              <h4 className="text-3xl font-bold text-cyan-400">{gameCode}</h4>
+              <p className="text-sm text-center text-slate-600 dark:text-gray-300">
+                {t('joinView.scanToJoin')} {gameCode}
+              </p>
+              <p className="text-xs text-center text-slate-500 dark:text-gray-400 mt-2">
+                {getJoinUrl(gameCode)}
+              </p>
+            </div>
+            <DialogFooter className="sm:justify-center">
+              <Button
+                onClick={() => setShowQR(false)}
+                className="w-full bg-gradient-to-r from-cyan-500 to-teal-500 hover:from-cyan-400 hover:to-teal-400 hover:shadow-[0_0_15px_rgba(6,182,212,0.5)]"
+              >
+                {t('common.close')}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </div>
     );
   }
