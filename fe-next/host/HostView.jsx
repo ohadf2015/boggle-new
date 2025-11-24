@@ -161,10 +161,7 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
 
 
         case 'playerFoundWord':
-          toast(`${message.username} ${t('hostView.playerFoundWord')} (${message.wordCount} ${t('hostView.words')})`, {
-            icon: '🎯',
-            duration: 2000,
-          });
+          // Update word counts without notification
           setPlayerWordCounts(prev => ({
             ...prev,
             [message.username]: message.wordCount

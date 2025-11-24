@@ -27,6 +27,7 @@ export const translations = {
       selectUILanguage: 'Interface Language',
       close: 'Close',
       understood: 'Got it, let\'s play!',
+      refresh: 'Refresh',
     },
     errors: {
       unstableConnection: 'Internet connection is unstable - you may experience issues during the game',
@@ -308,6 +309,7 @@ export const translations = {
       selectUILanguage: 'שפת ממשק',
       close: 'סגור',
       understood: 'הבנתי, בוא נשחק!',
+      refresh: 'רענן',
     },
     errors: {
       unstableConnection: 'חיבור האינטרנט לא יציב - ייתכנו בעיות במשחק',
@@ -589,6 +591,7 @@ export const translations = {
       selectUILanguage: 'Gränssnittsspråk',
       close: 'Stäng',
       understood: 'Förstått, låt oss spela!',
+      refresh: 'Uppdatera',
     },
     errors: {
       unstableConnection: 'Internetanslutningen är instabil - du kan uppleva problem under spelet',
@@ -637,6 +640,7 @@ export const translations = {
       english: 'English',
       hebrew: 'Hebrew',
       swedish: 'Svenska',
+      japanese: '日本語',
       generateNewCode: 'Generera ny kod',
       createGameInstructions: 'Skapa ett spel och dela koden med vänner!',
       createNewRoom: 'Skapa ett nytt rum för att komma igång!',
@@ -871,6 +875,7 @@ export const translations = {
       selectUILanguage: 'インターフェース言語',
       close: '閉じる',
       understood: 'わかりました、プレイしましょう！',
+      refresh: '更新',
     },
     errors: {
       unstableConnection: 'インターネット接続が不安定です - ゲーム中に問題が発生する可能性があります',
@@ -918,6 +923,7 @@ export const translations = {
       clearAndRestart: 'クリアして最初からやり直す',
       english: 'English',
       hebrew: 'Hebrew',
+      swedish: 'Svenska',
       japanese: '日本語',
       generateNewCode: '新しいコードを生成',
       createGameInstructions: 'ゲームを作成して友達とコードを共有しましょう！',

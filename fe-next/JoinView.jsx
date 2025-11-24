@@ -564,7 +564,7 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
                           <FaSync />
                         </Button>
                       </TooltipTrigger>
-                      <TooltipContent>רענן</TooltipContent>
+                      <TooltipContent>{t('common.refresh')}</TooltipContent>
                     </Tooltip>
                   </TooltipProvider>
                 </div>

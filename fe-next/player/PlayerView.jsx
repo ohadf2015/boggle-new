@@ -655,9 +655,13 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
 
       {/* Timer with Circular Progress */}
       {remainingTime !== null && gameActive && (
-        <div className="flex justify-center mb-2">
+        <motion.div
+          initial={{ scale: 0, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          className="flex justify-center mb-4 relative z-10"
+        >
           <CircularTimer remainingTime={remainingTime} totalTime={180} />
-        </div>
+        </motion.div>
       )}
 
       {/* Achievements */}
@@ -688,13 +692,13 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
       <div className="flex flex-col lg:flex-row gap-2 md:gap-4 max-w-7xl mx-auto flex-grow w-full overflow-hidden">
         {/* Left Column: Found Words (Hidden on mobile, shown on desktop) */}
         <div className="hidden lg:flex lg:flex-col lg:w-64 xl:w-80 gap-2">
-          <Card className="bg-white/90 dark:bg-slate-800/90 backdrop-blur-md shadow-2xl border border-teal-500/30 shadow-[0_0_15px_rgba(20,184,166,0.1)] flex flex-col flex-grow overflow-hidden">
-            <CardHeader className="py-2 border-b border-teal-500/20">
-              <CardTitle className="text-teal-600 dark:text-teal-300 text-lg uppercase tracking-wide">
-                {t('playerView.wordsFound') || 'Found Words'}
+          <Card className="bg-slate-900/95 dark:bg-slate-900/95 backdrop-blur-md shadow-2xl border border-teal-500/40 shadow-[0_0_25px_rgba(20,184,166,0.2)] flex flex-col flex-grow overflow-hidden">
+            <CardHeader className="py-3 border-b border-teal-500/30 bg-gradient-to-r from-teal-900/50 to-cyan-900/50">
+              <CardTitle className="text-white text-base uppercase tracking-widest font-bold">
+                FOUND WORDS
               </CardTitle>
             </CardHeader>
-            <CardContent className="flex-1 overflow-y-auto p-2">
+            <CardContent className="flex-1 overflow-y-auto p-3 bg-slate-900/90">
               <div className="space-y-2">
                 <AnimatePresence>
                   {foundWords.map((foundWord, index) => (
@@ -703,17 +707,17 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
                       initial={{ x: -30, opacity: 0 }}
                       animate={{ x: 0, opacity: 1 }}
                       exit={{ x: -30, opacity: 0 }}
-                      className={`p-2 rounded-lg text-center font-semibold
+                      className={`p-3 rounded-lg text-center font-bold transition-all
                         ${index === foundWords.length - 1 ?
-                          'bg-gradient-to-r from-cyan-500/30 to-teal-500/30 border border-cyan-500/50 text-cyan-700 dark:text-cyan-300' :
-                          'bg-slate-100 dark:bg-slate-700/50 text-slate-900 dark:text-white'}`}
+                          'bg-gradient-to-r from-cyan-500/80 to-teal-500/80 border border-cyan-400/60 text-white shadow-lg shadow-cyan-500/30' :
+                          'bg-slate-800/70 border border-slate-700/80 text-white hover:bg-slate-800/90'}`}
                     >
                       {applyHebrewFinalLetters(foundWord).toUpperCase()}
                     </motion.div>
                   ))}
                 </AnimatePresence>
                 {foundWords.length === 0 && gameActive && (
-                  <p className="text-center text-slate-500 dark:text-slate-400 text-sm mt-4">
+                  <p className="text-center text-slate-400 py-6 text-sm">
                     {t('playerView.noWordsYet') || 'No words found yet'}
                   </p>
                 )}
@@ -725,8 +729,8 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
         {/* Center Column: Letter Grid */}
         <div className="flex-1 flex flex-col gap-2 min-w-0">
           {(letterGrid || shufflingGrid) && (
-            <Card className="bg-white/90 dark:bg-slate-800/90 backdrop-blur-md shadow-2xl border border-cyan-500/30 shadow-[0_0_15px_rgba(6,182,212,0.1)] flex flex-col flex-grow overflow-hidden">
-              <CardContent className="flex-grow flex flex-col items-center justify-center p-2 md:p-4">
+            <Card className="bg-slate-900/95 dark:bg-slate-900/95 backdrop-blur-md shadow-2xl border border-cyan-500/40 shadow-[0_0_25px_rgba(6,182,212,0.2)] flex flex-col flex-grow overflow-hidden">
+              <CardContent className="flex-grow flex flex-col items-center justify-center p-2 md:p-4 bg-slate-900/90">
                 <GridComponent
                   grid={letterGrid || shufflingGrid}
                   interactive={gameActive}
@@ -805,14 +809,14 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
 
         {/* Right Column: Live Ranking */}
         <div className="lg:w-64 xl:w-80 flex flex-col gap-2">
-          <Card className="bg-white/90 dark:bg-slate-800/90 backdrop-blur-md shadow-2xl border border-purple-500/30 shadow-[0_0_15px_rgba(168,85,247,0.1)] flex flex-col overflow-hidden max-h-[40vh] lg:max-h-none lg:flex-grow">
-            <CardHeader className="py-2 border-b border-purple-500/20">
-              <CardTitle className="flex items-center gap-2 text-purple-600 dark:text-purple-300 text-lg uppercase tracking-wide">
-                <FaTrophy className="text-yellow-500 dark:text-yellow-400" />
-                {t('playerView.liveRanking') || 'Live Ranking'}
+          <Card className="bg-slate-900/95 dark:bg-slate-900/95 backdrop-blur-md shadow-2xl border border-purple-500/40 shadow-[0_0_25px_rgba(168,85,247,0.2)] flex flex-col overflow-hidden max-h-[40vh] lg:max-h-none lg:flex-grow">
+            <CardHeader className="py-3 border-b border-purple-500/30 bg-gradient-to-r from-purple-900/50 to-pink-900/50">
+              <CardTitle className="flex items-center gap-2 text-white text-base uppercase tracking-widest font-bold">
+                <FaTrophy className="text-yellow-400 drop-shadow-[0_0_8px_rgba(251,191,36,0.6)]" />
+                LIVE RANKING
               </CardTitle>
             </CardHeader>
-            <CardContent className="overflow-y-auto flex-1 p-2">
+            <CardContent className="overflow-y-auto flex-1 p-3 bg-slate-900/90">
               <div className="space-y-2">
                 {leaderboard.map((player, index) => (
                   <motion.div
@@ -820,23 +824,23 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
                     initial={{ x: 50, opacity: 0 }}
                     animate={{ x: 0, opacity: 1 }}
                     transition={{ delay: index * 0.05 }}
-                    className={`flex items-center gap-2 p-2 rounded-lg
-                      ${index === 0 ? 'bg-gradient-to-r from-yellow-500/90 to-orange-500/90 text-white shadow-lg border border-yellow-400/50' :
-                        index === 1 ? 'bg-gradient-to-r from-gray-400/90 to-gray-500/90 text-white shadow-md border border-gray-400/50' :
-                          index === 2 ? 'bg-gradient-to-r from-orange-500/90 to-orange-600/90 text-white shadow-md border border-orange-400/50' :
-                            'bg-slate-100 dark:bg-slate-700/50 text-slate-900 dark:text-white border border-slate-200 dark:border-slate-600'}`}
+                    className={`flex items-center gap-3 p-3 rounded-lg transition-all hover:scale-[1.02]
+                      ${index === 0 ? 'bg-gradient-to-r from-yellow-500/90 to-orange-500/90 text-white shadow-lg shadow-yellow-500/30 border border-yellow-400/60' :
+                        index === 1 ? 'bg-gradient-to-r from-gray-400/90 to-gray-500/90 text-white shadow-md shadow-gray-500/20 border border-gray-400/60' :
+                          index === 2 ? 'bg-gradient-to-r from-orange-500/90 to-orange-600/90 text-white shadow-md shadow-orange-500/20 border border-orange-400/60' :
+                            'bg-slate-800/70 text-white border border-slate-700/80 hover:bg-slate-800/90'}`}
                   >
-                    <div className="w-10 h-10 rounded-full flex items-center justify-center font-bold text-lg bg-white/20">
+                    <div className="w-12 h-12 rounded-full flex items-center justify-center font-bold text-xl bg-black/20 backdrop-blur-sm shadow-inner">
                       {index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : `#${index + 1}`}
                     </div>
                     <div className="flex-1 min-w-0">
-                      <div className="font-bold truncate text-sm">{player.username}</div>
-                      <div className="text-xs opacity-75">{player.score} pts</div>
+                      <div className="font-bold truncate text-base">{player.username}</div>
+                      <div className="text-sm font-semibold opacity-90">{player.score} pts</div>
                     </div>
                   </motion.div>
                 ))}
                 {leaderboard.length === 0 && (
-                  <p className="text-center text-slate-500 dark:text-slate-400 py-4 text-sm">
+                  <p className="text-center text-slate-400 py-6 text-sm">
                     {t('playerView.noPlayersYet') || 'No players yet'}
                   </p>
                 )}
