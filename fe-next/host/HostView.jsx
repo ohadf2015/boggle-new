@@ -976,7 +976,7 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
               )}
 
               {/* Grid Container - Responsive Sizing */}
-              <div className="flex-grow p-4 w-full flex justify-center items-center transition-all duration-500">
+              <div className="flex-grow p-1 md:p-3 w-full flex justify-center items-center transition-all duration-500">
                 <div className="max-w-[min(90vh,90vw)] max-h-[min(90vh,90vw)] w-full h-full flex items-center justify-center">
                   <GridComponent
                     grid={tableData}
@@ -990,7 +990,7 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
             </Card>
           ) : (
             /* Playing Mode or Pre-Game - Interactive Grid */
-            <Card className="flex-1 bg-white/80 dark:bg-slate-800/80 backdrop-blur-md p-2 sm:p-4 rounded-lg shadow-lg border border-cyan-500/30 shadow-[0_0_15px_rgba(6,182,212,0.1)] flex flex-col items-center transition-all duration-500 ease-in-out overflow-hidden">
+            <Card className="flex-1 bg-white/80 dark:bg-slate-800/80 backdrop-blur-md p-1 sm:p-3 rounded-lg shadow-lg border border-cyan-500/30 shadow-[0_0_15px_rgba(6,182,212,0.1)] flex flex-col items-center transition-all duration-500 ease-in-out overflow-hidden">
               {/* Circular Timer - Show when game is active */}
               {gameStarted && remainingTime !== null && (
                 <motion.div

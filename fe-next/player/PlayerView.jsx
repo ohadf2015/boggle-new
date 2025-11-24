@@ -657,7 +657,7 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
 
   // Normal game UI (when game is active or waiting for results)
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-50 via-slate-100 to-slate-200 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 p-2 md:p-4 flex flex-col transition-colors duration-300">
+    <div className="min-h-screen bg-gradient-to-b from-slate-50 via-slate-100 to-slate-200 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 p-1 md:p-4 flex flex-col transition-colors duration-300">
       <Toaster position="top-center" toastOptions={{ limit: 3 }} />
 
       {/* Start Game Animation */}
@@ -666,12 +666,12 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
       )}
 
       {/* Top Bar with Title and Exit Button */}
-      <div className="w-full max-w-7xl mx-auto flex items-center justify-between mb-2">
+      <div className="w-full max-w-7xl mx-auto flex items-center justify-between mb-1">
         {/* LEXICLASH Title */}
         <motion.h1
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="text-3xl md:text-5xl font-bold tracking-wider flex items-center gap-1"
+          className="text-2xl md:text-5xl font-bold tracking-wider flex items-center gap-1"
           style={{ fontFamily: "'Outfit', 'Rubik', sans-serif" }}
         >
           <span className="bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 to-blue-500 drop-shadow-[0_0_10px_rgba(34,211,238,0.5)]">
@@ -697,7 +697,7 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
         <motion.div
           initial={{ scale: 0, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
-          className="flex justify-center mb-4 relative z-10"
+          className="flex justify-center mb-1 md:mb-2 relative z-10"
         >
           <CircularTimer remainingTime={remainingTime} totalTime={180} />
         </motion.div>
@@ -708,7 +708,7 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
         <motion.div
           initial={{ y: -20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
-          className="max-w-7xl mx-auto mb-2"
+          className="max-w-7xl mx-auto mb-1"
         >
           <Card className="bg-white/90 dark:bg-slate-800/90 backdrop-blur-md shadow-xl border border-purple-500/30 shadow-[0_0_15px_rgba(168,85,247,0.1)]">
             <CardHeader className="py-2">
@@ -728,7 +728,7 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
       )}
 
       {/* 3 Column Layout: Found Words | Grid | Ranking */}
-      <div className="flex flex-col lg:flex-row gap-2 md:gap-4 max-w-7xl mx-auto flex-grow w-full overflow-hidden">
+      <div className="flex flex-col lg:flex-row gap-1 md:gap-2 max-w-7xl mx-auto flex-grow w-full overflow-hidden">
         {/* Left Column: Found Words (Hidden on mobile, shown on desktop) */}
         <div className="hidden lg:flex lg:flex-col lg:w-64 xl:w-80 gap-2">
           <Card className="bg-slate-900/95 dark:bg-slate-900/95 backdrop-blur-md shadow-2xl border border-teal-500/40 shadow-[0_0_25px_rgba(20,184,166,0.2)] flex flex-col flex-grow overflow-hidden">
@@ -769,7 +769,7 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
         <div className="flex-1 flex flex-col gap-2 min-w-0">
           {(letterGrid || shufflingGrid) && (
             <Card className="bg-slate-900/95 dark:bg-slate-900/95 backdrop-blur-md shadow-2xl border border-cyan-500/40 shadow-[0_0_25px_rgba(6,182,212,0.2)] flex flex-col flex-grow overflow-hidden">
-              <CardContent className="flex-grow flex flex-col items-center justify-center p-2 md:p-4 bg-slate-900/90">
+              <CardContent className="flex-grow flex flex-col items-center justify-center p-1 md:p-3 bg-slate-900/90">
                 <GridComponent
                   grid={letterGrid || shufflingGrid}
                   interactive={gameActive}

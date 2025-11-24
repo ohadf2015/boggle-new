@@ -281,6 +281,21 @@ const addUserToGame = async (gameCode, username, ws) => {
         return;
     }
 
+    // Check WebSocket connection state before allowing join
+    if (ws.readyState !== 1) { // 1 = OPEN
+        console.warn(`[JOIN] WebSocket not fully open for ${username} (state: ${ws.readyState})`);
+        // Wait a short time for connection to fully establish
+        setTimeout(() => {
+            if (ws.readyState === 1) {
+                console.log(`[JOIN] WebSocket now ready for ${username}, retrying join`);
+                addUserToGame(gameCode, username, ws);
+            } else {
+                safeSend(ws, { action: "error", message: "Connection not ready" });
+            }
+        }, 100);
+        return;
+    }
+
     // Sanitize username for security
     username = sanitizeInput(username, 20);
 
@@ -449,7 +464,18 @@ const handleStartGame = async (host, letterGrid, timerSeconds, language) => {
   });
 
   const startMessage = { action: "startGame", letterGrid, timerSeconds, language: games[gameCode].language };
-  sendAllPlayerAMessage(gameCode, startMessage);
+  const broadcastResult = sendAllPlayerAMessage(gameCode, startMessage);
+
+  // If some players didn't receive the message, retry after a short delay
+  if (broadcastResult && broadcastResult.failedCount > 0) {
+    console.log(`[START_GAME] Retrying broadcast for ${broadcastResult.failedCount} failed players`);
+    setTimeout(() => {
+      if (games[gameCode] && games[gameCode].gameState === 'playing') {
+        sendAllPlayerAMessage(gameCode, startMessage);
+      }
+    }, 200);
+  }
+
   broadcastLeaderboard(gameCode);
 
   // Start server-side timer with broadcasts every second
@@ -880,7 +906,15 @@ const sendAllPlayerAMessage = (gameCode, message) => {
   }
 
   // Use broadcast helper for efficient sending
-  broadcast(game.users, message, `BROADCAST-${gameCode}`);
+  const result = broadcast(game.users, message, `BROADCAST-${gameCode}`);
+
+  // Log any failed deliveries for critical messages like startGame
+  if (message.action === 'startGame' && result.failedCount > 0) {
+    console.warn(`[BROADCAST] Failed to send startGame to ${result.failedCount} players in game ${gameCode}`);
+    console.warn(`[BROADCAST] Successfully sent to ${result.sentCount}/${result.totalCount} players`);
+  }
+
+  return result;
 }
 
 const sendHostAMessage = (gameCode, message) => {
