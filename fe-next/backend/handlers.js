@@ -374,7 +374,8 @@ const addUserToGame = async (gameCode, username, ws) => {
         isHost: isNowHost,
         username: username,
         playerId: game.playerIds[username], // Send unique player ID
-        avatar: game.playerAvatars[username]
+        avatar: game.playerAvatars[username],
+        language: game.language // Include room language for reconnecting players
     }));
 
     // Sync the current game state to the player
@@ -976,25 +977,25 @@ const handleDisconnect = (ws, wss) => {
       const remainingPlayers = Object.keys(game.users);
 
       if (remainingPlayers.length === 0) {
-        // No players left, close room immediately
-        console.log(`[DISCONNECT] No players left in game ${gameCode}, closing room immediately`);
+        // No players left, start 2-minute grace period for host to return
+        console.log(`[DISCONNECT] No players left in game ${gameCode}, starting 2-minute grace period`);
 
-        // Clear any existing empty room timeout
-        if (game.emptyRoomTimeout) {
-          clearTimeout(game.emptyRoomTimeout);
+        // Mark host as disconnected
+        game.hostDisconnected = true;
+
+        // Store the host in disconnected players for reconnection
+        if (!game.disconnectedPlayers) {
+          game.disconnectedPlayers = {};
         }
+        game.disconnectedPlayers[username] = {
+          disconnectedAt: Date.now(),
+          isHost: true
+        };
 
-        // Close the room immediately
-        console.log(`[AUTO-CLOSE] Closing empty room ${gameCode}`);
-        cleanupGameTimers(gameCode);
-        delete games[gameCode];
+        // Start grace period - room stays open for 2 minutes
+        startRoomGracePeriod(gameCode, wss);
 
-        // Delete from Redis
-        deleteGameState(gameCode).catch(err =>
-          console.error('[REDIS] Error deleting game state:', err)
-        );
-
-        // Broadcast updated rooms list
+        // Broadcast updated rooms list (room still shows as available)
         if (wss) broadcastActiveRooms(wss);
       } else {
         // There are remaining players, start grace period
@@ -1505,6 +1506,133 @@ const handleChatMessage = (ws, gameCode, username, message, isHost) => {
   sendAllPlayerAMessage(gameCode, chatMessage);
 };
 
+// Constants for room keep-alive
+const ROOM_KEEP_ALIVE_DURATION = 120000; // 2 minutes in milliseconds
+
+// Handle host reactivation - when host returns to browser tab
+const handleHostReactivate = (ws, gameCode, wss) => {
+  if (!gameCode || !games[gameCode]) {
+    console.log(`[REACTIVATE] Game ${gameCode} does not exist`);
+    return;
+  }
+
+  const game = games[gameCode];
+
+  // Update host WebSocket reference if it changed
+  const username = wsUsername.get(ws);
+  if (username && username === game.hostUsername) {
+    console.log(`[REACTIVATE] Host ${username} reactivated room ${gameCode}`);
+
+    // Clear host disconnect timeout if it exists
+    if (game.hostDisconnectTimeout) {
+      clearTimeout(game.hostDisconnectTimeout);
+      game.hostDisconnectTimeout = null;
+    }
+
+    // Clear empty room timeout if it exists
+    if (game.emptyRoomTimeout) {
+      clearTimeout(game.emptyRoomTimeout);
+      game.emptyRoomTimeout = null;
+    }
+
+    // Update host reference
+    game.host = ws;
+    game.hostDisconnected = false;
+    game.lastHostActivity = Date.now();
+
+    // Update mappings
+    gameWs.set(ws, gameCode);
+    wsUsername.set(ws, username);
+
+    // Re-add host to users if not present
+    if (!game.users[username]) {
+      game.users[username] = ws;
+      broadcastPlayerList(gameCode);
+    }
+
+    // Broadcast that room is active
+    if (wss) broadcastActiveRooms(wss);
+  }
+};
+
+// Handle host keep-alive - periodic signal from active host
+const handleHostKeepAlive = (ws, gameCode, wss) => {
+  if (!gameCode || !games[gameCode]) {
+    return;
+  }
+
+  const game = games[gameCode];
+  const username = wsUsername.get(ws);
+
+  if (username && username === game.hostUsername) {
+    // Update last activity timestamp
+    game.lastHostActivity = Date.now();
+
+    // Clear any pending disconnect/close timeouts
+    if (game.hostDisconnectTimeout) {
+      clearTimeout(game.hostDisconnectTimeout);
+      game.hostDisconnectTimeout = null;
+    }
+
+    if (game.emptyRoomTimeout) {
+      clearTimeout(game.emptyRoomTimeout);
+      game.emptyRoomTimeout = null;
+    }
+
+    // Ensure host is not marked as disconnected
+    game.hostDisconnected = false;
+  }
+};
+
+// Check if room should stay active (within 2 minute grace period)
+const isRoomWithinGracePeriod = (gameCode) => {
+  if (!games[gameCode]) return false;
+
+  const game = games[gameCode];
+  const lastActivity = game.lastHostActivity || game.startTime || Date.now();
+  const timeSinceActivity = Date.now() - lastActivity;
+
+  return timeSinceActivity < ROOM_KEEP_ALIVE_DURATION;
+};
+
+// Start room grace period timer
+const startRoomGracePeriod = (gameCode, wss) => {
+  if (!games[gameCode]) return;
+
+  const game = games[gameCode];
+
+  // Clear existing timeout if any
+  if (game.emptyRoomTimeout) {
+    clearTimeout(game.emptyRoomTimeout);
+  }
+
+  console.log(`[GRACE_PERIOD] Starting 2-minute grace period for room ${gameCode}`);
+
+  game.emptyRoomTimeout = setTimeout(() => {
+    // Check if room still exists and is still empty/inactive
+    if (games[gameCode]) {
+      const hasActivePlayers = Object.keys(games[gameCode].users).length > 0;
+      const hostIsActive = !games[gameCode].hostDisconnected;
+
+      if (!hasActivePlayers && !hostIsActive) {
+        console.log(`[GRACE_PERIOD] Grace period expired for room ${gameCode}, closing room`);
+        cleanupGameTimers(gameCode);
+        delete games[gameCode];
+
+        // Delete from Redis
+        deleteGameState(gameCode).catch(err =>
+          console.error('[REDIS] Error deleting game state:', err)
+        );
+
+        // Broadcast updated rooms list
+        if (wss) broadcastActiveRooms(wss);
+      } else {
+        console.log(`[GRACE_PERIOD] Room ${gameCode} has activity, keeping alive`);
+      }
+    }
+  }, ROOM_KEEP_ALIVE_DURATION);
+};
+
 module.exports = {
   setNewGame,
   addUserToGame,
@@ -1524,4 +1652,8 @@ module.exports = {
   handleResetGame,
   broadcastActiveRooms,
   handleChatMessage,
+  handleHostReactivate,
+  handleHostKeepAlive,
+  startRoomGracePeriod,
+  isRoomWithinGracePeriod,
 };
