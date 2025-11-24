@@ -8,7 +8,7 @@ import { AchievementBadge } from '../components/AchievementBadge';
 import { motion, AnimatePresence } from 'framer-motion';
 import confetti from 'canvas-confetti';
 import toast, { Toaster } from 'react-hot-toast';
-import { FaTrophy, FaTrash, FaDoorOpen, FaUsers, FaMousePointer, FaCrown } from 'react-icons/fa';
+import { FaTrophy, FaTrash, FaDoorOpen, FaUsers, FaMousePointer, FaCrown, FaRandom } from 'react-icons/fa';
 import { useWebSocket } from '../utils/WebSocketContext';
 import { clearSession } from '../utils/session';
 import { useLanguage } from '../contexts/LanguageContext';
@@ -17,6 +17,7 @@ import GridComponent from '../components/GridComponent';
 import { applyHebrewFinalLetters } from '../utils/utils';
 import RoomChat from '../components/RoomChat';
 import CubeCrashAnimation from '../components/CubeCrashAnimation';
+import CircularTimer from '../components/CircularTimer';
 
 const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) => {
   const { t } = useLanguage();
@@ -617,7 +618,7 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
 
   // Normal game UI (when game is active or waiting for results)
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-50 via-slate-100 to-slate-200 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 p-4 md:p-8 flex flex-col transition-colors duration-300">
+    <div className="min-h-screen bg-gradient-to-b from-slate-50 via-slate-100 to-slate-200 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 p-2 md:p-4 flex flex-col transition-colors duration-300">
       <Toaster position="top-center" toastOptions={{ limit: 3 }} />
 
       {/* Start Game Animation */}
@@ -625,8 +626,23 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
         <CubeCrashAnimation onComplete={() => setShowStartAnimation(false)} />
       )}
 
-      {/* Top Bar with Exit Button */}
-      <div className="w-full max-w-7xl mx-auto flex justify-end mb-4">
+      {/* Top Bar with Title and Exit Button */}
+      <div className="w-full max-w-7xl mx-auto flex items-center justify-between mb-2">
+        {/* LEXICLASH Title */}
+        <motion.h1
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="text-3xl md:text-5xl font-bold tracking-wider flex items-center gap-1"
+          style={{ fontFamily: "'Outfit', 'Rubik', sans-serif" }}
+        >
+          <span className="bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 to-blue-500 drop-shadow-[0_0_10px_rgba(34,211,238,0.5)]">
+            LEXI
+          </span>
+          <span className="bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-pink-500 drop-shadow-[0_0_10px_rgba(168,85,247,0.5)] italic" style={{ transform: 'skewX(-10deg)' }}>
+            CLASH
+          </span>
+        </motion.h1>
+
         <Button
           onClick={handleExitRoom}
           size="sm"
@@ -637,28 +653,11 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
         </Button>
       </div>
 
-
-
-      {/* Timer */}
+      {/* Timer with Circular Progress */}
       {remainingTime !== null && gameActive && (
-        <motion.div
-          initial={{ scale: 0 }}
-          animate={{ scale: 1 }}
-          className="max-w-md mx-auto mb-4"
-        >
-          <Card className={`${remainingTime < 30
-            ? 'bg-gradient-to-r from-red-500 to-orange-500 border-red-400/50 shadow-[0_0_20px_rgba(239,68,68,0.3)]'
-            : 'bg-gradient-to-r from-teal-500 to-cyan-500 border-teal-400/50 shadow-[0_0_20px_rgba(20,184,166,0.3)]'}
-                          border backdrop-blur-md shadow-2xl`}
-          >
-            <CardContent className="p-4 text-center">
-              <div className="text-4xl font-bold text-white">
-                {formatTime(remainingTime)}
-              </div>
-              <div className="text-white/80 text-xs mt-1">{t('playerView.timeRemaining')}</div>
-            </CardContent>
-          </Card>
-        </motion.div>
+        <div className="flex justify-center mb-2">
+          <CircularTimer remainingTime={remainingTime} totalTime={180} />
+        </div>
       )}
 
       {/* Achievements */}
@@ -666,15 +665,15 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
         <motion.div
           initial={{ y: -20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
-          className="max-w-4xl mx-auto mb-6"
+          className="max-w-7xl mx-auto mb-2"
         >
           <Card className="bg-white/90 dark:bg-slate-800/90 backdrop-blur-md shadow-xl border border-purple-500/30 shadow-[0_0_15px_rgba(168,85,247,0.1)]">
-            <CardHeader>
-              <CardTitle className="text-xl flex items-center gap-2 text-purple-600 dark:text-purple-300">
+            <CardHeader className="py-2">
+              <CardTitle className="text-base md:text-xl flex items-center gap-2 text-purple-600 dark:text-purple-300">
                 🏆 {t('playerView.yourAchievements')}
               </CardTitle>
             </CardHeader>
-            <CardContent>
+            <CardContent className="py-2">
               <div className="flex flex-wrap gap-2">
                 {achievements.map((ach, index) => (
                   <AchievementBadge key={index} achievement={ach} index={index} />
@@ -685,81 +684,108 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
         </motion.div>
       )}
 
-      <div className="flex flex-col lg:flex-row gap-4 max-w-7xl mx-auto h-full flex-grow">
-        {/* Letter Grid - Takes maximum space */}
-        {(letterGrid || shufflingGrid) && (
-          <Card className="bg-white/90 dark:bg-slate-800/90 backdrop-blur-md shadow-2xl flex-grow lg:flex-[3] border border-cyan-500/30 shadow-[0_0_15px_rgba(6,182,212,0.1)] flex flex-col">
-            <CardHeader className="py-2">
-              <CardTitle className="text-center text-cyan-600 dark:text-cyan-300 text-lg flex items-center justify-center gap-2">
-                {gameActive ? (
-                  <>
-                    <FaMousePointer className="text-sm" />
-                    {t('playerView.clickToSelect') || 'Click letters to select words'}
-                  </>
-                ) : (
-                  t('playerView.waitingForGame')
-                )}
+      {/* 3 Column Layout: Found Words | Grid | Ranking */}
+      <div className="flex flex-col lg:flex-row gap-2 md:gap-4 max-w-7xl mx-auto flex-grow w-full overflow-hidden">
+        {/* Left Column: Found Words (Hidden on mobile, shown on desktop) */}
+        <div className="hidden lg:flex lg:flex-col lg:w-64 xl:w-80 gap-2">
+          <Card className="bg-white/90 dark:bg-slate-800/90 backdrop-blur-md shadow-2xl border border-teal-500/30 shadow-[0_0_15px_rgba(20,184,166,0.1)] flex flex-col flex-grow overflow-hidden">
+            <CardHeader className="py-2 border-b border-teal-500/20">
+              <CardTitle className="text-teal-600 dark:text-teal-300 text-lg uppercase tracking-wide">
+                {t('playerView.wordsFound') || 'Found Words'}
               </CardTitle>
             </CardHeader>
-            <CardContent className="flex-grow flex items-center justify-center p-2">
-              <GridComponent
-                grid={letterGrid || shufflingGrid}
-                interactive={gameActive}
-                onWordSubmit={(formedWord) => {
-                  // Direct submission logic - ONLY use game language
-                  const currentLang = gameLanguage;
-                  if (!currentLang) return; // Game hasn't started
-
-                  let regex;
-                  if (currentLang === 'he') {
-                    regex = /^[\u0590-\u05FF]+$/;
-                  } else if (currentLang === 'sv') {
-                    regex = /^[a-zA-ZåäöÅÄÖ]+$/;
-                  } else {
-                    regex = /^[a-zA-Z]+$/;
-                  }
-
-                  if (formedWord.length < 2) {
-                    toast.error(t('playerView.wordTooShort'), { duration: 1000, icon: '⚠️' });
-                    return;
-                  }
-
-                  if (regex.test(formedWord)) {
-                    ws.send(JSON.stringify({
-                      action: 'submitWord',
-                      word: formedWord.toLowerCase(),
-                    }));
-                    setFoundWords(prev => [...prev, formedWord]);
-                    toast.success(`${t('playerView.wordSubmitted')}: ${formedWord}`, { duration: 1000, icon: '📤' });
-                  } else {
-                    toast.error(t('playerView.onlyLanguageWords'), { duration: 1000 });
-                  }
-                  setWord(''); // Clear input
-                }}
-                playerView={true}
-                className="w-full max-w-3xl"
-              />
+            <CardContent className="flex-1 overflow-y-auto p-2">
+              <div className="space-y-2">
+                <AnimatePresence>
+                  {foundWords.map((foundWord, index) => (
+                    <motion.div
+                      key={index}
+                      initial={{ x: -30, opacity: 0 }}
+                      animate={{ x: 0, opacity: 1 }}
+                      exit={{ x: -30, opacity: 0 }}
+                      className={`p-2 rounded-lg text-center font-semibold
+                        ${index === foundWords.length - 1 ?
+                          'bg-gradient-to-r from-cyan-500/30 to-teal-500/30 border border-cyan-500/50 text-cyan-700 dark:text-cyan-300' :
+                          'bg-slate-100 dark:bg-slate-700/50 text-slate-900 dark:text-white'}`}
+                    >
+                      {applyHebrewFinalLetters(foundWord).toUpperCase()}
+                    </motion.div>
+                  ))}
+                </AnimatePresence>
+                {foundWords.length === 0 && gameActive && (
+                  <p className="text-center text-slate-500 dark:text-slate-400 text-sm mt-4">
+                    {t('playerView.noWordsYet') || 'No words found yet'}
+                  </p>
+                )}
+              </div>
             </CardContent>
           </Card>
-        )}
+        </div>
 
-        {/* Right Column: Word Input, List & Leaderboard */}
-        <div className="flex flex-col gap-3 lg:flex-1 lg:max-w-sm">
-          {/* Word Input & List */}
-          <Card className="bg-white/90 dark:bg-slate-800/90 backdrop-blur-md shadow-2xl border border-teal-500/30 shadow-[0_0_15px_rgba(20,184,166,0.1)] flex flex-col max-h-[45vh] lg:max-h-[55vh]">
-            <CardHeader className="py-2">
-              <CardTitle className="text-teal-600 dark:text-teal-300 text-base">{t('playerView.wordsFound')} ({foundWords.length})</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3 flex-1 flex flex-col overflow-hidden">
-              <div className="flex gap-2 flex-row-reverse">
-                <Button
-                  onClick={submitWord}
-                  disabled={!gameActive || !word.trim()}
-                  className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-400
-                         hover:to-pink-400 text-white font-bold shadow-lg hover:shadow-[0_0_15px_rgba(168,85,247,0.5)]"
-                >
-                  {t('playerView.add')}
-                </Button>
+        {/* Center Column: Letter Grid */}
+        <div className="flex-1 flex flex-col gap-2 min-w-0">
+          {(letterGrid || shufflingGrid) && (
+            <Card className="bg-white/90 dark:bg-slate-800/90 backdrop-blur-md shadow-2xl border border-cyan-500/30 shadow-[0_0_15px_rgba(6,182,212,0.1)] flex flex-col flex-grow overflow-hidden">
+              <CardContent className="flex-grow flex flex-col items-center justify-center p-2 md:p-4">
+                <GridComponent
+                  grid={letterGrid || shufflingGrid}
+                  interactive={gameActive}
+                  onWordSubmit={(formedWord) => {
+                    // Direct submission logic - ONLY use game language
+                    const currentLang = gameLanguage;
+                    if (!currentLang) return; // Game hasn't started
+
+                    let regex;
+                    if (currentLang === 'he') {
+                      regex = /^[\u0590-\u05FF]+$/;
+                    } else if (currentLang === 'sv') {
+                      regex = /^[a-zA-ZåäöÅÄÖ]+$/;
+                    } else {
+                      regex = /^[a-zA-Z]+$/;
+                    }
+
+                    if (formedWord.length < 2) {
+                      toast.error(t('playerView.wordTooShort'), { duration: 1000, icon: '⚠️' });
+                      return;
+                    }
+
+                    if (regex.test(formedWord)) {
+                      ws.send(JSON.stringify({
+                        action: 'submitWord',
+                        word: formedWord.toLowerCase(),
+                      }));
+                      setFoundWords(prev => [...prev, formedWord]);
+                      toast.success(`${t('playerView.wordSubmitted')}: ${formedWord}`, { duration: 1000, icon: '📤' });
+                    } else {
+                      toast.error(t('playerView.onlyLanguageWords'), { duration: 1000 });
+                    }
+                    setWord(''); // Clear input
+                  }}
+                  playerView={true}
+                  className="w-full max-w-2xl"
+                />
+
+                {/* Shuffle Button - Only visible for host in waiting state */}
+                {!gameActive && (
+                  <div className="mt-4 flex gap-2">
+                    <Button
+                      variant="outline"
+                      className="bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 border-slate-300 dark:border-slate-600"
+                      disabled
+                    >
+                      <FaRandom className="mr-2" />
+                      {t('playerView.shuffle') || 'SHUFFLE'}
+                    </Button>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Mobile: Word Input below grid */}
+          <div className="lg:hidden">
+            <Card className="bg-white/90 dark:bg-slate-800/90 backdrop-blur-md shadow-xl border border-teal-500/30 shadow-[0_0_15px_rgba(20,184,166,0.1)]">
+              <CardContent className="p-2">
                 <Input
                   ref={inputRef}
                   value={word}
@@ -767,126 +793,66 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
                   onKeyDown={handleKeyDown}
                   disabled={!gameActive}
                   placeholder={t('playerView.enterWord')}
-                  className="text-lg bg-slate-100 dark:bg-slate-700/50 border-slate-200 dark:border-slate-600 text-slate-900 dark:text-white placeholder:text-slate-500 dark:placeholder:text-gray-400 text-right"
+                  className="text-lg bg-slate-100 dark:bg-slate-700/50 border-slate-200 dark:border-slate-600 text-slate-900 dark:text-white placeholder:text-slate-500 dark:placeholder:text-gray-400 text-center"
                 />
-              </div>
-
-              {!gameActive && !waitingForResults && (
-                <div className="text-center py-4">
-                  <Progress value={50} className="mb-2" />
-                  <p className="text-sm text-slate-500 dark:text-gray-400">{t('playerView.waitingForGame')}</p>
+                <div className="mt-2 text-center text-sm text-teal-600 dark:text-teal-300 font-semibold">
+                  {foundWords.length} {t('playerView.wordsFound') || 'words found'}
                 </div>
-              )}
+              </CardContent>
+            </Card>
+          </div>
+        </div>
 
-              {waitingForResults && (
-                <motion.div
-                  initial={{ scale: 0.9, opacity: 0 }}
-                  animate={{ scale: 1, opacity: 1 }}
-                  className="text-center py-6 px-4"
-                >
-                  <div className="mb-4">
-                    <motion.div
-                      animate={{ rotate: 360 }}
-                      transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
-                      className="inline-block text-4xl mb-2"
-                    >
-                      ⏳
-                    </motion.div>
-                  </div>
-                  <Progress value={75} className="mb-3" />
-                  <p className="text-lg font-bold text-slate-700 dark:text-slate-300 mb-2">
-                    {t('playerView.waitingForResults')}
-                  </p>
-                  <p className="text-xs text-slate-500 dark:text-slate-400">
-                    {t('playerView.hostValidating') || 'Host is validating words...'}
-                  </p>
-                </motion.div>
-              )}
-
-              <div ref={wordListRef} className="flex-1 min-h-0 overflow-y-auto space-y-2">
-                <AnimatePresence>
-                  {foundWords.map((foundWord, index) => (
-                    <motion.div
-                      key={index}
-                      initial={{ x: -50, opacity: 0 }}
-                      animate={{ x: 0, opacity: 1 }}
-                      exit={{ x: 50, opacity: 0 }}
-                      className={`flex items-center justify-between p-3 rounded-lg
-                              ${index === foundWords.length - 1 ?
-                          'bg-gradient-to-r from-cyan-500/20 to-teal-500/20 font-bold border border-cyan-500/30' :
-                          'bg-slate-100 dark:bg-slate-700/50'}
-                              hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors text-slate-900 dark:text-white`}
-                    >
-                      <span>{applyHebrewFinalLetters(foundWord)}</span>
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        onClick={() => removeWord(index)}
-                        disabled={!gameActive}
-                        className="hover:bg-red-500/20 hover:text-red-400 text-slate-400 dark:text-gray-400"
-                      >
-                        <FaTrash />
-                      </Button>
-                    </motion.div>
-                  ))}
-                </AnimatePresence>
-              </div>
-            </CardContent>
-          </Card>
-
-
-
-          {/* Leaderboard */}
-          <Card className="bg-white/90 dark:bg-slate-800/90 backdrop-blur-md shadow-2xl border border-purple-500/30 shadow-[0_0_15px_rgba(168,85,247,0.1)] overflow-hidden flex flex-col max-h-[35vh]">
-            <CardHeader className="py-2">
-              <CardTitle className="flex items-center gap-2 text-purple-600 dark:text-purple-300 text-base">
+        {/* Right Column: Live Ranking */}
+        <div className="lg:w-64 xl:w-80 flex flex-col gap-2">
+          <Card className="bg-white/90 dark:bg-slate-800/90 backdrop-blur-md shadow-2xl border border-purple-500/30 shadow-[0_0_15px_rgba(168,85,247,0.1)] flex flex-col overflow-hidden max-h-[40vh] lg:max-h-none lg:flex-grow">
+            <CardHeader className="py-2 border-b border-purple-500/20">
+              <CardTitle className="flex items-center gap-2 text-purple-600 dark:text-purple-300 text-lg uppercase tracking-wide">
                 <FaTrophy className="text-yellow-500 dark:text-yellow-400" />
-                {t('playerView.leaderboard')}
+                {t('playerView.liveRanking') || 'Live Ranking'}
               </CardTitle>
             </CardHeader>
-            <CardContent className="overflow-y-auto flex-1 py-2">
+            <CardContent className="overflow-y-auto flex-1 p-2">
               <div className="space-y-2">
                 {leaderboard.map((player, index) => (
                   <motion.div
                     key={player.username}
                     initial={{ x: 50, opacity: 0 }}
                     animate={{ x: 0, opacity: 1 }}
-                    transition={{ delay: index * 0.1 }}
-                    className={`flex items-center justify-between p-4 rounded-lg
-                            ${index === 0 ? 'bg-gradient-to-r from-yellow-500/80 to-orange-500/80 text-white shadow-lg border border-yellow-400/50 shadow-[0_0_15px_rgba(234,179,8,0.3)]' :
-                        index === 1 ? 'bg-gradient-to-r from-gray-400/80 to-gray-500/80 text-white shadow-md border border-gray-400/50' :
-                          index === 2 ? 'bg-gradient-to-r from-orange-500/80 to-orange-600/80 text-white shadow-md border border-orange-400/50' :
-                            'bg-slate-100 dark:bg-slate-700/50 text-slate-900 dark:text-white'}`}
+                    transition={{ delay: index * 0.05 }}
+                    className={`flex items-center gap-2 p-2 rounded-lg
+                      ${index === 0 ? 'bg-gradient-to-r from-yellow-500/90 to-orange-500/90 text-white shadow-lg border border-yellow-400/50' :
+                        index === 1 ? 'bg-gradient-to-r from-gray-400/90 to-gray-500/90 text-white shadow-md border border-gray-400/50' :
+                          index === 2 ? 'bg-gradient-to-r from-orange-500/90 to-orange-600/90 text-white shadow-md border border-orange-400/50' :
+                            'bg-slate-100 dark:bg-slate-700/50 text-slate-900 dark:text-white border border-slate-200 dark:border-slate-600'}`}
                   >
-                    <div className="flex items-center gap-3">
-                      <div className="text-2xl font-bold min-w-[40px] text-center">
-                        {index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : `#${index + 1}`}
-                      </div>
-                      <div>
-                        <div className="font-bold">{player.username}</div>
-                        <div className="text-sm opacity-75">{player.wordCount} {t('playerView.wordCount')}</div>
-                      </div>
+                    <div className="w-10 h-10 rounded-full flex items-center justify-center font-bold text-lg bg-white/20">
+                      {index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : `#${index + 1}`}
                     </div>
-                    <div className="text-2xl font-bold">
-                      {player.score}
+                    <div className="flex-1 min-w-0">
+                      <div className="font-bold truncate text-sm">{player.username}</div>
+                      <div className="text-xs opacity-75">{player.score} pts</div>
                     </div>
                   </motion.div>
                 ))}
                 {leaderboard.length === 0 && (
-                  <p className="text-center text-slate-500 dark:text-gray-400 py-8">{t('playerView.noPlayersYet')}</p>
+                  <p className="text-center text-slate-500 dark:text-slate-400 py-4 text-sm">
+                    {t('playerView.noPlayersYet') || 'No players yet'}
+                  </p>
                 )}
               </div>
             </CardContent>
           </Card>
 
-          {/* Chat Component */}
-          <RoomChat
-            username={username}
-            isHost={false}
-            gameCode={gameCode}
-            className="flex-1 min-h-[250px]"
-          />
-
+          {/* Chat Component - Desktop only */}
+          <div className="hidden lg:block">
+            <RoomChat
+              username={username}
+              isHost={false}
+              gameCode={gameCode}
+              className="max-h-[200px]"
+            />
+          </div>
         </div>
       </div>
     </div >
