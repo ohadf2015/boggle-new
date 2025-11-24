@@ -1397,11 +1397,8 @@ const handleChatMessage = (ws, gameCode, username, message, isHost) => {
     isHost: isHost || false
   };
 
-  // Broadcast to all players
+  // Broadcast to all players (including host, since host is now a player)
   sendAllPlayerAMessage(gameCode, chatMessage);
-
-  // Send to host as well
-  sendHostAMessage(gameCode, chatMessage);
 };
 
 module.exports = {

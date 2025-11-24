@@ -285,7 +285,6 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
               {/* Language Selection (Only for Host) - Button Style */}
               {mode === 'host' && (
                 <div className="space-y-2">
-                  <Label className="text-slate-700 dark:text-gray-300 text-center block font-medium text-sm">{t('joinView.selectLanguage')}</Label>
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                     <button
                       type="button"
