@@ -19,7 +19,7 @@ import { cn } from './lib/utils';
 import { copyJoinUrl, shareViaWhatsApp, getJoinUrl } from './utils/share';
 import { useLanguage } from './contexts/LanguageContext';
 
-const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, error, activeRooms, refreshRooms, prefilledRoom, roomName, setRoomName }) => {
+const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, error, activeRooms, refreshRooms, prefilledRoom, roomName, setRoomName, isAutoJoining }) => {
   const { t, language } = useLanguage();
   const [mode, setMode] = useState('join'); // 'join' or 'host'
   const [showQR, setShowQR] = useState(false);
@@ -95,7 +95,89 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
 
   // Removed - now using utility function from utils/share
 
-  // Show simplified quick join interface when room is prefilled
+  // Show auto-joining loading state when user has saved name and came via invitation
+  if (prefilledRoom && isAutoJoining && username && username.trim()) {
+    return (
+      <div className="min-h-screen bg-gradient-to-b pt-4 from-slate-50 via-slate-100 to-slate-200 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 flex flex-col items-center justify-center p-4 sm:p-6 transition-colors duration-300">
+        <motion.div
+          initial={{ scale: 0, rotate: -10 }}
+          animate={{ scale: 1, rotate: 0 }}
+          transition={{ type: 'spring', stiffness: 260, damping: 20 }}
+          className="w-full max-w-md"
+        >
+          <Card className="backdrop-blur-md bg-white/90 dark:bg-slate-800/90 shadow-2xl border border-cyan-500/30 shadow-[0_0_20px_rgba(6,182,212,0.15)]">
+            <CardHeader className="text-center space-y-4">
+              <div className="flex justify-center">
+                <motion.div
+                  animate={{ rotate: 360 }}
+                  transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+                >
+                  <FaGamepad size={48} className="text-cyan-400" />
+                </motion.div>
+              </div>
+              <CardTitle className="text-2xl sm:text-3xl font-bold text-slate-800 dark:text-white">
+                {t('joinView.joiningRoom')}
+              </CardTitle>
+              <div className="flex justify-center">
+                <Badge className="text-2xl px-8 py-4 bg-gradient-to-r from-cyan-500 to-purple-600">
+                  {t('joinView.room')} {gameCode}
+                </Badge>
+              </div>
+              <p className="text-slate-600 dark:text-gray-400">
+                {t('joinView.welcomeBack')}, <span className="font-semibold text-cyan-600 dark:text-cyan-400">{username}</span>!
+              </p>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {/* Error Alert */}
+              {error && (
+                <motion.div
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  <Alert variant="destructive">
+                    <AlertDescription>{error}</AlertDescription>
+                  </Alert>
+                </motion.div>
+              )}
+
+              {/* Loading animation */}
+              <div className="flex justify-center py-4">
+                <motion.div
+                  className="flex space-x-2"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                >
+                  {[0, 1, 2].map((i) => (
+                    <motion.div
+                      key={i}
+                      className="w-3 h-3 bg-cyan-500 rounded-full"
+                      animate={{
+                        y: [-5, 5, -5],
+                        opacity: [1, 0.5, 1],
+                      }}
+                      transition={{
+                        duration: 0.8,
+                        repeat: Infinity,
+                        delay: i * 0.2,
+                      }}
+                    />
+                  ))}
+                </motion.div>
+              </div>
+
+              <p className="text-center text-slate-500 dark:text-gray-400 text-sm">
+                {t('joinView.connectingToRoom')}
+              </p>
+            </CardContent>
+          </Card>
+        </motion.div>
+        <MenuAnimation />
+      </div>
+    );
+  }
+
+  // Show simplified quick join interface when room is prefilled (no saved username)
   if (prefilledRoom && !showFullForm) {
     return (
       <div className="min-h-screen bg-gradient-to-b pt-4 from-slate-50 via-slate-100 to-slate-200 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 flex flex-col items-center justify-center p-4 sm:p-6 transition-colors duration-300">
@@ -114,10 +196,10 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
               <CardTitle className="text-2xl sm:text-3xl font-bold text-slate-800 dark:text-white">
                 {t('joinView.inviteTitle')}
               </CardTitle>
-              {/* Room number prominently displayed in title */}
+              {/* Room number prominently displayed */}
               <div className="flex justify-center">
                 <Badge className="text-2xl px-8 py-4 bg-gradient-to-r from-cyan-500 to-purple-600 hover:from-cyan-400 hover:to-purple-500">
-                  {t('joinView.joiningRoomNumber')} {gameCode}
+                  {t('joinView.room')} {gameCode}
                 </Badge>
               </div>
             </CardHeader>
@@ -166,7 +248,7 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
                   )}
                 </motion.div>
 
-                {/* Simple play button */}
+                {/* Play button */}
                 <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
                   <Button
                     type="submit"
@@ -174,7 +256,7 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
                     className="w-full h-14 text-xl font-bold bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-400 hover:to-emerald-500 hover:shadow-[0_0_25px_rgba(34,197,94,0.5)] transition-all"
                   >
                     <FaGamepad className="mr-3" size={24} />
-                    {t('joinView.playButton')}
+                    {t('joinView.enterRoom')}
                   </Button>
                 </motion.div>
 

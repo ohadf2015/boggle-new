@@ -386,6 +386,7 @@ export default function GamePage() {
                     }
                     setIsActive(false);
                     setAttemptingReconnect(false);
+                    setShouldAutoJoin(false);
                     clearSession();
                     break;
 
@@ -393,6 +394,7 @@ export default function GamePage() {
                     setError(t('errors.usernameTaken'));
                     setIsActive(false);
                     setAttemptingReconnect(false);
+                    setShouldAutoJoin(false);
                     clearSession();
                     break;
 
@@ -568,7 +570,8 @@ export default function GamePage() {
                     error={error}
                     activeRooms={activeRooms}
                     refreshRooms={refreshRooms}
-                    prefilledRoom={gameCode}
+                    prefilledRoom={prefilledRoomCode}
+                    isAutoJoining={shouldAutoJoin}
                 />
             );
         }
