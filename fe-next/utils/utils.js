@@ -1,4 +1,4 @@
-import { hebrewLetters, swedishLetters, DIFFICULTIES, DEFAULT_DIFFICULTY } from "./consts";
+import { hebrewLetters, swedishLetters, japaneseLetters, DIFFICULTIES, DEFAULT_DIFFICULTY } from "./consts";
 
 // Utilities for LexiClash game
 
@@ -55,6 +55,8 @@ export function generateRandomTable(rows = null, cols = null, language = 'he') {
       letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
     } else if (language === 'sv') {
       letters = swedishLetters;
+    } else if (language === 'ja') {
+      letters = japaneseLetters;
     } else {
       letters = hebrewLetters;
     }

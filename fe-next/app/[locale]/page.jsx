@@ -312,6 +312,7 @@ export default function GamePage() {
                         username: joinedUsername,
                         isHost: isHostResponse,
                         roomName: isHostResponse ? roomName : '',
+                        language: roomLang || roomLanguage, // Save room language
                     });
                     break;
 
@@ -432,6 +433,8 @@ export default function GamePage() {
                 action: 'createGame',
                 gameCode: savedSession.gameCode,
                 roomName: savedSession.roomName,
+                hostUsername: savedSession.roomName,
+                language: savedSession.language || language, // Restore room language
             });
         } else {
             if (!savedSession.username) {

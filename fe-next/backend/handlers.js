@@ -863,6 +863,7 @@ const handleDisconnect = (ws, wss) => {
       // Check if game should end (if 0 players left, or 1 player left and game is playing)
       // If 0 players, always end/delete.
       // If 1 player and playing, end game.
+      const remainingPlayers = Object.keys(games[gameCode].users);
       if (remainingPlayers.length === 0) {
          console.log(`[DISCONNECT] No players left in game ${gameCode}, closing room.`);
          // Clean up all timers and timeouts
@@ -870,6 +871,8 @@ const handleDisconnect = (ws, wss) => {
          // Delete game
          delete games[gameCode];
          deleteGameState(gameCode).catch(e => console.error(e));
+         // Broadcast updated rooms list
+         if (wss) broadcastActiveRooms(wss);
       } else if (remainingPlayers.length <= 1 && games[gameCode].gameState === 'playing') {
          console.log(`[DISCONNECT] ${remainingPlayers.length} player(s) remain in game ${gameCode}, ending game automatically`);
          // Clear timer before ending game
