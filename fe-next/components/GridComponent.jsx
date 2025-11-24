@@ -70,8 +70,8 @@ const GridComponent = ({
                 const rowDiff = rowIndex - lastCell.row;
                 const colDiff = colIndex - lastCell.col;
 
-                // Must be adjacent (allows free movement in any direction)
-                if (Math.abs(rowDiff) <= 1 && Math.abs(colDiff) <= 1) {
+                // Must be adjacent (allows free movement in any direction) but NOT the same cell
+                if (Math.abs(rowDiff) <= 1 && Math.abs(colDiff) <= 1 && !(rowDiff === 0 && colDiff === 0)) {
                     setSelectedCells(prev => [...prev, { row: rowIndex, col: colIndex, letter }]);
                     if (window.navigator && window.navigator.vibrate) window.navigator.vibrate(50);
                 }
@@ -122,8 +122,8 @@ const GridComponent = ({
             const rowDiff = rowIndex - lastCell.row;
             const colDiff = colIndex - lastCell.col;
 
-            // Must be adjacent (allows free movement in any direction)
-            if (Math.abs(rowDiff) <= 1 && Math.abs(colDiff) <= 1) {
+            // Must be adjacent (allows free movement in any direction) but NOT the same cell
+            if (Math.abs(rowDiff) <= 1 && Math.abs(colDiff) <= 1 && !(rowDiff === 0 && colDiff === 0)) {
                 setSelectedCells(prev => [...prev, { row: rowIndex, col: colIndex, letter }]);
             }
         }
@@ -149,32 +149,44 @@ const GridComponent = ({
             return {
                 gradient: 'from-yellow-400 to-orange-500',
                 border: 'border-yellow-300',
-                shadow: 'shadow-lg'
+                shadow: 'shadow-lg',
+                text: null
             };
         } else if (level === 1) {
             return {
                 gradient: 'from-orange-400 to-red-500',
                 border: 'border-orange-300',
-                shadow: 'shadow-[0_0_15px_rgba(251,146,60,0.6)]'
+                shadow: 'shadow-[0_0_15px_rgba(251,146,60,0.6)]',
+                text: 'x2'
             };
         } else if (level === 2) {
             return {
                 gradient: 'from-red-400 to-pink-500',
                 border: 'border-red-300',
-                shadow: 'shadow-[0_0_20px_rgba(239,68,68,0.7)]'
+                shadow: 'shadow-[0_0_20px_rgba(239,68,68,0.7)]',
+                text: 'x3'
             };
         } else if (level === 3) {
             return {
                 gradient: 'from-pink-400 to-purple-500',
                 border: 'border-pink-300',
-                shadow: 'shadow-[0_0_25px_rgba(236,72,153,0.8)]'
+                shadow: 'shadow-[0_0_25px_rgba(236,72,153,0.8)]',
+                text: 'x4'
+            };
+        } else if (level === 4) {
+            return {
+                gradient: 'from-purple-400 via-pink-500 to-red-500',
+                border: 'border-purple-300',
+                shadow: 'shadow-[0_0_30px_rgba(168,85,247,0.9)]',
+                text: 'x5'
             };
         } else {
-            // Level 4+: Epic rainbow/fire combo
+            // Level 5+: Epic rainbow/fire combo
             return {
-                gradient: 'from-purple-400 via-pink-500 to-yellow-400',
-                border: 'border-purple-300',
-                shadow: 'shadow-[0_0_30px_rgba(168,85,247,0.9)]'
+                gradient: 'from-purple-400 via-pink-500 to-yellow-400 animate-gradient-x',
+                border: 'border-yellow-300',
+                shadow: 'shadow-[0_0_35px_rgba(250,204,21,1)]',
+                text: `x${level + 1}`
             };
         }
     };
@@ -182,20 +194,39 @@ const GridComponent = ({
     const comboColors = getComboColors(comboLevel);
 
     return (
-        <div
-            ref={gridRef}
-            className={cn(
-                "grid touch-none select-none",
-                isLargeGrid ? "gap-0.5 sm:gap-1" : "gap-1 sm:gap-2",
-                className
+        <div className="relative">
+            {/* Combo Indicator */}
+            {comboLevel > 0 && comboColors.text && (
+                <motion.div
+                    initial={{ scale: 0, y: 20 }}
+                    animate={{ scale: 1, y: 0 }}
+                    exit={{ scale: 0, y: 20 }}
+                    className="absolute -top-12 left-1/2 transform -translate-x-1/2 z-20"
+                >
+                    <div className={cn(
+                        "px-6 py-2 rounded-full font-bold text-2xl text-white shadow-2xl",
+                        `bg-gradient-to-r ${comboColors.gradient}`,
+                        comboColors.shadow
+                    )}>
+                        {comboColors.text} COMBO!
+                    </div>
+                </motion.div>
             )}
-            style={{
-                gridTemplateColumns: `repeat(${grid[0]?.length || 4}, minmax(0, 1fr))`
-            }}
-            tabIndex={interactive ? 0 : -1}
-            onTouchMove={handleTouchMove}
-            onTouchEnd={handleTouchEnd}
-        >
+
+            <div
+                ref={gridRef}
+                className={cn(
+                    "grid touch-none select-none",
+                    isLargeGrid ? "gap-0.5 sm:gap-1" : "gap-1 sm:gap-2",
+                    className
+                )}
+                style={{
+                    gridTemplateColumns: `repeat(${grid[0]?.length || 4}, minmax(0, 1fr))`
+                }}
+                tabIndex={interactive ? 0 : -1}
+                onTouchMove={handleTouchMove}
+                onTouchEnd={handleTouchEnd}
+            >
             {grid.map((row, i) =>
                 row.map((cell, j) => {
                     const isSelected = selectedCells.some(c => c.row === i && c.col === j);
@@ -230,6 +261,7 @@ const GridComponent = ({
                     );
                 })
             )}
+            </div>
         </div>
     );
 };
