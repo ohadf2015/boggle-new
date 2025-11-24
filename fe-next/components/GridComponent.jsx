@@ -284,35 +284,40 @@ const GridComponent = ({
 
     return (
         <div className="relative w-full h-full flex items-center justify-center">
-            {/* Combo Indicator - Modern, compact, doesn't hide board */}
+            {/* Combo Indicator - Jumps through screen like GO animation */}
             <AnimatePresence mode="wait">
                 {comboLevel > 0 && comboColors.text && (
                     <motion.div
                         key={`combo-${comboLevel}`}
-                        initial={{ scale: 0, opacity: 0, y: 10 }}
+                        initial={{ scale: 0, opacity: 0, x: '-50%', y: '-50%' }}
                         animate={{
-                            scale: [0, 1.2, 1],
-                            opacity: 1,
-                            y: 0,
+                            scale: [0, 1.5, 1.2],
+                            opacity: [0, 1, 0],
+                            x: ['-50%', '-50%', '-50%'],
+                            y: ['-50%', '-50%', '-150%']
                         }}
                         exit={{
-                            scale: 0.8,
+                            scale: 0,
                             opacity: 0,
-                            y: -10,
-                            transition: { duration: 0.2 }
+                            transition: { duration: 0.1 }
                         }}
                         transition={{
-                            duration: 0.4,
+                            duration: 0.8,
+                            times: [0, 0.4, 1],
                             ease: "easeOut"
                         }}
-                        className="absolute -top-8 right-0 z-50 pointer-events-none"
+                        className="fixed top-1/2 left-1/2 z-50 pointer-events-none"
+                        style={{ transform: 'translate(-50%, -50%)' }}
                     >
                         <div className={cn(
-                            "px-3 py-1 rounded-full font-extrabold text-sm text-white backdrop-blur-sm",
+                            "px-6 py-3 rounded-full font-extrabold text-3xl md:text-4xl text-white backdrop-blur-sm",
                             `bg-gradient-to-r ${comboColors.gradient}`,
                             comboColors.shadow,
-                            "border-2 border-white/30"
-                        )}>
+                            "border-4 border-white/40"
+                        )}
+                        style={{
+                            filter: 'drop-shadow(0 0 20px rgba(251, 146, 60, 0.8))'
+                        }}>
                             🔥 {comboColors.text}
                         </div>
                     </motion.div>
@@ -359,7 +364,7 @@ const GridComponent = ({
                                 filter="url(#glow)"
                                 initial={{ opacity: 0 }}
                                 animate={{ opacity: 1 }}
-                                transition={{ duration: 0.2, ease: "easeOut" }}
+                                transition={{ duration: 0.1, ease: "easeOut" }}
                             />
                         );
                     })}
@@ -385,6 +390,7 @@ const GridComponent = ({
             {grid.map((row, i) =>
                 row.map((cell, j) => {
                     const isSelected = selectedCells.some(c => c.row === i && c.col === j);
+                    const isFirstSelected = selectedCells.length > 0 && selectedCells[0].row === i && selectedCells[0].col === j;
                     return (
                         <motion.div
                             key={`${i}-${j}`}
@@ -403,42 +409,137 @@ const GridComponent = ({
                             }}
                             whileTap={{ scale: 0.95 }}
                             transition={{
-                                duration: isSelected ? 0.2 : 0.6,
+                                duration: isSelected ? 0.12 : 0.6,
                                 ease: "easeOut",
-                                scale: { type: "spring", stiffness: 300, damping: 20 }
+                                scale: { type: "spring", stiffness: 400, damping: 18 }
                             }}
                             className={cn(
                                 "aspect-square flex items-center justify-center font-bold shadow-lg cursor-pointer transition-all duration-200 border-2 relative overflow-hidden",
                                 isLargeGrid
-                                    ? (largeText ? "text-2xl sm:text-3xl rounded-lg" : "text-lg sm:text-xl rounded-lg")
-                                    : (largeText || playerView ? "text-4xl sm:text-5xl md:text-6xl rounded-2xl" : "text-2xl sm:text-3xl rounded-xl"),
+                                    ? (largeText ? "text-2xl sm:text-3xl" : "text-lg sm:text-xl")
+                                    : (largeText || playerView ? "text-4xl sm:text-5xl md:text-6xl" : "text-2xl sm:text-3xl"),
                                 isSelected
                                     ? `bg-gradient-to-br ${comboColors.gradient} text-white ${comboColors.border} z-10 ${comboColors.shadow} border-white/40`
                                     : "bg-gradient-to-br from-slate-100 via-white to-slate-100 dark:from-slate-700 dark:via-slate-800 dark:to-slate-900 text-slate-900 dark:text-white border-slate-300/60 dark:border-slate-600/60 hover:scale-105 hover:shadow-xl dark:hover:bg-slate-700/80 active:scale-95 shadow-[0_4px_12px_rgba(0,0,0,0.1)]"
                             )}
+                            style={{ borderRadius: '12px' }}
                         >
                             {/* Ripple effect on selection */}
                             {isSelected && (
                                 <>
                                     {/* Main ripple effect */}
                                     <motion.div
-                                        className="absolute inset-0 bg-white/40 rounded-2xl"
+                                        className="absolute inset-0 bg-white/40"
+                                        style={{ borderRadius: '12px' }}
                                         initial={{ scale: 0.5, opacity: 0.8 }}
                                         animate={{ scale: 2.5, opacity: 0 }}
-                                        transition={{ duration: 0.6, ease: "easeOut" }}
+                                        transition={{ duration: 0.4, ease: "easeOut" }}
                                     />
 
                                     {/* Bright flare effect - always visible on click */}
                                     <motion.div
-                                        className="absolute inset-0 rounded-2xl pointer-events-none"
+                                        className="absolute inset-0 pointer-events-none"
                                         style={{
                                             background: 'radial-gradient(circle at center, rgba(255, 255, 255, 0.9), transparent 70%)',
-                                            filter: 'blur(2px)'
+                                            filter: 'blur(2px)',
+                                            borderRadius: '12px'
                                         }}
                                         initial={{ scale: 0, opacity: 1 }}
                                         animate={{ scale: [0, 1.5, 0], opacity: [1, 0.5, 0] }}
-                                        transition={{ duration: 0.8, ease: "easeOut" }}
+                                        transition={{ duration: 0.5, ease: "easeOut" }}
                                     />
+
+                                    {/* Enhanced fire burst for first selected cell (trail start) */}
+                                    {isFirstSelected && (
+                                        <>
+                                            {/* Large fire burst particles */}
+                                            {[...Array(16)].map((_, idx) => {
+                                                const angle = (idx * 22.5) * (Math.PI / 180);
+                                                const distance = 25 + (idx % 2) * 5;
+                                                return (
+                                                    <motion.div
+                                                        key={`first-burst-${idx}`}
+                                                        className="absolute w-3 h-3 rounded-full pointer-events-none"
+                                                        style={{
+                                                            background: idx % 3 === 0
+                                                                ? 'radial-gradient(circle, #ffff00, #ff6b00)'
+                                                                : idx % 3 === 1
+                                                                ? 'radial-gradient(circle, #ff6b00, #ff0000)'
+                                                                : 'radial-gradient(circle, #ff9500, #ff5500)',
+                                                            filter: 'blur(1.5px)',
+                                                            left: '50%',
+                                                            top: '50%',
+                                                            marginLeft: '-6px',
+                                                            marginTop: '-6px',
+                                                            boxShadow: '0 0 8px rgba(255, 107, 0, 0.8)'
+                                                        }}
+                                                        initial={{ scale: 0, opacity: 1, x: 0, y: 0 }}
+                                                        animate={{
+                                                            scale: [1, 2, 0],
+                                                            opacity: [1, 0.9, 0],
+                                                            x: Math.cos(angle) * distance,
+                                                            y: Math.sin(angle) * distance
+                                                        }}
+                                                        transition={{
+                                                            duration: 0.8,
+                                                            ease: "easeOut",
+                                                            delay: idx * 0.015
+                                                        }}
+                                                    />
+                                                );
+                                            })}
+
+                                            {/* Pulsing glow at start */}
+                                            <motion.div
+                                                className="absolute inset-0 pointer-events-none"
+                                                style={{
+                                                    background: 'radial-gradient(circle, rgba(255,107,0,0.6), transparent 60%)',
+                                                    filter: 'blur(8px)',
+                                                    borderRadius: '12px'
+                                                }}
+                                                animate={{
+                                                    scale: [1, 1.8, 1],
+                                                    opacity: [0.8, 0.4, 0.8],
+                                                }}
+                                                transition={{
+                                                    duration: 0.4,
+                                                    repeat: Infinity,
+                                                    ease: "easeInOut"
+                                                }}
+                                            />
+
+                                            {/* Continuous sparks emanating from start */}
+                                            {[...Array(6)].map((_, idx) => {
+                                                const angle = (idx * 60) * (Math.PI / 180);
+                                                return (
+                                                    <motion.div
+                                                        key={`spark-${idx}`}
+                                                        className="absolute w-1.5 h-1.5 rounded-full pointer-events-none"
+                                                        style={{
+                                                            background: 'radial-gradient(circle, #ffff00, #ff6b00)',
+                                                            filter: 'blur(0.5px)',
+                                                            left: '50%',
+                                                            top: '50%',
+                                                            marginLeft: '-3px',
+                                                            marginTop: '-3px'
+                                                        }}
+                                                        animate={{
+                                                            scale: [0, 1.5, 0],
+                                                            opacity: [1, 0.8, 0],
+                                                            x: [0, Math.cos(angle) * 20, Math.cos(angle) * 30],
+                                                            y: [0, Math.sin(angle) * 20, Math.sin(angle) * 30]
+                                                        }}
+                                                        transition={{
+                                                            duration: 0.5,
+                                                            repeat: Infinity,
+                                                            ease: "easeOut",
+                                                            delay: idx * 0.08
+                                                        }}
+                                                    />
+                                                );
+                                            })}
+                                        </>
+                                    )}
 
                                     {/* Fire particles - enhanced and always visible */}
                                     <>
@@ -468,9 +569,9 @@ const GridComponent = ({
                                                         y: Math.sin(angle) * distance
                                                     }}
                                                     transition={{
-                                                        duration: 0.6,
+                                                        duration: 0.4,
                                                         ease: "easeOut",
-                                                        delay: idx * 0.02
+                                                        delay: idx * 0.015
                                                     }}
                                                 />
                                             );
@@ -493,7 +594,7 @@ const GridComponent = ({
                                                     y: [-2, -4, -2],
                                                 }}
                                                 transition={{
-                                                    duration: 0.6,
+                                                    duration: 0.4,
                                                     repeat: Infinity,
                                                     ease: "easeInOut"
                                                 }}
@@ -513,7 +614,7 @@ const GridComponent = ({
                                                     y: [-3, -5, -3],
                                                 }}
                                                 transition={{
-                                                    duration: 0.7,
+                                                    duration: 0.45,
                                                     repeat: Infinity,
                                                     ease: "easeInOut",
                                                     delay: 0.1
@@ -534,7 +635,7 @@ const GridComponent = ({
                                                     y: [2, 4, 2],
                                                 }}
                                                 transition={{
-                                                    duration: 0.65,
+                                                    duration: 0.42,
                                                     repeat: Infinity,
                                                     ease: "easeInOut",
                                                     delay: 0.2
@@ -555,7 +656,7 @@ const GridComponent = ({
                                                     y: [3, 5, 3],
                                                 }}
                                                 transition={{
-                                                    duration: 0.8,
+                                                    duration: 0.5,
                                                     repeat: Infinity,
                                                     ease: "easeInOut",
                                                     delay: 0.3
@@ -565,17 +666,18 @@ const GridComponent = ({
                                             {/* Pulsing glow effect for high combos */}
                                             {comboLevel >= 2 && (
                                                 <motion.div
-                                                    className="absolute inset-0 rounded-lg pointer-events-none"
+                                                    className="absolute inset-0 pointer-events-none"
                                                     style={{
                                                         background: `radial-gradient(circle, ${comboLevel >= 4 ? 'rgba(168,85,247,0.4)' : 'rgba(255,107,0,0.3)'}, transparent)`,
-                                                        filter: 'blur(3px)'
+                                                        filter: 'blur(3px)',
+                                                        borderRadius: '12px'
                                                     }}
                                                     animate={{
                                                         scale: [1, 1.3, 1],
                                                         opacity: [0.5, 0.8, 0.5],
                                                     }}
                                                     transition={{
-                                                        duration: 1,
+                                                        duration: 0.6,
                                                         repeat: Infinity,
                                                         ease: "easeInOut"
                                                     }}
