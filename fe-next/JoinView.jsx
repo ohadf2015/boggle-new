@@ -601,7 +601,7 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
                             </div>
                           </div>
                           <Badge variant="secondary" className="h-5 text-xs bg-slate-700 text-gray-300">
-                            {room.playerCount} {t('joinView.players')}
+                            {room.playerCount}{' '}{t('joinView.players')}
                           </Badge>
                         </div>
                       </button>

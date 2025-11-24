@@ -561,7 +561,7 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
                             </span>
                             {isDuplicate && (
                               <Badge variant="destructive" className="bg-orange-500">
-                                ⚠ {item.playerCount} {t('joinView.players')}
+                                ⚠ {item.playerCount}{' '}{t('joinView.players')}
                               </Badge>
                             )}
                             {isAutoValidated && !isDuplicate && (

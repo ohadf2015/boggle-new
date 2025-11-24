@@ -781,30 +781,26 @@ const handleDisconnect = (ws, wss) => {
       const remainingPlayers = Object.keys(game.users);
 
       if (remainingPlayers.length === 0) {
-        // No players left, start 20-second auto-close timer
-        console.log(`[DISCONNECT] No players left in game ${gameCode}, starting 20-second auto-close timer`);
+        // No players left, close room immediately
+        console.log(`[DISCONNECT] No players left in game ${gameCode}, closing room immediately`);
 
         // Clear any existing empty room timeout
         if (game.emptyRoomTimeout) {
           clearTimeout(game.emptyRoomTimeout);
         }
 
-        // Start new 20-second timer to close the room
-        game.emptyRoomTimeout = setTimeout(() => {
-          if (games[gameCode] && Object.keys(games[gameCode].users).length === 0) {
-            console.log(`[AUTO-CLOSE] Empty room timer expired for ${gameCode}, closing room`);
-            cleanupGameTimers(gameCode);
-            delete games[gameCode];
+        // Close the room immediately
+        console.log(`[AUTO-CLOSE] Closing empty room ${gameCode}`);
+        cleanupGameTimers(gameCode);
+        delete games[gameCode];
 
-            // Delete from Redis
-            deleteGameState(gameCode).catch(err =>
-              console.error('[REDIS] Error deleting game state:', err)
-            );
+        // Delete from Redis
+        deleteGameState(gameCode).catch(err =>
+          console.error('[REDIS] Error deleting game state:', err)
+        );
 
-            // Broadcast updated rooms list
-            if (wss) broadcastActiveRooms(wss);
-          }
-        }, 20000); // 20 seconds
+        // Broadcast updated rooms list
+        if (wss) broadcastActiveRooms(wss);
       } else {
         // There are remaining players, start grace period
         console.log(`[DISCONNECT] ${remainingPlayers.length} player(s) remaining, starting grace period`);
@@ -851,6 +847,9 @@ const handleDisconnect = (ws, wss) => {
 
                 // Update player list with new host info
                 broadcastPlayerList(gameCode);
+
+                // Broadcast updated active rooms list
+                if (wss) broadcastActiveRooms(wss);
 
                 // Save to Redis
                 saveGameState(gameCode, games[gameCode]).catch(err =>
@@ -922,29 +921,28 @@ const handleDisconnect = (ws, wss) => {
       // Broadcast updated leaderboard
       broadcastLeaderboard(gameCode);
 
+      // Broadcast updated active rooms list to all clients
+      if (wss) broadcastActiveRooms(wss);
+
       // Check if game should end (if 0 players left, or 1 player left and game is playing)
-      // If 0 players, start 20-second auto-close timer.
+      // If 0 players, close room immediately.
       // If 1 player and playing, end game.
       const remainingPlayers = Object.keys(games[gameCode].users);
       if (remainingPlayers.length === 0) {
-         console.log(`[DISCONNECT] No players left in game ${gameCode}, starting 20-second auto-close timer`);
+         console.log(`[DISCONNECT] No players left in game ${gameCode}, closing room immediately`);
 
          // Clear any existing empty room timeout
          if (games[gameCode].emptyRoomTimeout) {
            clearTimeout(games[gameCode].emptyRoomTimeout);
          }
 
-         // Start new 20-second timer to close the room
-         games[gameCode].emptyRoomTimeout = setTimeout(() => {
-           if (games[gameCode] && Object.keys(games[gameCode].users).length === 0) {
-             console.log(`[AUTO-CLOSE] Empty room timer expired for ${gameCode}, closing room`);
-             cleanupGameTimers(gameCode);
-             delete games[gameCode];
-             deleteGameState(gameCode).catch(e => console.error(e));
-             // Broadcast updated rooms list
-             if (wss) broadcastActiveRooms(wss);
-           }
-         }, 20000); // 20 seconds
+         // Close the room immediately
+         console.log(`[AUTO-CLOSE] Closing empty room ${gameCode}`);
+         cleanupGameTimers(gameCode);
+         delete games[gameCode];
+         deleteGameState(gameCode).catch(e => console.error(e));
+         // Broadcast updated rooms list
+         if (wss) broadcastActiveRooms(wss);
       } else if (remainingPlayers.length <= 1 && games[gameCode].gameState === 'playing') {
          console.log(`[DISCONNECT] ${remainingPlayers.length} player(s) remain in game ${gameCode}, ending game automatically`);
          // Clear timer before ending game
