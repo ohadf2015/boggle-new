@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '../lib/utils';
 
 const GridComponent = ({
@@ -9,19 +9,51 @@ const GridComponent = ({
     selectedCells: externalSelectedCells,
     className,
     largeText = false,
-    playerView = false
+    playerView = false,
+    comboLevel = 0
 }) => {
     const [internalSelectedCells, setInternalSelectedCells] = useState([]);
+    const [direction, setDirection] = useState(null); // Track the direction of movement
     const isTouchingRef = useRef(false);
+    const gridRef = useRef(null);
 
     // Use external control if provided, otherwise internal state
     const selectedCells = externalSelectedCells || internalSelectedCells;
     const setSelectedCells = externalSelectedCells ? () => { } : setInternalSelectedCells;
 
+    // Auto-focus on grid when game becomes interactive
+    useEffect(() => {
+        if (interactive && gridRef.current) {
+            gridRef.current.focus();
+        }
+    }, [interactive]);
+
+    // Helper function to normalize direction to unit vector
+    const normalizeDirection = (rowDiff, colDiff) => {
+        // Return the direction as a unit vector (sign of the differences)
+        return {
+            row: rowDiff === 0 ? 0 : (rowDiff > 0 ? 1 : -1),
+            col: colDiff === 0 ? 0 : (colDiff > 0 ? 1 : -1)
+        };
+    };
+
+    // Helper function to check if a move continues in the same direction
+    const isValidDirection = (rowDiff, colDiff, currentDirection) => {
+        // If no direction set yet (first move), any adjacent cell is valid
+        if (!currentDirection) return true;
+
+        // Normalize the new direction
+        const newDir = normalizeDirection(rowDiff, colDiff);
+
+        // Check if the new direction matches the established direction
+        return newDir.row === currentDirection.row && newDir.col === currentDirection.col;
+    };
+
     const handleTouchStart = (rowIndex, colIndex, letter) => {
         if (!interactive) return;
         isTouchingRef.current = true;
         setSelectedCells([{ row: rowIndex, col: colIndex, letter }]);
+        setDirection(null); // Reset direction for new selection
         if (window.navigator && window.navigator.vibrate) {
             window.navigator.vibrate(50);
         }
@@ -51,34 +83,35 @@ const GridComponent = ({
             if (existingIndex !== -1) {
                 if (existingIndex === selectedCells.length - 2) {
                     setSelectedCells(prev => prev.slice(0, -1));
+
+                    // Reset direction if we're back to one cell (no direction established yet)
+                    if (selectedCells.length - 1 === 1) {
+                        setDirection(null);
+                    }
+
                     if (window.navigator && window.navigator.vibrate) window.navigator.vibrate(20);
                 }
                 return;
             }
 
-            // Validation Logic
+            // Validation Logic - only allow straight or diagonal lines
             if (lastCell) {
                 const rowDiff = rowIndex - lastCell.row;
                 const colDiff = colIndex - lastCell.col;
 
-                // Must be adjacent
-                if (Math.abs(rowDiff) <= 1 && Math.abs(colDiff) <= 1) {
+                // Must be adjacent (within 1 cell) but NOT the same cell
+                const isAdjacent = Math.abs(rowDiff) <= 1 && Math.abs(colDiff) <= 1 && !(rowDiff === 0 && colDiff === 0);
 
-                    // If we have more than 1 cell, enforce direction
-                    if (selectedCells.length >= 2) {
-                        const secondLastCell = selectedCells[selectedCells.length - 2];
-                        const initialRowDiff = lastCell.row - secondLastCell.row;
-                        const initialColDiff = lastCell.col - secondLastCell.col;
+                // Check if move continues in the same direction
+                if (isAdjacent && isValidDirection(rowDiff, colDiff, direction)) {
+                    setSelectedCells(prev => [...prev, { row: rowIndex, col: colIndex, letter }]);
 
-                        if (rowDiff === initialRowDiff && colDiff === initialColDiff) {
-                            setSelectedCells(prev => [...prev, { row: rowIndex, col: colIndex, letter }]);
-                            if (window.navigator && window.navigator.vibrate) window.navigator.vibrate(50);
-                        }
-                    } else {
-                        // First move defines direction
-                        setSelectedCells(prev => [...prev, { row: rowIndex, col: colIndex, letter }]);
-                        if (window.navigator && window.navigator.vibrate) window.navigator.vibrate(50);
+                    // Set direction on the first move (when direction is null)
+                    if (!direction) {
+                        setDirection(normalizeDirection(rowDiff, colDiff));
                     }
+
+                    if (window.navigator && window.navigator.vibrate) window.navigator.vibrate(50);
                 }
             }
         }
@@ -94,6 +127,7 @@ const GridComponent = ({
                 onWordSubmit(formedWord);
             }
             setSelectedCells([]);
+            setDirection(null); // Reset direction after word submission
         }
     };
 
@@ -119,6 +153,11 @@ const GridComponent = ({
         if (existingIndex !== -1) {
             if (existingIndex === selectedCells.length - 2) {
                 setSelectedCells(prev => prev.slice(0, -1));
+
+                // Reset direction if we're back to one cell (no direction established yet)
+                if (selectedCells.length - 1 === 1) {
+                    setDirection(null);
+                }
             }
             return;
         }
@@ -127,17 +166,16 @@ const GridComponent = ({
             const rowDiff = rowIndex - lastCell.row;
             const colDiff = colIndex - lastCell.col;
 
-            if (Math.abs(rowDiff) <= 1 && Math.abs(colDiff) <= 1) {
-                if (selectedCells.length >= 2) {
-                    const secondLastCell = selectedCells[selectedCells.length - 2];
-                    const initialRowDiff = lastCell.row - secondLastCell.row;
-                    const initialColDiff = lastCell.col - secondLastCell.col;
+            // Must be adjacent (within 1 cell) but NOT the same cell
+            const isAdjacent = Math.abs(rowDiff) <= 1 && Math.abs(colDiff) <= 1 && !(rowDiff === 0 && colDiff === 0);
 
-                    if (rowDiff === initialRowDiff && colDiff === initialColDiff) {
-                        setSelectedCells(prev => [...prev, { row: rowIndex, col: colIndex, letter }]);
-                    }
-                } else {
-                    setSelectedCells(prev => [...prev, { row: rowIndex, col: colIndex, letter }]);
+            // Check if move continues in the same direction
+            if (isAdjacent && isValidDirection(rowDiff, colDiff, direction)) {
+                setSelectedCells(prev => [...prev, { row: rowIndex, col: colIndex, letter }]);
+
+                // Set direction on the first move (when direction is null)
+                if (!direction) {
+                    setDirection(normalizeDirection(rowDiff, colDiff));
                 }
             }
         }
@@ -157,19 +195,107 @@ const GridComponent = ({
 
     const isLargeGrid = (grid[0]?.length || 0) > 8;
 
+    // Get combo colors based on level (escalating colors for gamification)
+    const getComboColors = (level) => {
+        if (level === 0) {
+            return {
+                gradient: 'from-yellow-400 to-orange-500',
+                border: 'border-yellow-300',
+                shadow: 'shadow-lg',
+                text: null
+            };
+        } else if (level === 1) {
+            return {
+                gradient: 'from-orange-400 to-red-500',
+                border: 'border-orange-300',
+                shadow: 'shadow-[0_0_15px_rgba(251,146,60,0.6)]',
+                text: 'x2'
+            };
+        } else if (level === 2) {
+            return {
+                gradient: 'from-red-400 to-pink-500',
+                border: 'border-red-300',
+                shadow: 'shadow-[0_0_20px_rgba(239,68,68,0.7)]',
+                text: 'x3'
+            };
+        } else if (level === 3) {
+            return {
+                gradient: 'from-pink-400 to-purple-500',
+                border: 'border-pink-300',
+                shadow: 'shadow-[0_0_25px_rgba(236,72,153,0.8)]',
+                text: 'x4'
+            };
+        } else if (level === 4) {
+            return {
+                gradient: 'from-purple-400 via-pink-500 to-red-500',
+                border: 'border-purple-300',
+                shadow: 'shadow-[0_0_30px_rgba(168,85,247,0.9)]',
+                text: 'x5'
+            };
+        } else {
+            // Level 5+: Epic rainbow/fire combo
+            return {
+                gradient: 'from-purple-400 via-pink-500 to-yellow-400 animate-gradient-x',
+                border: 'border-yellow-300',
+                shadow: 'shadow-[0_0_35px_rgba(250,204,21,1)]',
+                text: `x${level + 1}`
+            };
+        }
+    };
+
+    const comboColors = getComboColors(comboLevel);
+
     return (
-        <div
-            className={cn(
-                "grid touch-none select-none",
-                isLargeGrid ? "gap-0.5 sm:gap-1" : "gap-1 sm:gap-2",
-                className
-            )}
-            style={{
-                gridTemplateColumns: `repeat(${grid[0]?.length || 4}, minmax(0, 1fr))`
-            }}
-            onTouchMove={handleTouchMove}
-            onTouchEnd={handleTouchEnd}
-        >
+        <div className="relative">
+            {/* Combo Indicator - Modern, compact, doesn't hide board */}
+            <AnimatePresence mode="wait">
+                {comboLevel > 0 && comboColors.text && (
+                    <motion.div
+                        key={`combo-${comboLevel}`}
+                        initial={{ scale: 0, opacity: 0, y: 10 }}
+                        animate={{
+                            scale: [0, 1.2, 1],
+                            opacity: 1,
+                            y: 0,
+                        }}
+                        exit={{
+                            scale: 0.8,
+                            opacity: 0,
+                            y: -10,
+                            transition: { duration: 0.2 }
+                        }}
+                        transition={{
+                            duration: 0.4,
+                            ease: "easeOut"
+                        }}
+                        className="absolute -top-8 right-0 z-50 pointer-events-none"
+                    >
+                        <div className={cn(
+                            "px-3 py-1 rounded-full font-extrabold text-sm text-white backdrop-blur-sm",
+                            `bg-gradient-to-r ${comboColors.gradient}`,
+                            comboColors.shadow,
+                            "border-2 border-white/30"
+                        )}>
+                            🔥 {comboColors.text}
+                        </div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
+
+            <div
+                ref={gridRef}
+                className={cn(
+                    "grid touch-none select-none",
+                    isLargeGrid ? "gap-0.5 sm:gap-1" : "gap-1 sm:gap-2",
+                    className
+                )}
+                style={{
+                    gridTemplateColumns: `repeat(${grid[0]?.length || 4}, minmax(0, 1fr))`
+                }}
+                tabIndex={interactive ? 0 : -1}
+                onTouchMove={handleTouchMove}
+                onTouchEnd={handleTouchEnd}
+            >
             {grid.map((row, i) =>
                 row.map((cell, j) => {
                     const isSelected = selectedCells.some(c => c.row === i && c.col === j);
@@ -190,12 +316,12 @@ const GridComponent = ({
                             }}
                             transition={{ duration: 0.2 }}
                             className={cn(
-                                "aspect-square flex items-center justify-center font-bold shadow-sm cursor-pointer transition-colors border",
+                                "aspect-square flex items-center justify-center font-bold shadow-sm cursor-pointer transition-all duration-200 border",
                                 isLargeGrid
                                     ? (largeText ? "text-2xl sm:text-3xl rounded-md" : "text-lg sm:text-xl rounded-md")
                                     : (largeText || playerView ? "text-4xl sm:text-6xl rounded-xl" : "text-2xl sm:text-3xl rounded-lg"),
                                 isSelected
-                                    ? "bg-gradient-to-br from-yellow-400 to-orange-500 text-white border-yellow-300 z-10 shadow-lg"
+                                    ? `bg-gradient-to-br ${comboColors.gradient} text-white ${comboColors.border} z-10 ${comboColors.shadow}`
                                     : "bg-gradient-to-br from-white to-slate-100 dark:from-slate-800 dark:to-slate-900 text-slate-900 dark:text-white border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700/80"
                             )}
                         >
@@ -204,6 +330,7 @@ const GridComponent = ({
                     );
                 })
             )}
+            </div>
         </div>
     );
 };

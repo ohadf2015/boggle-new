@@ -27,6 +27,7 @@ export const translations = {
       selectUILanguage: 'Interface Language',
       close: 'Close',
       understood: 'Got it, let\'s play!',
+      refresh: 'Refresh',
     },
     errors: {
       unstableConnection: 'Internet connection is unstable - you may experience issues during the game',
@@ -59,6 +60,10 @@ export const translations = {
       joinRoom: 'Join Room',
       roomNamePlaceholder: 'Enter room name',
       playerNamePlaceholder: 'Enter your name',
+      yourName: 'Your Name',
+      enterYourName: 'Enter your name',
+      pleaseEnterYourName: 'Please enter your name',
+      playerAndRoomName: 'This will be your player name and room name',
       selectLanguage: 'Game Language',
       noRooms: 'No rooms available. Create one!',
       roomsList: 'Available Rooms',
@@ -115,6 +120,9 @@ export const translations = {
       qrCode: 'QR Code',
       scanQr: 'Scan QR code to join or use code',
       autoValidated: 'Auto-validated',
+      hostPlays: 'I want to play',
+      spectatorMode: 'Spectator mode - watch the board',
+      advancedSettings: 'Advanced Settings',
     },
     playerView: {
       waitingForHost: 'Waiting for host to start...',
@@ -222,6 +230,56 @@ export const translations = {
       },
       readyToPlay: 'Ready? Let\'s start playing! 🎮',
       funForFamily: 'An engaging and fun game for the whole family - completely free!',
+    },
+    achievements: {
+      FIRST_BLOOD: {
+        name: 'First Blood',
+        description: 'First to find a word'
+      },
+      SPEED_DEMON: {
+        name: 'Speed Demon',
+        description: 'Found 10 words in 2 minutes'
+      },
+      WORD_MASTER: {
+        name: 'Word Master',
+        description: 'Found a word with 7+ letters'
+      },
+      COMBO_KING: {
+        name: 'Combo King',
+        description: '5 words in a row'
+      },
+      PERFECTIONIST: {
+        name: 'Perfectionist',
+        description: 'All words are valid'
+      },
+      LEXICON: {
+        name: 'Lexicon',
+        description: 'Found 20+ words'
+      },
+      WORDSMITH: {
+        name: 'Wordsmith',
+        description: 'Found 15 valid words'
+      },
+      QUICK_THINKER: {
+        name: 'Quick Thinker',
+        description: 'Found a word within 10 seconds'
+      },
+      LONG_HAULER: {
+        name: 'Marathon Runner',
+        description: 'Found a word in the last minute'
+      },
+      DIVERSE_VOCABULARY: {
+        name: 'Diverse Vocabulary',
+        description: 'Found words of different lengths'
+      },
+      DOUBLE_TROUBLE: {
+        name: 'Winning Duo',
+        description: 'Found 2 words within 5 seconds'
+      },
+      TREASURE_HUNTER: {
+        name: 'Treasure Hunter',
+        description: 'Found a rare word (8+ letters)'
+      }
     }
   },
   he: {
@@ -252,6 +310,7 @@ export const translations = {
       selectUILanguage: 'שפת ממשק',
       close: 'סגור',
       understood: 'הבנתי, בוא נשחק!',
+      refresh: 'רענן',
     },
     errors: {
       unstableConnection: 'חיבור האינטרנט לא יציב - ייתכנו בעיות במשחק',
@@ -284,6 +343,10 @@ export const translations = {
       joinRoom: 'הצטרף לחדר',
       roomNamePlaceholder: 'הכנס שם חדר',
       playerNamePlaceholder: 'הכנס את שמך',
+      yourName: 'השם שלך',
+      enterYourName: 'הכנס את השם שלך',
+      pleaseEnterYourName: 'אנא הכנס את השם שלך',
+      playerAndRoomName: 'זה יהיה שם השחקן ושם החדר שלך',
       selectLanguage: 'שפת המשחק',
       noRooms: 'אין חדרים זמינים. צור אחד!',
       roomsList: 'חדרים זמינים',
@@ -295,6 +358,8 @@ export const translations = {
       clearAndRestart: 'נקה והתחל מחדש',
       english: 'English',
       hebrew: 'עברית',
+      swedish: 'Svenska',
+      japanese: '日本語',
       generateNewCode: 'צור קוד חדש',
       createGameInstructions: 'צור משחק ושתף את הקוד עם חברים!',
       createNewRoom: 'צור חדר חדש כדי להתחיל!',
@@ -340,6 +405,9 @@ export const translations = {
       qrCode: 'ברקוד',
       scanQr: 'סרוק את הקוד כדי להצטרף למשחק או השתמש בקוד',
       autoValidated: 'אומתה אוטומטית',
+      hostPlays: 'אני רוצה לשחק',
+      spectatorMode: 'מצב צפייה - צפה בלוח',
+      advancedSettings: 'הגדרות מתקדמות',
     },
     playerView: {
       waitingForHost: 'ממתין למארח שיתחיל...',
@@ -447,6 +515,626 @@ export const translations = {
       },
       readyToPlay: 'מוכנים? בואו נתחיל לשחק! 🎮',
       funForFamily: 'משחק חוויתי ומהנה לכל המשפחה - חינמי לחלוטין!',
+    },
+    achievements: {
+      FIRST_BLOOD: {
+        name: 'דם ראשון',
+        description: 'ראשון למצוא מילה'
+      },
+      SPEED_DEMON: {
+        name: 'שד המהירות',
+        description: 'מצא 10 מילים ב-2 דקות'
+      },
+      WORD_MASTER: {
+        name: 'אדון המילים',
+        description: 'מצא מילה בת 7+ אותיות'
+      },
+      COMBO_KING: {
+        name: 'מלך הקומבו',
+        description: '5 מילים ברצף'
+      },
+      PERFECTIONIST: {
+        name: 'פרפקציוניסט',
+        description: 'כל המילים תקינות'
+      },
+      LEXICON: {
+        name: 'לקסיקון',
+        description: 'מצא 20+ מילים'
+      },
+      WORDSMITH: {
+        name: 'צורף מילים',
+        description: 'מצא 15 מילים תקינות'
+      },
+      QUICK_THINKER: {
+        name: 'חושב מהיר',
+        description: 'מצא מילה בתוך 10 שניות'
+      },
+      LONG_HAULER: {
+        name: 'מרתונאי',
+        description: 'מצא מילה בדקה האחרונה'
+      },
+      DIVERSE_VOCABULARY: {
+        name: 'אוצר מילים מגוון',
+        description: 'מצא מילים באורכים שונים'
+      },
+      DOUBLE_TROUBLE: {
+        name: 'צמד מנצח',
+        description: 'מצא 2 מילים בתוך 5 שניות'
+      },
+      TREASURE_HUNTER: {
+        name: 'צייד אוצרות',
+        description: 'מצא מילה נדירה (8+ אותיות)'
+      }
+    }
+  },
+  sv: {
+    flag: '🇸🇪',
+    name: 'Svenska',
+    direction: 'ltr',
+    logo: {
+      lexi: 'Lexi',
+      clash: 'Clash',
+    },
+    seo: {
+      title: 'LexiClash - Multiplayer Word Game Online | Spela gratis nu',
+      description: 'LexiClash - Snabbt multiplayer-ordspel perfekt för fester, teambuilding och familjekul! Hitta ord, tävla i realtid. Gratis onlinespel - ingen nedladdning krävs!',
+      keywords: 'LexiClash, ordspel, multiplayer, onlinespel, festspel, teambuilding, familjespel, ordpussel, gratis spel',
+      ogTitle: 'LexiClash - Multiplayer ordspel',
+      ogDescription: 'LexiClash - Snabbt multiplayer-ordspel perfekt för fester, teambuilding och familjekul! Hitta ord, tävla i realtid. Gratis onlinespel - ingen nedladdning krävs!',
+      twitterTitle: 'LexiClash - Multiplayer ordspel',
+      twitterDescription: 'LexiClash - Snabbt multiplayer-ordspel perfekt för fester, teambuilding och familjekul! Hitta ord, tävla i realtid. Gratis onlinespel - ingen nedladdning krävs!',
+      locale: 'sv_SE',
+      language: 'Swedish',
+    },
+    common: {
+      loading: 'Laddar...',
+      error: 'Fel',
+      back: 'Tillbaka',
+      confirm: 'Bekräfta',
+      cancel: 'Avbryt',
+      selectUILanguage: 'Gränssnittsspråk',
+      close: 'Stäng',
+      understood: 'Förstått, låt oss spela!',
+      refresh: 'Uppdatera',
+    },
+    errors: {
+      unstableConnection: 'Internetanslutningen är instabil - du kan uppleva problem under spelet',
+      slowConnection: 'Långsam internetanslutning',
+      sessionExpired: 'Föregående session har gått ut. Vänligen gå med i ett nytt rum.',
+      gameCodeNotExist: 'Spelkoden finns inte. Vänligen kontrollera och försök igen.',
+      usernameTaken: 'Användarnamnet är redan upptaget i det här spelet. Välj ett annat.',
+      gameCodeExists: 'Spelkoden finns redan. Välj en annan kod.',
+    },
+    validation: {
+      usernameRequired: 'Användarnamn krävs! Fyll i fältet',
+      roomNameRequired: 'Rumsnamn krävs! Fyll i fältet',
+      enterNameToJoin: 'Ange ett namn för att gå med',
+      enterRoomName: 'Namn för att identifiera ditt rum',
+      enterGameCode: 'Ange spelkoden som delats av värden',
+      codeHelper: 'Kod som spelare delar för att gå med',
+      fourDigitCode: '4-siffrig kod',
+      enterFourDigitCode: 'Ange en 4-siffrig kod',
+    },
+    difficulty: {
+      easy: 'Lätt',
+      medium: 'Medel',
+      hard: 'Svår',
+      expert: 'Expert',
+      master: 'Mästare',
+    },
+    joinView: {
+      title: 'LexiClash',
+      createRoom: 'Skapa rum',
+      joinRoom: 'Gå med i rum',
+      roomNamePlaceholder: 'Ange rumsnamn',
+      playerNamePlaceholder: 'Ange ditt namn',
+      yourName: 'Ditt namn',
+      enterYourName: 'Ange ditt namn',
+      pleaseEnterYourName: 'Vänligen ange ditt namn',
+      playerAndRoomName: 'Detta blir ditt spelarnamn och rumsnamn',
+      selectLanguage: 'Spelspråk',
+      noRooms: 'Inga tillgängliga rum. Skapa ett!',
+      roomsList: 'Tillgängliga rum',
+      players: 'spelare',
+      host: 'Rum',
+      joiningRoom: 'Du går med i rummet',
+      roomLabel: 'Rum',
+      wantToHostOrJoinOther: 'Vill du vara värd eller gå med i ett annat rum?',
+      clearAndRestart: 'Rensa och börja om',
+      english: 'English',
+      hebrew: 'Hebrew',
+      swedish: 'Svenska',
+      japanese: '日本語',
+      generateNewCode: 'Generera ny kod',
+      createGameInstructions: 'Skapa ett spel och dela koden med vänner!',
+      createNewRoom: 'Skapa ett nytt rum för att komma igång!',
+      howToPlay: 'Hur spelar man?',
+      howToPlayTitle: 'Hur man spelar LexiClash',
+      qrCodeTitle: 'QR-kod för att gå med',
+      scanToJoin: 'Skanna koden för att gå med i spelet eller använd kod',
+      copyLink: 'Kopiera länk',
+      shareWhatsapp: 'WhatsApp',
+      shareEmail: 'E-post',
+    },
+    hostView: {
+      waitingForPlayers: 'Väntar på spelare...',
+      startGame: 'Starta spel',
+      stopGame: 'Stoppa spel',
+      roomCode: 'Rumskod',
+      playersJoined: 'Spelare anslutna',
+      gameSettings: 'Spelinställningar',
+      difficulty: 'Svårighetsgrad',
+      timer: 'Timer',
+      minutes: 'minuter',
+      playerJoinedLate: 'gick med sent!',
+      playerFoundWord: 'hittade',
+      validateWords: 'Granska och validera ord',
+      validationComplete: 'Validering klar!',
+      gameStarted: 'Spelet startat!',
+      gameStopped: 'Spelet stoppat',
+      confirmExit: 'Är du säker på att du vill avsluta? Detta stänger rummet för alla spelare.',
+      exitRoom: 'Lämna rum',
+      newGameReady: 'Redo för nytt spel!',
+      startNewGame: 'Starta nytt spel',
+      validation: 'Ordvalidering',
+      validateIntro: 'Markera giltiga ord. Omarkerade ord tas bort.',
+      duplicateWarning: 'Ord som hittas av flera spelare tas bort automatiskt',
+      totalWords: 'Totalt antal ord att validera',
+      submitValidation: 'Skicka validering',
+      finalScores: 'Slutresultat',
+      words: 'Ord',
+      achievements: 'Prestationer',
+      close: 'Stäng',
+      copyLink: 'Kopiera länk',
+      shareWhatsapp: 'Dela WhatsApp',
+      qrCode: 'QR-kod',
+      scanQr: 'Skanna QR-kod för att gå med eller använd kod',
+      autoValidated: 'Automatiskt validerat',
+      hostPlays: 'Jag vill spela',
+      spectatorMode: 'Åskådarläge - titta på brädet',
+      advancedSettings: 'Avancerade inställningar',
+    },
+    playerView: {
+      waitingForHost: 'Väntar på att värden ska starta...',
+      submitWord: 'Skicka',
+      clear: 'Rensa',
+      timeRemaining: 'Tid kvar',
+      score: 'Poäng',
+      wordsFound: 'Ord hittade',
+      gameStarted: 'Spelet startat! 🎮',
+      gameOver: 'Spelet slut! 🏁',
+      wordAlreadyFound: 'Ordet redan hittat! ❌',
+      wordNotOnBoard: 'Ordet finns inte på brädet! 🚫',
+      newWord: 'Nytt ord!',
+      scoresReady: 'Resultat klara! ✅',
+      roomClosed: 'Rummet stängt',
+      startingNewGame: 'Startar nytt spel!',
+      onlyLanguageWords: 'Endast ord på valt språk! 🚫',
+      exitConfirmation: 'Lämna rummet?',
+      exit: 'Avsluta',
+      waitForGameStart: 'Vänta på att spelet startar',
+      players: 'Spelare',
+      yourAchievements: 'Dina prestationer',
+      letterGrid: 'Bokstavsbräde',
+      waitingForGame: 'Väntar på spel...',
+      add: 'Lägg till',
+      enterWord: 'Ange ord...',
+      waitingForResults: 'Väntar på resultat...',
+      leaderboard: 'Topplista',
+      noPlayersYet: 'Inga spelare ännu',
+      wordSubmitted: 'Skickat',
+      wordTooShort: 'Ordet för kort! (min 2 bokstäver)',
+      wordCount: 'ord',
+      longestWord: 'Längsta',
+      hostValidating: 'Värden validerar ord...',
+      clickToSelect: 'Klicka på bokstäver för att välja ord',
+    },
+    chat: {
+      title: 'Rumschatt',
+      placeholder: 'Skriv ett meddelande...',
+      noMessages: 'Inga meddelanden ännu. Börja chatta!',
+    },
+    results: {
+      gameOver: 'Spelet slut',
+      winner: 'Vinnare',
+      winnerAnnouncement: 'Vinnare',
+      points: 'poäng',
+      exitRoom: 'Lämna rum',
+      playAgain: 'Spela igen',
+      finalScores: 'Slutresultat',
+      returnToRoom: 'Återvänd till aktivt rum',
+      cancelAutoReturn: 'Avbryt automatisk retur',
+      valid: 'giltiga',
+      playAgainQuestion: '🎮 Redo för en ny runda?',
+      playAgainDescription: 'Stanna kvar i rummet och vänta på att värden startar ett nytt spel',
+      stayInRoom: 'Ja, stanna i rummet',
+      leaveRoom: 'Nej, lämna rummet',
+    },
+    scorePage: {
+      title: '🏆 Spelresultat',
+      leaderboard: 'Topplista',
+      points: 'Poäng',
+      congratulations: 'Grattis',
+    },
+    howToPlay: {
+      title: 'Hur spelar man LexiClash?',
+      description: 'LexiClash är ett snabbt ordspel där du tävlar mot klockan för att hitta så många ord som möjligt på ett bokstavsrutnät. Ju längre ord, desto fler poäng!',
+      descriptionNote: 'Ord måste vara minst 2 bokstäver långa och på det valda spelspråket.',
+      createOrJoinTitle: 'Skapa eller gå med i ett spel',
+      createOrJoinDesc: 'Värden skapar ett rum och delar koden. Spelare går med med koden.',
+      hostStartsTitle: 'Värden startar spelet',
+      hostStartsDesc: 'När alla är redo startar värden timern och bokstäverna visas!',
+      findWordsTitle: 'Hitta ord på brädet',
+      findWordsDesc: 'Koppla ihop angränsande bokstäver (horisontellt, vertikalt eller diagonalt) för att bilda ord. Varje bokstav kan bara användas en gång per ord.',
+      findWordsNote: 'Obs: Du kan inte återanvända samma bokstav i ett enda ord!',
+      earnPointsTitle: 'Tjäna poäng och prestationer',
+      earnPointsDesc: 'Ju längre ord, desto fler poäng! Plus, lås upp speciella prestationer för imponerande bedrifter.',
+      earnPointsNote: 'Speciella prestationer kan ge dig en fin poängboost!',
+      scoringSystemTitle: 'Poängsystem 🎯',
+      scoringTable: {
+        letters2_3: '2-3 bokstäver: 1 poäng',
+        letters4: '4 bokstäver: 2 poäng',
+        letters5: '5 bokstäver: 3 poäng',
+        letters6: '6 bokstäver: 5 poäng',
+        letters7: '7 bokstäver: 7 poäng',
+        letters8: '8 bokstäver: 10 poäng',
+        letters9plus: '9+ bokstäver: 10+ poäng',
+      },
+      duplicateWarning: '⚠️ Obs: Dubbletter som hittas av flera spelare räknas inte för någon!',
+      achievementsTitle: 'Speciella prestationer 🏆',
+      achievements: {
+        speedDemon: '⚡ Hastighetsdemon - Första spelaren att hitta 5 ord',
+        wordWizard: '🎩 Ordtrollkarl - Hitta 20+ ord',
+        vocabularyKing: '👑 Ordförrådskung - Hitta 30+ ord',
+        longWordMaster: '📏 Långordsmästare - Hitta ett ord med 7+ bokstäver',
+        perfectionist: '💎 Perfektionist - 100% av dina ord är giltiga',
+        earlyBird: '🐦 Morgonpiggen - Hitta 3 ord på första minuten',
+      },
+      tipsTitle: 'Tips för att vinna 💡',
+      tips: {
+        tip1: 'Börja med korta ord och utöka dem (t.ex. "katt" → "katter")',
+        tip2: 'Leta efter vanliga bokstavskombinationer',
+        tip3: 'Skanna systematiskt - hoppa inte runt slumpmässigt',
+        tip4: 'Hastighet är viktigt! Hitta ord snabbt för att låsa upp prestationer',
+        tip5: 'Kom ihåg - endast giltiga ord på det valda språket räknas',
+      },
+      readyToPlay: 'Redo? Låt oss börja spela! 🎮',
+      funForFamily: 'Ett engagerande och roligt spel för hela familjen - helt gratis!',
+    },
+    achievements: {
+      FIRST_BLOOD: {
+        name: 'Första Blodet',
+        description: 'Först att hitta ett ord'
+      },
+      SPEED_DEMON: {
+        name: 'Hastighetsdemon',
+        description: 'Hittade 10 ord på 2 minuter'
+      },
+      WORD_MASTER: {
+        name: 'Ordmästare',
+        description: 'Hittade ett ord med 7+ bokstäver'
+      },
+      COMBO_KING: {
+        name: 'Kombokung',
+        description: '5 ord i rad'
+      },
+      PERFECTIONIST: {
+        name: 'Perfektionist',
+        description: 'Alla ord är giltiga'
+      },
+      LEXICON: {
+        name: 'Lexikon',
+        description: 'Hittade 20+ ord'
+      },
+      WORDSMITH: {
+        name: 'Ordsmed',
+        description: 'Hittade 15 giltiga ord'
+      },
+      QUICK_THINKER: {
+        name: 'Snabbtänkare',
+        description: 'Hittade ett ord inom 10 sekunder'
+      },
+      LONG_HAULER: {
+        name: 'Maratonlöpare',
+        description: 'Hittade ett ord i sista minuten'
+      },
+      DIVERSE_VOCABULARY: {
+        name: 'Varierat Ordförråd',
+        description: 'Hittade ord av olika längder'
+      },
+      DOUBLE_TROUBLE: {
+        name: 'Vinnande Duo',
+        description: 'Hittade 2 ord inom 5 sekunder'
+      },
+      TREASURE_HUNTER: {
+        name: 'Skattjägare',
+        description: 'Hittade ett sällsynt ord (8+ bokstäver)'
+      }
+    }
+  },
+  ja: {
+    flag: '🇯🇵',
+    name: '日本語',
+    direction: 'ltr',
+    logo: {
+      lexi: 'Lexi',
+      clash: 'Clash',
+    },
+    seo: {
+      title: 'LexiClash - オンライン マルチプレイヤー ワードゲーム | 今すぐ無料でプレイ',
+      description: 'LexiClash - パーティー、チームビルディング、家族での楽しみに最適な、速いペースのマルチプレイヤーワードゲーム！単語を見つけ、リアルタイムで競争しましょう。無料オンラインゲーム - ダウンロード不要！',
+      keywords: 'LexiClash, ワードゲーム, マルチプレイヤーゲーム, オンラインゲーム, パーティーゲーム, チームビルディングゲーム, ファミリーゲーム, ワードパズル, 無料オンラインゲーム, リアルタイムマルチプレイヤー',
+      ogTitle: 'LexiClash - マルチプレイヤーワードゲーム',
+      ogDescription: 'LexiClash - パーティー、チームビルディング、家族での楽しみに最適な、速いペースのマルチプレイヤーワードゲーム！単語を見つけ、リアルタイムで競争しましょう。無料オンラインゲーム - ダウンロード不要！',
+      twitterTitle: 'LexiClash - マルチプレイヤーワードゲーム',
+      twitterDescription: 'LexiClash - パーティー、チームビルディング、家族での楽しみに最適な、速いペースのマルチプレイヤーワードゲーム！単語を見つけ、リアルタイムで競争しましょう。無料オンラインゲーム - ダウンロード不要！',
+      locale: 'ja_JP',
+      language: 'Japanese',
+    },
+    common: {
+      loading: '読み込み中...',
+      error: 'エラー',
+      back: '戻る',
+      confirm: '確認',
+      cancel: 'キャンセル',
+      selectUILanguage: 'インターフェース言語',
+      close: '閉じる',
+      understood: 'わかりました、プレイしましょう！',
+      refresh: '更新',
+    },
+    errors: {
+      unstableConnection: 'インターネット接続が不安定です - ゲーム中に問題が発生する可能性があります',
+      slowConnection: 'インターネット接続が遅い',
+      sessionExpired: '前回のセッションの有効期限が切れました。新しいルームに参加してください。',
+      gameCodeNotExist: 'ゲームコードが存在しません。確認して再試行してください。',
+      usernameTaken: 'ユーザー名はこのゲームですでに使用されています。別の名前を選択してください。',
+      gameCodeExists: 'ゲームコードはすでに存在します。別のコードを選択してください。',
+    },
+    validation: {
+      usernameRequired: 'ユーザー名が必要です！フィールドに入力してください',
+      roomNameRequired: 'ルーム名が必要です！フィールドに入力してください',
+      enterNameToJoin: '参加するには名前を入力してください',
+      enterRoomName: 'ルームを識別する名前',
+      enterGameCode: 'ホストが共有したゲームコードを入力してください',
+      codeHelper: 'プレイヤーが参加するために共有するコード',
+      fourDigitCode: '4桁のコード',
+      enterFourDigitCode: '4桁のコードを入力してください',
+    },
+    difficulty: {
+      easy: '簡単',
+      medium: '普通',
+      hard: '難しい',
+      expert: 'エキスパート',
+      master: 'マスター',
+    },
+    joinView: {
+      title: 'LexiClash',
+      createRoom: 'ルーム作成',
+      joinRoom: 'ルーム参加',
+      roomNamePlaceholder: 'ルーム名を入力',
+      playerNamePlaceholder: '名前を入力',
+      yourName: 'あなたの名前',
+      enterYourName: '名前を入力してください',
+      pleaseEnterYourName: '名前を入力してください',
+      playerAndRoomName: 'これがあなたのプレイヤー名とルーム名になります',
+      selectLanguage: 'ゲーム言語',
+      noRooms: '利用可能なルームがありません。作成してください！',
+      roomsList: '利用可能なルーム',
+      players: 'プレイヤー',
+      host: 'ルーム',
+      joiningRoom: 'ルームに参加しています',
+      roomLabel: 'ルーム',
+      wantToHostOrJoinOther: 'ホストするか、別のルームに参加しますか？',
+      clearAndRestart: 'クリアして最初からやり直す',
+      english: 'English',
+      hebrew: 'Hebrew',
+      swedish: 'Svenska',
+      japanese: '日本語',
+      generateNewCode: '新しいコードを生成',
+      createGameInstructions: 'ゲームを作成して友達とコードを共有しましょう！',
+      createNewRoom: '新しいルームを作成して始めましょう！',
+      howToPlay: '遊び方',
+      howToPlayTitle: 'LexiClashの遊び方',
+      qrCodeTitle: '参加用QRコード',
+      scanToJoin: 'コードをスキャンしてゲームに参加するか、コードを使用してください',
+      copyLink: 'リンクをコピー',
+      shareWhatsapp: 'WhatsApp',
+      shareEmail: 'メール',
+    },
+    hostView: {
+      waitingForPlayers: 'プレイヤーを待っています...',
+      startGame: 'ゲーム開始',
+      stopGame: 'ゲーム停止',
+      roomCode: 'ルームコード',
+      playersJoined: '参加プレイヤー',
+      gameSettings: 'ゲーム設定',
+      difficulty: '難易度',
+      timer: 'タイマー',
+      minutes: '分',
+      playerJoinedLate: '途中参加しました！',
+      playerFoundWord: 'が見つけました',
+      validateWords: '単語を確認して検証する',
+      validationComplete: '検証完了！',
+      gameStarted: 'ゲーム開始！',
+      gameStopped: 'ゲーム停止',
+      confirmExit: '本当に終了しますか？これにより、すべてのプレイヤーのルームが閉じられます。',
+      exitRoom: 'ルームを退出',
+      newGameReady: '新しいゲームの準備ができました！',
+      startNewGame: '新しいゲームを開始',
+      validation: '単語の検証',
+      validateIntro: '有効な単語を確認してください。チェックされていない単語は削除されます。',
+      duplicateWarning: '複数のプレイヤーが見つけた単語は自動的に削除されます',
+      totalWords: '検証する単語の合計',
+      submitValidation: '検証を送信',
+      finalScores: '最終スコア',
+      words: '単語',
+      achievements: '実績',
+      close: '閉じる',
+      copyLink: 'リンクをコピー',
+      shareWhatsapp: 'WhatsAppで共有',
+      qrCode: 'QRコード',
+      scanQr: 'QRコードをスキャンして参加するか、コードを使用してください',
+      autoValidated: '自動検証済み',
+      hostPlays: 'プレイしたい',
+      spectatorMode: '観戦モード - ボードを見る',
+      advancedSettings: '詳細設定',
+    },
+    playerView: {
+      waitingForHost: 'ホストが開始するのを待っています...',
+      submitWord: '送信',
+      clear: 'クリア',
+      timeRemaining: '残り時間',
+      score: 'スコア',
+      wordsFound: '見つけた単語',
+      gameStarted: 'ゲーム開始！ 🎮',
+      gameOver: 'ゲームオーバー！ 🏁',
+      wordAlreadyFound: 'すでに見つけた単語です！ ❌',
+      wordNotOnBoard: 'ボードに単語がありません！ 🚫',
+      newWord: '新しい単語！',
+      scoresReady: 'スコア準備完了！ ✅',
+      roomClosed: 'ルームが閉じられました',
+      startingNewGame: '新しいゲームを開始します！',
+      onlyLanguageWords: '選択した言語の単語のみ！ 🚫',
+      exitConfirmation: 'ルームを退出しますか？',
+      exit: '退出',
+      waitForGameStart: 'ゲーム開始を待つ',
+      players: 'プレイヤー',
+      yourAchievements: 'あなたの実績',
+      letterGrid: '文字グリッド',
+      waitingForGame: 'ゲームを待っています...',
+      add: '追加',
+      enterWord: '単語を入力...',
+      waitingForResults: '結果を待っています...',
+      leaderboard: 'リーダーボード',
+      noPlayersYet: 'まだプレイヤーがいません',
+      wordSubmitted: '送信済み',
+      wordTooShort: '単語が短すぎます！（最低2文字）',
+      wordCount: '単語',
+      longestWord: '最長',
+      hostValidating: 'ホストが単語を検証しています...',
+      clickToSelect: '文字をクリックして単語を選択',
+    },
+    chat: {
+      title: 'ルームチャット',
+      placeholder: 'メッセージを入力...',
+      noMessages: 'まだメッセージがありません。チャットを始めましょう！',
+    },
+    results: {
+      gameOver: 'ゲームオーバー',
+      winner: '勝者',
+      winnerAnnouncement: '勝者',
+      points: 'ポイント',
+      exitRoom: 'ルームを退出',
+      playAgain: 'もう一度プレイ',
+      finalScores: '最終スコア',
+      returnToRoom: 'アクティブルームに戻る',
+      cancelAutoReturn: '自動復帰をキャンセル',
+      valid: '有効',
+      playAgainQuestion: '🎮 もう一度プレイしますか？',
+      playAgainDescription: 'ルームに留まり、ホストが新しいゲームを開始するのを待ちます',
+      stayInRoom: 'はい、ルームに留まる',
+      leaveRoom: 'いいえ、ルームを退出',
+    },
+    scorePage: {
+      title: '🏆 ゲーム結果',
+      leaderboard: 'リーダーボード',
+      points: 'ポイント',
+      congratulations: 'おめでとうございます',
+    },
+    howToPlay: {
+      title: 'LexiClashの遊び方',
+      description: 'LexiClashは、文字のグリッド上でできるだけ多くの単語を見つけるために時間と競う、速いペースのワードゲームです。単語が長いほど、獲得できるポイントが多くなります！',
+      descriptionNote: '単語は少なくとも2文字で、選択したゲーム言語である必要があります。',
+      createOrJoinTitle: 'ゲームを作成または参加',
+      createOrJoinDesc: 'ホストがルームを作成してコードを共有します。プレイヤーはコードを使用して参加します。',
+      hostStartsTitle: 'ホストがゲームを開始',
+      hostStartsDesc: '全員の準備ができたら、ホストがタイマーを開始し、文字が表示されます！',
+      findWordsTitle: 'ボード上で単語を見つける',
+      findWordsDesc: '隣接する文字（水平、垂直、または斜め）を接続して単語を形成します。各文字は単語ごとに1回しか使用できません。',
+      findWordsNote: '注意：単一の単語で同じ文字を再利用することはできません！',
+      earnPointsTitle: 'ポイントと実績を獲得',
+      earnPointsDesc: '単語が長いほど、獲得できるポイントが多くなります！さらに、印象的な成果のために特別な実績をアンロックします。',
+      earnPointsNote: '特別な実績は、素敵なポイントブーストを与えることができます！',
+      scoringSystemTitle: 'スコアリングシステム 🎯',
+      scoringTable: {
+        letters2_3: '2-3文字：1ポイント',
+        letters4: '4文字：2ポイント',
+        letters5: '5文字：3ポイント',
+        letters6: '6文字：5ポイント',
+        letters7: '7文字：7ポイント',
+        letters8: '8文字：10ポイント',
+        letters9plus: '9文字以上：10ポイント以上',
+      },
+      duplicateWarning: '⚠️ 注意：複数のプレイヤーが見つけた重複する単語は誰にもカウントされません！',
+      achievementsTitle: '特別な実績 🏆',
+      achievements: {
+        speedDemon: '⚡ スピードデーモン - 5つの単語を見つけた最初のプレイヤー',
+        wordWizard: '🎩 ワードウィザード - 20以上の単語を見つける',
+        vocabularyKing: '👑 ボキャブラリーキング - 30以上の単語を見つける',
+        longWordMaster: '📏 ロングワードマスター - 7文字以上の単語を見つける',
+        perfectionist: '💎 完璧主義者 - あなたの単語の100％が有効',
+        earlyBird: '🐦 早起き鳥 - 最初の1分で3つの単語を見つける',
+      },
+      tipsTitle: '勝つためのヒント 💡',
+      tips: {
+        tip1: '短い単語から始めて展開します（例：「猫」→「猫たち」）',
+        tip2: '一般的な文字の組み合わせを探します',
+        tip3: '体系的にスキャン - ランダムに飛び回らない',
+        tip4: 'スピードが重要です！実績をアンロックするために素早く単語を見つけましょう',
+        tip5: '覚えておいてください - 選択した言語の有効な単語のみがカウントされます',
+      },
+      readyToPlay: '準備はいいですか？プレイを始めましょう！ 🎮',
+      funForFamily: '家族全員のための魅力的で楽しいゲーム - 完全無料！',
+    },
+    achievements: {
+      FIRST_BLOOD: {
+        name: 'ファーストブラッド',
+        description: '最初に単語を見つける'
+      },
+      SPEED_DEMON: {
+        name: 'スピードデーモン',
+        description: '2分で10の単語を見つけた'
+      },
+      WORD_MASTER: {
+        name: 'ワードマスター',
+        description: '7文字以上の単語を見つけた'
+      },
+      COMBO_KING: {
+        name: 'コンボキング',
+        description: '連続で5つの単語'
+      },
+      PERFECTIONIST: {
+        name: '完璧主義者',
+        description: 'すべての単語が有効'
+      },
+      LEXICON: {
+        name: 'レキシコン',
+        description: '20以上の単語を見つけた'
+      },
+      WORDSMITH: {
+        name: 'ワードスミス',
+        description: '15の有効な単語を見つけた'
+      },
+      QUICK_THINKER: {
+        name: 'クイックシンカー',
+        description: '10秒以内に単語を見つけた'
+      },
+      LONG_HAULER: {
+        name: 'マラソンランナー',
+        description: '最後の1分で単語を見つけた'
+      },
+      DIVERSE_VOCABULARY: {
+        name: '多様なボキャブラリー',
+        description: '異なる長さの単語を見つけた'
+      },
+      DOUBLE_TROUBLE: {
+        name: 'ウィニングデュオ',
+        description: '5秒以内に2つの単語を見つけた'
+      },
+      TREASURE_HUNTER: {
+        name: 'トレジャーハンター',
+        description: '珍しい単語を見つけた（8文字以上）'
+      }
     }
   }
 };

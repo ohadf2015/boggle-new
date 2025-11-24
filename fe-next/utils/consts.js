@@ -25,6 +25,21 @@ export const hebrewLetters = [
 
 export const englishLetters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
 
+export const swedishLetters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZÅÄÖ'.split('');
+
+export const japaneseLetters = [
+  "あ", "い", "う", "え", "お",
+  "か", "き", "く", "け", "こ",
+  "さ", "し", "す", "せ", "そ",
+  "た", "ち", "つ", "て", "と",
+  "な", "に", "ぬ", "ね", "の",
+  "は", "ひ", "ふ", "へ", "ほ",
+  "ま", "み", "む", "め", "も",
+  "や", "ゆ", "よ",
+  "ら", "り", "る", "れ", "ろ",
+  "わ", "を", "ん",
+];
+
 export const DIFFICULTIES = {
   EASY: { nameKey: 'difficulty.easy', rows: 4, cols: 4 },
   MEDIUM: { nameKey: 'difficulty.medium', rows: 5, cols: 5 },

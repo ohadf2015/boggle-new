@@ -286,7 +286,7 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
               {mode === 'host' && (
                 <div className="space-y-2">
                   <Label className="text-slate-700 dark:text-gray-300 text-center block font-medium text-sm">{t('joinView.selectLanguage')}</Label>
-                  <div className="grid grid-cols-2 gap-2">
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                     <button
                       type="button"
                       onClick={() => setRoomLanguage('en')}
@@ -319,6 +319,38 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
                         roomLanguage === 'he' ? "text-cyan-600 dark:text-cyan-300" : "text-slate-600 dark:text-gray-400"
                       )}>{t('joinView.hebrew')}</span>
                     </button>
+                    <button
+                      type="button"
+                      onClick={() => setRoomLanguage('sv')}
+                      className={cn(
+                        "flex flex-col items-center gap-1 p-2 rounded-lg border-2 transition-all duration-300",
+                        roomLanguage === 'sv'
+                          ? "border-cyan-500 bg-cyan-500/20 shadow-lg shadow-cyan-500/30"
+                          : "border-slate-300 dark:border-slate-600 hover:border-cyan-400 dark:hover:border-cyan-500"
+                      )}
+                    >
+                      <span className="text-2xl">🇸🇪</span>
+                      <span className={cn(
+                        "font-medium text-xs",
+                        roomLanguage === 'sv' ? "text-cyan-600 dark:text-cyan-300" : "text-slate-600 dark:text-gray-400"
+                      )}>{t('joinView.swedish')}</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setRoomLanguage('ja')}
+                      className={cn(
+                        "flex flex-col items-center gap-1 p-2 rounded-lg border-2 transition-all duration-300",
+                        roomLanguage === 'ja'
+                          ? "border-cyan-500 bg-cyan-500/20 shadow-lg shadow-cyan-500/30"
+                          : "border-slate-300 dark:border-slate-600 hover:border-cyan-400 dark:hover:border-cyan-500"
+                      )}
+                    >
+                      <span className="text-2xl">🇯🇵</span>
+                      <span className={cn(
+                        "font-medium text-xs",
+                        roomLanguage === 'ja' ? "text-cyan-600 dark:text-cyan-300" : "text-slate-600 dark:text-gray-400"
+                      )}>{t('joinView.japanese')}</span>
+                    </button>
                   </div>
                 </div>
               )}
@@ -346,14 +378,14 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
                   </motion.div>
                 ) : (
                   <>
-                    {/* Room Name */}
+                    {/* Host Player Name */}
                     <motion.div
                       initial={{ x: 50, opacity: 0 }}
                       animate={{ x: 0, opacity: 1 }}
                       transition={{ duration: 0.3 }}
                       className="space-y-2"
                     >
-                      <Label htmlFor="roomName" className="text-slate-700 dark:text-gray-300">{t('joinView.roomNamePlaceholder')}</Label>
+                      <Label htmlFor="roomName" className="text-slate-700 dark:text-gray-300">{t('joinView.yourName')}</Label>
                       <Input
                         id="roomName"
                         value={roomName}
@@ -366,14 +398,14 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
                           "bg-slate-100 dark:bg-slate-700/50 border-slate-200 dark:border-slate-600 text-slate-900 dark:text-white placeholder:text-slate-500 dark:placeholder:text-gray-400",
                           roomNameError && "border-red-500 bg-red-900/30 focus-visible:ring-red-500"
                         )}
-                        placeholder={t('joinView.roomNamePlaceholder')}
+                        placeholder={t('joinView.enterYourName')}
                         maxLength={30}
                       />
                       {roomNameError && (
-                        <p className="text-sm text-red-400">{t('validation.roomNameRequired')}</p>
+                        <p className="text-sm text-red-400">{t('joinView.pleaseEnterYourName')}</p>
                       )}
                       {!roomNameError && (
-                        <p className="text-sm text-slate-500 dark:text-gray-400">{t('validation.enterRoomName')}</p>
+                        <p className="text-sm text-slate-500 dark:text-gray-400">{t('joinView.playerAndRoomName')}</p>
                       )}
                     </motion.div>
 
@@ -532,7 +564,7 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
                           <FaSync />
                         </Button>
                       </TooltipTrigger>
-                      <TooltipContent>רענן</TooltipContent>
+                      <TooltipContent>{t('common.refresh')}</TooltipContent>
                     </Tooltip>
                   </TooltipProvider>
                 </div>
@@ -558,8 +590,8 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
                       >
                         <div className="flex items-center justify-between gap-3">
                           <div className="flex items-center gap-2">
-                            <span className="text-2xl" title={room.language === 'he' ? t('joinView.hebrew') : t('joinView.english')}>
-                              {room.language === 'he' ? '🇮🇱' : '🇺🇸'}
+                            <span className="text-2xl" title={room.language === 'he' ? t('joinView.hebrew') : room.language === 'sv' ? t('joinView.swedish') : room.language === 'ja' ? t('joinView.japanese') : t('joinView.english')}>
+                              {room.language === 'he' ? '🇮🇱' : room.language === 'sv' ? '🇸🇪' : room.language === 'ja' ? '🇯🇵' : '🇺🇸'}
                             </span>
                             <div>
                               <div className="font-bold text-lg text-cyan-400">{room.roomName || room.gameCode}</div>
@@ -569,7 +601,7 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
                             </div>
                           </div>
                           <Badge variant="secondary" className="h-5 text-xs bg-slate-700 text-gray-300">
-                            {room.playerCount} {t('joinView.players')}
+                            {room.playerCount}{' '}{t('joinView.players')}
                           </Badge>
                         </div>
                       </button>

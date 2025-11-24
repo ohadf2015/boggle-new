@@ -137,7 +137,6 @@ const useWebSocketConnection = () => {
             globalWsInstance = ws;
 
             ws.onopen = () => {
-                console.log('[WS] Connected');
                 isConnectingRef.current = false;
                 reconnectAttemptsRef.current = 0;
                 setConnectionError('');
@@ -175,8 +174,6 @@ const useWebSocketConnection = () => {
                         WS_CONFIG.BASE_RECONNECT_DELAY * Math.pow(2, reconnectAttemptsRef.current),
                         WS_CONFIG.MAX_RECONNECT_DELAY
                     );
-
-                    console.log(`[WS] Reconnecting... (attempt ${reconnectAttemptsRef.current + 1}/${WS_CONFIG.MAX_RECONNECT_ATTEMPTS})`);
 
                     reconnectTimeoutRef.current = setTimeout(() => {
                         reconnectAttemptsRef.current += 1;
@@ -301,16 +298,37 @@ export default function GamePage() {
                         setRoomLanguage(roomLang);
                     }
 
-                    if (!isHostResponse && username) {
+                    // Host now also has a username
+                    const joinedUsername = message.username || username;
+                    if (isHostResponse) {
+                        setUsername(joinedUsername);
+                        localStorage.setItem('boggle_username', joinedUsername);
+                    } else if (username) {
                         localStorage.setItem('boggle_username', username);
                     }
 
                     saveSession({
                         gameCode,
-                        username: isHostResponse ? '' : username,
+                        username: joinedUsername,
                         isHost: isHostResponse,
                         roomName: isHostResponse ? roomName : '',
+                        language: roomLang || roomLanguage, // Save room language
                     });
+                    break;
+
+                case 'hostTransferred':
+                    // Handle host transfer - check if we're the new host
+                    if (message.newHost === username) {
+                        setIsHost(true);
+                        toast.success('You are now the host!', {
+                            duration: 5000,
+                            icon: '👑',
+                        });
+                    } else {
+                        toast.info(message.message || `${message.newHost} is now the host`, {
+                            duration: 3000,
+                        });
+                    }
                     break;
 
                 case 'gameDoesNotExist':
@@ -391,8 +409,6 @@ export default function GamePage() {
                 ws.removeEventListener('open', onOpen);
             };
             ws.addEventListener('open', onOpen);
-        } else {
-            console.warn('WebSocket is not open. Current state:', ws.readyState);
         }
     }, [wsRef]);
 
@@ -407,38 +423,45 @@ export default function GamePage() {
             return;
         }
 
-        console.log('Attempting to restore session:', savedSession);
+        // Add a small delay to ensure the old connection is fully closed on the backend
+        // This prevents race conditions when the host refreshes the page
+        const reconnectTimeout = setTimeout(() => {
+            if (savedSession.isHost) {
+                if (!savedSession.roomName) {
+                    clearSession();
+                    setAttemptingReconnect(false);
+                    return;
+                }
+                sendMessage({
+                    action: 'createGame',
+                    gameCode: savedSession.gameCode,
+                    roomName: savedSession.roomName,
+                    hostUsername: savedSession.roomName,
+                    language: savedSession.language || language, // Restore room language
+                });
+            } else {
+                if (!savedSession.username) {
+                    clearSession();
+                    setAttemptingReconnect(false);
+                    return;
+                }
+                sendMessage({
+                    action: 'join',
+                    gameCode: savedSession.gameCode,
+                    username: savedSession.username,
+                });
+            }
+        }, 1000); // 1 second delay to allow disconnect to process
 
-        if (savedSession.isHost) {
-            if (!savedSession.roomName) {
-                clearSession();
-                setAttemptingReconnect(false);
-                return;
-            }
-            sendMessage({
-                action: 'createGame',
-                gameCode: savedSession.gameCode,
-                roomName: savedSession.roomName,
-            });
-        } else {
-            if (!savedSession.username) {
-                clearSession();
-                setAttemptingReconnect(false);
-                return;
-            }
-            sendMessage({
-                action: 'join',
-                gameCode: savedSession.gameCode,
-                username: savedSession.username,
-            });
-        }
-    }, [attemptingReconnect, isActive, sendMessage, wsRef]);
+        return () => clearTimeout(reconnectTimeout);
+    }, [attemptingReconnect, isActive, sendMessage, wsRef, language]);
 
     const handleJoin = useCallback((isHostMode, roomLanguage) => {
         setError('');
 
         if (isHostMode) {
-            sendMessage({ action: 'createGame', gameCode, roomName, language: roomLanguage || language });
+            // Use roomName as both the room name and host's username
+            sendMessage({ action: 'createGame', gameCode, roomName, hostUsername: roomName, language: roomLanguage || language });
         } else {
             sendMessage({ action: 'join', gameCode, username });
         }

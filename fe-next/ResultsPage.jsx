@@ -13,19 +13,24 @@ import ResultsWinnerBanner from './components/results/ResultsWinnerBanner';
 const LetterGrid = ({ letterGrid }) => {
   const { t } = useLanguage();
   return (
-    <div className="mb-8 text-center">
-      <h3 className="text-xl font-bold text-cyan-600 dark:text-cyan-400 mb-4 flex items-center justify-center gap-2">
-        <span className="text-2xl">📝</span>
+    <motion.div
+      initial={{ y: 20, opacity: 0 }}
+      animate={{ y: 0, opacity: 1 }}
+      transition={{ delay: 0.3 }}
+      className="mb-10 text-center"
+    >
+      <h3 className="text-2xl font-bold text-cyan-600 dark:text-cyan-400 mb-6 flex items-center justify-center gap-3">
+        <span className="text-3xl drop-shadow-md">📝</span>
         {t('playerView.letterGrid')}
       </h3>
-      <div className="inline-block p-4 rounded-xl bg-gradient-to-br from-white/80 to-slate-100/80 dark:from-slate-800/80 dark:to-slate-900/80 border-2 border-cyan-500/30 shadow-lg backdrop-blur-md">
+      <div className="inline-block p-6 rounded-2xl bg-gradient-to-br from-white/90 to-slate-50/90 dark:from-slate-800/90 dark:to-slate-900/90 border-2 border-cyan-500/20 shadow-[0_4px_24px_rgba(6,182,212,0.15)] backdrop-blur-xl">
         <GridComponent
           grid={letterGrid}
           interactive={false}
           className="max-w-sm mx-auto"
         />
       </div>
-    </div>
+    </motion.div>
   );
 };
 
@@ -107,22 +112,22 @@ const ResultsPage = ({ finalScores, letterGrid, gameCode, onReturnToRoom, isHost
 
       {/* Main Results Card */}
       <motion.div
-        initial={{ scale: 0, rotate: -5 }}
-        animate={{ scale: 1, rotate: 0 }}
-        transition={{ type: 'spring', stiffness: 200, damping: 20 }}
+        initial={{ scale: 0.9, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        transition={{ type: 'spring', stiffness: 150, damping: 25 }}
         className="w-full max-w-6xl"
       >
-        <Card className="p-6 sm:p-8 max-h-[85vh] overflow-auto bg-white/90 dark:bg-slate-800/90 backdrop-blur-md border-2 border-purple-500/30 shadow-[0_0_30px_rgba(168,85,247,0.2)]">
+        <Card className="p-6 sm:p-10 max-h-[85vh] overflow-auto bg-white/95 dark:bg-slate-800/95 backdrop-blur-xl border-2 border-purple-500/20 shadow-[0_8px_32px_rgba(168,85,247,0.15)] rounded-2xl">
           {/* Title */}
           <motion.h2
-            initial={{ scale: 0 }}
-            animate={{ scale: 1 }}
-            transition={{ type: 'spring', delay: 0.2 }}
-            className="text-3xl sm:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 to-orange-500 text-center mb-8 flex items-center justify-center gap-3"
+            initial={{ y: -20, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ type: 'spring', delay: 0.2, stiffness: 120 }}
+            className="text-3xl sm:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 via-orange-400 to-orange-500 text-center mb-10 flex items-center justify-center gap-4"
           >
-            <FaTrophy className="text-yellow-500" />
+            <FaTrophy className="text-yellow-500 text-4xl drop-shadow-lg" />
             {t('results.finalScores')}
-            <FaTrophy className="text-yellow-500" />
+            <FaTrophy className="text-yellow-500 text-4xl drop-shadow-lg" />
           </motion.h2>
 
           {/* Letter Grid */}
@@ -132,7 +137,7 @@ const ResultsPage = ({ finalScores, letterGrid, gameCode, onReturnToRoom, isHost
           <ResultsPodium sortedScores={sortedScores} />
 
           {/* Detailed Player Cards */}
-          <div className="space-y-4 max-w-4xl mx-auto">
+          <div className="space-y-5 max-w-4xl mx-auto mt-12">
             {sortedScores.map((player, index) => (
               <ResultsPlayerCard key={player.username} player={player} index={index} />
             ))}
