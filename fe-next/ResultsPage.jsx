@@ -178,9 +178,9 @@ const ResultsPage = ({ finalScores, letterGrid, gameCode, onReturnToRoom, isHost
             </motion.div>
           )}
 
-          {/* Detailed Player Cards (Top 3 only) */}
+          {/* Detailed Player Cards (All Players) */}
           <div className="space-y-4 max-w-4xl mx-auto mt-8">
-            {sortedScores.slice(0, 3).map((player, index) => (
+            {sortedScores.map((player, index) => (
               <ResultsPlayerCard key={player.username} player={player} index={index} />
             ))}
           </div>
