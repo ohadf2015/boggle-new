@@ -23,6 +23,7 @@ class Dictionary {
     this.englishWords = new Set();
     this.hebrewWords = new Set();
     this.swedishWords = new Set();
+    this.japaneseWords = new Set();
     this.loaded = false;
   }
 
@@ -56,6 +57,26 @@ class Dictionary {
       this.swedishWords = new Set(swedish_words.map(w => w.toLowerCase()));
       console.log(`[Dictionary] Loaded ${this.swedishWords.size} Swedish words`);
 
+      // Load Japanese words
+      try {
+        const japaneseFilePath = path.join(__dirname, 'japanese_words.txt');
+        if (fs.existsSync(japaneseFilePath)) {
+          const japaneseContent = fs.readFileSync(japaneseFilePath, 'utf-8');
+          const japaneseWords = japaneseContent
+            .split('\n')
+            .map(w => w.trim())
+            .filter(w => w.length > 0);
+
+          this.japaneseWords = new Set(japaneseWords);
+          console.log(`[Dictionary] Loaded ${this.japaneseWords.size} Japanese words`);
+        } else {
+          console.log('[Dictionary] Japanese dictionary file not found - using fallback validation');
+        }
+      } catch (japaneseError) {
+        console.error('[Dictionary] Error loading Japanese dictionary:', japaneseError);
+        console.log('[Dictionary] Continuing without Japanese dictionary - words will require manual validation');
+      }
+
       this.loaded = true;
     } catch (error) {
       console.error('[Dictionary] Error loading dictionaries:', error);
@@ -69,17 +90,30 @@ class Dictionary {
       return null;
     }
 
-    const normalizedWord = language === 'he'
-      ? normalizeHebrewWord(word)
-      : word.toLowerCase();
-
+    let normalizedWord;
     let dictionary;
-    if (language === 'he') {
-      dictionary = this.hebrewWords;
-    } else if (language === 'sv') {
-      dictionary = this.swedishWords;
-    } else {
-      dictionary = this.englishWords;
+
+    switch (language) {
+      case 'he':
+        normalizedWord = normalizeHebrewWord(word);
+        dictionary = this.hebrewWords;
+        break;
+
+      case 'sv':
+        normalizedWord = word.toLowerCase();
+        dictionary = this.swedishWords;
+        break;
+
+      case 'ja':
+        normalizedWord = word; // Japanese doesn't need case normalization
+        dictionary = this.japaneseWords;
+        break;
+
+      case 'en':
+      default:
+        normalizedWord = word.toLowerCase();
+        dictionary = this.englishWords;
+        break;
     }
 
     return dictionary.has(normalizedWord);
@@ -95,6 +129,10 @@ class Dictionary {
 
   isValidSwedishWord(word) {
     return this.isValidWord(word, 'sv');
+  }
+
+  isValidJapaneseWord(word) {
+    return this.isValidWord(word, 'ja');
   }
 }
 

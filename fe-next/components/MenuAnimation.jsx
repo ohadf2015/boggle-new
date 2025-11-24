@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useLanguage } from '../contexts/LanguageContext';
-import { hebrewLetters, englishLetters } from '../utils/consts';
+import { hebrewLetters, englishLetters, swedishLetters, japaneseLetters } from '../utils/consts';
 
 /**
  * MenuAnimation - Flying letters animation for the menu/join view
@@ -14,7 +14,22 @@ const MenuAnimation = ({ className = '' }) => {
 
     // Generate random letters - always show regardless of language
     useEffect(() => {
-        const letterSet = language === 'he' ? hebrewLetters : englishLetters;
+        let letterSet;
+        switch (language) {
+            case 'he':
+                letterSet = hebrewLetters;
+                break;
+            case 'sv':
+                letterSet = swedishLetters;
+                break;
+            case 'ja':
+                letterSet = japaneseLetters;
+                break;
+            case 'en':
+            default:
+                letterSet = englishLetters;
+                break;
+        }
         const numberOfLetters = 20;
 
         const newLetters = Array(numberOfLetters).fill(null).map((_, index) => ({
@@ -78,7 +93,18 @@ const MenuAnimation = ({ className = '' }) => {
                             className="absolute font-bold"
                             style={{
                                 fontSize: `${letter.size}px`,
-                                fontFamily: language === 'he' ? "'Rubik', sans-serif" : "'Inter', sans-serif",
+                                fontFamily: (() => {
+                                    switch (language) {
+                                        case 'he':
+                                            return "'Rubik', sans-serif";
+                                        case 'ja':
+                                            return "'Noto Sans JP', sans-serif";
+                                        case 'sv':
+                                        case 'en':
+                                        default:
+                                            return "'Inter', sans-serif";
+                                    }
+                                })(),
                                 color: letter.color,
                                 textShadow: `
                                     0 0 8px ${letter.color}66,

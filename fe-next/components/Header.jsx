@@ -15,10 +15,25 @@ const Header = ({ className = '' }) => {
     const languages = [
         { code: 'en', name: 'English', flag: '🇺🇸' },
         { code: 'he', name: 'עברית', flag: '🇮🇱' },
-        { code: 'sv', name: 'Svenska', flag: '🇸🇪' }
+        { code: 'sv', name: 'Svenska', flag: '🇸🇪' },
+        { code: 'ja', name: '日本語', flag: '🇯🇵' }
     ];
 
     const currentLang = languages.find(l => l.code === language) || languages[0];
+
+    // Get font family based on language using switch case
+    const getFontFamily = (lang) => {
+        switch (lang) {
+            case 'he':
+                return "'Fredoka', sans-serif";
+            case 'ja':
+                return "'Noto Sans JP', 'Rubik', sans-serif";
+            case 'sv':
+            case 'en':
+            default:
+                return "'Outfit', 'Rubik', sans-serif";
+        }
+    };
 
 
 
@@ -37,7 +52,7 @@ const Header = ({ className = '' }) => {
                 >
                     <motion.h1
                         className="text-3xl sm:text-5xl font-black tracking-wider flex items-center gap-2"
-                        style={{ fontFamily: language === 'he' ? "'Fredoka', sans-serif" : "'Outfit', 'Rubik', sans-serif" }}
+                        style={{ fontFamily: getFontFamily(language) }}
                         whileHover={{ scale: 1.05 }}
                         transition={{ type: "spring", stiffness: 400, damping: 10 }}
                     >

@@ -286,7 +286,7 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
               {mode === 'host' && (
                 <div className="space-y-2">
                   <Label className="text-slate-700 dark:text-gray-300 text-center block font-medium text-sm">{t('joinView.selectLanguage')}</Label>
-                  <div className="grid grid-cols-3 gap-2">
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                     <button
                       type="button"
                       onClick={() => setRoomLanguage('en')}
@@ -334,6 +334,22 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
                         "font-medium text-xs",
                         roomLanguage === 'sv' ? "text-cyan-600 dark:text-cyan-300" : "text-slate-600 dark:text-gray-400"
                       )}>{t('joinView.swedish')}</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setRoomLanguage('ja')}
+                      className={cn(
+                        "flex flex-col items-center gap-1 p-2 rounded-lg border-2 transition-all duration-300",
+                        roomLanguage === 'ja'
+                          ? "border-cyan-500 bg-cyan-500/20 shadow-lg shadow-cyan-500/30"
+                          : "border-slate-300 dark:border-slate-600 hover:border-cyan-400 dark:hover:border-cyan-500"
+                      )}
+                    >
+                      <span className="text-2xl">🇯🇵</span>
+                      <span className={cn(
+                        "font-medium text-xs",
+                        roomLanguage === 'ja' ? "text-cyan-600 dark:text-cyan-300" : "text-slate-600 dark:text-gray-400"
+                      )}>{t('joinView.japanese')}</span>
                     </button>
                   </div>
                 </div>
