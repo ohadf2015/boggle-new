@@ -339,13 +339,22 @@ export default function GamePage() {
                     // Handle host transfer - check if we're the new host
                     if (message.newHost === username) {
                         setIsHost(true);
-                        toast.success('You are now the host!', {
+                        // Update session to reflect host status
+                        saveSession({
+                            gameCode,
+                            username,
+                            isHost: true,
+                            roomName: roomName || username,
+                            language: roomLanguage,
+                        });
+                        toast.success(t('hostView.youAreNowHost'), {
                             duration: 5000,
                             icon: '👑',
                         });
                     } else {
-                        toast.info(message.message || `${message.newHost} is now the host`, {
+                        toast.info(`${message.newHost} ${t('hostView.newHostAssigned')}`, {
                             duration: 3000,
+                            icon: '🔄',
                         });
                     }
                     break;

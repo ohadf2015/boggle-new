@@ -1324,30 +1324,83 @@ const handleCloseRoom = (host, gameCode, wss) => {
     return;
   }
 
-  // Notify all players that the room is closing
-  sendAllPlayerAMessage(gameCode, {
-    action: "hostLeftRoomClosing",
-    message: "המנחה עזב את החדר. החדר נסגר."
-  });
+  const game = games[gameCode];
+  const hostUsername = game.hostUsername;
 
-  // Clean up all timers and timeouts
-  cleanupGameTimers(gameCode);
+  // Remove host from active users
+  if (game.users[hostUsername]) {
+    delete game.users[hostUsername];
+  }
 
-  // Delete the game after a short delay to ensure messages are sent
-  setTimeout(() => {
-    if (games[gameCode]) {
-      delete games[gameCode];
-      console.log(`[CLOSE_ROOM] Game ${gameCode} deleted`);
+  // Get remaining players (excluding the host)
+  const remainingPlayers = Object.keys(game.users);
 
-      // Delete from Redis
-      deleteGameState(gameCode).catch(err =>
-        console.error('[REDIS] Error deleting game state:', err)
-      );
+  if (remainingPlayers.length === 0) {
+    // No players left, close room
+    console.log(`[CLOSE_ROOM] No players remaining in game ${gameCode}, closing room`);
 
-      // Broadcast updated rooms list
-      if (wss) broadcastActiveRooms(wss);
-    }
-  }, 500);
+    // Notify all that the room is closing
+    sendAllPlayerAMessage(gameCode, {
+      action: "hostLeftRoomClosing",
+      message: "Host left the room. The room is closing."
+    });
+
+    // Clean up all timers and timeouts
+    cleanupGameTimers(gameCode);
+
+    // Delete the game after a short delay to ensure messages are sent
+    setTimeout(() => {
+      if (games[gameCode]) {
+        delete games[gameCode];
+        console.log(`[CLOSE_ROOM] Game ${gameCode} deleted`);
+
+        // Delete from Redis
+        deleteGameState(gameCode).catch(err =>
+          console.error('[REDIS] Error deleting game state:', err)
+        );
+
+        // Broadcast updated rooms list
+        if (wss) broadcastActiveRooms(wss);
+      }
+    }, 500);
+  } else {
+    // There are remaining players, transfer host to first player
+    const newHostUsername = remainingPlayers[0];
+    const newHostWs = game.users[newHostUsername];
+
+    console.log(`[CLOSE_ROOM] Transferring host from ${hostUsername} to ${newHostUsername} in game ${gameCode}`);
+
+    // Update game host
+    game.host = newHostWs;
+    game.hostUsername = newHostUsername;
+    game.hostPlayerId = game.playerIds[newHostUsername];
+    game.hostDisconnected = false;
+
+    // Update mappings for new host
+    gameWs.set(newHostWs, gameCode);
+    wsUsername.set(newHostWs, newHostUsername);
+
+    // Notify all players about the host transfer
+    sendAllPlayerAMessage(gameCode, {
+      action: "hostTransferred",
+      newHost: newHostUsername,
+      oldHost: hostUsername,
+      message: `${newHostUsername} is now the host`
+    });
+
+    // Update player list with new host info
+    broadcastPlayerList(gameCode);
+
+    // Broadcast updated active rooms list
+    if (wss) broadcastActiveRooms(wss);
+
+    // Save to Redis
+    saveGameState(gameCode, games[gameCode]).catch(err =>
+      console.error('[REDIS] Error saving game state:', err)
+    );
+
+    console.log(`[CLOSE_ROOM] Host transfer complete. Room ${gameCode} remains open.`);
+  }
 };
 
 // Handle resetting game for a new round

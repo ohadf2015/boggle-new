@@ -123,28 +123,31 @@ const HowToPlay = () => {
           </h3>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
             <Badge className="py-3 px-4 text-center bg-gradient-to-r from-gray-400 to-gray-500 text-white">
-              {t('howToPlay.scoringTable.letters2_3')}
+              {t('howToPlay.scoringTable.letters2')}
             </Badge>
             <Badge className="py-3 px-4 text-center bg-gradient-to-r from-blue-400 to-blue-500 text-white">
-              {t('howToPlay.scoringTable.letters4')}
+              {t('howToPlay.scoringTable.letters3')}
             </Badge>
             <Badge className="py-3 px-4 text-center bg-gradient-to-r from-green-400 to-green-500 text-white">
-              {t('howToPlay.scoringTable.letters5')}
+              {t('howToPlay.scoringTable.letters4')}
             </Badge>
             <Badge className="py-3 px-4 text-center bg-gradient-to-r from-yellow-400 to-yellow-500 text-white">
-              {t('howToPlay.scoringTable.letters6')}
+              {t('howToPlay.scoringTable.letters5')}
             </Badge>
             <Badge className="py-3 px-4 text-center bg-gradient-to-r from-orange-400 to-orange-500 text-white">
-              {t('howToPlay.scoringTable.letters7')}
+              {t('howToPlay.scoringTable.letters6')}
             </Badge>
             <Badge className="py-3 px-4 text-center bg-gradient-to-r from-red-400 to-red-500 text-white">
-              {t('howToPlay.scoringTable.letters8')}
+              {t('howToPlay.scoringTable.letters7')}
             </Badge>
             <Badge className="py-3 px-4 text-center bg-gradient-to-r from-purple-400 to-purple-500 text-white col-span-2">
-              {t('howToPlay.scoringTable.letters9plus')}
+              {t('howToPlay.scoringTable.letters8plus')}
             </Badge>
           </div>
-          <p className="text-sm text-gray-600 mt-4 text-center">
+          <p className="text-sm text-indigo-700 font-semibold mt-4 text-center">
+            {t('howToPlay.scoringTable.formula')}
+          </p>
+          <p className="text-sm text-gray-600 mt-2 text-center">
             {t('howToPlay.duplicateWarning')}
           </p>
         </div>
@@ -156,22 +159,22 @@ const HowToPlay = () => {
           </h3>
           <div className="grid md:grid-cols-2 gap-3 text-sm">
             <div className="flex items-center gap-2">
-              <span>{t('howToPlay.achievements.speedDemon')}</span>
+              <span className="text-gray-900 font-medium">{t('howToPlay.achievements.speedDemon')}</span>
             </div>
             <div className="flex items-center gap-2">
-              <span>{t('howToPlay.achievements.wordWizard')}</span>
+              <span className="text-gray-900 font-medium">{t('howToPlay.achievements.wordWizard')}</span>
             </div>
             <div className="flex items-center gap-2">
-              <span>{t('howToPlay.achievements.vocabularyKing')}</span>
+              <span className="text-gray-900 font-medium">{t('howToPlay.achievements.vocabularyKing')}</span>
             </div>
             <div className="flex items-center gap-2">
-              <span>{t('howToPlay.achievements.longWordMaster')}</span>
+              <span className="text-gray-900 font-medium">{t('howToPlay.achievements.longWordMaster')}</span>
             </div>
             <div className="flex items-center gap-2">
-              <span>{t('howToPlay.achievements.perfectionist')}</span>
+              <span className="text-gray-900 font-medium">{t('howToPlay.achievements.perfectionist')}</span>
             </div>
             <div className="flex items-center gap-2">
-              <span>{t('howToPlay.achievements.earlyBird')}</span>
+              <span className="text-gray-900 font-medium">{t('howToPlay.achievements.earlyBird')}</span>
             </div>
           </div>
         </div>
