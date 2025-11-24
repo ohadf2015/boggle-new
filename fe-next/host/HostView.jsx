@@ -17,6 +17,7 @@ import ResultsPodium from '../components/results/ResultsPodium';
 import ResultsPlayerCard from '../components/results/ResultsPlayerCard';
 import RoomChat from '../components/RoomChat';
 import CubeCrashAnimation from '../components/CubeCrashAnimation';
+import CircularTimer from '../components/CircularTimer';
 import '../style/animation.scss';
 import { generateRandomTable, embedWordInGrid, applyHebrewFinalLetters } from '../utils/utils';
 import { useWebSocket } from '../utils/WebSocketContext';
@@ -892,22 +893,15 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
             <Card className="fixed inset-0 z-50 m-0 max-w-none h-screen w-screen justify-center bg-slate-900/95 dark:bg-slate-900/95 border-cyan-500/50 p-4 flex-1 bg-white/80 dark:bg-slate-800/80 backdrop-blur-md rounded-lg shadow-lg border border-cyan-500/30 shadow-[0_0_15px_rgba(6,182,212,0.1)] flex flex-col items-center transition-all duration-500 ease-in-out overflow-hidden">
               <h3 className="text-3xl font-bold text-cyan-600 dark:text-cyan-300 mb-4">לוח האותיות</h3>
 
-              {/* Timer - Neon Style */}
+              {/* Circular Timer */}
               {remainingTime !== null && (
                 <motion.div
-                  initial={{ scale: 0 }}
-                  animate={{ scale: 1 }}
-                  transition={{ type: 'spring' }}
+                  initial={{ scale: 0, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  transition={{ duration: 0.5, type: 'spring' }}
                   className="mb-4"
                 >
-                  <div className={cn(
-                    "text-5xl font-mono font-bold px-6 py-2 rounded-lg shadow-[0_0_20px_rgba(0,0,0,0.3)] border-2 backdrop-blur-md",
-                    remainingTime < 30
-                      ? "text-red-500 border-red-500/50 bg-red-500/10 shadow-[0_0_30px_rgba(239,68,68,0.4)] animate-pulse"
-                      : "text-cyan-400 border-cyan-500/50 bg-cyan-500/10 shadow-[0_0_30px_rgba(6,182,212,0.4)]"
-                  )}>
-                    {formatTime(remainingTime)}
-                  </div>
+                  <CircularTimer remainingTime={remainingTime} totalTime={timerValue * 60} />
                 </motion.div>
               )}
 
@@ -928,6 +922,18 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
             /* Playing Mode or Pre-Game - Interactive Grid */
             <Card className="flex-1 bg-white/80 dark:bg-slate-800/80 backdrop-blur-md p-2 sm:p-4 rounded-lg shadow-lg border border-cyan-500/30 shadow-[0_0_15px_rgba(6,182,212,0.1)] flex flex-col items-center transition-all duration-500 ease-in-out overflow-hidden">
               <h3 className="text-xl font-bold text-cyan-600 dark:text-cyan-300 mb-4">לוח האותיות</h3>
+
+              {/* Circular Timer - Show when game is active */}
+              {gameStarted && remainingTime !== null && (
+                <motion.div
+                  initial={{ scale: 0, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  transition={{ duration: 0.5, type: 'spring' }}
+                  className="mb-4"
+                >
+                  <CircularTimer remainingTime={remainingTime} totalTime={timerValue * 60} />
+                </motion.div>
+              )}
 
               {/* Grid Container */}
               <div className="w-full flex justify-center items-center transition-all duration-500 aspect-square max-w-[500px]">

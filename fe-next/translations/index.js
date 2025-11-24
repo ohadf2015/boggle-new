@@ -357,6 +357,8 @@ export const translations = {
       clearAndRestart: 'נקה והתחל מחדש',
       english: 'English',
       hebrew: 'עברית',
+      swedish: 'Svenska',
+      japanese: '日本語',
       generateNewCode: 'צור קוד חדש',
       createGameInstructions: 'צור משחק ושתף את הקוד עם חברים!',
       createNewRoom: 'צור חדר חדש כדי להתחיל!',
