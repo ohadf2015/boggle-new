@@ -953,7 +953,7 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
                         toast.error(t('playerView.onlyLanguageWords'), { duration: 1000 });
                       }
                     }}
-                    selectedCells={highlightedCells}
+                    selectedCells={gameStarted && hostPlaying ? undefined : highlightedCells}
                     className="w-full h-full"
                     playerView={hostPlaying}
                   />

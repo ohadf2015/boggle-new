@@ -27,6 +27,11 @@ const generateRandomAvatar = () => {
   };
 };
 
+// Generate a unique player ID
+const generatePlayerId = () => {
+  return `player_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+};
+
 // Comprehensive cleanup function to prevent memory leaks
 const cleanupGameTimers = (gameCode) => {
   if (!games[gameCode]) {
@@ -67,7 +72,8 @@ const cleanupGameTimers = (gameCode) => {
 const setNewGame = async (gameCode, host, roomName, language = 'en', hostUsername = null) => {
     const finalHostUsername = hostUsername || 'Host';
     const finalRoomName = roomName || finalHostUsername;
-    console.log(`[CREATE] Creating game - gameCode: ${gameCode}, hostUsername: ${finalHostUsername}, roomName: ${finalRoomName}, language: ${language}`);
+    const hostPlayerId = generatePlayerId(); // Generate unique ID for host
+    console.log(`[CREATE] Creating game - gameCode: ${gameCode}, hostUsername: ${finalHostUsername}, hostId: ${hostPlayerId}, roomName: ${finalRoomName}, language: ${language}`);
 
     const existingGame = getGame(gameCode);
 
@@ -79,6 +85,7 @@ const setNewGame = async (gameCode, host, roomName, language = 'en', hostUsernam
         games[gameCode] = {
             host,
             hostUsername: finalHostUsername,
+            hostPlayerId, // Store host's unique player ID
             roomName: finalRoomName,
             users: {
                 [finalHostUsername]: host  // Add host as a player
@@ -97,6 +104,9 @@ const setNewGame = async (gameCode, host, roomName, language = 'en', hostUsernam
             },
             playerAvatars: {
                 [finalHostUsername]: hostAvatar
+            },
+            playerIds: {
+                [finalHostUsername]: hostPlayerId // Map username to player ID
             },
             firstWordFound: false,
             gameState: 'waiting',
@@ -119,6 +129,7 @@ const setNewGame = async (gameCode, host, roomName, language = 'en', hostUsernam
             isHost: true,
             language: language,
             username: finalHostUsername,
+            playerId: hostPlayerId, // Send player ID to client
             avatar: hostAvatar
         }));
 
@@ -157,6 +168,7 @@ const setNewGame = async (gameCode, host, roomName, language = 'en', hostUsernam
             isHost: true,
             language: existingGame.language,
             username: existingGame.hostUsername,
+            playerId: existingGame.hostPlayerId || existingGame.playerIds?.[existingGame.hostUsername], // Send existing player ID
             avatar: existingGame.playerAvatars[existingGame.hostUsername]
         }));
 
@@ -210,8 +222,9 @@ const addUserToGame = async (gameCode, username, ws) => {
     } else {
       console.log(`[JOIN] User ${username} joined game ${gameCode}`);
 
-      // Generate avatar for new player
-      const playerAvatar = generateRandomAvatar();
+      // Generate avatar and player ID for new player (or reuse existing if available)
+      const playerAvatar = game.playerAvatars[username] || generateRandomAvatar();
+      const playerId = game.playerIds?.[username] || generatePlayerId();
 
       // New player joining
       game.users[username] = ws;
@@ -220,6 +233,13 @@ const addUserToGame = async (gameCode, username, ws) => {
       game.playerAchievements[username] = [];
       game.playerWordDetails[username] = [];
       game.playerAvatars[username] = playerAvatar;
+
+      // Initialize playerIds map if it doesn't exist (for backward compatibility)
+      if (!game.playerIds) {
+        game.playerIds = {};
+      }
+      game.playerIds[username] = playerId;
+
       gameWs.set(ws, gameCode);
       wsUsername.set(ws, username);
     }
@@ -229,6 +249,7 @@ const addUserToGame = async (gameCode, username, ws) => {
         action: "joined",
         isHost: false,
         username: username,
+        playerId: game.playerIds[username], // Send unique player ID
         avatar: game.playerAvatars[username]
     }));
 
@@ -240,6 +261,7 @@ const addUserToGame = async (gameCode, username, ws) => {
         action: "startGame",
         letterGrid: game.letterGrid,
         timerSeconds: remainingTime,
+        language: game.language,
         isLateJoin: true
       }));
 
@@ -262,6 +284,9 @@ const addUserToGame = async (gameCode, username, ws) => {
       ws.send(JSON.stringify({ action: "endGame" }));
       ws.send(JSON.stringify({ action: "timeUpdate", remainingTime: 0 }));
       console.log(`Player ${username} rejoined after game ended in ${gameCode}`);
+    } else if (game.gameState === 'waiting') {
+      // Game is waiting - send waiting state
+      console.log(`Player ${username} joined game ${gameCode} in waiting state`);
     }
 
     // Broadcast updated user list with avatar info
@@ -815,6 +840,7 @@ const handleDisconnect = (ws, wss) => {
                delete games[gameCode].playerWords[username];
                delete games[gameCode].playerAchievements[username];
                delete games[gameCode].playerWordDetails[username];
+               delete games[gameCode].playerAvatars[username];
             }
             
             // Broadcast updated leaderboard (to remove them from there too)

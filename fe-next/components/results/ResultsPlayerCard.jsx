@@ -49,22 +49,22 @@ const ResultsPlayerCard = ({ player, index }) => {
   };
 
   const getCardStyle = () => {
-    if (index === 0) return 'bg-gradient-to-br from-yellow-500/10 to-orange-500/10 border-yellow-500/30 shadow-[0_0_15px_rgba(234,179,8,0.2)]';
-    if (index === 1) return 'bg-gradient-to-br from-gray-400/10 to-gray-500/10 border-gray-400/30 shadow-[0_0_10px_rgba(156,163,175,0.15)]';
-    if (index === 2) return 'bg-gradient-to-br from-orange-500/10 to-orange-600/10 border-orange-500/30 shadow-[0_0_10px_rgba(249,115,22,0.15)]';
-    return 'bg-white/80 dark:bg-slate-800/80 border-slate-300 dark:border-slate-600';
+    if (index === 0) return 'bg-gradient-to-br from-yellow-500/15 to-orange-500/15 border-yellow-500/40 shadow-[0_0_20px_rgba(234,179,8,0.25)]';
+    if (index === 1) return 'bg-gradient-to-br from-gray-400/15 to-gray-500/15 border-gray-400/40 shadow-[0_0_15px_rgba(156,163,175,0.2)]';
+    if (index === 2) return 'bg-gradient-to-br from-orange-500/15 to-orange-600/15 border-orange-500/40 shadow-[0_0_15px_rgba(249,115,22,0.2)]';
+    return 'bg-white/90 dark:bg-slate-800/90 border-slate-300/50 dark:border-slate-600/50';
   };
 
   return (
     <motion.div
-      initial={{ x: -50, opacity: 0 }}
+      initial={{ x: -30, opacity: 0 }}
       animate={{ x: 0, opacity: 1 }}
-      transition={{ delay: index * 0.1 }}
-      whileHover={{ scale: 1.02, y: -2 }}
+      transition={{ delay: index * 0.08, type: 'spring', stiffness: 120 }}
+      whileHover={{ scale: 1.02, y: -4, transition: { duration: 0.2 } }}
     >
       <Card
         className={cn(
-          "p-5 mb-4 border-2 backdrop-blur-md transition-all duration-300",
+          "p-6 border-2 backdrop-blur-xl transition-all duration-300 rounded-xl shadow-lg hover:shadow-xl",
           getCardStyle()
         )}
       >
