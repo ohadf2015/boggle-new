@@ -13,23 +13,39 @@ export const LanguageProvider = ({ children, initialLanguage }) => {
     // Use initialLanguage from props, fallback to pathname locale, or default to 'he'
     const getInitialLanguage = () => {
         if (initialLanguage) return initialLanguage;
+        // Only try to parse pathname on client side
         if (typeof window !== 'undefined' && pathname) {
             const segments = pathname.split('/');
             const localeFromPath = segments[1];
             if (locales.includes(localeFromPath)) return localeFromPath;
         }
-        return 'he';
+        return 'en';
     };
-    const [language, setLanguageState] = useState(getInitialLanguage);
+    const [language, setLanguageState] = useState(() => {
+        // Use lazy initial state to avoid SSR issues
+        return initialLanguage || 'en';
+    });
 
     useEffect(() => {
-        if (initialLanguage && initialLanguage !== language) {
+        // On client side, check the pathname and update language if needed
+        if (typeof window !== 'undefined' && pathname && !initialLanguage) {
+            const segments = pathname.split('/');
+            const localeFromPath = segments[1];
+            if (locales.includes(localeFromPath) && localeFromPath !== language) {
+                // Defer state update to avoid synchronous setState
+                Promise.resolve().then(() => {
+                    setLanguageState(localeFromPath);
+                });
+            }
+        }
+        // If initialLanguage is provided and different, use it
+        else if (initialLanguage && initialLanguage !== language) {
             // Defer state update to avoid synchronous setState
             Promise.resolve().then(() => {
                 setLanguageState(initialLanguage);
             });
         }
-    }, [initialLanguage, language]);
+    }, [initialLanguage, pathname, language]);
 
     useEffect(() => {
         // Save to localStorage

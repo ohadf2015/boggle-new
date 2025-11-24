@@ -1,9 +1,8 @@
 'use client';
 
 import React from 'react';
-import { useLanguage } from '../../contexts/LanguageContext';
 
-class ErrorBoundaryInner extends React.Component {
+class ErrorBoundary extends React.Component {
   constructor(props) {
     super(props);
     this.state = { hasError: false, error: null, errorInfo: null };
@@ -28,7 +27,14 @@ class ErrorBoundaryInner extends React.Component {
 
   render() {
     if (this.state.hasError) {
-      const { t } = this.props;
+      // Fallback UI when LanguageContext is not available
+      // Using English as fallback for error messages
+      const errorMessages = {
+        somethingWentWrong: 'Something went wrong',
+        unexpectedError: 'An unexpected error occurred. Please refresh the page.',
+        errorDetails: 'Error details',
+        refreshPage: 'Refresh Page'
+      };
 
       return (
         <div style={{
@@ -54,13 +60,13 @@ class ErrorBoundaryInner extends React.Component {
               marginBottom: '1rem',
               color: '#ff6b6b'
             }}>
-              {t('errors.somethingWentWrong')}
+              {errorMessages.somethingWentWrong}
             </h1>
             <p style={{
               marginBottom: '1.5rem',
               color: '#aaa'
             }}>
-              {t('errors.unexpectedError')}
+              {errorMessages.unexpectedError}
             </p>
             {process.env.NODE_ENV === 'development' && this.state.error && (
               <details style={{
@@ -72,7 +78,7 @@ class ErrorBoundaryInner extends React.Component {
                 fontSize: '0.875rem'
               }}>
                 <summary style={{ cursor: 'pointer', marginBottom: '0.5rem', color: '#ffa500' }}>
-                  {t('errors.errorDetails')}
+                  {errorMessages.errorDetails}
                 </summary>
                 <pre style={{
                   overflowX: 'auto',
@@ -108,9 +114,9 @@ class ErrorBoundaryInner extends React.Component {
               }}
               onMouseOver={(e) => e.target.style.backgroundColor = '#45b7d1'}
               onMouseOut={(e) => e.target.style.backgroundColor = '#4ecdc4'}
-              aria-label={t('errors.refreshPage')}
+              aria-label={errorMessages.refreshPage}
             >
-              {t('errors.refreshPage')}
+              {errorMessages.refreshPage}
             </button>
           </div>
         </div>
@@ -121,13 +127,4 @@ class ErrorBoundaryInner extends React.Component {
   }
 }
 
-// Wrapper component that provides the language context
-export default function ErrorBoundary({ children }) {
-  const { t } = useLanguage();
-
-  return (
-    <ErrorBoundaryInner t={t}>
-      {children}
-    </ErrorBoundaryInner>
-  );
-}
+export default ErrorBoundary;
