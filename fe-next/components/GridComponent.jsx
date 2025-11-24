@@ -584,6 +584,7 @@ const GridComponent = ({
                                         </>
                                     )}
                                 </>
+                            </>
                             )}
                             {cell}
                         </motion.div>
