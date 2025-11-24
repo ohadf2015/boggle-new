@@ -4,6 +4,7 @@ import { Providers } from '../providers';
 // Force dynamic rendering - prevent static generation
 export const dynamic = 'force-dynamic';
 export const dynamicParams = true;
+export const runtime = 'nodejs';
 
 // Helper function to get locale-specific URL path
 function getLocalePath(locale) {

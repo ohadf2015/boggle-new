@@ -10,7 +10,17 @@ const LanguageContext = createContext();
 export const LanguageProvider = ({ children, initialLanguage }) => {
     const router = useRouter();
     const pathname = usePathname();
-    const [language, setLanguageState] = useState(initialLanguage || 'he');
+    // Use initialLanguage from props, fallback to pathname locale, or default to 'he'
+    const getInitialLanguage = () => {
+        if (initialLanguage) return initialLanguage;
+        if (typeof window !== 'undefined' && pathname) {
+            const segments = pathname.split('/');
+            const localeFromPath = segments[1];
+            if (locales.includes(localeFromPath)) return localeFromPath;
+        }
+        return 'he';
+    };
+    const [language, setLanguageState] = useState(getInitialLanguage);
 
     useEffect(() => {
         if (initialLanguage && initialLanguage !== language) {
