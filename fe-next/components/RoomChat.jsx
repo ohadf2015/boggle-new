@@ -7,15 +7,19 @@ import { Badge } from './ui/badge';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useWebSocket } from '../utils/WebSocketContext';
 import { useLanguage } from '../contexts/LanguageContext';
-import { FaPaperPlane, FaComments } from 'react-icons/fa';
+import { FaPaperPlane, FaComments, FaBell } from 'react-icons/fa';
+import toast from 'react-hot-toast';
 
 const RoomChat = ({ username, isHost, gameCode, className = '' }) => {
   const { t } = useLanguage();
   const ws = useWebSocket();
   const [messages, setMessages] = useState([]);
   const [inputMessage, setInputMessage] = useState('');
+  const [unreadCount, setUnreadCount] = useState(0);
+  const [isChatVisible, setIsChatVisible] = useState(true);
   const scrollRef = useRef(null);
   const inputRef = useRef(null);
+  const notificationSoundRef = useRef(null);
 
   // Use useCallback to ensure handleMessage has a stable reference
   const handleMessage = useCallback((event) => {
@@ -23,18 +27,54 @@ const RoomChat = ({ username, isHost, gameCode, className = '' }) => {
       const message = JSON.parse(event.data);
 
       if (message.action === 'chatMessage') {
-        setMessages(prev => [...prev, {
+        const newMessage = {
           id: Date.now() + Math.random(),
           username: message.username,
           message: message.message,
           timestamp: message.timestamp || Date.now(),
           isHost: message.isHost || false
-        }]);
+        };
+
+        setMessages(prev => [...prev, newMessage]);
+
+        // Check if message is from another user
+        const isOwnMessage = (isHost && message.isHost) || message.username === username;
+
+        if (!isOwnMessage) {
+          // Increment unread count
+          setUnreadCount(prev => prev + 1);
+
+          // Play notification sound
+          if (notificationSoundRef.current) {
+            notificationSoundRef.current.play().catch(err => console.log('Sound play failed:', err));
+          }
+
+          // Show toast notification
+          toast(
+            <div className="flex items-center gap-2">
+              <FaBell className="text-blue-500" />
+              <div>
+                <div className="font-semibold">{message.username}</div>
+                <div className="text-sm text-slate-600">{message.message.substring(0, 50)}{message.message.length > 50 ? '...' : ''}</div>
+              </div>
+            </div>,
+            {
+              duration: 3000,
+              position: 'top-right',
+              icon: '💬',
+            }
+          );
+
+          // Vibrate on mobile
+          if (window.navigator && window.navigator.vibrate) {
+            window.navigator.vibrate(200);
+          }
+        }
       }
     } catch (error) {
       console.error('Error parsing chat message:', error);
     }
-  }, []);
+  }, [username, isHost]);
 
   useEffect(() => {
     if (!ws) return;
@@ -46,15 +86,22 @@ const RoomChat = ({ username, isHost, gameCode, className = '' }) => {
     };
   }, [ws, handleMessage]);
 
-  // Auto-scroll to bottom when new messages arrive
+  // Auto-scroll to bottom when new messages arrive and clear unread
   useEffect(() => {
     if (scrollRef.current) {
       const scrollElement = scrollRef.current.querySelector('[data-radix-scroll-area-viewport]');
       if (scrollElement) {
         scrollElement.scrollTop = scrollElement.scrollHeight;
+        // Clear unread count when scrolled to bottom
+        setUnreadCount(0);
       }
     }
   }, [messages]);
+
+  // Clear unread count when user focuses on input
+  const handleInputFocus = () => {
+    setUnreadCount(0);
+  };
 
   const sendMessage = () => {
     if (!inputMessage.trim() || !ws) return;
@@ -91,10 +138,28 @@ const RoomChat = ({ username, isHost, gameCode, className = '' }) => {
 
   return (
     <Card className={`bg-white/90 dark:bg-slate-800/90 backdrop-blur-md shadow-xl border border-blue-500/30 shadow-[0_0_15px_rgba(59,130,246,0.1)] flex flex-col ${className}`}>
+      {/* Hidden notification sound */}
+      <audio
+        ref={notificationSoundRef}
+        src="data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBjaN0fPTgjMGHm7A7+OZUQ4PVqzn77BdGAg+ltryxnUpBSl+zPLaizsIGGS56+mgUA8NUKXh8Lp"
+        preload="auto"
+      />
+
       <CardHeader className="py-2 px-4">
         <CardTitle className="text-blue-600 dark:text-blue-300 text-base flex items-center gap-2">
           <FaComments />
           {t('chat.title') || 'Room Chat'}
+          {unreadCount > 0 && (
+            <motion.div
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              className="relative"
+            >
+              <Badge className="bg-red-500 text-white px-2 py-0.5 text-xs font-bold animate-pulse">
+                {unreadCount}
+              </Badge>
+            </motion.div>
+          )}
         </CardTitle>
       </CardHeader>
       <CardContent className="flex-1 flex flex-col p-2 space-y-2 min-h-0">
@@ -156,6 +221,7 @@ const RoomChat = ({ username, isHost, gameCode, className = '' }) => {
             value={inputMessage}
             onChange={(e) => setInputMessage(e.target.value)}
             onKeyDown={handleKeyDown}
+            onFocus={handleInputFocus}
             placeholder={t('chat.placeholder') || 'Type a message...'}
             className="flex-1 text-sm bg-slate-100 dark:bg-slate-700/50 border-slate-200 dark:border-slate-600"
             dir="auto"
