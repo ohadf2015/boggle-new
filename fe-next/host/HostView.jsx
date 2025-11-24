@@ -16,7 +16,7 @@ import SlotMachineText from '../components/SlotMachineText';
 import ResultsPodium from '../components/results/ResultsPodium';
 import ResultsPlayerCard from '../components/results/ResultsPlayerCard';
 import RoomChat from '../components/RoomChat';
-import CubeCrashAnimation from '../components/CubeCrashAnimation';
+import GoRipplesAnimation from '../components/GoRipplesAnimation';
 import CircularTimer from '../components/CircularTimer';
 import '../style/animation.scss';
 import { generateRandomTable, embedWordInGrid, applyHebrewFinalLetters } from '../utils/utils';
@@ -518,7 +518,7 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
 
       {/* Start Game Animation */}
       {showStartAnimation && (
-        <CubeCrashAnimation onComplete={() => setShowStartAnimation(false)} />
+        <GoRipplesAnimation onComplete={() => setShowStartAnimation(false)} />
       )}
 
       {/* Validation Modal */}
@@ -711,10 +711,56 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
 
       {/* Refined Layout */}
       <div className="flex flex-col gap-6 w-full max-w-6xl">
-        {/* Top Row: Game Settings (LEFT) + Game Code (RIGHT) */}
-        <div className={cn("flex flex-col lg:flex-row gap-6", gameStarted && "hidden")}>
-          {/* Game Settings - LEFT - Neon Style */}
-          <Card className="flex-1 bg-white/80 dark:bg-slate-800/80 backdrop-blur-md p-4 sm:p-5 rounded-lg shadow-lg border border-purple-500/30 shadow-[0_0_15px_rgba(168,85,247,0.1)]">
+        {/* Top Section: Room Code + Language + Share (when not started) */}
+        {!gameStarted && (
+          <Card className="bg-white/90 dark:bg-slate-800/90 backdrop-blur-md text-slate-900 dark:text-white p-4 sm:p-6 rounded-lg border border-cyan-500/30 shadow-[0_0_20px_rgba(6,182,212,0.15)]">
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+              {/* Room Code and Language in same row */}
+              <div className="flex flex-col items-center sm:items-start gap-2">
+                <div className="flex items-center gap-3">
+                  <div className="text-center sm:text-left">
+                    <p className="text-sm text-cyan-600 dark:text-cyan-300">{t('hostView.roomCode')}:</p>
+                    <h2 className="text-3xl sm:text-4xl font-bold tracking-wide text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-400">
+                      {gameCode}
+                    </h2>
+                  </div>
+                  <Badge variant="outline" className="text-base sm:text-lg px-3 py-1 border-cyan-500/50 text-cyan-600 dark:text-cyan-300">
+                    {roomLanguage === 'he' ? '🇮🇱 עברית' : roomLanguage === 'sv' ? '🇸🇪 Svenska' : roomLanguage === 'ja' ? '🇯🇵 日本語' : '🇺🇸 English'}
+                  </Badge>
+                </div>
+              </div>
+
+              {/* Share Buttons */}
+              <div className="flex flex-wrap gap-2 justify-center">
+                <ShareButton
+                  variant="link"
+                  onClick={() => copyJoinUrl(gameCode)}
+                  icon={<FaLink />}
+                >
+                  {t('hostView.copyLink')}
+                </ShareButton>
+                <ShareButton
+                  variant="whatsapp"
+                  onClick={() => shareViaWhatsApp(gameCode)}
+                  icon={<FaWhatsapp />}
+                >
+                  {t('hostView.shareWhatsapp')}
+                </ShareButton>
+                <ShareButton
+                  variant="qr"
+                  onClick={() => setShowQR(true)}
+                  icon={<FaQrcode />}
+                >
+                  {t('hostView.qrCode')}
+                </ShareButton>
+              </div>
+            </div>
+          </Card>
+        )}
+
+        {/* Game Settings - Now below room code */}
+        {!gameStarted && (
+          <Card className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-md p-4 sm:p-5 rounded-lg border border-purple-500/30 shadow-[0_0_15px_rgba(168,85,247,0.1)]">
             <h3 className="text-base font-bold text-purple-600 dark:text-purple-300 mb-4 flex items-center gap-2">
               <FaCog className="text-cyan-600 dark:text-cyan-400 text-sm" />
               {t('hostView.gameSettings')}
@@ -857,48 +903,7 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
               )}
             </div>
           </Card>
-
-          {/* Game Code - RIGHT - Neon Style */}
-          <Card className="lg:min-w-[320px] bg-white/90 dark:bg-slate-800/90 backdrop-blur-md text-slate-900 dark:text-white text-center p-4 sm:p-6 rounded-lg shadow-lg border border-cyan-500/30 shadow-[0_0_20px_rgba(6,182,212,0.15)] flex flex-col justify-center">
-            <p className="text-sm text-cyan-600 dark:text-cyan-300 mb-2">{t('hostView.roomCode')}:</p>
-            <h2 className="text-4xl sm:text-5xl font-bold mb-4 tracking-wide text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-400">
-              {gameCode}
-            </h2>
-
-            {/* Language Badge (Static) */}
-            {!gameStarted && (
-              <div className="mb-4 flex justify-center">
-                <Badge variant="outline" className="text-lg px-4 py-1 border-cyan-500/50 text-cyan-600 dark:text-cyan-300">
-                  {roomLanguage === 'he' ? '🇮🇱 עברית' : roomLanguage === 'sv' ? '🇸🇪 Svenska' : roomLanguage === 'ja' ? '🇯🇵 日本語' : '🇺🇸 English'}
-                </Badge>
-              </div>
-            )}
-
-            <div className="flex flex-wrap gap-2 justify-center">
-              <ShareButton
-                variant="link"
-                onClick={() => copyJoinUrl(gameCode)}
-                icon={<FaLink />}
-              >
-                {t('hostView.copyLink')}
-              </ShareButton>
-              <ShareButton
-                variant="whatsapp"
-                onClick={() => shareViaWhatsApp(gameCode)}
-                icon={<FaWhatsapp />}
-              >
-                {t('hostView.shareWhatsapp')}
-              </ShareButton>
-              <ShareButton
-                variant="qr"
-                onClick={() => setShowQR(true)}
-                icon={<FaQrcode />}
-              >
-                {t('hostView.qrCode')}
-              </ShareButton>
-            </div>
-          </Card>
-        </div>
+        )}
 
         {/* Main Content Area: Player List (LEFT) + Boggle Grid (RIGHT) */}
         <div className="flex flex-col lg:flex-row gap-6 transition-all duration-500 ease-in-out">
