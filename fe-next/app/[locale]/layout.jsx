@@ -1,9 +1,40 @@
 import { translations } from '@/translations';
 import { Providers } from '../providers';
 
+// Helper function to get locale-specific URL path
+function getLocalePath(locale) {
+    switch (locale) {
+        case 'en':
+            return '/en';
+        case 'sv':
+            return '/sv';
+        case 'ja':
+            return '/ja';
+        case 'he':
+        default:
+            return '';
+    }
+}
+
+// Helper function to get language code for structured data
+function getLanguageCode(locale) {
+    switch (locale) {
+        case 'en':
+            return 'en';
+        case 'sv':
+            return 'sv';
+        case 'ja':
+            return 'ja';
+        case 'he':
+        default:
+            return 'he';
+    }
+}
+
 export async function generateMetadata({ params }) {
     const { locale } = await params;
     const seo = translations[locale]?.seo || translations.he.seo;
+    const localePath = getLocalePath(locale);
 
     return {
         title: seo.title,
@@ -13,7 +44,7 @@ export async function generateMetadata({ params }) {
         openGraph: {
             type: 'website',
             locale: seo.locale,
-            url: `https://www.lexiclash.live${locale === 'en' ? '/en' : locale === 'sv' ? '/sv' : ''}`,
+            url: `https://www.lexiclash.live${localePath}`,
             title: seo.ogTitle,
             description: seo.ogDescription,
             siteName: 'LexiClash',
@@ -37,12 +68,13 @@ export async function generateMetadata({ params }) {
             apple: '/lexiclash.jpg',
         },
         alternates: {
-            canonical: `https://www.lexiclash.live${locale === 'en' ? '/en' : locale === 'sv' ? '/sv' : ''}`,
+            canonical: `https://www.lexiclash.live${localePath}`,
             languages: {
                 'x-default': 'https://www.lexiclash.live',
                 he: 'https://www.lexiclash.live',
                 en: 'https://www.lexiclash.live/en',
                 sv: 'https://www.lexiclash.live/sv',
+                ja: 'https://www.lexiclash.live/ja',
             },
         },
         other: {
@@ -52,13 +84,15 @@ export async function generateMetadata({ params }) {
 }
 
 export async function generateStaticParams() {
-    return [{ locale: 'he' }, { locale: 'en' }, { locale: 'sv' }];
+    return [{ locale: 'he' }, { locale: 'en' }, { locale: 'sv' }, { locale: 'ja' }];
 }
 
 export default async function LocaleLayout({ children, params }) {
     const { locale } = await params;
     const dir = translations[locale]?.direction || 'rtl';
     const seo = translations[locale]?.seo || translations.he.seo;
+    const localePath = getLocalePath(locale);
+    const languageCode = getLanguageCode(locale);
 
     // Structured data for Google
     const structuredData = {
@@ -78,9 +112,9 @@ export default async function LocaleLayout({ children, params }) {
             ratingCount: '150',
         },
         description: seo.description,
-        url: `https://www.lexiclash.live${locale === 'en' ? '/en' : locale === 'sv' ? '/sv' : ''}`,
+        url: `https://www.lexiclash.live${localePath}`,
         image: 'https://www.lexiclash.live/lexiclash.jpg',
-        inLanguage: locale === 'en' ? 'en' : locale === 'sv' ? 'sv' : 'he',
+        inLanguage: languageCode,
     };
 
     return (
