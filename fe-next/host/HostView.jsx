@@ -267,12 +267,40 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
         case 'wordAccepted':
           if (hostPlaying) {
             toast.success(`✓ ${message.word}`, { duration: 2000 });
+
+            // Combo system: only increase combo for validated words
+            const now = Date.now();
+            if (lastWordTime && (now - lastWordTime) < 3000) {
+              // Within 3 seconds - increase combo!
+              setComboLevel(prev => Math.min(prev + 1, 4)); // Max combo level 4
+            } else {
+              // Too slow, reset combo
+              setComboLevel(0);
+            }
+            setLastWordTime(now);
+
+            // Clear any existing combo timeout
+            if (comboTimeoutRef.current) {
+              clearTimeout(comboTimeoutRef.current);
+            }
+
+            // Reset combo after 3 seconds of inactivity
+            comboTimeoutRef.current = setTimeout(() => {
+              setComboLevel(0);
+              setLastWordTime(null);
+            }, 3000);
           }
           break;
 
         case 'wordAlreadyFound':
           if (hostPlaying) {
             toast.error(t('playerView.wordAlreadyFound'), { duration: 2000 });
+            // Reset combo on invalid word
+            setComboLevel(0);
+            setLastWordTime(null);
+            if (comboTimeoutRef.current) {
+              clearTimeout(comboTimeoutRef.current);
+            }
           }
           break;
 
@@ -280,6 +308,12 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
           if (hostPlaying) {
             toast.error(t('playerView.wordNotOnBoard'), { duration: 3000 });
             setHostFoundWords(prev => prev.filter(w => w !== message.word));
+            // Reset combo on invalid word
+            setComboLevel(0);
+            setLastWordTime(null);
+            if (comboTimeoutRef.current) {
+              clearTimeout(comboTimeoutRef.current);
+            }
           }
           break;
 
@@ -425,23 +459,6 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
 
     setHostFoundWords(prev => [...prev, trimmedWord]);
     setWord('');
-
-    // Combo system: track word submission timing
-    const now = Date.now();
-    if (lastWordTime && (now - lastWordTime) < 3000) {
-      setComboLevel(prev => Math.min(prev + 1, 4));
-    } else {
-      setComboLevel(0);
-    }
-    setLastWordTime(now);
-
-    if (comboTimeoutRef.current) {
-      clearTimeout(comboTimeoutRef.current);
-    }
-    comboTimeoutRef.current = setTimeout(() => {
-      setComboLevel(0);
-      setLastWordTime(null);
-    }, 4000);
 
     // Keep focus on input
     if (inputRef.current) {
@@ -982,23 +999,6 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
                         }));
                         setHostFoundWords(prev => [...prev, formedWord]);
                         toast.success(`${t('playerView.wordSubmitted')}: ${formedWord}`, { duration: 1000, icon: '📤' });
-
-                        // Combo system for grid submissions
-                        const now = Date.now();
-                        if (lastWordTime && (now - lastWordTime) < 3000) {
-                          setComboLevel(prev => Math.min(prev + 1, 4));
-                        } else {
-                          setComboLevel(0);
-                        }
-                        setLastWordTime(now);
-
-                        if (comboTimeoutRef.current) {
-                          clearTimeout(comboTimeoutRef.current);
-                        }
-                        comboTimeoutRef.current = setTimeout(() => {
-                          setComboLevel(0);
-                          setLastWordTime(null);
-                        }, 4000);
                       } else {
                         toast.error(t('playerView.onlyLanguageWords'), { duration: 1000 });
                       }
