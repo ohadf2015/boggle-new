@@ -423,32 +423,38 @@ export default function GamePage() {
             return;
         }
 
-        if (savedSession.isHost) {
-            if (!savedSession.roomName) {
-                clearSession();
-                setAttemptingReconnect(false);
-                return;
+        // Add a small delay to ensure the old connection is fully closed on the backend
+        // This prevents race conditions when the host refreshes the page
+        const reconnectTimeout = setTimeout(() => {
+            if (savedSession.isHost) {
+                if (!savedSession.roomName) {
+                    clearSession();
+                    setAttemptingReconnect(false);
+                    return;
+                }
+                sendMessage({
+                    action: 'createGame',
+                    gameCode: savedSession.gameCode,
+                    roomName: savedSession.roomName,
+                    hostUsername: savedSession.roomName,
+                    language: savedSession.language || language, // Restore room language
+                });
+            } else {
+                if (!savedSession.username) {
+                    clearSession();
+                    setAttemptingReconnect(false);
+                    return;
+                }
+                sendMessage({
+                    action: 'join',
+                    gameCode: savedSession.gameCode,
+                    username: savedSession.username,
+                });
             }
-            sendMessage({
-                action: 'createGame',
-                gameCode: savedSession.gameCode,
-                roomName: savedSession.roomName,
-                hostUsername: savedSession.roomName,
-                language: savedSession.language || language, // Restore room language
-            });
-        } else {
-            if (!savedSession.username) {
-                clearSession();
-                setAttemptingReconnect(false);
-                return;
-            }
-            sendMessage({
-                action: 'join',
-                gameCode: savedSession.gameCode,
-                username: savedSession.username,
-            });
-        }
-    }, [attemptingReconnect, isActive, sendMessage, wsRef]);
+        }, 1000); // 1 second delay to allow disconnect to process
+
+        return () => clearTimeout(reconnectTimeout);
+    }, [attemptingReconnect, isActive, sendMessage, wsRef, language]);
 
     const handleJoin = useCallback((isHostMode, roomLanguage) => {
         setError('');
