@@ -69,7 +69,7 @@ const Header = ({ className = '' }) => {
                                 rotate: [0, -10, 10, -10, 10, 0],
                                 scale: [1, 1.2, 1]
                             }}
-                            transition={{ duration: 0.5, delay: 1, repeat: Infinity, repeatDelay: 5 }}
+                            transition={{ duration: 0.5, delay: 1, repeat: 3, repeatDelay: 5 }}
                             className="text-xl sm:text-3xl filter drop-shadow-[0_0_8px_rgba(250,204,21,0.6)]"
                         >
                             ⚡

@@ -54,17 +54,32 @@ class Dictionary {
 
       // Load Swedish words
       try {
-        const swedishWordsModule = require('@arvidbt/swedish-words');
-        // Try different possible export formats
-        const swedishWordsArray = swedishWordsModule.swedish_words
-          || swedishWordsModule.default
-          || swedishWordsModule;
+        // The package has a broken package.json - need to use the compiled output directly
+        const swedishWordsPath = path.join(__dirname, '../node_modules/@arvidbt/swedish-words/out/index.js');
 
-        if (Array.isArray(swedishWordsArray)) {
-          this.swedishWords = new Set(swedishWordsArray.map(w => w.toLowerCase()));
+        // Read the file and parse it as a CommonJS module would be too complex
+        // Instead, read the file content and extract the array
+        const swedishFileContent = fs.readFileSync(swedishWordsPath, 'utf-8');
+
+        // The file exports as: export { swedish_words }
+        // We need to extract the array from the file
+        const arrayMatch = swedishFileContent.match(/var swedish_words = \[([\s\S]*?)\];/);
+
+        if (arrayMatch) {
+          // Parse the array content - it's formatted as quoted strings
+          const arrayContent = arrayMatch[1];
+          const words = arrayContent
+            .split(',')
+            .map(line => {
+              const match = line.trim().match(/^"(.*)"$/);
+              return match ? match[1] : null;
+            })
+            .filter(w => w && w.length > 1); // Filter out single chars and nulls
+
+          this.swedishWords = new Set(words.map(w => w.toLowerCase()));
           console.log(`[Dictionary] Loaded ${this.swedishWords.size} Swedish words`);
         } else {
-          console.log('[Dictionary] Swedish dictionary has unexpected format - using fallback validation');
+          console.log('[Dictionary] Could not parse Swedish dictionary - using fallback validation');
         }
       } catch (swedishError) {
         console.error('[Dictionary] Error loading Swedish dictionary:', swedishError.message);
