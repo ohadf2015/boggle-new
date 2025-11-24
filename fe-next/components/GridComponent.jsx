@@ -54,8 +54,9 @@ const GridComponent = ({
         isTouchingRef.current = true;
         setSelectedCells([{ row: rowIndex, col: colIndex, letter }]);
         setDirection(null); // Reset direction for new selection
+        // Enhanced haptic feedback - medium vibration on start
         if (window.navigator && window.navigator.vibrate) {
-            window.navigator.vibrate(50);
+            window.navigator.vibrate(30);
         }
     };
 
@@ -89,7 +90,8 @@ const GridComponent = ({
                         setDirection(null);
                     }
 
-                    if (window.navigator && window.navigator.vibrate) window.navigator.vibrate(20);
+                    // Light vibration for backtracking
+                    if (window.navigator && window.navigator.vibrate) window.navigator.vibrate(15);
                 }
                 return;
             }
@@ -111,7 +113,11 @@ const GridComponent = ({
                         setDirection(normalizeDirection(rowDiff, colDiff));
                     }
 
-                    if (window.navigator && window.navigator.vibrate) window.navigator.vibrate(50);
+                    // Progressive vibration - longer word = more intense feedback
+                    const vibrationIntensity = Math.min(20 + selectedCells.length * 3, 40);
+                    if (window.navigator && window.navigator.vibrate) {
+                        window.navigator.vibrate(vibrationIntensity);
+                    }
                 }
             }
         }
@@ -125,6 +131,22 @@ const GridComponent = ({
             const formedWord = selectedCells.map(c => c.letter).join('');
             if (onWordSubmit) {
                 onWordSubmit(formedWord);
+            }
+
+            // Success vibration pattern on word submission
+            // More intense for longer words and combos
+            if (window.navigator && window.navigator.vibrate) {
+                const wordLength = selectedCells.length;
+                if (comboLevel > 0) {
+                    // Combo celebration - multiple short bursts
+                    window.navigator.vibrate([50, 50, 50, 50, 80]);
+                } else if (wordLength >= 6) {
+                    // Long word - double vibration
+                    window.navigator.vibrate([40, 30, 60]);
+                } else if (wordLength >= 3) {
+                    // Valid word - single vibration
+                    window.navigator.vibrate(50);
+                }
             }
 
             // Delay clearing the selection to keep the trail visible longer
@@ -292,7 +314,7 @@ const GridComponent = ({
                 ref={gridRef}
                 className={cn(
                     "grid touch-none select-none",
-                    isLargeGrid ? "gap-0.5 sm:gap-1" : "gap-1 sm:gap-2",
+                    isLargeGrid ? "gap-0.5 sm:gap-1" : "gap-1 sm:gap-1.5",
                     className
                 )}
                 style={{
@@ -316,24 +338,36 @@ const GridComponent = ({
                             onMouseEnter={() => handleMouseEnter(i, j, cell)}
                             initial={{ scale: 0.8, opacity: 0 }}
                             animate={{
-                                scale: isSelected ? 1.1 : 1,
+                                scale: isSelected ? 1.15 : 1,
                                 opacity: 1,
-                                rotate: isSelected ? [0, -5, 5, 0] : 0
+                                rotate: isSelected ? [0, -5, 5, 0] : 0,
+                                y: isSelected ? -2 : 0
                             }}
+                            whileTap={{ scale: 0.95 }}
                             transition={{
-                                duration: isSelected ? 0.3 : 0.6,
-                                ease: "easeOut"
+                                duration: isSelected ? 0.2 : 0.6,
+                                ease: "easeOut",
+                                scale: { type: "spring", stiffness: 300, damping: 20 }
                             }}
                             className={cn(
-                                "aspect-square flex items-center justify-center font-bold shadow-sm cursor-pointer transition-all duration-200 border",
+                                "aspect-square flex items-center justify-center font-bold shadow-sm cursor-pointer transition-all duration-200 border relative overflow-hidden",
                                 isLargeGrid
                                     ? (largeText ? "text-2xl sm:text-3xl rounded-md" : "text-lg sm:text-xl rounded-md")
                                     : (largeText || playerView ? "text-4xl sm:text-6xl rounded-xl" : "text-2xl sm:text-3xl rounded-lg"),
                                 isSelected
                                     ? `bg-gradient-to-br ${comboColors.gradient} text-white ${comboColors.border} z-10 ${comboColors.shadow}`
-                                    : "bg-gradient-to-br from-white to-slate-100 dark:from-slate-800 dark:to-slate-900 text-slate-900 dark:text-white border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700/80"
+                                    : "bg-gradient-to-br from-white to-slate-100 dark:from-slate-800 dark:to-slate-900 text-slate-900 dark:text-white border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700/80 active:scale-95"
                             )}
                         >
+                            {/* Ripple effect on selection */}
+                            {isSelected && (
+                                <motion.div
+                                    className="absolute inset-0 bg-white/30 rounded-full"
+                                    initial={{ scale: 0, opacity: 0.5 }}
+                                    animate={{ scale: 2, opacity: 0 }}
+                                    transition={{ duration: 0.5 }}
+                                />
+                            )}
                             {cell}
                         </motion.div>
                     );
