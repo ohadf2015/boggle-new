@@ -23,6 +23,7 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
   const ws = useWebSocket();
   const inputRef = useRef(null);
   const wordListRef = useRef(null);
+  const intentionalExitRef = useRef(false);
 
   const [word, setWord] = useState('');
   const [foundWords, setFoundWords] = useState([]);
@@ -116,6 +117,9 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
     if (!shouldWarn) return;
 
     const handleBeforeUnload = (e) => {
+      // Don't show warning if user is intentionally exiting
+      if (intentionalExitRef.current) return;
+
       e.preventDefault();
       e.returnValue = ''; // Chrome requires returnValue to be set
       return ''; // Some browsers require a return value
@@ -245,6 +249,7 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
           break;
 
         case 'hostLeftRoomClosing':
+          intentionalExitRef.current = true;
           clearSession();
           toast.error(message.message || t('playerView.roomClosed'), {
             icon: '🚪',
@@ -364,6 +369,7 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
 
   const handleExitRoom = () => {
     if (window.confirm(t('playerView.exitConfirmation'))) {
+      intentionalExitRef.current = true;
       clearSession();
       ws.close();
       window.location.reload();

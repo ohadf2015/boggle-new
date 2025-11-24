@@ -29,6 +29,7 @@ import { cn } from '../lib/utils';
 const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [] }) => {
   const { t, language } = useLanguage();
   const ws = useWebSocket();
+  const intentionalExitRef = useRef(false);
   const [difficulty, setDifficulty] = useState(DEFAULT_DIFFICULTY);
   const [tableData, setTableData] = useState(generateRandomTable());
   const [timerValue, setTimerValue] = useState('1');
@@ -120,6 +121,9 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
     if (!shouldWarn) return;
 
     const handleBeforeUnload = (e) => {
+      // Don't show warning if user is intentionally exiting
+      if (intentionalExitRef.current) return;
+
       e.preventDefault();
       e.returnValue = ''; // Chrome requires returnValue to be set
       return ''; // Some browsers require a return value
@@ -226,6 +230,7 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
           break;
 
         case 'roomClosedDueToInactivity':
+          intentionalExitRef.current = true;
           toast.error(message.message || 'החדר נסגר עקב חוסר פעילות', {
             icon: '⏰',
             duration: 5000,
@@ -336,6 +341,7 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
 
   const handleExitRoom = () => {
     if (window.confirm(t('hostView.confirmExit'))) {
+      intentionalExitRef.current = true;
       // Clear session cookie
       clearSession();
       // Send close room message to server first
