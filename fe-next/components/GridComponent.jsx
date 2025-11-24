@@ -13,6 +13,7 @@ const GridComponent = ({
     comboLevel = 0
 }) => {
     const [internalSelectedCells, setInternalSelectedCells] = useState([]);
+    const [direction, setDirection] = useState(null); // Track the direction of movement
     const isTouchingRef = useRef(false);
     const gridRef = useRef(null);
 
@@ -27,10 +28,32 @@ const GridComponent = ({
         }
     }, [interactive]);
 
+    // Helper function to normalize direction to unit vector
+    const normalizeDirection = (rowDiff, colDiff) => {
+        // Return the direction as a unit vector (sign of the differences)
+        return {
+            row: rowDiff === 0 ? 0 : (rowDiff > 0 ? 1 : -1),
+            col: colDiff === 0 ? 0 : (colDiff > 0 ? 1 : -1)
+        };
+    };
+
+    // Helper function to check if a move continues in the same direction
+    const isValidDirection = (rowDiff, colDiff, currentDirection) => {
+        // If no direction set yet (first move), any adjacent cell is valid
+        if (!currentDirection) return true;
+
+        // Normalize the new direction
+        const newDir = normalizeDirection(rowDiff, colDiff);
+
+        // Check if the new direction matches the established direction
+        return newDir.row === currentDirection.row && newDir.col === currentDirection.col;
+    };
+
     const handleTouchStart = (rowIndex, colIndex, letter) => {
         if (!interactive) return;
         isTouchingRef.current = true;
         setSelectedCells([{ row: rowIndex, col: colIndex, letter }]);
+        setDirection(null); // Reset direction for new selection
         if (window.navigator && window.navigator.vibrate) {
             window.navigator.vibrate(50);
         }
@@ -60,19 +83,34 @@ const GridComponent = ({
             if (existingIndex !== -1) {
                 if (existingIndex === selectedCells.length - 2) {
                     setSelectedCells(prev => prev.slice(0, -1));
+
+                    // Reset direction if we're back to one cell (no direction established yet)
+                    if (selectedCells.length - 1 === 1) {
+                        setDirection(null);
+                    }
+
                     if (window.navigator && window.navigator.vibrate) window.navigator.vibrate(20);
                 }
                 return;
             }
 
-            // Validation Logic - allow any adjacent cell (easier diagonal selection)
+            // Validation Logic - only allow straight or diagonal lines
             if (lastCell) {
                 const rowDiff = rowIndex - lastCell.row;
                 const colDiff = colIndex - lastCell.col;
 
-                // Must be adjacent (allows free movement in any direction) but NOT the same cell
-                if (Math.abs(rowDiff) <= 1 && Math.abs(colDiff) <= 1 && !(rowDiff === 0 && colDiff === 0)) {
+                // Must be adjacent (within 1 cell) but NOT the same cell
+                const isAdjacent = Math.abs(rowDiff) <= 1 && Math.abs(colDiff) <= 1 && !(rowDiff === 0 && colDiff === 0);
+
+                // Check if move continues in the same direction
+                if (isAdjacent && isValidDirection(rowDiff, colDiff, direction)) {
                     setSelectedCells(prev => [...prev, { row: rowIndex, col: colIndex, letter }]);
+
+                    // Set direction on the first move (when direction is null)
+                    if (!direction) {
+                        setDirection(normalizeDirection(rowDiff, colDiff));
+                    }
+
                     if (window.navigator && window.navigator.vibrate) window.navigator.vibrate(50);
                 }
             }
@@ -89,6 +127,7 @@ const GridComponent = ({
                 onWordSubmit(formedWord);
             }
             setSelectedCells([]);
+            setDirection(null); // Reset direction after word submission
         }
     };
 
@@ -114,6 +153,11 @@ const GridComponent = ({
         if (existingIndex !== -1) {
             if (existingIndex === selectedCells.length - 2) {
                 setSelectedCells(prev => prev.slice(0, -1));
+
+                // Reset direction if we're back to one cell (no direction established yet)
+                if (selectedCells.length - 1 === 1) {
+                    setDirection(null);
+                }
             }
             return;
         }
@@ -122,9 +166,17 @@ const GridComponent = ({
             const rowDiff = rowIndex - lastCell.row;
             const colDiff = colIndex - lastCell.col;
 
-            // Must be adjacent (allows free movement in any direction) but NOT the same cell
-            if (Math.abs(rowDiff) <= 1 && Math.abs(colDiff) <= 1 && !(rowDiff === 0 && colDiff === 0)) {
+            // Must be adjacent (within 1 cell) but NOT the same cell
+            const isAdjacent = Math.abs(rowDiff) <= 1 && Math.abs(colDiff) <= 1 && !(rowDiff === 0 && colDiff === 0);
+
+            // Check if move continues in the same direction
+            if (isAdjacent && isValidDirection(rowDiff, colDiff, direction)) {
                 setSelectedCells(prev => [...prev, { row: rowIndex, col: colIndex, letter }]);
+
+                // Set direction on the first move (when direction is null)
+                if (!direction) {
+                    setDirection(normalizeDirection(rowDiff, colDiff));
+                }
             }
         }
     };

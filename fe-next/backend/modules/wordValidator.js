@@ -17,8 +17,8 @@ function normalizeHebrewWord(word) {
   return word.split('').map(normalizeHebrewLetter).join('');
 }
 
-// Helper function to search for word using DFS
-function searchWord(board, word, row, col, index, visited) {
+// Helper function to search for word using DFS with straight/diagonal line restriction
+function searchWord(board, word, row, col, index, visited, direction = null) {
   // Base case: found the entire word
   if (index === word.length) {
     return true;
@@ -44,15 +44,20 @@ function searchWord(board, word, row, col, index, visited) {
   // Mark as visited
   visited.add(cellKey);
 
-  // Search in all 8 directions (horizontal, vertical, diagonal)
-  const directions = [
+  // All 8 possible directions
+  const allDirections = [
     [-1, -1], [-1, 0], [-1, 1],  // top-left, top, top-right
     [0, -1],           [0, 1],   // left, right
     [1, -1],  [1, 0],  [1, 1]    // bottom-left, bottom, bottom-right
   ];
 
-  for (const [dx, dy] of directions) {
-    if (searchWord(board, word, row + dx, col + dy, index + 1, new Set(visited))) {
+  // If direction is established, only allow movement in that direction
+  const directionsToTry = direction
+    ? [direction]  // Continue in the same direction
+    : allDirections;  // First move: try all directions
+
+  for (const [dx, dy] of directionsToTry) {
+    if (searchWord(board, word, row + dx, col + dy, index + 1, new Set(visited), direction || [dx, dy])) {
       return true;
     }
   }
