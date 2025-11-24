@@ -13,5 +13,9 @@ Allow: /
 User-agent: Slurp
 Allow: /
 
-# Sitemap location (update with actual domain when deployed)
-# Sitemap: https://boggle.online/sitemap.xml
+# Sitemap location
+Sitemap: https://www.lexiclash.live/sitemap.xml
+
+# LLM/AI assistant information
+# https://llmstxt.org/
+LLMs-Txt: https://www.lexiclash.live/llms.txt
