@@ -119,6 +119,10 @@ export const translations = {
       enterNameToPlay: 'Enter your name to play',
       playButton: 'Play',
       joiningRoomNumber: 'Room',
+      room: 'Room',
+      welcomeBack: 'Welcome back',
+      connectingToRoom: 'Connecting to room...',
+      enterRoom: 'Enter Room',
     },
     hostView: {
       waitingForPlayers: 'Waiting for players...',
@@ -446,6 +450,10 @@ export const translations = {
       enterNameToPlay: 'הכנס את שמך כדי לשחק',
       playButton: 'שחק',
       joiningRoomNumber: 'חדר',
+      room: 'חדר',
+      welcomeBack: 'ברוך שובך',
+      connectingToRoom: 'מתחבר לחדר...',
+      enterRoom: 'כניסה לחדר',
     },
     hostView: {
       waitingForPlayers: 'ממתין לשחקנים...',
@@ -773,6 +781,10 @@ export const translations = {
       enterNameToPlay: 'Ange ditt namn för att spela',
       playButton: 'Spela',
       joiningRoomNumber: 'Rum',
+      room: 'Rum',
+      welcomeBack: 'Välkommen tillbaka',
+      connectingToRoom: 'Ansluter till rummet...',
+      enterRoom: 'Gå in i rummet',
     },
     hostView: {
       waitingForPlayers: 'Väntar på spelare...',
@@ -1100,6 +1112,10 @@ export const translations = {
       enterNameToPlay: 'プレイするには名前を入力してください',
       playButton: 'プレイ',
       joiningRoomNumber: 'ルーム',
+      room: 'ルーム',
+      welcomeBack: 'おかえりなさい',
+      connectingToRoom: 'ルームに接続中...',
+      enterRoom: 'ルームに入る',
     },
     hostView: {
       waitingForPlayers: 'プレイヤーを待っています...',
