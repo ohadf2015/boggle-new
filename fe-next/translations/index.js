@@ -9,8 +9,8 @@ export const translations = {
     },
     seo: {
       title: 'LexiClash - Free Multiplayer Word Game | Play Online Now',
-      description: 'Looking for fun indoor activities? Play our free multiplayer word game! Find words on a letter grid and compete with friends in real-time. Perfect Christmas activity for kids and the whole family. No download needed - create a room, invite friends, and race to find the most words. Great for family game night and party entertainment.',
-      keywords: 'word game online, multiplayer word game, free online game, indoor activities, Christmas activities for kids, family game night, party games, word puzzle game, group games online, holiday games, team building games, games to play with friends, no download games, boggle style game',
+      description: 'Looking for fun indoor activities? Play our free multiplayer word game similar to Alias and Kahoot! Find words on a letter grid and compete with friends in real-time. Perfect Christmas activity for kids and the whole family. No download needed - create a room, invite friends, and race to find the most words. Great for family game night and party entertainment.',
+      keywords: 'word game online, multiplayer word game, free online game, indoor activities, Christmas activities for kids, family game night, party games, word puzzle game, group games online, holiday games, team building games, games to play with friends, no download games, boggle style game, alias game, kahoot alternative, alias online',
       ogTitle: 'LexiClash - Free Multiplayer Word Game for Family & Friends',
       ogDescription: 'Find words on a letter grid and compete with friends in real-time! Perfect Christmas activity for kids and the whole family. No download - create a room and race to find the most words together.',
       twitterTitle: 'LexiClash - Free Multiplayer Word Game for Family & Friends',
@@ -340,8 +340,8 @@ export const translations = {
     },
     seo: {
       title: 'לקסיקלאש - משחק מילים אונליין חינם | פעילות לחנוכה לכל המשפחה',
-      description: 'מחפשים פעילות ביתית מהנה? משחק מילים קבוצתי בחינם! מצאו מילים על לוח אותיות והתחרו מול חברים בזמן אמת. פעילות מושלמת לחנוכה לילדים ולכל המשפחה. ללא התקנה - פתחו חדר, הזמינו חברים ומי שמוצא הכי הרבה מילים מנצח!',
-      keywords: 'משחק מילים, משחק מילים אונליין, פעילות לחנוכה, פעילות ביתית, משחק לילדים, משחק משפחתי, משחק קבוצתי, משחק חינם, פעילות לילדים בבית, משחק מסיבה, ערב משפחתי, משחק רב משתתפים, משחק בעברית, פעילות חורף, משחק לחופשה, לוח אותיות',
+      description: 'מחפשים פעילות ביתית מהנה? משחק מילים קבוצתי בחינם בסגנון אליאס וקהוט! מצאו מילים על לוח אותיות והתחרו מול חברים בזמן אמת. פעילות מושלמת לחנוכה לילדים ולכל המשפחה. ללא התקנה - פתחו חדר, הזמינו חברים ומי שמוצא הכי הרבה מילים מנצח!',
+      keywords: 'משחק מילים, משחק מילים אונליין, פעילות לחנוכה, פעילות ביתית, משחק לילדים, משחק משפחתי, משחק קבוצתי, משחק חינם, פעילות לילדים בבית, משחק מסיבה, ערב משפחתי, משחק רב משתתפים, משחק בעברית, פעילות חורף, משחק לחופשה, לוח אותיות, אליאס, קהוט, משחק כמו אליאס',
       ogTitle: 'לקסיקלאש - משחק מילים קבוצתי חינם למשפחה וחברים',
       ogDescription: 'מצאו מילים על לוח אותיות והתחרו מול חברים בזמן אמת! פעילות מושלמת לחנוכה לילדים ולכל המשפחה. ללא התקנה - פתחו חדר ומי שמוצא הכי הרבה מילים מנצח!',
       twitterTitle: 'לקסיקלאש - משחק מילים קבוצתי חינם למשפחה וחברים',
@@ -671,8 +671,8 @@ export const translations = {
     },
     seo: {
       title: 'LexiClash - Multiplayer Word Game Online | Spela gratis nu',
-      description: 'LexiClash - Snabbt multiplayer-ordspel perfekt för fester, teambuilding och familjekul! Hitta ord, tävla i realtid. Gratis onlinespel - ingen nedladdning krävs!',
-      keywords: 'LexiClash, ordspel, multiplayer, onlinespel, festspel, teambuilding, familjespel, ordpussel, gratis spel',
+      description: 'LexiClash - Snabbt multiplayer-ordspel liknande Alias och Kahoot, perfekt för fester, teambuilding och familjekul! Hitta ord, tävla i realtid. Gratis onlinespel - ingen nedladdning krävs!',
+      keywords: 'LexiClash, ordspel, multiplayer, onlinespel, festspel, teambuilding, familjespel, ordpussel, gratis spel, alias spel, kahoot alternativ, alias online',
       ogTitle: 'LexiClash - Multiplayer ordspel',
       ogDescription: 'LexiClash - Snabbt multiplayer-ordspel perfekt för fester, teambuilding och familjekul! Hitta ord, tävla i realtid. Gratis onlinespel - ingen nedladdning krävs!',
       twitterTitle: 'LexiClash - Multiplayer ordspel',
@@ -1002,8 +1002,8 @@ export const translations = {
     },
     seo: {
       title: 'LexiClash - オンライン マルチプレイヤー ワードゲーム | 今すぐ無料でプレイ',
-      description: 'LexiClash - パーティー、チームビルディング、家族での楽しみに最適な、速いペースのマルチプレイヤーワードゲーム！単語を見つけ、リアルタイムで競争しましょう。無料オンラインゲーム - ダウンロード不要！',
-      keywords: 'LexiClash, ワードゲーム, マルチプレイヤーゲーム, オンラインゲーム, パーティーゲーム, チームビルディングゲーム, ファミリーゲーム, ワードパズル, 無料オンラインゲーム, リアルタイムマルチプレイヤー',
+      description: 'LexiClash - AliasやKahootのような、パーティー、チームビルディング、家族での楽しみに最適な、速いペースのマルチプレイヤーワードゲーム！単語を見つけ、リアルタイムで競争しましょう。無料オンラインゲーム - ダウンロード不要！',
+      keywords: 'LexiClash, ワードゲーム, マルチプレイヤーゲーム, オンラインゲーム, パーティーゲーム, チームビルディングゲーム, ファミリーゲーム, ワードパズル, 無料オンラインゲーム, リアルタイムマルチプレイヤー, Alias, Kahoot, エイリアスゲーム',
       ogTitle: 'LexiClash - マルチプレイヤーワードゲーム',
       ogDescription: 'LexiClash - パーティー、チームビルディング、家族での楽しみに最適な、速いペースのマルチプレイヤーワードゲーム！単語を見つけ、リアルタイムで競争しましょう。無料オンラインゲーム - ダウンロード不要！',
       twitterTitle: 'LexiClash - マルチプレイヤーワードゲーム',
