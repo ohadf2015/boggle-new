@@ -743,79 +743,100 @@ const handleDisconnect = (ws, wss) => {
 
     // Check if this was the host
     if (isHost) {
-      console.log(`[DISCONNECT] Host ${username} disconnected from game ${gameCode}, starting grace period`);
-
-      // Store the host in disconnected players
-      if (!game.disconnectedPlayers) {
-        game.disconnectedPlayers = {};
-      }
-
-      // Mark host as disconnected
-      game.hostDisconnected = true;
-      game.disconnectedPlayers[username] = {
-        disconnectedAt: Date.now(),
-        isHost: true,
-        timeout: setTimeout(() => {
-          // Only transfer/close if game still exists and host hasn't reconnected
-          if (games[gameCode] && games[gameCode].hostDisconnected) {
-            console.log(`[DISCONNECT] Host reconnect grace period expired for game ${gameCode}`);
-
-            // Remove from disconnected players
-            delete games[gameCode].disconnectedPlayers[username];
-
-            // Get remaining players (excluding the disconnected host)
-            const remainingPlayers = Object.keys(games[gameCode].users).filter(u => u !== username);
-
-            if (remainingPlayers.length > 0) {
-              // Transfer host to the first remaining player
-              const newHostUsername = remainingPlayers[0];
-              const newHostWs = games[gameCode].users[newHostUsername];
-
-              console.log(`[DISCONNECT] Transferring host from ${username} to ${newHostUsername}`);
-
-              games[gameCode].host = newHostWs;
-              games[gameCode].hostUsername = newHostUsername;
-              games[gameCode].hostDisconnected = false;
-              games[gameCode].hostDisconnectTimeout = null;
-
-              // Notify all players about the new host
-              sendAllPlayerAMessage(gameCode, {
-                action: "hostTransferred",
-                newHost: newHostUsername,
-                message: `${newHostUsername} is now the host`
-              });
-
-              // Update player list with new host info
-              broadcastPlayerList(gameCode);
-
-              // Save to Redis
-              saveGameState(gameCode, games[gameCode]).catch(err =>
-                console.error('[REDIS] Error saving game state:', err)
-              );
-            } else {
-              // No players left, close the room
-              console.log(`[DISCONNECT] No players left in game ${gameCode}, closing room`);
-              cleanupGameTimers(gameCode);
-              delete games[gameCode];
-
-              // Delete from Redis
-              deleteGameState(gameCode).catch(err =>
-                console.error('[REDIS] Error deleting game state:', err)
-              );
-
-              // Broadcast updated rooms list
-              if (wss) broadcastActiveRooms(wss);
-            }
-          }
-        }, 300000) // 5 minute grace period (300000ms)
-      };
+      console.log(`[DISCONNECT] Host ${username} disconnected from game ${gameCode}`);
 
       // Remove host from active users immediately
       delete game.users[username];
 
-      // Notify remaining players
-      broadcastPlayerList(gameCode);
-      broadcastLeaderboard(gameCode);
+      // Get remaining players (excluding the disconnected host)
+      const remainingPlayers = Object.keys(game.users);
+
+      if (remainingPlayers.length === 0) {
+        // No players left, close the room immediately
+        console.log(`[DISCONNECT] No players left in game ${gameCode}, closing room immediately`);
+        cleanupGameTimers(gameCode);
+        delete games[gameCode];
+
+        // Delete from Redis
+        deleteGameState(gameCode).catch(err =>
+          console.error('[REDIS] Error deleting game state:', err)
+        );
+
+        // Broadcast updated rooms list
+        if (wss) broadcastActiveRooms(wss);
+      } else {
+        // There are remaining players, start grace period
+        console.log(`[DISCONNECT] ${remainingPlayers.length} player(s) remaining, starting grace period`);
+
+        // Store the host in disconnected players
+        if (!game.disconnectedPlayers) {
+          game.disconnectedPlayers = {};
+        }
+
+        // Mark host as disconnected
+        game.hostDisconnected = true;
+        game.disconnectedPlayers[username] = {
+          disconnectedAt: Date.now(),
+          isHost: true,
+          timeout: setTimeout(() => {
+            // Only transfer/close if game still exists and host hasn't reconnected
+            if (games[gameCode] && games[gameCode].hostDisconnected) {
+              console.log(`[DISCONNECT] Host reconnect grace period expired for game ${gameCode}`);
+
+              // Remove from disconnected players
+              delete games[gameCode].disconnectedPlayers[username];
+
+              // Get remaining players (excluding the disconnected host)
+              const remainingPlayers = Object.keys(games[gameCode].users).filter(u => u !== username);
+
+              if (remainingPlayers.length > 0) {
+                // Transfer host to the first remaining player
+                const newHostUsername = remainingPlayers[0];
+                const newHostWs = games[gameCode].users[newHostUsername];
+
+                console.log(`[DISCONNECT] Transferring host from ${username} to ${newHostUsername}`);
+
+                games[gameCode].host = newHostWs;
+                games[gameCode].hostUsername = newHostUsername;
+                games[gameCode].hostDisconnected = false;
+                games[gameCode].hostDisconnectTimeout = null;
+
+                // Notify all players about the new host
+                sendAllPlayerAMessage(gameCode, {
+                  action: "hostTransferred",
+                  newHost: newHostUsername,
+                  message: `${newHostUsername} is now the host`
+                });
+
+                // Update player list with new host info
+                broadcastPlayerList(gameCode);
+
+                // Save to Redis
+                saveGameState(gameCode, games[gameCode]).catch(err =>
+                  console.error('[REDIS] Error saving game state:', err)
+                );
+              } else {
+                // No players left, close the room
+                console.log(`[DISCONNECT] No players left in game ${gameCode}, closing room`);
+                cleanupGameTimers(gameCode);
+                delete games[gameCode];
+
+                // Delete from Redis
+                deleteGameState(gameCode).catch(err =>
+                  console.error('[REDIS] Error deleting game state:', err)
+                );
+
+                // Broadcast updated rooms list
+                if (wss) broadcastActiveRooms(wss);
+              }
+            }
+          }, 300000) // 5 minute grace period (300000ms)
+        };
+
+        // Notify remaining players
+        broadcastPlayerList(gameCode);
+        broadcastLeaderboard(gameCode);
+      }
     } else if (username && games[gameCode].users[username]) {
       // Player disconnected - give them a grace period to reconnect (30 seconds)
       console.log(`[DISCONNECT] Player ${username} disconnected from game ${gameCode}, starting grace period`);

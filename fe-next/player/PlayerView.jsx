@@ -307,6 +307,8 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
       regex = /^[\u0590-\u05FF]+$/;
     } else if (currentLang === 'sv') {
       regex = /^[a-zA-ZåäöÅÄÖ]+$/;
+    } else if (currentLang === 'ja') {
+      regex = /^[\u3040-\u309F\u30A0-\u30FF\u4E00-\u9FAF]+$/;
     } else {
       regex = /^[a-zA-Z]+$/;
     }
@@ -744,6 +746,8 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
                       regex = /^[\u0590-\u05FF]+$/;
                     } else if (currentLang === 'sv') {
                       regex = /^[a-zA-ZåäöÅÄÖ]+$/;
+                    } else if (currentLang === 'ja') {
+                      regex = /^[\u3040-\u309F\u30A0-\u30FF\u4E00-\u9FAF]+$/;
                     } else {
                       regex = /^[a-zA-Z]+$/;
                     }

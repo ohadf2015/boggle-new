@@ -13,10 +13,18 @@ const GridComponent = ({
 }) => {
     const [internalSelectedCells, setInternalSelectedCells] = useState([]);
     const isTouchingRef = useRef(false);
+    const gridRef = useRef(null);
 
     // Use external control if provided, otherwise internal state
     const selectedCells = externalSelectedCells || internalSelectedCells;
     const setSelectedCells = externalSelectedCells ? () => { } : setInternalSelectedCells;
+
+    // Auto-focus on grid when game becomes interactive
+    useEffect(() => {
+        if (interactive && gridRef.current) {
+            gridRef.current.focus();
+        }
+    }, [interactive]);
 
     const handleTouchStart = (rowIndex, colIndex, letter) => {
         if (!interactive) return;
@@ -159,6 +167,7 @@ const GridComponent = ({
 
     return (
         <div
+            ref={gridRef}
             className={cn(
                 "grid touch-none select-none",
                 isLargeGrid ? "gap-0.5 sm:gap-1" : "gap-1 sm:gap-2",
@@ -167,6 +176,7 @@ const GridComponent = ({
             style={{
                 gridTemplateColumns: `repeat(${grid[0]?.length || 4}, minmax(0, 1fr))`
             }}
+            tabIndex={interactive ? 0 : -1}
             onTouchMove={handleTouchMove}
             onTouchEnd={handleTouchEnd}
         >
