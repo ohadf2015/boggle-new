@@ -94,5 +94,7 @@ function isWordOnBoard(word, board) {
 module.exports = {
   normalizeHebrewLetter,
   normalizeHebrewWord,
-  isWordOnBoard
+  isWordOnBoard,
+  // Alias for backwards compatibility with socketHandlers.js
+  validateWordOnBoard: isWordOnBoard
 };

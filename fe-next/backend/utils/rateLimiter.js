@@ -95,4 +95,29 @@ class RateLimiter {
   }
 }
 
-module.exports = RateLimiter;
+// Create a singleton instance for use across the application
+const rateLimiterInstance = new RateLimiter();
+
+/**
+ * Check if a client is allowed to proceed (not rate limited)
+ * @param {string} clientId - Client identifier
+ * @returns {boolean} - True if allowed, false if rate limited
+ */
+function checkRateLimit(clientId) {
+  return !rateLimiterInstance.isRateLimited(clientId);
+}
+
+/**
+ * Reset/remove rate limiting for a client (e.g., on disconnect)
+ * @param {string} clientId - Client identifier
+ */
+function resetRateLimit(clientId) {
+  rateLimiterInstance.removeClient(clientId);
+}
+
+module.exports = {
+  RateLimiter,
+  rateLimiterInstance,
+  checkRateLimit,
+  resetRateLimit
+};

@@ -109,6 +109,48 @@ const checkLiveAchievements = (game, username, word, timeSinceStart) => {
   return newAchievements;
 };
 
+/**
+ * Check and award achievements for a word submission
+ * Wrapper function that handles gameCode lookup and time calculation
+ * @param {string} gameCode - Game identifier
+ * @param {string} username - Player username
+ * @param {string} word - The word submitted
+ * @returns {Array} Array of newly awarded achievements
+ */
+const checkAndAwardAchievements = (gameCode, username, word) => {
+  // Import here to avoid circular dependency at module load time
+  const { getGame } = require('./gameStateManager');
+
+  const game = getGame(gameCode);
+  if (!game || !game.playerAchievements || !game.playerAchievements[username]) {
+    return [];
+  }
+
+  // Calculate time since game start
+  const currentTime = Date.now();
+  const timeSinceStart = game.startTime ? (currentTime - game.startTime) / 1000 : 0;
+
+  return checkLiveAchievements(game, username, word, timeSinceStart);
+};
+
+/**
+ * Get achievements for a specific player in a game
+ * @param {string} gameCode - Game identifier
+ * @param {string} username - Player username
+ * @returns {Array} Array of achievement keys the player has earned
+ */
+const getPlayerAchievements = (gameCode, username) => {
+  // Import here to avoid circular dependency at module load time
+  const { getGame } = require('./gameStateManager');
+
+  const game = getGame(gameCode);
+  if (!game || !game.playerAchievements || !game.playerAchievements[username]) {
+    return [];
+  }
+
+  return game.playerAchievements[username];
+};
+
 // Award final achievements after validation (post-game)
 const awardFinalAchievements = (game, users) => {
   users.forEach(username => {
@@ -181,5 +223,8 @@ module.exports = {
   ACHIEVEMENTS,
   getLocalizedAchievements,
   checkLiveAchievements,
-  awardFinalAchievements
+  awardFinalAchievements,
+  // Additional exports for socketHandlers.js compatibility
+  checkAndAwardAchievements,
+  getPlayerAchievements
 };
