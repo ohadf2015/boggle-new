@@ -78,7 +78,9 @@ export default function GamePage() {
     const initializeState = () => {
       const urlParams = new URLSearchParams(window.location.search);
       const roomFromUrl = urlParams.get('room');
-      const savedUsername = localStorage.getItem('boggle_username') || '';
+      const savedUsername = typeof window !== 'undefined'
+        ? localStorage.getItem('boggle_username') || ''
+        : '';
       const savedSession = getSession();
 
       let joiningNewRoomViaInvitation = false;
@@ -343,7 +345,10 @@ export default function GamePage() {
     return () => {
       console.log('[SOCKET.IO] Cleaning up');
       newSocket.removeAllListeners();
-      // Don't disconnect on cleanup - let it persist
+      // Only keep socket connected if it's the global instance
+      if (!globalSocketInstance || globalSocketInstance !== newSocket) {
+        newSocket.disconnect();
+      }
     };
   }, [t, language]);
 
@@ -504,7 +509,6 @@ export default function GamePage() {
           letterGrid={resultsData?.letterGrid}
           gameCode={gameCode}
           onReturnToRoom={handleReturnToRoom}
-          isHost={isHost}
           username={username}
         />
       );

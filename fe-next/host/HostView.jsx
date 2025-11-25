@@ -744,14 +744,14 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
 
       {/* Validation Modal */}
       <Dialog open={showValidation} onOpenChange={setShowValidation}>
-        <DialogContent className="max-w-4xl max-h-[90vh] overflow-hidden bg-gradient-to-b from-indigo-50 to-purple-50 dark:from-slate-900 dark:to-indigo-950">
-          <DialogHeader>
+        <DialogContent className="max-w-4xl max-h-[90vh] flex flex-col bg-gradient-to-b from-indigo-50 to-purple-50 dark:from-slate-900 dark:to-indigo-950">
+          <DialogHeader className="flex-shrink-0">
             <DialogTitle className="text-center text-3xl sm:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600 dark:from-indigo-400 dark:to-purple-400 flex items-center justify-center gap-3">
               ✓ {t('hostView.validation')}
             </DialogTitle>
           </DialogHeader>
-          <div className="space-y-4">
-            <div className="text-center space-y-2 bg-white/50 dark:bg-slate-800/50 p-4 rounded-lg border border-indigo-200 dark:border-indigo-800">
+          <div className="flex-1 overflow-hidden flex flex-col min-h-0">
+            <div className="flex-shrink-0 text-center space-y-2 bg-white/50 dark:bg-slate-800/50 p-4 rounded-lg border border-indigo-200 dark:border-indigo-800 mb-4">
               <p className="text-sm text-slate-700 dark:text-slate-300">
                 {t('hostView.validateIntro')}
               </p>
@@ -774,8 +774,8 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
               const duplicateCount = uniqueWords.filter(item => item.playerCount > 1).length;
 
               return (
-                <div className="space-y-3">
-                  <div className="flex justify-center gap-4 text-sm">
+                <div className="flex-1 flex flex-col min-h-0 space-y-3">
+                  <div className="flex-shrink-0 flex justify-center gap-4 text-sm">
                     <div className="px-4 py-2 bg-indigo-100 dark:bg-indigo-900/30 rounded-full border border-indigo-300 dark:border-indigo-700">
                       <span className="font-semibold text-indigo-700 dark:text-indigo-300">
                         {t('hostView.totalWords')} {uniqueWords.length}
@@ -795,7 +795,7 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
                     )}
                   </div>
 
-                  <div className="max-h-[50vh] overflow-auto space-y-2 px-1">
+                  <div className="flex-1 overflow-auto space-y-2 px-1 min-h-0">
                     {/* Non-Auto-Verified Words Section */}
                     {nonAutoVerifiedWords.map((item, index) => {
                       const isDuplicate = item.playerCount > 1;
@@ -932,7 +932,7 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
               );
             })()}
           </div>
-          <DialogFooter className="mt-4">
+          <DialogFooter className="flex-shrink-0 mt-4 pt-4 border-t border-indigo-200 dark:border-indigo-800">
             <Button
               onClick={submitValidation}
               className="w-full h-14 text-xl font-bold bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 hover:from-indigo-700 hover:via-purple-700 hover:to-pink-700 shadow-lg hover:shadow-xl transition-all duration-200 text-white"
@@ -1053,6 +1053,11 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
                   setRemainingTime(null);
                   setTournamentData(null);
                   setTournamentMode(false);
+
+                  // Clear word-related state for new game
+                  setValidations({});
+                  setPlayerWords([]);
+                  setPlayerWordCounts({});
 
                   setTimerValue('');
 

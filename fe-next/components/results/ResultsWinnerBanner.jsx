@@ -17,8 +17,9 @@ const celebrationImages = [
   '/winner-celebration/thumbs-up.png',
 ];
 
-const ResultsWinnerBanner = ({ winner }) => {
+const ResultsWinnerBanner = ({ winner, isCurrentUserWinner }) => {
   const { t } = useLanguage();
+  const [imageError, setImageError] = useState(false);
 
   // Randomly select a celebration image (once per winner)
   const randomImage = useMemo(() => {
@@ -48,17 +49,22 @@ const ResultsWinnerBanner = ({ winner }) => {
       <div className="relative rounded-3xl overflow-hidden shadow-2xl min-h-[400px] md:min-h-[500px]">
         {/* Hero Background Image with Blur and Overlay */}
         <div className="absolute inset-0">
-          <motion.img
-            initial={{ scale: 1.2, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            transition={{ duration: 1.5, ease: 'easeOut' }}
-            src={randomImage}
-            alt="celebration"
-            className="absolute inset-0 w-full h-full object-cover"
-            style={{
-              filter: 'brightness(1.2) saturate(1.5) contrast(1.1)',
-            }}
-          />
+          {!imageError ? (
+            <motion.img
+              initial={{ scale: 1.2, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ duration: 1.5, ease: 'easeOut' }}
+              src={randomImage}
+              alt="celebration"
+              onError={() => setImageError(true)}
+              className="absolute inset-0 w-full h-full object-cover"
+              style={{
+                filter: 'brightness(1.2) saturate(1.5) contrast(1.1)',
+              }}
+            />
+          ) : (
+            <div className="absolute inset-0 bg-gradient-to-br from-yellow-400 via-orange-500 to-purple-600" />
+          )}
           {/* Glass glare overlay for depth */}
           <div className="absolute inset-0 bg-gradient-to-br from-white/25 via-transparent to-transparent pointer-events-none" />
           <div className="absolute inset-0 bg-gradient-to-br from-yellow-400/30 via-orange-400/20 to-transparent pointer-events-none" />
@@ -166,6 +172,27 @@ const ResultsWinnerBanner = ({ winner }) => {
                              style={{ filter: 'drop-shadow(0 4px 12px rgba(0,0,0,0.4))' }} />
                   </motion.div>
                 </motion.div>
+
+                {/* You Won! Message for current user */}
+                {isCurrentUserWinner && (
+                  <motion.div
+                    initial={{ scale: 0, rotate: -10 }}
+                    animate={{ scale: 1, rotate: 0 }}
+                    transition={{ delay: 0.7, type: 'spring', stiffness: 200 }}
+                    className="mb-2"
+                  >
+                    <motion.p
+                      animate={{ scale: [1, 1.1, 1] }}
+                      transition={{ duration: 1.5, repeat: Infinity }}
+                      className="text-3xl sm:text-4xl md:text-5xl font-black text-yellow-300"
+                      style={{
+                        textShadow: '0 0 30px rgba(255,215,0,1), 0 0 60px rgba(255,215,0,0.8), 0 4px 12px rgba(0,0,0,0.5)',
+                      }}
+                    >
+                      {t('results.youWon')}
+                    </motion.p>
+                  </motion.div>
+                )}
 
                 {/* Winner Announcement Text */}
                 <motion.h2

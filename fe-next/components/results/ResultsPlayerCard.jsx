@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Badge } from '../ui/badge';
 import { Card } from '../ui/card';
@@ -50,7 +50,7 @@ const WordChip = ({ wordObj, playerCount }) => {
         {label}
       </Badge>
       {isDuplicate && playerCount > 1 && (
-        <span className="absolute -top-2 -right-2 bg-orange-600 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold shadow-md">
+        <span className="absolute -top-2 end-[-8px] bg-orange-600 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold shadow-md">
           {playerCount}
         </span>
       )}
@@ -59,7 +59,7 @@ const WordChip = ({ wordObj, playerCount }) => {
 };
 
 const ResultsPlayerCard = ({ player, index, allPlayerWords, currentUsername, isWinner }) => {
-  const { t } = useLanguage();
+  const { t, dir } = useLanguage();
   // Auto-expand all players' words by default
   const [isWordsExpanded, setIsWordsExpanded] = useState(true);
 
@@ -68,6 +68,34 @@ const ResultsPlayerCard = ({ player, index, allPlayerWords, currentUsername, isW
 
   // Check if this is the current player
   const isCurrentPlayer = currentUsername && player.username === currentUsername;
+
+  // Memoize expensive word categorization and grouping at component level (not inside JSX)
+  const { duplicateWords, invalidWords, wordsByPoints, sortedPointGroups } = useMemo(() => {
+    if (!player.allWords || player.allWords.length === 0) {
+      return { duplicateWords: [], invalidWords: [], wordsByPoints: {}, sortedPointGroups: [] };
+    }
+
+    const duplicateWords = player.allWords.filter(w => w && w.isDuplicate);
+    const invalidWords = player.allWords.filter(w => w && !w.isDuplicate && !w.validated);
+    const validWords = player.allWords.filter(w => w && !w.isDuplicate && w.validated);
+
+    // Group valid words by points
+    const wordsByPoints = {};
+    validWords.forEach(wordObj => {
+      const points = wordObj.score || 0;
+      if (!wordsByPoints[points]) {
+        wordsByPoints[points] = [];
+      }
+      wordsByPoints[points].push(wordObj);
+    });
+
+    // Sort point groups in descending order
+    const sortedPointGroups = Object.keys(wordsByPoints)
+      .map(Number)
+      .sort((a, b) => b - a);
+
+    return { duplicateWords, invalidWords, wordsByPoints, sortedPointGroups };
+  }, [player.allWords]);
   const showWinnerMessage = isCurrentPlayer && isWinner;
 
   // Calculate how many players found each word
@@ -107,10 +135,10 @@ const ResultsPlayerCard = ({ player, index, allPlayerWords, currentUsername, isW
       <Card
         className={cn(
           "p-4 sm:p-5 md:p-6 border-2 transition-all duration-300 rounded-xl shadow-lg hover:shadow-xl relative overflow-hidden",
-          getCardStyle(),
+          !avatar?.color && getCardStyle(),
           isWordsExpanded && "ring-2 ring-purple-400/50 shadow-[0_0_20px_rgba(168,85,247,0.3)]"
         )}
-        style={avatar?.color && index > 2 ? {
+        style={avatar?.color ? {
           background: `linear-gradient(135deg, ${avatar.color}30, ${avatar.color}50)`,
           borderColor: `${avatar.color}80`
         } : {}}
@@ -121,7 +149,9 @@ const ResultsPlayerCard = ({ player, index, allPlayerWords, currentUsername, isW
         <div className="flex justify-between items-center mb-3 sm:mb-4 relative z-10">
           <div className="flex items-center gap-3">
             <motion.div
-              animate={index < 3 ? { rotate: [0, -10, 10, -10, 0] } : {}}
+              animate={index < 3 ? {
+                rotate: dir === 'rtl' ? [0, 10, -10, 10, 0] : [0, -10, 10, -10, 0]
+              } : {}}
               transition={index < 3 ? { duration: 2, repeat: Infinity, repeatDelay: 5 } : {}}
               className="text-3xl font-bold"
             >
@@ -136,7 +166,7 @@ const ResultsPlayerCard = ({ player, index, allPlayerWords, currentUsername, isW
               <h3 className="text-xl font-bold text-slate-900 dark:text-white">
                 {player.username}
                 {isCurrentPlayer && (
-                  <span className="ml-2 text-sm text-cyan-600 dark:text-cyan-400">({t('leaderboard.me')})</span>
+                  <span className="ml-2 text-sm text-cyan-600 dark:text-cyan-400">({t('playerView.me')})</span>
                 )}
               </h3>
               {showWinnerMessage && (
@@ -202,93 +232,68 @@ const ResultsPlayerCard = ({ player, index, allPlayerWords, currentUsername, isW
                 transition={{ duration: 0.3 }}
                 className="overflow-hidden"
               >
-                {/* Group words by points */}
-                {(() => {
-                  // Separate words into categories
-                  const duplicateWords = player.allWords.filter(w => w.isDuplicate);
-                  const invalidWords = player.allWords.filter(w => !w.isDuplicate && !w.validated);
-                  const validWords = player.allWords.filter(w => !w.isDuplicate && w.validated);
-
-                  // Group valid words by points
-                  const wordsByPoints = {};
-                  validWords.forEach(wordObj => {
-                    const points = wordObj.score;
-                    if (!wordsByPoints[points]) {
-                      wordsByPoints[points] = [];
-                    }
-                    wordsByPoints[points].push(wordObj);
-                  });
-
-                  // Sort point groups in descending order
-                  const sortedPointGroups = Object.keys(wordsByPoints)
-                    .map(Number)
-                    .sort((a, b) => b - a);
-
-                  return (
-                    <div className="space-y-4 pt-2">
-                      {/* Valid Words Grouped by Points */}
-                      {sortedPointGroups.map(points => (
-                        <div key={`points-${points}`}>
-                          <div
-                            className="text-xs font-bold mb-2 uppercase tracking-wide flex items-center gap-2"
-                            style={{ color: POINT_COLORS[points] || POINT_COLORS[8] }}
-                          >
-                            <span className="w-6 h-6 rounded-full flex items-center justify-center text-white font-bold text-sm"
-                                  style={{ backgroundColor: POINT_COLORS[points] || POINT_COLORS[8] }}>
-                              {points}
-                            </span>
-                            {t('results.pointWords', { points })} ({wordsByPoints[points].length})
-                          </div>
-                          <div className="flex flex-wrap gap-2">
-                            {wordsByPoints[points].map((wordObj, i) => (
-                              <WordChip
-                                key={`${points}-${i}`}
-                                wordObj={wordObj}
-                                playerCount={getPlayerCountForWord(wordObj.word)}
-                              />
-                            ))}
-                          </div>
-                        </div>
-                      ))}
-
-                      {/* Duplicate Words */}
-                      {duplicateWords.length > 0 && (
-                        <div>
-                          <div className="text-xs font-bold text-orange-600 dark:text-orange-400 mb-2 uppercase tracking-wide">
-                            {t('results.shared')} ({duplicateWords.length})
-                          </div>
-                          <div className="flex flex-wrap gap-2">
-                            {duplicateWords.map((wordObj, i) => (
-                              <WordChip
-                                key={`duplicate-${i}`}
-                                wordObj={wordObj}
-                                playerCount={getPlayerCountForWord(wordObj.word)}
-                              />
-                            ))}
-                          </div>
-                        </div>
-                      )}
-
-                      {/* Invalid Words */}
-                      {invalidWords.length > 0 && (
-                        <div>
-                          <div className="text-xs font-bold text-gray-600 dark:text-gray-400 mb-2 uppercase tracking-wide">
-                            {t('results.invalid')} ({invalidWords.length})
-                          </div>
-                          <div className="flex flex-wrap gap-2">
-                            {invalidWords.map((wordObj, i) => (
-                              <WordChip
-                                key={`invalid-${i}`}
-                                wordObj={wordObj}
-                                playerCount={getPlayerCountForWord(wordObj.word)}
-                              />
-                            ))}
-                          </div>
-                        </div>
-                      )}
+                <div className="space-y-4 pt-2">
+                  {/* Valid Words Grouped by Points */}
+                  {sortedPointGroups.map(points => (
+                    <div key={`points-${points}`}>
+                      <div
+                        className="text-xs font-bold mb-2 uppercase tracking-wide flex items-center gap-2"
+                        style={{ color: POINT_COLORS[points] || POINT_COLORS[8] }}
+                      >
+                        <span className="w-6 h-6 rounded-full flex items-center justify-center text-white font-bold text-sm"
+                              style={{ backgroundColor: POINT_COLORS[points] || POINT_COLORS[8] }}>
+                          {points}
+                        </span>
+                        {t('results.pointWords', { points })} ({wordsByPoints[points].length})
+                      </div>
+                      <div className="flex flex-wrap gap-2">
+                        {wordsByPoints[points].map((wordObj, i) => (
+                          <WordChip
+                            key={`${points}-${i}`}
+                            wordObj={wordObj}
+                            playerCount={getPlayerCountForWord(wordObj.word)}
+                          />
+                        ))}
+                      </div>
                     </div>
-                  );
-                })()}
+                  ))}
+
+                  {/* Duplicate Words */}
+                  {duplicateWords.length > 0 && (
+                    <div>
+                      <div className="text-xs font-bold text-orange-600 dark:text-orange-400 mb-2 uppercase tracking-wide">
+                        {t('results.shared')} ({duplicateWords.length})
+                      </div>
+                      <div className="flex flex-wrap gap-2">
+                        {duplicateWords.map((wordObj, i) => (
+                          <WordChip
+                            key={`duplicate-${i}`}
+                            wordObj={wordObj}
+                            playerCount={getPlayerCountForWord(wordObj.word)}
+                          />
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Invalid Words */}
+                  {invalidWords.length > 0 && (
+                    <div>
+                      <div className="text-xs font-bold text-gray-600 dark:text-gray-400 mb-2 uppercase tracking-wide">
+                        {t('results.invalid')} ({invalidWords.length})
+                      </div>
+                      <div className="flex flex-wrap gap-2">
+                        {invalidWords.map((wordObj, i) => (
+                          <WordChip
+                            key={`invalid-${i}`}
+                            wordObj={wordObj}
+                            playerCount={getPlayerCountForWord(wordObj.word)}
+                          />
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
               </motion.div>
             )}
           </AnimatePresence>

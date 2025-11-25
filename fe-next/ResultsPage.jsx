@@ -94,7 +94,7 @@ const ResultsPage = ({ finalScores, letterGrid, gameCode, onReturnToRoom, userna
       {/* Main Content Area */}
       <div className="flex-1 max-w-4xl mx-auto w-full">
         {/* Winner Banner */}
-        {winner && <ResultsWinnerBanner winner={winner} />}
+        {winner && <ResultsWinnerBanner winner={winner} isCurrentUserWinner={winner.username === username} />}
 
         {/* Letter Grid */}
         {letterGrid && (

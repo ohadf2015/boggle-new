@@ -7,43 +7,35 @@ import { locales } from '../lib/i18n';
 
 const LanguageContext = createContext();
 
+const parseLocaleFromPath = (pathname) => {
+    if (!pathname) return null;
+    const segments = pathname.split('/');
+    const locale = segments[1];
+    return locales.includes(locale) ? locale : null;
+};
+
 export const LanguageProvider = ({ children, initialLanguage }) => {
     const router = useRouter();
     const pathname = usePathname();
-    // Use initialLanguage from props, fallback to pathname locale, or default to 'he'
+
+    // Determine initial language
     const getInitialLanguage = () => {
         if (initialLanguage) return initialLanguage;
-        // Only try to parse pathname on client side
         if (typeof window !== 'undefined' && pathname) {
-            const segments = pathname.split('/');
-            const localeFromPath = segments[1];
-            if (locales.includes(localeFromPath)) return localeFromPath;
+            const pathLocale = parseLocaleFromPath(pathname);
+            if (pathLocale) return pathLocale;
         }
         return 'en';
     };
-    const [language, setLanguageState] = useState(() => {
-        // Use lazy initial state to avoid SSR issues
-        return initialLanguage || 'en';
-    });
 
+    const [language, setLanguageState] = useState(getInitialLanguage);
+
+    // Sync language when pathname or initialLanguage changes
     useEffect(() => {
-        // On client side, check the pathname and update language if needed
-        if (typeof window !== 'undefined' && pathname && !initialLanguage) {
-            const segments = pathname.split('/');
-            const localeFromPath = segments[1];
-            if (locales.includes(localeFromPath) && localeFromPath !== language) {
-                // Defer state update to avoid synchronous setState
-                Promise.resolve().then(() => {
-                    setLanguageState(localeFromPath);
-                });
-            }
-        }
-        // If initialLanguage is provided and different, use it
-        else if (initialLanguage && initialLanguage !== language) {
-            // Defer state update to avoid synchronous setState
-            Promise.resolve().then(() => {
-                setLanguageState(initialLanguage);
-            });
+        const newLang = initialLanguage || (pathname ? parseLocaleFromPath(pathname) : null) || 'en';
+        if (newLang !== language) {
+            // Use queueMicrotask to avoid setState during render warning
+            queueMicrotask(() => setLanguageState(newLang));
         }
     }, [initialLanguage, pathname, language]);
 
