@@ -494,6 +494,7 @@ export default function GamePage() {
           gameCode={gameCode}
           onReturnToRoom={handleReturnToRoom}
           isHost={isHost}
+          username={username}
         />
       );
     }
@@ -518,7 +519,7 @@ export default function GamePage() {
     }
 
     if (isHost) {
-      return <HostView gameCode={gameCode} roomLanguage={roomLanguage} initialPlayers={playersInRoom} />;
+      return <HostView gameCode={gameCode} roomLanguage={roomLanguage} initialPlayers={playersInRoom} username={username} />;
     }
 
     return (

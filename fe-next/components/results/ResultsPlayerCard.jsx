@@ -45,13 +45,17 @@ const WordChip = ({ wordObj, index, playerCount, t }) => {
   );
 };
 
-const ResultsPlayerCard = ({ player, index, allPlayerWords }) => {
+const ResultsPlayerCard = ({ player, index, allPlayerWords, currentUsername, isWinner }) => {
   const { t } = useLanguage();
   // Auto-expand all players' words by default
   const [isWordsExpanded, setIsWordsExpanded] = useState(true);
 
   // Extract avatar info if available
   const avatar = player.avatar || null;
+
+  // Check if this is the current player
+  const isCurrentPlayer = currentUsername && player.username === currentUsername;
+  const showWinnerMessage = isCurrentPlayer && isWinner;
 
   // Calculate how many players found each word
   const getPlayerCountForWord = (word) => {
@@ -109,14 +113,27 @@ const ResultsPlayerCard = ({ player, index, allPlayerWords }) => {
               {getRankIcon()}
             </motion.div>
             {avatar?.emoji && (
-              <div className="text-3xl">
+              <div className="text-3xl" style={{ imageRendering: 'crisp-edges' }}>
                 {avatar.emoji}
               </div>
             )}
             <div>
               <h3 className="text-xl font-bold text-slate-900 dark:text-white">
                 {player.username}
+                {isCurrentPlayer && (
+                  <span className="ml-2 text-sm text-cyan-600 dark:text-cyan-400">({t('leaderboard.me')})</span>
+                )}
               </h3>
+              {showWinnerMessage && (
+                <motion.p
+                  initial={{ scale: 0, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  transition={{ delay: 0.3, type: 'spring', stiffness: 200 }}
+                  className="text-base font-bold text-yellow-600 dark:text-yellow-400"
+                >
+                  🎉 {t('results.youWon')} 🎉
+                </motion.p>
+              )}
               <p className="text-sm text-slate-600 dark:text-slate-400">
                 {player.wordCount} {t('hostView.words')}
                 {player.validWordCount !== undefined && ` • ${player.validWordCount} ${t('results.valid')}`}
@@ -170,17 +187,55 @@ const ResultsPlayerCard = ({ player, index, allPlayerWords }) => {
                 transition={{ duration: 0.3 }}
                 className="overflow-hidden"
               >
-                <div className="flex flex-wrap gap-2 pt-2">
-                  {player.allWords.map((wordObj, i) => (
-                    <WordChip
-                      key={i}
-                      wordObj={wordObj}
-                      index={i}
-                      playerCount={getPlayerCountForWord(wordObj.word)}
-                      t={t}
-                    />
-                  ))}
-                </div>
+                {/* Group words by verification status */}
+                {(() => {
+                  const unverifiedWords = player.allWords.filter(w => !w.autoVerified);
+                  const autoVerifiedWords = player.allWords.filter(w => w.autoVerified);
+
+                  return (
+                    <div className="space-y-4 pt-2">
+                      {/* Unverified Words Group */}
+                      {unverifiedWords.length > 0 && (
+                        <div>
+                          <div className="text-xs font-bold text-orange-600 dark:text-orange-400 mb-2 uppercase tracking-wide">
+                            {t('results.needsVerification')} ({unverifiedWords.length})
+                          </div>
+                          <div className="flex flex-wrap gap-2">
+                            {unverifiedWords.map((wordObj, i) => (
+                              <WordChip
+                                key={`unverified-${i}`}
+                                wordObj={wordObj}
+                                index={i}
+                                playerCount={getPlayerCountForWord(wordObj.word)}
+                                t={t}
+                              />
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Auto Verified Words Group */}
+                      {autoVerifiedWords.length > 0 && (
+                        <div>
+                          <div className="text-xs font-bold text-green-600 dark:text-green-400 mb-2 uppercase tracking-wide">
+                            {t('results.autoVerified')} ({autoVerifiedWords.length})
+                          </div>
+                          <div className="flex flex-wrap gap-2">
+                            {autoVerifiedWords.map((wordObj, i) => (
+                              <WordChip
+                                key={`verified-${i}`}
+                                wordObj={wordObj}
+                                index={i}
+                                playerCount={getPlayerCountForWord(wordObj.word)}
+                                t={t}
+                              />
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })()}
               </motion.div>
             )}
           </AnimatePresence>

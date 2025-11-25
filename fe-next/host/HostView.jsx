@@ -30,7 +30,7 @@ import { useLanguage } from '../contexts/LanguageContext';
 import { DIFFICULTIES, DEFAULT_DIFFICULTY } from '../utils/consts';
 import { cn } from '../lib/utils';
 
-const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [] }) => {
+const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [], username }) => {
   const { t, language } = useLanguage();
   const { socket } = useSocket();
   const intentionalExitRef = useRef(false);
@@ -895,7 +895,14 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
                           allPlayerWords[p.username] = p.allWords || [];
                         });
                         return (
-                          <ResultsPlayerCard key={player.username} player={player} index={index} allPlayerWords={allPlayerWords} />
+                          <ResultsPlayerCard
+                            key={player.username}
+                            player={player}
+                            index={index}
+                            allPlayerWords={allPlayerWords}
+                            currentUsername={username}
+                            isWinner={index === 0}
+                          />
                         );
                       })}
                     </div>
@@ -931,7 +938,14 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
                     allPlayerWords[p.username] = p.allWords || [];
                   });
                   return (
-                    <ResultsPlayerCard key={player.username} player={player} index={index} allPlayerWords={allPlayerWords} />
+                    <ResultsPlayerCard
+                      key={player.username}
+                      player={player}
+                      index={index}
+                      allPlayerWords={allPlayerWords}
+                      currentUsername={username}
+                      isWinner={index === 0}
+                    />
                   );
                 })}
               </div>

@@ -341,64 +341,89 @@ const GridComponent = ({
                 gradient: 'from-yellow-400 to-orange-500',
                 border: 'border-yellow-300',
                 shadow: 'shadow-lg',
-                text: null // Don't show x1
+                text: null, // Don't show x1
+                flicker: false
             };
         } else if (level === 1) {
             return {
                 gradient: 'from-orange-400 to-red-500',
                 border: 'border-orange-300',
                 shadow: 'shadow-[0_0_15px_rgba(251,146,60,0.6)]',
-                text: multiplier
+                text: multiplier,
+                flicker: false
             };
         } else if (level === 2) {
             return {
                 gradient: 'from-red-400 to-pink-500',
                 border: 'border-red-300',
                 shadow: 'shadow-[0_0_20px_rgba(239,68,68,0.7)]',
-                text: multiplier
+                text: multiplier,
+                flicker: false
             };
         } else if (level === 3) {
             return {
                 gradient: 'from-pink-400 to-purple-500',
                 border: 'border-pink-300',
                 shadow: 'shadow-[0_0_25px_rgba(236,72,153,0.8)]',
-                text: multiplier
+                text: multiplier,
+                flicker: false
             };
         } else if (level === 4) {
             return {
                 gradient: 'from-purple-400 via-pink-500 to-red-500',
                 border: 'border-purple-300',
                 shadow: 'shadow-[0_0_30px_rgba(168,85,247,0.9)]',
-                text: multiplier
+                text: multiplier,
+                flicker: false
             };
         } else if (level === 5) {
             return {
                 gradient: 'from-purple-400 via-blue-500 to-cyan-400',
                 border: 'border-cyan-300',
                 shadow: 'shadow-[0_0_35px_rgba(34,211,238,1)]',
-                text: multiplier
+                text: multiplier,
+                flicker: false
             };
         } else if (level === 6) {
             return {
-                gradient: 'from-blue-400 via-green-500 to-yellow-400',
-                border: 'border-green-300',
-                shadow: 'shadow-[0_0_40px_rgba(34,197,94,1)]',
-                text: multiplier
+                gradient: 'from-cyan-400 via-teal-500 to-green-400',
+                border: 'border-teal-300',
+                shadow: 'shadow-[0_0_40px_rgba(20,184,166,1)]',
+                text: multiplier,
+                flicker: false
             };
         } else if (level === 7) {
             return {
-                gradient: 'from-green-400 via-yellow-500 to-orange-400',
-                border: 'border-yellow-300',
-                shadow: 'shadow-[0_0_45px_rgba(250,204,21,1)]',
-                text: multiplier
+                gradient: 'from-green-400 via-lime-500 to-yellow-400',
+                border: 'border-lime-300',
+                shadow: 'shadow-[0_0_45px_rgba(132,204,22,1)]',
+                text: multiplier,
+                flicker: false
+            };
+        } else if (level === 8) {
+            return {
+                gradient: 'from-yellow-400 via-orange-500 to-red-500',
+                border: 'border-orange-300',
+                shadow: 'shadow-[0_0_50px_rgba(251,146,60,1)]',
+                text: multiplier,
+                flicker: false
+            };
+        } else if (level === 9) {
+            return {
+                gradient: 'from-red-500 via-pink-500 to-purple-500',
+                border: 'border-pink-300',
+                shadow: 'shadow-[0_0_55px_rgba(236,72,153,1)]',
+                text: multiplier,
+                flicker: false
             };
         } else {
-            // Level 8+: Full rainbow gradient that animates
+            // Level 10+: Full rainbow gradient with flicker animation
             return {
-                gradient: 'from-red-500 via-yellow-500 via-green-500 via-blue-500 via-indigo-500 to-purple-500 bg-[length:200%_200%] animate-gradient-xy',
+                gradient: 'from-red-500 via-yellow-500 via-green-500 via-cyan-500 via-blue-500 via-purple-500 to-pink-500 bg-[length:400%_400%]',
                 border: 'border-white',
-                shadow: 'shadow-[0_0_50px_rgba(255,255,255,1)]',
-                text: multiplier
+                shadow: 'shadow-[0_0_60px_rgba(255,255,255,1)]',
+                text: multiplier,
+                flicker: true
             };
         }
     };
@@ -433,7 +458,7 @@ const GridComponent = ({
                         initial={{ scale: 0, opacity: 0, x: '-50%', y: '-50%' }}
                         animate={{
                             scale: [0, 1.5, 1.2],
-                            opacity: [0, 1, 0],
+                            opacity: comboColors.flicker ? [0, 1, 0.7, 1, 0.8, 1, 0] : [0, 1, 0],
                             x: ['-50%', '-50%', '-50%'],
                             y: ['-50%', '-50%', '-150%']
                         }}
@@ -443,24 +468,34 @@ const GridComponent = ({
                             transition: { duration: 0.1 }
                         }}
                         transition={{
-                            duration: 0.8,
-                            times: [0, 0.4, 1],
+                            duration: comboColors.flicker ? 1.2 : 0.8,
+                            times: comboColors.flicker ? [0, 0.2, 0.3, 0.5, 0.7, 0.9, 1] : [0, 0.4, 1],
                             ease: "easeOut"
                         }}
                         className="fixed top-1/2 left-1/2 z-50 pointer-events-none"
                         style={{ transform: 'translate(-50%, -50%)' }}
                     >
-                        <div className={cn(
-                            "px-6 py-3 rounded-full font-extrabold text-3xl md:text-4xl text-white backdrop-blur-sm",
-                            `bg-gradient-to-r ${comboColors.gradient}`,
-                            comboColors.shadow,
-                            "border-4 border-white/40"
-                        )}
-                        style={{
-                            filter: 'drop-shadow(0 0 20px rgba(251, 146, 60, 0.8))'
-                        }}>
+                        <motion.div
+                            className={cn(
+                                "px-6 py-3 rounded-full font-extrabold text-3xl md:text-4xl text-white backdrop-blur-sm",
+                                `bg-gradient-to-r ${comboColors.gradient}`,
+                                comboColors.shadow,
+                                "border-4 border-white/40"
+                            )}
+                            animate={comboColors.flicker ? {
+                                backgroundPosition: ['0% 50%', '100% 50%', '0% 50%'],
+                            } : {}}
+                            transition={comboColors.flicker ? {
+                                duration: 2,
+                                repeat: Infinity,
+                                ease: "linear"
+                            } : {}}
+                            style={{
+                                filter: 'drop-shadow(0 0 20px rgba(251, 146, 60, 0.8))'
+                            }}
+                        >
                             🔥 {comboColors.text}
-                        </div>
+                        </motion.div>
                     </motion.div>
                 )}
             </AnimatePresence>
@@ -564,7 +599,12 @@ const GridComponent = ({
                                     ? `bg-gradient-to-br ${comboColors.gradient} text-white ${comboColors.border} z-10 ${comboColors.shadow} border-white/40`
                                     : "bg-gradient-to-br from-slate-100 via-white to-slate-100 dark:from-slate-700 dark:via-slate-800 dark:to-slate-900 text-slate-900 dark:text-white border-slate-300/60 dark:border-slate-600/60 hover:scale-105 hover:shadow-xl dark:hover:bg-slate-700/80 active:scale-95 shadow-[0_4px_12px_rgba(0,0,0,0.1)]"
                             )}
-                            style={{ borderRadius: '8px' }}
+                            style={{
+                                borderRadius: '8px',
+                                ...(isSelected && comboColors.flicker ? {
+                                    animation: 'flicker 0.15s infinite alternate'
+                                } : {})
+                            }}
                         >
                             {/* Ripple effect on selection */}
                             {isSelected && (

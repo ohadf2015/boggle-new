@@ -49,7 +49,7 @@ const SlotMachineText = ({ text, duration = 1000 }) => {
 
     return (
         <span
-            className={`slot-machine-text ${isAnimating ? 'animating' : 'complete'}`}
+            className={`slot-machine-text ${isAnimating ? 'animating' : 'complete'} text-right`}
             style={{
                 '--glow-intensity': glowIntensity,
                 textShadow: `
@@ -60,7 +60,8 @@ const SlotMachineText = ({ text, duration = 1000 }) => {
                 fontWeight: 700,
                 letterSpacing: '0.05em',
                 verticalAlign: 'middle',
-                lineHeight: 1
+                lineHeight: 1,
+                textAlign: 'right'
             }}
         >
             {displayedText}

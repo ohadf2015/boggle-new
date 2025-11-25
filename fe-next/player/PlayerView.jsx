@@ -169,7 +169,7 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
 
         const now = Date.now();
         if (lastWordTime && (now - lastWordTime) < 5000) {
-          setComboLevel(prev => Math.min(prev + 1, 4));
+          setComboLevel(prev => prev + 1);
         } else {
           setComboLevel(0);
         }

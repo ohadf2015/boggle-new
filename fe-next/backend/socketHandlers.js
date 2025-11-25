@@ -260,6 +260,22 @@ function initializeSocketHandlers(io) {
         language: game.language
       });
 
+      // If game is in progress, allow player to join mid-game
+      if (game.gameState === 'in-progress') {
+        console.log(`[SOCKET] ${username} joining game ${gameCode} in progress - allowing participation`);
+
+        socket.emit('startGame', {
+          letterGrid: game.letterGrid,
+          timerSeconds: game.timerSeconds,
+          language: game.language,
+          messageId: 'late-join-' + Date.now()
+        });
+
+        // Send current leaderboard
+        const leaderboard = getLeaderboard(gameCode);
+        socket.emit('updateLeaderboard', { leaderboard });
+      }
+
       // Broadcast user list update
       broadcastToRoom(io, getGameRoom(gameCode), 'updateUsers', {
         users: getGameUsers(gameCode)
@@ -498,13 +514,39 @@ function initializeSocketHandlers(io) {
         updatePlayerScore(gameCode, username, score, false);
       }
 
+      // Build word count map to detect duplicates
+      const wordCountMap = {};
+      for (const words of Object.values(playerWords)) {
+        for (const word of words) {
+          wordCountMap[word] = (wordCountMap[word] || 0) + 1;
+        }
+      }
+
       // Convert scores to array format for frontend
-      const scoresArray = Object.entries(validatedScores).map(([username, score]) => ({
-        username,
-        score,
-        allWords: game.playerWords?.[username] || [],
-        avatar: game.users?.[username]?.avatar || null
-      })).sort((a, b) => b.score - a.score);
+      const scoresArray = Object.entries(validatedScores).map(([username, score]) => {
+        const playerWordsList = game.playerWords?.[username] || [];
+
+        // Transform word strings to objects with validation metadata
+        const allWords = playerWordsList.map(word => {
+          const isValid = validWords.has(word);
+          const isDuplicate = wordCountMap[word] > 1;
+          const wordScore = isValid ? Math.max(0, word.length - 1) : 0;
+
+          return {
+            word: word,
+            score: isDuplicate ? 0 : wordScore, // Duplicates get 0 points
+            validated: isValid,
+            isDuplicate: isDuplicate
+          };
+        });
+
+        return {
+          username,
+          score,
+          allWords,
+          avatar: game.users?.[username]?.avatar || null
+        };
+      }).sort((a, b) => b.score - a.score);
 
       // Log validation results
       console.log(`[SOCKET] Validation complete for game ${gameCode}:`, {

@@ -32,7 +32,7 @@ const LetterGrid = ({ letterGrid }) => {
   );
 };
 
-const ResultsPage = ({ finalScores, letterGrid, gameCode, onReturnToRoom }) => {
+const ResultsPage = ({ finalScores, letterGrid, gameCode, onReturnToRoom, username }) => {
   const { t } = useLanguage();
   const [showExitConfirm, setShowExitConfirm] = useState(false);
 
@@ -152,6 +152,8 @@ const ResultsPage = ({ finalScores, letterGrid, gameCode, onReturnToRoom }) => {
               player={player}
               index={index}
               allPlayerWords={allPlayerWords}
+              currentUsername={username}
+              isWinner={index === 0}
             />
           ))}
         </div>
