@@ -1137,8 +1137,15 @@ const sendAllPlayerAMessage = (gameCode, message) => {
     return; // No players to send to
   }
 
+  // For startGame, exclude the host from broadcast since host initiates and doesn't need the message
+  const users = message.action === 'startGame'
+    ? Object.fromEntries(
+        Object.entries(game.users).filter(([username]) => username !== game.hostUsername)
+      )
+    : game.users;
+
   // Use broadcast helper for efficient sending
-  const result = broadcast(game.users, message, `BROADCAST-${gameCode}`);
+  const result = broadcast(users, message, `BROADCAST-${gameCode}`);
 
   // Log any failed deliveries for critical messages like startGame
   if (message.action === 'startGame' && result.failedCount > 0) {
