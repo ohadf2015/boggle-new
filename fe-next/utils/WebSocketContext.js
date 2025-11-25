@@ -1,17 +1,17 @@
-import { createContext, useContext } from 'react';
+/**
+ * WebSocket Context - Legacy Compatibility Layer
+ * This file re-exports from SocketContext for backwards compatibility.
+ * All new code should use SocketContext directly.
+ */
 
-export const WebSocketContext = createContext(null);
-
-export const useWebSocket = () => {
-  const ws = useContext(WebSocketContext);
-  if (!ws) {
-    throw new Error('useWebSocket must be used within a WebSocketContext.Provider. Make sure your component is wrapped with a WebSocketContext.Provider.');
-  }
-  return ws;
-};
-
-// Optional hook for cases where WebSocket might not be available yet
-export const useWebSocketOptional = () => {
-  const ws = useContext(WebSocketContext);
-  return ws;
-};
+export {
+  SocketContext as WebSocketContext,
+  SocketProvider,
+  useSocket,
+  useSocketOptional,
+  useSocketEvent,
+  useSocketEmit,
+  useGameSocket,
+  useWebSocket,
+  useWebSocketOptional,
+} from './SocketContext';

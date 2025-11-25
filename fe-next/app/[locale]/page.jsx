@@ -2,700 +2,524 @@
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import toast from 'react-hot-toast';
+import { io } from 'socket.io-client';
 import HostView from '@/host/HostView';
 import PlayerView from '@/player/PlayerView';
 import JoinView from '@/JoinView';
 import ResultsPage from '@/ResultsPage.jsx';
 import Header from '@/components/Header';
-import { WebSocketContext } from '@/utils/WebSocketContext';
+import { SocketContext } from '@/utils/SocketContext';
 import { saveSession, getSession, clearSession } from '@/utils/session';
 import { useLanguage } from '@/contexts/LanguageContext';
 
 // Force dynamic rendering to prevent static generation issues
 export const dynamic = 'force-dynamic';
 
-const WS_CONFIG = {
-    MAX_RECONNECT_ATTEMPTS: 10,
-    BASE_RECONNECT_DELAY: 1000,
-    MAX_RECONNECT_DELAY: 30000,
-    HEARTBEAT_INTERVAL: 25000,
-    HIGH_LATENCY_THRESHOLD: 1000,
-    VERY_HIGH_LATENCY_THRESHOLD: 3000,
-    HOST_REACTIVATION_INTERVAL: 30000, // Send reactivation signal every 30 seconds when visible
+const SOCKET_CONFIG = {
+  RECONNECTION_ATTEMPTS: 10,
+  RECONNECTION_DELAY: 1000,
+  RECONNECTION_DELAY_MAX: 30000,
+  PING_INTERVAL: 25000,
+  PING_TIMEOUT: 60000,
+  HOST_KEEP_ALIVE_INTERVAL: 30000,
 };
 
-let globalWsInstance = null;
-let globalWsInitialized = false;
+// Singleton socket instance
+let globalSocketInstance = null;
 
-const getWebSocketURL = () => {
-    if (process.env.NEXT_PUBLIC_WS_URL) {
-        return process.env.NEXT_PUBLIC_WS_URL;
-    }
+const getSocketURL = () => {
+  if (process.env.NEXT_PUBLIC_WS_URL) {
+    // Convert ws:// to http:// for Socket.IO
+    return process.env.NEXT_PUBLIC_WS_URL.replace(/^ws:/, 'http:').replace(/^wss:/, 'https:');
+  }
 
-    if (process.env.NODE_ENV === 'development') {
-        return 'ws://localhost:3001';
-    }
+  if (process.env.NODE_ENV === 'development') {
+    return 'http://localhost:3001';
+  }
 
-    if (typeof window === 'undefined') return '';
+  if (typeof window === 'undefined') return '';
 
-    const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-    const host = window.location.host;
-    return `${protocol}//${host}`;
-};
-
-const useWebSocketConnection = () => {
-    const wsRef = useRef(null);
-    const reconnectTimeoutRef = useRef(null);
-    const reconnectAttemptsRef = useRef(0);
-    const heartbeatIntervalRef = useRef(null);
-    const isConnectingRef = useRef(false);
-    const messageHandlerRef = useRef(null);
-    const hasInitializedRef = useRef(false);
-    const [connectionError, setConnectionError] = useState('');
-    const lastPingTimeRef = useRef(null);
-    const [connectionQuality, setConnectionQuality] = useState('good');
-    const highLatencyWarningShownRef = useRef(false);
-    const { t } = useLanguage();
-
-    const checkLatency = useCallback((latency) => {
-        if (latency > WS_CONFIG.VERY_HIGH_LATENCY_THRESHOLD) {
-            setConnectionQuality('poor');
-            if (!highLatencyWarningShownRef.current) {
-                toast.error(t('errors.unstableConnection'), {
-                    duration: 5000,
-                    icon: '⚠️',
-                });
-                highLatencyWarningShownRef.current = true;
-                setTimeout(() => {
-                    highLatencyWarningShownRef.current = false;
-                }, 30000);
-            }
-        } else if (latency > WS_CONFIG.HIGH_LATENCY_THRESHOLD) {
-            setConnectionQuality('unstable');
-            if (!highLatencyWarningShownRef.current) {
-                toast.warning(t('errors.slowConnection'), {
-                    duration: 3000,
-                    icon: '⚠️',
-                });
-                highLatencyWarningShownRef.current = true;
-                setTimeout(() => {
-                    highLatencyWarningShownRef.current = false;
-                }, 30000);
-            }
-        } else {
-            setConnectionQuality('good');
-        }
-    }, [t]);
-
-    const startHeartbeat = useCallback((ws) => {
-        if (heartbeatIntervalRef.current) {
-            clearInterval(heartbeatIntervalRef.current);
-        }
-        heartbeatIntervalRef.current = setInterval(() => {
-            if (ws.readyState === WebSocket.OPEN) {
-                lastPingTimeRef.current = Date.now();
-                ws.send(JSON.stringify({ action: 'ping' }));
-            }
-        }, WS_CONFIG.HEARTBEAT_INTERVAL);
-    }, []);
-
-    const stopHeartbeat = useCallback(() => {
-        if (heartbeatIntervalRef.current) {
-            clearInterval(heartbeatIntervalRef.current);
-            heartbeatIntervalRef.current = null;
-        }
-    }, []);
-
-    const connectWebSocketRef = useRef(null);
-
-    const connectWebSocket = useCallback(() => {
-        if (typeof window === 'undefined') return;
-
-        if (globalWsInitialized && globalWsInstance && globalWsInstance.readyState <= 1) {
-            wsRef.current = globalWsInstance;
-            isConnectingRef.current = false;
-            hasInitializedRef.current = true;
-            return;
-        }
-
-        if (isConnectingRef.current) {
-            return;
-        }
-
-        if (wsRef.current) {
-            const state = wsRef.current.readyState;
-            if (state === WebSocket.OPEN || state === WebSocket.CONNECTING) {
-                return;
-            }
-        }
-
-        if (hasInitializedRef.current && wsRef.current && wsRef.current.readyState <= 1) {
-            return;
-        }
-
-        hasInitializedRef.current = true;
-        globalWsInitialized = true;
-        isConnectingRef.current = true;
-
-        try {
-            const ws = new WebSocket(getWebSocketURL());
-            wsRef.current = ws;
-            globalWsInstance = ws;
-
-            ws.onopen = () => {
-                isConnectingRef.current = false;
-                reconnectAttemptsRef.current = 0;
-                setConnectionError('');
-
-                startHeartbeat(ws);
-
-                if (ws.readyState === WebSocket.OPEN) {
-                    ws.send(JSON.stringify({ action: 'getActiveRooms' }));
-                }
-            };
-
-            ws.onmessage = (event) => {
-                if (messageHandlerRef.current) {
-                    messageHandlerRef.current(event);
-                }
-            };
-
-            ws.onerror = (error) => {
-                console.error('[WS] Error:', error);
-                isConnectingRef.current = false;
-                hasInitializedRef.current = false;
-            };
-
-            ws.onclose = (event) => {
-                isConnectingRef.current = false;
-                stopHeartbeat();
-
-                if (ws === globalWsInstance) {
-                    globalWsInstance = null;
-                    globalWsInitialized = false;
-                }
-
-                if (event.code !== 1000 && reconnectAttemptsRef.current < WS_CONFIG.MAX_RECONNECT_ATTEMPTS) {
-                    const delay = Math.min(
-                        WS_CONFIG.BASE_RECONNECT_DELAY * Math.pow(2, reconnectAttemptsRef.current),
-                        WS_CONFIG.MAX_RECONNECT_DELAY
-                    );
-
-                    reconnectTimeoutRef.current = setTimeout(() => {
-                        reconnectAttemptsRef.current += 1;
-                        hasInitializedRef.current = false;
-                        // Use ref to call the function recursively
-                        if (connectWebSocketRef.current) {
-                            connectWebSocketRef.current();
-                        }
-                    }, delay);
-                } else if (event.code !== 1000) {
-                    console.error('[WS] Connection lost');
-                    setConnectionError(t('errors.unstableConnection'));
-                }
-            };
-        } catch (error) {
-            console.error('[WS] Error creating WebSocket:', error);
-            isConnectingRef.current = false;
-            setConnectionError(t('errors.unstableConnection'));
-        }
-    }, [startHeartbeat, stopHeartbeat, t]);
-
-    // Store the function in ref for recursive calls
-    useEffect(() => {
-        connectWebSocketRef.current = connectWebSocket;
-    }, [connectWebSocket]);
-
-    const setMessageHandler = useCallback((handler) => {
-        messageHandlerRef.current = handler;
-    }, []);
-
-    const cleanup = useCallback(() => {
-        if (reconnectTimeoutRef.current) {
-            clearTimeout(reconnectTimeoutRef.current);
-        }
-        stopHeartbeat();
-
-        if (wsRef.current && wsRef.current === globalWsInstance) {
-            if (wsRef.current.readyState !== WebSocket.CLOSED) {
-                wsRef.current.close();
-            }
-            globalWsInstance = null;
-            globalWsInitialized = false;
-        }
-
-        hasInitializedRef.current = false;
-        isConnectingRef.current = false;
-    }, [stopHeartbeat]);
-
-    return { wsRef, connectWebSocket, setMessageHandler, cleanup, connectionError, checkLatency, lastPingTimeRef, connectionQuality };
+  const protocol = window.location.protocol;
+  const host = window.location.host;
+  return `${protocol}//${host}`;
 };
 
 export default function GamePage() {
-    const [gameCode, setGameCode] = useState('');
-    const [username, setUsername] = useState('');
-    const [roomName, setRoomName] = useState('');
-    const [isActive, setIsActive] = useState(false);
-    const [isHost, setIsHost] = useState(false);
-    const [error, setError] = useState('');
-    const [activeRooms, setActiveRooms] = useState([]);
-    const [showResults, setShowResults] = useState(false);
-    const [resultsData, setResultsData] = useState(null);
-    const [attemptingReconnect, setAttemptingReconnect] = useState(false);
-    const [roomLanguage, setRoomLanguage] = useState(null);
-    const [playersInRoom, setPlayersInRoom] = useState([]);
+  const [gameCode, setGameCode] = useState('');
+  const [username, setUsername] = useState('');
+  const [roomName, setRoomName] = useState('');
+  const [isActive, setIsActive] = useState(false);
+  const [isHost, setIsHost] = useState(false);
+  const [error, setError] = useState('');
+  const [activeRooms, setActiveRooms] = useState([]);
+  const [showResults, setShowResults] = useState(false);
+  const [resultsData, setResultsData] = useState(null);
+  const [attemptingReconnect, setAttemptingReconnect] = useState(false);
+  const [roomLanguage, setRoomLanguage] = useState(null);
+  const [playersInRoom, setPlayersInRoom] = useState([]);
+  const [socket, setSocket] = useState(null);
+  const [isConnected, setIsConnected] = useState(false);
 
-    const { wsRef, connectWebSocket, setMessageHandler, cleanup, connectionError, checkLatency, lastPingTimeRef } = useWebSocketConnection();
-    const [ws, setWs] = useState(null);
-    const { t, language } = useLanguage();
+  const socketRef = useRef(null);
+  const attemptingReconnectRef = useRef(attemptingReconnect);
+  const hostKeepAliveIntervalRef = useRef(null);
+  const wasConnectedRef = useRef(false);
 
-    const attemptingReconnectRef = useRef(attemptingReconnect);
+  const { t, language } = useLanguage();
 
-    // Track if we should auto-join (prefilled room + existing username)
-    const [shouldAutoJoin, setShouldAutoJoin] = useState(false);
-    const [prefilledRoomCode, setPrefilledRoomCode] = useState('');
+  // Track if we should auto-join (prefilled room + existing username)
+  const [shouldAutoJoin, setShouldAutoJoin] = useState(false);
+  const [prefilledRoomCode, setPrefilledRoomCode] = useState('');
 
-    // Track host reactivation
-    const hostReactivationIntervalRef = useRef(null);
-    const lastVisibilityChangeRef = useRef(0);
+  // Initialize state from URL and session
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
 
-    useEffect(() => {
-        if (typeof window === 'undefined') return;
+    const initializeState = () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      const roomFromUrl = urlParams.get('room');
+      const savedUsername = localStorage.getItem('boggle_username') || '';
+      const savedSession = getSession();
 
-        // Defer state updates to avoid synchronous setState in effect
-        const initializeState = () => {
-            const urlParams = new URLSearchParams(window.location.search);
-            const roomFromUrl = urlParams.get('room');
-            const savedUsername = localStorage.getItem('boggle_username') || '';
-            const savedSession = getSession();
+      let joiningNewRoomViaInvitation = false;
+      const hasSession = savedSession && savedSession.gameCode;
 
-            // Track if we're joining a new room via invitation
-            let joiningNewRoomViaInvitation = false;
-
-            // Check if user intentionally exited (session was cleared)
-            const hasSession = savedSession && savedSession.gameCode;
-
-            // URL room takes priority over saved session (explicit invitation)
-            if (roomFromUrl) {
-                setGameCode(roomFromUrl);
-                setPrefilledRoomCode(roomFromUrl);
-                // Clear the old session if joining a different room via invitation
-                if (savedSession?.gameCode && savedSession.gameCode !== roomFromUrl) {
-                    clearSession();
-                    joiningNewRoomViaInvitation = true;
-                }
-                // If player has saved username and comes via invitation link, mark for auto-join
-                // Set username first to ensure it's available when auto-join triggers
-                if (savedUsername && savedUsername.trim()) {
-                    setUsername(savedUsername);
-                    setShouldAutoJoin(true);
-                }
-            } else if (hasSession) {
-                // No URL room, try to reconnect to saved session only if session exists
-                // If session was cleared (user clicked exit), don't auto-reconnect
-                setGameCode(savedSession.gameCode);
-                setAttemptingReconnect(true);
-            }
-
-            // When joining a new room via invitation, use localStorage username
-            // Otherwise, prefer session username (for reconnection)
-            // Note: For invitation links with savedUsername, username is already set above
-            if (roomFromUrl && savedUsername) {
-                // Already set above for auto-join
-            } else if (joiningNewRoomViaInvitation) {
-                if (savedUsername) {
-                    setUsername(savedUsername);
-                }
-            } else if (savedSession?.username) {
-                setUsername(savedSession.username);
-            } else if (savedUsername) {
-                setUsername(savedUsername);
-            }
-
-            // Only restore room name if not joining a new room via invitation
-            if (!joiningNewRoomViaInvitation && savedSession?.roomName) {
-                setRoomName(savedSession.roomName);
-            }
-        };
-
-        // Use Promise.resolve().then() to defer execution
-        Promise.resolve().then(initializeState);
-    }, []);
-
-    useEffect(() => {
-        attemptingReconnectRef.current = attemptingReconnect;
-    }, [attemptingReconnect]);
-
-    useEffect(() => {
-        const interval = setInterval(() => {
-            if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN && wsRef.current !== ws) {
-                setWs(wsRef.current);
-            }
-        }, 100);
-
-        return () => clearInterval(interval);
-    }, [ws, wsRef]);
-
-    const handleWebSocketMessage = useCallback((event) => {
-        try {
-            const message = JSON.parse(event.data);
-            const { action, isHost: isHostResponse, rooms, language: roomLang } = message;
-
-            switch (action) {
-                case 'updateUsers':
-                    if (message.users) {
-                        setPlayersInRoom(message.users);
-                    }
-                    break;
-
-                case 'joined':
-                    setIsHost(isHostResponse);
-                    setIsActive(true);
-                    setError('');
-                    setAttemptingReconnect(false);
-                    if (roomLang) {
-                        setRoomLanguage(roomLang);
-                    }
-
-                    // Host now also has a username
-                    const joinedUsername = message.username || username;
-                    if (isHostResponse) {
-                        setUsername(joinedUsername);
-                        localStorage.setItem('boggle_username', joinedUsername);
-                    } else if (username) {
-                        localStorage.setItem('boggle_username', username);
-                    }
-
-                    saveSession({
-                        gameCode,
-                        username: joinedUsername,
-                        isHost: isHostResponse,
-                        roomName: isHostResponse ? roomName : '',
-                        language: roomLang || roomLanguage, // Save room language
-                    });
-                    break;
-
-                case 'hostTransferred':
-                    // Handle host transfer - check if we're the new host
-                    if (message.newHost === username) {
-                        setIsHost(true);
-                        // Update session to reflect host status
-                        saveSession({
-                            gameCode,
-                            username,
-                            isHost: true,
-                            roomName: roomName || username,
-                            language: roomLanguage,
-                        });
-                        toast.success(t('hostView.youAreNowHost'), {
-                            duration: 5000,
-                            icon: '👑',
-                        });
-                    } else {
-                        toast.info(`${message.newHost} ${t('hostView.newHostAssigned')}`, {
-                            duration: 3000,
-                            icon: '🔄',
-                        });
-                    }
-                    break;
-
-                case 'gameDoesNotExist':
-                    if (attemptingReconnectRef.current) {
-                        setError(t('errors.sessionExpired'));
-                        toast.error(t('errors.sessionExpired'), {
-                            duration: 4000,
-                            icon: '⚠️',
-                        });
-                        setGameCode('');
-                    } else {
-                        setError(t('errors.gameCodeNotExist'));
-                        toast.error(t('errors.gameCodeNotExist'), {
-                            duration: 4000,
-                            icon: '❌',
-                        });
-                        setGameCode('');
-                    }
-                    setIsActive(false);
-                    setAttemptingReconnect(false);
-                    setShouldAutoJoin(false);
-                    clearSession();
-                    break;
-
-                case 'usernameTaken':
-                    setError(t('errors.usernameTaken'));
-                    setIsActive(false);
-                    setAttemptingReconnect(false);
-                    setShouldAutoJoin(false);
-                    clearSession();
-                    break;
-
-                case 'gameExists':
-                    setError(t('errors.gameCodeExists'));
-                    setIsActive(false);
-                    setIsHost(false);
-                    setAttemptingReconnect(false);
-                    break;
-
-                case 'activeRooms':
-                    setActiveRooms(rooms || []);
-                    break;
-
-                case 'pong':
-                    if (lastPingTimeRef.current) {
-                        const latency = Date.now() - lastPingTimeRef.current;
-                        checkLatency(latency);
-                    }
-                    break;
-
-                default:
-                    break;
-            }
-        } catch (error) {
-            console.error('Error parsing WebSocket message:', error);
+      if (roomFromUrl) {
+        setGameCode(roomFromUrl);
+        setPrefilledRoomCode(roomFromUrl);
+        if (savedSession?.gameCode && savedSession.gameCode !== roomFromUrl) {
+          clearSession();
+          joiningNewRoomViaInvitation = true;
         }
-    }, [username, gameCode, roomName, checkLatency, lastPingTimeRef, t, roomLanguage]);
-
-    useEffect(() => {
-        connectWebSocket();
-        return () => {
-            cleanup();
-        };
-    }, [connectWebSocket, cleanup]);
-
-    const sendMessage = useCallback((message) => {
-        const ws = wsRef.current;
-        if (!ws) return;
-
-        if (ws.readyState === WebSocket.OPEN) {
-            ws.send(JSON.stringify(message));
-        } else if (ws.readyState === WebSocket.CONNECTING) {
-            const onOpen = () => {
-                ws.send(JSON.stringify(message));
-                ws.removeEventListener('open', onOpen);
-            };
-            ws.addEventListener('open', onOpen);
+        if (savedUsername && savedUsername.trim()) {
+          setUsername(savedUsername);
+          setShouldAutoJoin(true);
         }
-    }, [wsRef]);
+      } else if (hasSession) {
+        setGameCode(savedSession.gameCode);
+        setAttemptingReconnect(true);
+      }
 
-    // Host visibility change handler - reactivate room when host returns to the browser
-    useEffect(() => {
-        if (typeof window === 'undefined' || !isActive || !isHost) return;
-
-        const handleVisibilityChange = () => {
-            if (document.visibilityState === 'visible') {
-                lastVisibilityChangeRef.current = Date.now();
-
-                // Send reactivation signal immediately when host returns
-                if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN && gameCode) {
-                    sendMessage({
-                        action: 'hostReactivate',
-                        gameCode,
-                        timestamp: Date.now()
-                    });
-                }
-            }
-        };
-
-        // Set up periodic keep-alive when host is active and visible
-        const startKeepAlive = () => {
-            if (hostReactivationIntervalRef.current) {
-                clearInterval(hostReactivationIntervalRef.current);
-            }
-
-            hostReactivationIntervalRef.current = setInterval(() => {
-                if (document.visibilityState === 'visible' &&
-                    wsRef.current &&
-                    wsRef.current.readyState === WebSocket.OPEN &&
-                    gameCode) {
-                    sendMessage({
-                        action: 'hostKeepAlive',
-                        gameCode,
-                        timestamp: Date.now()
-                    });
-                }
-            }, WS_CONFIG.HOST_REACTIVATION_INTERVAL);
-        };
-
-        document.addEventListener('visibilitychange', handleVisibilityChange);
-        startKeepAlive();
-
-        // Send initial reactivation signal
-        if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN && gameCode) {
-            sendMessage({
-                action: 'hostReactivate',
-                gameCode,
-                timestamp: Date.now()
-            });
+      if (roomFromUrl && savedUsername) {
+        // Already set above
+      } else if (joiningNewRoomViaInvitation) {
+        if (savedUsername) {
+          setUsername(savedUsername);
         }
+      } else if (savedSession?.username) {
+        setUsername(savedSession.username);
+      } else if (savedUsername) {
+        setUsername(savedUsername);
+      }
 
-        return () => {
-            document.removeEventListener('visibilitychange', handleVisibilityChange);
-            if (hostReactivationIntervalRef.current) {
-                clearInterval(hostReactivationIntervalRef.current);
-                hostReactivationIntervalRef.current = null;
-            }
-        };
-    }, [isActive, isHost, gameCode, sendMessage, wsRef]);
-
-    useEffect(() => {
-        setMessageHandler(handleWebSocketMessage);
-    }, [handleWebSocketMessage, setMessageHandler]);
-
-    useEffect(() => {
-        if (connectionError) {
-            // Defer state update to avoid synchronous setState
-            Promise.resolve().then(() => {
-                setError(connectionError);
-            });
-        }
-    }, [connectionError]);
-
-    // Auto-join effect for players coming via invitation link with existing username
-    useEffect(() => {
-        // Use `ws` state variable which updates when WebSocket becomes ready
-        if (!shouldAutoJoin || !ws || ws.readyState !== WebSocket.OPEN || isActive || attemptingReconnect) {
-            return;
-        }
-
-        // Player has prefilled room code and saved username - auto-join
-        if (prefilledRoomCode && username && username.trim()) {
-            // Add a small delay to ensure all states are settled and WebSocket is fully ready
-            const autoJoinTimeout = setTimeout(() => {
-                if (ws && ws.readyState === WebSocket.OPEN && !isActive) {
-                    sendMessage({ action: 'join', gameCode: prefilledRoomCode, username });
-                    setShouldAutoJoin(false); // Prevent re-triggering
-                }
-            }, 200);
-            return () => clearTimeout(autoJoinTimeout);
-        }
-    }, [shouldAutoJoin, prefilledRoomCode, username, isActive, attemptingReconnect, ws, sendMessage]);
-
-    useEffect(() => {
-        // Use `ws` state variable which updates when WebSocket becomes ready
-        if (!attemptingReconnect || !ws || ws.readyState !== WebSocket.OPEN || isActive) {
-            return;
-        }
-
-        const savedSession = getSession();
-        if (!savedSession?.gameCode) {
-            // Defer state update to avoid synchronous setState
-            Promise.resolve().then(() => {
-                setAttemptingReconnect(false);
-            });
-            return;
-        }
-
-        // Add a small delay to ensure the old connection is fully closed on the backend
-        // This prevents race conditions when the host refreshes the page
-        const reconnectTimeout = setTimeout(() => {
-            if (savedSession.isHost) {
-                if (!savedSession.roomName) {
-                    clearSession();
-                    setAttemptingReconnect(false);
-                    return;
-                }
-                sendMessage({
-                    action: 'createGame',
-                    gameCode: savedSession.gameCode,
-                    roomName: savedSession.roomName,
-                    hostUsername: savedSession.roomName,
-                    language: savedSession.language || language, // Restore room language
-                });
-            } else {
-                if (!savedSession.username) {
-                    clearSession();
-                    setAttemptingReconnect(false);
-                    return;
-                }
-                sendMessage({
-                    action: 'join',
-                    gameCode: savedSession.gameCode,
-                    username: savedSession.username,
-                });
-            }
-        }, 1000); // 1 second delay to allow disconnect to process
-
-        return () => clearTimeout(reconnectTimeout);
-    }, [attemptingReconnect, isActive, sendMessage, ws, language]);
-
-    const handleJoin = useCallback((isHostMode, roomLanguage) => {
-        setError('');
-
-        if (isHostMode) {
-            // Use roomName as both the room name and host's username
-            sendMessage({ action: 'createGame', gameCode, roomName, hostUsername: roomName, language: roomLanguage || language });
-        } else {
-            sendMessage({ action: 'join', gameCode, username });
-        }
-    }, [sendMessage, gameCode, username, roomName, language]);
-
-    const refreshRooms = useCallback(() => {
-        sendMessage({ action: 'getActiveRooms' });
-    }, [sendMessage]);
-
-    const handleReturnToRoom = useCallback(() => {
-        setShowResults(false);
-        setResultsData(null);
-    }, []);
-
-    const handleShowResults = useCallback((data) => {
-        setResultsData(data);
-        setShowResults(true);
-    }, []);
-
-    const renderView = () => {
-        if (showResults) {
-            return (
-                <ResultsPage
-                    finalScores={resultsData?.scores}
-                    letterGrid={resultsData?.letterGrid}
-                    gameCode={gameCode}
-                    onReturnToRoom={handleReturnToRoom}
-                    isHost={isHost}
-                />
-            );
-        }
-
-        if (!isActive) {
-            return (
-                <JoinView
-                    handleJoin={handleJoin}
-                    gameCode={gameCode}
-                    username={username}
-                    roomName={roomName}
-                    setGameCode={setGameCode}
-                    setUsername={setUsername}
-                    setRoomName={setRoomName}
-                    error={error}
-                    activeRooms={activeRooms}
-                    refreshRooms={refreshRooms}
-                    prefilledRoom={prefilledRoomCode}
-                    isAutoJoining={shouldAutoJoin}
-                />
-            );
-        }
-
-        if (isHost) {
-            return <HostView gameCode={gameCode} roomLanguage={roomLanguage} initialPlayers={playersInRoom} />;
-        }
-
-        return (
-            <PlayerView
-                handleJoin={handleJoin}
-                gameCode={gameCode}
-                username={username}
-                setGameCode={setGameCode}
-                setUsername={setUsername}
-                onShowResults={handleShowResults}
-                initialPlayers={playersInRoom}
-            />
-        );
+      if (!joiningNewRoomViaInvitation && savedSession?.roomName) {
+        setRoomName(savedSession.roomName);
+      }
     };
 
+    Promise.resolve().then(initializeState);
+  }, []);
+
+  useEffect(() => {
+    attemptingReconnectRef.current = attemptingReconnect;
+  }, [attemptingReconnect]);
+
+  // Initialize Socket.IO connection
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    // Use existing socket if available
+    if (globalSocketInstance && globalSocketInstance.connected) {
+      socketRef.current = globalSocketInstance;
+      setSocket(globalSocketInstance);
+      setIsConnected(true);
+      return;
+    }
+
+    const socketUrl = getSocketURL();
+    console.log('[SOCKET.IO] Connecting to:', socketUrl);
+
+    const newSocket = io(socketUrl, {
+      transports: ['websocket', 'polling'],
+      reconnectionAttempts: SOCKET_CONFIG.RECONNECTION_ATTEMPTS,
+      reconnectionDelay: SOCKET_CONFIG.RECONNECTION_DELAY,
+      reconnectionDelayMax: SOCKET_CONFIG.RECONNECTION_DELAY_MAX,
+      timeout: 20000,
+      autoConnect: true,
+    });
+
+    globalSocketInstance = newSocket;
+    socketRef.current = newSocket;
+
+    // Connection events
+    newSocket.on('connect', () => {
+      console.log('[SOCKET.IO] Connected:', newSocket.id);
+      setIsConnected(true);
+      setSocket(newSocket);
+
+      // Request active rooms on connect
+      newSocket.emit('getActiveRooms');
+
+      // Handle reconnection to game
+      if (wasConnectedRef.current) {
+        const savedSession = getSession();
+        if (savedSession?.gameCode) {
+          console.log('[SOCKET.IO] Reconnecting to game:', savedSession.gameCode);
+          toast.success(t('common.reconnecting') || 'Reconnecting to game...', {
+            duration: 2000,
+            icon: '🔄',
+          });
+
+          if (savedSession.isHost) {
+            newSocket.emit('createGame', {
+              gameCode: savedSession.gameCode,
+              roomName: savedSession.roomName,
+              language: savedSession.language || language,
+              hostUsername: savedSession.username || savedSession.roomName,
+            });
+          } else {
+            newSocket.emit('join', {
+              gameCode: savedSession.gameCode,
+              username: savedSession.username,
+            });
+          }
+        }
+      }
+      wasConnectedRef.current = true;
+    });
+
+    newSocket.on('disconnect', (reason) => {
+      console.log('[SOCKET.IO] Disconnected:', reason);
+      setIsConnected(false);
+
+      if (reason === 'io server disconnect') {
+        newSocket.connect();
+      }
+    });
+
+    newSocket.on('connect_error', (error) => {
+      console.error('[SOCKET.IO] Connection error:', error.message);
+      setError(t('errors.unstableConnection') || 'Connection error');
+    });
+
+    newSocket.on('reconnect', (attemptNumber) => {
+      console.log('[SOCKET.IO] Reconnected after', attemptNumber, 'attempts');
+      setIsConnected(true);
+      toast.success(t('common.reconnected') || 'Reconnected!', {
+        duration: 2000,
+        icon: '✓',
+      });
+    });
+
+    newSocket.on('reconnect_failed', () => {
+      console.error('[SOCKET.IO] Reconnection failed');
+      setError(t('errors.connectionLost') || 'Connection lost');
+    });
+
+    // Game events
+    newSocket.on('joined', (data) => {
+      console.log('[SOCKET.IO] Joined:', data);
+      setIsHost(data.isHost);
+      setIsActive(true);
+      setError('');
+      setAttemptingReconnect(false);
+      setShouldAutoJoin(false);
+
+      if (data.language) {
+        setRoomLanguage(data.language);
+      }
+
+      const joinedUsername = data.username || username;
+      if (data.isHost) {
+        setUsername(joinedUsername);
+        localStorage.setItem('boggle_username', joinedUsername);
+      } else if (username) {
+        localStorage.setItem('boggle_username', username);
+      }
+
+      saveSession({
+        gameCode: data.gameCode || gameCode,
+        username: joinedUsername,
+        isHost: data.isHost,
+        roomName: data.isHost ? roomName : '',
+        language: data.language || roomLanguage,
+      });
+    });
+
+    newSocket.on('updateUsers', (data) => {
+      if (data.users) {
+        setPlayersInRoom(data.users);
+      }
+    });
+
+    newSocket.on('activeRooms', (data) => {
+      setActiveRooms(data.rooms || []);
+    });
+
+    newSocket.on('error', (data) => {
+      console.error('[SOCKET.IO] Error:', data);
+
+      // Handle specific error cases
+      if (data.message?.includes('not found') || data.message?.includes('Game not found')) {
+        if (attemptingReconnectRef.current) {
+          setError(t('errors.sessionExpired'));
+          toast.error(t('errors.sessionExpired'), { duration: 4000, icon: '⚠️' });
+        } else {
+          setError(t('errors.gameCodeNotExist'));
+          toast.error(t('errors.gameCodeNotExist'), { duration: 4000, icon: '❌' });
+        }
+        setGameCode('');
+        setIsActive(false);
+        setAttemptingReconnect(false);
+        setShouldAutoJoin(false);
+        clearSession();
+      } else if (data.message?.includes('already in use') || data.message?.includes('Game code already')) {
+        setError(t('errors.gameCodeExists'));
+        setIsActive(false);
+        setIsHost(false);
+        setAttemptingReconnect(false);
+      } else if (data.message?.includes('username') || data.message?.includes('Username')) {
+        setError(t('errors.usernameTaken'));
+        setIsActive(false);
+        setAttemptingReconnect(false);
+        setShouldAutoJoin(false);
+        clearSession();
+      } else {
+        setError(data.message || 'An error occurred');
+      }
+    });
+
+    newSocket.on('hostLeftRoomClosing', (data) => {
+      toast.error(data.message || t('playerView.roomClosed'), {
+        icon: '🚪',
+        duration: 5000,
+      });
+      clearSession();
+      setIsActive(false);
+      setIsHost(false);
+      setGameCode('');
+      setTimeout(() => window.location.reload(), 2000);
+    });
+
+    newSocket.on('hostTransferred', (data) => {
+      if (data.newHost === username) {
+        setIsHost(true);
+        saveSession({
+          gameCode,
+          username,
+          isHost: true,
+          roomName: roomName || username,
+          language: roomLanguage,
+        });
+        toast.success(t('hostView.youAreNowHost'), { duration: 5000, icon: '👑' });
+      } else {
+        toast.info(`${data.newHost} ${t('hostView.newHostAssigned')}`, { duration: 3000, icon: '🔄' });
+      }
+    });
+
+    newSocket.on('pong', () => {
+      // Heartbeat response - connection is alive
+    });
+
+    setSocket(newSocket);
+
+    return () => {
+      console.log('[SOCKET.IO] Cleaning up');
+      newSocket.removeAllListeners();
+      // Don't disconnect on cleanup - let it persist
+    };
+  }, [t, language]);
+
+  // Host keep-alive
+  useEffect(() => {
+    if (!isActive || !isHost || !socket || !isConnected) {
+      if (hostKeepAliveIntervalRef.current) {
+        clearInterval(hostKeepAliveIntervalRef.current);
+        hostKeepAliveIntervalRef.current = null;
+      }
+      return;
+    }
+
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible' && socket && isConnected) {
+        socket.emit('hostReactivate', { gameCode });
+      }
+    };
+
+    hostKeepAliveIntervalRef.current = setInterval(() => {
+      if (document.visibilityState === 'visible' && socket && isConnected) {
+        socket.emit('hostKeepAlive', { gameCode });
+      }
+    }, SOCKET_CONFIG.HOST_KEEP_ALIVE_INTERVAL);
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    // Send initial reactivation
+    socket.emit('hostReactivate', { gameCode });
+
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      if (hostKeepAliveIntervalRef.current) {
+        clearInterval(hostKeepAliveIntervalRef.current);
+        hostKeepAliveIntervalRef.current = null;
+      }
+    };
+  }, [isActive, isHost, socket, isConnected, gameCode]);
+
+  // Auto-join effect
+  useEffect(() => {
+    if (!shouldAutoJoin || !socket || !isConnected || isActive || attemptingReconnect) {
+      return;
+    }
+
+    if (prefilledRoomCode && username && username.trim()) {
+      const autoJoinTimeout = setTimeout(() => {
+        if (socket && isConnected && !isActive) {
+          socket.emit('join', { gameCode: prefilledRoomCode, username });
+          setShouldAutoJoin(false);
+        }
+      }, 200);
+      return () => clearTimeout(autoJoinTimeout);
+    }
+  }, [shouldAutoJoin, prefilledRoomCode, username, isActive, attemptingReconnect, socket, isConnected]);
+
+  // Session reconnection
+  useEffect(() => {
+    if (!attemptingReconnect || !socket || !isConnected || isActive) {
+      return;
+    }
+
+    const savedSession = getSession();
+    if (!savedSession?.gameCode) {
+      Promise.resolve().then(() => setAttemptingReconnect(false));
+      return;
+    }
+
+    const reconnectTimeout = setTimeout(() => {
+      if (savedSession.isHost) {
+        if (!savedSession.roomName) {
+          clearSession();
+          setAttemptingReconnect(false);
+          return;
+        }
+        socket.emit('createGame', {
+          gameCode: savedSession.gameCode,
+          roomName: savedSession.roomName,
+          hostUsername: savedSession.roomName,
+          language: savedSession.language || language,
+        });
+      } else {
+        if (!savedSession.username) {
+          clearSession();
+          setAttemptingReconnect(false);
+          return;
+        }
+        socket.emit('join', {
+          gameCode: savedSession.gameCode,
+          username: savedSession.username,
+        });
+      }
+    }, 500);
+
+    return () => clearTimeout(reconnectTimeout);
+  }, [attemptingReconnect, isActive, socket, isConnected, language]);
+
+  const handleJoin = useCallback((isHostMode, roomLang) => {
+    if (!socket || !isConnected) {
+      setError(t('errors.notConnected') || 'Not connected to server');
+      return;
+    }
+
+    setError('');
+
+    if (isHostMode) {
+      socket.emit('createGame', {
+        gameCode,
+        roomName,
+        hostUsername: roomName,
+        language: roomLang || language,
+      });
+    } else {
+      socket.emit('join', { gameCode, username });
+    }
+  }, [socket, isConnected, gameCode, username, roomName, language, t]);
+
+  const refreshRooms = useCallback(() => {
+    if (socket && isConnected) {
+      socket.emit('getActiveRooms');
+    }
+  }, [socket, isConnected]);
+
+  const handleReturnToRoom = useCallback(() => {
+    setShowResults(false);
+    setResultsData(null);
+  }, []);
+
+  const handleShowResults = useCallback((data) => {
+    setResultsData(data);
+    setShowResults(true);
+  }, []);
+
+  // Create context value
+  const socketContextValue = {
+    socket,
+    isConnected,
+    connectionError: error,
+  };
+
+  const renderView = () => {
+    if (showResults) {
+      return (
+        <ResultsPage
+          finalScores={resultsData?.scores}
+          letterGrid={resultsData?.letterGrid}
+          gameCode={gameCode}
+          onReturnToRoom={handleReturnToRoom}
+          isHost={isHost}
+        />
+      );
+    }
+
+    if (!isActive) {
+      return (
+        <JoinView
+          handleJoin={handleJoin}
+          gameCode={gameCode}
+          username={username}
+          roomName={roomName}
+          setGameCode={setGameCode}
+          setUsername={setUsername}
+          setRoomName={setRoomName}
+          error={error}
+          activeRooms={activeRooms}
+          refreshRooms={refreshRooms}
+          prefilledRoom={prefilledRoomCode}
+          isAutoJoining={shouldAutoJoin}
+        />
+      );
+    }
+
+    if (isHost) {
+      return <HostView gameCode={gameCode} roomLanguage={roomLanguage} initialPlayers={playersInRoom} />;
+    }
+
     return (
-        <WebSocketContext.Provider value={ws}>
-            <Header />
-            {renderView()}
-        </WebSocketContext.Provider>
+      <PlayerView
+        handleJoin={handleJoin}
+        gameCode={gameCode}
+        username={username}
+        setGameCode={setGameCode}
+        setUsername={setUsername}
+        onShowResults={handleShowResults}
+        initialPlayers={playersInRoom}
+      />
     );
+  };
+
+  return (
+    <SocketContext.Provider value={socketContextValue}>
+      <Header />
+      {renderView()}
+    </SocketContext.Provider>
+  );
 }

@@ -704,12 +704,8 @@ const startServerTimer = (gameCode, totalSeconds) => {
       games[gameCode].timerInterval = null;
       clearInterval(intervalId);
 
-      // RACE CONDITION FIX: Check host still exists before calling handleEndGame
-      if (games[gameCode].host) {
-        handleEndGame(games[gameCode].host);
-      } else {
-        console.warn(`[TIMER] No host found for game ${gameCode}, cannot end game`);
-      }
+      // Call handleEndGame with gameCode directly - this works even if host is AFK/disconnected
+      handleEndGame(gameCode);
     }
   }, 1000); // Broadcast every second
 
@@ -717,11 +713,34 @@ const startServerTimer = (gameCode, totalSeconds) => {
   games[gameCode].timerInterval = intervalId;
 }
 
-const handleEndGame = (host) => {
-  const gameCode = gameWs.get(host);
+// End game - can be called with host WebSocket or gameCode directly
+// This allows the game to end even if host is disconnected (e.g., timer expiry)
+const handleEndGame = (hostOrGameCode) => {
+  let gameCode;
+
+  // Support both WebSocket and direct gameCode
+  if (typeof hostOrGameCode === 'string') {
+    // Called with gameCode directly (for timer expiry when host is AFK)
+    gameCode = hostOrGameCode;
+  } else {
+    // Called with WebSocket (host)
+    gameCode = gameWs.get(hostOrGameCode);
+
+    // If WebSocket mapping doesn't exist, try to find the game by host reference
+    if (!gameCode) {
+      // Search for game where this WS is the host
+      for (const [code, game] of Object.entries(games)) {
+        if (game.host === hostOrGameCode) {
+          gameCode = code;
+          console.log(`[END_GAME] Found game ${gameCode} by host reference (mapping was missing)`);
+          break;
+        }
+      }
+    }
+  }
 
   // Safety check: ensure game still exists
-  if (!games[gameCode]) {
+  if (!gameCode || !games[gameCode]) {
     console.warn(`[END_GAME] Game ${gameCode} no longer exists, skipping end game`);
     return;
   }
@@ -892,8 +911,8 @@ const handleEndGame = (host) => {
         }
       });
 
-      // Call the validation handler
-      handleValidateWords(games[gameCode].host, autoValidations, games[gameCode].letterGrid);
+      // Call the validation handler using gameCode directly (works even if host is AFK/disconnected)
+      handleValidateWords(gameCode, autoValidations, games[gameCode].letterGrid);
 
       // Notify host that auto-validation occurred
       sendHostAMessage(gameCode, {
@@ -907,7 +926,12 @@ const handleEndGame = (host) => {
 const handleSendAnswer = (ws, foundWords) => {
   const gameCode = gameWs.get(ws);
   const username = wsUsername.get(ws);
-  const wsHost = getWsHostFromGameCode(gameCode);
+
+  if (!gameCode || !games[gameCode]) {
+    console.warn(`[SEND_ANSWER] Invalid game - gameCode: ${gameCode}, username: ${username}`);
+    return;
+  }
+
   sendHostAMessage(gameCode, { action: "updateScores", username, foundWords });
 }
 
@@ -944,8 +968,44 @@ const handleWordSubmission = (ws, word) => {
   const gameCode = gameWs.get(ws);
   const username = wsUsername.get(ws);
 
+  // Handle case where WebSocket isn't properly mapped to a game
+  // This typically happens when the client reconnects but hasn't re-joined the game yet
+  if (!gameCode) {
+    console.warn(`[WORD_SUBMIT] WebSocket not mapped to any game - username: ${username}, clientId: ${ws.clientId || 'unknown'}`);
+    console.warn('[WORD_SUBMIT] This usually means the player reconnected but the client did not re-send join message');
+    // Try to send helpful error to player
+    if (ws && ws.readyState === 1) {
+      try {
+        ws.send(JSON.stringify({
+          action: "error",
+          message: "Connection not properly established. Please refresh the page.",
+          code: "NOT_IN_GAME"
+        }));
+      } catch (error) {
+        console.error("[WORD_SUBMIT] Error sending not-in-game error:", error);
+      }
+    }
+    return;
+  }
+
   if (!games[gameCode]) {
-    console.warn(`Invalid game code for word submission: ${gameCode}`);
+    console.warn(`[WORD_SUBMIT] Game ${gameCode} no longer exists`);
+    // Notify player that game ended
+    if (ws && ws.readyState === 1) {
+      try {
+        ws.send(JSON.stringify({
+          action: "error",
+          message: "Game has ended",
+          code: "GAME_ENDED"
+        }));
+        ws.send(JSON.stringify({ action: "endGame" }));
+      } catch (error) {
+        console.error("[WORD_SUBMIT] Error sending game-ended error:", error);
+      }
+    }
+    // Clean up the stale mapping
+    gameWs.delete(ws);
+    wsUsername.delete(ws);
     return;
   }
 
@@ -1376,7 +1436,8 @@ const handleDisconnect = (ws, wss) => {
            clearInterval(games[gameCode].timerInterval);
            games[gameCode].timerInterval = null;
          }
-         handleEndGame(games[gameCode].host);
+         // Use gameCode directly to ensure it works even if host is disconnected
+         handleEndGame(gameCode);
       }
 
   }
@@ -1388,10 +1449,32 @@ const handleDisconnect = (ws, wss) => {
 };
 
 // Handle word validation by host - THIS IS WHERE SCORING HAPPENS
-const handleValidateWords = (host, validations, letterGrid) => {
-  const gameCode = gameWs.get(host);
-  if (!games[gameCode]) {
-    console.error("Game not found for validation");
+// Can be called with host WebSocket or gameCode directly (for auto-validation when host is AFK)
+const handleValidateWords = (hostOrGameCode, validations, letterGrid) => {
+  let gameCode;
+
+  // Support both WebSocket and direct gameCode
+  if (typeof hostOrGameCode === 'string') {
+    // Called with gameCode directly (for auto-validation when host is AFK)
+    gameCode = hostOrGameCode;
+  } else {
+    // Called with WebSocket (host)
+    gameCode = gameWs.get(hostOrGameCode);
+
+    // If WebSocket mapping doesn't exist, try to find the game by host reference
+    if (!gameCode) {
+      for (const [code, game] of Object.entries(games)) {
+        if (game.host === hostOrGameCode) {
+          gameCode = code;
+          console.log(`[VALIDATE] Found game ${gameCode} by host reference (mapping was missing)`);
+          break;
+        }
+      }
+    }
+  }
+
+  if (!gameCode || !games[gameCode]) {
+    console.error(`[VALIDATE] Game not found for validation - gameCode: ${gameCode}`);
     return;
   }
 

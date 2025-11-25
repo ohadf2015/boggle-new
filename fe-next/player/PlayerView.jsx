@@ -9,7 +9,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import confetti from 'canvas-confetti';
 import toast from 'react-hot-toast';
 import { FaTrophy, FaDoorOpen, FaUsers, FaCrown, FaRandom, FaLink, FaWhatsapp, FaQrcode } from 'react-icons/fa';
-import { useWebSocket } from '../utils/WebSocketContext';
+import { useSocket } from '../utils/SocketContext';
 import { clearSession } from '../utils/session';
 import { useLanguage } from '../contexts/LanguageContext';
 import gsap from 'gsap';
@@ -27,7 +27,7 @@ import TournamentStandings from '../components/TournamentStandings';
 
 const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) => {
   const { t } = useLanguage();
-  const ws = useWebSocket();
+  const { socket } = useSocket();
   const inputRef = useRef(null);
   const wordListRef = useRef(null);
   const intentionalExitRef = useRef(false);
@@ -44,6 +44,7 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
 
   const [playersReady, setPlayersReady] = useState(initialPlayers);
   const [shufflingGrid, setShufflingGrid] = useState(null);
+  const [highlightedCells, setHighlightedCells] = useState([]);
   const [gameLanguage, setGameLanguage] = useState(null);
   const [showQR, setShowQR] = useState(false);
   const [showExitConfirm, setShowExitConfirm] = useState(false);
@@ -61,63 +62,14 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
   const [tournamentStandings, setTournamentStandings] = useState([]);
   const [showTournamentStandings, setShowTournamentStandings] = useState(false);
 
-  // Pre-game shuffling animation with player names
+  // Pre-game shuffling animation - Disabled, now receives from host
+  // Players will receive the shuffling grid from the host via socket event
   useEffect(() => {
     if (gameActive) {
       setShufflingGrid(null);
-      return;
+      setHighlightedCells([]);
     }
-
-    // Use game language if available (set when game starts), otherwise use Hebrew as default
-    const currentLang = gameLanguage || 'he';
-    const hebrewLetters = 'אבגדהוזחטיכלמנסעפצקרשת';
-    const englishLetters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-    const letters = currentLang === 'he' ? hebrewLetters : englishLetters;
-    const rows = 4;
-    const cols = 4;
-
-    const interval = setInterval(() => {
-      // 30% chance to show a player name if players exist
-      const showPlayerName = playersReady.length > 0 && Math.random() < 0.3;
-
-      if (showPlayerName) {
-        const randomPlayerEntry = playersReady[Math.floor(Math.random() * playersReady.length)];
-        const randomPlayer = typeof randomPlayerEntry === 'string' ? randomPlayerEntry : randomPlayerEntry.username;
-
-        // Simple embed function for player view
-        const embedWordInGrid = (rows, cols, word) => {
-          const grid = Array(rows).fill(null).map(() =>
-            Array(cols).fill(null).map(() =>
-              letters[Math.floor(Math.random() * letters.length)]
-            )
-          );
-
-          // Try to place word horizontally in a random row
-          const wordLength = Math.min(word.length, cols);
-          const row = Math.floor(Math.random() * rows);
-          const maxStartCol = cols - wordLength;
-          const startCol = maxStartCol > 0 ? Math.floor(Math.random() * maxStartCol) : 0;
-
-          for (let i = 0; i < wordLength; i++) {
-            grid[row][startCol + i] = word[i];
-          }
-
-          return grid;
-        };
-
-        setShufflingGrid(embedWordInGrid(rows, cols, randomPlayer));
-      } else {
-        const newGrid = Array(rows).fill(null).map(() =>
-          Array(cols).fill(null).map(() =>
-            letters[Math.floor(Math.random() * letters.length)]
-          )
-        );
-        setShufflingGrid(newGrid);
-      }
-    }, 2000); // Shuffle every 2 seconds
-
-    return () => clearInterval(interval);
-  }, [gameActive, gameLanguage, playersReady]);
+  }, [gameActive]);
 
   // Clear game state when entering
   useEffect(() => {
@@ -153,331 +105,341 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
     };
   }, [gameActive, foundWords.length, waitingForResults]);
 
-  // WebSocket message handler
+  // Socket.IO event handlers
   useEffect(() => {
-    if (!ws) {
-      return;
-    }
+    if (!socket) return;
 
-    const handleMessage = (event) => {
-      const message = JSON.parse(event.data);
-      const { action } = message;
+    const handleUpdateUsers = (data) => {
+      setPlayersReady(data.users || []);
+    };
 
-      switch (action) {
-        case 'updateUsers':
-          setPlayersReady(message.users || []);
-          break;
-
-        case 'startGame':
-          // Start the game immediately
-          setWasInActiveGame(true); // Mark that player participated in this game session
-          setFoundWords([]);
-          setAchievements([]);
-          if (message.letterGrid) setLetterGrid(message.letterGrid);
-          if (message.timerSeconds) setRemainingTime(message.timerSeconds);
-          if (message.language) setGameLanguage(message.language);
-          setGameActive(true);
-          setShowStartAnimation(true);
-
-          // Send acknowledgment to server
-          if (ws && ws.readyState === WebSocket.OPEN && message.messageId) {
-            ws.send(JSON.stringify({
-              action: 'startGameAck',
-              messageId: message.messageId
-            }));
-            console.log('[PLAYER] Sent startGameAck for messageId:', message.messageId);
-          }
-
-          toast.success(t('playerView.gameStarted'), {
-            icon: '🚀',
-            duration: 3000,
-            style: {
-              background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-              color: 'white',
-            },
-          });
-          break;
-
-        case 'endGame':
-          setGameActive(false);
-          setRemainingTime(0);
-          // Only show "waiting for results" if player participated in the game
-          // If they just joined after the game ended, they shouldn't see the calculating scores screen
-          if (wasInActiveGame) {
-            setWaitingForResults(true);
-            toast(t('playerView.gameOver'), { icon: '⏱️', duration: 4000 });
-          }
-          // else: player joined after game ended, they'll see "waiting for new game" screen
-          break;
-
-        case 'wordAccepted':
-          gsap.fromTo(inputRef.current,
-            { scale: 1.1, borderColor: '#4ade80' },
-            { scale: 1, borderColor: '', duration: 0.3 }
-          );
-
-          // Only increase combo if word was auto-validated
-          if (message.autoValidated) {
-            toast.success(`✓ ${message.word}`, { duration: 2000, icon: '✅' });
-
-            // Combo system: only increase combo for auto-validated words
-            const now = Date.now();
-            if (lastWordTime && (now - lastWordTime) < 5000) {
-              // Within 5 seconds - increase combo!
-              setComboLevel(prev => Math.min(prev + 1, 4)); // Max combo level 4
-            } else {
-              // Too slow, reset combo
-              setComboLevel(0);
-            }
-            setLastWordTime(now);
-
-            // Clear any existing combo timeout
-            if (comboTimeoutRef.current) {
-              clearTimeout(comboTimeoutRef.current);
-            }
-
-            // Reset combo after 5 seconds of inactivity
-            comboTimeoutRef.current = setTimeout(() => {
-              setComboLevel(0);
-              setLastWordTime(null);
-            }, 5000);
-          } else {
-            toast.success(`✓ ${message.word}`, { duration: 2000 });
-          }
-          break;
-
-        case 'wordNeedsValidation':
-          // Word needs host validation - show notification and reset combo
-          toast(message.message || `⏳ ${message.word} - Needs host validation`, {
-            duration: 3000,
-            icon: '⏳',
-            style: {
-              background: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
-              color: 'white',
-            },
-          });
-
-          // Reset combo for non-auto-validated words
-          setComboLevel(0);
-          setLastWordTime(null);
-          if (comboTimeoutRef.current) {
-            clearTimeout(comboTimeoutRef.current);
-          }
-          break;
-
-        case 'wordAlreadyFound':
-          toast.error(t('playerView.wordAlreadyFound'), { duration: 2000 });
-          // Reset combo on invalid word
-          setComboLevel(0);
-          setLastWordTime(null);
-          if (comboTimeoutRef.current) {
-            clearTimeout(comboTimeoutRef.current);
-          }
-          break;
-
-        case 'wordNotOnBoard':
-          toast.error(t('playerView.wordNotOnBoard'), { duration: 3000 });
-          setFoundWords(prev => prev.filter(w => w !== message.word));
-          // Reset combo on invalid word
-          setComboLevel(0);
-          setLastWordTime(null);
-          if (comboTimeoutRef.current) {
-            clearTimeout(comboTimeoutRef.current);
-          }
-          break;
-
-        case 'timeUpdate':
-          setRemainingTime(message.remainingTime);
-
-          // CRITICAL FIX: If we receive time updates but game isn't active yet,
-          // it means the server started the timer while we were still in countdown.
-          // Force the game to active state since the timer is running.
-          if (!gameActive && message.remainingTime > 0 && letterGrid) {
-            console.log('[PLAYER] Timer started on server, activating game (remainingTime:', message.remainingTime, ')');
-            setGameActive(true);       // Activate the game
-            setShowStartAnimation(true); // Show GO animation
-          }
-
-          if (message.remainingTime === 0) {
-            setGameActive(false);
-            setWaitingForResults(true);
-            // Don't show toast here - 'endGame' message will handle it to avoid duplicate notifications
-          }
-          break;
-
-        case 'updateLeaderboard':
-          setLeaderboard(message.leaderboard);
-          break;
-
-        case 'liveAchievementUnlocked':
-          message.achievements.forEach(achievement => {
-            toast.success(`🎉 ${achievement.icon} ${achievement.name}!`, {
-              duration: 4000,
-              style: {
-                background: 'linear-gradient(45deg, #FE6B8B 30%, #FF8E53 90%)',
-                color: 'white',
-                fontWeight: 'bold',
-              },
-            });
-            confetti({
-              particleCount: 100,
-              spread: 70,
-              origin: { y: 0.6 },
-            });
-          });
-          setAchievements(prev => [...prev, ...message.achievements]);
-          break;
-
-        case 'validatedScores':
-          // Show results immediately after host validation
-          setWaitingForResults(false);
-          if (onShowResults) {
-            onShowResults({
-              scores: message.scores,
-              letterGrid: message.letterGrid,
-            });
-          }
-          break;
-
-        case 'finalScores':
-          // Delay showing results to ensure waiting screen is seen
-          setTimeout(() => {
-            setWaitingForResults(false);
-            if (onShowResults) {
-              onShowResults({
-                scores: message.scores,
-                letterGrid: letterGrid,
-              });
-            }
-          }, 10000);
-          break;
-
-        case 'hostLeftRoomClosing':
-          intentionalExitRef.current = true;
-          clearSession();
-          toast.error(message.message || t('playerView.roomClosed'), {
-            icon: '🚪',
-            duration: 5000,
-          });
-          setTimeout(() => {
-            ws.close();
-            window.location.reload();
-          }, 2000);
-          break;
-
-        case 'resetGame':
-          // Reset player state for new game
-          setGameActive(false);
-          setWasInActiveGame(false); // Reset for new game session
-          setFoundWords([]);
-          setAchievements([]);
-          setLeaderboard([]);
-          setRemainingTime(null);
-          setWaitingForResults(false);
-          setLetterGrid(null);
-          setPlayersReady([]);
-          toast.success(message.message || t('playerView.startingNewGame'), {
-            icon: '🔄',
-            duration: 3000,
-          });
-          break;
-
-        case 'tournamentCreated':
-          setTournamentData(message.tournament);
-          toast.success(t('hostView.tournamentCreated') || 'Tournament created!', {
-            icon: '🏆',
-            duration: 3000,
-            style: {
-              background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-              color: 'white',
-            },
-          });
-          break;
-
-        case 'tournamentRoundStarting':
-          if (message.tournament) {
-            setTournamentData(message.tournament);
-          }
-          if (message.standings) {
-            setTournamentStandings(message.standings);
-          }
-          const roundNum = message.tournament?.currentRound || 1;
-          const totalRounds = message.tournament?.totalRounds || 3;
-          toast.success(
-            `${t('hostView.tournamentRound')} ${roundNum}/${totalRounds}`,
-            {
-              icon: '🎯',
-              duration: 3000,
-              style: {
-                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                color: 'white',
-              },
-            }
-          );
-          break;
-
-        case 'tournamentRoundCompleted':
-          if (message.standings) {
-            setTournamentStandings(message.standings);
-            setShowTournamentStandings(true);
-          }
-          if (message.tournament) {
-            setTournamentData(message.tournament);
-          }
-          break;
-
-        case 'tournamentComplete':
-          if (message.standings) {
-            setTournamentStandings(message.standings);
-            setShowTournamentStandings(true);
-          }
-          if (message.tournament) {
-            setTournamentData(message.tournament);
-          }
-          // Show winner confetti
-          const winner = message.standings?.[0];
-          if (winner) {
-            confetti({
-              particleCount: 150,
-              spread: 100,
-              origin: { y: 0.6 },
-            });
-            toast.success(
-              `🏆 ${winner.username} ${t('hostView.wonTournament')}!`,
-              {
-                duration: 5000,
-                style: {
-                  background: 'linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%)',
-                  color: 'white',
-                  fontWeight: 'bold',
-                },
-              }
-            );
-          }
-          break;
-
-        case 'tournamentCancelled':
-          setTournamentData(null);
-          setTournamentStandings([]);
-          setShowTournamentStandings(false);
-          toast.error(message.message || t('hostView.tournamentCancelled'), {
-            icon: '❌',
-            duration: 3000,
-          });
-          break;
-
-        default:
-          // Let other messages pass through to App-level handler
-          break;
+    const handleShufflingGridUpdate = (data) => {
+      if (data.grid) {
+        setShufflingGrid(data.grid);
+      }
+      if (data.highlightedCells !== undefined) {
+        setHighlightedCells(data.highlightedCells);
       }
     };
 
-    ws.addEventListener('message', handleMessage);
+    const handleStartGame = (data) => {
+      setWasInActiveGame(true);
+      setFoundWords([]);
+      setAchievements([]);
+      if (data.letterGrid) setLetterGrid(data.letterGrid);
+      if (data.timerSeconds) setRemainingTime(data.timerSeconds);
+      if (data.language) setGameLanguage(data.language);
+      setGameActive(true);
+      setShowStartAnimation(true);
+
+      // Send acknowledgment to server
+      if (data.messageId) {
+        socket.emit('startGameAck', { messageId: data.messageId });
+        console.log('[PLAYER] Sent startGameAck for messageId:', data.messageId);
+      }
+
+      toast.success(t('playerView.gameStarted'), {
+        icon: '🚀',
+        duration: 3000,
+        style: {
+          background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+          color: 'white',
+        },
+      });
+    };
+
+    const handleEndGame = () => {
+      setGameActive(false);
+      setRemainingTime(0);
+      if (wasInActiveGame) {
+        setWaitingForResults(true);
+        toast(t('playerView.gameOver'), { icon: '⏱️', duration: 4000 });
+      }
+    };
+
+    const handleWordAccepted = (data) => {
+      gsap.fromTo(inputRef.current,
+        { scale: 1.1, borderColor: '#4ade80' },
+        { scale: 1, borderColor: '', duration: 0.3 }
+      );
+
+      if (data.autoValidated) {
+        toast.success(`✓ ${data.word}`, { duration: 2000, icon: '✅' });
+
+        const now = Date.now();
+        if (lastWordTime && (now - lastWordTime) < 5000) {
+          setComboLevel(prev => Math.min(prev + 1, 4));
+        } else {
+          setComboLevel(0);
+        }
+        setLastWordTime(now);
+
+        if (comboTimeoutRef.current) {
+          clearTimeout(comboTimeoutRef.current);
+        }
+
+        comboTimeoutRef.current = setTimeout(() => {
+          setComboLevel(0);
+          setLastWordTime(null);
+        }, 5000);
+      } else {
+        toast.success(`✓ ${data.word}`, { duration: 2000 });
+      }
+    };
+
+    const handleWordNeedsValidation = (data) => {
+      toast(data.message || `⏳ ${data.word} - Needs host validation`, {
+        duration: 3000,
+        icon: '⏳',
+        style: {
+          background: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
+          color: 'white',
+        },
+      });
+
+      setComboLevel(0);
+      setLastWordTime(null);
+      if (comboTimeoutRef.current) {
+        clearTimeout(comboTimeoutRef.current);
+      }
+    };
+
+    const handleWordAlreadyFound = () => {
+      toast.error(t('playerView.wordAlreadyFound'), { duration: 2000 });
+      setComboLevel(0);
+      setLastWordTime(null);
+      if (comboTimeoutRef.current) {
+        clearTimeout(comboTimeoutRef.current);
+      }
+    };
+
+    const handleWordNotOnBoard = (data) => {
+      toast.error(t('playerView.wordNotOnBoard'), { duration: 3000 });
+      setFoundWords(prev => prev.filter(w => w !== data.word));
+      setComboLevel(0);
+      setLastWordTime(null);
+      if (comboTimeoutRef.current) {
+        clearTimeout(comboTimeoutRef.current);
+      }
+    };
+
+    const handleTimeUpdate = (data) => {
+      setRemainingTime(data.remainingTime);
+
+      if (!gameActive && data.remainingTime > 0 && letterGrid) {
+        console.log('[PLAYER] Timer started on server, activating game (remainingTime:', data.remainingTime, ')');
+        setGameActive(true);
+        setShowStartAnimation(true);
+      }
+
+      if (data.remainingTime === 0) {
+        setGameActive(false);
+        setWaitingForResults(true);
+      }
+    };
+
+    const handleUpdateLeaderboard = (data) => {
+      setLeaderboard(data.leaderboard);
+    };
+
+    const handleLiveAchievementUnlocked = (data) => {
+      data.achievements.forEach(achievement => {
+        toast.success(`🎉 ${achievement.icon} ${achievement.name}!`, {
+          duration: 4000,
+          style: {
+            background: 'linear-gradient(45deg, #FE6B8B 30%, #FF8E53 90%)',
+            color: 'white',
+            fontWeight: 'bold',
+          },
+        });
+        confetti({
+          particleCount: 100,
+          spread: 70,
+          origin: { y: 0.6 },
+        });
+      });
+      setAchievements(prev => [...prev, ...data.achievements]);
+    };
+
+    const handleValidatedScores = (data) => {
+      setWaitingForResults(false);
+      if (onShowResults) {
+        onShowResults({
+          scores: data.scores,
+          letterGrid: data.letterGrid,
+        });
+      }
+    };
+
+    const handleFinalScores = (data) => {
+      setTimeout(() => {
+        setWaitingForResults(false);
+        if (onShowResults) {
+          onShowResults({
+            scores: data.scores,
+            letterGrid: letterGrid,
+          });
+        }
+      }, 10000);
+    };
+
+    const handleHostLeftRoomClosing = (data) => {
+      intentionalExitRef.current = true;
+      clearSession();
+      toast.error(data.message || t('playerView.roomClosed'), {
+        icon: '🚪',
+        duration: 5000,
+      });
+      setTimeout(() => {
+        socket.disconnect();
+        window.location.reload();
+      }, 2000);
+    };
+
+    const handleResetGame = (data) => {
+      setGameActive(false);
+      setWasInActiveGame(false);
+      setFoundWords([]);
+      setAchievements([]);
+      setLeaderboard([]);
+      setRemainingTime(null);
+      setWaitingForResults(false);
+      setLetterGrid(null);
+      setPlayersReady([]);
+      toast.success(data.message || t('playerView.startingNewGame'), {
+        icon: '🔄',
+        duration: 3000,
+      });
+    };
+
+    const handleTournamentCreated = (data) => {
+      setTournamentData(data.tournament);
+      toast.success(t('hostView.tournamentCreated') || 'Tournament created!', {
+        icon: '🏆',
+        duration: 3000,
+        style: {
+          background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+          color: 'white',
+        },
+      });
+    };
+
+    const handleTournamentRoundStarting = (data) => {
+      if (data.tournament) {
+        setTournamentData(data.tournament);
+      }
+      if (data.standings) {
+        setTournamentStandings(data.standings);
+      }
+      const roundNum = data.tournament?.currentRound || 1;
+      const totalRounds = data.tournament?.totalRounds || 3;
+      toast.success(
+        `${t('hostView.tournamentRound')} ${roundNum}/${totalRounds}`,
+        {
+          icon: '🎯',
+          duration: 3000,
+          style: {
+            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+            color: 'white',
+          },
+        }
+      );
+    };
+
+    const handleTournamentRoundCompleted = (data) => {
+      if (data.standings) {
+        setTournamentStandings(data.standings);
+        setShowTournamentStandings(true);
+      }
+      if (data.tournament) {
+        setTournamentData(data.tournament);
+      }
+    };
+
+    const handleTournamentComplete = (data) => {
+      if (data.standings) {
+        setTournamentStandings(data.standings);
+        setShowTournamentStandings(true);
+      }
+      if (data.tournament) {
+        setTournamentData(data.tournament);
+      }
+      const winner = data.standings?.[0];
+      if (winner) {
+        confetti({
+          particleCount: 150,
+          spread: 100,
+          origin: { y: 0.6 },
+        });
+        toast.success(
+          `🏆 ${winner.username} ${t('hostView.wonTournament')}!`,
+          {
+            duration: 5000,
+            style: {
+              background: 'linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%)',
+              color: 'white',
+              fontWeight: 'bold',
+            },
+          }
+        );
+      }
+    };
+
+    const handleTournamentCancelled = (data) => {
+      setTournamentData(null);
+      setTournamentStandings([]);
+      setShowTournamentStandings(false);
+      toast.error(data?.message || t('hostView.tournamentCancelled'), {
+        icon: '❌',
+        duration: 3000,
+      });
+    };
+
+    // Register all event listeners
+    socket.on('updateUsers', handleUpdateUsers);
+    socket.on('shufflingGridUpdate', handleShufflingGridUpdate);
+    socket.on('startGame', handleStartGame);
+    socket.on('endGame', handleEndGame);
+    socket.on('wordAccepted', handleWordAccepted);
+    socket.on('wordNeedsValidation', handleWordNeedsValidation);
+    socket.on('wordAlreadyFound', handleWordAlreadyFound);
+    socket.on('wordNotOnBoard', handleWordNotOnBoard);
+    socket.on('timeUpdate', handleTimeUpdate);
+    socket.on('updateLeaderboard', handleUpdateLeaderboard);
+    socket.on('liveAchievementUnlocked', handleLiveAchievementUnlocked);
+    socket.on('validatedScores', handleValidatedScores);
+    socket.on('finalScores', handleFinalScores);
+    socket.on('hostLeftRoomClosing', handleHostLeftRoomClosing);
+    socket.on('resetGame', handleResetGame);
+    socket.on('tournamentCreated', handleTournamentCreated);
+    socket.on('tournamentRoundStarting', handleTournamentRoundStarting);
+    socket.on('tournamentRoundCompleted', handleTournamentRoundCompleted);
+    socket.on('tournamentComplete', handleTournamentComplete);
+    socket.on('tournamentCancelled', handleTournamentCancelled);
 
     return () => {
-      ws.removeEventListener('message', handleMessage);
+      socket.off('updateUsers', handleUpdateUsers);
+      socket.off('shufflingGridUpdate', handleShufflingGridUpdate);
+      socket.off('startGame', handleStartGame);
+      socket.off('endGame', handleEndGame);
+      socket.off('wordAccepted', handleWordAccepted);
+      socket.off('wordNeedsValidation', handleWordNeedsValidation);
+      socket.off('wordAlreadyFound', handleWordAlreadyFound);
+      socket.off('wordNotOnBoard', handleWordNotOnBoard);
+      socket.off('timeUpdate', handleTimeUpdate);
+      socket.off('updateLeaderboard', handleUpdateLeaderboard);
+      socket.off('liveAchievementUnlocked', handleLiveAchievementUnlocked);
+      socket.off('validatedScores', handleValidatedScores);
+      socket.off('finalScores', handleFinalScores);
+      socket.off('hostLeftRoomClosing', handleHostLeftRoomClosing);
+      socket.off('resetGame', handleResetGame);
+      socket.off('tournamentCreated', handleTournamentCreated);
+      socket.off('tournamentRoundStarting', handleTournamentRoundStarting);
+      socket.off('tournamentRoundCompleted', handleTournamentRoundCompleted);
+      socket.off('tournamentComplete', handleTournamentComplete);
+      socket.off('tournamentCancelled', handleTournamentCancelled);
     };
-  }, [ws, onShowResults, t, letterGrid, lastWordTime, wasInActiveGame, gameActive]);
+  }, [socket, onShowResults, t, letterGrid, lastWordTime, wasInActiveGame, gameActive]);
 
   const submitWord = useCallback(() => {
     if (!word.trim() || !gameActive) return;
@@ -525,10 +487,9 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
       return;
     }
 
-    ws.send(JSON.stringify({
-      action: 'submitWord',
+    socket.emit('submitWord', {
       word: trimmedWord.toLowerCase(),
-    }));
+    });
 
     setFoundWords(prev => [...prev, trimmedWord]);
     setWord('');
@@ -540,7 +501,7 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
 
 
     }
-  }, [word, gameActive, ws, t, gameLanguage]);
+  }, [word, gameActive, socket, t, gameLanguage]);
 
   const removeWord = (index) => {
     if (!gameActive) return;
@@ -575,13 +536,13 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
     intentionalExitRef.current = true;
     clearSession();
 
-    // Safely close WebSocket connection
+    // Safely disconnect socket
     try {
-      if (ws && ws.readyState !== WebSocket.CLOSED) {
-        ws.close();
+      if (socket) {
+        socket.disconnect();
       }
     } catch (error) {
-      console.error('[PLAYER] Error closing WebSocket:', error);
+      console.error('[PLAYER] Error disconnecting socket:', error);
     }
 
     // Force reload after a brief delay to ensure cleanup
@@ -772,6 +733,7 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
                     <GridComponent
                       grid={shufflingGrid}
                       interactive={false}
+                      selectedCells={highlightedCells}
                       className="w-full max-w-xs"
                     />
                   </div>
@@ -1076,10 +1038,9 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
                     }
 
                     if (regex.test(formedWord)) {
-                      ws.send(JSON.stringify({
-                        action: 'submitWord',
+                      socket.emit('submitWord', {
                         word: formedWord.toLowerCase(),
-                      }));
+                      });
                       setFoundWords(prev => [...prev, formedWord]);
                     } else {
                       toast.error(t('playerView.onlyLanguageWords'), { duration: 1000 });

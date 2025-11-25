@@ -168,4 +168,24 @@ class Dictionary {
 // Create a singleton instance
 const dictionary = new Dictionary();
 
-module.exports = dictionary;
+// Export wrapper functions for compatibility
+function isDictionaryWord(word, language) {
+  return dictionary.isValidWord(word, language);
+}
+
+function getAvailableDictionaries() {
+  return ['en', 'he', 'sv', 'ja'];
+}
+
+module.exports = {
+  dictionary,
+  isDictionaryWord,
+  getAvailableDictionaries,
+  // Also export the dictionary instance as default for backward compatibility
+  load: () => dictionary.load(),
+  isValidWord: (word, language) => dictionary.isValidWord(word, language),
+  isValidEnglishWord: (word) => dictionary.isValidEnglishWord(word),
+  isValidHebrewWord: (word) => dictionary.isValidHebrewWord(word),
+  isValidSwedishWord: (word) => dictionary.isValidSwedishWord(word),
+  isValidJapaneseWord: (word) => dictionary.isValidJapaneseWord(word)
+};
