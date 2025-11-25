@@ -969,8 +969,10 @@ const handleWordSubmission = (ws, word) => {
   const username = wsUsername.get(ws);
 
   // Handle case where WebSocket isn't properly mapped to a game
+  // This typically happens when the client reconnects but hasn't re-joined the game yet
   if (!gameCode) {
-    console.warn(`[WORD_SUBMIT] WebSocket not mapped to any game - username: ${username}`);
+    console.warn(`[WORD_SUBMIT] WebSocket not mapped to any game - username: ${username}, clientId: ${ws.clientId || 'unknown'}`);
+    console.warn('[WORD_SUBMIT] This usually means the player reconnected but the client did not re-send join message');
     // Try to send helpful error to player
     if (ws && ws.readyState === 1) {
       try {
