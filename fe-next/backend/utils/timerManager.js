@@ -140,4 +140,19 @@ class TimerManager {
 // Singleton instance
 const timerManager = new TimerManager();
 
+// Convenience functions for game timers
+const setGameTimer = (gameCode, intervalId) => {
+  timerManager.timers.set(`game:${gameCode}`, {
+    type: 'interval',
+    id: intervalId,
+    ref: intervalId
+  });
+};
+
+const clearGameTimer = (gameCode) => {
+  return timerManager.clearTimer(`game:${gameCode}`);
+};
+
 module.exports = timerManager;
+module.exports.setGameTimer = setGameTimer;
+module.exports.clearGameTimer = clearGameTimer;

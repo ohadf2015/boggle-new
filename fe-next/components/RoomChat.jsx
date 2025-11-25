@@ -5,86 +5,77 @@ import { Button } from './ui/button';
 import { ScrollArea } from './ui/scroll-area';
 import { Badge } from './ui/badge';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useWebSocket } from '../utils/WebSocketContext';
+import { useSocket } from '../utils/SocketContext';
 import { useLanguage } from '../contexts/LanguageContext';
 import { FaPaperPlane, FaComments, FaBell } from 'react-icons/fa';
 import toast from 'react-hot-toast';
 
 const RoomChat = ({ username, isHost, gameCode, className = '' }) => {
   const { t } = useLanguage();
-  const ws = useWebSocket();
+  const { socket } = useSocket();
   const [messages, setMessages] = useState([]);
   const [inputMessage, setInputMessage] = useState('');
   const [unreadCount, setUnreadCount] = useState(0);
-  const [isChatVisible, setIsChatVisible] = useState(true);
   const scrollRef = useRef(null);
   const inputRef = useRef(null);
   const notificationSoundRef = useRef(null);
 
-  // Use useCallback to ensure handleMessage has a stable reference
-  const handleMessage = useCallback((event) => {
-    try {
-      const message = JSON.parse(event.data);
+  // Handle incoming chat messages
+  const handleChatMessage = useCallback((data) => {
+    const newMessage = {
+      id: Date.now() + Math.random(),
+      username: data.username,
+      message: data.message,
+      timestamp: data.timestamp || Date.now(),
+      isHost: data.isHost || false
+    };
 
-      if (message.action === 'chatMessage') {
-        const newMessage = {
-          id: Date.now() + Math.random(),
-          username: message.username,
-          message: message.message,
-          timestamp: message.timestamp || Date.now(),
-          isHost: message.isHost || false
-        };
+    setMessages(prev => [...prev, newMessage]);
 
-        setMessages(prev => [...prev, newMessage]);
+    // Check if message is from another user
+    const isOwnMessage = (isHost && data.isHost) || data.username === username;
 
-        // Check if message is from another user
-        const isOwnMessage = (isHost && message.isHost) || message.username === username;
+    if (!isOwnMessage) {
+      // Increment unread count
+      setUnreadCount(prev => prev + 1);
 
-        if (!isOwnMessage) {
-          // Increment unread count
-          setUnreadCount(prev => prev + 1);
-
-          // Play notification sound
-          if (notificationSoundRef.current) {
-            notificationSoundRef.current.play().catch(err => console.log('Sound play failed:', err));
-          }
-
-          // Show toast notification
-          toast(
-            <div className="flex items-center gap-2">
-              <FaBell className="text-blue-500" />
-              <div>
-                <div className="font-semibold">{message.username}</div>
-                <div className="text-sm text-slate-600">{message.message.substring(0, 50)}{message.message.length > 50 ? '...' : ''}</div>
-              </div>
-            </div>,
-            {
-              duration: 3000,
-              position: 'top-right',
-              icon: '💬',
-            }
-          );
-
-          // Vibrate on mobile
-          if (window.navigator && window.navigator.vibrate) {
-            window.navigator.vibrate(200);
-          }
-        }
+      // Play notification sound
+      if (notificationSoundRef.current) {
+        notificationSoundRef.current.play().catch(err => console.log('Sound play failed:', err));
       }
-    } catch (error) {
-      console.error('Error parsing chat message:', error);
+
+      // Show toast notification
+      toast(
+        <div className="flex items-center gap-2">
+          <FaBell className="text-blue-500" />
+          <div>
+            <div className="font-semibold">{data.username}</div>
+            <div className="text-sm text-slate-600">{data.message.substring(0, 50)}{data.message.length > 50 ? '...' : ''}</div>
+          </div>
+        </div>,
+        {
+          duration: 3000,
+          position: 'top-right',
+          icon: '💬',
+        }
+      );
+
+      // Vibrate on mobile
+      if (window.navigator && window.navigator.vibrate) {
+        window.navigator.vibrate(200);
+      }
     }
   }, [username, isHost]);
 
   useEffect(() => {
-    if (!ws) return;
+    if (!socket) return;
 
-    ws.addEventListener('message', handleMessage);
+    socket.on('chatMessage', handleChatMessage);
 
     return () => {
-      ws.removeEventListener('message', handleMessage);
+      socket.off('chatMessage', handleChatMessage);
     };
-  }, [ws, handleMessage]);
+  }, [socket, handleChatMessage]);
 
   // Auto-scroll to bottom when new messages arrive and clear unread
   useEffect(() => {
@@ -104,15 +95,14 @@ const RoomChat = ({ username, isHost, gameCode, className = '' }) => {
   };
 
   const sendMessage = () => {
-    if (!inputMessage.trim() || !ws) return;
+    if (!inputMessage.trim() || !socket) return;
 
-    ws.send(JSON.stringify({
-      action: 'chatMessage',
+    socket.emit('chatMessage', {
       message: inputMessage.trim(),
       gameCode,
       username: isHost ? 'Host' : username,
       isHost
-    }));
+    });
 
     setInputMessage('');
     if (inputRef.current) {
