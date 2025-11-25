@@ -636,13 +636,32 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
               </Card>
             </motion.div>
 
+            {/* Shuffling Letter Grid Preview */}
+            {shufflingGrid && (
+              <motion.div
+                initial={{ y: 20, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ delay: 0.15 }}
+              >
+                <Card className="bg-slate-900/95 dark:bg-slate-900/95 backdrop-blur-md border border-cyan-500/40 shadow-[0_0_25px_rgba(6,182,212,0.2)] overflow-hidden">
+                  <div className="p-4 flex flex-col items-center justify-center bg-slate-900/90">
+                    <GridComponent
+                      grid={shufflingGrid}
+                      interactive={false}
+                      className="w-full max-w-xs"
+                    />
+                  </div>
+                </Card>
+              </motion.div>
+            )}
+
             {/* Players List */}
             <motion.div
               initial={{ y: 20, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               transition={{ delay: 0.2 }}
             >
-              <Card className="bg-white/90 dark:bg-slate-800/90 backdrop-blur-md shadow-xl border border-purple-500/30 shadow-[0_0_15px_rgba(168,85,247,0.1)] p-4 sm:p-5 md:p-6">
+              <Card className="bg-white/90 dark:bg-slate-800/90 backdrop-blur-md border border-purple-500/30 shadow-[0_0_15px_rgba(168,85,247,0.1)] p-4 sm:p-5 md:p-6">
                 <h3 className="text-lg font-bold text-purple-600 dark:text-purple-300 mb-4 flex items-center gap-2 justify-center">
                   <FaUsers className="text-purple-500 dark:text-purple-400" />
                   {t('playerView.players')} ({playersReady.length})
@@ -692,7 +711,7 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
               animate={{ y: 0, opacity: 1 }}
               transition={{ delay: 0.25 }}
             >
-              <Card className="bg-white/90 dark:bg-slate-800/90 backdrop-blur-md shadow-xl border border-teal-500/30 shadow-[0_0_15px_rgba(20,184,166,0.1)] p-3 sm:p-4">
+              <Card className="bg-white/90 dark:bg-slate-800/90 backdrop-blur-md border border-teal-500/30 shadow-[0_0_15px_rgba(20,184,166,0.1)] p-3 sm:p-4">
                 <h3 className="text-sm font-bold text-teal-600 dark:text-teal-300 mb-3 text-center">
                   {t('playerView.inviteFriends') || 'Invite Friends'}
                 </h3>
@@ -858,7 +877,7 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
       <div className="flex flex-col lg:flex-row gap-1 md:gap-2 max-w-7xl mx-auto flex-grow w-full overflow-hidden">
         {/* Left Column: Found Words (Hidden on mobile, shown on desktop) */}
         <div className="hidden lg:flex lg:flex-col lg:w-64 xl:w-80 gap-2">
-          <Card className="bg-slate-900/95 dark:bg-slate-900/95 backdrop-blur-md shadow-2xl border border-teal-500/40 shadow-[0_0_25px_rgba(20,184,166,0.2)] flex flex-col flex-grow overflow-hidden">
+          <Card className="bg-slate-900/95 dark:bg-slate-900/95 backdrop-blur-md border border-teal-500/40 shadow-[0_0_25px_rgba(20,184,166,0.2)] flex flex-col flex-grow overflow-hidden">
             <CardHeader className="py-3 border-b border-teal-500/30 bg-gradient-to-r from-teal-900/50 to-cyan-900/50">
               <CardTitle className="text-white text-base uppercase tracking-widest font-bold">
                 FOUND WORDS
@@ -895,7 +914,7 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
         {/* Center Column: Letter Grid */}
         <div className="flex-1 flex flex-col gap-2 min-w-0 min-h-0">
           {(letterGrid || shufflingGrid) && (
-            <Card className="bg-slate-900/95 dark:bg-slate-900/95 backdrop-blur-md shadow-2xl border border-cyan-500/40 shadow-[0_0_25px_rgba(6,182,212,0.2)] flex flex-col flex-grow overflow-hidden">
+            <Card className="bg-slate-900/95 dark:bg-slate-900/95 backdrop-blur-md border border-cyan-500/40 shadow-[0_0_25px_rgba(6,182,212,0.2)] flex flex-col flex-grow overflow-hidden">
               <CardContent className="flex-grow flex flex-col items-center justify-center p-1 md:p-2 bg-slate-900/90">
                 <GridComponent
                   grid={letterGrid || shufflingGrid}
@@ -956,7 +975,7 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
 
           {/* Mobile: Word Input below grid */}
           <div className="lg:hidden">
-            <Card className="bg-white/90 dark:bg-slate-800/90 backdrop-blur-md shadow-xl border border-teal-500/30 shadow-[0_0_15px_rgba(20,184,166,0.1)]">
+            <Card className="bg-white/90 dark:bg-slate-800/90 backdrop-blur-md border border-teal-500/30 shadow-[0_0_15px_rgba(20,184,166,0.1)]">
               <CardContent className="p-2">
                 <Input
                   ref={inputRef}
@@ -977,7 +996,7 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
 
         {/* Right Column: Live Ranking */}
         <div className="lg:w-64 xl:w-80 flex flex-col gap-2">
-          <Card className="bg-slate-900/95 dark:bg-slate-900/95 backdrop-blur-md shadow-2xl border border-purple-500/40 shadow-[0_0_25px_rgba(168,85,247,0.2)] flex flex-col overflow-hidden max-h-[40vh] lg:max-h-none lg:flex-grow">
+          <Card className="bg-slate-900/95 dark:bg-slate-900/95 backdrop-blur-md border border-purple-500/40 shadow-[0_0_25px_rgba(168,85,247,0.2)] flex flex-col overflow-hidden max-h-[40vh] lg:max-h-none lg:flex-grow">
             <CardHeader className="py-3 border-b border-purple-500/30 bg-gradient-to-r from-purple-900/50 to-pink-900/50">
               <CardTitle className="flex items-center gap-2 text-white text-base uppercase tracking-widest font-bold">
                 <FaTrophy className="text-yellow-400 drop-shadow-[0_0_8px_rgba(251,191,36,0.6)]" />

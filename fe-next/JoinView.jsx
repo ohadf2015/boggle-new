@@ -654,7 +654,7 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
                     </div>
                     <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                       <Button
-                        onClick={() => setMode('host')}
+                        onClick={() => handleModeChange('host')}
                         className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-400 hover:to-pink-400 hover:shadow-[0_0_15px_rgba(168,85,247,0.5)]"
                       >
                         <FaCrown className="mr-2" />
