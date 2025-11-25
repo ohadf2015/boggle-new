@@ -990,7 +990,7 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
 
       {/* Refined Layout */}
       <div className="flex flex-col gap-3 sm:gap-4 md:gap-6 w-full max-w-6xl">
-        {/* Top Section: Room Code + Language + Share (when not started) */}
+        {/* Row 1: Room Code + Language + Share (when not started) */}
         {!gameStarted && (
           <Card className="bg-white/90 dark:bg-slate-800/90 backdrop-blur-md text-slate-900 dark:text-white p-3 sm:p-4 md:p-6 rounded-lg border border-cyan-500/30 shadow-[0_0_20px_rgba(6,182,212,0.15)]">
             <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
@@ -1043,9 +1043,11 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
           </Card>
         )}
 
-        {/* Game Settings - Now below room code */}
+        {/* Row 2: Game Settings + Players List (side by side on desktop) */}
         {!gameStarted && (
-          <Card className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-md p-3 sm:p-4 md:p-5 rounded-lg border border-purple-500/30 shadow-[0_0_15px_rgba(168,85,247,0.1)]">
+          <div className="flex flex-col lg:flex-row gap-3 sm:gap-4 md:gap-6">
+            {/* Game Settings - LEFT */}
+          <Card className="flex-1 bg-white/80 dark:bg-slate-800/80 backdrop-blur-md p-3 sm:p-4 md:p-5 rounded-lg border border-purple-500/30 shadow-[0_0_15px_rgba(168,85,247,0.1)]">
             <h3 className="text-base font-bold text-purple-600 dark:text-purple-300 mb-4 flex items-center gap-2">
               <FaCog className="text-cyan-600 dark:text-cyan-400 text-sm" />
               {t('hostView.gameSettings')}
@@ -1241,15 +1243,9 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
               )}
             </div>
           </Card>
-        )}
 
-        {/* Main Content Area: Player List (LEFT) + Boggle Grid (CENTER) + Chat (RIGHT on desktop when not started) */}
-        <div className="flex flex-col lg:flex-row gap-3 sm:gap-4 md:gap-6 transition-all duration-500 ease-in-out">
-          {/* Players Section - LEFT - Neon Style */}
-          <Card className={cn(
-            "bg-white/80 dark:bg-slate-800/80 backdrop-blur-md p-3 sm:p-4 md:p-6 rounded-lg shadow-lg border border-purple-500/30 shadow-[0_0_15px_rgba(168,85,247,0.1)] lg:min-w-[280px] transition-all duration-500 ease-in-out overflow-hidden",
-            gameStarted ? "lg:w-[300px]" : "w-full lg:w-[300px]"
-          )}>
+          {/* Players List - RIGHT */}
+          <Card className="lg:w-[350px] bg-white/80 dark:bg-slate-800/80 backdrop-blur-md p-3 sm:p-4 md:p-6 rounded-lg shadow-lg border border-purple-500/30 shadow-[0_0_15px_rgba(168,85,247,0.1)]">
             <h3 className="text-lg font-bold text-purple-600 dark:text-purple-300 mb-4 flex items-center gap-2">
               <FaUsers className="text-purple-500 dark:text-purple-400" />
               {t('hostView.playersJoined')} ({playersReady.length})
@@ -1296,6 +1292,92 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
               </p>
             )}
           </Card>
+          </div>
+        )}
+
+        {/* Row 3: Letter Grid + Chat (side by side on desktop when not started) */}
+        {!gameStarted && (
+          <div className="flex flex-col lg:flex-row gap-3 sm:gap-4 md:gap-6">
+            {/* Letter Grid - LEFT */}
+            <Card className="flex-1 bg-white/80 dark:bg-slate-800/80 backdrop-blur-md p-1 sm:p-3 rounded-lg shadow-lg border border-cyan-500/30 shadow-[0_0_15px_rgba(6,182,212,0.1)] flex flex-col items-center">
+              {/* Grid Container */}
+              <div className="w-full flex justify-center items-center transition-all duration-500 aspect-square max-w-[500px]">
+                <div className="w-full h-full flex items-center justify-center">
+                  <GridComponent
+                    grid={shufflingGrid || tableData}
+                    interactive={false}
+                    selectedCells={highlightedCells}
+                    className="w-full h-full"
+                    playerView={false}
+                    comboLevel={0}
+                  />
+                </div>
+              </div>
+            </Card>
+
+            {/* Chat - RIGHT */}
+            <div className="lg:w-[350px] xl:w-[400px]">
+              <RoomChat
+                username="Host"
+                isHost={true}
+                gameCode={gameCode}
+                className="h-full min-h-[400px]"
+              />
+            </div>
+          </div>
+        )}
+
+        {/* Game Started View */}
+        {gameStarted && (
+          <div className="flex flex-col lg:flex-row gap-3 sm:gap-4 md:gap-6 transition-all duration-500 ease-in-out">
+            {/* Players Section - LEFT during game */}
+            <Card className="lg:w-[300px] bg-white/80 dark:bg-slate-800/80 backdrop-blur-md p-3 sm:p-4 md:p-6 rounded-lg shadow-lg border border-purple-500/30 shadow-[0_0_15px_rgba(168,85,247,0.1)]">
+              <h3 className="text-lg font-bold text-purple-600 dark:text-purple-300 mb-4 flex items-center gap-2">
+                <FaUsers className="text-purple-500 dark:text-purple-400" />
+                {t('hostView.playersJoined')} ({playersReady.length})
+              </h3>
+              <div className="flex flex-col gap-2">
+                <AnimatePresence>
+                  {playersReady.map((player, index) => {
+                    // Handle both old format (string) and new format (object)
+                    const username = typeof player === 'string' ? player : player.username;
+                    const avatar = typeof player === 'object' ? player.avatar : null;
+                    const isHost = typeof player === 'object' ? player.isHost : false;
+
+                    return (
+                      <motion.div
+                        key={username}
+                        initial={{ scale: 0, opacity: 0 }}
+                        animate={{ scale: 1, opacity: 1 }}
+                        exit={{ scale: 0, opacity: 0 }}
+                        transition={{ delay: index * 0.05 }}
+                      >
+                        <Badge
+                          className="bg-gradient-to-r from-purple-500 to-pink-500 font-bold text-white px-3 py-2 text-base w-full justify-between shadow-[0_0_10px_rgba(168,85,247,0.3)]"
+                          style={avatar?.color ? { background: `linear-gradient(to right, ${avatar.color}, ${avatar.color}dd)` } : {}}
+                        >
+                          <div className="flex items-center gap-2">
+                            {avatar?.emoji && <span className="text-lg">{avatar.emoji}</span>}
+                            {isHost && <FaCrown className="text-yellow-300" />}
+                            <SlotMachineText text={username} />
+                          </div>
+                          {gameStarted && (
+                            <span className="bg-white/20 px-2 py-0.5 rounded-full text-sm">
+                              {playerWordCounts[username] || 0}
+                            </span>
+                          )}
+                        </Badge>
+                      </motion.div>
+                    );
+                  })}
+                </AnimatePresence>
+              </div>
+              {playersReady.length === 0 && (
+                <p className="text-sm text-center text-slate-500 mt-2">
+                  {t('hostView.waitingForPlayers')}
+                </p>
+              )}
+            </Card>
 
           {/* Letter Grid - RIGHT - Conditional rendering based on host playing */}
           {gameStarted && !hostPlaying ? (
@@ -1421,20 +1503,8 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
                 </div>
               )}
             </Card>
-          )}
-
-          {/* Chat Section - RIGHT on desktop when not started */}
-          {!gameStarted && (
-            <div className="w-full lg:w-[350px] xl:w-[400px]">
-              <RoomChat
-                username="Host"
-                isHost={true}
-                gameCode={gameCode}
-                className="h-full min-h-[400px]"
-              />
-            </div>
-          )}
-        </div>
+          </div>
+        )}
       </div>
 
       {/* Cancel Tournament Confirmation Dialog */}
