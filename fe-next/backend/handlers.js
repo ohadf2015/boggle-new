@@ -573,7 +573,9 @@ const handleStartGame = async (host, letterGrid, timerSeconds, language, hostPla
   });
 
   // Initialize acknowledgment coordination
-  const playerUsernames = Object.keys(games[gameCode].users);
+  // Exclude host from acknowledgments since host initiates and doesn't need to acknowledge
+  const playerUsernames = Object.keys(games[gameCode].users)
+    .filter(username => username !== games[gameCode].hostUsername);
   const messageId = gameStartCoordinator.initializeSequence(gameCode, playerUsernames, timerSeconds);
 
   const startMessage = {
