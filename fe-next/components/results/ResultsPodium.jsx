@@ -110,14 +110,14 @@ const PodiumPlace = ({ player, place, delay, backgroundImage }) => {
       >
         {/* Background Celebration Image */}
         {backgroundImage && (
-          <div className="absolute inset-0 overflow-hidden opacity-20 pointer-events-none">
+          <div className="absolute inset-0 overflow-hidden opacity-35 pointer-events-none">
             <img
               src={backgroundImage}
               alt="celebration"
               className="w-full h-full object-cover"
               style={{
                 mixBlendMode: 'soft-light',
-                filter: 'blur(1px) saturate(1.3)'
+                filter: 'blur(0.3px) saturate(1.3)'
               }}
             />
           </div>

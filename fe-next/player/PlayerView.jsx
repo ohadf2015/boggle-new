@@ -16,7 +16,8 @@ import gsap from 'gsap';
 import GridComponent from '../components/GridComponent';
 import { applyHebrewFinalLetters } from '../utils/utils';
 import RoomChat from '../components/RoomChat';
-import CubeCrashAnimation from '../components/CubeCrashAnimation';
+import GoRipplesAnimation from '../components/GoRipplesAnimation';
+import CountdownAnimation from '../components/CountdownAnimation';
 import CircularTimer from '../components/CircularTimer';
 import { copyJoinUrl, shareViaWhatsApp, getJoinUrl } from '../utils/share';
 import ShareButton from '../components/ShareButton';
@@ -39,6 +40,7 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
   const [letterGrid, setLetterGrid] = useState(null);
   const [remainingTime, setRemainingTime] = useState(null);
   const [waitingForResults, setWaitingForResults] = useState(false);
+  const [showCountdown, setShowCountdown] = useState(false);
   const [showStartAnimation, setShowStartAnimation] = useState(false);
 
   const [playersReady, setPlayersReady] = useState(initialPlayers);
@@ -55,6 +57,12 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
   const [lastWordTime, setLastWordTime] = useState(null);
   const comboTimeoutRef = useRef(null);
 
+  // Handle countdown complete
+  const handleCountdownComplete = () => {
+    setShowCountdown(false);
+    setGameActive(true);
+    setShowStartAnimation(true);
+  };
 
   // Pre-game shuffling animation with player names
   useEffect(() => {
@@ -164,14 +172,14 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
           break;
 
         case 'startGame':
-          setGameActive(true);
+          // Show countdown first, then start the game
           setWasInActiveGame(true); // Mark that player participated in this game session
           setFoundWords([]);
           setAchievements([]);
           if (message.letterGrid) setLetterGrid(message.letterGrid);
           if (message.timerSeconds) setRemainingTime(message.timerSeconds);
           if (message.language) setGameLanguage(message.language);
-          setShowStartAnimation(true);
+          setShowCountdown(true);
 
           toast.success(t('playerView.gameStarted'), {
             icon: '🚀',
@@ -774,9 +782,14 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-50 via-slate-100 to-slate-200 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 p-1 md:p-4 flex flex-col transition-colors duration-300">
 
-      {/* Start Game Animation */}
+      {/* Countdown Animation (3-2-1) */}
+      {showCountdown && (
+        <CountdownAnimation onComplete={handleCountdownComplete} />
+      )}
+
+      {/* GO Animation */}
       {showStartAnimation && (
-        <CubeCrashAnimation onComplete={() => setShowStartAnimation(false)} />
+        <GoRipplesAnimation onComplete={() => setShowStartAnimation(false)} />
       )}
 
       {/* Top Bar with Title and Exit Button */}

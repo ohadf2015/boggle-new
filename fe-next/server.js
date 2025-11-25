@@ -27,6 +27,10 @@ const {
   handleChatMessage,
   handleHostReactivate,
   handleHostKeepAlive,
+  handleCreateTournament,
+  handleStartTournamentRound,
+  handleGetTournamentStandings,
+  handleCancelTournament,
 } = require("./backend/handlers");
 
 const dev = process.env.NODE_ENV !== "production";
@@ -149,7 +153,7 @@ app.prepare().then(() => {
             broadcastActiveRooms(wss);
             break;
           case "startGame":
-            handleStartGame(ws, message.letterGrid, message.timerSeconds, message.language);
+            handleStartGame(ws, message.letterGrid, message.timerSeconds, message.language, message.hostPlaying);
             break;
           case "endGame":
             handleEndGame(ws);
@@ -180,6 +184,18 @@ app.prepare().then(() => {
             break;
           case "hostKeepAlive":
             handleHostKeepAlive(ws, message.gameCode, wss);
+            break;
+          case "createTournament":
+            handleCreateTournament(ws, message.settings);
+            break;
+          case "startTournamentRound":
+            handleStartTournamentRound(ws);
+            break;
+          case "getTournamentStandings":
+            handleGetTournamentStandings(ws);
+            break;
+          case "cancelTournament":
+            handleCancelTournament(ws);
             break;
           default:
             console.warn(`Unknown action: ${action}`);

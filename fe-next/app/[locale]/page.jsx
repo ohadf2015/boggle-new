@@ -272,6 +272,9 @@ export default function GamePage() {
             // Track if we're joining a new room via invitation
             let joiningNewRoomViaInvitation = false;
 
+            // Check if user intentionally exited (session was cleared)
+            const hasSession = savedSession && savedSession.gameCode;
+
             // URL room takes priority over saved session (explicit invitation)
             if (roomFromUrl) {
                 setGameCode(roomFromUrl);
@@ -285,8 +288,9 @@ export default function GamePage() {
                     clearSession();
                     joiningNewRoomViaInvitation = true;
                 }
-            } else if (savedSession?.gameCode) {
-                // No URL room, try to reconnect to saved session
+            } else if (hasSession) {
+                // No URL room, try to reconnect to saved session only if session exists
+                // If session was cleared (user clicked exit), don't auto-reconnect
                 setGameCode(savedSession.gameCode);
                 setAttemptingReconnect(true);
             }

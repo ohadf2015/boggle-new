@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useIdleTimer } from 'react-idle-timer';
 import confetti from 'canvas-confetti';
 import toast, { Toaster } from 'react-hot-toast';
 import { FaTrophy, FaClock, FaUsers, FaQrcode, FaSignOutAlt, FaWhatsapp, FaLink, FaCog, FaPlus, FaMinus, FaCrown, FaTrash, FaChevronDown, FaChevronUp } from 'react-icons/fa';
@@ -18,7 +19,10 @@ import ResultsPodium from '../components/results/ResultsPodium';
 import ResultsPlayerCard from '../components/results/ResultsPlayerCard';
 import RoomChat from '../components/RoomChat';
 import GoRipplesAnimation from '../components/GoRipplesAnimation';
+import CountdownAnimation from '../components/CountdownAnimation';
 import CircularTimer from '../components/CircularTimer';
+import HostLiveResults from '../components/HostLiveResults';
+import TournamentStandings from '../components/TournamentStandings';
 import '../style/animation.scss';
 import { generateRandomTable, embedWordInGrid, applyHebrewFinalLetters } from '../utils/utils';
 import { useWebSocket } from '../utils/WebSocketContext';
@@ -46,6 +50,9 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
   const [finalScores, setFinalScores] = useState(null);
   const [showQR, setShowQR] = useState(false);
   const [playerWordCounts, setPlayerWordCounts] = useState({});
+  const [playerScores, setPlayerScores] = useState({});
+  const [playerAchievements, setPlayerAchievements] = useState({});
+  const [showCountdown, setShowCountdown] = useState(false);
   const [showStartAnimation, setShowStartAnimation] = useState(false);
   const [showAdvancedSettings, setShowAdvancedSettings] = useState(false);
   const [showExitConfirm, setShowExitConfirm] = useState(false);
@@ -56,6 +63,13 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
   const inputRef = useRef(null);
   const [word, setWord] = useState('');
 
+  // Tournament mode states
+  const [tournamentMode, setTournamentMode] = useState(false);
+  const [tournamentRounds, setTournamentRounds] = useState(3);
+  const [tournamentData, setTournamentData] = useState(null);
+  const [tournamentCreating, setTournamentCreating] = useState(false);
+  const tournamentTimeoutRef = useRef(null);
+
   // Animation states
   const [shufflingGrid, setShufflingGrid] = useState(null);
   const [highlightedCells, setHighlightedCells] = useState([]);
@@ -64,6 +78,9 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
   const [comboLevel, setComboLevel] = useState(0);
   const [lastWordTime, setLastWordTime] = useState(null);
   const comboTimeoutRef = useRef(null);
+
+  // Idle detection for validation - using ref to avoid dependency issues
+  const submitValidationRef = useRef(null);
 
   // Update players list when initialPlayers prop changes
   useEffect(() => {
@@ -175,6 +192,23 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
             ...prev,
             [message.username]: message.wordCount
           }));
+          // Also update score if provided
+          if (message.score !== undefined) {
+            setPlayerScores(prev => ({
+              ...prev,
+              [message.username]: message.score
+            }));
+          }
+          break;
+
+        case 'achievementUnlocked':
+          // Track achievement for the player
+          if (!hostPlaying && message.username && message.achievement) {
+            setPlayerAchievements(prev => ({
+              ...prev,
+              [message.username]: [...(prev[message.username] || []), message.achievement]
+            }));
+          }
           break;
 
         case 'showValidation':
@@ -320,6 +354,78 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
           }
           break;
 
+        case 'tournamentCreated':
+          // Clear timeout since tournament was created successfully
+          if (tournamentTimeoutRef.current) {
+            clearTimeout(tournamentTimeoutRef.current);
+            tournamentTimeoutRef.current = null;
+          }
+          setTournamentCreating(false);
+          setTournamentData(message.tournament);
+          toast.success(`${t('hostView.tournamentMode')}: ${message.tournament.totalRounds} ${t('hostView.rounds')}`, {
+            icon: '🏆',
+            duration: 4000,
+          });
+          // Auto-start the first round after tournament creation
+          setTimeout(() => {
+            ws.send(JSON.stringify({ action: 'startTournamentRound' }));
+          }, 1500);
+          break;
+
+        case 'tournamentRoundStarting':
+          setTournamentData(prev => ({
+            ...prev,
+            currentRound: message.roundNumber,
+            standings: message.standings,
+          }));
+          toast(`${t('hostView.tournamentRound')} ${message.roundNumber}/${message.totalRounds}`, {
+            icon: '🏁',
+            duration: 3000,
+          });
+          break;
+
+        case 'tournamentRoundCompleted':
+          setTournamentData(prev => ({
+            ...prev,
+            standings: message.standings,
+            isComplete: message.isComplete,
+          }));
+
+          if (message.isComplete) {
+            confetti({
+              particleCount: 200,
+              spread: 100,
+              origin: { y: 0.5 },
+            });
+            toast.success(t('hostView.tournamentComplete'), {
+              icon: '🏆',
+              duration: 5000,
+            });
+          }
+          break;
+
+        case 'tournamentComplete':
+          setTournamentData(prev => ({
+            ...prev,
+            standings: message.standings,
+            isComplete: true,
+          }));
+          confetti({
+            particleCount: 200,
+            spread: 100,
+            origin: { y: 0.5 },
+          });
+          break;
+
+        case 'tournamentCancelled':
+          setTournamentData(null);
+          setTournamentMode(false);
+          toast('Tournament cancelled', {
+            icon: '🚫',
+            duration: 3000,
+          });
+          break;
+
         default:
           break;
       }
@@ -336,7 +442,52 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
   const startGame = () => {
     if (playersReady.length === 0) return;
 
-    // Actually start the game
+    // If tournament mode is enabled and no tournament exists, create one first
+    if (tournamentMode && !tournamentData) {
+      setTournamentCreating(true);
+
+      ws.send(
+        JSON.stringify({
+          action: 'createTournament',
+          settings: {
+            name: 'Tournament',
+            totalRounds: tournamentRounds,
+            timerSeconds: timerValue * 60,
+            difficulty: difficulty,
+            language: roomLanguage,
+          },
+        })
+      );
+
+      // Set timeout in case backend doesn't respond
+      tournamentTimeoutRef.current = setTimeout(() => {
+        if (!tournamentData) {
+          setTournamentCreating(false);
+          toast.error('Failed to create tournament. Please try again.', {
+            icon: '❌',
+            duration: 5000,
+          });
+        }
+      }, 5000);
+
+      // Wait for tournament creation, then start first round
+      return;
+    }
+
+    // If tournament mode and tournament exists, start next round
+    if (tournamentMode && tournamentData) {
+      ws.send(JSON.stringify({ action: 'startTournamentRound' }));
+      return;
+    }
+
+    // Regular game mode - show countdown first
+    setShowCountdown(true);
+  };
+
+  const handleCountdownComplete = () => {
+    setShowCountdown(false);
+
+    // Actually start the game after countdown
     const difficultyConfig = DIFFICULTIES[difficulty];
     const newTable = generateRandomTable(difficultyConfig.rows, difficultyConfig.cols, roomLanguage);
     setTableData(newTable);
@@ -353,7 +504,8 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
         action: 'startGame',
         letterGrid: newTable,
         timerSeconds: seconds,
-        language: roomLanguage
+        language: roomLanguage,
+        hostPlaying: hostPlaying
       })
     );
 
@@ -396,7 +548,7 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
     }, 100);
   };
 
-  const submitValidation = () => {
+  const submitValidation = useCallback(() => {
     // Convert validations object to array with unique words only
     const validationArray = [];
     Object.keys(validations).forEach(word => {
@@ -414,7 +566,37 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
     toast.loading(t('hostView.validatingWords'), {
       duration: 2000,
     });
-  };
+  }, [validations, ws, t]);
+
+  // Update ref whenever submitValidation changes
+  useEffect(() => {
+    submitValidationRef.current = submitValidation;
+  }, [submitValidation]);
+
+  // Idle timer for auto-submitting validation after 15 seconds
+  const handleValidationIdle = useCallback(() => {
+    if (showValidation && submitValidationRef.current) {
+      toast.info(t('hostView.autoSubmittingValidation') || 'Auto-submitting validation due to inactivity', {
+        icon: '⏱️',
+        duration: 2000,
+      });
+      submitValidationRef.current();
+    }
+  }, [showValidation, t]);
+
+  const { reset: resetIdleTimer } = useIdleTimer({
+    timeout: 15000, // 15 seconds
+    onIdle: handleValidationIdle,
+    disabled: !showValidation, // Only active during validation
+    throttle: 500,
+  });
+
+  // Reset idle timer when validation state changes or validations are updated
+  useEffect(() => {
+    if (showValidation) {
+      resetIdleTimer();
+    }
+  }, [showValidation, validations, resetIdleTimer]);
 
   const toggleWordValidation = (username, word) => {
     // username is not used anymore - we validate by word only
@@ -515,7 +697,12 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-50 via-slate-100 to-slate-200 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 flex flex-col items-center p-2 sm:p-4 md:p-6 lg:p-8 overflow-auto transition-colors duration-300">
 
-      {/* Start Game Animation */}
+      {/* Countdown Animation (3-2-1) */}
+      {showCountdown && (
+        <CountdownAnimation onComplete={handleCountdownComplete} />
+      )}
+
+      {/* GO Animation */}
       {showStartAnimation && (
         <GoRipplesAnimation onComplete={() => setShowStartAnimation(false)} />
       )}
@@ -617,46 +804,104 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
           <DialogHeader>
             <DialogTitle className="text-center text-3xl sm:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 to-orange-500 flex items-center justify-center gap-3">
               <FaTrophy className="text-yellow-500" />
-              {t('hostView.finalScores')}
+              {tournamentData ? t('hostView.tournamentRound') + ' ' + tournamentData.currentRound : t('hostView.finalScores')}
               <FaTrophy className="text-yellow-500" />
             </DialogTitle>
           </DialogHeader>
 
           <div className="space-y-6">
-            {/* Podium */}
-            {finalScores && finalScores.length > 0 && (
-              <ResultsPodium sortedScores={finalScores} />
+            {/* Tournament Mode: Show both round results AND tournament standings */}
+            {tournamentData && (
+              <>
+                {/* Current Round Results */}
+                <div className="space-y-4">
+                  <h3 className="text-xl font-bold text-center text-purple-600 dark:text-purple-300">
+                    Round {tournamentData.currentRound} Results
+                  </h3>
+                  {finalScores && finalScores.length > 0 && (
+                    <>
+                      <ResultsPodium sortedScores={finalScores} />
+                      <div className="space-y-3 max-w-3xl mx-auto">
+                        {finalScores.map((player, index) => (
+                          <ResultsPlayerCard key={player.username} player={player} index={index} />
+                        ))}
+                      </div>
+                    </>
+                  )}
+                </div>
+
+                {/* Overall Tournament Standings */}
+                {tournamentData.standings && (
+                  <div className="space-y-4">
+                    <h3 className="text-xl font-bold text-center text-amber-600 dark:text-amber-300">
+                      Tournament Standings (After Round {tournamentData.currentRound})
+                    </h3>
+                    <div className="max-w-3xl mx-auto">
+                      <TournamentStandings
+                        standings={tournamentData.standings}
+                        currentRound={tournamentData.currentRound}
+                        totalRounds={tournamentData.totalRounds}
+                        isComplete={tournamentData.isComplete}
+                      />
+                    </div>
+                  </div>
+                )}
+              </>
             )}
 
-            {/* Detailed Player Cards */}
-            <div className="space-y-3 max-w-3xl mx-auto">
-              {finalScores && finalScores.map((player, index) => (
-                <ResultsPlayerCard key={player.username} player={player} index={index} />
-              ))}
-            </div>
+            {/* Regular Game Mode: Show only game results */}
+            {!tournamentData && finalScores && finalScores.length > 0 && (
+              <>
+                {/* Podium */}
+                <ResultsPodium sortedScores={finalScores} />
+
+                {/* Detailed Player Cards */}
+                <div className="space-y-3 max-w-3xl mx-auto">
+                  {finalScores.map((player, index) => (
+                    <ResultsPlayerCard key={player.username} player={player} index={index} />
+                  ))}
+                </div>
+              </>
+            )}
           </div>
           <DialogFooter className="flex-col sm:flex-row gap-2">
-            <Button
-              onClick={() => {
-                // Send reset message to all players
-                ws.send(JSON.stringify({ action: 'resetGame' }));
+            {tournamentData && !tournamentData.isComplete && (
+              <Button
+                onClick={() => {
+                  setFinalScores(null);
+                  // Start next round
+                  ws.send(JSON.stringify({ action: 'startTournamentRound' }));
+                }}
+                className="w-full bg-gradient-to-r from-amber-500 to-yellow-600 hover:from-amber-400 hover:to-yellow-500"
+              >
+                🏁 {t('hostView.nextRound')}
+              </Button>
+            )}
+            {(!tournamentData || tournamentData.isComplete) && (
+              <Button
+                onClick={() => {
+                  // Send reset message to all players
+                  ws.send(JSON.stringify({ action: 'resetGame' }));
 
-                // Reset host local state
-                setFinalScores(null);
-                setGameStarted(false);
-                setRemainingTime(null);
+                  // Reset host local state
+                  setFinalScores(null);
+                  setGameStarted(false);
+                  setRemainingTime(null);
+                  setTournamentData(null);
+                  setTournamentMode(false);
 
-                setTimerValue('');
+                  setTimerValue('');
 
-                toast.success(`${t('hostView.newGameReady')} 🎮`, {
-                  icon: '🔄',
-                  duration: 2000,
-                });
-              }}
-              className="w-full bg-gradient-to-r from-cyan-500 to-purple-600 hover:from-cyan-400 hover:to-purple-500"
-            >
-              🎮 {t('hostView.startNewGame')}
-            </Button>
+                  toast.success(`${t('hostView.newGameReady')} 🎮`, {
+                    icon: '🔄',
+                    duration: 2000,
+                  });
+                }}
+                className="w-full bg-gradient-to-r from-cyan-500 to-purple-600 hover:from-cyan-400 hover:to-purple-500"
+              >
+                🎮 {t('hostView.startNewGame')}
+              </Button>
+            )}
             <Button onClick={() => setFinalScores(null)} variant="outline" className="w-full">
               {t('hostView.close')}
             </Button>
@@ -726,6 +971,12 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
                   <Badge variant="outline" className="text-base sm:text-lg px-3 py-1 border-cyan-500/50 text-cyan-600 dark:text-cyan-300">
                     {roomLanguage === 'he' ? '🇮🇱 עברית' : roomLanguage === 'sv' ? '🇸🇪 Svenska' : roomLanguage === 'ja' ? '🇯🇵 日本語' : '🇺🇸 English'}
                   </Badge>
+                  {tournamentData && (
+                    <Badge className="text-sm px-3 py-1 bg-gradient-to-r from-amber-500 to-yellow-600 text-white border-0">
+                      <FaTrophy className="mr-1" />
+                      {t('hostView.tournamentMode')} - {t('hostView.tournamentRound')} {tournamentData.currentRound}/{tournamentData.totalRounds}
+                    </Badge>
+                  )}
                 </div>
               </div>
 
@@ -844,6 +1095,47 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
                           </label>
                         </div>
 
+                        {/* Tournament Mode */}
+                        <div className="space-y-3 p-3 bg-gradient-to-br from-amber-50 to-yellow-50 dark:from-amber-900/20 dark:to-yellow-900/20 rounded-md border-2 border-amber-500/50">
+                          <div className="flex items-center gap-2">
+                            <Checkbox
+                              id="tournamentMode"
+                              checked={tournamentMode}
+                              onCheckedChange={setTournamentMode}
+                              className="border-amber-500/50"
+                            />
+                            <label htmlFor="tournamentMode" className="text-sm font-bold text-amber-700 dark:text-amber-300 cursor-pointer flex items-center gap-2">
+                              <FaTrophy className="text-amber-500" />
+                              {t('hostView.tournamentMode') || 'Tournament Mode'}
+                            </label>
+                          </div>
+
+                          {tournamentMode && (
+                            <div className="flex items-center gap-2 bg-white/50 dark:bg-slate-800/50 p-2 rounded-md border border-amber-500/30">
+                              <span className="text-xs font-medium text-amber-700 dark:text-amber-300 whitespace-nowrap">
+                                {t('hostView.rounds') || 'Rounds'}:
+                              </span>
+                              <button
+                                type="button"
+                                onClick={() => setTournamentRounds(prev => Math.max(2, prev - 1))}
+                                className="w-7 h-7 flex items-center justify-center rounded-full bg-white dark:bg-slate-800 border border-amber-500/50 text-amber-600 dark:text-amber-300 hover:bg-amber-50 dark:hover:bg-amber-500/20 transition-all duration-300"
+                              >
+                                <FaMinus size={10} />
+                              </button>
+                              <span className="w-8 text-center text-sm font-bold text-amber-700 dark:text-amber-300">
+                                {tournamentRounds}
+                              </span>
+                              <button
+                                type="button"
+                                onClick={() => setTournamentRounds(prev => Math.min(10, prev + 1))}
+                                className="w-7 h-7 flex items-center justify-center rounded-full bg-white dark:bg-slate-800 border border-amber-500/50 text-amber-600 dark:text-amber-300 hover:bg-amber-50 dark:hover:bg-amber-500/20 transition-all duration-300"
+                              >
+                                <FaPlus size={10} />
+                              </button>
+                            </div>
+                          )}
+                        </div>
+
                         {/* Difficulty Selection */}
                         <div className="space-y-2">
                           <label className="text-sm font-medium text-purple-600 dark:text-purple-300">
@@ -960,33 +1252,22 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
 
           {/* Letter Grid - RIGHT - Conditional rendering based on host playing */}
           {gameStarted && !hostPlaying ? (
-            /* Spectator Mode - Large Grid View */
-            <Card className="fixed inset-0 z-50 m-0 max-w-none h-screen w-screen justify-center bg-slate-900/95 dark:bg-slate-900/95 border-cyan-500/50 p-4 flex-1 bg-white/80 dark:bg-slate-800/80 backdrop-blur-md rounded-lg shadow-lg border border-cyan-500/30 shadow-[0_0_15px_rgba(6,182,212,0.1)] flex flex-col items-center transition-all duration-500 ease-in-out overflow-hidden">
-              {/* Circular Timer */}
-              {remainingTime !== null && (
-                <motion.div
-                  initial={{ scale: 0, opacity: 0 }}
-                  animate={{ scale: 1, opacity: 1 }}
-                  transition={{ duration: 0.5, type: 'spring' }}
-                  className="mb-4"
-                >
-                  <CircularTimer remainingTime={remainingTime} totalTime={timerValue * 60} />
-                </motion.div>
-              )}
-
-              {/* Grid Container - Responsive Sizing */}
-              <div className="flex-grow p-1 md:p-3 w-full flex justify-center items-center transition-all duration-500">
-                <div className="max-w-[min(90vh,90vw)] max-h-[min(90vh,90vw)] w-full h-full flex items-center justify-center">
-                  <GridComponent
-                    grid={tableData}
-                    interactive={false}
-                    largeText={true}
-                    selectedCells={highlightedCells}
-                    className="w-full h-full aspect-square max-w-full max-h-full"
-                  />
-                </div>
-              </div>
-            </Card>
+            /* Spectator Mode - Live Results Dashboard */
+            <div className="fixed inset-0 z-50 bg-slate-50 dark:bg-slate-900 overflow-y-auto">
+              <HostLiveResults
+                players={playersReady.map(player => {
+                  const username = typeof player === 'string' ? player : player.username;
+                  return {
+                    username,
+                    score: playerScores[username] || 0,
+                    wordCount: playerWordCounts[username] || 0,
+                    achievements: playerAchievements[username] || []
+                  };
+                })}
+                gameLanguage={roomLanguage}
+                remainingTime={remainingTime || 0}
+              />
+            </div>
           ) : (
             /* Playing Mode or Pre-Game - Interactive Grid */
             <Card className="flex-1 bg-white/80 dark:bg-slate-800/80 backdrop-blur-md p-1 sm:p-3 rounded-lg shadow-lg border border-cyan-500/30 shadow-[0_0_15px_rgba(6,182,212,0.1)] flex flex-col items-center transition-all duration-500 ease-in-out overflow-hidden">

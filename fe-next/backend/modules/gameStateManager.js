@@ -45,6 +45,20 @@ const deleteGame = (gameCode) => {
   }
 };
 
+// Get tournament ID from game code
+const getTournamentIdFromGame = (gameCode) => {
+  return games[gameCode]?.tournamentId || null;
+};
+
+// Set tournament ID for a game
+const setTournamentIdForGame = (gameCode, tournamentId) => {
+  if (games[gameCode]) {
+    games[gameCode].tournamentId = tournamentId;
+    return true;
+  }
+  return false;
+};
+
 module.exports = {
   games,
   gameWs,
@@ -55,5 +69,7 @@ module.exports = {
   getWsHostFromGameCode,
   getWsFromUsername,
   getGameCodeFromUsername,
-  deleteGame
+  deleteGame,
+  getTournamentIdFromGame,
+  setTournamentIdForGame
 };

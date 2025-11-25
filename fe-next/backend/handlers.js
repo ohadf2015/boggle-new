@@ -3,8 +3,24 @@ const dictionary = require('./dictionary');
 const { isWordOnBoard } = require('./modules/wordValidator');
 const { calculateWordScore } = require('./modules/scoringEngine');
 const { ACHIEVEMENTS, checkLiveAchievements, awardFinalAchievements, getLocalizedAchievements } = require('./modules/achievementManager');
-const { games, gameWs, wsUsername, getActiveRooms, getGame, getUsernameFromWs, getWsHostFromGameCode, getWsFromUsername, getGameCodeFromUsername, deleteGame: deleteGameFromState } = require('./modules/gameStateManager');
+const { games, gameWs, wsUsername, getActiveRooms, getGame, getUsernameFromWs, getWsHostFromGameCode, getWsFromUsername, getGameCodeFromUsername, deleteGame: deleteGameFromState, getTournamentIdFromGame, setTournamentIdForGame } = require('./modules/gameStateManager');
 const { safeSend, broadcast } = require('./utils/websocketHelpers');
+const { generateRandomTable } = require('../utils/utils');
+const { DIFFICULTIES } = require('../utils/consts');
+const {
+  tournaments,
+  createTournament,
+  addPlayerToTournament,
+  removePlayerFromTournament,
+  startTournamentRound,
+  completeTournamentRound,
+  completeTournament,
+  getTournament,
+  getTournamentStandings,
+  deleteTournament,
+  getActiveTournaments,
+  linkGameToTournament,
+} = require('./modules/tournamentManager');
 
 // Avatar generation
 const AVATAR_COLORS = [
@@ -454,7 +470,7 @@ const addUserToGame = async (gameCode, username, ws) => {
     );
 }
 
-const handleStartGame = async (host, letterGrid, timerSeconds, language) => {
+const handleStartGame = async (host, letterGrid, timerSeconds, language, hostPlaying = true) => {
   const gameCode = gameWs.get(host);
 
   if (!gameCode || !games[gameCode]) {
@@ -462,7 +478,7 @@ const handleStartGame = async (host, letterGrid, timerSeconds, language) => {
     return;
   }
 
-  console.log(`[START_GAME] Starting game ${gameCode}`);
+  console.log(`[START_GAME] Starting game ${gameCode}, host playing: ${hostPlaying}`);
 
   games[gameCode].gameState = 'playing';
   games[gameCode].startTime = Date.now();
@@ -470,6 +486,7 @@ const handleStartGame = async (host, letterGrid, timerSeconds, language) => {
   games[gameCode].letterGrid = letterGrid;
   games[gameCode].firstWordFound = false;
   games[gameCode].timerSeconds = timerSeconds;
+  games[gameCode].hostPlaying = hostPlaying;
   if (language) {
     games[gameCode].language = language;
   }
@@ -1297,8 +1314,18 @@ const handleValidateWords = (host, validations, letterGrid) => {
   const localizedAchievements = getLocalizedAchievements(gameLanguage);
 
   // Calculate final scores with all validated data - only for existing players
+  // Exclude host if they're not playing
+  const hostUsername = games[gameCode].hostUsername;
+  const hostPlaying = games[gameCode].hostPlaying !== false; // Default to true if not set
+
   const finalScores = Object.keys(games[gameCode].playerScores)
-    .filter(username => games[gameCode].users[username]) // Only include players still in game
+    .filter(username => {
+      // Only include players still in game
+      if (!games[gameCode].users[username]) return false;
+      // Exclude host if not playing
+      if (username === hostUsername && !hostPlaying) return false;
+      return true;
+    })
     .map(username => {
       // Safety checks for all data
       const playerWordDetails = games[gameCode].playerWordDetails[username] || [];
@@ -1332,6 +1359,9 @@ const handleValidateWords = (host, validations, letterGrid) => {
     action: "validationComplete",
     scores: finalScores
   });
+
+  // Check if this is a tournament game and complete the round
+  handleCompleteTournamentRound(gameCode);
 };
 
 // Handle host manually closing the room
@@ -1651,6 +1681,258 @@ const startRoomGracePeriod = (gameCode, wss) => {
   }, ROOM_KEEP_ALIVE_DURATION);
 };
 
+// ============================================================================
+// TOURNAMENT MODE HANDLERS
+// ============================================================================
+
+// Create a new tournament
+const handleCreateTournament = (host, settings) => {
+  const hostUsername = wsUsername.get(host);
+  const gameCode = gameWs.get(host);
+
+  if (!gameCode || !games[gameCode]) {
+    console.error('[TOURNAMENT] Cannot create tournament - host not in a game');
+    safeSend(host, JSON.stringify({
+      action: 'error',
+      message: 'Must create a room first before starting a tournament'
+    }));
+    return null;
+  }
+
+  const game = games[gameCode];
+  const hostPlayerId = game.hostPlayerId;
+
+  try {
+    const tournament = createTournament(hostPlayerId, hostUsername, settings);
+
+    // Link the game to this tournament
+    setTournamentIdForGame(gameCode, tournament.id);
+
+    // Add all current players in the room to the tournament
+    Object.keys(game.users).forEach(username => {
+      const playerId = game.playerIds[username];
+      const avatar = game.playerAvatars[username];
+      addPlayerToTournament(tournament.id, playerId, username, avatar);
+    });
+
+    console.log(`[TOURNAMENT] Created tournament ${tournament.id} in game ${gameCode} with ${Object.keys(tournament.players).length} players`);
+
+    const tournamentMessage = {
+      action: 'tournamentCreated',
+      tournament: {
+        id: tournament.id,
+        name: tournament.name,
+        totalRounds: tournament.totalRounds,
+        currentRound: tournament.currentRound,
+        settings: tournament.settings,
+        players: Object.values(tournament.players).map(p => ({
+          playerId: p.playerId,
+          username: p.username,
+          avatar: p.avatar,
+          totalScore: p.totalScore,
+          roundScores: p.roundScores,
+        })),
+      },
+    };
+
+    // Broadcast tournament created to all players
+    sendAllPlayerAMessage(gameCode, tournamentMessage);
+
+    // Also send explicitly to host to ensure they get it
+    sendHostAMessage(gameCode, tournamentMessage);
+
+    return tournament;
+  } catch (error) {
+    console.error('[TOURNAMENT] Error creating tournament:', error);
+    safeSend(host, JSON.stringify({
+      action: 'error',
+      message: 'Failed to create tournament'
+    }));
+    return null;
+  }
+};
+
+// Start a tournament round
+const handleStartTournamentRound = (host) => {
+  const gameCode = gameWs.get(host);
+
+  if (!gameCode || !games[gameCode]) {
+    console.error('[TOURNAMENT] Cannot start round - game not found');
+    return;
+  }
+
+  const tournamentId = getTournamentIdFromGame(gameCode);
+  if (!tournamentId) {
+    console.error('[TOURNAMENT] No tournament associated with this game');
+    return;
+  }
+
+  const tournament = getTournament(tournamentId);
+  if (!tournament) {
+    console.error('[TOURNAMENT] Tournament not found');
+    return;
+  }
+
+  // Check if tournament is complete
+  if (tournament.currentRound >= tournament.totalRounds) {
+    console.log('[TOURNAMENT] Tournament already completed');
+    safeSend(host, JSON.stringify({
+      action: 'tournamentComplete',
+      standings: tournament.finalStandings,
+    }));
+    return;
+  }
+
+  try {
+    // Start a new round in the tournament
+    const round = startTournamentRound(tournamentId, gameCode);
+
+    console.log(`[TOURNAMENT] Starting round ${round.roundNumber}/${tournament.totalRounds} for tournament ${tournamentId}`);
+
+    // Broadcast round started to all players
+    sendAllPlayerAMessage(gameCode, {
+      action: 'tournamentRoundStarting',
+      roundNumber: round.roundNumber,
+      totalRounds: tournament.totalRounds,
+      standings: getTournamentStandings(tournamentId),
+    });
+
+    // Generate grid and settings from tournament configuration
+    const difficulty = tournament.settings.difficulty || 'medium';
+    const difficultyConfig = DIFFICULTIES[difficulty];
+    const language = tournament.settings.language || 'en';
+    const timerSeconds = tournament.settings.timerSeconds || 180;
+
+    // Generate random letter grid
+    const letterGrid = generateRandomTable(difficultyConfig.rows, difficultyConfig.cols, language);
+
+    // Auto-start the game after a brief delay with proper parameters
+    setTimeout(() => {
+      if (games[gameCode]) {
+        handleStartGame(host, letterGrid, timerSeconds, language, games[gameCode].hostPlaying);
+      }
+    }, 3000);
+
+  } catch (error) {
+    console.error('[TOURNAMENT] Error starting round:', error);
+    safeSend(host, JSON.stringify({
+      action: 'error',
+      message: error.message || 'Failed to start tournament round'
+    }));
+  }
+};
+
+// Complete a tournament round (called after game validation)
+const handleCompleteTournamentRound = (gameCode) => {
+  const tournamentId = getTournamentIdFromGame(gameCode);
+  if (!tournamentId) {
+    return; // Not a tournament game
+  }
+
+  const tournament = getTournament(tournamentId);
+  if (!tournament) {
+    console.error('[TOURNAMENT] Tournament not found');
+    return;
+  }
+
+  const game = games[gameCode];
+  if (!game) {
+    console.error('[TOURNAMENT] Game not found');
+    return;
+  }
+
+  try {
+    // Collect round results from the game
+    const roundResults = {};
+    Object.keys(game.users).forEach(username => {
+      const playerId = game.playerIds[username];
+      roundResults[playerId] = {
+        score: game.playerScores[username] || 0,
+        words: game.playerWords[username] || [],
+        achievements: game.playerAchievements[username] || [],
+      };
+    });
+
+    // Update tournament with round results
+    const round = completeTournamentRound(tournamentId, roundResults);
+
+    console.log(`[TOURNAMENT] Completed round ${round.roundNumber}/${tournament.totalRounds} for tournament ${tournamentId}`);
+
+    // Get updated standings
+    const standings = getTournamentStandings(tournamentId);
+
+    // Broadcast round completed to all players
+    sendAllPlayerAMessage(gameCode, {
+      action: 'tournamentRoundCompleted',
+      roundNumber: round.roundNumber,
+      totalRounds: tournament.totalRounds,
+      standings: standings,
+      isComplete: tournament.status === 'completed',
+    });
+
+    // If tournament is complete, send final results
+    if (tournament.status === 'completed') {
+      sendAllPlayerAMessage(gameCode, {
+        action: 'tournamentComplete',
+        standings: tournament.finalStandings,
+      });
+    }
+
+  } catch (error) {
+    console.error('[TOURNAMENT] Error completing round:', error);
+  }
+};
+
+// Get tournament standings
+const handleGetTournamentStandings = (ws) => {
+  const gameCode = gameWs.get(ws);
+  if (!gameCode || !games[gameCode]) {
+    return;
+  }
+
+  const tournamentId = getTournamentIdFromGame(gameCode);
+  if (!tournamentId) {
+    return;
+  }
+
+  const tournament = getTournament(tournamentId);
+  if (!tournament) {
+    return;
+  }
+
+  const standings = getTournamentStandings(tournamentId);
+
+  safeSend(ws, JSON.stringify({
+    action: 'tournamentStandings',
+    standings: standings,
+    currentRound: tournament.currentRound,
+    totalRounds: tournament.totalRounds,
+    status: tournament.status,
+  }));
+};
+
+// Cancel/delete tournament
+const handleCancelTournament = (host) => {
+  const gameCode = gameWs.get(host);
+  if (!gameCode || !games[gameCode]) {
+    return;
+  }
+
+  const tournamentId = getTournamentIdFromGame(gameCode);
+  if (!tournamentId) {
+    return;
+  }
+
+  deleteTournament(tournamentId);
+  setTournamentIdForGame(gameCode, null);
+
+  console.log(`[TOURNAMENT] Tournament ${tournamentId} cancelled`);
+
+  sendAllPlayerAMessage(gameCode, {
+    action: 'tournamentCancelled',
+  });
+};
+
 module.exports = {
   setNewGame,
   addUserToGame,
@@ -1674,4 +1956,10 @@ module.exports = {
   handleHostKeepAlive,
   startRoomGracePeriod,
   isRoomWithinGracePeriod,
+  // Tournament handlers
+  handleCreateTournament,
+  handleStartTournamentRound,
+  handleCompleteTournamentRound,
+  handleGetTournamentStandings,
+  handleCancelTournament,
 };

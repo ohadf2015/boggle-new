@@ -6,10 +6,9 @@ import { Card } from './components/ui/card';
 import GridComponent from './components/GridComponent';
 import confetti from 'canvas-confetti';
 import { useLanguage } from './contexts/LanguageContext';
-import ResultsPodium from './components/results/ResultsPodium';
 import ResultsPlayerCard from './components/results/ResultsPlayerCard';
-import ResultsWinnerBanner from './components/results/ResultsWinnerBanner';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from './components/ui/alert-dialog';
+import { clearSession } from './utils/session';
 
 const LetterGrid = ({ letterGrid }) => {
   const { t } = useLanguage();
@@ -35,7 +34,7 @@ const LetterGrid = ({ letterGrid }) => {
   );
 };
 
-const ResultsPage = ({ finalScores, letterGrid, gameCode, onReturnToRoom, isHost = false }) => {
+const ResultsPage = ({ finalScores, letterGrid, gameCode, onReturnToRoom }) => {
   const { t } = useLanguage();
   const [showExitConfirm, setShowExitConfirm] = useState(false);
 
@@ -44,11 +43,24 @@ const ResultsPage = ({ finalScores, letterGrid, gameCode, onReturnToRoom, isHost
   };
 
   const confirmExitRoom = () => {
+    // Clear session before reloading to prevent auto-redirect
+    clearSession();
     window.location.reload();
   };
 
   const sortedScores = useMemo(() => {
     return finalScores ? [...finalScores].sort((a, b) => b.score - a.score) : [];
+  }, [finalScores]);
+
+  // Create a map of all player words for duplicate detection
+  const allPlayerWords = useMemo(() => {
+    const wordMap = {};
+    if (finalScores) {
+      finalScores.forEach(player => {
+        wordMap[player.username] = player.allWords || [];
+      });
+    }
+    return wordMap;
   }, [finalScores]);
 
   const winner = sortedScores[0];
@@ -111,8 +123,7 @@ const ResultsPage = ({ finalScores, letterGrid, gameCode, onReturnToRoom, isHost
         </h1>
       </motion.div>
 
-      {/* Winner Announcement Banner - Only show for host */}
-      {isHost && winner && <ResultsWinnerBanner winner={winner} />}
+      {/* Winner Announcement Banner - Removed for unified view */}
 
       {/* Main Results Card */}
       <motion.div
@@ -158,19 +169,93 @@ const ResultsPage = ({ finalScores, letterGrid, gameCode, onReturnToRoom, isHost
           {/* Letter Grid */}
           {letterGrid && <LetterGrid letterGrid={letterGrid} />}
 
-          {/* Podium */}
-          <ResultsPodium sortedScores={sortedScores.slice(0, 3)} />
+          {/* Duplicate Words Clarification Banner */}
+          <motion.div
+            initial={{ y: -20, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 0.4 }}
+            className="mb-6 max-w-2xl mx-auto"
+          >
+            <div className="p-4 rounded-lg bg-gradient-to-r from-orange-500/20 to-red-500/20 border-2 border-orange-500/40 backdrop-blur-sm">
+              <p className="text-center text-sm font-bold text-orange-800 dark:text-orange-200">
+                ⚠️ {t('results.duplicateWarning')}
+              </p>
+            </div>
+          </motion.div>
+
+          {/* Top 3 Ranked List (Flat Design) */}
+          {sortedScores.length > 0 && (
+            <motion.div
+              initial={{ y: 20, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ delay: 0.5 }}
+              className="mb-8 max-w-3xl mx-auto"
+            >
+              <div className="space-y-3">
+                {sortedScores.slice(0, 3).map((player, index) => {
+                  const medals = ['🥇', '🥈', '🥉'];
+                  const gradients = [
+                    'from-yellow-500/20 via-yellow-400/15 to-orange-500/20 border-yellow-500/50',
+                    'from-gray-400/20 via-gray-300/15 to-slate-400/20 border-gray-400/50',
+                    'from-orange-500/20 via-amber-400/15 to-orange-600/20 border-orange-500/50'
+                  ];
+                  const textColors = [
+                    'text-yellow-600 dark:text-yellow-400',
+                    'text-gray-600 dark:text-gray-300',
+                    'text-orange-600 dark:text-orange-400'
+                  ];
+
+                  return (
+                    <motion.div
+                      key={player.username}
+                      initial={{ x: -30, opacity: 0, scale: 0.95 }}
+                      animate={{ x: 0, opacity: 1, scale: 1 }}
+                      transition={{ delay: 0.6 + index * 0.1, type: 'spring', stiffness: 120 }}
+                      whileHover={{ scale: 1.02, y: -2, transition: { duration: 0.2 } }}
+                      className={`flex items-center justify-between p-4 rounded-xl bg-gradient-to-r ${gradients[index]} border-2 backdrop-blur-md shadow-lg hover:shadow-xl transition-all`}
+                    >
+                      <div className="flex items-center gap-4">
+                        <motion.div
+                          animate={index === 0 ? { scale: [1, 1.2, 1], rotate: [0, -10, 10, -10, 0] } : {}}
+                          transition={index === 0 ? { duration: 2, repeat: Infinity, repeatDelay: 3 } : {}}
+                          className="text-4xl"
+                        >
+                          {medals[index]}
+                        </motion.div>
+                        <div>
+                          <h3 className="text-xl font-bold text-slate-900 dark:text-white">
+                            {player.username}
+                          </h3>
+                          <p className="text-sm text-slate-600 dark:text-slate-400">
+                            {player.wordCount} {t('hostView.words')}
+                            {player.validWordCount !== undefined && ` • ${player.validWordCount} ${t('results.valid')}`}
+                          </p>
+                        </div>
+                      </div>
+                      <motion.div
+                        animate={index === 0 ? { scale: [1, 1.1, 1] } : {}}
+                        transition={index === 0 ? { duration: 1.5, repeat: Infinity } : {}}
+                        className={`text-4xl font-black ${textColors[index]}`}
+                      >
+                        {player.score}
+                      </motion.div>
+                    </motion.div>
+                  );
+                })}
+              </div>
+            </motion.div>
+          )}
 
           {/* Remaining Players List (4th place and beyond) */}
           {sortedScores.length > 3 && (
             <motion.div
               initial={{ y: 20, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
-              transition={{ delay: 0.6 }}
-              className="mt-8 max-w-2xl mx-auto"
+              transition={{ delay: 0.9 }}
+              className="mt-8 max-w-3xl mx-auto"
             >
               <h3 className="text-xl font-bold text-slate-700 dark:text-slate-300 mb-4 text-center">
-                {t('results.otherPlayers') || 'Other Players'}
+                {t('results.otherPlayers')}
               </h3>
               <div className="space-y-2">
                 {sortedScores.slice(3).map((player, index) => (
@@ -178,11 +263,11 @@ const ResultsPage = ({ finalScores, letterGrid, gameCode, onReturnToRoom, isHost
                     key={player.username}
                     initial={{ x: -20, opacity: 0 }}
                     animate={{ x: 0, opacity: 1 }}
-                    transition={{ delay: 0.7 + index * 0.1 }}
+                    transition={{ delay: 1.0 + index * 0.08 }}
                     className="flex items-center justify-between p-3 rounded-lg bg-gradient-to-r from-slate-100 to-slate-50 dark:from-slate-700 dark:to-slate-800 border border-slate-300 dark:border-slate-600 hover:shadow-md transition-all"
                   >
                     <div className="flex items-center gap-3">
-                      <span className="text-lg font-bold text-slate-600 dark:text-slate-400 min-w-[2rem]">
+                      <span className="text-lg font-bold text-slate-600 dark:text-slate-400 min-w-[2.5rem]">
                         #{index + 4}
                       </span>
                       <span className="font-semibold text-slate-800 dark:text-white">
@@ -206,7 +291,12 @@ const ResultsPage = ({ finalScores, letterGrid, gameCode, onReturnToRoom, isHost
           {/* Detailed Player Cards (All Players) */}
           <div className="space-y-4 max-w-4xl mx-auto mt-8">
             {sortedScores.map((player, index) => (
-              <ResultsPlayerCard key={player.username} player={player} index={index} />
+              <ResultsPlayerCard
+                key={player.username}
+                player={player}
+                index={index}
+                allPlayerWords={allPlayerWords}
+              />
             ))}
           </div>
 

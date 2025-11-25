@@ -1,44 +1,65 @@
-import React from 'react';
-import { motion } from 'framer-motion';
+import React, { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Badge } from '../ui/badge';
 import { Card } from '../ui/card';
 import { AchievementBadge } from '../AchievementBadge';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { cn } from '../../lib/utils';
 import { applyHebrewFinalLetters } from '../../utils/utils';
+import { ChevronDown, ChevronUp } from 'lucide-react';
 
 const WORD_COLORS = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#FFA07A', '#98D8C8', '#F7DC6F', '#BB8FCE'];
 
-const WordChip = ({ wordObj, index }) => {
+const WordChip = ({ wordObj, index, playerCount, t }) => {
   const isDuplicate = wordObj.isDuplicate;
   const isValid = wordObj.validated;
   const displayWord = applyHebrewFinalLetters(wordObj.word);
 
   const label = isDuplicate
-    ? `${displayWord} (כפול ❌)`
+    ? `${displayWord} (${t('results.shared')} • ${t('results.noPoints')})`
     : `${displayWord} ${isValid ? `(${wordObj.score})` : '(✗)'}`;
 
   return (
-    <Badge
-      className={cn(
-        "font-bold transition-all duration-200 hover:scale-105",
-        isDuplicate && "bg-orange-500 text-white opacity-70 line-through",
-        !isDuplicate && isValid && "text-white shadow-md",
-        !isDuplicate && !isValid && "bg-gray-400 text-white opacity-70"
+    <div className="relative group">
+      <Badge
+        className={cn(
+          "font-bold transition-all duration-200 hover:scale-105",
+          isDuplicate && "bg-orange-500 text-white opacity-70 line-through",
+          !isDuplicate && isValid && "text-white shadow-md",
+          !isDuplicate && !isValid && "bg-gray-400 text-white opacity-70"
+        )}
+        style={{
+          backgroundColor: !isDuplicate && isValid
+            ? WORD_COLORS[index % WORD_COLORS.length]
+            : undefined
+        }}
+      >
+        {label}
+      </Badge>
+      {isDuplicate && playerCount > 1 && (
+        <span className="absolute -top-2 -right-2 bg-orange-600 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold shadow-md">
+          {playerCount}
+        </span>
       )}
-      style={{
-        backgroundColor: !isDuplicate && isValid
-          ? WORD_COLORS[index % WORD_COLORS.length]
-          : undefined
-      }}
-    >
-      {label}
-    </Badge>
+    </div>
   );
 };
 
-const ResultsPlayerCard = ({ player, index }) => {
+const ResultsPlayerCard = ({ player, index, allPlayerWords }) => {
   const { t } = useLanguage();
+  const [isWordsExpanded, setIsWordsExpanded] = useState(false);
+
+  // Calculate how many players found each word
+  const getPlayerCountForWord = (word) => {
+    if (!allPlayerWords) return 1;
+    let count = 0;
+    Object.values(allPlayerWords).forEach(playerWordList => {
+      if (playerWordList.some(w => w.word.toLowerCase() === word.toLowerCase())) {
+        count++;
+      }
+    });
+    return count;
+  };
 
   // Determine rank styling
   const getRankIcon = () => {
@@ -116,14 +137,40 @@ const ResultsPlayerCard = ({ player, index }) => {
         {/* Words Section */}
         {player.allWords && player.allWords.length > 0 && (
           <div className="mb-3">
-            <p className="text-sm font-bold mb-2 text-purple-600 dark:text-purple-400">
-              {t('hostView.words')}:
-            </p>
-            <div className="flex flex-wrap gap-2">
-              {player.allWords.map((wordObj, i) => (
-                <WordChip key={i} wordObj={wordObj} index={i} />
-              ))}
-            </div>
+            <button
+              onClick={() => setIsWordsExpanded(!isWordsExpanded)}
+              className="w-full flex items-center justify-between text-sm font-bold mb-2 text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 transition-colors"
+            >
+              <span>{t('hostView.words')}: ({player.allWords.length})</span>
+              {isWordsExpanded ? (
+                <ChevronUp className="w-4 h-4" />
+              ) : (
+                <ChevronDown className="w-4 h-4" />
+              )}
+            </button>
+            <AnimatePresence>
+              {isWordsExpanded && (
+                <motion.div
+                  initial={{ height: 0, opacity: 0 }}
+                  animate={{ height: 'auto', opacity: 1 }}
+                  exit={{ height: 0, opacity: 0 }}
+                  transition={{ duration: 0.3 }}
+                  className="overflow-hidden"
+                >
+                  <div className="flex flex-wrap gap-2 pt-2">
+                    {player.allWords.map((wordObj, i) => (
+                      <WordChip
+                        key={i}
+                        wordObj={wordObj}
+                        index={i}
+                        playerCount={getPlayerCountForWord(wordObj.word)}
+                        t={t}
+                      />
+                    ))}
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
         )}
 
