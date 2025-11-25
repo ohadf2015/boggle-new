@@ -1,9 +1,22 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { FaCrown, FaMedal, FaTrophy } from 'react-icons/fa';
 import { useLanguage } from '../../contexts/LanguageContext';
 
-const PodiumPlace = ({ player, place, delay }) => {
+const celebrationImages = [
+  '/winner-celebration/trophy-confetti.png',
+  '/winner-celebration/crown-sparkles.png',
+  '/winner-celebration/medal-stars.png',
+  '/winner-celebration/fireworks-burst.png',
+  '/winner-celebration/champion-ribbon.png',
+  '/winner-celebration/laurel-wreath.png',
+  '/winner-celebration/celebration-balloons.png',
+  '/winner-celebration/winner-podium.png',
+  '/winner-celebration/star-burst.png',
+  '/winner-celebration/thumbs-up.png',
+];
+
+const PodiumPlace = ({ player, place, delay, backgroundImage }) => {
   const { t } = useLanguage();
 
   const heights = {
@@ -19,9 +32,9 @@ const PodiumPlace = ({ player, place, delay }) => {
   };
 
   const gradients = {
-    1: 'from-yellow-500 via-yellow-400 to-yellow-300',
-    2: 'from-gray-400 via-gray-300 to-gray-200',
-    3: 'from-orange-500 via-orange-400 to-orange-300'
+    1: 'from-yellow-500 via-yellow-400 via-orange-400 to-yellow-300',
+    2: 'from-gray-400 via-slate-300 to-gray-200',
+    3: 'from-orange-500 via-amber-400 to-orange-300'
   };
 
   const borderColors = {
@@ -31,9 +44,9 @@ const PodiumPlace = ({ player, place, delay }) => {
   };
 
   const glowColors = {
-    1: 'shadow-[0_0_30px_rgba(234,179,8,0.6)]',
-    2: 'shadow-[0_0_20px_rgba(156,163,175,0.4)]',
-    3: 'shadow-[0_0_20px_rgba(249,115,22,0.4)]'
+    1: 'shadow-[0_0_40px_rgba(234,179,8,0.7),0_0_60px_rgba(255,215,0,0.4)]',
+    2: 'shadow-[0_0_25px_rgba(156,163,175,0.5)]',
+    3: 'shadow-[0_0_25px_rgba(249,115,22,0.5)]'
   };
 
   const icons = {
@@ -84,9 +97,40 @@ const PodiumPlace = ({ player, place, delay }) => {
       {/* Player Info Card */}
       <motion.div
         whileHover={{ scale: 1.05, y: -5 }}
-        className={`mb-2 text-center p-2 rounded-lg bg-gradient-to-br ${gradients[place]} border-2 ${borderColors[place]} ${glowColors[place]} backdrop-blur-md`}
-        style={{ minWidth: '100px' }}
+        animate={place === 1 ? {
+          boxShadow: [
+            '0 0 40px rgba(234,179,8,0.7)',
+            '0 0 60px rgba(255,215,0,0.8)',
+            '0 0 40px rgba(234,179,8,0.7)'
+          ]
+        } : {}}
+        transition={place === 1 ? { duration: 2, repeat: Infinity } : {}}
+        className={`mb-2 text-center p-2 rounded-lg bg-gradient-to-br ${gradients[place]} border-2 ${borderColors[place]} ${glowColors[place]} backdrop-blur-md relative overflow-hidden`}
+        style={{ minWidth: '100px', backgroundSize: '200% 200%', animation: place === 1 ? 'gradient-xy 4s ease infinite' : 'none' }}
       >
+        {/* Background Celebration Image */}
+        {backgroundImage && (
+          <div className="absolute inset-0 overflow-hidden opacity-20 pointer-events-none">
+            <img
+              src={backgroundImage}
+              alt="celebration"
+              className="w-full h-full object-cover"
+              style={{
+                mixBlendMode: 'soft-light',
+                filter: 'blur(1px) saturate(1.3)'
+              }}
+            />
+          </div>
+        )}
+        {/* Shimmer effect for 1st place */}
+        {place === 1 && (
+          <motion.div
+            className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent"
+            animate={{ x: ['-100%', '200%'] }}
+            transition={{ duration: 2, repeat: Infinity, ease: 'linear', repeatDelay: 1 }}
+            style={{ width: '50%' }}
+          />
+        )}
         <motion.div
           animate={place === 1 ? {
             scale: [1, 1.1, 1],
@@ -174,6 +218,15 @@ const PodiumPlace = ({ player, place, delay }) => {
 };
 
 const ResultsPodium = ({ sortedScores }) => {
+  // Randomly select celebration images for each podium position
+  const podiumImages = useMemo(() => {
+    const shuffled = [...celebrationImages].sort(() => Math.random() - 0.5);
+    return {
+      first: shuffled[0],
+      second: shuffled[1],
+      third: shuffled[2]
+    };
+  }, []);
 
   return (
     <div className="mb-6 sm:mb-8 md:mb-12 relative">
@@ -184,17 +237,32 @@ const ResultsPodium = ({ sortedScores }) => {
       <div className="flex justify-center items-end gap-4 md:gap-6 min-h-[180px] relative px-2 sm:px-3 md:px-4">
         {/* 2nd Place */}
         {sortedScores[1] && (
-          <PodiumPlace player={sortedScores[1]} place={2} delay={0.3} />
+          <PodiumPlace
+            player={sortedScores[1]}
+            place={2}
+            delay={0.3}
+            backgroundImage={podiumImages.second}
+          />
         )}
 
         {/* 1st Place */}
         {sortedScores[0] && (
-          <PodiumPlace player={sortedScores[0]} place={1} delay={0.1} />
+          <PodiumPlace
+            player={sortedScores[0]}
+            place={1}
+            delay={0.1}
+            backgroundImage={podiumImages.first}
+          />
         )}
 
         {/* 3rd Place */}
         {sortedScores[2] && (
-          <PodiumPlace player={sortedScores[2]} place={3} delay={0.5} />
+          <PodiumPlace
+            player={sortedScores[2]}
+            place={3}
+            delay={0.5}
+            backgroundImage={podiumImages.third}
+          />
         )}
       </div>
 

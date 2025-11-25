@@ -119,19 +119,40 @@ const ResultsPage = ({ finalScores, letterGrid, gameCode, onReturnToRoom, isHost
         initial={{ scale: 0.9, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         transition={{ type: 'spring', stiffness: 150, damping: 25 }}
-        className="w-full max-w-6xl"
+        className="w-full max-w-6xl relative"
       >
-        <Card className="p-3 sm:p-4 md:p-6 max-h-[85vh] overflow-auto bg-white/95 dark:bg-slate-800/95 backdrop-blur-xl border-2 border-purple-500/20 shadow-[0_8px_32px_rgba(168,85,247,0.15)] rounded-2xl">
+        {/* Enhanced glow effect around card */}
+        <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/20 via-purple-500/20 to-teal-500/20 rounded-2xl blur-2xl"
+             style={{ animation: 'gradient-x 6s ease infinite' }} />
+
+        <Card className="relative p-3 sm:p-4 md:p-6 max-h-[85vh] overflow-auto bg-white/98 dark:bg-slate-800/98 backdrop-blur-xl border-2 border-purple-500/30 shadow-[0_8px_32px_rgba(168,85,247,0.2),0_0_60px_rgba(6,182,212,0.1)] rounded-2xl">
           {/* Title */}
           <motion.h2
             initial={{ y: -20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ type: 'spring', delay: 0.2, stiffness: 120 }}
-            className="text-2xl sm:text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 via-orange-400 to-orange-500 text-center mb-6 flex items-center justify-center gap-3"
+            className="text-2xl sm:text-3xl font-black text-center mb-6 flex items-center justify-center gap-3 relative"
           >
-            <FaTrophy className="text-yellow-500 text-2xl drop-shadow-lg" />
-            {t('results.finalScores')}
-            <FaTrophy className="text-yellow-500 text-2xl drop-shadow-lg" />
+            <motion.div
+              animate={{ rotate: [0, -10, 10, -10, 0], scale: [1, 1.1, 1] }}
+              transition={{ duration: 2, repeat: Infinity, repeatDelay: 1 }}
+            >
+              <FaTrophy className="text-yellow-500 text-2xl drop-shadow-[0_0_15px_rgba(234,179,8,0.6)]" />
+            </motion.div>
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 via-orange-400 to-orange-500"
+                  style={{
+                    textShadow: '0 0 30px rgba(234,179,8,0.3)',
+                    backgroundSize: '200% 200%',
+                    animation: 'gradient-x 3s ease infinite'
+                  }}>
+              {t('results.finalScores')}
+            </span>
+            <motion.div
+              animate={{ rotate: [0, 10, -10, 10, 0], scale: [1, 1.1, 1] }}
+              transition={{ duration: 2, repeat: Infinity, repeatDelay: 1, delay: 0.5 }}
+            >
+              <FaTrophy className="text-yellow-500 text-2xl drop-shadow-[0_0_15px_rgba(234,179,8,0.6)]" />
+            </motion.div>
           </motion.h2>
 
           {/* Letter Grid */}
