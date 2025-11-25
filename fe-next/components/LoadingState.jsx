@@ -48,7 +48,7 @@ export function LoadingOverlay({ message = 'Loading...', transparent = false }) 
       aria-live="assertive"
       aria-busy="true"
     >
-      <div className="bg-white dark:bg-slate-800 rounded-lg p-8 shadow-2xl flex flex-col items-center gap-4">
+      <div className="bg-white dark:bg-slate-800 rounded-lg p-4 sm:p-6 md:p-8 shadow-2xl flex flex-col items-center gap-2 sm:gap-3 md:gap-4">
         <LoadingSpinner size="lg" />
         <p className="text-lg font-medium text-gray-700 dark:text-gray-200">{message}</p>
       </div>

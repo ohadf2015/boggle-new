@@ -463,7 +463,7 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
   // Show waiting for results screen after game ends
   if (waitingForResults) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-slate-50 via-slate-100 to-slate-200 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 p-4 md:p-8 flex flex-col transition-colors duration-300">
+      <div className="min-h-screen bg-gradient-to-b from-slate-50 via-slate-100 to-slate-200 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 p-3 sm:p-4 md:p-8 flex flex-col transition-colors duration-300">
 
         {/* Exit Button */}
         <div className="w-full max-w-md mx-auto flex justify-end mb-4 relative z-50">
@@ -479,14 +479,14 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
 
         {/* Centered Content */}
         <div className="flex-1 flex items-center justify-center">
-          <div className="max-w-2xl w-full space-y-6">
+          <div className="max-w-2xl w-full space-y-3 sm:space-y-4 md:space-y-6">
             {/* Waiting for Results Message */}
             <motion.div
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               className="text-center"
             >
-              <Card className="bg-white/90 dark:bg-slate-800/90 backdrop-blur-md shadow-2xl border border-cyan-500/30 shadow-[0_0_20px_rgba(6,182,212,0.2)] p-8">
+              <Card className="bg-white/90 dark:bg-slate-800/90 backdrop-blur-md shadow-2xl border border-cyan-500/30 shadow-[0_0_20px_rgba(6,182,212,0.2)] p-4 sm:p-6 md:p-8">
                 <div className="mb-4">
                   <motion.div
                     animate={{ rotate: 360 }}
@@ -584,7 +584,7 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
   // Show waiting screen if game hasn't started yet
   if (!gameActive && !waitingForResults) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-slate-50 via-slate-100 to-slate-200 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 p-4 md:p-8 flex flex-col transition-colors duration-300">
+      <div className="min-h-screen bg-gradient-to-b from-slate-50 via-slate-100 to-slate-200 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 p-3 sm:p-4 md:p-8 flex flex-col transition-colors duration-300">
 
         {/* Exit Button */}
         <div className="w-full max-w-md mx-auto flex justify-end mb-4 relative z-50">
@@ -602,7 +602,7 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
 
         {/* Centered Waiting Content */}
         <div className="flex-1 flex items-center justify-center">
-          <div className="max-w-md w-full space-y-6">
+          <div className="max-w-md w-full space-y-3 sm:space-y-4 md:space-y-6">
             {/* Waiting Message */}
             <motion.div
               initial={{ scale: 0, opacity: 0 }}
@@ -634,7 +634,7 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
               animate={{ y: 0, opacity: 1 }}
               transition={{ delay: 0.2 }}
             >
-              <Card className="bg-white/90 dark:bg-slate-800/90 backdrop-blur-md shadow-xl border border-purple-500/30 shadow-[0_0_15px_rgba(168,85,247,0.1)] p-6">
+              <Card className="bg-white/90 dark:bg-slate-800/90 backdrop-blur-md shadow-xl border border-purple-500/30 shadow-[0_0_15px_rgba(168,85,247,0.1)] p-4 sm:p-5 md:p-6">
                 <h3 className="text-lg font-bold text-purple-600 dark:text-purple-300 mb-4 flex items-center gap-2 justify-center">
                   <FaUsers className="text-purple-500 dark:text-purple-400" />
                   {t('playerView.players')} ({playersReady.length})
@@ -684,7 +684,7 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
               animate={{ y: 0, opacity: 1 }}
               transition={{ delay: 0.25 }}
             >
-              <Card className="bg-white/90 dark:bg-slate-800/90 backdrop-blur-md shadow-xl border border-teal-500/30 shadow-[0_0_15px_rgba(20,184,166,0.1)] p-4">
+              <Card className="bg-white/90 dark:bg-slate-800/90 backdrop-blur-md shadow-xl border border-teal-500/30 shadow-[0_0_15px_rgba(20,184,166,0.1)] p-3 sm:p-4">
                 <h3 className="text-sm font-bold text-teal-600 dark:text-teal-300 mb-3 text-center">
                   {t('playerView.inviteFriends') || 'Invite Friends'}
                 </h3>

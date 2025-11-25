@@ -87,7 +87,7 @@ const ResultsPage = ({ finalScores, letterGrid, gameCode, onReturnToRoom, isHost
   }, [winner]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-50 via-slate-100 to-slate-200 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 flex flex-col items-center p-4 sm:p-6 overflow-auto transition-colors duration-300">
+    <div className="min-h-screen bg-gradient-to-b from-slate-50 via-slate-100 to-slate-200 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 flex flex-col items-center p-3 sm:p-4 md:p-6 overflow-auto transition-colors duration-300">
       {/* Exit Button */}
       <div className="absolute top-5 right-5 z-50">
         <Button
@@ -121,7 +121,7 @@ const ResultsPage = ({ finalScores, letterGrid, gameCode, onReturnToRoom, isHost
         transition={{ type: 'spring', stiffness: 150, damping: 25 }}
         className="w-full max-w-6xl"
       >
-        <Card className="p-4 sm:p-6 max-h-[85vh] overflow-auto bg-white/95 dark:bg-slate-800/95 backdrop-blur-xl border-2 border-purple-500/20 shadow-[0_8px_32px_rgba(168,85,247,0.15)] rounded-2xl">
+        <Card className="p-3 sm:p-4 md:p-6 max-h-[85vh] overflow-auto bg-white/95 dark:bg-slate-800/95 backdrop-blur-xl border-2 border-purple-500/20 shadow-[0_8px_32px_rgba(168,85,247,0.15)] rounded-2xl">
           {/* Title */}
           <motion.h2
             initial={{ y: -20, opacity: 0 }}
@@ -195,9 +195,9 @@ const ResultsPage = ({ finalScores, letterGrid, gameCode, onReturnToRoom, isHost
               initial={{ y: 20, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               transition={{ delay: 0.5 }}
-              className="mt-8"
+              className="mt-4 sm:mt-6 md:mt-8"
             >
-              <Card className="p-6 bg-gradient-to-r from-cyan-500/10 to-purple-600/10 dark:from-cyan-500/20 dark:to-purple-600/20 border-2 border-cyan-500/30 shadow-lg">
+              <Card className="p-4 sm:p-5 md:p-6 bg-gradient-to-r from-cyan-500/10 to-purple-600/10 dark:from-cyan-500/20 dark:to-purple-600/20 border-2 border-cyan-500/30 shadow-lg">
                 <div className="text-center space-y-4">
                   <h3 className="text-2xl font-bold text-slate-800 dark:text-white">
                     {t('results.playAgainQuestion')}

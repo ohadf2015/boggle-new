@@ -98,7 +98,7 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
   // Show auto-joining loading state when user has saved name and came via invitation
   if (prefilledRoom && isAutoJoining && username && username.trim()) {
     return (
-      <div className="min-h-screen bg-gradient-to-b pt-4 from-slate-50 via-slate-100 to-slate-200 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 flex flex-col items-center justify-center p-4 sm:p-6 transition-colors duration-300">
+      <div className="min-h-screen bg-gradient-to-b pt-4 from-slate-50 via-slate-100 to-slate-200 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 flex flex-col items-center justify-center p-2 sm:p-4 md:p-6 transition-colors duration-300">
         <motion.div
           initial={{ scale: 0, rotate: -10 }}
           animate={{ scale: 1, rotate: 0 }}
@@ -180,7 +180,7 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
   // Show simplified quick join interface when room is prefilled (no saved username)
   if (prefilledRoom && !showFullForm) {
     return (
-      <div className="min-h-screen bg-gradient-to-b pt-4 from-slate-50 via-slate-100 to-slate-200 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 flex flex-col items-center justify-center p-4 sm:p-6 transition-colors duration-300">
+      <div className="min-h-screen bg-gradient-to-b pt-4 from-slate-50 via-slate-100 to-slate-200 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 flex flex-col items-center justify-center p-2 sm:p-4 md:p-6 transition-colors duration-300">
         {/* Quick Join Form */}
         <motion.div
           initial={{ scale: 0, rotate: -10 }}
@@ -203,7 +203,7 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
                 </Badge>
               </div>
             </CardHeader>
-            <CardContent className="space-y-6">
+            <CardContent className="space-y-3 sm:space-y-6">
               {/* Error Alert */}
               {error && (
                 <motion.div
@@ -217,7 +217,7 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
                 </motion.div>
               )}
 
-              <form onSubmit={handleQuickJoin} className="space-y-6">
+              <form onSubmit={handleQuickJoin} className="space-y-3 sm:space-y-6">
                 {/* Simple name input */}
                 <motion.div
                   animate={usernameError ? { x: [-10, 10, -10, 10, 0] } : {}}
@@ -284,11 +284,11 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-50 via-slate-100 to-slate-200 pt-4 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 flex flex-col items-center justify-center p-4 sm:p-6 overflow-auto transition-colors duration-300">
+    <div className="min-h-screen bg-gradient-to-b from-slate-50 via-slate-100 to-slate-200 pt-4 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 flex flex-col items-center justify-center p-2 sm:p-4 md:p-6 overflow-auto transition-colors duration-300">
       {/* Animated Title */}
 
 
-      <div className="flex flex-col-reverse md:flex-row gap-6 w-full max-w-6xl relative z-10">
+      <div className="flex flex-col-reverse md:flex-row gap-4 sm:gap-6 w-full max-w-6xl relative z-10">
         {/* Main Join/Host Form */}
         <motion.div
           initial={{ x: 50, opacity: 0 }}
@@ -299,7 +299,7 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
           <Card className="backdrop-blur-md bg-white/90 dark:bg-slate-800/90 shadow-2xl border border-purple-500/30">
             <CardHeader className="text-center space-y-4">
             </CardHeader>
-            <CardContent className="space-y-6">
+            <CardContent className="space-y-3 sm:space-y-6">
               {/* Error Alert */}
               {error && (
                 <motion.div
@@ -356,7 +356,7 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
                     <CardDescription className="text-sm sm:text-base text-slate-600 dark:text-gray-300">
                         {t('joinView.selectLanguage')}
                    </CardDescription>
-                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5 sm:gap-2">
                     <button
                       type="button"
                       onClick={() => setRoomLanguage('en')}
@@ -425,7 +425,7 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
                 </div>
               )}
 
-              <form onSubmit={handleSubmit} className="space-y-4">
+              <form onSubmit={handleSubmit} className="space-y-3 sm:space-y-4">
                 {mode === 'join' ? (
                   <motion.div
                     initial={{ x: -50, opacity: 0 }}

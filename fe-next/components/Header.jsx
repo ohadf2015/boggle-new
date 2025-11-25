@@ -89,7 +89,7 @@ const Header = ({ className = '' }) => {
                 </div>
 
                 {/* Controls: Language Selector + Theme Toggle */}
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-2 sm:gap-3">
                     {/* Language Selector */}
                     <div className="relative">
                         <Button

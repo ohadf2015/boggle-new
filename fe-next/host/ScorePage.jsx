@@ -9,7 +9,7 @@ const ScorePage = ({ scores }) => {
   const { t } = useLanguage();
 
   return (
-    <div className="flex flex-col items-center min-h-screen bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 p-4">
+    <div className="flex flex-col items-center min-h-screen bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 p-3 sm:p-4">
       <motion.h2
         initial={{ y: -50, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
@@ -35,7 +35,7 @@ const ScorePage = ({ scores }) => {
                 animate={{ x: 0, opacity: 1 }}
                 transition={{ delay: index * 0.1, type: "spring" }}
                 className={`
-                  flex items-center justify-between p-4 rounded-lg transition-all duration-300 border
+                  flex items-center justify-between p-3 sm:p-4 rounded-lg transition-all duration-300 border
                   ${index === 0 ? 'bg-gradient-to-r from-yellow-500/80 to-orange-500/80 text-white scale-105 shadow-xl border-yellow-400/50 shadow-[0_0_15px_rgba(234,179,8,0.3)]' :
                     index === 1 ? 'bg-gradient-to-r from-gray-400/80 to-gray-500/80 text-white shadow-lg border-gray-400/50' :
                     index === 2 ? 'bg-gradient-to-r from-orange-500/80 to-orange-600/80 text-white shadow-lg border-orange-400/50' :

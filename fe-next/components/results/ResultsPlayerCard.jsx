@@ -64,12 +64,12 @@ const ResultsPlayerCard = ({ player, index }) => {
     >
       <Card
         className={cn(
-          "p-6 border-2 backdrop-blur-xl transition-all duration-300 rounded-xl shadow-lg hover:shadow-xl",
+          "p-4 sm:p-5 md:p-6 border-2 backdrop-blur-xl transition-all duration-300 rounded-xl shadow-lg hover:shadow-xl",
           getCardStyle()
         )}
       >
         {/* Header: Rank, Name, Score */}
-        <div className="flex justify-between items-center mb-4">
+        <div className="flex justify-between items-center mb-3 sm:mb-4">
           <div className="flex items-center gap-3">
             <motion.div
               animate={index < 3 ? { rotate: [0, -10, 10, -10, 0] } : {}}
@@ -129,7 +129,7 @@ const ResultsPlayerCard = ({ player, index }) => {
 
         {/* Achievements Section */}
         {player.achievements && player.achievements.length > 0 && (
-          <div className="mt-4 pt-3 border-t border-slate-200 dark:border-slate-700">
+          <div className="mt-3 pt-2 sm:mt-4 sm:pt-3 border-t border-slate-200 dark:border-slate-700">
             <p className="text-sm font-bold mb-2 text-purple-600 dark:text-purple-400">
               {t('hostView.achievements')}:
             </p>

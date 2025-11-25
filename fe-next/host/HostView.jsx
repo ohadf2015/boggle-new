@@ -513,7 +513,7 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-50 via-slate-100 to-slate-200 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 flex flex-col items-center p-4 sm:p-6 md:p-8 overflow-auto transition-colors duration-300">
+    <div className="min-h-screen bg-gradient-to-b from-slate-50 via-slate-100 to-slate-200 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 flex flex-col items-center p-2 sm:p-4 md:p-6 lg:p-8 overflow-auto transition-colors duration-300">
 
       {/* Start Game Animation */}
       {showStartAnimation && (
@@ -709,10 +709,10 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
       </Dialog>
 
       {/* Refined Layout */}
-      <div className="flex flex-col gap-6 w-full max-w-6xl">
+      <div className="flex flex-col gap-3 sm:gap-4 md:gap-6 w-full max-w-6xl">
         {/* Top Section: Room Code + Language + Share (when not started) */}
         {!gameStarted && (
-          <Card className="bg-white/90 dark:bg-slate-800/90 backdrop-blur-md text-slate-900 dark:text-white p-4 sm:p-6 rounded-lg border border-cyan-500/30 shadow-[0_0_20px_rgba(6,182,212,0.15)]">
+          <Card className="bg-white/90 dark:bg-slate-800/90 backdrop-blur-md text-slate-900 dark:text-white p-3 sm:p-4 md:p-6 rounded-lg border border-cyan-500/30 shadow-[0_0_20px_rgba(6,182,212,0.15)]">
             <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
               {/* Room Code and Language in same row */}
               <div className="flex flex-col items-center sm:items-start gap-2">
@@ -759,12 +759,12 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
 
         {/* Game Settings - Now below room code */}
         {!gameStarted && (
-          <Card className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-md p-4 sm:p-5 rounded-lg border border-purple-500/30 shadow-[0_0_15px_rgba(168,85,247,0.1)]">
+          <Card className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-md p-3 sm:p-4 md:p-5 rounded-lg border border-purple-500/30 shadow-[0_0_15px_rgba(168,85,247,0.1)]">
             <h3 className="text-base font-bold text-purple-600 dark:text-purple-300 mb-4 flex items-center gap-2">
               <FaCog className="text-cyan-600 dark:text-cyan-400 text-sm" />
               {t('hostView.gameSettings')}
             </h3>
-            <div className="w-full space-y-4">
+            <div className="w-full space-y-3 sm:space-y-4">
               {!gameStarted ? (
                 <>
                   {/* Timer Input - Neon Style */}
@@ -904,12 +904,12 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
           </Card>
         )}
 
-        {/* Main Content Area: Player List (LEFT) + Boggle Grid (RIGHT) */}
-        <div className="flex flex-col lg:flex-row gap-6 transition-all duration-500 ease-in-out">
+        {/* Main Content Area: Player List (LEFT) + Boggle Grid (CENTER) + Chat (RIGHT on desktop when not started) */}
+        <div className="flex flex-col lg:flex-row gap-3 sm:gap-4 md:gap-6 transition-all duration-500 ease-in-out">
           {/* Players Section - LEFT - Neon Style */}
           <Card className={cn(
-            "bg-white/80 dark:bg-slate-800/80 backdrop-blur-md p-4 sm:p-6 rounded-lg shadow-lg border border-purple-500/30 shadow-[0_0_15px_rgba(168,85,247,0.1)] lg:min-w-[280px] transition-all duration-500 ease-in-out overflow-hidden",
-            gameStarted ? "lg:w-[300px]" : "w-full lg:w-auto"
+            "bg-white/80 dark:bg-slate-800/80 backdrop-blur-md p-3 sm:p-4 md:p-6 rounded-lg shadow-lg border border-purple-500/30 shadow-[0_0_15px_rgba(168,85,247,0.1)] lg:min-w-[280px] transition-all duration-500 ease-in-out overflow-hidden",
+            gameStarted ? "lg:w-[300px]" : "w-full lg:w-[300px]"
           )}>
             <h3 className="text-lg font-bold text-purple-600 dark:text-purple-300 mb-4 flex items-center gap-2">
               <FaUsers className="text-purple-500 dark:text-purple-400" />
@@ -1095,19 +1095,19 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
               )}
             </Card>
           )}
-        </div>
 
-        {/* Chat Section */}
-        {!gameStarted && (
-          <div className="w-full">
-            <RoomChat
-              username="Host"
-              isHost={true}
-              gameCode={gameCode}
-              className="max-w-2xl mx-auto min-h-[400px]"
-            />
-          </div>
-        )}
+          {/* Chat Section - RIGHT on desktop when not started */}
+          {!gameStarted && (
+            <div className="w-full lg:w-[350px] xl:w-[400px]">
+              <RoomChat
+                username="Host"
+                isHost={true}
+                gameCode={gameCode}
+                className="h-full min-h-[400px]"
+              />
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Exit Confirmation Dialog */}

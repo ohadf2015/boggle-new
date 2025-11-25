@@ -176,12 +176,12 @@ const PodiumPlace = ({ player, place, delay }) => {
 const ResultsPodium = ({ sortedScores }) => {
 
   return (
-    <div className="mb-12 relative">
+    <div className="mb-6 sm:mb-8 md:mb-12 relative">
       {/* Stage Platform */}
       <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-full max-w-2xl h-8 bg-gradient-to-r from-transparent via-slate-600/30 to-transparent rounded-lg blur-sm" />
 
       {/* Podium Arrangement */}
-      <div className="flex justify-center items-end gap-4 md:gap-6 min-h-[180px] relative px-4">
+      <div className="flex justify-center items-end gap-4 md:gap-6 min-h-[180px] relative px-2 sm:px-3 md:px-4">
         {/* 2nd Place */}
         {sortedScores[1] && (
           <PodiumPlace player={sortedScores[1]} place={2} delay={0.3} />

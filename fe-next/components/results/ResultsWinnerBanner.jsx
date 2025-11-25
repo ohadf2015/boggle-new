@@ -19,7 +19,7 @@ const ResultsWinnerBanner = ({ winner }) => {
         damping: 15,
         delay: 0.3
       }}
-      className="mb-8 relative"
+      className="mb-4 sm:mb-6 md:mb-8 relative"
     >
       {/* Glowing Background */}
       <div className="absolute inset-0 bg-gradient-to-r from-yellow-400/20 via-yellow-500/30 to-orange-500/20 rounded-2xl blur-2xl animate-pulse" />
@@ -51,7 +51,7 @@ const ResultsWinnerBanner = ({ winner }) => {
           ))}
         </div>
 
-        <div className="p-8 text-center relative z-10">
+        <div className="p-4 sm:p-6 md:p-8 text-center relative z-10">
           {/* Animated Crown */}
           <motion.div
             animate={{

@@ -12,16 +12,16 @@ const HowToPlay = () => {
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="w-full max-w-4xl mx-auto p-4"
+      className="w-full max-w-4xl mx-auto p-2 sm:p-3 md:p-4"
     >
-      <Card className="p-6 bg-white/95 backdrop-blur-sm shadow-2xl">
+      <Card className="p-4 sm:p-5 md:p-6 bg-white/95 backdrop-blur-sm shadow-2xl">
         <h2 className="text-3xl font-bold text-center mb-6 text-indigo-700 flex items-center justify-center gap-3">
           <FaGamepad className="text-4xl" />
           {t('howToPlay.title')}
         </h2>
 
         {/* Main Description */}
-        <div className="mb-8 text-center">
+        <div className="mb-4 sm:mb-6 md:mb-8 text-center">
           <p className="text-lg text-gray-700 leading-relaxed">
             {t('howToPlay.description')}
             <br />
@@ -30,7 +30,7 @@ const HowToPlay = () => {
         </div>
 
         {/* Game Steps */}
-        <div className="space-y-6 mb-8">
+        <div className="space-y-4 sm:space-y-5 md:space-y-6 mb-4 sm:mb-6 md:mb-8">
           <motion.div
             initial={{ x: -20, opacity: 0 }}
             animate={{ x: 0, opacity: 1 }}
@@ -117,11 +117,11 @@ const HowToPlay = () => {
         </div>
 
         {/* Scoring System */}
-        <div className="bg-gradient-to-br from-indigo-50 to-purple-50 rounded-lg p-6 mb-6">
+        <div className="bg-gradient-to-br from-indigo-50 to-purple-50 rounded-lg p-4 sm:p-5 md:p-6 mb-4 sm:mb-5 md:mb-6">
           <h3 className="text-2xl font-bold text-center mb-4 text-indigo-700">
             {t('howToPlay.scoringSystemTitle')}
           </h3>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-2 sm:gap-3">
             <Badge className="py-3 px-4 text-center bg-gradient-to-r from-gray-400 to-gray-500 text-white">
               {t('howToPlay.scoringTable.letters2')}
             </Badge>
@@ -153,7 +153,7 @@ const HowToPlay = () => {
         </div>
 
         {/* Achievements */}
-        <div className="bg-gradient-to-br from-yellow-50 to-orange-50 rounded-lg p-6 mb-6">
+        <div className="bg-gradient-to-br from-yellow-50 to-orange-50 rounded-lg p-4 sm:p-5 md:p-6 mb-4 sm:mb-5 md:mb-6">
           <h3 className="text-2xl font-bold text-center mb-4 text-orange-700">
             {t('howToPlay.achievementsTitle')}
           </h3>
@@ -180,7 +180,7 @@ const HowToPlay = () => {
         </div>
 
         {/* Tips */}
-        <div className="bg-gradient-to-br from-green-50 to-teal-50 rounded-lg p-6">
+        <div className="bg-gradient-to-br from-green-50 to-teal-50 rounded-lg p-4 sm:p-5 md:p-6">
           <h3 className="text-2xl font-bold text-center mb-4 text-green-700">
             {t('howToPlay.tipsTitle')}
           </h3>
