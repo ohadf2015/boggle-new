@@ -288,13 +288,13 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
       {/* Animated Title */}
 
 
-      <div className="flex flex-col-reverse md:flex-row gap-4 sm:gap-6 w-full max-w-6xl relative z-10">
+      <div className="flex flex-col-reverse md:flex-row gap-4 sm:gap-6 w-full max-w-6xl relative z-10 px-2 sm:px-4 md:px-6">
         {/* Main Join/Host Form */}
         <motion.div
           initial={{ x: 50, opacity: 0 }}
           animate={{ x: 0, opacity: 1 }}
           transition={{ duration: 0.5 }}
-          className="flex-1 max-w-md mx-auto"
+          className="flex-1 max-w-md mx-auto w-full"
         >
           <Card className="backdrop-blur-md bg-white/90 dark:bg-slate-800/90 shadow-2xl border border-purple-500/30">
             <CardHeader className="text-center space-y-4">
