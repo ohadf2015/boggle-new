@@ -50,6 +50,9 @@ const ResultsPlayerCard = ({ player, index, allPlayerWords }) => {
   // Auto-expand all players' words by default
   const [isWordsExpanded, setIsWordsExpanded] = useState(true);
 
+  // Extract avatar info if available
+  const avatar = player.avatar || null;
+
   // Calculate how many players found each word
   const getPlayerCountForWord = (word) => {
     if (!allPlayerWords || !word) return 1;
@@ -90,6 +93,10 @@ const ResultsPlayerCard = ({ player, index, allPlayerWords }) => {
           getCardStyle(),
           isWordsExpanded && "ring-2 ring-purple-400/50 shadow-[0_0_20px_rgba(168,85,247,0.3)]"
         )}
+        style={avatar?.color && index > 2 ? {
+          background: `linear-gradient(135deg, ${avatar.color}20, ${avatar.color}40)`,
+          borderColor: `${avatar.color}60`
+        } : {}}
       >
         {/* Header: Rank, Name, Score */}
         <div className="flex justify-between items-center mb-3 sm:mb-4">
@@ -101,6 +108,11 @@ const ResultsPlayerCard = ({ player, index, allPlayerWords }) => {
             >
               {getRankIcon()}
             </motion.div>
+            {avatar?.emoji && (
+              <div className="text-3xl">
+                {avatar.emoji}
+              </div>
+            )}
             <div>
               <h3 className="text-xl font-bold text-slate-900 dark:text-white">
                 {player.username}

@@ -502,7 +502,8 @@ function initializeSocketHandlers(io) {
       const scoresArray = Object.entries(validatedScores).map(([username, score]) => ({
         username,
         score,
-        allWords: game.playerWords?.[username] || []
+        allWords: game.playerWords?.[username] || [],
+        avatar: game.users?.[username]?.avatar || null
       })).sort((a, b) => b.score - a.score);
 
       // Log validation results
