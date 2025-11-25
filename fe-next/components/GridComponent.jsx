@@ -1,6 +1,8 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '../lib/utils';
+
+const noOp = () => { };
 
 const GridComponent = ({
     grid,
@@ -13,15 +15,18 @@ const GridComponent = ({
     comboLevel = 0
 }) => {
     const [internalSelectedCells, setInternalSelectedCells] = useState([]);
+    const [direction, setDirection] = useState(null); // Track the direction of movement
+    const [fadingCells, setFadingCells] = useState([]); // Track cells that are fading out
     const isTouchingRef = useRef(false);
     const gridRef = useRef(null);
     const startPosRef = useRef({ x: 0, y: 0 });
     const hasMovedRef = useRef(false);
+    const autoSubmitTimeoutRef = useRef(null);
     const MOVEMENT_THRESHOLD = 10; // pixels - minimum movement to register as intentional
 
     // Use external control if provided, otherwise internal state
     const selectedCells = externalSelectedCells || internalSelectedCells;
-    const setSelectedCells = externalSelectedCells ? () => { } : setInternalSelectedCells;
+    const setSelectedCells = externalSelectedCells ? noOp : setInternalSelectedCells;
 
     // Auto-focus on grid when game becomes interactive
     useEffect(() => {
@@ -29,6 +34,93 @@ const GridComponent = ({
             gridRef.current.focus();
         }
     }, [interactive]);
+
+    // Sequential fade-out animation for combo trail
+    const startSequentialFadeOut = useCallback(() => {
+        if (selectedCells.length === 0) return;
+
+        // Copy selected cells for fading animation
+        const cellsToFade = [...selectedCells];
+        setFadingCells(cellsToFade);
+
+        // Fade out each cell sequentially in the order they were marked
+        cellsToFade.forEach((cell, index) => {
+            setTimeout(() => {
+                setFadingCells(prev => prev.filter(c => !(c.row === cell.row && c.col === cell.col)));
+            }, index * 80); // 80ms delay between each cell fade
+        });
+
+        // Clear all selections after animation completes
+        const totalDelay = cellsToFade.length * 80 + 200;
+        setTimeout(() => {
+            setSelectedCells([]);
+            setDirection(null);
+            setFadingCells([]);
+        }, totalDelay);
+    }, [selectedCells, setSelectedCells]);
+
+    // Auto-validation for combo words (only when combo is active)
+    useEffect(() => {
+        if (!interactive || comboLevel === 0 || selectedCells.length === 0) {
+            if (autoSubmitTimeoutRef.current) {
+                clearTimeout(autoSubmitTimeoutRef.current);
+                autoSubmitTimeoutRef.current = null;
+            }
+            return;
+        }
+
+        // Auto-submit when word reaches minimum valid length (3 letters) during combo
+        if (selectedCells.length >= 3) {
+            // Clear any existing timeout
+            if (autoSubmitTimeoutRef.current) {
+                clearTimeout(autoSubmitTimeoutRef.current);
+            }
+
+            // Auto-submit after 500ms of no new selection (debounced)
+            autoSubmitTimeoutRef.current = setTimeout(() => {
+                if (selectedCells.length >= 3 && isTouchingRef.current) {
+                    // Trigger submission
+                    const formedWord = selectedCells.map(c => c.letter).join('');
+                    if (onWordSubmit) {
+                        onWordSubmit(formedWord);
+                    }
+
+                    // Start sequential fade-out animation
+                    startSequentialFadeOut();
+
+                    // End touch/mouse interaction
+                    isTouchingRef.current = false;
+                }
+            }, 500);
+        }
+
+        return () => {
+            if (autoSubmitTimeoutRef.current) {
+                clearTimeout(autoSubmitTimeoutRef.current);
+            }
+        };
+    }, [selectedCells, comboLevel, interactive, onWordSubmit, startSequentialFadeOut]);
+
+    // Helper function to normalize direction to unit vector
+    const normalizeDirection = (rowDiff, colDiff) => {
+        // Return the direction as a unit vector (sign of the differences)
+        return {
+            row: rowDiff === 0 ? 0 : (rowDiff > 0 ? 1 : -1),
+            col: colDiff === 0 ? 0 : (colDiff > 0 ? 1 : -1)
+        };
+    };
+
+    // Helper function to check if a move continues in the same direction
+    const isValidDirection = (rowDiff, colDiff, currentDirection) => {
+        // If no direction set yet (first move), any adjacent cell is valid
+        if (!currentDirection) return true;
+
+        // Normalize the new direction
+        const newDir = normalizeDirection(rowDiff, colDiff);
+
+        // Check if the new direction matches the established direction
+        return newDir.row === currentDirection.row && newDir.col === currentDirection.col;
+    };
 
     const handleTouchStart = (rowIndex, colIndex, letter, event) => {
         if (!interactive) return;
@@ -123,6 +215,12 @@ const GridComponent = ({
         if (!interactive || !isTouchingRef.current) return;
         isTouchingRef.current = false;
 
+        // Clear auto-submit timeout if exists
+        if (autoSubmitTimeoutRef.current) {
+            clearTimeout(autoSubmitTimeoutRef.current);
+            autoSubmitTimeoutRef.current = null;
+        }
+
         // Misclick prevention: only submit if user has moved OR selected multiple letters
         // This prevents accidental single-letter submissions from taps
         if (selectedCells.length > 0 && (hasMovedRef.current || selectedCells.length >= 2)) {
@@ -160,12 +258,16 @@ const GridComponent = ({
                 }
             }
 
-            // Delay clearing the selection to keep the trail visible longer
-            // Longer delay for combos to showcase the achievement
-            const clearDelay = comboLevel > 0 ? 800 : 500;
-            setTimeout(() => {
-                setSelectedCells([]);
-            }, clearDelay);
+            // Use sequential fade-out animation for combo words
+            if (comboLevel > 0) {
+                startSequentialFadeOut();
+            } else {
+                // Regular delay for non-combo words
+                setTimeout(() => {
+                    setSelectedCells([]);
+                    setDirection(null);
+                }, 500);
+            }
         } else {
             // Clear selection immediately if it was a misclick
             setSelectedCells([]);
@@ -430,6 +532,7 @@ const GridComponent = ({
                 row.map((cell, j) => {
                     const isSelected = selectedCells.some(c => c.row === i && c.col === j);
                     const isFirstSelected = selectedCells.length > 0 && selectedCells[0].row === i && selectedCells[0].col === j;
+                    const isFading = fadingCells.some(c => c.row === i && c.col === j);
                     return (
                         <motion.div
                             key={`${i}-${j}`}
@@ -441,23 +544,23 @@ const GridComponent = ({
                             onMouseEnter={() => handleMouseEnter(i, j, cell)}
                             initial={{ scale: 0.8, opacity: 0 }}
                             animate={{
-                                scale: isSelected ? 1.15 : 1,
-                                opacity: 1,
-                                rotate: isSelected ? [0, -5, 5, 0] : 0,
+                                scale: isSelected || isFading ? 1.15 : 1,
+                                opacity: isFading ? 0 : 1,
+                                rotate: (isSelected || isFading) ? [0, -5, 5, 0] : 0,
                                 y: isSelected ? -2 : 0
                             }}
                             whileTap={{ scale: 0.95 }}
                             transition={{
-                                duration: isSelected ? 0.12 : 0.6,
+                                duration: isFading ? 0.3 : (isSelected ? 0.12 : 0.6),
                                 ease: "easeOut",
-                                scale: { type: "spring", stiffness: 400, damping: 18 }
+                                scale: isSelected ? { type: "spring", stiffness: 400, damping: 18 } : undefined
                             }}
                             className={cn(
                                 "aspect-square flex items-center justify-center font-bold shadow-lg cursor-pointer transition-all duration-200 border-2 relative overflow-hidden",
                                 isLargeGrid
                                     ? (largeText ? "text-2xl sm:text-3xl" : "text-lg sm:text-xl")
                                     : (largeText || playerView ? "text-4xl sm:text-5xl md:text-6xl" : "text-2xl sm:text-3xl"),
-                                isSelected
+                                (isSelected || isFading)
                                     ? `bg-gradient-to-br ${comboColors.gradient} text-white ${comboColors.border} z-10 ${comboColors.shadow} border-white/40`
                                     : "bg-gradient-to-br from-slate-100 via-white to-slate-100 dark:from-slate-700 dark:via-slate-800 dark:to-slate-900 text-slate-900 dark:text-white border-slate-300/60 dark:border-slate-600/60 hover:scale-105 hover:shadow-xl dark:hover:bg-slate-700/80 active:scale-95 shadow-[0_4px_12px_rgba(0,0,0,0.1)]"
                             )}
