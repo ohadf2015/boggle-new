@@ -131,8 +131,11 @@ export default function GamePage() {
     // Use existing socket if available
     if (globalSocketInstance && globalSocketInstance.connected) {
       socketRef.current = globalSocketInstance;
-      setSocket(globalSocketInstance);
-      setIsConnected(true);
+      // Defer state updates to avoid calling setState directly within effect
+      Promise.resolve().then(() => {
+        setSocket(globalSocketInstance);
+        setIsConnected(true);
+      });
       return;
     }
 
@@ -321,7 +324,10 @@ export default function GamePage() {
       // Heartbeat response - connection is alive
     });
 
-    setSocket(newSocket);
+    // Defer state update to avoid calling setState directly within effect
+    Promise.resolve().then(() => {
+      setSocket(newSocket);
+    });
 
     return () => {
       console.log('[SOCKET.IO] Cleaning up');
@@ -391,6 +397,18 @@ export default function GamePage() {
 
     const savedSession = getSession();
     if (!savedSession?.gameCode) {
+      Promise.resolve().then(() => setAttemptingReconnect(false));
+      return;
+    }
+
+    // Check if session is too old (more than 5 minutes of inactivity)
+    const sessionAge = Date.now() - savedSession.timestamp;
+    const maxInactivity = 5 * 60 * 1000; // 5 minutes
+
+    if (sessionAge > maxInactivity) {
+      // Session is too old, don't auto-reconnect - user needs to manually rejoin
+      console.log('[SESSION] Session too old for auto-reconnect, clearing session');
+      clearSession();
       Promise.resolve().then(() => setAttemptingReconnect(false));
       return;
     }

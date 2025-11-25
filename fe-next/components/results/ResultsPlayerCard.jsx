@@ -86,7 +86,7 @@ const ResultsPlayerCard = ({ player, index, allPlayerWords, currentUsername }) =
     >
       <Card
         className={cn(
-          "p-4 sm:p-5 md:p-6 border-2 backdrop-blur-xl transition-all duration-300 rounded-xl shadow-lg hover:shadow-xl",
+          "p-4 sm:p-5 md:p-6 border-2 backdrop-blur-sm transition-all duration-300 rounded-xl shadow-lg hover:shadow-xl",
           getCardStyle(),
           isWordsExpanded && "ring-2 ring-purple-400/50 shadow-[0_0_20px_rgba(168,85,247,0.3)]"
         )}

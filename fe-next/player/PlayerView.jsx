@@ -534,21 +534,32 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
   const confirmExitRoom = () => {
     console.log('[PLAYER] Exit confirmed, closing connection');
     intentionalExitRef.current = true;
-    clearSession();
 
-    // Safely disconnect socket
+    // Emit explicit leave event BEFORE disconnecting
     try {
-      if (socket) {
-        socket.disconnect();
+      if (socket && gameCode && username) {
+        console.log('[PLAYER] Emitting leaveRoom event');
+        socket.emit('leaveRoom', { gameCode, username });
       }
     } catch (error) {
-      console.error('[PLAYER] Error disconnecting socket:', error);
+      console.error('[PLAYER] Error emitting leaveRoom event:', error);
     }
 
-    // Force reload after a brief delay to ensure cleanup
+    clearSession();
+
+    // Safely disconnect socket after a brief delay to allow event to send
     setTimeout(() => {
+      try {
+        if (socket) {
+          socket.disconnect();
+        }
+      } catch (error) {
+        console.error('[PLAYER] Error disconnecting socket:', error);
+      }
+
+      // Force reload after disconnect
       window.location.reload();
-    }, 100);
+    }, 200);
   };
 
   // Show waiting for results screen after game ends
@@ -578,7 +589,7 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
               animate={{ scale: 1, opacity: 1 }}
               className="text-center"
             >
-              <Card className="bg-white/90 dark:bg-slate-800/90 backdrop-blur-md shadow-2xl border border-cyan-500/30 shadow-[0_0_20px_rgba(6,182,212,0.2)] p-4 sm:p-6 md:p-8">
+              <Card className="bg-white/90 dark:bg-slate-800/90 backdrop-blur-md shadow-2xl border border-cyan-500/30 p-4 sm:p-6 md:p-8">
                 <div className="mb-4">
                   <motion.div
                     animate={{ rotate: 360 }}
@@ -615,7 +626,7 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
                 animate={{ y: 0, opacity: 1 }}
                 transition={{ delay: 0.2 }}
               >
-                <Card className="bg-white/90 dark:bg-slate-800/90 backdrop-blur-md shadow-xl border border-purple-500/30 shadow-[0_0_15px_rgba(168,85,247,0.1)]">
+                <Card className="bg-white/90 dark:bg-slate-800/90 backdrop-blur-md shadow-xl border border-purple-500/30 ">
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2 text-purple-600 dark:text-purple-300 text-xl">
                       <FaTrophy className="text-yellow-500 dark:text-yellow-400" />
@@ -703,7 +714,7 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
               transition={{ type: 'spring', stiffness: 200, damping: 15 }}
               className="text-center"
             >
-              <Card className="bg-white/90 dark:bg-slate-800/90 backdrop-blur-md shadow-2xl border border-cyan-500/30 shadow-[0_0_20px_rgba(6,182,212,0.2)] p-8">
+              <Card className="bg-white/90 dark:bg-slate-800/90 backdrop-blur-md shadow-2xl border border-cyan-500/30 p-8">
                 <motion.h2
                   animate={{
                     scale: [1, 1.05, 1],
@@ -953,7 +964,7 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
           animate={{ y: 0, opacity: 1 }}
           className="max-w-7xl mx-auto mb-1"
         >
-          <Card className="bg-white/90 dark:bg-slate-800/90 backdrop-blur-md shadow-xl border border-purple-500/30 shadow-[0_0_15px_rgba(168,85,247,0.1)]">
+          <Card className="bg-white/90 dark:bg-slate-800/90 backdrop-blur-md shadow-xl border border-purple-500/30">
             <CardHeader className="py-2">
               <CardTitle className="text-base md:text-xl flex items-center gap-2 text-purple-600 dark:text-purple-300">
                 🏆 {t('playerView.yourAchievements')}

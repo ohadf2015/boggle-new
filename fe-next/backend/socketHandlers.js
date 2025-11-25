@@ -410,15 +410,34 @@ function initializeSocketHandlers(io) {
       const game = getGame(gameCode);
       if (!game || game.hostSocketId !== socket.id) return;
 
+      // Clear auto-validation timeout since host is manually validating
+      if (game.validationTimeout) {
+        clearTimeout(game.validationTimeout);
+        game.validationTimeout = null;
+        console.log(`[SOCKET] Cleared auto-validation timeout for game ${gameCode} - host validated manually`);
+      }
+
       // Update scores
       for (const [username, score] of Object.entries(validatedScores)) {
         updatePlayerScore(gameCode, username, score, false);
       }
 
+      // Convert scores to array format for frontend
+      const scoresArray = Object.entries(validatedScores).map(([username, score]) => ({
+        username,
+        score,
+        allWords: game.playerWords?.[username] || []
+      })).sort((a, b) => b.score - a.score);
+
       // Broadcast validated scores
       broadcastToRoom(io, getGameRoom(gameCode), 'validatedScores', {
         scores: validatedScores,
         letterGrid: game.letterGrid
+      });
+
+      // Send validation complete event to host with array format
+      safeEmit(socket, 'validationComplete', {
+        scores: scoresArray
       });
     });
 
@@ -549,6 +568,61 @@ function initializeSocketHandlers(io) {
       });
     });
 
+    // Handle intentional player leave
+    socket.on('leaveRoom', ({ gameCode, username }) => {
+      console.log(`[SOCKET] Player ${username} intentionally leaving game ${gameCode}`);
+
+      const game = getGame(gameCode);
+      if (!game) {
+        console.log(`[SOCKET] Game ${gameCode} not found for leaveRoom`);
+        return;
+      }
+
+      // Check if this is the host
+      if (game.hostSocketId === socket.id) {
+        console.log(`[SOCKET] Host intentionally left game ${gameCode} - closing room immediately`);
+
+        // No grace period for intentional host exit
+        timerManager.clearGameTimer(gameCode);
+
+        broadcastToRoom(io, getGameRoom(gameCode), 'hostLeftRoomClosing', {
+          message: 'Host has left the room. Room is closing.'
+        });
+
+        deleteGame(gameCode);
+        io.emit('activeRooms', { rooms: getActiveRooms() });
+      } else {
+        // Regular player intentionally left
+        console.log(`[SOCKET] Player ${username} left game ${gameCode}`);
+
+        // Remove player completely including all their data
+        removeUserBySocketId(socket.id);
+
+        // Clean up player-specific game data
+        if (game.playerScores) delete game.playerScores[username];
+        if (game.playerWords) delete game.playerWords[username];
+        if (game.playerAchievements) delete game.playerAchievements[username];
+        if (game.playerAvatars) delete game.playerAvatars[username];
+
+        // Broadcast player left notification
+        broadcastToRoom(io, getGameRoom(gameCode), 'playerLeft', {
+          username,
+          message: `${username} has left the room`
+        });
+
+        // Update user list for remaining players
+        broadcastToRoom(io, getGameRoom(gameCode), 'updateUsers', {
+          users: getGameUsers(gameCode)
+        });
+
+        // Handle game start coordination
+        gameStartCoordinator.handlePlayerDisconnect(gameCode, username);
+      }
+
+      // Reset rate limit
+      resetRateLimit(socket.id);
+    });
+
     // Handle disconnection
     socket.on('disconnect', (reason) => {
       console.log(`[SOCKET] Client disconnected: ${socket.id} - ${reason}`);
@@ -674,8 +748,122 @@ function endGame(io, gameCode) {
     scores
   });
 
-  // Check for tournament
+  // Prepare validation data for host
+  const allPlayerWords = [];
+  const uniqueWords = new Set();
+  let autoValidatedCount = 0;
+
+  Object.keys(game.users).forEach(username => {
+    const playerWords = game.playerWords?.[username] || [];
+    const wordsWithValidation = playerWords.map(word => {
+      const isAutoValidated = isDictionaryWord(word, game.language || 'en');
+      if (isAutoValidated) {
+        autoValidatedCount++;
+      }
+      uniqueWords.add(word);
+      return {
+        word,
+        autoValidated: isAutoValidated
+      };
+    });
+
+    if (wordsWithValidation.length > 0) {
+      allPlayerWords.push({
+        username,
+        words: wordsWithValidation
+      });
+    }
+  });
+
+  // Send validation data to host
+  const hostSocketId = game.hostSocketId;
+  if (hostSocketId) {
+    const hostSocket = getSocketById(io, hostSocketId);
+    if (hostSocket) {
+      safeEmit(hostSocket, 'showValidation', {
+        playerWords: allPlayerWords,
+        autoValidatedCount,
+        totalWords: uniqueWords.size
+      });
+
+      console.log(`[SOCKET] Sent showValidation to host for game ${gameCode} - ${uniqueWords.size} unique words, ${autoValidatedCount} auto-validated`);
+    }
+  }
+
+  // Set auto-validation timeout
   const tournamentId = getTournamentIdFromGame(gameCode);
+  const timeoutDuration = tournamentId ? 30000 : 15000;
+
+  // Send timeout notification to host
+  if (hostSocketId) {
+    const hostSocket = getSocketById(io, hostSocketId);
+    if (hostSocket) {
+      safeEmit(hostSocket, 'validationTimeoutStarted', {
+        timeoutSeconds: timeoutDuration / 1000,
+        isTournament: !!tournamentId
+      });
+    }
+  }
+
+  // Set up auto-validation timeout
+  const validationTimeout = setTimeout(() => {
+    const currentGame = getGame(gameCode);
+    if (currentGame && currentGame.gameState === 'finished') {
+      console.log(`[AUTO_VALIDATION] Host AFK for game ${gameCode}, auto-validating dictionary words only`);
+
+      // Auto-validate dictionary words, mark others as invalid
+      const validatedScores = {};
+      Object.keys(currentGame.users).forEach(username => {
+        const playerWords = currentGame.playerWords?.[username] || [];
+        let score = 0;
+
+        playerWords.forEach(word => {
+          if (isDictionaryWord(word, currentGame.language || 'en')) {
+            score += calculateWordScore(word);
+          }
+        });
+
+        validatedScores[username] = score;
+      });
+
+      // Update scores and broadcast
+      for (const [username, score] of Object.entries(validatedScores)) {
+        updatePlayerScore(gameCode, username, score, false);
+      }
+
+      // Convert scores to array format for frontend
+      const scoresArray = Object.entries(validatedScores).map(([username, score]) => ({
+        username,
+        score,
+        allWords: currentGame.playerWords?.[username] || []
+      })).sort((a, b) => b.score - a.score);
+
+      broadcastToRoom(io, getGameRoom(gameCode), 'validatedScores', {
+        scores: validatedScores,
+        letterGrid: currentGame.letterGrid
+      });
+
+      // Notify host of auto-validation with results
+      if (hostSocketId) {
+        const hostSocket = getSocketById(io, hostSocketId);
+        if (hostSocket) {
+          safeEmit(hostSocket, 'autoValidationOccurred', {
+            message: 'Auto-validation completed due to inactivity'
+          });
+
+          // Also send validation complete to trigger results display
+          safeEmit(hostSocket, 'validationComplete', {
+            scores: scoresArray
+          });
+        }
+      }
+    }
+  }, timeoutDuration);
+
+  // Store timeout so it can be cleared if manual validation occurs
+  game.validationTimeout = validationTimeout;
+
+  // Check for tournament
   if (tournamentId) {
     // Record round results
     const standings = tournamentManager.recordRoundResults(tournamentId, scores);
@@ -706,13 +894,6 @@ function endGame(io, gameCode) {
       });
     }
   }
-
-  // Send final scores after a delay
-  setTimeout(() => {
-    broadcastToRoom(io, getGameRoom(gameCode), 'finalScores', {
-      scores
-    });
-  }, 2000);
 
   console.log(`[SOCKET] Game ${gameCode} ended`);
 }

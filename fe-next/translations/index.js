@@ -219,6 +219,7 @@ export const translations = {
       clickToSelect: 'Click letters to select words',
       noWordsYet: 'No words found yet',
       shuffle: 'Shuffle',
+      inviteFriends: 'Invite Friends',
     },
     chat: {
       title: 'Room Chat',
@@ -569,6 +570,7 @@ export const translations = {
       clickToSelect: 'לחץ על אותיות כדי לבחור מילים',
       noWordsYet: 'לא נמצאו מילים עדיין',
       shuffle: 'ערבב',
+      inviteFriends: 'הזמן חברים',
     },
     chat: {
       title: 'צ\'אט החדר',
@@ -910,6 +912,7 @@ export const translations = {
       clickToSelect: 'Klicka på bokstäver för att välja ord',
       noWordsYet: 'Inga ord hittade ännu',
       shuffle: 'Blanda',
+      inviteFriends: 'Bjud in vänner',
     },
     chat: {
       title: 'Rumschatt',
@@ -1251,6 +1254,7 @@ export const translations = {
       clickToSelect: '文字をクリックして単語を選択',
       noWordsYet: 'まだ単語が見つかりません',
       shuffle: 'シャッフル',
+      inviteFriends: '友達を招待',
     },
     chat: {
       title: 'ルームチャット',
