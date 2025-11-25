@@ -43,23 +43,13 @@ export const copyJoinUrl = async (gameCode, t = null) => {
  * Share game via WhatsApp
  * @param {string} gameCode - The game code
  * @param {string} roomName - The room name (optional)
- * @param {function} t - Translation function (optional for backward compatibility)
+ * @param {function} t - Translation function
  */
-export const shareViaWhatsApp = (gameCode, roomName = '', t = null) => {
+export const shareViaWhatsApp = (gameCode, roomName = '', t) => {
   const url = getJoinUrl(gameCode);
 
-  let message;
-  if (t) {
-    const roomText = roomName ? `\n${t('share.room')}: ${roomName}` : '';
-    message = `🎮 ${t('share.inviteMessage')}\n${roomText}\n${t('share.code')}: ${gameCode}\n\n${t('share.joinViaLink')}:\n${url}`;
-  } else {
-    // Fallback for backward compatibility
-    const roomText = roomName ? `"${roomName}"` : '';
-    message = `🎮 בואו לשחק LexiClash איתי!\n\n` +
-      `${roomText ? `חדר: ${roomText}\n` : ''}` +
-      `קוד: ${gameCode}\n\n` +
-      `הצטרפו דרך הקישור:\n${url}`;
-  }
+  const roomText = roomName ? `\n${t('share.room')}: ${roomName}` : '';
+  const message = `🎮 ${t('share.inviteMessage')}\n${roomText}\n${t('share.code')}: ${gameCode}\n\n${t('share.joinViaLink')}:\n${url}`;
 
   const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(message)}`;
   window.open(whatsappUrl, '_blank');
@@ -68,19 +58,22 @@ export const shareViaWhatsApp = (gameCode, roomName = '', t = null) => {
 /**
  * Copy the game code to clipboard
  * @param {string} gameCode - The game code
+ * @param {function} t - Translation function (optional for backward compatibility)
  * @returns {Promise<boolean>} Success status
  */
-export const copyGameCode = async (gameCode) => {
+export const copyGameCode = async (gameCode, t = null) => {
   try {
     await navigator.clipboard.writeText(gameCode);
-    toast.success('הקוד הועתק ללוח! 🎯', {
+    const successMessage = t ? t('share.codeCopied') : 'הקוד הועתק ללוח! 🎯';
+    toast.success(successMessage, {
       duration: 2000,
       icon: '✅',
     });
     return true;
   } catch (error) {
     console.error('Failed to copy game code:', error);
-    toast.error('שגיאה בהעתקת הקוד', {
+    const errorMessage = t ? t('share.codeCopyError') : 'שגיאה בהעתקת הקוד';
+    toast.error(errorMessage, {
       duration: 2000,
     });
     return false;

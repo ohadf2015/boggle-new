@@ -288,7 +288,7 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
     };
 
     const handleAutoValidationOccurred = (data) => {
-      toast(data.message || 'Auto-validation completed', {
+      toast(data.message || t('hostView.autoValidationCompleted'), {
         icon: '⏱️',
         duration: 4000,
       });
@@ -498,7 +498,7 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
       tournamentTimeoutRef.current = setTimeout(() => {
         if (!tournamentData) {
           setTournamentCreating(false);
-          toast.error('Failed to create tournament. Please try again.', {
+          toast.error(t('hostView.tournamentCreateFailed'), {
             icon: '❌',
             duration: 5000,
           });

@@ -16,6 +16,7 @@ function getLocalePath(locale) {
         case 'ja':
             return '/ja';
         case 'he':
+            return '/he';
         default:
             return '';
     }
@@ -76,7 +77,7 @@ export async function generateMetadata({ params }) {
             canonical: `https://www.lexiclash.live${localePath}`,
             languages: {
                 'x-default': 'https://www.lexiclash.live',
-                he: 'https://www.lexiclash.live',
+                he: 'https://www.lexiclash.live/he',
                 en: 'https://www.lexiclash.live/en',
                 sv: 'https://www.lexiclash.live/sv',
                 ja: 'https://www.lexiclash.live/ja',
