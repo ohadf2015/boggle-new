@@ -15,7 +15,6 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import GridComponent from '../components/GridComponent';
 import ShareButton from '../components/ShareButton';
 import SlotMachineText from '../components/SlotMachineText';
-import ResultsPodium from '../components/results/ResultsPodium';
 import ResultsPlayerCard from '../components/results/ResultsPlayerCard';
 import RoomChat from '../components/RoomChat';
 import GoRipplesAnimation from '../components/GoRipplesAnimation';
@@ -68,6 +67,7 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
   const [tournamentRounds, setTournamentRounds] = useState(3);
   const [tournamentData, setTournamentData] = useState(null);
   const [tournamentCreating, setTournamentCreating] = useState(false);
+  const [showCancelTournamentDialog, setShowCancelTournamentDialog] = useState(false);
   const tournamentTimeoutRef = useRef(null);
 
   // Animation states
@@ -548,6 +548,21 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
     }, 100);
   };
 
+  // Cancel tournament handler
+  const handleCancelTournament = () => {
+    if (!ws || !tournamentData) return;
+
+    ws.send(JSON.stringify({
+      action: 'cancelTournament'
+    }));
+
+    setShowCancelTournamentDialog(false);
+    toast.success(t('hostView.tournamentCancelled') || 'Tournament cancelled', {
+      icon: '❌',
+      duration: 3000,
+    });
+  };
+
   const submitValidation = useCallback(() => {
     // Convert validations object to array with unique words only
     const validationArray = [];
@@ -819,14 +834,18 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
                     Round {tournamentData.currentRound} Results
                   </h3>
                   {finalScores && finalScores.length > 0 && (
-                    <>
-                      <ResultsPodium sortedScores={finalScores} />
-                      <div className="space-y-3 max-w-3xl mx-auto">
-                        {finalScores.map((player, index) => (
-                          <ResultsPlayerCard key={player.username} player={player} index={index} />
-                        ))}
-                      </div>
-                    </>
+                    <div className="space-y-3 max-w-3xl mx-auto">
+                      {finalScores.map((player, index) => {
+                        // Create allPlayerWords map for duplicate detection
+                        const allPlayerWords = {};
+                        finalScores.forEach(p => {
+                          allPlayerWords[p.username] = p.allWords || [];
+                        });
+                        return (
+                          <ResultsPlayerCard key={player.username} player={player} index={index} allPlayerWords={allPlayerWords} />
+                        );
+                      })}
+                    </div>
                   )}
                 </div>
 
@@ -851,17 +870,18 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
 
             {/* Regular Game Mode: Show only game results */}
             {!tournamentData && finalScores && finalScores.length > 0 && (
-              <>
-                {/* Podium */}
-                <ResultsPodium sortedScores={finalScores} />
-
-                {/* Detailed Player Cards */}
-                <div className="space-y-3 max-w-3xl mx-auto">
-                  {finalScores.map((player, index) => (
-                    <ResultsPlayerCard key={player.username} player={player} index={index} />
-                  ))}
-                </div>
-              </>
+              <div className="space-y-3 max-w-3xl mx-auto">
+                {finalScores.map((player, index) => {
+                  // Create allPlayerWords map for duplicate detection
+                  const allPlayerWords = {};
+                  finalScores.forEach(p => {
+                    allPlayerWords[p.username] = p.allWords || [];
+                  });
+                  return (
+                    <ResultsPlayerCard key={player.username} player={player} index={index} allPlayerWords={allPlayerWords} />
+                  );
+                })}
+              </div>
             )}
           </div>
           <DialogFooter className="flex-col sm:flex-row gap-2">
@@ -1111,28 +1131,40 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
                           </div>
 
                           {tournamentMode && (
-                            <div className="flex items-center gap-2 bg-white/50 dark:bg-slate-800/50 p-2 rounded-md border border-amber-500/30">
-                              <span className="text-xs font-medium text-amber-700 dark:text-amber-300 whitespace-nowrap">
-                                {t('hostView.rounds') || 'Rounds'}:
-                              </span>
-                              <button
-                                type="button"
-                                onClick={() => setTournamentRounds(prev => Math.max(2, prev - 1))}
-                                className="w-7 h-7 flex items-center justify-center rounded-full bg-white dark:bg-slate-800 border border-amber-500/50 text-amber-600 dark:text-amber-300 hover:bg-amber-50 dark:hover:bg-amber-500/20 transition-all duration-300"
-                              >
-                                <FaMinus size={10} />
-                              </button>
-                              <span className="w-8 text-center text-sm font-bold text-amber-700 dark:text-amber-300">
-                                {tournamentRounds}
-                              </span>
-                              <button
-                                type="button"
-                                onClick={() => setTournamentRounds(prev => Math.min(10, prev + 1))}
-                                className="w-7 h-7 flex items-center justify-center rounded-full bg-white dark:bg-slate-800 border border-amber-500/50 text-amber-600 dark:text-amber-300 hover:bg-amber-50 dark:hover:bg-amber-500/20 transition-all duration-300"
-                              >
-                                <FaPlus size={10} />
-                              </button>
-                            </div>
+                            <>
+                              <div className="flex items-center gap-2 bg-white/50 dark:bg-slate-800/50 p-2 rounded-md border border-amber-500/30">
+                                <span className="text-xs font-medium text-amber-700 dark:text-amber-300 whitespace-nowrap">
+                                  {t('hostView.rounds') || 'Rounds'}:
+                                </span>
+                                <button
+                                  type="button"
+                                  onClick={() => setTournamentRounds(prev => Math.max(2, prev - 1))}
+                                  className="w-7 h-7 flex items-center justify-center rounded-full bg-white dark:bg-slate-800 border border-amber-500/50 text-amber-600 dark:text-amber-300 hover:bg-amber-50 dark:hover:bg-amber-500/20 transition-all duration-300"
+                                >
+                                  <FaMinus size={10} />
+                                </button>
+                                <span className="w-8 text-center text-sm font-bold text-amber-700 dark:text-amber-300">
+                                  {tournamentRounds}
+                                </span>
+                                <button
+                                  type="button"
+                                  onClick={() => setTournamentRounds(prev => Math.min(10, prev + 1))}
+                                  className="w-7 h-7 flex items-center justify-center rounded-full bg-white dark:bg-slate-800 border border-amber-500/50 text-amber-600 dark:text-amber-300 hover:bg-amber-50 dark:hover:bg-amber-500/20 transition-all duration-300"
+                                >
+                                  <FaPlus size={10} />
+                                </button>
+                              </div>
+
+                              {/* Cancel Tournament Button - Only show if tournament has started */}
+                              {tournamentData && (
+                                <Button
+                                  onClick={() => setShowCancelTournamentDialog(true)}
+                                  className="w-full bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white text-xs py-2"
+                                >
+                                  ❌ {t('hostView.cancelTournament') || 'Cancel Tournament'}
+                                </Button>
+                              )}
+                            </>
                           )}
                         </div>
 
@@ -1390,6 +1422,31 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
           )}
         </div>
       </div>
+
+      {/* Cancel Tournament Confirmation Dialog */}
+      <AlertDialog open={showCancelTournamentDialog} onOpenChange={setShowCancelTournamentDialog}>
+        <AlertDialogContent className="bg-white dark:bg-slate-800 border-red-500/30">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="text-slate-900 dark:text-white">
+              {t('hostView.confirmCancelTournament') || 'Cancel Tournament?'}
+            </AlertDialogTitle>
+            <AlertDialogDescription className="text-slate-600 dark:text-gray-300">
+              {t('hostView.cancelTournamentWarning') || 'Are you sure you want to cancel the tournament? All progress will be lost and this cannot be undone.'}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel className="bg-slate-100 dark:bg-slate-700 text-slate-900 dark:text-white border-slate-300 dark:border-slate-600">
+              {t('common.cancel')}
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleCancelTournament}
+              className="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white"
+            >
+              {t('common.confirm')}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       {/* Exit Confirmation Dialog */}
       <AlertDialog open={showExitConfirm} onOpenChange={setShowExitConfirm}>

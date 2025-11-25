@@ -47,14 +47,14 @@ const WordChip = ({ wordObj, index, playerCount, t }) => {
 
 const ResultsPlayerCard = ({ player, index, allPlayerWords }) => {
   const { t } = useLanguage();
-  const [isWordsExpanded, setIsWordsExpanded] = useState(false);
+  const [isWordsExpanded, setIsWordsExpanded] = useState(false); // Start collapsed
 
   // Calculate how many players found each word
   const getPlayerCountForWord = (word) => {
-    if (!allPlayerWords) return 1;
+    if (!allPlayerWords || !word) return 1;
     let count = 0;
     Object.values(allPlayerWords).forEach(playerWordList => {
-      if (playerWordList.some(w => w.word.toLowerCase() === word.toLowerCase())) {
+      if (Array.isArray(playerWordList) && playerWordList.some(w => w?.word?.toLowerCase() === word.toLowerCase())) {
         count++;
       }
     });
@@ -134,45 +134,43 @@ const ResultsPlayerCard = ({ player, index, allPlayerWords }) => {
           </div>
         )}
 
-        {/* Words Section */}
-        {player.allWords && player.allWords.length > 0 && (
-          <div className="mb-3">
-            <button
-              onClick={() => setIsWordsExpanded(!isWordsExpanded)}
-              className="w-full flex items-center justify-between text-sm font-bold mb-2 text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 transition-colors"
-            >
-              <span>{t('hostView.words')}: ({player.allWords.length})</span>
-              {isWordsExpanded ? (
-                <ChevronUp className="w-4 h-4" />
-              ) : (
-                <ChevronDown className="w-4 h-4" />
-              )}
-            </button>
-            <AnimatePresence>
-              {isWordsExpanded && (
-                <motion.div
-                  initial={{ height: 0, opacity: 0 }}
-                  animate={{ height: 'auto', opacity: 1 }}
-                  exit={{ height: 0, opacity: 0 }}
-                  transition={{ duration: 0.3 }}
-                  className="overflow-hidden"
-                >
-                  <div className="flex flex-wrap gap-2 pt-2">
-                    {player.allWords.map((wordObj, i) => (
-                      <WordChip
-                        key={i}
-                        wordObj={wordObj}
-                        index={i}
-                        playerCount={getPlayerCountForWord(wordObj.word)}
-                        t={t}
-                      />
-                    ))}
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </div>
-        )}
+        {/* Words Section - Always show, collapsible */}
+        <div className="mb-3">
+          <button
+            onClick={() => setIsWordsExpanded(!isWordsExpanded)}
+            className="w-full flex items-center justify-between p-2 rounded-lg text-sm font-bold text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 hover:bg-purple-50 dark:hover:bg-purple-900/20 transition-all"
+          >
+            <span>{t('hostView.words')}: ({player.allWords?.length || 0})</span>
+            {isWordsExpanded ? (
+              <ChevronUp className="w-4 h-4" />
+            ) : (
+              <ChevronDown className="w-4 h-4" />
+            )}
+          </button>
+          <AnimatePresence>
+            {isWordsExpanded && player.allWords && player.allWords.length > 0 && (
+              <motion.div
+                initial={{ height: 0, opacity: 0 }}
+                animate={{ height: 'auto', opacity: 1 }}
+                exit={{ height: 0, opacity: 0 }}
+                transition={{ duration: 0.3 }}
+                className="overflow-hidden"
+              >
+                <div className="flex flex-wrap gap-2 pt-2">
+                  {player.allWords.map((wordObj, i) => (
+                    <WordChip
+                      key={i}
+                      wordObj={wordObj}
+                      index={i}
+                      playerCount={getPlayerCountForWord(wordObj.word)}
+                      t={t}
+                    />
+                  ))}
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
 
         {/* Achievements Section */}
         {player.achievements && player.achievements.length > 0 && (

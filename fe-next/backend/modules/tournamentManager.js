@@ -1,5 +1,6 @@
 // Tournament state management
 const tournaments = {};
+const { saveTournamentState, deleteTournamentState } = require('../redisClient');
 
 // Generate a unique tournament ID
 const generateTournamentId = () => {
@@ -40,6 +41,12 @@ const createTournament = (hostPlayerId, hostUsername, settings) => {
   };
 
   console.log(`[TOURNAMENT] Created tournament ${tournamentId} by ${hostUsername}`);
+
+  // Save to Redis for persistence
+  saveTournamentState(tournamentId, tournaments[tournamentId]).catch(err => {
+    console.error('[TOURNAMENT] Failed to save tournament to Redis:', err);
+  });
+
   return tournaments[tournamentId];
 };
 
@@ -71,6 +78,12 @@ const addPlayerToTournament = (tournamentId, playerId, username, avatar) => {
 
   tournament.updatedAt = Date.now();
   console.log(`[TOURNAMENT] Added player ${username} to tournament ${tournamentId}`);
+
+  // Save to Redis for persistence
+  saveTournamentState(tournamentId, tournament).catch(err => {
+    console.error('[TOURNAMENT] Failed to save tournament to Redis:', err);
+  });
+
   return tournament.players[playerId];
 };
 
@@ -89,6 +102,12 @@ const removePlayerFromTournament = (tournamentId, playerId) => {
     delete tournament.players[playerId];
     tournament.updatedAt = Date.now();
     console.log(`[TOURNAMENT] Removed player ${playerId} from tournament ${tournamentId}`);
+
+    // Save to Redis for persistence
+    saveTournamentState(tournamentId, tournament).catch(err => {
+      console.error('[TOURNAMENT] Failed to save tournament to Redis:', err);
+    });
+
     return true;
   }
 
@@ -123,6 +142,12 @@ const startTournamentRound = (tournamentId, gameCode) => {
   tournament.updatedAt = Date.now();
 
   console.log(`[TOURNAMENT] Started round ${roundNumber}/${tournament.totalRounds} for tournament ${tournamentId}`);
+
+  // Save to Redis for persistence
+  saveTournamentState(tournamentId, tournament).catch(err => {
+    console.error('[TOURNAMENT] Failed to save tournament to Redis:', err);
+  });
+
   return roundData;
 };
 
@@ -156,6 +181,11 @@ const completeTournamentRound = (tournamentId, roundResults) => {
   tournament.updatedAt = Date.now();
 
   console.log(`[TOURNAMENT] Completed round ${round.roundNumber}/${tournament.totalRounds} for tournament ${tournamentId}`);
+
+  // Save to Redis for persistence
+  saveTournamentState(tournamentId, tournament).catch(err => {
+    console.error('[TOURNAMENT] Failed to save tournament to Redis:', err);
+  });
 
   // Check if tournament is complete
   if (tournament.currentRound >= tournament.totalRounds) {
@@ -193,6 +223,12 @@ const completeTournament = (tournamentId) => {
   tournament.updatedAt = Date.now();
 
   console.log(`[TOURNAMENT] Tournament ${tournamentId} completed. Winner: ${standings[0]?.username}`);
+
+  // Save to Redis for persistence
+  saveTournamentState(tournamentId, tournament).catch(err => {
+    console.error('[TOURNAMENT] Failed to save tournament to Redis:', err);
+  });
+
   return standings;
 };
 
@@ -230,6 +266,12 @@ const deleteTournament = (tournamentId) => {
   if (tournaments[tournamentId]) {
     console.log(`[TOURNAMENT] Deleting tournament ${tournamentId}`);
     delete tournaments[tournamentId];
+
+    // Delete from Redis
+    deleteTournamentState(tournamentId).catch(err => {
+      console.error('[TOURNAMENT] Failed to delete tournament from Redis:', err);
+    });
+
     return true;
   }
   return false;
@@ -257,6 +299,32 @@ const linkGameToTournament = (gameCode, tournamentId) => {
   return false;
 };
 
+// Restore tournaments from Redis on server start
+const restoreTournamentsFromRedis = async () => {
+  const { getAllTournamentIds, getTournamentState } = require('../redisClient');
+
+  try {
+    const tournamentIds = await getAllTournamentIds();
+    console.log(`[TOURNAMENT] Restoring ${tournamentIds.length} tournaments from Redis...`);
+
+    for (const tournamentId of tournamentIds) {
+      try {
+        const tournamentData = await getTournamentState(tournamentId);
+        if (tournamentData) {
+          tournaments[tournamentId] = tournamentData;
+          console.log(`[TOURNAMENT] Restored tournament ${tournamentId} (status: ${tournamentData.status})`);
+        }
+      } catch (err) {
+        console.error(`[TOURNAMENT] Failed to restore tournament ${tournamentId}:`, err);
+      }
+    }
+
+    console.log(`[TOURNAMENT] Successfully restored ${Object.keys(tournaments).length} tournaments`);
+  } catch (err) {
+    console.error('[TOURNAMENT] Failed to restore tournaments from Redis:', err);
+  }
+};
+
 module.exports = {
   tournaments,
   generateTournamentId,
@@ -271,4 +339,5 @@ module.exports = {
   deleteTournament,
   getActiveTournaments,
   linkGameToTournament,
+  restoreTournamentsFromRedis,
 };

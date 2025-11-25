@@ -24,6 +24,7 @@ import ShareButton from '../components/ShareButton';
 import { QRCodeSVG } from 'qrcode.react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '../components/ui/dialog';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '../components/ui/alert-dialog';
+import TournamentStandings from '../components/TournamentStandings';
 
 const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) => {
   const { t } = useLanguage();
@@ -56,6 +57,11 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
   const [comboLevel, setComboLevel] = useState(0);
   const [lastWordTime, setLastWordTime] = useState(null);
   const comboTimeoutRef = useRef(null);
+
+  // Tournament state
+  const [tournamentData, setTournamentData] = useState(null);
+  const [tournamentStandings, setTournamentStandings] = useState([]);
+  const [showTournamentStandings, setShowTournamentStandings] = useState(false);
 
   // Handle countdown complete
   const handleCountdownComplete = () => {
@@ -361,6 +367,90 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
           setPlayersReady([]);
           toast.success(message.message || t('playerView.startingNewGame'), {
             icon: '🔄',
+            duration: 3000,
+          });
+          break;
+
+        case 'tournamentCreated':
+          setTournamentData(message.tournament);
+          toast.success(t('hostView.tournamentCreated') || 'Tournament created!', {
+            icon: '🏆',
+            duration: 3000,
+            style: {
+              background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+              color: 'white',
+            },
+          });
+          break;
+
+        case 'tournamentRoundStarting':
+          if (message.tournament) {
+            setTournamentData(message.tournament);
+          }
+          if (message.standings) {
+            setTournamentStandings(message.standings);
+          }
+          const roundNum = message.tournament?.currentRound || 1;
+          const totalRounds = message.tournament?.totalRounds || 3;
+          toast.success(
+            `${t('hostView.tournamentRound')} ${roundNum}/${totalRounds}`,
+            {
+              icon: '🎯',
+              duration: 3000,
+              style: {
+                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                color: 'white',
+              },
+            }
+          );
+          break;
+
+        case 'tournamentRoundCompleted':
+          if (message.standings) {
+            setTournamentStandings(message.standings);
+            setShowTournamentStandings(true);
+          }
+          if (message.tournament) {
+            setTournamentData(message.tournament);
+          }
+          break;
+
+        case 'tournamentComplete':
+          if (message.standings) {
+            setTournamentStandings(message.standings);
+            setShowTournamentStandings(true);
+          }
+          if (message.tournament) {
+            setTournamentData(message.tournament);
+          }
+          // Show winner confetti
+          const winner = message.standings?.[0];
+          if (winner) {
+            confetti({
+              particleCount: 150,
+              spread: 100,
+              origin: { y: 0.6 },
+            });
+            toast.success(
+              `🏆 ${winner.username} ${t('hostView.wonTournament')}!`,
+              {
+                duration: 5000,
+                style: {
+                  background: 'linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%)',
+                  color: 'white',
+                  fontWeight: 'bold',
+                },
+              }
+            );
+          }
+          break;
+
+        case 'tournamentCancelled':
+          setTournamentData(null);
+          setTournamentStandings([]);
+          setShowTournamentStandings(false);
+          toast.error(message.message || t('hostView.tournamentCancelled'), {
+            icon: '❌',
             duration: 3000,
           });
           break;
@@ -849,6 +939,36 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
         </motion.div>
       )}
 
+      {/* Tournament Progress Banner */}
+      {tournamentData && (
+        <motion.div
+          initial={{ y: -20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          className="max-w-7xl mx-auto mb-2"
+        >
+          <Card className="bg-gradient-to-r from-purple-600/90 to-pink-600/90 dark:from-purple-700/90 dark:to-pink-700/90 backdrop-blur-md border border-purple-400/50 shadow-[0_0_20px_rgba(168,85,247,0.3)]">
+            <CardContent className="py-2 px-4">
+              <div className="flex items-center justify-between gap-4">
+                <div className="flex items-center gap-3">
+                  <FaTrophy className="text-yellow-300 text-xl drop-shadow-[0_0_8px_rgba(251,191,36,0.6)]" />
+                  <div>
+                    <div className="text-white font-bold text-sm md:text-base">
+                      {tournamentData.name || t('hostView.tournament')}
+                    </div>
+                    <div className="text-purple-100 text-xs md:text-sm">
+                      {t('hostView.tournamentRound')} {tournamentData.currentRound || 1} / {tournamentData.totalRounds || 3}
+                    </div>
+                  </div>
+                </div>
+                <Badge className="bg-white/20 text-white border-white/30 text-xs md:text-sm">
+                  {t('hostView.tournamentProgress')}
+                </Badge>
+              </div>
+            </CardContent>
+          </Card>
+        </motion.div>
+      )}
+
       {/* Achievements */}
       {achievements.length > 0 && (
         <motion.div
@@ -1046,6 +1166,32 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
           </div>
         </div>
       </div>
+
+      {/* Tournament Standings Modal */}
+      <Dialog open={showTournamentStandings} onOpenChange={setShowTournamentStandings}>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto bg-white dark:bg-slate-800 border-purple-500/30">
+          <DialogHeader>
+            <DialogTitle className="text-center text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-pink-600 dark:from-purple-400 dark:to-pink-400">
+              {tournamentData?.status === 'completed' ? t('hostView.tournamentComplete') : t('hostView.tournamentStandings')}
+            </DialogTitle>
+          </DialogHeader>
+          <div className="py-4">
+            <TournamentStandings
+              standings={tournamentStandings}
+              tournament={tournamentData}
+              isComplete={tournamentData?.status === 'completed'}
+            />
+          </div>
+          <DialogFooter className="sm:justify-center">
+            <Button
+              onClick={() => setShowTournamentStandings(false)}
+              className="w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-400 hover:to-pink-400 hover:shadow-[0_0_15px_rgba(168,85,247,0.5)]"
+            >
+              {t('common.close')}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       {/* Exit Confirmation Dialog */}
       <AlertDialog open={showExitConfirm} onOpenChange={setShowExitConfirm}>

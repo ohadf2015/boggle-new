@@ -70,6 +70,12 @@ const cleanupGameTimers = (gameCode) => {
     game.validationTimeout = null;
   }
 
+  // Clear warning timeouts as well
+  if (game.validationWarningTimeouts) {
+    game.validationWarningTimeouts.forEach(timeout => clearTimeout(timeout));
+    game.validationWarningTimeouts = null;
+  }
+
   // Clear host disconnect timeout
   if (game.hostDisconnectTimeout) {
     clearTimeout(game.hostDisconnectTimeout);
@@ -455,6 +461,71 @@ const addUserToGame = async (gameCode, username, ws) => {
       game.emptyRoomTimeout = null;
     }
 
+    // Handle tournament late joins
+    const tournamentId = getTournamentIdFromGame(gameCode);
+    if (tournamentId) {
+      const tournament = getTournament(tournamentId);
+      if (tournament) {
+        // Check if player is already in tournament (reconnection)
+        const playerId = game.playerIds[username];
+        if (tournament.players[playerId]) {
+          console.log(`[TOURNAMENT] Player ${username} reconnected to tournament ${tournamentId}`);
+          // Send tournament data to reconnecting player
+          ws.send(JSON.stringify({
+            action: 'tournamentCreated',
+            tournament: {
+              id: tournament.id,
+              name: tournament.name,
+              totalRounds: tournament.totalRounds,
+              currentRound: tournament.currentRound,
+              status: tournament.status,
+              settings: tournament.settings,
+            }
+          }));
+        } else if (tournament.status === 'lobby') {
+          // Tournament is still in lobby - add new player
+          try {
+            addPlayerToTournament(tournamentId, playerId, username, game.playerAvatars[username]);
+            console.log(`[TOURNAMENT] Added late joiner ${username} to tournament ${tournamentId} (lobby phase)`);
+
+            // Send tournament data to new player
+            ws.send(JSON.stringify({
+              action: 'tournamentCreated',
+              tournament: {
+                id: tournament.id,
+                name: tournament.name,
+                totalRounds: tournament.totalRounds,
+                currentRound: tournament.currentRound,
+                status: tournament.status,
+                settings: tournament.settings,
+              }
+            }));
+
+            // Notify host and other players that someone joined the tournament
+            sendHostAMessage(gameCode, {
+              action: 'playerJoinedTournament',
+              username: username,
+              playerId: playerId
+            });
+          } catch (error) {
+            console.error(`[TOURNAMENT] Failed to add late joiner ${username}:`, error);
+          }
+        } else {
+          // Tournament is already in progress - don't add to tournament
+          console.log(`[TOURNAMENT] Player ${username} joined during active tournament ${tournamentId} - not adding to tournament`);
+          ws.send(JSON.stringify({
+            action: 'tournamentInProgress',
+            message: 'A tournament is currently in progress. You can watch but won\'t be able to participate.',
+            tournament: {
+              name: tournament.name,
+              currentRound: tournament.currentRound,
+              totalRounds: tournament.totalRounds
+            }
+          }));
+        }
+      }
+    }
+
     // Broadcast updated user list with avatar info
     const playerList = Object.keys(game.users).map(username => ({
         username,
@@ -687,7 +758,51 @@ const handleEndGame = (host) => {
   // Log dictionary validation stats
   console.log(`[Dictionary] Auto-validated ${autoValidatedCount} words, ${wordsNeedingValidation.size} words need host validation`);
 
-  // Start auto-validation timeout in case host is AFK (15 seconds)
+  // Determine timeout based on tournament mode
+  // Tournament rounds get 30 seconds, regular games get 15 seconds
+  const tournamentId = getTournamentIdFromGame(gameCode);
+  const timeoutDuration = tournamentId ? 30000 : 15000; // 30s for tournaments, 15s for regular games
+
+  console.log(`[AUTO_VALIDATION] Setting ${timeoutDuration/1000}s timeout for game ${gameCode}${tournamentId ? ' (tournament)' : ''}`);
+
+  // Send initial notification to host about auto-validation timeout
+  sendHostAMessage(gameCode, {
+    action: "validationTimeoutStarted",
+    timeoutSeconds: timeoutDuration / 1000,
+    isTournament: !!tournamentId
+  });
+
+  // Send countdown warnings at 10s and 5s remaining
+  const warningTimeouts = [];
+
+  if (timeoutDuration >= 10000) {
+    // 10 second warning (only if timeout is >= 10s)
+    warningTimeouts.push(setTimeout(() => {
+      if (games[gameCode] && games[gameCode].gameState === 'ended') {
+        sendHostAMessage(gameCode, {
+          action: "validationTimeoutWarning",
+          remainingSeconds: 10
+        });
+      }
+    }, timeoutDuration - 10000));
+  }
+
+  if (timeoutDuration >= 5000) {
+    // 5 second warning
+    warningTimeouts.push(setTimeout(() => {
+      if (games[gameCode] && games[gameCode].gameState === 'ended') {
+        sendHostAMessage(gameCode, {
+          action: "validationTimeoutWarning",
+          remainingSeconds: 5
+        });
+      }
+    }, timeoutDuration - 5000));
+  }
+
+  // Store warning timeouts so they can be cleared if validation happens
+  games[gameCode].validationWarningTimeouts = warningTimeouts;
+
+  // Start auto-validation timeout in case host is AFK
   games[gameCode].validationTimeout = setTimeout(() => {
     // Check if game still exists and hasn't been validated yet
     if (games[gameCode] && games[gameCode].gameState === 'ended') {
@@ -722,7 +837,7 @@ const handleEndGame = (host) => {
         message: "Auto-validation completed due to inactivity"
       });
     }
-  }, 15000); // 15 seconds
+  }, timeoutDuration); // Dynamic timeout: 30s for tournaments, 15s for regular games
 }
 
 const handleSendAnswer = (ws, foundWords) => {
@@ -1208,6 +1323,12 @@ const handleValidateWords = (host, validations, letterGrid) => {
     games[gameCode].validationTimeout = null;
   }
 
+  // Clear warning timeouts as well
+  if (games[gameCode].validationWarningTimeouts) {
+    games[gameCode].validationWarningTimeouts.forEach(timeout => clearTimeout(timeout));
+    games[gameCode].validationWarningTimeouts = null;
+  }
+
   // Timing-based achievements that should be preserved (not affected by validation)
   const TIMING_BASED_ACHIEVEMENTS = ['FIRST_BLOOD', 'QUICK_THINKER', 'LONG_HAULER', 'DOUBLE_TROUBLE'];
 
@@ -1472,6 +1593,12 @@ const handleResetGame = async (host) => {
   if (games[gameCode].validationTimeout) {
     clearTimeout(games[gameCode].validationTimeout);
     games[gameCode].validationTimeout = null;
+  }
+
+  // Clear warning timeouts as well
+  if (games[gameCode].validationWarningTimeouts) {
+    games[gameCode].validationWarningTimeouts.forEach(timeout => clearTimeout(timeout));
+    games[gameCode].validationWarningTimeouts = null;
   }
 
   // Reset game state

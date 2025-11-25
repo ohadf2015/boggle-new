@@ -109,6 +109,7 @@ async function saveGameState(gameCode, gameData) {
     letterGrid: gameData.letterGrid,
     timerSeconds: gameData.timerSeconds,
     language: gameData.language,
+    tournamentId: gameData.tournamentId, // Include tournament ID if present
   };
 
   // Retry logic for critical save operations
@@ -188,6 +189,108 @@ async function getAllGameCodes() {
   }
 }
 
+// Save tournament state to Redis with retry logic
+async function saveTournamentState(tournamentId, tournamentData) {
+  if (!isRedisAvailable || !redisClient) {
+    return; // Skip if Redis is not available
+  }
+
+  const key = `tournament:${tournamentId}`;
+
+  // Convert tournament data to JSON, excluding any non-serializable data
+  const sanitizedData = {
+    id: tournamentData.id,
+    hostPlayerId: tournamentData.hostPlayerId,
+    hostUsername: tournamentData.hostUsername,
+    name: tournamentData.name,
+    totalRounds: tournamentData.totalRounds,
+    currentRound: tournamentData.currentRound,
+    status: tournamentData.status,
+    settings: tournamentData.settings,
+    players: tournamentData.players,
+    rounds: tournamentData.rounds,
+    finalStandings: tournamentData.finalStandings,
+    createdAt: tournamentData.createdAt,
+  };
+
+  // Retry logic for critical save operations
+  for (let attempt = 1; attempt <= MAX_RETRY_ATTEMPTS; attempt++) {
+    try {
+      // Use longer TTL for tournaments (3 hours)
+      await redisClient.setex(key, GAME_STATE_TTL * 3, JSON.stringify(sanitizedData));
+      return; // Success
+    } catch (error) {
+      console.error(`[REDIS] Error saving tournament state (attempt ${attempt}/${MAX_RETRY_ATTEMPTS}):`, error.message);
+      if (attempt === MAX_RETRY_ATTEMPTS) {
+        console.error('[REDIS] Failed to save tournament state after all retry attempts');
+        isRedisAvailable = false; // Mark Redis as unavailable
+      } else {
+        // Wait before retry with exponential backoff
+        await new Promise(resolve => setTimeout(resolve, attempt * 100));
+      }
+    }
+  }
+}
+
+// Get tournament state from Redis
+async function getTournamentState(tournamentId) {
+  if (!isRedisAvailable || !redisClient) {
+    return null;
+  }
+
+  try {
+    const key = `tournament:${tournamentId}`;
+    const data = await redisClient.get(key);
+    return data ? JSON.parse(data) : null;
+  } catch (error) {
+    console.error('[REDIS] Error getting tournament state:', error.message);
+    return null;
+  }
+}
+
+// Delete tournament state from Redis
+async function deleteTournamentState(tournamentId) {
+  if (!isRedisAvailable || !redisClient) {
+    return;
+  }
+
+  try {
+    const key = `tournament:${tournamentId}`;
+    await redisClient.del(key);
+  } catch (error) {
+    console.error('[REDIS] Error deleting tournament state:', error.message);
+  }
+}
+
+// Get all active tournament IDs using SCAN
+async function getAllTournamentIds() {
+  if (!isRedisAvailable || !redisClient) {
+    return [];
+  }
+
+  try {
+    const tournamentIds = [];
+    let cursor = '0';
+
+    // Use SCAN instead of KEYS to avoid blocking Redis
+    do {
+      const result = await redisClient.scan(cursor, 'MATCH', 'tournament:*', 'COUNT', 100);
+      cursor = result[0];
+      const keys = result[1];
+
+      // Extract tournament IDs from keys
+      keys.forEach(key => {
+        tournamentIds.push(key.replace('tournament:', ''));
+      });
+    } while (cursor !== '0');
+
+    return tournamentIds;
+  } catch (error) {
+    console.error('[REDIS] Error getting tournament IDs:', error.message);
+    return [];
+  }
+}
+
 // Close Redis connection
 async function closeRedis() {
   if (redisClient) {
@@ -202,6 +305,10 @@ module.exports = {
   getGameState,
   deleteGameState,
   getAllGameCodes,
+  saveTournamentState,
+  getTournamentState,
+  deleteTournamentState,
+  getAllTournamentIds,
   closeRedis,
   isRedisAvailable: () => isRedisAvailable,
 };

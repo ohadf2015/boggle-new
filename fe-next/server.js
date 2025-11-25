@@ -32,6 +32,7 @@ const {
   handleGetTournamentStandings,
   handleCancelTournament,
 } = require("./backend/handlers");
+const { restoreTournamentsFromRedis } = require("./backend/modules/tournamentManager");
 
 const dev = process.env.NODE_ENV !== "production";
 const app = next({ dev });
@@ -261,6 +262,14 @@ app.prepare().then(() => {
   // Start server
   async function startServer() {
     await initRedis();
+
+    // Restore tournaments from Redis
+    try {
+      await restoreTournamentsFromRedis();
+    } catch (error) {
+      console.error('Failed to restore tournaments:', error);
+    }
+
     try {
       await dictionary.load();
     } catch (error) {
