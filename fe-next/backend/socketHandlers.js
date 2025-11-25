@@ -1,0 +1,705 @@
+/**
+ * Socket.IO Event Handlers
+ * Handles all real-time game events using Socket.IO
+ */
+
+const {
+  games,
+  createGame,
+  getGame,
+  updateGame,
+  deleteGame,
+  gameExists,
+  addUserToGame,
+  removeUserFromGame,
+  removeUserBySocketId,
+  getGameBySocketId,
+  getUsernameBySocketId,
+  getSocketIdByUsername,
+  getUserBySocketId,
+  updateUserSocketId,
+  getGameUsers,
+  getActiveRooms,
+  isHost,
+  updateHostSocketId,
+  resetGameForNewRound,
+  addPlayerWord,
+  playerHasWord,
+  updatePlayerScore,
+  getLeaderboard,
+  getTournamentIdFromGame,
+  setTournamentIdForGame
+} = require('./modules/gameStateManager');
+
+const {
+  broadcastToRoom,
+  broadcastToRoomExceptSender,
+  getGameRoom,
+  joinRoom,
+  leaveRoom,
+  leaveAllGameRooms,
+  safeEmit,
+  getSocketById
+} = require('./utils/socketHelpers');
+
+const { validateWordOnBoard } = require('./modules/wordValidator');
+const { calculateWordScore, calculateGameScores } = require('./modules/scoringEngine');
+const { checkAndAwardAchievements, getPlayerAchievements, ACHIEVEMENTS } = require('./modules/achievementManager');
+const { isDictionaryWord, getAvailableDictionaries } = require('./dictionary');
+const gameStartCoordinator = require('./utils/gameStartCoordinator');
+const timerManager = require('./utils/timerManager');
+const { checkRateLimit, resetRateLimit } = require('./utils/rateLimiter');
+const redisClient = require('./redisClient');
+const tournamentManager = require('./modules/tournamentManager');
+
+/**
+ * Initialize Socket.IO event handlers
+ * @param {Server} io - Socket.IO server instance
+ */
+function initializeSocketHandlers(io) {
+  io.on('connection', (socket) => {
+    console.log(`[SOCKET] Client connected: ${socket.id}`);
+
+    // Rate limiting
+    if (!checkRateLimit(socket.id)) {
+      console.warn(`[SOCKET] Rate limit exceeded for ${socket.id}`);
+      socket.emit('error', { message: 'Rate limit exceeded. Please slow down.' });
+      socket.disconnect(true);
+      return;
+    }
+
+    // Handle game creation
+    socket.on('createGame', async (data) => {
+      const { gameCode, roomName, language, hostUsername, playerId, avatar } = data;
+
+      console.log(`[SOCKET] Create game request: ${gameCode} by ${hostUsername}`);
+
+      // Validate game code
+      if (!gameCode || gameCode.length !== 4) {
+        socket.emit('error', { message: 'Invalid game code' });
+        return;
+      }
+
+      // Check if game already exists
+      if (gameExists(gameCode)) {
+        socket.emit('error', { message: 'Game code already in use' });
+        return;
+      }
+
+      // Create the game
+      const game = createGame(gameCode, {
+        hostSocketId: socket.id,
+        hostUsername: hostUsername || 'Host',
+        hostPlayerId: playerId,
+        roomName: roomName || gameCode,
+        language: language || 'en'
+      });
+
+      // Add host as first user
+      addUserToGame(gameCode, hostUsername || 'Host', socket.id, {
+        avatar,
+        isHost: true,
+        playerId
+      });
+
+      // Join the socket to the game room
+      joinRoom(socket, getGameRoom(gameCode));
+
+      // Confirm game creation
+      socket.emit('joined', {
+        success: true,
+        gameCode,
+        isHost: true,
+        username: hostUsername || 'Host',
+        roomName: roomName || gameCode,
+        language: language || 'en'
+      });
+
+      // Broadcast updated room list to all clients
+      io.emit('activeRooms', { rooms: getActiveRooms() });
+
+      // Broadcast user list update
+      broadcastToRoom(io, getGameRoom(gameCode), 'updateUsers', {
+        users: getGameUsers(gameCode)
+      });
+
+      // Save to Redis if available
+      try {
+        await redisClient.saveGameState(gameCode, game);
+      } catch (err) {
+        console.error('[REDIS] Failed to save game state:', err);
+      }
+
+      console.log(`[SOCKET] Game ${gameCode} created by ${hostUsername}`);
+    });
+
+    // Handle player joining
+    socket.on('join', async (data) => {
+      const { gameCode, username, playerId, avatar } = data;
+
+      console.log(`[SOCKET] Join request: ${username} to game ${gameCode}`);
+
+      // Validate
+      if (!gameCode || !username) {
+        socket.emit('error', { message: 'Game code and username are required' });
+        return;
+      }
+
+      const game = getGame(gameCode);
+      if (!game) {
+        socket.emit('error', { message: 'Game not found' });
+        return;
+      }
+
+      // Check for existing user (reconnection)
+      const existingSocketId = getSocketIdByUsername(gameCode, username);
+      if (existingSocketId) {
+        // Handle reconnection
+        console.log(`[SOCKET] Reconnection detected for ${username}`);
+
+        // Update socket ID
+        updateUserSocketId(gameCode, username, socket.id);
+
+        // Check if this is the host reconnecting
+        if (game.hostUsername === username) {
+          updateHostSocketId(gameCode, socket.id);
+        }
+
+        // Join room
+        joinRoom(socket, getGameRoom(gameCode));
+
+        // Send current game state
+        socket.emit('joined', {
+          success: true,
+          gameCode,
+          isHost: game.hostUsername === username,
+          username,
+          roomName: game.roomName,
+          language: game.language,
+          reconnected: true
+        });
+
+        // If game is in progress, send current state
+        if (game.gameState === 'in-progress') {
+          socket.emit('startGame', {
+            letterGrid: game.letterGrid,
+            timerSeconds: game.timerSeconds,
+            language: game.language,
+            messageId: 'reconnect-' + Date.now()
+          });
+        }
+
+        broadcastToRoom(io, getGameRoom(gameCode), 'updateUsers', {
+          users: getGameUsers(gameCode)
+        });
+
+        return;
+      }
+
+      // Add new user
+      addUserToGame(gameCode, username, socket.id, {
+        avatar,
+        isHost: false,
+        playerId
+      });
+
+      // Join room
+      joinRoom(socket, getGameRoom(gameCode));
+
+      // Confirm join
+      socket.emit('joined', {
+        success: true,
+        gameCode,
+        isHost: false,
+        username,
+        roomName: game.roomName,
+        language: game.language
+      });
+
+      // Broadcast user list update
+      broadcastToRoom(io, getGameRoom(gameCode), 'updateUsers', {
+        users: getGameUsers(gameCode)
+      });
+
+      // Broadcast updated room list
+      io.emit('activeRooms', { rooms: getActiveRooms() });
+
+      console.log(`[SOCKET] ${username} joined game ${gameCode}`);
+    });
+
+    // Handle game start
+    socket.on('startGame', (data) => {
+      const { letterGrid, timerSeconds, language } = data;
+
+      const gameCode = getGameBySocketId(socket.id);
+      if (!gameCode) {
+        socket.emit('error', { message: 'Not in a game' });
+        return;
+      }
+
+      const game = getGame(gameCode);
+      if (!game) {
+        socket.emit('error', { message: 'Game not found' });
+        return;
+      }
+
+      // Verify sender is host
+      if (game.hostSocketId !== socket.id) {
+        socket.emit('error', { message: 'Only host can start the game' });
+        return;
+      }
+
+      // Update game state
+      updateGame(gameCode, {
+        letterGrid,
+        timerSeconds: timerSeconds || 180,
+        language: language || game.language,
+        gameState: 'in-progress'
+      });
+
+      // Reset player data
+      const users = getGameUsers(gameCode);
+      const playerUsernames = users.map(u => u.username);
+
+      // Initialize game start coordination
+      const messageId = gameStartCoordinator.initializeSequence(gameCode, playerUsernames, timerSeconds);
+
+      // Broadcast start game to all players
+      broadcastToRoom(io, getGameRoom(gameCode), 'startGame', {
+        letterGrid,
+        timerSeconds: timerSeconds || 180,
+        language: language || game.language,
+        messageId
+      });
+
+      // Set up timeout for acknowledgments
+      gameStartCoordinator.setAcknowledgmentTimeout(gameCode, 2000, (stats) => {
+        // Start timer even if not all players acknowledged
+        startGameTimer(io, gameCode, timerSeconds || 180);
+      });
+
+      console.log(`[SOCKET] Game ${gameCode} starting with ${playerUsernames.length} players`);
+    });
+
+    // Handle start game acknowledgment
+    socket.on('startGameAck', (data) => {
+      const { messageId } = data;
+
+      const gameCode = getGameBySocketId(socket.id);
+      const username = getUsernameBySocketId(socket.id);
+
+      if (!gameCode || !username) return;
+
+      const result = gameStartCoordinator.recordAcknowledgment(gameCode, username, messageId);
+
+      if (result.valid && result.allReady) {
+        const game = getGame(gameCode);
+        startGameTimer(io, gameCode, game?.timerSeconds || 180);
+      }
+    });
+
+    // Handle word submission
+    socket.on('submitWord', (data) => {
+      const { word } = data;
+
+      const gameCode = getGameBySocketId(socket.id);
+      const username = getUsernameBySocketId(socket.id);
+
+      if (!gameCode || !username || !word) return;
+
+      const game = getGame(gameCode);
+      if (!game || game.gameState !== 'in-progress') return;
+
+      const normalizedWord = word.toLowerCase().trim();
+
+      // Check if already found
+      if (playerHasWord(gameCode, username, normalizedWord)) {
+        socket.emit('wordAlreadyFound', { word: normalizedWord });
+        return;
+      }
+
+      // Validate word on board
+      const isOnBoard = validateWordOnBoard(normalizedWord, game.letterGrid);
+      if (!isOnBoard) {
+        socket.emit('wordNotOnBoard', { word: normalizedWord });
+        return;
+      }
+
+      // Add word to player's list
+      addPlayerWord(gameCode, username, normalizedWord);
+
+      // Check dictionary
+      const isInDictionary = isDictionaryWord(normalizedWord, game.language);
+
+      if (isInDictionary) {
+        // Calculate score
+        const wordScore = calculateWordScore(normalizedWord);
+        updatePlayerScore(gameCode, username, wordScore, true);
+
+        socket.emit('wordAccepted', {
+          word: normalizedWord,
+          score: wordScore,
+          autoValidated: true
+        });
+
+        // Check for achievements
+        const achievements = checkAndAwardAchievements(gameCode, username, normalizedWord);
+        if (achievements.length > 0) {
+          socket.emit('liveAchievementUnlocked', { achievements });
+        }
+      } else {
+        socket.emit('wordNeedsValidation', {
+          word: normalizedWord,
+          message: 'Word will be validated by host'
+        });
+      }
+
+      // Update leaderboard
+      broadcastToRoom(io, getGameRoom(gameCode), 'updateLeaderboard', {
+        leaderboard: getLeaderboard(gameCode)
+      });
+    });
+
+    // Handle chat messages
+    socket.on('chatMessage', (data) => {
+      const { message, gameCode: providedGameCode } = data;
+
+      const gameCode = providedGameCode || getGameBySocketId(socket.id);
+      const username = getUsernameBySocketId(socket.id);
+
+      if (!gameCode || !message) return;
+
+      const game = getGame(gameCode);
+      if (!game) return;
+
+      const isHostUser = game.hostSocketId === socket.id;
+
+      // Broadcast to room
+      broadcastToRoom(io, getGameRoom(gameCode), 'chatMessage', {
+        username: isHostUser ? 'Host' : username,
+        message: message.trim().substring(0, 500), // Limit message length
+        timestamp: Date.now(),
+        isHost: isHostUser
+      });
+    });
+
+    // Handle end game
+    socket.on('endGame', () => {
+      const gameCode = getGameBySocketId(socket.id);
+      if (!gameCode) return;
+
+      const game = getGame(gameCode);
+      if (!game) return;
+
+      // Verify sender is host
+      if (game.hostSocketId !== socket.id) {
+        socket.emit('error', { message: 'Only host can end the game' });
+        return;
+      }
+
+      endGame(io, gameCode);
+    });
+
+    // Handle validate words (host validation)
+    socket.on('validateWords', (data) => {
+      const { validatedScores } = data;
+
+      const gameCode = getGameBySocketId(socket.id);
+      if (!gameCode) return;
+
+      const game = getGame(gameCode);
+      if (!game || game.hostSocketId !== socket.id) return;
+
+      // Update scores
+      for (const [username, score] of Object.entries(validatedScores)) {
+        updatePlayerScore(gameCode, username, score, false);
+      }
+
+      // Broadcast validated scores
+      broadcastToRoom(io, getGameRoom(gameCode), 'validatedScores', {
+        scores: validatedScores,
+        letterGrid: game.letterGrid
+      });
+    });
+
+    // Handle reset game
+    socket.on('resetGame', () => {
+      const gameCode = getGameBySocketId(socket.id);
+      if (!gameCode) return;
+
+      const game = getGame(gameCode);
+      if (!game || game.hostSocketId !== socket.id) return;
+
+      // Stop any running timers
+      timerManager.clearGameTimer(gameCode);
+
+      // Reset game state
+      resetGameForNewRound(gameCode);
+
+      // Broadcast reset
+      broadcastToRoom(io, getGameRoom(gameCode), 'resetGame', {
+        message: 'Game has been reset. Get ready for a new round!'
+      });
+
+      console.log(`[SOCKET] Game ${gameCode} reset`);
+    });
+
+    // Handle close room
+    socket.on('closeRoom', () => {
+      const gameCode = getGameBySocketId(socket.id);
+      if (!gameCode) return;
+
+      const game = getGame(gameCode);
+      if (!game || game.hostSocketId !== socket.id) return;
+
+      // Stop any running timers
+      timerManager.clearGameTimer(gameCode);
+
+      // Notify all players
+      broadcastToRoom(io, getGameRoom(gameCode), 'hostLeftRoomClosing', {
+        message: 'Host has closed the room'
+      });
+
+      // Remove game
+      deleteGame(gameCode);
+
+      // Update room list
+      io.emit('activeRooms', { rooms: getActiveRooms() });
+
+      console.log(`[SOCKET] Room ${gameCode} closed by host`);
+    });
+
+    // Handle get active rooms
+    socket.on('getActiveRooms', () => {
+      socket.emit('activeRooms', { rooms: getActiveRooms() });
+    });
+
+    // Handle host keep alive
+    socket.on('hostKeepAlive', () => {
+      const gameCode = getGameBySocketId(socket.id);
+      if (!gameCode) return;
+
+      const game = getGame(gameCode);
+      if (game) {
+        game.lastActivity = Date.now();
+      }
+    });
+
+    // Handle host reactivate
+    socket.on('hostReactivate', () => {
+      const gameCode = getGameBySocketId(socket.id);
+      if (!gameCode) return;
+
+      const game = getGame(gameCode);
+      if (game) {
+        game.lastActivity = Date.now();
+        console.log(`[SOCKET] Host reactivated for game ${gameCode}`);
+      }
+    });
+
+    // Tournament handlers
+    socket.on('createTournament', (data) => {
+      const { name, totalRounds } = data;
+
+      const gameCode = getGameBySocketId(socket.id);
+      if (!gameCode) return;
+
+      const game = getGame(gameCode);
+      if (!game || game.hostSocketId !== socket.id) return;
+
+      const tournament = tournamentManager.createTournament(name, gameCode, totalRounds);
+      setTournamentIdForGame(gameCode, tournament.id);
+
+      broadcastToRoom(io, getGameRoom(gameCode), 'tournamentCreated', {
+        tournament: {
+          id: tournament.id,
+          name: tournament.name,
+          totalRounds: tournament.totalRounds,
+          currentRound: tournament.currentRound
+        }
+      });
+    });
+
+    socket.on('getTournamentStandings', () => {
+      const gameCode = getGameBySocketId(socket.id);
+      if (!gameCode) return;
+
+      const tournamentId = getTournamentIdFromGame(gameCode);
+      if (!tournamentId) return;
+
+      const standings = tournamentManager.getStandings(tournamentId);
+      socket.emit('tournamentStandings', { standings });
+    });
+
+    socket.on('cancelTournament', () => {
+      const gameCode = getGameBySocketId(socket.id);
+      if (!gameCode) return;
+
+      const game = getGame(gameCode);
+      if (!game || game.hostSocketId !== socket.id) return;
+
+      const tournamentId = getTournamentIdFromGame(gameCode);
+      if (!tournamentId) return;
+
+      tournamentManager.deleteTournament(tournamentId);
+      setTournamentIdForGame(gameCode, null);
+
+      broadcastToRoom(io, getGameRoom(gameCode), 'tournamentCancelled', {
+        message: 'Tournament has been cancelled'
+      });
+    });
+
+    // Handle disconnection
+    socket.on('disconnect', (reason) => {
+      console.log(`[SOCKET] Client disconnected: ${socket.id} - ${reason}`);
+
+      const userInfo = removeUserBySocketId(socket.id);
+      if (!userInfo) return;
+
+      const { gameCode, username } = userInfo;
+      const game = getGame(gameCode);
+
+      if (!game) return;
+
+      // Check if this was the host
+      if (game.hostSocketId === socket.id) {
+        console.log(`[SOCKET] Host disconnected from game ${gameCode}`);
+
+        // Wait a bit for potential reconnection
+        setTimeout(() => {
+          const currentGame = getGame(gameCode);
+          if (currentGame && currentGame.hostSocketId === socket.id) {
+            // Host didn't reconnect, close the room
+            timerManager.clearGameTimer(gameCode);
+
+            broadcastToRoom(io, getGameRoom(gameCode), 'hostLeftRoomClosing', {
+              message: 'Host disconnected. Room is closing.'
+            });
+
+            deleteGame(gameCode);
+            io.emit('activeRooms', { rooms: getActiveRooms() });
+          }
+        }, 30000); // 30 second grace period
+      } else {
+        // Regular player disconnected
+        broadcastToRoom(io, getGameRoom(gameCode), 'updateUsers', {
+          users: getGameUsers(gameCode)
+        });
+
+        // Handle game start coordination
+        gameStartCoordinator.handlePlayerDisconnect(gameCode, username);
+      }
+
+      // Reset rate limit
+      resetRateLimit(socket.id);
+    });
+
+    // Ping/pong for connection health
+    socket.on('ping', () => {
+      socket.emit('pong');
+    });
+  });
+
+  return io;
+}
+
+/**
+ * Start the game timer
+ */
+function startGameTimer(io, gameCode, timerSeconds) {
+  const game = getGame(gameCode);
+  if (!game) return;
+
+  let remainingTime = timerSeconds;
+
+  // Clear any existing timer
+  timerManager.clearGameTimer(gameCode);
+
+  // Create interval for time updates
+  const timerId = setInterval(() => {
+    remainingTime--;
+
+    // Broadcast time update
+    broadcastToRoom(io, getGameRoom(gameCode), 'timeUpdate', {
+      remainingTime
+    });
+
+    if (remainingTime <= 0) {
+      timerManager.clearGameTimer(gameCode);
+      endGame(io, gameCode);
+    }
+  }, 1000);
+
+  timerManager.setGameTimer(gameCode, timerId);
+
+  // Broadcast that game has officially started (timer running)
+  broadcastToRoom(io, getGameRoom(gameCode), 'gameStarted', {
+    timerSeconds: remainingTime
+  });
+}
+
+/**
+ * End the game
+ */
+function endGame(io, gameCode) {
+  const game = getGame(gameCode);
+  if (!game) return;
+
+  // Stop timer
+  timerManager.clearGameTimer(gameCode);
+
+  // Update game state
+  updateGame(gameCode, { gameState: 'finished' });
+
+  // Calculate final scores
+  const scores = calculateGameScores(gameCode);
+
+  // Broadcast end game
+  broadcastToRoom(io, getGameRoom(gameCode), 'endGame', {
+    scores
+  });
+
+  // Check for tournament
+  const tournamentId = getTournamentIdFromGame(gameCode);
+  if (tournamentId) {
+    // Record round results
+    const standings = tournamentManager.recordRoundResults(tournamentId, scores);
+    const tournament = tournamentManager.getTournament(tournamentId);
+
+    if (tournament && tournament.currentRound >= tournament.totalRounds) {
+      // Tournament complete
+      broadcastToRoom(io, getGameRoom(gameCode), 'tournamentComplete', {
+        tournament: {
+          id: tournament.id,
+          name: tournament.name,
+          totalRounds: tournament.totalRounds,
+          currentRound: tournament.currentRound,
+          status: 'completed'
+        },
+        standings
+      });
+    } else {
+      // Round complete
+      broadcastToRoom(io, getGameRoom(gameCode), 'tournamentRoundCompleted', {
+        tournament: {
+          id: tournament.id,
+          name: tournament.name,
+          totalRounds: tournament.totalRounds,
+          currentRound: tournament.currentRound
+        },
+        standings
+      });
+    }
+  }
+
+  // Send final scores after a delay
+  setTimeout(() => {
+    broadcastToRoom(io, getGameRoom(gameCode), 'finalScores', {
+      scores
+    });
+  }, 2000);
+
+  console.log(`[SOCKET] Game ${gameCode} ended`);
+}
+
+module.exports = { initializeSocketHandlers };
