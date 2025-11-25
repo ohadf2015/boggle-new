@@ -634,7 +634,9 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-2 max-h-[300px] overflow-y-auto">
-                    {leaderboard.map((player, index) => (
+                    {leaderboard.map((player, index) => {
+                      const isMe = player.username === username;
+                      return (
                       <motion.div
                         key={player.username}
                         initial={{ x: 50, opacity: 0 }}
@@ -645,13 +647,26 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
                             index === 1 ? 'bg-gradient-to-r from-gray-400/80 to-gray-500/80 text-white shadow-md border border-gray-400/50' :
                               index === 2 ? 'bg-gradient-to-r from-orange-500/80 to-orange-600/80 text-white shadow-md border border-orange-400/50' :
                                 'bg-slate-100 dark:bg-slate-700/50 text-slate-900 dark:text-white'}`}
+                        style={player.avatar?.color && index > 2 ? { background: `linear-gradient(to right, ${player.avatar.color}40, ${player.avatar.color}60)` } : {}}
                       >
                         <div className="flex items-center gap-3">
                           <div className="text-2xl font-bold min-w-[40px] text-center">
                             {index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : `#${index + 1}`}
                           </div>
+                          {player.avatar?.emoji && (
+                            <div className="text-2xl">
+                              {player.avatar.emoji}
+                            </div>
+                          )}
                           <div>
-                            <div className="font-bold">{player.username}</div>
+                            <div className="font-bold flex items-center gap-2">
+                              {player.username}
+                              {isMe && (
+                                <span className="text-xs bg-white/30 px-2 py-0.5 rounded-full">
+                                  ({t('playerView.me')})
+                                </span>
+                              )}
+                            </div>
                             <div className="text-sm opacity-75">{player.wordCount} {t('playerView.wordCount')}</div>
                           </div>
                         </div>
@@ -659,7 +674,8 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
                           {player.score}
                         </div>
                       </motion.div>
-                    ))}
+                    );
+                    })}
                   </CardContent>
                 </Card>
               </motion.div>
@@ -767,13 +783,14 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
                   <AnimatePresence>
                     {playersReady.map((player, index) => {
                       // Handle both old format (string) and new format (object)
-                      const username = typeof player === 'string' ? player : player.username;
+                      const playerUsername = typeof player === 'string' ? player : player.username;
                       const avatar = typeof player === 'object' ? player.avatar : null;
                       const isHost = typeof player === 'object' ? player.isHost : false;
+                      const isMe = playerUsername === username;
 
                       return (
                         <motion.div
-                          key={username}
+                          key={playerUsername}
                           initial={{ scale: 0, opacity: 0 }}
                           animate={{ scale: 1, opacity: 1 }}
                           exit={{ scale: 0, opacity: 0 }}
@@ -786,7 +803,12 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
                             <div className="flex items-center gap-2">
                               {avatar?.emoji && <span className="text-lg">{avatar.emoji}</span>}
                               {isHost && <FaCrown className="text-yellow-300" />}
-                              <span>{username}</span>
+                              <span>{playerUsername}</span>
+                              {isMe && (
+                                <span className="text-xs bg-white/30 px-2 py-0.5 rounded-full">
+                                  ({t('playerView.me')})
+                                </span>
+                              )}
                             </div>
                           </Badge>
                         </motion.div>
@@ -1112,7 +1134,9 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
             </CardHeader>
             <CardContent className="overflow-y-auto flex-1 p-3 bg-slate-900/90">
               <div className="space-y-2">
-                {leaderboard.map((player, index) => (
+                {leaderboard.map((player, index) => {
+                  const isMe = player.username === username;
+                  return (
                   <motion.div
                     key={player.username}
                     initial={{ x: 50, opacity: 0 }}
@@ -1123,16 +1147,30 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
                         index === 1 ? 'bg-gradient-to-r from-gray-400/90 to-gray-500/90 text-white shadow-md shadow-gray-500/20 border border-gray-400/60' :
                           index === 2 ? 'bg-gradient-to-r from-orange-500/90 to-orange-600/90 text-white shadow-md shadow-orange-500/20 border border-orange-400/60' :
                             'bg-slate-800/70 text-white border border-slate-700/80 hover:bg-slate-800/90'}`}
+                    style={player.avatar?.color && index > 2 ? { background: `linear-gradient(to right, ${player.avatar.color}60, ${player.avatar.color}90)`, borderColor: `${player.avatar.color}80` } : {}}
                   >
                     <div className="w-12 h-12 rounded-full flex items-center justify-center font-bold text-xl bg-black/20 backdrop-blur-sm shadow-inner">
                       {index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : `#${index + 1}`}
                     </div>
+                    {player.avatar?.emoji && (
+                      <div className="text-2xl">
+                        {player.avatar.emoji}
+                      </div>
+                    )}
                     <div className="flex-1 min-w-0">
-                      <div className="font-bold truncate text-base">{player.username}</div>
+                      <div className="font-bold truncate text-base flex items-center gap-2">
+                        {player.username}
+                        {isMe && (
+                          <span className="text-xs bg-white/30 px-2 py-0.5 rounded-full">
+                            ({t('playerView.me')})
+                          </span>
+                        )}
+                      </div>
                       <div className="text-sm font-semibold opacity-90">{player.score} pts</div>
                     </div>
                   </motion.div>
-                ))}
+                );
+                })}
                 {leaderboard.length === 0 && (
                   <p className="text-center text-slate-400 py-6 text-sm">
                     {t('playerView.noPlayersYet') || 'No players yet'}

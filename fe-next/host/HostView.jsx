@@ -1386,11 +1386,13 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
               <HostLiveResults
                 players={playersReady.map(player => {
                   const username = typeof player === 'string' ? player : player.username;
+                  const avatar = typeof player === 'object' ? player.avatar : null;
                   return {
                     username,
                     score: playerScores[username] || 0,
                     wordCount: playerWordCounts[username] || 0,
-                    achievements: playerAchievements[username] || []
+                    achievements: playerAchievements[username] || [],
+                    avatar
                   };
                 })}
                 gameLanguage={roomLanguage}

@@ -1179,7 +1179,8 @@ const broadcastLeaderboard = (gameCode) => {
     .map(username => ({
       username,
       score: games[gameCode].playerScores[username],
-      wordCount: games[gameCode].playerWords[username] ? games[gameCode].playerWords[username].length : 0
+      wordCount: games[gameCode].playerWords[username] ? games[gameCode].playerWords[username].length : 0,
+      avatar: games[gameCode].playerAvatars[username]
     }))
     .sort((a, b) => b.wordCount - a.wordCount); // Sort by word count during game
 

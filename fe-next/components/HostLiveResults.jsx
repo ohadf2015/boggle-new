@@ -116,6 +116,10 @@ const HostLiveResults = ({ players, gameLanguage, remainingTime }) => {
                 "p-4 sm:p-5 border-2 backdrop-blur-xl transition-all duration-300 rounded-xl shadow-lg",
                 getCardStyle(index)
               )}
+              style={player.avatar?.color && index > 2 ? {
+                background: `linear-gradient(135deg, ${player.avatar.color}20, ${player.avatar.color}40)`,
+                borderColor: `${player.avatar.color}60`
+              } : {}}
             >
               <div className="flex items-center justify-between">
                 {/* Rank & Name */}
@@ -127,6 +131,11 @@ const HostLiveResults = ({ players, gameLanguage, remainingTime }) => {
                   >
                     {getRankIcon(index)}
                   </motion.div>
+                  {player.avatar?.emoji && (
+                    <div className="text-3xl">
+                      {player.avatar.emoji}
+                    </div>
+                  )}
                   <div>
                     <h3 className="text-xl font-bold text-slate-900 dark:text-white">
                       {player.username}
