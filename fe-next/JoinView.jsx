@@ -296,12 +296,8 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
           transition={{ duration: 0.5 }}
           className="flex-1 max-w-md mx-auto"
         >
-          <Card className="backdrop-blur-md bg-white/90 dark:bg-slate-800/90 shadow-2xl border border-purple-500/30 shadow-[0_0_20px_rgba(168,85,247,0.15)]">
+          <Card className="backdrop-blur-md bg-white/90 dark:bg-slate-800/90 shadow-2xl border border-purple-500/30">
             <CardHeader className="text-center space-y-4">
-
-              <CardDescription className="text-sm sm:text-base text-slate-600 dark:text-gray-300">
-                {t('joinView.selectLanguage')}
-              </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
               {/* Error Alert */}
@@ -357,6 +353,9 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
               {/* Language Selection (Only for Host) - Button Style */}
               {mode === 'host' && (
                 <div className="space-y-2">
+                    <CardDescription className="text-sm sm:text-base text-slate-600 dark:text-gray-300">
+                        {t('joinView.selectLanguage')}
+                   </CardDescription>
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                     <button
                       type="button"
