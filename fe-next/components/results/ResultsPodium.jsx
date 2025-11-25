@@ -7,15 +7,15 @@ const PodiumPlace = ({ player, place, delay }) => {
   const { t } = useLanguage();
 
   const heights = {
-    1: 'h-56',
-    2: 'h-44',
-    3: 'h-32'
+    1: 'h-36',
+    2: 'h-28',
+    3: 'h-20'
   };
 
   const widths = {
-    1: 'w-32',
-    2: 'w-28',
-    3: 'w-28'
+    1: 'w-24',
+    2: 'w-20',
+    3: 'w-20'
   };
 
   const gradients = {
@@ -37,9 +37,9 @@ const PodiumPlace = ({ player, place, delay }) => {
   };
 
   const icons = {
-    1: <FaCrown className="text-5xl text-yellow-300 drop-shadow-lg" />,
-    2: <FaMedal className="text-4xl text-gray-300 drop-shadow-md" />,
-    3: <FaTrophy className="text-4xl text-orange-300 drop-shadow-md" />
+    1: <FaCrown className="text-3xl text-yellow-300 drop-shadow-lg" />,
+    2: <FaMedal className="text-2xl text-gray-300 drop-shadow-md" />,
+    3: <FaTrophy className="text-2xl text-orange-300 drop-shadow-md" />
   };
 
   const medals = {
@@ -84,8 +84,8 @@ const PodiumPlace = ({ player, place, delay }) => {
       {/* Player Info Card */}
       <motion.div
         whileHover={{ scale: 1.05, y: -5 }}
-        className={`mb-3 text-center p-3 rounded-lg bg-gradient-to-br ${gradients[place]} border-2 ${borderColors[place]} ${glowColors[place]} backdrop-blur-md`}
-        style={{ minWidth: '140px' }}
+        className={`mb-2 text-center p-2 rounded-lg bg-gradient-to-br ${gradients[place]} border-2 ${borderColors[place]} ${glowColors[place]} backdrop-blur-md`}
+        style={{ minWidth: '100px' }}
       >
         <motion.div
           animate={place === 1 ? {
@@ -96,17 +96,17 @@ const PodiumPlace = ({ player, place, delay }) => {
             repeat: Infinity,
             repeatDelay: 2
           } : {}}
-          className="text-4xl mb-1"
+          className="text-2xl mb-0.5"
         >
           {medals[place]}
         </motion.div>
-        <div className="text-xl font-bold text-white drop-shadow-md truncate px-2">
+        <div className="text-base font-bold text-white drop-shadow-md truncate px-1">
           {player.username}
         </div>
-        <div className="text-lg font-bold text-white/90 mt-1">
+        <div className="text-sm font-bold text-white/90 mt-0.5">
           {player.score} {t('results.points').slice(0, 3)}
         </div>
-        <div className="text-sm text-white/70 mt-1">
+        <div className="text-xs text-white/70 mt-0.5">
           {player.wordCount} {t('playerView.wordCount')}
         </div>
       </motion.div>
@@ -129,7 +129,7 @@ const PodiumPlace = ({ player, place, delay }) => {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: delay + 0.5 }}
-          className="text-8xl font-black text-white absolute bottom-2"
+          className="text-5xl font-black text-white absolute bottom-1"
           style={{
             textShadow: '0 4px 8px rgba(0, 0, 0, 0.5), 0 2px 4px rgba(0, 0, 0, 0.3)',
             WebkitTextStroke: '2px rgba(0, 0, 0, 0.2)'
@@ -181,7 +181,7 @@ const ResultsPodium = ({ sortedScores }) => {
       <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-full max-w-2xl h-8 bg-gradient-to-r from-transparent via-slate-600/30 to-transparent rounded-lg blur-sm" />
 
       {/* Podium Arrangement */}
-      <div className="flex justify-center items-end gap-6 md:gap-8 min-h-[280px] relative px-4">
+      <div className="flex justify-center items-end gap-4 md:gap-6 min-h-[180px] relative px-4">
         {/* 2nd Place */}
         {sortedScores[1] && (
           <PodiumPlace player={sortedScores[1]} place={2} delay={0.3} />

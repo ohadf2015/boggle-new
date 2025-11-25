@@ -10,6 +10,7 @@ const SESSION_EXPIRY_HOURS = 2; // Session expires after 2 hours
  * @param {string} session.username - The username (for players)
  * @param {boolean} session.isHost - Whether the user is a host
  * @param {string} session.roomName - The room name (for hosts)
+ * @param {string} session.language - The room language
  */
 export const saveSession = (session) => {
   const sessionData = {
@@ -17,6 +18,7 @@ export const saveSession = (session) => {
     username: session.username,
     isHost: session.isHost,
     roomName: session.roomName,
+    language: session.language,
     timestamp: Date.now(),
   };
 

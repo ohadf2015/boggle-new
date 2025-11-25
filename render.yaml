@@ -1,16 +1,30 @@
 services:
+  # Node.js environment (direct build without Docker)
+  # This bypasses Docker/BuildKit to avoid gRPC server issues
   - type: web
     name: boggle-game
     env: node
-    buildCommand: |
-      npm install --prefix fe &&
-      npm run build --prefix fe &&
-      npm install --prefix be --production
-    startCommand: cd be && node server.js
+    buildCommand: npm install && npm run build
+    startCommand: npm start
     envVars:
       - key: NODE_ENV
         value: production
       - key: PORT
-        value: 10000
+        value: 3001
       - key: HOST
         value: 0.0.0.0
+
+  # Docker environment (disabled due to BuildKit gRPC server crashes)
+  # Uncomment this and comment out the node service above if you want to use Docker
+  # - type: web
+  #   name: boggle-game
+  #   env: docker
+  #   dockerfilePath: ./Dockerfile
+  #   dockerContext: .
+  #   envVars:
+  #     - key: NODE_ENV
+  #       value: production
+  #     - key: PORT
+  #       value: 3001
+  #     - key: HOST
+  #       value: 0.0.0.0

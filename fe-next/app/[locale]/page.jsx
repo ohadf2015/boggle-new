@@ -21,6 +21,7 @@ const WS_CONFIG = {
     HEARTBEAT_INTERVAL: 25000,
     HIGH_LATENCY_THRESHOLD: 1000,
     VERY_HIGH_LATENCY_THRESHOLD: 3000,
+    HOST_REACTIVATION_INTERVAL: 30000, // Send reactivation signal every 30 seconds when visible
 };
 
 let globalWsInstance = null;
@@ -250,6 +251,14 @@ export default function GamePage() {
 
     const attemptingReconnectRef = useRef(attemptingReconnect);
 
+    // Track if we should auto-join (prefilled room + existing username)
+    const [shouldAutoJoin, setShouldAutoJoin] = useState(false);
+    const [prefilledRoomCode, setPrefilledRoomCode] = useState('');
+
+    // Track host reactivation
+    const hostReactivationIntervalRef = useRef(null);
+    const lastVisibilityChangeRef = useRef(Date.now());
+
     useEffect(() => {
         if (typeof window === 'undefined') return;
 
@@ -260,20 +269,42 @@ export default function GamePage() {
             const savedUsername = localStorage.getItem('boggle_username') || '';
             const savedSession = getSession();
 
-            if (savedSession?.gameCode) {
+            // Track if we're joining a new room via invitation
+            let joiningNewRoomViaInvitation = false;
+
+            // URL room takes priority over saved session (explicit invitation)
+            if (roomFromUrl) {
+                setGameCode(roomFromUrl);
+                setPrefilledRoomCode(roomFromUrl);
+                // If player has saved username and comes via invitation link, mark for auto-join
+                if (savedUsername && savedUsername.trim()) {
+                    setShouldAutoJoin(true);
+                }
+                // Clear the old session if joining a different room via invitation
+                if (savedSession?.gameCode && savedSession.gameCode !== roomFromUrl) {
+                    clearSession();
+                    joiningNewRoomViaInvitation = true;
+                }
+            } else if (savedSession?.gameCode) {
+                // No URL room, try to reconnect to saved session
                 setGameCode(savedSession.gameCode);
                 setAttemptingReconnect(true);
-            } else if (roomFromUrl) {
-                setGameCode(roomFromUrl);
             }
 
-            if (savedSession?.username) {
+            // When joining a new room via invitation, use localStorage username
+            // Otherwise, prefer session username (for reconnection)
+            if (joiningNewRoomViaInvitation) {
+                if (savedUsername) {
+                    setUsername(savedUsername);
+                }
+            } else if (savedSession?.username) {
                 setUsername(savedSession.username);
             } else if (savedUsername) {
                 setUsername(savedUsername);
             }
 
-            if (savedSession?.roomName) {
+            // Only restore room name if not joining a new room via invitation
+            if (!joiningNewRoomViaInvitation && savedSession?.roomName) {
                 setRoomName(savedSession.roomName);
             }
         };
@@ -339,13 +370,22 @@ export default function GamePage() {
                     // Handle host transfer - check if we're the new host
                     if (message.newHost === username) {
                         setIsHost(true);
-                        toast.success('You are now the host!', {
+                        // Update session to reflect host status
+                        saveSession({
+                            gameCode,
+                            username,
+                            isHost: true,
+                            roomName: roomName || username,
+                            language: roomLanguage,
+                        });
+                        toast.success(t('hostView.youAreNowHost'), {
                             duration: 5000,
                             icon: '👑',
                         });
                     } else {
-                        toast.info(message.message || `${message.newHost} is now the host`, {
+                        toast.info(`${message.newHost} ${t('hostView.newHostAssigned')}`, {
                             duration: 3000,
+                            icon: '🔄',
                         });
                     }
                     break;
@@ -368,6 +408,7 @@ export default function GamePage() {
                     }
                     setIsActive(false);
                     setAttemptingReconnect(false);
+                    setShouldAutoJoin(false);
                     clearSession();
                     break;
 
@@ -375,6 +416,7 @@ export default function GamePage() {
                     setError(t('errors.usernameTaken'));
                     setIsActive(false);
                     setAttemptingReconnect(false);
+                    setShouldAutoJoin(false);
                     clearSession();
                     break;
 
@@ -411,19 +453,6 @@ export default function GamePage() {
         };
     }, [connectWebSocket, cleanup]);
 
-    useEffect(() => {
-        setMessageHandler(handleWebSocketMessage);
-    }, [handleWebSocketMessage, setMessageHandler]);
-
-    useEffect(() => {
-        if (connectionError) {
-            // Defer state update to avoid synchronous setState
-            Promise.resolve().then(() => {
-                setError(connectionError);
-            });
-        }
-    }, [connectionError]);
-
     const sendMessage = useCallback((message) => {
         const ws = wsRef.current;
         if (!ws) return;
@@ -439,8 +468,96 @@ export default function GamePage() {
         }
     }, [wsRef]);
 
+    // Host visibility change handler - reactivate room when host returns to the browser
     useEffect(() => {
-        if (!attemptingReconnect || !wsRef.current || wsRef.current.readyState !== WebSocket.OPEN || isActive) {
+        if (typeof window === 'undefined' || !isActive || !isHost) return;
+
+        const handleVisibilityChange = () => {
+            if (document.visibilityState === 'visible') {
+                lastVisibilityChangeRef.current = Date.now();
+
+                // Send reactivation signal immediately when host returns
+                if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN && gameCode) {
+                    sendMessage({
+                        action: 'hostReactivate',
+                        gameCode,
+                        timestamp: Date.now()
+                    });
+                }
+            }
+        };
+
+        // Set up periodic keep-alive when host is active and visible
+        const startKeepAlive = () => {
+            if (hostReactivationIntervalRef.current) {
+                clearInterval(hostReactivationIntervalRef.current);
+            }
+
+            hostReactivationIntervalRef.current = setInterval(() => {
+                if (document.visibilityState === 'visible' &&
+                    wsRef.current &&
+                    wsRef.current.readyState === WebSocket.OPEN &&
+                    gameCode) {
+                    sendMessage({
+                        action: 'hostKeepAlive',
+                        gameCode,
+                        timestamp: Date.now()
+                    });
+                }
+            }, WS_CONFIG.HOST_REACTIVATION_INTERVAL);
+        };
+
+        document.addEventListener('visibilitychange', handleVisibilityChange);
+        startKeepAlive();
+
+        // Send initial reactivation signal
+        if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN && gameCode) {
+            sendMessage({
+                action: 'hostReactivate',
+                gameCode,
+                timestamp: Date.now()
+            });
+        }
+
+        return () => {
+            document.removeEventListener('visibilitychange', handleVisibilityChange);
+            if (hostReactivationIntervalRef.current) {
+                clearInterval(hostReactivationIntervalRef.current);
+                hostReactivationIntervalRef.current = null;
+            }
+        };
+    }, [isActive, isHost, gameCode, sendMessage, wsRef]);
+
+    useEffect(() => {
+        setMessageHandler(handleWebSocketMessage);
+    }, [handleWebSocketMessage, setMessageHandler]);
+
+    useEffect(() => {
+        if (connectionError) {
+            // Defer state update to avoid synchronous setState
+            Promise.resolve().then(() => {
+                setError(connectionError);
+            });
+        }
+    }, [connectionError]);
+
+    // Auto-join effect for players coming via invitation link with existing username
+    useEffect(() => {
+        // Use `ws` state variable which updates when WebSocket becomes ready
+        if (!shouldAutoJoin || !ws || ws.readyState !== WebSocket.OPEN || isActive || attemptingReconnect) {
+            return;
+        }
+
+        // Player has prefilled room code and saved username - auto-join
+        if (prefilledRoomCode && username && username.trim()) {
+            sendMessage({ action: 'join', gameCode: prefilledRoomCode, username });
+            setShouldAutoJoin(false); // Prevent re-triggering
+        }
+    }, [shouldAutoJoin, prefilledRoomCode, username, isActive, attemptingReconnect, ws, sendMessage]);
+
+    useEffect(() => {
+        // Use `ws` state variable which updates when WebSocket becomes ready
+        if (!attemptingReconnect || !ws || ws.readyState !== WebSocket.OPEN || isActive) {
             return;
         }
 
@@ -484,7 +601,7 @@ export default function GamePage() {
         }, 1000); // 1 second delay to allow disconnect to process
 
         return () => clearTimeout(reconnectTimeout);
-    }, [attemptingReconnect, isActive, sendMessage, wsRef, language]);
+    }, [attemptingReconnect, isActive, sendMessage, ws, language]);
 
     const handleJoin = useCallback((isHostMode, roomLanguage) => {
         setError('');
@@ -537,7 +654,8 @@ export default function GamePage() {
                     error={error}
                     activeRooms={activeRooms}
                     refreshRooms={refreshRooms}
-                    prefilledRoom={gameCode}
+                    prefilledRoom={prefilledRoomCode}
+                    isAutoJoining={shouldAutoJoin}
                 />
             );
         }

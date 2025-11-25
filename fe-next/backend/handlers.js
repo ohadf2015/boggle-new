@@ -281,6 +281,21 @@ const addUserToGame = async (gameCode, username, ws) => {
         return;
     }
 
+    // Check WebSocket connection state before allowing join
+    if (ws.readyState !== 1) { // 1 = OPEN
+        console.warn(`[JOIN] WebSocket not fully open for ${username} (state: ${ws.readyState})`);
+        // Wait a short time for connection to fully establish
+        setTimeout(() => {
+            if (ws.readyState === 1) {
+                console.log(`[JOIN] WebSocket now ready for ${username}, retrying join`);
+                addUserToGame(gameCode, username, ws);
+            } else {
+                safeSend(ws, { action: "error", message: "Connection not ready" });
+            }
+        }, 100);
+        return;
+    }
+
     // Sanitize username for security
     username = sanitizeInput(username, 20);
 
@@ -309,9 +324,27 @@ const addUserToGame = async (gameCode, username, ws) => {
 
       console.log(`[JOIN] Player ${username} reconnected to game ${gameCode}`);
     } else if(game.users[username]) {
-      // Username exists in active users - truly taken by someone else
-      ws.send(JSON.stringify({ action: "usernameTaken" }));
-      return;
+      // Username exists in active users - check if the existing connection is actually alive
+      const existingWs = game.users[username];
+      if (existingWs && existingWs.readyState === 1) { // 1 = OPEN
+        // Existing connection is still alive - username is truly taken
+        ws.send(JSON.stringify({ action: "usernameTaken" }));
+        return;
+      } else {
+        // Existing connection is dead/closing - allow reconnection
+        console.log(`[JOIN] Player ${username} reconnecting (old connection was dead/closing)`);
+
+        // Clean up old WebSocket references
+        if (existingWs) {
+          gameWs.delete(existingWs);
+          wsUsername.delete(existingWs);
+        }
+
+        // Update with new WebSocket
+        game.users[username] = ws;
+        gameWs.set(ws, gameCode);
+        wsUsername.set(ws, username);
+      }
     } else {
       console.log(`[JOIN] User ${username} joined game ${gameCode}`);
 
@@ -359,7 +392,8 @@ const addUserToGame = async (gameCode, username, ws) => {
         isHost: isNowHost,
         username: username,
         playerId: game.playerIds[username], // Send unique player ID
-        avatar: game.playerAvatars[username]
+        avatar: game.playerAvatars[username],
+        language: game.language // Include room language for reconnecting players
     }));
 
     // Sync the current game state to the player
@@ -449,7 +483,18 @@ const handleStartGame = async (host, letterGrid, timerSeconds, language) => {
   });
 
   const startMessage = { action: "startGame", letterGrid, timerSeconds, language: games[gameCode].language };
-  sendAllPlayerAMessage(gameCode, startMessage);
+  const broadcastResult = sendAllPlayerAMessage(gameCode, startMessage);
+
+  // If some players didn't receive the message, retry after a short delay
+  if (broadcastResult && broadcastResult.failedCount > 0) {
+    console.log(`[START_GAME] Retrying broadcast for ${broadcastResult.failedCount} failed players`);
+    setTimeout(() => {
+      if (games[gameCode] && games[gameCode].gameState === 'playing') {
+        sendAllPlayerAMessage(gameCode, startMessage);
+      }
+    }, 200);
+  }
+
   broadcastLeaderboard(gameCode);
 
   // Start server-side timer with broadcasts every second
@@ -786,6 +831,11 @@ const handleWordSubmission = (ws, word) => {
   const currentTime = Date.now();
   const timeSinceStart = (currentTime - games[gameCode].startTime) / 1000; // in seconds
 
+  // Auto-validate using dictionary
+  const gameLanguage = games[gameCode].language || 'he';
+  const isValidInDictionary = dictionary.isValidWord(word, gameLanguage);
+  const autoValidated = isValidInDictionary === true;
+
   // Store the word (it passed board validation)
   games[gameCode].playerWords[username].push(word);
   games[gameCode].playerWordDetails[username].push({
@@ -793,17 +843,29 @@ const handleWordSubmission = (ws, word) => {
     score: 0, // Will be calculated after validation
     timestamp: currentTime,
     timeSinceStart,
-    validated: null, // Will be set by host later (for dictionary/semantic validation)
+    validated: autoValidated ? true : null, // Auto-validate if in dictionary, otherwise needs host validation
+    autoValidated: autoValidated, // Track if word was auto-validated
     onBoard: true, // Passed board validation
   });
 
-  // Send confirmation to player (no score yet)
+  // Send confirmation to player with auto-validation status
   if (ws && ws.readyState === 1) { // Check connection is open
     try {
-      ws.send(JSON.stringify({
-        action: "wordAccepted",
-        word,
-      }));
+      if (autoValidated) {
+        // Word is auto-validated - normal flow
+        ws.send(JSON.stringify({
+          action: "wordAccepted",
+          word,
+          autoValidated: true
+        }));
+      } else {
+        // Word needs host validation - notify player
+        ws.send(JSON.stringify({
+          action: "wordNeedsValidation",
+          word,
+          message: "Word needs host validation - won't count towards combo until validated"
+        }));
+      }
     } catch (error) {
       console.error(`Error confirming word to ${username}:`, error);
     }
@@ -880,7 +942,15 @@ const sendAllPlayerAMessage = (gameCode, message) => {
   }
 
   // Use broadcast helper for efficient sending
-  broadcast(game.users, message, `BROADCAST-${gameCode}`);
+  const result = broadcast(game.users, message, `BROADCAST-${gameCode}`);
+
+  // Log any failed deliveries for critical messages like startGame
+  if (message.action === 'startGame' && result.failedCount > 0) {
+    console.warn(`[BROADCAST] Failed to send startGame to ${result.failedCount} players in game ${gameCode}`);
+    console.warn(`[BROADCAST] Successfully sent to ${result.sentCount}/${result.totalCount} players`);
+  }
+
+  return result;
 }
 
 const sendHostAMessage = (gameCode, message) => {
@@ -925,25 +995,25 @@ const handleDisconnect = (ws, wss) => {
       const remainingPlayers = Object.keys(game.users);
 
       if (remainingPlayers.length === 0) {
-        // No players left, close room immediately
-        console.log(`[DISCONNECT] No players left in game ${gameCode}, closing room immediately`);
+        // No players left, start 2-minute grace period for host to return
+        console.log(`[DISCONNECT] No players left in game ${gameCode}, starting 2-minute grace period`);
 
-        // Clear any existing empty room timeout
-        if (game.emptyRoomTimeout) {
-          clearTimeout(game.emptyRoomTimeout);
+        // Mark host as disconnected
+        game.hostDisconnected = true;
+
+        // Store the host in disconnected players for reconnection
+        if (!game.disconnectedPlayers) {
+          game.disconnectedPlayers = {};
         }
+        game.disconnectedPlayers[username] = {
+          disconnectedAt: Date.now(),
+          isHost: true
+        };
 
-        // Close the room immediately
-        console.log(`[AUTO-CLOSE] Closing empty room ${gameCode}`);
-        cleanupGameTimers(gameCode);
-        delete games[gameCode];
+        // Start grace period - room stays open for 2 minutes
+        startRoomGracePeriod(gameCode, wss);
 
-        // Delete from Redis
-        deleteGameState(gameCode).catch(err =>
-          console.error('[REDIS] Error deleting game state:', err)
-        );
-
-        // Broadcast updated rooms list
+        // Broadcast updated rooms list (room still shows as available)
         if (wss) broadcastActiveRooms(wss);
       } else {
         // There are remaining players, start grace period
@@ -1273,30 +1343,83 @@ const handleCloseRoom = (host, gameCode, wss) => {
     return;
   }
 
-  // Notify all players that the room is closing
-  sendAllPlayerAMessage(gameCode, {
-    action: "hostLeftRoomClosing",
-    message: "המנחה עזב את החדר. החדר נסגר."
-  });
+  const game = games[gameCode];
+  const hostUsername = game.hostUsername;
 
-  // Clean up all timers and timeouts
-  cleanupGameTimers(gameCode);
+  // Remove host from active users
+  if (game.users[hostUsername]) {
+    delete game.users[hostUsername];
+  }
 
-  // Delete the game after a short delay to ensure messages are sent
-  setTimeout(() => {
-    if (games[gameCode]) {
-      delete games[gameCode];
-      console.log(`[CLOSE_ROOM] Game ${gameCode} deleted`);
+  // Get remaining players (excluding the host)
+  const remainingPlayers = Object.keys(game.users);
 
-      // Delete from Redis
-      deleteGameState(gameCode).catch(err =>
-        console.error('[REDIS] Error deleting game state:', err)
-      );
+  if (remainingPlayers.length === 0) {
+    // No players left, close room
+    console.log(`[CLOSE_ROOM] No players remaining in game ${gameCode}, closing room`);
 
-      // Broadcast updated rooms list
-      if (wss) broadcastActiveRooms(wss);
-    }
-  }, 500);
+    // Notify all that the room is closing
+    sendAllPlayerAMessage(gameCode, {
+      action: "hostLeftRoomClosing",
+      message: "Host left the room. The room is closing."
+    });
+
+    // Clean up all timers and timeouts
+    cleanupGameTimers(gameCode);
+
+    // Delete the game after a short delay to ensure messages are sent
+    setTimeout(() => {
+      if (games[gameCode]) {
+        delete games[gameCode];
+        console.log(`[CLOSE_ROOM] Game ${gameCode} deleted`);
+
+        // Delete from Redis
+        deleteGameState(gameCode).catch(err =>
+          console.error('[REDIS] Error deleting game state:', err)
+        );
+
+        // Broadcast updated rooms list
+        if (wss) broadcastActiveRooms(wss);
+      }
+    }, 500);
+  } else {
+    // There are remaining players, transfer host to first player
+    const newHostUsername = remainingPlayers[0];
+    const newHostWs = game.users[newHostUsername];
+
+    console.log(`[CLOSE_ROOM] Transferring host from ${hostUsername} to ${newHostUsername} in game ${gameCode}`);
+
+    // Update game host
+    game.host = newHostWs;
+    game.hostUsername = newHostUsername;
+    game.hostPlayerId = game.playerIds[newHostUsername];
+    game.hostDisconnected = false;
+
+    // Update mappings for new host
+    gameWs.set(newHostWs, gameCode);
+    wsUsername.set(newHostWs, newHostUsername);
+
+    // Notify all players about the host transfer
+    sendAllPlayerAMessage(gameCode, {
+      action: "hostTransferred",
+      newHost: newHostUsername,
+      oldHost: hostUsername,
+      message: `${newHostUsername} is now the host`
+    });
+
+    // Update player list with new host info
+    broadcastPlayerList(gameCode);
+
+    // Broadcast updated active rooms list
+    if (wss) broadcastActiveRooms(wss);
+
+    // Save to Redis
+    saveGameState(gameCode, games[gameCode]).catch(err =>
+      console.error('[REDIS] Error saving game state:', err)
+    );
+
+    console.log(`[CLOSE_ROOM] Host transfer complete. Room ${gameCode} remains open.`);
+  }
 };
 
 // Handle resetting game for a new round
@@ -1401,6 +1524,133 @@ const handleChatMessage = (ws, gameCode, username, message, isHost) => {
   sendAllPlayerAMessage(gameCode, chatMessage);
 };
 
+// Constants for room keep-alive
+const ROOM_KEEP_ALIVE_DURATION = 120000; // 2 minutes in milliseconds
+
+// Handle host reactivation - when host returns to browser tab
+const handleHostReactivate = (ws, gameCode, wss) => {
+  if (!gameCode || !games[gameCode]) {
+    console.log(`[REACTIVATE] Game ${gameCode} does not exist`);
+    return;
+  }
+
+  const game = games[gameCode];
+
+  // Update host WebSocket reference if it changed
+  const username = wsUsername.get(ws);
+  if (username && username === game.hostUsername) {
+    console.log(`[REACTIVATE] Host ${username} reactivated room ${gameCode}`);
+
+    // Clear host disconnect timeout if it exists
+    if (game.hostDisconnectTimeout) {
+      clearTimeout(game.hostDisconnectTimeout);
+      game.hostDisconnectTimeout = null;
+    }
+
+    // Clear empty room timeout if it exists
+    if (game.emptyRoomTimeout) {
+      clearTimeout(game.emptyRoomTimeout);
+      game.emptyRoomTimeout = null;
+    }
+
+    // Update host reference
+    game.host = ws;
+    game.hostDisconnected = false;
+    game.lastHostActivity = Date.now();
+
+    // Update mappings
+    gameWs.set(ws, gameCode);
+    wsUsername.set(ws, username);
+
+    // Re-add host to users if not present
+    if (!game.users[username]) {
+      game.users[username] = ws;
+      broadcastPlayerList(gameCode);
+    }
+
+    // Broadcast that room is active
+    if (wss) broadcastActiveRooms(wss);
+  }
+};
+
+// Handle host keep-alive - periodic signal from active host
+const handleHostKeepAlive = (ws, gameCode, wss) => {
+  if (!gameCode || !games[gameCode]) {
+    return;
+  }
+
+  const game = games[gameCode];
+  const username = wsUsername.get(ws);
+
+  if (username && username === game.hostUsername) {
+    // Update last activity timestamp
+    game.lastHostActivity = Date.now();
+
+    // Clear any pending disconnect/close timeouts
+    if (game.hostDisconnectTimeout) {
+      clearTimeout(game.hostDisconnectTimeout);
+      game.hostDisconnectTimeout = null;
+    }
+
+    if (game.emptyRoomTimeout) {
+      clearTimeout(game.emptyRoomTimeout);
+      game.emptyRoomTimeout = null;
+    }
+
+    // Ensure host is not marked as disconnected
+    game.hostDisconnected = false;
+  }
+};
+
+// Check if room should stay active (within 2 minute grace period)
+const isRoomWithinGracePeriod = (gameCode) => {
+  if (!games[gameCode]) return false;
+
+  const game = games[gameCode];
+  const lastActivity = game.lastHostActivity || game.startTime || Date.now();
+  const timeSinceActivity = Date.now() - lastActivity;
+
+  return timeSinceActivity < ROOM_KEEP_ALIVE_DURATION;
+};
+
+// Start room grace period timer
+const startRoomGracePeriod = (gameCode, wss) => {
+  if (!games[gameCode]) return;
+
+  const game = games[gameCode];
+
+  // Clear existing timeout if any
+  if (game.emptyRoomTimeout) {
+    clearTimeout(game.emptyRoomTimeout);
+  }
+
+  console.log(`[GRACE_PERIOD] Starting 2-minute grace period for room ${gameCode}`);
+
+  game.emptyRoomTimeout = setTimeout(() => {
+    // Check if room still exists and is still empty/inactive
+    if (games[gameCode]) {
+      const hasActivePlayers = Object.keys(games[gameCode].users).length > 0;
+      const hostIsActive = !games[gameCode].hostDisconnected;
+
+      if (!hasActivePlayers && !hostIsActive) {
+        console.log(`[GRACE_PERIOD] Grace period expired for room ${gameCode}, closing room`);
+        cleanupGameTimers(gameCode);
+        delete games[gameCode];
+
+        // Delete from Redis
+        deleteGameState(gameCode).catch(err =>
+          console.error('[REDIS] Error deleting game state:', err)
+        );
+
+        // Broadcast updated rooms list
+        if (wss) broadcastActiveRooms(wss);
+      } else {
+        console.log(`[GRACE_PERIOD] Room ${gameCode} has activity, keeping alive`);
+      }
+    }
+  }, ROOM_KEEP_ALIVE_DURATION);
+};
+
 module.exports = {
   setNewGame,
   addUserToGame,
@@ -1420,4 +1670,8 @@ module.exports = {
   handleResetGame,
   broadcastActiveRooms,
   handleChatMessage,
+  handleHostReactivate,
+  handleHostKeepAlive,
+  startRoomGracePeriod,
+  isRoomWithinGracePeriod,
 };

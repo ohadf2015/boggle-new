@@ -19,7 +19,7 @@ import { cn } from './lib/utils';
 import { copyJoinUrl, shareViaWhatsApp, getJoinUrl } from './utils/share';
 import { useLanguage } from './contexts/LanguageContext';
 
-const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, error, activeRooms, refreshRooms, prefilledRoom, roomName, setRoomName }) => {
+const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, error, activeRooms, refreshRooms, prefilledRoom, roomName, setRoomName, isAutoJoining }) => {
   const { t, language } = useLanguage();
   const [mode, setMode] = useState('join'); // 'join' or 'host'
   const [showQR, setShowQR] = useState(false);
@@ -69,12 +69,16 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
 
   const handleRoomSelect = (roomCode) => {
     setGameCode(roomCode);
-    // If we are in "join" mode, we want to show the username input now
-    // If the user clicked a room from the list, they likely want to join it
-    // We can simulate this by ensuring we are in 'join' mode and maybe focusing the username input
     setMode('join');
-    // If we were in a "prefilled" state or just browsing, we want to ensure the form is visible and ready
     setShowFullForm(true);
+
+    // Auto-join if username is already set
+    if (username && username.trim()) {
+      // Small delay to let state update, then auto-join
+      setTimeout(() => {
+        handleJoin(false);
+      }, 100);
+    }
   };
 
   const handleQuickJoin = (e) => {
@@ -91,23 +95,10 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
 
   // Removed - now using utility function from utils/share
 
-  // Show simplified quick join interface when room is prefilled
-  if (prefilledRoom && !showFullForm) {
+  // Show auto-joining loading state when user has saved name and came via invitation
+  if (prefilledRoom && isAutoJoining && username && username.trim()) {
     return (
       <div className="min-h-screen bg-gradient-to-b pt-4 from-slate-50 via-slate-100 to-slate-200 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 flex flex-col items-center justify-center p-4 sm:p-6 transition-colors duration-300">
-        {/* Animated Title - Removed as it is now in global header */}
-        <motion.div
-          initial={{ y: -50, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ duration: 0.5 }}
-          className="mb-8 flex flex-col items-center"
-        >
-          <div className="mt-4">
-            {/* Language selector moved to Create Room form */}
-          </div>
-        </motion.div>
-
-        {/* Quick Join Form */}
         <motion.div
           initial={{ scale: 0, rotate: -10 }}
           animate={{ scale: 1, rotate: 0 }}
@@ -117,15 +108,24 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
           <Card className="backdrop-blur-md bg-white/90 dark:bg-slate-800/90 shadow-2xl border border-cyan-500/30 shadow-[0_0_20px_rgba(6,182,212,0.15)]">
             <CardHeader className="text-center space-y-4">
               <div className="flex justify-center">
-                <FaGamepad size={48} className="text-cyan-400" />
+                <motion.div
+                  animate={{ rotate: 360 }}
+                  transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+                >
+                  <FaGamepad size={48} className="text-cyan-400" />
+                </motion.div>
               </div>
-              <CardTitle className="text-2xl sm:text-3xl text-cyan-300">
-                {t('joinView.joinRoom')}
+              <CardTitle className="text-2xl sm:text-3xl font-bold text-slate-800 dark:text-white">
+                {t('joinView.joiningRoom')}
               </CardTitle>
-              <CardDescription className="text-sm sm:text-base text-gray-300">
-                {t('joinView.joiningRoom')}{' '}
-                <strong className="text-purple-600 dark:text-purple-400">{gameCode}</strong>
-              </CardDescription>
+              <div className="flex justify-center">
+                <Badge className="text-2xl px-8 py-4 bg-gradient-to-r from-cyan-500 to-purple-600">
+                  {t('joinView.room')} {gameCode}
+                </Badge>
+              </div>
+              <p className="text-slate-600 dark:text-gray-400">
+                {t('joinView.welcomeBack')}, <span className="font-semibold text-cyan-600 dark:text-cyan-400">{username}</span>!
+              </p>
             </CardHeader>
             <CardContent className="space-y-4">
               {/* Error Alert */}
@@ -141,20 +141,92 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
                 </motion.div>
               )}
 
-              {/* Room Code Display */}
-              <div className="flex justify-center">
-                <Badge className="text-xl px-6 py-3 bg-gradient-to-r from-cyan-500 to-purple-600 hover:from-cyan-400 hover:to-purple-500">
-                  {t('joinView.roomLabel')}: {gameCode}
-                </Badge>
+              {/* Loading animation */}
+              <div className="flex justify-center py-4">
+                <motion.div
+                  className="flex space-x-2"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                >
+                  {[0, 1, 2].map((i) => (
+                    <motion.div
+                      key={i}
+                      className="w-3 h-3 bg-cyan-500 rounded-full"
+                      animate={{
+                        y: [-5, 5, -5],
+                        opacity: [1, 0.5, 1],
+                      }}
+                      transition={{
+                        duration: 0.8,
+                        repeat: Infinity,
+                        delay: i * 0.2,
+                      }}
+                    />
+                  ))}
+                </motion.div>
               </div>
 
-              <form onSubmit={handleQuickJoin} className="space-y-4">
+              <p className="text-center text-slate-500 dark:text-gray-400 text-sm">
+                {t('joinView.connectingToRoom')}
+              </p>
+            </CardContent>
+          </Card>
+        </motion.div>
+        <MenuAnimation />
+      </div>
+    );
+  }
+
+  // Show simplified quick join interface when room is prefilled (no saved username)
+  if (prefilledRoom && !showFullForm) {
+    return (
+      <div className="min-h-screen bg-gradient-to-b pt-4 from-slate-50 via-slate-100 to-slate-200 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 flex flex-col items-center justify-center p-4 sm:p-6 transition-colors duration-300">
+        {/* Quick Join Form */}
+        <motion.div
+          initial={{ scale: 0, rotate: -10 }}
+          animate={{ scale: 1, rotate: 0 }}
+          transition={{ type: 'spring', stiffness: 260, damping: 20 }}
+          className="w-full max-w-md"
+        >
+          <Card className="backdrop-blur-md bg-white/90 dark:bg-slate-800/90 shadow-2xl border border-cyan-500/30 shadow-[0_0_20px_rgba(6,182,212,0.15)]">
+            <CardHeader className="text-center space-y-4">
+              <div className="flex justify-center">
+                <FaGamepad size={48} className="text-cyan-400" />
+              </div>
+              <CardTitle className="text-2xl sm:text-3xl font-bold text-slate-800 dark:text-white">
+                {t('joinView.inviteTitle')}
+              </CardTitle>
+              {/* Room number prominently displayed */}
+              <div className="flex justify-center">
+                <Badge className="text-2xl px-8 py-4 bg-gradient-to-r from-cyan-500 to-purple-600 hover:from-cyan-400 hover:to-purple-500">
+                  {t('joinView.room')} {gameCode}
+                </Badge>
+              </div>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              {/* Error Alert */}
+              {error && (
+                <motion.div
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  <Alert variant="destructive">
+                    <AlertDescription>{error}</AlertDescription>
+                  </Alert>
+                </motion.div>
+              )}
+
+              <form onSubmit={handleQuickJoin} className="space-y-6">
+                {/* Simple name input */}
                 <motion.div
                   animate={usernameError ? { x: [-10, 10, -10, 10, 0] } : {}}
                   transition={{ duration: 0.4 }}
                   className="space-y-2"
                 >
-                  <Label htmlFor="username" className="text-slate-700 dark:text-gray-300">{t('joinView.playerNamePlaceholder')}</Label>
+                  <Label htmlFor="username" className="text-base font-semibold text-slate-700 dark:text-gray-300">
+                    {t('joinView.enterNameToPlay')}
+                  </Label>
                   <Input
                     id="username"
                     value={username}
@@ -165,41 +237,41 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
                     required
                     autoFocus
                     className={cn(
-                      "h-11 bg-slate-100 dark:bg-slate-700/50 border-slate-200 dark:border-slate-600 text-slate-900 dark:text-white placeholder:text-slate-500 dark:placeholder:text-gray-400",
-                      usernameError && "border-red-500 bg-red-900/30 focus-visible:ring-red-500"
+                      "h-14 text-lg bg-slate-100 dark:bg-slate-700/50 border-2 border-slate-300 dark:border-slate-600 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-gray-500",
+                      usernameError && "border-red-500 bg-red-50 dark:bg-red-900/30 focus-visible:ring-red-500"
                     )}
                     placeholder={t('joinView.playerNamePlaceholder')}
                     maxLength={20}
                   />
                   {usernameError && (
-                    <p className="text-sm text-red-400">{t('validation.usernameRequired')}</p>
-                  )}
-                  {!usernameError && (
-                    <p className="text-sm text-slate-500 dark:text-gray-400">{t('validation.enterNameToJoin')}</p>
+                    <p className="text-sm text-red-500 dark:text-red-400">{t('validation.usernameRequired')}</p>
                   )}
                 </motion.div>
 
-                <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                {/* Play button */}
+                <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
                   <Button
                     type="submit"
                     disabled={!username}
-                    className="w-full h-12 text-lg font-bold bg-gradient-to-r from-cyan-500 to-purple-600 hover:from-cyan-400 hover:to-purple-500 hover:shadow-[0_0_20px_rgba(6,182,212,0.5)]"
+                    className="w-full h-14 text-xl font-bold bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-400 hover:to-emerald-500 hover:shadow-[0_0_25px_rgba(34,197,94,0.5)] transition-all"
                   >
-                    <FaUser className="mr-2" />
-                    {t('joinView.joinRoom')}
+                    <FaGamepad className="mr-3" size={24} />
+                    {t('joinView.enterRoom')}
                   </Button>
                 </motion.div>
 
-                {/* Switch to full form */}
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  type="button"
-                  onClick={() => setShowFullForm(true)}
-                  className="w-full text-cyan-600 dark:text-cyan-400 hover:text-cyan-500 dark:hover:text-cyan-300 hover:bg-slate-200 dark:hover:bg-slate-700/50"
-                >
-                  {t('joinView.wantToHostOrJoinOther')}
-                </Button>
+                {/* Switch to full form - subtle link */}
+                <div className="text-center pt-2">
+                  <Button
+                    variant="link"
+                    size="sm"
+                    type="button"
+                    onClick={() => setShowFullForm(true)}
+                    className="text-sm text-cyan-600 dark:text-cyan-400 hover:text-cyan-500 dark:hover:text-cyan-300 underline"
+                  >
+                    {t('joinView.wantToHostOrJoinOther')}
+                  </Button>
+                </div>
               </form>
             </CardContent>
           </Card>
@@ -513,14 +585,14 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
                   <div className="flex flex-wrap gap-2 justify-center">
                     <ShareButton
                       variant="link"
-                      onClick={() => copyJoinUrl(gameCode)}
+                      onClick={() => copyJoinUrl(gameCode, t)}
                       icon={<FaLink />}
                     >
                       {t('joinView.copyLink')}
                     </ShareButton>
                     <ShareButton
                       variant="whatsapp"
-                      onClick={() => shareViaWhatsApp(gameCode, roomName)}
+                      onClick={() => shareViaWhatsApp(gameCode, roomName, t)}
                       icon={<FaWhatsapp />}
                     >
                       {t('joinView.shareWhatsapp')}
@@ -665,14 +737,14 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
           </DialogHeader>
           <div className="flex flex-col items-center gap-4 py-4">
             <div className="p-6 bg-white rounded-lg shadow-md">
-              <QRCodeSVG value={getJoinUrl()} size={250} level="H" includeMargin />
+              <QRCodeSVG value={getJoinUrl(gameCode)} size={250} level="H" includeMargin />
             </div>
             <h4 className="text-3xl font-bold text-cyan-400">{gameCode}</h4>
             <p className="text-sm text-center text-slate-600 dark:text-gray-300">
               {t('joinView.scanToJoin')} {gameCode}
             </p>
             <p className="text-xs text-center text-slate-500 dark:text-gray-400 mt-2">
-              {getJoinUrl()}
+              {getJoinUrl(gameCode)}
             </p>
           </div>
           <DialogFooter className="sm:justify-center">

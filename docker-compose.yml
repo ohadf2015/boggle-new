@@ -1,0 +1,45 @@
+version: '3.8'
+
+services:
+  boggle-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      # Use Docker's built-in BuildKit instead of external daemon
+      args:
+        BUILDKIT_INLINE_CACHE: "1"
+    image: boggle-game:latest
+    container_name: boggle-game
+    ports:
+      - "3001:3001"
+    environment:
+      - NODE_ENV=production
+      - PORT=3001
+      - HOST=0.0.0.0
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "node", "-e", "require('http').get('http://localhost:3001', (r) => {process.exit(r.statusCode === 200 ? 0 : 1)})"]
+      interval: 30s
+      timeout: 3s
+      start_period: 5s
+      retries: 3
+
+  # Development service
+  boggle-dev:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: builder
+    image: boggle-game:dev
+    container_name: boggle-game-dev
+    ports:
+      - "3001:3001"
+    environment:
+      - NODE_ENV=development
+      - PORT=3001
+    volumes:
+      - ./fe-next:/app
+      - /app/node_modules
+    command: npm run dev
+    profiles:
+      - dev

@@ -8,7 +8,7 @@ import { AchievementBadge } from '../components/AchievementBadge';
 import { motion, AnimatePresence } from 'framer-motion';
 import confetti from 'canvas-confetti';
 import toast, { Toaster } from 'react-hot-toast';
-import { FaTrophy, FaTrash, FaDoorOpen, FaUsers, FaMousePointer, FaCrown, FaRandom } from 'react-icons/fa';
+import { FaTrophy, FaTrash, FaDoorOpen, FaUsers, FaMousePointer, FaCrown, FaRandom, FaLink, FaWhatsapp, FaQrcode } from 'react-icons/fa';
 import { useWebSocket } from '../utils/WebSocketContext';
 import { clearSession } from '../utils/session';
 import { useLanguage } from '../contexts/LanguageContext';
@@ -18,6 +18,10 @@ import { applyHebrewFinalLetters } from '../utils/utils';
 import RoomChat from '../components/RoomChat';
 import CubeCrashAnimation from '../components/CubeCrashAnimation';
 import CircularTimer from '../components/CircularTimer';
+import { copyJoinUrl, shareViaWhatsApp, getJoinUrl } from '../utils/share';
+import ShareButton from '../components/ShareButton';
+import { QRCodeSVG } from 'qrcode.react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '../components/ui/dialog';
 
 const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) => {
   const { t } = useLanguage();
@@ -39,6 +43,10 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
   const [playersReady, setPlayersReady] = useState(initialPlayers);
   const [shufflingGrid, setShufflingGrid] = useState(null);
   const [gameLanguage, setGameLanguage] = useState(null);
+  const [showQR, setShowQR] = useState(false);
+
+  // Track if player was in an active game session (to distinguish late joiners after game ended)
+  const [wasInActiveGame, setWasInActiveGame] = useState(false);
 
   // Combo system state
   const [comboLevel, setComboLevel] = useState(0);
@@ -155,6 +163,7 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
 
         case 'startGame':
           setGameActive(true);
+          setWasInActiveGame(true); // Mark that player participated in this game session
           setFoundWords([]);
           setAchievements([]);
           if (message.letterGrid) setLetterGrid(message.letterGrid);
@@ -175,8 +184,13 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
         case 'endGame':
           setGameActive(false);
           setRemainingTime(0);
-          setWaitingForResults(true);
-          toast(t('playerView.gameOver'), { icon: '⏱️', duration: 4000 });
+          // Only show "waiting for results" if player participated in the game
+          // If they just joined after the game ended, they shouldn't see the calculating scores screen
+          if (wasInActiveGame) {
+            setWaitingForResults(true);
+            toast(t('playerView.gameOver'), { icon: '⏱️', duration: 4000 });
+          }
+          // else: player joined after game ended, they'll see "waiting for new game" screen
           break;
 
         case 'wordAccepted':
@@ -184,29 +198,54 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
             { scale: 1.1, borderColor: '#4ade80' },
             { scale: 1, borderColor: '', duration: 0.3 }
           );
-          toast.success(`✓ ${message.word}`, { duration: 2000 });
 
-          // Combo system: only increase combo for validated words
-          const now = Date.now();
-          if (lastWordTime && (now - lastWordTime) < 5000) {
-            // Within 5 seconds - increase combo!
-            setComboLevel(prev => Math.min(prev + 1, 4)); // Max combo level 4
+          // Only increase combo if word was auto-validated
+          if (message.autoValidated) {
+            toast.success(`✓ ${message.word}`, { duration: 2000, icon: '✅' });
+
+            // Combo system: only increase combo for auto-validated words
+            const now = Date.now();
+            if (lastWordTime && (now - lastWordTime) < 5000) {
+              // Within 5 seconds - increase combo!
+              setComboLevel(prev => Math.min(prev + 1, 4)); // Max combo level 4
+            } else {
+              // Too slow, reset combo
+              setComboLevel(0);
+            }
+            setLastWordTime(now);
+
+            // Clear any existing combo timeout
+            if (comboTimeoutRef.current) {
+              clearTimeout(comboTimeoutRef.current);
+            }
+
+            // Reset combo after 5 seconds of inactivity
+            comboTimeoutRef.current = setTimeout(() => {
+              setComboLevel(0);
+              setLastWordTime(null);
+            }, 5000);
           } else {
-            // Too slow, reset combo
-            setComboLevel(0);
+            toast.success(`✓ ${message.word}`, { duration: 2000 });
           }
-          setLastWordTime(now);
+          break;
 
-          // Clear any existing combo timeout
+        case 'wordNeedsValidation':
+          // Word needs host validation - show notification and reset combo
+          toast(message.message || `⏳ ${message.word} - Needs host validation`, {
+            duration: 3000,
+            icon: '⏳',
+            style: {
+              background: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
+              color: 'white',
+            },
+          });
+
+          // Reset combo for non-auto-validated words
+          setComboLevel(0);
+          setLastWordTime(null);
           if (comboTimeoutRef.current) {
             clearTimeout(comboTimeoutRef.current);
           }
-
-          // Reset combo after 5 seconds of inactivity
-          comboTimeoutRef.current = setTimeout(() => {
-            setComboLevel(0);
-            setLastWordTime(null);
-          }, 5000);
           break;
 
         case 'wordAlreadyFound':
@@ -235,7 +274,7 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
           if (message.remainingTime === 0) {
             setGameActive(false);
             setWaitingForResults(true);
-            toast(t('playerView.gameOver'), { icon: '⏱️', duration: 4000 });
+            // Don't show toast here - 'endGame' message will handle it to avoid duplicate notifications
           }
           break;
 
@@ -302,6 +341,7 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
         case 'resetGame':
           // Reset player state for new game
           setGameActive(false);
+          setWasInActiveGame(false); // Reset for new game session
           setFoundWords([]);
           setAchievements([]);
           setLeaderboard([]);
@@ -326,7 +366,7 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
     return () => {
       ws.removeEventListener('message', handleMessage);
     };
-  }, [ws, onShowResults, t, letterGrid, lastWordTime]);
+  }, [ws, onShowResults, t, letterGrid, lastWordTime, wasInActiveGame]);
 
   const submitWord = useCallback(() => {
     if (!word.trim() || !gameActive) return;
@@ -420,7 +460,6 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
   if (waitingForResults) {
     return (
       <div className="min-h-screen bg-gradient-to-b from-slate-50 via-slate-100 to-slate-200 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 p-4 md:p-8 flex flex-col transition-colors duration-300">
-        <Toaster position="top-center" limit={3} />
 
         {/* Exit Button */}
         <div className="w-full max-w-md mx-auto flex justify-end mb-4 relative z-50">
@@ -542,7 +581,6 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
   if (!gameActive && !waitingForResults) {
     return (
       <div className="min-h-screen bg-gradient-to-b from-slate-50 via-slate-100 to-slate-200 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 p-4 md:p-8 flex flex-col transition-colors duration-300">
-        <Toaster position="top-center" limit={3} />
 
         {/* Exit Button */}
         <div className="w-full max-w-md mx-auto flex justify-end mb-4 relative z-50">
@@ -636,6 +674,47 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
               </Card>
             </motion.div>
 
+            {/* Share Game Section */}
+            <motion.div
+              initial={{ y: 20, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ delay: 0.25 }}
+            >
+              <Card className="bg-white/90 dark:bg-slate-800/90 backdrop-blur-md shadow-xl border border-teal-500/30 shadow-[0_0_15px_rgba(20,184,166,0.1)] p-4">
+                <h3 className="text-sm font-bold text-teal-600 dark:text-teal-300 mb-3 text-center">
+                  {t('playerView.inviteFriends') || 'Invite Friends'}
+                </h3>
+                <div className="flex flex-wrap gap-2 justify-center">
+                  <ShareButton
+                    variant="link"
+                    onClick={() => copyJoinUrl(gameCode, t)}
+                    icon={<FaLink />}
+                  >
+                    {t('joinView.copyLink')}
+                  </ShareButton>
+                  <ShareButton
+                    variant="whatsapp"
+                    onClick={() => shareViaWhatsApp(gameCode, '', t)}
+                    icon={<FaWhatsapp />}
+                  >
+                    {t('joinView.shareWhatsapp')}
+                  </ShareButton>
+                  <ShareButton
+                    variant="qr"
+                    onClick={() => setShowQR(true)}
+                    icon={<FaQrcode />}
+                  >
+                    {t('hostView.qrCode')}
+                  </ShareButton>
+                </div>
+                <div className="mt-3 text-center">
+                  <Badge className="bg-gradient-to-r from-teal-500 to-cyan-500 text-white px-3 py-1">
+                    {t('hostView.roomCode')}: {gameCode}
+                  </Badge>
+                </div>
+              </Card>
+            </motion.div>
+
             {/* Chat Section */}
             <motion.div
               initial={{ y: 20, opacity: 0 }}
@@ -651,14 +730,45 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
             </motion.div>
           </div>
         </div>
+
+        {/* QR Code Dialog */}
+        <Dialog open={showQR} onOpenChange={setShowQR}>
+          <DialogContent className="sm:max-w-md bg-white dark:bg-slate-800 border-cyan-500/30">
+            <DialogHeader>
+              <DialogTitle className="text-center text-cyan-300 flex items-center justify-center gap-2">
+                <FaQrcode />
+                {t('joinView.qrCodeTitle')}
+              </DialogTitle>
+            </DialogHeader>
+            <div className="flex flex-col items-center gap-4 py-4">
+              <div className="p-6 bg-white rounded-lg shadow-md">
+                <QRCodeSVG value={getJoinUrl(gameCode)} size={250} level="H" includeMargin />
+              </div>
+              <h4 className="text-3xl font-bold text-cyan-400">{gameCode}</h4>
+              <p className="text-sm text-center text-slate-600 dark:text-gray-300">
+                {t('joinView.scanToJoin')} {gameCode}
+              </p>
+              <p className="text-xs text-center text-slate-500 dark:text-gray-400 mt-2">
+                {getJoinUrl(gameCode)}
+              </p>
+            </div>
+            <DialogFooter className="sm:justify-center">
+              <Button
+                onClick={() => setShowQR(false)}
+                className="w-full bg-gradient-to-r from-cyan-500 to-teal-500 hover:from-cyan-400 hover:to-teal-400 hover:shadow-[0_0_15px_rgba(6,182,212,0.5)]"
+              >
+                {t('common.close')}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </div>
     );
   }
 
   // Normal game UI (when game is active or waiting for results)
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-50 via-slate-100 to-slate-200 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 p-2 md:p-4 flex flex-col transition-colors duration-300">
-      <Toaster position="top-center" toastOptions={{ limit: 3 }} />
+    <div className="min-h-screen bg-gradient-to-b from-slate-50 via-slate-100 to-slate-200 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 p-1 md:p-4 flex flex-col transition-colors duration-300">
 
       {/* Start Game Animation */}
       {showStartAnimation && (
@@ -666,12 +776,12 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
       )}
 
       {/* Top Bar with Title and Exit Button */}
-      <div className="w-full max-w-7xl mx-auto flex items-center justify-between mb-2">
+      <div className="w-full max-w-7xl mx-auto flex items-center justify-between mb-1">
         {/* LEXICLASH Title */}
         <motion.h1
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="text-3xl md:text-5xl font-bold tracking-wider flex items-center gap-1"
+          className="text-2xl md:text-5xl font-bold tracking-wider flex items-center gap-1"
           style={{ fontFamily: "'Outfit', 'Rubik', sans-serif" }}
         >
           <span className="bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 to-blue-500 drop-shadow-[0_0_10px_rgba(34,211,238,0.5)]">
@@ -697,7 +807,7 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
         <motion.div
           initial={{ scale: 0, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
-          className="flex justify-center mb-4 relative z-10"
+          className="flex justify-center mb-1 md:mb-2 relative z-10"
         >
           <CircularTimer remainingTime={remainingTime} totalTime={180} />
         </motion.div>
@@ -708,7 +818,7 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
         <motion.div
           initial={{ y: -20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
-          className="max-w-7xl mx-auto mb-2"
+          className="max-w-7xl mx-auto mb-1"
         >
           <Card className="bg-white/90 dark:bg-slate-800/90 backdrop-blur-md shadow-xl border border-purple-500/30 shadow-[0_0_15px_rgba(168,85,247,0.1)]">
             <CardHeader className="py-2">
@@ -728,7 +838,7 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
       )}
 
       {/* 3 Column Layout: Found Words | Grid | Ranking */}
-      <div className="flex flex-col lg:flex-row gap-2 md:gap-4 max-w-7xl mx-auto flex-grow w-full overflow-hidden">
+      <div className="flex flex-col lg:flex-row gap-1 md:gap-2 max-w-7xl mx-auto flex-grow w-full overflow-hidden">
         {/* Left Column: Found Words (Hidden on mobile, shown on desktop) */}
         <div className="hidden lg:flex lg:flex-col lg:w-64 xl:w-80 gap-2">
           <Card className="bg-slate-900/95 dark:bg-slate-900/95 backdrop-blur-md shadow-2xl border border-teal-500/40 shadow-[0_0_25px_rgba(20,184,166,0.2)] flex flex-col flex-grow overflow-hidden">
@@ -766,10 +876,10 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
         </div>
 
         {/* Center Column: Letter Grid */}
-        <div className="flex-1 flex flex-col gap-2 min-w-0">
+        <div className="flex-1 flex flex-col gap-2 min-w-0 min-h-0">
           {(letterGrid || shufflingGrid) && (
             <Card className="bg-slate-900/95 dark:bg-slate-900/95 backdrop-blur-md shadow-2xl border border-cyan-500/40 shadow-[0_0_25px_rgba(6,182,212,0.2)] flex flex-col flex-grow overflow-hidden">
-              <CardContent className="flex-grow flex flex-col items-center justify-center p-2 md:p-4 bg-slate-900/90">
+              <CardContent className="flex-grow flex flex-col items-center justify-center p-1 md:p-2 bg-slate-900/90">
                 <GridComponent
                   grid={letterGrid || shufflingGrid}
                   interactive={gameActive}
