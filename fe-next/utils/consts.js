@@ -1,4 +1,4 @@
-export const hebrewLetters = [
+const hebrewLetters = [
     "א",
     "ב",
     "ג",
@@ -23,11 +23,11 @@ export const hebrewLetters = [
     "ת",
   ];
 
-export const englishLetters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
+const englishLetters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
 
-export const swedishLetters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZÅÄÖ'.split('');
+const swedishLetters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZÅÄÖ'.split('');
 
-export const japaneseLetters = [
+const japaneseLetters = [
   // Common kanji for word games
   "日", "本", "人", "年", "月", "火", "水", "木", "金", "土",
   "一", "二", "三", "四", "五", "六", "七", "八", "九", "十",
@@ -46,7 +46,7 @@ export const japaneseLetters = [
   "肉", "魚", "米", "茶", "酒", "水", "火", "土", "金", "銀"
 ];
 
-export const DIFFICULTIES = {
+const DIFFICULTIES = {
   EASY: { nameKey: 'difficulty.easy', rows: 4, cols: 4 },
   MEDIUM: { nameKey: 'difficulty.medium', rows: 5, cols: 5 },
   HARD: { nameKey: 'difficulty.hard', rows: 7, cols: 7 },
@@ -54,5 +54,14 @@ export const DIFFICULTIES = {
   MASTER: { nameKey: 'difficulty.master', rows: 11, cols: 11 },
 };
 
-export const DEFAULT_DIFFICULTY = 'HARD';
+const DEFAULT_DIFFICULTY = 'HARD';
+
+module.exports = {
+  hebrewLetters,
+  englishLetters,
+  swedishLetters,
+  japaneseLetters,
+  DIFFICULTIES,
+  DEFAULT_DIFFICULTY,
+};
   
