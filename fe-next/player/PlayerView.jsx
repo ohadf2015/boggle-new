@@ -296,6 +296,17 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
 
         case 'timeUpdate':
           setRemainingTime(message.remainingTime);
+
+          // CRITICAL FIX: If we receive time updates but game isn't active yet,
+          // it means the server started the timer while we were still in countdown.
+          // Force the game to active state since the timer is running.
+          if (!gameActive && message.remainingTime > 0 && letterGrid) {
+            console.log('[PLAYER] Timer started on server, activating game (remainingTime:', message.remainingTime, ')');
+            setShowCountdown(false);  // Hide countdown if still showing
+            setGameActive(true);       // Activate the game
+            setShowStartAnimation(true); // Show GO animation
+          }
+
           if (message.remainingTime === 0) {
             setGameActive(false);
             setWaitingForResults(true);
@@ -475,7 +486,7 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
     return () => {
       ws.removeEventListener('message', handleMessage);
     };
-  }, [ws, onShowResults, t, letterGrid, lastWordTime, wasInActiveGame]);
+  }, [ws, onShowResults, t, letterGrid, lastWordTime, wasInActiveGame, gameActive]);
 
   const submitWord = useCallback(() => {
     if (!word.trim() || !gameActive) return;
