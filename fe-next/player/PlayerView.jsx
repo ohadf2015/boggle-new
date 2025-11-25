@@ -574,7 +574,9 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
       e.stopPropagation();
     }
     console.log('[PLAYER] Exit button clicked');
+    console.log('[PLAYER] Current showExitConfirm state:', showExitConfirm);
     setShowExitConfirm(true);
+    console.log('[PLAYER] Setting showExitConfirm to true');
   };
 
   const confirmExitRoom = () => {
@@ -1237,7 +1239,7 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
 
       {/* Exit Confirmation Dialog */}
       <AlertDialog open={showExitConfirm} onOpenChange={setShowExitConfirm}>
-        <AlertDialogContent className="bg-white dark:bg-slate-800 border-red-500/30">
+        <AlertDialogContent className="bg-white dark:bg-slate-800 border-red-500/30 z-[9999]">
           <AlertDialogHeader>
             <AlertDialogTitle className="text-slate-900 dark:text-white">
               {t('playerView.exitConfirmation')}
@@ -1259,6 +1261,13 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Debug indicator */}
+      {showExitConfirm && (
+        <div className="fixed top-0 left-0 bg-yellow-500 text-black px-4 py-2 z-[10000]">
+          Dialog should be visible
+        </div>
+      )}
     </div >
   );
 };
