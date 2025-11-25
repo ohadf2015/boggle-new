@@ -45,9 +45,10 @@ const WordChip = ({ wordObj, index, playerCount, t }) => {
   );
 };
 
-const ResultsPlayerCard = ({ player, index, allPlayerWords }) => {
+const ResultsPlayerCard = ({ player, index, allPlayerWords, currentUsername }) => {
   const { t } = useLanguage();
-  const [isWordsExpanded, setIsWordsExpanded] = useState(false); // Start collapsed
+  // Auto-expand current player's card, collapse others
+  const [isWordsExpanded, setIsWordsExpanded] = useState(player.username === currentUsername);
 
   // Calculate how many players found each word
   const getPlayerCountForWord = (word) => {
@@ -86,7 +87,8 @@ const ResultsPlayerCard = ({ player, index, allPlayerWords }) => {
       <Card
         className={cn(
           "p-4 sm:p-5 md:p-6 border-2 backdrop-blur-xl transition-all duration-300 rounded-xl shadow-lg hover:shadow-xl",
-          getCardStyle()
+          getCardStyle(),
+          isWordsExpanded && "ring-2 ring-purple-400/50 shadow-[0_0_20px_rgba(168,85,247,0.3)]"
         )}
       >
         {/* Header: Rank, Name, Score */}

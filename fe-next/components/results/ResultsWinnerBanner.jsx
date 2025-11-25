@@ -56,7 +56,7 @@ const ResultsWinnerBanner = ({ winner }) => {
             alt="celebration"
             className="absolute inset-0 w-full h-full object-cover"
             style={{
-              filter: 'blur(8px) brightness(1.1) saturate(1.4)',
+              filter: 'blur(4px) brightness(1.1) saturate(1.4)',
             }}
           />
           {/* Gradient Overlays for Depth */}

@@ -7,6 +7,7 @@ const { games, gameWs, wsUsername, getActiveRooms, getGame, getUsernameFromWs, g
 const { safeSend, broadcast } = require('./utils/websocketHelpers');
 const { generateRandomTable } = require('../utils/utils');
 const { DIFFICULTIES } = require('../utils/consts');
+const Filter = require('bad-words');
 const {
   tournaments,
   createTournament,
