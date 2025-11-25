@@ -55,6 +55,8 @@ const useWebSocketConnection = () => {
     const lastPingTimeRef = useRef(null);
     const [connectionQuality, setConnectionQuality] = useState('good');
     const highLatencyWarningShownRef = useRef(false);
+    const onReconnectCallbackRef = useRef(null);
+    const wasConnectedRef = useRef(false); // Track if we had a previous connection
     const { t } = useLanguage();
 
     const checkLatency = useCallback((latency) => {
@@ -143,14 +145,27 @@ const useWebSocketConnection = () => {
             globalWsInstance = ws;
 
             ws.onopen = () => {
+                const isReconnection = wasConnectedRef.current;
                 isConnectingRef.current = false;
                 reconnectAttemptsRef.current = 0;
                 setConnectionError('');
+                wasConnectedRef.current = true; // Mark that we've had a connection
 
                 startHeartbeat(ws);
 
                 if (ws.readyState === WebSocket.OPEN) {
                     ws.send(JSON.stringify({ action: 'getActiveRooms' }));
+
+                    // If this is a reconnection (not initial connect), notify the callback
+                    if (isReconnection && onReconnectCallbackRef.current) {
+                        console.log('[WS] Reconnected - notifying callback to re-join game');
+                        // Small delay to ensure WebSocket is fully ready
+                        setTimeout(() => {
+                            if (onReconnectCallbackRef.current) {
+                                onReconnectCallbackRef.current();
+                            }
+                        }, 100);
+                    }
                 }
             };
 
@@ -210,6 +225,10 @@ const useWebSocketConnection = () => {
         messageHandlerRef.current = handler;
     }, []);
 
+    const setOnReconnect = useCallback((callback) => {
+        onReconnectCallbackRef.current = callback;
+    }, []);
+
     const cleanup = useCallback(() => {
         if (reconnectTimeoutRef.current) {
             clearTimeout(reconnectTimeoutRef.current);
@@ -226,9 +245,10 @@ const useWebSocketConnection = () => {
 
         hasInitializedRef.current = false;
         isConnectingRef.current = false;
+        wasConnectedRef.current = false; // Reset on cleanup
     }, [stopHeartbeat]);
 
-    return { wsRef, connectWebSocket, setMessageHandler, cleanup, connectionError, checkLatency, lastPingTimeRef, connectionQuality };
+    return { wsRef, connectWebSocket, setMessageHandler, setOnReconnect, cleanup, connectionError, checkLatency, lastPingTimeRef, connectionQuality };
 };
 
 export default function GamePage() {
@@ -245,7 +265,7 @@ export default function GamePage() {
     const [roomLanguage, setRoomLanguage] = useState(null);
     const [playersInRoom, setPlayersInRoom] = useState([]);
 
-    const { wsRef, connectWebSocket, setMessageHandler, cleanup, connectionError, checkLatency, lastPingTimeRef } = useWebSocketConnection();
+    const { wsRef, connectWebSocket, setMessageHandler, setOnReconnect, cleanup, connectionError, checkLatency, lastPingTimeRef } = useWebSocketConnection();
     const [ws, setWs] = useState(null);
     const { t, language } = useLanguage();
 
@@ -476,6 +496,46 @@ export default function GamePage() {
             ws.addEventListener('open', onOpen);
         }
     }, [wsRef]);
+
+    // Handle WebSocket reconnection - re-join game if player was in an active session
+    useEffect(() => {
+        setOnReconnect(() => {
+            // Check if player was in an active game session
+            const savedSession = getSession();
+            if (!isActive || !savedSession?.gameCode) {
+                console.log('[WS] Reconnected but no active session to rejoin');
+                return;
+            }
+
+            console.log('[WS] Reconnected - re-joining game', savedSession.gameCode);
+            toast.success(t('common.reconnecting') || 'Reconnecting to game...', {
+                duration: 2000,
+                icon: '🔄',
+            });
+
+            if (savedSession.isHost) {
+                // Host reconnect
+                if (savedSession.roomName) {
+                    sendMessage({
+                        action: 'createGame',
+                        gameCode: savedSession.gameCode,
+                        roomName: savedSession.roomName,
+                        hostUsername: savedSession.roomName,
+                        language: savedSession.language || language,
+                    });
+                }
+            } else {
+                // Player reconnect
+                if (savedSession.username) {
+                    sendMessage({
+                        action: 'join',
+                        gameCode: savedSession.gameCode,
+                        username: savedSession.username,
+                    });
+                }
+            }
+        });
+    }, [setOnReconnect, isActive, sendMessage, language, t]);
 
     // Host visibility change handler - reactivate room when host returns to the browser
     useEffect(() => {
