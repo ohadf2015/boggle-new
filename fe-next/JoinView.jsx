@@ -620,7 +620,7 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
           >
             <Card className={cn(
               "backdrop-blur-md bg-white/90 dark:bg-slate-800/90 shadow-xl flex flex-col border border-teal-500/30 shadow-[0_0_15px_rgba(20,184,166,0.1)]",
-              activeRooms.length === 0 ? "h-auto" : "h-full max-h-[500px]"
+              activeRooms.length === 0 ? "h-auto" : "h-full max-h-[300px] md:max-h-[500px]"
             )}>
               <CardHeader>
                 <div className="flex justify-between items-center">
