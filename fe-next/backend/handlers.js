@@ -5,6 +5,7 @@ const { calculateWordScore } = require('./modules/scoringEngine');
 const { ACHIEVEMENTS, checkLiveAchievements, awardFinalAchievements, getLocalizedAchievements } = require('./modules/achievementManager');
 const { games, gameWs, wsUsername, getActiveRooms, getGame, getUsernameFromWs, getWsHostFromGameCode, getWsFromUsername, getGameCodeFromUsername, deleteGame: deleteGameFromState, getTournamentIdFromGame, setTournamentIdForGame } = require('./modules/gameStateManager');
 const { safeSend, broadcast } = require('./utils/websocketHelpers');
+const gameStartCoordinator = require('./utils/gameStartCoordinator');
 const { generateRandomTable } = require('../utils/utils');
 const { DIFFICULTIES } = require('../utils/consts');
 const Filter = require('bad-words');
@@ -571,23 +572,83 @@ const handleStartGame = async (host, letterGrid, timerSeconds, language, hostPla
     games[gameCode].playerWordDetails[username] = [];
   });
 
-  const startMessage = { action: "startGame", letterGrid, timerSeconds, language: games[gameCode].language };
+  // Initialize acknowledgment coordination
+  const playerUsernames = Object.keys(games[gameCode].users);
+  const messageId = gameStartCoordinator.initializeSequence(gameCode, playerUsernames, timerSeconds);
+
+  const startMessage = {
+    action: "startGame",
+    letterGrid,
+    timerSeconds,
+    language: games[gameCode].language,
+    messageId
+  };
+
+  console.log(`[START_GAME] Broadcasting to ${playerUsernames.length} players with coordinator`);
   const broadcastResult = sendAllPlayerAMessage(gameCode, startMessage);
 
-  // If some players didn't receive the message, retry after a short delay
-  if (broadcastResult && broadcastResult.failedCount > 0) {
-    console.log(`[START_GAME] Retrying broadcast for ${broadcastResult.failedCount} failed players`);
-    setTimeout(() => {
-      if (games[gameCode] && games[gameCode].gameState === 'playing') {
-        sendAllPlayerAMessage(gameCode, startMessage);
+  // Handle failed broadcasts with intelligent retry
+  if (broadcastResult && broadcastResult.failedIdentifiers.length > 0) {
+    console.log(`[START_GAME] Initial broadcast failed for: ${broadcastResult.failedIdentifiers.join(', ')}`);
+
+    // Use coordinator's intelligent retry system
+    gameStartCoordinator.scheduleRetries(gameCode, broadcastResult.failedIdentifiers, (username) => {
+      const game = games[gameCode];
+      if (!game) return false;
+
+      const ws = game.users[username];
+      if (ws && ws.readyState === 1) {
+        try {
+          ws.send(JSON.stringify(startMessage));
+          return true;
+        } catch (error) {
+          console.error(`[START_GAME] Retry failed for ${username}:`, error.message);
+          return false;
+        }
       }
-    }, 200);
+      return false;
+    });
   }
 
   broadcastLeaderboard(gameCode);
 
-  // Start server-side timer with broadcasts every second
-  startServerTimer(gameCode, timerSeconds);
+  // Set acknowledgment timeout - coordinator will handle timer start
+  gameStartCoordinator.setAcknowledgmentTimeout(gameCode, 3000, (stats) => {
+    if (!games[gameCode]) return;
+
+    if (stats.missing.length > 0) {
+      console.warn(`[START_GAME] Starting timer with ${stats.acknowledged}/${stats.expected} players (missing: ${stats.missing.join(', ')})`);
+    } else {
+      console.log(`[START_GAME] All players acknowledged in ${stats.waitTime}ms`);
+    }
+
+    startServerTimer(gameCode, timerSeconds);
+  });
+}
+
+// Handle player acknowledgment of game start
+const handleStartGameAck = (ws, messageId) => {
+  const gameCode = gameWs.get(ws);
+  const username = wsUsername.get(ws);
+
+  if (!gameCode || !games[gameCode]) {
+    console.error(`[START_GAME_ACK] Invalid game - gameCode: ${gameCode}`);
+    return;
+  }
+
+  // Record acknowledgment with coordinator
+  const result = gameStartCoordinator.recordAcknowledgment(gameCode, username, messageId);
+
+  if (!result.valid) {
+    console.warn(`[START_GAME_ACK] Invalid acknowledgment from ${username}: ${result.reason}`);
+    return;
+  }
+
+  // If all players are ready, start the timer immediately
+  if (result.allReady) {
+    console.log(`[START_GAME_ACK] All players ready! Starting timer (wait time: ${result.waitTime}ms)`);
+    startServerTimer(gameCode, games[gameCode].timerSeconds);
+  }
 }
 
 // Server-side timer that broadcasts remaining time to all clients
@@ -1113,6 +1174,15 @@ const handleDisconnect = (ws, wss) => {
     console.log(`[DISCONNECT] ws disconnected - gameCode: ${gameCode}, username: ${username}`);
   }
 
+  // Handle disconnection during game start acknowledgment phase
+  if (gameCode && username) {
+    const disconnectResult = gameStartCoordinator.handlePlayerDisconnect(gameCode, username);
+    if (disconnectResult && disconnectResult.startTimer && games[gameCode]) {
+      console.log(`[DISCONNECT] Starting timer after ${username} disconnect (remaining players ready)`);
+      startServerTimer(gameCode, games[gameCode].timerSeconds);
+    }
+  }
+
   if (gameCode && games[gameCode]) {
     const game = games[gameCode];
     const isHost = game.host === ws;
@@ -1495,6 +1565,9 @@ const handleCloseRoom = (host, gameCode, wss) => {
     return;
   }
 
+  // Clean up any active game start coordination
+  gameStartCoordinator.cleanupSequence(gameCode);
+
   const game = games[gameCode];
   const hostUsername = game.hostUsername;
 
@@ -1584,6 +1657,9 @@ const handleResetGame = async (host) => {
   }
 
   console.log(`[RESET_GAME] Resetting game ${gameCode} for new round`);
+
+  // Clean up any active game start coordination
+  gameStartCoordinator.cleanupSequence(gameCode);
 
   // Clean up all timers and timeouts (except host/player disconnect timeouts)
   if (games[gameCode].timerInterval) {
@@ -2065,6 +2141,7 @@ module.exports = {
   setNewGame,
   addUserToGame,
   handleStartGame,
+  handleStartGameAck,
   handleEndGame,
   handleSendAnswer,
   handleWordSubmission,

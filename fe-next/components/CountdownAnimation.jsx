@@ -31,7 +31,8 @@ const CountdownAnimation = ({ onComplete, duration = 3000 }) => {
             animate={{ scale: 1, opacity: 1, rotate: 0 }}
             exit={{ scale: 0, opacity: 0, rotate: 180 }}
             transition={{ type: 'spring', stiffness: 200, damping: 20 }}
-            className="relative"
+            className="relative flex items-center justify-center"
+            style={{ width: '200px', height: '200px' }}
           >
             {/* Outer glow rings */}
             <motion.div
@@ -41,7 +42,7 @@ const CountdownAnimation = ({ onComplete, duration = 3000 }) => {
               className="absolute inset-0 rounded-full bg-gradient-to-r from-cyan-500 to-purple-500 blur-2xl"
             />
 
-            {/* Main number */}
+            {/* Main number - centered in the container */}
             <motion.div
               animate={{
                 scale: [1, 1.1, 1],
@@ -52,7 +53,7 @@ const CountdownAnimation = ({ onComplete, duration = 3000 }) => {
                 ]
               }}
               transition={{ duration: 1, repeat: Infinity }}
-              className="text-9xl font-black text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-purple-400 to-pink-400"
+              className="text-9xl font-black text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-purple-400 to-pink-400 relative z-10"
               style={{
                 WebkitTextStroke: '2px rgba(255, 255, 255, 0.8)',
                 filter: 'drop-shadow(0 0 30px rgba(6, 182, 212, 0.6))'
@@ -61,7 +62,7 @@ const CountdownAnimation = ({ onComplete, duration = 3000 }) => {
               {count}
             </motion.div>
 
-            {/* Pulse rings */}
+            {/* Pulse rings - centered around the number */}
             {[0, 0.2, 0.4].map((delay, i) => (
               <motion.div
                 key={i}
@@ -73,8 +74,14 @@ const CountdownAnimation = ({ onComplete, duration = 3000 }) => {
                   delay,
                   ease: 'easeOut'
                 }}
-                className="absolute inset-0 rounded-full border-4 border-cyan-400"
-                style={{ top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }}
+                className="absolute rounded-full border-4 border-cyan-400"
+                style={{
+                  top: '50%',
+                  left: '50%',
+                  transform: 'translate(-50%, -50%)',
+                  width: '100px',
+                  height: '100px'
+                }}
               />
             ))}
           </motion.div>

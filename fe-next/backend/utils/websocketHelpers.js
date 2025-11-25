@@ -33,13 +33,14 @@ function safeSend(ws, message, context = 'client') {
  * @param {Map<string, WebSocket>|Object} connections - Map or object of username -> WebSocket
  * @param {Object} message - Message object to broadcast
  * @param {string} context - Context for logging
- * @returns {Object} - Statistics about the broadcast
+ * @returns {Object} - Statistics about the broadcast including failed identifiers
  */
 function broadcast(connections, message, context = 'broadcast') {
   const messageStr = JSON.stringify(message);
   let sentCount = 0;
   let failedCount = 0;
   let totalCount = 0;
+  const failedIdentifiers = [];
 
   // Handle both Map and plain object
   const entries = connections instanceof Map
@@ -55,16 +56,21 @@ function broadcast(connections, message, context = 'broadcast') {
       } catch (error) {
         console.error(`[WS] Error in ${context} to ${identifier}:`, error.message);
         failedCount++;
+        failedIdentifiers.push(identifier);
       }
+    } else {
+      // Connection not open
+      failedCount++;
+      failedIdentifiers.push(identifier);
     }
   });
 
   // Log summary
   if (failedCount > 0) {
-    console.warn(`[${context}] Failed to send ${message.action} to ${failedCount} connections`);
+    console.warn(`[${context}] Failed to send ${message.action} to ${failedCount} connections: ${failedIdentifiers.join(', ')}`);
   }
 
-  return { sentCount, failedCount, totalCount };
+  return { sentCount, failedCount, totalCount, failedIdentifiers };
 }
 
 /**

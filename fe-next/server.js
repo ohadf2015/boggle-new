@@ -15,6 +15,7 @@ const {
   setNewGame,
   handleEndGame,
   handleStartGame,
+  handleStartGameAck,
   addUserToGame,
   handleWordSubmission,
   handleSendAnswer,
@@ -155,6 +156,9 @@ app.prepare().then(() => {
             break;
           case "startGame":
             handleStartGame(ws, message.letterGrid, message.timerSeconds, message.language, message.hostPlaying);
+            break;
+          case "startGameAck":
+            handleStartGameAck(ws, message.messageId);
             break;
           case "endGame":
             handleEndGame(ws);

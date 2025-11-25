@@ -187,6 +187,15 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
           if (message.language) setGameLanguage(message.language);
           setShowCountdown(true);
 
+          // Send acknowledgment to server
+          if (ws && ws.readyState === WebSocket.OPEN && message.messageId) {
+            ws.send(JSON.stringify({
+              action: 'startGameAck',
+              messageId: message.messageId
+            }));
+            console.log('[PLAYER] Sent startGameAck for messageId:', message.messageId);
+          }
+
           toast.success(t('playerView.gameStarted'), {
             icon: '🚀',
             duration: 3000,
@@ -547,15 +556,34 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
     return `${mins}:${paddedSecs}`;
   };
 
-  const handleExitRoom = () => {
+  const handleExitRoom = (e) => {
+    // Prevent any event bubbling that might interfere
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+    console.log('[PLAYER] Exit button clicked');
     setShowExitConfirm(true);
   };
 
   const confirmExitRoom = () => {
+    console.log('[PLAYER] Exit confirmed, closing connection');
     intentionalExitRef.current = true;
     clearSession();
-    ws.close();
-    window.location.reload();
+
+    // Safely close WebSocket connection
+    try {
+      if (ws && ws.readyState !== WebSocket.CLOSED) {
+        ws.close();
+      }
+    } catch (error) {
+      console.error('[PLAYER] Error closing WebSocket:', error);
+    }
+
+    // Force reload after a brief delay to ensure cleanup
+    setTimeout(() => {
+      window.location.reload();
+    }, 100);
   };
 
   // Show waiting for results screen after game ends
@@ -566,9 +594,10 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
         {/* Exit Button */}
         <div className="w-full max-w-md mx-auto flex justify-end mb-4 relative z-50">
           <Button
+            type="button"
             onClick={handleExitRoom}
             size="sm"
-            className="shadow-lg hover:scale-105 transition-transform bg-red-500 hover:bg-red-600 border border-red-400/30 hover:shadow-[0_0_15px_rgba(239,68,68,0.5)]"
+            className="shadow-lg hover:scale-105 transition-transform bg-red-500 hover:bg-red-600 border border-red-400/30 hover:shadow-[0_0_15px_rgba(239,68,68,0.5)] cursor-pointer"
           >
             <FaDoorOpen className="mr-2" />
             {t('playerView.exit')}
@@ -687,9 +716,10 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
         {/* Exit Button */}
         <div className="w-full max-w-md mx-auto flex justify-end mb-4 relative z-50">
           <Button
+            type="button"
             onClick={handleExitRoom}
             size="sm"
-            className="shadow-lg hover:scale-105 transition-transform bg-red-500 hover:bg-red-600 border border-red-400/30 hover:shadow-[0_0_15px_rgba(239,68,68,0.5)]"
+            className="shadow-lg hover:scale-105 transition-transform bg-red-500 hover:bg-red-600 border border-red-400/30 hover:shadow-[0_0_15px_rgba(239,68,68,0.5)] cursor-pointer"
           >
             <FaDoorOpen className="mr-2" />
             {t('playerView.exit')}
@@ -919,9 +949,10 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
         </motion.h1>
 
         <Button
+          type="button"
           onClick={handleExitRoom}
           size="sm"
-          className="shadow-lg hover:scale-105 transition-transform bg-red-500 hover:bg-red-600 border border-red-400/30 hover:shadow-[0_0_15px_rgba(239,68,68,0.5)]"
+          className="shadow-lg hover:scale-105 transition-transform bg-red-500 hover:bg-red-600 border border-red-400/30 hover:shadow-[0_0_15px_rgba(239,68,68,0.5)] cursor-pointer relative z-50"
         >
           <FaDoorOpen className="mr-2" />
           {t('playerView.exit')}
