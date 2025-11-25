@@ -16,6 +16,9 @@ const socketToUsername = new Map();
 // Username to socket mapping - maps "gameCode:username" to socket.id
 const usernameToSocket = new Map();
 
+// Leaderboard throttling - maps gameCode to timeout ID
+const leaderboardThrottleTimers = {};
+
 /**
  * Create a new game
  * @param {string} gameCode - Unique game code
@@ -33,11 +36,11 @@ function createGame(gameCode, gameData) {
     playerScores: {},
     playerWords: {},
     playerAchievements: {},
-    playerAvatars: {},
     gameState: 'waiting', // waiting, in-progress, finished
     letterGrid: null,
     timerSeconds: 180,
     tournamentId: null,
+    reconnectionTimeout: null, // Store timeout ID for host reconnection grace period
     createdAt: Date.now(),
     lastActivity: Date.now()
   };
@@ -123,9 +126,6 @@ function addUserToGame(gameCode, username, socketId, options = {}) {
   }
   if (!game.playerWords[username]) {
     game.playerWords[username] = [];
-  }
-  if (avatar) {
-    game.playerAvatars[username] = avatar;
   }
 
   // Update mappings
@@ -265,7 +265,7 @@ function getGameUsers(gameCode) {
   return Object.entries(game.users).map(([username, data]) => ({
     username,
     isHost: data.isHost,
-    avatar: data.avatar || game.playerAvatars[username],
+    avatar: data.avatar,
     score: game.playerScores[username] || 0
   }));
 }
@@ -414,9 +414,35 @@ function getLeaderboard(gameCode) {
     .map(([username, score]) => ({
       username,
       score,
-      wordCount: game.playerWords[username]?.length || 0
+      wordCount: game.playerWords[username]?.length || 0,
+      avatar: game.users[username]?.avatar
     }))
     .sort((a, b) => b.score - a.score);
+}
+
+/**
+ * Get leaderboard with throttling to prevent excessive updates
+ * @param {string} gameCode - Game code
+ * @param {function} broadcastFn - Function to call with leaderboard data
+ * @param {number} throttleMs - Throttle duration in milliseconds (default 1000ms)
+ */
+function getLeaderboardThrottled(gameCode, broadcastFn, throttleMs = 1000) {
+  const game = games[gameCode];
+  if (!game) return;
+
+  // Clear existing timer for this game
+  if (leaderboardThrottleTimers[gameCode]) {
+    clearTimeout(leaderboardThrottleTimers[gameCode]);
+  }
+
+  // Set new timer to broadcast leaderboard after throttle period
+  leaderboardThrottleTimers[gameCode] = setTimeout(() => {
+    const leaderboard = getLeaderboard(gameCode);
+    if (broadcastFn && typeof broadcastFn === 'function') {
+      broadcastFn(leaderboard);
+    }
+    delete leaderboardThrottleTimers[gameCode];
+  }, throttleMs);
 }
 
 /**
@@ -500,6 +526,7 @@ module.exports = {
   playerHasWord,
   updatePlayerScore,
   getLeaderboard,
+  getLeaderboardThrottled,
 
   // Cleanup
   cleanupStaleGames,

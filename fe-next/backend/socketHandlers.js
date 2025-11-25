@@ -27,6 +27,7 @@ const {
   playerHasWord,
   updatePlayerScore,
   getLeaderboard,
+  getLeaderboardThrottled,
   getTournamentIdFromGame,
   setTournamentIdForGame
 } = require('./modules/gameStateManager');
@@ -51,6 +52,11 @@ const timerManager = require('./utils/timerManager');
 const { checkRateLimit, resetRateLimit } = require('./utils/rateLimiter');
 const redisClient = require('./redisClient');
 const tournamentManager = require('./modules/tournamentManager');
+const { cleanupPlayerData } = require('./utils/playerCleanup');
+const { emitError, ErrorMessages } = require('./utils/errorHandler');
+
+// Game configuration constants
+const MAX_PLAYERS_PER_ROOM = 50; // Maximum number of players allowed in a single room
 
 // Avatar generation constants
 const AVATAR_COLORS = [
@@ -87,7 +93,7 @@ function initializeSocketHandlers(io) {
     // Rate limiting
     if (!checkRateLimit(socket.id)) {
       console.warn(`[SOCKET] Rate limit exceeded for ${socket.id}`);
-      socket.emit('error', { message: 'Rate limit exceeded. Please slow down.' });
+      emitError(socket, ErrorMessages.RATE_LIMIT_EXCEEDED);
       socket.disconnect(true);
       return;
     }
@@ -100,13 +106,13 @@ function initializeSocketHandlers(io) {
 
       // Validate game code
       if (!gameCode || gameCode.length !== 4) {
-        socket.emit('error', { message: 'Invalid game code' });
+        emitError(socket, ErrorMessages.INVALID_GAME_CODE);
         return;
       }
 
       // Check if game already exists
       if (gameExists(gameCode)) {
-        socket.emit('error', { message: 'Game code already in use' });
+        emitError(socket, 'Game code already in use');
         return;
       }
 
@@ -165,18 +171,25 @@ function initializeSocketHandlers(io) {
 
       // Validate
       if (!gameCode || !username) {
-        socket.emit('error', { message: 'Game code and username are required' });
+        emitError(socket, ErrorMessages.USERNAME_REQUIRED);
         return;
       }
 
       const game = getGame(gameCode);
       if (!game) {
-        socket.emit('error', { message: 'Game not found' });
+        emitError(socket, ErrorMessages.GAME_NOT_FOUND);
         return;
       }
 
       // Check for existing user (reconnection)
       const existingSocketId = getSocketIdByUsername(gameCode, username);
+
+      // Check player limit (unless this is a reconnection)
+      if (!existingSocketId && Object.keys(game.users).length >= MAX_PLAYERS_PER_ROOM) {
+        emitError(socket, ErrorMessages.ROOM_FULL(MAX_PLAYERS_PER_ROOM));
+        console.log(`[SOCKET] ${username} tried to join full room ${gameCode}`);
+        return;
+      }
       if (existingSocketId) {
         // Handle reconnection
         console.log(`[SOCKET] Reconnection detected for ${username}`);
@@ -187,6 +200,13 @@ function initializeSocketHandlers(io) {
         // Check if this is the host reconnecting
         if (game.hostUsername === username) {
           updateHostSocketId(gameCode, socket.id);
+
+          // Clear reconnection timeout if host is reconnecting
+          if (game.reconnectionTimeout) {
+            clearTimeout(game.reconnectionTimeout);
+            game.reconnectionTimeout = null;
+            console.log(`[SOCKET] Cleared host reconnection timeout for game ${gameCode}`);
+          }
         }
 
         // Join room
@@ -257,19 +277,19 @@ function initializeSocketHandlers(io) {
 
       const gameCode = getGameBySocketId(socket.id);
       if (!gameCode) {
-        socket.emit('error', { message: 'Not in a game' });
+        emitError(socket, ErrorMessages.NOT_IN_GAME);
         return;
       }
 
       const game = getGame(gameCode);
       if (!game) {
-        socket.emit('error', { message: 'Game not found' });
+        emitError(socket, ErrorMessages.GAME_NOT_FOUND);
         return;
       }
 
       // Verify sender is host
       if (game.hostSocketId !== socket.id) {
-        socket.emit('error', { message: 'Only host can start the game' });
+        emitError(socket, ErrorMessages.ONLY_HOST_CAN_START);
         return;
       }
 
@@ -378,9 +398,11 @@ function initializeSocketHandlers(io) {
         });
       }
 
-      // Update leaderboard
-      broadcastToRoom(io, getGameRoom(gameCode), 'updateLeaderboard', {
-        leaderboard: getLeaderboard(gameCode)
+      // Update leaderboard with throttling to prevent excessive broadcasts
+      getLeaderboardThrottled(gameCode, (leaderboard) => {
+        broadcastToRoom(io, getGameRoom(gameCode), 'updateLeaderboard', {
+          leaderboard
+        });
       });
     });
 
@@ -417,7 +439,7 @@ function initializeSocketHandlers(io) {
 
       // Verify sender is host
       if (game.hostSocketId !== socket.id) {
-        socket.emit('error', { message: 'Only host can end the game' });
+        emitError(socket, ErrorMessages.ONLY_HOST_CAN_END);
         return;
       }
 
@@ -661,11 +683,8 @@ function initializeSocketHandlers(io) {
         // Remove player completely including all their data
         removeUserBySocketId(socket.id);
 
-        // Clean up player-specific game data
-        if (game.playerScores) delete game.playerScores[username];
-        if (game.playerWords) delete game.playerWords[username];
-        if (game.playerAchievements) delete game.playerAchievements[username];
-        if (game.playerAvatars) delete game.playerAvatars[username];
+        // Clean up player-specific game data using centralized utility
+        cleanupPlayerData(game, username);
 
         // Broadcast player left notification
         broadcastToRoom(io, getGameRoom(gameCode), 'playerLeft', {
@@ -703,9 +722,10 @@ function initializeSocketHandlers(io) {
         console.log(`[SOCKET] Host disconnected from game ${gameCode}`);
 
         // Wait a bit for potential reconnection
-        setTimeout(() => {
+        const reconnectionTimeout = setTimeout(() => {
           const currentGame = getGame(gameCode);
-          if (currentGame && currentGame.hostSocketId === socket.id) {
+          if (currentGame && currentGame.hostSocketId === socket.id &&
+              currentGame.reconnectionTimeout === reconnectionTimeout) {
             // Host didn't reconnect, close the room
             timerManager.clearGameTimer(gameCode);
 
@@ -717,6 +737,9 @@ function initializeSocketHandlers(io) {
             io.emit('activeRooms', { rooms: getActiveRooms() });
           }
         }, 30000); // 30 second grace period
+
+        // Store timeout ID in game object
+        game.reconnectionTimeout = reconnectionTimeout;
       } else {
         // Regular player disconnected
         broadcastToRoom(io, getGameRoom(gameCode), 'updateUsers', {

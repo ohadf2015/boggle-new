@@ -1,3 +1,13 @@
+/**
+ * ⚠️ DEPRECATED FILE ⚠️
+ *
+ * This file has been replaced by socketHandlers.js which uses Socket.IO instead of raw WebSockets.
+ * This file is kept for reference only and should NOT be used in production.
+ *
+ * Migration: All functionality has been moved to socketHandlers.js
+ * Date deprecated: 2025-11-25
+ */
+
 const { saveGameState, deleteGameState } = require('./redisClient');
 const dictionary = require('./dictionary');
 const { isWordOnBoard } = require('./modules/wordValidator');
