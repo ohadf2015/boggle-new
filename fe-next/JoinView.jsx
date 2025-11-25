@@ -284,11 +284,11 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-50 via-slate-100 to-slate-200 pt-4 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 flex flex-col items-center justify-center p-2 sm:p-4 md:p-6 overflow-auto transition-colors duration-300">
+    <div className="min-h-screen bg-gradient-to-b from-slate-50 via-slate-100 to-slate-200 pt-4 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 flex flex-col items-center justify-start md:justify-center p-2 sm:p-4 md:p-6 overflow-auto transition-colors duration-300">
       {/* Animated Title */}
 
 
-      <div className="flex flex-col-reverse md:flex-row gap-2 sm:gap-4 md:gap-6 w-full max-w-6xl relative z-10 px-2 sm:px-4 md:px-6">
+      <div className="flex flex-col-reverse md:flex-row gap-4 sm:gap-6 w-full max-w-6xl relative z-10 px-2 sm:px-4 md:px-6">
         {/* Main Join/Host Form */}
         <motion.div
           initial={{ x: 50, opacity: 0 }}
@@ -618,7 +618,10 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
             transition={{ duration: 0.5 }}
             className="flex-1 relative z-10"
           >
-            <Card className="backdrop-blur-md bg-white/90 dark:bg-slate-800/90 shadow-xl h-full max-h-[500px] flex flex-col border border-teal-500/30 shadow-[0_0_15px_rgba(20,184,166,0.1)]">
+            <Card className={cn(
+              "backdrop-blur-md bg-white/90 dark:bg-slate-800/90 shadow-xl flex flex-col border border-teal-500/30 shadow-[0_0_15px_rgba(20,184,166,0.1)]",
+              activeRooms.length === 0 ? "h-auto" : "h-full max-h-[500px]"
+            )}>
               <CardHeader>
                 <div className="flex justify-between items-center">
                   <CardTitle className="text-teal-400">{t('joinView.roomsList')}</CardTitle>
@@ -641,9 +644,23 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
               </CardHeader>
               <CardContent className="flex-1 overflow-auto">
                 {activeRooms.length === 0 ? (
-                  <div className="text-center py-8 text-slate-500 dark:text-gray-400">
-                    <p className="text-sm">{t('joinView.noRooms')}</p>
-                    <p className="text-xs mt-1">{t('joinView.createNewRoom')}</p>
+                  <div className="text-center py-6 text-slate-500 dark:text-gray-400 space-y-4">
+                    <div className="flex justify-center">
+                      <FaGamepad size={48} className="text-slate-400 dark:text-slate-600" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium">{t('joinView.noRooms')}</p>
+                      <p className="text-xs mt-1">{t('joinView.createNewRoom')}</p>
+                    </div>
+                    <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                      <Button
+                        onClick={() => setMode('host')}
+                        className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-400 hover:to-pink-400 hover:shadow-[0_0_15px_rgba(168,85,247,0.5)]"
+                      >
+                        <FaCrown className="mr-2" />
+                        {t('joinView.createRoom')}
+                      </Button>
+                    </motion.div>
                   </div>
                 ) : (
                   <div className="space-y-2">
