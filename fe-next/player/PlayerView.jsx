@@ -290,7 +290,7 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
           setRemainingTime(message.remainingTime);
 
           // CRITICAL FIX: If we receive time updates but game isn't active yet,
-          // it means the server started the timer while we were still in countdown.
+          // it means the server started the timer before our game state was set.
           // Force the game to active state since the timer is running.
           if (!gameActive && message.remainingTime > 0 && letterGrid) {
             console.log('[PLAYER] Timer started on server, activating game (remainingTime:', message.remainingTime, ')');

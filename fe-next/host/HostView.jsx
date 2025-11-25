@@ -18,7 +18,6 @@ import SlotMachineText from '../components/SlotMachineText';
 import ResultsPlayerCard from '../components/results/ResultsPlayerCard';
 import RoomChat from '../components/RoomChat';
 import GoRipplesAnimation from '../components/GoRipplesAnimation';
-import CountdownAnimation from '../components/CountdownAnimation';
 import CircularTimer from '../components/CircularTimer';
 import HostLiveResults from '../components/HostLiveResults';
 import TournamentStandings from '../components/TournamentStandings';
@@ -51,7 +50,6 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
   const [playerWordCounts, setPlayerWordCounts] = useState({});
   const [playerScores, setPlayerScores] = useState({});
   const [playerAchievements, setPlayerAchievements] = useState({});
-  const [showCountdown, setShowCountdown] = useState(false);
   const [showStartAnimation, setShowStartAnimation] = useState(false);
   const [showAdvancedSettings, setShowAdvancedSettings] = useState(false);
   const [showExitConfirm, setShowExitConfirm] = useState(false);
@@ -480,14 +478,7 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
       return;
     }
 
-    // Regular game mode - show countdown first
-    setShowCountdown(true);
-  };
-
-  const handleCountdownComplete = () => {
-    setShowCountdown(false);
-
-    // Actually start the game after countdown
+    // Regular game mode - start the game immediately (no countdown)
     const difficultyConfig = DIFFICULTIES[difficulty];
     const newTable = generateRandomTable(difficultyConfig.rows, difficultyConfig.cols, roomLanguage);
     setTableData(newTable);
@@ -711,11 +702,6 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-50 via-slate-100 to-slate-200 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 flex flex-col items-center p-2 sm:p-4 md:p-6 lg:p-8 overflow-auto transition-colors duration-300">
-
-      {/* Countdown Animation (3-2-1) */}
-      {showCountdown && (
-        <CountdownAnimation onComplete={handleCountdownComplete} />
-      )}
 
       {/* GO Animation */}
       {showStartAnimation && (
