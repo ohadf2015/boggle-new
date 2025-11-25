@@ -288,7 +288,7 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
       {/* Animated Title */}
 
 
-      <div className="flex flex-col-reverse md:flex-row gap-4 sm:gap-6 w-full max-w-6xl relative z-10 px-2 sm:px-4 md:px-6">
+      <div className="flex flex-col-reverse md:flex-row gap-2 sm:gap-4 md:gap-6 w-full max-w-6xl relative z-10 px-2 sm:px-4 md:px-6">
         {/* Main Join/Host Form */}
         <motion.div
           initial={{ x: 50, opacity: 0 }}
