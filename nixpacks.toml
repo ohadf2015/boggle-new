@@ -1,16 +1,25 @@
 [phases.setup]
 nixPkgs = ['nodejs_20']
+aptPkgs = []
 
 [phases.install]
 dependsOn = ['setup']
-cmds = ['npm install']
+cmds = [
+    'cd fe-next',
+    'npm ci --prefer-offline --no-audit --no-fund --loglevel=error'
+]
+cacheDirectories = ['fe-next/node_modules', 'fe-next/.next/cache']
 
 [phases.build]
 dependsOn = ['install']
-cmds = ['npm run build']
+cmds = [
+    'cd fe-next',
+    'npm run build --loglevel=error'
+]
 
 [start]
-cmd = 'npm start'
+cmd = 'cd fe-next && npm start'
 
 [variables]
-NIXPACKS_BUILD_DIR = 'fe-next'
+NODE_ENV = 'production'
+NPM_CONFIG_LOGLEVEL = 'error'

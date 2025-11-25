@@ -1,0 +1,66 @@
+# Dependencies
+node_modules/
+fe-next/node_modules/
+package-lock.json
+fe-next/package-lock.json
+
+# Build outputs
+build/
+dist/
+fe-next/.next/
+fe-next/out/
+fe-next/build/
+
+# Cache directories
+.cache/
+.npm/
+.eslintcache
+fe-next/.next/cache/
+
+# Test files
+coverage/
+__tests__/
+*.test.js
+*.test.ts
+*.spec.js
+*.spec.ts
+
+# Development files
+.git/
+.github/
+.vscode/
+.idea/
+
+# Documentation
+*.md
+docs/
+BUILD.md
+DEPLOYMENT.md
+RAILWAY.md
+README.md
+
+# Environment and config
+.env*
+!.env.example
+.DS_Store
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+logs/
+
+# Docker (not needed for Railway)
+Dockerfile
+docker-compose.yml
+.dockerignore
+
+# Misc
+.husky/
+.git/
+*.swp
+*.swo
+*~
+.tmp/
+temp/
