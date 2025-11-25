@@ -276,14 +276,16 @@ export default function GamePage() {
             if (roomFromUrl) {
                 setGameCode(roomFromUrl);
                 setPrefilledRoomCode(roomFromUrl);
-                // If player has saved username and comes via invitation link, mark for auto-join
-                if (savedUsername && savedUsername.trim()) {
-                    setShouldAutoJoin(true);
-                }
                 // Clear the old session if joining a different room via invitation
                 if (savedSession?.gameCode && savedSession.gameCode !== roomFromUrl) {
                     clearSession();
                     joiningNewRoomViaInvitation = true;
+                }
+                // If player has saved username and comes via invitation link, mark for auto-join
+                // Set username first to ensure it's available when auto-join triggers
+                if (savedUsername && savedUsername.trim()) {
+                    setUsername(savedUsername);
+                    setShouldAutoJoin(true);
                 }
             } else if (savedSession?.gameCode) {
                 // No URL room, try to reconnect to saved session
@@ -293,7 +295,10 @@ export default function GamePage() {
 
             // When joining a new room via invitation, use localStorage username
             // Otherwise, prefer session username (for reconnection)
-            if (joiningNewRoomViaInvitation) {
+            // Note: For invitation links with savedUsername, username is already set above
+            if (roomFromUrl && savedUsername) {
+                // Already set above for auto-join
+            } else if (joiningNewRoomViaInvitation) {
                 if (savedUsername) {
                     setUsername(savedUsername);
                 }
@@ -550,8 +555,14 @@ export default function GamePage() {
 
         // Player has prefilled room code and saved username - auto-join
         if (prefilledRoomCode && username && username.trim()) {
-            sendMessage({ action: 'join', gameCode: prefilledRoomCode, username });
-            setShouldAutoJoin(false); // Prevent re-triggering
+            // Add a small delay to ensure all states are settled and WebSocket is fully ready
+            const autoJoinTimeout = setTimeout(() => {
+                if (ws && ws.readyState === WebSocket.OPEN && !isActive) {
+                    sendMessage({ action: 'join', gameCode: prefilledRoomCode, username });
+                    setShouldAutoJoin(false); // Prevent re-triggering
+                }
+            }, 200);
+            return () => clearTimeout(autoJoinTimeout);
         }
     }, [shouldAutoJoin, prefilledRoomCode, username, isActive, attemptingReconnect, ws, sendMessage]);
 

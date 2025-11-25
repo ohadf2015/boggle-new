@@ -16,7 +16,7 @@ import gsap from 'gsap';
 import GridComponent from '../components/GridComponent';
 import { applyHebrewFinalLetters } from '../utils/utils';
 import RoomChat from '../components/RoomChat';
-import CubeCrashAnimation from '../components/CubeCrashAnimation';
+import GoRipplesAnimation from '../components/GoRipplesAnimation';
 import CircularTimer from '../components/CircularTimer';
 import { copyJoinUrl, shareViaWhatsApp, getJoinUrl } from '../utils/share';
 import ShareButton from '../components/ShareButton';
@@ -628,6 +628,25 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
               </Card>
             </motion.div>
 
+            {/* Shuffling Letter Grid Preview */}
+            {shufflingGrid && (
+              <motion.div
+                initial={{ y: 20, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ delay: 0.15 }}
+              >
+                <Card className="bg-slate-900/95 dark:bg-slate-900/95 backdrop-blur-md shadow-2xl border border-cyan-500/40 shadow-[0_0_25px_rgba(6,182,212,0.2)] overflow-hidden">
+                  <div className="p-4 flex flex-col items-center justify-center bg-slate-900/90">
+                    <GridComponent
+                      grid={shufflingGrid}
+                      interactive={false}
+                      className="w-full max-w-xs"
+                    />
+                  </div>
+                </Card>
+              </motion.div>
+            )}
+
             {/* Players List */}
             <motion.div
               initial={{ y: 20, opacity: 0 }}
@@ -776,7 +795,7 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
 
       {/* Start Game Animation */}
       {showStartAnimation && (
-        <CubeCrashAnimation onComplete={() => setShowStartAnimation(false)} />
+        <GoRipplesAnimation onComplete={() => setShowStartAnimation(false)} />
       )}
 
       {/* Top Bar with Title and Exit Button */}
