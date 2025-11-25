@@ -1,4 +1,4 @@
-import { hebrewLetters, swedishLetters, japaneseLetters, DIFFICULTIES, DEFAULT_DIFFICULTY } from "./consts";
+import { hebrewLetters, swedishLetters, japaneseLetters, DIFFICULTIES, DEFAULT_DIFFICULTY } from "./consts.js";
 
 // Utilities for LexiClash game
 
