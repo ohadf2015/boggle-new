@@ -273,6 +273,7 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
     };
 
     const handleValidationComplete = (data) => {
+      console.log('[HOST] Received validationComplete event:', data);
       setFinalScores(data.scores);
       setShowValidation(false);
       toast.success(t('hostView.validationComplete'), {
@@ -595,6 +596,11 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
       });
     });
 
+    console.log('[HOST] Submitting validation:', {
+      validationArrayLength: validationArray.length,
+      validations: validationArray
+    });
+
     socket.emit('validateWords', {
       validations: validationArray,
     });
@@ -739,77 +745,109 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
 
       {/* Validation Modal */}
       <Dialog open={showValidation} onOpenChange={setShowValidation}>
-        <DialogContent className="max-w-4xl max-h-[90vh] overflow-auto bg-white dark:bg-slate-800 border-indigo-500/30">
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-hidden bg-gradient-to-b from-indigo-50 to-purple-50 dark:from-slate-900 dark:to-indigo-950">
           <DialogHeader>
-            <DialogTitle className="text-center text-2xl sm:text-3xl text-indigo-600 dark:text-indigo-400 font-bold">
-              ✅ {t('hostView.validation')}
+            <DialogTitle className="text-center text-3xl sm:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600 dark:from-indigo-400 dark:to-purple-400 flex items-center justify-center gap-3">
+              ✓ {t('hostView.validation')}
             </DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
-            <p className="text-center text-muted-foreground">
-              {t('hostView.validateIntro')}
-            </p>
-            <p className="text-center text-sm text-orange-600 font-bold">
-              ⚠ {t('hostView.duplicateWarning')}
-            </p>
+            <div className="text-center space-y-2 bg-white/50 dark:bg-slate-800/50 p-4 rounded-lg border border-indigo-200 dark:border-indigo-800">
+              <p className="text-sm text-slate-700 dark:text-slate-300">
+                {t('hostView.validateIntro')}
+              </p>
+              <p className="text-sm font-semibold text-orange-600 dark:text-orange-400 flex items-center justify-center gap-2">
+                <span className="text-lg">⚠</span> {t('hostView.duplicateWarning')}
+              </p>
+            </div>
 
             {showValidation && (() => {
               const uniqueWords = getUniqueWords();
+              const validCount = uniqueWords.filter(item => {
+                const isValid = validations[item.word] !== undefined ? validations[item.word] : true;
+                return isValid && item.playerCount === 1;
+              }).length;
+              const duplicateCount = uniqueWords.filter(item => item.playerCount > 1).length;
 
               return (
                 <div className="space-y-3">
-                  <p className="text-center text-sm text-muted-foreground">
-                    {t('hostView.totalWords')} {uniqueWords.length}
-                  </p>
+                  <div className="flex justify-center gap-4 text-sm">
+                    <div className="px-4 py-2 bg-indigo-100 dark:bg-indigo-900/30 rounded-full border border-indigo-300 dark:border-indigo-700">
+                      <span className="font-semibold text-indigo-700 dark:text-indigo-300">
+                        {t('hostView.totalWords')} {uniqueWords.length}
+                      </span>
+                    </div>
+                    <div className="px-4 py-2 bg-green-100 dark:bg-green-900/30 rounded-full border border-green-300 dark:border-green-700">
+                      <span className="font-semibold text-green-700 dark:text-green-300">
+                        ✓ {validCount}
+                      </span>
+                    </div>
+                    {duplicateCount > 0 && (
+                      <div className="px-4 py-2 bg-orange-100 dark:bg-orange-900/30 rounded-full border border-orange-300 dark:border-orange-700">
+                        <span className="font-semibold text-orange-700 dark:text-orange-300">
+                          ⚠ {duplicateCount}
+                        </span>
+                      </div>
+                    )}
+                  </div>
 
-                  <div className="max-h-[50vh] overflow-auto space-y-2">
+                  <div className="max-h-[50vh] overflow-auto space-y-2 px-1">
                     {uniqueWords.map((item, index) => {
                       const isDuplicate = item.playerCount > 1;
                       const isAutoValidated = item.autoValidated;
                       const isValid = validations[item.word] !== undefined ? validations[item.word] : true;
 
                       return (
-                        <div
+                        <motion.div
                           key={index}
+                          initial={{ opacity: 0, x: -20 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ delay: Math.min(index * 0.02, 0.5) }}
                           className={cn(
-                            "flex items-center gap-3 p-3 rounded-lg transition-colors border",
+                            "flex items-center gap-3 p-3 rounded-xl transition-all border-2",
                             isDuplicate
-                              ? "bg-orange-50 dark:bg-orange-900/20 hover:bg-orange-100 dark:hover:bg-orange-900/30 border-orange-200 dark:border-orange-700"
+                              ? "bg-gradient-to-r from-orange-50 to-red-50 dark:from-orange-900/20 dark:to-red-900/20 border-orange-300 dark:border-orange-700"
                               : isAutoValidated
-                                ? "bg-cyan-50 dark:bg-cyan-900/20 border-cyan-200 dark:border-cyan-700"
-                                : "hover:bg-gray-50 dark:hover:bg-slate-700 border-gray-200 dark:border-slate-600"
+                                ? "bg-gradient-to-r from-cyan-50 to-blue-50 dark:from-cyan-900/20 dark:to-blue-900/20 border-cyan-300 dark:border-cyan-700"
+                                : isValid
+                                  ? "bg-white dark:bg-slate-800 border-indigo-200 dark:border-slate-600 hover:border-indigo-400 dark:hover:border-indigo-500"
+                                  : "bg-slate-100 dark:bg-slate-700 border-slate-300 dark:border-slate-500 opacity-60"
                           )}
                         >
                           <Checkbox
                             checked={isValid}
                             onCheckedChange={() => toggleWordValidation(null, item.word)}
                             disabled={isDuplicate}
-                            className={cn(isDuplicate && "opacity-50")}
+                            className={cn(
+                              "w-6 h-6 data-[state=checked]:bg-gradient-to-r data-[state=checked]:from-indigo-600 data-[state=checked]:to-purple-600",
+                              isDuplicate && "opacity-30 cursor-not-allowed"
+                            )}
                           />
-                          <div className="flex items-center gap-2 flex-1">
+                          <div className="flex items-center gap-2 flex-1 min-w-0">
                             <span className={cn(
-                              "text-lg font-medium",
-                              isDuplicate && "line-through text-gray-500"
+                              "text-lg font-bold",
+                              isDuplicate && "line-through text-gray-400 dark:text-gray-600",
+                              !isDuplicate && !isValid && "text-gray-400 dark:text-gray-600"
                             )}>
                               {applyHebrewFinalLetters(item.word)}
                             </span>
                             {isDuplicate && (
-                              <Badge variant="destructive" className="bg-orange-500">
-                                ⚠ {item.playerCount}{' '}{t('joinView.players')}
+                              <Badge className="bg-gradient-to-r from-orange-500 to-red-500 text-white border-0 shadow-md">
+                                ⚠ {item.playerCount} {t('joinView.players')}
                               </Badge>
                             )}
                             {isAutoValidated && !isDuplicate && (
-                              <Badge variant="success" className="bg-cyan-500 text-white">
+                              <Badge className="bg-gradient-to-r from-cyan-500 to-blue-500 text-white border-0 shadow-md">
                                 ✓ {t('hostView.autoValidated')}
                               </Badge>
                             )}
                             {item.playerCount === 1 && (
-                              <span className="text-sm text-muted-foreground ml-auto">
+                              <span className="text-sm font-medium text-slate-500 dark:text-slate-400 ml-auto truncate">
                                 {item.players[0]}
                               </span>
                             )}
                           </div>
-                        </div>
+                        </motion.div>
                       );
                     })}
                   </div>
@@ -817,12 +855,12 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
               );
             })()}
           </div>
-          <DialogFooter>
+          <DialogFooter className="mt-4">
             <Button
               onClick={submitValidation}
-              className="w-full h-12 text-lg font-bold bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-purple-600 hover:to-indigo-600"
+              className="w-full h-14 text-xl font-bold bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 hover:from-indigo-700 hover:via-purple-700 hover:to-pink-700 shadow-lg hover:shadow-xl transition-all duration-200 text-white"
             >
-              {t('hostView.submitValidation')}
+              {t('hostView.submitValidation')} →
             </Button>
           </DialogFooter>
         </DialogContent>

@@ -525,10 +525,7 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
       e.preventDefault();
       e.stopPropagation();
     }
-    console.log('[PLAYER] Exit button clicked');
-    console.log('[PLAYER] Current showExitConfirm state:', showExitConfirm);
     setShowExitConfirm(true);
-    console.log('[PLAYER] Setting showExitConfirm to true');
   };
 
   const confirmExitRoom = () => {
@@ -696,6 +693,31 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
             </motion.div>
           </div>
         </div>
+
+        {/* Exit Confirmation Dialog */}
+        <AlertDialog open={showExitConfirm} onOpenChange={setShowExitConfirm}>
+          <AlertDialogContent className="bg-white dark:bg-slate-800 border-red-500/30">
+            <AlertDialogHeader>
+              <AlertDialogTitle className="text-slate-900 dark:text-white">
+                {t('playerView.exitConfirmation')}
+              </AlertDialogTitle>
+              <AlertDialogDescription className="text-slate-600 dark:text-gray-300">
+                {t('playerView.exitWarning')}
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel className="bg-slate-100 dark:bg-slate-700 text-slate-900 dark:text-white border-slate-300 dark:border-slate-600">
+                {t('common.cancel')}
+              </AlertDialogCancel>
+              <AlertDialogAction
+                onClick={confirmExitRoom}
+                className="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white"
+              >
+                {t('common.confirm')}
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </div>
     );
   }
@@ -912,6 +934,31 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
             </DialogFooter>
           </DialogContent>
         </Dialog>
+
+        {/* Exit Confirmation Dialog */}
+        <AlertDialog open={showExitConfirm} onOpenChange={setShowExitConfirm}>
+          <AlertDialogContent className="bg-white dark:bg-slate-800 border-red-500/30">
+            <AlertDialogHeader>
+              <AlertDialogTitle className="text-slate-900 dark:text-white">
+                {t('playerView.exitConfirmation')}
+              </AlertDialogTitle>
+              <AlertDialogDescription className="text-slate-600 dark:text-gray-300">
+                {t('playerView.exitWarning')}
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel className="bg-slate-100 dark:bg-slate-700 text-slate-900 dark:text-white border-slate-300 dark:border-slate-600">
+                {t('common.cancel')}
+              </AlertDialogCancel>
+              <AlertDialogAction
+                onClick={confirmExitRoom}
+                className="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white"
+              >
+                {t('common.confirm')}
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </div>
     );
   }

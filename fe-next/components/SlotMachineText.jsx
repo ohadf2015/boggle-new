@@ -58,7 +58,9 @@ const SlotMachineText = ({ text, duration = 1000 }) => {
                     0 0 ${15 + glowIntensity * 30}px rgba(236, 72, 153, ${0.1 + glowIntensity * 0.3})
                 `,
                 fontWeight: 700,
-                letterSpacing: '0.05em'
+                letterSpacing: '0.05em',
+                verticalAlign: 'middle',
+                lineHeight: 1
             }}
         >
             {displayedText}

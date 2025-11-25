@@ -52,6 +52,30 @@ const { checkRateLimit, resetRateLimit } = require('./utils/rateLimiter');
 const redisClient = require('./redisClient');
 const tournamentManager = require('./modules/tournamentManager');
 
+// Avatar generation constants
+const AVATAR_COLORS = [
+  '#FF6B6B', '#4ECDC4', '#45B7D1', '#FFA07A', '#98D8C8',
+  '#F7DC6F', '#BB8FCE', '#85C1E2', '#F8B739', '#52B788',
+  '#FF8FAB', '#6BCF7F', '#FFB347', '#9D84B7', '#FF6F61'
+];
+
+const AVATAR_EMOJIS = [
+  '🐶', '🐱', '🐭', '🐹', '🐰', '🦊', '🐻', '🐼',
+  '🐨', '🐯', '🦁', '🐮', '🐷', '🐸', '🐵', '🐔',
+  '🐧', '🐦', '🐤', '🦆', '🦅', '🦉', '🦇', '🐺',
+  '🐗', '🐴', '🦄', '🐝', '🐛', '🦋', '🐌', '🐞'
+];
+
+/**
+ * Generate a random avatar with emoji and color
+ */
+const generateRandomAvatar = () => {
+  return {
+    color: AVATAR_COLORS[Math.floor(Math.random() * AVATAR_COLORS.length)],
+    emoji: AVATAR_EMOJIS[Math.floor(Math.random() * AVATAR_EMOJIS.length)]
+  };
+};
+
 /**
  * Initialize Socket.IO event handlers
  * @param {Server} io - Socket.IO server instance
@@ -97,7 +121,7 @@ function initializeSocketHandlers(io) {
 
       // Add host as first user
       addUserToGame(gameCode, hostUsername || 'Host', socket.id, {
-        avatar,
+        avatar: avatar || generateRandomAvatar(),
         isHost: true,
         playerId
       });
@@ -198,7 +222,7 @@ function initializeSocketHandlers(io) {
 
       // Add new user
       addUserToGame(gameCode, username, socket.id, {
-        avatar,
+        avatar: avatar || generateRandomAvatar(),
         isHost: false,
         playerId
       });
@@ -402,7 +426,7 @@ function initializeSocketHandlers(io) {
 
     // Handle validate words (host validation)
     socket.on('validateWords', (data) => {
-      const { validatedScores } = data;
+      const { validations } = data || {};
 
       const gameCode = getGameBySocketId(socket.id);
       if (!gameCode) return;
@@ -410,11 +434,41 @@ function initializeSocketHandlers(io) {
       const game = getGame(gameCode);
       if (!game || game.hostSocketId !== socket.id) return;
 
+      // Validate that validations exists and is an array
+      if (!validations || !Array.isArray(validations)) {
+        console.error(`[SOCKET] Invalid validations received for game ${gameCode}:`, validations);
+        return;
+      }
+
       // Clear auto-validation timeout since host is manually validating
       if (game.validationTimeout) {
         clearTimeout(game.validationTimeout);
         game.validationTimeout = null;
         console.log(`[SOCKET] Cleared auto-validation timeout for game ${gameCode} - host validated manually`);
+      }
+
+      // Create a map of valid words for quick lookup
+      const validWords = new Set(
+        validations.filter(v => v.isValid).map(v => v.word)
+      );
+
+      // Calculate scores for each player based on validated words
+      const validatedScores = {};
+      const playerWords = game.playerWords || {};
+
+      for (const [username, words] of Object.entries(playerWords)) {
+        const uniqueWords = [...new Set(words)];
+        let totalScore = 0;
+
+        for (const word of uniqueWords) {
+          if (validWords.has(word)) {
+            // Calculate score: word length - 1
+            const score = Math.max(0, word.length - 1);
+            totalScore += score;
+          }
+        }
+
+        validatedScores[username] = totalScore;
       }
 
       // Update scores
@@ -429,6 +483,13 @@ function initializeSocketHandlers(io) {
         allWords: game.playerWords?.[username] || []
       })).sort((a, b) => b.score - a.score);
 
+      // Log validation results
+      console.log(`[SOCKET] Validation complete for game ${gameCode}:`, {
+        totalPlayers: Object.keys(validatedScores).length,
+        scores: validatedScores,
+        validWordsCount: validWords.size
+      });
+
       // Broadcast validated scores
       broadcastToRoom(io, getGameRoom(gameCode), 'validatedScores', {
         scores: validatedScores,
@@ -436,9 +497,11 @@ function initializeSocketHandlers(io) {
       });
 
       // Send validation complete event to host with array format
-      safeEmit(socket, 'validationComplete', {
+      const emitSuccess = safeEmit(socket, 'validationComplete', {
         scores: scoresArray
       });
+
+      console.log(`[SOCKET] Sent validationComplete to host for game ${gameCode} - ${emitSuccess ? 'SUCCESS' : 'FAILED'}`);
     });
 
     // Handle reset game
