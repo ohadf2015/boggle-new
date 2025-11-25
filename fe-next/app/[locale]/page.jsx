@@ -269,25 +269,42 @@ export default function GamePage() {
             const savedUsername = localStorage.getItem('boggle_username') || '';
             const savedSession = getSession();
 
-            if (savedSession?.gameCode) {
-                setGameCode(savedSession.gameCode);
-                setAttemptingReconnect(true);
-            } else if (roomFromUrl) {
+            // Track if we're joining a new room via invitation
+            let joiningNewRoomViaInvitation = false;
+
+            // URL room takes priority over saved session (explicit invitation)
+            if (roomFromUrl) {
                 setGameCode(roomFromUrl);
                 setPrefilledRoomCode(roomFromUrl);
                 // If player has saved username and comes via invitation link, mark for auto-join
                 if (savedUsername && savedUsername.trim()) {
                     setShouldAutoJoin(true);
                 }
+                // Clear the old session if joining a different room via invitation
+                if (savedSession?.gameCode && savedSession.gameCode !== roomFromUrl) {
+                    clearSession();
+                    joiningNewRoomViaInvitation = true;
+                }
+            } else if (savedSession?.gameCode) {
+                // No URL room, try to reconnect to saved session
+                setGameCode(savedSession.gameCode);
+                setAttemptingReconnect(true);
             }
 
-            if (savedSession?.username) {
+            // When joining a new room via invitation, use localStorage username
+            // Otherwise, prefer session username (for reconnection)
+            if (joiningNewRoomViaInvitation) {
+                if (savedUsername) {
+                    setUsername(savedUsername);
+                }
+            } else if (savedSession?.username) {
                 setUsername(savedSession.username);
             } else if (savedUsername) {
                 setUsername(savedUsername);
             }
 
-            if (savedSession?.roomName) {
+            // Only restore room name if not joining a new room via invitation
+            if (!joiningNewRoomViaInvitation && savedSession?.roomName) {
                 setRoomName(savedSession.roomName);
             }
         };
