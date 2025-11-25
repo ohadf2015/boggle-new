@@ -109,34 +109,76 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
         if (result.path && result.path.length > 0) {
           setShufflingGrid(result.grid);
 
+          // Broadcast grid to all players immediately
+          if (socket) {
+            socket.emit('broadcastShufflingGrid', {
+              grid: result.grid,
+              highlightedCells: []
+            });
+          }
+
           // Animate letter-by-letter selection
           let currentIndex = 0;
           const animateSelection = () => {
             if (currentIndex < result.path.length) {
-              setHighlightedCells(result.path.slice(0, currentIndex + 1));
+              const newHighlightedCells = result.path.slice(0, currentIndex + 1);
+              setHighlightedCells(newHighlightedCells);
+
+              // Broadcast highlighted cells to all players
+              if (socket) {
+                socket.emit('broadcastShufflingGrid', {
+                  grid: result.grid,
+                  highlightedCells: newHighlightedCells
+                });
+              }
+
               currentIndex++;
               setTimeout(animateSelection, 100); // 100ms per letter
             } else {
               // Clear highlight after completing the word
               setTimeout(() => {
                 setHighlightedCells([]);
+                if (socket) {
+                  socket.emit('broadcastShufflingGrid', {
+                    grid: result.grid,
+                    highlightedCells: []
+                  });
+                }
               }, 500);
             }
           };
           animateSelection();
         } else {
           // Fallback to random grid if name couldn't be placed
-          setShufflingGrid(generateRandomTable(rows, cols, currentLang));
+          const randomGrid = generateRandomTable(rows, cols, currentLang);
+          setShufflingGrid(randomGrid);
           setHighlightedCells([]);
+
+          // Broadcast random grid to all players
+          if (socket) {
+            socket.emit('broadcastShufflingGrid', {
+              grid: randomGrid,
+              highlightedCells: []
+            });
+          }
         }
       } else {
-        setShufflingGrid(generateRandomTable(rows, cols, currentLang));
+        const randomGrid = generateRandomTable(rows, cols, currentLang);
+        setShufflingGrid(randomGrid);
         setHighlightedCells([]);
+
+        // Broadcast random grid to all players
+        if (socket) {
+          socket.emit('broadcastShufflingGrid', {
+            grid: randomGrid,
+            highlightedCells: []
+          });
+        }
       }
     }, 2000);
 
     return () => clearInterval(interval);
-  }, [gameStarted, difficulty, roomLanguage, language, playersReady]);
+  }, [gameStarted, difficulty, roomLanguage, language, playersReady, socket]);
 
   // Prevent accidental page refresh/close only when there are players or game is active
   useEffect(() => {

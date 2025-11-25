@@ -598,6 +598,21 @@ function initializeSocketHandlers(io) {
     socket.on('ping', () => {
       socket.emit('pong');
     });
+
+    // Handle shuffling grid broadcast from host
+    socket.on('broadcastShufflingGrid', (data) => {
+      const gameCode = getGameBySocketId(socket.id);
+      if (!gameCode) return;
+
+      const game = getGame(gameCode);
+      if (!game || game.hostSocketId !== socket.id) return;
+
+      // Broadcast the shuffling grid to all players in the room (except host)
+      broadcastToRoomExceptSender(socket, getGameRoom(gameCode), 'shufflingGridUpdate', {
+        grid: data.grid,
+        highlightedCells: data.highlightedCells || []
+      });
+    });
   });
 
   return io;
