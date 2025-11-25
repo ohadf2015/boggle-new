@@ -324,9 +324,27 @@ const addUserToGame = async (gameCode, username, ws) => {
 
       console.log(`[JOIN] Player ${username} reconnected to game ${gameCode}`);
     } else if(game.users[username]) {
-      // Username exists in active users - truly taken by someone else
-      ws.send(JSON.stringify({ action: "usernameTaken" }));
-      return;
+      // Username exists in active users - check if the existing connection is actually alive
+      const existingWs = game.users[username];
+      if (existingWs && existingWs.readyState === 1) { // 1 = OPEN
+        // Existing connection is still alive - username is truly taken
+        ws.send(JSON.stringify({ action: "usernameTaken" }));
+        return;
+      } else {
+        // Existing connection is dead/closing - allow reconnection
+        console.log(`[JOIN] Player ${username} reconnecting (old connection was dead/closing)`);
+
+        // Clean up old WebSocket references
+        if (existingWs) {
+          gameWs.delete(existingWs);
+          wsUsername.delete(existingWs);
+        }
+
+        // Update with new WebSocket
+        game.users[username] = ws;
+        gameWs.set(ws, gameCode);
+        wsUsername.set(ws, username);
+      }
     } else {
       console.log(`[JOIN] User ${username} joined game ${gameCode}`);
 
