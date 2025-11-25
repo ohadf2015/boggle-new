@@ -24,9 +24,10 @@ import { QRCodeSVG } from 'qrcode.react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '../components/ui/dialog';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '../components/ui/alert-dialog';
 import TournamentStandings from '../components/TournamentStandings';
+import SlotMachineText from '../components/SlotMachineText';
 
 const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) => {
-  const { t } = useLanguage();
+  const { t, dir } = useLanguage();
   const { socket } = useSocket();
   const inputRef = useRef(null);
   const wordListRef = useRef(null);
@@ -639,14 +640,19 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
                         initial={{ x: 50, opacity: 0 }}
                         animate={{ x: 0, opacity: 1 }}
                         transition={{ delay: index * 0.1 }}
-                        className={`flex items-center justify-between p-4 rounded-lg
+                        className={`flex items-center p-4 rounded-lg
                                 ${index === 0 ? 'bg-gradient-to-r from-yellow-500/80 to-orange-500/80 text-white shadow-lg border border-yellow-400/50' :
                             index === 1 ? 'bg-gradient-to-r from-gray-400/80 to-gray-500/80 text-white shadow-md border border-gray-400/50' :
                               index === 2 ? 'bg-gradient-to-r from-orange-500/80 to-orange-600/80 text-white shadow-md border border-orange-400/50' :
                                 'bg-slate-100 dark:bg-slate-700/50 text-slate-900 dark:text-white'}`}
-                        style={player.avatar?.color && index > 2 ? { background: `linear-gradient(to right, ${player.avatar.color}40, ${player.avatar.color}60)` } : {}}
+                        style={player.avatar?.color && index > 2 ? {
+                          background: `linear-gradient(to right, ${player.avatar.color}40, ${player.avatar.color}60)`,
+                          justifyContent: dir === 'rtl' ? 'flex-end' : 'flex-start'
+                        } : {
+                          justifyContent: dir === 'rtl' ? 'flex-end' : 'flex-start'
+                        }}
                       >
-                        <div className="flex items-center gap-3">
+                        <div className={`flex items-center gap-3 ${dir === 'rtl' ? 'flex-row-reverse' : ''} flex-1`}>
                           <div className="text-2xl font-bold min-w-[40px] text-center">
                             {index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : `#${index + 1}`}
                           </div>
@@ -655,9 +661,9 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
                               {player.avatar.emoji}
                             </div>
                           )}
-                          <div>
-                            <div className="font-bold flex items-center gap-2">
-                              {player.username}
+                          <div className="flex-1">
+                            <div className={`font-bold flex items-center gap-2 ${dir === 'rtl' ? 'flex-row-reverse' : ''}`}>
+                              <SlotMachineText text={player.username} />
                               {isMe && (
                                 <span className="text-xs bg-white/30 px-2 py-0.5 rounded-full">
                                   ({t('playerView.me')})
@@ -666,9 +672,9 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
                             </div>
                             <div className="text-sm opacity-75">{player.wordCount} {t('playerView.wordCount')}</div>
                           </div>
-                        </div>
-                        <div className="text-2xl font-bold">
-                          {player.score}
+                          <div className="text-2xl font-bold">
+                            {player.score}
+                          </div>
                         </div>
                       </motion.div>
                     );
@@ -819,13 +825,18 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
                           transition={{ delay: index * 0.05 }}
                         >
                           <Badge
-                            className="bg-gradient-to-r from-purple-500 to-pink-500 font-bold text-white px-3 py-2 text-base w-full justify-center shadow-[0_0_10px_rgba(168,85,247,0.3)]"
-                            style={avatar?.color ? { background: `linear-gradient(to right, ${avatar.color}, ${avatar.color}dd)` } : {}}
+                            className="bg-gradient-to-r from-purple-500 to-pink-500 font-bold text-white px-3 py-2 text-base w-full shadow-[0_0_10px_rgba(168,85,247,0.3)]"
+                            style={avatar?.color ? {
+                              background: `linear-gradient(to right, ${avatar.color}, ${avatar.color}dd)`,
+                              justifyContent: dir === 'rtl' ? 'flex-end' : 'flex-start'
+                            } : {
+                              justifyContent: dir === 'rtl' ? 'flex-end' : 'flex-start'
+                            }}
                           >
                             <div className="flex items-center gap-2">
                               {avatar?.emoji && <span className="text-lg">{avatar.emoji}</span>}
                               {isHost && <FaCrown className="text-yellow-300" />}
-                              <span>{playerUsername}</span>
+                              <SlotMachineText text={playerUsername} />
                               {isMe && (
                                 <span className="text-xs bg-white/30 px-2 py-0.5 rounded-full">
                                   ({t('playerView.me')})
@@ -1193,7 +1204,7 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
                       ${index === 0 ? 'bg-gradient-to-r from-yellow-500/90 to-orange-500/90 text-white shadow-lg shadow-yellow-500/30 border border-yellow-400/60' :
                         index === 1 ? 'bg-gradient-to-r from-gray-400/90 to-gray-500/90 text-white shadow-md shadow-gray-500/20 border border-gray-400/60' :
                           index === 2 ? 'bg-gradient-to-r from-orange-500/90 to-orange-600/90 text-white shadow-md shadow-orange-500/20 border border-orange-400/60' :
-                            'bg-slate-800/70 text-white border border-slate-700/80 hover:bg-slate-800/90'}`}
+                            'bg-slate-800/70 text-white border border-slate-700/80 hover:bg-slate-800/90'} ${dir === 'rtl' ? 'flex-row-reverse' : ''}`}
                     style={player.avatar?.color && index > 2 ? { background: `linear-gradient(to right, ${player.avatar.color}60, ${player.avatar.color}90)`, borderColor: `${player.avatar.color}80` } : {}}
                   >
                     <div className="w-12 h-12 rounded-full flex items-center justify-center font-bold text-xl bg-black/20 backdrop-blur-sm shadow-inner">
@@ -1205,8 +1216,8 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
                       </div>
                     )}
                     <div className="flex-1 min-w-0">
-                      <div className="font-bold truncate text-base flex items-center gap-2">
-                        {player.username}
+                      <div className={`font-bold truncate text-base flex items-center gap-2 ${dir === 'rtl' ? 'flex-row-reverse' : ''}`}>
+                        <SlotMachineText text={player.username} />
                         {isMe && (
                           <span className="text-xs bg-white/30 px-2 py-0.5 rounded-full">
                             ({t('playerView.me')})

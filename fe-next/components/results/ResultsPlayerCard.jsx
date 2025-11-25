@@ -45,10 +45,10 @@ const WordChip = ({ wordObj, index, playerCount, t }) => {
   );
 };
 
-const ResultsPlayerCard = ({ player, index, allPlayerWords, currentUsername }) => {
+const ResultsPlayerCard = ({ player, index, allPlayerWords }) => {
   const { t } = useLanguage();
-  // Auto-expand current player's card, collapse others
-  const [isWordsExpanded, setIsWordsExpanded] = useState(player.username === currentUsername);
+  // Auto-expand all players' words by default
+  const [isWordsExpanded, setIsWordsExpanded] = useState(true);
 
   // Calculate how many players found each word
   const getPlayerCountForWord = (word) => {

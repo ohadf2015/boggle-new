@@ -9,7 +9,7 @@ import { useLanguage } from './contexts/LanguageContext';
 import ResultsPlayerCard from './components/results/ResultsPlayerCard';
 import ResultsWinnerBanner from './components/results/ResultsWinnerBanner';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from './components/ui/alert-dialog';
-import { clearSession, getSession } from './utils/session';
+import { clearSession } from './utils/session';
 
 
 const LetterGrid = ({ letterGrid }) => {
@@ -35,10 +35,6 @@ const LetterGrid = ({ letterGrid }) => {
 const ResultsPage = ({ finalScores, letterGrid, gameCode, onReturnToRoom }) => {
   const { t } = useLanguage();
   const [showExitConfirm, setShowExitConfirm] = useState(false);
-
-  // Get current user's username from session
-  const session = getSession();
-  const currentUsername = session?.username;
 
   const handleExitRoom = () => {
     setShowExitConfirm(true);
@@ -156,7 +152,6 @@ const ResultsPage = ({ finalScores, letterGrid, gameCode, onReturnToRoom }) => {
               player={player}
               index={index}
               allPlayerWords={allPlayerWords}
-              currentUsername={currentUsername}
             />
           ))}
         </div>

@@ -514,7 +514,7 @@ function initializeSocketHandlers(io) {
 
       // Broadcast validated scores
       broadcastToRoom(io, getGameRoom(gameCode), 'validatedScores', {
-        scores: validatedScores,
+        scores: scoresArray,
         letterGrid: game.letterGrid
       });
 
@@ -925,7 +925,7 @@ function endGame(io, gameCode) {
       })).sort((a, b) => b.score - a.score);
 
       broadcastToRoom(io, getGameRoom(gameCode), 'validatedScores', {
-        scores: validatedScores,
+        scores: scoresArray,
         letterGrid: currentGame.letterGrid
       });
 
