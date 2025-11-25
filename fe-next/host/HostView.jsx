@@ -1503,7 +1503,8 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
                 </div>
               )}
             </Card>
-          </div>
+          )}
+        </div>
         )}
       </div>
 
