@@ -10,6 +10,7 @@ import { Card } from '../components/ui/card';
 import { Badge } from '../components/ui/badge';
 import { Checkbox } from '../components/ui/checkbox';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '../components/ui/dialog';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '../components/ui/alert-dialog';
 import GridComponent from '../components/GridComponent';
 import ShareButton from '../components/ShareButton';
 import SlotMachineText from '../components/SlotMachineText';
@@ -47,6 +48,7 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
   const [playerWordCounts, setPlayerWordCounts] = useState({});
   const [showStartAnimation, setShowStartAnimation] = useState(false);
   const [showAdvancedSettings, setShowAdvancedSettings] = useState(false);
+  const [showExitConfirm, setShowExitConfirm] = useState(false);
 
   // Host playing states
   const [hostPlaying, setHostPlaying] = useState(true); // Default: host plays
@@ -378,18 +380,20 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
   };
 
   const handleExitRoom = () => {
-    if (window.confirm(t('hostView.confirmExit'))) {
-      intentionalExitRef.current = true;
-      // Clear session cookie
-      clearSession();
-      // Send close room message to server first
-      ws.send(JSON.stringify({ action: 'closeRoom', gameCode }));
-      // Wait a bit for the message to be sent, then close and reload
-      setTimeout(() => {
-        ws.close();
-        window.location.reload();
-      }, 100);
-    }
+    setShowExitConfirm(true);
+  };
+
+  const confirmExitRoom = () => {
+    intentionalExitRef.current = true;
+    // Clear session cookie
+    clearSession();
+    // Send close room message to server first
+    ws.send(JSON.stringify({ action: 'closeRoom', gameCode }));
+    // Wait a bit for the message to be sent, then close and reload
+    setTimeout(() => {
+      ws.close();
+      window.location.reload();
+    }, 100);
   };
 
   const submitValidation = () => {
@@ -1105,6 +1109,31 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
           </div>
         )}
       </div>
+
+      {/* Exit Confirmation Dialog */}
+      <AlertDialog open={showExitConfirm} onOpenChange={setShowExitConfirm}>
+        <AlertDialogContent className="bg-white dark:bg-slate-800 border-red-500/30">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="text-slate-900 dark:text-white">
+              {t('hostView.confirmExit')}
+            </AlertDialogTitle>
+            <AlertDialogDescription className="text-slate-600 dark:text-gray-300">
+              {t('hostView.exitWarning')}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel className="bg-slate-100 dark:bg-slate-700 text-slate-900 dark:text-white border-slate-300 dark:border-slate-600">
+              {t('common.cancel')}
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={confirmExitRoom}
+              className="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white"
+            >
+              {t('common.confirm')}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };

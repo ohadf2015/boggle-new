@@ -1,4 +1,4 @@
-import React, { useMemo, useEffect } from 'react';
+import React, { useMemo, useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { FaTrophy, FaSignOutAlt } from 'react-icons/fa';
 import { Button } from './components/ui/button';
@@ -9,6 +9,7 @@ import { useLanguage } from './contexts/LanguageContext';
 import ResultsPodium from './components/results/ResultsPodium';
 import ResultsPlayerCard from './components/results/ResultsPlayerCard';
 import ResultsWinnerBanner from './components/results/ResultsWinnerBanner';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from './components/ui/alert-dialog';
 
 const LetterGrid = ({ letterGrid }) => {
   const { t } = useLanguage();
@@ -36,11 +37,14 @@ const LetterGrid = ({ letterGrid }) => {
 
 const ResultsPage = ({ finalScores, letterGrid, gameCode, onReturnToRoom, isHost = false }) => {
   const { t } = useLanguage();
+  const [showExitConfirm, setShowExitConfirm] = useState(false);
 
   const handleExitRoom = () => {
-    if (window.confirm(t('playerView.exitConfirmation'))) {
-      window.location.reload();
-    }
+    setShowExitConfirm(true);
+  };
+
+  const confirmExitRoom = () => {
+    window.location.reload();
   };
 
   const sortedScores = useMemo(() => {
@@ -224,6 +228,31 @@ const ResultsPage = ({ finalScores, letterGrid, gameCode, onReturnToRoom, isHost
           )}
         </Card>
       </motion.div>
+
+      {/* Exit Confirmation Dialog */}
+      <AlertDialog open={showExitConfirm} onOpenChange={setShowExitConfirm}>
+        <AlertDialogContent className="bg-white dark:bg-slate-800 border-red-500/30">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="text-slate-900 dark:text-white">
+              {t('playerView.exitConfirmation')}
+            </AlertDialogTitle>
+            <AlertDialogDescription className="text-slate-600 dark:text-gray-300">
+              {t('results.exitWarning')}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel className="bg-slate-100 dark:bg-slate-700 text-slate-900 dark:text-white border-slate-300 dark:border-slate-600">
+              {t('common.cancel')}
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={confirmExitRoom}
+              className="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white"
+            >
+              {t('common.confirm')}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };

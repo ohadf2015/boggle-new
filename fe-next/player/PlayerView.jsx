@@ -7,8 +7,8 @@ import { Badge } from '../components/ui/badge';
 import { AchievementBadge } from '../components/AchievementBadge';
 import { motion, AnimatePresence } from 'framer-motion';
 import confetti from 'canvas-confetti';
-import toast, { Toaster } from 'react-hot-toast';
-import { FaTrophy, FaTrash, FaDoorOpen, FaUsers, FaMousePointer, FaCrown, FaRandom, FaLink, FaWhatsapp, FaQrcode } from 'react-icons/fa';
+import toast from 'react-hot-toast';
+import { FaTrophy, FaDoorOpen, FaUsers, FaCrown, FaRandom, FaLink, FaWhatsapp, FaQrcode } from 'react-icons/fa';
 import { useWebSocket } from '../utils/WebSocketContext';
 import { clearSession } from '../utils/session';
 import { useLanguage } from '../contexts/LanguageContext';
@@ -22,6 +22,7 @@ import { copyJoinUrl, shareViaWhatsApp, getJoinUrl } from '../utils/share';
 import ShareButton from '../components/ShareButton';
 import { QRCodeSVG } from 'qrcode.react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '../components/ui/dialog';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '../components/ui/alert-dialog';
 
 const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) => {
   const { t } = useLanguage();
@@ -44,6 +45,7 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
   const [shufflingGrid, setShufflingGrid] = useState(null);
   const [gameLanguage, setGameLanguage] = useState(null);
   const [showQR, setShowQR] = useState(false);
+  const [showExitConfirm, setShowExitConfirm] = useState(false);
 
   // Track if player was in an active game session (to distinguish late joiners after game ended)
   const [wasInActiveGame, setWasInActiveGame] = useState(false);
@@ -448,12 +450,14 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
   };
 
   const handleExitRoom = () => {
-    if (window.confirm(t('playerView.exitConfirmation'))) {
-      intentionalExitRef.current = true;
-      clearSession();
-      ws.close();
-      window.location.reload();
-    }
+    setShowExitConfirm(true);
+  };
+
+  const confirmExitRoom = () => {
+    intentionalExitRef.current = true;
+    clearSession();
+    ws.close();
+    window.location.reload();
   };
 
   // Show waiting for results screen after game ends
@@ -1010,6 +1014,31 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
           </div>
         </div>
       </div>
+
+      {/* Exit Confirmation Dialog */}
+      <AlertDialog open={showExitConfirm} onOpenChange={setShowExitConfirm}>
+        <AlertDialogContent className="bg-white dark:bg-slate-800 border-red-500/30">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="text-slate-900 dark:text-white">
+              {t('playerView.exitConfirmation')}
+            </AlertDialogTitle>
+            <AlertDialogDescription className="text-slate-600 dark:text-gray-300">
+              {t('playerView.exitWarning')}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel className="bg-slate-100 dark:bg-slate-700 text-slate-900 dark:text-white border-slate-300 dark:border-slate-600">
+              {t('common.cancel')}
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={confirmExitRoom}
+              className="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white"
+            >
+              {t('common.confirm')}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div >
   );
 };
