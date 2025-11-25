@@ -19,7 +19,6 @@ import ResultsPlayerCard from '../components/results/ResultsPlayerCard';
 import RoomChat from '../components/RoomChat';
 import GoRipplesAnimation from '../components/GoRipplesAnimation';
 import CircularTimer from '../components/CircularTimer';
-import HostLiveResults from '../components/HostLiveResults';
 import TournamentStandings from '../components/TournamentStandings';
 import '../style/animation.scss';
 import { generateRandomTable, embedWordInGrid, applyHebrewFinalLetters } from '../utils/utils';
@@ -763,6 +762,11 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
 
             {showValidation && (() => {
               const uniqueWords = getUniqueWords();
+
+              // Separate words into auto-verified and non-auto-verified
+              const nonAutoVerifiedWords = uniqueWords.filter(item => !item.autoValidated);
+              const autoVerifiedWords = uniqueWords.filter(item => item.autoValidated);
+
               const validCount = uniqueWords.filter(item => {
                 const isValid = validations[item.word] !== undefined ? validations[item.word] : true;
                 return isValid && item.playerCount === 1;
@@ -792,17 +796,90 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
                   </div>
 
                   <div className="max-h-[50vh] overflow-auto space-y-2 px-1">
-                    {uniqueWords.map((item, index) => {
+                    {/* Non-Auto-Verified Words Section */}
+                    {nonAutoVerifiedWords.map((item, index) => {
                       const isDuplicate = item.playerCount > 1;
                       const isAutoValidated = item.autoValidated;
                       const isValid = validations[item.word] !== undefined ? validations[item.word] : true;
 
                       return (
                         <motion.div
-                          key={index}
+                          key={`non-auto-${index}`}
                           initial={{ opacity: 0, x: -20 }}
                           animate={{ opacity: 1, x: 0 }}
                           transition={{ delay: Math.min(index * 0.02, 0.5) }}
+                          className={cn(
+                            "flex items-center gap-3 p-3 rounded-xl transition-all border-2",
+                            isDuplicate
+                              ? "bg-gradient-to-r from-orange-50 to-red-50 dark:from-orange-900/20 dark:to-red-900/20 border-orange-300 dark:border-orange-700"
+                              : isAutoValidated
+                                ? "bg-gradient-to-r from-cyan-50 to-blue-50 dark:from-cyan-900/20 dark:to-blue-900/20 border-cyan-300 dark:border-cyan-700"
+                                : isValid
+                                  ? "bg-white dark:bg-slate-800 border-indigo-200 dark:border-slate-600 hover:border-indigo-400 dark:hover:border-indigo-500"
+                                  : "bg-slate-100 dark:bg-slate-700 border-slate-300 dark:border-slate-500 opacity-60"
+                          )}
+                        >
+                          <Checkbox
+                            checked={isValid}
+                            onCheckedChange={() => toggleWordValidation(null, item.word)}
+                            disabled={isDuplicate}
+                            className={cn(
+                              "w-6 h-6 data-[state=checked]:bg-gradient-to-r data-[state=checked]:from-indigo-600 data-[state=checked]:to-purple-600",
+                              isDuplicate && "opacity-30 cursor-not-allowed"
+                            )}
+                          />
+                          <div className="flex items-center gap-2 flex-1 min-w-0">
+                            <span className={cn(
+                              "text-lg font-bold",
+                              isDuplicate && "line-through text-gray-400 dark:text-gray-600",
+                              !isDuplicate && !isValid && "text-gray-400 dark:text-gray-600"
+                            )}>
+                              {applyHebrewFinalLetters(item.word)}
+                            </span>
+                            {isDuplicate && (
+                              <Badge className="bg-gradient-to-r from-orange-500 to-red-500 text-white border-0 shadow-md">
+                                ⚠ {item.playerCount} {t('joinView.players')}
+                              </Badge>
+                            )}
+                            {isAutoValidated && !isDuplicate && (
+                              <Badge className="bg-gradient-to-r from-cyan-500 to-blue-500 text-white border-0 shadow-md">
+                                ✓ {t('hostView.autoValidated')}
+                              </Badge>
+                            )}
+                            {item.playerCount === 1 && (
+                              <span className="text-sm font-medium text-slate-500 dark:text-slate-400 ml-auto truncate">
+                                {item.players[0]}
+                              </span>
+                            )}
+                          </div>
+                        </motion.div>
+                      );
+                    })}
+
+                    {/* Divider - Only show if both sections have words */}
+                    {nonAutoVerifiedWords.length > 0 && autoVerifiedWords.length > 0 && (
+                      <div className="flex items-center gap-3 py-3">
+                        <div className="flex-1 h-px bg-gradient-to-r from-transparent via-cyan-500/50 to-transparent"></div>
+                        <span className="text-sm font-semibold text-cyan-600 dark:text-cyan-400 flex items-center gap-2">
+                          <span className="text-lg">✓</span>
+                          {t('hostView.autoValidated')}
+                        </span>
+                        <div className="flex-1 h-px bg-gradient-to-r from-transparent via-cyan-500/50 to-transparent"></div>
+                      </div>
+                    )}
+
+                    {/* Auto-Verified Words Section */}
+                    {autoVerifiedWords.map((item, index) => {
+                      const isDuplicate = item.playerCount > 1;
+                      const isAutoValidated = item.autoValidated;
+                      const isValid = validations[item.word] !== undefined ? validations[item.word] : true;
+
+                      return (
+                        <motion.div
+                          key={`auto-${index}`}
+                          initial={{ opacity: 0, x: -20 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ delay: Math.min((nonAutoVerifiedWords.length + index) * 0.02, 0.5) }}
                           className={cn(
                             "flex items-center gap-3 p-3 rounded-xl transition-all border-2",
                             isDuplicate
@@ -1434,9 +1511,17 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
           {/* Letter Grid - RIGHT - Conditional rendering based on host playing */}
           {gameStarted && !hostPlaying ? (
             /* Spectator Mode - Live Results Dashboard */
-            <div className="fixed inset-0 z-50 bg-slate-50 dark:bg-slate-900 overflow-y-auto">
-              <HostLiveResults
-                players={playersReady.map(player => {
+            <div className="flex-1 space-y-4">
+              {/* Timer Display */}
+              {remainingTime !== null && (
+                <div className="flex items-center justify-center mb-4">
+                  <CircularTimer remainingTime={remainingTime} totalTime={timerValue * 60} />
+                </div>
+              )}
+
+              {/* Live Player Results */}
+              {(() => {
+                const sortedPlayers = [...playersReady].map(player => {
                   const username = typeof player === 'string' ? player : player.username;
                   const avatar = typeof player === 'object' ? player.avatar : null;
                   return {
@@ -1444,12 +1529,22 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
                     score: playerScores[username] || 0,
                     wordCount: playerWordCounts[username] || 0,
                     achievements: playerAchievements[username] || [],
-                    avatar
+                    avatar,
+                    allWords: []
                   };
-                })}
-                gameLanguage={roomLanguage}
-                remainingTime={remainingTime || 0}
-              />
+                }).sort((a, b) => b.score - a.score);
+
+                return sortedPlayers.map((player, index) => (
+                  <ResultsPlayerCard
+                    key={player.username}
+                    player={player}
+                    index={index}
+                    allPlayerWords={{}}
+                    currentUsername={username}
+                    isWinner={false}
+                  />
+                ));
+              })()}
             </div>
           ) : (
             /* Playing Mode or Pre-Game - Interactive Grid */

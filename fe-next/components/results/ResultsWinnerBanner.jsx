@@ -56,14 +56,12 @@ const ResultsWinnerBanner = ({ winner }) => {
             alt="celebration"
             className="absolute inset-0 w-full h-full object-cover"
             style={{
-              filter: 'blur(4px) brightness(1.1) saturate(1.4)',
+              filter: 'brightness(1.2) saturate(1.5) contrast(1.1)',
             }}
           />
-          {/* Gradient Overlays for Depth */}
-          <div className="absolute inset-0 bg-gradient-to-br from-yellow-500/60 via-orange-500/50 to-yellow-400/60"
-               style={{ mixBlendMode: 'multiply' }} />
-          <div className="absolute inset-0 bg-gradient-radial from-transparent via-yellow-500/20 to-orange-600/40" />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-black/20" />
+          {/* Glass glare overlay for depth */}
+          <div className="absolute inset-0 bg-gradient-to-br from-white/25 via-transparent to-transparent pointer-events-none" />
+          <div className="absolute inset-0 bg-gradient-to-br from-yellow-400/30 via-orange-400/20 to-transparent pointer-events-none" />
         </div>
 
         {/* Floating Particles Animation */}
@@ -110,8 +108,10 @@ const ResultsWinnerBanner = ({ winner }) => {
             {/* Glassmorphic Card */}
             <div className="relative rounded-2xl overflow-hidden">
               {/* Glass Effect */}
-              <div className="absolute inset-0 bg-white/15 backdrop-blur-xl border-2 border-white/30 rounded-2xl"
-                   style={{ boxShadow: '0 8px 32px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.3)' }} />
+              <div className="absolute inset-0 bg-white/20 backdrop-blur-sm border-2 border-white/40 rounded-2xl"
+                   style={{ boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.4)' }} />
+              {/* Glass glare effect */}
+              <div className="absolute inset-0 bg-gradient-to-br from-white/30 via-transparent to-transparent pointer-events-none rounded-2xl" />
 
               {/* Animated Border Glow */}
               <motion.div

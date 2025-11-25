@@ -292,6 +292,17 @@ export default function GamePage() {
       }
     });
 
+    // Auto-join next game if player is viewing results
+    newSocket.on('startGame', () => {
+      console.log('[SOCKET.IO] New game starting - auto-joining from results');
+      setShowResults(false);
+      setResultsData(null);
+      toast.success(t('playerView.gameStarted') || 'Game is starting!', {
+        icon: '🚀',
+        duration: 3000,
+      });
+    });
+
     newSocket.on('hostLeftRoomClosing', (data) => {
       toast.error(data.message || t('playerView.roomClosed'), {
         icon: '🚪',

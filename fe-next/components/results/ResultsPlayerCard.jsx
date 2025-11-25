@@ -8,16 +8,31 @@ import { cn } from '../../lib/utils';
 import { applyHebrewFinalLetters } from '../../utils/utils';
 import { ChevronDown, ChevronUp } from 'lucide-react';
 
-const WORD_COLORS = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#FFA07A', '#98D8C8', '#F7DC6F', '#BB8FCE'];
+// Color mapping based on points
+const POINT_COLORS = {
+  1: '#94A3B8',  // slate-400 - 2 letters
+  2: '#60A5FA',  // blue-400 - 3 letters
+  3: '#34D399',  // green-400 - 4 letters
+  4: '#F59E0B',  // amber-500 - 5 letters
+  5: '#EC4899',  // pink-500 - 6 letters
+  6: '#8B5CF6',  // violet-500 - 7 letters
+  7: '#EF4444',  // red-500 - 8 letters
+  8: '#06B6D4',  // cyan-500 - 9+ letters
+};
 
-const WordChip = ({ wordObj, index, playerCount, t }) => {
+const WordChip = ({ wordObj, playerCount }) => {
   const isDuplicate = wordObj.isDuplicate;
   const isValid = wordObj.validated;
   const displayWord = applyHebrewFinalLetters(wordObj.word);
 
-  const label = isDuplicate
-    ? `${displayWord} (${t('results.shared')} • ${t('results.noPoints')})`
-    : `${displayWord} ${isValid ? `(${wordObj.score})` : '(✗)'}`;
+  const label = displayWord;
+
+  // Get color based on score
+  const getBackgroundColor = () => {
+    if (isDuplicate) return undefined;
+    if (!isValid) return undefined;
+    return POINT_COLORS[wordObj.score] || POINT_COLORS[8];
+  };
 
   return (
     <div className="relative group">
@@ -29,9 +44,7 @@ const WordChip = ({ wordObj, index, playerCount, t }) => {
           !isDuplicate && !isValid && "bg-gray-400 text-white opacity-70"
         )}
         style={{
-          backgroundColor: !isDuplicate && isValid
-            ? WORD_COLORS[index % WORD_COLORS.length]
-            : undefined
+          backgroundColor: getBackgroundColor()
         }}
       >
         {label}
@@ -78,10 +91,10 @@ const ResultsPlayerCard = ({ player, index, allPlayerWords, currentUsername, isW
   };
 
   const getCardStyle = () => {
-    if (index === 0) return 'bg-gradient-to-br from-yellow-500/15 to-orange-500/15 border-yellow-500/40 shadow-[0_0_20px_rgba(234,179,8,0.25)]';
-    if (index === 1) return 'bg-gradient-to-br from-gray-400/15 to-gray-500/15 border-gray-400/40 shadow-[0_0_15px_rgba(156,163,175,0.2)]';
-    if (index === 2) return 'bg-gradient-to-br from-orange-500/15 to-orange-600/15 border-orange-500/40 shadow-[0_0_15px_rgba(249,115,22,0.2)]';
-    return 'bg-white/90 dark:bg-slate-800/90 border-slate-300/50 dark:border-slate-600/50';
+    if (index === 0) return 'bg-gradient-to-br from-yellow-500/25 to-orange-500/25 border-yellow-500/60 shadow-[0_0_20px_rgba(234,179,8,0.4)]';
+    if (index === 1) return 'bg-gradient-to-br from-gray-400/25 to-gray-500/25 border-gray-400/60 shadow-[0_0_15px_rgba(156,163,175,0.3)]';
+    if (index === 2) return 'bg-gradient-to-br from-orange-500/25 to-orange-600/25 border-orange-500/60 shadow-[0_0_15px_rgba(249,115,22,0.3)]';
+    return 'bg-white/30 dark:bg-slate-800/30 border-slate-300/70 dark:border-slate-600/70';
   };
 
   return (
@@ -93,17 +106,19 @@ const ResultsPlayerCard = ({ player, index, allPlayerWords, currentUsername, isW
     >
       <Card
         className={cn(
-          "p-4 sm:p-5 md:p-6 border-2 backdrop-blur-sm transition-all duration-300 rounded-xl shadow-lg hover:shadow-xl",
+          "p-4 sm:p-5 md:p-6 border-2 transition-all duration-300 rounded-xl shadow-lg hover:shadow-xl relative overflow-hidden",
           getCardStyle(),
           isWordsExpanded && "ring-2 ring-purple-400/50 shadow-[0_0_20px_rgba(168,85,247,0.3)]"
         )}
         style={avatar?.color && index > 2 ? {
-          background: `linear-gradient(135deg, ${avatar.color}20, ${avatar.color}40)`,
-          borderColor: `${avatar.color}60`
+          background: `linear-gradient(135deg, ${avatar.color}30, ${avatar.color}50)`,
+          borderColor: `${avatar.color}80`
         } : {}}
       >
+        {/* Glass glare effect */}
+        <div className="absolute inset-0 bg-gradient-to-br from-white/20 via-transparent to-transparent pointer-events-none" />
         {/* Header: Rank, Name, Score */}
-        <div className="flex justify-between items-center mb-3 sm:mb-4">
+        <div className="flex justify-between items-center mb-3 sm:mb-4 relative z-10">
           <div className="flex items-center gap-3">
             <motion.div
               animate={index < 3 ? { rotate: [0, -10, 10, -10, 0] } : {}}
@@ -157,7 +172,7 @@ const ResultsPlayerCard = ({ player, index, allPlayerWords, currentUsername, isW
 
         {/* Longest Word */}
         {player.longestWord && (
-          <div className="mb-3 p-2 rounded-lg bg-gradient-to-r from-cyan-500/10 to-teal-500/10 border border-cyan-500/20">
+          <div className="mb-3 p-2 rounded-lg bg-gradient-to-r from-cyan-500/10 to-teal-500/10 border border-cyan-500/20 relative z-10">
             <p className="text-sm text-slate-700 dark:text-slate-300">
               <span className="font-bold text-cyan-600 dark:text-cyan-400">{t('playerView.longestWord')}:</span>
               <span className="ml-2 text-lg font-bold text-cyan-700 dark:text-cyan-300">{applyHebrewFinalLetters(player.longestWord)}</span>
@@ -166,7 +181,7 @@ const ResultsPlayerCard = ({ player, index, allPlayerWords, currentUsername, isW
         )}
 
         {/* Words Section - Always show, collapsible */}
-        <div className="mb-3">
+        <div className="mb-3 relative z-10">
           <button
             onClick={() => setIsWordsExpanded(!isWordsExpanded)}
             className="w-full flex items-center justify-between p-2 rounded-lg text-sm font-bold text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 hover:bg-purple-50 dark:hover:bg-purple-900/20 transition-all"
@@ -187,47 +202,85 @@ const ResultsPlayerCard = ({ player, index, allPlayerWords, currentUsername, isW
                 transition={{ duration: 0.3 }}
                 className="overflow-hidden"
               >
-                {/* Group words by verification status */}
+                {/* Group words by points */}
                 {(() => {
-                  const unverifiedWords = player.allWords.filter(w => !w.autoVerified);
-                  const autoVerifiedWords = player.allWords.filter(w => w.autoVerified);
+                  // Separate words into categories
+                  const duplicateWords = player.allWords.filter(w => w.isDuplicate);
+                  const invalidWords = player.allWords.filter(w => !w.isDuplicate && !w.validated);
+                  const validWords = player.allWords.filter(w => !w.isDuplicate && w.validated);
+
+                  // Group valid words by points
+                  const wordsByPoints = {};
+                  validWords.forEach(wordObj => {
+                    const points = wordObj.score;
+                    if (!wordsByPoints[points]) {
+                      wordsByPoints[points] = [];
+                    }
+                    wordsByPoints[points].push(wordObj);
+                  });
+
+                  // Sort point groups in descending order
+                  const sortedPointGroups = Object.keys(wordsByPoints)
+                    .map(Number)
+                    .sort((a, b) => b - a);
 
                   return (
                     <div className="space-y-4 pt-2">
-                      {/* Unverified Words Group */}
-                      {unverifiedWords.length > 0 && (
-                        <div>
-                          <div className="text-xs font-bold text-orange-600 dark:text-orange-400 mb-2 uppercase tracking-wide">
-                            {t('results.needsVerification')} ({unverifiedWords.length})
+                      {/* Valid Words Grouped by Points */}
+                      {sortedPointGroups.map(points => (
+                        <div key={`points-${points}`}>
+                          <div
+                            className="text-xs font-bold mb-2 uppercase tracking-wide flex items-center gap-2"
+                            style={{ color: POINT_COLORS[points] || POINT_COLORS[8] }}
+                          >
+                            <span className="w-6 h-6 rounded-full flex items-center justify-center text-white font-bold text-sm"
+                                  style={{ backgroundColor: POINT_COLORS[points] || POINT_COLORS[8] }}>
+                              {points}
+                            </span>
+                            {t('results.pointWords', { points })} ({wordsByPoints[points].length})
                           </div>
                           <div className="flex flex-wrap gap-2">
-                            {unverifiedWords.map((wordObj, i) => (
+                            {wordsByPoints[points].map((wordObj, i) => (
                               <WordChip
-                                key={`unverified-${i}`}
+                                key={`${points}-${i}`}
                                 wordObj={wordObj}
-                                index={i}
                                 playerCount={getPlayerCountForWord(wordObj.word)}
-                                t={t}
+                              />
+                            ))}
+                          </div>
+                        </div>
+                      ))}
+
+                      {/* Duplicate Words */}
+                      {duplicateWords.length > 0 && (
+                        <div>
+                          <div className="text-xs font-bold text-orange-600 dark:text-orange-400 mb-2 uppercase tracking-wide">
+                            {t('results.shared')} ({duplicateWords.length})
+                          </div>
+                          <div className="flex flex-wrap gap-2">
+                            {duplicateWords.map((wordObj, i) => (
+                              <WordChip
+                                key={`duplicate-${i}`}
+                                wordObj={wordObj}
+                                playerCount={getPlayerCountForWord(wordObj.word)}
                               />
                             ))}
                           </div>
                         </div>
                       )}
 
-                      {/* Auto Verified Words Group */}
-                      {autoVerifiedWords.length > 0 && (
+                      {/* Invalid Words */}
+                      {invalidWords.length > 0 && (
                         <div>
-                          <div className="text-xs font-bold text-green-600 dark:text-green-400 mb-2 uppercase tracking-wide">
-                            {t('results.autoVerified')} ({autoVerifiedWords.length})
+                          <div className="text-xs font-bold text-gray-600 dark:text-gray-400 mb-2 uppercase tracking-wide">
+                            {t('results.invalid')} ({invalidWords.length})
                           </div>
                           <div className="flex flex-wrap gap-2">
-                            {autoVerifiedWords.map((wordObj, i) => (
+                            {invalidWords.map((wordObj, i) => (
                               <WordChip
-                                key={`verified-${i}`}
+                                key={`invalid-${i}`}
                                 wordObj={wordObj}
-                                index={i}
                                 playerCount={getPlayerCountForWord(wordObj.word)}
-                                t={t}
                               />
                             ))}
                           </div>
@@ -243,7 +296,7 @@ const ResultsPlayerCard = ({ player, index, allPlayerWords, currentUsername, isW
 
         {/* Achievements Section */}
         {player.achievements && player.achievements.length > 0 && (
-          <div className="mt-3 pt-2 sm:mt-4 sm:pt-3 border-t border-slate-200 dark:border-slate-700">
+          <div className="mt-3 pt-2 sm:mt-4 sm:pt-3 border-t border-slate-200 dark:border-slate-700 relative z-10">
             <p className="text-sm font-bold mb-2 text-purple-600 dark:text-purple-400">
               {t('hostView.achievements')}:
             </p>

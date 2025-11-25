@@ -73,7 +73,7 @@ export const LanguageProvider = ({ children, initialLanguage }) => {
         }
     };
 
-    const t = (path) => {
+    const t = (path, params = {}) => {
         const keys = path.split('.');
         let current = translations[language] || translations['he']; // Fallback to Hebrew if language is invalid
 
@@ -88,6 +88,13 @@ export const LanguageProvider = ({ children, initialLanguage }) => {
                 return path;
             }
             current = current[key];
+        }
+
+        // Replace template variables like ${varName} with params
+        if (typeof current === 'string' && Object.keys(params).length > 0) {
+            return current.replace(/\$\{(\w+)\}/g, (match, key) => {
+                return params[key] !== undefined ? params[key] : match;
+            });
         }
 
         return current;

@@ -21,11 +21,13 @@ const LetterGrid = ({ letterGrid }) => {
       transition={{ delay: 0.3 }}
       className="text-center"
     >
-      <div className="inline-block p-3 rounded-xl bg-gradient-to-br from-slate-800/90 to-slate-900/90 dark:from-slate-800/90 dark:to-slate-900/90 border-2 border-cyan-500/30 shadow-[0_4px_24px_rgba(6,182,212,0.2)] backdrop-blur-xl">
+      <div className="inline-block p-3 rounded-xl bg-gradient-to-br from-slate-800/40 to-slate-900/40 dark:from-slate-800/40 dark:to-slate-900/40 border-2 border-cyan-500/50 shadow-[0_4px_24px_rgba(6,182,212,0.3)] relative overflow-hidden">
+        {/* Glass glare effect */}
+        <div className="absolute inset-0 bg-gradient-to-br from-white/20 via-transparent to-transparent pointer-events-none" />
         <GridComponent
           grid={letterGrid}
           interactive={false}
-          className="max-w-[180px] mx-auto"
+          className="max-w-[180px] mx-auto relative z-10"
         />
       </div>
     </motion.div>
@@ -137,8 +139,10 @@ const ResultsPage = ({ finalScores, letterGrid, gameCode, onReturnToRoom, userna
           transition={{ delay: 0.3 }}
           className="mb-6"
         >
-          <div className="p-4 rounded-lg bg-gradient-to-r from-orange-500/20 to-red-500/20 border-2 border-orange-500/40 backdrop-blur-sm">
-            <p className="text-center text-sm font-bold text-orange-800 dark:text-orange-200">
+          <div className="p-4 rounded-lg bg-gradient-to-r from-orange-500/30 to-red-500/30 border-2 border-orange-500/60 relative overflow-hidden">
+            {/* Glass glare effect */}
+            <div className="absolute inset-0 bg-gradient-to-br from-white/15 via-transparent to-transparent pointer-events-none" />
+            <p className="text-center text-sm font-bold text-orange-800 dark:text-orange-200 relative z-10">
               ⚠️ {t('results.duplicateWarning')}
             </p>
           </div>
@@ -166,8 +170,10 @@ const ResultsPage = ({ finalScores, letterGrid, gameCode, onReturnToRoom, userna
             transition={{ delay: 0.5 + sortedScores.length * 0.1 }}
             className="mt-8"
           >
-            <Card className="p-5 sm:p-6 bg-gradient-to-r from-slate-800/90 to-slate-900/90 border-2 border-cyan-500/30 shadow-[0_0_30px_rgba(6,182,212,0.15)] backdrop-blur-xl rounded-2xl">
-              <div className="text-center space-y-4">
+            <Card className="p-5 sm:p-6 bg-gradient-to-r from-slate-800/40 to-slate-900/40 border-2 border-cyan-500/50 shadow-[0_0_30px_rgba(6,182,212,0.3)] rounded-2xl relative overflow-hidden">
+              {/* Glass glare effect */}
+              <div className="absolute inset-0 bg-gradient-to-br from-white/15 via-transparent to-transparent pointer-events-none" />
+              <div className="text-center space-y-4 relative z-10">
                 <motion.h3
                   className="text-xl sm:text-2xl font-bold text-white"
                   animate={{ scale: [1, 1.02, 1] }}

@@ -11,18 +11,18 @@ export function Providers({ children, lang }) {
             <ThemeProvider>
                 <LanguageProvider initialLanguage={lang}>
                     {children}
-                    <Toaster
-                        position="top-center"
-                        toastOptions={{
-                            duration: 2000,
-                            style: {
-                                background: '#363636',
-                                color: '#fff',
-                            },
-                        }}
-                    />
                 </LanguageProvider>
             </ThemeProvider>
+            <Toaster
+                position="top-center"
+                toastOptions={{
+                    duration: 2000,
+                    style: {
+                        background: '#363636',
+                        color: '#fff',
+                    },
+                }}
+            />
         </ErrorBoundary>
     );
 }
