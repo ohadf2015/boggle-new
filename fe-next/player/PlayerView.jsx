@@ -17,7 +17,6 @@ import GridComponent from '../components/GridComponent';
 import { applyHebrewFinalLetters } from '../utils/utils';
 import RoomChat from '../components/RoomChat';
 import GoRipplesAnimation from '../components/GoRipplesAnimation';
-import CountdownAnimation from '../components/CountdownAnimation';
 import CircularTimer from '../components/CircularTimer';
 import { copyJoinUrl, shareViaWhatsApp, getJoinUrl } from '../utils/share';
 import ShareButton from '../components/ShareButton';
@@ -41,7 +40,6 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
   const [letterGrid, setLetterGrid] = useState(null);
   const [remainingTime, setRemainingTime] = useState(null);
   const [waitingForResults, setWaitingForResults] = useState(false);
-  const [showCountdown, setShowCountdown] = useState(false);
   const [showStartAnimation, setShowStartAnimation] = useState(false);
 
   const [playersReady, setPlayersReady] = useState(initialPlayers);
@@ -62,13 +60,6 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
   const [tournamentData, setTournamentData] = useState(null);
   const [tournamentStandings, setTournamentStandings] = useState([]);
   const [showTournamentStandings, setShowTournamentStandings] = useState(false);
-
-  // Handle countdown complete
-  const handleCountdownComplete = () => {
-    setShowCountdown(false);
-    setGameActive(true);
-    setShowStartAnimation(true);
-  };
 
   // Pre-game shuffling animation with player names
   useEffect(() => {
@@ -178,14 +169,15 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
           break;
 
         case 'startGame':
-          // Show countdown first, then start the game
+          // Start the game immediately
           setWasInActiveGame(true); // Mark that player participated in this game session
           setFoundWords([]);
           setAchievements([]);
           if (message.letterGrid) setLetterGrid(message.letterGrid);
           if (message.timerSeconds) setRemainingTime(message.timerSeconds);
           if (message.language) setGameLanguage(message.language);
-          setShowCountdown(true);
+          setGameActive(true);
+          setShowStartAnimation(true);
 
           // Send acknowledgment to server
           if (ws && ws.readyState === WebSocket.OPEN && message.messageId) {
@@ -302,7 +294,6 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
           // Force the game to active state since the timer is running.
           if (!gameActive && message.remainingTime > 0 && letterGrid) {
             console.log('[PLAYER] Timer started on server, activating game (remainingTime:', message.remainingTime, ')');
-            setShowCountdown(false);  // Hide countdown if still showing
             setGameActive(true);       // Activate the game
             setShowStartAnimation(true); // Show GO animation
           }
@@ -934,11 +925,6 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-50 via-slate-100 to-slate-200 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 p-1 md:p-4 flex flex-col transition-colors duration-300">
 
-      {/* Countdown Animation (3-2-1) */}
-      {showCountdown && (
-        <CountdownAnimation onComplete={handleCountdownComplete} />
-      )}
-
       {/* GO Animation */}
       {showStartAnimation && (
         <GoRipplesAnimation onComplete={() => setShowStartAnimation(false)} />
@@ -946,21 +932,6 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
 
       {/* Top Bar with Title and Exit Button */}
       <div className="w-full max-w-7xl mx-auto flex items-center justify-between mb-1">
-        {/* LEXICLASH Title */}
-        <motion.h1
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="text-2xl md:text-5xl font-bold tracking-wider flex items-center gap-1"
-          style={{ fontFamily: "'Outfit', 'Rubik', sans-serif" }}
-        >
-          <span className="bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 to-blue-500 drop-shadow-[0_0_10px_rgba(34,211,238,0.5)]">
-            LEXI
-          </span>
-          <span className="bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-pink-500 drop-shadow-[0_0_10px_rgba(168,85,247,0.5)] italic" style={{ transform: 'skewX(-10deg)' }}>
-            CLASH
-          </span>
-        </motion.h1>
-
         <Button
           type="button"
           onClick={handleExitRoom}
