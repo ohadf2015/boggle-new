@@ -59,6 +59,7 @@ export default function GamePage() {
   const [playersInRoom, setPlayersInRoom] = useState([]);
   const [socket, setSocket] = useState(null);
   const [isConnected, setIsConnected] = useState(false);
+  const [roomsLoading, setRoomsLoading] = useState(true); // Track rooms loading state
 
   const socketRef = useRef(null);
   const attemptingReconnectRef = useRef(attemptingReconnect);
@@ -259,6 +260,7 @@ export default function GamePage() {
 
     newSocket.on('activeRooms', (data) => {
       setActiveRooms(data.rooms || []);
+      setRoomsLoading(false);
     });
 
     newSocket.on('error', (data) => {
@@ -301,6 +303,17 @@ export default function GamePage() {
       setResultsData(null);
       toast.success(t('playerView.gameStarted') || 'Game is starting!', {
         icon: '🚀',
+        duration: 3000,
+      });
+    });
+
+    // Handle game reset - keep players in the room for new game
+    newSocket.on('resetGame', () => {
+      console.log('[SOCKET.IO] Game reset - staying in room for new game');
+      setShowResults(false);
+      setResultsData(null);
+      toast.success(t('hostView.newGameReady') || 'New game ready!', {
+        icon: '🎮',
         duration: 3000,
       });
     });
@@ -480,6 +493,7 @@ export default function GamePage() {
 
   const refreshRooms = useCallback(() => {
     if (socket && isConnected) {
+      setRoomsLoading(true);
       socket.emit('getActiveRooms');
     }
   }, [socket, isConnected]);
@@ -529,12 +543,13 @@ export default function GamePage() {
           refreshRooms={refreshRooms}
           prefilledRoom={prefilledRoomCode}
           isAutoJoining={shouldAutoJoin}
+          roomsLoading={roomsLoading}
         />
       );
     }
 
     if (isHost) {
-      return <HostView gameCode={gameCode} roomLanguage={roomLanguage} initialPlayers={playersInRoom} username={username} />;
+      return <HostView gameCode={gameCode} roomLanguage={roomLanguage} initialPlayers={playersInRoom} username={username} onShowResults={handleShowResults} />;
     }
 
     return (

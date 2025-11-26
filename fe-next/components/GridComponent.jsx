@@ -12,7 +12,8 @@ const GridComponent = ({
     className,
     largeText = false,
     playerView = false,
-    comboLevel = 0
+    comboLevel = 0,
+    animateOnMount = false // When true, adds a slot machine style cascade animation on initial render
 }) => {
     const [internalSelectedCells, setInternalSelectedCells] = useState([]);
     const [direction, setDirection] = useState(null); // Track the direction of movement
@@ -419,11 +420,12 @@ const GridComponent = ({
         } else {
             // Level 10+: Full rainbow gradient with flicker animation
             return {
-                gradient: 'from-red-500 via-yellow-500 via-green-500 via-cyan-500 via-blue-500 via-purple-500 to-pink-500 bg-[length:400%_400%]',
+                gradient: 'rainbow-gradient',
                 border: 'border-white',
                 shadow: 'shadow-[0_0_60px_rgba(255,255,255,1)]',
                 text: multiplier,
-                flicker: true
+                flicker: true,
+                isRainbow: true
             };
         }
     };
@@ -478,7 +480,7 @@ const GridComponent = ({
                         <motion.div
                             className={cn(
                                 "px-6 py-3 rounded-full font-extrabold text-3xl md:text-4xl text-white backdrop-blur-sm",
-                                `bg-gradient-to-r ${comboColors.gradient}`,
+                                !comboColors.isRainbow && `bg-gradient-to-r ${comboColors.gradient}`,
                                 comboColors.shadow,
                                 "border-4 border-white/40"
                             )}
@@ -486,15 +488,22 @@ const GridComponent = ({
                                 backgroundPosition: ['0% 50%', '100% 50%', '0% 50%'],
                             } : {}}
                             transition={comboColors.flicker ? {
-                                duration: 2,
+                                duration: 1,
                                 repeat: Infinity,
                                 ease: "linear"
                             } : {}}
                             style={{
-                                filter: 'drop-shadow(0 0 20px rgba(251, 146, 60, 0.8))'
+                                filter: comboColors.isRainbow
+                                    ? 'drop-shadow(0 0 30px rgba(255, 255, 255, 1))'
+                                    : 'drop-shadow(0 0 20px rgba(251, 146, 60, 0.8))',
+                                ...(comboColors.isRainbow && {
+                                    background: 'linear-gradient(90deg, #ef4444, #f97316, #eab308, #22c55e, #06b6d4, #3b82f6, #8b5cf6, #ec4899, #ef4444)',
+                                    backgroundSize: '300% 100%',
+                                    animation: 'rainbow-shift 1.5s linear infinite'
+                                })
                             }}
                         >
-                            🔥 {comboColors.text}
+                            {comboColors.isRainbow ? '🌈' : '🔥'} {comboColors.text}
                         </motion.div>
                     </motion.div>
                 )}
@@ -577,17 +586,22 @@ const GridComponent = ({
                             onTouchStart={(e) => handleTouchStart(i, j, cell, e)}
                             onMouseDown={(e) => handleMouseDown(i, j, cell, e)}
                             onMouseEnter={() => handleMouseEnter(i, j, cell)}
-                            initial={{ scale: 0.8, opacity: 0 }}
+                            initial={animateOnMount
+                                ? { scale: 0, opacity: 0, rotateX: -90, y: -20 }
+                                : { scale: 0.8, opacity: 0 }
+                            }
                             animate={{
                                 scale: isSelected || isFading ? 1.15 : 1,
                                 opacity: isFading ? 0 : 1,
                                 rotate: (isSelected || isFading) ? [0, -5, 5, 0] : 0,
+                                rotateX: 0,
                                 y: isSelected ? -2 : 0
                             }}
                             whileTap={{ scale: 0.95 }}
                             transition={{
-                                duration: isFading ? 0.3 : (isSelected ? 0.12 : 0.6),
-                                ease: "easeOut",
+                                duration: animateOnMount && !isSelected && !isFading ? 0.5 : (isFading ? 0.3 : (isSelected ? 0.12 : 0.6)),
+                                ease: animateOnMount ? [0.34, 1.56, 0.64, 1] : "easeOut", // Spring-like bounce for mount animation
+                                delay: animateOnMount ? (i + j) * 0.04 : 0, // Cascade delay from top-left
                                 scale: isSelected ? { type: "spring", stiffness: 400, damping: 18 } : undefined
                             }}
                             className={cn(
@@ -596,12 +610,18 @@ const GridComponent = ({
                                     ? (largeText ? "text-2xl sm:text-3xl" : "text-lg sm:text-xl")
                                     : (largeText || playerView ? "text-4xl sm:text-5xl md:text-6xl" : "text-2xl sm:text-3xl"),
                                 (isSelected || isFading)
-                                    ? `bg-gradient-to-br ${comboColors.gradient} text-white ${comboColors.border} z-10 ${comboColors.shadow} border-white/40`
+                                    ? comboColors.isRainbow
+                                        ? `text-white ${comboColors.border} z-10 ${comboColors.shadow} border-white/40`
+                                        : `bg-gradient-to-br ${comboColors.gradient} text-white ${comboColors.border} z-10 ${comboColors.shadow} border-white/40`
                                     : "bg-gradient-to-br from-slate-100 via-white to-slate-100 dark:from-slate-700 dark:via-slate-800 dark:to-slate-900 text-slate-900 dark:text-white border-slate-300/60 dark:border-slate-600/60 hover:scale-105 hover:shadow-xl dark:hover:bg-slate-700/80 active:scale-95 shadow-[0_4px_12px_rgba(0,0,0,0.1)]"
                             )}
                             style={{
                                 borderRadius: '8px',
-                                ...(isSelected && comboColors.flicker ? {
+                                ...((isSelected || isFading) && comboColors.isRainbow ? {
+                                    background: 'linear-gradient(135deg, #ef4444, #f97316, #eab308, #22c55e, #06b6d4, #3b82f6, #8b5cf6, #ec4899)',
+                                    backgroundSize: '400% 400%',
+                                    animation: 'rainbow-cell 2s ease infinite'
+                                } : isSelected && comboColors.flicker ? {
                                     animation: 'flicker 0.15s infinite alternate'
                                 } : {})
                             }}

@@ -1,8 +1,8 @@
-import React, { useState, useEffect, useMemo } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { FaCrown, FaMedal, FaTrophy } from 'react-icons/fa';
-import { Card } from '../ui/card';
+import React, { useState, useMemo, useEffect } from 'react';
+import { motion } from 'framer-motion';
+import { FaCrown, FaTrophy } from 'react-icons/fa';
 import { useLanguage } from '../../contexts/LanguageContext';
+import confetti from 'canvas-confetti';
 
 const celebrationImages = [
   '/winner-celebration/trophy-confetti.png',
@@ -17,312 +17,264 @@ const celebrationImages = [
   '/winner-celebration/thumbs-up.png',
 ];
 
+// Confetti burst on mount
+const fireConfetti = () => {
+  const count = 100;
+  const defaults = {
+    origin: { y: 0.7 },
+    zIndex: 1000,
+  };
+
+  function fire(particleRatio, opts) {
+    confetti({
+      ...defaults,
+      ...opts,
+      particleCount: Math.floor(count * particleRatio),
+    });
+  }
+
+  fire(0.25, { spread: 26, startVelocity: 55 });
+  fire(0.2, { spread: 60 });
+  fire(0.35, { spread: 100, decay: 0.91, scalar: 0.8 });
+  fire(0.1, { spread: 120, startVelocity: 25, decay: 0.92, scalar: 1.2 });
+  fire(0.1, { spread: 120, startVelocity: 45 });
+};
+
 const ResultsWinnerBanner = ({ winner, isCurrentUserWinner }) => {
   const { t } = useLanguage();
   const [imageError, setImageError] = useState(false);
+  const [isHovered, setIsHovered] = useState(false);
 
   // Randomly select a celebration image (once per winner)
   const randomImage = useMemo(() => {
     return celebrationImages[Math.floor(Math.random() * celebrationImages.length)];
   }, [winner?.username]);
 
+  // Fire confetti on mount
+  useEffect(() => {
+    if (winner) {
+      const timer = setTimeout(fireConfetti, 400);
+      return () => clearTimeout(timer);
+    }
+  }, [winner?.username]);
+
   if (!winner) return null;
 
   return (
     <motion.div
-      initial={{ scale: 0, rotateY: 180, y: -100 }}
-      animate={{ scale: 1, rotateY: 0, y: 0 }}
-      transition={{
-        type: 'spring',
-        stiffness: 200,
-        damping: 15,
-        delay: 0.3
-      }}
+      initial={{ scale: 0.9, opacity: 0 }}
+      animate={{ scale: 1, opacity: 1 }}
+      transition={{ duration: 0.5, ease: 'easeOut' }}
       className="mb-4 sm:mb-6 md:mb-8 relative w-full"
     >
-      {/* Outer Glow Effects */}
-      <div className="absolute inset-0 bg-gradient-to-r from-yellow-400/30 via-orange-500/40 to-yellow-400/30 rounded-3xl blur-3xl animate-pulse" />
-      <div className="absolute inset-0 bg-gradient-to-br from-cyan-400/20 via-purple-500/20 to-teal-400/20 rounded-3xl blur-2xl"
-           style={{ animation: 'gradient-xy 8s ease infinite' }} />
+      {/* Outer glow */}
+      <div
+        className="absolute -inset-1 rounded-3xl opacity-60"
+        style={{
+          background: 'linear-gradient(135deg, rgba(255,215,0,0.4), rgba(255,140,0,0.3))',
+          filter: 'blur(12px)',
+        }}
+      />
 
-      {/* Main Container with Hero Background Image */}
-      <div className="relative rounded-3xl overflow-hidden shadow-2xl min-h-[400px] md:min-h-[500px]">
-        {/* Hero Background Image with Blur and Overlay */}
-        <div className="absolute inset-0">
+      {/* Main Container */}
+      <div
+        className="relative rounded-2xl overflow-hidden min-h-[300px] md:min-h-[400px] border-2 border-yellow-500/60"
+        style={{
+          boxShadow: '0 20px 40px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255,255,255,0.1)',
+        }}
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
+      >
+        {/* Hero Background Image with scale animation */}
+        <motion.div
+          className="absolute inset-0"
+          animate={{
+            scale: isHovered ? 1.05 : 1,
+          }}
+          transition={{ duration: 0.4, ease: 'easeOut' }}
+        >
           {!imageError ? (
             <motion.img
-              initial={{ scale: 1.2, opacity: 0 }}
+              initial={{ scale: 1.1, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
-              transition={{ duration: 1.5, ease: 'easeOut' }}
+              transition={{ duration: 0.8, ease: 'easeOut' }}
               src={randomImage}
               alt="celebration"
               onError={() => setImageError(true)}
               className="absolute inset-0 w-full h-full object-cover"
-              style={{
-                filter: 'brightness(1.2) saturate(1.5) contrast(1.1)',
-              }}
+              style={{ filter: 'brightness(1.1) saturate(1.2)' }}
             />
           ) : (
             <div className="absolute inset-0 bg-gradient-to-br from-yellow-400 via-orange-500 to-purple-600" />
           )}
-          {/* Glass glare overlay for depth */}
-          <div className="absolute inset-0 bg-gradient-to-br from-white/25 via-transparent to-transparent pointer-events-none" />
-          <div className="absolute inset-0 bg-gradient-to-br from-yellow-400/30 via-orange-400/20 to-transparent pointer-events-none" />
-        </div>
 
-        {/* Floating Particles Animation */}
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          {[...Array(30)].map((_, i) => (
-            <motion.div
-              key={i}
-              className="absolute rounded-full bg-white/60"
-              style={{
-                width: `${4 + Math.random() * 8}px`,
-                height: `${4 + Math.random() * 8}px`,
-                left: `${Math.random() * 100}%`,
-                bottom: 0,
-              }}
-              animate={{
-                y: [0, -500 - Math.random() * 200],
-                x: [(i % 2 === 0 ? 1 : -1) * (30 + Math.random() * 50)],
-                opacity: [0.8, 0],
-                scale: [1, 0.3]
-              }}
-              transition={{
-                duration: 4 + Math.random() * 3,
-                repeat: Infinity,
-                delay: i * 0.15,
-                ease: 'easeOut'
-              }}
-            />
-          ))}
-        </div>
+          {/* Overlay for text readability */}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/20 to-transparent" />
+        </motion.div>
 
-        {/* Central Glassmorphic Winner Card */}
-        <div className="relative z-10 flex items-center justify-center min-h-[400px] md:min-h-[500px] p-6 sm:p-8 md:p-12">
+        {/* Glass glare effect - sweeping animation */}
+        <motion.div
+          className="absolute inset-0 pointer-events-none z-10"
+          initial={{ x: '-100%' }}
+          animate={{ x: '200%' }}
+          transition={{
+            duration: 2,
+            delay: 0.5,
+            ease: 'easeInOut',
+            repeat: Infinity,
+            repeatDelay: 4,
+          }}
+          style={{
+            background: 'linear-gradient(105deg, transparent 40%, rgba(255,255,255,0.3) 45%, rgba(255,255,255,0.5) 50%, rgba(255,255,255,0.3) 55%, transparent 60%)',
+          }}
+        />
+
+        {/* Top glass reflection */}
+        <div
+          className="absolute inset-x-0 top-0 h-1/3 pointer-events-none z-10"
+          style={{
+            background: 'linear-gradient(180deg, rgba(255,255,255,0.25) 0%, transparent 100%)',
+          }}
+        />
+
+        {/* Central Winner Card */}
+        <div className="relative z-20 flex items-center justify-center min-h-[300px] md:min-h-[400px] p-4 sm:p-6">
           <motion.div
-            initial={{ scale: 0.8, opacity: 0, y: 50 }}
-            animate={{ scale: 1, opacity: 1, y: 0 }}
-            transition={{
-              type: 'spring',
-              stiffness: 150,
-              damping: 20,
-              delay: 0.5
-            }}
-            className="relative max-w-3xl w-full"
+            initial={{ y: 30, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 0.3, duration: 0.4, type: 'spring', stiffness: 100 }}
+            className="relative max-w-2xl w-full"
           >
-            {/* Glassmorphic Card */}
-            <div className="relative rounded-2xl overflow-hidden">
-              {/* Glass Effect */}
-              <div className="absolute inset-0 bg-white/20 backdrop-blur-sm border-2 border-white/40 rounded-2xl"
-                   style={{ boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.4)' }} />
-              {/* Glass glare effect */}
-              <div className="absolute inset-0 bg-gradient-to-br from-white/30 via-transparent to-transparent pointer-events-none rounded-2xl" />
-
-              {/* Animated Border Glow */}
-              <motion.div
-                animate={{
-                  opacity: [0.5, 0.8, 0.5],
-                }}
-                transition={{
-                  duration: 2,
-                  repeat: Infinity,
-                  ease: 'easeInOut'
-                }}
-                className="absolute inset-0 rounded-2xl"
+            {/* Glass Card */}
+            <div
+              className="relative rounded-2xl overflow-hidden p-5 sm:p-7 md:p-10 text-center"
+              style={{
+                background: 'rgba(255, 255, 255, 0.12)',
+                backdropFilter: 'blur(12px)',
+                WebkitBackdropFilter: 'blur(12px)',
+                border: '1px solid rgba(255, 255, 255, 0.3)',
+                boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.3), 0 10px 40px rgba(0,0,0,0.2)',
+              }}
+            >
+              {/* Card glass glare */}
+              <div
+                className="absolute inset-0 pointer-events-none rounded-2xl"
                 style={{
-                  background: 'linear-gradient(135deg, rgba(255,215,0,0.4), rgba(255,140,0,0.4), rgba(255,215,0,0.4))',
-                  filter: 'blur(8px)',
-                  zIndex: -1
+                  background: 'linear-gradient(135deg, rgba(255,255,255,0.3) 0%, transparent 40%, transparent 60%, rgba(255,255,255,0.1) 100%)',
                 }}
               />
 
-              {/* Card Content */}
-              <div className="relative p-6 sm:p-8 md:p-12 text-center">
-                {/* Animated Crown */}
+              {/* Animated Crown */}
+              <motion.div
+                initial={{ y: -20, opacity: 0, rotate: -15 }}
+                animate={{ y: 0, opacity: 1, rotate: 0 }}
+                transition={{ delay: 0.4, type: 'spring', stiffness: 150 }}
+                className="inline-block mb-4"
+              >
                 <motion.div
-                  initial={{ y: -30, opacity: 0, rotate: -20 }}
                   animate={{
-                    y: 0,
-                    opacity: 1,
-                    rotate: 0
+                    y: [0, -8, 0],
+                    rotate: [0, -5, 5, 0],
                   }}
                   transition={{
-                    type: 'spring',
-                    stiffness: 200,
-                    damping: 12,
-                    delay: 0.7
+                    duration: 2.5,
+                    repeat: Infinity,
+                    repeatDelay: 1,
+                    ease: 'easeInOut',
                   }}
+                  whileHover={{ scale: 1.2 }}
+                  className="cursor-pointer"
                 >
-                  <motion.div
-                    animate={{
-                      rotate: [0, -8, 8, -8, 8, 0],
-                      y: [0, -12, 0],
-                      scale: [1, 1.15, 1]
-                    }}
-                    transition={{
-                      duration: 3,
-                      repeat: Infinity,
-                      repeatDelay: 2,
-                      ease: 'easeInOut'
-                    }}
-                    className="inline-block mb-4 sm:mb-6"
-                  >
-                    <FaCrown className="text-6xl sm:text-7xl md:text-8xl text-yellow-300 drop-shadow-[0_0_30px_rgba(255,215,0,0.8)]"
-                             style={{ filter: 'drop-shadow(0 4px 12px rgba(0,0,0,0.4))' }} />
-                  </motion.div>
-                </motion.div>
-
-                {/* You Won! Message for current user */}
-                {isCurrentUserWinner && (
-                  <motion.div
-                    initial={{ scale: 0, rotate: -10 }}
-                    animate={{ scale: 1, rotate: 0 }}
-                    transition={{ delay: 0.7, type: 'spring', stiffness: 200 }}
-                    className="mb-2"
-                  >
-                    <motion.p
-                      animate={{ scale: [1, 1.1, 1] }}
-                      transition={{ duration: 1.5, repeat: Infinity }}
-                      className="text-3xl sm:text-4xl md:text-5xl font-black text-yellow-300"
-                      style={{
-                        textShadow: '0 0 30px rgba(255,215,0,1), 0 0 60px rgba(255,215,0,0.8), 0 4px 12px rgba(0,0,0,0.5)',
-                      }}
-                    >
-                      {t('results.youWon')}
-                    </motion.p>
-                  </motion.div>
-                )}
-
-                {/* Winner Announcement Text */}
-                <motion.h2
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.9 }}
-                  className="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-3 sm:mb-4"
-                  style={{
-                    textShadow: '0 0 20px rgba(255,255,255,0.6), 0 0 40px rgba(255,215,0,0.5), 0 4px 12px rgba(0,0,0,0.5)',
-                    letterSpacing: '0.05em'
-                  }}
-                >
-                  {t('results.winnerAnnouncement')}
-                </motion.h2>
-
-                {/* Winner Name - Giant Gradient Text */}
-                <motion.div
-                  initial={{ scale: 0.5, opacity: 0 }}
-                  animate={{ scale: 1, opacity: 1 }}
-                  transition={{
-                    type: 'spring',
-                    stiffness: 180,
-                    damping: 15,
-                    delay: 1.1
-                  }}
-                  className="mb-4 sm:mb-6"
-                >
-                  <motion.h1
-                    animate={{
-                      scale: [1, 1.03, 1],
-                    }}
-                    transition={{
-                      duration: 2,
-                      repeat: Infinity,
-                      ease: 'easeInOut'
-                    }}
-                    className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-black relative"
-                    style={{ lineHeight: 1.2 }}
-                  >
-                    {/* Glow Layer */}
-                    <span className="absolute inset-0 blur-xl opacity-80"
-                          style={{
-                            background: 'linear-gradient(135deg, #FFD700, #FFA500, #FFD700)',
-                            backgroundClip: 'text',
-                            WebkitBackgroundClip: 'text',
-                            WebkitTextFillColor: 'transparent'
-                          }}>
-                      {winner.username}!
-                    </span>
-                    {/* Main Text */}
-                    <span className="relative"
-                          style={{
-                            background: 'linear-gradient(135deg, #FFFFFF 0%, #FFE066 20%, #FFD700 40%, #FFA500 60%, #FFD700 80%, #FFFFFF 100%)',
-                            backgroundSize: '200% 200%',
-                            backgroundClip: 'text',
-                            WebkitBackgroundClip: 'text',
-                            WebkitTextFillColor: 'transparent',
-                            textShadow: '0 0 40px rgba(255,215,0,0.8), 0 0 80px rgba(255,165,0,0.6), 0 8px 16px rgba(0,0,0,0.4)',
-                            filter: 'drop-shadow(0 4px 12px rgba(0,0,0,0.5))',
-                            animation: 'gradient-x 4s ease infinite'
-                          }}>
-                      {winner.username}!
-                    </span>
-                  </motion.h1>
-                </motion.div>
-
-                {/* Score Display */}
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 1.3 }}
-                  className="flex items-center justify-center gap-3 sm:gap-4"
-                >
-                  <motion.div
-                    animate={{
-                      rotate: [0, 360],
-                      scale: [1, 1.2, 1]
-                    }}
-                    transition={{
-                      duration: 2,
-                      repeat: Infinity,
-                      ease: 'easeInOut'
-                    }}
-                  >
-                    <FaTrophy className="text-3xl sm:text-4xl md:text-5xl text-yellow-300 drop-shadow-lg" />
-                  </motion.div>
-                  <motion.p
-                    animate={{
-                      scale: [1, 1.05, 1],
-                    }}
-                    transition={{
-                      duration: 1.5,
-                      repeat: Infinity,
-                      ease: 'easeInOut'
-                    }}
-                    className="text-3xl sm:text-4xl md:text-5xl font-black text-white"
+                  <FaCrown
+                    className="text-5xl sm:text-6xl md:text-7xl text-yellow-300"
                     style={{
-                      textShadow: '0 0 20px rgba(255,255,255,0.8), 0 0 40px rgba(255,215,0,0.6), 0 4px 12px rgba(0,0,0,0.5)',
+                      filter: 'drop-shadow(0 0 20px rgba(255,215,0,0.6)) drop-shadow(0 4px 8px rgba(0,0,0,0.3))',
                     }}
-                  >
-                    {winner.score} {t('results.points')}
-                  </motion.p>
+                  />
                 </motion.div>
+              </motion.div>
 
-                {/* Decorative Trophy Icons */}
-                <motion.div
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ delay: 1.5 }}
-                  className="flex justify-center gap-4 sm:gap-6 mt-6 sm:mt-8"
+              {/* You Won! Message for current user */}
+              {isCurrentUserWinner && (
+                <motion.p
+                  initial={{ scale: 0, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  transition={{ delay: 0.5, type: 'spring', stiffness: 200 }}
+                  className="text-2xl sm:text-3xl md:text-4xl font-black text-yellow-300 mb-2"
+                  style={{
+                    textShadow: '0 0 20px rgba(255,215,0,0.8), 0 2px 8px rgba(0,0,0,0.4)',
+                  }}
                 >
-                  {[FaTrophy, FaMedal, FaTrophy].map((Icon, i) => (
-                    <motion.div
-                      key={i}
-                      animate={{
-                        y: [0, -12, 0],
-                        rotate: [0, 15, -15, 0]
-                      }}
-                      transition={{
-                        duration: 2.5,
-                        repeat: Infinity,
-                        delay: i * 0.4,
-                        ease: 'easeInOut'
-                      }}
-                    >
-                      <Icon className="text-2xl sm:text-3xl md:text-4xl text-white/90 drop-shadow-lg" />
-                    </motion.div>
-                  ))}
+                  {t('results.youWon')}
+                </motion.p>
+              )}
+
+              {/* Winner Announcement Text */}
+              <motion.h2
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.55 }}
+                className="text-lg sm:text-xl md:text-2xl font-bold text-white mb-2"
+                style={{ textShadow: '0 2px 10px rgba(0,0,0,0.5)' }}
+              >
+                {t('results.winnerAnnouncement')}
+              </motion.h2>
+
+              {/* Winner Name with pulse animation */}
+              <motion.div
+                initial={{ scale: 0.8, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={{ delay: 0.6, type: 'spring', stiffness: 120 }}
+                className="mb-4"
+              >
+                <motion.h1
+                  animate={{ scale: [1, 1.02, 1] }}
+                  transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+                  whileHover={{ scale: 1.05 }}
+                  className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black cursor-pointer"
+                  style={{
+                    background: 'linear-gradient(135deg, #FFFFFF 0%, #FFE066 25%, #FFD700 50%, #FFA500 75%, #FFD700 100%)',
+                    backgroundClip: 'text',
+                    WebkitBackgroundClip: 'text',
+                    WebkitTextFillColor: 'transparent',
+                    filter: 'drop-shadow(0 4px 8px rgba(0,0,0,0.4))',
+                  }}
+                  onClick={fireConfetti}
+                >
+                  {winner.username}!
+                </motion.h1>
+              </motion.div>
+
+              {/* Score Display with trophy animation */}
+              <motion.div
+                initial={{ y: 15, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ delay: 0.7 }}
+                className="flex items-center justify-center gap-3"
+              >
+                <motion.div
+                  animate={{ rotate: [0, -10, 10, 0] }}
+                  transition={{ duration: 1.5, repeat: Infinity, repeatDelay: 2 }}
+                  whileHover={{ scale: 1.3 }}
+                  className="cursor-pointer"
+                  onClick={fireConfetti}
+                >
+                  <FaTrophy
+                    className="text-3xl sm:text-4xl text-yellow-300"
+                    style={{ filter: 'drop-shadow(0 0 10px rgba(255,215,0,0.5))' }}
+                  />
                 </motion.div>
-              </div>
+                <motion.p
+                  animate={{ scale: [1, 1.03, 1] }}
+                  transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut' }}
+                  className="text-2xl sm:text-3xl md:text-4xl font-black text-white"
+                  style={{
+                    textShadow: '0 0 15px rgba(255,255,255,0.5), 0 2px 8px rgba(0,0,0,0.4)',
+                  }}
+                >
+                  {winner.score} {t('results.points')}
+                </motion.p>
+              </motion.div>
             </div>
           </motion.div>
         </div>

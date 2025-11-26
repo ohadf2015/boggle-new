@@ -287,16 +287,44 @@ function getAllGames() {
 
 /**
  * Get active rooms for lobby display
+ * Filters out rooms with no players
  * @returns {array} - Array of room info
  */
 function getActiveRooms() {
-  return Object.values(games).map(game => ({
-    gameCode: game.gameCode,
-    roomName: game.roomName,
-    playerCount: Object.keys(game.users).length,
-    gameState: game.gameState,
-    language: game.language
-  }));
+  return Object.values(games)
+    .filter(game => Object.keys(game.users).length > 0) // Only show rooms with players
+    .map(game => ({
+      gameCode: game.gameCode,
+      roomName: game.roomName,
+      playerCount: Object.keys(game.users).length,
+      gameState: game.gameState,
+      language: game.language
+    }));
+}
+
+/**
+ * Get empty rooms (rooms with no players)
+ * @returns {array} - Array of game codes for empty rooms
+ */
+function getEmptyRooms() {
+  return Object.values(games)
+    .filter(game => Object.keys(game.users).length === 0)
+    .map(game => game.gameCode);
+}
+
+/**
+ * Clean up empty rooms (rooms with no players)
+ * @returns {number} - Number of rooms cleaned up
+ */
+function cleanupEmptyRooms() {
+  const emptyRooms = getEmptyRooms();
+
+  for (const gameCode of emptyRooms) {
+    console.log(`[CLEANUP] Removing empty room: ${gameCode}`);
+    deleteGame(gameCode);
+  }
+
+  return emptyRooms.length;
 }
 
 /**
@@ -513,6 +541,8 @@ module.exports = {
   // Game queries
   getAllGames,
   getActiveRooms,
+  getEmptyRooms,
+  cleanupEmptyRooms,
 
   // Host management
   isHost,

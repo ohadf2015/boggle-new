@@ -1,0 +1,154 @@
+/* Slot Machine Animations */
+
+/* Spinning reel effect - vertical scroll */
+@keyframes slotSpin {
+  0% {
+    transform: translateY(-100%) rotateX(10deg);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  50% {
+    transform: translateY(0) rotateX(0);
+    opacity: 1;
+  }
+  90% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(100%) rotateX(-10deg);
+    opacity: 0;
+  }
+}
+
+/* Letter landing with bounce */
+@keyframes slotLand {
+  0% {
+    transform: translateY(-30px) scale(0.8);
+    opacity: 0;
+  }
+  60% {
+    transform: translateY(5px) scale(1.1);
+    opacity: 1;
+  }
+  80% {
+    transform: translateY(-2px) scale(0.95);
+  }
+  100% {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+}
+
+/* Glow pulse effect - simplified for performance */
+@keyframes slotGlow {
+  0%, 100% {
+    opacity: 0.9;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+/* Text blur during spin */
+@keyframes slotBlur {
+  0%, 100% {
+    filter: blur(0);
+  }
+  50% {
+    filter: blur(2px);
+  }
+}
+
+/* Reel strip effect */
+@keyframes slotReelStrip {
+  0% {
+    background-position: 0 0;
+  }
+  100% {
+    background-position: 0 100%;
+  }
+}
+
+/* Fast letter cycle */
+@keyframes letterCycle {
+  0% {
+    transform: translateY(-20px);
+    opacity: 0.3;
+  }
+  50% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(20px);
+    opacity: 0.3;
+  }
+}
+
+/* Shimmer highlight effect for winning cells */
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+/* Apply animations */
+.slot-spinning {
+  animation: letterCycle 0.08s ease-in-out;
+}
+
+.slot-landing {
+  animation: slotLand 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+.slot-glow {
+  animation: slotGlow 0.15s ease-in-out infinite;
+}
+
+/* Simplified spinning indicator */
+.slot-cell-spinning {
+  position: relative;
+}
+
+/* Highlighted cell shimmer */
+.slot-highlighted {
+  background: linear-gradient(
+    90deg,
+    rgba(251, 191, 36, 1) 0%,
+    rgba(255, 255, 255, 0.5) 50%,
+    rgba(251, 191, 36, 1) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 2s linear infinite;
+}
+
+/* 3D perspective for reel effect */
+.slot-reel-container {
+  perspective: 500px;
+  transform-style: preserve-3d;
+}
+
+.slot-letter {
+  backface-visibility: hidden;
+  transform-style: preserve-3d;
+}
+
+/* Smooth transitions */
+.slot-letter-transition {
+  transition: all 0.1s ease-out;
+}
+
+/* Text effects during spin - keep original color, only add subtle blur */
+.slot-letter-spinning {
+  filter: blur(0.5px);
+}
+
+/* Final letter appearance */
+.slot-letter-final {
+  animation: slotLand 0.25s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}

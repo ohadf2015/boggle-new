@@ -129,6 +129,7 @@ export const translations = {
       welcomeBack: 'Welcome back',
       connectingToRoom: 'Connecting to room...',
       enterRoom: 'Enter Room',
+      joinGame: 'Join Game',
     },
     hostView: {
       waitingForPlayers: 'Waiting for players...',
@@ -233,6 +234,7 @@ export const translations = {
       me: 'Me',
       noWordsYet: 'No words found yet',
       shuffle: 'Shuffle',
+      swipeToFormWords: 'Swipe on the board to form words',
       inviteFriends: 'Invite Friends',
     },
     chat: {
@@ -255,6 +257,7 @@ export const translations = {
       returnToRoom: 'Return to Active Room',
       cancelAutoReturn: 'Cancel Auto Return',
       valid: 'valid',
+      validWords: 'Valid Words',
       playAgainQuestion: '🎮 Ready for Another Round?',
       playAgainDescription: 'Stay in the room and wait for the host to start a new game',
       stayInRoom: 'Yes, Stay in Room',
@@ -499,6 +502,7 @@ export const translations = {
       welcomeBack: 'ברוך שובך',
       connectingToRoom: 'מתחבר לחדר...',
       enterRoom: 'כניסה לחדר',
+      joinGame: 'הצטרף למשחק',
     },
     hostView: {
       waitingForPlayers: 'ממתין לשחקנים...',
@@ -603,6 +607,7 @@ export const translations = {
       me: 'אני',
       noWordsYet: 'לא נמצאו מילים עדיין',
       shuffle: 'ערבב',
+      swipeToFormWords: 'החליקו על הלוח כדי ליצור מילים',
       inviteFriends: 'הזמן חברים',
     },
     chat: {
@@ -625,6 +630,7 @@ export const translations = {
       returnToRoom: 'חזור לחדר הפעיל',
       cancelAutoReturn: 'בטל מעבר אוטומטי',
       valid: 'תקינות',
+      validWords: 'מילים תקינות',
       playAgainQuestion: '🎮 מוכנים לסיבוב נוסף?',
       playAgainDescription: 'הישארו בחדר והמתינו למארח שיתחיל משחק חדש',
       stayInRoom: 'כן, הישאר בחדר',
@@ -869,6 +875,7 @@ export const translations = {
       welcomeBack: 'Välkommen tillbaka',
       connectingToRoom: 'Ansluter till rummet...',
       enterRoom: 'Gå in i rummet',
+      joinGame: 'Gå med i spelet',
     },
     hostView: {
       waitingForPlayers: 'Väntar på spelare...',
@@ -973,6 +980,7 @@ export const translations = {
       me: 'Jag',
       noWordsYet: 'Inga ord hittade ännu',
       shuffle: 'Blanda',
+      swipeToFormWords: 'Svep på brädet för att bilda ord',
       inviteFriends: 'Bjud in vänner',
     },
     chat: {
@@ -995,6 +1003,7 @@ export const translations = {
       returnToRoom: 'Återvänd till aktivt rum',
       cancelAutoReturn: 'Avbryt automatisk retur',
       valid: 'giltiga',
+      validWords: 'Giltiga Ord',
       playAgainQuestion: '🎮 Redo för en ny runda?',
       playAgainDescription: 'Stanna kvar i rummet och vänta på att värden startar ett nytt spel',
       stayInRoom: 'Ja, stanna i rummet',
@@ -1239,6 +1248,7 @@ export const translations = {
       welcomeBack: 'おかえりなさい',
       connectingToRoom: 'ルームに接続中...',
       enterRoom: 'ルームに入る',
+      joinGame: 'ゲームに参加',
     },
     hostView: {
       waitingForPlayers: 'プレイヤーを待っています...',
@@ -1343,6 +1353,7 @@ export const translations = {
       me: '自分',
       noWordsYet: 'まだ単語が見つかりません',
       shuffle: 'シャッフル',
+      swipeToFormWords: 'ボードをスワイプして単語を作ります',
       inviteFriends: '友達を招待',
     },
     chat: {
@@ -1365,6 +1376,7 @@ export const translations = {
       returnToRoom: 'アクティブルームに戻る',
       cancelAutoReturn: '自動復帰をキャンセル',
       valid: '有効',
+      validWords: '有効な単語',
       playAgainQuestion: '🎮 もう一度プレイしますか？',
       playAgainDescription: 'ルームに留まり、ホストが新しいゲームを開始するのを待ちます',
       stayInRoom: 'はい、ルームに留まる',

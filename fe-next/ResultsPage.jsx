@@ -19,15 +19,15 @@ const LetterGrid = ({ letterGrid }) => {
       initial={{ y: 20, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       transition={{ delay: 0.3 }}
-      className="text-center"
+      className="w-full"
     >
-      <div className="inline-block p-3 rounded-xl bg-gradient-to-br from-slate-800/40 to-slate-900/40 dark:from-slate-800/40 dark:to-slate-900/40 border-2 border-cyan-500/50 shadow-[0_4px_24px_rgba(6,182,212,0.3)] relative overflow-hidden">
+      <div className="w-full max-w-[400px] sm:max-w-[350px] md:max-w-[320px] mx-auto p-1 sm:p-2 rounded-xl bg-gradient-to-br from-slate-800/40 to-slate-900/40 dark:from-slate-800/40 dark:to-slate-900/40 border-2 border-cyan-500/50 shadow-[0_4px_24px_rgba(6,182,212,0.3)] relative overflow-hidden">
         {/* Glass glare effect */}
         <div className="absolute inset-0 bg-gradient-to-br from-white/20 via-transparent to-transparent pointer-events-none" />
         <GridComponent
           grid={letterGrid}
           interactive={false}
-          className="max-w-[180px] mx-auto relative z-10"
+          className="w-full relative z-10"
         />
       </div>
     </motion.div>
@@ -78,7 +78,7 @@ const ResultsPage = ({ finalScores, letterGrid, gameCode, onReturnToRoom, userna
   }, [winner]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-50 via-slate-100 to-slate-200 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 flex flex-col overflow-auto transition-colors duration-300 p-3 sm:p-4 md:p-8">
+    <div className="min-h-screen bg-gradient-to-b from-slate-50 via-slate-100 to-slate-200 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 flex flex-col overflow-auto transition-colors duration-300 px-1 py-3 sm:px-4 sm:py-4 md:p-8">
       {/* Top Bar with Exit Button */}
       <div className="w-full max-w-4xl mx-auto flex justify-end mb-4">
         <Button
@@ -92,64 +92,67 @@ const ResultsPage = ({ finalScores, letterGrid, gameCode, onReturnToRoom, userna
       </div>
 
       {/* Main Content Area */}
-      <div className="flex-1 max-w-4xl mx-auto w-full">
-        {/* Winner Banner */}
-        {winner && <ResultsWinnerBanner winner={winner} isCurrentUserWinner={winner.username === username} />}
+      <div className="flex-1 w-full">
+        {/* Header Section - Centered */}
+        <div className="max-w-4xl mx-auto">
+          {/* Winner Banner */}
+          {winner && <ResultsWinnerBanner winner={winner} isCurrentUserWinner={winner.username === username} />}
 
-        {/* Letter Grid */}
-        {letterGrid && (
+          {/* Letter Grid */}
+          {letterGrid && (
+            <motion.div
+              initial={{ y: 20, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ delay: 0.1 }}
+              className="mb-6 px-0 sm:px-4"
+            >
+              <LetterGrid letterGrid={letterGrid} />
+            </motion.div>
+          )}
+
+          {/* Final Scores Title */}
           <motion.div
             initial={{ y: 20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
-            transition={{ delay: 0.1 }}
-            className="mb-6 flex justify-center"
+            transition={{ delay: 0.2 }}
+            className="flex items-center justify-center gap-3 mb-6"
           >
-            <LetterGrid letterGrid={letterGrid} />
+            <motion.div
+              animate={{ rotate: [0, -10, 10, 0], scale: [1, 1.1, 1] }}
+              transition={{ duration: 2, repeat: Infinity, repeatDelay: 2 }}
+            >
+              <FaTrophy className="text-2xl text-yellow-500 dark:text-yellow-400 drop-shadow-[0_0_10px_rgba(234,179,8,0.5)]" />
+            </motion.div>
+            <h2 className="text-2xl sm:text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 via-orange-400 to-yellow-500 dark:from-yellow-300 dark:via-orange-300 dark:to-yellow-400">
+              {t('results.finalScores')}
+            </h2>
+            <motion.div
+              animate={{ rotate: [0, 10, -10, 0], scale: [1, 1.1, 1] }}
+              transition={{ duration: 2, repeat: Infinity, repeatDelay: 2, delay: 0.5 }}
+            >
+              <FaTrophy className="text-2xl text-yellow-500 dark:text-yellow-400 drop-shadow-[0_0_10px_rgba(234,179,8,0.5)]" />
+            </motion.div>
           </motion.div>
-        )}
 
-        {/* Final Scores Title */}
-        <motion.div
-          initial={{ y: 20, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.2 }}
-          className="flex items-center justify-center gap-3 mb-6"
-        >
+          {/* Duplicate Words Clarification Banner */}
           <motion.div
-            animate={{ rotate: [0, -10, 10, 0], scale: [1, 1.1, 1] }}
-            transition={{ duration: 2, repeat: Infinity, repeatDelay: 2 }}
+            initial={{ y: -20, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 0.3 }}
+            className="mb-6"
           >
-            <FaTrophy className="text-2xl text-yellow-500 dark:text-yellow-400 drop-shadow-[0_0_10px_rgba(234,179,8,0.5)]" />
+            <div className="p-4 rounded-lg bg-gradient-to-r from-orange-500/30 to-red-500/30 border-2 border-orange-500/60 relative overflow-hidden">
+              {/* Glass glare effect */}
+              <div className="absolute inset-0 bg-gradient-to-br from-white/15 via-transparent to-transparent pointer-events-none" />
+              <p className="text-center text-sm font-bold text-orange-800 dark:text-orange-200 relative z-10">
+                ⚠️ {t('results.duplicateWarning')}
+              </p>
+            </div>
           </motion.div>
-          <h2 className="text-2xl sm:text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 via-orange-400 to-yellow-500 dark:from-yellow-300 dark:via-orange-300 dark:to-yellow-400">
-            {t('results.finalScores')}
-          </h2>
-          <motion.div
-            animate={{ rotate: [0, 10, -10, 0], scale: [1, 1.1, 1] }}
-            transition={{ duration: 2, repeat: Infinity, repeatDelay: 2, delay: 0.5 }}
-          >
-            <FaTrophy className="text-2xl text-yellow-500 dark:text-yellow-400 drop-shadow-[0_0_10px_rgba(234,179,8,0.5)]" />
-          </motion.div>
-        </motion.div>
+        </div>
 
-        {/* Duplicate Words Clarification Banner */}
-        <motion.div
-          initial={{ y: -20, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.3 }}
-          className="mb-6"
-        >
-          <div className="p-4 rounded-lg bg-gradient-to-r from-orange-500/30 to-red-500/30 border-2 border-orange-500/60 relative overflow-hidden">
-            {/* Glass glare effect */}
-            <div className="absolute inset-0 bg-gradient-to-br from-white/15 via-transparent to-transparent pointer-events-none" />
-            <p className="text-center text-sm font-bold text-orange-800 dark:text-orange-200 relative z-10">
-              ⚠️ {t('results.duplicateWarning')}
-            </p>
-          </div>
-        </motion.div>
-
-        {/* Player Results Cards */}
-        <div className="space-y-4">
+        {/* Player Results Cards - Full Width */}
+        <div className="space-y-4 max-w-full px-1 sm:px-2">
           {sortedScores.map((player, index) => (
             <ResultsPlayerCard
               key={player.username}
@@ -162,13 +165,13 @@ const ResultsPage = ({ finalScores, letterGrid, gameCode, onReturnToRoom, userna
           ))}
         </div>
 
-        {/* Play Again Section */}
+        {/* Play Again Section - Centered */}
         {gameCode && onReturnToRoom && (
           <motion.div
             initial={{ y: 30, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ delay: 0.5 + sortedScores.length * 0.1 }}
-            className="mt-8"
+            className="mt-8 max-w-4xl mx-auto"
           >
             <Card className="p-5 sm:p-6 bg-gradient-to-r from-slate-800/40 to-slate-900/40 border-2 border-cyan-500/50 shadow-[0_0_30px_rgba(6,182,212,0.3)] rounded-2xl relative overflow-hidden">
               {/* Glass glare effect */}

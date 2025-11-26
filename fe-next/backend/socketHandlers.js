@@ -20,6 +20,7 @@ const {
   updateUserSocketId,
   getGameUsers,
   getActiveRooms,
+  cleanupEmptyRooms,
   isHost,
   updateHostSocketId,
   resetGameForNewRound,
@@ -223,13 +224,14 @@ function initializeSocketHandlers(io) {
           reconnected: true
         });
 
-        // If game is in progress, send current state
+        // If game is in progress, send current state with remaining time
         if (game.gameState === 'in-progress') {
           socket.emit('startGame', {
             letterGrid: game.letterGrid,
-            timerSeconds: game.timerSeconds,
+            timerSeconds: game.remainingTime || game.timerSeconds, // Use remaining time if available
             language: game.language,
-            messageId: 'reconnect-' + Date.now()
+            messageId: 'reconnect-' + Date.now(),
+            reconnect: true
           });
         }
 
@@ -264,11 +266,13 @@ function initializeSocketHandlers(io) {
       if (game.gameState === 'in-progress') {
         console.log(`[SOCKET] ${username} joining game ${gameCode} in progress - allowing participation`);
 
+        // Send startGame with the current remaining time (not original timer)
         socket.emit('startGame', {
           letterGrid: game.letterGrid,
-          timerSeconds: game.timerSeconds,
+          timerSeconds: game.remainingTime || game.timerSeconds, // Use remaining time if available
           language: game.language,
-          messageId: 'late-join-' + Date.now()
+          messageId: 'late-join-' + Date.now(),
+          lateJoin: true
         });
 
         // Send current leaderboard
@@ -742,6 +746,13 @@ function initializeSocketHandlers(io) {
 
         // Handle game start coordination
         gameStartCoordinator.handlePlayerDisconnect(gameCode, username);
+
+        // Clean up empty rooms and broadcast updated room list
+        const cleanedCount = cleanupEmptyRooms();
+        if (cleanedCount > 0) {
+          console.log(`[SOCKET] Cleaned up ${cleanedCount} empty room(s)`);
+        }
+        io.emit('activeRooms', { rooms: getActiveRooms() });
       }
 
       // Reset rate limit
@@ -791,6 +802,13 @@ function initializeSocketHandlers(io) {
 
         // Handle game start coordination
         gameStartCoordinator.handlePlayerDisconnect(gameCode, username);
+
+        // Clean up empty rooms and broadcast updated room list
+        const cleanedCount = cleanupEmptyRooms();
+        if (cleanedCount > 0) {
+          console.log(`[SOCKET] Cleaned up ${cleanedCount} empty room(s)`);
+        }
+        io.emit('activeRooms', { rooms: getActiveRooms() });
       }
 
       // Reset rate limit
@@ -830,6 +848,9 @@ function startGameTimer(io, gameCode, timerSeconds) {
 
   let remainingTime = timerSeconds;
 
+  // Store remaining time in game state for late joiners
+  updateGame(gameCode, { remainingTime });
+
   // Clear any existing timer
   timerManager.clearGameTimer(gameCode);
 
@@ -837,9 +858,16 @@ function startGameTimer(io, gameCode, timerSeconds) {
   const timerId = setInterval(() => {
     remainingTime--;
 
-    // Broadcast time update
+    // Update remaining time in game state for late joiners
+    updateGame(gameCode, { remainingTime });
+
+    // Broadcast time update with game state for late joiners
+    const currentGame = getGame(gameCode);
     broadcastToRoom(io, getGameRoom(gameCode), 'timeUpdate', {
-      remainingTime
+      remainingTime,
+      // Include game state for late joiners who might have missed startGame
+      letterGrid: currentGame?.letterGrid,
+      language: currentGame?.language
     });
 
     if (remainingTime <= 0) {
@@ -940,19 +968,43 @@ function endGame(io, gameCode) {
     if (currentGame && currentGame.gameState === 'finished') {
       console.log(`[AUTO_VALIDATION] Host AFK for game ${gameCode}, auto-validating dictionary words only`);
 
+      // Build word count map to detect duplicates across all players
+      const wordCountMap = {};
+      Object.values(currentGame.playerWords || {}).forEach(words => {
+        words.forEach(word => {
+          wordCountMap[word] = (wordCountMap[word] || 0) + 1;
+        });
+      });
+
       // Auto-validate dictionary words, mark others as invalid
       const validatedScores = {};
+      const playerWordObjects = {}; // Store formatted word objects for each player
+
       Object.keys(currentGame.users).forEach(username => {
         const playerWords = currentGame.playerWords?.[username] || [];
         let score = 0;
+        const wordObjects = [];
 
         playerWords.forEach(word => {
-          if (isDictionaryWord(word, currentGame.language || 'en')) {
-            score += calculateWordScore(word);
+          const isValid = isDictionaryWord(word, currentGame.language || 'en');
+          const isDuplicate = wordCountMap[word] > 1;
+          const wordScore = isValid ? calculateWordScore(word) : 0;
+
+          // Only add to score if valid and not a duplicate
+          if (isValid && !isDuplicate) {
+            score += wordScore;
           }
+
+          wordObjects.push({
+            word: word,
+            score: isDuplicate ? 0 : wordScore,
+            validated: isValid,
+            isDuplicate: isDuplicate
+          });
         });
 
         validatedScores[username] = score;
+        playerWordObjects[username] = wordObjects;
       });
 
       // Update scores and broadcast
@@ -960,12 +1012,24 @@ function endGame(io, gameCode) {
         updatePlayerScore(gameCode, username, score, false);
       }
 
-      // Convert scores to array format for frontend
-      const scoresArray = Object.entries(validatedScores).map(([username, score]) => ({
-        username,
-        score,
-        allWords: currentGame.playerWords?.[username] || []
-      })).sort((a, b) => b.score - a.score);
+      // Convert scores to array format for frontend with properly formatted word objects
+      const scoresArray = Object.entries(validatedScores).map(([username, score]) => {
+        const allWords = playerWordObjects[username] || [];
+        const validWords = allWords.filter(w => w.validated && !w.isDuplicate);
+        const longestWord = validWords.length > 0
+          ? validWords.reduce((longest, w) => w.word.length > longest.length ? w.word : longest, '')
+          : '';
+
+        return {
+          username,
+          score,
+          allWords,
+          wordCount: allWords.length,
+          validWordCount: validWords.length,
+          longestWord,
+          avatar: currentGame.users?.[username]?.avatar || null
+        };
+      }).sort((a, b) => b.score - a.score);
 
       broadcastToRoom(io, getGameRoom(gameCode), 'validatedScores', {
         scores: scoresArray,
