@@ -19,15 +19,15 @@ const LetterGrid = ({ letterGrid }) => {
       initial={{ y: 20, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       transition={{ delay: 0.3 }}
-      className="text-center"
+      className="w-full"
     >
-      <div className="inline-block p-3 rounded-xl bg-gradient-to-br from-slate-800/40 to-slate-900/40 dark:from-slate-800/40 dark:to-slate-900/40 border-2 border-cyan-500/50 shadow-[0_4px_24px_rgba(6,182,212,0.3)] relative overflow-hidden">
+      <div className="w-full max-w-[400px] sm:max-w-[350px] md:max-w-[320px] mx-auto p-1 sm:p-2 rounded-xl bg-gradient-to-br from-slate-800/40 to-slate-900/40 dark:from-slate-800/40 dark:to-slate-900/40 border-2 border-cyan-500/50 shadow-[0_4px_24px_rgba(6,182,212,0.3)] relative overflow-hidden">
         {/* Glass glare effect */}
         <div className="absolute inset-0 bg-gradient-to-br from-white/20 via-transparent to-transparent pointer-events-none" />
         <GridComponent
           grid={letterGrid}
           interactive={false}
-          className="max-w-[180px] mx-auto relative z-10"
+          className="w-full relative z-10"
         />
       </div>
     </motion.div>
@@ -78,7 +78,7 @@ const ResultsPage = ({ finalScores, letterGrid, gameCode, onReturnToRoom, userna
   }, [winner]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-50 via-slate-100 to-slate-200 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 flex flex-col overflow-auto transition-colors duration-300 p-3 sm:p-4 md:p-8">
+    <div className="min-h-screen bg-gradient-to-b from-slate-50 via-slate-100 to-slate-200 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 flex flex-col overflow-auto transition-colors duration-300 px-1 py-3 sm:px-4 sm:py-4 md:p-8">
       {/* Top Bar with Exit Button */}
       <div className="w-full max-w-4xl mx-auto flex justify-end mb-4">
         <Button
@@ -104,7 +104,7 @@ const ResultsPage = ({ finalScores, letterGrid, gameCode, onReturnToRoom, userna
               initial={{ y: 20, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               transition={{ delay: 0.1 }}
-              className="mb-6 flex justify-center"
+              className="mb-6 px-0 sm:px-4"
             >
               <LetterGrid letterGrid={letterGrid} />
             </motion.div>
