@@ -308,9 +308,9 @@ const GridComponent = ({
             const startCenter = startCellCenterRef.current;
             if (!startCenter) return;
 
-            const dxFromCenter = touchX - startCenter.x;
-            const dyFromCenter = touchY - startCenter.y;
-            const rawAngle = calculateAngle(dxFromCenter, dyFromCenter);
+            // Use movement direction from initial touch position, not position relative to cell center
+            // This fixes the bug where touching near a cell edge and moving would lock the opposite direction
+            const rawAngle = calculateAngle(deltaX, deltaY);
             const snappedAngle = snapAngleTo45(rawAngle);
 
             lockedAngleRef.current = snappedAngle;
