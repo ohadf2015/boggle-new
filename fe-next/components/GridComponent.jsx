@@ -201,8 +201,8 @@ const GridComponent = ({
         const cells = [];
         const sign = forward ? 1 : -1;
         for (let i = 0; i < numCells; i++) {
-            const row = startRow + (i * dRow * sign);
-            const col = startCol + (i * dCol * sign);
+            const row = startRow - (i * dRow * sign);
+            const col = startCol - (i * dCol * sign);
             if (row < 0 || row >= grid.length || col < 0 || col >= grid[0].length) break;
             cells.push({ row, col, letter: grid[row][col] });
         }
