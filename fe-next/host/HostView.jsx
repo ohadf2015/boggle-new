@@ -45,6 +45,7 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
   const [showValidation, setShowValidation] = useState(false);
   const [playerWords, setPlayerWords] = useState([]);
   const [validations, setValidations] = useState({});
+  const [showAutoVerifiedWords, setShowAutoVerifiedWords] = useState(false);
   const [finalScores, setFinalScores] = useState(null);
   const [showQR, setShowQR] = useState(false);
   const [playerWordCounts, setPlayerWordCounts] = useState({});
@@ -281,6 +282,7 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
     const handleShowValidation = (data) => {
       setPlayerWords(data.playerWords);
       setShowValidation(true);
+      setShowAutoVerifiedWords(false); // Reset collapsed state when modal opens
       const initialValidations = {};
       const uniqueWords = new Set();
       data.playerWords.forEach(player => {
@@ -905,77 +907,88 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
                       );
                     })}
 
-                    {/* Divider - Only show if both sections have words */}
-                    {nonAutoVerifiedWords.length > 0 && autoVerifiedWords.length > 0 && (
-                      <div className="flex items-center gap-3 py-3">
-                        <div className="flex-1 h-px bg-gradient-to-r from-transparent via-cyan-500/50 to-transparent"></div>
-                        <span className="text-sm font-semibold text-cyan-600 dark:text-cyan-400 flex items-center gap-2">
-                          <span className="text-lg">✓</span>
-                          {t('hostView.autoValidated')}
-                        </span>
-                        <div className="flex-1 h-px bg-gradient-to-r from-transparent via-cyan-500/50 to-transparent"></div>
+                    {/* Collapsible Auto-Verified Words Section */}
+                    {autoVerifiedWords.length > 0 && (
+                      <div className="mt-2">
+                        <button
+                          onClick={() => setShowAutoVerifiedWords(!showAutoVerifiedWords)}
+                          className="w-full flex items-center gap-3 py-3 px-4 bg-gradient-to-r from-cyan-50 to-blue-50 dark:from-cyan-900/20 dark:to-blue-900/20 rounded-xl border-2 border-cyan-300 dark:border-cyan-700 hover:border-cyan-400 dark:hover:border-cyan-600 transition-all"
+                        >
+                          <span className={cn(
+                            "text-lg transition-transform duration-200",
+                            showAutoVerifiedWords ? "rotate-90" : ""
+                          )}>
+                            ▶
+                          </span>
+                          <span className="text-sm font-semibold text-cyan-600 dark:text-cyan-400 flex items-center gap-2">
+                            <span className="text-lg">✓</span>
+                            {t('hostView.autoValidated')} ({autoVerifiedWords.length})
+                          </span>
+                          <span className="ml-auto text-xs text-cyan-500 dark:text-cyan-500">
+                            {showAutoVerifiedWords ? t('hostView.clickToHide') : t('hostView.clickToShow')}
+                          </span>
+                        </button>
+
+                        {/* Auto-Verified Words - Only show when expanded */}
+                        {showAutoVerifiedWords && (
+                          <div className="mt-2 space-y-2">
+                            {autoVerifiedWords.map((item, index) => {
+                              const isDuplicate = item.playerCount > 1;
+                              const isAutoValidated = item.autoValidated;
+                              const isValid = validations[item.word] !== undefined ? validations[item.word] : true;
+
+                              return (
+                                <motion.div
+                                  key={`auto-${index}`}
+                                  initial={{ opacity: 0, x: -20 }}
+                                  animate={{ opacity: 1, x: 0 }}
+                                  transition={{ delay: Math.min(index * 0.02, 0.3) }}
+                                  className={cn(
+                                    "flex items-center gap-3 p-3 rounded-xl transition-all border-2",
+                                    isDuplicate
+                                      ? "bg-gradient-to-r from-orange-50 to-red-50 dark:from-orange-900/20 dark:to-red-900/20 border-orange-300 dark:border-orange-700"
+                                      : isAutoValidated
+                                        ? "bg-gradient-to-r from-cyan-50 to-blue-50 dark:from-cyan-900/20 dark:to-blue-900/20 border-cyan-300 dark:border-cyan-700"
+                                        : isValid
+                                          ? "bg-white dark:bg-slate-800 border-indigo-200 dark:border-slate-600 hover:border-indigo-400 dark:hover:border-indigo-500"
+                                          : "bg-slate-100 dark:bg-slate-700 border-slate-300 dark:border-slate-500 opacity-60"
+                                  )}
+                                >
+                                  <Checkbox
+                                    checked={isValid}
+                                    onCheckedChange={() => toggleWordValidation(null, item.word)}
+                                    disabled={isDuplicate}
+                                    className={cn(
+                                      "w-6 h-6 data-[state=checked]:bg-gradient-to-r data-[state=checked]:from-indigo-600 data-[state=checked]:to-purple-600",
+                                      isDuplicate && "opacity-30 cursor-not-allowed"
+                                    )}
+                                  />
+                                  <div className="flex items-center gap-2 flex-1 min-w-0">
+                                    <span className={cn(
+                                      "text-lg font-bold",
+                                      isDuplicate && "line-through text-gray-400 dark:text-gray-600",
+                                      !isDuplicate && !isValid && "text-gray-400 dark:text-gray-600"
+                                    )}>
+                                      {applyHebrewFinalLetters(item.word)}
+                                    </span>
+                                    {isDuplicate && (
+                                      <Badge className="bg-gradient-to-r from-orange-500 to-red-500 text-white border-0 shadow-md">
+                                        ⚠ {item.playerCount} {t('joinView.players')}
+                                      </Badge>
+                                    )}
+                                    {item.playerCount === 1 && (
+                                      <span className="text-sm font-medium text-slate-500 dark:text-slate-400 ml-auto truncate">
+                                        {item.players[0]}
+                                      </span>
+                                    )}
+                                  </div>
+                                </motion.div>
+                              );
+                            })}
+                          </div>
+                        )}
                       </div>
                     )}
-
-                    {/* Auto-Verified Words Section */}
-                    {autoVerifiedWords.map((item, index) => {
-                      const isDuplicate = item.playerCount > 1;
-                      const isAutoValidated = item.autoValidated;
-                      const isValid = validations[item.word] !== undefined ? validations[item.word] : true;
-
-                      return (
-                        <motion.div
-                          key={`auto-${index}`}
-                          initial={{ opacity: 0, x: -20 }}
-                          animate={{ opacity: 1, x: 0 }}
-                          transition={{ delay: Math.min((nonAutoVerifiedWords.length + index) * 0.02, 0.5) }}
-                          className={cn(
-                            "flex items-center gap-3 p-3 rounded-xl transition-all border-2",
-                            isDuplicate
-                              ? "bg-gradient-to-r from-orange-50 to-red-50 dark:from-orange-900/20 dark:to-red-900/20 border-orange-300 dark:border-orange-700"
-                              : isAutoValidated
-                                ? "bg-gradient-to-r from-cyan-50 to-blue-50 dark:from-cyan-900/20 dark:to-blue-900/20 border-cyan-300 dark:border-cyan-700"
-                                : isValid
-                                  ? "bg-white dark:bg-slate-800 border-indigo-200 dark:border-slate-600 hover:border-indigo-400 dark:hover:border-indigo-500"
-                                  : "bg-slate-100 dark:bg-slate-700 border-slate-300 dark:border-slate-500 opacity-60"
-                          )}
-                        >
-                          <Checkbox
-                            checked={isValid}
-                            onCheckedChange={() => toggleWordValidation(null, item.word)}
-                            disabled={isDuplicate}
-                            className={cn(
-                              "w-6 h-6 data-[state=checked]:bg-gradient-to-r data-[state=checked]:from-indigo-600 data-[state=checked]:to-purple-600",
-                              isDuplicate && "opacity-30 cursor-not-allowed"
-                            )}
-                          />
-                          <div className="flex items-center gap-2 flex-1 min-w-0">
-                            <span className={cn(
-                              "text-lg font-bold",
-                              isDuplicate && "line-through text-gray-400 dark:text-gray-600",
-                              !isDuplicate && !isValid && "text-gray-400 dark:text-gray-600"
-                            )}>
-                              {applyHebrewFinalLetters(item.word)}
-                            </span>
-                            {isDuplicate && (
-                              <Badge className="bg-gradient-to-r from-orange-500 to-red-500 text-white border-0 shadow-md">
-                                ⚠ {item.playerCount} {t('joinView.players')}
-                              </Badge>
-                            )}
-                            {isAutoValidated && !isDuplicate && (
-                              <Badge className="bg-gradient-to-r from-cyan-500 to-blue-500 text-white border-0 shadow-md">
-                                ✓ {t('hostView.autoValidated')}
-                              </Badge>
-                            )}
-                            {item.playerCount === 1 && (
-                              <span className="text-sm font-medium text-slate-500 dark:text-slate-400 ml-auto truncate">
-                                {item.players[0]}
-                              </span>
-                            )}
-                          </div>
-                        </motion.div>
-                      );
-                    })}
                   </div>
                 </div>
               );

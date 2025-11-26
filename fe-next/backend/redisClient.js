@@ -299,6 +299,101 @@ async function closeRedis() {
   }
 }
 
+// ==========================================
+// Word Approval Tracking (no TTL - persistent)
+// ==========================================
+
+// Get approval status for a word
+async function getWordApprovalStatus(word, language) {
+  if (!isRedisAvailable || !redisClient) {
+    return null;
+  }
+
+  try {
+    const key = `approved_word:${language}:${word}`;
+    const data = await redisClient.get(key);
+    return data ? JSON.parse(data) : null;
+  } catch (error) {
+    console.error('[REDIS] Error getting word approval status:', error.message);
+    return null;
+  }
+}
+
+// Increment approval count for a word (returns new approval data)
+async function incrementWordApproval(word, language, gameId) {
+  if (!isRedisAvailable || !redisClient) {
+    return null;
+  }
+
+  try {
+    const key = `approved_word:${language}:${word}`;
+    const existing = await redisClient.get(key);
+    const now = new Date().toISOString();
+
+    let approvalData;
+    if (existing) {
+      approvalData = JSON.parse(existing);
+      // Only count if this game hasn't already approved this word
+      if (!approvalData.gameIds.includes(gameId)) {
+        approvalData.gameIds.push(gameId);
+        approvalData.approvalCount = approvalData.gameIds.length;
+        approvalData.lastApproved = now;
+      }
+    } else {
+      approvalData = {
+        approvalCount: 1,
+        gameIds: [gameId],
+        firstApproved: now,
+        lastApproved: now
+      };
+    }
+
+    // Save without TTL (persistent)
+    await redisClient.set(key, JSON.stringify(approvalData));
+    return approvalData;
+  } catch (error) {
+    console.error('[REDIS] Error incrementing word approval:', error.message);
+    return null;
+  }
+}
+
+// Get all approved words for a language with minimum approvals
+async function getApprovedWords(language, minApprovals = 2) {
+  if (!isRedisAvailable || !redisClient) {
+    return [];
+  }
+
+  try {
+    const approvedWords = [];
+    let cursor = '0';
+
+    // Use SCAN to find all approved word keys for this language
+    do {
+      const result = await redisClient.scan(cursor, 'MATCH', `approved_word:${language}:*`, 'COUNT', 100);
+      cursor = result[0];
+      const keys = result[1];
+
+      // Get data for each key and filter by approval count
+      for (const key of keys) {
+        const data = await redisClient.get(key);
+        if (data) {
+          const approvalData = JSON.parse(data);
+          if (approvalData.approvalCount >= minApprovals) {
+            // Extract word from key (approved_word:he:word -> word)
+            const word = key.replace(`approved_word:${language}:`, '');
+            approvedWords.push(word);
+          }
+        }
+      }
+    } while (cursor !== '0');
+
+    return approvedWords;
+  } catch (error) {
+    console.error('[REDIS] Error getting approved words:', error.message);
+    return [];
+  }
+}
+
 module.exports = {
   initRedis,
   saveGameState,
@@ -311,4 +406,8 @@ module.exports = {
   getAllTournamentIds,
   closeRedis,
   isRedisAvailable: () => isRedisAvailable,
+  // Word approval tracking
+  getWordApprovalStatus,
+  incrementWordApproval,
+  getApprovedWords,
 };

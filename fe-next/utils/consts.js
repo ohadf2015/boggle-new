@@ -111,6 +111,17 @@ const DIFFICULTIES = {
 
 const DEFAULT_DIFFICULTY = 'HARD';
 
+// Adaptive deadzone threshold for directional locking
+// Larger threshold on smaller screens to account for touch precision
+const getDeadzoneThreshold = () => {
+  if (typeof window === 'undefined') return 20;
+  const screenWidth = window.innerWidth;
+  if (screenWidth < 375) return 28;  // Small phones (iPhone SE)
+  if (screenWidth < 414) return 24;  // Regular phones
+  if (screenWidth < 768) return 20;  // Large phones
+  return 16;                          // Tablets and desktop
+};
+
 module.exports = {
   hebrewLetters,
   englishLetters,
@@ -119,5 +130,6 @@ module.exports = {
   kanjiCompounds,
   DIFFICULTIES,
   DEFAULT_DIFFICULTY,
+  getDeadzoneThreshold,
 };
   

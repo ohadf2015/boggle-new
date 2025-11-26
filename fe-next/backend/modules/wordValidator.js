@@ -44,11 +44,11 @@ function searchWord(board, word, row, col, index, visited) {
   // Mark as visited
   visited.add(cellKey);
 
-  // All 8 possible directions - allow changing direction at any point
+  // 6 directions - horizontal and diagonal only (no vertical)
   const allDirections = [
-    [-1, -1], [-1, 0], [-1, 1],  // top-left, top, top-right
-    [0, -1],           [0, 1],   // left, right
-    [1, -1],  [1, 0],  [1, 1]    // bottom-left, bottom, bottom-right
+    [-1, -1],          [-1, 1],  // top-left, top-right (diagonals)
+    [0, -1],           [0, 1],   // left, right (horizontal)
+    [1, -1],           [1, 1]    // bottom-left, bottom-right (diagonals)
   ];
 
   // Try all adjacent cells - no direction restriction

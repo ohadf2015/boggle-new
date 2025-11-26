@@ -4,6 +4,11 @@ import { ThemeProvider } from '@/utils/ThemeContext';
 import { LanguageProvider } from '@/contexts/LanguageContext';
 import { Toaster } from 'react-hot-toast';
 import ErrorBoundary from './components/ErrorBoundary';
+import LogRocket from 'logrocket';
+
+if (typeof window !== 'undefined') {
+    LogRocket.init('ioiov9/lexiclash');
+}
 
 export function Providers({ children, lang }) {
     return (

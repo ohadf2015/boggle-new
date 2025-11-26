@@ -134,8 +134,8 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
       setGameActive(true);
       setShowStartAnimation(true);
 
-      // Send acknowledgment to server
-      if (data.messageId) {
+      // Send acknowledgment to server (skip for late-join/reconnect scenarios)
+      if (data.messageId && !data.skipAck) {
         socket.emit('startGameAck', { messageId: data.messageId });
         console.log('[PLAYER] Sent startGameAck for messageId:', data.messageId);
       }

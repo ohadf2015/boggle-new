@@ -47,7 +47,8 @@ const {
 const { validateWordOnBoard } = require('./modules/wordValidator');
 const { calculateWordScore, calculateGameScores } = require('./modules/scoringEngine');
 const { checkAndAwardAchievements, getPlayerAchievements, ACHIEVEMENTS } = require('./modules/achievementManager');
-const { isDictionaryWord, getAvailableDictionaries } = require('./dictionary');
+const { isDictionaryWord, getAvailableDictionaries, addApprovedWord, normalizeWord } = require('./dictionary');
+const { incrementWordApproval } = require('./redisClient');
 const gameStartCoordinator = require('./utils/gameStartCoordinator');
 const timerManager = require('./utils/timerManager');
 const { checkRateLimit, resetRateLimit } = require('./utils/rateLimiter');
@@ -231,7 +232,8 @@ function initializeSocketHandlers(io) {
             timerSeconds: game.remainingTime || game.timerSeconds, // Use remaining time if available
             language: game.language,
             messageId: 'reconnect-' + Date.now(),
-            reconnect: true
+            reconnect: true,
+            skipAck: true // Reconnecting players don't need to participate in game start coordination
           });
         }
 
@@ -272,7 +274,8 @@ function initializeSocketHandlers(io) {
           timerSeconds: game.remainingTime || game.timerSeconds, // Use remaining time if available
           language: game.language,
           messageId: 'late-join-' + Date.now(),
-          lateJoin: true
+          lateJoin: true,
+          skipAck: true // Late-joining players don't need to participate in game start coordination
         });
 
         // Send current leaderboard
@@ -467,7 +470,7 @@ function initializeSocketHandlers(io) {
     });
 
     // Handle validate words (host validation)
-    socket.on('validateWords', (data) => {
+    socket.on('validateWords', async (data) => {
       const { validations } = data || {};
 
       const gameCode = getGameBySocketId(socket.id);
@@ -571,6 +574,34 @@ function initializeSocketHandlers(io) {
       });
 
       console.log(`[SOCKET] Sent validationComplete to host for game ${gameCode} - ${emitSuccess ? 'SUCCESS' : 'FAILED'}`);
+
+      // Track host-approved words for community dictionary promotion
+      // For words that were NOT in the dictionary but approved by host
+      const language = game.language || 'en';
+      const approvedNonDictionaryWords = validations.filter(v => {
+        if (!v.isValid) return false;
+        // Check if word was NOT in the original dictionary (host manually approved it)
+        const isInDictionary = isDictionaryWord(v.word, language);
+        return !isInDictionary;
+      });
+
+      // Process each approved non-dictionary word
+      for (const { word } of approvedNonDictionaryWords) {
+        const normalizedWord = normalizeWord(word, language);
+
+        // Increment approval in Redis and check if threshold reached
+        const approvalData = await incrementWordApproval(normalizedWord, language, gameCode);
+
+        if (approvalData && approvalData.approvalCount >= 2) {
+          // Word has been approved by 2+ different game sessions - promote it!
+          const promoted = await addApprovedWord(normalizedWord, language);
+          if (promoted) {
+            console.log(`[SOCKET] Word "${word}" (${language}) promoted to community dictionary after ${approvalData.approvalCount} approvals from games: ${approvalData.gameIds.join(', ')}`);
+          }
+        } else if (approvalData) {
+          console.log(`[SOCKET] Word "${word}" (${language}) approved in game ${gameCode} (${approvalData.approvalCount}/2 approvals needed)`);
+        }
+      }
     });
 
     // Handle reset game

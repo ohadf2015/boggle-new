@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '../lib/utils';
+import { getDeadzoneThreshold } from '../utils/consts';
 
 const noOp = () => { };
 
@@ -18,11 +19,23 @@ const GridComponent = ({
     const [internalSelectedCells, setInternalSelectedCells] = useState([]);
     const [direction, setDirection] = useState(null); // Track the direction of movement
     const [fadingCells, setFadingCells] = useState([]); // Track cells that are fading out
+    const [isAxisLocked, setIsAxisLocked] = useState(false); // Visual feedback state
+    const [axisGuidePoints, setAxisGuidePoints] = useState(null); // { start, end } for guide line
+    const [projectedPosition, setProjectedPosition] = useState(null); // { x, y } for projection dot
+
     const isTouchingRef = useRef(false);
     const gridRef = useRef(null);
     const startPosRef = useRef({ x: 0, y: 0 });
     const hasMovedRef = useRef(false);
     const autoSubmitTimeoutRef = useRef(null);
+
+    // Directional locking refs
+    const startCellRef = useRef(null);           // { row, col, letter }
+    const startCellCenterRef = useRef(null);     // { x, y } viewport coordinates
+    const lockedAngleRef = useRef(null);         // Snapped angle (0, 45, 90, etc.) or null
+    const lockedDirectionRef = useRef(null);     // { dx, dy, dRow, dCol, isDiagonal }
+    const cellSizeRef = useRef(null);            // Cell size in pixels
+
     const MOVEMENT_THRESHOLD = 10; // pixels - minimum movement to register as intentional
 
     // Use external control if provided, otherwise internal state
@@ -123,19 +136,146 @@ const GridComponent = ({
         return newDir.row === currentDirection.row && newDir.col === currentDirection.col;
     };
 
+    // ==================== Directional Locking Helper Functions ====================
+
+    // Calculate angle in degrees from delta coordinates
+    const calculateAngle = (dx, dy) => {
+        const radians = Math.atan2(dy, dx);
+        const degrees = radians * (180 / Math.PI);
+        return ((degrees % 360) + 360) % 360;
+    };
+
+    // Snap to nearest 45-degree increment
+    const snapAngleTo45 = (angleDegrees) => {
+        const snapped = Math.round(angleDegrees / 45) * 45;
+        return snapped % 360;
+    };
+
+    // Get direction vectors for a snapped angle
+    const getDirectionFromAngle = (angle) => {
+        const directions = {
+            0:   { dx: 1,  dy: 0,  dRow: 0,  dCol: 1  },  // Right
+            45:  { dx: 1,  dy: 1,  dRow: 1,  dCol: 1  },  // Down-Right
+            90:  { dx: 0,  dy: 1,  dRow: 1,  dCol: 0  },  // Down
+            135: { dx: -1, dy: 1,  dRow: 1,  dCol: -1 },  // Down-Left
+            180: { dx: -1, dy: 0,  dRow: 0,  dCol: -1 },  // Left
+            225: { dx: -1, dy: -1, dRow: -1, dCol: -1 },  // Up-Left
+            270: { dx: 0,  dy: -1, dRow: -1, dCol: 0  },  // Up
+            315: { dx: 1,  dy: -1, dRow: -1, dCol: 1  },  // Up-Right
+        };
+        const dir = directions[angle] || directions[0];
+        const isDiagonal = angle % 90 !== 0;
+        // Normalize diagonal vectors for proper projection
+        if (isDiagonal) {
+            const sqrt2 = Math.SQRT2;
+            return { ...dir, dx: dir.dx / sqrt2, dy: dir.dy / sqrt2, isDiagonal };
+        }
+        return { ...dir, isDiagonal: false };
+    };
+
+    // Project touch onto locked axis
+    const projectOntoAxis = (touchX, touchY, startX, startY, dirX, dirY) => {
+        const vecX = touchX - startX;
+        const vecY = touchY - startY;
+        const dot = vecX * dirX + vecY * dirY;
+        return {
+            x: startX + dot * dirX,
+            y: startY + dot * dirY,
+            distance: dot
+        };
+    };
+
+    // Get cell center in viewport coordinates
+    const getCellCenterViewport = useCallback((rowIndex, colIndex) => {
+        if (!gridRef.current) return null;
+        const cells = gridRef.current.children;
+        const cellIndex = rowIndex * (grid[0]?.length || 4) + colIndex;
+        const cell = cells[cellIndex];
+        if (!cell) return null;
+        const rect = cell.getBoundingClientRect();
+        return { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 };
+    }, [grid]);
+
+    // Calculate cells along direction from start
+    const getCellsAlongDirection = useCallback((startRow, startCol, dRow, dCol, numCells, forward) => {
+        const cells = [];
+        const sign = forward ? 1 : -1;
+        for (let i = 0; i < numCells; i++) {
+            const row = startRow + (i * dRow * sign);
+            const col = startCol + (i * dCol * sign);
+            if (row < 0 || row >= grid.length || col < 0 || col >= grid[0].length) break;
+            cells.push({ row, col, letter: grid[row][col] });
+        }
+        return cells;
+    }, [grid]);
+
+    // Calculate axis guide line endpoints (extends to grid edges)
+    const calculateAxisGuidePoints = useCallback((centerX, centerY, dirX, dirY) => {
+        if (!gridRef.current) return null;
+        const gridRect = gridRef.current.getBoundingClientRect();
+        const relX = centerX - gridRect.left;
+        const relY = centerY - gridRect.top;
+
+        // Extend line to grid boundaries in both directions
+        const extendToEdge = (x, y, dx, dy, width, height) => {
+            if (dx === 0 && dy === 0) return { x, y };
+            let t = Infinity;
+            if (dx > 0) t = Math.min(t, (width - x) / dx);
+            if (dx < 0) t = Math.min(t, -x / dx);
+            if (dy > 0) t = Math.min(t, (height - y) / dy);
+            if (dy < 0) t = Math.min(t, -y / dy);
+            return { x: x + dx * t, y: y + dy * t };
+        };
+
+        const forward = extendToEdge(relX, relY, dirX, dirY, gridRect.width, gridRect.height);
+        const backward = extendToEdge(relX, relY, -dirX, -dirY, gridRect.width, gridRect.height);
+
+        return { start: backward, end: forward, center: { x: relX, y: relY } };
+    }, []);
+
+    // Reset all directional locking state
+    const resetDirectionalLock = useCallback(() => {
+        lockedAngleRef.current = null;
+        lockedDirectionRef.current = null;
+        startCellRef.current = null;
+        startCellCenterRef.current = null;
+        setIsAxisLocked(false);
+        setAxisGuidePoints(null);
+        setProjectedPosition(null);
+    }, []);
+
+    // ==================== End Directional Locking Helpers ====================
+
     const handleTouchStart = (rowIndex, colIndex, letter, event) => {
         if (!interactive) return;
         isTouchingRef.current = true;
         hasMovedRef.current = false;
 
         // Store initial touch position for misclick prevention
-        if (event.touches && event.touches[0]) {
-            startPosRef.current = { x: event.touches[0].clientX, y: event.touches[0].clientY };
-        } else if (event.clientX !== undefined) {
-            startPosRef.current = { x: event.clientX, y: event.clientY };
+        const touch = event.touches?.[0] || event;
+        const touchX = touch.clientX;
+        const touchY = touch.clientY;
+        startPosRef.current = { x: touchX, y: touchY };
+
+        // Store start cell info for directional locking
+        startCellRef.current = { row: rowIndex, col: colIndex, letter };
+        startCellCenterRef.current = getCellCenterViewport(rowIndex, colIndex);
+
+        // Calculate cell size for distance calculations
+        if (gridRef.current?.children[0]) {
+            const rect = gridRef.current.children[0].getBoundingClientRect();
+            cellSizeRef.current = rect.width;
         }
 
+        // Reset direction lock state
+        lockedAngleRef.current = null;
+        lockedDirectionRef.current = null;
+        setIsAxisLocked(false);
+        setAxisGuidePoints(null);
+        setProjectedPosition(null);
+
         setSelectedCells([{ row: rowIndex, col: colIndex, letter }]);
+
         // Enhanced haptic feedback - medium vibration on start
         if (window.navigator && window.navigator.vibrate) {
             window.navigator.vibrate(30);
@@ -147,68 +287,106 @@ const GridComponent = ({
         if (e.cancelable) e.preventDefault();
 
         const touch = e.touches[0];
+        const touchX = touch.clientX;
+        const touchY = touch.clientY;
 
-        // Misclick prevention: check if user has moved enough from start position
-        if (!hasMovedRef.current) {
-            const deltaX = Math.abs(touch.clientX - startPosRef.current.x);
-            const deltaY = Math.abs(touch.clientY - startPosRef.current.y);
-            const totalMovement = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+        // Calculate total movement from start
+        const deltaX = touchX - startPosRef.current.x;
+        const deltaY = touchY - startPosRef.current.y;
+        const totalMovement = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
 
-            if (totalMovement < MOVEMENT_THRESHOLD) {
-                // User hasn't moved enough yet - don't register as intentional movement
-                return;
-            }
-            // User has moved enough - mark as intentional
-            hasMovedRef.current = true;
+        const deadzoneThreshold = getDeadzoneThreshold();
+
+        // Phase 1: Within deadzone - don't lock yet
+        if (lockedAngleRef.current === null && totalMovement < deadzoneThreshold) {
+            return;
         }
 
-        const element = document.elementFromPoint(touch.clientX, touch.clientY);
+        // Phase 2: Lock direction if not already locked
+        if (lockedAngleRef.current === null) {
+            hasMovedRef.current = true;
+            const startCenter = startCellCenterRef.current;
+            if (!startCenter) return;
 
-        if (element && element.dataset.row !== undefined) {
-            const rowIndex = parseInt(element.dataset.row);
-            const colIndex = parseInt(element.dataset.col);
-            const letter = element.dataset.letter;
+            const dxFromCenter = touchX - startCenter.x;
+            const dyFromCenter = touchY - startCenter.y;
+            const rawAngle = calculateAngle(dxFromCenter, dyFromCenter);
+            const snappedAngle = snapAngleTo45(rawAngle);
 
-            const lastCell = selectedCells[selectedCells.length - 1];
+            lockedAngleRef.current = snappedAngle;
+            lockedDirectionRef.current = getDirectionFromAngle(snappedAngle);
 
-            // Avoid rapid re-adding same cell
-            if (lastCell && lastCell.row === rowIndex && lastCell.col === colIndex) {
-                return;
+            // Calculate and set axis guide points for visual
+            const guidePoints = calculateAxisGuidePoints(
+                startCenter.x, startCenter.y,
+                lockedDirectionRef.current.dx, lockedDirectionRef.current.dy
+            );
+            setAxisGuidePoints(guidePoints);
+            setIsAxisLocked(true);
+
+            // Haptic feedback for axis lock
+            if (window.navigator?.vibrate) window.navigator.vibrate([15, 10, 25]);
+        }
+
+        // Phase 3: Project touch onto locked axis and select cells
+        const startCenter = startCellCenterRef.current;
+        const dir = lockedDirectionRef.current;
+        if (!startCenter || !dir) return;
+
+        const projection = projectOntoAxis(
+            touchX, touchY, startCenter.x, startCenter.y, dir.dx, dir.dy
+        );
+
+        // Update projected position for visual indicator (relative to grid)
+        const gridRect = gridRef.current?.getBoundingClientRect();
+        if (gridRect) {
+            setProjectedPosition({
+                x: projection.x - gridRect.left,
+                y: projection.y - gridRect.top
+            });
+        }
+
+        // Calculate number of cells based on projection distance
+        const cellSize = cellSizeRef.current || 50;
+        const effectiveSpacing = dir.isDiagonal ? cellSize * Math.SQRT2 : cellSize;
+        const absDistance = Math.abs(projection.distance);
+        const numCells = Math.max(1, Math.floor((absDistance + effectiveSpacing * 0.4) / effectiveSpacing) + 1);
+        const forward = projection.distance >= 0;
+
+        // Get cells along direction
+        const startCell = startCellRef.current;
+        if (!startCell) return;
+
+        const newCells = getCellsAlongDirection(
+            startCell.row, startCell.col, dir.dRow, dir.dCol, numCells, forward
+        );
+
+        // Check if returned to start cell (only start cell selected) after having more
+        if (newCells.length === 1 && selectedCells.length > 1) {
+            // Release axis lock - user can choose new direction
+            lockedAngleRef.current = null;
+            lockedDirectionRef.current = null;
+            setIsAxisLocked(false);
+            setAxisGuidePoints(null);
+            setProjectedPosition(null);
+            // Reset start position to allow new direction from current touch
+            startPosRef.current = { x: touchX, y: touchY };
+            if (window.navigator?.vibrate) window.navigator.vibrate(20);
+        }
+
+        // Update selection if changed
+        const cellsChanged = newCells.length !== selectedCells.length ||
+            newCells.some((c, i) => c.row !== selectedCells[i]?.row || c.col !== selectedCells[i]?.col);
+
+        if (cellsChanged) {
+            // Haptic feedback
+            if (newCells.length > selectedCells.length && window.navigator?.vibrate) {
+                const intensity = Math.min(20 + newCells.length * 3 + comboLevel * 5, 60);
+                window.navigator.vibrate(intensity);
+            } else if (newCells.length < selectedCells.length && window.navigator?.vibrate) {
+                window.navigator.vibrate(15);
             }
-
-            // Backtracking
-            const existingIndex = selectedCells.findIndex(c => c.row === rowIndex && c.col === colIndex);
-            if (existingIndex !== -1) {
-                if (existingIndex === selectedCells.length - 2) {
-                    setSelectedCells(prev => prev.slice(0, -1));
-
-                    // Light vibration for backtracking
-                    if (window.navigator && window.navigator.vibrate) window.navigator.vibrate(15);
-                }
-                return;
-            }
-
-            // Validation Logic - allow any adjacent cell (multi-directional)
-            if (lastCell) {
-                const rowDiff = rowIndex - lastCell.row;
-                const colDiff = colIndex - lastCell.col;
-
-                // Must be adjacent (within 1 cell) but NOT the same cell
-                const isAdjacent = Math.abs(rowDiff) <= 1 && Math.abs(colDiff) <= 1 && !(rowDiff === 0 && colDiff === 0);
-
-                // Allow any adjacent cell - no direction restriction
-                if (isAdjacent) {
-                    setSelectedCells(prev => [...prev, { row: rowIndex, col: colIndex, letter }]);
-
-                    // Progressive vibration - longer word and combo level = more intense feedback
-                    const baseIntensity = 20 + selectedCells.length * 3;
-                    const comboBonus = comboLevel * 5; // Add extra intensity for combo streaks
-                    const vibrationIntensity = Math.min(baseIntensity + comboBonus, 60);
-                    if (window.navigator && window.navigator.vibrate) {
-                        window.navigator.vibrate(vibrationIntensity);
-                    }
-                }
-            }
+            setSelectedCells(newCells);
         }
     };
 
@@ -221,6 +399,9 @@ const GridComponent = ({
             clearTimeout(autoSubmitTimeoutRef.current);
             autoSubmitTimeoutRef.current = null;
         }
+
+        // Reset directional locking state
+        resetDirectionalLock();
 
         // Misclick prevention: only submit if user has moved OR selected multiple letters
         // This prevents accidental single-letter submissions from taps
@@ -283,39 +464,17 @@ const GridComponent = ({
         handleTouchStart(rowIndex, colIndex, letter, event);
     };
 
-    const handleMouseEnter = (rowIndex, colIndex, letter) => {
+    // Handle mouse move for directional locking on desktop
+    const handleMouseMove = (e) => {
         if (!interactive || !isTouchingRef.current) return;
 
-
-
-        // For mouse enter, we already know the target, so we can skip elementFromPoint logic if we refactor handleTouchMove
-        // But to reuse handleTouchMove as is, we'd need coordinates. 
-        // Let's just duplicate the logic for mouse enter to be safe and simple.
-
-        const lastCell = selectedCells[selectedCells.length - 1];
-        if (lastCell && lastCell.row === rowIndex && lastCell.col === colIndex) return;
-
-        // Backtracking
-        const existingIndex = selectedCells.findIndex(c => c.row === rowIndex && c.col === colIndex);
-        if (existingIndex !== -1) {
-            if (existingIndex === selectedCells.length - 2) {
-                setSelectedCells(prev => prev.slice(0, -1));
-            }
-            return;
-        }
-
-        if (lastCell) {
-            const rowDiff = rowIndex - lastCell.row;
-            const colDiff = colIndex - lastCell.col;
-
-            // Must be adjacent (within 1 cell) but NOT the same cell
-            const isAdjacent = Math.abs(rowDiff) <= 1 && Math.abs(colDiff) <= 1 && !(rowDiff === 0 && colDiff === 0);
-
-            // Allow any adjacent cell - no direction restriction
-            if (isAdjacent) {
-                setSelectedCells(prev => [...prev, { row: rowIndex, col: colIndex, letter }]);
-            }
-        }
+        // Create mock touch event structure for unified handling
+        const mockEvent = {
+            touches: [{ clientX: e.clientX, clientY: e.clientY }],
+            cancelable: true,
+            preventDefault: () => {}
+        };
+        handleTouchMove(mockEvent);
     };
 
     const handleMouseUp = () => {
@@ -556,6 +715,52 @@ const GridComponent = ({
                 </svg>
             )}
 
+            {/* Axis Guide Line - shown when direction is locked */}
+            {isAxisLocked && axisGuidePoints && gridRef.current && (
+                <svg
+                    className="absolute inset-0 pointer-events-none z-0"
+                    style={{ width: '100%', height: '100%' }}
+                >
+                    <defs>
+                        <filter id="projectionGlow" x="-50%" y="-50%" width="200%" height="200%">
+                            <feGaussianBlur stdDeviation="4" result="blur" />
+                            <feMerge>
+                                <feMergeNode in="blur" />
+                                <feMergeNode in="SourceGraphic" />
+                            </feMerge>
+                        </filter>
+                    </defs>
+                    {/* Axis guide line extending across grid */}
+                    <motion.line
+                        x1={axisGuidePoints.start.x}
+                        y1={axisGuidePoints.start.y}
+                        x2={axisGuidePoints.end.x}
+                        y2={axisGuidePoints.end.y}
+                        stroke={comboLevel > 0 ? "#f97316" : "#eab308"}
+                        strokeWidth={2}
+                        strokeDasharray="8,6"
+                        strokeOpacity={0.5}
+                        initial={{ pathLength: 0, opacity: 0 }}
+                        animate={{ pathLength: 1, opacity: 0.5 }}
+                        transition={{ duration: 0.25 }}
+                    />
+                    {/* Projection dot - shows where touch maps onto axis */}
+                    {projectedPosition && (
+                        <motion.circle
+                            cx={projectedPosition.x}
+                            cy={projectedPosition.y}
+                            r={10}
+                            fill={comboLevel > 0 ? "#f97316" : "#eab308"}
+                            fillOpacity={0.6}
+                            filter="url(#projectionGlow)"
+                            initial={{ scale: 0 }}
+                            animate={{ scale: [1, 1.3, 1] }}
+                            transition={{ duration: 0.8, repeat: Infinity, ease: "easeInOut" }}
+                        />
+                    )}
+                </svg>
+            )}
+
             <div
                 ref={gridRef}
                 className={cn(
@@ -571,6 +776,7 @@ const GridComponent = ({
                 tabIndex={interactive ? 0 : -1}
                 onTouchMove={handleTouchMove}
                 onTouchEnd={handleTouchEnd}
+                onMouseMove={handleMouseMove}
             >
             {grid.map((row, i) =>
                 row.map((cell, j) => {
@@ -585,7 +791,6 @@ const GridComponent = ({
                             data-letter={cell}
                             onTouchStart={(e) => handleTouchStart(i, j, cell, e)}
                             onMouseDown={(e) => handleMouseDown(i, j, cell, e)}
-                            onMouseEnter={() => handleMouseEnter(i, j, cell)}
                             initial={animateOnMount
                                 ? { scale: 0, opacity: 0, rotateX: -90, y: -20 }
                                 : { scale: 0.8, opacity: 0 }
