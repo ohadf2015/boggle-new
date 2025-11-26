@@ -109,7 +109,7 @@ const ResultsWinnerBanner = ({ winner, isCurrentUserWinner }) => {
           )}
 
           {/* Overlay for text readability */}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/20 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent" />
         </motion.div>
 
         {/* Glass glare effect - sweeping animation */}
@@ -149,11 +149,11 @@ const ResultsWinnerBanner = ({ winner, isCurrentUserWinner }) => {
             <div
               className="relative rounded-2xl overflow-hidden p-5 sm:p-7 md:p-10 text-center"
               style={{
-                background: 'rgba(255, 255, 255, 0.12)',
-                backdropFilter: 'blur(12px)',
-                WebkitBackdropFilter: 'blur(12px)',
-                border: '1px solid rgba(255, 255, 255, 0.3)',
-                boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.3), 0 10px 40px rgba(0,0,0,0.2)',
+                background: 'rgba(255, 255, 255, 0.08)',
+                backdropFilter: 'blur(4px)',
+                WebkitBackdropFilter: 'blur(4px)',
+                border: '1px solid rgba(255, 255, 255, 0.25)',
+                boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.2), 0 10px 40px rgba(0,0,0,0.15)',
               }}
             >
               {/* Card glass glare */}
