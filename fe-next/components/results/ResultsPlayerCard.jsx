@@ -50,9 +50,9 @@ const WordChip = ({ wordObj, playerCount }) => {
         {label}
       </Badge>
       {isDuplicate && playerCount > 1 && (
-        <span className="absolute -top-2 end-[-8px] bg-orange-600 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold shadow-md">
+        <Badge className="absolute -top-2 end-[-8px] bg-gradient-to-r from-orange-500 to-amber-500 text-white text-[10px] px-1.5 py-0 min-w-[18px] h-[18px] flex items-center justify-center font-bold shadow-lg border border-orange-400/50 hover:scale-110 transition-transform">
           {playerCount}
-        </span>
+        </Badge>
       )}
     </div>
   );
@@ -130,9 +130,10 @@ const ResultsPlayerCard = ({ player, index, allPlayerWords, currentUsername, isW
   };
 
   const getCardStyle = () => {
-    if (index === 0) return 'bg-gradient-to-br from-yellow-500/25 to-orange-500/25 border-yellow-500/60 shadow-[0_0_20px_rgba(234,179,8,0.4)]';
-    if (index === 1) return 'bg-gradient-to-br from-gray-400/25 to-gray-500/25 border-gray-400/60 shadow-[0_0_15px_rgba(156,163,175,0.3)]';
-    if (index === 2) return 'bg-gradient-to-br from-orange-500/25 to-orange-600/25 border-orange-500/60 shadow-[0_0_15px_rgba(249,115,22,0.3)]';
+    // Modern shiny metallic styles for podium positions
+    if (index === 0) return 'bg-gradient-to-br from-yellow-100 via-amber-300 to-yellow-500 dark:from-yellow-200/60 dark:via-amber-400/50 dark:to-yellow-600/40 border-yellow-400 shadow-[0_0_30px_rgba(234,179,8,0.6),inset_0_1px_0_rgba(255,255,255,0.5)]';
+    if (index === 1) return 'bg-gradient-to-br from-slate-100 via-gray-300 to-slate-400 dark:from-slate-200/60 dark:via-gray-300/50 dark:to-slate-500/40 border-slate-400 shadow-[0_0_25px_rgba(148,163,184,0.5),inset_0_1px_0_rgba(255,255,255,0.5)]';
+    if (index === 2) return 'bg-gradient-to-br from-orange-200 via-amber-400 to-orange-600 dark:from-orange-300/60 dark:via-amber-500/50 dark:to-orange-700/40 border-orange-500 shadow-[0_0_25px_rgba(234,88,12,0.5),inset_0_1px_0_rgba(255,255,255,0.5)]';
     return 'bg-white/30 dark:bg-slate-800/30 border-slate-300/70 dark:border-slate-600/70';
   };
 
@@ -191,10 +192,10 @@ const ResultsPlayerCard = ({ player, index, allPlayerWords, currentUsername, isW
           </div>
           <div
             className={cn(
-              "text-4xl font-black",
-              index === 0 && "text-yellow-500",
-              index === 1 && "text-gray-400",
-              index === 2 && "text-orange-500",
+              "text-4xl font-black drop-shadow-lg",
+              index === 0 && "text-yellow-700 dark:text-yellow-300",
+              index === 1 && "text-slate-600 dark:text-slate-200",
+              index === 2 && "text-orange-700 dark:text-orange-300",
               index > 2 && "text-slate-700 dark:text-slate-300"
             )}
           >
@@ -257,7 +258,7 @@ const ResultsPlayerCard = ({ player, index, allPlayerWords, currentUsername, isW
                               <span className="text-slate-400">•</span>
                               <span className="text-slate-500 dark:text-slate-400">{wordsByPoints[points].length} {t('hostView.words') || 'words'}</span>
                             </div>
-                            <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-8 gap-1.5">
+                            <div className="flex flex-wrap gap-1">
                               {wordsByPoints[points].map((wordObj, i) => (
                                 <WordChip
                                   key={`${points}-${i}`}
@@ -279,7 +280,7 @@ const ResultsPlayerCard = ({ player, index, allPlayerWords, currentUsername, isW
                         <span>👥</span>
                         {t('results.shared') || 'Shared Words'} ({duplicateWords.length})
                       </div>
-                      <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-8 gap-1.5">
+                      <div className="flex flex-wrap gap-1">
                         {duplicateWords.map((wordObj, i) => (
                           <WordChip
                             key={`duplicate-${i}`}
@@ -298,7 +299,7 @@ const ResultsPlayerCard = ({ player, index, allPlayerWords, currentUsername, isW
                         <span>✗</span>
                         {t('results.invalid') || 'Invalid Words'} ({invalidWords.length})
                       </div>
-                      <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-8 gap-1.5">
+                      <div className="flex flex-wrap gap-1">
                         {invalidWords.map((wordObj, i) => (
                           <WordChip
                             key={`invalid-${i}`}
