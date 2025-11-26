@@ -340,3 +340,65 @@ body {
     filter: brightness(1) saturate(1);
   }
 }
+
+/* Glass Shine Animation - sweeping highlight effect */
+@keyframes glass-shine {
+  0% {
+    background-position: 200% 0;
+  }
+
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+@keyframes glass-shine-reverse {
+  0% {
+    background-position: -200% 0;
+  }
+
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+/* Sparkle Flash Animation */
+@keyframes sparkle-flash {
+  0%,
+  100% {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+
+  50% {
+    opacity: 1;
+    transform: scale(1.2);
+  }
+}
+
+/* Gradient XY Animation for background glow */
+@keyframes gradient-xy {
+  0%,
+  100% {
+    background-position: 0% 50%;
+  }
+
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+/* Gradient X Animation for text */
+@keyframes gradient-x {
+  0% {
+    background-position: 0% 50%;
+  }
+
+  50% {
+    background-position: 100% 50%;
+  }
+
+  100% {
+    background-position: 0% 50%;
+  }
+}
