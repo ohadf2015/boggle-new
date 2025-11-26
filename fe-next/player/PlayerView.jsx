@@ -1177,6 +1177,7 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
                     playerView={true}
                     comboLevel={comboLevel}
                     className="w-full max-w-2xl"
+                    dir={dir}
                   />
 
                   {/* Shuffle Button - Only visible for host in waiting state */}

@@ -14,7 +14,8 @@ const GridComponent = ({
     largeText = false,
     playerView = false,
     comboLevel = 0,
-    animateOnMount = false // When true, adds a slot machine style cascade animation on initial render
+    animateOnMount = false, // When true, adds a slot machine style cascade animation on initial render
+    dir = 'ltr' // Text direction - 'ltr' or 'rtl' - affects axis lock direction for grid navigation
 }) => {
     const [internalSelectedCells, setInternalSelectedCells] = useState([]);
     const [direction, setDirection] = useState(null); // Track the direction of movement
@@ -152,7 +153,11 @@ const GridComponent = ({
     };
 
     // Get direction vectors for a snapped angle
+    // In RTL mode, the grid columns are visually reversed (column 0 is on the right)
+    // so we need to invert the column direction to match visual movement
+    const isRTL = dir === 'rtl';
     const getDirectionFromAngle = (angle) => {
+        // Base directions for LTR mode (standard left-to-right grid layout)
         const directions = {
             0:   { dx: 1,  dy: 0,  dRow: 0,  dCol: 1  },  // Right
             45:  { dx: 1,  dy: 1,  dRow: 1,  dCol: 1  },  // Down-Right
@@ -163,14 +168,20 @@ const GridComponent = ({
             270: { dx: 0,  dy: -1, dRow: -1, dCol: 0  },  // Up
             315: { dx: 1,  dy: -1, dRow: -1, dCol: 1  },  // Up-Right
         };
-        const dir = directions[angle] || directions[0];
+        const direction = directions[angle] || directions[0];
         const isDiagonal = angle % 90 !== 0;
+
+        // In RTL mode, invert the column direction to match visual movement
+        // Screen coordinates (dx, dy) stay the same for projection calculations
+        // Grid coordinates (dCol) need to be inverted because columns render right-to-left
+        const adjustedDCol = isRTL ? -direction.dCol : direction.dCol;
+
         // Normalize diagonal vectors for proper projection
         if (isDiagonal) {
             const sqrt2 = Math.SQRT2;
-            return { ...dir, dx: dir.dx / sqrt2, dy: dir.dy / sqrt2, isDiagonal };
+            return { ...direction, dx: direction.dx / sqrt2, dy: direction.dy / sqrt2, dCol: adjustedDCol, isDiagonal };
         }
-        return { ...dir, isDiagonal: false };
+        return { ...direction, dCol: adjustedDCol, isDiagonal: false };
     };
 
     // Project touch onto locked axis
