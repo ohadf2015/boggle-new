@@ -57,8 +57,11 @@ const GridComponent = ({
         const cellsToFade = [...selectedCells];
         setFadingCells(cellsToFade);
 
-        // Fade out each cell sequentially in the order they were marked
-        cellsToFade.forEach((cell, index) => {
+        // Fade out each cell sequentially from END to START (reverse order)
+        // This creates a "retracting trail" effect from where the finger lifted
+        // back to where the swipe began, which feels more natural
+        const reversedCells = [...cellsToFade].reverse();
+        reversedCells.forEach((cell, index) => {
             setTimeout(() => {
                 setFadingCells(prev => prev.filter(c => !(c.row === cell.row && c.col === cell.col)));
             }, index * 80); // 80ms delay between each cell fade
