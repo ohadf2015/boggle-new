@@ -59,6 +59,7 @@ export default function GamePage() {
   const [playersInRoom, setPlayersInRoom] = useState([]);
   const [socket, setSocket] = useState(null);
   const [isConnected, setIsConnected] = useState(false);
+  const [roomsLoading, setRoomsLoading] = useState(true); // Track rooms loading state
 
   const socketRef = useRef(null);
   const attemptingReconnectRef = useRef(attemptingReconnect);
@@ -259,6 +260,7 @@ export default function GamePage() {
 
     newSocket.on('activeRooms', (data) => {
       setActiveRooms(data.rooms || []);
+      setRoomsLoading(false);
     });
 
     newSocket.on('error', (data) => {
@@ -491,6 +493,7 @@ export default function GamePage() {
 
   const refreshRooms = useCallback(() => {
     if (socket && isConnected) {
+      setRoomsLoading(true);
       socket.emit('getActiveRooms');
     }
   }, [socket, isConnected]);
@@ -540,6 +543,7 @@ export default function GamePage() {
           refreshRooms={refreshRooms}
           prefilledRoom={prefilledRoomCode}
           isAutoJoining={shouldAutoJoin}
+          roomsLoading={roomsLoading}
         />
       );
     }

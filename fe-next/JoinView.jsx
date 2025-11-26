@@ -19,7 +19,7 @@ import { cn } from './lib/utils';
 import { copyJoinUrl, shareViaWhatsApp, getJoinUrl } from './utils/share';
 import { useLanguage } from './contexts/LanguageContext';
 
-const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, error, activeRooms, refreshRooms, prefilledRoom, roomName, setRoomName, isAutoJoining }) => {
+const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, error, activeRooms, refreshRooms, prefilledRoom, roomName, setRoomName, isAutoJoining, roomsLoading }) => {
   const { t, language } = useLanguage();
   const [mode, setMode] = useState('join'); // 'join' or 'host'
   const [showQR, setShowQR] = useState(false);
@@ -643,7 +643,28 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
                 </div>
               </CardHeader>
               <CardContent className="flex-1 overflow-auto">
-                {activeRooms.length === 0 ? (
+                {roomsLoading ? (
+                  // Loading skeleton for rooms
+                  <div className="space-y-2">
+                    {[1, 2, 3].map((i) => (
+                      <div
+                        key={i}
+                        className="w-full p-3 rounded-lg bg-slate-700/30 animate-pulse"
+                      >
+                        <div className="flex items-center justify-between gap-3">
+                          <div className="flex items-center gap-2">
+                            <div className="w-8 h-8 bg-slate-600/50 rounded-full" />
+                            <div>
+                              <div className="h-5 w-24 bg-slate-600/50 rounded mb-1" />
+                              <div className="h-3 w-16 bg-slate-600/30 rounded" />
+                            </div>
+                          </div>
+                          <div className="h-5 w-16 bg-slate-600/50 rounded-full" />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : activeRooms.length === 0 ? (
                   <div className="text-center py-6 text-slate-500 dark:text-gray-400 space-y-4">
                     <div className="flex justify-center">
                       <FaGamepad size={48} className="text-slate-400 dark:text-slate-600" />

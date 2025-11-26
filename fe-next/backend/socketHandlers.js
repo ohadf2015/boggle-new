@@ -20,6 +20,7 @@ const {
   updateUserSocketId,
   getGameUsers,
   getActiveRooms,
+  cleanupEmptyRooms,
   isHost,
   updateHostSocketId,
   resetGameForNewRound,
@@ -742,6 +743,13 @@ function initializeSocketHandlers(io) {
 
         // Handle game start coordination
         gameStartCoordinator.handlePlayerDisconnect(gameCode, username);
+
+        // Clean up empty rooms and broadcast updated room list
+        const cleanedCount = cleanupEmptyRooms();
+        if (cleanedCount > 0) {
+          console.log(`[SOCKET] Cleaned up ${cleanedCount} empty room(s)`);
+        }
+        io.emit('activeRooms', { rooms: getActiveRooms() });
       }
 
       // Reset rate limit
@@ -791,6 +799,13 @@ function initializeSocketHandlers(io) {
 
         // Handle game start coordination
         gameStartCoordinator.handlePlayerDisconnect(gameCode, username);
+
+        // Clean up empty rooms and broadcast updated room list
+        const cleanedCount = cleanupEmptyRooms();
+        if (cleanedCount > 0) {
+          console.log(`[SOCKET] Cleaned up ${cleanedCount} empty room(s)`);
+        }
+        io.emit('activeRooms', { rooms: getActiveRooms() });
       }
 
       // Reset rate limit
