@@ -1160,21 +1160,15 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
             </Card>
           )}
 
-          {/* Mobile: Word Input below grid */}
+          {/* Mobile: Word count display (input removed - use board to form words) */}
           <div className="lg:hidden">
             <Card className="bg-white/90 dark:bg-slate-800/90 backdrop-blur-md border border-teal-500/30 shadow-[0_0_15px_rgba(20,184,166,0.1)]">
-              <CardContent className="p-2">
-                <Input
-                  ref={inputRef}
-                  value={word}
-                  onChange={(e) => setWord(e.target.value)}
-                  onKeyDown={handleKeyDown}
-                  disabled={!gameActive}
-                  placeholder={t('playerView.enterWord')}
-                  className="text-lg bg-slate-100 dark:bg-slate-700/50 border-slate-200 dark:border-slate-600 text-slate-900 dark:text-white placeholder:text-slate-500 dark:placeholder:text-gray-400 text-center"
-                />
-                <div className="mt-2 text-center text-sm text-teal-600 dark:text-teal-300 font-semibold">
+              <CardContent className="p-3">
+                <div className="text-center text-lg text-teal-600 dark:text-teal-300 font-bold">
                   {foundWords.length} {t('playerView.wordsFound') || 'words found'}
+                </div>
+                <div className="text-center text-xs text-slate-500 dark:text-slate-400 mt-1">
+                  {t('playerView.swipeToFormWords') || 'Swipe on the board to form words'}
                 </div>
               </CardContent>
             </Card>
