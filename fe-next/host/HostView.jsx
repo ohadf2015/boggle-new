@@ -13,6 +13,7 @@ import { Checkbox } from '../components/ui/checkbox';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '../components/ui/dialog';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '../components/ui/alert-dialog';
 import GridComponent from '../components/GridComponent';
+import SlotMachineGrid from '../components/SlotMachineGrid';
 import ShareButton from '../components/ShareButton';
 import SlotMachineText from '../components/SlotMachineText';
 import ResultsPlayerCard from '../components/results/ResultsPlayerCard';
@@ -1439,16 +1440,17 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
           <div className="flex flex-col lg:flex-row gap-3 sm:gap-4 md:gap-6">
             {/* Letter Grid - LEFT */}
             <Card className="flex-1 bg-white/80 dark:bg-slate-800/80 backdrop-blur-md p-1 sm:p-3 rounded-lg shadow-lg border border-cyan-500/30 shadow-[0_0_15px_rgba(6,182,212,0.1)] flex flex-col items-center">
-              {/* Grid Container */}
+              {/* Grid Container with Slot Machine Animation */}
               <div className="w-full flex justify-center items-center transition-all duration-500 aspect-square max-w-[500px]">
                 <div className="w-full h-full flex items-center justify-center">
-                  <GridComponent
+                  <SlotMachineGrid
                     grid={shufflingGrid || tableData}
-                    interactive={false}
-                    selectedCells={highlightedCells}
+                    highlightedCells={highlightedCells}
+                    language={roomLanguage || language}
                     className="w-full h-full"
-                    playerView={false}
-                    comboLevel={0}
+                    animationDuration={600}
+                    staggerDelay={40}
+                    animationPattern="cascade"
                   />
                 </div>
               </div>
