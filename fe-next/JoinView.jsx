@@ -105,7 +105,7 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
           transition={{ type: 'spring', stiffness: 260, damping: 20 }}
           className="w-full max-w-md"
         >
-          <Card className="backdrop-blur-md bg-white/90 dark:bg-slate-800/90 shadow-2xl border border-cyan-500/30 shadow-[0_0_20px_rgba(6,182,212,0.15)]">
+          <Card className="backdrop-blur-md bg-white/90 dark:bg-slate-800/90 shadow-2xl border border-cyan-500/30">
             <CardHeader className="text-center space-y-4">
               <div className="flex justify-center">
                 <motion.div
@@ -619,11 +619,11 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
             className="flex-1 relative z-10"
           >
             <Card className={cn(
-              "backdrop-blur-md bg-white/90 dark:bg-slate-800/90 shadow-xl flex flex-col border border-teal-500/30 shadow-[0_0_15px_rgba(20,184,166,0.1)]",
+              "backdrop-blur-md bg-white/90 dark:bg-slate-800/90 shadow-xl flex flex-col border border-teal-500/30",
               activeRooms.length === 0 ? "h-auto" : "h-full max-h-[300px] md:max-h-[500px]"
             )}>
               <CardHeader>
-                <div className="flex justify-between items-center">
+                <div className="flex h-full justify-between items-center">
                   <CardTitle className="text-teal-400">{t('joinView.roomsList')}</CardTitle>
                   <TooltipProvider>
                     <Tooltip>
