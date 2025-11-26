@@ -14,6 +14,7 @@ import { clearSession } from '../utils/session';
 import { useLanguage } from '../contexts/LanguageContext';
 import gsap from 'gsap';
 import GridComponent from '../components/GridComponent';
+import SlotMachineGrid from '../components/SlotMachineGrid';
 import { applyHebrewFinalLetters } from '../utils/utils';
 import RoomChat from '../components/RoomChat';
 import GoRipplesAnimation from '../components/GoRipplesAnimation';
@@ -796,11 +797,14 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
               <Card className="bg-slate-900/95 dark:bg-slate-900/95 backdrop-blur-md border border-cyan-500/40 shadow-[0_0_25px_rgba(6,182,212,0.2)] overflow-hidden">
                 <div className="p-4 flex flex-col items-center justify-center bg-slate-900/90">
                   {shufflingGrid ? (
-                    <GridComponent
+                    <SlotMachineGrid
                       grid={shufflingGrid}
-                      interactive={false}
-                      selectedCells={highlightedCells}
+                      highlightedCells={highlightedCells}
+                      language={gameLanguage || 'en'}
                       className="w-full max-w-xs"
+                      animationDuration={600}
+                      staggerDelay={40}
+                      animationPattern="cascade"
                     />
                   ) : (
                     // Loading skeleton for the grid
