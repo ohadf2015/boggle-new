@@ -223,15 +223,13 @@ const GridComponent = ({
     // The 'forward' flag indicates whether the user is swiping in the positive direction
     // of the locked axis (projection.distance >= 0) or in the negative direction.
     //
-    // When forward = true:  sign = -1 → select cells opposite to (dRow, dCol)
-    // When forward = false: sign = 1  → select cells in direction of (dRow, dCol)
+    // When forward = true:  sign = 1  → select cells in direction of (dRow, dCol)
+    // When forward = false: sign = -1 → select cells opposite to (dRow, dCol)
     //
-    // The sign is inverted because the projection distance increases in the
-    // direction of the locked axis (dRow, dCol), but visually the user expects
-    // cells to be selected in the direction they are swiping.
+    // This ensures cells are selected in the same direction the user is swiping.
     const getCellsAlongDirection = useCallback((startRow, startCol, dRow, dCol, numCells, forward) => {
         const cells = [];
-        const sign = forward ? -1 : 1;
+        const sign = forward ? 1 : -1;
         for (let i = 0; i < numCells; i++) {
             const row = startRow + (i * dRow * sign);
             const col = startCol + (i * dCol * sign);
