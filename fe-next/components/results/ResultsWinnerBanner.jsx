@@ -40,9 +40,9 @@ const ResultsWinnerBanner = ({ winner, isCurrentUserWinner }) => {
       }}
       className="mb-4 sm:mb-6 md:mb-8 relative w-full"
     >
-      {/* Outer Glow Effects */}
-      <div className="absolute inset-0 bg-gradient-to-r from-yellow-400/30 via-orange-500/40 to-yellow-400/30 rounded-3xl blur-3xl animate-pulse" />
-      <div className="absolute inset-0 bg-gradient-to-br from-cyan-400/20 via-purple-500/20 to-teal-400/20 rounded-3xl blur-2xl"
+      {/* Outer Glow Effects - reduced blur for cleaner appearance */}
+      <div className="absolute inset-0 bg-gradient-to-r from-yellow-400/20 via-orange-500/30 to-yellow-400/20 rounded-3xl blur-xl animate-pulse" />
+      <div className="absolute inset-0 bg-gradient-to-br from-cyan-400/15 via-purple-500/15 to-teal-400/15 rounded-3xl blur-lg"
            style={{ animation: 'gradient-xy 8s ease infinite' }} />
 
       {/* Main Container with Hero Background Image */}
@@ -113,8 +113,8 @@ const ResultsWinnerBanner = ({ winner, isCurrentUserWinner }) => {
           >
             {/* Glassmorphic Card */}
             <div className="relative rounded-2xl overflow-hidden">
-              {/* Glass Effect */}
-              <div className="absolute inset-0 bg-white/20 backdrop-blur-sm border-2 border-white/40 rounded-2xl"
+              {/* Glass Effect - reduced blur for clearer image visibility */}
+              <div className="absolute inset-0 bg-white/10 border-2 border-white/40 rounded-2xl"
                    style={{ boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.4)' }} />
               {/* Glass glare effect */}
               <div className="absolute inset-0 bg-gradient-to-br from-white/30 via-transparent to-transparent pointer-events-none rounded-2xl" />
