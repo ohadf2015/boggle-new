@@ -45,9 +45,34 @@ const ResultsWinnerBanner = ({ winner, isCurrentUserWinner }) => {
       <div className="absolute inset-0 bg-gradient-to-br from-cyan-400/15 via-purple-500/15 to-teal-400/15 rounded-3xl blur-lg"
            style={{ animation: 'gradient-xy 8s ease infinite' }} />
 
-      {/* Main Container with Hero Background Image */}
-      <div className="relative rounded-3xl overflow-hidden shadow-2xl min-h-[400px] md:min-h-[500px]">
-        {/* Hero Background Image with Clear Glass Effect */}
+      {/* Main Container with Hero Background Image - 3D Glass Frame */}
+      <div
+        className="relative rounded-3xl overflow-hidden min-h-[400px] md:min-h-[500px]"
+        style={{
+          boxShadow: `
+            0 25px 50px -12px rgba(0, 0, 0, 0.5),
+            0 0 0 1px rgba(255, 255, 255, 0.1),
+            inset 0 1px 0 rgba(255, 255, 255, 0.2),
+            inset 0 -1px 0 rgba(0, 0, 0, 0.1)
+          `,
+          transform: 'perspective(1000px) rotateX(2deg)',
+          transformStyle: 'preserve-3d'
+        }}
+      >
+        {/* 3D Glass Frame Border */}
+        <div
+          className="absolute inset-0 rounded-3xl pointer-events-none z-20"
+          style={{
+            background: 'linear-gradient(135deg, rgba(255,255,255,0.4) 0%, transparent 50%, rgba(0,0,0,0.2) 100%)',
+            boxShadow: `
+              inset 2px 2px 4px rgba(255, 255, 255, 0.3),
+              inset -2px -2px 4px rgba(0, 0, 0, 0.2),
+              inset 0 0 20px rgba(255, 255, 255, 0.1)
+            `
+          }}
+        />
+
+        {/* Hero Background Image */}
         <div className="absolute inset-0">
           {!imageError ? (
             <motion.img
@@ -65,11 +90,42 @@ const ResultsWinnerBanner = ({ winner, isCurrentUserWinner }) => {
           ) : (
             <div className="absolute inset-0 bg-gradient-to-br from-yellow-400 via-orange-500 to-purple-600" />
           )}
-          {/* Clear glass effect - light reflections only, no blur */}
-          <div className="absolute inset-0 bg-gradient-to-br from-white/15 via-transparent to-transparent pointer-events-none" />
-          <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-transparent to-white/10 pointer-events-none" />
-          {/* Subtle edge highlight like glass edges catch light */}
-          <div className="absolute inset-0 rounded-3xl shadow-[inset_0_1px_0_rgba(255,255,255,0.3),inset_0_-1px_0_rgba(0,0,0,0.1)] pointer-events-none" />
+
+          {/* 3D Glass Reflection - Top left shine */}
+          <div
+            className="absolute inset-0 pointer-events-none"
+            style={{
+              background: 'linear-gradient(135deg, rgba(255,255,255,0.25) 0%, rgba(255,255,255,0.1) 20%, transparent 40%)'
+            }}
+          />
+
+          {/* 3D Glass Reflection - Bottom right subtle reflection */}
+          <div
+            className="absolute inset-0 pointer-events-none"
+            style={{
+              background: 'linear-gradient(315deg, rgba(255,255,255,0.08) 0%, transparent 30%)'
+            }}
+          />
+
+          {/* Horizontal light streak across glass */}
+          <div
+            className="absolute inset-0 pointer-events-none"
+            style={{
+              background: 'linear-gradient(180deg, transparent 35%, rgba(255,255,255,0.08) 40%, rgba(255,255,255,0.12) 42%, rgba(255,255,255,0.08) 44%, transparent 49%)'
+            }}
+          />
+
+          {/* 3D depth shadow at edges */}
+          <div
+            className="absolute inset-0 rounded-3xl pointer-events-none"
+            style={{
+              boxShadow: `
+                inset 4px 4px 8px rgba(255, 255, 255, 0.15),
+                inset -4px -4px 8px rgba(0, 0, 0, 0.15),
+                inset 0 0 40px rgba(0, 0, 0, 0.1)
+              `
+            }}
+          />
         </div>
 
         {/* Floating Particles Animation */}
