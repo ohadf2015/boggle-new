@@ -12,8 +12,11 @@ export default function sitemap() {
           'x-default': baseUrl,
           he: baseUrl,
           en: `${baseUrl}/en`,
+          sv: `${baseUrl}/sv`,
+          ja: `${baseUrl}/ja`,
         },
       },
+      images: [`${baseUrl}/lexiclash.jpg`],
     },
     {
       url: `${baseUrl}/en`,
@@ -25,8 +28,43 @@ export default function sitemap() {
           'x-default': baseUrl,
           he: baseUrl,
           en: `${baseUrl}/en`,
+          sv: `${baseUrl}/sv`,
+          ja: `${baseUrl}/ja`,
         },
       },
+      images: [`${baseUrl}/lexiclash.jpg`],
+    },
+    {
+      url: `${baseUrl}/sv`,
+      lastModified: new Date(),
+      changeFrequency: 'weekly',
+      priority: 0.9,
+      alternates: {
+        languages: {
+          'x-default': baseUrl,
+          he: baseUrl,
+          en: `${baseUrl}/en`,
+          sv: `${baseUrl}/sv`,
+          ja: `${baseUrl}/ja`,
+        },
+      },
+      images: [`${baseUrl}/lexiclash.jpg`],
+    },
+    {
+      url: `${baseUrl}/ja`,
+      lastModified: new Date(),
+      changeFrequency: 'weekly',
+      priority: 0.9,
+      alternates: {
+        languages: {
+          'x-default': baseUrl,
+          he: baseUrl,
+          en: `${baseUrl}/en`,
+          sv: `${baseUrl}/sv`,
+          ja: `${baseUrl}/ja`,
+        },
+      },
+      images: [`${baseUrl}/lexiclash.jpg`],
     },
   ];
 }

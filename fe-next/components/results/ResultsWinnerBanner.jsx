@@ -1,7 +1,8 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { FaCrown, FaMedal, FaTrophy } from 'react-icons/fa';
 import { useLanguage } from '../../contexts/LanguageContext';
+import gsap from 'gsap';
 
 const celebrationImages = [
   '/winner-celebration/trophy-confetti.png',
@@ -19,16 +20,74 @@ const celebrationImages = [
 const ResultsWinnerBanner = ({ winner, isCurrentUserWinner }) => {
   const { t } = useLanguage();
   const [imageError, setImageError] = useState(false);
+  const containerRef = useRef(null);
+  const glassShineRef = useRef(null);
+  const sparkleRefs = useRef([]);
+  const particlesRef = useRef(null);
 
   // Randomly select a celebration image (once per winner)
   const randomImage = useMemo(() => {
     return celebrationImages[Math.floor(Math.random() * celebrationImages.length)];
   }, [winner?.username]);
 
+  // GSAP animations for GPU-accelerated performance
+  useEffect(() => {
+    if (!containerRef.current) return;
+
+    const ctx = gsap.context(() => {
+      // Glass shine animation - GPU accelerated with transform
+      if (glassShineRef.current) {
+        gsap.to(glassShineRef.current, {
+          x: '100%',
+          duration: 2.5,
+          ease: 'power2.inOut',
+          repeat: -1,
+          repeatDelay: 1,
+        });
+      }
+
+      // Sparkle animations with stagger
+      sparkleRefs.current.forEach((sparkle, i) => {
+        if (sparkle) {
+          gsap.to(sparkle, {
+            opacity: 0.9,
+            scale: 1.3,
+            duration: 1.2,
+            ease: 'power2.inOut',
+            repeat: -1,
+            yoyo: true,
+            delay: i * 0.5,
+          });
+        }
+      });
+
+      // Particles animation - reduced count for performance
+      if (particlesRef.current) {
+        const particles = particlesRef.current.children;
+        gsap.fromTo(
+          particles,
+          { y: 0, opacity: 0.8, scale: 1 },
+          {
+            y: -400,
+            opacity: 0,
+            scale: 0.3,
+            duration: 4,
+            ease: 'power1.out',
+            stagger: 0.6,
+            repeat: -1,
+          }
+        );
+      }
+    }, containerRef);
+
+    return () => ctx.revert();
+  }, [winner]);
+
   if (!winner) return null;
 
   return (
     <motion.div
+      ref={containerRef}
       initial={{ scale: 0, rotateY: 180, y: -100 }}
       animate={{ scale: 1, rotateY: 0, y: 0 }}
       transition={{
@@ -38,11 +97,17 @@ const ResultsWinnerBanner = ({ winner, isCurrentUserWinner }) => {
         delay: 0.3
       }}
       className="mb-4 sm:mb-6 md:mb-8 relative w-full"
+      style={{ willChange: 'transform' }}
     >
-      {/* Outer Glow Effects - reduced blur for cleaner appearance */}
-      <div className="absolute inset-0 bg-gradient-to-r from-yellow-400/20 via-orange-500/30 to-yellow-400/20 rounded-3xl blur-xl animate-pulse" />
-      <div className="absolute inset-0 bg-gradient-to-br from-cyan-400/15 via-purple-500/15 to-teal-400/15 rounded-3xl blur-lg"
-           style={{ animation: 'gradient-xy 8s ease infinite' }} />
+      {/* Outer Glow Effects - simplified for performance */}
+      <div
+        className="absolute inset-0 rounded-3xl"
+        style={{
+          background: 'linear-gradient(135deg, rgba(255,215,0,0.25) 0%, rgba(255,140,0,0.35) 50%, rgba(255,215,0,0.25) 100%)',
+          filter: 'blur(20px)',
+          willChange: 'opacity',
+        }}
+      />
 
       {/* Main Container with Hero Background Image - 3D Glass Frame */}
       <div
@@ -50,24 +115,25 @@ const ResultsWinnerBanner = ({ winner, isCurrentUserWinner }) => {
         style={{
           boxShadow: `
             0 25px 50px -12px rgba(0, 0, 0, 0.5),
-            0 0 0 1px rgba(255, 255, 255, 0.1),
-            inset 0 1px 0 rgba(255, 255, 255, 0.2),
+            0 0 0 1px rgba(255, 255, 255, 0.15),
+            inset 0 1px 0 rgba(255, 255, 255, 0.3),
             inset 0 -1px 0 rgba(0, 0, 0, 0.1)
           `,
           transform: 'perspective(1000px) rotateX(2deg)',
-          transformStyle: 'preserve-3d'
+          transformStyle: 'preserve-3d',
+          willChange: 'transform',
         }}
       >
-        {/* 3D Glass Frame Border */}
+        {/* Enhanced 3D Glass Frame Border with stronger visibility */}
         <div
           className="absolute inset-0 rounded-3xl pointer-events-none z-20"
           style={{
-            background: 'linear-gradient(135deg, rgba(255,255,255,0.4) 0%, transparent 50%, rgba(0,0,0,0.2) 100%)',
+            background: 'linear-gradient(135deg, rgba(255,255,255,0.5) 0%, rgba(255,255,255,0.1) 30%, transparent 50%, rgba(0,0,0,0.15) 100%)',
             boxShadow: `
-              inset 2px 2px 4px rgba(255, 255, 255, 0.3),
-              inset -2px -2px 4px rgba(0, 0, 0, 0.2),
-              inset 0 0 20px rgba(255, 255, 255, 0.1)
-            `
+              inset 3px 3px 6px rgba(255, 255, 255, 0.4),
+              inset -3px -3px 6px rgba(0, 0, 0, 0.25),
+              inset 0 0 30px rgba(255, 255, 255, 0.15)
+            `,
           }}
         />
 
@@ -90,43 +156,54 @@ const ResultsWinnerBanner = ({ winner, isCurrentUserWinner }) => {
             <div className="absolute inset-0 bg-gradient-to-br from-yellow-400 via-orange-500 to-purple-600" />
           )}
 
-          {/* Animated Glass Shine - Main sweeping highlight */}
+          {/* GPU-Accelerated Glass Shine - using transform instead of background-position */}
           <div
+            ref={glassShineRef}
             className="absolute inset-0 pointer-events-none z-10"
             style={{
-              background: 'linear-gradient(105deg, transparent 20%, rgba(255,255,255,0) 40%, rgba(255,255,255,0.5) 50%, rgba(255,255,255,0) 60%, transparent 80%)',
-              backgroundSize: '200% 100%',
-              animation: 'glass-shine 3s ease-in-out infinite'
+              background: 'linear-gradient(105deg, transparent 0%, transparent 35%, rgba(255,255,255,0.6) 45%, rgba(255,255,255,0.8) 50%, rgba(255,255,255,0.6) 55%, transparent 65%, transparent 100%)',
+              transform: 'translateX(-100%)',
+              willChange: 'transform',
             }}
           />
 
-          {/* Secondary shine - opposite direction */}
+          {/* Enhanced Sparkle Effects - Positioned for glass corners */}
           <div
-            className="absolute inset-0 pointer-events-none z-10"
+            ref={(el) => (sparkleRefs.current[0] = el)}
+            className="absolute top-[15%] left-[20%] w-16 h-16 pointer-events-none z-10"
             style={{
-              background: 'linear-gradient(-105deg, transparent 20%, rgba(255,255,255,0) 40%, rgba(255,255,255,0.3) 50%, rgba(255,255,255,0) 60%, transparent 80%)',
-              backgroundSize: '200% 100%',
-              animation: 'glass-shine-reverse 4s ease-in-out infinite',
-              animationDelay: '1.5s'
+              background: 'radial-gradient(circle, rgba(255,255,255,0.7) 0%, rgba(255,255,255,0.3) 30%, transparent 70%)',
+              opacity: 0.4,
+              willChange: 'transform, opacity',
+            }}
+          />
+          <div
+            ref={(el) => (sparkleRefs.current[1] = el)}
+            className="absolute bottom-[20%] right-[15%] w-20 h-20 pointer-events-none z-10"
+            style={{
+              background: 'radial-gradient(circle, rgba(255,255,255,0.6) 0%, rgba(255,255,255,0.25) 35%, transparent 70%)',
+              opacity: 0.3,
+              willChange: 'transform, opacity',
+            }}
+          />
+          <div
+            ref={(el) => (sparkleRefs.current[2] = el)}
+            className="absolute top-[40%] right-[25%] w-12 h-12 pointer-events-none z-10"
+            style={{
+              background: 'radial-gradient(circle, rgba(255,255,255,0.8) 0%, transparent 60%)',
+              opacity: 0.5,
+              willChange: 'transform, opacity',
             }}
           />
 
-          {/* Sparkle flash overlay */}
+          {/* Strong Glass Glare Overlay */}
           <div
-            className="absolute inset-0 pointer-events-none z-10"
+            className="absolute inset-0 rounded-3xl pointer-events-none z-10"
             style={{
-              background: 'radial-gradient(ellipse at 30% 20%, rgba(255,255,255,0.4) 0%, transparent 30%)',
-              animation: 'sparkle-flash 2s ease-in-out infinite'
-            }}
-          />
-
-          {/* Corner sparkle */}
-          <div
-            className="absolute inset-0 pointer-events-none z-10"
-            style={{
-              background: 'radial-gradient(ellipse at 70% 80%, rgba(255,255,255,0.3) 0%, transparent 25%)',
-              animation: 'sparkle-flash 2.5s ease-in-out infinite',
-              animationDelay: '1s'
+              background: `
+                linear-gradient(135deg, rgba(255,255,255,0.35) 0%, rgba(255,255,255,0.15) 25%, transparent 50%),
+                linear-gradient(225deg, rgba(255,255,255,0.2) 0%, transparent 30%)
+              `,
             }}
           />
 
@@ -135,43 +212,34 @@ const ResultsWinnerBanner = ({ winner, isCurrentUserWinner }) => {
             className="absolute inset-0 rounded-3xl pointer-events-none"
             style={{
               boxShadow: `
-                inset 4px 4px 8px rgba(255, 255, 255, 0.2),
-                inset -4px -4px 8px rgba(0, 0, 0, 0.2),
-                inset 0 0 40px rgba(0, 0, 0, 0.1)
-              `
+                inset 5px 5px 10px rgba(255, 255, 255, 0.25),
+                inset -5px -5px 10px rgba(0, 0, 0, 0.2),
+                inset 0 0 50px rgba(0, 0, 0, 0.1)
+              `,
             }}
           />
         </div>
 
-        {/* Floating Particles Animation - reduced count for performance */}
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          {[...Array(12)].map((_, i) => (
-            <motion.div
+        {/* Optimized Floating Particles - reduced from 12 to 6 for performance */}
+        <div ref={particlesRef} className="absolute inset-0 overflow-hidden pointer-events-none">
+          {[...Array(6)].map((_, i) => (
+            <div
               key={i}
-              className="absolute rounded-full bg-white/70"
+              className="absolute rounded-full"
               style={{
-                width: `${5 + (i % 3) * 3}px`,
-                height: `${5 + (i % 3) * 3}px`,
-                left: `${(i * 8) + 5}%`,
+                width: `${6 + (i % 3) * 4}px`,
+                height: `${6 + (i % 3) * 4}px`,
+                left: `${(i * 16) + 8}%`,
                 bottom: 0,
-              }}
-              animate={{
-                y: [0, -450],
-                x: [(i % 2 === 0 ? 1 : -1) * 40],
-                opacity: [0.9, 0],
-                scale: [1, 0.4]
-              }}
-              transition={{
-                duration: 5,
-                repeat: Infinity,
-                delay: i * 0.4,
-                ease: 'easeOut'
+                background: 'rgba(255, 255, 255, 0.8)',
+                boxShadow: '0 0 6px rgba(255, 255, 255, 0.6)',
+                willChange: 'transform, opacity',
               }}
             />
           ))}
         </div>
 
-        {/* Central Glassmorphic Winner Card */}
+        {/* Central Glassmorphic Winner Card - Enhanced */}
         <div className="relative z-10 flex items-center justify-center min-h-[400px] md:min-h-[500px] p-6 sm:p-8 md:p-12">
           <motion.div
             initial={{ scale: 0.8, opacity: 0, y: 50 }}
@@ -184,18 +252,39 @@ const ResultsWinnerBanner = ({ winner, isCurrentUserWinner }) => {
             }}
             className="relative max-w-3xl w-full"
           >
-            {/* Glassmorphic Card */}
+            {/* Enhanced Glassmorphic Card with visible backdrop blur */}
             <div className="relative rounded-2xl overflow-hidden">
-              {/* Glass Effect - reduced blur for clearer image visibility */}
-              <div className="absolute inset-0 bg-white/10 border-2 border-white/40 rounded-2xl"
-                   style={{ boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.4)' }} />
-              {/* Glass glare effect */}
-              <div className="absolute inset-0 bg-gradient-to-br from-white/30 via-transparent to-transparent pointer-events-none rounded-2xl" />
+              {/* Strong Glass Effect - increased opacity and blur */}
+              <div
+                className="absolute inset-0 rounded-2xl"
+                style={{
+                  background: 'rgba(255, 255, 255, 0.15)',
+                  backdropFilter: 'blur(16px) saturate(180%)',
+                  WebkitBackdropFilter: 'blur(16px) saturate(180%)',
+                  border: '2px solid rgba(255, 255, 255, 0.5)',
+                  boxShadow: `
+                    0 8px 32px rgba(0, 0, 0, 0.35),
+                    inset 0 2px 0 rgba(255, 255, 255, 0.5),
+                    inset 0 -1px 0 rgba(0, 0, 0, 0.1)
+                  `,
+                }}
+              />
+
+              {/* Prominent Glass Glare Effect */}
+              <div
+                className="absolute inset-0 pointer-events-none rounded-2xl"
+                style={{
+                  background: `
+                    linear-gradient(135deg, rgba(255,255,255,0.45) 0%, rgba(255,255,255,0.2) 30%, transparent 60%),
+                    linear-gradient(315deg, rgba(255,255,255,0.15) 0%, transparent 40%)
+                  `,
+                }}
+              />
 
               {/* Animated Border Glow */}
               <motion.div
                 animate={{
-                  opacity: [0.5, 0.8, 0.5],
+                  opacity: [0.5, 0.85, 0.5],
                 }}
                 transition={{
                   duration: 2,
@@ -204,9 +293,10 @@ const ResultsWinnerBanner = ({ winner, isCurrentUserWinner }) => {
                 }}
                 className="absolute inset-0 rounded-2xl"
                 style={{
-                  background: 'linear-gradient(135deg, rgba(255,215,0,0.4), rgba(255,140,0,0.4), rgba(255,215,0,0.4))',
-                  filter: 'blur(8px)',
-                  zIndex: -1
+                  background: 'linear-gradient(135deg, rgba(255,215,0,0.5), rgba(255,140,0,0.5), rgba(255,215,0,0.5))',
+                  filter: 'blur(10px)',
+                  zIndex: -1,
+                  willChange: 'opacity',
                 }}
               />
 
@@ -240,6 +330,7 @@ const ResultsWinnerBanner = ({ winner, isCurrentUserWinner }) => {
                       ease: 'easeInOut'
                     }}
                     className="inline-block mb-4 sm:mb-6"
+                    style={{ willChange: 'transform' }}
                   >
                     <FaCrown className="text-6xl sm:text-7xl md:text-8xl text-yellow-300 drop-shadow-[0_0_30px_rgba(255,215,0,0.8)]"
                              style={{ filter: 'drop-shadow(0 4px 12px rgba(0,0,0,0.4))' }} />
@@ -260,6 +351,7 @@ const ResultsWinnerBanner = ({ winner, isCurrentUserWinner }) => {
                       className="text-3xl sm:text-4xl md:text-5xl font-black text-yellow-300"
                       style={{
                         textShadow: '0 0 30px rgba(255,215,0,1), 0 0 60px rgba(255,215,0,0.8), 0 4px 12px rgba(0,0,0,0.5)',
+                        willChange: 'transform',
                       }}
                     >
                       {t('results.youWon')}
@@ -303,7 +395,7 @@ const ResultsWinnerBanner = ({ winner, isCurrentUserWinner }) => {
                       ease: 'easeInOut'
                     }}
                     className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-black relative"
-                    style={{ lineHeight: 1.2 }}
+                    style={{ lineHeight: 1.2, willChange: 'transform' }}
                   >
                     {/* Glow Layer */}
                     <span className="absolute inset-0 blur-xl opacity-80"
@@ -349,6 +441,7 @@ const ResultsWinnerBanner = ({ winner, isCurrentUserWinner }) => {
                       repeat: Infinity,
                       ease: 'easeInOut'
                     }}
+                    style={{ willChange: 'transform' }}
                   >
                     <FaTrophy className="text-3xl sm:text-4xl md:text-5xl text-yellow-300 drop-shadow-lg" />
                   </motion.div>
@@ -364,6 +457,7 @@ const ResultsWinnerBanner = ({ winner, isCurrentUserWinner }) => {
                     className="text-3xl sm:text-4xl md:text-5xl font-black text-white"
                     style={{
                       textShadow: '0 0 20px rgba(255,255,255,0.8), 0 0 40px rgba(255,215,0,0.6), 0 4px 12px rgba(0,0,0,0.5)',
+                      willChange: 'transform',
                     }}
                   >
                     {winner.score} {t('results.points')}
@@ -390,6 +484,7 @@ const ResultsWinnerBanner = ({ winner, isCurrentUserWinner }) => {
                         delay: i * 0.4,
                         ease: 'easeInOut'
                       }}
+                      style={{ willChange: 'transform' }}
                     >
                       <Icon className="text-2xl sm:text-3xl md:text-4xl text-white/90 drop-shadow-lg" />
                     </motion.div>
