@@ -152,7 +152,7 @@ const ResultsPage = ({ finalScores, letterGrid, gameCode, onReturnToRoom, userna
         </div>
 
         {/* Player Results Cards - Full Width */}
-        <div className="space-y-4 max-w-full px-1 sm:px-2">
+        <div className="space-y-4 w-full px-0">
           {sortedScores.map((player, index) => (
             <ResultsPlayerCard
               key={player.username}

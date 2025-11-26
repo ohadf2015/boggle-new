@@ -130,9 +130,10 @@ const ResultsPlayerCard = ({ player, index, allPlayerWords, currentUsername, isW
   };
 
   const getCardStyle = () => {
-    if (index === 0) return 'bg-gradient-to-br from-amber-300/40 via-yellow-400/30 to-orange-300/40 border-amber-400/70 shadow-[0_0_25px_rgba(251,191,36,0.5)]';
-    if (index === 1) return 'bg-gradient-to-br from-slate-300/40 via-gray-200/30 to-blue-200/30 border-slate-400/70 shadow-[0_0_20px_rgba(148,163,184,0.4)]';
-    if (index === 2) return 'bg-gradient-to-br from-orange-300/40 via-amber-400/30 to-yellow-500/30 border-orange-400/70 shadow-[0_0_20px_rgba(251,146,60,0.4)]';
+    // Modern shiny metallic styles for podium positions
+    if (index === 0) return 'bg-gradient-to-br from-yellow-100 via-amber-300 to-yellow-500 dark:from-yellow-200/60 dark:via-amber-400/50 dark:to-yellow-600/40 border-yellow-400 shadow-[0_0_30px_rgba(234,179,8,0.6),inset_0_1px_0_rgba(255,255,255,0.5)]';
+    if (index === 1) return 'bg-gradient-to-br from-slate-100 via-gray-300 to-slate-400 dark:from-slate-200/60 dark:via-gray-300/50 dark:to-slate-500/40 border-slate-400 shadow-[0_0_25px_rgba(148,163,184,0.5),inset_0_1px_0_rgba(255,255,255,0.5)]';
+    if (index === 2) return 'bg-gradient-to-br from-orange-200 via-amber-400 to-orange-600 dark:from-orange-300/60 dark:via-amber-500/50 dark:to-orange-700/40 border-orange-500 shadow-[0_0_25px_rgba(234,88,12,0.5),inset_0_1px_0_rgba(255,255,255,0.5)]';
     return 'bg-white/30 dark:bg-slate-800/30 border-slate-300/70 dark:border-slate-600/70';
   };
 
@@ -191,10 +192,10 @@ const ResultsPlayerCard = ({ player, index, allPlayerWords, currentUsername, isW
           </div>
           <div
             className={cn(
-              "text-4xl font-black",
-              index === 0 && "text-yellow-500",
-              index === 1 && "text-gray-400",
-              index === 2 && "text-orange-500",
+              "text-4xl font-black drop-shadow-lg",
+              index === 0 && "text-yellow-700 dark:text-yellow-300",
+              index === 1 && "text-slate-600 dark:text-slate-200",
+              index === 2 && "text-orange-700 dark:text-orange-300",
               index > 2 && "text-slate-700 dark:text-slate-300"
             )}
           >
