@@ -1577,8 +1577,10 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
               <div className="w-full flex justify-center items-center transition-all duration-500 aspect-square max-w-[500px]">
                 <div className="w-full h-full flex items-center justify-center">
                   <GridComponent
+                    key={gameStarted ? 'game-grid' : 'waiting-grid'}
                     grid={gameStarted ? tableData : (shufflingGrid || tableData)}
                     interactive={gameStarted && hostPlaying}
+                    animateOnMount={gameStarted}
                     onWordSubmit={(formedWord) => {
                       if (!hostPlaying) return;
 

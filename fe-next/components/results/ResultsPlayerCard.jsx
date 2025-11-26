@@ -266,7 +266,7 @@ const ResultsPlayerCard = ({ player, index, allPlayerWords, currentUsername, isW
                               <span className="text-slate-400">•</span>
                               <span className="text-slate-500 dark:text-slate-400">{wordsByPoints[points].length} {t('hostView.words') || 'words'}</span>
                             </div>
-                            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-1.5">
+                            <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-8 gap-1.5">
                               {wordsByPoints[points].map((wordObj, i) => (
                                 <WordChip
                                   key={`${points}-${i}`}
@@ -288,7 +288,7 @@ const ResultsPlayerCard = ({ player, index, allPlayerWords, currentUsername, isW
                         <span>👥</span>
                         {t('results.shared') || 'Shared Words'} ({duplicateWords.length})
                       </div>
-                      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-1.5">
+                      <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-8 gap-1.5">
                         {duplicateWords.map((wordObj, i) => (
                           <WordChip
                             key={`duplicate-${i}`}
@@ -307,7 +307,7 @@ const ResultsPlayerCard = ({ player, index, allPlayerWords, currentUsername, isW
                         <span>✗</span>
                         {t('results.invalid') || 'Invalid Words'} ({invalidWords.length})
                       </div>
-                      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-1.5">
+                      <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-8 gap-1.5">
                         {invalidWords.map((wordObj, i) => (
                           <WordChip
                             key={`invalid-${i}`}

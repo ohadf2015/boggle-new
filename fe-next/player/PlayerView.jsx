@@ -1139,8 +1139,10 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
               {(letterGrid || shufflingGrid) ? (
                 <>
                   <GridComponent
+                    key={letterGrid ? 'game-grid' : 'waiting-grid'}
                     grid={letterGrid || shufflingGrid}
                     interactive={gameActive}
+                    animateOnMount={!!letterGrid}
                     onWordSubmit={(formedWord) => {
                       // Direct submission logic - ONLY use game language
                       const currentLang = gameLanguage;

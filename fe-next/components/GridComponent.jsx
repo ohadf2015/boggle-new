@@ -12,7 +12,8 @@ const GridComponent = ({
     className,
     largeText = false,
     playerView = false,
-    comboLevel = 0
+    comboLevel = 0,
+    animateOnMount = false // When true, adds a slot machine style cascade animation on initial render
 }) => {
     const [internalSelectedCells, setInternalSelectedCells] = useState([]);
     const [direction, setDirection] = useState(null); // Track the direction of movement
@@ -585,17 +586,22 @@ const GridComponent = ({
                             onTouchStart={(e) => handleTouchStart(i, j, cell, e)}
                             onMouseDown={(e) => handleMouseDown(i, j, cell, e)}
                             onMouseEnter={() => handleMouseEnter(i, j, cell)}
-                            initial={{ scale: 0.8, opacity: 0 }}
+                            initial={animateOnMount
+                                ? { scale: 0, opacity: 0, rotateX: -90, y: -20 }
+                                : { scale: 0.8, opacity: 0 }
+                            }
                             animate={{
                                 scale: isSelected || isFading ? 1.15 : 1,
                                 opacity: isFading ? 0 : 1,
                                 rotate: (isSelected || isFading) ? [0, -5, 5, 0] : 0,
+                                rotateX: 0,
                                 y: isSelected ? -2 : 0
                             }}
                             whileTap={{ scale: 0.95 }}
                             transition={{
-                                duration: isFading ? 0.3 : (isSelected ? 0.12 : 0.6),
-                                ease: "easeOut",
+                                duration: animateOnMount && !isSelected && !isFading ? 0.5 : (isFading ? 0.3 : (isSelected ? 0.12 : 0.6)),
+                                ease: animateOnMount ? [0.34, 1.56, 0.64, 1] : "easeOut", // Spring-like bounce for mount animation
+                                delay: animateOnMount ? (i + j) * 0.04 : 0, // Cascade delay from top-left
                                 scale: isSelected ? { type: "spring", stiffness: 400, damping: 18 } : undefined
                             }}
                             className={cn(

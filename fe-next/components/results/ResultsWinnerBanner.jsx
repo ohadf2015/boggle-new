@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
-import { FaCrown, FaMedal, FaTrophy } from 'react-icons/fa';
+import { FaCrown, FaTrophy } from 'react-icons/fa';
 import { useLanguage } from '../../contexts/LanguageContext';
 import gsap from 'gsap';
 
@@ -99,12 +99,12 @@ const ResultsWinnerBanner = ({ winner, isCurrentUserWinner }) => {
       className="mb-4 sm:mb-6 md:mb-8 relative w-full"
       style={{ willChange: 'transform' }}
     >
-      {/* Outer Glow Effects - simplified for performance */}
+      {/* Outer Glow Effects - minimal blur for better visibility */}
       <div
         className="absolute inset-0 rounded-3xl"
         style={{
-          background: 'linear-gradient(135deg, rgba(255,215,0,0.25) 0%, rgba(255,140,0,0.35) 50%, rgba(255,215,0,0.25) 100%)',
-          filter: 'blur(20px)',
+          background: 'linear-gradient(135deg, rgba(255,215,0,0.2) 0%, rgba(255,140,0,0.25) 50%, rgba(255,215,0,0.2) 100%)',
+          filter: 'blur(8px)',
           willChange: 'opacity',
         }}
       />
@@ -433,8 +433,7 @@ const ResultsWinnerBanner = ({ winner, isCurrentUserWinner }) => {
                 >
                   <motion.div
                     animate={{
-                      rotate: [0, 360],
-                      scale: [1, 1.2, 1]
+                      scale: [1, 1.15, 1]
                     }}
                     transition={{
                       duration: 2,
@@ -462,33 +461,6 @@ const ResultsWinnerBanner = ({ winner, isCurrentUserWinner }) => {
                   >
                     {winner.score} {t('results.points')}
                   </motion.p>
-                </motion.div>
-
-                {/* Decorative Trophy Icons */}
-                <motion.div
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ delay: 1.5 }}
-                  className="flex justify-center gap-4 sm:gap-6 mt-6 sm:mt-8"
-                >
-                  {[FaTrophy, FaMedal, FaTrophy].map((Icon, i) => (
-                    <motion.div
-                      key={i}
-                      animate={{
-                        y: [0, -12, 0],
-                        rotate: [0, 15, -15, 0]
-                      }}
-                      transition={{
-                        duration: 2.5,
-                        repeat: Infinity,
-                        delay: i * 0.4,
-                        ease: 'easeInOut'
-                      }}
-                      style={{ willChange: 'transform' }}
-                    >
-                      <Icon className="text-2xl sm:text-3xl md:text-4xl text-white/90 drop-shadow-lg" />
-                    </motion.div>
-                  ))}
                 </motion.div>
               </div>
             </div>
