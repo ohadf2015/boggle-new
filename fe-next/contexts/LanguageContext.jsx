@@ -3,7 +3,7 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { translations } from '../translations';
-import { locales } from '../lib/i18n';
+import { locales, defaultLocale } from '../lib/i18n';
 
 const LanguageContext = createContext();
 
@@ -14,6 +14,26 @@ const parseLocaleFromPath = (pathname) => {
     return locales.includes(locale) ? locale : null;
 };
 
+// Map browser language codes to supported locales
+const getBrowserLanguage = () => {
+    if (typeof window === 'undefined' || !navigator) return null;
+
+    // Get browser languages (e.g., ['en-US', 'en', 'he'])
+    const browserLanguages = navigator.languages || [navigator.language];
+
+    for (const lang of browserLanguages) {
+        // Get the primary language code (e.g., 'en' from 'en-US')
+        const primaryLang = lang.split('-')[0].toLowerCase();
+
+        // Check if we support this language
+        if (locales.includes(primaryLang)) {
+            return primaryLang;
+        }
+    }
+
+    return null;
+};
+
 export const LanguageProvider = ({ children, initialLanguage }) => {
     const router = useRouter();
     const pathname = usePathname();
@@ -21,11 +41,26 @@ export const LanguageProvider = ({ children, initialLanguage }) => {
     // Determine initial language
     const getInitialLanguage = () => {
         if (initialLanguage) return initialLanguage;
-        if (typeof window !== 'undefined' && pathname) {
-            const pathLocale = parseLocaleFromPath(pathname);
-            if (pathLocale) return pathLocale;
+
+        if (typeof window !== 'undefined') {
+            // Check path locale first
+            if (pathname) {
+                const pathLocale = parseLocaleFromPath(pathname);
+                if (pathLocale) return pathLocale;
+            }
+
+            // Check localStorage for saved preference
+            const savedLanguage = localStorage.getItem('boggle_language');
+            if (savedLanguage && locales.includes(savedLanguage)) {
+                return savedLanguage;
+            }
+
+            // Use browser language as default
+            const browserLang = getBrowserLanguage();
+            if (browserLang) return browserLang;
         }
-        return 'en';
+
+        return defaultLocale;
     };
 
     const [language, setLanguageState] = useState(getInitialLanguage);

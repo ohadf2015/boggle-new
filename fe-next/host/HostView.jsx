@@ -30,7 +30,7 @@ import { useLanguage } from '../contexts/LanguageContext';
 import { DIFFICULTIES, DEFAULT_DIFFICULTY } from '../utils/consts';
 import { cn } from '../lib/utils';
 
-const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [], username }) => {
+const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [], username, onShowResults }) => {
   const { t, language } = useLanguage();
   const { socket } = useSocket();
   const intentionalExitRef = useRef(false);
@@ -98,8 +98,8 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
     const cols = DIFFICULTIES[difficulty].cols;
 
     const interval = setInterval(() => {
-      // 30% chance to show a player name if players exist
-      const showPlayerName = playersReady.length > 0 && Math.random() < 0.3;
+      // 50% chance to show a player name if players exist (increased from 30%)
+      const showPlayerName = playersReady.length > 0 && Math.random() < 0.5;
 
       if (showPlayerName) {
         const randomPlayerEntry = playersReady[Math.floor(Math.random() * playersReady.length)];
@@ -117,37 +117,40 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
             });
           }
 
-          // Animate letter-by-letter selection
-          let currentIndex = 0;
-          const animateSelection = () => {
-            if (currentIndex < result.path.length) {
-              const newHighlightedCells = result.path.slice(0, currentIndex + 1);
-              setHighlightedCells(newHighlightedCells);
+          // Wait before starting letter animation for visibility
+          setTimeout(() => {
+            // Animate letter-by-letter selection
+            let currentIndex = 0;
+            const animateSelection = () => {
+              if (currentIndex < result.path.length) {
+                const newHighlightedCells = result.path.slice(0, currentIndex + 1);
+                setHighlightedCells(newHighlightedCells);
 
-              // Broadcast highlighted cells to all players
-              if (socket) {
-                socket.emit('broadcastShufflingGrid', {
-                  grid: result.grid,
-                  highlightedCells: newHighlightedCells
-                });
-              }
-
-              currentIndex++;
-              setTimeout(animateSelection, 100); // 100ms per letter
-            } else {
-              // Clear highlight after completing the word
-              setTimeout(() => {
-                setHighlightedCells([]);
+                // Broadcast highlighted cells to all players
                 if (socket) {
                   socket.emit('broadcastShufflingGrid', {
                     grid: result.grid,
-                    highlightedCells: []
+                    highlightedCells: newHighlightedCells
                   });
                 }
-              }, 500);
-            }
-          };
-          animateSelection();
+
+                currentIndex++;
+                setTimeout(animateSelection, 150); // 150ms per letter (slower for visibility)
+              } else {
+                // Keep highlight visible longer after completing the word
+                setTimeout(() => {
+                  setHighlightedCells([]);
+                  if (socket) {
+                    socket.emit('broadcastShufflingGrid', {
+                      grid: result.grid,
+                      highlightedCells: []
+                    });
+                  }
+                }, 1500); // 1.5 seconds to keep name highlighted
+              }
+            };
+            animateSelection();
+          }, 400); // 400ms delay before starting letter animation
         } else {
           // Fallback to random grid if name couldn't be placed
           const randomGrid = generateRandomTable(rows, cols, currentLang);
@@ -175,7 +178,7 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
           });
         }
       }
-    }, 2000);
+    }, 3500); // Increased interval to 3.5 seconds for better visibility
 
     return () => clearInterval(interval);
   }, [gameStarted, difficulty, roomLanguage, language, playersReady, socket]);
@@ -207,7 +210,43 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
     if (!socket) return;
 
     const handleUpdateUsers = (data) => {
-      setPlayersReady(data.users || []);
+      const newUsers = data.users || [];
+      setPlayersReady(newUsers);
+
+      // Clean up scores/stats for players who left
+      const currentUsernames = new Set(newUsers.map(u =>
+        typeof u === 'string' ? u : u.username
+      ));
+
+      setPlayerScores(prev => {
+        const filtered = {};
+        Object.keys(prev).forEach(username => {
+          if (currentUsernames.has(username)) {
+            filtered[username] = prev[username];
+          }
+        });
+        return filtered;
+      });
+
+      setPlayerWordCounts(prev => {
+        const filtered = {};
+        Object.keys(prev).forEach(username => {
+          if (currentUsernames.has(username)) {
+            filtered[username] = prev[username];
+          }
+        });
+        return filtered;
+      });
+
+      setPlayerAchievements(prev => {
+        const filtered = {};
+        Object.keys(prev).forEach(username => {
+          if (currentUsernames.has(username)) {
+            filtered[username] = prev[username];
+          }
+        });
+        return filtered;
+      });
     };
 
     const handlePlayerJoinedLate = (data) => {
@@ -274,7 +313,6 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
 
     const handleValidationComplete = (data) => {
       console.log('[HOST] Received validationComplete event:', data);
-      setFinalScores(data.scores);
       setShowValidation(false);
       toast.success(t('hostView.validationComplete'), {
         icon: '🎉',
@@ -285,6 +323,16 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
         spread: 80,
         origin: { y: 0.6 },
       });
+      // Show results page like players do
+      if (onShowResults) {
+        onShowResults({
+          scores: data.scores,
+          letterGrid: tableData
+        });
+      } else {
+        // Fallback to modal if no callback provided
+        setFinalScores(data.scores);
+      }
     };
 
     const handleAutoValidationOccurred = (data) => {
@@ -1522,41 +1570,91 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
 
           {/* Letter Grid - RIGHT - Conditional rendering based on host playing */}
           {gameStarted && !hostPlaying ? (
-            /* Spectator Mode - Live Results Dashboard */
-            <div className="flex-1 space-y-4">
-              {/* Timer Display */}
-              {remainingTime !== null && (
-                <div className="flex items-center justify-center mb-4">
-                  <CircularTimer remainingTime={remainingTime} totalTime={timerValue * 60} />
+            /* Spectator Mode - Letter Board + Live Results */
+            <div className="flex-1 flex flex-col lg:flex-row gap-4">
+              {/* Letter Board - Main display for spectator mode */}
+              <Card className="flex-1 bg-white/80 dark:bg-slate-800/80 backdrop-blur-md p-1 sm:p-3 rounded-lg shadow-lg border border-cyan-500/30 shadow-[0_0_15px_rgba(6,182,212,0.1)] flex flex-col items-center">
+                {/* Timer Display */}
+                {remainingTime !== null && (
+                  <motion.div
+                    initial={{ scale: 0, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    transition={{ duration: 0.5, type: 'spring' }}
+                    className="mb-4"
+                  >
+                    <CircularTimer remainingTime={remainingTime} totalTime={timerValue * 60} />
+                  </motion.div>
+                )}
+
+                {/* Grid Container */}
+                <div className="w-full flex justify-center items-center transition-all duration-500 aspect-square max-w-[500px]">
+                  <div className="w-full h-full flex items-center justify-center">
+                    <GridComponent
+                      key="spectator-grid"
+                      grid={tableData}
+                      interactive={false}
+                      animateOnMount={true}
+                      className="w-full h-full"
+                      playerView={false}
+                    />
+                  </div>
                 </div>
-              )}
+              </Card>
 
-              {/* Live Player Results */}
-              {(() => {
-                const sortedPlayers = [...playersReady].map(player => {
-                  const username = typeof player === 'string' ? player : player.username;
-                  const avatar = typeof player === 'object' ? player.avatar : null;
-                  return {
-                    username,
-                    score: playerScores[username] || 0,
-                    wordCount: playerWordCounts[username] || 0,
-                    achievements: playerAchievements[username] || [],
-                    avatar,
-                    allWords: []
-                  };
-                }).sort((a, b) => b.score - a.score);
+              {/* Live Player Scores - Side panel */}
+              <div className="lg:w-[280px] space-y-2 max-h-[600px] overflow-y-auto">
+                <h4 className="text-sm font-bold text-purple-600 dark:text-purple-300 mb-2 flex items-center gap-2">
+                  <FaTrophy className="text-yellow-500" />
+                  {t('hostView.liveScores') || 'Live Scores'}
+                </h4>
+                {(() => {
+                  const sortedPlayers = [...playersReady].map(player => {
+                    const playerUsername = typeof player === 'string' ? player : player.username;
+                    const avatar = typeof player === 'object' ? player.avatar : null;
+                    return {
+                      username: playerUsername,
+                      score: playerScores[playerUsername] || 0,
+                      wordCount: playerWordCounts[playerUsername] || 0,
+                      achievements: playerAchievements[playerUsername] || [],
+                      avatar,
+                      allWords: []
+                    };
+                  }).sort((a, b) => b.score - a.score);
 
-                return sortedPlayers.map((player, index) => (
-                  <ResultsPlayerCard
-                    key={player.username}
-                    player={player}
-                    index={index}
-                    allPlayerWords={{}}
-                    currentUsername={username}
-                    isWinner={false}
-                  />
-                ));
-              })()}
+                  return sortedPlayers.map((player, index) => (
+                    <motion.div
+                      key={player.username}
+                      initial={{ x: 20, opacity: 0 }}
+                      animate={{ x: 0, opacity: 1 }}
+                      transition={{ delay: index * 0.05 }}
+                      className={cn(
+                        "flex items-center justify-between p-2 rounded-lg border",
+                        index === 0 ? "bg-gradient-to-r from-yellow-500/20 to-orange-500/20 border-yellow-500/50" :
+                        index === 1 ? "bg-gradient-to-r from-gray-400/20 to-gray-500/20 border-gray-500/50" :
+                        index === 2 ? "bg-gradient-to-r from-orange-500/20 to-orange-600/20 border-orange-600/50" :
+                        "bg-slate-100 dark:bg-slate-700/50 border-slate-200 dark:border-slate-600"
+                      )}
+                    >
+                      <div className="flex items-center gap-2">
+                        <span className="text-lg">
+                          {index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : `#${index + 1}`}
+                        </span>
+                        <span className="font-medium text-slate-900 dark:text-white truncate max-w-[100px]">
+                          {player.username}
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs text-slate-500 dark:text-slate-400">
+                          {player.wordCount} {t('hostView.words') || 'words'}
+                        </span>
+                        <span className="font-bold text-cyan-600 dark:text-cyan-400">
+                          {player.score}
+                        </span>
+                      </div>
+                    </motion.div>
+                  ));
+                })()}
+              </div>
             </div>
           ) : (
             /* Playing Mode or Pre-Game - Interactive Grid */
