@@ -24,6 +24,7 @@ class Dictionary {
     this.hebrewWords = new Set();
     this.swedishWords = new Set();
     this.japaneseWords = new Set();
+    this.kanjiCompounds = []; // Array of valid Kanji compounds for board generation
     this.loaded = false;
   }
 
@@ -86,23 +87,24 @@ class Dictionary {
         console.log('[Dictionary] Continuing without Swedish dictionary - words will require manual validation');
       }
 
-      // Load Japanese words
+      // Load Japanese Kanji compounds
       try {
-        const japaneseFilePath = path.join(__dirname, 'japanese_words.txt');
-        if (fs.existsSync(japaneseFilePath)) {
-          const japaneseContent = fs.readFileSync(japaneseFilePath, 'utf-8');
-          const japaneseWords = japaneseContent
+        const kanjiFilePath = path.join(__dirname, 'kanji_compounds.txt');
+        if (fs.existsSync(kanjiFilePath)) {
+          const kanjiContent = fs.readFileSync(kanjiFilePath, 'utf-8');
+          const kanjiCompounds = kanjiContent
             .split('\n')
             .map(w => w.trim())
             .filter(w => w.length > 0);
 
-          this.japaneseWords = new Set(japaneseWords);
-          console.log(`[Dictionary] Loaded ${this.japaneseWords.size} Japanese words`);
+          this.japaneseWords = new Set(kanjiCompounds);
+          this.kanjiCompounds = kanjiCompounds; // Keep as array for random selection
+          console.log(`[Dictionary] Loaded ${this.japaneseWords.size} Japanese Kanji compounds`);
         } else {
-          console.log('[Dictionary] Japanese dictionary file not found - using fallback validation');
+          console.log('[Dictionary] Kanji compounds file not found - using fallback validation');
         }
       } catch (japaneseError) {
-        console.error('[Dictionary] Error loading Japanese dictionary:', japaneseError);
+        console.error('[Dictionary] Error loading Japanese Kanji compounds:', japaneseError);
         console.log('[Dictionary] Continuing without Japanese dictionary - words will require manual validation');
       }
 
@@ -163,6 +165,26 @@ class Dictionary {
   isValidJapaneseWord(word) {
     return this.isValidWord(word, 'ja');
   }
+
+  // Get random Kanji compounds for board generation
+  getRandomKanjiCompounds(count = 5, minLength = 2, maxLength = 4) {
+    if (!this.kanjiCompounds || this.kanjiCompounds.length === 0) {
+      return [];
+    }
+
+    // Filter compounds by length
+    const filteredCompounds = this.kanjiCompounds.filter(
+      w => w.length >= minLength && w.length <= maxLength
+    );
+
+    if (filteredCompounds.length === 0) {
+      return [];
+    }
+
+    // Shuffle and pick random compounds
+    const shuffled = [...filteredCompounds].sort(() => Math.random() - 0.5);
+    return shuffled.slice(0, Math.min(count, shuffled.length));
+  }
 }
 
 // Create a singleton instance
@@ -187,5 +209,6 @@ module.exports = {
   isValidEnglishWord: (word) => dictionary.isValidEnglishWord(word),
   isValidHebrewWord: (word) => dictionary.isValidHebrewWord(word),
   isValidSwedishWord: (word) => dictionary.isValidSwedishWord(word),
-  isValidJapaneseWord: (word) => dictionary.isValidJapaneseWord(word)
+  isValidJapaneseWord: (word) => dictionary.isValidJapaneseWord(word),
+  getRandomKanjiCompounds: (count, minLength, maxLength) => dictionary.getRandomKanjiCompounds(count, minLength, maxLength)
 };

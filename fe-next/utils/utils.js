@@ -1,4 +1,4 @@
-import { hebrewLetters, swedishLetters, japaneseLetters, DIFFICULTIES, DEFAULT_DIFFICULTY } from "./consts.js";
+import { hebrewLetters, swedishLetters, japaneseLetters, kanjiCompounds, DIFFICULTIES, DEFAULT_DIFFICULTY } from "./consts.js";
 
 // Utilities for LexiClash game
 
@@ -56,7 +56,8 @@ export function generateRandomTable(rows = null, cols = null, language = 'he') {
     } else if (language === 'sv') {
       letters = swedishLetters;
     } else if (language === 'ja') {
-      letters = japaneseLetters;
+      // For Japanese, generate a board with embedded Kanji compounds
+      return generateJapaneseTable(rows, cols);
     } else {
       letters = hebrewLetters;
     }
@@ -72,6 +73,120 @@ export function generateRandomTable(rows = null, cols = null, language = 'he') {
     }
     return newTable;
   }
+
+// Generate a Japanese board with embedded Kanji compounds
+function generateJapaneseTable(rows, cols) {
+  // Initialize grid with null values
+  const grid = Array(rows).fill(null).map(() => Array(cols).fill(null));
+
+  // Calculate how many compounds to embed based on board size
+  // Aim for roughly 1 compound per 4-6 cells to ensure good coverage
+  const totalCells = rows * cols;
+  const targetCompounds = Math.floor(totalCells / 5);
+
+  // Shuffle compounds and pick ones to embed
+  const shuffledCompounds = [...kanjiCompounds].sort(() => Math.random() - 0.5);
+
+  // Filter to 2-character compounds for easier embedding (more reliable)
+  const twoCharCompounds = shuffledCompounds.filter(w => w.length === 2);
+  const threeCharCompounds = shuffledCompounds.filter(w => w.length === 3);
+
+  let embeddedCount = 0;
+  const usedCells = new Set();
+
+  // First, try to embed some 3-character compounds
+  for (const compound of threeCharCompounds) {
+    if (embeddedCount >= Math.floor(targetCompounds * 0.2)) break; // 20% three-char compounds
+
+    if (tryEmbedCompound(grid, compound, rows, cols, usedCells)) {
+      embeddedCount++;
+    }
+  }
+
+  // Then embed 2-character compounds
+  for (const compound of twoCharCompounds) {
+    if (embeddedCount >= targetCompounds) break;
+
+    if (tryEmbedCompound(grid, compound, rows, cols, usedCells)) {
+      embeddedCount++;
+    }
+  }
+
+  // Fill remaining empty cells with random Kanji
+  for (let i = 0; i < rows; i++) {
+    for (let j = 0; j < cols; j++) {
+      if (grid[i][j] === null) {
+        grid[i][j] = japaneseLetters[Math.floor(Math.random() * japaneseLetters.length)];
+      }
+    }
+  }
+
+  return grid;
+}
+
+// Try to embed a compound word into the grid
+function tryEmbedCompound(grid, compound, rows, cols, usedCells) {
+  const wordLen = compound.length;
+  const directions = [
+    { dr: 0, dc: 1 },   // horizontal right
+    { dr: 1, dc: 0 },   // vertical down
+    { dr: 1, dc: 1 },   // diagonal down-right
+    { dr: 1, dc: -1 },  // diagonal down-left
+    { dr: 0, dc: -1 },  // horizontal left
+    { dr: -1, dc: 0 },  // vertical up
+    { dr: -1, dc: -1 }, // diagonal up-left
+    { dr: -1, dc: 1 },  // diagonal up-right
+  ];
+
+  // Shuffle directions for randomness
+  const shuffledDirs = directions.sort(() => Math.random() - 0.5);
+
+  // Try random starting positions
+  const attempts = 50;
+  for (let attempt = 0; attempt < attempts; attempt++) {
+    const startRow = Math.floor(Math.random() * rows);
+    const startCol = Math.floor(Math.random() * cols);
+
+    for (const dir of shuffledDirs) {
+      // Check if word fits in this direction
+      const endRow = startRow + (wordLen - 1) * dir.dr;
+      const endCol = startCol + (wordLen - 1) * dir.dc;
+
+      if (endRow < 0 || endRow >= rows || endCol < 0 || endCol >= cols) {
+        continue;
+      }
+
+      // Check if all cells are available (either empty or have matching character)
+      let canPlace = true;
+      const cellsToUse = [];
+
+      for (let i = 0; i < wordLen; i++) {
+        const r = startRow + i * dir.dr;
+        const c = startCol + i * dir.dc;
+        const cellKey = `${r},${c}`;
+
+        // Check if this cell conflicts
+        if (grid[r][c] !== null && grid[r][c] !== compound[i]) {
+          canPlace = false;
+          break;
+        }
+
+        cellsToUse.push({ r, c, char: compound[i], key: cellKey });
+      }
+
+      if (canPlace) {
+        // Place the word
+        for (const cell of cellsToUse) {
+          grid[cell.r][cell.c] = cell.char;
+          usedCells.add(cell.key);
+        }
+        return true;
+      }
+    }
+  }
+
+  return false;
+}
 
 export function embedWordInGrid(rows, cols, word, language = 'he') {
   // 1. Generate a random grid first
