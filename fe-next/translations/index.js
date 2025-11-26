@@ -234,6 +234,7 @@ export const translations = {
       me: 'Me',
       noWordsYet: 'No words found yet',
       shuffle: 'Shuffle',
+      swipeToFormWords: 'Swipe on the board to form words',
       inviteFriends: 'Invite Friends',
     },
     chat: {
@@ -605,6 +606,7 @@ export const translations = {
       me: 'אני',
       noWordsYet: 'לא נמצאו מילים עדיין',
       shuffle: 'ערבב',
+      swipeToFormWords: 'החליקו על הלוח כדי ליצור מילים',
       inviteFriends: 'הזמן חברים',
     },
     chat: {
@@ -976,6 +978,7 @@ export const translations = {
       me: 'Jag',
       noWordsYet: 'Inga ord hittade ännu',
       shuffle: 'Blanda',
+      swipeToFormWords: 'Svep på brädet för att bilda ord',
       inviteFriends: 'Bjud in vänner',
     },
     chat: {
@@ -1347,6 +1350,7 @@ export const translations = {
       me: '自分',
       noWordsYet: 'まだ単語が見つかりません',
       shuffle: 'シャッフル',
+      swipeToFormWords: 'ボードをスワイプして単語を作ります',
       inviteFriends: '友達を招待',
     },
     chat: {

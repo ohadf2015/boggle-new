@@ -20,6 +20,7 @@ const {
   updateUserSocketId,
   getGameUsers,
   getActiveRooms,
+  cleanupEmptyRooms,
   isHost,
   updateHostSocketId,
   resetGameForNewRound,
@@ -223,13 +224,14 @@ function initializeSocketHandlers(io) {
           reconnected: true
         });
 
-        // If game is in progress, send current state
+        // If game is in progress, send current state with remaining time
         if (game.gameState === 'in-progress') {
           socket.emit('startGame', {
             letterGrid: game.letterGrid,
-            timerSeconds: game.timerSeconds,
+            timerSeconds: game.remainingTime || game.timerSeconds, // Use remaining time if available
             language: game.language,
-            messageId: 'reconnect-' + Date.now()
+            messageId: 'reconnect-' + Date.now(),
+            reconnect: true
           });
         }
 
@@ -264,11 +266,13 @@ function initializeSocketHandlers(io) {
       if (game.gameState === 'in-progress') {
         console.log(`[SOCKET] ${username} joining game ${gameCode} in progress - allowing participation`);
 
+        // Send startGame with the current remaining time (not original timer)
         socket.emit('startGame', {
           letterGrid: game.letterGrid,
-          timerSeconds: game.timerSeconds,
+          timerSeconds: game.remainingTime || game.timerSeconds, // Use remaining time if available
           language: game.language,
-          messageId: 'late-join-' + Date.now()
+          messageId: 'late-join-' + Date.now(),
+          lateJoin: true
         });
 
         // Send current leaderboard
@@ -742,6 +746,13 @@ function initializeSocketHandlers(io) {
 
         // Handle game start coordination
         gameStartCoordinator.handlePlayerDisconnect(gameCode, username);
+
+        // Clean up empty rooms and broadcast updated room list
+        const cleanedCount = cleanupEmptyRooms();
+        if (cleanedCount > 0) {
+          console.log(`[SOCKET] Cleaned up ${cleanedCount} empty room(s)`);
+        }
+        io.emit('activeRooms', { rooms: getActiveRooms() });
       }
 
       // Reset rate limit
@@ -791,6 +802,13 @@ function initializeSocketHandlers(io) {
 
         // Handle game start coordination
         gameStartCoordinator.handlePlayerDisconnect(gameCode, username);
+
+        // Clean up empty rooms and broadcast updated room list
+        const cleanedCount = cleanupEmptyRooms();
+        if (cleanedCount > 0) {
+          console.log(`[SOCKET] Cleaned up ${cleanedCount} empty room(s)`);
+        }
+        io.emit('activeRooms', { rooms: getActiveRooms() });
       }
 
       // Reset rate limit
@@ -830,6 +848,9 @@ function startGameTimer(io, gameCode, timerSeconds) {
 
   let remainingTime = timerSeconds;
 
+  // Store remaining time in game state for late joiners
+  updateGame(gameCode, { remainingTime });
+
   // Clear any existing timer
   timerManager.clearGameTimer(gameCode);
 
@@ -837,9 +858,16 @@ function startGameTimer(io, gameCode, timerSeconds) {
   const timerId = setInterval(() => {
     remainingTime--;
 
-    // Broadcast time update
+    // Update remaining time in game state for late joiners
+    updateGame(gameCode, { remainingTime });
+
+    // Broadcast time update with game state for late joiners
+    const currentGame = getGame(gameCode);
     broadcastToRoom(io, getGameRoom(gameCode), 'timeUpdate', {
-      remainingTime
+      remainingTime,
+      // Include game state for late joiners who might have missed startGame
+      letterGrid: currentGame?.letterGrid,
+      language: currentGame?.language
     });
 
     if (remainingTime <= 0) {

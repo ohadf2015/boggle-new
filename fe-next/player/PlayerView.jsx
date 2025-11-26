@@ -227,7 +227,18 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
     const handleTimeUpdate = (data) => {
       setRemainingTime(data.remainingTime);
 
-      if (!gameActive && data.remainingTime > 0 && letterGrid) {
+      // If we receive letterGrid in timeUpdate, update it (for late joiners who missed startGame)
+      if (data.letterGrid && !letterGrid) {
+        console.log('[PLAYER] Received letterGrid in timeUpdate - late join sync');
+        setLetterGrid(data.letterGrid);
+      }
+      if (data.language && !gameLanguage) {
+        setGameLanguage(data.language);
+      }
+
+      // Auto-activate game if timer is running and we have the grid
+      const hasGrid = letterGrid || data.letterGrid;
+      if (!gameActive && data.remainingTime > 0 && hasGrid) {
         console.log('[PLAYER] Timer started on server, activating game (remainingTime:', data.remainingTime, ')');
         setGameActive(true);
         setShowStartAnimation(true);
@@ -777,24 +788,42 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
             </motion.div>
 
             {/* Shuffling Letter Grid Preview */}
-            {shufflingGrid && (
-              <motion.div
-                initial={{ y: 20, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                transition={{ delay: 0.15 }}
-              >
-                <Card className="bg-slate-900/95 dark:bg-slate-900/95 backdrop-blur-md border border-cyan-500/40 shadow-[0_0_25px_rgba(6,182,212,0.2)] overflow-hidden">
-                  <div className="p-4 flex flex-col items-center justify-center bg-slate-900/90">
+            <motion.div
+              initial={{ y: 20, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ delay: 0.15 }}
+            >
+              <Card className="bg-slate-900/95 dark:bg-slate-900/95 backdrop-blur-md border border-cyan-500/40 shadow-[0_0_25px_rgba(6,182,212,0.2)] overflow-hidden">
+                <div className="p-4 flex flex-col items-center justify-center bg-slate-900/90">
+                  {shufflingGrid ? (
                     <GridComponent
                       grid={shufflingGrid}
                       interactive={false}
                       selectedCells={highlightedCells}
                       className="w-full max-w-xs"
                     />
-                  </div>
-                </Card>
-              </motion.div>
-            )}
+                  ) : (
+                    // Loading skeleton for the grid
+                    <div className="w-full max-w-xs aspect-square grid grid-cols-4 gap-2 p-2">
+                      {Array.from({ length: 16 }).map((_, i) => (
+                        <motion.div
+                          key={i}
+                          className="aspect-square rounded-lg bg-slate-700/50"
+                          animate={{
+                            opacity: [0.3, 0.6, 0.3],
+                          }}
+                          transition={{
+                            duration: 1.5,
+                            repeat: Infinity,
+                            delay: i * 0.05,
+                          }}
+                        />
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </Card>
+            </motion.div>
 
             {/* Players List */}
             <motion.div
@@ -1101,64 +1130,84 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
 
         {/* Center Column: Letter Grid */}
         <div className="flex-1 flex flex-col gap-2 min-w-0 min-h-0">
-          {(letterGrid || shufflingGrid) && (
-            <Card className="bg-slate-900/95 dark:bg-slate-900/95 backdrop-blur-md border border-cyan-500/40 shadow-[0_0_25px_rgba(6,182,212,0.2)] flex flex-col flex-grow overflow-hidden">
-              <CardContent className="flex-grow flex flex-col items-center justify-center p-1 md:p-2 bg-slate-900/90">
-                <GridComponent
-                  grid={letterGrid || shufflingGrid}
-                  interactive={gameActive}
-                  onWordSubmit={(formedWord) => {
-                    // Direct submission logic - ONLY use game language
-                    const currentLang = gameLanguage;
-                    if (!currentLang) return; // Game hasn't started
+          <Card className="bg-slate-900/95 dark:bg-slate-900/95 backdrop-blur-md border border-cyan-500/40 shadow-[0_0_25px_rgba(6,182,212,0.2)] flex flex-col flex-grow overflow-hidden">
+            <CardContent className="flex-grow flex flex-col items-center justify-center p-1 md:p-2 bg-slate-900/90">
+              {(letterGrid || shufflingGrid) ? (
+                <>
+                  <GridComponent
+                    grid={letterGrid || shufflingGrid}
+                    interactive={gameActive}
+                    onWordSubmit={(formedWord) => {
+                      // Direct submission logic - ONLY use game language
+                      const currentLang = gameLanguage;
+                      if (!currentLang) return; // Game hasn't started
 
-                    let regex;
-                    if (currentLang === 'he') {
-                      regex = /^[\u0590-\u05FF]+$/;
-                    } else if (currentLang === 'sv') {
-                      regex = /^[a-zA-ZåäöÅÄÖ]+$/;
-                    } else if (currentLang === 'ja') {
-                      regex = /^[\u3040-\u309F\u30A0-\u30FF\u4E00-\u9FAF]+$/;
-                    } else {
-                      regex = /^[a-zA-Z]+$/;
-                    }
+                      let regex;
+                      if (currentLang === 'he') {
+                        regex = /^[\u0590-\u05FF]+$/;
+                      } else if (currentLang === 'sv') {
+                        regex = /^[a-zA-ZåäöÅÄÖ]+$/;
+                      } else if (currentLang === 'ja') {
+                        regex = /^[\u3040-\u309F\u30A0-\u30FF\u4E00-\u9FAF]+$/;
+                      } else {
+                        regex = /^[a-zA-Z]+$/;
+                      }
 
-                    if (formedWord.length < 2) {
-                      toast.error(t('playerView.wordTooShort'), { duration: 1000, icon: '⚠️' });
-                      return;
-                    }
+                      if (formedWord.length < 2) {
+                        toast.error(t('playerView.wordTooShort'), { duration: 1000, icon: '⚠️' });
+                        return;
+                      }
 
-                    if (regex.test(formedWord)) {
-                      socket.emit('submitWord', {
-                        word: formedWord.toLowerCase(),
-                      });
-                      setFoundWords(prev => [...prev, formedWord]);
-                    } else {
-                      toast.error(t('playerView.onlyLanguageWords'), { duration: 1000 });
-                    }
-                    setWord(''); // Clear input
-                  }}
-                  playerView={true}
-                  comboLevel={comboLevel}
-                  className="w-full max-w-2xl"
-                />
+                      if (regex.test(formedWord)) {
+                        socket.emit('submitWord', {
+                          word: formedWord.toLowerCase(),
+                        });
+                        setFoundWords(prev => [...prev, formedWord]);
+                      } else {
+                        toast.error(t('playerView.onlyLanguageWords'), { duration: 1000 });
+                      }
+                      setWord(''); // Clear input
+                    }}
+                    playerView={true}
+                    comboLevel={comboLevel}
+                    className="w-full max-w-2xl"
+                  />
 
-                {/* Shuffle Button - Only visible for host in waiting state */}
-                {!gameActive && (
-                  <div className="mt-4 flex gap-2">
-                    <Button
-                      variant="outline"
-                      className="bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 border-slate-300 dark:border-slate-600"
-                      disabled
-                    >
-                      <FaRandom className="mr-2" />
-                      {t('playerView.shuffle') || 'SHUFFLE'}
-                    </Button>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          )}
+                  {/* Shuffle Button - Only visible for host in waiting state */}
+                  {!gameActive && (
+                    <div className="mt-4 flex gap-2">
+                      <Button
+                        variant="outline"
+                        className="bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 border-slate-300 dark:border-slate-600"
+                        disabled
+                      >
+                        <FaRandom className="mr-2" />
+                        {t('playerView.shuffle') || 'SHUFFLE'}
+                      </Button>
+                    </div>
+                  )}
+                </>
+              ) : (
+                // Loading skeleton for the grid while waiting
+                <div className="w-full max-w-2xl aspect-square grid grid-cols-4 gap-2 sm:gap-3 p-2 sm:p-4">
+                  {Array.from({ length: 16 }).map((_, i) => (
+                    <motion.div
+                      key={i}
+                      className="aspect-square rounded-xl bg-slate-700/50"
+                      animate={{
+                        opacity: [0.3, 0.6, 0.3],
+                      }}
+                      transition={{
+                        duration: 1.5,
+                        repeat: Infinity,
+                        delay: i * 0.05,
+                      }}
+                    />
+                  ))}
+                </div>
+              )}
+            </CardContent>
+          </Card>
 
           {/* Mobile: Word count display (input removed - use board to form words) */}
           <div className="lg:hidden">
