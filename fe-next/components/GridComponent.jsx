@@ -57,8 +57,11 @@ const GridComponent = ({
         const cellsToFade = [...selectedCells];
         setFadingCells(cellsToFade);
 
-        // Fade out each cell sequentially in the order they were marked
-        cellsToFade.forEach((cell, index) => {
+        // Fade out each cell sequentially from END to START (reverse order)
+        // This creates a "retracting trail" effect from where the finger lifted
+        // back to where the swipe began, which feels more natural
+        const reversedCells = [...cellsToFade].reverse();
+        reversedCells.forEach((cell, index) => {
             setTimeout(() => {
                 setFadingCells(prev => prev.filter(c => !(c.row === cell.row && c.col === cell.col)));
             }, index * 80); // 80ms delay between each cell fade
@@ -152,6 +155,17 @@ const GridComponent = ({
     };
 
     // Get direction vectors for a snapped angle
+    //
+    // dx, dy: Viewport coordinates (screen space)
+    //   - Positive dx = right, negative dx = left
+    //   - Positive dy = down, negative dy = up
+    //
+    // dRow, dCol: Grid coordinates (array indices)
+    //   - Positive dRow = down (increasing row index)
+    //   - Positive dCol = right (increasing column index)
+    //
+    // These are aligned so that moving in (dx, dy) direction in viewport
+    // corresponds to moving in (dRow, dCol) direction in the grid.
     const getDirectionFromAngle = (angle) => {
         const directions = {
             0:   { dx: 1,  dy: 0,  dRow: 0,  dCol: 1  },  // Right
@@ -174,6 +188,15 @@ const GridComponent = ({
     };
 
     // Project touch onto locked axis
+    //
+    // Returns the projection of the touch point onto the locked axis, plus the
+    // signed distance along the axis from the start point.
+    //
+    // distance > 0: Touch is on the "forward" side (in direction of dx, dy)
+    // distance < 0: Touch is on the "backward" side (opposite to dx, dy)
+    //
+    // This allows bi-directional selection: user can extend in either direction
+    // along the locked axis.
     const projectOntoAxis = (touchX, touchY, startX, startY, dirX, dirY) => {
         const vecX = touchX - startX;
         const vecY = touchY - startY;
@@ -197,9 +220,18 @@ const GridComponent = ({
     }, [grid]);
 
     // Calculate cells along direction from start
+    // The 'forward' flag indicates whether the user is swiping in the positive direction
+    // of the locked axis (projection.distance >= 0) or in the negative direction.
+    //
+    // When forward = true:  sign = -1 → select cells opposite to (dRow, dCol)
+    // When forward = false: sign = 1  → select cells in direction of (dRow, dCol)
+    //
+    // The sign is inverted because the projection distance increases in the
+    // direction of the locked axis (dRow, dCol), but visually the user expects
+    // cells to be selected in the direction they are swiping.
     const getCellsAlongDirection = useCallback((startRow, startCol, dRow, dCol, numCells, forward) => {
         const cells = [];
-        const sign = forward ? 1 : -1;
+        const sign = forward ? -1 : 1;
         for (let i = 0; i < numCells; i++) {
             const row = startRow + (i * dRow * sign);
             const col = startCol + (i * dCol * sign);
