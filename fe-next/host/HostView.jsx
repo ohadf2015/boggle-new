@@ -210,7 +210,43 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
     if (!socket) return;
 
     const handleUpdateUsers = (data) => {
-      setPlayersReady(data.users || []);
+      const newUsers = data.users || [];
+      setPlayersReady(newUsers);
+
+      // Clean up scores/stats for players who left
+      const currentUsernames = new Set(newUsers.map(u =>
+        typeof u === 'string' ? u : u.username
+      ));
+
+      setPlayerScores(prev => {
+        const filtered = {};
+        Object.keys(prev).forEach(username => {
+          if (currentUsernames.has(username)) {
+            filtered[username] = prev[username];
+          }
+        });
+        return filtered;
+      });
+
+      setPlayerWordCounts(prev => {
+        const filtered = {};
+        Object.keys(prev).forEach(username => {
+          if (currentUsernames.has(username)) {
+            filtered[username] = prev[username];
+          }
+        });
+        return filtered;
+      });
+
+      setPlayerAchievements(prev => {
+        const filtered = {};
+        Object.keys(prev).forEach(username => {
+          if (currentUsernames.has(username)) {
+            filtered[username] = prev[username];
+          }
+        });
+        return filtered;
+      });
     };
 
     const handlePlayerJoinedLate = (data) => {
