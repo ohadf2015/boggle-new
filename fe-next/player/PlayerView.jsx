@@ -227,7 +227,18 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
     const handleTimeUpdate = (data) => {
       setRemainingTime(data.remainingTime);
 
-      if (!gameActive && data.remainingTime > 0 && letterGrid) {
+      // If we receive letterGrid in timeUpdate, update it (for late joiners who missed startGame)
+      if (data.letterGrid && !letterGrid) {
+        console.log('[PLAYER] Received letterGrid in timeUpdate - late join sync');
+        setLetterGrid(data.letterGrid);
+      }
+      if (data.language && !gameLanguage) {
+        setGameLanguage(data.language);
+      }
+
+      // Auto-activate game if timer is running and we have the grid
+      const hasGrid = letterGrid || data.letterGrid;
+      if (!gameActive && data.remainingTime > 0 && hasGrid) {
         console.log('[PLAYER] Timer started on server, activating game (remainingTime:', data.remainingTime, ')');
         setGameActive(true);
         setShowStartAnimation(true);

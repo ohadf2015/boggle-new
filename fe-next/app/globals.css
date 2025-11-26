@@ -311,3 +311,32 @@ body {
     filter: brightness(1.1) saturate(1.2);
   }
 }
+
+/* Rainbow Shift Animation for Combo 10+ */
+@keyframes rainbow-shift {
+  0% {
+    background-position: 0% 50%;
+  }
+
+  100% {
+    background-position: 100% 50%;
+  }
+}
+
+/* Rainbow Gradient Cell Animation */
+@keyframes rainbow-cell {
+  0% {
+    background-position: 0% 50%;
+    filter: brightness(1) saturate(1);
+  }
+
+  50% {
+    background-position: 100% 50%;
+    filter: brightness(1.2) saturate(1.3);
+  }
+
+  100% {
+    background-position: 0% 50%;
+    filter: brightness(1) saturate(1);
+  }
+}
