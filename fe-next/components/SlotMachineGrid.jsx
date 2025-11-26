@@ -1,11 +1,40 @@
-import React, { useState, useEffect, useRef, useMemo } from 'react';
+import React, { useRef } from 'react';
 import { motion } from 'framer-motion';
 import SlotMachineCell from './SlotMachineCell';
 import { cn } from '../lib/utils';
+import 'animate.css';
+
+// Pre-generate duration variations for cells at module level (up to 20x20 grid)
+// These are constant random values that stay the same across renders
+const DURATION_VARIATIONS = (() => {
+  const variations = [];
+  for (let r = 0; r < 20; r++) {
+    variations[r] = [];
+    for (let c = 0; c < 20; c++) {
+      variations[r][c] = Math.random() * 150;
+    }
+  }
+  return variations;
+})();
+
+// Pre-generate random delays for 'random' pattern at module level
+const RANDOM_DELAYS = (() => {
+  const delays = [];
+  for (let r = 0; r < 20; r++) {
+    delays[r] = [];
+    for (let c = 0; c < 20; c++) {
+      delays[r][c] = Math.random() * 400;
+    }
+  }
+  return delays;
+})();
 
 /**
  * SlotMachineGrid - A grid of letters with casino slot machine animation
  * Used in the waiting room to display shuffling letters with visual flair
+ *
+ * The animation works by keeping stable cell keys, so when letters change
+ * the SlotMachineCell detects the change and triggers the slot machine spin effect.
  */
 const SlotMachineGrid = ({
   grid,
@@ -13,24 +42,10 @@ const SlotMachineGrid = ({
   language = 'en',
   className,
   animationDuration = 800,
-  staggerDelay = 50,
-  animationPattern = 'cascade' // 'cascade', 'random', 'columns', 'rows'
+  staggerDelay = 40,
+  animationPattern = 'cascade' // 'cascade', 'random', 'columns', 'rows', 'spiral', 'center-out'
 }) => {
-  const [previousGrid, setPreviousGrid] = useState(null);
-  const [animationKey, setAnimationKey] = useState(0);
   const gridRef = useRef(null);
-
-  // Detect grid changes and trigger animation
-  useEffect(() => {
-    if (grid && previousGrid) {
-      // Check if grid actually changed
-      const gridChanged = JSON.stringify(grid) !== JSON.stringify(previousGrid);
-      if (gridChanged) {
-        setAnimationKey(prev => prev + 1);
-      }
-    }
-    setPreviousGrid(grid);
-  }, [grid]);
 
   // Calculate delay for each cell based on animation pattern
   const getCellDelay = (rowIndex, colIndex, totalRows, totalCols) => {
@@ -48,28 +63,33 @@ const SlotMachineGrid = ({
         return rowIndex * staggerDelay * 2 + colIndex * (staggerDelay / 2);
 
       case 'random':
-        // Random delays for chaotic slot machine feel
-        return Math.random() * (totalRows * totalCols * staggerDelay * 0.5);
+        // Use pre-computed random delays
+        return RANDOM_DELAYS[rowIndex]?.[colIndex] ?? 0;
 
-      case 'spiral':
+      case 'spiral': {
         // Spiral from outside to center
         const centerRow = Math.floor(totalRows / 2);
         const centerCol = Math.floor(totalCols / 2);
         const distance = Math.max(Math.abs(rowIndex - centerRow), Math.abs(colIndex - centerCol));
         const maxDistance = Math.max(centerRow, centerCol);
         return (maxDistance - distance) * staggerDelay * 2;
+      }
 
-      case 'center-out':
+      case 'center-out': {
         // From center outward
         const cRow = Math.floor(totalRows / 2);
         const cCol = Math.floor(totalCols / 2);
         const dist = Math.abs(rowIndex - cRow) + Math.abs(colIndex - cCol);
         return dist * staggerDelay;
+      }
 
       default:
         return (rowIndex + colIndex) * staggerDelay;
     }
   };
+
+  // Get duration variation for a cell
+  const getDurationVariation = (row, col) => DURATION_VARIATIONS[row]?.[col] ?? 0;
 
   // Check if a cell is highlighted
   const isCellHighlighted = (rowIndex, colIndex) => {
@@ -138,10 +158,10 @@ const SlotMachineGrid = ({
 
           return (
             <SlotMachineCell
-              key={`${rowIndex}-${colIndex}-${animationKey}`}
+              key={`cell-${rowIndex}-${colIndex}`}
               letter={cell}
               delay={cellDelay}
-              duration={animationDuration + Math.random() * 200}
+              duration={animationDuration + getDurationVariation(rowIndex, colIndex)}
               language={language}
               isHighlighted={isHighlighted}
               size={isLargeGrid ? 'small' : 'normal'}
@@ -149,18 +169,6 @@ const SlotMachineGrid = ({
           );
         })
       )}
-
-      {/* Ambient glow effect when grid changes */}
-      <motion.div
-        key={`glow-${animationKey}`}
-        className="absolute inset-0 pointer-events-none rounded-2xl"
-        initial={{ opacity: 0.6 }}
-        animate={{ opacity: 0 }}
-        transition={{ duration: 1.5 }}
-        style={{
-          background: 'radial-gradient(circle at center, rgba(6, 182, 212, 0.2), transparent 70%)'
-        }}
-      />
     </motion.div>
   );
 };

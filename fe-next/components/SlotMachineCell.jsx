@@ -1,5 +1,6 @@
-import React, { useState, useEffect, useRef, useMemo } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
+import 'animate.css';
+import './SlotMachine.css';
 
 // Character sets for different languages
 const CHAR_SETS = {
@@ -17,71 +18,111 @@ const SlotMachineCell = ({
   isHighlighted = false,
   size = 'normal'
 }) => {
-  const [isAnimating, setIsAnimating] = useState(false);
   const [displayLetter, setDisplayLetter] = useState(letter);
-  const [previousLetter, setPreviousLetter] = useState(null);
-  const animationRef = useRef(null);
-  const letterRef = useRef(letter);
+  const [isAnimating, setIsAnimating] = useState(false);
+  const [animationPhase, setAnimationPhase] = useState('idle'); // 'idle', 'spinning', 'landing'
+  const previousLetterRef = useRef(letter);
+  const animationTimeoutRef = useRef(null);
+  const spinIntervalRef = useRef(null);
+  const isMountedRef = useRef(true);
+  const isInitialMountRef = useRef(true);
 
   // Get character set for current language
   const charSet = useMemo(() => {
     return CHAR_SETS[language] || CHAR_SETS.en;
   }, [language]);
 
-  // Generate random letters for the spinning effect
-  const getRandomLetter = () => {
+  // Generate random letter for spinning effect
+  const getRandomLetter = useCallback(() => {
     return charSet[Math.floor(Math.random() * charSet.length)];
-  };
+  }, [charSet]);
+
+  // Cleanup on unmount
+  useEffect(() => {
+    isMountedRef.current = true;
+    return () => {
+      isMountedRef.current = false;
+      if (animationTimeoutRef.current) {
+        clearTimeout(animationTimeoutRef.current);
+      }
+      if (spinIntervalRef.current) {
+        clearInterval(spinIntervalRef.current);
+      }
+    };
+  }, []);
 
   useEffect(() => {
+    // Skip animation on initial mount
+    if (isInitialMountRef.current) {
+      isInitialMountRef.current = false;
+      setDisplayLetter(letter);
+      previousLetterRef.current = letter;
+      return;
+    }
+
     // Only animate if the letter actually changed
-    if (letter !== letterRef.current) {
-      setPreviousLetter(letterRef.current);
-      letterRef.current = letter;
+    if (letter !== previousLetterRef.current) {
+      previousLetterRef.current = letter;
+
+      // Clear any existing animations
+      if (animationTimeoutRef.current) {
+        clearTimeout(animationTimeoutRef.current);
+      }
+      if (spinIntervalRef.current) {
+        clearInterval(spinIntervalRef.current);
+      }
 
       // Start animation after delay
-      const startTimeout = setTimeout(() => {
+      animationTimeoutRef.current = setTimeout(() => {
+        if (!isMountedRef.current) return;
+
         setIsAnimating(true);
+        setAnimationPhase('spinning');
 
         // Spin through random letters
         let spinCount = 0;
-        const maxSpins = Math.floor(duration / 50); // ~50ms per spin frame
+        const spinInterval = 60; // ms between letter changes
+        const totalSpins = Math.floor(duration / spinInterval);
 
-        const spin = () => {
-          if (spinCount < maxSpins - 3) {
-            setDisplayLetter(getRandomLetter());
-            spinCount++;
-            animationRef.current = setTimeout(spin, 50);
-          } else if (spinCount < maxSpins) {
-            // Slow down at the end
-            setDisplayLetter(getRandomLetter());
-            spinCount++;
-            animationRef.current = setTimeout(spin, 80 + (spinCount - maxSpins + 3) * 30);
-          } else {
-            // Final letter
-            setDisplayLetter(letter);
-            setIsAnimating(false);
+        spinIntervalRef.current = setInterval(() => {
+          if (!isMountedRef.current) {
+            clearInterval(spinIntervalRef.current);
+            return;
           }
-        };
 
-        spin();
+          spinCount++;
+          setDisplayLetter(getRandomLetter());
+
+          if (spinCount >= totalSpins) {
+            clearInterval(spinIntervalRef.current);
+            setAnimationPhase('landing');
+
+            // Show final letter with landing animation
+            setTimeout(() => {
+              if (!isMountedRef.current) return;
+              setDisplayLetter(letter);
+
+              // Reset animation state after landing animation completes
+              setTimeout(() => {
+                if (!isMountedRef.current) return;
+                setIsAnimating(false);
+                setAnimationPhase('idle');
+              }, 250);
+            }, 50);
+          }
+        }, spinInterval);
       }, delay);
-
-      return () => {
-        clearTimeout(startTimeout);
-        if (animationRef.current) {
-          clearTimeout(animationRef.current);
-        }
-      };
     }
-  }, [letter, delay, duration, charSet]);
 
-  // Initial render - set display letter without animation
-  useEffect(() => {
-    if (!previousLetter) {
-      setDisplayLetter(letter);
-    }
-  }, []);
+    return () => {
+      if (animationTimeoutRef.current) {
+        clearTimeout(animationTimeoutRef.current);
+      }
+      if (spinIntervalRef.current) {
+        clearInterval(spinIntervalRef.current);
+      }
+    };
+  }, [letter, delay, duration, getRandomLetter]);
 
   const sizeClasses = {
     small: 'text-lg sm:text-xl',
@@ -89,9 +130,24 @@ const SlotMachineCell = ({
     large: 'text-3xl sm:text-4xl md:text-5xl'
   };
 
+  // Get CSS classes based on animation phase
+  const getLetterClasses = () => {
+    const classes = ['slot-letter', 'slot-letter-transition'];
+
+    if (animationPhase === 'spinning') {
+      classes.push('slot-letter-spinning');
+    }
+    if (animationPhase === 'landing') {
+      classes.push('slot-letter-final');
+    }
+
+    return classes.join(' ');
+  };
+
   return (
     <div
       className={`
+        slot-reel-container
         relative aspect-square flex items-center justify-center
         font-bold overflow-hidden
         ${sizeClasses[size]}
@@ -102,54 +158,25 @@ const SlotMachineCell = ({
         border-2
         ${isHighlighted ? 'border-yellow-300' : 'border-slate-300/60 dark:border-slate-600/60'}
         shadow-lg
-        transition-colors duration-200
+        ${isAnimating ? 'slot-glow' : ''}
       `}
       style={{ borderRadius: '8px' }}
     >
-      {/* Slot machine reel effect */}
-      <AnimatePresence mode="popLayout">
-        <motion.span
-          key={`${displayLetter}-${isAnimating}`}
-          initial={isAnimating ? { y: -40, opacity: 0, scale: 0.8 } : false}
-          animate={{
-            y: 0,
-            opacity: 1,
-            scale: 1,
-            rotateX: 0
-          }}
-          exit={{ y: 40, opacity: 0, scale: 0.8 }}
-          transition={{
-            duration: isAnimating ? 0.05 : 0.2,
-            ease: isAnimating ? 'linear' : 'easeOut'
-          }}
-          className={`
-            ${isAnimating ? 'blur-[0.5px]' : ''}
-            ${isAnimating ? 'text-cyan-400' : ''}
-          `}
-          style={{
-            textShadow: isAnimating
-              ? '0 0 10px rgba(6, 182, 212, 0.8), 0 2px 4px rgba(0,0,0,0.3)'
-              : isHighlighted
-                ? '0 0 15px rgba(255,255,255,0.6)'
-                : '0 2px 4px rgba(0,0,0,0.2)'
-          }}
-        >
-          {displayLetter}
-        </motion.span>
-      </AnimatePresence>
+      {/* Slot machine letter display */}
+      <span
+        className={getLetterClasses()}
+        style={{
+          textShadow: isHighlighted && !isAnimating
+            ? '0 0 15px rgba(255,255,255,0.6)'
+            : !isAnimating ? '0 2px 4px rgba(0,0,0,0.2)' : undefined
+        }}
+      >
+        {displayLetter}
+      </span>
 
-      {/* Spinning glow effect */}
-      {isAnimating && (
-        <motion.div
-          className="absolute inset-0 pointer-events-none"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: [0, 0.5, 0] }}
-          transition={{ duration: 0.1, repeat: Infinity }}
-          style={{
-            background: 'linear-gradient(180deg, rgba(6,182,212,0.3) 0%, transparent 30%, transparent 70%, rgba(6,182,212,0.3) 100%)',
-            borderRadius: '8px'
-          }}
-        />
+      {/* Spinning reel effect overlay */}
+      {isAnimating && animationPhase === 'spinning' && (
+        <div className="slot-cell-spinning" />
       )}
 
       {/* Top and bottom gradients for 3D depth (slot machine look) */}
