@@ -549,7 +549,7 @@ export default function GamePage() {
     }
 
     if (isHost) {
-      return <HostView gameCode={gameCode} roomLanguage={roomLanguage} initialPlayers={playersInRoom} username={username} />;
+      return <HostView gameCode={gameCode} roomLanguage={roomLanguage} initialPlayers={playersInRoom} username={username} onShowResults={handleShowResults} />;
     }
 
     return (

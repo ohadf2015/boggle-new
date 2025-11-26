@@ -158,13 +158,8 @@
   transition: all 0.1s ease-out;
 }
 
-/* Text effects during spin */
+/* Text effects during spin - keep original color, only add subtle blur */
 .slot-letter-spinning {
-  color: #06b6d4;
-  text-shadow:
-    0 0 10px rgba(6, 182, 212, 0.8),
-    0 0 20px rgba(6, 182, 212, 0.5),
-    0 0 30px rgba(6, 182, 212, 0.3);
   filter: blur(0.5px);
 }
 
