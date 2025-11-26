@@ -47,7 +47,7 @@ const ResultsWinnerBanner = ({ winner, isCurrentUserWinner }) => {
 
       {/* Main Container with Hero Background Image */}
       <div className="relative rounded-3xl overflow-hidden shadow-2xl min-h-[400px] md:min-h-[500px]">
-        {/* Hero Background Image with Blur and Overlay */}
+        {/* Hero Background Image with Clear Glass Effect */}
         <div className="absolute inset-0">
           {!imageError ? (
             <motion.img
@@ -59,15 +59,17 @@ const ResultsWinnerBanner = ({ winner, isCurrentUserWinner }) => {
               onError={() => setImageError(true)}
               className="absolute inset-0 w-full h-full object-cover"
               style={{
-                filter: 'brightness(1.2) saturate(1.5) contrast(1.1)',
+                filter: 'brightness(1.15) saturate(1.4) contrast(1.1)',
               }}
             />
           ) : (
             <div className="absolute inset-0 bg-gradient-to-br from-yellow-400 via-orange-500 to-purple-600" />
           )}
-          {/* Glass glare overlay for depth */}
-          <div className="absolute inset-0 bg-gradient-to-br from-white/25 via-transparent to-transparent pointer-events-none" />
-          <div className="absolute inset-0 bg-gradient-to-br from-yellow-400/30 via-orange-400/20 to-transparent pointer-events-none" />
+          {/* Clear glass effect - light reflections only, no blur */}
+          <div className="absolute inset-0 bg-gradient-to-br from-white/15 via-transparent to-transparent pointer-events-none" />
+          <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-transparent to-white/10 pointer-events-none" />
+          {/* Subtle edge highlight like glass edges catch light */}
+          <div className="absolute inset-0 rounded-3xl shadow-[inset_0_1px_0_rgba(255,255,255,0.3),inset_0_-1px_0_rgba(0,0,0,0.1)] pointer-events-none" />
         </div>
 
         {/* Floating Particles Animation */}
