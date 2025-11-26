@@ -21,7 +21,7 @@ const LetterGrid = ({ letterGrid }) => {
       transition={{ delay: 0.3 }}
       className="w-full"
     >
-      <div className="w-full max-w-[400px] sm:max-w-[350px] md:max-w-[320px] mx-auto p-1 sm:p-2 rounded-xl bg-gradient-to-br from-slate-800/40 to-slate-900/40 dark:from-slate-800/40 dark:to-slate-900/40 border-2 border-cyan-500/50 shadow-[0_4px_24px_rgba(6,182,212,0.3)] relative overflow-hidden">
+      <div className="w-full max-w-[500px] mx-auto p-2 sm:p-3 rounded-xl bg-gradient-to-br from-slate-800/40 to-slate-900/40 dark:from-slate-800/40 dark:to-slate-900/40 border-2 border-cyan-500/50 shadow-[0_4px_24px_rgba(6,182,212,0.3)] relative overflow-hidden">
         {/* Glass glare effect */}
         <div className="absolute inset-0 bg-gradient-to-br from-white/20 via-transparent to-transparent pointer-events-none" />
         <GridComponent
