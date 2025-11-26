@@ -199,7 +199,7 @@ const GridComponent = ({
     // Calculate cells along direction from start
     const getCellsAlongDirection = useCallback((startRow, startCol, dRow, dCol, numCells, forward) => {
         const cells = [];
-        const sign = forward ? 1 : -1;
+        const sign = forward ? -1 : 1;
         for (let i = 0; i < numCells; i++) {
             const row = startRow + (i * dRow * sign);
             const col = startCol + (i * dCol * sign);
