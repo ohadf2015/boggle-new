@@ -256,7 +256,7 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
                     className="w-full h-14 text-xl font-bold bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-400 hover:to-emerald-500 hover:shadow-[0_0_25px_rgba(34,197,94,0.5)] transition-all"
                   >
                     <FaGamepad className="mr-3" size={24} />
-                    {t('joinView.enterRoom')}
+                    {t('joinView.joinGame')}
                   </Button>
                 </motion.div>
 

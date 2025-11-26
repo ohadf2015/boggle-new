@@ -129,6 +129,7 @@ export const translations = {
       welcomeBack: 'Welcome back',
       connectingToRoom: 'Connecting to room...',
       enterRoom: 'Enter Room',
+      joinGame: 'Join Game',
     },
     hostView: {
       waitingForPlayers: 'Waiting for players...',
@@ -499,6 +500,7 @@ export const translations = {
       welcomeBack: 'ברוך שובך',
       connectingToRoom: 'מתחבר לחדר...',
       enterRoom: 'כניסה לחדר',
+      joinGame: 'הצטרף למשחק',
     },
     hostView: {
       waitingForPlayers: 'ממתין לשחקנים...',
@@ -869,6 +871,7 @@ export const translations = {
       welcomeBack: 'Välkommen tillbaka',
       connectingToRoom: 'Ansluter till rummet...',
       enterRoom: 'Gå in i rummet',
+      joinGame: 'Gå med i spelet',
     },
     hostView: {
       waitingForPlayers: 'Väntar på spelare...',
@@ -1239,6 +1242,7 @@ export const translations = {
       welcomeBack: 'おかえりなさい',
       connectingToRoom: 'ルームに接続中...',
       enterRoom: 'ルームに入る',
+      joinGame: 'ゲームに参加',
     },
     hostView: {
       waitingForPlayers: 'プレイヤーを待っています...',
