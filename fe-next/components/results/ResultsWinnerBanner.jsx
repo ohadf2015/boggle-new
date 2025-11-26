@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FaCrown, FaMedal, FaTrophy } from 'react-icons/fa';
 import { Card } from '../ui/card';
@@ -20,13 +20,97 @@ const celebrationImages = [
 const ResultsWinnerBanner = ({ winner, isCurrentUserWinner }) => {
   const { t } = useLanguage();
   const [imageError, setImageError] = useState(false);
+  const containerRef = useRef(null);
+
+  // Tilt state for interactive glass reflection
+  const [tilt, setTilt] = useState({ x: 0, y: 0 });
+  const [isHovering, setIsHovering] = useState(false);
 
   // Randomly select a celebration image (once per winner)
   const randomImage = useMemo(() => {
     return celebrationImages[Math.floor(Math.random() * celebrationImages.length)];
   }, [winner?.username]);
 
+  // Handle mouse movement for desktop
+  const handleMouseMove = useCallback((e) => {
+    if (!containerRef.current) return;
+
+    const rect = containerRef.current.getBoundingClientRect();
+    const centerX = rect.left + rect.width / 2;
+    const centerY = rect.top + rect.height / 2;
+
+    // Calculate tilt based on mouse position relative to center (-1 to 1)
+    const tiltX = ((e.clientX - centerX) / (rect.width / 2)) * 15; // Max 15 degrees
+    const tiltY = ((e.clientY - centerY) / (rect.height / 2)) * -10; // Max 10 degrees (inverted for natural feel)
+
+    setTilt({ x: tiltX, y: tiltY });
+  }, []);
+
+  const handleMouseEnter = useCallback(() => {
+    setIsHovering(true);
+  }, []);
+
+  const handleMouseLeave = useCallback(() => {
+    setIsHovering(false);
+    setTilt({ x: 0, y: 0 });
+  }, []);
+
+  // Handle device orientation (gyroscope) for mobile
+  useEffect(() => {
+    let permissionGranted = false;
+
+    const handleOrientation = (e) => {
+      if (!permissionGranted && e.gamma === null) return;
+
+      // gamma: left-right tilt (-90 to 90)
+      // beta: front-back tilt (-180 to 180)
+      const gamma = e.gamma || 0;
+      const beta = e.beta || 0;
+
+      // Normalize and clamp values
+      const tiltX = Math.max(-15, Math.min(15, gamma * 0.5));
+      const tiltY = Math.max(-10, Math.min(10, (beta - 45) * 0.3)); // Assume phone held at ~45 degrees
+
+      setTilt({ x: tiltX, y: tiltY });
+    };
+
+    const requestPermission = async () => {
+      // Check if DeviceOrientationEvent exists and has requestPermission (iOS 13+)
+      if (typeof DeviceOrientationEvent !== 'undefined' &&
+          typeof DeviceOrientationEvent.requestPermission === 'function') {
+        try {
+          const permission = await DeviceOrientationEvent.requestPermission();
+          if (permission === 'granted') {
+            permissionGranted = true;
+            window.addEventListener('deviceorientation', handleOrientation);
+          }
+        } catch (err) {
+          console.log('Gyroscope permission denied');
+        }
+      } else if (typeof DeviceOrientationEvent !== 'undefined') {
+        // Non-iOS devices or older iOS
+        permissionGranted = true;
+        window.addEventListener('deviceorientation', handleOrientation);
+      }
+    };
+
+    // Check if we're on a mobile device
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+
+    if (isMobile) {
+      requestPermission();
+    }
+
+    return () => {
+      window.removeEventListener('deviceorientation', handleOrientation);
+    };
+  }, []);
+
   if (!winner) return null;
+
+  // Calculate reflection position based on tilt
+  const reflectionX = 50 + tilt.x * 2; // Percentage offset
+  const reflectionY = 20 + tilt.y * 2;
 
   return (
     <motion.div
@@ -47,7 +131,11 @@ const ResultsWinnerBanner = ({ winner, isCurrentUserWinner }) => {
 
       {/* Main Container with Hero Background Image - 3D Glass Frame */}
       <div
-        className="relative rounded-3xl overflow-hidden min-h-[400px] md:min-h-[500px]"
+        ref={containerRef}
+        onMouseMove={handleMouseMove}
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={handleMouseLeave}
+        className="relative rounded-3xl overflow-hidden min-h-[400px] md:min-h-[500px] cursor-pointer"
         style={{
           boxShadow: `
             0 25px 50px -12px rgba(0, 0, 0, 0.5),
@@ -55,20 +143,22 @@ const ResultsWinnerBanner = ({ winner, isCurrentUserWinner }) => {
             inset 0 1px 0 rgba(255, 255, 255, 0.2),
             inset 0 -1px 0 rgba(0, 0, 0, 0.1)
           `,
-          transform: 'perspective(1000px) rotateX(2deg)',
-          transformStyle: 'preserve-3d'
+          transform: `perspective(1000px) rotateX(${2 + tilt.y * 0.1}deg) rotateY(${tilt.x * 0.1}deg)`,
+          transformStyle: 'preserve-3d',
+          transition: isHovering ? 'transform 0.1s ease-out' : 'transform 0.5s ease-out'
         }}
       >
-        {/* 3D Glass Frame Border */}
+        {/* 3D Glass Frame Border - responds to tilt */}
         <div
           className="absolute inset-0 rounded-3xl pointer-events-none z-20"
           style={{
-            background: 'linear-gradient(135deg, rgba(255,255,255,0.4) 0%, transparent 50%, rgba(0,0,0,0.2) 100%)',
+            background: `linear-gradient(${135 + tilt.x}deg, rgba(255,255,255,${0.4 + tilt.x * 0.01}) 0%, transparent 50%, rgba(0,0,0,${0.2 - tilt.x * 0.005}) 100%)`,
             boxShadow: `
-              inset 2px 2px 4px rgba(255, 255, 255, 0.3),
-              inset -2px -2px 4px rgba(0, 0, 0, 0.2),
+              inset ${2 + tilt.x * 0.2}px ${2 - tilt.y * 0.2}px 4px rgba(255, 255, 255, 0.3),
+              inset ${-2 + tilt.x * 0.2}px ${-2 - tilt.y * 0.2}px 4px rgba(0, 0, 0, 0.2),
               inset 0 0 20px rgba(255, 255, 255, 0.1)
-            `
+            `,
+            transition: 'all 0.1s ease-out'
           }}
         />
 
@@ -91,37 +181,54 @@ const ResultsWinnerBanner = ({ winner, isCurrentUserWinner }) => {
             <div className="absolute inset-0 bg-gradient-to-br from-yellow-400 via-orange-500 to-purple-600" />
           )}
 
-          {/* 3D Glass Reflection - Top left shine */}
+          {/* Interactive Glass Reflection - Main specular highlight */}
           <div
-            className="absolute inset-0 pointer-events-none"
+            className="absolute pointer-events-none transition-all duration-100 ease-out"
             style={{
-              background: 'linear-gradient(135deg, rgba(255,255,255,0.25) 0%, rgba(255,255,255,0.1) 20%, transparent 40%)'
+              width: '150%',
+              height: '150%',
+              left: `${reflectionX - 75}%`,
+              top: `${reflectionY - 75}%`,
+              background: `radial-gradient(ellipse at center, rgba(255,255,255,0.35) 0%, rgba(255,255,255,0.15) 25%, transparent 50%)`,
+              transform: `rotate(${45 + tilt.x * 2}deg)`,
             }}
           />
 
-          {/* 3D Glass Reflection - Bottom right subtle reflection */}
+          {/* Secondary reflection - moves opposite */}
           <div
-            className="absolute inset-0 pointer-events-none"
+            className="absolute pointer-events-none transition-all duration-150 ease-out"
             style={{
-              background: 'linear-gradient(315deg, rgba(255,255,255,0.08) 0%, transparent 30%)'
+              width: '100%',
+              height: '100%',
+              left: `${100 - reflectionX - 25}%`,
+              top: `${80 - reflectionY}%`,
+              background: `radial-gradient(ellipse at center, rgba(255,255,255,0.12) 0%, transparent 40%)`,
             }}
           />
 
-          {/* Horizontal light streak across glass */}
+          {/* Horizontal light streak across glass - moves with tilt */}
           <div
-            className="absolute inset-0 pointer-events-none"
+            className="absolute inset-0 pointer-events-none transition-all duration-100 ease-out"
             style={{
-              background: 'linear-gradient(180deg, transparent 35%, rgba(255,255,255,0.08) 40%, rgba(255,255,255,0.12) 42%, rgba(255,255,255,0.08) 44%, transparent 49%)'
+              background: `linear-gradient(${180 + tilt.x * 0.5}deg, transparent ${30 + tilt.y}%, rgba(255,255,255,0.08) ${35 + tilt.y}%, rgba(255,255,255,0.15) ${37 + tilt.y}%, rgba(255,255,255,0.08) ${39 + tilt.y}%, transparent ${44 + tilt.y}%)`
             }}
           />
 
-          {/* 3D depth shadow at edges */}
+          {/* Edge light effect - responds to tilt direction */}
           <div
-            className="absolute inset-0 rounded-3xl pointer-events-none"
+            className="absolute inset-0 pointer-events-none transition-all duration-100 ease-out"
+            style={{
+              background: `linear-gradient(${90 + tilt.x * 3}deg, rgba(255,255,255,${0.1 + Math.abs(tilt.x) * 0.01}) 0%, transparent 15%, transparent 85%, rgba(0,0,0,${0.1 + Math.abs(tilt.x) * 0.01}) 100%)`
+            }}
+          />
+
+          {/* 3D depth shadow at edges - responds to tilt */}
+          <div
+            className="absolute inset-0 rounded-3xl pointer-events-none transition-all duration-100 ease-out"
             style={{
               boxShadow: `
-                inset 4px 4px 8px rgba(255, 255, 255, 0.15),
-                inset -4px -4px 8px rgba(0, 0, 0, 0.15),
+                inset ${4 + tilt.x * 0.3}px ${4 - tilt.y * 0.3}px 8px rgba(255, 255, 255, 0.2),
+                inset ${-4 + tilt.x * 0.3}px ${-4 - tilt.y * 0.3}px 8px rgba(0, 0, 0, 0.2),
                 inset 0 0 40px rgba(0, 0, 0, 0.1)
               `
             }}
