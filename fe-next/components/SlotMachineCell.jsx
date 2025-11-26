@@ -79,9 +79,9 @@ const SlotMachineCell = ({
         setIsAnimating(true);
         setAnimationPhase('spinning');
 
-        // Spin through random letters
+        // Spin through random letters - optimized for performance
         let spinCount = 0;
-        const spinInterval = 60; // ms between letter changes
+        const spinInterval = 100; // ms between letter changes (increased from 60 for better performance)
         const totalSpins = Math.floor(duration / spinInterval);
 
         spinIntervalRef.current = setInterval(() => {
@@ -147,53 +147,21 @@ const SlotMachineCell = ({
   return (
     <div
       className={`
-        slot-reel-container
         relative aspect-square flex items-center justify-center
-        font-bold overflow-hidden
+        font-bold overflow-hidden rounded-lg
         ${sizeClasses[size]}
         ${isHighlighted
-          ? 'bg-gradient-to-br from-yellow-400 to-orange-500 text-white shadow-[0_0_20px_rgba(251,191,36,0.6)]'
-          : 'bg-gradient-to-br from-slate-100 via-white to-slate-100 dark:from-slate-700 dark:via-slate-800 dark:to-slate-900 text-slate-900 dark:text-white'
+          ? 'bg-yellow-500 text-white'
+          : 'bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white'
         }
         border-2
         ${isHighlighted ? 'border-yellow-300' : 'border-slate-300/60 dark:border-slate-600/60'}
-        shadow-lg
-        ${isAnimating ? 'slot-glow' : ''}
       `}
-      style={{ borderRadius: '8px' }}
     >
       {/* Slot machine letter display */}
-      <span
-        className={getLetterClasses()}
-        style={{
-          textShadow: isHighlighted && !isAnimating
-            ? '0 0 15px rgba(255,255,255,0.6)'
-            : !isAnimating ? '0 2px 4px rgba(0,0,0,0.2)' : undefined
-        }}
-      >
+      <span className={getLetterClasses()}>
         {displayLetter}
       </span>
-
-      {/* Spinning reel effect overlay */}
-      {isAnimating && animationPhase === 'spinning' && (
-        <div className="slot-cell-spinning" />
-      )}
-
-      {/* Top and bottom gradients for 3D depth (slot machine look) */}
-      <div
-        className="absolute inset-x-0 top-0 h-1/4 pointer-events-none"
-        style={{
-          background: 'linear-gradient(180deg, rgba(0,0,0,0.15) 0%, transparent 100%)',
-          borderRadius: '8px 8px 0 0'
-        }}
-      />
-      <div
-        className="absolute inset-x-0 bottom-0 h-1/4 pointer-events-none"
-        style={{
-          background: 'linear-gradient(0deg, rgba(0,0,0,0.15) 0%, transparent 100%)',
-          borderRadius: '0 0 8px 8px'
-        }}
-      />
     </div>
   );
 };

@@ -138,10 +138,9 @@ const ResultsPlayerCard = ({ player, index, allPlayerWords, currentUsername, isW
 
   return (
     <motion.div
-      initial={{ x: -30, opacity: 0 }}
+      initial={{ x: -20, opacity: 0 }}
       animate={{ x: 0, opacity: 1 }}
-      transition={{ delay: index * 0.08, type: 'spring', stiffness: 120 }}
-      whileHover={{ scale: 1.02, y: -4, transition: { duration: 0.2 } }}
+      transition={{ delay: Math.min(index * 0.05, 0.3), duration: 0.3 }}
     >
       <Card
         className={cn(
@@ -159,15 +158,9 @@ const ResultsPlayerCard = ({ player, index, allPlayerWords, currentUsername, isW
         {/* Header: Rank, Name, Score */}
         <div className="flex justify-between items-center mb-3 sm:mb-4 relative z-10">
           <div className="flex items-center gap-3">
-            <motion.div
-              animate={index < 3 ? {
-                rotate: dir === 'rtl' ? [0, 10, -10, 10, 0] : [0, -10, 10, -10, 0]
-              } : {}}
-              transition={index < 3 ? { duration: 2, repeat: Infinity, repeatDelay: 5 } : {}}
-              className="text-3xl font-bold"
-            >
+            <div className="text-3xl font-bold">
               {getRankIcon()}
-            </motion.div>
+            </div>
             {avatar?.emoji && (
               <div className="text-3xl" style={{ imageRendering: 'crisp-edges' }}>
                 {avatar.emoji}
@@ -196,9 +189,7 @@ const ResultsPlayerCard = ({ player, index, allPlayerWords, currentUsername, isW
               </p>
             </div>
           </div>
-          <motion.div
-            animate={index === 0 ? { scale: [1, 1.1, 1] } : {}}
-            transition={index === 0 ? { duration: 1.5, repeat: Infinity } : {}}
+          <div
             className={cn(
               "text-4xl font-black",
               index === 0 && "text-yellow-500",
@@ -208,7 +199,7 @@ const ResultsPlayerCard = ({ player, index, allPlayerWords, currentUsername, isW
             )}
           >
             {player.score}
-          </motion.div>
+          </div>
         </div>
 
         {/* Longest Word */}
@@ -332,14 +323,7 @@ const ResultsPlayerCard = ({ player, index, allPlayerWords, currentUsername, isW
             </p>
             <div className="flex flex-wrap gap-2">
               {player.achievements.map((ach, i) => (
-                <motion.div
-                  key={i}
-                  initial={{ scale: 0, rotate: -180 }}
-                  animate={{ scale: 1, rotate: 0 }}
-                  transition={{ delay: 0.5 + i * 0.1, type: 'spring' }}
-                >
-                  <AchievementBadge achievement={ach} index={i} />
-                </motion.div>
+                <AchievementBadge key={i} achievement={ach} index={i} />
               ))}
             </div>
           </div>

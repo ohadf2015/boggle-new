@@ -1,5 +1,4 @@
 import React, { useRef } from 'react';
-import { motion } from 'framer-motion';
 import SlotMachineCell from './SlotMachineCell';
 import { cn } from '../lib/utils';
 import 'animate.css';
@@ -108,49 +107,18 @@ const SlotMachineGrid = ({
   const isLargeGrid = totalCols > 8;
 
   return (
-    <motion.div
+    <div
       ref={gridRef}
       className={cn(
         "grid touch-none select-none relative rounded-2xl p-2 sm:p-3 md:p-4 aspect-square w-full max-w-[min(90vh,90vw)]",
         isLargeGrid ? "gap-0.5 sm:gap-1" : "gap-1 sm:gap-1.5",
+        "bg-slate-900/95 border-2 border-cyan-500/30",
         className
       )}
       style={{
         gridTemplateColumns: `repeat(${totalCols}, minmax(0, 1fr))`,
-        background: 'linear-gradient(135deg, rgba(15, 23, 42, 0.95) 0%, rgba(30, 41, 59, 0.95) 100%)',
-        boxShadow: '0 0 60px rgba(6, 182, 212, 0.4), inset 0 0 40px rgba(6, 182, 212, 0.1)'
       }}
-      initial={{ opacity: 0, scale: 0.95 }}
-      animate={{ opacity: 1, scale: 1 }}
-      transition={{ duration: 0.3 }}
     >
-      {/* Decorative frame lines (casino slot machine style) */}
-      <div
-        className="absolute inset-0 pointer-events-none rounded-2xl"
-        style={{
-          border: '3px solid rgba(6, 182, 212, 0.3)',
-          boxShadow: 'inset 0 0 30px rgba(6, 182, 212, 0.1)'
-        }}
-      />
-
-      {/* Top highlight bar */}
-      <div
-        className="absolute top-0 left-4 right-4 h-1 pointer-events-none"
-        style={{
-          background: 'linear-gradient(90deg, transparent, rgba(6, 182, 212, 0.5), transparent)',
-          borderRadius: '0 0 4px 4px'
-        }}
-      />
-
-      {/* Bottom highlight bar */}
-      <div
-        className="absolute bottom-0 left-4 right-4 h-1 pointer-events-none"
-        style={{
-          background: 'linear-gradient(90deg, transparent, rgba(168, 85, 247, 0.5), transparent)',
-          borderRadius: '4px 4px 0 0'
-        }}
-      />
-
       {grid.map((row, rowIndex) =>
         row.map((cell, colIndex) => {
           const isHighlighted = isCellHighlighted(rowIndex, colIndex);
@@ -169,7 +137,7 @@ const SlotMachineGrid = ({
           );
         })
       )}
-    </motion.div>
+    </div>
   );
 };
 

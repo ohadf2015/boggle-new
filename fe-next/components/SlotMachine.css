@@ -41,13 +41,13 @@
   }
 }
 
-/* Glow pulse effect */
+/* Glow pulse effect - simplified for performance */
 @keyframes slotGlow {
   0%, 100% {
-    box-shadow: 0 0 5px rgba(6, 182, 212, 0.3);
+    opacity: 0.9;
   }
   50% {
-    box-shadow: 0 0 20px rgba(6, 182, 212, 0.8), 0 0 40px rgba(6, 182, 212, 0.4);
+    opacity: 1;
   }
 }
 
@@ -110,24 +110,9 @@
   animation: slotGlow 0.15s ease-in-out infinite;
 }
 
+/* Simplified spinning indicator */
 .slot-cell-spinning {
   position: relative;
-}
-
-.slot-cell-spinning::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(
-    180deg,
-    rgba(6, 182, 212, 0.4) 0%,
-    transparent 30%,
-    transparent 70%,
-    rgba(6, 182, 212, 0.4) 100%
-  );
-  pointer-events: none;
-  animation: slotGlow 0.2s ease-in-out infinite alternate;
-  border-radius: inherit;
 }
 
 /* Highlighted cell shimmer */
