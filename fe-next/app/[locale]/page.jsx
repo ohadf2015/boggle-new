@@ -305,6 +305,17 @@ export default function GamePage() {
       });
     });
 
+    // Handle game reset - keep players in the room for new game
+    newSocket.on('resetGame', () => {
+      console.log('[SOCKET.IO] Game reset - staying in room for new game');
+      setShowResults(false);
+      setResultsData(null);
+      toast.success(t('hostView.newGameReady') || 'New game ready!', {
+        icon: '🎮',
+        duration: 3000,
+      });
+    });
+
     newSocket.on('hostLeftRoomClosing', (data) => {
       toast.error(data.message || t('playerView.roomClosed'), {
         icon: '🚪',

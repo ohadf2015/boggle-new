@@ -1059,7 +1059,7 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
                   setPlayerWords([]);
                   setPlayerWordCounts({});
 
-                  setTimerValue('');
+                  setTimerValue('1');
 
                   toast.success(`${t('hostView.newGameReady')} 🎮`, {
                     icon: '🔄',
@@ -1211,6 +1211,11 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
                         type="number"
                         value={timerValue}
                         onChange={(e) => setTimerValue(e.target.value)}
+                        onBlur={(e) => {
+                          const val = parseInt(e.target.value) || 0;
+                          if (val < 1) setTimerValue('1');
+                        }}
+                        min="1"
                         className="h-10 w-16 text-center text-lg font-bold border-none bg-transparent text-slate-900 dark:text-white placeholder:text-slate-500 focus-visible:ring-0 p-0"
                         placeholder="1"
                       />
