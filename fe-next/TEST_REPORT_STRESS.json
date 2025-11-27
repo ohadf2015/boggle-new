@@ -1,0 +1,46 @@
+{
+  "server": "http://localhost:3002",
+  "rooms": 2,
+  "clientsTotal": 100,
+  "clientsPerRoom": 50,
+  "durationSeconds": 30,
+  "ratePerSec": 3,
+  "connected": 102,
+  "joined": 98,
+  "spectators": 2,
+  "submissions": 8784,
+  "accepted": 0,
+  "rejected": 0,
+  "needsValidation": 0,
+  "errors": 0,
+  "roomsBreakdown": [
+    {
+      "gameCode": "RR65",
+      "roomName": "Stress-1-RR65",
+      "metrics": {
+        "connected": 51,
+        "joined": 49,
+        "submissions": 4393,
+        "accepted": 0,
+        "rejected": 0,
+        "needsValidation": 0,
+        "errors": 0,
+        "spectators": 1
+      }
+    },
+    {
+      "gameCode": "OVMM",
+      "roomName": "Stress-2-OVMM",
+      "metrics": {
+        "connected": 51,
+        "joined": 49,
+        "submissions": 4391,
+        "accepted": 0,
+        "rejected": 0,
+        "needsValidation": 0,
+        "errors": 0,
+        "spectators": 1
+      }
+    }
+  ]
+}

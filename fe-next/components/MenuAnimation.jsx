@@ -30,7 +30,7 @@ const MenuAnimation = ({ className = '' }) => {
                 letterSet = englishLetters;
                 break;
         }
-        const numberOfLetters = 10; // Reduced from 20 for better performance
+        const numberOfLetters = 25; // More letters for richer background effect
 
         const newLetters = Array(numberOfLetters).fill(null).map((_, index) => ({
             id: `letter-${index}`,

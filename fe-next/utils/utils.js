@@ -127,11 +127,14 @@ function generateJapaneseTable(rows, cols) {
 // Try to embed a compound word into the grid
 function tryEmbedCompound(grid, compound, rows, cols, usedCells) {
   const wordLen = compound.length;
+  // All 8 directions: horizontal, vertical, and diagonal
   const directions = [
     { dr: 0, dc: 1 },   // horizontal right
+    { dr: 0, dc: -1 },  // horizontal left
+    { dr: 1, dc: 0 },   // vertical down
+    { dr: -1, dc: 0 },  // vertical up
     { dr: 1, dc: 1 },   // diagonal down-right
     { dr: 1, dc: -1 },  // diagonal down-left
-    { dr: 0, dc: -1 },  // horizontal left
     { dr: -1, dc: -1 }, // diagonal up-left
     { dr: -1, dc: 1 },  // diagonal up-right
   ];

@@ -1,5 +1,5 @@
 import React, { useMemo, useEffect, useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { FaTrophy, FaSignOutAlt, FaStar } from 'react-icons/fa';
 import { Button } from './components/ui/button';
 import { Card } from './components/ui/card';
@@ -151,8 +151,8 @@ const ResultsPage = ({ finalScores, letterGrid, gameCode, onReturnToRoom, userna
           </motion.div>
         </div>
 
-        {/* Player Results Cards - Full Width */}
-        <div className="space-y-4 w-full px-0">
+        {/* Player Results Cards */}
+        <div className="w-full max-w-2xl mx-auto px-2 sm:px-4 space-y-4">
           {sortedScores.map((player, index) => (
             <ResultsPlayerCard
               key={player.username}

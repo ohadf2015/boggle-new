@@ -28,6 +28,7 @@ import { clearSession } from '../utils/session';
 import { copyJoinUrl, shareViaWhatsApp, getJoinUrl } from '../utils/share';
 import { useLanguage } from '../contexts/LanguageContext';
 import { DIFFICULTIES, DEFAULT_DIFFICULTY } from '../utils/consts';
+import { sanitizeInput } from '../utils/validation';
 import { cn } from '../lib/utils';
 
 const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [], username, onShowResults }) => {
@@ -668,7 +669,7 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
   // Idle timer for auto-submitting validation after 15 seconds
   const handleValidationIdle = useCallback(() => {
     if (showValidation && submitValidationRef.current) {
-      toast.info(t('hostView.autoSubmittingValidation') || 'Auto-submitting validation due to inactivity', {
+      toast(t('hostView.autoSubmittingValidation') || 'Auto-submitting validation due to inactivity', {
         icon: '⏱️',
         duration: 2000,
       });
@@ -707,7 +708,7 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
                   currentLang === 'sv' ? /^[a-zA-ZåäöÅÄÖ]+$/ :
                   currentLang === 'ja' ? /^[\u3040-\u309F\u30A0-\u30FF\u4E00-\u9FAF]+$/ :
                   /^[a-zA-Z]+$/;
-    const trimmedWord = word.trim();
+    const trimmedWord = sanitizeInput(word, 20).trim();
 
     // Min length validation
     if (trimmedWord.length < 2) {
@@ -1729,7 +1730,7 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
                     <Input
                       ref={inputRef}
                       value={word}
-                      onChange={(e) => setWord(e.target.value)}
+                      onChange={(e) => setWord(sanitizeInput(e.target.value, 20))}
                       onKeyDown={handleKeyDown}
                       placeholder={t('playerView.enterWord')}
                       className="flex-1 text-lg bg-slate-100 dark:bg-slate-700/50 border-slate-200 dark:border-slate-600 text-slate-900 dark:text-white placeholder:text-slate-500 dark:placeholder:text-gray-400 text-right"

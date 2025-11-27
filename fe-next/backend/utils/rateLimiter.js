@@ -23,7 +23,7 @@ class RateLimiter {
    * @param {string} clientId - Client identifier
    * @returns {boolean} - True if rate limit exceeded, false otherwise
    */
-  isRateLimited(clientId) {
+  isRateLimited(clientId, weight = 1) {
     const client = this.clients.get(clientId);
 
     if (!client) {
@@ -41,7 +41,7 @@ class RateLimiter {
     }
 
     // Increment and check
-    client.messageCount++;
+    client.messageCount += weight;
 
     if (client.messageCount > this.maxMessages) {
       console.warn(`[RATE_LIMIT] Client ${clientId} exceeded limit (${client.messageCount}/${this.maxMessages})`);
@@ -96,15 +96,17 @@ class RateLimiter {
 }
 
 // Create a singleton instance for use across the application
-const rateLimiterInstance = new RateLimiter();
+const maxMessages = parseInt(process.env.RATE_MAX_MESSAGES || '50');
+const windowMs = parseInt(process.env.RATE_WINDOW_MS || '10000');
+const rateLimiterInstance = new RateLimiter(maxMessages, windowMs);
 
 /**
  * Check if a client is allowed to proceed (not rate limited)
  * @param {string} clientId - Client identifier
  * @returns {boolean} - True if allowed, false if rate limited
  */
-function checkRateLimit(clientId) {
-  return !rateLimiterInstance.isRateLimited(clientId);
+function checkRateLimit(clientId, weight = 1) {
+  return !rateLimiterInstance.isRateLimited(clientId, weight);
 }
 
 /**

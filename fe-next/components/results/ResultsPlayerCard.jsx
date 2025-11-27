@@ -63,6 +63,10 @@ const ResultsPlayerCard = ({ player, index, allPlayerWords, currentUsername, isW
   // Auto-expand all players' words by default
   const [isWordsExpanded, setIsWordsExpanded] = useState(true);
 
+  const handleToggleExpand = () => {
+    setIsWordsExpanded(!isWordsExpanded);
+  };
+
   // Extract avatar info if available
   const avatar = player.avatar || null;
 
@@ -129,12 +133,32 @@ const ResultsPlayerCard = ({ player, index, allPlayerWords, currentUsername, isW
     return `#${index + 1}`;
   };
 
+  // Get rank box styling based on position
+  const getRankBoxStyle = () => {
+    if (index === 0) {
+      // Gold - bright yellow/gold gradient
+      return 'bg-gradient-to-br from-yellow-200 via-yellow-400 to-yellow-500 shadow-[0_0_15px_rgba(250,204,21,0.6),inset_0_1px_0_rgba(255,255,255,0.6)] border-2 border-yellow-500/80';
+    }
+    if (index === 1) {
+      // Silver - cool gray metallic gradient
+      return 'bg-gradient-to-br from-gray-200 via-gray-300 to-gray-400 shadow-[0_0_12px_rgba(156,163,175,0.5),inset_0_1px_0_rgba(255,255,255,0.6)] border-2 border-gray-400/80';
+    }
+    if (index === 2) {
+      // Bronze - warm copper/brown gradient (no amber to avoid gold confusion)
+      return 'bg-gradient-to-br from-amber-600 via-orange-700 to-amber-800 shadow-[0_0_12px_rgba(180,83,9,0.5),inset_0_1px_0_rgba(255,255,255,0.4)] border-2 border-amber-700/80';
+    }
+    // Others - subtle neutral box
+    return 'bg-gradient-to-br from-slate-200 to-slate-300 dark:from-slate-600 dark:to-slate-700 border-2 border-slate-300 dark:border-slate-500';
+  };
+
+  // Get card gradient based on rank (not avatar color)
   const getCardStyle = () => {
     // Modern shiny metallic styles for podium positions
     if (index === 0) return 'bg-gradient-to-br from-yellow-100 via-amber-300 to-yellow-500 dark:from-yellow-200/60 dark:via-amber-400/50 dark:to-yellow-600/40 border-yellow-400 shadow-[0_0_30px_rgba(234,179,8,0.6),inset_0_1px_0_rgba(255,255,255,0.5)]';
     if (index === 1) return 'bg-gradient-to-br from-slate-100 via-gray-300 to-slate-400 dark:from-slate-200/60 dark:via-gray-300/50 dark:to-slate-500/40 border-slate-400 shadow-[0_0_25px_rgba(148,163,184,0.5),inset_0_1px_0_rgba(255,255,255,0.5)]';
     if (index === 2) return 'bg-gradient-to-br from-orange-200 via-amber-400 to-orange-600 dark:from-orange-300/60 dark:via-amber-500/50 dark:to-orange-700/40 border-orange-500 shadow-[0_0_25px_rgba(234,88,12,0.5),inset_0_1px_0_rgba(255,255,255,0.5)]';
-    return 'bg-white/30 dark:bg-slate-800/30 border-slate-300/70 dark:border-slate-600/70';
+    // Smooth gradient for ranks 4+: subtle blue-purple tones that suit the game theme
+    return 'bg-gradient-to-br from-slate-100 via-indigo-50 to-purple-100 dark:from-slate-700/60 dark:via-indigo-900/40 dark:to-purple-900/30 border-indigo-300/50 dark:border-indigo-600/40 shadow-[0_0_15px_rgba(99,102,241,0.2),inset_0_1px_0_rgba(255,255,255,0.3)]';
   };
 
   return (
@@ -146,20 +170,19 @@ const ResultsPlayerCard = ({ player, index, allPlayerWords, currentUsername, isW
       <Card
         className={cn(
           "p-4 sm:p-5 md:p-6 border-2 transition-all duration-300 rounded-xl shadow-lg hover:shadow-xl relative overflow-hidden",
-          !avatar?.color && getCardStyle(),
+          getCardStyle(),
           isWordsExpanded && "ring-2 ring-purple-400/50 shadow-[0_0_20px_rgba(168,85,247,0.3)]"
         )}
-        style={avatar?.color ? {
-          background: `linear-gradient(135deg, ${avatar.color}30, ${avatar.color}50)`,
-          borderColor: `${avatar.color}80`
-        } : {}}
       >
         {/* Glass glare effect */}
         <div className="absolute inset-0 bg-gradient-to-br from-white/20 via-transparent to-transparent pointer-events-none" />
         {/* Header: Rank, Name, Score */}
         <div className="flex justify-between items-center mb-3 sm:mb-4 relative z-10">
           <div className="flex items-center gap-3">
-            <div className="text-3xl font-bold">
+            <div className={cn(
+              "w-12 h-12 rounded-xl flex items-center justify-center text-2xl font-bold",
+              getRankBoxStyle()
+            )}>
               {getRankIcon()}
             </div>
             {avatar?.emoji && (
@@ -185,7 +208,6 @@ const ResultsPlayerCard = ({ player, index, allPlayerWords, currentUsername, isW
                 </motion.p>
               )}
               <p className="text-sm text-slate-600 dark:text-slate-400">
-                {player.wordCount} {t('hostView.words')}
                 {player.validWordCount !== undefined && ` • ${player.validWordCount} ${t('results.valid')}`}
               </p>
             </div>
@@ -216,7 +238,7 @@ const ResultsPlayerCard = ({ player, index, allPlayerWords, currentUsername, isW
         {/* Words Section - Always show, collapsible */}
         <div className="mb-3 relative z-10">
           <button
-            onClick={() => setIsWordsExpanded(!isWordsExpanded)}
+            onClick={handleToggleExpand}
             className="w-full flex items-center justify-between p-2 rounded-lg text-sm font-bold text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 hover:bg-purple-50 dark:hover:bg-purple-900/20 transition-all"
           >
             <span>{t('hostView.words')}: ({player.allWords?.length || 0})</span>

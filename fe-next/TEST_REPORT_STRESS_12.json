@@ -1,0 +1,186 @@
+{
+  "server": "http://localhost:3002",
+  "rooms": 12,
+  "clientsTotal": 100,
+  "clientsPerRoom": 9,
+  "durationSeconds": 30,
+  "ratePerSec": 3,
+  "connected": 120,
+  "joined": 108,
+  "spectators": 0,
+  "submissions": 9479,
+  "accepted": 919,
+  "rejected": 0,
+  "needsValidation": 0,
+  "errors": 0,
+  "roomsBreakdown": [
+    {
+      "gameCode": "B4HS",
+      "roomName": "Stress-1-B4HS",
+      "metrics": {
+        "connected": 10,
+        "joined": 9,
+        "submissions": 789,
+        "accepted": 235,
+        "rejected": 0,
+        "needsValidation": 0,
+        "errors": 0,
+        "spectators": 0
+      }
+    },
+    {
+      "gameCode": "T4U5",
+      "roomName": "Stress-2-T4U5",
+      "metrics": {
+        "connected": 10,
+        "joined": 9,
+        "submissions": 790,
+        "accepted": 27,
+        "rejected": 0,
+        "needsValidation": 0,
+        "errors": 0,
+        "spectators": 0
+      }
+    },
+    {
+      "gameCode": "Y372",
+      "roomName": "Stress-3-Y372",
+      "metrics": {
+        "connected": 10,
+        "joined": 9,
+        "submissions": 792,
+        "accepted": 63,
+        "rejected": 0,
+        "needsValidation": 0,
+        "errors": 0,
+        "spectators": 0
+      }
+    },
+    {
+      "gameCode": "JP17",
+      "roomName": "Stress-4-JP17",
+      "metrics": {
+        "connected": 10,
+        "joined": 9,
+        "submissions": 795,
+        "accepted": 90,
+        "rejected": 0,
+        "needsValidation": 0,
+        "errors": 0,
+        "spectators": 0
+      }
+    },
+    {
+      "gameCode": "27DA",
+      "roomName": "Stress-5-27DA",
+      "metrics": {
+        "connected": 10,
+        "joined": 9,
+        "submissions": 791,
+        "accepted": 135,
+        "rejected": 0,
+        "needsValidation": 0,
+        "errors": 0,
+        "spectators": 0
+      }
+    },
+    {
+      "gameCode": "YF14",
+      "roomName": "Stress-6-YF14",
+      "metrics": {
+        "connected": 10,
+        "joined": 9,
+        "submissions": 788,
+        "accepted": 36,
+        "rejected": 0,
+        "needsValidation": 0,
+        "errors": 0,
+        "spectators": 0
+      }
+    },
+    {
+      "gameCode": "O050",
+      "roomName": "Stress-7-O050",
+      "metrics": {
+        "connected": 10,
+        "joined": 9,
+        "submissions": 788,
+        "accepted": 9,
+        "rejected": 0,
+        "needsValidation": 0,
+        "errors": 0,
+        "spectators": 0
+      }
+    },
+    {
+      "gameCode": "UTJL",
+      "roomName": "Stress-8-UTJL",
+      "metrics": {
+        "connected": 10,
+        "joined": 9,
+        "submissions": 788,
+        "accepted": 63,
+        "rejected": 0,
+        "needsValidation": 0,
+        "errors": 0,
+        "spectators": 0
+      }
+    },
+    {
+      "gameCode": "88SW",
+      "roomName": "Stress-9-88SW",
+      "metrics": {
+        "connected": 10,
+        "joined": 9,
+        "submissions": 794,
+        "accepted": 90,
+        "rejected": 0,
+        "needsValidation": 0,
+        "errors": 0,
+        "spectators": 0
+      }
+    },
+    {
+      "gameCode": "NV0I",
+      "roomName": "Stress-10-NV0I",
+      "metrics": {
+        "connected": 10,
+        "joined": 9,
+        "submissions": 788,
+        "accepted": 36,
+        "rejected": 0,
+        "needsValidation": 0,
+        "errors": 0,
+        "spectators": 0
+      }
+    },
+    {
+      "gameCode": "IP9R",
+      "roomName": "Stress-11-IP9R",
+      "metrics": {
+        "connected": 10,
+        "joined": 9,
+        "submissions": 786,
+        "accepted": 81,
+        "rejected": 0,
+        "needsValidation": 0,
+        "errors": 0,
+        "spectators": 0
+      }
+    },
+    {
+      "gameCode": "2B4Y",
+      "roomName": "Stress-12-2B4Y",
+      "metrics": {
+        "connected": 10,
+        "joined": 9,
+        "submissions": 790,
+        "accepted": 54,
+        "rejected": 0,
+        "needsValidation": 0,
+        "errors": 0,
+        "spectators": 0
+      }
+    }
+  ]
+}

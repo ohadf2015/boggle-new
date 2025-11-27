@@ -17,26 +17,15 @@ const GridComponent = ({
     animateOnMount = false // When true, adds a slot machine style cascade animation on initial render
 }) => {
     const [internalSelectedCells, setInternalSelectedCells] = useState([]);
-    const [direction, setDirection] = useState(null); // Track the direction of movement
     const [fadingCells, setFadingCells] = useState([]); // Track cells that are fading out
-    const [isAxisLocked, setIsAxisLocked] = useState(false); // Visual feedback state
-    const [axisGuidePoints, setAxisGuidePoints] = useState(null); // { start, end } for guide line
-    const [projectedPosition, setProjectedPosition] = useState(null); // { x, y } for projection dot
+    const [reduceMotion, setReduceMotion] = useState(false);
 
     const isTouchingRef = useRef(false);
     const gridRef = useRef(null);
     const startPosRef = useRef({ x: 0, y: 0 });
     const hasMovedRef = useRef(false);
     const autoSubmitTimeoutRef = useRef(null);
-
-    // Directional locking refs
     const startCellRef = useRef(null);           // { row, col, letter }
-    const startCellCenterRef = useRef(null);     // { x, y } viewport coordinates
-    const lockedAngleRef = useRef(null);         // Snapped angle (0, 45, 90, etc.) or null
-    const lockedDirectionRef = useRef(null);     // { dx, dy, dRow, dCol, isDiagonal }
-    const cellSizeRef = useRef(null);            // Cell size in pixels
-
-    const MOVEMENT_THRESHOLD = 10; // pixels - minimum movement to register as intentional
 
     // Use external control if provided, otherwise internal state
     const selectedCells = externalSelectedCells || internalSelectedCells;
@@ -49,29 +38,48 @@ const GridComponent = ({
         }
     }, [interactive]);
 
+    // Detect reduced motion preference
+    useEffect(() => {
+        try {
+            const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
+            setReduceMotion(!!mq.matches);
+            const handler = (e) => setReduceMotion(!!e.matches);
+            mq.addEventListener?.('change', handler);
+            return () => mq.removeEventListener?.('change', handler);
+        } catch {
+            setReduceMotion(false);
+        }
+    }, []);
+
     // Sequential fade-out animation for combo trail
-    const startSequentialFadeOut = useCallback(() => {
+    // Combo trails fade out slower and with more dramatic timing
+    // Trail fades from START to END (following the direction of the drag)
+    const startSequentialFadeOut = useCallback((isCombo = false) => {
         if (selectedCells.length === 0) return;
 
         // Copy selected cells for fading animation
         const cellsToFade = [...selectedCells];
         setFadingCells(cellsToFade);
 
-        // Fade out each cell sequentially from END to START (reverse order)
-        // This creates a "retracting trail" effect from where the finger lifted
-        // back to where the swipe began, which feels more natural
-        const reversedCells = [...cellsToFade].reverse();
-        reversedCells.forEach((cell, index) => {
+        // Combo trails stay much longer and fade slower
+        // Regular: 80ms between cells, Combo: 120ms between cells
+        const cellFadeDelay = isCombo ? 120 : 80;
+        // Initial hold time before starting to fade (combo gets extra time to appreciate the trail)
+        const initialHold = isCombo ? 500 : 0;
+
+        // Fade out each cell sequentially from START to END (in order of selection)
+        // This creates a "following trail" effect in the direction the user dragged
+        cellsToFade.forEach((cell, index) => {
             setTimeout(() => {
                 setFadingCells(prev => prev.filter(c => !(c.row === cell.row && c.col === cell.col)));
-            }, index * 80); // 80ms delay between each cell fade
+            }, initialHold + index * cellFadeDelay);
         });
 
         // Clear all selections after animation completes
-        const totalDelay = cellsToFade.length * 80 + 200;
+        // Give extra time for the SVG trail animation to complete (it has its own fade timing)
+        const totalDelay = initialHold + cellsToFade.length * cellFadeDelay + (isCombo ? 800 : 200);
         setTimeout(() => {
             setSelectedCells([]);
-            setDirection(null);
             setFadingCells([]);
         }, totalDelay);
     }, [selectedCells, setSelectedCells]);
@@ -102,8 +110,8 @@ const GridComponent = ({
                         onWordSubmit(formedWord);
                     }
 
-                    // Start sequential fade-out animation
-                    startSequentialFadeOut();
+                    // Start sequential fade-out animation (with combo timing)
+                    startSequentialFadeOut(true);
 
                     // End touch/mouse interaction
                     isTouchingRef.current = false;
@@ -118,195 +126,91 @@ const GridComponent = ({
         };
     }, [selectedCells, comboLevel, interactive, onWordSubmit, startSequentialFadeOut]);
 
-    // Helper function to normalize direction to unit vector
-    const normalizeDirection = (rowDiff, colDiff) => {
-        // Return the direction as a unit vector (sign of the differences)
-        return {
-            row: rowDiff === 0 ? 0 : (rowDiff > 0 ? 1 : -1),
-            col: colDiff === 0 ? 0 : (colDiff > 0 ? 1 : -1)
-        };
+    // ==================== Free-Form Selection Helper Functions ====================
+
+    // Check if two cells are adjacent (8 directions including diagonals)
+    const isAdjacentCell = (cell1, cell2) => {
+        const rowDiff = Math.abs(cell1.row - cell2.row);
+        const colDiff = Math.abs(cell1.col - cell2.col);
+        return rowDiff <= 1 && colDiff <= 1 && (rowDiff > 0 || colDiff > 0);
     };
 
-    // Helper function to check if a move continues in the same direction
-    const isValidDirection = (rowDiff, colDiff, currentDirection) => {
-        // If no direction set yet (first move), any adjacent cell is valid
-        if (!currentDirection) return true;
+    // Selection threshold - must be within this % of cell center to select
+    // This prevents accidentally selecting cells when dragging near edges
+    const CELL_SELECTION_THRESHOLD = 0.75; // 75% of cell radius
 
-        // Normalize the new direction
-        const newDir = normalizeDirection(rowDiff, colDiff);
-
-        // Check if the new direction matches the established direction
-        return newDir.row === currentDirection.row && newDir.col === currentDirection.col;
-    };
-
-    // ==================== Directional Locking Helper Functions ====================
-
-    // Calculate angle in degrees from delta coordinates
-    const calculateAngle = (dx, dy) => {
-        const radians = Math.atan2(dy, dx);
-        const degrees = radians * (180 / Math.PI);
-        return ((degrees % 360) + 360) % 360;
-    };
-
-    // Snap to nearest 45-degree increment
-    const snapAngleTo45 = (angleDegrees) => {
-        const snapped = Math.round(angleDegrees / 45) * 45;
-        return snapped % 360;
-    };
-
-    // Get direction vectors for a snapped angle
-    //
-    // dx, dy: Viewport coordinates (screen space)
-    //   - Positive dx = right, negative dx = left
-    //   - Positive dy = down, negative dy = up
-    //
-    // dRow, dCol: Grid coordinates (array indices)
-    //   - Positive dRow = down (increasing row index)
-    //   - Positive dCol = right (increasing column index)
-    //
-    // These are aligned so that moving in (dx, dy) direction in viewport
-    // corresponds to moving in (dRow, dCol) direction in the grid.
-    const getDirectionFromAngle = (angle) => {
-        const directions = {
-            0:   { dx: 1,  dy: 0,  dRow: 0,  dCol: 1  },  // Right
-            45:  { dx: 1,  dy: 1,  dRow: 1,  dCol: 1  },  // Down-Right
-            90:  { dx: 0,  dy: 1,  dRow: 1,  dCol: 0  },  // Down
-            135: { dx: -1, dy: 1,  dRow: 1,  dCol: -1 },  // Down-Left
-            180: { dx: -1, dy: 0,  dRow: 0,  dCol: -1 },  // Left
-            225: { dx: -1, dy: -1, dRow: -1, dCol: -1 },  // Up-Left
-            270: { dx: 0,  dy: -1, dRow: -1, dCol: 0  },  // Up
-            315: { dx: 1,  dy: -1, dRow: -1, dCol: 1  },  // Up-Right
-        };
-        const dir = directions[angle] || directions[0];
-        const isDiagonal = angle % 90 !== 0;
-        // Normalize diagonal vectors for proper projection
-        if (isDiagonal) {
-            const sqrt2 = Math.SQRT2;
-            return { ...dir, dx: dir.dx / sqrt2, dy: dir.dy / sqrt2, isDiagonal };
-        }
-        return { ...dir, isDiagonal: false };
-    };
-
-    // Project touch onto locked axis
-    //
-    // Returns the projection of the touch point onto the locked axis, plus the
-    // signed distance along the axis from the start point.
-    //
-    // distance > 0: Touch is on the "forward" side (in direction of dx, dy)
-    // distance < 0: Touch is on the "backward" side (opposite to dx, dy)
-    //
-    // This allows bi-directional selection: user can extend in either direction
-    // along the locked axis.
-    const projectOntoAxis = (touchX, touchY, startX, startY, dirX, dirY) => {
-        const vecX = touchX - startX;
-        const vecY = touchY - startY;
-        const dot = vecX * dirX + vecY * dirY;
-        return {
-            x: startX + dot * dirX,
-            y: startY + dot * dirY,
-            distance: dot
-        };
-    };
-
-    // Get cell center in viewport coordinates
-    const getCellCenterViewport = useCallback((rowIndex, colIndex) => {
+    // Get cell at touch position with cell center distance info
+    const getCellAtPosition = useCallback((touchX, touchY) => {
         if (!gridRef.current) return null;
-        const cells = gridRef.current.children;
-        const cellIndex = rowIndex * (grid[0]?.length || 4) + colIndex;
-        const cell = cells[cellIndex];
-        if (!cell) return null;
-        const rect = cell.getBoundingClientRect();
-        return { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 };
-    }, [grid]);
 
-    // Calculate cells along direction from start
-    // The 'forward' flag indicates whether the user is swiping in the positive direction
-    // of the locked axis (projection.distance >= 0) or in the negative direction.
-    //
-    // When forward = true:  sign = 1  → select cells in direction of (dRow, dCol)
-    // When forward = false: sign = -1 → select cells opposite to (dRow, dCol)
-    //
-    // This ensures cells are selected in the same direction the user is swiping.
-    const getCellsAlongDirection = useCallback((startRow, startCol, dRow, dCol, numCells, forward) => {
-        const cells = [];
-        const sign = forward ? 1 : -1;
-        for (let i = 0; i < numCells; i++) {
-            const row = startRow + (i * dRow * sign);
-            const col = startCol + (i * dCol * sign);
-            if (row < 0 || row >= grid.length || col < 0 || col >= grid[0].length) break;
-            cells.push({ row, col, letter: grid[row][col] });
-        }
-        return cells;
-    }, [grid]);
-
-    // Calculate axis guide line endpoints (extends to grid edges)
-    const calculateAxisGuidePoints = useCallback((centerX, centerY, dirX, dirY) => {
-        if (!gridRef.current) return null;
         const gridRect = gridRef.current.getBoundingClientRect();
-        const relX = centerX - gridRect.left;
-        const relY = centerY - gridRect.top;
+        const cols = grid[0]?.length || 4;
+        const rows = grid.length;
 
-        // Extend line to grid boundaries in both directions
-        const extendToEdge = (x, y, dx, dy, width, height) => {
-            if (dx === 0 && dy === 0) return { x, y };
-            let t = Infinity;
-            if (dx > 0) t = Math.min(t, (width - x) / dx);
-            if (dx < 0) t = Math.min(t, -x / dx);
-            if (dy > 0) t = Math.min(t, (height - y) / dy);
-            if (dy < 0) t = Math.min(t, -y / dy);
-            return { x: x + dx * t, y: y + dy * t };
+        const firstCell = gridRef.current.children[0];
+        if (!firstCell) return null;
+
+        const firstCellRect = firstCell.getBoundingClientRect();
+        const cellWidth = firstCellRect.width;
+        const cellHeight = firstCellRect.height;
+        const gridPaddingLeft = firstCellRect.left - gridRect.left;
+        const gridPaddingTop = firstCellRect.top - gridRect.top;
+
+        // Calculate gap between cells
+        const lastCellInRow = gridRef.current.children[cols - 1];
+        const gapX = lastCellInRow
+            ? (lastCellInRow.getBoundingClientRect().left - firstCellRect.left - (cols - 1) * cellWidth) / Math.max(1, cols - 1)
+            : 0;
+
+        const cellWithGapWidth = cellWidth + gapX;
+        const cellWithGapHeight = cellHeight + gapX;
+
+        const adjustedX = touchX - gridRect.left - gridPaddingLeft;
+        const adjustedY = touchY - gridRect.top - gridPaddingTop;
+
+        const col = Math.floor(adjustedX / cellWithGapWidth);
+        const row = Math.floor(adjustedY / cellWithGapHeight);
+
+        if (row < 0 || row >= rows || col < 0 || col >= cols) return null;
+
+        // Calculate cell center for distance checking
+        const cellCenterX = col * cellWithGapWidth + cellWidth / 2;
+        const cellCenterY = row * cellWithGapHeight + cellHeight / 2;
+        const distanceFromCenter = Math.sqrt(
+            Math.pow(adjustedX - cellCenterX, 2) +
+            Math.pow(adjustedY - cellCenterY, 2)
+        );
+
+        return {
+            row,
+            col,
+            letter: grid[row][col],
+            distanceFromCenter,
+            cellRadius: cellWidth / 2
         };
+    }, [grid]);
 
-        const forward = extendToEdge(relX, relY, dirX, dirY, gridRect.width, gridRect.height);
-        const backward = extendToEdge(relX, relY, -dirX, -dirY, gridRect.width, gridRect.height);
-
-        return { start: backward, end: forward, center: { x: relX, y: relY } };
-    }, []);
-
-    // Reset all directional locking state
-    const resetDirectionalLock = useCallback(() => {
-        lockedAngleRef.current = null;
-        lockedDirectionRef.current = null;
+    // Reset selection state
+    const resetSelectionState = useCallback(() => {
         startCellRef.current = null;
-        startCellCenterRef.current = null;
-        setIsAxisLocked(false);
-        setAxisGuidePoints(null);
-        setProjectedPosition(null);
     }, []);
-
-    // ==================== End Directional Locking Helpers ====================
 
     const handleTouchStart = (rowIndex, colIndex, letter, event) => {
         if (!interactive) return;
         isTouchingRef.current = true;
         hasMovedRef.current = false;
 
-        // Store initial touch position for misclick prevention
+        // Store initial touch position for deadzone detection
         const touch = event.touches?.[0] || event;
-        const touchX = touch.clientX;
-        const touchY = touch.clientY;
-        startPosRef.current = { x: touchX, y: touchY };
+        startPosRef.current = { x: touch.clientX, y: touch.clientY };
 
-        // Store start cell info for directional locking
+        // Store start cell for reference
         startCellRef.current = { row: rowIndex, col: colIndex, letter };
-        startCellCenterRef.current = getCellCenterViewport(rowIndex, colIndex);
 
-        // Calculate cell size for distance calculations
-        if (gridRef.current?.children[0]) {
-            const rect = gridRef.current.children[0].getBoundingClientRect();
-            cellSizeRef.current = rect.width;
-        }
-
-        // Reset direction lock state
-        lockedAngleRef.current = null;
-        lockedDirectionRef.current = null;
-        setIsAxisLocked(false);
-        setAxisGuidePoints(null);
-        setProjectedPosition(null);
-
+        // Initialize selection with just the starting cell
         setSelectedCells([{ row: rowIndex, col: colIndex, letter }]);
 
-        // Enhanced haptic feedback - medium vibration on start
+        // Haptic feedback - medium vibration on start
         if (window.navigator && window.navigator.vibrate) {
             window.navigator.vibrate(30);
         }
@@ -320,104 +224,60 @@ const GridComponent = ({
         const touchX = touch.clientX;
         const touchY = touch.clientY;
 
-        // Calculate total movement from start
+        // Deadzone check - must move minimum distance before selecting starts
         const deltaX = touchX - startPosRef.current.x;
         const deltaY = touchY - startPosRef.current.y;
         const totalMovement = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
 
-        const deadzoneThreshold = getDeadzoneThreshold();
+        if (!hasMovedRef.current && totalMovement < getDeadzoneThreshold()) {
+            return;
+        }
+        hasMovedRef.current = true;
 
-        // Phase 1: Within deadzone - don't lock yet
-        if (lockedAngleRef.current === null && totalMovement < deadzoneThreshold) {
+        // Get the cell currently under the touch point
+        const currentCell = getCellAtPosition(touchX, touchY);
+        if (!currentCell) return;
+
+        const lastCell = selectedCells[selectedCells.length - 1];
+        if (!lastCell) return;
+
+        // Same cell - no change
+        if (currentCell.row === lastCell.row && currentCell.col === lastCell.col) {
             return;
         }
 
-        // Phase 2: Lock direction if not already locked
-        if (lockedAngleRef.current === null) {
-            hasMovedRef.current = true;
-            const startCenter = startCellCenterRef.current;
-            if (!startCenter) return;
-
-            const dxFromCenter = touchX - startCenter.x;
-            const dyFromCenter = touchY - startCenter.y;
-            const rawAngle = calculateAngle(dxFromCenter, dyFromCenter);
-            const snappedAngle = snapAngleTo45(rawAngle);
-
-            lockedAngleRef.current = snappedAngle;
-            lockedDirectionRef.current = getDirectionFromAngle(snappedAngle);
-
-            // Calculate and set axis guide points for visual
-            const guidePoints = calculateAxisGuidePoints(
-                startCenter.x, startCenter.y,
-                lockedDirectionRef.current.dx, lockedDirectionRef.current.dy
-            );
-            setAxisGuidePoints(guidePoints);
-            setIsAxisLocked(true);
-
-            // Haptic feedback for axis lock
-            if (window.navigator?.vibrate) window.navigator.vibrate([15, 10, 25]);
+        // ANTI-ACCIDENT MECHANISM: Must be close enough to cell center
+        // This prevents accidentally selecting cells when dragging near edges
+        const selectionThreshold = currentCell.cellRadius * CELL_SELECTION_THRESHOLD;
+        if (currentCell.distanceFromCenter > selectionThreshold) {
+            // Touch is near cell edge, not close enough to center - don't select
+            return;
         }
 
-        // Phase 3: Project touch onto locked axis and select cells
-        const startCenter = startCellCenterRef.current;
-        const dir = lockedDirectionRef.current;
-        if (!startCenter || !dir) return;
-
-        const projection = projectOntoAxis(
-            touchX, touchY, startCenter.x, startCenter.y, dir.dx, dir.dy
+        // Backtracking: if cell already selected, remove cells after it
+        const existingIndex = selectedCells.findIndex(
+            c => c.row === currentCell.row && c.col === currentCell.col
         );
 
-        // Update projected position for visual indicator (relative to grid)
-        const gridRect = gridRef.current?.getBoundingClientRect();
-        if (gridRect) {
-            setProjectedPosition({
-                x: projection.x - gridRect.left,
-                y: projection.y - gridRect.top
-            });
-        }
-
-        // Calculate number of cells based on projection distance
-        const cellSize = cellSizeRef.current || 50;
-        const effectiveSpacing = dir.isDiagonal ? cellSize * Math.SQRT2 : cellSize;
-        const absDistance = Math.abs(projection.distance);
-        const numCells = Math.max(1, Math.floor((absDistance + effectiveSpacing * 0.4) / effectiveSpacing) + 1);
-        const forward = projection.distance >= 0;
-
-        // Get cells along direction
-        const startCell = startCellRef.current;
-        if (!startCell) return;
-
-        const newCells = getCellsAlongDirection(
-            startCell.row, startCell.col, dir.dRow, dir.dCol, numCells, forward
-        );
-
-        // Check if returned to start cell (only start cell selected) after having more
-        if (newCells.length === 1 && selectedCells.length > 1) {
-            // Release axis lock - user can choose new direction
-            lockedAngleRef.current = null;
-            lockedDirectionRef.current = null;
-            setIsAxisLocked(false);
-            setAxisGuidePoints(null);
-            setProjectedPosition(null);
-            // Reset start position to allow new direction from current touch
-            startPosRef.current = { x: touchX, y: touchY };
-            if (window.navigator?.vibrate) window.navigator.vibrate(20);
-        }
-
-        // Update selection if changed
-        const cellsChanged = newCells.length !== selectedCells.length ||
-            newCells.some((c, i) => c.row !== selectedCells[i]?.row || c.col !== selectedCells[i]?.col);
-
-        if (cellsChanged) {
-            // Haptic feedback
-            if (newCells.length > selectedCells.length && window.navigator?.vibrate) {
-                const intensity = Math.min(20 + newCells.length * 3 + comboLevel * 5, 60);
-                window.navigator.vibrate(intensity);
-            } else if (newCells.length < selectedCells.length && window.navigator?.vibrate) {
-                window.navigator.vibrate(15);
+        if (existingIndex !== -1) {
+            const newSelection = selectedCells.slice(0, existingIndex + 1);
+            if (newSelection.length !== selectedCells.length) {
+                setSelectedCells(newSelection);
+                if (window.navigator?.vibrate) window.navigator.vibrate(15);
             }
-            setSelectedCells(newCells);
+            return;
         }
+
+        // New cell - check if adjacent to last selected cell
+        if (isAdjacentCell(lastCell, currentCell)) {
+            const newSelection = [...selectedCells, { row: currentCell.row, col: currentCell.col, letter: currentCell.letter }];
+            setSelectedCells(newSelection);
+            if (window.navigator?.vibrate) {
+                const intensity = Math.min(20 + newSelection.length * 3 + comboLevel * 5, 60);
+                window.navigator.vibrate(intensity);
+            }
+        }
+        // If not adjacent, ignore - prevents jumping over cells
     };
 
     const handleTouchEnd = () => {
@@ -430,8 +290,8 @@ const GridComponent = ({
             autoSubmitTimeoutRef.current = null;
         }
 
-        // Reset directional locking state
-        resetDirectionalLock();
+        // Reset selection state
+        resetSelectionState();
 
         // Misclick prevention: only submit if user has moved OR selected multiple letters
         // This prevents accidental single-letter submissions from taps
@@ -470,14 +330,13 @@ const GridComponent = ({
                 }
             }
 
-            // Use sequential fade-out animation for combo words
+            // Use sequential fade-out animation for combo words (slower fade for combos)
             if (comboLevel > 0) {
-                startSequentialFadeOut();
+                startSequentialFadeOut(true);
             } else {
                 // Regular delay for non-combo words
                 setTimeout(() => {
                     setSelectedCells([]);
-                    setDirection(null);
                 }, 500);
             }
         } else {
@@ -535,6 +394,7 @@ const GridComponent = ({
                 flicker: false
             };
         } else if (level === 1) {
+            // x2 - Orange to red
             return {
                 gradient: 'from-orange-400 to-red-500',
                 border: 'border-orange-300',
@@ -543,6 +403,7 @@ const GridComponent = ({
                 flicker: false
             };
         } else if (level === 2) {
+            // x3 - Red to pink
             return {
                 gradient: 'from-red-400 to-pink-500',
                 border: 'border-red-300',
@@ -551,6 +412,7 @@ const GridComponent = ({
                 flicker: false
             };
         } else if (level === 3) {
+            // x4 - Pink to purple
             return {
                 gradient: 'from-pink-400 to-purple-500',
                 border: 'border-pink-300',
@@ -559,6 +421,7 @@ const GridComponent = ({
                 flicker: false
             };
         } else if (level === 4) {
+            // x5 - Purple multi-gradient
             return {
                 gradient: 'from-purple-400 via-pink-500 to-red-500',
                 border: 'border-purple-300',
@@ -567,6 +430,7 @@ const GridComponent = ({
                 flicker: false
             };
         } else if (level === 5) {
+            // x6 - Purple to cyan
             return {
                 gradient: 'from-purple-400 via-blue-500 to-cyan-400',
                 border: 'border-cyan-300',
@@ -575,6 +439,7 @@ const GridComponent = ({
                 flicker: false
             };
         } else if (level === 6) {
+            // x7 - Cyan to green
             return {
                 gradient: 'from-cyan-400 via-teal-500 to-green-400',
                 border: 'border-teal-300',
@@ -583,38 +448,48 @@ const GridComponent = ({
                 flicker: false
             };
         } else if (level === 7) {
+            // x8 - Rainbow (first rainbow level)
             return {
-                gradient: 'from-green-400 via-lime-500 to-yellow-400',
-                border: 'border-lime-300',
-                shadow: 'shadow-[0_0_45px_rgba(132,204,22,1)]',
+                gradient: 'rainbow-gradient',
+                border: 'border-white',
+                shadow: 'shadow-[0_0_50px_rgba(255,255,255,0.8)]',
                 text: multiplier,
-                flicker: false
+                flicker: false,
+                isRainbow: true
             };
         } else if (level === 8) {
+            // x9 - Rainbow with subtle pulse
             return {
-                gradient: 'from-yellow-400 via-orange-500 to-red-500',
-                border: 'border-orange-300',
-                shadow: 'shadow-[0_0_50px_rgba(251,146,60,1)]',
+                gradient: 'rainbow-gradient',
+                border: 'border-white',
+                shadow: 'shadow-[0_0_55px_rgba(255,255,255,0.9)]',
                 text: multiplier,
-                flicker: false
+                flicker: false,
+                isRainbow: true,
+                pulse: true
             };
         } else if (level === 9) {
-            return {
-                gradient: 'from-red-500 via-pink-500 to-purple-500',
-                border: 'border-pink-300',
-                shadow: 'shadow-[0_0_55px_rgba(236,72,153,1)]',
-                text: multiplier,
-                flicker: false
-            };
-        } else {
-            // Level 10+: Full rainbow gradient with flicker animation
+            // x10 - Rainbow with light strobe
             return {
                 gradient: 'rainbow-gradient',
                 border: 'border-white',
                 shadow: 'shadow-[0_0_60px_rgba(255,255,255,1)]',
                 text: multiplier,
                 flicker: true,
-                isRainbow: true
+                isRainbow: true,
+                strobe: true
+            };
+        } else {
+            // Level 10+ (x11+): Full rainbow with intense strobe
+            return {
+                gradient: 'rainbow-gradient',
+                border: 'border-white',
+                shadow: 'shadow-[0_0_70px_rgba(255,255,255,1)]',
+                text: multiplier,
+                flicker: true,
+                isRainbow: true,
+                strobe: true,
+                intenseStrobe: true
             };
         }
     };
@@ -698,8 +573,8 @@ const GridComponent = ({
                 )}
             </AnimatePresence>
 
-            {/* Trail connector overlay */}
-            {selectedCells.length > 1 && gridRef.current && (
+            {/* Trail connector overlay - show for both selected and fading cells */}
+            {(selectedCells.length > 1 || fadingCells.length > 1) && gridRef.current && (
                 <svg
                     className="absolute inset-0 pointer-events-none z-0"
                     style={{ width: '100%', height: '100%' }}
@@ -717,6 +592,7 @@ const GridComponent = ({
                             </feMerge>
                         </filter>
                     </defs>
+                    {/* Active selection trail */}
                     {selectedCells.map((cell, index) => {
                         if (index === 0) return null;
                         const prevCell = selectedCells[index - 1];
@@ -742,57 +618,50 @@ const GridComponent = ({
                             />
                         );
                     })}
-                </svg>
-            )}
+                    {/* Fading trail - renders during combo fade out with slower transition */}
+                    {/* Fades from drag START to drag END (first segment fades first, last segment fades last) */}
+                    {fadingCells.length > 1 && selectedCells.length === 0 && fadingCells.map((cell, index) => {
+                        if (index === 0) return null;
+                        const prevCell = fadingCells[index - 1];
+                        const start = getCellCenter(prevCell.row, prevCell.col);
+                        const end = getCellCenter(cell.row, cell.col);
 
-            {/* Axis Guide Line - shown when direction is locked */}
-            {isAxisLocked && axisGuidePoints && gridRef.current && (
-                <svg
-                    className="absolute inset-0 pointer-events-none z-0"
-                    style={{ width: '100%', height: '100%' }}
-                >
-                    <defs>
-                        <filter id="projectionGlow" x="-50%" y="-50%" width="200%" height="200%">
-                            <feGaussianBlur stdDeviation="4" result="blur" />
-                            <feMerge>
-                                <feMergeNode in="blur" />
-                                <feMergeNode in="SourceGraphic" />
-                            </feMerge>
-                        </filter>
-                    </defs>
-                    {/* Axis guide line extending across grid */}
-                    <motion.line
-                        x1={axisGuidePoints.start.x}
-                        y1={axisGuidePoints.start.y}
-                        x2={axisGuidePoints.end.x}
-                        y2={axisGuidePoints.end.y}
-                        stroke={comboLevel > 0 ? "#f97316" : "#eab308"}
-                        strokeWidth={2}
-                        strokeDasharray="8,6"
-                        strokeOpacity={0.5}
-                        initial={{ pathLength: 0, opacity: 0 }}
-                        animate={{ pathLength: 1, opacity: 0.5 }}
-                        transition={{ duration: 0.25 }}
-                    />
-                    {/* Projection dot - shows where touch maps onto axis */}
-                    {projectedPosition && (
-                        <motion.circle
-                            cx={projectedPosition.x}
-                            cy={projectedPosition.y}
-                            r={10}
-                            fill={comboLevel > 0 ? "#f97316" : "#eab308"}
-                            fillOpacity={0.6}
-                            filter="url(#projectionGlow)"
-                            initial={{ scale: 0 }}
-                            animate={{ scale: [1, 1.3, 1] }}
-                            transition={{ duration: 0.8, repeat: Infinity, ease: "easeInOut" }}
-                        />
-                    )}
+                        if (!start || !end) return null;
+
+                        // Segments are indexed 1 to N (index 0 is skipped as it's just a point, not a segment)
+                        // We want: first segment (index=1) fades first (delay=0), last segment fades last
+                        // So delay is simply proportional to (index - 1)
+                        const fadeOrder = index - 1;
+
+                        return (
+                            <motion.line
+                                key={`fading-trail-${index}`}
+                                x1={start.x}
+                                y1={start.y}
+                                x2={end.x}
+                                y2={end.y}
+                                stroke="url(#trailGradient)"
+                                strokeWidth={comboLevel > 0 ? 4 : 3}
+                                strokeLinecap="round"
+                                filter="url(#glow)"
+                                initial={{ opacity: 1 }}
+                                animate={{ opacity: 0 }}
+                                transition={{
+                                    // Combo: longer hold (500ms), slower fade (600ms), more stagger (120ms)
+                                    // Regular: quick fade
+                                    duration: comboLevel > 0 ? 0.6 : 0.3,
+                                    ease: comboLevel > 0 ? [0.4, 0, 0.2, 1] : "easeOut",
+                                    delay: comboLevel > 0 ? 0.5 + fadeOrder * 0.12 : fadeOrder * 0.05
+                                }}
+                            />
+                        );
+                    })}
                 </svg>
             )}
 
             <div
                 ref={gridRef}
+                dir="ltr"
                 className={cn(
                     "grid touch-none select-none relative rounded-2xl p-2 sm:p-3 md:p-4 aspect-square w-full max-w-[min(90vh,90vw)]",
                     isLargeGrid ? "gap-0.5 sm:gap-1" : "gap-1 sm:gap-1.5",
@@ -803,6 +672,8 @@ const GridComponent = ({
                     background: 'linear-gradient(135deg, rgba(15, 23, 42, 0.95) 0%, rgba(30, 41, 59, 0.95) 100%)',
                     boxShadow: '0 0 60px rgba(6, 182, 212, 0.4), inset 0 0 40px rgba(6, 182, 212, 0.1)'
                 }}
+                role="grid"
+                aria-label="Letter grid"
                 tabIndex={interactive ? 0 : -1}
                 onTouchMove={handleTouchMove}
                 onTouchEnd={handleTouchEnd}
@@ -819,6 +690,10 @@ const GridComponent = ({
                             data-row={i}
                             data-col={j}
                             data-letter={cell}
+                            role="gridcell"
+                            aria-selected={isSelected}
+                            aria-label={`Letter ${cell}`}
+                            tabIndex={interactive ? 0 : -1}
                             onTouchStart={(e) => handleTouchStart(i, j, cell, e)}
                             onMouseDown={(e) => handleMouseDown(i, j, cell, e)}
                             initial={animateOnMount
@@ -826,36 +701,46 @@ const GridComponent = ({
                                 : { scale: 0.8, opacity: 0 }
                             }
                             animate={{
-                                scale: isSelected || isFading ? 1.15 : 1,
-                                opacity: isFading ? 0 : 1,
-                                rotate: (isSelected || isFading) ? [0, -5, 5, 0] : 0,
+                                scale: isSelected ? 1.08 : (isFading ? 1.04 : 1),
+                                opacity: 1, // Letters never fade, only the styling
+                                rotate: reduceMotion ? 0 : ((isSelected || isFading) ? [0, -5, 5, 0] : 0),
                                 rotateX: 0,
                                 y: isSelected ? -2 : 0
                             }}
                             whileTap={{ scale: 0.95 }}
                             transition={{
-                                duration: animateOnMount && !isSelected && !isFading ? 0.5 : (isFading ? 0.3 : (isSelected ? 0.12 : 0.6)),
-                                ease: animateOnMount ? [0.34, 1.56, 0.64, 1] : "easeOut", // Spring-like bounce for mount animation
-                                delay: animateOnMount ? (i + j) * 0.04 : 0, // Cascade delay from top-left
-                                scale: isSelected ? { type: "spring", stiffness: 400, damping: 18 } : undefined
+                                duration: reduceMotion
+                                    ? 0.1
+                                    : (animateOnMount && !isSelected
+                                        ? 0.5
+                                        : (isSelected ? 0.12 : 0.6)),
+                                ease: animateOnMount ? [0.34, 1.56, 0.64, 1] : "easeOut",
+                                delay: reduceMotion ? 0 : (animateOnMount ? (i + j) * 0.04 : 0),
+                                scale: isSelected ? { type: "spring", stiffness: reduceMotion ? 200 : 400, damping: reduceMotion ? 30 : 18 } : undefined
                             }}
                             className={cn(
-                                "aspect-square flex items-center justify-center font-bold shadow-lg cursor-pointer transition-all duration-200 border-2 relative overflow-hidden",
+                                "aspect-square flex items-center justify-center font-bold shadow-lg cursor-pointer border-2 relative overflow-hidden focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500",
                                 isLargeGrid
                                     ? (largeText ? "text-2xl sm:text-3xl" : "text-lg sm:text-xl")
                                     : (largeText || playerView ? "text-4xl sm:text-5xl md:text-6xl" : "text-2xl sm:text-3xl"),
-                                (isSelected || isFading)
+                                // Only apply combo styling when selected (not when fading - fading cells return to normal)
+                                isSelected
                                     ? comboColors.isRainbow
                                         ? `text-white ${comboColors.border} z-10 ${comboColors.shadow} border-white/40`
                                         : `bg-gradient-to-br ${comboColors.gradient} text-white ${comboColors.border} z-10 ${comboColors.shadow} border-white/40`
-                                    : "bg-gradient-to-br from-slate-100 via-white to-slate-100 dark:from-slate-700 dark:via-slate-800 dark:to-slate-900 text-slate-900 dark:text-white border-slate-300/60 dark:border-slate-600/60 hover:scale-105 hover:shadow-xl dark:hover:bg-slate-700/80 active:scale-95 shadow-[0_4px_12px_rgba(0,0,0,0.1)]"
+                                    : "bg-gradient-to-br from-slate-100 via-white to-slate-100 dark:from-slate-700 dark:via-slate-800 dark:to-slate-900 text-slate-900 dark:text-white border-slate-300/60 dark:border-slate-600/60 hover:scale-105 hover:shadow-xl dark:hover:bg-slate-700/80 active:scale-95 shadow-[0_4px_12px_rgba(0,0,0,0.1)]",
+                                // Smooth transition for combo styling fade
+                                "transition-all",
+                                comboLevel > 0 ? "duration-500" : "duration-200"
                             )}
                             style={{
                                 borderRadius: '8px',
-                                ...((isSelected || isFading) && comboColors.isRainbow ? {
+                                ...(isSelected && comboColors.isRainbow ? {
                                     background: 'linear-gradient(135deg, #ef4444, #f97316, #eab308, #22c55e, #06b6d4, #3b82f6, #8b5cf6, #ec4899)',
                                     backgroundSize: '400% 400%',
-                                    animation: 'rainbow-cell 2s ease infinite'
+                                    animation: comboColors.strobe
+                                        ? (comboColors.intenseStrobe ? 'rainbow-cell 1s ease infinite, strobe-intense 0.15s infinite alternate' : 'rainbow-cell 1.5s ease infinite, strobe-light 0.25s infinite alternate')
+                                        : 'rainbow-cell 2s ease infinite'
                                 } : isSelected && comboColors.flicker ? {
                                     animation: 'flicker 0.15s infinite alternate'
                                 } : {})

@@ -26,6 +26,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '../components/ui/alert-dialog';
 import TournamentStandings from '../components/TournamentStandings';
 import SlotMachineText from '../components/SlotMachineText';
+import { sanitizeInput } from '../utils/validation';
 
 const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) => {
   const { t, dir } = useLanguage();
@@ -35,7 +36,7 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
   const intentionalExitRef = useRef(false);
 
   const [word, setWord] = useState('');
-  const [foundWords, setFoundWords] = useState([]);
+  const [foundWords, setFoundWords] = useState([]); // Array of { word: string, isValid: boolean | null }
   const [leaderboard, setLeaderboard] = useState([]);
   const [gameActive, setGameActive] = useState(false);
   const [achievements, setAchievements] = useState([]);
@@ -160,18 +161,31 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
     };
 
     const handleWordAccepted = (data) => {
-      gsap.fromTo(inputRef.current,
-        { scale: 1.1, borderColor: '#4ade80' },
-        { scale: 1, borderColor: '', duration: 0.3 }
-      );
+      // Only animate input if it exists (may not exist when using grid swiping)
+      if (inputRef.current) {
+        gsap.fromTo(inputRef.current,
+          { scale: 1.1, borderColor: '#4ade80' },
+          { scale: 1, borderColor: '', duration: 0.3 }
+        );
+      }
+
+      // Mark the word as valid in foundWords
+      setFoundWords(prev => prev.map(fw =>
+        fw.word.toLowerCase() === data.word.toLowerCase()
+          ? { ...fw, isValid: true }
+          : fw
+      ));
 
       if (data.autoValidated) {
         toast.success(`✓ ${data.word}`, { duration: 2000, icon: '✅' });
 
         const now = Date.now();
+        let newComboLevel;
         if (lastWordTime && (now - lastWordTime) < 5000) {
-          setComboLevel(prev => prev + 1);
+          newComboLevel = comboLevel + 1;
+          setComboLevel(newComboLevel);
         } else {
+          newComboLevel = 0;
           setComboLevel(0);
         }
         setLastWordTime(now);
@@ -180,10 +194,12 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
           clearTimeout(comboTimeoutRef.current);
         }
 
+        // Base timeout 5s + 1s per combo level (max 12s at level 7+)
+        const comboTimeout = Math.min(5000 + newComboLevel * 1000, 12000);
         comboTimeoutRef.current = setTimeout(() => {
           setComboLevel(0);
           setLastWordTime(null);
-        }, 5000);
+        }, comboTimeout);
       } else {
         toast.success(`✓ ${data.word}`, { duration: 2000 });
       }
@@ -217,7 +233,12 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
 
     const handleWordNotOnBoard = (data) => {
       toast.error(t('playerView.wordNotOnBoard'), { duration: 3000 });
-      setFoundWords(prev => prev.filter(w => w !== data.word));
+      // Mark the word as invalid (red-pink) instead of removing it
+      setFoundWords(prev => prev.map(fw =>
+        fw.word.toLowerCase() === data.word.toLowerCase()
+          ? { ...fw, isValid: false }
+          : fw
+      ));
       setComboLevel(0);
       setLastWordTime(null);
       if (comboTimeoutRef.current) {
@@ -475,7 +496,7 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
     } else {
       regex = /^[a-zA-Z]+$/;
     }
-    const trimmedWord = word.trim();
+    const trimmedWord = sanitizeInput(word, 20).trim();
 
     // Min length validation
     if (trimmedWord.length < 2) {
@@ -504,7 +525,7 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
       word: trimmedWord.toLowerCase(),
     });
 
-    setFoundWords(prev => [...prev, trimmedWord]);
+    setFoundWords(prev => [...prev, { word: trimmedWord, isValid: null }]);
     setWord('');
 
     // Keep focus on input and prevent scroll
@@ -1101,26 +1122,33 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
           <Card className="bg-slate-900/95 dark:bg-slate-900/95 backdrop-blur-md border border-teal-500/40 shadow-[0_0_25px_rgba(20,184,166,0.2)] flex flex-col flex-grow overflow-hidden">
             <CardHeader className="py-3 border-b border-teal-500/30 bg-gradient-to-r from-teal-900/50 to-cyan-900/50">
               <CardTitle className="text-white text-base uppercase tracking-widest font-bold">
-                FOUND WORDS
+                {t('playerView.wordsFound')}
               </CardTitle>
             </CardHeader>
             <CardContent className="flex-1 overflow-y-auto p-3 bg-slate-900/90">
               <div className="space-y-2">
                 <AnimatePresence>
-                  {foundWords.map((foundWord, index) => (
-                    <motion.div
-                      key={index}
-                      initial={{ x: -30, opacity: 0 }}
-                      animate={{ x: 0, opacity: 1 }}
-                      exit={{ x: -30, opacity: 0 }}
-                      className={`p-3 rounded-lg text-center font-bold transition-all
-                        ${index === foundWords.length - 1 ?
-                          'bg-gradient-to-r from-cyan-500/80 to-teal-500/80 border border-cyan-400/60 text-white shadow-lg shadow-cyan-500/30' :
-                          'bg-slate-800/70 border border-slate-700/80 text-white hover:bg-slate-800/90'}`}
-                    >
-                      {applyHebrewFinalLetters(foundWord).toUpperCase()}
-                    </motion.div>
-                  ))}
+                  {foundWords.map((foundWordObj, index) => {
+                    const wordText = foundWordObj.word;
+                    const isInvalid = foundWordObj.isValid === false;
+                    const isLatest = index === foundWords.length - 1;
+                    return (
+                      <motion.div
+                        key={index}
+                        initial={{ x: -30, opacity: 0 }}
+                        animate={{ x: 0, opacity: 1 }}
+                        exit={{ x: -30, opacity: 0 }}
+                        className={`p-3 rounded-lg text-center font-bold transition-all
+                          ${isInvalid
+                            ? 'bg-gradient-to-r from-red-500/80 to-pink-500/80 border border-red-400/60 text-white shadow-lg shadow-red-500/30 line-through opacity-70'
+                            : isLatest
+                              ? 'bg-gradient-to-r from-cyan-500/80 to-teal-500/80 border border-cyan-400/60 text-white shadow-lg shadow-cyan-500/30'
+                              : 'bg-slate-800/70 border border-slate-700/80 text-white hover:bg-slate-800/90'}`}
+                      >
+                        {applyHebrewFinalLetters(wordText).toUpperCase()}
+                      </motion.div>
+                    );
+                  })}
                 </AnimatePresence>
                 {foundWords.length === 0 && gameActive && (
                   <p className="text-center text-slate-400 py-6 text-sm">
@@ -1168,7 +1196,7 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
                         socket.emit('submitWord', {
                           word: formedWord.toLowerCase(),
                         });
-                        setFoundWords(prev => [...prev, formedWord]);
+                        setFoundWords(prev => [...prev, { word: formedWord, isValid: null }]);
                       } else {
                         toast.error(t('playerView.onlyLanguageWords'), { duration: 1000 });
                       }
@@ -1236,7 +1264,7 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
             <CardHeader className="py-3 border-b border-purple-500/30 bg-gradient-to-r from-purple-900/50 to-pink-900/50">
               <CardTitle className="flex items-center gap-2 text-white text-base uppercase tracking-widest font-bold">
                 <FaTrophy className="text-yellow-400 drop-shadow-[0_0_8px_rgba(251,191,36,0.6)]" />
-                LIVE RANKING
+                {t('playerView.leaderboard')}
               </CardTitle>
             </CardHeader>
             <CardContent className="overflow-y-auto flex-1 p-3 bg-slate-900/90">

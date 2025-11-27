@@ -1,4 +1,5 @@
 const fs = require('fs');
+const fsp = fs.promises;
 const path = require('path');
 const { promisify } = require('util');
 const appendFileAsync = promisify(fs.appendFile);
@@ -48,7 +49,7 @@ class Dictionary {
       const englishApprovedFilePath = path.join(__dirname, 'english_words_approved.txt');
       let englishApprovedCount = 0;
       if (fs.existsSync(englishApprovedFilePath)) {
-        const approvedContent = fs.readFileSync(englishApprovedFilePath, 'utf-8');
+        const approvedContent = await fsp.readFile(englishApprovedFilePath, 'utf-8');
         const approvedWords = approvedContent
           .split('\n')
           .map(w => w.trim().toLowerCase())
@@ -68,7 +69,7 @@ class Dictionary {
 
       // Load Hebrew words (main dictionary)
       const hebrewFilePath = path.join(__dirname, 'hebrew_words.txt');
-      const hebrewContent = fs.readFileSync(hebrewFilePath, 'utf-8');
+      const hebrewContent = await fsp.readFile(hebrewFilePath, 'utf-8');
       const hebrewWords = hebrewContent
         .split('\n')
         .map(w => w.trim())
@@ -83,7 +84,7 @@ class Dictionary {
       const hebrewApprovedFilePath = path.join(__dirname, 'hebrew_words_approved.txt');
       let approvedCount = 0;
       if (fs.existsSync(hebrewApprovedFilePath)) {
-        const approvedContent = fs.readFileSync(hebrewApprovedFilePath, 'utf-8');
+        const approvedContent = await fsp.readFile(hebrewApprovedFilePath, 'utf-8');
         const approvedWords = approvedContent
           .split('\n')
           .map(w => w.trim())
@@ -108,7 +109,7 @@ class Dictionary {
 
         // Read the file and parse it as a CommonJS module would be too complex
         // Instead, read the file content and extract the array
-        const swedishFileContent = fs.readFileSync(swedishWordsPath, 'utf-8');
+        const swedishFileContent = await fsp.readFile(swedishWordsPath, 'utf-8');
 
         // The file exports as: export { swedish_words }
         // We need to extract the array from the file
@@ -133,7 +134,7 @@ class Dictionary {
           const swedishApprovedFilePath = path.join(__dirname, 'swedish_words_approved.txt');
           let swedishApprovedCount = 0;
           if (fs.existsSync(swedishApprovedFilePath)) {
-            const approvedContent = fs.readFileSync(swedishApprovedFilePath, 'utf-8');
+            const approvedContent = await fsp.readFile(swedishApprovedFilePath, 'utf-8');
             const approvedWords = approvedContent
               .split('\n')
               .map(w => w.trim().toLowerCase())
@@ -162,7 +163,7 @@ class Dictionary {
       try {
         const kanjiFilePath = path.join(__dirname, 'kanji_compounds.txt');
         if (fs.existsSync(kanjiFilePath)) {
-          const kanjiContent = fs.readFileSync(kanjiFilePath, 'utf-8');
+          const kanjiContent = await fsp.readFile(kanjiFilePath, 'utf-8');
           const kanjiCompounds = kanjiContent
             .split('\n')
             .map(w => w.trim())
@@ -177,7 +178,7 @@ class Dictionary {
           const japaneseApprovedFilePath = path.join(__dirname, 'japanese_words_approved.txt');
           let japaneseApprovedCount = 0;
           if (fs.existsSync(japaneseApprovedFilePath)) {
-            const approvedContent = fs.readFileSync(japaneseApprovedFilePath, 'utf-8');
+            const approvedContent = await fsp.readFile(japaneseApprovedFilePath, 'utf-8');
             const approvedWords = approvedContent
               .split('\n')
               .map(w => w.trim())

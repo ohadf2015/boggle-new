@@ -44,7 +44,7 @@ const {
   getSocketById
 } = require('./utils/socketHelpers');
 
-const { validateWordOnBoard } = require('./modules/wordValidator');
+const { validateWordOnBoard, makePositionsMap } = require('./modules/wordValidator');
 const { calculateWordScore, calculateGameScores } = require('./modules/scoringEngine');
 const { checkAndAwardAchievements, getPlayerAchievements, ACHIEVEMENTS } = require('./modules/achievementManager');
 const { isDictionaryWord, getAvailableDictionaries, addApprovedWord, normalizeWord } = require('./dictionary');
@@ -56,6 +56,7 @@ const redisClient = require('./redisClient');
 const tournamentManager = require('./modules/tournamentManager');
 const { cleanupPlayerData } = require('./utils/playerCleanup');
 const { emitError, ErrorMessages } = require('./utils/errorHandler');
+const { inc, incPerGame, ensureGame } = require('./utils/metrics');
 
 // Game configuration constants
 const MAX_PLAYERS_PER_ROOM = 50; // Maximum number of players allowed in a single room
@@ -95,13 +96,19 @@ function initializeSocketHandlers(io) {
     // Rate limiting
     if (!checkRateLimit(socket.id)) {
       console.warn(`[SOCKET] Rate limit exceeded for ${socket.id}`);
-      emitError(socket, ErrorMessages.RATE_LIMIT_EXCEEDED);
+      socket.emit('rateLimited');
       socket.disconnect(true);
       return;
     }
 
     // Handle game creation
     socket.on('createGame', async (data) => {
+      if (!checkRateLimit(socket.id)) {
+        inc('rateLimited');
+        incPerGame(gameCode, 'rateLimited');
+        socket.emit('rateLimited');
+        return;
+      }
       const { gameCode, roomName, language, hostUsername, playerId, avatar } = data;
 
       console.log(`[SOCKET] Create game request: ${gameCode} by ${hostUsername}`);
@@ -147,6 +154,8 @@ function initializeSocketHandlers(io) {
         language: language || 'en'
       });
 
+      ensureGame(gameCode);
+
       // Broadcast updated room list to all clients
       io.emit('activeRooms', { rooms: getActiveRooms() });
 
@@ -167,6 +176,10 @@ function initializeSocketHandlers(io) {
 
     // Handle player joining
     socket.on('join', async (data) => {
+      if (!checkRateLimit(socket.id)) {
+        socket.emit('rateLimited');
+        return;
+      }
       const { gameCode, username, playerId, avatar } = data;
 
       console.log(`[SOCKET] Join request: ${username} to game ${gameCode}`);
@@ -188,8 +201,16 @@ function initializeSocketHandlers(io) {
 
       // Check player limit (unless this is a reconnection)
       if (!existingSocketId && Object.keys(game.users).length >= MAX_PLAYERS_PER_ROOM) {
-        emitError(socket, ErrorMessages.ROOM_FULL(MAX_PLAYERS_PER_ROOM));
         console.log(`[SOCKET] ${username} tried to join full room ${gameCode}`);
+        // Spectator overflow: join room without adding to users
+        joinRoom(socket, getGameRoom(gameCode));
+        socket.emit('joinedAsSpectator', {
+          success: true,
+          gameCode,
+          spectator: true,
+          roomName: game.roomName,
+          language: game.language
+        });
         return;
       }
       if (existingSocketId) {
@@ -296,6 +317,10 @@ function initializeSocketHandlers(io) {
 
     // Handle game start
     socket.on('startGame', (data) => {
+      if (!checkRateLimit(socket.id)) {
+        socket.emit('rateLimited');
+        return;
+      }
       const { letterGrid, timerSeconds, language } = data;
 
       const gameCode = getGameBySocketId(socket.id);
@@ -324,6 +349,14 @@ function initializeSocketHandlers(io) {
         gameState: 'in-progress'
       });
 
+      // Precompute letter positions for faster validation
+      const positions = makePositionsMap(letterGrid);
+      const current = getGame(gameCode);
+      if (current) {
+        current.letterPositions = positions;
+      }
+      ensureGame(gameCode);
+
       // Reset player data
       const users = getGameUsers(gameCode);
       const playerUsernames = users.map(u => u.username);
@@ -350,6 +383,10 @@ function initializeSocketHandlers(io) {
 
     // Handle start game acknowledgment
     socket.on('startGameAck', (data) => {
+      if (!checkRateLimit(socket.id)) {
+        socket.emit('rateLimited');
+        return;
+      }
       const { messageId } = data;
 
       const gameCode = getGameBySocketId(socket.id);
@@ -366,7 +403,14 @@ function initializeSocketHandlers(io) {
     });
 
     // Handle word submission
+    const SUBMIT_WORD_WEIGHT = parseInt(process.env.RATE_WEIGHT_SUBMITWORD || '1');
+    const CHAT_WEIGHT = parseInt(process.env.RATE_WEIGHT_CHAT || '1');
+
     socket.on('submitWord', (data) => {
+      if (!checkRateLimit(socket.id, SUBMIT_WORD_WEIGHT)) {
+        socket.emit('rateLimited');
+        return;
+      }
       const { word } = data;
 
       const gameCode = getGameBySocketId(socket.id);
@@ -386,8 +430,10 @@ function initializeSocketHandlers(io) {
       }
 
       // Validate word on board
-      const isOnBoard = validateWordOnBoard(normalizedWord, game.letterGrid);
+      const isOnBoard = validateWordOnBoard(normalizedWord, game.letterGrid, game.letterPositions);
       if (!isOnBoard) {
+        inc('wordNotOnBoard');
+        incPerGame(gameCode, 'wordNotOnBoard');
         socket.emit('wordNotOnBoard', { word: normalizedWord });
         return;
       }
@@ -403,6 +449,8 @@ function initializeSocketHandlers(io) {
         const wordScore = calculateWordScore(normalizedWord);
         updatePlayerScore(gameCode, username, wordScore, true);
 
+        inc('wordAccepted');
+        incPerGame(gameCode, 'wordAccepted');
         socket.emit('wordAccepted', {
           word: normalizedWord,
           score: wordScore,
@@ -415,22 +463,29 @@ function initializeSocketHandlers(io) {
           socket.emit('liveAchievementUnlocked', { achievements });
         }
       } else {
+        inc('wordNeedsValidation');
+        incPerGame(gameCode, 'wordNeedsValidation');
         socket.emit('wordNeedsValidation', {
           word: normalizedWord,
           message: 'Word will be validated by host'
         });
       }
 
-      // Update leaderboard with throttling to prevent excessive broadcasts
+      const lbThrottleMs = parseInt(process.env.LEADERBOARD_THROTTLE_MS || '1000');
       getLeaderboardThrottled(gameCode, (leaderboard) => {
         broadcastToRoom(io, getGameRoom(gameCode), 'updateLeaderboard', {
           leaderboard
         });
-      });
+      }, lbThrottleMs);
     });
 
     // Handle chat messages
     socket.on('chatMessage', (data) => {
+      if (!checkRateLimit(socket.id, CHAT_WEIGHT)) {
+        inc('rateLimited');
+        socket.emit('rateLimited');
+        return;
+      }
       const { message, gameCode: providedGameCode } = data;
 
       const gameCode = providedGameCode || getGameBySocketId(socket.id);
@@ -454,6 +509,10 @@ function initializeSocketHandlers(io) {
 
     // Handle end game
     socket.on('endGame', () => {
+      if (!checkRateLimit(socket.id)) {
+        socket.emit('rateLimited');
+        return;
+      }
       const gameCode = getGameBySocketId(socket.id);
       if (!gameCode) return;
 
@@ -471,6 +530,10 @@ function initializeSocketHandlers(io) {
 
     // Handle validate words (host validation)
     socket.on('validateWords', async (data) => {
+      if (!checkRateLimit(socket.id)) {
+        socket.emit('rateLimited');
+        return;
+      }
       const { validations } = data || {};
 
       const gameCode = getGameBySocketId(socket.id);
@@ -606,6 +669,10 @@ function initializeSocketHandlers(io) {
 
     // Handle reset game
     socket.on('resetGame', () => {
+      if (!checkRateLimit(socket.id)) {
+        socket.emit('rateLimited');
+        return;
+      }
       const gameCode = getGameBySocketId(socket.id);
       if (!gameCode) return;
 
@@ -628,6 +695,10 @@ function initializeSocketHandlers(io) {
 
     // Handle close room
     socket.on('closeRoom', () => {
+      if (!checkRateLimit(socket.id)) {
+        emitError(socket, ErrorMessages.RATE_LIMIT_EXCEEDED);
+        return;
+      }
       const gameCode = getGameBySocketId(socket.id);
       if (!gameCode) return;
 
@@ -653,11 +724,19 @@ function initializeSocketHandlers(io) {
 
     // Handle get active rooms
     socket.on('getActiveRooms', () => {
+      if (!checkRateLimit(socket.id)) {
+        emitError(socket, ErrorMessages.RATE_LIMIT_EXCEEDED);
+        return;
+      }
       socket.emit('activeRooms', { rooms: getActiveRooms() });
     });
 
     // Handle host keep alive
     socket.on('hostKeepAlive', () => {
+      if (!checkRateLimit(socket.id)) {
+        emitError(socket, ErrorMessages.RATE_LIMIT_EXCEEDED);
+        return;
+      }
       const gameCode = getGameBySocketId(socket.id);
       if (!gameCode) return;
 
@@ -669,6 +748,10 @@ function initializeSocketHandlers(io) {
 
     // Handle host reactivate
     socket.on('hostReactivate', () => {
+      if (!checkRateLimit(socket.id)) {
+        emitError(socket, ErrorMessages.RATE_LIMIT_EXCEEDED);
+        return;
+      }
       const gameCode = getGameBySocketId(socket.id);
       if (!gameCode) return;
 
@@ -681,6 +764,10 @@ function initializeSocketHandlers(io) {
 
     // Tournament handlers
     socket.on('createTournament', (data) => {
+      if (!checkRateLimit(socket.id)) {
+        emitError(socket, ErrorMessages.RATE_LIMIT_EXCEEDED);
+        return;
+      }
       const { name, totalRounds } = data;
 
       const gameCode = getGameBySocketId(socket.id);
@@ -703,6 +790,10 @@ function initializeSocketHandlers(io) {
     });
 
     socket.on('getTournamentStandings', () => {
+      if (!checkRateLimit(socket.id)) {
+        emitError(socket, ErrorMessages.RATE_LIMIT_EXCEEDED);
+        return;
+      }
       const gameCode = getGameBySocketId(socket.id);
       if (!gameCode) return;
 
@@ -714,6 +805,10 @@ function initializeSocketHandlers(io) {
     });
 
     socket.on('cancelTournament', () => {
+      if (!checkRateLimit(socket.id)) {
+        emitError(socket, ErrorMessages.RATE_LIMIT_EXCEEDED);
+        return;
+      }
       const gameCode = getGameBySocketId(socket.id);
       if (!gameCode) return;
 
@@ -733,6 +828,10 @@ function initializeSocketHandlers(io) {
 
     // Handle intentional player leave
     socket.on('leaveRoom', ({ gameCode, username }) => {
+      if (!checkRateLimit(socket.id)) {
+        emitError(socket, ErrorMessages.RATE_LIMIT_EXCEEDED);
+        return;
+      }
       console.log(`[SOCKET] Player ${username} intentionally leaving game ${gameCode}`);
 
       const game = getGame(gameCode);
@@ -848,11 +947,19 @@ function initializeSocketHandlers(io) {
 
     // Ping/pong for connection health
     socket.on('ping', () => {
+      if (!checkRateLimit(socket.id)) {
+        emitError(socket, ErrorMessages.RATE_LIMIT_EXCEEDED);
+        return;
+      }
       socket.emit('pong');
     });
 
     // Handle shuffling grid broadcast from host
     socket.on('broadcastShufflingGrid', (data) => {
+      if (!checkRateLimit(socket.id)) {
+        emitError(socket, ErrorMessages.RATE_LIMIT_EXCEEDED);
+        return;
+      }
       const gameCode = getGameBySocketId(socket.id);
       if (!gameCode) return;
 
@@ -878,6 +985,7 @@ function startGameTimer(io, gameCode, timerSeconds) {
   if (!game) return;
 
   let remainingTime = timerSeconds;
+  const intervalMs = parseInt(process.env.TIME_UPDATE_INTERVAL_MS || '1000');
 
   // Store remaining time in game state for late joiners
   updateGame(gameCode, { remainingTime });
@@ -887,7 +995,7 @@ function startGameTimer(io, gameCode, timerSeconds) {
 
   // Create interval for time updates
   const timerId = setInterval(() => {
-    remainingTime--;
+    remainingTime -= intervalMs / 1000;
 
     // Update remaining time in game state for late joiners
     updateGame(gameCode, { remainingTime });
@@ -895,17 +1003,14 @@ function startGameTimer(io, gameCode, timerSeconds) {
     // Broadcast time update with game state for late joiners
     const currentGame = getGame(gameCode);
     broadcastToRoom(io, getGameRoom(gameCode), 'timeUpdate', {
-      remainingTime,
-      // Include game state for late joiners who might have missed startGame
-      letterGrid: currentGame?.letterGrid,
-      language: currentGame?.language
+      remainingTime
     });
 
     if (remainingTime <= 0) {
       timerManager.clearGameTimer(gameCode);
       endGame(io, gameCode);
     }
-  }, 1000);
+  }, intervalMs);
 
   timerManager.setGameTimer(gameCode, timerId);
 

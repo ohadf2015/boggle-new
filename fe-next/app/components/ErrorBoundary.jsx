@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { translations } from '../../translations';
 
 class ErrorBoundary extends React.Component {
   constructor(props) {
@@ -27,73 +28,40 @@ class ErrorBoundary extends React.Component {
 
   render() {
     if (this.state.hasError) {
-      // Fallback UI when LanguageContext is not available
-      // Using English as fallback for error messages
-      const errorMessages = {
-        somethingWentWrong: 'Something went wrong',
-        unexpectedError: 'An unexpected error occurred. Please refresh the page.',
-        errorDetails: 'Error details',
-        refreshPage: 'Refresh Page'
+      const language = (typeof window !== 'undefined' && localStorage.getItem('boggle_language')) || 'en';
+      const t = (path) => {
+        try {
+          const keys = path.split('.');
+          let current = translations[language];
+          for (const key of keys) {
+            current = current[key];
+            if (current === undefined) return path;
+          }
+          return current;
+        } catch {
+          return path;
+        }
       };
 
       return (
-        <div style={{
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          justifyContent: 'center',
-          minHeight: '100vh',
-          padding: '2rem',
-          backgroundColor: '#1a1a2e',
-          color: '#eee'
-        }}>
-          <div style={{
-            maxWidth: '600px',
-            textAlign: 'center',
-            padding: '2rem',
-            backgroundColor: '#16213e',
-            borderRadius: '12px',
-            boxShadow: '0 4px 6px rgba(0, 0, 0, 0.3)'
-          }}>
-            <h1 style={{
-              fontSize: '2rem',
-              marginBottom: '1rem',
-              color: '#ff6b6b'
-            }}>
-              {errorMessages.somethingWentWrong}
+        <div className="min-h-screen flex items-center justify-center p-6 bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 text-white">
+          <div className="max-w-xl w-full text-center p-6 rounded-2xl bg-slate-800/90 border border-rose-500/30 shadow-[0_0_20px_rgba(244,63,94,0.25)]">
+            <h1 className="text-2xl font-bold mb-3 text-rose-400">
+              {t('errors.somethingWentWrong')}
             </h1>
-            <p style={{
-              marginBottom: '1.5rem',
-              color: '#aaa'
-            }}>
-              {errorMessages.unexpectedError}
+            <p className="text-sm text-slate-300 mb-4">
+              {t('errors.unexpectedError')}
             </p>
             {process.env.NODE_ENV === 'development' && this.state.error && (
-              <details style={{
-                marginBottom: '1.5rem',
-                textAlign: 'left',
-                backgroundColor: '#0f1419',
-                padding: '1rem',
-                borderRadius: '8px',
-                fontSize: '0.875rem'
-              }}>
-                <summary style={{ cursor: 'pointer', marginBottom: '0.5rem', color: '#ffa500' }}>
-                  {errorMessages.errorDetails}
+              <details className="mb-4 text-left bg-slate-900/60 p-3 rounded-lg text-xs">
+                <summary className="cursor-pointer mb-2 text-amber-400">
+                  {t('errors.errorDetails')}
                 </summary>
-                <pre style={{
-                  overflowX: 'auto',
-                  color: '#ff6b6b',
-                  margin: 0
-                }}>
+                <pre className="overflow-x-auto text-rose-400 m-0">
                   {this.state.error.toString()}
                 </pre>
                 {this.state.errorInfo && (
-                  <pre style={{
-                    overflowX: 'auto',
-                    color: '#aaa',
-                    marginTop: '0.5rem',
-                    fontSize: '0.75rem'
-                  }}>
+                  <pre className="overflow-x-auto text-slate-400 mt-2 text-[11px]">
                     {this.state.errorInfo.componentStack}
                   </pre>
                 )}
@@ -101,22 +69,10 @@ class ErrorBoundary extends React.Component {
             )}
             <button
               onClick={this.handleReset}
-              style={{
-                padding: '0.75rem 2rem',
-                fontSize: '1rem',
-                backgroundColor: '#4ecdc4',
-                color: '#1a1a2e',
-                border: 'none',
-                borderRadius: '8px',
-                cursor: 'pointer',
-                fontWeight: '600',
-                transition: 'background-color 0.2s'
-              }}
-              onMouseOver={(e) => e.target.style.backgroundColor = '#45b7d1'}
-              onMouseOut={(e) => e.target.style.backgroundColor = '#4ecdc4'}
-              aria-label={errorMessages.refreshPage}
+              className="px-6 py-2 text-sm font-semibold rounded-md bg-gradient-to-r from-cyan-500 to-teal-500 hover:from-cyan-400 hover:to-teal-400 text-white"
+              aria-label={t('errors.refreshPage')}
             >
-              {errorMessages.refreshPage}
+              {t('errors.refreshPage')}
             </button>
           </div>
         </div>

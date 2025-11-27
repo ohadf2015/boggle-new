@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { FaGamepad, FaCrown, FaUser, FaDice, FaSync, FaQrcode, FaWhatsapp, FaLink, FaQuestionCircle } from 'react-icons/fa';
 import { QRCodeSVG } from 'qrcode.react';
@@ -18,16 +18,33 @@ import Particles from './components/Particles';
 import { cn } from './lib/utils';
 import { copyJoinUrl, shareViaWhatsApp, getJoinUrl } from './utils/share';
 import { useLanguage } from './contexts/LanguageContext';
+import LogRocket from 'logrocket';
+import toast from 'react-hot-toast';
+import { validateUsername, validateRoomName, validateGameCode, sanitizeInput } from './utils/validation';
+import { useValidation } from './hooks/useValidation';
 
 const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, error, activeRooms, refreshRooms, prefilledRoom, roomName, setRoomName, isAutoJoining, roomsLoading }) => {
-  const { t, language } = useLanguage();
+  const { t, language, dir } = useLanguage();
   const [mode, setMode] = useState('join'); // 'join' or 'host'
   const [showQR, setShowQR] = useState(false);
   const [showHowToPlay, setShowHowToPlay] = useState(false);
   const [usernameError, setUsernameError] = useState(false);
   const [roomNameError, setRoomNameError] = useState(false);
+  const [gameCodeError, setGameCodeError] = useState(false);
+  const [usernameErrorKey, setUsernameErrorKey] = useState(null);
+  const [roomNameErrorKey, setRoomNameErrorKey] = useState(null);
+  const [gameCodeErrorKey, setGameCodeErrorKey] = useState(null);
   const [showFullForm, setShowFullForm] = useState(!prefilledRoom); // Show simplified form if room is prefilled
   const [roomLanguage, setRoomLanguage] = useState(language); // Separate state for room/game language
+  const usernameInputRef = useRef(null);
+  const { notifyError } = useValidation(t);
+
+  // Sync showFullForm when prefilledRoom prop changes (from URL params loaded after mount)
+  useEffect(() => {
+    if (prefilledRoom) {
+      setShowFullForm(false);
+    }
+  }, [prefilledRoom]);
 
   const handleModeChange = (newMode) => {
     if (newMode) {
@@ -50,18 +67,62 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
     // Validate based on mode
     if (mode === 'host') {
       // Host needs room name
-      if (!roomName || !roomName.trim()) {
-        setRoomNameError(true);
-        setTimeout(() => setRoomNameError(false), 2000);
+      const rn = sanitizeInput(roomName, 30);
+      const { isValid: roomOk, error: roomErr } = validateRoomName(rn);
+      const { isValid: codeOk, error: codeErr } = validateGameCode(gameCode);
+      if (!roomOk || !codeOk) {
+        if (!roomOk) {
+          setRoomNameError(true);
+          setRoomNameErrorKey(roomErr);
+        }
+        if (!codeOk) {
+          setGameCodeError(true);
+          setGameCodeErrorKey(codeErr);
+        }
+        notifyError(roomErr || codeErr);
+        setTimeout(() => {
+          setRoomNameError(false);
+          setGameCodeError(false);
+          setRoomNameErrorKey(null);
+          setGameCodeErrorKey(null);
+        }, 2500);
         return;
       }
+      // Identify host in LogRocket
+      LogRocket.identify(rn.trim(), {
+        name: rn.trim(),
+        role: 'host',
+        gameCode: gameCode,
+      });
     } else {
       // Player needs username
-      if (!username || !username.trim()) {
-        setUsernameError(true);
-        setTimeout(() => setUsernameError(false), 2000);
+      const un = sanitizeInput(username, 20);
+      const { isValid: userOk, error: userErr } = validateUsername(un);
+      const { isValid: codeOk, error: codeErr } = validateGameCode(gameCode);
+      if (!userOk || !codeOk) {
+        if (!userOk) {
+          setUsernameError(true);
+          setUsernameErrorKey(userErr);
+        }
+        if (!codeOk) {
+          setGameCodeError(true);
+          setGameCodeErrorKey(codeErr);
+        }
+        notifyError(userErr || codeErr);
+        setTimeout(() => {
+          setUsernameError(false);
+          setGameCodeError(false);
+          setUsernameErrorKey(null);
+          setGameCodeErrorKey(null);
+        }, 2500);
         return;
       }
+      // Identify player in LogRocket
+      LogRocket.identify(un.trim(), {
+        name: un.trim(),
+        role: 'player',
+        gameCode: gameCode,
+      });
     }
 
     handleJoin(mode === 'host', roomLanguage);
@@ -83,11 +144,25 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
 
   const handleQuickJoin = (e) => {
     e.preventDefault();
-    if (!username || !username.trim()) {
+    const un = sanitizeInput(username, 20);
+    const { isValid: userOk, error: userErr } = validateUsername(un);
+    if (!userOk) {
       setUsernameError(true);
-      setTimeout(() => setUsernameError(false), 2000);
+      setUsernameErrorKey(userErr);
+      usernameInputRef.current?.focus();
+      notifyError(userErr);
+      setTimeout(() => {
+        setUsernameError(false);
+        setUsernameErrorKey(null);
+      }, 2500);
       return;
     }
+    // Identify player in LogRocket
+    LogRocket.identify(un.trim(), {
+      name: un.trim(),
+      role: 'player',
+      gameCode: gameCode,
+    });
     handleJoin(false); // Always join mode for quick join
   };
 
@@ -227,11 +302,12 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
                   <Label htmlFor="username" className="text-base font-semibold text-slate-700 dark:text-gray-300">
                     {t('joinView.enterNameToPlay')}
                   </Label>
-                  <Input
+                    <Input
+                    ref={usernameInputRef}
                     id="username"
                     value={username}
                     onChange={(e) => {
-                      setUsername(e.target.value);
+                      setUsername(sanitizeInput(e.target.value, 20));
                       if (usernameError) setUsernameError(false);
                     }}
                     required
@@ -244,7 +320,7 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
                     maxLength={20}
                   />
                   {usernameError && (
-                    <p className="text-sm text-red-500 dark:text-red-400">{t('validation.usernameRequired')}</p>
+                    <p className="text-sm text-red-500 dark:text-red-400">{t(usernameErrorKey || 'validation.usernameRequired')}</p>
                   )}
                 </motion.div>
 
@@ -284,7 +360,7 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-50 via-slate-100 to-slate-200 pt-4 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 flex flex-col items-center justify-start md:justify-center p-2 sm:p-4 md:p-6 overflow-auto transition-colors duration-300">
+    <div dir={dir} className="min-h-screen bg-gradient-to-b from-slate-50 via-slate-100 to-slate-200 pt-4 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 flex flex-col items-center justify-start md:justify-center p-2 sm:p-4 md:p-6 overflow-auto transition-colors duration-300">
       {/* Animated Title */}
 
 
@@ -443,8 +519,14 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
                       maxLength={4}
                       pattern="[0-9]*"
                       inputMode="numeric"
-                      className="bg-slate-100 dark:bg-slate-700/50 border-slate-200 dark:border-slate-600 text-slate-900 dark:text-white placeholder:text-slate-500 dark:placeholder:text-gray-400"
+                      className={cn(
+                        "bg-slate-100 dark:bg-slate-700/50 border-slate-200 dark:border-slate-600 text-slate-900 dark:text-white placeholder:text-slate-500 dark:placeholder:text-gray-400",
+                        gameCodeError && "border-red-500 bg-red-900/30 focus-visible:ring-red-500"
+                      )}
                     />
+                    {gameCodeError && (
+                      <p className="text-sm text-red-400">{t(gameCodeErrorKey || 'validation.gameCodeInvalid')}</p>
+                    )}
                   </motion.div>
                 ) : (
                   <>
@@ -460,7 +542,7 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
                         id="roomName"
                         value={roomName}
                         onChange={(e) => {
-                          setRoomName(e.target.value);
+                          setRoomName(sanitizeInput(e.target.value, 30));
                           if (roomNameError) setRoomNameError(false);
                         }}
                         required
@@ -472,7 +554,7 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
                         maxLength={30}
                       />
                       {roomNameError && (
-                        <p className="text-sm text-red-400">{t('joinView.pleaseEnterYourName')}</p>
+                        <p className="text-sm text-red-400">{t(roomNameErrorKey || 'joinView.pleaseEnterYourName')}</p>
                       )}
                       {!roomNameError && (
                         <p className="text-sm text-slate-500 dark:text-gray-400">{t('joinView.playerAndRoomName')}</p>
@@ -497,8 +579,14 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
                           maxLength={4}
                           pattern="[0-9]*"
                           inputMode="numeric"
-                          className="flex-1 bg-slate-100 dark:bg-slate-700/50 border-slate-200 dark:border-slate-600 text-slate-900 dark:text-white placeholder:text-slate-500 dark:placeholder:text-gray-400"
+                          className={cn(
+                            "flex-1 bg-slate-100 dark:bg-slate-700/50 border-slate-200 dark:border-slate-600 text-slate-900 dark:text-white placeholder:text-slate-500 dark:placeholder:text-gray-400",
+                            gameCodeError && "border-red-500 bg-red-900/30 focus-visible:ring-red-500"
+                          )}
                         />
+                        {gameCodeError && (
+                          <p className="text-sm text-red-400">{t(gameCodeErrorKey || 'validation.gameCodeInvalid')}</p>
+                        )}
                         <TooltipProvider>
                           <Tooltip>
                             <TooltipTrigger asChild>
@@ -534,7 +622,7 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
                       id="username-main"
                       value={username}
                       onChange={(e) => {
-                        setUsername(e.target.value);
+                        setUsername(sanitizeInput(e.target.value, 20));
                         if (usernameError) setUsernameError(false);
                       }}
                       required
@@ -546,7 +634,7 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
                       maxLength={20}
                     />
                     {usernameError && (
-                      <p className="text-sm text-red-400">{t('validation.usernameRequired')}</p>
+                      <p className="text-sm text-red-400">{t(usernameErrorKey || 'validation.usernameRequired')}</p>
                     )}
                   </motion.div>
                 )}

@@ -13,6 +13,7 @@ const dictionary = require("./backend/dictionary");
 const { initializeSocketHandlers } = require("./backend/socketHandlers");
 const { restoreTournamentsFromRedis } = require("./backend/modules/tournamentManager");
 const { cleanupStaleGames } = require("./backend/modules/gameStateManager");
+const { setEventLoopLag } = require("./backend/utils/metrics");
 
 const dev = process.env.NODE_ENV !== "production";
 const app = next({ dev });
@@ -79,16 +80,21 @@ app.prepare().then(() => {
 
   // SECURITY: Add security headers
   server.use((req, res, next) => {
-    // Content Security Policy
-    res.setHeader('Content-Security-Policy',
-      "default-src 'self'; " +
+    const cspDev = "default-src 'self'; " +
       "script-src 'self' 'unsafe-inline' 'unsafe-eval'; " +
       "style-src 'self' 'unsafe-inline'; " +
       "img-src 'self' data: https:; " +
       "font-src 'self' data:; " +
       "connect-src 'self' ws: wss:; " +
-      "frame-ancestors 'none';"
-    );
+      "frame-ancestors 'none';";
+    const cspProd = "default-src 'self'; " +
+      "script-src 'self'; " +
+      "style-src 'self' 'unsafe-inline'; " +
+      "img-src 'self' data: https:; " +
+      "font-src 'self' data:; " +
+      "connect-src 'self' ws: wss:; " +
+      "frame-ancestors 'none';";
+    res.setHeader('Content-Security-Policy', dev ? cspDev : cspProd);
 
     // Additional security headers
     res.setHeader('X-Content-Type-Options', 'nosniff');
@@ -125,11 +131,26 @@ app.prepare().then(() => {
     }
   }, 5 * 60 * 1000); // Every 5 minutes
 
+  // Metrics endpoint
+  const { getMetrics, getRoomMetrics, resetAll, setEventLoopLag } = require('./backend/utils/metrics');
+  server.get('/metrics', (_req, res) => {
+    res.json(getMetrics());
+  });
+  server.get('/metrics/rooms', (_req, res) => {
+    res.json(getRoomMetrics());
+  });
+  server.get('/metrics/reset', (_req, res) => {
+    resetAll();
+    res.json({ ok: true });
+  });
+
   // Next.js handler for all other routes
   server.use(async (req, res) => {
     try {
       const parsedUrl = require('url').parse(req.url, true);
       const { pathname, query } = parsedUrl;
+
+      console.log(`[Request] ${req.method} ${req.url} | pathname: ${pathname}`);
 
       // Manual redirect for root path (since middleware might be skipped in custom server)
       if (pathname === '/') {
@@ -143,7 +164,10 @@ app.prepare().then(() => {
           }
         }
 
-        res.writeHead(307, { Location: `/${locale}` });
+        // Preserve query params (e.g., ?room=1234) during redirect
+        const queryString = parsedUrl.search || '';
+        console.log(`[Redirect] Root path redirect: ${req.url} -> /${locale}${queryString}`);
+        res.writeHead(307, { Location: `/${locale}${queryString}` });
         res.end();
         return;
       }
@@ -204,3 +228,14 @@ app.prepare().then(() => {
 
   startServer();
 });
+  // Event loop lag measurement
+  (function monitorLoopLag() {
+    let last = Date.now();
+    const interval = parseInt(process.env.EVENT_LOOP_MONITOR_INTERVAL_MS || '1000');
+    setInterval(() => {
+      const now = Date.now();
+      const drift = now - last - interval;
+      last = now;
+      setEventLoopLag(Math.max(0, drift));
+    }, interval).unref();
+  })();

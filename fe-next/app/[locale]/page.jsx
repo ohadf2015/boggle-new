@@ -11,6 +11,7 @@ import Header from '@/components/Header';
 import { SocketContext } from '@/utils/SocketContext';
 import { saveSession, getSession, clearSession } from '@/utils/session';
 import { useLanguage } from '@/contexts/LanguageContext';
+import logger from '@/utils/logger';
 
 // Force dynamic rendering to prevent static generation issues
 export const dynamic = 'force-dynamic';
@@ -79,6 +80,7 @@ export default function GamePage() {
     const initializeState = () => {
       const urlParams = new URLSearchParams(window.location.search);
       const roomFromUrl = urlParams.get('room');
+      console.log('[Init] URL search:', window.location.search, '| roomFromUrl:', roomFromUrl);
       const savedUsername = typeof window !== 'undefined'
         ? localStorage.getItem('boggle_username') || ''
         : '';
@@ -88,6 +90,7 @@ export default function GamePage() {
       const hasSession = savedSession && savedSession.gameCode;
 
       if (roomFromUrl) {
+        console.log('[Init] Setting prefilledRoomCode to:', roomFromUrl);
         setGameCode(roomFromUrl);
         setPrefilledRoomCode(roomFromUrl);
         if (savedSession?.gameCode && savedSession.gameCode !== roomFromUrl) {
@@ -143,7 +146,7 @@ export default function GamePage() {
     }
 
     const socketUrl = getSocketURL();
-    console.log('[SOCKET.IO] Connecting to:', socketUrl);
+    logger.log('[SOCKET.IO] Connecting to:', socketUrl);
 
     const newSocket = io(socketUrl, {
       transports: ['websocket', 'polling'],
@@ -159,7 +162,7 @@ export default function GamePage() {
 
     // Connection events
     newSocket.on('connect', () => {
-      console.log('[SOCKET.IO] Connected:', newSocket.id);
+      logger.log('[SOCKET.IO] Connected:', newSocket.id);
       setIsConnected(true);
       setSocket(newSocket);
 
@@ -170,7 +173,7 @@ export default function GamePage() {
       if (wasConnectedRef.current) {
         const savedSession = getSession();
         if (savedSession?.gameCode) {
-          console.log('[SOCKET.IO] Reconnecting to game:', savedSession.gameCode);
+          logger.log('[SOCKET.IO] Reconnecting to game:', savedSession.gameCode);
           toast.success(t('common.reconnecting') || 'Reconnecting to game...', {
             duration: 2000,
             icon: '🔄',
@@ -195,7 +198,7 @@ export default function GamePage() {
     });
 
     newSocket.on('disconnect', (reason) => {
-      console.log('[SOCKET.IO] Disconnected:', reason);
+      logger.log('[SOCKET.IO] Disconnected:', reason);
       setIsConnected(false);
 
       if (reason === 'io server disconnect') {
@@ -204,12 +207,12 @@ export default function GamePage() {
     });
 
     newSocket.on('connect_error', (error) => {
-      console.error('[SOCKET.IO] Connection error:', error.message);
+      logger.error('[SOCKET.IO] Connection error:', error.message);
       setError(t('errors.unstableConnection') || 'Connection error');
     });
 
     newSocket.on('reconnect', (attemptNumber) => {
-      console.log('[SOCKET.IO] Reconnected after', attemptNumber, 'attempts');
+      logger.log('[SOCKET.IO] Reconnected after', attemptNumber, 'attempts');
       setIsConnected(true);
       toast.success(t('common.reconnected') || 'Reconnected!', {
         duration: 2000,
@@ -218,13 +221,13 @@ export default function GamePage() {
     });
 
     newSocket.on('reconnect_failed', () => {
-      console.error('[SOCKET.IO] Reconnection failed');
+      logger.error('[SOCKET.IO] Reconnection failed');
       setError(t('errors.connectionLost') || 'Connection lost');
     });
 
     // Game events
     newSocket.on('joined', (data) => {
-      console.log('[SOCKET.IO] Joined:', data);
+      logger.log('[SOCKET.IO] Joined:', data);
       setIsHost(data.isHost);
       setIsActive(true);
       setError('');
@@ -298,7 +301,7 @@ export default function GamePage() {
 
     // Auto-join next game if player is viewing results
     newSocket.on('startGame', () => {
-      console.log('[SOCKET.IO] New game starting - auto-joining from results');
+      logger.log('[SOCKET.IO] New game starting - auto-joining from results');
       setShowResults(false);
       setResultsData(null);
       toast.success(t('playerView.gameStarted') || 'Game is starting!', {
@@ -309,7 +312,7 @@ export default function GamePage() {
 
     // Handle game reset - keep players in the room for new game
     newSocket.on('resetGame', () => {
-      console.log('[SOCKET.IO] Game reset - staying in room for new game');
+      logger.log('[SOCKET.IO] Game reset - staying in room for new game');
       setShowResults(false);
       setResultsData(null);
       toast.success(t('hostView.newGameReady') || 'New game ready!', {
@@ -356,7 +359,7 @@ export default function GamePage() {
     });
 
     return () => {
-      console.log('[SOCKET.IO] Cleaning up');
+      logger.log('[SOCKET.IO] Cleaning up');
       newSocket.removeAllListeners();
       // Only keep socket connected if it's the global instance
       if (!globalSocketInstance || globalSocketInstance !== newSocket) {
@@ -436,7 +439,7 @@ export default function GamePage() {
 
     if (sessionAge > maxInactivity) {
       // Session is too old, don't auto-reconnect - user needs to manually rejoin
-      console.log('[SESSION] Session too old for auto-reconnect, clearing session');
+      logger.log('[SESSION] Session too old for auto-reconnect, clearing session');
       clearSession();
       Promise.resolve().then(() => setAttemptingReconnect(false));
       return;
@@ -474,6 +477,10 @@ export default function GamePage() {
   const handleJoin = useCallback((isHostMode, roomLang) => {
     if (!socket || !isConnected) {
       setError(t('errors.notConnected') || 'Not connected to server');
+      toast.error(t('common.notConnected') || 'Not connected to server', {
+        duration: 3000,
+        icon: '⚠️',
+      });
       return;
     }
 

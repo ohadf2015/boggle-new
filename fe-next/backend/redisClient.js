@@ -369,19 +369,24 @@ async function getApprovedWords(language, minApprovals = 2) {
 
     // Use SCAN to find all approved word keys for this language
     do {
-      const result = await redisClient.scan(cursor, 'MATCH', `approved_word:${language}:*`, 'COUNT', 100);
+      const result = await redisClient.scan(cursor, 'MATCH', `approved_word:${language}:*`, 'COUNT', 500);
       cursor = result[0];
       const keys = result[1];
 
-      // Get data for each key and filter by approval count
-      for (const key of keys) {
-        const data = await redisClient.get(key);
-        if (data) {
-          const approvalData = JSON.parse(data);
-          if (approvalData.approvalCount >= minApprovals) {
-            // Extract word from key (approved_word:he:word -> word)
-            const word = key.replace(`approved_word:${language}:`, '');
-            approvedWords.push(word);
+      if (keys.length > 0) {
+        const pipeline = redisClient.pipeline();
+        for (const key of keys) {
+          pipeline.get(key);
+        }
+        const res = await pipeline.exec();
+        for (let i = 0; i < keys.length; i++) {
+          const [err, data] = res[i] || [];
+          if (!err && data) {
+            const approvalData = JSON.parse(data);
+            if (approvalData.approvalCount >= minApprovals) {
+              const word = keys[i].replace(`approved_word:${language}:`, '');
+              approvedWords.push(word);
+            }
           }
         }
       }
