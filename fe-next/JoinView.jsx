@@ -416,11 +416,11 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
                   variant="outline"
                 >
                   <ToggleGroupItem value="join" className="flex-1 border-slate-600 text-gray-300 data-[state=on]:bg-gradient-to-r data-[state=on]:from-cyan-500 data-[state=on]:to-teal-500 data-[state=on]:text-white data-[state=on]:border-transparent">
-                    <FaUser className="mr-2" />
+                    <span className="mr-2"><FaUser /></span>
                     {t('joinView.joinRoom')}
                   </ToggleGroupItem>
                   <ToggleGroupItem value="host" className="flex-1 border-slate-600 text-gray-300 data-[state=on]:bg-gradient-to-r data-[state=on]:from-purple-500 data-[state=on]:to-pink-500 data-[state=on]:text-white data-[state=on]:border-transparent">
-                    <FaCrown className="mr-2" />
+                    <span className="mr-2"><FaCrown /></span>
                     {t('joinView.createRoom')}
                   </ToggleGroupItem>
                 </ToggleGroup>
@@ -647,12 +647,12 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
                   >
                     {mode === 'host' ? (
                       <>
-                        <FaCrown className="mr-2" />
+                        <span className="mr-2"><FaCrown /></span>
                         {t('joinView.createRoom')}
                       </>
                     ) : (
                       <>
-                        <FaUser className="mr-2" />
+                        <span className="mr-2"><FaUser /></span>
                         {t('joinView.joinRoom')}
                       </>
                     )}
@@ -766,7 +766,7 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
                         onClick={() => handleModeChange('host')}
                         className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-400 hover:to-pink-400 hover:shadow-[0_0_15px_rgba(168,85,247,0.5)]"
                       >
-                        <FaCrown className="mr-2" />
+                        <span className="mr-2"><FaCrown /></span>
                         {t('joinView.createRoom')}
                       </Button>
                     </motion.div>
