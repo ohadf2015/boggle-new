@@ -266,6 +266,11 @@ export default function GamePage() {
       setRoomsLoading(false);
     });
 
+    // Fallback: if rooms don't load within 5 seconds, stop showing loading state
+    const roomsLoadingTimeout = setTimeout(() => {
+      setRoomsLoading(false);
+    }, 5000);
+
     newSocket.on('error', (data) => {
       console.error('[SOCKET.IO] Error:', data);
 
@@ -360,6 +365,7 @@ export default function GamePage() {
 
     return () => {
       logger.log('[SOCKET.IO] Cleaning up');
+      clearTimeout(roomsLoadingTimeout);
       newSocket.removeAllListeners();
       // Only keep socket connected if it's the global instance
       if (!globalSocketInstance || globalSocketInstance !== newSocket) {

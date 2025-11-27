@@ -96,7 +96,9 @@ class RateLimiter {
 }
 
 // Create a singleton instance for use across the application
-const maxMessages = parseInt(process.env.RATE_MAX_MESSAGES || '50');
+// Increased defaults: 150 messages per 10 seconds is more reasonable for real gameplay
+// (ping/pong, join, ack, word submissions, leaderboard requests all count)
+const maxMessages = parseInt(process.env.RATE_MAX_MESSAGES || '150');
 const windowMs = parseInt(process.env.RATE_WINDOW_MS || '10000');
 const rateLimiterInstance = new RateLimiter(maxMessages, windowMs);
 

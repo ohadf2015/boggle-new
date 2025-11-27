@@ -381,12 +381,8 @@ function initializeSocketHandlers(io) {
       console.log(`[SOCKET] Game ${gameCode} starting with ${playerUsernames.length} players`);
     });
 
-    // Handle start game acknowledgment
+    // Handle start game acknowledgment - NOT rate limited (essential for game coordination)
     socket.on('startGameAck', (data) => {
-      if (!checkRateLimit(socket.id)) {
-        socket.emit('rateLimited');
-        return;
-      }
       const { messageId } = data;
 
       const gameCode = getGameBySocketId(socket.id);
@@ -722,21 +718,13 @@ function initializeSocketHandlers(io) {
       console.log(`[SOCKET] Room ${gameCode} closed by host`);
     });
 
-    // Handle get active rooms
+    // Handle get active rooms - NOT rate limited (essential for lobby)
     socket.on('getActiveRooms', () => {
-      if (!checkRateLimit(socket.id)) {
-        emitError(socket, ErrorMessages.RATE_LIMIT_EXCEEDED);
-        return;
-      }
       socket.emit('activeRooms', { rooms: getActiveRooms() });
     });
 
-    // Handle host keep alive
+    // Handle host keep alive - NOT rate limited (essential for connection health)
     socket.on('hostKeepAlive', () => {
-      if (!checkRateLimit(socket.id)) {
-        emitError(socket, ErrorMessages.RATE_LIMIT_EXCEEDED);
-        return;
-      }
       const gameCode = getGameBySocketId(socket.id);
       if (!gameCode) return;
 
@@ -746,12 +734,8 @@ function initializeSocketHandlers(io) {
       }
     });
 
-    // Handle host reactivate
+    // Handle host reactivate - NOT rate limited (essential for reconnection)
     socket.on('hostReactivate', () => {
-      if (!checkRateLimit(socket.id)) {
-        emitError(socket, ErrorMessages.RATE_LIMIT_EXCEEDED);
-        return;
-      }
       const gameCode = getGameBySocketId(socket.id);
       if (!gameCode) return;
 
@@ -945,12 +929,8 @@ function initializeSocketHandlers(io) {
       resetRateLimit(socket.id);
     });
 
-    // Ping/pong for connection health
+    // Ping/pong for connection health - NOT rate limited (essential for connection health)
     socket.on('ping', () => {
-      if (!checkRateLimit(socket.id)) {
-        emitError(socket, ErrorMessages.RATE_LIMIT_EXCEEDED);
-        return;
-      }
       socket.emit('pong');
     });
 
