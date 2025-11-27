@@ -136,8 +136,8 @@ const GridComponent = ({
     };
 
     // Selection threshold - must be within this % of cell center to select
-    // This prevents accidentally selecting cells when dragging near edges
-    const CELL_SELECTION_THRESHOLD = 0.75; // 75% of cell radius
+    // Higher value = more forgiving selection near cell edges
+    const CELL_SELECTION_THRESHOLD = 0.85; // 85% of cell radius
 
     // Get cell at touch position with cell center distance info
     const getCellAtPosition = useCallback((touchX, touchY) => {
@@ -458,29 +458,18 @@ const GridComponent = ({
                 isRainbow: true
             };
         } else if (level === 8) {
-            // x9 - Rainbow with subtle pulse
+            // x9 - Rainbow with strobe
             return {
                 gradient: 'rainbow-gradient',
                 border: 'border-white',
                 shadow: 'shadow-[0_0_55px_rgba(255,255,255,0.9)]',
-                text: multiplier,
-                flicker: false,
-                isRainbow: true,
-                pulse: true
-            };
-        } else if (level === 9) {
-            // x10 - Rainbow with light strobe
-            return {
-                gradient: 'rainbow-gradient',
-                border: 'border-white',
-                shadow: 'shadow-[0_0_60px_rgba(255,255,255,1)]',
                 text: multiplier,
                 flicker: true,
                 isRainbow: true,
                 strobe: true
             };
         } else {
-            // Level 10+ (x11+): Full rainbow with intense strobe
+            // Level 9+ (x10+): Full rainbow with intense strobe
             return {
                 gradient: 'rainbow-gradient',
                 border: 'border-white',
@@ -716,7 +705,7 @@ const GridComponent = ({
                                         : (isSelected ? 0.12 : 0.6)),
                                 ease: animateOnMount ? [0.34, 1.56, 0.64, 1] : "easeOut",
                                 delay: reduceMotion ? 0 : (animateOnMount ? (i + j) * 0.04 : 0),
-                                scale: isSelected ? { type: "spring", stiffness: reduceMotion ? 200 : 400, damping: reduceMotion ? 30 : 18 } : undefined
+                                scale: isSelected ? { type: "spring", stiffness: reduceMotion ? 200 : 350, damping: reduceMotion ? 30 : 22 } : undefined
                             }}
                             className={cn(
                                 "aspect-square flex items-center justify-center font-bold shadow-lg cursor-pointer border-2 relative overflow-hidden focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500",
@@ -774,9 +763,9 @@ const GridComponent = ({
                                     {/* Enhanced fire burst for first selected cell (trail start) */}
                                     {isFirstSelected && (
                                         <>
-                                            {/* Large fire burst particles */}
-                                            {[...Array(16)].map((_, idx) => {
-                                                const angle = (idx * 22.5) * (Math.PI / 180);
+                                            {/* Large fire burst particles - reduced for performance */}
+                                            {[...Array(14)].map((_, idx) => {
+                                                const angle = (idx * 25.7) * (Math.PI / 180); // 360/14 ≈ 25.7
                                                 const distance = 25 + (idx % 2) * 5;
                                                 return (
                                                     <motion.div
@@ -788,7 +777,6 @@ const GridComponent = ({
                                                                 : idx % 3 === 1
                                                                 ? 'radial-gradient(circle, #ff6b00, #ff0000)'
                                                                 : 'radial-gradient(circle, #ff9500, #ff5500)',
-                                                            filter: 'blur(1.5px)',
                                                             left: '50%',
                                                             top: '50%',
                                                             marginLeft: '-6px',
@@ -863,11 +851,11 @@ const GridComponent = ({
                                         </>
                                     )}
 
-                                    {/* Fire particles - enhanced and always visible */}
+                                    {/* Fire particles - reduced for performance */}
                                     <>
                                         {/* Center burst particles */}
-                                        {[...Array(8)].map((_, idx) => {
-                                            const angle = (idx * 45) * (Math.PI / 180);
+                                        {[...Array(7)].map((_, idx) => {
+                                            const angle = (idx * 51.4) * (Math.PI / 180); // 360/7 ≈ 51.4
                                             const distance = 15 + (comboLevel * 3);
                                             return (
                                                 <motion.div
@@ -877,7 +865,6 @@ const GridComponent = ({
                                                         background: comboLevel > 0
                                                             ? 'radial-gradient(circle, #ff6b00, #ff0000)'
                                                             : 'radial-gradient(circle, #fbbf24, #f97316)',
-                                                        filter: 'blur(1px)',
                                                         left: '50%',
                                                         top: '50%',
                                                         marginLeft: '-4px',

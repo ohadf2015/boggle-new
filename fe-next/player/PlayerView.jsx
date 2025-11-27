@@ -194,8 +194,8 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
           clearTimeout(comboTimeoutRef.current);
         }
 
-        // Base timeout 5s + 1s per combo level (max 12s at level 7+)
-        const comboTimeout = Math.min(5000 + newComboLevel * 1000, 12000);
+        // Base timeout 5s + 1.5s per combo level (max 15s at level 7+)
+        const comboTimeout = Math.min(5000 + newComboLevel * 1500, 15000);
         comboTimeoutRef.current = setTimeout(() => {
           setComboLevel(0);
           setLastWordTime(null);
