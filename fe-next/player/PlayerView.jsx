@@ -181,7 +181,9 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
 
         const now = Date.now();
         let newComboLevel;
-        if (lastWordTime && (now - lastWordTime) < 5000) {
+        // Combo chain window scales with current combo level (5s base + 1.5s per level, max 15s)
+        const comboChainWindow = Math.min(5000 + comboLevel * 1500, 15000);
+        if (lastWordTime && (now - lastWordTime) < comboChainWindow) {
           newComboLevel = comboLevel + 1;
           setComboLevel(newComboLevel);
         } else {
@@ -194,7 +196,7 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
           clearTimeout(comboTimeoutRef.current);
         }
 
-        // Base timeout 5s + 1.5s per combo level (max 15s at level 7+)
+        // Timeout to reset combo if no word submitted (same scaling)
         const comboTimeout = Math.min(5000 + newComboLevel * 1500, 15000);
         comboTimeoutRef.current = setTimeout(() => {
           setComboLevel(0);

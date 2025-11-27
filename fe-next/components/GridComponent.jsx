@@ -156,14 +156,20 @@ const GridComponent = ({
         const gridPaddingLeft = firstCellRect.left - gridRect.left;
         const gridPaddingTop = firstCellRect.top - gridRect.top;
 
-        // Calculate gap between cells
+        // Calculate horizontal gap between cells
         const lastCellInRow = gridRef.current.children[cols - 1];
         const gapX = lastCellInRow
             ? (lastCellInRow.getBoundingClientRect().left - firstCellRect.left - (cols - 1) * cellWidth) / Math.max(1, cols - 1)
             : 0;
 
+        // Calculate vertical gap between cells (use cell in second row if available)
+        const firstCellInSecondRow = rows > 1 ? gridRef.current.children[cols] : null;
+        const gapY = firstCellInSecondRow
+            ? (firstCellInSecondRow.getBoundingClientRect().top - firstCellRect.top - cellHeight)
+            : gapX; // Fallback to gapX if only one row
+
         const cellWithGapWidth = cellWidth + gapX;
-        const cellWithGapHeight = cellHeight + gapX;
+        const cellWithGapHeight = cellHeight + gapY;
 
         const adjustedX = touchX - gridRect.left - gridPaddingLeft;
         const adjustedY = touchY - gridRect.top - gridPaddingTop;
@@ -186,7 +192,7 @@ const GridComponent = ({
             col,
             letter: grid[row][col],
             distanceFromCenter,
-            cellRadius: cellWidth / 2
+            cellRadius: Math.min(cellWidth, cellHeight) / 2
         };
     }, [grid]);
 
