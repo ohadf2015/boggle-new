@@ -475,7 +475,7 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
       socket.off('tournamentComplete', handleTournamentComplete);
       socket.off('tournamentCancelled', handleTournamentCancelled);
     };
-  }, [socket, onShowResults, t, letterGrid, lastWordTime, wasInActiveGame, gameActive]);
+  }, [socket, onShowResults, t, letterGrid, lastWordTime, comboLevel, wasInActiveGame, gameActive, gameLanguage]);
 
   const submitWord = useCallback(() => {
     if (!word.trim() || !gameActive) return;
