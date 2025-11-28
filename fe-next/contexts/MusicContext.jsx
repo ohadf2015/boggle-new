@@ -101,29 +101,10 @@ export function MusicProvider({ children }) {
         }
     }, [volume, isMuted]);
 
-    // Handle browser autoplay - unlock on first user interaction
-    useEffect(() => {
-        if (typeof window === 'undefined') return;
-
-        const handleInteraction = () => {
-            if (!audioUnlocked) {
-                setAudioUnlocked(true);
-            }
-            document.removeEventListener('click', handleInteraction);
-            document.removeEventListener('touchstart', handleInteraction);
-            document.removeEventListener('keydown', handleInteraction);
-        };
-
-        document.addEventListener('click', handleInteraction);
-        document.addEventListener('touchstart', handleInteraction);
-        document.addEventListener('keydown', handleInteraction);
-
-        return () => {
-            document.removeEventListener('click', handleInteraction);
-            document.removeEventListener('touchstart', handleInteraction);
-            document.removeEventListener('keydown', handleInteraction);
-        };
-    }, [audioUnlocked]);
+    // Explicitly unlock audio - called when user clicks the speaker button
+    const unlockAudio = useCallback(() => {
+        setAudioUnlocked(true);
+    }, []);
 
     // Crossfade to a new track
     const fadeToTrack = useCallback((trackKey, fadeOutMs = 1000, fadeInMs = 1000) => {
@@ -244,6 +225,7 @@ export function MusicProvider({ children }) {
         fadeToTrack,
         setVolume,
         toggleMute,
+        unlockAudio,
 
         // Track keys for convenience
         TRACKS: {

@@ -10,7 +10,7 @@ import { Button } from './ui/button';
 import { cn } from '../lib/utils';
 
 const MusicControls = () => {
-    const { volume, setVolume, isMuted, toggleMute, isPlaying, audioUnlocked } = useMusic();
+    const { volume, setVolume, isMuted, toggleMute, isPlaying, audioUnlocked, unlockAudio } = useMusic();
     const { theme } = useTheme();
     const { t, dir } = useLanguage();
     const [showSlider, setShowSlider] = useState(false);
@@ -32,6 +32,16 @@ const MusicControls = () => {
         }
     };
 
+    const handleClick = () => {
+        if (!audioUnlocked) {
+            // First click unlocks audio and starts playing
+            unlockAudio();
+        } else {
+            // Subsequent clicks toggle mute
+            toggleMute();
+        }
+    };
+
     return (
         <div
             className="relative"
@@ -41,7 +51,7 @@ const MusicControls = () => {
             <Button
                 variant="outline"
                 size="icon"
-                onClick={toggleMute}
+                onClick={handleClick}
                 className={cn(
                     "rounded-full transition-all duration-300 relative",
                     isDarkMode
