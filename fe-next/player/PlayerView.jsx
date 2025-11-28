@@ -4,7 +4,6 @@ import { Input } from '../components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
 import { Progress } from '../components/ui/progress';
 import { Badge } from '../components/ui/badge';
-import { AchievementBadge } from '../components/AchievementBadge';
 import Avatar from '../components/Avatar';
 import { motion, AnimatePresence } from 'framer-motion';
 import confetti from 'canvas-confetti';
@@ -14,6 +13,8 @@ import { useSocket } from '../utils/SocketContext';
 import { clearSession } from '../utils/session';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useMusic } from '../contexts/MusicContext';
+import { useSoundEffects } from '../contexts/SoundEffectsContext';
+import { useAchievementQueue, AchievementDock } from '../components/achievements';
 import gsap from 'gsap';
 import GridComponent from '../components/GridComponent';
 import SlotMachineGrid from '../components/SlotMachineGrid';
@@ -34,6 +35,8 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
   const { t, dir } = useLanguage();
   const { socket } = useSocket();
   const { fadeToTrack, stopMusic, TRACKS } = useMusic();
+  const { playComboSound } = useSoundEffects();
+  const { queueAchievement } = useAchievementQueue();
   const inputRef = useRef(null);
   const wordListRef = useRef(null);
   const intentionalExitRef = useRef(false);
@@ -241,6 +244,8 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
           newComboLevel = currentComboLevel + 1;
           setComboLevel(newComboLevel);
           comboLevelRef.current = newComboLevel; // Update ref immediately
+          // Play combo sound with increasing pitch
+          playComboSound(newComboLevel);
         } else {
           newComboLevel = 0;
           setComboLevel(0);
@@ -360,20 +365,9 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
     };
 
     const handleLiveAchievementUnlocked = (data) => {
+      // Queue achievements for Xbox-style popup display
       data.achievements.forEach(achievement => {
-        toast.success(`🎉 ${achievement.icon} ${achievement.name}!`, {
-          duration: 4000,
-          style: {
-            background: 'linear-gradient(45deg, #FE6B8B 30%, #FF8E53 90%)',
-            color: 'white',
-            fontWeight: 'bold',
-          },
-        });
-        confetti({
-          particleCount: 100,
-          spread: 70,
-          origin: { y: 0.6 },
-        });
+        queueAchievement(achievement);
       });
       setAchievements(prev => [...prev, ...data.achievements]);
     };
@@ -560,7 +554,7 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
       socket.off('tournamentCancelled', handleTournamentCancelled);
     };
   // Note: comboLevel and lastWordTime removed from deps - we use refs to avoid stale closures
-  }, [socket, onShowResults, t, letterGrid, wasInActiveGame, gameActive, gameLanguage]);
+  }, [socket, onShowResults, t, letterGrid, wasInActiveGame, gameActive, gameLanguage, queueAchievement, playComboSound]);
 
   const submitWord = useCallback(() => {
     if (!word.trim() || !gameActive) return;
@@ -1198,29 +1192,11 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
         </motion.div>
       )}
 
-      {/* Achievements */}
-      {achievements.length > 0 && (
-        <motion.div
-          initial={{ y: -20, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          className="max-w-7xl mx-auto mb-1"
-        >
-          <Card className="bg-white/90 dark:bg-slate-800/90 backdrop-blur-md shadow-xl border border-purple-500/30">
-            <CardHeader className="py-2">
-              <CardTitle className="text-base md:text-xl flex items-center gap-2 text-purple-600 dark:text-purple-300">
-                🏆 {t('playerView.yourAchievements')}
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="py-2">
-              <div className="flex flex-wrap gap-2">
-                {achievements.map((ach, index) => (
-                  <AchievementBadge key={index} achievement={ach} index={index} />
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        </motion.div>
-      )}
+      {/* Floating Achievement Dock */}
+      <AchievementDock
+        achievements={achievements}
+        className={`fixed top-16 z-40 ${dir === 'rtl' ? 'left-4' : 'right-4'}`}
+      />
 
       {/* 3 Column Layout: Found Words | Grid | Ranking */}
       <div className="flex flex-col lg:flex-row gap-1 md:gap-2 max-w-7xl mx-auto flex-grow w-full overflow-hidden">

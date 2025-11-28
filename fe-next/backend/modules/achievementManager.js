@@ -15,6 +15,16 @@ const ACHIEVEMENT_ICONS = {
   DIVERSE_VOCABULARY: '🌈',
   DOUBLE_TROUBLE: '⚡⚡',
   TREASURE_HUNTER: '💎',
+  // New achievements
+  TRIPLE_THREAT: '🎰',
+  UNSTOPPABLE: '🚀',
+  COMEBACK_KID: '🔄',
+  DICTIONARY_DIVER: '📖',
+  LIGHTNING_ROUND: '⚡',
+  RARE_GEM: '💠',
+  EXPLORER: '🧭',
+  STREAK_MASTER: '🔥',
+  ANAGRAM_ARTIST: '🔀',
 };
 
 // Get localized achievements based on locale
@@ -103,6 +113,65 @@ const checkLiveAchievements = (game, username, word, timeSinceStart) => {
     if (lastTwo[1].timeSinceStart - lastTwo[0].timeSinceStart <= 5) {
       achievements.push('DOUBLE_TROUBLE');
       newAchievements.push(localizedAchievements.DOUBLE_TROUBLE);
+    }
+  }
+
+  // Triple Threat - 3 words within 8 seconds (LIVE)
+  if (playerWordDetails.length >= 3 && !achievements.includes('TRIPLE_THREAT')) {
+    const lastThree = playerWordDetails.slice(-3);
+    if (lastThree[2].timeSinceStart - lastThree[0].timeSinceStart <= 8) {
+      achievements.push('TRIPLE_THREAT');
+      newAchievements.push(localizedAchievements.TRIPLE_THREAT);
+    }
+  }
+
+  // Rare Gem - 9+ letter word (LIVE)
+  if (word.length >= 9 && !achievements.includes('RARE_GEM')) {
+    achievements.push('RARE_GEM');
+    newAchievements.push(localizedAchievements.RARE_GEM);
+  }
+
+  // Lightning Round - 5 words in first 30 seconds (LIVE)
+  if (game.playerWords[username].length >= 5 && timeSinceStart <= 30 && !achievements.includes('LIGHTNING_ROUND')) {
+    achievements.push('LIGHTNING_ROUND');
+    newAchievements.push(localizedAchievements.LIGHTNING_ROUND);
+  }
+
+  // Unstoppable - 30+ words (LIVE)
+  if (game.playerWords[username].length >= 30 && !achievements.includes('UNSTOPPABLE')) {
+    achievements.push('UNSTOPPABLE');
+    newAchievements.push(localizedAchievements.UNSTOPPABLE);
+  }
+
+  // Streak Master - 10+ combo streak (LIVE)
+  // Check if player has a combo tracker and reached 10+
+  const currentCombo = game.playerCombos?.[username] || 0;
+  if (currentCombo >= 10 && !achievements.includes('STREAK_MASTER')) {
+    achievements.push('STREAK_MASTER');
+    newAchievements.push(localizedAchievements.STREAK_MASTER);
+  }
+
+  // Comeback Kid - word in last 30 seconds (LIVE)
+  // Note: gameDuration is in seconds, need to check if game duration exists
+  const gameDuration = game.gameDuration || 180; // Default 3 minutes
+  if (timeSinceStart >= (gameDuration - 30) && !achievements.includes('COMEBACK_KID')) {
+    achievements.push('COMEBACK_KID');
+    newAchievements.push(localizedAchievements.COMEBACK_KID);
+  }
+
+  // Anagram Artist - found 2 consecutive words that are anagrams of each other (LIVE)
+  if (playerWordDetails.length >= 2 && !achievements.includes('ANAGRAM_ARTIST')) {
+    const lastTwo = playerWordDetails.slice(-2);
+    const word1 = lastTwo[0].word.toLowerCase();
+    const word2 = lastTwo[1].word.toLowerCase();
+    // Check if same length and same letters (anagram)
+    if (word1.length === word2.length && word1 !== word2) {
+      const sorted1 = word1.split('').sort().join('');
+      const sorted2 = word2.split('').sort().join('');
+      if (sorted1 === sorted2) {
+        achievements.push('ANAGRAM_ARTIST');
+        newAchievements.push(localizedAchievements.ANAGRAM_ARTIST);
+      }
     }
   }
 
@@ -216,6 +285,58 @@ const awardFinalAchievements = (game, users) => {
     if (validWords.some(w => w.word.length >= 8)) {
       addAchievement('TREASURE_HUNTER');
     }
+
+    // NEW ACHIEVEMENTS
+
+    // Rare Gem - 9+ letter word (validated)
+    if (validWords.some(w => w.word.length >= 9)) {
+      addAchievement('RARE_GEM');
+    }
+
+    // Explorer - found words of 5+ different lengths (validated)
+    if (uniqueLengths.size >= 5) {
+      addAchievement('EXPLORER');
+    }
+
+    // Dictionary Diver - 25+ valid words
+    if (validWords.length >= 25) {
+      addAchievement('DICTIONARY_DIVER');
+    }
+
+    // Unstoppable - 30+ valid words
+    if (validWords.length >= 30) {
+      addAchievement('UNSTOPPABLE');
+    }
+
+    // Lightning Round - 5 valid words in first 30 seconds
+    const wordsIn30Sec = validWords.filter(w => w.timeSinceStart <= 30);
+    if (wordsIn30Sec.length >= 5) {
+      addAchievement('LIGHTNING_ROUND');
+    }
+
+    // Comeback Kid - found a valid word in the last 30 seconds
+    const gameDuration = game.gameDuration || 180; // Default 3 minutes
+    if (validWords.some(w => w.timeSinceStart >= (gameDuration - 30))) {
+      addAchievement('COMEBACK_KID');
+    }
+
+    // Anagram Artist - found consecutive anagram words (post-validation)
+    // Check all consecutive valid word pairs
+    for (let i = 0; i < validWords.length - 1; i++) {
+      const word1 = validWords[i].word.toLowerCase();
+      const word2 = validWords[i + 1].word.toLowerCase();
+      if (word1.length === word2.length && word1 !== word2) {
+        const sorted1 = word1.split('').sort().join('');
+        const sorted2 = word2.split('').sort().join('');
+        if (sorted1 === sorted2) {
+          addAchievement('ANAGRAM_ARTIST');
+          break;
+        }
+      }
+    }
+
+    // Note: TRIPLE_THREAT and STREAK_MASTER are timing/combo based achievements
+    // that are primarily awarded during live gameplay
   });
 };
 

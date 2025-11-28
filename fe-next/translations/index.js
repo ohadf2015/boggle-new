@@ -164,7 +164,7 @@ export const translations = {
       exitRoom: 'Exit Room',
       startNewGame: 'Start New Game',
       validation: 'Word Validation',
-      validateIntro: 'Check valid words. Unchecked words will be removed.',
+      validateIntro: 'Are these valid words? Mark the valid ones.',
       totalWords: 'Total words to validate',
       submitValidation: 'Submit Validation',
       finalScores: 'Final Scores',
@@ -264,6 +264,13 @@ export const translations = {
       swipeToFormWords: 'Swipe on the board to form words',
       inviteFriends: 'Invite Friends',
       waitingForHostToStart: 'Waiting for host to start the game...',
+    },
+    achievementPopup: {
+      unlocked: 'Achievement Unlocked!',
+      tapToDismiss: 'Tap to dismiss',
+    },
+    achievementDock: {
+      title: 'Your Achievements',
     },
     chat: {
       title: 'Room Chat',
@@ -395,6 +402,42 @@ export const translations = {
       TREASURE_HUNTER: {
         name: 'Treasure Hunter',
         description: 'Found a rare word (8+ letters)'
+      },
+      TRIPLE_THREAT: {
+        name: 'Triple Threat',
+        description: 'Found 3 words within 8 seconds'
+      },
+      UNSTOPPABLE: {
+        name: 'Unstoppable',
+        description: 'Found 30+ words'
+      },
+      COMEBACK_KID: {
+        name: 'Comeback Kid',
+        description: 'Found a word in the last 30 seconds'
+      },
+      DICTIONARY_DIVER: {
+        name: 'Dictionary Diver',
+        description: 'Found 25+ valid words'
+      },
+      LIGHTNING_ROUND: {
+        name: 'Lightning Round',
+        description: 'Found 5 words in the first 30 seconds'
+      },
+      RARE_GEM: {
+        name: 'Rare Gem',
+        description: 'Found an ultra-rare word (9+ letters)'
+      },
+      EXPLORER: {
+        name: 'Explorer',
+        description: 'Found words of 5+ different lengths'
+      },
+      STREAK_MASTER: {
+        name: 'Streak Master',
+        description: 'Reached a 10+ combo streak'
+      },
+      ANAGRAM_ARTIST: {
+        name: 'Anagram Artist',
+        description: 'Found 2 consecutive anagram words'
       }
     },
     auth: {
@@ -758,7 +801,7 @@ export const translations = {
       exitRoom: 'יציאה מהחדר',
       startNewGame: 'התחל משחק חדש',
       validation: 'אימות מילים',
-      validateIntro: 'סמן את המילים התקינות. מילים לא מסומנות יוסרו מהציון הסופי.',
+      validateIntro: 'האם אלו מילים תקינות? סמן את התקינות.',
       totalWords: 'סה"כ מילים לאימות',
       submitValidation: 'שלח אימות',
       finalScores: 'תוצאות סופיות',
@@ -858,6 +901,13 @@ export const translations = {
       swipeToFormWords: 'החליקו על הלוח כדי ליצור מילים',
       inviteFriends: 'הזמן חברים',
       waitingForHostToStart: 'ממתינים למארח שיתחיל את המשחק...',
+    },
+    achievementPopup: {
+      unlocked: 'הישג נפתח!',
+      tapToDismiss: 'הקש לסגירה',
+    },
+    achievementDock: {
+      title: 'ההישגים שלך',
     },
     chat: {
       title: 'צ\'אט החדר',
@@ -989,6 +1039,42 @@ export const translations = {
       TREASURE_HUNTER: {
         name: 'צייד אוצרות',
         description: 'מצא מילה נדירה (8+ אותיות)'
+      },
+      TRIPLE_THREAT: {
+        name: 'שלישייה מנצחת',
+        description: 'מצא 3 מילים בתוך 8 שניות'
+      },
+      UNSTOPPABLE: {
+        name: 'בלתי ניתן לעצירה',
+        description: 'מצא 30+ מילים'
+      },
+      COMEBACK_KID: {
+        name: 'חזרה מהשטח',
+        description: 'מצא מילה ב-30 השניות האחרונות'
+      },
+      DICTIONARY_DIVER: {
+        name: 'צוללן המילון',
+        description: 'מצא 25+ מילים תקינות'
+      },
+      LIGHTNING_ROUND: {
+        name: 'סיבוב ברקים',
+        description: 'מצא 5 מילים ב-30 השניות הראשונות'
+      },
+      RARE_GEM: {
+        name: 'יהלום נדיר',
+        description: 'מצא מילה נדירה במיוחד (9+ אותיות)'
+      },
+      EXPLORER: {
+        name: 'חוקר',
+        description: 'מצא מילים ב-5+ אורכים שונים'
+      },
+      STREAK_MASTER: {
+        name: 'אלוף הרצף',
+        description: 'הגיע לרצף של 10+ קומבו'
+      },
+      ANAGRAM_ARTIST: {
+        name: 'אמן האנגרמות',
+        description: 'מצא 2 מילים עוקבות מאותן אותיות'
       }
     },
     auth: {
@@ -1451,6 +1537,13 @@ export const translations = {
       inviteFriends: 'Bjud in vänner',
       waitingForHostToStart: 'Väntar på att värden ska starta spelet...',
     },
+    achievementPopup: {
+      unlocked: 'Prestation upplåst!',
+      tapToDismiss: 'Tryck för att stänga',
+    },
+    achievementDock: {
+      title: 'Dina prestationer',
+    },
     chat: {
       title: 'Rumschatt',
       placeholder: 'Skriv ett meddelande...',
@@ -1581,6 +1674,42 @@ export const translations = {
       TREASURE_HUNTER: {
         name: 'Skattjägare',
         description: 'Hittade ett sällsynt ord (8+ bokstäver)'
+      },
+      TRIPLE_THREAT: {
+        name: 'Trippelhot',
+        description: 'Hittade 3 ord inom 8 sekunder'
+      },
+      UNSTOPPABLE: {
+        name: 'Ostoppbar',
+        description: 'Hittade 30+ ord'
+      },
+      COMEBACK_KID: {
+        name: 'Comeback-kungen',
+        description: 'Hittade ett ord i sista 30 sekunderna'
+      },
+      DICTIONARY_DIVER: {
+        name: 'Ordboksdykare',
+        description: 'Hittade 25+ giltiga ord'
+      },
+      LIGHTNING_ROUND: {
+        name: 'Blixtomgång',
+        description: 'Hittade 5 ord i första 30 sekunderna'
+      },
+      RARE_GEM: {
+        name: 'Sällsynt Juvel',
+        description: 'Hittade ett ultrasällsynt ord (9+ bokstäver)'
+      },
+      EXPLORER: {
+        name: 'Utforskare',
+        description: 'Hittade ord av 5+ olika längder'
+      },
+      STREAK_MASTER: {
+        name: 'Seriemästare',
+        description: 'Nådde 10+ komboserie'
+      },
+      ANAGRAM_ARTIST: {
+        name: 'Anagramkonstnär',
+        description: 'Hittade 2 konsekutiva anagramord'
       }
     },
     auth: {
@@ -1915,6 +2044,13 @@ export const translations = {
       inviteFriends: '友達を招待',
       waitingForHostToStart: 'ホストがゲームを開始するのを待っています...',
     },
+    achievementPopup: {
+      unlocked: '実績解除！',
+      tapToDismiss: 'タップして閉じる',
+    },
+    achievementDock: {
+      title: 'あなたの実績',
+    },
     chat: {
       title: 'ルームチャット',
       placeholder: 'メッセージを入力...',
@@ -2045,6 +2181,42 @@ export const translations = {
       TREASURE_HUNTER: {
         name: 'トレジャーハンター',
         description: '珍しい単語を見つけた（8文字以上）'
+      },
+      TRIPLE_THREAT: {
+        name: 'トリプルスレット',
+        description: '8秒以内に3つの単語を見つけた'
+      },
+      UNSTOPPABLE: {
+        name: 'アンストッパブル',
+        description: '30以上の単語を見つけた'
+      },
+      COMEBACK_KID: {
+        name: 'カムバックキッド',
+        description: '最後の30秒で単語を見つけた'
+      },
+      DICTIONARY_DIVER: {
+        name: 'ディクショナリーダイバー',
+        description: '25以上の有効な単語を見つけた'
+      },
+      LIGHTNING_ROUND: {
+        name: 'ライトニングラウンド',
+        description: '最初の30秒で5つの単語を見つけた'
+      },
+      RARE_GEM: {
+        name: 'レアジェム',
+        description: '超珍しい単語を見つけた（9文字以上）'
+      },
+      EXPLORER: {
+        name: 'エクスプローラー',
+        description: '5種類以上の長さの単語を見つけた'
+      },
+      STREAK_MASTER: {
+        name: 'ストリークマスター',
+        description: '10以上のコンボストリークに到達'
+      },
+      ANAGRAM_ARTIST: {
+        name: 'アナグラムアーティスト',
+        description: '連続でアナグラム単語を見つけた'
       }
     },
     auth: {

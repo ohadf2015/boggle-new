@@ -85,7 +85,7 @@ function cleanProfanity(text) {
   }).join('');
 }
 const { calculateWordScore, calculateGameScores } = require('./modules/scoringEngine');
-const { checkAndAwardAchievements, getPlayerAchievements, ACHIEVEMENTS } = require('./modules/achievementManager');
+const { checkAndAwardAchievements, getPlayerAchievements, ACHIEVEMENTS, getLocalizedAchievements } = require('./modules/achievementManager');
 const { isDictionaryWord, getAvailableDictionaries, addApprovedWord, normalizeWord } = require('./dictionary');
 const { incrementWordApproval } = require('./redisClient');
 const gameStartCoordinator = require('./utils/gameStartCoordinator');
@@ -778,11 +778,17 @@ function initializeSocketHandlers(io) {
           };
         });
 
+        // Get localized achievements for this player
+        const playerAchievementKeys = game.playerAchievements?.[username] || [];
+        const localizedAchievements = getLocalizedAchievements(game.language || 'he');
+        const playerAchievements = playerAchievementKeys.map(key => localizedAchievements[key]).filter(Boolean);
+
         return {
           username,
           score,
           allWords,
-          avatar: game.users?.[username]?.avatar || null
+          avatar: game.users?.[username]?.avatar || null,
+          achievements: playerAchievements
         };
       }).sort((a, b) => b.score - a.score);
 
@@ -1440,6 +1446,11 @@ function endGame(io, gameCode) {
           ? validWords.reduce((longest, w) => w.word.length > longest.length ? w.word : longest, '')
           : '';
 
+        // Get localized achievements for this player
+        const playerAchievementKeys = currentGame.playerAchievements?.[username] || [];
+        const localizedAchievements = getLocalizedAchievements(currentGame.language || 'he');
+        const playerAchievements = playerAchievementKeys.map(key => localizedAchievements[key]).filter(Boolean);
+
         return {
           username,
           score,
@@ -1447,7 +1458,8 @@ function endGame(io, gameCode) {
           wordCount: allWords.length,
           validWordCount: validWords.length,
           longestWord,
-          avatar: currentGame.users?.[username]?.avatar || null
+          avatar: currentGame.users?.[username]?.avatar || null,
+          achievements: playerAchievements
         };
       }).sort((a, b) => b.score - a.score);
 

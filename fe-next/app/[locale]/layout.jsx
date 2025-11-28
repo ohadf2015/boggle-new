@@ -1,5 +1,6 @@
 import { translations } from '@/translations';
 import { Providers } from '../providers';
+import Footer from '@/components/Footer';
 
 // Force dynamic rendering - prevent static generation
 export const dynamic = 'force-dynamic';
@@ -146,8 +147,11 @@ export default async function LocaleLayout({ children, params }) {
                 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
                 <meta name="apple-mobile-web-app-title" content="LexiClash" />
             </head>
-            <body className="antialiased">
-                <Providers lang={locale}>{children}</Providers>
+            <body className="antialiased flex flex-col min-h-screen">
+                <Providers lang={locale}>
+                    <main className="flex-grow">{children}</main>
+                    <Footer />
+                </Providers>
             </body>
         </html>
     );
