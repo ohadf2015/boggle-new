@@ -28,7 +28,10 @@ const ErrorMessages = {
   ROOM_FULL: (max) => `Room is full (maximum ${max} players)`,
   ONLY_HOST_CAN_START: 'Only host can start the game',
   ONLY_HOST_CAN_END: 'Only host can end the game',
-  RATE_LIMIT_EXCEEDED: 'Rate limit exceeded. Please slow down.'
+  RATE_LIMIT_EXCEEDED: 'Rate limit exceeded. Please slow down.',
+  INVALID_WORD_SUBMISSION: 'Invalid word submission - missing required fields',
+  INVALID_MESSAGE: 'Invalid message',
+  GAME_NOT_IN_PROGRESS: 'Game is not in progress'
 };
 
 module.exports = {

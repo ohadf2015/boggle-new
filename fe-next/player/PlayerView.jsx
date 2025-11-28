@@ -577,6 +577,7 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
 
     socket.emit('submitWord', {
       word: trimmedWord.toLowerCase(),
+      comboLevel: comboLevelRef.current,
     });
 
     setFoundWords(prev => [...prev, { word: trimmedWord, isValid: null }]);
@@ -870,7 +871,7 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
               transition={{ delay: 0.15 }}
             >
               <Card className="bg-slate-900/95 dark:bg-slate-900/95 backdrop-blur-md border border-cyan-500/40 shadow-[0_0_25px_rgba(6,182,212,0.2)] overflow-hidden">
-                <div className="p-4 flex flex-col items-center justify-center bg-slate-900/90">
+                <div className="p-4 flex flex-col items-center justify-center bg-slate-900/90 relative">
                   {shufflingGrid ? (
                     <SlotMachineGrid
                       grid={shufflingGrid}
@@ -900,6 +901,16 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
                       ))}
                     </div>
                   )}
+                  {/* Transparent blur overlay with waiting message */}
+                  <div className="absolute inset-0 bg-slate-900/30 backdrop-blur-[2px] flex items-center justify-center">
+                    <motion.p
+                      animate={{ opacity: [0.7, 1, 0.7] }}
+                      transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+                      className="text-white/90 text-sm md:text-base font-medium drop-shadow-lg text-center px-4"
+                    >
+                      {t('playerView.waitingForHostToStart') || 'Waiting for host to start the game...'}
+                    </motion.p>
+                  </div>
                 </div>
               </Card>
             </motion.div>
@@ -1252,6 +1263,7 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
                       if (regex.test(formedWord)) {
                         socket.emit('submitWord', {
                           word: formedWord.toLowerCase(),
+                          comboLevel: comboLevelRef.current,
                         });
                         setFoundWords(prev => [...prev, { word: formedWord, isValid: null }]);
                       } else {

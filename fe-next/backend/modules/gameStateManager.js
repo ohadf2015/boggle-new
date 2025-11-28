@@ -77,6 +77,17 @@ function deleteGame(gameCode) {
   if (games[gameCode]) {
     // Clean up user mappings
     const game = games[gameCode];
+
+    // Clean up any active timeouts to prevent memory leaks
+    if (game.reconnectionTimeout) {
+      clearTimeout(game.reconnectionTimeout);
+      game.reconnectionTimeout = null;
+    }
+    if (game.validationTimeout) {
+      clearTimeout(game.validationTimeout);
+      game.validationTimeout = null;
+    }
+
     for (const username of Object.keys(game.users)) {
       const key = `${gameCode}:${username}`;
       const socketId = usernameToSocket.get(key);

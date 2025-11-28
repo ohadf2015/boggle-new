@@ -113,7 +113,7 @@ function initializeSocketHandlers(io) {
     socket.on('createGame', async (data) => {
       if (!checkRateLimit(socket.id)) {
         inc('rateLimited');
-        incPerGame(gameCode, 'rateLimited');
+        // Note: gameCode not yet defined here, skip per-game metric
         socket.emit('rateLimited');
         return;
       }
@@ -401,11 +401,14 @@ function initializeSocketHandlers(io) {
         return;
       }
 
+      // Validate and clamp timer to reasonable bounds (30 seconds to 10 minutes)
+      const validTimer = Math.max(30, Math.min(600, parseInt(timerSeconds) || 180));
+
       // Update game state
       updateGame(gameCode, {
         letterGrid,
-        timerSeconds: timerSeconds || 180,
-        remainingTime: timerSeconds || 180,  // Initialize remaining time for late joiners
+        timerSeconds: validTimer,
+        remainingTime: validTimer,  // Initialize remaining time for late joiners
         language: language || game.language,
         minWordLength: minWordLength || 2,  // Minimum word length setting
         gameState: 'in-progress',
@@ -430,7 +433,7 @@ function initializeSocketHandlers(io) {
       // Broadcast start game to all players
       broadcastToRoom(io, getGameRoom(gameCode), 'startGame', {
         letterGrid,
-        timerSeconds: timerSeconds || 180,
+        timerSeconds: validTimer,
         language: language || game.language,
         minWordLength: minWordLength || 2,
         messageId
@@ -439,7 +442,7 @@ function initializeSocketHandlers(io) {
       // Set up timeout for acknowledgments
       gameStartCoordinator.setAcknowledgmentTimeout(gameCode, 2000, (stats) => {
         // Start timer even if not all players acknowledged
-        startGameTimer(io, gameCode, timerSeconds || 180);
+        startGameTimer(io, gameCode, validTimer);
       });
 
       console.log(`[SOCKET] Game ${gameCode} starting with ${playerUsernames.length} players`);
@@ -471,17 +474,33 @@ function initializeSocketHandlers(io) {
         socket.emit('rateLimited');
         return;
       }
-      const { word } = data;
+       const { word, comboLevel = 0 } = data;
 
       const gameCode = getGameBySocketId(socket.id);
       const username = getUsernameBySocketId(socket.id);
 
-      if (!gameCode || !username || !word) return;
+      if (!gameCode || !username || !word) {
+        emitError(socket, ErrorMessages.INVALID_WORD_SUBMISSION);
+        return;
+      }
 
       const game = getGame(gameCode);
-      if (!game || game.gameState !== 'in-progress') return;
+      if (!game || game.gameState !== 'in-progress') {
+        emitError(socket, ErrorMessages.GAME_NOT_IN_PROGRESS);
+        return;
+      }
 
-      const normalizedWord = word.toLowerCase().trim();
+      // Cap word length to prevent abuse (max 50 chars)
+      const normalizedWord = word.toLowerCase().trim().substring(0, 50);
+
+      // Check for profanity - reject inappropriate words
+      if (badWordsFilter.isProfane(normalizedWord)) {
+        socket.emit('wordRejected', {
+          word: normalizedWord,
+          reason: 'inappropriate'
+        });
+        return;
+      }
 
       // Validate minimum word length
       const minLength = game.minWordLength || 2;
@@ -515,8 +534,10 @@ function initializeSocketHandlers(io) {
       const isInDictionary = isDictionaryWord(normalizedWord, game.language);
 
       if (isInDictionary) {
-        // Calculate score
-        const wordScore = calculateWordScore(normalizedWord);
+        // Calculate score with combo multiplier
+        // Clamp combo level to reasonable bounds (0-10) to prevent abuse
+        const safeComboLevel = Math.max(0, Math.min(10, parseInt(comboLevel) || 0));
+        const wordScore = calculateWordScore(normalizedWord, safeComboLevel);
         updatePlayerScore(gameCode, username, wordScore, true);
 
         inc('wordAccepted');
@@ -524,6 +545,7 @@ function initializeSocketHandlers(io) {
         socket.emit('wordAccepted', {
           word: normalizedWord,
           score: wordScore,
+          comboLevel: safeComboLevel,
           autoValidated: true
         });
 
@@ -561,10 +583,16 @@ function initializeSocketHandlers(io) {
       const gameCode = providedGameCode || getGameBySocketId(socket.id);
       const username = getUsernameBySocketId(socket.id);
 
-      if (!gameCode || !message) return;
+      if (!gameCode || !message) {
+        emitError(socket, ErrorMessages.INVALID_MESSAGE);
+        return;
+      }
 
       const game = getGame(gameCode);
-      if (!game) return;
+      if (!game) {
+        emitError(socket, ErrorMessages.GAME_NOT_FOUND);
+        return;
+      }
 
       const isHostUser = game.hostSocketId === socket.id;
 
@@ -585,10 +613,16 @@ function initializeSocketHandlers(io) {
         return;
       }
       const gameCode = getGameBySocketId(socket.id);
-      if (!gameCode) return;
+      if (!gameCode) {
+        emitError(socket, ErrorMessages.NOT_IN_GAME);
+        return;
+      }
 
       const game = getGame(gameCode);
-      if (!game) return;
+      if (!game) {
+        emitError(socket, ErrorMessages.GAME_NOT_FOUND);
+        return;
+      }
 
       // Verify sender is host
       if (game.hostSocketId !== socket.id) {
@@ -608,10 +642,20 @@ function initializeSocketHandlers(io) {
       const { validations } = data || {};
 
       const gameCode = getGameBySocketId(socket.id);
-      if (!gameCode) return;
+      if (!gameCode) {
+        emitError(socket, ErrorMessages.NOT_IN_GAME);
+        return;
+      }
 
       const game = getGame(gameCode);
-      if (!game || game.hostSocketId !== socket.id) return;
+      if (!game) {
+        emitError(socket, ErrorMessages.GAME_NOT_FOUND);
+        return;
+      }
+      if (game.hostSocketId !== socket.id) {
+        emitError(socket, ErrorMessages.ONLY_HOST_CAN_END);
+        return;
+      }
 
       // Validate that validations exists and is an array
       if (!validations || !Array.isArray(validations)) {
@@ -641,8 +685,8 @@ function initializeSocketHandlers(io) {
 
         for (const word of uniqueWords) {
           if (validWords.has(word)) {
-            // Calculate score: word length - 1
-            const score = Math.max(0, word.length - 1);
+            // Calculate score using consistent scoring formula (no combo for manual validation)
+            const score = calculateWordScore(word, 0);
             totalScore += score;
           }
         }
@@ -671,7 +715,7 @@ function initializeSocketHandlers(io) {
         const allWords = playerWordsList.map(word => {
           const isValid = validWords.has(word);
           const isDuplicate = wordCountMap[word] > 1;
-          const wordScore = isValid ? Math.max(0, word.length - 1) : 0;
+          const wordScore = isValid ? calculateWordScore(word, 0) : 0;
 
           return {
             word: word,
@@ -755,6 +799,12 @@ function initializeSocketHandlers(io) {
 
       // Stop any running timers
       timerManager.clearGameTimer(gameCode);
+
+      // Clear validation timeout to prevent auto-validation from firing after reset
+      if (game.validationTimeout) {
+        clearTimeout(game.validationTimeout);
+        game.validationTimeout = null;
+      }
 
       // Clean up any active game start sequence from previous game
       // This prevents race conditions when starting a new game quickly
@@ -1387,7 +1437,7 @@ function endGame(io, gameCode) {
       );
       if (playerSocketId) {
         roundResults[playerSocketId] = {
-          score: scores[username],
+          score: scores[username]?.totalScore || 0,
           words: (game.playerWords && game.playerWords[username]) || []
         };
       }

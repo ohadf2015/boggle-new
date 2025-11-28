@@ -79,6 +79,8 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
   const [comboLevel, setComboLevel] = useState(0);
   const [lastWordTime, setLastWordTime] = useState(null);
   const comboTimeoutRef = useRef(null);
+  const comboLevelRef = useRef(0);
+  const lastWordTimeRef = useRef(null);
 
   // Idle detection for validation - using ref to avoid dependency issues
   const submitValidationRef = useRef(null);
@@ -422,17 +424,23 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
 
         const now = Date.now();
         let newComboLevel;
+        // Use refs to get current values (avoids stale closure bug)
+        const currentComboLevel = comboLevelRef.current;
+        const currentLastWordTime = lastWordTimeRef.current;
 
         // Combo chain window scales with current combo level (3s base + 1s per level, max 10s)
-        const comboChainWindow = Math.min(3000 + comboLevel * 1000, 10000);
-        if (lastWordTime && (now - lastWordTime) < comboChainWindow) {
-          newComboLevel = comboLevel + 1;
+        const comboChainWindow = Math.min(3000 + currentComboLevel * 1000, 10000);
+        if (currentLastWordTime && (now - currentLastWordTime) < comboChainWindow) {
+          newComboLevel = currentComboLevel + 1;
           setComboLevel(newComboLevel);
+          comboLevelRef.current = newComboLevel;
         } else {
           newComboLevel = 0;
           setComboLevel(0);
+          comboLevelRef.current = 0;
         }
         setLastWordTime(now);
+        lastWordTimeRef.current = now;
 
         if (comboTimeoutRef.current) {
           clearTimeout(comboTimeoutRef.current);
@@ -442,7 +450,9 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
         const comboTimeout = Math.min(3000 + newComboLevel * 1000, 10000);
         comboTimeoutRef.current = setTimeout(() => {
           setComboLevel(0);
+          comboLevelRef.current = 0;
           setLastWordTime(null);
+          lastWordTimeRef.current = null;
         }, comboTimeout);
       }
     };
@@ -580,7 +590,7 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
       socket.off('tournamentComplete', handleTournamentComplete);
       socket.off('tournamentCancelled', handleTournamentCancelled);
     };
-  }, [socket, gameStarted, t, hostPlaying, lastWordTime]);
+  }, [socket, gameStarted, t, hostPlaying, onShowResults, tableData]);
 
   const startGame = () => {
     if (playersReady.length === 0) return;
@@ -787,6 +797,7 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
     // Send word to server just like a regular player
     socket.emit('submitWord', {
       word: trimmedWord.toLowerCase(),
+      comboLevel: comboLevelRef.current,
     });
 
     setHostFoundWords(prev => [...prev, trimmedWord]);
@@ -849,138 +860,83 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
 
       {/* Validation Modal */}
       <Dialog open={showValidation} onOpenChange={setShowValidation}>
-        <DialogContent className="max-w-4xl max-h-[90vh] flex flex-col bg-gradient-to-b from-indigo-50 to-purple-50 dark:from-slate-900 dark:to-indigo-950">
-          <DialogHeader className="flex-shrink-0">
-            <DialogTitle className="text-center text-3xl sm:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600 dark:from-indigo-400 dark:to-purple-400 flex items-center justify-center gap-3">
-              ✓ {t('hostView.validation')}
+        <DialogContent className="max-w-2xl max-h-[85vh] flex flex-col bg-slate-900 border-cyan-500/40">
+          <DialogHeader className="flex-shrink-0 pb-2">
+            <DialogTitle className="text-center text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-400">
+              {t('hostView.validation')}
             </DialogTitle>
           </DialogHeader>
-          <div className="flex-1 overflow-hidden flex flex-col min-h-0">
-            <div className="flex-shrink-0 text-center space-y-2 bg-white/50 dark:bg-slate-800/50 p-4 rounded-lg border border-indigo-200 dark:border-indigo-800 mb-4">
-              <p className="text-sm text-slate-700 dark:text-slate-300">
-                {t('hostView.validateIntro')}
-              </p>
-              <p className="text-sm font-semibold text-orange-600 dark:text-orange-400 flex items-center justify-center gap-2">
-                <span className="text-lg">⚠</span> {t('common.duplicateWarning')}
-              </p>
-            </div>
 
+          <div className="flex-1 overflow-hidden flex flex-col min-h-0">
             {showValidation && (() => {
               const uniqueWords = getUniqueWords();
-
-              // Separate words into auto-verified and non-auto-verified
               const nonAutoVerifiedWords = uniqueWords.filter(item => !item.autoValidated);
               const autoVerifiedWords = uniqueWords.filter(item => item.autoValidated);
 
-              const validCount = uniqueWords.filter(item => {
-                const isValid = validations[item.word] !== undefined ? validations[item.word] : true;
-                return isValid && item.playerCount === 1;
-              }).length;
-              const duplicateCount = uniqueWords.filter(item => item.playerCount > 1).length;
-
               return (
-                <div className="flex-1 flex flex-col min-h-0 space-y-3">
-                  <div className="flex-shrink-0 flex justify-center gap-4 text-sm">
-                    <div className="px-4 py-2 bg-indigo-100 dark:bg-indigo-900/30 rounded-full border border-indigo-300 dark:border-indigo-700">
-                      <span className="font-semibold text-indigo-700 dark:text-indigo-300">
-                        {t('hostView.totalWords')} {uniqueWords.length}
-                      </span>
-                    </div>
-                    <div className="px-4 py-2 bg-green-100 dark:bg-green-900/30 rounded-full border border-green-300 dark:border-green-700">
-                      <span className="font-semibold text-green-700 dark:text-green-300">
-                        ✓ {validCount}
-                      </span>
-                    </div>
-                    {duplicateCount > 0 && (
-                      <div className="px-4 py-2 bg-orange-100 dark:bg-orange-900/30 rounded-full border border-orange-300 dark:border-orange-700">
-                        <span className="font-semibold text-orange-700 dark:text-orange-300">
-                          ⚠ {duplicateCount}
-                        </span>
-                      </div>
-                    )}
-                  </div>
+                <div className="flex-1 flex flex-col min-h-0 gap-3">
+                  {/* Words to validate - Grid layout for better visibility */}
+                  <div className="flex-1 overflow-auto min-h-0">
+                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 p-1">
+                      {nonAutoVerifiedWords.map((item, index) => {
+                        const isDuplicate = item.playerCount > 1;
+                        const isValid = validations[item.word] !== undefined ? validations[item.word] : true;
 
-                  <div className="flex-1 overflow-auto space-y-2 px-1 min-h-0">
-                    {/* Non-Auto-Verified Words Section */}
-                    {nonAutoVerifiedWords.map((item, index) => {
-                      const isDuplicate = item.playerCount > 1;
-                      const isAutoValidated = item.autoValidated;
-                      const isValid = validations[item.word] !== undefined ? validations[item.word] : true;
-
-                      return (
-                        <motion.div
-                          key={`non-auto-${index}`}
-                          initial={{ opacity: 0, x: -20 }}
-                          animate={{ opacity: 1, x: 0 }}
-                          transition={{ delay: Math.min(index * 0.02, 0.5) }}
-                          className={cn(
-                            "flex items-center gap-3 p-3 rounded-xl transition-all border-2",
-                            isDuplicate
-                              ? "bg-gradient-to-r from-orange-50 to-red-50 dark:from-orange-900/20 dark:to-red-900/20 border-orange-300 dark:border-orange-700"
-                              : isAutoValidated
-                                ? "bg-gradient-to-r from-cyan-50 to-blue-50 dark:from-cyan-900/20 dark:to-blue-900/20 border-cyan-300 dark:border-cyan-700"
-                                : isValid
-                                  ? "bg-white dark:bg-slate-800 border-indigo-200 dark:border-slate-600 hover:border-indigo-400 dark:hover:border-indigo-500"
-                                  : "bg-slate-100 dark:bg-slate-700 border-slate-300 dark:border-slate-500 opacity-60"
-                          )}
-                        >
-                          <Checkbox
-                            checked={isValid}
-                            onCheckedChange={() => toggleWordValidation(null, item.word)}
+                        return (
+                          <motion.button
+                            key={`word-${index}`}
+                            type="button"
+                            initial={{ opacity: 0, scale: 0.9 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            transition={{ delay: Math.min(index * 0.02, 0.3) }}
+                            onClick={() => !isDuplicate && toggleWordValidation(null, item.word)}
                             disabled={isDuplicate}
                             className={cn(
-                              "w-6 h-6 data-[state=checked]:bg-gradient-to-r data-[state=checked]:from-indigo-600 data-[state=checked]:to-purple-600",
-                              isDuplicate && "opacity-30 cursor-not-allowed"
+                              "p-3 rounded-lg text-center transition-all border-2 cursor-pointer",
+                              isDuplicate
+                                ? "bg-orange-900/40 border-orange-500/50 opacity-50 cursor-not-allowed"
+                                : isValid
+                                  ? "bg-gradient-to-br from-cyan-600/80 to-teal-600/80 border-cyan-400/60 hover:border-cyan-300 shadow-lg shadow-cyan-500/20"
+                                  : "bg-slate-800/80 border-slate-600/50 hover:border-slate-500"
                             )}
-                          />
-                          <div className="flex items-center gap-2 flex-1 min-w-0">
+                          >
                             <span className={cn(
-                              "text-lg font-bold",
-                              isDuplicate && "line-through text-gray-400 dark:text-gray-600",
-                              !isDuplicate && !isValid && "text-gray-400 dark:text-gray-600"
+                              "text-xl font-bold block",
+                              isDuplicate ? "line-through text-orange-300/60" :
+                              isValid ? "text-white" : "text-slate-500"
                             )}>
-                              {applyHebrewFinalLetters(item.word)}
+                              {applyHebrewFinalLetters(item.word).toUpperCase()}
                             </span>
                             {isDuplicate && (
-                              <Badge className="bg-gradient-to-r from-orange-500 to-red-500 text-white border-0 shadow-md">
-                                ⚠ {item.playerCount} {t('joinView.players')}
-                              </Badge>
-                            )}
-                            {isAutoValidated && !isDuplicate && (
-                              <Badge className="bg-gradient-to-r from-cyan-500 to-blue-500 text-white border-0 shadow-md">
-                                ✓ {t('hostView.autoValidated')}
-                              </Badge>
-                            )}
-                            {item.playerCount === 1 && (
-                              <span className="text-sm font-medium text-slate-500 dark:text-slate-400 ml-auto truncate">
-                                {item.players[0]}
+                              <span className="text-xs text-orange-400 mt-1 block">
+                                {item.playerCount} {t('joinView.players')}
                               </span>
                             )}
-                          </div>
-                        </motion.div>
-                      );
-                    })}
-
-                    {/* Auto-Validated Words Summary - just show count, don't display the words */}
-                    {autoVerifiedWords.length > 0 && (
-                      <div className="mt-2 py-3 px-4 bg-gradient-to-r from-cyan-50 to-blue-50 dark:from-cyan-900/20 dark:to-blue-900/20 rounded-xl border-2 border-cyan-300 dark:border-cyan-700">
-                        <span className="text-sm font-semibold text-cyan-600 dark:text-cyan-400 flex items-center gap-2">
-                          <span className="text-lg">✓</span>
-                          {autoVerifiedWords.length} {t('hostView.wordsAutoValidated') || 'words auto-validated'}
-                        </span>
-                      </div>
-                    )}
+                          </motion.button>
+                        );
+                      })}
+                    </div>
                   </div>
+
+                  {/* Auto-validated summary */}
+                  {autoVerifiedWords.length > 0 && (
+                    <div className="flex-shrink-0 py-2 px-3 bg-teal-900/30 rounded-lg border border-teal-500/40 text-center">
+                      <span className="text-sm text-teal-300">
+                        ✓ {autoVerifiedWords.length} {t('hostView.wordsAutoValidated') || 'auto-validated'}
+                      </span>
+                    </div>
+                  )}
                 </div>
               );
             })()}
           </div>
-          <DialogFooter className="flex-shrink-0 mt-4 pt-4 border-t border-indigo-200 dark:border-indigo-800">
+
+          <DialogFooter className="flex-shrink-0 pt-3 border-t border-cyan-500/30">
             <Button
               onClick={submitValidation}
-              className="w-full h-14 text-xl font-bold bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 hover:from-indigo-700 hover:via-purple-700 hover:to-pink-700 shadow-lg hover:shadow-xl transition-all duration-200 text-white"
+              className="w-full h-12 text-lg font-bold bg-gradient-to-r from-cyan-500 to-teal-500 hover:from-cyan-400 hover:to-teal-400 shadow-lg shadow-cyan-500/30 hover:shadow-cyan-500/50 text-white"
             >
-              {t('hostView.submitValidation')} →
+              {t('hostView.submitValidation')}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -1682,6 +1638,7 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
                       if (regex.test(formedWord)) {
                         socket.emit('submitWord', {
                           word: formedWord.toLowerCase(),
+                          comboLevel: comboLevelRef.current,
                         });
                         setHostFoundWords(prev => [...prev, formedWord]);
                       } else {

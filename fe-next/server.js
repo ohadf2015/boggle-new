@@ -252,6 +252,17 @@ app.prepare().then(() => {
 
       console.log(`[Request] ${req.method} ${req.url} | pathname: ${pathname}`);
 
+      // Redirect locale-prefixed auth callbacks to the correct path
+      const locales = ['he', 'en', 'sv', 'ja'];
+      const authCallbackMatch = pathname.match(/^\/([a-z]{2})\/auth\/callback$/);
+      if (authCallbackMatch && locales.includes(authCallbackMatch[1])) {
+        const queryString = parsedUrl.search || '';
+        console.log(`[Redirect] Auth callback redirect: ${pathname} -> /auth/callback${queryString}`);
+        res.writeHead(307, { Location: `/auth/callback${queryString}` });
+        res.end();
+        return;
+      }
+
       // Manual redirect for root path (since middleware might be skipped in custom server)
       if (pathname === '/') {
         const acceptLanguage = req.headers['accept-language'];
