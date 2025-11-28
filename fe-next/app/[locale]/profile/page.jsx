@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { FaUser, FaArrowLeft, FaEdit, FaGamepad, FaTrophy, FaStar, FaCamera, FaTimes, FaCheck } from 'react-icons/fa';
+import { FaUser, FaArrowLeft, FaEdit, FaGamepad, FaTrophy, FaStar, FaCamera, FaTimes, FaCheck, FaClock } from 'react-icons/fa';
 import { useRouter } from 'next/navigation';
 import Header from '@/components/Header';
 import { Button } from '@/components/ui/button';
@@ -18,6 +18,19 @@ import { cn } from '@/lib/utils';
 import toast from 'react-hot-toast';
 
 export const dynamic = 'force-dynamic';
+
+// Format seconds into human-readable time (e.g., "2h 30m" or "45m")
+function formatTimePlayed(totalSeconds) {
+  if (!totalSeconds || totalSeconds <= 0) return '0m';
+
+  const hours = Math.floor(totalSeconds / 3600);
+  const minutes = Math.floor((totalSeconds % 3600) / 60);
+
+  if (hours > 0) {
+    return minutes > 0 ? `${hours}h ${minutes}m` : `${hours}h`;
+  }
+  return `${minutes}m`;
+}
 
 export default function ProfilePage() {
   const { theme } = useTheme();
@@ -363,7 +376,7 @@ export default function ProfilePage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
-          className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6"
+          className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 mb-6"
         >
           <StatCard
             icon={<FaGamepad />}
@@ -388,6 +401,12 @@ export default function ProfilePage() {
             icon={<span className="text-lg">📝</span>}
             label={t('profile.wordsFound')}
             value={profile?.total_words || 0}
+            isDarkMode={isDarkMode}
+          />
+          <StatCard
+            icon={<FaClock />}
+            label={t('profile.timePlayed')}
+            value={formatTimePlayed(profile?.total_time_played)}
             isDarkMode={isDarkMode}
           />
         </motion.div>

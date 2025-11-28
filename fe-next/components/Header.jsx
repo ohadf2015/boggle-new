@@ -33,12 +33,16 @@ const Header = ({ className = '' }) => {
             animate={{ y: 0, opacity: 1 }}
             transition={{ duration: 0.5, ease: "easeOut" }}
             className={cn(
-                "w-full mb-1 sm:mb-4 px-4 pt-2 sm:pt-3 pb-2 sticky top-0 z-50 transition-all duration-300",
-                isDarkMode
-                    ? "bg-slate-900/70 backdrop-blur-xl border-b border-white/10 shadow-lg shadow-black/20"
-                    : "bg-white/60 backdrop-blur-xl border-b border-black/5 shadow-lg shadow-black/5",
+                "w-full mb-1 sm:mb-4 px-4 pt-2 sm:pt-3 pb-4 sticky top-0 z-50 transition-all duration-300",
                 className
             )}
+            style={{
+                background: isDarkMode
+                    ? 'linear-gradient(to bottom, rgba(15, 23, 42, 0.85) 0%, rgba(15, 23, 42, 0.7) 60%, transparent 100%)'
+                    : 'linear-gradient(to bottom, rgba(255, 255, 255, 0.85) 0%, rgba(255, 255, 255, 0.6) 60%, transparent 100%)',
+                backdropFilter: 'blur(12px)',
+                WebkitBackdropFilter: 'blur(12px)',
+            }}
         >
             <div className="max-w-6xl mx-auto flex items-center justify-between">
                 {/* Logo */}

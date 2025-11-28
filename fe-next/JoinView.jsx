@@ -847,13 +847,6 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
                   </div>
                 ) : activeRooms.length === 0 ? (
                   <div className="text-center py-6 text-slate-500 dark:text-gray-400 space-y-4">
-                    <div className="flex justify-center">
-                      <FaGamepad size={48} className="text-slate-400 dark:text-slate-600" />
-                    </div>
-                    <div>
-                      <p className="text-sm font-medium">{t('joinView.noRooms')}</p>
-                      <p className="text-xs mt-1">{t('joinView.createNewRoom')}</p>
-                    </div>
                     <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                       <Button
                         onClick={() => handleModeChange('host')}
@@ -863,6 +856,13 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
                         {t('joinView.createRoom')}
                       </Button>
                     </motion.div>
+                    <div className="flex justify-center">
+                      <FaGamepad size={48} className="text-slate-400 dark:text-slate-600" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium">{t('joinView.noRooms')}</p>
+                      <p className="text-xs mt-1">{t('joinView.createNewRoom')}</p>
+                    </div>
                   </div>
                 ) : (
                   <div className="space-y-2">

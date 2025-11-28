@@ -51,7 +51,8 @@ async function recordGameResult(result) {
         longest_word: result.longestWord || null,
         placement: result.placement,
         is_ranked: result.isRanked || false,
-        language: result.language || 'en'
+        language: result.language || 'en',
+        time_played: result.timePlayed || 0
       })
       .select()
       .single();
@@ -93,6 +94,7 @@ async function updatePlayerStats(playerId, gameStats) {
     total_games: (profile.total_games || 0) + 1,
     total_score: (profile.total_score || 0) + (gameStats.score || 0),
     total_words: (profile.total_words || 0) + (gameStats.wordCount || 0),
+    total_time_played: (profile.total_time_played || 0) + (gameStats.timePlayed || 0),
     last_game_at: new Date().toISOString()
   };
 
@@ -275,13 +277,14 @@ async function updateGuestStats(tokenHash, gameStats) {
     return getOrCreateGuestToken(tokenHash);
   }
 
-  const currentStats = token.stats || { games: 0, score: 0, words: 0, achievementCounts: {} };
+  const currentStats = token.stats || { games: 0, score: 0, words: 0, timePlayed: 0, achievementCounts: {} };
 
   // Update stats
   const updatedStats = {
     games: (currentStats.games || 0) + 1,
     score: (currentStats.score || 0) + (gameStats.score || 0),
     words: (currentStats.words || 0) + (gameStats.wordCount || 0),
+    timePlayed: (currentStats.timePlayed || 0) + (gameStats.timePlayed || 0),
     longestWord: gameStats.longestWord &&
       (!currentStats.longestWord || gameStats.longestWord.length > currentStats.longestWord.length)
       ? gameStats.longestWord
@@ -312,7 +315,7 @@ async function updateGuestStats(tokenHash, gameStats) {
  * Process game results for all players after a game ends
  * @param {string} gameCode - Game code
  * @param {array} scores - Array of { username, score, wordCount, longestWord, placement, achievements }
- * @param {object} gameInfo - Game metadata { language, isRanked }
+ * @param {object} gameInfo - Game metadata { language, isRanked, timePlayed }
  * @param {object} userAuthMap - Map of username to { authUserId, guestTokenHash }
  */
 async function processGameResults(gameCode, scores, gameInfo, userAuthMap) {
@@ -336,7 +339,8 @@ async function processGameResults(gameCode, scores, gameInfo, userAuthMap) {
       placement: playerScore.placement,
       achievements: playerScore.achievements || [],
       isRanked: gameInfo.isRanked || false,
-      totalPlayers: scores.length
+      totalPlayers: scores.length,
+      timePlayed: gameInfo.timePlayed || 0
     };
 
     try {

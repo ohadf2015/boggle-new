@@ -1580,13 +1580,18 @@ async function recordGameResultsToSupabase(gameCode, scoresArray, game) {
       return;
     }
 
+    // Calculate time played (in seconds)
+    // Use the original timer setting since that's how long the round lasted
+    const timePlayed = game.timerSeconds || 180;
+
     // Process game results
     await processGameResults(
       gameCode,
       scoresWithPlacement,
       {
         language: game.language || 'en',
-        isRanked: game.isRanked || false
+        isRanked: game.isRanked || false,
+        timePlayed
       },
       userAuthMap
     );

@@ -48,20 +48,9 @@ export function MusicProvider({ children }) {
 
     const [currentTrack, setCurrentTrack] = useState(null);
     const [isPlaying, setIsPlaying] = useState(false);
-    const [audioUnlocked, setAudioUnlocked] = useState(() => {
-        if (typeof window !== 'undefined') {
-            try {
-                const saved = localStorage.getItem(STORAGE_KEY);
-                if (saved) {
-                    const { audioUnlocked: savedUnlocked } = JSON.parse(saved);
-                    return savedUnlocked ?? false;
-                }
-            } catch (e) {
-                console.warn('Failed to load audio unlock state:', e);
-            }
-        }
-        return false;
-    });
+    // audioUnlocked is session-based, NOT persisted to localStorage
+    // Browser AudioContext resets between sessions, so we must always start locked
+    const [audioUnlocked, setAudioUnlocked] = useState(false);
 
     // Ref to track audioUnlocked state without causing re-renders
     const audioUnlockedRef = useRef(false);
@@ -124,16 +113,16 @@ export function MusicProvider({ children }) {
         return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
     }, []);
 
-    // Persist settings to localStorage
+    // Persist settings to localStorage (volume and mute only, NOT audioUnlocked)
     useEffect(() => {
         if (typeof window !== 'undefined') {
             try {
-                localStorage.setItem(STORAGE_KEY, JSON.stringify({ volume, isMuted, audioUnlocked }));
+                localStorage.setItem(STORAGE_KEY, JSON.stringify({ volume, isMuted }));
             } catch (e) {
                 console.warn('Failed to save music settings:', e);
             }
         }
-    }, [volume, isMuted, audioUnlocked]);
+    }, [volume, isMuted]);
 
     // Auto-unlock audio on first user interaction anywhere in the app
     useEffect(() => {
