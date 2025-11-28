@@ -14,7 +14,8 @@ const GridComponent = ({
     largeText = false,
     playerView = false,
     comboLevel = 0,
-    animateOnMount = false // When true, adds a slot machine style cascade animation on initial render
+    animateOnMount = false, // When true, adds a slot machine style cascade animation on initial render
+    heatMapData = null // { cellUsageCounts: { "row,col": count }, maxCount: number } for results heat map
 }) => {
     const [internalSelectedCells, setInternalSelectedCells] = useState([]);
     const [fadingCells, setFadingCells] = useState([]); // Track cells that are fading out
@@ -490,6 +491,54 @@ const GridComponent = ({
     };
 
     const comboColors = getComboColors(comboLevel);
+
+    // Get heat map style - glowing thermal overlay effect (red-pink-orange-yellow scheme)
+    const getHeatMapStyle = (row, col) => {
+        if (!heatMapData || !heatMapData.cellUsageCounts) return null;
+        const key = `${row},${col}`;
+        const count = heatMapData.cellUsageCounts[key] || 0;
+        if (count === 0) return null;
+
+        const maxCount = heatMapData.maxCount || 1;
+        const t = count / maxCount; // 0 to 1
+
+        // Heat map: dark red -> red -> pink/magenta -> orange -> yellow -> white-hot
+        let r, g, b;
+
+        if (t < 0.2) {
+            // Dark red to red
+            const p = t / 0.2;
+            r = Math.round(120 + p * 135);
+            g = 0;
+            b = Math.round(p * 30);
+        } else if (t < 0.4) {
+            // Red to pink/magenta
+            const p = (t - 0.2) / 0.2;
+            r = 255;
+            g = Math.round(p * 50);
+            b = Math.round(30 + p * 100);
+        } else if (t < 0.6) {
+            // Pink to orange
+            const p = (t - 0.4) / 0.2;
+            r = 255;
+            g = Math.round(50 + p * 100);
+            b = Math.round(130 - p * 130);
+        } else if (t < 0.8) {
+            // Orange to yellow
+            const p = (t - 0.6) / 0.2;
+            r = 255;
+            g = Math.round(150 + p * 105);
+            b = 0;
+        } else {
+            // Yellow to white-hot
+            const p = (t - 0.8) / 0.2;
+            r = 255;
+            g = 255;
+            b = Math.round(p * 180);
+        }
+
+        return { r, g, b, t };
+    };
 
     // Calculate cell positions for drawing trails
     const getCellCenter = (rowIndex, colIndex) => {
@@ -1003,6 +1052,48 @@ const GridComponent = ({
                                 </>
                             </>
                             )}
+                            {/* Heat map glow overlay for results page */}
+                            {(() => {
+                                const heatStyle = getHeatMapStyle(i, j);
+                                if (!heatStyle) return null;
+                                const { r, g, b, t } = heatStyle;
+                                return (
+                                    <>
+                                        {/* Outer glow layer */}
+                                        <div
+                                            className="absolute pointer-events-none"
+                                            style={{
+                                                inset: '-50%',
+                                                background: `radial-gradient(circle, rgba(${r}, ${g}, ${b}, ${0.5 + t * 0.3}) 0%, rgba(${r}, ${g}, ${b}, 0.1) 50%, transparent 70%)`,
+                                                filter: `blur(${8 + t * 12}px)`,
+                                                zIndex: 5
+                                            }}
+                                        />
+                                        {/* Inner core glow */}
+                                        <div
+                                            className="absolute pointer-events-none"
+                                            style={{
+                                                inset: '-20%',
+                                                background: `radial-gradient(circle, rgba(${r}, ${g}, ${b}, ${0.6 + t * 0.35}) 0%, rgba(${r}, ${g}, ${b}, 0.2) 60%, transparent 80%)`,
+                                                filter: `blur(${3 + t * 5}px)`,
+                                                zIndex: 6
+                                            }}
+                                        />
+                                        {/* Hot center spot for high values */}
+                                        {t > 0.5 && (
+                                            <div
+                                                className="absolute pointer-events-none"
+                                                style={{
+                                                    inset: '10%',
+                                                    background: `radial-gradient(circle, rgba(255, ${Math.round(200 + t * 55)}, ${Math.round(t * 200)}, ${0.4 + t * 0.4}) 0%, transparent 70%)`,
+                                                    filter: `blur(${2 + t * 3}px)`,
+                                                    zIndex: 7
+                                                }}
+                                            />
+                                        )}
+                                    </>
+                                );
+                            })()}
                             {cell}
                         </motion.div>
                     );

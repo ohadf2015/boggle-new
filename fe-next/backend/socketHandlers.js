@@ -33,6 +33,9 @@ const {
   setTournamentIdForGame
 } = require('./modules/gameStateManager');
 
+const { processGameResults, isSupabaseConfigured } = require('./modules/supabaseServer');
+const { invalidateLeaderboardCaches } = require('./redisClient');
+
 const {
   broadcastToRoom,
   broadcastToRoomExceptSender,
@@ -57,6 +60,7 @@ const tournamentManager = require('./modules/tournamentManager');
 const { cleanupPlayerData } = require('./utils/playerCleanup');
 const { emitError, ErrorMessages } = require('./utils/errorHandler');
 const { inc, incPerGame, ensureGame } = require('./utils/metrics');
+const { DIFFICULTIES } = require('../utils/consts');
 
 // Game configuration constants
 const MAX_PLAYERS_PER_ROOM = 50; // Maximum number of players allowed in a single room
@@ -109,9 +113,9 @@ function initializeSocketHandlers(io) {
         socket.emit('rateLimited');
         return;
       }
-      const { gameCode, roomName, language, hostUsername, playerId, avatar } = data;
+      const { gameCode, roomName, language, hostUsername, playerId, avatar, authUserId, guestTokenHash, isRanked } = data;
 
-      console.log(`[SOCKET] Create game request: ${gameCode} by ${hostUsername}`);
+      console.log(`[SOCKET] Create game request: ${gameCode} by ${hostUsername}${isRanked ? ' (RANKED)' : ''}`);
 
       // Validate game code
       if (!gameCode || gameCode.length !== 4) {
@@ -125,33 +129,38 @@ function initializeSocketHandlers(io) {
         return;
       }
 
-      // Create the game
+      // Create the game with ranked mode settings
       const game = createGame(gameCode, {
         hostSocketId: socket.id,
         hostUsername: hostUsername || 'Host',
         hostPlayerId: playerId,
         roomName: roomName || gameCode,
-        language: language || 'en'
+        language: language || 'en',
+        isRanked: isRanked || false,
+        allowLateJoin: isRanked ? false : true // Ranked games don't allow late joins
       });
 
-      // Add host as first user
+      // Add host as first user with auth context
       addUserToGame(gameCode, hostUsername || 'Host', socket.id, {
         avatar: avatar || generateRandomAvatar(),
         isHost: true,
-        playerId
+        playerId,
+        authUserId: authUserId || null,
+        guestTokenHash: guestTokenHash || null
       });
 
       // Join the socket to the game room
       joinRoom(socket, getGameRoom(gameCode));
 
-      // Confirm game creation
+      // Confirm game creation - include users list to avoid race condition
       socket.emit('joined', {
         success: true,
         gameCode,
         isHost: true,
         username: hostUsername || 'Host',
         roomName: roomName || gameCode,
-        language: language || 'en'
+        language: language || 'en',
+        users: getGameUsers(gameCode)
       });
 
       ensureGame(gameCode);
@@ -180,7 +189,7 @@ function initializeSocketHandlers(io) {
         socket.emit('rateLimited');
         return;
       }
-      const { gameCode, username, playerId, avatar } = data;
+      const { gameCode, username, playerId, avatar, authUserId, guestTokenHash } = data;
 
       console.log(`[SOCKET] Join request: ${username} to game ${gameCode}`);
 
@@ -194,6 +203,16 @@ function initializeSocketHandlers(io) {
       if (!game) {
         emitError(socket, ErrorMessages.GAME_NOT_FOUND);
         return;
+      }
+
+      // Block late joins for ranked games that are in progress
+      if (game.isRanked && game.gameState === 'in-progress' && !game.allowLateJoin) {
+        const existingSocketId = getSocketIdByUsername(gameCode, username);
+        // Allow reconnection but not new joins
+        if (!existingSocketId) {
+          emitError(socket, 'Cannot join ranked game in progress');
+          return;
+        }
       }
 
       // Check for existing user (reconnection)
@@ -235,7 +254,7 @@ function initializeSocketHandlers(io) {
         // Join room
         joinRoom(socket, getGameRoom(gameCode));
 
-        // Send current game state
+        // Send current game state - include users list to avoid race condition
         socket.emit('joined', {
           success: true,
           gameCode,
@@ -243,7 +262,8 @@ function initializeSocketHandlers(io) {
           username,
           roomName: game.roomName,
           language: game.language,
-          reconnected: true
+          reconnected: true,
+          users: getGameUsers(gameCode)
         });
 
         // If game is in progress, send current state with remaining time
@@ -252,6 +272,7 @@ function initializeSocketHandlers(io) {
             letterGrid: game.letterGrid,
             timerSeconds: game.remainingTime || game.timerSeconds, // Use remaining time if available
             language: game.language,
+            minWordLength: game.minWordLength || 2,
             messageId: 'reconnect-' + Date.now(),
             reconnect: true,
             skipAck: true // Reconnecting players don't need to participate in game start coordination
@@ -265,24 +286,27 @@ function initializeSocketHandlers(io) {
         return;
       }
 
-      // Add new user
+      // Add new user with auth context
       addUserToGame(gameCode, username, socket.id, {
         avatar: avatar || generateRandomAvatar(),
         isHost: false,
-        playerId
+        playerId,
+        authUserId: authUserId || null,
+        guestTokenHash: guestTokenHash || null
       });
 
       // Join room
       joinRoom(socket, getGameRoom(gameCode));
 
-      // Confirm join
+      // Confirm join - include users list to avoid race condition
       socket.emit('joined', {
         success: true,
         gameCode,
         isHost: false,
         username,
         roomName: game.roomName,
-        language: game.language
+        language: game.language,
+        users: getGameUsers(gameCode)
       });
 
       // If game is in progress, allow player to join mid-game
@@ -294,6 +318,7 @@ function initializeSocketHandlers(io) {
           letterGrid: game.letterGrid,
           timerSeconds: game.remainingTime || game.timerSeconds, // Use remaining time if available
           language: game.language,
+          minWordLength: game.minWordLength || 2,
           messageId: 'late-join-' + Date.now(),
           lateJoin: true,
           skipAck: true // Late-joining players don't need to participate in game start coordination
@@ -302,6 +327,37 @@ function initializeSocketHandlers(io) {
         // Send current leaderboard
         const leaderboard = getLeaderboard(gameCode);
         socket.emit('updateLeaderboard', { leaderboard });
+      }
+
+      // Add to tournament if one is active (mid-tournament join)
+      const tournamentId = getTournamentIdFromGame(gameCode);
+      if (tournamentId) {
+        try {
+          const userAvatar = avatar || generateRandomAvatar();
+          tournamentManager.addPlayerMidTournament(tournamentId, socket.id, username, userAvatar);
+
+          // Send tournament info to the joining player
+          const tournament = tournamentManager.getTournament(tournamentId);
+          const standings = tournamentManager.getTournamentStandings(tournamentId);
+          socket.emit('tournamentInfo', {
+            tournament: {
+              id: tournament.id,
+              name: tournament.name,
+              totalRounds: tournament.totalRounds,
+              currentRound: tournament.currentRound,
+              status: tournament.status
+            },
+            standings
+          });
+
+          // Notify others that a new player joined the tournament
+          broadcastToRoomExceptSender(socket, getGameRoom(gameCode), 'tournamentPlayerJoined', {
+            username,
+            standings
+          });
+        } catch (err) {
+          console.log(`[TOURNAMENT] Could not add ${username} to tournament: ${err.message}`);
+        }
       }
 
       // Broadcast user list update
@@ -321,7 +377,7 @@ function initializeSocketHandlers(io) {
         socket.emit('rateLimited');
         return;
       }
-      const { letterGrid, timerSeconds, language } = data;
+      const { letterGrid, timerSeconds, language, minWordLength } = data;
 
       const gameCode = getGameBySocketId(socket.id);
       if (!gameCode) {
@@ -345,8 +401,11 @@ function initializeSocketHandlers(io) {
       updateGame(gameCode, {
         letterGrid,
         timerSeconds: timerSeconds || 180,
+        remainingTime: timerSeconds || 180,  // Initialize remaining time for late joiners
         language: language || game.language,
-        gameState: 'in-progress'
+        minWordLength: minWordLength || 2,  // Minimum word length setting
+        gameState: 'in-progress',
+        gameStartedAt: Date.now()  // Track when game started for debugging
       });
 
       // Precompute letter positions for faster validation
@@ -369,6 +428,7 @@ function initializeSocketHandlers(io) {
         letterGrid,
         timerSeconds: timerSeconds || 180,
         language: language || game.language,
+        minWordLength: minWordLength || 2,
         messageId
       });
 
@@ -418,6 +478,16 @@ function initializeSocketHandlers(io) {
       if (!game || game.gameState !== 'in-progress') return;
 
       const normalizedWord = word.toLowerCase().trim();
+
+      // Validate minimum word length
+      const minLength = game.minWordLength || 2;
+      if (normalizedWord.length < minLength) {
+        socket.emit('wordTooShort', {
+          word: normalizedWord,
+          minLength: minLength
+        });
+        return;
+      }
 
       // Check if already found
       if (playerHasWord(gameCode, username, normalizedWord)) {
@@ -661,6 +731,9 @@ function initializeSocketHandlers(io) {
           console.log(`[SOCKET] Word "${word}" (${language}) approved in game ${gameCode} (${approvalData.approvalCount}/2 approvals needed)`);
         }
       }
+
+      // Record game results to Supabase for leaderboard/stats
+      await recordGameResultsToSupabase(gameCode, scoresArray, game);
     });
 
     // Handle reset game
@@ -678,12 +751,22 @@ function initializeSocketHandlers(io) {
       // Stop any running timers
       timerManager.clearGameTimer(gameCode);
 
+      // Clean up any active game start sequence from previous game
+      // This prevents race conditions when starting a new game quickly
+      gameStartCoordinator.cleanupSequence(gameCode);
+
       // Reset game state
       resetGameForNewRound(gameCode);
 
       // Broadcast reset
       broadcastToRoom(io, getGameRoom(gameCode), 'resetGame', {
         message: 'Game has been reset. Get ready for a new round!'
+      });
+
+      // Broadcast updated user list to ensure all clients have correct player data
+      // This helps players who may have stale state after the reset
+      broadcastToRoom(io, getGameRoom(gameCode), 'updateUsers', {
+        users: getGameUsers(gameCode)
       });
 
       console.log(`[SOCKET] Game ${gameCode} reset`);
@@ -752,7 +835,7 @@ function initializeSocketHandlers(io) {
         emitError(socket, ErrorMessages.RATE_LIMIT_EXCEEDED);
         return;
       }
-      const { name, totalRounds } = data;
+      const { name, totalRounds, timerSeconds, difficulty, language } = data;
 
       const gameCode = getGameBySocketId(socket.id);
       if (!gameCode) return;
@@ -760,8 +843,25 @@ function initializeSocketHandlers(io) {
       const game = getGame(gameCode);
       if (!game || game.hostSocketId !== socket.id) return;
 
-      const tournament = tournamentManager.createTournament(name, gameCode, totalRounds);
+      // Create tournament with correct signature: hostPlayerId, hostUsername, settings
+      const tournament = tournamentManager.createTournament(socket.id, game.hostUsername, {
+        name: name || 'Tournament',
+        totalRounds: totalRounds || 3,
+        timerSeconds: timerSeconds || 180,
+        difficulty: difficulty || 'medium',
+        language: language || 'en',
+      });
       setTournamentIdForGame(gameCode, tournament.id);
+
+      // Add all current players to the tournament
+      Object.entries(game.users).forEach(([username, userData]) => {
+        const playerSocketId = Object.keys(game.playerSocketIds || {}).find(
+          id => game.playerSocketIds[id] === username
+        );
+        if (playerSocketId) {
+          tournamentManager.addPlayerToTournament(tournament.id, playerSocketId, username, userData.avatar);
+        }
+      });
 
       broadcastToRoom(io, getGameRoom(gameCode), 'tournamentCreated', {
         tournament: {
@@ -771,6 +871,81 @@ function initializeSocketHandlers(io) {
           currentRound: tournament.currentRound
         }
       });
+    });
+
+    // Start a tournament round
+    socket.on('startTournamentRound', () => {
+      if (!checkRateLimit(socket.id)) {
+        emitError(socket, ErrorMessages.RATE_LIMIT_EXCEEDED);
+        return;
+      }
+
+      const gameCode = getGameBySocketId(socket.id);
+      if (!gameCode) return;
+
+      const game = getGame(gameCode);
+      if (!game || game.hostSocketId !== socket.id) return;
+
+      const tournamentId = getTournamentIdFromGame(gameCode);
+      if (!tournamentId) return;
+
+      const tournament = tournamentManager.getTournament(tournamentId);
+      if (!tournament) return;
+
+      // Check if tournament is already complete
+      if (tournament.currentRound >= tournament.totalRounds) {
+        socket.emit('tournamentComplete', {
+          standings: tournamentManager.getTournamentStandings(tournamentId)
+        });
+        return;
+      }
+
+      try {
+        // Start the round in tournament manager
+        const roundData = tournamentManager.startTournamentRound(tournamentId, gameCode);
+
+        // Get standings for display
+        const standings = tournamentManager.getTournamentStandings(tournamentId);
+
+        // Broadcast round starting to all players
+        broadcastToRoom(io, getGameRoom(gameCode), 'tournamentRoundStarting', {
+          roundNumber: roundData.roundNumber,
+          totalRounds: tournament.totalRounds,
+          standings: standings
+        });
+
+        // Generate new grid and start the game
+        const { generateRandomTable } = require('../utils/utils');
+        const difficultyKey = (tournament.settings.difficulty || 'HARD').toUpperCase();
+        const difficultyConfig = DIFFICULTIES[difficultyKey] || DIFFICULTIES.HARD;
+        const newTable = generateRandomTable(difficultyConfig.rows, difficultyConfig.cols, tournament.settings.language);
+        const timerSeconds = tournament.settings.timerSeconds;
+
+        // Reset game state for new round
+        resetGameForNewRound(gameCode);
+
+        // Update game state
+        game.letterGrid = newTable;
+        game.gameState = 'playing';
+        game.minWordLength = game.minWordLength || 2;
+
+        // Start the game
+        broadcastToRoom(io, getGameRoom(gameCode), 'startGame', {
+          letterGrid: newTable,
+          timerSeconds: timerSeconds,
+          language: tournament.settings.language,
+          hostPlaying: game.hostPlaying,
+          minWordLength: game.minWordLength
+        });
+
+        // Start timer
+        startGameTimer(io, gameCode, timerSeconds);
+
+        console.log(`[TOURNAMENT] Started round ${roundData.roundNumber}/${tournament.totalRounds} for game ${gameCode}`);
+      } catch (err) {
+        console.error('[TOURNAMENT] Error starting round:', err);
+        socket.emit('error', { message: err?.message || String(err) || 'Failed to start tournament round' });
+      }
     });
 
     socket.on('getTournamentStandings', () => {
@@ -784,7 +959,7 @@ function initializeSocketHandlers(io) {
       const tournamentId = getTournamentIdFromGame(gameCode);
       if (!tournamentId) return;
 
-      const standings = tournamentManager.getStandings(tournamentId);
+      const standings = tournamentManager.getTournamentStandings(tournamentId);
       socket.emit('tournamentStandings', { standings });
     });
 
@@ -917,6 +1092,21 @@ function initializeSocketHandlers(io) {
         // Handle game start coordination
         gameStartCoordinator.handlePlayerDisconnect(gameCode, username);
 
+        // Remove player from tournament if active
+        const tournamentId = getTournamentIdFromGame(gameCode);
+        if (tournamentId) {
+          const removed = tournamentManager.removePlayerFromTournament(tournamentId, socket.id, true);
+          if (removed) {
+            console.log(`[TOURNAMENT] Removed disconnected player ${username} from tournament ${tournamentId}`);
+            // Broadcast updated standings
+            const standings = tournamentManager.getTournamentStandings(tournamentId);
+            broadcastToRoom(io, getGameRoom(gameCode), 'tournamentPlayerLeft', {
+              username,
+              standings
+            });
+          }
+        }
+
         // Clean up empty rooms and broadcast updated room list
         const cleanedCount = cleanupEmptyRooms();
         if (cleanedCount > 0) {
@@ -995,7 +1185,7 @@ function startGameTimer(io, gameCode, timerSeconds) {
   timerManager.setGameTimer(gameCode, timerId);
 
   // Broadcast that game has officially started (timer running)
-  broadcastToRoom(io, getGameRoom(gameCode), 'gameStarted', {
+  broadcastToRoom(io, getGameRoom(gameCode), 'startGame', {
     timerSeconds: remainingTime
   });
 }
@@ -1048,6 +1238,11 @@ function endGame(io, gameCode) {
     }
   });
 
+  // Check if there are any non-auto-validated words that need host review
+  const hasNonAutoValidatedWords = allPlayerWords.some(player =>
+    player.words.some(w => !w.autoValidated)
+  );
+
   // Send validation data to host
   const hostSocketId = game.hostSocketId;
   if (hostSocketId) {
@@ -1056,10 +1251,11 @@ function endGame(io, gameCode) {
       safeEmit(hostSocket, 'showValidation', {
         playerWords: allPlayerWords,
         autoValidatedCount,
-        totalWords: uniqueWords.size
+        totalWords: uniqueWords.size,
+        skipValidation: !hasNonAutoValidatedWords  // Skip validation screen if all words are auto-validated
       });
 
-      console.log(`[SOCKET] Sent showValidation to host for game ${gameCode} - ${uniqueWords.size} unique words, ${autoValidatedCount} auto-validated`);
+      console.log(`[SOCKET] Sent showValidation to host for game ${gameCode} - ${uniqueWords.size} unique words, ${autoValidatedCount} auto-validated, skipValidation: ${!hasNonAutoValidatedWords}`);
     }
   }
 
@@ -1166,6 +1362,9 @@ function endGame(io, gameCode) {
           });
         }
       }
+
+      // Record game results to Supabase for leaderboard/stats (auto-validation case)
+      recordGameResultsToSupabase(gameCode, scoresArray, currentGame);
     }
   }, timeoutDuration);
 
@@ -1174,8 +1373,23 @@ function endGame(io, gameCode) {
 
   // Check for tournament
   if (tournamentId) {
-    // Record round results
-    const standings = tournamentManager.recordRoundResults(tournamentId, scores);
+    // Record round results - convert scores object to round results format
+    const roundResults = {};
+    Object.keys(scores).forEach(username => {
+      // Find the player's socket ID
+      const playerSocketId = Object.keys(game.playerSocketIds || {}).find(
+        id => game.playerSocketIds[id] === username
+      );
+      if (playerSocketId) {
+        roundResults[playerSocketId] = {
+          score: scores[username],
+          words: (game.playerWords && game.playerWords[username]) || []
+        };
+      }
+    });
+
+    tournamentManager.completeTournamentRound(tournamentId, roundResults);
+    const standings = tournamentManager.getTournamentStandings(tournamentId);
     const tournament = tournamentManager.getTournament(tournamentId);
 
     if (tournament && tournament.currentRound >= tournament.totalRounds) {
@@ -1205,6 +1419,72 @@ function endGame(io, gameCode) {
   }
 
   console.log(`[SOCKET] Game ${gameCode} ended`);
+}
+
+/**
+ * Record game results to Supabase for leaderboard and stats
+ * @param {string} gameCode - Game code
+ * @param {array} scoresArray - Array of player scores with metadata
+ * @param {object} game - Game object
+ */
+async function recordGameResultsToSupabase(gameCode, scoresArray, game) {
+  if (!isSupabaseConfigured()) {
+    return;
+  }
+
+  try {
+    // Build scores with placement and additional metadata
+    const scoresWithPlacement = scoresArray.map((playerScore, index) => {
+      const validPlayerWords = playerScore.allWords?.filter(w => w.validated && !w.isDuplicate) || [];
+      const longestWord = validPlayerWords.length > 0
+        ? validPlayerWords.reduce((longest, w) => w.word.length > longest.length ? w.word : longest, '')
+        : '';
+
+      return {
+        username: playerScore.username,
+        score: playerScore.score,
+        wordCount: validPlayerWords.length,
+        longestWord,
+        placement: index + 1, // 1-based placement
+        achievements: game.playerAchievements?.[playerScore.username] || []
+      };
+    });
+
+    // Build auth map from game users
+    const userAuthMap = {};
+    for (const [username, userData] of Object.entries(game.users || {})) {
+      if (userData.authUserId || userData.guestTokenHash) {
+        userAuthMap[username] = {
+          authUserId: userData.authUserId || null,
+          guestTokenHash: userData.guestTokenHash || null
+        };
+      }
+    }
+
+    // Only process if there are users with auth context
+    if (Object.keys(userAuthMap).length === 0) {
+      console.log(`[SUPABASE] No authenticated users in game ${gameCode}, skipping result recording`);
+      return;
+    }
+
+    // Process game results
+    await processGameResults(
+      gameCode,
+      scoresWithPlacement,
+      {
+        language: game.language || 'en',
+        isRanked: game.isRanked || false
+      },
+      userAuthMap
+    );
+
+    // Invalidate leaderboard cache after recording results
+    await invalidateLeaderboardCaches();
+
+    console.log(`[SUPABASE] Recorded game results for ${gameCode} - ${scoresWithPlacement.length} players`);
+  } catch (error) {
+    console.error(`[SUPABASE] Error recording game results for ${gameCode}:`, error);
+  }
 }
 
 module.exports = { initializeSocketHandlers };

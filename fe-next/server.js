@@ -144,6 +144,106 @@ app.prepare().then(() => {
     res.json({ ok: true });
   });
 
+  // Leaderboard API endpoints
+  const { getSupabase, isSupabaseConfigured } = require('./backend/modules/supabaseServer');
+  const { getCachedLeaderboardTop100, cacheLeaderboardTop100, getCachedUserRank, cacheUserRank } = require('./backend/redisClient');
+
+  // GET /api/leaderboard - Get top 100 leaderboard
+  server.get('/api/leaderboard', async (_req, res) => {
+    try {
+      if (!isSupabaseConfigured()) {
+        return res.status(503).json({ error: 'Leaderboard service not available' });
+      }
+
+      // Try cache first
+      const cached = await getCachedLeaderboardTop100();
+      if (cached) {
+        return res.json({ data: cached, cached: true });
+      }
+
+      // Fetch from Supabase
+      const supabase = getSupabase();
+      const { data, error } = await supabase
+        .from('leaderboard')
+        .select('player_id, username, avatar_emoji, avatar_color, total_score, games_played, games_won, ranked_mmr')
+        .order('total_score', { ascending: false })
+        .limit(100);
+
+      if (error) {
+        console.error('[API] Leaderboard fetch error:', error);
+        return res.status(500).json({ error: 'Failed to fetch leaderboard' });
+      }
+
+      // Cache the result
+      if (data) {
+        await cacheLeaderboardTop100(data);
+      }
+
+      res.json({ data: data || [], cached: false });
+    } catch (error) {
+      console.error('[API] Leaderboard error:', error);
+      res.status(500).json({ error: 'Internal server error' });
+    }
+  });
+
+  // GET /api/leaderboard/rank/:userId - Get a specific user's rank
+  server.get('/api/leaderboard/rank/:userId', async (req, res) => {
+    try {
+      if (!isSupabaseConfigured()) {
+        return res.status(503).json({ error: 'Leaderboard service not available' });
+      }
+
+      const { userId } = req.params;
+      if (!userId) {
+        return res.status(400).json({ error: 'User ID required' });
+      }
+
+      // Try cache first
+      const cached = await getCachedUserRank(userId);
+      if (cached) {
+        return res.json({ data: cached, cached: true });
+      }
+
+      // Fetch from Supabase using a window function to get rank
+      const supabase = getSupabase();
+
+      // First get the user's total score
+      const { data: userData, error: userError } = await supabase
+        .from('leaderboard')
+        .select('player_id, username, total_score, games_played')
+        .eq('player_id', userId)
+        .single();
+
+      if (userError || !userData) {
+        return res.status(404).json({ error: 'User not found in leaderboard' });
+      }
+
+      // Count how many users have a higher score to get rank
+      const { count, error: countError } = await supabase
+        .from('leaderboard')
+        .select('*', { count: 'exact', head: true })
+        .gt('total_score', userData.total_score);
+
+      if (countError) {
+        console.error('[API] Rank count error:', countError);
+        return res.status(500).json({ error: 'Failed to calculate rank' });
+      }
+
+      const rankData = {
+        ...userData,
+        rank_position: (count || 0) + 1
+      };
+
+      // Cache the result
+      await cacheUserRank(userId, rankData);
+
+      res.json({ data: rankData, cached: false });
+    } catch (error) {
+      console.error('[API] User rank error:', error);
+      res.status(500).json({ error: 'Internal server error' });
+    }
+  });
+
   // Next.js handler for all other routes
   server.use(async (req, res) => {
     try {

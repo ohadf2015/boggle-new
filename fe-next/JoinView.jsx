@@ -180,7 +180,7 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
           transition={{ type: 'spring', stiffness: 260, damping: 20 }}
           className="w-full max-w-md"
         >
-          <Card className="backdrop-blur-md bg-white/90 dark:bg-slate-800/90 shadow-2xl border border-cyan-500/30">
+          <Card className="backdrop-blur-md bg-white/90 h-full dark:bg-slate-800/90 shadow-2xl border border-cyan-500/30">
             <CardHeader className="text-center space-y-4">
               <div className="flex justify-center">
                 <motion.div
@@ -707,8 +707,7 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
             className="flex-1 relative z-10"
           >
             <Card className={cn(
-              "backdrop-blur-md bg-white/90 dark:bg-slate-800/90 shadow-xl flex flex-col border border-teal-500/30",
-              activeRooms.length === 0 ? "h-auto" : "h-full max-h-[300px] md:max-h-[500px]"
+              "backdrop-blur-md bg-white/90 dark:bg-slate-800/90 shadow-xl flex h-full flex-col border border-teal-500/30",
             )}>
               <CardHeader>
                 <div className="flex h-full justify-between items-center">

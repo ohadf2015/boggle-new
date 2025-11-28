@@ -2,13 +2,16 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTheme } from '../utils/ThemeContext';
 import { useLanguage } from '../contexts/LanguageContext';
-import { FaSun, FaMoon, FaGlobe, FaChevronDown } from 'react-icons/fa';
+import { FaSun, FaMoon, FaGlobe, FaChevronDown, FaTrophy } from 'react-icons/fa';
 import { Button } from './ui/button';
 import { cn } from '../lib/utils';
+import AuthButton from './auth/AuthButton';
+import { useRouter } from 'next/navigation';
 
-const Header = ({ className = '' }) => {
+const Header = ({ className = '', showLeaderboardLink = true }) => {
     const { theme, toggleTheme } = useTheme();
     const { t, language, setLanguage } = useLanguage();
+    const router = useRouter();
     const [showLanguageMenu, setShowLanguageMenu] = useState(false);
     const isDarkMode = theme === 'dark';
 
@@ -88,8 +91,30 @@ const Header = ({ className = '' }) => {
                     </motion.h1>
                 </div>
 
-                {/* Controls: Language Selector + Theme Toggle */}
+                {/* Controls: Leaderboard + Auth + Language Selector + Theme Toggle */}
                 <div className="flex items-center gap-2 sm:gap-3">
+                    {/* Leaderboard Link */}
+                    {showLeaderboardLink && (
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => router.push(`/${language}/leaderboard`)}
+                            className={cn(
+                                'flex items-center gap-2 rounded-full transition-all duration-300',
+                                isDarkMode
+                                    ? 'bg-slate-800 text-yellow-400 hover:bg-slate-700 hover:shadow-[0_0_15px_rgba(250,204,21,0.3)] border-slate-700'
+                                    : 'bg-white text-yellow-600 hover:bg-gray-50 hover:shadow-[0_0_15px_rgba(250,204,21,0.2)] border-gray-200'
+                            )}
+                            aria-label={t('leaderboard.title')}
+                        >
+                            <FaTrophy size={16} />
+                            <span className="hidden sm:inline">{t('leaderboard.title')}</span>
+                        </Button>
+                    )}
+
+                    {/* Auth Button */}
+                    <AuthButton />
+
                     {/* Language Selector */}
                     <div className="relative">
                         <Button

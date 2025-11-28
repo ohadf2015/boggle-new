@@ -49,6 +49,56 @@ function searchWord(board, word, row, col, index, visited) {
   return false;
 }
 
+// Helper function to search for word and return the path
+function searchWordPath(board, word, row, col, index, visited, path) {
+  if (index === word.length) return [...path];
+
+  if (row < 0 || row >= board.length || col < 0 || col >= board[0].length) return null;
+
+  const cellKey = `${row},${col}`;
+  if (visited.has(cellKey)) return null;
+
+  const cellNormalized = normalizeHebrewLetter(board[row][col].toLowerCase());
+  if (cellNormalized !== word[index]) return null;
+
+  visited.add(cellKey);
+  path.push({ row, col });
+
+  const allDirections = [
+    [-1, -1], [-1, 0], [-1, 1],
+    [0, -1],           [0, 1],
+    [1, -1],  [1, 0],  [1, 1]
+  ];
+
+  for (const [dx, dy] of allDirections) {
+    const result = searchWordPath(board, word, row + dx, col + dy, index + 1, visited, path);
+    if (result) {
+      visited.delete(cellKey);
+      return result;
+    }
+  }
+
+  visited.delete(cellKey);
+  path.pop();
+  return null;
+}
+
+// Get the path of cells used to form a word on the board
+function getWordPath(word, board, positions) {
+  if (!word || !board || board.length === 0) return null;
+
+  const wordNormalized = normalizeHebrewWord(word.toLowerCase());
+  const posMap = positions || makePositionsMap(board);
+  const startPositions = posMap.get(wordNormalized[0]) || [];
+
+  for (const [startRow, startCol] of startPositions) {
+    const path = searchWordPath(board, wordNormalized, startRow, startCol, 0, new Set(), []);
+    if (path) return path;
+  }
+
+  return null;
+}
+
 // Word validation: Check if a word exists on the board as a valid path
 function makePositionsMap(board) {
   const positions = new Map();
@@ -90,6 +140,7 @@ module.exports = {
   normalizeHebrewWord,
   isWordOnBoard,
   makePositionsMap,
+  getWordPath,
   // Alias for backwards compatibility with socketHandlers.js
   validateWordOnBoard: isWordOnBoard
 };

@@ -11,6 +11,8 @@ import Header from '@/components/Header';
 import { SocketContext } from '@/utils/SocketContext';
 import { saveSession, getSession, clearSession } from '@/utils/session';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useAuth } from '@/contexts/AuthContext';
+import { getGuestSessionId, hashToken } from '@/utils/guestManager';
 import logger from '@/utils/logger';
 
 // Force dynamic rendering to prevent static generation issues
@@ -68,6 +70,7 @@ export default function GamePage() {
   const wasConnectedRef = useRef(false);
 
   const { t, language } = useLanguage();
+  const { user, isAuthenticated, isSupabaseEnabled } = useAuth();
 
   // Track if we should auto-join (prefilled room + existing username)
   const [shouldAutoJoin, setShouldAutoJoin] = useState(false);
@@ -141,8 +144,26 @@ export default function GamePage() {
       Promise.resolve().then(() => {
         setSocket(globalSocketInstance);
         setIsConnected(true);
+        // Request active rooms since we're reusing an existing connection
+        globalSocketInstance.emit('getActiveRooms');
       });
-      return;
+
+      // Set up activeRooms listener for existing socket
+      const handleActiveRooms = (data) => {
+        setActiveRooms(data.rooms || []);
+        setRoomsLoading(false);
+      };
+      globalSocketInstance.on('activeRooms', handleActiveRooms);
+
+      // Fallback timeout for rooms loading
+      const roomsLoadingTimeout = setTimeout(() => {
+        setRoomsLoading(false);
+      }, 5000);
+
+      return () => {
+        clearTimeout(roomsLoadingTimeout);
+        globalSocketInstance.off('activeRooms', handleActiveRooms);
+      };
     }
 
     const socketUrl = getSocketURL();
@@ -179,19 +200,39 @@ export default function GamePage() {
             icon: '🔄',
           });
 
-          if (savedSession.isHost) {
-            newSocket.emit('createGame', {
-              gameCode: savedSession.gameCode,
-              roomName: savedSession.roomName,
-              language: savedSession.language || language,
-              hostUsername: savedSession.username || savedSession.roomName,
-            });
-          } else {
-            newSocket.emit('join', {
-              gameCode: savedSession.gameCode,
-              username: savedSession.username,
-            });
-          }
+          // Build auth context inline for reconnection
+          const buildAuthContext = async () => {
+            try {
+              // Check if user is authenticated (user state may not be set yet during reconnect)
+              // For reconnection, we'll get auth context from session storage if available
+              const guestSessionId = getGuestSessionId();
+              if (guestSessionId) {
+                const hash = await hashToken(guestSessionId);
+                return { authUserId: null, guestTokenHash: hash };
+              }
+              return { authUserId: null, guestTokenHash: null };
+            } catch {
+              return { authUserId: null, guestTokenHash: null };
+            }
+          };
+
+          buildAuthContext().then((authContext) => {
+            if (savedSession.isHost) {
+              newSocket.emit('createGame', {
+                gameCode: savedSession.gameCode,
+                roomName: savedSession.roomName,
+                language: savedSession.language || language,
+                hostUsername: savedSession.username || savedSession.roomName,
+                ...authContext,
+              });
+            } else {
+              newSocket.emit('join', {
+                gameCode: savedSession.gameCode,
+                username: savedSession.username,
+                ...authContext,
+              });
+            }
+          });
         }
       }
       wasConnectedRef.current = true;
@@ -305,25 +346,22 @@ export default function GamePage() {
     });
 
     // Auto-join next game if player is viewing results
+    // Note: The actual "Game Started" toast is shown by PlayerView/HostView components
+    // This handler only manages state transitions
     newSocket.on('startGame', () => {
       logger.log('[SOCKET.IO] New game starting - auto-joining from results');
       setShowResults(false);
       setResultsData(null);
-      toast.success(t('playerView.gameStarted') || 'Game is starting!', {
-        icon: '🚀',
-        duration: 3000,
-      });
+      // Toast notification is handled by PlayerView/HostView to avoid duplicates
     });
 
     // Handle game reset - keep players in the room for new game
+    // Note: Toast notification is handled by PlayerView/HostView to avoid duplicates
     newSocket.on('resetGame', () => {
       logger.log('[SOCKET.IO] Game reset - staying in room for new game');
       setShowResults(false);
       setResultsData(null);
-      toast.success(t('hostView.newGameReady') || 'New game ready!', {
-        icon: '🎮',
-        duration: 3000,
-      });
+      // Toast notification is handled by PlayerView/HostView to avoid duplicates
     });
 
     newSocket.on('hostLeftRoomClosing', (data) => {
@@ -410,6 +448,23 @@ export default function GamePage() {
     };
   }, [isActive, isHost, socket, isConnected, gameCode]);
 
+  // Helper to get auth context for socket events
+  const getAuthContext = useCallback(async () => {
+    if (!isSupabaseEnabled) return { authUserId: null, guestTokenHash: null };
+
+    if (isAuthenticated && user?.id) {
+      return { authUserId: user.id, guestTokenHash: null };
+    }
+
+    const guestSessionId = getGuestSessionId();
+    if (guestSessionId) {
+      const hash = await hashToken(guestSessionId);
+      return { authUserId: null, guestTokenHash: hash };
+    }
+
+    return { authUserId: null, guestTokenHash: null };
+  }, [isSupabaseEnabled, isAuthenticated, user]);
+
   // Auto-join effect
   useEffect(() => {
     if (!shouldAutoJoin || !socket || !isConnected || isActive || attemptingReconnect) {
@@ -417,15 +472,20 @@ export default function GamePage() {
     }
 
     if (prefilledRoomCode && username && username.trim()) {
-      const autoJoinTimeout = setTimeout(() => {
+      const autoJoinTimeout = setTimeout(async () => {
         if (socket && isConnected && !isActive) {
-          socket.emit('join', { gameCode: prefilledRoomCode, username });
+          const authContext = await getAuthContext();
+          socket.emit('join', {
+            gameCode: prefilledRoomCode,
+            username,
+            ...authContext,
+          });
           setShouldAutoJoin(false);
         }
       }, 200);
       return () => clearTimeout(autoJoinTimeout);
     }
-  }, [shouldAutoJoin, prefilledRoomCode, username, isActive, attemptingReconnect, socket, isConnected]);
+  }, [shouldAutoJoin, prefilledRoomCode, username, isActive, attemptingReconnect, socket, isConnected, getAuthContext]);
 
   // Session reconnection
   useEffect(() => {
@@ -451,7 +511,9 @@ export default function GamePage() {
       return;
     }
 
-    const reconnectTimeout = setTimeout(() => {
+    const reconnectTimeout = setTimeout(async () => {
+      const authContext = await getAuthContext();
+
       if (savedSession.isHost) {
         if (!savedSession.roomName) {
           clearSession();
@@ -463,6 +525,7 @@ export default function GamePage() {
           roomName: savedSession.roomName,
           hostUsername: savedSession.roomName,
           language: savedSession.language || language,
+          ...authContext,
         });
       } else {
         if (!savedSession.username) {
@@ -473,14 +536,15 @@ export default function GamePage() {
         socket.emit('join', {
           gameCode: savedSession.gameCode,
           username: savedSession.username,
+          ...authContext,
         });
       }
     }, 500);
 
     return () => clearTimeout(reconnectTimeout);
-  }, [attemptingReconnect, isActive, socket, isConnected, language]);
+  }, [attemptingReconnect, isActive, socket, isConnected, language, getAuthContext]);
 
-  const handleJoin = useCallback((isHostMode, roomLang) => {
+  const handleJoin = useCallback(async (isHostMode, roomLang) => {
     if (!socket || !isConnected) {
       setError(t('errors.notConnected') || 'Not connected to server');
       toast.error(t('common.notConnected') || 'Not connected to server', {
@@ -492,17 +556,41 @@ export default function GamePage() {
 
     setError('');
 
+    // Build auth context for game result tracking
+    let authUserId = null;
+    let guestTokenHash = null;
+
+    if (isSupabaseEnabled) {
+      if (isAuthenticated && user?.id) {
+        // Authenticated user
+        authUserId = user.id;
+      } else {
+        // Guest user - get or create guest session
+        const guestSessionId = getGuestSessionId();
+        if (guestSessionId) {
+          guestTokenHash = await hashToken(guestSessionId);
+        }
+      }
+    }
+
     if (isHostMode) {
       socket.emit('createGame', {
         gameCode,
         roomName,
         hostUsername: roomName,
         language: roomLang || language,
+        authUserId,
+        guestTokenHash,
       });
     } else {
-      socket.emit('join', { gameCode, username });
+      socket.emit('join', {
+        gameCode,
+        username,
+        authUserId,
+        guestTokenHash,
+      });
     }
-  }, [socket, isConnected, gameCode, username, roomName, language, t]);
+  }, [socket, isConnected, gameCode, username, roomName, language, t, isSupabaseEnabled, isAuthenticated, user]);
 
   const refreshRooms = useCallback(() => {
     if (socket && isConnected) {

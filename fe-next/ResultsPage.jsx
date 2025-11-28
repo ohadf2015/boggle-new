@@ -11,8 +11,56 @@ import ResultsWinnerBanner from './components/results/ResultsWinnerBanner';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from './components/ui/alert-dialog';
 import { clearSession } from './utils/session';
 
+// Helper functions for finding word paths on the board (client-side version)
+const normalizeHebrewLetter = (letter) => {
+  const finalToRegular = { 'ץ': 'צ', 'ך': 'כ', 'ם': 'מ', 'ן': 'נ', 'ף': 'פ' };
+  return finalToRegular[letter] || letter;
+};
 
-const LetterGrid = ({ letterGrid }) => {
+const searchWordPath = (board, word, row, col, index, visited, path) => {
+  if (index === word.length) return [...path];
+  if (row < 0 || row >= board.length || col < 0 || col >= board[0].length) return null;
+
+  const cellKey = `${row},${col}`;
+  if (visited.has(cellKey)) return null;
+
+  const cellNormalized = normalizeHebrewLetter(board[row][col].toLowerCase());
+  if (cellNormalized !== word[index]) return null;
+
+  visited.add(cellKey);
+  path.push({ row, col });
+
+  const directions = [[-1, -1], [-1, 0], [-1, 1], [0, -1], [0, 1], [1, -1], [1, 0], [1, 1]];
+  for (const [dx, dy] of directions) {
+    const result = searchWordPath(board, word, row + dx, col + dy, index + 1, visited, path);
+    if (result) {
+      visited.delete(cellKey);
+      return result;
+    }
+  }
+
+  visited.delete(cellKey);
+  path.pop();
+  return null;
+};
+
+const getWordPath = (word, board) => {
+  if (!word || !board || board.length === 0) return null;
+  const wordNormalized = word.toLowerCase().split('').map(normalizeHebrewLetter).join('');
+  const firstChar = wordNormalized[0];
+
+  for (let i = 0; i < board.length; i++) {
+    for (let j = 0; j < board[0].length; j++) {
+      if (normalizeHebrewLetter(board[i][j].toLowerCase()) === firstChar) {
+        const path = searchWordPath(board, wordNormalized, i, j, 0, new Set(), []);
+        if (path) return path;
+      }
+    }
+  }
+  return null;
+};
+
+const LetterGrid = ({ letterGrid, heatMapData }) => {
   const { t } = useLanguage();
   return (
     <motion.div
@@ -28,6 +76,7 @@ const LetterGrid = ({ letterGrid }) => {
           grid={letterGrid}
           interactive={false}
           className="w-full relative z-10"
+          heatMapData={heatMapData}
         />
       </div>
     </motion.div>
@@ -62,6 +111,36 @@ const ResultsPage = ({ finalScores, letterGrid, gameCode, onReturnToRoom, userna
     }
     return wordMap;
   }, [finalScores]);
+
+  // Calculate heat map data from all valid words found
+  const heatMapData = useMemo(() => {
+    if (!finalScores || !letterGrid) return null;
+
+    const cellUsageCounts = {};
+    let maxCount = 0;
+
+    // Collect all unique valid words from all players
+    const processedWords = new Set();
+    finalScores.forEach(player => {
+      const words = player.allWords || [];
+      words.forEach(wordObj => {
+        // Only count validated words that scored points (not duplicates)
+        if (wordObj.validated && wordObj.score > 0 && !processedWords.has(wordObj.word)) {
+          processedWords.add(wordObj.word);
+          const path = getWordPath(wordObj.word, letterGrid);
+          if (path) {
+            path.forEach(({ row, col }) => {
+              const key = `${row},${col}`;
+              cellUsageCounts[key] = (cellUsageCounts[key] || 0) + 1;
+              maxCount = Math.max(maxCount, cellUsageCounts[key]);
+            });
+          }
+        }
+      });
+    });
+
+    return { cellUsageCounts, maxCount };
+  }, [finalScores, letterGrid]);
 
   const winner = sortedScores[0];
 
@@ -106,7 +185,7 @@ const ResultsPage = ({ finalScores, letterGrid, gameCode, onReturnToRoom, userna
               transition={{ delay: 0.1 }}
               className="mb-6 px-0 sm:px-4"
             >
-              <LetterGrid letterGrid={letterGrid} />
+              <LetterGrid letterGrid={letterGrid} heatMapData={heatMapData} />
             </motion.div>
           )}
 
@@ -134,21 +213,6 @@ const ResultsPage = ({ finalScores, letterGrid, gameCode, onReturnToRoom, userna
             </motion.div>
           </motion.div>
 
-          {/* Duplicate Words Clarification Banner */}
-          <motion.div
-            initial={{ y: -20, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ delay: 0.3 }}
-            className="mb-6"
-          >
-            <div className="p-4 rounded-lg bg-gradient-to-r from-orange-500/30 to-red-500/30 border-2 border-orange-500/60 relative overflow-hidden">
-              {/* Glass glare effect */}
-              <div className="absolute inset-0 bg-gradient-to-br from-white/15 via-transparent to-transparent pointer-events-none" />
-              <p className="text-center text-sm font-bold text-orange-800 dark:text-orange-200 relative z-10">
-                ⚠️ {t('results.duplicateWarning')}
-              </p>
-            </div>
-          </motion.div>
         </div>
 
         {/* Player Results Cards */}

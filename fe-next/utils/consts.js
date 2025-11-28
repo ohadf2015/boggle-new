@@ -122,6 +122,15 @@ const getDeadzoneThreshold = () => {
   return 12;                          // Tablets and desktop
 };
 
+// Minimum word length options
+const MIN_WORD_LENGTH_OPTIONS = [
+  { value: 2, labelKey: 'hostView.minWordLength2' },
+  { value: 3, labelKey: 'hostView.minWordLength3' },
+  { value: 4, labelKey: 'hostView.minWordLength4' },
+];
+
+const DEFAULT_MIN_WORD_LENGTH = 2;
+
 module.exports = {
   hebrewLetters,
   englishLetters,
@@ -131,5 +140,7 @@ module.exports = {
   DIFFICULTIES,
   DEFAULT_DIFFICULTY,
   getDeadzoneThreshold,
+  MIN_WORD_LENGTH_OPTIONS,
+  DEFAULT_MIN_WORD_LENGTH,
 };
   

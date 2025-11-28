@@ -44,6 +44,7 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
   const [remainingTime, setRemainingTime] = useState(null);
   const [waitingForResults, setWaitingForResults] = useState(false);
   const [showStartAnimation, setShowStartAnimation] = useState(false);
+  const [minWordLength, setMinWordLength] = useState(2);
 
   const [playersReady, setPlayersReady] = useState(initialPlayers);
   const [shufflingGrid, setShufflingGrid] = useState(null);
@@ -59,11 +60,23 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
   const [comboLevel, setComboLevel] = useState(0);
   const [lastWordTime, setLastWordTime] = useState(null);
   const comboTimeoutRef = useRef(null);
+  // Refs for current values (to avoid stale closures in socket handlers)
+  const comboLevelRef = useRef(0);
+  const lastWordTimeRef = useRef(null);
 
   // Tournament state
   const [tournamentData, setTournamentData] = useState(null);
   const [tournamentStandings, setTournamentStandings] = useState([]);
   const [showTournamentStandings, setShowTournamentStandings] = useState(false);
+
+  // Keep refs in sync with state for socket handlers (avoids stale closures)
+  useEffect(() => {
+    comboLevelRef.current = comboLevel;
+  }, [comboLevel]);
+
+  useEffect(() => {
+    lastWordTimeRef.current = lastWordTime;
+  }, [lastWordTime]);
 
   // Pre-game shuffling animation - Disabled, now receives from host
   // Players will receive the shuffling grid from the host via socket event
@@ -132,6 +145,7 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
       if (data.letterGrid) setLetterGrid(data.letterGrid);
       if (data.timerSeconds) setRemainingTime(data.timerSeconds);
       if (data.language) setGameLanguage(data.language);
+      if (data.minWordLength) setMinWordLength(data.minWordLength);
       setGameActive(true);
       setShowStartAnimation(true);
 
@@ -141,7 +155,7 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
         console.log('[PLAYER] Sent startGameAck for messageId:', data.messageId);
       }
 
-      toast.success(t('playerView.gameStarted'), {
+      toast.success(t('common.gameStarted'), {
         icon: '🚀',
         duration: 3000,
         style: {
@@ -181,26 +195,35 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
 
         const now = Date.now();
         let newComboLevel;
-        // Combo chain window scales with current combo level (5s base + 1.5s per level, max 15s)
-        const comboChainWindow = Math.min(5000 + comboLevel * 1500, 15000);
-        if (lastWordTime && (now - lastWordTime) < comboChainWindow) {
-          newComboLevel = comboLevel + 1;
+        // Use refs to get current values (avoids stale closure bug)
+        const currentComboLevel = comboLevelRef.current;
+        const currentLastWordTime = lastWordTimeRef.current;
+
+        // Combo chain window scales with current combo level (3s base + 1s per level, max 10s)
+        const comboChainWindow = Math.min(3000 + currentComboLevel * 1000, 10000);
+        if (currentLastWordTime && (now - currentLastWordTime) < comboChainWindow) {
+          newComboLevel = currentComboLevel + 1;
           setComboLevel(newComboLevel);
+          comboLevelRef.current = newComboLevel; // Update ref immediately
         } else {
           newComboLevel = 0;
           setComboLevel(0);
+          comboLevelRef.current = 0; // Update ref immediately
         }
         setLastWordTime(now);
+        lastWordTimeRef.current = now; // Update ref immediately
 
         if (comboTimeoutRef.current) {
           clearTimeout(comboTimeoutRef.current);
         }
 
         // Timeout to reset combo if no word submitted (same scaling)
-        const comboTimeout = Math.min(5000 + newComboLevel * 1500, 15000);
+        const comboTimeout = Math.min(3000 + newComboLevel * 1000, 10000);
         comboTimeoutRef.current = setTimeout(() => {
           setComboLevel(0);
+          comboLevelRef.current = 0;
           setLastWordTime(null);
+          lastWordTimeRef.current = null;
         }, comboTimeout);
       } else {
         toast.success(`✓ ${data.word}`, { duration: 2000 });
@@ -218,7 +241,9 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
       });
 
       setComboLevel(0);
+      comboLevelRef.current = 0;
       setLastWordTime(null);
+      lastWordTimeRef.current = null;
       if (comboTimeoutRef.current) {
         clearTimeout(comboTimeoutRef.current);
       }
@@ -227,7 +252,9 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
     const handleWordAlreadyFound = () => {
       toast.error(t('playerView.wordAlreadyFound'), { duration: 2000 });
       setComboLevel(0);
+      comboLevelRef.current = 0;
       setLastWordTime(null);
+      lastWordTimeRef.current = null;
       if (comboTimeoutRef.current) {
         clearTimeout(comboTimeoutRef.current);
       }
@@ -240,6 +267,24 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
         fw.word.toLowerCase() === data.word.toLowerCase()
           ? { ...fw, isValid: false }
           : fw
+      ));
+      setComboLevel(0);
+      comboLevelRef.current = 0;
+      setLastWordTime(null);
+      lastWordTimeRef.current = null;
+      if (comboTimeoutRef.current) {
+        clearTimeout(comboTimeoutRef.current);
+      }
+    };
+
+    const handleWordTooShort = (data) => {
+      const msg = t('playerView.wordTooShortMin')
+        ? t('playerView.wordTooShortMin').replace('${min}', data.minLength)
+        : `Word too short! (min ${data.minLength} letters)`;
+      toast.error(msg, { duration: 2000, icon: '⚠️' });
+      // Remove the word from found words list
+      setFoundWords(prev => prev.filter(fw =>
+        fw.word.toLowerCase() !== data.word.toLowerCase()
       ));
       setComboLevel(0);
       setLastWordTime(null);
@@ -341,8 +386,9 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
       setRemainingTime(null);
       setWaitingForResults(false);
       setLetterGrid(null);
-      setPlayersReady([]);
-      toast.success(data.message || t('playerView.startingNewGame'), {
+      // NOTE: Don't clear playersReady here - the server will send updateUsers
+      // with the correct player list. Clearing it causes a flash of empty player list.
+      toast.success(data.message || t('common.newGameReady'), {
         icon: '🔄',
         duration: 3000,
       });
@@ -440,6 +486,7 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
     socket.on('wordNeedsValidation', handleWordNeedsValidation);
     socket.on('wordAlreadyFound', handleWordAlreadyFound);
     socket.on('wordNotOnBoard', handleWordNotOnBoard);
+    socket.on('wordTooShort', handleWordTooShort);
     socket.on('timeUpdate', handleTimeUpdate);
     socket.on('updateLeaderboard', handleUpdateLeaderboard);
     socket.on('liveAchievementUnlocked', handleLiveAchievementUnlocked);
@@ -462,6 +509,7 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
       socket.off('wordNeedsValidation', handleWordNeedsValidation);
       socket.off('wordAlreadyFound', handleWordAlreadyFound);
       socket.off('wordNotOnBoard', handleWordNotOnBoard);
+      socket.off('wordTooShort', handleWordTooShort);
       socket.off('timeUpdate', handleTimeUpdate);
       socket.off('updateLeaderboard', handleUpdateLeaderboard);
       socket.off('liveAchievementUnlocked', handleLiveAchievementUnlocked);
@@ -475,7 +523,8 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
       socket.off('tournamentComplete', handleTournamentComplete);
       socket.off('tournamentCancelled', handleTournamentCancelled);
     };
-  }, [socket, onShowResults, t, letterGrid, lastWordTime, comboLevel, wasInActiveGame, gameActive, gameLanguage]);
+  // Note: comboLevel and lastWordTime removed from deps - we use refs to avoid stale closures
+  }, [socket, onShowResults, t, letterGrid, wasInActiveGame, gameActive, gameLanguage]);
 
   const submitWord = useCallback(() => {
     if (!word.trim() || !gameActive) return;
@@ -501,8 +550,11 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
     const trimmedWord = sanitizeInput(word, 20).trim();
 
     // Min length validation
-    if (trimmedWord.length < 2) {
-      toast.error(t('playerView.wordTooShort'), {
+    if (trimmedWord.length < minWordLength) {
+      const msg = t('playerView.wordTooShortMin')
+        ? t('playerView.wordTooShortMin').replace('${min}', minWordLength)
+        : `Word too short! (min ${minWordLength} letters)`;
+      toast.error(msg, {
         duration: 2000,
         icon: '⚠️'
       });
@@ -1189,8 +1241,11 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
                         regex = /^[a-zA-Z]+$/;
                       }
 
-                      if (formedWord.length < 2) {
-                        toast.error(t('playerView.wordTooShort'), { duration: 1000, icon: '⚠️' });
+                      if (formedWord.length < minWordLength) {
+                        const msg = t('playerView.wordTooShortMin')
+                          ? t('playerView.wordTooShortMin').replace('${min}', minWordLength)
+                          : `Word too short! (min ${minWordLength} letters)`;
+                        toast.error(msg, { duration: 1000, icon: '⚠️' });
                         return;
                       }
 

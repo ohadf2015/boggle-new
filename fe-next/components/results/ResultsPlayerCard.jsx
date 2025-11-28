@@ -8,16 +8,17 @@ import { cn } from '../../lib/utils';
 import { applyHebrewFinalLetters } from '../../utils/utils';
 import { ChevronDown, ChevronUp } from 'lucide-react';
 
-// Color mapping based on points
+// Color mapping based on points - using game theme colors (cyan/teal/purple spectrum)
+// Intensity increases with points for intuitive visual hierarchy
 const POINT_COLORS = {
-  1: '#94A3B8',  // slate-400 - 2 letters
-  2: '#60A5FA',  // blue-400 - 3 letters
-  3: '#34D399',  // green-400 - 4 letters
-  4: '#F59E0B',  // amber-500 - 5 letters
-  5: '#EC4899',  // pink-500 - 6 letters
-  6: '#8B5CF6',  // violet-500 - 7 letters
-  7: '#EF4444',  // red-500 - 8 letters
-  8: '#06B6D4',  // cyan-500 - 9+ letters
+  1: '#64748B',  // slate-500 - 2 letters (neutral, lowest value)
+  2: '#06B6D4',  // cyan-500 - 3 letters
+  3: '#0891B2',  // cyan-600 - 4 letters
+  4: '#0D9488',  // teal-600 - 5 letters
+  5: '#7C3AED',  // violet-600 - 6 letters
+  6: '#9333EA',  // purple-600 - 7 letters
+  7: '#A855F7',  // purple-500 - 8 letters (brighter for highlight)
+  8: '#C026D3',  // fuchsia-600 - 9+ letters (premium/rare)
 };
 
 const WordChip = ({ wordObj, playerCount }) => {
@@ -59,7 +60,7 @@ const WordChip = ({ wordObj, playerCount }) => {
 };
 
 const ResultsPlayerCard = ({ player, index, allPlayerWords, currentUsername, isWinner }) => {
-  const { t, dir } = useLanguage();
+  const { t } = useLanguage();
   // Auto-expand all players' words by default
   const [isWordsExpanded, setIsWordsExpanded] = useState(true);
 
@@ -74,9 +75,9 @@ const ResultsPlayerCard = ({ player, index, allPlayerWords, currentUsername, isW
   const isCurrentPlayer = currentUsername && player.username === currentUsername;
 
   // Memoize expensive word categorization and grouping at component level (not inside JSX)
-  const { duplicateWords, invalidWords, wordsByPoints, sortedPointGroups, totalValidScore } = useMemo(() => {
+  const { duplicateWords, invalidWords, wordsByPoints, sortedPointGroups } = useMemo(() => {
     if (!player.allWords || player.allWords.length === 0) {
-      return { duplicateWords: [], invalidWords: [], wordsByPoints: {}, sortedPointGroups: [], totalValidScore: 0 };
+      return { duplicateWords: [], invalidWords: [], wordsByPoints: {}, sortedPointGroups: [] };
     }
 
     const duplicateWords = player.allWords.filter(w => w && w.isDuplicate);
@@ -85,10 +86,8 @@ const ResultsPlayerCard = ({ player, index, allPlayerWords, currentUsername, isW
 
     // Group valid words by points
     const wordsByPoints = {};
-    let totalValidScore = 0;
     validWords.forEach(wordObj => {
       const points = wordObj.score || 0;
-      totalValidScore += points;
       if (!wordsByPoints[points]) {
         wordsByPoints[points] = [];
       }
@@ -109,7 +108,7 @@ const ResultsPlayerCard = ({ player, index, allPlayerWords, currentUsername, isW
       .map(Number)
       .sort((a, b) => b - a);
 
-    return { duplicateWords, invalidWords, wordsByPoints, sortedPointGroups, totalValidScore };
+    return { duplicateWords, invalidWords, wordsByPoints, sortedPointGroups };
   }, [player.allWords]);
   const showWinnerMessage = isCurrentPlayer && isWinner;
 
@@ -133,31 +132,28 @@ const ResultsPlayerCard = ({ player, index, allPlayerWords, currentUsername, isW
     return `#${index + 1}`;
   };
 
-  // Get rank box styling based on position
+  // Get rank box styling based on position - gold/silver/bronze
   const getRankBoxStyle = () => {
     if (index === 0) {
-      // Gold - bright yellow/gold gradient
-      return 'bg-gradient-to-br from-yellow-200 via-yellow-400 to-yellow-500 shadow-[0_0_15px_rgba(250,204,21,0.6),inset_0_1px_0_rgba(255,255,255,0.6)] border-2 border-yellow-500/80';
+      // Gold
+      return 'bg-gradient-to-br from-yellow-300 via-yellow-400 to-amber-500 border border-yellow-500 shadow-lg';
     }
     if (index === 1) {
-      // Silver - cool gray metallic gradient
-      return 'bg-gradient-to-br from-gray-200 via-gray-300 to-gray-400 shadow-[0_0_12px_rgba(156,163,175,0.5),inset_0_1px_0_rgba(255,255,255,0.6)] border-2 border-gray-400/80';
+      // Silver
+      return 'bg-gradient-to-br from-slate-200 via-slate-300 to-slate-400 border border-slate-400 shadow-lg';
     }
     if (index === 2) {
-      // Bronze - warm copper/brown gradient (no amber to avoid gold confusion)
-      return 'bg-gradient-to-br from-amber-600 via-orange-700 to-amber-800 shadow-[0_0_12px_rgba(180,83,9,0.5),inset_0_1px_0_rgba(255,255,255,0.4)] border-2 border-amber-700/80';
+      // Bronze
+      return 'bg-gradient-to-br from-amber-500 via-orange-600 to-amber-700 border border-amber-600 shadow-lg';
     }
-    // Others - subtle neutral box
-    return 'bg-gradient-to-br from-slate-200 to-slate-300 dark:from-slate-600 dark:to-slate-700 border-2 border-slate-300 dark:border-slate-500';
+    return 'bg-slate-200 dark:bg-slate-600 border border-slate-300 dark:border-slate-500';
   };
 
-  // Get card gradient based on rank (not avatar color)
+  // Get card gradient based on rank - gold/silver/bronze styling with glow
   const getCardStyle = () => {
-    // Modern shiny metallic styles for podium positions
     if (index === 0) return 'bg-gradient-to-br from-yellow-100 via-amber-300 to-yellow-500 dark:from-yellow-200/60 dark:via-amber-400/50 dark:to-yellow-600/40 border-yellow-400 shadow-[0_0_30px_rgba(234,179,8,0.6),inset_0_1px_0_rgba(255,255,255,0.5)]';
     if (index === 1) return 'bg-gradient-to-br from-slate-100 via-gray-300 to-slate-400 dark:from-slate-200/60 dark:via-gray-300/50 dark:to-slate-500/40 border-slate-400 shadow-[0_0_25px_rgba(148,163,184,0.5),inset_0_1px_0_rgba(255,255,255,0.5)]';
     if (index === 2) return 'bg-gradient-to-br from-orange-200 via-amber-400 to-orange-600 dark:from-orange-300/60 dark:via-amber-500/50 dark:to-orange-700/40 border-orange-500 shadow-[0_0_25px_rgba(234,88,12,0.5),inset_0_1px_0_rgba(255,255,255,0.5)]';
-    // Smooth gradient for ranks 4+: subtle blue-purple tones that suit the game theme
     return 'bg-gradient-to-br from-slate-100 via-indigo-50 to-purple-100 dark:from-slate-700/60 dark:via-indigo-900/40 dark:to-purple-900/30 border-indigo-300/50 dark:border-indigo-600/40 shadow-[0_0_15px_rgba(99,102,241,0.2),inset_0_1px_0_rgba(255,255,255,0.3)]';
   };
 
@@ -171,10 +167,21 @@ const ResultsPlayerCard = ({ player, index, allPlayerWords, currentUsername, isW
         className={cn(
           "p-4 sm:p-5 md:p-6 border-2 transition-all duration-300 rounded-xl shadow-lg hover:shadow-xl relative overflow-hidden",
           getCardStyle(),
-          isWordsExpanded && "ring-2 ring-purple-400/50 shadow-[0_0_20px_rgba(168,85,247,0.3)]"
+          isWordsExpanded && "ring-2 ring-purple-400/50"
         )}
       >
-        {/* Glass glare effect */}
+        {/* Animated glass glare effect */}
+        <motion.div
+          className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent pointer-events-none"
+          initial={{ x: '-100%', opacity: 0 }}
+          animate={{ x: '200%', opacity: 1 }}
+          transition={{
+            duration: 1.5,
+            delay: index * 0.2,
+            ease: 'easeInOut',
+          }}
+        />
+        {/* Static glare overlay */}
         <div className="absolute inset-0 bg-gradient-to-br from-white/20 via-transparent to-transparent pointer-events-none" />
         {/* Header: Rank, Name, Score */}
         <div className="flex justify-between items-center mb-3 sm:mb-4 relative z-10">
@@ -191,24 +198,24 @@ const ResultsPlayerCard = ({ player, index, allPlayerWords, currentUsername, isW
               </div>
             )}
             <div>
-              <h3 className="text-xl font-bold text-slate-900 dark:text-white">
-                {player.username}
+              <h3 className="text-xl font-bold text-slate-900 dark:text-white flex items-center gap-2 flex-wrap">
+                <span>{player.username}</span>
                 {isCurrentPlayer && (
-                  <span className="ml-2 text-sm text-cyan-600 dark:text-cyan-400">({t('playerView.me')})</span>
+                  <span className="text-sm text-cyan-600 dark:text-cyan-400">({t('playerView.me')})</span>
+                )}
+                {showWinnerMessage && (
+                  <motion.span
+                    initial={{ scale: 0, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    transition={{ delay: 0.3, type: 'spring', stiffness: 200 }}
+                    className="text-sm font-bold text-yellow-600 dark:text-yellow-400"
+                  >
+                    🎉 {t('results.youWon')} 🎉
+                  </motion.span>
                 )}
               </h3>
-              {showWinnerMessage && (
-                <motion.p
-                  initial={{ scale: 0, opacity: 0 }}
-                  animate={{ scale: 1, opacity: 1 }}
-                  transition={{ delay: 0.3, type: 'spring', stiffness: 200 }}
-                  className="text-base font-bold text-yellow-600 dark:text-yellow-400"
-                >
-                  🎉 {t('results.youWon')} 🎉
-                </motion.p>
-              )}
               <p className="text-sm text-slate-600 dark:text-slate-400">
-                {player.validWordCount !== undefined && ` • ${player.validWordCount} ${t('results.valid')}`}
+                {player.validWordCount !== undefined && `${player.validWordCount} ${t('results.valid')}`}
               </p>
             </div>
           </div>
@@ -227,7 +234,7 @@ const ResultsPlayerCard = ({ player, index, allPlayerWords, currentUsername, isW
 
         {/* Longest Word */}
         {player.longestWord && (
-          <div className="mb-3 p-2 rounded-lg bg-gradient-to-r from-cyan-500/10 to-teal-500/10 border border-cyan-500/20 relative z-10">
+          <div className="mb-3 p-2 rounded-lg bg-cyan-50 dark:bg-cyan-900/20 border border-cyan-200 dark:border-cyan-800 relative z-10">
             <p className="text-sm text-slate-700 dark:text-slate-300">
               <span className="font-bold text-cyan-600 dark:text-cyan-400">{t('playerView.longestWord')}:</span>
               <span className="ml-2 text-lg font-bold text-cyan-700 dark:text-cyan-300">{applyHebrewFinalLetters(player.longestWord)}</span>
@@ -239,7 +246,7 @@ const ResultsPlayerCard = ({ player, index, allPlayerWords, currentUsername, isW
         <div className="mb-3 relative z-10">
           <button
             onClick={handleToggleExpand}
-            className="w-full flex items-center justify-between p-2 rounded-lg text-sm font-bold text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 hover:bg-purple-50 dark:hover:bg-purple-900/20 transition-all"
+            className="w-full flex items-center justify-between p-2 rounded-lg text-sm font-bold text-slate-700 dark:text-slate-200 hover:bg-black/5 dark:hover:bg-white/5 transition-all"
           >
             <span>{t('hostView.words')}: ({player.allWords?.length || 0})</span>
             {isWordsExpanded ? (
@@ -258,27 +265,22 @@ const ResultsPlayerCard = ({ player, index, allPlayerWords, currentUsername, isW
                 className="overflow-hidden"
               >
                 <div className="space-y-3 pt-2">
-                  {/* Valid Words Grouped by Points - Grid Layout */}
+                  {/* Valid Words Grouped by Points - Clean Layout */}
                   {sortedPointGroups.length > 0 && (
-                    <div className="bg-gradient-to-r from-green-500/10 to-teal-500/10 rounded-lg p-3 border border-green-500/20">
-                      <div className="text-sm font-bold text-green-600 dark:text-green-400 mb-3 flex items-center gap-2">
-                        <span>✓</span>
+                    <div className="bg-white/40 dark:bg-black/20 rounded-lg p-3 border border-black/10 dark:border-white/10">
+                      <div className="text-sm font-bold text-slate-700 dark:text-slate-200 mb-3 flex items-center gap-2">
+                        <span className="text-cyan-600 dark:text-cyan-400">✓</span>
                         {t('results.validWords') || 'Valid Words'} ({Object.values(wordsByPoints).flat().length})
                       </div>
-                      <div className="space-y-3">
+                      <div className="space-y-2">
                         {sortedPointGroups.map(points => (
-                          <div key={`points-${points}`} className="bg-white/50 dark:bg-slate-800/50 rounded-lg p-2">
-                            <div
-                              className="text-xs font-bold mb-2 flex items-center gap-2"
-                              style={{ color: POINT_COLORS[points] || POINT_COLORS[8] }}
-                            >
-                              <span className="w-5 h-5 rounded-full flex items-center justify-center text-white font-bold text-xs"
+                          <div key={`points-${points}`} className="rounded-lg p-2 border-l-4 bg-white/50 dark:bg-white/5" style={{ borderLeftColor: POINT_COLORS[points] || POINT_COLORS[8] }}>
+                            <div className="text-xs font-semibold mb-1.5 flex items-center gap-2 text-slate-600 dark:text-slate-300">
+                              <span className="px-2 py-0.5 rounded flex items-center justify-center text-white font-bold text-xs"
                                     style={{ backgroundColor: POINT_COLORS[points] || POINT_COLORS[8] }}>
-                                {points}
+                                {points} {t('results.points') || 'pts'}
                               </span>
-                              <span>{points} {t('results.points') || 'pts'}</span>
-                              <span className="text-slate-400">•</span>
-                              <span className="text-slate-500 dark:text-slate-400">{wordsByPoints[points].length} {t('hostView.words') || 'words'}</span>
+                              <span>{wordsByPoints[points].length} {t('hostView.words') || 'words'}</span>
                             </div>
                             <div className="flex flex-wrap gap-1">
                               {wordsByPoints[points].map((wordObj, i) => (
@@ -297,9 +299,9 @@ const ResultsPlayerCard = ({ player, index, allPlayerWords, currentUsername, isW
 
                   {/* Duplicate Words */}
                   {duplicateWords.length > 0 && (
-                    <div className="bg-gradient-to-r from-orange-500/10 to-amber-500/10 rounded-lg p-3 border border-orange-500/20">
-                      <div className="text-sm font-bold text-orange-600 dark:text-orange-400 mb-2 flex items-center gap-2">
-                        <span>👥</span>
+                    <div className="bg-white/40 dark:bg-black/20 rounded-lg p-3 border border-black/10 dark:border-white/10">
+                      <div className="text-sm font-bold text-slate-700 dark:text-slate-200 mb-2 flex items-center gap-2">
+                        <span className="text-amber-500">👥</span>
                         {t('results.shared') || 'Shared Words'} ({duplicateWords.length})
                       </div>
                       <div className="flex flex-wrap gap-1">
@@ -316,9 +318,9 @@ const ResultsPlayerCard = ({ player, index, allPlayerWords, currentUsername, isW
 
                   {/* Invalid Words */}
                   {invalidWords.length > 0 && (
-                    <div className="bg-gradient-to-r from-gray-500/10 to-slate-500/10 rounded-lg p-3 border border-gray-500/20">
-                      <div className="text-sm font-bold text-gray-600 dark:text-gray-400 mb-2 flex items-center gap-2">
-                        <span>✗</span>
+                    <div className="bg-white/40 dark:bg-black/20 rounded-lg p-3 border border-black/10 dark:border-white/10">
+                      <div className="text-sm font-bold text-slate-600 dark:text-slate-300 mb-2 flex items-center gap-2">
+                        <span className="text-slate-400">✗</span>
                         {t('results.invalid') || 'Invalid Words'} ({invalidWords.length})
                       </div>
                       <div className="flex flex-wrap gap-1">

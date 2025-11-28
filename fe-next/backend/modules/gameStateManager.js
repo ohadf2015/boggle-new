@@ -32,7 +32,7 @@ function createGame(gameCode, gameData) {
     hostPlayerId: gameData.hostPlayerId,
     roomName: gameData.roomName || gameCode,
     language: gameData.language || 'en',
-    users: {}, // username -> { socketId, avatar, isHost }
+    users: {}, // username -> { socketId, avatar, isHost, authUserId, guestTokenHash }
     playerScores: {},
     playerWords: {},
     playerAchievements: {},
@@ -41,6 +41,8 @@ function createGame(gameCode, gameData) {
     timerSeconds: 180,
     tournamentId: null,
     reconnectionTimeout: null, // Store timeout ID for host reconnection grace period
+    isRanked: gameData.isRanked || false, // Ranked mode flag
+    allowLateJoin: gameData.allowLateJoin !== false, // Allow late joins (default true, false for ranked)
     createdAt: Date.now(),
     lastActivity: Date.now()
   };
@@ -109,14 +111,16 @@ function addUserToGame(gameCode, username, socketId, options = {}) {
   const game = games[gameCode];
   if (!game) return false;
 
-  const { avatar = null, isHost = false, playerId = null } = options;
+  const { avatar = null, isHost = false, playerId = null, authUserId = null, guestTokenHash = null } = options;
 
-  // Store user data
+  // Store user data with auth context
   game.users[username] = {
     socketId,
     avatar,
     isHost,
     playerId,
+    authUserId,        // Supabase user ID for authenticated users
+    guestTokenHash,    // Hashed guest token for guest users
     joinedAt: Date.now()
   };
 
@@ -362,7 +366,14 @@ function resetGameForNewRound(gameCode) {
   const game = games[gameCode];
   if (!game) return;
 
-  // Reset scores and words but keep players
+  // COMPLETELY clear all game data first to prevent stale data from previous games
+  // This is critical because playerWords/playerScores may contain entries
+  // for players who left the game during previous rounds
+  game.playerScores = {};
+  game.playerWords = {};
+  game.playerAchievements = {};
+
+  // Re-initialize scores/words only for CURRENT players in the room
   for (const username of Object.keys(game.users)) {
     game.playerScores[username] = 0;
     game.playerWords[username] = [];

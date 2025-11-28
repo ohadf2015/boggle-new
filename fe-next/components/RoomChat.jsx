@@ -2,13 +2,16 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Input } from './ui/input';
 import { Button } from './ui/button';
-import { ScrollArea } from './ui/scroll-area';
 import { Badge } from './ui/badge';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
+import { useVirtualizer } from '@tanstack/react-virtual';
 import { useSocket } from '../utils/SocketContext';
 import { useLanguage } from '../contexts/LanguageContext';
 import { FaPaperPlane, FaComments, FaBell } from 'react-icons/fa';
 import toast from 'react-hot-toast';
+
+const MAX_CHAT_HEIGHT = 300; // Max height in pixels
+const ESTIMATED_MESSAGE_HEIGHT = 60; // Estimated height per message
 
 const RoomChat = ({ username, isHost, gameCode, className = '' }) => {
   const { t } = useLanguage();
@@ -16,14 +19,23 @@ const RoomChat = ({ username, isHost, gameCode, className = '' }) => {
   const [messages, setMessages] = useState([]);
   const [inputMessage, setInputMessage] = useState('');
   const [unreadCount, setUnreadCount] = useState(0);
-  const scrollRef = useRef(null);
+  const parentRef = useRef(null);
   const inputRef = useRef(null);
   const notificationSoundRef = useRef(null);
 
+  // Virtual scrolling setup
+  const virtualizer = useVirtualizer({
+    count: messages.length,
+    getScrollElement: () => parentRef.current,
+    estimateSize: () => ESTIMATED_MESSAGE_HEIGHT,
+    overscan: 5,
+  });
+
   // Handle incoming chat messages
   const handleChatMessage = useCallback((data) => {
+    const messageId = `msg-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
     const newMessage = {
-      id: Date.now() + Math.random(),
+      id: messageId,
       username: data.username,
       message: data.message,
       timestamp: data.timestamp || Date.now(),
@@ -44,19 +56,42 @@ const RoomChat = ({ username, isHost, gameCode, className = '' }) => {
         notificationSoundRef.current.play().catch(err => console.log('Sound play failed:', err));
       }
 
-      // Show toast notification
+      // Show toast notification with click to scroll
+      const newMessageIndex = messages.length; // Index of the new message (will be added after this)
       toast(
-        <div className="flex items-center gap-2">
-          <FaBell className="text-blue-500" />
-          <div>
-            <div className="font-semibold">{data.username}</div>
-            <div className="text-sm text-slate-600">{data.message.substring(0, 50)}{data.message.length > 50 ? '...' : ''}</div>
+        <div
+          className="flex items-center gap-2 cursor-pointer"
+          onClick={() => {
+            // Scroll to the message using virtualizer
+            virtualizer.scrollToIndex(newMessageIndex, { align: 'center', behavior: 'smooth' });
+            // Apply highlight effect after scroll
+            setTimeout(() => {
+              const messageElement = document.getElementById(messageId);
+              if (messageElement) {
+                messageElement.classList.add('ring-2', 'ring-blue-400', 'ring-offset-2');
+                setTimeout(() => {
+                  messageElement.classList.remove('ring-2', 'ring-blue-400', 'ring-offset-2');
+                }, 2000);
+              }
+            }, 300);
+            // Clear unread count
+            setUnreadCount(0);
+            toast.dismiss();
+          }}
+        >
+          <FaBell className="text-blue-500 flex-shrink-0" />
+          <div className="min-w-0">
+            <div className="font-semibold text-slate-900">{data.username}</div>
+            <div className="text-sm font-medium text-slate-800 truncate">{data.message.substring(0, 50)}{data.message.length > 50 ? '...' : ''}</div>
           </div>
         </div>,
         {
-          duration: 3000,
+          duration: 4000,
           position: 'top-right',
           icon: '💬',
+          style: {
+            cursor: 'pointer',
+          },
         }
       );
 
@@ -65,7 +100,7 @@ const RoomChat = ({ username, isHost, gameCode, className = '' }) => {
         window.navigator.vibrate(200);
       }
     }
-  }, [username, isHost]);
+  }, [username, isHost, messages.length, virtualizer]);
 
   useEffect(() => {
     if (!socket) return;
@@ -77,17 +112,13 @@ const RoomChat = ({ username, isHost, gameCode, className = '' }) => {
     };
   }, [socket, handleChatMessage]);
 
-  // Auto-scroll to bottom when new messages arrive and clear unread
+  // Auto-scroll to bottom when new messages arrive
   useEffect(() => {
-    if (scrollRef.current) {
-      const scrollElement = scrollRef.current.querySelector('[data-radix-scroll-area-viewport]');
-      if (scrollElement) {
-        scrollElement.scrollTop = scrollElement.scrollHeight;
-        // Clear unread count when scrolled to bottom
-        setUnreadCount(0);
-      }
+    if (messages.length > 0) {
+      virtualizer.scrollToIndex(messages.length - 1, { align: 'end', behavior: 'smooth' });
+      setUnreadCount(0);
     }
-  }, [messages]);
+  }, [messages.length, virtualizer]);
 
   // Clear unread count when user focuses on input
   const handleInputFocus = () => {
@@ -153,56 +184,79 @@ const RoomChat = ({ username, isHost, gameCode, className = '' }) => {
         </CardTitle>
       </CardHeader>
       <CardContent className="flex-1 flex flex-col p-2 space-y-2 min-h-0">
-        {/* Messages Area */}
-        <ScrollArea ref={scrollRef} className="flex-1 pr-2">
-          <div className="space-y-2">
-            <AnimatePresence>
-              {messages.map((msg) => (
-                <motion.div
-                  key={msg.id}
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0 }}
-                  className={`flex flex-col gap-1 ${
-                    msg.username === username || (isHost && msg.isHost)
-                      ? 'items-end'
-                      : 'items-start'
-                  }`}
-                >
-                  <div className="flex items-center gap-2">
-                    <Badge
-                      variant={msg.isHost ? 'default' : 'secondary'}
-                      className={`text-xs ${
-                        msg.isHost
-                          ? 'bg-gradient-to-r from-purple-500 to-pink-500'
-                          : 'bg-slate-200 dark:bg-slate-700 text-slate-900 dark:text-white'
+        {/* Messages Area with Virtual Scrolling */}
+        <div
+          ref={parentRef}
+          className="flex-1 overflow-auto pr-2 scrollbar-thin scrollbar-thumb-slate-300 dark:scrollbar-thumb-slate-600"
+          style={{ maxHeight: MAX_CHAT_HEIGHT }}
+        >
+          {messages.length === 0 ? (
+            <div className="text-center text-slate-400 dark:text-slate-500 py-8 text-sm">
+              {t('chat.noMessages') || 'No messages yet. Start chatting!'}
+            </div>
+          ) : (
+            <div
+              style={{
+                height: `${virtualizer.getTotalSize()}px`,
+                width: '100%',
+                position: 'relative',
+              }}
+            >
+              {virtualizer.getVirtualItems().map((virtualItem) => {
+                const msg = messages[virtualItem.index];
+                const isOwnMessage = msg.username === username || (isHost && msg.isHost);
+                return (
+                  <div
+                    key={msg.id}
+                    data-index={virtualItem.index}
+                    ref={virtualizer.measureElement}
+                    style={{
+                      position: 'absolute',
+                      top: 0,
+                      left: 0,
+                      width: '100%',
+                      transform: `translateY(${virtualItem.start}px)`,
+                    }}
+                  >
+                    <motion.div
+                      id={msg.id}
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className={`flex flex-col gap-1 py-1 transition-all duration-300 ${
+                        isOwnMessage ? 'items-end' : 'items-start'
                       }`}
                     >
-                      {msg.username}
-                    </Badge>
-                    <span className="text-xs text-slate-400 dark:text-slate-500">
-                      {formatTime(msg.timestamp)}
-                    </span>
+                      <div className="flex items-center gap-2">
+                        <Badge
+                          variant={msg.isHost ? 'default' : 'secondary'}
+                          className={`text-xs ${
+                            msg.isHost
+                              ? 'bg-gradient-to-r from-purple-500 to-pink-500'
+                              : 'bg-slate-200 dark:bg-slate-700 text-slate-900 dark:text-white'
+                          }`}
+                        >
+                          {msg.username}
+                        </Badge>
+                        <span className="text-xs text-slate-400 dark:text-slate-500">
+                          {formatTime(msg.timestamp)}
+                        </span>
+                      </div>
+                      <div
+                        className={`px-3 py-2 rounded-lg max-w-[80%] break-words ${
+                          isOwnMessage
+                            ? 'bg-gradient-to-r from-blue-500 to-cyan-500 text-white'
+                            : 'bg-slate-100 dark:bg-slate-700 text-slate-900 dark:text-white'
+                        }`}
+                      >
+                        {msg.message}
+                      </div>
+                    </motion.div>
                   </div>
-                  <div
-                    className={`px-3 py-2 rounded-lg max-w-[80%] break-words ${
-                      msg.username === username || (isHost && msg.isHost)
-                        ? 'bg-gradient-to-r from-blue-500 to-cyan-500 text-white'
-                        : 'bg-slate-100 dark:bg-slate-700 text-slate-900 dark:text-white'
-                    }`}
-                  >
-                    {msg.message}
-                  </div>
-                </motion.div>
-              ))}
-            </AnimatePresence>
-            {messages.length === 0 && (
-              <div className="text-center text-slate-400 dark:text-slate-500 py-8 text-sm">
-                {t('chat.noMessages') || 'No messages yet. Start chatting!'}
-              </div>
-            )}
-          </div>
-        </ScrollArea>
+                );
+              })}
+            </div>
+          )}
+        </div>
 
         {/* Input Area */}
         <div className="flex gap-2">

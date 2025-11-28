@@ -21,13 +21,14 @@ import RoomChat from '../components/RoomChat';
 import GoRipplesAnimation from '../components/GoRipplesAnimation';
 import CircularTimer from '../components/CircularTimer';
 import TournamentStandings from '../components/TournamentStandings';
+import GameTypeSelector from '../components/GameTypeSelector';
 import '../style/animation.scss';
 import { generateRandomTable, embedWordInGrid, applyHebrewFinalLetters } from '../utils/utils';
 import { useSocket } from '../utils/SocketContext';
 import { clearSession } from '../utils/session';
 import { copyJoinUrl, shareViaWhatsApp, getJoinUrl } from '../utils/share';
 import { useLanguage } from '../contexts/LanguageContext';
-import { DIFFICULTIES, DEFAULT_DIFFICULTY } from '../utils/consts';
+import { DIFFICULTIES, DEFAULT_DIFFICULTY, MIN_WORD_LENGTH_OPTIONS, DEFAULT_MIN_WORD_LENGTH } from '../utils/consts';
 import { sanitizeInput } from '../utils/validation';
 import { cn } from '../lib/utils';
 
@@ -36,6 +37,7 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
   const { socket } = useSocket();
   const intentionalExitRef = useRef(false);
   const [difficulty, setDifficulty] = useState(DEFAULT_DIFFICULTY);
+  const [minWordLength, setMinWordLength] = useState(DEFAULT_MIN_WORD_LENGTH);
   const [tableData, setTableData] = useState(generateRandomTable());
   const [timerValue, setTimerValue] = useState('1');
   const [remainingTime, setRemainingTime] = useState(null);
@@ -46,7 +48,6 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
   const [showValidation, setShowValidation] = useState(false);
   const [playerWords, setPlayerWords] = useState([]);
   const [validations, setValidations] = useState({});
-  const [showAutoVerifiedWords, setShowAutoVerifiedWords] = useState(false);
   const [finalScores, setFinalScores] = useState(null);
   const [showQR, setShowQR] = useState(false);
   const [playerWordCounts, setPlayerWordCounts] = useState({});
@@ -63,7 +64,7 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
   const [word, setWord] = useState('');
 
   // Tournament mode states
-  const [tournamentMode, setTournamentMode] = useState(false);
+  const [gameType, setGameType] = useState('regular'); // 'regular' or 'tournament'
   const [tournamentRounds, setTournamentRounds] = useState(3);
   const [tournamentData, setTournamentData] = useState(null);
   const [tournamentCreating, setTournamentCreating] = useState(false);
@@ -281,9 +282,36 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
     };
 
     const handleShowValidation = (data) => {
+      // If all words are auto-validated, skip validation screen entirely
+      if (data.skipValidation) {
+        // Build validations array with all auto-validated words marked as valid
+        const validationArray = [];
+        data.playerWords.forEach(player => {
+          player.words.forEach(wordObj => {
+            // Only add unique words
+            if (!validationArray.some(v => v.word === wordObj.word)) {
+              validationArray.push({
+                word: wordObj.word,
+                isValid: wordObj.autoValidated,
+              });
+            }
+          });
+        });
+
+        // Auto-submit validation
+        socket.emit('validateWords', {
+          validations: validationArray,
+        });
+
+        toast.success(t('hostView.allWordsAutoValidated') || 'All words auto-validated!', {
+          icon: '✅',
+          duration: 3000,
+        });
+        return;
+      }
+
       setPlayerWords(data.playerWords);
       setShowValidation(true);
-      setShowAutoVerifiedWords(false); // Reset collapsed state when modal opens
       const initialValidations = {};
       const uniqueWords = new Set();
       data.playerWords.forEach(player => {
@@ -374,14 +402,34 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
       }
     };
 
+    // Handle gameStarted event from server (used by tournament mode)
+    const handleGameStarted = (data) => {
+      if (data.letterGrid) {
+        setTableData(data.letterGrid);
+      }
+      if (data.timerSeconds !== undefined) {
+        setRemainingTime(data.timerSeconds);
+      }
+      setGameStarted(true);
+      setShowStartAnimation(true);
+      setPlayerWordCounts({});
+      setHostFoundWords([]);
+    };
+
     const handleWordAccepted = (data) => {
       if (hostPlaying) {
         toast.success(`✓ ${data.word}`, { duration: 2000 });
 
         const now = Date.now();
-        if (lastWordTime && (now - lastWordTime) < 5000) {
-          setComboLevel(prev => Math.min(prev + 1, 4));
+        let newComboLevel;
+
+        // Combo chain window scales with current combo level (3s base + 1s per level, max 10s)
+        const comboChainWindow = Math.min(3000 + comboLevel * 1000, 10000);
+        if (lastWordTime && (now - lastWordTime) < comboChainWindow) {
+          newComboLevel = comboLevel + 1;
+          setComboLevel(newComboLevel);
         } else {
+          newComboLevel = 0;
           setComboLevel(0);
         }
         setLastWordTime(now);
@@ -390,10 +438,12 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
           clearTimeout(comboTimeoutRef.current);
         }
 
+        // Timeout to reset combo if no word submitted (same scaling)
+        const comboTimeout = Math.min(3000 + newComboLevel * 1000, 10000);
         comboTimeoutRef.current = setTimeout(() => {
           setComboLevel(0);
           setLastWordTime(null);
-        }, 5000);
+        }, comboTimeout);
       }
     };
 
@@ -483,7 +533,7 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
 
     const handleTournamentCancelled = () => {
       setTournamentData(null);
-      setTournamentMode(false);
+      setGameType('regular');
       toast('Tournament cancelled', {
         icon: '🚫',
         duration: 3000,
@@ -500,6 +550,7 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
     socket.on('autoValidationOccurred', handleAutoValidationOccurred);
     socket.on('roomClosedDueToInactivity', handleRoomClosedDueToInactivity);
     socket.on('timeUpdate', handleTimeUpdate);
+    socket.on('gameStarted', handleGameStarted);
     socket.on('wordAccepted', handleWordAccepted);
     socket.on('wordAlreadyFound', handleWordAlreadyFound);
     socket.on('wordNotOnBoard', handleWordNotOnBoard);
@@ -519,6 +570,7 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
       socket.off('autoValidationOccurred', handleAutoValidationOccurred);
       socket.off('roomClosedDueToInactivity', handleRoomClosedDueToInactivity);
       socket.off('timeUpdate', handleTimeUpdate);
+      socket.off('gameStarted', handleGameStarted);
       socket.off('wordAccepted', handleWordAccepted);
       socket.off('wordAlreadyFound', handleWordAlreadyFound);
       socket.off('wordNotOnBoard', handleWordNotOnBoard);
@@ -534,7 +586,7 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
     if (playersReady.length === 0) return;
 
     // If tournament mode is enabled and no tournament exists, create one first
-    if (tournamentMode && !tournamentData) {
+    if (gameType === 'tournament' && !tournamentData) {
       setTournamentCreating(true);
 
       socket.emit('createTournament', {
@@ -561,7 +613,7 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
     }
 
     // If tournament mode and tournament exists, start next round
-    if (tournamentMode && tournamentData) {
+    if (gameType === 'tournament' && tournamentData) {
       socket.emit('startTournamentRound');
       return;
     }
@@ -582,10 +634,11 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
       letterGrid: newTable,
       timerSeconds: seconds,
       language: roomLanguage,
-      hostPlaying: hostPlaying
+      hostPlaying: hostPlaying,
+      minWordLength: minWordLength
     });
 
-    toast.success(t('hostView.gameStarted'), {
+    toast.success(t('common.gameStarted'), {
       icon: '🎮',
       duration: 3000,
     });
@@ -808,7 +861,7 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
                 {t('hostView.validateIntro')}
               </p>
               <p className="text-sm font-semibold text-orange-600 dark:text-orange-400 flex items-center justify-center gap-2">
-                <span className="text-lg">⚠</span> {t('hostView.duplicateWarning')}
+                <span className="text-lg">⚠</span> {t('common.duplicateWarning')}
               </p>
             </div>
 
@@ -908,86 +961,13 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
                       );
                     })}
 
-                    {/* Collapsible Auto-Verified Words Section */}
+                    {/* Auto-Validated Words Summary - just show count, don't display the words */}
                     {autoVerifiedWords.length > 0 && (
-                      <div className="mt-2">
-                        <button
-                          onClick={() => setShowAutoVerifiedWords(!showAutoVerifiedWords)}
-                          className="w-full flex items-center gap-3 py-3 px-4 bg-gradient-to-r from-cyan-50 to-blue-50 dark:from-cyan-900/20 dark:to-blue-900/20 rounded-xl border-2 border-cyan-300 dark:border-cyan-700 hover:border-cyan-400 dark:hover:border-cyan-600 transition-all"
-                        >
-                          <span className={cn(
-                            "text-lg transition-transform duration-200",
-                            showAutoVerifiedWords ? "rotate-90" : ""
-                          )}>
-                            ▶
-                          </span>
-                          <span className="text-sm font-semibold text-cyan-600 dark:text-cyan-400 flex items-center gap-2">
-                            <span className="text-lg">✓</span>
-                            {t('hostView.autoValidated')} ({autoVerifiedWords.length})
-                          </span>
-                          <span className="ml-auto text-xs text-cyan-500 dark:text-cyan-500">
-                            {showAutoVerifiedWords ? t('hostView.clickToHide') : t('hostView.clickToShow')}
-                          </span>
-                        </button>
-
-                        {/* Auto-Verified Words - Only show when expanded */}
-                        {showAutoVerifiedWords && (
-                          <div className="mt-2 space-y-2">
-                            {autoVerifiedWords.map((item, index) => {
-                              const isDuplicate = item.playerCount > 1;
-                              const isAutoValidated = item.autoValidated;
-                              const isValid = validations[item.word] !== undefined ? validations[item.word] : true;
-
-                              return (
-                                <motion.div
-                                  key={`auto-${index}`}
-                                  initial={{ opacity: 0, x: -20 }}
-                                  animate={{ opacity: 1, x: 0 }}
-                                  transition={{ delay: Math.min(index * 0.02, 0.3) }}
-                                  className={cn(
-                                    "flex items-center gap-3 p-3 rounded-xl transition-all border-2",
-                                    isDuplicate
-                                      ? "bg-gradient-to-r from-orange-50 to-red-50 dark:from-orange-900/20 dark:to-red-900/20 border-orange-300 dark:border-orange-700"
-                                      : isAutoValidated
-                                        ? "bg-gradient-to-r from-cyan-50 to-blue-50 dark:from-cyan-900/20 dark:to-blue-900/20 border-cyan-300 dark:border-cyan-700"
-                                        : isValid
-                                          ? "bg-white dark:bg-slate-800 border-indigo-200 dark:border-slate-600 hover:border-indigo-400 dark:hover:border-indigo-500"
-                                          : "bg-slate-100 dark:bg-slate-700 border-slate-300 dark:border-slate-500 opacity-60"
-                                  )}
-                                >
-                                  <Checkbox
-                                    checked={isValid}
-                                    onCheckedChange={() => toggleWordValidation(null, item.word)}
-                                    disabled={isDuplicate}
-                                    className={cn(
-                                      "w-6 h-6 data-[state=checked]:bg-gradient-to-r data-[state=checked]:from-indigo-600 data-[state=checked]:to-purple-600",
-                                      isDuplicate && "opacity-30 cursor-not-allowed"
-                                    )}
-                                  />
-                                  <div className="flex items-center gap-2 flex-1 min-w-0">
-                                    <span className={cn(
-                                      "text-lg font-bold",
-                                      isDuplicate && "line-through text-gray-400 dark:text-gray-600",
-                                      !isDuplicate && !isValid && "text-gray-400 dark:text-gray-600"
-                                    )}>
-                                      {applyHebrewFinalLetters(item.word)}
-                                    </span>
-                                    {isDuplicate && (
-                                      <Badge className="bg-gradient-to-r from-orange-500 to-red-500 text-white border-0 shadow-md">
-                                        ⚠ {item.playerCount} {t('joinView.players')}
-                                      </Badge>
-                                    )}
-                                    {item.playerCount === 1 && (
-                                      <span className="text-sm font-medium text-slate-500 dark:text-slate-400 ml-auto truncate">
-                                        {item.players[0]}
-                                      </span>
-                                    )}
-                                  </div>
-                                </motion.div>
-                              );
-                            })}
-                          </div>
-                        )}
+                      <div className="mt-2 py-3 px-4 bg-gradient-to-r from-cyan-50 to-blue-50 dark:from-cyan-900/20 dark:to-blue-900/20 rounded-xl border-2 border-cyan-300 dark:border-cyan-700">
+                        <span className="text-sm font-semibold text-cyan-600 dark:text-cyan-400 flex items-center gap-2">
+                          <span className="text-lg">✓</span>
+                          {autoVerifiedWords.length} {t('hostView.wordsAutoValidated') || 'words auto-validated'}
+                        </span>
                       </div>
                     )}
                   </div>
@@ -1115,7 +1095,7 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
                   setGameStarted(false);
                   setRemainingTime(null);
                   setTournamentData(null);
-                  setTournamentMode(false);
+                  setGameType('regular');
 
                   // Clear word-related state for new game
                   setValidations({});
@@ -1124,7 +1104,7 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
 
                   setTimerValue('1');
 
-                  toast.success(`${t('hostView.newGameReady')} 🎮`, {
+                  toast.success(`${t('common.newGameReady')} 🎮`, {
                     icon: '🔄',
                     duration: 2000,
                   });
@@ -1242,7 +1222,7 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
 
         {/* Row 2: Game Settings + Players List (side by side on desktop) */}
         {!gameStarted && (
-          <div className="flex flex-col lg:flex-row gap-3 sm:gap-4 md:gap-6">
+          <div className="flex flex-col lg:flex-row lg:items-stretch gap-3 sm:gap-4 md:gap-6">
             {/* Game Settings - LEFT */}
           <Card className="flex-1 bg-white/80 dark:bg-slate-800/80 backdrop-blur-md p-3 sm:p-4 md:p-5 rounded-lg border border-purple-500/30 shadow-[0_0_15px_rgba(168,85,247,0.1)]">
             <h3 className="text-base font-bold text-purple-600 dark:text-purple-300 mb-4 flex items-center gap-2">
@@ -1299,6 +1279,14 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
                       <span className="text-sm text-purple-600 dark:text-purple-300 font-medium mr-2">{t('hostView.minutes')}</span>
                     </div>
 
+                  {/* Game Type Selector */}
+                  <GameTypeSelector
+                    gameType={gameType}
+                    setGameType={setGameType}
+                    tournamentRounds={tournamentRounds}
+                    setTournamentRounds={setTournamentRounds}
+                  />
+
                   {/* Advanced Settings Toggle */}
                   <button
                     type="button"
@@ -1334,58 +1322,15 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
                           </label>
                         </div>
 
-                        {/* Tournament Mode */}
-                        <div className="space-y-3 p-3 bg-gradient-to-br from-amber-50 to-yellow-50 dark:from-amber-900/20 dark:to-yellow-900/20 rounded-md border-2 border-amber-500/50">
-                          <div className="flex items-center gap-2">
-                            <Checkbox
-                              id="tournamentMode"
-                              checked={tournamentMode}
-                              onCheckedChange={setTournamentMode}
-                              className="border-amber-500/50"
-                            />
-                            <label htmlFor="tournamentMode" className="text-sm font-bold text-amber-700 dark:text-amber-300 cursor-pointer flex items-center gap-2">
-                              <FaTrophy className="text-amber-500" />
-                              {t('hostView.tournamentMode') || 'Tournament Mode'}
-                            </label>
-                          </div>
-
-                          {tournamentMode && (
-                            <>
-                              <div className="flex items-center gap-2 bg-white/50 dark:bg-slate-800/50 p-2 rounded-md border border-amber-500/30">
-                                <span className="text-xs font-medium text-amber-700 dark:text-amber-300 whitespace-nowrap">
-                                  {t('hostView.rounds') || 'Rounds'}:
-                                </span>
-                                <button
-                                  type="button"
-                                  onClick={() => setTournamentRounds(prev => Math.max(2, prev - 1))}
-                                  className="w-7 h-7 flex items-center justify-center rounded-full bg-white dark:bg-slate-800 border border-amber-500/50 text-amber-600 dark:text-amber-300 hover:bg-amber-50 dark:hover:bg-amber-500/20 transition-all duration-300"
-                                >
-                                  <FaMinus size={10} />
-                                </button>
-                                <span className="w-8 text-center text-sm font-bold text-amber-700 dark:text-amber-300">
-                                  {tournamentRounds}
-                                </span>
-                                <button
-                                  type="button"
-                                  onClick={() => setTournamentRounds(prev => Math.min(10, prev + 1))}
-                                  className="w-7 h-7 flex items-center justify-center rounded-full bg-white dark:bg-slate-800 border border-amber-500/50 text-amber-600 dark:text-amber-300 hover:bg-amber-50 dark:hover:bg-amber-500/20 transition-all duration-300"
-                                >
-                                  <FaPlus size={10} />
-                                </button>
-                              </div>
-
-                              {/* Cancel Tournament Button - Only show if tournament has started */}
-                              {tournamentData && (
-                                <Button
-                                  onClick={() => setShowCancelTournamentDialog(true)}
-                                  className="w-full bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white text-xs py-2"
-                                >
-                                  ❌ {t('hostView.cancelTournament') || 'Cancel Tournament'}
-                                </Button>
-                              )}
-                            </>
-                          )}
-                        </div>
+                        {/* Cancel Tournament Button - Only show if tournament has started */}
+                        {tournamentData && (
+                          <Button
+                            onClick={() => setShowCancelTournamentDialog(true)}
+                            className="w-full bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white text-xs py-2"
+                          >
+                            ❌ {t('hostView.cancelTournament') || 'Cancel Tournament'}
+                          </Button>
+                        )}
 
                         {/* Difficulty Selection */}
                         <div className="space-y-2">
@@ -1419,6 +1364,34 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
                             })}
                           </div>
                         </div>
+
+                        {/* Minimum Word Length Selection */}
+                        <div className="space-y-2">
+                          <label className="text-sm font-medium text-purple-600 dark:text-purple-300">
+                            {t('hostView.minWordLength') || 'Minimum Word Length'}
+                          </label>
+                          <div className="flex gap-2">
+                            {MIN_WORD_LENGTH_OPTIONS.map((option) => {
+                              const isSelected = minWordLength === option.value;
+                              return (
+                                <motion.button
+                                  key={option.value}
+                                  onClick={() => setMinWordLength(option.value)}
+                                  whileHover={{ scale: 1.02 }}
+                                  whileTap={{ scale: 0.98 }}
+                                  className={cn(
+                                    "px-4 py-2 rounded-md font-medium transition-all duration-300",
+                                    isSelected
+                                      ? "bg-gradient-to-r from-cyan-500 to-teal-500 text-white text-sm shadow-[0_0_15px_rgba(6,182,212,0.4)]"
+                                      : "bg-slate-100 dark:bg-slate-700/60 text-slate-600 dark:text-slate-300 text-sm hover:bg-slate-200 dark:hover:bg-slate-600/60 border border-slate-200 dark:border-slate-600/50 hover:border-cyan-500/30"
+                                  )}
+                                >
+                                  {t(option.labelKey) || `${option.value} letters`}
+                                </motion.button>
+                              );
+                            })}
+                          </div>
+                        </div>
                       </motion.div>
                     )}
                   </AnimatePresence>
@@ -1447,12 +1420,12 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
           </Card>
 
           {/* Players List - RIGHT */}
-          <Card className="lg:w-[350px] bg-white/80 dark:bg-slate-800/80 backdrop-blur-md p-3 sm:p-4 md:p-6 rounded-lg shadow-lg border border-purple-500/30 shadow-[0_0_15px_rgba(168,85,247,0.1)]">
-            <h3 className="text-lg font-bold text-purple-600 dark:text-purple-300 mb-4 flex items-center gap-2">
+          <Card className="lg:w-[350px] h-auto bg-white/80 dark:bg-slate-800/80 backdrop-blur-md p-3 sm:p-4 md:p-6 rounded-lg shadow-lg border border-purple-500/30 shadow-[0_0_15px_rgba(168,85,247,0.1)] flex flex-col">
+            <h3 className="text-lg font-bold text-purple-600 dark:text-purple-300 mb-4 flex items-center gap-2 flex-shrink-0">
               <FaUsers className="text-purple-500 dark:text-purple-400" />
               {t('hostView.playersJoined')} ({playersReady.length})
             </h3>
-            <div className="flex flex-col gap-2">
+            <div className="flex flex-col gap-2 flex-1 overflow-y-auto">
               <AnimatePresence>
                 {playersReady.map((player, index) => {
                   // Handle both old format (string) and new format (object)

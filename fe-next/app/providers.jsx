@@ -2,6 +2,7 @@
 
 import { ThemeProvider } from '@/utils/ThemeContext';
 import { LanguageProvider } from '@/contexts/LanguageContext';
+import { AuthProvider } from '@/contexts/AuthContext';
 import { Toaster } from 'react-hot-toast';
 import ErrorBoundary from './components/ErrorBoundary';
 import LogRocket from 'logrocket';
@@ -14,9 +15,11 @@ export function Providers({ children, lang }) {
     return (
         <ErrorBoundary>
             <ThemeProvider>
-                <LanguageProvider initialLanguage={lang}>
-                    {children}
-                </LanguageProvider>
+                <AuthProvider>
+                    <LanguageProvider initialLanguage={lang}>
+                        {children}
+                    </LanguageProvider>
+                </AuthProvider>
             </ThemeProvider>
             <Toaster
                 position="top-center"

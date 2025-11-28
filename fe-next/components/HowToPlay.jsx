@@ -148,7 +148,7 @@ const HowToPlay = () => {
             {t('howToPlay.scoringTable.formula')}
           </p>
           <p className="text-sm text-gray-600 mt-2 text-center">
-            {t('howToPlay.duplicateWarning')}
+            ⚠️ {t('common.duplicateWarning')}
           </p>
         </div>
 

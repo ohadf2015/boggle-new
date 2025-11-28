@@ -87,21 +87,23 @@ const addPlayerToTournament = (tournamentId, playerId, username, avatar) => {
   return tournament.players[playerId];
 };
 
-// Remove player from tournament (only in lobby)
-const removePlayerFromTournament = (tournamentId, playerId) => {
+// Remove player from tournament (during lobby or in-progress)
+const removePlayerFromTournament = (tournamentId, playerId, allowDuringGame = false) => {
   const tournament = tournaments[tournamentId];
   if (!tournament) {
     return false;
   }
 
-  if (tournament.status !== 'lobby') {
+  // Only allow removal in lobby, unless allowDuringGame is true (for disconnects)
+  if (tournament.status !== 'lobby' && !allowDuringGame) {
     return false;
   }
 
   if (tournament.players[playerId]) {
+    const username = tournament.players[playerId].username;
     delete tournament.players[playerId];
     tournament.updatedAt = Date.now();
-    console.log(`[TOURNAMENT] Removed player ${playerId} from tournament ${tournamentId}`);
+    console.log(`[TOURNAMENT] Removed player ${username} (${playerId}) from tournament ${tournamentId}`);
 
     // Save to Redis for persistence
     saveTournamentState(tournamentId, tournament).catch(err => {
@@ -112,6 +114,47 @@ const removePlayerFromTournament = (tournamentId, playerId) => {
   }
 
   return false;
+};
+
+// Allow new player to join mid-tournament
+const addPlayerMidTournament = (tournamentId, playerId, username, avatar) => {
+  const tournament = tournaments[tournamentId];
+  if (!tournament) {
+    throw new Error('Tournament not found');
+  }
+
+  // Can join if tournament is in-progress (but not completed)
+  if (tournament.status === 'completed') {
+    throw new Error('Cannot join completed tournament');
+  }
+
+  // Check if player already in tournament
+  if (tournament.players[playerId]) {
+    console.log(`[TOURNAMENT] Player ${username} already in tournament ${tournamentId}`);
+    return tournament.players[playerId];
+  }
+
+  // Add player with zero scores for missed rounds
+  const missedRounds = tournament.currentRound;
+  tournament.players[playerId] = {
+    playerId,
+    username,
+    avatar,
+    totalScore: 0,
+    roundScores: Array(missedRounds).fill(0), // Zero scores for missed rounds
+    joinedAt: Date.now(),
+    joinedMidTournament: missedRounds > 0,
+  };
+
+  tournament.updatedAt = Date.now();
+  console.log(`[TOURNAMENT] Added player ${username} mid-tournament to ${tournamentId} (missed ${missedRounds} rounds)`);
+
+  // Save to Redis for persistence
+  saveTournamentState(tournamentId, tournament).catch(err => {
+    console.error('[TOURNAMENT] Failed to save tournament to Redis:', err);
+  });
+
+  return tournament.players[playerId];
 };
 
 // Start a new round in the tournament
@@ -330,6 +373,7 @@ module.exports = {
   generateTournamentId,
   createTournament,
   addPlayerToTournament,
+  addPlayerMidTournament,
   removePlayerFromTournament,
   startTournamentRound,
   completeTournamentRound,

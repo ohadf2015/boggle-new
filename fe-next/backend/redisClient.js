@@ -399,6 +399,95 @@ async function getApprovedWords(language, minApprovals = 2) {
   }
 }
 
+// ==========================================
+// Leaderboard Caching
+// ==========================================
+
+const LEADERBOARD_TTL = 300; // 5 minutes cache
+
+// Get cached leaderboard top 100
+async function getCachedLeaderboardTop100() {
+  if (!isRedisAvailable || !redisClient) {
+    return null;
+  }
+
+  try {
+    const data = await redisClient.get('lb:top100');
+    return data ? JSON.parse(data) : null;
+  } catch (error) {
+    console.error('[REDIS] Error getting cached leaderboard:', error.message);
+    return null;
+  }
+}
+
+// Cache leaderboard top 100
+async function cacheLeaderboardTop100(leaderboard) {
+  if (!isRedisAvailable || !redisClient) {
+    return;
+  }
+
+  try {
+    await redisClient.setex('lb:top100', LEADERBOARD_TTL, JSON.stringify(leaderboard));
+  } catch (error) {
+    console.error('[REDIS] Error caching leaderboard:', error.message);
+  }
+}
+
+// Get cached user rank
+async function getCachedUserRank(userId) {
+  if (!isRedisAvailable || !redisClient) {
+    return null;
+  }
+
+  try {
+    const data = await redisClient.get(`lb:user:${userId}`);
+    return data ? JSON.parse(data) : null;
+  } catch (error) {
+    console.error('[REDIS] Error getting cached user rank:', error.message);
+    return null;
+  }
+}
+
+// Cache user rank
+async function cacheUserRank(userId, rankData) {
+  if (!isRedisAvailable || !redisClient) {
+    return;
+  }
+
+  try {
+    await redisClient.setex(`lb:user:${userId}`, 60, JSON.stringify(rankData)); // 1 minute cache
+  } catch (error) {
+    console.error('[REDIS] Error caching user rank:', error.message);
+  }
+}
+
+// Invalidate leaderboard caches
+async function invalidateLeaderboardCaches() {
+  if (!isRedisAvailable || !redisClient) {
+    return;
+  }
+
+  try {
+    // Delete top 100 cache
+    await redisClient.del('lb:top100');
+
+    // Delete all user rank caches using SCAN
+    let cursor = '0';
+    do {
+      const result = await redisClient.scan(cursor, 'MATCH', 'lb:user:*', 'COUNT', 100);
+      cursor = result[0];
+      const keys = result[1];
+      if (keys.length > 0) {
+        await redisClient.del(...keys);
+      }
+    } while (cursor !== '0');
+
+    console.log('[REDIS] Leaderboard caches invalidated');
+  } catch (error) {
+    console.error('[REDIS] Error invalidating leaderboard caches:', error.message);
+  }
+}
+
 module.exports = {
   initRedis,
   saveGameState,
@@ -415,4 +504,10 @@ module.exports = {
   getWordApprovalStatus,
   incrementWordApproval,
   getApprovedWords,
+  // Leaderboard caching
+  getCachedLeaderboardTop100,
+  cacheLeaderboardTop100,
+  getCachedUserRank,
+  cacheUserRank,
+  invalidateLeaderboardCaches,
 };
