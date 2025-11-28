@@ -50,8 +50,40 @@ const {
 const { validateWordOnBoard, makePositionsMap } = require('./modules/wordValidator');
 const Filter = require('bad-words');
 
-// Initialize bad words filter
-const badWordsFilter = new Filter();
+// Initialize bad words filter with exact word matching only
+// The default bad-words library uses regex that causes false positives for non-Latin scripts (Hebrew, etc.)
+const badWordsFilter = new Filter({ placeHolder: '*' });
+
+// Get the list of bad words for exact matching
+const badWordsList = new Set(badWordsFilter.list.map(w => w.toLowerCase()));
+
+/**
+ * Check if text contains profanity using exact word matching
+ * This avoids false positives in Hebrew and other non-Latin scripts
+ */
+function isProfane(text) {
+  if (!text) return false;
+  // Split into words and check each one exactly (not substring matching)
+  const words = text.toLowerCase().split(/\s+/);
+  return words.some(word => badWordsList.has(word));
+}
+
+/**
+ * Clean profanity from text using exact word matching
+ * Only replaces exact bad words, not substrings
+ */
+function cleanProfanity(text) {
+  if (!text) return text;
+  // Split into words, replace bad words, rejoin
+  return text.split(/(\s+)/).map(part => {
+    // Check if this part (ignoring whitespace) is a bad word
+    const lowerPart = part.toLowerCase();
+    if (badWordsList.has(lowerPart)) {
+      return '*'.repeat(part.length);
+    }
+    return part;
+  }).join('');
+}
 const { calculateWordScore, calculateGameScores } = require('./modules/scoringEngine');
 const { checkAndAwardAchievements, getPlayerAchievements, ACHIEVEMENTS } = require('./modules/achievementManager');
 const { isDictionaryWord, getAvailableDictionaries, addApprovedWord, normalizeWord } = require('./dictionary');
@@ -117,7 +149,7 @@ function initializeSocketHandlers(io) {
         socket.emit('rateLimited');
         return;
       }
-      const { gameCode, roomName, language, hostUsername, playerId, avatar, authUserId, guestTokenHash, isRanked } = data;
+      const { gameCode, roomName, language, hostUsername, playerId, avatar, authUserId, guestTokenHash, isRanked, profilePictureUrl } = data;
 
       console.log(`[SOCKET] Create game request: ${gameCode} by ${hostUsername}${isRanked ? ' (RANKED)' : ''}`);
 
@@ -145,8 +177,9 @@ function initializeSocketHandlers(io) {
       });
 
       // Add host as first user with auth context
+      const hostAvatar = avatar || generateRandomAvatar();
       addUserToGame(gameCode, hostUsername || 'Host', socket.id, {
-        avatar: avatar || generateRandomAvatar(),
+        avatar: { ...hostAvatar, profilePictureUrl: profilePictureUrl || null },
         isHost: true,
         playerId,
         authUserId: authUserId || null,
@@ -193,7 +226,7 @@ function initializeSocketHandlers(io) {
         socket.emit('rateLimited');
         return;
       }
-      const { gameCode, username, playerId, avatar, authUserId, guestTokenHash } = data;
+      const { gameCode, username, playerId, avatar, authUserId, guestTokenHash, profilePictureUrl } = data;
 
       console.log(`[SOCKET] Join request: ${username} to game ${gameCode}`, { authUserId, guestTokenHash: !!guestTokenHash });
 
@@ -291,8 +324,9 @@ function initializeSocketHandlers(io) {
       }
 
       // Add new user with auth context
+      const userAvatar = avatar || generateRandomAvatar();
       addUserToGame(gameCode, username, socket.id, {
-        avatar: avatar || generateRandomAvatar(),
+        avatar: { ...userAvatar, profilePictureUrl: profilePictureUrl || null },
         isHost: false,
         playerId,
         authUserId: authUserId || null,
@@ -337,8 +371,8 @@ function initializeSocketHandlers(io) {
       const tournamentId = getTournamentIdFromGame(gameCode);
       if (tournamentId) {
         try {
-          const userAvatar = avatar || generateRandomAvatar();
-          tournamentManager.addPlayerMidTournament(tournamentId, socket.id, username, userAvatar);
+          const tournamentAvatar = { ...userAvatar, profilePictureUrl: profilePictureUrl || null };
+          tournamentManager.addPlayerMidTournament(tournamentId, socket.id, username, tournamentAvatar);
 
           // Send tournament info to the joining player
           const tournament = tournamentManager.getTournament(tournamentId);
@@ -493,8 +527,8 @@ function initializeSocketHandlers(io) {
       // Cap word length to prevent abuse (max 50 chars)
       const normalizedWord = word.toLowerCase().trim().substring(0, 50);
 
-      // Check for profanity - reject inappropriate words
-      if (badWordsFilter.isProfane(normalizedWord)) {
+      // Check for profanity - reject inappropriate words (exact word matching to avoid false positives)
+      if (isProfane(normalizedWord)) {
         socket.emit('wordRejected', {
           word: normalizedWord,
           reason: 'inappropriate'
@@ -596,8 +630,8 @@ function initializeSocketHandlers(io) {
 
       const isHostUser = game.hostSocketId === socket.id;
 
-      // Filter profanity and broadcast to room
-      const cleanMessage = badWordsFilter.clean(message.trim().substring(0, 500));
+      // Filter profanity (exact word matching to avoid false positives in other languages) and broadcast to room
+      const cleanMessage = cleanProfanity(message.trim().substring(0, 500));
       broadcastToRoom(io, getGameRoom(gameCode), 'chatMessage', {
         username: isHostUser ? 'Host' : username,
         message: cleanMessage,

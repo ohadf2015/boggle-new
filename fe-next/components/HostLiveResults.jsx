@@ -5,6 +5,7 @@ import { Badge } from './ui/badge';
 import { useLanguage } from '../contexts/LanguageContext';
 import { cn } from '../lib/utils';
 import { Trophy, Zap, Clock, Award } from 'lucide-react';
+import Avatar from './Avatar';
 
 const HostLiveResults = ({ players, gameLanguage, remainingTime }) => {
   const { t } = useLanguage();
@@ -131,11 +132,12 @@ const HostLiveResults = ({ players, gameLanguage, remainingTime }) => {
                   >
                     {getRankIcon(index)}
                   </motion.div>
-                  {player.avatar?.emoji && (
-                    <div className="text-3xl">
-                      {player.avatar.emoji}
-                    </div>
-                  )}
+                  <Avatar
+                    profilePictureUrl={player.avatar?.profilePictureUrl}
+                    avatarEmoji={player.avatar?.emoji}
+                    avatarColor={player.avatar?.color}
+                    size="lg"
+                  />
                   <div>
                     <h3 className="text-xl font-bold text-slate-900 dark:text-white">
                       {player.username}

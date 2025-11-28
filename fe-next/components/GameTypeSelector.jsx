@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { FaGamepad, FaTrophy, FaMinus, FaPlus } from 'react-icons/fa';
+import { FaGamepad, FaTrophy, FaMinus, FaPlus, FaLock } from 'react-icons/fa';
 import { cn } from '../lib/utils';
 import { useLanguage } from '../contexts/LanguageContext';
 
@@ -38,6 +38,7 @@ const GameTypeSelector = ({
       icon: FaTrophy,
       titleKey: 'hostView.tournament',
       descKey: 'hostView.tournamentDesc',
+      locked: true,
       colors: {
         gradient: 'from-amber-500/20 to-yellow-500/20',
         border: 'border-amber-500/50',
@@ -61,24 +62,39 @@ const GameTypeSelector = ({
       <div className="grid grid-cols-2 gap-3">
         {gameTypes.map((type) => {
           const isSelected = gameType === type.id;
+          const isLocked = type.locked;
           const Icon = type.icon;
 
           return (
             <motion.button
               key={type.id}
-              onClick={() => setGameType(type.id)}
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
+              onClick={() => !isLocked && setGameType(type.id)}
+              whileHover={isLocked ? {} : { scale: 1.02 }}
+              whileTap={isLocked ? {} : { scale: 0.98 }}
+              disabled={isLocked}
               className={cn(
                 "relative p-4 rounded-xl border-2 transition-all duration-300",
                 `bg-gradient-to-br ${type.colors.gradient}`,
-                isSelected
-                  ? `${type.colors.borderSelected} ${type.colors.shadow}`
-                  : `${type.colors.border} ${type.colors.shadowHover} opacity-70 hover:opacity-100`
+                isLocked
+                  ? `${type.colors.border} opacity-50 cursor-not-allowed`
+                  : isSelected
+                    ? `${type.colors.borderSelected} ${type.colors.shadow}`
+                    : `${type.colors.border} ${type.colors.shadowHover} opacity-70 hover:opacity-100`
               )}
             >
+              {/* Coming Soon badge for locked items */}
+              {isLocked && (
+                <motion.div
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  className="absolute -top-2 -right-2 px-2 py-0.5 bg-gradient-to-r from-amber-500 to-yellow-500 rounded-full flex items-center justify-center gap-1 text-white text-[10px] font-bold shadow-lg"
+                >
+                  <FaLock className="text-[8px]" />
+                  {t('hostView.comingSoon') || 'Coming Soon'}
+                </motion.div>
+              )}
               {/* Selection indicator */}
-              {isSelected && (
+              {isSelected && !isLocked && (
                 <motion.div
                   initial={{ scale: 0 }}
                   animate={{ scale: 1 }}

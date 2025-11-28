@@ -14,6 +14,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { useMusic } from '@/contexts/MusicContext';
 import { getGuestSessionId, hashToken } from '@/utils/guestManager';
+import { getSession as getSupabaseSession } from '@/lib/supabase';
 import logger from '@/utils/logger';
 
 // Force dynamic rendering to prevent static generation issues
@@ -251,8 +252,14 @@ export default function GamePage() {
           // Build auth context inline for reconnection
           const buildAuthContext = async () => {
             try {
-              // Check if user is authenticated (user state may not be set yet during reconnect)
-              // For reconnection, we'll get auth context from session storage if available
+              // First check if user is authenticated via Supabase session
+              // (user state may not be set yet during reconnect, so check session directly)
+              const { data: { session } } = await getSupabaseSession();
+              if (session?.user?.id) {
+                return { authUserId: session.user.id, guestTokenHash: null };
+              }
+
+              // Fall back to guest token
               const guestSessionId = getGuestSessionId();
               if (guestSessionId) {
                 const hash = await hashToken(guestSessionId);
@@ -631,6 +638,7 @@ export default function GamePage() {
         language: roomLang || language,
         authUserId,
         guestTokenHash,
+        profilePictureUrl: profile?.profile_picture_url,
       });
     } else {
       socket.emit('join', {
@@ -638,9 +646,10 @@ export default function GamePage() {
         username,
         authUserId,
         guestTokenHash,
+        profilePictureUrl: profile?.profile_picture_url,
       });
     }
-  }, [socket, isConnected, gameCode, username, roomName, language, t, isSupabaseEnabled, isAuthenticated, user]);
+  }, [socket, isConnected, gameCode, username, roomName, language, t, isSupabaseEnabled, isAuthenticated, user, profile]);
 
   const refreshRooms = useCallback(() => {
     if (socket && isConnected) {

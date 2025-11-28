@@ -67,7 +67,7 @@ const AuthButton = () => {
             size="sm"
           />
           <span className="max-w-[80px] truncate font-medium">
-            {profile.username}
+            {profile.display_name || profile.username}
           </span>
           <FaChevronDown size={10} className={showUserMenu ? 'rotate-180 transition-transform' : 'transition-transform'} />
         </Button>

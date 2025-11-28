@@ -1,7 +1,7 @@
 'use client';
 
 import React, { createContext, useContext, useEffect, useState, useRef, useCallback } from 'react';
-import { Howl } from 'howler';
+import { Howl, Howler } from 'howler';
 
 const MusicContext = createContext(null);
 
@@ -50,6 +50,9 @@ export function MusicProvider({ children }) {
     const [isPlaying, setIsPlaying] = useState(false);
     const [audioUnlocked, setAudioUnlocked] = useState(false);
 
+    // Ref to track audioUnlocked state without causing re-renders
+    const audioUnlockedRef = useRef(false);
+
     // Howl instances ref - one per track for seamless transitions
     const howlsRef = useRef({});
     const currentHowlRef = useRef(null);
@@ -64,6 +67,7 @@ export function MusicProvider({ children }) {
     // Keep refs in sync with state
     useEffect(() => { isMutedRef.current = isMuted; }, [isMuted]);
     useEffect(() => { volumeRef.current = volume; }, [volume]);
+    useEffect(() => { audioUnlockedRef.current = audioUnlocked; }, [audioUnlocked]);
 
     // Initialize Howl instances
     useEffect(() => {
@@ -101,8 +105,51 @@ export function MusicProvider({ children }) {
         }
     }, [volume, isMuted]);
 
-    // Explicitly unlock audio - called when user clicks the speaker button
+    // Auto-unlock audio on first user interaction anywhere in the app
+    useEffect(() => {
+        if (typeof window === 'undefined' || audioUnlocked) return;
+
+        const handleFirstInteraction = () => {
+            if (audioUnlockedRef.current) return;
+
+            // Resume AudioContext for iOS Safari
+            if (Howler.ctx && Howler.ctx.state === 'suspended') {
+                Howler.ctx.resume();
+            }
+
+            setAudioUnlocked(true);
+
+            // Remove all listeners after first interaction
+            cleanup();
+        };
+
+        const events = ['click', 'touchend', 'keydown'];
+
+        events.forEach(event => {
+            document.addEventListener(event, handleFirstInteraction, {
+                capture: true,
+                passive: true
+            });
+        });
+
+        const cleanup = () => {
+            events.forEach(event => {
+                document.removeEventListener(event, handleFirstInteraction, { capture: true });
+            });
+        };
+
+        return cleanup;
+    }, [audioUnlocked]);
+
+    // Explicitly unlock audio - called when user clicks the speaker button (fallback)
     const unlockAudio = useCallback(() => {
+        if (audioUnlockedRef.current) return;
+
+        // Resume AudioContext for iOS Safari
+        if (Howler.ctx && Howler.ctx.state === 'suspended') {
+            Howler.ctx.resume();
+        }
+
         setAudioUnlocked(true);
     }, []);
 

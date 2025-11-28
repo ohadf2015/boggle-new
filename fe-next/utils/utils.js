@@ -192,19 +192,38 @@ function tryEmbedCompound(grid, compound, rows, cols, usedCells) {
 export function embedWordInGrid(rows, cols, word, language = 'he') {
   // 1. Generate a random grid first
   const grid = generateRandomTable(rows, cols, language);
-  
-  if (!word || word.length === 0) return grid;
-  
+
+  if (!word || word.length === 0) return { grid, path: [] };
+
   // 2. Choose a random starting position and direction
   // Directions: 0=horizontal, 1=vertical, 2=diagonal-down-right, 3=diagonal-up-right
   const wordLen = word.length;
+
+  // If word is too long to fit in any direction, return grid without embedding
+  if (wordLen > rows && wordLen > cols) {
+    return { grid, path: [] };
+  }
+
   const maxAttempts = 50;
-  
+
   for (let attempt = 0; attempt < maxAttempts; attempt++) {
-    const direction = Math.floor(Math.random() * 4);
+    // Build list of valid directions based on word length
+    const validDirections = [];
+    if (wordLen <= cols) validDirections.push(0); // Horizontal
+    if (wordLen <= rows) validDirections.push(1); // Vertical
+    if (wordLen <= rows && wordLen <= cols) {
+      validDirections.push(2); // Diagonal down-right
+      validDirections.push(3); // Diagonal up-right
+    }
+
+    if (validDirections.length === 0) {
+      return { grid, path: [] };
+    }
+
+    const direction = validDirections[Math.floor(Math.random() * validDirections.length)];
     let startRow, startCol;
     let rowStep = 0, colStep = 0;
-    
+
     // Set steps based on direction
     if (direction === 0) { // Horizontal
       rowStep = 0; colStep = 1;
@@ -223,7 +242,7 @@ export function embedWordInGrid(rows, cols, word, language = 'he') {
       startRow = Math.floor(Math.random() * (rows - wordLen + 1)) + (wordLen - 1);
       startCol = Math.floor(Math.random() * (cols - wordLen + 1));
     }
-    
+
     // 3. Place the word
     const path = [];
     for (let i = 0; i < wordLen; i++) {
@@ -232,10 +251,10 @@ export function embedWordInGrid(rows, cols, word, language = 'he') {
       grid[r][c] = word[i];
       path.push({ row: r, col: c, letter: word[i] });
     }
-    
+
     return { grid, path };
   }
-  
+
   // Fallback if placement failed
   return { grid, path: [] };
 }

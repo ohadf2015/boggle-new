@@ -7,6 +7,7 @@ import { useLanguage } from '../../contexts/LanguageContext';
 import { cn } from '../../lib/utils';
 import { applyHebrewFinalLetters } from '../../utils/utils';
 import { ChevronDown, ChevronUp } from 'lucide-react';
+import Avatar from '../Avatar';
 
 // Color mapping based on points - using game theme colors (cyan/teal/purple spectrum)
 // Intensity increases with points for intuitive visual hierarchy
@@ -192,11 +193,12 @@ const ResultsPlayerCard = ({ player, index, allPlayerWords, currentUsername, isW
             )}>
               {getRankIcon()}
             </div>
-            {avatar?.emoji && (
-              <div className="text-3xl" style={{ imageRendering: 'crisp-edges' }}>
-                {avatar.emoji}
-              </div>
-            )}
+            <Avatar
+              profilePictureUrl={avatar?.profilePictureUrl}
+              avatarEmoji={avatar?.emoji}
+              avatarColor={avatar?.color}
+              size="lg"
+            />
             <div>
               <h3 className="text-xl font-bold text-slate-900 dark:text-white flex items-center gap-2 flex-wrap">
                 <span>{player.username}</span>

@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card'
 import { Progress } from '../components/ui/progress';
 import { Badge } from '../components/ui/badge';
 import { AchievementBadge } from '../components/AchievementBadge';
+import Avatar from '../components/Avatar';
 import { motion, AnimatePresence } from 'framer-motion';
 import confetti from 'canvas-confetti';
 import toast from 'react-hot-toast';
@@ -771,11 +772,12 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
                           <div className="text-2xl font-bold min-w-[40px] text-center">
                             {index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : `#${index + 1}`}
                           </div>
-                          {player.avatar?.emoji && (
-                            <div className="text-2xl">
-                              {player.avatar.emoji}
-                            </div>
-                          )}
+                          <Avatar
+                            profilePictureUrl={player.avatar?.profilePictureUrl}
+                            avatarEmoji={player.avatar?.emoji}
+                            avatarColor={player.avatar?.color}
+                            size="md"
+                          />
                           <div className="flex-1">
                             <div className={`font-bold flex items-center gap-2 ${dir === 'rtl' ? 'flex-row-reverse' : ''}`}>
                               <SlotMachineText text={player.username} />
@@ -980,7 +982,12 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
                             }}
                           >
                             <div className="flex items-center gap-2">
-                              {avatar?.emoji && <span className="text-lg">{avatar.emoji}</span>}
+                              <Avatar
+                                profilePictureUrl={avatar?.profilePictureUrl}
+                                avatarEmoji={avatar?.emoji}
+                                avatarColor={avatar?.color}
+                                size="sm"
+                              />
                               {isHost && <FaCrown className="text-yellow-300" />}
                               <SlotMachineText text={playerUsername} />
                               {isMe && (
@@ -1383,11 +1390,12 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
                     <div className="w-12 h-12 rounded-full flex items-center justify-center font-bold text-xl bg-black/20 backdrop-blur-sm shadow-inner">
                       {index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : `#${index + 1}`}
                     </div>
-                    {player.avatar?.emoji && (
-                      <div className="text-2xl">
-                        {player.avatar.emoji}
-                      </div>
-                    )}
+                    <Avatar
+                      profilePictureUrl={player.avatar?.profilePictureUrl}
+                      avatarEmoji={player.avatar?.emoji}
+                      avatarColor={player.avatar?.color}
+                      size="md"
+                    />
                     <div className="flex-1 min-w-0">
                       <div className={`font-bold truncate text-base flex items-center gap-2 ${dir === 'rtl' ? 'flex-row-reverse' : ''}`}>
                         <SlotMachineText text={player.username} />

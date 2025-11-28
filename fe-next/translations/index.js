@@ -140,6 +140,7 @@ export const translations = {
       enterRoom: 'Enter Room',
       joinGame: 'Join Game',
       joiningAs: 'Joining as',
+      hostingAs: 'Hosting as',
     },
     hostView: {
       waitingForPlayers: 'Waiting for players...',
@@ -215,6 +216,7 @@ export const translations = {
       regularGameDesc: 'Quick single round for casual play',
       tournament: 'Tournament',
       tournamentDesc: 'Multi-round competition for champions',
+      comingSoon: 'Coming Soon',
       numberOfRounds: 'Number of Rounds',
       betweenRoundsStandings: 'Current Standings',
       nextRoundIn: 'Next round starts in',
@@ -600,6 +602,7 @@ export const translations = {
       enterRoom: 'כניסה לחדר',
       joinGame: 'הצטרף למשחק',
       joiningAs: 'מצטרף בשם',
+      hostingAs: 'מארח בשם',
     },
     hostView: {
       waitingForPlayers: 'ממתין לשחקנים...',
@@ -675,6 +678,7 @@ export const translations = {
       regularGameDesc: 'סיבוב בודד למשחק מזדמן',
       tournament: 'טורניר',
       tournamentDesc: 'תחרות מרובת סיבובים לאלופים',
+      comingSoon: 'בקרוב',
       numberOfRounds: 'מספר סיבובים',
       betweenRoundsStandings: 'דירוג נוכחי',
       nextRoundIn: 'הסיבוב הבא מתחיל בעוד',
@@ -1060,6 +1064,7 @@ export const translations = {
       enterRoom: 'Gå in i rummet',
       joinGame: 'Gå med i spelet',
       joiningAs: 'Går med som',
+      hostingAs: 'Värd som',
     },
     hostView: {
       waitingForPlayers: 'Väntar på spelare...',
@@ -1133,6 +1138,7 @@ export const translations = {
       regularGameDesc: 'Snabb enkelomgång för avslappnat spel',
       tournament: 'Turnering',
       tournamentDesc: 'Flerrundskonkurrens för mästare',
+      comingSoon: 'Kommer snart',
       numberOfRounds: 'Antal omgångar',
       betweenRoundsStandings: 'Aktuell ställning',
       nextRoundIn: 'Nästa omgång börjar om',
@@ -1518,6 +1524,7 @@ export const translations = {
       enterRoom: 'ルームに入る',
       joinGame: 'ゲームに参加',
       joiningAs: '参加者名',
+      hostingAs: 'ホスト名',
     },
     hostView: {
       waitingForPlayers: 'プレイヤーを待っています...',
@@ -1591,6 +1598,7 @@ export const translations = {
       regularGameDesc: 'カジュアルプレイ用のクイックシングルラウンド',
       tournament: 'トーナメント',
       tournamentDesc: 'チャンピオン向けのマルチラウンド競技',
+      comingSoon: '近日公開',
       numberOfRounds: 'ラウンド数',
       betweenRoundsStandings: '現在の順位',
       nextRoundIn: '次のラウンド開始まで',
