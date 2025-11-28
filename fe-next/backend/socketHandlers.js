@@ -276,10 +276,13 @@ function initializeSocketHandlers(io) {
       }
       if (existingSocketId) {
         // Handle reconnection
-        console.log(`[SOCKET] Reconnection detected for ${username}`);
+        console.log(`[SOCKET] Reconnection detected for ${username}`, { authUserId, guestTokenHash: !!guestTokenHash });
 
-        // Update socket ID
-        updateUserSocketId(gameCode, username, socket.id);
+        // Update socket ID and auth context (user may have logged in since original join)
+        updateUserSocketId(gameCode, username, socket.id, {
+          authUserId: authUserId || null,
+          guestTokenHash: guestTokenHash || null
+        });
 
         // Check if this is the host reconnecting
         if (game.hostUsername === username) {

@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FaGoogle, FaDiscord, FaTimes } from 'react-icons/fa';
+import Link from 'next/link';
 import { Button } from '../ui/button';
 import { useTheme } from '../../utils/ThemeContext';
 import { useLanguage } from '../../contexts/LanguageContext';
@@ -13,7 +14,7 @@ import { cn } from '../../lib/utils';
 
 const AuthModal = ({ isOpen, onClose, showGuestStats = false }) => {
   const { theme } = useTheme();
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const isDarkMode = theme === 'dark';
   const [isLoading, setIsLoading] = useState(null);
   const [error, setError] = useState(null);
@@ -196,7 +197,28 @@ const AuthModal = ({ isOpen, onClose, showGuestStats = false }) => {
             'mt-4 text-xs text-center',
             isDarkMode ? 'text-gray-500' : 'text-gray-400'
           )}>
-            {t('auth.termsAgreement')}
+            {t('auth.termsPrefix')}{' '}
+            <Link
+              href={`/${language}/legal/terms`}
+              className={cn(
+                'underline transition-colors',
+                isDarkMode ? 'hover:text-cyan-400' : 'hover:text-cyan-600'
+              )}
+              onClick={(e) => e.stopPropagation()}
+            >
+              {t('auth.termsLink')}
+            </Link>
+            {' '}{t('auth.andText')}{' '}
+            <Link
+              href={`/${language}/legal/privacy`}
+              className={cn(
+                'underline transition-colors',
+                isDarkMode ? 'hover:text-cyan-400' : 'hover:text-cyan-600'
+              )}
+              onClick={(e) => e.stopPropagation()}
+            >
+              {t('auth.privacyLink')}
+            </Link>
           </p>
         </motion.div>
       </motion.div>

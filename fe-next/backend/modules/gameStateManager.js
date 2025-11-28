@@ -244,8 +244,9 @@ function getUserBySocketId(socketId) {
  * @param {string} gameCode - Game code
  * @param {string} username - Username
  * @param {string} newSocketId - New socket ID
+ * @param {object} authContext - Optional auth context to update { authUserId, guestTokenHash }
  */
-function updateUserSocketId(gameCode, username, newSocketId) {
+function updateUserSocketId(gameCode, username, newSocketId, authContext = null) {
   const game = games[gameCode];
   if (!game || !game.users[username]) return false;
 
@@ -259,6 +260,16 @@ function updateUserSocketId(gameCode, username, newSocketId) {
 
   // Update user data
   game.users[username].socketId = newSocketId;
+
+  // Update auth context if provided (for reconnection with new auth state)
+  if (authContext) {
+    if (authContext.authUserId !== undefined) {
+      game.users[username].authUserId = authContext.authUserId;
+    }
+    if (authContext.guestTokenHash !== undefined) {
+      game.users[username].guestTokenHash = authContext.guestTokenHash;
+    }
+  }
 
   // Set up new mappings
   socketToGame.set(newSocketId, gameCode);

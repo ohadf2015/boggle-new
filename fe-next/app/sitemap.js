@@ -66,5 +66,31 @@ export default function sitemap() {
       },
       images: [`${baseUrl}/lexiclash.jpg`],
     },
+    // Legal pages - English
+    {
+      url: `${baseUrl}/en/legal/terms`,
+      lastModified: new Date(),
+      changeFrequency: 'monthly',
+      priority: 0.3,
+    },
+    {
+      url: `${baseUrl}/en/legal/privacy`,
+      lastModified: new Date(),
+      changeFrequency: 'monthly',
+      priority: 0.3,
+    },
+    // Legal pages - Hebrew
+    {
+      url: `${baseUrl}/he/legal/terms`,
+      lastModified: new Date(),
+      changeFrequency: 'monthly',
+      priority: 0.3,
+    },
+    {
+      url: `${baseUrl}/he/legal/privacy`,
+      lastModified: new Date(),
+      changeFrequency: 'monthly',
+      priority: 0.3,
+    },
   ];
 }

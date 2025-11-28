@@ -1225,15 +1225,15 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
       {/* 3 Column Layout: Found Words | Grid | Ranking */}
       <div className="flex flex-col lg:flex-row gap-1 md:gap-2 max-w-7xl mx-auto flex-grow w-full overflow-hidden">
         {/* Left Column: Found Words (Hidden on mobile, shown on desktop) */}
-        <div className="hidden lg:flex lg:flex-col lg:w-64 xl:w-80 gap-2">
-          <Card className="bg-slate-900/95 dark:bg-slate-900/95 backdrop-blur-md border border-teal-500/40 shadow-[0_0_25px_rgba(20,184,166,0.2)] flex flex-col flex-grow overflow-hidden">
+        <div className="hidden lg:flex lg:flex-col lg:w-64 xl:w-80 gap-2 min-h-0">
+          <Card className="bg-slate-900/95 dark:bg-slate-900/95 backdrop-blur-md border border-teal-500/40 shadow-[0_0_25px_rgba(20,184,166,0.2)] flex flex-col min-h-0 max-h-full overflow-hidden">
             <CardHeader className="py-3 border-b border-teal-500/30 bg-gradient-to-r from-teal-900/50 to-cyan-900/50">
               <CardTitle className="text-white text-base uppercase tracking-widest font-bold">
                 {t('playerView.wordsFound')}
               </CardTitle>
             </CardHeader>
-            <CardContent className="flex-1 overflow-y-auto p-3 bg-slate-900/90">
-              <div className="space-y-2">
+            <CardContent className="flex-1 overflow-y-auto p-3 bg-slate-900/90 min-h-0">
+              <div className="space-y-2" ref={wordListRef}>
                 <AnimatePresence>
                   {foundWords.map((foundWordObj, index) => {
                     const wordText = foundWordObj.word;
