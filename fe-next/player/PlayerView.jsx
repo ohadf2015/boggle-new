@@ -115,11 +115,19 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
     }
   }, [gameActive]);
 
-  // Clear game state when entering
+  // Clear game state when entering and cleanup combo timeout on unmount
   useEffect(() => {
     localStorage.removeItem('boggle_player_state');
     setFoundWords([]);
     setAchievements([]);
+
+    // Cleanup combo timeout on unmount to prevent memory leak
+    return () => {
+      if (comboTimeoutRef.current) {
+        clearTimeout(comboTimeoutRef.current);
+        comboTimeoutRef.current = null;
+      }
+    };
   }, []);
 
   // Update players list when initialPlayers prop changes

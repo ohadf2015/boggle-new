@@ -4,6 +4,9 @@ import { hebrewLetters, swedishLetters, japaneseLetters, kanjiCompounds, DIFFICU
 
 // Normalize Hebrew letters - convert final forms to regular forms
 export function normalizeHebrewLetter(letter) {
+  // Type guard: return as-is if not a string
+  if (typeof letter !== 'string') return letter;
+
   const finalToRegular = {
     'ץ': 'צ',
     'ך': 'כ',
@@ -16,12 +19,15 @@ export function normalizeHebrewLetter(letter) {
 
 // Normalize an entire Hebrew word
 export function normalizeHebrewWord(word) {
+  // Type guard: return empty string if not a string
+  if (typeof word !== 'string') return '';
   return word.split('').map(normalizeHebrewLetter).join('');
 }
 
 // Convert regular Hebrew letters to final forms when at end of word
 export function applyHebrewFinalLetters(word) {
-  if (!word || word.length === 0) return word;
+  // Type guard: return as-is if not a string or empty
+  if (typeof word !== 'string' || word.length === 0) return word;
 
   const regularToFinal = {
     'צ': 'ץ',

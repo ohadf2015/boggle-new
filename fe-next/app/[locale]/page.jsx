@@ -105,7 +105,7 @@ export default function GamePage() {
     const initializeState = () => {
       const urlParams = new URLSearchParams(window.location.search);
       const roomFromUrl = urlParams.get('room');
-      console.log('[Init] URL search:', window.location.search, '| roomFromUrl:', roomFromUrl);
+      logger.log('[Init] URL search:', window.location.search, '| roomFromUrl:', roomFromUrl);
       const savedUsername = typeof window !== 'undefined'
         ? localStorage.getItem('boggle_username') || ''
         : '';
@@ -115,7 +115,7 @@ export default function GamePage() {
       const hasSession = savedSession && savedSession.gameCode;
 
       if (roomFromUrl) {
-        console.log('[Init] Setting prefilledRoomCode to:', roomFromUrl);
+        logger.log('[Init] Setting prefilledRoomCode to:', roomFromUrl);
         setGameCode(roomFromUrl);
         setPrefilledRoomCode(roomFromUrl);
         if (savedSession?.gameCode && savedSession.gameCode !== roomFromUrl) {
@@ -266,7 +266,8 @@ export default function GamePage() {
                 return { authUserId: null, guestTokenHash: hash };
               }
               return { authUserId: null, guestTokenHash: null };
-            } catch {
+            } catch (error) {
+              logger.error('[AUTH] Failed to build auth context during reconnection:', error);
               return { authUserId: null, guestTokenHash: null };
             }
           };
@@ -368,7 +369,7 @@ export default function GamePage() {
     }, 5000);
 
     newSocket.on('error', (data) => {
-      console.error('[SOCKET.IO] Error:', data);
+      logger.error('[SOCKET.IO] Error:', data);
 
       // Handle specific error cases
       if (data.message?.includes('not found') || data.message?.includes('Game not found')) {
@@ -634,14 +635,14 @@ export default function GamePage() {
       if (isAuthenticated && user?.id) {
         // Authenticated user
         authUserId = user.id;
-        console.log('[AUTH] Joining as authenticated user:', { authUserId, username });
+        logger.log('[AUTH] Joining as authenticated user:', { authUserId, username });
       } else {
         // Guest user - get or create guest session
         const guestSessionId = getGuestSessionId();
         if (guestSessionId) {
           guestTokenHash = await hashToken(guestSessionId);
         }
-        console.log('[AUTH] Joining as guest:', { isAuthenticated, hasUser: !!user, userId: user?.id, guestTokenHash: !!guestTokenHash });
+        logger.log('[AUTH] Joining as guest:', { isAuthenticated, hasUser: !!user, userId: user?.id, guestTokenHash: !!guestTokenHash });
       }
     }
 

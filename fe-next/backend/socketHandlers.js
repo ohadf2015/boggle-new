@@ -215,6 +215,11 @@ function initializeSocketHandlers(io) {
         await redisClient.saveGameState(gameCode, game);
       } catch (err) {
         console.error('[REDIS] Failed to save game state:', err);
+        // Warn host that game state may not persist across server restarts
+        safeEmit(socket, 'warning', {
+          type: 'persistence',
+          message: 'Game state could not be saved. Progress may be lost on server restart.'
+        });
       }
 
       console.log(`[SOCKET] Game ${gameCode} created by ${hostUsername}`);
@@ -631,10 +636,20 @@ function initializeSocketHandlers(io) {
 
       const isHostUser = game.hostSocketId === socket.id;
 
+      // Sanitize HTML to prevent XSS attacks
+      const sanitizeHtml = (str) => {
+        return str
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;')
+          .replace(/'/g, '&#039;');
+      };
+
       // Filter profanity (exact word matching to avoid false positives in other languages) and broadcast to room
-      const cleanMessage = cleanProfanity(message.trim().substring(0, 500));
+      const cleanMessage = sanitizeHtml(cleanProfanity(message.trim().substring(0, 500)));
       broadcastToRoom(io, getGameRoom(gameCode), 'chatMessage', {
-        username: isHostUser ? 'Host' : username,
+        username: isHostUser ? 'Host' : sanitizeHtml(username),
         message: cleanMessage,
         timestamp: Date.now(),
         isHost: isHostUser
@@ -1544,6 +1559,11 @@ async function recordGameResultsToSupabase(gameCode, scoresArray, game) {
     const userAuthMap = {};
     console.log(`[SUPABASE] Building userAuthMap from game.users:`, Object.keys(game.users || {}));
     for (const [username, userData] of Object.entries(game.users || {})) {
+      // Validate userData is an object before accessing properties
+      if (!userData || typeof userData !== 'object') {
+        console.warn(`[SUPABASE] Skipping invalid userData for ${username}`);
+        continue;
+      }
       console.log(`[SUPABASE] User ${username} auth data:`, { authUserId: userData.authUserId, guestTokenHash: !!userData.guestTokenHash });
       if (userData.authUserId || userData.guestTokenHash) {
         userAuthMap[username] = {

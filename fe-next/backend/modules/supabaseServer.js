@@ -40,22 +40,31 @@ async function recordGameResult(result) {
   const client = getSupabase();
   if (!client) return { data: null, error: { message: 'Supabase not configured' } };
 
-  const { data, error } = await client
-    .from('game_results')
-    .insert({
-      player_id: result.playerId,
-      game_code: result.gameCode,
-      score: result.score,
-      word_count: result.wordCount || 0,
-      longest_word: result.longestWord || null,
-      placement: result.placement,
-      is_ranked: result.isRanked || false,
-      language: result.language || 'en'
-    })
-    .select()
-    .single();
+  try {
+    const { data, error } = await client
+      .from('game_results')
+      .insert({
+        player_id: result.playerId,
+        game_code: result.gameCode,
+        score: result.score,
+        word_count: result.wordCount || 0,
+        longest_word: result.longestWord || null,
+        placement: result.placement,
+        is_ranked: result.isRanked || false,
+        language: result.language || 'en'
+      })
+      .select()
+      .single();
 
-  return { data, error };
+    if (error) {
+      console.error(`[SUPABASE] Failed to record game result for ${result.playerId}:`, error.message);
+    }
+
+    return { data, error };
+  } catch (err) {
+    console.error(`[SUPABASE] Unexpected error recording game result:`, err);
+    return { data: null, error: { message: err.message || 'Unexpected error recording game result' } };
+  }
 }
 
 /**
@@ -74,7 +83,10 @@ async function updatePlayerStats(playerId, gameStats) {
     .eq('id', playerId)
     .single();
 
-  if (fetchError) return { data: null, error: fetchError };
+  if (fetchError) {
+    console.error(`[SUPABASE] Failed to fetch profile for ${playerId}:`, fetchError.message);
+    return { data: null, error: fetchError };
+  }
 
   // Calculate updated stats
   const updates = {
@@ -113,14 +125,25 @@ async function updatePlayerStats(playerId, gameStats) {
     updates.achievement_counts = currentCounts;
   }
 
-  const { data, error } = await client
-    .from('profiles')
-    .update(updates)
-    .eq('id', playerId)
-    .select()
-    .single();
+  try {
+    const { data, error } = await client
+      .from('profiles')
+      .update(updates)
+      .eq('id', playerId)
+      .select()
+      .single();
 
-  return { data, error };
+    if (error) {
+      console.error(`[SUPABASE] Failed to update profile stats for ${playerId}:`, error.message);
+      // Log the attempted updates for debugging
+      console.error(`[SUPABASE] Attempted updates:`, JSON.stringify(updates));
+    }
+
+    return { data, error };
+  } catch (err) {
+    console.error(`[SUPABASE] Unexpected error updating profile for ${playerId}:`, err);
+    return { data: null, error: { message: err.message || 'Unexpected error during profile update' } };
+  }
 }
 
 /**
@@ -380,14 +403,16 @@ async function updateRankedMmr(participants) {
       mmrChange = -20;
     }
 
-    const newMmr = Math.max(0, (participant.currentMmr || 1000) + mmrChange);
+    const currentMmr = participant.currentMmr || 1000;
+    const newMmr = Math.max(0, currentMmr + mmrChange);
+    const peakMmr = participant.peakMmr || currentMmr;
 
     try {
       await client
         .from('profiles')
         .update({
           ranked_mmr: newMmr,
-          peak_mmr: Math.max(newMmr, participant.currentMmr || 1000)
+          peak_mmr: Math.max(newMmr, peakMmr)
         })
         .eq('id', participant.playerId);
     } catch (error) {

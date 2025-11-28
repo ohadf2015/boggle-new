@@ -728,6 +728,7 @@ export const translations = {
       shuffle: 'ערבב',
       swipeToFormWords: 'החליקו על הלוח כדי ליצור מילים',
       inviteFriends: 'הזמן חברים',
+      waitingForHostToStart: 'ממתינים למארח שיתחיל את המשחק...',
     },
     chat: {
       title: 'צ\'אט החדר',
@@ -1190,6 +1191,7 @@ export const translations = {
       shuffle: 'Blanda',
       swipeToFormWords: 'Svep på brädet för att bilda ord',
       inviteFriends: 'Bjud in vänner',
+      waitingForHostToStart: 'Väntar på att värden ska starta spelet...',
     },
     chat: {
       title: 'Rumschatt',
@@ -1652,6 +1654,7 @@ export const translations = {
       shuffle: 'シャッフル',
       swipeToFormWords: 'ボードをスワイプして単語を作ります',
       inviteFriends: '友達を招待',
+      waitingForHostToStart: 'ホストがゲームを開始するのを待っています...',
     },
     chat: {
       title: 'ルームチャット',

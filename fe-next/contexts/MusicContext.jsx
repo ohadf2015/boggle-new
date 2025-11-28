@@ -48,7 +48,20 @@ export function MusicProvider({ children }) {
 
     const [currentTrack, setCurrentTrack] = useState(null);
     const [isPlaying, setIsPlaying] = useState(false);
-    const [audioUnlocked, setAudioUnlocked] = useState(false);
+    const [audioUnlocked, setAudioUnlocked] = useState(() => {
+        if (typeof window !== 'undefined') {
+            try {
+                const saved = localStorage.getItem(STORAGE_KEY);
+                if (saved) {
+                    const { audioUnlocked: savedUnlocked } = JSON.parse(saved);
+                    return savedUnlocked ?? false;
+                }
+            } catch (e) {
+                console.warn('Failed to load audio unlock state:', e);
+            }
+        }
+        return false;
+    });
 
     // Ref to track audioUnlocked state without causing re-renders
     const audioUnlockedRef = useRef(false);
@@ -91,19 +104,36 @@ export function MusicProvider({ children }) {
             if (fadeTimeoutRef.current) {
                 clearTimeout(fadeTimeoutRef.current);
             }
+            // Note: transitionTimeoutRef cleanup is in the useCallback scope
         };
+    }, []);
+
+    // Handle iOS Safari tab switching - re-resume AudioContext when returning to tab
+    useEffect(() => {
+        if (typeof window === 'undefined') return;
+
+        const handleVisibilityChange = () => {
+            if (document.visibilityState === 'visible' && audioUnlockedRef.current) {
+                if (Howler.ctx && Howler.ctx.state === 'suspended') {
+                    Howler.ctx.resume();
+                }
+            }
+        };
+
+        document.addEventListener('visibilitychange', handleVisibilityChange);
+        return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
     }, []);
 
     // Persist settings to localStorage
     useEffect(() => {
         if (typeof window !== 'undefined') {
             try {
-                localStorage.setItem(STORAGE_KEY, JSON.stringify({ volume, isMuted }));
+                localStorage.setItem(STORAGE_KEY, JSON.stringify({ volume, isMuted, audioUnlocked }));
             } catch (e) {
                 console.warn('Failed to save music settings:', e);
             }
         }
-    }, [volume, isMuted]);
+    }, [volume, isMuted, audioUnlocked]);
 
     // Auto-unlock audio on first user interaction anywhere in the app
     useEffect(() => {
@@ -117,6 +147,8 @@ export function MusicProvider({ children }) {
                 Howler.ctx.resume();
             }
 
+            // Update ref immediately so fadeToTrack works in the same event cycle
+            audioUnlockedRef.current = true;
             setAudioUnlocked(true);
 
             // Remove all listeners after first interaction
@@ -153,6 +185,10 @@ export function MusicProvider({ children }) {
         setAudioUnlocked(true);
     }, []);
 
+    // Queue for pending track requests during transitions
+    const pendingTrackRef = useRef(null);
+    const transitionTimeoutRef = useRef(null);
+
     // Crossfade to a new track
     const fadeToTrack = useCallback((trackKey, fadeOutMs = 1000, fadeInMs = 1000) => {
         if (!audioUnlocked || !trackKey) return;
@@ -168,15 +204,21 @@ export function MusicProvider({ children }) {
             return;
         }
 
-        // Prevent rapid track switching - ignore requests during active transition
+        // If currently transitioning, queue this track request instead of ignoring
         if (isTransitioningRef.current) {
+            pendingTrackRef.current = { trackKey, fadeOutMs, fadeInMs };
             return;
         }
         isTransitioningRef.current = true;
 
-        // Clear any pending fade
+        // Clear any pending fade timeout
         if (fadeTimeoutRef.current) {
             clearTimeout(fadeTimeoutRef.current);
+        }
+
+        // Clear any previous transition timeout
+        if (transitionTimeoutRef.current) {
+            clearTimeout(transitionTimeoutRef.current);
         }
 
         const oldHowl = currentHowlRef.current;
@@ -200,9 +242,16 @@ export function MusicProvider({ children }) {
         setCurrentTrack(trackKey);
         setIsPlaying(true);
 
-        // Clear transition lock after fade completes
-        setTimeout(() => {
+        // Clear transition lock after fade completes, then process any pending request
+        transitionTimeoutRef.current = setTimeout(() => {
             isTransitioningRef.current = false;
+
+            // Process pending track request if there is one
+            if (pendingTrackRef.current) {
+                const { trackKey: pendingTrack, fadeOutMs: pendingFadeOut, fadeInMs: pendingFadeIn } = pendingTrackRef.current;
+                pendingTrackRef.current = null;
+                fadeToTrack(pendingTrack, pendingFadeOut, pendingFadeIn);
+            }
         }, Math.max(fadeOutMs, fadeInMs));
     }, [audioUnlocked]);
 

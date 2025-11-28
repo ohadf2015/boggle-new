@@ -66,7 +66,7 @@ const HostLiveResults = ({ players, gameLanguage, remainingTime }) => {
         className="text-center"
       >
         <h2 className="text-3xl font-bold text-slate-900 dark:text-white mb-2">
-          {t('hostView.liveResults')}
+          {t('hostView.liveResults') || 'Live Results'}
         </h2>
         <div className="flex items-center justify-center gap-2 text-slate-600 dark:text-slate-400">
           <Clock className="w-5 h-5" />
@@ -144,7 +144,7 @@ const HostLiveResults = ({ players, gameLanguage, remainingTime }) => {
                     </h3>
                     <div className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400">
                       <Zap className="w-4 h-4" />
-                      <span>{player.wordCount} {t('hostView.words')}</span>
+                      <span>{player.wordCount} {t('hostView.words') || 'words'}</span>
                     </div>
                   </div>
                 </div>
@@ -171,7 +171,7 @@ const HostLiveResults = ({ players, gameLanguage, remainingTime }) => {
                   <div className="flex items-center gap-2">
                     <Trophy className="w-4 h-4 text-purple-600 dark:text-purple-400" />
                     <span className="text-sm font-bold text-purple-600 dark:text-purple-400">
-                      {player.achievements.length} {t('hostView.achievements')}
+                      {player.achievements.length} {t('hostView.achievements') || 'achievements'}
                     </span>
                   </div>
                 </div>
@@ -189,7 +189,7 @@ const HostLiveResults = ({ players, gameLanguage, remainingTime }) => {
       >
         <Card className="p-4 bg-gradient-to-r from-cyan-500/10 to-blue-500/10 border-2 border-cyan-500/30 backdrop-blur-sm">
           <p className="text-center text-sm text-slate-700 dark:text-slate-300">
-            ℹ️ {t('hostView.spectatingInfo')}
+            ℹ️ {t('hostView.spectatingInfo') || 'Spectating mode - watch the game unfold in real-time!'}
           </p>
         </Card>
       </motion.div>

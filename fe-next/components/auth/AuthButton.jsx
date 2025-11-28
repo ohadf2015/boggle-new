@@ -109,7 +109,7 @@ const AuthButton = () => {
                 )}
               >
                 <FaUser size={14} />
-                <span>{t('profile.title')}</span>
+                <span>{t('profile.title') || 'Profile'}</span>
               </Button>
 
               {/* Leaderboard Link */}
@@ -127,7 +127,7 @@ const AuthButton = () => {
                 )}
               >
                 <FaTrophy size={14} />
-                <span>{t('leaderboard.title')}</span>
+                <span>{t('leaderboard.title') || 'Leaderboard'}</span>
               </Button>
 
               {/* Divider */}
@@ -172,7 +172,7 @@ const AuthButton = () => {
                 )}
               >
                 {isDarkMode ? <FaSun size={14} className="text-yellow-400" /> : <FaMoon size={14} className="text-slate-600" />}
-                <span>{isDarkMode ? t('common.lightMode') : t('common.darkMode')}</span>
+                <span>{isDarkMode ? (t('common.lightMode') || 'Light Mode') : (t('common.darkMode') || 'Dark Mode')}</span>
               </Button>
 
               {/* Divider */}
@@ -198,7 +198,7 @@ const AuthButton = () => {
                 ) : (
                   <FaSignOutAlt size={14} />
                 )}
-                <span>{t('auth.signOut')}</span>
+                <span>{t('auth.signOut') || 'Sign Out'}</span>
               </Button>
             </motion.div>
           )}
@@ -279,7 +279,7 @@ const AuthButton = () => {
                 )}
               >
                 {isDarkMode ? <FaSun size={14} className="text-yellow-400" /> : <FaMoon size={14} className="text-slate-600" />}
-                <span>{isDarkMode ? t('common.lightMode') : t('common.darkMode')}</span>
+                <span>{isDarkMode ? (t('common.lightMode') || 'Light Mode') : (t('common.darkMode') || 'Dark Mode')}</span>
               </Button>
 
               {/* Divider */}
@@ -303,7 +303,7 @@ const AuthButton = () => {
                 )}
               >
                 <FaTrophy size={14} />
-                <span>{t('leaderboard.title')}</span>
+                <span>{t('leaderboard.title') || 'Leaderboard'}</span>
               </Button>
 
               {/* Sign In */}
@@ -321,7 +321,7 @@ const AuthButton = () => {
                 )}
               >
                 <FaUser size={14} />
-                <span>{t('auth.signIn')}</span>
+                <span>{t('auth.signIn') || 'Sign In'}</span>
               </Button>
             </motion.div>
           )}
