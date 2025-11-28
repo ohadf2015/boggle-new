@@ -266,8 +266,7 @@ const ResultsPage = ({ finalScores, letterGrid, gameCode, onReturnToRoom, userna
                     <Button
                       onClick={handleExitRoom}
                       size="lg"
-                      variant="outline"
-                      className="w-full sm:w-auto font-bold text-lg px-8 border-2 border-slate-600 text-slate-300 hover:bg-red-500/20 hover:border-red-500/50 hover:text-red-300 transition-all duration-300"
+                      className="w-full sm:w-auto font-bold text-lg px-8 shadow-lg hover:scale-105 transition-transform bg-red-500 hover:bg-red-600 border border-red-400/30 hover:shadow-[0_0_15px_rgba(239,68,68,0.5)]"
                     >
                       <FaSignOutAlt className="mr-2" />
                       {t('results.leaveRoom')}

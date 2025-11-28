@@ -1107,9 +1107,9 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
       {/* Top Bar with Exit Button */}
       <div className="w-full max-w-6xl flex justify-end mb-4">
         <Button
-          variant="outline"
           onClick={handleExitRoom}
-          className="font-medium bg-white/80 dark:bg-slate-800/80 text-cyan-600 dark:text-cyan-300 border border-cyan-500/50 hover:border-cyan-400 hover:text-cyan-700 dark:hover:text-cyan-200 hover:shadow-[0_0_15px_rgba(6,182,212,0.3)] shadow-md backdrop-blur-sm transition-all duration-300"
+          size="sm"
+          className="shadow-lg hover:scale-105 transition-transform bg-red-500 hover:bg-red-600 border border-red-400/30 hover:shadow-[0_0_15px_rgba(239,68,68,0.5)]"
         >
           <FaSignOutAlt className="mr-2" />
           {t('hostView.exitRoom')}

@@ -534,13 +534,18 @@ export default function GamePage() {
             gameCode: prefilledRoomCode,
             username,
             ...authContext,
+            avatar: profile ? {
+              emoji: profile.avatar_emoji,
+              color: profile.avatar_color,
+            } : undefined,
+            profilePictureUrl: profile?.profile_picture_url,
           });
           setShouldAutoJoin(false);
         }
       }, 200);
       return () => clearTimeout(autoJoinTimeout);
     }
-  }, [shouldAutoJoin, prefilledRoomCode, username, isActive, attemptingReconnect, socket, isConnected, getAuthContext]);
+  }, [shouldAutoJoin, prefilledRoomCode, username, isActive, attemptingReconnect, socket, isConnected, getAuthContext, profile]);
 
   // Session reconnection
   useEffect(() => {
@@ -581,6 +586,11 @@ export default function GamePage() {
           hostUsername: savedSession.roomName,
           language: savedSession.language || language,
           ...authContext,
+          avatar: profile ? {
+            emoji: profile.avatar_emoji,
+            color: profile.avatar_color,
+          } : undefined,
+          profilePictureUrl: profile?.profile_picture_url,
         });
       } else {
         if (!savedSession.username) {
@@ -592,12 +602,17 @@ export default function GamePage() {
           gameCode: savedSession.gameCode,
           username: savedSession.username,
           ...authContext,
+          avatar: profile ? {
+            emoji: profile.avatar_emoji,
+            color: profile.avatar_color,
+          } : undefined,
+          profilePictureUrl: profile?.profile_picture_url,
         });
       }
     }, 500);
 
     return () => clearTimeout(reconnectTimeout);
-  }, [attemptingReconnect, isActive, socket, isConnected, language, getAuthContext]);
+  }, [attemptingReconnect, isActive, socket, isConnected, language, getAuthContext, profile]);
 
   const handleJoin = useCallback(async (isHostMode, roomLang) => {
     if (!socket || !isConnected) {
@@ -638,6 +653,10 @@ export default function GamePage() {
         language: roomLang || language,
         authUserId,
         guestTokenHash,
+        avatar: profile ? {
+          emoji: profile.avatar_emoji,
+          color: profile.avatar_color,
+        } : undefined,
         profilePictureUrl: profile?.profile_picture_url,
       });
     } else {
@@ -646,6 +665,10 @@ export default function GamePage() {
         username,
         authUserId,
         guestTokenHash,
+        avatar: profile ? {
+          emoji: profile.avatar_emoji,
+          color: profile.avatar_color,
+        } : undefined,
         profilePictureUrl: profile?.profile_picture_url,
       });
     }

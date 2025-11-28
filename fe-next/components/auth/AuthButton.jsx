@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FaUser, FaSignOutAlt, FaTrophy, FaChevronDown } from 'react-icons/fa';
+import { FaUser, FaSignOutAlt, FaTrophy, FaChevronDown, FaSun, FaMoon, FaCog } from 'react-icons/fa';
 import { Button } from '../ui/button';
 import { useTheme } from '../../utils/ThemeContext';
 import { useLanguage } from '../../contexts/LanguageContext';
@@ -13,9 +13,16 @@ import Avatar from '../Avatar';
 import { cn } from '../../lib/utils';
 import { useRouter } from 'next/navigation';
 
+const languages = [
+  { code: 'en', name: 'English', flag: '🇺🇸' },
+  { code: 'he', name: 'עברית', flag: '🇮🇱' },
+  { code: 'sv', name: 'Svenska', flag: '🇸🇪' },
+  { code: 'ja', name: '日本語', flag: '🇯🇵' }
+];
+
 const AuthButton = () => {
-  const { theme } = useTheme();
-  const { t, language } = useLanguage();
+  const { theme, toggleTheme } = useTheme();
+  const { t, language, setLanguage } = useLanguage();
   const { isAuthenticated, profile, isSupabaseEnabled, loading } = useAuth();
   const router = useRouter();
   const isDarkMode = theme === 'dark';
@@ -129,6 +136,51 @@ const AuthButton = () => {
                 isDarkMode ? 'bg-slate-700' : 'bg-gray-200'
               )} />
 
+              {/* Language Options */}
+              {languages.map((lang) => (
+                <Button
+                  key={lang.code}
+                  variant="ghost"
+                  onClick={() => {
+                    setLanguage(lang.code);
+                  }}
+                  className={cn(
+                    'w-full justify-start gap-3',
+                    language === lang.code
+                      ? isDarkMode
+                        ? 'bg-cyan-500/20 text-cyan-300'
+                        : 'bg-cyan-50 text-cyan-700'
+                      : isDarkMode
+                        ? 'text-gray-300 hover:bg-slate-700 hover:text-gray-300'
+                        : 'text-gray-700 hover:bg-gray-50 hover:text-gray-700'
+                  )}
+                >
+                  <span className="text-lg">{lang.flag}</span>
+                  <span>{lang.name}</span>
+                </Button>
+              ))}
+
+              {/* Theme Toggle */}
+              <Button
+                variant="ghost"
+                onClick={toggleTheme}
+                className={cn(
+                  'w-full justify-start gap-3',
+                  isDarkMode
+                    ? 'text-gray-300 hover:bg-slate-700 hover:text-gray-300'
+                    : 'text-gray-700 hover:bg-gray-50 hover:text-gray-700'
+                )}
+              >
+                {isDarkMode ? <FaSun size={14} className="text-yellow-400" /> : <FaMoon size={14} className="text-slate-600" />}
+                <span>{isDarkMode ? t('common.lightMode') : t('common.darkMode')}</span>
+              </Button>
+
+              {/* Divider */}
+              <div className={cn(
+                'my-1 h-px',
+                isDarkMode ? 'bg-slate-700' : 'bg-gray-200'
+              )} />
+
               {/* Sign Out */}
               <Button
                 variant="ghost"
@@ -155,23 +207,126 @@ const AuthButton = () => {
     );
   }
 
-  // Guest user - show sign in button
+  // Guest user - show settings dropdown
   return (
     <>
-      <Button
-        variant="outline"
-        size="sm"
-        onClick={() => setShowAuthModal(true)}
-        className={cn(
-          'flex items-center gap-2 rounded-full transition-all duration-300',
-          isDarkMode
-            ? 'bg-gradient-to-r from-cyan-600 to-blue-600 text-white hover:from-cyan-500 hover:to-blue-500 border-transparent'
-            : 'bg-gradient-to-r from-cyan-500 to-blue-500 text-white hover:from-cyan-400 hover:to-blue-400 border-transparent'
-        )}
-      >
-        <FaUser size={14} />
-        <span>{t('auth.signIn')}</span>
-      </Button>
+      <div className="relative">
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => setShowUserMenu(!showUserMenu)}
+          onBlur={() => setTimeout(() => setShowUserMenu(false), 200)}
+          className={cn(
+            'flex items-center gap-2 rounded-full transition-all duration-300',
+            isDarkMode
+              ? 'bg-slate-800 text-cyan-300 hover:bg-slate-700 hover:shadow-[0_0_15px_rgba(6,182,212,0.3)] border-slate-700'
+              : 'bg-white text-cyan-600 hover:bg-gray-50 hover:shadow-[0_0_15px_rgba(6,182,212,0.2)] border-gray-200'
+          )}
+        >
+          <FaCog size={16} />
+          <FaChevronDown size={10} className={showUserMenu ? 'rotate-180 transition-transform' : 'transition-transform'} />
+        </Button>
+
+        {/* Guest Dropdown */}
+        <AnimatePresence>
+          {showUserMenu && (
+            <motion.div
+              initial={{ opacity: 0, y: -10, scale: 0.95 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: -10, scale: 0.95 }}
+              transition={{ duration: 0.2 }}
+              className={cn(
+                'absolute top-full right-0 mt-2 min-w-[180px] rounded-lg shadow-xl z-50',
+                isDarkMode
+                  ? 'bg-slate-800 border border-slate-700'
+                  : 'bg-white border border-gray-200'
+              )}
+            >
+              {/* Language Options */}
+              {languages.map((lang, index) => (
+                <Button
+                  key={lang.code}
+                  variant="ghost"
+                  onClick={() => {
+                    setLanguage(lang.code);
+                  }}
+                  className={cn(
+                    'w-full justify-start gap-3',
+                    index === 0 ? 'rounded-t-lg' : '',
+                    language === lang.code
+                      ? isDarkMode
+                        ? 'bg-cyan-500/20 text-cyan-300'
+                        : 'bg-cyan-50 text-cyan-700'
+                      : isDarkMode
+                        ? 'text-gray-300 hover:bg-slate-700 hover:text-gray-300'
+                        : 'text-gray-700 hover:bg-gray-50 hover:text-gray-700'
+                  )}
+                >
+                  <span className="text-lg">{lang.flag}</span>
+                  <span>{lang.name}</span>
+                </Button>
+              ))}
+
+              {/* Theme Toggle */}
+              <Button
+                variant="ghost"
+                onClick={toggleTheme}
+                className={cn(
+                  'w-full justify-start gap-3',
+                  isDarkMode
+                    ? 'text-gray-300 hover:bg-slate-700 hover:text-gray-300'
+                    : 'text-gray-700 hover:bg-gray-50 hover:text-gray-700'
+                )}
+              >
+                {isDarkMode ? <FaSun size={14} className="text-yellow-400" /> : <FaMoon size={14} className="text-slate-600" />}
+                <span>{isDarkMode ? t('common.lightMode') : t('common.darkMode')}</span>
+              </Button>
+
+              {/* Divider */}
+              <div className={cn(
+                'my-1 h-px',
+                isDarkMode ? 'bg-slate-700' : 'bg-gray-200'
+              )} />
+
+              {/* Leaderboard Link */}
+              <Button
+                variant="ghost"
+                onClick={() => {
+                  router.push(`/${language}/leaderboard`);
+                  setShowUserMenu(false);
+                }}
+                className={cn(
+                  'w-full justify-start gap-3',
+                  isDarkMode
+                    ? 'text-gray-300 hover:bg-slate-700 hover:text-gray-300'
+                    : 'text-gray-700 hover:bg-gray-50 hover:text-gray-700'
+                )}
+              >
+                <FaTrophy size={14} />
+                <span>{t('leaderboard.title')}</span>
+              </Button>
+
+              {/* Sign In */}
+              <Button
+                variant="ghost"
+                onClick={() => {
+                  setShowUserMenu(false);
+                  setShowAuthModal(true);
+                }}
+                className={cn(
+                  'w-full justify-start gap-3 rounded-b-lg',
+                  isDarkMode
+                    ? 'text-cyan-300 hover:bg-slate-700 hover:text-cyan-300'
+                    : 'text-cyan-600 hover:bg-gray-50 hover:text-cyan-600'
+                )}
+              >
+                <FaUser size={14} />
+                <span>{t('auth.signIn')}</span>
+              </Button>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
 
       <AuthModal
         isOpen={showAuthModal}

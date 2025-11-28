@@ -514,6 +514,7 @@ function initializeSocketHandlers(io) {
       const username = getUsernameBySocketId(socket.id);
 
       if (!gameCode || !username || !word) {
+        console.warn(`[SOCKET] submitWord failed - socketId: ${socket.id}, gameCode: ${gameCode || 'NULL'}, username: ${username || 'NULL'}, word: ${word || 'NULL'}`);
         emitError(socket, ErrorMessages.INVALID_WORD_SUBMISSION);
         return;
       }

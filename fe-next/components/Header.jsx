@@ -1,29 +1,15 @@
-import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import React from 'react';
+import { motion } from 'framer-motion';
 import { useTheme } from '../utils/ThemeContext';
 import { useLanguage } from '../contexts/LanguageContext';
-import { FaSun, FaMoon, FaGlobe, FaChevronDown, FaTrophy } from 'react-icons/fa';
-import { Button } from './ui/button';
 import { cn } from '../lib/utils';
 import AuthButton from './auth/AuthButton';
 import MusicControls from './MusicControls';
-import { useRouter } from 'next/navigation';
 
-const Header = ({ className = '', showLeaderboardLink = true }) => {
-    const { theme, toggleTheme } = useTheme();
-    const { t, language, setLanguage } = useLanguage();
-    const router = useRouter();
-    const [showLanguageMenu, setShowLanguageMenu] = useState(false);
+const Header = ({ className = '' }) => {
+    const { theme } = useTheme();
+    const { t, language } = useLanguage();
     const isDarkMode = theme === 'dark';
-
-    const languages = [
-        { code: 'en', name: 'English', flag: '🇺🇸' },
-        { code: 'he', name: 'עברית', flag: '🇮🇱' },
-        { code: 'sv', name: 'Svenska', flag: '🇸🇪' },
-        { code: 'ja', name: '日本語', flag: '🇯🇵' }
-    ];
-
-    const currentLang = languages.find(l => l.code === language) || languages[0];
 
     // Get font family based on language using switch case
     const getFontFamily = (lang) => {
@@ -46,7 +32,7 @@ const Header = ({ className = '', showLeaderboardLink = true }) => {
             initial={{ y: -20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ duration: 0.5, ease: "easeOut" }}
-            className={`w-full max-w-6xl mx-auto mb-1 sm:mb-4 px-4 pt-2 sm:pt-3 ${className}`}
+            className={`w-full max-w-6xl mx-auto mb-1 sm:mb-4 px-4 pt-2 sm:pt-3 sticky top-0 z-50 ${isDarkMode ? 'bg-slate-900/95 backdrop-blur-sm' : 'bg-white/95 backdrop-blur-sm'} ${className}`}
         >
             <div className="flex items-center justify-between">
                 {/* Logo */}
@@ -92,114 +78,13 @@ const Header = ({ className = '', showLeaderboardLink = true }) => {
                     </motion.h1>
                 </div>
 
-                {/* Controls: Leaderboard + Auth + Language Selector + Theme Toggle */}
+                {/* Controls: Music + Auth/Settings */}
                 <div className="flex items-center gap-2 sm:gap-3">
-                    {/* Leaderboard Link */}
-                    {showLeaderboardLink && (
-                        <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => router.push(`/${language}/leaderboard`)}
-                            className={cn(
-                                'flex items-center gap-2 rounded-full transition-all duration-300',
-                                isDarkMode
-                                    ? 'bg-slate-800 text-yellow-400 hover:bg-slate-700 hover:shadow-[0_0_15px_rgba(250,204,21,0.3)] border-slate-700'
-                                    : 'bg-white text-yellow-600 hover:bg-gray-50 hover:shadow-[0_0_15px_rgba(250,204,21,0.2)] border-gray-200'
-                            )}
-                            aria-label={t('leaderboard.title')}
-                        >
-                            <FaTrophy size={16} />
-                            <span className="hidden sm:inline">{t('leaderboard.title')}</span>
-                        </Button>
-                    )}
-
-                    {/* Auth Button */}
-                    <AuthButton />
-
                     {/* Music Controls */}
                     <MusicControls />
 
-                    {/* Language Selector */}
-                    <div className="relative">
-                        <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => setShowLanguageMenu(!showLanguageMenu)}
-                            onBlur={() => setTimeout(() => setShowLanguageMenu(false), 200)}
-                            className={cn(
-                                "flex items-center gap-2 rounded-full transition-all duration-300",
-                                isDarkMode
-                                    ? "bg-slate-800 text-cyan-300 hover:bg-slate-700 hover:shadow-[0_0_15px_rgba(6,182,212,0.3)] border-slate-700"
-                                    : "bg-white text-cyan-600 hover:bg-gray-50 hover:shadow-[0_0_15px_rgba(6,182,212,0.2)] border-gray-200"
-                            )}
-                            aria-label={t('common.selectUILanguage')}
-                        >
-                            <FaGlobe size={18} />
-                            <span className="text-xl">{currentLang.flag}</span>
-                            <FaChevronDown size={12} className={showLanguageMenu ? 'rotate-180 transition-transform' : 'transition-transform'} />
-                        </Button>
-
-                        {/* Language Dropdown */}
-                        <AnimatePresence>
-                            {showLanguageMenu && (
-                                <motion.div
-                                    initial={{ opacity: 0, y: -10, scale: 0.95 }}
-                                    animate={{ opacity: 1, y: 0, scale: 1 }}
-                                    exit={{ opacity: 0, y: -10, scale: 0.95 }}
-                                    transition={{ duration: 0.2 }}
-                                    className={`
-                                        absolute top-full right-0 mt-2 min-w-[160px] rounded-lg shadow-xl z-50
-                                        ${isDarkMode
-                                            ? "bg-slate-800 border border-slate-700"
-                                            : "bg-white border border-gray-200"
-                                        }
-                                    `}
-                                >
-                                    {languages.map((lang) => (
-                                        <Button
-                                            key={lang.code}
-                                            variant="ghost"
-                                            onClick={() => {
-                                                setLanguage(lang.code);
-                                                setShowLanguageMenu(false);
-                                            }}
-                                            className={cn(
-                                                "w-full justify-start gap-3 transition-colors",
-                                                language === lang.code
-                                                    ? isDarkMode
-                                                        ? "bg-cyan-500/20 text-cyan-300"
-                                                        : "bg-cyan-50 text-cyan-700"
-                                                    : isDarkMode
-                                                        ? "text-gray-300 hover:bg-slate-700 hover:text-gray-300"
-                                                        : "text-gray-700 hover:bg-gray-50 hover:text-gray-700",
-                                                lang.code === languages[0].code ? 'rounded-t-lg' : '',
-                                                lang.code === languages[languages.length - 1].code ? 'rounded-b-lg' : ''
-                                            )}
-                                        >
-                                            <span className="text-2xl">{lang.flag}</span>
-                                            <span className="font-medium">{lang.name}</span>
-                                        </Button>
-                                    ))}
-                                </motion.div>
-                            )}
-                        </AnimatePresence>
-                    </div>
-
-                    {/* Theme Toggle */}
-                    <Button
-                        variant="outline"
-                        size="icon"
-                        onClick={toggleTheme}
-                        className={cn(
-                            "rounded-full transition-all duration-300",
-                            isDarkMode
-                                ? "bg-slate-800 text-yellow-400 hover:bg-slate-700 hover:shadow-[0_0_15px_rgba(250,204,21,0.4)] border-slate-700"
-                                : "bg-white text-orange-500 hover:bg-gray-50 hover:shadow-[0_0_15px_rgba(249,115,22,0.3)] border-gray-200"
-                        )}
-                        aria-label="Toggle theme"
-                    >
-                        {isDarkMode ? <FaMoon size={20} /> : <FaSun size={20} />}
-                    </Button>
+                    {/* Auth Button (includes settings dropdown for guests) */}
+                    <AuthButton />
                 </div>
             </div>
         </motion.header>

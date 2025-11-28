@@ -35,6 +35,8 @@ export const translations = {
       duplicateWarning: 'Words found by multiple players don\'t count',
       gameStarted: 'Game Started!',
       newGameReady: 'New game starting!',
+      lightMode: 'Light Mode',
+      darkMode: 'Dark Mode',
     },
     music: {
       volume: 'Volume',
@@ -261,6 +263,7 @@ export const translations = {
       shuffle: 'Shuffle',
       swipeToFormWords: 'Swipe on the board to form words',
       inviteFriends: 'Invite Friends',
+      waitingForHostToStart: 'Waiting for host to start the game...',
     },
     chat: {
       title: 'Room Chat',
@@ -497,6 +500,8 @@ export const translations = {
       duplicateWarning: 'מילים שנמצאו על ידי מספר שחקנים לא נספרות',
       gameStarted: 'המשחק התחיל!',
       newGameReady: 'מתחיל משחק חדש!',
+      lightMode: 'מצב בהיר',
+      darkMode: 'מצב כהה',
     },
     music: {
       volume: 'עוצמה',
@@ -959,6 +964,8 @@ export const translations = {
       duplicateWarning: 'Ord som hittas av flera spelare räknas inte',
       gameStarted: 'Spelet startat!',
       newGameReady: 'Startar nytt spel!',
+      lightMode: 'Ljust läge',
+      darkMode: 'Mörkt läge',
     },
     music: {
       volume: 'Volym',
@@ -1419,6 +1426,8 @@ export const translations = {
       duplicateWarning: '複数のプレイヤーが見つけた単語はカウントされません',
       gameStarted: 'ゲーム開始！',
       newGameReady: '新しいゲームを開始します！',
+      lightMode: 'ライトモード',
+      darkMode: 'ダークモード',
     },
     music: {
       volume: '音量',
