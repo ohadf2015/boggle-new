@@ -732,9 +732,10 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
                   <Button
                     type="submit"
                     disabled={
-                      mode === 'join'
+                      isProfileLoading ||
+                      (mode === 'join'
                         ? (!gameCode || (!isAuthenticated && !username))
-                        : (!gameCode || (isAuthenticated && !displayName && isProfileLoading))
+                        : (!gameCode || (isAuthenticated && !displayName)))
                     }
                     className="w-full h-12 text-lg font-bold bg-gradient-to-r from-cyan-500 to-purple-600 hover:from-cyan-400 hover:to-purple-500 hover:shadow-[0_0_20px_rgba(6,182,212,0.5)]"
                   >

@@ -625,6 +625,16 @@ export default function GamePage() {
       return;
     }
 
+    // Wait for auth to finish loading before creating/joining game
+    if (loading) {
+      logger.log('[AUTH] Auth still loading, waiting...');
+      toast.error(t('common.loadingProfile') || 'Loading profile, please wait...', {
+        duration: 2000,
+        icon: '⏳',
+      });
+      return;
+    }
+
     setError('');
 
     // Build auth context for game result tracking
@@ -673,7 +683,7 @@ export default function GamePage() {
         profilePictureUrl: profile?.profile_picture_url,
       });
     }
-  }, [socket, isConnected, gameCode, username, roomName, language, t, isSupabaseEnabled, isAuthenticated, user, profile]);
+  }, [socket, isConnected, gameCode, username, roomName, language, t, isSupabaseEnabled, isAuthenticated, user, profile, loading]);
 
   const refreshRooms = useCallback(() => {
     if (socket && isConnected) {

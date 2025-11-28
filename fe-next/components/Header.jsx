@@ -32,9 +32,15 @@ const Header = ({ className = '' }) => {
             initial={{ y: -20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ duration: 0.5, ease: "easeOut" }}
-            className={`w-full max-w-6xl mx-auto mb-1 sm:mb-4 px-4 pt-2 sm:pt-3 sticky top-0 z-50 ${isDarkMode ? 'bg-slate-900/95 backdrop-blur-sm' : 'bg-white/95 backdrop-blur-sm'} ${className}`}
+            className={cn(
+                "w-full mb-1 sm:mb-4 px-4 pt-2 sm:pt-3 pb-2 sticky top-0 z-50 transition-all duration-300",
+                isDarkMode
+                    ? "bg-slate-900/70 backdrop-blur-xl border-b border-white/10 shadow-lg shadow-black/20"
+                    : "bg-white/60 backdrop-blur-xl border-b border-black/5 shadow-lg shadow-black/5",
+                className
+            )}
         >
-            <div className="flex items-center justify-between">
+            <div className="max-w-6xl mx-auto flex items-center justify-between">
                 {/* Logo */}
                 <div
                     className="flex items-center gap-2 sm:gap-3 cursor-pointer"

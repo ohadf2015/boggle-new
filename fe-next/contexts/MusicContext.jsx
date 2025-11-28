@@ -182,6 +182,7 @@ export function MusicProvider({ children }) {
             Howler.ctx.resume();
         }
 
+        audioUnlockedRef.current = true;
         setAudioUnlocked(true);
     }, []);
 
@@ -189,9 +190,18 @@ export function MusicProvider({ children }) {
     const pendingTrackRef = useRef(null);
     const transitionTimeoutRef = useRef(null);
 
+    // Queue for track requests made before audio is unlocked
+    const pendingUnlockTrackRef = useRef(null);
+
     // Crossfade to a new track
     const fadeToTrack = useCallback((trackKey, fadeOutMs = 1000, fadeInMs = 1000) => {
-        if (!audioUnlocked || !trackKey) return;
+        if (!trackKey) return;
+
+        // If audio not yet unlocked, queue the track request for when it gets unlocked
+        if (!audioUnlockedRef.current) {
+            pendingUnlockTrackRef.current = { trackKey, fadeOutMs, fadeInMs };
+            return;
+        }
 
         const newHowl = howlsRef.current[trackKey];
         if (!newHowl) {
@@ -253,12 +263,24 @@ export function MusicProvider({ children }) {
                 fadeToTrack(pendingTrack, pendingFadeOut, pendingFadeIn);
             }
         }, Math.max(fadeOutMs, fadeInMs));
-    }, [audioUnlocked]);
+    }, []); // Using refs instead of state to avoid stale closures
 
     // Play a track (with short fade)
     const playTrack = useCallback((trackKey) => {
         fadeToTrack(trackKey, 500, 500);
     }, [fadeToTrack]);
+
+    // Process pending track requests when audio gets unlocked
+    useEffect(() => {
+        if (audioUnlocked && pendingUnlockTrackRef.current) {
+            const { trackKey, fadeOutMs, fadeInMs } = pendingUnlockTrackRef.current;
+            pendingUnlockTrackRef.current = null;
+            // Small delay to ensure AudioContext is fully resumed
+            setTimeout(() => {
+                fadeToTrack(trackKey, fadeOutMs, fadeInMs);
+            }, 50);
+        }
+    }, [audioUnlocked, fadeToTrack]);
 
     // Stop music with fade out
     const stopMusic = useCallback((fadeOutMs = 1000) => {
