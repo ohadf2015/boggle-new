@@ -48,6 +48,10 @@ const {
 } = require('./utils/socketHelpers');
 
 const { validateWordOnBoard, makePositionsMap } = require('./modules/wordValidator');
+const Filter = require('bad-words');
+
+// Initialize bad words filter
+const badWordsFilter = new Filter();
 const { calculateWordScore, calculateGameScores } = require('./modules/scoringEngine');
 const { checkAndAwardAchievements, getPlayerAchievements, ACHIEVEMENTS } = require('./modules/achievementManager');
 const { isDictionaryWord, getAvailableDictionaries, addApprovedWord, normalizeWord } = require('./dictionary');
@@ -564,10 +568,11 @@ function initializeSocketHandlers(io) {
 
       const isHostUser = game.hostSocketId === socket.id;
 
-      // Broadcast to room
+      // Filter profanity and broadcast to room
+      const cleanMessage = badWordsFilter.clean(message.trim().substring(0, 500));
       broadcastToRoom(io, getGameRoom(gameCode), 'chatMessage', {
         username: isHostUser ? 'Host' : username,
-        message: message.trim().substring(0, 500), // Limit message length
+        message: cleanMessage,
         timestamp: Date.now(),
         isHost: isHostUser
       });

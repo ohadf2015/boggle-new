@@ -26,14 +26,6 @@ export async function signInWithGoogle() {
   });
 }
 
-export async function signInWithFacebook() {
-  if (!supabase) return { error: { message: 'Supabase not configured' } };
-  return supabase.auth.signInWithOAuth({
-    provider: 'facebook',
-    options: { redirectTo: `${window.location.origin}/auth/callback` }
-  });
-}
-
 export async function signInWithDiscord() {
   if (!supabase) return { error: { message: 'Supabase not configured' } };
   return supabase.auth.signInWithOAuth({

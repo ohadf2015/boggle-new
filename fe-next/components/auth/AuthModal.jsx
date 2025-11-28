@@ -2,11 +2,11 @@
 
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FaGoogle, FaFacebook, FaDiscord, FaTimes } from 'react-icons/fa';
+import { FaGoogle, FaDiscord, FaTimes } from 'react-icons/fa';
 import { Button } from '../ui/button';
 import { useTheme } from '../../utils/ThemeContext';
 import { useLanguage } from '../../contexts/LanguageContext';
-import { signInWithGoogle, signInWithFacebook, signInWithDiscord } from '../../lib/supabase';
+import { signInWithGoogle, signInWithDiscord } from '../../lib/supabase';
 import { getGuestStatsSummary } from '../../utils/guestManager';
 import { cn } from '../../lib/utils';
 
@@ -29,9 +29,6 @@ const AuthModal = ({ isOpen, onClose, showGuestStats = false }) => {
         case 'google':
           result = await signInWithGoogle();
           break;
-        case 'facebook':
-          result = await signInWithFacebook();
-          break;
         case 'discord':
           result = await signInWithDiscord();
           break;
@@ -52,7 +49,6 @@ const AuthModal = ({ isOpen, onClose, showGuestStats = false }) => {
 
   const providers = [
     { id: 'google', icon: FaGoogle, label: 'Google', color: 'bg-[#4285F4] text-white hover:bg-[#3367D6]' },
-    { id: 'facebook', icon: FaFacebook, label: 'Facebook', color: 'bg-[#1877F2] text-white hover:bg-[#166FE5]' },
     { id: 'discord', icon: FaDiscord, label: 'Discord', color: 'bg-[#5865F2] text-white hover:bg-[#4752C4]' }
   ];
 
