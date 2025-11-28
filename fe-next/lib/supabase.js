@@ -107,7 +107,7 @@ export async function getUserRank(userId) {
     .from('leaderboard')
     .select('rank_position, total_score, games_played')
     .eq('player_id', userId)
-    .single();
+    .maybeSingle();
 }
 
 // Guest token helpers
