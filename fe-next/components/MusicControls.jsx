@@ -12,9 +12,10 @@ import { cn } from '../lib/utils';
 const MusicControls = () => {
     const { volume, setVolume, isMuted, toggleMute, isPlaying, audioUnlocked } = useMusic();
     const { theme } = useTheme();
-    const { t } = useLanguage();
+    const { t, dir } = useLanguage();
     const [showSlider, setShowSlider] = useState(false);
     const isDarkMode = theme === 'dark';
+    const isRTL = dir === 'rtl';
 
     const getVolumeIcon = () => {
         if (isMuted || volume === 0) return <FaVolumeMute size={18} />;
@@ -91,6 +92,7 @@ const MusicControls = () => {
                                 step="0.01"
                                 value={isMuted ? 0 : volume}
                                 onChange={handleVolumeChange}
+                                dir="ltr"
                                 className={cn(
                                     "w-full h-2 rounded-lg appearance-none cursor-pointer",
                                     isDarkMode

@@ -54,6 +54,7 @@ export function MusicProvider({ children }) {
     const howlsRef = useRef({});
     const currentHowlRef = useRef(null);
     const fadeTimeoutRef = useRef(null);
+    const currentTrackRef = useRef(null);
 
     // Initialize Howl instances
     useEffect(() => {
@@ -125,8 +126,8 @@ export function MusicProvider({ children }) {
             return;
         }
 
-        // If same track, just ensure it's playing
-        if (currentTrack === trackKey && currentHowlRef.current?.playing()) {
+        // If same track, just ensure it's playing (use ref to avoid dependency)
+        if (currentTrackRef.current === trackKey && currentHowlRef.current?.playing()) {
             return;
         }
 
@@ -152,9 +153,10 @@ export function MusicProvider({ children }) {
         newHowl.fade(0, targetVolume, fadeInMs);
 
         currentHowlRef.current = newHowl;
+        currentTrackRef.current = trackKey;
         setCurrentTrack(trackKey);
         setIsPlaying(true);
-    }, [audioUnlocked, currentTrack, isMuted, volume]);
+    }, [audioUnlocked, isMuted, volume]);
 
     // Play a track (with short fade)
     const playTrack = useCallback((trackKey) => {
@@ -171,6 +173,7 @@ export function MusicProvider({ children }) {
             }, fadeOutMs);
         }
         currentHowlRef.current = null;
+        currentTrackRef.current = null;
         setCurrentTrack(null);
         setIsPlaying(false);
     }, []);

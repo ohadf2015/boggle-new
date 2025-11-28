@@ -298,6 +298,8 @@ async function processGameResults(gameCode, scores, gameInfo, userAuthMap) {
   }
 
   console.log(`[SUPABASE] Processing game results for ${gameCode}, ${scores.length} players`);
+  console.log(`[SUPABASE] userAuthMap received:`, JSON.stringify(userAuthMap));
+  console.log(`[SUPABASE] scores usernames:`, scores.map(s => s.username));
 
   for (const playerScore of scores) {
     const authInfo = userAuthMap[playerScore.username];
@@ -315,25 +317,29 @@ async function processGameResults(gameCode, scores, gameInfo, userAuthMap) {
     try {
       if (authInfo.authUserId) {
         // Authenticated user - update all tables
-        console.log(`[SUPABASE] Recording result for authenticated user: ${playerScore.username}`);
+        console.log(`[SUPABASE] Recording result for authenticated user: ${playerScore.username} (id: ${authInfo.authUserId})`);
 
         // Record game result
-        await recordGameResult({
+        const gameResultRes = await recordGameResult({
           playerId: authInfo.authUserId,
           gameCode,
           ...gameStats,
           language: gameInfo.language
         });
+        console.log(`[SUPABASE] recordGameResult response:`, gameResultRes.error ? `ERROR: ${gameResultRes.error.message}` : 'SUCCESS');
 
         // Update profile stats
-        await updatePlayerStats(authInfo.authUserId, gameStats);
+        const statsRes = await updatePlayerStats(authInfo.authUserId, gameStats);
+        console.log(`[SUPABASE] updatePlayerStats response:`, statsRes.error ? `ERROR: ${statsRes.error.message}` : 'SUCCESS');
 
         // Update leaderboard
-        await updateLeaderboardEntry(authInfo.authUserId);
+        const leaderboardRes = await updateLeaderboardEntry(authInfo.authUserId);
+        console.log(`[SUPABASE] updateLeaderboardEntry response:`, leaderboardRes.error ? `ERROR: ${leaderboardRes.error.message}` : 'SUCCESS');
 
         // Update ranked progress (if casual game)
         if (!gameInfo.isRanked) {
-          await updateRankedProgress(authInfo.authUserId);
+          const rankedRes = await updateRankedProgress(authInfo.authUserId);
+          console.log(`[SUPABASE] updateRankedProgress response:`, rankedRes?.error ? `ERROR: ${rankedRes.error.message}` : 'SUCCESS');
         }
 
       } else if (authInfo.guestTokenHash) {

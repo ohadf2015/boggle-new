@@ -71,8 +71,8 @@ export default function GamePage() {
   const wasConnectedRef = useRef(false);
 
   const { t, language } = useLanguage();
-  const { user, isAuthenticated, isSupabaseEnabled } = useAuth();
-  const { playTrack, fadeToTrack, TRACKS } = useMusic();
+  const { user, isAuthenticated, isSupabaseEnabled, profile } = useAuth();
+  const { playTrack, fadeToTrack, TRACKS, audioUnlocked } = useMusic();
 
   // Track if we should auto-join (prefilled room + existing username)
   const [shouldAutoJoin, setShouldAutoJoin] = useState(false);
@@ -80,6 +80,9 @@ export default function GamePage() {
 
   // Music transitions based on game state
   useEffect(() => {
+    // Don't attempt to play music until audio is unlocked by user interaction
+    if (!audioUnlocked) return;
+
     if (showResults) {
       // Results screen - fade to before_game music (players often start another game)
       fadeToTrack(TRACKS.BEFORE_GAME, 1500, 1000);
@@ -91,7 +94,7 @@ export default function GamePage() {
       // (in_game music is triggered by HostView/PlayerView when game actually starts)
       playTrack(TRACKS.BEFORE_GAME);
     }
-  }, [isActive, showResults, playTrack, fadeToTrack, TRACKS]);
+  }, [isActive, showResults, audioUnlocked, playTrack, fadeToTrack, TRACKS]);
 
   // Initialize state from URL and session
   useEffect(() => {
@@ -145,6 +148,13 @@ export default function GamePage() {
 
     Promise.resolve().then(initializeState);
   }, []);
+
+  // Set username from profile display_name for authenticated users
+  useEffect(() => {
+    if (isAuthenticated && profile?.display_name) {
+      setUsername(profile.display_name);
+    }
+  }, [isAuthenticated, profile?.display_name]);
 
   useEffect(() => {
     attemptingReconnectRef.current = attemptingReconnect;
@@ -581,12 +591,14 @@ export default function GamePage() {
       if (isAuthenticated && user?.id) {
         // Authenticated user
         authUserId = user.id;
+        console.log('[AUTH] Joining as authenticated user:', { authUserId, username });
       } else {
         // Guest user - get or create guest session
         const guestSessionId = getGuestSessionId();
         if (guestSessionId) {
           guestTokenHash = await hashToken(guestSessionId);
         }
+        console.log('[AUTH] Joining as guest:', { isAuthenticated, hasUser: !!user, userId: user?.id, guestTokenHash: !!guestTokenHash });
       }
     }
 
@@ -662,6 +674,8 @@ export default function GamePage() {
           prefilledRoom={prefilledRoomCode}
           isAutoJoining={shouldAutoJoin}
           roomsLoading={roomsLoading}
+          isAuthenticated={isAuthenticated}
+          displayName={profile?.display_name}
         />
       );
     }

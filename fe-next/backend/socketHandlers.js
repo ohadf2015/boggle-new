@@ -195,7 +195,7 @@ function initializeSocketHandlers(io) {
       }
       const { gameCode, username, playerId, avatar, authUserId, guestTokenHash } = data;
 
-      console.log(`[SOCKET] Join request: ${username} to game ${gameCode}`);
+      console.log(`[SOCKET] Join request: ${username} to game ${gameCode}`, { authUserId, guestTokenHash: !!guestTokenHash });
 
       // Validate
       if (!gameCode || !username) {
@@ -1507,7 +1507,9 @@ async function recordGameResultsToSupabase(gameCode, scoresArray, game) {
 
     // Build auth map from game users
     const userAuthMap = {};
+    console.log(`[SUPABASE] Building userAuthMap from game.users:`, Object.keys(game.users || {}));
     for (const [username, userData] of Object.entries(game.users || {})) {
+      console.log(`[SUPABASE] User ${username} auth data:`, { authUserId: userData.authUserId, guestTokenHash: !!userData.guestTokenHash });
       if (userData.authUserId || userData.guestTokenHash) {
         userAuthMap[username] = {
           authUserId: userData.authUserId || null,
@@ -1515,6 +1517,7 @@ async function recordGameResultsToSupabase(gameCode, scoresArray, game) {
         };
       }
     }
+    console.log(`[SUPABASE] Final userAuthMap:`, JSON.stringify(userAuthMap));
 
     // Only process if there are users with auth context
     if (Object.keys(userAuthMap).length === 0) {

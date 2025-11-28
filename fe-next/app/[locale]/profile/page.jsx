@@ -2,26 +2,145 @@
 
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { FaUser, FaArrowLeft, FaEdit, FaGamepad, FaTrophy, FaStar } from 'react-icons/fa';
+import { FaUser, FaArrowLeft, FaEdit, FaGamepad, FaTrophy, FaStar, FaCamera, FaTimes, FaCheck } from 'react-icons/fa';
 import { useRouter } from 'next/navigation';
 import Header from '@/components/Header';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { useTheme } from '@/utils/ThemeContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import AuthModal from '@/components/auth/AuthModal';
+import Avatar from '@/components/Avatar';
+import EmojiAvatarPicker from '@/components/EmojiAvatarPicker';
+import { uploadProfilePicture, removeProfilePicture } from '@/lib/supabase';
 import { cn } from '@/lib/utils';
+import toast from 'react-hot-toast';
 
 export const dynamic = 'force-dynamic';
 
 export default function ProfilePage() {
   const { theme } = useTheme();
   const { t, language } = useLanguage();
-  const { user, profile, isAuthenticated, isSupabaseEnabled, loading, canPlayRanked, gamesUntilRanked } = useAuth();
+  const { user, profile, isAuthenticated, loading, canPlayRanked, gamesUntilRanked, updateProfile, refreshProfile } = useAuth();
   const router = useRouter();
   const isDarkMode = theme === 'dark';
 
   const [showAuthModal, setShowAuthModal] = useState(false);
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+  const [isEditingName, setIsEditingName] = useState(false);
+  const [editDisplayName, setEditDisplayName] = useState('');
+  const [isUploading, setIsUploading] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+
+  // Handle profile picture upload
+  const handleProfilePictureUpload = async (event) => {
+    const file = event.target.files?.[0];
+    if (!file || !user?.id) return;
+
+    // Validate file size (2MB)
+    if (file.size > 2 * 1024 * 1024) {
+      toast.error(t('profile.imageTooLarge') || 'Image must be less than 2MB');
+      return;
+    }
+
+    // Validate file type
+    const validTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+    if (!validTypes.includes(file.type)) {
+      toast.error(t('profile.invalidImageType') || 'Please upload a JPG, PNG, WebP, or GIF image');
+      return;
+    }
+
+    setIsUploading(true);
+
+    try {
+      const { url, error } = await uploadProfilePicture(user.id, file);
+      if (error) throw error;
+
+      await updateProfile({
+        profile_picture_url: url,
+        profile_picture_provider: 'custom'
+      });
+
+      await refreshProfile();
+      toast.success(t('profile.uploadSuccess') || 'Profile picture updated!');
+    } catch (err) {
+      console.error('Upload error:', err);
+      toast.error(t('profile.uploadError') || 'Failed to upload image');
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
+  // Handle profile picture removal
+  const handleRemoveProfilePicture = async () => {
+    if (!user?.id) return;
+
+    try {
+      if (profile?.profile_picture_provider === 'custom') {
+        await removeProfilePicture(user.id);
+      }
+
+      await updateProfile({
+        profile_picture_url: null,
+        profile_picture_provider: null
+      });
+
+      await refreshProfile();
+      toast.success(t('profile.photoRemoved') || 'Profile picture removed');
+    } catch (err) {
+      console.error('Remove error:', err);
+      toast.error(t('profile.removeError') || 'Failed to remove picture');
+    }
+  };
+
+  // Handle display name save
+  const handleSaveDisplayName = async () => {
+    if (!editDisplayName.trim() || editDisplayName.trim().length < 2) {
+      toast.error(t('validation.usernameTooShort') || 'Name must be at least 2 characters');
+      return;
+    }
+
+    if (editDisplayName.trim().length > 20) {
+      toast.error(t('validation.usernameTooLong') || 'Name must be 20 characters or less');
+      return;
+    }
+
+    setIsSaving(true);
+
+    try {
+      await updateProfile({ display_name: editDisplayName.trim() });
+      await refreshProfile();
+      setIsEditingName(false);
+      toast.success(t('profile.saved') || 'Profile saved!');
+    } catch (err) {
+      console.error('Save error:', err);
+      toast.error(t('profile.saveError') || 'Failed to save');
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  // Handle emoji avatar save
+  const handleSaveEmojiAvatar = async ({ emoji, color }) => {
+    try {
+      await updateProfile({
+        avatar_emoji: emoji,
+        avatar_color: color
+      });
+      await refreshProfile();
+      toast.success(t('profile.saved') || 'Avatar updated!');
+    } catch (err) {
+      console.error('Save emoji error:', err);
+      toast.error(t('profile.saveError') || 'Failed to save');
+    }
+  };
+
+  // Start editing display name
+  const startEditingName = () => {
+    setEditDisplayName(profile?.display_name || profile?.username || '');
+    setIsEditingName(true);
+  };
 
   // Not authenticated - show sign in prompt
   if (!loading && !isAuthenticated) {
@@ -119,32 +238,116 @@ export default function ProfilePage() {
           )}
         >
           <div className="flex items-center gap-6">
-            {/* Avatar */}
+            {/* Avatar with upload/edit controls */}
             <div className="relative">
-              <span
-                className="w-24 h-24 rounded-full flex items-center justify-center text-5xl shadow-lg"
-                style={{ backgroundColor: profile?.avatar_color || '#4ECDC4' }}
-              >
-                {profile?.avatar_emoji || '🐶'}
-              </span>
-              <button
+              <Avatar
+                profilePictureUrl={profile?.profile_picture_url}
+                avatarEmoji={profile?.avatar_emoji}
+                avatarColor={profile?.avatar_color}
+                size="xl"
+                className="shadow-lg"
+              />
+
+              {/* Upload Button (camera icon) */}
+              <label
                 className={cn(
-                  'absolute bottom-0 right-0 w-8 h-8 rounded-full flex items-center justify-center shadow-md',
-                  isDarkMode ? 'bg-slate-700 text-gray-300' : 'bg-white text-gray-600'
+                  'absolute bottom-0 right-0 w-8 h-8 rounded-full flex items-center justify-center shadow-md cursor-pointer transition-colors',
+                  isDarkMode ? 'bg-slate-700 text-gray-300 hover:bg-slate-600' : 'bg-white text-gray-600 hover:bg-gray-100'
                 )}
+                title={t('profile.uploadPhoto') || 'Upload Photo'}
               >
-                <FaEdit size={14} />
-              </button>
+                {isUploading ? (
+                  <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
+                ) : (
+                  <FaCamera size={14} />
+                )}
+                <input
+                  type="file"
+                  accept="image/jpeg,image/png,image/webp,image/gif"
+                  onChange={handleProfilePictureUpload}
+                  className="hidden"
+                  disabled={isUploading}
+                />
+              </label>
+
+              {/* Remove profile picture button */}
+              {profile?.profile_picture_url && (
+                <button
+                  onClick={handleRemoveProfilePicture}
+                  className={cn(
+                    'absolute -top-1 -right-1 w-6 h-6 rounded-full flex items-center justify-center shadow-md transition-colors',
+                    isDarkMode ? 'bg-red-600 text-white hover:bg-red-500' : 'bg-red-500 text-white hover:bg-red-400'
+                  )}
+                  title={t('profile.removePhoto') || 'Remove Photo'}
+                >
+                  <FaTimes size={10} />
+                </button>
+              )}
+
+              {/* Edit emoji button (only show if no profile picture) */}
+              {!profile?.profile_picture_url && (
+                <button
+                  onClick={() => setShowEmojiPicker(true)}
+                  className={cn(
+                    'absolute -top-1 -right-1 w-6 h-6 rounded-full flex items-center justify-center shadow-md transition-colors',
+                    isDarkMode ? 'bg-slate-600 text-gray-300 hover:bg-slate-500' : 'bg-gray-200 text-gray-600 hover:bg-gray-300'
+                  )}
+                  title={t('profile.chooseEmoji') || 'Change Emoji'}
+                >
+                  <FaEdit size={10} />
+                </button>
+              )}
             </div>
 
             {/* User Info */}
             <div className="flex-1">
-              <h1 className={cn(
-                'text-2xl font-bold',
-                isDarkMode ? 'text-white' : 'text-gray-900'
-              )}>
-                {profile?.username || 'Player'}
-              </h1>
+              {isEditingName ? (
+                <div className="flex items-center gap-2">
+                  <Input
+                    value={editDisplayName}
+                    onChange={(e) => setEditDisplayName(e.target.value)}
+                    className={cn(
+                      'h-10 text-lg font-bold',
+                      isDarkMode ? 'bg-slate-700 border-slate-600' : 'bg-gray-50 border-gray-300'
+                    )}
+                    maxLength={20}
+                    autoFocus
+                  />
+                  <Button
+                    size="sm"
+                    onClick={handleSaveDisplayName}
+                    disabled={isSaving}
+                    className="bg-green-600 hover:bg-green-500"
+                  >
+                    {isSaving ? <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" /> : <FaCheck />}
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => setIsEditingName(false)}
+                    className={isDarkMode ? 'border-slate-600' : ''}
+                  >
+                    <FaTimes />
+                  </Button>
+                </div>
+              ) : (
+                <h1 className={cn(
+                  'text-2xl font-bold flex items-center gap-2',
+                  isDarkMode ? 'text-white' : 'text-gray-900'
+                )}>
+                  {profile?.display_name || profile?.username || 'Player'}
+                  <button
+                    onClick={startEditingName}
+                    className={cn(
+                      'p-1 rounded hover:bg-gray-200 dark:hover:bg-slate-700 transition-colors',
+                      isDarkMode ? 'text-gray-400' : 'text-gray-500'
+                    )}
+                    title={t('profile.editName') || 'Edit Name'}
+                  >
+                    <FaEdit size={14} />
+                  </button>
+                </h1>
+              )}
               <p className={cn(
                 'text-sm',
                 isDarkMode ? 'text-gray-400' : 'text-gray-500'
@@ -324,6 +527,15 @@ export default function ProfilePage() {
           </Button>
         </div>
       </div>
+
+      {/* Emoji Avatar Picker Modal */}
+      <EmojiAvatarPicker
+        isOpen={showEmojiPicker}
+        onClose={() => setShowEmojiPicker(false)}
+        onSave={handleSaveEmojiAvatar}
+        currentEmoji={profile?.avatar_emoji}
+        currentColor={profile?.avatar_color}
+      />
     </div>
   );
 }
@@ -350,7 +562,9 @@ function StatCard({ icon, label, value, isDarkMode, highlight = false }) {
       </div>
       <p className={cn(
         'text-2xl font-bold',
-        isDarkMode ? 'text-white' : 'text-gray-900'
+        highlight
+          ? isDarkMode ? 'text-cyan-400' : 'text-cyan-600'
+          : isDarkMode ? 'text-white' : 'text-gray-900'
       )}>
         {value}
       </p>

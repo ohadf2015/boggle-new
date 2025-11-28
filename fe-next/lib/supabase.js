@@ -164,3 +164,49 @@ export async function getRankedProgress(userId) {
 export async function isSupabaseConfigured() {
   return !!supabase;
 }
+
+// Profile picture storage functions
+export async function uploadProfilePicture(userId, file) {
+  if (!supabase) return { url: null, error: { message: 'Supabase not configured' } };
+
+  const fileExt = file.name.split('.').pop().toLowerCase();
+  const fileName = `${userId}/profile.${fileExt}`;
+
+  // Remove any existing profile pictures for this user
+  const extensions = ['jpg', 'jpeg', 'png', 'webp', 'gif'];
+  const filesToRemove = extensions.map(ext => `${userId}/profile.${ext}`);
+  await supabase.storage.from('profile-pictures').remove(filesToRemove);
+
+  // Upload new file
+  const { error } = await supabase.storage
+    .from('profile-pictures')
+    .upload(fileName, file, {
+      cacheControl: '3600',
+      upsert: true
+    });
+
+  if (error) return { url: null, error };
+
+  // Get public URL
+  const { data: { publicUrl } } = supabase.storage
+    .from('profile-pictures')
+    .getPublicUrl(fileName);
+
+  // Add cache-busting timestamp
+  const urlWithCacheBust = `${publicUrl}?t=${Date.now()}`;
+
+  return { url: urlWithCacheBust, error: null };
+}
+
+export async function removeProfilePicture(userId) {
+  if (!supabase) return { error: { message: 'Supabase not configured' } };
+
+  const extensions = ['jpg', 'jpeg', 'png', 'webp', 'gif'];
+  const filesToRemove = extensions.map(ext => `${userId}/profile.${ext}`);
+
+  const { error } = await supabase.storage
+    .from('profile-pictures')
+    .remove(filesToRemove);
+
+  return { error };
+}

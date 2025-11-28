@@ -91,12 +91,28 @@ export const AuthProvider = ({ children }) => {
   const setupProfile = async (username, avatarEmoji, avatarColor) => {
     if (!user) return { error: { message: 'Not authenticated' } };
 
+    // Extract profile picture from OAuth provider metadata
+    const userMetadata = user.user_metadata;
+    let profilePictureUrl = null;
+    let profilePictureProvider = null;
+
+    // Google provides 'avatar_url' or 'picture' in user_metadata
+    if (userMetadata?.avatar_url) {
+      profilePictureUrl = userMetadata.avatar_url;
+      profilePictureProvider = user.app_metadata?.provider || 'oauth';
+    } else if (userMetadata?.picture) {
+      profilePictureUrl = userMetadata.picture;
+      profilePictureProvider = 'google';
+    }
+
     const profileData = {
       id: user.id,
       username,
       display_name: username,
       avatar_emoji: avatarEmoji || '🐶',
-      avatar_color: avatarColor || '#4ECDC4'
+      avatar_color: avatarColor || '#4ECDC4',
+      profile_picture_url: profilePictureUrl,
+      profile_picture_provider: profilePictureProvider
     };
 
     // Check if there's a guest session to merge

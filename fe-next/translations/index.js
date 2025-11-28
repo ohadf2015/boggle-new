@@ -139,6 +139,7 @@ export const translations = {
       connectingToRoom: 'Connecting to room...',
       enterRoom: 'Enter Room',
       joinGame: 'Join Game',
+      joiningAs: 'Joining as',
     },
     hostView: {
       waitingForPlayers: 'Waiting for players...',
@@ -414,7 +415,20 @@ export const translations = {
       editProfile: 'Edit Profile',
       changeAvatar: 'Change Avatar',
       username: 'Username',
-      saveChanges: 'Save Changes'
+      saveChanges: 'Save Changes',
+      uploadPhoto: 'Upload Photo',
+      removePhoto: 'Remove Photo',
+      imageTooLarge: 'Image must be less than 2MB',
+      invalidImageType: 'Please upload a JPG, PNG, WebP, or GIF image',
+      uploadSuccess: 'Profile picture updated!',
+      uploadError: 'Failed to upload image',
+      photoRemoved: 'Profile picture removed',
+      removeError: 'Failed to remove picture',
+      saved: 'Profile saved!',
+      saveError: 'Failed to save',
+      editName: 'Edit Name',
+      chooseEmoji: 'Change Emoji',
+      chooseColor: 'Choose Color'
     },
     leaderboard: {
       title: 'Leaderboard',
@@ -585,6 +599,7 @@ export const translations = {
       connectingToRoom: 'מתחבר לחדר...',
       enterRoom: 'כניסה לחדר',
       joinGame: 'הצטרף למשחק',
+      joiningAs: 'מצטרף בשם',
     },
     hostView: {
       waitingForPlayers: 'ממתין לשחקנים...',
@@ -860,7 +875,20 @@ export const translations = {
       editProfile: 'ערוך פרופיל',
       changeAvatar: 'שנה אווטאר',
       username: 'שם משתמש',
-      saveChanges: 'שמור שינויים'
+      saveChanges: 'שמור שינויים',
+      uploadPhoto: 'העלה תמונה',
+      removePhoto: 'הסר תמונה',
+      imageTooLarge: 'התמונה חייבת להיות פחות מ-2MB',
+      invalidImageType: 'אנא העלה תמונת JPG, PNG, WebP או GIF',
+      uploadSuccess: 'תמונת הפרופיל עודכנה!',
+      uploadError: 'העלאת התמונה נכשלה',
+      photoRemoved: 'תמונת הפרופיל הוסרה',
+      removeError: 'הסרת התמונה נכשלה',
+      saved: 'הפרופיל נשמר!',
+      saveError: 'השמירה נכשלה',
+      editName: 'ערוך שם',
+      chooseEmoji: 'בחר אימוג\'י',
+      chooseColor: 'בחר צבע'
     },
     leaderboard: {
       title: 'טבלת מובילים',
@@ -1031,6 +1059,7 @@ export const translations = {
       connectingToRoom: 'Ansluter till rummet...',
       enterRoom: 'Gå in i rummet',
       joinGame: 'Gå med i spelet',
+      joiningAs: 'Går med som',
     },
     hostView: {
       waitingForPlayers: 'Väntar på spelare...',
@@ -1304,7 +1333,20 @@ export const translations = {
       editProfile: 'Redigera profil',
       changeAvatar: 'Ändra avatar',
       username: 'Användarnamn',
-      saveChanges: 'Spara ändringar'
+      saveChanges: 'Spara ändringar',
+      uploadPhoto: 'Ladda upp foto',
+      removePhoto: 'Ta bort foto',
+      imageTooLarge: 'Bilden måste vara mindre än 2MB',
+      invalidImageType: 'Ladda upp en JPG, PNG, WebP eller GIF-bild',
+      uploadSuccess: 'Profilbild uppdaterad!',
+      uploadError: 'Kunde inte ladda upp bild',
+      photoRemoved: 'Profilbild borttagen',
+      removeError: 'Kunde inte ta bort bild',
+      saved: 'Profil sparad!',
+      saveError: 'Kunde inte spara',
+      editName: 'Redigera namn',
+      chooseEmoji: 'Välj emoji',
+      chooseColor: 'Välj färg'
     },
     leaderboard: {
       title: 'Topplista',
@@ -1475,6 +1517,7 @@ export const translations = {
       connectingToRoom: 'ルームに接続中...',
       enterRoom: 'ルームに入る',
       joinGame: 'ゲームに参加',
+      joiningAs: '参加者名',
     },
     hostView: {
       waitingForPlayers: 'プレイヤーを待っています...',
@@ -1748,7 +1791,20 @@ export const translations = {
       editProfile: 'プロフィール編集',
       changeAvatar: 'アバター変更',
       username: 'ユーザー名',
-      saveChanges: '変更を保存'
+      saveChanges: '変更を保存',
+      uploadPhoto: '写真をアップロード',
+      removePhoto: '写真を削除',
+      imageTooLarge: '画像は2MB以下にしてください',
+      invalidImageType: 'JPG、PNG、WebP、またはGIF画像をアップロードしてください',
+      uploadSuccess: 'プロフィール写真を更新しました!',
+      uploadError: '画像のアップロードに失敗しました',
+      photoRemoved: 'プロフィール写真を削除しました',
+      removeError: '写真の削除に失敗しました',
+      saved: 'プロフィールを保存しました!',
+      saveError: '保存に失敗しました',
+      editName: '名前を編集',
+      chooseEmoji: '絵文字を選択',
+      chooseColor: '色を選択'
     },
     leaderboard: {
       title: 'リーダーボード',

@@ -19,11 +19,10 @@ import { cn } from './lib/utils';
 import { copyJoinUrl, shareViaWhatsApp, getJoinUrl } from './utils/share';
 import { useLanguage } from './contexts/LanguageContext';
 import LogRocket from 'logrocket';
-import toast from 'react-hot-toast';
 import { validateUsername, validateRoomName, validateGameCode, sanitizeInput } from './utils/validation';
 import { useValidation } from './hooks/useValidation';
 
-const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, error, activeRooms, refreshRooms, prefilledRoom, roomName, setRoomName, isAutoJoining, roomsLoading }) => {
+const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, error, activeRooms, refreshRooms, prefilledRoom, roomName, setRoomName, isAutoJoining, roomsLoading, isAuthenticated, displayName }) => {
   const { t, language, dir } = useLanguage();
   const [mode, setMode] = useState('join'); // 'join' or 'host'
   const [showQR, setShowQR] = useState(false);
@@ -292,63 +291,115 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
                 </motion.div>
               )}
 
-              <form onSubmit={handleQuickJoin} className="space-y-3 sm:space-y-6">
-                {/* Simple name input */}
-                <motion.div
-                  animate={usernameError ? { x: [-10, 10, -10, 10, 0] } : {}}
-                  transition={{ duration: 0.4 }}
-                  className="space-y-2"
-                >
-                  <Label htmlFor="username" className="text-base font-semibold text-slate-700 dark:text-gray-300">
-                    {t('joinView.enterNameToPlay')}
-                  </Label>
-                    <Input
-                    ref={usernameInputRef}
-                    id="username"
-                    value={username}
-                    onChange={(e) => {
-                      setUsername(sanitizeInput(e.target.value, 20));
-                      if (usernameError) setUsernameError(false);
-                    }}
-                    required
-                    autoFocus
-                    className={cn(
-                      "h-14 text-lg bg-slate-100 dark:bg-slate-700/50 border-2 border-slate-300 dark:border-slate-600 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-gray-500",
-                      usernameError && "border-red-500 bg-red-50 dark:bg-red-900/30 focus-visible:ring-red-500"
-                    )}
-                    placeholder={t('joinView.playerNamePlaceholder')}
-                    maxLength={20}
-                  />
-                  {usernameError && (
-                    <p className="text-sm text-red-500 dark:text-red-400">{t(usernameErrorKey || 'validation.usernameRequired')}</p>
+              {/* Authenticated user - simplified view */}
+              {isAuthenticated && displayName ? (
+                <div className="space-y-3 sm:space-y-6">
+                  <div className="text-center py-4">
+                    <p className="text-slate-600 dark:text-gray-400 mb-2">
+                      {t('joinView.welcomeBack') || 'Welcome back'},
+                    </p>
+                    <p className="text-2xl font-bold text-cyan-600 dark:text-cyan-400">
+                      {displayName}
+                    </p>
+                  </div>
+
+                  {/* Error Alert */}
+                  {error && (
+                    <motion.div
+                      initial={{ opacity: 0, y: -10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.3 }}
+                    >
+                      <Alert variant="destructive">
+                        <AlertDescription>{error}</AlertDescription>
+                      </Alert>
+                    </motion.div>
                   )}
-                </motion.div>
 
-                {/* Play button */}
-                <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
-                  <Button
-                    type="submit"
-                    disabled={!username}
-                    className="w-full h-14 text-xl font-bold bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-400 hover:to-emerald-500 hover:shadow-[0_0_25px_rgba(34,197,94,0.5)] transition-all"
-                  >
-                    <FaGamepad className="mr-3" size={24} />
-                    {t('joinView.joinGame')}
-                  </Button>
-                </motion.div>
+                  {/* Play button */}
+                  <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
+                    <Button
+                      onClick={() => handleJoin(false)}
+                      className="w-full h-14 text-xl font-bold bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-400 hover:to-emerald-500 hover:shadow-[0_0_25px_rgba(34,197,94,0.5)] transition-all"
+                    >
+                      <FaGamepad className="mr-3" size={24} />
+                      {t('joinView.joinGame')}
+                    </Button>
+                  </motion.div>
 
-                {/* Switch to full form - subtle link */}
-                <div className="text-center pt-2">
-                  <Button
-                    variant="link"
-                    size="sm"
-                    type="button"
-                    onClick={() => setShowFullForm(true)}
-                    className="text-sm text-cyan-600 dark:text-cyan-400 hover:text-cyan-500 dark:hover:text-cyan-300 underline"
-                  >
-                    {t('joinView.wantToHostOrJoinOther')}
-                  </Button>
+                  {/* Switch to full form - subtle link */}
+                  <div className="text-center pt-2">
+                    <Button
+                      variant="link"
+                      size="sm"
+                      type="button"
+                      onClick={() => setShowFullForm(true)}
+                      className="text-sm text-cyan-600 dark:text-cyan-400 hover:text-cyan-500 dark:hover:text-cyan-300 underline"
+                    >
+                      {t('joinView.wantToHostOrJoinOther')}
+                    </Button>
+                  </div>
                 </div>
-              </form>
+              ) : (
+                /* Guest user - needs name input */
+                <form onSubmit={handleQuickJoin} className="space-y-3 sm:space-y-6">
+                  {/* Simple name input */}
+                  <motion.div
+                    animate={usernameError ? { x: [-10, 10, -10, 10, 0] } : {}}
+                    transition={{ duration: 0.4 }}
+                    className="space-y-2"
+                  >
+                    <Label htmlFor="username" className="text-base font-semibold text-slate-700 dark:text-gray-300">
+                      {t('joinView.enterNameToPlay')}
+                    </Label>
+                      <Input
+                      ref={usernameInputRef}
+                      id="username"
+                      value={username}
+                      onChange={(e) => {
+                        setUsername(sanitizeInput(e.target.value, 20));
+                        if (usernameError) setUsernameError(false);
+                      }}
+                      required
+                      autoFocus
+                      className={cn(
+                        "h-14 text-lg bg-slate-100 dark:bg-slate-700/50 border-2 border-slate-300 dark:border-slate-600 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-gray-500",
+                        usernameError && "border-red-500 bg-red-50 dark:bg-red-900/30 focus-visible:ring-red-500"
+                      )}
+                      placeholder={t('joinView.playerNamePlaceholder')}
+                      maxLength={20}
+                    />
+                    {usernameError && (
+                      <p className="text-sm text-red-500 dark:text-red-400">{t(usernameErrorKey || 'validation.usernameRequired')}</p>
+                    )}
+                  </motion.div>
+
+                  {/* Play button */}
+                  <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
+                    <Button
+                      type="submit"
+                      disabled={!username}
+                      className="w-full h-14 text-xl font-bold bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-400 hover:to-emerald-500 hover:shadow-[0_0_25px_rgba(34,197,94,0.5)] transition-all"
+                    >
+                      <FaGamepad className="mr-3" size={24} />
+                      {t('joinView.joinGame')}
+                    </Button>
+                  </motion.div>
+
+                  {/* Switch to full form - subtle link */}
+                  <div className="text-center pt-2">
+                    <Button
+                      variant="link"
+                      size="sm"
+                      type="button"
+                      onClick={() => setShowFullForm(true)}
+                      className="text-sm text-cyan-600 dark:text-cyan-400 hover:text-cyan-500 dark:hover:text-cyan-300 underline"
+                    >
+                      {t('joinView.wantToHostOrJoinOther')}
+                    </Button>
+                  </div>
+                </form>
+              )}
             </CardContent>
           </Card>
         </motion.div>
@@ -610,8 +661,8 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
                   </>
                 )}
 
-                {/* Only show username field for join mode, not host mode */}
-                {mode === 'join' && (
+                {/* Only show username field for join mode (guest users only) */}
+                {mode === 'join' && !isAuthenticated && (
                   <motion.div
                     animate={usernameError ? { x: [-10, 10, -10, 10, 0] } : {}}
                     transition={{ duration: 0.4 }}
@@ -639,10 +690,20 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
                   </motion.div>
                 )}
 
+                {/* Show "Joining as" for authenticated users in join mode */}
+                {mode === 'join' && isAuthenticated && displayName && (
+                  <div className="p-3 rounded-lg bg-cyan-50 dark:bg-cyan-900/20 border border-cyan-200 dark:border-cyan-800">
+                    <p className="text-sm text-slate-600 dark:text-gray-400">
+                      {t('joinView.joiningAs') || 'Joining as'}{' '}
+                      <span className="font-semibold text-cyan-600 dark:text-cyan-400">{displayName}</span>
+                    </p>
+                  </div>
+                )}
+
                 <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                   <Button
                     type="submit"
-                    disabled={mode === 'join' ? (!gameCode || !username) : !gameCode}
+                    disabled={mode === 'join' ? (!gameCode || (!isAuthenticated && !username)) : !gameCode}
                     className="w-full h-12 text-lg font-bold bg-gradient-to-r from-cyan-500 to-purple-600 hover:from-cyan-400 hover:to-purple-500 hover:shadow-[0_0_20px_rgba(6,182,212,0.5)]"
                   >
                     {mode === 'host' ? (

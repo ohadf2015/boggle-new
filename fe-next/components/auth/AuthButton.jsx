@@ -9,6 +9,7 @@ import { useLanguage } from '../../contexts/LanguageContext';
 import { useAuth } from '../../contexts/AuthContext';
 import { signOut } from '../../lib/supabase';
 import AuthModal from './AuthModal';
+import Avatar from '../Avatar';
 import { cn } from '../../lib/utils';
 import { useRouter } from 'next/navigation';
 
@@ -59,12 +60,12 @@ const AuthButton = () => {
               : 'bg-white text-cyan-600 hover:bg-gray-50 hover:shadow-[0_0_15px_rgba(6,182,212,0.2)] border-gray-200'
           )}
         >
-          <span
-            className="w-6 h-6 rounded-full flex items-center justify-center text-sm"
-            style={{ backgroundColor: profile.avatar_color || '#4ECDC4' }}
-          >
-            {profile.avatar_emoji || '🐶'}
-          </span>
+          <Avatar
+            profilePictureUrl={profile.profile_picture_url}
+            avatarEmoji={profile.avatar_emoji}
+            avatarColor={profile.avatar_color}
+            size="sm"
+          />
           <span className="max-w-[80px] truncate font-medium">
             {profile.username}
           </span>
