@@ -149,10 +149,11 @@ export default function GamePage() {
     Promise.resolve().then(initializeState);
   }, []);
 
-  // Set username from profile display_name for authenticated users
+  // Set username and roomName from profile display_name for authenticated users
   useEffect(() => {
     if (isAuthenticated && profile?.display_name) {
       setUsername(profile.display_name);
+      setRoomName(profile.display_name);
     }
   }, [isAuthenticated, profile?.display_name]);
 

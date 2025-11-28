@@ -38,9 +38,9 @@ export default function ProfilePage() {
     const file = event.target.files?.[0];
     if (!file || !user?.id) return;
 
-    // Validate file size (2MB)
-    if (file.size > 2 * 1024 * 1024) {
-      toast.error(t('profile.imageTooLarge') || 'Image must be less than 2MB');
+    // Validate file size (4MB)
+    if (file.size > 4 * 1024 * 1024) {
+      toast.error(t('profile.imageTooLarge') || 'Image must be less than 4MB');
       return;
     }
 

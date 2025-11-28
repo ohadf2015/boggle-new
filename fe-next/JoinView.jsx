@@ -581,36 +581,48 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
                   </motion.div>
                 ) : (
                   <>
-                    {/* Host Player Name */}
-                    <motion.div
-                      initial={{ x: 50, opacity: 0 }}
-                      animate={{ x: 0, opacity: 1 }}
-                      transition={{ duration: 0.3 }}
-                      className="space-y-2"
-                    >
-                      <Label htmlFor="roomName" className="text-slate-700 dark:text-gray-300">{t('joinView.yourName')}</Label>
-                      <Input
-                        id="roomName"
-                        value={roomName}
-                        onChange={(e) => {
-                          setRoomName(sanitizeInput(e.target.value, 30));
-                          if (roomNameError) setRoomNameError(false);
-                        }}
-                        required
-                        className={cn(
-                          "bg-slate-100 dark:bg-slate-700/50 border-slate-200 dark:border-slate-600 text-slate-900 dark:text-white placeholder:text-slate-500 dark:placeholder:text-gray-400",
-                          roomNameError && "border-red-500 bg-red-900/30 focus-visible:ring-red-500"
+                    {/* Host Player Name - only show for guests */}
+                    {!isAuthenticated && (
+                      <motion.div
+                        initial={{ x: 50, opacity: 0 }}
+                        animate={{ x: 0, opacity: 1 }}
+                        transition={{ duration: 0.3 }}
+                        className="space-y-2"
+                      >
+                        <Label htmlFor="roomName" className="text-slate-700 dark:text-gray-300">{t('joinView.yourName')}</Label>
+                        <Input
+                          id="roomName"
+                          value={roomName}
+                          onChange={(e) => {
+                            setRoomName(sanitizeInput(e.target.value, 30));
+                            if (roomNameError) setRoomNameError(false);
+                          }}
+                          required
+                          className={cn(
+                            "bg-slate-100 dark:bg-slate-700/50 border-slate-200 dark:border-slate-600 text-slate-900 dark:text-white placeholder:text-slate-500 dark:placeholder:text-gray-400",
+                            roomNameError && "border-red-500 bg-red-900/30 focus-visible:ring-red-500"
+                          )}
+                          placeholder={t('joinView.enterYourName')}
+                          maxLength={30}
+                        />
+                        {roomNameError && (
+                          <p className="text-sm text-red-400">{t(roomNameErrorKey || 'joinView.pleaseEnterYourName')}</p>
                         )}
-                        placeholder={t('joinView.enterYourName')}
-                        maxLength={30}
-                      />
-                      {roomNameError && (
-                        <p className="text-sm text-red-400">{t(roomNameErrorKey || 'joinView.pleaseEnterYourName')}</p>
-                      )}
-                      {!roomNameError && (
-                        <p className="text-sm text-slate-500 dark:text-gray-400">{t('joinView.playerAndRoomName')}</p>
-                      )}
-                    </motion.div>
+                        {!roomNameError && (
+                          <p className="text-sm text-slate-500 dark:text-gray-400">{t('joinView.playerAndRoomName')}</p>
+                        )}
+                      </motion.div>
+                    )}
+
+                    {/* Show "Hosting as" for authenticated users in host mode */}
+                    {isAuthenticated && displayName && (
+                      <div className="p-3 rounded-lg bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800">
+                        <p className="text-sm text-slate-600 dark:text-gray-400">
+                          {t('joinView.hostingAs') || 'Hosting as'}{' '}
+                          <span className="font-semibold text-purple-600 dark:text-purple-400">{displayName}</span>
+                        </p>
+                      </div>
+                    )}
 
                     {/* Room Code */}
                     <motion.div
