@@ -407,7 +407,135 @@ export const translations = {
       claimStats: 'Claim Your Stats',
       statsClaimedSuccess: 'Stats claimed successfully!',
       termsAgreement: 'By continuing, you agree to our Terms of Service',
+      termsPrefix: 'By continuing, you agree to our',
+      termsLink: 'Terms of Service',
+      andText: 'and',
+      privacyLink: 'Privacy Policy',
       upgradePrompt: 'Sign in to save your progress and compete on the leaderboard!'
+    },
+    legal: {
+      termsOfService: 'Terms of Service',
+      privacyPolicy: 'Privacy Policy',
+      backToGame: 'Back to Game',
+      lastUpdated: 'Last updated',
+      copyright: '© 2025 LexiClash Ltd. All rights reserved.',
+      allRightsReserved: 'All rights reserved.',
+      // Terms of Service sections
+      terms: {
+        title: 'Terms of Service',
+        intro: 'Welcome to LexiClash. These Terms of Service govern your use of our multiplayer word game platform at lexiclash.live.',
+        acceptance: {
+          title: '1. Acceptance of Terms',
+          content: 'By accessing or using LexiClash, you agree to be bound by these Terms of Service. If you do not agree to these terms, please do not use our service.'
+        },
+        service: {
+          title: '2. Description of Service',
+          content: 'LexiClash is a free-to-play multiplayer word game where players compete to find words on a letter grid in real-time. The service includes user accounts, leaderboards, achievements, and multiplayer gameplay features.'
+        },
+        accounts: {
+          title: '3. User Accounts',
+          content: 'You may use LexiClash as a guest or create an account using Google or Discord authentication. You are responsible for maintaining the security of your account credentials. We do not store your passwords - authentication is handled securely through OAuth providers.'
+        },
+        conduct: {
+          title: '4. User Conduct',
+          content: 'You agree to use LexiClash fairly and respectfully. Prohibited activities include: using offensive or discriminatory display names, cheating or exploiting bugs, using automated bots or scripts, harassing other players, and any attempt to disrupt the service or manipulate leaderboard rankings.'
+        },
+        contentLicense: {
+          title: '5. User Content License',
+          content: 'By using LexiClash, you grant us a worldwide, royalty-free, non-exclusive license to display your username, avatar, and game statistics on leaderboards, in-game displays, and within the service. This license allows us to operate the game and display player information to other users.'
+        },
+        intellectualProperty: {
+          title: '6. Intellectual Property',
+          content: 'LexiClash, including its name, logo, game mechanics, code, and all content, is owned by LexiClash Ltd. All rights reserved. You may not copy, modify, distribute, or create derivative works without our express written permission.'
+        },
+        disclaimers: {
+          title: '7. Disclaimers',
+          content: 'LexiClash is provided "as is" and "as available" without warranties of any kind, either express or implied. We do not guarantee that the service will be uninterrupted, error-free, or secure. We are not responsible for any loss of data, including game progress or statistics.'
+        },
+        liability: {
+          title: '8. Limitation of Liability',
+          content: 'To the maximum extent permitted by law, LexiClash Ltd shall not be liable for any indirect, incidental, special, consequential, or punitive damages arising from your use of the service, including but not limited to loss of profits, data, or goodwill.'
+        },
+        indemnification: {
+          title: '9. Indemnification',
+          content: 'You agree to indemnify, defend, and hold harmless LexiClash Ltd from any claims, damages, losses, or expenses arising from your violation of these terms, your use of the service, or your violation of any rights of another party.'
+        },
+        termination: {
+          title: '10. Termination',
+          content: 'We may suspend or terminate your access to LexiClash at any time, with or without cause, and with or without notice. Upon termination, your right to use the service ceases immediately, and your account data may be deleted.'
+        },
+        modifications: {
+          title: '11. Modifications to Terms',
+          content: 'We reserve the right to modify these Terms of Service at any time. Changes will be effective upon posting to the website. Your continued use of LexiClash after changes constitutes acceptance of the new terms.'
+        },
+        governingLaw: {
+          title: '12. Governing Law',
+          content: 'These Terms of Service shall be governed by and construed in accordance with the laws of the State of Israel, without regard to its conflict of law provisions.'
+        },
+        disputes: {
+          title: '13. Dispute Resolution',
+          content: 'Any disputes arising from these terms or your use of LexiClash shall first be attempted to be resolved informally. If unsuccessful, disputes shall be resolved exclusively in the courts located in Israel, and you consent to the personal jurisdiction of such courts.'
+        },
+        severability: {
+          title: '14. Severability',
+          content: 'If any provision of these Terms of Service is found to be unenforceable or invalid, that provision shall be limited or eliminated to the minimum extent necessary, and the remaining provisions shall continue in full force and effect.'
+        }
+      },
+      // Privacy Policy sections
+      privacy: {
+        title: 'Privacy Policy',
+        intro: 'This Privacy Policy explains how LexiClash Ltd collects, uses, and protects your personal information when you use our multiplayer word game at lexiclash.live.',
+        infoCollected: {
+          title: '1. Information We Collect',
+          content: 'We collect the following types of information:',
+          oauth: 'Account data via Google/Discord OAuth: name, email address, and profile picture',
+          profile: 'Player profile information: display name, avatar emoji/color, and custom profile pictures you upload',
+          stats: 'Game statistics: scores, wins, words found, games played, time played, achievements, and leaderboard rankings',
+          gameState: 'Temporary game state: room information, current game data (stored temporarily in Redis with automatic deletion)',
+          analytics: 'Analytics data via LogRocket: session recordings, error logs, and usage patterns to help us improve the service'
+        },
+        howWeUse: {
+          title: '2. How We Use Your Information',
+          content: 'We use your information to: provide authentication and account features, display your profile and statistics to other players, maintain leaderboards and rankings, improve our service through analytics, send important service-related communications, and ensure fair play and enforce our Terms of Service.'
+        },
+        thirdParties: {
+          title: '3. Third-Party Services',
+          content: 'We use the following third-party services to operate LexiClash:',
+          supabase: 'Supabase - For authentication, database storage, and profile picture storage',
+          logrocket: 'LogRocket - For analytics, session recording, and error tracking',
+          google: 'Google - For OAuth authentication',
+          discord: 'Discord - For OAuth authentication',
+          noSale: 'We do not sell your personal information to third parties.'
+        },
+        cookies: {
+          title: '4. Cookies and Local Storage',
+          content: 'We use essential cookies and local storage for: authentication tokens (Supabase), username and preferences (localStorage), theme settings (dark/light mode), and language preferences. We also use LogRocket cookies for analytics purposes. We do not use advertising or tracking cookies.'
+        },
+        dataRetention: {
+          title: '5. Data Retention',
+          content: 'Account and profile data is retained until you request deletion. Game statistics are retained to maintain leaderboard integrity. Temporary game state (Redis) is automatically deleted within 1 hour. Analytics data is retained according to LogRocket\'s policies.'
+        },
+        security: {
+          title: '6. Data Security',
+          content: 'We implement industry-standard security measures including: encrypted connections (HTTPS), secure OAuth authentication, encrypted database storage via Supabase, and secure WebSocket connections for real-time gameplay.'
+        },
+        yourRights: {
+          title: '7. Your Rights',
+          content: 'You have the right to: access your personal data through your profile page, update your profile information at any time, delete your account and associated data, and request information about how your data is used.'
+        },
+        international: {
+          title: '8. International Users',
+          content: 'Your data may be transferred to and stored in countries outside your country of residence, including countries that may have different data protection laws. By using LexiClash, you consent to such transfers.'
+        },
+        changes: {
+          title: '9. Changes to This Policy',
+          content: 'We may update this Privacy Policy from time to time. Changes will be posted on this page with an updated date. Your continued use of LexiClash after changes constitutes acceptance of the updated policy.'
+        },
+        governingLaw: {
+          title: '10. Governing Law',
+          content: 'This Privacy Policy is governed by the laws of the State of Israel. Any disputes shall be resolved in the courts located in Israel.'
+        }
+      }
     },
     profile: {
       title: 'Profile',
@@ -873,7 +1001,135 @@ export const translations = {
       claimStats: 'קבל את הנקודות שלך',
       statsClaimedSuccess: 'הנקודות נשמרו בהצלחה!',
       termsAgreement: 'בהמשך, אתה מסכים לתנאי השימוש שלנו',
+      termsPrefix: 'בהמשך, את/ה מסכים/ה ל',
+      termsLink: 'תנאי השימוש',
+      andText: 'ול',
+      privacyLink: 'מדיניות הפרטיות',
       upgradePrompt: 'התחבר כדי לשמור את ההתקדמות שלך ולהתחרות בטבלת המובילים!'
+    },
+    legal: {
+      termsOfService: 'תנאי שימוש',
+      privacyPolicy: 'מדיניות פרטיות',
+      backToGame: 'חזרה למשחק',
+      lastUpdated: 'עודכן לאחרונה',
+      copyright: '© 2025 LexiClash Ltd. כל הזכויות שמורות.',
+      allRightsReserved: 'כל הזכויות שמורות.',
+      // Terms of Service sections
+      terms: {
+        title: 'תנאי שימוש',
+        intro: 'ברוכים הבאים ל-LexiClash. תנאי שימוש אלה מסדירים את השימוש שלך בפלטפורמת משחק המילים המרובה משתתפים שלנו בכתובת lexiclash.live.',
+        acceptance: {
+          title: '1. קבלת התנאים',
+          content: 'על ידי גישה או שימוש ב-LexiClash, את/ה מסכים/ה להיות כפוף/ה לתנאי שימוש אלה. אם אינך מסכים/ה לתנאים אלה, אנא אל תשתמש/י בשירות שלנו.'
+        },
+        service: {
+          title: '2. תיאור השירות',
+          content: 'LexiClash הוא משחק מילים מרובה משתתפים חינמי שבו שחקנים מתחרים למצוא מילים על לוח אותיות בזמן אמת. השירות כולל חשבונות משתמש, טבלאות מובילים, הישגים ותכונות משחק מרובות משתתפים.'
+        },
+        accounts: {
+          title: '3. חשבונות משתמש',
+          content: 'ניתן להשתמש ב-LexiClash כאורח או ליצור חשבון באמצעות אימות Google או Discord. את/ה אחראי/ת לשמירה על אבטחת פרטי החשבון שלך. איננו מאחסנים את הסיסמאות שלך - האימות מתבצע בצורה מאובטחת דרך ספקי OAuth.'
+        },
+        conduct: {
+          title: '4. התנהגות משתמשים',
+          content: 'את/ה מסכים/ה להשתמש ב-LexiClash בצורה הוגנת ומכבדת. פעילויות אסורות כוללות: שימוש בשמות תצוגה פוגעניים או מפלים, רמאות או ניצול באגים, שימוש בבוטים אוטומטיים או סקריפטים, הטרדת שחקנים אחרים, וכל ניסיון לשבש את השירות או לתמרן את דירוגי טבלת המובילים.'
+        },
+        contentLicense: {
+          title: '5. רישיון תוכן משתמש',
+          content: 'על ידי שימוש ב-LexiClash, את/ה מעניק/ה לנו רישיון עולמי, ללא תמלוגים ולא בלעדי להציג את שם המשתמש, האווטאר והסטטיסטיקות שלך בטבלאות המובילים, בתצוגות במשחק ובתוך השירות. רישיון זה מאפשר לנו להפעיל את המשחק ולהציג מידע שחקנים למשתמשים אחרים.'
+        },
+        intellectualProperty: {
+          title: '6. קניין רוחני',
+          content: 'LexiClash, כולל שמו, הלוגו, מכניקת המשחק, הקוד וכל התוכן, הם בבעלות LexiClash Ltd. כל הזכויות שמורות. אסור לך להעתיק, לשנות, להפיץ או ליצור יצירות נגזרות ללא אישור כתוב מפורש מאיתנו.'
+        },
+        disclaimers: {
+          title: '7. הצהרות אחריות',
+          content: 'LexiClash מסופק "כמות שהוא" ו"כפי שזמין" ללא אחריות מכל סוג, בין אם מפורשת או משתמעת. איננו מבטיחים שהשירות יהיה רציף, נקי משגיאות או מאובטח. איננו אחראים לאובדן נתונים, כולל התקדמות או סטטיסטיקות משחק.'
+        },
+        liability: {
+          title: '8. הגבלת אחריות',
+          content: 'במידה המרבית המותרת על פי חוק, LexiClash Ltd לא תהיה אחראית לכל נזק עקיף, מקרי, מיוחד, תוצאתי או עונשי הנובע משימושך בשירות, כולל אך לא מוגבל לאובדן רווחים, נתונים או מוניטין.'
+        },
+        indemnification: {
+          title: '9. שיפוי',
+          content: 'את/ה מסכים/ה לשפות, להגן ולהחזיק את LexiClash Ltd חסינה מפני כל תביעות, נזקים, הפסדים או הוצאות הנובעים מהפרת תנאים אלה על ידך, משימושך בשירות, או מהפרת זכויות של צד אחר.'
+        },
+        termination: {
+          title: '10. סיום',
+          content: 'אנו עשויים להשעות או לסיים את הגישה שלך ל-LexiClash בכל עת, עם או בלי סיבה, ועם או בלי הודעה מוקדמת. עם הסיום, הזכות שלך להשתמש בשירות מסתיימת מיידית, ונתוני החשבון שלך עשויים להימחק.'
+        },
+        modifications: {
+          title: '11. שינויים בתנאים',
+          content: 'אנו שומרים לעצמנו את הזכות לשנות תנאי שימוש אלה בכל עת. שינויים ייכנסו לתוקף עם הפרסום באתר. המשך השימוש שלך ב-LexiClash לאחר שינויים מהווה הסכמה לתנאים החדשים.'
+        },
+        governingLaw: {
+          title: '12. דין חל',
+          content: 'תנאי שימוש אלה יפורשו וייושמו בהתאם לחוקי מדינת ישראל, מבלי להתחשב בכללי ברירת הדין שלה.'
+        },
+        disputes: {
+          title: '13. יישוב סכסוכים',
+          content: 'כל סכסוך הנובע מתנאים אלה או משימושך ב-LexiClash ייושב תחילה באופן לא פורמלי. אם לא יצליח, הסכסוכים ייושבו באופן בלעדי בבתי המשפט בישראל, ואת/ה מסכים/ה לסמכות השיפוט האישית של בתי משפט אלה.'
+        },
+        severability: {
+          title: '14. הפרדה',
+          content: 'אם הוראה כלשהי מתנאי שימוש אלה תימצא בלתי ניתנת לאכיפה או בלתי חוקית, הוראה זו תוגבל או תבוטל במידה המינימלית הנדרשת, וההוראות הנותרות ימשיכו לחול במלואן.'
+        }
+      },
+      // Privacy Policy sections
+      privacy: {
+        title: 'מדיניות פרטיות',
+        intro: 'מדיניות פרטיות זו מסבירה כיצד LexiClash Ltd אוספת, משתמשת ומגנה על המידע האישי שלך כאשר את/ה משתמש/ת במשחק המילים המרובה משתתפים שלנו בכתובת lexiclash.live.',
+        infoCollected: {
+          title: '1. מידע שאנו אוספים',
+          content: 'אנו אוספים את סוגי המידע הבאים:',
+          oauth: 'נתוני חשבון דרך Google/Discord OAuth: שם, כתובת אימייל ותמונת פרופיל',
+          profile: 'מידע פרופיל שחקן: שם תצוגה, אימוג\'י/צבע אווטאר ותמונות פרופיל מותאמות אישית שאת/ה מעלה',
+          stats: 'סטטיסטיקות משחק: ניקוד, ניצחונות, מילים שנמצאו, משחקים ששוחקו, זמן משחק, הישגים ודירוגי טבלת מובילים',
+          gameState: 'מצב משחק זמני: מידע על חדר, נתוני משחק נוכחיים (מאוחסנים באופן זמני ב-Redis עם מחיקה אוטומטית)',
+          analytics: 'נתוני אנליטיקה דרך LogRocket: הקלטות פעילות, יומני שגיאות ודפוסי שימוש כדי לעזור לנו לשפר את השירות'
+        },
+        howWeUse: {
+          title: '2. כיצד אנו משתמשים במידע שלך',
+          content: 'אנו משתמשים במידע שלך כדי: לספק אימות ותכונות חשבון, להציג את הפרופיל והסטטיסטיקות שלך לשחקנים אחרים, לתחזק טבלאות מובילים ודירוגים, לשפר את השירות שלנו באמצעות אנליטיקה, לשלוח תקשורת חשובה הקשורה לשירות, ולהבטיח משחק הוגן ולאכוף את תנאי השימוש שלנו.'
+        },
+        thirdParties: {
+          title: '3. שירותי צד שלישי',
+          content: 'אנו משתמשים בשירותי צד שלישי הבאים כדי להפעיל את LexiClash:',
+          supabase: 'Supabase - לאימות, אחסון מסד נתונים ואחסון תמונות פרופיל',
+          logrocket: 'LogRocket - לאנליטיקה, הקלטת פעילות ומעקב אחר שגיאות',
+          google: 'Google - לאימות OAuth',
+          discord: 'Discord - לאימות OAuth',
+          noSale: 'איננו מוכרים את המידע האישי שלך לצדדים שלישיים.'
+        },
+        cookies: {
+          title: '4. עוגיות ואחסון מקומי',
+          content: 'אנו משתמשים בעוגיות חיוניות ואחסון מקומי עבור: אסימוני אימות (Supabase), שם משתמש והעדפות (localStorage), הגדרות ערכת נושא (מצב כהה/בהיר) והעדפות שפה. אנו גם משתמשים בעוגיות LogRocket למטרות אנליטיקה. איננו משתמשים בעוגיות פרסום או מעקב.'
+        },
+        dataRetention: {
+          title: '5. שמירת נתונים',
+          content: 'נתוני חשבון ופרופיל נשמרים עד שתבקש/י מחיקה. סטטיסטיקות משחק נשמרות לשמירה על שלמות טבלת המובילים. מצב משחק זמני (Redis) נמחק אוטומטית תוך שעה אחת. נתוני אנליטיקה נשמרים בהתאם למדיניות LogRocket.'
+        },
+        security: {
+          title: '6. אבטחת נתונים',
+          content: 'אנו מיישמים אמצעי אבטחה סטנדרטיים בתעשייה כולל: חיבורים מוצפנים (HTTPS), אימות OAuth מאובטח, אחסון מסד נתונים מוצפן דרך Supabase, וחיבורי WebSocket מאובטחים למשחק בזמן אמת.'
+        },
+        yourRights: {
+          title: '7. הזכויות שלך',
+          content: 'יש לך את הזכות: לגשת לנתונים האישיים שלך דרך דף הפרופיל שלך, לעדכן את מידע הפרופיל שלך בכל עת, למחוק את החשבון והנתונים המשויכים אליו, ולבקש מידע על אופן השימוש בנתונים שלך.'
+        },
+        international: {
+          title: '8. משתמשים בינלאומיים',
+          content: 'הנתונים שלך עשויים להיות מועברים ומאוחסנים במדינות מחוץ למדינת מגוריך, כולל מדינות שעשויות להיות להן חוקי הגנת נתונים שונים. על ידי שימוש ב-LexiClash, את/ה מסכים/ה להעברות כאלה.'
+        },
+        changes: {
+          title: '9. שינויים במדיניות זו',
+          content: 'אנו עשויים לעדכן מדיניות פרטיות זו מעת לעת. שינויים יפורסמו בדף זה עם תאריך מעודכן. המשך השימוש שלך ב-LexiClash לאחר שינויים מהווה הסכמה למדיניות המעודכנת.'
+        },
+        governingLaw: {
+          title: '10. דין חל',
+          content: 'מדיניות פרטיות זו כפופה לחוקי מדינת ישראל. כל סכסוך ייושב בבתי המשפט בישראל.'
+        }
+      }
     },
     profile: {
       title: 'פרופיל',

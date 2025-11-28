@@ -138,62 +138,6 @@ export function MusicProvider({ children }) {
         }
     }, [volume, isMuted]);
 
-    // Auto-unlock audio on first user interaction anywhere in the app
-    useEffect(() => {
-        if (typeof window === 'undefined' || audioUnlocked) return;
-
-        const handleFirstInteraction = async () => {
-            if (audioUnlockedRef.current) return;
-
-            console.log('[Music] First user interaction detected, unlocking audio...');
-
-            // Resume AudioContext for iOS Safari
-            if (Howler.ctx && Howler.ctx.state === 'suspended') {
-                try {
-                    await Howler.ctx.resume();
-                    console.log('[Music] AudioContext resumed successfully');
-                } catch (err) {
-                    console.error('[Music] Failed to resume AudioContext:', err);
-                }
-            }
-
-            // Update ref immediately so fadeToTrack works in the same event cycle
-            audioUnlockedRef.current = true;
-            setAudioUnlocked(true);
-
-            // Process any pending track request immediately (don't wait for React re-render)
-            if (pendingUnlockTrackRef.current) {
-                const { trackKey, fadeOutMs, fadeInMs } = pendingUnlockTrackRef.current;
-                pendingUnlockTrackRef.current = null;
-                console.log('[Music] Playing pending track:', trackKey);
-                // Small delay to ensure AudioContext is fully ready
-                setTimeout(() => {
-                    fadeToTrack(trackKey, fadeOutMs, fadeInMs);
-                }, 100);
-            }
-
-            // Remove all listeners after first interaction
-            cleanup();
-        };
-
-        const events = ['click', 'touchend', 'keydown'];
-
-        events.forEach(event => {
-            document.addEventListener(event, handleFirstInteraction, {
-                capture: true,
-                passive: true
-            });
-        });
-
-        const cleanup = () => {
-            events.forEach(event => {
-                document.removeEventListener(event, handleFirstInteraction, { capture: true });
-            });
-        };
-
-        return cleanup;
-    }, [audioUnlocked, fadeToTrack]);
-
     // Explicitly unlock audio - called when user clicks the speaker button (fallback)
     const unlockAudio = useCallback(() => {
         if (audioUnlockedRef.current) return;
@@ -214,7 +158,10 @@ export function MusicProvider({ children }) {
     // Queue for track requests made before audio is unlocked
     const pendingUnlockTrackRef = useRef(null);
 
-    // Crossfade to a new track
+    // Ref to hold fadeToTrack for recursive calls
+    const fadeToTrackRef = useRef(null);
+
+    // Crossfade to a new track - MUST be defined before useEffects that reference it
     const fadeToTrack = useCallback((trackKey, fadeOutMs = 1000, fadeInMs = 1000) => {
         if (!trackKey) return;
 
@@ -286,10 +233,71 @@ export function MusicProvider({ children }) {
             if (pendingTrackRef.current) {
                 const { trackKey: pendingTrack, fadeOutMs: pendingFadeOut, fadeInMs: pendingFadeIn } = pendingTrackRef.current;
                 pendingTrackRef.current = null;
-                fadeToTrack(pendingTrack, pendingFadeOut, pendingFadeIn);
+                fadeToTrackRef.current(pendingTrack, pendingFadeOut, pendingFadeIn);
             }
         }, Math.max(fadeOutMs, fadeInMs));
     }, []); // Using refs instead of state to avoid stale closures
+
+    // Keep ref in sync for recursive calls
+    useEffect(() => {
+        fadeToTrackRef.current = fadeToTrack;
+    }, [fadeToTrack]);
+
+    // Auto-unlock audio on first user interaction anywhere in the app
+    useEffect(() => {
+        if (typeof window === 'undefined' || audioUnlocked) return;
+
+        const handleFirstInteraction = async () => {
+            if (audioUnlockedRef.current) return;
+
+            console.log('[Music] First user interaction detected, unlocking audio...');
+
+            // Resume AudioContext for iOS Safari
+            if (Howler.ctx && Howler.ctx.state === 'suspended') {
+                try {
+                    await Howler.ctx.resume();
+                    console.log('[Music] AudioContext resumed successfully');
+                } catch (err) {
+                    console.error('[Music] Failed to resume AudioContext:', err);
+                }
+            }
+
+            // Update ref immediately so fadeToTrack works in the same event cycle
+            audioUnlockedRef.current = true;
+            setAudioUnlocked(true);
+
+            // Process any pending track request immediately (don't wait for React re-render)
+            if (pendingUnlockTrackRef.current) {
+                const { trackKey, fadeOutMs, fadeInMs } = pendingUnlockTrackRef.current;
+                pendingUnlockTrackRef.current = null;
+                console.log('[Music] Playing pending track:', trackKey);
+                // Small delay to ensure AudioContext is fully ready
+                setTimeout(() => {
+                    fadeToTrack(trackKey, fadeOutMs, fadeInMs);
+                }, 100);
+            }
+
+            // Remove all listeners after first interaction
+            cleanup();
+        };
+
+        const events = ['click', 'touchend', 'keydown'];
+
+        events.forEach(event => {
+            document.addEventListener(event, handleFirstInteraction, {
+                capture: true,
+                passive: true
+            });
+        });
+
+        const cleanup = () => {
+            events.forEach(event => {
+                document.removeEventListener(event, handleFirstInteraction, { capture: true });
+            });
+        };
+
+        return cleanup;
+    }, [audioUnlocked, fadeToTrack]);
 
     // Play a track (with short fade)
     const playTrack = useCallback((trackKey) => {

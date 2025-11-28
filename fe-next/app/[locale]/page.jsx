@@ -507,7 +507,8 @@ export default function GamePage() {
   const getAuthContext = useCallback(async () => {
     if (!isSupabaseEnabled) return { authUserId: null, guestTokenHash: null };
 
-    if (isAuthenticated && user?.id) {
+    // Use user.id directly - don't require profile for stats recording
+    if (user?.id) {
       return { authUserId: user.id, guestTokenHash: null };
     }
 
@@ -518,7 +519,7 @@ export default function GamePage() {
     }
 
     return { authUserId: null, guestTokenHash: null };
-  }, [isSupabaseEnabled, isAuthenticated, user]);
+  }, [isSupabaseEnabled, user]);
 
   // Auto-join effect
   useEffect(() => {
@@ -641,17 +642,19 @@ export default function GamePage() {
     let guestTokenHash = null;
 
     if (isSupabaseEnabled) {
-      if (isAuthenticated && user?.id) {
-        // Authenticated user
+      // For stats recording, we only need the user.id from Supabase auth
+      // Don't require profile to exist - user may have logged in but not completed profile setup
+      if (user?.id) {
+        // Authenticated user (has Supabase auth, regardless of profile status)
         authUserId = user.id;
-        logger.log('[AUTH] Joining as authenticated user:', { authUserId, username });
+        logger.log('[AUTH] Joining as authenticated user:', { authUserId, username, hasProfile: !!profile });
       } else {
         // Guest user - get or create guest session
         const guestSessionId = getGuestSessionId();
         if (guestSessionId) {
           guestTokenHash = await hashToken(guestSessionId);
         }
-        logger.log('[AUTH] Joining as guest:', { isAuthenticated, hasUser: !!user, userId: user?.id, guestTokenHash: !!guestTokenHash });
+        logger.log('[AUTH] Joining as guest:', { hasUser: !!user, guestTokenHash: !!guestTokenHash });
       }
     }
 
@@ -682,7 +685,7 @@ export default function GamePage() {
         profilePictureUrl: profile?.profile_picture_url,
       });
     }
-  }, [socket, isConnected, gameCode, username, roomName, language, t, isSupabaseEnabled, isAuthenticated, user, profile, loading]);
+  }, [socket, isConnected, gameCode, username, roomName, language, t, isSupabaseEnabled, user, profile, loading]);
 
   const refreshRooms = useCallback(() => {
     if (socket && isConnected) {

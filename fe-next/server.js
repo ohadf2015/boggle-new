@@ -13,7 +13,6 @@ const dictionary = require("./backend/dictionary");
 const { initializeSocketHandlers } = require("./backend/socketHandlers");
 const { restoreTournamentsFromRedis } = require("./backend/modules/tournamentManager");
 const { cleanupStaleGames } = require("./backend/modules/gameStateManager");
-const { setEventLoopLag } = require("./backend/utils/metrics");
 
 const dev = process.env.NODE_ENV !== "production";
 const app = next({ dev });
@@ -130,6 +129,11 @@ app.prepare().then(() => {
       console.log(`[CLEANUP] Removed ${cleaned} stale games`);
     }
   }, 5 * 60 * 1000); // Every 5 minutes
+
+  // Health check endpoint (responds immediately, doesn't depend on Redis/DB)
+  server.get('/health', (_req, res) => {
+    res.status(200).json({ status: 'ok', timestamp: Date.now() });
+  });
 
   // Metrics endpoint
   const { getMetrics, getRoomMetrics, resetAll, setEventLoopLag } = require('./backend/utils/metrics');
@@ -331,8 +335,6 @@ app.prepare().then(() => {
   process.on('SIGTERM', shutdown);
   process.on('SIGINT', shutdown);
 
-  startServer();
-});
   // Event loop lag measurement
   (function monitorLoopLag() {
     let last = Date.now();
@@ -344,3 +346,6 @@ app.prepare().then(() => {
       setEventLoopLag(Math.max(0, drift));
     }, interval).unref();
   })();
+
+  startServer();
+});
