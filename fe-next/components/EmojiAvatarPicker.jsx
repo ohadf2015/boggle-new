@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FaCheck, FaTimes } from 'react-icons/fa';
-import { useTheme } from '../contexts/ThemeContext';
+import { useTheme } from '../utils/ThemeContext';
 
 // Same emojis and colors as backend socketHandlers.js
 const AVATAR_EMOJIS = [
@@ -35,7 +35,8 @@ const EmojiAvatarPicker = ({
   currentEmoji = '🐶',
   currentColor = '#4ECDC4'
 }) => {
-  const { isDarkMode } = useTheme();
+  const { theme } = useTheme();
+  const isDarkMode = theme === 'dark';
   const [selectedEmoji, setSelectedEmoji] = useState(currentEmoji);
   const [selectedColor, setSelectedColor] = useState(currentColor);
 
