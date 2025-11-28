@@ -252,16 +252,10 @@ app.prepare().then(() => {
 
       console.log(`[Request] ${req.method} ${req.url} | pathname: ${pathname}`);
 
-      // Redirect locale-prefixed auth callbacks to the correct path
-      const locales = ['he', 'en', 'sv', 'ja'];
-      const authCallbackMatch = pathname.match(/^\/([a-z]{2})\/auth\/callback$/);
-      if (authCallbackMatch && locales.includes(authCallbackMatch[1])) {
-        const queryString = parsedUrl.search || '';
-        console.log(`[Redirect] Auth callback redirect: ${pathname} -> /auth/callback${queryString}`);
-        res.writeHead(307, { Location: `/auth/callback${queryString}` });
-        res.end();
-        return;
-      }
+      // Note: Locale-prefixed auth callbacks (e.g., /he/auth/callback) are now handled
+      // by the client-side page at app/[locale]/auth/callback/page.jsx
+      // This is necessary because hash fragments (#access_token=...) are not sent to the server,
+      // so we need client-side JavaScript to process the OAuth implicit flow response.
 
       // Manual redirect for root path (since middleware might be skipped in custom server)
       if (pathname === '/') {
