@@ -408,21 +408,50 @@ function resetGameForNewRound(gameCode) {
 }
 
 /**
- * Add a word to a player's list
+ * Add a word to a player's list (both playerWords and playerWordDetails)
  * @param {string} gameCode - Game code
  * @param {string} username - Username
  * @param {string} word - Word to add
+ * @param {Object} options - Additional word details
+ * @param {boolean} options.autoValidated - Whether word was auto-validated
  */
-function addPlayerWord(gameCode, username, word) {
+function addPlayerWord(gameCode, username, word, options = {}) {
   const game = games[gameCode];
   if (!game) return;
 
+  const normalizedWord = word.toLowerCase();
+
+  // Initialize playerWords if needed
   if (!game.playerWords[username]) {
     game.playerWords[username] = [];
   }
 
-  if (!game.playerWords[username].includes(word.toLowerCase())) {
-    game.playerWords[username].push(word.toLowerCase());
+  // Initialize playerWordDetails if needed
+  if (!game.playerWordDetails) {
+    game.playerWordDetails = {};
+  }
+  if (!game.playerWordDetails[username]) {
+    game.playerWordDetails[username] = [];
+  }
+
+  // Only add if not already present
+  if (!game.playerWords[username].includes(normalizedWord)) {
+    game.playerWords[username].push(normalizedWord);
+
+    // Calculate time since game start
+    const currentTime = Date.now();
+    const timeSinceStart = game.startTime ? (currentTime - game.startTime) / 1000 : 0;
+
+    // Add to playerWordDetails for achievement tracking
+    game.playerWordDetails[username].push({
+      word: normalizedWord,
+      score: 0, // Will be calculated after validation
+      timestamp: currentTime,
+      timeSinceStart,
+      validated: options.autoValidated ? true : null,
+      autoValidated: options.autoValidated || false,
+      onBoard: true,
+    });
   }
 }
 

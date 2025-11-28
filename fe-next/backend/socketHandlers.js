@@ -570,11 +570,11 @@ function initializeSocketHandlers(io) {
         return;
       }
 
-      // Add word to player's list
-      addPlayerWord(gameCode, username, normalizedWord);
-
-      // Check dictionary
+      // Check dictionary first to determine if auto-validated
       const isInDictionary = isDictionaryWord(normalizedWord, game.language);
+
+      // Add word to player's list with validation status
+      addPlayerWord(gameCode, username, normalizedWord, { autoValidated: isInDictionary });
 
       if (isInDictionary) {
         // Calculate score with combo multiplier

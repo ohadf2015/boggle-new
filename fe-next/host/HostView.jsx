@@ -30,13 +30,17 @@ import { clearSession } from '../utils/session';
 import { copyJoinUrl, shareViaWhatsApp, getJoinUrl } from '../utils/share';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useMusic } from '../contexts/MusicContext';
+import { useSoundEffects } from '../contexts/SoundEffectsContext';
+import { useAchievementQueue, AchievementDock } from '../components/achievements';
 import { DIFFICULTIES, DEFAULT_DIFFICULTY, MIN_WORD_LENGTH_OPTIONS, DEFAULT_MIN_WORD_LENGTH } from '../utils/consts';
 import { cn } from '../lib/utils';
 
 const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [], username, onShowResults }) => {
-  const { t, language } = useLanguage();
+  const { t, language, dir } = useLanguage();
   const { socket } = useSocket();
   const { fadeToTrack, stopMusic, TRACKS } = useMusic();
+  const { playComboSound } = useSoundEffects();
+  const { queueAchievement } = useAchievementQueue();
   const intentionalExitRef = useRef(false);
   const [difficulty, setDifficulty] = useState(DEFAULT_DIFFICULTY);
   const [minWordLength, setMinWordLength] = useState(DEFAULT_MIN_WORD_LENGTH);
@@ -62,6 +66,7 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
   // Host playing states
   const [hostPlaying, setHostPlaying] = useState(true); // Default: host plays
   const [hostFoundWords, setHostFoundWords] = useState([]);
+  const [hostAchievements, setHostAchievements] = useState([]); // Host's own achievements
 
   // Tournament mode states
   const [gameType, setGameType] = useState('regular'); // 'regular' or 'tournament'
@@ -308,6 +313,17 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
       }
     };
 
+    // Handle host's own live achievements (when host is playing)
+    const handleLiveAchievementUnlocked = (data) => {
+      if (hostPlaying && data.achievements) {
+        // Queue achievements for Xbox-style popup display
+        data.achievements.forEach(achievement => {
+          queueAchievement(achievement);
+        });
+        setHostAchievements(prev => [...prev, ...data.achievements]);
+      }
+    };
+
     const handleShowValidation = (data) => {
       // If all words are auto-validated, skip validation screen entirely
       if (data.skipValidation) {
@@ -441,6 +457,7 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
       setShowStartAnimation(true);
       setPlayerWordCounts({});
       setHostFoundWords([]);
+      setHostAchievements([]); // Reset host achievements for new game
     };
 
     const handleWordAccepted = (data) => {
@@ -459,6 +476,8 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
           newComboLevel = currentComboLevel + 1;
           setComboLevel(newComboLevel);
           comboLevelRef.current = newComboLevel;
+          // Play combo sound with increasing pitch
+          playComboSound(newComboLevel);
         } else {
           newComboLevel = 0;
           setComboLevel(0);
@@ -580,6 +599,7 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
     socket.on('playerJoinedLate', handlePlayerJoinedLate);
     socket.on('playerFoundWord', handlePlayerFoundWord);
     socket.on('achievementUnlocked', handleAchievementUnlocked);
+    socket.on('liveAchievementUnlocked', handleLiveAchievementUnlocked);
     socket.on('showValidation', handleShowValidation);
     socket.on('validationComplete', handleValidationComplete);
     socket.on('autoValidationOccurred', handleAutoValidationOccurred);
@@ -600,6 +620,7 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
       socket.off('playerJoinedLate', handlePlayerJoinedLate);
       socket.off('playerFoundWord', handlePlayerFoundWord);
       socket.off('achievementUnlocked', handleAchievementUnlocked);
+      socket.off('liveAchievementUnlocked', handleLiveAchievementUnlocked);
       socket.off('showValidation', handleShowValidation);
       socket.off('validationComplete', handleValidationComplete);
       socket.off('autoValidationOccurred', handleAutoValidationOccurred);
@@ -615,7 +636,7 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
       socket.off('tournamentComplete', handleTournamentComplete);
       socket.off('tournamentCancelled', handleTournamentCancelled);
     };
-  }, [socket, gameStarted, t, hostPlaying, onShowResults, tableData]);
+  }, [socket, gameStarted, t, hostPlaying, onShowResults, tableData, queueAchievement, playComboSound]);
 
   const startGame = () => {
     if (playersReady.length === 0) return;
@@ -663,6 +684,7 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
     setShowStartAnimation(true);
     setPlayerWordCounts({}); // Reset counts
     setHostFoundWords([]); // Reset host words
+    setHostAchievements([]); // Reset host achievements
 
     // Send start game message with letter grid and timer
     socket.emit('startGame', {
@@ -1429,6 +1451,14 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
               />
             </div>
           </div>
+        )}
+
+        {/* Floating Achievement Dock (only when host is playing and game has started) */}
+        {hostPlaying && gameStarted && (
+          <AchievementDock
+            achievements={hostAchievements}
+            className={`fixed top-16 z-40 ${dir === 'rtl' ? 'left-4' : 'right-4'}`}
+          />
         )}
 
         {/* Game Started View - Same layout as PlayerView */}
