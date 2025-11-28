@@ -77,22 +77,24 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
   // Music: Play in_game music when game starts
   useEffect(() => {
     if (gameActive) {
-      fadeToTrack(TRACKS.IN_GAME, 500, 1000);
+      fadeToTrack(TRACKS.IN_GAME, 800, 800);
       hasTriggeredUrgentMusicRef.current = false; // Reset for new game
     }
-  }, [gameActive, fadeToTrack, TRACKS]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [gameActive]);
 
   // Music: Play urgent music when 20 seconds remaining
   useEffect(() => {
     if (gameActive && remainingTime !== null && remainingTime <= 20 && remainingTime > 0 && !hasTriggeredUrgentMusicRef.current) {
       hasTriggeredUrgentMusicRef.current = true;
-      fadeToTrack(TRACKS.ALMOST_OUT_OF_TIME, 2000, 1000);
+      fadeToTrack(TRACKS.ALMOST_OUT_OF_TIME, 500, 500);
     }
     // Stop music when game ends (remainingTime hits 0)
     if (remainingTime === 0) {
       stopMusic(1500);
     }
-  }, [remainingTime, gameActive, fadeToTrack, stopMusic, TRACKS]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [remainingTime, gameActive]);
 
   // Keep refs in sync with state for socket handlers (avoids stale closures)
   useEffect(() => {

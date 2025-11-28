@@ -158,7 +158,7 @@ export async function getRankedProgress(userId) {
     .from('ranked_progress')
     .select('*')
     .eq('player_id', userId)
-    .single();
+    .maybeSingle();
 }
 
 export async function isSupabaseConfigured() {
@@ -175,11 +175,11 @@ export async function uploadProfilePicture(userId, file) {
   // Remove any existing profile pictures for this user
   const extensions = ['jpg', 'jpeg', 'png', 'webp', 'gif'];
   const filesToRemove = extensions.map(ext => `${userId}/profile.${ext}`);
-  await supabase.storage.from('profile-pictures').remove(filesToRemove);
+  await supabase.storage.from('profile_pictures').remove(filesToRemove);
 
   // Upload new file
   const { error } = await supabase.storage
-    .from('profile-pictures')
+    .from('profile_pictures')
     .upload(fileName, file, {
       cacheControl: '3600',
       upsert: true
@@ -189,7 +189,7 @@ export async function uploadProfilePicture(userId, file) {
 
   // Get public URL
   const { data: { publicUrl } } = supabase.storage
-    .from('profile-pictures')
+    .from('profile_pictures')
     .getPublicUrl(fileName);
 
   // Add cache-busting timestamp
@@ -205,7 +205,7 @@ export async function removeProfilePicture(userId) {
   const filesToRemove = extensions.map(ext => `${userId}/profile.${ext}`);
 
   const { error } = await supabase.storage
-    .from('profile-pictures')
+    .from('profile_pictures')
     .remove(filesToRemove);
 
   return { error };

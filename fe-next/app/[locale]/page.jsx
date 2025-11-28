@@ -85,7 +85,7 @@ export default function GamePage() {
 
     if (showResults) {
       // Results screen - fade to before_game music (players often start another game)
-      fadeToTrack(TRACKS.BEFORE_GAME, 1500, 1000);
+      fadeToTrack(TRACKS.BEFORE_GAME, 1200, 1200);
     } else if (!isActive) {
       // Lobby - play lobby music
       playTrack(TRACKS.LOBBY);
@@ -94,7 +94,8 @@ export default function GamePage() {
       // (in_game music is triggered by HostView/PlayerView when game actually starts)
       playTrack(TRACKS.BEFORE_GAME);
     }
-  }, [isActive, showResults, audioUnlocked, playTrack, fadeToTrack, TRACKS]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isActive, showResults, audioUnlocked]);
 
   // Initialize state from URL and session
   useEffect(() => {

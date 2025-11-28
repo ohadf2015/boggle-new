@@ -55,6 +55,15 @@ export function MusicProvider({ children }) {
     const currentHowlRef = useRef(null);
     const fadeTimeoutRef = useRef(null);
     const currentTrackRef = useRef(null);
+    const isTransitioningRef = useRef(false);
+
+    // Refs for stable function references (avoid unnecessary re-renders)
+    const isMutedRef = useRef(isMuted);
+    const volumeRef = useRef(volume);
+
+    // Keep refs in sync with state
+    useEffect(() => { isMutedRef.current = isMuted; }, [isMuted]);
+    useEffect(() => { volumeRef.current = volume; }, [volume]);
 
     // Initialize Howl instances
     useEffect(() => {
@@ -117,7 +126,7 @@ export function MusicProvider({ children }) {
     }, [audioUnlocked]);
 
     // Crossfade to a new track
-    const fadeToTrack = useCallback((trackKey, fadeOutMs = 2000, fadeInMs = 1000) => {
+    const fadeToTrack = useCallback((trackKey, fadeOutMs = 1000, fadeInMs = 1000) => {
         if (!audioUnlocked || !trackKey) return;
 
         const newHowl = howlsRef.current[trackKey];
@@ -131,13 +140,19 @@ export function MusicProvider({ children }) {
             return;
         }
 
+        // Prevent rapid track switching - ignore requests during active transition
+        if (isTransitioningRef.current) {
+            return;
+        }
+        isTransitioningRef.current = true;
+
         // Clear any pending fade
         if (fadeTimeoutRef.current) {
             clearTimeout(fadeTimeoutRef.current);
         }
 
         const oldHowl = currentHowlRef.current;
-        const targetVolume = isMuted ? 0 : volume;
+        const targetVolume = isMutedRef.current ? 0 : volumeRef.current;
 
         // Fade out old track
         if (oldHowl && oldHowl !== newHowl && oldHowl.playing()) {
@@ -156,7 +171,12 @@ export function MusicProvider({ children }) {
         currentTrackRef.current = trackKey;
         setCurrentTrack(trackKey);
         setIsPlaying(true);
-    }, [audioUnlocked, isMuted, volume]);
+
+        // Clear transition lock after fade completes
+        setTimeout(() => {
+            isTransitioningRef.current = false;
+        }, Math.max(fadeOutMs, fadeInMs));
+    }, [audioUnlocked]);
 
     // Play a track (with short fade)
     const playTrack = useCallback((trackKey) => {
