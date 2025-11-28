@@ -71,7 +71,7 @@ export default function GamePage() {
   const wasConnectedRef = useRef(false);
 
   const { t, language } = useLanguage();
-  const { user, isAuthenticated, isSupabaseEnabled, profile } = useAuth();
+  const { user, isAuthenticated, isSupabaseEnabled, profile, loading, refreshProfile } = useAuth();
   const { playTrack, fadeToTrack, TRACKS, audioUnlocked } = useMusic();
 
   // Track if we should auto-join (prefilled room + existing username)
@@ -151,12 +151,31 @@ export default function GamePage() {
   }, []);
 
   // Set username and roomName from profile display_name for authenticated users
+  // Uses fallback chain from OAuth metadata if profile hasn't loaded yet
   useEffect(() => {
-    if (isAuthenticated && profile?.display_name) {
-      setUsername(profile.display_name);
-      setRoomName(profile.display_name);
+    if (!user) return;
+
+    // Fallback chain for display name
+    const displayName =
+      profile?.display_name ||                    // Best: profile display name
+      user?.user_metadata?.full_name ||           // Good: OAuth full name
+      user?.user_metadata?.name ||                // Okay: OAuth name
+      user?.email?.split('@')[0] ||               // Fallback: email prefix
+      '';
+
+    if (displayName) {
+      setUsername(displayName);
+      setRoomName(displayName);
     }
-  }, [isAuthenticated, profile?.display_name]);
+  }, [user, profile?.display_name]);
+
+  // Refresh profile on mount for authenticated users to get latest display_name
+  useEffect(() => {
+    if (isAuthenticated && user?.id && refreshProfile) {
+      refreshProfile();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Run once on mount
 
   useEffect(() => {
     attemptingReconnectRef.current = attemptingReconnect;
@@ -678,6 +697,7 @@ export default function GamePage() {
           roomsLoading={roomsLoading}
           isAuthenticated={isAuthenticated}
           displayName={profile?.display_name}
+          isProfileLoading={loading}
         />
       );
     }

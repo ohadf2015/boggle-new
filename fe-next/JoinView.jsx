@@ -22,7 +22,7 @@ import LogRocket from 'logrocket';
 import { validateUsername, validateRoomName, validateGameCode, sanitizeInput } from './utils/validation';
 import { useValidation } from './hooks/useValidation';
 
-const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, error, activeRooms, refreshRooms, prefilledRoom, roomName, setRoomName, isAutoJoining, roomsLoading, isAuthenticated, displayName }) => {
+const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, error, activeRooms, refreshRooms, prefilledRoom, roomName, setRoomName, isAutoJoining, roomsLoading, isAuthenticated, displayName, isProfileLoading }) => {
   const { t, language, dir } = useLanguage();
   const [mode, setMode] = useState('join'); // 'join' or 'host'
   const [showQR, setShowQR] = useState(false);
@@ -65,8 +65,15 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
 
     // Validate based on mode
     if (mode === 'host') {
+      // For authenticated users with displayName but empty roomName, use displayName
+      let effectiveRoomName = roomName;
+      if (isAuthenticated && displayName && (!roomName || !roomName.trim())) {
+        effectiveRoomName = displayName;
+        setRoomName(displayName);
+      }
+
       // Host needs room name
-      const rn = sanitizeInput(roomName, 30);
+      const rn = sanitizeInput(effectiveRoomName, 30);
       const { isValid: roomOk, error: roomErr } = validateRoomName(rn);
       const { isValid: codeOk, error: codeErr } = validateGameCode(gameCode);
       if (!roomOk || !codeOk) {
@@ -581,8 +588,8 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
                   </motion.div>
                 ) : (
                   <>
-                    {/* Host Player Name - only show for guests */}
-                    {!isAuthenticated && (
+                    {/* Host Player Name - show for guests OR authenticated users without displayName */}
+                    {(!isAuthenticated || !displayName) && !isProfileLoading && (
                       <motion.div
                         initial={{ x: 50, opacity: 0 }}
                         animate={{ x: 0, opacity: 1 }}
@@ -612,6 +619,15 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
                           <p className="text-sm text-slate-500 dark:text-gray-400">{t('joinView.playerAndRoomName')}</p>
                         )}
                       </motion.div>
+                    )}
+
+                    {/* Show loading indicator when profile is loading for authenticated users */}
+                    {isAuthenticated && !displayName && isProfileLoading && (
+                      <div className="p-3 rounded-lg bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800">
+                        <p className="text-sm text-amber-600 dark:text-amber-400">
+                          {t('joinView.loadingProfile') || 'Loading your profile...'}
+                        </p>
+                      </div>
                     )}
 
                     {/* Show "Hosting as" for authenticated users in host mode */}
@@ -715,7 +731,11 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
                 <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                   <Button
                     type="submit"
-                    disabled={mode === 'join' ? (!gameCode || (!isAuthenticated && !username)) : !gameCode}
+                    disabled={
+                      mode === 'join'
+                        ? (!gameCode || (!isAuthenticated && !username))
+                        : (!gameCode || (isAuthenticated && !displayName && isProfileLoading))
+                    }
                     className="w-full h-12 text-lg font-bold bg-gradient-to-r from-cyan-500 to-purple-600 hover:from-cyan-400 hover:to-purple-500 hover:shadow-[0_0_20px_rgba(6,182,212,0.5)]"
                   >
                     {mode === 'host' ? (
