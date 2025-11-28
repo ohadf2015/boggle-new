@@ -12,6 +12,7 @@ import { SocketContext } from '@/utils/SocketContext';
 import { saveSession, getSession, clearSession } from '@/utils/session';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
+import { useMusic } from '@/contexts/MusicContext';
 import { getGuestSessionId, hashToken } from '@/utils/guestManager';
 import logger from '@/utils/logger';
 
@@ -71,10 +72,26 @@ export default function GamePage() {
 
   const { t, language } = useLanguage();
   const { user, isAuthenticated, isSupabaseEnabled } = useAuth();
+  const { playTrack, fadeToTrack, TRACKS } = useMusic();
 
   // Track if we should auto-join (prefilled room + existing username)
   const [shouldAutoJoin, setShouldAutoJoin] = useState(false);
   const [prefilledRoomCode, setPrefilledRoomCode] = useState('');
+
+  // Music transitions based on game state
+  useEffect(() => {
+    if (showResults) {
+      // Results screen - fade to before_game music (players often start another game)
+      fadeToTrack(TRACKS.BEFORE_GAME, 1500, 1000);
+    } else if (!isActive) {
+      // Lobby - play lobby music
+      playTrack(TRACKS.LOBBY);
+    } else if (isActive) {
+      // In room waiting - play before game music
+      // (in_game music is triggered by HostView/PlayerView when game actually starts)
+      playTrack(TRACKS.BEFORE_GAME);
+    }
+  }, [isActive, showResults, playTrack, fadeToTrack, TRACKS]);
 
   // Initialize state from URL and session
   useEffect(() => {

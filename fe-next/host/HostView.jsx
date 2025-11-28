@@ -28,6 +28,7 @@ import { useSocket } from '../utils/SocketContext';
 import { clearSession } from '../utils/session';
 import { copyJoinUrl, shareViaWhatsApp, getJoinUrl } from '../utils/share';
 import { useLanguage } from '../contexts/LanguageContext';
+import { useMusic } from '../contexts/MusicContext';
 import { DIFFICULTIES, DEFAULT_DIFFICULTY, MIN_WORD_LENGTH_OPTIONS, DEFAULT_MIN_WORD_LENGTH } from '../utils/consts';
 import { sanitizeInput } from '../utils/validation';
 import { cn } from '../lib/utils';
@@ -35,6 +36,7 @@ import { cn } from '../lib/utils';
 const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [], username, onShowResults }) => {
   const { t, language } = useLanguage();
   const { socket } = useSocket();
+  const { fadeToTrack, stopMusic, TRACKS } = useMusic();
   const intentionalExitRef = useRef(false);
   const [difficulty, setDifficulty] = useState(DEFAULT_DIFFICULTY);
   const [minWordLength, setMinWordLength] = useState(DEFAULT_MIN_WORD_LENGTH);
@@ -84,6 +86,29 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
 
   // Idle detection for validation - using ref to avoid dependency issues
   const submitValidationRef = useRef(null);
+
+  // Track if urgent music has been triggered (to prevent re-triggering)
+  const hasTriggeredUrgentMusicRef = useRef(false);
+
+  // Music: Play in_game music when game starts
+  useEffect(() => {
+    if (gameStarted) {
+      fadeToTrack(TRACKS.IN_GAME, 500, 1000);
+      hasTriggeredUrgentMusicRef.current = false; // Reset for new game
+    }
+  }, [gameStarted, fadeToTrack, TRACKS]);
+
+  // Music: Play urgent music when 20 seconds remaining
+  useEffect(() => {
+    if (gameStarted && remainingTime !== null && remainingTime <= 20 && remainingTime > 0 && !hasTriggeredUrgentMusicRef.current) {
+      hasTriggeredUrgentMusicRef.current = true;
+      fadeToTrack(TRACKS.ALMOST_OUT_OF_TIME, 2000, 1000);
+    }
+    // Stop music when game ends (remainingTime hits 0)
+    if (remainingTime === 0) {
+      stopMusic(1500);
+    }
+  }, [remainingTime, gameStarted, fadeToTrack, stopMusic, TRACKS]);
 
   // Update players list when initialPlayers prop changes
   useEffect(() => {

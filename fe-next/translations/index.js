@@ -36,6 +36,12 @@ export const translations = {
       gameStarted: 'Game Started!',
       newGameReady: 'New game starting!',
     },
+    music: {
+      volume: 'Volume',
+      mute: 'Mute',
+      unmute: 'Unmute',
+      clickToEnable: 'Click anywhere to enable music',
+    },
     share: {
       linkCopied: 'Link copied! 📋',
       copyError: 'Error copying link',
@@ -475,6 +481,12 @@ export const translations = {
       duplicateWarning: 'מילים שנמצאו על ידי מספר שחקנים לא נספרות',
       gameStarted: 'המשחק התחיל!',
       newGameReady: 'מתחיל משחק חדש!',
+    },
+    music: {
+      volume: 'עוצמה',
+      mute: 'השתק',
+      unmute: 'בטל השתקה',
+      clickToEnable: 'לחצו כדי להפעיל מוזיקה',
     },
     share: {
       linkCopied: 'הקישור הועתק ללוח! 📋',
@@ -916,6 +928,12 @@ export const translations = {
       gameStarted: 'Spelet startat!',
       newGameReady: 'Startar nytt spel!',
     },
+    music: {
+      volume: 'Volym',
+      mute: 'Tyst',
+      unmute: 'Ljud på',
+      clickToEnable: 'Klicka för att aktivera musik',
+    },
     share: {
       linkCopied: 'Länk kopierad! 📋',
       copyError: 'Fel vid kopiering av länk',
@@ -1353,6 +1371,12 @@ export const translations = {
       duplicateWarning: '複数のプレイヤーが見つけた単語はカウントされません',
       gameStarted: 'ゲーム開始！',
       newGameReady: '新しいゲームを開始します！',
+    },
+    music: {
+      volume: '音量',
+      mute: 'ミュート',
+      unmute: 'ミュート解除',
+      clickToEnable: 'クリックして音楽を有効にする',
     },
     share: {
       linkCopied: 'リンクをコピーしました！📋',

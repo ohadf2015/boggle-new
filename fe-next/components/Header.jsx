@@ -6,6 +6,7 @@ import { FaSun, FaMoon, FaGlobe, FaChevronDown, FaTrophy } from 'react-icons/fa'
 import { Button } from './ui/button';
 import { cn } from '../lib/utils';
 import AuthButton from './auth/AuthButton';
+import MusicControls from './MusicControls';
 import { useRouter } from 'next/navigation';
 
 const Header = ({ className = '', showLeaderboardLink = true }) => {
@@ -114,6 +115,9 @@ const Header = ({ className = '', showLeaderboardLink = true }) => {
 
                     {/* Auth Button */}
                     <AuthButton />
+
+                    {/* Music Controls */}
+                    <MusicControls />
 
                     {/* Language Selector */}
                     <div className="relative">

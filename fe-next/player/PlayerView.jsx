@@ -12,6 +12,7 @@ import { FaTrophy, FaDoorOpen, FaUsers, FaCrown, FaRandom, FaLink, FaWhatsapp, F
 import { useSocket } from '../utils/SocketContext';
 import { clearSession } from '../utils/session';
 import { useLanguage } from '../contexts/LanguageContext';
+import { useMusic } from '../contexts/MusicContext';
 import gsap from 'gsap';
 import GridComponent from '../components/GridComponent';
 import SlotMachineGrid from '../components/SlotMachineGrid';
@@ -31,6 +32,7 @@ import { sanitizeInput } from '../utils/validation';
 const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) => {
   const { t, dir } = useLanguage();
   const { socket } = useSocket();
+  const { fadeToTrack, stopMusic, TRACKS } = useMusic();
   const inputRef = useRef(null);
   const wordListRef = useRef(null);
   const intentionalExitRef = useRef(false);
@@ -68,6 +70,29 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
   const [tournamentData, setTournamentData] = useState(null);
   const [tournamentStandings, setTournamentStandings] = useState([]);
   const [showTournamentStandings, setShowTournamentStandings] = useState(false);
+
+  // Track if urgent music has been triggered (to prevent re-triggering)
+  const hasTriggeredUrgentMusicRef = useRef(false);
+
+  // Music: Play in_game music when game starts
+  useEffect(() => {
+    if (gameActive) {
+      fadeToTrack(TRACKS.IN_GAME, 500, 1000);
+      hasTriggeredUrgentMusicRef.current = false; // Reset for new game
+    }
+  }, [gameActive, fadeToTrack, TRACKS]);
+
+  // Music: Play urgent music when 20 seconds remaining
+  useEffect(() => {
+    if (gameActive && remainingTime !== null && remainingTime <= 20 && remainingTime > 0 && !hasTriggeredUrgentMusicRef.current) {
+      hasTriggeredUrgentMusicRef.current = true;
+      fadeToTrack(TRACKS.ALMOST_OUT_OF_TIME, 2000, 1000);
+    }
+    // Stop music when game ends (remainingTime hits 0)
+    if (remainingTime === 0) {
+      stopMusic(1500);
+    }
+  }, [remainingTime, gameActive, fadeToTrack, stopMusic, TRACKS]);
 
   // Keep refs in sync with state for socket handlers (avoids stale closures)
   useEffect(() => {

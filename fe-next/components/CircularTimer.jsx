@@ -18,8 +18,8 @@ const CircularTimer = ({ remainingTime, totalTime = 180 }) => {
     return `${mins}:${paddedSecs}`;
   };
 
-  // Determine color based on remaining time
-  const isLowTime = remainingTime < 30;
+  // Determine color based on remaining time (20 seconds to match music transition)
+  const isLowTime = remainingTime <= 20;
   const gradientId = isLowTime ? 'timer-gradient-red' : 'timer-gradient-blue';
 
   return (
