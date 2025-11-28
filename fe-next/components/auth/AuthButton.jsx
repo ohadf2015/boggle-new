@@ -22,14 +22,18 @@ const languages = [
 
 const AuthButton = () => {
   const { theme, toggleTheme } = useTheme();
-  const { t, language, setLanguage } = useLanguage();
+  const { t, language, setLanguage, dir } = useLanguage();
   const { isAuthenticated, profile, isSupabaseEnabled, loading } = useAuth();
   const router = useRouter();
   const isDarkMode = theme === 'dark';
+  const isRTL = dir === 'rtl';
 
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [isSigningOut, setIsSigningOut] = useState(false);
+  const [isLanguageExpanded, setIsLanguageExpanded] = useState(false);
+
+  const currentLang = languages.find(l => l.code === language) || languages[0];
 
   // Don't render if Supabase is not configured
   if (!isSupabaseEnabled) return null;
@@ -59,7 +63,7 @@ const AuthButton = () => {
           variant="outline"
           size="sm"
           onClick={() => setShowUserMenu(!showUserMenu)}
-          onBlur={() => setTimeout(() => setShowUserMenu(false), 200)}
+          onBlur={() => setTimeout(() => { setShowUserMenu(false); setIsLanguageExpanded(false); }, 200)}
           className={cn(
             'flex items-center gap-2 rounded-full transition-all duration-300',
             isDarkMode
@@ -88,7 +92,8 @@ const AuthButton = () => {
               exit={{ opacity: 0, y: -10, scale: 0.95 }}
               transition={{ duration: 0.2 }}
               className={cn(
-                'absolute top-full right-0 mt-2 min-w-[180px] rounded-lg shadow-xl z-50',
+                'absolute top-full mt-2 min-w-[180px] rounded-lg shadow-xl z-50',
+                isRTL ? 'left-0' : 'right-0',
                 isDarkMode
                   ? 'bg-slate-800 border border-slate-700'
                   : 'bg-white border border-gray-200'
@@ -136,29 +141,71 @@ const AuthButton = () => {
                 isDarkMode ? 'bg-slate-700' : 'bg-gray-200'
               )} />
 
-              {/* Language Options */}
-              {languages.map((lang) => (
+              {/* Language Section - Collapsible */}
+              <div>
                 <Button
-                  key={lang.code}
                   variant="ghost"
-                  onClick={() => {
-                    setLanguage(lang.code);
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setIsLanguageExpanded(!isLanguageExpanded);
                   }}
                   className={cn(
-                    'w-full justify-start gap-3',
-                    language === lang.code
-                      ? isDarkMode
-                        ? 'bg-cyan-500/20 text-cyan-300'
-                        : 'bg-cyan-50 text-cyan-700'
-                      : isDarkMode
-                        ? 'text-gray-300 hover:bg-slate-700 hover:text-gray-300'
-                        : 'text-gray-700 hover:bg-gray-50 hover:text-gray-700'
+                    'w-full justify-between gap-3',
+                    isDarkMode
+                      ? 'text-gray-300 hover:bg-slate-700 hover:text-gray-300'
+                      : 'text-gray-700 hover:bg-gray-50 hover:text-gray-700'
                   )}
                 >
-                  <span className="text-lg">{lang.flag}</span>
-                  <span>{lang.name}</span>
+                  <div className="flex items-center gap-3">
+                    <span className="text-lg">{currentLang.flag}</span>
+                    <span>{currentLang.name}</span>
+                  </div>
+                  <FaChevronDown
+                    size={10}
+                    className={cn('transition-transform duration-200', isLanguageExpanded && 'rotate-180')}
+                  />
                 </Button>
-              ))}
+
+                <AnimatePresence>
+                  {isLanguageExpanded && (
+                    <motion.div
+                      initial={{ height: 0, opacity: 0 }}
+                      animate={{ height: 'auto', opacity: 1 }}
+                      exit={{ height: 0, opacity: 0 }}
+                      transition={{ duration: 0.2 }}
+                      className="overflow-hidden"
+                    >
+                      {languages
+                        .filter(lang => lang.code !== language)
+                        .map((lang) => (
+                          <Button
+                            key={lang.code}
+                            variant="ghost"
+                            onClick={() => {
+                              setLanguage(lang.code);
+                              setIsLanguageExpanded(false);
+                            }}
+                            className={cn(
+                              'w-full justify-start gap-3 ps-8',
+                              isDarkMode
+                                ? 'text-gray-300 hover:bg-slate-700 hover:text-gray-300'
+                                : 'text-gray-700 hover:bg-gray-50 hover:text-gray-700'
+                            )}
+                          >
+                            <span className="text-lg">{lang.flag}</span>
+                            <span>{lang.name}</span>
+                          </Button>
+                        ))}
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+
+              {/* Divider between Language and Theme */}
+              <div className={cn(
+                'my-1 h-px',
+                isDarkMode ? 'bg-slate-700' : 'bg-gray-200'
+              )} />
 
               {/* Theme Toggle */}
               <Button
@@ -215,7 +262,7 @@ const AuthButton = () => {
           variant="outline"
           size="sm"
           onClick={() => setShowUserMenu(!showUserMenu)}
-          onBlur={() => setTimeout(() => setShowUserMenu(false), 200)}
+          onBlur={() => setTimeout(() => { setShowUserMenu(false); setIsLanguageExpanded(false); }, 200)}
           className={cn(
             'flex items-center gap-2 rounded-full transition-all duration-300',
             isDarkMode
@@ -236,36 +283,78 @@ const AuthButton = () => {
               exit={{ opacity: 0, y: -10, scale: 0.95 }}
               transition={{ duration: 0.2 }}
               className={cn(
-                'absolute top-full right-0 mt-2 min-w-[180px] rounded-lg shadow-xl z-50',
+                'absolute top-full mt-2 min-w-[180px] rounded-lg shadow-xl z-50',
+                isRTL ? 'left-0' : 'right-0',
                 isDarkMode
                   ? 'bg-slate-800 border border-slate-700'
                   : 'bg-white border border-gray-200'
               )}
             >
-              {/* Language Options */}
-              {languages.map((lang, index) => (
+              {/* Language Section - Collapsible */}
+              <div>
                 <Button
-                  key={lang.code}
                   variant="ghost"
-                  onClick={() => {
-                    setLanguage(lang.code);
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setIsLanguageExpanded(!isLanguageExpanded);
                   }}
                   className={cn(
-                    'w-full justify-start gap-3',
-                    index === 0 ? 'rounded-t-lg' : '',
-                    language === lang.code
-                      ? isDarkMode
-                        ? 'bg-cyan-500/20 text-cyan-300'
-                        : 'bg-cyan-50 text-cyan-700'
-                      : isDarkMode
-                        ? 'text-gray-300 hover:bg-slate-700 hover:text-gray-300'
-                        : 'text-gray-700 hover:bg-gray-50 hover:text-gray-700'
+                    'w-full justify-between gap-3 rounded-t-lg',
+                    isDarkMode
+                      ? 'text-gray-300 hover:bg-slate-700 hover:text-gray-300'
+                      : 'text-gray-700 hover:bg-gray-50 hover:text-gray-700'
                   )}
                 >
-                  <span className="text-lg">{lang.flag}</span>
-                  <span>{lang.name}</span>
+                  <div className="flex items-center gap-3">
+                    <span className="text-lg">{currentLang.flag}</span>
+                    <span>{currentLang.name}</span>
+                  </div>
+                  <FaChevronDown
+                    size={10}
+                    className={cn('transition-transform duration-200', isLanguageExpanded && 'rotate-180')}
+                  />
                 </Button>
-              ))}
+
+                <AnimatePresence>
+                  {isLanguageExpanded && (
+                    <motion.div
+                      initial={{ height: 0, opacity: 0 }}
+                      animate={{ height: 'auto', opacity: 1 }}
+                      exit={{ height: 0, opacity: 0 }}
+                      transition={{ duration: 0.2 }}
+                      className="overflow-hidden"
+                    >
+                      {languages
+                        .filter(lang => lang.code !== language)
+                        .map((lang) => (
+                          <Button
+                            key={lang.code}
+                            variant="ghost"
+                            onClick={() => {
+                              setLanguage(lang.code);
+                              setIsLanguageExpanded(false);
+                            }}
+                            className={cn(
+                              'w-full justify-start gap-3 ps-8',
+                              isDarkMode
+                                ? 'text-gray-300 hover:bg-slate-700 hover:text-gray-300'
+                                : 'text-gray-700 hover:bg-gray-50 hover:text-gray-700'
+                            )}
+                          >
+                            <span className="text-lg">{lang.flag}</span>
+                            <span>{lang.name}</span>
+                          </Button>
+                        ))}
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+
+              {/* Divider between Language and Theme */}
+              <div className={cn(
+                'my-1 h-px',
+                isDarkMode ? 'bg-slate-700' : 'bg-gray-200'
+              )} />
 
               {/* Theme Toggle */}
               <Button

@@ -16,6 +16,7 @@ import GridComponent from '../components/GridComponent';
 import SlotMachineGrid from '../components/SlotMachineGrid';
 import ShareButton from '../components/ShareButton';
 import SlotMachineText from '../components/SlotMachineText';
+import Avatar from '../components/Avatar';
 import ResultsPlayerCard from '../components/results/ResultsPlayerCard';
 import RoomChat from '../components/RoomChat';
 import GoRipplesAnimation from '../components/GoRipplesAnimation';
@@ -1429,7 +1430,12 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
                         style={avatar?.color ? { background: `linear-gradient(to right, ${avatar.color}, ${avatar.color}dd)` } : {}}
                       >
                         <div className="flex items-center gap-2">
-                          {avatar?.emoji && <span className="text-lg">{avatar.emoji}</span>}
+                          <Avatar
+                            profilePictureUrl={avatar?.profilePictureUrl}
+                            avatarEmoji={avatar?.emoji}
+                            avatarColor={avatar?.color}
+                            size="sm"
+                          />
                           {isHost && <FaCrown className="text-yellow-300" />}
                           <SlotMachineText text={username} />
                         </div>
@@ -1516,7 +1522,12 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
                           style={avatar?.color ? { background: `linear-gradient(to right, ${avatar.color}, ${avatar.color}dd)` } : {}}
                         >
                           <div className="flex items-center gap-2">
-                            {avatar?.emoji && <span className="text-lg">{avatar.emoji}</span>}
+                            <Avatar
+                              profilePictureUrl={avatar?.profilePictureUrl}
+                              avatarEmoji={avatar?.emoji}
+                              avatarColor={avatar?.color}
+                              size="sm"
+                            />
                             {isHost && <FaCrown className="text-yellow-300" />}
                             <SlotMachineText text={username} />
                           </div>
