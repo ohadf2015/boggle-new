@@ -81,7 +81,21 @@ export function MusicProvider({ children }) {
                 loop: true,
                 volume: 0,
                 preload: true,
-                html5: true, // Better for mobile and large files
+                // Using Web Audio API (html5: false) for better autoplay support
+                // html5 mode has stricter autoplay restrictions on some browsers
+                html5: false,
+                onloaderror: (id, err) => {
+                    console.error(`[Music] Failed to load ${key}:`, err);
+                },
+                onplayerror: (id, err) => {
+                    console.error(`[Music] Failed to play ${key}:`, err);
+                    // Try to unlock and retry
+                    if (Howler.ctx && Howler.ctx.state === 'suspended') {
+                        Howler.ctx.resume().then(() => {
+                            howlsRef.current[key]?.play();
+                        });
+                    }
+                },
             });
         });
 
@@ -128,17 +142,35 @@ export function MusicProvider({ children }) {
     useEffect(() => {
         if (typeof window === 'undefined' || audioUnlocked) return;
 
-        const handleFirstInteraction = () => {
+        const handleFirstInteraction = async () => {
             if (audioUnlockedRef.current) return;
+
+            console.log('[Music] First user interaction detected, unlocking audio...');
 
             // Resume AudioContext for iOS Safari
             if (Howler.ctx && Howler.ctx.state === 'suspended') {
-                Howler.ctx.resume();
+                try {
+                    await Howler.ctx.resume();
+                    console.log('[Music] AudioContext resumed successfully');
+                } catch (err) {
+                    console.error('[Music] Failed to resume AudioContext:', err);
+                }
             }
 
             // Update ref immediately so fadeToTrack works in the same event cycle
             audioUnlockedRef.current = true;
             setAudioUnlocked(true);
+
+            // Process any pending track request immediately (don't wait for React re-render)
+            if (pendingUnlockTrackRef.current) {
+                const { trackKey, fadeOutMs, fadeInMs } = pendingUnlockTrackRef.current;
+                pendingUnlockTrackRef.current = null;
+                console.log('[Music] Playing pending track:', trackKey);
+                // Small delay to ensure AudioContext is fully ready
+                setTimeout(() => {
+                    fadeToTrack(trackKey, fadeOutMs, fadeInMs);
+                }, 100);
+            }
 
             // Remove all listeners after first interaction
             cleanup();
@@ -160,7 +192,7 @@ export function MusicProvider({ children }) {
         };
 
         return cleanup;
-    }, [audioUnlocked]);
+    }, [audioUnlocked, fadeToTrack]);
 
     // Explicitly unlock audio - called when user clicks the speaker button (fallback)
     const unlockAudio = useCallback(() => {
@@ -186,20 +218,24 @@ export function MusicProvider({ children }) {
     const fadeToTrack = useCallback((trackKey, fadeOutMs = 1000, fadeInMs = 1000) => {
         if (!trackKey) return;
 
+        console.log('[Music] fadeToTrack called:', trackKey, 'audioUnlocked:', audioUnlockedRef.current);
+
         // If audio not yet unlocked, queue the track request for when it gets unlocked
         if (!audioUnlockedRef.current) {
+            console.log('[Music] Audio not unlocked, queueing track:', trackKey);
             pendingUnlockTrackRef.current = { trackKey, fadeOutMs, fadeInMs };
             return;
         }
 
         const newHowl = howlsRef.current[trackKey];
         if (!newHowl) {
-            console.warn(`Track not found: ${trackKey}`);
+            console.warn(`[Music] Track not found: ${trackKey}`);
             return;
         }
 
         // If same track, just ensure it's playing (use ref to avoid dependency)
         if (currentTrackRef.current === trackKey && currentHowlRef.current?.playing()) {
+            console.log('[Music] Track already playing:', trackKey);
             return;
         }
 
@@ -233,6 +269,7 @@ export function MusicProvider({ children }) {
 
         // Start and fade in new track
         newHowl.volume(0);
+        console.log('[Music] Starting playback:', trackKey, 'target volume:', targetVolume);
         newHowl.play();
         newHowl.fade(0, targetVolume, fadeInMs);
 

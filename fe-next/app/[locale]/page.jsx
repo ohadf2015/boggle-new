@@ -73,17 +73,16 @@ export default function GamePage() {
 
   const { t, language } = useLanguage();
   const { user, isAuthenticated, isSupabaseEnabled, profile, loading, refreshProfile } = useAuth();
-  const { playTrack, fadeToTrack, TRACKS, audioUnlocked } = useMusic();
+  const { playTrack, fadeToTrack, TRACKS } = useMusic();
 
   // Track if we should auto-join (prefilled room + existing username)
   const [shouldAutoJoin, setShouldAutoJoin] = useState(false);
   const [prefilledRoomCode, setPrefilledRoomCode] = useState('');
 
   // Music transitions based on game state
+  // Note: We always call playTrack/fadeToTrack even if audio isn't unlocked yet
+  // The MusicContext will queue the request and play when user interacts
   useEffect(() => {
-    // Don't attempt to play music until audio is unlocked by user interaction
-    if (!audioUnlocked) return;
-
     if (showResults) {
       // Results screen - fade to before_game music (players often start another game)
       fadeToTrack(TRACKS.BEFORE_GAME, 1200, 1200);
@@ -96,7 +95,7 @@ export default function GamePage() {
       playTrack(TRACKS.BEFORE_GAME);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isActive, showResults, audioUnlocked]);
+  }, [isActive, showResults]);
 
   // Initialize state from URL and session
   useEffect(() => {
