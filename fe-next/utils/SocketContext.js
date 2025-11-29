@@ -2,6 +2,7 @@
 
 import { createContext, useContext, useEffect, useState, useCallback, useRef } from 'react';
 import { io } from 'socket.io-client';
+import logger from '@/utils/logger';
 
 // Socket.IO Context
 export const SocketContext = createContext(null);
@@ -45,13 +46,13 @@ export function SocketProvider({ children }) {
 
     // Connection event handlers
     socketInstance.on('connect', () => {
-      console.log('[SOCKET.IO] Connected:', socketInstance.id);
+      logger.log('[SOCKET.IO] Connected:', socketInstance.id);
       setIsConnected(true);
       setConnectionError(null);
     });
 
     socketInstance.on('disconnect', (reason) => {
-      console.log('[SOCKET.IO] Disconnected:', reason);
+      logger.log('[SOCKET.IO] Disconnected:', reason);
       setIsConnected(false);
 
       if (reason === 'io server disconnect') {
@@ -61,35 +62,47 @@ export function SocketProvider({ children }) {
     });
 
     socketInstance.on('connect_error', (error) => {
-      console.error('[SOCKET.IO] Connection error:', error.message);
+      logger.error('[SOCKET.IO] Connection error:', error.message);
       setConnectionError(error.message);
       setIsConnected(false);
     });
 
     socketInstance.on('reconnect', (attemptNumber) => {
-      console.log('[SOCKET.IO] Reconnected after', attemptNumber, 'attempts');
+      logger.log('[SOCKET.IO] Reconnected after', attemptNumber, 'attempts');
       setIsConnected(true);
       setConnectionError(null);
     });
 
     socketInstance.on('reconnect_attempt', (attemptNumber) => {
-      console.log('[SOCKET.IO] Reconnection attempt:', attemptNumber);
+      logger.log('[SOCKET.IO] Reconnection attempt:', attemptNumber);
     });
 
     socketInstance.on('reconnect_error', (error) => {
-      console.error('[SOCKET.IO] Reconnection error:', error.message);
+      logger.error('[SOCKET.IO] Reconnection error:', error.message);
     });
 
     socketInstance.on('reconnect_failed', () => {
-      console.error('[SOCKET.IO] Reconnection failed after all attempts');
+      logger.error('[SOCKET.IO] Reconnection failed after all attempts');
       setConnectionError('Failed to reconnect to server');
     });
 
-    setSocket(socketInstance);
+    // Catch any unhandled error events
+    socketInstance.on('error', (error) => {
+      logger.error('[SOCKET.IO] Socket error event:', error);
+      // Log additional context if error is empty
+      if (!error || (typeof error === 'object' && Object.keys(error).length === 0)) {
+        logger.error('[SOCKET.IO] Received empty error - checking socket state');
+        logger.error('[SOCKET.IO] Connected:', socketInstance.connected);
+        logger.error('[SOCKET.IO] ID:', socketInstance.id);
+      }
+    });
+
+    // Schedule setSocket asynchronously to avoid synchronous setState in effect
+    Promise.resolve().then(() => setSocket(socketInstance));
 
     // Cleanup on unmount
     return () => {
-      console.log('[SOCKET.IO] Cleaning up socket connection');
+      logger.log('[SOCKET.IO] Cleaning up socket connection');
       socketInstance.removeAllListeners();
       socketInstance.disconnect();
     };
@@ -153,7 +166,7 @@ export function useSocketEmit() {
       socket.emit(event, data);
       return true;
     }
-    console.warn('[SOCKET.IO] Cannot emit - socket not connected');
+    logger.warn('[SOCKET.IO] Cannot emit - socket not connected');
     return false;
   }, [socket, isConnected]);
 

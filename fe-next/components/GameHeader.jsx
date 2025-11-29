@@ -26,115 +26,73 @@ const GameHeader = ({
 
 
 
-  // Theme-based styles
-  const containerStyles = isDarkMode
-    ? "bg-slate-800/90 border-cyan-500/30 shadow-[0_0_20px_rgba(6,182,212,0.15)]"
-    : "bg-white/90 border-cyan-400/40 shadow-[0_4px_20px_rgba(6,182,212,0.1)]";
-
-  const textStyles = isDarkMode
-    ? "text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-teal-300 to-purple-400"
-    : "text-transparent bg-clip-text bg-gradient-to-r from-cyan-600 via-teal-500 to-purple-600";
-
-  const glowStyles = isDarkMode
-    ? "drop-shadow-[0_0_10px_rgba(6,182,212,0.5)]"
-    : "drop-shadow-[0_0_8px_rgba(6,182,212,0.3)]";
-
+  // NEO-BRUTALIST: No theme switching needed - dark only
   return (
     <motion.header
-      initial={{ y: -20, opacity: 0 }}
-      animate={{ y: 0, opacity: 1 }}
-      transition={{ duration: 0.5, ease: "easeOut" }}
+      initial={{ y: -20, opacity: 0, rotate: -2 }}
+      animate={{ y: 0, opacity: 1, rotate: -1 }}
+      transition={{ duration: 0.4, ease: [0.68, -0.55, 0.265, 1.55] }}
       className={`w-full max-w-6xl mx-auto mb-3 sm:mb-4 ${className}`}
     >
+      {/* NEO-BRUTALIST Header Container */}
       <div
-        className={`
+        className="
           flex items-center justify-between
-          px-3 sm:px-6 py-2 sm:py-3
-          rounded-xl sm:rounded-2xl
-          border backdrop-blur-md
-          transition-all duration-300
-          ${containerStyles}
-        `}
+          px-4 sm:px-6 py-3 sm:py-4
+          bg-neo-cyan
+          border-4 border-neo-black
+          shadow-hard-lg
+          rounded-neo-lg
+          transition-all duration-100
+        "
       >
-        {/* Left side - Title */}
+        {/* Left side - NEO-BRUTALIST Title */}
         <motion.div
           className="flex items-center gap-2 sm:gap-3 cursor-pointer"
           onClick={onLogoClick}
-          whileHover={{ scale: 1.02 }}
-          whileTap={{ scale: 0.98 }}
+          whileHover={{ x: -2, y: -2 }}
+          whileTap={{ x: 2, y: 2 }}
         >
-          {/* Title */}
-          <motion.h1
-            className="text-xl sm:text-3xl font-bold tracking-wider flex items-center gap-1"
-            style={{ fontFamily: t('direction') === 'rtl' ? "'Fredoka', sans-serif" : "'Outfit', 'Rubik', sans-serif" }}
-            whileHover={{ scale: 1.05 }}
-            transition={{ type: "spring", stiffness: 400, damping: 10 }}
+          {/* NEO-BRUTALIST Title with text-stroke */}
+          <h1
+            className="text-2xl sm:text-4xl font-black uppercase tracking-tight flex items-center gap-1"
+            style={{ fontFamily: "'Fredoka', 'Rubik', sans-serif" }}
           >
-            <span className={cn(
-              "bg-clip-text text-transparent bg-gradient-to-r",
-              isDarkMode
-                ? "from-cyan-400 to-blue-500 drop-shadow-[0_0_10px_rgba(34,211,238,0.5)]"
-                : "from-cyan-600 to-blue-600"
-            )}>
+            {/* LEXI - with text shadow */}
+            <span
+              className="text-neo-black"
+              style={{
+                textShadow: '3px 3px 0px var(--neo-pink)',
+              }}
+            >
               {t('logo.lexi')}
             </span>
+            {/* Lightning bolt */}
             <motion.span
               animate={{
-                rotate: [0, -10, 10, -10, 10, 0],
-                scale: [1, 1.2, 1]
+                rotate: [0, -15, 15, -15, 15, 0],
+                scale: [1, 1.3, 1]
               }}
-              transition={{ duration: 0.5, delay: 1, repeat: 3, repeatDelay: 5 }}
-              className="text-lg sm:text-2xl filter drop-shadow-[0_0_8px_rgba(250,204,21,0.6)]"
+              transition={{ duration: 0.4, delay: 1, repeat: 3, repeatDelay: 5 }}
+              className="text-xl sm:text-3xl"
             >
               ⚡
             </motion.span>
+            {/* CLASH - italic skewed */}
             <span
-              className={cn(
-                "italic bg-clip-text text-transparent bg-gradient-to-r",
-                isDarkMode
-                  ? "from-purple-400 to-pink-500 drop-shadow-[0_0_10px_rgba(168,85,247,0.5)]"
-                  : "from-purple-600 to-pink-600"
-              )}
-              style={{ transform: 'skewX(-10deg)' }}
+              className="text-neo-pink italic"
+              style={{
+                transform: 'skewX(-8deg)',
+                textShadow: '3px 3px 0px var(--neo-black)',
+              }}
             >
               {t('logo.clash')}
             </span>
-          </motion.h1>
+          </h1>
         </motion.div>
 
-        {/* Right side - Optional actions container */}
+        {/* Right side - Actions */}
         <div className="flex items-center gap-2">
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={toggleTheme}
-            className={cn(
-              "rounded-full transition-all duration-300",
-              isDarkMode
-                ? "bg-slate-700 text-yellow-400 hover:bg-slate-600 hover:shadow-[0_0_10px_rgba(250,204,21,0.5)] hover:text-yellow-400"
-                : "bg-indigo-100 text-indigo-600 hover:bg-indigo-200 hover:shadow-[0_0_10px_rgba(79,70,229,0.3)] hover:text-indigo-600"
-            )}
-            aria-label="Toggle theme"
-          >
-            {isDarkMode ? (
-              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <circle cx="12" cy="12" r="5"></circle>
-                <line x1="12" y1="1" x2="12" y2="3"></line>
-                <line x1="12" y1="21" x2="12" y2="23"></line>
-                <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
-                <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
-                <line x1="1" y1="12" x2="3" y2="12"></line>
-                <line x1="21" y1="12" x2="23" y2="12"></line>
-                <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
-                <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
-              </svg>
-            ) : (
-              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
-              </svg>
-            )}
-          </Button>
-
           {rightContent}
         </div>
       </div>

@@ -4,18 +4,39 @@ import { cva } from "class-variance-authority";
 
 import { cn } from "../../lib/utils";
 
+// Neo-Brutalist Toggle: Thick borders, hard shadow, physical press effect
 const toggleVariants = cva(
-  "inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors hover:bg-muted hover:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=on]:bg-accent data-[state=on]:text-accent-foreground",
+  [
+    // Base layout
+    "inline-flex items-center justify-center",
+    // Typography
+    "text-sm font-bold uppercase tracking-wide",
+    // Neo-Brutalist styling
+    "bg-neo-cream text-neo-black",
+    "border-3 border-neo-black",
+    "rounded-neo",
+    "shadow-hard-sm",
+    // Focus state
+    "ring-offset-background",
+    "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan focus-visible:ring-offset-2",
+    // Disabled state
+    "disabled:pointer-events-none disabled:opacity-50",
+    // Transition
+    "transition-all duration-100",
+    // Active (selected) state - yellow with shadow
+    "data-[state=on]:bg-neo-yellow data-[state=on]:shadow-hard",
+    // Hover effect (non-selected)
+    "hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-hard",
+  ].join(" "),
   {
     variants: {
       variant: {
-        default: "bg-transparent",
-        outline:
-          "border border-input bg-transparent hover:bg-accent hover:text-accent-foreground",
+        default: "",
+        outline: "bg-transparent border-2 text-neo-cream",
       },
       size: {
-        default: "h-10 px-3",
-        sm: "h-9 px-2.5",
+        default: "h-10 px-4",
+        sm: "h-9 px-3",
         lg: "h-11 px-5",
       },
     },

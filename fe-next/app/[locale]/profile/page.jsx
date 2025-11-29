@@ -16,6 +16,7 @@ import EmojiAvatarPicker from '@/components/EmojiAvatarPicker';
 import { uploadProfilePicture, removeProfilePicture } from '@/lib/supabase';
 import { cn } from '@/lib/utils';
 import toast from 'react-hot-toast';
+import logger from '@/utils/logger';
 
 export const dynamic = 'force-dynamic';
 

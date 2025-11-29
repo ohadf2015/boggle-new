@@ -65,6 +65,7 @@ export default function GamePage() {
   const [socket, setSocket] = useState(null);
   const [isConnected, setIsConnected] = useState(false);
   const [roomsLoading, setRoomsLoading] = useState(true); // Track rooms loading state
+  const [pendingGameStart, setPendingGameStart] = useState(null); // Store game start data for players returning from results
 
   const socketRef = useRef(null);
   const attemptingReconnectRef = useRef(attemptingReconnect);
@@ -369,6 +370,14 @@ export default function GamePage() {
 
     newSocket.on('error', (data) => {
       logger.error('[SOCKET.IO] Error:', data);
+      // Log additional debug info to help diagnose empty errors
+      if (!data || Object.keys(data).length === 0) {
+        logger.error('[SOCKET.IO] Received empty error object - this may be a Socket.IO internal error');
+        logger.error('[SOCKET.IO] Socket state:', {
+          connected: newSocket.connected,
+          id: newSocket.id
+        });
+      }
 
       // Handle specific error cases
       if (data.message?.includes('not found') || data.message?.includes('Game not found')) {
@@ -401,10 +410,12 @@ export default function GamePage() {
     });
 
     // Auto-join next game if player is viewing results
+    // Store game start data so PlayerView can use it when re-mounted
     // Note: The actual "Game Started" toast is shown by PlayerView/HostView components
-    // This handler only manages state transitions
-    newSocket.on('startGame', () => {
-      logger.log('[SOCKET.IO] New game starting - auto-joining from results');
+    newSocket.on('startGame', (data) => {
+      logger.log('[SOCKET.IO] New game starting - auto-joining from results', data);
+      // Store the game start data for PlayerView to consume when it mounts
+      setPendingGameStart(data);
       setShowResults(false);
       setResultsData(null);
       // Toast notification is handled by PlayerView/HostView to avoid duplicates
@@ -465,6 +476,7 @@ export default function GamePage() {
         newSocket.disconnect();
       }
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- gameCode, username, roomName, roomLanguage are used in handlers but shouldn't trigger socket recreation
   }, [t, language]);
 
   // Host keep-alive
@@ -615,7 +627,7 @@ export default function GamePage() {
     return () => clearTimeout(reconnectTimeout);
   }, [attemptingReconnect, isActive, socket, isConnected, language, getAuthContext, profile]);
 
-  const handleJoin = useCallback(async (isHostMode, roomLang) => {
+  const handleJoin = useCallback(async (isHostMode, roomLang, overrideGameCode) => {
     if (!socket || !isConnected) {
       setError(t('errors.notConnected') || 'Not connected to server');
       toast.error(t('common.notConnected') || 'Not connected to server', {
@@ -636,6 +648,9 @@ export default function GamePage() {
     }
 
     setError('');
+
+    // Use overrideGameCode if provided, otherwise use state gameCode
+    const codeToUse = overrideGameCode || gameCode;
 
     // Build auth context for game result tracking
     let authUserId = null;
@@ -660,7 +675,7 @@ export default function GamePage() {
 
     if (isHostMode) {
       socket.emit('createGame', {
-        gameCode,
+        gameCode: codeToUse,
         roomName,
         hostUsername: roomName,
         language: roomLang || language,
@@ -674,7 +689,7 @@ export default function GamePage() {
       });
     } else {
       socket.emit('join', {
-        gameCode,
+        gameCode: codeToUse,
         username,
         authUserId,
         guestTokenHash,
@@ -697,6 +712,7 @@ export default function GamePage() {
   const handleReturnToRoom = useCallback(() => {
     setShowResults(false);
     setResultsData(null);
+    setPendingGameStart(null);
   }, []);
 
   const handleShowResults = useCallback((data) => {
@@ -760,6 +776,8 @@ export default function GamePage() {
         setUsername={setUsername}
         onShowResults={handleShowResults}
         initialPlayers={playersInRoom}
+        pendingGameStart={pendingGameStart}
+        onGameStartConsumed={() => setPendingGameStart(null)}
       />
     );
   };

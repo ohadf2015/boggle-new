@@ -2,6 +2,7 @@
 
 import React, { createContext, useContext, useEffect, useState, useRef, useCallback } from 'react';
 import { Howl, Howler } from 'howler';
+import logger from '@/utils/logger';
 
 const MusicContext = createContext(null);
 
@@ -25,7 +26,7 @@ export function MusicProvider({ children }) {
                     return volume ?? 0.5;
                 }
             } catch (e) {
-                console.warn('Failed to load music settings:', e);
+                logger.warn('Failed to load music settings:', e);
             }
         }
         return 0.5;
@@ -40,7 +41,7 @@ export function MusicProvider({ children }) {
                     return isMuted ?? false;
                 }
             } catch (e) {
-                console.warn('Failed to load music settings:', e);
+                logger.warn('Failed to load music settings:', e);
             }
         }
         return false;
@@ -78,17 +79,17 @@ export function MusicProvider({ children }) {
         Object.entries(TRACKS).forEach(([key, src]) => {
             howlsRef.current[key] = new Howl({
                 src: [src],
-                loop: true,
+                loop: false, // Changed to false - we'll handle looping manually for crossfade
                 volume: 0,
                 preload: true,
                 // Using Web Audio API (html5: false) for better autoplay support
                 // html5 mode has stricter autoplay restrictions on some browsers
                 html5: false,
                 onloaderror: (id, err) => {
-                    console.error(`[Music] Failed to load ${key}:`, err);
+                    logger.error(`[Music] Failed to load ${key}:`, err);
                 },
                 onplayerror: (id, err) => {
-                    console.error(`[Music] Failed to play ${key}:`, err);
+                    logger.error(`[Music] Failed to play ${key}:`, err);
                     // Try to unlock and retry
                     if (Howler.ctx && Howler.ctx.state === 'suspended') {
                         Howler.ctx.resume().then(() => {
@@ -96,16 +97,39 @@ export function MusicProvider({ children }) {
                         });
                     }
                 },
+                onend: () => {
+                    // When track ends, crossfade to itself starting from 10 seconds
+                    if (currentTrackRef.current === key && howlsRef.current[key]) {
+                        logger.log('[Music] Track ended, restarting from 10s with crossfade:', key);
+                        const howl = howlsRef.current[key];
+                        const targetVolume = isMutedRef.current ? 0 : volumeRef.current;
+
+                        // Crossfade: start fading out current instance
+                        howl.fade(howl.volume(), 0, 2000);
+
+                        // Start new instance from 10 seconds and fade in (overlapping with fade out)
+                        setTimeout(() => {
+                            howl.seek(10);
+                            howl.volume(0);
+                            howl.play();
+                            howl.fade(0, targetVolume, 2000);
+                        }, 0); // Start immediately for true crossfade
+                    }
+                },
             });
         });
 
+        // Copy ref values for cleanup to avoid stale ref warnings
+        const howls = howlsRef.current;
+        const fadeTimeout = fadeTimeoutRef.current;
+
         return () => {
             // Cleanup on unmount
-            Object.values(howlsRef.current).forEach(howl => {
+            Object.values(howls).forEach(howl => {
                 howl.unload();
             });
-            if (fadeTimeoutRef.current) {
-                clearTimeout(fadeTimeoutRef.current);
+            if (fadeTimeout) {
+                clearTimeout(fadeTimeout);
             }
             // Note: transitionTimeoutRef cleanup is in the useCallback scope
         };
@@ -133,7 +157,7 @@ export function MusicProvider({ children }) {
             try {
                 localStorage.setItem(STORAGE_KEY, JSON.stringify({ volume, isMuted }));
             } catch (e) {
-                console.warn('Failed to save music settings:', e);
+                logger.warn('Failed to save music settings:', e);
             }
         }
     }, [volume, isMuted]);
@@ -165,24 +189,24 @@ export function MusicProvider({ children }) {
     const fadeToTrack = useCallback((trackKey, fadeOutMs = 1000, fadeInMs = 1000) => {
         if (!trackKey) return;
 
-        console.log('[Music] fadeToTrack called:', trackKey, 'audioUnlocked:', audioUnlockedRef.current);
+        logger.log('[Music] fadeToTrack called:', trackKey, 'audioUnlocked:', audioUnlockedRef.current);
 
         // If audio not yet unlocked, queue the track request for when it gets unlocked
         if (!audioUnlockedRef.current) {
-            console.log('[Music] Audio not unlocked, queueing track:', trackKey);
+            logger.log('[Music] Audio not unlocked, queueing track:', trackKey);
             pendingUnlockTrackRef.current = { trackKey, fadeOutMs, fadeInMs };
             return;
         }
 
         const newHowl = howlsRef.current[trackKey];
         if (!newHowl) {
-            console.warn(`[Music] Track not found: ${trackKey}`);
+            logger.warn(`[Music] Track not found: ${trackKey}`);
             return;
         }
 
         // If same track, just ensure it's playing (use ref to avoid dependency)
         if (currentTrackRef.current === trackKey && currentHowlRef.current?.playing()) {
-            console.log('[Music] Track already playing:', trackKey);
+            logger.log('[Music] Track already playing:', trackKey);
             return;
         }
 
@@ -216,7 +240,7 @@ export function MusicProvider({ children }) {
 
         // Start and fade in new track
         newHowl.volume(0);
-        console.log('[Music] Starting playback:', trackKey, 'target volume:', targetVolume);
+        logger.log('[Music] Starting playback:', trackKey, 'target volume:', targetVolume);
         newHowl.play();
         newHowl.fade(0, targetVolume, fadeInMs);
 
@@ -250,15 +274,15 @@ export function MusicProvider({ children }) {
         const handleFirstInteraction = async () => {
             if (audioUnlockedRef.current) return;
 
-            console.log('[Music] First user interaction detected, unlocking audio...');
+            logger.log('[Music] First user interaction detected, unlocking audio...');
 
             // Resume AudioContext for iOS Safari
             if (Howler.ctx && Howler.ctx.state === 'suspended') {
                 try {
                     await Howler.ctx.resume();
-                    console.log('[Music] AudioContext resumed successfully');
+                    logger.log('[Music] AudioContext resumed successfully');
                 } catch (err) {
-                    console.error('[Music] Failed to resume AudioContext:', err);
+                    logger.error('[Music] Failed to resume AudioContext:', err);
                 }
             }
 
@@ -270,7 +294,7 @@ export function MusicProvider({ children }) {
             if (pendingUnlockTrackRef.current) {
                 const { trackKey, fadeOutMs, fadeInMs } = pendingUnlockTrackRef.current;
                 pendingUnlockTrackRef.current = null;
-                console.log('[Music] Playing pending track:', trackKey);
+                logger.log('[Music] Playing pending track:', trackKey);
                 // Small delay to ensure AudioContext is fully ready
                 setTimeout(() => {
                     fadeToTrack(trackKey, fadeOutMs, fadeInMs);

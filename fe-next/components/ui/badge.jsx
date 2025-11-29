@@ -3,18 +3,36 @@ import { cva } from "class-variance-authority";
 
 import { cn } from "../../lib/utils";
 
+// Neo-Brutalist Badge: Thick borders, hard shadows, bold colors
 const badgeVariants = cva(
-  "inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2",
+  // Base styles
+  [
+    "inline-flex items-center justify-center",
+    "rounded-neo-pill border-2 border-neo-black",
+    "px-3 py-1 text-xs font-black uppercase tracking-wide",
+    "shadow-hard-sm",
+    "transition-all duration-100",
+    "focus:outline-none focus:ring-2 focus:ring-neo-cyan focus:ring-offset-2",
+  ].join(" "),
   {
     variants: {
       variant: {
-        default:
-          "border-transparent bg-primary text-primary-foreground hover:bg-primary/80",
-        secondary:
-          "border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80",
-        destructive:
-          "border-transparent bg-destructive text-destructive-foreground hover:bg-destructive/80",
-        outline: "text-foreground",
+        // Primary: Yellow
+        default: "bg-neo-yellow text-neo-black",
+        // Secondary: Orange
+        secondary: "bg-neo-orange text-neo-black",
+        // Destructive: Red
+        destructive: "bg-neo-red text-neo-white",
+        // Outline: Cream/transparent
+        outline: "bg-neo-cream text-neo-black",
+        // Success: Lime green
+        success: "bg-neo-lime text-neo-black",
+        // Accent: Pink
+        accent: "bg-neo-pink text-neo-white",
+        // Cyan: For special highlights
+        cyan: "bg-neo-cyan text-neo-black",
+        // Purple: For rare/special
+        purple: "bg-neo-purple text-neo-white",
       },
     },
     defaultVariants: {

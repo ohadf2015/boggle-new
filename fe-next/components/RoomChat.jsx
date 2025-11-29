@@ -1,5 +1,8 @@
+/* eslint-disable react-hooks/incompatible-library */
+'use no memo'; // Disable React Compiler memoization due to TanStack Virtual incompatibility
+
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
+import { CardContent } from './ui/card';
 import { Input } from './ui/input';
 import { Button } from './ui/button';
 import { Badge } from './ui/badge';
@@ -9,6 +12,7 @@ import { useSocket } from '../utils/SocketContext';
 import { useLanguage } from '../contexts/LanguageContext';
 import { FaPaperPlane, FaComments, FaBell } from 'react-icons/fa';
 import toast from 'react-hot-toast';
+import logger from '@/utils/logger';
 
 const MAX_CHAT_HEIGHT = 300; // Max height in pixels
 const ESTIMATED_MESSAGE_HEIGHT = 60; // Estimated height per message
@@ -53,14 +57,14 @@ const RoomChat = ({ username, isHost, gameCode, className = '' }) => {
 
       // Play notification sound
       if (notificationSoundRef.current) {
-        notificationSoundRef.current.play().catch(err => console.log('Sound play failed:', err));
+        notificationSoundRef.current.play().catch(err => logger.log('Sound play failed:', err));
       }
 
       // Show toast notification with click to scroll
       const newMessageIndex = messages.length; // Index of the new message (will be added after this)
       toast(
         <div
-          className="flex items-center gap-2 cursor-pointer"
+          className="flex items-center gap-3 cursor-pointer"
           onClick={() => {
             // Scroll to the message using virtualizer
             virtualizer.scrollToIndex(newMessageIndex, { align: 'center', behavior: 'smooth' });
@@ -68,9 +72,9 @@ const RoomChat = ({ username, isHost, gameCode, className = '' }) => {
             setTimeout(() => {
               const messageElement = document.getElementById(messageId);
               if (messageElement) {
-                messageElement.classList.add('ring-2', 'ring-blue-400', 'ring-offset-2');
+                messageElement.classList.add('ring-3', 'ring-neo-cyan', 'ring-offset-2');
                 setTimeout(() => {
-                  messageElement.classList.remove('ring-2', 'ring-blue-400', 'ring-offset-2');
+                  messageElement.classList.remove('ring-3', 'ring-neo-cyan', 'ring-offset-2');
                 }, 2000);
               }
             }, 300);
@@ -79,17 +83,21 @@ const RoomChat = ({ username, isHost, gameCode, className = '' }) => {
             toast.dismiss();
           }}
         >
-          <FaBell className="text-blue-500 flex-shrink-0" />
+          <FaBell className="text-neo-pink flex-shrink-0 text-lg" />
           <div className="min-w-0">
-            <div className="font-semibold text-slate-900">{data.username}</div>
-            <div className="text-sm font-medium text-slate-800 truncate">{data.message.substring(0, 50)}{data.message.length > 50 ? '...' : ''}</div>
+            <div className="font-black text-neo-black uppercase text-sm">{data.username}</div>
+            <div className="text-sm font-bold text-neo-black/80 truncate">{data.message.substring(0, 50)}{data.message.length > 50 ? '...' : ''}</div>
           </div>
         </div>,
         {
           duration: 4000,
           position: 'top-right',
-          icon: '💬',
           style: {
+            background: '#FFFEF0',
+            border: '3px solid #000000',
+            boxShadow: '4px 4px 0px #000000',
+            borderRadius: '8px',
+            padding: '12px 16px',
             cursor: 'pointer',
           },
         }
@@ -158,7 +166,8 @@ const RoomChat = ({ username, isHost, gameCode, className = '' }) => {
   };
 
   return (
-    <Card className={`bg-white/90 dark:bg-slate-800/90 backdrop-blur-md shadow-xl border border-blue-500/30 shadow-[0_0_15px_rgba(59,130,246,0.1)] flex flex-col ${className}`}>
+    // NEO-BRUTALIST: Speech bubble container with tail and tilt
+    <div className={`speech-bubble rotate-[1deg] flex flex-col mb-4 ${className}`}>
       {/* Hidden notification sound */}
       <audio
         ref={notificationSoundRef}
@@ -166,9 +175,10 @@ const RoomChat = ({ username, isHost, gameCode, className = '' }) => {
         preload="auto"
       />
 
-      <CardHeader className="py-2 px-4">
-        <CardTitle className="text-blue-600 dark:text-blue-300 text-base flex items-center gap-2">
-          <FaComments />
+      {/* NEO-BRUTALIST Header */}
+      <div className="py-3 px-4 border-b-3 border-neo-black flex-shrink-0">
+        <h3 className="text-neo-black text-base font-black uppercase flex items-center gap-2">
+          <FaComments className="text-neo-pink" />
           {t('chat.title') || 'Room Chat'}
           {unreadCount > 0 && (
             <motion.div
@@ -176,14 +186,14 @@ const RoomChat = ({ username, isHost, gameCode, className = '' }) => {
               animate={{ scale: 1 }}
               className="relative"
             >
-              <Badge className="bg-red-500 text-white px-2 py-0.5 text-xs font-bold animate-pulse">
+              <Badge variant="destructive" className="animate-pulse">
                 {unreadCount}
               </Badge>
             </motion.div>
           )}
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="flex-1 flex flex-col p-2 space-y-2 min-h-0">
+        </h3>
+      </div>
+      <CardContent className="flex-1 flex flex-col p-3 gap-3 min-h-0 overflow-hidden">
         {/* Messages Area with Virtual Scrolling */}
         <div
           ref={parentRef}
@@ -191,8 +201,38 @@ const RoomChat = ({ username, isHost, gameCode, className = '' }) => {
           style={{ maxHeight: MAX_CHAT_HEIGHT }}
         >
           {messages.length === 0 ? (
-            <div className="text-center text-slate-400 dark:text-slate-500 py-8 text-sm">
-              {t('chat.noMessages') || 'No messages yet. Start chatting!'}
+            <div className="flex flex-col items-center justify-center py-8 gap-4">
+              {/* NEO-BRUTALIST empty state */}
+              <motion.div
+                initial={{ scale: 0.8, rotate: -5 }}
+                animate={{ scale: 1, rotate: 0 }}
+                transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                className="relative"
+              >
+                {/* Decorative background shapes */}
+                <div className="absolute -top-2 -right-2 w-16 h-16 bg-neo-pink border-3 border-neo-black rotate-12 -z-10" />
+                <div className="absolute -bottom-2 -left-2 w-12 h-12 bg-neo-cyan border-3 border-neo-black -rotate-6 -z-10" />
+
+                {/* Main icon container */}
+                <div className="bg-neo-yellow border-3 border-neo-black shadow-hard p-4 rotate-[-2deg]">
+                  <FaComments className="text-4xl text-neo-black" />
+                </div>
+              </motion.div>
+
+              {/* Text with Neo-Brutalist styling */}
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2 }}
+                className="text-center"
+              >
+                <div className="bg-neo-black text-neo-white px-4 py-2 font-black uppercase text-sm tracking-wider rotate-[1deg] shadow-hard-sm border-2 border-neo-black">
+                  {t('chat.noMessages') || 'No messages yet'}
+                </div>
+                <p className="text-neo-black/60 font-bold text-xs mt-3 uppercase tracking-wide">
+                  {t('chat.startChatting') || 'Start chatting!'}
+                </p>
+              </motion.div>
             </div>
           ) : (
             <div
@@ -228,24 +268,20 @@ const RoomChat = ({ username, isHost, gameCode, className = '' }) => {
                     >
                       <div className="flex items-center gap-2">
                         <Badge
-                          variant={msg.isHost ? 'default' : 'secondary'}
-                          className={`text-xs ${
-                            msg.isHost
-                              ? 'bg-gradient-to-r from-purple-500 to-pink-500'
-                              : 'bg-slate-200 dark:bg-slate-700 text-slate-900 dark:text-white'
-                          }`}
+                          variant={msg.isHost ? 'accent' : 'outline'}
                         >
                           {msg.username}
                         </Badge>
-                        <span className="text-xs text-slate-400 dark:text-slate-500">
+                        <span className="text-xs text-neo-black/50 font-medium">
                           {formatTime(msg.timestamp)}
                         </span>
                       </div>
+                      {/* NEO-BRUTALIST message bubble */}
                       <div
-                        className={`px-3 py-2 rounded-lg max-w-[80%] break-words ${
+                        className={`px-3 py-2 max-w-[80%] break-words border-2 border-neo-black rounded-neo font-medium ${
                           isOwnMessage
-                            ? 'bg-gradient-to-r from-blue-500 to-cyan-500 text-white'
-                            : 'bg-slate-100 dark:bg-slate-700 text-slate-900 dark:text-white'
+                            ? 'bg-neo-cyan text-neo-black shadow-hard-sm'
+                            : 'bg-neo-white text-neo-black shadow-hard-sm'
                         }`}
                       >
                         {msg.message}
@@ -258,8 +294,8 @@ const RoomChat = ({ username, isHost, gameCode, className = '' }) => {
           )}
         </div>
 
-        {/* Input Area */}
-        <div className="flex gap-2">
+        {/* NEO-BRUTALIST Input Area */}
+        <div className="flex gap-2 flex-shrink-0">
           <Input
             ref={inputRef}
             value={inputMessage}
@@ -267,20 +303,21 @@ const RoomChat = ({ username, isHost, gameCode, className = '' }) => {
             onKeyDown={handleKeyDown}
             onFocus={handleInputFocus}
             placeholder={t('chat.placeholder') || 'Type a message...'}
-            className="flex-1 text-sm bg-slate-100 dark:bg-slate-700/50 border-slate-200 dark:border-slate-600"
+            className="flex-1 min-w-0 text-sm"
             dir="auto"
           />
           <Button
             onClick={sendMessage}
             disabled={!inputMessage.trim()}
-            size="sm"
-            className="bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-400 hover:to-cyan-400 text-white shadow-lg"
+            size="icon"
+            variant="cyan"
+            className="flex-shrink-0"
           >
             <FaPaperPlane />
           </Button>
         </div>
       </CardContent>
-    </Card>
+    </div>
   );
 };
 

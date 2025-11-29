@@ -85,7 +85,8 @@ function cleanProfanity(text) {
   }).join('');
 }
 const { calculateWordScore, calculateGameScores } = require('./modules/scoringEngine');
-const { checkAndAwardAchievements, getPlayerAchievements, ACHIEVEMENTS, getLocalizedAchievements } = require('./modules/achievementManager');
+const { checkAndAwardAchievements, getPlayerAchievements, ACHIEVEMENTS, getLocalizedAchievements, awardFinalAchievements } = require('./modules/achievementManager');
+const { calculatePlayerTitles } = require('./modules/playerTitlesManager');
 const { isDictionaryWord, getAvailableDictionaries, addApprovedWord, normalizeWord } = require('./dictionary');
 const { incrementWordApproval } = require('./redisClient');
 const gameStartCoordinator = require('./utils/gameStartCoordinator');
@@ -132,6 +133,19 @@ const generateRandomAvatar = () => {
 function initializeSocketHandlers(io) {
   io.on('connection', (socket) => {
     console.log(`[SOCKET] Client connected: ${socket.id}`);
+
+    // Wrap socket.emit to track error events for debugging
+    const originalEmit = socket.emit.bind(socket);
+    socket.emit = function(event, ...args) {
+      if (event === 'error') {
+        console.log('[SOCKET] Emitting error event:', { socketId: socket.id, data: args[0] });
+        if (!args[0] || (typeof args[0] === 'object' && Object.keys(args[0]).length === 0)) {
+          console.warn('[SOCKET] WARNING: Emitting empty error object!');
+          console.trace('[SOCKET] Stack trace for empty error:');
+        }
+      }
+      return originalEmit(event, ...args);
+    };
 
     // Rate limiting
     if (!checkRateLimit(socket.id)) {
@@ -373,6 +387,18 @@ function initializeSocketHandlers(io) {
         // Send current leaderboard
         const leaderboard = getLeaderboard(gameCode);
         socket.emit('updateLeaderboard', { leaderboard });
+
+        // Send current achievements to late-joiner (including reconnecting players)
+        const playerAchievementKeys = game.playerAchievements?.[username] || [];
+        if (playerAchievementKeys.length > 0) {
+          const localizedAchievements = getLocalizedAchievements(game.language || 'he');
+          const achievements = playerAchievementKeys
+            .map(key => localizedAchievements[key])
+            .filter(Boolean);
+
+          console.log(`[SOCKET] Syncing ${achievements.length} achievements to late-joiner ${username}`);
+          socket.emit('liveAchievementUnlocked', { achievements });
+        }
       }
 
       // Add to tournament if one is active (mid-tournament join)
@@ -451,6 +477,7 @@ function initializeSocketHandlers(io) {
         letterGrid,
         timerSeconds: validTimer,
         remainingTime: validTimer,  // Initialize remaining time for late joiners
+        gameDuration: validTimer,   // Store original game duration for achievement calculations
         language: language || game.language,
         minWordLength: minWordLength || 2,  // Minimum word length setting
         gameState: 'in-progress',
@@ -465,9 +492,44 @@ function initializeSocketHandlers(io) {
       }
       ensureGame(gameCode);
 
-      // Reset player data
+      // Reset player data and ensure achievements are initialized
       const users = getGameUsers(gameCode);
       const playerUsernames = users.map(u => u.username);
+
+      // Initialize achievements and word details for all players
+      // CRITICAL: playerWordDetails MUST be initialized BEFORE playerAchievements
+      // because achievement checks reference playerWordDetails
+      const gameForInit = getGame(gameCode);
+      if (gameForInit) {
+        // Ensure parent objects exist first
+        if (!gameForInit.playerWordDetails) {
+          gameForInit.playerWordDetails = {};
+        }
+        if (!gameForInit.playerAchievements) {
+          gameForInit.playerAchievements = {};
+        }
+        if (!gameForInit.playerScores) {
+          gameForInit.playerScores = {};
+        }
+        if (!gameForInit.playerWords) {
+          gameForInit.playerWords = {};
+        }
+
+        playerUsernames.forEach(username => {
+          // Reset all player data for new game (clear previous round data)
+          // Initialize playerWordDetails FIRST (achievements depend on it)
+          gameForInit.playerWordDetails[username] = [];
+          gameForInit.playerWords[username] = [];
+          gameForInit.playerScores[username] = 0;
+          // Initialize achievements LAST (they may check other data)
+          gameForInit.playerAchievements[username] = [];
+        });
+        // Reset game-level achievement tracking
+        gameForInit.firstWordFound = false;
+        gameForInit.startTime = Date.now();
+
+        console.log(`[SOCKET] Initialized player data for ${playerUsernames.length} players in game ${gameCode}`);
+      }
 
       // Initialize game start coordination
       const messageId = gameStartCoordinator.initializeSequence(gameCode, playerUsernames, timerSeconds);
@@ -573,14 +635,29 @@ function initializeSocketHandlers(io) {
       // Check dictionary first to determine if auto-validated
       const isInDictionary = isDictionaryWord(normalizedWord, game.language);
 
-      // Add word to player's list with validation status
-      addPlayerWord(gameCode, username, normalizedWord, { autoValidated: isInDictionary });
-
       if (isInDictionary) {
         // Calculate score with combo multiplier
         // Clamp combo level to reasonable bounds (0-10) to prevent abuse
         const safeComboLevel = Math.max(0, Math.min(10, parseInt(comboLevel) || 0));
+        const baseScore = normalizedWord.length - 1; // Score without combo
         const wordScore = calculateWordScore(normalizedWord, safeComboLevel);
+        const comboBonus = wordScore - baseScore;
+
+        // Diagnostic logging for combo calculation
+        console.log(`[COMBO] ${username} submitted "${normalizedWord}": baseScore=${baseScore}, comboLevel=${safeComboLevel}, comboBonus=${comboBonus}, totalScore=${wordScore}`);
+
+        // Store combo level server-side for STREAK_MASTER achievement tracking
+        if (!game.playerCombos) game.playerCombos = {};
+        game.playerCombos[username] = safeComboLevel;
+
+        // Add word to player's list with score and combo data
+        addPlayerWord(gameCode, username, normalizedWord, {
+          autoValidated: true,
+          score: wordScore,
+          comboBonus: comboBonus,
+          comboLevel: safeComboLevel
+        });
+
         updatePlayerScore(gameCode, username, wordScore, true);
 
         inc('wordAccepted');
@@ -588,22 +665,80 @@ function initializeSocketHandlers(io) {
         socket.emit('wordAccepted', {
           word: normalizedWord,
           score: wordScore,
+          baseScore: baseScore,
+          comboBonus: comboBonus,
           comboLevel: safeComboLevel,
           autoValidated: true
         });
 
         // Check for achievements
+        console.log(`[ACHIEVEMENT] Checking live achievements for ${username} after word "${normalizedWord}"`);
         const achievements = checkAndAwardAchievements(gameCode, username, normalizedWord);
         if (achievements.length > 0) {
+          console.log(`[ACHIEVEMENT] Emitting ${achievements.length} achievements to ${username}:`, achievements.map(a => a.name || a).join(', '));
           socket.emit('liveAchievementUnlocked', { achievements });
+          console.log(`[ACHIEVEMENT] Emission complete for ${username}`);
         }
       } else {
-        inc('wordNeedsValidation');
-        incPerGame(gameCode, 'wordNeedsValidation');
-        socket.emit('wordNeedsValidation', {
-          word: normalizedWord,
-          message: 'Word will be validated by host'
-        });
+        // Check if host is playing solo
+        const playerCount = Object.keys(game.users).length;
+        const isHostSoloGame = playerCount === 1;
+
+        if (isHostSoloGame) {
+          // Solo host game: reject non-dictionary words immediately (no validation needed)
+          inc('wordNotValid');
+          incPerGame(gameCode, 'wordNotValid');
+
+          // Add word to playerWordDetails as invalid to track for achievements
+          // This ensures PERFECTIONIST and other achievements work correctly
+          addPlayerWord(gameCode, username, normalizedWord, {
+            autoValidated: false,
+            score: 0,
+            comboBonus: 0,
+            comboLevel: 0,
+            validated: false  // Mark as invalid for achievement tracking
+          });
+
+          // Reset combo level since invalid word breaks combo
+          if (!game.playerCombos) game.playerCombos = {};
+          game.playerCombos[username] = 0;
+
+          socket.emit('wordRejected', {
+            word: normalizedWord,
+            reason: 'notInDictionary'
+          });
+          console.log(`[SOCKET] Solo host game - rejected non-dictionary word: "${normalizedWord}"`);
+        } else {
+          // Multi-player game: word needs host validation
+          // IMPORTANT: Preserve combo data even for non-dictionary words
+          // so that if host validates the word, combo bonus is applied
+          const safeComboLevel = Math.max(0, Math.min(10, parseInt(comboLevel) || 0));
+          const baseScore = normalizedWord.length - 1;
+          const potentialScore = calculateWordScore(normalizedWord, safeComboLevel);
+          const comboBonus = potentialScore - baseScore;
+
+          // Store combo level server-side for STREAK_MASTER achievement tracking
+          if (!game.playerCombos) game.playerCombos = {};
+          game.playerCombos[username] = safeComboLevel;
+
+          addPlayerWord(gameCode, username, normalizedWord, {
+            autoValidated: false,
+            score: 0,  // Keep score 0 until validated
+            comboBonus: comboBonus,     // Preserve combo bonus for later validation
+            comboLevel: safeComboLevel  // Preserve combo level for later validation
+          });
+
+          inc('wordNeedsValidation');
+          incPerGame(gameCode, 'wordNeedsValidation');
+          socket.emit('wordNeedsValidation', {
+            word: normalizedWord,
+            message: 'Word will be validated by host'
+          });
+
+          // DO NOT check achievements for non-validated words
+          // Achievements will be checked when host validates the word
+          // This prevents awarding achievements like PERFECTIONIST for invalid words
+        }
       }
 
       const lbThrottleMs = parseInt(process.env.LEADERBOARD_THROTTLE_MS || '1000');
@@ -729,18 +864,28 @@ function initializeSocketHandlers(io) {
       );
 
       // Calculate scores for each player based on validated words
+      // Include combo bonuses that were earned during live play
       const validatedScores = {};
       const playerWords = game.playerWords || {};
 
       for (const [username, words] of Object.entries(playerWords)) {
         const uniqueWords = [...new Set(words)];
+        const playerWordDetails = game.playerWordDetails?.[username] || [];
         let totalScore = 0;
 
         for (const word of uniqueWords) {
           if (validWords.has(word)) {
-            // Calculate score using consistent scoring formula (no combo for manual validation)
-            const score = calculateWordScore(word, 0);
-            totalScore += score;
+            // Look up the score from word details (includes combo bonus earned during live play)
+            const wordDetail = playerWordDetails.find(wd => wd.word === word);
+            if (wordDetail && wordDetail.score > 0) {
+              // Use the score that was recorded during live play (includes combo bonus)
+              totalScore += wordDetail.score;
+            } else {
+              // For non-dictionary words validated by host, use stored combo level if available
+              const comboLevel = wordDetail?.comboLevel || 0;
+              const score = calculateWordScore(word, comboLevel);
+              totalScore += score;
+            }
           }
         }
 
@@ -760,37 +905,111 @@ function initializeSocketHandlers(io) {
         }
       }
 
+      // Update playerWordDetails with validation status for achievement calculation
+      // Also check live achievements for newly validated words
+      for (const username of Object.keys(playerWords)) {
+        const playerWordDetails = game.playerWordDetails?.[username] || [];
+        for (const wordDetail of playerWordDetails) {
+          const wasUnvalidated = wordDetail.validated === false;
+          wordDetail.validated = validWords.has(wordDetail.word);
+
+          // If this word was just validated (wasn't auto-validated before)
+          // Check for live achievements now
+          if (wasUnvalidated && wordDetail.validated) {
+            const newAchievements = checkAndAwardAchievements(gameCode, username, wordDetail.word);
+            if (newAchievements.length > 0) {
+              // Find the player's socket to emit achievements
+              const playerSocket = io.sockets.sockets.get(game.users[username]?.socketId);
+              if (playerSocket) {
+                playerSocket.emit('liveAchievementUnlocked', { achievements: newAchievements });
+              }
+            }
+          }
+        }
+      }
+
+      // Award final achievements based on validated words
+      const usernames = Object.keys(playerWords);
+      awardFinalAchievements(game, usernames);
+
       // Convert scores to array format for frontend
       const scoresArray = Object.entries(validatedScores).map(([username, score]) => {
         const playerWordsList = game.playerWords?.[username] || [];
+        const playerWordDetailsList = game.playerWordDetails?.[username] || [];
 
         // Transform word strings to objects with validation metadata
         const allWords = playerWordsList.map(word => {
           const isValid = validWords.has(word);
           const isDuplicate = wordCountMap[word] > 1;
-          const wordScore = isValid ? calculateWordScore(word, 0) : 0;
+
+          // Look up score and combo bonus from word details (earned during live play)
+          const wordDetail = playerWordDetailsList.find(wd => wd.word === word);
+          const comboBonus = wordDetail?.comboBonus || 0;
+          // Use stored score (includes combo) or calculate with stored combo level as fallback
+          const storedComboLevel = wordDetail?.comboLevel || 0;
+          const wordScore = isValid ? (wordDetail?.score || calculateWordScore(word, storedComboLevel)) : 0;
 
           return {
             word: word,
             score: isDuplicate ? 0 : wordScore, // Duplicates get 0 points
+            comboBonus: comboBonus, // Bonus earned during live play
             validated: isValid,
             isDuplicate: isDuplicate
           };
         });
+
+        // Calculate valid words count and longest word
+        const validWordsInList = allWords.filter(w => w.validated && !w.isDuplicate);
+        const longestWord = validWordsInList.length > 0
+          ? validWordsInList.reduce((longest, w) => w.word.length > longest.length ? w.word : longest, '')
+          : '';
 
         // Get localized achievements for this player
         const playerAchievementKeys = game.playerAchievements?.[username] || [];
         const localizedAchievements = getLocalizedAchievements(game.language || 'he');
         const playerAchievements = playerAchievementKeys.map(key => localizedAchievements[key]).filter(Boolean);
 
+        // Comprehensive logging for results with translation check
+        console.log(`[RESULTS] Player ${username} results:`, {
+          score: score,
+          wordCount: allWords.length,
+          validWordCount: validWordsInList.length,
+          achievementKeys: playerAchievementKeys,
+          localizedAchievementsCount: playerAchievements.length,
+          gameLanguage: game.language || 'he',
+          comboBonus: allWords.reduce((sum, w) => sum + (w.comboBonus || 0), 0)
+        });
+
+        // Check for missing translations
+        if (playerAchievementKeys.length !== playerAchievements.length) {
+          const missingKeys = playerAchievementKeys.filter(key => !localizedAchievements[key]);
+          console.warn(`[RESULTS] Missing achievement translations for ${username}:`, missingKeys);
+        }
+
         return {
           username,
           score,
           allWords,
+          wordCount: allWords.length,
+          validWordCount: validWordsInList.length,
+          longestWord,
           avatar: game.users?.[username]?.avatar || null,
           achievements: playerAchievements
         };
       }).sort((a, b) => b.score - a.score);
+
+      // Calculate player titles based on performance
+      const gameDuration = game.gameDuration || 180;
+      const playerTitles = calculatePlayerTitles(scoresArray, game.language || 'he', gameDuration);
+
+      // Add titles to each player's score object
+      scoresArray.forEach(playerScore => {
+        const titleData = playerTitles[playerScore.username];
+        if (titleData) {
+          playerScore.title = titleData.title;
+          playerScore.titleKey = titleData.titleKey;
+        }
+      });
 
       // Log validation results
       console.log(`[SOCKET] Validation complete for game ${gameCode}:`, {
@@ -1357,6 +1576,13 @@ function endGame(io, gameCode) {
     player.words.some(w => !w.autoValidated)
   );
 
+  // Check if host is the only player (solo game)
+  const playerCount = Object.keys(game.users).length;
+  const isHostSoloGame = playerCount === 1;
+
+  // Skip validation if: all words auto-validated OR host is playing solo
+  const shouldSkipValidation = !hasNonAutoValidatedWords || isHostSoloGame;
+
   // Send validation data to host
   const hostSocketId = game.hostSocketId;
   if (hostSocketId) {
@@ -1366,10 +1592,10 @@ function endGame(io, gameCode) {
         playerWords: allPlayerWords,
         autoValidatedCount,
         totalWords: uniqueWords.size,
-        skipValidation: !hasNonAutoValidatedWords  // Skip validation screen if all words are auto-validated
+        skipValidation: shouldSkipValidation  // Skip validation screen if all words are auto-validated OR host is solo
       });
 
-      console.log(`[SOCKET] Sent showValidation to host for game ${gameCode} - ${uniqueWords.size} unique words, ${autoValidatedCount} auto-validated, skipValidation: ${!hasNonAutoValidatedWords}`);
+      console.log(`[SOCKET] Sent showValidation to host for game ${gameCode} - ${uniqueWords.size} unique words, ${autoValidatedCount} auto-validated, playerCount: ${playerCount}, skipValidation: ${shouldSkipValidation}`);
     }
   }
 
@@ -1408,13 +1634,20 @@ function endGame(io, gameCode) {
 
       Object.keys(currentGame.users).forEach(username => {
         const playerWords = currentGame.playerWords?.[username] || [];
+        const playerWordDetailsList = currentGame.playerWordDetails?.[username] || [];
         let score = 0;
         const wordObjects = [];
 
         playerWords.forEach(word => {
           const isValid = isDictionaryWord(word, currentGame.language || 'en');
           const isDuplicate = wordCountMap[word] > 1;
-          const wordScore = isValid ? calculateWordScore(word) : 0;
+
+          // Look up score and combo bonus from word details (earned during live play)
+          const wordDetail = playerWordDetailsList.find(wd => wd.word === word);
+          const comboBonus = wordDetail?.comboBonus || 0;
+          // Use stored score (includes combo) or calculate with stored combo level as fallback
+          const storedComboLevel = wordDetail?.comboLevel || 0;
+          const wordScore = isValid ? (wordDetail?.score || calculateWordScore(word, storedComboLevel)) : 0;
 
           // Only add to score if valid and not a duplicate
           if (isValid && !isDuplicate) {
@@ -1424,6 +1657,7 @@ function endGame(io, gameCode) {
           wordObjects.push({
             word: word,
             score: isDuplicate ? 0 : wordScore,
+            comboBonus: comboBonus, // Bonus earned during live play
             validated: isValid,
             isDuplicate: isDuplicate
           });
@@ -1437,6 +1671,18 @@ function endGame(io, gameCode) {
       for (const [username, score] of Object.entries(validatedScores)) {
         updatePlayerScore(gameCode, username, score, false);
       }
+
+      // Update playerWordDetails with validation status for achievement calculation
+      for (const username of Object.keys(currentGame.users)) {
+        const playerWordDetails = currentGame.playerWordDetails?.[username] || [];
+        for (const wordDetail of playerWordDetails) {
+          wordDetail.validated = isDictionaryWord(wordDetail.word, currentGame.language || 'en');
+        }
+      }
+
+      // Award final achievements based on validated words
+      const usernames = Object.keys(currentGame.users);
+      awardFinalAchievements(currentGame, usernames);
 
       // Convert scores to array format for frontend with properly formatted word objects
       const scoresArray = Object.entries(validatedScores).map(([username, score]) => {

@@ -2,17 +2,39 @@ import * as React from "react";
 
 import { cn } from "../../lib/utils";
 
-const Card = React.forwardRef(({ className, ...props }, ref) => (
+// Neo-Brutalist Card: Paper texture, thick borders, hard shadows
+const Card = React.forwardRef(({ className, tilt, ...props }, ref) => (
   <div
     ref={ref}
     className={cn(
-      "rounded-lg border bg-card h-full text-card-foreground shadow-sm",
+      // Neo-Brutalist card styling
+      "rounded-neo-lg border-4 border-neo-black bg-neo-cream text-neo-black",
+      "shadow-hard-lg h-full",
+      // Optional tilt for playfulness
+      tilt === "left" && "rotate-[-2deg]",
+      tilt === "right" && "rotate-[2deg]",
       className
     )}
     {...props}
   />
 ));
 Card.displayName = "Card";
+
+// Dark variant for cards that need dark backgrounds
+const CardDark = React.forwardRef(({ className, tilt, ...props }, ref) => (
+  <div
+    ref={ref}
+    className={cn(
+      "rounded-neo-lg border-4 border-neo-black bg-neo-gray text-neo-white",
+      "shadow-hard-lg h-full",
+      tilt === "left" && "rotate-[-2deg]",
+      tilt === "right" && "rotate-[2deg]",
+      className
+    )}
+    {...props}
+  />
+));
+CardDark.displayName = "CardDark";
 
 const CardHeader = React.forwardRef(({ className, ...props }, ref) => (
   <div
@@ -23,11 +45,12 @@ const CardHeader = React.forwardRef(({ className, ...props }, ref) => (
 ));
 CardHeader.displayName = "CardHeader";
 
+// Neo-Brutalist Card Title: Bold, uppercase, with text shadow
 const CardTitle = React.forwardRef(({ className, ...props }, ref) => (
   <h3
     ref={ref}
     className={cn(
-      "text-2xl font-semibold leading-none tracking-tight",
+      "text-2xl font-black uppercase leading-none tracking-tight",
       className
     )}
     {...props}
@@ -38,7 +61,7 @@ CardTitle.displayName = "CardTitle";
 const CardDescription = React.forwardRef(({ className, ...props }, ref) => (
   <p
     ref={ref}
-    className={cn("text-sm text-muted-foreground", className)}
+    className={cn("text-sm text-neo-black/70", className)}
     {...props}
   />
 ));
@@ -58,4 +81,4 @@ const CardFooter = React.forwardRef(({ className, ...props }, ref) => (
 ));
 CardFooter.displayName = "CardFooter";
 
-export { Card, CardHeader, CardFooter, CardTitle, CardDescription, CardContent };
+export { Card, CardDark, CardHeader, CardFooter, CardTitle, CardDescription, CardContent };

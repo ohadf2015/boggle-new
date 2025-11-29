@@ -8,13 +8,14 @@ import Avatar from '../components/Avatar';
 import { motion, AnimatePresence } from 'framer-motion';
 import confetti from 'canvas-confetti';
 import toast from 'react-hot-toast';
+import { wordAcceptedToast, wordNeedsValidationToast, wordErrorToast, neoSuccessToast, neoErrorToast, neoInfoToast } from '../components/NeoToast';
 import { FaTrophy, FaDoorOpen, FaUsers, FaCrown, FaRandom, FaLink, FaWhatsapp, FaQrcode } from 'react-icons/fa';
 import { useSocket } from '../utils/SocketContext';
 import { clearSession } from '../utils/session';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useMusic } from '../contexts/MusicContext';
 import { useSoundEffects } from '../contexts/SoundEffectsContext';
-import { useAchievementQueue, AchievementDock } from '../components/achievements';
+import { useAchievementQueue } from '../components/achievements';
 import gsap from 'gsap';
 import GridComponent from '../components/GridComponent';
 import SlotMachineGrid from '../components/SlotMachineGrid';
@@ -30,8 +31,9 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import TournamentStandings from '../components/TournamentStandings';
 import SlotMachineText from '../components/SlotMachineText';
 import { sanitizeInput } from '../utils/validation';
+import logger from '@/utils/logger';
 
-const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) => {
+const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode, pendingGameStart, onGameStartConsumed }) => {
   const { t, dir } = useLanguage();
   const { socket } = useSocket();
   const { fadeToTrack, stopMusic, TRACKS } = useMusic();
@@ -138,6 +140,35 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
     setPlayersReady(initialPlayers);
   }, [initialPlayers]);
 
+  // Handle pending game start (when player was on results page and game started)
+  useEffect(() => {
+    if (pendingGameStart && socket && onGameStartConsumed) {
+      logger.log('[PLAYER] Processing pending game start from results page:', pendingGameStart);
+
+      // Apply the game start data
+      setWasInActiveGame(true);
+      setFoundWords([]);
+      setAchievements([]);
+      if (pendingGameStart.letterGrid) setLetterGrid(pendingGameStart.letterGrid);
+      if (pendingGameStart.timerSeconds) setRemainingTime(pendingGameStart.timerSeconds);
+      if (pendingGameStart.language) setGameLanguage(pendingGameStart.language);
+      if (pendingGameStart.minWordLength) setMinWordLength(pendingGameStart.minWordLength);
+      setGameActive(true);
+      setShowStartAnimation(true);
+
+      // Send acknowledgment to server if messageId is present
+      if (pendingGameStart.messageId) {
+        socket.emit('startGameAck', { messageId: pendingGameStart.messageId });
+        logger.log('[PLAYER] Sent startGameAck for pending game start, messageId:', pendingGameStart.messageId);
+      }
+
+      neoSuccessToast(t('common.gameStarted'), { icon: '🚀', duration: 3000 });
+
+      // Clear the pending game start
+      onGameStartConsumed();
+    }
+  }, [pendingGameStart, socket, onGameStartConsumed, t]);
+
   // Prevent accidental page refresh/close only when game is active or has data
   useEffect(() => {
     const shouldWarn = gameActive || foundWords.length > 0 || waitingForResults;
@@ -191,17 +222,10 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
       // Send acknowledgment to server (skip for late-join/reconnect scenarios)
       if (data.messageId && !data.skipAck) {
         socket.emit('startGameAck', { messageId: data.messageId });
-        console.log('[PLAYER] Sent startGameAck for messageId:', data.messageId);
+        logger.log('[PLAYER] Sent startGameAck for messageId:', data.messageId);
       }
 
-      toast.success(t('common.gameStarted'), {
-        icon: '🚀',
-        duration: 3000,
-        style: {
-          background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-          color: 'white',
-        },
-      });
+      neoSuccessToast(t('common.gameStarted'), { icon: '🚀', duration: 3000 });
     };
 
     const handleEndGame = () => {
@@ -209,7 +233,18 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
       setRemainingTime(0);
       if (wasInActiveGame) {
         setWaitingForResults(true);
-        toast(t('playerView.gameOver'), { icon: '⏱️', duration: 4000 });
+        toast(t('playerView.gameOver'), {
+          duration: 4000,
+          style: {
+            background: '#FFFEF0',
+            border: '3px solid #000000',
+            boxShadow: '4px 4px 0px #000000',
+            borderRadius: '8px',
+            fontWeight: '700',
+            color: '#000000',
+          },
+          icon: '⏱️',
+        });
       }
     };
 
@@ -229,11 +264,10 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
           : fw
       ));
 
-      if (data.autoValidated) {
-        toast.success(`✓ ${data.word}`, { duration: 2000, icon: '✅' });
+      const now = Date.now();
+      let newComboLevel = 0;
 
-        const now = Date.now();
-        let newComboLevel;
+      if (data.autoValidated) {
         // Use refs to get current values (avoids stale closure bug)
         const currentComboLevel = comboLevelRef.current;
         const currentLastWordTime = lastWordTimeRef.current;
@@ -266,20 +300,20 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
           setLastWordTime(null);
           lastWordTimeRef.current = null;
         }, comboTimeout);
-      } else {
-        toast.success(`✓ ${data.word}`, { duration: 2000 });
       }
+
+      // Use combo bonus from server response (already calculated correctly)
+      // Neo-Brutalist word accepted toast with score and combo bonus
+      wordAcceptedToast(data.word, {
+        score: data.score || (data.word.length - 1),
+        comboBonus: data.comboBonus || 0,
+        comboLevel: data.comboLevel || 0,
+        duration: 2000
+      });
     };
 
     const handleWordNeedsValidation = (data) => {
-      toast(data.message || `⏳ ${data.word} - Needs host validation`, {
-        duration: 3000,
-        icon: '⏳',
-        style: {
-          background: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
-          color: 'white',
-        },
-      });
+      wordNeedsValidationToast(data.word, { duration: 3000 });
 
       setComboLevel(0);
       comboLevelRef.current = 0;
@@ -291,7 +325,7 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
     };
 
     const handleWordAlreadyFound = () => {
-      toast.error(t('playerView.wordAlreadyFound'), { duration: 2000 });
+      wordErrorToast(t('playerView.wordAlreadyFound'), { duration: 2000 });
       setComboLevel(0);
       comboLevelRef.current = 0;
       setLastWordTime(null);
@@ -302,7 +336,7 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
     };
 
     const handleWordNotOnBoard = (data) => {
-      toast.error(t('playerView.wordNotOnBoard'), { duration: 3000 });
+      wordErrorToast(t('playerView.wordNotOnBoard'), { duration: 3000 });
       // Mark the word as invalid (red-pink) instead of removing it
       setFoundWords(prev => prev.map(fw =>
         fw.word.toLowerCase() === data.word.toLowerCase()
@@ -322,13 +356,33 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
       const msg = t('playerView.wordTooShortMin')
         ? t('playerView.wordTooShortMin').replace('${min}', data.minLength)
         : `Word too short! (min ${data.minLength} letters)`;
-      toast.error(msg, { duration: 2000, icon: '⚠️' });
+      wordErrorToast(msg, { duration: 2000 });
       // Remove the word from found words list
       setFoundWords(prev => prev.filter(fw =>
         fw.word.toLowerCase() !== data.word.toLowerCase()
       ));
+      // Reset combo - update both state AND refs to ensure next submission uses correct values
       setComboLevel(0);
+      comboLevelRef.current = 0;
       setLastWordTime(null);
+      lastWordTimeRef.current = null;
+      if (comboTimeoutRef.current) {
+        clearTimeout(comboTimeoutRef.current);
+      }
+    };
+
+    const handleWordRejected = (data) => {
+      // Handle rejected words (e.g., profanity filter)
+      wordErrorToast(t('playerView.wordRejected') || 'Word rejected', { duration: 2000 });
+      // Remove the word from found words list
+      setFoundWords(prev => prev.filter(fw =>
+        fw.word.toLowerCase() !== data.word.toLowerCase()
+      ));
+      // Reset combo
+      setComboLevel(0);
+      comboLevelRef.current = 0;
+      setLastWordTime(null);
+      lastWordTimeRef.current = null;
       if (comboTimeoutRef.current) {
         clearTimeout(comboTimeoutRef.current);
       }
@@ -339,7 +393,7 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
 
       // If we receive letterGrid in timeUpdate, update it (for late joiners who missed startGame)
       if (data.letterGrid && !letterGrid) {
-        console.log('[PLAYER] Received letterGrid in timeUpdate - late join sync');
+        logger.log('[PLAYER] Received letterGrid in timeUpdate - late join sync');
         setLetterGrid(data.letterGrid);
       }
       if (data.language && !gameLanguage) {
@@ -349,7 +403,7 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
       // Auto-activate game if timer is running and we have the grid
       const hasGrid = letterGrid || data.letterGrid;
       if (!gameActive && data.remainingTime > 0 && hasGrid) {
-        console.log('[PLAYER] Timer started on server, activating game (remainingTime:', data.remainingTime, ')');
+        logger.log('[PLAYER] Timer started on server, activating game (remainingTime:', data.remainingTime, ')');
         setGameActive(true);
         setShowStartAnimation(true);
       }
@@ -365,11 +419,30 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
     };
 
     const handleLiveAchievementUnlocked = (data) => {
+      // Validate achievement data before processing
+      if (!data || !data.achievements || !Array.isArray(data.achievements)) {
+        logger.warn('[PLAYER] Received invalid achievement data:', data);
+        return;
+      }
+
+      logger.log(`[PLAYER] Received ${data.achievements.length} live achievements:`,
+        data.achievements.map(a => a?.name || 'unknown').join(', '));
+
       // Queue achievements for Xbox-style popup display
       data.achievements.forEach(achievement => {
-        queueAchievement(achievement);
+        if (achievement && achievement.name) {
+          queueAchievement(achievement);
+        } else {
+          logger.warn('[PLAYER] Skipping invalid achievement object:', achievement);
+        }
       });
-      setAchievements(prev => [...prev, ...data.achievements]);
+
+      // Filter out any invalid achievements before adding to state
+      const validAchievements = data.achievements.filter(a => a && a.name);
+      if (validAchievements.length > 0) {
+        setAchievements(prev => [...prev, ...validAchievements]);
+        logger.log(`[PLAYER] Added ${validAchievements.length} valid achievements to state`);
+      }
     };
 
     const handleValidatedScores = (data) => {
@@ -397,10 +470,7 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
     const handleHostLeftRoomClosing = (data) => {
       intentionalExitRef.current = true;
       clearSession();
-      toast.error(data.message || t('playerView.roomClosed'), {
-        icon: '🚪',
-        duration: 5000,
-      });
+      neoErrorToast(data.message || t('playerView.roomClosed'), { icon: '🚪', duration: 5000 });
       setTimeout(() => {
         socket.disconnect();
         window.location.reload();
@@ -418,22 +488,12 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
       setLetterGrid(null);
       // NOTE: Don't clear playersReady here - the server will send updateUsers
       // with the correct player list. Clearing it causes a flash of empty player list.
-      toast.success(data.message || t('common.newGameReady'), {
-        icon: '🔄',
-        duration: 3000,
-      });
+      neoSuccessToast(data.message || t('common.newGameReady'), { icon: '🔄', duration: 3000 });
     };
 
     const handleTournamentCreated = (data) => {
       setTournamentData(data.tournament);
-      toast.success(t('hostView.tournamentCreated') || 'Tournament created!', {
-        icon: '🏆',
-        duration: 3000,
-        style: {
-          background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-          color: 'white',
-        },
-      });
+      neoSuccessToast(t('hostView.tournamentCreated') || 'Tournament created!', { icon: '🏆', duration: 3000 });
     };
 
     const handleTournamentRoundStarting = (data) => {
@@ -445,17 +505,7 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
       }
       const roundNum = data.tournament?.currentRound || 1;
       const totalRounds = data.tournament?.totalRounds || 3;
-      toast.success(
-        `${t('hostView.tournamentRound')} ${roundNum}/${totalRounds}`,
-        {
-          icon: '🎯',
-          duration: 3000,
-          style: {
-            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-            color: 'white',
-          },
-        }
-      );
+      neoInfoToast(`${t('hostView.tournamentRound')} ${roundNum}/${totalRounds}`, { icon: '🎯', duration: 3000 });
     };
 
     const handleTournamentRoundCompleted = (data) => {
@@ -483,17 +533,7 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
           spread: 100,
           origin: { y: 0.6 },
         });
-        toast.success(
-          `🏆 ${winner.username} ${t('hostView.wonTournament')}!`,
-          {
-            duration: 5000,
-            style: {
-              background: 'linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%)',
-              color: 'white',
-              fontWeight: 'bold',
-            },
-          }
-        );
+        neoSuccessToast(`🏆 ${winner.username} ${t('hostView.wonTournament')}!`, { duration: 5000 });
       }
     };
 
@@ -501,10 +541,18 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
       setTournamentData(null);
       setTournamentStandings([]);
       setShowTournamentStandings(false);
-      toast.error(data?.message || t('hostView.tournamentCancelled'), {
-        icon: '❌',
-        duration: 3000,
-      });
+      neoErrorToast(data?.message || t('hostView.tournamentCancelled'), { icon: '❌', duration: 3000 });
+    };
+
+    // Handle generic errors from server (game state issues, invalid submissions)
+    const handleError = (data) => {
+      const message = data?.message || t('playerView.errorOccurred') || 'An error occurred';
+      wordErrorToast(message, { duration: 3000 });
+    };
+
+    // Handle rate limiting feedback
+    const handleRateLimited = () => {
+      wordErrorToast(t('playerView.tooFast') || 'Slow down! Submitting too fast', { duration: 2000 });
     };
 
     // Register all event listeners
@@ -517,6 +565,7 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
     socket.on('wordAlreadyFound', handleWordAlreadyFound);
     socket.on('wordNotOnBoard', handleWordNotOnBoard);
     socket.on('wordTooShort', handleWordTooShort);
+    socket.on('wordRejected', handleWordRejected);
     socket.on('timeUpdate', handleTimeUpdate);
     socket.on('updateLeaderboard', handleUpdateLeaderboard);
     socket.on('liveAchievementUnlocked', handleLiveAchievementUnlocked);
@@ -529,6 +578,8 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
     socket.on('tournamentRoundCompleted', handleTournamentRoundCompleted);
     socket.on('tournamentComplete', handleTournamentComplete);
     socket.on('tournamentCancelled', handleTournamentCancelled);
+    socket.on('error', handleError);
+    socket.on('rateLimited', handleRateLimited);
 
     return () => {
       socket.off('updateUsers', handleUpdateUsers);
@@ -540,6 +591,7 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
       socket.off('wordAlreadyFound', handleWordAlreadyFound);
       socket.off('wordNotOnBoard', handleWordNotOnBoard);
       socket.off('wordTooShort', handleWordTooShort);
+      socket.off('wordRejected', handleWordRejected);
       socket.off('timeUpdate', handleTimeUpdate);
       socket.off('updateLeaderboard', handleUpdateLeaderboard);
       socket.off('liveAchievementUnlocked', handleLiveAchievementUnlocked);
@@ -552,6 +604,8 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
       socket.off('tournamentRoundCompleted', handleTournamentRoundCompleted);
       socket.off('tournamentComplete', handleTournamentComplete);
       socket.off('tournamentCancelled', handleTournamentCancelled);
+      socket.off('error', handleError);
+      socket.off('rateLimited', handleRateLimited);
     };
   // Note: comboLevel and lastWordTime removed from deps - we use refs to avoid stale closures
   }, [socket, onShowResults, t, letterGrid, wasInActiveGame, gameActive, gameLanguage, queueAchievement, playComboSound]);
@@ -584,18 +638,12 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
       const msg = t('playerView.wordTooShortMin')
         ? t('playerView.wordTooShortMin').replace('${min}', minWordLength)
         : `Word too short! (min ${minWordLength} letters)`;
-      toast.error(msg, {
-        duration: 2000,
-        icon: '⚠️'
-      });
+      wordErrorToast(msg, { duration: 2000 });
       return;
     }
 
     if (!regex.test(trimmedWord)) {
-      toast.error(t('playerView.onlyLanguageWords'), {
-        duration: 2500,
-        icon: '❌'
-      });
+      wordErrorToast(t('playerView.onlyLanguageWords'), { duration: 2500 });
       setWord('');
 
       // Keep focus on input
@@ -620,7 +668,7 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
 
 
     }
-  }, [word, gameActive, socket, t, gameLanguage]);
+  }, [word, gameActive, socket, t, gameLanguage, minWordLength]);
 
   const removeWord = (index) => {
     if (!gameActive) return;
@@ -648,17 +696,17 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
   };
 
   const confirmExitRoom = () => {
-    console.log('[PLAYER] Exit confirmed, closing connection');
+    logger.log('[PLAYER] Exit confirmed, closing connection');
     intentionalExitRef.current = true;
 
     // Emit explicit leave event BEFORE disconnecting
     try {
       if (socket && gameCode && username) {
-        console.log('[PLAYER] Emitting leaveRoom event');
+        logger.log('[PLAYER] Emitting leaveRoom event');
         socket.emit('leaveRoom', { gameCode, username });
       }
     } catch (error) {
-      console.error('[PLAYER] Error emitting leaveRoom event:', error);
+      logger.error('[PLAYER] Error emitting leaveRoom event:', error);
     }
 
     clearSession();
@@ -670,7 +718,7 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
           socket.disconnect();
         }
       } catch (error) {
-        console.error('[PLAYER] Error disconnecting socket:', error);
+        logger.error('[PLAYER] Error disconnecting socket:', error);
       }
 
       // Force reload after disconnect
@@ -678,18 +726,18 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
     }, 200);
   };
 
-  // Show waiting for results screen after game ends
+  // Show waiting for results screen after game ends - NEO-BRUTALIST STYLE
   if (waitingForResults) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-slate-50 via-slate-100 to-slate-200 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 p-3 sm:p-4 md:p-8 flex flex-col transition-colors duration-300">
+      <div className="min-h-screen bg-neo-cream p-3 sm:p-4 md:p-8 flex flex-col transition-colors duration-300">
 
-        {/* Exit Button */}
+        {/* Exit Button - Neo-Brutalist */}
         <div className="w-full max-w-md mx-auto flex justify-end mb-4 relative z-50">
           <Button
             type="button"
             onClick={handleExitRoom}
             size="sm"
-            className="shadow-lg hover:scale-105 transition-transform bg-red-500 hover:bg-red-600 border border-red-400/30 hover:shadow-[0_0_15px_rgba(239,68,68,0.5)] cursor-pointer"
+            className="bg-neo-red text-neo-white border-4 border-neo-black shadow-hard hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-hard-lg active:translate-x-[2px] active:translate-y-[2px] active:shadow-none font-black"
           >
             <FaDoorOpen className="mr-2" />
             {t('playerView.exit')}
@@ -698,80 +746,99 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
 
         {/* Centered Content */}
         <div className="flex-1 flex items-center justify-center">
-          <div className="max-w-2xl w-full space-y-3 sm:space-y-4 md:space-y-6">
-            {/* Waiting for Results Message */}
+          <div className="max-w-2xl w-full space-y-4 sm:space-y-6 md:space-y-8">
+            {/* Waiting for Results Message - Neo-Brutalist */}
             <motion.div
-              initial={{ scale: 0.9, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
+              initial={{ scale: 0.9, opacity: 0, rotate: -2 }}
+              animate={{ scale: 1, opacity: 1, rotate: 0 }}
               className="text-center"
             >
-              <Card className="bg-white/90 dark:bg-slate-800/90 backdrop-blur-md shadow-2xl border border-cyan-500/30 p-4 sm:p-6 md:p-8">
-                <div className="mb-4">
+              <div className="bg-neo-yellow border-4 border-neo-black shadow-hard-lg p-6 sm:p-8 md:p-10 rotate-[1deg]">
+                {/* Neo-Brutalist Hourglass Animation */}
+                <div className="mb-6">
                   <motion.div
-                    animate={{ rotate: 360 }}
-                    transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
-                    className="inline-block text-5xl mb-4"
+                    animate={{ rotate: [0, 10, -10, 0] }}
+                    transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+                    className="inline-block bg-neo-pink border-4 border-neo-black shadow-hard p-3"
                   >
-                    ⏳
+                    <div className="relative w-12 h-16 flex flex-col items-center">
+                      {/* Top triangle */}
+                      <div className="w-0 h-0 border-l-[20px] border-r-[20px] border-t-[24px] border-l-transparent border-r-transparent border-t-neo-black" />
+                      {/* Middle neck */}
+                      <div className="w-2 h-1 bg-neo-black -my-[2px] z-10" />
+                      {/* Bottom triangle */}
+                      <div className="w-0 h-0 border-l-[20px] border-r-[20px] border-b-[24px] border-l-transparent border-r-transparent border-b-neo-black" />
+                      {/* Falling sand animation */}
+                      <motion.div
+                        animate={{ y: [0, 20, 0], opacity: [1, 1, 0] }}
+                        transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
+                        className="absolute top-[24px] w-1 h-2 bg-neo-cyan"
+                      />
+                    </div>
                   </motion.div>
                 </div>
-                <motion.h2
-                  animate={{
-                    scale: [1, 1.05, 1],
-                    opacity: [0.8, 1, 0.8],
-                  }}
-                  transition={{
-                    duration: 2,
-                    repeat: Infinity,
-                    ease: "easeInOut"
-                  }}
-                  className="text-3xl md:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-teal-300 to-purple-400 mb-2"
-                >
+
+                {/* Title - Neo-Brutalist */}
+                <div className="bg-neo-black text-neo-white px-6 py-4 font-black uppercase text-2xl md:text-3xl tracking-wider shadow-hard border-4 border-neo-black mb-4">
                   {t('playerView.waitingForResults')}
-                </motion.h2>
-                <p className="text-sm text-slate-600 dark:text-slate-400 mt-4">
+                </div>
+
+                {/* Subtitle */}
+                <p className="text-neo-black font-bold text-base uppercase tracking-wide">
                   {t('playerView.hostValidating') || 'Host is validating words...'}
                 </p>
-              </Card>
+
+                {/* Decorative animated dots */}
+                <div className="flex gap-3 mt-6 justify-center">
+                  {[0, 1, 2].map((i) => (
+                    <motion.div
+                      key={i}
+                      animate={{ scale: [1, 1.3, 1], y: [0, -8, 0] }}
+                      transition={{ duration: 1.2, repeat: Infinity, delay: i * 0.2 }}
+                      className="w-4 h-4 bg-neo-black border-2 border-neo-black"
+                    />
+                  ))}
+                </div>
+              </div>
             </motion.div>
 
-            {/* Leaderboard */}
+            {/* Leaderboard - Neo-Brutalist */}
             {leaderboard.length > 0 && (
               <motion.div
-                initial={{ y: 20, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
+                initial={{ y: 20, opacity: 0, rotate: 1 }}
+                animate={{ y: 0, opacity: 1, rotate: 0 }}
                 transition={{ delay: 0.2 }}
+                className="rotate-[-0.5deg]"
               >
-                <Card className="bg-white/90 dark:bg-slate-800/90 backdrop-blur-md shadow-xl border border-purple-500/30 ">
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2 text-purple-600 dark:text-purple-300 text-xl">
-                      <FaTrophy className="text-yellow-500 dark:text-yellow-400" />
+                <div className="bg-neo-cream border-4 border-neo-black shadow-hard-lg overflow-hidden">
+                  {/* Header */}
+                  <div className="py-3 px-4 border-b-4 border-neo-black bg-neo-purple">
+                    <h3 className="flex items-center gap-2 text-neo-white text-xl uppercase tracking-wider font-black">
+                      <FaTrophy className="text-neo-yellow" style={{ filter: 'drop-shadow(2px 2px 0px var(--neo-black))' }} />
                       {t('playerView.leaderboard')}
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-2 max-h-[300px] overflow-y-auto">
+                    </h3>
+                  </div>
+                  {/* Content */}
+                  <div className="p-3 space-y-2 max-h-[300px] overflow-y-auto">
                     {leaderboard.map((player, index) => {
                       const isMe = player.username === username;
+                      const getRankStyle = () => {
+                        if (index === 0) return 'bg-neo-yellow text-neo-black';
+                        if (index === 1) return 'bg-slate-300 text-neo-black';
+                        if (index === 2) return 'bg-neo-orange text-neo-black';
+                        return 'bg-neo-cream text-neo-black border-neo-black border-3';
+                      };
                       return (
-                      <motion.div
-                        key={player.username}
-                        initial={{ x: 50, opacity: 0 }}
-                        animate={{ x: 0, opacity: 1 }}
-                        transition={{ delay: index * 0.1 }}
-                        className={`flex items-center p-4 rounded-lg
-                                ${index === 0 ? 'bg-gradient-to-r from-yellow-500/80 to-orange-500/80 text-white shadow-lg border border-yellow-400/50' :
-                            index === 1 ? 'bg-gradient-to-r from-gray-400/80 to-gray-500/80 text-white shadow-md border border-gray-400/50' :
-                              index === 2 ? 'bg-gradient-to-r from-orange-500/80 to-orange-600/80 text-white shadow-md border border-orange-400/50' :
-                                'bg-slate-100 dark:bg-slate-700/50 text-slate-900 dark:text-white'}`}
-                        style={player.avatar?.color && index > 2 ? {
-                          background: `linear-gradient(to right, ${player.avatar.color}40, ${player.avatar.color}60)`,
-                          justifyContent: dir === 'rtl' ? 'flex-end' : 'flex-start'
-                        } : {
-                          justifyContent: dir === 'rtl' ? 'flex-end' : 'flex-start'
-                        }}
-                      >
-                        <div className={`flex items-center gap-3 ${dir === 'rtl' ? 'flex-row-reverse' : ''} flex-1`}>
-                          <div className="text-2xl font-bold min-w-[40px] text-center">
+                        <motion.div
+                          key={player.username}
+                          initial={{ x: 50, opacity: 0 }}
+                          animate={{ x: 0, opacity: 1 }}
+                          transition={{ delay: index * 0.1 }}
+                          className={`flex items-center gap-3 p-3 rounded-neo border-3 border-neo-black shadow-hard-sm transition-all
+                            hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-hard
+                            ${getRankStyle()} ${dir === 'rtl' ? 'flex-row-reverse' : ''}`}
+                        >
+                          <div className="w-10 h-10 rounded-neo flex items-center justify-center font-black text-lg bg-neo-black text-neo-white border-2 border-neo-black">
                             {index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : `#${index + 1}`}
                           </div>
                           <Avatar
@@ -781,33 +848,33 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
                             size="md"
                           />
                           <div className="flex-1">
-                            <div className={`font-bold flex items-center gap-2 ${dir === 'rtl' ? 'flex-row-reverse' : ''}`}>
+                            <div className={`font-black flex items-center gap-2 ${dir === 'rtl' ? 'flex-row-reverse' : ''}`}>
                               <SlotMachineText text={player.username} />
                               {isMe && (
-                                <span className="text-xs bg-white/30 px-2 py-0.5 rounded-full">
+                                <span className="text-xs bg-neo-black text-neo-white px-2 py-0.5 rounded-neo font-bold border-2 border-neo-black">
                                   ({t('playerView.me')})
                                 </span>
                               )}
                             </div>
-                            <div className="text-sm opacity-75">{player.wordCount} {t('playerView.wordCount')}</div>
+                            <div className="text-sm font-bold opacity-75">{player.wordCount} {t('playerView.wordCount')}</div>
                           </div>
-                          <div className="text-2xl font-bold">
+                          <div className="text-2xl font-black">
                             {player.score}
                           </div>
-                        </div>
-                      </motion.div>
-                    );
+                        </motion.div>
+                      );
                     })}
-                  </CardContent>
-                </Card>
+                  </div>
+                </div>
               </motion.div>
             )}
 
-            {/* Chat Section */}
+            {/* Chat Section - Neo-Brutalist */}
             <motion.div
-              initial={{ y: 20, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
+              initial={{ y: 20, opacity: 0, rotate: -1 }}
+              animate={{ y: 0, opacity: 1, rotate: 0 }}
               transition={{ delay: 0.3 }}
+              className="rotate-[0.5deg]"
             >
               <RoomChat
                 username={username}
@@ -847,13 +914,13 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
     );
   }
 
-  // Show waiting screen if game hasn't started yet
+  // Show waiting screen if game hasn't started yet - matches HostView layout
   if (!gameActive && !waitingForResults) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-slate-50 via-slate-100 to-slate-200 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 p-3 sm:p-4 md:p-8 flex flex-col transition-colors duration-300">
+      <div className="min-h-screen bg-gradient-to-b from-slate-50 via-slate-100 to-slate-200 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 flex flex-col items-center p-2 sm:p-4 md:p-6 lg:p-8 overflow-auto transition-colors duration-300">
 
-        {/* Exit Button */}
-        <div className="w-full max-w-md mx-auto flex justify-end mb-4 relative z-50">
+        {/* Top Bar with Exit Button */}
+        <div className="w-full max-w-6xl flex justify-end mb-4">
           <Button
             type="button"
             onClick={handleExitRoom}
@@ -865,57 +932,202 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
           </Button>
         </div>
 
+        {/* Main Layout - matches HostView structure */}
+        <div className="flex flex-col gap-3 sm:gap-4 md:gap-6 w-full max-w-6xl">
 
+          {/* Row 1: Room Code + Language + Share Buttons */}
+          <Card className="bg-slate-800/95 text-white p-3 sm:p-4 md:p-6 border-4 border-slate-700 shadow-lg">
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+              {/* Room Code and Language */}
+              <div className="flex flex-col items-center sm:items-start gap-2">
+                <div className="flex items-center gap-3">
+                  <div className="text-center sm:text-left">
+                    <p className="text-sm text-cyan-400 font-bold uppercase">{t('hostView.roomCode')}:</p>
+                    <h2 className="text-3xl sm:text-4xl font-black tracking-wide text-yellow-400">
+                      {gameCode}
+                    </h2>
+                  </div>
+                  {gameLanguage && (
+                    <Badge className="text-base sm:text-lg px-3 py-1 bg-slate-200 text-slate-800 border-2 border-slate-600 font-bold">
+                      {gameLanguage === 'he' ? '🇮🇱 עברית' : gameLanguage === 'sv' ? '🇸🇪 Svenska' : gameLanguage === 'ja' ? '🇯🇵 日本語' : '🇺🇸 English'}
+                    </Badge>
+                  )}
+                </div>
+              </div>
 
-        {/* Centered Waiting Content */}
-        <div className="flex-1 flex items-center justify-center">
-          <div className="max-w-md w-full space-y-3 sm:space-y-4 md:space-y-6">
-            {/* Waiting Message */}
-            <motion.div
-              initial={{ scale: 0, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              transition={{ type: 'spring', stiffness: 200, damping: 15 }}
-              className="text-center"
-            >
-              <Card className="bg-white/90 dark:bg-slate-800/90 backdrop-blur-md shadow-2xl border border-cyan-500/30 p-8">
-                <motion.h2
-                  animate={{
-                    scale: [1, 1.05, 1],
-                    opacity: [0.8, 1, 0.8],
-                  }}
-                  transition={{
-                    duration: 2,
-                    repeat: Infinity,
-                    ease: "easeInOut"
-                  }}
-                  className="text-3xl md:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-teal-300 to-purple-400"
+              {/* Share Buttons */}
+              <div className="flex flex-wrap gap-2 justify-center">
+                <ShareButton
+                  variant="link"
+                  onClick={() => copyJoinUrl(gameCode, t)}
+                  icon={<FaLink />}
                 >
-                  {t('playerView.waitForGameStart')}
-                </motion.h2>
-              </Card>
-            </motion.div>
+                  {t('joinView.copyLink')}
+                </ShareButton>
+                <ShareButton
+                  variant="whatsapp"
+                  onClick={() => shareViaWhatsApp(gameCode, '', t)}
+                  icon={<FaWhatsapp />}
+                >
+                  {t('joinView.shareWhatsapp')}
+                </ShareButton>
+                <ShareButton
+                  variant="qr"
+                  onClick={() => setShowQR(true)}
+                  icon={<FaQrcode />}
+                >
+                  {t('hostView.qrCode')}
+                </ShareButton>
+              </div>
+            </div>
+          </Card>
 
-            {/* Shuffling Letter Grid Preview */}
-            <motion.div
-              initial={{ y: 20, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              transition={{ delay: 0.15 }}
-            >
-              <Card className="bg-slate-900/95 dark:bg-slate-900/95 backdrop-blur-md border border-cyan-500/40 shadow-[0_0_25px_rgba(6,182,212,0.2)] overflow-hidden">
-                <div className="p-4 flex flex-col items-center justify-center bg-slate-900/90 relative">
+          {/* Row 2: Waiting Message (instead of settings) + Players List */}
+          <div className="flex flex-col lg:flex-row lg:items-stretch gap-3 sm:gap-4 md:gap-6">
+            {/* Waiting Message Card - LEFT (replaces game settings) - NEO-BRUTALIST */}
+            <div className="flex-1 p-4 sm:p-6 md:p-8 bg-slate-800/95 border-4 border-neo-black shadow-hard flex flex-col items-center justify-center rotate-[-0.5deg]">
+              <motion.div
+                initial={{ scale: 0.9, rotate: -3 }}
+                animate={{ scale: 1, rotate: 0 }}
+                transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                className="relative"
+              >
+                {/* Decorative background shapes */}
+                <div className="absolute -top-4 -right-6 w-20 h-20 bg-neo-pink border-4 border-neo-black rotate-12 -z-10" />
+                <div className="absolute -bottom-4 -left-6 w-16 h-16 bg-neo-cyan border-4 border-neo-black -rotate-6 -z-10" />
+                <div className="absolute top-1/2 -right-10 w-10 h-10 bg-neo-yellow border-3 border-neo-black rotate-45 -z-10" />
+
+                {/* Neo-Brutalist Hourglass */}
+                <motion.div
+                  animate={{ rotate: [0, 10, -10, 0] }}
+                  transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+                  className="bg-neo-yellow border-4 border-neo-black shadow-hard p-4 rotate-[2deg]"
+                >
+                  <div className="relative w-16 h-20 flex flex-col items-center">
+                    {/* Top triangle (sand container) */}
+                    <div className="w-0 h-0 border-l-[28px] border-r-[28px] border-t-[32px] border-l-transparent border-r-transparent border-t-neo-black" />
+                    {/* Middle neck */}
+                    <div className="w-2 h-1 bg-neo-black -my-[2px] z-10" />
+                    {/* Bottom triangle (sand collecting) */}
+                    <div className="w-0 h-0 border-l-[28px] border-r-[28px] border-b-[32px] border-l-transparent border-r-transparent border-b-neo-black" />
+                    {/* Falling sand animation */}
+                    <motion.div
+                      animate={{ y: [0, 24, 0], opacity: [1, 1, 0] }}
+                      transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
+                      className="absolute top-[32px] w-1 h-3 bg-neo-pink"
+                    />
+                  </div>
+                </motion.div>
+              </motion.div>
+
+              {/* Text with Neo-Brutalist styling */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.3 }}
+                className="mt-6 text-center"
+              >
+                <div className="bg-neo-black text-neo-white px-6 py-3 font-black uppercase text-xl md:text-2xl tracking-wider rotate-[1deg] shadow-hard border-4 border-neo-black">
+                  {t('playerView.waitForGameStart')}
+                </div>
+                <motion.p
+                  animate={{ opacity: [0.6, 1, 0.6] }}
+                  transition={{ duration: 2, repeat: Infinity }}
+                  className="text-slate-400 font-bold text-sm mt-4 uppercase tracking-wide"
+                >
+                  {t('playerView.waitingForHostToStart') || 'Waiting for host to start the game...'}
+                </motion.p>
+              </motion.div>
+
+              {/* Decorative dots */}
+              <div className="flex gap-3 mt-6">
+                {[0, 1, 2].map((i) => (
+                  <motion.div
+                    key={i}
+                    animate={{ scale: [1, 1.3, 1], rotate: [0, 180, 360] }}
+                    transition={{ duration: 1.5, repeat: Infinity, delay: i * 0.2 }}
+                    className="w-4 h-4 bg-neo-pink border-2 border-neo-black"
+                  />
+                ))}
+              </div>
+            </div>
+
+            {/* Players List - RIGHT */}
+            <Card className="lg:w-[350px] h-auto p-3 sm:p-4 md:p-6 flex flex-col bg-slate-800/95 text-white border-4 border-slate-700 shadow-lg">
+              <h3 className="text-lg font-black uppercase text-slate-200 mb-4 flex items-center gap-2 flex-shrink-0">
+                <FaUsers className="text-purple-400" />
+                {t('playerView.players')} ({playersReady.length})
+              </h3>
+              <div className="flex flex-col gap-3 flex-1 overflow-y-auto">
+                <AnimatePresence>
+                  {playersReady.map((player, index) => {
+                    const playerUsername = typeof player === 'string' ? player : player.username;
+                    const avatar = typeof player === 'object' ? player.avatar : null;
+                    const isHost = typeof player === 'object' ? player.isHost : false;
+                    const isMe = playerUsername === username;
+
+                    return (
+                      <motion.div
+                        key={playerUsername}
+                        initial={{ scale: 0, opacity: 0, rotate: -5 }}
+                        animate={{ scale: 1, opacity: 1, rotate: 0 }}
+                        exit={{ scale: 0, opacity: 0 }}
+                        transition={{ delay: index * 0.05 }}
+                      >
+                        <Badge
+                          className={`font-black px-3 py-2 text-base w-full justify-between border-2 border-slate-600 shadow-md ${
+                            isHost ? "bg-yellow-500 text-slate-900" : "bg-slate-200 text-slate-900"
+                          }`}
+                          style={avatar?.color && !isHost ? { backgroundColor: avatar.color } : {}}
+                        >
+                          <div className="flex items-center gap-2">
+                            <Avatar
+                              profilePictureUrl={avatar?.profilePictureUrl}
+                              avatarEmoji={avatar?.emoji}
+                              avatarColor={avatar?.color}
+                              size="sm"
+                            />
+                            {isHost && <FaCrown className="text-slate-900" />}
+                            <SlotMachineText text={playerUsername} />
+                            {isMe && (
+                              <span className="text-xs bg-white/30 px-2 py-0.5 rounded-full">
+                                ({t('playerView.me')})
+                              </span>
+                            )}
+                          </div>
+                        </Badge>
+                      </motion.div>
+                    );
+                  })}
+                </AnimatePresence>
+              </div>
+              {playersReady.length === 0 && (
+                <p className="text-sm text-center text-slate-400 font-bold mt-2">
+                  {t('hostView.waitingForPlayers')}
+                </p>
+              )}
+            </Card>
+          </div>
+
+          {/* Row 3: Letter Grid + Chat */}
+          <div className="flex flex-col lg:flex-row gap-3 sm:gap-4 md:gap-6">
+            {/* Letter Grid - LEFT */}
+            <Card className="flex-1 p-1 sm:p-3 flex flex-col items-center bg-slate-800/95 border-4 border-slate-700 shadow-lg">
+              <div className="w-full flex justify-center items-center transition-all duration-500 aspect-square max-w-full">
+                <div className="w-full h-full flex items-center justify-center">
                   {shufflingGrid ? (
                     <SlotMachineGrid
                       grid={shufflingGrid}
                       highlightedCells={highlightedCells}
                       language={gameLanguage || 'en'}
-                      className="w-full max-w-xs"
+                      className="w-full h-full"
                       animationDuration={600}
                       staggerDelay={40}
                       animationPattern="cascade"
                     />
                   ) : (
                     // Loading skeleton for the grid
-                    <div className="w-full max-w-xs aspect-square grid grid-cols-4 gap-2 p-2">
+                    <div className="w-full aspect-square grid grid-cols-4 gap-2 p-4">
                       {Array.from({ length: 16 }).map((_, i) => (
                         <motion.div
                           key={i}
@@ -932,140 +1144,19 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
                       ))}
                     </div>
                   )}
-                  {/* Transparent blur overlay with waiting message */}
-                  <div className="absolute inset-0 bg-slate-900/30 backdrop-blur-[2px] flex items-center justify-center">
-                    <motion.p
-                      animate={{ opacity: [0.7, 1, 0.7] }}
-                      transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-                      className="text-white/90 text-sm md:text-base font-medium drop-shadow-lg text-center px-4"
-                    >
-                      {t('playerView.waitingForHostToStart') || 'Waiting for host to start the game...'}
-                    </motion.p>
-                  </div>
                 </div>
-              </Card>
-            </motion.div>
+              </div>
+            </Card>
 
-            {/* Players List */}
-            <motion.div
-              initial={{ y: 20, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              transition={{ delay: 0.2 }}
-            >
-              <Card className="bg-white/90 dark:bg-slate-800/90 backdrop-blur-md border border-purple-500/30 shadow-[0_0_15px_rgba(168,85,247,0.1)] p-4 sm:p-5 md:p-6">
-                <h3 className="text-lg font-bold text-purple-600 dark:text-purple-300 mb-4 flex items-center gap-2 justify-center">
-                  <FaUsers className="text-purple-500 dark:text-purple-400" />
-                  {t('playerView.players')} ({playersReady.length})
-                </h3>
-                <div className="flex flex-col gap-2">
-                  <AnimatePresence>
-                    {playersReady.map((player, index) => {
-                      // Handle both old format (string) and new format (object)
-                      const playerUsername = typeof player === 'string' ? player : player.username;
-                      const avatar = typeof player === 'object' ? player.avatar : null;
-                      const isHost = typeof player === 'object' ? player.isHost : false;
-                      const isMe = playerUsername === username;
-
-                      return (
-                        <motion.div
-                          key={playerUsername}
-                          initial={{ scale: 0, opacity: 0 }}
-                          animate={{ scale: 1, opacity: 1 }}
-                          exit={{ scale: 0, opacity: 0 }}
-                          transition={{ delay: index * 0.05 }}
-                        >
-                          <Badge
-                            className="bg-gradient-to-r from-purple-500 to-pink-500 font-bold text-white px-3 py-2 text-base w-full shadow-[0_0_10px_rgba(168,85,247,0.3)]"
-                            style={avatar?.color ? {
-                              background: `linear-gradient(to right, ${avatar.color}, ${avatar.color}dd)`,
-                              justifyContent: dir === 'rtl' ? 'flex-end' : 'flex-start'
-                            } : {
-                              justifyContent: dir === 'rtl' ? 'flex-end' : 'flex-start'
-                            }}
-                          >
-                            <div className="flex items-center gap-2">
-                              <Avatar
-                                profilePictureUrl={avatar?.profilePictureUrl}
-                                avatarEmoji={avatar?.emoji}
-                                avatarColor={avatar?.color}
-                                size="sm"
-                              />
-                              {isHost && <FaCrown className="text-yellow-300" />}
-                              <SlotMachineText text={playerUsername} />
-                              {isMe && (
-                                <span className="text-xs bg-white/30 px-2 py-0.5 rounded-full">
-                                  ({t('playerView.me')})
-                                </span>
-                              )}
-                            </div>
-                          </Badge>
-                        </motion.div>
-                      );
-                    })}
-                  </AnimatePresence>
-                </div>
-                {playersReady.length === 0 && (
-                  <p className="text-sm text-center text-slate-500 dark:text-gray-400 mt-2">
-                    {t('hostView.waitingForPlayers')}
-                  </p>
-                )}
-              </Card>
-            </motion.div>
-
-            {/* Share Game Section */}
-            <motion.div
-              initial={{ y: 20, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              transition={{ delay: 0.25 }}
-            >
-              <Card className="bg-white/90 dark:bg-slate-800/90 backdrop-blur-md border border-teal-500/30 shadow-[0_0_15px_rgba(20,184,166,0.1)] p-3 sm:p-4">
-                <h3 className="text-sm font-bold text-teal-600 dark:text-teal-300 mb-3 text-center">
-                  {t('playerView.inviteFriends') || 'Invite Friends'}
-                </h3>
-                <div className="flex flex-wrap gap-2 justify-center">
-                  <ShareButton
-                    variant="link"
-                    onClick={() => copyJoinUrl(gameCode, t)}
-                    icon={<FaLink />}
-                  >
-                    {t('joinView.copyLink')}
-                  </ShareButton>
-                  <ShareButton
-                    variant="whatsapp"
-                    onClick={() => shareViaWhatsApp(gameCode, '', t)}
-                    icon={<FaWhatsapp />}
-                  >
-                    {t('joinView.shareWhatsapp')}
-                  </ShareButton>
-                  <ShareButton
-                    variant="qr"
-                    onClick={() => setShowQR(true)}
-                    icon={<FaQrcode />}
-                  >
-                    {t('hostView.qrCode')}
-                  </ShareButton>
-                </div>
-                <div className="mt-3 text-center">
-                  <Badge className="bg-gradient-to-r from-teal-500 to-cyan-500 text-white px-3 py-1">
-                    {t('hostView.roomCode')}: {gameCode}
-                  </Badge>
-                </div>
-              </Card>
-            </motion.div>
-
-            {/* Chat Section */}
-            <motion.div
-              initial={{ y: 20, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              transition={{ delay: 0.3 }}
-            >
+            {/* Chat - RIGHT */}
+            <div className="lg:w-[350px] xl:w-[400px]">
               <RoomChat
                 username={username}
                 isHost={false}
                 gameCode={gameCode}
-                className="min-h-[300px]"
+                className="h-full min-h-[400px]"
               />
-            </motion.div>
+            </div>
           </div>
         </div>
 
@@ -1073,7 +1164,7 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
         <Dialog open={showQR} onOpenChange={setShowQR}>
           <DialogContent className="sm:max-w-md bg-white dark:bg-slate-800 border-cyan-500/30">
             <DialogHeader>
-              <DialogTitle className="text-center text-cyan-300 flex items-center justify-center gap-2">
+              <DialogTitle className="text-center text-cyan-600 dark:text-cyan-300 flex items-center justify-center gap-2">
                 <FaQrcode />
                 {t('joinView.qrCodeTitle')}
               </DialogTitle>
@@ -1082,11 +1173,11 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
               <div className="p-6 bg-white rounded-lg shadow-md">
                 <QRCodeSVG value={getJoinUrl(gameCode)} size={250} level="H" includeMargin />
               </div>
-              <h4 className="text-3xl font-bold text-cyan-400">{gameCode}</h4>
-              <p className="text-sm text-center text-slate-600 dark:text-gray-300">
+              <h4 className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-400">{gameCode}</h4>
+              <p className="text-sm text-center text-slate-500 dark:text-slate-400">
                 {t('joinView.scanToJoin')} {gameCode}
               </p>
-              <p className="text-xs text-center text-slate-500 dark:text-gray-400 mt-2">
+              <p className="text-xs text-center text-slate-500">
                 {getJoinUrl(gameCode)}
               </p>
             </div>
@@ -1131,7 +1222,7 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
 
   // Normal game UI (when game is active or waiting for results)
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-50 via-slate-100 to-slate-200 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 p-1 md:p-4 flex flex-col transition-colors duration-300">
+    <div className="min-h-screen bg-gradient-to-b from-slate-50 via-slate-100 to-slate-200 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 p-0 md:p-4 flex flex-col transition-colors duration-300">
 
       {/* GO Animation */}
       {showStartAnimation && (
@@ -1192,23 +1283,22 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
         </motion.div>
       )}
 
-      {/* Floating Achievement Dock */}
-      <AchievementDock
-        achievements={achievements}
-        className={`fixed top-16 z-40 ${dir === 'rtl' ? 'left-4' : 'right-4'}`}
-      />
-
       {/* 3 Column Layout: Found Words | Grid | Ranking */}
-      <div className="flex flex-col lg:flex-row gap-1 md:gap-2 max-w-7xl mx-auto flex-grow w-full overflow-hidden">
-        {/* Left Column: Found Words (Hidden on mobile, shown on desktop) */}
+      <div className="flex flex-col lg:flex-row gap-0 md:gap-2 max-w-7xl mx-auto flex-grow w-full overflow-hidden">
+        {/* Left Column: Found Words (Hidden on mobile, shown on desktop) - Neo-Brutalist */}
         <div className="hidden lg:flex lg:flex-col lg:w-64 xl:w-80 gap-2 min-h-0">
-          <Card className="bg-slate-900/95 dark:bg-slate-900/95 backdrop-blur-md border border-teal-500/40 shadow-[0_0_25px_rgba(20,184,166,0.2)] flex flex-col min-h-0 max-h-full overflow-hidden">
-            <CardHeader className="py-3 border-b border-teal-500/30 bg-gradient-to-r from-teal-900/50 to-cyan-900/50">
-              <CardTitle className="text-white text-base uppercase tracking-widest font-bold">
+          <div
+            className="bg-neo-cream border-4 border-neo-black rounded-neo-lg shadow-hard-lg flex flex-col min-h-0 max-h-[60vh] overflow-hidden"
+            style={{ transform: 'rotate(1deg)' }}
+          >
+            {/* Header */}
+            <div className="py-3 px-4 border-b-4 border-neo-black bg-neo-cyan">
+              <h3 className="text-neo-black text-base uppercase tracking-widest font-black">
                 {t('playerView.wordsFound')}
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="flex-1 overflow-y-auto p-3 bg-slate-900/90 min-h-0">
+              </h3>
+            </div>
+            {/* Content with fixed height */}
+            <div className="flex-1 overflow-y-auto p-3 min-h-0">
               <div className="space-y-2" ref={wordListRef}>
                 <AnimatePresence>
                   {foundWords.map((foundWordObj, index) => {
@@ -1221,12 +1311,12 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
                         initial={{ x: -30, opacity: 0 }}
                         animate={{ x: 0, opacity: 1 }}
                         exit={{ x: -30, opacity: 0 }}
-                        className={`p-3 rounded-lg text-center font-bold transition-all
+                        className={`p-2 text-center font-black uppercase border-3 border-neo-black rounded-neo transition-all
                           ${isInvalid
-                            ? 'bg-gradient-to-r from-red-500/80 to-pink-500/80 border border-red-400/60 text-white shadow-lg shadow-red-500/30 line-through opacity-70'
+                            ? 'bg-neo-red text-neo-cream shadow-hard-sm line-through opacity-70'
                             : isLatest
-                              ? 'bg-gradient-to-r from-cyan-500/80 to-teal-500/80 border border-cyan-400/60 text-white shadow-lg shadow-cyan-500/30'
-                              : 'bg-slate-800/70 border border-slate-700/80 text-white hover:bg-slate-800/90'}`}
+                              ? 'bg-neo-yellow text-neo-black shadow-hard'
+                              : 'bg-neo-cream text-neo-black shadow-hard-sm hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-hard'}`}
                       >
                         {applyHebrewFinalLetters(wordText).toUpperCase()}
                       </motion.div>
@@ -1234,19 +1324,19 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
                   })}
                 </AnimatePresence>
                 {foundWords.length === 0 && gameActive && (
-                  <p className="text-center text-slate-400 py-6 text-sm">
+                  <p className="text-center text-neo-black/60 py-6 text-sm font-bold">
                     {t('playerView.noWordsYet') || 'No words found yet'}
                   </p>
                 )}
               </div>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
         </div>
 
         {/* Center Column: Letter Grid */}
-        <div className="flex-1 flex flex-col gap-2 min-w-0 min-h-0">
-          <Card className="bg-slate-900/95 dark:bg-slate-900/95 backdrop-blur-md border border-cyan-500/40 shadow-[0_0_25px_rgba(6,182,212,0.2)] flex flex-col flex-grow overflow-hidden">
-            <CardContent className="flex-grow flex flex-col items-center justify-center p-1 md:p-2 bg-slate-900/90">
+        <div className="flex-1 flex flex-col gap-0 md:gap-2 min-w-0 min-h-0">
+          <Card className="bg-slate-900/95 dark:bg-slate-900/95 backdrop-blur-md border-0 md:border border-cyan-500/40 shadow-none md:shadow-[0_0_25px_rgba(6,182,212,0.2)] flex flex-col flex-grow overflow-hidden">
+            <CardContent className="flex-grow flex flex-col items-center justify-center p-0 md:p-2 bg-slate-900/90">
               {(letterGrid || shufflingGrid) ? (
                 <>
                   <GridComponent
@@ -1274,7 +1364,7 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
                         const msg = t('playerView.wordTooShortMin')
                           ? t('playerView.wordTooShortMin').replace('${min}', minWordLength)
                           : `Word too short! (min ${minWordLength} letters)`;
-                        toast.error(msg, { duration: 1000, icon: '⚠️' });
+                        wordErrorToast(msg, { duration: 1000 });
                         return;
                       }
 
@@ -1285,13 +1375,13 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
                         });
                         setFoundWords(prev => [...prev, { word: formedWord, isValid: null }]);
                       } else {
-                        toast.error(t('playerView.onlyLanguageWords'), { duration: 1000 });
+                        wordErrorToast(t('playerView.onlyLanguageWords'), { duration: 1000 });
                       }
                       setWord(''); // Clear input
                     }}
                     playerView={true}
                     comboLevel={comboLevel}
-                    className="w-full max-w-2xl"
+                    className="w-full max-w-full md:max-w-2xl"
                   />
 
                   {/* Shuffle Button - Only visible for host in waiting state */}
@@ -1310,7 +1400,7 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
                 </>
               ) : (
                 // Loading skeleton for the grid while waiting
-                <div className="w-full max-w-2xl aspect-square grid grid-cols-4 gap-2 sm:gap-3 p-2 sm:p-4">
+                <div className="w-full max-w-full md:max-w-2xl aspect-square grid grid-cols-4 gap-1 sm:gap-3 p-0 sm:p-4">
                   {Array.from({ length: 16 }).map((_, i) => (
                     <motion.div
                       key={i}
@@ -1345,33 +1435,42 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
           </div>
         </div>
 
-        {/* Right Column: Live Ranking */}
+        {/* Right Column: Live Ranking - Neo-Brutalist */}
         <div className="lg:w-64 xl:w-80 flex flex-col gap-2">
-          <Card className="bg-slate-900/95 dark:bg-slate-900/95 backdrop-blur-md border border-purple-500/40 shadow-[0_0_25px_rgba(168,85,247,0.2)] flex flex-col overflow-hidden max-h-[40vh] lg:max-h-none lg:flex-grow">
-            <CardHeader className="py-3 border-b border-purple-500/30 bg-gradient-to-r from-purple-900/50 to-pink-900/50">
-              <CardTitle className="flex items-center gap-2 text-white text-base uppercase tracking-widest font-bold">
-                <FaTrophy className="text-yellow-400 drop-shadow-[0_0_8px_rgba(251,191,36,0.6)]" />
+          <div
+            className="bg-neo-cream border-4 border-neo-black rounded-neo-lg shadow-hard-lg flex flex-col overflow-hidden max-h-[40vh] lg:max-h-none lg:flex-grow"
+            style={{ transform: 'rotate(-1deg)' }}
+          >
+            {/* Header */}
+            <div className="py-3 px-4 border-b-4 border-neo-black bg-neo-purple">
+              <h3 className="flex items-center gap-2 text-neo-cream text-base uppercase tracking-widest font-black">
+                <FaTrophy className="text-neo-yellow" style={{ filter: 'drop-shadow(2px 2px 0px var(--neo-black))' }} />
                 {t('playerView.leaderboard')}
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="overflow-y-auto flex-1 p-3 bg-slate-900/90">
+              </h3>
+            </div>
+            {/* Content */}
+            <div className="overflow-y-auto flex-1 p-3">
               <div className="space-y-2">
                 {leaderboard.map((player, index) => {
                   const isMe = player.username === username;
+                  // Neo-Brutalist rank colors (solid, no gradients)
+                  const getRankStyle = () => {
+                    if (index === 0) return 'bg-neo-yellow text-neo-black border-neo-black';
+                    if (index === 1) return 'bg-slate-300 text-neo-black border-neo-black';
+                    if (index === 2) return 'bg-neo-orange text-neo-black border-neo-black';
+                    return 'bg-neo-cream text-neo-black border-neo-black';
+                  };
                   return (
                   <motion.div
                     key={player.username}
                     initial={{ x: 50, opacity: 0 }}
                     animate={{ x: 0, opacity: 1 }}
                     transition={{ delay: index * 0.05 }}
-                    className={`flex items-center gap-3 p-3 rounded-lg transition-all hover:scale-[1.02]
-                      ${index === 0 ? 'bg-gradient-to-r from-yellow-500/90 to-orange-500/90 text-white shadow-lg shadow-yellow-500/30 border border-yellow-400/60' :
-                        index === 1 ? 'bg-gradient-to-r from-gray-400/90 to-gray-500/90 text-white shadow-md shadow-gray-500/20 border border-gray-400/60' :
-                          index === 2 ? 'bg-gradient-to-r from-orange-500/90 to-orange-600/90 text-white shadow-md shadow-orange-500/20 border border-orange-400/60' :
-                            'bg-slate-800/70 text-white border border-slate-700/80 hover:bg-slate-800/90'} ${dir === 'rtl' ? 'flex-row-reverse' : ''}`}
-                    style={player.avatar?.color && index > 2 ? { background: `linear-gradient(to right, ${player.avatar.color}60, ${player.avatar.color}90)`, borderColor: `${player.avatar.color}80` } : {}}
+                    className={`flex items-center gap-3 p-2 rounded-neo border-3 shadow-hard-sm transition-all
+                      hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-hard
+                      ${getRankStyle()} ${dir === 'rtl' ? 'flex-row-reverse' : ''}`}
                   >
-                    <div className="w-12 h-12 rounded-full flex items-center justify-center font-bold text-xl bg-black/20 backdrop-blur-sm shadow-inner">
+                    <div className="w-10 h-10 rounded-neo flex items-center justify-center font-black text-lg bg-neo-black text-neo-cream border-2 border-neo-black">
                       {index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : `#${index + 1}`}
                     </div>
                     <Avatar
@@ -1381,27 +1480,27 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode }) 
                       size="md"
                     />
                     <div className="flex-1 min-w-0">
-                      <div className={`font-bold truncate text-base flex items-center gap-2 ${dir === 'rtl' ? 'flex-row-reverse' : ''}`}>
+                      <div className={`font-black truncate text-base flex items-center gap-2 ${dir === 'rtl' ? 'flex-row-reverse' : ''}`}>
                         <SlotMachineText text={player.username} />
                         {isMe && (
-                          <span className="text-xs bg-white/30 px-2 py-0.5 rounded-full">
+                          <span className="text-xs bg-neo-black text-neo-cream px-2 py-0.5 rounded-neo font-bold">
                             ({t('playerView.me')})
                           </span>
                         )}
                       </div>
-                      <div className="text-sm font-semibold opacity-90">{player.score} pts</div>
+                      <div className="text-sm font-bold">{player.score} pts</div>
                     </div>
                   </motion.div>
                 );
                 })}
                 {leaderboard.length === 0 && (
-                  <p className="text-center text-slate-400 py-6 text-sm">
+                  <p className="text-center text-neo-black/60 py-6 text-sm font-bold">
                     {t('playerView.noPlayersYet') || 'No players yet'}
                   </p>
                 )}
               </div>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
 
           {/* Chat Component - Desktop only */}
           <div className="hidden lg:block">

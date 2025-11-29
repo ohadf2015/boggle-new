@@ -12,7 +12,6 @@ const GridComponent = ({
     selectedCells: externalSelectedCells,
     className,
     largeText = false,
-    playerView = false,
     comboLevel = 0,
     animateOnMount = false, // When true, adds a slot machine style cascade animation on initial render
     heatMapData = null // { cellUsageCounts: { "row,col": count }, maxCount: number } for results heat map
@@ -27,6 +26,7 @@ const GridComponent = ({
     const hasMovedRef = useRef(false);
     const autoSubmitTimeoutRef = useRef(null);
     const startCellRef = useRef(null);           // { row, col, letter }
+    const fadeTimeoutRef = useRef(null);         // Track fade timeout to cancel on new selection
 
     // Use external control if provided, otherwise internal state
     const selectedCells = externalSelectedCells || internalSelectedCells;
@@ -58,6 +58,12 @@ const GridComponent = ({
     const startSequentialFadeOut = useCallback((isCombo = false) => {
         if (selectedCells.length === 0) return;
 
+        // Cancel any existing fade timeout to prevent clearing new selections
+        if (fadeTimeoutRef.current) {
+            clearTimeout(fadeTimeoutRef.current);
+            fadeTimeoutRef.current = null;
+        }
+
         // Copy selected cells for fading animation
         const cellsToFade = [...selectedCells];
         setFadingCells(cellsToFade);
@@ -79,9 +85,13 @@ const GridComponent = ({
         // Clear all selections after animation completes
         // Give extra time for the SVG trail animation to complete (it has its own fade timing)
         const totalDelay = initialHold + cellsToFade.length * cellFadeDelay + (isCombo ? 800 : 200);
-        setTimeout(() => {
-            setSelectedCells([]);
-            setFadingCells([]);
+        fadeTimeoutRef.current = setTimeout(() => {
+            // Only clear if user hasn't started a new selection
+            if (!isTouchingRef.current) {
+                setSelectedCells([]);
+                setFadingCells([]);
+            }
+            fadeTimeoutRef.current = null;
         }, totalDelay);
     }, [selectedCells, setSelectedCells]);
 
@@ -206,6 +216,16 @@ const GridComponent = ({
         if (!interactive) return;
         isTouchingRef.current = true;
         hasMovedRef.current = false;
+
+        // Cancel any pending fade timeout to prevent it from clearing our new selection
+        if (fadeTimeoutRef.current) {
+            clearTimeout(fadeTimeoutRef.current);
+            fadeTimeoutRef.current = null;
+        }
+
+        // Clear any fading animation to allow immediate re-selection
+        // This ensures the grid feels responsive even during combo fade-out
+        setFadingCells([]);
 
         // Store initial touch position for deadzone detection
         const touch = event.touches?.[0] || event;
@@ -387,105 +407,113 @@ const GridComponent = ({
 
     const isLargeGrid = (grid[0]?.length || 0) > 8;
 
-    // Get combo colors based on level (escalating colors for gamification)
+    // Get combo colors based on level - NEO-BRUTALIST FLAT COLORS with hard shadows
     const getComboColors = (level) => {
-        // Always show combo multiplier text, even for level 0
-        const multiplier = `x${level + 1}`;
+        // Show combo bonus as +N (capped at +5 for scoring, but visual can go higher)
+        const bonus = Math.min(level, 5); // Actual bonus caps at 5
+        const bonusText = `+${bonus}`;
 
         if (level === 0) {
+            // No combo - Electric Yellow (Neo-Brutalist primary)
             return {
-                gradient: 'from-yellow-400 to-orange-500',
-                border: 'border-yellow-300',
-                shadow: 'shadow-lg',
-                text: null, // Don't show x1
+                bg: 'bg-neo-yellow',
+                border: 'border-neo-black',
+                shadow: 'shadow-hard',
+                text: null, // Don't show +0
                 flicker: false
             };
         } else if (level === 1) {
-            // x2 - Orange to red
+            // +1 - Orange
             return {
-                gradient: 'from-orange-400 to-red-500',
-                border: 'border-orange-300',
-                shadow: 'shadow-[0_0_15px_rgba(251,146,60,0.6)]',
-                text: multiplier,
+                bg: 'bg-neo-orange',
+                border: 'border-neo-black',
+                shadow: 'shadow-hard-lg',
+                text: bonusText,
                 flicker: false
             };
         } else if (level === 2) {
-            // x3 - Red to pink
+            // +2 - Red
             return {
-                gradient: 'from-red-400 to-pink-500',
-                border: 'border-red-300',
-                shadow: 'shadow-[0_0_20px_rgba(239,68,68,0.7)]',
-                text: multiplier,
-                flicker: false
+                bg: 'bg-neo-red',
+                border: 'border-neo-black',
+                shadow: 'shadow-hard-lg',
+                text: bonusText,
+                flicker: false,
+                textColor: 'text-neo-white'
             };
         } else if (level === 3) {
-            // x4 - Pink to purple
+            // +3 - Pink
             return {
-                gradient: 'from-pink-400 to-purple-500',
-                border: 'border-pink-300',
-                shadow: 'shadow-[0_0_25px_rgba(236,72,153,0.8)]',
-                text: multiplier,
-                flicker: false
+                bg: 'bg-neo-pink',
+                border: 'border-neo-black',
+                shadow: 'shadow-hard-lg',
+                text: bonusText,
+                flicker: false,
+                textColor: 'text-neo-white'
             };
         } else if (level === 4) {
-            // x5 - Purple multi-gradient
+            // +4 - Purple
             return {
-                gradient: 'from-purple-400 via-pink-500 to-red-500',
-                border: 'border-purple-300',
-                shadow: 'shadow-[0_0_30px_rgba(168,85,247,0.9)]',
-                text: multiplier,
-                flicker: false
+                bg: 'bg-neo-purple',
+                border: 'border-neo-black',
+                shadow: 'shadow-hard-xl',
+                text: bonusText,
+                flicker: false,
+                textColor: 'text-neo-white'
             };
         } else if (level === 5) {
-            // x6 - Purple to cyan
+            // +5 (max bonus) - Cyan
             return {
-                gradient: 'from-purple-400 via-blue-500 to-cyan-400',
-                border: 'border-cyan-300',
-                shadow: 'shadow-[0_0_35px_rgba(34,211,238,1)]',
-                text: multiplier,
+                bg: 'bg-neo-cyan',
+                border: 'border-neo-black',
+                shadow: 'shadow-hard-xl',
+                text: bonusText,
                 flicker: false
             };
         } else if (level === 6) {
-            // x7 - Cyan to green
+            // +5 (visual level 6) - Lime
             return {
-                gradient: 'from-cyan-400 via-teal-500 to-green-400',
-                border: 'border-teal-300',
-                shadow: 'shadow-[0_0_40px_rgba(20,184,166,1)]',
-                text: multiplier,
+                bg: 'bg-neo-lime',
+                border: 'border-neo-black',
+                shadow: 'shadow-hard-xl',
+                text: bonusText,
                 flicker: false
             };
         } else if (level === 7) {
-            // x8 - Rainbow (first rainbow level)
+            // +5 (visual level 7) - Rainbow with hard shadow
             return {
-                gradient: 'rainbow-gradient',
-                border: 'border-white',
-                shadow: 'shadow-[0_0_50px_rgba(255,255,255,0.8)]',
-                text: multiplier,
+                bg: 'rainbow-gradient',
+                border: 'border-neo-black border-4',
+                shadow: 'shadow-hard-xl',
+                text: bonusText,
                 flicker: false,
-                isRainbow: true
+                isRainbow: true,
+                textColor: 'text-neo-white'
             };
         } else if (level === 8) {
-            // x9 - Rainbow with strobe
+            // +5 (visual level 8) - Rainbow with strobe
             return {
-                gradient: 'rainbow-gradient',
-                border: 'border-white',
-                shadow: 'shadow-[0_0_55px_rgba(255,255,255,0.9)]',
-                text: multiplier,
-                flicker: true,
-                isRainbow: true,
-                strobe: true
-            };
-        } else {
-            // Level 9+ (x10+): Full rainbow with intense strobe
-            return {
-                gradient: 'rainbow-gradient',
-                border: 'border-white',
-                shadow: 'shadow-[0_0_70px_rgba(255,255,255,1)]',
-                text: multiplier,
+                bg: 'rainbow-gradient',
+                border: 'border-neo-black border-4',
+                shadow: 'shadow-hard-2xl',
+                text: bonusText,
                 flicker: true,
                 isRainbow: true,
                 strobe: true,
-                intenseStrobe: true
+                textColor: 'text-neo-white'
+            };
+        } else {
+            // Level 9+ : Full rainbow with intense strobe (bonus still +5)
+            return {
+                bg: 'rainbow-gradient',
+                border: 'border-neo-black border-5',
+                shadow: 'shadow-hard-2xl',
+                text: bonusText,
+                flicker: true,
+                isRainbow: true,
+                strobe: true,
+                intenseStrobe: true,
+                textColor: 'text-neo-white'
             };
         }
     };
@@ -540,26 +568,8 @@ const GridComponent = ({
         return { r, g, b, t };
     };
 
-    // Calculate cell positions for drawing trails
-    const getCellCenter = (rowIndex, colIndex) => {
-        if (!gridRef.current) return null;
-        const gridElement = gridRef.current;
-        const cells = gridElement.children;
-        const cellIndex = rowIndex * (grid[0]?.length || 4) + colIndex;
-        const cell = cells[cellIndex];
-        if (!cell) return null;
-
-        const cellRect = cell.getBoundingClientRect();
-        const gridRect = gridElement.getBoundingClientRect();
-
-        return {
-            x: cellRect.left - gridRect.left + cellRect.width / 2,
-            y: cellRect.top - gridRect.top + cellRect.height / 2
-        };
-    };
-
     return (
-        <div className="relative w-full h-full flex items-center justify-center">
+        <div className="relative w-full flex items-center justify-center">
             {/* Combo Indicator - Jumps through screen like GO animation */}
             <AnimatePresence mode="wait">
                 {comboLevel > 0 && comboColors.text && (
@@ -617,112 +627,43 @@ const GridComponent = ({
                 )}
             </AnimatePresence>
 
-            {/* Trail connector overlay - show for both selected and fading cells */}
-            {(selectedCells.length > 1 || fadingCells.length > 1) && gridRef.current && (
-                <svg
-                    className="absolute inset-0 pointer-events-none z-0"
-                    style={{ width: '100%', height: '100%' }}
-                >
-                    <defs>
-                        <linearGradient id="trailGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                            <stop offset="0%" stopColor={comboLevel > 0 ? "#ff6b00" : "#fbbf24"} stopOpacity={0.8} />
-                            <stop offset="100%" stopColor={comboLevel > 0 ? "#ff0000" : "#f97316"} stopOpacity={0.8} />
-                        </linearGradient>
-                        <filter id="glow">
-                            <feGaussianBlur stdDeviation={comboLevel > 0 ? "3" : "2"} result="coloredBlur" />
-                            <feMerge>
-                                <feMergeNode in="coloredBlur" />
-                                <feMergeNode in="SourceGraphic" />
-                            </feMerge>
-                        </filter>
-                    </defs>
-                    {/* Active selection trail */}
-                    {selectedCells.map((cell, index) => {
-                        if (index === 0) return null;
-                        const prevCell = selectedCells[index - 1];
-                        const start = getCellCenter(prevCell.row, prevCell.col);
-                        const end = getCellCenter(cell.row, cell.col);
-
-                        if (!start || !end) return null;
-
-                        return (
-                            <motion.line
-                                key={`trail-${index}`}
-                                x1={start.x}
-                                y1={start.y}
-                                x2={end.x}
-                                y2={end.y}
-                                stroke="url(#trailGradient)"
-                                strokeWidth={comboLevel > 0 ? 4 : 3}
-                                strokeLinecap="round"
-                                filter="url(#glow)"
-                                initial={{ opacity: 0 }}
-                                animate={{ opacity: 1 }}
-                                transition={{ duration: 0.1, ease: "easeOut" }}
-                            />
-                        );
-                    })}
-                    {/* Fading trail - renders during combo fade out with slower transition */}
-                    {/* Fades from drag START to drag END (first segment fades first, last segment fades last) */}
-                    {fadingCells.length > 1 && selectedCells.length === 0 && fadingCells.map((cell, index) => {
-                        if (index === 0) return null;
-                        const prevCell = fadingCells[index - 1];
-                        const start = getCellCenter(prevCell.row, prevCell.col);
-                        const end = getCellCenter(cell.row, cell.col);
-
-                        if (!start || !end) return null;
-
-                        // Segments are indexed 1 to N (index 0 is skipped as it's just a point, not a segment)
-                        // We want: first segment (index=1) fades first (delay=0), last segment fades last
-                        // So delay is simply proportional to (index - 1)
-                        const fadeOrder = index - 1;
-
-                        return (
-                            <motion.line
-                                key={`fading-trail-${index}`}
-                                x1={start.x}
-                                y1={start.y}
-                                x2={end.x}
-                                y2={end.y}
-                                stroke="url(#trailGradient)"
-                                strokeWidth={comboLevel > 0 ? 4 : 3}
-                                strokeLinecap="round"
-                                filter="url(#glow)"
-                                initial={{ opacity: 1 }}
-                                animate={{ opacity: 0 }}
-                                transition={{
-                                    // Combo: longer hold (500ms), slower fade (600ms), more stagger (120ms)
-                                    // Regular: quick fade
-                                    duration: comboLevel > 0 ? 0.6 : 0.3,
-                                    ease: comboLevel > 0 ? [0.4, 0, 0.2, 1] : "easeOut",
-                                    delay: comboLevel > 0 ? 0.5 + fadeOrder * 0.12 : fadeOrder * 0.05
-                                }}
-                            />
-                        );
-                    })}
-                </svg>
-            )}
-
+            {/* NEO-BRUTALIST: Clipboard frame wrapper with 2° tilt (only when not in active gameplay) */}
             <div
-                ref={gridRef}
-                dir="ltr"
-                className={cn(
-                    "grid touch-none select-none relative rounded-2xl p-2 sm:p-3 md:p-4 aspect-square w-full max-w-[min(90vh,90vw)]",
-                    isLargeGrid ? "gap-0.5 sm:gap-1" : "gap-1 sm:gap-1.5",
-                    className
-                )}
-                style={{
-                    gridTemplateColumns: `repeat(${grid[0]?.length || 4}, minmax(0, 1fr))`,
-                    background: 'linear-gradient(135deg, rgba(15, 23, 42, 0.95) 0%, rgba(30, 41, 59, 0.95) 100%)',
-                    boxShadow: '0 0 60px rgba(6, 182, 212, 0.4), inset 0 0 40px rgba(6, 182, 212, 0.1)'
-                }}
-                role="grid"
-                aria-label="Letter grid"
-                tabIndex={interactive ? 0 : -1}
-                onTouchMove={handleTouchMove}
-                onTouchEnd={handleTouchEnd}
-                onMouseMove={handleMouseMove}
+                className="game-board-frame relative w-full max-w-full"
+                style={{ transform: interactive ? 'none' : 'rotate(-2deg)' }}
             >
+                {/* Clipboard clip decoration */}
+                <div className="clipboard-clip" />
+
+                {/* Inner grid container */}
+                <div
+                    ref={gridRef}
+                    dir="ltr"
+                    className={cn(
+                        "grid touch-none select-none relative rounded-neo p-2 sm:p-3 md:p-4 aspect-square w-full max-w-full md:max-w-[min(90vh,880px)]",
+                        isLargeGrid ? "gap-1 sm:gap-1" : "gap-1 sm:gap-1.5",
+                        // Neo-Brutalist: cream paper background with subtle border
+                        "bg-neo-cream border-2 border-neo-black/20",
+                        className
+                    )}
+                    style={{
+                        gridTemplateColumns: `repeat(${grid[0]?.length || 4}, minmax(0, 1fr))`,
+                        // Subtle paper texture via background
+                        backgroundImage: 'var(--halftone-pattern)',
+                        backgroundColor: 'var(--neo-cream)',
+                        // Set responsive font size based on grid size using CSS calc
+                        // Formula: Each cell is (100% / gridSize), font should be ~55-70% of that
+                        '--cell-font-size': `calc((100cqw / ${grid[0]?.length || 4}) * ${largeText ? 0.55 : 0.50})`,
+                        // Enable container query units
+                        containerType: 'size',
+                    }}
+                    role="grid"
+                    aria-label="Letter grid"
+                    tabIndex={interactive ? 0 : -1}
+                    onTouchMove={handleTouchMove}
+                    onTouchEnd={handleTouchEnd}
+                    onMouseMove={handleMouseMove}
+                >
             {grid.map((row, i) =>
                 row.map((cell, j) => {
                     const isSelected = selectedCells.some(c => c.row === i && c.col === j);
@@ -763,30 +704,36 @@ const GridComponent = ({
                                 scale: isSelected ? { type: "spring", stiffness: reduceMotion ? 200 : 350, damping: reduceMotion ? 30 : 22 } : undefined
                             }}
                             className={cn(
-                                "aspect-square flex items-center justify-center font-bold shadow-lg cursor-pointer border-2 relative overflow-hidden focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500",
-                                isLargeGrid
-                                    ? (largeText ? "text-2xl sm:text-3xl" : "text-lg sm:text-xl")
-                                    : (largeText || playerView ? "text-4xl sm:text-5xl md:text-6xl" : "text-2xl sm:text-3xl"),
-                                // Only apply combo styling when selected (not when fading - fading cells return to normal)
+                                // NEO-BRUTALIST TILE: Clean, readable letters with hard shadows
+                                "aspect-square flex items-center justify-center font-black cursor-pointer relative overflow-hidden",
+                                "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan",
+                                // NEO-BRUTALIST: Selected tiles get combo colors, unselected stay clean white
                                 isSelected
                                     ? comboColors.isRainbow
-                                        ? `text-white ${comboColors.border} z-10 ${comboColors.shadow} border-white/40`
-                                        : `bg-gradient-to-br ${comboColors.gradient} text-white ${comboColors.border} z-10 ${comboColors.shadow} border-white/40`
-                                    : "bg-gradient-to-br from-slate-100 via-white to-slate-100 dark:from-slate-700 dark:via-slate-800 dark:to-slate-900 text-slate-900 dark:text-white border-slate-300/60 dark:border-slate-600/60 hover:scale-105 hover:shadow-xl dark:hover:bg-slate-700/80 active:scale-95 shadow-[0_4px_12px_rgba(0,0,0,0.1)]",
-                                // Smooth transition for combo styling fade
+                                        // Rainbow: gradient background with thick black border
+                                        ? `${comboColors.textColor || 'text-neo-black'} ${comboColors.border} z-10 ${comboColors.shadow}`
+                                        // Flat combo color with hard shadow
+                                        : `${comboColors.bg} ${comboColors.textColor || 'text-neo-black'} border-3 ${comboColors.border} z-10 ${comboColors.shadow}`
+                                    // UNSELECTED: Clean white tiles with subtle hard shadow - NO rotation, perfectly aligned
+                                    : "bg-neo-white text-neo-black border-3 border-neo-black shadow-hard-sm hover:shadow-hard hover:translate-x-[-1px] hover:translate-y-[-1px] active:translate-x-[1px] active:translate-y-[1px] active:shadow-hard-pressed",
+                                // Smooth transition for styling
                                 "transition-all",
-                                comboLevel > 0 ? "duration-500" : "duration-200"
+                                comboLevel > 0 ? "duration-300" : "duration-100"
                             )}
                             style={{
-                                borderRadius: '8px',
+                                // NEO-BRUTALIST: Chunky rounded corners
+                                borderRadius: '4px',
+                                // Responsive font size based on cell size
+                                fontSize: 'var(--cell-font-size)',
                                 ...(isSelected && comboColors.isRainbow ? {
-                                    background: 'linear-gradient(135deg, #ef4444, #f97316, #eab308, #22c55e, #06b6d4, #3b82f6, #8b5cf6, #ec4899)',
+                                    // Rainbow gradient with higher saturation for Neo-Brutalist
+                                    background: 'linear-gradient(135deg, #FF3366, #FF6B35, #FFE135, #BFFF00, #00FFFF, #FF1493, #4a1c6a)',
                                     backgroundSize: '400% 400%',
                                     animation: comboColors.strobe
-                                        ? (comboColors.intenseStrobe ? 'rainbow-cell 1s ease infinite, strobe-intense 0.15s infinite alternate' : 'rainbow-cell 1.5s ease infinite, strobe-light 0.25s infinite alternate')
-                                        : 'rainbow-cell 2s ease infinite'
+                                        ? (comboColors.intenseStrobe ? 'rainbow-cell 0.8s ease infinite, strobe-intense 0.12s infinite alternate' : 'rainbow-cell 1.2s ease infinite, strobe-light 0.2s infinite alternate')
+                                        : 'rainbow-cell 1.5s ease infinite'
                                 } : isSelected && comboColors.flicker ? {
-                                    animation: 'flicker 0.15s infinite alternate'
+                                    animation: 'flicker 0.12s infinite alternate'
                                 } : {})
                             }}
                         >
@@ -1099,6 +1046,7 @@ const GridComponent = ({
                     );
                 })
             )}
+                </div>
             </div>
         </div>
     );

@@ -2,33 +2,39 @@
 
 const { getGame, getLeaderboard } = require('./gameStateManager');
 
-// Calculate combo multiplier based on combo level
-// Combo 0: 1x (no bonus)
-// Combo 1: 1.1x (+10%)
-// Combo 2: 1.2x (+20%)
-// Combo 3: 1.4x (+40%)
-// Combo 4: 1.6x (+60%)
-// Combo 5: 1.8x (+80%)
-// Combo 6+: 2.0x (max bonus, +100%)
+// Get flat combo bonus based on combo level
+// Combo gives a flat bonus equal to the combo level (capped at 8)
+// Combo 0-2: +0 bonus (no bonus for small combos)
+// Combo 3: +1 bonus
+// Combo 4: +2 bonus
+// Combo 5: +3 bonus
+// Combo 6: +4 bonus
+// Combo 7: +6 bonus
+// Combo 8+: +8 bonus (max)
+const getComboBonus = (comboLevel) => {
+  if (comboLevel <= 2) return 0; // No bonus for combos 0-2
+  if (comboLevel === 3) return 1;
+  if (comboLevel === 4) return 2;
+  if (comboLevel === 5) return 3;
+  if (comboLevel === 6) return 4;
+  if (comboLevel === 7) return 6;
+  return 8; // Max bonus at combo 8+
+};
+
+// Legacy function for backwards compatibility (now returns 1.0 always)
 const getComboMultiplier = (comboLevel) => {
-  if (comboLevel <= 0) return 1.0;
-  if (comboLevel === 1) return 1.1;
-  if (comboLevel === 2) return 1.2;
-  if (comboLevel === 3) return 1.4;
-  if (comboLevel === 4) return 1.6;
-  if (comboLevel === 5) return 1.8;
-  return 2.0; // Max multiplier for combo 6+
+  return 1.0;
 };
 
 // Calculate score based on word length - 1 point per letter beyond the first
 // This gives every letter value: 2 letters = 1 point, 3 letters = 2 points, 4 letters = 3 points, etc.
-// Combo bonus is applied as a multiplier (rounded down)
+// Combo bonus is applied as flat addition
 const calculateWordScore = (word, comboLevel = 0) => {
   const length = word.length;
   if (length === 1) return 0; // Single letters not allowed
   const baseScore = length - 1; // Each letter beyond the first gets 1 point
-  const multiplier = getComboMultiplier(comboLevel);
-  return Math.floor(baseScore * multiplier);
+  const bonus = getComboBonus(comboLevel);
+  return baseScore + bonus;
 };
 
 /**
@@ -66,5 +72,6 @@ const calculateGameScores = (gameCode) => {
 module.exports = {
   calculateWordScore,
   calculateGameScores,
-  getComboMultiplier
+  getComboBonus,
+  getComboMultiplier // Legacy, kept for backwards compatibility
 };

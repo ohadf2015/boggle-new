@@ -2,12 +2,11 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useIdleTimer } from 'react-idle-timer';
 import confetti from 'canvas-confetti';
-import toast, { Toaster } from 'react-hot-toast';
+import { wordAcceptedToast, wordErrorToast, neoSuccessToast, neoErrorToast, neoInfoToast } from '../components/NeoToast';
 import { FaTrophy, FaClock, FaUsers, FaQrcode, FaSignOutAlt, FaWhatsapp, FaLink, FaCog, FaPlus, FaMinus, FaCrown, FaChevronDown, FaChevronUp } from 'react-icons/fa';
 import { QRCodeSVG } from 'qrcode.react';
 import { Button } from '../components/ui/button';
-import { Input } from '../components/ui/input';
-import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
+import { Card, CardContent } from '../components/ui/card';
 import { Badge } from '../components/ui/badge';
 import { Checkbox } from '../components/ui/checkbox';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '../components/ui/dialog';
@@ -31,9 +30,10 @@ import { copyJoinUrl, shareViaWhatsApp, getJoinUrl } from '../utils/share';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useMusic } from '../contexts/MusicContext';
 import { useSoundEffects } from '../contexts/SoundEffectsContext';
-import { useAchievementQueue, AchievementDock } from '../components/achievements';
+import { useAchievementQueue } from '../components/achievements';
 import { DIFFICULTIES, DEFAULT_DIFFICULTY, MIN_WORD_LENGTH_OPTIONS, DEFAULT_MIN_WORD_LENGTH } from '../utils/consts';
 import { cn } from '../lib/utils';
+import logger from '@/utils/logger';
 
 const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [], username, onShowResults }) => {
   const { t, language, dir } = useLanguage();
@@ -285,7 +285,7 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
     };
 
     const handlePlayerJoinedLate = (data) => {
-      toast.success(`${data.username} ${t('hostView.playerJoinedLate')} ⏰`, {
+      neoInfoToast(`${data.username} ${t('hostView.playerJoinedLate')}`, {
         icon: '🚀',
         duration: 4000,
       });
@@ -313,14 +313,31 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
       }
     };
 
-    // Handle host's own live achievements (when host is playing)
+    // Handle host's own live achievements
     const handleLiveAchievementUnlocked = (data) => {
-      if (hostPlaying && data.achievements) {
-        // Queue achievements for Xbox-style popup display
-        data.achievements.forEach(achievement => {
+      // Validate achievement data
+      if (!data || !data.achievements || !Array.isArray(data.achievements)) {
+        logger.warn('[HOST] Received invalid achievement data:', data);
+        return;
+      }
+
+      logger.log(`[HOST] Received ${data.achievements.length} live achievements:`,
+        data.achievements.map(a => a?.name || 'unknown').join(', '));
+
+      // Queue achievements for popup display (works whether host is playing or not)
+      data.achievements.forEach(achievement => {
+        if (achievement && achievement.name) {
           queueAchievement(achievement);
-        });
-        setHostAchievements(prev => [...prev, ...data.achievements]);
+        } else {
+          logger.warn('[HOST] Skipping invalid achievement:', achievement);
+        }
+      });
+
+      // Store achievements if host is playing
+      if (hostPlaying) {
+        const validAchievements = data.achievements.filter(a => a && a.name);
+        setHostAchievements(prev => [...prev, ...validAchievements]);
+        logger.log(`[HOST] Added ${validAchievements.length} achievements to host state`);
       }
     };
 
@@ -346,7 +363,7 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
           validations: validationArray,
         });
 
-        toast.success(t('hostView.allWordsAutoValidated') || 'All words auto-validated!', {
+        neoSuccessToast(t('hostView.allWordsAutoValidated') || 'All words auto-validated!', {
           icon: '✅',
           duration: 3000,
         });
@@ -373,22 +390,22 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
       setValidations(initialValidations);
 
       if (data.autoValidatedCount > 0) {
-        toast.success(`${data.autoValidatedCount} ${t('hostView.autoValidatedCount')}`, {
+        neoSuccessToast(`${data.autoValidatedCount} ${t('hostView.autoValidatedCount')}`, {
           duration: 5000,
           icon: '✅',
         });
       }
 
-      toast.success(t('hostView.validateWords'), {
+      neoInfoToast(t('hostView.validateWords'), {
         icon: '✅',
         duration: 5000,
       });
     };
 
     const handleValidationComplete = (data) => {
-      console.log('[HOST] Received validationComplete event:', data);
+      logger.log('[HOST] Received validationComplete event:', data);
       setShowValidation(false);
-      toast.success(t('hostView.validationComplete'), {
+      neoSuccessToast(t('hostView.validationComplete'), {
         icon: '🎉',
         duration: 3000,
       });
@@ -410,7 +427,7 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
     };
 
     const handleAutoValidationOccurred = (data) => {
-      toast(data.message || t('hostView.autoValidationCompleted'), {
+      neoInfoToast(data.message || t('hostView.autoValidationCompleted'), {
         icon: '⏱️',
         duration: 4000,
       });
@@ -418,7 +435,7 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
 
     const handleRoomClosedDueToInactivity = (data) => {
       intentionalExitRef.current = true;
-      toast.error(data.message || t('hostView.roomClosedInactivity'), {
+      neoErrorToast(data.message || t('hostView.roomClosedInactivity'), {
         icon: '⏰',
         duration: 5000,
       });
@@ -438,7 +455,7 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
           spread: 80,
           origin: { y: 0.6 },
         });
-        toast.success(t('hostView.gameOverCheckScores'), {
+        neoSuccessToast(t('hostView.gameOverCheckScores'), {
           icon: '🏁',
           duration: 5000,
         });
@@ -456,14 +473,13 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
       setGameStarted(true);
       setShowStartAnimation(true);
       setPlayerWordCounts({});
+      setPlayerScores({});  // Clear scores for new round
       setHostFoundWords([]);
       setHostAchievements([]); // Reset host achievements for new game
     };
 
     const handleWordAccepted = (data) => {
       if (hostPlaying) {
-        toast.success(`✓ ${data.word}`, { duration: 2000 });
-
         const now = Date.now();
         let newComboLevel;
         // Use refs to get current values (avoids stale closure bug)
@@ -498,14 +514,28 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
           setLastWordTime(null);
           lastWordTimeRef.current = null;
         }, comboTimeout);
+
+        // Calculate combo bonus for display
+        const baseScore = data.word.length - 1; // Base score without combo
+        const comboBonus = (data.score || baseScore) - baseScore;
+
+        // Neo-Brutalist word accepted toast with score and combo bonus
+        wordAcceptedToast(data.word, {
+          score: data.score || baseScore,
+          comboBonus: comboBonus > 0 ? comboBonus : 0,
+          comboLevel: newComboLevel,
+          duration: 2000
+        });
       }
     };
 
     const handleWordAlreadyFound = () => {
       if (hostPlaying) {
-        toast.error(t('playerView.wordAlreadyFound'), { duration: 2000 });
+        wordErrorToast(t('playerView.wordAlreadyFound'), { duration: 2000 });
         setComboLevel(0);
+        comboLevelRef.current = 0;
         setLastWordTime(null);
+        lastWordTimeRef.current = null;
         if (comboTimeoutRef.current) {
           clearTimeout(comboTimeoutRef.current);
         }
@@ -514,10 +544,12 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
 
     const handleWordNotOnBoard = (data) => {
       if (hostPlaying) {
-        toast.error(t('playerView.wordNotOnBoard'), { duration: 3000 });
+        wordErrorToast(t('playerView.wordNotOnBoard'), { duration: 3000 });
         setHostFoundWords(prev => prev.filter(w => w !== data.word));
         setComboLevel(0);
+        comboLevelRef.current = 0;
         setLastWordTime(null);
+        lastWordTimeRef.current = null;
         if (comboTimeoutRef.current) {
           clearTimeout(comboTimeoutRef.current);
         }
@@ -531,7 +563,7 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
       }
       setTournamentCreating(false);
       setTournamentData(data.tournament);
-      toast.success(`${t('hostView.tournamentMode')}: ${data.tournament.totalRounds} ${t('hostView.rounds')}`, {
+      neoSuccessToast(`${t('hostView.tournamentMode')}: ${data.tournament.totalRounds} ${t('hostView.rounds')}`, {
         icon: '🏆',
         duration: 4000,
       });
@@ -546,7 +578,7 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
         currentRound: data.roundNumber,
         standings: data.standings,
       }));
-      toast(`${t('hostView.tournamentRound')} ${data.roundNumber}/${data.totalRounds}`, {
+      neoInfoToast(`${t('hostView.tournamentRound')} ${data.roundNumber}/${data.totalRounds}`, {
         icon: '🏁',
         duration: 3000,
       });
@@ -565,7 +597,7 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
           spread: 100,
           origin: { y: 0.5 },
         });
-        toast.success(t('hostView.tournamentComplete'), {
+        neoSuccessToast(t('hostView.tournamentComplete'), {
           icon: '🏆',
           duration: 5000,
         });
@@ -588,7 +620,7 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
     const handleTournamentCancelled = () => {
       setTournamentData(null);
       setGameType('regular');
-      toast('Tournament cancelled', {
+      neoErrorToast('Tournament cancelled', {
         icon: '🚫',
         duration: 3000,
       });
@@ -657,7 +689,7 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
       tournamentTimeoutRef.current = setTimeout(() => {
         if (!tournamentData) {
           setTournamentCreating(false);
-          toast.error(t('hostView.tournamentCreateFailed'), {
+          neoErrorToast(t('hostView.tournamentCreateFailed'), {
             icon: '❌',
             duration: 5000,
           });
@@ -683,6 +715,7 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
     setGameStarted(true);
     setShowStartAnimation(true);
     setPlayerWordCounts({}); // Reset counts
+    setPlayerScores({}); // Reset scores
     setHostFoundWords([]); // Reset host words
     setHostAchievements([]); // Reset host achievements
 
@@ -695,7 +728,7 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
       minWordLength: minWordLength
     });
 
-    toast.success(t('common.gameStarted'), {
+    neoSuccessToast(t('common.gameStarted'), {
       icon: '🎮',
       duration: 3000,
     });
@@ -706,7 +739,7 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
     setRemainingTime(null);
     setGameStarted(false);
 
-    toast(t('hostView.gameStopped'), {
+    neoInfoToast(t('hostView.gameStopped'), {
       icon: '⏹️',
     });
   };
@@ -741,7 +774,7 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
     socket.emit('cancelTournament');
 
     setShowCancelTournamentDialog(false);
-    toast.success(t('hostView.tournamentCancelled') || 'Tournament cancelled', {
+    neoErrorToast(t('hostView.tournamentCancelled') || 'Tournament cancelled', {
       icon: '❌',
       duration: 3000,
     });
@@ -757,7 +790,7 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
       });
     });
 
-    console.log('[HOST] Submitting validation:', {
+    logger.log('[HOST] Submitting validation:', {
       validationArrayLength: validationArray.length,
       validations: validationArray
     });
@@ -766,8 +799,9 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
       validations: validationArray,
     });
 
-    toast.loading(t('hostView.validatingWords'), {
+    neoInfoToast(t('hostView.validatingWords'), {
       duration: 2000,
+      icon: '⏳',
     });
   }, [validations, socket, t]);
 
@@ -779,7 +813,7 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
   // Idle timer for auto-submitting validation after 15 seconds
   const handleValidationIdle = useCallback(() => {
     if (showValidation && submitValidationRef.current) {
-      toast(t('hostView.autoSubmittingValidation') || 'Auto-submitting validation due to inactivity', {
+      neoInfoToast(t('hostView.autoSubmittingValidation') || 'Auto-submitting validation due to inactivity', {
         icon: '⏱️',
         duration: 2000,
       });
@@ -1046,10 +1080,13 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
                   setValidations({});
                   setPlayerWords([]);
                   setPlayerWordCounts({});
+                  setPlayerScores({});  // Clear scores
+                  setHostFoundWords([]); // Clear host's found words
+                  setHostAchievements([]); // Clear host's achievements
 
                   setTimerValue('1');
 
-                  toast.success(`${t('common.newGameReady')} 🎮`, {
+                  neoSuccessToast(`${t('common.newGameReady')}`, {
                     icon: '🔄',
                     duration: 2000,
                   });
@@ -1114,18 +1151,18 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
       <div className="flex flex-col gap-3 sm:gap-4 md:gap-6 w-full max-w-6xl">
         {/* Row 1: Room Code + Language + Share (when not started) */}
         {!gameStarted && (
-          <Card className="bg-white/90 dark:bg-slate-800/90 backdrop-blur-md text-slate-900 dark:text-white p-3 sm:p-4 md:p-6 rounded-lg border border-cyan-500/30 shadow-[0_0_20px_rgba(6,182,212,0.15)]">
+          <Card className="bg-slate-800/95 text-neo-white p-3 sm:p-4 md:p-6 border-4 border-neo-black shadow-hard-lg">
             <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
               {/* Room Code and Language in same row */}
               <div className="flex flex-col items-center sm:items-start gap-2">
                 <div className="flex items-center gap-3">
                   <div className="text-center sm:text-left">
-                    <p className="text-sm text-cyan-600 dark:text-cyan-300">{t('hostView.roomCode')}:</p>
-                    <h2 className="text-3xl sm:text-4xl font-bold tracking-wide text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-400">
+                    <p className="text-sm text-neo-cyan font-bold uppercase">{t('hostView.roomCode')}:</p>
+                    <h2 className="text-3xl sm:text-4xl font-black tracking-wide text-neo-yellow">
                       {gameCode}
                     </h2>
                   </div>
-                  <Badge variant="outline" className="text-base sm:text-lg px-3 py-1 border-cyan-500/50 text-cyan-600 dark:text-cyan-300">
+                  <Badge className="text-base sm:text-lg px-3 py-1 bg-neo-cream text-neo-black border-3 border-neo-black shadow-hard-sm font-bold">
                     {roomLanguage === 'he' ? '🇮🇱 עברית' : roomLanguage === 'sv' ? '🇸🇪 Svenska' : roomLanguage === 'ja' ? '🇯🇵 日本語' : '🇺🇸 English'}
                   </Badge>
                   {tournamentData && (
@@ -1168,19 +1205,22 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
         {/* Row 2: Game Settings + Players List (side by side on desktop) */}
         {!gameStarted && (
           <div className="flex flex-col lg:flex-row lg:items-stretch gap-3 sm:gap-4 md:gap-6">
-            {/* Game Settings - LEFT */}
-          <Card className="flex-1 bg-white/80 dark:bg-slate-800/80 backdrop-blur-md p-3 sm:p-4 md:p-5 rounded-lg border border-purple-500/30 shadow-[0_0_15px_rgba(168,85,247,0.1)]">
-            <h3 className="text-base font-bold text-purple-600 dark:text-purple-300 mb-4 flex items-center gap-2">
-              <FaCog className="text-cyan-600 dark:text-cyan-400 text-sm" />
+            {/* Game Settings - LEFT - Neo-Brutalist Dark */}
+          <Card className="flex-1 p-3 sm:p-4 md:p-5 bg-slate-800/95 text-neo-white border-4 border-neo-black shadow-hard-lg">
+            <h3 className="text-base font-black uppercase text-neo-cream mb-4 flex items-center gap-2">
+              <FaCog className="text-neo-cyan text-sm" />
               {t('hostView.gameSettings')}
             </h3>
             <div className="w-full space-y-3 sm:space-y-4">
               {!gameStarted ? (
                 <>
-                  {/* Timer Input - Neon Style */}
-                  <div className="flex items-center gap-2 bg-slate-100 dark:bg-slate-700/50 border border-purple-500/30 px-3 py-2 rounded-md">
-                      <FaClock className="text-purple-600 dark:text-purple-400 text-sm" />
-
+                  {/* Timer Input */}
+                  <div className="space-y-2">
+                    <label className="text-sm font-bold uppercase text-neo-cream flex items-center gap-2">
+                      <FaClock className="text-neo-cyan text-sm" />
+                      {t('hostView.roundDuration')}
+                    </label>
+                    <div className="flex items-center gap-3">
                       {/* Minus Button */}
                       <button
                         type="button"
@@ -1189,24 +1229,17 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
                           return Math.max(1, current - 1).toString();
                         })}
                         disabled={gameStarted}
-                        className="w-8 h-8 flex items-center justify-center rounded-full bg-white dark:bg-slate-800 border border-purple-500/50 text-purple-600 dark:text-purple-300 hover:bg-purple-50 dark:hover:bg-purple-500/20 hover:border-purple-400 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="w-10 h-10 flex items-center justify-center rounded-neo bg-neo-cream text-neo-black border-2 border-neo-black shadow-hard-sm hover:shadow-hard hover:translate-x-[-1px] hover:translate-y-[-1px] active:shadow-none active:translate-x-[1px] active:translate-y-[1px] transition-all duration-100 disabled:opacity-50 disabled:cursor-not-allowed font-black"
                       >
-                        <FaMinus size={12} />
+                        <FaMinus size={14} />
                       </button>
 
-                      <Input
-                        id="timer"
-                        type="number"
-                        value={timerValue}
-                        onChange={(e) => setTimerValue(e.target.value)}
-                        onBlur={(e) => {
-                          const val = parseInt(e.target.value) || 0;
-                          if (val < 1) setTimerValue('1');
-                        }}
-                        min="1"
-                        className="h-10 w-16 text-center text-lg font-bold border-none bg-transparent text-slate-900 dark:text-white placeholder:text-slate-500 focus-visible:ring-0 p-0"
-                        placeholder="1"
-                      />
+                      <div className="flex items-center gap-2">
+                        <span className="text-3xl font-black text-neo-yellow w-12 text-center">
+                          {timerValue || '1'}
+                        </span>
+                        <span className="text-base text-neo-cream font-bold">{t('hostView.minutes')}</span>
+                      </div>
 
                       {/* Plus Button */}
                       <button
@@ -1216,13 +1249,12 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
                           return (current + 1).toString();
                         })}
                         disabled={gameStarted}
-                        className="w-8 h-8 flex items-center justify-center rounded-full bg-white dark:bg-slate-800 border border-purple-500/50 text-purple-600 dark:text-purple-300 hover:bg-purple-50 dark:hover:bg-purple-500/20 hover:border-purple-400 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="w-10 h-10 flex items-center justify-center rounded-neo bg-neo-cream text-neo-black border-2 border-neo-black shadow-hard-sm hover:shadow-hard hover:translate-x-[-1px] hover:translate-y-[-1px] active:shadow-none active:translate-x-[1px] active:translate-y-[1px] transition-all duration-100 disabled:opacity-50 disabled:cursor-not-allowed font-black"
                       >
-                        <FaPlus size={12} />
+                        <FaPlus size={14} />
                       </button>
-
-                      <span className="text-sm text-purple-600 dark:text-purple-300 font-medium mr-2">{t('hostView.minutes')}</span>
                     </div>
+                  </div>
 
                   {/* Game Type Selector */}
                   <GameTypeSelector
@@ -1236,12 +1268,12 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
                   <button
                     type="button"
                     onClick={() => setShowAdvancedSettings(!showAdvancedSettings)}
-                    className="w-full flex items-center justify-between p-3 bg-slate-100 dark:bg-slate-700/50 rounded-md border border-purple-500/30 hover:bg-slate-200 dark:hover:bg-slate-600/50 transition-all"
+                    className="w-full flex items-center justify-between py-2 text-neo-cream/70 hover:text-neo-cream transition-colors duration-100"
                   >
-                    <span className="text-sm font-medium text-purple-600 dark:text-purple-300">
+                    <span className="text-sm font-bold uppercase">
                       {t('hostView.advancedSettings')}
                     </span>
-                    {showAdvancedSettings ? <FaChevronUp className="text-purple-600 dark:text-purple-400" /> : <FaChevronDown className="text-purple-600 dark:text-purple-400" />}
+                    {showAdvancedSettings ? <FaChevronUp /> : <FaChevronDown />}
                   </button>
 
                   {/* Collapsible Advanced Settings */}
@@ -1255,52 +1287,59 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
                         className="overflow-hidden space-y-4"
                       >
                         {/* Host Play Option */}
-                        <div className="flex items-center gap-2 p-3 bg-slate-100 dark:bg-slate-700/50 rounded-md border border-purple-500/30">
+                        <div className="flex items-center gap-3">
                           <Checkbox
                             id="hostPlays"
                             checked={hostPlaying}
                             onCheckedChange={setHostPlaying}
-                            className="border-purple-500/50"
                           />
-                          <label htmlFor="hostPlays" className="text-sm font-medium text-purple-600 dark:text-purple-300 cursor-pointer">
+                          <label htmlFor="hostPlays" className="text-sm font-bold text-neo-cream cursor-pointer">
                             {t('hostView.hostPlays')}
                           </label>
                         </div>
 
-                        {/* Cancel Tournament Button - Only show if tournament has started */}
+                        {/* Cancel Tournament Button - Only show if tournament has started - Neo-Brutalist */}
                         {tournamentData && (
                           <Button
                             onClick={() => setShowCancelTournamentDialog(true)}
-                            className="w-full bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white text-xs py-2"
+                            className="w-full bg-neo-red text-neo-white text-xs py-2"
                           >
-                            ❌ {t('hostView.cancelTournament') || 'Cancel Tournament'}
+                            {t('hostView.cancelTournament') || 'Cancel Tournament'}
                           </Button>
                         )}
 
-                        {/* Difficulty Selection */}
+                        {/* Difficulty Selection - Neo-Brutalist Dark */}
                         <div className="space-y-2">
-                          <label className="text-sm font-medium text-purple-600 dark:text-purple-300">
+                          <label className="text-sm font-bold uppercase text-neo-cream">
                             {t('hostView.difficulty')}
                           </label>
                           <div className="flex flex-wrap gap-2">
                             {Object.keys(DIFFICULTIES).map((key) => {
                               const isSelected = difficulty === key;
+                              // Neo-Brutalist colors for difficulty
+                              const difficultyColors = {
+                                easy: 'bg-neo-lime',
+                                normal: 'bg-neo-yellow',
+                                medium: 'bg-neo-orange',
+                                hard: 'bg-neo-red text-neo-white',
+                                extreme: 'bg-neo-purple text-neo-white'
+                              };
                               return (
                                 <motion.button
                                   key={key}
                                   onClick={() => setDifficulty(key)}
-                                  whileHover={{ scale: 1.02 }}
-                                  whileTap={{ scale: 0.98 }}
+                                  whileHover={{ x: -1, y: -1 }}
+                                  whileTap={{ x: 2, y: 2 }}
                                   className={cn(
-                                    "px-3 py-2 rounded-md font-medium transition-all duration-300",
+                                    "px-3 py-2 rounded-neo font-bold transition-all duration-100 border-3 border-neo-black",
                                     isSelected
-                                      ? "bg-gradient-to-r from-cyan-500 to-teal-500 text-white text-sm shadow-[0_0_15px_rgba(6,182,212,0.4)]"
-                                      : "bg-slate-100 dark:bg-slate-700/60 text-slate-600 dark:text-slate-300 text-xs hover:bg-slate-200 dark:hover:bg-slate-600/60 border border-slate-200 dark:border-slate-600/50 hover:border-cyan-500/30"
+                                      ? `${difficultyColors[key] || 'bg-neo-cyan'} shadow-none translate-x-[2px] translate-y-[2px]`
+                                      : "bg-neo-cream text-neo-black shadow-hard-sm hover:shadow-hard"
                                   )}
                                 >
                                   <div className="flex flex-col items-center gap-0.5">
-                                    <span className="font-bold">{t(DIFFICULTIES[key].nameKey)}</span>
-                                    <span className="text-xs opacity-90">
+                                    <span className="font-black text-sm">{t(DIFFICULTIES[key].nameKey)}</span>
+                                    <span className="text-xs font-bold opacity-80">
                                       ({DIFFICULTIES[key].rows}x{DIFFICULTIES[key].cols})
                                     </span>
                                   </div>
@@ -1310,9 +1349,9 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
                           </div>
                         </div>
 
-                        {/* Minimum Word Length Selection */}
+                        {/* Minimum Word Length Selection - Neo-Brutalist Dark */}
                         <div className="space-y-2">
-                          <label className="text-sm font-medium text-purple-600 dark:text-purple-300">
+                          <label className="text-sm font-bold uppercase text-neo-cream">
                             {t('hostView.minWordLength') || 'Minimum Word Length'}
                           </label>
                           <div className="flex gap-2">
@@ -1322,13 +1361,13 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
                                 <motion.button
                                   key={option.value}
                                   onClick={() => setMinWordLength(option.value)}
-                                  whileHover={{ scale: 1.02 }}
-                                  whileTap={{ scale: 0.98 }}
+                                  whileHover={{ x: -1, y: -1 }}
+                                  whileTap={{ x: 2, y: 2 }}
                                   className={cn(
-                                    "px-4 py-2 rounded-md font-medium transition-all duration-300",
+                                    "px-4 py-2 rounded-neo font-bold transition-all duration-100 border-3 border-neo-black",
                                     isSelected
-                                      ? "bg-gradient-to-r from-cyan-500 to-teal-500 text-white text-sm shadow-[0_0_15px_rgba(6,182,212,0.4)]"
-                                      : "bg-slate-100 dark:bg-slate-700/60 text-slate-600 dark:text-slate-300 text-sm hover:bg-slate-200 dark:hover:bg-slate-600/60 border border-slate-200 dark:border-slate-600/50 hover:border-cyan-500/30"
+                                      ? "bg-neo-cyan text-neo-black shadow-none translate-x-[2px] translate-y-[2px]"
+                                      : "bg-neo-cream text-neo-black shadow-hard-sm hover:shadow-hard"
                                   )}
                                 >
                                   {t(option.labelKey) || `${option.value} letters`}
@@ -1341,12 +1380,12 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
                     )}
                   </AnimatePresence>
 
-                  {/* Start Button - Neon Glow */}
+                  {/* Start Button - Neo-Brutalist */}
                   <div className="pt-2 flex justify-center">
                     <Button
                       onClick={startGame}
                       disabled={!timerValue || playersReady.length === 0}
-                      className="w-full max-w-xs h-11 bg-gradient-to-r from-cyan-500 to-teal-500 hover:from-cyan-400 hover:to-teal-400 text-base font-bold text-white shadow-lg hover:shadow-[0_0_25px_rgba(6,182,212,0.5)] transition-all duration-300 disabled:opacity-50 disabled:hover:shadow-none"
+                      className="w-full max-w-xs h-11 text-base bg-neo-lime text-neo-black"
                     >
                       {t('hostView.startGame')}
                     </Button>
@@ -1356,7 +1395,7 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
                 <Button
                   onClick={stopGame}
                   variant="destructive"
-                  className="w-full max-w-xs h-12 text-base font-bold shadow-lg bg-gradient-to-r from-rose-500 to-pink-500 hover:from-rose-400 hover:to-pink-400 hover:shadow-[0_0_25px_rgba(244,63,94,0.5)] transition-all duration-300"
+                  className="w-full max-w-xs h-12 text-base bg-neo-red text-neo-white"
                 >
                   {t('hostView.stopGame')}
                 </Button>
@@ -1364,13 +1403,13 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
             </div>
           </Card>
 
-          {/* Players List - RIGHT */}
-          <Card className="lg:w-[350px] h-auto bg-white/80 dark:bg-slate-800/80 backdrop-blur-md p-3 sm:p-4 md:p-6 rounded-lg shadow-lg border border-purple-500/30 shadow-[0_0_15px_rgba(168,85,247,0.1)] flex flex-col">
-            <h3 className="text-lg font-bold text-purple-600 dark:text-purple-300 mb-4 flex items-center gap-2 flex-shrink-0">
-              <FaUsers className="text-purple-500 dark:text-purple-400" />
+          {/* Players List - RIGHT - Neo-Brutalist Dark */}
+          <Card className="lg:w-[350px] h-auto p-3 sm:p-4 md:p-6 flex flex-col bg-slate-800/95 text-neo-white border-4 border-neo-black shadow-hard-lg">
+            <h3 className="text-lg font-black uppercase text-neo-cream mb-4 flex items-center gap-2 flex-shrink-0">
+              <FaUsers className="text-neo-pink" />
               {t('hostView.playersJoined')} ({playersReady.length})
             </h3>
-            <div className="flex flex-col gap-2 flex-1 overflow-y-auto">
+            <div className="flex flex-col gap-3 flex-1 overflow-y-auto">
               <AnimatePresence>
                 {playersReady.map((player, index) => {
                   // Handle both old format (string) and new format (object)
@@ -1381,14 +1420,17 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
                   return (
                     <motion.div
                       key={username}
-                      initial={{ scale: 0, opacity: 0 }}
-                      animate={{ scale: 1, opacity: 1 }}
+                      initial={{ scale: 0, opacity: 0, rotate: -5 }}
+                      animate={{ scale: 1, opacity: 1, rotate: 0 }}
                       exit={{ scale: 0, opacity: 0 }}
                       transition={{ delay: index * 0.05 }}
                     >
                       <Badge
-                        className="bg-gradient-to-r from-purple-500 to-pink-500 font-bold text-white px-3 py-2 text-base w-full justify-between shadow-[0_0_10px_rgba(168,85,247,0.3)]"
-                        style={avatar?.color ? { background: `linear-gradient(to right, ${avatar.color}, ${avatar.color}dd)` } : {}}
+                        className={cn(
+                          "font-black px-3 py-2 text-base w-full justify-between border-3 border-neo-black shadow-hard-sm",
+                          isHost ? "bg-neo-yellow text-neo-black" : "bg-neo-cream text-neo-black"
+                        )}
+                        style={avatar?.color && !isHost ? { backgroundColor: avatar.color } : {}}
                       >
                         <div className="flex items-center gap-2">
                           <Avatar
@@ -1397,11 +1439,11 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
                             avatarColor={avatar?.color}
                             size="sm"
                           />
-                          {isHost && <FaCrown className="text-yellow-300" />}
+                          {isHost && <FaCrown className="text-neo-black" />}
                           <SlotMachineText text={username} />
                         </div>
                         {gameStarted && (
-                          <span className="bg-white/20 px-2 py-0.5 rounded-full text-sm">
+                          <span className="bg-neo-black/20 px-2 py-0.5 rounded-neo text-sm font-black">
                             {playerWordCounts[username] || 0}
                           </span>
                         )}
@@ -1412,7 +1454,7 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
               </AnimatePresence>
             </div>
             {playersReady.length === 0 && (
-              <p className="text-sm text-center text-slate-500 mt-2">
+              <p className="text-sm text-center text-neo-cream/60 font-bold mt-2">
                 {t('hostView.waitingForPlayers')}
               </p>
             )}
@@ -1423,10 +1465,10 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
         {/* Row 3: Letter Grid + Chat (side by side on desktop when not started) */}
         {!gameStarted && (
           <div className="flex flex-col lg:flex-row gap-3 sm:gap-4 md:gap-6">
-            {/* Letter Grid - LEFT */}
-            <Card className="flex-1 bg-white/80 dark:bg-slate-800/80 backdrop-blur-md p-1 sm:p-3 rounded-lg shadow-lg border border-cyan-500/30 shadow-[0_0_15px_rgba(6,182,212,0.1)] flex flex-col items-center">
+            {/* Letter Grid - LEFT - Neo-Brutalist */}
+            <Card className="flex-1 p-1 sm:p-3 flex flex-col items-center bg-slate-800/95 border-4 border-neo-black shadow-hard-lg">
               {/* Grid Container with Slot Machine Animation */}
-              <div className="w-full flex justify-center items-center transition-all duration-500 aspect-square max-w-[500px]">
+              <div className="w-full flex justify-center items-center transition-all duration-500 aspect-square max-w-full">
                 <div className="w-full h-full flex items-center justify-center">
                   <SlotMachineGrid
                     grid={shufflingGrid || tableData}
@@ -1453,27 +1495,24 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
           </div>
         )}
 
-        {/* Floating Achievement Dock (only when host is playing and game has started) */}
-        {hostPlaying && gameStarted && (
-          <AchievementDock
-            achievements={hostAchievements}
-            className={`fixed top-16 z-40 ${dir === 'rtl' ? 'left-4' : 'right-4'}`}
-          />
-        )}
-
         {/* Game Started View - Same layout as PlayerView */}
         {gameStarted && (
           <div className="flex flex-col lg:flex-row gap-1 md:gap-2 flex-grow w-full overflow-hidden transition-all duration-500 ease-in-out">
             {/* Left Column: Found Words (only when host is playing) */}
             {hostPlaying && (
-              <div className="hidden lg:flex lg:flex-col lg:w-64 xl:w-80 gap-2">
-                <Card className="bg-slate-900/95 dark:bg-slate-900/95 backdrop-blur-md border border-teal-500/40 shadow-[0_0_25px_rgba(20,184,166,0.2)] flex flex-col flex-grow overflow-hidden">
-                  <CardHeader className="py-3 border-b border-teal-500/30 bg-gradient-to-r from-teal-900/50 to-cyan-900/50">
-                    <CardTitle className="text-white text-base uppercase tracking-widest font-bold">
+              <div className="hidden lg:flex lg:flex-col lg:w-64 xl:w-80 gap-2 min-h-0">
+                <div
+                  className="bg-neo-cream border-4 border-neo-black rounded-neo-lg shadow-hard-lg flex flex-col min-h-0 max-h-[60vh] overflow-hidden"
+                  style={{ transform: 'rotate(1deg)' }}
+                >
+                  {/* Header */}
+                  <div className="py-3 px-4 border-b-4 border-neo-black bg-neo-cyan">
+                    <h3 className="text-neo-black text-base uppercase tracking-widest font-black">
                       {t('playerView.wordsFound')}
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="flex-1 overflow-y-auto p-3 bg-slate-900/90">
+                    </h3>
+                  </div>
+                  {/* Content with fixed height */}
+                  <div className="flex-1 overflow-y-auto p-3 min-h-0">
                     <div className="space-y-2">
                       <AnimatePresence>
                         {hostFoundWords.map((foundWord, index) => {
@@ -1484,10 +1523,10 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
                               initial={{ x: -30, opacity: 0 }}
                               animate={{ x: 0, opacity: 1 }}
                               exit={{ x: -30, opacity: 0 }}
-                              className={`p-3 rounded-lg text-center font-bold transition-all
+                              className={`p-2 text-center font-black uppercase border-3 border-neo-black rounded-neo transition-all
                                 ${isLatest
-                                  ? 'bg-gradient-to-r from-cyan-500/80 to-teal-500/80 border border-cyan-400/60 text-white shadow-lg shadow-cyan-500/30'
-                                  : 'bg-slate-800/70 border border-slate-700/80 text-white hover:bg-slate-800/90'}`}
+                                  ? 'bg-neo-yellow text-neo-black shadow-hard'
+                                  : 'bg-neo-cream text-neo-black shadow-hard-sm hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-hard'}`}
                             >
                               {applyHebrewFinalLetters(foundWord).toUpperCase()}
                             </motion.div>
@@ -1495,13 +1534,13 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
                         })}
                       </AnimatePresence>
                       {hostFoundWords.length === 0 && (
-                        <p className="text-center text-slate-400 py-6 text-sm">
+                        <p className="text-center text-neo-black/60 py-6 text-sm font-bold">
                           {t('playerView.noWordsYet') || 'No words found yet'}
                         </p>
                       )}
                     </div>
-                  </CardContent>
-                </Card>
+                  </div>
+                </div>
               </div>
             )}
 
@@ -1518,7 +1557,7 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
                 </motion.div>
               )}
 
-              <Card className="bg-slate-900/95 dark:bg-slate-900/95 backdrop-blur-md border border-cyan-500/40 shadow-[0_0_25px_rgba(6,182,212,0.2)] flex flex-col flex-grow overflow-hidden">
+              <Card className="bg-slate-800/95 dark:bg-slate-800/95 backdrop-blur-md border border-cyan-500/40 shadow-[0_0_25px_rgba(6,182,212,0.2)] flex flex-col flex-grow overflow-hidden">
                 <CardContent className="flex-grow flex flex-col items-center justify-center p-1 md:p-2 bg-slate-900/90">
                   <GridComponent
                     key={hostPlaying ? 'host-playing-grid' : 'host-spectating-grid'}
@@ -1534,7 +1573,7 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
                                     /^[a-zA-Z]+$/;
 
                       if (formedWord.length < minWordLength) {
-                        toast.error(t('playerView.wordTooShort'), { duration: 1000, icon: '⚠️' });
+                        wordErrorToast(t('playerView.wordTooShort'), { duration: 1000 });
                         return;
                       }
 
@@ -1545,7 +1584,7 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
                         });
                         setHostFoundWords(prev => [...prev, formedWord]);
                       } else {
-                        toast.error(t('playerView.onlyLanguageWords'), { duration: 1000 });
+                        wordErrorToast(t('playerView.onlyLanguageWords'), { duration: 1000 });
                       }
                     }}
                     className="w-full max-w-2xl"
@@ -1572,16 +1611,21 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
               )}
             </div>
 
-            {/* Right Column: Live Leaderboard (same style as PlayerView) */}
+            {/* Right Column: Live Leaderboard - Neo-Brutalist */}
             <div className="lg:w-64 xl:w-80 flex flex-col gap-2">
-              <Card className="bg-slate-900/95 dark:bg-slate-900/95 backdrop-blur-md border border-purple-500/40 shadow-[0_0_25px_rgba(168,85,247,0.2)] flex flex-col overflow-hidden max-h-[40vh] lg:max-h-none lg:flex-grow">
-                <CardHeader className="py-3 border-b border-purple-500/30 bg-gradient-to-r from-purple-900/50 to-pink-900/50">
-                  <CardTitle className="flex items-center gap-2 text-white text-base uppercase tracking-widest font-bold">
-                    <FaTrophy className="text-yellow-400 drop-shadow-[0_0_8px_rgba(251,191,36,0.6)]" />
+              <div
+                className="bg-neo-cream border-4 border-neo-black rounded-neo-lg shadow-hard-lg flex flex-col overflow-hidden max-h-[40vh] lg:max-h-none lg:flex-grow"
+                style={{ transform: 'rotate(-1deg)' }}
+              >
+                {/* Header */}
+                <div className="py-3 px-4 border-b-4 border-neo-black bg-neo-purple">
+                  <h3 className="flex items-center gap-2 text-neo-cream text-base uppercase tracking-widest font-black">
+                    <FaTrophy className="text-neo-yellow" style={{ filter: 'drop-shadow(2px 2px 0px var(--neo-black))' }} />
                     {t('playerView.leaderboard')}
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="overflow-y-auto flex-1 p-3 bg-slate-900/90">
+                  </h3>
+                </div>
+                {/* Content */}
+                <div className="overflow-y-auto flex-1 p-3">
                   <div className="space-y-2">
                     {(() => {
                       const sortedPlayers = [...playersReady].map(player => {
@@ -1597,20 +1641,25 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
                         };
                       }).sort((a, b) => b.score - a.score);
 
+                      // Neo-Brutalist rank colors (solid, no gradients)
+                      const getRankStyle = (index) => {
+                        if (index === 0) return 'bg-neo-yellow text-neo-black border-neo-black';
+                        if (index === 1) return 'bg-slate-300 text-neo-black border-neo-black';
+                        if (index === 2) return 'bg-neo-orange text-neo-black border-neo-black';
+                        return 'bg-neo-cream text-neo-black border-neo-black';
+                      };
+
                       return sortedPlayers.map((player, index) => (
                         <motion.div
                           key={player.username}
                           initial={{ x: 50, opacity: 0 }}
                           animate={{ x: 0, opacity: 1 }}
                           transition={{ delay: index * 0.05 }}
-                          className={`flex items-center gap-3 p-3 rounded-lg transition-all hover:scale-[1.02]
-                            ${index === 0 ? 'bg-gradient-to-r from-yellow-500/90 to-orange-500/90 text-white shadow-lg shadow-yellow-500/30 border border-yellow-400/60' :
-                              index === 1 ? 'bg-gradient-to-r from-gray-400/90 to-gray-500/90 text-white shadow-md shadow-gray-500/20 border border-gray-400/60' :
-                                index === 2 ? 'bg-gradient-to-r from-orange-500/90 to-orange-600/90 text-white shadow-md shadow-orange-500/20 border border-orange-400/60' :
-                                  'bg-slate-800/70 text-white border border-slate-700/80 hover:bg-slate-800/90'}`}
-                          style={player.avatar?.color && index > 2 ? { background: `linear-gradient(to right, ${player.avatar.color}60, ${player.avatar.color}90)`, borderColor: `${player.avatar.color}80` } : {}}
+                          className={`flex items-center gap-3 p-2 rounded-neo border-3 shadow-hard-sm transition-all
+                            hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-hard
+                            ${getRankStyle(index)}`}
                         >
-                          <div className="w-10 h-10 rounded-full flex items-center justify-center font-bold text-lg bg-black/20 backdrop-blur-sm shadow-inner">
+                          <div className="w-10 h-10 rounded-neo flex items-center justify-center font-black text-lg bg-neo-black text-neo-cream border-2 border-neo-black">
                             {index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : `#${index + 1}`}
                           </div>
                           <Avatar
@@ -1620,26 +1669,26 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
                             size="sm"
                           />
                           <div className="flex-1 min-w-0">
-                            <div className="font-bold truncate text-sm flex items-center gap-1">
-                              {player.isHost && <FaCrown className="text-yellow-300 text-xs" />}
+                            <div className="font-black truncate text-sm flex items-center gap-1">
+                              {player.isHost && <FaCrown className="text-neo-yellow" style={{ filter: 'drop-shadow(1px 1px 0px var(--neo-black))' }} />}
                               <SlotMachineText text={player.username} />
                             </div>
-                            <div className="text-xs opacity-80">{player.wordCount} {t('hostView.words') || 'words'}</div>
+                            <div className="text-xs font-bold">{player.wordCount} {t('hostView.words') || 'words'}</div>
                           </div>
-                          <div className="text-lg font-bold">
-                            {player.score} <span className="text-xs opacity-80">pts</span>
+                          <div className="text-lg font-black">
+                            {player.score} <span className="text-xs font-bold">pts</span>
                           </div>
                         </motion.div>
                       ));
                     })()}
                     {playersReady.length === 0 && (
-                      <p className="text-center text-slate-400 py-6 text-sm">
+                      <p className="text-center text-neo-black/60 py-6 text-sm font-bold">
                         {t('hostView.waitingForPlayers')}
                       </p>
                     )}
                   </div>
-                </CardContent>
-              </Card>
+                </div>
+              </div>
 
               {/* Chat Component - Desktop only */}
               <div className="hidden lg:block">

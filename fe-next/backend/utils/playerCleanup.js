@@ -24,6 +24,14 @@ function cleanupPlayerData(game, username) {
     delete game.playerAchievements[username];
   }
 
+  if (game.playerWordDetails) {
+    delete game.playerWordDetails[username];
+  }
+
+  if (game.playerCombos) {
+    delete game.playerCombos[username];
+  }
+
   // Note: playerAvatars has been deprecated and removed
   // Avatar data is now stored in game.users[username].avatar
 }

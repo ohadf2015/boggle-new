@@ -3,14 +3,21 @@ import { motion } from 'framer-motion';
 import { prefersReducedMotion } from '../utils/accessibility';
 
 /**
- * Loading spinner component with accessibility support
+ * LoadingSpinner - Neo-Brutalist styled loading spinner
  */
 export function LoadingSpinner({ size = 'md', className = '' }) {
   const sizes = {
-    sm: 'w-4 h-4',
-    md: 'w-8 h-8',
-    lg: 'w-12 h-12',
-    xl: 'w-16 h-16',
+    sm: 'w-5 h-5',
+    md: 'w-10 h-10',
+    lg: 'w-14 h-14',
+    xl: 'w-20 h-20',
+  };
+
+  const borderSizes = {
+    sm: 'border-2',
+    md: 'border-3',
+    lg: 'border-4',
+    xl: 'border-4',
   };
 
   const reducedMotion = prefersReducedMotion();
@@ -18,13 +25,17 @@ export function LoadingSpinner({ size = 'md', className = '' }) {
   return (
     <div className={`inline-block ${className}`} role="status" aria-label="Loading">
       <motion.div
-        className={`${sizes[size]} border-4 border-cyan-200 border-t-cyan-500 rounded-full`}
+        className={`
+          ${sizes[size]} ${borderSizes[size]}
+          border-neo-black border-t-neo-yellow
+          rounded-full
+        `}
         animate={reducedMotion ? {} : { rotate: 360 }}
         transition={
           reducedMotion
             ? {}
             : {
-                duration: 1,
+                duration: 0.8,
                 repeat: Infinity,
                 ease: 'linear',
               }
@@ -36,40 +47,55 @@ export function LoadingSpinner({ size = 'md', className = '' }) {
 }
 
 /**
- * Loading overlay component
+ * LoadingOverlay - Neo-Brutalist styled loading overlay
  */
 export function LoadingOverlay({ message = 'Loading...', transparent = false }) {
   return (
     <div
       className={`fixed inset-0 z-50 flex items-center justify-center ${
-        transparent ? 'bg-black/30' : 'bg-black/50'
+        transparent ? 'bg-neo-black/50' : 'bg-neo-black/80'
       }`}
+      style={{ backgroundImage: 'var(--halftone-pattern-lg)' }}
       role="alert"
       aria-live="assertive"
       aria-busy="true"
     >
-      <div className="bg-white dark:bg-slate-800 rounded-lg p-4 sm:p-6 md:p-8 shadow-2xl flex flex-col items-center gap-2 sm:gap-3 md:gap-4">
+      <motion.div
+        initial={{ scale: 0.8, rotate: -5 }}
+        animate={{ scale: 1, rotate: 2 }}
+        transition={{ duration: 0.3, ease: [0.68, -0.55, 0.265, 1.55] }}
+        className="
+          bg-neo-cream
+          border-4 border-neo-black
+          rounded-neo-lg
+          shadow-hard-xl
+          p-6 sm:p-8
+          flex flex-col items-center gap-4
+        "
+      >
         <LoadingSpinner size="lg" />
-        <p className="text-lg font-medium text-gray-700 dark:text-gray-200">{message}</p>
-      </div>
+        <p className="text-lg font-black uppercase tracking-wide text-neo-black">
+          {message}
+        </p>
+      </motion.div>
     </div>
   );
 }
 
 /**
- * Inline loading state component
+ * InlineLoading - Neo-Brutalist styled inline loading
  */
 export function InlineLoading({ message = 'Loading...', size = 'md' }) {
   return (
     <div className="flex items-center gap-3" role="status">
       <LoadingSpinner size={size} />
-      <span className="text-gray-600 dark:text-gray-300">{message}</span>
+      <span className="font-bold text-neo-cream">{message}</span>
     </div>
   );
 }
 
 /**
- * Skeleton loader for content
+ * SkeletonLoader - Neo-Brutalist styled skeleton loader
  */
 export function SkeletonLoader({ className = '', count = 1 }) {
   const reducedMotion = prefersReducedMotion();
@@ -79,9 +105,13 @@ export function SkeletonLoader({ className = '', count = 1 }) {
       {Array.from({ length: count }).map((_, index) => (
         <div
           key={index}
-          className={`bg-gray-200 dark:bg-gray-700 rounded ${className} ${
-            reducedMotion ? '' : 'animate-pulse'
-          }`}
+          className={`
+            bg-neo-navy-light
+            border-2 border-neo-black/20
+            rounded-neo
+            ${className}
+            ${reducedMotion ? '' : 'animate-pulse'}
+          `}
           role="status"
           aria-label="Loading content"
         >
@@ -93,7 +123,7 @@ export function SkeletonLoader({ className = '', count = 1 }) {
 }
 
 /**
- * Button loading state
+ * ButtonLoader - Neo-Brutalist styled button with loading state
  */
 export function ButtonLoader({ children, loading, disabled, ...props }) {
   return (

@@ -10,7 +10,7 @@ import { Toaster } from 'react-hot-toast';
 import ErrorBoundary from './components/ErrorBoundary';
 import LogRocket from 'logrocket';
 
-if (typeof window !== 'undefined') {
+if (typeof window !== 'undefined' && window.location.hostname !== 'localhost') {
     LogRocket.init('ioiov9/lexiclash');
 }
 
@@ -18,17 +18,17 @@ export function Providers({ children, lang }) {
     return (
         <ErrorBoundary>
             <ThemeProvider>
-                <MusicProvider>
-                    <SoundEffectsProvider>
-                        <AchievementQueueProvider>
-                            <AuthProvider>
-                                <LanguageProvider initialLanguage={lang}>
+                <LanguageProvider initialLanguage={lang}>
+                    <MusicProvider>
+                        <SoundEffectsProvider>
+                            <AchievementQueueProvider>
+                                <AuthProvider>
                                     {children}
-                                </LanguageProvider>
-                            </AuthProvider>
-                        </AchievementQueueProvider>
-                    </SoundEffectsProvider>
-                </MusicProvider>
+                                </AuthProvider>
+                            </AchievementQueueProvider>
+                        </SoundEffectsProvider>
+                    </MusicProvider>
+                </LanguageProvider>
             </ThemeProvider>
             <Toaster
                 position="top-center"

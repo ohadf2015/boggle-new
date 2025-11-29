@@ -22,6 +22,27 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
   const [isSupabaseEnabled, setIsSupabaseEnabled] = useState(false);
 
+  // Define fetchUserData before useEffect to fix "variable used before declaration" error
+  const fetchUserData = useCallback(async (userId) => {
+    // Fetch profile
+    const { data: profileData, error: profileError } = await getProfile(userId);
+
+    if (profileError && profileError.code === 'PGRST116') {
+      // Profile doesn't exist, will be created on first sign in
+      return;
+    }
+
+    if (profileData) {
+      setProfile(profileData);
+    }
+
+    // Fetch ranked progress
+    const { data: rankedData } = await getRankedProgress(userId);
+    if (rankedData) {
+      setRankedProgress(rankedData);
+    }
+  }, []);
+
   // Initialize and check auth state
   useEffect(() => {
     const initAuth = async () => {
@@ -59,33 +80,13 @@ export const AuthProvider = ({ children }) => {
     };
 
     initAuth();
-  }, []);
-
-  const fetchUserData = async (userId) => {
-    // Fetch profile
-    const { data: profileData, error: profileError } = await getProfile(userId);
-
-    if (profileError && profileError.code === 'PGRST116') {
-      // Profile doesn't exist, will be created on first sign in
-      return;
-    }
-
-    if (profileData) {
-      setProfile(profileData);
-    }
-
-    // Fetch ranked progress
-    const { data: rankedData } = await getRankedProgress(userId);
-    if (rankedData) {
-      setRankedProgress(rankedData);
-    }
-  };
+  }, [fetchUserData]);
 
   const refreshProfile = useCallback(async () => {
     if (user?.id) {
       await fetchUserData(user.id);
     }
-  }, [user?.id]);
+  }, [user, fetchUserData]);
 
   // Create profile after OAuth sign up
   const setupProfile = async (username, avatarEmoji, avatarColor) => {

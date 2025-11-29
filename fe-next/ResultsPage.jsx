@@ -1,14 +1,13 @@
 import React, { useMemo, useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { FaTrophy, FaSignOutAlt, FaStar } from 'react-icons/fa';
-import { Button } from './components/ui/button';
-import { Card } from './components/ui/card';
 import GridComponent from './components/GridComponent';
 import confetti from 'canvas-confetti';
 import { useLanguage } from './contexts/LanguageContext';
 import ResultsPlayerCard from './components/results/ResultsPlayerCard';
 import ResultsWinnerBanner from './components/results/ResultsWinnerBanner';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from './components/ui/alert-dialog';
+import { Button } from './components/ui/button';
 import { clearSession } from './utils/session';
 
 // Helper functions for finding word paths on the board (client-side version)
@@ -69,7 +68,7 @@ const LetterGrid = ({ letterGrid, heatMapData }) => {
       transition={{ delay: 0.3 }}
       className="w-full"
     >
-      <div className="w-full max-w-[500px] mx-auto p-2 sm:p-3 rounded-xl bg-gradient-to-br from-slate-800/40 to-slate-900/40 dark:from-slate-800/40 dark:to-slate-900/40 border-2 border-cyan-500/50 shadow-[0_4px_24px_rgba(6,182,212,0.3)] relative overflow-hidden">
+      <div className="w-full max-w-full mx-auto p-2 sm:p-3 rounded-xl bg-gradient-to-br from-slate-800/40 to-slate-900/40 dark:from-slate-800/40 dark:to-slate-900/40 border-2 border-cyan-500/50 shadow-[0_4px_24px_rgba(6,182,212,0.3)] relative overflow-hidden">
         {/* Glass glare effect */}
         <div className="absolute inset-0 bg-gradient-to-br from-white/20 via-transparent to-transparent pointer-events-none" />
         <GridComponent
@@ -229,52 +228,63 @@ const ResultsPage = ({ finalScores, letterGrid, gameCode, onReturnToRoom, userna
           ))}
         </div>
 
-        {/* Play Again Section - Centered */}
+        {/* Play Again Section - Neo-Brutalist */}
         {gameCode && onReturnToRoom && (
           <motion.div
-            initial={{ y: 30, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
+            initial={{ y: 30, opacity: 0, rotate: -2 }}
+            animate={{ y: 0, opacity: 1, rotate: 1 }}
             transition={{ delay: 0.5 + sortedScores.length * 0.1 }}
             className="mt-8 max-w-4xl mx-auto"
           >
-            <Card className="p-5 sm:p-6 bg-gradient-to-r from-slate-800/40 to-slate-900/40 border-2 border-cyan-500/50 shadow-[0_0_30px_rgba(6,182,212,0.3)] rounded-2xl relative overflow-hidden">
-              {/* Glass glare effect */}
-              <div className="absolute inset-0 bg-gradient-to-br from-white/15 via-transparent to-transparent pointer-events-none" />
+            <div className="p-5 sm:p-6 bg-neo-cyan border-4 border-neo-black rounded-neo-lg shadow-hard-xl relative overflow-hidden">
+              {/* Halftone texture pattern */}
+              <div
+                className="absolute inset-0 pointer-events-none opacity-10"
+                style={{
+                  backgroundImage: `radial-gradient(circle, var(--neo-black) 1px, transparent 1px)`,
+                  backgroundSize: '8px 8px',
+                }}
+              />
               <div className="text-center space-y-4 relative z-10">
                 <motion.h3
-                  className="text-xl sm:text-2xl font-bold text-white"
+                  className="text-xl sm:text-2xl font-black text-neo-black uppercase"
+                  style={{ textShadow: '2px 2px 0px var(--neo-yellow)' }}
                   animate={{ scale: [1, 1.02, 1] }}
                   transition={{ duration: 2, repeat: Infinity }}
                 >
                   {t('results.playAgainQuestion')}
                 </motion.h3>
-                <p className="text-slate-400 text-sm">
+                <p className="text-neo-black text-sm font-bold">
                   {t('results.playAgainDescription')}
                 </p>
                 <div className="flex flex-col sm:flex-row gap-3 justify-center mt-4">
-                  <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                    <Button
+                  <motion.div
+                    whileHover={{ x: -2, y: -2 }}
+                    whileTap={{ x: 2, y: 2 }}
+                  >
+                    <button
                       onClick={onReturnToRoom}
-                      size="lg"
-                      className="w-full sm:w-auto bg-gradient-to-r from-cyan-500 to-purple-600 hover:from-cyan-400 hover:to-purple-500 hover:shadow-[0_0_25px_rgba(6,182,212,0.6)] font-bold text-lg px-8 transition-all duration-300"
+                      className="w-full sm:w-auto bg-neo-yellow text-neo-black font-black text-lg px-8 py-3 uppercase border-4 border-neo-black rounded-neo shadow-hard hover:shadow-hard-lg transition-all flex items-center justify-center gap-2"
                     >
-                      <FaStar className="mr-2" />
+                      <FaStar />
                       {t('results.stayInRoom')}
-                    </Button>
+                    </button>
                   </motion.div>
-                  <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                    <Button
+                  <motion.div
+                    whileHover={{ x: -2, y: -2 }}
+                    whileTap={{ x: 2, y: 2 }}
+                  >
+                    <button
                       onClick={handleExitRoom}
-                      size="lg"
-                      className="w-full sm:w-auto font-bold text-lg px-8 shadow-lg hover:scale-105 transition-transform bg-red-500 hover:bg-red-600 border border-red-400/30 hover:shadow-[0_0_15px_rgba(239,68,68,0.5)]"
+                      className="w-full sm:w-auto bg-neo-red text-neo-cream font-black text-lg px-8 py-3 uppercase border-4 border-neo-black rounded-neo shadow-hard hover:shadow-hard-lg transition-all flex items-center justify-center gap-2"
                     >
-                      <FaSignOutAlt className="mr-2" />
+                      <FaSignOutAlt />
                       {t('results.leaveRoom')}
-                    </Button>
+                    </button>
                   </motion.div>
                 </div>
               </div>
-            </Card>
+            </div>
           </motion.div>
         )}
       </div>

@@ -25,6 +25,7 @@ const ACHIEVEMENT_ICONS = {
   EXPLORER: '🧭',
   STREAK_MASTER: '🔥',
   ANAGRAM_ARTIST: '🔀',
+  LETTER_POPPER: '🎈',
 };
 
 // Get localized achievements based on locale
@@ -34,11 +35,21 @@ const getLocalizedAchievements = (locale = 'he') => {
 
   const achievements = {};
   Object.keys(ACHIEVEMENT_ICONS).forEach(key => {
-    achievements[key] = {
-      name: t[key].name,
-      description: t[key].description,
-      icon: ACHIEVEMENT_ICONS[key]
-    };
+    if (!t[key]) {
+      // Fallback for missing translation - use English or key name
+      console.warn(`[ACHIEVEMENT] Missing translation for ${key} in locale ${supportedLocale}`);
+      achievements[key] = {
+        name: key.replace(/_/g, ' '),
+        description: `Achievement: ${key}`,
+        icon: ACHIEVEMENT_ICONS[key]
+      };
+    } else {
+      achievements[key] = {
+        name: t[key].name,
+        description: t[key].description,
+        icon: ACHIEVEMENT_ICONS[key]
+      };
+    }
   });
 
   return achievements;
@@ -74,52 +85,52 @@ const checkLiveAchievements = (game, username, word, timeSinceStart) => {
     newAchievements.push(localizedAchievements.TREASURE_HUNTER);
   }
 
-  // Quick Thinker - word within 10 seconds (LIVE)
-  if (timeSinceStart <= 10 && !achievements.includes('QUICK_THINKER')) {
+  // Quick Thinker - word within 5 seconds (LIVE) - HARDER
+  if (timeSinceStart <= 5 && !achievements.includes('QUICK_THINKER')) {
     achievements.push('QUICK_THINKER');
     newAchievements.push(localizedAchievements.QUICK_THINKER);
   }
 
-  // Speed Demon - 10 words in 2 minutes (LIVE)
-  if (game.playerWords[username].length >= 10 && timeSinceStart <= 120 && !achievements.includes('SPEED_DEMON')) {
+  // Speed Demon - 15 words in 2 minutes (LIVE) - HARDER
+  if (game.playerWords[username].length >= 15 && timeSinceStart <= 120 && !achievements.includes('SPEED_DEMON')) {
     achievements.push('SPEED_DEMON');
     newAchievements.push(localizedAchievements.SPEED_DEMON);
   }
 
-  // Combo King - multiples of 5 words (LIVE)
-  if (game.playerWords[username].length >= 5 &&
-      game.playerWords[username].length % 5 === 0 &&
+  // Combo King - multiples of 8 words (LIVE) - HARDER
+  if (game.playerWords[username].length >= 8 &&
+      game.playerWords[username].length % 8 === 0 &&
       !achievements.includes('COMBO_KING')) {
     achievements.push('COMBO_KING');
     newAchievements.push(localizedAchievements.COMBO_KING);
   }
 
-  // Wordsmith - 15 words (LIVE)
-  if (game.playerWords[username].length >= 15 && !achievements.includes('WORDSMITH')) {
+  // Wordsmith - 20 words (LIVE) - HARDER
+  if (game.playerWords[username].length >= 20 && !achievements.includes('WORDSMITH')) {
     achievements.push('WORDSMITH');
     newAchievements.push(localizedAchievements.WORDSMITH);
   }
 
-  // Lexicon - 20+ words (LIVE)
-  if (game.playerWords[username].length >= 20 && !achievements.includes('LEXICON')) {
+  // Lexicon - 28+ words (LIVE) - HARDER
+  if (game.playerWords[username].length >= 28 && !achievements.includes('LEXICON')) {
     achievements.push('LEXICON');
     newAchievements.push(localizedAchievements.LEXICON);
   }
 
-  // Double Trouble - 2 words within 5 seconds (LIVE)
-  const playerWordDetails = game.playerWordDetails[username];
+  // Double Trouble - 2 words within 2 seconds (LIVE) - HARDER
+  const playerWordDetails = game.playerWordDetails?.[username] || [];
   if (playerWordDetails.length >= 2 && !achievements.includes('DOUBLE_TROUBLE')) {
     const lastTwo = playerWordDetails.slice(-2);
-    if (lastTwo[1].timeSinceStart - lastTwo[0].timeSinceStart <= 5) {
+    if (lastTwo[1].timeSinceStart - lastTwo[0].timeSinceStart <= 2) {
       achievements.push('DOUBLE_TROUBLE');
       newAchievements.push(localizedAchievements.DOUBLE_TROUBLE);
     }
   }
 
-  // Triple Threat - 3 words within 8 seconds (LIVE)
+  // Triple Threat - 3 words within 5 seconds (LIVE) - HARDER
   if (playerWordDetails.length >= 3 && !achievements.includes('TRIPLE_THREAT')) {
     const lastThree = playerWordDetails.slice(-3);
-    if (lastThree[2].timeSinceStart - lastThree[0].timeSinceStart <= 8) {
+    if (lastThree[2].timeSinceStart - lastThree[0].timeSinceStart <= 5) {
       achievements.push('TRIPLE_THREAT');
       newAchievements.push(localizedAchievements.TRIPLE_THREAT);
     }
@@ -131,30 +142,30 @@ const checkLiveAchievements = (game, username, word, timeSinceStart) => {
     newAchievements.push(localizedAchievements.RARE_GEM);
   }
 
-  // Lightning Round - 5 words in first 30 seconds (LIVE)
-  if (game.playerWords[username].length >= 5 && timeSinceStart <= 30 && !achievements.includes('LIGHTNING_ROUND')) {
+  // Lightning Round - 8 words in first 30 seconds (LIVE) - HARDER
+  if (game.playerWords[username].length >= 8 && timeSinceStart <= 30 && !achievements.includes('LIGHTNING_ROUND')) {
     achievements.push('LIGHTNING_ROUND');
     newAchievements.push(localizedAchievements.LIGHTNING_ROUND);
   }
 
-  // Unstoppable - 30+ words (LIVE)
-  if (game.playerWords[username].length >= 30 && !achievements.includes('UNSTOPPABLE')) {
+  // Unstoppable - 40+ words (LIVE) - HARDER
+  if (game.playerWords[username].length >= 40 && !achievements.includes('UNSTOPPABLE')) {
     achievements.push('UNSTOPPABLE');
     newAchievements.push(localizedAchievements.UNSTOPPABLE);
   }
 
-  // Streak Master - 10+ combo streak (LIVE)
-  // Check if player has a combo tracker and reached 10+
+  // Streak Master - 15+ combo streak (LIVE) - HARDER
+  // Check if player has a combo tracker and reached 15+
   const currentCombo = game.playerCombos?.[username] || 0;
-  if (currentCombo >= 10 && !achievements.includes('STREAK_MASTER')) {
+  if (currentCombo >= 15 && !achievements.includes('STREAK_MASTER')) {
     achievements.push('STREAK_MASTER');
     newAchievements.push(localizedAchievements.STREAK_MASTER);
   }
 
-  // Comeback Kid - word in last 30 seconds (LIVE)
+  // Comeback Kid - word in last 15 seconds (LIVE) - HARDER
   // Note: gameDuration is in seconds, need to check if game duration exists
   const gameDuration = game.gameDuration || 180; // Default 3 minutes
-  if (timeSinceStart >= (gameDuration - 30) && !achievements.includes('COMEBACK_KID')) {
+  if (timeSinceStart >= (gameDuration - 15) && !achievements.includes('COMEBACK_KID')) {
     achievements.push('COMEBACK_KID');
     newAchievements.push(localizedAchievements.COMEBACK_KID);
   }
@@ -192,6 +203,7 @@ const checkAndAwardAchievements = (gameCode, username, word) => {
 
   const game = getGame(gameCode);
   if (!game || !game.playerAchievements || !game.playerAchievements[username]) {
+    console.log(`[ACHIEVEMENT] Skip - no game/playerAchievements for ${username} in ${gameCode}`);
     return [];
   }
 
@@ -199,7 +211,15 @@ const checkAndAwardAchievements = (gameCode, username, word) => {
   const currentTime = Date.now();
   const timeSinceStart = game.startTime ? (currentTime - game.startTime) / 1000 : 0;
 
-  return checkLiveAchievements(game, username, word, timeSinceStart);
+  console.log(`[ACHIEVEMENT] Checking achievements for ${username} - word: "${word}", timeSinceStart: ${timeSinceStart.toFixed(1)}s, wordCount: ${game.playerWords[username]?.length || 0}`);
+
+  const newAchievements = checkLiveAchievements(game, username, word, timeSinceStart);
+
+  if (newAchievements.length > 0) {
+    console.log(`[ACHIEVEMENT] ${username} earned:`, newAchievements.map(a => a.name).join(', '));
+  }
+
+  return newAchievements;
 };
 
 /**
@@ -222,6 +242,7 @@ const getPlayerAchievements = (gameCode, username) => {
 
 // Award final achievements after validation (post-game)
 const awardFinalAchievements = (game, users) => {
+  console.log(`[ACHIEVEMENT] awarding final achievements for ${users.length} players`);
   users.forEach(username => {
     // Safety check: ensure player data exists
     if (!game.playerWordDetails[username]) {
@@ -249,19 +270,19 @@ const awardFinalAchievements = (game, users) => {
       addAchievement('WORD_MASTER');
     }
 
-    // Speed Demon - 10 valid words in 2 minutes
+    // Speed Demon - 15 valid words in 2 minutes - HARDER
     const wordsIn2Min = validWords.filter(w => w.timeSinceStart <= 120);
-    if (wordsIn2Min.length >= 10) {
+    if (wordsIn2Min.length >= 15) {
       addAchievement('SPEED_DEMON');
     }
 
-    // Lexicon - 20+ valid words
-    if (validWords.length >= 20) {
+    // Lexicon - 28+ valid words - HARDER
+    if (validWords.length >= 28) {
       addAchievement('LEXICON');
     }
 
-    // Combo King - 5+ valid words (multiples of 5)
-    if (validWords.length >= 5 && validWords.length % 5 === 0) {
+    // Combo King - 8+ valid words (multiples of 8) - HARDER
+    if (validWords.length >= 8 && validWords.length % 8 === 0) {
       addAchievement('COMBO_KING');
     }
 
@@ -270,8 +291,8 @@ const awardFinalAchievements = (game, users) => {
       addAchievement('PERFECTIONIST');
     }
 
-    // Wordsmith - 15+ valid words
-    if (validWords.length >= 15) {
+    // Wordsmith - 20+ valid words - HARDER
+    if (validWords.length >= 20) {
       addAchievement('WORDSMITH');
     }
 
@@ -298,25 +319,25 @@ const awardFinalAchievements = (game, users) => {
       addAchievement('EXPLORER');
     }
 
-    // Dictionary Diver - 25+ valid words
-    if (validWords.length >= 25) {
+    // Dictionary Diver - 32+ valid words - HARDER
+    if (validWords.length >= 32) {
       addAchievement('DICTIONARY_DIVER');
     }
 
-    // Unstoppable - 30+ valid words
-    if (validWords.length >= 30) {
+    // Unstoppable - 40+ valid words - HARDER
+    if (validWords.length >= 40) {
       addAchievement('UNSTOPPABLE');
     }
 
-    // Lightning Round - 5 valid words in first 30 seconds
+    // Lightning Round - 8 valid words in first 30 seconds - HARDER
     const wordsIn30Sec = validWords.filter(w => w.timeSinceStart <= 30);
-    if (wordsIn30Sec.length >= 5) {
+    if (wordsIn30Sec.length >= 8) {
       addAchievement('LIGHTNING_ROUND');
     }
 
-    // Comeback Kid - found a valid word in the last 30 seconds
+    // Comeback Kid - found a valid word in the last 15 seconds - HARDER
     const gameDuration = game.gameDuration || 180; // Default 3 minutes
-    if (validWords.some(w => w.timeSinceStart >= (gameDuration - 30))) {
+    if (validWords.some(w => w.timeSinceStart >= (gameDuration - 15))) {
       addAchievement('COMEBACK_KID');
     }
 
@@ -337,6 +358,8 @@ const awardFinalAchievements = (game, users) => {
 
     // Note: TRIPLE_THREAT and STREAK_MASTER are timing/combo based achievements
     // that are primarily awarded during live gameplay
+
+    console.log(`[ACHIEVEMENT] Final achievements for ${username}:`, currentAchievements);
   });
 };
 

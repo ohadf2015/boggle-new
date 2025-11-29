@@ -4,8 +4,13 @@ import { cva } from "class-variance-authority";
 
 import { cn } from "../../lib/utils";
 
+// Neo-Brutalist Label: Bold, uppercase styling
 const labelVariants = cva(
-  "text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+  [
+    "text-sm font-bold uppercase tracking-wide leading-none",
+    "text-neo-cream",
+    "peer-disabled:cursor-not-allowed peer-disabled:opacity-50",
+  ].join(" ")
 );
 
 const Label = React.forwardRef(({ className, ...props }, ref) => (

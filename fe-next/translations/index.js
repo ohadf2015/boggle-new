@@ -37,6 +37,7 @@ export const translations = {
       newGameReady: 'New game starting!',
       lightMode: 'Light Mode',
       darkMode: 'Dark Mode',
+      hurry: 'HURRY!',
     },
     music: {
       volume: 'Volume',
@@ -153,6 +154,7 @@ export const translations = {
       gameSettings: 'Game Settings',
       difficulty: 'Difficulty',
       timer: 'Timer',
+      roundDuration: 'Round Duration',
       minutes: 'minutes',
       playerJoinedLate: 'joined late!',
       playerFoundWord: 'found',
@@ -234,6 +236,7 @@ export const translations = {
       gameOver: 'Game Over! 🏁',
       wordAlreadyFound: 'Word already found! ❌',
       wordNotOnBoard: 'Word not on board! 🚫',
+      wordRejected: 'Not a valid word! ❌',
       newWord: 'New word!',
       scoresReady: 'Scores ready! ✅',
       roomClosed: 'Room closed',
@@ -254,6 +257,8 @@ export const translations = {
       wordSubmitted: 'Submitted',
       wordTooShort: 'Word too short! (min 2 letters)',
       wordTooShortMin: 'Word too short! (min ${min} letters)',
+      errorOccurred: 'An error occurred',
+      tooFast: 'Slow down! Submitting too fast',
       wordCount: 'words',
       longestWord: 'Longest',
       hostValidating: 'Host is validating words...',
@@ -275,7 +280,8 @@ export const translations = {
     chat: {
       title: 'Room Chat',
       placeholder: 'Type a message...',
-      noMessages: 'No messages yet. Start chatting!',
+      noMessages: 'No messages yet',
+      startChatting: 'Start chatting!',
     },
     results: {
       gameOver: 'Game Over',
@@ -298,10 +304,27 @@ export const translations = {
       stayInRoom: 'Yes, Stay in Room',
       leaveRoom: 'No, Leave Room',
       shared: 'Shared',
+      comboBonus: 'Combo Bonus',
+      basePoints: 'Base',
+      totalScore: 'Total',
       noPoints: 'No Points',
       otherPlayers: 'Other Players',
       needsVerification: 'Needs Verification',
       autoVerified: 'Auto-Verified',
+    },
+    playerTitles: {
+      champion: { name: 'Champion', icon: '👑', description: 'Winner of the game' },
+      perfectionist: { name: 'The Perfectionist', icon: '✨', description: 'Highest accuracy - all valid words' },
+      speedster: { name: 'Speed Demon', icon: '⚡', description: 'Fastest words per minute' },
+      wordsmith: { name: 'Wordsmith', icon: '📝', description: 'Found the most words' },
+      scholar: { name: 'Scholar', icon: '🎓', description: 'Found the longest word' },
+      explorer: { name: 'Explorer', icon: '🧭', description: 'Most diverse word lengths' },
+      sniper: { name: 'Sniper', icon: '🎯', description: 'Best accuracy (fewest invalid words)' },
+      comboMaster: { name: 'Combo Master', icon: '🔥', description: 'Highest combo bonus earned' },
+      earlyBird: { name: 'Early Bird', icon: '🐦', description: 'Most words in first minute' },
+      clutchPlayer: { name: 'Clutch Player', icon: '⏰', description: 'Most words in final 30 seconds' },
+      bigWordHunter: { name: 'Big Word Hunter', icon: '🦁', description: 'Most 6+ letter words' },
+      consistentPlayer: { name: 'Steady Eddie', icon: '📊', description: 'Most consistent word submissions' },
     },
     scorePage: {
       title: '🏆 Game Results',
@@ -438,6 +461,10 @@ export const translations = {
       ANAGRAM_ARTIST: {
         name: 'Anagram Artist',
         description: 'Found 2 consecutive anagram words'
+      },
+      LETTER_POPPER: {
+        name: 'Balloon Popper',
+        description: 'Popped 20+ letters in the main menu'
       }
     },
     auth: {
@@ -674,6 +701,7 @@ export const translations = {
       newGameReady: 'מתחיל משחק חדש!',
       lightMode: 'מצב בהיר',
       darkMode: 'מצב כהה',
+      hurry: 'מהרו!',
     },
     music: {
       volume: 'עוצמה',
@@ -790,6 +818,7 @@ export const translations = {
       gameSettings: 'הגדרות משחק',
       difficulty: 'רמת קושי',
       timer: 'טיימר',
+      roundDuration: 'משך סיבוב',
       minutes: 'דקות',
       playerJoinedLate: 'הצטרף למשחק באמצע!',
       playerFoundWord: 'מצא',
@@ -871,6 +900,7 @@ export const translations = {
       gameOver: 'המשחק נגמר! 🏁',
       wordAlreadyFound: 'כבר מצאת את המילה! ❌',
       wordNotOnBoard: 'המילה לא על הלוח! 🚫',
+      wordRejected: 'מילה לא תקינה! ❌',
       newWord: 'מילה חדשה!',
       scoresReady: 'הציונים מוכנים! ✅',
       roomClosed: 'החדר נסגר',
@@ -891,6 +921,8 @@ export const translations = {
       wordSubmitted: 'נשלח',
       wordTooShort: 'מילה קצרה מדי! (מינימום 2 אותיות)',
       wordTooShortMin: 'מילה קצרה מדי! (מינימום ${min} אותיות)',
+      errorOccurred: 'אירעה שגיאה',
+      tooFast: 'לאט! שולח מהר מדי',
       wordCount: 'מילים',
       longestWord: 'הארוכה ביותר',
       hostValidating: 'המארח מאמת מילים...',
@@ -912,7 +944,8 @@ export const translations = {
     chat: {
       title: 'צ\'אט החדר',
       placeholder: 'הקלד הודעה...',
-      noMessages: 'אין הודעות עדיין. התחל לשוחח!',
+      noMessages: 'אין הודעות עדיין',
+      startChatting: 'התחילו לשוחח!',
     },
     results: {
       gameOver: 'המשחק נגמר',
@@ -935,10 +968,27 @@ export const translations = {
       stayInRoom: 'כן, הישאר בחדר',
       leaveRoom: 'לא, צא מהחדר',
       shared: 'משותף',
+      comboBonus: 'בונוס קומבו',
+      basePoints: 'בסיס',
+      totalScore: 'סה"כ',
       noPoints: 'אין נקודות',
       otherPlayers: 'שחקנים אחרים',
       needsVerification: 'דורש אימות',
       autoVerified: 'אומת אוטומטית',
+    },
+    playerTitles: {
+      champion: { name: 'אלוף', icon: '👑', description: 'מנצח המשחק' },
+      perfectionist: { name: 'הפרפקציוניסט', icon: '✨', description: 'דיוק מושלם - כל המילים תקינות' },
+      speedster: { name: 'שד המהירות', icon: '⚡', description: 'הכי הרבה מילים לדקה' },
+      wordsmith: { name: 'מילונאי', icon: '📝', description: 'מצא הכי הרבה מילים' },
+      scholar: { name: 'המלומד', icon: '🎓', description: 'מצא את המילה הארוכה ביותר' },
+      explorer: { name: 'החוקר', icon: '🧭', description: 'מגוון אורכי מילים הכי גדול' },
+      sniper: { name: 'הצלף', icon: '🎯', description: 'דיוק הכי גבוה (הכי פחות טעויות)' },
+      comboMaster: { name: 'אמן הקומבו', icon: '🔥', description: 'בונוס קומבו הכי גבוה' },
+      earlyBird: { name: 'ציפור מוקדמת', icon: '🐦', description: 'הכי הרבה מילים בדקה הראשונה' },
+      clutchPlayer: { name: 'שחקן הרגע', icon: '⏰', description: 'הכי הרבה מילים ב-30 השניות האחרונות' },
+      bigWordHunter: { name: 'צייד מילים גדולות', icon: '🦁', description: 'הכי הרבה מילים של 6+ אותיות' },
+      consistentPlayer: { name: 'עקבי ויציב', icon: '📊', description: 'הכי עקבי בשליחת מילים' },
     },
     scorePage: {
       title: '🏆 תוצאות המשחק',
@@ -1075,6 +1125,10 @@ export const translations = {
       ANAGRAM_ARTIST: {
         name: 'אמן האנגרמות',
         description: 'מצא 2 מילים עוקבות מאותן אותיות'
+      },
+      LETTER_POPPER: {
+        name: 'מפוצץ בלונים',
+        description: 'פוצץ 20+ אותיות בתפריט הראשי'
       }
     },
     auth: {
@@ -1311,6 +1365,7 @@ export const translations = {
       newGameReady: 'Startar nytt spel!',
       lightMode: 'Ljust läge',
       darkMode: 'Mörkt läge',
+      hurry: 'SKYNDA!',
     },
     music: {
       volume: 'Volym',
@@ -1427,6 +1482,7 @@ export const translations = {
       gameSettings: 'Spelinställningar',
       difficulty: 'Svårighetsgrad',
       timer: 'Timer',
+      roundDuration: 'Rundans längd',
       minutes: 'minuter',
       playerJoinedLate: 'gick med sent!',
       playerFoundWord: 'hittade',
@@ -1506,6 +1562,7 @@ export const translations = {
       gameOver: 'Spelet slut! 🏁',
       wordAlreadyFound: 'Ordet redan hittat! ❌',
       wordNotOnBoard: 'Ordet finns inte på brädet! 🚫',
+      wordRejected: 'Inte ett giltigt ord! ❌',
       newWord: 'Nytt ord!',
       scoresReady: 'Resultat klara! ✅',
       roomClosed: 'Rummet stängt',
@@ -1526,6 +1583,8 @@ export const translations = {
       wordSubmitted: 'Skickat',
       wordTooShort: 'Ordet för kort! (min 2 bokstäver)',
       wordTooShortMin: 'Ordet för kort! (min ${min} bokstäver)',
+      errorOccurred: 'Ett fel inträffade',
+      tooFast: 'Sakta ner! Skickar för snabbt',
       wordCount: 'ord',
       longestWord: 'Längsta',
       hostValidating: 'Värden validerar ord...',
@@ -1547,7 +1606,8 @@ export const translations = {
     chat: {
       title: 'Rumschatt',
       placeholder: 'Skriv ett meddelande...',
-      noMessages: 'Inga meddelanden ännu. Börja chatta!',
+      noMessages: 'Inga meddelanden ännu',
+      startChatting: 'Börja chatta!',
     },
     results: {
       gameOver: 'Spelet slut',
@@ -1570,10 +1630,27 @@ export const translations = {
       stayInRoom: 'Ja, stanna i rummet',
       leaveRoom: 'Nej, lämna rummet',
       shared: 'Delad',
+      comboBonus: 'Kombobonus',
+      basePoints: 'Bas',
+      totalScore: 'Totalt',
       noPoints: 'Inga poäng',
       otherPlayers: 'Andra spelare',
       needsVerification: 'Behöver Verifiering',
       autoVerified: 'Automatiskt Verifierad',
+    },
+    playerTitles: {
+      champion: { name: 'Mästare', icon: '👑', description: 'Spelets vinnare' },
+      perfectionist: { name: 'Perfektionisten', icon: '✨', description: 'Högsta träffsäkerhet - alla ord giltiga' },
+      speedster: { name: 'Blixtsnabb', icon: '⚡', description: 'Flest ord per minut' },
+      wordsmith: { name: 'Ordsmeden', icon: '📝', description: 'Hittade flest ord' },
+      scholar: { name: 'Den Lärde', icon: '🎓', description: 'Hittade det längsta ordet' },
+      explorer: { name: 'Utforskaren', icon: '🧭', description: 'Mest varierade ordlängder' },
+      sniper: { name: 'Prickskytten', icon: '🎯', description: 'Bästa träffsäkerhet (minst ogiltiga ord)' },
+      comboMaster: { name: 'Kombomästare', icon: '🔥', description: 'Högsta intjänad kombobonus' },
+      earlyBird: { name: 'Morgonfågeln', icon: '🐦', description: 'Flest ord under första minuten' },
+      clutchPlayer: { name: 'Avgörande Spelaren', icon: '⏰', description: 'Flest ord under sista 30 sekunderna' },
+      bigWordHunter: { name: 'Storordsjägare', icon: '🦁', description: 'Flest ord med 6+ bokstäver' },
+      consistentPlayer: { name: 'Den Stadige', icon: '📊', description: 'Mest konsekvent ordinlämning' },
     },
     scorePage: {
       title: '🏆 Spelresultat',
@@ -1710,6 +1787,10 @@ export const translations = {
       ANAGRAM_ARTIST: {
         name: 'Anagramkonstnär',
         description: 'Hittade 2 konsekutiva anagramord'
+      },
+      LETTER_POPPER: {
+        name: 'Ballongsprängare',
+        description: 'Sprängde 20+ bokstäver i huvudmenyn'
       }
     },
     auth: {
@@ -1778,6 +1859,128 @@ export const translations = {
       playersInQueue: '${count} spelare i kö',
       matchFound: 'Match hittad!',
       requiresAuth: 'Logga in för att få tillgång till rankat läge'
+    },
+    legal: {
+      termsOfService: 'Användarvillkor',
+      privacyPolicy: 'Integritetspolicy',
+      backToGame: 'Tillbaka till spelet',
+      lastUpdated: 'Senast uppdaterad',
+      copyright: '© 2025 LexiClash Ltd. Alla rättigheter förbehållna.',
+      allRightsReserved: 'Alla rättigheter förbehållna.',
+      terms: {
+        title: 'Användarvillkor',
+        intro: 'Välkommen till LexiClash. Dessa användarvillkor reglerar din användning av vår multiplayer-ordspelsplattform på lexiclash.live.',
+        acceptance: {
+          title: '1. Godkännande av villkor',
+          content: 'Genom att använda LexiClash godkänner du dessa användarvillkor. Om du inte godkänner dessa villkor, vänligen använd inte vår tjänst.'
+        },
+        service: {
+          title: '2. Beskrivning av tjänsten',
+          content: 'LexiClash är ett gratis multiplayer-ordspel där spelare tävlar om att hitta ord på ett bokstavsrutnät i realtid. Tjänsten inkluderar användarkonton, topplistor, prestationer och multiplayer-funktioner.'
+        },
+        accounts: {
+          title: '3. Användarkonton',
+          content: 'Du kan använda LexiClash som gäst eller skapa ett konto med Google eller Discord-autentisering. Du ansvarar för att hålla dina kontouppgifter säkra. Vi lagrar inte dina lösenord - autentisering hanteras säkert via OAuth-leverantörer.'
+        },
+        conduct: {
+          title: '4. Användaruppförande',
+          content: 'Du samtycker till att använda LexiClash rättvist och respektfullt. Förbjudna aktiviteter inkluderar: användning av stötande eller diskriminerande visningsnamn, fusk eller utnyttjande av buggar, användning av automatiserade bottar eller skript, trakassering av andra spelare, och alla försök att störa tjänsten eller manipulera topplistor.'
+        },
+        contentLicense: {
+          title: '5. Licens för användarinnehåll',
+          content: 'Genom att använda LexiClash ger du oss en världsomspännande, royaltyfri, icke-exklusiv licens att visa ditt användarnamn, avatar och spelstatistik på topplistor, i spelet och inom tjänsten. Denna licens tillåter oss att driva spelet och visa spelarinformation för andra användare.'
+        },
+        intellectualProperty: {
+          title: '6. Immateriella rättigheter',
+          content: 'LexiClash, inklusive dess namn, logotyp, spelmekanik, kod och allt innehåll, ägs av LexiClash Ltd. Alla rättigheter förbehållna. Du får inte kopiera, modifiera, distribuera eller skapa härledda verk utan vårt uttryckliga skriftliga tillstånd.'
+        },
+        disclaimers: {
+          title: '7. Friskrivningar',
+          content: 'LexiClash tillhandahålls "i befintligt skick" och "som tillgängligt" utan garantier av något slag, varken uttryckliga eller underförstådda. Vi garanterar inte att tjänsten kommer att vara oavbruten, felfri eller säker. Vi ansvarar inte för förlust av data, inklusive spelframsteg eller statistik.'
+        },
+        liability: {
+          title: '8. Ansvarsbegränsning',
+          content: 'I den utsträckning lagen tillåter ska LexiClash Ltd inte hållas ansvarig för indirekta, tillfälliga, speciella, följd- eller straffskador som uppstår från din användning av tjänsten, inklusive men inte begränsat till förlust av vinst, data eller goodwill.'
+        },
+        indemnification: {
+          title: '9. Skadeersättning',
+          content: 'Du samtycker till att hålla LexiClash Ltd skadeslöst från alla anspråk, skador, förluster eller kostnader som uppstår från din överträdelse av dessa villkor, din användning av tjänsten eller din kränkning av någon annan parts rättigheter.'
+        },
+        termination: {
+          title: '10. Uppsägning',
+          content: 'Vi kan suspendera eller avsluta din åtkomst till LexiClash när som helst, med eller utan orsak, och med eller utan förvarning. Vid uppsägning upphör din rätt att använda tjänsten omedelbart och dina kontodata kan raderas.'
+        },
+        modifications: {
+          title: '11. Ändringar av villkor',
+          content: 'Vi förbehåller oss rätten att ändra dessa användarvillkor när som helst. Ändringar träder i kraft vid publicering på webbplatsen. Din fortsatta användning av LexiClash efter ändringar utgör godkännande av de nya villkoren.'
+        },
+        governingLaw: {
+          title: '12. Tillämplig lag',
+          content: 'Dessa användarvillkor ska styras av och tolkas i enlighet med lagarna i staten Israel, utan hänsyn till dess lagvalsregler.'
+        },
+        disputes: {
+          title: '13. Tvistlösning',
+          content: 'Alla tvister som uppstår från dessa villkor eller din användning av LexiClash ska först försöka lösas informellt. Om detta misslyckas ska tvister lösas exklusivt i domstolar i Israel, och du samtycker till sådan domstols personliga jurisdiktion.'
+        },
+        severability: {
+          title: '14. Avskiljbarhet',
+          content: 'Om någon bestämmelse i dessa användarvillkor befinns vara icke verkställbar eller ogiltig, ska den bestämmelsen begränsas eller elimineras i minsta nödvändiga utsträckning, och de återstående bestämmelserna ska fortsätta gälla fullt ut.'
+        }
+      },
+      privacy: {
+        title: 'Integritetspolicy',
+        intro: 'Denna integritetspolicy förklarar hur LexiClash Ltd samlar in, använder och skyddar din personliga information när du använder vårt multiplayer-ordspel på lexiclash.live.',
+        infoCollected: {
+          title: '1. Information vi samlar in',
+          content: 'Vi samlar in följande typer av information:',
+          oauth: 'Kontodata via Google/Discord OAuth: namn, e-postadress och profilbild',
+          profile: 'Spelarprofilinformation: visningsnamn, avatar-emoji/färg och anpassade profilbilder du laddar upp',
+          stats: 'Spelstatistik: poäng, vinster, hittade ord, spelade spel, speltid, prestationer och topplisteplaceringar',
+          gameState: 'Tillfälligt speltillstånd: rumsinformation, aktuell speldata (lagras tillfälligt i Redis med automatisk radering)',
+          analytics: 'Analysdata via LogRocket: sessionsinspelningar, felloggar och användningsmönster för att hjälpa oss förbättra tjänsten'
+        },
+        howWeUse: {
+          title: '2. Hur vi använder din information',
+          content: 'Vi använder din information för att: tillhandahålla autentisering och kontofunktioner, visa din profil och statistik för andra spelare, upprätthålla topplistor och rankingar, förbättra vår tjänst genom analys, skicka viktig tjänsterelaterad kommunikation, och säkerställa rättvist spel och upprätthålla våra användarvillkor.'
+        },
+        thirdParties: {
+          title: '3. Tredjepartstjänster',
+          content: 'Vi använder följande tredjepartstjänster för att driva LexiClash:',
+          supabase: 'Supabase - För autentisering, databaslagring och lagring av profilbilder',
+          logrocket: 'LogRocket - För analys, sessionsinspelning och felspårning',
+          google: 'Google - För OAuth-autentisering',
+          discord: 'Discord - För OAuth-autentisering',
+          noSale: 'Vi säljer inte din personliga information till tredje part.'
+        },
+        cookies: {
+          title: '4. Cookies och lokal lagring',
+          content: 'Vi använder essentiella cookies och lokal lagring för: autentiseringstoken (Supabase), användarnamn och preferenser (localStorage), temainställningar (mörkt/ljust läge) och språkpreferenser. Vi använder också LogRocket-cookies för analysändamål. Vi använder inte reklam- eller spårningscookies.'
+        },
+        dataRetention: {
+          title: '5. Datalagring',
+          content: 'Konto- och profildata behålls tills du begär radering. Spelstatistik behålls för att upprätthålla topplistans integritet. Tillfälligt speltillstånd (Redis) raderas automatiskt inom 1 timme. Analysdata behålls enligt LogRockets policyer.'
+        },
+        security: {
+          title: '6. Datasäkerhet',
+          content: 'Vi implementerar branschstandardsäkerhetsåtgärder inklusive: krypterade anslutningar (HTTPS), säker OAuth-autentisering, krypterad databaslagring via Supabase, och säkra WebSocket-anslutningar för realtidsspel.'
+        },
+        yourRights: {
+          title: '7. Dina rättigheter',
+          content: 'Du har rätt att: få tillgång till dina personuppgifter via din profilsida, uppdatera din profilinformation när som helst, radera ditt konto och tillhörande data, och begära information om hur dina data används.'
+        },
+        international: {
+          title: '8. Internationella användare',
+          content: 'Dina data kan överföras till och lagras i länder utanför ditt hemland, inklusive länder som kan ha andra dataskyddslagar. Genom att använda LexiClash samtycker du till sådana överföringar.'
+        },
+        changes: {
+          title: '9. Ändringar i denna policy',
+          content: 'Vi kan uppdatera denna integritetspolicy från tid till annan. Ändringar kommer att publiceras på denna sida med ett uppdaterat datum. Din fortsatta användning av LexiClash efter ändringar utgör godkännande av den uppdaterade policyn.'
+        },
+        governingLaw: {
+          title: '10. Tillämplig lag',
+          content: 'Denna integritetspolicy styrs av lagarna i staten Israel. Alla tvister ska lösas i domstolar i Israel.'
+        }
+      }
     }
   },
   ja: {
@@ -1818,6 +2021,7 @@ export const translations = {
       newGameReady: '新しいゲームを開始します！',
       lightMode: 'ライトモード',
       darkMode: 'ダークモード',
+      hurry: '急いで!',
     },
     music: {
       volume: '音量',
@@ -1934,6 +2138,7 @@ export const translations = {
       gameSettings: 'ゲーム設定',
       difficulty: '難易度',
       timer: 'タイマー',
+      roundDuration: 'ラウンド時間',
       minutes: '分',
       playerJoinedLate: '途中参加しました！',
       playerFoundWord: 'が見つけました',
@@ -2013,6 +2218,7 @@ export const translations = {
       gameOver: 'ゲームオーバー！ 🏁',
       wordAlreadyFound: 'すでに見つけた単語です！ ❌',
       wordNotOnBoard: 'ボードに単語がありません！ 🚫',
+      wordRejected: '有効な単語ではありません！ ❌',
       newWord: '新しい単語！',
       scoresReady: 'スコア準備完了！ ✅',
       roomClosed: 'ルームが閉じられました',
@@ -2033,6 +2239,8 @@ export const translations = {
       wordSubmitted: '送信済み',
       wordTooShort: '単語が短すぎます！（最低2文字）',
       wordTooShortMin: '単語が短すぎます！（最低${min}文字）',
+      errorOccurred: 'エラーが発生しました',
+      tooFast: 'ゆっくり！送信が速すぎます',
       wordCount: '単語',
       longestWord: '最長',
       hostValidating: 'ホストが単語を検証しています...',
@@ -2054,7 +2262,8 @@ export const translations = {
     chat: {
       title: 'ルームチャット',
       placeholder: 'メッセージを入力...',
-      noMessages: 'まだメッセージがありません。チャットを始めましょう！',
+      noMessages: 'まだメッセージがありません',
+      startChatting: 'チャットを始めましょう！',
     },
     results: {
       gameOver: 'ゲームオーバー',
@@ -2077,10 +2286,27 @@ export const translations = {
       stayInRoom: 'はい、ルームに留まる',
       leaveRoom: 'いいえ、ルームを退出',
       shared: '共有',
+      comboBonus: 'コンボボーナス',
+      basePoints: 'ベース',
+      totalScore: '合計',
       noPoints: 'ポイントなし',
       otherPlayers: '他のプレイヤー',
       needsVerification: '検証が必要',
       autoVerified: '自動検証済み',
+    },
+    playerTitles: {
+      champion: { name: 'チャンピオン', icon: '👑', description: 'ゲームの勝者' },
+      perfectionist: { name: '完璧主義者', icon: '✨', description: '最高の正確性 - 全ての単語が有効' },
+      speedster: { name: 'スピードスター', icon: '⚡', description: '1分あたり最多の単語' },
+      wordsmith: { name: '言葉の達人', icon: '📝', description: '最も多くの単語を発見' },
+      scholar: { name: '学者', icon: '🎓', description: '最も長い単語を発見' },
+      explorer: { name: '探検家', icon: '🧭', description: '最も多様な単語の長さ' },
+      sniper: { name: 'スナイパー', icon: '🎯', description: '最高の精度（無効な単語が最少）' },
+      comboMaster: { name: 'コンボマスター', icon: '🔥', description: '最高のコンボボーナス獲得' },
+      earlyBird: { name: '早起き鳥', icon: '🐦', description: '最初の1分で最多の単語' },
+      clutchPlayer: { name: 'クラッチプレイヤー', icon: '⏰', description: '最後の30秒で最多の単語' },
+      bigWordHunter: { name: '大物ハンター', icon: '🦁', description: '6文字以上の単語が最多' },
+      consistentPlayer: { name: '安定プレイヤー', icon: '📊', description: '最も安定した単語提出' },
     },
     scorePage: {
       title: '🏆 ゲーム結果',
@@ -2217,6 +2443,10 @@ export const translations = {
       ANAGRAM_ARTIST: {
         name: 'アナグラムアーティスト',
         description: '連続でアナグラム単語を見つけた'
+      },
+      LETTER_POPPER: {
+        name: 'バルーンポッパー',
+        description: 'メインメニューで20以上の文字をポップした'
       }
     },
     auth: {
@@ -2285,6 +2515,128 @@ export const translations = {
       playersInQueue: '${count}人がキューに',
       matchFound: 'マッチ発見!',
       requiresAuth: 'ランクマッチにはログインが必要です'
+    },
+    legal: {
+      termsOfService: '利用規約',
+      privacyPolicy: 'プライバシーポリシー',
+      backToGame: 'ゲームに戻る',
+      lastUpdated: '最終更新日',
+      copyright: '© 2025 LexiClash Ltd. All rights reserved.',
+      allRightsReserved: 'All rights reserved.',
+      terms: {
+        title: '利用規約',
+        intro: 'LexiClashへようこそ。この利用規約は、lexiclash.liveでのマルチプレイヤーワードゲームプラットフォームの使用を規定します。',
+        acceptance: {
+          title: '1. 規約への同意',
+          content: 'LexiClashにアクセスまたは使用することにより、本利用規約に拘束されることに同意したものとみなされます。これらの条件に同意されない場合は、当サービスをご利用にならないでください。'
+        },
+        service: {
+          title: '2. サービスの説明',
+          content: 'LexiClashは、プレイヤーがリアルタイムで文字グリッド上の単語を見つけて競い合う無料のマルチプレイヤーワードゲームです。このサービスには、ユーザーアカウント、リーダーボード、実績、マルチプレイヤーゲームプレイ機能が含まれます。'
+        },
+        accounts: {
+          title: '3. ユーザーアカウント',
+          content: 'LexiClashはゲストとして使用するか、GoogleまたはDiscord認証を使用してアカウントを作成できます。アカウント情報のセキュリティを維持する責任はお客様にあります。パスワードは保存されません。認証はOAuthプロバイダーを通じて安全に処理されます。'
+        },
+        conduct: {
+          title: '4. ユーザーの行動',
+          content: 'LexiClashを公正かつ敬意を持って使用することに同意するものとします。禁止される活動には、攻撃的または差別的な表示名の使用、チートまたはバグの悪用、自動ボットまたはスクリプトの使用、他のプレイヤーへの嫌がらせ、サービスの妨害またはリーダーボードランキングの操作の試みが含まれます。'
+        },
+        contentLicense: {
+          title: '5. ユーザーコンテンツライセンス',
+          content: 'LexiClashを使用することにより、リーダーボード、ゲーム内ディスプレイ、およびサービス内でユーザー名、アバター、ゲーム統計を表示するための世界規模のロイヤリティフリーの非独占的ライセンスを当社に付与します。このライセンスにより、ゲームを運営し、他のユーザーにプレイヤー情報を表示することができます。'
+        },
+        intellectualProperty: {
+          title: '6. 知的財産権',
+          content: 'LexiClash（名前、ロゴ、ゲームメカニクス、コード、すべてのコンテンツを含む）は、LexiClash Ltdが所有しています。すべての権利が留保されています。当社の明示的な書面による許可なく、コピー、変更、配布、または派生作品を作成することはできません。'
+        },
+        disclaimers: {
+          title: '7. 免責事項',
+          content: 'LexiClashは、明示または黙示を問わず、いかなる種類の保証もなく「現状のまま」および「利用可能な状態で」提供されます。サービスが中断なく、エラーなく、または安全であることを保証するものではありません。ゲームの進行状況や統計を含むデータの損失について責任を負いません。'
+        },
+        liability: {
+          title: '8. 責任の制限',
+          content: '法律で許可される最大限の範囲で、LexiClash Ltdは、利益、データ、またはのれんの損失を含むがこれに限定されない、サービスの使用から生じる間接的、偶発的、特別、結果的、または懲罰的損害について責任を負いません。'
+        },
+        indemnification: {
+          title: '9. 補償',
+          content: 'これらの条件への違反、サービスの使用、または他の当事者の権利侵害から生じるすべての請求、損害、損失、または費用からLexiClash Ltdを免責し、防御し、無害に保つことに同意するものとします。'
+        },
+        termination: {
+          title: '10. 終了',
+          content: '当社は、理由の有無にかかわらず、通知の有無にかかわらず、いつでもLexiClashへのアクセスを一時停止または終了することができます。終了時には、サービスを使用する権利は直ちに終了し、アカウントデータは削除される場合があります。'
+        },
+        modifications: {
+          title: '11. 規約の変更',
+          content: '当社は、いつでも本利用規約を変更する権利を留保します。変更は、ウェブサイトへの掲載時に有効となります。変更後もLexiClashを継続して使用することで、新しい条件に同意したものとみなされます。'
+        },
+        governingLaw: {
+          title: '12. 準拠法',
+          content: '本利用規約は、抵触法の規定に関係なく、イスラエル国の法律に準拠し、それに従って解釈されるものとします。'
+        },
+        disputes: {
+          title: '13. 紛争解決',
+          content: 'これらの条件またはLexiClashの使用から生じる紛争は、まず非公式に解決を試みるものとします。それが失敗した場合、紛争はイスラエルの裁判所でのみ解決され、そのような裁判所の対人管轄権に同意するものとします。'
+        },
+        severability: {
+          title: '14. 分離可能性',
+          content: '本利用規約のいずれかの条項が執行不能または無効であると判断された場合、その条項は必要最小限の範囲で制限または削除され、残りの条項は完全な効力を維持するものとします。'
+        }
+      },
+      privacy: {
+        title: 'プライバシーポリシー',
+        intro: 'このプライバシーポリシーは、lexiclash.liveでマルチプレイヤーワードゲームを使用する際に、LexiClash Ltdがお客様の個人情報をどのように収集、使用、保護するかを説明します。',
+        infoCollected: {
+          title: '1. 収集する情報',
+          content: '以下の種類の情報を収集します：',
+          oauth: 'Google/Discord OAuthによるアカウントデータ：名前、メールアドレス、プロフィール写真',
+          profile: 'プレイヤープロフィール情報：表示名、アバター絵文字/色、アップロードしたカスタムプロフィール写真',
+          stats: 'ゲーム統計：スコア、勝利数、見つけた単語、プレイしたゲーム、プレイ時間、実績、リーダーボードランキング',
+          gameState: '一時的なゲーム状態：ルーム情報、現在のゲームデータ（Redisに一時的に保存され、自動削除）',
+          analytics: 'LogRocketによる分析データ：サービス改善のためのセッション録画、エラーログ、使用パターン'
+        },
+        howWeUse: {
+          title: '2. 情報の使用方法',
+          content: '以下の目的で情報を使用します：認証とアカウント機能の提供、他のプレイヤーへのプロフィールと統計の表示、リーダーボードとランキングの維持、分析によるサービスの改善、重要なサービス関連の通知の送信、公正なプレイの確保と利用規約の施行。'
+        },
+        thirdParties: {
+          title: '3. サードパーティサービス',
+          content: 'LexiClashを運営するために以下のサードパーティサービスを使用しています：',
+          supabase: 'Supabase - 認証、データベースストレージ、プロフィール写真ストレージ',
+          logrocket: 'LogRocket - 分析、セッション録画、エラー追跡',
+          google: 'Google - OAuth認証',
+          discord: 'Discord - OAuth認証',
+          noSale: 'お客様の個人情報を第三者に販売することはありません。'
+        },
+        cookies: {
+          title: '4. Cookieとローカルストレージ',
+          content: '以下の目的でエッセンシャルCookieとローカルストレージを使用します：認証トークン（Supabase）、ユーザー名と設定（localStorage）、テーマ設定（ダーク/ライトモード）、言語設定。また、分析目的でLogRocket Cookieを使用します。広告やトラッキングCookieは使用しません。'
+        },
+        dataRetention: {
+          title: '5. データ保持',
+          content: 'アカウントとプロフィールデータは、削除をリクエストするまで保持されます。ゲーム統計は、リーダーボードの整合性を維持するために保持されます。一時的なゲーム状態（Redis）は1時間以内に自動的に削除されます。分析データは、LogRocketのポリシーに従って保持されます。'
+        },
+        security: {
+          title: '6. データセキュリティ',
+          content: '業界標準のセキュリティ対策を実施しています：暗号化された接続（HTTPS）、安全なOAuth認証、Supabaseによる暗号化されたデータベースストレージ、リアルタイムゲームプレイのための安全なWebSocket接続。'
+        },
+        yourRights: {
+          title: '7. お客様の権利',
+          content: 'お客様には以下の権利があります：プロフィールページからの個人データへのアクセス、いつでもプロフィール情報を更新、アカウントと関連データの削除、データの使用方法に関する情報のリクエスト。'
+        },
+        international: {
+          title: '8. 海外ユーザー',
+          content: 'お客様のデータは、異なるデータ保護法を持つ可能性のある国を含む、居住国以外の国に転送および保存される場合があります。LexiClashを使用することにより、そのような転送に同意するものとします。'
+        },
+        changes: {
+          title: '9. 本ポリシーの変更',
+          content: '当社は、随時このプライバシーポリシーを更新することがあります。変更は、更新された日付とともにこのページに掲載されます。変更後もLexiClashを継続して使用することで、更新されたポリシーに同意したものとみなされます。'
+        },
+        governingLaw: {
+          title: '10. 準拠法',
+          content: 'このプライバシーポリシーは、イスラエル国の法律に準拠します。すべての紛争は、イスラエルの裁判所で解決されるものとします。'
+        }
+      }
     }
   }
 };

@@ -3,6 +3,7 @@
 import React, { createContext, useContext, useEffect, useRef, useCallback } from 'react';
 import { Howl } from 'howler';
 import { useMusic } from './MusicContext';
+import logger from '@/utils/logger';
 
 const SoundEffectsContext = createContext(null);
 
@@ -31,19 +32,22 @@ export function SoundEffectsProvider({ children }) {
         preload: true,
         html5: false, // Web Audio API for pitch control
         onload: () => {
-          console.log(`[SFX] Loaded: ${key}`);
+          logger.log(`[SFX] Loaded: ${key}`);
         },
         onloaderror: (id, err) => {
-          console.warn(`[SFX] Failed to load ${key}:`, err);
+          logger.warn(`[SFX] Failed to load ${key}:`, err);
         },
       });
     });
 
     soundsLoadedRef.current = true;
 
+    // Copy ref value for cleanup to avoid stale ref warnings
+    const sounds = soundsRef.current;
+
     return () => {
       // Cleanup on unmount
-      Object.values(soundsRef.current).forEach(howl => {
+      Object.values(sounds).forEach(howl => {
         howl.unload();
       });
     };
@@ -55,7 +59,7 @@ export function SoundEffectsProvider({ children }) {
 
     const howl = soundsRef.current[soundKey];
     if (!howl) {
-      console.warn(`[SFX] Sound not found: ${soundKey}`);
+      logger.warn(`[SFX] Sound not found: ${soundKey}`);
       return;
     }
 

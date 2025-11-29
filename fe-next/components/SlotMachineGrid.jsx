@@ -107,18 +107,35 @@ const SlotMachineGrid = ({
   const isLargeGrid = totalCols > 8;
 
   return (
+    // NEO-BRUTALIST: Clipboard frame wrapper with tilt
     <div
-      ref={gridRef}
-      className={cn(
-        "grid touch-none select-none relative rounded-2xl p-2 sm:p-3 md:p-4 aspect-square w-full max-w-[min(90vh,90vw)]",
-        isLargeGrid ? "gap-0.5 sm:gap-1" : "gap-1 sm:gap-1.5",
-        "bg-slate-900/95 border-2 border-cyan-500/30",
-        className
-      )}
-      style={{
-        gridTemplateColumns: `repeat(${totalCols}, minmax(0, 1fr))`,
-      }}
+      className="game-board-frame relative w-full max-w-full"
+      style={{ transform: 'rotate(-2deg)' }}
     >
+      {/* Clipboard clip decoration */}
+      <div className="clipboard-clip" />
+
+      {/* Inner grid */}
+      <div
+        ref={gridRef}
+        className={cn(
+          "grid touch-none select-none relative rounded-neo p-2 sm:p-3 md:p-4 aspect-square w-full max-w-full md:max-w-[min(90vh,880px)]",
+          isLargeGrid ? "gap-1 sm:gap-1" : "gap-1 sm:gap-1.5",
+          // NEO-BRUTALIST: Cream paper background
+          "bg-neo-cream border-2 border-neo-black/20",
+          className
+        )}
+        style={{
+          gridTemplateColumns: `repeat(${totalCols}, minmax(0, 1fr))`,
+          backgroundImage: 'var(--halftone-pattern)',
+          backgroundColor: 'var(--neo-cream)',
+          // Set responsive font size based on grid size using CSS calc
+          // Formula: Each cell is (100% / gridSize), font should be ~50% of that
+          '--cell-font-size': `calc((100cqw / ${totalCols}) * 0.50)`,
+          // Enable container query units
+          containerType: 'size',
+        }}
+      >
       {grid.map((row, rowIndex) =>
         row.map((cell, colIndex) => {
           const isHighlighted = isCellHighlighted(rowIndex, colIndex);
@@ -137,6 +154,7 @@ const SlotMachineGrid = ({
           );
         })
       )}
+      </div>
     </div>
   );
 };

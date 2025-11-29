@@ -1,7 +1,13 @@
 import React from 'react';
 import { motion } from 'framer-motion';
+import { useLanguage } from '../contexts/LanguageContext';
 
+/**
+ * CircularTimer - Neo-Brutalist styled countdown timer
+ */
 const CircularTimer = ({ remainingTime, totalTime = 180 }) => {
+  const { t } = useLanguage();
+
   // Calculate the progress percentage
   const progress = totalTime > 0 ? (remainingTime / totalTime) * 100 : 0;
 
@@ -20,79 +26,114 @@ const CircularTimer = ({ remainingTime, totalTime = 180 }) => {
 
   // Determine color based on remaining time (20 seconds to match music transition)
   const isLowTime = remainingTime <= 20;
-  const gradientId = isLowTime ? 'timer-gradient-red' : 'timer-gradient-blue';
 
   return (
     <motion.div
-      initial={{ scale: 0, opacity: 0 }}
-      animate={{ scale: 1, opacity: 1 }}
-      transition={{ duration: 0.5, type: 'spring' }}
+      initial={{ scale: 0, opacity: 0, rotate: -10 }}
+      animate={{ scale: 1, opacity: 1, rotate: 0 }}
+      transition={{ duration: 0.4, ease: [0.68, -0.55, 0.265, 1.55] }}
       className="flex items-center justify-center"
     >
-      <div className="relative">
-        <svg width="120" height="120" className="transform -rotate-90">
-          <defs>
-            {/* Blue to Purple gradient for normal time */}
-            <linearGradient id="timer-gradient-blue" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stopColor="#06b6d4" />
-              <stop offset="50%" stopColor="#8b5cf6" />
-              <stop offset="100%" stopColor="#f97316" />
-            </linearGradient>
-            {/* Red to Orange gradient for low time */}
-            <linearGradient id="timer-gradient-red" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stopColor="#ef4444" />
-              <stop offset="100%" stopColor="#f97316" />
-            </linearGradient>
-          </defs>
+      {/* Neo-Brutalist frame */}
+      <div
+        className="
+          relative p-3
+          bg-neo-cream
+          border-4 border-neo-black
+          rounded-neo-lg
+          shadow-hard-lg
+        "
+        style={{ transform: 'rotate(-2deg)' }}
+      >
+        <div className="relative" style={{ transform: 'rotate(2deg)' }}>
+          <svg width="120" height="120" className="transform -rotate-90">
+            {/* Neo-Brutalist: Solid colors instead of gradients */}
 
-          {/* Background circle */}
-          <circle
-            cx="60"
-            cy="60"
-            r={radius}
-            stroke="rgba(148, 163, 184, 0.2)"
-            strokeWidth="8"
-            fill="none"
-          />
+            {/* Background circle - thick black stroke */}
+            <circle
+              cx="60"
+              cy="60"
+              r={radius}
+              stroke="var(--neo-black)"
+              strokeWidth="4"
+              fill="none"
+              opacity="0.2"
+            />
 
-          {/* Progress circle */}
-          <motion.circle
-            cx="60"
-            cy="60"
-            r={radius}
-            stroke={`url(#${gradientId})`}
-            strokeWidth="8"
-            fill="none"
-            strokeLinecap="round"
-            strokeDasharray={circumference}
-            strokeDashoffset={strokeDashoffset}
-            initial={{ strokeDashoffset: circumference }}
-            animate={{ strokeDashoffset }}
-            transition={{ duration: 0.5 }}
-            style={{
-              filter: isLowTime
-                ? 'drop-shadow(0 0 8px rgba(239, 68, 68, 0.8))'
-                : 'drop-shadow(0 0 8px rgba(139, 92, 246, 0.6))'
-            }}
-          />
-        </svg>
+            {/* Inner background circle */}
+            <circle
+              cx="60"
+              cy="60"
+              r={radius - 6}
+              stroke="var(--neo-black)"
+              strokeWidth="12"
+              fill="none"
+              opacity="0.1"
+            />
 
-        {/* Timer text in the center */}
-        <div className="absolute inset-0 flex items-center justify-center">
-          <motion.div
-            animate={isLowTime ? {
-              scale: [1, 1.1, 1],
-            } : {}}
-            transition={{ duration: 0.5, repeat: isLowTime ? Infinity : 0 }}
-            className={`text-3xl font-bold ${
-              isLowTime
-                ? 'text-red-500 dark:text-red-400'
-                : 'text-slate-800 dark:text-white'
-            }`}
-          >
-            {formatTime(remainingTime)}
-          </motion.div>
+            {/* Progress circle - solid Neo-Brutalist colors */}
+            <motion.circle
+              cx="60"
+              cy="60"
+              r={radius}
+              stroke={isLowTime ? 'var(--neo-red)' : 'var(--neo-cyan)'}
+              strokeWidth="10"
+              fill="none"
+              strokeLinecap="square"
+              strokeDasharray={circumference}
+              strokeDashoffset={strokeDashoffset}
+              initial={{ strokeDashoffset: circumference }}
+              animate={{ strokeDashoffset }}
+              transition={{ duration: 0.5 }}
+            />
+
+            {/* Outer ring */}
+            <circle
+              cx="60"
+              cy="60"
+              r={radius + 4}
+              stroke="var(--neo-black)"
+              strokeWidth="3"
+              fill="none"
+            />
+          </svg>
+
+          {/* Timer text in the center */}
+          <div className="absolute inset-0 flex items-center justify-center">
+            <motion.div
+              animate={isLowTime ? { scale: [1, 1.1, 1] } : {}}
+              transition={{ duration: 0.5, repeat: isLowTime ? Infinity : 0 }}
+              className="text-3xl font-black text-neo-black"
+              style={{
+                textShadow: isLowTime
+                  ? '2px 2px 0px var(--neo-red)'
+                  : '2px 2px 0px var(--neo-cyan)',
+              }}
+            >
+              {formatTime(remainingTime)}
+            </motion.div>
+          </div>
         </div>
+
+        {/* Low time warning badge */}
+        {isLowTime && (
+          <motion.div
+            initial={{ scale: 0, rotate: -20 }}
+            animate={{ scale: 1, rotate: 12 }}
+            className="
+              absolute -top-2 -right-2 z-10
+              px-2 py-1
+              bg-neo-red text-neo-cream
+              text-[10px] font-black uppercase
+              border-2 border-neo-black
+              rounded-neo
+              shadow-hard-sm
+              whitespace-nowrap
+            "
+          >
+            {t('common.hurry')}
+          </motion.div>
+        )}
       </div>
     </motion.div>
   );

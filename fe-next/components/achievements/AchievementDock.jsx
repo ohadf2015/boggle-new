@@ -5,6 +5,10 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { cn } from '../../lib/utils';
 
+/**
+ * Neo-Brutalist Achievement Dock
+ * Features: Thick borders, hard shadows, bold uppercase text, vibrant colors
+ */
 const AchievementDock = ({ achievements = [], className }) => {
   const { t, dir } = useLanguage();
   const [isExpanded, setIsExpanded] = useState(false);
@@ -15,28 +19,33 @@ const AchievementDock = ({ achievements = [], className }) => {
   // Detect new achievement added
   useEffect(() => {
     if (achievements.length > prevCountRef.current) {
-      setHasNewAchievement(true);
-      // Brief expand to show new achievement
-      setIsExpanded(true);
-
       // Clear any existing timeout
       if (autoCollapseTimeoutRef.current) {
         clearTimeout(autoCollapseTimeoutRef.current);
       }
+
+      // Schedule state updates asynchronously to avoid synchronous setState in effect
+      const showTimeoutId = setTimeout(() => {
+        setHasNewAchievement(true);
+        setIsExpanded(true);
+      }, 0);
 
       // Auto-collapse after 5 seconds
       autoCollapseTimeoutRef.current = setTimeout(() => {
         setIsExpanded(false);
         setHasNewAchievement(false);
       }, 5000);
+
+      prevCountRef.current = achievements.length;
+
+      return () => {
+        clearTimeout(showTimeoutId);
+        if (autoCollapseTimeoutRef.current) {
+          clearTimeout(autoCollapseTimeoutRef.current);
+        }
+      };
     }
     prevCountRef.current = achievements.length;
-
-    return () => {
-      if (autoCollapseTimeoutRef.current) {
-        clearTimeout(autoCollapseTimeoutRef.current);
-      }
-    };
   }, [achievements.length]);
 
   const handleToggle = () => {
@@ -53,39 +62,39 @@ const AchievementDock = ({ achievements = [], className }) => {
 
   return (
     <div className={cn('relative z-40', className)}>
-      {/* Trophy Button */}
+      {/* Trophy Button - Neo-Brutalist */}
       <motion.button
         onClick={handleToggle}
-        whileHover={{ scale: 1.1 }}
+        whileHover={{ scale: 1.05, rotate: 3 }}
         whileTap={{ scale: 0.95 }}
         animate={hasNewAchievement ? {
-          scale: [1, 1.2, 1],
-          rotate: [0, 10, -10, 0],
+          scale: [1, 1.15, 1],
+          rotate: [0, 5, -5, 0],
         } : {}}
-        transition={{ duration: 0.5 }}
+        transition={{ duration: 0.4, ease: 'easeInOut', repeat: hasNewAchievement ? Infinity : 0 }}
         className={cn(
-          'relative w-12 h-12 rounded-full flex items-center justify-center',
-          'bg-gradient-to-br from-amber-400 to-orange-500',
-          'shadow-lg shadow-amber-500/30',
-          'border-2 border-amber-300/50',
-          'hover:shadow-amber-500/50 transition-shadow',
-          'cursor-pointer'
+          'relative w-14 h-14 rounded-lg flex items-center justify-center',
+          'bg-neo-yellow border-4 border-neo-black',
+          'shadow-hard',
+          'hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-hard-lg',
+          'active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-pressed',
+          'cursor-pointer transition-all duration-100'
         )}
       >
         <span className="text-2xl">🏆</span>
 
-        {/* Count badge */}
+        {/* Count badge - Neo-Brutalist */}
         <motion.span
           key={achievements.length}
           initial={{ scale: 1.5 }}
           animate={{ scale: 1 }}
           className={cn(
-            'absolute -top-1 -right-1',
-            'w-6 h-6 rounded-full',
-            'bg-gradient-to-br from-purple-500 to-pink-500',
-            'text-white text-xs font-bold',
+            'absolute -top-2 -right-2',
+            'w-7 h-7 rounded-md',
+            'bg-neo-pink border-3 border-neo-black',
+            'text-neo-white text-xs font-black',
             'flex items-center justify-center',
-            'border-2 border-white shadow-md'
+            'shadow-hard-sm'
           )}
         >
           {achievements.length}
@@ -94,70 +103,69 @@ const AchievementDock = ({ achievements = [], className }) => {
         {/* Pulse ring for new achievement */}
         {hasNewAchievement && (
           <motion.span
-            className="absolute inset-0 rounded-full bg-amber-400"
+            className="absolute inset-0 rounded-lg bg-neo-lime border-4 border-neo-black"
             initial={{ scale: 1, opacity: 0.8 }}
-            animate={{ scale: 2, opacity: 0 }}
-            transition={{ duration: 1, repeat: Infinity }}
+            animate={{ scale: 1.5, opacity: 0 }}
+            transition={{ duration: 0.8, repeat: Infinity }}
           />
         )}
       </motion.button>
 
-      {/* Expanded Panel */}
+      {/* Expanded Panel - Neo-Brutalist */}
       <AnimatePresence>
         {isExpanded && (
           <motion.div
-            initial={{ opacity: 0, scale: 0.9, y: -10 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
+            initial={{ opacity: 0, scale: 0.9, y: -10, rotate: -2 }}
+            animate={{ opacity: 1, scale: 1, y: 0, rotate: 0 }}
             exit={{ opacity: 0, scale: 0.9, y: -10 }}
             transition={{ type: 'spring', damping: 20, stiffness: 300 }}
             className={cn(
-              'absolute top-full mt-2',
+              'absolute top-full mt-3',
               dir === 'rtl' ? 'left-0' : 'right-0',
-              'w-72 max-h-80 overflow-y-auto',
-              'bg-white/95 dark:bg-slate-800/95 backdrop-blur-md',
-              'rounded-xl shadow-xl',
-              'border border-amber-500/30 dark:border-amber-400/20',
-              'p-4'
+              'w-80 max-h-80 overflow-y-auto',
+              'bg-neo-cream border-4 border-neo-black',
+              'rounded-lg shadow-hard-lg',
+              'p-0'
             )}
           >
-            {/* Header */}
-            <div className="flex items-center gap-2 mb-3 pb-2 border-b border-slate-200 dark:border-slate-700">
+            {/* Header - Neo-Brutalist stripe */}
+            <div className="bg-neo-purple border-b-4 border-neo-black px-4 py-3 flex items-center gap-2">
               <span className="text-xl">🏆</span>
-              <h3 className="font-bold text-slate-800 dark:text-white">
-                {t('achievementDock.title') || 'Your Achievements'}
+              <h3 className="font-black uppercase text-neo-white tracking-wide">
+                {t('achievementDock.title') || 'YOUR ACHIEVEMENTS'}
               </h3>
             </div>
 
             {/* Achievement list */}
-            <div className="space-y-2">
+            <div className="p-3 space-y-2">
               {achievements.map((achievement, index) => (
                 <motion.div
                   key={`${achievement.name}-${index}`}
                   initial={index === achievements.length - 1 && hasNewAchievement ? {
                     x: 20,
                     opacity: 0,
-                    backgroundColor: 'rgba(6, 182, 212, 0.3)',
                   } : false}
                   animate={{
                     x: 0,
                     opacity: 1,
-                    backgroundColor: 'transparent',
                   }}
-                  transition={{ duration: 0.5 }}
+                  transition={{ duration: 0.3 }}
                   className={cn(
-                    'flex items-center gap-3 p-2 rounded-lg',
-                    'hover:bg-amber-50 dark:hover:bg-amber-900/20',
-                    'transition-colors cursor-pointer'
+                    'flex items-center gap-3 p-3 rounded-md',
+                    'bg-neo-white border-3 border-neo-black',
+                    'shadow-hard-sm',
+                    'hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-hard',
+                    'transition-all duration-100 cursor-pointer'
                   )}
                 >
-                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-cyan-400 to-purple-500 flex items-center justify-center shadow-md flex-shrink-0">
+                  <div className="w-10 h-10 rounded-md bg-neo-cyan border-2 border-neo-black flex items-center justify-center shadow-hard-sm flex-shrink-0">
                     <span className="text-lg">{achievement.icon}</span>
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="font-semibold text-sm text-slate-800 dark:text-white truncate">
+                    <p className="font-black text-sm text-neo-black uppercase truncate tracking-wide">
                       {achievement.name}
                     </p>
-                    <p className="text-xs text-slate-500 dark:text-slate-400 truncate">
+                    <p className="text-xs font-bold text-neo-black/70 truncate">
                       {achievement.description}
                     </p>
                   </div>

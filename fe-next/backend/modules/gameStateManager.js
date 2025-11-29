@@ -36,6 +36,7 @@ function createGame(gameCode, gameData) {
     playerScores: {},
     playerWords: {},
     playerAchievements: {},
+    playerCombos: {}, // Track combo level per player for STREAK_MASTER achievement
     gameState: 'waiting', // waiting, in-progress, finished
     letterGrid: null,
     timerSeconds: 180,
@@ -141,6 +142,15 @@ function addUserToGame(gameCode, username, socketId, options = {}) {
   }
   if (!game.playerWords[username]) {
     game.playerWords[username] = [];
+  }
+  if (!game.playerAchievements[username]) {
+    game.playerAchievements[username] = [];
+  }
+  if (!game.playerWordDetails) {
+    game.playerWordDetails = {};
+  }
+  if (!game.playerWordDetails[username]) {
+    game.playerWordDetails[username] = [];
   }
 
   // Update mappings
@@ -393,13 +403,18 @@ function resetGameForNewRound(gameCode) {
   // for players who left the game during previous rounds
   game.playerScores = {};
   game.playerWords = {};
+  game.playerWordDetails = {};
   game.playerAchievements = {};
+  game.playerCombos = {}; // Reset combo tracking for new round
+  game.firstWordFound = false; // Reset FIRST_BLOOD achievement flag
 
   // Re-initialize scores/words only for CURRENT players in the room
   for (const username of Object.keys(game.users)) {
     game.playerScores[username] = 0;
     game.playerWords[username] = [];
+    game.playerWordDetails[username] = [];
     game.playerAchievements[username] = [];
+    game.playerCombos[username] = 0; // Initialize combo tracking
   }
 
   game.gameState = 'waiting';
@@ -414,6 +429,10 @@ function resetGameForNewRound(gameCode) {
  * @param {string} word - Word to add
  * @param {Object} options - Additional word details
  * @param {boolean} options.autoValidated - Whether word was auto-validated
+ * @param {boolean|null} options.validated - Explicit validation status (true/false/null)
+ * @param {number} options.score - Score for this word (with combo if applicable)
+ * @param {number} options.comboBonus - Combo bonus points earned
+ * @param {number} options.comboLevel - Combo level when word was submitted
  */
 function addPlayerWord(gameCode, username, word, options = {}) {
   const game = games[gameCode];
@@ -442,13 +461,28 @@ function addPlayerWord(gameCode, username, word, options = {}) {
     const currentTime = Date.now();
     const timeSinceStart = game.startTime ? (currentTime - game.startTime) / 1000 : 0;
 
+    // Determine validated status:
+    // - If explicitly provided (true/false), use it
+    // - If autoValidated is true, set to true
+    // - Otherwise null (pending validation)
+    let validatedStatus;
+    if (options.validated !== undefined) {
+      validatedStatus = options.validated;
+    } else if (options.autoValidated) {
+      validatedStatus = true;
+    } else {
+      validatedStatus = null;
+    }
+
     // Add to playerWordDetails for achievement tracking
     game.playerWordDetails[username].push({
       word: normalizedWord,
-      score: 0, // Will be calculated after validation
+      score: options.score || 0,
+      comboBonus: options.comboBonus || 0,
+      comboLevel: options.comboLevel || 0,
       timestamp: currentTime,
       timeSinceStart,
-      validated: options.autoValidated ? true : null,
+      validated: validatedStatus,
       autoValidated: options.autoValidated || false,
       onBoard: true,
     });

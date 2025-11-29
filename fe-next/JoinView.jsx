@@ -36,14 +36,31 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
   const [showFullForm, setShowFullForm] = useState(!prefilledRoom); // Show simplified form if room is prefilled
   const [roomLanguage, setRoomLanguage] = useState(language); // Separate state for room/game language
   const usernameInputRef = useRef(null);
+  const prevPrefilledRoomRef = useRef(prefilledRoom);
   const { notifyError } = useValidation(t);
+  const hasAutoSwitchedToHostRef = useRef(false);
 
   // Sync showFullForm when prefilledRoom prop changes (from URL params loaded after mount)
+  // Using ref to track previous value and only update when it actually changes to a truthy value
   useEffect(() => {
-    if (prefilledRoom) {
-      setShowFullForm(false);
+    if (prefilledRoom && !prevPrefilledRoomRef.current) {
+      // Schedule the state update for the next tick to avoid synchronous setState in effect
+      Promise.resolve().then(() => setShowFullForm(false));
     }
+    prevPrefilledRoomRef.current = prefilledRoom;
   }, [prefilledRoom]);
+
+  // Auto-switch to host mode when no rooms exist and not loading
+  useEffect(() => {
+    if (!roomsLoading && activeRooms.length === 0 && mode === 'join' && !hasAutoSwitchedToHostRef.current) {
+      hasAutoSwitchedToHostRef.current = true;
+      handleModeChange('host');
+    }
+    // Reset the flag when rooms become available again
+    if (activeRooms.length > 0) {
+      hasAutoSwitchedToHostRef.current = false;
+    }
+  }, [roomsLoading, activeRooms.length, mode]);
 
   const handleModeChange = (newMode) => {
     if (newMode) {
@@ -135,15 +152,20 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
   };
 
   const handleRoomSelect = (roomCode) => {
+    // Check if clicking the same room that's already selected
+    const isSameRoom = gameCode === roomCode;
+
     setGameCode(roomCode);
     setMode('join');
     setShowFullForm(true);
 
-    // Auto-join if username is already set
-    if (username && username.trim()) {
+    // Auto-join if username is already set AND this is a different room
+    // (prevents duplicate join attempts when clicking the same room multiple times)
+    if (username && username.trim() && !isSameRoom) {
       // Small delay to let state update, then auto-join
+      // Pass roomCode directly to avoid stale state issues
       setTimeout(() => {
-        handleJoin(false);
+        handleJoin(false, null, roomCode);
       }, 100);
     }
   };
@@ -473,87 +495,75 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
                   className="w-full"
                   variant="outline"
                 >
-                  <ToggleGroupItem value="join" className="flex-1 border-slate-600 text-gray-300 data-[state=on]:bg-gradient-to-r data-[state=on]:from-cyan-500 data-[state=on]:to-teal-500 data-[state=on]:text-white data-[state=on]:border-transparent">
+                  <ToggleGroupItem value="join" className="flex-1 data-[state=on]:bg-neo-cyan data-[state=on]:text-neo-black">
                     <span className="mr-2"><FaUser /></span>
                     {t('joinView.joinRoom')}
                   </ToggleGroupItem>
-                  <ToggleGroupItem value="host" className="flex-1 border-slate-600 text-gray-300 data-[state=on]:bg-gradient-to-r data-[state=on]:from-purple-500 data-[state=on]:to-pink-500 data-[state=on]:text-white data-[state=on]:border-transparent">
+                  <ToggleGroupItem value="host" className="flex-1 data-[state=on]:bg-neo-pink data-[state=on]:text-neo-white">
                     <span className="mr-2"><FaCrown /></span>
                     {t('joinView.createRoom')}
                   </ToggleGroupItem>
                 </ToggleGroup>
               </div>
 
-              {/* Language Selection (Only for Host) - Button Style */}
+              {/* Language Selection (Only for Host) - Neo-Brutalist Dark Mode */}
               {mode === 'host' && (
                 <div className="space-y-2">
-                    <CardDescription className="text-sm sm:text-base text-slate-600 dark:text-gray-300">
+                    <CardDescription className="text-sm sm:text-base font-bold uppercase text-neo-cream">
                         {t('joinView.selectLanguage')}
                    </CardDescription>
-                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5 sm:gap-2">
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3">
                     <button
                       type="button"
                       onClick={() => setRoomLanguage('en')}
                       className={cn(
-                        "flex flex-col items-center gap-1 p-2 rounded-lg border-2 transition-all duration-300",
+                        "flex flex-col items-center gap-1 p-3 rounded-neo border-3 transition-all duration-100",
                         roomLanguage === 'en'
-                          ? "border-cyan-500 bg-cyan-500/20 shadow-lg shadow-cyan-500/30"
-                          : "border-slate-300 dark:border-slate-600 hover:border-cyan-400 dark:hover:border-cyan-500"
+                          ? "bg-neo-cyan border-neo-cyan text-neo-black shadow-hard"
+                          : "bg-white border-neo-black text-neo-black shadow-hard-sm hover:shadow-hard hover:translate-x-[-1px] hover:translate-y-[-1px] hover:border-neo-cyan"
                       )}
                     >
                       <span className="text-2xl">🇺🇸</span>
-                      <span className={cn(
-                        "font-medium text-xs",
-                        roomLanguage === 'en' ? "text-cyan-600 dark:text-cyan-300" : "text-slate-600 dark:text-gray-400"
-                      )}>{t('joinView.english')}</span>
+                      <span className="font-bold text-xs uppercase">{t('joinView.english')}</span>
                     </button>
                     <button
                       type="button"
                       onClick={() => setRoomLanguage('he')}
                       className={cn(
-                        "flex flex-col items-center gap-1 p-2 rounded-lg border-2 transition-all duration-300",
+                        "flex flex-col items-center gap-1 p-3 rounded-neo border-3 transition-all duration-100",
                         roomLanguage === 'he'
-                          ? "border-cyan-500 bg-cyan-500/20 shadow-lg shadow-cyan-500/30"
-                          : "border-slate-300 dark:border-slate-600 hover:border-cyan-400 dark:hover:border-cyan-500"
+                          ? "bg-neo-cyan border-neo-cyan text-neo-black shadow-hard"
+                          : "bg-white border-neo-black text-neo-black shadow-hard-sm hover:shadow-hard hover:translate-x-[-1px] hover:translate-y-[-1px] hover:border-neo-cyan"
                       )}
                     >
                       <span className="text-2xl">🇮🇱</span>
-                      <span className={cn(
-                        "font-medium text-xs",
-                        roomLanguage === 'he' ? "text-cyan-600 dark:text-cyan-300" : "text-slate-600 dark:text-gray-400"
-                      )}>{t('joinView.hebrew')}</span>
+                      <span className="font-bold text-xs uppercase">{t('joinView.hebrew')}</span>
                     </button>
                     <button
                       type="button"
                       onClick={() => setRoomLanguage('sv')}
                       className={cn(
-                        "flex flex-col items-center gap-1 p-2 rounded-lg border-2 transition-all duration-300",
+                        "flex flex-col items-center gap-1 p-3 rounded-neo border-3 transition-all duration-100",
                         roomLanguage === 'sv'
-                          ? "border-cyan-500 bg-cyan-500/20 shadow-lg shadow-cyan-500/30"
-                          : "border-slate-300 dark:border-slate-600 hover:border-cyan-400 dark:hover:border-cyan-500"
+                          ? "bg-neo-cyan border-neo-cyan text-neo-black shadow-hard"
+                          : "bg-white border-neo-black text-neo-black shadow-hard-sm hover:shadow-hard hover:translate-x-[-1px] hover:translate-y-[-1px] hover:border-neo-cyan"
                       )}
                     >
                       <span className="text-2xl">🇸🇪</span>
-                      <span className={cn(
-                        "font-medium text-xs",
-                        roomLanguage === 'sv' ? "text-cyan-600 dark:text-cyan-300" : "text-slate-600 dark:text-gray-400"
-                      )}>{t('joinView.swedish')}</span>
+                      <span className="font-bold text-xs uppercase">{t('joinView.swedish')}</span>
                     </button>
                     <button
                       type="button"
                       onClick={() => setRoomLanguage('ja')}
                       className={cn(
-                        "flex flex-col items-center gap-1 p-2 rounded-lg border-2 transition-all duration-300",
+                        "flex flex-col items-center gap-1 p-3 rounded-neo border-3 transition-all duration-100",
                         roomLanguage === 'ja'
-                          ? "border-cyan-500 bg-cyan-500/20 shadow-lg shadow-cyan-500/30"
-                          : "border-slate-300 dark:border-slate-600 hover:border-cyan-400 dark:hover:border-cyan-500"
+                          ? "bg-neo-cyan border-neo-cyan text-neo-black shadow-hard"
+                          : "bg-white border-neo-black text-neo-black shadow-hard-sm hover:shadow-hard hover:translate-x-[-1px] hover:translate-y-[-1px] hover:border-neo-cyan"
                       )}
                     >
                       <span className="text-2xl">🇯🇵</span>
-                      <span className={cn(
-                        "font-medium text-xs",
-                        roomLanguage === 'ja' ? "text-cyan-600 dark:text-cyan-300" : "text-slate-600 dark:text-gray-400"
-                      )}>{t('joinView.japanese')}</span>
+                      <span className="font-bold text-xs uppercase">{t('joinView.japanese')}</span>
                     </button>
                   </div>
                 </div>
@@ -718,17 +728,18 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
                   </motion.div>
                 )}
 
-                {/* Show "Joining as" for authenticated users in join mode */}
+                {/* Show "Joining as" for authenticated users in join mode - Neo-Brutalist Dark */}
                 {mode === 'join' && isAuthenticated && displayName && (
-                  <div className="p-3 rounded-lg bg-cyan-50 dark:bg-cyan-900/20 border border-cyan-200 dark:border-cyan-800">
-                    <p className="text-sm text-slate-600 dark:text-gray-400">
+                  <div className="p-3 rounded-neo bg-neo-navy border-3 border-neo-cyan/50 shadow-hard-sm">
+                    <p className="text-sm text-neo-cream font-bold">
                       {t('joinView.joiningAs') || 'Joining as'}{' '}
-                      <span className="font-semibold text-cyan-600 dark:text-cyan-400">{displayName}</span>
+                      <span className="text-neo-cyan">{displayName}</span>
                     </p>
                   </div>
                 )}
 
-                <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                {/* Neo-Brutalist Submit Button */}
+                <motion.div whileHover={{ x: -2, y: -2 }} whileTap={{ x: 2, y: 2 }}>
                   <Button
                     type="submit"
                     disabled={
@@ -737,7 +748,12 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
                         ? (!gameCode || (!isAuthenticated && !username))
                         : (!gameCode || (isAuthenticated && !displayName)))
                     }
-                    className="w-full h-12 text-lg font-bold bg-gradient-to-r from-cyan-500 to-purple-600 hover:from-cyan-400 hover:to-purple-500 hover:shadow-[0_0_20px_rgba(6,182,212,0.5)]"
+                    className={cn(
+                      "w-full h-12 text-lg",
+                      mode === 'host'
+                        ? "bg-neo-pink text-neo-white"
+                        : "bg-neo-cyan text-neo-black"
+                    )}
                   >
                     {mode === 'host' ? (
                       <>
@@ -792,115 +808,112 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
           </Card>
         </motion.div>
 
-        {/* Active Rooms Panel */}
-        {mode === 'join' && (
-          <motion.div
-            initial={{ x: -50, opacity: 0 }}
-            animate={{ x: 0, opacity: 1 }}
-            transition={{ duration: 0.5 }}
-            className="flex-1 relative z-10"
-          >
-            <Card className={cn(
-              "backdrop-blur-md bg-white/90 dark:bg-slate-800/90 shadow-xl flex h-full flex-col border border-teal-500/30",
-            )}>
-              <CardHeader>
-                <div className="flex h-full justify-between items-center">
-                  <CardTitle className="text-teal-400">{t('joinView.roomsList')}</CardTitle>
-                  <TooltipProvider>
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={refreshRooms}
-                          className="text-teal-400 hover:text-teal-300 hover:bg-slate-700/50"
-                        >
-                          <FaSync />
-                        </Button>
-                      </TooltipTrigger>
-                      <TooltipContent>{t('common.refresh')}</TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
-                </div>
-              </CardHeader>
-              <CardContent className="flex-1 overflow-auto">
-                {roomsLoading ? (
-                  // Loading skeleton for rooms
-                  <div className="space-y-2">
-                    {[1, 2, 3].map((i) => (
-                      <div
-                        key={i}
-                        className="w-full p-3 rounded-lg bg-slate-700/30 animate-pulse"
+        {/* Active Rooms Panel - Neo-Brutalist - Always visible */}
+        <motion.div
+          initial={{ x: -50, opacity: 0, rotate: 2 }}
+          animate={{ x: 0, opacity: 1, rotate: 1 }}
+          transition={{ duration: 0.5 }}
+          className="flex-1 relative z-10"
+        >
+          <Card className="flex h-full flex-col">
+            <CardHeader>
+              <div className="flex h-full justify-between items-center">
+                <CardTitle>{t('joinView.roomsList')}</CardTitle>
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        onClick={refreshRooms}
                       >
-                        <div className="flex items-center justify-between gap-3">
-                          <div className="flex items-center gap-2">
-                            <div className="w-8 h-8 bg-slate-600/50 rounded-full" />
-                            <div>
-                              <div className="h-5 w-24 bg-slate-600/50 rounded mb-1" />
-                              <div className="h-3 w-16 bg-slate-600/30 rounded" />
-                            </div>
+                        <FaSync />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>{t('common.refresh')}</TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              </div>
+            </CardHeader>
+            <CardContent className="flex-1 overflow-auto">
+              {roomsLoading ? (
+                // Loading skeleton for rooms - Neo-Brutalist
+                <div className="space-y-3">
+                  {[1, 2, 3].map((i) => (
+                    <div
+                      key={i}
+                      className="w-full p-3 rounded-neo bg-neo-navy/50 border-3 border-neo-cream/20 animate-pulse"
+                    >
+                      <div className="flex items-center justify-between gap-3">
+                        <div className="flex items-center gap-2">
+                          <div className="w-8 h-8 bg-neo-cream/20 rounded-neo" />
+                          <div>
+                            <div className="h-5 w-24 bg-neo-cream/20 rounded-neo mb-1" />
+                            <div className="h-3 w-16 bg-neo-cream/10 rounded-neo" />
                           </div>
-                          <div className="h-5 w-16 bg-slate-600/50 rounded-full" />
                         </div>
+                        <div className="h-5 w-16 bg-neo-cream/20 rounded-neo" />
                       </div>
-                    ))}
-                  </div>
-                ) : activeRooms.length === 0 ? (
-                  <div className="text-center py-6 text-slate-500 dark:text-gray-400 space-y-4">
-                    <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                    </div>
+                  ))}
+                </div>
+              ) : activeRooms.length === 0 ? (
+                <div className="text-center py-6 text-neo-cream/60 space-y-4">
+                  {mode === 'join' && (
+                    <motion.div whileHover={{ x: -2, y: -2 }} whileTap={{ x: 2, y: 2 }}>
                       <Button
                         onClick={() => handleModeChange('host')}
-                        className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-400 hover:to-pink-400 hover:shadow-[0_0_15px_rgba(168,85,247,0.5)]"
+                        className="bg-neo-pink text-neo-white"
                       >
                         <span className="mr-2"><FaCrown /></span>
                         {t('joinView.createRoom')}
                       </Button>
                     </motion.div>
-                    <div className="flex justify-center">
-                      <FaGamepad size={48} className="text-slate-400 dark:text-slate-600" />
-                    </div>
-                    <div>
-                      <p className="text-sm font-medium">{t('joinView.noRooms')}</p>
-                      <p className="text-xs mt-1">{t('joinView.createNewRoom')}</p>
-                    </div>
+                  )}
+                  <div className="flex justify-center">
+                    <FaGamepad size={48} className="text-neo-cream/30" />
                   </div>
-                ) : (
-                  <div className="space-y-2">
-                    {activeRooms.map((room) => (
-                      <button
-                        key={room.gameCode}
-                        onClick={() => handleRoomSelect(room.gameCode)}
-                        className={cn(
-                          "w-full p-3 rounded-lg text-left transition-colors",
-                          gameCode === room.gameCode
-                            ? "bg-cyan-500/20 hover:bg-cyan-500/30 border border-cyan-500/50"
-                            : "hover:bg-slate-700/50"
-                        )}
-                      >
-                        <div className="flex items-center justify-between gap-3">
-                          <div className="flex items-center gap-2">
-                            <span className="text-2xl" title={room.language === 'he' ? t('joinView.hebrew') : room.language === 'sv' ? t('joinView.swedish') : room.language === 'ja' ? t('joinView.japanese') : t('joinView.english')}>
-                              {room.language === 'he' ? '🇮🇱' : room.language === 'sv' ? '🇸🇪' : room.language === 'ja' ? '🇯🇵' : '🇺🇸'}
-                            </span>
-                            <div>
-                              <div className="font-bold text-lg text-cyan-400">{room.roomName || room.gameCode}</div>
-                              <div className="text-xs text-slate-500 dark:text-slate-400">
-                                {t('joinView.host')}: {room.gameCode}
-                              </div>
+                  <div>
+                    <p className="text-sm font-bold uppercase text-neo-cream">{t('joinView.noRooms')}</p>
+                    <p className="text-xs mt-1 text-neo-cream/70">{t('joinView.createNewRoom')}</p>
+                  </div>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {activeRooms.map((room) => (
+                    <button
+                      key={room.gameCode}
+                      onClick={() => handleRoomSelect(room.gameCode)}
+                      className={cn(
+                        "w-full p-3 rounded-neo text-left transition-all duration-100 border-3",
+                        gameCode === room.gameCode
+                          ? "bg-neo-cyan border-neo-cyan text-neo-black shadow-hard"
+                          : "bg-neo-navy border-neo-cream/50 text-neo-cream shadow-hard-sm hover:shadow-hard hover:translate-x-[-1px] hover:translate-y-[-1px] hover:border-neo-cyan"
+                      )}
+                    >
+                      <div className="flex items-center justify-between gap-3">
+                        <div className="flex items-center gap-2">
+                          <span className="text-2xl" title={room.language === 'he' ? t('joinView.hebrew') : room.language === 'sv' ? t('joinView.swedish') : room.language === 'ja' ? t('joinView.japanese') : t('joinView.english')}>
+                            {room.language === 'he' ? '🇮🇱' : room.language === 'sv' ? '🇸🇪' : room.language === 'ja' ? '🇯🇵' : '🇺🇸'}
+                          </span>
+                          <div>
+                            <div className={cn("font-black text-lg", gameCode === room.gameCode ? "text-neo-black" : "text-neo-cream")}>{room.roomName || room.gameCode}</div>
+                            <div className={cn("text-xs font-bold", gameCode === room.gameCode ? "text-neo-black/60" : "text-neo-cream/60")}>
+                              {t('joinView.host')}: {room.gameCode}
                             </div>
                           </div>
-                          <Badge variant="secondary" className="h-5 text-xs bg-slate-700 text-gray-300">
-                            {room.playerCount}{' '}{t('joinView.players')}
-                          </Badge>
                         </div>
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          </motion.div>
-        )}
+                        <Badge className="bg-neo-cyan text-neo-black border-2 border-neo-black">
+                          {room.playerCount}{' '}{t('joinView.players')}
+                        </Badge>
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </motion.div>
       </div>
 
       {/* Floating How to Play Button */}

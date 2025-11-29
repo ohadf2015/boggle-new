@@ -124,12 +124,6 @@ const SlotMachineCell = ({
     };
   }, [letter, delay, duration, getRandomLetter]);
 
-  const sizeClasses = {
-    small: 'text-lg sm:text-xl',
-    normal: 'text-2xl sm:text-3xl md:text-4xl',
-    large: 'text-3xl sm:text-4xl md:text-5xl'
-  };
-
   // Get CSS classes based on animation phase
   const getLetterClasses = () => {
     const classes = ['slot-letter', 'slot-letter-transition'];
@@ -148,15 +142,18 @@ const SlotMachineCell = ({
     <div
       className={`
         relative aspect-square flex items-center justify-center
-        font-bold overflow-hidden rounded-lg
-        ${sizeClasses[size]}
+        font-black overflow-hidden
+        ${/* NEO-BRUTALIST: Clean white tiles with hard shadows */ ''}
         ${isHighlighted
-          ? 'bg-yellow-500 text-white'
-          : 'bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white'
+          ? 'bg-neo-yellow text-neo-black border-3 border-neo-black shadow-hard'
+          : 'bg-neo-white text-neo-black border-3 border-neo-black shadow-hard-sm'
         }
-        border-2
-        ${isHighlighted ? 'border-yellow-300' : 'border-slate-300/60 dark:border-slate-600/60'}
       `}
+      style={{
+        borderRadius: '4px',
+        // Use responsive font size from parent grid
+        fontSize: 'var(--cell-font-size)',
+      }}
     >
       {/* Slot machine letter display */}
       <span className={getLetterClasses()}>

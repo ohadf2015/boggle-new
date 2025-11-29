@@ -5,9 +5,8 @@ import { cn } from '../lib/utils';
 import { useLanguage } from '../contexts/LanguageContext';
 
 /**
- * Game Type Selector Component
+ * Game Type Selector Component - Neo-Brutalist Style
  * Allows host to choose between Regular Game and Tournament mode
- * with animated cards and round selection for tournaments
  */
 const GameTypeSelector = ({
   gameType,
@@ -24,13 +23,10 @@ const GameTypeSelector = ({
       titleKey: 'hostView.regularGame',
       descKey: 'hostView.regularGameDesc',
       colors: {
-        gradient: 'from-cyan-500/20 to-teal-500/20',
-        border: 'border-cyan-500/50',
-        borderSelected: 'border-cyan-400',
-        shadow: 'shadow-[0_0_25px_rgba(6,182,212,0.5)]',
-        shadowHover: 'hover:shadow-[0_0_15px_rgba(6,182,212,0.3)]',
-        text: 'text-cyan-400',
-        iconBg: 'bg-cyan-500/20',
+        bg: 'bg-neo-cyan',
+        bgUnselected: 'bg-neo-cream',
+        text: 'text-neo-black',
+        icon: 'text-neo-black',
       }
     },
     {
@@ -40,23 +36,20 @@ const GameTypeSelector = ({
       descKey: 'hostView.tournamentDesc',
       locked: true,
       colors: {
-        gradient: 'from-amber-500/20 to-yellow-500/20',
-        border: 'border-amber-500/50',
-        borderSelected: 'border-amber-400',
-        shadow: 'shadow-[0_0_25px_rgba(245,158,11,0.5)]',
-        shadowHover: 'hover:shadow-[0_0_15px_rgba(245,158,11,0.3)]',
-        text: 'text-amber-400',
-        iconBg: 'bg-amber-500/20',
+        bg: 'bg-neo-yellow',
+        bgUnselected: 'bg-neo-cream',
+        text: 'text-neo-black',
+        icon: 'text-neo-black',
       }
     }
   ];
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-3">
       {/* Title */}
-      <h3 className="text-center text-lg font-semibold text-purple-600 dark:text-purple-300">
-        {t('hostView.gameTypeSelector') || 'Choose Game Mode'}
-      </h3>
+      <label className="text-sm font-bold uppercase text-neo-cream">
+        {t('hostView.gameTypeSelector') || 'Game Mode'}
+      </label>
 
       {/* Game Type Cards */}
       <div className="grid grid-cols-2 gap-3">
@@ -69,69 +62,58 @@ const GameTypeSelector = ({
             <motion.button
               key={type.id}
               onClick={() => !isLocked && setGameType(type.id)}
-              whileHover={isLocked ? {} : { scale: 1.02 }}
-              whileTap={isLocked ? {} : { scale: 0.98 }}
+              whileHover={isLocked ? {} : { x: -2, y: -2 }}
+              whileTap={isLocked ? {} : { x: 2, y: 2 }}
               disabled={isLocked}
               className={cn(
-                "relative p-4 rounded-xl border-2 transition-all duration-300",
-                `bg-gradient-to-br ${type.colors.gradient}`,
+                "relative p-4 rounded-neo border-3 border-neo-black transition-all duration-100",
                 isLocked
-                  ? `${type.colors.border} opacity-50 cursor-not-allowed`
+                  ? "bg-neo-gray opacity-70 cursor-not-allowed"
                   : isSelected
-                    ? `${type.colors.borderSelected} ${type.colors.shadow}`
-                    : `${type.colors.border} ${type.colors.shadowHover} opacity-70 hover:opacity-100`
+                    ? `${type.colors.bg} shadow-none translate-x-[2px] translate-y-[2px]`
+                    : `${type.colors.bgUnselected} shadow-hard-sm hover:shadow-hard`
               )}
             >
               {/* Coming Soon badge for locked items */}
               {isLocked && (
-                <motion.div
-                  initial={{ scale: 0 }}
-                  animate={{ scale: 1 }}
-                  className="absolute -top-2 -right-2 px-2 py-0.5 bg-gradient-to-r from-amber-500 to-yellow-500 rounded-full flex items-center justify-center gap-1 text-white text-[10px] font-bold shadow-lg"
-                >
+                <div className="absolute -top-2 -right-2 px-2 py-0.5 bg-neo-orange rounded-neo border-2 border-neo-black flex items-center justify-center gap-1 text-neo-black text-[10px] font-black shadow-hard-sm">
                   <FaLock className="text-[8px]" />
-                  {t('hostView.comingSoon') || 'Coming Soon'}
-                </motion.div>
+                  {t('hostView.comingSoon') || 'Soon'}
+                </div>
               )}
+
               {/* Selection indicator */}
               {isSelected && !isLocked && (
                 <motion.div
-                  initial={{ scale: 0 }}
-                  animate={{ scale: 1 }}
-                  className="absolute -top-2 -right-2 w-6 h-6 bg-green-500 rounded-full flex items-center justify-center text-white text-xs font-bold shadow-lg"
+                  initial={{ scale: 0, rotate: -10 }}
+                  animate={{ scale: 1, rotate: 0 }}
+                  className="absolute -top-2 -right-2 w-6 h-6 bg-neo-lime rounded-neo border-2 border-neo-black flex items-center justify-center text-neo-black text-xs font-black shadow-hard-sm"
                 >
                   ✓
                 </motion.div>
               )}
 
-              {/* Icon with pulse animation for tournament */}
-              <motion.div
-                className={cn(
-                  "w-12 h-12 mx-auto mb-2 rounded-full flex items-center justify-center",
-                  type.colors.iconBg
-                )}
-                animate={type.id === 'tournament' && isSelected ? {
-                  scale: [1, 1.1, 1],
-                } : {}}
-                transition={{
-                  duration: 2,
-                  repeat: Infinity,
-                  ease: "easeInOut"
-                }}
-              >
-                <Icon className={cn("text-2xl", type.colors.text)} />
-              </motion.div>
+              {/* Icon */}
+              <div className={cn(
+                "w-10 h-10 mx-auto mb-2 rounded-neo border-2 border-neo-black flex items-center justify-center",
+                isSelected ? "bg-neo-white" : "bg-neo-white/50"
+              )}>
+                <Icon className={cn("text-xl", type.colors.icon)} />
+              </div>
 
               {/* Title */}
               <h4 className={cn(
-                "font-bold text-base mb-1",
-                isSelected ? type.colors.text : "text-slate-600 dark:text-slate-300"
+                "font-black text-sm uppercase",
+                isLocked ? "text-neo-cream" : type.colors.text
               )}>
                 {t(type.titleKey) || type.id}
               </h4>
 
               {/* Description */}
-              <p className="text-xs text-slate-500 dark:text-slate-400 leading-tight">
+              <p className={cn(
+                "text-xs font-medium leading-tight mt-1",
+                isLocked ? "text-neo-cream" : "text-neo-black"
+              )}>
                 {t(type.descKey) || ''}
               </p>
             </motion.button>
@@ -145,22 +127,22 @@ const GameTypeSelector = ({
           initial={{ opacity: 0, height: 0 }}
           animate={{ opacity: 1, height: 'auto' }}
           exit={{ opacity: 0, height: 0 }}
-          className="mt-3 p-3 rounded-xl bg-gradient-to-r from-amber-500/10 to-yellow-500/10 border border-amber-500/30"
+          className="p-3 rounded-neo bg-neo-navy border-3 border-neo-cream/30 shadow-hard-sm"
         >
-          <label className="block text-sm font-medium text-amber-600 dark:text-amber-400 mb-2 text-center">
-            {t('hostView.numberOfRounds') || 'Number of Rounds'}
+          <label className="block text-sm font-bold uppercase text-neo-cream mb-2 text-center">
+            {t('hostView.numberOfRounds') || 'Rounds'}
           </label>
           <div className="flex items-center justify-center gap-4">
             <motion.button
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.9 }}
+              whileHover={{ x: -1, y: -1 }}
+              whileTap={{ x: 1, y: 1 }}
               onClick={() => setTournamentRounds(Math.max(2, tournamentRounds - 1))}
               disabled={tournamentRounds <= 2}
               className={cn(
-                "w-10 h-10 rounded-full flex items-center justify-center transition-all",
+                "w-10 h-10 rounded-neo border-2 flex items-center justify-center transition-all font-black",
                 tournamentRounds <= 2
-                  ? "bg-slate-200 dark:bg-slate-700 text-slate-400 cursor-not-allowed"
-                  : "bg-amber-500/20 text-amber-500 hover:bg-amber-500/30"
+                  ? "bg-neo-gray/50 text-neo-cream/60 border-neo-cream/30 cursor-not-allowed"
+                  : "bg-neo-cream text-neo-black border-neo-black shadow-hard-sm hover:shadow-hard"
               )}
             >
               <FaMinus />
@@ -168,23 +150,23 @@ const GameTypeSelector = ({
 
             <motion.span
               key={tournamentRounds}
-              initial={{ scale: 1.2 }}
+              initial={{ scale: 1.3 }}
               animate={{ scale: 1 }}
-              className="text-3xl font-bold text-amber-500 w-12 text-center"
+              className="text-3xl font-black text-neo-yellow w-12 text-center"
             >
               {tournamentRounds}
             </motion.span>
 
             <motion.button
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.9 }}
+              whileHover={{ x: -1, y: -1 }}
+              whileTap={{ x: 1, y: 1 }}
               onClick={() => setTournamentRounds(Math.min(5, tournamentRounds + 1))}
               disabled={tournamentRounds >= 5}
               className={cn(
-                "w-10 h-10 rounded-full flex items-center justify-center transition-all",
+                "w-10 h-10 rounded-neo border-2 flex items-center justify-center transition-all font-black",
                 tournamentRounds >= 5
-                  ? "bg-slate-200 dark:bg-slate-700 text-slate-400 cursor-not-allowed"
-                  : "bg-amber-500/20 text-amber-500 hover:bg-amber-500/30"
+                  ? "bg-neo-gray/50 text-neo-cream/60 border-neo-cream/30 cursor-not-allowed"
+                  : "bg-neo-cream text-neo-black border-neo-black shadow-hard-sm hover:shadow-hard"
               )}
             >
               <FaPlus />
