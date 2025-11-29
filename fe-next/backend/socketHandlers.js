@@ -30,7 +30,11 @@ const {
   getLeaderboard,
   getLeaderboardThrottled,
   getTournamentIdFromGame,
-  setTournamentIdForGame
+  setTournamentIdForGame,
+  // Auth user tracking
+  getAuthUserConnection,
+  removeAuthUserConnection,
+  clearSocketMappings
 } = require('./modules/gameStateManager');
 
 const { processGameResults, isSupabaseConfigured } = require('./modules/supabaseServer');
@@ -44,7 +48,8 @@ const {
   leaveRoom,
   leaveAllGameRooms,
   safeEmit,
-  getSocketById
+  getSocketById,
+  disconnectSocket
 } = require('./utils/socketHelpers');
 
 const { validateWordOnBoard, makePositionsMap } = require('./modules/wordValidator');
@@ -179,6 +184,49 @@ function initializeSocketHandlers(io) {
         return;
       }
 
+      // Check if authenticated user is already in another game (multi-tab detection)
+      if (authUserId) {
+        const existingConnection = getAuthUserConnection(authUserId);
+        if (existingConnection) {
+          console.log(`[SOCKET] Auth user ${authUserId} already in game ${existingConnection.gameCode}, migrating session`);
+
+          // Disconnect old socket
+          const oldSocket = getSocketById(io, existingConnection.socketId);
+          if (oldSocket && oldSocket.connected) {
+            safeEmit(oldSocket, 'sessionMigrated', {
+              message: 'Your session was moved to another tab'
+            });
+            disconnectSocket(oldSocket, true);
+          }
+
+          // Clean up old game
+          if (existingConnection.isHost) {
+            const oldGame = getGame(existingConnection.gameCode);
+            if (oldGame) {
+              if (oldGame.reconnectionTimeout) {
+                clearTimeout(oldGame.reconnectionTimeout);
+                oldGame.reconnectionTimeout = null;
+              }
+              broadcastToRoom(io, getGameRoom(existingConnection.gameCode), 'hostLeftRoomClosing', {
+                message: 'Host started a new game. Room is closing.'
+              });
+              timerManager.clearGameTimer(existingConnection.gameCode);
+              deleteGame(existingConnection.gameCode);
+              io.emit('activeRooms', { rooms: getActiveRooms() });
+            }
+          } else {
+            // User was a player, just remove them from old game
+            removeUserFromGame(existingConnection.gameCode, existingConnection.username);
+            const oldGame = getGame(existingConnection.gameCode);
+            if (oldGame) {
+              broadcastToRoom(io, getGameRoom(existingConnection.gameCode), 'updateUsers', {
+                users: getGameUsers(existingConnection.gameCode)
+              });
+            }
+          }
+        }
+      }
+
       // Create the game with ranked mode settings
       const game = createGame(gameCode, {
         hostSocketId: socket.id,
@@ -261,6 +309,49 @@ function initializeSocketHandlers(io) {
         return;
       }
 
+      // Check if authenticated user is already in a DIFFERENT game (multi-tab detection)
+      if (authUserId) {
+        const existingConnection = getAuthUserConnection(authUserId);
+        if (existingConnection && existingConnection.gameCode !== gameCode) {
+          console.log(`[SOCKET] Auth user ${authUserId} migrating from game ${existingConnection.gameCode} to ${gameCode}`);
+
+          // Disconnect old socket
+          const oldSocket = getSocketById(io, existingConnection.socketId);
+          if (oldSocket && oldSocket.connected) {
+            safeEmit(oldSocket, 'sessionMigrated', {
+              message: 'Your session was moved to another tab'
+            });
+            disconnectSocket(oldSocket, true);
+          }
+
+          // Clean up old game
+          if (existingConnection.isHost) {
+            const oldGame = getGame(existingConnection.gameCode);
+            if (oldGame) {
+              if (oldGame.reconnectionTimeout) {
+                clearTimeout(oldGame.reconnectionTimeout);
+                oldGame.reconnectionTimeout = null;
+              }
+              broadcastToRoom(io, getGameRoom(existingConnection.gameCode), 'hostLeftRoomClosing', {
+                message: 'Host joined a different game. Room is closing.'
+              });
+              timerManager.clearGameTimer(existingConnection.gameCode);
+              deleteGame(existingConnection.gameCode);
+              io.emit('activeRooms', { rooms: getActiveRooms() });
+            }
+          } else {
+            // User was a player, just remove them from old game
+            removeUserFromGame(existingConnection.gameCode, existingConnection.username);
+            const oldGame = getGame(existingConnection.gameCode);
+            if (oldGame) {
+              broadcastToRoom(io, getGameRoom(existingConnection.gameCode), 'updateUsers', {
+                users: getGameUsers(existingConnection.gameCode)
+              });
+            }
+          }
+        }
+      }
+
       // Block late joins for ranked games that are in progress
       if (game.isRanked && game.gameState === 'in-progress' && !game.allowLateJoin) {
         const existingSocketId = getSocketIdByUsername(gameCode, username);
@@ -288,9 +379,15 @@ function initializeSocketHandlers(io) {
         });
         return;
       }
-      if (existingSocketId) {
-        // Handle reconnection
+      if (existingSocketId || game.users[username]) {
+        // Handle reconnection - either existing socket OR user marked as disconnected
         console.log(`[SOCKET] Reconnection detected for ${username}`, { authUserId, guestTokenHash: !!guestTokenHash });
+
+        // Clear disconnected status on reconnection
+        if (game.users[username]) {
+          game.users[username].disconnected = false;
+          delete game.users[username].disconnectedAt;
+        }
 
         // Update socket ID and auth context (user may have logged in since original join)
         updateUserSocketId(gameCode, username, socket.id, {
@@ -741,7 +838,7 @@ function initializeSocketHandlers(io) {
         }
       }
 
-      const lbThrottleMs = parseInt(process.env.LEADERBOARD_THROTTLE_MS || '1000');
+      const lbThrottleMs = parseInt(process.env.LEADERBOARD_THROTTLE_MS || '500');
       getLeaderboardThrottled(gameCode, (leaderboard) => {
         broadcastToRoom(io, getGameRoom(gameCode), 'updateLeaderboard', {
           leaderboard
@@ -1385,24 +1482,46 @@ function initializeSocketHandlers(io) {
     socket.on('disconnect', (reason) => {
       console.log(`[SOCKET] Client disconnected: ${socket.id} - ${reason}`);
 
-      const userInfo = removeUserBySocketId(socket.id);
-      if (!userInfo) return;
+      // Get user info WITHOUT removing them yet - we need to check if it's the host
+      const gameCode = getGameBySocketId(socket.id);
+      const username = getUsernameBySocketId(socket.id);
 
-      const { gameCode, username } = userInfo;
+      if (!gameCode || !username) {
+        resetRateLimit(socket.id);
+        return;
+      }
+
       const game = getGame(gameCode);
+      if (!game) {
+        // Clean up orphan mappings
+        clearSocketMappings(socket.id);
+        resetRateLimit(socket.id);
+        return;
+      }
 
-      if (!game) return;
+      const isHostDisconnect = game.hostSocketId === socket.id;
 
-      // Check if this was the host
-      if (game.hostSocketId === socket.id) {
+      if (isHostDisconnect) {
         console.log(`[SOCKET] Host disconnected from game ${gameCode}`);
 
-        // Wait a bit for potential reconnection
+        // Mark host as disconnected but DON'T remove their user data yet
+        // This allows reconnection to find them and restore their session
+        if (game.users[username]) {
+          game.users[username].disconnected = true;
+          game.users[username].disconnectedAt = Date.now();
+        }
+
+        // Only clear socket mappings, NOT user data
+        clearSocketMappings(socket.id);
+
+        // Set reconnection timeout - only remove user data and close room if timeout expires
         const reconnectionTimeout = setTimeout(() => {
           const currentGame = getGame(gameCode);
-          if (currentGame && currentGame.hostSocketId === socket.id &&
-              currentGame.reconnectionTimeout === reconnectionTimeout) {
-            // Host didn't reconnect, close the room
+          if (currentGame && currentGame.users[username]?.disconnected) {
+            // Host didn't reconnect within grace period - NOW remove their data and close room
+            console.log(`[SOCKET] Host reconnect grace period expired for game ${gameCode}`);
+
+            removeUserFromGame(gameCode, username);
             timerManager.clearGameTimer(gameCode);
 
             broadcastToRoom(io, getGameRoom(gameCode), 'hostLeftRoomClosing', {
@@ -1416,8 +1535,15 @@ function initializeSocketHandlers(io) {
 
         // Store timeout ID in game object
         game.reconnectionTimeout = reconnectionTimeout;
+
       } else {
-        // Regular player disconnected
+        // Regular player disconnected - use existing behavior (full removal)
+        const userInfo = removeUserBySocketId(socket.id);
+        if (!userInfo) {
+          resetRateLimit(socket.id);
+          return;
+        }
+
         broadcastToRoom(io, getGameRoom(gameCode), 'updateUsers', {
           users: getGameUsers(gameCode)
         });
@@ -1730,7 +1856,7 @@ function endGame(io, gameCode) {
       }
 
       // Record game results to Supabase for leaderboard/stats (auto-validation case)
-      recordGameResultsToSupabase(gameCode, scoresArray, currentGame);
+      await recordGameResultsToSupabase(gameCode, scoresArray, currentGame);
     }
   }, timeoutDuration);
 
@@ -1795,6 +1921,7 @@ function endGame(io, gameCode) {
  */
 async function recordGameResultsToSupabase(gameCode, scoresArray, game) {
   if (!isSupabaseConfigured()) {
+    console.log(`[SUPABASE] Supabase not configured (missing NEXT_PUBLIC_SUPABASE_URL or NEXT_PUBLIC_SUPABASE_ANON_KEY), skipping stats save for game ${gameCode}`);
     return;
   }
 

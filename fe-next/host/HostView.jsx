@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useIdleTimer } from 'react-idle-timer';
 import confetti from 'canvas-confetti';
-import { wordAcceptedToast, wordErrorToast, neoSuccessToast, neoErrorToast, neoInfoToast } from '../components/NeoToast';
+import { wordAcceptedToast, wordNeedsValidationToast, wordErrorToast, neoSuccessToast, neoErrorToast, neoInfoToast } from '../components/NeoToast';
 import { FaTrophy, FaClock, FaUsers, FaQrcode, FaSignOutAlt, FaWhatsapp, FaLink, FaCog, FaPlus, FaMinus, FaCrown, FaChevronDown, FaChevronUp } from 'react-icons/fa';
 import { QRCodeSVG } from 'qrcode.react';
 import { Button } from '../components/ui/button';
@@ -25,7 +25,7 @@ import GameTypeSelector from '../components/GameTypeSelector';
 import '../style/animation.scss';
 import { generateRandomTable, embedWordInGrid, applyHebrewFinalLetters } from '../utils/utils';
 import { useSocket } from '../utils/SocketContext';
-import { clearSession } from '../utils/session';
+import { clearSession, clearSessionPreservingUsername } from '../utils/session';
 import { copyJoinUrl, shareViaWhatsApp, getJoinUrl } from '../utils/share';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useMusic } from '../contexts/MusicContext';
@@ -448,7 +448,8 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
         duration: 5000,
       });
       setTimeout(() => {
-        clearSession();
+        // Preserve username in localStorage for smooth fallback to lobby
+        clearSessionPreservingUsername(username);
         socket.disconnect();
         window.location.reload();
       }, 2000);
@@ -582,6 +583,20 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
       }
     };
 
+    const handleWordNeedsValidation = (data) => {
+      if (hostPlaying) {
+        wordNeedsValidationToast(data.word, { duration: 3000 });
+        // Reset combo when word needs validation (non-dictionary word)
+        setComboLevel(0);
+        comboLevelRef.current = 0;
+        setLastWordTime(null);
+        lastWordTimeRef.current = null;
+        if (comboTimeoutRef.current) {
+          clearTimeout(comboTimeoutRef.current);
+        }
+      }
+    };
+
     const handleTournamentCreated = (data) => {
       if (tournamentTimeoutRef.current) {
         clearTimeout(tournamentTimeoutRef.current);
@@ -668,6 +683,7 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
     socket.on('wordAlreadyFound', handleWordAlreadyFound);
     socket.on('wordNotOnBoard', handleWordNotOnBoard);
     socket.on('wordRejected', handleWordRejected);
+    socket.on('wordNeedsValidation', handleWordNeedsValidation);
     socket.on('tournamentCreated', handleTournamentCreated);
     socket.on('tournamentRoundStarting', handleTournamentRoundStarting);
     socket.on('tournamentRoundCompleted', handleTournamentRoundCompleted);
@@ -690,6 +706,7 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
       socket.off('wordAlreadyFound', handleWordAlreadyFound);
       socket.off('wordNotOnBoard', handleWordNotOnBoard);
       socket.off('wordRejected', handleWordRejected);
+      socket.off('wordNeedsValidation', handleWordNeedsValidation);
       socket.off('tournamentCreated', handleTournamentCreated);
       socket.off('tournamentRoundStarting', handleTournamentRoundStarting);
       socket.off('tournamentRoundCompleted', handleTournamentRoundCompleted);
@@ -784,8 +801,8 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
 
   const confirmExitRoom = () => {
     intentionalExitRef.current = true;
-    // Clear session cookie
-    clearSession();
+    // Preserve username in localStorage for smooth fallback to lobby
+    clearSessionPreservingUsername(username);
     // Send close room message to server first
     socket.emit('closeRoom', { gameCode });
     // Wait a bit for the message to be sent, then disconnect and reload

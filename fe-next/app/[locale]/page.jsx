@@ -9,7 +9,7 @@ import JoinView from '@/JoinView';
 import ResultsPage from '@/ResultsPage.jsx';
 import Header from '@/components/Header';
 import { SocketContext } from '@/utils/SocketContext';
-import { saveSession, getSession, clearSession } from '@/utils/session';
+import { saveSession, getSession, clearSession, clearSessionPreservingUsername } from '@/utils/session';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { useMusic } from '@/contexts/MusicContext';
@@ -443,11 +443,26 @@ export default function GamePage() {
         icon: '🚪',
         duration: 5000,
       });
-      clearSession();
+      // Preserve username in localStorage for smooth fallback to lobby
+      clearSessionPreservingUsername(username);
       setIsActive(false);
       setIsHost(false);
       setGameCode('');
       setTimeout(() => window.location.reload(), 2000);
+    });
+
+    // Handle session migration (another tab took over)
+    newSocket.on('sessionMigrated', (data) => {
+      logger.log('[SOCKET.IO] Session migrated:', data);
+      toast.info(data.message || 'Your session was moved to another tab', {
+        icon: '🔄',
+        duration: 5000,
+      });
+      // Clear local state - session is now in another tab
+      clearSessionPreservingUsername(username);
+      setIsActive(false);
+      setIsHost(false);
+      setGameCode('');
     });
 
     newSocket.on('hostTransferred', (data) => {

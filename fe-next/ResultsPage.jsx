@@ -9,7 +9,7 @@ import ResultsPlayerCard from './components/results/ResultsPlayerCard';
 import ResultsWinnerBanner from './components/results/ResultsWinnerBanner';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from './components/ui/alert-dialog';
 import { Button } from './components/ui/button';
-import { clearSession } from './utils/session';
+import { clearSessionPreservingUsername } from './utils/session';
 import { shouldShowUpgradePrompt, getGuestStatsSummary } from './utils/guestManager';
 import AuthModal from './components/auth/AuthModal';
 
@@ -109,8 +109,8 @@ const ResultsPage = ({ finalScores, letterGrid, gameCode, onReturnToRoom, userna
   };
 
   const confirmExitRoom = () => {
-    // Clear session before reloading to prevent auto-redirect
-    clearSession();
+    // Preserve username in localStorage for smooth fallback to lobby
+    clearSessionPreservingUsername();
     window.location.reload();
   };
 

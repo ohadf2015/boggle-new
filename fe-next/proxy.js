@@ -1,36 +1,100 @@
 import { NextResponse } from 'next/server';
-import { locales, defaultLocale } from './lib/i18n';
+import { locales, defaultLocale, countryToLocale } from './lib/i18n';
+
+// Get locale from Accept-Language header
+function getLocaleFromAcceptLanguage(acceptLanguage) {
+  if (!acceptLanguage) return null;
+
+  // Parse Accept-Language header (e.g., "en-US,en;q=0.9,he;q=0.8")
+  const languages = acceptLanguage
+    .split(',')
+    .map(lang => {
+      const [code, qValue] = lang.trim().split(';q=');
+      return {
+        code: code.split('-')[0].toLowerCase(),
+        quality: qValue ? parseFloat(qValue) : 1.0
+      };
+    })
+    .sort((a, b) => b.quality - a.quality);
+
+  // Find the first supported locale
+  for (const lang of languages) {
+    if (locales.includes(lang.code)) {
+      return lang.code;
+    }
+  }
+
+  return null;
+}
+
+// Get locale from geo headers (Vercel, Cloudflare, etc.)
+function getLocaleFromGeo(request) {
+  // Vercel provides x-vercel-ip-country
+  const vercelCountry = request.headers.get('x-vercel-ip-country');
+  if (vercelCountry && countryToLocale[vercelCountry]) {
+    return countryToLocale[vercelCountry];
+  }
+
+  // Cloudflare provides cf-ipcountry
+  const cfCountry = request.headers.get('cf-ipcountry');
+  if (cfCountry && countryToLocale[cfCountry]) {
+    return countryToLocale[cfCountry];
+  }
+
+  // AWS CloudFront provides cloudfront-viewer-country
+  const awsCountry = request.headers.get('cloudfront-viewer-country');
+  if (awsCountry && countryToLocale[awsCountry]) {
+    return countryToLocale[awsCountry];
+  }
+
+  // Generic geo header (some proxies/CDNs use this)
+  const geoCountry = request.headers.get('x-country-code');
+  if (geoCountry && countryToLocale[geoCountry]) {
+    return countryToLocale[geoCountry];
+  }
+
+  return null;
+}
 
 export function proxy(request) {
   const { pathname } = request.nextUrl;
 
-  // Check if the pathname is missing a locale
+  // Check if the pathname already has a locale
   const pathnameHasLocale = locales.some(
     (locale) => pathname.startsWith(`/${locale}/`) || pathname === `/${locale}`
   );
 
   if (pathnameHasLocale) return;
 
-  // Detect locale from Accept-Language header
-  const acceptLanguage = request.headers.get('accept-language');
-  let locale = defaultLocale;
-
-  if (acceptLanguage) {
-    const browserLang = acceptLanguage.split(',')[0].split('-')[0];
-    if (locales.includes(browserLang)) {
-      locale = browserLang;
-    }
+  // Check for user's explicit language preference cookie
+  const cookieLocale = request.cookies.get('boggle_language')?.value;
+  if (cookieLocale && locales.includes(cookieLocale)) {
+    request.nextUrl.pathname = `/${cookieLocale}${pathname === '/' ? '' : pathname}`;
+    return NextResponse.redirect(request.nextUrl);
   }
 
-  // Redirect to the locale-specific path
-  // For root path, redirect to default locale
-  if (pathname === '/') {
-    request.nextUrl.pathname = `/${defaultLocale}`;
-  } else {
-    request.nextUrl.pathname = `/${locale}${pathname}`;
-  }
+  // Determine locale based on location (priority order):
+  // 1. Geo headers (IP-based location from CDN/hosting provider)
+  // 2. Accept-Language header (browser preference)
+  // 3. Default locale
+  const geoLocale = getLocaleFromGeo(request);
+  const acceptLanguageLocale = getLocaleFromAcceptLanguage(
+    request.headers.get('accept-language')
+  );
+  const detectedLocale = geoLocale || acceptLanguageLocale || defaultLocale;
 
-  return NextResponse.redirect(request.nextUrl);
+  // Redirect to the detected locale
+  request.nextUrl.pathname = `/${detectedLocale}${pathname === '/' ? '' : pathname}`;
+
+  const response = NextResponse.redirect(request.nextUrl);
+
+  // Set the detected locale in a cookie for subsequent requests
+  response.cookies.set('boggle_detected_locale', detectedLocale, {
+    maxAge: 60 * 60 * 24 * 30, // 30 days
+    path: '/',
+  });
+
+  return response;
 }
 
 export const config = {

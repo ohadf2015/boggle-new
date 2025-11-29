@@ -38,6 +38,19 @@ export const LanguageProvider = ({ children, initialLanguage }) => {
     const router = useRouter();
     const pathname = usePathname();
 
+    // Get locale from cookie (works on client-side)
+    const getCookieLocale = (cookieName) => {
+        if (typeof document === 'undefined') return null;
+        const cookies = document.cookie.split(';');
+        for (const cookie of cookies) {
+            const [name, value] = cookie.trim().split('=');
+            if (name === cookieName && locales.includes(value)) {
+                return value;
+            }
+        }
+        return null;
+    };
+
     // Determine initial language
     const getInitialLanguage = () => {
         if (initialLanguage) return initialLanguage;
@@ -49,13 +62,17 @@ export const LanguageProvider = ({ children, initialLanguage }) => {
                 if (pathLocale) return pathLocale;
             }
 
-            // Check localStorage for saved preference
+            // Check localStorage for user's explicit preference
             const savedLanguage = localStorage.getItem('boggle_language');
             if (savedLanguage && locales.includes(savedLanguage)) {
                 return savedLanguage;
             }
 
-            // Use browser language as default
+            // Check for location-detected locale from middleware
+            const detectedLocale = getCookieLocale('boggle_detected_locale');
+            if (detectedLocale) return detectedLocale;
+
+            // Use browser language as fallback
             const browserLang = getBrowserLanguage();
             if (browserLang) return browserLang;
         }

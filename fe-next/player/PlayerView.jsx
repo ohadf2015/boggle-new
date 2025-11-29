@@ -11,7 +11,7 @@ import toast from 'react-hot-toast';
 import { wordAcceptedToast, wordNeedsValidationToast, wordErrorToast, neoSuccessToast, neoErrorToast, neoInfoToast } from '../components/NeoToast';
 import { FaTrophy, FaDoorOpen, FaUsers, FaCrown, FaRandom, FaLink, FaWhatsapp, FaQrcode } from 'react-icons/fa';
 import { useSocket } from '../utils/SocketContext';
-import { clearSession } from '../utils/session';
+import { clearSession, clearSessionPreservingUsername } from '../utils/session';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useMusic } from '../contexts/MusicContext';
 import { useSoundEffects } from '../contexts/SoundEffectsContext';
@@ -477,7 +477,8 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode, pe
 
     const handleHostLeftRoomClosing = (data) => {
       intentionalExitRef.current = true;
-      clearSession();
+      // Preserve username in localStorage for smooth fallback to lobby
+      clearSessionPreservingUsername(username);
       neoErrorToast(data.message || t('playerView.roomClosed'), { icon: '🚪', duration: 5000 });
       setTimeout(() => {
         socket.disconnect();
@@ -717,7 +718,8 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode, pe
       logger.error('[PLAYER] Error emitting leaveRoom event:', error);
     }
 
-    clearSession();
+    // Preserve username in localStorage for smooth fallback to lobby
+    clearSessionPreservingUsername(username);
 
     // Safely disconnect socket after a brief delay to allow event to send
     setTimeout(() => {

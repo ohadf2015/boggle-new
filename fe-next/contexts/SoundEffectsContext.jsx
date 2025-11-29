@@ -9,7 +9,7 @@ const SoundEffectsContext = createContext(null);
 
 // Sound effect definitions
 const SOUND_EFFECTS = {
-  achievement: '/sounds/achievement.wav',
+  achievement: '/sounds/achievment.mp3',
   combo: '/sounds/combo.wav',
   wordAccepted: '/sounds/word-accepted.wav',
   countdownBeep: '/sounds/countdown-beep.wav',

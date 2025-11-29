@@ -6,7 +6,13 @@
 const { createClient } = require('@supabase/supabase-js');
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+// Log configuration status at startup
+console.log(`[SUPABASE] Configuration status: URL=${!!supabaseUrl}, AnonKey=${!!supabaseAnonKey}`);
+if (!supabaseUrl || !supabaseAnonKey) {
+  console.warn('[SUPABASE] WARNING: Supabase not fully configured. Stats will not be saved to database.');
+}
 
 let supabase = null;
 
@@ -14,8 +20,8 @@ let supabase = null;
  * Initialize Supabase client (lazy initialization)
  */
 function getSupabase() {
-  if (!supabase && supabaseUrl && supabaseServiceKey) {
-    supabase = createClient(supabaseUrl, supabaseServiceKey, {
+  if (!supabase && supabaseUrl && supabaseAnonKey) {
+    supabase = createClient(supabaseUrl, supabaseAnonKey, {
       auth: {
         autoRefreshToken: false,
         persistSession: false
@@ -29,7 +35,7 @@ function getSupabase() {
  * Check if Supabase is configured
  */
 function isSupabaseConfigured() {
-  return !!(supabaseUrl && supabaseServiceKey);
+  return !!(supabaseUrl && supabaseAnonKey);
 }
 
 /**

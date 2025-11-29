@@ -201,66 +201,67 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
   // Show auto-joining loading state when user has saved name and came via invitation
   if (prefilledRoom && isAutoJoining && username && username.trim()) {
     return (
-      <div className="min-h-screen bg-gradient-to-b pt-4 from-slate-50 via-slate-100 to-slate-200 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 flex flex-col items-center justify-center p-2 sm:p-4 md:p-6 transition-colors duration-300">
+      <div className="min-h-screen bg-neo-black pt-4 flex flex-col items-center justify-center p-2 sm:p-4 md:p-6">
         <motion.div
-          initial={{ scale: 0, rotate: -10 }}
-          animate={{ scale: 1, rotate: 0 }}
+          initial={{ scale: 0, rotate: -3 }}
+          animate={{ scale: 1, rotate: 1 }}
           transition={{ type: 'spring', stiffness: 260, damping: 20 }}
           className="w-full max-w-md"
         >
-          <Card className="backdrop-blur-md bg-white/90 h-full dark:bg-slate-800/90 shadow-2xl border border-cyan-500/30">
+          <Card className="bg-neo-navy border-4 border-neo-cream rounded-neo shadow-hard">
             <CardHeader className="text-center space-y-4">
               <div className="flex justify-center">
                 <motion.div
                   animate={{ rotate: 360 }}
                   transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+                  className="p-4 bg-neo-cyan rounded-neo border-3 border-neo-black shadow-hard-sm"
                 >
-                  <FaGamepad size={48} className="text-cyan-400" />
+                  <FaGamepad size={48} className="text-neo-black" />
                 </motion.div>
               </div>
-              <CardTitle className="text-2xl sm:text-3xl font-bold text-slate-800 dark:text-white">
+              <CardTitle className="text-2xl sm:text-3xl font-black uppercase text-neo-cream tracking-tight">
                 {t('joinView.joiningRoom')}
               </CardTitle>
               <div className="flex justify-center">
-                <Badge className="text-2xl px-8 py-4 bg-gradient-to-r from-cyan-500 to-purple-600">
+                <div className="text-2xl px-8 py-4 bg-neo-pink text-neo-white font-black uppercase rounded-neo border-3 border-neo-black shadow-hard -rotate-1">
                   {t('joinView.room')} {gameCode}
-                </Badge>
+                </div>
               </div>
-              <p className="text-slate-600 dark:text-gray-400">
-                {t('joinView.welcomeBack')}, <span className="font-semibold text-cyan-600 dark:text-cyan-400">{username}</span>!
+              <p className="text-neo-cream/70 font-bold uppercase text-sm">
+                {t('joinView.welcomeBack')}, <span className="text-neo-cyan">{username}</span>!
               </p>
             </CardHeader>
             <CardContent className="space-y-4">
-              {/* Error Alert */}
+              {/* Error Alert - Neo-Brutalist */}
               {error && (
                 <motion.div
                   initial={{ opacity: 0, y: -10 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.3 }}
                 >
-                  <Alert variant="destructive">
-                    <AlertDescription>{error}</AlertDescription>
-                  </Alert>
+                  <div className="p-4 bg-neo-pink/20 border-3 border-neo-pink rounded-neo">
+                    <p className="text-neo-pink font-bold uppercase text-sm">{error}</p>
+                  </div>
                 </motion.div>
               )}
 
-              {/* Loading animation */}
+              {/* Loading animation - Neo-Brutalist blocks */}
               <div className="flex justify-center py-4">
                 <motion.div
-                  className="flex space-x-2"
+                  className="flex space-x-3"
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                 >
                   {[0, 1, 2].map((i) => (
                     <motion.div
                       key={i}
-                      className="w-3 h-3 bg-cyan-500 rounded-full"
+                      className="w-4 h-4 bg-neo-cyan border-2 border-neo-black rounded-neo"
                       animate={{
-                        y: [-5, 5, -5],
-                        opacity: [1, 0.5, 1],
+                        y: [-8, 8, -8],
+                        rotate: [0, 180, 360],
                       }}
                       transition={{
-                        duration: 0.8,
+                        duration: 1,
                         repeat: Infinity,
                         delay: i * 0.2,
                       }}
@@ -269,7 +270,7 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
                 </motion.div>
               </div>
 
-              <p className="text-center text-slate-500 dark:text-gray-400 text-sm">
+              <p className="text-center text-neo-cream/60 text-sm font-bold uppercase">
                 {t('joinView.connectingToRoom')}
               </p>
             </CardContent>
@@ -283,40 +284,42 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
   // Show simplified quick join interface when room is prefilled (no saved username)
   if (prefilledRoom && !showFullForm) {
     return (
-      <div className="min-h-screen bg-gradient-to-b pt-4 from-slate-50 via-slate-100 to-slate-200 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 flex flex-col items-center justify-center p-2 sm:p-4 md:p-6 transition-colors duration-300">
-        {/* Quick Join Form */}
+      <div className="min-h-screen bg-neo-black pt-4 flex flex-col items-center justify-center p-2 sm:p-4 md:p-6">
+        {/* Quick Join Form - Neo-Brutalist */}
         <motion.div
-          initial={{ scale: 0, rotate: -10 }}
-          animate={{ scale: 1, rotate: 0 }}
+          initial={{ scale: 0, rotate: -3 }}
+          animate={{ scale: 1, rotate: 1 }}
           transition={{ type: 'spring', stiffness: 260, damping: 20 }}
           className="w-full max-w-md"
         >
-          <Card className="backdrop-blur-md bg-white/90 dark:bg-slate-800/90 shadow-2xl border border-cyan-500/30 shadow-[0_0_20px_rgba(6,182,212,0.15)]">
+          <Card className="bg-neo-navy border-4 border-neo-cream rounded-neo shadow-hard">
             <CardHeader className="text-center space-y-4">
               <div className="flex justify-center">
-                <FaGamepad size={48} className="text-cyan-400" />
+                <div className="p-4 bg-neo-cyan rounded-neo border-3 border-neo-black shadow-hard-sm rotate-3">
+                  <FaGamepad size={48} className="text-neo-black" />
+                </div>
               </div>
-              <CardTitle className="text-2xl sm:text-3xl font-bold text-slate-800 dark:text-white">
+              <CardTitle className="text-2xl sm:text-3xl font-black uppercase text-neo-cream tracking-tight">
                 {t('joinView.inviteTitle')}
               </CardTitle>
-              {/* Room number prominently displayed */}
+              {/* Room number prominently displayed - Neo-Brutalist Badge */}
               <div className="flex justify-center">
-                <Badge className="text-2xl px-8 py-4 bg-gradient-to-r from-cyan-500 to-purple-600 hover:from-cyan-400 hover:to-purple-500">
+                <div className="text-2xl px-8 py-4 bg-neo-pink text-neo-white font-black uppercase rounded-neo border-3 border-neo-black shadow-hard -rotate-1">
                   {t('joinView.room')} {gameCode}
-                </Badge>
+                </div>
               </div>
             </CardHeader>
             <CardContent className="space-y-3 sm:space-y-6">
-              {/* Error Alert */}
+              {/* Error Alert - Neo-Brutalist */}
               {error && (
                 <motion.div
                   initial={{ opacity: 0, y: -10 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.3 }}
                 >
-                  <Alert variant="destructive">
-                    <AlertDescription>{error}</AlertDescription>
-                  </Alert>
+                  <div className="p-4 bg-neo-pink/20 border-3 border-neo-pink rounded-neo">
+                    <p className="text-neo-pink font-bold uppercase text-sm">{error}</p>
+                  </div>
                 </motion.div>
               )}
 
@@ -324,64 +327,49 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
               {isAuthenticated && displayName ? (
                 <div className="space-y-3 sm:space-y-6">
                   <div className="text-center py-4">
-                    <p className="text-slate-600 dark:text-gray-400 mb-2">
+                    <p className="text-neo-cream/70 mb-2 font-bold uppercase text-sm">
                       {t('joinView.welcomeBack') || 'Welcome back'},
                     </p>
-                    <p className="text-2xl font-bold text-cyan-600 dark:text-cyan-400">
+                    <p className="text-3xl font-black text-neo-cyan uppercase tracking-tight">
                       {displayName}
                     </p>
                   </div>
 
-                  {/* Error Alert */}
-                  {error && (
-                    <motion.div
-                      initial={{ opacity: 0, y: -10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ duration: 0.3 }}
-                    >
-                      <Alert variant="destructive">
-                        <AlertDescription>{error}</AlertDescription>
-                      </Alert>
-                    </motion.div>
-                  )}
-
-                  {/* Play button */}
-                  <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
+                  {/* Play button - Neo-Brutalist */}
+                  <motion.div whileHover={{ x: -2, y: -2 }} whileTap={{ x: 2, y: 2 }}>
                     <Button
                       onClick={() => handleJoin(false)}
-                      className="w-full h-14 text-xl font-bold bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-400 hover:to-emerald-500 hover:shadow-[0_0_25px_rgba(34,197,94,0.5)] transition-all"
+                      className="w-full h-14 text-xl font-black uppercase bg-neo-lime text-neo-black border-3 border-neo-black rounded-neo shadow-hard hover:shadow-hard-lg hover:bg-neo-lime/90 transition-all"
                     >
                       <FaGamepad className="mr-3" size={24} />
                       {t('joinView.joinGame')}
                     </Button>
                   </motion.div>
 
-                  {/* Switch to full form - subtle link */}
+                  {/* Switch to full form - Neo-Brutalist link */}
                   <div className="text-center pt-2">
-                    <Button
-                      variant="link"
-                      size="sm"
+                    <button
                       type="button"
                       onClick={() => setShowFullForm(true)}
-                      className="text-sm text-cyan-600 dark:text-cyan-400 hover:text-cyan-500 dark:hover:text-cyan-300 underline"
+                      className="text-sm text-neo-cyan font-bold uppercase underline underline-offset-4 hover:text-neo-cyan/80 transition-colors"
                     >
                       {t('joinView.wantToHostOrJoinOther')}
-                    </Button>
+                    </button>
                   </div>
                 </div>
               ) : (
                 /* Guest user - needs name input */
                 <form onSubmit={handleQuickJoin} className="space-y-3 sm:space-y-6">
-                  {/* Simple name input */}
+                  {/* Simple name input - Neo-Brutalist */}
                   <motion.div
                     animate={usernameError ? { x: [-10, 10, -10, 10, 0] } : {}}
                     transition={{ duration: 0.4 }}
                     className="space-y-2"
                   >
-                    <Label htmlFor="username" className="text-base font-semibold text-slate-700 dark:text-gray-300">
+                    <Label htmlFor="username" className="text-base font-black uppercase text-neo-cream">
                       {t('joinView.enterNameToPlay')}
                     </Label>
-                      <Input
+                    <Input
                       ref={usernameInputRef}
                       id="username"
                       value={username}
@@ -392,40 +380,38 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
                       required
                       autoFocus
                       className={cn(
-                        "h-14 text-lg bg-slate-100 dark:bg-slate-700/50 border-2 border-slate-300 dark:border-slate-600 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-gray-500",
-                        usernameError && "border-red-500 bg-red-50 dark:bg-red-900/30 focus-visible:ring-red-500"
+                        "h-14 text-lg bg-neo-cream text-neo-black font-bold border-3 border-neo-black rounded-neo shadow-hard-sm placeholder:text-neo-black/50 focus:border-neo-cyan focus:ring-0",
+                        usernameError && "border-neo-pink bg-neo-pink/20 text-neo-pink"
                       )}
                       placeholder={t('joinView.playerNamePlaceholder')}
                       maxLength={20}
                     />
                     {usernameError && (
-                      <p className="text-sm text-red-500 dark:text-red-400">{t(usernameErrorKey || 'validation.usernameRequired')}</p>
+                      <p className="text-sm text-neo-pink font-bold uppercase">{t(usernameErrorKey || 'validation.usernameRequired')}</p>
                     )}
                   </motion.div>
 
-                  {/* Play button */}
-                  <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
+                  {/* Play button - Neo-Brutalist */}
+                  <motion.div whileHover={{ x: -2, y: -2 }} whileTap={{ x: 2, y: 2 }}>
                     <Button
                       type="submit"
                       disabled={!username}
-                      className="w-full h-14 text-xl font-bold bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-400 hover:to-emerald-500 hover:shadow-[0_0_25px_rgba(34,197,94,0.5)] transition-all"
+                      className="w-full h-14 text-xl font-black uppercase bg-neo-lime text-neo-black border-3 border-neo-black rounded-neo shadow-hard hover:shadow-hard-lg hover:bg-neo-lime/90 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       <FaGamepad className="mr-3" size={24} />
                       {t('joinView.joinGame')}
                     </Button>
                   </motion.div>
 
-                  {/* Switch to full form - subtle link */}
+                  {/* Switch to full form - Neo-Brutalist link */}
                   <div className="text-center pt-2">
-                    <Button
-                      variant="link"
-                      size="sm"
+                    <button
                       type="button"
                       onClick={() => setShowFullForm(true)}
-                      className="text-sm text-cyan-600 dark:text-cyan-400 hover:text-cyan-500 dark:hover:text-cyan-300 underline"
+                      className="text-sm text-neo-cyan font-bold uppercase underline underline-offset-4 hover:text-neo-cyan/80 transition-colors"
                     >
                       {t('joinView.wantToHostOrJoinOther')}
-                    </Button>
+                    </button>
                   </div>
                 </form>
               )}
@@ -847,8 +833,8 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
                     <FaGamepad size={48} className="text-neo-cream/30" />
                   </div>
                   <div>
-                    <p className="text-sm font-bold uppercase bg-gradient-to-r from-neo-pink via-neo-cyan to-neo-lime bg-clip-text text-transparent">{t('joinView.noRooms')}</p>
-                    <p className="text-xs mt-1 bg-gradient-to-r from-neo-lime via-neo-yellow to-neo-pink bg-clip-text text-transparent">{t('joinView.createNewRoom')}</p>
+                    <p className="text-base font-bold uppercase text-black">{t('joinView.noRooms')}</p>
+                    <p className="text-sm mt-1 text-black/70">{t('joinView.createNewRoom')}</p>
                   </div>
                 </div>
               ) : (

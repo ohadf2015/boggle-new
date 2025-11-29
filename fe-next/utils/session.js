@@ -63,6 +63,28 @@ export const clearSession = () => {
 };
 
 /**
+ * Clear the session but preserve the username in localStorage for next join
+ * This ensures smooth fallback to lobby with the username pre-filled
+ * @param {string} [username] - Optional username to preserve (will read from session if not provided)
+ */
+export const clearSessionPreservingUsername = (username) => {
+  try {
+    // Get the username from session if not provided
+    const usernameToSave = username || getSession()?.username;
+
+    // Save username to localStorage before clearing session
+    if (usernameToSave && typeof window !== 'undefined') {
+      localStorage.setItem('boggle_username', usernameToSave);
+    }
+  } catch (error) {
+    console.error('Error preserving username:', error);
+  }
+
+  // Clear the session cookie
+  Cookies.remove(SESSION_COOKIE_NAME);
+};
+
+/**
  * Check if a valid session exists
  * @returns {boolean}
  */

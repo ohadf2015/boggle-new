@@ -55,10 +55,18 @@ export const AuthProvider = ({ children }) => {
       }
 
       // Get initial session
-      const { data: { session } } = await supabase.auth.getSession();
-      if (session?.user) {
-        setUser(session.user);
-        await fetchUserData(session.user.id);
+      try {
+        const { data: { session }, error } = await supabase.auth.getSession();
+        if (error) {
+          // Invalid refresh token or other auth error - clear state
+          console.warn('Session error, signing out:', error.message);
+          await supabase.auth.signOut();
+        } else if (session?.user) {
+          setUser(session.user);
+          await fetchUserData(session.user.id);
+        }
+      } catch (err) {
+        console.warn('Failed to get session:', err.message);
       }
       setLoading(false);
 
@@ -69,6 +77,12 @@ export const AuthProvider = ({ children }) => {
             setUser(session.user);
             await fetchUserData(session.user.id);
           } else if (event === 'SIGNED_OUT') {
+            setUser(null);
+            setProfile(null);
+            setRankedProgress(null);
+          } else if (event === 'TOKEN_REFRESHED' && !session) {
+            // Token refresh failed - sign out
+            console.warn('Token refresh failed, signing out');
             setUser(null);
             setProfile(null);
             setRankedProgress(null);

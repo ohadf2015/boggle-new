@@ -19,6 +19,10 @@ const usernameToSocket = new Map();
 // Leaderboard throttling - maps gameCode to timeout ID
 const leaderboardThrottleTimers = {};
 
+// Track authenticated users across all games
+// Maps authUserId -> { gameCode, socketId, username, isHost, connectedAt }
+const authUserConnections = new Map();
+
 /**
  * Create a new game
  * @param {string} gameCode - Unique game code
@@ -158,6 +162,11 @@ function addUserToGame(gameCode, username, socketId, options = {}) {
   socketToUsername.set(socketId, username);
   usernameToSocket.set(`${gameCode}:${username}`, socketId);
 
+  // Track authenticated user globally for multi-tab detection
+  if (authUserId) {
+    setAuthUserConnection(authUserId, { gameCode, socketId, username, isHost });
+  }
+
   game.lastActivity = Date.now();
   return true;
 }
@@ -170,6 +179,12 @@ function addUserToGame(gameCode, username, socketId, options = {}) {
 function removeUserFromGame(gameCode, username) {
   const game = games[gameCode];
   if (!game) return;
+
+  // Remove from global auth tracking before removing user data
+  const userData = game.users[username];
+  if (userData && userData.authUserId) {
+    removeAuthUserConnection(userData.authUserId);
+  }
 
   const key = `${gameCode}:${username}`;
   const socketId = usernameToSocket.get(key);
@@ -285,6 +300,17 @@ function updateUserSocketId(gameCode, username, newSocketId, authContext = null)
   socketToGame.set(newSocketId, gameCode);
   socketToUsername.set(newSocketId, username);
   usernameToSocket.set(`${gameCode}:${username}`, newSocketId);
+
+  // Update auth user connection tracking
+  const authUserId = authContext?.authUserId || game.users[username]?.authUserId;
+  if (authUserId) {
+    setAuthUserConnection(authUserId, {
+      gameCode,
+      socketId: newSocketId,
+      username,
+      isHost: game.users[username]?.isHost || false
+    });
+  }
 
   return true;
 }
@@ -545,28 +571,62 @@ function getLeaderboard(gameCode) {
 }
 
 /**
- * Get leaderboard with throttling to prevent excessive updates
+ * Get leaderboard with leading-edge throttling for immediate feedback
+ * Uses a leading-edge pattern: broadcasts immediately on first call,
+ * then throttles subsequent calls to prevent excessive updates.
+ * This ensures players get immediate feedback while preventing broadcast storms.
+ *
  * @param {string} gameCode - Game code
  * @param {function} broadcastFn - Function to call with leaderboard data
- * @param {number} throttleMs - Throttle duration in milliseconds (default 1000ms)
+ * @param {number} throttleMs - Throttle duration in milliseconds (default 500ms)
  */
-function getLeaderboardThrottled(gameCode, broadcastFn, throttleMs = 1000) {
+const leaderboardLastBroadcast = {};
+const leaderboardPendingUpdate = {};
+
+function getLeaderboardThrottled(gameCode, broadcastFn, throttleMs = 500) {
   const game = games[gameCode];
   if (!game) return;
 
-  // Clear existing timer for this game
-  if (leaderboardThrottleTimers[gameCode]) {
-    clearTimeout(leaderboardThrottleTimers[gameCode]);
-  }
+  const now = Date.now();
+  const lastBroadcast = leaderboardLastBroadcast[gameCode] || 0;
+  const timeSinceLastBroadcast = now - lastBroadcast;
 
-  // Set new timer to broadcast leaderboard after throttle period
-  leaderboardThrottleTimers[gameCode] = setTimeout(() => {
+  // If enough time has passed since last broadcast, send immediately (leading edge)
+  if (timeSinceLastBroadcast >= throttleMs) {
     const leaderboard = getLeaderboard(gameCode);
     if (broadcastFn && typeof broadcastFn === 'function') {
       broadcastFn(leaderboard);
     }
-    delete leaderboardThrottleTimers[gameCode];
-  }, throttleMs);
+    leaderboardLastBroadcast[gameCode] = now;
+
+    // Clear any pending trailing update since we just broadcasted
+    if (leaderboardThrottleTimers[gameCode]) {
+      clearTimeout(leaderboardThrottleTimers[gameCode]);
+      delete leaderboardThrottleTimers[gameCode];
+    }
+    leaderboardPendingUpdate[gameCode] = false;
+  } else {
+    // Within throttle window - mark that we have a pending update
+    leaderboardPendingUpdate[gameCode] = true;
+
+    // Set a trailing-edge timer to catch any updates during the throttle window
+    // Only set if not already set
+    if (!leaderboardThrottleTimers[gameCode]) {
+      const remainingTime = throttleMs - timeSinceLastBroadcast;
+      leaderboardThrottleTimers[gameCode] = setTimeout(() => {
+        // Only broadcast if there's actually a pending update
+        if (leaderboardPendingUpdate[gameCode]) {
+          const leaderboard = getLeaderboard(gameCode);
+          if (broadcastFn && typeof broadcastFn === 'function') {
+            broadcastFn(leaderboard);
+          }
+          leaderboardLastBroadcast[gameCode] = Date.now();
+          leaderboardPendingUpdate[gameCode] = false;
+        }
+        delete leaderboardThrottleTimers[gameCode];
+      }, remainingTime);
+    }
+  }
 }
 
 /**
@@ -589,6 +649,56 @@ function cleanupStaleGames(maxAge = 2 * 60 * 60 * 1000) {
   }
 
   return staleCodes.length;
+}
+
+/**
+ * Get connection info for an authenticated user
+ * @param {string} authUserId - Supabase auth user ID
+ * @returns {object|null} - { gameCode, socketId, username, isHost, connectedAt } or null
+ */
+function getAuthUserConnection(authUserId) {
+  if (!authUserId) return null;
+  return authUserConnections.get(authUserId) || null;
+}
+
+/**
+ * Set connection info for an authenticated user
+ * @param {string} authUserId - Supabase auth user ID
+ * @param {object} connectionInfo - { gameCode, socketId, username, isHost }
+ */
+function setAuthUserConnection(authUserId, connectionInfo) {
+  if (!authUserId) return;
+  authUserConnections.set(authUserId, {
+    ...connectionInfo,
+    connectedAt: Date.now()
+  });
+}
+
+/**
+ * Remove connection info for an authenticated user
+ * @param {string} authUserId - Supabase auth user ID
+ */
+function removeAuthUserConnection(authUserId) {
+  if (!authUserId) return;
+  authUserConnections.delete(authUserId);
+}
+
+/**
+ * Clear socket mappings without removing user data (for disconnect grace period)
+ * @param {string} socketId - Socket ID to clear
+ * @returns {object|null} - { gameCode, username } or null
+ */
+function clearSocketMappings(socketId) {
+  const gameCode = socketToGame.get(socketId);
+  const username = socketToUsername.get(socketId);
+
+  if (!gameCode || !username) return null;
+
+  socketToGame.delete(socketId);
+  socketToUsername.delete(socketId);
+  // Note: Don't delete usernameToSocket - user data remains valid for reconnection
+
+  return { gameCode, username };
 }
 
 // Legacy compatibility exports (for gradual migration)
@@ -656,6 +766,12 @@ module.exports = {
 
   // Cleanup
   cleanupStaleGames,
+
+  // Auth user tracking
+  getAuthUserConnection,
+  setAuthUserConnection,
+  removeAuthUserConnection,
+  clearSocketMappings,
 
   // Legacy compatibility
   gameWs,
