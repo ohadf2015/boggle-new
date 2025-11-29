@@ -255,25 +255,42 @@ const AuthButton = () => {
     );
   }
 
-  // Guest user - show settings dropdown
+  // Guest user - show prominent Sign In button + settings dropdown
   return (
     <>
-      <div className="relative">
+      <div className="flex items-center gap-2">
+        {/* Prominent Sign In Button - Always Visible */}
         <Button
-          variant="outline"
           size="sm"
-          onClick={() => setShowUserMenu(!showUserMenu)}
-          onBlur={() => setTimeout(() => { setShowUserMenu(false); setIsLanguageExpanded(false); }, 200)}
+          onClick={() => setShowAuthModal(true)}
           className={cn(
-            'flex items-center gap-2 rounded-full transition-all duration-300',
+            'flex items-center gap-2 rounded-full font-bold transition-all duration-300',
             isDarkMode
-              ? 'bg-slate-800 text-cyan-300 hover:bg-slate-700 hover:shadow-[0_0_15px_rgba(6,182,212,0.3)] border-slate-700'
-              : 'bg-white text-cyan-600 hover:bg-gray-50 hover:shadow-[0_0_15px_rgba(6,182,212,0.2)] border-gray-200'
+              ? 'bg-neo-cyan text-neo-black hover:bg-cyan-400 hover:shadow-[0_0_15px_rgba(6,182,212,0.5)] border-2 border-neo-black'
+              : 'bg-neo-cyan text-neo-black hover:bg-cyan-400 hover:shadow-[0_0_15px_rgba(6,182,212,0.4)] border-2 border-neo-black'
           )}
         >
-          <FaCog size={16} />
-          <FaChevronDown size={10} className={showUserMenu ? 'rotate-180 transition-transform' : 'transition-transform'} />
+          <FaUser size={14} />
+          <span className="hidden sm:inline">{t('auth.signIn') || 'Sign In'}</span>
         </Button>
+
+        {/* Settings Dropdown */}
+        <div className="relative">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setShowUserMenu(!showUserMenu)}
+            onBlur={() => setTimeout(() => { setShowUserMenu(false); setIsLanguageExpanded(false); }, 200)}
+            className={cn(
+              'flex items-center gap-2 rounded-full transition-all duration-300',
+              isDarkMode
+                ? 'bg-slate-800 text-cyan-300 hover:bg-slate-700 hover:shadow-[0_0_15px_rgba(6,182,212,0.3)] border-slate-700'
+                : 'bg-white text-cyan-600 hover:bg-gray-50 hover:shadow-[0_0_15px_rgba(6,182,212,0.2)] border-gray-200'
+            )}
+          >
+            <FaCog size={16} />
+            <FaChevronDown size={10} className={showUserMenu ? 'rotate-180 transition-transform' : 'transition-transform'} />
+          </Button>
 
         {/* Guest Dropdown */}
         <AnimatePresence>
@@ -379,7 +396,7 @@ const AuthButton = () => {
                 isDarkMode ? 'bg-slate-700' : 'bg-gray-200'
               )} />
 
-              {/* Leaderboard Link */}
+              {/* Leaderboard Link - Now the last item */}
               <Button
                 variant="ghost"
                 onClick={() => {
@@ -387,7 +404,7 @@ const AuthButton = () => {
                   setShowUserMenu(false);
                 }}
                 className={cn(
-                  'w-full justify-start gap-3',
+                  'w-full justify-start gap-3 rounded-b-lg',
                   isDarkMode
                     ? 'text-gray-300 hover:bg-slate-700 hover:text-gray-300'
                     : 'text-gray-700 hover:bg-gray-50 hover:text-gray-700'
@@ -396,27 +413,10 @@ const AuthButton = () => {
                 <FaTrophy size={14} />
                 <span>{t('leaderboard.title') || 'Leaderboard'}</span>
               </Button>
-
-              {/* Sign In */}
-              <Button
-                variant="ghost"
-                onClick={() => {
-                  setShowUserMenu(false);
-                  setShowAuthModal(true);
-                }}
-                className={cn(
-                  'w-full justify-start gap-3 rounded-b-lg',
-                  isDarkMode
-                    ? 'text-cyan-300 hover:bg-slate-700 hover:text-cyan-300'
-                    : 'text-cyan-600 hover:bg-gray-50 hover:text-cyan-600'
-                )}
-              >
-                <FaUser size={14} />
-                <span>{t('auth.signIn') || 'Sign In'}</span>
-              </Button>
             </motion.div>
           )}
         </AnimatePresence>
+        </div>
       </div>
 
       <AuthModal

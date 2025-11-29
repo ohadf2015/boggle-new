@@ -389,10 +389,18 @@ export default function GamePage() {
           toast.error(t('errors.gameCodeNotExist'), { duration: 4000, icon: '❌' });
         }
         setGameCode('');
+        setPrefilledRoomCode(''); // Clear prefilled room so user sees main join page
         setIsActive(false);
         setAttemptingReconnect(false);
         setShouldAutoJoin(false);
         clearSession();
+
+        // Remove room parameter from URL without page reload
+        if (typeof window !== 'undefined' && window.location.search.includes('room=')) {
+          const url = new URL(window.location.href);
+          url.searchParams.delete('room');
+          window.history.replaceState({}, '', url.pathname + (url.search || ''));
+        }
       } else if (data.message?.includes('already in use') || data.message?.includes('Game code already')) {
         setError(t('errors.gameCodeExists'));
         setIsActive(false);

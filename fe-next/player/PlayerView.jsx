@@ -37,7 +37,7 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode, pe
   const { t, dir } = useLanguage();
   const { socket } = useSocket();
   const { fadeToTrack, stopMusic, TRACKS } = useMusic();
-  const { playComboSound } = useSoundEffects();
+  const { playComboSound, playCountdownBeep } = useSoundEffects();
   const { queueAchievement } = useAchievementQueue();
   const inputRef = useRef(null);
   const wordListRef = useRef(null);
@@ -89,7 +89,7 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode, pe
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [gameActive]);
 
-  // Music: Play urgent music when 20 seconds remaining
+  /// Music: Play urgent music when 20 seconds remaining
   useEffect(() => {
     if (gameActive && remainingTime !== null && remainingTime <= 20 && remainingTime > 0 && !hasTriggeredUrgentMusicRef.current) {
       hasTriggeredUrgentMusicRef.current = true;
@@ -101,6 +101,13 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode, pe
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [remainingTime, gameActive]);
+
+  // Countdown beep for last 3 seconds
+  useEffect(() => {
+    if (gameActive && remainingTime !== null && remainingTime <= 3 && remainingTime > 0) {
+      playCountdownBeep(remainingTime);
+    }
+  }, [remainingTime, gameActive, playCountdownBeep]);
 
   // Keep refs in sync with state for socket handlers (avoids stale closures)
   useEffect(() => {
@@ -162,7 +169,7 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode, pe
         logger.log('[PLAYER] Sent startGameAck for pending game start, messageId:', pendingGameStart.messageId);
       }
 
-      neoSuccessToast(t('common.gameStarted'), { icon: '🚀', duration: 3000 });
+      neoSuccessToast(t('common.gameStarted'), { id: 'game-started', icon: '🚀', duration: 3000 });
 
       // Clear the pending game start
       onGameStartConsumed();
@@ -225,7 +232,7 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode, pe
         logger.log('[PLAYER] Sent startGameAck for messageId:', data.messageId);
       }
 
-      neoSuccessToast(t('common.gameStarted'), { icon: '🚀', duration: 3000 });
+      neoSuccessToast(t('common.gameStarted'), { id: 'game-started', icon: '🚀', duration: 3000 });
     };
 
     const handleEndGame = () => {
@@ -242,6 +249,7 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode, pe
             borderRadius: '8px',
             fontWeight: '700',
             color: '#000000',
+            pointerEvents: 'auto',
           },
           icon: '⏱️',
         });

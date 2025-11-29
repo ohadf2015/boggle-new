@@ -99,6 +99,7 @@ const RoomChat = ({ username, isHost, gameCode, className = '' }) => {
             borderRadius: '8px',
             padding: '12px 16px',
             cursor: 'pointer',
+            pointerEvents: 'auto',
           },
         }
       );

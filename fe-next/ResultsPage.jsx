@@ -1,14 +1,17 @@
 import React, { useMemo, useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { FaTrophy, FaSignOutAlt, FaStar } from 'react-icons/fa';
+import { FaTrophy, FaSignOutAlt, FaStar, FaUser } from 'react-icons/fa';
 import GridComponent from './components/GridComponent';
 import confetti from 'canvas-confetti';
 import { useLanguage } from './contexts/LanguageContext';
+import { useAuth } from './contexts/AuthContext';
 import ResultsPlayerCard from './components/results/ResultsPlayerCard';
 import ResultsWinnerBanner from './components/results/ResultsWinnerBanner';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from './components/ui/alert-dialog';
 import { Button } from './components/ui/button';
 import { clearSession } from './utils/session';
+import { shouldShowUpgradePrompt, getGuestStatsSummary } from './utils/guestManager';
+import AuthModal from './components/auth/AuthModal';
 
 // Helper functions for finding word paths on the board (client-side version)
 const normalizeHebrewLetter = (letter) => {
@@ -84,7 +87,22 @@ const LetterGrid = ({ letterGrid, heatMapData }) => {
 
 const ResultsPage = ({ finalScores, letterGrid, gameCode, onReturnToRoom, username }) => {
   const { t } = useLanguage();
+  const { user, isAuthenticated } = useAuth();
   const [showExitConfirm, setShowExitConfirm] = useState(false);
+  const [showAuthModal, setShowAuthModal] = useState(false);
+  const [hasShownUpgradePrompt, setHasShownUpgradePrompt] = useState(false);
+
+  // Show sign-up prompt for guests after their first game
+  useEffect(() => {
+    if (!isAuthenticated && !hasShownUpgradePrompt && shouldShowUpgradePrompt()) {
+      // Delay showing the modal so players can see results first
+      const timeout = setTimeout(() => {
+        setShowAuthModal(true);
+        setHasShownUpgradePrompt(true);
+      }, 3000);
+      return () => clearTimeout(timeout);
+    }
+  }, [isAuthenticated, hasShownUpgradePrompt]);
 
   const handleExitRoom = () => {
     setShowExitConfirm(true);
@@ -313,6 +331,13 @@ const ResultsPage = ({ finalScores, letterGrid, gameCode, onReturnToRoom, userna
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Sign Up Prompt for Guests */}
+      <AuthModal
+        isOpen={showAuthModal}
+        onClose={() => setShowAuthModal(false)}
+        showGuestStats={true}
+      />
     </div>
   );
 };

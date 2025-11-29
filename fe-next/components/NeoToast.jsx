@@ -51,7 +51,7 @@ export const wordAcceptedToast = (word, options = {}) => {
             exit={{ y: -10, opacity: 0, scale: 0.95 }}
             transition={{ type: 'spring', stiffness: 400, damping: 25 }}
             className="flex items-center gap-3 px-4 py-3 rounded-lg bg-neo-lime border-3 border-neo-black shadow-hard"
-            style={{ minWidth: '200px' }}
+            style={{ minWidth: '200px', pointerEvents: 'auto' }}
           >
             <motion.span
               initial={{ scale: 0, rotate: -180 }}
@@ -109,7 +109,7 @@ export const wordNeedsValidationToast = (word, options = {}) => {
             exit={{ y: -10, opacity: 0, scale: 0.95 }}
             transition={{ type: 'spring', stiffness: 400, damping: 25 }}
             className="flex items-center gap-3 px-4 py-3 rounded-lg bg-neo-yellow border-3 border-neo-black shadow-hard"
-            style={{ minWidth: '200px' }}
+            style={{ minWidth: '200px', pointerEvents: 'auto' }}
           >
             <motion.span
               animate={{ rotate: [0, 10, -10, 0] }}
@@ -157,7 +157,7 @@ export const wordErrorToast = (message, options = {}) => {
               x: { duration: 0.4, delay: 0.1 }
             }}
             className="flex items-center gap-3 px-4 py-3 rounded-lg bg-neo-red border-3 border-neo-black shadow-hard"
-            style={{ minWidth: '200px' }}
+            style={{ minWidth: '200px', pointerEvents: 'auto' }}
           >
             <motion.span
               initial={{ scale: 0 }}
@@ -193,6 +193,7 @@ export const neoSuccessToast = (message, options = {}) => {
             exit={{ y: -10, opacity: 0, scale: 0.95 }}
             transition={{ type: 'spring', stiffness: 400, damping: 25 }}
             className="flex items-center gap-3 px-4 py-3 rounded-lg bg-neo-lime border-3 border-neo-black shadow-hard"
+            style={{ pointerEvents: 'auto' }}
           >
             {options.icon && (
               <motion.span
@@ -212,6 +213,7 @@ export const neoSuccessToast = (message, options = {}) => {
       </AnimatePresence>
     ),
     {
+      id: options.id, // Unique ID to prevent duplicate toasts
       duration: options.duration || 3000,
       position: 'top-center',
     }
@@ -240,6 +242,7 @@ export const neoErrorToast = (message, options = {}) => {
               x: { duration: 0.3 }
             }}
             className="flex items-center gap-3 px-4 py-3 rounded-lg bg-neo-red border-3 border-neo-black shadow-hard"
+            style={{ pointerEvents: 'auto' }}
           >
             {options.icon && (
               <motion.span
@@ -277,6 +280,7 @@ export const neoInfoToast = (message, options = {}) => {
             exit={{ y: -10, opacity: 0, scale: 0.95 }}
             transition={{ type: 'spring', stiffness: 400, damping: 25 }}
             className="flex items-center gap-3 px-4 py-3 rounded-lg bg-neo-cyan border-3 border-neo-black shadow-hard"
+            style={{ pointerEvents: 'auto' }}
           >
             {options.icon && (
               <motion.span

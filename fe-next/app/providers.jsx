@@ -32,11 +32,15 @@ export function Providers({ children, lang }) {
             </ThemeProvider>
             <Toaster
                 position="top-center"
+                containerStyle={{
+                    pointerEvents: 'none',
+                }}
                 toastOptions={{
                     duration: 2000,
                     style: {
                         background: '#363636',
                         color: '#fff',
+                        pointerEvents: 'auto',
                     },
                 }}
             />

@@ -776,33 +776,6 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
                     ? t('joinView.createGameInstructions')
                     : t('validation.enterGameCode')}
                 </p>
-
-                {/* Share Buttons for Hosts */}
-                {mode === 'host' && gameCode && (
-                  <div className="flex flex-wrap gap-2 justify-center">
-                    <ShareButton
-                      variant="link"
-                      onClick={() => copyJoinUrl(gameCode, t)}
-                      icon={<FaLink />}
-                    >
-                      {t('joinView.copyLink')}
-                    </ShareButton>
-                    <ShareButton
-                      variant="whatsapp"
-                      onClick={() => shareViaWhatsApp(gameCode, roomName, t)}
-                      icon={<FaWhatsapp />}
-                    >
-                      {t('joinView.shareWhatsapp')}
-                    </ShareButton>
-                    <ShareButton
-                      variant="qr"
-                      onClick={() => setShowQR(true)}
-                      icon={<FaQrcode />}
-                    >
-                      {t('hostView.qrCode')}
-                    </ShareButton>
-                  </div>
-                )}
               </div>
             </CardContent>
           </Card>
@@ -838,8 +811,8 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
             <CardContent className="flex-1 overflow-auto">
               {roomsLoading ? (
                 // Loading skeleton for rooms - Neo-Brutalist
-                <div className="space-y-3">
-                  {[1, 2, 3].map((i) => (
+                <div className="space-y-2">
+                  {[1, 2].map((i) => (
                     <div
                       key={i}
                       className="w-full p-3 rounded-neo bg-neo-navy/50 border-3 border-neo-cream/20 animate-pulse"
@@ -874,8 +847,8 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
                     <FaGamepad size={48} className="text-neo-cream/30" />
                   </div>
                   <div>
-                    <p className="text-sm font-bold uppercase text-neo-cream">{t('joinView.noRooms')}</p>
-                    <p className="text-xs mt-1 text-neo-cream/70">{t('joinView.createNewRoom')}</p>
+                    <p className="text-sm font-bold uppercase bg-gradient-to-r from-neo-pink via-neo-cyan to-neo-lime bg-clip-text text-transparent">{t('joinView.noRooms')}</p>
+                    <p className="text-xs mt-1 bg-gradient-to-r from-neo-lime via-neo-yellow to-neo-pink bg-clip-text text-transparent">{t('joinView.createNewRoom')}</p>
                   </div>
                 </div>
               ) : (

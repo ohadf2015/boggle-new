@@ -39,13 +39,14 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
   const { t, language, dir } = useLanguage();
   const { socket } = useSocket();
   const { fadeToTrack, stopMusic, TRACKS } = useMusic();
-  const { playComboSound } = useSoundEffects();
+  const { playComboSound, playCountdownBeep } = useSoundEffects();
   const { queueAchievement } = useAchievementQueue();
   const intentionalExitRef = useRef(false);
   const [difficulty, setDifficulty] = useState(DEFAULT_DIFFICULTY);
   const [minWordLength, setMinWordLength] = useState(DEFAULT_MIN_WORD_LENGTH);
   const [tableData, setTableData] = useState(generateRandomTable());
   const [timerValue, setTimerValue] = useState('1');
+  const [timerDirection, setTimerDirection] = useState(0); // -1 for down, 1 for up
   const [remainingTime, setRemainingTime] = useState(null);
   const [gameStarted, setGameStarted] = useState(false);
   const [roomLanguage] = useState(roomLanguageProp || language); // Use prop if available, fallback to user's language
@@ -114,6 +115,13 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [remainingTime, gameStarted]);
+
+  // Countdown beep for last 3 seconds
+  useEffect(() => {
+    if (gameStarted && remainingTime !== null && remainingTime <= 3 && remainingTime > 0) {
+      playCountdownBeep(remainingTime);
+    }
+  }, [remainingTime, gameStarted, playCountdownBeep]);
 
   // Update players list when initialPlayers prop changes
   useEffect(() => {
@@ -556,6 +564,24 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
       }
     };
 
+    const handleWordRejected = (data) => {
+      if (hostPlaying) {
+        // Show notification for word not in dictionary
+        const reason = data.reason === 'notInDictionary'
+          ? (t('playerView.notInDictionary') || 'Not in dictionary')
+          : (t('playerView.wordRejected') || 'Word rejected');
+        wordErrorToast(`${data.word}: ${reason}`, { duration: 3000 });
+        setHostFoundWords(prev => prev.filter(w => w !== data.word));
+        setComboLevel(0);
+        comboLevelRef.current = 0;
+        setLastWordTime(null);
+        lastWordTimeRef.current = null;
+        if (comboTimeoutRef.current) {
+          clearTimeout(comboTimeoutRef.current);
+        }
+      }
+    };
+
     const handleTournamentCreated = (data) => {
       if (tournamentTimeoutRef.current) {
         clearTimeout(tournamentTimeoutRef.current);
@@ -641,6 +667,7 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
     socket.on('wordAccepted', handleWordAccepted);
     socket.on('wordAlreadyFound', handleWordAlreadyFound);
     socket.on('wordNotOnBoard', handleWordNotOnBoard);
+    socket.on('wordRejected', handleWordRejected);
     socket.on('tournamentCreated', handleTournamentCreated);
     socket.on('tournamentRoundStarting', handleTournamentRoundStarting);
     socket.on('tournamentRoundCompleted', handleTournamentRoundCompleted);
@@ -662,6 +689,7 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
       socket.off('wordAccepted', handleWordAccepted);
       socket.off('wordAlreadyFound', handleWordAlreadyFound);
       socket.off('wordNotOnBoard', handleWordNotOnBoard);
+      socket.off('wordRejected', handleWordRejected);
       socket.off('tournamentCreated', handleTournamentCreated);
       socket.off('tournamentRoundStarting', handleTournamentRoundStarting);
       socket.off('tournamentRoundCompleted', handleTournamentRoundCompleted);
@@ -1224,10 +1252,13 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
                       {/* Minus Button */}
                       <button
                         type="button"
-                        onClick={() => setTimerValue(prev => {
-                          const current = parseInt(prev) || 0;
-                          return Math.max(1, current - 1).toString();
-                        })}
+                        onClick={() => {
+                          setTimerDirection(-1);
+                          setTimerValue(prev => {
+                            const current = parseInt(prev) || 0;
+                            return Math.max(1, current - 1).toString();
+                          });
+                        }}
                         disabled={gameStarted}
                         className="w-10 h-10 flex items-center justify-center rounded-neo bg-neo-cream text-neo-black border-2 border-neo-black shadow-hard-sm hover:shadow-hard hover:translate-x-[-1px] hover:translate-y-[-1px] active:shadow-none active:translate-x-[1px] active:translate-y-[1px] transition-all duration-100 disabled:opacity-50 disabled:cursor-not-allowed font-black"
                       >
@@ -1235,19 +1266,32 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
                       </button>
 
                       <div className="flex items-center gap-2">
-                        <span className="text-3xl font-black text-neo-yellow w-12 text-center">
-                          {timerValue || '1'}
-                        </span>
+                        <div className="text-3xl font-black text-neo-yellow w-12 text-center overflow-hidden h-10 flex items-center justify-center">
+                          <AnimatePresence mode="wait">
+                            <motion.span
+                              key={timerValue}
+                              initial={{ y: timerDirection > 0 ? 20 : -20, opacity: 0 }}
+                              animate={{ y: 0, opacity: 1 }}
+                              exit={{ y: timerDirection > 0 ? -20 : 20, opacity: 0 }}
+                              transition={{ duration: 0.15, ease: 'easeOut' }}
+                            >
+                              {timerValue || '1'}
+                            </motion.span>
+                          </AnimatePresence>
+                        </div>
                         <span className="text-base text-neo-cream font-bold">{t('hostView.minutes')}</span>
                       </div>
 
                       {/* Plus Button */}
                       <button
                         type="button"
-                        onClick={() => setTimerValue(prev => {
-                          const current = parseInt(prev) || 0;
-                          return (current + 1).toString();
-                        })}
+                        onClick={() => {
+                          setTimerDirection(1);
+                          setTimerValue(prev => {
+                            const current = parseInt(prev) || 0;
+                            return (current + 1).toString();
+                          });
+                        }}
                         disabled={gameStarted}
                         className="w-10 h-10 flex items-center justify-center rounded-neo bg-neo-cream text-neo-black border-2 border-neo-black shadow-hard-sm hover:shadow-hard hover:translate-x-[-1px] hover:translate-y-[-1px] active:shadow-none active:translate-x-[1px] active:translate-y-[1px] transition-all duration-100 disabled:opacity-50 disabled:cursor-not-allowed font-black"
                       >

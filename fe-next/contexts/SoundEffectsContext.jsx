@@ -12,6 +12,7 @@ const SOUND_EFFECTS = {
   achievement: '/sounds/achievement.wav',
   combo: '/sounds/combo.wav',
   wordAccepted: '/sounds/word-accepted.wav',
+  countdownBeep: '/sounds/countdown-beep.wav',
 };
 
 export function SoundEffectsProvider({ children }) {
@@ -105,11 +106,25 @@ export function SoundEffectsProvider({ children }) {
     playSound('wordAccepted', { volume: 0.4 });
   }, [playSound]);
 
+  // Play countdown beep with increasing pitch (3, 2, 1 seconds remaining)
+  // secondsRemaining: 3 = lowest pitch, 1 = highest pitch
+  const playCountdownBeep = useCallback((secondsRemaining) => {
+    if (!audioUnlocked || isMuted) return;
+
+    // Pitch increases as we get closer to 0: 3->1.0, 2->1.2, 1->1.4
+    const pitchMap = { 3: 1.0, 2: 1.2, 1: 1.4 };
+    const rate = pitchMap[secondsRemaining] || 1.0;
+    const volume = secondsRemaining === 1 ? 0.9 : 0.7; // Loudest on final beep
+
+    playSound('countdownBeep', { rate, volume });
+  }, [audioUnlocked, isMuted, playSound]);
+
   const value = {
     playSound,
     playComboSound,
     playAchievementSound,
     playWordAcceptedSound,
+    playCountdownBeep,
   };
 
   return (

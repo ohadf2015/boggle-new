@@ -59,11 +59,11 @@ const Header = ({ className = '' }) => {
                         className="text-2xl sm:text-4xl font-black uppercase tracking-tight flex items-center gap-1"
                         style={{ fontFamily: getFontFamily(language) }}
                     >
-                        {/* LEXI - with pink text shadow */}
+                        {/* LEXI - Neo-Brutalist white with black shadow */}
                         <span
-                            className="text-neo-black"
+                            className="text-white"
                             style={{
-                                textShadow: '3px 3px 0px var(--neo-pink)',
+                                textShadow: '3px 3px 0px var(--neo-black), -1px -1px 0px var(--neo-black), 1px -1px 0px var(--neo-black), -1px 1px 0px var(--neo-black)',
                             }}
                         >
                             {t('logo.lexi')}
@@ -79,12 +79,12 @@ const Header = ({ className = '' }) => {
                         >
                             ⚡
                         </motion.span>
-                        {/* CLASH - italic skewed with black shadow */}
+                        {/* CLASH - Neo-Brutalist white italic skewed with black shadow */}
                         <span
-                            className="text-neo-pink italic"
+                            className="text-white italic"
                             style={{
                                 transform: 'skewX(-8deg)',
-                                textShadow: '3px 3px 0px var(--neo-black)',
+                                textShadow: '3px 3px 0px var(--neo-black), -1px -1px 0px var(--neo-black), 1px -1px 0px var(--neo-black), -1px 1px 0px var(--neo-black)',
                             }}
                         >
                             {t('logo.clash')}

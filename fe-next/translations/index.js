@@ -436,7 +436,7 @@ export const translations = {
       },
       COMEBACK_KID: {
         name: 'Comeback Kid',
-        description: 'Found a word in the last 30 seconds'
+        description: 'Found a word in the last 4 seconds'
       },
       DICTIONARY_DIVER: {
         name: 'Dictionary Diver',
@@ -1100,7 +1100,7 @@ export const translations = {
       },
       COMEBACK_KID: {
         name: 'חזרה מהשטח',
-        description: 'מצא מילה ב-30 השניות האחרונות'
+        description: 'מצא מילה ב-4 השניות האחרונות'
       },
       DICTIONARY_DIVER: {
         name: 'צוללן המילון',
@@ -1762,7 +1762,7 @@ export const translations = {
       },
       COMEBACK_KID: {
         name: 'Comeback-kungen',
-        description: 'Hittade ett ord i sista 30 sekunderna'
+        description: 'Hittade ett ord under de sista 4 sekunderna'
       },
       DICTIONARY_DIVER: {
         name: 'Ordboksdykare',
@@ -2418,7 +2418,7 @@ export const translations = {
       },
       COMEBACK_KID: {
         name: 'カムバックキッド',
-        description: '最後の30秒で単語を見つけた'
+        description: '最後の4秒で単語を見つけた'
       },
       DICTIONARY_DIVER: {
         name: 'ディクショナリーダイバー',

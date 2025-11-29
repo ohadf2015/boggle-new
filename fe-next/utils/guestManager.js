@@ -147,7 +147,7 @@ export function getGuestStatsSummary() {
  */
 export function shouldShowUpgradePrompt() {
   const stats = getGuestStats();
-  return (stats.games || 0) >= 3; // Show after 3 games
+  return (stats.games || 0) >= 1; // Show after first game
 }
 
 /**

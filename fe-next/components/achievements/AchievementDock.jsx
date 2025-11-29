@@ -4,6 +4,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { cn } from '../../lib/utils';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../ui/tooltip';
 
 /**
  * Neo-Brutalist Achievement Dock
@@ -138,39 +139,51 @@ const AchievementDock = ({ achievements = [], className }) => {
 
             {/* Achievement list */}
             <div className="p-3 space-y-2">
-              {achievements.map((achievement, index) => (
-                <motion.div
-                  key={`${achievement.name}-${index}`}
-                  initial={index === achievements.length - 1 && hasNewAchievement ? {
-                    x: 20,
-                    opacity: 0,
-                  } : false}
-                  animate={{
-                    x: 0,
-                    opacity: 1,
-                  }}
-                  transition={{ duration: 0.3 }}
-                  className={cn(
-                    'flex items-center gap-3 p-3 rounded-md',
-                    'bg-neo-white border-3 border-neo-black',
-                    'shadow-hard-sm',
-                    'hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-hard',
-                    'transition-all duration-100 cursor-pointer'
-                  )}
-                >
-                  <div className="w-10 h-10 rounded-md bg-neo-cyan border-2 border-neo-black flex items-center justify-center shadow-hard-sm flex-shrink-0">
-                    <span className="text-lg">{achievement.icon}</span>
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="font-black text-sm text-neo-black uppercase truncate tracking-wide">
-                      {achievement.name}
-                    </p>
-                    <p className="text-xs font-bold text-neo-black/70 truncate">
-                      {achievement.description}
-                    </p>
-                  </div>
-                </motion.div>
-              ))}
+              <TooltipProvider delayDuration={0}>
+                {achievements.map((achievement, index) => (
+                  <Tooltip key={`${achievement.name}-${index}`}>
+                    <TooltipTrigger asChild>
+                      <motion.div
+                        initial={index === achievements.length - 1 && hasNewAchievement ? {
+                          x: 20,
+                          opacity: 0,
+                        } : false}
+                        animate={{
+                          x: 0,
+                          opacity: 1,
+                        }}
+                        transition={{ duration: 0.3 }}
+                        className={cn(
+                          'flex items-center gap-3 p-3 rounded-md',
+                          'bg-neo-white border-3 border-neo-black',
+                          'shadow-hard-sm',
+                          'hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-hard',
+                          'transition-all duration-100 cursor-pointer'
+                        )}
+                      >
+                        <div className="w-10 h-10 rounded-md bg-neo-cyan border-2 border-neo-black flex items-center justify-center shadow-hard-sm flex-shrink-0">
+                          <span className="text-lg">{achievement.icon}</span>
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="font-black text-sm text-neo-black uppercase truncate tracking-wide">
+                            {achievement.name}
+                          </p>
+                          <p className="text-xs font-bold text-neo-black/70 truncate">
+                            {achievement.description}
+                          </p>
+                        </div>
+                      </motion.div>
+                    </TooltipTrigger>
+                    <TooltipContent
+                      side="left"
+                      className="bg-neo-purple text-neo-white border-3 border-neo-black shadow-hard p-3 max-w-[200px]"
+                    >
+                      <p className="font-black text-sm uppercase">{achievement.name}</p>
+                      <p className="text-xs mt-1">{achievement.description}</p>
+                    </TooltipContent>
+                  </Tooltip>
+                ))}
+              </TooltipProvider>
             </div>
           </motion.div>
         )}
