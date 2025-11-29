@@ -13,12 +13,44 @@ import { useAuth } from '@/contexts/AuthContext';
 import AuthModal from '@/components/auth/AuthModal';
 import Avatar from '@/components/Avatar';
 import EmojiAvatarPicker from '@/components/EmojiAvatarPicker';
+import { AchievementBadge } from '@/components/AchievementBadge';
+import LevelBadge from '@/components/LevelBadge';
+import XpProgressBar from '@/components/XpProgressBar';
 import { uploadProfilePicture, removeProfilePicture } from '@/lib/supabase';
 import { cn } from '@/lib/utils';
 import toast from 'react-hot-toast';
 import logger from '@/utils/logger';
 
-export const dynamic = 'force-dynamic';
+// Achievement icons mapping (matches backend achievementManager.js)
+const ACHIEVEMENT_ICONS = {
+  FIRST_BLOOD: '🎯',
+  SPEED_DEMON: '⚡',
+  WORD_MASTER: '📚',
+  COMBO_KING: '🔥',
+  PERFECTIONIST: '✨',
+  LEXICON: '🏆',
+  WORDSMITH: '🎓',
+  QUICK_THINKER: '💨',
+  LONG_HAULER: '🏃',
+  DIVERSE_VOCABULARY: '🌈',
+  DOUBLE_TROUBLE: '⚡⚡',
+  TREASURE_HUNTER: '💎',
+  TRIPLE_THREAT: '🎰',
+  UNSTOPPABLE: '🚀',
+  COMEBACK_KID: '🔄',
+  DICTIONARY_DIVER: '📖',
+  LIGHTNING_ROUND: '⚡',
+  RARE_GEM: '💠',
+  EXPLORER: '🧭',
+  STREAK_MASTER: '🔥',
+  ANAGRAM_ARTIST: '🔀',
+  LETTER_POPPER: '🎈',
+};
+
+// Helper to get achievement icon by key
+function getAchievementIcon(key) {
+  return ACHIEVEMENT_ICONS[key] || '🏅';
+}
 
 // Format seconds into human-readable time (e.g., "2h 30m" or "45m")
 function formatTimePlayed(totalSeconds) {
@@ -372,6 +404,54 @@ export default function ProfilePage() {
           </div>
         </motion.div>
 
+        {/* XP Progress Section */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.05 }}
+          className={cn(
+            'rounded-2xl p-4 sm:p-6 mb-6',
+            isDarkMode ? 'bg-slate-800/50 border border-slate-700' : 'bg-white border border-gray-200 shadow-lg'
+          )}
+        >
+          <div className="flex items-center justify-between mb-4">
+            <h2 className={cn(
+              'text-lg font-bold flex items-center gap-2',
+              isDarkMode ? 'text-white' : 'text-gray-900'
+            )}>
+              <span className="text-xl">⚡</span>
+              {t('xp.title') || 'Player Level'}
+            </h2>
+            <LevelBadge
+              level={profile?.current_level || 1}
+              size="lg"
+              showLabel
+            />
+          </div>
+
+          <XpProgressBar
+            totalXp={profile?.total_xp || 0}
+            showDetails
+          />
+
+          {profile?.current_level >= 5 && (
+            <div className={cn(
+              'mt-4 pt-4 border-t',
+              isDarkMode ? 'border-slate-700' : 'border-gray-200'
+            )}>
+              <p className={cn(
+                'text-sm font-medium',
+                isDarkMode ? 'text-gray-400' : 'text-gray-600'
+              )}>
+                {t('xp.totalXpEarned') || 'Total XP Earned'}: <span className={cn(
+                  'font-bold',
+                  isDarkMode ? 'text-neo-cyan' : 'text-neo-purple'
+                )}>{(profile?.total_xp || 0).toLocaleString()}</span>
+              </p>
+            </div>
+          )}
+        </motion.div>
+
         {/* Stats Grid */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -486,7 +566,7 @@ export default function ProfilePage() {
           )}
         </motion.div>
 
-        {/* Achievement Counts */}
+        {/* Achievement Counts with Tier Display */}
         {profile?.achievement_counts && Object.keys(profile.achievement_counts).length > 0 && (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -503,29 +583,26 @@ export default function ProfilePage() {
             )}>
               {t('profile.achievements')}
             </h2>
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-              {Object.entries(profile.achievement_counts).map(([key, count]) => (
-                <div
-                  key={key}
-                  className={cn(
-                    'p-3 rounded-lg text-center',
-                    isDarkMode ? 'bg-slate-700/50' : 'bg-gray-50'
-                  )}
-                >
-                  <p className={cn(
-                    'text-sm font-medium truncate',
-                    isDarkMode ? 'text-gray-300' : 'text-gray-700'
-                  )}>
-                    {t(`achievements.${key}.name`) || key}
-                  </p>
-                  <p className={cn(
-                    'text-lg font-bold',
-                    isDarkMode ? 'text-cyan-400' : 'text-cyan-600'
-                  )}>
-                    x{count}
-                  </p>
-                </div>
-              ))}
+            <div className="flex flex-wrap gap-3">
+              {Object.entries(profile.achievement_counts)
+                .sort((a, b) => b[1] - a[1]) // Sort by count descending
+                .map(([key, count], index) => {
+                  // Get achievement info from translations
+                  const achievementData = {
+                    icon: getAchievementIcon(key),
+                    name: t(`achievements.${key}.name`) || key,
+                    description: t(`achievements.${key}.description`) || '',
+                  };
+                  return (
+                    <AchievementBadge
+                      key={key}
+                      achievement={achievementData}
+                      index={index}
+                      count={count}
+                      showTier={true}
+                    />
+                  );
+                })}
             </div>
           </motion.div>
         )}

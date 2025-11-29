@@ -6,13 +6,18 @@ const { Server } = require("socket.io");
 const path = require("path");
 const next = require("next");
 const cors = require("cors");
+const { createAdapter } = require("@socket.io/redis-adapter");
 
 // Backend imports
-const { initRedis, closeRedis } = require("./backend/redisClient");
+const { initRedis, closeRedis, createPubSubClients, getRedisMetrics } = require("./backend/redisClient");
 const dictionary = require("./backend/dictionary");
 const { initializeSocketHandlers } = require("./backend/socketHandlers");
 const { restoreTournamentsFromRedis } = require("./backend/modules/tournamentManager");
-const { cleanupStaleGames } = require("./backend/modules/gameStateManager");
+const { cleanupStaleGames, cleanupEmptyRooms } = require("./backend/modules/gameStateManager");
+const { pool: wordValidatorPool } = require("./backend/modules/wordValidatorPool");
+
+// Track cleanup timers for graceful shutdown
+const cleanupTimers = new Set();
 
 const dev = process.env.NODE_ENV !== "production";
 const app = next({ dev });
@@ -114,25 +119,63 @@ app.prepare().then(() => {
     console.error('[SOCKET.IO] Connection error:', err.req?.url, err.code, err.message);
   });
 
-  // Log connection stats periodically
-  setInterval(() => {
+  // Log connection stats periodically (tracked for graceful shutdown)
+  const statsTimer = setInterval(() => {
     const socketCount = io.sockets.sockets.size;
     if (socketCount > 0) {
       console.log(`[SOCKET.IO] Active connections: ${socketCount}`);
     }
   }, 60000);
+  cleanupTimers.add(statsTimer);
 
-  // Cleanup stale games periodically
-  setInterval(() => {
+  // Cleanup stale games periodically (tracked for graceful shutdown)
+  const staleGamesTimer = setInterval(() => {
     const cleaned = cleanupStaleGames();
     if (cleaned > 0) {
       console.log(`[CLEANUP] Removed ${cleaned} stale games`);
     }
   }, 5 * 60 * 1000); // Every 5 minutes
+  cleanupTimers.add(staleGamesTimer);
+
+  // Cleanup empty rooms more frequently (tracked for graceful shutdown)
+  const emptyRoomsTimer = setInterval(() => {
+    const cleaned = cleanupEmptyRooms();
+    if (cleaned > 0) {
+      console.log(`[CLEANUP] Removed ${cleaned} empty room(s)`);
+      io.emit('activeRooms', { rooms: require('./backend/modules/gameStateManager').getActiveRooms() });
+    }
+  }, 30 * 1000); // Every 30 seconds
+  cleanupTimers.add(emptyRoomsTimer);
 
   // Health check endpoint (responds immediately, doesn't depend on Redis/DB)
   server.get('/health', (_req, res) => {
     res.status(200).json({ status: 'ok', timestamp: Date.now() });
+  });
+
+  // Scaling readiness endpoint - shows whether horizontal scaling is enabled
+  server.get('/health/scaling', (_req, res) => {
+    const { isRedisAvailable } = require('./backend/redisClient');
+    const { getAllGames } = require('./backend/modules/gameStateManager');
+
+    const games = getAllGames();
+    const hasRedisAdapter = !!io.pubClient;
+    const redisAvailable = isRedisAvailable();
+
+    res.json({
+      status: 'ok',
+      scaling: {
+        horizontalReady: hasRedisAdapter && redisAvailable,
+        redisAdapter: hasRedisAdapter,
+        redisAvailable: redisAvailable,
+        instanceId: process.env.RAILWAY_REPLICA_ID || process.env.HOSTNAME || 'local'
+      },
+      stats: {
+        activeGames: games.length,
+        totalPlayers: games.reduce((sum, g) => sum + g.playerCount, 0),
+        socketConnections: io.sockets.sockets.size
+      },
+      timestamp: Date.now()
+    });
   });
 
   // Metrics endpoint
@@ -146,6 +189,16 @@ app.prepare().then(() => {
   server.get('/metrics/reset', (_req, res) => {
     resetAll();
     res.json({ ok: true });
+  });
+
+  // Redis metrics endpoint
+  server.get('/metrics/redis', async (_req, res) => {
+    try {
+      const metrics = await getRedisMetrics();
+      res.json(metrics);
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
   });
 
   // Leaderboard API endpoints
@@ -294,7 +347,40 @@ app.prepare().then(() => {
 
   // Start server
   async function startServer() {
-    await initRedis();
+    const redisConnected = await initRedis();
+
+    // Set up Socket.IO Redis adapter for horizontal scaling
+    // Reuses existing Redis connection via createPubSubClients()
+    if (redisConnected) {
+      try {
+        const clients = createPubSubClients();
+
+        if (clients) {
+          const { pubClient, subClient } = clients;
+
+          // Connect the duplicated clients
+          await Promise.all([
+            pubClient.connect(),
+            subClient.connect()
+          ]);
+
+          io.adapter(createAdapter(pubClient, subClient));
+          console.log('[SOCKET.IO] Redis adapter enabled - horizontal scaling ready');
+
+          // Store adapter clients for cleanup
+          io.pubClient = pubClient;
+          io.subClient = subClient;
+        } else {
+          console.warn('[SOCKET.IO] Could not create pub/sub clients');
+          console.log('[SOCKET.IO] Running in single instance mode');
+        }
+      } catch (error) {
+        console.warn('[SOCKET.IO] Could not set up Redis adapter:', error.message);
+        console.warn('[SOCKET.IO] Continuing without Redis adapter (single instance mode)');
+      }
+    } else {
+      console.log('[SOCKET.IO] Running in single instance mode (no Redis adapter)');
+    }
 
     // Restore tournaments from Redis
     try {
@@ -309,6 +395,14 @@ app.prepare().then(() => {
       console.error('Failed to load dictionaries:', error);
     }
 
+    // Warm up worker pool for word validation (prevents cold start latency)
+    try {
+      await wordValidatorPool.initialize();
+      console.log('[WORKER POOL] Worker pool warmed up');
+    } catch (error) {
+      console.warn('[WORKER POOL] Failed to warm up worker pool:', error.message);
+    }
+
     httpServer.listen(PORT, HOST, () => {
       console.log(`> Server ready on http://${HOST}:${PORT}`);
       console.log(`> Socket.IO server ready`);
@@ -316,20 +410,74 @@ app.prepare().then(() => {
     });
   }
 
-  // Graceful shutdown
+  // Graceful shutdown with connection draining
+  let isShuttingDown = false;
   const shutdown = async () => {
-    console.log('Closing server...');
+    if (isShuttingDown) return;
+    isShuttingDown = true;
+
+    console.log('[SHUTDOWN] Starting graceful shutdown...');
+
+    // Clear all cleanup timers to prevent memory leaks
+    console.log(`[SHUTDOWN] Clearing ${cleanupTimers.size} cleanup timers...`);
+    for (const timer of cleanupTimers) {
+      clearInterval(timer);
+    }
+    cleanupTimers.clear();
+
+    // Stop accepting new connections
+    httpServer.close(() => {
+      console.log('[SHUTDOWN] HTTP server closed');
+    });
+
+    // Notify all connected clients about the shutdown
+    io.emit('serverShutdown', { reconnectIn: 5000, message: 'Server is restarting' });
+    console.log('[SHUTDOWN] Notified clients of shutdown');
+
+    // Give clients a moment to receive the notification
+    await new Promise(resolve => setTimeout(resolve, 1000));
+
+    // Shutdown worker pool
+    try {
+      await wordValidatorPool.shutdown();
+      console.log('[SHUTDOWN] Worker pool closed');
+    } catch (err) {
+      console.error('[SHUTDOWN] Error closing worker pool:', err.message);
+    }
 
     // Close all socket connections
     io.close(() => {
-      console.log('Socket.IO server closed');
+      console.log('[SHUTDOWN] Socket.IO server closed');
     });
 
+    // Clean up Redis adapter clients if they exist
+    if (io.pubClient) {
+      try {
+        await io.pubClient.quit();
+        console.log('[SHUTDOWN] Redis pub client closed');
+      } catch (err) {
+        console.error('[SHUTDOWN] Error closing pub client:', err.message);
+      }
+    }
+    if (io.subClient) {
+      try {
+        await io.subClient.quit();
+        console.log('[SHUTDOWN] Redis sub client closed');
+      } catch (err) {
+        console.error('[SHUTDOWN] Error closing sub client:', err.message);
+      }
+    }
+
     await closeRedis();
-    httpServer.close(() => {
-      console.log('Server closed');
+
+    // Force exit after timeout if graceful shutdown takes too long
+    setTimeout(() => {
+      console.log('[SHUTDOWN] Forcing exit after timeout');
       process.exit(0);
-    });
+    }, 10000);
+
+    console.log('[SHUTDOWN] Server shutdown complete');
+    process.exit(0);
   };
 
   process.on('SIGTERM', shutdown);

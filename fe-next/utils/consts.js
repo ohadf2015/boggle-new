@@ -1,27 +1,12 @@
+/**
+ * Shared constants for LexiClash
+ * CommonJS version for backend compatibility
+ */
+
 const hebrewLetters = [
-    "א",
-    "ב",
-    "ג",
-    "ד",
-    "ה",
-    "ו",
-    "ז",
-    "ח",
-    "ט",
-    "י",
-    "כ",
-    "ל",
-    "מ",
-    "נ",
-    "ס",
-    "ע",
-    "פ",
-    "צ",
-    "ק",
-    "ר",
-    "ש",
-    "ת",
-  ];
+    "א", "ב", "ג", "ד", "ה", "ו", "ז", "ח", "ט", "י",
+    "כ", "ל", "מ", "נ", "ס", "ע", "פ", "צ", "ק", "ר", "ש", "ת",
+];
 
 const englishLetters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
 
@@ -46,8 +31,6 @@ const japaneseLetters = [
   "肉", "魚", "米", "茶", "酒", "水", "火", "土", "金", "銀"
 ];
 
-// Valid Kanji compounds (熟語) that can be formed using the above characters
-// These are embedded into the board to ensure valid words exist
 const kanjiCompounds = [
   // 2-character compounds - common words
   "日本", "本人", "本日", "日中", "日月", "人口", "人生", "人物", "人手", "人体",
@@ -112,14 +95,13 @@ const DIFFICULTIES = {
 const DEFAULT_DIFFICULTY = 'HARD';
 
 // Adaptive deadzone threshold for directional locking
-// Smaller threshold for more responsive selection
 const getDeadzoneThreshold = () => {
   if (typeof window === 'undefined') return 15;
   const screenWidth = window.innerWidth;
-  if (screenWidth < 375) return 20;  // Small phones (iPhone SE)
-  if (screenWidth < 414) return 18;  // Regular phones
-  if (screenWidth < 768) return 15;  // Large phones
-  return 12;                          // Tablets and desktop
+  if (screenWidth < 375) return 20;
+  if (screenWidth < 414) return 18;
+  if (screenWidth < 768) return 15;
+  return 12;
 };
 
 // Minimum word length options
@@ -130,6 +112,32 @@ const MIN_WORD_LENGTH_OPTIONS = [
 ];
 
 const DEFAULT_MIN_WORD_LENGTH = 2;
+
+// Avatar generation constants
+const AVATAR_COLORS = [
+  '#FF6B6B', '#4ECDC4', '#45B7D1', '#FFA07A', '#98D8C8',
+  '#F7DC6F', '#BB8FCE', '#85C1E2', '#F8B739', '#52B788',
+  '#FF8FAB', '#6BCF7F', '#FFB347', '#9D84B7', '#FF6F61'
+];
+
+const AVATAR_EMOJIS = [
+  '🐶', '🐱', '🐭', '🐹', '🐰', '🦊', '🐻', '🐼',
+  '🐨', '🐯', '🦁', '🐮', '🐷', '🐸', '🐵', '🐔',
+  '🐧', '🐦', '🐤', '🦆', '🦅', '🦉', '🦇', '🐺',
+  '🐗', '🐴', '🦄', '🐝', '🐛', '🦋', '🐌', '🐞'
+];
+
+// Neo-Brutalist color mapping based on word points
+const POINT_COLORS = {
+  1: 'var(--neo-gray)',
+  2: 'var(--neo-cyan)',
+  3: 'var(--neo-cyan)',
+  4: 'var(--neo-orange)',
+  5: 'var(--neo-purple)',
+  6: 'var(--neo-purple)',
+  7: 'var(--neo-pink)',
+  8: 'var(--neo-pink)',
+};
 
 module.exports = {
   hebrewLetters,
@@ -142,5 +150,7 @@ module.exports = {
   getDeadzoneThreshold,
   MIN_WORD_LENGTH_OPTIONS,
   DEFAULT_MIN_WORD_LENGTH,
+  AVATAR_COLORS,
+  AVATAR_EMOJIS,
+  POINT_COLORS,
 };
-  

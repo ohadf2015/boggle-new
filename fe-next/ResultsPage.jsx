@@ -1,17 +1,25 @@
-import React, { useMemo, useEffect, useState } from 'react';
-import { motion } from 'framer-motion';
-import { FaTrophy, FaSignOutAlt, FaStar, FaUser } from 'react-icons/fa';
-import GridComponent from './components/GridComponent';
+import React, { useMemo, useEffect, useState, useCallback } from 'react';
+import dynamic from 'next/dynamic';
+import { motion, AnimatePresence } from 'framer-motion';
+import { FaTrophy, FaSignOutAlt, FaStar, FaUser, FaFire, FaChartBar } from 'react-icons/fa';
 import confetti from 'canvas-confetti';
 import { useLanguage } from './contexts/LanguageContext';
 import { useAuth } from './contexts/AuthContext';
-import ResultsPlayerCard from './components/results/ResultsPlayerCard';
-import ResultsWinnerBanner from './components/results/ResultsWinnerBanner';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from './components/ui/alert-dialog';
 import { Button } from './components/ui/button';
 import { clearSessionPreservingUsername } from './utils/session';
-import { shouldShowUpgradePrompt, getGuestStatsSummary } from './utils/guestManager';
-import AuthModal from './components/auth/AuthModal';
+import { shouldShowUpgradePrompt, getGuestStatsSummary, updateGuestStatsAfterGame, isFirstWin } from './utils/guestManager';
+import { useWinStreak } from './hooks/useWinStreak';
+import { trackGameCompletion, trackStreakMilestone } from './utils/growthTracking';
+
+// Dynamic imports for heavy components (loaded after initial render)
+const GridComponent = dynamic(() => import('./components/GridComponent'), { ssr: false });
+const ResultsPlayerCard = dynamic(() => import('./components/results/ResultsPlayerCard'), { ssr: false });
+const ResultsWinnerBanner = dynamic(() => import('./components/results/ResultsWinnerBanner'), { ssr: false });
+const AuthModal = dynamic(() => import('./components/auth/AuthModal'), { ssr: false });
+const FirstWinSignupModal = dynamic(() => import('./components/auth/FirstWinSignupModal'), { ssr: false });
+const ShareWinPrompt = dynamic(() => import('./components/results/ShareWinPrompt'), { ssr: false });
+const WinStreakDisplay = dynamic(() => import('./components/results/WinStreakDisplay'), { ssr: false });
 
 // Helper functions for finding word paths on the board (client-side version)
 const normalizeHebrewLetter = (letter) => {
@@ -62,47 +70,190 @@ const getWordPath = (word, board) => {
   return null;
 };
 
-const LetterGrid = ({ letterGrid, heatMapData }) => {
+const LetterGrid = ({ letterGrid, heatMapData, showHeatmap, onToggleHeatmap }) => {
   const { t } = useLanguage();
   return (
-    <motion.div
-      initial={{ y: 20, opacity: 0 }}
-      animate={{ y: 0, opacity: 1 }}
-      transition={{ delay: 0.3 }}
-      className="w-full"
-    >
-      <div className="w-full max-w-full mx-auto p-2 sm:p-3 rounded-xl bg-gradient-to-br from-slate-800/40 to-slate-900/40 dark:from-slate-800/40 dark:to-slate-900/40 border-2 border-cyan-500/50 shadow-[0_4px_24px_rgba(6,182,212,0.3)] relative overflow-hidden">
-        {/* Glass glare effect */}
-        <div className="absolute inset-0 bg-gradient-to-br from-white/20 via-transparent to-transparent pointer-events-none" />
-        <GridComponent
-          grid={letterGrid}
-          interactive={false}
-          className="w-full relative z-10"
-          heatMapData={heatMapData}
-        />
-      </div>
-    </motion.div>
+    <div className="w-full">
+      {/* Heatmap Toggle Button - Always visible */}
+      {heatMapData && heatMapData.maxCount > 0 && (
+        <motion.button
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3 }}
+          onClick={onToggleHeatmap}
+          className={`mb-3 mx-auto flex items-center gap-2 px-4 py-2 rounded-neo border-3 border-neo-black font-bold text-sm uppercase transition-all shadow-hard-sm hover:shadow-hard hover:translate-x-[-1px] hover:translate-y-[-1px] active:translate-x-[1px] active:translate-y-[1px] active:shadow-hard-pressed ${
+            showHeatmap
+              ? 'bg-neo-orange text-neo-black'
+              : 'bg-neo-cream text-neo-black'
+          }`}
+        >
+          <FaFire className={`text-lg ${showHeatmap ? 'text-neo-red' : 'text-neo-black/60'}`} />
+          <span>{showHeatmap ? (t('results.hideHeatmap') || 'Hide Heatmap') : (t('results.showHeatmap') || 'Show Heatmap')}</span>
+          <FaChartBar className={`text-lg ${showHeatmap ? 'text-neo-black' : 'text-neo-black/60'}`} />
+        </motion.button>
+      )}
+
+      {/* Grid - Only shown when heatmap is enabled */}
+      <AnimatePresence>
+        {showHeatmap && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.3, ease: 'easeInOut' }}
+            className="overflow-hidden"
+          >
+            <div className="w-full max-w-full mx-auto p-2 sm:p-3 rounded-xl bg-gradient-to-br from-slate-800/40 to-slate-900/40 dark:from-slate-800/40 dark:to-slate-900/40 border-2 border-cyan-500/50 shadow-[0_4px_24px_rgba(6,182,212,0.3)] relative overflow-hidden">
+              {/* Glass glare effect */}
+              <div className="absolute inset-0 bg-gradient-to-br from-white/20 via-transparent to-transparent pointer-events-none" />
+              <GridComponent
+                grid={letterGrid}
+                interactive={false}
+                className="w-full relative z-10"
+                heatMapData={heatMapData}
+              />
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
   );
 };
 
 const ResultsPage = ({ finalScores, letterGrid, gameCode, onReturnToRoom, username }) => {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const { user, isAuthenticated } = useAuth();
   const [showExitConfirm, setShowExitConfirm] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
+  const [showFirstWinModal, setShowFirstWinModal] = useState(false);
   const [hasShownUpgradePrompt, setHasShownUpgradePrompt] = useState(false);
+  const [hasUpdatedStats, setHasUpdatedStats] = useState(false);
+  const [hasTrackedGame, setHasTrackedGame] = useState(false);
+  const [previousStreak, setPreviousStreak] = useState(0);
+  const [showHeatmap, setShowHeatmap] = useState(false);
 
-  // Show sign-up prompt for guests after their first game
+  // Win streak tracking
+  const { currentStreak, bestStreak, recordWin } = useWinStreak();
+
+  // Calculate if current player is the winner
+  const sortedScores = useMemo(() => {
+    return finalScores ? [...finalScores].sort((a, b) => b.score - a.score) : [];
+  }, [finalScores]);
+
+  const winner = sortedScores[0];
+  const isCurrentUserWinner = winner?.username === username;
+
+  // Get current player data for share prompt
+  const currentPlayerData = useMemo(() => {
+    if (!finalScores || !username) return null;
+    return finalScores.find(p => p.username === username);
+  }, [finalScores, username]);
+
+  // Update guest stats when results load (only once)
   useEffect(() => {
-    if (!isAuthenticated && !hasShownUpgradePrompt && shouldShowUpgradePrompt()) {
-      // Delay showing the modal so players can see results first
-      const timeout = setTimeout(() => {
-        setShowAuthModal(true);
-        setHasShownUpgradePrompt(true);
-      }, 3000);
-      return () => clearTimeout(timeout);
+    // Debug logging
+    console.log('[ResultsPage] Stats update check:', {
+      isAuthenticated,
+      hasUpdatedStats,
+      hasFinalScores: !!finalScores,
+      username,
+      isCurrentUserWinner,
+      scoresUsernames: finalScores?.map(p => p.username)
+    });
+
+    if (!isAuthenticated && !hasUpdatedStats && finalScores && username) {
+      const currentPlayerData = finalScores.find(p => p.username === username);
+      console.log('[ResultsPage] Current player data:', currentPlayerData);
+
+      if (currentPlayerData) {
+        const validWords = currentPlayerData.allWords?.filter(w => w.validated && w.score > 0) || [];
+        const longestValidWord = validWords.reduce((longest, w) =>
+          w.word.length > (longest?.length || 0) ? w.word : longest, null
+        );
+
+        updateGuestStatsAfterGame({
+          score: currentPlayerData.score || 0,
+          wordCount: validWords.length,
+          longestWord: longestValidWord,
+          isWinner: isCurrentUserWinner,
+          achievements: currentPlayerData.achievements || []
+        });
+        setHasUpdatedStats(true);
+        console.log('[ResultsPage] Stats updated, isFirstWin:', isFirstWin());
+      }
     }
-  }, [isAuthenticated, hasShownUpgradePrompt]);
+  }, [isAuthenticated, hasUpdatedStats, finalScores, username, isCurrentUserWinner]);
+
+  // Track game completion and record win streak (only once)
+  useEffect(() => {
+    if (hasTrackedGame || !currentPlayerData) return;
+
+    const validWords = currentPlayerData.allWords?.filter(w => w.validated && w.score > 0) || [];
+    const guestStats = getGuestStatsSummary();
+    const isFirstGame = guestStats.gamesPlayed <= 1;
+
+    // Track game completion for analytics
+    trackGameCompletion(
+      isCurrentUserWinner,
+      currentPlayerData.score || 0,
+      validWords.length,
+      isFirstGame
+    );
+
+    // Record win and update streak
+    if (isCurrentUserWinner) {
+      setPreviousStreak(currentStreak);
+      recordWin();
+
+      // Track streak milestones
+      const newStreak = currentStreak + 1;
+      trackStreakMilestone(newStreak);
+    }
+
+    setHasTrackedGame(true);
+  }, [hasTrackedGame, currentPlayerData, isCurrentUserWinner, currentStreak, recordWin]);
+
+  // Show celebratory signup prompt for guests who just won their first game
+  useEffect(() => {
+    console.log('[ResultsPage] Modal check:', {
+      isAuthenticated,
+      hasShownUpgradePrompt,
+      hasUpdatedStats,
+      isCurrentUserWinner,
+      isFirstWinResult: isFirstWin(),
+      shouldShowUpgradePromptResult: shouldShowUpgradePrompt()
+    });
+
+    if (!isAuthenticated && !hasShownUpgradePrompt && hasUpdatedStats) {
+      // Check if this is their first win - show celebratory modal
+      if (isCurrentUserWinner && isFirstWin()) {
+        console.log('[ResultsPage] Showing first win modal (first win)');
+        const timeout = setTimeout(() => {
+          setShowFirstWinModal(true);
+          setHasShownUpgradePrompt(true);
+        }, 4000); // Slightly longer delay to let them enjoy the win
+        return () => clearTimeout(timeout);
+      }
+      // For winners who have won before, still show the celebratory modal (they haven't signed up yet)
+      else if (isCurrentUserWinner && shouldShowUpgradePrompt()) {
+        console.log('[ResultsPage] Showing first win modal (repeat winner)');
+        const timeout = setTimeout(() => {
+          setShowFirstWinModal(true);
+          setHasShownUpgradePrompt(true);
+        }, 4000);
+        return () => clearTimeout(timeout);
+      }
+      // For non-winners, show regular signup prompt after first game
+      else if (shouldShowUpgradePrompt() && !isCurrentUserWinner) {
+        console.log('[ResultsPage] Showing regular auth modal');
+        const timeout = setTimeout(() => {
+          setShowAuthModal(true);
+          setHasShownUpgradePrompt(true);
+        }, 5000);
+        return () => clearTimeout(timeout);
+      }
+    }
+  }, [isAuthenticated, hasShownUpgradePrompt, hasUpdatedStats, isCurrentUserWinner]);
 
   const handleExitRoom = () => {
     setShowExitConfirm(true);
@@ -113,10 +264,6 @@ const ResultsPage = ({ finalScores, letterGrid, gameCode, onReturnToRoom, userna
     clearSessionPreservingUsername();
     window.location.reload();
   };
-
-  const sortedScores = useMemo(() => {
-    return finalScores ? [...finalScores].sort((a, b) => b.score - a.score) : [];
-  }, [finalScores]);
 
   // Create a map of all player words for duplicate detection
   const allPlayerWords = useMemo(() => {
@@ -159,8 +306,6 @@ const ResultsPage = ({ finalScores, letterGrid, gameCode, onReturnToRoom, userna
     return { cellUsageCounts, maxCount };
   }, [finalScores, letterGrid]);
 
-  const winner = sortedScores[0];
-
   // Celebration effect when results load
   useEffect(() => {
     if (winner) {
@@ -202,7 +347,12 @@ const ResultsPage = ({ finalScores, letterGrid, gameCode, onReturnToRoom, userna
               transition={{ delay: 0.1 }}
               className="mb-6 px-0 sm:px-4"
             >
-              <LetterGrid letterGrid={letterGrid} heatMapData={heatMapData} />
+              <LetterGrid
+                letterGrid={letterGrid}
+                heatMapData={heatMapData}
+                showHeatmap={showHeatmap}
+                onToggleHeatmap={() => setShowHeatmap(prev => !prev)}
+              />
             </motion.div>
           )}
 
@@ -244,6 +394,49 @@ const ResultsPage = ({ finalScores, letterGrid, gameCode, onReturnToRoom, userna
               isWinner={index === 0}
             />
           ))}
+        </div>
+
+        {/* Growth Features Section - Appears smoothly on scroll */}
+        <div className="w-full max-w-2xl mx-auto px-2 sm:px-4 mt-6 space-y-3">
+          {/* Win Streak Display - Compact for low streaks, full for milestones */}
+          {isCurrentUserWinner && currentStreak > 0 && (
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-50px" }}
+              transition={{ duration: 0.3, ease: "easeOut" }}
+              className="flex justify-center"
+            >
+              <WinStreakDisplay
+                currentStreak={currentStreak}
+                bestStreak={bestStreak}
+                isNewMilestone={[3, 7, 14, 30].includes(currentStreak)}
+                previousStreak={previousStreak}
+                compact={currentStreak < 3 && !([3, 7, 14, 30].includes(currentStreak))}
+              />
+            </motion.div>
+          )}
+
+          {/* Share Prompt - Compact inline for non-winners, full for winners */}
+          {currentPlayerData && gameCode && (isCurrentUserWinner || currentPlayerData.score >= 50) && (
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-30px" }}
+              transition={{ duration: 0.3, delay: 0.1, ease: "easeOut" }}
+            >
+              <ShareWinPrompt
+                isWinner={isCurrentUserWinner}
+                username={username}
+                score={currentPlayerData.score || 0}
+                wordCount={currentPlayerData.allWords?.filter(w => w.validated && w.score > 0).length || 0}
+                achievements={currentPlayerData.achievements || []}
+                gameCode={gameCode}
+                streakDays={isCurrentUserWinner ? currentStreak : 0}
+                compact={!isCurrentUserWinner}
+              />
+            </motion.div>
+          )}
         </div>
 
         {/* Play Again Section - Neo-Brutalist */}
@@ -332,11 +525,17 @@ const ResultsPage = ({ finalScores, letterGrid, gameCode, onReturnToRoom, userna
         </AlertDialogContent>
       </AlertDialog>
 
-      {/* Sign Up Prompt for Guests */}
+      {/* Sign Up Prompt for Guests (non-winners) */}
       <AuthModal
         isOpen={showAuthModal}
         onClose={() => setShowAuthModal(false)}
         showGuestStats={true}
+      />
+
+      {/* Celebratory First Win Signup Prompt */}
+      <FirstWinSignupModal
+        isOpen={showFirstWinModal}
+        onClose={() => setShowFirstWinModal(false)}
       />
     </div>
   );

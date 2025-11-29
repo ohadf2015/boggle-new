@@ -93,7 +93,7 @@ const CubeCrashAnimation = ({ onComplete }) => {
                         <>
                             {[0, 0.15, 0.3].map((delay, index) => (
                                 <motion.div
-                                    key={index}
+                                    key={`shockwave-${delay}`}
                                     className="absolute w-32 h-32 border-4 border-cyan-400 rounded-full"
                                     style={{ willChange: 'transform, opacity' }}
                                     initial={{ scale: 0, opacity: 0 }}

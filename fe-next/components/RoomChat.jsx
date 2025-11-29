@@ -10,6 +10,7 @@ import { motion } from 'framer-motion';
 import { useVirtualizer } from '@tanstack/react-virtual';
 import { useSocket } from '../utils/SocketContext';
 import { useLanguage } from '../contexts/LanguageContext';
+import { useSoundEffects } from '../contexts/SoundEffectsContext';
 import { FaPaperPlane, FaComments, FaBell } from 'react-icons/fa';
 import toast from 'react-hot-toast';
 import logger from '@/utils/logger';
@@ -20,12 +21,12 @@ const ESTIMATED_MESSAGE_HEIGHT = 60; // Estimated height per message
 const RoomChat = ({ username, isHost, gameCode, className = '' }) => {
   const { t } = useLanguage();
   const { socket } = useSocket();
+  const { playMessageSound } = useSoundEffects();
   const [messages, setMessages] = useState([]);
   const [inputMessage, setInputMessage] = useState('');
   const [unreadCount, setUnreadCount] = useState(0);
   const parentRef = useRef(null);
   const inputRef = useRef(null);
-  const notificationSoundRef = useRef(null);
 
   // Virtual scrolling setup
   const virtualizer = useVirtualizer({
@@ -56,9 +57,7 @@ const RoomChat = ({ username, isHost, gameCode, className = '' }) => {
       setUnreadCount(prev => prev + 1);
 
       // Play notification sound
-      if (notificationSoundRef.current) {
-        notificationSoundRef.current.play().catch(err => logger.log('Sound play failed:', err));
-      }
+      playMessageSound();
 
       // Show toast notification with click to scroll
       const newMessageIndex = messages.length; // Index of the new message (will be added after this)
@@ -83,10 +82,10 @@ const RoomChat = ({ username, isHost, gameCode, className = '' }) => {
             toast.dismiss();
           }}
         >
-          <FaBell className="text-neo-pink flex-shrink-0 text-lg" />
-          <div className="min-w-0">
-            <div className="font-black text-neo-black uppercase text-sm">{data.username}</div>
-            <div className="text-sm font-bold text-neo-black/80 truncate">{data.message.substring(0, 50)}{data.message.length > 50 ? '...' : ''}</div>
+          <FaBell style={{ color: '#FF6B9D', flexShrink: 0, fontSize: '18px' }} />
+          <div style={{ minWidth: 0 }}>
+            <div style={{ fontWeight: 900, color: '#000000', textTransform: 'uppercase', fontSize: '14px' }}>{data.username}</div>
+            <div style={{ fontSize: '14px', fontWeight: 700, color: 'rgba(0,0,0,0.8)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{data.message.substring(0, 50)}{data.message.length > 50 ? '...' : ''}</div>
           </div>
         </div>,
         {
@@ -109,7 +108,7 @@ const RoomChat = ({ username, isHost, gameCode, className = '' }) => {
         window.navigator.vibrate(200);
       }
     }
-  }, [username, isHost, messages.length, virtualizer]);
+  }, [username, isHost, messages.length, virtualizer, playMessageSound]);
 
   useEffect(() => {
     if (!socket) return;
@@ -169,13 +168,6 @@ const RoomChat = ({ username, isHost, gameCode, className = '' }) => {
   return (
     // NEO-BRUTALIST: Speech bubble container with tail and tilt
     <div className={`speech-bubble rotate-[1deg] flex flex-col mb-4 ${className}`}>
-      {/* Hidden notification sound */}
-      <audio
-        ref={notificationSoundRef}
-        src="data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBjaN0fPTgjMGHm7A7+OZUQ4PVqzn77BdGAg+ltryxnUpBSl+zPLaizsIGGS56+mgUA8NUKXh8Lp"
-        preload="auto"
-      />
-
       {/* NEO-BRUTALIST Header */}
       <div className="py-3 px-4 border-b-3 border-neo-black flex-shrink-0">
         <h3 className="text-neo-black text-base font-black uppercase flex items-center gap-2">

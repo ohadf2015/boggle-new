@@ -1,0 +1,535 @@
+import { useEffect, useCallback, MutableRefObject, RefObject } from 'react';
+import { Socket } from 'socket.io-client';
+import confetti from 'canvas-confetti';
+import gsap from 'gsap';
+import { wordAcceptedToast, wordNeedsValidationToast, wordErrorToast, neoSuccessToast, neoErrorToast, neoInfoToast } from '../../components/NeoToast';
+import { clearSessionPreservingUsername } from '../../utils/session';
+import logger from '@/utils/logger';
+
+interface FoundWord {
+  word: string;
+  isValid?: boolean;
+}
+
+interface Player {
+  username: string;
+  presenceStatus?: string;
+  isWindowFocused?: boolean;
+}
+
+interface TournamentData {
+  currentRound?: number;
+  totalRounds?: number;
+  isComplete?: boolean;
+}
+
+interface UsePlayerSocketEventsProps {
+  socket: Socket | null;
+  t: (key: string) => string;
+  inputRef: RefObject<HTMLInputElement>;
+  wasInActiveGame: boolean;
+  gameActive: boolean;
+  letterGrid: any;
+  gameLanguage: string | null;
+  username: string;
+  queueAchievement: (achievement: any) => void;
+  playComboSound: (level: number) => void;
+  onShowResults?: (data: { scores: any; letterGrid: any }) => void;
+
+  // State setters
+  setPlayersReady: React.Dispatch<React.SetStateAction<Player[]>>;
+  setShufflingGrid: React.Dispatch<React.SetStateAction<any>>;
+  setHighlightedCells: React.Dispatch<React.SetStateAction<any>>;
+  setWasInActiveGame: React.Dispatch<React.SetStateAction<boolean>>;
+  setFoundWords: React.Dispatch<React.SetStateAction<FoundWord[]>>;
+  setAchievements: React.Dispatch<React.SetStateAction<any[]>>;
+  setLetterGrid: React.Dispatch<React.SetStateAction<any>>;
+  setRemainingTime: React.Dispatch<React.SetStateAction<number | null>>;
+  setMinWordLength: React.Dispatch<React.SetStateAction<number>>;
+  setGameLanguage: React.Dispatch<React.SetStateAction<string | null>>;
+  setGameActive: React.Dispatch<React.SetStateAction<boolean>>;
+  setShowStartAnimation: React.Dispatch<React.SetStateAction<boolean>>;
+  setWaitingForResults: React.Dispatch<React.SetStateAction<boolean>>;
+  setLeaderboard: React.Dispatch<React.SetStateAction<any[]>>;
+  setTournamentData: React.Dispatch<React.SetStateAction<TournamentData | null>>;
+  setTournamentStandings: React.Dispatch<React.SetStateAction<any[]>>;
+  setShowTournamentStandings: React.Dispatch<React.SetStateAction<boolean>>;
+
+  // Combo refs and setters
+  comboLevelRef: MutableRefObject<number>;
+  lastWordTimeRef: MutableRefObject<number | null>;
+  setComboLevel: React.Dispatch<React.SetStateAction<number>>;
+  setLastWordTime: React.Dispatch<React.SetStateAction<number | null>>;
+  comboTimeoutRef: MutableRefObject<NodeJS.Timeout | null>;
+
+  // Exit ref
+  intentionalExitRef: MutableRefObject<boolean>;
+}
+
+/**
+ * Custom hook for managing player socket events
+ */
+const usePlayerSocketEvents = ({
+  socket,
+  t,
+  inputRef,
+  wasInActiveGame,
+  gameActive,
+  letterGrid,
+  gameLanguage,
+  username,
+  queueAchievement,
+  playComboSound,
+  onShowResults,
+
+  // State setters
+  setPlayersReady,
+  setShufflingGrid,
+  setHighlightedCells,
+  setWasInActiveGame,
+  setFoundWords,
+  setAchievements,
+  setLetterGrid,
+  setRemainingTime,
+  setMinWordLength,
+  setGameLanguage,
+  setGameActive,
+  setShowStartAnimation,
+  setWaitingForResults,
+  setLeaderboard,
+  setTournamentData,
+  setTournamentStandings,
+  setShowTournamentStandings,
+
+  // Combo refs and setters
+  comboLevelRef,
+  lastWordTimeRef,
+  setComboLevel,
+  setLastWordTime,
+  comboTimeoutRef,
+
+  // Exit ref
+  intentionalExitRef,
+}: UsePlayerSocketEventsProps): void => {
+  // Reset combo helper
+  const resetCombo = useCallback(() => {
+    setComboLevel(0);
+    comboLevelRef.current = 0;
+    setLastWordTime(null);
+    lastWordTimeRef.current = null;
+    if (comboTimeoutRef.current) {
+      clearTimeout(comboTimeoutRef.current);
+    }
+  }, [setComboLevel, setLastWordTime, comboLevelRef, lastWordTimeRef, comboTimeoutRef]);
+
+  useEffect(() => {
+    if (!socket) return;
+
+    const handleUpdateUsers = (data: any) => {
+      setPlayersReady(data.users || []);
+    };
+
+    const handleShufflingGridUpdate = (data: any) => {
+      if (data.grid) {
+        setShufflingGrid(data.grid);
+      }
+      if (data.highlightedCells !== undefined) {
+        setHighlightedCells(data.highlightedCells);
+      }
+    };
+
+    const handleStartGame = (data: any) => {
+      setWasInActiveGame(true);
+      setFoundWords([]);
+      setAchievements([]);
+      if (data.letterGrid) setLetterGrid(data.letterGrid);
+      if (data.timerSeconds) setRemainingTime(data.timerSeconds);
+      if (data.language) setGameLanguage(data.language);
+      if (data.minWordLength) setMinWordLength(data.minWordLength);
+      setGameActive(true);
+      setShowStartAnimation(true);
+
+      if (data.messageId && !data.skipAck) {
+        socket.emit('startGameAck', { messageId: data.messageId });
+        logger.log('[PLAYER] Sent startGameAck for messageId:', data.messageId);
+      }
+
+      neoSuccessToast(t('common.gameStarted'), { id: 'game-started', icon: '🚀', duration: 3000 });
+    };
+
+    const handleEndGame = () => {
+      setGameActive(false);
+      setRemainingTime(0);
+      if (wasInActiveGame) {
+        setWaitingForResults(true);
+      }
+    };
+
+    const handleWordAccepted = (data: any) => {
+      if (inputRef.current) {
+        gsap.fromTo(inputRef.current,
+          { scale: 1.1, borderColor: '#4ade80' },
+          { scale: 1, borderColor: '', duration: 0.3 }
+        );
+      }
+
+      setFoundWords(prev => prev.map(fw =>
+        fw.word.toLowerCase() === data.word.toLowerCase()
+          ? { ...fw, isValid: true }
+          : fw
+      ));
+
+      const now = Date.now();
+      let newComboLevel = 0;
+
+      if (data.autoValidated) {
+        const currentComboLevel = comboLevelRef.current;
+        const currentLastWordTime = lastWordTimeRef.current;
+
+        const comboChainWindow = Math.min(3000 + currentComboLevel * 1000, 10000);
+        if (currentLastWordTime && (now - currentLastWordTime) < comboChainWindow) {
+          newComboLevel = currentComboLevel + 1;
+          setComboLevel(newComboLevel);
+          comboLevelRef.current = newComboLevel;
+          playComboSound(newComboLevel);
+        } else {
+          newComboLevel = 0;
+          setComboLevel(0);
+          comboLevelRef.current = 0;
+        }
+        setLastWordTime(now);
+        lastWordTimeRef.current = now;
+
+        if (comboTimeoutRef.current) {
+          clearTimeout(comboTimeoutRef.current);
+        }
+
+        const comboTimeout = Math.min(3000 + newComboLevel * 1000, 10000);
+        comboTimeoutRef.current = setTimeout(() => {
+          setComboLevel(0);
+          comboLevelRef.current = 0;
+          setLastWordTime(null);
+          lastWordTimeRef.current = null;
+        }, comboTimeout);
+      }
+
+      wordAcceptedToast(data.word, {
+        score: data.score || (data.word.length - 1),
+        comboBonus: data.comboBonus || 0,
+        comboLevel: data.comboLevel || 0,
+        duration: 2000
+      });
+    };
+
+    const handleWordNeedsValidation = (data: any) => {
+      wordNeedsValidationToast(data.word, { duration: 3000 });
+      resetCombo();
+    };
+
+    const handleWordAlreadyFound = () => {
+      wordErrorToast(t('playerView.wordAlreadyFound'), { duration: 2000 });
+      resetCombo();
+    };
+
+    const handleWordNotOnBoard = (data: any) => {
+      wordErrorToast(t('playerView.wordNotOnBoard'), { duration: 3000 });
+      setFoundWords(prev => prev.map(fw =>
+        fw.word.toLowerCase() === data.word.toLowerCase()
+          ? { ...fw, isValid: false }
+          : fw
+      ));
+      resetCombo();
+    };
+
+    const handleWordTooShort = (data: any) => {
+      const msg = t('playerView.wordTooShortMin')
+        ? t('playerView.wordTooShortMin').replace('${min}', data.minLength)
+        : `Word too short! (min ${data.minLength} letters)`;
+      wordErrorToast(msg, { duration: 2000 });
+      setFoundWords(prev => prev.filter(fw =>
+        fw.word.toLowerCase() !== data.word.toLowerCase()
+      ));
+      resetCombo();
+    };
+
+    const handleWordRejected = (data: any) => {
+      wordErrorToast(t('playerView.wordRejected') || 'Word rejected', { duration: 2000 });
+      setFoundWords(prev => prev.filter(fw =>
+        fw.word.toLowerCase() !== data.word.toLowerCase()
+      ));
+      resetCombo();
+    };
+
+    const handleTimeUpdate = (data: any) => {
+      setRemainingTime(data.remainingTime);
+
+      if (data.letterGrid && !letterGrid) {
+        logger.log('[PLAYER] Received letterGrid in timeUpdate - late join sync');
+        setLetterGrid(data.letterGrid);
+      }
+      if (data.language && !gameLanguage) {
+        setGameLanguage(data.language);
+      }
+
+      const hasGrid = letterGrid || data.letterGrid;
+      if (!gameActive && data.remainingTime > 0 && hasGrid) {
+        logger.log('[PLAYER] Timer started on server, activating game (remainingTime:', data.remainingTime, ')');
+        setGameActive(true);
+        setShowStartAnimation(true);
+      }
+
+      if (data.remainingTime === 0) {
+        setGameActive(false);
+        setWaitingForResults(true);
+      }
+    };
+
+    const handleUpdateLeaderboard = (data: any) => {
+      setLeaderboard(data.leaderboard);
+    };
+
+    const handleLiveAchievementUnlocked = (data: any) => {
+      if (!data || !data.achievements || !Array.isArray(data.achievements)) {
+        logger.warn('[PLAYER] Received invalid achievement data:', data);
+        return;
+      }
+
+      logger.log(`[PLAYER] Received ${data.achievements.length} live achievements:`,
+        data.achievements.map((a: any) => a?.name || 'unknown').join(', '));
+
+      data.achievements.forEach((achievement: any) => {
+        if (achievement && achievement.name) {
+          queueAchievement(achievement);
+        } else {
+          logger.warn('[PLAYER] Skipping invalid achievement object:', achievement);
+        }
+      });
+
+      const validAchievements = data.achievements.filter((a: any) => a && a.name);
+      if (validAchievements.length > 0) {
+        setAchievements(prev => [...prev, ...validAchievements]);
+        logger.log(`[PLAYER] Added ${validAchievements.length} valid achievements to state`);
+      }
+    };
+
+    const handleValidatedScores = (data: any) => {
+      setWaitingForResults(false);
+      if (onShowResults) {
+        onShowResults({
+          scores: data.scores,
+          letterGrid: data.letterGrid,
+        });
+      }
+    };
+
+    const handleFinalScores = (data: any) => {
+      setTimeout(() => {
+        setWaitingForResults(false);
+        if (onShowResults) {
+          onShowResults({
+            scores: data.scores,
+            letterGrid: letterGrid,
+          });
+        }
+      }, 10000);
+    };
+
+    const handleHostLeftRoomClosing = (data: any) => {
+      intentionalExitRef.current = true;
+      clearSessionPreservingUsername(username);
+      neoErrorToast(data.message || t('playerView.roomClosed'), { icon: '🚪', duration: 5000 });
+      setTimeout(() => {
+        socket.disconnect();
+        window.location.reload();
+      }, 2000);
+    };
+
+    const handleResetGame = (data: any) => {
+      setGameActive(false);
+      setWasInActiveGame(false);
+      setFoundWords([]);
+      setAchievements([]);
+      setLeaderboard([]);
+      setRemainingTime(null);
+      setWaitingForResults(false);
+      setLetterGrid(null);
+      neoSuccessToast(data.message || t('common.newGameReady'), { icon: '🔄', duration: 3000 });
+    };
+
+    const handleTournamentCreated = (data: any) => {
+      setTournamentData(data.tournament);
+      neoSuccessToast(t('hostView.tournamentCreated') || 'Tournament created!', { icon: '🏆', duration: 3000 });
+    };
+
+    const handleTournamentRoundStarting = (data: any) => {
+      if (data.tournament) {
+        setTournamentData(data.tournament);
+      }
+      if (data.standings) {
+        setTournamentStandings(data.standings);
+      }
+      const roundNum = data.tournament?.currentRound || 1;
+      const totalRounds = data.tournament?.totalRounds || 3;
+      neoInfoToast(`${t('hostView.tournamentRound')} ${roundNum}/${totalRounds}`, { icon: '🎯', duration: 3000 });
+    };
+
+    const handleTournamentRoundCompleted = (data: any) => {
+      if (data.standings) {
+        setTournamentStandings(data.standings);
+        setShowTournamentStandings(true);
+      }
+      if (data.tournament) {
+        setTournamentData(data.tournament);
+      }
+    };
+
+    const handleTournamentComplete = (data: any) => {
+      if (data.standings) {
+        setTournamentStandings(data.standings);
+        setShowTournamentStandings(true);
+      }
+      if (data.tournament) {
+        setTournamentData(data.tournament);
+      }
+      const winner = data.standings?.[0];
+      if (winner) {
+        confetti({
+          particleCount: 150,
+          spread: 100,
+          origin: { y: 0.6 },
+        });
+        neoSuccessToast(`🏆 ${winner.username} ${t('hostView.wonTournament')}!`, { duration: 5000 });
+      }
+    };
+
+    const handleTournamentCancelled = (data: any) => {
+      setTournamentData(null);
+      setTournamentStandings([]);
+      setShowTournamentStandings(false);
+      neoErrorToast(data?.message || t('hostView.tournamentCancelled'), { icon: '❌', duration: 3000 });
+    };
+
+    const handleError = (data: any) => {
+      const message = data?.message || t('playerView.errorOccurred') || 'An error occurred';
+      wordErrorToast(message, { duration: 3000 });
+    };
+
+    const handleRateLimited = () => {
+      wordErrorToast(t('playerView.tooFast') || 'Slow down! Submitting too fast', { duration: 2000 });
+    };
+
+    const handlePlayerPresenceUpdate = (data: any) => {
+      console.log('[PRESENCE] Received playerPresenceUpdate:', data);
+      const { username: playerUsername, presenceStatus, isWindowFocused } = data;
+      setPlayersReady(prev => {
+        console.log('[PRESENCE] Current playersReady:', prev);
+        const updated = prev.map(player => {
+          const name = typeof player === 'string' ? player : player.username;
+          if (name === playerUsername) {
+            const newPlayer: Player = typeof player === 'string'
+              ? { username: player, presenceStatus, isWindowFocused }
+              : { ...player, presenceStatus, isWindowFocused };
+            console.log('[PRESENCE] Updated player:', newPlayer);
+            return newPlayer;
+          }
+          return player;
+        });
+        console.log('[PRESENCE] Updated playersReady:', updated);
+        return updated;
+      });
+    };
+
+    // Register all event listeners
+    socket.on('updateUsers', handleUpdateUsers);
+    socket.on('playerPresenceUpdate', handlePlayerPresenceUpdate);
+    socket.on('shufflingGridUpdate', handleShufflingGridUpdate);
+    socket.on('startGame', handleStartGame);
+    socket.on('endGame', handleEndGame);
+    socket.on('wordAccepted', handleWordAccepted);
+    socket.on('wordNeedsValidation', handleWordNeedsValidation);
+    socket.on('wordAlreadyFound', handleWordAlreadyFound);
+    socket.on('wordNotOnBoard', handleWordNotOnBoard);
+    socket.on('wordTooShort', handleWordTooShort);
+    socket.on('wordRejected', handleWordRejected);
+    socket.on('timeUpdate', handleTimeUpdate);
+    socket.on('updateLeaderboard', handleUpdateLeaderboard);
+    socket.on('liveAchievementUnlocked', handleLiveAchievementUnlocked);
+    socket.on('validatedScores', handleValidatedScores);
+    socket.on('finalScores', handleFinalScores);
+    socket.on('hostLeftRoomClosing', handleHostLeftRoomClosing);
+    socket.on('resetGame', handleResetGame);
+    socket.on('tournamentCreated', handleTournamentCreated);
+    socket.on('tournamentRoundStarting', handleTournamentRoundStarting);
+    socket.on('tournamentRoundCompleted', handleTournamentRoundCompleted);
+    socket.on('tournamentComplete', handleTournamentComplete);
+    socket.on('tournamentCancelled', handleTournamentCancelled);
+    socket.on('error', handleError);
+    socket.on('rateLimited', handleRateLimited);
+
+    return () => {
+      socket.off('updateUsers', handleUpdateUsers);
+      socket.off('playerPresenceUpdate', handlePlayerPresenceUpdate);
+      socket.off('shufflingGridUpdate', handleShufflingGridUpdate);
+      socket.off('startGame', handleStartGame);
+      socket.off('endGame', handleEndGame);
+      socket.off('wordAccepted', handleWordAccepted);
+      socket.off('wordNeedsValidation', handleWordNeedsValidation);
+      socket.off('wordAlreadyFound', handleWordAlreadyFound);
+      socket.off('wordNotOnBoard', handleWordNotOnBoard);
+      socket.off('wordTooShort', handleWordTooShort);
+      socket.off('wordRejected', handleWordRejected);
+      socket.off('timeUpdate', handleTimeUpdate);
+      socket.off('updateLeaderboard', handleUpdateLeaderboard);
+      socket.off('liveAchievementUnlocked', handleLiveAchievementUnlocked);
+      socket.off('validatedScores', handleValidatedScores);
+      socket.off('finalScores', handleFinalScores);
+      socket.off('hostLeftRoomClosing', handleHostLeftRoomClosing);
+      socket.off('resetGame', handleResetGame);
+      socket.off('tournamentCreated', handleTournamentCreated);
+      socket.off('tournamentRoundStarting', handleTournamentRoundStarting);
+      socket.off('tournamentRoundCompleted', handleTournamentRoundCompleted);
+      socket.off('tournamentComplete', handleTournamentComplete);
+      socket.off('tournamentCancelled', handleTournamentCancelled);
+      socket.off('error', handleError);
+      socket.off('rateLimited', handleRateLimited);
+    };
+  }, [
+    socket,
+    t,
+    inputRef,
+    wasInActiveGame,
+    gameActive,
+    letterGrid,
+    gameLanguage,
+    username,
+    queueAchievement,
+    playComboSound,
+    onShowResults,
+    resetCombo,
+    setPlayersReady,
+    setShufflingGrid,
+    setHighlightedCells,
+    setWasInActiveGame,
+    setFoundWords,
+    setAchievements,
+    setLetterGrid,
+    setRemainingTime,
+    setMinWordLength,
+    setGameLanguage,
+    setGameActive,
+    setShowStartAnimation,
+    setWaitingForResults,
+    setLeaderboard,
+    setTournamentData,
+    setTournamentStandings,
+    setShowTournamentStandings,
+    comboLevelRef,
+    lastWordTimeRef,
+    setComboLevel,
+    setLastWordTime,
+    comboTimeoutRef,
+    intentionalExitRef,
+  ]);
+};
+
+export default usePlayerSocketEvents;

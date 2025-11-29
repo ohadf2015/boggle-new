@@ -1,18 +1,16 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { motion } from 'framer-motion';
-import { FaTrophy, FaMedal, FaArrowLeft } from 'react-icons/fa';
+import { FaTrophy, FaMedal, FaArrowLeft, FaSync } from 'react-icons/fa';
 import { useRouter } from 'next/navigation';
 import Header from '@/components/Header';
 import { Button } from '@/components/ui/button';
 import { useTheme } from '@/utils/ThemeContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
-import { getLeaderboard, getUserRank } from '@/lib/supabase';
+import { useLeaderboard, useUserRank } from '@/hooks/useSupabaseRealtime';
 import { cn } from '@/lib/utils';
-
-export const dynamic = 'force-dynamic';
 
 export default function LeaderboardPage() {
   const { theme } = useTheme();
@@ -21,40 +19,16 @@ export default function LeaderboardPage() {
   const router = useRouter();
   const isDarkMode = theme === 'dark';
 
-  const [leaderboard, setLeaderboard] = useState([]);
-  const [userRank, setUserRank] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  // Use real-time hooks for live leaderboard updates
+  const {
+    data: leaderboard,
+    loading,
+    error,
+    subscriptionStatus,
+    refetch
+  } = useLeaderboard({ limit: 100, enabled: isSupabaseEnabled });
 
-  useEffect(() => {
-    const fetchLeaderboard = async () => {
-      if (!isSupabaseEnabled) {
-        setLoading(false);
-        return;
-      }
-
-      try {
-        const { data, error: fetchError } = await getLeaderboard(100);
-        if (fetchError) throw fetchError;
-        setLeaderboard(data || []);
-
-        // Fetch user's rank if authenticated
-        if (user?.id) {
-          const { data: rankData } = await getUserRank(user.id);
-          if (rankData) {
-            setUserRank(rankData);
-          }
-        }
-      } catch (err) {
-        console.error('Failed to fetch leaderboard:', err);
-        setError(err.message);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchLeaderboard();
-  }, [isSupabaseEnabled, user?.id]);
+  const { rank: userRank } = useUserRank(user?.id);
 
   const getRankIcon = (rank) => {
     switch (rank) {
@@ -125,12 +99,42 @@ export default function LeaderboardPage() {
             <FaTrophy className="text-yellow-500" />
             {t('leaderboard.title')}
           </h1>
-          <p className={cn(
-            'mt-2',
-            isDarkMode ? 'text-gray-400' : 'text-gray-600'
-          )}>
-            {t('leaderboard.allTime')}
-          </p>
+          <div className="flex items-center justify-center gap-3 mt-2">
+            <p className={cn(
+              isDarkMode ? 'text-gray-400' : 'text-gray-600'
+            )}>
+              {t('leaderboard.allTime')}
+            </p>
+            {/* Live indicator */}
+            <div className="flex items-center gap-1.5">
+              <span className={cn(
+                'w-2 h-2 rounded-full animate-pulse',
+                subscriptionStatus === 'SUBSCRIBED' ? 'bg-green-500' : 'bg-yellow-500'
+              )} />
+              <span className={cn(
+                'text-xs',
+                isDarkMode ? 'text-gray-500' : 'text-gray-400'
+              )}>
+                {subscriptionStatus === 'SUBSCRIBED' ? 'Live' : 'Connecting...'}
+              </span>
+            </div>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={refetch}
+              className={cn(
+                'h-7 w-7 p-0 rounded-full',
+                isDarkMode ? 'hover:bg-slate-700' : 'hover:bg-gray-100'
+              )}
+              title="Refresh"
+            >
+              <FaSync className={cn(
+                'w-3 h-3',
+                loading && 'animate-spin',
+                isDarkMode ? 'text-gray-400' : 'text-gray-500'
+              )} />
+            </Button>
+          </div>
         </motion.div>
 
         {/* User's Rank Card (if authenticated) */}

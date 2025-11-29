@@ -75,12 +75,29 @@
   --radius-sm: 2px;
   --radius-md: 4px;
   --radius-lg: 8px;
+
+  /* Avatar Color Palette */
+  --avatar-1: #FF6B6B;
+  --avatar-2: #4ECDC4;
+  --avatar-3: #45B7D1;
+  --avatar-4: #FFA07A;
+  --avatar-5: #98D8C8;
+  --avatar-6: #F7DC6F;
+  --avatar-7: #BB8FCE;
+  --avatar-8: #85C1E2;
+  --avatar-9: #F8B739;
+  --avatar-10: #52B788;
+  --avatar-11: #FF8FAB;
+  --avatar-12: #6BCF7F;
+  --avatar-13: #FFB347;
+  --avatar-14: #9D84B7;
+  --avatar-15: #FF6F61;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: 'Rubik', Arial, Helvetica, sans-serif;
+  font-family: var(--font-rubik), 'Rubik', Arial, Helvetica, sans-serif;
   margin: 0;
   padding: 0;
   /* Halftone texture overlay on body */
@@ -319,16 +336,31 @@ body {
     border: var(--border-neo-thick) solid var(--neo-black);
     box-shadow: var(--shadow-xl);
     border-radius: var(--radius-lg);
-    transform: rotate(-2deg);
+    /* No rotation - keep grid perfectly straight */
     padding: 16px;
-    width: 100%;
-    max-width: 100%;
+    /* Constrain to a perfect square */
+    width: min(100%, 80vh);
+    max-width: min(100%, 80vh);
+    aspect-ratio: 1 / 1;
+    /* Center within parent */
+    margin: 0 auto;
+  }
+
+  /* On desktop screens, make the board a bit smaller */
+  @media (min-width: 769px) {
+    .game-board-frame {
+      width: min(100%, 65vh);
+      max-width: min(100%, 65vh);
+    }
   }
 
   /* On smaller screens, reduce padding to maximize board size */
   @media (max-width: 768px) {
     .game-board-frame {
       padding: 6px;
+      /* On mobile, use full width but still square */
+      width: 100%;
+      max-width: 100%;
     }
   }
 
@@ -364,6 +396,183 @@ body {
     border: 2px solid var(--neo-black);
     border-top: none;
     border-radius: 0 0 2px 2px;
+  }
+
+  /* ====================================
+     NEO-BRUTALIST DROP SHADOW UTILITIES
+     ==================================== */
+
+  /* Drop shadow filters for icons and elements */
+  .drop-shadow-neo {
+    filter: drop-shadow(2px 2px 0px var(--neo-black));
+  }
+
+  .drop-shadow-neo-sm {
+    filter: drop-shadow(1px 1px 0px var(--neo-black));
+  }
+
+  .drop-shadow-neo-lg {
+    filter: drop-shadow(3px 3px 0px var(--neo-black));
+  }
+
+  /* Combo glow effects */
+  .combo-glow-rainbow {
+    filter: drop-shadow(0 0 30px rgba(255, 255, 255, 1));
+  }
+
+  .combo-glow-normal {
+    filter: drop-shadow(0 0 20px rgba(255, 255, 255, 0.8));
+  }
+
+  .combo-glow-subtle {
+    filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.5));
+  }
+
+  /* RTL-aware drop shadows */
+  [dir="rtl"] .drop-shadow-neo {
+    filter: drop-shadow(-2px 2px 0px var(--neo-black));
+  }
+
+  [dir="rtl"] .drop-shadow-neo-sm {
+    filter: drop-shadow(-1px 1px 0px var(--neo-black));
+  }
+
+  [dir="rtl"] .drop-shadow-neo-lg {
+    filter: drop-shadow(-3px 3px 0px var(--neo-black));
+  }
+}
+
+@layer components {
+  /* ====================================
+     NEO-BRUTALIST COMPONENT CLASSES
+     ==================================== */
+
+  /* Neo-Brutalist Card - use instead of repeated border patterns */
+  .neo-card {
+    @apply bg-neo-cream border-4 border-neo-black rounded-neo-lg shadow-hard-lg;
+  }
+
+  .neo-card-sm {
+    @apply bg-neo-cream border-3 border-neo-black rounded-neo shadow-hard;
+  }
+
+  .neo-card-dark {
+    @apply bg-neo-gray border-4 border-neo-black rounded-neo-lg shadow-hard-lg text-neo-white;
+  }
+
+  .neo-card-hover {
+    @apply neo-card hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-hard-xl transition-all duration-200;
+  }
+
+  /* Neo-Brutalist Button Variants */
+  .btn-neo-primary {
+    @apply bg-neo-yellow text-neo-black border-3 border-neo-black rounded-neo shadow-hard font-bold uppercase tracking-wide;
+    @apply hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-hard-lg;
+    @apply active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-pressed;
+    @apply transition-all duration-100;
+  }
+
+  .btn-neo-secondary {
+    @apply bg-neo-orange text-neo-black border-3 border-neo-black rounded-neo shadow-hard font-bold uppercase tracking-wide;
+    @apply hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-hard-lg;
+    @apply active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-pressed;
+    @apply transition-all duration-100;
+  }
+
+  .btn-neo-accent {
+    @apply bg-neo-pink text-neo-white border-3 border-neo-black rounded-neo shadow-hard font-bold uppercase tracking-wide;
+    @apply hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-hard-lg;
+    @apply active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-pressed;
+    @apply transition-all duration-100;
+  }
+
+  .btn-neo-ghost {
+    @apply bg-transparent text-neo-white border-3 border-neo-black rounded-neo shadow-hard font-bold uppercase tracking-wide;
+    @apply hover:bg-neo-navy-light hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-hard-lg;
+    @apply active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-pressed;
+    @apply transition-all duration-100;
+  }
+
+  /* Neo-Brutalist Badge */
+  .badge-neo {
+    @apply px-3 py-1 text-sm font-black uppercase tracking-wide border-3 border-neo-black rounded-md shadow-hard-sm;
+    @apply transition-all duration-100;
+  }
+
+  .badge-neo-yellow {
+    @apply badge-neo bg-neo-yellow text-neo-black;
+  }
+
+  .badge-neo-pink {
+    @apply badge-neo bg-neo-pink text-neo-white;
+  }
+
+  .badge-neo-cyan {
+    @apply badge-neo bg-neo-cyan text-neo-black;
+  }
+
+  .badge-neo-lime {
+    @apply badge-neo bg-neo-lime text-neo-black;
+  }
+
+  /* Neo-Brutalist Panel with tilt */
+  .neo-panel {
+    @apply bg-neo-cream border-4 border-neo-black rounded-neo-lg shadow-hard-lg p-4;
+  }
+
+  .neo-panel-tilt-left {
+    @apply neo-panel rotate-[-2deg];
+  }
+
+  .neo-panel-tilt-right {
+    @apply neo-panel rotate-[2deg];
+  }
+
+  .neo-panel-tilt-slight-left {
+    @apply neo-panel rotate-[-1deg];
+  }
+
+  .neo-panel-tilt-slight-right {
+    @apply neo-panel rotate-[1deg];
+  }
+
+  /* Leaderboard styling */
+  .leaderboard-row {
+    @apply py-3 px-4 border-b-4 border-neo-black bg-neo-purple;
+  }
+
+  .leaderboard-title {
+    @apply flex items-center gap-2 text-neo-cream text-base uppercase tracking-widest font-black;
+  }
+
+  /* Input field styling */
+  .input-neo {
+    @apply w-full px-4 py-3 bg-neo-cream text-neo-black border-3 border-neo-black rounded-neo shadow-hard-sm;
+    @apply placeholder:text-neo-gray focus:outline-none focus:ring-2 focus:ring-neo-cyan focus:ring-offset-2;
+    @apply transition-all duration-100;
+  }
+
+  .input-neo:focus {
+    @apply translate-x-[-1px] translate-y-[-1px] shadow-hard;
+  }
+
+  /* Particle effects for combo animations */
+  .particle-yellow {
+    background: radial-gradient(circle, #ffff00, #ff6b00);
+  }
+
+  .particle-cyan {
+    background: radial-gradient(circle, #00ffff, #0088ff);
+  }
+
+  .particle-pink {
+    background: radial-gradient(circle, #ff00ff, #ff0088);
+  }
+
+  .particle-rainbow {
+    background: linear-gradient(135deg, #ff0000, #ff7f00, #ffff00, #00ff00, #0000ff, #4b0082, #9400d3);
+    background-size: 200% 200%;
+    animation: rainbow-shift 2s ease infinite;
   }
 }
 

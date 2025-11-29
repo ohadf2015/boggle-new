@@ -37,7 +37,7 @@ const GoRipplesAnimation = ({ onComplete }) => {
                     {/* Neo-Brutalist ripple waves - thick black borders */}
                     {ripples.map((ripple, index) => (
                         <motion.div
-                            key={index}
+                            key={`ripple-${ripple.id || index}`}
                             className="absolute rounded-neo-lg border-4 border-neo-black"
                             style={{
                                 width: '120px',

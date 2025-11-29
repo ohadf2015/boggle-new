@@ -4,6 +4,7 @@
  */
 
 const { createClient } = require('@supabase/supabase-js');
+const { calculateGameXp, getLevelFromXp, checkLevelUp, getTitleForLevel } = require('./xpManager');
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
@@ -133,6 +134,36 @@ async function updatePlayerStats(playerId, gameStats) {
     updates.achievement_counts = currentCounts;
   }
 
+  // Calculate XP earned this game
+  const isWinner = gameStats.placement === 1 && (gameStats.totalPlayers || 0) > 1;
+  const achievementCount = gameStats.achievements?.length || 0;
+  const xpResult = calculateGameXp({
+    score: gameStats.score || 0,
+    isWinner,
+    achievementCount,
+    playerCount: gameStats.totalPlayers || 1,
+  });
+
+  // Update XP and level
+  const currentXp = profile.total_xp || 0;
+  const newTotalXp = currentXp + xpResult.totalXp;
+  const oldLevel = profile.current_level || getLevelFromXp(currentXp);
+  const newLevel = getLevelFromXp(newTotalXp);
+
+  updates.total_xp = newTotalXp;
+  updates.current_level = newLevel;
+
+  // Check for level up
+  const levelUpInfo = checkLevelUp(oldLevel, newLevel);
+  if (levelUpInfo.leveledUp) {
+    console.log(`[XP] Player ${playerId} leveled up! ${oldLevel} -> ${newLevel}`);
+    // Update player title if a new one was unlocked
+    const newTitle = getTitleForLevel(newLevel);
+    if (newTitle && newTitle !== profile.player_title) {
+      updates.player_title = newTitle;
+    }
+  }
+
   try {
     const { data, error } = await client
       .from('profiles')
@@ -147,7 +178,21 @@ async function updatePlayerStats(playerId, gameStats) {
       console.error(`[SUPABASE] Attempted updates:`, JSON.stringify(updates));
     }
 
-    return { data, error };
+    // Return XP info along with data for socket emission
+    return {
+      data,
+      error,
+      xpInfo: {
+        xpEarned: xpResult.totalXp,
+        xpBreakdown: xpResult.breakdown,
+        newTotalXp,
+        oldLevel,
+        newLevel,
+        leveledUp: levelUpInfo.leveledUp,
+        levelsGained: levelUpInfo.levelsGained,
+        newTitles: levelUpInfo.newTitles,
+      }
+    };
   } catch (err) {
     console.error(`[SUPABASE] Unexpected error updating profile for ${playerId}:`, err);
     return { data: null, error: { message: err.message || 'Unexpected error during profile update' } };
@@ -325,9 +370,11 @@ async function updateGuestStats(tokenHash, gameStats) {
  * @param {object} userAuthMap - Map of username to { authUserId, guestTokenHash }
  */
 async function processGameResults(gameCode, scores, gameInfo, userAuthMap) {
+  const xpResults = {}; // Store XP results for each player to emit via socket
+
   if (!isSupabaseConfigured()) {
     console.log('[SUPABASE] Not configured, skipping game result recording');
-    return;
+    return { xpResults };
   }
 
   console.log(`[SUPABASE] Processing game results for ${gameCode}, ${scores.length} players`);
@@ -363,9 +410,18 @@ async function processGameResults(gameCode, scores, gameInfo, userAuthMap) {
         });
         console.log(`[SUPABASE] recordGameResult response:`, gameResultRes.error ? `ERROR: ${gameResultRes.error.message}` : 'SUCCESS');
 
-        // Update profile stats
+        // Update profile stats (includes XP calculation)
         const statsRes = await updatePlayerStats(authInfo.authUserId, gameStats);
         console.log(`[SUPABASE] updatePlayerStats response:`, statsRes.error ? `ERROR: ${statsRes.error.message}` : 'SUCCESS');
+
+        // Store XP info for socket emission
+        if (statsRes.xpInfo) {
+          xpResults[playerScore.username] = {
+            ...statsRes.xpInfo,
+            socketId: authInfo.socketId,
+          };
+          console.log(`[XP] ${playerScore.username} earned ${statsRes.xpInfo.xpEarned} XP`);
+        }
 
         // Update leaderboard
         const leaderboardRes = await updateLeaderboardEntry(authInfo.authUserId);
@@ -385,6 +441,120 @@ async function processGameResults(gameCode, scores, gameInfo, userAuthMap) {
     } catch (error) {
       console.error(`[SUPABASE] Error processing result for ${playerScore.username}:`, error);
     }
+  }
+
+  return { xpResults };
+}
+
+/**
+ * Save a host-approved word that wasn't in the dictionary to Supabase
+ * @param {object} params - Word approval data
+ * @param {string} params.word - The word that was approved
+ * @param {string} params.language - Language code (en, he, sv, ja)
+ * @param {string} params.gameCode - Game where approval happened
+ * @param {string|null} params.hostUserId - UUID of host who approved (null if guest)
+ * @param {boolean} params.promoted - Whether word reached promotion threshold
+ * @returns {object} - { data, error, isNewWord }
+ */
+async function saveHostApprovedWord({ word, language, gameCode, hostUserId, promoted = false }) {
+  const client = getSupabase();
+  if (!client) return { data: null, error: { message: 'Supabase not configured' }, isNewWord: false };
+
+  try {
+    // Check if word already exists
+    const { data: existing, error: fetchError } = await client
+      .from('community_words')
+      .select('id, approval_count, promoted_to_dictionary')
+      .eq('word', word)
+      .eq('language', language)
+      .single();
+
+    if (fetchError && fetchError.code !== 'PGRST116') {
+      // PGRST116 = not found, which is fine
+      console.error(`[SUPABASE] Error checking existing word "${word}":`, fetchError.message);
+      return { data: null, error: fetchError, isNewWord: false };
+    }
+
+    let wordRecord;
+    let isNewWord = false;
+
+    if (existing) {
+      // Word exists - update approval count
+      const updates = {
+        approval_count: existing.approval_count + 1,
+        last_approved_by: hostUserId,
+        last_approved_in_game: gameCode,
+        last_approved_at: new Date().toISOString()
+      };
+
+      // Mark as promoted if threshold reached
+      if (promoted && !existing.promoted_to_dictionary) {
+        updates.promoted_to_dictionary = true;
+        updates.promoted_at = new Date().toISOString();
+      }
+
+      const { data: updated, error: updateError } = await client
+        .from('community_words')
+        .update(updates)
+        .eq('id', existing.id)
+        .select()
+        .single();
+
+      if (updateError) {
+        console.error(`[SUPABASE] Error updating word "${word}":`, updateError.message);
+        return { data: null, error: updateError, isNewWord: false };
+      }
+
+      wordRecord = updated;
+    } else {
+      // New word - insert
+      isNewWord = true;
+      const { data: inserted, error: insertError } = await client
+        .from('community_words')
+        .insert({
+          word,
+          language,
+          approval_count: 1,
+          promoted_to_dictionary: promoted,
+          promoted_at: promoted ? new Date().toISOString() : null,
+          first_approved_by: hostUserId,
+          first_approved_in_game: gameCode,
+          last_approved_by: hostUserId,
+          last_approved_in_game: gameCode
+        })
+        .select()
+        .single();
+
+      if (insertError) {
+        console.error(`[SUPABASE] Error inserting word "${word}":`, insertError.message);
+        return { data: null, error: insertError, isNewWord: false };
+      }
+
+      wordRecord = inserted;
+    }
+
+    // Record the individual approval event
+    if (wordRecord) {
+      const { error: approvalError } = await client
+        .from('community_word_approvals')
+        .insert({
+          word_id: wordRecord.id,
+          approved_by: hostUserId,
+          game_code: gameCode
+        });
+
+      if (approvalError) {
+        console.error(`[SUPABASE] Error recording approval for "${word}":`, approvalError.message);
+        // Don't fail the whole operation for this
+      }
+    }
+
+    console.log(`[SUPABASE] ${isNewWord ? 'Saved new' : 'Updated'} community word "${word}" (${language}) - approval count: ${wordRecord?.approval_count || 1}${promoted ? ' - PROMOTED' : ''}`);
+    return { data: wordRecord, error: null, isNewWord };
+
+  } catch (err) {
+    console.error(`[SUPABASE] Unexpected error saving word "${word}":`, err);
+    return { data: null, error: { message: err.message || 'Unexpected error' }, isNewWord: false };
   }
 }
 
@@ -441,5 +611,6 @@ module.exports = {
   getOrCreateGuestToken,
   updateGuestStats,
   processGameResults,
-  updateRankedMmr
+  updateRankedMmr,
+  saveHostApprovedWord
 };

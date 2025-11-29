@@ -30,7 +30,7 @@ const ScorePage = ({ scores }) => {
           <ul className="space-y-4">
             {scores.map((score, index) => (
               <motion.li
-                key={index}
+                key={score.odataId || score.username || `score-${index}`}
                 initial={{ x: -50, opacity: 0 }}
                 animate={{ x: 0, opacity: 1 }}
                 transition={{ delay: index * 0.1, type: "spring" }}

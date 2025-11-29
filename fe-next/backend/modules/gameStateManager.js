@@ -19,6 +19,13 @@ const usernameToSocket = new Map();
 // Leaderboard throttling - maps gameCode to timeout ID
 const leaderboardThrottleTimers = {};
 
+// Presence tracking configuration
+const PRESENCE_CONFIG = {
+  IDLE_THRESHOLD: 30000,     // 30 seconds without activity = idle
+  AFK_THRESHOLD: 45000,      // 45 seconds without activity = afk (for testing, change to 120000 for production)
+  HEARTBEAT_TIMEOUT: 15000,  // 15 seconds without heartbeat = disconnected
+};
+
 // Track authenticated users across all games
 // Maps authUserId -> { gameCode, socketId, username, isHost, connectedAt }
 const authUserConnections = new Map();
@@ -129,7 +136,7 @@ function addUserToGame(gameCode, username, socketId, options = {}) {
 
   const { avatar = null, isHost = false, playerId = null, authUserId = null, guestTokenHash = null } = options;
 
-  // Store user data with auth context
+  // Store user data with auth context and presence tracking
   game.users[username] = {
     socketId,
     avatar,
@@ -137,7 +144,12 @@ function addUserToGame(gameCode, username, socketId, options = {}) {
     playerId,
     authUserId,        // Supabase user ID for authenticated users
     guestTokenHash,    // Hashed guest token for guest users
-    joinedAt: Date.now()
+    joinedAt: Date.now(),
+    // Presence tracking
+    lastActivityAt: Date.now(),
+    lastHeartbeatAt: Date.now(),
+    isWindowFocused: true,
+    presenceStatus: 'active', // 'active' | 'idle' | 'afk'
   };
 
   // Initialize player tracking
@@ -328,8 +340,91 @@ function getGameUsers(gameCode) {
     username,
     isHost: data.isHost,
     avatar: data.avatar,
-    score: game.playerScores[username] || 0
+    score: game.playerScores[username] || 0,
+    // Include presence information
+    presenceStatus: data.presenceStatus || 'active',
+    isWindowFocused: data.isWindowFocused !== false,
+    lastActivityAt: data.lastActivityAt || Date.now(),
   }));
+}
+
+/**
+ * Update user presence status
+ * @param {string} gameCode - Game code
+ * @param {string} username - Username
+ * @param {object} presenceData - { isWindowFocused, lastActivityAt, forceIdle }
+ * @returns {string|null} - New presence status or null if user not found
+ */
+function updateUserPresence(gameCode, username, presenceData) {
+  const game = games[gameCode];
+  if (!game || !game.users[username]) return null;
+
+  const user = game.users[username];
+  const now = Date.now();
+
+  // Update presence data
+  if (presenceData.isWindowFocused !== undefined) {
+    user.isWindowFocused = presenceData.isWindowFocused;
+  }
+  if (presenceData.lastActivityAt !== undefined) {
+    user.lastActivityAt = presenceData.lastActivityAt;
+  }
+
+  // Calculate presence status based on window focus and activity time
+  const timeSinceActivity = now - (user.lastActivityAt || now);
+  let newStatus = 'active';
+
+  // Check for AFK first (regardless of window focus - 2 minutes of inactivity)
+  if (timeSinceActivity >= PRESENCE_CONFIG.AFK_THRESHOLD) {
+    newStatus = 'afk';
+  }
+  // If not AFK, check if idle (either window not focused OR 30 seconds of inactivity)
+  else if (!user.isWindowFocused || presenceData.forceIdle || timeSinceActivity >= PRESENCE_CONFIG.IDLE_THRESHOLD) {
+    newStatus = 'idle';
+  }
+  // else stays 'active'
+
+  user.presenceStatus = newStatus;
+  return newStatus;
+}
+
+/**
+ * Update user heartbeat (proves connection is alive)
+ * @param {string} gameCode - Game code
+ * @param {string} username - Username
+ */
+function updateUserHeartbeat(gameCode, username) {
+  const game = games[gameCode];
+  if (!game || !game.users[username]) return;
+
+  game.users[username].lastHeartbeatAt = Date.now();
+}
+
+/**
+ * Mark user activity (reset idle timer)
+ * @param {string} gameCode - Game code
+ * @param {string} username - Username
+ */
+function markUserActivity(gameCode, username) {
+  const game = games[gameCode];
+  if (!game || !game.users[username]) return;
+
+  const now = Date.now();
+  game.users[username].lastActivityAt = now;
+  game.users[username].lastHeartbeatAt = now;
+
+  // If user was idle/afk and window is focused, set back to active
+  if (game.users[username].isWindowFocused) {
+    game.users[username].presenceStatus = 'active';
+  }
+}
+
+/**
+ * Get presence configuration
+ * @returns {object} - Presence configuration
+ */
+function getPresenceConfig() {
+  return { ...PRESENCE_CONFIG };
 }
 
 /**
@@ -365,12 +460,20 @@ function getActiveRooms() {
 }
 
 /**
- * Get empty rooms (rooms with no players)
+ * Get empty rooms (rooms with no active players)
+ * A room is considered empty if it has no users, or if all users are marked as disconnected
  * @returns {array} - Array of game codes for empty rooms
  */
 function getEmptyRooms() {
   return Object.values(games)
-    .filter(game => Object.keys(game.users).length === 0)
+    .filter(game => {
+      const users = Object.values(game.users);
+      // Room is empty if no users at all
+      if (users.length === 0) return true;
+      // Room is empty if all users are disconnected (e.g., host in grace period with no other players)
+      const activeUsers = users.filter(user => !user.disconnected);
+      return activeUsers.length === 0;
+    })
     .map(game => game.gameCode);
 }
 
@@ -631,9 +734,10 @@ function getLeaderboardThrottled(gameCode, broadcastFn, throttleMs = 500) {
 
 /**
  * Cleanup stale games (older than maxAge)
- * @param {number} maxAge - Maximum age in milliseconds (default 2 hours)
+ * @param {number} maxAge - Maximum age in milliseconds (default 30 minutes)
+ * NOTE: Reduced from 2 hours to 30 minutes to prevent memory leaks from abandoned games
  */
-function cleanupStaleGames(maxAge = 2 * 60 * 60 * 1000) {
+function cleanupStaleGames(maxAge = 30 * 60 * 1000) {
   const now = Date.now();
   const staleCodes = [];
 
@@ -766,6 +870,12 @@ module.exports = {
 
   // Cleanup
   cleanupStaleGames,
+
+  // Presence tracking
+  updateUserPresence,
+  updateUserHeartbeat,
+  markUserActivity,
+  getPresenceConfig,
 
   // Auth user tracking
   getAuthUserConnection,

@@ -76,15 +76,16 @@ const PopExplosion = ({ x, y, color, onComplete }) => {
     );
 };
 
-// Neo-Brutalist color palette - bold, high contrast (moved outside component to avoid dependency issues)
+// Neo-Brutalist color palette - uses CSS variables from theme for consistency
+// These map to the neo-* colors defined in globals.css and tailwind.config.js
 const BRUTALIST_COLORS = [
-    { bg: '#fef08a', border: '#000000' }, // Yellow
-    { bg: '#fca5a5', border: '#000000' }, // Red/Pink
-    { bg: '#86efac', border: '#000000' }, // Green
-    { bg: '#93c5fd', border: '#000000' }, // Blue
-    { bg: '#fdba74', border: '#000000' }, // Orange
-    { bg: '#c4b5fd', border: '#000000' }, // Purple
-    { bg: '#ffffff', border: '#000000' }, // White
+    { bg: 'var(--neo-yellow)', border: 'var(--neo-black)' },
+    { bg: 'var(--neo-pink)', border: 'var(--neo-black)' },
+    { bg: 'var(--neo-lime)', border: 'var(--neo-black)' },
+    { bg: 'var(--neo-cyan)', border: 'var(--neo-black)' },
+    { bg: 'var(--neo-orange)', border: 'var(--neo-black)' },
+    { bg: 'var(--neo-purple-light)', border: 'var(--neo-black)' },
+    { bg: 'var(--neo-cream)', border: 'var(--neo-black)' },
 ];
 
 const MenuAnimation = ({ className = '' }) => {
@@ -169,8 +170,8 @@ const MenuAnimation = ({ className = '' }) => {
         setPoppedCount(prevCount => {
             const newCount = prevCount + 1;
 
-            // Check for achievement unlock (20+ letters popped)
-            if (newCount >= 20 && !achievementShownRef.current) {
+            // Check for achievement unlock (10+ letters popped)
+            if (newCount >= 10 && !achievementShownRef.current) {
                 // Check if already unlocked in localStorage
                 const hasUnlocked = typeof window !== 'undefined' &&
                     localStorage.getItem('achievement_LETTER_POPPER') === 'true';

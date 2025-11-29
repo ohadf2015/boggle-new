@@ -43,6 +43,64 @@ module.exports = {
           white: "var(--neo-white)",
           gray: "var(--neo-gray)",
         },
+        // Brand colors for social auth
+        brand: {
+          google: "#4285F4",
+          "google-hover": "#3367D6",
+          discord: "#5865F2",
+          "discord-hover": "#4752C4",
+          apple: "#000000",
+          "apple-hover": "#333333",
+        },
+        // Achievement tier colors
+        tier: {
+          bronze: "#CD7F32",
+          "bronze-border": "#8B4513",
+          "bronze-glow": "rgba(205, 127, 50, 0.5)",
+          silver: "#C0C0C0",
+          "silver-border": "#808080",
+          "silver-glow": "rgba(192, 192, 192, 0.5)",
+          gold: "#FFD700",
+          "gold-border": "#B8860B",
+          "gold-glow": "rgba(255, 215, 0, 0.5)",
+          platinum: "#E5E4E2",
+          "platinum-border": "#9370DB",
+          "platinum-glow": "rgba(229, 228, 226, 0.5)",
+          diamond: "#B9F2FF",
+          "diamond-border": "#00CED1",
+          "diamond-glow": "rgba(185, 242, 255, 0.5)",
+        },
+        // Overlay utilities
+        overlay: {
+          light: "rgba(0, 0, 0, 0.1)",
+          DEFAULT: "rgba(0, 0, 0, 0.5)",
+          dark: "rgba(0, 0, 0, 0.8)",
+        },
+        // Glow utilities
+        glow: {
+          white: "rgba(255, 255, 255, 0.5)",
+          "white-strong": "rgba(255, 255, 255, 0.9)",
+          cyan: "rgba(0, 255, 255, 0.5)",
+          pink: "rgba(255, 20, 147, 0.5)",
+        },
+        // Avatar colors
+        avatar: {
+          1: "#FF6B6B",
+          2: "#4ECDC4",
+          3: "#45B7D1",
+          4: "#FFA07A",
+          5: "#98D8C8",
+          6: "#F7DC6F",
+          7: "#BB8FCE",
+          8: "#85C1E2",
+          9: "#F8B739",
+          10: "#52B788",
+          11: "#FF8FAB",
+          12: "#6BCF7F",
+          13: "#FFB347",
+          14: "#9D84B7",
+          15: "#FF6F61",
+        },
         // Semantic colors using CSS variables
         border: "var(--border)",
         input: "var(--input)",
@@ -176,11 +234,11 @@ module.exports = {
         '-1': '-1deg',
         '-2': '-2deg',
       },
-      // Font families
+      // Font families - using CSS variables from next/font
       fontFamily: {
-        'neo': ['Fredoka', 'Rubik', 'sans-serif'],
-        'neo-display': ['Fredoka', 'sans-serif'],
-        'neo-body': ['Rubik', 'sans-serif'],
+        'neo': ['var(--font-fredoka)', 'var(--font-rubik)', 'Fredoka', 'Rubik', 'sans-serif'],
+        'neo-display': ['var(--font-fredoka)', 'Fredoka', 'sans-serif'],
+        'neo-body': ['var(--font-rubik)', 'Rubik', 'sans-serif'],
       },
     },
   },

@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
-import 'animate.css';
 import './SlotMachine.css';
 
 // Character sets for different languages

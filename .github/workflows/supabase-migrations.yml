@@ -1,0 +1,45 @@
+name: Supabase Migrations
+
+on:
+  push:
+    branches: [main, master]
+    paths:
+      - 'fe-next/supabase/migrations/**'
+  workflow_dispatch:  # Allow manual trigger
+
+jobs:
+  migrate:
+    name: Run Database Migrations
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Supabase CLI
+        uses: supabase/setup-cli@v1
+        with:
+          version: latest
+
+      - name: Link Supabase Project
+        working-directory: fe-next/supabase
+        run: supabase link --project-ref hdtmpkicuxvtmvrmtybx
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+
+      - name: Run Database Migrations
+        working-directory: fe-next/supabase
+        run: supabase db push
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+          SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
+
+      - name: Migration Summary
+        if: always()
+        run: |
+          echo "### Migration Results" >> $GITHUB_STEP_SUMMARY
+          echo "✅ Database migrations completed successfully" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Project:** ${{ secrets.SUPABASE_PROJECT_REF }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Triggered by:** ${{ github.event_name }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Commit:** ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY

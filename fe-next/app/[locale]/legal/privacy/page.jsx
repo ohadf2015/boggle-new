@@ -6,8 +6,6 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { useTheme } from '@/utils/ThemeContext';
 import { cn } from '@/lib/utils';
 
-export const dynamic = 'force-dynamic';
-
 export default function PrivacyPolicyPage() {
   const { t } = useLanguage();
   const { theme } = useTheme();

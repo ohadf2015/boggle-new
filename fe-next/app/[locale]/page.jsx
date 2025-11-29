@@ -1,13 +1,11 @@
 'use client';
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
+import nextDynamic from 'next/dynamic';
 import toast from 'react-hot-toast';
 import { io } from 'socket.io-client';
-import HostView from '@/host/HostView';
-import PlayerView from '@/player/PlayerView';
-import JoinView from '@/JoinView';
-import ResultsPage from '@/ResultsPage.jsx';
 import Header from '@/components/Header';
+import ErrorBoundary from '@/app/components/ErrorBoundary';
 import { SocketContext } from '@/utils/SocketContext';
 import { saveSession, getSession, clearSession, clearSessionPreservingUsername } from '@/utils/session';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -16,6 +14,42 @@ import { useMusic } from '@/contexts/MusicContext';
 import { getGuestSessionId, hashToken } from '@/utils/guestManager';
 import { getSession as getSupabaseSession } from '@/lib/supabase';
 import logger from '@/utils/logger';
+
+// Dynamic imports for code splitting - only load when needed
+const HostView = nextDynamic(() => import('@/host/HostView'), {
+  loading: () => <ViewLoadingSkeleton />,
+  ssr: false,
+});
+
+const PlayerView = nextDynamic(() => import('@/player/PlayerView'), {
+  loading: () => <ViewLoadingSkeleton />,
+  ssr: false,
+});
+
+const JoinView = nextDynamic(() => import('@/JoinView'), {
+  loading: () => <ViewLoadingSkeleton />,
+  ssr: false,
+});
+
+const ResultsPage = nextDynamic(() => import('@/ResultsPage.jsx'), {
+  loading: () => <ViewLoadingSkeleton />,
+  ssr: false,
+});
+
+// Loading skeleton component
+function ViewLoadingSkeleton() {
+  return (
+    <div className="min-h-[60vh] flex items-center justify-center">
+      <div className="text-center">
+        <div className="relative w-12 h-12 mx-auto mb-3">
+          <div className="absolute inset-0 border-4 border-cyan-500/30 rounded-full" />
+          <div className="absolute inset-0 border-4 border-transparent border-t-cyan-500 rounded-full animate-spin" />
+        </div>
+        <p className="text-gray-400 text-sm">Loading game...</p>
+      </div>
+    </div>
+  );
+}
 
 // Force dynamic rendering to prevent static generation issues
 export const dynamic = 'force-dynamic';
@@ -808,7 +842,9 @@ export default function GamePage() {
   return (
     <SocketContext.Provider value={socketContextValue}>
       <Header />
-      {renderView()}
+      <ErrorBoundary>
+        {renderView()}
+      </ErrorBoundary>
     </SocketContext.Provider>
   );
 }

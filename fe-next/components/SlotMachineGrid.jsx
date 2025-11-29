@@ -1,7 +1,6 @@
-import React, { useRef } from 'react';
+import React, { useRef, memo } from 'react';
 import SlotMachineCell from './SlotMachineCell';
 import { cn } from '../lib/utils';
-import 'animate.css';
 
 // Pre-generate duration variations for cells at module level (up to 20x20 grid)
 // These are constant random values that stay the same across renders
@@ -119,7 +118,7 @@ const SlotMachineGrid = ({
       <div
         ref={gridRef}
         className={cn(
-          "grid touch-none select-none relative rounded-neo p-2 sm:p-3 md:p-4 aspect-square w-full max-w-full md:max-w-[min(90vh,880px)]",
+          "grid select-none relative rounded-neo p-2 sm:p-3 md:p-4 aspect-square w-full max-w-full md:max-w-[min(90vh,880px)]",
           isLargeGrid ? "gap-1 sm:gap-1" : "gap-1 sm:gap-1.5",
           // NEO-BRUTALIST: Cream paper background
           "bg-neo-cream border-2 border-neo-black/20",
@@ -159,4 +158,14 @@ const SlotMachineGrid = ({
   );
 };
 
-export default SlotMachineGrid;
+// Memoize the component to prevent unnecessary re-renders
+// Only re-render when grid content actually changes
+export default memo(SlotMachineGrid, (prevProps, nextProps) => {
+  // Custom comparison - only re-render if these specific props change
+  return (
+    prevProps.grid === nextProps.grid &&
+    prevProps.highlightedCells === nextProps.highlightedCells &&
+    prevProps.language === nextProps.language &&
+    prevProps.animationPattern === nextProps.animationPattern
+  );
+});

@@ -1,4 +1,5 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
+import dynamic from 'next/dynamic';
 import { motion } from 'framer-motion';
 import { FaGamepad, FaCrown, FaUser, FaDice, FaSync, FaQrcode, FaWhatsapp, FaLink, FaQuestionCircle } from 'react-icons/fa';
 import { QRCodeSVG } from 'qrcode.react';
@@ -11,16 +12,19 @@ import { Alert, AlertDescription } from './components/ui/alert';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from './components/ui/dialog';
 import { ToggleGroup, ToggleGroupItem } from './components/ui/toggle-group';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './components/ui/tooltip';
-import HowToPlay from './components/HowToPlay';
 import ShareButton from './components/ShareButton';
-import MenuAnimation from './components/MenuAnimation';
-import Particles from './components/Particles';
 import { cn } from './lib/utils';
 import { copyJoinUrl, shareViaWhatsApp, getJoinUrl } from './utils/share';
 import { useLanguage } from './contexts/LanguageContext';
 import LogRocket from 'logrocket';
 import { validateUsername, validateRoomName, validateGameCode, sanitizeInput } from './utils/validation';
 import { useValidation } from './hooks/useValidation';
+import { generateRoomCode as generateCode } from './utils/utils';
+
+// Dynamic imports for heavy animation components (reduces initial bundle by ~50KB)
+const HowToPlay = dynamic(() => import('./components/HowToPlay'), { ssr: false });
+const MenuAnimation = dynamic(() => import('./components/MenuAnimation'), { ssr: false });
+const Particles = dynamic(() => import('./components/Particles'), { ssr: false });
 
 const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, error, activeRooms, refreshRooms, prefilledRoom, roomName, setRoomName, isAutoJoining, roomsLoading, isAuthenticated, displayName, isProfileLoading }) => {
   const { t, language, dir } = useLanguage();
@@ -62,20 +66,54 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
     }
   }, [roomsLoading, activeRooms.length, mode]);
 
-  const handleModeChange = (newMode) => {
+  const handleModeChange = useCallback((newMode) => {
     if (newMode) {
       setMode(newMode);
       // Auto-generate code when switching to host mode
       if (newMode === 'host') {
-        generateRoomCode();
+        setGameCode(generateCode());
       }
     }
-  };
+  }, [setGameCode]);
 
-  const generateRoomCode = () => {
-    const code = Math.floor(1000 + Math.random() * 9000).toString();
-    setGameCode(code);
-  };
+  const generateRoomCode = useCallback(() => {
+    setGameCode(generateCode());
+  }, [setGameCode]);
+
+  // Memoized handlers
+  const handleJoinGuest = useCallback(() => {
+    handleJoin(false);
+  }, [handleJoin]);
+
+  const handleShowFullForm = useCallback(() => {
+    setShowFullForm(true);
+  }, []);
+
+  const handleClearAndRestart = useCallback(() => {
+    setGameCode('');
+    setUsername('');
+  }, [setGameCode, setUsername]);
+
+  const handleSetLanguageEn = useCallback(() => setRoomLanguage('en'), []);
+  const handleSetLanguageHe = useCallback(() => setRoomLanguage('he'), []);
+  const handleSetLanguageSv = useCallback(() => setRoomLanguage('sv'), []);
+  const handleSetLanguageJa = useCallback(() => setRoomLanguage('ja'), []);
+
+  const handleSwitchToHostMode = useCallback(() => {
+    handleModeChange('host');
+  }, [handleModeChange]);
+
+  const handleShowHowToPlay = useCallback(() => {
+    setShowHowToPlay(true);
+  }, []);
+
+  const handleCloseHowToPlay = useCallback(() => {
+    setShowHowToPlay(false);
+  }, []);
+
+  const handleCloseQR = useCallback(() => {
+    setShowQR(false);
+  }, []);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -338,7 +376,7 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
                   {/* Play button - Neo-Brutalist */}
                   <motion.div whileHover={{ x: -2, y: -2 }} whileTap={{ x: 2, y: 2 }}>
                     <Button
-                      onClick={() => handleJoin(false)}
+                      onClick={handleJoinGuest}
                       className="w-full h-14 text-xl font-black uppercase bg-neo-lime text-neo-black border-3 border-neo-black rounded-neo shadow-hard hover:shadow-hard-lg hover:bg-neo-lime/90 transition-all"
                     >
                       <FaGamepad className="mr-3" size={24} />
@@ -350,7 +388,7 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
                   <div className="text-center pt-2">
                     <button
                       type="button"
-                      onClick={() => setShowFullForm(true)}
+                      onClick={handleShowFullForm}
                       className="text-sm text-neo-cyan font-bold uppercase underline underline-offset-4 hover:text-neo-cyan/80 transition-colors"
                     >
                       {t('joinView.wantToHostOrJoinOther')}
@@ -407,7 +445,7 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
                   <div className="text-center pt-2">
                     <button
                       type="button"
-                      onClick={() => setShowFullForm(true)}
+                      onClick={handleShowFullForm}
                       className="text-sm text-neo-cyan font-bold uppercase underline underline-offset-4 hover:text-neo-cyan/80 transition-colors"
                     >
                       {t('joinView.wantToHostOrJoinOther')}
@@ -457,10 +495,7 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
                           <Button
                             size="sm"
                             variant="outline"
-                            onClick={() => {
-                              setGameCode('');
-                              setUsername('');
-                            }}
+                            onClick={handleClearAndRestart}
                             className="border-white text-white hover:bg-white/20"
                           >
                             {t('joinView.clearAndRestart')}
@@ -501,7 +536,7 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3">
                     <button
                       type="button"
-                      onClick={() => setRoomLanguage('en')}
+                      onClick={handleSetLanguageEn}
                       className={cn(
                         "flex flex-col items-center gap-1 p-3 rounded-neo border-3 transition-all duration-100",
                         roomLanguage === 'en'
@@ -514,7 +549,7 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
                     </button>
                     <button
                       type="button"
-                      onClick={() => setRoomLanguage('he')}
+                      onClick={handleSetLanguageHe}
                       className={cn(
                         "flex flex-col items-center gap-1 p-3 rounded-neo border-3 transition-all duration-100",
                         roomLanguage === 'he'
@@ -527,7 +562,7 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
                     </button>
                     <button
                       type="button"
-                      onClick={() => setRoomLanguage('sv')}
+                      onClick={handleSetLanguageSv}
                       className={cn(
                         "flex flex-col items-center gap-1 p-3 rounded-neo border-3 transition-all duration-100",
                         roomLanguage === 'sv'
@@ -540,7 +575,7 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
                     </button>
                     <button
                       type="button"
-                      onClick={() => setRoomLanguage('ja')}
+                      onClick={handleSetLanguageJa}
                       className={cn(
                         "flex flex-col items-center gap-1 p-3 rounded-neo border-3 transition-all duration-100",
                         roomLanguage === 'ja'
@@ -821,7 +856,7 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
                   {mode === 'join' && (
                     <motion.div whileHover={{ x: -2, y: -2 }} whileTap={{ x: 2, y: 2 }}>
                       <Button
-                        onClick={() => handleModeChange('host')}
+                        onClick={handleSwitchToHostMode}
                         className="bg-neo-pink text-neo-white"
                       >
                         <span className="mr-2"><FaCrown /></span>
@@ -886,7 +921,7 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
           <Tooltip>
             <TooltipTrigger asChild>
               <Button
-                onClick={() => setShowHowToPlay(true)}
+                onClick={handleShowHowToPlay}
                 size="lg"
                 className="rounded-full w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-r from-teal-500 to-cyan-500 hover:from-teal-400 hover:to-cyan-400 shadow-2xl hover:shadow-[0_0_25px_rgba(20,184,166,0.6)] p-0"
               >
@@ -907,7 +942,7 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
           <HowToPlay />
           <DialogFooter className="sm:justify-center">
             <Button
-              onClick={() => setShowHowToPlay(false)}
+              onClick={handleCloseHowToPlay}
               className="bg-gradient-to-r from-cyan-500 to-purple-600 hover:from-cyan-400 hover:to-purple-500 hover:shadow-[0_0_15px_rgba(6,182,212,0.5)] text-lg px-8"
             >
               {t('common.understood')}
@@ -939,7 +974,7 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
           </div>
           <DialogFooter className="sm:justify-center">
             <Button
-              onClick={() => setShowQR(false)}
+              onClick={handleCloseQR}
               className="w-full bg-gradient-to-r from-cyan-500 to-teal-500 hover:from-cyan-400 hover:to-teal-400 hover:shadow-[0_0_15px_rgba(6,182,212,0.5)]"
             >
               {t('common.close')}

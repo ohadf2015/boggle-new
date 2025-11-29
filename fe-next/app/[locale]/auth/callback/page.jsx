@@ -3,6 +3,7 @@
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
+import logger from '@/utils/logger';
 
 export default function AuthCallbackPage() {
   const router = useRouter();
@@ -16,7 +17,7 @@ export default function AuthCallbackPage() {
           const { data, error } = await supabase.auth.getSession();
 
           if (error) {
-            console.error('Auth callback error:', error);
+            logger.error('Auth callback error:', error);
             router.replace('/?auth_error=true');
             return;
           }
@@ -46,7 +47,7 @@ export default function AuthCallbackPage() {
         // Fallback: redirect to home with error
         router.replace('/?auth_error=true');
       } catch (err) {
-        console.error('Auth callback exception:', err);
+        logger.error('Auth callback exception:', err);
         router.replace('/?auth_error=true');
       }
     };

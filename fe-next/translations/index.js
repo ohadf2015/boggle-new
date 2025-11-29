@@ -17,6 +17,30 @@ export const translations = {
       twitterDescription: 'Find words on a letter grid and compete with friends in real-time! Perfect Christmas activity for kids and the whole family. No download - create a room and race to find the most words together.',
       locale: 'en_US',
       language: 'English',
+      leaderboard: {
+        title: 'Global Leaderboard - Top Players | LexiClash',
+        description: 'View the top-ranked players on LexiClash global leaderboard. Compete with word game enthusiasts worldwide and track your progress to become the ultimate word master.',
+        ogTitle: 'Global Leaderboard - Top Word Game Players',
+        ogDescription: 'See where you rank among the best word game players. Join LexiClash and compete for the top spot!',
+      },
+      profile: {
+        title: 'Your Profile & Stats | LexiClash',
+        description: 'View your LexiClash profile, game statistics, achievements, and progress. Track your wins, total score, words found, and time played in this competitive word game.',
+        ogTitle: 'Player Profile & Game Stats - LexiClash',
+        ogDescription: 'Track your word game achievements, statistics, and climb the leaderboard rankings.',
+      },
+      terms: {
+        title: 'Terms of Service | LexiClash',
+        description: 'Read LexiClash Terms of Service. Learn about user rights, acceptable use, account management, and our game policies for this multiplayer word game platform.',
+        ogTitle: 'Terms of Service - LexiClash',
+        ogDescription: 'LexiClash Terms of Service - User rights and acceptable use policies.',
+      },
+      privacy: {
+        title: 'Privacy Policy | LexiClash',
+        description: 'LexiClash Privacy Policy - Learn how we collect, use, and protect your data. We prioritize your privacy and use industry-standard security measures.',
+        ogTitle: 'Privacy Policy - LexiClash',
+        ogDescription: 'Learn how LexiClash protects your privacy and handles your data securely.',
+      },
     },
     common: {
       loading: 'Loading...',
@@ -41,6 +65,8 @@ export const translations = {
     },
     music: {
       volume: 'Volume',
+      musicVolume: 'Music',
+      sfxVolume: 'Sounds',
       mute: 'Mute',
       unmute: 'Unmute',
       clickToEnable: 'Click anywhere to enable music',
@@ -269,6 +295,7 @@ export const translations = {
       swipeToFormWords: 'Swipe on the board to form words',
       inviteFriends: 'Invite Friends',
       waitingForHostToStart: 'Waiting for host to start the game...',
+      notInDictionary: 'Not in dictionary',
     },
     achievementPopup: {
       unlocked: 'Achievement Unlocked!',
@@ -311,6 +338,8 @@ export const translations = {
       otherPlayers: 'Other Players',
       needsVerification: 'Needs Verification',
       autoVerified: 'Auto-Verified',
+      showHeatmap: 'Show Heatmap',
+      hideHeatmap: 'Hide Heatmap',
     },
     playerTitles: {
       champion: { name: 'Champion', icon: '👑', description: 'Winner of the game' },
@@ -464,8 +493,87 @@ export const translations = {
       },
       LETTER_POPPER: {
         name: 'Balloon Popper',
-        description: 'Popped 20+ letters in the main menu'
+        description: 'Popped 10+ letters in the main menu'
       }
+    },
+    achievementTiers: {
+      bronze: 'Bronze',
+      silver: 'Silver',
+      gold: 'Gold',
+      platinum: 'Platinum',
+      earned: 'Earned',
+      maxTier: 'Max Tier Reached!',
+    },
+    insights: {
+      yourStats: 'Your Stats',
+      longestWord: 'Longest Word',
+      wordsPerMinute: 'Words/Min',
+      avgWordLength: 'Avg Length',
+      favoriteLength: 'Favorite Length',
+      speedPattern: 'Speed Pattern',
+      letters: 'letters',
+      early: 'Early',
+      mid: 'Mid',
+      late: 'Late',
+      fastStart: 'Fast Starter',
+      strongFinish: 'Strong Finish',
+      momentum: 'Building Momentum',
+      steady: 'Steady Pace',
+      accuracy: 'Accuracy',
+      // Data storytelling - player archetypes
+      story: {
+        precisionSpeed: 'Precision at Speed',
+        precisionSpeedDesc: 'Elite-level wordplay. Fast AND accurate.',
+        bigGameHunter: 'Big Game Hunter',
+        bigGameHunterDesc: 'Going after the big words pays off.',
+        speedDemon: 'Speed Demon',
+        speedDemonDesc: 'Your fingers are on fire!',
+        sharpshooter: 'Sharpshooter',
+        sharpshooterDesc: 'Quality over quantity. Every shot counts.',
+        wordStorm: 'Word Storm',
+        wordStormDesc: 'Spray and pray has its merits!',
+        clutchFinisher: 'Clutch Finisher',
+        clutchFinisherDesc: 'You saved the best for last. Pressure makes diamonds.',
+        firstBlood: 'First Blood',
+        firstBloodDesc: 'You came out swinging. Early aggression sets the tone.',
+        slowBurn: 'Slow Burn',
+        slowBurnDesc: 'Started slow, ended strong. The tortoise knew what was up.',
+        wordsmith: 'Wordsmith',
+        wordsmithDesc: "You don't settle for small words.",
+        solidPerformance: 'Solid Performance',
+        solidPerformanceDesc: 'A respectable showing. Keep at it!',
+        gettingStarted: 'Warming Up',
+        gettingStartedDesc: 'Every champion started somewhere. Next round is yours!',
+      },
+    },
+    xp: {
+      title: 'Player Level',
+      level: 'Level',
+      maxLevel: 'Max Level',
+      xpProgress: 'XP Progress',
+      totalXpEarned: 'Total XP Earned',
+      xpToNextLevel: 'XP to next level',
+      xpGained: 'XP Gained',
+      levelUp: 'Level Up!',
+      youReached: 'You reached',
+      titleUnlocked: 'Title Unlocked',
+      baseXp: 'Base XP',
+      scoreBonus: 'Score Bonus',
+      winBonus: 'Win Bonus',
+      achievementBonus: 'Achievement Bonus',
+      // Player titles
+      titles: {
+        wordSeeker: 'Word Seeker',
+        letterHunter: 'Letter Hunter',
+        vocabularian: 'Vocabularian',
+        wordsmith: 'Wordsmith',
+        lexiconAdept: 'Lexicon Adept',
+        grammarGuardian: 'Grammar Guardian',
+        syntaxSage: 'Syntax Sage',
+        eloquentElite: 'Eloquent Elite',
+        linguisticLegend: 'Linguistic Legend',
+        lexiClashChampion: 'LexiClash Champion',
+      },
     },
     auth: {
       signIn: 'Sign In',
@@ -481,7 +589,19 @@ export const translations = {
       termsLink: 'Terms of Service',
       andText: 'and',
       privacyLink: 'Privacy Policy',
-      upgradePrompt: 'Sign in to save your progress and compete on the leaderboard!'
+      upgradePrompt: 'Sign in to save your progress and compete on the leaderboard!',
+      firstWin: {
+        title: 'Congratulations on Your First Win!',
+        subtitle: 'You\'ve got skills! Create an account to keep your winning streak going.',
+        benefitsTitle: 'Sign up to unlock:',
+        benefits: {
+          trackProgress: 'Track your stats, wins, and achievements',
+          leaderboard: 'Compete on the global leaderboard',
+          playWithFriends: 'Challenge friends and build your reputation'
+        },
+        statsTeaser: 'You\'ve played ${games} game(s) and scored ${score} points!',
+        maybeLater: 'Maybe later'
+      }
     },
     legal: {
       termsOfService: 'Terms of Service',
@@ -661,6 +781,51 @@ export const translations = {
       playersInQueue: '${count} players in queue',
       matchFound: 'Match found!',
       requiresAuth: 'Sign in to access Ranked Mode'
+    },
+    growth: {
+      // Share prompts
+      shareYourResult: 'Share Your Result',
+      shareVictory: '🎉 Share Your Victory!',
+      shareResult: 'Share Your Game',
+      bragToFriends: 'Let your friends know you won!',
+      inviteFriendsToPlay: 'Invite friends to challenge you',
+      viralPrompt: 'Challenge your friends to beat your score!',
+      share: 'Share',
+      // Win streak
+      dayStreak: 'day streak',
+      winsAway: 'wins away',
+      nextTier: 'Next tier',
+      newBest: 'New Best!',
+      newPersonalBest: 'New Personal Best!',
+      streakUnlocked: 'Streak Unlocked!',
+      streakAtRisk: 'Your streak is at risk! Play today to keep it going.',
+      keepStreakAlive: 'Keep your streak alive!',
+      // Streak tiers
+      streakStarting: 'Starting',
+      streakHot: 'Hot',
+      streakOnFire: 'On Fire',
+      streakEpic: 'Epic',
+      streakLegendary: 'Legendary',
+      // Referral
+      referFriend: 'Refer a Friend',
+      referralReward: 'Get rewards for inviting friends!',
+      yourReferralLink: 'Your Referral Link',
+      referralsCount: 'Friends Referred',
+      // Daily challenge
+      dailyChallenge: 'Daily Challenge',
+      dailyChallengeDesc: 'New challenge every day!',
+      todaysChallenge: "Today's Challenge",
+      challengeCompleted: 'Challenge Completed!',
+      nextChallengeIn: 'Next challenge in',
+      // Engagement
+      welcomeBack: 'Welcome Back!',
+      missedYou: 'We missed you! Ready for another round?',
+      playNow: 'Play Now',
+      // Milestones
+      firstWin: 'First Win!',
+      tenWins: '10 Wins!',
+      hundredWins: '100 Wins!',
+      milestoneUnlocked: 'Milestone Unlocked!'
     }
   },
   he: {
@@ -681,6 +846,30 @@ export const translations = {
       twitterDescription: 'מצאו מילים על לוח אותיות והתחרו מול חברים בזמן אמת! פעילות מושלמת לחנוכה לילדים ולכל המשפחה. ללא התקנה - פתחו חדר ומי שמוצא הכי הרבה מילים מנצח!',
       locale: 'he_IL',
       language: 'Hebrew',
+      leaderboard: {
+        title: 'טבלת מובילים עולמית - השחקנים המובילים | לקסיקלאש',
+        description: 'צפו בשחקנים המדורגים הגבוה ביותר בטבלת המובילים העולמית של לקסיקלאש. התחרו עם חובבי משחקי מילים ברחבי העולם ועקבו אחר ההתקדמות שלכם.',
+        ogTitle: 'טבלת מובילים עולמית - שחקני משחקי מילים מובילים',
+        ogDescription: 'ראו איפה אתם מדורגים בין שחקני משחקי המילים הטובים ביותר. הצטרפו ללקסיקלאש והתחרו על המקום הראשון!',
+      },
+      profile: {
+        title: 'הפרופיל והסטטיסטיקות שלך | לקסיקלאש',
+        description: 'צפו בפרופיל לקסיקלאש שלכם, סטטיסטיקות משחק, הישגים והתקדמות. עקבו אחר הניצחונות, הניקוד הכולל, המילים שמצאתם והזמן ששיחקתם במשחק מילים תחרותי זה.',
+        ogTitle: 'פרופיל שחקן וסטטיסטיקות משחק - לקסיקלאש',
+        ogDescription: 'עקבו אחר הישגי משחקי המילים, הסטטיסטיקות וטפסו בדירוג טבלת המובילים.',
+      },
+      terms: {
+        title: 'תנאי שימוש | לקסיקלאש',
+        description: 'קראו את תנאי השימוש של לקסיקלאש. למדו על זכויות משתמשים, שימוש מקובל, ניהול חשבון ומדיניות המשחק שלנו לפלטפורמת משחקי מילים מרובי משתתפים.',
+        ogTitle: 'תנאי שימוש - לקסיקלאש',
+        ogDescription: 'תנאי השימוש של לקסיקלאש - זכויות משתמשים ומדיניות שימוש מקובל.',
+      },
+      privacy: {
+        title: 'מדיניות פרטיות | לקסיקלאש',
+        description: 'מדיניות הפרטיות של לקסיקלאש - למדו כיצד אנו אוספים, משתמשים ומגנים על הנתונים שלכם. אנו שמים בראש סדר העדיפויות את הפרטיות שלכם ומשתמשים באמצעי אבטחה בתקן התעשייה.',
+        ogTitle: 'מדיניות פרטיות - לקסיקלאש',
+        ogDescription: 'למדו כיצד לקסיקלאש מגן על הפרטיות שלכם ומטפל בנתונים שלכם בצורה מאובטחת.',
+      },
     },
     common: {
       loading: 'טוען...',
@@ -705,6 +894,8 @@ export const translations = {
     },
     music: {
       volume: 'עוצמה',
+      musicVolume: 'מוזיקה',
+      sfxVolume: 'צלילים',
       mute: 'השתק',
       unmute: 'בטל השתקה',
       clickToEnable: 'לחצו כדי להפעיל מוזיקה',
@@ -933,6 +1124,7 @@ export const translations = {
       swipeToFormWords: 'החליקו על הלוח כדי ליצור מילים',
       inviteFriends: 'הזמן חברים',
       waitingForHostToStart: 'ממתינים למארח שיתחיל את המשחק...',
+      notInDictionary: 'לא נמצא במילון',
     },
     achievementPopup: {
       unlocked: 'הישג נפתח!',
@@ -975,6 +1167,8 @@ export const translations = {
       otherPlayers: 'שחקנים אחרים',
       needsVerification: 'דורש אימות',
       autoVerified: 'אומת אוטומטית',
+      showHeatmap: 'הצג מפת חום',
+      hideHeatmap: 'הסתר מפת חום',
     },
     playerTitles: {
       champion: { name: 'אלוף', icon: '👑', description: 'מנצח המשחק' },
@@ -1128,8 +1322,86 @@ export const translations = {
       },
       LETTER_POPPER: {
         name: 'מפוצץ בלונים',
-        description: 'פוצץ 20+ אותיות בתפריט הראשי'
+        description: 'פוצץ 10+ אותיות בתפריט הראשי'
       }
+    },
+    achievementTiers: {
+      bronze: 'ארד',
+      silver: 'כסף',
+      gold: 'זהב',
+      platinum: 'פלטינום',
+      earned: 'הושג',
+      maxTier: 'דרגה מקסימלית!',
+    },
+    insights: {
+      yourStats: 'הסטטיסטיקות שלך',
+      longestWord: 'המילה הארוכה ביותר',
+      wordsPerMinute: 'מילים/דקה',
+      avgWordLength: 'אורך ממוצע',
+      favoriteLength: 'אורך מועדף',
+      speedPattern: 'תבנית מהירות',
+      letters: 'אותיות',
+      early: 'התחלה',
+      mid: 'אמצע',
+      late: 'סוף',
+      fastStart: 'התחלה מהירה',
+      strongFinish: 'סיום חזק',
+      momentum: 'מומנטום עולה',
+      steady: 'קצב יציב',
+      accuracy: 'דיוק',
+      // Data storytelling - player archetypes
+      story: {
+        precisionSpeed: 'דיוק במהירות',
+        precisionSpeedDesc: 'משחק מילים ברמה גבוהה. מהיר ומדויק.',
+        bigGameHunter: 'צייד מילים גדולות',
+        bigGameHunterDesc: 'ציד המילים הארוכות משתלם.',
+        speedDemon: 'שד מהירות',
+        speedDemonDesc: 'האצבעות שלך בוערות!',
+        sharpshooter: 'צלף מדויק',
+        sharpshooterDesc: 'איכות על כמות. כל יריה נספרת.',
+        wordStorm: 'סערת מילים',
+        wordStormDesc: 'לפעמים כמות זה היתרון שלך!',
+        clutchFinisher: 'מסיים קלאץ׳',
+        clutchFinisherDesc: 'שמרת את הטוב לסוף. לחץ יוצר יהלומים.',
+        firstBlood: 'דם ראשון',
+        firstBloodDesc: 'יצאת לדרך בכוח. אגרסיביות מוקדמת קובעת את הטון.',
+        slowBurn: 'שריפה איטית',
+        slowBurnDesc: 'התחלת לאט, סיימת חזק. הצב ידע מה הוא עושה.',
+        wordsmith: 'אומן מילים',
+        wordsmithDesc: 'אתה לא מסתפק במילים קצרות.',
+        solidPerformance: 'ביצוע מוצק',
+        solidPerformanceDesc: 'הופעה מכובדת. המשך כך!',
+        gettingStarted: 'מתחממים',
+        gettingStartedDesc: 'כל אלוף התחיל איפשהו. הסיבוב הבא שלך!',
+      },
+    },
+    xp: {
+      title: 'רמת שחקן',
+      level: 'רמה',
+      maxLevel: 'רמה מקסימלית',
+      xpProgress: 'התקדמות XP',
+      totalXpEarned: 'סה"כ XP שנצבר',
+      xpToNextLevel: 'XP לרמה הבאה',
+      xpGained: 'XP שנצבר',
+      levelUp: 'עליית רמה!',
+      youReached: 'הגעת ל',
+      titleUnlocked: 'תואר נפתח',
+      baseXp: 'XP בסיסי',
+      scoreBonus: 'בונוס ניקוד',
+      winBonus: 'בונוס ניצחון',
+      achievementBonus: 'בונוס הישג',
+      titles: {
+        wordSeeker: 'מחפש מילים',
+        letterHunter: 'צייד אותיות',
+        vocabularian: 'אוצר מילים',
+        wordsmith: 'נפח מילים',
+        lexiconAdept: 'מומחה לקסיקון',
+        grammarGuardian: 'שומר הדקדוק',
+        syntaxSage: 'חכם התחביר',
+        eloquentElite: 'עילית רהוטה',
+        linguisticLegend: 'אגדת הלשון',
+        lexiClashChampion: 'אלוף לקסיקלאש',
+      },
     },
     auth: {
       signIn: 'התחברות',
@@ -1145,7 +1417,19 @@ export const translations = {
       termsLink: 'תנאי השימוש',
       andText: 'ול',
       privacyLink: 'מדיניות הפרטיות',
-      upgradePrompt: 'התחבר כדי לשמור את ההתקדמות שלך ולהתחרות בטבלת המובילים!'
+      upgradePrompt: 'התחבר כדי לשמור את ההתקדמות שלך ולהתחרות בטבלת המובילים!',
+      firstWin: {
+        title: 'מזל טוב על הניצחון הראשון!',
+        subtitle: 'יש לך כישרון! צור חשבון כדי להמשיך את רצף הניצחונות.',
+        benefitsTitle: 'הירשם כדי לקבל:',
+        benefits: {
+          trackProgress: 'מעקב אחר הסטטיסטיקות, הניצחונות וההישגים שלך',
+          leaderboard: 'התחרות בטבלת המובילים העולמית',
+          playWithFriends: 'אתגר חברים ובנה את המוניטין שלך'
+        },
+        statsTeaser: 'שיחקת ${games} משחק(ים) וצברת ${score} נקודות!',
+        maybeLater: 'אולי אחר כך'
+      }
     },
     legal: {
       termsOfService: 'תנאי שימוש',
@@ -1325,6 +1609,51 @@ export const translations = {
       playersInQueue: '${count} שחקנים בתור',
       matchFound: 'נמצא משחק!',
       requiresAuth: 'התחבר כדי לגשת למצב מדורג'
+    },
+    growth: {
+      // Share prompts
+      shareYourResult: 'שתף את התוצאה',
+      shareVictory: '🎉 שתף את הניצחון!',
+      shareResult: 'שתף את המשחק',
+      bragToFriends: 'ספר לחברים שלך שניצחת!',
+      inviteFriendsToPlay: 'הזמן חברים לאתגר אותך',
+      viralPrompt: 'אתגר את החברים שלך לנצח את הניקוד שלך!',
+      share: 'שתף',
+      // Win streak
+      dayStreak: 'ימי רצף',
+      winsAway: 'ניצחונות עד',
+      nextTier: 'הרמה הבאה',
+      newBest: 'שיא חדש!',
+      newPersonalBest: 'שיא אישי חדש!',
+      streakUnlocked: 'רצף נפתח!',
+      streakAtRisk: 'הרצף שלך בסכנה! שחק היום כדי לשמור עליו.',
+      keepStreakAlive: 'שמור על הרצף!',
+      // Streak tiers
+      streakStarting: 'מתחיל',
+      streakHot: 'חם',
+      streakOnFire: 'בוער',
+      streakEpic: 'אפי',
+      streakLegendary: 'אגדי',
+      // Referral
+      referFriend: 'הזמן חבר',
+      referralReward: 'קבל פרסים על הזמנת חברים!',
+      yourReferralLink: 'הקישור שלך להזמנה',
+      referralsCount: 'חברים שהוזמנו',
+      // Daily challenge
+      dailyChallenge: 'אתגר יומי',
+      dailyChallengeDesc: 'אתגר חדש כל יום!',
+      todaysChallenge: 'האתגר של היום',
+      challengeCompleted: 'האתגר הושלם!',
+      nextChallengeIn: 'האתגר הבא בעוד',
+      // Engagement
+      welcomeBack: 'ברוך הבא חזרה!',
+      missedYou: 'התגעגענו! מוכן לעוד סיבוב?',
+      playNow: 'שחק עכשיו',
+      // Milestones
+      firstWin: 'ניצחון ראשון!',
+      tenWins: '10 ניצחונות!',
+      hundredWins: '100 ניצחונות!',
+      milestoneUnlocked: 'אבן דרך נפתחה!'
     }
   },
   sv: {
@@ -1345,6 +1674,30 @@ export const translations = {
       twitterDescription: 'LexiClash - Snabbt multiplayer-ordspel perfekt för fester, teambuilding och familjekul! Hitta ord, tävla i realtid. Gratis onlinespel - ingen nedladdning krävs!',
       locale: 'sv_SE',
       language: 'Swedish',
+      leaderboard: {
+        title: 'Global topplista - Toppspelare | LexiClash',
+        description: 'Visa de högst rankade spelarna på LexiClash globala topplista. Tävla med ordspelsentusiaster över hela världen och följ dina framsteg.',
+        ogTitle: 'Global topplista - Topp ordspelspelare',
+        ogDescription: 'Se var du rankas bland de bästa ordspelsspelarna. Gå med i LexiClash och tävla om toppplatsen!',
+      },
+      profile: {
+        title: 'Din profil och statistik | LexiClash',
+        description: 'Visa din LexiClash-profil, spelstatistik, prestationer och framsteg. Följ dina vinster, totala poäng, hittade ord och speltid i detta tävlingsinriktade ordspel.',
+        ogTitle: 'Spelarprofil och spelstatistik - LexiClash',
+        ogDescription: 'Följ dina ordspelsprestationer, statistik och klättra i topplistans rankningar.',
+      },
+      terms: {
+        title: 'Användarvillkor | LexiClash',
+        description: 'Läs LexiClash användarvillkor. Lär dig om användarrättigheter, acceptabel användning, kontohantering och våra spelregler för denna multiplayer-ordspelsplattform.',
+        ogTitle: 'Användarvillkor - LexiClash',
+        ogDescription: 'LexiClash användarvillkor - Användarrättigheter och policyer för acceptabel användning.',
+      },
+      privacy: {
+        title: 'Integritetspolicy | LexiClash',
+        description: 'LexiClash integritetspolicy - Lär dig hur vi samlar in, använder och skyddar dina data. Vi prioriterar din integritet och använder branschstandardiserade säkerhetsåtgärder.',
+        ogTitle: 'Integritetspolicy - LexiClash',
+        ogDescription: 'Lär dig hur LexiClash skyddar din integritet och hanterar dina data säkert.',
+      },
     },
     common: {
       loading: 'Laddar...',
@@ -1369,6 +1722,8 @@ export const translations = {
     },
     music: {
       volume: 'Volym',
+      musicVolume: 'Musik',
+      sfxVolume: 'Ljud',
       mute: 'Tyst',
       unmute: 'Ljud på',
       clickToEnable: 'Klicka för att aktivera musik',
@@ -1595,6 +1950,7 @@ export const translations = {
       swipeToFormWords: 'Svep på brädet för att bilda ord',
       inviteFriends: 'Bjud in vänner',
       waitingForHostToStart: 'Väntar på att värden ska starta spelet...',
+      notInDictionary: 'Finns inte i ordlistan',
     },
     achievementPopup: {
       unlocked: 'Prestation upplåst!',
@@ -1637,6 +1993,8 @@ export const translations = {
       otherPlayers: 'Andra spelare',
       needsVerification: 'Behöver Verifiering',
       autoVerified: 'Automatiskt Verifierad',
+      showHeatmap: 'Visa värmekarta',
+      hideHeatmap: 'Dölj värmekarta',
     },
     playerTitles: {
       champion: { name: 'Mästare', icon: '👑', description: 'Spelets vinnare' },
@@ -1790,8 +2148,86 @@ export const translations = {
       },
       LETTER_POPPER: {
         name: 'Ballongsprängare',
-        description: 'Sprängde 20+ bokstäver i huvudmenyn'
+        description: 'Sprängde 10+ bokstäver i huvudmenyn'
       }
+    },
+    achievementTiers: {
+      bronze: 'Brons',
+      silver: 'Silver',
+      gold: 'Guld',
+      platinum: 'Platina',
+      earned: 'Uppnått',
+      maxTier: 'Max nivå nådd!',
+    },
+    insights: {
+      yourStats: 'Din Statistik',
+      longestWord: 'Längsta Ordet',
+      wordsPerMinute: 'Ord/Min',
+      avgWordLength: 'Snittlängd',
+      favoriteLength: 'Favoritlängd',
+      speedPattern: 'Hastighetsmönster',
+      letters: 'bokstäver',
+      early: 'Tidigt',
+      mid: 'Mitt',
+      late: 'Sent',
+      fastStart: 'Snabb Start',
+      strongFinish: 'Stark Finish',
+      momentum: 'Bygger Momentum',
+      steady: 'Jämn Takt',
+      accuracy: 'Precision',
+      // Data storytelling - player archetypes
+      story: {
+        precisionSpeed: 'Precision i Fart',
+        precisionSpeedDesc: 'Ordspel på elitnivå. Snabb OCH träffsäker.',
+        bigGameHunter: 'Storviltsjakare',
+        bigGameHunterDesc: 'Att jaga långa ord lönar sig.',
+        speedDemon: 'Hastighetsdemon',
+        speedDemonDesc: 'Dina fingrar brinner!',
+        sharpshooter: 'Prickskytt',
+        sharpshooterDesc: 'Kvalitet över kvantitet. Varje skott räknas.',
+        wordStorm: 'Ordstorm',
+        wordStormDesc: 'Ibland vinner mängden!',
+        clutchFinisher: 'Avgörande Avslutare',
+        clutchFinisherDesc: 'Du sparade det bästa till sist. Tryck skapar diamanter.',
+        firstBlood: 'Första Blod',
+        firstBloodDesc: 'Du kom ut svingandes. Tidig aggression sätter tonen.',
+        slowBurn: 'Långsam Brand',
+        slowBurnDesc: 'Startade sakta, slutade starkt. Sköldpaddan visste.',
+        wordsmith: 'Ordsmed',
+        wordsmithDesc: 'Du nöjer dig inte med korta ord.',
+        solidPerformance: 'Solid Prestation',
+        solidPerformanceDesc: 'Ett respektabelt resultat. Fortsätt så!',
+        gettingStarted: 'Värmer Upp',
+        gettingStartedDesc: 'Varje mästare började någonstans. Nästa runda är din!',
+      },
+    },
+    xp: {
+      title: 'Spelarnivå',
+      level: 'Nivå',
+      maxLevel: 'Max Nivå',
+      xpProgress: 'XP-framsteg',
+      totalXpEarned: 'Total XP intjänad',
+      xpToNextLevel: 'XP till nästa nivå',
+      xpGained: 'XP intjänad',
+      levelUp: 'Nivå upp!',
+      youReached: 'Du nådde',
+      titleUnlocked: 'Titel upplåst',
+      baseXp: 'Bas-XP',
+      scoreBonus: 'Poängbonus',
+      winBonus: 'Vinstbonus',
+      achievementBonus: 'Prestationsbonus',
+      titles: {
+        wordSeeker: 'Ordsökare',
+        letterHunter: 'Bokstavsjägare',
+        vocabularian: 'Ordförrådsexpert',
+        wordsmith: 'Ordsmed',
+        lexiconAdept: 'Lexikonadept',
+        grammarGuardian: 'Grammatikväktare',
+        syntaxSage: 'Syntaxvis',
+        eloquentElite: 'Vältalande Elit',
+        linguisticLegend: 'Lingvistisk Legend',
+        lexiClashChampion: 'LexiClash-mästare',
+      },
     },
     auth: {
       signIn: 'Logga in',
@@ -1803,7 +2239,19 @@ export const translations = {
       claimStats: 'Hämta din statistik',
       statsClaimedSuccess: 'Statistik sparad!',
       termsAgreement: 'Genom att fortsätta godkänner du våra användarvillkor',
-      upgradePrompt: 'Logga in för att spara din framsteg och tävla på topplistan!'
+      upgradePrompt: 'Logga in för att spara din framsteg och tävla på topplistan!',
+      firstWin: {
+        title: 'Grattis till din första vinst!',
+        subtitle: 'Du har talang! Skapa ett konto för att fortsätta din vinstsvit.',
+        benefitsTitle: 'Registrera dig för att låsa upp:',
+        benefits: {
+          trackProgress: 'Följ din statistik, vinster och prestationer',
+          leaderboard: 'Tävla på den globala topplistan',
+          playWithFriends: 'Utmana vänner och bygg ditt rykte'
+        },
+        statsTeaser: 'Du har spelat ${games} spel och fått ${score} poäng!',
+        maybeLater: 'Kanske senare'
+      }
     },
     profile: {
       title: 'Profil',
@@ -2001,6 +2449,30 @@ export const translations = {
       twitterDescription: 'LexiClash - パーティー、チームビルディング、家族での楽しみに最適な、速いペースのマルチプレイヤーワードゲーム！単語を見つけ、リアルタイムで競争しましょう。無料オンラインゲーム - ダウンロード不要！',
       locale: 'ja_JP',
       language: 'Japanese',
+      leaderboard: {
+        title: 'グローバルリーダーボード - トッププレイヤー | LexiClash',
+        description: 'LexiClashグローバルリーダーボードで上位ランクのプレイヤーを見る。世界中のワードゲーム愛好家と競い合い、進捗を追跡しましょう。',
+        ogTitle: 'グローバルリーダーボード - トップワードゲームプレイヤー',
+        ogDescription: '最高のワードゲームプレイヤーの中で自分のランクを確認しよう。LexiClashに参加してトップを目指そう！',
+      },
+      profile: {
+        title: 'あなたのプロフィールと統計 | LexiClash',
+        description: 'LexiClashプロフィール、ゲーム統計、実績、進捗を表示。この競争的なワードゲームで勝利数、合計スコア、見つけた単語、プレイ時間を追跡しましょう。',
+        ogTitle: 'プレイヤープロフィールとゲーム統計 - LexiClash',
+        ogDescription: 'ワードゲームの実績、統計を追跡し、リーダーボードランキングを登りましょう。',
+      },
+      terms: {
+        title: '利用規約 | LexiClash',
+        description: 'LexiClash利用規約を読む。このマルチプレイヤーワードゲームプラットフォームのユーザー権利、利用規定、アカウント管理、ゲームポリシーについて学びましょう。',
+        ogTitle: '利用規約 - LexiClash',
+        ogDescription: 'LexiClash利用規約 - ユーザー権利と利用規定ポリシー。',
+      },
+      privacy: {
+        title: 'プライバシーポリシー | LexiClash',
+        description: 'LexiClashプライバシーポリシー - データの収集、使用、保護方法を学びましょう。私たちはあなたのプライバシーを優先し、業界標準のセキュリティ対策を使用しています。',
+        ogTitle: 'プライバシーポリシー - LexiClash',
+        ogDescription: 'LexiClashがあなたのプライバシーをどのように保護し、データを安全に処理するかを学びましょう。',
+      },
     },
     common: {
       loading: '読み込み中...',
@@ -2025,6 +2497,8 @@ export const translations = {
     },
     music: {
       volume: '音量',
+      musicVolume: '音楽',
+      sfxVolume: '効果音',
       mute: 'ミュート',
       unmute: 'ミュート解除',
       clickToEnable: 'クリックして音楽を有効にする',
@@ -2251,6 +2725,7 @@ export const translations = {
       swipeToFormWords: 'ボードをスワイプして単語を作ります',
       inviteFriends: '友達を招待',
       waitingForHostToStart: 'ホストがゲームを開始するのを待っています...',
+      notInDictionary: '辞書にありません',
     },
     achievementPopup: {
       unlocked: '実績解除！',
@@ -2293,6 +2768,8 @@ export const translations = {
       otherPlayers: '他のプレイヤー',
       needsVerification: '検証が必要',
       autoVerified: '自動検証済み',
+      showHeatmap: 'ヒートマップを表示',
+      hideHeatmap: 'ヒートマップを非表示',
     },
     playerTitles: {
       champion: { name: 'チャンピオン', icon: '👑', description: 'ゲームの勝者' },
@@ -2446,8 +2923,86 @@ export const translations = {
       },
       LETTER_POPPER: {
         name: 'バルーンポッパー',
-        description: 'メインメニューで20以上の文字をポップした'
+        description: 'メインメニューで10以上の文字をポップした'
       }
+    },
+    achievementTiers: {
+      bronze: 'ブロンズ',
+      silver: 'シルバー',
+      gold: 'ゴールド',
+      platinum: 'プラチナ',
+      earned: '獲得',
+      maxTier: '最高ランク達成!',
+    },
+    insights: {
+      yourStats: 'あなたの統計',
+      longestWord: '最長の単語',
+      wordsPerMinute: '単語/分',
+      avgWordLength: '平均長さ',
+      favoriteLength: 'お気に入りの長さ',
+      speedPattern: 'スピードパターン',
+      letters: '文字',
+      early: '序盤',
+      mid: '中盤',
+      late: '終盤',
+      fastStart: '高速スタート',
+      strongFinish: '強力なフィニッシュ',
+      momentum: '勢いを構築',
+      steady: '安定したペース',
+      accuracy: '正確性',
+      // Data storytelling - player archetypes
+      story: {
+        precisionSpeed: 'スピードと精度',
+        precisionSpeedDesc: 'エリートレベルのワードプレイ。速くて正確。',
+        bigGameHunter: 'ビッグワードハンター',
+        bigGameHunterDesc: '長い単語を狙うのは正解。',
+        speedDemon: 'スピードデーモン',
+        speedDemonDesc: '指が燃えている！',
+        sharpshooter: 'シャープシューター',
+        sharpshooterDesc: '質は量に勝る。一発必中。',
+        wordStorm: 'ワードストーム',
+        wordStormDesc: '数で勝負も悪くない！',
+        clutchFinisher: 'クラッチフィニッシャー',
+        clutchFinisherDesc: '最後に本領発揮。プレッシャーがダイヤモンドを作る。',
+        firstBlood: 'ファーストブラッド',
+        firstBloodDesc: '序盤から全力。攻撃的なスタートが流れを決める。',
+        slowBurn: 'スロースタート',
+        slowBurnDesc: 'ゆっくり始まり、強く終わる。亀の勝利。',
+        wordsmith: 'ワードスミス',
+        wordsmithDesc: '短い単語では満足しない。',
+        solidPerformance: '安定したパフォーマンス',
+        solidPerformanceDesc: '立派な結果。この調子で！',
+        gettingStarted: 'ウォームアップ中',
+        gettingStartedDesc: 'チャンピオンも最初は初心者。次のラウンドはあなたの番！',
+      },
+    },
+    xp: {
+      title: 'プレイヤーレベル',
+      level: 'レベル',
+      maxLevel: '最大レベル',
+      xpProgress: 'XP進捗',
+      totalXpEarned: '獲得した合計XP',
+      xpToNextLevel: '次のレベルまでのXP',
+      xpGained: '獲得XP',
+      levelUp: 'レベルアップ!',
+      youReached: '到達しました',
+      titleUnlocked: '称号解除',
+      baseXp: '基本XP',
+      scoreBonus: 'スコアボーナス',
+      winBonus: '勝利ボーナス',
+      achievementBonus: '実績ボーナス',
+      titles: {
+        wordSeeker: 'ワードシーカー',
+        letterHunter: 'レターハンター',
+        vocabularian: 'ボキャブラリアン',
+        wordsmith: 'ワードスミス',
+        lexiconAdept: 'レキシコンアデプト',
+        grammarGuardian: 'グラマーガーディアン',
+        syntaxSage: 'シンタックスセージ',
+        eloquentElite: 'エロクエントエリート',
+        linguisticLegend: 'リングイスティックレジェンド',
+        lexiClashChampion: 'レキシクラッシュチャンピオン',
+      },
     },
     auth: {
       signIn: 'ログイン',
@@ -2459,7 +3014,19 @@ export const translations = {
       claimStats: '統計を取得',
       statsClaimedSuccess: '統計が保存されました!',
       termsAgreement: '続けることで利用規約に同意します',
-      upgradePrompt: 'ログインして進捗を保存し、リーダーボードで競いましょう!'
+      upgradePrompt: 'ログインして進捗を保存し、リーダーボードで競いましょう!',
+      firstWin: {
+        title: '初勝利おめでとうございます!',
+        subtitle: '才能がありますね!アカウントを作成して連勝を続けましょう。',
+        benefitsTitle: '登録して以下をアンロック:',
+        benefits: {
+          trackProgress: '統計、勝利、実績を追跡',
+          leaderboard: 'グローバルリーダーボードで競争',
+          playWithFriends: '友達に挑戦して評判を築く'
+        },
+        statsTeaser: '${games}ゲームをプレイして${score}ポイントを獲得しました!',
+        maybeLater: 'また今度'
+      }
     },
     profile: {
       title: 'プロフィール',

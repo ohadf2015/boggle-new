@@ -1,6 +1,22 @@
+import { Fredoka, Rubik } from 'next/font/google';
 import { translations } from '@/translations';
 import { Providers } from '../providers';
 import Footer from '@/components/Footer';
+
+// Optimize fonts with next/font
+const fredoka = Fredoka({
+  subsets: ['latin', 'hebrew'],
+  weight: ['400', '500', '600', '700'],
+  display: 'swap',
+  variable: '--font-fredoka',
+});
+
+const rubik = Rubik({
+  subsets: ['latin', 'hebrew'],
+  weight: ['400', '500', '600', '700'],
+  display: 'swap',
+  variable: '--font-rubik',
+});
 
 // Force dynamic rendering - prevent static generation
 export const dynamic = 'force-dynamic';
@@ -43,6 +59,14 @@ export async function generateMetadata({ params }) {
     const seo = translations[locale]?.seo || translations.he.seo;
     const localePath = getLocalePath(locale);
 
+    // Use locale-specific OG image
+    const ogImage = locale === 'he'
+        ? 'https://www.lexiclash.live/og-image-he.jpg'
+        : 'https://www.lexiclash.live/og-image-en.jpg';
+    const ogImageAlt = locale === 'he'
+        ? 'לקסי קלאש - משחק מילים מרובה משתתפים'
+        : 'LexiClash - Multiplayer Word Game';
+
     return {
         title: seo.title,
         description: seo.description,
@@ -57,10 +81,10 @@ export async function generateMetadata({ params }) {
             siteName: 'LexiClash',
             images: [
                 {
-                    url: 'https://www.lexiclash.live/lexiclash.jpg',
+                    url: ogImage,
                     width: 1200,
                     height: 630,
-                    alt: 'LexiClash - Multiplayer Word Game',
+                    alt: ogImageAlt,
                 },
             ],
         },
@@ -68,11 +92,17 @@ export async function generateMetadata({ params }) {
             card: 'summary_large_image',
             title: seo.twitterTitle,
             description: seo.twitterDescription,
-            images: ['https://www.lexiclash.live/lexiclash.jpg'],
+            images: [ogImage],
         },
         icons: {
-            icon: '/favicon.ico',
-            apple: '/lexiclash.jpg',
+            icon: [
+                { url: '/favicon.ico', sizes: '48x48 32x32 16x16' },
+                { url: '/icon-192.png', sizes: '192x192', type: 'image/png' },
+                { url: '/icon-512.png', sizes: '512x512', type: 'image/png' },
+            ],
+            apple: [
+                { url: '/apple-touch-icon.png', sizes: '180x180', type: 'image/png' },
+            ],
         },
         alternates: {
             canonical: `https://www.lexiclash.live${localePath}`,
@@ -100,46 +130,95 @@ export default async function LocaleLayout({ children, params }) {
     const localePath = getLocalePath(locale);
     const languageCode = getLanguageCode(locale);
 
-    // Structured data for Google
-    const structuredData = {
-        '@context': 'https://schema.org',
-        '@type': 'WebApplication',
-        name: 'LexiClash',
-        applicationCategory: 'Game',
-        operatingSystem: 'Any',
-        offers: {
-            '@type': 'Offer',
-            price: '0',
-            priceCurrency: 'USD',
+    // Structured data for Google (JSON-LD)
+    const structuredData = [
+        // WebApplication schema
+        {
+            '@context': 'https://schema.org',
+            '@type': 'WebApplication',
+            '@id': 'https://www.lexiclash.live/#webapp',
+            name: 'LexiClash',
+            alternateName: 'LexiClash Multiplayer Word Game',
+            applicationCategory: 'GameApplication',
+            applicationSubCategory: 'Word Game',
+            operatingSystem: 'Any',
+            browserRequirements: 'Requires JavaScript. Requires HTML5.',
+            offers: {
+                '@type': 'Offer',
+                price: '0',
+                priceCurrency: 'USD',
+                availability: 'https://schema.org/InStock',
+            },
+            aggregateRating: {
+                '@type': 'AggregateRating',
+                ratingValue: '4.8',
+                ratingCount: '150',
+                bestRating: '5',
+                worstRating: '1',
+            },
+            description: seo.description,
+            url: `https://www.lexiclash.live${localePath}`,
+            image: 'https://www.lexiclash.live/og-image-en.jpg',
+            screenshot: 'https://www.lexiclash.live/og-image-en.jpg',
+            inLanguage: [languageCode, 'he', 'en', 'sv', 'ja'],
+            featureList: [
+                'Real-time multiplayer gameplay',
+                'Multiple language support (Hebrew, English, Swedish, Japanese)',
+                'Live leaderboard and rankings',
+                'Achievement system',
+                'Room-based multiplayer',
+                'QR code sharing',
+                'Cross-platform compatibility'
+            ],
+            genre: ['Word Game', 'Puzzle', 'Multiplayer', 'Party Game'],
+            playMode: ['MultiPlayer', 'CoOp'],
+            author: {
+                '@type': 'Organization',
+                name: 'LexiClash',
+                url: 'https://www.lexiclash.live',
+            },
         },
-        aggregateRating: {
-            '@type': 'AggregateRating',
-            ratingValue: '4.8',
-            ratingCount: '150',
+        // Organization schema
+        {
+            '@context': 'https://schema.org',
+            '@type': 'Organization',
+            '@id': 'https://www.lexiclash.live/#organization',
+            name: 'LexiClash',
+            url: 'https://www.lexiclash.live',
+            logo: {
+                '@type': 'ImageObject',
+                url: 'https://www.lexiclash.live/og-image-en.jpg',
+            },
+            sameAs: [],
         },
-        description: seo.description,
-        url: `https://www.lexiclash.live${localePath}`,
-        image: 'https://www.lexiclash.live/lexiclash.jpg',
-        inLanguage: languageCode,
-    };
+        // Website schema
+        {
+            '@context': 'https://schema.org',
+            '@type': 'WebSite',
+            '@id': 'https://www.lexiclash.live/#website',
+            url: 'https://www.lexiclash.live',
+            name: 'LexiClash',
+            description: seo.description,
+            publisher: {
+                '@id': 'https://www.lexiclash.live/#organization',
+            },
+            inLanguage: [languageCode, 'he', 'en', 'sv', 'ja'],
+        },
+    ];
 
     return (
-        <html lang={locale} dir={dir}>
+        <html lang={locale} dir={dir} className={`${fredoka.variable} ${rubik.variable}`}>
             <head>
                 <meta charSet="utf-8" />
-                <link rel="icon" href="/favicon.ico" sizes="any" />
-                <link rel="apple-touch-icon" href="/lexiclash.jpg" />
+                <link rel="icon" href="/favicon.ico" sizes="48x48 32x32 16x16" />
+                <link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png" />
+                <link rel="icon" type="image/png" sizes="512x512" href="/icon-512.png" />
+                <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
                 <meta name="viewport" content="width=device-width, initial-scale=1" />
                 <meta name="theme-color" content="#667eea" />
                 <script
                     type="application/ld+json"
                     dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
-                />
-                <link rel="preconnect" href="https://fonts.googleapis.com" />
-                <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-                <link
-                    href="https://fonts.googleapis.com/css2?family=Fredoka:wght@300..700&family=Rubik:ital,wght@0,300..900;1,300..900&display=swap"
-                    rel="stylesheet"
                 />
                 <link rel="manifest" href="/manifest.json" />
                 <meta name="mobile-web-app-capable" content="yes" />
@@ -147,7 +226,7 @@ export default async function LocaleLayout({ children, params }) {
                 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
                 <meta name="apple-mobile-web-app-title" content="LexiClash" />
             </head>
-            <body className="antialiased flex flex-col min-h-screen">
+            <body className="antialiased flex flex-col min-h-screen" suppressHydrationWarning>
                 <Providers lang={locale}>
                     <main className="flex-grow">{children}</main>
                     <Footer />

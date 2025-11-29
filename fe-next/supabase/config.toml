@@ -1,0 +1,40 @@
+# Supabase Configuration
+# https://supabase.com/docs/guides/cli/config
+
+[project]
+id = "hdtmpkicuxvtmvrmtybx"  # Your Supabase project ID
+
+[api]
+enabled = true
+port = 54321
+
+[db]
+port = 54322
+major_version = 15
+
+[db.pooler]
+enabled = true
+port = 54329
+pool_mode = "transaction"
+default_pool_size = 20
+max_client_conn = 100
+
+[realtime]
+enabled = true
+
+[studio]
+enabled = true
+port = 54323
+
+[storage]
+enabled = true
+
+[auth]
+enabled = true
+site_url = "http://localhost:3001"
+
+[auth.external.google]
+enabled = true
+
+[auth.external.discord]
+enabled = true

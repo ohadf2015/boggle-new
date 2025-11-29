@@ -1,0 +1,54 @@
+export default function manifest() {
+  return {
+    short_name: 'LexiClash',
+    name: 'LexiClash - Multiplayer Word Game',
+    description: 'Fast-paced multiplayer word game perfect for parties, team building, and family fun. Find words, compete in real-time!',
+    lang: 'en',
+    dir: 'ltr',
+    icons: [
+      {
+        src: '/favicon.ico',
+        sizes: '48x48 32x32 16x16',
+        type: 'image/x-icon',
+      },
+      {
+        src: '/icon-48.png',
+        type: 'image/png',
+        sizes: '48x48',
+      },
+      {
+        src: '/icon-72.png',
+        type: 'image/png',
+        sizes: '72x72',
+      },
+      {
+        src: '/icon-96.png',
+        type: 'image/png',
+        sizes: '96x96',
+      },
+      {
+        src: '/icon-144.png',
+        type: 'image/png',
+        sizes: '144x144',
+      },
+      {
+        src: '/icon-192.png',
+        type: 'image/png',
+        sizes: '192x192',
+        purpose: 'any maskable',
+      },
+      {
+        src: '/icon-512.png',
+        type: 'image/png',
+        sizes: '512x512',
+        purpose: 'any maskable',
+      },
+    ],
+    start_url: '/',
+    display: 'standalone',
+    orientation: 'any',
+    theme_color: '#667eea',
+    background_color: '#4a4a7a',
+    categories: ['games', 'entertainment'],
+  };
+}
