@@ -172,8 +172,29 @@ export default function GamePage() {
           setShouldAutoJoin(true);
         }
       } else if (hasSession) {
-        setGameCode(savedSession.gameCode);
-        setAttemptingReconnect(true);
+        // Only auto-reconnect if this is a page refresh, not intentional navigation
+        // Check if user arrived via refresh (reload) vs navigation
+        const isPageRefresh = (() => {
+          try {
+            const navEntries = performance.getEntriesByType('navigation');
+            if (navEntries.length > 0) {
+              return navEntries[0].type === 'reload';
+            }
+            // Fallback for older browsers
+            return performance.navigation?.type === 1;
+          } catch {
+            return false;
+          }
+        })();
+
+        if (isPageRefresh) {
+          setGameCode(savedSession.gameCode);
+          setAttemptingReconnect(true);
+        } else {
+          // User intentionally navigated to main page - clear session and let them start fresh
+          logger.log('[Init] User navigated to main page, clearing session');
+          clearSession();
+        }
       }
 
       if (roomFromUrl && savedUsername) {
@@ -781,6 +802,22 @@ export default function GamePage() {
 
     setError('');
     setIsJoining(true); // Show loading state
+
+    // Safety timeout: clear isJoining after 10 seconds if no response
+    const safetyTimeout = setTimeout(() => {
+      setIsJoining(false);
+      logger.warn('[JOIN] Safety timeout triggered - no response received within 10 seconds');
+      toast.error(t('errors.connectionTimeout') || 'Connection timeout. Please try again.', {
+        duration: 4000,
+        icon: '⚠️',
+      });
+    }, 10000);
+
+    // Clear safety timeout when response is received (via joined/error events)
+    const clearSafetyTimeout = () => clearTimeout(safetyTimeout);
+    socket.once('joined', clearSafetyTimeout);
+    socket.once('error', clearSafetyTimeout);
+    socket.once('joinedAsSpectator', clearSafetyTimeout);
 
     // Use overrideGameCode if provided, otherwise use state gameCode
     const codeToUse = overrideGameCode || gameCode;

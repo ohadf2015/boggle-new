@@ -153,15 +153,19 @@ function initializeSocketHandlers(io) {
       if (authUserId) {
         const existingConnection = getAuthUserConnection(authUserId);
         if (existingConnection) {
-          logger.info('SOCKET', `Auth user ${authUserId} already in game ${existingConnection.gameCode}, migrating session`);
+          const isSameSocket = existingConnection.socketId === socket.id;
+          logger.info('SOCKET', `Auth user ${authUserId} already in game ${existingConnection.gameCode}, ${isSameSocket ? 'same socket - cleaning up old game' : 'different socket - migrating session'}`);
 
-          // Disconnect old socket
-          const oldSocket = getSocketById(io, existingConnection.socketId);
-          if (oldSocket && oldSocket.connected) {
-            safeEmit(oldSocket, 'sessionMigrated', {
-              message: 'Your session was moved to another tab'
-            });
-            disconnectSocket(oldSocket, true);
+          // Only disconnect old socket if it's a DIFFERENT socket (multi-tab scenario)
+          // If same socket, the user is just creating a new room from the same tab
+          if (!isSameSocket) {
+            const oldSocket = getSocketById(io, existingConnection.socketId);
+            if (oldSocket && oldSocket.connected) {
+              safeEmit(oldSocket, 'sessionMigrated', {
+                message: 'Your session was moved to another tab'
+              });
+              disconnectSocket(oldSocket, true);
+            }
           }
 
           // Clean up old game
@@ -172,6 +176,7 @@ function initializeSocketHandlers(io) {
                 clearTimeout(oldGame.reconnectionTimeout);
                 oldGame.reconnectionTimeout = null;
               }
+              // Only broadcast to other players if there are any
               broadcastToRoom(io, getGameRoom(existingConnection.gameCode), 'hostLeftRoomClosing', {
                 message: 'Host started a new game. Room is closing.'
               });
@@ -188,6 +193,11 @@ function initializeSocketHandlers(io) {
                 users: getGameUsers(existingConnection.gameCode)
               });
             }
+          }
+
+          // If same socket, make sure to leave the old room
+          if (isSameSocket) {
+            leaveRoom(socket, getGameRoom(existingConnection.gameCode));
           }
         }
       }
@@ -297,67 +307,84 @@ function initializeSocketHandlers(io) {
       if (authUserId) {
         const existingConnection = getAuthUserConnection(authUserId);
 
-        // Same room multi-tab: user opens same room in another tab
-        if (existingConnection && existingConnection.gameCode === gameCode) {
-          logger.info('SOCKET', `Auth user ${authUserId} opening same room ${gameCode} in new tab - taking over session`);
+        if (existingConnection) {
+          const isSameSocket = existingConnection.socketId === socket.id;
 
-          // Mark old socket as migrating to prevent race conditions
-          const oldSocket = getSocketById(io, existingConnection.socketId);
-          if (oldSocket && oldSocket.connected) {
-            // Mark socket as migrating to prevent it from processing any more events
-            oldSocket.data = oldSocket.data || {};
-            oldSocket.data.migrating = true;
+          // Same room: user opens same room in another tab (or same tab rejoining)
+          if (existingConnection.gameCode === gameCode) {
+            if (isSameSocket) {
+              // Same socket rejoining same room - this is normal, just continue
+              logger.info('SOCKET', `Auth user ${authUserId} rejoining same room ${gameCode} from same socket`);
+            } else {
+              // Different tab opening same room - take over session
+              logger.info('SOCKET', `Auth user ${authUserId} opening same room ${gameCode} in new tab - taking over session`);
 
-            safeEmit(oldSocket, 'sessionTakenOver', {
-              message: 'Your session was moved to another tab',
-              gameCode
-            });
-            // Disconnect old socket after small delay to ensure message is sent
-            setTimeout(() => {
-              if (oldSocket.connected) {
+              // Mark old socket as migrating to prevent race conditions
+              const oldSocket = getSocketById(io, existingConnection.socketId);
+              if (oldSocket && oldSocket.connected) {
+                // Mark socket as migrating to prevent it from processing any more events
+                oldSocket.data = oldSocket.data || {};
+                oldSocket.data.migrating = true;
+
+                safeEmit(oldSocket, 'sessionTakenOver', {
+                  message: 'Your session was moved to another tab',
+                  gameCode
+                });
+                // Disconnect old socket after small delay to ensure message is sent
+                setTimeout(() => {
+                  if (oldSocket.connected) {
+                    disconnectSocket(oldSocket, true);
+                  }
+                }, 100);
+              }
+            }
+            // Continue with join flow - user will be reconnected with new socket
+          }
+
+          // Different room: user switches to a different room
+          if (existingConnection.gameCode !== gameCode) {
+            logger.info('SOCKET', `Auth user ${authUserId} migrating from game ${existingConnection.gameCode} to ${gameCode}${isSameSocket ? ' (same socket)' : ' (different socket)'}`);
+
+            // Only disconnect old socket if it's a DIFFERENT socket
+            if (!isSameSocket) {
+              const oldSocket = getSocketById(io, existingConnection.socketId);
+              if (oldSocket && oldSocket.connected) {
+                safeEmit(oldSocket, 'sessionMigrated', {
+                  message: 'Your session was moved to another tab'
+                });
                 disconnectSocket(oldSocket, true);
               }
-            }, 100);
-          }
-          // Continue with join flow - user will be reconnected with new socket
-        }
-
-        // Different room multi-tab: user switches to a different room
-        if (existingConnection && existingConnection.gameCode !== gameCode) {
-          logger.info('SOCKET', `Auth user ${authUserId} migrating from game ${existingConnection.gameCode} to ${gameCode}`);
-
-          // Disconnect old socket
-          const oldSocket = getSocketById(io, existingConnection.socketId);
-          if (oldSocket && oldSocket.connected) {
-            safeEmit(oldSocket, 'sessionMigrated', {
-              message: 'Your session was moved to another tab'
-            });
-            disconnectSocket(oldSocket, true);
-          }
-
-          // Clean up old game
-          if (existingConnection.isHost) {
-            const oldGame = getGame(existingConnection.gameCode);
-            if (oldGame) {
-              if (oldGame.reconnectionTimeout) {
-                clearTimeout(oldGame.reconnectionTimeout);
-                oldGame.reconnectionTimeout = null;
-              }
-              broadcastToRoom(io, getGameRoom(existingConnection.gameCode), 'hostLeftRoomClosing', {
-                message: 'Host joined a different game. Room is closing.'
-              });
-              timerManager.clearGameTimer(existingConnection.gameCode);
-              deleteGame(existingConnection.gameCode);
-              io.emit('activeRooms', { rooms: getActiveRooms() });
             }
-          } else {
-            // User was a player, just remove them from old game
-            removeUserFromGame(existingConnection.gameCode, existingConnection.username);
-            const oldGame = getGame(existingConnection.gameCode);
-            if (oldGame) {
-              broadcastToRoom(io, getGameRoom(existingConnection.gameCode), 'updateUsers', {
-                users: getGameUsers(existingConnection.gameCode)
-              });
+
+            // Clean up old game
+            if (existingConnection.isHost) {
+              const oldGame = getGame(existingConnection.gameCode);
+              if (oldGame) {
+                if (oldGame.reconnectionTimeout) {
+                  clearTimeout(oldGame.reconnectionTimeout);
+                  oldGame.reconnectionTimeout = null;
+                }
+                broadcastToRoom(io, getGameRoom(existingConnection.gameCode), 'hostLeftRoomClosing', {
+                  message: 'Host joined a different game. Room is closing.'
+                });
+                timerManager.clearGameTimer(existingConnection.gameCode);
+                deleteGame(existingConnection.gameCode);
+                io.emit('activeRooms', { rooms: getActiveRooms() });
+              }
+            } else {
+              // User was a player, just remove them from old game
+              removeUserFromGame(existingConnection.gameCode, existingConnection.username);
+              const oldGame = getGame(existingConnection.gameCode);
+              if (oldGame) {
+                broadcastToRoom(io, getGameRoom(existingConnection.gameCode), 'updateUsers', {
+                  users: getGameUsers(existingConnection.gameCode)
+                });
+              }
+            }
+
+            // If same socket, make sure to leave the old room
+            if (isSameSocket) {
+              leaveRoom(socket, getGameRoom(existingConnection.gameCode));
             }
           }
         }

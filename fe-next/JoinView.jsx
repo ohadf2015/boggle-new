@@ -858,7 +858,7 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
                   <CardTitle>{t('joinView.roomsList')}</CardTitle>
                   {/* Social proof: Show total players online */}
                   {activeRooms.length > 0 && (
-                    <Badge className="bg-neo-lime text-neo-black border-2 border-neo-black animate-pulse">
+                    <Badge className="bg-neo-lime text-neo-black border-2 border-neo-black">
                       {activeRooms.reduce((sum, room) => sum + (room.playerCount || 0), 0)} {t('joinView.playersOnline')}
                     </Badge>
                   )}
