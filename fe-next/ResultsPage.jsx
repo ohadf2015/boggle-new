@@ -521,8 +521,8 @@ const ResultsPage = ({ finalScores, letterGrid, gameCode, onReturnToRoom, userna
 
         {/* Growth Features Section - Appears smoothly on scroll */}
         <div className="w-full max-w-2xl mx-auto px-2 sm:px-4 mt-6 space-y-3">
-          {/* Win Streak Display - Compact for low streaks, full for milestones */}
-          {isCurrentUserWinner && currentStreak > 0 && (
+          {/* Win Streak Display - Only show when NOT showing victory card (ShareWinPrompt already has streak badge) */}
+          {isCurrentUserWinner && currentStreak > 0 && !(currentPlayerData && gameCode) && (
             <motion.div
               initial={{ opacity: 0, y: 10 }}
               whileInView={{ opacity: 1, y: 0 }}

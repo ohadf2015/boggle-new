@@ -49,6 +49,7 @@ export function SoundEffectsProvider({ children }: SoundEffectsProviderProps) {
   const { isMuted, audioUnlocked } = useMusic();
   const soundsRef = useRef<Record<string, Howl>>({});
   const soundsLoadedRef = useRef(false);
+  const isTabVisibleRef = useRef(true);
 
   // Separate volume state for sound effects
   const [sfxVolume, setSfxVolumeState] = useState<number>(() => {
@@ -103,6 +104,19 @@ export function SoundEffectsProvider({ children }: SoundEffectsProviderProps) {
     setSfxMuted(prev => !prev);
   }, []);
 
+  // Track tab visibility to block sounds when tab is hidden
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    const handleVisibilityChange = () => {
+      isTabVisibleRef.current = document.visibilityState === 'visible';
+      logger.log('[SFX] Tab visibility changed:', isTabVisibleRef.current ? 'visible' : 'hidden');
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
+  }, []);
+
   // Initialize sound effects
   useEffect(() => {
     if (typeof window === 'undefined') return;
@@ -139,7 +153,7 @@ export function SoundEffectsProvider({ children }: SoundEffectsProviderProps) {
 
   // Play a sound effect
   const playSound = useCallback((soundKey: keyof typeof SOUND_EFFECTS, options: SoundEffectOptions = {}) => {
-    if (!audioUnlocked || isMuted || sfxMuted) return;
+    if (!audioUnlocked || isMuted || sfxMuted || !isTabVisibleRef.current) return;
 
     const howl = soundsRef.current[soundKey];
     if (!howl) {
@@ -164,7 +178,7 @@ export function SoundEffectsProvider({ children }: SoundEffectsProviderProps) {
   // Play combo sound with dynamic pitch based on combo level
   // Pitch increases with each combo level (infinite scaling)
   const playComboSound = useCallback((comboLevel: number) => {
-    if (!audioUnlocked || isMuted || sfxMuted || comboLevel < 1) return;
+    if (!audioUnlocked || isMuted || sfxMuted || !isTabVisibleRef.current || comboLevel < 1) return;
 
     // Calculate pitch rate: starts at 1.0, increases by ~0.1 per combo level
     // Uses logarithmic scaling for smooth progression that doesn't get too extreme
@@ -192,7 +206,7 @@ export function SoundEffectsProvider({ children }: SoundEffectsProviderProps) {
   // Play countdown beep with increasing pitch (3, 2, 1 seconds remaining)
   // secondsRemaining: 3 = lowest pitch, 1 = highest pitch
   const playCountdownBeep = useCallback((secondsRemaining: number) => {
-    if (!audioUnlocked || isMuted || sfxMuted) return;
+    if (!audioUnlocked || isMuted || sfxMuted || !isTabVisibleRef.current) return;
 
     // Pitch increases as we get closer to 0: 3->1.0, 2->1.2, 1->1.4
     const pitchMap: Record<number, number> = { 3: 1.0, 2: 1.2, 1: 1.4 };

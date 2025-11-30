@@ -46,6 +46,7 @@ export const translations = {
       loading: 'Loading...',
       error: 'Error',
       back: 'Back',
+      next: 'Next',
       confirm: 'Confirm',
       cancel: 'Cancel',
       selectUILanguage: 'Interface Language',
@@ -395,7 +396,7 @@ export const translations = {
       earnPointsTitle: 'Earn Points and Achievements',
       earnPointsDesc: 'The longer the word, the more points you get! Plus, unlock special achievements for impressive feats.',
       earnPointsNote: 'Special achievements can give you a nice points boost!',
-      scoringSystemTitle: 'Scoring System 🎯',
+      scoringSystemTitle: 'Scoring System',
       scoringTable: {
         letters2: '2 letters: 1 point',
         letters3: '3 letters: 2 points',
@@ -406,7 +407,7 @@ export const translations = {
         letters8plus: '8+ letters: 7+ points',
         formula: 'Simple formula: (word length - 1) points',
       },
-      achievementsTitle: 'Special Achievements 🏆',
+      achievementsTitle: 'Special Achievements',
       achievements: {
         speedDemon: '⚡ Speed Demon - First player to find 5 words',
         wordWizard: '🎩 Word Wizard - Find 20+ words',
@@ -414,17 +415,82 @@ export const translations = {
         longWordMaster: '📏 Long Word Master - Find a word with 7+ letters',
         perfectionist: '💎 Perfectionist - 100% of your words are valid',
         earlyBird: '🐦 Early Bird - Find 3 words in the first minute',
+        examples: 'Example Achievements',
       },
-      tipsTitle: 'Tips for Winning 💡',
+      tipsTitle: 'Tips for Winning',
       tips: {
         tip1: 'Start with short words and expand them (e.g., "cat" → "cats")',
         tip2: 'Look for common letter combinations (e.g., "th", "ch", "ing")',
         tip3: 'Scan systematically - don\'t jump around randomly',
-        tip4: 'Speed matters! Find words quickly to unlock achievements',
+        tip4: 'Speed matters! Find words quickly to build combos',
         tip5: 'Remember - only valid words in the selected language count',
       },
-      readyToPlay: 'Ready? Let\'s start playing! 🎮',
+      readyToPlay: 'Ready? Let\'s start playing!',
       funForFamily: 'An engaging and fun game for the whole family - completely free!',
+      letters: 'letters',
+      pts: 'pts',
+      // Step-based tutorial sections
+      steps: {
+        basics: {
+          title: 'Game Basics',
+          description: 'LexiClash is a fast-paced multiplayer word game. Race against friends to find words on a grid of letters!',
+        },
+        grid: {
+          title: 'Finding Words',
+          description: 'Swipe or click adjacent letters to form words. Letters connect in all 8 directions - horizontal, vertical, and diagonal!',
+        },
+        scoring: {
+          title: 'Scoring System',
+          description: 'Longer words earn more points! Each letter beyond the first adds one point to your score.',
+        },
+        combo: {
+          title: 'Combo System',
+          description: 'Submit words quickly to build combo multipliers! The faster you find words, the bigger your bonus.',
+        },
+        xp: {
+          title: 'XP & Levels',
+          description: 'Earn XP from every game to level up and unlock new titles. Win bonuses and achievements boost your XP!',
+        },
+        achievements: {
+          title: 'Achievements',
+          description: 'Unlock achievements for special feats! Each achievement can be earned multiple times to upgrade its tier.',
+        },
+      },
+      // Interactive demo translations
+      demo: {
+        watchAnimation: 'Watch how words are formed on the grid',
+        autoPlay: 'Auto',
+        replay: 'Replay',
+        tryIt: 'Try dragging letters yourself!',
+        gridExample: 'Example of tracing a word on the grid',
+        traceExample: 'Trace letters to form words - T→O→N→D',
+      },
+      // Combo system translations
+      combo: {
+        currentCombo: 'Current Combo',
+        multiplier: 'multiplier',
+        noBonus: 'No bonus',
+        tryIt: 'Simulate Combo',
+        building: 'Building combo...',
+        tip: 'Submit words within 5 seconds of each other to maintain your combo!',
+      },
+      // XP system translations
+      xp: {
+        howToEarn: 'How to Earn XP',
+        base: 'Complete a game',
+        score: 'Score points',
+        win: 'Win the game',
+        achievement: 'Unlock achievements',
+        unlockTitles: 'Unlock Titles as You Level Up',
+      },
+      // New player welcome
+      newPlayer: {
+        welcomeTitle: 'Welcome to LexiClash!',
+        welcomeMessage: 'Looks like this is your first time here. Would you like a quick tour of how to play?',
+        showTutorial: 'Show Me How',
+        skipTutorial: 'I\'ll Figure It Out',
+        dontShowAgain: 'Don\'t show this again',
+      },
     },
     achievements: {
       FIRST_BLOOD: {
@@ -989,6 +1055,7 @@ export const translations = {
       loading: 'טוען...',
       error: 'שגיאה',
       back: 'חזור',
+      next: 'הבא',
       confirm: 'אישור',
       cancel: 'ביטול',
       selectUILanguage: 'שפת ממשק',
@@ -1338,7 +1405,7 @@ export const translations = {
       earnPointsTitle: 'צברו נקודות והשיגו הישגים',
       earnPointsDesc: 'ככל שהמילה ארוכה יותר, כך תקבלו יותר נקודות! בנוסף, פתחו הישגים מיוחדים על הישגים מרשימים.',
       earnPointsNote: 'הישגים מיוחדים יכולים לתת לכם בונוס נקודות נחמד!',
-      scoringSystemTitle: 'מערכת ניקוד 🎯',
+      scoringSystemTitle: 'מערכת ניקוד',
       scoringTable: {
         letters2: '2 אותיות: 1 נקודה',
         letters3: '3 אותיות: 2 נקודות',
@@ -1349,7 +1416,7 @@ export const translations = {
         letters8plus: '8+ אותיות: 7+ נקודות',
         formula: 'נוסחה פשוטה: (אורך המילה - 1) נקודות',
       },
-      achievementsTitle: 'הישגים מיוחדים 🏆',
+      achievementsTitle: 'הישגים מיוחדים',
       achievements: {
         speedDemon: '⚡ שד המהירות - שחקן ראשון שמצא 5 מילים',
         wordWizard: '🎩 קוסם המילים - מצא 20+ מילים',
@@ -1357,17 +1424,77 @@ export const translations = {
         longWordMaster: '📏 אמן המילים הארוכות - מצא מילה באורך 7+ אותיות',
         perfectionist: '💎 פרפקציוניסט - 100% מהמילים שלך תקינות',
         earlyBird: '🐦 ציפור מוקדמת - מצא 3 מילים בדקה הראשונה',
+        examples: 'דוגמאות להישגים',
       },
-      tipsTitle: 'טיפים למשחק מנצח 💡',
+      tipsTitle: 'טיפים למשחק מנצח',
       tips: {
         tip1: 'התחילו במילים קצרות והרחיבו אותן (לדוגמה: "חתול" ← "חתולים")',
         tip2: 'חפשו צירופי אותיות נפוצים',
         tip3: 'סרקו באופן שיטתי - אל תקפצו בצורה אקראית',
-        tip4: 'מהירות חשובה! מצאו מילים במהירות כדי לפתוח הישגים',
+        tip4: 'מהירות חשובה! מצאו מילים במהירות כדי לבנות קומבו',
         tip5: 'זכרו - רק מילים תקינות בשפה הנבחרת נספרות',
       },
-      readyToPlay: 'מוכנים? בואו נתחיל לשחק! 🎮',
+      readyToPlay: 'מוכנים? בואו נתחיל לשחק!',
       funForFamily: 'משחק חוויתי ומהנה לכל המשפחה - חינמי לחלוטין!',
+      letters: 'אותיות',
+      pts: 'נק׳',
+      steps: {
+        basics: {
+          title: 'יסודות המשחק',
+          description: 'לקסיקלאש הוא משחק מילים מרובה משתתפים מהיר. התחרו מול חברים במציאת מילים על לוח אותיות!',
+        },
+        grid: {
+          title: 'איך מוצאים מילים',
+          description: 'החליקו או לחצו על אותיות סמוכות ליצירת מילים. אותיות מתחברות בכל 8 הכיוונים - אופקית, אנכית ובאלכסון!',
+        },
+        scoring: {
+          title: 'מערכת ניקוד',
+          description: 'מילים ארוכות יותר מרוויחות יותר נקודות! כל אות מעבר לראשונה מוסיפה נקודה לתוצאה.',
+        },
+        combo: {
+          title: 'מערכת קומבו',
+          description: 'שלחו מילים במהירות כדי לבנות מכפילי קומבו! ככל שתמצאו מילים מהר יותר, כך הבונוס יגדל.',
+        },
+        xp: {
+          title: 'XP ורמות',
+          description: 'צברו XP מכל משחק כדי לעלות רמה ולפתוח תארים חדשים. בונוסים על ניצחון והישגים מעלים את ה-XP שלכם!',
+        },
+        achievements: {
+          title: 'הישגים',
+          description: 'פתחו הישגים על מעשים מיוחדים! כל הישג ניתן להשגה מספר פעמים כדי לשדרג את הדרגה שלו.',
+        },
+      },
+      demo: {
+        watchAnimation: 'צפו כיצד מילים נוצרות על הלוח',
+        autoPlay: 'אוטו',
+        replay: 'שחזר',
+        tryIt: 'נסו לגרור אותיות בעצמכם!',
+        gridExample: 'דוגמה לציור מילה על הלוח',
+        traceExample: 'עקבו אחר אותיות כדי ליצור מילים - T→O→N→D',
+      },
+      combo: {
+        currentCombo: 'קומבו נוכחי',
+        multiplier: 'מכפיל',
+        noBonus: 'ללא בונוס',
+        tryIt: 'סמלץ קומבו',
+        building: 'בונה קומבו...',
+        tip: 'שלחו מילים תוך 5 שניות אחת מהשנייה כדי לשמור על הקומבו!',
+      },
+      xp: {
+        howToEarn: 'איך צוברים XP',
+        base: 'סיום משחק',
+        score: 'צבירת נקודות',
+        win: 'ניצחון במשחק',
+        achievement: 'פתיחת הישגים',
+        unlockTitles: 'פתחו תארים ככל שתעלו רמה',
+      },
+      newPlayer: {
+        welcomeTitle: 'ברוכים הבאים ללקסיקלאש!',
+        welcomeMessage: 'נראה שזו הפעם הראשונה שלכם כאן. רוצים סיור מהיר איך לשחק?',
+        showTutorial: 'הראה לי איך',
+        skipTutorial: 'אני אסתדר',
+        dontShowAgain: 'אל תראה שוב',
+      },
     },
     achievements: {
       FIRST_BLOOD: {

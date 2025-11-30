@@ -114,13 +114,13 @@ export function MusicProvider({ children }: MusicProviderProps) {
         if (typeof window === 'undefined') return;
 
         Object.entries(TRACKS).forEach(([key, src]) => {
-            // almostOutOfTime should loop normally from the beginning
-            // Other tracks use manual looping with crossfade from 10s mark
+            // All tracks use manual looping with crossfade for smooth transitions
+            // Warning track (almostOutOfTime) loops from beginning, others from 10s mark
             const isWarningTrack = key === 'almostOutOfTime';
 
             howlsRef.current[key as TrackKey] = new Howl({
                 src: [src],
-                loop: isWarningTrack, // Warning track loops normally, others use manual crossfade
+                loop: false, // All tracks use manual crossfade looping for smooth transitions
                 volume: 0,
                 preload: true,
                 // Using Web Audio API (html5: false) for better autoplay support
@@ -139,21 +139,20 @@ export function MusicProvider({ children }: MusicProviderProps) {
                     }
                 },
                 onend: () => {
-                    // Warning track uses native looping, skip manual crossfade
-                    if (isWarningTrack) return;
-
-                    // When track ends, crossfade to itself starting from 10 seconds
+                    // When track ends, crossfade to itself for smooth looping
                     if (currentTrackRef.current === key && howlsRef.current[key as TrackKey]) {
-                        logger.log('[Music] Track ended, restarting from 10s with crossfade:', key);
+                        // Warning track restarts from beginning, others from 10s mark
+                        const seekPosition = isWarningTrack ? 0 : 10;
+                        logger.log(`[Music] Track ended, restarting from ${seekPosition}s with crossfade:`, key);
                         const howl = howlsRef.current[key as TrackKey];
                         const targetVolume = isMutedRef.current ? 0 : volumeRef.current;
 
                         // Crossfade: start fading out current instance
                         howl.fade(howl.volume(), 0, 2000);
 
-                        // Start new instance from 10 seconds and fade in (overlapping with fade out)
+                        // Start new instance from seek position and fade in (overlapping with fade out)
                         setTimeout(() => {
-                            howl.seek(10);
+                            howl.seek(seekPosition);
                             howl.volume(0);
                             howl.play();
                             howl.fade(0, targetVolume, 2000);
@@ -179,14 +178,37 @@ export function MusicProvider({ children }: MusicProviderProps) {
         };
     }, []);
 
-    // Handle iOS Safari tab switching - re-resume AudioContext when returning to tab
+    // Track if we paused music due to tab visibility (to know whether to resume)
+    const pausedByVisibilityRef = useRef(false);
+    const volumeBeforePauseRef = useRef<number>(0);
+
+    // Handle tab visibility - pause music when hidden, resume when visible
     useEffect(() => {
         if (typeof window === 'undefined') return;
 
         const handleVisibilityChange = () => {
-            if (document.visibilityState === 'visible' && audioUnlockedRef.current) {
-                if (Howler.ctx && Howler.ctx.state === 'suspended') {
-                    Howler.ctx.resume();
+            if (document.visibilityState === 'hidden') {
+                // Tab is hidden - pause/mute the music
+                if (currentHowlRef.current && currentHowlRef.current.playing()) {
+                    volumeBeforePauseRef.current = currentHowlRef.current.volume();
+                    currentHowlRef.current.volume(0);
+                    pausedByVisibilityRef.current = true;
+                    logger.log('[Music] Tab hidden - muting music');
+                }
+            } else if (document.visibilityState === 'visible') {
+                // Tab is visible again - resume AudioContext and restore volume
+                if (audioUnlockedRef.current) {
+                    if (Howler.ctx && Howler.ctx.state === 'suspended') {
+                        Howler.ctx.resume();
+                    }
+                }
+
+                // Restore volume if we paused due to visibility
+                if (pausedByVisibilityRef.current && currentHowlRef.current) {
+                    const targetVolume = isMutedRef.current ? 0 : volumeRef.current;
+                    currentHowlRef.current.volume(targetVolume);
+                    pausedByVisibilityRef.current = false;
+                    logger.log('[Music] Tab visible - restoring music volume');
                 }
             }
         };

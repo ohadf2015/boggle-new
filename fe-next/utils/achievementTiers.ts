@@ -6,9 +6,9 @@
 // Tier thresholds - number of times achievement must be earned to reach tier
 export const TIER_THRESHOLDS = {
   BRONZE: 1,
-  SILVER: 10,
-  GOLD: 50,
-  PLATINUM: 200,
+  SILVER: 15,
+  GOLD: 75,
+  PLATINUM: 300,
 } as const;
 
 export type TierName = keyof typeof TIER_THRESHOLDS;

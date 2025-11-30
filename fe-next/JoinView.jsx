@@ -23,14 +23,19 @@ import { generateRoomCode as generateCode } from './utils/utils';
 
 // Dynamic imports for heavy animation components (reduces initial bundle by ~50KB)
 const HowToPlay = dynamic(() => import('./components/HowToPlay'), { ssr: false });
+const NewPlayerWelcome = dynamic(() => import('./components/NewPlayerWelcome'), { ssr: false });
 const MenuAnimation = dynamic(() => import('./components/MenuAnimation'), { ssr: false });
 const Particles = dynamic(() => import('./components/Particles'), { ssr: false });
+
+// Import helper for first-time player detection
+import { isFirstTimePlayer, markTutorialSeen } from './components/NewPlayerWelcome';
 
 const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, error, activeRooms, refreshRooms, prefilledRoom, roomName, setRoomName, isAutoJoining, roomsLoading, isAuthenticated, displayName, isProfileLoading, isJoining = false }) => {
   const { t, language, dir } = useLanguage();
   const [mode, setMode] = useState('join'); // 'join' or 'host'
   const [showQR, setShowQR] = useState(false);
   const [showHowToPlay, setShowHowToPlay] = useState(false);
+  const [showNewPlayerWelcome, setShowNewPlayerWelcome] = useState(false);
   const [usernameError, setUsernameError] = useState(false);
   const [roomNameError, setRoomNameError] = useState(false);
   const [gameCodeError, setGameCodeError] = useState(false);
@@ -44,6 +49,7 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
   const prevPrefilledRoomRef = useRef(prefilledRoom);
   const { notifyError } = useValidation(t);
   const hasAutoSwitchedToHostRef = useRef(false);
+  const hasCheckedFirstTimePlayerRef = useRef(false);
 
   // Define handleModeChange before effects that use it
   const handleModeChange = useCallback((newMode) => {
@@ -78,6 +84,21 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
     }
   }, [roomsLoading, activeRooms.length, mode, handleModeChange]);
 
+  // Check if this is a first-time player and show welcome modal
+  useEffect(() => {
+    if (hasCheckedFirstTimePlayerRef.current) return;
+    hasCheckedFirstTimePlayerRef.current = true;
+
+    // Small delay to let the page load before showing the modal
+    const timer = setTimeout(() => {
+      if (isFirstTimePlayer()) {
+        setShowNewPlayerWelcome(true);
+      }
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, []);
+
   const generateRoomCode = useCallback(() => {
     setGameCode(generateCode());
   }, [setGameCode]);
@@ -111,6 +132,17 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
 
   const handleCloseHowToPlay = useCallback(() => {
     setShowHowToPlay(false);
+  }, []);
+
+  // New player welcome handlers
+  const handleCloseNewPlayerWelcome = useCallback(() => {
+    setShowNewPlayerWelcome(false);
+  }, []);
+
+  const handleNewPlayerShowTutorial = useCallback(() => {
+    setShowNewPlayerWelcome(false);
+    markTutorialSeen();
+    setShowHowToPlay(true);
   }, []);
 
   const handleCloseQR = useCallback(() => {
@@ -1004,21 +1036,20 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
         </TooltipProvider>
       </motion.div>
 
+      {/* New Player Welcome Modal */}
+      <NewPlayerWelcome
+        isOpen={showNewPlayerWelcome}
+        onClose={handleCloseNewPlayerWelcome}
+        onShowTutorial={handleNewPlayerShowTutorial}
+      />
+
       {/* How to Play Dialog */}
       <Dialog open={showHowToPlay} onOpenChange={setShowHowToPlay}>
-        <DialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto bg-white dark:bg-slate-800 border-cyan-500/30">
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="sr-only">{t('joinView.howToPlayTitle')}</DialogTitle>
           </DialogHeader>
-          <HowToPlay />
-          <DialogFooter className="sm:justify-center">
-            <Button
-              onClick={handleCloseHowToPlay}
-              className="bg-gradient-to-r from-cyan-500 to-purple-600 hover:from-cyan-400 hover:to-purple-500 hover:shadow-[0_0_15px_rgba(6,182,212,0.5)] text-lg px-8"
-            >
-              {t('common.understood')}
-            </Button>
-          </DialogFooter>
+          <HowToPlay onClose={handleCloseHowToPlay} />
         </DialogContent>
       </Dialog>
 
