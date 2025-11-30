@@ -826,6 +826,21 @@ export const translations = {
       tenWins: '10 Wins!',
       hundredWins: '100 Wins!',
       milestoneUnlocked: 'Milestone Unlocked!'
+    },
+    wordFeedback: {
+      title: 'Word Jury Duty',
+      question: 'Is this a real word?',
+      submittedBy: 'Submitted by',
+      thumbsUp: 'Legit!',
+      thumbsDown: 'Nope',
+      skipHint: 'Press ESC to skip',
+      thankYou: 'Thanks for voting!',
+      witty1: '{player} claims "{word}" is totally a word...',
+      witty2: 'Real word or creative genius? You decide!',
+      witty3: '{player} found "{word}" in their brain dictionary',
+      witty4: 'Webster called, they want to know about "{word}"',
+      witty5: 'Sounds legit... or does it?',
+      nowValid: 'is now a valid word!',
     }
   },
   he: {
@@ -1654,6 +1669,21 @@ export const translations = {
       tenWins: '10 ניצחונות!',
       hundredWins: '100 ניצחונות!',
       milestoneUnlocked: 'אבן דרך נפתחה!'
+    },
+    wordFeedback: {
+      title: 'בית דין למילים',
+      question: 'האם זו מילה אמיתית?',
+      submittedBy: 'נשלח על ידי',
+      thumbsUp: 'לגיטימי!',
+      thumbsDown: 'לא',
+      skipHint: 'לחץ ESC לדילוג',
+      thankYou: 'תודה על ההצבעה!',
+      witty1: '{player} טוען ש"{word}" היא מילה לגמרי...',
+      witty2: 'מילה אמיתית או יצירתיות? אתה מחליט!',
+      witty3: '{player} מצא את "{word}" במילון שלו',
+      witty4: 'האקדמיה ללשון התקשרה, רוצים לדעת על "{word}"',
+      witty5: 'נשמע לגיטימי... או לא?',
+      nowValid: 'היא עכשיו מילה חוקית!',
     }
   },
   sv: {
@@ -2429,6 +2459,21 @@ export const translations = {
           content: 'Denna integritetspolicy styrs av lagarna i staten Israel. Alla tvister ska lösas i domstolar i Israel.'
         }
       }
+    },
+    wordFeedback: {
+      title: 'Ordjury',
+      question: 'Är detta ett riktigt ord?',
+      submittedBy: 'Skickad av',
+      thumbsUp: 'Giltig!',
+      thumbsDown: 'Nej',
+      skipHint: 'Tryck ESC för att hoppa över',
+      thankYou: 'Tack för din röst!',
+      witty1: '{player} påstår att "{word}" är ett riktigt ord...',
+      witty2: 'Riktigt ord eller kreativt geni? Du bestämmer!',
+      witty3: '{player} hittade "{word}" i sin hjärnordbok',
+      witty4: 'Svenska Akademien ringde, de vill veta om "{word}"',
+      witty5: 'Låter legit... eller?',
+      nowValid: 'är nu ett giltigt ord!',
     }
   },
   ja: {
@@ -3204,6 +3249,21 @@ export const translations = {
           content: 'このプライバシーポリシーは、イスラエル国の法律に準拠します。すべての紛争は、イスラエルの裁判所で解決されるものとします。'
         }
       }
+    },
+    wordFeedback: {
+      title: '言葉の審査',
+      question: 'これは本当の言葉ですか？',
+      submittedBy: '提出者',
+      thumbsUp: '正解！',
+      thumbsDown: '不正解',
+      skipHint: 'ESCでスキップ',
+      thankYou: '投票ありがとう！',
+      witty1: '{player}は「{word}」が本当の言葉だと主張しています...',
+      witty2: '本当の言葉？それとも創造性？あなたが決めて！',
+      witty3: '{player}は「{word}」を脳の辞書で見つけました',
+      witty4: '辞書編集者が電話してきました、「{word}」について知りたいそうです',
+      witty5: '正しそうに聞こえる...本当に？',
+      nowValid: 'は有効な単語になりました！',
     }
   }
 };

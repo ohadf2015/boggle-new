@@ -34,9 +34,6 @@ interface UseHostSocketEventsProps {
   setPlayerWordCounts: React.Dispatch<React.SetStateAction<Record<string, number>>>;
   setPlayerScores: React.Dispatch<React.SetStateAction<Record<string, number>>>;
   setPlayerAchievements: React.Dispatch<React.SetStateAction<Record<string, any[]>>>;
-  setPlayerWords: React.Dispatch<React.SetStateAction<any[]>>;
-  setShowValidation: React.Dispatch<React.SetStateAction<boolean>>;
-  setValidations: React.Dispatch<React.SetStateAction<Record<string, boolean>>>;
   setFinalScores: React.Dispatch<React.SetStateAction<any>>;
   setRemainingTime: React.Dispatch<React.SetStateAction<number | null>>;
   setGameStarted: React.Dispatch<React.SetStateAction<boolean>>;
@@ -82,9 +79,6 @@ const useHostSocketEvents = ({
   setPlayerWordCounts,
   setPlayerScores,
   setPlayerAchievements,
-  setPlayerWords,
-  setShowValidation,
-  setValidations,
   setFinalScores,
   setRemainingTime,
   setGameStarted,
@@ -262,72 +256,17 @@ const useHostSocketEvents = ({
       }
     };
 
-    const handleShowValidation = (data: any) => {
-      if (data.skipValidation) {
-        const validationArray: any[] = [];
-        data.playerWords.forEach((player: any) => {
-          player.words.forEach((wordObj: any) => {
-            if (!validationArray.some(v => v.word === wordObj.word)) {
-              validationArray.push({
-                word: wordObj.word,
-                isValid: wordObj.autoValidated,
-              });
-            }
-          });
-        });
-
-        socket.emit('validateWords', { validations: validationArray });
-
-        neoSuccessToast(t('hostView.allWordsAutoValidated') || 'All words auto-validated!', {
-          icon: '✅',
-          duration: 3000,
-        });
-        return;
-      }
-
-      setPlayerWords(data.playerWords);
-      setShowValidation(true);
-      const initialValidations: Record<string, boolean> = {};
-      const uniqueWords = new Set<string>();
-      data.playerWords.forEach((player: any) => {
-        player.words.forEach((wordObj: any) => {
-          uniqueWords.add(wordObj.word);
-          if (wordObj.autoValidated) {
-            initialValidations[wordObj.word] = true;
-          }
-        });
-      });
-      uniqueWords.forEach(word => {
-        if (initialValidations[word] === undefined) {
-          initialValidations[word] = false;
-        }
-      });
-      setValidations(initialValidations);
-
-      if (data.autoValidatedCount > 0) {
-        neoSuccessToast(`${data.autoValidatedCount} ${t('hostView.autoValidatedCount')}`, {
-          duration: 5000,
-          icon: '✅',
-        });
-      }
-
-      neoInfoToast(t('hostView.validateWords'), {
-        icon: '✅',
-        duration: 5000,
-      });
-    };
-
-    const handleValidationComplete = (data: any) => {
-      logger.log('[HOST] Received validationComplete event:', data);
-      setShowValidation(false);
-      neoSuccessToast(t('hostView.validationComplete'), {
-        icon: '🎉',
-        duration: 3000,
-      });
+    // Handle final scores (after word feedback voting timeout)
+    const handleFinalScores = (data: any) => {
+      logger.log('[HOST] Received finalScores event:', data);
       confetti({
         particleCount: 150,
         spread: 80,
         origin: { y: 0.6 },
+      });
+      neoSuccessToast(t('hostView.gameComplete') || 'Game complete!', {
+        icon: '🎉',
+        duration: 3000,
       });
       if (onShowResults) {
         onShowResults({
@@ -337,13 +276,6 @@ const useHostSocketEvents = ({
       } else {
         setFinalScores(data.scores);
       }
-    };
-
-    const handleAutoValidationOccurred = (data: any) => {
-      neoInfoToast(data.message || t('hostView.autoValidationCompleted'), {
-        icon: '⏱️',
-        duration: 4000,
-      });
     };
 
     const handleRoomClosedDueToInactivity = (data: any) => {
@@ -526,9 +458,7 @@ const useHostSocketEvents = ({
     socket.on('playerFoundWord', handlePlayerFoundWord);
     socket.on('achievementUnlocked', handleAchievementUnlocked);
     socket.on('liveAchievementUnlocked', handleLiveAchievementUnlocked);
-    socket.on('showValidation', handleShowValidation);
-    socket.on('validationComplete', handleValidationComplete);
-    socket.on('autoValidationOccurred', handleAutoValidationOccurred);
+    socket.on('finalScores', handleFinalScores);
     socket.on('roomClosedDueToInactivity', handleRoomClosedDueToInactivity);
     socket.on('timeUpdate', handleTimeUpdate);
     socket.on('gameStarted', handleGameStarted);
@@ -551,9 +481,7 @@ const useHostSocketEvents = ({
       socket.off('playerFoundWord', handlePlayerFoundWord);
       socket.off('achievementUnlocked', handleAchievementUnlocked);
       socket.off('liveAchievementUnlocked', handleLiveAchievementUnlocked);
-      socket.off('showValidation', handleShowValidation);
-      socket.off('validationComplete', handleValidationComplete);
-      socket.off('autoValidationOccurred', handleAutoValidationOccurred);
+      socket.off('finalScores', handleFinalScores);
       socket.off('roomClosedDueToInactivity', handleRoomClosedDueToInactivity);
       socket.off('timeUpdate', handleTimeUpdate);
       socket.off('gameStarted', handleGameStarted);
@@ -584,9 +512,6 @@ const useHostSocketEvents = ({
     setPlayerWordCounts,
     setPlayerScores,
     setPlayerAchievements,
-    setPlayerWords,
-    setShowValidation,
-    setValidations,
     setFinalScores,
     setRemainingTime,
     setGameStarted,

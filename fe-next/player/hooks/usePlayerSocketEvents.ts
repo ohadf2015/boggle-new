@@ -23,6 +23,19 @@ interface TournamentData {
   isComplete?: boolean;
 }
 
+interface WordToVote {
+  word: string;
+  submittedBy: string;
+  submitterAvatar?: {
+    emoji?: string;
+    color?: string;
+    profilePictureUrl?: string;
+  };
+  timeoutSeconds: number;
+  gameCode: string;
+  language: string;
+}
+
 interface UsePlayerSocketEventsProps {
   socket: Socket | null;
   t: (key: string) => string;
@@ -54,6 +67,10 @@ interface UsePlayerSocketEventsProps {
   setTournamentData: React.Dispatch<React.SetStateAction<TournamentData | null>>;
   setTournamentStandings: React.Dispatch<React.SetStateAction<any[]>>;
   setShowTournamentStandings: React.Dispatch<React.SetStateAction<boolean>>;
+
+  // Word feedback state setters
+  setShowWordFeedback: React.Dispatch<React.SetStateAction<boolean>>;
+  setWordToVote: React.Dispatch<React.SetStateAction<WordToVote | null>>;
 
   // Combo refs and setters
   comboLevelRef: MutableRefObject<number>;
@@ -100,6 +117,10 @@ const usePlayerSocketEvents = ({
   setTournamentData,
   setTournamentStandings,
   setShowTournamentStandings,
+
+  // Word feedback state setters
+  setShowWordFeedback,
+  setWordToVote,
 
   // Combo refs and setters
   comboLevelRef,
@@ -418,6 +439,38 @@ const usePlayerSocketEvents = ({
       wordErrorToast(t('playerView.tooFast') || 'Slow down! Submitting too fast', { duration: 2000 });
     };
 
+    // Word feedback handlers
+    const handleShowWordFeedback = (data: any) => {
+      logger.log('[PLAYER] Received word feedback request:', data);
+      setWordToVote({
+        word: data.word,
+        submittedBy: data.submittedBy,
+        submitterAvatar: data.submitterAvatar,
+        timeoutSeconds: data.timeoutSeconds || 10,
+        gameCode: data.gameCode,
+        language: data.language
+      });
+      setShowWordFeedback(true);
+    };
+
+    const handleNoWordFeedback = () => {
+      logger.log('[PLAYER] No word feedback needed');
+      setShowWordFeedback(false);
+      setWordToVote(null);
+    };
+
+    const handleVoteRecorded = (data: any) => {
+      logger.log('[PLAYER] Vote recorded:', data);
+      if (data.success) {
+        neoSuccessToast(t('wordFeedback.thankYou') || 'Thanks for voting!', { icon: '✓', duration: 2000 });
+      }
+    };
+
+    const handleWordBecameValid = (data: any) => {
+      logger.log('[PLAYER] Word became valid:', data);
+      neoInfoToast(`"${data.word}" ${t('wordFeedback.nowValid') || 'is now a valid word!'}`, { icon: '📖', duration: 3000 });
+    };
+
     const handlePlayerPresenceUpdate = (data: any) => {
       console.log('[PRESENCE] Received playerPresenceUpdate:', data);
       const { username: playerUsername, presenceStatus, isWindowFocused } = data;
@@ -465,6 +518,10 @@ const usePlayerSocketEvents = ({
     socket.on('tournamentCancelled', handleTournamentCancelled);
     socket.on('error', handleError);
     socket.on('rateLimited', handleRateLimited);
+    socket.on('showWordFeedback', handleShowWordFeedback);
+    socket.on('noWordFeedback', handleNoWordFeedback);
+    socket.on('voteRecorded', handleVoteRecorded);
+    socket.on('wordBecameValid', handleWordBecameValid);
 
     return () => {
       socket.off('updateUsers', handleUpdateUsers);
@@ -492,6 +549,10 @@ const usePlayerSocketEvents = ({
       socket.off('tournamentCancelled', handleTournamentCancelled);
       socket.off('error', handleError);
       socket.off('rateLimited', handleRateLimited);
+      socket.off('showWordFeedback', handleShowWordFeedback);
+      socket.off('noWordFeedback', handleNoWordFeedback);
+      socket.off('voteRecorded', handleVoteRecorded);
+      socket.off('wordBecameValid', handleWordBecameValid);
     };
   }, [
     socket,
@@ -523,6 +584,8 @@ const usePlayerSocketEvents = ({
     setTournamentData,
     setTournamentStandings,
     setShowTournamentStandings,
+    setShowWordFeedback,
+    setWordToVote,
     comboLevelRef,
     lastWordTimeRef,
     setComboLevel,

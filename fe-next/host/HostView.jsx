@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { useIdleTimer } from 'react-idle-timer';
 import { FaSignOutAlt } from 'react-icons/fa';
 import { Button } from '../components/ui/button';
 import { neoSuccessToast, neoErrorToast, neoInfoToast } from '../components/NeoToast';
@@ -21,7 +20,6 @@ import HostPreGameView from './components/HostPreGameView';
 import HostInGameView from './components/HostInGameView';
 import {
   QRCodeDialog,
-  ValidationModal,
   FinalScoresModal,
   ExitConfirmDialog,
   CancelTournamentDialog
@@ -57,10 +55,7 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
   const [playerScores, setPlayerScores] = useState({});
   const [playerAchievements, setPlayerAchievements] = useState({});
 
-  // Validation state
-  const [showValidation, setShowValidation] = useState(false);
-  const [playerWords, setPlayerWords] = useState([]);
-  const [validations, setValidations] = useState({});
+  // Scores state
   const [finalScores, setFinalScores] = useState(null);
 
   // UI state
@@ -95,9 +90,6 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
   // Words for board embedding
   const [wordsForBoard, setWordsForBoard] = useState([]);
 
-  // Idle timer ref
-  const submitValidationRef = useRef(null);
-
   // Urgent music ref
   const hasTriggeredUrgentMusicRef = useRef(false);
 
@@ -116,9 +108,6 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
     setPlayerWordCounts,
     setPlayerScores,
     setPlayerAchievements,
-    setPlayerWords,
-    setShowValidation,
-    setValidations,
     setFinalScores,
     setRemainingTime,
     setGameStarted,
@@ -318,59 +307,6 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
     });
   }, [socket, tournamentData, t]);
 
-  // Validation handlers
-  const submitValidation = useCallback(() => {
-    const validationArray = Object.keys(validations).map(word => ({
-      word: word,
-      isValid: validations[word],
-    }));
-
-    logger.log('[HOST] Submitting validation:', {
-      validationArrayLength: validationArray.length,
-      validations: validationArray
-    });
-
-    socket.emit('validateWords', { validations: validationArray });
-    neoInfoToast(t('hostView.validatingWords'), {
-      duration: 2000,
-      icon: '⏳',
-    });
-  }, [validations, socket, t]);
-
-  useEffect(() => {
-    submitValidationRef.current = submitValidation;
-  }, [submitValidation]);
-
-  const handleValidationIdle = useCallback(() => {
-    if (showValidation && submitValidationRef.current) {
-      neoInfoToast(t('hostView.autoSubmittingValidation') || 'Auto-submitting validation due to inactivity', {
-        icon: '⏱️',
-        duration: 2000,
-      });
-      submitValidationRef.current();
-    }
-  }, [showValidation, t]);
-
-  const { reset: resetIdleTimer } = useIdleTimer({
-    timeout: 15000,
-    onIdle: handleValidationIdle,
-    disabled: !showValidation,
-    throttle: 500,
-  });
-
-  useEffect(() => {
-    if (showValidation) {
-      resetIdleTimer();
-    }
-  }, [showValidation, validations, resetIdleTimer]);
-
-  const toggleWordValidation = useCallback((username, word) => {
-    setValidations(prev => ({
-      ...prev,
-      [word]: !prev[word],
-    }));
-  }, []);
-
   const handleHostWordSubmit = useCallback((formedWord) => {
     setHostFoundWords(prev => [...prev, formedWord]);
   }, []);
@@ -382,8 +318,6 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
     setRemainingTime(null);
     setTournamentData(null);
     setGameType('regular');
-    setValidations({});
-    setPlayerWords([]);
     setPlayerWordCounts({});
     setPlayerScores({});
     setHostFoundWords([]);
@@ -410,16 +344,6 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
       )}
 
       {/* Dialogs */}
-      <ValidationModal
-        open={showValidation}
-        onOpenChange={setShowValidation}
-        playerWords={playerWords}
-        validations={validations}
-        onToggleValidation={toggleWordValidation}
-        onSubmit={submitValidation}
-        t={t}
-      />
-
       <FinalScoresModal
         open={!!finalScores}
         onOpenChange={() => setFinalScores(null)}

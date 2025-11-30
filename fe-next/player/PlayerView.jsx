@@ -13,6 +13,7 @@ import logger from '@/utils/logger';
 import PlayerWaitingView from './components/PlayerWaitingView';
 import PlayerWaitingResultsView from './components/PlayerWaitingResultsView';
 import PlayerInGameView from './components/PlayerInGameView';
+import WordFeedbackModal from '../components/voting/WordFeedbackModal';
 
 // Custom hooks
 import usePlayerSocketEvents from './hooks/usePlayerSocketEvents';
@@ -66,6 +67,10 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode, pe
   const [tournamentStandings, setTournamentStandings] = useState([]);
   const [showTournamentStandings, setShowTournamentStandings] = useState(false);
 
+  // Word feedback state
+  const [showWordFeedback, setShowWordFeedback] = useState(false);
+  const [wordToVote, setWordToVote] = useState(null);
+
   // Music ref
   const hasTriggeredUrgentMusicRef = useRef(false);
 
@@ -99,6 +104,8 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode, pe
     setTournamentData,
     setTournamentStandings,
     setShowTournamentStandings,
+    setShowWordFeedback,
+    setWordToVote,
     comboLevelRef,
     lastWordTimeRef,
     setComboLevel,
@@ -248,6 +255,30 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode, pe
     setFoundWords(prev => [...prev, { word: formedWord, isValid: null }]);
   }, []);
 
+  // Word feedback vote handler
+  const handleVote = useCallback((voteType) => {
+    if (!socket || !wordToVote) return;
+
+    logger.log('[PLAYER] Submitting vote:', { word: wordToVote.word, voteType });
+    socket.emit('submitWordVote', {
+      word: wordToVote.word,
+      language: wordToVote.language,
+      gameCode: wordToVote.gameCode,
+      voteType,
+      submitter: wordToVote.submittedBy
+    });
+
+    setShowWordFeedback(false);
+    setWordToVote(null);
+  }, [socket, wordToVote]);
+
+  // Word feedback skip/timeout handler
+  const handleFeedbackSkip = useCallback(() => {
+    logger.log('[PLAYER] Skipping word feedback');
+    setShowWordFeedback(false);
+    setWordToVote(null);
+  }, []);
+
   // Render appropriate view
   if (waitingForResults) {
     return (
@@ -265,6 +296,17 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode, pe
           setShowExitConfirm={setShowExitConfirm}
           onExitRoom={handleExitRoom}
           onConfirmExit={confirmExitRoom}
+        />
+        {/* Word Feedback Modal - shows after game ends for crowd-sourced word validation */}
+        <WordFeedbackModal
+          isOpen={showWordFeedback && wordToVote !== null}
+          word={wordToVote?.word || ''}
+          submittedBy={wordToVote?.submittedBy || ''}
+          submitterAvatar={wordToVote?.submitterAvatar}
+          timeoutSeconds={wordToVote?.timeoutSeconds || 10}
+          onVote={handleVote}
+          onSkip={handleFeedbackSkip}
+          onTimeout={handleFeedbackSkip}
         />
       </>
     );

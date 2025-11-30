@@ -65,6 +65,7 @@ const { checkAndAwardAchievements, getPlayerAchievements, ACHIEVEMENTS, getLocal
 const { calculatePlayerTitles } = require('./modules/playerTitlesManager');
 const { isDictionaryWord, getAvailableDictionaries, addApprovedWord, normalizeWord, getRandomLongWords } = require('./dictionary');
 const { incrementWordApproval } = require('./redisClient');
+const { loadCommunityWords, collectNonDictionaryWords, getWordForPlayer, recordVote } = require('./modules/communityWordManager');
 const gameStartCoordinator = require('./utils/gameStartCoordinator');
 const timerManager = require('./utils/timerManager');
 const { checkRateLimit, resetRateLimit } = require('./utils/rateLimiter');
@@ -864,6 +865,63 @@ function initializeSocketHandlers(io) {
         timestamp: Date.now(),
         isHost: isHostUser
       });
+    });
+
+    // Handle word vote submission (crowd-sourced dictionary improvement)
+    socket.on('submitWordVote', async (data) => {
+      if (!checkRateLimit(socket.id)) {
+        socket.emit('rateLimited');
+        return;
+      }
+
+      const { word, voteType, gameCode: providedGameCode } = data;
+      const gameCode = providedGameCode || getGameBySocketId(socket.id);
+      const username = getUsernameBySocketId(socket.id);
+
+      if (!gameCode || !word || !voteType) {
+        return;
+      }
+
+      const game = getGame(gameCode);
+      if (!game) {
+        return;
+      }
+
+      // Get user data for auth context
+      const userData = game.users?.[username];
+      const userId = userData?.authUserId || null;
+      const guestId = userData?.guestTokenHash || null;
+
+      if (!userId && !guestId) {
+        console.log(`[VOTE] No voter identifier for ${username}, skipping vote`);
+        return;
+      }
+
+      // Record the vote
+      const result = await recordVote({
+        word,
+        language: game.language || 'en',
+        userId,
+        guestId,
+        gameCode,
+        voteType,
+        submitter: data.submittedBy || 'unknown'
+      });
+
+      if (result.success) {
+        socket.emit('voteRecorded', { word, success: true });
+        console.log(`[VOTE] ${username} voted ${voteType} on "${word}"`);
+
+        // If word just became valid (crossed 6+ threshold), notify everyone
+        if (result.isNowValid) {
+          broadcastToRoom(io, getGameRoom(gameCode), 'wordBecameValid', {
+            word,
+            language: game.language || 'en'
+          });
+        }
+      } else {
+        socket.emit('voteRecorded', { word, success: false, error: result.error });
+      }
     });
 
     // Handle end game
@@ -1692,7 +1750,7 @@ function startGameTimer(io, gameCode, timerSeconds) {
 }
 
 /**
- * End the game
+ * End the game - NEW FLOW: No host validation, crowd-sourced word feedback
  */
 function endGame(io, gameCode) {
   const game = getGame(gameCode);
@@ -1704,7 +1762,7 @@ function endGame(io, gameCode) {
   // Update game state
   updateGame(gameCode, { gameState: 'finished' });
 
-  // Calculate final scores
+  // Calculate preliminary scores (dictionary words only for now)
   const scores = calculateGameScores(gameCode);
 
   // Broadcast end game
@@ -1712,200 +1770,52 @@ function endGame(io, gameCode) {
     scores
   });
 
-  // Prepare validation data for host
-  const allPlayerWords = [];
-  const uniqueWords = new Set();
-  let autoValidatedCount = 0;
-
-  Object.keys(game.users).forEach(username => {
-    const playerWords = game.playerWords?.[username] || [];
-    const wordsWithValidation = playerWords.map(word => {
-      const isAutoValidated = isDictionaryWord(word, game.language || 'en');
-      if (isAutoValidated) {
-        autoValidatedCount++;
-      }
-      uniqueWords.add(word);
-      return {
-        word,
-        autoValidated: isAutoValidated
-      };
-    });
-
-    if (wordsWithValidation.length > 0) {
-      allPlayerWords.push({
-        username,
-        words: wordsWithValidation
-      });
-    }
-  });
-
-  // Check if there are any non-auto-validated words that need host review
-  const hasNonAutoValidatedWords = allPlayerWords.some(player =>
-    player.words.some(w => !w.autoValidated)
-  );
-
-  // Check if host is the only player (solo game)
+  // Collect non-dictionary words for feedback
+  const nonDictWords = collectNonDictionaryWords(game);
   const playerCount = Object.keys(game.users).length;
-  const isHostSoloGame = playerCount === 1;
+  const FEEDBACK_TIMEOUT_SECONDS = 10;
 
-  // Skip validation if: all words auto-validated OR host is playing solo
-  const shouldSkipValidation = !hasNonAutoValidatedWords || isHostSoloGame;
+  console.log(`[GAME_END] Game ${gameCode} ended. ${nonDictWords.length} non-dictionary words found.`);
 
-  // Send validation data to host
-  const hostSocketId = game.hostSocketId;
-  if (hostSocketId) {
-    const hostSocket = getSocketById(io, hostSocketId);
-    if (hostSocket) {
-      safeEmit(hostSocket, 'showValidation', {
-        playerWords: allPlayerWords,
-        autoValidatedCount,
-        totalWords: uniqueWords.size,
-        skipValidation: shouldSkipValidation  // Skip validation screen if all words are auto-validated OR host is solo
-      });
+  // Send word feedback to each player (they vote on words they didn't submit)
+  if (nonDictWords.length > 0 && playerCount > 1) {
+    for (const [username, userData] of Object.entries(game.users)) {
+      const wordForPlayer = getWordForPlayer(nonDictWords, username);
 
-      console.log(`[SOCKET] Sent showValidation to host for game ${gameCode} - ${uniqueWords.size} unique words, ${autoValidatedCount} auto-validated, playerCount: ${playerCount}, skipValidation: ${shouldSkipValidation}`);
+      if (wordForPlayer) {
+        const playerSocket = getSocketById(io, userData.socketId);
+        if (playerSocket) {
+          safeEmit(playerSocket, 'showWordFeedback', {
+            word: wordForPlayer.word,
+            submittedBy: wordForPlayer.submittedBy,
+            submitterAvatar: wordForPlayer.submitterAvatar,
+            timeoutSeconds: FEEDBACK_TIMEOUT_SECONDS,
+            gameCode,
+            language: game.language || 'en'
+          });
+          console.log(`[FEEDBACK] Sent word "${wordForPlayer.word}" to ${username} for feedback`);
+        }
+      } else {
+        // No eligible word for this player (they submitted all non-dict words)
+        const playerSocket = getSocketById(io, userData.socketId);
+        if (playerSocket) {
+          safeEmit(playerSocket, 'noWordFeedback', {});
+        }
+      }
     }
   }
 
-  // Set auto-validation timeout
-  const tournamentId = getTournamentIdFromGame(gameCode);
-  const timeoutDuration = tournamentId ? 30000 : 15000;
+  // Set timeout for feedback phase, then calculate final scores
+  const feedbackTimeoutMs = (nonDictWords.length > 0 && playerCount > 1)
+    ? (FEEDBACK_TIMEOUT_SECONDS + 1) * 1000
+    : 0;
 
-  // Send timeout notification to host
-  if (hostSocketId) {
-    const hostSocket = getSocketById(io, hostSocketId);
-    if (hostSocket) {
-      safeEmit(hostSocket, 'validationTimeoutStarted', {
-        timeoutSeconds: timeoutDuration / 1000,
-        isTournament: !!tournamentId
-      });
-    }
-  }
-
-  // Set up auto-validation timeout
-  const validationTimeout = setTimeout(async () => {
-    const currentGame = getGame(gameCode);
-    if (currentGame && currentGame.gameState === 'finished') {
-      console.log(`[AUTO_VALIDATION] Host AFK for game ${gameCode}, auto-validating dictionary words only`);
-
-      // Build word count map to detect duplicates across all players
-      const wordCountMap = {};
-      Object.values(currentGame.playerWords || {}).forEach(words => {
-        words.forEach(word => {
-          wordCountMap[word] = (wordCountMap[word] || 0) + 1;
-        });
-      });
-
-      // Auto-validate dictionary words, mark others as invalid
-      const validatedScores = {};
-      const playerWordObjects = {}; // Store formatted word objects for each player
-
-      Object.keys(currentGame.users).forEach(username => {
-        const playerWords = currentGame.playerWords?.[username] || [];
-        const playerWordDetailsList = currentGame.playerWordDetails?.[username] || [];
-        let score = 0;
-        const wordObjects = [];
-
-        playerWords.forEach(word => {
-          const isValid = isDictionaryWord(word, currentGame.language || 'en');
-          const isDuplicate = wordCountMap[word] > 1;
-
-          // Look up score and combo bonus from word details (earned during live play)
-          const wordDetail = playerWordDetailsList.find(wd => wd.word === word);
-          const comboBonus = wordDetail?.comboBonus || 0;
-          // Use stored score (includes combo) or calculate with stored combo level as fallback
-          const storedComboLevel = wordDetail?.comboLevel || 0;
-          const wordScore = isValid ? (wordDetail?.score || calculateWordScore(word, storedComboLevel)) : 0;
-
-          // Only add to score if valid and not a duplicate
-          if (isValid && !isDuplicate) {
-            score += wordScore;
-          }
-
-          wordObjects.push({
-            word: word,
-            score: isDuplicate ? 0 : wordScore,
-            comboBonus: comboBonus, // Bonus earned during live play
-            validated: isValid,
-            isDuplicate: isDuplicate
-          });
-        });
-
-        validatedScores[username] = score;
-        playerWordObjects[username] = wordObjects;
-      });
-
-      // Update scores and broadcast
-      for (const [username, score] of Object.entries(validatedScores)) {
-        updatePlayerScore(gameCode, username, score, false);
-      }
-
-      // Update playerWordDetails with validation status for achievement calculation
-      for (const username of Object.keys(currentGame.users)) {
-        const playerWordDetails = currentGame.playerWordDetails?.[username] || [];
-        for (const wordDetail of playerWordDetails) {
-          wordDetail.validated = isDictionaryWord(wordDetail.word, currentGame.language || 'en');
-        }
-      }
-
-      // Award final achievements based on validated words
-      const usernames = Object.keys(currentGame.users);
-      awardFinalAchievements(currentGame, usernames);
-
-      // Convert scores to array format for frontend with properly formatted word objects
-      const scoresArray = Object.entries(validatedScores).map(([username, score]) => {
-        const allWords = playerWordObjects[username] || [];
-        const validWords = allWords.filter(w => w.validated && !w.isDuplicate);
-        const longestWord = validWords.length > 0
-          ? validWords.reduce((longest, w) => w.word.length > longest.length ? w.word : longest, '')
-          : '';
-
-        // Get localized achievements for this player
-        const playerAchievementKeys = currentGame.playerAchievements?.[username] || [];
-        const localizedAchievements = getLocalizedAchievements(currentGame.language || 'he');
-        const playerAchievements = playerAchievementKeys.map(key => localizedAchievements[key]).filter(Boolean);
-
-        return {
-          username,
-          score,
-          allWords,
-          wordCount: allWords.length,
-          validWordCount: validWords.length,
-          longestWord,
-          avatar: currentGame.users?.[username]?.avatar || null,
-          achievements: playerAchievements
-        };
-      }).sort((a, b) => b.score - a.score);
-
-      broadcastToRoom(io, getGameRoom(gameCode), 'validatedScores', {
-        scores: scoresArray,
-        letterGrid: currentGame.letterGrid
-      });
-
-      // Notify host of auto-validation with results
-      if (hostSocketId) {
-        const hostSocket = getSocketById(io, hostSocketId);
-        if (hostSocket) {
-          safeEmit(hostSocket, 'autoValidationOccurred', {
-            message: 'Auto-validation completed due to inactivity'
-          });
-
-          // Also send validation complete to trigger results display
-          safeEmit(hostSocket, 'validationComplete', {
-            scores: scoresArray
-          });
-        }
-      }
-
-      // Record game results to Supabase for leaderboard/stats (auto-validation case)
-      await recordGameResultsToSupabase(gameCode, scoresArray, currentGame);
-    }
-  }, timeoutDuration);
-
-  // Store timeout so it can be cleared if manual validation occurs
-  game.validationTimeout = validationTimeout;
+  setTimeout(async () => {
+    await calculateAndBroadcastFinalScores(io, gameCode);
+  }, feedbackTimeoutMs);
 
   // Check for tournament
+  const tournamentId = getTournamentIdFromGame(gameCode);
   if (tournamentId) {
     // Record round results - convert scores object to round results format
     const roundResults = {};
@@ -1953,6 +1863,142 @@ function endGame(io, gameCode) {
   }
 
   console.log(`[SOCKET] Game ${gameCode} ended`);
+}
+
+/**
+ * Calculate and broadcast final scores after feedback phase
+ * No host validation - just auto-validate dictionary + community-validated words
+ */
+async function calculateAndBroadcastFinalScores(io, gameCode) {
+  const game = getGame(gameCode);
+  if (!game || game.gameState !== 'finished') return;
+
+  console.log(`[FINAL_SCORES] Calculating final scores for game ${gameCode}`);
+
+  // Build word count map to detect duplicates across all players
+  const wordCountMap = {};
+  Object.values(game.playerWords || {}).forEach(words => {
+    words.forEach(word => {
+      wordCountMap[word] = (wordCountMap[word] || 0) + 1;
+    });
+  });
+
+  // Calculate scores: dictionary words + community-validated words (6+ net votes)
+  const validatedScores = {};
+  const playerWordObjects = {};
+
+  Object.keys(game.users).forEach(username => {
+    const playerWords = game.playerWords?.[username] || [];
+    const playerWordDetailsList = game.playerWordDetails?.[username] || [];
+    let score = 0;
+    const wordObjects = [];
+
+    playerWords.forEach(word => {
+      // Word is valid if: in dictionary OR community-validated (6+ net votes)
+      // isDictionaryWord now includes community word check
+      const isValid = isDictionaryWord(word, game.language || 'en');
+      const isDuplicate = wordCountMap[word] > 1;
+
+      // Look up score and combo bonus from word details
+      const wordDetail = playerWordDetailsList.find(wd => wd.word === word);
+      const comboBonus = wordDetail?.comboBonus || 0;
+      const storedComboLevel = wordDetail?.comboLevel || 0;
+      const wordScore = isValid ? (wordDetail?.score || calculateWordScore(word, storedComboLevel)) : 0;
+
+      // Only add to score if valid and not a duplicate
+      if (isValid && !isDuplicate) {
+        score += wordScore;
+      }
+
+      wordObjects.push({
+        word: word,
+        score: isDuplicate ? 0 : wordScore,
+        comboBonus: comboBonus,
+        validated: isValid,
+        isDuplicate: isDuplicate
+      });
+    });
+
+    validatedScores[username] = score;
+    playerWordObjects[username] = wordObjects;
+  });
+
+  // Update scores
+  for (const [username, score] of Object.entries(validatedScores)) {
+    updatePlayerScore(gameCode, username, score, false);
+  }
+
+  // Update playerWordDetails with validation status for achievement calculation
+  for (const username of Object.keys(game.users)) {
+    const playerWordDetails = game.playerWordDetails?.[username] || [];
+    for (const wordDetail of playerWordDetails) {
+      wordDetail.validated = isDictionaryWord(wordDetail.word, game.language || 'en');
+    }
+  }
+
+  // Award final achievements based on validated words
+  const usernames = Object.keys(game.users);
+  awardFinalAchievements(game, usernames);
+
+  // Convert scores to array format for frontend
+  const scoresArray = Object.entries(validatedScores).map(([username, score]) => {
+    const allWords = playerWordObjects[username] || [];
+    const validWords = allWords.filter(w => w.validated && !w.isDuplicate);
+    const longestWord = validWords.length > 0
+      ? validWords.reduce((longest, w) => w.word.length > longest.length ? w.word : longest, '')
+      : '';
+
+    // Get localized achievements for this player
+    const playerAchievementKeys = game.playerAchievements?.[username] || [];
+    const localizedAchievements = getLocalizedAchievements(game.language || 'he');
+    const playerAchievements = playerAchievementKeys.map(key => localizedAchievements[key]).filter(Boolean);
+
+    return {
+      username,
+      score,
+      allWords,
+      wordCount: allWords.length,
+      validWordCount: validWords.length,
+      longestWord,
+      avatar: game.users?.[username]?.avatar || null,
+      achievements: playerAchievements
+    };
+  }).sort((a, b) => b.score - a.score);
+
+  // Calculate player titles based on performance
+  const gameDuration = game.gameDuration || 180;
+  const playerTitles = calculatePlayerTitles(scoresArray, game.language || 'he', gameDuration);
+
+  // Add titles to each player's score object
+  scoresArray.forEach(playerScore => {
+    const titleData = playerTitles[playerScore.username];
+    if (titleData) {
+      playerScore.title = titleData.title;
+      playerScore.titleKey = titleData.titleKey;
+    }
+  });
+
+  // Broadcast final scores to everyone
+  broadcastToRoom(io, getGameRoom(gameCode), 'validatedScores', {
+    scores: scoresArray,
+    letterGrid: game.letterGrid
+  });
+
+  // Also send validationComplete to host for backward compatibility
+  const hostSocketId = game.hostSocketId;
+  if (hostSocketId) {
+    const hostSocket = getSocketById(io, hostSocketId);
+    if (hostSocket) {
+      safeEmit(hostSocket, 'validationComplete', {
+        scores: scoresArray
+      });
+    }
+  }
+
+  // Record game results to Supabase
+  await recordGameResultsToSupabase(gameCode, scoresArray, game);
+
+  console.log(`[FINAL_SCORES] Final scores broadcast for game ${gameCode}`);
 }
 
 /**

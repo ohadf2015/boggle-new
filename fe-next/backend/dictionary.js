@@ -264,7 +264,23 @@ class Dictionary {
         break;
     }
 
-    return dictionary.has(normalizedWord);
+    // Check static dictionary first
+    if (dictionary.has(normalizedWord)) {
+      return true;
+    }
+
+    // Check community-validated words (words with 6+ net votes)
+    // Lazy require to avoid circular dependency
+    try {
+      const { isWordCommunityValid } = require('./modules/communityWordManager');
+      if (isWordCommunityValid(normalizedWord, language)) {
+        return true;
+      }
+    } catch (e) {
+      // Community word manager not available yet (during initial load)
+    }
+
+    return false;
   }
 
   isValidEnglishWord(word) {
