@@ -161,6 +161,14 @@ const useHostSocketEvents = ({
     }
   }, [setComboLevel, setLastWordTime, comboLevelRef, lastWordTimeRef, comboTimeoutRef]);
 
+  // Use refs for onShowResults and tableData to avoid stale closure issues during game end race condition
+  const onShowResultsRef = useRef(onShowResults);
+  const tableDataRef = useRef(tableData);
+  useEffect(() => {
+    onShowResultsRef.current = onShowResults;
+    tableDataRef.current = tableData;
+  }, [onShowResults, tableData]);
+
   useEffect(() => {
     if (!socket) return;
 
@@ -259,8 +267,11 @@ const useHostSocketEvents = ({
     // Handle validation complete (after word feedback voting timeout)
     const handleValidationComplete = (data: any) => {
       logger.log('[HOST] Received validationComplete event:', data);
-      logger.log('[HOST] onShowResults defined:', !!onShowResults);
-      logger.log('[HOST] tableData available:', !!tableData);
+      // Use refs to get the latest values to avoid stale closure issues
+      const currentOnShowResults = onShowResultsRef.current;
+      const currentTableData = tableDataRef.current;
+      logger.log('[HOST] onShowResults defined:', !!currentOnShowResults);
+      logger.log('[HOST] tableData available:', !!currentTableData);
       confetti({
         particleCount: 150,
         spread: 80,
@@ -270,11 +281,11 @@ const useHostSocketEvents = ({
         icon: '🎉',
         duration: 3000,
       });
-      if (onShowResults) {
+      if (currentOnShowResults) {
         logger.log('[HOST] Calling onShowResults with scores');
-        onShowResults({
+        currentOnShowResults({
           scores: data.scores,
-          letterGrid: tableData
+          letterGrid: currentTableData
         });
       } else {
         logger.log('[HOST] onShowResults not defined, setting finalScores in modal');
@@ -557,10 +568,9 @@ const useHostSocketEvents = ({
     t,
     hostPlaying,
     gameStarted,
-    tableData,
+    // tableData and onShowResults removed - using refs instead to avoid stale closure issues
     username,
     queueAchievement,
-    onShowResults,
     handleWordAccepted,
     resetCombo,
     setPlayersReady,

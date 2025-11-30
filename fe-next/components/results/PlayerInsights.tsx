@@ -56,6 +56,11 @@ function generatePlayerStory(insights: PlayerInsightsData, t: (key: string) => s
   const isClutchPlayer = speedPattern === SPEED_PATTERNS.STRONG_FINISH;
   const isQuickStarter = speedPattern === SPEED_PATTERNS.FAST_START;
   const isMomentumBuilder = speedPattern === SPEED_PATTERNS.MOMENTUM;
+  const isFadeOut = speedPattern === SPEED_PATTERNS.FADE_OUT;
+  const isMidGamePeak = speedPattern === SPEED_PATTERNS.MID_GAME_PEAK;
+  const isBurstMode = speedPattern === SPEED_PATTERNS.BURST_MODE;
+  const isSlowStarter = speedPattern === SPEED_PATTERNS.SLOW_STARTER;
+  const isSecondWind = speedPattern === SPEED_PATTERNS.SECOND_WIND;
 
   // Priority-based story selection (most impressive trait wins)
   if (isSpeedDemon && isSniper) {
@@ -122,6 +127,46 @@ function generatePlayerStory(insights: PlayerInsightsData, t: (key: string) => s
     };
   }
 
+  if (isFadeOut) {
+    return {
+      emoji: '📉',
+      headline: t('insights.story.earlyBurst') || 'Early Burst',
+      story: t('insights.story.earlyBurstDesc') || `You came out guns blazing. Maybe save some firepower for later?`
+    };
+  }
+
+  if (isMidGamePeak) {
+    return {
+      emoji: '⛰️',
+      headline: t('insights.story.midGamePeak') || 'Peak Performer',
+      story: t('insights.story.midGamePeakDesc') || `You hit your stride in the middle. Warm-up complete, cooldown pending.`
+    };
+  }
+
+  if (isBurstMode) {
+    return {
+      emoji: '💥',
+      headline: t('insights.story.burstMode') || 'Burst Mode',
+      story: t('insights.story.burstModeDesc') || `One explosive phase of pure dominance. Quality over consistency!`
+    };
+  }
+
+  if (isSlowStarter) {
+    return {
+      emoji: '🐢',
+      headline: t('insights.story.slowStarter') || 'Slow Starter',
+      story: t('insights.story.slowStarterDesc') || `Took a minute to find your groove. Once you did, no stopping you.`
+    };
+  }
+
+  if (isSecondWind) {
+    return {
+      emoji: '🌊',
+      headline: t('insights.story.secondWind') || 'Second Wind',
+      story: t('insights.story.secondWindDesc') || `A mid-game slump? Not a problem. You bounced back stronger.`
+    };
+  }
+
   if (isWordsmith) {
     return {
       emoji: '✨',
@@ -172,6 +217,11 @@ const PlayerInsights: React.FC<PlayerInsightsProps> = ({ insights }) => {
       [SPEED_PATTERNS.STRONG_FINISH]: t('insights.strongFinish') || 'Strong Finish',
       [SPEED_PATTERNS.MOMENTUM]: t('insights.momentum') || 'Building Momentum',
       [SPEED_PATTERNS.STEADY]: t('insights.steady') || 'Steady Pace',
+      [SPEED_PATTERNS.FADE_OUT]: t('insights.fadeOut') || 'Early Burst',
+      [SPEED_PATTERNS.MID_GAME_PEAK]: t('insights.midGamePeak') || 'Mid-Game Peak',
+      [SPEED_PATTERNS.BURST_MODE]: t('insights.burstMode') || 'Burst Mode',
+      [SPEED_PATTERNS.SLOW_STARTER]: t('insights.slowStarter') || 'Slow Starter',
+      [SPEED_PATTERNS.SECOND_WIND]: t('insights.secondWind') || 'Second Wind',
     };
     return names[pattern] || names[SPEED_PATTERNS.STEADY];
   };

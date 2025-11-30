@@ -34,4 +34,4 @@ site_url = "http://localhost:3001"
 enabled = true
 
 [auth.external.discord]
-enabled = true
+enabled = false

@@ -1,4 +1,4 @@
-import { useEffect, useCallback, MutableRefObject, RefObject } from 'react';
+import { useEffect, useCallback, useRef, MutableRefObject, RefObject } from 'react';
 import { Socket } from 'socket.io-client';
 import confetti from 'canvas-confetti';
 import gsap from 'gsap';
@@ -143,6 +143,13 @@ const usePlayerSocketEvents = ({
       clearTimeout(comboTimeoutRef.current);
     }
   }, [setComboLevel, setLastWordTime, comboLevelRef, lastWordTimeRef, comboTimeoutRef]);
+
+  // Use a ref for onShowResults to avoid stale closure issues during game end race condition
+  // This ensures the validatedScores event handler always has access to the latest callback
+  const onShowResultsRef = useRef(onShowResults);
+  useEffect(() => {
+    onShowResultsRef.current = onShowResults;
+  }, [onShowResults]);
 
   useEffect(() => {
     if (!socket) return;
@@ -315,7 +322,7 @@ const usePlayerSocketEvents = ({
         setShowStartAnimation(true);
       }
 
-      if (data.remainingTime === 0) {
+      if (data.remainingTime <= 0) {
         setGameActive(false);
         setWaitingForResults(true);
       }
@@ -354,9 +361,11 @@ const usePlayerSocketEvents = ({
       setWaitingForResults(false);
       setShowWordFeedback(false);
       setWordToVote(null);
-      if (onShowResults) {
+      // Use ref to get the latest onShowResults callback to avoid stale closure issues
+      const currentOnShowResults = onShowResultsRef.current;
+      if (currentOnShowResults) {
         logger.log('[PLAYER] Calling onShowResults with scores');
-        onShowResults({
+        currentOnShowResults({
           scores: data.scores,
           letterGrid: data.letterGrid,
         });
@@ -372,8 +381,10 @@ const usePlayerSocketEvents = ({
       setWaitingForResults(false);
       setShowWordFeedback(false);
       setWordToVote(null);
-      if (onShowResults) {
-        onShowResults({
+      // Use ref to get the latest onShowResults callback
+      const currentOnShowResults = onShowResultsRef.current;
+      if (currentOnShowResults) {
+        currentOnShowResults({
           scores: data.scores,
           letterGrid: letterGrid,
         });
@@ -662,7 +673,7 @@ const usePlayerSocketEvents = ({
     username,
     queueAchievement,
     playComboSound,
-    onShowResults,
+    // onShowResults removed - using onShowResultsRef instead to avoid stale closure issues
     resetCombo,
     setPlayersReady,
     setShufflingGrid,

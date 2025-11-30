@@ -9,10 +9,15 @@ import type { LetterGrid } from '@/types';
  * Speed pattern categories based on word submission timing
  */
 export const SPEED_PATTERNS = {
-  FAST_START: 'fastStart',     // Most words in first third
+  FAST_START: 'fastStart',       // Most words in first third
   STRONG_FINISH: 'strongFinish', // Most words in last third
-  MOMENTUM: 'momentum',         // Words increase over time
-  STEADY: 'steady',             // Even distribution
+  MOMENTUM: 'momentum',          // Words increase over time
+  STEADY: 'steady',              // Even distribution
+  FADE_OUT: 'fadeOut',           // Words decrease over time (early > mid > late)
+  MID_GAME_PEAK: 'midGamePeak',  // Most words in middle third
+  BURST_MODE: 'burstMode',       // Very uneven distribution (one phase dominates)
+  SLOW_STARTER: 'slowStarter',   // Weak early game, then picks up
+  SECOND_WIND: 'secondWind',     // Dip in middle, strong finish
 } as const;
 
 export type SpeedPattern = typeof SPEED_PATTERNS[keyof typeof SPEED_PATTERNS];
@@ -197,16 +202,8 @@ function analyzeSpeedPattern(words: WordData[], gameDuration: number): SpeedPatt
     }
   });
 
-  // Determine speed pattern
-  let speedPattern: SpeedPattern = SPEED_PATTERNS.STEADY;
-
-  if (earlyGameWords > midGameWords && earlyGameWords > lateGameWords) {
-    speedPattern = SPEED_PATTERNS.FAST_START;
-  } else if (lateGameWords > earlyGameWords && lateGameWords > midGameWords) {
-    speedPattern = SPEED_PATTERNS.STRONG_FINISH;
-  } else if (earlyGameWords < midGameWords && midGameWords < lateGameWords) {
-    speedPattern = SPEED_PATTERNS.MOMENTUM;
-  }
+  // Determine speed pattern with more nuanced detection
+  const speedPattern = determineSpeedPattern(earlyGameWords, midGameWords, lateGameWords);
 
   return {
     speedPattern,
@@ -214,6 +211,87 @@ function analyzeSpeedPattern(words: WordData[], gameDuration: number): SpeedPatt
     midGameWords,
     lateGameWords,
   };
+}
+
+/**
+ * Determine the speed pattern based on word distribution across game phases
+ * Uses a more sophisticated analysis to avoid defaulting to "steady"
+ */
+function determineSpeedPattern(early: number, mid: number, late: number): SpeedPattern {
+  const total = early + mid + late;
+
+  // Handle edge cases
+  if (total === 0) return SPEED_PATTERNS.STEADY;
+  if (total <= 2) return SPEED_PATTERNS.STEADY; // Too few words to determine pattern
+
+  // Calculate percentages for each phase
+  const earlyPct = (early / total) * 100;
+  const midPct = (mid / total) * 100;
+  const latePct = (late / total) * 100;
+
+  // Calculate the expected percentage for even distribution (33.3%)
+  const expectedPct = 100 / 3;
+
+  // Calculate variance from expected (how "uneven" the distribution is)
+  const variance = Math.abs(earlyPct - expectedPct) + Math.abs(midPct - expectedPct) + Math.abs(latePct - expectedPct);
+
+  // If distribution is very even (low variance), it's steady
+  if (variance < 15) {
+    return SPEED_PATTERNS.STEADY;
+  }
+
+  // Check for burst mode (one phase has 60%+ of words)
+  if (earlyPct >= 60) return SPEED_PATTERNS.BURST_MODE;
+  if (midPct >= 60) return SPEED_PATTERNS.BURST_MODE;
+  if (latePct >= 60) return SPEED_PATTERNS.BURST_MODE;
+
+  // Check for clear ascending pattern (momentum)
+  if (early < mid && mid < late && latePct >= 40) {
+    return SPEED_PATTERNS.MOMENTUM;
+  }
+
+  // Check for clear descending pattern (fade out)
+  if (early > mid && mid > late && earlyPct >= 40) {
+    return SPEED_PATTERNS.FADE_OUT;
+  }
+
+  // Check for mid-game peak (middle has most words by significant margin)
+  if (mid > early && mid > late && midPct >= 40) {
+    return SPEED_PATTERNS.MID_GAME_PEAK;
+  }
+
+  // Check for second wind (dip in middle, strong finish)
+  if (mid < early && mid < late && latePct >= 35) {
+    return SPEED_PATTERNS.SECOND_WIND;
+  }
+
+  // Check for slow starter (weak early, then picks up - either mid or late dominates)
+  if (earlyPct < 20 && (midPct >= 35 || latePct >= 35)) {
+    return SPEED_PATTERNS.SLOW_STARTER;
+  }
+
+  // Fast start - early game dominates
+  if (earlyPct >= 40 && early > mid && early > late) {
+    return SPEED_PATTERNS.FAST_START;
+  }
+
+  // Strong finish - late game dominates
+  if (latePct >= 40 && late > early && late > mid) {
+    return SPEED_PATTERNS.STRONG_FINISH;
+  }
+
+  // If early is strongest but not dominant enough for fast start
+  if (early >= mid && early >= late) {
+    return SPEED_PATTERNS.FAST_START;
+  }
+
+  // If late is strongest but not dominant enough for strong finish
+  if (late >= early && late >= mid) {
+    return SPEED_PATTERNS.STRONG_FINISH;
+  }
+
+  // Default fallback
+  return SPEED_PATTERNS.STEADY;
 }
 
 /**
@@ -238,6 +316,26 @@ export function getSpeedPatternDisplay(pattern: SpeedPattern): SpeedPatternDispl
     [SPEED_PATTERNS.STEADY]: {
       icon: '⚖️',
       color: '#3B82F6', // blue
+    },
+    [SPEED_PATTERNS.FADE_OUT]: {
+      icon: '📉',
+      color: '#EF4444', // red
+    },
+    [SPEED_PATTERNS.MID_GAME_PEAK]: {
+      icon: '⛰️',
+      color: '#06B6D4', // cyan
+    },
+    [SPEED_PATTERNS.BURST_MODE]: {
+      icon: '💥',
+      color: '#EC4899', // pink
+    },
+    [SPEED_PATTERNS.SLOW_STARTER]: {
+      icon: '🐢',
+      color: '#84CC16', // lime
+    },
+    [SPEED_PATTERNS.SECOND_WIND]: {
+      icon: '🌊',
+      color: '#0EA5E9', // sky blue
     },
   };
 
