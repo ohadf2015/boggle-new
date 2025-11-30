@@ -256,9 +256,11 @@ const useHostSocketEvents = ({
       }
     };
 
-    // Handle final scores (after word feedback voting timeout)
-    const handleFinalScores = (data: any) => {
-      logger.log('[HOST] Received finalScores event:', data);
+    // Handle validation complete (after word feedback voting timeout)
+    const handleValidationComplete = (data: any) => {
+      logger.log('[HOST] Received validationComplete event:', data);
+      logger.log('[HOST] onShowResults defined:', !!onShowResults);
+      logger.log('[HOST] tableData available:', !!tableData);
       confetti({
         particleCount: 150,
         spread: 80,
@@ -269,11 +271,13 @@ const useHostSocketEvents = ({
         duration: 3000,
       });
       if (onShowResults) {
+        logger.log('[HOST] Calling onShowResults with scores');
         onShowResults({
           scores: data.scores,
           letterGrid: tableData
         });
       } else {
+        logger.log('[HOST] onShowResults not defined, setting finalScores in modal');
         setFinalScores(data.scores);
       }
     };
@@ -458,7 +462,7 @@ const useHostSocketEvents = ({
     socket.on('playerFoundWord', handlePlayerFoundWord);
     socket.on('achievementUnlocked', handleAchievementUnlocked);
     socket.on('liveAchievementUnlocked', handleLiveAchievementUnlocked);
-    socket.on('finalScores', handleFinalScores);
+    socket.on('validationComplete', handleValidationComplete);
     socket.on('roomClosedDueToInactivity', handleRoomClosedDueToInactivity);
     socket.on('timeUpdate', handleTimeUpdate);
     socket.on('gameStarted', handleGameStarted);
@@ -481,7 +485,7 @@ const useHostSocketEvents = ({
       socket.off('playerFoundWord', handlePlayerFoundWord);
       socket.off('achievementUnlocked', handleAchievementUnlocked);
       socket.off('liveAchievementUnlocked', handleLiveAchievementUnlocked);
-      socket.off('finalScores', handleFinalScores);
+      socket.off('validationComplete', handleValidationComplete);
       socket.off('roomClosedDueToInactivity', handleRoomClosedDueToInactivity);
       socket.off('timeUpdate', handleTimeUpdate);
       socket.off('gameStarted', handleGameStarted);

@@ -1775,9 +1775,14 @@ function endGame(io, gameCode) {
   const playerCount = Object.keys(game.users).length;
   const FEEDBACK_TIMEOUT_SECONDS = 10;
 
-  console.log(`[GAME_END] Game ${gameCode} ended. ${nonDictWords.length} non-dictionary words found.`);
+  console.log(`[GAME_END] Game ${gameCode} ended. ${nonDictWords.length} non-dictionary words found, ${playerCount} players.`);
 
   // Send word feedback to each player (they vote on words they didn't submit)
+  if (nonDictWords.length > 0 && playerCount > 1) {
+    console.log(`[FEEDBACK] Will show word feedback to players (non-dict words: ${nonDictWords.length}, players: ${playerCount})`);
+  } else {
+    console.log(`[FEEDBACK] Skipping word feedback (non-dict words: ${nonDictWords.length}, players: ${playerCount})`);
+  }
   if (nonDictWords.length > 0 && playerCount > 1) {
     for (const [username, userData] of Object.entries(game.users)) {
       const wordForPlayer = getWordForPlayer(nonDictWords, username);
@@ -1870,8 +1875,12 @@ function endGame(io, gameCode) {
  * No host validation - just auto-validate dictionary + community-validated words
  */
 async function calculateAndBroadcastFinalScores(io, gameCode) {
+  console.log(`[FINAL_SCORES] calculateAndBroadcastFinalScores called for game ${gameCode}`);
   const game = getGame(gameCode);
-  if (!game || game.gameState !== 'finished') return;
+  if (!game || game.gameState !== 'finished') {
+    console.log(`[FINAL_SCORES] Skipping - game not found or not finished. game: ${!!game}, state: ${game?.gameState}`);
+    return;
+  }
 
   console.log(`[FINAL_SCORES] Calculating final scores for game ${gameCode}`);
 
@@ -1979,6 +1988,7 @@ async function calculateAndBroadcastFinalScores(io, gameCode) {
   });
 
   // Broadcast final scores to everyone
+  console.log(`[FINAL_SCORES] Broadcasting validatedScores to room for game ${gameCode}, ${scoresArray.length} players`);
   broadcastToRoom(io, getGameRoom(gameCode), 'validatedScores', {
     scores: scoresArray,
     letterGrid: game.letterGrid
@@ -1986,12 +1996,16 @@ async function calculateAndBroadcastFinalScores(io, gameCode) {
 
   // Also send validationComplete to host for backward compatibility
   const hostSocketId = game.hostSocketId;
+  console.log(`[FINAL_SCORES] Sending validationComplete to host socket ${hostSocketId}`);
   if (hostSocketId) {
     const hostSocket = getSocketById(io, hostSocketId);
     if (hostSocket) {
+      console.log(`[FINAL_SCORES] Found host socket, emitting validationComplete`);
       safeEmit(hostSocket, 'validationComplete', {
         scores: scoresArray
       });
+    } else {
+      console.log(`[FINAL_SCORES] WARNING: Host socket not found!`);
     }
   }
 

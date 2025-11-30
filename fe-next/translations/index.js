@@ -62,6 +62,7 @@ export const translations = {
       lightMode: 'Light Mode',
       darkMode: 'Dark Mode',
       hurry: 'HURRY!',
+      goToHome: 'Go to Home',
     },
     music: {
       volume: 'Volume',
@@ -70,6 +71,7 @@ export const translations = {
       mute: 'Mute',
       unmute: 'Unmute',
       clickToEnable: 'Click anywhere to enable music',
+      controls: 'Music Controls',
     },
     share: {
       linkCopied: 'Link copied! 📋',
@@ -906,6 +908,7 @@ export const translations = {
       lightMode: 'מצב בהיר',
       darkMode: 'מצב כהה',
       hurry: 'מהרו!',
+      goToHome: 'חזרה לדף הבית',
     },
     music: {
       volume: 'עוצמה',
@@ -914,6 +917,7 @@ export const translations = {
       mute: 'השתק',
       unmute: 'בטל השתקה',
       clickToEnable: 'לחצו כדי להפעיל מוזיקה',
+      controls: 'בקרות מוזיקה',
     },
     share: {
       linkCopied: 'הקישור הועתק ללוח! 📋',
@@ -1749,6 +1753,7 @@ export const translations = {
       lightMode: 'Ljust läge',
       darkMode: 'Mörkt läge',
       hurry: 'SKYNDA!',
+      goToHome: 'Gå till startsidan',
     },
     music: {
       volume: 'Volym',
@@ -1757,6 +1762,7 @@ export const translations = {
       mute: 'Tyst',
       unmute: 'Ljud på',
       clickToEnable: 'Klicka för att aktivera musik',
+      controls: 'Musikkontroller',
     },
     share: {
       linkCopied: 'Länk kopierad! 📋',
@@ -2539,6 +2545,7 @@ export const translations = {
       lightMode: 'ライトモード',
       darkMode: 'ダークモード',
       hurry: '急いで!',
+      goToHome: 'ホームへ戻る',
     },
     music: {
       volume: '音量',
@@ -2547,6 +2554,7 @@ export const translations = {
       mute: 'ミュート',
       unmute: 'ミュート解除',
       clickToEnable: 'クリックして音楽を有効にする',
+      controls: '音楽コントロール',
     },
     share: {
       linkCopied: 'リンクをコピーしました！📋',

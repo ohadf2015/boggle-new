@@ -179,9 +179,11 @@ const usePlayerSocketEvents = ({
     };
 
     const handleEndGame = () => {
+      logger.log('[PLAYER] Received endGame event, wasInActiveGame:', wasInActiveGame);
       setGameActive(false);
       setRemainingTime(0);
       if (wasInActiveGame) {
+        logger.log('[PLAYER] Setting waitingForResults to true');
         setWaitingForResults(true);
       }
     };
@@ -334,25 +336,34 @@ const usePlayerSocketEvents = ({
     };
 
     const handleValidatedScores = (data: any) => {
+      logger.log('[PLAYER] Received validatedScores event:', data);
       setWaitingForResults(false);
+      setShowWordFeedback(false);
+      setWordToVote(null);
       if (onShowResults) {
+        logger.log('[PLAYER] Calling onShowResults with scores');
         onShowResults({
           scores: data.scores,
           letterGrid: data.letterGrid,
         });
+      } else {
+        logger.warn('[PLAYER] onShowResults is not defined!');
       }
     };
 
     const handleFinalScores = (data: any) => {
-      setTimeout(() => {
-        setWaitingForResults(false);
-        if (onShowResults) {
-          onShowResults({
-            scores: data.scores,
-            letterGrid: letterGrid,
-          });
-        }
-      }, 10000);
+      // Legacy handler - finalScores is no longer used in the new flow
+      // The new flow uses validatedScores which is handled by handleValidatedScores
+      logger.log('[PLAYER] Received legacy finalScores event (deprecated):', data);
+      setWaitingForResults(false);
+      setShowWordFeedback(false);
+      setWordToVote(null);
+      if (onShowResults) {
+        onShowResults({
+          scores: data.scores,
+          letterGrid: letterGrid,
+        });
+      }
     };
 
     const handleHostLeftRoomClosing = (data: any) => {
