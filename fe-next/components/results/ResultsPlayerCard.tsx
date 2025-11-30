@@ -13,6 +13,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../ui/
 import logger from '@/utils/logger';
 import { POINT_COLORS } from '../../utils/consts';
 import type { Avatar as AvatarType } from '@/types';
+import XpBreakdownCard from './XpBreakdownCard';
 
 interface WordObject {
   word: string;
@@ -516,6 +517,17 @@ const ResultsPlayerCard: React.FC<ResultsPlayerCardProps> = ({ player, index, al
                 <AchievementBadge key={i} achievement={ach} index={i} />
               ))}
             </div>
+          </div>
+        )}
+
+        {/* XP Breakdown Card - Only for current authenticated player with XP data */}
+        {isCurrentPlayer && xpGainedData && (
+          <div className="relative z-10">
+            <XpBreakdownCard
+              xpGainedData={xpGainedData}
+              levelUpData={levelUpData}
+              isWinner={isWinner}
+            />
           </div>
         )}
       </div>

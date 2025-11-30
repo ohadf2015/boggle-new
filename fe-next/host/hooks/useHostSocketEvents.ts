@@ -173,9 +173,10 @@ const useHostSocketEvents = ({
       score: data.score || baseScore,
       comboBonus: comboBonus > 0 ? comboBonus : 0,
       comboLevel: newComboLevel,
+      comboBonusLabel: t('common.comboBonus'),
       duration: 2000
     });
-  }, [hostPlaying, playComboSound, setComboLevel, setLastWordTime, comboLevelRef, lastWordTimeRef, comboTimeoutRef]);
+  }, [hostPlaying, playComboSound, setComboLevel, setLastWordTime, comboLevelRef, lastWordTimeRef, comboTimeoutRef, t]);
 
   // Reset combo helper
   const resetCombo = useCallback(() => {
@@ -416,7 +417,7 @@ const useHostSocketEvents = ({
 
     const handleWordNeedsValidation = (data: any) => {
       if (hostPlaying) {
-        wordNeedsValidationToast(data.word, { duration: 3000 });
+        wordNeedsValidationToast(data.word, { pendingLabel: t('common.pending'), duration: 3000 });
         // Word stays in list - host can decide whether to validate it
         resetCombo();
       }
@@ -542,7 +543,7 @@ const useHostSocketEvents = ({
     const handleXpGained = (data: XpGainedData) => {
       logger.log('[HOST] XP gained:', data);
       setXpGainedData(data);
-      neoSuccessToast(`+${data.xpEarned} XP`, {
+      neoSuccessToast(`+${data.xpEarned} ${t('common.xpGained')}`, {
         icon: '⭐',
         duration: 3000
       });

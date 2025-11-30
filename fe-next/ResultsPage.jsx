@@ -12,6 +12,8 @@ import { shouldShowUpgradePrompt, getGuestStatsSummary, updateGuestStatsAfterGam
 import { useWinStreak } from './hooks/useWinStreak';
 import { trackGameCompletion, trackStreakMilestone } from './utils/growthTracking';
 import logger from './utils/logger';
+import { levelUpToast } from './components/NeoToast';
+import { FaArrowDown } from 'react-icons/fa';
 
 // Dynamic imports for heavy components (loaded after initial render)
 const GridComponent = dynamic(() => import('./components/GridComponent'), { ssr: false });
@@ -22,6 +24,7 @@ const FirstWinSignupModal = dynamic(() => import('./components/auth/FirstWinSign
 const ShareWinPrompt = dynamic(() => import('./components/results/ShareWinPrompt'), { ssr: false });
 const WinStreakDisplay = dynamic(() => import('./components/results/WinStreakDisplay'), { ssr: false });
 const WordFeedbackModal = dynamic(() => import('./components/voting/WordFeedbackModal'), { ssr: false });
+const XpBreakdownCard = dynamic(() => import('./components/results/XpBreakdownCard'), { ssr: false });
 
 // Helper functions for finding word paths on the board (client-side version)
 const normalizeHebrewLetter = (letter) => {
@@ -144,6 +147,10 @@ const ResultsPage = ({ finalScores, letterGrid, gameCode, onReturnToRoom, userna
   // XP and Level state (received via socket after game ends)
   const [xpGainedData, setXpGainedData] = useState(null);
   const [levelUpData, setLevelUpData] = useState(null);
+
+  // Scroll to new game button state
+  const [showScrollButton, setShowScrollButton] = useState(false);
+  const playAgainRef = useRef(null);
 
   // Win streak tracking
   const { currentStreak, bestStreak, recordWin } = useWinStreak();
@@ -330,6 +337,17 @@ const ResultsPage = ({ finalScores, letterGrid, gameCode, onReturnToRoom, userna
     }
   }, [winner]);
 
+  // Show scroll button after 8 seconds
+  useEffect(() => {
+    if (!gameCode || !onReturnToRoom) return;
+
+    const timer = setTimeout(() => {
+      setShowScrollButton(true);
+    }, 8000);
+
+    return () => clearTimeout(timer);
+  }, [gameCode, onReturnToRoom]);
+
   // Socket event listeners for word feedback (crowd-sourced word validation) and XP
   useEffect(() => {
     if (!socket) return;
@@ -366,6 +384,13 @@ const ResultsPage = ({ finalScores, letterGrid, gameCode, onReturnToRoom, userna
         spread: 100,
         origin: { y: 0.5 },
         colors: ['#ffd700', '#ff6b6b', '#4ecdc4', '#45b7d1', '#a855f7']
+      });
+      // Show level up toast notification
+      levelUpToast(data.oldLevel, data.newLevel, {
+        title: t('xp.levelUp') || 'Level Up!',
+        newTitle: data.newTitles?.[0],
+        newTitleLabel: t('xp.titleUnlocked') || 'New Title',
+        duration: 5000
       });
     };
 
@@ -404,6 +429,14 @@ const ResultsPage = ({ finalScores, letterGrid, gameCode, onReturnToRoom, userna
     logger.log('[RESULTS] Skipping word feedback');
     setShowWordFeedback(false);
     setWordToVote(null);
+  }, []);
+
+  // Scroll to play again section
+  const scrollToPlayAgain = useCallback(() => {
+    if (playAgainRef.current) {
+      playAgainRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      setShowScrollButton(false);
+    }
   }, []);
 
   return (
@@ -532,6 +565,7 @@ const ResultsPage = ({ finalScores, letterGrid, gameCode, onReturnToRoom, userna
         {/* Play Again Section - Neo-Brutalist */}
         {gameCode && onReturnToRoom && (
           <motion.div
+            ref={playAgainRef}
             initial={{ y: 30, opacity: 0, rotate: -2 }}
             animate={{ y: 0, opacity: 1, rotate: 1 }}
             transition={{ delay: 0.5 + sortedScores.length * 0.1 }}
@@ -639,6 +673,34 @@ const ResultsPage = ({ finalScores, letterGrid, gameCode, onReturnToRoom, userna
         onSkip={handleFeedbackSkip}
         onTimeout={handleFeedbackSkip}
       />
+
+      {/* Floating Scroll to New Game Button - appears after 8 seconds */}
+      <AnimatePresence>
+        {showScrollButton && gameCode && onReturnToRoom && (
+          <motion.button
+            initial={{ y: 100, opacity: 0, scale: 0.8 }}
+            animate={{ y: 0, opacity: 1, scale: 1 }}
+            exit={{ y: 100, opacity: 0, scale: 0.8 }}
+            transition={{ type: 'spring', stiffness: 300, damping: 25 }}
+            onClick={scrollToPlayAgain}
+            className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 flex items-center gap-2 px-6 py-3 bg-neo-yellow border-4 border-neo-black rounded-neo shadow-hard-lg hover:shadow-hard-xl hover:translate-y-[-2px] transition-all font-black text-neo-black uppercase"
+          >
+            <motion.span
+              animate={{ y: [0, 5, 0] }}
+              transition={{ duration: 1, repeat: Infinity }}
+            >
+              <FaArrowDown className="text-lg" />
+            </motion.span>
+            <span className="text-sm sm:text-base">{t('results.startNewGame') || 'Start New Game'}</span>
+            <motion.span
+              animate={{ y: [0, 5, 0] }}
+              transition={{ duration: 1, repeat: Infinity, delay: 0.2 }}
+            >
+              <FaArrowDown className="text-lg" />
+            </motion.span>
+          </motion.button>
+        )}
+      </AnimatePresence>
     </div>
   );
 };

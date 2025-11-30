@@ -1,8 +1,8 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { FaUser, FaArrowLeft, FaEdit, FaGamepad, FaTrophy, FaStar, FaCamera, FaTimes, FaCheck, FaClock } from 'react-icons/fa';
+import { FaUser, FaArrowLeft, FaEdit, FaGamepad, FaTrophy, FaStar, FaCamera, FaTimes, FaCheck, FaClock, FaPlay } from 'react-icons/fa';
 import { useRouter } from 'next/navigation';
 import Header from '@/components/Header';
 import { Button } from '@/components/ui/button';
@@ -20,6 +20,7 @@ import { uploadProfilePicture, removeProfilePicture } from '@/lib/supabase';
 import { cn } from '@/lib/utils';
 import toast from 'react-hot-toast';
 import logger from '@/utils/logger';
+import { getSession } from '@/utils/session';
 
 // Achievement icons mapping (matches backend achievementManager.js)
 const ACHIEVEMENT_ICONS = {
@@ -78,6 +79,15 @@ export default function ProfilePage() {
   const [editDisplayName, setEditDisplayName] = useState('');
   const [isUploading, setIsUploading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [activeGameSession, setActiveGameSession] = useState(null);
+
+  // Check for active game session on mount
+  useEffect(() => {
+    const session = getSession();
+    if (session && session.gameCode) {
+      setActiveGameSession(session);
+    }
+  }, []);
 
   // Handle profile picture upload
   const handleProfilePictureUpload = async (event) => {
@@ -607,26 +617,50 @@ export default function ProfilePage() {
           </motion.div>
         )}
 
-        {/* Back Button - Neo-Brutalist styled */}
+        {/* Back Buttons - Neo-Brutalist styled */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4 }}
-          className="mt-8 text-center"
+          className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3"
         >
+          {/* Back to Active Game - Only shown when in a game room */}
+          {activeGameSession && (
+            <Button
+              onClick={() => router.push(`/${language}`)}
+              className={cn(
+                'px-6 py-3 rounded-neo border-3 border-neo-black font-black uppercase tracking-wide transition-all',
+                'shadow-hard hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-hard-lg',
+                'active:translate-x-[2px] active:translate-y-[2px] active:shadow-none',
+                'bg-neo-lime text-neo-black hover:bg-neo-lime/90'
+              )}
+            >
+              <FaPlay className="mr-2" />
+              {t('profile.backToRoom') || 'Back to Room'} {activeGameSession.gameCode}
+            </Button>
+          )}
+
+          {/* Back to Lobby - Always shown, secondary when in game */}
           <Button
             onClick={() => router.push(`/${language}`)}
+            variant={activeGameSession ? 'outline' : 'default'}
             className={cn(
               'px-6 py-3 rounded-neo border-3 border-neo-black font-black uppercase tracking-wide transition-all',
               'shadow-hard hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-hard-lg',
               'active:translate-x-[2px] active:translate-y-[2px] active:shadow-none',
-              isDarkMode
-                ? 'bg-neo-cyan text-neo-black hover:bg-neo-cyan/90'
-                : 'bg-neo-purple text-neo-white hover:bg-neo-purple/90'
+              activeGameSession
+                ? isDarkMode
+                  ? 'bg-slate-700 text-gray-300 hover:bg-slate-600'
+                  : 'bg-white text-gray-700 hover:bg-gray-100'
+                : isDarkMode
+                  ? 'bg-neo-cyan text-neo-black hover:bg-neo-cyan/90'
+                  : 'bg-neo-purple text-neo-white hover:bg-neo-purple/90'
             )}
           >
             <FaArrowLeft className="mr-2" />
-            {t('profile.backToGame') || 'Back to Game'}
+            {activeGameSession
+              ? (t('profile.backToLobby') || 'Back to Lobby')
+              : (t('profile.backToGame') || 'Back to Game')}
           </Button>
         </motion.div>
       </div>

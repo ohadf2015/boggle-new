@@ -2,38 +2,54 @@
 
 const { getGame, getLeaderboard } = require('./gameStateManager');
 
-// Get flat combo bonus based on combo level
-// Combo gives a flat bonus equal to the combo level (capped at 8)
-// Combo 0-2: +0 bonus (no bonus for small combos)
-// Combo 3: +1 bonus
-// Combo 4: +2 bonus
-// Combo 5: +3 bonus
-// Combo 6: +4 bonus
-// Combo 7: +6 bonus
-// Combo 8+: +8 bonus (max)
-const getComboBonus = (comboLevel) => {
-  if (comboLevel <= 2) return 0; // No bonus for combos 0-2
-  if (comboLevel === 3) return 1;
-  if (comboLevel === 4) return 2;
-  if (comboLevel === 5) return 3;
-  if (comboLevel === 6) return 4;
-  if (comboLevel === 7) return 6;
-  return 8; // Max bonus at combo 8+
+// Get combo multiplier based on combo level
+// Higher combo levels give better multipliers
+// Combo 0-2: x1.0 (no bonus for small combos)
+// Combo 3-4: x1.25
+// Combo 5-6: x1.5
+// Combo 7-8: x1.75
+// Combo 9-10: x2.0
+// Combo 11+: x2.25 (max)
+const getComboMultiplier = (comboLevel) => {
+  if (comboLevel <= 2) return 1.0;
+  if (comboLevel <= 4) return 1.25;
+  if (comboLevel <= 6) return 1.5;
+  if (comboLevel <= 8) return 1.75;
+  if (comboLevel <= 10) return 2.0;
+  return 2.25; // Max multiplier at combo 11+
 };
 
-// Legacy function for backwards compatibility (now returns 1.0 always)
-const getComboMultiplier = (comboLevel) => {
-  return 1.0;
+// Get flat combo bonus based on combo level and word length
+// Combo bonus now scales with word length to reward longer words in combos
+// Formula: comboBonus = floor(comboLevel * wordLengthFactor)
+// wordLengthFactor: 3-4 letters = 0.5, 5-6 letters = 1.0, 7+ letters = 1.5
+const getComboBonus = (comboLevel, wordLength = 4) => {
+  if (comboLevel <= 2) return 0; // No bonus for combos 0-2
+
+  // Word length factor - longer words get better combo bonuses
+  let wordLengthFactor;
+  if (wordLength <= 4) {
+    wordLengthFactor = 0.5;  // Short words
+  } else if (wordLength <= 6) {
+    wordLengthFactor = 1.0;  // Medium words
+  } else {
+    wordLengthFactor = 1.5;  // Long words (7+)
+  }
+
+  // Base bonus scales with combo level
+  const baseBonus = Math.min(comboLevel - 2, 8); // Caps at 8 bonus points base
+
+  return Math.floor(baseBonus * wordLengthFactor);
 };
 
 // Calculate score based on word length - 1 point per letter beyond the first
 // This gives every letter value: 2 letters = 1 point, 3 letters = 2 points, 4 letters = 3 points, etc.
-// Combo bonus is applied as flat addition
+// Combo bonus is applied based on word length (longer words benefit more from combos)
 const calculateWordScore = (word, comboLevel = 0) => {
   const length = word.length;
   if (length === 1) return 0; // Single letters not allowed
   const baseScore = length - 1; // Each letter beyond the first gets 1 point
-  const bonus = getComboBonus(comboLevel);
+  const bonus = getComboBonus(comboLevel, length);
   return baseScore + bonus;
 };
 

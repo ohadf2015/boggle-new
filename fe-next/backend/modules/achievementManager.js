@@ -16,7 +16,7 @@ const ACHIEVEMENT_ICONS = {
   DIVERSE_VOCABULARY: '🌈',
   DOUBLE_TROUBLE: '⚡⚡',
   TREASURE_HUNTER: '💎',
-  // New achievements
+  // Existing achievements
   TRIPLE_THREAT: '🎰',
   UNSTOPPABLE: '🚀',
   COMEBACK_KID: '🔄',
@@ -27,6 +27,13 @@ const ACHIEVEMENT_ICONS = {
   STREAK_MASTER: '🔥',
   ANAGRAM_ARTIST: '🔀',
   LETTER_POPPER: '🎈',
+  // New elite achievements
+  WORD_ARCHITECT: '🏛️',      // Find 3 words of 7+ letters
+  SPEED_LEGEND: '🏎️',        // 25 words in 90 seconds
+  COMBO_GOD: '👑',            // Reach 20+ combo streak
+  VOCABULARY_TITAN: '🗿',     // 50+ valid words
+  PRECISION_MASTER: '🎯',     // 25+ words with 100% accuracy
+  LONG_WORD_CHAIN: '🔗',      // 3 consecutive words of 6+ letters
 };
 
 // Get localized achievements based on locale
@@ -99,51 +106,50 @@ const checkLiveAchievements = (game, username, word, timeSinceStart) => {
     newAchievements.push(localizedAchievements.TREASURE_HUNTER);
   }
 
-  // Quick Thinker - valid word within 5 seconds (LIVE) - HARDER
-  if (timeSinceStart <= 5 && isCurrentWordValid && !achievements.includes('QUICK_THINKER')) {
+  // Quick Thinker - valid word within 3 seconds (LIVE) - VERY HARD
+  if (timeSinceStart <= 3 && isCurrentWordValid && !achievements.includes('QUICK_THINKER')) {
     achievements.push('QUICK_THINKER');
     newAchievements.push(localizedAchievements.QUICK_THINKER);
   }
 
-  // Speed Demon - 15 valid words in 2 minutes (LIVE) - HARDER
-  if (validatedWordCount >= 15 && timeSinceStart <= 120 && !achievements.includes('SPEED_DEMON')) {
+  // Speed Demon - 20 valid words in 90 seconds (LIVE) - VERY HARD
+  if (validatedWordCount >= 20 && timeSinceStart <= 90 && !achievements.includes('SPEED_DEMON')) {
     achievements.push('SPEED_DEMON');
     newAchievements.push(localizedAchievements.SPEED_DEMON);
   }
 
-  // Combo King - multiples of 8 valid words (LIVE) - HARDER
-  if (validatedWordCount >= 8 &&
-      validatedWordCount % 8 === 0 &&
-      !achievements.includes('COMBO_KING')) {
+  // Combo King - reach combo level 10+ (LIVE) - VERY HARD (now based on actual combo, not word count)
+  const currentComboForKing = game.playerCombos?.[username] || 0;
+  if (currentComboForKing >= 10 && !achievements.includes('COMBO_KING')) {
     achievements.push('COMBO_KING');
     newAchievements.push(localizedAchievements.COMBO_KING);
   }
 
-  // Wordsmith - 20 valid words (LIVE) - HARDER
-  if (validatedWordCount >= 20 && !achievements.includes('WORDSMITH')) {
+  // Wordsmith - 25 valid words (LIVE) - HARDER
+  if (validatedWordCount >= 25 && !achievements.includes('WORDSMITH')) {
     achievements.push('WORDSMITH');
     newAchievements.push(localizedAchievements.WORDSMITH);
   }
 
-  // Lexicon - 28+ valid words (LIVE) - HARDER
-  if (validatedWordCount >= 28 && !achievements.includes('LEXICON')) {
+  // Lexicon - 35+ valid words (LIVE) - VERY HARD
+  if (validatedWordCount >= 35 && !achievements.includes('LEXICON')) {
     achievements.push('LEXICON');
     newAchievements.push(localizedAchievements.LEXICON);
   }
 
-  // Double Trouble - 2 valid words within 2 seconds (LIVE) - HARDER
+  // Double Trouble - 2 valid words within 1.5 seconds (LIVE) - VERY HARD
   if (validatedWordDetails.length >= 2 && !achievements.includes('DOUBLE_TROUBLE')) {
     const lastTwo = validatedWordDetails.slice(-2);
-    if (lastTwo[1].timeSinceStart - lastTwo[0].timeSinceStart <= 2) {
+    if (lastTwo[1].timeSinceStart - lastTwo[0].timeSinceStart <= 1.5) {
       achievements.push('DOUBLE_TROUBLE');
       newAchievements.push(localizedAchievements.DOUBLE_TROUBLE);
     }
   }
 
-  // Triple Threat - 3 valid words within 5 seconds (LIVE) - HARDER
+  // Triple Threat - 3 valid words within 4 seconds (LIVE) - VERY HARD
   if (validatedWordDetails.length >= 3 && !achievements.includes('TRIPLE_THREAT')) {
     const lastThree = validatedWordDetails.slice(-3);
-    if (lastThree[2].timeSinceStart - lastThree[0].timeSinceStart <= 5) {
+    if (lastThree[2].timeSinceStart - lastThree[0].timeSinceStart <= 4) {
       achievements.push('TRIPLE_THREAT');
       newAchievements.push(localizedAchievements.TRIPLE_THREAT);
     }
@@ -155,30 +161,28 @@ const checkLiveAchievements = (game, username, word, timeSinceStart) => {
     newAchievements.push(localizedAchievements.RARE_GEM);
   }
 
-  // Lightning Round - 8 valid words in first 30 seconds (LIVE) - HARDER
-  if (validatedWordCount >= 8 && timeSinceStart <= 30 && !achievements.includes('LIGHTNING_ROUND')) {
+  // Lightning Round - 10 valid words in first 30 seconds (LIVE) - VERY HARD
+  if (validatedWordCount >= 10 && timeSinceStart <= 30 && !achievements.includes('LIGHTNING_ROUND')) {
     achievements.push('LIGHTNING_ROUND');
     newAchievements.push(localizedAchievements.LIGHTNING_ROUND);
   }
 
-  // Unstoppable - 40+ valid words (LIVE) - HARDER
-  if (validatedWordCount >= 40 && !achievements.includes('UNSTOPPABLE')) {
+  // Unstoppable - 45+ valid words (LIVE) - VERY HARD
+  if (validatedWordCount >= 45 && !achievements.includes('UNSTOPPABLE')) {
     achievements.push('UNSTOPPABLE');
     newAchievements.push(localizedAchievements.UNSTOPPABLE);
   }
 
-  // Streak Master - 15+ combo streak (LIVE) - HARDER
-  // Check if player has a combo tracker and reached 15+
+  // Streak Master - 18+ combo streak (LIVE) - VERY HARD
   const currentCombo = game.playerCombos?.[username] || 0;
-  if (currentCombo >= 15 && !achievements.includes('STREAK_MASTER')) {
+  if (currentCombo >= 18 && !achievements.includes('STREAK_MASTER')) {
     achievements.push('STREAK_MASTER');
     newAchievements.push(localizedAchievements.STREAK_MASTER);
   }
 
-  // Comeback Kid - valid word in last 4 seconds (LIVE) - HARDER
-  // Note: gameDuration is in seconds, need to check if game duration exists
+  // Comeback Kid - valid word in last 3 seconds (LIVE) - VERY HARD
   const gameDuration = game.gameDuration || 180; // Default 3 minutes
-  if (timeSinceStart >= (gameDuration - 4) && isCurrentWordValid && !achievements.includes('COMEBACK_KID')) {
+  if (timeSinceStart >= (gameDuration - 3) && isCurrentWordValid && !achievements.includes('COMEBACK_KID')) {
     achievements.push('COMEBACK_KID');
     newAchievements.push(localizedAchievements.COMEBACK_KID);
   }
@@ -196,6 +200,42 @@ const checkLiveAchievements = (game, username, word, timeSinceStart) => {
         achievements.push('ANAGRAM_ARTIST');
         newAchievements.push(localizedAchievements.ANAGRAM_ARTIST);
       }
+    }
+  }
+
+  // NEW ELITE ACHIEVEMENTS
+
+  // Word Architect - 3 words of 7+ letters (LIVE) - ELITE
+  const longWords = validatedWordDetails.filter(w => w.word.length >= 7);
+  if (longWords.length >= 3 && !achievements.includes('WORD_ARCHITECT')) {
+    achievements.push('WORD_ARCHITECT');
+    newAchievements.push(localizedAchievements.WORD_ARCHITECT);
+  }
+
+  // Speed Legend - 25 words in 90 seconds (LIVE) - ELITE
+  if (validatedWordCount >= 25 && timeSinceStart <= 90 && !achievements.includes('SPEED_LEGEND')) {
+    achievements.push('SPEED_LEGEND');
+    newAchievements.push(localizedAchievements.SPEED_LEGEND);
+  }
+
+  // Combo God - 20+ combo streak (LIVE) - ELITE
+  if (currentCombo >= 20 && !achievements.includes('COMBO_GOD')) {
+    achievements.push('COMBO_GOD');
+    newAchievements.push(localizedAchievements.COMBO_GOD);
+  }
+
+  // Vocabulary Titan - 50+ valid words (LIVE) - ELITE
+  if (validatedWordCount >= 50 && !achievements.includes('VOCABULARY_TITAN')) {
+    achievements.push('VOCABULARY_TITAN');
+    newAchievements.push(localizedAchievements.VOCABULARY_TITAN);
+  }
+
+  // Long Word Chain - 3 consecutive words of 6+ letters (LIVE) - ELITE
+  if (validatedWordDetails.length >= 3 && !achievements.includes('LONG_WORD_CHAIN')) {
+    const lastThree = validatedWordDetails.slice(-3);
+    if (lastThree.every(w => w.word.length >= 6)) {
+      achievements.push('LONG_WORD_CHAIN');
+      newAchievements.push(localizedAchievements.LONG_WORD_CHAIN);
     }
   }
 
@@ -280,35 +320,32 @@ const awardFinalAchievements = (game, users) => {
       addAchievement('WORD_MASTER');
     }
 
-    // Speed Demon - 15 valid words in 2 minutes - HARDER
-    const wordsIn2Min = validWords.filter(w => w.timeSinceStart <= 120);
-    if (wordsIn2Min.length >= 15) {
+    // Speed Demon - 20 valid words in 90 seconds - VERY HARD
+    const wordsIn90Sec = validWords.filter(w => w.timeSinceStart <= 90);
+    if (wordsIn90Sec.length >= 20) {
       addAchievement('SPEED_DEMON');
     }
 
-    // Lexicon - 28+ valid words - HARDER
-    if (validWords.length >= 28) {
+    // Lexicon - 35+ valid words - VERY HARD
+    if (validWords.length >= 35) {
       addAchievement('LEXICON');
     }
 
-    // Combo King - 8+ valid words (multiples of 8) - HARDER
-    if (validWords.length >= 8 && validWords.length % 8 === 0) {
-      addAchievement('COMBO_KING');
-    }
+    // Combo King is now checked live (based on combo level, not word count)
 
-    // Perfectionist - all words valid
-    if (allWords.length > 0 && allWords.every(w => w.validated === true)) {
+    // Perfectionist - all words valid AND at least 15 words (not trivial) - HARDER
+    if (allWords.length >= 15 && allWords.every(w => w.validated === true)) {
       addAchievement('PERFECTIONIST');
     }
 
-    // Wordsmith - 20+ valid words - HARDER
-    if (validWords.length >= 20) {
+    // Wordsmith - 25+ valid words - HARDER
+    if (validWords.length >= 25) {
       addAchievement('WORDSMITH');
     }
 
-    // Diverse Vocabulary - found words of at least 4 different lengths
+    // Diverse Vocabulary - found words of at least 5 different lengths - HARDER
     const uniqueLengths = new Set(validWords.map(w => w.word.length));
-    if (uniqueLengths.size >= 4) {
+    if (uniqueLengths.size >= 5) {
       addAchievement('DIVERSE_VOCABULARY');
     }
 
@@ -317,42 +354,41 @@ const awardFinalAchievements = (game, users) => {
       addAchievement('TREASURE_HUNTER');
     }
 
-    // NEW ACHIEVEMENTS
+    // EXISTING ACHIEVEMENTS (HARDER)
 
     // Rare Gem - 9+ letter word (validated)
     if (validWords.some(w => w.word.length >= 9)) {
       addAchievement('RARE_GEM');
     }
 
-    // Explorer - found words of 5+ different lengths (validated)
-    if (uniqueLengths.size >= 5) {
+    // Explorer - found words of 6+ different lengths (validated) - HARDER
+    if (uniqueLengths.size >= 6) {
       addAchievement('EXPLORER');
     }
 
-    // Dictionary Diver - 32+ valid words - HARDER
-    if (validWords.length >= 32) {
+    // Dictionary Diver - 40+ valid words - VERY HARD
+    if (validWords.length >= 40) {
       addAchievement('DICTIONARY_DIVER');
     }
 
-    // Unstoppable - 40+ valid words - HARDER
-    if (validWords.length >= 40) {
+    // Unstoppable - 45+ valid words - VERY HARD
+    if (validWords.length >= 45) {
       addAchievement('UNSTOPPABLE');
     }
 
-    // Lightning Round - 8 valid words in first 30 seconds - HARDER
+    // Lightning Round - 10 valid words in first 30 seconds - VERY HARD
     const wordsIn30Sec = validWords.filter(w => w.timeSinceStart <= 30);
-    if (wordsIn30Sec.length >= 8) {
+    if (wordsIn30Sec.length >= 10) {
       addAchievement('LIGHTNING_ROUND');
     }
 
-    // Comeback Kid - found a valid word in the last 4 seconds - HARDER
+    // Comeback Kid - found a valid word in the last 3 seconds - VERY HARD
     const gameDuration = game.gameDuration || 180; // Default 3 minutes
-    if (validWords.some(w => w.timeSinceStart >= (gameDuration - 4))) {
+    if (validWords.some(w => w.timeSinceStart >= (gameDuration - 3))) {
       addAchievement('COMEBACK_KID');
     }
 
     // Anagram Artist - found consecutive anagram words (post-validation)
-    // Check all consecutive valid word pairs
     for (let i = 0; i < validWords.length - 1; i++) {
       const word1 = validWords[i].word.toLowerCase();
       const word2 = validWords[i + 1].word.toLowerCase();
@@ -366,7 +402,40 @@ const awardFinalAchievements = (game, users) => {
       }
     }
 
-    // Note: TRIPLE_THREAT and STREAK_MASTER are timing/combo based achievements
+    // NEW ELITE ACHIEVEMENTS (Final check)
+
+    // Word Architect - 3 words of 7+ letters
+    const longWords = validWords.filter(w => w.word.length >= 7);
+    if (longWords.length >= 3) {
+      addAchievement('WORD_ARCHITECT');
+    }
+
+    // Speed Legend - 25 words in 90 seconds - ELITE
+    if (wordsIn90Sec.length >= 25) {
+      addAchievement('SPEED_LEGEND');
+    }
+
+    // Vocabulary Titan - 50+ valid words - ELITE
+    if (validWords.length >= 50) {
+      addAchievement('VOCABULARY_TITAN');
+    }
+
+    // Precision Master - 25+ words with 100% accuracy - ELITE
+    if (allWords.length >= 25 && allWords.every(w => w.validated === true)) {
+      addAchievement('PRECISION_MASTER');
+    }
+
+    // Long Word Chain - check for 3 consecutive words of 6+ letters
+    for (let i = 0; i < validWords.length - 2; i++) {
+      if (validWords[i].word.length >= 6 &&
+          validWords[i + 1].word.length >= 6 &&
+          validWords[i + 2].word.length >= 6) {
+        addAchievement('LONG_WORD_CHAIN');
+        break;
+      }
+    }
+
+    // Note: COMBO_KING, COMBO_GOD, STREAK_MASTER are combo-based achievements
     // that are primarily awarded during live gameplay
   });
 };

@@ -277,12 +277,13 @@ const usePlayerSocketEvents = ({
         score: data.score || (data.word.length - 1),
         comboBonus: data.comboBonus || 0,
         comboLevel: data.comboLevel || 0,
+        comboBonusLabel: t('common.comboBonus'),
         duration: 2000
       });
     };
 
     const handleWordNeedsValidation = (data: any) => {
-      wordNeedsValidationToast(data.word, { duration: 3000 });
+      wordNeedsValidationToast(data.word, { pendingLabel: t('common.pending'), duration: 3000 });
       // Word stays in list with isValid: null (pending validation)
       // No need to update state since it's already null
       resetCombo();
@@ -618,7 +619,7 @@ const usePlayerSocketEvents = ({
       logger.log('[PLAYER] XP gained:', data);
       setXpGainedData(data);
       // Show a brief toast notification
-      neoSuccessToast(`+${data.xpEarned} XP`, {
+      neoSuccessToast(`+${data.xpEarned} ${t('common.xpGained')}`, {
         icon: '⭐',
         duration: 3000
       });

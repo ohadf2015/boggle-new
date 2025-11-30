@@ -114,14 +114,39 @@ export function validateWordLocally(
 }
 
 /**
+ * Get combo bonus based on combo level and word length
+ * Combo bonus scales with word length to reward longer words in combos
+ * Formula: comboBonus = floor(baseBonus * wordLengthFactor)
+ * wordLengthFactor: 3-4 letters = 0.5, 5-6 letters = 1.0, 7+ letters = 1.5
+ */
+function getComboBonus(comboLevel: number, wordLength: number): number {
+  if (comboLevel <= 2) return 0; // No bonus for combos 0-2
+
+  // Word length factor - longer words get better combo bonuses
+  let wordLengthFactor: number;
+  if (wordLength <= 4) {
+    wordLengthFactor = 0.5;  // Short words
+  } else if (wordLength <= 6) {
+    wordLengthFactor = 1.0;  // Medium words
+  } else {
+    wordLengthFactor = 1.5;  // Long words (7+)
+  }
+
+  // Base bonus scales with combo level (caps at 8)
+  const baseBonus = Math.min(comboLevel - 2, 8);
+
+  return Math.floor(baseBonus * wordLengthFactor);
+}
+
+/**
  * Calculate predicted score for a word (matches backend scoring)
  */
 export function calculatePredictedScore(word: string, comboLevel: number = 0): { baseScore: number; comboBonus: number; totalScore: number } {
   // Base score: word length - 1 (minimum 1)
   const baseScore = Math.max(word.length - 1, 1);
 
-  // Combo bonus: comboLevel * 1 (each combo adds 1 point)
-  const comboBonus = comboLevel > 0 ? comboLevel : 0;
+  // Combo bonus: scales with word length (longer words benefit more)
+  const comboBonus = getComboBonus(comboLevel, word.length);
 
   const totalScore = baseScore + comboBonus;
 

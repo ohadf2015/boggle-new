@@ -352,19 +352,21 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
 
               {/* Authenticated user - simplified view */}
               {isAuthenticated && displayName ? (
-                <div className="space-y-3 sm:space-y-6">
-                  <div className="text-center py-4">
-                    <p className="text-neo-cream/70 mb-2 font-bold uppercase text-sm">
+                <div className="space-y-4 sm:space-y-6">
+                  {/* Display name input section */}
+                  <div className="space-y-3">
+                    <Label htmlFor="auth-display-name" className="text-base font-black uppercase text-neo-cream">
                       {t('joinView.joiningAs') || 'Joining as'}
-                    </p>
+                    </Label>
                     <Input
+                      id="auth-display-name"
                       value={username || displayName}
                       onChange={(e) => setUsername(sanitizeInput(e.target.value, 20))}
-                      className="h-14 text-xl text-center font-black text-neo-cyan uppercase tracking-tight bg-neo-navy border-3 border-neo-cyan/50 rounded-neo shadow-hard-sm placeholder:text-neo-cyan/50 focus:border-neo-cyan focus:ring-0"
+                      className="w-full h-16 sm:h-14 text-xl sm:text-lg text-center font-black text-neo-cyan uppercase tracking-tight bg-neo-navy border-3 border-neo-cyan/50 rounded-neo shadow-hard-sm placeholder:text-neo-cyan/50 focus:border-neo-cyan focus:ring-0"
                       placeholder={displayName}
                       maxLength={20}
                     />
-                    <p className="text-neo-cream/50 text-xs mt-2 font-bold uppercase">
+                    <p className="text-neo-cream/50 text-xs font-bold uppercase text-center">
                       {t('joinView.tapToChangeDisplayName') || 'Tap to change display name'}
                     </p>
                   </div>
@@ -374,7 +376,7 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
                     <Button
                       onClick={handleJoinGuest}
                       disabled={isJoining}
-                      className="w-full h-14 text-xl font-black uppercase bg-neo-lime text-neo-black border-3 border-neo-black rounded-neo shadow-hard hover:shadow-hard-lg hover:bg-neo-lime/90 transition-all disabled:opacity-70"
+                      className="w-full h-16 sm:h-14 text-xl font-black uppercase bg-neo-lime text-neo-black border-3 border-neo-black rounded-neo shadow-hard hover:shadow-hard-lg hover:bg-neo-lime/90 transition-all disabled:opacity-70"
                     >
                       {isJoining ? (
                         <>

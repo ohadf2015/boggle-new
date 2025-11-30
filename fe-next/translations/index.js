@@ -63,6 +63,9 @@ export const translations = {
       darkMode: 'Dark Mode',
       hurry: 'HURRY!',
       goToHome: 'Go to Home',
+      comboBonus: 'combo!',
+      pending: 'Pending',
+      xpGained: 'XP',
     },
     music: {
       volume: 'Volume',
@@ -236,6 +239,8 @@ export const translations = {
       tournamentProgress: 'Tournament Progress',
       tournamentCreated: 'Tournament created!',
       tournamentCancelled: 'Tournament cancelled',
+      gameComplete: 'Game complete!',
+      wonTournament: 'won the tournament',
       tournamentCreateFailed: 'Failed to create tournament. Please try again.',
       autoValidationCompleted: 'Auto-validation completed',
       cancelTournament: 'Cancel Tournament',
@@ -353,6 +358,8 @@ export const translations = {
       autoVerified: 'Auto-Verified',
       showHeatmap: 'Show Heatmap',
       hideHeatmap: 'Hide Heatmap',
+      startNewGame: 'Start New Game',
+      levelUp: 'Level Up!',
     },
     playerTitles: {
       champion: { name: 'Champion', icon: '👑', description: 'Winner of the game' },
@@ -426,7 +433,7 @@ export const translations = {
       },
       SPEED_DEMON: {
         name: 'Speed Demon',
-        description: 'Found 10 words in 2 minutes'
+        description: 'Found 20 words in 90 seconds'
       },
       WORD_MASTER: {
         name: 'Word Master',
@@ -434,23 +441,23 @@ export const translations = {
       },
       COMBO_KING: {
         name: 'Combo King',
-        description: '5 words in a row'
+        description: 'Reached a 10+ combo streak'
       },
       PERFECTIONIST: {
         name: 'Perfectionist',
-        description: 'All words are valid'
+        description: '15+ words, all valid'
       },
       LEXICON: {
         name: 'Lexicon',
-        description: 'Found 20+ words'
+        description: 'Found 35+ words'
       },
       WORDSMITH: {
         name: 'Wordsmith',
-        description: 'Found 15 valid words'
+        description: 'Found 25 valid words'
       },
       QUICK_THINKER: {
         name: 'Quick Thinker',
-        description: 'Found a word within 10 seconds'
+        description: 'Found a word within 3 seconds'
       },
       LONG_HAULER: {
         name: 'Marathon Runner',
@@ -458,11 +465,11 @@ export const translations = {
       },
       DIVERSE_VOCABULARY: {
         name: 'Diverse Vocabulary',
-        description: 'Found words of different lengths'
+        description: 'Found words of 5+ different lengths'
       },
       DOUBLE_TROUBLE: {
         name: 'Winning Duo',
-        description: 'Found 2 words within 5 seconds'
+        description: 'Found 2 words within 1.5 seconds'
       },
       TREASURE_HUNTER: {
         name: 'Treasure Hunter',
@@ -470,23 +477,23 @@ export const translations = {
       },
       TRIPLE_THREAT: {
         name: 'Triple Threat',
-        description: 'Found 3 words within 8 seconds'
+        description: 'Found 3 words within 4 seconds'
       },
       UNSTOPPABLE: {
         name: 'Unstoppable',
-        description: 'Found 30+ words'
+        description: 'Found 45+ words'
       },
       COMEBACK_KID: {
         name: 'Comeback Kid',
-        description: 'Found a word in the last 4 seconds'
+        description: 'Found a word in the last 3 seconds'
       },
       DICTIONARY_DIVER: {
         name: 'Dictionary Diver',
-        description: 'Found 25+ valid words'
+        description: 'Found 40+ valid words'
       },
       LIGHTNING_ROUND: {
         name: 'Lightning Round',
-        description: 'Found 5 words in the first 30 seconds'
+        description: 'Found 10 words in the first 30 seconds'
       },
       RARE_GEM: {
         name: 'Rare Gem',
@@ -494,11 +501,11 @@ export const translations = {
       },
       EXPLORER: {
         name: 'Explorer',
-        description: 'Found words of 5+ different lengths'
+        description: 'Found words of 6+ different lengths'
       },
       STREAK_MASTER: {
         name: 'Streak Master',
-        description: 'Reached a 10+ combo streak'
+        description: 'Reached an 18+ combo streak'
       },
       ANAGRAM_ARTIST: {
         name: 'Anagram Artist',
@@ -507,6 +514,30 @@ export const translations = {
       LETTER_POPPER: {
         name: 'Balloon Popper',
         description: 'Popped 10+ letters in the main menu'
+      },
+      WORD_ARCHITECT: {
+        name: 'Word Architect',
+        description: 'Found 3 words with 7+ letters'
+      },
+      SPEED_LEGEND: {
+        name: 'Speed Legend',
+        description: 'Found 25 words in 90 seconds'
+      },
+      COMBO_GOD: {
+        name: 'Combo God',
+        description: 'Reached a 20+ combo streak'
+      },
+      VOCABULARY_TITAN: {
+        name: 'Vocabulary Titan',
+        description: 'Found 50+ valid words'
+      },
+      PRECISION_MASTER: {
+        name: 'Precision Master',
+        description: '25+ words with 100% accuracy'
+      },
+      LONG_WORD_CHAIN: {
+        name: 'Long Word Chain',
+        description: '3 consecutive words of 6+ letters'
       }
     },
     achievementTiers: {
@@ -818,7 +849,9 @@ export const translations = {
       editName: 'Edit Name',
       chooseEmoji: 'Change Emoji',
       chooseColor: 'Choose Color',
-      backToGame: 'Back to Game'
+      backToGame: 'Back to Game',
+      backToRoom: 'Back to Room',
+      backToLobby: 'Back to Lobby'
     },
     leaderboard: {
       title: 'Leaderboard',
@@ -973,6 +1006,9 @@ export const translations = {
       darkMode: 'מצב כהה',
       hurry: 'מהרו!',
       goToHome: 'חזרה לדף הבית',
+      comboBonus: 'קומבו!',
+      pending: 'ממתין',
+      xpGained: 'XP',
     },
     music: {
       volume: 'עוצמה',
@@ -1146,6 +1182,8 @@ export const translations = {
       tournamentProgress: 'התקדמות בטורניר',
       tournamentCreated: 'הטורניר נוצר!',
       tournamentCancelled: 'הטורניר בוטל',
+      gameComplete: 'המשחק הסתיים!',
+      wonTournament: 'ניצח בטורניר',
       tournamentCreateFailed: 'יצירת הטורניר נכשלה. אנא נסה שוב.',
       autoValidationCompleted: 'האימות האוטומטי הושלם',
       cancelTournament: 'בטל טורניר',
@@ -1263,6 +1301,8 @@ export const translations = {
       autoVerified: 'אומת אוטומטית',
       showHeatmap: 'הצג מפת חום',
       hideHeatmap: 'הסתר מפת חום',
+      startNewGame: 'התחל משחק חדש',
+      levelUp: 'עליית רמה!',
     },
     playerTitles: {
       champion: { name: 'אלוף', icon: '👑', description: 'מנצח המשחק' },
@@ -1336,7 +1376,7 @@ export const translations = {
       },
       SPEED_DEMON: {
         name: 'שד המהירות',
-        description: 'מצא 10 מילים ב-2 דקות'
+        description: 'מצא 20 מילים ב-90 שניות'
       },
       WORD_MASTER: {
         name: 'אדון המילים',
@@ -1344,23 +1384,23 @@ export const translations = {
       },
       COMBO_KING: {
         name: 'מלך הקומבו',
-        description: '5 מילים ברצף'
+        description: 'הגיע לרצף של 10+ קומבו'
       },
       PERFECTIONIST: {
         name: 'פרפקציוניסט',
-        description: 'כל המילים תקינות'
+        description: '15+ מילים, כולן תקינות'
       },
       LEXICON: {
         name: 'לקסיקון',
-        description: 'מצא 20+ מילים'
+        description: 'מצא 35+ מילים'
       },
       WORDSMITH: {
         name: 'צורף מילים',
-        description: 'מצא 15 מילים תקינות'
+        description: 'מצא 25 מילים תקינות'
       },
       QUICK_THINKER: {
         name: 'חושב מהיר',
-        description: 'מצא מילה בתוך 10 שניות'
+        description: 'מצא מילה בתוך 3 שניות'
       },
       LONG_HAULER: {
         name: 'מרתונאי',
@@ -1368,11 +1408,11 @@ export const translations = {
       },
       DIVERSE_VOCABULARY: {
         name: 'אוצר מילים מגוון',
-        description: 'מצא מילים באורכים שונים'
+        description: 'מצא מילים ב-5+ אורכים שונים'
       },
       DOUBLE_TROUBLE: {
         name: 'צמד מנצח',
-        description: 'מצא 2 מילים בתוך 5 שניות'
+        description: 'מצא 2 מילים בתוך 1.5 שניות'
       },
       TREASURE_HUNTER: {
         name: 'צייד אוצרות',
@@ -1380,23 +1420,23 @@ export const translations = {
       },
       TRIPLE_THREAT: {
         name: 'שלישייה מנצחת',
-        description: 'מצא 3 מילים בתוך 8 שניות'
+        description: 'מצא 3 מילים בתוך 4 שניות'
       },
       UNSTOPPABLE: {
         name: 'בלתי ניתן לעצירה',
-        description: 'מצא 30+ מילים'
+        description: 'מצא 45+ מילים'
       },
       COMEBACK_KID: {
         name: 'חזרה מהשטח',
-        description: 'מצא מילה ב-4 השניות האחרונות'
+        description: 'מצא מילה ב-3 השניות האחרונות'
       },
       DICTIONARY_DIVER: {
         name: 'צוללן המילון',
-        description: 'מצא 25+ מילים תקינות'
+        description: 'מצא 40+ מילים תקינות'
       },
       LIGHTNING_ROUND: {
         name: 'סיבוב ברקים',
-        description: 'מצא 5 מילים ב-30 השניות הראשונות'
+        description: 'מצא 10 מילים ב-30 השניות הראשונות'
       },
       RARE_GEM: {
         name: 'יהלום נדיר',
@@ -1404,11 +1444,11 @@ export const translations = {
       },
       EXPLORER: {
         name: 'חוקר',
-        description: 'מצא מילים ב-5+ אורכים שונים'
+        description: 'מצא מילים ב-6+ אורכים שונים'
       },
       STREAK_MASTER: {
         name: 'אלוף הרצף',
-        description: 'הגיע לרצף של 10+ קומבו'
+        description: 'הגיע לרצף של 18+ קומבו'
       },
       ANAGRAM_ARTIST: {
         name: 'אמן האנגרמות',
@@ -1417,6 +1457,30 @@ export const translations = {
       LETTER_POPPER: {
         name: 'מפוצץ בלונים',
         description: 'פוצץ 10+ אותיות בתפריט הראשי'
+      },
+      WORD_ARCHITECT: {
+        name: 'אדריכל מילים',
+        description: 'מצא 3 מילים בנות 7+ אותיות'
+      },
+      SPEED_LEGEND: {
+        name: 'אגדת מהירות',
+        description: 'מצא 25 מילים ב-90 שניות'
+      },
+      COMBO_GOD: {
+        name: 'אל הקומבו',
+        description: 'הגיע לרצף של 20+ קומבו'
+      },
+      VOCABULARY_TITAN: {
+        name: 'טיטאן המילים',
+        description: 'מצא 50+ מילים תקינות'
+      },
+      PRECISION_MASTER: {
+        name: 'אלוף הדיוק',
+        description: '25+ מילים עם 100% דיוק'
+      },
+      LONG_WORD_CHAIN: {
+        name: 'שרשרת מילים ארוכות',
+        description: '3 מילים רצופות בנות 6+ אותיות'
       }
     },
     achievementTiers: {
@@ -1727,7 +1791,9 @@ export const translations = {
       editName: 'ערוך שם',
       chooseEmoji: 'בחר אימוג\'י',
       chooseColor: 'בחר צבע',
-      backToGame: 'חזרה למשחק'
+      backToGame: 'חזרה למשחק',
+      backToRoom: 'חזרה לחדר',
+      backToLobby: 'חזרה ללובי'
     },
     leaderboard: {
       title: 'טבלת מובילים',
@@ -1882,6 +1948,9 @@ export const translations = {
       darkMode: 'Mörkt läge',
       hurry: 'SKYNDA!',
       goToHome: 'Gå till startsidan',
+      comboBonus: 'kombo!',
+      pending: 'Väntar',
+      xpGained: 'XP',
     },
     music: {
       volume: 'Volym',
@@ -2055,6 +2124,8 @@ export const translations = {
       tournamentProgress: 'Turneringsframsteg',
       tournamentCreated: 'Turnering skapad!',
       tournamentCancelled: 'Turnering avbruten',
+      gameComplete: 'Spelet avslutat!',
+      wonTournament: 'vann turneringen',
       tournamentCreateFailed: 'Misslyckades med att skapa turnering. Försök igen.',
       autoValidationCompleted: 'Automatisk validering slutförd',
       cancelTournament: 'Avbryt turnering',
@@ -2172,6 +2243,8 @@ export const translations = {
       autoVerified: 'Automatiskt Verifierad',
       showHeatmap: 'Visa värmekarta',
       hideHeatmap: 'Dölj värmekarta',
+      startNewGame: 'Starta nytt spel',
+      levelUp: 'Nivå upp!',
     },
     playerTitles: {
       champion: { name: 'Mästare', icon: '👑', description: 'Spelets vinnare' },
@@ -2245,7 +2318,7 @@ export const translations = {
       },
       SPEED_DEMON: {
         name: 'Hastighetsdemon',
-        description: 'Hittade 10 ord på 2 minuter'
+        description: 'Hittade 20 ord på 90 sekunder'
       },
       WORD_MASTER: {
         name: 'Ordmästare',
@@ -2253,23 +2326,23 @@ export const translations = {
       },
       COMBO_KING: {
         name: 'Kombokung',
-        description: '5 ord i rad'
+        description: 'Nådde 10+ komboserie'
       },
       PERFECTIONIST: {
         name: 'Perfektionist',
-        description: 'Alla ord är giltiga'
+        description: '15+ ord, alla giltiga'
       },
       LEXICON: {
         name: 'Lexikon',
-        description: 'Hittade 20+ ord'
+        description: 'Hittade 35+ ord'
       },
       WORDSMITH: {
         name: 'Ordsmed',
-        description: 'Hittade 15 giltiga ord'
+        description: 'Hittade 25 giltiga ord'
       },
       QUICK_THINKER: {
         name: 'Snabbtänkare',
-        description: 'Hittade ett ord inom 10 sekunder'
+        description: 'Hittade ett ord inom 3 sekunder'
       },
       LONG_HAULER: {
         name: 'Maratonlöpare',
@@ -2277,11 +2350,11 @@ export const translations = {
       },
       DIVERSE_VOCABULARY: {
         name: 'Varierat Ordförråd',
-        description: 'Hittade ord av olika längder'
+        description: 'Hittade ord av 5+ olika längder'
       },
       DOUBLE_TROUBLE: {
         name: 'Vinnande Duo',
-        description: 'Hittade 2 ord inom 5 sekunder'
+        description: 'Hittade 2 ord inom 1,5 sekunder'
       },
       TREASURE_HUNTER: {
         name: 'Skattjägare',
@@ -2289,23 +2362,23 @@ export const translations = {
       },
       TRIPLE_THREAT: {
         name: 'Trippelhot',
-        description: 'Hittade 3 ord inom 8 sekunder'
+        description: 'Hittade 3 ord inom 4 sekunder'
       },
       UNSTOPPABLE: {
         name: 'Ostoppbar',
-        description: 'Hittade 30+ ord'
+        description: 'Hittade 45+ ord'
       },
       COMEBACK_KID: {
         name: 'Comeback-kungen',
-        description: 'Hittade ett ord under de sista 4 sekunderna'
+        description: 'Hittade ett ord under de sista 3 sekunderna'
       },
       DICTIONARY_DIVER: {
         name: 'Ordboksdykare',
-        description: 'Hittade 25+ giltiga ord'
+        description: 'Hittade 40+ giltiga ord'
       },
       LIGHTNING_ROUND: {
         name: 'Blixtomgång',
-        description: 'Hittade 5 ord i första 30 sekunderna'
+        description: 'Hittade 10 ord i första 30 sekunderna'
       },
       RARE_GEM: {
         name: 'Sällsynt Juvel',
@@ -2313,11 +2386,11 @@ export const translations = {
       },
       EXPLORER: {
         name: 'Utforskare',
-        description: 'Hittade ord av 5+ olika längder'
+        description: 'Hittade ord av 6+ olika längder'
       },
       STREAK_MASTER: {
         name: 'Seriemästare',
-        description: 'Nådde 10+ komboserie'
+        description: 'Nådde 18+ komboserie'
       },
       ANAGRAM_ARTIST: {
         name: 'Anagramkonstnär',
@@ -2326,6 +2399,30 @@ export const translations = {
       LETTER_POPPER: {
         name: 'Ballongsprängare',
         description: 'Sprängde 10+ bokstäver i huvudmenyn'
+      },
+      WORD_ARCHITECT: {
+        name: 'Ordarkitekt',
+        description: 'Hittade 3 ord med 7+ bokstäver'
+      },
+      SPEED_LEGEND: {
+        name: 'Hastighetslegend',
+        description: 'Hittade 25 ord på 90 sekunder'
+      },
+      COMBO_GOD: {
+        name: 'Kombogud',
+        description: 'Nådde 20+ komboserie'
+      },
+      VOCABULARY_TITAN: {
+        name: 'Ordförrådstitanen',
+        description: 'Hittade 50+ giltiga ord'
+      },
+      PRECISION_MASTER: {
+        name: 'Precisionsmästare',
+        description: '25+ ord med 100% träffsäkerhet'
+      },
+      LONG_WORD_CHAIN: {
+        name: 'Lång Ordkedja',
+        description: '3 konsekutiva ord med 6+ bokstäver'
       }
     },
     achievementTiers: {
@@ -2511,7 +2608,10 @@ export const translations = {
       saveError: 'Kunde inte spara',
       editName: 'Redigera namn',
       chooseEmoji: 'Välj emoji',
-      chooseColor: 'Välj färg'
+      chooseColor: 'Välj färg',
+      backToGame: 'Tillbaka till spelet',
+      backToRoom: 'Tillbaka till rummet',
+      backToLobby: 'Tillbaka till lobbyn'
     },
     leaderboard: {
       title: 'Topplista',
@@ -2788,6 +2888,9 @@ export const translations = {
       darkMode: 'ダークモード',
       hurry: '急いで!',
       goToHome: 'ホームへ戻る',
+      comboBonus: 'コンボ！',
+      pending: '保留中',
+      xpGained: 'XP',
     },
     music: {
       volume: '音量',
@@ -2961,6 +3064,8 @@ export const translations = {
       tournamentProgress: 'トーナメント進行状況',
       tournamentCreated: 'トーナメントが作成されました！',
       tournamentCancelled: 'トーナメントがキャンセルされました',
+      gameComplete: 'ゲーム完了！',
+      wonTournament: 'がトーナメントに優勝しました',
       tournamentCreateFailed: 'トーナメントの作成に失敗しました。もう一度お試しください。',
       autoValidationCompleted: '自動検証が完了しました',
       cancelTournament: 'トーナメントをキャンセル',
@@ -3078,6 +3183,8 @@ export const translations = {
       autoVerified: '自動検証済み',
       showHeatmap: 'ヒートマップを表示',
       hideHeatmap: 'ヒートマップを非表示',
+      startNewGame: '新しいゲームを開始',
+      levelUp: 'レベルアップ!',
     },
     playerTitles: {
       champion: { name: 'チャンピオン', icon: '👑', description: 'ゲームの勝者' },
@@ -3151,7 +3258,7 @@ export const translations = {
       },
       SPEED_DEMON: {
         name: 'スピードデーモン',
-        description: '2分で10の単語を見つけた'
+        description: '90秒で20の単語を見つけた'
       },
       WORD_MASTER: {
         name: 'ワードマスター',
@@ -3159,23 +3266,23 @@ export const translations = {
       },
       COMBO_KING: {
         name: 'コンボキング',
-        description: '連続で5つの単語'
+        description: '10以上のコンボストリークに到達'
       },
       PERFECTIONIST: {
         name: '完璧主義者',
-        description: 'すべての単語が有効'
+        description: '15以上の単語、すべて有効'
       },
       LEXICON: {
         name: 'レキシコン',
-        description: '20以上の単語を見つけた'
+        description: '35以上の単語を見つけた'
       },
       WORDSMITH: {
         name: 'ワードスミス',
-        description: '15の有効な単語を見つけた'
+        description: '25の有効な単語を見つけた'
       },
       QUICK_THINKER: {
         name: 'クイックシンカー',
-        description: '10秒以内に単語を見つけた'
+        description: '3秒以内に単語を見つけた'
       },
       LONG_HAULER: {
         name: 'マラソンランナー',
@@ -3183,11 +3290,11 @@ export const translations = {
       },
       DIVERSE_VOCABULARY: {
         name: '多様なボキャブラリー',
-        description: '異なる長さの単語を見つけた'
+        description: '5種類以上の長さの単語を見つけた'
       },
       DOUBLE_TROUBLE: {
         name: 'ウィニングデュオ',
-        description: '5秒以内に2つの単語を見つけた'
+        description: '1.5秒以内に2つの単語を見つけた'
       },
       TREASURE_HUNTER: {
         name: 'トレジャーハンター',
@@ -3195,23 +3302,23 @@ export const translations = {
       },
       TRIPLE_THREAT: {
         name: 'トリプルスレット',
-        description: '8秒以内に3つの単語を見つけた'
+        description: '4秒以内に3つの単語を見つけた'
       },
       UNSTOPPABLE: {
         name: 'アンストッパブル',
-        description: '30以上の単語を見つけた'
+        description: '45以上の単語を見つけた'
       },
       COMEBACK_KID: {
         name: 'カムバックキッド',
-        description: '最後の4秒で単語を見つけた'
+        description: '最後の3秒で単語を見つけた'
       },
       DICTIONARY_DIVER: {
         name: 'ディクショナリーダイバー',
-        description: '25以上の有効な単語を見つけた'
+        description: '40以上の有効な単語を見つけた'
       },
       LIGHTNING_ROUND: {
         name: 'ライトニングラウンド',
-        description: '最初の30秒で5つの単語を見つけた'
+        description: '最初の30秒で10の単語を見つけた'
       },
       RARE_GEM: {
         name: 'レアジェム',
@@ -3219,11 +3326,11 @@ export const translations = {
       },
       EXPLORER: {
         name: 'エクスプローラー',
-        description: '5種類以上の長さの単語を見つけた'
+        description: '6種類以上の長さの単語を見つけた'
       },
       STREAK_MASTER: {
         name: 'ストリークマスター',
-        description: '10以上のコンボストリークに到達'
+        description: '18以上のコンボストリークに到達'
       },
       ANAGRAM_ARTIST: {
         name: 'アナグラムアーティスト',
@@ -3232,6 +3339,30 @@ export const translations = {
       LETTER_POPPER: {
         name: 'バルーンポッパー',
         description: 'メインメニューで10以上の文字をポップした'
+      },
+      WORD_ARCHITECT: {
+        name: 'ワードアーキテクト',
+        description: '7文字以上の単語を3つ見つけた'
+      },
+      SPEED_LEGEND: {
+        name: 'スピードレジェンド',
+        description: '90秒で25の単語を見つけた'
+      },
+      COMBO_GOD: {
+        name: 'コンボゴッド',
+        description: '20以上のコンボストリークに到達'
+      },
+      VOCABULARY_TITAN: {
+        name: 'ボキャブラリータイタン',
+        description: '50以上の有効な単語を見つけた'
+      },
+      PRECISION_MASTER: {
+        name: 'プレシジョンマスター',
+        description: '25以上の単語で100%の精度'
+      },
+      LONG_WORD_CHAIN: {
+        name: 'ロングワードチェーン',
+        description: '6文字以上の単語を3つ連続で'
       }
     },
     achievementTiers: {
@@ -3417,7 +3548,10 @@ export const translations = {
       saveError: '保存に失敗しました',
       editName: '名前を編集',
       chooseEmoji: '絵文字を選択',
-      chooseColor: '色を選択'
+      chooseColor: '色を選択',
+      backToGame: 'ゲームに戻る',
+      backToRoom: 'ルームに戻る',
+      backToLobby: 'ロビーに戻る'
     },
     leaderboard: {
       title: 'リーダーボード',
