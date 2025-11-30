@@ -37,28 +37,29 @@ const DialogContent = React.forwardRef(({ className, children, ...props }, ref) 
     <DialogPrimitive.Content
       ref={ref}
       className={cn(
-        // Mobile-first positioning - full screen on mobile, centered modal on desktop
-        "fixed z-50 grid w-full",
-        // Mobile: full screen with safe area insets
-        "inset-0 sm:inset-auto",
-        "sm:left-[50%] sm:top-[50%] sm:translate-x-[-50%] sm:translate-y-[-50%]",
-        "sm:max-w-lg sm:max-h-[90vh]",
+        // Mobile-first positioning - constrained on mobile, centered modal on desktop
+        "fixed z-50 grid w-[calc(100%-1rem)] max-w-[95vw]",
+        // Positioning
+        "left-[50%] top-[50%] translate-x-[-50%] translate-y-[-50%]",
+        "sm:max-w-lg",
+        // Height constraints - prevent overflow
+        "max-h-[90vh] sm:max-h-[85vh]",
         // Neo-Brutalist styling
         "bg-neo-cream text-neo-black",
-        "border-0 sm:border-4 border-neo-black",
-        "rounded-none sm:rounded-neo-lg",
-        "shadow-none sm:shadow-hard-xl",
+        "border-3 sm:border-4 border-neo-black",
+        "rounded-neo sm:rounded-neo-lg",
+        "shadow-hard sm:shadow-hard-xl",
         // Spacing
         "p-0 gap-0",
-        // Overflow for mobile scrolling
-        "overflow-y-auto",
+        // Overflow for scrolling
+        "overflow-y-auto overflow-x-hidden",
         // Animations
         "duration-200",
         "data-[state=open]:animate-in data-[state=closed]:animate-out",
         "data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
-        "sm:data-[state=closed]:zoom-out-95 sm:data-[state=open]:zoom-in-95",
-        "data-[state=closed]:slide-out-to-bottom sm:data-[state=closed]:slide-out-to-left-1/2 sm:data-[state=closed]:slide-out-to-top-[48%]",
-        "data-[state=open]:slide-in-from-bottom sm:data-[state=open]:slide-in-from-left-1/2 sm:data-[state=open]:slide-in-from-top-[48%]",
+        "data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95",
+        "data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%]",
+        "data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%]",
         className
       )}
       style={{
