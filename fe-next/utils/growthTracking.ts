@@ -314,7 +314,7 @@ export const getShareUrlWithTracking = (gameCode: string, referralCode?: string)
   return `${baseUrl}?${params.toString()}`;
 };
 
-export default {
+const growthTracking = {
   trackGrowthEvent,
   trackShare,
   trackAchievement,
@@ -326,3 +326,5 @@ export default {
   getShareUrlWithTracking,
   getReferralSource,
 };
+
+export default growthTracking;

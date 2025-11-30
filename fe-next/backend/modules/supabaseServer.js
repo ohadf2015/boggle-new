@@ -5,14 +5,15 @@
 
 const { createClient } = require('@supabase/supabase-js');
 const { calculateGameXp, getLevelFromXp, checkLevelUp, getTitleForLevel } = require('./xpManager');
+const logger = require('../utils/logger');
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
 // Log configuration status at startup
-console.log(`[SUPABASE] Configuration status: URL=${!!supabaseUrl}, AnonKey=${!!supabaseAnonKey}`);
+logger.info('SUPABASE', `Configuration status: URL=${!!supabaseUrl}, AnonKey=${!!supabaseAnonKey}`);
 if (!supabaseUrl || !supabaseAnonKey) {
-  console.warn('[SUPABASE] WARNING: Supabase not fully configured. Stats will not be saved to database.');
+  logger.warn('SUPABASE', 'Supabase not fully configured. Stats will not be saved to database.');
 }
 
 let supabase = null;
@@ -65,12 +66,12 @@ async function recordGameResult(result) {
       .single();
 
     if (error) {
-      console.error(`[SUPABASE] Failed to record game result for ${result.playerId}:`, error.message);
+      logger.error('SUPABASE', `Failed to record game result for ${result.playerId}`, error.message);
     }
 
     return { data, error };
   } catch (err) {
-    console.error(`[SUPABASE] Unexpected error recording game result:`, err);
+    logger.error('SUPABASE', 'Unexpected error recording game result', err);
     return { data: null, error: { message: err.message || 'Unexpected error recording game result' } };
   }
 }
@@ -85,15 +86,42 @@ async function updatePlayerStats(playerId, gameStats) {
   if (!client) return { data: null, error: { message: 'Supabase not configured' } };
 
   // First, get current profile
-  const { data: profile, error: fetchError } = await client
+  let { data: profile, error: fetchError } = await client
     .from('profiles')
     .select('*')
     .eq('id', playerId)
     .single();
 
   if (fetchError) {
-    console.error(`[SUPABASE] Failed to fetch profile for ${playerId}:`, fetchError.message);
-    return { data: null, error: fetchError };
+    // Check if the error is "not found" - user authenticated but hasn't set up profile yet
+    if (fetchError.code === 'PGRST116') {
+      logger.info('SUPABASE', `Profile not found for ${playerId}, creating minimal profile for stats tracking`);
+
+      // Create a minimal profile so we can track stats
+      // User will need to complete profile setup later to set username, avatar, etc.
+      const { data: newProfile, error: createError } = await client
+        .from('profiles')
+        .insert({
+          id: playerId,
+          username: `player_${playerId.substring(0, 8)}`, // Temporary username
+          display_name: 'New Player',
+          avatar_emoji: '😀',
+          avatar_color: '#6366f1'
+        })
+        .select()
+        .single();
+
+      if (createError) {
+        logger.error('SUPABASE', `Failed to create profile for ${playerId}`, createError.message);
+        return { data: null, error: createError };
+      }
+
+      profile = newProfile;
+      logger.debug('SUPABASE', `Created minimal profile for ${playerId}`);
+    } else {
+      logger.error('SUPABASE', `Failed to fetch profile for ${playerId}`, fetchError.message);
+      return { data: null, error: fetchError };
+    }
   }
 
   // Calculate updated stats
@@ -156,7 +184,7 @@ async function updatePlayerStats(playerId, gameStats) {
   // Check for level up
   const levelUpInfo = checkLevelUp(oldLevel, newLevel);
   if (levelUpInfo.leveledUp) {
-    console.log(`[XP] Player ${playerId} leveled up! ${oldLevel} -> ${newLevel}`);
+    logger.info('XP', `Player ${playerId} leveled up! ${oldLevel} -> ${newLevel}`);
     // Update player title if a new one was unlocked
     const newTitle = getTitleForLevel(newLevel);
     if (newTitle && newTitle !== profile.player_title) {
@@ -173,9 +201,7 @@ async function updatePlayerStats(playerId, gameStats) {
       .single();
 
     if (error) {
-      console.error(`[SUPABASE] Failed to update profile stats for ${playerId}:`, error.message);
-      // Log the attempted updates for debugging
-      console.error(`[SUPABASE] Attempted updates:`, JSON.stringify(updates));
+      logger.error('SUPABASE', `Failed to update profile stats for ${playerId}`, error.message);
     }
 
     // Return XP info along with data for socket emission
@@ -194,7 +220,7 @@ async function updatePlayerStats(playerId, gameStats) {
       }
     };
   } catch (err) {
-    console.error(`[SUPABASE] Unexpected error updating profile for ${playerId}:`, err);
+    logger.error('SUPABASE', `Unexpected error updating profile for ${playerId}`, err);
     return { data: null, error: { message: err.message || 'Unexpected error during profile update' } };
   }
 }
@@ -373,13 +399,11 @@ async function processGameResults(gameCode, scores, gameInfo, userAuthMap) {
   const xpResults = {}; // Store XP results for each player to emit via socket
 
   if (!isSupabaseConfigured()) {
-    console.log('[SUPABASE] Not configured, skipping game result recording');
+    logger.debug('SUPABASE', 'Not configured, skipping game result recording');
     return { xpResults };
   }
 
-  console.log(`[SUPABASE] Processing game results for ${gameCode}, ${scores.length} players`);
-  console.log(`[SUPABASE] userAuthMap received:`, JSON.stringify(userAuthMap));
-  console.log(`[SUPABASE] scores usernames:`, scores.map(s => s.username));
+  logger.info('SUPABASE', `Processing game results for ${gameCode}, ${scores.length} players`);
 
   for (const playerScore of scores) {
     const authInfo = userAuthMap[playerScore.username];
@@ -399,7 +423,7 @@ async function processGameResults(gameCode, scores, gameInfo, userAuthMap) {
     try {
       if (authInfo.authUserId) {
         // Authenticated user - update all tables
-        console.log(`[SUPABASE] Recording result for authenticated user: ${playerScore.username} (id: ${authInfo.authUserId})`);
+        logger.debug('SUPABASE', `Recording result for authenticated user: ${playerScore.username}`);
 
         // Record game result
         const gameResultRes = await recordGameResult({
@@ -408,11 +432,15 @@ async function processGameResults(gameCode, scores, gameInfo, userAuthMap) {
           ...gameStats,
           language: gameInfo.language
         });
-        console.log(`[SUPABASE] recordGameResult response:`, gameResultRes.error ? `ERROR: ${gameResultRes.error.message}` : 'SUCCESS');
+        if (gameResultRes.error) {
+          logger.error('SUPABASE', `recordGameResult error for ${playerScore.username}`, gameResultRes.error.message);
+        }
 
         // Update profile stats (includes XP calculation)
         const statsRes = await updatePlayerStats(authInfo.authUserId, gameStats);
-        console.log(`[SUPABASE] updatePlayerStats response:`, statsRes.error ? `ERROR: ${statsRes.error.message}` : 'SUCCESS');
+        if (statsRes.error) {
+          logger.error('SUPABASE', `updatePlayerStats error for ${playerScore.username}`, statsRes.error.message);
+        }
 
         // Store XP info for socket emission
         if (statsRes.xpInfo) {
@@ -420,26 +448,30 @@ async function processGameResults(gameCode, scores, gameInfo, userAuthMap) {
             ...statsRes.xpInfo,
             socketId: authInfo.socketId,
           };
-          console.log(`[XP] ${playerScore.username} earned ${statsRes.xpInfo.xpEarned} XP`);
+          logger.debug('XP', `${playerScore.username} earned ${statsRes.xpInfo.xpEarned} XP`);
         }
 
         // Update leaderboard
         const leaderboardRes = await updateLeaderboardEntry(authInfo.authUserId);
-        console.log(`[SUPABASE] updateLeaderboardEntry response:`, leaderboardRes.error ? `ERROR: ${leaderboardRes.error.message}` : 'SUCCESS');
+        if (leaderboardRes.error) {
+          logger.error('SUPABASE', `updateLeaderboardEntry error for ${playerScore.username}`, leaderboardRes.error.message);
+        }
 
         // Update ranked progress (if casual game)
         if (!gameInfo.isRanked) {
           const rankedRes = await updateRankedProgress(authInfo.authUserId);
-          console.log(`[SUPABASE] updateRankedProgress response:`, rankedRes?.error ? `ERROR: ${rankedRes.error.message}` : 'SUCCESS');
+          if (rankedRes?.error) {
+            logger.error('SUPABASE', `updateRankedProgress error for ${playerScore.username}`, rankedRes.error.message);
+          }
         }
 
       } else if (authInfo.guestTokenHash) {
         // Guest user - update guest token stats
-        console.log(`[SUPABASE] Recording result for guest: ${playerScore.username}`);
+        logger.debug('SUPABASE', `Recording result for guest: ${playerScore.username}`);
         await updateGuestStats(authInfo.guestTokenHash, gameStats);
       }
     } catch (error) {
-      console.error(`[SUPABASE] Error processing result for ${playerScore.username}:`, error);
+      logger.error('SUPABASE', `Error processing result for ${playerScore.username}`, error);
     }
   }
 
@@ -471,7 +503,7 @@ async function saveHostApprovedWord({ word, language, gameCode, hostUserId, prom
 
     if (fetchError && fetchError.code !== 'PGRST116') {
       // PGRST116 = not found, which is fine
-      console.error(`[SUPABASE] Error checking existing word "${word}":`, fetchError.message);
+      logger.error('SUPABASE', `Error checking existing word "${word}"`, fetchError.message);
       return { data: null, error: fetchError, isNewWord: false };
     }
 
@@ -501,7 +533,7 @@ async function saveHostApprovedWord({ word, language, gameCode, hostUserId, prom
         .single();
 
       if (updateError) {
-        console.error(`[SUPABASE] Error updating word "${word}":`, updateError.message);
+        logger.error('SUPABASE', `Error updating word "${word}"`, updateError.message);
         return { data: null, error: updateError, isNewWord: false };
       }
 
@@ -526,7 +558,7 @@ async function saveHostApprovedWord({ word, language, gameCode, hostUserId, prom
         .single();
 
       if (insertError) {
-        console.error(`[SUPABASE] Error inserting word "${word}":`, insertError.message);
+        logger.error('SUPABASE', `Error inserting word "${word}"`, insertError.message);
         return { data: null, error: insertError, isNewWord: false };
       }
 
@@ -544,16 +576,16 @@ async function saveHostApprovedWord({ word, language, gameCode, hostUserId, prom
         });
 
       if (approvalError) {
-        console.error(`[SUPABASE] Error recording approval for "${word}":`, approvalError.message);
+        logger.warn('SUPABASE', `Error recording approval for "${word}"`, approvalError.message);
         // Don't fail the whole operation for this
       }
     }
 
-    console.log(`[SUPABASE] ${isNewWord ? 'Saved new' : 'Updated'} community word "${word}" (${language}) - approval count: ${wordRecord?.approval_count || 1}${promoted ? ' - PROMOTED' : ''}`);
+    logger.debug('SUPABASE', `${isNewWord ? 'Saved new' : 'Updated'} community word "${word}" (${language}) - approval count: ${wordRecord?.approval_count || 1}${promoted ? ' - PROMOTED' : ''}`);
     return { data: wordRecord, error: null, isNewWord };
 
   } catch (err) {
-    console.error(`[SUPABASE] Unexpected error saving word "${word}":`, err);
+    logger.error('SUPABASE', `Unexpected error saving word "${word}"`, err);
     return { data: null, error: { message: err.message || 'Unexpected error' }, isNewWord: false };
   }
 }
@@ -596,7 +628,7 @@ async function updateRankedMmr(participants) {
         })
         .eq('id', participant.playerId);
     } catch (error) {
-      console.error(`[SUPABASE] Error updating MMR for ${participant.playerId}:`, error);
+      logger.error('SUPABASE', `Error updating MMR for ${participant.playerId}`, error);
     }
   }
 }

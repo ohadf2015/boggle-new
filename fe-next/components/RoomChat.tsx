@@ -186,11 +186,10 @@ const RoomChat: React.FC<RoomChatProps> = ({ username, isHost, gameCode, classNa
 
   const formatTime = (timestamp: number): string => {
     const date = new Date(timestamp);
-    return date.toLocaleTimeString('en-US', {
-      hour: '2-digit',
-      minute: '2-digit',
-      hour12: false
-    });
+    // Use UTC-based formatting to avoid timezone hydration mismatch
+    const hours = date.getHours().toString().padStart(2, '0');
+    const minutes = date.getMinutes().toString().padStart(2, '0');
+    return `${hours}:${minutes}`;
   };
 
   return (

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { createContext, useState, useContext, useEffect, ReactNode } from 'react';
+import React, { createContext, useState, useContext, useEffect, ReactNode, useRef } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { translations } from '../translations';
 import { locales, defaultLocale } from '../lib/i18n';
@@ -66,45 +66,64 @@ export const LanguageProvider = ({ children, initialLanguage }: LanguageProvider
         return null;
     };
 
-    // Determine initial language
-    const getInitialLanguage = (): Language => {
+    // Determine initial language - only use server-safe values
+    const getServerSafeLanguage = (): Language => {
+        // Use initialLanguage prop if provided (from server)
         if (initialLanguage) return initialLanguage;
-
-        if (typeof window !== 'undefined') {
-            // Check path locale first
-            if (pathname) {
-                const pathLocale = parseLocaleFromPath(pathname);
-                if (pathLocale) return pathLocale;
-            }
-
-            // Check localStorage for user's explicit preference
-            const savedLanguage = localStorage.getItem('boggle_language');
-            if (savedLanguage && locales.includes(savedLanguage as Language)) {
-                return savedLanguage as Language;
-            }
-
-            // Check for location-detected locale from middleware
-            const detectedLocale = getCookieLocale('boggle_detected_locale');
-            if (detectedLocale) return detectedLocale;
-
-            // Use browser language as fallback
-            const browserLang = getBrowserLanguage();
-            if (browserLang) return browserLang;
+        // Use pathname locale if available
+        if (pathname) {
+            const pathLocale = parseLocaleFromPath(pathname);
+            if (pathLocale) return pathLocale;
         }
-
         return defaultLocale;
     };
 
-    const [language, setLanguageState] = useState<Language>(getInitialLanguage);
+    // Initialize with server-safe value to avoid hydration mismatch
+    const [language, setLanguageState] = useState<Language>(getServerSafeLanguage);
+    const mountedRef = useRef(false);
+    const languageRef = useRef(language);
 
-    // Sync language when pathname or initialLanguage changes
+    // Keep ref in sync
     useEffect(() => {
-        const newLang = initialLanguage || (pathname ? parseLocaleFromPath(pathname) : null) || 'en';
-        if (newLang !== language) {
-            // Use queueMicrotask to avoid setState during render warning
-            queueMicrotask(() => setLanguageState(newLang));
+        languageRef.current = language;
+    }, [language]);
+
+    // After mount, check for client-side preferences
+    useEffect(() => {
+        mountedRef.current = true;
+        const currentLang = languageRef.current;
+
+        // Check localStorage for user's explicit preference
+        const savedLanguage = localStorage.getItem('boggle_language');
+        if (savedLanguage && locales.includes(savedLanguage as Language)) {
+            if (savedLanguage !== currentLang) {
+                setLanguageState(savedLanguage as Language);
+            }
+            return;
         }
-    }, [initialLanguage, pathname, language]);
+
+        // Check for location-detected locale from middleware
+        const detectedLocale = getCookieLocale('boggle_detected_locale');
+        if (detectedLocale && detectedLocale !== currentLang) {
+            setLanguageState(detectedLocale);
+            return;
+        }
+
+        // Use browser language as fallback
+        const browserLang = getBrowserLanguage();
+        if (browserLang && browserLang !== currentLang) {
+            setLanguageState(browserLang);
+        }
+    }, []); // Only run on mount
+
+    // Sync language when pathname or initialLanguage changes (after mount)
+    useEffect(() => {
+        if (!mountedRef.current) return;
+        const newLang = initialLanguage || (pathname ? parseLocaleFromPath(pathname) : null);
+        if (newLang && newLang !== languageRef.current) {
+            setLanguageState(newLang);
+        }
+    }, [initialLanguage, pathname]);
 
     useEffect(() => {
         // Save to localStorage

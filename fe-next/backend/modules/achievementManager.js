@@ -1,5 +1,6 @@
 // Achievement definitions and checking logic
 const { translations } = require('../../translations/index.js');
+const logger = require('../utils/logger');
 
 // Achievement icons (language-independent)
 const ACHIEVEMENT_ICONS = {
@@ -37,7 +38,7 @@ const getLocalizedAchievements = (locale = 'he') => {
   Object.keys(ACHIEVEMENT_ICONS).forEach(key => {
     if (!t[key]) {
       // Fallback for missing translation - use English or key name
-      console.warn(`[ACHIEVEMENT] Missing translation for ${key} in locale ${supportedLocale}`);
+      logger.warn('ACHIEVEMENT', `Missing translation for ${key} in locale ${supportedLocale}`);
       achievements[key] = {
         name: key.replace(/_/g, ' '),
         description: `Achievement: ${key}`,
@@ -215,7 +216,6 @@ const checkAndAwardAchievements = (gameCode, username, word) => {
 
   const game = getGame(gameCode);
   if (!game || !game.playerAchievements || !game.playerAchievements[username]) {
-    console.log(`[ACHIEVEMENT] Skip - no game/playerAchievements for ${username} in ${gameCode}`);
     return [];
   }
 
@@ -223,12 +223,10 @@ const checkAndAwardAchievements = (gameCode, username, word) => {
   const currentTime = Date.now();
   const timeSinceStart = game.startTime ? (currentTime - game.startTime) / 1000 : 0;
 
-  console.log(`[ACHIEVEMENT] Checking achievements for ${username} - word: "${word}", timeSinceStart: ${timeSinceStart.toFixed(1)}s, wordCount: ${game.playerWords[username]?.length || 0}`);
-
   const newAchievements = checkLiveAchievements(game, username, word, timeSinceStart);
 
   if (newAchievements.length > 0) {
-    console.log(`[ACHIEVEMENT] ${username} earned:`, newAchievements.map(a => a.name).join(', '));
+    logger.debug('ACHIEVEMENT', `${username} earned: ${newAchievements.map(a => a.name).join(', ')}`);
   }
 
   return newAchievements;
@@ -254,11 +252,11 @@ const getPlayerAchievements = (gameCode, username) => {
 
 // Award final achievements after validation (post-game)
 const awardFinalAchievements = (game, users) => {
-  console.log(`[ACHIEVEMENT] awarding final achievements for ${users.length} players`);
+  logger.debug('ACHIEVEMENT', `Awarding final achievements for ${users.length} players`);
   users.forEach(username => {
     // Safety check: ensure player data exists
     if (!game.playerWordDetails[username]) {
-      console.warn(`Player ${username} missing word details during achievement calculation`);
+      logger.warn('ACHIEVEMENT', `Player ${username} missing word details during achievement calculation`);
       return;
     }
 
@@ -370,8 +368,6 @@ const awardFinalAchievements = (game, users) => {
 
     // Note: TRIPLE_THREAT and STREAK_MASTER are timing/combo based achievements
     // that are primarily awarded during live gameplay
-
-    console.log(`[ACHIEVEMENT] Final achievements for ${username}:`, currentAchievements);
   });
 };
 

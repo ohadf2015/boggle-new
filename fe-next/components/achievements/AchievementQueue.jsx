@@ -1,5 +1,4 @@
 'use client';
-/* eslint-disable react-hooks/refs */
 
 import React, { useState, useCallback, useRef, useEffect } from 'react';
 import AchievementPopup from './AchievementPopup';

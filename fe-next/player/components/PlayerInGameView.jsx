@@ -14,6 +14,8 @@ import Avatar from '../../components/Avatar';
 import SlotMachineText from '../../components/SlotMachineText';
 import { applyHebrewFinalLetters } from '../../utils/utils';
 import { wordErrorToast } from '../../components/NeoToast';
+import { useSoundEffects } from '../../contexts/SoundEffectsContext';
+import { validateWordLocally, couldBeOnBoard } from '../../utils/clientWordValidator';
 
 const PlayerInGameView = ({
   // Core props
@@ -54,6 +56,7 @@ const PlayerInGameView = ({
   setWord,
 }) => {
   const wordListRef = useRef(null);
+  const { playWordAcceptedSound } = useSoundEffects();
 
   // Memoized handler for closing tournament standings
   const handleCloseTournamentStandings = useCallback(() => {
@@ -64,34 +67,42 @@ const PlayerInGameView = ({
     const currentLang = gameLanguage;
     if (!currentLang) return;
 
-    let regex;
-    if (currentLang === 'he') {
-      regex = /^[\u0590-\u05FF]+$/;
-    } else if (currentLang === 'sv') {
-      regex = /^[a-zA-ZåäöÅÄÖ]+$/;
-    } else if (currentLang === 'ja') {
-      regex = /^[\u3040-\u309F\u30A0-\u30FF\u4E00-\u9FAF]+$/;
-    } else {
-      regex = /^[a-zA-Z]+$/;
-    }
+    // Client-side validation for immediate error feedback (saves server round-trip)
+    const validation = validateWordLocally(formedWord, currentLang, minWordLength, foundWords);
 
-    if (formedWord.length < minWordLength) {
-      const msg = t('playerView.wordTooShortMin')
-        ? t('playerView.wordTooShortMin').replace('${min}', minWordLength)
-        : `Word too short! (min ${minWordLength} letters)`;
+    if (!validation.isValid) {
+      // Show error toast immediately - don't submit to server
+      let msg;
+      if (validation.errorKey === 'playerView.wordTooShortMin') {
+        msg = t('playerView.wordTooShortMin')
+          ? t('playerView.wordTooShortMin').replace('${min}', validation.errorParams?.min || minWordLength)
+          : `Word too short! (min ${validation.errorParams?.min || minWordLength} letters)`;
+      } else {
+        msg = t(validation.errorKey) || validation.errorKey;
+      }
       wordErrorToast(msg, { duration: 1000 });
+      setWord('');
       return;
     }
 
-    if (regex.test(formedWord)) {
-      socket.emit('submitWord', {
-        word: formedWord.toLowerCase(),
-        comboLevel: comboLevelRef.current,
-      });
-      onWordSubmit(formedWord);
-    } else {
-      wordErrorToast(t('playerView.onlyLanguageWords'), { duration: 1000 });
+    // Additional check: can the word possibly be on the board?
+    if (!couldBeOnBoard(formedWord, letterGrid, currentLang)) {
+      wordErrorToast(t('playerView.wordNotOnBoard'), { duration: 1500 });
+      setWord('');
+      return;
     }
+
+    // Play sound immediately (optimistic) - toasts/combo handled by server response
+    playWordAcceptedSound();
+
+    // Submit to server for actual validation
+    socket.emit('submitWord', {
+      word: formedWord.toLowerCase(),
+      comboLevel: comboLevelRef.current,
+    });
+
+    // Add to local found words list (will be updated by server response)
+    onWordSubmit(formedWord);
     setWord('');
   };
 

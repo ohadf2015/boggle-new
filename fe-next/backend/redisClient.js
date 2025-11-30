@@ -1,5 +1,6 @@
 // redisClient.js - Enhanced Redis Client with Connection Pooling, Circuit Breaker, and Optimizations
 const Redis = require('ioredis');
+const logger = require('./utils/logger');
 
 // ==========================================
 // Configuration Constants
@@ -63,7 +64,7 @@ class CircuitBreaker {
         throw new Error('Circuit breaker is OPEN - Redis operations suspended');
       }
       this.state = 'HALF_OPEN';
-      console.log('[REDIS] Circuit breaker entering HALF_OPEN state');
+      logger.info('REDIS', 'Circuit breaker entering HALF_OPEN state');
     }
 
     try {
@@ -78,7 +79,7 @@ class CircuitBreaker {
 
   onSuccess() {
     if (this.state === 'HALF_OPEN') {
-      console.log('[REDIS] Circuit breaker recovered - entering CLOSED state');
+      logger.info('REDIS', 'Circuit breaker recovered - entering CLOSED state');
     }
     this.failureCount = 0;
     this.state = 'CLOSED';
@@ -89,7 +90,7 @@ class CircuitBreaker {
     if (this.failureCount >= this.threshold) {
       this.state = 'OPEN';
       this.nextAttempt = Date.now() + this.timeout;
-      console.error(`[REDIS] Circuit breaker OPENED after ${this.failureCount} failures. Will retry at ${new Date(this.nextAttempt).toISOString()}`);
+      logger.error('REDIS', `Circuit breaker OPENED after ${this.failureCount} failures. Will retry at ${new Date(this.nextAttempt).toISOString()}`);
     }
   }
 
@@ -115,11 +116,11 @@ const baseRedisConfig = {
   // Reconnection strategy with exponential backoff
   retryStrategy(times) {
     if (times > 10) {
-      console.error('[REDIS] Max reconnection attempts reached');
+      logger.error('REDIS', 'Max reconnection attempts reached');
       return null; // Stop retrying
     }
     const delay = Math.min(times * 50, 2000);
-    console.log(`[REDIS] Reconnecting in ${delay}ms (attempt ${times})`);
+    logger.debug('REDIS', `Reconnecting in ${delay}ms (attempt ${times})`);
     return delay;
   },
 
@@ -200,14 +201,14 @@ async function initRedis() {
   try {
     // Create Redis client based on environment
     if (process.env.REDIS_URL) {
-      console.log('[REDIS] Connecting using REDIS_URL');
+      logger.info('REDIS', 'Connecting using REDIS_URL');
       redisClient = new Redis(process.env.REDIS_URL, baseRedisConfig);
     } else {
       const host = process.env.REDIS_HOST || process.env.REDISHOST || '127.0.0.1';
       const port = process.env.REDIS_PORT || process.env.REDISPORT || 6379;
       const password = process.env.REDIS_PASSWORD || undefined;
 
-      console.log(`[REDIS] Connecting to ${host}:${port}`);
+      logger.info('REDIS', `Connecting to ${host}:${port}`);
       redisClient = new Redis({
         ...baseRedisConfig,
         host,
@@ -218,28 +219,28 @@ async function initRedis() {
 
     // Event handlers
     redisClient.on('connect', () => {
-      console.log('[REDIS] Connected to Redis server');
+      logger.info('REDIS', 'Connected to Redis server');
       isRedisAvailable = true;
     });
 
     redisClient.on('ready', () => {
-      console.log('[REDIS] Redis client ready');
+      logger.info('REDIS', 'Redis client ready');
       isRedisAvailable = true;
       loadLuaScripts(); // Load Lua scripts when ready
     });
 
     redisClient.on('error', (err) => {
-      console.warn('[REDIS] Redis error:', err.message);
+      logger.warn('REDIS', `Redis error: ${err.message}`);
       isRedisAvailable = false;
     });
 
     redisClient.on('close', () => {
-      console.log('[REDIS] Redis connection closed');
+      logger.debug('REDIS', 'Redis connection closed');
       isRedisAvailable = false;
     });
 
     redisClient.on('reconnecting', (delay) => {
-      console.log(`[REDIS] Reconnecting in ${delay}ms`);
+      logger.debug('REDIS', `Reconnecting in ${delay}ms`);
     });
 
     // Connect
@@ -248,15 +249,15 @@ async function initRedis() {
     // Test connection
     await redisClient.ping();
     isRedisAvailable = true;
-    console.log('[REDIS] Redis connection test successful');
+    logger.info('REDIS', 'Redis connection test successful');
 
     // Start health monitoring
     startHealthMonitoring();
 
     return true;
   } catch (error) {
-    console.warn('[REDIS] Could not connect to Redis:', error.message);
-    console.warn('[REDIS] Application will continue with in-memory storage');
+    logger.warn('REDIS', `Could not connect to Redis: ${error.message}`);
+    logger.warn('REDIS', 'Application will continue with in-memory storage');
     isRedisAvailable = false;
     redisClient = null;
     return false;
@@ -269,9 +270,9 @@ async function loadLuaScripts() {
 
   try {
     wordApprovalScriptSha = await redisClient.script('LOAD', WORD_APPROVAL_SCRIPT);
-    console.log('[REDIS] Loaded Lua scripts successfully');
+    logger.debug('REDIS', 'Loaded Lua scripts successfully');
   } catch (error) {
-    console.error('[REDIS] Failed to load Lua scripts:', error.message);
+    logger.error('REDIS', `Failed to load Lua scripts: ${error.message}`);
     // Fallback to non-atomic operations will be used
   }
 }
@@ -303,14 +304,14 @@ async function healthCheck() {
     const latency = Date.now() - start;
 
     if (latency > 100) {
-      console.warn(`[REDIS] High latency: ${latency}ms`);
+      logger.warn('REDIS', `High latency: ${latency}ms`);
     }
 
     lastHealthCheck = Date.now();
     isRedisAvailable = true;
     return true;
   } catch (error) {
-    console.error('[REDIS] Health check failed:', error.message);
+    logger.error('REDIS', `Health check failed: ${error.message}`);
     isRedisAvailable = false;
     return false;
   }
@@ -331,7 +332,7 @@ async function checkRedisMemory() {
       if (maxMemory > 0) {
         const usagePercent = (usedMemory / maxMemory) * 100;
         if (usagePercent > MEMORY_WARNING_THRESHOLD) {
-          console.warn(`[REDIS] Memory usage high: ${usagePercent.toFixed(2)}% (${formatBytes(usedMemory)} / ${formatBytes(maxMemory)})`);
+          logger.warn('REDIS', `Memory usage high: ${usagePercent.toFixed(2)}% (${formatBytes(usedMemory)} / ${formatBytes(maxMemory)})`);
         }
       }
     }
@@ -403,9 +404,9 @@ async function saveGameState(gameCode, gameData) {
       });
       return; // Success
     } catch (error) {
-      console.error(`[REDIS] Error saving game state (attempt ${attempt}/${MAX_RETRY_ATTEMPTS}):`, error.message);
+      logger.error('REDIS', `Error saving game state (attempt ${attempt}/${MAX_RETRY_ATTEMPTS}): ${error.message}`);
       if (attempt === MAX_RETRY_ATTEMPTS) {
-        console.error('[REDIS] Failed to save game state after all retry attempts');
+        logger.error('REDIS', 'Failed to save game state after all retry attempts');
       } else {
         await new Promise(resolve => setTimeout(resolve, attempt * 100));
       }
@@ -444,7 +445,7 @@ async function getGameState(gameCode) {
       tournamentId: data.tournamentId || null,
     };
   } catch (error) {
-    console.error('[REDIS] Error getting game state:', error.message);
+    logger.error('REDIS', `Error getting game state: ${error.message}`);
     return null;
   }
 }
@@ -458,7 +459,7 @@ async function deleteGameState(gameCode) {
     const key = KEYS.game(gameCode);
     await circuitBreaker.execute(() => redisClient.del(key));
   } catch (error) {
-    console.error('[REDIS] Error deleting game state:', error.message);
+    logger.error('REDIS', `Error deleting game state: ${error.message}`);
   }
 }
 
@@ -474,7 +475,7 @@ async function getAllGameCodes() {
 
     do {
       if (iterations++ > MAX_SCAN_ITERATIONS) {
-        console.warn('[REDIS] SCAN exceeded max iterations, returning partial results');
+        logger.warn('REDIS', 'SCAN exceeded max iterations, returning partial results');
         break;
       }
 
@@ -493,14 +494,14 @@ async function getAllGameCodes() {
           }
         });
       } catch (scanError) {
-        console.error(`[REDIS] SCAN iteration failed at cursor ${cursor}:`, scanError.message);
+        logger.error('REDIS', `SCAN iteration failed at cursor ${cursor}: ${scanError.message}`);
         await new Promise(resolve => setTimeout(resolve, 100));
       }
     } while (cursor !== '0');
 
     return gameCodes;
   } catch (error) {
-    console.error('[REDIS] Error getting game codes:', error.message);
+    logger.error('REDIS', `Error getting game codes: ${error.message}`);
     return [];
   }
 }
@@ -546,7 +547,7 @@ async function saveTournamentState(tournamentId, tournamentData) {
       });
       return;
     } catch (error) {
-      console.error(`[REDIS] Error saving tournament state (attempt ${attempt}/${MAX_RETRY_ATTEMPTS}):`, error.message);
+      logger.error('REDIS', `Error saving tournament state (attempt ${attempt}/${MAX_RETRY_ATTEMPTS}): ${error.message}`);
       if (attempt < MAX_RETRY_ATTEMPTS) {
         await new Promise(resolve => setTimeout(resolve, attempt * 100));
       }
@@ -582,7 +583,7 @@ async function getTournamentState(tournamentId) {
       createdAt: data.createdAt,
     };
   } catch (error) {
-    console.error('[REDIS] Error getting tournament state:', error.message);
+    logger.error('REDIS', `Error getting tournament state: ${error.message}`);
     return null;
   }
 }
@@ -596,7 +597,7 @@ async function deleteTournamentState(tournamentId) {
     const key = KEYS.tournament(tournamentId);
     await circuitBreaker.execute(() => redisClient.del(key));
   } catch (error) {
-    console.error('[REDIS] Error deleting tournament state:', error.message);
+    logger.error('REDIS', `Error deleting tournament state: ${error.message}`);
   }
 }
 
@@ -612,7 +613,7 @@ async function getAllTournamentIds() {
 
     do {
       if (iterations++ > MAX_SCAN_ITERATIONS) {
-        console.warn('[REDIS] SCAN exceeded max iterations for tournaments');
+        logger.warn('REDIS', 'SCAN exceeded max iterations for tournaments');
         break;
       }
 
@@ -632,7 +633,7 @@ async function getAllTournamentIds() {
 
     return tournamentIds;
   } catch (error) {
-    console.error('[REDIS] Error getting tournament IDs:', error.message);
+    logger.error('REDIS', `Error getting tournament IDs: ${error.message}`);
     return [];
   }
 }
@@ -651,7 +652,7 @@ async function getWordApprovalStatus(word, language) {
     const data = await circuitBreaker.execute(() => redisClient.get(key));
     return data ? JSON.parse(data) : null;
   } catch (error) {
-    console.error('[REDIS] Error getting word approval status:', error.message);
+    logger.error('REDIS', `Error getting word approval status: ${error.message}`);
     return null;
   }
 }
@@ -676,7 +677,7 @@ async function incrementWordApproval(word, language, gameId) {
       if (error.message.includes('NOSCRIPT')) {
         await loadLuaScripts();
       }
-      console.warn('[REDIS] Lua script failed, falling back to WATCH/MULTI:', error.message);
+      logger.warn('REDIS', `Lua script failed, falling back to WATCH/MULTI: ${error.message}`);
     }
   }
 
@@ -723,7 +724,7 @@ async function incrementWordApproval(word, language, gameId) {
       return approvalData;
     } catch (error) {
       await redisClient.unwatch();
-      console.error('[REDIS] Error incrementing word approval:', error.message);
+      logger.error('REDIS', `Error incrementing word approval: ${error.message}`);
       if (attempt === maxRetries - 1) {
         return null;
       }
@@ -745,7 +746,7 @@ async function getApprovedWords(language, minApprovals = 2) {
 
     do {
       if (iterations++ > MAX_SCAN_ITERATIONS) {
-        console.warn('[REDIS] SCAN exceeded max iterations for approved words');
+        logger.warn('REDIS', 'SCAN exceeded max iterations for approved words');
         break;
       }
 
@@ -766,7 +767,7 @@ async function getApprovedWords(language, minApprovals = 2) {
           const results = await pipeline.exec();
           results.forEach(([err, data], idx) => {
             if (err) {
-              console.error(`[REDIS] Pipeline error for key ${batch[idx]}:`, err.message);
+              logger.error('REDIS', `Pipeline error for key ${batch[idx]}: ${err.message}`);
               return;
             }
             if (data) {
@@ -790,7 +791,7 @@ async function getApprovedWords(language, minApprovals = 2) {
 
     return approvedWords;
   } catch (error) {
-    console.error('[REDIS] Error getting approved words:', error.message);
+    logger.error('REDIS', `Error getting approved words: ${error.message}`);
     return [];
   }
 }
@@ -808,7 +809,7 @@ async function getCachedLeaderboardTop100() {
     const data = await circuitBreaker.execute(() => redisClient.get(KEYS.leaderboardTop()));
     return data ? JSON.parse(data) : null;
   } catch (error) {
-    console.error('[REDIS] Error getting cached leaderboard:', error.message);
+    logger.error('REDIS', `Error getting cached leaderboard: ${error.message}`);
     return null;
   }
 }
@@ -827,7 +828,7 @@ async function cacheLeaderboardTop100(leaderboard) {
       )
     );
   } catch (error) {
-    console.error('[REDIS] Error caching leaderboard:', error.message);
+    logger.error('REDIS', `Error caching leaderboard: ${error.message}`);
   }
 }
 
@@ -840,7 +841,7 @@ async function getCachedUserRank(userId) {
     const data = await circuitBreaker.execute(() => redisClient.get(KEYS.leaderboardUser(userId)));
     return data ? JSON.parse(data) : null;
   } catch (error) {
-    console.error('[REDIS] Error getting cached user rank:', error.message);
+    logger.error('REDIS', `Error getting cached user rank: ${error.message}`);
     return null;
   }
 }
@@ -859,7 +860,7 @@ async function cacheUserRank(userId, rankData) {
       )
     );
   } catch (error) {
-    console.error('[REDIS] Error caching user rank:', error.message);
+    logger.error('REDIS', `Error caching user rank: ${error.message}`);
   }
 }
 
@@ -888,9 +889,9 @@ async function invalidateLeaderboardCaches() {
       }
     } while (cursor !== '0');
 
-    console.log('[REDIS] Leaderboard caches invalidated');
+    logger.debug('REDIS', 'Leaderboard caches invalidated');
   } catch (error) {
-    console.error('[REDIS] Error invalidating leaderboard caches:', error.message);
+    logger.error('REDIS', `Error invalidating leaderboard caches: ${error.message}`);
   }
 }
 
@@ -958,9 +959,9 @@ async function closeRedis() {
   if (redisClient) {
     try {
       await redisClient.quit();
-      console.log('[REDIS] Redis connection closed');
+      logger.info('REDIS', 'Redis connection closed');
     } catch (error) {
-      console.error('[REDIS] Error closing connection:', error.message);
+      logger.error('REDIS', `Error closing connection: ${error.message}`);
     }
     redisClient = null;
     isRedisAvailable = false;
@@ -980,7 +981,7 @@ function createPubSubClients() {
 
     return { pubClient, subClient };
   } catch (error) {
-    console.error('[REDIS] Failed to create pub/sub clients:', error.message);
+    logger.error('REDIS', `Failed to create pub/sub clients: ${error.message}`);
     return null;
   }
 }

@@ -4,26 +4,30 @@ import { cn } from '../lib/utils';
 import type { Language, LetterGrid, GridPosition } from '@/types';
 import 'animate.css';
 
-// Pre-generate duration variations for cells at module level (up to 20x20 grid)
-// These are constant random values that stay the same across renders
+// Pre-generate duration variations for cells using seeded values (deterministic)
+// Using a simple seeded approach to avoid SSR/client mismatch
 const DURATION_VARIATIONS = (() => {
   const variations: number[][] = [];
   for (let r = 0; r < 20; r++) {
     variations[r] = [];
     for (let c = 0; c < 20; c++) {
-      variations[r][c] = Math.random() * 150;
+      // Use deterministic pseudo-random based on position
+      const seed = (r * 20 + c) * 17 % 150;
+      variations[r][c] = seed;
     }
   }
   return variations;
 })();
 
-// Pre-generate random delays for 'random' pattern at module level
+// Pre-generate random delays for 'random' pattern using seeded values
 const RANDOM_DELAYS = (() => {
   const delays: number[][] = [];
   for (let r = 0; r < 20; r++) {
     delays[r] = [];
     for (let c = 0; c < 20; c++) {
-      delays[r][c] = Math.random() * 400;
+      // Use deterministic pseudo-random based on position
+      const seed = ((r * 20 + c) * 31 + 7) % 400;
+      delays[r][c] = seed;
     }
   }
   return delays;

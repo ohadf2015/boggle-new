@@ -54,7 +54,9 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
 
   render(): ReactNode {
     if (this.state.hasError) {
-      const language = (typeof window !== 'undefined' && localStorage.getItem('boggle_language')) || 'en';
+      // Always use 'en' for error boundary - accessing localStorage here causes hydration issues
+      // The error boundary is a fallback UI, so using a consistent language is acceptable
+      const language = 'en';
       const t: TranslationFunction = (path: string): string => {
         try {
           const keys = path.split('.');

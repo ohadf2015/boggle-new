@@ -145,12 +145,14 @@ const BRUTALIST_COLORS: ColorScheme[] = [
 
 const MenuAnimation: React.FC<MenuAnimationProps> = ({ className = '' }) => {
   const { language, t } = useLanguage();
+  // Initialize with empty array to avoid hydration mismatch (random values)
   const [letters, setLetters] = useState<Letter[]>([]);
   const [explosions, setExplosions] = useState<Explosion[]>([]);
   const explosionCounterRef = useRef(0);
   const [poppedCount, setPoppedCount] = useState(0);
   const [showAchievement, setShowAchievement] = useState<Achievement | null>(null);
   const achievementShownRef = useRef(false);
+  const [mounted, setMounted] = useState(false);
 
   // Get letter set based on language
   const getLetterSet = useCallback((): string[] => {
@@ -167,17 +169,19 @@ const MenuAnimation: React.FC<MenuAnimationProps> = ({ className = '' }) => {
     }
   }, [language]);
 
-  // Generate a single letter
+  // Generate a single letter (only call client-side after mount)
   const generateLetter = useCallback((index: number): Letter => {
     const letterSet = getLetterSet();
     const colorScheme = BRUTALIST_COLORS[Math.floor(Math.random() * BRUTALIST_COLORS.length)];
+    const width = window.innerWidth;
+    const height = window.innerHeight;
     return {
       id: `letter-${index}-${Date.now()}-${Math.random()}`,
       char: letterSet[Math.floor(Math.random() * letterSet.length)],
-      x: Math.random() * (typeof window !== 'undefined' ? window.innerWidth : 1000),
-      y: Math.random() * (typeof window !== 'undefined' ? window.innerHeight : 1000),
-      targetX: Math.random() * (typeof window !== 'undefined' ? window.innerWidth : 1000),
-      targetY: Math.random() * (typeof window !== 'undefined' ? window.innerHeight : 1000),
+      x: Math.random() * width,
+      y: Math.random() * height,
+      targetX: Math.random() * width,
+      targetY: Math.random() * height,
       size: Math.random() * 35 + 35, // 35-70px
       duration: Math.random() * 15 + 12, // 12-27 seconds - slow float
       delay: Math.random() * 3,
@@ -187,17 +191,22 @@ const MenuAnimation: React.FC<MenuAnimationProps> = ({ className = '' }) => {
     };
   }, [getLetterSet]);
 
-  // Generate initial letters
+  // Mark as mounted after initial render (client-side only)
   useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  // Generate initial letters only after mount (client-side)
+  useEffect(() => {
+    if (!mounted) return;
+
     const numberOfLetters = 18;
     const newLetters = Array(numberOfLetters).fill(null).map((_, index) =>
       generateLetter(index)
     );
 
-    Promise.resolve().then(() => {
-      setLetters(newLetters);
-    });
-  }, [language, generateLetter]);
+    setLetters(newLetters);
+  }, [mounted, language, generateLetter]);
 
   // Handle letter click - pop it!
   const handleLetterClick = useCallback((letter: Letter, event: React.MouseEvent<HTMLDivElement>) => {

@@ -76,9 +76,21 @@ const { emitError, ErrorMessages } = require('./utils/errorHandler');
 const { inc, incPerGame, ensureGame } = require('./utils/metrics');
 const { DIFFICULTIES } = require('../utils/consts');
 const { generateRandomAvatar, generateRoomCode } = require('../utils/utils');
+const logger = require('./utils/logger');
 
 // Game configuration constants
 const MAX_PLAYERS_PER_ROOM = 50; // Maximum number of players allowed in a single room
+const HOST_RECONNECT_GRACE_PERIOD_MS = 30000; // 30 seconds for host
+const PLAYER_RECONNECT_GRACE_PERIOD_MS = 15000; // 15 seconds for players (guests and authenticated)
+
+/**
+ * Check if a socket is marked as migrating (session being taken over by another tab)
+ * @param {Socket} socket - Socket.IO socket instance
+ * @returns {boolean} True if socket is migrating and should not process events
+ */
+function isSocketMigrating(socket) {
+  return socket.data && socket.data.migrating === true;
+}
 
 /**
  * Initialize Socket.IO event handlers
@@ -86,16 +98,15 @@ const MAX_PLAYERS_PER_ROOM = 50; // Maximum number of players allowed in a singl
  */
 function initializeSocketHandlers(io) {
   io.on('connection', (socket) => {
-    console.log(`[SOCKET] Client connected: ${socket.id}`);
+    logger.info('SOCKET', `Client connected: ${socket.id}`);
 
     // Wrap socket.emit to track error events for debugging
     const originalEmit = socket.emit.bind(socket);
     socket.emit = function(event, ...args) {
       if (event === 'error') {
-        console.log('[SOCKET] Emitting error event:', { socketId: socket.id, data: args[0] });
+        logger.debug('SOCKET', 'Emitting error event', { socketId: socket.id, data: args[0] });
         if (!args[0] || (typeof args[0] === 'object' && Object.keys(args[0]).length === 0)) {
-          console.warn('[SOCKET] WARNING: Emitting empty error object!');
-          console.trace('[SOCKET] Stack trace for empty error:');
+          logger.warn('SOCKET', 'Emitting empty error object!');
         }
       }
       return originalEmit(event, ...args);
@@ -103,7 +114,7 @@ function initializeSocketHandlers(io) {
 
     // Rate limiting
     if (!checkRateLimit(socket.id)) {
-      console.warn(`[SOCKET] Rate limit exceeded for ${socket.id}`);
+      logger.warn('SOCKET', `Rate limit exceeded for ${socket.id}`);
       socket.emit('rateLimited');
       socket.disconnect(true);
       return;
@@ -119,13 +130,18 @@ function initializeSocketHandlers(io) {
       }
       const { gameCode, roomName, language, hostUsername, playerId, avatar, authUserId, guestTokenHash, isRanked, profilePictureUrl } = data;
 
-      console.log(`[SOCKET] Create game request: ${gameCode} by ${hostUsername}${isRanked ? ' (RANKED)' : ''}`);
+      logger.info('SOCKET', `Create game request: ${gameCode} by ${hostUsername}${isRanked ? ' (RANKED)' : ''}`);
 
       // Validate game code
       if (!gameCode || gameCode.length !== 4) {
         emitError(socket, ErrorMessages.INVALID_GAME_CODE);
         return;
       }
+
+      // Validate playerId if provided (sanitize to prevent injection)
+      const sanitizedPlayerId = playerId && typeof playerId === 'string'
+        ? playerId.slice(0, 64).replace(/[^a-zA-Z0-9_-]/g, '')
+        : null;
 
       // Check if game already exists
       if (gameExists(gameCode)) {
@@ -137,7 +153,7 @@ function initializeSocketHandlers(io) {
       if (authUserId) {
         const existingConnection = getAuthUserConnection(authUserId);
         if (existingConnection) {
-          console.log(`[SOCKET] Auth user ${authUserId} already in game ${existingConnection.gameCode}, migrating session`);
+          logger.info('SOCKET', `Auth user ${authUserId} already in game ${existingConnection.gameCode}, migrating session`);
 
           // Disconnect old socket
           const oldSocket = getSocketById(io, existingConnection.socketId);
@@ -180,7 +196,7 @@ function initializeSocketHandlers(io) {
       const game = createGame(gameCode, {
         hostSocketId: socket.id,
         hostUsername: hostUsername || 'Host',
-        hostPlayerId: playerId,
+        hostPlayerId: sanitizedPlayerId,
         roomName: roomName || gameCode,
         language: language || 'en',
         isRanked: isRanked || false,
@@ -192,7 +208,7 @@ function initializeSocketHandlers(io) {
       addUserToGame(gameCode, hostUsername || 'Host', socket.id, {
         avatar: { ...hostAvatar, profilePictureUrl: profilePictureUrl || null },
         isHost: true,
-        playerId,
+        playerId: sanitizedPlayerId,
         authUserId: authUserId || null,
         guestTokenHash: guestTokenHash || null
       });
@@ -225,7 +241,7 @@ function initializeSocketHandlers(io) {
       try {
         await redisClient.saveGameState(gameCode, game);
       } catch (err) {
-        console.error('[REDIS] Failed to save game state:', err);
+        logger.error('REDIS', 'Failed to save game state', err);
         // Warn host that game state may not persist across server restarts
         safeEmit(socket, 'warning', {
           type: 'persistence',
@@ -233,7 +249,7 @@ function initializeSocketHandlers(io) {
         });
       }
 
-      console.log(`[SOCKET] Game ${gameCode} created by ${hostUsername}`);
+      logger.info('SOCKET', `Game ${gameCode} created by ${hostUsername}`);
     });
 
     // Handle request for words to embed in board (for enhanced gameplay)
@@ -263,7 +279,7 @@ function initializeSocketHandlers(io) {
       }
       const { gameCode, username, playerId, avatar, authUserId, guestTokenHash, profilePictureUrl } = data;
 
-      console.log(`[SOCKET] Join request: ${username} to game ${gameCode}`, { authUserId, guestTokenHash: !!guestTokenHash });
+      logger.info('SOCKET', `Join request: ${username} to game ${gameCode}`, { authUserId, guestTokenHash: !!guestTokenHash });
 
       // Validate
       if (!gameCode || !username) {
@@ -277,11 +293,38 @@ function initializeSocketHandlers(io) {
         return;
       }
 
-      // Check if authenticated user is already in a DIFFERENT game (multi-tab detection)
+      // Check if authenticated user is already in a game (multi-tab detection)
       if (authUserId) {
         const existingConnection = getAuthUserConnection(authUserId);
+
+        // Same room multi-tab: user opens same room in another tab
+        if (existingConnection && existingConnection.gameCode === gameCode) {
+          logger.info('SOCKET', `Auth user ${authUserId} opening same room ${gameCode} in new tab - taking over session`);
+
+          // Mark old socket as migrating to prevent race conditions
+          const oldSocket = getSocketById(io, existingConnection.socketId);
+          if (oldSocket && oldSocket.connected) {
+            // Mark socket as migrating to prevent it from processing any more events
+            oldSocket.data = oldSocket.data || {};
+            oldSocket.data.migrating = true;
+
+            safeEmit(oldSocket, 'sessionTakenOver', {
+              message: 'Your session was moved to another tab',
+              gameCode
+            });
+            // Disconnect old socket after small delay to ensure message is sent
+            setTimeout(() => {
+              if (oldSocket.connected) {
+                disconnectSocket(oldSocket, true);
+              }
+            }, 100);
+          }
+          // Continue with join flow - user will be reconnected with new socket
+        }
+
+        // Different room multi-tab: user switches to a different room
         if (existingConnection && existingConnection.gameCode !== gameCode) {
-          console.log(`[SOCKET] Auth user ${authUserId} migrating from game ${existingConnection.gameCode} to ${gameCode}`);
+          logger.info('SOCKET', `Auth user ${authUserId} migrating from game ${existingConnection.gameCode} to ${gameCode}`);
 
           // Disconnect old socket
           const oldSocket = getSocketById(io, existingConnection.socketId);
@@ -335,7 +378,7 @@ function initializeSocketHandlers(io) {
 
       // Check player limit (unless this is a reconnection)
       if (!existingSocketId && Object.keys(game.users).length >= MAX_PLAYERS_PER_ROOM) {
-        console.log(`[SOCKET] ${username} tried to join full room ${gameCode}`);
+        logger.info('SOCKET', `${username} tried to join full room ${gameCode}`);
         // Spectator overflow: join room without adding to users
         joinRoom(socket, getGameRoom(gameCode));
         socket.emit('joinedAsSpectator', {
@@ -349,12 +392,25 @@ function initializeSocketHandlers(io) {
       }
       if (existingSocketId || game.users[username]) {
         // Handle reconnection - either existing socket OR user marked as disconnected
-        console.log(`[SOCKET] Reconnection detected for ${username}`, { authUserId, guestTokenHash: !!guestTokenHash });
+        logger.info('SOCKET', `Reconnection detected for ${username}`, { authUserId, guestTokenHash: !!guestTokenHash });
 
-        // Clear disconnected status on reconnection
+        // Clear disconnected status and reconnection timeout on reconnection
         if (game.users[username]) {
           game.users[username].disconnected = false;
           delete game.users[username].disconnectedAt;
+
+          // Clear player reconnection timeout if exists
+          if (game.users[username].reconnectionTimeout) {
+            clearTimeout(game.users[username].reconnectionTimeout);
+            delete game.users[username].reconnectionTimeout;
+            logger.debug('SOCKET', `Cleared player reconnection timeout for ${username} in game ${gameCode}`);
+          }
+
+          // Notify room that player reconnected
+          broadcastToRoom(io, getGameRoom(gameCode), 'playerReconnected', {
+            username,
+            message: `${username} reconnected`
+          });
         }
 
         // Update socket ID and auth context (user may have logged in since original join)
@@ -371,7 +427,7 @@ function initializeSocketHandlers(io) {
           if (game.reconnectionTimeout) {
             clearTimeout(game.reconnectionTimeout);
             game.reconnectionTimeout = null;
-            console.log(`[SOCKET] Cleared host reconnection timeout for game ${gameCode}`);
+            logger.debug('SOCKET', `Cleared host reconnection timeout for game ${gameCode}`);
           }
         }
 
@@ -436,7 +492,7 @@ function initializeSocketHandlers(io) {
 
       // If game is in progress, allow player to join mid-game
       if (game.gameState === 'in-progress') {
-        console.log(`[SOCKET] ${username} joining game ${gameCode} in progress - allowing participation`);
+        logger.info('SOCKET', `${username} joining game ${gameCode} in progress - allowing participation`);
 
         // Send startGame with the current remaining time (not original timer)
         socket.emit('startGame', {
@@ -461,7 +517,7 @@ function initializeSocketHandlers(io) {
             .map(key => localizedAchievements[key])
             .filter(Boolean);
 
-          console.log(`[SOCKET] Syncing ${achievements.length} achievements to late-joiner ${username}`);
+          logger.debug('SOCKET', `Syncing ${achievements.length} achievements to late-joiner ${username}`);
           socket.emit('liveAchievementUnlocked', { achievements });
         }
       }
@@ -493,7 +549,7 @@ function initializeSocketHandlers(io) {
             standings
           });
         } catch (err) {
-          console.log(`[TOURNAMENT] Could not add ${username} to tournament: ${err.message}`);
+          logger.warn('TOURNAMENT', `Could not add ${username} to tournament: ${err.message}`);
         }
       }
 
@@ -505,7 +561,7 @@ function initializeSocketHandlers(io) {
       // Broadcast updated room list
       io.emit('activeRooms', { rooms: getActiveRooms() });
 
-      console.log(`[SOCKET] ${username} joined game ${gameCode}`);
+      logger.info('SOCKET', `${username} joined game ${gameCode}`);
     });
 
     // Handle game start
@@ -593,7 +649,7 @@ function initializeSocketHandlers(io) {
         gameForInit.firstWordFound = false;
         gameForInit.startTime = Date.now();
 
-        console.log(`[SOCKET] Initialized player data for ${playerUsernames.length} players in game ${gameCode}`);
+        logger.debug('SOCKET', `Initialized player data for ${playerUsernames.length} players in game ${gameCode}`);
       }
 
       // Initialize game start coordination
@@ -614,7 +670,7 @@ function initializeSocketHandlers(io) {
         startGameTimer(io, gameCode, validTimer);
       });
 
-      console.log(`[SOCKET] Game ${gameCode} starting with ${playerUsernames.length} players`);
+      logger.info('SOCKET', `Game ${gameCode} starting with ${playerUsernames.length} players`);
     });
 
     // Handle start game acknowledgment - NOT rate limited (essential for game coordination)
@@ -639,6 +695,9 @@ function initializeSocketHandlers(io) {
     const CHAT_WEIGHT = parseInt(process.env.RATE_WEIGHT_CHAT || '1');
 
     socket.on('submitWord', async (data) => {
+      // Skip if socket is migrating to another tab
+      if (isSocketMigrating(socket)) return;
+
       if (!checkRateLimit(socket.id, SUBMIT_WORD_WEIGHT)) {
         socket.emit('rateLimited');
         return;
@@ -650,7 +709,7 @@ function initializeSocketHandlers(io) {
         const username = getUsernameBySocketId(socket.id);
 
         if (!gameCode || !username || !word) {
-          console.warn(`[SOCKET] submitWord failed - socketId: ${socket.id}, gameCode: ${gameCode || 'NULL'}, username: ${username || 'NULL'}, word: ${word || 'NULL'}`);
+          logger.warn('SOCKET', `submitWord failed - socketId: ${socket.id}, gameCode: ${gameCode || 'NULL'}, username: ${username || 'NULL'}, word: ${word || 'NULL'}`);
           emitError(socket, ErrorMessages.INVALID_WORD_SUBMISSION);
           return;
         }
@@ -713,7 +772,7 @@ function initializeSocketHandlers(io) {
           const comboBonus = wordScore - baseScore;
 
           // Diagnostic logging for combo calculation
-          console.log(`[COMBO] ${username} submitted "${normalizedWord}": baseScore=${baseScore}, comboLevel=${safeComboLevel}, comboBonus=${comboBonus}, totalScore=${wordScore}`);
+          logger.debug('COMBO', `${username} submitted "${normalizedWord}": baseScore=${baseScore}, comboLevel=${safeComboLevel}, comboBonus=${comboBonus}, totalScore=${wordScore}`);
 
           // Store combo level server-side for STREAK_MASTER achievement tracking
           if (!game.playerCombos) game.playerCombos = {};
@@ -741,12 +800,11 @@ function initializeSocketHandlers(io) {
           });
 
           // Check for achievements
-          console.log(`[ACHIEVEMENT] Checking live achievements for ${username} after word "${normalizedWord}"`);
+          logger.debug('ACHIEVEMENT', `Checking live achievements for ${username} after word "${normalizedWord}"`);
           const achievements = checkAndAwardAchievements(gameCode, username, normalizedWord);
           if (achievements.length > 0) {
-            console.log(`[ACHIEVEMENT] Emitting ${achievements.length} achievements to ${username}:`, achievements.map(a => a.name || a).join(', '));
+            logger.debug('ACHIEVEMENT', `Emitting ${achievements.length} achievements to ${username}: ${achievements.map(a => a.name || a).join(', ')}`);
             socket.emit('liveAchievementUnlocked', { achievements });
-            console.log(`[ACHIEVEMENT] Emission complete for ${username}`);
           }
         } else {
           // Check if host is playing solo
@@ -776,7 +834,7 @@ function initializeSocketHandlers(io) {
               word: normalizedWord,
               reason: 'notInDictionary'
             });
-            console.log(`[SOCKET] Solo host game - rejected non-dictionary word: "${normalizedWord}"`);
+            logger.debug('SOCKET', `Solo host game - rejected non-dictionary word: "${normalizedWord}"`);
           } else {
             // Multi-player game: word needs host validation
             // IMPORTANT: Preserve combo data even for non-dictionary words
@@ -817,13 +875,16 @@ function initializeSocketHandlers(io) {
           });
         }, lbThrottleMs);
       } catch (error) {
-        console.error('[SOCKET] Error in submitWord handler:', error);
+        logger.error('SOCKET', 'Error in submitWord handler', error);
         emitError(socket, 'An error occurred while processing your word');
       }
     });
 
     // Handle chat messages
     socket.on('chatMessage', (data) => {
+      // Skip if socket is migrating to another tab
+      if (isSocketMigrating(socket)) return;
+
       if (!checkRateLimit(socket.id, CHAT_WEIGHT)) {
         inc('rateLimited');
         socket.emit('rateLimited');
@@ -893,7 +954,7 @@ function initializeSocketHandlers(io) {
       const guestId = userData?.guestTokenHash || null;
 
       if (!userId && !guestId) {
-        console.log(`[VOTE] No voter identifier for ${username}, skipping vote`);
+        logger.debug('VOTE', `No voter identifier for ${username}, skipping vote`);
         return;
       }
 
@@ -910,7 +971,7 @@ function initializeSocketHandlers(io) {
 
       if (result.success) {
         socket.emit('voteRecorded', { word, success: true });
-        console.log(`[VOTE] ${username} voted ${voteType} on "${word}"`);
+        logger.info('VOTE', `${username} voted ${voteType} on "${word}"`);
 
         // If word just became valid (crossed 6+ threshold), notify everyone
         if (result.isNowValid) {
@@ -977,7 +1038,7 @@ function initializeSocketHandlers(io) {
 
       // Validate that validations exists and is an array
       if (!validations || !Array.isArray(validations)) {
-        console.error(`[SOCKET] Invalid validations received for game ${gameCode}:`, validations);
+        logger.error('SOCKET', `Invalid validations received for game ${gameCode}`, validations);
         return;
       }
 
@@ -985,7 +1046,7 @@ function initializeSocketHandlers(io) {
       if (game.validationTimeout) {
         clearTimeout(game.validationTimeout);
         game.validationTimeout = null;
-        console.log(`[SOCKET] Cleared auto-validation timeout for game ${gameCode} - host validated manually`);
+        logger.debug('SOCKET', `Cleared auto-validation timeout for game ${gameCode} - host validated manually`);
       }
 
       // Create a map of valid words for quick lookup
@@ -1099,21 +1160,10 @@ function initializeSocketHandlers(io) {
         const localizedAchievements = getLocalizedAchievements(game.language || 'he');
         const playerAchievements = playerAchievementKeys.map(key => localizedAchievements[key]).filter(Boolean);
 
-        // Comprehensive logging for results with translation check
-        console.log(`[RESULTS] Player ${username} results:`, {
-          score: score,
-          wordCount: allWords.length,
-          validWordCount: validWordsInList.length,
-          achievementKeys: playerAchievementKeys,
-          localizedAchievementsCount: playerAchievements.length,
-          gameLanguage: game.language || 'he',
-          comboBonus: allWords.reduce((sum, w) => sum + (w.comboBonus || 0), 0)
-        });
-
         // Check for missing translations
         if (playerAchievementKeys.length !== playerAchievements.length) {
           const missingKeys = playerAchievementKeys.filter(key => !localizedAchievements[key]);
-          console.warn(`[RESULTS] Missing achievement translations for ${username}:`, missingKeys);
+          logger.warn('RESULTS', `Missing achievement translations for ${username}`, missingKeys);
         }
 
         return {
@@ -1142,9 +1192,8 @@ function initializeSocketHandlers(io) {
       });
 
       // Log validation results
-      console.log(`[SOCKET] Validation complete for game ${gameCode}:`, {
+      logger.info('SOCKET', `Validation complete for game ${gameCode}`, {
         totalPlayers: Object.keys(validatedScores).length,
-        scores: validatedScores,
         validWordsCount: validWords.size
       });
 
@@ -1159,7 +1208,7 @@ function initializeSocketHandlers(io) {
         scores: scoresArray
       });
 
-      console.log(`[SOCKET] Sent validationComplete to host for game ${gameCode} - ${emitSuccess ? 'SUCCESS' : 'FAILED'}`);
+      logger.debug('SOCKET', `Sent validationComplete to host for game ${gameCode} - ${emitSuccess ? 'SUCCESS' : 'FAILED'}`);
 
       // Track host-approved words for community dictionary promotion
       // For words that were NOT in the dictionary but approved by host
@@ -1184,10 +1233,10 @@ function initializeSocketHandlers(io) {
           // Word has been approved by 2+ different game sessions - promote it!
           promoted = await addApprovedWord(normalizedWord, language);
           if (promoted) {
-            console.log(`[SOCKET] Word "${word}" (${language}) promoted to community dictionary after ${approvalData.approvalCount} approvals from games: ${approvalData.gameIds.join(', ')}`);
+            logger.info('SOCKET', `Word "${word}" (${language}) promoted to community dictionary after ${approvalData.approvalCount} approvals`);
           }
         } else if (approvalData) {
-          console.log(`[SOCKET] Word "${word}" (${language}) approved in game ${gameCode} (${approvalData.approvalCount}/2 approvals needed)`);
+          logger.debug('SOCKET', `Word "${word}" (${language}) approved in game ${gameCode} (${approvalData.approvalCount}/2 approvals needed)`);
         }
 
         // Save to Supabase for tracking and analytics
@@ -1243,7 +1292,7 @@ function initializeSocketHandlers(io) {
         users: getGameUsers(gameCode)
       });
 
-      console.log(`[SOCKET] Game ${gameCode} reset`);
+      logger.info('SOCKET', `Game ${gameCode} reset`);
     });
 
     // Handle close room
@@ -1272,7 +1321,7 @@ function initializeSocketHandlers(io) {
       // Update room list
       io.emit('activeRooms', { rooms: getActiveRooms() });
 
-      console.log(`[SOCKET] Room ${gameCode} closed by host`);
+      logger.info('SOCKET', `Room ${gameCode} closed by host`);
     });
 
     // Handle get active rooms - NOT rate limited (essential for lobby)
@@ -1299,7 +1348,7 @@ function initializeSocketHandlers(io) {
       const game = getGame(gameCode);
       if (game) {
         game.lastActivity = Date.now();
-        console.log(`[SOCKET] Host reactivated for game ${gameCode}`);
+        logger.debug('SOCKET', `Host reactivated for game ${gameCode}`);
       }
     });
 
@@ -1329,11 +1378,9 @@ function initializeSocketHandlers(io) {
 
       // Add all current players to the tournament
       Object.entries(game.users).forEach(([username, userData]) => {
-        const playerSocketId = Object.keys(game.playerSocketIds || {}).find(
-          id => game.playerSocketIds[id] === username
-        );
-        if (playerSocketId) {
-          tournamentManager.addPlayerToTournament(tournament.id, playerSocketId, username, userData.avatar);
+        // Use userData.socketId which is properly maintained in game.users
+        if (userData && userData.socketId) {
+          tournamentManager.addPlayerToTournament(tournament.id, userData.socketId, username, userData.avatar);
         }
       });
 
@@ -1426,10 +1473,10 @@ function initializeSocketHandlers(io) {
         // Start timer
         startGameTimer(io, gameCode, timerSeconds);
 
-        console.log(`[TOURNAMENT] Started round ${roundData.roundNumber}/${tournament.totalRounds} for game ${gameCode}`);
+        logger.info('TOURNAMENT', `Started round ${roundData.roundNumber}/${tournament.totalRounds} for game ${gameCode}`);
       } catch (err) {
-        console.error('[TOURNAMENT] Error starting round:', err);
-        socket.emit('error', { message: err?.message || String(err) || 'Failed to start tournament round' });
+        logger.error('TOURNAMENT', 'Error starting round', err);
+        emitError(socket, err?.message || 'Failed to start tournament round');
       }
     });
 
@@ -1476,17 +1523,17 @@ function initializeSocketHandlers(io) {
         emitError(socket, ErrorMessages.RATE_LIMIT_EXCEEDED);
         return;
       }
-      console.log(`[SOCKET] Player ${username} intentionally leaving game ${gameCode}`);
+      logger.info('SOCKET', `Player ${username} intentionally leaving game ${gameCode}`);
 
       const game = getGame(gameCode);
       if (!game) {
-        console.log(`[SOCKET] Game ${gameCode} not found for leaveRoom`);
+        logger.debug('SOCKET', `Game ${gameCode} not found for leaveRoom`);
         return;
       }
 
       // Check if this is the host
       if (game.hostSocketId === socket.id) {
-        console.log(`[SOCKET] Host intentionally left game ${gameCode} - closing room immediately`);
+        logger.info('SOCKET', `Host intentionally left game ${gameCode} - closing room immediately`);
 
         // No grace period for intentional host exit
         timerManager.clearGameTimer(gameCode);
@@ -1499,7 +1546,7 @@ function initializeSocketHandlers(io) {
         io.emit('activeRooms', { rooms: getActiveRooms() });
       } else {
         // Regular player intentionally left
-        console.log(`[SOCKET] Player ${username} left game ${gameCode}`);
+        logger.info('SOCKET', `Player ${username} left game ${gameCode}`);
 
         // Remove player completely including all their data
         removeUserBySocketId(socket.id);
@@ -1524,7 +1571,7 @@ function initializeSocketHandlers(io) {
         // Clean up empty rooms and broadcast updated room list
         const cleanedCount = cleanupEmptyRooms();
         if (cleanedCount > 0) {
-          console.log(`[SOCKET] Cleaned up ${cleanedCount} empty room(s)`);
+          logger.debug('SOCKET', `Cleaned up ${cleanedCount} empty room(s)`);
         }
         io.emit('activeRooms', { rooms: getActiveRooms() });
       }
@@ -1535,7 +1582,7 @@ function initializeSocketHandlers(io) {
 
     // Handle disconnection
     socket.on('disconnect', (reason) => {
-      console.log(`[SOCKET] Client disconnected: ${socket.id} - ${reason}`);
+      logger.info('SOCKET', `Client disconnected: ${socket.id} - ${reason}`);
 
       // Get user info WITHOUT removing them yet - we need to check if it's the host
       const gameCode = getGameBySocketId(socket.id);
@@ -1557,7 +1604,7 @@ function initializeSocketHandlers(io) {
       const isHostDisconnect = game.hostSocketId === socket.id;
 
       if (isHostDisconnect) {
-        console.log(`[SOCKET] Host disconnected from game ${gameCode}`);
+        logger.info('SOCKET', `Host disconnected from game ${gameCode}`);
 
         // Mark host as disconnected but DON'T remove their user data yet
         // This allows reconnection to find them and restore their session
@@ -1569,64 +1616,133 @@ function initializeSocketHandlers(io) {
         // Only clear socket mappings, NOT user data
         clearSocketMappings(socket.id);
 
-        // Set reconnection timeout - only remove user data and close room if timeout expires
+        // Notify players that host disconnected (for UI feedback)
+        broadcastToRoom(io, getGameRoom(gameCode), 'hostDisconnected', {
+          message: 'Host disconnected. Waiting for reconnection...',
+          gracePeriodMs: HOST_RECONNECT_GRACE_PERIOD_MS
+        });
+
+        // Set reconnection timeout - try host transfer first, then close room
         const reconnectionTimeout = setTimeout(() => {
           const currentGame = getGame(gameCode);
           if (currentGame && currentGame.users[username]?.disconnected) {
-            // Host didn't reconnect within grace period - NOW remove their data and close room
-            console.log(`[SOCKET] Host reconnect grace period expired for game ${gameCode}`);
+            // Host didn't reconnect within grace period
+            logger.info('SOCKET', `Host reconnect grace period expired for game ${gameCode}`);
 
-            removeUserFromGame(gameCode, username);
-            timerManager.clearGameTimer(gameCode);
+            // Try to transfer host to another player
+            const otherPlayers = Object.entries(currentGame.users)
+              .filter(([uname, userData]) => uname !== username && !userData.disconnected)
+              .sort((a, b) => a[1].joinedAt - b[1].joinedAt); // Sort by join time (oldest first)
 
-            broadcastToRoom(io, getGameRoom(gameCode), 'hostLeftRoomClosing', {
-              message: 'Host disconnected. Room is closing.'
-            });
+            if (otherPlayers.length > 0) {
+              // Transfer host to the longest-tenured active player
+              const [newHostUsername, newHostData] = otherPlayers[0];
+              logger.info('SOCKET', `Transferring host to ${newHostUsername} for game ${gameCode}`);
 
-            deleteGame(gameCode);
-            io.emit('activeRooms', { rooms: getActiveRooms() });
+              // Update game state
+              currentGame.hostSocketId = newHostData.socketId;
+              currentGame.hostUsername = newHostUsername;
+              newHostData.isHost = true;
+
+              // Remove old host from game
+              removeUserFromGame(gameCode, username);
+
+              // Notify all players about host transfer
+              broadcastToRoom(io, getGameRoom(gameCode), 'hostTransferred', {
+                newHost: newHostUsername,
+                message: `${newHostUsername} is now the host`
+              });
+
+              // Update user list
+              broadcastToRoom(io, getGameRoom(gameCode), 'updateUsers', {
+                users: getGameUsers(gameCode)
+              });
+
+              io.emit('activeRooms', { rooms: getActiveRooms() });
+            } else {
+              // No other players to transfer to - close room
+              removeUserFromGame(gameCode, username);
+              timerManager.clearGameTimer(gameCode);
+
+              broadcastToRoom(io, getGameRoom(gameCode), 'hostLeftRoomClosing', {
+                message: 'Host disconnected and no other players available. Room is closing.'
+              });
+
+              deleteGame(gameCode);
+              io.emit('activeRooms', { rooms: getActiveRooms() });
+            }
           }
-        }, 30000); // 30 second grace period
+        }, HOST_RECONNECT_GRACE_PERIOD_MS);
 
         // Store timeout ID in game object
         game.reconnectionTimeout = reconnectionTimeout;
 
       } else {
-        // Regular player disconnected - use existing behavior (full removal)
-        const userInfo = removeUserBySocketId(socket.id);
-        if (!userInfo) {
-          resetRateLimit(socket.id);
-          return;
+        // Regular player disconnected - give them a grace period too
+        logger.info('SOCKET', `Player ${username} disconnected from game ${gameCode}`);
+
+        // Mark player as disconnected but DON'T remove them yet
+        if (game.users[username]) {
+          game.users[username].disconnected = true;
+          game.users[username].disconnectedAt = Date.now();
+
+          // Store reconnection timeout on user object
+          game.users[username].reconnectionTimeout = setTimeout(() => {
+            const currentGame = getGame(gameCode);
+            if (currentGame && currentGame.users[username]?.disconnected) {
+              // Player didn't reconnect within grace period - now remove them
+              logger.info('SOCKET', `Player ${username} reconnect grace period expired for game ${gameCode}`);
+
+              removeUserFromGame(gameCode, username);
+
+              // Clean up player-specific game data
+              cleanupPlayerData(currentGame, username);
+
+              broadcastToRoom(io, getGameRoom(gameCode), 'playerLeft', {
+                username,
+                message: `${username} disconnected`
+              });
+
+              broadcastToRoom(io, getGameRoom(gameCode), 'updateUsers', {
+                users: getGameUsers(gameCode)
+              });
+
+              // Handle game start coordination
+              gameStartCoordinator.handlePlayerDisconnect(gameCode, username);
+
+              // Remove player from tournament if active
+              const tournamentId = getTournamentIdFromGame(gameCode);
+              if (tournamentId) {
+                const removed = tournamentManager.removePlayerFromTournament(tournamentId, socket.id, true);
+                if (removed) {
+                  logger.info('TOURNAMENT', `Removed disconnected player ${username} from tournament ${tournamentId}`);
+                  const standings = tournamentManager.getTournamentStandings(tournamentId);
+                  broadcastToRoom(io, getGameRoom(gameCode), 'tournamentPlayerLeft', {
+                    username,
+                    standings
+                  });
+                }
+              }
+
+              // Clean up empty rooms and broadcast updated room list
+              const cleanedCount = cleanupEmptyRooms();
+              if (cleanedCount > 0) {
+                logger.debug('SOCKET', `Cleaned up ${cleanedCount} empty room(s)`);
+              }
+              io.emit('activeRooms', { rooms: getActiveRooms() });
+            }
+          }, PLAYER_RECONNECT_GRACE_PERIOD_MS);
         }
 
-        broadcastToRoom(io, getGameRoom(gameCode), 'updateUsers', {
-          users: getGameUsers(gameCode)
+        // Only clear socket mappings, NOT user data
+        clearSocketMappings(socket.id);
+
+        // Notify room that player is reconnecting
+        broadcastToRoom(io, getGameRoom(gameCode), 'playerDisconnected', {
+          username,
+          message: `${username} disconnected. Waiting for reconnection...`,
+          gracePeriodMs: PLAYER_RECONNECT_GRACE_PERIOD_MS
         });
-
-        // Handle game start coordination
-        gameStartCoordinator.handlePlayerDisconnect(gameCode, username);
-
-        // Remove player from tournament if active
-        const tournamentId = getTournamentIdFromGame(gameCode);
-        if (tournamentId) {
-          const removed = tournamentManager.removePlayerFromTournament(tournamentId, socket.id, true);
-          if (removed) {
-            console.log(`[TOURNAMENT] Removed disconnected player ${username} from tournament ${tournamentId}`);
-            // Broadcast updated standings
-            const standings = tournamentManager.getTournamentStandings(tournamentId);
-            broadcastToRoom(io, getGameRoom(gameCode), 'tournamentPlayerLeft', {
-              username,
-              standings
-            });
-          }
-        }
-
-        // Clean up empty rooms and broadcast updated room list
-        const cleanedCount = cleanupEmptyRooms();
-        if (cleanedCount > 0) {
-          console.log(`[SOCKET] Cleaned up ${cleanedCount} empty room(s)`);
-        }
-        io.emit('activeRooms', { rooms: getActiveRooms() });
       }
 
       // Reset rate limit
@@ -1643,10 +1759,7 @@ function initializeSocketHandlers(io) {
       const gameCode = getGameBySocketId(socket.id);
       const username = getUsernameBySocketId(socket.id);
 
-      console.log(`[PRESENCE] Received from ${username} in ${gameCode}:`, data);
-
       if (!gameCode || !username) {
-        console.log('[PRESENCE] No gameCode or username, ignoring');
         return;
       }
 
@@ -1660,11 +1773,8 @@ function initializeSocketHandlers(io) {
         forceIdle: isIdle === true, // Explicit idle flag from client
       });
 
-      console.log(`[PRESENCE] updateUserPresence returned: ${newStatus}`);
-
       if (newStatus) {
         // Broadcast presence update to all players in room
-        console.log(`[PRESENCE] Broadcasting to room ${getGameRoom(gameCode)}:`, { username, presenceStatus: newStatus, isWindowFocused });
         broadcastToRoom(io, getGameRoom(gameCode), 'playerPresenceUpdate', {
           username,
           presenceStatus: newStatus,
@@ -1762,7 +1872,7 @@ async function endGame(io, gameCode) {
   // Update game state
   updateGame(gameCode, { gameState: 'finished' });
 
-  console.log(`[GAME_END] Game ${gameCode} ending, calculating final scores immediately`);
+  logger.info('GAME', `Game ${gameCode} ending, calculating final scores immediately`);
 
   // Calculate and broadcast final scores IMMEDIATELY (no waiting for feedback)
   await calculateAndBroadcastFinalScores(io, gameCode);
@@ -1770,13 +1880,13 @@ async function endGame(io, gameCode) {
   // Collect non-dictionary words for feedback (to be shown on results page)
   const nonDictWords = collectNonDictionaryWords(game);
   const playerCount = Object.keys(game.users).length;
-  const FEEDBACK_TIMEOUT_SECONDS = 10;
+  const FEEDBACK_TIMEOUT_SECONDS = 15;
 
-  console.log(`[GAME_END] Game ${gameCode} ended. ${nonDictWords.length} non-dictionary words found, ${playerCount} players.`);
+  logger.info('GAME', `Game ${gameCode} ended. ${nonDictWords.length} non-dictionary words found, ${playerCount} players.`);
 
   // Send word feedback to each player AFTER results are shown (they vote on words they didn't submit)
   if (nonDictWords.length > 0 && playerCount > 1) {
-    console.log(`[FEEDBACK] Will show word feedback to players on results page (non-dict words: ${nonDictWords.length}, players: ${playerCount})`);
+    logger.debug('FEEDBACK', `Will show word feedback to players on results page (non-dict words: ${nonDictWords.length}, players: ${playerCount})`);
 
     // Small delay to ensure results page has loaded first
     setTimeout(() => {
@@ -1794,28 +1904,26 @@ async function endGame(io, gameCode) {
               gameCode,
               language: game.language || 'en'
             });
-            console.log(`[FEEDBACK] Sent word "${wordForPlayer.word}" to ${username} for feedback`);
+            logger.debug('FEEDBACK', `Sent word "${wordForPlayer.word}" to ${username} for feedback`);
           }
         }
       }
     }, 500); // 500ms delay to let results page render
   } else {
-    console.log(`[FEEDBACK] Skipping word feedback (non-dict words: ${nonDictWords.length}, players: ${playerCount})`);
+    logger.debug('FEEDBACK', `Skipping word feedback (non-dict words: ${nonDictWords.length}, players: ${playerCount})`);
   }
 
   // Check for tournament
   const tournamentId = getTournamentIdFromGame(gameCode);
   if (tournamentId) {
-    // Record round results - convert scores object to round results format
+    // Record round results - use game.playerScores which is updated by calculateAndBroadcastFinalScores
     const roundResults = {};
-    Object.keys(scores).forEach(username => {
-      // Find the player's socket ID
-      const playerSocketId = Object.keys(game.playerSocketIds || {}).find(
-        id => game.playerSocketIds[id] === username
-      );
-      if (playerSocketId) {
-        roundResults[playerSocketId] = {
-          score: scores[username]?.totalScore || 0,
+    Object.keys(game.users).forEach(username => {
+      // Use userData.socketId which is properly maintained
+      const userData = game.users[username];
+      if (userData && userData.socketId) {
+        roundResults[userData.socketId] = {
+          score: game.playerScores?.[username] || 0,
           words: (game.playerWords && game.playerWords[username]) || []
         };
       }
@@ -1851,7 +1959,7 @@ async function endGame(io, gameCode) {
     }
   }
 
-  console.log(`[SOCKET] Game ${gameCode} ended`);
+  logger.info('SOCKET', `Game ${gameCode} ended`);
 }
 
 /**
@@ -1859,14 +1967,14 @@ async function endGame(io, gameCode) {
  * No host validation - just auto-validate dictionary + community-validated words
  */
 async function calculateAndBroadcastFinalScores(io, gameCode) {
-  console.log(`[FINAL_SCORES] calculateAndBroadcastFinalScores called for game ${gameCode}`);
+  logger.debug('FINAL_SCORES', `calculateAndBroadcastFinalScores called for game ${gameCode}`);
   const game = getGame(gameCode);
   if (!game || game.gameState !== 'finished') {
-    console.log(`[FINAL_SCORES] Skipping - game not found or not finished. game: ${!!game}, state: ${game?.gameState}`);
+    logger.debug('FINAL_SCORES', `Skipping - game not found or not finished. game: ${!!game}, state: ${game?.gameState}`);
     return;
   }
 
-  console.log(`[FINAL_SCORES] Calculating final scores for game ${gameCode}`);
+  logger.info('FINAL_SCORES', `Calculating final scores for game ${gameCode}`);
 
   // Build word count map to detect duplicates across all players
   const wordCountMap = {};
@@ -1972,7 +2080,7 @@ async function calculateAndBroadcastFinalScores(io, gameCode) {
   });
 
   // Broadcast final scores to everyone
-  console.log(`[FINAL_SCORES] Broadcasting validatedScores to room for game ${gameCode}, ${scoresArray.length} players`);
+  logger.info('FINAL_SCORES', `Broadcasting validatedScores to room for game ${gameCode}, ${scoresArray.length} players`);
   broadcastToRoom(io, getGameRoom(gameCode), 'validatedScores', {
     scores: scoresArray,
     letterGrid: game.letterGrid
@@ -1980,23 +2088,21 @@ async function calculateAndBroadcastFinalScores(io, gameCode) {
 
   // Also send validationComplete to host for backward compatibility
   const hostSocketId = game.hostSocketId;
-  console.log(`[FINAL_SCORES] Sending validationComplete to host socket ${hostSocketId}`);
   if (hostSocketId) {
     const hostSocket = getSocketById(io, hostSocketId);
     if (hostSocket) {
-      console.log(`[FINAL_SCORES] Found host socket, emitting validationComplete`);
       safeEmit(hostSocket, 'validationComplete', {
         scores: scoresArray
       });
     } else {
-      console.log(`[FINAL_SCORES] WARNING: Host socket not found!`);
+      logger.warn('FINAL_SCORES', 'Host socket not found!');
     }
   }
 
   // Record game results to Supabase
   await recordGameResultsToSupabase(gameCode, scoresArray, game);
 
-  console.log(`[FINAL_SCORES] Final scores broadcast for game ${gameCode}`);
+  logger.info('FINAL_SCORES', `Final scores broadcast for game ${gameCode}`);
 }
 
 /**
@@ -2007,7 +2113,7 @@ async function calculateAndBroadcastFinalScores(io, gameCode) {
  */
 async function recordGameResultsToSupabase(gameCode, scoresArray, game) {
   if (!isSupabaseConfigured()) {
-    console.log(`[SUPABASE] Supabase not configured (missing NEXT_PUBLIC_SUPABASE_URL or NEXT_PUBLIC_SUPABASE_ANON_KEY), skipping stats save for game ${gameCode}`);
+    logger.debug('SUPABASE', `Supabase not configured, skipping stats save for game ${gameCode}`);
     return;
   }
 
@@ -2031,14 +2137,12 @@ async function recordGameResultsToSupabase(gameCode, scoresArray, game) {
 
     // Build auth map from game users
     const userAuthMap = {};
-    console.log(`[SUPABASE] Building userAuthMap from game.users:`, Object.keys(game.users || {}));
     for (const [username, userData] of Object.entries(game.users || {})) {
       // Validate userData is an object before accessing properties
       if (!userData || typeof userData !== 'object') {
-        console.warn(`[SUPABASE] Skipping invalid userData for ${username}`);
+        logger.warn('SUPABASE', `Skipping invalid userData for ${username}`);
         continue;
       }
-      console.log(`[SUPABASE] User ${username} auth data:`, { authUserId: userData.authUserId, guestTokenHash: !!userData.guestTokenHash });
       if (userData.authUserId || userData.guestTokenHash) {
         userAuthMap[username] = {
           authUserId: userData.authUserId || null,
@@ -2046,11 +2150,10 @@ async function recordGameResultsToSupabase(gameCode, scoresArray, game) {
         };
       }
     }
-    console.log(`[SUPABASE] Final userAuthMap:`, JSON.stringify(userAuthMap));
 
     // Only process if there are users with auth context
     if (Object.keys(userAuthMap).length === 0) {
-      console.log(`[SUPABASE] No authenticated users in game ${gameCode}, skipping result recording`);
+      logger.debug('SUPABASE', `No authenticated users in game ${gameCode}, skipping result recording`);
       return;
     }
 
@@ -2083,7 +2186,7 @@ async function recordGameResultsToSupabase(gameCode, scoresArray, game) {
               newTotalXp: xpInfo.newTotalXp,
               newLevel: xpInfo.newLevel,
             });
-            console.log(`[XP] Emitted xpGained to ${username}: +${xpInfo.xpEarned} XP`);
+            logger.debug('XP', `Emitted xpGained to ${username}: +${xpInfo.xpEarned} XP`);
 
             // Emit level up event if applicable
             if (xpInfo.leveledUp) {
@@ -2093,7 +2196,7 @@ async function recordGameResultsToSupabase(gameCode, scoresArray, game) {
                 levelsGained: xpInfo.levelsGained,
                 newTitles: xpInfo.newTitles,
               });
-              console.log(`[XP] Emitted levelUp to ${username}: Level ${xpInfo.oldLevel} -> ${xpInfo.newLevel}`);
+              logger.info('XP', `Emitted levelUp to ${username}: Level ${xpInfo.oldLevel} -> ${xpInfo.newLevel}`);
             }
           }
         }
@@ -2103,9 +2206,9 @@ async function recordGameResultsToSupabase(gameCode, scoresArray, game) {
     // Invalidate leaderboard cache after recording results
     await invalidateLeaderboardCaches();
 
-    console.log(`[SUPABASE] Recorded game results for ${gameCode} - ${scoresWithPlacement.length} players`);
+    logger.info('SUPABASE', `Recorded game results for ${gameCode} - ${scoresWithPlacement.length} players`);
   } catch (error) {
-    console.error(`[SUPABASE] Error recording game results for ${gameCode}:`, error);
+    logger.error('SUPABASE', `Error recording game results for ${gameCode}`, error);
   }
 }
 

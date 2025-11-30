@@ -1,4 +1,4 @@
-import React, { useMemo, useEffect, useState, useCallback } from 'react';
+import React, { useMemo, useEffect, useState, useCallback, useRef } from 'react';
 import dynamic from 'next/dynamic';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FaTrophy, FaSignOutAlt, FaStar, FaUser, FaFire, FaChartBar } from 'react-icons/fa';
@@ -129,10 +129,13 @@ const ResultsPage = ({ finalScores, letterGrid, gameCode, onReturnToRoom, userna
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [showFirstWinModal, setShowFirstWinModal] = useState(false);
   const [hasShownUpgradePrompt, setHasShownUpgradePrompt] = useState(false);
-  const [hasUpdatedStats, setHasUpdatedStats] = useState(false);
-  const [hasTrackedGame, setHasTrackedGame] = useState(false);
-  const [previousStreak, setPreviousStreak] = useState(0);
   const [showHeatmap, setShowHeatmap] = useState(false);
+
+  // Use refs for values that don't need to trigger re-renders
+  const hasUpdatedStatsRef = useRef(false);
+  const hasTrackedGameRef = useRef(false);
+  // previousStreak needs to be state since it's used in render
+  const [previousStreak, setPreviousStreak] = useState(0);
 
   // Word feedback state for crowd-sourced word validation
   const [showWordFeedback, setShowWordFeedback] = useState(false);
@@ -157,19 +160,8 @@ const ResultsPage = ({ finalScores, letterGrid, gameCode, onReturnToRoom, userna
 
   // Update guest stats when results load (only once)
   useEffect(() => {
-    // Debug logging
-    console.log('[ResultsPage] Stats update check:', {
-      isAuthenticated,
-      hasUpdatedStats,
-      hasFinalScores: !!finalScores,
-      username,
-      isCurrentUserWinner,
-      scoresUsernames: finalScores?.map(p => p.username)
-    });
-
-    if (!isAuthenticated && !hasUpdatedStats && finalScores && username) {
+    if (!isAuthenticated && !hasUpdatedStatsRef.current && finalScores && username) {
       const currentPlayerData = finalScores.find(p => p.username === username);
-      console.log('[ResultsPage] Current player data:', currentPlayerData);
 
       if (currentPlayerData) {
         const validWords = currentPlayerData.allWords?.filter(w => w.validated && w.score > 0) || [];
@@ -184,15 +176,14 @@ const ResultsPage = ({ finalScores, letterGrid, gameCode, onReturnToRoom, userna
           isWinner: isCurrentUserWinner,
           achievements: currentPlayerData.achievements || []
         });
-        setHasUpdatedStats(true);
-        console.log('[ResultsPage] Stats updated, isFirstWin:', isFirstWin());
+        hasUpdatedStatsRef.current = true;
       }
     }
-  }, [isAuthenticated, hasUpdatedStats, finalScores, username, isCurrentUserWinner]);
+  }, [isAuthenticated, finalScores, username, isCurrentUserWinner]);
 
   // Track game completion and record win streak (only once)
   useEffect(() => {
-    if (hasTrackedGame || !currentPlayerData) return;
+    if (hasTrackedGameRef.current || !currentPlayerData) return;
 
     const validWords = currentPlayerData.allWords?.filter(w => w.validated && w.score > 0) || [];
     const guestStats = getGuestStatsSummary();
@@ -216,29 +207,19 @@ const ResultsPage = ({ finalScores, letterGrid, gameCode, onReturnToRoom, userna
       trackStreakMilestone(newStreak);
     }
 
-    setHasTrackedGame(true);
-  }, [hasTrackedGame, currentPlayerData, isCurrentUserWinner, currentStreak, recordWin]);
+    hasTrackedGameRef.current = true;
+  }, [currentPlayerData, isCurrentUserWinner, currentStreak, recordWin]);
 
   // Show celebratory signup prompt for guests - triggered on scroll near bottom
   // This ensures it doesn't interfere with the word feedback modal
   useEffect(() => {
     // Don't set up scroll listener if already shown, authenticated, or word feedback is showing
-    if (isAuthenticated || hasShownUpgradePrompt || !hasUpdatedStats || showWordFeedback) {
+    if (isAuthenticated || hasShownUpgradePrompt || !hasUpdatedStatsRef.current || showWordFeedback) {
       return;
     }
 
     const shouldShowModal = shouldShowUpgradePrompt();
     const isFirstWinUser = isFirstWin();
-
-    console.log('[ResultsPage] Setting up scroll-based signup prompt:', {
-      isAuthenticated,
-      hasShownUpgradePrompt,
-      hasUpdatedStats,
-      isCurrentUserWinner,
-      isFirstWinResult: isFirstWinUser,
-      shouldShowUpgradePromptResult: shouldShowModal,
-      showWordFeedback
-    });
 
     // Only proceed if we should show a modal
     if (!shouldShowModal && !(isCurrentUserWinner && isFirstWinUser)) {
@@ -253,8 +234,6 @@ const ResultsPage = ({ finalScores, letterGrid, gameCode, onReturnToRoom, userna
       const scrollPercentage = (scrollTop + clientHeight) / scrollHeight;
 
       if (scrollPercentage >= 0.8 && !showWordFeedback) {
-        console.log('[ResultsPage] User scrolled near bottom, showing signup modal');
-
         if (isCurrentUserWinner && (isFirstWinUser || shouldShowModal)) {
           setShowFirstWinModal(true);
         } else if (shouldShowModal) {
@@ -282,7 +261,7 @@ const ResultsPage = ({ finalScores, letterGrid, gameCode, onReturnToRoom, userna
       window.removeEventListener('scroll', handleScroll);
       clearTimeout(initialCheckTimeout);
     };
-  }, [isAuthenticated, hasShownUpgradePrompt, hasUpdatedStats, isCurrentUserWinner, showWordFeedback]);
+  }, [isAuthenticated, hasShownUpgradePrompt, isCurrentUserWinner, showWordFeedback]);
 
   const handleExitRoom = () => {
     setShowExitConfirm(true);
@@ -627,7 +606,7 @@ const ResultsPage = ({ finalScores, letterGrid, gameCode, onReturnToRoom, userna
         word={wordToVote?.word || ''}
         submittedBy={wordToVote?.submittedBy || ''}
         submitterAvatar={wordToVote?.submitterAvatar}
-        timeoutSeconds={wordToVote?.timeoutSeconds || 10}
+        timeoutSeconds={wordToVote?.timeoutSeconds || 15}
         onVote={handleVote}
         onSkip={handleFeedbackSkip}
         onTimeout={handleFeedbackSkip}

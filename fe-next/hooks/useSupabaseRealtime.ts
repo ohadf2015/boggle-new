@@ -117,8 +117,9 @@ export function useLeaderboard(options: LeaderboardOptions = {}): LeaderboardRes
     setLoading(false);
   }, [limit, orderBy, enabled]);
 
+  // Trigger initial fetch - using void to acknowledge fire-and-forget pattern
   useEffect(() => {
-    fetchLeaderboard();
+    void fetchLeaderboard();
   }, [fetchLeaderboard]);
 
   useEffect(() => {
@@ -178,7 +179,7 @@ export function useUserRank(userId: string | null | undefined): UserRankResult {
   }, [userId]);
 
   useEffect(() => {
-    fetchRank();
+    void fetchRank();
   }, [fetchRank]);
 
   // Subscribe to leaderboard changes to update rank
@@ -227,7 +228,7 @@ export function useProfile(userId: string | null | undefined): ProfileResult {
   }, [userId]);
 
   useEffect(() => {
-    fetchProfile();
+    void fetchProfile();
   }, [fetchProfile]);
 
   // Subscribe to profile changes
@@ -294,8 +295,8 @@ export function useGameHistory(userId: string | null | undefined, options: GameH
 
   useEffect(() => {
     setOffset(0);
-    fetchHistory(0, false);
-  }, [userId]); // eslint-disable-line react-hooks/exhaustive-deps
+    void fetchHistory(0, false);
+  }, [userId, fetchHistory]);
 
   // Subscribe to new game results
   useEffect(() => {
@@ -461,7 +462,7 @@ export function useConnectionHealth(interval = 30000): ConnectionHealth {
       error: result.error
     });
     return result;
-  }, []);
+  }, [connectionMonitor]);
 
   useEffect(() => {
     checkHealth();

@@ -8,7 +8,8 @@ import logger from '@/utils/logger';
 
 interface FoundWord {
   word: string;
-  isValid?: boolean;
+  isValid?: boolean | null;
+  timestamp?: number;
 }
 
 interface Player {
@@ -196,6 +197,7 @@ const usePlayerSocketEvents = ({
         );
       }
 
+      // Update found words - mark as valid
       setFoundWords(prev => prev.map(fw =>
         fw.word.toLowerCase() === data.word.toLowerCase()
           ? { ...fw, isValid: true }
@@ -236,6 +238,7 @@ const usePlayerSocketEvents = ({
         }, comboTimeout);
       }
 
+      // Show toast with score from server
       wordAcceptedToast(data.word, {
         score: data.score || (data.word.length - 1),
         comboBonus: data.comboBonus || 0,
@@ -246,11 +249,22 @@ const usePlayerSocketEvents = ({
 
     const handleWordNeedsValidation = (data: any) => {
       wordNeedsValidationToast(data.word, { duration: 3000 });
+      // Word stays in list with isValid: null (pending validation)
+      // No need to update state since it's already null
       resetCombo();
     };
 
-    const handleWordAlreadyFound = () => {
+    const handleWordAlreadyFound = (data: any) => {
       wordErrorToast(t('playerView.wordAlreadyFound'), { duration: 2000 });
+      // Remove any pending (isValid === null) entries for this word
+      if (data?.word) {
+        setFoundWords(prev => prev.filter(fw => {
+          if (fw.word.toLowerCase() === data.word.toLowerCase() && fw.isValid === null) {
+            return false; // Remove pending duplicate
+          }
+          return true;
+        }));
+      }
       resetCombo();
     };
 
@@ -483,23 +497,81 @@ const usePlayerSocketEvents = ({
     };
 
     const handlePlayerPresenceUpdate = (data: any) => {
-      console.log('[PRESENCE] Received playerPresenceUpdate:', data);
       const { username: playerUsername, presenceStatus, isWindowFocused } = data;
       setPlayersReady(prev => {
-        console.log('[PRESENCE] Current playersReady:', prev);
-        const updated = prev.map(player => {
+        return prev.map(player => {
           const name = typeof player === 'string' ? player : player.username;
           if (name === playerUsername) {
             const newPlayer: Player = typeof player === 'string'
               ? { username: player, presenceStatus, isWindowFocused }
               : { ...player, presenceStatus, isWindowFocused };
-            console.log('[PRESENCE] Updated player:', newPlayer);
             return newPlayer;
           }
           return player;
         });
-        console.log('[PRESENCE] Updated playersReady:', updated);
-        return updated;
+      });
+    };
+
+    // Reconnection and host transfer handlers
+    const handleHostDisconnected = (data: any) => {
+      logger.log('[PLAYER] Host disconnected, waiting for reconnection');
+      neoInfoToast(data.message || t('playerView.hostDisconnected') || 'Host disconnected. Waiting for reconnection...', {
+        icon: '⏳',
+        duration: 5000
+      });
+    };
+
+    const handleHostTransferred = (data: any) => {
+      logger.log('[PLAYER] Host transferred to:', data.newHost);
+      neoSuccessToast(data.message || `${data.newHost} ${t('playerView.isNowHost') || 'is now the host'}`, {
+        icon: '👑',
+        duration: 4000
+      });
+    };
+
+    const handlePlayerDisconnected = (data: any) => {
+      logger.log('[PLAYER] Player disconnected:', data.username);
+      neoInfoToast(data.message || `${data.username} ${t('playerView.disconnected') || 'disconnected. Waiting for reconnection...'}`, {
+        icon: '📡',
+        duration: 3000
+      });
+    };
+
+    const handlePlayerReconnected = (data: any) => {
+      logger.log('[PLAYER] Player reconnected:', data.username);
+      neoSuccessToast(data.message || `${data.username} ${t('playerView.reconnected') || 'reconnected'}`, {
+        icon: '✅',
+        duration: 2000
+      });
+    };
+
+    const handlePlayerLeft = (data: any) => {
+      logger.log('[PLAYER] Player left:', data.username);
+      neoInfoToast(data.message || `${data.username} ${t('playerView.leftRoom') || 'left the room'}`, {
+        icon: '👋',
+        duration: 2000
+      });
+    };
+
+    // Multi-tab handling - session taken over by another tab
+    const handleSessionTakenOver = (data: any) => {
+      logger.log('[PLAYER] Session taken over by another tab');
+      intentionalExitRef.current = true;
+      clearSessionPreservingUsername(username);
+      neoInfoToast(data.message || t('playerView.sessionMovedToAnotherTab') || 'Session moved to another tab', {
+        icon: '📱',
+        duration: 3000
+      });
+      // Don't reload - just let the socket disconnect naturally
+    };
+
+    const handleSessionMigrated = (data: any) => {
+      logger.log('[PLAYER] Session migrated to different room');
+      intentionalExitRef.current = true;
+      clearSessionPreservingUsername(username);
+      neoInfoToast(data.message || t('playerView.sessionMovedToAnotherRoom') || 'Session moved to another room', {
+        icon: '🔄',
+        duration: 3000
       });
     };
 
@@ -533,6 +605,13 @@ const usePlayerSocketEvents = ({
     socket.on('noWordFeedback', handleNoWordFeedback);
     socket.on('voteRecorded', handleVoteRecorded);
     socket.on('wordBecameValid', handleWordBecameValid);
+    socket.on('hostDisconnected', handleHostDisconnected);
+    socket.on('hostTransferred', handleHostTransferred);
+    socket.on('playerDisconnected', handlePlayerDisconnected);
+    socket.on('playerReconnected', handlePlayerReconnected);
+    socket.on('playerLeft', handlePlayerLeft);
+    socket.on('sessionTakenOver', handleSessionTakenOver);
+    socket.on('sessionMigrated', handleSessionMigrated);
 
     return () => {
       socket.off('updateUsers', handleUpdateUsers);
@@ -564,6 +643,13 @@ const usePlayerSocketEvents = ({
       socket.off('noWordFeedback', handleNoWordFeedback);
       socket.off('voteRecorded', handleVoteRecorded);
       socket.off('wordBecameValid', handleWordBecameValid);
+      socket.off('hostDisconnected', handleHostDisconnected);
+      socket.off('hostTransferred', handleHostTransferred);
+      socket.off('playerDisconnected', handlePlayerDisconnected);
+      socket.off('playerReconnected', handlePlayerReconnected);
+      socket.off('playerLeft', handlePlayerLeft);
+      socket.off('sessionTakenOver', handleSessionTakenOver);
+      socket.off('sessionMigrated', handleSessionMigrated);
     };
   }, [
     socket,

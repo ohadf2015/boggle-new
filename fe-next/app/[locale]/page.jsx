@@ -100,11 +100,22 @@ export default function GamePage() {
   const [isConnected, setIsConnected] = useState(false);
   const [roomsLoading, setRoomsLoading] = useState(true); // Track rooms loading state
   const [pendingGameStart, setPendingGameStart] = useState(null); // Store game start data for players returning from results
+  const [isJoining, setIsJoining] = useState(false); // Track join/create loading state
+  const [authLoadingStartTime, setAuthLoadingStartTime] = useState(null); // Track when auth loading started
 
   const socketRef = useRef(null);
   const attemptingReconnectRef = useRef(attemptingReconnect);
   const hostKeepAliveIntervalRef = useRef(null);
   const wasConnectedRef = useRef(false);
+
+  // Track auth loading start time for timeout
+  useEffect(() => {
+    if (loading && !authLoadingStartTime) {
+      setAuthLoadingStartTime(Date.now());
+    } else if (!loading) {
+      setAuthLoadingStartTime(null);
+    }
+  }, [loading, authLoadingStartTime]);
 
   const { t, language } = useLanguage();
   const { user, isAuthenticated, isSupabaseEnabled, profile, loading, refreshProfile } = useAuth();
@@ -307,6 +318,11 @@ export default function GamePage() {
           };
 
           buildAuthContext().then((authContext) => {
+            // Check if socket is still connected after async operation
+            if (!newSocket.connected) {
+              logger.warn('[SOCKET.IO] Socket disconnected during auth context build, skipping reconnection emit');
+              return;
+            }
             if (savedSession.isHost) {
               newSocket.emit('createGame', {
                 gameCode: savedSession.gameCode,
@@ -364,6 +380,8 @@ export default function GamePage() {
       setError('');
       setAttemptingReconnect(false);
       setShouldAutoJoin(false);
+      setIsJoining(false); // Clear loading state
+      setPrefilledRoomCode(''); // Clear prefilled room code on successful join
 
       if (data.language) {
         setRoomLanguage(data.language);
@@ -404,6 +422,8 @@ export default function GamePage() {
 
     newSocket.on('error', (data) => {
       logger.error('[SOCKET.IO] Error:', data);
+      setIsJoining(false); // Clear loading state on any error
+
       // Log additional debug info to help diagnose empty errors
       if (!data || Object.keys(data).length === 0) {
         logger.error('[SOCKET.IO] Received empty error object - this may be a Socket.IO internal error');
@@ -497,6 +517,43 @@ export default function GamePage() {
       setIsActive(false);
       setIsHost(false);
       setGameCode('');
+    });
+
+    // Handle joining as spectator (room is full)
+    newSocket.on('joinedAsSpectator', (data) => {
+      logger.log('[SOCKET.IO] Joined as spectator:', data);
+      setIsJoining(false); // Clear loading state
+      setPrefilledRoomCode(''); // Clear prefilled room code
+      setAttemptingReconnect(false);
+      setShouldAutoJoin(false);
+
+      toast.info(t('common.roomFull') || 'Room is full. You joined as a spectator.', {
+        icon: '👀',
+        duration: 5000,
+      });
+
+      // Set spectator state - user can watch but not participate
+      if (data.language) {
+        setRoomLanguage(data.language);
+      }
+      // Note: We don't set isActive=true since spectators can't participate
+      // They're in the socket room but not in the game
+    });
+
+    // Handle server warnings (e.g., Redis failures)
+    newSocket.on('warning', (data) => {
+      logger.warn('[SOCKET.IO] Warning:', data);
+      if (data.type === 'persistence') {
+        toast.error(data.message || 'Game state could not be saved. Progress may be lost on server restart.', {
+          icon: '⚠️',
+          duration: 6000,
+        });
+      } else {
+        toast.error(data.message || 'A warning occurred', {
+          icon: '⚠️',
+          duration: 4000,
+        });
+      }
     });
 
     newSocket.on('hostTransferred', (data) => {
@@ -597,18 +654,28 @@ export default function GamePage() {
     }
 
     if (prefilledRoomCode && username && username.trim()) {
+      // Capture current values to avoid stale closure issues
+      const currentUsername = username;
+      const currentProfile = profile;
+      const currentPrefilledRoomCode = prefilledRoomCode;
+
       const autoJoinTimeout = setTimeout(async () => {
-        if (socket && isConnected && !isActive) {
+        if (socket && socket.connected && !isActive) {
           const authContext = await getAuthContext();
+          // Check socket is still connected after async operation
+          if (!socket.connected) {
+            logger.warn('[AUTO-JOIN] Socket disconnected during auth context build, skipping auto-join');
+            return;
+          }
           socket.emit('join', {
-            gameCode: prefilledRoomCode,
-            username,
+            gameCode: currentPrefilledRoomCode,
+            username: currentUsername,
             ...authContext,
-            avatar: profile ? {
-              emoji: profile.avatar_emoji,
-              color: profile.avatar_color,
+            avatar: currentProfile ? {
+              emoji: currentProfile.avatar_emoji,
+              color: currentProfile.avatar_color,
             } : undefined,
-            profilePictureUrl: profile?.profile_picture_url,
+            profilePictureUrl: currentProfile?.profile_picture_url,
           });
           setShouldAutoJoin(false);
         }
@@ -695,7 +762,11 @@ export default function GamePage() {
     }
 
     // Wait for auth to finish loading before creating/joining game
-    if (loading) {
+    // But allow joining after 5 seconds even if auth is still loading (to prevent permanent block)
+    const AUTH_LOADING_TIMEOUT = 5000;
+    const authLoadingTooLong = authLoadingStartTime && (Date.now() - authLoadingStartTime > AUTH_LOADING_TIMEOUT);
+
+    if (loading && !authLoadingTooLong) {
       logger.log('[AUTH] Auth still loading, waiting...');
       toast.error(t('common.loadingProfile') || 'Loading profile, please wait...', {
         duration: 2000,
@@ -704,7 +775,12 @@ export default function GamePage() {
       return;
     }
 
+    if (authLoadingTooLong) {
+      logger.warn('[AUTH] Auth loading timed out, proceeding without profile');
+    }
+
     setError('');
+    setIsJoining(true); // Show loading state
 
     // Use overrideGameCode if provided, otherwise use state gameCode
     const codeToUse = overrideGameCode || gameCode;
@@ -757,7 +833,7 @@ export default function GamePage() {
         profilePictureUrl: profile?.profile_picture_url,
       });
     }
-  }, [socket, isConnected, gameCode, username, roomName, language, t, isSupabaseEnabled, user, profile, loading]);
+  }, [socket, isConnected, gameCode, username, roomName, language, t, isSupabaseEnabled, user, profile, loading, authLoadingStartTime]);
 
   const refreshRooms = useCallback(() => {
     if (socket && isConnected) {
@@ -817,6 +893,7 @@ export default function GamePage() {
           isAuthenticated={isAuthenticated}
           displayName={profile?.display_name}
           isProfileLoading={loading}
+          isJoining={isJoining}
         />
       );
     }

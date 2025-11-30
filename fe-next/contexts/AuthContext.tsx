@@ -96,6 +96,35 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     }
   }, []);
 
+  // Helper to check if error is a refresh token error
+  const isRefreshTokenError = (error: { code?: string; message?: string } | null): boolean => {
+    if (!error) return false;
+    const errorCode = error.code?.toLowerCase() || '';
+    const errorMessage = error.message?.toLowerCase() || '';
+    return (
+      errorCode === 'refresh_token_not_found' ||
+      errorMessage.includes('refresh token not found') ||
+      errorMessage.includes('invalid refresh token') ||
+      errorCode === 'bad_jwt' ||
+      errorMessage.includes('jwt expired')
+    );
+  };
+
+  // Helper to clear auth state and sign out
+  const clearAuthState = useCallback(async (reason: string) => {
+    logger.warn(`Clearing auth state: ${reason}`);
+    setUser(null);
+    setProfile(null);
+    setRankedProgress(null);
+    if (supabase) {
+      try {
+        await supabase.auth.signOut({ scope: 'local' });
+      } catch {
+        // Ignore signout errors - we're already clearing state
+      }
+    }
+  }, []);
+
   // Initialize and check auth state
   useEffect(() => {
     const initAuth = async () => {
@@ -111,15 +140,23 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       try {
         const { data: { session }, error } = await supabase.auth.getSession();
         if (error) {
-          // Invalid refresh token or other auth error - clear state
-          logger.warn('Session error, signing out:', error.message);
-          await supabase.auth.signOut();
+          if (isRefreshTokenError(error)) {
+            await clearAuthState('Invalid or expired refresh token');
+          } else {
+            logger.warn('Session error, signing out:', error.message);
+            await supabase.auth.signOut();
+          }
         } else if (session?.user) {
           setUser(session.user);
           await fetchUserData(session.user.id);
         }
       } catch (err) {
-        logger.warn('Failed to get session:', (err as Error).message);
+        const error = err as { code?: string; message?: string };
+        if (isRefreshTokenError(error)) {
+          await clearAuthState('Invalid or expired refresh token');
+        } else {
+          logger.warn('Failed to get session:', error.message);
+        }
       }
       setLoading(false);
 
@@ -135,19 +172,27 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
             setRankedProgress(null);
           } else if (event === 'TOKEN_REFRESHED' && !session) {
             // Token refresh failed - sign out
-            logger.warn('Token refresh failed, signing out');
-            setUser(null);
-            setProfile(null);
-            setRankedProgress(null);
+            await clearAuthState('Token refresh failed');
           }
         }
       );
 
-      return () => subscription.unsubscribe();
+      // Listen for auth errors from API calls
+      const handleAuthError = (event: CustomEvent<{ code?: string; message?: string }>) => {
+        if (isRefreshTokenError(event.detail)) {
+          clearAuthState('Auth error: ' + event.detail.message);
+        }
+      };
+      window.addEventListener('supabase-auth-error', handleAuthError as EventListener);
+
+      return () => {
+        subscription.unsubscribe();
+        window.removeEventListener('supabase-auth-error', handleAuthError as EventListener);
+      };
     };
 
     initAuth();
-  }, [fetchUserData]);
+  }, [fetchUserData, clearAuthState]);
 
   const refreshProfile = useCallback(async () => {
     if (user?.id) {

@@ -5,20 +5,26 @@ import React, { createContext, useContext, useEffect, useState } from 'react';
 const ThemeContext = createContext();
 
 export const ThemeProvider = ({ children }) => {
-    const [theme, setTheme] = useState(() => {
-        if (typeof window !== 'undefined') {
-            const savedTheme = localStorage.getItem('boggle_theme');
-            return savedTheme || 'dark'; // Default to dark
+    // Initialize with default value to avoid hydration mismatch
+    const [theme, setTheme] = useState('dark');
+    const [mounted, setMounted] = useState(false);
+
+    // Load saved theme from localStorage after mount
+    useEffect(() => {
+        const savedTheme = localStorage.getItem('boggle_theme');
+        if (savedTheme) {
+            setTheme(savedTheme);
         }
-        return 'dark';
-    });
+        setMounted(true);
+    }, []);
 
     useEffect(() => {
+        if (!mounted) return;
         const root = window.document.documentElement;
         root.classList.remove('light', 'dark');
         root.classList.add(theme);
         localStorage.setItem('boggle_theme', theme);
-    }, [theme]);
+    }, [theme, mounted]);
 
     const toggleTheme = () => {
         setTheme((prev) => (prev === 'dark' ? 'light' : 'dark'));

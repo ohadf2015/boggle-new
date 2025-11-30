@@ -3,6 +3,8 @@
  * Ensures all players are ready before starting game timer
  */
 
+const logger = require('./logger');
+
 class GameStartCoordinator {
   constructor() {
     // Track active game start sequences
@@ -36,7 +38,7 @@ class GameStartCoordinator {
 
     this.activeSequences.set(gameCode, sequence);
 
-    console.log(`[GAME_START_COORD] Initialized sequence ${messageId} for game ${gameCode} with ${players.length} players`);
+    logger.debug('GAME_START', `Initialized sequence ${messageId} for game ${gameCode} with ${players.length} players`);
 
     return messageId;
   }
@@ -49,32 +51,27 @@ class GameStartCoordinator {
     const sequence = this.activeSequences.get(gameCode);
 
     if (!sequence) {
-      console.warn(`[GAME_START_COORD] No active sequence for game ${gameCode}`);
       return { valid: false, reason: 'no_active_sequence' };
     }
 
     if (sequence.cancelled) {
-      console.warn(`[GAME_START_COORD] Sequence cancelled for game ${gameCode}`);
       return { valid: false, reason: 'sequence_cancelled' };
     }
 
     if (sequence.messageId !== messageId) {
-      console.warn(`[GAME_START_COORD] Wrong messageId from ${username}. Expected: ${sequence.messageId}, Got: ${messageId}`);
+      logger.warn('GAME_START', `Wrong messageId from ${username}. Expected: ${sequence.messageId}, Got: ${messageId}`);
       return { valid: false, reason: 'wrong_message_id' };
     }
 
     if (sequence.timerStarted) {
-      console.log(`[GAME_START_COORD] Late acknowledgment from ${username} - timer already started`);
       return { valid: true, reason: 'timer_already_started', late: true };
     }
 
     if (!sequence.expectedPlayers.has(username)) {
-      console.warn(`[GAME_START_COORD] Unexpected player ${username} acknowledged`);
       return { valid: false, reason: 'unexpected_player' };
     }
 
     if (sequence.acknowledgedPlayers.has(username)) {
-      console.log(`[GAME_START_COORD] Duplicate acknowledgment from ${username}`);
       return { valid: true, reason: 'already_acknowledged', duplicate: true };
     }
 
@@ -85,7 +82,7 @@ class GameStartCoordinator {
     const ackCount = sequence.acknowledgedPlayers.size;
     const expectedCount = sequence.expectedPlayers.size;
 
-    console.log(`[GAME_START_COORD] Acknowledgment from ${username} (${ackCount}/${expectedCount})`);
+    logger.debug('GAME_START', `Acknowledgment from ${username} (${ackCount}/${expectedCount})`);
 
     // Check if all players have acknowledged
     const allAcknowledged = ackCount === expectedCount;
@@ -104,7 +101,7 @@ class GameStartCoordinator {
       this.clearRetryTimeouts(sequence);
 
       const waitTime = sequence.timerStartedAt - sequence.startedAt;
-      console.log(`[GAME_START_COORD] All players ready! Starting timer after ${waitTime}ms wait`);
+      logger.info('GAME_START', `All players ready! Starting timer after ${waitTime}ms wait`);
 
       return {
         valid: true,
@@ -134,7 +131,7 @@ class GameStartCoordinator {
     }
 
     if (sequence.expectedPlayers.has(username)) {
-      console.log(`[GAME_START_COORD] Player ${username} disconnected during start sequence`);
+      logger.debug('GAME_START', `Player ${username} disconnected during start sequence`);
 
       // Remove from expected players
       sequence.expectedPlayers.delete(username);
@@ -156,7 +153,7 @@ class GameStartCoordinator {
         }
         this.clearRetryTimeouts(sequence);
 
-        console.log(`[GAME_START_COORD] All remaining players ready after disconnect`);
+        logger.debug('GAME_START', 'All remaining players ready after disconnect');
         return { startTimer: true };
       }
     }
@@ -192,7 +189,7 @@ class GameStartCoordinator {
 
       const scheduleRetry = (attemptNumber) => {
         if (attemptNumber >= retryDelays.length) {
-          console.log(`[GAME_START_COORD] Max retries reached for ${username}`);
+          logger.debug('GAME_START', `Max retries reached for ${username}`);
           return;
         }
 
@@ -209,7 +206,7 @@ class GameStartCoordinator {
             return;
           }
 
-          console.log(`[GAME_START_COORD] Retry ${attemptNumber + 1} for ${username}`);
+          logger.debug('GAME_START', `Retry ${attemptNumber + 1} for ${username}`);
 
           // Attempt to resend
           const sent = sendFunction(username);
@@ -266,8 +263,7 @@ class GameStartCoordinator {
         waitTime: currentSequence.timerStartedAt - currentSequence.startedAt
       };
 
-      console.log(`[GAME_START_COORD] Timeout reached. Starting with ${stats.acknowledged}/${stats.expected} players ready`);
-      console.log(`[GAME_START_COORD] Missing players: ${missing.join(', ')}`);
+      logger.info('GAME_START', `Timeout reached. Starting with ${stats.acknowledged}/${stats.expected} players ready. Missing: ${missing.join(', ')}`);
 
       onTimeout(stats);
     }, timeoutMs);
@@ -293,7 +289,7 @@ class GameStartCoordinator {
       return;
     }
 
-    console.log(`[GAME_START_COORD] Cancelling sequence for game ${gameCode}`);
+    logger.debug('GAME_START', `Cancelling sequence for game ${gameCode}`);
 
     sequence.cancelled = true;
 

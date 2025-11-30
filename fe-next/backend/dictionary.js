@@ -3,6 +3,7 @@ const fsp = fs.promises;
 const path = require('path');
 const { promisify } = require('util');
 const appendFileAsync = promisify(fs.appendFile);
+const logger = require('./utils/logger');
 
 // Hebrew letter normalization - final letters
 const hebrewFinalLetters = {
@@ -36,7 +37,7 @@ class Dictionary {
       return;
     }
 
-    console.log('[Dictionary] Loading dictionaries in parallel...');
+    logger.info('DICT', 'Loading dictionaries in parallel...');
     const startTime = Date.now();
 
     try {
@@ -56,7 +57,7 @@ class Dictionary {
             return await fsp.readFile(filePath, 'utf-8');
           }
         } catch (e) {
-          console.warn(`[Dictionary] Could not read ${filePath}: ${e.message}`);
+          logger.warn('DICT', `Could not read ${filePath}: ${e.message}`);
         }
         return '';
       };
@@ -84,7 +85,7 @@ class Dictionary {
       const englishWords = require('an-array-of-english-words');
       this.englishWords = new Set(englishWords.map(w => w.toLowerCase()));
       const englishMainCount = this.englishWords.size;
-      console.log(`[Dictionary] Loaded ${englishMainCount} English words from main dictionary`);
+      logger.debug('DICT', `Loaded ${englishMainCount} English words from main dictionary`);
 
       // Process community-approved English words
       if (englishApprovedContent) {
@@ -101,10 +102,10 @@ class Dictionary {
           }
         }
         if (englishApprovedCount > 0) {
-          console.log(`[Dictionary] Loaded ${englishApprovedCount} community-approved English words`);
+          logger.debug('DICT', `Loaded ${englishApprovedCount} community-approved English words`);
         }
       }
-      console.log(`[Dictionary] Total English words: ${this.englishWords.size}`);
+      logger.debug('DICT', `Total English words: ${this.englishWords.size}`);
 
       // Process Hebrew words
       if (hebrewContent) {
@@ -116,7 +117,7 @@ class Dictionary {
 
         this.hebrewWords = new Set(hebrewWords);
         const mainCount = this.hebrewWords.size;
-        console.log(`[Dictionary] Loaded ${mainCount} Hebrew words from main dictionary`);
+        logger.debug('DICT', `Loaded ${mainCount} Hebrew words from main dictionary`);
       }
 
       // Process community-approved Hebrew words
@@ -135,10 +136,10 @@ class Dictionary {
           }
         }
         if (approvedCount > 0) {
-          console.log(`[Dictionary] Loaded ${approvedCount} community-approved Hebrew words`);
+          logger.debug('DICT', `Loaded ${approvedCount} community-approved Hebrew words`);
         }
       }
-      console.log(`[Dictionary] Total Hebrew words: ${this.hebrewWords.size}`);
+      logger.debug('DICT', `Total Hebrew words: ${this.hebrewWords.size}`);
 
       // Process Swedish words
       if (swedishFileContent) {
@@ -157,7 +158,7 @@ class Dictionary {
 
             this.swedishWords = new Set(words.map(w => w.toLowerCase()));
             const swedishMainCount = this.swedishWords.size;
-            console.log(`[Dictionary] Loaded ${swedishMainCount} Swedish words from main dictionary`);
+            logger.debug('DICT', `Loaded ${swedishMainCount} Swedish words from main dictionary`);
 
             // Process community-approved Swedish words
             if (swedishApprovedContent) {
@@ -174,15 +175,15 @@ class Dictionary {
                 }
               }
               if (swedishApprovedCount > 0) {
-                console.log(`[Dictionary] Loaded ${swedishApprovedCount} community-approved Swedish words`);
+                logger.debug('DICT', `Loaded ${swedishApprovedCount} community-approved Swedish words`);
               }
             }
-            console.log(`[Dictionary] Total Swedish words: ${this.swedishWords.size}`);
+            logger.debug('DICT', `Total Swedish words: ${this.swedishWords.size}`);
           } else {
-            console.log('[Dictionary] Could not parse Swedish dictionary - using fallback validation');
+            logger.warn('DICT', 'Could not parse Swedish dictionary - using fallback validation');
           }
         } catch (swedishError) {
-          console.error('[Dictionary] Error processing Swedish dictionary:', swedishError.message);
+          logger.error('DICT', `Error processing Swedish dictionary: ${swedishError.message}`);
         }
       }
 
@@ -197,7 +198,7 @@ class Dictionary {
           this.japaneseWords = new Set(kanjiCompounds);
           this.kanjiCompounds = kanjiCompounds;
           const japaneseMainCount = this.japaneseWords.size;
-          console.log(`[Dictionary] Loaded ${japaneseMainCount} Japanese Kanji compounds from main dictionary`);
+          logger.debug('DICT', `Loaded ${japaneseMainCount} Japanese Kanji compounds from main dictionary`);
 
           // Process community-approved Japanese words
           if (japaneseApprovedContent) {
@@ -214,20 +215,20 @@ class Dictionary {
               }
             }
             if (japaneseApprovedCount > 0) {
-              console.log(`[Dictionary] Loaded ${japaneseApprovedCount} community-approved Japanese words`);
+              logger.debug('DICT', `Loaded ${japaneseApprovedCount} community-approved Japanese words`);
             }
           }
-          console.log(`[Dictionary] Total Japanese words: ${this.japaneseWords.size}`);
+          logger.debug('DICT', `Total Japanese words: ${this.japaneseWords.size}`);
         } catch (japaneseError) {
-          console.error('[Dictionary] Error processing Japanese Kanji compounds:', japaneseError);
+          logger.error('DICT', `Error processing Japanese Kanji compounds: ${japaneseError}`);
         }
       }
 
       this.loaded = true;
       const loadTime = Date.now() - startTime;
-      console.log(`[Dictionary] All dictionaries loaded in ${loadTime}ms`);
+      logger.info('DICT', `All dictionaries loaded in ${loadTime}ms`);
     } catch (error) {
-      console.error('[Dictionary] Error loading dictionaries:', error);
+      logger.error('DICT', `Error loading dictionaries: ${error}`);
       // Continue without dictionaries - fall back to manual validation
     }
   }
@@ -428,10 +429,10 @@ async function addApprovedWord(word, language) {
   try {
     const approvedFilePath = path.join(__dirname, config.approvedFile);
     await appendFileAsync(approvedFilePath, normalizedWord + '\n', 'utf-8');
-    console.log(`[Dictionary] Word "${word}" (${language}) promoted to community-approved dictionary`);
+    logger.info('DICT', `Word "${word}" (${language}) promoted to community-approved dictionary`);
     return true;
   } catch (error) {
-    console.error('[Dictionary] Error appending approved word to file:', error.message);
+    logger.error('DICT', `Error appending approved word to file: ${error.message}`);
     // Word is still in memory, just not persisted
     return true;
   }

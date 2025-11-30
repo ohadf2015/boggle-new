@@ -166,6 +166,27 @@ export async function isSupabaseConfigured(): Promise<boolean> {
   return !!supabase;
 }
 
+// Helper to check and handle refresh token errors
+export function isRefreshTokenError(error: { code?: string; message?: string } | null): boolean {
+  if (!error) return false;
+  const errorCode = error.code?.toLowerCase() || '';
+  const errorMessage = error.message?.toLowerCase() || '';
+  return (
+    errorCode === 'refresh_token_not_found' ||
+    errorMessage.includes('refresh token not found') ||
+    errorMessage.includes('invalid refresh token') ||
+    errorCode === 'bad_jwt' ||
+    errorMessage.includes('jwt expired')
+  );
+}
+
+// Dispatch auth error event for centralized handling
+export function dispatchAuthError(error: { code?: string; message?: string }): void {
+  if (typeof window !== 'undefined') {
+    window.dispatchEvent(new CustomEvent('supabase-auth-error', { detail: error }));
+  }
+}
+
 // Profile picture storage functions
 export async function uploadProfilePicture(userId: string, file: File) {
   if (!supabase) return { url: null, error: { message: 'Supabase not configured' } };

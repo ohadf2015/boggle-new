@@ -326,9 +326,27 @@ const useHostSocketEvents = ({
       setHostAchievements([]);
     };
 
-    const handleWordAlreadyFound = () => {
+    const handleWordAlreadyFound = (data: any) => {
       if (hostPlaying) {
         wordErrorToast(t('playerView.wordAlreadyFound'), { duration: 2000 });
+        // Remove the duplicate word that was just added
+        if (data?.word) {
+          const wordLower = data.word.toLowerCase();
+          setHostFoundWords(prev => {
+            // Keep the first occurrence, remove subsequent duplicates
+            let foundFirst = false;
+            return prev.filter(w => {
+              if (w.toLowerCase() === wordLower) {
+                if (!foundFirst) {
+                  foundFirst = true;
+                  return true;
+                }
+                return false;
+              }
+              return true;
+            });
+          });
+        }
         resetCombo();
       }
     };
@@ -336,7 +354,10 @@ const useHostSocketEvents = ({
     const handleWordNotOnBoard = (data: any) => {
       if (hostPlaying) {
         wordErrorToast(t('playerView.wordNotOnBoard'), { duration: 3000 });
-        setHostFoundWords(prev => prev.filter(w => w !== data.word));
+        if (data?.word) {
+          const wordLower = data.word.toLowerCase();
+          setHostFoundWords(prev => prev.filter(w => w.toLowerCase() !== wordLower));
+        }
         resetCombo();
       }
     };
@@ -347,7 +368,10 @@ const useHostSocketEvents = ({
           ? (t('playerView.notInDictionary') || 'Not in dictionary')
           : (t('playerView.wordRejected') || 'Word rejected');
         wordErrorToast(`${data.word}: ${reason}`, { duration: 3000 });
-        setHostFoundWords(prev => prev.filter(w => w !== data.word));
+        if (data?.word) {
+          const wordLower = data.word.toLowerCase();
+          setHostFoundWords(prev => prev.filter(w => w.toLowerCase() !== wordLower));
+        }
         resetCombo();
       }
     };
@@ -355,6 +379,7 @@ const useHostSocketEvents = ({
     const handleWordNeedsValidation = (data: any) => {
       if (hostPlaying) {
         wordNeedsValidationToast(data.word, { duration: 3000 });
+        // Word stays in list - host can decide whether to validate it
         resetCombo();
       }
     };
@@ -429,23 +454,18 @@ const useHostSocketEvents = ({
     };
 
     const handlePlayerPresenceUpdate = (data: any) => {
-      console.log('[PRESENCE] Host received playerPresenceUpdate:', data);
       const { username: playerUsername, presenceStatus, isWindowFocused } = data;
       setPlayersReady(prev => {
-        console.log('[PRESENCE] Host current playersReady:', prev);
-        const updated = prev.map(player => {
+        return prev.map(player => {
           const name = typeof player === 'string' ? player : player.username;
           if (name === playerUsername) {
             const newPlayer: Player = typeof player === 'string'
               ? { username: player, presenceStatus, isWindowFocused }
               : { ...player, presenceStatus, isWindowFocused };
-            console.log('[PRESENCE] Host updated player:', newPlayer);
             return newPlayer;
           }
           return player;
         });
-        console.log('[PRESENCE] Host updated playersReady:', updated);
-        return updated;
       });
     };
 
@@ -453,6 +473,31 @@ const useHostSocketEvents = ({
       if (data?.words) {
         setWordsForBoard(data.words);
       }
+    };
+
+    // Reconnection and player status handlers
+    const handlePlayerDisconnected = (data: any) => {
+      logger.log('[HOST] Player disconnected:', data.username);
+      neoInfoToast(data.message || `${data.username} disconnected. Waiting for reconnection...`, {
+        icon: '📡',
+        duration: 3000,
+      });
+    };
+
+    const handlePlayerReconnected = (data: any) => {
+      logger.log('[HOST] Player reconnected:', data.username);
+      neoSuccessToast(data.message || `${data.username} reconnected`, {
+        icon: '✅',
+        duration: 2000,
+      });
+    };
+
+    const handlePlayerLeft = (data: any) => {
+      logger.log('[HOST] Player left:', data.username);
+      neoInfoToast(data.message || `${data.username} left the room`, {
+        icon: '👋',
+        duration: 2000,
+      });
     };
 
     // Register all event listeners
@@ -477,6 +522,9 @@ const useHostSocketEvents = ({
     socket.on('tournamentComplete', handleTournamentComplete);
     socket.on('tournamentCancelled', handleTournamentCancelled);
     socket.on('wordsForBoard', handleWordsForBoard);
+    socket.on('playerDisconnected', handlePlayerDisconnected);
+    socket.on('playerReconnected', handlePlayerReconnected);
+    socket.on('playerLeft', handlePlayerLeft);
 
     return () => {
       socket.off('updateUsers', handleUpdateUsers);
@@ -500,6 +548,9 @@ const useHostSocketEvents = ({
       socket.off('tournamentComplete', handleTournamentComplete);
       socket.off('tournamentCancelled', handleTournamentCancelled);
       socket.off('wordsForBoard', handleWordsForBoard);
+      socket.off('playerDisconnected', handlePlayerDisconnected);
+      socket.off('playerReconnected', handlePlayerReconnected);
+      socket.off('playerLeft', handlePlayerLeft);
     };
   }, [
     socket,

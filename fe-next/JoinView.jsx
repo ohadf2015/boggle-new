@@ -26,7 +26,7 @@ const HowToPlay = dynamic(() => import('./components/HowToPlay'), { ssr: false }
 const MenuAnimation = dynamic(() => import('./components/MenuAnimation'), { ssr: false });
 const Particles = dynamic(() => import('./components/Particles'), { ssr: false });
 
-const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, error, activeRooms, refreshRooms, prefilledRoom, roomName, setRoomName, isAutoJoining, roomsLoading, isAuthenticated, displayName, isProfileLoading }) => {
+const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, error, activeRooms, refreshRooms, prefilledRoom, roomName, setRoomName, isAutoJoining, roomsLoading, isAuthenticated, displayName, isProfileLoading, isJoining = false }) => {
   const { t, language, dir } = useLanguage();
   const [mode, setMode] = useState('join'); // 'join' or 'host'
   const [showQR, setShowQR] = useState(false);
@@ -39,10 +39,22 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
   const [gameCodeErrorKey, setGameCodeErrorKey] = useState(null);
   const [showFullForm, setShowFullForm] = useState(!prefilledRoom); // Show simplified form if room is prefilled
   const [roomLanguage, setRoomLanguage] = useState(language); // Separate state for room/game language
+  const [mobileRoomsExpanded, setMobileRoomsExpanded] = useState(false); // Mobile rooms list expansion
   const usernameInputRef = useRef(null);
   const prevPrefilledRoomRef = useRef(prefilledRoom);
   const { notifyError } = useValidation(t);
   const hasAutoSwitchedToHostRef = useRef(false);
+
+  // Define handleModeChange before effects that use it
+  const handleModeChange = useCallback((newMode) => {
+    if (newMode) {
+      setMode(newMode);
+      // Auto-generate code when switching to host mode
+      if (newMode === 'host') {
+        setGameCode(generateCode());
+      }
+    }
+  }, [setGameCode]);
 
   // Sync showFullForm when prefilledRoom prop changes (from URL params loaded after mount)
   // Using ref to track previous value and only update when it actually changes to a truthy value
@@ -64,17 +76,7 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
     if (activeRooms.length > 0) {
       hasAutoSwitchedToHostRef.current = false;
     }
-  }, [roomsLoading, activeRooms.length, mode]);
-
-  const handleModeChange = useCallback((newMode) => {
-    if (newMode) {
-      setMode(newMode);
-      // Auto-generate code when switching to host mode
-      if (newMode === 'host') {
-        setGameCode(generateCode());
-      }
-    }
-  }, [setGameCode]);
+  }, [roomsLoading, activeRooms.length, mode, handleModeChange]);
 
   const generateRoomCode = useCallback(() => {
     setGameCode(generateCode());
@@ -141,12 +143,7 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
           setGameCodeErrorKey(codeErr);
         }
         notifyError(roomErr || codeErr);
-        setTimeout(() => {
-          setRoomNameError(false);
-          setGameCodeError(false);
-          setRoomNameErrorKey(null);
-          setGameCodeErrorKey(null);
-        }, 2500);
+        // Errors stay visible until user corrects input (cleared in onChange handlers)
         return;
       }
       // Identify host in LogRocket
@@ -170,12 +167,7 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
           setGameCodeErrorKey(codeErr);
         }
         notifyError(userErr || codeErr);
-        setTimeout(() => {
-          setUsernameError(false);
-          setGameCodeError(false);
-          setUsernameErrorKey(null);
-          setGameCodeErrorKey(null);
-        }, 2500);
+        // Errors stay visible until user corrects input (cleared in onChange handlers)
         return;
       }
       // Identify player in LogRocket
@@ -217,10 +209,7 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
       setUsernameErrorKey(userErr);
       usernameInputRef.current?.focus();
       notifyError(userErr);
-      setTimeout(() => {
-        setUsernameError(false);
-        setUsernameErrorKey(null);
-      }, 2500);
+      // Errors stay visible until user corrects input (cleared in onChange handlers)
       return;
     }
     // Identify player in LogRocket
@@ -374,13 +363,29 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
                   </div>
 
                   {/* Play button - Neo-Brutalist */}
-                  <motion.div whileHover={{ x: -2, y: -2 }} whileTap={{ x: 2, y: 2 }}>
+                  <motion.div whileHover={!isJoining ? { x: -2, y: -2 } : {}} whileTap={!isJoining ? { x: 2, y: 2 } : {}}>
                     <Button
                       onClick={handleJoinGuest}
-                      className="w-full h-14 text-xl font-black uppercase bg-neo-lime text-neo-black border-3 border-neo-black rounded-neo shadow-hard hover:shadow-hard-lg hover:bg-neo-lime/90 transition-all"
+                      disabled={isJoining}
+                      className="w-full h-14 text-xl font-black uppercase bg-neo-lime text-neo-black border-3 border-neo-black rounded-neo shadow-hard hover:shadow-hard-lg hover:bg-neo-lime/90 transition-all disabled:opacity-70"
                     >
-                      <FaGamepad className="mr-3" size={24} />
-                      {t('joinView.joinGame')}
+                      {isJoining ? (
+                        <>
+                          <motion.span
+                            animate={{ rotate: 360 }}
+                            transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                            className="mr-3 inline-block"
+                          >
+                            <FaSync size={24} />
+                          </motion.span>
+                          {t('joinView.joining')}
+                        </>
+                      ) : (
+                        <>
+                          <FaGamepad className="mr-3" size={24} />
+                          {t('joinView.joinGame')}
+                        </>
+                      )}
                     </Button>
                   </motion.div>
 
@@ -430,14 +435,29 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
                   </motion.div>
 
                   {/* Play button - Neo-Brutalist */}
-                  <motion.div whileHover={{ x: -2, y: -2 }} whileTap={{ x: 2, y: 2 }}>
+                  <motion.div whileHover={!isJoining ? { x: -2, y: -2 } : {}} whileTap={!isJoining ? { x: 2, y: 2 } : {}}>
                     <Button
                       type="submit"
-                      disabled={!username}
+                      disabled={!username || isJoining}
                       className="w-full h-14 text-xl font-black uppercase bg-neo-lime text-neo-black border-3 border-neo-black rounded-neo shadow-hard hover:shadow-hard-lg hover:bg-neo-lime/90 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                      <FaGamepad className="mr-3" size={24} />
-                      {t('joinView.joinGame')}
+                      {isJoining ? (
+                        <>
+                          <motion.span
+                            animate={{ rotate: 360 }}
+                            transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                            className="mr-3 inline-block"
+                          >
+                            <FaSync size={24} />
+                          </motion.span>
+                          {t('joinView.joining')}
+                        </>
+                      ) : (
+                        <>
+                          <FaGamepad className="mr-3" size={24} />
+                          {t('joinView.joinGame')}
+                        </>
+                      )}
                     </Button>
                   </motion.div>
 
@@ -468,7 +488,7 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
       {/* Animated Title */}
 
 
-      <div className="flex flex-col-reverse md:flex-row gap-4 sm:gap-6 w-full max-w-6xl relative z-10 px-2 sm:px-4 md:px-6">
+      <div className="flex flex-col md:flex-row gap-4 sm:gap-6 w-full max-w-6xl relative z-10 px-2 sm:px-4 md:px-6">
         {/* Main Join/Host Form */}
         <motion.div
           initial={{ x: 50, opacity: 0 }}
@@ -602,7 +622,10 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
                     <Input
                       id="gameCode"
                       value={gameCode}
-                      onChange={(e) => setGameCode(e.target.value)}
+                      onChange={(e) => {
+                        setGameCode(e.target.value);
+                        if (gameCodeError) setGameCodeError(false);
+                      }}
                       required
                       placeholder={t('validation.enterFourDigitCode')}
                       maxLength={4}
@@ -683,7 +706,10 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
                         <Input
                           id="gameCode"
                           value={gameCode}
-                          onChange={(e) => setGameCode(e.target.value)}
+                          onChange={(e) => {
+                            setGameCode(e.target.value);
+                            if (gameCodeError) setGameCodeError(false);
+                          }}
                           required
                           placeholder={t('validation.fourDigitCode')}
                           maxLength={4}
@@ -760,10 +786,11 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
                 )}
 
                 {/* Neo-Brutalist Submit Button */}
-                <motion.div whileHover={{ x: -2, y: -2 }} whileTap={{ x: 2, y: 2 }}>
+                <motion.div whileHover={!isJoining ? { x: -2, y: -2 } : {}} whileTap={!isJoining ? { x: 2, y: 2 } : {}}>
                   <Button
                     type="submit"
                     disabled={
+                      isJoining ||
                       isProfileLoading ||
                       (mode === 'join'
                         ? (!gameCode || (!isAuthenticated && !username))
@@ -776,7 +803,18 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
                         : "bg-neo-cyan text-neo-black"
                     )}
                   >
-                    {mode === 'host' ? (
+                    {isJoining ? (
+                      <>
+                        <motion.span
+                          animate={{ rotate: 360 }}
+                          transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                          className="mr-2 inline-block"
+                        >
+                          <FaSync />
+                        </motion.span>
+                        {mode === 'host' ? t('joinView.creating') : t('joinView.joining')}
+                      </>
+                    ) : mode === 'host' ? (
                       <>
                         <span className="mr-2"><FaCrown /></span>
                         {t('joinView.createRoom')}
@@ -802,7 +840,7 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
           </Card>
         </motion.div>
 
-        {/* Active Rooms Panel - Neo-Brutalist - Always visible */}
+        {/* Active Rooms Panel - Collapsible on mobile */}
         <motion.div
           initial={{ x: -50, opacity: 0, rotate: 2 }}
           animate={{ x: 0, opacity: 1, rotate: 1 }}
@@ -810,16 +848,35 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
           className="flex-1 relative z-10"
         >
           <Card className="flex h-full flex-col">
-            <CardHeader>
+            {/* Mobile: Clickable header to expand/collapse */}
+            <CardHeader
+              className="md:cursor-default cursor-pointer"
+              onClick={() => setMobileRoomsExpanded(!mobileRoomsExpanded)}
+            >
               <div className="flex h-full justify-between items-center">
-                <CardTitle>{t('joinView.roomsList')}</CardTitle>
+                <div className="flex items-center gap-2 flex-wrap">
+                  <CardTitle>{t('joinView.roomsList')}</CardTitle>
+                  {/* Social proof: Show total players online */}
+                  {activeRooms.length > 0 && (
+                    <Badge className="bg-neo-lime text-neo-black border-2 border-neo-black animate-pulse">
+                      {activeRooms.reduce((sum, room) => sum + (room.playerCount || 0), 0)} {t('joinView.playersOnline')}
+                    </Badge>
+                  )}
+                  {/* Mobile: Expand/collapse indicator */}
+                  <span className="md:hidden text-slate-500 dark:text-slate-400 text-sm">
+                    {mobileRoomsExpanded ? '▲' : '▼'}
+                  </span>
+                </div>
                 <TooltipProvider>
                   <Tooltip>
                     <TooltipTrigger asChild>
                       <Button
                         variant="outline"
                         size="icon"
-                        onClick={refreshRooms}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          refreshRooms();
+                        }}
                       >
                         <FaSync />
                       </Button>
@@ -829,7 +886,12 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
                 </TooltipProvider>
               </div>
             </CardHeader>
-            <CardContent className="flex-1 overflow-auto">
+            {/* Content: Always visible on desktop, collapsible on mobile */}
+            <CardContent className={cn(
+              "flex-1 overflow-auto transition-all duration-300",
+              "md:block", // Always visible on desktop
+              mobileRoomsExpanded ? "block" : "hidden md:block" // Collapsible on mobile
+            )}>
               {roomsLoading ? (
                 // Loading skeleton for rooms - Neo-Brutalist
                 <div className="space-y-2">

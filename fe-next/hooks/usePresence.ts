@@ -47,7 +47,8 @@ export function usePresence({ enabled = true }: PresenceOptions = {}): UsePresen
   const socketRef = useRef(socket);
   const isConnectedRef = useRef(isConnected);
   const enabledRef = useRef(enabled);
-  const lastActivityRef = useRef(Date.now());
+  // Initialize with 0, will be set to Date.now() in useEffect
+  const lastActivityRef = useRef(0);
   const isActiveRef = useRef(true);
   const isWindowFocusedRef = useRef(true);
   const heartbeatIntervalRef = useRef<NodeJS.Timeout | null>(null);
@@ -87,6 +88,9 @@ export function usePresence({ enabled = true }: PresenceOptions = {}): UsePresen
   // Main effect for all presence tracking
   useEffect(() => {
     if (!enabled) return;
+
+    // Initialize lastActivityRef on mount
+    lastActivityRef.current = Date.now();
 
     // Helper to emit presence update using refs
     const emitPresenceUpdate = (focused: boolean, active: boolean, forceIdle = false) => {

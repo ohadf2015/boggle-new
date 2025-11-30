@@ -250,7 +250,7 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode, pe
     }, 200);
   }, [socket, gameCode, username]);
 
-  // Word submission handler
+  // Word submission handler - adds word to list, server will update isValid
   const handleWordSubmit = useCallback((formedWord) => {
     setFoundWords(prev => [...prev, { word: formedWord, isValid: null }]);
   }, []);

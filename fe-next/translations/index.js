@@ -172,6 +172,9 @@ export const translations = {
       joinGame: 'Join Game',
       joiningAs: 'Joining as',
       hostingAs: 'Hosting as',
+      joining: 'Joining...',
+      creating: 'Creating...',
+      playersOnline: 'online',
     },
     hostView: {
       waitingForPlayers: 'Waiting for players...',
@@ -298,6 +301,13 @@ export const translations = {
       inviteFriends: 'Invite Friends',
       waitingForHostToStart: 'Waiting for host to start the game...',
       notInDictionary: 'Not in dictionary',
+      hostDisconnected: 'Host disconnected. Waiting for reconnection...',
+      isNowHost: 'is now the host',
+      disconnected: 'disconnected. Waiting for reconnection...',
+      reconnected: 'reconnected',
+      leftRoom: 'left the room',
+      sessionMovedToAnotherTab: 'Session moved to another tab',
+      sessionMovedToAnotherRoom: 'Session moved to another room',
     },
     achievementPopup: {
       unlocked: 'Achievement Unlocked!',
@@ -1018,6 +1028,9 @@ export const translations = {
       joinGame: 'הצטרף למשחק',
       joiningAs: 'מצטרף בשם',
       hostingAs: 'מארח בשם',
+      joining: 'מצטרף...',
+      creating: 'יוצר...',
+      playersOnline: 'מחוברים',
     },
     hostView: {
       waitingForPlayers: 'ממתין לשחקנים...',
@@ -1144,6 +1157,13 @@ export const translations = {
       inviteFriends: 'הזמן חברים',
       waitingForHostToStart: 'ממתינים למארח שיתחיל את המשחק...',
       notInDictionary: 'לא נמצא במילון',
+      hostDisconnected: 'המארח התנתק. ממתין לחיבור מחדש...',
+      isNowHost: 'הוא עכשיו המארח',
+      disconnected: 'התנתק. ממתין לחיבור מחדש...',
+      reconnected: 'התחבר מחדש',
+      leftRoom: 'עזב את החדר',
+      sessionMovedToAnotherTab: 'החיבור עבר ללשונית אחרת',
+      sessionMovedToAnotherRoom: 'החיבור עבר לחדר אחר',
     },
     achievementPopup: {
       unlocked: 'הישג נפתח!',
@@ -1863,6 +1883,9 @@ export const translations = {
       joinGame: 'Gå med i spelet',
       joiningAs: 'Går med som',
       hostingAs: 'Värd som',
+      joining: 'Går med...',
+      creating: 'Skapar...',
+      playersOnline: 'online',
     },
     hostView: {
       waitingForPlayers: 'Väntar på spelare...',
@@ -1897,6 +1920,8 @@ export const translations = {
       qrCode: 'QR-kod',
       scanQr: 'Skanna QR-kod för att gå med eller använd kod',
       autoValidated: 'Automatiskt validerat',
+      clickToShow: 'Klicka för att visa',
+      clickToHide: 'Klicka för att dölja',
       hostPlays: 'Jag vill spela',
       spectatorMode: 'Åskådarläge - titta på brädet',
       advancedSettings: 'Avancerade inställningar',
@@ -1987,6 +2012,13 @@ export const translations = {
       inviteFriends: 'Bjud in vänner',
       waitingForHostToStart: 'Väntar på att värden ska starta spelet...',
       notInDictionary: 'Finns inte i ordlistan',
+      hostDisconnected: 'Värden kopplades bort. Väntar på återanslutning...',
+      isNowHost: 'är nu värd',
+      disconnected: 'kopplades bort. Väntar på återanslutning...',
+      reconnected: 'återansluten',
+      leftRoom: 'lämnade rummet',
+      sessionMovedToAnotherTab: 'Sessionen flyttades till en annan flik',
+      sessionMovedToAnotherRoom: 'Sessionen flyttades till ett annat rum',
     },
     achievementPopup: {
       unlocked: 'Prestation upplåst!',
@@ -2275,6 +2307,10 @@ export const translations = {
       claimStats: 'Hämta din statistik',
       statsClaimedSuccess: 'Statistik sparad!',
       termsAgreement: 'Genom att fortsätta godkänner du våra användarvillkor',
+      termsPrefix: 'Genom att fortsätta godkänner du våra',
+      termsLink: 'Användarvillkor',
+      andText: 'och',
+      privacyLink: 'Integritetspolicy',
       upgradePrompt: 'Logga in för att spara din framsteg och tävla på topplistan!',
       firstWin: {
         title: 'Grattis till din första vinst!',
@@ -2466,6 +2502,51 @@ export const translations = {
         }
       }
     },
+    growth: {
+      // Share prompts
+      shareYourResult: 'Dela ditt resultat',
+      shareVictory: '🎉 Dela din seger!',
+      shareResult: 'Dela ditt spel',
+      bragToFriends: 'Låt dina vänner veta att du vann!',
+      inviteFriendsToPlay: 'Bjud in vänner att utmana dig',
+      viralPrompt: 'Utmana dina vänner att slå ditt resultat!',
+      share: 'Dela',
+      // Win streak
+      dayStreak: 'dagars svit',
+      winsAway: 'vinster kvar',
+      nextTier: 'Nästa nivå',
+      newBest: 'Nytt rekord!',
+      newPersonalBest: 'Nytt personligt rekord!',
+      streakUnlocked: 'Svit upplåst!',
+      streakAtRisk: 'Din svit är i fara! Spela idag för att behålla den.',
+      keepStreakAlive: 'Håll din svit vid liv!',
+      // Streak tiers
+      streakStarting: 'Start',
+      streakHot: 'Het',
+      streakOnFire: 'I brand',
+      streakEpic: 'Episk',
+      streakLegendary: 'Legendarisk',
+      // Referral
+      referFriend: 'Rekommendera en vän',
+      referralReward: 'Få belöningar för att bjuda in vänner!',
+      yourReferralLink: 'Din rekommendationslänk',
+      referralsCount: 'Rekommenderade vänner',
+      // Daily challenge
+      dailyChallenge: 'Daglig utmaning',
+      dailyChallengeDesc: 'Ny utmaning varje dag!',
+      todaysChallenge: 'Dagens utmaning',
+      challengeCompleted: 'Utmaning slutförd!',
+      nextChallengeIn: 'Nästa utmaning om',
+      // Engagement
+      welcomeBack: 'Välkommen tillbaka!',
+      missedYou: 'Vi saknade dig! Redo för en ny runda?',
+      playNow: 'Spela nu',
+      // Milestones
+      firstWin: 'Första vinst!',
+      tenWins: '10 vinster!',
+      hundredWins: '100 vinster!',
+      milestoneUnlocked: 'Milstolpe upplåst!'
+    },
     wordFeedback: {
       title: 'Ordjury',
       question: 'Är detta ett riktigt ord?',
@@ -2655,6 +2736,9 @@ export const translations = {
       joinGame: 'ゲームに参加',
       joiningAs: '参加者名',
       hostingAs: 'ホスト名',
+      joining: '参加中...',
+      creating: '作成中...',
+      playersOnline: 'オンライン',
     },
     hostView: {
       waitingForPlayers: 'プレイヤーを待っています...',
@@ -2689,6 +2773,8 @@ export const translations = {
       qrCode: 'QRコード',
       scanQr: 'QRコードをスキャンして参加するか、コードを使用してください',
       autoValidated: '自動検証済み',
+      clickToShow: 'クリックして表示',
+      clickToHide: 'クリックして非表示',
       hostPlays: 'プレイしたい',
       spectatorMode: '観戦モード - ボードを見る',
       advancedSettings: '詳細設定',
@@ -2779,6 +2865,13 @@ export const translations = {
       inviteFriends: '友達を招待',
       waitingForHostToStart: 'ホストがゲームを開始するのを待っています...',
       notInDictionary: '辞書にありません',
+      hostDisconnected: 'ホストが切断されました。再接続を待っています...',
+      isNowHost: 'が新しいホストになりました',
+      disconnected: 'が切断されました。再接続を待っています...',
+      reconnected: '再接続しました',
+      leftRoom: 'がルームを退出しました',
+      sessionMovedToAnotherTab: 'セッションが別のタブに移動しました',
+      sessionMovedToAnotherRoom: 'セッションが別のルームに移動しました',
     },
     achievementPopup: {
       unlocked: '実績解除！',
@@ -3067,6 +3160,10 @@ export const translations = {
       claimStats: '統計を取得',
       statsClaimedSuccess: '統計が保存されました!',
       termsAgreement: '続けることで利用規約に同意します',
+      termsPrefix: '続けることで',
+      termsLink: '利用規約',
+      andText: 'と',
+      privacyLink: 'プライバシーポリシー',
       upgradePrompt: 'ログインして進捗を保存し、リーダーボードで競いましょう!',
       firstWin: {
         title: '初勝利おめでとうございます!',
@@ -3257,6 +3354,51 @@ export const translations = {
           content: 'このプライバシーポリシーは、イスラエル国の法律に準拠します。すべての紛争は、イスラエルの裁判所で解決されるものとします。'
         }
       }
+    },
+    growth: {
+      // Share prompts
+      shareYourResult: '結果を共有',
+      shareVictory: '🎉 勝利を共有！',
+      shareResult: 'ゲームを共有',
+      bragToFriends: '友達にあなたの勝利を知らせよう！',
+      inviteFriendsToPlay: '友達を招待して挑戦しよう',
+      viralPrompt: '友達にあなたのスコアを超えられるか挑戦しよう！',
+      share: '共有',
+      // Win streak
+      dayStreak: '日連続',
+      winsAway: '勝利まで',
+      nextTier: '次のティア',
+      newBest: '新記録！',
+      newPersonalBest: '新しい自己ベスト！',
+      streakUnlocked: '連勝解除！',
+      streakAtRisk: '連勝が危険！今日プレイして維持しよう。',
+      keepStreakAlive: '連勝を続けよう！',
+      // Streak tiers
+      streakStarting: 'スタート',
+      streakHot: 'ホット',
+      streakOnFire: '燃えている',
+      streakEpic: 'エピック',
+      streakLegendary: 'レジェンド',
+      // Referral
+      referFriend: '友達を紹介',
+      referralReward: '友達を招待して報酬をもらおう！',
+      yourReferralLink: '紹介リンク',
+      referralsCount: '紹介した友達',
+      // Daily challenge
+      dailyChallenge: 'デイリーチャレンジ',
+      dailyChallengeDesc: '毎日新しいチャレンジ！',
+      todaysChallenge: '今日のチャレンジ',
+      challengeCompleted: 'チャレンジ達成！',
+      nextChallengeIn: '次のチャレンジまで',
+      // Engagement
+      welcomeBack: 'おかえりなさい！',
+      missedYou: 'お待ちしていました！もう一回プレイしませんか？',
+      playNow: '今すぐプレイ',
+      // Milestones
+      firstWin: '初勝利！',
+      tenWins: '10勝利！',
+      hundredWins: '100勝利！',
+      milestoneUnlocked: 'マイルストーン達成！'
     },
     wordFeedback: {
       title: '言葉の審査',

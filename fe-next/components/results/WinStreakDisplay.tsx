@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FaFire, FaBolt, FaCrown, FaGem, FaStar } from 'react-icons/fa';
 import { useLanguage } from '../../contexts/LanguageContext';
@@ -53,6 +53,7 @@ const WinStreakDisplay: React.FC<WinStreakDisplayProps> = ({
   const { theme } = useTheme();
   const isDarkMode = theme === 'dark';
   const [showMilestone, setShowMilestone] = useState(false);
+  const hasShownMilestoneRef = useRef(false);
 
   const tier = getStreakTier(currentStreak);
   const nextTier = getNextTier(currentStreak);
@@ -63,7 +64,8 @@ const WinStreakDisplay: React.FC<WinStreakDisplayProps> = ({
   const tierChanged = tier && previousTier && tier.min > previousTier.min;
 
   useEffect(() => {
-    if (isNewMilestone || tierChanged || isNewBest) {
+    if ((isNewMilestone || tierChanged || isNewBest) && !hasShownMilestoneRef.current) {
+      hasShownMilestoneRef.current = true;
       setShowMilestone(true);
 
       // Trigger celebration confetti

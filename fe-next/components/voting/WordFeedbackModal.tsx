@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useCallback, memo } from 'react';
+import React, { useState, useEffect, useCallback, memo, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FaThumbsUp, FaThumbsDown, FaTimes } from 'react-icons/fa';
 import Avatar from '../Avatar';
@@ -58,10 +58,12 @@ const WordFeedbackModal = memo<WordFeedbackModalProps>(({
   const [remainingTime, setRemainingTime] = useState(timeoutSeconds);
   const [hasVoted, setHasVoted] = useState(false);
   const [wittySentence, setWittySentence] = useState('');
+  const prevWordRef = useRef<string | null>(null);
 
-  // Select random witty sentence on mount
+  // Select random witty sentence when modal opens with a new word
   useEffect(() => {
-    if (isOpen) {
+    if (isOpen && word !== prevWordRef.current) {
+      prevWordRef.current = word;
       const sentences = getWittySentences(t);
       const validSentences = sentences.filter(s => s && s !== 'wordFeedback.witty1');
       if (validSentences.length > 0) {
@@ -73,6 +75,9 @@ const WordFeedbackModal = memo<WordFeedbackModalProps>(({
       }
       setRemainingTime(timeoutSeconds);
       setHasVoted(false);
+    }
+    if (!isOpen) {
+      prevWordRef.current = null;
     }
   }, [isOpen, word, submittedBy, timeoutSeconds, t]);
 
@@ -229,7 +234,7 @@ const WordFeedbackModal = memo<WordFeedbackModalProps>(({
               transition={{ delay: 0.2 }}
               className="text-center text-neo-black/70 italic text-sm px-4"
             >
-              "{wittySentence.replace('{player}', submittedBy).replace('{word}', word)}"
+              &ldquo;{wittySentence.replace('{player}', submittedBy).replace('{word}', word)}&rdquo;
             </motion.p>
 
             {/* Voting Buttons */}

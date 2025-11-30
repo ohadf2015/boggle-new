@@ -36,18 +36,23 @@ const isYesterday = (date: Date): boolean => {
 };
 
 /**
- * Get streak data from localStorage
+ * Default streak data (used for SSR and initial state)
+ */
+const DEFAULT_STREAK_DATA: WinStreakData = {
+  currentStreak: 0,
+  bestStreak: 0,
+  totalWins: 0,
+  lastWinDate: null,
+  isStreakActive: false,
+  streakBroken: false,
+};
+
+/**
+ * Get streak data from localStorage (client-side only)
  */
 const getStoredStreakData = (): WinStreakData => {
   if (typeof window === 'undefined') {
-    return {
-      currentStreak: 0,
-      bestStreak: 0,
-      totalWins: 0,
-      lastWinDate: null,
-      isStreakActive: false,
-      streakBroken: false,
-    };
+    return DEFAULT_STREAK_DATA;
   }
 
   const currentStreak = parseInt(localStorage.getItem(STREAK_KEY) || '0', 10);
@@ -109,9 +114,10 @@ const saveStreakData = (data: Partial<WinStreakData>): void => {
  * Hook to manage win streaks
  */
 export const useWinStreak = () => {
-  const [streakData, setStreakData] = useState<WinStreakData>(getStoredStreakData);
+  // Initialize with default data to avoid hydration mismatch
+  const [streakData, setStreakData] = useState<WinStreakData>(DEFAULT_STREAK_DATA);
 
-  // Refresh streak data on mount
+  // Load streak data from localStorage after mount
   useEffect(() => {
     const data = getStoredStreakData();
 

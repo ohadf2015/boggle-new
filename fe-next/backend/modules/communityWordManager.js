@@ -6,6 +6,7 @@
 
 const { getSupabase, isSupabaseConfigured } = require('./supabaseServer');
 const { normalizeWord } = require('../dictionary');
+const logger = require('../utils/logger');
 
 // In-memory cache of community-validated words per language
 // These are words with net_score >= 6 that should auto-validate during gameplay
@@ -28,12 +29,12 @@ async function loadCommunityWords() {
 
   const client = getSupabase();
   if (!client) {
-    console.log('[CommunityWords] Supabase not configured, skipping community word loading');
+    logger.debug('CommunityWords', 'Supabase not configured, skipping community word loading');
     loaded = true;
     return;
   }
 
-  console.log('[CommunityWords] Loading community-validated words from database...');
+  logger.info('CommunityWords', 'Loading community-validated words from database...');
   const startTime = Date.now();
 
   try {
@@ -44,7 +45,7 @@ async function loadCommunityWords() {
       .eq('is_potentially_valid', true);
 
     if (error) {
-      console.error('[CommunityWords] Error loading from database:', error.message);
+      logger.error('CommunityWords', `Error loading from database: ${error.message}`);
       loaded = true;
       return;
     }
@@ -61,11 +62,11 @@ async function loadCommunityWords() {
     }
 
     const loadTime = Date.now() - startTime;
-    console.log(`[CommunityWords] Loaded in ${loadTime}ms:`, counts);
+    logger.info('CommunityWords', `Loaded in ${loadTime}ms: ${JSON.stringify(counts)}`);
     loaded = true;
 
   } catch (err) {
-    console.error('[CommunityWords] Unexpected error loading words:', err);
+    logger.error('CommunityWords', `Unexpected error loading words: ${err}`);
     loaded = true;
   }
 }
@@ -98,7 +99,7 @@ function addToCommunityCache(word, language) {
 
   const normalized = normalizeWord(word, lang);
   set.add(normalized);
-  console.log(`[CommunityWords] Word "${word}" (${lang}) added to community cache`);
+  logger.debug('CommunityWords', `Word "${word}" (${lang}) added to community cache`);
 }
 
 /**
@@ -147,10 +148,10 @@ async function recordVote({ word, language, userId, guestId, gameCode, voteType,
     if (insertError) {
       // Check if it's a duplicate vote error
       if (insertError.code === '23505') { // Unique violation
-        console.log(`[CommunityWords] Duplicate vote ignored for "${word}" (${lang})`);
+        logger.debug('CommunityWords', `Duplicate vote ignored for "${word}" (${lang})`);
         return { success: false, isNowValid: false, error: 'Already voted on this word' };
       }
-      console.error(`[CommunityWords] Error recording vote:`, insertError.message);
+      logger.error('CommunityWords', `Error recording vote: ${insertError.message}`);
       return { success: false, isNowValid: false, error: insertError.message };
     }
 
@@ -164,7 +165,7 @@ async function recordVote({ word, language, userId, guestId, gameCode, voteType,
       .single();
 
     if (scoreError) {
-      console.error(`[CommunityWords] Error fetching score:`, scoreError.message);
+      logger.error('CommunityWords', `Error fetching score: ${scoreError.message}`);
       // Vote was recorded successfully, just couldn't check threshold
       return { success: true, isNowValid: false, error: null };
     }
@@ -174,16 +175,16 @@ async function recordVote({ word, language, userId, guestId, gameCode, voteType,
     // If word just became valid, add to cache
     if (isNowValid && !communityValidWords[lang]?.has(normalizedWord)) {
       addToCommunityCache(normalizedWord, lang);
-      console.log(`[CommunityWords] Word "${word}" (${lang}) reached 6+ votes! Now auto-validates.`);
+      logger.info('CommunityWords', `Word "${word}" (${lang}) reached 6+ votes! Now auto-validates.`);
     }
 
     const voterType = userId ? 'auth user' : 'guest';
-    console.log(`[CommunityWords] Vote recorded: "${word}" (${lang}) - ${voteType} by ${voterType}`);
+    logger.debug('CommunityWords', `Vote recorded: "${word}" (${lang}) - ${voteType} by ${voterType}`);
 
     return { success: true, isNowValid, error: null };
 
   } catch (err) {
-    console.error(`[CommunityWords] Unexpected error recording vote:`, err);
+    logger.error('CommunityWords', `Unexpected error recording vote: ${err}`);
     return { success: false, isNowValid: false, error: err.message };
   }
 }
@@ -274,14 +275,14 @@ async function hasUserVoted(word, language, userId, guestId) {
     const { data, error } = await query.single();
 
     if (error && error.code !== 'PGRST116') { // Not found is OK
-      console.error('[CommunityWords] Error checking vote:', error.message);
+      logger.error('CommunityWords', `Error checking vote: ${error.message}`);
       return false;
     }
 
     return !!data;
 
   } catch (err) {
-    console.error('[CommunityWords] Unexpected error checking vote:', err);
+    logger.error('CommunityWords', `Unexpected error checking vote: ${err}`);
     return false;
   }
 }

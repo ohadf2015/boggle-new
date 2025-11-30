@@ -306,7 +306,7 @@ export const neoInfoToast = (message, options = {}) => {
   );
 };
 
-export default {
+const NeoToast = {
   wordAccepted: wordAcceptedToast,
   wordNeedsValidation: wordNeedsValidationToast,
   wordError: wordErrorToast,
@@ -314,3 +314,5 @@ export default {
   error: neoErrorToast,
   info: neoInfoToast,
 };
+
+export default NeoToast;
