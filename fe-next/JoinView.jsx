@@ -355,10 +355,17 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
                 <div className="space-y-3 sm:space-y-6">
                   <div className="text-center py-4">
                     <p className="text-neo-cream/70 mb-2 font-bold uppercase text-sm">
-                      {t('joinView.welcomeBack') || 'Welcome back'},
+                      {t('joinView.joiningAs') || 'Joining as'}
                     </p>
-                    <p className="text-3xl font-black text-neo-cyan uppercase tracking-tight">
-                      {displayName}
+                    <Input
+                      value={username || displayName}
+                      onChange={(e) => setUsername(sanitizeInput(e.target.value, 20))}
+                      className="h-14 text-xl text-center font-black text-neo-cyan uppercase tracking-tight bg-neo-navy border-3 border-neo-cyan/50 rounded-neo shadow-hard-sm placeholder:text-neo-cyan/50 focus:border-neo-cyan focus:ring-0"
+                      placeholder={displayName}
+                      maxLength={20}
+                    />
+                    <p className="text-neo-cream/50 text-xs mt-2 font-bold uppercase">
+                      {t('joinView.tapToChangeDisplayName') || 'Tap to change display name'}
                     </p>
                   </div>
 

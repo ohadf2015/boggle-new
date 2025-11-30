@@ -172,6 +172,7 @@ export const translations = {
       joinGame: 'Join Game',
       joiningAs: 'Joining as',
       hostingAs: 'Hosting as',
+      tapToChangeDisplayName: 'Tap to change display name',
       joining: 'Joining...',
       creating: 'Creating...',
       playersOnline: 'online',
@@ -573,6 +574,43 @@ export const translations = {
         gettingStartedDesc: 'Every champion started somewhere. Next round is yours!',
       },
     },
+    noWords: {
+      noWordsThisRound: 'No words this round',
+      keepGoing: 'Keep going!',
+      nextRoundIsYours: 'Next round is yours!',
+      funFact: 'Fun fact: The average player misses 70% of possible words!',
+      otherPlayer: {
+        headline: 'Tough Round',
+        message: 'The letters weren\'t kind this time.',
+      },
+      encourage: {
+        rookie: {
+          headline: 'First Time Jitters?',
+          message: 'Even the best word hunters start somewhere. The board was tricky!',
+          tip: 'Tip: Start with 3-letter words and build from there.',
+        },
+        unlucky: {
+          headline: 'Tough Letters!',
+          message: 'Sometimes the dice just don\'t roll your way. It happens to everyone!',
+          tip: 'Tip: Look for common patterns like -ING, -ED, -ER.',
+        },
+        thinking: {
+          headline: 'Strategic Silence',
+          message: 'Quality over quantity mindset... maybe too much quality this time!',
+          tip: 'Tip: Submit words as you find them - no penalty for trying!',
+        },
+        warmup: {
+          headline: 'Warm-up Round',
+          message: 'Consider this a practice run. Your brain is just getting started!',
+          tip: 'Tip: Scan the board quickly, then focus on high-value corners.',
+        },
+        comeback: {
+          headline: 'Comeback Loading...',
+          message: 'The greatest players have off rounds. Next game is YOUR game!',
+          tip: 'Tip: Try saying letters out loud to trigger word associations.',
+        },
+      },
+    },
     xp: {
       title: 'Player Level',
       level: 'Level',
@@ -779,7 +817,8 @@ export const translations = {
       saveError: 'Failed to save',
       editName: 'Edit Name',
       chooseEmoji: 'Change Emoji',
-      chooseColor: 'Choose Color'
+      chooseColor: 'Choose Color',
+      backToGame: 'Back to Game'
     },
     leaderboard: {
       title: 'Leaderboard',
@@ -1043,6 +1082,7 @@ export const translations = {
       joinGame: 'הצטרף למשחק',
       joiningAs: 'מצטרף בשם',
       hostingAs: 'מארח בשם',
+      tapToChangeDisplayName: 'לחץ לשינוי שם התצוגה',
       joining: 'מצטרף...',
       creating: 'יוצר...',
       playersOnline: 'מחוברים',
@@ -1444,6 +1484,43 @@ export const translations = {
         gettingStartedDesc: 'כל אלוף התחיל איפשהו. הסיבוב הבא שלך!',
       },
     },
+    noWords: {
+      noWordsThisRound: 'ללא מילים בסיבוב זה',
+      keepGoing: 'להמשיך!',
+      nextRoundIsYours: 'הסיבוב הבא שלך!',
+      funFact: 'עובדה מעניינת: השחקן הממוצע מפספס 70% מהמילים האפשריות!',
+      otherPlayer: {
+        headline: 'סיבוב קשה',
+        message: 'האותיות לא היו נדיבות הפעם.',
+      },
+      encourage: {
+        rookie: {
+          headline: 'פעם ראשונה?',
+          message: 'גם הציידים הטובים ביותר מתחילים איפשהו. הלוח היה מסובך!',
+          tip: 'טיפ: התחל עם מילים של 3 אותיות ותבנה משם.',
+        },
+        unlucky: {
+          headline: 'אותיות קשות!',
+          message: 'לפעמים הקוביות פשוט לא מתגלגלות לטובתך. קורה לכולם!',
+          tip: 'טיפ: חפש דפוסים נפוצים כמו -ות, -ים, -ה.',
+        },
+        thinking: {
+          headline: 'שתיקה אסטרטגית',
+          message: 'גישת איכות על כמות... אולי יותר מדי איכות הפעם!',
+          tip: 'טיפ: שלח מילים ברגע שאתה מוצא אותן - אין עונש על ניסיון!',
+        },
+        warmup: {
+          headline: 'סיבוב חימום',
+          message: 'תחשוב על זה כתרגול. המוח שלך רק מתחיל!',
+          tip: 'טיפ: סרוק את הלוח במהירות, ואז התמקד בפינות עתירות ערך.',
+        },
+        comeback: {
+          headline: 'חזרה בעיבוד...',
+          message: 'לשחקנים הגדולים ביותר יש סיבובים קשים. המשחק הבא שלך!',
+          tip: 'טיפ: נסה לומר אותיות בקול כדי לעורר אסוציאציות.',
+        },
+      },
+    },
     xp: {
       title: 'רמת שחקן',
       level: 'רמה',
@@ -1649,7 +1726,8 @@ export const translations = {
       saveError: 'השמירה נכשלה',
       editName: 'ערוך שם',
       chooseEmoji: 'בחר אימוג\'י',
-      chooseColor: 'בחר צבע'
+      chooseColor: 'בחר צבע',
+      backToGame: 'חזרה למשחק'
     },
     leaderboard: {
       title: 'טבלת מובילים',
@@ -1913,6 +1991,7 @@ export const translations = {
       joinGame: 'Gå med i spelet',
       joiningAs: 'Går med som',
       hostingAs: 'Värd som',
+      tapToChangeDisplayName: 'Tryck för att ändra visningsnamn',
       joining: 'Går med...',
       creating: 'Skapar...',
       playersOnline: 'online',
@@ -2312,6 +2391,43 @@ export const translations = {
         solidPerformanceDesc: 'Ett respektabelt resultat. Fortsätt så!',
         gettingStarted: 'Värmer Upp',
         gettingStartedDesc: 'Varje mästare började någonstans. Nästa runda är din!',
+      },
+    },
+    noWords: {
+      noWordsThisRound: 'Inga ord denna runda',
+      keepGoing: 'Fortsätt!',
+      nextRoundIsYours: 'Nästa runda är din!',
+      funFact: 'Kul fakta: Genomsnittsspelaren missar 70% av möjliga ord!',
+      otherPlayer: {
+        headline: 'Tuff Runda',
+        message: 'Bokstäverna var inte snälla denna gång.',
+      },
+      encourage: {
+        rookie: {
+          headline: 'Första Gången Nervös?',
+          message: 'Även de bästa ordjägarna börjar någonstans. Brädet var knepigt!',
+          tip: 'Tips: Börja med 3-bokstavsord och bygg därifrån.',
+        },
+        unlucky: {
+          headline: 'Tuffa Bokstäver!',
+          message: 'Ibland rullar inte tärningarna din väg. Det händer alla!',
+          tip: 'Tips: Leta efter vanliga mönster som -ING, -AR, -ER.',
+        },
+        thinking: {
+          headline: 'Strategisk Tystnad',
+          message: 'Kvalitet över kvantitet-mentalitet... kanske för mycket kvalitet denna gång!',
+          tip: 'Tips: Skicka ord när du hittar dem - inget straff för att försöka!',
+        },
+        warmup: {
+          headline: 'Uppvärmningsrunda',
+          message: 'Se detta som övning. Din hjärna håller bara på att börja!',
+          tip: 'Tips: Skanna brädet snabbt, fokusera sedan på hövärdeshörn.',
+        },
+        comeback: {
+          headline: 'Comeback Laddar...',
+          message: 'De största spelarna har dåliga rundor. Nästa spel är DITT spel!',
+          tip: 'Tips: Prova att säga bokstäver högt för att utlösa ordassociationer.',
+        },
       },
     },
     xp: {
@@ -2781,6 +2897,7 @@ export const translations = {
       joinGame: 'ゲームに参加',
       joiningAs: '参加者名',
       hostingAs: 'ホスト名',
+      tapToChangeDisplayName: 'タップして表示名を変更',
       joining: '参加中...',
       creating: '作成中...',
       playersOnline: 'オンライン',
@@ -3180,6 +3297,43 @@ export const translations = {
         solidPerformanceDesc: '立派な結果。この調子で！',
         gettingStarted: 'ウォームアップ中',
         gettingStartedDesc: 'チャンピオンも最初は初心者。次のラウンドはあなたの番！',
+      },
+    },
+    noWords: {
+      noWordsThisRound: '今ラウンドは単語なし',
+      keepGoing: '頑張って！',
+      nextRoundIsYours: '次のラウンドはあなたの番！',
+      funFact: '豆知識：平均的なプレイヤーは可能な単語の70%を見逃します！',
+      otherPlayer: {
+        headline: '厳しいラウンド',
+        message: '今回は文字が味方しなかった。',
+      },
+      encourage: {
+        rookie: {
+          headline: '初めての緊張？',
+          message: '最高のワードハンターも最初はここから。ボードが難しかった！',
+          tip: 'ヒント：3文字の単語から始めて、そこから広げましょう。',
+        },
+        unlucky: {
+          headline: '難しい文字！',
+          message: 'サイコロが味方しないこともある。誰にでもあること！',
+          tip: 'ヒント：-ING、-ED、-ERなどの一般的なパターンを探そう。',
+        },
+        thinking: {
+          headline: '戦略的沈黙',
+          message: '質より量の考え方...今回は質にこだわりすぎたかも！',
+          tip: 'ヒント：見つけたらすぐに送信 - 試すことにペナルティなし！',
+        },
+        warmup: {
+          headline: 'ウォームアップラウンド',
+          message: '練習だと思って。脳がまだ始まったばかり！',
+          tip: 'ヒント：ボードを素早くスキャンし、高得点のコーナーに集中。',
+        },
+        comeback: {
+          headline: 'カムバック準備中...',
+          message: '最高のプレイヤーにもオフラウンドがある。次のゲームはあなたの番！',
+          tip: 'ヒント：文字を声に出して言うと、単語の連想が生まれます。',
+        },
       },
     },
     xp: {

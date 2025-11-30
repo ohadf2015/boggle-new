@@ -37,6 +37,25 @@ interface WordToVote {
   language: string;
 }
 
+interface XpGainedData {
+  xpEarned: number;
+  xpBreakdown: {
+    gameCompletion: number;
+    scoreXp: number;
+    winBonus: number;
+    achievementXp: number;
+  };
+  newTotalXp: number;
+  newLevel: number;
+}
+
+interface LevelUpData {
+  oldLevel: number;
+  newLevel: number;
+  levelsGained: number;
+  newTitles: string[];
+}
+
 interface UsePlayerSocketEventsProps {
   socket: Socket | null;
   t: (key: string) => string;
@@ -72,6 +91,10 @@ interface UsePlayerSocketEventsProps {
   // Word feedback state setters
   setShowWordFeedback: React.Dispatch<React.SetStateAction<boolean>>;
   setWordToVote: React.Dispatch<React.SetStateAction<WordToVote | null>>;
+
+  // XP state setters
+  setXpGainedData: React.Dispatch<React.SetStateAction<XpGainedData | null>>;
+  setLevelUpData: React.Dispatch<React.SetStateAction<LevelUpData | null>>;
 
   // Combo refs and setters
   comboLevelRef: MutableRefObject<number>;
@@ -122,6 +145,10 @@ const usePlayerSocketEvents = ({
   // Word feedback state setters
   setShowWordFeedback,
   setWordToVote,
+
+  // XP state setters
+  setXpGainedData,
+  setLevelUpData,
 
   // Combo refs and setters
   comboLevelRef,
@@ -586,6 +613,33 @@ const usePlayerSocketEvents = ({
       });
     };
 
+    // XP and Level Up handlers
+    const handleXpGained = (data: XpGainedData) => {
+      logger.log('[PLAYER] XP gained:', data);
+      setXpGainedData(data);
+      // Show a brief toast notification
+      neoSuccessToast(`+${data.xpEarned} XP`, {
+        icon: '⭐',
+        duration: 3000
+      });
+    };
+
+    const handleLevelUp = (data: LevelUpData) => {
+      logger.log('[PLAYER] Level up!', data);
+      setLevelUpData(data);
+      // Celebratory confetti for level up
+      confetti({
+        particleCount: 100,
+        spread: 70,
+        origin: { y: 0.6 },
+        colors: ['#ffd700', '#ff6b6b', '#4ecdc4', '#45b7d1']
+      });
+      neoSuccessToast(`${t('results.levelUp') || 'Level Up!'} ${data.oldLevel} → ${data.newLevel}`, {
+        icon: '🎉',
+        duration: 5000
+      });
+    };
+
     // Register all event listeners
     socket.on('updateUsers', handleUpdateUsers);
     socket.on('playerPresenceUpdate', handlePlayerPresenceUpdate);
@@ -623,6 +677,8 @@ const usePlayerSocketEvents = ({
     socket.on('playerLeft', handlePlayerLeft);
     socket.on('sessionTakenOver', handleSessionTakenOver);
     socket.on('sessionMigrated', handleSessionMigrated);
+    socket.on('xpGained', handleXpGained);
+    socket.on('levelUp', handleLevelUp);
 
     return () => {
       socket.off('updateUsers', handleUpdateUsers);
@@ -661,6 +717,8 @@ const usePlayerSocketEvents = ({
       socket.off('playerLeft', handlePlayerLeft);
       socket.off('sessionTakenOver', handleSessionTakenOver);
       socket.off('sessionMigrated', handleSessionMigrated);
+      socket.off('xpGained', handleXpGained);
+      socket.off('levelUp', handleLevelUp);
     };
   }, [
     socket,
@@ -694,6 +752,8 @@ const usePlayerSocketEvents = ({
     setShowTournamentStandings,
     setShowWordFeedback,
     setWordToVote,
+    setXpGainedData,
+    setLevelUpData,
     comboLevelRef,
     lastWordTimeRef,
     setComboLevel,

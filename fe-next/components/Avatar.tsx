@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, memo } from 'react';
+import React, { useState, useEffect, memo } from 'react';
 import Image from 'next/image';
 
 /**
@@ -51,6 +51,11 @@ const Avatar = memo<AvatarProps>(({
 }) => {
   const [imageError, setImageError] = useState(false);
   const config = SIZE_CONFIG[size] || SIZE_CONFIG.md;
+
+  // Reset error state when profilePictureUrl changes
+  useEffect(() => {
+    setImageError(false);
+  }, [profilePictureUrl]);
 
   // Show profile picture if available and hasn't errored
   if (profilePictureUrl && !imageError) {

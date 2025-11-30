@@ -90,6 +90,10 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
   // Words for board embedding
   const [wordsForBoard, setWordsForBoard] = useState([]);
 
+  // XP and Level state (for passing to results)
+  const [xpGainedData, setXpGainedData] = useState(null);
+  const [levelUpData, setLevelUpData] = useState(null);
+
   // Urgent music ref
   const hasTriggeredUrgentMusicRef = useRef(false);
 
@@ -118,6 +122,8 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
     setTournamentData,
     setTournamentCreating,
     setWordsForBoard,
+    setXpGainedData,
+    setLevelUpData,
     comboLevelRef,
     lastWordTimeRef,
     setComboLevel,

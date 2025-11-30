@@ -2,6 +2,7 @@ import React, { useState, useMemo, memo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { AchievementBadge } from '../AchievementBadge';
 import PlayerInsights from './PlayerInsights';
+import NoWordsFoundView from './NoWordsFoundView';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { cn } from '../../lib/utils';
 import { applyHebrewFinalLetters } from '../../utils/utils';
@@ -43,12 +44,33 @@ interface Player {
   title?: Title;
 }
 
+interface XpGainedData {
+  xpEarned: number;
+  xpBreakdown: {
+    gameCompletion: number;
+    scoreXp: number;
+    winBonus: number;
+    achievementXp: number;
+  };
+  newTotalXp: number;
+  newLevel: number;
+}
+
+interface LevelUpData {
+  oldLevel: number;
+  newLevel: number;
+  levelsGained: number;
+  newTitles: string[];
+}
+
 interface ResultsPlayerCardProps {
   player: Player;
   index: number;
   allPlayerWords: Record<string, WordObject[]>;
   currentUsername?: string;
   isWinner: boolean;
+  xpGainedData?: XpGainedData | null;
+  levelUpData?: LevelUpData | null;
 }
 
 interface WordChipProps {
@@ -111,7 +133,7 @@ const WordChip = memo<WordChipProps>(({ wordObj, playerCount }) => {
 
 WordChip.displayName = 'WordChip';
 
-const ResultsPlayerCard: React.FC<ResultsPlayerCardProps> = ({ player, index, allPlayerWords, currentUsername, isWinner }) => {
+const ResultsPlayerCard: React.FC<ResultsPlayerCardProps> = ({ player, index, allPlayerWords, currentUsername, isWinner, xpGainedData, levelUpData }) => {
   const { t } = useLanguage();
 
   // Check if this is the current player
@@ -338,6 +360,30 @@ const ResultsPlayerCard: React.FC<ResultsPlayerCardProps> = ({ player, index, al
                 <span className="text-xs font-black">🔥 {t('results.comboBonus')}: +{totalComboBonus}</span>
               </motion.div>
             )}
+
+            {/* XP Earned - Only for current player with XP data */}
+            {isCurrentPlayer && xpGainedData && (
+              <motion.div
+                initial={{ scale: 0, opacity: 0, x: -20 }}
+                animate={{ scale: 1, opacity: 1, x: 0 }}
+                transition={{ delay: 0.3, type: 'spring', stiffness: 300 }}
+                className="bg-gradient-to-r from-neo-purple to-neo-pink border-2 border-neo-black rounded-neo px-2 py-0.5 shadow-hard-sm text-neo-cream flex items-center gap-1"
+              >
+                <span className="text-xs font-black">⭐ +{xpGainedData.xpEarned} XP</span>
+              </motion.div>
+            )}
+
+            {/* Level Up - Only for current player with level up data */}
+            {isCurrentPlayer && levelUpData && (
+              <motion.div
+                initial={{ scale: 0, opacity: 0, rotate: -10 }}
+                animate={{ scale: 1, opacity: 1, rotate: 2 }}
+                transition={{ delay: 0.4, type: 'spring', stiffness: 200, damping: 10 }}
+                className="bg-neo-yellow border-2 border-neo-black rounded-neo px-2 py-0.5 shadow-hard-sm text-neo-black flex items-center gap-1"
+              >
+                <span className="text-xs font-black">🎉 {t('results.levelUp') || 'Level Up!'} {levelUpData.oldLevel} → {levelUpData.newLevel}</span>
+              </motion.div>
+            )}
           </div>
         </div>
 
@@ -356,7 +402,7 @@ const ResultsPlayerCard: React.FC<ResultsPlayerCardProps> = ({ player, index, al
             )}
           </button>
           <AnimatePresence>
-            {isWordsExpanded && player.allWords && player.allWords.length > 0 && (
+            {isWordsExpanded && (
               <motion.div
                 initial={{ height: 0, opacity: 0 }}
                 animate={{ height: 'auto', opacity: 1 }}
@@ -364,6 +410,14 @@ const ResultsPlayerCard: React.FC<ResultsPlayerCardProps> = ({ player, index, al
                 transition={{ duration: 0.3 }}
                 className="overflow-hidden"
               >
+                {/* Show NoWordsFoundView if player has no words */}
+                {(!player.allWords || player.allWords.length === 0) && (
+                  <NoWordsFoundView
+                    isCurrentPlayer={isCurrentPlayer || false}
+                    playerName={player.username}
+                  />
+                )}
+                {player.allWords && player.allWords.length > 0 && (
                 <div className="space-y-3 pt-3">
                   {/* Valid Words Grouped by Points - Neo-Brutalist */}
                   {sortedPointGroups.length > 0 && (
@@ -438,6 +492,7 @@ const ResultsPlayerCard: React.FC<ResultsPlayerCardProps> = ({ player, index, al
                     </div>
                   )}
                 </div>
+                )}
               </motion.div>
             )}
           </AnimatePresence>

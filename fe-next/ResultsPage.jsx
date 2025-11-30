@@ -141,6 +141,10 @@ const ResultsPage = ({ finalScores, letterGrid, gameCode, onReturnToRoom, userna
   const [showWordFeedback, setShowWordFeedback] = useState(false);
   const [wordToVote, setWordToVote] = useState(null);
 
+  // XP and Level state (received via socket after game ends)
+  const [xpGainedData, setXpGainedData] = useState(null);
+  const [levelUpData, setLevelUpData] = useState(null);
+
   // Win streak tracking
   const { currentStreak, bestStreak, recordWin } = useWinStreak();
 
@@ -326,7 +330,7 @@ const ResultsPage = ({ finalScores, letterGrid, gameCode, onReturnToRoom, userna
     }
   }, [winner]);
 
-  // Socket event listeners for word feedback (crowd-sourced word validation)
+  // Socket event listeners for word feedback (crowd-sourced word validation) and XP
   useEffect(() => {
     if (!socket) return;
 
@@ -347,12 +351,34 @@ const ResultsPage = ({ finalScores, letterGrid, gameCode, onReturnToRoom, userna
       logger.log('[RESULTS] Vote recorded:', data);
     };
 
+    // XP and Level Up handlers
+    const handleXpGained = (data) => {
+      logger.log('[RESULTS] XP gained:', data);
+      setXpGainedData(data);
+    };
+
+    const handleLevelUp = (data) => {
+      logger.log('[RESULTS] Level up!', data);
+      setLevelUpData(data);
+      // Celebratory confetti for level up
+      confetti({
+        particleCount: 150,
+        spread: 100,
+        origin: { y: 0.5 },
+        colors: ['#ffd700', '#ff6b6b', '#4ecdc4', '#45b7d1', '#a855f7']
+      });
+    };
+
     socket.on('showWordFeedback', handleShowWordFeedback);
     socket.on('voteRecorded', handleVoteRecorded);
+    socket.on('xpGained', handleXpGained);
+    socket.on('levelUp', handleLevelUp);
 
     return () => {
       socket.off('showWordFeedback', handleShowWordFeedback);
       socket.off('voteRecorded', handleVoteRecorded);
+      socket.off('xpGained', handleXpGained);
+      socket.off('levelUp', handleLevelUp);
     };
   }, [socket]);
 
@@ -454,6 +480,8 @@ const ResultsPage = ({ finalScores, letterGrid, gameCode, onReturnToRoom, userna
               allPlayerWords={allPlayerWords}
               currentUsername={username}
               isWinner={index === 0}
+              xpGainedData={player.username === username ? xpGainedData : null}
+              levelUpData={player.username === username ? levelUpData : null}
             />
           ))}
         </div>

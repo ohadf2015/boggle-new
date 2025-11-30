@@ -2162,7 +2162,7 @@ async function recordGameResultsToSupabase(gameCode, scoresArray, game) {
       };
     });
 
-    // Build auth map from game users
+    // Build auth map from game users (include socketId for XP event emission)
     const userAuthMap = {};
     for (const [username, userData] of Object.entries(game.users || {})) {
       // Validate userData is an object before accessing properties
@@ -2173,7 +2173,8 @@ async function recordGameResultsToSupabase(gameCode, scoresArray, game) {
       if (userData.authUserId || userData.guestTokenHash) {
         userAuthMap[username] = {
           authUserId: userData.authUserId || null,
-          guestTokenHash: userData.guestTokenHash || null
+          guestTokenHash: userData.guestTokenHash || null,
+          socketId: userData.socketId || null  // Include socketId for XP event emission
         };
       }
     }

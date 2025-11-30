@@ -18,6 +18,25 @@ interface TournamentData {
   isComplete?: boolean;
 }
 
+interface XpGainedData {
+  xpEarned: number;
+  xpBreakdown: {
+    gameCompletion: number;
+    scoreXp: number;
+    winBonus: number;
+    achievementXp: number;
+  };
+  newTotalXp: number;
+  newLevel: number;
+}
+
+interface LevelUpData {
+  oldLevel: number;
+  newLevel: number;
+  levelsGained: number;
+  newTitles: string[];
+}
+
 interface UseHostSocketEventsProps {
   socket: Socket | null;
   t: (key: string) => string;
@@ -44,6 +63,10 @@ interface UseHostSocketEventsProps {
   setTournamentData: React.Dispatch<React.SetStateAction<TournamentData | null>>;
   setTournamentCreating: React.Dispatch<React.SetStateAction<boolean>>;
   setWordsForBoard: React.Dispatch<React.SetStateAction<string[]>>;
+
+  // XP state setters
+  setXpGainedData: React.Dispatch<React.SetStateAction<XpGainedData | null>>;
+  setLevelUpData: React.Dispatch<React.SetStateAction<LevelUpData | null>>;
 
   // Combo refs and setters
   comboLevelRef: MutableRefObject<number>;
@@ -89,6 +112,10 @@ const useHostSocketEvents = ({
   setTournamentData,
   setTournamentCreating,
   setWordsForBoard,
+
+  // XP state setters
+  setXpGainedData,
+  setLevelUpData,
 
   // Combo refs and setters
   comboLevelRef,
@@ -511,6 +538,31 @@ const useHostSocketEvents = ({
       });
     };
 
+    // XP and Level Up handlers (for host who is also playing)
+    const handleXpGained = (data: XpGainedData) => {
+      logger.log('[HOST] XP gained:', data);
+      setXpGainedData(data);
+      neoSuccessToast(`+${data.xpEarned} XP`, {
+        icon: '⭐',
+        duration: 3000
+      });
+    };
+
+    const handleLevelUp = (data: LevelUpData) => {
+      logger.log('[HOST] Level up!', data);
+      setLevelUpData(data);
+      confetti({
+        particleCount: 100,
+        spread: 70,
+        origin: { y: 0.6 },
+        colors: ['#ffd700', '#ff6b6b', '#4ecdc4', '#45b7d1']
+      });
+      neoSuccessToast(`${t('results.levelUp') || 'Level Up!'} ${data.oldLevel} → ${data.newLevel}`, {
+        icon: '🎉',
+        duration: 5000
+      });
+    };
+
     // Register all event listeners
     socket.on('updateUsers', handleUpdateUsers);
     socket.on('playerPresenceUpdate', handlePlayerPresenceUpdate);
@@ -536,6 +588,8 @@ const useHostSocketEvents = ({
     socket.on('playerDisconnected', handlePlayerDisconnected);
     socket.on('playerReconnected', handlePlayerReconnected);
     socket.on('playerLeft', handlePlayerLeft);
+    socket.on('xpGained', handleXpGained);
+    socket.on('levelUp', handleLevelUp);
 
     return () => {
       socket.off('updateUsers', handleUpdateUsers);
@@ -562,6 +616,8 @@ const useHostSocketEvents = ({
       socket.off('playerDisconnected', handlePlayerDisconnected);
       socket.off('playerReconnected', handlePlayerReconnected);
       socket.off('playerLeft', handlePlayerLeft);
+      socket.off('xpGained', handleXpGained);
+      socket.off('levelUp', handleLevelUp);
     };
   }, [
     socket,
@@ -587,6 +643,8 @@ const useHostSocketEvents = ({
     setTournamentData,
     setTournamentCreating,
     setWordsForBoard,
+    setXpGainedData,
+    setLevelUpData,
     intentionalExitRef,
     tournamentTimeoutRef,
   ]);

@@ -607,22 +607,28 @@ export default function ProfilePage() {
           </motion.div>
         )}
 
-        {/* Back Button */}
-        <div className="mt-8 text-center">
+        {/* Back Button - Neo-Brutalist styled */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.4 }}
+          className="mt-8 text-center"
+        >
           <Button
-            variant="outline"
             onClick={() => router.push(`/${language}`)}
             className={cn(
-              'rounded-full',
+              'px-6 py-3 rounded-neo border-3 border-neo-black font-black uppercase tracking-wide transition-all',
+              'shadow-hard hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-hard-lg',
+              'active:translate-x-[2px] active:translate-y-[2px] active:shadow-none',
               isDarkMode
-                ? 'border-slate-600 text-gray-300 hover:bg-slate-700'
-                : 'border-gray-300 text-gray-700 hover:bg-gray-100'
+                ? 'bg-neo-cyan text-neo-black hover:bg-neo-cyan/90'
+                : 'bg-neo-purple text-neo-white hover:bg-neo-purple/90'
             )}
           >
             <FaArrowLeft className="mr-2" />
-            Back to Game
+            {t('profile.backToGame') || 'Back to Game'}
           </Button>
-        </div>
+        </motion.div>
       </div>
 
       {/* Emoji Avatar Picker Modal */}

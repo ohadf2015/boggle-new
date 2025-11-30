@@ -71,6 +71,10 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode, pe
   const [showWordFeedback, setShowWordFeedback] = useState(false);
   const [wordToVote, setWordToVote] = useState(null);
 
+  // XP and Level state (for passing to results)
+  const [xpGainedData, setXpGainedData] = useState(null);
+  const [levelUpData, setLevelUpData] = useState(null);
+
   // Music ref
   const hasTriggeredUrgentMusicRef = useRef(false);
 
@@ -106,6 +110,8 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode, pe
     setShowTournamentStandings,
     setShowWordFeedback,
     setWordToVote,
+    setXpGainedData,
+    setLevelUpData,
     comboLevelRef,
     lastWordTimeRef,
     setComboLevel,
