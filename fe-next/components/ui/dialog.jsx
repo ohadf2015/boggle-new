@@ -37,48 +37,55 @@ const DialogContent = React.forwardRef(({ className, children, ...props }, ref) 
     <DialogPrimitive.Content
       ref={ref}
       className={cn(
-        // Positioning
-        "fixed left-[50%] top-[50%] z-50 grid w-full max-w-lg translate-x-[-50%] translate-y-[-50%]",
+        // Mobile-first positioning - full screen on mobile, centered modal on desktop
+        "fixed z-50 grid w-full",
+        // Mobile: full screen with safe area insets
+        "inset-0 sm:inset-auto",
+        "sm:left-[50%] sm:top-[50%] sm:translate-x-[-50%] sm:translate-y-[-50%]",
+        "sm:max-w-lg sm:max-h-[90vh]",
         // Neo-Brutalist styling
         "bg-neo-cream text-neo-black",
-        "border-4 border-neo-black",
-        "rounded-neo-lg",
-        "shadow-hard-xl",
+        "border-0 sm:border-4 border-neo-black",
+        "rounded-none sm:rounded-neo-lg",
+        "shadow-none sm:shadow-hard-xl",
         // Spacing
         "p-0 gap-0",
+        // Overflow for mobile scrolling
+        "overflow-y-auto",
         // Animations
         "duration-200",
         "data-[state=open]:animate-in data-[state=closed]:animate-out",
         "data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
-        "data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95",
-        "data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%]",
-        "data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%]",
+        "sm:data-[state=closed]:zoom-out-95 sm:data-[state=open]:zoom-in-95",
+        "data-[state=closed]:slide-out-to-bottom sm:data-[state=closed]:slide-out-to-left-1/2 sm:data-[state=closed]:slide-out-to-top-[48%]",
+        "data-[state=open]:slide-in-from-bottom sm:data-[state=open]:slide-in-from-left-1/2 sm:data-[state=open]:slide-in-from-top-[48%]",
         className
       )}
       style={{
         backgroundImage: 'var(--halftone-pattern)',
-        transform: 'translate(-50%, -50%) rotate(-1deg)',
       }}
       {...props}
     >
       {children}
-      {/* Neo-Brutalist Close Button */}
+      {/* Neo-Brutalist Close Button - adjusted for mobile and RTL */}
       <DialogPrimitive.Close
         className="
-          absolute -right-3 -top-3
-          w-10 h-10
+          absolute top-2 sm:-top-3
+          right-2 sm:-right-3 rtl:right-auto rtl:left-2 rtl:sm:-left-3
+          w-8 h-8 sm:w-10 sm:h-10
           flex items-center justify-center
           bg-neo-red text-neo-white
-          border-3 border-neo-black
+          border-2 sm:border-3 border-neo-black
           rounded-neo
           shadow-hard-sm
           transition-all duration-100
           hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-hard
           active:translate-x-[2px] active:translate-y-[2px] active:shadow-none
           focus:outline-none focus:ring-2 focus:ring-neo-cyan focus:ring-offset-2
+          z-10
         "
       >
-        <X className="h-5 w-5 stroke-[3]" />
+        <X className="h-4 w-4 sm:h-5 sm:w-5 stroke-[3]" />
         <span className="sr-only">Close</span>
       </DialogPrimitive.Close>
     </DialogPrimitive.Content>

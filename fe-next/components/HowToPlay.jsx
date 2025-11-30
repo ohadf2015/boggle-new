@@ -75,10 +75,10 @@ const InteractiveGridDemo = ({ t, dir }) => {
   const currentWord = demoWords[currentWordIndex];
 
   return (
-    <div className="flex flex-col items-center gap-4">
+    <div className="flex flex-col items-center gap-3 sm:gap-4">
       {/* Demo Grid */}
       <div className="relative">
-        <div className="grid grid-cols-3 gap-1.5 p-3 bg-neo-black/10 rounded-neo border-3 border-neo-black">
+        <div className="grid grid-cols-3 gap-1 sm:gap-1.5 p-2 sm:p-3 bg-neo-black/10 rounded-neo border-2 sm:border-3 border-neo-black">
           {demoGrid.map((row, rowIndex) => (
             row.map((letter, colIndex) => {
               const isSelected = isCellSelected(rowIndex, colIndex);
@@ -88,12 +88,12 @@ const InteractiveGridDemo = ({ t, dir }) => {
                 <motion.div
                   key={`${rowIndex}-${colIndex}`}
                   className={`
-                    w-12 h-12 sm:w-14 sm:h-14 flex items-center justify-center
-                    text-xl sm:text-2xl font-black uppercase
-                    rounded-neo border-3 border-neo-black
+                    w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 flex items-center justify-center relative
+                    text-lg sm:text-xl md:text-2xl font-black uppercase
+                    rounded-neo border-2 sm:border-3 border-neo-black
                     transition-all duration-200
                     ${isSelected
-                      ? 'bg-neo-yellow text-neo-black shadow-hard scale-110 z-10'
+                      ? 'bg-neo-yellow text-neo-black shadow-hard scale-105 sm:scale-110 z-10'
                       : 'bg-neo-cream text-neo-black shadow-hard-sm'
                     }
                   `}
@@ -105,7 +105,7 @@ const InteractiveGridDemo = ({ t, dir }) => {
                 >
                   {letter}
                   {isSelected && cellIndex >= 0 && (
-                    <span className="absolute -top-1 -right-1 w-5 h-5 bg-neo-pink text-neo-white text-xs font-bold rounded-full flex items-center justify-center border-2 border-neo-black">
+                    <span className="absolute -top-1 -right-1 w-4 h-4 sm:w-5 sm:h-5 bg-neo-pink text-neo-white text-[10px] sm:text-xs font-bold rounded-full flex items-center justify-center border-2 border-neo-black">
                       {cellIndex + 1}
                     </span>
                   )}
@@ -117,11 +117,12 @@ const InteractiveGridDemo = ({ t, dir }) => {
 
         {/* Connection Lines SVG Overlay */}
         {selectedCells.length > 1 && (
-          <svg className="absolute inset-0 pointer-events-none" style={{ margin: '12px' }}>
+          <svg className="absolute inset-0 pointer-events-none" style={{ margin: '8px' }}>
             {selectedCells.slice(1).map((cell, i) => {
               const prev = selectedCells[i];
-              const cellSize = 56;
-              const gap = 6;
+              // Responsive cell size calculation
+              const cellSize = typeof window !== 'undefined' && window.innerWidth < 640 ? 40 : 48;
+              const gap = typeof window !== 'undefined' && window.innerWidth < 640 ? 4 : 6;
               const x1 = prev[1] * (cellSize + gap) + cellSize / 2;
               const y1 = prev[0] * (cellSize + gap) + cellSize / 2;
               const x2 = cell[1] * (cellSize + gap) + cellSize / 2;
@@ -135,7 +136,7 @@ const InteractiveGridDemo = ({ t, dir }) => {
                   x2={x2}
                   y2={y2}
                   stroke="#FF6B9D"
-                  strokeWidth="4"
+                  strokeWidth="3"
                   strokeLinecap="round"
                   initial={{ pathLength: 0 }}
                   animate={{ pathLength: 1 }}
@@ -156,8 +157,8 @@ const InteractiveGridDemo = ({ t, dir }) => {
           exit={{ opacity: 0, y: -10 }}
           className="text-center"
         >
-          <div className="flex items-center justify-center gap-2 mb-2">
-            <span className="text-2xl font-black text-neo-black tracking-wider">
+          <div className="flex items-center justify-center gap-2 mb-1 sm:mb-2">
+            <span className="text-xl sm:text-2xl font-black text-neo-black tracking-wider">
               {selectedCells.length > 0
                 ? currentWord.word.slice(0, selectedCells.length)
                 : '...'
@@ -169,14 +170,14 @@ const InteractiveGridDemo = ({ t, dir }) => {
                 animate={{ scale: 1 }}
                 className="flex items-center gap-1"
               >
-                <FaCheck className="text-neo-lime text-xl" />
-                <Badge className="bg-neo-lime text-neo-black border-2 border-neo-black font-bold">
+                <FaCheck className="text-neo-lime text-lg sm:text-xl" />
+                <Badge className="bg-neo-lime text-neo-black border-2 border-neo-black font-bold text-xs sm:text-sm">
                   +{currentWord.points} {t('results.points')}
                 </Badge>
               </motion.div>
             )}
           </div>
-          <p className="text-sm text-neo-black/60 font-medium">
+          <p className="text-xs sm:text-sm text-neo-black/60 font-medium">
             {t('howToPlay.demo.watchAnimation')}
           </p>
         </motion.div>
@@ -188,7 +189,7 @@ const InteractiveGridDemo = ({ t, dir }) => {
           variant="neo"
           size="sm"
           onClick={() => setAutoPlay(!autoPlay)}
-          className={autoPlay ? 'bg-neo-lime' : 'bg-neo-cream'}
+          className={`${autoPlay ? 'bg-neo-lime' : 'bg-neo-cream'} text-xs sm:text-sm`}
         >
           {autoPlay ? <FaPlay className="mr-1" /> : <FaRedo className="mr-1" />}
           {autoPlay ? t('howToPlay.demo.autoPlay') : t('howToPlay.demo.replay')}
@@ -460,6 +461,7 @@ const HowToPlay = ({ onClose }) => {
   const { t, dir } = useLanguage();
   const [currentStep, setCurrentStep] = useState(0);
 
+  // Simplified to 3 main steps for clearer onboarding
   const steps = useMemo(() => [
     {
       id: 'basics',
@@ -479,58 +481,40 @@ const HowToPlay = ({ onClose }) => {
       title: t('howToPlay.steps.scoring.title'),
       color: 'bg-neo-lime'
     },
-    {
-      id: 'combo',
-      icon: FaFire,
-      title: t('howToPlay.steps.combo.title'),
-      color: 'bg-neo-orange'
-    },
-    {
-      id: 'xp',
-      icon: FaLevelUpAlt,
-      title: t('howToPlay.steps.xp.title'),
-      color: 'bg-neo-pink'
-    },
-    {
-      id: 'achievements',
-      icon: FaTrophy,
-      title: t('howToPlay.steps.achievements.title'),
-      color: 'bg-neo-purple'
-    },
   ], [t]);
 
   const nextStep = () => setCurrentStep((prev) => Math.min(prev + 1, steps.length - 1));
   const prevStep = () => setCurrentStep((prev) => Math.max(prev - 1, 0));
+  const isRTL = dir === 'rtl';
 
   const renderStepContent = () => {
     switch (steps[currentStep].id) {
       case 'basics':
         return (
-          <div className="space-y-4">
-            <p className="text-neo-black leading-relaxed">
+          <div className="space-y-3 sm:space-y-4">
+            <p className="text-neo-black leading-relaxed text-sm sm:text-base">
               {t('howToPlay.steps.basics.description')}
             </p>
 
-            <div className="space-y-3">
+            <div className="space-y-2 sm:space-y-3">
               {[
                 { icon: FaUsers, title: t('howToPlay.createOrJoinTitle'), desc: t('howToPlay.createOrJoinDesc') },
                 { icon: FaClock, title: t('howToPlay.hostStartsTitle'), desc: t('howToPlay.hostStartsDesc') },
-                { icon: FaStar, title: t('howToPlay.findWordsTitle'), desc: t('howToPlay.findWordsDesc') },
                 { icon: FaTrophy, title: t('howToPlay.earnPointsTitle'), desc: t('howToPlay.earnPointsDesc') },
               ].map((item, index) => (
                 <motion.div
                   key={index}
-                  initial={{ x: -20, opacity: 0 }}
+                  initial={{ x: isRTL ? 20 : -20, opacity: 0 }}
                   animate={{ x: 0, opacity: 1 }}
                   transition={{ delay: index * 0.1 }}
-                  className="flex gap-3 items-start"
+                  className="flex gap-2 sm:gap-3 items-start"
                 >
-                  <div className="flex-shrink-0 w-10 h-10 bg-neo-yellow rounded-neo border-2 border-neo-black flex items-center justify-center shadow-hard-sm">
-                    <item.icon className="text-neo-black" />
+                  <div className="flex-shrink-0 w-8 h-8 sm:w-10 sm:h-10 bg-neo-yellow rounded-neo border-2 border-neo-black flex items-center justify-center shadow-hard-sm">
+                    <item.icon className="text-neo-black text-sm sm:text-base" />
                   </div>
-                  <div>
-                    <h4 className="font-bold text-neo-black">{item.title}</h4>
-                    <p className="text-sm text-neo-black/70">{item.desc}</p>
+                  <div className="min-w-0">
+                    <h4 className="font-bold text-neo-black text-sm sm:text-base">{item.title}</h4>
+                    <p className="text-xs sm:text-sm text-neo-black/70">{item.desc}</p>
                   </div>
                 </motion.div>
               ))}
@@ -540,8 +524,8 @@ const HowToPlay = ({ onClose }) => {
 
       case 'grid':
         return (
-          <div className="space-y-4">
-            <p className="text-neo-black leading-relaxed">
+          <div className="space-y-3 sm:space-y-4">
+            <p className="text-neo-black leading-relaxed text-sm sm:text-base">
               {t('howToPlay.steps.grid.description')}
             </p>
 
@@ -549,24 +533,23 @@ const HowToPlay = ({ onClose }) => {
             <motion.div
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
-              className="relative rounded-neo border-3 border-neo-black overflow-hidden shadow-hard"
+              className="relative rounded-neo border-2 sm:border-3 border-neo-black overflow-hidden shadow-hard"
             >
               <img
                 src="/how-to/image-1764521954444-678.jpg"
                 alt={t('howToPlay.demo.gridExample') || 'Example of tracing a word on the grid'}
                 className="w-full h-auto"
               />
-              <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-neo-black/80 to-transparent p-3">
-                <p className="text-neo-white text-sm font-bold text-center">
+              <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-neo-black/80 to-transparent p-2 sm:p-3">
+                <p className="text-neo-white text-xs sm:text-sm font-bold text-center">
                   {t('howToPlay.demo.traceExample') || 'Trace letters to form words - T→O→N→D'}
                 </p>
               </div>
             </motion.div>
 
-            <InteractiveGridDemo t={t} dir={dir} />
-            <div className="bg-neo-yellow/30 rounded-neo border-2 border-neo-black p-3">
-              <p className="text-sm font-medium text-neo-black flex items-center gap-2">
-                <FaLightbulb className="text-neo-orange" />
+            <div className="bg-neo-yellow/30 rounded-neo border-2 border-neo-black p-2 sm:p-3">
+              <p className="text-xs sm:text-sm font-medium text-neo-black flex items-center gap-2">
+                <FaLightbulb className="text-neo-orange flex-shrink-0" />
                 {t('howToPlay.findWordsNote')}
               </p>
             </div>
@@ -575,78 +558,38 @@ const HowToPlay = ({ onClose }) => {
 
       case 'scoring':
         return (
-          <div className="space-y-4">
-            <p className="text-neo-black leading-relaxed">
+          <div className="space-y-3 sm:space-y-4">
+            <p className="text-neo-black leading-relaxed text-sm sm:text-base">
               {t('howToPlay.steps.scoring.description')}
             </p>
 
-            {/* Scoring Table */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-              {[
-                { letters: '2', points: 1, color: 'bg-gray-400' },
-                { letters: '3', points: 2, color: 'bg-neo-cyan' },
-                { letters: '4', points: 3, color: 'bg-neo-lime' },
-                { letters: '5', points: 4, color: 'bg-neo-yellow' },
-                { letters: '6', points: 5, color: 'bg-neo-orange' },
-                { letters: '7', points: 6, color: 'bg-neo-pink' },
-                { letters: '8+', points: '7+', color: 'bg-neo-purple' },
-              ].map((item, index) => (
-                <motion.div
-                  key={index}
-                  initial={{ scale: 0 }}
-                  animate={{ scale: 1 }}
-                  transition={{ delay: index * 0.05 }}
-                  className={`${item.color} p-3 rounded-neo border-2 border-neo-black text-center shadow-hard-sm`}
-                >
-                  <div className="text-lg font-black text-neo-black">{item.letters}</div>
-                  <div className="text-xs font-bold text-neo-black/80">{t('howToPlay.letters')}</div>
-                  <div className="text-sm font-bold text-neo-black mt-1">= {item.points} {t('howToPlay.pts')}</div>
-                </motion.div>
-              ))}
-            </div>
-
-            <div className="bg-neo-cream rounded-neo border-2 border-neo-black p-3 text-center">
-              <p className="font-bold text-neo-black">
+            {/* Simplified Scoring - Just show the formula and a few examples */}
+            <div className="bg-neo-cream rounded-neo border-2 sm:border-3 border-neo-black p-3 sm:p-4 text-center shadow-hard">
+              <p className="font-black text-neo-black text-base sm:text-lg mb-2">
                 {t('howToPlay.scoringTable.formula')}
               </p>
+              <div className="flex justify-center gap-2 sm:gap-3 flex-wrap">
+                {[
+                  { letters: '3', points: 2 },
+                  { letters: '5', points: 4 },
+                  { letters: '7+', points: '6+' },
+                ].map((item, index) => (
+                  <div key={index} className="bg-neo-yellow rounded-neo border-2 border-neo-black px-3 py-1 sm:px-4 sm:py-2">
+                    <span className="font-bold text-neo-black text-sm sm:text-base">
+                      {item.letters} {t('howToPlay.letters')} = {item.points} {t('howToPlay.pts')}
+                    </span>
+                  </div>
+                ))}
+              </div>
             </div>
 
-            <div className="bg-neo-red/20 rounded-neo border-2 border-neo-black p-3">
-              <p className="text-sm font-medium text-neo-black flex items-center gap-2">
-                <FaTimes className="text-neo-red" />
-                {t('common.duplicateWarning')}
+            {/* Bonus features mention */}
+            <div className="bg-neo-lime/30 rounded-neo border-2 border-neo-black p-2 sm:p-3">
+              <p className="text-xs sm:text-sm font-medium text-neo-black flex items-center gap-2">
+                <FaFire className="text-neo-orange flex-shrink-0" />
+                {t('howToPlay.steps.combo.description') || 'Find words quickly for combo bonuses!'}
               </p>
             </div>
-          </div>
-        );
-
-      case 'combo':
-        return (
-          <div className="space-y-4">
-            <p className="text-neo-black leading-relaxed">
-              {t('howToPlay.steps.combo.description')}
-            </p>
-            <ComboVisualizer t={t} />
-          </div>
-        );
-
-      case 'xp':
-        return (
-          <div className="space-y-4">
-            <p className="text-neo-black leading-relaxed">
-              {t('howToPlay.steps.xp.description')}
-            </p>
-            <XpExplainer t={t} />
-          </div>
-        );
-
-      case 'achievements':
-        return (
-          <div className="space-y-4">
-            <p className="text-neo-black leading-relaxed">
-              {t('howToPlay.steps.achievements.description')}
-            </p>
-            <AchievementTiers t={t} />
           </div>
         );
 
@@ -659,21 +602,21 @@ const HowToPlay = ({ onClose }) => {
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="w-full max-w-2xl mx-auto"
+      className="w-full max-w-2xl mx-auto px-3 sm:px-4 pb-4"
       dir={dir}
     >
-      {/* Progress Indicator */}
-      <div className="mb-4">
-        <div className="flex justify-between mb-2">
+      {/* Progress Indicator - Scrollable on mobile */}
+      <div className="mb-3 sm:mb-4">
+        <div className="flex justify-between gap-1 sm:gap-2 mb-2 overflow-x-auto pb-1">
           {steps.map((step, index) => (
             <button
               key={step.id}
               onClick={() => setCurrentStep(index)}
               className={`
-                w-10 h-10 rounded-neo border-2 border-neo-black flex items-center justify-center
+                w-8 h-8 sm:w-10 sm:h-10 flex-shrink-0 rounded-neo border-2 border-neo-black flex items-center justify-center
                 transition-all duration-200 shadow-hard-sm
                 ${index === currentStep
-                  ? `${step.color} scale-110 shadow-hard`
+                  ? `${step.color} scale-105 sm:scale-110 shadow-hard`
                   : index < currentStep
                     ? 'bg-neo-lime'
                     : 'bg-neo-cream'
@@ -681,9 +624,9 @@ const HowToPlay = ({ onClose }) => {
               `}
             >
               {index < currentStep ? (
-                <FaCheck className="text-neo-black" />
+                <FaCheck className="text-neo-black text-xs sm:text-sm" />
               ) : (
-                <step.icon className="text-neo-black" />
+                <step.icon className="text-neo-black text-xs sm:text-sm" />
               )}
             </button>
           ))}
@@ -694,12 +637,12 @@ const HowToPlay = ({ onClose }) => {
       {/* Step Title */}
       <motion.div
         key={currentStep}
-        initial={{ opacity: 0, x: 20 }}
+        initial={{ opacity: 0, x: isRTL ? -20 : 20 }}
         animate={{ opacity: 1, x: 0 }}
-        className={`${steps[currentStep].color} rounded-neo border-3 border-neo-black p-4 mb-4 shadow-hard`}
+        className={`${steps[currentStep].color} rounded-neo border-2 sm:border-3 border-neo-black p-3 sm:p-4 mb-3 sm:mb-4 shadow-hard`}
       >
-        <h3 className="text-xl font-black text-neo-black flex items-center gap-2">
-          {React.createElement(steps[currentStep].icon)}
+        <h3 className="text-base sm:text-xl font-black text-neo-black flex items-center gap-2">
+          {React.createElement(steps[currentStep].icon, { className: 'text-sm sm:text-base' })}
           {steps[currentStep].title}
         </h3>
       </motion.div>
@@ -708,29 +651,29 @@ const HowToPlay = ({ onClose }) => {
       <AnimatePresence mode="wait">
         <motion.div
           key={currentStep}
-          initial={{ opacity: 0, x: 50 }}
+          initial={{ opacity: 0, x: isRTL ? -50 : 50 }}
           animate={{ opacity: 1, x: 0 }}
-          exit={{ opacity: 0, x: -50 }}
+          exit={{ opacity: 0, x: isRTL ? 50 : -50 }}
           transition={{ duration: 0.2 }}
-          className="min-h-[300px]"
+          className="min-h-[200px] sm:min-h-[300px]"
         >
           {renderStepContent()}
         </motion.div>
       </AnimatePresence>
 
-      {/* Navigation */}
-      <div className="flex justify-between items-center mt-6 pt-4 border-t-2 border-neo-black/20">
+      {/* Navigation - Fixed at bottom on mobile */}
+      <div className="flex justify-between items-center mt-4 sm:mt-6 pt-3 sm:pt-4 border-t-2 border-neo-black/20 gap-2">
         <Button
           variant="neo"
           onClick={prevStep}
           disabled={currentStep === 0}
-          className="bg-neo-cream"
+          className="bg-neo-cream text-sm sm:text-base px-2 sm:px-4"
         >
-          <FaChevronLeft className="mr-2" />
-          {t('common.back')}
+          <FaChevronLeft className={`${isRTL ? 'ml-1 sm:ml-2 rotate-180' : 'mr-1 sm:mr-2'}`} />
+          <span className="hidden xs:inline">{t('common.back')}</span>
         </Button>
 
-        <span className="text-sm font-bold text-neo-black/60">
+        <span className="text-xs sm:text-sm font-bold text-neo-black/60 flex-shrink-0">
           {currentStep + 1} / {steps.length}
         </span>
 
@@ -738,43 +681,47 @@ const HowToPlay = ({ onClose }) => {
           <Button
             variant="neo"
             onClick={onClose}
-            className="bg-neo-lime"
+            className="bg-neo-lime text-sm sm:text-base px-2 sm:px-4"
           >
-            {t('common.understood')}
-            <FaCheck className="ml-2" />
+            <span className="hidden xs:inline">{t('common.understood')}</span>
+            <span className="xs:hidden">OK</span>
+            <FaCheck className={`${isRTL ? 'mr-1 sm:mr-2' : 'ml-1 sm:ml-2'}`} />
           </Button>
         ) : (
           <Button
             variant="neo"
             onClick={nextStep}
-            className="bg-neo-yellow"
+            className="bg-neo-yellow text-sm sm:text-base px-2 sm:px-4"
           >
-            {t('common.next') || 'Next'}
-            <FaChevronRight className="ml-2" />
+            <span className="hidden xs:inline">{t('common.next') || 'Next'}</span>
+            <span className="xs:hidden">{t('common.next') || 'Next'}</span>
+            <FaChevronRight className={`${isRTL ? 'mr-1 sm:mr-2 rotate-180' : 'ml-1 sm:ml-2'}`} />
           </Button>
         )}
       </div>
 
-      {/* Tips Section */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.5 }}
-        className="mt-6 bg-neo-lime/20 rounded-neo border-2 border-neo-black p-4"
-      >
-        <h4 className="font-bold text-neo-black mb-2 flex items-center gap-2">
-          <FaLightbulb className="text-neo-yellow" />
-          {t('howToPlay.tipsTitle')}
-        </h4>
-        <ul className="space-y-1 text-sm text-neo-black">
-          {[1, 2, 3, 4, 5].map((num) => (
-            <li key={num} className="flex items-start gap-2">
-              <FaCheck className="text-neo-lime mt-0.5 flex-shrink-0" />
-              <span>{t(`howToPlay.tips.tip${num}`)}</span>
-            </li>
-          ))}
-        </ul>
-      </motion.div>
+      {/* Quick Tips - Only show on last step */}
+      {currentStep === steps.length - 1 && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.3 }}
+          className="mt-4 bg-neo-pink/20 rounded-neo border-2 border-neo-black p-3"
+        >
+          <h4 className="font-bold text-neo-black mb-2 flex items-center gap-2 text-sm">
+            <FaLightbulb className="text-neo-yellow" />
+            {t('howToPlay.tipsTitle')}
+          </h4>
+          <ul className="space-y-1 text-xs text-neo-black">
+            {[1, 2, 4].map((num) => (
+              <li key={num} className="flex items-start gap-2">
+                <FaCheck className="text-neo-lime mt-0.5 flex-shrink-0 text-xs" />
+                <span>{t(`howToPlay.tips.tip${num}`)}</span>
+              </li>
+            ))}
+          </ul>
+        </motion.div>
+      )}
     </motion.div>
   );
 };
