@@ -11,7 +11,7 @@ import { Button } from './ui/button';
 import { Progress } from './ui/progress';
 import { useLanguage } from '../contexts/LanguageContext';
 
-// Interactive Mini Grid Demo Component - Users can tap/drag to try it themselves!
+// Interactive Mini Grid Demo Component - Auto-plays words with combo demonstration
 const InteractiveGridDemo = ({ t, dir }) => {
   const demoGrid = [
     ['C', 'A', 'T'],
@@ -19,88 +19,77 @@ const InteractiveGridDemo = ({ t, dir }) => {
     ['W', 'D', 'E']
   ];
 
-  // Valid words that can be found in this grid
-  const validWords = ['CAT', 'CATS', 'CAR', 'CARS', 'TAR', 'TARS', 'ART', 'ARTS', 'RAT', 'RATS', 'OAR', 'OARS', 'SWORD', 'WORDS', 'WARS', 'STAR', 'CORD', 'CORDS', 'RED', 'REDS', 'ROW', 'ROWS', 'SOD', 'COD', 'COW', 'COWS', 'OWE', 'OWED', 'WED', 'SEW'];
+  // Demo sequence: words to show with combo building
+  const demoSequence = [
+    { word: 'CAT', path: [[0,0], [0,1], [0,2]], points: 2 },
+    { word: 'RAT', path: [[1,1], [0,1], [0,2]], points: 2 },
+    { word: 'ART', path: [[0,1], [1,1], [0,2]], points: 2 },
+    { word: 'CARS', path: [[0,0], [0,1], [1,1], [1,2]], points: 3 },
+  ];
 
   const [selectedCells, setSelectedCells] = useState([]);
-  const [isDragging, setIsDragging] = useState(false);
-  const [currentWord, setCurrentWord] = useState('');
-  const [showResult, setShowResult] = useState(null); // 'valid' | 'invalid' | null
-  const [score, setScore] = useState(0);
-  const [foundWords, setFoundWords] = useState([]);
+  const [currentWordIndex, setCurrentWordIndex] = useState(0);
+  const [isAnimating, setIsAnimating] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
+  const [comboCount, setComboCount] = useState(0);
+  const [totalScore, setTotalScore] = useState(0);
+  const [autoPlay, setAutoPlay] = useState(true);
 
-  // Check if two cells are adjacent
-  const isAdjacent = (cell1, cell2) => {
-    const rowDiff = Math.abs(cell1[0] - cell2[0]);
-    const colDiff = Math.abs(cell1[1] - cell2[1]);
-    return rowDiff <= 1 && colDiff <= 1 && !(rowDiff === 0 && colDiff === 0);
+  const currentDemo = demoSequence[currentWordIndex];
+
+  // Calculate combo multiplier
+  const getComboMultiplier = (combo) => {
+    if (combo <= 2) return 1;
+    if (combo <= 4) return 1.25;
+    if (combo <= 6) return 1.5;
+    return 1.75;
   };
 
-  const handleCellInteraction = (row, col) => {
-    const cellKey = `${row}-${col}`;
-    const isAlreadySelected = selectedCells.some(([r, c]) => r === row && c === col);
+  const animateWord = useCallback(() => {
+    if (isAnimating) return;
 
-    if (isAlreadySelected) return;
+    setIsAnimating(true);
+    setShowSuccess(false);
+    const currentWord = demoSequence[currentWordIndex];
 
-    // Check if adjacent to last selected cell (or first selection)
-    if (selectedCells.length === 0 || isAdjacent(selectedCells[selectedCells.length - 1], [row, col])) {
-      const newCells = [...selectedCells, [row, col]];
-      setSelectedCells(newCells);
-      const word = newCells.map(([r, c]) => demoGrid[r][c]).join('');
-      setCurrentWord(word);
-    }
-  };
+    // Animate path step by step
+    currentWord.path.forEach((cell, index) => {
+      setTimeout(() => {
+        setSelectedCells(prev => [...prev, cell]);
+      }, index * 300);
+    });
 
-  const handlePointerDown = (row, col) => {
-    setIsDragging(true);
-    setShowResult(null);
-    setSelectedCells([[row, col]]);
-    setCurrentWord(demoGrid[row][col]);
-  };
+    // Show success and combo
+    setTimeout(() => {
+      setShowSuccess(true);
+      const multiplier = getComboMultiplier(comboCount + 1);
+      const points = Math.floor(currentWord.points * multiplier);
+      setTotalScore(prev => prev + points);
+      setComboCount(prev => prev + 1);
 
-  const handlePointerEnter = (row, col) => {
-    if (isDragging) {
-      handleCellInteraction(row, col);
-    }
-  };
-
-  const handlePointerUp = () => {
-    setIsDragging(false);
-
-    if (currentWord.length >= 2) {
-      const isValid = validWords.includes(currentWord.toUpperCase());
-      const alreadyFound = foundWords.includes(currentWord.toUpperCase());
-
-      if (isValid && !alreadyFound) {
-        setShowResult('valid');
-        const points = currentWord.length - 1;
-        setScore(prev => prev + points);
-        setFoundWords(prev => [...prev, currentWord.toUpperCase()]);
-      } else if (alreadyFound) {
-        setShowResult('duplicate');
-      } else {
-        setShowResult('invalid');
-      }
-
-      // Reset after showing result
       setTimeout(() => {
         setSelectedCells([]);
-        setCurrentWord('');
-        setShowResult(null);
-      }, 1000);
-    } else {
-      setSelectedCells([]);
-      setCurrentWord('');
-    }
-  };
+        setShowSuccess(false);
+        setIsAnimating(false);
+        setCurrentWordIndex((prev) => (prev + 1) % demoSequence.length);
 
-  const resetGame = () => {
-    setSelectedCells([]);
-    setCurrentWord('');
-    setShowResult(null);
-    setScore(0);
-    setFoundWords([]);
-  };
+        // Reset combo and score after full cycle
+        if (currentWordIndex === demoSequence.length - 1) {
+          setTimeout(() => {
+            setComboCount(0);
+            setTotalScore(0);
+          }, 500);
+        }
+      }, 1200);
+    }, currentWord.path.length * 300 + 400);
+  }, [currentWordIndex, isAnimating, comboCount]);
+
+  // Auto-play animation
+  useEffect(() => {
+    if (!autoPlay) return;
+    const timer = setTimeout(animateWord, 800);
+    return () => clearTimeout(timer);
+  }, [animateWord, autoPlay, currentWordIndex]);
 
   const isCellSelected = (row, col) => {
     return selectedCells.some(([r, c]) => r === row && c === col);
@@ -110,36 +99,48 @@ const InteractiveGridDemo = ({ t, dir }) => {
     return selectedCells.findIndex(([r, c]) => r === row && c === col);
   };
 
+  const handleReplay = () => {
+    setSelectedCells([]);
+    setCurrentWordIndex(0);
+    setComboCount(0);
+    setTotalScore(0);
+    setShowSuccess(false);
+    setIsAnimating(false);
+    setAutoPlay(true);
+  };
+
   return (
-    <div className="flex flex-col items-center gap-3">
-      {/* Instructions */}
-      <div className="flex items-center gap-2 text-xs sm:text-sm text-neo-black/70 font-medium">
-        <FaHandPointer className="text-neo-pink animate-bounce" />
-        <span>{t('howToPlay.demo.tryIt')}</span>
+    <div className="flex flex-col items-center gap-2 sm:gap-3">
+      {/* Combo & Score Display */}
+      <div className="flex items-center gap-2 flex-wrap justify-center">
+        {comboCount > 0 && (
+          <motion.div
+            key={comboCount}
+            initial={{ scale: 0.5, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            className="flex items-center gap-1"
+          >
+            <FaFire className={`${comboCount >= 3 ? 'text-neo-orange animate-pulse' : 'text-gray-400'}`} />
+            <Badge className={`${comboCount >= 3 ? 'bg-neo-orange' : 'bg-gray-300'} text-neo-black border-2 border-neo-black font-bold text-xs`}>
+              {comboCount}x Combo {comboCount >= 3 && `(${getComboMultiplier(comboCount)}×)`}
+            </Badge>
+          </motion.div>
+        )}
+        {totalScore > 0 && (
+          <motion.div
+            key={totalScore}
+            initial={{ scale: 1.2 }}
+            animate={{ scale: 1 }}
+          >
+            <Badge className="bg-neo-yellow text-neo-black border-2 border-neo-black font-bold text-xs">
+              {t('results.points')}: {totalScore}
+            </Badge>
+          </motion.div>
+        )}
       </div>
 
-      {/* Score Display */}
-      {score > 0 && (
-        <motion.div
-          initial={{ scale: 0 }}
-          animate={{ scale: 1 }}
-          className="flex items-center gap-2"
-        >
-          <Badge className="bg-neo-yellow text-neo-black border-2 border-neo-black font-bold">
-            {t('results.points')}: {score}
-          </Badge>
-          <Badge className="bg-neo-cyan text-neo-black border-2 border-neo-black font-bold">
-            {foundWords.length} {foundWords.length === 1 ? 'word' : 'words'}
-          </Badge>
-        </motion.div>
-      )}
-
-      {/* Demo Grid - Interactive! */}
-      <div
-        className="relative select-none touch-none"
-        onPointerUp={handlePointerUp}
-        onPointerLeave={handlePointerUp}
-      >
+      {/* Demo Grid */}
+      <div className="relative">
         <div className="grid grid-cols-3 gap-1 sm:gap-1.5 p-2 sm:p-3 bg-neo-black/10 rounded-neo border-2 sm:border-3 border-neo-black">
           {demoGrid.map((row, rowIndex) => (
             row.map((letter, colIndex) => {
@@ -149,26 +150,27 @@ const InteractiveGridDemo = ({ t, dir }) => {
               return (
                 <motion.div
                   key={`${rowIndex}-${colIndex}`}
-                  onPointerDown={() => handlePointerDown(rowIndex, colIndex)}
-                  onPointerEnter={() => handlePointerEnter(rowIndex, colIndex)}
                   className={`
-                    w-12 h-12 sm:w-14 sm:h-14 flex items-center justify-center relative cursor-pointer
-                    text-xl sm:text-2xl font-black uppercase
+                    w-11 h-11 sm:w-13 sm:h-13 flex items-center justify-center relative
+                    text-lg sm:text-xl font-black uppercase
                     rounded-neo border-2 sm:border-3 border-neo-black
-                    transition-all duration-150
+                    transition-all duration-200
                     ${isSelected
                       ? 'bg-neo-yellow text-neo-black shadow-hard scale-110 z-10'
-                      : 'bg-neo-cream text-neo-black shadow-hard-sm hover:bg-neo-yellow/50 active:scale-95'
+                      : 'bg-neo-cream text-neo-black shadow-hard-sm'
                     }
                   `}
-                  whileTap={{ scale: 0.95 }}
+                  animate={isSelected ? {
+                    scale: [1, 1.15, 1.1],
+                  } : { scale: 1 }}
+                  transition={{ duration: 0.2 }}
                 >
                   {letter}
                   {isSelected && cellIndex >= 0 && (
                     <motion.span
                       initial={{ scale: 0 }}
                       animate={{ scale: 1 }}
-                      className="absolute -top-1 -right-1 w-5 h-5 bg-neo-pink text-neo-white text-xs font-bold rounded-full flex items-center justify-center border-2 border-neo-black"
+                      className="absolute -top-1 -right-1 w-4 h-4 sm:w-5 sm:h-5 bg-neo-pink text-neo-white text-[10px] sm:text-xs font-bold rounded-full flex items-center justify-center border-2 border-neo-black"
                     >
                       {cellIndex + 1}
                     </motion.span>
@@ -184,7 +186,7 @@ const InteractiveGridDemo = ({ t, dir }) => {
           <svg className="absolute inset-0 pointer-events-none" style={{ margin: '8px' }}>
             {selectedCells.slice(1).map((cell, i) => {
               const prev = selectedCells[i];
-              const cellSize = 56;
+              const cellSize = 52;
               const gap = 6;
               const x1 = prev[1] * (cellSize + gap) + cellSize / 2;
               const y1 = prev[0] * (cellSize + gap) + cellSize / 2;
@@ -199,11 +201,11 @@ const InteractiveGridDemo = ({ t, dir }) => {
                   x2={x2}
                   y2={y2}
                   stroke="#FF6B9D"
-                  strokeWidth="4"
+                  strokeWidth="3"
                   strokeLinecap="round"
                   initial={{ pathLength: 0 }}
                   animate={{ pathLength: 1 }}
-                  transition={{ duration: 0.15 }}
+                  transition={{ duration: 0.2 }}
                 />
               );
             })}
@@ -214,65 +216,52 @@ const InteractiveGridDemo = ({ t, dir }) => {
       {/* Current Word Display */}
       <AnimatePresence mode="wait">
         <motion.div
-          key={currentWord || 'empty'}
+          key={`${currentWordIndex}-${showSuccess}`}
           initial={{ opacity: 0, y: 5 }}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -5 }}
-          className="h-10 flex items-center justify-center"
+          className="h-8 sm:h-10 flex items-center justify-center"
         >
-          {currentWord ? (
-            <div className="flex items-center gap-2">
-              <span className={`text-xl sm:text-2xl font-black tracking-wider ${
-                showResult === 'valid' ? 'text-neo-lime' :
-                showResult === 'invalid' ? 'text-neo-red' :
-                showResult === 'duplicate' ? 'text-neo-orange' :
-                'text-neo-black'
-              }`}>
-                {currentWord}
-              </span>
-              {showResult === 'valid' && (
-                <motion.div
-                  initial={{ scale: 0, rotate: -180 }}
-                  animate={{ scale: 1, rotate: 0 }}
-                  className="flex items-center gap-1"
-                >
-                  <FaCheck className="text-neo-lime text-xl" />
-                  <Badge className="bg-neo-lime text-neo-black border-2 border-neo-black font-bold">
-                    +{currentWord.length - 1}
-                  </Badge>
-                </motion.div>
-              )}
-              {showResult === 'invalid' && (
-                <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }}>
-                  <FaTimes className="text-neo-red text-xl" />
-                </motion.div>
-              )}
-              {showResult === 'duplicate' && (
-                <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }}>
-                  <span className="text-xs text-neo-orange font-bold">Already found!</span>
-                </motion.div>
-              )}
-            </div>
-          ) : (
-            <span className="text-sm text-neo-black/40 font-medium">
-              {foundWords.length > 0 ? `Found: ${foundWords.slice(-3).join(', ')}` : '...'}
+          <div className="flex items-center gap-2">
+            <span className={`text-lg sm:text-xl font-black tracking-wider ${
+              showSuccess ? 'text-neo-lime' : 'text-neo-black'
+            }`}>
+              {selectedCells.length > 0
+                ? currentDemo.word.slice(0, selectedCells.length)
+                : '...'
+              }
             </span>
-          )}
+            {showSuccess && (
+              <motion.div
+                initial={{ scale: 0, rotate: -180 }}
+                animate={{ scale: 1, rotate: 0 }}
+                className="flex items-center gap-1"
+              >
+                <FaCheck className="text-neo-lime text-lg" />
+                <Badge className="bg-neo-lime text-neo-black border-2 border-neo-black font-bold text-xs">
+                  +{Math.floor(currentDemo.points * getComboMultiplier(comboCount))}
+                </Badge>
+              </motion.div>
+            )}
+          </div>
         </motion.div>
       </AnimatePresence>
 
-      {/* Reset Button */}
-      {foundWords.length > 0 && (
+      {/* Instructions & Controls */}
+      <div className="flex items-center gap-2">
+        <p className="text-[10px] sm:text-xs text-neo-black/60 font-medium">
+          {t('howToPlay.demo.watchAnimation')}
+        </p>
         <Button
           variant="neo"
           size="sm"
-          onClick={resetGame}
-          className="bg-neo-cream text-xs"
+          onClick={handleReplay}
+          className="bg-neo-cream text-[10px] sm:text-xs px-2 py-1"
         >
-          <FaRedo className="mr-1" />
-          {t('howToPlay.demo.replay') || 'Reset'}
+          <FaRedo className="mr-1 text-[10px]" />
+          {t('howToPlay.demo.replay') || 'Replay'}
         </Button>
-      )}
+      </div>
     </div>
   );
 };
