@@ -66,14 +66,14 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
             >
                 {/* Logo */}
                 <motion.button
-                    className="flex items-center gap-2 sm:gap-3 cursor-pointer bg-transparent border-none p-0"
+                    className="flex items-center gap-2 sm:gap-3 cursor-pointer bg-transparent border-none p-0 min-w-0 flex-shrink"
                     onClick={handleLogoClick}
                     whileHover={{ x: -2, y: -2 }}
                     whileTap={{ x: 2, y: 2 }}
                     aria-label={t('common.goToHome') || 'Go to home page'}
                 >
                     <h1
-                        className="text-2xl sm:text-4xl font-black uppercase tracking-tight flex items-center gap-1"
+                        className="text-xl xs:text-2xl sm:text-4xl font-black uppercase tracking-tight flex items-center gap-0.5 xs:gap-1"
                         style={{ fontFamily }}
                     >
                         {/* LEXI - Neo-Brutalist white with black shadow */}
@@ -92,7 +92,7 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                                 scale: [1, 1.3, 1]
                             }}
                             transition={{ duration: 0.4, delay: 1, repeat: 3, repeatDelay: 5 }}
-                            className="text-xl sm:text-3xl"
+                            className="text-base xs:text-xl sm:text-3xl"
                         >
                             ⚡
                         </motion.span>
@@ -110,14 +110,16 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                 </motion.button>
 
                 {/* Controls: Level + Music + Auth/Settings */}
-                <div className="flex items-center gap-2 sm:gap-3">
-                    {/* Show level badge for authenticated users */}
+                <div className="flex items-center gap-1.5 sm:gap-3 flex-shrink-0 min-w-0">
+                    {/* Show level badge for authenticated users - hidden on very small screens */}
                     {isAuthenticated && profile?.current_level && (
-                        <LevelBadge
-                            level={profile.current_level}
-                            size="md"
-                            animate={false}
-                        />
+                        <div className="hidden xs:block">
+                            <LevelBadge
+                                level={profile.current_level}
+                                size="md"
+                                animate={false}
+                            />
+                        </div>
                     )}
                     <MusicControls />
                     <AuthButton />

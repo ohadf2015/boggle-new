@@ -58,14 +58,14 @@ const AuthButton = () => {
   // Authenticated user - show user menu
   if (isAuthenticated && profile) {
     return (
-      <div className="relative">
+      <div className="relative flex-shrink-0">
         <Button
           variant="outline"
           size="sm"
           onClick={() => setShowUserMenu(!showUserMenu)}
           onBlur={() => setTimeout(() => { setShowUserMenu(false); setIsLanguageExpanded(false); }, 200)}
           className={cn(
-            'flex items-center gap-2 rounded-full transition-all duration-300',
+            'flex items-center gap-1 sm:gap-2 rounded-full transition-all duration-300 px-2 sm:px-3',
             isDarkMode
               ? 'bg-slate-800 text-cyan-300 hover:bg-slate-700 hover:shadow-[0_0_15px_rgba(6,182,212,0.3)] border-slate-700'
               : 'bg-white text-cyan-600 hover:bg-gray-50 hover:shadow-[0_0_15px_rgba(6,182,212,0.2)] border-gray-200'
@@ -77,7 +77,7 @@ const AuthButton = () => {
             avatarColor={profile.avatar_color}
             size="sm"
           />
-          <span className="max-w-[80px] truncate font-medium">
+          <span className="hidden sm:inline max-w-[80px] truncate font-medium">
             {profile.display_name || profile.username}
           </span>
           <FaChevronDown size={10} className={showUserMenu ? 'rotate-180 transition-transform' : 'transition-transform'} />

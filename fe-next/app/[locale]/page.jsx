@@ -108,6 +108,10 @@ export default function GamePage() {
   const hostKeepAliveIntervalRef = useRef(null);
   const wasConnectedRef = useRef(false);
 
+  const { t, language } = useLanguage();
+  const { user, isAuthenticated, isSupabaseEnabled, profile, loading, refreshProfile } = useAuth();
+  const { playTrack, fadeToTrack, TRACKS } = useMusic();
+
   // Track auth loading start time for timeout
   useEffect(() => {
     if (loading && !authLoadingStartTime) {
@@ -116,10 +120,6 @@ export default function GamePage() {
       setAuthLoadingStartTime(null);
     }
   }, [loading, authLoadingStartTime]);
-
-  const { t, language } = useLanguage();
-  const { user, isAuthenticated, isSupabaseEnabled, profile, loading, refreshProfile } = useAuth();
-  const { playTrack, fadeToTrack, TRACKS } = useMusic();
 
   // Track if we should auto-join (prefilled room + existing username)
   const [shouldAutoJoin, setShouldAutoJoin] = useState(false);

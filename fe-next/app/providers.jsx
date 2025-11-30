@@ -17,33 +17,35 @@ if (typeof window !== 'undefined' && window.location.hostname !== 'localhost') {
 export function Providers({ children, lang }) {
     return (
         <ErrorBoundary>
-            <ThemeProvider>
-                <LanguageProvider initialLanguage={lang}>
-                    <MusicProvider>
-                        <SoundEffectsProvider>
-                            <AchievementQueueProvider>
-                                <AuthProvider>
-                                    {children}
-                                </AuthProvider>
-                            </AchievementQueueProvider>
-                        </SoundEffectsProvider>
-                    </MusicProvider>
-                </LanguageProvider>
-            </ThemeProvider>
-            <Toaster
-                position="top-center"
-                containerStyle={{
-                    pointerEvents: 'none',
-                }}
-                toastOptions={{
-                    duration: 2000,
-                    style: {
-                        background: '#363636',
-                        color: '#fff',
-                        pointerEvents: 'auto',
-                    },
-                }}
-            />
+            <>
+                <ThemeProvider>
+                    <LanguageProvider initialLanguage={lang}>
+                        <MusicProvider>
+                            <SoundEffectsProvider>
+                                <AchievementQueueProvider>
+                                    <AuthProvider>
+                                        {children}
+                                    </AuthProvider>
+                                </AchievementQueueProvider>
+                            </SoundEffectsProvider>
+                        </MusicProvider>
+                    </LanguageProvider>
+                </ThemeProvider>
+                <Toaster
+                    position="top-center"
+                    containerStyle={{
+                        pointerEvents: 'none',
+                    }}
+                    toastOptions={{
+                        duration: 2000,
+                        style: {
+                            background: '#363636',
+                            color: '#fff',
+                            pointerEvents: 'auto',
+                        },
+                    }}
+                />
+            </>
         </ErrorBoundary>
     );
 }
