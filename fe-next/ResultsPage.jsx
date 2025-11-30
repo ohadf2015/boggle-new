@@ -11,6 +11,7 @@ import { clearSessionPreservingUsername } from './utils/session';
 import { shouldShowUpgradePrompt, getGuestStatsSummary, updateGuestStatsAfterGame, isFirstWin } from './utils/guestManager';
 import { useWinStreak } from './hooks/useWinStreak';
 import { trackGameCompletion, trackStreakMilestone } from './utils/growthTracking';
+import logger from './utils/logger';
 
 // Dynamic imports for heavy components (loaded after initial render)
 const GridComponent = dynamic(() => import('./components/GridComponent'), { ssr: false });
@@ -20,6 +21,7 @@ const AuthModal = dynamic(() => import('./components/auth/AuthModal'), { ssr: fa
 const FirstWinSignupModal = dynamic(() => import('./components/auth/FirstWinSignupModal'), { ssr: false });
 const ShareWinPrompt = dynamic(() => import('./components/results/ShareWinPrompt'), { ssr: false });
 const WinStreakDisplay = dynamic(() => import('./components/results/WinStreakDisplay'), { ssr: false });
+const WordFeedbackModal = dynamic(() => import('./components/voting/WordFeedbackModal'), { ssr: false });
 
 // Helper functions for finding word paths on the board (client-side version)
 const normalizeHebrewLetter = (letter) => {
@@ -120,7 +122,7 @@ const LetterGrid = ({ letterGrid, heatMapData, showHeatmap, onToggleHeatmap }) =
   );
 };
 
-const ResultsPage = ({ finalScores, letterGrid, gameCode, onReturnToRoom, username }) => {
+const ResultsPage = ({ finalScores, letterGrid, gameCode, onReturnToRoom, username, socket }) => {
   const { t, language } = useLanguage();
   const { user, isAuthenticated } = useAuth();
   const [showExitConfirm, setShowExitConfirm] = useState(false);
@@ -131,6 +133,10 @@ const ResultsPage = ({ finalScores, letterGrid, gameCode, onReturnToRoom, userna
   const [hasTrackedGame, setHasTrackedGame] = useState(false);
   const [previousStreak, setPreviousStreak] = useState(0);
   const [showHeatmap, setShowHeatmap] = useState(false);
+
+  // Word feedback state for crowd-sourced word validation
+  const [showWordFeedback, setShowWordFeedback] = useState(false);
+  const [wordToVote, setWordToVote] = useState(null);
 
   // Win streak tracking
   const { currentStreak, bestStreak, recordWin } = useWinStreak();
@@ -213,47 +219,70 @@ const ResultsPage = ({ finalScores, letterGrid, gameCode, onReturnToRoom, userna
     setHasTrackedGame(true);
   }, [hasTrackedGame, currentPlayerData, isCurrentUserWinner, currentStreak, recordWin]);
 
-  // Show celebratory signup prompt for guests who just won their first game
+  // Show celebratory signup prompt for guests - triggered on scroll near bottom
+  // This ensures it doesn't interfere with the word feedback modal
   useEffect(() => {
-    console.log('[ResultsPage] Modal check:', {
+    // Don't set up scroll listener if already shown, authenticated, or word feedback is showing
+    if (isAuthenticated || hasShownUpgradePrompt || !hasUpdatedStats || showWordFeedback) {
+      return;
+    }
+
+    const shouldShowModal = shouldShowUpgradePrompt();
+    const isFirstWinUser = isFirstWin();
+
+    console.log('[ResultsPage] Setting up scroll-based signup prompt:', {
       isAuthenticated,
       hasShownUpgradePrompt,
       hasUpdatedStats,
       isCurrentUserWinner,
-      isFirstWinResult: isFirstWin(),
-      shouldShowUpgradePromptResult: shouldShowUpgradePrompt()
+      isFirstWinResult: isFirstWinUser,
+      shouldShowUpgradePromptResult: shouldShowModal,
+      showWordFeedback
     });
 
-    if (!isAuthenticated && !hasShownUpgradePrompt && hasUpdatedStats) {
-      // Check if this is their first win - show celebratory modal
-      if (isCurrentUserWinner && isFirstWin()) {
-        console.log('[ResultsPage] Showing first win modal (first win)');
-        const timeout = setTimeout(() => {
-          setShowFirstWinModal(true);
-          setHasShownUpgradePrompt(true);
-        }, 4000); // Slightly longer delay to let them enjoy the win
-        return () => clearTimeout(timeout);
-      }
-      // For winners who have won before, still show the celebratory modal (they haven't signed up yet)
-      else if (isCurrentUserWinner && shouldShowUpgradePrompt()) {
-        console.log('[ResultsPage] Showing first win modal (repeat winner)');
-        const timeout = setTimeout(() => {
-          setShowFirstWinModal(true);
-          setHasShownUpgradePrompt(true);
-        }, 4000);
-        return () => clearTimeout(timeout);
-      }
-      // For non-winners, show regular signup prompt after first game
-      else if (shouldShowUpgradePrompt() && !isCurrentUserWinner) {
-        console.log('[ResultsPage] Showing regular auth modal');
-        const timeout = setTimeout(() => {
-          setShowAuthModal(true);
-          setHasShownUpgradePrompt(true);
-        }, 5000);
-        return () => clearTimeout(timeout);
-      }
+    // Only proceed if we should show a modal
+    if (!shouldShowModal && !(isCurrentUserWinner && isFirstWinUser)) {
+      return;
     }
-  }, [isAuthenticated, hasShownUpgradePrompt, hasUpdatedStats, isCurrentUserWinner]);
+
+    const handleScroll = () => {
+      // Check if user has scrolled near the bottom (80% of page)
+      const scrollTop = window.scrollY || document.documentElement.scrollTop;
+      const scrollHeight = document.documentElement.scrollHeight;
+      const clientHeight = document.documentElement.clientHeight;
+      const scrollPercentage = (scrollTop + clientHeight) / scrollHeight;
+
+      if (scrollPercentage >= 0.8 && !showWordFeedback) {
+        console.log('[ResultsPage] User scrolled near bottom, showing signup modal');
+
+        if (isCurrentUserWinner && (isFirstWinUser || shouldShowModal)) {
+          setShowFirstWinModal(true);
+        } else if (shouldShowModal) {
+          setShowAuthModal(true);
+        }
+        setHasShownUpgradePrompt(true);
+
+        // Remove listener after showing
+        window.removeEventListener('scroll', handleScroll);
+      }
+    };
+
+    // Add scroll listener
+    window.addEventListener('scroll', handleScroll, { passive: true });
+
+    // Also check immediately in case page is already scrolled or short
+    // But with a delay to let word feedback show first
+    const initialCheckTimeout = setTimeout(() => {
+      if (!showWordFeedback) {
+        handleScroll();
+      }
+    }, 2000);
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      clearTimeout(initialCheckTimeout);
+    };
+  }, [isAuthenticated, hasShownUpgradePrompt, hasUpdatedStats, isCurrentUserWinner, showWordFeedback]);
 
   const handleExitRoom = () => {
     setShowExitConfirm(true);
@@ -317,6 +346,60 @@ const ResultsPage = ({ finalScores, letterGrid, gameCode, onReturnToRoom, userna
       });
     }
   }, [winner]);
+
+  // Socket event listeners for word feedback (crowd-sourced word validation)
+  useEffect(() => {
+    if (!socket) return;
+
+    const handleShowWordFeedback = (data) => {
+      logger.log('[RESULTS] Received word feedback request:', data);
+      setWordToVote({
+        word: data.word,
+        submittedBy: data.submittedBy,
+        submitterAvatar: data.submitterAvatar,
+        timeoutSeconds: data.timeoutSeconds || 10,
+        gameCode: data.gameCode,
+        language: data.language
+      });
+      setShowWordFeedback(true);
+    };
+
+    const handleVoteRecorded = (data) => {
+      logger.log('[RESULTS] Vote recorded:', data);
+    };
+
+    socket.on('showWordFeedback', handleShowWordFeedback);
+    socket.on('voteRecorded', handleVoteRecorded);
+
+    return () => {
+      socket.off('showWordFeedback', handleShowWordFeedback);
+      socket.off('voteRecorded', handleVoteRecorded);
+    };
+  }, [socket]);
+
+  // Handle word feedback vote
+  const handleVote = useCallback((voteType) => {
+    if (!socket || !wordToVote) return;
+
+    logger.log('[RESULTS] Submitting vote:', { word: wordToVote.word, voteType });
+    socket.emit('submitWordVote', {
+      word: wordToVote.word,
+      language: wordToVote.language,
+      gameCode: wordToVote.gameCode,
+      voteType,
+      submittedBy: wordToVote.submittedBy
+    });
+
+    setShowWordFeedback(false);
+    setWordToVote(null);
+  }, [socket, wordToVote]);
+
+  // Handle word feedback skip/timeout
+  const handleFeedbackSkip = useCallback(() => {
+    logger.log('[RESULTS] Skipping word feedback');
+    setShowWordFeedback(false);
+    setWordToVote(null);
+  }, []);
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-50 via-slate-100 to-slate-200 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 flex flex-col overflow-auto transition-colors duration-300 px-1 py-3 sm:px-4 sm:py-4 md:p-8">
@@ -536,6 +619,18 @@ const ResultsPage = ({ finalScores, letterGrid, gameCode, onReturnToRoom, userna
       <FirstWinSignupModal
         isOpen={showFirstWinModal}
         onClose={() => setShowFirstWinModal(false)}
+      />
+
+      {/* Word Feedback Modal - Crowd-sourced word validation */}
+      <WordFeedbackModal
+        isOpen={showWordFeedback && wordToVote !== null}
+        word={wordToVote?.word || ''}
+        submittedBy={wordToVote?.submittedBy || ''}
+        submitterAvatar={wordToVote?.submitterAvatar}
+        timeoutSeconds={wordToVote?.timeoutSeconds || 10}
+        onVote={handleVote}
+        onSkip={handleFeedbackSkip}
+        onTimeout={handleFeedbackSkip}
       />
     </div>
   );

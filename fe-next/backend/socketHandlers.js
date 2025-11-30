@@ -1750,9 +1750,9 @@ function startGameTimer(io, gameCode, timerSeconds) {
 }
 
 /**
- * End the game - NEW FLOW: No host validation, crowd-sourced word feedback
+ * End the game - NEW FLOW: Show results immediately, then word feedback on results page
  */
-function endGame(io, gameCode) {
+async function endGame(io, gameCode) {
   const game = getGame(gameCode);
   if (!game) return;
 
@@ -1762,62 +1762,46 @@ function endGame(io, gameCode) {
   // Update game state
   updateGame(gameCode, { gameState: 'finished' });
 
-  // Calculate preliminary scores (dictionary words only for now)
-  const scores = calculateGameScores(gameCode);
+  console.log(`[GAME_END] Game ${gameCode} ending, calculating final scores immediately`);
 
-  // Broadcast end game
-  broadcastToRoom(io, getGameRoom(gameCode), 'endGame', {
-    scores
-  });
+  // Calculate and broadcast final scores IMMEDIATELY (no waiting for feedback)
+  await calculateAndBroadcastFinalScores(io, gameCode);
 
-  // Collect non-dictionary words for feedback
+  // Collect non-dictionary words for feedback (to be shown on results page)
   const nonDictWords = collectNonDictionaryWords(game);
   const playerCount = Object.keys(game.users).length;
   const FEEDBACK_TIMEOUT_SECONDS = 10;
 
   console.log(`[GAME_END] Game ${gameCode} ended. ${nonDictWords.length} non-dictionary words found, ${playerCount} players.`);
 
-  // Send word feedback to each player (they vote on words they didn't submit)
+  // Send word feedback to each player AFTER results are shown (they vote on words they didn't submit)
   if (nonDictWords.length > 0 && playerCount > 1) {
-    console.log(`[FEEDBACK] Will show word feedback to players (non-dict words: ${nonDictWords.length}, players: ${playerCount})`);
+    console.log(`[FEEDBACK] Will show word feedback to players on results page (non-dict words: ${nonDictWords.length}, players: ${playerCount})`);
+
+    // Small delay to ensure results page has loaded first
+    setTimeout(() => {
+      for (const [username, userData] of Object.entries(game.users)) {
+        const wordForPlayer = getWordForPlayer(nonDictWords, username);
+
+        if (wordForPlayer) {
+          const playerSocket = getSocketById(io, userData.socketId);
+          if (playerSocket) {
+            safeEmit(playerSocket, 'showWordFeedback', {
+              word: wordForPlayer.word,
+              submittedBy: wordForPlayer.submittedBy,
+              submitterAvatar: wordForPlayer.submitterAvatar,
+              timeoutSeconds: FEEDBACK_TIMEOUT_SECONDS,
+              gameCode,
+              language: game.language || 'en'
+            });
+            console.log(`[FEEDBACK] Sent word "${wordForPlayer.word}" to ${username} for feedback`);
+          }
+        }
+      }
+    }, 500); // 500ms delay to let results page render
   } else {
     console.log(`[FEEDBACK] Skipping word feedback (non-dict words: ${nonDictWords.length}, players: ${playerCount})`);
   }
-  if (nonDictWords.length > 0 && playerCount > 1) {
-    for (const [username, userData] of Object.entries(game.users)) {
-      const wordForPlayer = getWordForPlayer(nonDictWords, username);
-
-      if (wordForPlayer) {
-        const playerSocket = getSocketById(io, userData.socketId);
-        if (playerSocket) {
-          safeEmit(playerSocket, 'showWordFeedback', {
-            word: wordForPlayer.word,
-            submittedBy: wordForPlayer.submittedBy,
-            submitterAvatar: wordForPlayer.submitterAvatar,
-            timeoutSeconds: FEEDBACK_TIMEOUT_SECONDS,
-            gameCode,
-            language: game.language || 'en'
-          });
-          console.log(`[FEEDBACK] Sent word "${wordForPlayer.word}" to ${username} for feedback`);
-        }
-      } else {
-        // No eligible word for this player (they submitted all non-dict words)
-        const playerSocket = getSocketById(io, userData.socketId);
-        if (playerSocket) {
-          safeEmit(playerSocket, 'noWordFeedback', {});
-        }
-      }
-    }
-  }
-
-  // Set timeout for feedback phase, then calculate final scores
-  const feedbackTimeoutMs = (nonDictWords.length > 0 && playerCount > 1)
-    ? (FEEDBACK_TIMEOUT_SECONDS + 1) * 1000
-    : 0;
-
-  setTimeout(async () => {
-    await calculateAndBroadcastFinalScores(io, gameCode);
-  }, feedbackTimeoutMs);
 
   // Check for tournament
   const tournamentId = getTournamentIdFromGame(gameCode);

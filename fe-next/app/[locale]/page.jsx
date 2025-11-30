@@ -793,6 +793,7 @@ export default function GamePage() {
           gameCode={gameCode}
           onReturnToRoom={handleReturnToRoom}
           username={username}
+          socket={socket}
         />
       );
     }

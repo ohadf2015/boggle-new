@@ -1,4 +1,4 @@
-import React, { useState, memo, useCallback, useMemo } from 'react';
+import React, { useState, memo, useCallback, useMemo, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { Badge } from './ui/badge';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './ui/tooltip';
@@ -33,11 +33,25 @@ interface AchievementBadgeProps {
 export const AchievementBadge = memo<AchievementBadgeProps>(({ achievement, index = 0, count = 0, showTier = false }) => {
   const [open, setOpen] = useState(false);
   const { t } = useLanguage();
+  const isTouchDevice = useRef(false);
+
+  const handleTouchStart = () => {
+    isTouchDevice.current = true;
+  };
 
   const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     e.stopPropagation();
     setOpen(!open);
+  };
+
+  const handleOpenChange = (newOpen: boolean) => {
+    // On touch devices, ignore Radix's automatic open/close from hover simulation
+    // We'll rely solely on the click handler to control the state
+    if (isTouchDevice.current) {
+      return;
+    }
+    setOpen(newOpen);
   };
 
   // Calculate tier information
@@ -60,8 +74,8 @@ export const AchievementBadge = memo<AchievementBadgeProps>(({ achievement, inde
 
   return (
     <TooltipProvider delayDuration={0}>
-      <Tooltip open={open} onOpenChange={setOpen}>
-        <TooltipTrigger asChild onClick={handleClick}>
+      <Tooltip open={open} onOpenChange={handleOpenChange}>
+        <TooltipTrigger asChild onClick={handleClick} onTouchStart={handleTouchStart}>
           <motion.button
             initial={{ scale: 0, rotate: -10 }}
             animate={{ scale: 1, rotate: 0 }}
