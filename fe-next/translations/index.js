@@ -1026,7 +1026,9 @@ export const translations = {
       realWord: 'Real word!',
       nextWord: 'Next word...',
       almostApproved: 'Almost approved!',
-      votesNeeded: '${count} more votes to approve',
+      votesNeeded: '{count} more votes to approve',
+      validForScoring: 'Counts as valid! Help add it to dictionary.',
+      moreForDictionary: 'more for dictionary',
     },
     support: {
       kofiWinner: 'Feeling Generous, Champ?',
@@ -2055,7 +2057,9 @@ export const translations = {
       realWord: 'מילה אמיתית!',
       nextWord: 'מילה הבאה...',
       almostApproved: 'כמעט מאושר!',
-      votesNeeded: 'עוד ${count} הצבעות לאישור',
+      votesNeeded: 'עוד {count} הצבעות לאישור',
+      validForScoring: 'נחשב כמילה! עזור להוסיף למילון.',
+      moreForDictionary: 'עוד להוספה למילון',
     },
     support: {
       kofiWinner: 'מרגיש נדיב, אלוף?',
@@ -3087,7 +3091,9 @@ export const translations = {
       realWord: 'Riktigt ord!',
       nextWord: 'Nästa ord...',
       almostApproved: 'Nästan godkänt!',
-      votesNeeded: '${count} röster till för att godkänna',
+      votesNeeded: '{count} röster till för att godkänna',
+      validForScoring: 'Räknas som giltigt! Hjälp till att lägga till i ordboken.',
+      moreForDictionary: 'mer till ordbok',
     },
     support: {
       kofiWinner: 'Känn dig generös, mästare?',
@@ -4053,7 +4059,9 @@ export const translations = {
       realWord: '本物の言葉！',
       nextWord: '次の言葉...',
       almostApproved: 'もう少しで承認！',
-      votesNeeded: 'あと${count}票で承認',
+      votesNeeded: 'あと{count}票で承認',
+      validForScoring: '有効とカウント！辞書に追加するお手伝いを。',
+      moreForDictionary: 'あと辞書に追加まで',
     },
     support: {
       kofiWinner: '勝者の余裕で応援してね！',

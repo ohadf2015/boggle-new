@@ -2,10 +2,13 @@
  * AI Validation Service Wrapper
  * CommonJS wrapper for the GameAIService
  * Provides AI-powered word validation for solo host games
+ *
+ * AI votes count as 4 points toward the validation threshold (10 points for prominent validation)
  */
 
 const logger = require('../utils/logger');
 const { gameAIService } = require('./gameAIService');
+const { recordAIVote, AI_VOTE_POINTS } = require('./communityWordManager');
 
 /**
  * Get the AI service instance
@@ -37,10 +40,10 @@ async function isAIServiceAvailable() {
 }
 
 /**
- * Validate a word using AI
+ * Validate a word using AI and record the AI vote (4 points)
  * @param {string} word - The word to validate
  * @param {string} language - Language code (e.g., 'en', 'sv')
- * @returns {Promise<{isValid: boolean, isAiVerified: boolean, reason?: string}>}
+ * @returns {Promise<{isValid: boolean, isAiVerified: boolean, reason?: string, confidence?: number}>}
  */
 async function validateWordWithAI(word, language = 'en') {
   const startTime = Date.now();
@@ -64,10 +67,27 @@ async function validateWordWithAI(word, language = 'en') {
       duration: `${duration}ms`
     });
 
+    // Record AI vote (4 points toward threshold) if AI actually validated
+    if (result.source === 'ai') {
+      try {
+        const aiVoteResult = await recordAIVote({
+          word,
+          language,
+          isValid: result.isValid,
+          reason: result.reason || (result.isValid ? 'Valid word' : 'Invalid word'),
+          confidence: result.confidence || 85
+        });
+        logger.debug('AI_SERVICE', `AI vote recorded for "${word}": ${AI_VOTE_POINTS} points, netScore: ${aiVoteResult.netScore}`);
+      } catch (voteError) {
+        logger.warn('AI_SERVICE', `Failed to record AI vote for "${word}": ${voteError.message}`);
+      }
+    }
+
     return {
       isValid: result.isValid,
       isAiVerified: result.source === 'ai',
-      reason: result.reason || (result.isValid ? 'Valid word' : 'Invalid word')
+      reason: result.reason || (result.isValid ? 'Valid word' : 'Invalid word'),
+      confidence: result.confidence
     };
   } catch (error) {
     const duration = Date.now() - startTime;
@@ -77,10 +97,10 @@ async function validateWordWithAI(word, language = 'en') {
 }
 
 /**
- * Batch validate multiple words
+ * Batch validate multiple words and record AI votes (4 points each)
  * @param {string[]} words - Array of words to validate
  * @param {string} language - Language code
- * @returns {Promise<Map<string, {isValid: boolean, isAiVerified: boolean, reason?: string}>>}
+ * @returns {Promise<Map<string, {isValid: boolean, isAiVerified: boolean, reason?: string, confidence?: number}>>}
  */
 async function validateWordsWithAI(words, language = 'en') {
   const startTime = Date.now();
@@ -110,20 +130,58 @@ async function validateWordsWithAI(words, language = 'en') {
     let aiVerifiedCount = 0;
     let dbVerifiedCount = 0;
 
+    // Process results and record AI votes
+    const votePromises = [];
+
     words.forEach((word, index) => {
       const result = aiResults[index];
       const isValid = result?.isValid || false;
       const isAiVerified = result?.source === 'ai';
       const reason = result?.reason || (isValid ? undefined : 'Invalid word');
+      const confidence = result?.confidence;
 
-      results.set(word, { isValid, isAiVerified, reason });
+      results.set(word, { isValid, isAiVerified, reason, confidence });
 
       if (isValid) {
         validCount++;
-        if (isAiVerified) aiVerifiedCount++;
-        else dbVerifiedCount++;
+        if (isAiVerified) {
+          aiVerifiedCount++;
+          // Record AI vote (4 points) for each AI-verified word
+          votePromises.push(
+            recordAIVote({
+              word,
+              language,
+              isValid: true,
+              reason: reason || 'Valid word',
+              confidence: confidence || 85
+            }).catch(err => {
+              logger.warn('AI_SERVICE', `Failed to record AI vote for "${word}": ${err.message}`);
+            })
+          );
+        } else {
+          dbVerifiedCount++;
+        }
+      } else if (isAiVerified) {
+        // Also record negative AI votes for rejected words
+        votePromises.push(
+          recordAIVote({
+            word,
+            language,
+            isValid: false,
+            reason: reason || 'Invalid word',
+            confidence: confidence || 85
+          }).catch(err => {
+            logger.warn('AI_SERVICE', `Failed to record AI vote for "${word}": ${err.message}`);
+          })
+        );
       }
     });
+
+    // Wait for all AI votes to be recorded (but don't block on failures)
+    if (votePromises.length > 0) {
+      await Promise.allSettled(votePromises);
+      logger.debug('AI_SERVICE', `Recorded ${votePromises.length} AI votes (${AI_VOTE_POINTS} points each)`);
+    }
 
     logger.info('AI_SERVICE', `Batch AI validation completed for ${words.length} words`, {
       totalWords: words.length,

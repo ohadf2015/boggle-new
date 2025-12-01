@@ -2345,6 +2345,7 @@ async function calculateAndBroadcastFinalScores(io, gameCode) {
         isDuplicate: isDuplicate,
         isPendingValidation: isPendingValidation, // New flag for pending community validation
         isAiVerified: aiResult?.isAiVerified || wordDetail?.isAiVerified || false,  // Track if AI verified
+        aiReason: aiResult?.reason || undefined,  // AI's reason for validating/invalidating (shown in tooltip)
         invalidReason: !isValid && aiResult?.reason ? aiResult.reason : undefined  // Reason for invalid words (in game language)
       });
     });

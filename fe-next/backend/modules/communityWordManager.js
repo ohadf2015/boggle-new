@@ -1,7 +1,14 @@
 /**
  * Community Word Manager
  * Handles crowd-sourced word voting and dynamic dictionary expansion
- * Words with net_score >= 6 become "potentially valid" and auto-validate during gameplay
+ * Words with net_score >= 10 become "prominently valid" and auto-validate during gameplay
+ * Words with positive ratio (> 0) count as valid for scoring but still show validation modal
+ *
+ * VALIDATION SCORING:
+ * - AI validation = 4 points
+ * - Player vote = 1 point (like = +1, dislike = -1)
+ * - Words need 10+ net score to be added prominently to dictionary
+ * - Words with positive ratio (> 0) count as valid for scoring
  *
  * SELF-HEALING FEATURES:
  * - Prioritized word selection: Focus on words that need votes most
@@ -13,8 +20,14 @@ const { getSupabase, isSupabaseConfigured } = require('./supabaseServer');
 const { normalizeWord } = require('../dictionary');
 const logger = require('../utils/logger');
 
+// Validation scoring constants
+const AI_VOTE_POINTS = 4;          // AI validation counts as 4 points
+const PROMINENT_THRESHOLD = 10;    // Words need 10+ net score for prominent dictionary addition
+const VALID_THRESHOLD = 0;         // Words with positive ratio (> 0) count as valid for scoring
+
 // In-memory cache of community-validated words per language
-// These are words with net_score >= 6 that should auto-validate during gameplay
+// These are words with net_score >= PROMINENT_THRESHOLD (10) that are prominently valid
+// Words with positive ratio (> 0) also count as valid for scoring
 const communityValidWords = {
   en: new Set(),
   he: new Set(),
@@ -73,7 +86,7 @@ async function loadCommunityWords() {
   const startTime = Date.now();
 
   try {
-    // Query all words with net_score >= 6 (is_potentially_valid = true)
+    // Query all words with net_score >= PROMINENT_THRESHOLD (is_potentially_valid = true)
     const { data, error } = await client
       .from('word_scores')
       .select('word, language')
@@ -150,7 +163,7 @@ function isWordCommunityValid(word, language) {
 }
 
 /**
- * Add a word to the community-valid cache (when it crosses the 6+ threshold)
+ * Add a word to the community-valid cache (when it crosses the PROMINENT_THRESHOLD)
  * @param {string} word - The word to add
  * @param {string} language - Language code
  */
@@ -234,10 +247,10 @@ async function recordVote({ word, language, userId, guestId, gameCode, voteType,
 
     const isNowValid = scoreData?.is_potentially_valid === true;
 
-    // If word just became valid, add to cache
+    // If word just became prominently valid, add to cache
     if (isNowValid && !communityValidWords[lang]?.has(normalizedWord)) {
       addToCommunityCache(normalizedWord, lang);
-      logger.info('CommunityWords', `Word "${word}" (${lang}) reached 6+ votes! Now auto-validates.`);
+      logger.info('CommunityWords', `Word "${word}" (${lang}) reached ${PROMINENT_THRESHOLD}+ votes! Now prominently valid.`);
     }
 
     const voterType = userId ? 'auth user' : 'guest';
@@ -249,6 +262,177 @@ async function recordVote({ word, language, userId, guestId, gameCode, voteType,
     logger.error('CommunityWords', `Unexpected error recording vote: ${err}`);
     return { success: false, isNowValid: false, error: err.message };
   }
+}
+
+/**
+ * Record an AI validation vote for a word
+ * AI votes count as AI_VOTE_POINTS (4 points) toward the threshold
+ * @param {object} params - Vote parameters
+ * @param {string} params.word - The word validated
+ * @param {string} params.language - Language code
+ * @param {boolean} params.isValid - Whether AI validated as valid
+ * @param {string} params.reason - AI's reason for validation
+ * @param {number} params.confidence - AI confidence score (0-100)
+ * @returns {object} - { success, netScore, isProminentlyValid, isValidForScoring, error }
+ */
+async function recordAIVote({ word, language, isValid, reason, confidence }) {
+  const client = getSupabase();
+  if (!client) {
+    return { success: false, netScore: 0, isProminentlyValid: false, isValidForScoring: false, error: 'Supabase not configured' };
+  }
+
+  const normalizedWord = normalizeWord(word, language || 'en');
+  const lang = language || 'en';
+  const votePoints = isValid ? AI_VOTE_POINTS : -AI_VOTE_POINTS;
+
+  try {
+    // Upsert the word_scores record with AI vote points
+    // First, try to get existing record
+    const { data: existing, error: fetchError } = await client
+      .from('word_scores')
+      .select('net_score, ai_score, ai_reason, ai_validated')
+      .eq('word', normalizedWord)
+      .eq('language', lang)
+      .single();
+
+    if (fetchError && fetchError.code !== 'PGRST116') { // PGRST116 = no rows returned
+      logger.error('CommunityWords', `Error fetching word score for AI vote: ${fetchError.message}`);
+      return { success: false, netScore: 0, isProminentlyValid: false, isValidForScoring: false, error: fetchError.message };
+    }
+
+    // Skip if already AI validated
+    if (existing?.ai_validated) {
+      logger.debug('CommunityWords', `Word "${word}" (${lang}) already AI validated, skipping`);
+      const netScore = existing.net_score || 0;
+      return {
+        success: true,
+        netScore,
+        isProminentlyValid: netScore >= PROMINENT_THRESHOLD,
+        isValidForScoring: netScore > VALID_THRESHOLD,
+        error: null
+      };
+    }
+
+    const currentNetScore = existing?.net_score || 0;
+    const newNetScore = currentNetScore + votePoints;
+
+    // Upsert the record
+    const { error: upsertError } = await client
+      .from('word_scores')
+      .upsert({
+        word: normalizedWord,
+        language: lang,
+        net_score: newNetScore,
+        ai_score: votePoints,
+        ai_reason: reason || (isValid ? 'Valid word' : 'Invalid word'),
+        ai_validated: true,
+        ai_confidence: confidence || 85,
+        is_potentially_valid: newNetScore >= PROMINENT_THRESHOLD
+      }, {
+        onConflict: 'word,language'
+      });
+
+    if (upsertError) {
+      logger.error('CommunityWords', `Error recording AI vote: ${upsertError.message}`);
+      return { success: false, netScore: 0, isProminentlyValid: false, isValidForScoring: false, error: upsertError.message };
+    }
+
+    const isProminentlyValid = newNetScore >= PROMINENT_THRESHOLD;
+    const isValidForScoring = newNetScore > VALID_THRESHOLD;
+
+    // If word crossed the prominent threshold, add to cache
+    if (isProminentlyValid && !communityValidWords[lang]?.has(normalizedWord)) {
+      addToCommunityCache(normalizedWord, lang);
+      logger.info('CommunityWords', `Word "${word}" (${lang}) reached ${PROMINENT_THRESHOLD}+ via AI vote! Now prominently valid.`);
+    }
+
+    // Update pending cache
+    updatePendingCache(word, lang, isValid ? 'like' : 'dislike', true);
+
+    logger.info('CommunityWords', `AI vote recorded: "${word}" (${lang}) - ${isValid ? 'VALID' : 'INVALID'} (${votePoints} points, new score: ${newNetScore})`);
+
+    return {
+      success: true,
+      netScore: newNetScore,
+      isProminentlyValid,
+      isValidForScoring,
+      aiReason: reason,
+      error: null
+    };
+
+  } catch (err) {
+    logger.error('CommunityWords', `Unexpected error recording AI vote: ${err}`);
+    return { success: false, netScore: 0, isProminentlyValid: false, isValidForScoring: false, error: err.message };
+  }
+}
+
+/**
+ * Get word validation info including AI reason
+ * @param {string} word - The word to check
+ * @param {string} language - Language code
+ * @returns {Promise<object>} - { netScore, isProminentlyValid, isValidForScoring, aiReason, aiValidated }
+ */
+async function getWordValidationInfo(word, language) {
+  const client = getSupabase();
+  if (!client) {
+    return { netScore: 0, isProminentlyValid: false, isValidForScoring: false, aiReason: null, aiValidated: false };
+  }
+
+  const normalizedWord = normalizeWord(word, language || 'en');
+  const lang = language || 'en';
+
+  try {
+    const { data, error } = await client
+      .from('word_scores')
+      .select('net_score, ai_reason, ai_validated, ai_confidence, is_potentially_valid')
+      .eq('word', normalizedWord)
+      .eq('language', lang)
+      .single();
+
+    if (error) {
+      return { netScore: 0, isProminentlyValid: false, isValidForScoring: false, aiReason: null, aiValidated: false };
+    }
+
+    const netScore = data?.net_score || 0;
+    return {
+      netScore,
+      isProminentlyValid: data?.is_potentially_valid || netScore >= PROMINENT_THRESHOLD,
+      isValidForScoring: netScore > VALID_THRESHOLD,
+      aiReason: data?.ai_reason || null,
+      aiValidated: data?.ai_validated || false,
+      aiConfidence: data?.ai_confidence || null
+    };
+
+  } catch (err) {
+    return { netScore: 0, isProminentlyValid: false, isValidForScoring: false, aiReason: null, aiValidated: false };
+  }
+}
+
+/**
+ * Check if a word has positive validation ratio (valid for scoring)
+ * @param {string} word - The word to check
+ * @param {string} language - Language code
+ * @returns {boolean} - True if word has positive ratio
+ */
+function isWordValidForScoring(word, language) {
+  const lang = language || 'en';
+  const normalized = normalizeWord(word, lang);
+
+  // First check if it's prominently valid
+  if (communityValidWords[lang]?.has(normalized)) {
+    return true;
+  }
+
+  // Then check pending cache for positive ratio
+  const pendingCache = wordsPendingVotes[lang];
+  if (pendingCache) {
+    const cached = pendingCache.get(normalized);
+    if (cached && cached.netScore > VALID_THRESHOLD) {
+      return true;
+    }
+  }
+
+  return false;
 }
 
 /**
@@ -305,12 +489,12 @@ function calculateWordPriority(wordData) {
 
   let priority = 0;
 
-  // Factor 1: Proximity to threshold (words close to 6 get highest priority)
-  // Words with netScore between 3-5 are almost valid - they need just a few more votes
-  if (netScore >= 3 && netScore < 6) {
-    priority += 100 - (6 - netScore) * 10; // 70-90 points
-  } else if (netScore >= 1 && netScore < 3) {
-    priority += 40 - (3 - netScore) * 10; // 20-30 points
+  // Factor 1: Proximity to threshold (words close to PROMINENT_THRESHOLD get highest priority)
+  // Words approaching the threshold need just a few more votes to become prominently valid
+  if (netScore >= PROMINENT_THRESHOLD - 3 && netScore < PROMINENT_THRESHOLD) {
+    priority += 100 - (PROMINENT_THRESHOLD - netScore) * 10; // 70-90 points
+  } else if (netScore >= 1 && netScore < PROMINENT_THRESHOLD - 3) {
+    priority += 40 - Math.min(20, (PROMINENT_THRESHOLD - 3 - netScore) * 5); // 20-40 points
   } else if (netScore < 0) {
     // Negative words might be being unfairly rejected - give them a chance
     priority += Math.max(0, 20 + netScore * 5); // 0-15 points for words between -4 and 0
@@ -330,9 +514,9 @@ function calculateWordPriority(wordData) {
     priority += 30 + dislikes * 5; // 35+ points - AI might be wrong
   }
 
-  // Factor 4: Words with significant likes but not yet validated
+  // Factor 4: Words with significant likes but not yet prominently validated
   // Community clearly wants these validated
-  if (likes >= 3 && netScore < 6) {
+  if (likes >= 3 && netScore < PROMINENT_THRESHOLD) {
     priority += 20;
   }
 
@@ -413,7 +597,8 @@ function getWordsForPlayer(nonDictWords, excludeUsername, language, count = SELF
     voteInfo: {
       netScore: netScore || 0,
       totalVotes: (likes || 0) + (dislikes || 0),
-      votesNeeded: Math.max(0, 6 - (netScore || 0))
+      votesNeeded: Math.max(0, PROMINENT_THRESHOLD - (netScore || 0)),
+      isValidForScoring: (netScore || 0) > VALID_THRESHOLD // Positive ratio = valid for scoring
     }
   }));
 }
@@ -462,11 +647,11 @@ function updatePendingCache(word, language, voteType, aiApproved = null) {
   existing.lastVoted = Date.now();
   cache.set(normalized, existing);
 
-  // If word crossed the threshold, remove from pending and add to valid
-  if (existing.netScore >= 6) {
+  // If word crossed the prominent threshold, remove from pending and add to valid cache
+  if (existing.netScore >= PROMINENT_THRESHOLD) {
     cache.delete(normalized);
     addToCommunityCache(word, lang);
-    logger.info('CommunityWords', `Word "${word}" (${lang}) crossed threshold via cache update`);
+    logger.info('CommunityWords', `Word "${word}" (${lang}) crossed prominent threshold (${PROMINENT_THRESHOLD}) via cache update`);
   }
 }
 
@@ -772,13 +957,20 @@ module.exports = {
   isWordCommunityValid,
   addToCommunityCache,
   recordVote,
+  recordAIVote,
   collectNonDictionaryWords,
   getWordForPlayer,
   getWordsForPlayer,
   updatePendingCache,
   hasUserVoted,
   getWordStats,
+  getWordValidationInfo,
+  isWordValidForScoring,
   SELF_HEALING_CONFIG,
+  // Validation constants
+  AI_VOTE_POINTS,
+  PROMINENT_THRESHOLD,
+  VALID_THRESHOLD,
   // Hybrid validation exports
   shouldUseAIValidation,
   recordAIValidationUsed,
