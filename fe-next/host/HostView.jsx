@@ -18,6 +18,7 @@ import logger from '@/utils/logger';
 // Extracted components
 import HostPreGameView from './components/HostPreGameView';
 import HostInGameView from './components/HostInGameView';
+import HostWaitingResultsView from './components/HostWaitingResultsView';
 import {
   QRCodeDialog,
   FinalScoresModal,
@@ -63,6 +64,7 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
   const [showStartAnimation, setShowStartAnimation] = useState(false);
   const [showExitConfirm, setShowExitConfirm] = useState(false);
   const [showCancelTournamentDialog, setShowCancelTournamentDialog] = useState(false);
+  const [waitingForResults, setWaitingForResults] = useState(false);
 
   // Host playing state
   const [hostPlaying, setHostPlaying] = useState(true);
@@ -124,6 +126,7 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
     setWordsForBoard,
     setXpGainedData,
     setLevelUpData,
+    setWaitingForResults,
     comboLevelRef,
     lastWordTimeRef,
     setComboLevel,
@@ -321,6 +324,7 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
     socket.emit('resetGame');
     setFinalScores(null);
     setGameStarted(false);
+    setWaitingForResults(false);
     setRemainingTime(null);
     setTournamentData(null);
     setGameType('regular');
@@ -395,8 +399,23 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
         </Button>
       </div>
 
+      {/* Waiting for Results View */}
+      {waitingForResults && (
+        <HostWaitingResultsView
+          username={username}
+          gameCode={gameCode}
+          t={t}
+          playersReady={playersReady}
+          playerScores={playerScores}
+          showExitConfirm={showExitConfirm}
+          setShowExitConfirm={setShowExitConfirm}
+          onExitRoom={handleExitRoom}
+          onConfirmExit={confirmExitRoom}
+        />
+      )}
+
       {/* Pre-Game View */}
-      {!gameStarted && (
+      {!gameStarted && !waitingForResults && (
         <HostPreGameView
           gameCode={gameCode}
           roomLanguage={roomLanguage}
@@ -432,7 +451,7 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
       )}
 
       {/* In-Game View */}
-      {gameStarted && (
+      {gameStarted && !waitingForResults && (
         <HostInGameView
           gameCode={gameCode}
           username={username}
