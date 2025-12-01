@@ -8,22 +8,24 @@ const { calculateGameXp, getLevelFromXp, checkLevelUp, getTitleForLevel } = requ
 const logger = require('../utils/logger');
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+// Use service role key to bypass RLS for server-side operations
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
 // Log configuration status at startup
-logger.info('SUPABASE', `Configuration status: URL=${!!supabaseUrl}, AnonKey=${!!supabaseAnonKey}`);
-if (!supabaseUrl || !supabaseAnonKey) {
-  logger.warn('SUPABASE', 'Supabase not fully configured. Stats will not be saved to database.');
+logger.info('SUPABASE', `Configuration status: URL=${!!supabaseUrl}, ServiceKey=${!!supabaseServiceKey}`);
+if (!supabaseUrl || !supabaseServiceKey) {
+  logger.warn('SUPABASE', 'Supabase not fully configured (missing URL or SUPABASE_SERVICE_ROLE_KEY). Stats will not be saved to database.');
 }
 
 let supabase = null;
 
 /**
  * Initialize Supabase client (lazy initialization)
+ * Uses service role key to bypass RLS for server-side operations
  */
 function getSupabase() {
-  if (!supabase && supabaseUrl && supabaseAnonKey) {
-    supabase = createClient(supabaseUrl, supabaseAnonKey, {
+  if (!supabase && supabaseUrl && supabaseServiceKey) {
+    supabase = createClient(supabaseUrl, supabaseServiceKey, {
       auth: {
         autoRefreshToken: false,
         persistSession: false
@@ -37,7 +39,7 @@ function getSupabase() {
  * Check if Supabase is configured
  */
 function isSupabaseConfigured() {
-  return !!(supabaseUrl && supabaseAnonKey);
+  return !!(supabaseUrl && supabaseServiceKey);
 }
 
 /**
