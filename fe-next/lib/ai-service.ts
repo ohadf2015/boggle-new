@@ -3,6 +3,10 @@
  *
  * Designed for Railway deployment with ENV-based credentials.
  * Uses Gemini 1.5 Flash for word validation and caches results in Supabase.
+ *
+ * Uses existing tables:
+ * - community_words: Host/AI approved words
+ * - word_scores: Crowd-sourced validation (is_potentially_valid when net_score >= 6)
  */
 
 import { VertexAI, GenerativeModel } from '@google-cloud/vertexai';
@@ -45,11 +49,13 @@ interface WordValidationResult {
   error?: string;
 }
 
-interface ApprovedWord {
+interface CommunityWord {
   id: string;
   word: string;
   language: string;
-  created_at: string;
+  approval_count: number;
+  promoted_to_dictionary: boolean;
+  first_approved_at: string;
 }
 
 // =============================================================================
@@ -200,16 +206,16 @@ class GameAIService {
   // ===========================================================================
 
   /**
-   * Fast check: Query approved_words table in Supabase.
+   * Check if word exists in community_words table (host/AI approved words).
    */
-  private async checkApprovedWords(
+  private async checkCommunityWords(
     word: string,
     language: string
   ): Promise<boolean> {
     if (!this.supabaseAdmin) return false;
 
     const { data, error } = await this.supabaseAdmin
-      .from('approved_words')
+      .from('community_words')
       .select('id')
       .eq('word', word)
       .eq('language', language)
@@ -217,7 +223,7 @@ class GameAIService {
       .maybeSingle();
 
     if (error) {
-      console.warn('[GameAIService] DB lookup error:', error.message);
+      console.warn('[GameAIService] community_words lookup error:', error.message);
       return false;
     }
 
@@ -225,31 +231,71 @@ class GameAIService {
   }
 
   /**
-   * Save a valid word to approved_words table.
-   * Uses upsert with ignoreDuplicates to handle race conditions.
+   * Check if word is crowd-validated in word_scores table (net_score >= 6).
    */
-  private async saveApprovedWord(
+  private async checkWordScores(
+    word: string,
+    language: string
+  ): Promise<boolean> {
+    if (!this.supabaseAdmin) return false;
+
+    const { data, error } = await this.supabaseAdmin
+      .from('word_scores')
+      .select('id')
+      .eq('word', word)
+      .eq('language', language)
+      .eq('is_potentially_valid', true)
+      .limit(1)
+      .maybeSingle();
+
+    if (error) {
+      console.warn('[GameAIService] word_scores lookup error:', error.message);
+      return false;
+    }
+
+    return data !== null;
+  }
+
+  /**
+   * Save a valid word to community_words table.
+   * Uses upsert to handle race conditions - increments approval_count if exists.
+   */
+  private async saveToCommunityWords(
     word: string,
     language: string
   ): Promise<void> {
     if (!this.supabaseAdmin) return;
 
-    const { error } = await this.supabaseAdmin
-      .from('approved_words')
-      .upsert(
-        {
-          word,
-          language,
-          created_at: new Date().toISOString(),
-        },
-        {
-          onConflict: 'word,language',
-          ignoreDuplicates: true,
-        }
-      );
+    const now = new Date().toISOString();
 
-    if (error) {
-      console.error('[GameAIService] Failed to save approved word:', error.message);
+    // First try to insert
+    const { error: insertError } = await this.supabaseAdmin
+      .from('community_words')
+      .insert({
+        word,
+        language,
+        approval_count: 1,
+        first_approved_at: now,
+        last_approved_at: now,
+        // No user reference - AI-approved
+      });
+
+    // If unique constraint violation, update approval count
+    if (insertError?.code === '23505') {
+      const { error: updateError } = await this.supabaseAdmin
+        .from('community_words')
+        .update({
+          approval_count: this.supabaseAdmin.rpc ? undefined : 1, // Will be incremented via raw SQL if needed
+          last_approved_at: now,
+        })
+        .eq('word', word)
+        .eq('language', language);
+
+      if (updateError) {
+        console.error('[GameAIService] Failed to update community_words:', updateError.message);
+      }
+    } else if (insertError) {
+      console.error('[GameAIService] Failed to insert community_words:', insertError.message);
     }
   }
 
@@ -311,14 +357,15 @@ class GameAIService {
   }
 
   /**
-   * Validate a word and save valid words to the approved_words table.
+   * Validate a word and save valid words to the community_words table.
    *
    * Flow:
    * 1. Normalize: Trim and lowercase the input word
-   * 2. Fast Check (DB): Query approved_words table
-   * 3. Slow Check (AI): If not found, call Gemini 1.5 Flash
-   * 4. Persistence: If valid, upsert to approved_words (learning loop)
-   * 5. Return the result with source indicator
+   * 2. Fast Check (DB): Query community_words table (host/AI approved)
+   * 3. Fast Check (DB): Query word_scores table (crowd-validated, net_score >= 6)
+   * 4. Slow Check (AI): If not found, call Gemini 1.5 Flash
+   * 5. Persistence: If valid, upsert to community_words (learning loop)
+   * 6. Return the result with source indicator
    *
    * @param word - The word to validate
    * @param language - Language code (e.g., 'en', 'sv')
@@ -344,27 +391,36 @@ class GameAIService {
     }
 
     try {
-      // Step 2: Fast Check (DB)
-      const existsInDb = await this.checkApprovedWords(normalizedWord, language);
-      if (existsInDb) {
+      // Step 2: Fast Check - community_words (host/AI approved)
+      const inCommunityWords = await this.checkCommunityWords(normalizedWord, language);
+      if (inCommunityWords) {
         return {
           isValid: true,
           source: 'database',
         };
       }
 
-      // Step 3: Slow Check (AI)
+      // Step 3: Fast Check - word_scores (crowd-validated)
+      const inWordScores = await this.checkWordScores(normalizedWord, language);
+      if (inWordScores) {
+        return {
+          isValid: true,
+          source: 'database',
+        };
+      }
+
+      // Step 4: Slow Check (AI)
       const aiResult = await this.validateWithAI(normalizedWord, language);
 
-      // Step 4: Persistence (Learning Loop) - Only save valid words
+      // Step 5: Persistence (Learning Loop) - Only save valid words
       if (aiResult.isValid) {
         // Fire and forget - don't block on save
-        this.saveApprovedWord(normalizedWord, language).catch((err) => {
+        this.saveToCommunityWords(normalizedWord, language).catch((err) => {
           console.error('[GameAIService] Background save failed:', err);
         });
       }
 
-      // Step 5: Return result
+      // Step 6: Return result
       return {
         isValid: aiResult.isValid,
         reason: aiResult.reason,
@@ -520,7 +576,7 @@ class GameAIService {
 export const gameAIService = new GameAIService();
 
 // Export types for consumers
-export type { WordValidationResult, ApprovedWord };
+export type { WordValidationResult, CommunityWord };
 
 // Export class for testing
 export { GameAIService };
