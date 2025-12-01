@@ -31,7 +31,7 @@ enabled = true
 site_url = "http://localhost:3001"
 
 [auth.external.google]
-enabled = true
+enabled = false
 
 [auth.external.discord]
 enabled = false
