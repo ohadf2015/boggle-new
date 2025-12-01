@@ -66,6 +66,7 @@ const { calculatePlayerTitles } = require('./modules/playerTitlesManager');
 const { isDictionaryWord, getAvailableDictionaries, addApprovedWord, normalizeWord, getRandomLongWords } = require('./dictionary');
 const { incrementWordApproval } = require('./redisClient');
 const { loadCommunityWords, collectNonDictionaryWords, getWordForPlayer, recordVote } = require('./modules/communityWordManager');
+const { validateWordWithAI, isAIServiceAvailable } = require('./modules/aiValidationService');
 const gameStartCoordinator = require('./utils/gameStartCoordinator');
 const timerManager = require('./utils/timerManager');
 const { checkRateLimit, resetRateLimit } = require('./utils/rateLimiter');
@@ -839,29 +840,75 @@ function initializeSocketHandlers(io) {
           const isHostSoloGame = playerCount === 1;
 
           if (isHostSoloGame) {
-            // Solo host game: reject non-dictionary words immediately (no validation needed)
-            inc('wordNotValid');
-            incPerGame(gameCode, 'wordNotValid');
+            // Solo host game: try AI validation for non-dictionary words
+            const aiResult = await validateWordWithAI(normalizedWord, game.language || 'en');
 
-            // Add word to playerWordDetails as invalid to track for achievements
-            // This ensures PERFECTIONIST and other achievements work correctly
-            addPlayerWord(gameCode, username, normalizedWord, {
-              autoValidated: false,
-              score: 0,
-              comboBonus: 0,
-              comboLevel: 0,
-              validated: false  // Mark as invalid for achievement tracking
-            });
+            if (aiResult.isValid) {
+              // AI validated the word!
+              const safeComboLevel = Math.max(0, Math.min(10, parseInt(comboLevel) || 0));
+              const baseScore = normalizedWord.length - 1;
+              const wordScore = calculateWordScore(normalizedWord, safeComboLevel);
+              const comboBonus = wordScore - baseScore;
 
-            // Reset combo level since invalid word breaks combo
-            if (!game.playerCombos) game.playerCombos = {};
-            game.playerCombos[username] = 0;
+              // Store combo level
+              if (!game.playerCombos) game.playerCombos = {};
+              game.playerCombos[username] = safeComboLevel;
 
-            socket.emit('wordRejected', {
-              word: normalizedWord,
-              reason: 'notInDictionary'
-            });
-            logger.debug('SOCKET', `Solo host game - rejected non-dictionary word: "${normalizedWord}"`);
+              // Add word with AI verification flag
+              addPlayerWord(gameCode, username, normalizedWord, {
+                autoValidated: true,  // Treated as auto-validated since AI approved
+                score: wordScore,
+                comboBonus: comboBonus,
+                comboLevel: safeComboLevel,
+                isAiVerified: aiResult.isAiVerified  // Track AI verification
+              });
+
+              updatePlayerScore(gameCode, username, wordScore, true);
+
+              inc('wordAccepted');
+              incPerGame(gameCode, 'wordAccepted');
+              socket.emit('wordAccepted', {
+                word: normalizedWord,
+                score: wordScore,
+                baseScore: baseScore,
+                comboBonus: comboBonus,
+                comboLevel: safeComboLevel,
+                autoValidated: true,
+                isAiVerified: aiResult.isAiVerified
+              });
+
+              logger.info('SOCKET', `Solo host game - AI verified word: "${normalizedWord}" (source: ${aiResult.isAiVerified ? 'AI' : 'database'})`);
+
+              // Check for achievements
+              const achievements = checkAndAwardAchievements(gameCode, username, normalizedWord);
+              if (achievements.length > 0) {
+                socket.emit('liveAchievementUnlocked', { achievements });
+              }
+            } else {
+              // AI rejected the word
+              inc('wordNotValid');
+              incPerGame(gameCode, 'wordNotValid');
+
+              // Add word to playerWordDetails as invalid to track for achievements
+              addPlayerWord(gameCode, username, normalizedWord, {
+                autoValidated: false,
+                score: 0,
+                comboBonus: 0,
+                comboLevel: 0,
+                validated: false,
+                isAiVerified: false
+              });
+
+              // Reset combo level since invalid word breaks combo
+              if (!game.playerCombos) game.playerCombos = {};
+              game.playerCombos[username] = 0;
+
+              socket.emit('wordRejected', {
+                word: normalizedWord,
+                reason: 'notInDictionary'
+              });
+              logger.debug('SOCKET', `Solo host game - AI rejected non-dictionary word: "${normalizedWord}"`);
+            }
           } else {
             // Multi-player game: word needs host validation
             // IMPORTANT: Preserve combo data even for non-dictionary words
@@ -1172,7 +1219,8 @@ function initializeSocketHandlers(io) {
             score: isDuplicate ? 0 : wordScore, // Duplicates get 0 points
             comboBonus: comboBonus, // Bonus earned during live play
             validated: isValid,
-            isDuplicate: isDuplicate
+            isDuplicate: isDuplicate,
+            isAiVerified: wordDetail?.isAiVerified || false  // Track if AI verified
           };
         });
 
@@ -2043,7 +2091,8 @@ async function calculateAndBroadcastFinalScores(io, gameCode) {
         score: isDuplicate ? 0 : wordScore,
         comboBonus: comboBonus,
         validated: isValid,
-        isDuplicate: isDuplicate
+        isDuplicate: isDuplicate,
+        isAiVerified: wordDetail?.isAiVerified || false  // Track if AI verified
       });
     });
 

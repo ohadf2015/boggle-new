@@ -21,6 +21,7 @@ interface WordObject {
   validated: boolean;
   isDuplicate: boolean;
   comboBonus?: number;
+  isAiVerified?: boolean;
 }
 
 interface Title {
@@ -80,8 +81,10 @@ interface WordChipProps {
 }
 
 const WordChip = memo<WordChipProps>(({ wordObj, playerCount }) => {
+  const { t } = useLanguage();
   const isDuplicate = wordObj.isDuplicate;
   const isValid = wordObj.validated;
+  const isAiVerified = wordObj.isAiVerified;
   const displayWord = applyHebrewFinalLetters(wordObj.word);
   const comboBonus = wordObj.comboBonus || 0;
 
@@ -121,6 +124,24 @@ const WordChip = memo<WordChipProps>(({ wordObj, playerCount }) => {
           <span className="text-[10px] px-1 py-0.5 bg-neo-yellow text-neo-black rounded border border-neo-black font-black">
             +{comboBonus}
           </span>
+        )}
+        {/* Show AI verification indicator */}
+        {isAiVerified && isValid && !isDuplicate && (
+          <TooltipProvider delayDuration={0}>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <span className="text-[10px] px-1 py-0.5 bg-neo-purple text-neo-cream rounded border border-neo-black font-black cursor-help">
+                  AI
+                </span>
+              </TooltipTrigger>
+              <TooltipContent
+                side="top"
+                className="bg-neo-purple border-2 border-neo-black shadow-hard rounded-neo p-2"
+              >
+                <p className="text-xs font-bold text-neo-cream">{t('results.aiVerified') || 'Verified by AI'}</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
         )}
       </span>
       {isDuplicate && playerCount > 1 && (
