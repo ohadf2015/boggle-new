@@ -7,6 +7,18 @@
 
 import { VertexAI, GenerativeModel } from '@google-cloud/vertexai';
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
+import { z } from 'zod';
+
+// =============================================================================
+// Zod Schemas for AI Response Validation
+// =============================================================================
+
+const WordValidationResponseSchema = z.object({
+  isValid: z.boolean(),
+  reason: z.string(),
+});
+
+const ThemedWordsResponseSchema = z.array(z.string());
 
 // =============================================================================
 // Types
@@ -27,21 +39,17 @@ interface GoogleCredentials {
 }
 
 interface WordValidationResult {
-  word: string;
-  language: string;
   isValid: boolean;
-  definition?: string;
-  source: 'cache' | 'ai';
+  reason?: string;
+  source: 'database' | 'ai';
   error?: string;
 }
 
-interface CachedWord {
+interface ApprovedWord {
+  id: string;
   word: string;
   language: string;
-  is_valid: boolean;
-  definition: string | null;
   created_at: string;
-  updated_at: string;
 }
 
 // =============================================================================
@@ -187,75 +195,72 @@ class GameAIService {
     }
   }
 
+  // ===========================================================================
+  // Feature A: validateAndSaveWord
+  // ===========================================================================
+
   /**
-   * Check if a word exists in the Supabase cache.
+   * Fast check: Query approved_words table in Supabase.
    */
-  private async getFromCache(
+  private async checkApprovedWords(
     word: string,
     language: string
-  ): Promise<CachedWord | null> {
-    if (!this.supabaseAdmin) return null;
-
-    const normalizedWord = word.toLowerCase().trim();
+  ): Promise<boolean> {
+    if (!this.supabaseAdmin) return false;
 
     const { data, error } = await this.supabaseAdmin
-      .from('word_validations')
-      .select('*')
-      .eq('word', normalizedWord)
+      .from('approved_words')
+      .select('id')
+      .eq('word', word)
       .eq('language', language)
-      .single();
+      .limit(1)
+      .maybeSingle();
 
     if (error) {
-      // PGRST116 = not found, which is expected for cache misses
-      if (error.code !== 'PGRST116') {
-        console.warn('[GameAIService] Cache lookup error:', error.message);
-      }
-      return null;
+      console.warn('[GameAIService] DB lookup error:', error.message);
+      return false;
     }
 
-    return data as CachedWord;
+    return data !== null;
   }
 
   /**
-   * Save a word validation result to Supabase cache.
+   * Save a valid word to approved_words table.
+   * Uses upsert with ignoreDuplicates to handle race conditions.
    */
-  private async saveToCache(
+  private async saveApprovedWord(
     word: string,
-    language: string,
-    isValid: boolean,
-    definition: string | null
+    language: string
   ): Promise<void> {
     if (!this.supabaseAdmin) return;
 
-    const normalizedWord = word.toLowerCase().trim();
-
     const { error } = await this.supabaseAdmin
-      .from('word_validations')
+      .from('approved_words')
       .upsert(
         {
-          word: normalizedWord,
+          word,
           language,
-          is_valid: isValid,
-          definition,
-          updated_at: new Date().toISOString(),
+          created_at: new Date().toISOString(),
         },
         {
           onConflict: 'word,language',
+          ignoreDuplicates: true,
         }
       );
 
     if (error) {
-      console.error('[GameAIService] Cache save error:', error.message);
+      console.error('[GameAIService] Failed to save approved word:', error.message);
     }
   }
 
   /**
-   * Validate a word using Vertex AI (Gemini 1.5 Flash).
+   * Slow check: Validate word using Vertex AI (Gemini 1.5 Flash).
+   * Uses zod to validate the AI response schema.
    */
   private async validateWithAI(
     word: string,
     language: string
-  ): Promise<{ isValid: boolean; definition: string | null }> {
+  ): Promise<{ isValid: boolean; reason: string }> {
     if (!this.model) {
       throw new Error('Vertex AI model not initialized');
     }
@@ -276,24 +281,7 @@ class GameAIService {
 
     const languageName = languageNames[language] || language;
 
-    const prompt = `You are a dictionary validator for the word game Boggle.
-Determine if "${word}" is a valid ${languageName} word that would be accepted in Boggle.
-
-Rules for valid Boggle words:
-1. Must be a real word found in a standard dictionary
-2. Must be at least 3 letters long
-3. No proper nouns (names of people, places, brands)
-4. No abbreviations or acronyms
-5. No hyphenated words
-6. Conjugated verbs and plural nouns ARE allowed
-
-Respond in this exact JSON format:
-{
-  "isValid": true or false,
-  "definition": "brief definition if valid, null if invalid"
-}
-
-Only respond with the JSON, no other text.`;
+    const prompt = `You are a lenient word game judge. Is '${word}' a valid word in ${languageName}? Accept slang if it is commonly used. Ignore case. Return ONLY a JSON object: { "isValid": boolean, "reason": string }.`;
 
     try {
       const result = await this.model.generateContent(prompt);
@@ -303,28 +291,34 @@ Only respond with the JSON, no other text.`;
       // Extract JSON from response (handle potential markdown code blocks)
       const jsonMatch = text.match(/\{[\s\S]*\}/);
       if (!jsonMatch) {
-        console.warn('[GameAIService] Could not parse AI response:', text);
-        return { isValid: false, definition: null };
+        console.warn('[GameAIService] Could not extract JSON from AI response:', text);
+        return { isValid: false, reason: 'Failed to parse AI response' };
       }
 
+      // Parse and validate with zod
       const parsed = JSON.parse(jsonMatch[0]);
-      return {
-        isValid: Boolean(parsed.isValid),
-        definition: parsed.definition || null,
-      };
+      const validated = WordValidationResponseSchema.parse(parsed);
+
+      return validated;
     } catch (error) {
+      if (error instanceof z.ZodError) {
+        console.error('[GameAIService] AI response schema validation failed:', error.errors);
+        return { isValid: false, reason: 'Invalid AI response format' };
+      }
       console.error('[GameAIService] AI validation error:', error);
       throw error;
     }
   }
 
   /**
-   * Validate a word and save the result to cache.
+   * Validate a word and save valid words to the approved_words table.
    *
    * Flow:
-   * 1. Check Supabase cache for existing validation
-   * 2. If not cached, call Vertex AI for validation
-   * 3. Upsert result to Supabase for future lookups
+   * 1. Normalize: Trim and lowercase the input word
+   * 2. Fast Check (DB): Query approved_words table
+   * 3. Slow Check (AI): If not found, call Gemini 1.5 Flash
+   * 4. Persistence: If valid, upsert to approved_words (learning loop)
+   * 5. Return the result with source indicator
    *
    * @param word - The word to validate
    * @param language - Language code (e.g., 'en', 'sv')
@@ -337,50 +331,43 @@ Only respond with the JSON, no other text.`;
     // Ensure initialized
     await this.initialize();
 
+    // Step 1: Normalization
     const normalizedWord = word.toLowerCase().trim();
 
     // Basic validation
     if (!normalizedWord || normalizedWord.length < 3) {
       return {
-        word: normalizedWord,
-        language,
         isValid: false,
-        source: 'cache',
-        error: 'Word must be at least 3 characters',
+        reason: 'Word must be at least 3 characters',
+        source: 'database',
       };
     }
 
     try {
-      // Step 1: Check cache
-      const cached = await this.getFromCache(normalizedWord, language);
-      if (cached) {
+      // Step 2: Fast Check (DB)
+      const existsInDb = await this.checkApprovedWords(normalizedWord, language);
+      if (existsInDb) {
         return {
-          word: cached.word,
-          language: cached.language,
-          isValid: cached.is_valid,
-          definition: cached.definition || undefined,
-          source: 'cache',
+          isValid: true,
+          source: 'database',
         };
       }
 
-      // Step 2: Call AI for validation
+      // Step 3: Slow Check (AI)
       const aiResult = await this.validateWithAI(normalizedWord, language);
 
-      // Step 3: Save to cache (async, don't wait)
-      this.saveToCache(
-        normalizedWord,
-        language,
-        aiResult.isValid,
-        aiResult.definition
-      ).catch((err) => {
-        console.error('[GameAIService] Background cache save failed:', err);
-      });
+      // Step 4: Persistence (Learning Loop) - Only save valid words
+      if (aiResult.isValid) {
+        // Fire and forget - don't block on save
+        this.saveApprovedWord(normalizedWord, language).catch((err) => {
+          console.error('[GameAIService] Background save failed:', err);
+        });
+      }
 
+      // Step 5: Return result
       return {
-        word: normalizedWord,
-        language,
         isValid: aiResult.isValid,
-        definition: aiResult.definition || undefined,
+        reason: aiResult.reason,
         source: 'ai',
       };
     } catch (error) {
@@ -388,14 +375,91 @@ Only respond with the JSON, no other text.`;
       console.error('[GameAIService] validateAndSaveWord error:', error);
 
       return {
-        word: normalizedWord,
-        language,
         isValid: false,
+        reason: 'Validation failed',
         source: 'ai',
-        error: `Validation failed: ${errorMessage}`,
+        error: errorMessage,
       };
     }
   }
+
+  // ===========================================================================
+  // Feature B: generateThemedBoard
+  // ===========================================================================
+
+  /**
+   * Generate a themed word board using AI.
+   *
+   * @param theme - The theme for word generation (e.g., 'halloween', 'space')
+   * @param count - Number of words to generate
+   * @param language - Language code (e.g., 'en', 'sv')
+   * @returns Array of themed words
+   */
+  async generateThemedBoard(
+    theme: string,
+    count: number,
+    language: string = 'en'
+  ): Promise<string[]> {
+    // Ensure initialized
+    await this.initialize();
+
+    if (!this.model) {
+      throw new Error('Vertex AI model not initialized');
+    }
+
+    const languageNames: Record<string, string> = {
+      en: 'English',
+      sv: 'Swedish',
+      es: 'Spanish',
+      fr: 'French',
+      de: 'German',
+      it: 'Italian',
+      pt: 'Portuguese',
+      nl: 'Dutch',
+      no: 'Norwegian',
+      da: 'Danish',
+      fi: 'Finnish',
+    };
+
+    const languageName = languageNames[language] || language;
+
+    const prompt = `Generate a JSON array of ${count} distinct words related to the theme '${theme}' in ${languageName}. Words must be between 3 to 10 letters long. No spaces, no hyphens. Output raw JSON only.`;
+
+    try {
+      const result = await this.model.generateContent(prompt);
+      const response = result.response;
+      const text = response.candidates?.[0]?.content?.parts?.[0]?.text || '';
+
+      // Extract JSON array from response
+      const jsonMatch = text.match(/\[[\s\S]*\]/);
+      if (!jsonMatch) {
+        console.warn('[GameAIService] Could not extract JSON array from AI response:', text);
+        return [];
+      }
+
+      // Parse and validate with zod
+      const parsed = JSON.parse(jsonMatch[0]);
+      const validated = ThemedWordsResponseSchema.parse(parsed);
+
+      // Filter to ensure word constraints
+      const filteredWords = validated
+        .map((w) => w.toLowerCase().trim())
+        .filter((w) => w.length >= 3 && w.length <= 10 && /^[a-zA-Z\u00C0-\u024F]+$/.test(w));
+
+      return filteredWords;
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        console.error('[GameAIService] Themed words schema validation failed:', error.errors);
+        return [];
+      }
+      console.error('[GameAIService] generateThemedBoard error:', error);
+      throw error;
+    }
+  }
+
+  // ===========================================================================
+  // Utility Methods
+  // ===========================================================================
 
   /**
    * Batch validate multiple words.
@@ -456,7 +520,7 @@ Only respond with the JSON, no other text.`;
 export const gameAIService = new GameAIService();
 
 // Export types for consumers
-export type { WordValidationResult, CachedWord };
+export type { WordValidationResult, ApprovedWord };
 
 // Export class for testing
 export { GameAIService };
