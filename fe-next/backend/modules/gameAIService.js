@@ -318,14 +318,38 @@ Example responses:
       const text = response.candidates?.[0]?.content?.parts?.[0]?.text || '';
 
       // Extract JSON from response (handle potential markdown code blocks)
-      const jsonMatch = text.match(/\{[\s\S]*\}/);
+      // First, try to strip markdown code blocks
+      let cleanText = text;
+      // Remove ```json ... ``` or ``` ... ``` blocks
+      const codeBlockMatch = text.match(/```(?:json)?\s*([\s\S]*?)```/);
+      if (codeBlockMatch) {
+        cleanText = codeBlockMatch[1].trim();
+      }
+
+      // Try to extract JSON object
+      const jsonMatch = cleanText.match(/\{[\s\S]*\}/);
       if (!jsonMatch) {
-        console.warn('[GameAIService] Could not extract JSON from AI response:', text);
+        // If no complete JSON found, try to handle truncated responses
+        // Look for partial JSON that starts with { and has isValid
+        const partialMatch = cleanText.match(/\{\s*"isValid"\s*:\s*(true|false)/);
+        if (partialMatch) {
+          // Return based on the partial isValid value found
+          const isValid = partialMatch[1] === 'true';
+          console.warn('[GameAIService] Extracted partial JSON response, isValid:', isValid);
+          return { isValid, reason: 'Partial AI response - treated as ' + (isValid ? 'valid' : 'invalid'), confidence: 50 };
+        }
+        console.warn('[GameAIService] Could not extract JSON from AI response:', text.substring(0, 200));
         return { isValid: false, reason: 'Failed to parse AI response', confidence: 0 };
       }
 
       // Parse and validate
-      const parsed = JSON.parse(jsonMatch[0]);
+      let parsed;
+      try {
+        parsed = JSON.parse(jsonMatch[0]);
+      } catch (parseError) {
+        console.warn('[GameAIService] JSON parse error:', parseError.message, 'Raw:', jsonMatch[0].substring(0, 100));
+        return { isValid: false, reason: 'Failed to parse AI response JSON', confidence: 0 };
+      }
 
       if (typeof parsed.isValid !== 'boolean' || typeof parsed.reason !== 'string') {
         console.error('[GameAIService] AI response schema validation failed:', parsed);
@@ -475,15 +499,28 @@ Example responses:
       const response = result.response;
       const text = response.candidates?.[0]?.content?.parts?.[0]?.text || '';
 
-      // Extract JSON array from response
-      const jsonMatch = text.match(/\[[\s\S]*\]/);
+      // Extract JSON array from response (handle markdown code blocks)
+      let cleanText = text;
+      // Remove ```json ... ``` or ``` ... ``` blocks
+      const codeBlockMatch = text.match(/```(?:json)?\s*([\s\S]*?)```/);
+      if (codeBlockMatch) {
+        cleanText = codeBlockMatch[1].trim();
+      }
+
+      const jsonMatch = cleanText.match(/\[[\s\S]*\]/);
       if (!jsonMatch) {
-        console.warn('[GameAIService] Could not extract JSON array from AI response:', text);
+        console.warn('[GameAIService] Could not extract JSON array from AI response:', text.substring(0, 200));
         return [];
       }
 
       // Parse and validate
-      const parsed = JSON.parse(jsonMatch[0]);
+      let parsed;
+      try {
+        parsed = JSON.parse(jsonMatch[0]);
+      } catch (parseError) {
+        console.warn('[GameAIService] JSON array parse error:', parseError.message);
+        return [];
+      }
 
       if (!Array.isArray(parsed)) {
         console.error('[GameAIService] Themed words response is not an array:', parsed);
