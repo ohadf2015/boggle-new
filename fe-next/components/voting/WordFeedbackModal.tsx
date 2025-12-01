@@ -297,8 +297,8 @@ const WordFeedbackModal = memo<WordFeedbackModalProps>(({
               >
                 {currentWord.submitterAvatar && (
                   <Avatar
-                    emoji={currentWord.submitterAvatar.emoji}
-                    color={currentWord.submitterAvatar.color}
+                    avatarEmoji={currentWord.submitterAvatar.emoji}
+                    avatarColor={currentWord.submitterAvatar.color}
                     profilePictureUrl={currentWord.submitterAvatar.profilePictureUrl}
                     size="sm"
                   />
