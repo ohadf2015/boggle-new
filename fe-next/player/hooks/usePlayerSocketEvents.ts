@@ -600,6 +600,23 @@ const usePlayerSocketEvents = ({
       });
     };
 
+    const handlePlayerConnectionStatusChanged = (data: { username: string; connectionStatus: 'weak' | 'stable'; message: string }) => {
+      logger.log('[PLAYER] Player connection status changed:', data);
+      if (data.connectionStatus === 'weak') {
+        // Show a subtle warning toast for weak connection
+        neoInfoToast(data.message || `${data.username} has weak connection`, {
+          icon: '📶',
+          duration: 4000
+        });
+      } else if (data.connectionStatus === 'stable') {
+        // Connection recovered
+        neoSuccessToast(data.message || `${data.username}'s connection recovered`, {
+          icon: '✅',
+          duration: 2000
+        });
+      }
+    };
+
     const handlePlayerLeft = (data: any) => {
       logger.log('[PLAYER] Player left:', data.username);
       neoInfoToast(data.message || `${data.username} ${t('playerView.leftRoom') || 'left the room'}`, {
@@ -692,6 +709,7 @@ const usePlayerSocketEvents = ({
     socket.on('hostTransferred', handleHostTransferred);
     socket.on('playerDisconnected', handlePlayerDisconnected);
     socket.on('playerReconnected', handlePlayerReconnected);
+    socket.on('playerConnectionStatusChanged', handlePlayerConnectionStatusChanged);
     socket.on('playerLeft', handlePlayerLeft);
     socket.on('sessionTakenOver', handleSessionTakenOver);
     socket.on('sessionMigrated', handleSessionMigrated);
@@ -733,6 +751,7 @@ const usePlayerSocketEvents = ({
       socket.off('hostTransferred', handleHostTransferred);
       socket.off('playerDisconnected', handlePlayerDisconnected);
       socket.off('playerReconnected', handlePlayerReconnected);
+      socket.off('playerConnectionStatusChanged', handlePlayerConnectionStatusChanged);
       socket.off('playerLeft', handlePlayerLeft);
       socket.off('sessionTakenOver', handleSessionTakenOver);
       socket.off('sessionMigrated', handleSessionMigrated);

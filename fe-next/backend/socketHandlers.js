@@ -39,7 +39,8 @@ const {
   updateUserPresence,
   updateUserHeartbeat,
   markUserActivity,
-  getPresenceConfig
+  getPresenceConfig,
+  checkUserConnectionHealth
 } = require('./modules/gameStateManager');
 
 const { processGameResults, isSupabaseConfigured, saveHostApprovedWord } = require('./modules/supabaseServer');
@@ -81,8 +82,10 @@ const logger = require('./utils/logger');
 
 // Game configuration constants
 const MAX_PLAYERS_PER_ROOM = 50; // Maximum number of players allowed in a single room
-const HOST_RECONNECT_GRACE_PERIOD_MS = 30000; // 30 seconds for host
-const PLAYER_RECONNECT_GRACE_PERIOD_MS = 15000; // 15 seconds for players (guests and authenticated)
+const HOST_RECONNECT_GRACE_PERIOD_MS = 60000; // 60 seconds for host (increased for poor connections)
+const PLAYER_RECONNECT_GRACE_PERIOD_MS = 45000; // 45 seconds for players (increased from 15s for poor connections)
+const WEAK_CONNECTION_THRESHOLD_MS = 15000; // 15 seconds without heartbeat = weak connection warning
+const MISSED_HEARTBEATS_FOR_WEAK = 2; // Number of missed heartbeats before weak connection state
 
 /**
  * Check if a socket is marked as migrating (session being taken over by another tab)
@@ -94,10 +97,52 @@ function isSocketMigrating(socket) {
 }
 
 /**
+ * Start periodic connection health check for all connected users
+ * Detects weak connections and broadcasts warnings before full disconnect
+ * @param {Server} io - Socket.IO server instance
+ */
+function startConnectionHealthCheck(io) {
+  const CONNECTION_CHECK_INTERVAL = 10000; // Check every 10 seconds
+
+  setInterval(() => {
+    // Iterate through all games and check each user's connection health
+    for (const gameCode in games) {
+      const game = games[gameCode];
+      if (!game || !game.users) continue;
+
+      for (const username in game.users) {
+        const user = game.users[username];
+        // Skip disconnected users (they're already in grace period)
+        if (user.disconnected) continue;
+
+        const health = checkUserConnectionHealth(gameCode, username);
+
+        // If connection became weak, broadcast warning
+        if (health.status === 'weak' && user.connectionStatus !== 'weak') {
+          user.connectionStatus = 'weak';
+          logger.debug('SOCKET', `Player ${username} has weak connection in game ${gameCode}`);
+          broadcastToRoom(io, getGameRoom(gameCode), 'playerConnectionStatusChanged', {
+            username,
+            connectionStatus: 'weak',
+            message: `${username} has weak connection`,
+            missedHeartbeats: health.missedHeartbeats
+          });
+        }
+      }
+    }
+  }, CONNECTION_CHECK_INTERVAL);
+
+  logger.info('SOCKET', 'Connection health check started');
+}
+
+/**
  * Initialize Socket.IO event handlers
  * @param {Server} io - Socket.IO server instance
  */
 function initializeSocketHandlers(io) {
+  // Start connection health monitoring
+  startConnectionHealthCheck(io);
+
   io.on('connection', (socket) => {
     logger.info('SOCKET', `Client connected: ${socket.id}`);
 
@@ -1871,7 +1916,17 @@ function initializeSocketHandlers(io) {
 
       if (!gameCode || !username) return;
 
-      updateUserHeartbeat(gameCode, username);
+      const statusChange = updateUserHeartbeat(gameCode, username);
+
+      // If connection recovered from weak state, notify the room
+      if (statusChange && statusChange.statusChange === 'recovered') {
+        logger.debug('SOCKET', `Player ${username} connection recovered in game ${gameCode}`);
+        broadcastToRoom(io, getGameRoom(gameCode), 'playerConnectionStatusChanged', {
+          username,
+          connectionStatus: 'stable',
+          message: `${username}'s connection recovered`
+        });
+      }
     });
 
     // Handle shuffling grid broadcast from host
