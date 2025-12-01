@@ -1,7 +1,7 @@
 /**
- * GameAIService - Vertex AI + Supabase Integration
+ * GameAIService - Vertex AI + Supabase Integration (JavaScript/CommonJS version)
  *
- * Designed for Railway deployment with ENV-based credentials.
+ * Backend-compatible version for Railway deployment with ENV-based credentials.
  * Uses Gemini 1.5 Flash for word validation and caches results in Supabase.
  *
  * Uses existing tables:
@@ -9,55 +9,8 @@
  * - word_scores: Crowd-sourced validation (is_potentially_valid when net_score >= 6)
  */
 
-import { VertexAI, GenerativeModel } from '@google-cloud/vertexai';
-import { createClient } from '@supabase/supabase-js';
-import type { SupabaseClient } from '@supabase/supabase-js';
-import { z } from 'zod';
-
-// =============================================================================
-// Zod Schemas for AI Response Validation
-// =============================================================================
-
-const WordValidationResponseSchema = z.object({
-  isValid: z.boolean(),
-  reason: z.string(),
-});
-
-const ThemedWordsResponseSchema = z.array(z.string());
-
-// =============================================================================
-// Types
-// =============================================================================
-
-interface GoogleCredentials {
-  type: string;
-  project_id: string;
-  private_key_id: string;
-  private_key: string;
-  client_email: string;
-  client_id: string;
-  auth_uri: string;
-  token_uri: string;
-  auth_provider_x509_cert_url: string;
-  client_x509_cert_url: string;
-  universe_domain?: string;
-}
-
-interface WordValidationResult {
-  isValid: boolean;
-  reason?: string;
-  source: 'database' | 'ai';
-  error?: string;
-}
-
-interface CommunityWord {
-  id: string;
-  word: string;
-  language: string;
-  approval_count: number;
-  promoted_to_dictionary: boolean;
-  first_approved_at: string;
-}
+const { VertexAI } = require('@google-cloud/vertexai');
+const { createClient } = require('@supabase/supabase-js');
 
 // =============================================================================
 // Credential Parsing (Railway ENV-based)
@@ -68,8 +21,9 @@ interface CommunityWord {
  * This is crucial for Railway deployment where we can't use file-based credentials.
  *
  * @throws {Error} If GOOGLE_CREDENTIALS_JSON is missing or malformed
+ * @returns {Object} Google credentials object
  */
-function parseGoogleCredentials(): GoogleCredentials {
+function parseGoogleCredentials() {
   const credentialsJson = process.env.GOOGLE_CREDENTIALS_JSON;
 
   if (!credentialsJson) {
@@ -80,14 +34,10 @@ function parseGoogleCredentials(): GoogleCredentials {
   }
 
   try {
-    const credentials = JSON.parse(credentialsJson) as GoogleCredentials;
+    const credentials = JSON.parse(credentialsJson);
 
     // Validate required fields
-    const requiredFields = [
-      'project_id',
-      'private_key',
-      'client_email',
-    ] as const;
+    const requiredFields = ['project_id', 'private_key', 'client_email'];
 
     for (const field of requiredFields) {
       if (!credentials[field]) {
@@ -119,8 +69,9 @@ function parseGoogleCredentials(): GoogleCredentials {
 
 /**
  * Create a Supabase client with service role key to bypass RLS for writing.
+ * @returns {Object|null} Supabase client or null if not configured
  */
-function createServiceClient(): SupabaseClient | null {
+function createServiceClient() {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
@@ -145,21 +96,19 @@ function createServiceClient(): SupabaseClient | null {
 // =============================================================================
 
 class GameAIService {
-  private vertexAI: VertexAI | null = null;
-  private model: GenerativeModel | null = null;
-  private supabaseAdmin: SupabaseClient | null = null;
-  private credentials: GoogleCredentials | null = null;
-  private initialized = false;
-  private initError: Error | null = null;
-
   constructor() {
-    // Lazy initialization - will be called on first use
+    this.vertexAI = null;
+    this.model = null;
+    this.supabaseAdmin = null;
+    this.credentials = null;
+    this.initialized = false;
+    this.initError = null;
   }
 
   /**
    * Initialize the service. Called lazily on first use.
    */
-  private async initialize(): Promise<void> {
+  async initialize() {
     if (this.initialized) return;
     if (this.initError) throw this.initError;
 
@@ -196,7 +145,7 @@ class GameAIService {
       this.initialized = true;
       console.log('[GameAIService] Initialized successfully');
     } catch (error) {
-      this.initError = error as Error;
+      this.initError = error;
       console.error('[GameAIService] Initialization failed:', error);
       throw error;
     }
@@ -208,11 +157,11 @@ class GameAIService {
 
   /**
    * Check if word exists in community_words table (host/AI approved words).
+   * @param {string} word
+   * @param {string} language
+   * @returns {Promise<boolean>}
    */
-  private async checkCommunityWords(
-    word: string,
-    language: string
-  ): Promise<boolean> {
+  async checkCommunityWords(word, language) {
     if (!this.supabaseAdmin) return false;
 
     const { data, error } = await this.supabaseAdmin
@@ -233,11 +182,11 @@ class GameAIService {
 
   /**
    * Check if word is crowd-validated in word_scores table (net_score >= 6).
+   * @param {string} word
+   * @param {string} language
+   * @returns {Promise<boolean>}
    */
-  private async checkWordScores(
-    word: string,
-    language: string
-  ): Promise<boolean> {
+  async checkWordScores(word, language) {
     if (!this.supabaseAdmin) return false;
 
     const { data, error } = await this.supabaseAdmin
@@ -260,11 +209,10 @@ class GameAIService {
   /**
    * Save a valid word to community_words table.
    * Uses upsert to handle race conditions - increments approval_count if exists.
+   * @param {string} word
+   * @param {string} language
    */
-  private async saveToCommunityWords(
-    word: string,
-    language: string
-  ): Promise<void> {
+  async saveToCommunityWords(word, language) {
     if (!this.supabaseAdmin) return;
 
     const now = new Date().toISOString();
@@ -286,7 +234,6 @@ class GameAIService {
       const { error: updateError } = await this.supabaseAdmin
         .from('community_words')
         .update({
-          approval_count: this.supabaseAdmin.rpc ? undefined : 1, // Will be incremented via raw SQL if needed
           last_approved_at: now,
         })
         .eq('word', word)
@@ -302,17 +249,16 @@ class GameAIService {
 
   /**
    * Slow check: Validate word using Vertex AI (Gemini 1.5 Flash).
-   * Uses zod to validate the AI response schema.
+   * @param {string} word
+   * @param {string} language
+   * @returns {Promise<{isValid: boolean, reason: string}>}
    */
-  private async validateWithAI(
-    word: string,
-    language: string
-  ): Promise<{ isValid: boolean; reason: string }> {
+  async validateWithAI(word, language) {
     if (!this.model) {
       throw new Error('Vertex AI model not initialized');
     }
 
-    const languageNames: Record<string, string> = {
+    const languageNames = {
       en: 'English',
       he: 'Hebrew',
       sv: 'Swedish',
@@ -367,16 +313,16 @@ Example responses:
         return { isValid: false, reason: 'Failed to parse AI response' };
       }
 
-      // Parse and validate with zod
+      // Parse and validate
       const parsed = JSON.parse(jsonMatch[0]);
-      const validated = WordValidationResponseSchema.parse(parsed);
 
-      return validated;
-    } catch (error) {
-      if (error instanceof z.ZodError) {
-        console.error('[GameAIService] AI response schema validation failed:', error.issues);
+      if (typeof parsed.isValid !== 'boolean' || typeof parsed.reason !== 'string') {
+        console.error('[GameAIService] AI response schema validation failed:', parsed);
         return { isValid: false, reason: 'Invalid AI response format' };
       }
+
+      return parsed;
+    } catch (error) {
       console.error('[GameAIService] AI validation error:', error);
       throw error;
     }
@@ -393,14 +339,11 @@ Example responses:
    * 5. Persistence: If valid, upsert to community_words (learning loop)
    * 6. Return the result with source indicator
    *
-   * @param word - The word to validate
-   * @param language - Language code (e.g., 'en', 'sv')
-   * @returns Validation result with source indicator
+   * @param {string} word - The word to validate
+   * @param {string} language - Language code (e.g., 'en', 'sv')
+   * @returns {Promise<{isValid: boolean, reason?: string, source: 'database'|'ai', error?: string}>}
    */
-  async validateAndSaveWord(
-    word: string,
-    language: string = 'en'
-  ): Promise<WordValidationResult> {
+  async validateAndSaveWord(word, language = 'en') {
     // Ensure initialized
     await this.initialize();
 
@@ -472,16 +415,12 @@ Example responses:
   /**
    * Generate a themed word board using AI.
    *
-   * @param theme - The theme for word generation (e.g., 'halloween', 'space')
-   * @param count - Number of words to generate
-   * @param language - Language code (e.g., 'en', 'sv')
-   * @returns Array of themed words
+   * @param {string} theme - The theme for word generation (e.g., 'halloween', 'space')
+   * @param {number} count - Number of words to generate
+   * @param {string} language - Language code (e.g., 'en', 'sv')
+   * @returns {Promise<string[]>} Array of themed words
    */
-  async generateThemedBoard(
-    theme: string,
-    count: number,
-    language: string = 'en'
-  ): Promise<string[]> {
+  async generateThemedBoard(theme, count, language = 'en') {
     // Ensure initialized
     await this.initialize();
 
@@ -489,7 +428,7 @@ Example responses:
       throw new Error('Vertex AI model not initialized');
     }
 
-    const languageNames: Record<string, string> = {
+    const languageNames = {
       en: 'English',
       sv: 'Swedish',
       es: 'Spanish',
@@ -519,21 +458,22 @@ Example responses:
         return [];
       }
 
-      // Parse and validate with zod
+      // Parse and validate
       const parsed = JSON.parse(jsonMatch[0]);
-      const validated = ThemedWordsResponseSchema.parse(parsed);
+
+      if (!Array.isArray(parsed)) {
+        console.error('[GameAIService] Themed words response is not an array:', parsed);
+        return [];
+      }
 
       // Filter to ensure word constraints
-      const filteredWords = validated
-        .map((w) => w.toLowerCase().trim())
-        .filter((w) => w.length >= 3 && w.length <= 10 && /^[a-zA-Z\u00C0-\u024F]+$/.test(w));
+      const filteredWords = parsed
+        .filter(w => typeof w === 'string')
+        .map(w => w.toLowerCase().trim())
+        .filter(w => w.length >= 3 && w.length <= 10 && /^[a-zA-Z\u00C0-\u024F]+$/.test(w));
 
       return filteredWords;
     } catch (error) {
-      if (error instanceof z.ZodError) {
-        console.error('[GameAIService] Themed words schema validation failed:', error.issues);
-        return [];
-      }
       console.error('[GameAIService] generateThemedBoard error:', error);
       throw error;
     }
@@ -546,19 +486,19 @@ Example responses:
   /**
    * Batch validate multiple words.
    * Useful for validating all words at end of a game round.
+   * @param {string[]} words
+   * @param {string} language
+   * @returns {Promise<Array<{isValid: boolean, reason?: string, source: string, error?: string}>>}
    */
-  async validateWords(
-    words: string[],
-    language: string = 'en'
-  ): Promise<WordValidationResult[]> {
+  async validateWords(words, language = 'en') {
     // Process in parallel with concurrency limit
     const BATCH_SIZE = 5;
-    const results: WordValidationResult[] = [];
+    const results = [];
 
     for (let i = 0; i < words.length; i += BATCH_SIZE) {
       const batch = words.slice(i, i + BATCH_SIZE);
       const batchResults = await Promise.all(
-        batch.map((word) => this.validateAndSaveWord(word, language))
+        batch.map(word => this.validateAndSaveWord(word, language))
       );
       results.push(...batchResults);
     }
@@ -568,8 +508,9 @@ Example responses:
 
   /**
    * Check if the service is properly configured and ready.
+   * @returns {Promise<boolean>}
    */
-  async isConfigured(): Promise<boolean> {
+  async isConfigured() {
     try {
       await this.initialize();
       return true;
@@ -580,12 +521,9 @@ Example responses:
 
   /**
    * Get configuration status for debugging.
+   * @returns {{vertexAI: boolean, supabase: boolean, error: string|null}}
    */
-  getStatus(): {
-    vertexAI: boolean;
-    supabase: boolean;
-    error: string | null;
-  } {
+  getStatus() {
     return {
       vertexAI: this.vertexAI !== null,
       supabase: this.supabaseAdmin !== null,
@@ -599,10 +537,9 @@ Example responses:
 // =============================================================================
 
 // Export singleton instance
-export const gameAIService = new GameAIService();
+const gameAIService = new GameAIService();
 
-// Export types for consumers
-export type { WordValidationResult, CommunityWord };
-
-// Export class for testing
-export { GameAIService };
+module.exports = {
+  gameAIService,
+  GameAIService,
+};
