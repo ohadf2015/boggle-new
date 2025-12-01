@@ -232,9 +232,25 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
     initAuth();
 
+    // Safety timeout: ensure loading is set to false after 10 seconds
+    // This prevents infinite loading states due to network issues or edge cases
+    const loadingTimeout = setTimeout(() => {
+      if (isMounted) {
+        // Use functional update to check current loading state
+        setLoading(currentLoading => {
+          if (currentLoading) {
+            logger.warn('Auth loading timeout - forcing loading to false');
+            return false;
+          }
+          return currentLoading;
+        });
+      }
+    }, 10000);
+
     // Cleanup function - properly returned from useEffect
     return () => {
       isMounted = false;
+      clearTimeout(loadingTimeout);
       if (subscription) {
         subscription.unsubscribe();
       }

@@ -961,7 +961,7 @@ function initializeSocketHandlers(io) {
                 baseScore: baseScore,
                 comboBonus: comboBonus,
                 comboLevel: safeComboLevel,
-                autoValidated: true,
+                autoValidated: false,  // Non-dictionary words don't continue combo even if AI approves
                 isAiVerified: aiResult.isAiVerified
               });
 
@@ -1057,7 +1057,7 @@ function initializeSocketHandlers(io) {
       const gameCode = providedGameCode || getGameBySocketId(socket.id);
       const username = getUsernameBySocketId(socket.id);
 
-      if (!gameCode || !message) {
+      if (!gameCode || !message || !username) {
         emitError(socket, ErrorMessages.INVALID_MESSAGE);
         return;
       }

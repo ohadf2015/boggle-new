@@ -246,6 +246,7 @@ const usePlayerSocketEvents = ({
       let newComboLevel = 0;
 
       if (data.autoValidated) {
+        // Word was in dictionary - combo can continue
         const currentComboLevel = comboLevelRef.current;
         const currentLastWordTime = lastWordTimeRef.current;
 
@@ -274,6 +275,9 @@ const usePlayerSocketEvents = ({
           setLastWordTime(null);
           lastWordTimeRef.current = null;
         }, comboTimeout);
+      } else {
+        // Word was NOT in dictionary (AI-validated or host-validated) - reset combo
+        resetCombo();
       }
 
       // Show toast with score from server
