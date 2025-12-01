@@ -841,6 +841,12 @@ function initializeSocketHandlers(io) {
 
           if (isHostSoloGame) {
             // Solo host game: try AI validation for non-dictionary words
+            // Emit event to show AI validation indicator to the player
+            socket.emit('wordValidatingWithAI', {
+              word: normalizedWord,
+              message: 'AI is checking your word...'
+            });
+
             const aiResult = await validateWordWithAI(normalizedWord, game.language || 'en');
 
             if (aiResult.isValid) {
