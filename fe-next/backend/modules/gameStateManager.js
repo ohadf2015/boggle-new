@@ -57,6 +57,10 @@ function createGame(gameCode, gameData) {
     reconnectionTimeout: null, // Store timeout ID for host reconnection grace period
     isRanked: gameData.isRanked || false, // Ranked mode flag
     allowLateJoin: gameData.allowLateJoin !== false, // Allow late joins (default true, false for ranked)
+    // AI-approved words tracking for peer validation
+    aiApprovedWords: [], // Array of { word, submitter, score, confidence }
+    peerValidationWord: null, // The randomly selected AI-approved word for peer validation
+    peerValidationVotes: {}, // username -> 'valid' | 'invalid'
     createdAt: Date.now(),
     lastActivity: Date.now()
   };
@@ -614,6 +618,10 @@ function resetGameForNewRound(gameCode) {
   game.playerAchievements = {};
   game.playerCombos = {}; // Reset combo tracking for new round
   game.firstWordFound = false; // Reset FIRST_BLOOD achievement flag
+  // Reset AI word peer validation tracking
+  game.aiApprovedWords = [];
+  game.peerValidationWord = null;
+  game.peerValidationVotes = {};
 
   // Re-initialize scores/words only for CURRENT players in the room
   for (const username of Object.keys(game.users)) {
@@ -708,6 +716,144 @@ function playerHasWord(gameCode, username, word) {
   if (!game) return false;
 
   return game.playerWords[username]?.includes(word.toLowerCase()) || false;
+}
+
+/**
+ * Track an AI-approved word for potential peer validation
+ * @param {string} gameCode - Game code
+ * @param {string} word - The AI-approved word
+ * @param {string} submitter - Username who submitted the word
+ * @param {number} score - Score for this word
+ * @param {number} confidence - AI confidence score (0-100)
+ */
+function trackAiApprovedWord(gameCode, word, submitter, score, confidence) {
+  const game = games[gameCode];
+  if (!game) return;
+
+  if (!game.aiApprovedWords) {
+    game.aiApprovedWords = [];
+  }
+
+  game.aiApprovedWords.push({
+    word: word.toLowerCase(),
+    submitter,
+    score,
+    confidence,
+    timestamp: Date.now()
+  });
+}
+
+/**
+ * Select a random AI-approved word for peer validation
+ * Excludes words from a specific submitter if needed
+ * @param {string} gameCode - Game code
+ * @returns {object|null} - The selected word object or null if none available
+ */
+function selectWordForPeerValidation(gameCode) {
+  const game = games[gameCode];
+  if (!game || !game.aiApprovedWords || game.aiApprovedWords.length === 0) {
+    return null;
+  }
+
+  // Randomly select one word from the AI-approved list
+  const randomIndex = Math.floor(Math.random() * game.aiApprovedWords.length);
+  const selectedWord = game.aiApprovedWords[randomIndex];
+
+  game.peerValidationWord = selectedWord;
+  game.peerValidationVotes = {};
+
+  return selectedWord;
+}
+
+/**
+ * Record a peer validation vote
+ * @param {string} gameCode - Game code
+ * @param {string} username - Username who is voting
+ * @param {boolean} isValid - True if player thinks word is valid
+ * @returns {object} - { success, totalVotes, invalidVotes, shouldReject }
+ */
+function recordPeerValidationVote(gameCode, username, isValid) {
+  const game = games[gameCode];
+  if (!game || !game.peerValidationWord) {
+    return { success: false, error: 'No word for peer validation' };
+  }
+
+  // Don't allow the submitter to vote on their own word
+  if (username === game.peerValidationWord.submitter) {
+    return { success: false, error: 'Cannot vote on your own word' };
+  }
+
+  // Record the vote (only one vote per user)
+  if (!game.peerValidationVotes) {
+    game.peerValidationVotes = {};
+  }
+
+  // Only allow one vote per player
+  if (game.peerValidationVotes[username]) {
+    return { success: false, error: 'Already voted' };
+  }
+
+  game.peerValidationVotes[username] = isValid ? 'valid' : 'invalid';
+
+  // Count votes
+  const votes = Object.values(game.peerValidationVotes);
+  const invalidVotes = votes.filter(v => v === 'invalid').length;
+  const totalVotes = votes.length;
+
+  // Check if word should be rejected (more than 3 players said invalid)
+  const shouldReject = invalidVotes > 3;
+
+  return {
+    success: true,
+    totalVotes,
+    invalidVotes,
+    validVotes: votes.filter(v => v === 'valid').length,
+    shouldReject,
+    word: game.peerValidationWord.word,
+    submitter: game.peerValidationWord.submitter
+  };
+}
+
+/**
+ * Get the peer validation word info
+ * @param {string} gameCode - Game code
+ * @returns {object|null} - The peer validation word or null
+ */
+function getPeerValidationWord(gameCode) {
+  const game = games[gameCode];
+  if (!game) return null;
+  return game.peerValidationWord || null;
+}
+
+/**
+ * Remove score for a peer-rejected word
+ * @param {string} gameCode - Game code
+ * @param {string} word - The rejected word
+ * @param {string} submitter - Username who submitted the word
+ * @returns {number} - Score that was removed
+ */
+function removePeerRejectedWordScore(gameCode, word, submitter) {
+  const game = games[gameCode];
+  if (!game) return 0;
+
+  // Find the word in playerWordDetails and mark as invalidated
+  const wordDetails = game.playerWordDetails?.[submitter] || [];
+  const wordDetail = wordDetails.find(wd => wd.word === word.toLowerCase());
+
+  if (!wordDetail) return 0;
+
+  const scoreRemoved = wordDetail.score || 0;
+
+  // Mark word as invalidated by peers
+  wordDetail.validated = false;
+  wordDetail.peerRejected = true;
+
+  // Subtract score from player
+  if (game.playerScores[submitter]) {
+    game.playerScores[submitter] = Math.max(0, game.playerScores[submitter] - scoreRemoved);
+  }
+
+  return scoreRemoved;
 }
 
 /**
@@ -945,6 +1091,13 @@ module.exports = {
   updatePlayerScore,
   getLeaderboard,
   getLeaderboardThrottled,
+
+  // AI word peer validation
+  trackAiApprovedWord,
+  selectWordForPeerValidation,
+  recordPeerValidationVote,
+  getPeerValidationWord,
+  removePeerRejectedWordScore,
 
   // Cleanup
   cleanupStaleGames,

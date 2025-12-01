@@ -40,7 +40,13 @@ const {
   updateUserHeartbeat,
   markUserActivity,
   getPresenceConfig,
-  checkUserConnectionHealth
+  checkUserConnectionHealth,
+  // AI word peer validation
+  trackAiApprovedWord,
+  selectWordForPeerValidation,
+  recordPeerValidationVote,
+  getPeerValidationWord,
+  removePeerRejectedWordScore
 } = require('./modules/gameStateManager');
 
 const { processGameResults, isSupabaseConfigured, saveHostApprovedWord } = require('./modules/supabaseServer');
@@ -1110,6 +1116,65 @@ function initializeSocketHandlers(io) {
       }
     });
 
+    // Handle peer validation vote for AI-approved words
+    socket.on('submitPeerValidationVote', async (data) => {
+      if (!checkRateLimit(socket.id)) {
+        socket.emit('rateLimited');
+        return;
+      }
+
+      const { word, isValid, gameCode: providedGameCode } = data;
+      const gameCode = providedGameCode || getGameBySocketId(socket.id);
+      const username = getUsernameBySocketId(socket.id);
+
+      if (!gameCode || word === undefined || isValid === undefined) {
+        return;
+      }
+
+      const game = getGame(gameCode);
+      if (!game) {
+        return;
+      }
+
+      // Record the vote
+      const result = recordPeerValidationVote(gameCode, username, isValid);
+
+      if (result.success) {
+        socket.emit('peerVoteRecorded', {
+          word,
+          success: true,
+          totalVotes: result.totalVotes,
+          invalidVotes: result.invalidVotes
+        });
+        logger.info('PEER_VALIDATION', `${username} voted ${isValid ? 'valid' : 'invalid'} on "${word}" (${result.invalidVotes} invalid votes, ${result.validVotes} valid votes)`);
+
+        // Check if word should be rejected (more than 3 players said invalid)
+        if (result.shouldReject) {
+          const scoreRemoved = removePeerRejectedWordScore(gameCode, result.word, result.submitter);
+
+          logger.info('PEER_VALIDATION', `Word "${result.word}" rejected by peers (${result.invalidVotes} invalid votes). Removed ${scoreRemoved} points from ${result.submitter}`);
+
+          // Notify all players about the peer rejection
+          broadcastToRoom(io, getGameRoom(gameCode), 'peerValidationResult', {
+            word: result.word,
+            submitter: result.submitter,
+            rejected: true,
+            invalidVotes: result.invalidVotes,
+            validVotes: result.validVotes,
+            scoreRemoved
+          });
+
+          // Send updated leaderboard
+          const leaderboard = getLeaderboard(gameCode);
+          broadcastToRoom(io, getGameRoom(gameCode), 'updateLeaderboard', {
+            leaderboard
+          });
+        }
+      } else {
+        socket.emit('peerVoteRecorded', { word, success: false, error: result.error });
+      }
+    });
+
     // Handle end game
     socket.on('endGame', () => {
       if (!checkRateLimit(socket.id)) {
@@ -2049,6 +2114,43 @@ async function endGame(io, gameCode) {
     logger.debug('FEEDBACK', `Skipping word feedback (non-dict words: ${nonDictWords.length}, players: ${playerCount})`);
   }
 
+  // Peer validation for AI-approved words (only in multiplayer games with 4+ players)
+  // Select one random AI-approved word and show it to other players for validation
+  const PEER_VALIDATION_TIMEOUT_SECONDS = 20;
+  const aiApprovedWords = game.aiApprovedWords || [];
+
+  if (aiApprovedWords.length > 0 && playerCount >= 4) {
+    const selectedWord = selectWordForPeerValidation(gameCode);
+
+    if (selectedWord) {
+      logger.info('PEER_VALIDATION', `Game ${gameCode}: Selected AI-approved word "${selectedWord.word}" (by ${selectedWord.submitter}) for peer validation`);
+
+      // Send peer validation request to all players except the submitter
+      setTimeout(() => {
+        for (const [username, userData] of Object.entries(game.users)) {
+          // Don't send to the player who submitted the word
+          if (username === selectedWord.submitter) continue;
+
+          const playerSocket = getSocketById(io, userData.socketId);
+          if (playerSocket) {
+            safeEmit(playerSocket, 'peerValidationRequest', {
+              word: selectedWord.word,
+              submittedBy: selectedWord.submitter,
+              submitterAvatar: game.users[selectedWord.submitter]?.avatar || null,
+              confidence: selectedWord.confidence,
+              timeoutSeconds: PEER_VALIDATION_TIMEOUT_SECONDS,
+              gameCode,
+              language: game.language || 'en'
+            });
+            logger.debug('PEER_VALIDATION', `Sent peer validation request for "${selectedWord.word}" to ${username}`);
+          }
+        }
+      }, 1000); // 1 second delay to let results page render
+    }
+  } else {
+    logger.debug('PEER_VALIDATION', `Skipping peer validation (AI-approved words: ${aiApprovedWords.length}, players: ${playerCount})`);
+  }
+
   // Check for tournament
   const tournamentId = getTournamentIdFromGame(gameCode);
   if (tournamentId) {
@@ -2165,6 +2267,17 @@ async function calculateAndBroadcastFinalScores(io, gameCode) {
           if (result.isValid) {
             validCount++;
             if (result.isAiVerified) aiVerifiedCount++;
+
+            // Track AI-approved word for peer validation
+            // Find which player submitted this word
+            for (const [username, words] of Object.entries(game.playerWords || {})) {
+              if (words.includes(word)) {
+                const wordDetail = game.playerWordDetails?.[username]?.find(wd => wd.word === word);
+                const wordScore = wordDetail?.score || calculateWordScore(word, wordDetail?.comboLevel || 0);
+                trackAiApprovedWord(gameCode, word, username, wordScore, result.confidence || 85);
+                break;
+              }
+            }
           }
         }
 
