@@ -238,7 +238,7 @@ async function updateLeaderboardEntry(playerId) {
   // Get updated profile stats
   const { data: profile, error: fetchError } = await client
     .from('profiles')
-    .select('username, avatar_emoji, avatar_color, total_score, total_games, ranked_wins, ranked_mmr')
+    .select('username, display_name, avatar_emoji, avatar_color, total_score, total_games, ranked_wins, ranked_mmr')
     .eq('id', playerId)
     .single();
 
@@ -250,6 +250,7 @@ async function updateLeaderboardEntry(playerId) {
     .upsert({
       player_id: playerId,
       username: profile.username,
+      display_name: profile.display_name,
       avatar_emoji: profile.avatar_emoji,
       avatar_color: profile.avatar_color,
       total_score: profile.total_score || 0,

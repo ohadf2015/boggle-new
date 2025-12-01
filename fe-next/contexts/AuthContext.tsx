@@ -140,9 +140,15 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         return;
       }
 
-      // Get initial session
+      // Get initial session with timeout to prevent slow connections from blocking UI
       try {
-        const { data: { session }, error } = await supabase.auth.getSession();
+        // Wrap getSession with a 2 second timeout for fast failure on slow connections
+        const sessionPromise = supabase.auth.getSession();
+        const timeoutPromise = new Promise<{ data: { session: null }; error: { message: string } }>((_, reject) =>
+          setTimeout(() => reject(new Error('Session fetch timeout')), 2000)
+        );
+
+        const { data: { session }, error } = await Promise.race([sessionPromise, timeoutPromise]);
         if (!isMounted) return;
 
         if (error) {
@@ -154,12 +160,17 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
           }
         } else if (session?.user) {
           setUser(session.user);
-          await fetchUserData(session.user.id);
+          // Fetch user data in background, don't block loading state
+          fetchUserData(session.user.id).catch((err) => {
+            logger.warn('Failed to fetch user data:', err.message);
+          });
         }
       } catch (err) {
         if (!isMounted) return;
         const error = err as { code?: string; message?: string };
-        if (isRefreshTokenError(error)) {
+        if (error.message === 'Session fetch timeout') {
+          logger.warn('Auth session fetch timed out - continuing without blocking');
+        } else if (isRefreshTokenError(error)) {
           await clearAuthState('Invalid or expired refresh token');
         } else {
           logger.warn('Failed to get session:', error.message);
@@ -232,8 +243,9 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
     initAuth();
 
-    // Safety timeout: ensure loading is set to false after 10 seconds
+    // Safety timeout: ensure loading is set to false after 3 seconds
     // This prevents infinite loading states due to network issues or edge cases
+    // Reduced from 10s to 3s for better UX on slow connections
     const loadingTimeout = setTimeout(() => {
       if (isMounted) {
         // Use functional update to check current loading state
@@ -245,7 +257,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
           return currentLoading;
         });
       }
-    }, 10000);
+    }, 3000);
 
     // Cleanup function - properly returned from useEffect
     return () => {
