@@ -287,19 +287,33 @@ class GameAIService {
     };
 
     const languageName = languageNames[language] || language;
+    const isHebrew = language === 'he';
+
+    // Build Hebrew-specific instruction if needed
+    const hebrewFinalLettersNote = isHebrew ? `
+IMPORTANT FOR HEBREW: The game board does NOT have final Hebrew letters (sofit letters: ך, ם, ן, ף, ץ).
+Players type using regular letters (כ, מ, נ, פ, צ) even at the end of words.
+When validating, treat words written with regular letters at the end as if they were written with final letters.
+For example: "שלומ" should be considered as "שלום" (valid word).
+Do NOT reject words just because they use regular letters instead of final forms at the end.
+` : '';
+
+    // Determine response language - provide reason in the game language
+    const responseLanguageNote = `
+RESPONSE LANGUAGE: Provide the "reason" field in ${languageName}. The reason should be a brief, clear explanation in ${languageName}.`;
 
     const prompt = `You are a word validator for a Boggle-style word game. Your task is to determine if a word is valid with a confidence score.
 
 LANGUAGE: ${languageName} (${language})
 WORD TO VALIDATE: "${word}"
-
+${hebrewFinalLettersNote}
 VALIDATION RULES:
 1. The word must be a REAL word or name that exists in ${languageName}
 2. ACCEPT: Common dictionary words, verbs in any conjugation, nouns (singular/plural), adjectives, adverbs
 3. ACCEPT: Well-established slang that appears in dictionaries
 4. ACCEPT: Common first names (e.g., "David", "Sarah", "Mohammed") - names ARE allowed
 5. ACCEPT: Well-known place names, country names, city names (e.g., "Paris", "Japan", "London")
-6. REJECT: Abbreviations and acronyms (e.g., "TV", "USA", "LOL")
+6. ACCEPT: Well-known acronyms that are commonly used (e.g., "NASA", "FIFA", "NATO")
 7. REJECT: Words with spaces, hyphens, or special characters
 8. REJECT: Random letter combinations that aren't real words
 9. REJECT: Gibberish or misspellings - the word must be spelled correctly
@@ -314,17 +328,18 @@ CONFIDENCE SCORE (0-100):
 - Below 70: Not confident - likely invalid, misspelled, or very obscure
 
 The word is case-insensitive (ignore capitalization).
+${responseLanguageNote}
 
 Respond with ONLY a valid JSON object in this exact format:
-{ "isValid": boolean, "reason": "brief explanation in English", "confidence": number }
+{ "isValid": boolean, "reason": "brief explanation in ${languageName}", "confidence": number }
 
-Example responses:
-{ "isValid": true, "reason": "Common ${languageName} noun", "confidence": 98 }
-{ "isValid": true, "reason": "Common first name", "confidence": 95 }
-{ "isValid": true, "reason": "Well-known city name", "confidence": 96 }
-{ "isValid": false, "reason": "Misspelling of 'beautiful'", "confidence": 92 }
-{ "isValid": false, "reason": "Not a recognized ${languageName} word", "confidence": 88 }
-{ "isValid": false, "reason": "Random letter combination", "confidence": 95 }`;
+Example responses for ${languageName}:
+{ "isValid": true, "reason": "${isHebrew ? 'שם עצם נפוץ' : `Common ${languageName} noun`}", "confidence": 98 }
+{ "isValid": true, "reason": "${isHebrew ? 'שם פרטי נפוץ' : 'Common first name'}", "confidence": 95 }
+{ "isValid": true, "reason": "${isHebrew ? 'שם עיר ידועה' : 'Well-known city name'}", "confidence": 96 }
+{ "isValid": false, "reason": "${isHebrew ? 'שגיאת כתיב' : "Misspelling of 'beautiful'"}", "confidence": 92 }
+{ "isValid": false, "reason": "${isHebrew ? 'לא מילה מוכרת' : `Not a recognized ${languageName} word`}", "confidence": 88 }
+{ "isValid": false, "reason": "${isHebrew ? 'צירוף אותיות אקראי' : 'Random letter combination'}", "confidence": 95 }`;
 
     try {
       const result = await this.model.generateContent(prompt);
@@ -695,35 +710,50 @@ Example responses:
     };
 
     const languageName = languageNames[language] || language;
+    const isHebrew = language === 'he';
     const wordList = words.map((w, i) => `${i + 1}. "${w}"`).join('\n');
+
+    // Build Hebrew-specific instruction if needed
+    const hebrewFinalLettersNote = isHebrew ? `
+IMPORTANT FOR HEBREW: The game board does NOT have final Hebrew letters (sofit letters: ך, ם, ן, ף, ץ).
+Players type using regular letters (כ, מ, נ, פ, צ) even at the end of words.
+When validating, treat words written with regular letters at the end as if they were written with final letters.
+For example: "שלומ" should be considered as "שלום" (valid word).
+Do NOT reject words just because they use regular letters instead of final forms at the end.
+` : '';
+
+    // Determine response language - provide reason in the game language
+    const responseLanguageNote = `
+RESPONSE LANGUAGE: Provide all "reason" fields in ${languageName}. Each reason should be a brief, clear explanation in ${languageName}.`;
 
     const prompt = `You are a word validator for a Boggle-style word game. Validate ALL of these ${words.length} words in ${languageName}.
 
 WORDS TO VALIDATE:
 ${wordList}
-
+${hebrewFinalLettersNote}
 VALIDATION RULES:
 1. The word must be a REAL word or name that exists in ${languageName}
 2. ACCEPT: Common dictionary words, verbs in any conjugation, nouns (singular/plural), adjectives, adverbs
 3. ACCEPT: Well-established slang that appears in dictionaries
 4. ACCEPT: Common first names (e.g., "David", "Sarah") - names ARE allowed
 5. ACCEPT: Well-known place names, country names, city names
-6. REJECT: Abbreviations and acronyms (e.g., "TV", "USA")
+6. ACCEPT: Well-known acronyms that are commonly used (e.g., "NASA", "FIFA", "NATO")
 7. REJECT: Random letter combinations that aren't real words
 8. REJECT: Misspellings - words must be spelled correctly
 9. When in doubt about obscure words, reject them
 
 IMPORTANT: Check spelling carefully. Misspelled words should be REJECTED.
+${responseLanguageNote}
 
 Respond with ONLY a valid JSON array with one object per word, in the same order as the input.
-Each object must have: { "word": string, "isValid": boolean, "reason": string, "confidence": number (0-100) }
+Each object must have: { "word": string, "isValid": boolean, "reason": string (in ${languageName}), "confidence": number (0-100) }
 
-Example response format:
+Example response format for ${languageName}:
 [
-  { "word": "cat", "isValid": true, "reason": "Common English noun", "confidence": 99 },
-  { "word": "david", "isValid": true, "reason": "Common first name", "confidence": 95 },
-  { "word": "xyz", "isValid": false, "reason": "Random letter combination", "confidence": 95 },
-  { "word": "beutiful", "isValid": false, "reason": "Misspelling of 'beautiful'", "confidence": 92 }
+  { "word": "${isHebrew ? 'חתול' : 'cat'}", "isValid": true, "reason": "${isHebrew ? 'שם עצם נפוץ' : 'Common English noun'}", "confidence": 99 },
+  { "word": "${isHebrew ? 'דוד' : 'david'}", "isValid": true, "reason": "${isHebrew ? 'שם פרטי נפוץ' : 'Common first name'}", "confidence": 95 },
+  { "word": "xyz", "isValid": false, "reason": "${isHebrew ? 'צירוף אותיות אקראי' : 'Random letter combination'}", "confidence": 95 },
+  { "word": "${isHebrew ? 'יפהה' : 'beutiful'}", "isValid": false, "reason": "${isHebrew ? 'שגיאת כתיב' : "Misspelling of 'beautiful'"}", "confidence": 92 }
 ]`;
 
     try {

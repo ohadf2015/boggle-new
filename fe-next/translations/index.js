@@ -392,7 +392,7 @@ export const translations = {
     howToPlay: {
       title: 'How to Play LexiClash?',
       description: 'LexiClash is a fast-paced word game where you race against time to find as many words as possible on a grid of letters. The longer the word, the more points you earn!',
-      descriptionNote: 'Words must be at least 2 letters long and must be in the selected game language.',
+      descriptionNote: 'Words must be at least 2 letters long. Names, places, and well-known acronyms are allowed!',
       createOrJoinTitle: 'Create or Join a Game',
       createOrJoinDesc: 'The host creates a room and shares the code. Players join using the code.',
       hostStartsTitle: 'Host Starts the Game',
@@ -1427,7 +1427,7 @@ export const translations = {
     howToPlay: {
       title: 'איך משחקים בלקסיקלאש?',
       description: 'לקסיקלאש הוא משחק מילים מהיר בו אתם מתחרים בזמן כדי למצוא כמה שיותר מילים על לוח אותיות. ככל שהמילה ארוכה יותר, כך תקבלו יותר נקודות!',
-      descriptionNote: 'מילים חייבות להיות לפחות בנות 2 אותיות וחייבות להיות בשפת המשחק הנבחרת.',
+      descriptionNote: 'מילים חייבות להיות לפחות בנות 2 אותיות. שמות, מקומות וראשי תיבות מוכרים מותרים!',
       createOrJoinTitle: 'צרו או הצטרפו למשחק',
       createOrJoinDesc: 'המארח יוצר חדר ומשתף את הקוד. השחקנים מצטרפים באמצעות הקוד.',
       hostStartsTitle: 'המארח מתחיל את המשחק',
@@ -2456,7 +2456,7 @@ export const translations = {
     howToPlay: {
       title: 'Hur spelar man LexiClash?',
       description: 'LexiClash är ett snabbt ordspel där du tävlar mot klockan för att hitta så många ord som möjligt på ett bokstavsrutnät. Ju längre ord, desto fler poäng!',
-      descriptionNote: 'Ord måste vara minst 2 bokstäver långa och på det valda spelspråket.',
+      descriptionNote: 'Ord måste vara minst 2 bokstäver långa. Namn, platser och kända akronymer är tillåtna!',
       createOrJoinTitle: 'Skapa eller gå med i ett spel',
       createOrJoinDesc: 'Värden skapar ett rum och delar koden. Spelare går med med koden.',
       hostStartsTitle: 'Värden startar spelet',
@@ -3487,7 +3487,7 @@ export const translations = {
     howToPlay: {
       title: 'LexiClashの遊び方',
       description: 'LexiClashは、文字のグリッド上でできるだけ多くの単語を見つけるために時間と競う、速いペースのワードゲームです。単語が長いほど、獲得できるポイントが多くなります！',
-      descriptionNote: '単語は少なくとも2文字で、選択したゲーム言語である必要があります。',
+      descriptionNote: '単語は少なくとも2文字である必要があります。名前、場所、有名な頭字語も使用できます！',
       createOrJoinTitle: 'ゲームを作成または参加',
       createOrJoinDesc: 'ホストがルームを作成してコードを共有します。プレイヤーはコードを使用して参加します。',
       hostStartsTitle: 'ホストがゲームを開始',

@@ -80,7 +80,7 @@ async function validateWordWithAI(word, language = 'en') {
  * Batch validate multiple words
  * @param {string[]} words - Array of words to validate
  * @param {string} language - Language code
- * @returns {Promise<Map<string, {isValid: boolean, isAiVerified: boolean}>>}
+ * @returns {Promise<Map<string, {isValid: boolean, isAiVerified: boolean, reason?: string}>>}
  */
 async function validateWordsWithAI(words, language = 'en') {
   const startTime = Date.now();
@@ -95,7 +95,7 @@ async function validateWordsWithAI(words, language = 'en') {
     if (!service) {
       logger.warn('AI_SERVICE', `AI service not available - cannot batch validate ${words.length} words`);
       words.forEach(word => {
-        results.set(word, { isValid: false, isAiVerified: false });
+        results.set(word, { isValid: false, isAiVerified: false, reason: 'AI service not available' });
       });
       return results;
     }
@@ -114,8 +114,9 @@ async function validateWordsWithAI(words, language = 'en') {
       const result = aiResults[index];
       const isValid = result?.isValid || false;
       const isAiVerified = result?.source === 'ai';
+      const reason = result?.reason || (isValid ? undefined : 'Invalid word');
 
-      results.set(word, { isValid, isAiVerified });
+      results.set(word, { isValid, isAiVerified, reason });
 
       if (isValid) {
         validCount++;
@@ -138,7 +139,7 @@ async function validateWordsWithAI(words, language = 'en') {
     const duration = Date.now() - startTime;
     logger.error('AI_SERVICE', `Batch AI validation failed after ${duration}ms: ${error.message}`);
     words.forEach(word => {
-      results.set(word, { isValid: false, isAiVerified: false });
+      results.set(word, { isValid: false, isAiVerified: false, reason: 'Validation error' });
     });
     return results;
   }
