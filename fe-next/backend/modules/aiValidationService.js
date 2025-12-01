@@ -1,37 +1,18 @@
 /**
  * AI Validation Service Wrapper
- * CommonJS wrapper for the TypeScript GameAIService
+ * CommonJS wrapper for the GameAIService
  * Provides AI-powered word validation for solo host games
  */
 
 const logger = require('../utils/logger');
-
-// Cache the AI service instance
-let gameAIServicePromise = null;
+const { gameAIService } = require('./gameAIService');
 
 /**
- * Get or initialize the AI service instance
- * Uses dynamic import to load the TypeScript module
+ * Get the AI service instance
+ * @returns {Object} The game AI service instance
  */
-async function getAIService() {
-  if (!gameAIServicePromise) {
-    logger.info('AI_SERVICE', 'Initializing AI service (first load)...');
-    gameAIServicePromise = (async () => {
-      try {
-        // Dynamic import of the TypeScript module
-        logger.debug('AI_SERVICE', 'Dynamically importing ai-service.ts module...');
-        const aiModule = await import('../../lib/ai-service.ts');
-        logger.info('AI_SERVICE', 'AI service module loaded successfully');
-        return aiModule.gameAIService;
-      } catch (error) {
-        logger.error('AI_SERVICE', `Failed to load AI service: ${error.message}`, {
-          stack: error.stack
-        });
-        return null;
-      }
-    })();
-  }
-  return gameAIServicePromise;
+function getAIService() {
+  return gameAIService;
 }
 
 /**
@@ -41,7 +22,7 @@ async function getAIService() {
 async function isAIServiceAvailable() {
   logger.debug('AI_SERVICE', 'Checking AI service availability...');
   try {
-    const service = await getAIService();
+    const service = getAIService();
     if (!service) {
       logger.info('AI_SERVICE', 'AI service is not available (service is null)');
       return false;
@@ -66,13 +47,13 @@ async function validateWordWithAI(word, language = 'en') {
   logger.info('AI_SERVICE', `Starting AI validation for word: "${word}" (language: ${language})`);
 
   try {
-    const service = await getAIService();
+    const service = getAIService();
     if (!service) {
       logger.warn('AI_SERVICE', `AI service not available - cannot validate "${word}"`);
       return { isValid: false, isAiVerified: false, reason: 'AI service not available' };
     }
 
-    logger.debug('AI_SERVICE', `AI service loaded, calling validateAndSaveWord for "${word}"`);
+    logger.debug('AI_SERVICE', `Calling validateAndSaveWord for "${word}"`);
     const result = await service.validateAndSaveWord(word, language);
     const duration = Date.now() - startTime;
 
@@ -110,7 +91,7 @@ async function validateWordsWithAI(words, language = 'en') {
   });
 
   try {
-    const service = await getAIService();
+    const service = getAIService();
     if (!service) {
       logger.warn('AI_SERVICE', `AI service not available - cannot batch validate ${words.length} words`);
       words.forEach(word => {
@@ -119,7 +100,7 @@ async function validateWordsWithAI(words, language = 'en') {
       return results;
     }
 
-    logger.debug('AI_SERVICE', `AI service loaded, calling batch validateWords for ${words.length} words`);
+    logger.debug('AI_SERVICE', `Calling batch validateWords for ${words.length} words`);
 
     // Use the batch validation method
     const aiResults = await service.validateWords(words, language);
