@@ -12,6 +12,9 @@
 const { VertexAI } = require('@google-cloud/vertexai');
 const { createClient } = require('@supabase/supabase-js');
 
+// Minimum confidence threshold for AI to approve a word (85%)
+const MIN_CONFIDENCE_THRESHOLD = 85;
+
 // =============================================================================
 // Credential Parsing (Railway ENV-based)
 // =============================================================================
@@ -275,31 +278,39 @@ class GameAIService {
 
     const languageName = languageNames[language] || language;
 
-    const prompt = `You are a word validator for a Boggle-style word game. Your task is to determine if a word is valid.
+    const prompt = `You are a strict word validator for a Boggle-style word game. Your task is to determine if a word is valid with a confidence score.
 
 LANGUAGE: ${languageName} (${language})
 WORD TO VALIDATE: "${word}"
 
 VALIDATION RULES:
-1. The word must be a real word in ${languageName}
+1. The word must be a REAL, established word in ${languageName}
 2. ACCEPT: Common dictionary words, verbs in any conjugation, nouns (singular/plural), adjectives, adverbs
-3. ACCEPT: Common slang and colloquial words that native speakers would recognize
-4. ACCEPT: Informal but widely-used words
-5. REJECT: Proper nouns (names of people, places, brands) - these are NOT allowed in word games
-6. REJECT: Abbreviations and acronyms (e.g., "TV", "USA")
-7. REJECT: Words with spaces, hyphens, or special characters
-8. REJECT: Random letter combinations that aren't real words
-9. BE LENIENT: When in doubt about informal/slang words, lean towards accepting if a native speaker would recognize it
+3. ACCEPT: Well-established slang that appears in dictionaries
+4. REJECT: Proper nouns (names of people, places, brands) - these are NOT allowed in word games
+5. REJECT: Abbreviations and acronyms (e.g., "TV", "USA")
+6. REJECT: Words with spaces, hyphens, or special characters
+7. REJECT: Random letter combinations that aren't real words
+8. REJECT: Very obscure or archaic words that most native speakers wouldn't recognize
+9. BE STRICT: Only approve words you are highly confident about. When in doubt, reject the word.
+
+IMPORTANT: You must provide a confidence score (0-100) indicating how certain you are that this is a valid word.
+- 95-100: Absolutely certain - common, well-known word
+- 85-94: Very confident - established word, may be less common
+- 70-84: Moderately confident - possibly valid but uncertain
+- Below 70: Not confident - likely invalid or very obscure
 
 The word is case-insensitive (ignore capitalization).
 
 Respond with ONLY a valid JSON object in this exact format:
-{ "isValid": boolean, "reason": "brief explanation in English" }
+{ "isValid": boolean, "reason": "brief explanation in English", "confidence": number }
 
 Example responses:
-{ "isValid": true, "reason": "Common ${languageName} noun" }
-{ "isValid": false, "reason": "Proper noun - not allowed in word games" }
-{ "isValid": false, "reason": "Not a recognized ${languageName} word" }`;
+{ "isValid": true, "reason": "Common ${languageName} noun", "confidence": 98 }
+{ "isValid": true, "reason": "Valid ${languageName} verb conjugation", "confidence": 92 }
+{ "isValid": false, "reason": "Proper noun - not allowed in word games", "confidence": 95 }
+{ "isValid": false, "reason": "Not a recognized ${languageName} word", "confidence": 88 }
+{ "isValid": false, "reason": "Uncertain - may be valid but cannot confirm", "confidence": 60 }`;
 
     try {
       const result = await this.model.generateContent(prompt);
@@ -310,7 +321,7 @@ Example responses:
       const jsonMatch = text.match(/\{[\s\S]*\}/);
       if (!jsonMatch) {
         console.warn('[GameAIService] Could not extract JSON from AI response:', text);
-        return { isValid: false, reason: 'Failed to parse AI response' };
+        return { isValid: false, reason: 'Failed to parse AI response', confidence: 0 };
       }
 
       // Parse and validate
@@ -318,10 +329,23 @@ Example responses:
 
       if (typeof parsed.isValid !== 'boolean' || typeof parsed.reason !== 'string') {
         console.error('[GameAIService] AI response schema validation failed:', parsed);
-        return { isValid: false, reason: 'Invalid AI response format' };
+        return { isValid: false, reason: 'Invalid AI response format', confidence: 0 };
       }
 
-      return parsed;
+      // Ensure confidence is a number, default to 50 if not provided
+      const confidence = typeof parsed.confidence === 'number' ? parsed.confidence : 50;
+
+      // Apply confidence threshold - only approve if confidence >= 85%
+      if (parsed.isValid && confidence < MIN_CONFIDENCE_THRESHOLD) {
+        console.log(`[GameAIService] Word "${word}" rejected due to low confidence: ${confidence}% (threshold: ${MIN_CONFIDENCE_THRESHOLD}%)`);
+        return {
+          isValid: false,
+          reason: `Confidence too low (${confidence}%) - need ${MIN_CONFIDENCE_THRESHOLD}%+ to approve`,
+          confidence: confidence
+        };
+      }
+
+      return { ...parsed, confidence };
     } catch (error) {
       console.error('[GameAIService] AI validation error:', error);
       throw error;
