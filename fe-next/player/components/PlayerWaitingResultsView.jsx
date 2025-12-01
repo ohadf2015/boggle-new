@@ -65,11 +65,11 @@ const PlayerWaitingResultsView = ({
               </div>
 
               <div className="bg-neo-black text-neo-white px-6 py-4 font-black uppercase text-2xl md:text-3xl tracking-wider shadow-hard border-4 border-neo-black mb-4">
-                {t('playerView.waitingForResults')}
+                {t('playerView.calculatingScores') || t('playerView.waitingForResults')}
               </div>
 
               <p className="text-neo-black font-bold text-base uppercase tracking-wide">
-                {t('playerView.hostValidating') || 'Host is validating words...'}
+                {t('playerView.aiValidating') || 'AI is checking your words...'}
               </p>
 
               <div className="flex gap-3 mt-6 justify-center">
