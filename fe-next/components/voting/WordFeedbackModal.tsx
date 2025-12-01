@@ -51,15 +51,18 @@ interface WordFeedbackModalProps {
 }
 
 /**
- * Dictionary-focused encouragement sentences
- * Focus on building the dictionary, not judging the player
+ * Witty sentences about the word being validated
+ * Makes voting fun with humorous commentary
  */
-const getDictionarySentences = (t: (key: string, params?: Record<string, string>) => string) => [
-  t('wordFeedback.dictionary1') || 'Help us build a better dictionary!',
-  t('wordFeedback.dictionary2') || 'Your vote makes words official!',
-  t('wordFeedback.dictionary3') || 'Every vote improves the game!',
-  t('wordFeedback.dictionary4') || 'Be the word judge!',
-  t('wordFeedback.dictionary5') || 'Shape our dictionary together!',
+const getWittySentences = (t: (key: string, params?: Record<string, string>) => string, word: string, player: string) => [
+  t('wordFeedback.witty1', { player, word }) || `${player} claims "${word}" is totally a word...`,
+  t('wordFeedback.witty2', { player, word }) || 'Real word or creative genius? You decide!',
+  t('wordFeedback.witty3', { player, word }) || `${player} found "${word}" in their brain dictionary`,
+  t('wordFeedback.witty4', { player, word }) || `Webster called, they want to know about "${word}"`,
+  t('wordFeedback.witty5', { player, word }) || 'Sounds legit... or does it?',
+  t('wordFeedback.witty6', { player, word }) || `Is "${word}" a stroke of genius or madness?`,
+  t('wordFeedback.witty7', { player, word }) || `${player} swears this is a real word!`,
+  t('wordFeedback.witty8', { player, word }) || `The dictionary committee awaits your verdict on "${word}"`,
 ];
 
 /**
@@ -92,17 +95,17 @@ const WordFeedbackModal = memo<WordFeedbackModalProps>(({
   const totalWords = wordQueue.length > 0 ? wordQueue.length : 1;
   const hasMoreWords = currentWordIndex < totalWords - 1;
 
-  // Select random encouragement sentence when modal opens
+  // Select random witty sentence when modal opens or word changes
   useEffect(() => {
     if (isOpen && currentWord.word !== prevWordRef.current) {
       prevWordRef.current = currentWord.word;
-      const sentences = getDictionarySentences(t);
+      const sentences = getWittySentences(t, currentWord.word, currentWord.submittedBy);
       const validSentences = sentences.filter(s => s && !s.startsWith('wordFeedback.'));
       if (validSentences.length > 0) {
         const randomIndex = Math.floor(Math.random() * validSentences.length);
         setEncouragementSentence(validSentences[randomIndex]);
       } else {
-        setEncouragementSentence('Help us build a better dictionary!');
+        setEncouragementSentence(`${currentWord.submittedBy} claims "${currentWord.word}" is totally a word...`);
       }
       setRemainingTime(timeoutSeconds);
       setHasVoted(false);
@@ -112,7 +115,7 @@ const WordFeedbackModal = memo<WordFeedbackModalProps>(({
       setCurrentWordIndex(0);
       setVotedWords(new Set());
     }
-  }, [isOpen, currentWord.word, timeoutSeconds, t]);
+  }, [isOpen, currentWord.word, currentWord.submittedBy, timeoutSeconds, t]);
 
   // Countdown timer
   useEffect(() => {
@@ -284,6 +287,27 @@ const WordFeedbackModal = memo<WordFeedbackModalProps>(({
             <p className="text-center text-neo-black font-bold text-lg">
               {t('wordFeedback.question') || 'Is this a real word?'}
             </p>
+
+            {/* Submitter Info - Shows who found this word */}
+            {currentWord.submittedBy && (
+              <motion.div
+                initial={{ opacity: 0, x: -10 }}
+                animate={{ opacity: 1, x: 0 }}
+                className="flex items-center justify-center gap-2 text-neo-black/70"
+              >
+                {currentWord.submitterAvatar && (
+                  <Avatar
+                    emoji={currentWord.submitterAvatar.emoji}
+                    color={currentWord.submitterAvatar.color}
+                    profilePictureUrl={currentWord.submitterAvatar.profilePictureUrl}
+                    size="sm"
+                  />
+                )}
+                <span className="text-sm font-semibold">
+                  {t('wordFeedback.submittedBy') || 'Submitted by'}: <span className="font-bold text-neo-purple">{currentWord.submittedBy}</span>
+                </span>
+              </motion.div>
+            )}
 
             {/* Word Card - Cleaner, focused on the word */}
             <motion.div

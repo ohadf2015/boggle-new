@@ -1138,8 +1138,43 @@ function initializeSocketHandlers(io) {
         socket.emit('voteRecorded', { word, success: true });
         logger.info('VOTE', `${username} voted ${voteType} on "${word}"`);
 
-        // If word just became valid (crossed 6+ threshold), notify everyone
+        // If word just became valid (crossed 6+ threshold), award points to submitter
         if (result.isNowValid) {
+          // Find who submitted this word and award them points
+          const submitter = data.submittedBy;
+          if (submitter && game.playerWordDetails?.[submitter]) {
+            const wordDetail = game.playerWordDetails[submitter].find(wd => wd.word === word);
+            if (wordDetail && wordDetail.validated !== true) {
+              // Calculate the score for this word
+              const potentialScore = wordDetail.score || calculateWordScore(word, wordDetail.comboLevel || 0);
+
+              // Update the word as validated
+              wordDetail.validated = true;
+              wordDetail.validatedByCommunity = true;
+
+              // Update player's score
+              const currentScore = game.playerScores?.[submitter] || 0;
+              const newScore = currentScore + potentialScore;
+              updatePlayerScore(gameCode, submitter, newScore, false);
+
+              logger.info('VOTE', `Word "${word}" validated by community! Awarding ${potentialScore} points to ${submitter}`);
+
+              // Notify the submitter that their word was validated and they got points
+              const submitterData = game.users?.[submitter];
+              if (submitterData?.socketId) {
+                const submitterSocket = getSocketById(io, submitterData.socketId);
+                if (submitterSocket) {
+                  safeEmit(submitterSocket, 'wordValidatedByVotes', {
+                    word,
+                    score: potentialScore,
+                    newTotalScore: newScore
+                  });
+                }
+              }
+            }
+          }
+
+          // Notify everyone that the word became valid
           broadcastToRoom(io, getGameRoom(gameCode), 'wordBecameValid', {
             word,
             language: game.language || 'en'
@@ -2379,11 +2414,20 @@ async function calculateAndBroadcastFinalScores(io, gameCode) {
       const isValid = inDictionary || isAiValid;
       const isDuplicate = wordCountMap[word] > 1;
 
+      // Word is pending validation if:
+      // - Not in dictionary
+      // - Not AI validated (either not checked or AI said invalid)
+      // - Will be sent to community for voting
+      const isPendingValidation = !inDictionary && !isAiValid && nonDictionaryWords.includes(word);
+
       // Look up score and combo bonus from word details
       const wordDetail = playerWordDetailsList.find(wd => wd.word === word);
       const comboBonus = wordDetail?.comboBonus || 0;
       const storedComboLevel = wordDetail?.comboLevel || 0;
-      const wordScore = isValid ? (wordDetail?.score || calculateWordScore(word, storedComboLevel)) : 0;
+
+      // For pending words, calculate potential score but don't add to total yet
+      const potentialScore = wordDetail?.score || calculateWordScore(word, storedComboLevel);
+      const wordScore = isValid ? potentialScore : 0;
 
       // Only add to score if valid and not a duplicate
       if (isValid && !isDuplicate) {
@@ -2393,9 +2437,11 @@ async function calculateAndBroadcastFinalScores(io, gameCode) {
       wordObjects.push({
         word: word,
         score: isDuplicate ? 0 : wordScore,
+        potentialScore: isPendingValidation ? potentialScore : undefined, // Score if community validates
         comboBonus: comboBonus,
         validated: isValid,
         isDuplicate: isDuplicate,
+        isPendingValidation: isPendingValidation, // New flag for pending community validation
         isAiVerified: aiResult?.isAiVerified || wordDetail?.isAiVerified || false  // Track if AI verified
       });
     });

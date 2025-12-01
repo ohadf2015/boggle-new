@@ -22,6 +22,8 @@ interface WordObject {
   isDuplicate: boolean;
   comboBonus?: number;
   isAiVerified?: boolean;
+  isPendingValidation?: boolean;
+  potentialScore?: number;
 }
 
 interface Title {
@@ -85,6 +87,7 @@ const WordChip = memo<WordChipProps>(({ wordObj, playerCount }) => {
   const isDuplicate = wordObj.isDuplicate;
   const isValid = wordObj.validated;
   const isAiVerified = wordObj.isAiVerified;
+  const isPending = wordObj.isPendingValidation;
   const displayWord = applyHebrewFinalLetters(wordObj.word);
   const comboBonus = wordObj.comboBonus || 0;
 
@@ -93,13 +96,14 @@ const WordChip = memo<WordChipProps>(({ wordObj, playerCount }) => {
   // Get color based on score - Neo-Brutalist solid colors
   const getBackgroundColor = (): string => {
     if (isDuplicate) return 'var(--neo-orange)';
+    if (isPending) return 'var(--neo-purple)'; // Pending = purple (awaiting community vote)
     if (!isValid) return 'var(--neo-red, #ef4444)';
     return POINT_COLORS[wordObj.score] || POINT_COLORS[8];
   };
 
   // Get text color based on background - ensure readability
   const getTextColor = (): string => {
-    if (isDuplicate || !isValid) return 'var(--neo-cream)';
+    if (isDuplicate || !isValid || isPending) return 'var(--neo-cream)';
     // For cyan backgrounds (2-3 point words), use dark text for better contrast
     if (wordObj.score === 2 || wordObj.score === 3) return 'var(--neo-black)';
     return 'var(--neo-cream)';
@@ -111,7 +115,8 @@ const WordChip = memo<WordChipProps>(({ wordObj, playerCount }) => {
         className={cn(
           "inline-flex items-center gap-1 px-2 py-1 text-sm font-black uppercase border-2 border-neo-black rounded-neo shadow-hard-sm transition-all hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-hard",
           isDuplicate && "line-through opacity-80",
-          !isDuplicate && !isValid && "opacity-70"
+          !isDuplicate && !isValid && !isPending && "opacity-70",
+          isPending && "animate-pulse"
         )}
         style={{
           backgroundColor: getBackgroundColor(),
@@ -124,6 +129,31 @@ const WordChip = memo<WordChipProps>(({ wordObj, playerCount }) => {
           <span className="text-[10px] px-1 py-0.5 bg-neo-yellow text-neo-black rounded border border-neo-black font-black">
             +{comboBonus}
           </span>
+        )}
+        {/* Show pending validation indicator */}
+        {isPending && !isDuplicate && (
+          <TooltipProvider delayDuration={0}>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <span className="text-[10px] px-1 py-0.5 bg-neo-yellow text-neo-black rounded border border-neo-black font-black cursor-help">
+                  ?
+                </span>
+              </TooltipTrigger>
+              <TooltipContent
+                side="top"
+                className="bg-neo-purple border-2 border-neo-black shadow-hard rounded-neo p-2"
+              >
+                <p className="text-xs font-bold text-neo-cream">
+                  {t('results.pendingValidation') || 'Pending community validation'}
+                  {wordObj.potentialScore && (
+                    <span className="block text-neo-yellow mt-1">
+                      {t('results.potentialScore', { score: String(wordObj.potentialScore) }) || `+${wordObj.potentialScore} pts if approved`}
+                    </span>
+                  )}
+                </p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
         )}
         {/* Show AI verification indicator */}
         {isAiVerified && isValid && !isDuplicate && (
