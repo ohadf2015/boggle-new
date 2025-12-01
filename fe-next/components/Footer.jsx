@@ -3,6 +3,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { SiKofi } from 'react-icons/si';
 
 /**
  * Footer - Neo-Brutalist styled footer
@@ -20,7 +21,7 @@ export default function Footer() {
           </p>
 
           {/* Legal Links */}
-          <nav className="flex items-center gap-3">
+          <nav className="flex items-center gap-3 flex-wrap justify-center sm:justify-start">
             <Link
               href={`/${language}/legal/terms`}
               className="
@@ -44,6 +45,24 @@ export default function Footer() {
             >
               {t('legal.privacyPolicy')}
             </Link>
+            <span className="text-neo-cream/40 font-black">•</span>
+            <a
+              href="https://ko-fi.com/lexiclash"
+              target="_blank"
+              rel="noopener noreferrer"
+              title={t('support.kofiTooltip')}
+              className="
+                inline-flex items-center gap-1.5
+                text-sm font-bold uppercase tracking-wide
+                text-neo-pink hover:text-neo-yellow
+                transition-colors duration-100
+                hover:underline underline-offset-4 decoration-2
+                group
+              "
+            >
+              <SiKofi className="text-base group-hover:animate-bounce" />
+              <span>{t('support.kofiFooter')}</span>
+            </a>
           </nav>
         </div>
       </div>

@@ -1,8 +1,9 @@
-import React, { useEffect } from 'react';
-import { motion } from 'framer-motion';
+import React, { useEffect, useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { FaCrown, FaTrophy } from 'react-icons/fa';
 import { useLanguage } from '../../contexts/LanguageContext';
 import confetti from 'canvas-confetti';
+import { SiKofi } from 'react-icons/si';
 
 // Confetti burst on mount
 const fireConfetti = () => {
@@ -176,6 +177,77 @@ const ResultsWinnerBanner = ({ winner, isCurrentUserWinner }) => {
               </p>
             </div>
           </motion.div>
+
+          {/* Ko-fi Support Button - Shows after victory celebration */}
+          {isCurrentUserWinner && (
+            <motion.div
+              initial={{ opacity: 0, y: 20, scale: 0.9 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              transition={{ delay: 1.2, type: 'spring', stiffness: 120 }}
+              className="mt-6 flex justify-center"
+            >
+              <motion.a
+                href="https://ko-fi.com/lexiclash"
+                target="_blank"
+                rel="noopener noreferrer"
+                whileHover={{
+                  scale: 1.05,
+                  rotate: [0, -2, 2, 0],
+                  transition: { rotate: { duration: 0.3 } }
+                }}
+                whileTap={{ scale: 0.95 }}
+                onClick={() => {
+                  // Fire celebration confetti when clicking support
+                  confetti({
+                    particleCount: 50,
+                    spread: 60,
+                    origin: { y: 0.8 },
+                    colors: ['#FF5E5B', '#FFED66', '#00CECB'],
+                  });
+                }}
+                className="
+                  group
+                  inline-flex items-center gap-2
+                  px-5 py-3
+                  bg-gradient-to-r from-[#FF5E5B] to-[#FF1493]
+                  text-neo-cream
+                  font-black
+                  text-sm sm:text-base
+                  uppercase
+                  tracking-wide
+                  border-4 border-neo-black
+                  rounded-neo
+                  shadow-hard
+                  hover:shadow-hard-lg
+                  transition-shadow
+                  cursor-pointer
+                "
+                style={{ textShadow: '1px 1px 0px var(--neo-black)' }}
+              >
+                <motion.span
+                  animate={{
+                    rotate: [0, -10, 10, 0],
+                    scale: [1, 1.1, 1]
+                  }}
+                  transition={{
+                    duration: 2,
+                    repeat: Infinity,
+                    repeatDelay: 3
+                  }}
+                >
+                  <SiKofi className="text-xl" />
+                </motion.span>
+                <span>{t('support.kofiWinner')}</span>
+                <motion.span
+                  className="text-lg"
+                  animate={{ scale: [1, 1.2, 1] }}
+                  transition={{ duration: 0.5, repeat: Infinity, repeatDelay: 2 }}
+                >
+                  ☕
+                </motion.span>
+              </motion.a>
+            </motion.div>
+          )}
         </div>
       </div>
     </motion.div>

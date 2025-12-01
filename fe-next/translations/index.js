@@ -1006,6 +1006,11 @@ export const translations = {
       witty4: 'Webster called, they want to know about "{word}"',
       witty5: 'Sounds legit... or does it?',
       nowValid: 'is now a valid word!',
+    },
+    support: {
+      kofiWinner: 'Feeling Generous, Champ?',
+      kofiFooter: 'Buy Us a Coffee',
+      kofiTooltip: 'Support LexiClash development',
     }
   },
   he: {
@@ -2009,6 +2014,11 @@ export const translations = {
       witty4: 'האקדמיה ללשון התקשרה, רוצים לדעת על "{word}"',
       witty5: 'נשמע לגיטימי... או לא?',
       nowValid: 'היא עכשיו מילה חוקית!',
+    },
+    support: {
+      kofiWinner: 'מרגיש נדיב, אלוף?',
+      kofiFooter: 'קנה לנו קפה',
+      kofiTooltip: 'תמוך בפיתוח לקסיקלאש',
     }
   },
   sv: {
@@ -2949,6 +2959,11 @@ export const translations = {
       witty4: 'Svenska Akademien ringde, de vill veta om "{word}"',
       witty5: 'Låter legit... eller?',
       nowValid: 'är nu ett giltigt ord!',
+    },
+    support: {
+      kofiWinner: 'Känn dig generös, mästare?',
+      kofiFooter: 'Köp oss en kaffe',
+      kofiTooltip: 'Stöd LexiClash-utveckling',
     }
   },
   ja: {
@@ -3889,6 +3904,11 @@ export const translations = {
       witty4: '辞書編集者が電話してきました、「{word}」について知りたいそうです',
       witty5: '正しそうに聞こえる...本当に？',
       nowValid: 'は有効な単語になりました！',
+    },
+    support: {
+      kofiWinner: '勝者の余裕で応援してね！',
+      kofiFooter: 'コーヒーをおごる',
+      kofiTooltip: 'LexiClashの開発を応援',
     }
   }
 };
