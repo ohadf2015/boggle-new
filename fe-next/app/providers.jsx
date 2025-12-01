@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect } from 'react';
 import { ThemeProvider } from '@/utils/ThemeContext';
 import { LanguageProvider } from '@/contexts/LanguageContext';
 import { AuthProvider } from '@/contexts/AuthContext';
@@ -8,13 +9,46 @@ import { SoundEffectsProvider } from '@/contexts/SoundEffectsContext';
 import { AchievementQueueProvider } from '@/components/achievements';
 import { Toaster } from 'react-hot-toast';
 import ErrorBoundary from './components/ErrorBoundary';
-import LogRocket from 'logrocket';
 
-if (typeof window !== 'undefined' && window.location.hostname !== 'localhost') {
-    LogRocket.init('ioiov9/lexiclash');
-}
+// Lazy load LogRocket after user interaction to save ~100KB on initial load
+let logRocketInitialized = false;
+const initLogRocket = () => {
+    if (logRocketInitialized) return;
+    if (typeof window === 'undefined' || window.location.hostname === 'localhost') return;
+
+    logRocketInitialized = true;
+    import('logrocket').then(({ default: LogRocket }) => {
+        LogRocket.init('ioiov9/lexiclash');
+    });
+};
 
 export function Providers({ children, lang }) {
+    // Defer LogRocket initialization for slow connections
+    // Load after 3 seconds or on first user interaction, whichever comes first
+    useEffect(() => {
+        const timeoutId = setTimeout(initLogRocket, 3000);
+
+        const events = ['click', 'touchstart', 'keydown'];
+        const handleInteraction = () => {
+            clearTimeout(timeoutId);
+            initLogRocket();
+            events.forEach(event => {
+                window.removeEventListener(event, handleInteraction);
+            });
+        };
+
+        events.forEach(event => {
+            window.addEventListener(event, handleInteraction, { once: true, passive: true });
+        });
+
+        return () => {
+            clearTimeout(timeoutId);
+            events.forEach(event => {
+                window.removeEventListener(event, handleInteraction);
+            });
+        };
+    }, []);
+
     return (
         <ErrorBoundary>
             <>

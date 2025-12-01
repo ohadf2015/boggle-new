@@ -210,6 +210,13 @@ export default async function LocaleLayout({ children, params }) {
         <html lang={locale} dir={dir} className={`${fredoka.variable} ${rubik.variable}`}>
             <head>
                 <meta charSet="utf-8" />
+                {/* Preconnect hints for faster resource loading on slow connections */}
+                <link rel="preconnect" href="https://fonts.googleapis.com" />
+                <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+                <link rel="preconnect" href="https://hdtmpkicuxvtmvrmtybx.supabase.co" />
+                <link rel="dns-prefetch" href="https://fonts.googleapis.com" />
+                <link rel="dns-prefetch" href="https://fonts.gstatic.com" />
+                <link rel="dns-prefetch" href="https://hdtmpkicuxvtmvrmtybx.supabase.co" />
                 <link rel="icon" href="/favicon.ico" sizes="48x48 32x32 16x16" />
                 <link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png" />
                 <link rel="icon" type="image/png" sizes="512x512" href="/icon-512.png" />
