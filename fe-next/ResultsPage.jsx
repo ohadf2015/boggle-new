@@ -140,9 +140,10 @@ const ResultsPage = ({ finalScores, letterGrid, gameCode, onReturnToRoom, userna
   // previousStreak needs to be state since it's used in render
   const [previousStreak, setPreviousStreak] = useState(0);
 
-  // Word feedback state for crowd-sourced word validation
+  // Word feedback state for crowd-sourced word validation (self-healing system)
   const [showWordFeedback, setShowWordFeedback] = useState(false);
   const [wordToVote, setWordToVote] = useState(null);
+  const [wordQueue, setWordQueue] = useState([]); // Multiple words for self-healing
 
   // XP and Level state (received via socket after game ends)
   const [xpGainedData, setXpGainedData] = useState(null);
@@ -354,10 +355,18 @@ const ResultsPage = ({ finalScores, letterGrid, gameCode, onReturnToRoom, userna
 
     const handleShowWordFeedback = (data) => {
       logger.log('[RESULTS] Received word feedback request:', data);
+
+      // Handle new word queue format (self-healing system)
+      if (data.wordQueue && data.wordQueue.length > 0) {
+        setWordQueue(data.wordQueue);
+        logger.log('[RESULTS] Word queue with', data.wordQueue.length, 'words for voting');
+      }
+
       setWordToVote({
         word: data.word,
         submittedBy: data.submittedBy,
         submitterAvatar: data.submitterAvatar,
+        voteInfo: data.voteInfo,
         timeoutSeconds: data.timeoutSeconds || 10,
         gameCode: data.gameCode,
         language: data.language
@@ -407,28 +416,32 @@ const ResultsPage = ({ finalScores, letterGrid, gameCode, onReturnToRoom, userna
     };
   }, [socket]);
 
-  // Handle word feedback vote
-  const handleVote = useCallback((voteType) => {
+  // Handle word feedback vote (supports multi-word queue from self-healing system)
+  const handleVote = useCallback((voteType, votedWord) => {
     if (!socket || !wordToVote) return;
 
-    logger.log('[RESULTS] Submitting vote:', { word: wordToVote.word, voteType });
+    // Use the specific word being voted on, or fall back to current word
+    const wordToSubmit = votedWord || wordToVote.word;
+
+    logger.log('[RESULTS] Submitting vote:', { word: wordToSubmit, voteType });
     socket.emit('submitWordVote', {
-      word: wordToVote.word,
+      word: wordToSubmit,
       language: wordToVote.language,
       gameCode: wordToVote.gameCode,
       voteType,
       submittedBy: wordToVote.submittedBy
     });
 
-    setShowWordFeedback(false);
-    setWordToVote(null);
+    // Note: Modal handles moving to next word internally via word queue
+    // Only close when modal calls onSkip/onTimeout (after all words)
   }, [socket, wordToVote]);
 
-  // Handle word feedback skip/timeout
+  // Handle word feedback skip/timeout (clears queue for self-healing system)
   const handleFeedbackSkip = useCallback(() => {
     logger.log('[RESULTS] Skipping word feedback');
     setShowWordFeedback(false);
     setWordToVote(null);
+    setWordQueue([]); // Clear the queue
   }, []);
 
   // Scroll to play again section
@@ -662,12 +675,14 @@ const ResultsPage = ({ finalScores, letterGrid, gameCode, onReturnToRoom, userna
         onClose={() => setShowFirstWinModal(false)}
       />
 
-      {/* Word Feedback Modal - Crowd-sourced word validation */}
+      {/* Word Feedback Modal - Self-healing dictionary validation */}
       <WordFeedbackModal
         isOpen={showWordFeedback && wordToVote !== null}
         word={wordToVote?.word || ''}
         submittedBy={wordToVote?.submittedBy || ''}
         submitterAvatar={wordToVote?.submitterAvatar}
+        voteInfo={wordToVote?.voteInfo}
+        wordQueue={wordQueue}
         timeoutSeconds={wordToVote?.timeoutSeconds || 15}
         onVote={handleVote}
         onSkip={handleFeedbackSkip}

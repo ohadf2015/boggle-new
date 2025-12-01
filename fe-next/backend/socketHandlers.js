@@ -72,7 +72,7 @@ const { checkAndAwardAchievements, getPlayerAchievements, ACHIEVEMENTS, getLocal
 const { calculatePlayerTitles } = require('./modules/playerTitlesManager');
 const { isDictionaryWord, getAvailableDictionaries, addApprovedWord, normalizeWord, getRandomLongWords } = require('./dictionary');
 const { incrementWordApproval } = require('./redisClient');
-const { loadCommunityWords, collectNonDictionaryWords, getWordForPlayer, recordVote } = require('./modules/communityWordManager');
+const { loadCommunityWords, collectNonDictionaryWords, getWordForPlayer, getWordsForPlayer, recordVote, updatePendingCache, SELF_HEALING_CONFIG } = require('./modules/communityWordManager');
 const { validateWordWithAI, validateWordsWithAI, isAIServiceAvailable } = require('./modules/aiValidationService');
 const gameStartCoordinator = require('./utils/gameStartCoordinator');
 const timerManager = require('./utils/timerManager');
@@ -1101,6 +1101,9 @@ function initializeSocketHandlers(io) {
       });
 
       if (result.success) {
+        // Update the in-memory cache for prioritized word selection
+        updatePendingCache(word, game.language || 'en', voteType);
+
         socket.emit('voteRecorded', { word, success: true });
         logger.info('VOTE', `${username} voted ${voteType} on "${word}"`);
 
@@ -2086,26 +2089,34 @@ async function endGame(io, gameCode) {
   logger.info('GAME', `Game ${gameCode} ended. ${nonDictWords.length} non-dictionary words found, ${playerCount} players.`);
 
   // Send word feedback to each player AFTER results are shown (they vote on words they didn't submit)
+  // SELF-HEALING: Now sends multiple prioritized words per player for better validation coverage
   if (nonDictWords.length > 0 && playerCount > 1) {
-    logger.debug('FEEDBACK', `Will show word feedback to players on results page (non-dict words: ${nonDictWords.length}, players: ${playerCount})`);
+    const wordsPerPlayer = Math.min(SELF_HEALING_CONFIG.WORDS_PER_PLAYER, nonDictWords.length);
+    logger.debug('FEEDBACK', `Will show ${wordsPerPlayer} words per player for voting (non-dict words: ${nonDictWords.length}, players: ${playerCount})`);
 
     // Small delay to ensure results page has loaded first
     setTimeout(() => {
       for (const [username, userData] of Object.entries(game.users)) {
-        const wordForPlayer = getWordForPlayer(nonDictWords, username);
+        // Get multiple prioritized words for this player
+        const wordsForPlayer = getWordsForPlayer(nonDictWords, username, game.language || 'en', wordsPerPlayer);
 
-        if (wordForPlayer) {
+        if (wordsForPlayer.length > 0) {
           const playerSocket = getSocketById(io, userData.socketId);
           if (playerSocket) {
+            // Send all words in a single event - UI will show them in sequence
             safeEmit(playerSocket, 'showWordFeedback', {
-              word: wordForPlayer.word,
-              submittedBy: wordForPlayer.submittedBy,
-              submitterAvatar: wordForPlayer.submitterAvatar,
+              // First word for backward compatibility
+              word: wordsForPlayer[0].word,
+              submittedBy: wordsForPlayer[0].submittedBy,
+              submitterAvatar: wordsForPlayer[0].submitterAvatar,
+              voteInfo: wordsForPlayer[0].voteInfo,
+              // Full queue of words for the new multi-word UI
+              wordQueue: wordsForPlayer,
               timeoutSeconds: FEEDBACK_TIMEOUT_SECONDS,
               gameCode,
               language: game.language || 'en'
             });
-            logger.debug('FEEDBACK', `Sent word "${wordForPlayer.word}" to ${username} for feedback`);
+            logger.debug('FEEDBACK', `Sent ${wordsForPlayer.length} words to ${username} for feedback: ${wordsForPlayer.map(w => w.word).join(', ')}`);
           }
         }
       }
