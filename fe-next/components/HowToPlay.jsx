@@ -272,12 +272,12 @@ const ComboVisualizer = ({ t }) => {
   const [isAnimating, setIsAnimating] = useState(false);
 
   const comboTiers = [
-    { level: '0-2', multiplier: '1.0x', color: 'bg-gray-400', bonus: t('howToPlay.combo.noBonus') },
-    { level: '3-4', multiplier: '1.25x', color: 'bg-neo-cyan', bonus: '+25%' },
-    { level: '5-6', multiplier: '1.5x', color: 'bg-neo-lime', bonus: '+50%' },
-    { level: '7-8', multiplier: '1.75x', color: 'bg-neo-yellow', bonus: '+75%' },
-    { level: '9-10', multiplier: '2.0x', color: 'bg-neo-orange', bonus: '+100%' },
-    { level: '11+', multiplier: '2.25x', color: 'bg-neo-pink', bonus: '+125%' },
+    { level: '0', multiplier: '1.0x', color: 'bg-gray-400', bonus: t('howToPlay.combo.noBonus') },
+    { level: '1-2', multiplier: '+1-2', color: 'bg-neo-cyan', bonus: '+1-2' },
+    { level: '3-4', multiplier: '+3-4', color: 'bg-neo-lime', bonus: '+3-4' },
+    { level: '5-6', multiplier: '+5-6', color: 'bg-neo-yellow', bonus: '+5-6' },
+    { level: '7-8', multiplier: '+7-8', color: 'bg-neo-orange', bonus: '+7-8' },
+    { level: '9+', multiplier: '+10', color: 'bg-neo-pink', bonus: '+10 max' },
   ];
 
   const simulateCombo = () => {
@@ -300,11 +300,11 @@ const ComboVisualizer = ({ t }) => {
   };
 
   const getCurrentTier = () => {
-    if (comboLevel <= 2) return 0;
-    if (comboLevel <= 4) return 1;
-    if (comboLevel <= 6) return 2;
-    if (comboLevel <= 8) return 3;
-    if (comboLevel <= 10) return 4;
+    if (comboLevel <= 0) return 0;
+    if (comboLevel <= 2) return 1;
+    if (comboLevel <= 4) return 2;
+    if (comboLevel <= 6) return 3;
+    if (comboLevel <= 8) return 4;
     return 5;
   };
 
