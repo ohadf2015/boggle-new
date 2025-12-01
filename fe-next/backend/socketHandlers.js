@@ -80,14 +80,12 @@ const {
   recordVote,
   updatePendingCache,
   SELF_HEALING_CONFIG,
-  // Hybrid validation (cost-saving)
-  shouldUseAIValidation,
-  recordAIValidationUsed,
+  // Hybrid validation (cost-saving) - used at game end for batch validation
   filterWordsForAIValidation,
   resetGameAIValidationCount,
   cleanupGameTracking
 } = require('./modules/communityWordManager');
-const { validateWordWithAI, validateWordsWithAI, isAIServiceAvailable } = require('./modules/aiValidationService');
+const { validateWordsWithAI, isAIServiceAvailable } = require('./modules/aiValidationService');
 const gameStartCoordinator = require('./utils/gameStartCoordinator');
 const timerManager = require('./utils/timerManager');
 const { checkRateLimit, resetRateLimit } = require('./utils/rateLimiter');
@@ -900,134 +898,36 @@ function initializeSocketHandlers(io) {
             socket.emit('liveAchievementUnlocked', { achievements });
           }
         } else {
-          // Check if host is playing solo
-          const playerCount = Object.keys(game.users).length;
-          const isHostSoloGame = playerCount === 1;
+          // Non-dictionary word: queue for validation at game end (batch AI validation)
+          // This applies to both solo and multiplayer games - no AI validation during game
+          // IMPORTANT: Preserve combo data even for non-dictionary words
+          // so that if validated at game end, combo bonus is applied
+          const safeComboLevel = Math.max(0, Math.min(10, parseInt(comboLevel) || 0));
+          const baseScore = normalizedWord.length - 1;
+          const potentialScore = calculateWordScore(normalizedWord, safeComboLevel);
+          const comboBonus = potentialScore - baseScore;
 
-          if (isHostSoloGame) {
-            // Solo host game: try AI validation for non-dictionary words
-            // HYBRID APPROACH: Check if we should use AI (cost-saving)
-            const aiDecision = shouldUseAIValidation(normalizedWord, game.language || 'en', gameCode);
+          // Store combo level server-side for STREAK_MASTER achievement tracking
+          if (!game.playerCombos) game.playerCombos = {};
+          game.playerCombos[username] = safeComboLevel;
 
-            let aiResult;
-            if (aiDecision.shouldValidate) {
-              // Emit event to show AI validation indicator to the player
-              socket.emit('wordValidatingWithAI', {
-                word: normalizedWord,
-                message: 'AI is checking your word...'
-              });
+          addPlayerWord(gameCode, username, normalizedWord, {
+            autoValidated: false,
+            score: 0,  // Keep score 0 until validated at game end
+            comboBonus: comboBonus,     // Preserve combo bonus for later validation
+            comboLevel: safeComboLevel  // Preserve combo level for later validation
+          });
 
-              aiResult = await validateWordWithAI(normalizedWord, game.language || 'en');
+          inc('wordNeedsValidation');
+          incPerGame(gameCode, 'wordNeedsValidation');
+          socket.emit('wordNeedsValidation', {
+            word: normalizedWord,
+            message: 'Word will be validated at game end'
+          });
 
-              // Track AI usage for this game
-              recordAIValidationUsed(gameCode);
-            } else {
-              // Use alternative result from hybrid check (community/pattern/limit)
-              aiResult = {
-                isValid: aiDecision.alternativeResult?.isValid || false,
-                isAiVerified: false,
-                reason: aiDecision.reason
-              };
-              logger.debug('SOCKET', `Hybrid validation for "${normalizedWord}": ${aiDecision.reason} (isValid: ${aiResult.isValid})`);
-            }
-
-            if (aiResult.isValid) {
-              // AI validated the word!
-              const safeComboLevel = Math.max(0, Math.min(10, parseInt(comboLevel) || 0));
-              const baseScore = normalizedWord.length - 1;
-              const wordScore = calculateWordScore(normalizedWord, safeComboLevel);
-              const comboBonus = wordScore - baseScore;
-
-              // Store combo level
-              if (!game.playerCombos) game.playerCombos = {};
-              game.playerCombos[username] = safeComboLevel;
-
-              // Add word with AI verification flag
-              addPlayerWord(gameCode, username, normalizedWord, {
-                autoValidated: true,  // Treated as auto-validated since AI approved
-                score: wordScore,
-                comboBonus: comboBonus,
-                comboLevel: safeComboLevel,
-                isAiVerified: aiResult.isAiVerified  // Track AI verification
-              });
-
-              updatePlayerScore(gameCode, username, wordScore, true);
-
-              inc('wordAccepted');
-              incPerGame(gameCode, 'wordAccepted');
-              socket.emit('wordAccepted', {
-                word: normalizedWord,
-                score: wordScore,
-                baseScore: baseScore,
-                comboBonus: comboBonus,
-                comboLevel: safeComboLevel,
-                autoValidated: false,  // Non-dictionary words don't continue combo even if AI approves
-                isAiVerified: aiResult.isAiVerified
-              });
-
-              logger.info('SOCKET', `Solo host game - AI verified word: "${normalizedWord}" (source: ${aiResult.isAiVerified ? 'AI' : 'database'})`);
-
-              // Check for achievements
-              const achievements = checkAndAwardAchievements(gameCode, username, normalizedWord);
-              if (achievements.length > 0) {
-                socket.emit('liveAchievementUnlocked', { achievements });
-              }
-            } else {
-              // AI rejected the word
-              inc('wordNotValid');
-              incPerGame(gameCode, 'wordNotValid');
-
-              // Add word to playerWordDetails as invalid to track for achievements
-              addPlayerWord(gameCode, username, normalizedWord, {
-                autoValidated: false,
-                score: 0,
-                comboBonus: 0,
-                comboLevel: 0,
-                validated: false,
-                isAiVerified: false
-              });
-
-              // Reset combo level since invalid word breaks combo
-              if (!game.playerCombos) game.playerCombos = {};
-              game.playerCombos[username] = 0;
-
-              socket.emit('wordRejected', {
-                word: normalizedWord,
-                reason: 'notInDictionary'
-              });
-              logger.debug('SOCKET', `Solo host game - AI rejected non-dictionary word: "${normalizedWord}"`);
-            }
-          } else {
-            // Multi-player game: word needs host validation
-            // IMPORTANT: Preserve combo data even for non-dictionary words
-            // so that if host validates the word, combo bonus is applied
-            const safeComboLevel = Math.max(0, Math.min(10, parseInt(comboLevel) || 0));
-            const baseScore = normalizedWord.length - 1;
-            const potentialScore = calculateWordScore(normalizedWord, safeComboLevel);
-            const comboBonus = potentialScore - baseScore;
-
-            // Store combo level server-side for STREAK_MASTER achievement tracking
-            if (!game.playerCombos) game.playerCombos = {};
-            game.playerCombos[username] = safeComboLevel;
-
-            addPlayerWord(gameCode, username, normalizedWord, {
-              autoValidated: false,
-              score: 0,  // Keep score 0 until validated
-              comboBonus: comboBonus,     // Preserve combo bonus for later validation
-              comboLevel: safeComboLevel  // Preserve combo level for later validation
-            });
-
-            inc('wordNeedsValidation');
-            incPerGame(gameCode, 'wordNeedsValidation');
-            socket.emit('wordNeedsValidation', {
-              word: normalizedWord,
-              message: 'Word will be validated by host'
-            });
-
-            // DO NOT check achievements for non-validated words
-            // Achievements will be checked when host validates the word
-            // This prevents awarding achievements like PERFECTIONIST for invalid words
-          }
+          // DO NOT check achievements for non-validated words
+          // Achievements will be checked when the word is validated at game end
+          // This prevents awarding achievements like PERFECTIONIST for invalid words
         }
 
         const lbThrottleMs = parseInt(process.env.LEADERBOARD_THROTTLE_MS || '500');

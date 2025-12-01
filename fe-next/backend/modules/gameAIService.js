@@ -102,6 +102,7 @@ class GameAIService {
   constructor() {
     this.vertexAI = null;
     this.model = null;
+    this.batchModel = null; // Separate model for batch validation with higher token limit
     this.supabaseAdmin = null;
     this.credentials = null;
     this.initialized = false;
@@ -133,12 +134,21 @@ class GameAIService {
         },
       });
 
-      // Get the Gemini 1.5 Flash model
+      // Get the Gemini 1.5 Flash model for single word validation
       this.model = this.vertexAI.getGenerativeModel({
         model: process.env.VERTEX_AI_MODEL || 'gemini-1.5-flash-002',
         generationConfig: {
           maxOutputTokens: 256,
           temperature: 0.1, // Low temperature for consistent validation
+        },
+      });
+
+      // Get a separate model for batch validation with higher token limit
+      this.batchModel = this.vertexAI.getGenerativeModel({
+        model: process.env.VERTEX_AI_MODEL || 'gemini-1.5-flash-002',
+        generationConfig: {
+          maxOutputTokens: 2048, // Higher limit for batch responses (100 chars per word × 20 words max)
+          temperature: 0.1,
         },
       });
 
@@ -661,8 +671,8 @@ Example responses:
    * @returns {Promise<Array<{isValid: boolean, reason: string, confidence: number}>>}
    */
   async batchValidateWithAI(words, language) {
-    if (!this.model) {
-      throw new Error('Vertex AI model not initialized');
+    if (!this.batchModel) {
+      throw new Error('Vertex AI batch model not initialized');
     }
 
     const languageNames = {
@@ -707,9 +717,12 @@ Example response format:
 ]`;
 
     try {
-      const result = await this.model.generateContent(prompt);
+      const result = await this.batchModel.generateContent(prompt);
       const response = result.response;
       const text = response.candidates?.[0]?.content?.parts?.[0]?.text || '';
+
+      // Log raw response for debugging (first 500 chars)
+      console.log(`[GameAIService] Batch AI raw response (${text.length} chars): ${text.substring(0, 500)}${text.length > 500 ? '...' : ''}`);
 
       // Extract JSON array from response
       let cleanText = text;
@@ -720,7 +733,8 @@ Example response format:
 
       const jsonMatch = cleanText.match(/\[[\s\S]*\]/);
       if (!jsonMatch) {
-        console.warn('[GameAIService] Could not extract JSON array from batch AI response');
+        // Log the full response when extraction fails to help debug
+        console.error('[GameAIService] Could not extract JSON array from batch AI response. Full response:', text);
         // Return all as invalid
         return words.map(w => ({ isValid: false, reason: 'Failed to parse AI response', confidence: 0 }));
       }
