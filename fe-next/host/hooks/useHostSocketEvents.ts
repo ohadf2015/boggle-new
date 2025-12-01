@@ -131,40 +131,58 @@ const useHostSocketEvents = ({
   // Exit ref
   intentionalExitRef,
 }: UseHostSocketEventsProps): void => {
+  // Reset combo helper - defined first since handleWordAccepted depends on it
+  const resetCombo = useCallback(() => {
+    setComboLevel(0);
+    comboLevelRef.current = 0;
+    setLastWordTime(null);
+    lastWordTimeRef.current = null;
+    if (comboTimeoutRef.current) {
+      clearTimeout(comboTimeoutRef.current);
+    }
+  }, [setComboLevel, setLastWordTime, comboLevelRef, lastWordTimeRef, comboTimeoutRef]);
+
   // Handle word accepted (for host playing)
   const handleWordAccepted = useCallback((data: any) => {
     if (!hostPlaying) return;
 
     const now = Date.now();
-    let newComboLevel: number;
-    const currentComboLevel = comboLevelRef.current;
-    const currentLastWordTime = lastWordTimeRef.current;
+    let newComboLevel = 0;
 
-    const comboChainWindow = Math.min(3000 + currentComboLevel * 1000, 10000);
-    if (currentLastWordTime && (now - currentLastWordTime) < comboChainWindow) {
-      newComboLevel = currentComboLevel + 1;
-      setComboLevel(newComboLevel);
-      comboLevelRef.current = newComboLevel;
-      playComboSound(newComboLevel);
+    if (data.autoValidated) {
+      // Word was in dictionary - combo can continue
+      const currentComboLevel = comboLevelRef.current;
+      const currentLastWordTime = lastWordTimeRef.current;
+
+      const comboChainWindow = Math.min(3000 + currentComboLevel * 1000, 10000);
+      if (currentLastWordTime && (now - currentLastWordTime) < comboChainWindow) {
+        newComboLevel = currentComboLevel + 1;
+        setComboLevel(newComboLevel);
+        comboLevelRef.current = newComboLevel;
+        playComboSound(newComboLevel);
+      } else {
+        newComboLevel = 0;
+        setComboLevel(0);
+        comboLevelRef.current = 0;
+      }
+      setLastWordTime(now);
+      lastWordTimeRef.current = now;
+
+      if (comboTimeoutRef.current) {
+        clearTimeout(comboTimeoutRef.current);
+      }
+
+      const comboTimeout = Math.min(3000 + newComboLevel * 1000, 10000);
+      comboTimeoutRef.current = setTimeout(() => {
+        setComboLevel(0);
+        comboLevelRef.current = 0;
+        setLastWordTime(null);
+        lastWordTimeRef.current = null;
+      }, comboTimeout);
     } else {
-      newComboLevel = 0;
-      setComboLevel(0);
-      comboLevelRef.current = 0;
+      // Word was NOT in dictionary (AI-validated or host-validated) - reset combo
+      resetCombo();
     }
-    setLastWordTime(now);
-    lastWordTimeRef.current = now;
-
-    if (comboTimeoutRef.current) {
-      clearTimeout(comboTimeoutRef.current);
-    }
-
-    const comboTimeout = Math.min(3000 + newComboLevel * 1000, 10000);
-    comboTimeoutRef.current = setTimeout(() => {
-      setComboLevel(0);
-      comboLevelRef.current = 0;
-      setLastWordTime(null);
-      lastWordTimeRef.current = null;
-    }, comboTimeout);
 
     const baseScore = data.word.length - 1;
     const comboBonus = (data.score || baseScore) - baseScore;
@@ -176,18 +194,7 @@ const useHostSocketEvents = ({
       comboBonusLabel: t('common.comboBonus'),
       duration: 2000
     });
-  }, [hostPlaying, playComboSound, setComboLevel, setLastWordTime, comboLevelRef, lastWordTimeRef, comboTimeoutRef, t]);
-
-  // Reset combo helper
-  const resetCombo = useCallback(() => {
-    setComboLevel(0);
-    comboLevelRef.current = 0;
-    setLastWordTime(null);
-    lastWordTimeRef.current = null;
-    if (comboTimeoutRef.current) {
-      clearTimeout(comboTimeoutRef.current);
-    }
-  }, [setComboLevel, setLastWordTime, comboLevelRef, lastWordTimeRef, comboTimeoutRef]);
+  }, [hostPlaying, playComboSound, setComboLevel, setLastWordTime, comboLevelRef, lastWordTimeRef, comboTimeoutRef, t, resetCombo]);
 
   // Use refs for onShowResults and tableData to avoid stale closure issues during game end race condition
   const onShowResultsRef = useRef(onShowResults);

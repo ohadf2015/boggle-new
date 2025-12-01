@@ -961,7 +961,7 @@ function initializeSocketHandlers(io) {
                 baseScore: baseScore,
                 comboBonus: comboBonus,
                 comboLevel: safeComboLevel,
-                autoValidated: true,
+                autoValidated: false,  // Non-dictionary words don't continue combo even if AI approves
                 isAiVerified: aiResult.isAiVerified
               });
 
