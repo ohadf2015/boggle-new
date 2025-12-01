@@ -314,6 +314,7 @@ class GameAIService {
 
     const languageNames: Record<string, string> = {
       en: 'English',
+      he: 'Hebrew',
       sv: 'Swedish',
       es: 'Spanish',
       fr: 'French',
@@ -328,7 +329,31 @@ class GameAIService {
 
     const languageName = languageNames[language] || language;
 
-    const prompt = `You are a lenient word game judge. Is '${word}' a valid word in ${languageName}? Accept slang if it is commonly used. Ignore case. Return ONLY a JSON object: { "isValid": boolean, "reason": string }.`;
+    const prompt = `You are a word validator for a Boggle-style word game. Your task is to determine if a word is valid.
+
+LANGUAGE: ${languageName} (${language})
+WORD TO VALIDATE: "${word}"
+
+VALIDATION RULES:
+1. The word must be a real word in ${languageName}
+2. ACCEPT: Common dictionary words, verbs in any conjugation, nouns (singular/plural), adjectives, adverbs
+3. ACCEPT: Common slang and colloquial words that native speakers would recognize
+4. ACCEPT: Informal but widely-used words
+5. REJECT: Proper nouns (names of people, places, brands) - these are NOT allowed in word games
+6. REJECT: Abbreviations and acronyms (e.g., "TV", "USA")
+7. REJECT: Words with spaces, hyphens, or special characters
+8. REJECT: Random letter combinations that aren't real words
+9. BE LENIENT: When in doubt about informal/slang words, lean towards accepting if a native speaker would recognize it
+
+The word is case-insensitive (ignore capitalization).
+
+Respond with ONLY a valid JSON object in this exact format:
+{ "isValid": boolean, "reason": "brief explanation in English" }
+
+Example responses:
+{ "isValid": true, "reason": "Common ${languageName} noun" }
+{ "isValid": false, "reason": "Proper noun - not allowed in word games" }
+{ "isValid": false, "reason": "Not a recognized ${languageName} word" }`;
 
     try {
       const result = await this.model.generateContent(prompt);
