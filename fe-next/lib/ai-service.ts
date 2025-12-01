@@ -505,7 +505,7 @@ class GameAIService {
       return filteredWords;
     } catch (error) {
       if (error instanceof z.ZodError) {
-        console.error('[GameAIService] Themed words schema validation failed:', error.errors);
+        console.error('[GameAIService] Themed words schema validation failed:', error.issues);
         return [];
       }
       console.error('[GameAIService] generateThemedBoard error:', error);
