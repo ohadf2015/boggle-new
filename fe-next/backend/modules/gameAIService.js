@@ -132,7 +132,7 @@ class GameAIService {
 
       // Get the Gemini 1.5 Flash model
       this.model = this.vertexAI.getGenerativeModel({
-        model: process.env.VERTEX_AI_MODEL || 'gemini-1.5-flash-001',
+        model: process.env.VERTEX_AI_MODEL || 'gemini-1.5-flash-002',
         generationConfig: {
           maxOutputTokens: 256,
           temperature: 0.1, // Low temperature for consistent validation
