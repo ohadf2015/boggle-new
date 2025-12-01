@@ -2,7 +2,8 @@ import { useEffect, useCallback, useRef, MutableRefObject, RefObject } from 'rea
 import { Socket } from 'socket.io-client';
 import confetti from 'canvas-confetti';
 import gsap from 'gsap';
-import { wordAcceptedToast, wordNeedsValidationToast, wordErrorToast, neoSuccessToast, neoErrorToast, neoInfoToast } from '../../components/NeoToast';
+import toast from 'react-hot-toast';
+import { wordAcceptedToast, wordNeedsValidationToast, wordAIValidatingToast, wordErrorToast, neoSuccessToast, neoErrorToast, neoInfoToast } from '../../components/NeoToast';
 import { clearSessionPreservingUsername } from '../../utils/session';
 import logger from '@/utils/logger';
 
@@ -224,6 +225,9 @@ const usePlayerSocketEvents = ({
     };
 
     const handleWordAccepted = (data: any) => {
+      // Dismiss any AI validation toast for this word
+      toast.dismiss(`ai-validating-${data.word.toLowerCase()}`);
+
       if (inputRef.current) {
         gsap.fromTo(inputRef.current,
           { scale: 1.1, borderColor: '#4ade80' },
@@ -289,6 +293,15 @@ const usePlayerSocketEvents = ({
       resetCombo();
     };
 
+    const handleWordValidatingWithAI = (data: any) => {
+      // Show AI validation indicator toast
+      wordAIValidatingToast(data.word, {
+        aiValidatingLabel: t('playerView.aiValidating') || 'AI checking...',
+        duration: 15000 // Will be dismissed when validation completes
+      });
+      logger.log('[PLAYER] AI is validating word:', data.word);
+    };
+
     const handleWordAlreadyFound = (data: any) => {
       wordErrorToast(t('playerView.wordAlreadyFound'), { duration: 2000 });
       // Remove any pending (isValid === null) entries for this word
@@ -325,6 +338,9 @@ const usePlayerSocketEvents = ({
     };
 
     const handleWordRejected = (data: any) => {
+      // Dismiss any AI validation toast for this word
+      toast.dismiss(`ai-validating-${data.word.toLowerCase()}`);
+
       wordErrorToast(t('playerView.wordRejected') || 'Word rejected', { duration: 2000 });
       setFoundWords(prev => prev.filter(fw =>
         fw.word.toLowerCase() !== data.word.toLowerCase()
@@ -649,6 +665,7 @@ const usePlayerSocketEvents = ({
     socket.on('endGame', handleEndGame);
     socket.on('wordAccepted', handleWordAccepted);
     socket.on('wordNeedsValidation', handleWordNeedsValidation);
+    socket.on('wordValidatingWithAI', handleWordValidatingWithAI);
     socket.on('wordAlreadyFound', handleWordAlreadyFound);
     socket.on('wordNotOnBoard', handleWordNotOnBoard);
     socket.on('wordTooShort', handleWordTooShort);
@@ -689,6 +706,7 @@ const usePlayerSocketEvents = ({
       socket.off('endGame', handleEndGame);
       socket.off('wordAccepted', handleWordAccepted);
       socket.off('wordNeedsValidation', handleWordNeedsValidation);
+      socket.off('wordValidatingWithAI', handleWordValidatingWithAI);
       socket.off('wordAlreadyFound', handleWordAlreadyFound);
       socket.off('wordNotOnBoard', handleWordNotOnBoard);
       socket.off('wordTooShort', handleWordTooShort);

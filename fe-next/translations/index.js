@@ -315,6 +315,7 @@ export const translations = {
       leftRoom: 'left the room',
       sessionMovedToAnotherTab: 'Session moved to another tab',
       sessionMovedToAnotherRoom: 'Session moved to another room',
+      aiValidating: 'AI checking...',
     },
     achievementPopup: {
       unlocked: 'Achievement Unlocked!',
@@ -1330,6 +1331,7 @@ export const translations = {
       leftRoom: 'עזב את החדר',
       sessionMovedToAnotherTab: 'החיבור עבר ללשונית אחרת',
       sessionMovedToAnotherRoom: 'החיבור עבר לחדר אחר',
+      aiValidating: 'AI בודק...',
     },
     achievementPopup: {
       unlocked: 'הישג נפתח!',
@@ -2339,6 +2341,7 @@ export const translations = {
       leftRoom: 'lämnade rummet',
       sessionMovedToAnotherTab: 'Sessionen flyttades till en annan flik',
       sessionMovedToAnotherRoom: 'Sessionen flyttades till ett annat rum',
+      aiValidating: 'AI kontrollerar...',
     },
     achievementPopup: {
       unlocked: 'Prestation upplåst!',
@@ -3350,6 +3353,7 @@ export const translations = {
       leftRoom: 'がルームを退出しました',
       sessionMovedToAnotherTab: 'セッションが別のタブに移動しました',
       sessionMovedToAnotherRoom: 'セッションが別のルームに移動しました',
+      aiValidating: 'AIが確認中...',
     },
     achievementPopup: {
       unlocked: '実績解除！',
