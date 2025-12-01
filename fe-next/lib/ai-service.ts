@@ -348,7 +348,7 @@ class GameAIService {
       return validated;
     } catch (error) {
       if (error instanceof z.ZodError) {
-        console.error('[GameAIService] AI response schema validation failed:', error.errors);
+        console.error('[GameAIService] AI response schema validation failed:', error.issues);
         return { isValid: false, reason: 'Invalid AI response format' };
       }
       console.error('[GameAIService] AI validation error:', error);
