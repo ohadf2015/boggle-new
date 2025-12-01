@@ -72,7 +72,21 @@ const { checkAndAwardAchievements, getPlayerAchievements, ACHIEVEMENTS, getLocal
 const { calculatePlayerTitles } = require('./modules/playerTitlesManager');
 const { isDictionaryWord, getAvailableDictionaries, addApprovedWord, normalizeWord, getRandomLongWords } = require('./dictionary');
 const { incrementWordApproval } = require('./redisClient');
-const { loadCommunityWords, collectNonDictionaryWords, getWordForPlayer, recordVote } = require('./modules/communityWordManager');
+const {
+  loadCommunityWords,
+  collectNonDictionaryWords,
+  getWordForPlayer,
+  getWordsForPlayer,
+  recordVote,
+  updatePendingCache,
+  SELF_HEALING_CONFIG,
+  // Hybrid validation (cost-saving)
+  shouldUseAIValidation,
+  recordAIValidationUsed,
+  filterWordsForAIValidation,
+  resetGameAIValidationCount,
+  cleanupGameTracking
+} = require('./modules/communityWordManager');
 const { validateWordWithAI, validateWordsWithAI, isAIServiceAvailable } = require('./modules/aiValidationService');
 const gameStartCoordinator = require('./utils/gameStartCoordinator');
 const timerManager = require('./utils/timerManager');
@@ -892,13 +906,30 @@ function initializeSocketHandlers(io) {
 
           if (isHostSoloGame) {
             // Solo host game: try AI validation for non-dictionary words
-            // Emit event to show AI validation indicator to the player
-            socket.emit('wordValidatingWithAI', {
-              word: normalizedWord,
-              message: 'AI is checking your word...'
-            });
+            // HYBRID APPROACH: Check if we should use AI (cost-saving)
+            const aiDecision = shouldUseAIValidation(normalizedWord, game.language || 'en', gameCode);
 
-            const aiResult = await validateWordWithAI(normalizedWord, game.language || 'en');
+            let aiResult;
+            if (aiDecision.shouldValidate) {
+              // Emit event to show AI validation indicator to the player
+              socket.emit('wordValidatingWithAI', {
+                word: normalizedWord,
+                message: 'AI is checking your word...'
+              });
+
+              aiResult = await validateWordWithAI(normalizedWord, game.language || 'en');
+
+              // Track AI usage for this game
+              recordAIValidationUsed(gameCode);
+            } else {
+              // Use alternative result from hybrid check (community/pattern/limit)
+              aiResult = {
+                isValid: aiDecision.alternativeResult?.isValid || false,
+                isAiVerified: false,
+                reason: aiDecision.reason
+              };
+              logger.debug('SOCKET', `Hybrid validation for "${normalizedWord}": ${aiDecision.reason} (isValid: ${aiResult.isValid})`);
+            }
 
             if (aiResult.isValid) {
               // AI validated the word!
@@ -1101,6 +1132,9 @@ function initializeSocketHandlers(io) {
       });
 
       if (result.success) {
+        // Update the in-memory cache for prioritized word selection
+        updatePendingCache(word, game.language || 'en', voteType);
+
         socket.emit('voteRecorded', { word, success: true });
         logger.info('VOTE', `${username} voted ${voteType} on "${word}"`);
 
@@ -2024,6 +2058,9 @@ function startGameTimer(io, gameCode, timerSeconds) {
   const game = getGame(gameCode);
   if (!game) return;
 
+  // Reset AI validation count for this game (hybrid cost-saving)
+  resetGameAIValidationCount(gameCode);
+
   let remainingTime = timerSeconds;
   const intervalMs = parseInt(process.env.TIME_UPDATE_INTERVAL_MS || '1000');
 
@@ -2070,6 +2107,9 @@ async function endGame(io, gameCode) {
   // Stop timer
   timerManager.clearGameTimer(gameCode);
 
+  // Clean up AI validation tracking for this game (hybrid cost-saving)
+  cleanupGameTracking(gameCode);
+
   // Update game state
   updateGame(gameCode, { gameState: 'finished' });
 
@@ -2086,26 +2126,34 @@ async function endGame(io, gameCode) {
   logger.info('GAME', `Game ${gameCode} ended. ${nonDictWords.length} non-dictionary words found, ${playerCount} players.`);
 
   // Send word feedback to each player AFTER results are shown (they vote on words they didn't submit)
+  // SELF-HEALING: Now sends multiple prioritized words per player for better validation coverage
   if (nonDictWords.length > 0 && playerCount > 1) {
-    logger.debug('FEEDBACK', `Will show word feedback to players on results page (non-dict words: ${nonDictWords.length}, players: ${playerCount})`);
+    const wordsPerPlayer = Math.min(SELF_HEALING_CONFIG.WORDS_PER_PLAYER, nonDictWords.length);
+    logger.debug('FEEDBACK', `Will show ${wordsPerPlayer} words per player for voting (non-dict words: ${nonDictWords.length}, players: ${playerCount})`);
 
     // Small delay to ensure results page has loaded first
     setTimeout(() => {
       for (const [username, userData] of Object.entries(game.users)) {
-        const wordForPlayer = getWordForPlayer(nonDictWords, username);
+        // Get multiple prioritized words for this player
+        const wordsForPlayer = getWordsForPlayer(nonDictWords, username, game.language || 'en', wordsPerPlayer);
 
-        if (wordForPlayer) {
+        if (wordsForPlayer.length > 0) {
           const playerSocket = getSocketById(io, userData.socketId);
           if (playerSocket) {
+            // Send all words in a single event - UI will show them in sequence
             safeEmit(playerSocket, 'showWordFeedback', {
-              word: wordForPlayer.word,
-              submittedBy: wordForPlayer.submittedBy,
-              submitterAvatar: wordForPlayer.submitterAvatar,
+              // First word for backward compatibility
+              word: wordsForPlayer[0].word,
+              submittedBy: wordsForPlayer[0].submittedBy,
+              submitterAvatar: wordsForPlayer[0].submitterAvatar,
+              voteInfo: wordsForPlayer[0].voteInfo,
+              // Full queue of words for the new multi-word UI
+              wordQueue: wordsForPlayer,
               timeoutSeconds: FEEDBACK_TIMEOUT_SECONDS,
               gameCode,
               language: game.language || 'en'
             });
-            logger.debug('FEEDBACK', `Sent word "${wordForPlayer.word}" to ${username} for feedback`);
+            logger.debug('FEEDBACK', `Sent ${wordsForPlayer.length} words to ${username} for feedback: ${wordsForPlayer.map(w => w.word).join(', ')}`);
           }
         }
       }
@@ -2248,45 +2296,64 @@ async function calculateAndBroadcastFinalScores(io, gameCode) {
   const aiValidatedWords = new Map(); // word -> { isValid, isAiVerified }
 
   if (nonDictionaryWords.length > 0) {
-    const aiAvailable = await isAIServiceAvailable();
-    logger.info('AI_VALIDATION', `Game ${gameCode}: AI service availability check: ${aiAvailable ? 'AVAILABLE' : 'NOT AVAILABLE'}`);
+    // HYBRID APPROACH: Filter words before sending to AI (cost-saving)
+    // This uses community validation, gibberish detection, and limits
+    const { wordsForAI, skippedWords } = filterWordsForAIValidation(nonDictionaryWords, language, gameCode);
 
-    if (aiAvailable) {
-      logger.info('AI_VALIDATION', `Game ${gameCode}: Starting AI validation for ${nonDictionaryWords.length} non-dictionary words`);
-      const startTime = Date.now();
+    // Add skipped words to results (with their alternative validation)
+    for (const [word, result] of skippedWords.entries()) {
+      aiValidatedWords.set(word, {
+        isValid: result.isValid,
+        isAiVerified: false,
+        source: result.source
+      });
+    }
 
-      try {
-        const aiResults = await validateWordsWithAI(nonDictionaryWords, language);
-        const duration = Date.now() - startTime;
+    logger.info('AI_VALIDATION', `Game ${gameCode}: Hybrid filter - ${wordsForAI.length} for AI, ${skippedWords.size} skipped (community/pattern/limit)`);
 
-        let validCount = 0;
-        let aiVerifiedCount = 0;
+    if (wordsForAI.length > 0) {
+      const aiAvailable = await isAIServiceAvailable();
+      logger.info('AI_VALIDATION', `Game ${gameCode}: AI service availability check: ${aiAvailable ? 'AVAILABLE' : 'NOT AVAILABLE'}`);
 
-        for (const [word, result] of aiResults.entries()) {
-          aiValidatedWords.set(word, result);
-          if (result.isValid) {
-            validCount++;
-            if (result.isAiVerified) aiVerifiedCount++;
+      if (aiAvailable) {
+        logger.info('AI_VALIDATION', `Game ${gameCode}: Starting AI validation for ${wordsForAI.length} words (filtered from ${nonDictionaryWords.length})`);
+        const startTime = Date.now();
 
-            // Track AI-approved word for peer validation
-            // Find which player submitted this word
-            for (const [username, words] of Object.entries(game.playerWords || {})) {
-              if (words.includes(word)) {
-                const wordDetail = game.playerWordDetails?.[username]?.find(wd => wd.word === word);
-                const wordScore = wordDetail?.score || calculateWordScore(word, wordDetail?.comboLevel || 0);
-                trackAiApprovedWord(gameCode, word, username, wordScore, result.confidence || 85);
-                break;
+        try {
+          const aiResults = await validateWordsWithAI(wordsForAI, language);
+          const duration = Date.now() - startTime;
+
+          let validCount = 0;
+          let aiVerifiedCount = 0;
+
+          for (const [word, result] of aiResults.entries()) {
+            aiValidatedWords.set(word, result);
+            if (result.isValid) {
+              validCount++;
+              if (result.isAiVerified) aiVerifiedCount++;
+
+              // Track AI-approved word for peer validation
+              // Find which player submitted this word
+              for (const [username, words] of Object.entries(game.playerWords || {})) {
+                if (words.includes(word)) {
+                  const wordDetail = game.playerWordDetails?.[username]?.find(wd => wd.word === word);
+                  const wordScore = wordDetail?.score || calculateWordScore(word, wordDetail?.comboLevel || 0);
+                  trackAiApprovedWord(gameCode, word, username, wordScore, result.confidence || 85);
+                  break;
+                }
               }
             }
           }
-        }
 
-        logger.info('AI_VALIDATION', `Game ${gameCode}: AI validation completed in ${duration}ms - ${validCount}/${nonDictionaryWords.length} words valid (${aiVerifiedCount} AI-verified)`);
-      } catch (error) {
-        logger.error('AI_VALIDATION', `Game ${gameCode}: AI validation failed: ${error.message}`);
+          logger.info('AI_VALIDATION', `Game ${gameCode}: AI validation completed in ${duration}ms - ${validCount}/${wordsForAI.length} words valid (${aiVerifiedCount} AI-verified)`);
+        } catch (error) {
+          logger.error('AI_VALIDATION', `Game ${gameCode}: AI validation failed: ${error.message}`);
+        }
+      } else {
+        logger.info('AI_VALIDATION', `Game ${gameCode}: Skipping AI validation - service not available`);
       }
     } else {
-      logger.info('AI_VALIDATION', `Game ${gameCode}: Skipping AI validation - service not available`);
+      logger.info('AI_VALIDATION', `Game ${gameCode}: All words handled by hybrid validation - no AI calls needed`);
     }
   } else {
     logger.info('AI_VALIDATION', `Game ${gameCode}: No non-dictionary words to validate with AI`);
