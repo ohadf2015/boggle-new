@@ -122,12 +122,12 @@ export function SoundEffectsProvider({ children }: SoundEffectsProviderProps) {
     if (typeof window === 'undefined') return;
     if (soundsLoadedRef.current) return; // Prevent re-initialization
 
-    // Create Howl instances for each sound effect
+    // Create Howl instances for each sound effect with deferred loading for slow connections
     Object.entries(SOUND_EFFECTS).forEach(([key, src]) => {
       soundsRef.current[key] = new Howl({
         src: [src],
         volume: 0.6,
-        preload: true,
+        preload: false, // Defer loading for slow connections - load on demand
         html5: false, // Web Audio API for pitch control
         onload: () => {
           logger.log(`[SFX] Loaded: ${key}`);
@@ -159,6 +159,12 @@ export function SoundEffectsProvider({ children }: SoundEffectsProviderProps) {
     if (!howl) {
       logger.warn(`[SFX] Sound not found: ${soundKey}`);
       return;
+    }
+
+    // Load on-demand for slow connections - only load when actually needed
+    if (howl.state() === 'unloaded') {
+      logger.log(`[SFX] Loading sound on demand: ${soundKey}`);
+      howl.load();
     }
 
     // Apply volume (uses separate SFX volume)

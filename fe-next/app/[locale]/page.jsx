@@ -61,6 +61,8 @@ const SOCKET_CONFIG = {
   PING_INTERVAL: 25000,
   PING_TIMEOUT: 60000,
   HOST_KEEP_ALIVE_INTERVAL: 30000,
+  CONNECTION_TIMEOUT: 15000, // Reduced from 20s for faster feedback on slow connections
+  ROOMS_LOADING_TIMEOUT: 3000, // Reduced timeout for active rooms - show UI faster
 };
 
 // Singleton socket instance
@@ -270,10 +272,10 @@ export default function GamePage() {
       };
       globalSocketInstance.on('activeRooms', handleActiveRooms);
 
-      // Fallback timeout for rooms loading
+      // Fallback timeout for rooms loading - show UI faster on slow connections
       const roomsLoadingTimeout = setTimeout(() => {
         setRoomsLoading(false);
-      }, 5000);
+      }, SOCKET_CONFIG.ROOMS_LOADING_TIMEOUT);
 
       return () => {
         clearTimeout(roomsLoadingTimeout);
@@ -289,7 +291,7 @@ export default function GamePage() {
       reconnectionAttempts: SOCKET_CONFIG.RECONNECTION_ATTEMPTS,
       reconnectionDelay: SOCKET_CONFIG.RECONNECTION_DELAY,
       reconnectionDelayMax: SOCKET_CONFIG.RECONNECTION_DELAY_MAX,
-      timeout: 20000,
+      timeout: SOCKET_CONFIG.CONNECTION_TIMEOUT,
       autoConnect: true,
     });
 
@@ -436,10 +438,10 @@ export default function GamePage() {
       setRoomsLoading(false);
     });
 
-    // Fallback: if rooms don't load within 5 seconds, stop showing loading state
+    // Fallback: if rooms don't load quickly, stop showing loading state for better UX on slow connections
     const roomsLoadingTimeout = setTimeout(() => {
       setRoomsLoading(false);
-    }, 5000);
+    }, SOCKET_CONFIG.ROOMS_LOADING_TIMEOUT);
 
     newSocket.on('error', (data) => {
       logger.error('[SOCKET.IO] Error:', data);

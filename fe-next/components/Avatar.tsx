@@ -71,6 +71,8 @@ const Avatar = memo<AvatarProps>(({
           className="object-cover"
           onError={() => setImageError(true)}
           referrerPolicy="no-referrer"
+          loading="lazy"
+          priority={false}
         />
       </div>
     );
