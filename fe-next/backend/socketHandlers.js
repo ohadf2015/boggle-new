@@ -67,7 +67,7 @@ const { calculatePlayerTitles } = require('./modules/playerTitlesManager');
 const { isDictionaryWord, getAvailableDictionaries, addApprovedWord, normalizeWord, getRandomLongWords } = require('./dictionary');
 const { incrementWordApproval } = require('./redisClient');
 const { loadCommunityWords, collectNonDictionaryWords, getWordForPlayer, recordVote } = require('./modules/communityWordManager');
-const { validateWordWithAI, isAIServiceAvailable } = require('./modules/aiValidationService');
+const { validateWordWithAI, validateWordsWithAI, isAIServiceAvailable } = require('./modules/aiValidationService');
 const gameStartCoordinator = require('./utils/gameStartCoordinator');
 const timerManager = require('./utils/timerManager');
 const { checkRateLimit, resetRateLimit } = require('./utils/rateLimiter');
@@ -2101,6 +2101,7 @@ async function endGame(io, gameCode) {
 /**
  * Calculate and broadcast final scores after feedback phase
  * No host validation - just auto-validate dictionary + community-validated words
+ * Also uses AI validation for non-dictionary words when available
  */
 async function calculateAndBroadcastFinalScores(io, gameCode) {
   logger.debug('FINAL_SCORES', `calculateAndBroadcastFinalScores called for game ${gameCode}`);
@@ -2120,7 +2121,65 @@ async function calculateAndBroadcastFinalScores(io, gameCode) {
     });
   });
 
-  // Calculate scores: dictionary words + community-validated words (6+ net votes)
+  // Collect all unique words that need validation
+  const allUniqueWords = new Set();
+  Object.values(game.playerWords || {}).forEach(words => {
+    words.forEach(word => allUniqueWords.add(word));
+  });
+
+  // Separate dictionary words from non-dictionary words
+  const dictionaryValidatedWords = new Set();
+  const nonDictionaryWords = [];
+  const language = game.language || 'en';
+
+  for (const word of allUniqueWords) {
+    if (isDictionaryWord(word, language)) {
+      dictionaryValidatedWords.add(word);
+    } else {
+      nonDictionaryWords.push(word);
+    }
+  }
+
+  logger.info('AI_VALIDATION', `Game ${gameCode}: ${allUniqueWords.size} unique words, ${dictionaryValidatedWords.size} in dictionary, ${nonDictionaryWords.length} need AI validation`);
+
+  // AI validation for non-dictionary words
+  const aiValidatedWords = new Map(); // word -> { isValid, isAiVerified }
+
+  if (nonDictionaryWords.length > 0) {
+    const aiAvailable = await isAIServiceAvailable();
+    logger.info('AI_VALIDATION', `Game ${gameCode}: AI service availability check: ${aiAvailable ? 'AVAILABLE' : 'NOT AVAILABLE'}`);
+
+    if (aiAvailable) {
+      logger.info('AI_VALIDATION', `Game ${gameCode}: Starting AI validation for ${nonDictionaryWords.length} non-dictionary words`);
+      const startTime = Date.now();
+
+      try {
+        const aiResults = await validateWordsWithAI(nonDictionaryWords, language);
+        const duration = Date.now() - startTime;
+
+        let validCount = 0;
+        let aiVerifiedCount = 0;
+
+        for (const [word, result] of aiResults.entries()) {
+          aiValidatedWords.set(word, result);
+          if (result.isValid) {
+            validCount++;
+            if (result.isAiVerified) aiVerifiedCount++;
+          }
+        }
+
+        logger.info('AI_VALIDATION', `Game ${gameCode}: AI validation completed in ${duration}ms - ${validCount}/${nonDictionaryWords.length} words valid (${aiVerifiedCount} AI-verified)`);
+      } catch (error) {
+        logger.error('AI_VALIDATION', `Game ${gameCode}: AI validation failed: ${error.message}`);
+      }
+    } else {
+      logger.info('AI_VALIDATION', `Game ${gameCode}: Skipping AI validation - service not available`);
+    }
+  } else {
+    logger.info('AI_VALIDATION', `Game ${gameCode}: No non-dictionary words to validate with AI`);
+  }
+
+  // Calculate scores: dictionary words + AI-validated words + community-validated words
   const validatedScores = {};
   const playerWordObjects = {};
 
@@ -2131,9 +2190,13 @@ async function calculateAndBroadcastFinalScores(io, gameCode) {
     const wordObjects = [];
 
     playerWords.forEach(word => {
-      // Word is valid if: in dictionary OR community-validated (6+ net votes)
-      // isDictionaryWord now includes community word check
-      const isValid = isDictionaryWord(word, game.language || 'en');
+      // Word is valid if:
+      // 1. In dictionary (includes community-validated with 6+ net votes)
+      // 2. OR AI validated as valid
+      const inDictionary = dictionaryValidatedWords.has(word);
+      const aiResult = aiValidatedWords.get(word);
+      const isAiValid = aiResult?.isValid || false;
+      const isValid = inDictionary || isAiValid;
       const isDuplicate = wordCountMap[word] > 1;
 
       // Look up score and combo bonus from word details
@@ -2153,7 +2216,7 @@ async function calculateAndBroadcastFinalScores(io, gameCode) {
         comboBonus: comboBonus,
         validated: isValid,
         isDuplicate: isDuplicate,
-        isAiVerified: wordDetail?.isAiVerified || false  // Track if AI verified
+        isAiVerified: aiResult?.isAiVerified || wordDetail?.isAiVerified || false  // Track if AI verified
       });
     });
 
@@ -2170,7 +2233,13 @@ async function calculateAndBroadcastFinalScores(io, gameCode) {
   for (const username of Object.keys(game.users)) {
     const playerWordDetails = game.playerWordDetails?.[username] || [];
     for (const wordDetail of playerWordDetails) {
-      wordDetail.validated = isDictionaryWord(wordDetail.word, game.language || 'en');
+      const inDictionary = dictionaryValidatedWords.has(wordDetail.word);
+      const aiResult = aiValidatedWords.get(wordDetail.word);
+      const isAiValid = aiResult?.isValid || false;
+      wordDetail.validated = inDictionary || isAiValid;
+      if (aiResult?.isAiVerified) {
+        wordDetail.isAiVerified = true;
+      }
     }
   }
 
