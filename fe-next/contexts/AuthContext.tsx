@@ -127,8 +127,12 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
   // Initialize and check auth state
   useEffect(() => {
+    let subscription: { unsubscribe: () => void } | null = null;
+    let isMounted = true;
+
     const initAuth = async () => {
       const configured = await isSupabaseConfigured();
+      if (!isMounted) return;
       setIsSupabaseEnabled(configured);
 
       if (!configured || !supabase) {
@@ -139,6 +143,8 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       // Get initial session
       try {
         const { data: { session }, error } = await supabase.auth.getSession();
+        if (!isMounted) return;
+
         if (error) {
           if (isRefreshTokenError(error)) {
             await clearAuthState('Invalid or expired refresh token');
@@ -151,6 +157,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
           await fetchUserData(session.user.id);
         }
       } catch (err) {
+        if (!isMounted) return;
         const error = err as { code?: string; message?: string };
         if (isRefreshTokenError(error)) {
           await clearAuthState('Invalid or expired refresh token');
@@ -158,40 +165,81 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
           logger.warn('Failed to get session:', error.message);
         }
       }
-      setLoading(false);
 
-      // Listen for auth changes
-      const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      if (isMounted) {
+        setLoading(false);
+      }
+
+      // Listen for auth changes (including cross-tab events)
+      const { data } = supabase.auth.onAuthStateChange(
         async (event, session) => {
+          if (!isMounted) return;
+
+          // Handle cross-tab auth state sync
           if (event === 'SIGNED_IN' && session?.user) {
             setUser(session.user);
-            await fetchUserData(session.user.id);
+            setLoading(true);
+            try {
+              await fetchUserData(session.user.id);
+            } finally {
+              if (isMounted) {
+                setLoading(false);
+              }
+            }
           } else if (event === 'SIGNED_OUT') {
             setUser(null);
             setProfile(null);
             setRankedProgress(null);
-          } else if (event === 'TOKEN_REFRESHED' && !session) {
-            // Token refresh failed - sign out
-            await clearAuthState('Token refresh failed');
+            setLoading(false);
+          } else if (event === 'TOKEN_REFRESHED') {
+            if (!session) {
+              // Token refresh failed - sign out
+              await clearAuthState('Token refresh failed');
+            }
+            // Even on successful refresh, ensure loading is false
+            if (isMounted) {
+              setLoading(false);
+            }
+          } else if (event === 'INITIAL_SESSION') {
+            // Handle initial session from other tabs - ensure loading is set
+            if (session?.user) {
+              setUser(session.user);
+              try {
+                await fetchUserData(session.user.id);
+              } finally {
+                if (isMounted) {
+                  setLoading(false);
+                }
+              }
+            } else {
+              if (isMounted) {
+                setLoading(false);
+              }
+            }
           }
         }
       );
-
-      // Listen for auth errors from API calls
-      const handleAuthError = (event: CustomEvent<{ code?: string; message?: string }>) => {
-        if (isRefreshTokenError(event.detail)) {
-          clearAuthState('Auth error: ' + event.detail.message);
-        }
-      };
-      window.addEventListener('supabase-auth-error', handleAuthError as EventListener);
-
-      return () => {
-        subscription.unsubscribe();
-        window.removeEventListener('supabase-auth-error', handleAuthError as EventListener);
-      };
+      subscription = data.subscription;
     };
 
+    // Listen for auth errors from API calls
+    const handleAuthError = (event: CustomEvent<{ code?: string; message?: string }>) => {
+      if (isRefreshTokenError(event.detail)) {
+        clearAuthState('Auth error: ' + event.detail.message);
+      }
+    };
+    window.addEventListener('supabase-auth-error', handleAuthError as EventListener);
+
     initAuth();
+
+    // Cleanup function - properly returned from useEffect
+    return () => {
+      isMounted = false;
+      if (subscription) {
+        subscription.unsubscribe();
+      }
+      window.removeEventListener('supabase-auth-error', handleAuthError as EventListener);
+    };
   }, [fetchUserData, clearAuthState]);
 
   const refreshProfile = useCallback(async () => {

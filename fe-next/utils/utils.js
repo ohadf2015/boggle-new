@@ -36,6 +36,27 @@ function normalizeHebrewLetter(letter) {
   return finalToRegular[letter] || letter;
 }
 
+// Valid Hebrew letters (aleph to tav, including final forms)
+const validHebrewLettersSet = new Set([
+  'א', 'ב', 'ג', 'ד', 'ה', 'ו', 'ז', 'ח', 'ט', 'י',
+  'כ', 'ך', 'ל', 'מ', 'ם', 'נ', 'ן', 'ס', 'ע', 'פ',
+  'ף', 'צ', 'ץ', 'ק', 'ר', 'ש', 'ת'
+]);
+
+/**
+ * Check if a character is a valid Hebrew letter (no punctuation like gershayim ״ or geresh ׳)
+ */
+function isValidHebrewLetter(char) {
+  return validHebrewLettersSet.has(char);
+}
+
+/**
+ * Filter a Hebrew word to only include valid letters (removes punctuation marks)
+ */
+function filterHebrewWord(word) {
+  return word.split('').filter(isValidHebrewLetter).join('');
+}
+
 /**
  * Normalize an entire Hebrew word
  */
@@ -113,8 +134,14 @@ function generateTableWithEmbeddedWords(rows, cols, letters, wordsToEmbed, langu
   const totalCells = rows * cols;
   const targetWords = Math.min(wordsToEmbed.length, Math.max(2, Math.floor(totalCells / 8)));
 
+  // Filter words to only include valid letters for the language
+  // For Hebrew, this removes punctuation marks like gershayim (״) and geresh (׳)
+  const cleanedWords = language === 'he'
+    ? wordsToEmbed.map(filterHebrewWord).filter(w => w.length >= 2)
+    : wordsToEmbed;
+
   // Sort words by length (longer first) for better placement
-  const sortedWords = [...wordsToEmbed].sort((a, b) => b.length - a.length);
+  const sortedWords = [...cleanedWords].sort((a, b) => b.length - a.length);
 
   let embeddedCount = 0;
 
@@ -499,6 +526,8 @@ module.exports = {
   normalizeHebrewLetter,
   normalizeHebrewWord,
   applyHebrewFinalLetters,
+  isValidHebrewLetter,
+  filterHebrewWord,
   generateRandomTable,
   embedWordInGrid,
   isWordOnBoard,
