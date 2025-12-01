@@ -99,6 +99,118 @@ const WITTY_LOSER_MESSAGES_HE = [
   "🎮 אוצר המילים שלי יצא לחופש. בפעם הבאה אני מנצח/ת!",
 ];
 
+// Swedish messages
+const WITTY_WINNER_MESSAGES_SV = {
+  legendary: [
+    "🔥 {score} poäng?! Min hjärna brinner fortfarande. LexiClash gjorde mig till ett geni.",
+    "🔥 Krossade just LexiClash med {score} poäng. Vågar någon utmana mig?",
+    "🔥 {score} poäng! Ordboken ringde, den är rädd för mig.",
+  ],
+  amazing: [
+    "⚡ {score} poäng! Antingen är jag ett geni eller så behöver motståndarna kaffe.",
+    "⚡ {score} poäng! Jag ser bokstäver i mina drömmar nu. Skicka hjälp.",
+    "⚡ Ordförråd? Check. Motståndare? Krossade. {score} poäng!",
+  ],
+  good: [
+    "⭐ {score} poäng! Inte illa för någon som skriver med två fingrar.",
+    "⭐ {score} poäng! Min svensklärare skulle äntligen vara stolt.",
+  ],
+  normal: [
+    "🎮 {score} poäng! Kom och försök slå det (spoiler: förmodligen inte).",
+    "🎮 {score} poäng! Bokstäverna var rädda för mig idag.",
+  ],
+};
+
+const WITTY_LOSER_MESSAGES_SV = [
+  "🎮 Spelade LexiClash och ärligt talat? Ångrar ingenting. Kom och var med!",
+  "🎮 Förlorade men hade kul. Det räknas, eller hur? ELLER HUR?!",
+  "🎮 Hittade {wordCount} ord men min värdighet? Letar fortfarande.",
+];
+
+// Spanish messages
+const WITTY_WINNER_MESSAGES_ES = {
+  legendary: [
+    "🔥 ¡{score} puntos! Mi cerebro todavía está ardiendo. LexiClash me convirtió en genio.",
+    "🔥 Acabo de destruir LexiClash con {score} puntos. ¿Alguien se atreve?",
+    "🔥 ¡{score} puntos! El diccionario llamó, me tiene miedo.",
+  ],
+  amazing: [
+    "⚡ ¡{score} puntos! O soy un genio o mis oponentes necesitan café.",
+    "⚡ ¡{score} puntos! Ahora veo letras en mis sueños. Envíen ayuda.",
+    "⚡ ¿Vocabulario? Listo. ¿Oponentes? Destruidos. ¡{score} puntos!",
+  ],
+  good: [
+    "⭐ ¡{score} puntos! Nada mal para alguien que escribe con dos dedos.",
+    "⭐ ¡{score} puntos! Mi profe de español finalmente estaría orgulloso/a.",
+  ],
+  normal: [
+    "🎮 ¡{score} puntos! Ven a intentar superarlo (spoiler: probablemente no).",
+    "🎮 ¡{score} puntos! Las letras me temían hoy.",
+  ],
+};
+
+const WITTY_LOSER_MESSAGES_ES = [
+  "🎮 Jugué LexiClash y ¿sinceramente? No me arrepiento de nada. ¡Únete al caos!",
+  "🎮 Perdí pero me divertí. Eso cuenta, ¿verdad? ¿¡VERDAD!?",
+  "🎮 Encontré {wordCount} palabras pero ¿mi dignidad? Sigo buscando.",
+];
+
+// French messages
+const WITTY_WINNER_MESSAGES_FR = {
+  legendary: [
+    "🔥 {score} points ?! Mon cerveau fume encore. LexiClash m'a transformé en génie.",
+    "🔥 Je viens d'écraser LexiClash avec {score} points. Qui ose me défier ?",
+    "🔥 {score} points ! Le dictionnaire a appelé, il a peur de moi.",
+  ],
+  amazing: [
+    "⚡ {score} points ! Soit je suis un génie, soit mes adversaires ont besoin de café.",
+    "⚡ {score} points ! Je vois des lettres dans mes rêves maintenant. Envoyez de l'aide.",
+    "⚡ Vocabulaire ? OK. Adversaires ? Détruits. {score} points !",
+  ],
+  good: [
+    "⭐ {score} points ! Pas mal pour quelqu'un qui tape avec deux doigts.",
+    "⭐ {score} points ! Mon prof de français serait enfin fier/fière.",
+  ],
+  normal: [
+    "🎮 {score} points ! Viens essayer de faire mieux (spoiler : probablement pas).",
+    "🎮 {score} points ! Les lettres me craignaient aujourd'hui.",
+  ],
+};
+
+const WITTY_LOSER_MESSAGES_FR = [
+  "🎮 J'ai joué à LexiClash et honnêtement ? Je ne regrette rien. Rejoins le chaos !",
+  "🎮 J'ai perdu mais je me suis amusé(e). Ça compte, non ? NON ?!",
+  "🎮 J'ai trouvé {wordCount} mots mais ma dignité ? Toujours en recherche.",
+];
+
+// German messages
+const WITTY_WINNER_MESSAGES_DE = {
+  legendary: [
+    "🔥 {score} Punkte?! Mein Gehirn brennt noch. LexiClash hat mich zum Genie gemacht.",
+    "🔥 Gerade LexiClash mit {score} Punkten zerstört. Wagt es jemand, mich herauszufordern?",
+    "🔥 {score} Punkte! Das Wörterbuch hat angerufen, es hat Angst vor mir.",
+  ],
+  amazing: [
+    "⚡ {score} Punkte! Entweder bin ich ein Genie oder meine Gegner brauchen Kaffee.",
+    "⚡ {score} Punkte! Ich sehe jetzt Buchstaben in meinen Träumen. Schickt Hilfe.",
+    "⚡ Wortschatz? Check. Gegner? Zerstört. {score} Punkte!",
+  ],
+  good: [
+    "⭐ {score} Punkte! Nicht schlecht für jemanden, der mit zwei Fingern tippt.",
+    "⭐ {score} Punkte! Mein Deutschlehrer wäre endlich stolz.",
+  ],
+  normal: [
+    "🎮 {score} Punkte! Komm und versuch es besser zu machen (Spoiler: wahrscheinlich nicht).",
+    "🎮 {score} Punkte! Die Buchstaben hatten heute Angst vor mir.",
+  ],
+};
+
+const WITTY_LOSER_MESSAGES_DE = [
+  "🎮 Habe LexiClash gespielt und ehrlich? Bereue nichts. Komm ins Chaos!",
+  "🎮 Verloren aber Spaß gehabt. Das zählt, oder? ODER?!",
+  "🎮 Habe {wordCount} Wörter gefunden, aber meine Würde? Suche noch.",
+];
+
 // Witty viral prompts to display below the share buttons
 const VIRAL_PROMPTS_EN = [
   "Challenge your friends... if they dare 😈",
@@ -116,6 +228,34 @@ const VIRAL_PROMPTS_HE = [
   "הראו להם מי הבוס של המילים 💪",
   "בואו נראה מי באמת הקשיב בשיעור",
   "הזמינו את החברים לאבד בכבוד",
+];
+
+const VIRAL_PROMPTS_SV = [
+  "Utmana dina vänner... om de vågar 😈",
+  "Varning: Kan orsaka intensiv ordförrådsavund",
+  "Visa dem vem som är den riktiga ordsmeden 💪",
+  "Dags att ta reda på vem den smarta vännen är",
+];
+
+const VIRAL_PROMPTS_ES = [
+  "Desafía a tus amigos... si se atreven 😈",
+  "Advertencia: Puede causar envidia de vocabulario intensa",
+  "Demuéstrales quién es el verdadero maestro de palabras 💪",
+  "¡Hora de ver quién es el amigo inteligente!",
+];
+
+const VIRAL_PROMPTS_FR = [
+  "Défiez vos amis... s'ils osent 😈",
+  "Attention : Peut causer une jalousie de vocabulaire intense",
+  "Montrez-leur qui est le vrai maître des mots 💪",
+  "C'est l'heure de découvrir qui est l'ami intelligent !",
+];
+
+const VIRAL_PROMPTS_DE = [
+  "Fordere deine Freunde heraus... wenn sie sich trauen 😈",
+  "Warnung: Kann intensiven Wortschatz-Neid verursachen",
+  "Zeig ihnen, wer der wahre Wortmeister ist 💪",
+  "Zeit herauszufinden, wer der schlaue Freund ist!",
 ];
 
 // Helper to pick random item from array
@@ -156,12 +296,34 @@ const ShareWinPrompt: React.FC<ShareWinPromptProps> = ({
         : `\n🔥 ${streakDays} day streak - I'm on FIRE!`
       : '';
 
-    // Pick witty message based on score tier and winner status
-    const isHebrew = language === 'he';
+    // Pick witty message based on score tier, winner status, and language
+    // Get language-specific messages or fall back to English
+    const getWinnerMessages = () => {
+      switch (language) {
+        case 'he': return WITTY_WINNER_MESSAGES_HE;
+        case 'sv': return WITTY_WINNER_MESSAGES_SV;
+        case 'es': return WITTY_WINNER_MESSAGES_ES;
+        case 'fr': return WITTY_WINNER_MESSAGES_FR;
+        case 'de': return WITTY_WINNER_MESSAGES_DE;
+        default: return WITTY_WINNER_MESSAGES_EN;
+      }
+    };
+
+    const getLoserMessages = () => {
+      switch (language) {
+        case 'he': return WITTY_LOSER_MESSAGES_HE;
+        case 'sv': return WITTY_LOSER_MESSAGES_SV;
+        case 'es': return WITTY_LOSER_MESSAGES_ES;
+        case 'fr': return WITTY_LOSER_MESSAGES_FR;
+        case 'de': return WITTY_LOSER_MESSAGES_DE;
+        default: return WITTY_LOSER_MESSAGES_EN;
+      }
+    };
+
     let baseMessage: string;
 
     if (isWinner) {
-      const messages = isHebrew ? WITTY_WINNER_MESSAGES_HE : WITTY_WINNER_MESSAGES_EN;
+      const messages = getWinnerMessages();
       if (score > 150) {
         baseMessage = pickRandom(messages.legendary);
       } else if (score > 100) {
@@ -172,7 +334,7 @@ const ShareWinPrompt: React.FC<ShareWinPromptProps> = ({
         baseMessage = pickRandom(messages.normal);
       }
     } else {
-      baseMessage = pickRandom(isHebrew ? WITTY_LOSER_MESSAGES_HE : WITTY_LOSER_MESSAGES_EN);
+      baseMessage = pickRandom(getLoserMessages());
     }
 
     // Replace placeholders
@@ -189,9 +351,19 @@ const ShareWinPrompt: React.FC<ShareWinPromptProps> = ({
     return `${baseMessage}${isWinner ? statsLine : ''}${streakText}\n\n${url}`;
   }, [isWinner, score, wordCount, achievements, gameCode, language, streakDays]);
 
-  // Random viral prompt
+  // Random viral prompt based on language
   const viralPrompt = useMemo(() => {
-    return pickRandom(language === 'he' ? VIRAL_PROMPTS_HE : VIRAL_PROMPTS_EN);
+    const getViralPrompts = () => {
+      switch (language) {
+        case 'he': return VIRAL_PROMPTS_HE;
+        case 'sv': return VIRAL_PROMPTS_SV;
+        case 'es': return VIRAL_PROMPTS_ES;
+        case 'fr': return VIRAL_PROMPTS_FR;
+        case 'de': return VIRAL_PROMPTS_DE;
+        default: return VIRAL_PROMPTS_EN;
+      }
+    };
+    return pickRandom(getViralPrompts());
   }, [language]);
 
   // Handle WhatsApp share

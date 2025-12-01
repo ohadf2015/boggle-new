@@ -2314,11 +2314,13 @@ async function calculateAndBroadcastFinalScores(io, gameCode) {
       const isValid = inDictionary || isAiValid;
       const isDuplicate = wordCountMap[word] > 1;
 
-      // Word is pending validation if:
+      // Word is pending validation ONLY if:
       // - Not in dictionary
-      // - Not AI validated (either not checked or AI said invalid)
-      // - Will be sent to community for voting
-      const isPendingValidation = !inDictionary && !isAiValid && nonDictionaryWords.includes(word);
+      // - AI did NOT check this word (aiResult is undefined) - NOT if AI explicitly rejected it
+      // - Is in the list of non-dictionary words that would be sent to community
+      // Note: If AI checked the word and said invalid, it's just invalid - no question mark
+      const aiDidNotCheck = !aiResult; // AI didn't check if aiResult is undefined
+      const isPendingValidation = !inDictionary && aiDidNotCheck && nonDictionaryWords.includes(word);
 
       // Look up score and combo bonus from word details
       const wordDetail = playerWordDetailsList.find(wd => wd.word === word);
