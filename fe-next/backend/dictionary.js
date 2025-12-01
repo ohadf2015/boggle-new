@@ -148,13 +148,29 @@ class Dictionary {
 
           if (arrayMatch) {
             const arrayContent = arrayMatch[1];
+
+            // Helper function to decode JavaScript escape sequences (e.g., \xE5 -> å)
+            const decodeJsEscapes = (str) => {
+              // Convert \xNN to \u00NN for JSON compatibility
+              const jsonCompatible = str.replace(/\\x([0-9A-Fa-f]{2})/g, '\\u00$1');
+              try {
+                return JSON.parse(jsonCompatible);
+              } catch {
+                return null;
+              }
+            };
+
+            // Valid Swedish word pattern - only alphabetic characters (including å, ä, ö)
+            const validSwedishWordPattern = /^[a-zåäöéàü]+$/i;
+
             const words = arrayContent
               .split(',')
               .map(line => {
-                const match = line.trim().match(/^"(.*)"$/);
-                return match ? match[1] : null;
+                const trimmed = line.trim();
+                if (!trimmed.startsWith('"') || !trimmed.endsWith('"')) return null;
+                return decodeJsEscapes(trimmed);
               })
-              .filter(w => w && w.length > 1);
+              .filter(w => w && w.length > 1 && validSwedishWordPattern.test(w));
 
             this.swedishWords = new Set(words.map(w => w.toLowerCase()));
             const swedishMainCount = this.swedishWords.size;

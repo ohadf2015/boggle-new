@@ -2068,6 +2068,7 @@ export const translations = {
       loading: 'Laddar...',
       error: 'Fel',
       back: 'Tillbaka',
+      next: 'Nästa',
       confirm: 'Bekräfta',
       cancel: 'Avbryt',
       selectUILanguage: 'Gränssnittsspråk',
@@ -2436,6 +2437,7 @@ export const translations = {
         longWordMaster: '📏 Långordsmästare - Hitta ett ord med 7+ bokstäver',
         perfectionist: '💎 Perfektionist - 100% av dina ord är giltiga',
         earlyBird: '🐦 Morgonpiggen - Hitta 3 ord på första minuten',
+        examples: 'Exempel på prestationer',
       },
       tipsTitle: 'Tips för att vinna 💡',
       tips: {
@@ -2447,6 +2449,70 @@ export const translations = {
       },
       readyToPlay: 'Redo? Låt oss börja spela! 🎮',
       funForFamily: 'Ett engagerande och roligt spel för hela familjen - helt gratis!',
+      letters: 'bokstäver',
+      pts: 'poäng',
+      // Step-based tutorial sections
+      steps: {
+        basics: {
+          title: 'Spelgrunder',
+          description: 'LexiClash är ett snabbt multiplayer-ordspel. Tävla mot vänner om att hitta ord på ett bokstavsrutnät!',
+        },
+        grid: {
+          title: 'Hitta ord',
+          description: 'Svep eller klicka på angränsande bokstäver för att bilda ord. Bokstäver kopplas ihop i alla 8 riktningar - horisontellt, vertikalt och diagonalt!',
+        },
+        scoring: {
+          title: 'Poängsystem',
+          description: 'Längre ord ger fler poäng! Varje bokstav utöver den första ger en poäng till din totala poäng.',
+        },
+        combo: {
+          title: 'Kombosystem',
+          description: 'Skicka ord snabbt för att bygga kombomultiplikatorer! Ju snabbare du hittar ord, desto större bonus.',
+        },
+        xp: {
+          title: 'XP & Nivåer',
+          description: 'Tjäna XP från varje spel för att stiga i nivå och låsa upp nya titlar. Vinstbonusar och prestationer ökar din XP!',
+        },
+        achievements: {
+          title: 'Prestationer',
+          description: 'Lås upp prestationer för speciella bedrifter! Varje prestation kan tjänas flera gånger för att uppgradera dess nivå.',
+        },
+      },
+      // Interactive demo translations
+      demo: {
+        watchAnimation: 'Se hur ord bildas på rutnätet',
+        autoPlay: 'Auto',
+        replay: 'Spela om',
+        tryIt: 'Prova att dra bokstäver själv!',
+        gridExample: 'Exempel på att spåra ett ord på rutnätet',
+        traceExample: 'Spåra bokstäver för att bilda ord - T→O→N→D',
+      },
+      // Combo system translations
+      combo: {
+        currentCombo: 'Nuvarande Kombo',
+        multiplier: 'multiplikator',
+        noBonus: 'Ingen bonus',
+        tryIt: 'Simulera Kombo',
+        building: 'Bygger kombo...',
+        tip: 'Skicka ord inom 5 sekunder från varandra för att behålla din kombo!',
+      },
+      // XP system translations
+      xp: {
+        howToEarn: 'Hur man tjänar XP',
+        base: 'Slutför ett spel',
+        score: 'Få poäng',
+        win: 'Vinn spelet',
+        achievement: 'Lås upp prestationer',
+        unlockTitles: 'Lås upp titlar när du stiger i nivå',
+      },
+      // New player welcome
+      newPlayer: {
+        welcomeTitle: 'Välkommen till LexiClash!',
+        welcomeMessage: 'Det verkar som att det här är din första gång här. Vill du ha en snabb genomgång av hur man spelar?',
+        showTutorial: 'Visa mig hur',
+        skipTutorial: 'Jag klarar mig',
+        dontShowAgain: 'Visa inte detta igen',
+      },
     },
     achievements: {
       FIRST_BLOOD: {
