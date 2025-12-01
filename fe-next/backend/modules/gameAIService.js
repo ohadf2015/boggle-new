@@ -545,26 +545,263 @@ Example responses:
   // ===========================================================================
 
   /**
-   * Batch validate multiple words.
-   * Useful for validating all words at end of a game round.
-   * @param {string[]} words
-   * @param {string} language
+   * Batch validate multiple words in a SINGLE AI prompt.
+   * Much more efficient than individual calls - validates all words at once.
+   * @param {string[]} words - Array of words to validate
+   * @param {string} language - Language code
    * @returns {Promise<Array<{isValid: boolean, reason?: string, source: string, error?: string}>>}
    */
   async validateWords(words, language = 'en') {
-    // Process in parallel with concurrency limit
-    const BATCH_SIZE = 5;
-    const results = [];
+    // Ensure initialized
+    await this.initialize();
 
-    for (let i = 0; i < words.length; i += BATCH_SIZE) {
-      const batch = words.slice(i, i + BATCH_SIZE);
-      const batchResults = await Promise.all(
-        batch.map(word => this.validateAndSaveWord(word, language))
-      );
-      results.push(...batchResults);
+    if (!words || words.length === 0) {
+      return [];
     }
 
-    return results;
+    // Normalize all words
+    const normalizedWords = words.map(w => w.toLowerCase().trim());
+    const results = new Array(normalizedWords.length).fill(null);
+
+    // Step 1: Check which words are already in database (fast path)
+    const wordsNeedingAI = [];
+    const wordIndexMap = new Map(); // Maps word to its original index
+
+    for (let i = 0; i < normalizedWords.length; i++) {
+      const word = normalizedWords[i];
+
+      // Basic validation
+      if (!word || word.length < 3) {
+        results[i] = { isValid: false, reason: 'Word too short', source: 'database' };
+        continue;
+      }
+
+      // Check database first
+      const inCommunityWords = await this.checkCommunityWords(word, language);
+      if (inCommunityWords) {
+        results[i] = { isValid: true, source: 'database' };
+        continue;
+      }
+
+      const inWordScores = await this.checkWordScores(word, language);
+      if (inWordScores) {
+        results[i] = { isValid: true, source: 'database' };
+        continue;
+      }
+
+      // Word needs AI validation
+      wordsNeedingAI.push(word);
+      wordIndexMap.set(word, i);
+    }
+
+    // Step 2: If no words need AI validation, return results
+    if (wordsNeedingAI.length === 0) {
+      console.log(`[GameAIService] All ${normalizedWords.length} words found in database - no AI calls needed`);
+      return results;
+    }
+
+    // Step 3: Batch validate with AI in a single prompt
+    console.log(`[GameAIService] Batch validating ${wordsNeedingAI.length} words with AI (${normalizedWords.length - wordsNeedingAI.length} from database)`);
+
+    try {
+      const aiResults = await this.batchValidateWithAI(wordsNeedingAI, language);
+
+      // Step 4: Process AI results and save valid words to database
+      const validWords = [];
+
+      for (let i = 0; i < wordsNeedingAI.length; i++) {
+        const word = wordsNeedingAI[i];
+        const aiResult = aiResults[i] || { isValid: false, reason: 'No AI response' };
+        const originalIndex = wordIndexMap.get(word);
+
+        results[originalIndex] = {
+          isValid: aiResult.isValid,
+          reason: aiResult.reason,
+          source: 'ai',
+          confidence: aiResult.confidence
+        };
+
+        if (aiResult.isValid) {
+          validWords.push(word);
+        }
+      }
+
+      // Step 5: Batch save valid words to community_words (fire and forget)
+      if (validWords.length > 0) {
+        console.log(`[GameAIService] Saving ${validWords.length} AI-validated words to database`);
+        this.batchSaveToCommunityWords(validWords, language).catch(err => {
+          console.error('[GameAIService] Batch save failed:', err);
+        });
+      }
+
+      return results;
+    } catch (error) {
+      console.error('[GameAIService] Batch AI validation failed:', error);
+
+      // Fill remaining results with errors
+      for (const word of wordsNeedingAI) {
+        const originalIndex = wordIndexMap.get(word);
+        results[originalIndex] = {
+          isValid: false,
+          reason: 'AI validation failed',
+          source: 'ai',
+          error: error.message
+        };
+      }
+
+      return results;
+    }
+  }
+
+  /**
+   * Validate multiple words in a SINGLE AI prompt.
+   * Returns validation results for all words at once.
+   * @param {string[]} words - Array of words to validate
+   * @param {string} language - Language code
+   * @returns {Promise<Array<{isValid: boolean, reason: string, confidence: number}>>}
+   */
+  async batchValidateWithAI(words, language) {
+    if (!this.model) {
+      throw new Error('Vertex AI model not initialized');
+    }
+
+    const languageNames = {
+      en: 'English',
+      he: 'Hebrew',
+      sv: 'Swedish',
+      es: 'Spanish',
+      fr: 'French',
+      de: 'German',
+      it: 'Italian',
+      pt: 'Portuguese',
+      nl: 'Dutch',
+      no: 'Norwegian',
+      da: 'Danish',
+      fi: 'Finnish',
+    };
+
+    const languageName = languageNames[language] || language;
+    const wordList = words.map((w, i) => `${i + 1}. "${w}"`).join('\n');
+
+    const prompt = `You are a strict word validator for a Boggle-style word game. Validate ALL of these ${words.length} words in ${languageName}.
+
+WORDS TO VALIDATE:
+${wordList}
+
+VALIDATION RULES:
+1. The word must be a REAL, established word in ${languageName}
+2. ACCEPT: Common dictionary words, verbs in any conjugation, nouns (singular/plural), adjectives, adverbs
+3. ACCEPT: Well-established slang that appears in dictionaries
+4. REJECT: Proper nouns (names of people, places, brands)
+5. REJECT: Abbreviations and acronyms
+6. REJECT: Random letter combinations that aren't real words
+7. BE STRICT: When in doubt, reject the word
+
+Respond with ONLY a valid JSON array with one object per word, in the same order as the input.
+Each object must have: { "word": string, "isValid": boolean, "reason": string, "confidence": number (0-100) }
+
+Example response format:
+[
+  { "word": "cat", "isValid": true, "reason": "Common English noun", "confidence": 99 },
+  { "word": "xyz", "isValid": false, "reason": "Not a recognized word", "confidence": 95 }
+]`;
+
+    try {
+      const result = await this.model.generateContent(prompt);
+      const response = result.response;
+      const text = response.candidates?.[0]?.content?.parts?.[0]?.text || '';
+
+      // Extract JSON array from response
+      let cleanText = text;
+      const codeBlockMatch = text.match(/```(?:json)?\s*([\s\S]*?)```/);
+      if (codeBlockMatch) {
+        cleanText = codeBlockMatch[1].trim();
+      }
+
+      const jsonMatch = cleanText.match(/\[[\s\S]*\]/);
+      if (!jsonMatch) {
+        console.warn('[GameAIService] Could not extract JSON array from batch AI response');
+        // Return all as invalid
+        return words.map(w => ({ isValid: false, reason: 'Failed to parse AI response', confidence: 0 }));
+      }
+
+      let parsed;
+      try {
+        parsed = JSON.parse(jsonMatch[0]);
+      } catch (parseError) {
+        console.warn('[GameAIService] JSON parse error in batch validation:', parseError.message);
+        return words.map(w => ({ isValid: false, reason: 'Failed to parse AI response', confidence: 0 }));
+      }
+
+      if (!Array.isArray(parsed)) {
+        console.warn('[GameAIService] Batch AI response is not an array');
+        return words.map(w => ({ isValid: false, reason: 'Invalid AI response format', confidence: 0 }));
+      }
+
+      // Map results back to original word order
+      const resultMap = new Map();
+      for (const item of parsed) {
+        if (item && typeof item.word === 'string') {
+          const normalizedWord = item.word.toLowerCase().trim();
+          const confidence = typeof item.confidence === 'number' ? item.confidence : 50;
+
+          // Apply confidence threshold
+          let isValid = item.isValid === true;
+          let reason = item.reason || (isValid ? 'Valid word' : 'Invalid word');
+
+          if (isValid && confidence < MIN_CONFIDENCE_THRESHOLD) {
+            isValid = false;
+            reason = `Confidence too low (${confidence}%) - need ${MIN_CONFIDENCE_THRESHOLD}%+ to approve`;
+          }
+
+          resultMap.set(normalizedWord, { isValid, reason, confidence });
+        }
+      }
+
+      // Return results in original word order
+      return words.map(word => {
+        const result = resultMap.get(word.toLowerCase().trim());
+        return result || { isValid: false, reason: 'Word not in AI response', confidence: 0 };
+      });
+
+    } catch (error) {
+      console.error('[GameAIService] Batch AI validation error:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Batch save multiple valid words to community_words table.
+   * @param {string[]} words - Array of valid words to save
+   * @param {string} language - Language code
+   */
+  async batchSaveToCommunityWords(words, language) {
+    if (!this.supabaseAdmin || words.length === 0) return;
+
+    const now = new Date().toISOString();
+
+    // Prepare batch insert data
+    const insertData = words.map(word => ({
+      word: word.toLowerCase().trim(),
+      language,
+      approval_count: 1,
+      first_approved_at: now,
+      last_approved_at: now,
+    }));
+
+    // Use upsert to handle duplicates gracefully
+    const { error } = await this.supabaseAdmin
+      .from('community_words')
+      .upsert(insertData, {
+        onConflict: 'word,language',
+        ignoreDuplicates: false
+      });
+
+    if (error) {
+      console.error('[GameAIService] Batch save to community_words failed:', error.message);
+    } else {
+      console.log(`[GameAIService] Successfully saved ${words.length} words to community_words`);
+    }
   }
 
   /**
