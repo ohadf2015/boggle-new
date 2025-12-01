@@ -18,10 +18,39 @@ class Logger {
     return this.enableTimestamp ? `[${new Date().toISOString()}] ` : '';
   }
 
+  serializeData(data) {
+    if (data === undefined || data === null) return '';
+
+    // Handle Error objects specially since they don't serialize properly
+    if (data instanceof Error) {
+      return JSON.stringify({
+        name: data.name,
+        message: data.message,
+        stack: data.stack?.split('\n').slice(0, 5).join('\n') // First 5 lines of stack
+      });
+    }
+
+    // Handle objects that might contain Error instances
+    if (typeof data === 'object') {
+      try {
+        return JSON.stringify(data, (key, value) => {
+          if (value instanceof Error) {
+            return { name: value.name, message: value.message };
+          }
+          return value;
+        });
+      } catch (e) {
+        return `[Serialization Error: ${e.message}]`;
+      }
+    }
+
+    return JSON.stringify(data);
+  }
+
   formatMessage(level, category, message, data) {
     const timestamp = this.getTimestamp();
     const categoryStr = category ? `[${category}] ` : '';
-    const dataStr = data ? ` ${JSON.stringify(data)}` : '';
+    const dataStr = data ? ` ${this.serializeData(data)}` : '';
 
     if (this.enableColors) {
       const colors = {

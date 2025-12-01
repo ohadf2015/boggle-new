@@ -2545,7 +2545,11 @@ async function recordGameResultsToSupabase(gameCode, scoresArray, game) {
 
     logger.info('SUPABASE', `Recorded game results for ${gameCode} - ${scoresWithPlacement.length} players`);
   } catch (error) {
-    logger.error('SUPABASE', `Error recording game results for ${gameCode}`, error);
+    // Extract error details even if error object is not a standard Error
+    const errorDetails = error instanceof Error
+      ? { name: error.name, message: error.message, stack: error.stack }
+      : (error?.message || error?.code || error?.error || String(error) || 'Unknown error');
+    logger.error('SUPABASE', `Error recording game results for ${gameCode}`, errorDetails);
   }
 }
 

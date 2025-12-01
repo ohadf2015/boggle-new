@@ -281,7 +281,7 @@ export default function LeaderboardPage() {
                             ? isDarkMode ? 'text-cyan-400' : 'text-cyan-600'
                             : isDarkMode ? 'text-white' : 'text-gray-900'
                         )}>
-                          {entry.username}
+                          {entry.display_name || entry.username}
                         </span>
                       </div>
                       <div className={cn(
