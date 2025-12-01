@@ -68,6 +68,9 @@ interface UseHostSocketEventsProps {
   setXpGainedData: React.Dispatch<React.SetStateAction<XpGainedData | null>>;
   setLevelUpData: React.Dispatch<React.SetStateAction<LevelUpData | null>>;
 
+  // Results waiting state
+  setWaitingForResults: React.Dispatch<React.SetStateAction<boolean>>;
+
   // Combo refs and setters
   comboLevelRef: MutableRefObject<number>;
   lastWordTimeRef: MutableRefObject<number | null>;
@@ -116,6 +119,9 @@ const useHostSocketEvents = ({
   // XP state setters
   setXpGainedData,
   setLevelUpData,
+
+  // Results waiting state
+  setWaitingForResults,
 
   // Combo refs and setters
   comboLevelRef,
@@ -307,6 +313,10 @@ const useHostSocketEvents = ({
       const currentTableData = tableDataRef.current;
       logger.log('[HOST] onShowResults defined:', !!currentOnShowResults);
       logger.log('[HOST] tableData available:', !!currentTableData);
+
+      // Clear waiting state - results are ready
+      setWaitingForResults(false);
+
       confetti({
         particleCount: 150,
         spread: 80,
@@ -345,6 +355,7 @@ const useHostSocketEvents = ({
       setRemainingTime(data.remainingTime);
       if (data.remainingTime === 0 && gameStarted) {
         setGameStarted(false);
+        setWaitingForResults(true); // Show loading state while calculating scores
         confetti({
           particleCount: 150,
           spread: 80,
@@ -365,6 +376,7 @@ const useHostSocketEvents = ({
         setRemainingTime(data.timerSeconds);
       }
       setGameStarted(true);
+      setWaitingForResults(false); // Reset waiting state when new game starts
       setShowStartAnimation(true);
       setPlayerWordCounts({});
       setPlayerScores({});
@@ -672,6 +684,7 @@ const useHostSocketEvents = ({
     setWordsForBoard,
     setXpGainedData,
     setLevelUpData,
+    setWaitingForResults,
     intentionalExitRef,
     tournamentTimeoutRef,
   ]);
