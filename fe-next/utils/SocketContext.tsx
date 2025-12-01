@@ -15,12 +15,12 @@ export interface SocketContextValue {
 // Socket.IO Context
 export const SocketContext = createContext<SocketContextValue | null>(null);
 
-// Configuration
+// Configuration - increased for better handling of poor network conditions
 const SOCKET_CONFIG = {
-  reconnectionAttempts: 10,
+  reconnectionAttempts: 20,        // Increased from 10 for poor connections
   reconnectionDelay: 1000,
-  reconnectionDelayMax: 30000,
-  timeout: 20000,
+  reconnectionDelayMax: 45000,     // Increased from 30000 for longer grace period
+  timeout: 30000,                  // Increased from 20000 for slow connections
 };
 
 interface SocketProviderProps {

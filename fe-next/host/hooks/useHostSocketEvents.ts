@@ -531,6 +531,23 @@ const useHostSocketEvents = ({
       });
     };
 
+    const handlePlayerConnectionStatusChanged = (data: { username: string; connectionStatus: 'weak' | 'stable'; message: string }) => {
+      logger.log('[HOST] Player connection status changed:', data);
+      if (data.connectionStatus === 'weak') {
+        // Show a subtle warning toast for weak connection
+        neoInfoToast(data.message || `${data.username} has weak connection`, {
+          icon: '📶',
+          duration: 4000
+        });
+      } else if (data.connectionStatus === 'stable') {
+        // Connection recovered
+        neoSuccessToast(data.message || `${data.username}'s connection recovered`, {
+          icon: '✅',
+          duration: 2000
+        });
+      }
+    };
+
     const handlePlayerLeft = (data: any) => {
       logger.log('[HOST] Player left:', data.username);
       neoInfoToast(data.message || `${data.username} left the room`, {
@@ -588,6 +605,7 @@ const useHostSocketEvents = ({
     socket.on('wordsForBoard', handleWordsForBoard);
     socket.on('playerDisconnected', handlePlayerDisconnected);
     socket.on('playerReconnected', handlePlayerReconnected);
+    socket.on('playerConnectionStatusChanged', handlePlayerConnectionStatusChanged);
     socket.on('playerLeft', handlePlayerLeft);
     socket.on('xpGained', handleXpGained);
     socket.on('levelUp', handleLevelUp);
@@ -616,6 +634,7 @@ const useHostSocketEvents = ({
       socket.off('wordsForBoard', handleWordsForBoard);
       socket.off('playerDisconnected', handlePlayerDisconnected);
       socket.off('playerReconnected', handlePlayerReconnected);
+      socket.off('playerConnectionStatusChanged', handlePlayerConnectionStatusChanged);
       socket.off('playerLeft', handlePlayerLeft);
       socket.off('xpGained', handleXpGained);
       socket.off('levelUp', handleLevelUp);

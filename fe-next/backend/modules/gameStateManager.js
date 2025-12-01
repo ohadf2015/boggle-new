@@ -23,7 +23,9 @@ const leaderboardThrottleTimers = {};
 const PRESENCE_CONFIG = {
   IDLE_THRESHOLD: 30000,     // 30 seconds without activity = idle
   AFK_THRESHOLD: 45000,      // 45 seconds without activity = afk (for testing, change to 120000 for production)
-  HEARTBEAT_TIMEOUT: 15000,  // 15 seconds without heartbeat = disconnected
+  HEARTBEAT_TIMEOUT: 30000,  // 30 seconds without heartbeat = disconnected (increased for poor connections)
+  WEAK_CONNECTION_THRESHOLD: 15000, // 15 seconds without heartbeat = weak connection warning
+  MISSED_HEARTBEATS_FOR_WEAK: 2,    // Number of consecutive missed heartbeats before weak connection
 };
 
 // Track authenticated users across all games
@@ -392,12 +394,88 @@ function updateUserPresence(gameCode, username, presenceData) {
  * Update user heartbeat (proves connection is alive)
  * @param {string} gameCode - Game code
  * @param {string} username - Username
+ * @returns {object|null} - Connection status change info or null
  */
 function updateUserHeartbeat(gameCode, username) {
   const game = games[gameCode];
-  if (!game || !game.users[username]) return;
+  if (!game || !game.users[username]) return null;
 
-  game.users[username].lastHeartbeatAt = Date.now();
+  const user = game.users[username];
+  const now = Date.now();
+  const wasWeakConnection = user.connectionStatus === 'weak';
+
+  // Reset heartbeat tracking
+  user.lastHeartbeatAt = now;
+  user.missedHeartbeats = 0;
+  user.connectionStatus = 'stable';
+
+  // Return status change if connection was previously weak
+  if (wasWeakConnection) {
+    return {
+      statusChange: 'recovered',
+      previousStatus: 'weak',
+      newStatus: 'stable'
+    };
+  }
+  return null;
+}
+
+/**
+ * Check user connection health based on heartbeats
+ * @param {string} gameCode - Game code
+ * @param {string} username - Username
+ * @returns {object} - Connection health status
+ */
+function checkUserConnectionHealth(gameCode, username) {
+  const game = games[gameCode];
+  if (!game || !game.users[username]) {
+    return { status: 'unknown', healthy: false };
+  }
+
+  const user = game.users[username];
+  const now = Date.now();
+  const timeSinceHeartbeat = now - (user.lastHeartbeatAt || now);
+
+  // Initialize tracking fields if needed
+  if (user.missedHeartbeats === undefined) {
+    user.missedHeartbeats = 0;
+  }
+  if (user.connectionStatus === undefined) {
+    user.connectionStatus = 'stable';
+  }
+
+  // Check if heartbeat is overdue
+  if (timeSinceHeartbeat >= PRESENCE_CONFIG.WEAK_CONNECTION_THRESHOLD) {
+    const expectedHeartbeats = Math.floor(timeSinceHeartbeat / 10000); // Heartbeats are every 10s
+    user.missedHeartbeats = Math.max(user.missedHeartbeats, expectedHeartbeats);
+
+    if (user.missedHeartbeats >= PRESENCE_CONFIG.MISSED_HEARTBEATS_FOR_WEAK) {
+      user.connectionStatus = 'weak';
+      return {
+        status: 'weak',
+        healthy: true, // Still healthy, just weak - don't disconnect yet
+        missedHeartbeats: user.missedHeartbeats,
+        timeSinceHeartbeat
+      };
+    }
+  }
+
+  // Check for complete timeout (still within grace period though)
+  if (timeSinceHeartbeat >= PRESENCE_CONFIG.HEARTBEAT_TIMEOUT) {
+    return {
+      status: 'timeout',
+      healthy: false,
+      missedHeartbeats: user.missedHeartbeats,
+      timeSinceHeartbeat
+    };
+  }
+
+  return {
+    status: user.connectionStatus || 'stable',
+    healthy: true,
+    missedHeartbeats: user.missedHeartbeats || 0,
+    timeSinceHeartbeat
+  };
 }
 
 /**
@@ -876,6 +954,7 @@ module.exports = {
   updateUserHeartbeat,
   markUserActivity,
   getPresenceConfig,
+  checkUserConnectionHealth,
 
   // Auth user tracking
   getAuthUserConnection,
