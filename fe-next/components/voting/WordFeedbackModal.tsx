@@ -22,6 +22,7 @@ interface VoteInfo {
   netScore: number;
   totalVotes: number;
   votesNeeded: number;
+  isValidForScoring?: boolean; // True if word has positive ratio (valid for scoring but not prominently validated)
 }
 
 /**
@@ -199,9 +200,12 @@ const WordFeedbackModal = memo<WordFeedbackModalProps>(({
   if (!isOpen) return null;
 
   // Get vote info for current word
+  // Words need 10 points to be prominently valid (added to dictionary)
+  const PROMINENT_THRESHOLD = 10;
   const wordVoteInfo = currentWord.voteInfo;
-  const votesNeeded = wordVoteInfo?.votesNeeded ?? 6;
-  const progressPercent = wordVoteInfo ? Math.min(100, ((6 - votesNeeded) / 6) * 100) : 0;
+  const votesNeeded = wordVoteInfo?.votesNeeded ?? PROMINENT_THRESHOLD;
+  const progressPercent = wordVoteInfo ? Math.min(100, ((PROMINENT_THRESHOLD - votesNeeded) / PROMINENT_THRESHOLD) * 100) : 0;
+  const isValidForScoring = wordVoteInfo?.isValidForScoring || false;
 
   return (
     <AnimatePresence>
@@ -334,14 +338,24 @@ const WordFeedbackModal = memo<WordFeedbackModalProps>(({
                 <div className="mt-4 space-y-1">
                   <div className="h-2 bg-neo-black/20 rounded-full overflow-hidden">
                     <motion.div
-                      className="h-full bg-neo-lime"
+                      className={`h-full ${isValidForScoring ? 'bg-neo-cyan' : 'bg-neo-lime'}`}
                       initial={{ width: 0 }}
                       animate={{ width: `${progressPercent}%` }}
                       transition={{ duration: 0.5 }}
                     />
                   </div>
                   <p className="text-xs font-semibold text-neo-black/70">
-                    {votesNeeded > 0 ? (
+                    {isValidForScoring ? (
+                      <>
+                        <FaCheckCircle className="inline mr-1 text-neo-cyan" />
+                        {t('wordFeedback.validForScoring') || 'Counts as valid! Help add it to dictionary.'}
+                        {votesNeeded > 0 && (
+                          <span className="text-neo-black/50 ml-1">
+                            ({votesNeeded} {t('wordFeedback.moreForDictionary') || 'more for dictionary'})
+                          </span>
+                        )}
+                      </>
+                    ) : votesNeeded > 0 ? (
                       <>
                         <FaCheckCircle className="inline mr-1 text-neo-lime" />
                         {t('wordFeedback.votesNeeded', { count: String(votesNeeded) }) || `${votesNeeded} more votes to approve`}

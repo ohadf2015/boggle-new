@@ -25,6 +25,7 @@ interface WordObject {
   isPendingValidation?: boolean;
   potentialScore?: number;
   invalidReason?: string;
+  aiReason?: string; // AI's reason for validating/invalidating the word
 }
 
 interface Title {
@@ -90,6 +91,7 @@ const WordChip = memo<WordChipProps>(({ wordObj, playerCount }) => {
   const isAiVerified = wordObj.isAiVerified;
   const isPending = wordObj.isPendingValidation;
   const invalidReason = wordObj.invalidReason;
+  const aiReason = wordObj.aiReason;
   const displayWord = applyHebrewFinalLetters(wordObj.word);
   const comboBonus = wordObj.comboBonus || 0;
 
@@ -158,7 +160,7 @@ const WordChip = memo<WordChipProps>(({ wordObj, playerCount }) => {
           </Tooltip>
         </TooltipProvider>
       )}
-      {/* Show AI verification indicator */}
+      {/* Show AI verification indicator with reason tooltip */}
       {isAiVerified && isValid && !isDuplicate && (
         <TooltipProvider delayDuration={0}>
           <Tooltip>
@@ -169,9 +171,12 @@ const WordChip = memo<WordChipProps>(({ wordObj, playerCount }) => {
             </TooltipTrigger>
             <TooltipContent
               side="top"
-              className="bg-neo-purple border-2 border-neo-black shadow-hard rounded-neo p-2"
+              className="bg-neo-purple border-2 border-neo-black shadow-hard rounded-neo p-2 max-w-[250px]"
             >
               <p className="text-xs font-bold text-neo-cream">{t('results.aiVerified') || 'Verified by AI'}</p>
+              {aiReason && (
+                <p className="text-xs text-neo-yellow mt-1">{aiReason}</p>
+              )}
             </TooltipContent>
           </Tooltip>
         </TooltipProvider>
