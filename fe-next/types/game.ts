@@ -3,7 +3,7 @@
  * Core types for LexiClash game logic
  */
 
-export type Language = 'he' | 'en' | 'sv' | 'ja';
+export type Language = 'he' | 'en' | 'sv' | 'ja' | 'es' | 'fr' | 'de';
 
 export type GameState = 'waiting' | 'in-progress' | 'finished' | 'validating';
 

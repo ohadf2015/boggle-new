@@ -343,7 +343,7 @@ const ShareWinPrompt: React.FC<ShareWinPromptProps> = ({
       .replace('{wordCount}', String(wordCount));
 
     // Add achievements and word count info
-    const statsLine = isHebrew
+    const statsLine = language === 'he'
       ? `\n${wordCount} מילים${achievementIcons ? ` ${achievementIcons}` : ''}`
       : `\n${wordCount} words found${achievementIcons ? ` ${achievementIcons}` : ''}`;
 
