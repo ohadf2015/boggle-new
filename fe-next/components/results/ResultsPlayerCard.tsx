@@ -24,6 +24,7 @@ interface WordObject {
   isAiVerified?: boolean;
   isPendingValidation?: boolean;
   potentialScore?: number;
+  invalidReason?: string;
 }
 
 interface Title {
@@ -88,6 +89,7 @@ const WordChip = memo<WordChipProps>(({ wordObj, playerCount }) => {
   const isValid = wordObj.validated;
   const isAiVerified = wordObj.isAiVerified;
   const isPending = wordObj.isPendingValidation;
+  const invalidReason = wordObj.invalidReason;
   const displayWord = applyHebrewFinalLetters(wordObj.word);
   const comboBonus = wordObj.comboBonus || 0;
 
@@ -109,71 +111,94 @@ const WordChip = memo<WordChipProps>(({ wordObj, playerCount }) => {
     return 'var(--neo-cream)';
   };
 
+  // Render the word chip content
+  const chipContent = (
+    <span
+      className={cn(
+        "inline-flex items-center gap-1 px-2 py-1 text-sm font-black uppercase border-2 border-neo-black rounded-neo shadow-hard-sm transition-all hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-hard",
+        isDuplicate && "line-through opacity-80",
+        !isDuplicate && !isValid && !isPending && "opacity-70",
+        isPending && "animate-pulse",
+        !isValid && !isDuplicate && !isPending && invalidReason && "cursor-help"
+      )}
+      style={{
+        backgroundColor: getBackgroundColor(),
+        color: getTextColor(),
+      }}
+    >
+      {label}
+      {/* Show combo bonus indicator */}
+      {comboBonus > 0 && !isDuplicate && isValid && (
+        <span className="text-[10px] px-1 py-0.5 bg-neo-yellow text-neo-black rounded border border-neo-black font-black">
+          +{comboBonus}
+        </span>
+      )}
+      {/* Show pending validation indicator */}
+      {isPending && !isDuplicate && (
+        <TooltipProvider delayDuration={0}>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <span className="text-[10px] px-1 py-0.5 bg-neo-yellow text-neo-black rounded border border-neo-black font-black cursor-help">
+                ?
+              </span>
+            </TooltipTrigger>
+            <TooltipContent
+              side="top"
+              className="bg-neo-purple border-2 border-neo-black shadow-hard rounded-neo p-2"
+            >
+              <p className="text-xs font-bold text-neo-cream">
+                {t('results.pendingValidation') || 'Pending community validation'}
+                {wordObj.potentialScore && (
+                  <span className="block text-neo-yellow mt-1">
+                    {t('results.potentialScore', { score: String(wordObj.potentialScore) }) || `+${wordObj.potentialScore} pts if approved`}
+                  </span>
+                )}
+              </p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+      )}
+      {/* Show AI verification indicator */}
+      {isAiVerified && isValid && !isDuplicate && (
+        <TooltipProvider delayDuration={0}>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <span className="text-[10px] px-1 py-0.5 bg-neo-purple text-neo-cream rounded border border-neo-black font-black cursor-help">
+                AI
+              </span>
+            </TooltipTrigger>
+            <TooltipContent
+              side="top"
+              className="bg-neo-purple border-2 border-neo-black shadow-hard rounded-neo p-2"
+            >
+              <p className="text-xs font-bold text-neo-cream">{t('results.aiVerified') || 'Verified by AI'}</p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+      )}
+    </span>
+  );
+
   return (
     <div className="relative group">
-      <span
-        className={cn(
-          "inline-flex items-center gap-1 px-2 py-1 text-sm font-black uppercase border-2 border-neo-black rounded-neo shadow-hard-sm transition-all hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-hard",
-          isDuplicate && "line-through opacity-80",
-          !isDuplicate && !isValid && !isPending && "opacity-70",
-          isPending && "animate-pulse"
-        )}
-        style={{
-          backgroundColor: getBackgroundColor(),
-          color: getTextColor(),
-        }}
-      >
-        {label}
-        {/* Show combo bonus indicator */}
-        {comboBonus > 0 && !isDuplicate && isValid && (
-          <span className="text-[10px] px-1 py-0.5 bg-neo-yellow text-neo-black rounded border border-neo-black font-black">
-            +{comboBonus}
-          </span>
-        )}
-        {/* Show pending validation indicator */}
-        {isPending && !isDuplicate && (
-          <TooltipProvider delayDuration={0}>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <span className="text-[10px] px-1 py-0.5 bg-neo-yellow text-neo-black rounded border border-neo-black font-black cursor-help">
-                  ?
-                </span>
-              </TooltipTrigger>
-              <TooltipContent
-                side="top"
-                className="bg-neo-purple border-2 border-neo-black shadow-hard rounded-neo p-2"
-              >
-                <p className="text-xs font-bold text-neo-cream">
-                  {t('results.pendingValidation') || 'Pending community validation'}
-                  {wordObj.potentialScore && (
-                    <span className="block text-neo-yellow mt-1">
-                      {t('results.potentialScore', { score: String(wordObj.potentialScore) }) || `+${wordObj.potentialScore} pts if approved`}
-                    </span>
-                  )}
-                </p>
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
-        )}
-        {/* Show AI verification indicator */}
-        {isAiVerified && isValid && !isDuplicate && (
-          <TooltipProvider delayDuration={0}>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <span className="text-[10px] px-1 py-0.5 bg-neo-purple text-neo-cream rounded border border-neo-black font-black cursor-help">
-                  AI
-                </span>
-              </TooltipTrigger>
-              <TooltipContent
-                side="top"
-                className="bg-neo-purple border-2 border-neo-black shadow-hard rounded-neo p-2"
-              >
-                <p className="text-xs font-bold text-neo-cream">{t('results.aiVerified') || 'Verified by AI'}</p>
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
-        )}
-      </span>
+      {/* Wrap invalid words with tooltip showing the reason */}
+      {!isValid && !isDuplicate && !isPending && invalidReason ? (
+        <TooltipProvider delayDuration={0}>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              {chipContent}
+            </TooltipTrigger>
+            <TooltipContent
+              side="top"
+              className="bg-neo-red border-2 border-neo-black shadow-hard rounded-neo p-2 max-w-[200px]"
+            >
+              <p className="text-xs font-bold text-neo-cream">{invalidReason}</p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+      ) : (
+        chipContent
+      )}
       {isDuplicate && playerCount > 1 && (
         <span className="absolute -top-2 end-[-8px] bg-neo-black text-neo-cream text-[10px] px-1.5 py-0.5 min-w-[18px] h-[18px] flex items-center justify-center font-black border-2 border-neo-black rounded-neo">
           {playerCount}

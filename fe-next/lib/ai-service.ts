@@ -333,40 +333,59 @@ class GameAIService {
     };
 
     const languageName = languageNames[language] || language;
+    const isHebrew = language === 'he';
 
-    const prompt = `You are a strict word validator for a Boggle-style word game. Your task is to determine if a word is valid with a confidence score.
+    // Build Hebrew-specific instruction if needed
+    const hebrewFinalLettersNote = isHebrew ? `
+IMPORTANT FOR HEBREW: The game board does NOT have final Hebrew letters (sofit letters: ך, ם, ן, ף, ץ).
+Players type using regular letters (כ, מ, נ, פ, צ) even at the end of words.
+When validating, treat words written with regular letters at the end as if they were written with final letters.
+For example: "שלומ" should be considered as "שלום" (valid word).
+Do NOT reject words just because they use regular letters instead of final forms at the end.
+` : '';
+
+    // Determine response language - provide reason in the game language
+    const responseLanguageNote = `
+RESPONSE LANGUAGE: Provide the "reason" field in ${languageName}. The reason should be a brief, clear explanation in ${languageName}.`;
+
+    const prompt = `You are a word validator for a Boggle-style word game. Your task is to determine if a word is valid with a confidence score.
 
 LANGUAGE: ${languageName} (${language})
 WORD TO VALIDATE: "${word}"
-
+${hebrewFinalLettersNote}
 VALIDATION RULES:
-1. The word must be a REAL, established word in ${languageName}
+1. The word must be a REAL word or name that exists in ${languageName}
 2. ACCEPT: Common dictionary words, verbs in any conjugation, nouns (singular/plural), adjectives, adverbs
 3. ACCEPT: Well-established slang that appears in dictionaries
-4. REJECT: Proper nouns (names of people, places, brands) - these are NOT allowed in word games
-5. REJECT: Abbreviations and acronyms (e.g., "TV", "USA")
-6. REJECT: Words with spaces, hyphens, or special characters
-7. REJECT: Random letter combinations that aren't real words
-8. REJECT: Very obscure or archaic words that most native speakers wouldn't recognize
-9. BE STRICT: Only approve words you are highly confident about. When in doubt, reject the word.
+4. ACCEPT: Common first names (e.g., "David", "Sarah", "Mohammed") - names ARE allowed
+5. ACCEPT: Well-known place names, country names, city names (e.g., "Paris", "Japan", "London")
+6. ACCEPT: Well-known acronyms that are commonly used (e.g., "NASA", "FIFA", "NATO")
+7. REJECT: Words with spaces, hyphens, or special characters
+8. REJECT: Random letter combinations that aren't real words
+9. REJECT: Gibberish or misspellings - the word must be spelled correctly
+10. When in doubt about obscure words, reject them
 
-IMPORTANT: You must provide a confidence score (0-100) indicating how certain you are that this is a valid word.
-- 95-100: Absolutely certain - common, well-known word
-- 85-94: Very confident - established word, may be less common
+IMPORTANT SPELLING CHECK: Make sure the word is spelled correctly. Common misspellings should be REJECTED.
+
+CONFIDENCE SCORE (0-100):
+- 95-100: Absolutely certain - common, well-known word or name
+- 85-94: Very confident - established word/name, may be less common
 - 70-84: Moderately confident - possibly valid but uncertain
-- Below 70: Not confident - likely invalid or very obscure
+- Below 70: Not confident - likely invalid, misspelled, or very obscure
 
 The word is case-insensitive (ignore capitalization).
+${responseLanguageNote}
 
 Respond with ONLY a valid JSON object in this exact format:
-{ "isValid": boolean, "reason": "brief explanation in English", "confidence": number }
+{ "isValid": boolean, "reason": "brief explanation in ${languageName}", "confidence": number }
 
-Example responses:
-{ "isValid": true, "reason": "Common ${languageName} noun", "confidence": 98 }
-{ "isValid": true, "reason": "Valid ${languageName} verb conjugation", "confidence": 92 }
-{ "isValid": false, "reason": "Proper noun - not allowed in word games", "confidence": 95 }
-{ "isValid": false, "reason": "Not a recognized ${languageName} word", "confidence": 88 }
-{ "isValid": false, "reason": "Uncertain - may be valid but cannot confirm", "confidence": 60 }`;
+Example responses for ${languageName}:
+{ "isValid": true, "reason": "${isHebrew ? 'שם עצם נפוץ' : `Common ${languageName} noun`}", "confidence": 98 }
+{ "isValid": true, "reason": "${isHebrew ? 'שם פרטי נפוץ' : 'Common first name'}", "confidence": 95 }
+{ "isValid": true, "reason": "${isHebrew ? 'ראשי תיבות ידועים' : 'Well-known acronym'}", "confidence": 96 }
+{ "isValid": false, "reason": "${isHebrew ? 'שגיאת כתיב' : 'Misspelling'}", "confidence": 92 }
+{ "isValid": false, "reason": "${isHebrew ? 'לא מילה מוכרת' : `Not a recognized ${languageName} word`}", "confidence": 88 }
+{ "isValid": false, "reason": "${isHebrew ? 'צירוף אותיות אקראי' : 'Random letter combination'}", "confidence": 95 }`;
 
     try {
       const result = await this.model.generateContent(prompt);
