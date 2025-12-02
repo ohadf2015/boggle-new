@@ -126,9 +126,11 @@ export const LanguageProvider = ({ children, initialLanguage }: LanguageProvider
     }, [initialLanguage, pathname]);
 
     useEffect(() => {
-        // Save to localStorage
+        // Save to localStorage AND cookie (middleware reads cookie)
         if (typeof window !== 'undefined') {
             localStorage.setItem('boggle_language', language);
+            // Set cookie with 1-year expiry for server-side middleware
+            document.cookie = `boggle_language=${language}; path=/; max-age=${60 * 60 * 24 * 365}; SameSite=Lax`;
         }
     }, [language]);
 
@@ -136,14 +138,21 @@ export const LanguageProvider = ({ children, initialLanguage }: LanguageProvider
         if (newLang !== language) {
             setLanguageState(newLang);
 
-            // Navigate to new locale preserving path
+            // Also update cookie immediately for server-side consistency
+            if (typeof document !== 'undefined') {
+                document.cookie = `boggle_language=${newLang}; path=/; max-age=${60 * 60 * 24 * 365}; SameSite=Lax`;
+            }
+
+            // Navigate to new locale preserving FULL path (everything after locale)
             const segments = pathname.split('/');
-            // segments[0] is empty string
+            // segments[0] is empty string, segments[1] is locale
             const currentLocale = segments[1];
 
             if (locales.includes(currentLocale as Language)) {
                 segments[1] = newLang;
-                router.push(segments.join('/'));
+                // Join segments and ensure we have a valid path
+                const newPath = segments.join('/') || `/${newLang}`;
+                router.push(newPath);
             } else {
                 // Fallback if locale is missing (shouldn't happen with middleware)
                 router.push(`/${newLang}${pathname}`);
