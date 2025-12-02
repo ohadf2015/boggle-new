@@ -259,6 +259,15 @@ app.prepare().then(() => {
   // GET /api/geolocation - Get geolocation data for the requesting client
   server.get('/api/geolocation', async (req, res) => {
     try {
+      // First check if middleware already populated geoData (more efficient)
+      if (req.geoData && req.geoData.countryCode) {
+        return res.json({
+          success: true,
+          ...req.geoData
+        });
+      }
+
+      // Fallback to fetching geolocation if middleware didn't run or failed
       const geoData = await getCountryFromRequest(req);
       res.json({
         success: true,
@@ -266,10 +275,13 @@ app.prepare().then(() => {
       });
     } catch (error) {
       console.error('[API] Geolocation error:', error);
-      res.status(500).json({
+      // Return a graceful response with null countryCode instead of 500 error
+      // This allows the client to continue functioning without geolocation
+      res.json({
         success: false,
         error: 'Failed to get geolocation',
-        countryCode: null
+        countryCode: null,
+        source: 'error'
       });
     }
   });

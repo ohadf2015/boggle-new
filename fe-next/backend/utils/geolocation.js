@@ -136,38 +136,58 @@ async function cacheGeodata(ip, data) {
 /**
  * Lookup geolocation from IP address using ip-api.com
  * Free tier: 45 requests/minute
+ * This function is designed to never throw - it always returns a valid object
  */
 async function lookupIP(ip) {
-  if (isPrivateIP(ip)) {
-    return {
-      status: 'success',
-      country: 'Unknown',
-      countryCode: null,
-      region: null,
-      city: null,
-      isPrivate: true
-    };
-  }
-
-  // Check cache first
-  const cached = await getCachedGeodata(ip);
-  if (cached) {
-    return cached;
-  }
-
   try {
+    if (isPrivateIP(ip)) {
+      return {
+        status: 'success',
+        country: 'Unknown',
+        countryCode: null,
+        region: null,
+        city: null,
+        isPrivate: true
+      };
+    }
+
+    // Check cache first
+    const cached = await getCachedGeodata(ip);
+    if (cached) {
+      return cached;
+    }
+
+    // Check if fetch is available (Node.js 18+ has global fetch)
+    if (typeof fetch === 'undefined') {
+      console.warn('[GEOLOCATION] fetch is not available - returning null');
+      return {
+        status: 'error',
+        message: 'fetch not available',
+        countryCode: null
+      };
+    }
+
     // ip-api.com provides free geolocation without API key
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 3000); // 3 second timeout
 
-    const response = await fetch(
-      `http://ip-api.com/json/${ip}?fields=status,message,country,countryCode,region,regionName,city`,
-      { signal: controller.signal }
-    );
-    clearTimeout(timeout);
+    let response;
+    try {
+      response = await fetch(
+        `http://ip-api.com/json/${ip}?fields=status,message,country,countryCode,region,regionName,city`,
+        { signal: controller.signal }
+      );
+    } finally {
+      clearTimeout(timeout);
+    }
 
     if (!response.ok) {
-      throw new Error(`HTTP ${response.status}`);
+      console.warn('[GEOLOCATION] API returned HTTP', response.status);
+      return {
+        status: 'error',
+        message: `HTTP ${response.status}`,
+        countryCode: null
+      };
     }
 
     const data = await response.json();
@@ -191,15 +211,22 @@ async function lookupIP(ip) {
       ip: ip
     };
 
-    // Cache the result
-    await cacheGeodata(ip, result);
+    // Cache the result (in background, don't await)
+    cacheGeodata(ip, result).catch(err => {
+      console.warn('[GEOLOCATION] Cache write failed:', err.message);
+    });
 
     return result;
   } catch (error) {
-    console.warn('[GEOLOCATION] Lookup failed for', ip, ':', error.message);
+    // Handle AbortError specially for clearer logging
+    if (error.name === 'AbortError') {
+      console.warn('[GEOLOCATION] Request timed out for', ip);
+    } else {
+      console.warn('[GEOLOCATION] Lookup failed for', ip, ':', error.message);
+    }
     return {
       status: 'error',
-      message: error.message,
+      message: error.name === 'AbortError' ? 'timeout' : error.message,
       countryCode: null
     };
   }
@@ -208,50 +235,57 @@ async function lookupIP(ip) {
 /**
  * Get country code from request
  * First checks CDN headers, then falls back to IP lookup
+ * This function is designed to never throw - it always returns a valid object
  */
 async function getCountryFromRequest(req) {
-  // First, check for existing CDN geolocation headers
-  // (In case Railway is fronted by Cloudflare or other CDN)
+  try {
+    // First, check for existing CDN geolocation headers
+    // (In case Railway is fronted by Cloudflare or other CDN)
 
-  // Vercel
-  const vercelCountry = req.headers['x-vercel-ip-country'];
-  if (vercelCountry) {
-    return { countryCode: vercelCountry, source: 'vercel' };
+    // Vercel
+    const vercelCountry = req.headers?.['x-vercel-ip-country'];
+    if (vercelCountry) {
+      return { countryCode: vercelCountry, source: 'vercel' };
+    }
+
+    // Cloudflare
+    const cfCountry = req.headers?.['cf-ipcountry'];
+    if (cfCountry && cfCountry !== 'XX') {
+      return { countryCode: cfCountry, source: 'cloudflare' };
+    }
+
+    // AWS CloudFront
+    const awsCountry = req.headers?.['cloudfront-viewer-country'];
+    if (awsCountry) {
+      return { countryCode: awsCountry, source: 'cloudfront' };
+    }
+
+    // Generic geo header (custom setups)
+    const geoCountry = req.headers?.['x-country-code'];
+    if (geoCountry) {
+      return { countryCode: geoCountry, source: 'header' };
+    }
+
+    // Fall back to IP lookup
+    const ip = getClientIP(req);
+    if (!ip) {
+      return { countryCode: null, source: 'none' };
+    }
+
+    const geoData = await lookupIP(ip);
+    return {
+      countryCode: geoData.countryCode || null,
+      country: geoData.country,
+      city: geoData.city,
+      region: geoData.regionName,
+      ip: ip,
+      source: 'ip-lookup'
+    };
+  } catch (error) {
+    // Log the error but return a safe fallback - never throw
+    console.warn('[GEOLOCATION] getCountryFromRequest error:', error.message);
+    return { countryCode: null, source: 'error', error: error.message };
   }
-
-  // Cloudflare
-  const cfCountry = req.headers['cf-ipcountry'];
-  if (cfCountry && cfCountry !== 'XX') {
-    return { countryCode: cfCountry, source: 'cloudflare' };
-  }
-
-  // AWS CloudFront
-  const awsCountry = req.headers['cloudfront-viewer-country'];
-  if (awsCountry) {
-    return { countryCode: awsCountry, source: 'cloudfront' };
-  }
-
-  // Generic geo header (custom setups)
-  const geoCountry = req.headers['x-country-code'];
-  if (geoCountry) {
-    return { countryCode: geoCountry, source: 'header' };
-  }
-
-  // Fall back to IP lookup
-  const ip = getClientIP(req);
-  if (!ip) {
-    return { countryCode: null, source: 'none' };
-  }
-
-  const geoData = await lookupIP(ip);
-  return {
-    countryCode: geoData.countryCode || null,
-    country: geoData.country,
-    city: geoData.city,
-    region: geoData.regionName,
-    ip: ip,
-    source: 'ip-lookup'
-  };
 }
 
 /**
