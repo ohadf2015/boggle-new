@@ -9,7 +9,7 @@
  * We cache results for 24 hours to stay well within limits.
  */
 
-const { getClient } = require('../redisClient');
+const { getRedisClient } = require('../redisClient');
 
 // Cache TTL: 24 hours
 const GEOLOCATION_CACHE_TTL = 24 * 60 * 60;
@@ -86,7 +86,7 @@ function isPrivateIP(ip) {
  */
 async function getCachedGeodata(ip) {
   // Try Redis first
-  const redis = getClient();
+  const redis = getRedisClient();
   if (redis) {
     try {
       const cached = await redis.get(`geo:${ip}`);
@@ -112,7 +112,7 @@ async function getCachedGeodata(ip) {
  */
 async function cacheGeodata(ip, data) {
   // Try Redis first
-  const redis = getClient();
+  const redis = getRedisClient();
   if (redis) {
     try {
       await redis.setEx(`geo:${ip}`, GEOLOCATION_CACHE_TTL, JSON.stringify(data));
