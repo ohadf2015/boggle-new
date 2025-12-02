@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FaPlay, FaTimes, FaClock } from 'react-icons/fa';
 import { useLanguage } from '../../contexts/LanguageContext';
@@ -35,23 +35,56 @@ const AutoRejoinTimer: React.FC<AutoRejoinTimerProps> = ({
     setIsDismissed(false);
   }, [duration]);
 
+  // Refs to track callback and interval for proper cleanup
+  const onRejoinRef = useRef(onRejoin);
+  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const hasTriggeredRef = useRef(false);
+
+  useEffect(() => {
+    onRejoinRef.current = onRejoin;
+  }, [onRejoin]);
+
+  // Reset triggered state when component remounts or becomes visible again
+  useEffect(() => {
+    hasTriggeredRef.current = false;
+  }, [visible, duration]);
+
   // Countdown timer
   useEffect(() => {
-    if (isDismissed || !visible || countdown <= 0) return;
+    if (isDismissed || !visible) return;
 
-    const timer = setInterval(() => {
+    // Clear any existing timer
+    if (timerRef.current) {
+      clearInterval(timerRef.current);
+    }
+
+    timerRef.current = setInterval(() => {
       setCountdown((prev) => {
         if (prev <= 1) {
-          // Auto-rejoin when timer reaches 0
-          onRejoin();
+          // Clear the interval immediately when reaching 0
+          if (timerRef.current) {
+            clearInterval(timerRef.current);
+            timerRef.current = null;
+          }
+          // Only trigger onRejoin once
+          if (!hasTriggeredRef.current) {
+            hasTriggeredRef.current = true;
+            // Use setTimeout to avoid calling onRejoin during state update
+            setTimeout(() => onRejoinRef.current(), 0);
+          }
           return 0;
         }
         return prev - 1;
       });
     }, 1000);
 
-    return () => clearInterval(timer);
-  }, [isDismissed, visible, countdown, onRejoin]);
+    return () => {
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+        timerRef.current = null;
+      }
+    };
+  }, [isDismissed, visible]);
 
   const handleDismiss = useCallback(() => {
     setIsDismissed(true);
