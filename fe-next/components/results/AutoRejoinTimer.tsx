@@ -109,51 +109,53 @@ const AutoRejoinTimer: React.FC<AutoRejoinTimerProps> = ({
         animate={{ y: 0, opacity: 1, scale: 1 }}
         exit={{ y: 100, opacity: 0, scale: 0.9 }}
         transition={{ type: 'spring', stiffness: 300, damping: 25 }}
-        className="fixed bottom-4 left-1/2 -translate-x-1/2 z-50"
+        className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 mx-4 max-w-[calc(100%-2rem)]"
       >
-        <div className="bg-neo-cyan border-4 border-neo-black rounded-neo-lg shadow-hard-xl p-4 flex items-center gap-4">
-          {/* Circular countdown timer */}
-          <div className="relative w-16 h-16 flex-shrink-0">
-            <svg className="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
-              {/* Background circle */}
-              <circle
-                cx="50"
-                cy="50"
-                r="42"
-                fill="none"
-                stroke="var(--neo-black)"
-                strokeWidth="6"
-                opacity="0.2"
-              />
-              {/* Progress circle */}
-              <motion.circle
-                cx="50"
-                cy="50"
-                r="42"
-                fill="none"
-                stroke="var(--neo-black)"
-                strokeWidth="6"
-                strokeLinecap="round"
-                strokeDasharray={circumference}
-                strokeDashoffset={strokeDashoffset}
-                transition={{ duration: 0.3, ease: 'linear' }}
-              />
-            </svg>
-            {/* Countdown number */}
-            <div className="absolute inset-0 flex items-center justify-center">
-              <span className="text-2xl font-black text-neo-black">{countdown}</span>
-            </div>
+        <div className="bg-neo-cyan border-4 border-neo-black rounded-neo-lg shadow-hard-xl p-4 flex flex-col items-center gap-3">
+          {/* Row 1: Text label */}
+          <div className="flex items-center gap-2">
+            <FaClock className="text-neo-black" />
+            <span className="font-bold text-neo-black text-sm sm:text-base whitespace-nowrap">
+              {t('results.autoRejoinIn') || 'Auto-rejoin in'}
+            </span>
           </div>
 
-          {/* Text and buttons */}
-          <div className="flex flex-col gap-2">
-            <div className="flex items-center gap-2">
-              <FaClock className="text-neo-black" />
-              <span className="font-bold text-neo-black text-sm sm:text-base whitespace-nowrap">
-                {t('results.autoRejoinIn') || 'Auto-rejoin in'}
-              </span>
+          {/* Row 2: Timer and buttons */}
+          <div className="flex items-center gap-4">
+            {/* Circular countdown timer */}
+            <div className="relative w-14 h-14 flex-shrink-0">
+              <svg className="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
+                {/* Background circle */}
+                <circle
+                  cx="50"
+                  cy="50"
+                  r="42"
+                  fill="none"
+                  stroke="var(--neo-black)"
+                  strokeWidth="6"
+                  opacity="0.2"
+                />
+                {/* Progress circle */}
+                <motion.circle
+                  cx="50"
+                  cy="50"
+                  r="42"
+                  fill="none"
+                  stroke="var(--neo-black)"
+                  strokeWidth="6"
+                  strokeLinecap="round"
+                  strokeDasharray={circumference}
+                  strokeDashoffset={strokeDashoffset}
+                  transition={{ duration: 0.3, ease: 'linear' }}
+                />
+              </svg>
+              {/* Countdown number */}
+              <div className="absolute inset-0 flex items-center justify-center">
+                <span className="text-xl font-black text-neo-black">{countdown}</span>
+              </div>
             </div>
 
+            {/* Buttons */}
             <div className="flex gap-2">
               {/* Rejoin Now button */}
               <motion.button
