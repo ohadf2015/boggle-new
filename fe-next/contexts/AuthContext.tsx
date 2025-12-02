@@ -30,6 +30,7 @@ export interface ProfileData {
   longest_word_length?: number;
   achievement_counts?: Record<string, number>;
   current_level?: number;
+  is_admin?: boolean;
   created_at?: string;
   updated_at?: string;
 }
@@ -53,6 +54,7 @@ export interface AuthContextValue {
   // Computed
   isAuthenticated: boolean;
   isGuest: boolean;
+  isAdmin: boolean;
   canPlayRanked: boolean;
   gamesUntilRanked: number;
 
@@ -408,6 +410,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     // Computed
     isAuthenticated: !!user && !!profile,
     isGuest: !user,
+    isAdmin: !!profile?.is_admin,
     canPlayRanked: canPlayRanked(),
     gamesUntilRanked: gamesUntilRanked(),
 
