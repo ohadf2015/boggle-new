@@ -386,18 +386,21 @@ const usePlayerSocketEvents = ({
         return;
       }
 
+      // Achievements now use { key, icon } format - frontend will localize using player's language
       logger.log(`[PLAYER] Received ${data.achievements.length} live achievements:`,
-        data.achievements.map((a: any) => a?.name || 'unknown').join(', '));
+        data.achievements.map((a: any) => a?.key || a?.name || 'unknown').join(', '));
 
       data.achievements.forEach((achievement: any) => {
-        if (achievement && achievement.name) {
+        // Check for key (new format) or name (legacy format)
+        if (achievement && (achievement.key || achievement.name)) {
           queueAchievement(achievement);
         } else {
           logger.warn('[PLAYER] Skipping invalid achievement object:', achievement);
         }
       });
 
-      const validAchievements = data.achievements.filter((a: any) => a && a.name);
+      // Filter valid achievements - check for key or name
+      const validAchievements = data.achievements.filter((a: any) => a && (a.key || a.name));
       if (validAchievements.length > 0) {
         setAchievements(prev => [...prev, ...validAchievements]);
         logger.log(`[PLAYER] Added ${validAchievements.length} valid achievements to state`);

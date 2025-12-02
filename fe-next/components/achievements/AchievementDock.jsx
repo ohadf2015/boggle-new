@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { cn } from '../../lib/utils';
@@ -12,6 +12,22 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../ui/
  */
 const AchievementDock = ({ achievements = [], className }) => {
   const { t, dir } = useLanguage();
+
+  // Localize achievements using player's language
+  // Achievement can have either { key, icon } (unlocalized) or { name, description, icon } (legacy localized)
+  const localizedAchievements = useMemo(() => {
+    return achievements.map(achievement => {
+      if (achievement.key) {
+        return {
+          icon: achievement.icon,
+          name: t(`achievements.${achievement.key}.name`) || achievement.key,
+          description: t(`achievements.${achievement.key}.description`) || ''
+        };
+      }
+      // Legacy format: already has name and description
+      return achievement;
+    });
+  }, [achievements, t]);
   const [isExpanded, setIsExpanded] = useState(false);
   const [hasNewAchievement, setHasNewAchievement] = useState(false);
   const prevCountRef = useRef(achievements.length);
@@ -140,11 +156,11 @@ const AchievementDock = ({ achievements = [], className }) => {
             {/* Achievement list */}
             <div className="p-3 space-y-2">
               <TooltipProvider delayDuration={0}>
-                {achievements.map((achievement, index) => (
+                {localizedAchievements.map((achievement, index) => (
                   <Tooltip key={`${achievement.name}-${index}`}>
                     <TooltipTrigger asChild>
                       <motion.div
-                        initial={index === achievements.length - 1 && hasNewAchievement ? {
+                        initial={index === localizedAchievements.length - 1 && hasNewAchievement ? {
                           x: 20,
                           opacity: 0,
                         } : false}

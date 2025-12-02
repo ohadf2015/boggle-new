@@ -35,10 +35,10 @@ interface Title {
 }
 
 interface GameAchievement {
-  id: string;
-  name: string;
-  description: string;
   icon: string; // Required for game achievements
+  key?: string;        // Unlocalized format - frontend will localize
+  name?: string;       // Legacy localized format
+  description?: string; // Legacy localized format
 }
 
 interface Player {
