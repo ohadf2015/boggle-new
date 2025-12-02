@@ -290,7 +290,7 @@ async function recordAIVote({ word, language, isValid, reason, confidence }) {
     // First, try to get existing record
     const { data: existing, error: fetchError } = await client
       .from('word_scores')
-      .select('net_score, ai_score, ai_reason, ai_validated')
+      .select('net_score, ai_reason, ai_validated')
       .eq('word', normalizedWord)
       .eq('language', lang)
       .single();
@@ -323,7 +323,6 @@ async function recordAIVote({ word, language, isValid, reason, confidence }) {
         word: normalizedWord,
         language: lang,
         net_score: newNetScore,
-        ai_score: votePoints,
         ai_reason: reason || (isValid ? 'Valid word' : 'Invalid word'),
         ai_validated: true,
         ai_confidence: confidence || 85,
