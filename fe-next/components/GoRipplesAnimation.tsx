@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useSoundEffects } from '../contexts/SoundEffectsContext';
 
@@ -10,8 +10,8 @@ interface GoRipplesAnimationProps {
 
 /**
  * Pre-game countdown and GO animation
- * Shows 3-2-1 countdown with sound beeps, then a clean "GO!" animation
- * Total duration: ~4 seconds (3 seconds countdown + 1 second GO)
+ * Shows 3-2-1 countdown with sound beeps, then a quick "GO!"
+ * Clean, minimal design that's not distracting
  */
 const GoRipplesAnimation: React.FC<GoRipplesAnimationProps> = ({
   onComplete,
@@ -34,14 +34,13 @@ const GoRipplesAnimation: React.FC<GoRipplesAnimationProps> = ({
     if (phase !== 'countdown') return;
 
     if (countdownNumber <= 0) {
-      // Switch to GO phase
       setPhase('go');
       return;
     }
 
     const timer = setTimeout(() => {
       setCountdownNumber(prev => prev - 1);
-    }, 900); // Slightly less than 1 second for snappier feel
+    }, 800); // Quick countdown
 
     return () => clearTimeout(timer);
   }, [phase, countdownNumber]);
@@ -53,60 +52,50 @@ const GoRipplesAnimation: React.FC<GoRipplesAnimationProps> = ({
     const completeTimer = setTimeout(() => {
       setIsVisible(false);
       if (onComplete) onComplete();
-    }, 1200); // 1.2 seconds for GO animation
+    }, 800); // Quick GO display
 
     return () => clearTimeout(completeTimer);
   }, [phase, onComplete]);
 
   // Get color for countdown number
-  const getCountdownColor = useCallback((num: number): string => {
+  const getCountdownColor = (num: number): string => {
     switch (num) {
       case 3: return 'var(--neo-cyan)';
       case 2: return 'var(--neo-yellow)';
       case 1: return 'var(--neo-orange)';
       default: return 'var(--neo-yellow)';
     }
-  }, []);
+  };
 
   return (
     <AnimatePresence>
       {isVisible && (
         <motion.div
-          className="fixed inset-0 z-50 flex items-center justify-center pointer-events-none overflow-hidden bg-neo-black/60"
+          className="fixed inset-0 z-50 flex items-center justify-center pointer-events-none"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          transition={{ duration: 0.2 }}
+          transition={{ duration: 0.15 }}
         >
+          {/* Semi-transparent backdrop */}
+          <div className="absolute inset-0 bg-black/40" />
+
           {/* Countdown Phase */}
           <AnimatePresence mode="wait">
             {phase === 'countdown' && countdownNumber > 0 && (
               <motion.div
                 key={`countdown-${countdownNumber}`}
-                className="absolute flex items-center justify-center"
-                initial={{ scale: 0.3, opacity: 0 }}
+                className="relative z-10"
+                initial={{ scale: 0.5, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
-                exit={{ scale: 1.5, opacity: 0 }}
-                transition={{
-                  duration: 0.4,
-                  ease: [0.34, 1.56, 0.64, 1], // Overshoot easing
-                }}
+                exit={{ scale: 1.2, opacity: 0 }}
+                transition={{ duration: 0.25, ease: 'easeOut' }}
               >
-                {/* Single pulse ring */}
-                <motion.div
-                  className="absolute w-32 h-32 rounded-full border-4 border-neo-black"
-                  style={{ backgroundColor: getCountdownColor(countdownNumber) }}
-                  initial={{ scale: 1, opacity: 0.8 }}
-                  animate={{ scale: 2.5, opacity: 0 }}
-                  transition={{ duration: 0.8, ease: 'easeOut' }}
-                />
-
-                {/* Number */}
                 <div
-                  className="relative bg-neo-cream border-4 border-neo-black rounded-neo-lg shadow-hard-xl px-8 py-4"
+                  className="bg-neo-cream border-4 border-neo-black rounded-neo-lg shadow-hard-lg px-8 py-4"
                 >
                   <span
-                    className="text-8xl sm:text-9xl font-black text-neo-black"
+                    className="text-7xl sm:text-8xl font-black text-neo-black"
                     style={{ textShadow: `3px 3px 0px ${getCountdownColor(countdownNumber)}` }}
                   >
                     {countdownNumber}
@@ -121,38 +110,18 @@ const GoRipplesAnimation: React.FC<GoRipplesAnimationProps> = ({
             {phase === 'go' && (
               <motion.div
                 key="go-animation"
-                className="absolute z-10"
-                initial={{ scale: 0, opacity: 0, rotate: -10 }}
-                animate={{
-                  scale: [0, 1.15, 1],
-                  opacity: [0, 1, 1, 0],
-                  rotate: [-10, 3, 0],
-                }}
-                transition={{
-                  duration: 1.2,
-                  times: [0, 0.3, 0.7, 1],
-                  ease: [0.34, 1.56, 0.64, 1]
-                }}
+                className="relative z-10"
+                initial={{ scale: 0.5, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 1.1, opacity: 0 }}
+                transition={{ duration: 0.3, ease: [0.34, 1.56, 0.64, 1] }}
               >
-                {/* Single accent ripple */}
-                <motion.div
-                  className="absolute -inset-8 rounded-neo-lg border-4 border-neo-black bg-neo-cyan"
-                  initial={{ scale: 0.8, opacity: 0.6 }}
-                  animate={{ scale: 2, opacity: 0 }}
-                  transition={{ duration: 0.8, ease: 'easeOut' }}
-                />
-
-                {/* GO text container */}
                 <div
-                  className="relative bg-neo-yellow border-4 border-neo-black rounded-neo-lg shadow-hard-xl px-8 py-4"
-                  style={{ transform: 'rotate(-1deg)' }}
+                  className="bg-neo-yellow border-4 border-neo-black rounded-neo-lg shadow-hard-lg px-6 py-3"
                 >
                   <h1
-                    className="text-7xl sm:text-8xl font-black text-neo-black uppercase"
-                    style={{
-                      textShadow: '3px 3px 0px var(--neo-cyan)',
-                      letterSpacing: '0.05em',
-                    }}
+                    className="text-6xl sm:text-7xl font-black text-neo-black uppercase"
+                    style={{ textShadow: '3px 3px 0px var(--neo-cyan)' }}
                   >
                     GO!
                   </h1>
