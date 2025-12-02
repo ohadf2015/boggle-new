@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LexiClash - Copy Description</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #4a4a7a 100%);
+      min-height: 100vh;
+      padding: 40px 20px;
+      margin: 0;
+    }
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    h1 {
+      color: white;
+      text-align: center;
+      margin-bottom: 10px;
+      font-size: 2rem;
+    }
+    .subtitle {
+      color: rgba(255,255,255,0.8);
+      text-align: center;
+      margin-bottom: 30px;
+    }
+    .card {
+      background: #fffef5;
+      border: 4px solid #1a1a2e;
+      border-radius: 12px;
+      box-shadow: 6px 6px 0 #1a1a2e;
+      padding: 24px;
+      margin-bottom: 20px;
+    }
+    .description {
+      white-space: pre-wrap;
+      line-height: 1.7;
+      color: #1a1a2e;
+      font-size: 15px;
+    }
+    .btn {
+      width: 100%;
+      padding: 16px 24px;
+      font-size: 16px;
+      font-weight: bold;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      border: 4px solid #1a1a2e;
+      border-radius: 12px;
+      box-shadow: 6px 6px 0 #1a1a2e;
+      cursor: pointer;
+      transition: all 0.1s ease;
+      background: #00d9ff;
+      color: #1a1a2e;
+    }
+    .btn:hover {
+      transform: translate(-2px, -2px);
+      box-shadow: 8px 8px 0 #1a1a2e;
+    }
+    .btn:active {
+      transform: translate(3px, 3px);
+      box-shadow: 2px 2px 0 #1a1a2e;
+    }
+    .btn.copied {
+      background: #a8e619;
+    }
+    .title-section {
+      margin-bottom: 20px;
+    }
+    .title-card {
+      background: #ffeb3b;
+      border: 4px solid #1a1a2e;
+      border-radius: 12px;
+      box-shadow: 6px 6px 0 #1a1a2e;
+      padding: 16px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .title-text {
+      font-weight: bold;
+      font-size: 18px;
+      color: #1a1a2e;
+    }
+    .btn-small {
+      padding: 10px 20px;
+      font-size: 14px;
+      width: auto;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>LexiClash Game Description</h1>
+    <p class="subtitle">Click to copy the title and description</p>
+
+    <div class="title-section">
+      <div class="title-card">
+        <span class="title-text">LexiClash: The Ultimate Word Battle</span>
+        <button class="btn btn-small" onclick="copyTitle(this)">Copy Title</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="description" id="description">LexiClash is a fast-paced multiplayer word-finding game where players compete in real-time to discover hidden words within randomized letter grids.
+
+Race against the clock and your opponents to form words by connecting adjacent letters horizontally, vertically, or diagonally. Each round presents a fresh grid filled with letters waiting to be transformed into words. Create game rooms and invite up to 50 friends, family members, or classmates to join the word-hunting frenzy.
+
+Simply click or tap on letters to build your word, then submit it for instant validation. The intuitive drag-and-swipe interface makes word creation smooth and satisfying on both desktop and mobile devices.
+
+Longer words earn more points, but the real secret to domination lies in the combo system. Submit words consecutively without mistakes to build your combo multiplier, reaching up to 1.75x your base score. Accuracy matters—invalid submissions break your streak and reset your multiplier to zero.
+
+Start with shorter words to build momentum and secure your combo multiplier before hunting for longer, high-value discoveries. Scan the grid edges where competitors often overlook hidden gems. Balance speed with precision—a broken combo costs more than a few extra seconds of careful selection.
+
+Choose from five difficulty levels ranging from beginner-friendly 4x4 grids to the mind-bending 11x11 master challenge. Unlock over 15 unique achievements like Combo King for maintaining epic streaks or Word Architect for discovering lengthy vocabulary treasures. Track your progress through the leveling system, earn experience points, and watch your rank climb from newcomer to Eternal Champion.
+
+Whether you are hosting a party, energizing a classroom, or enjoying family game night, LexiClash transforms vocabulary building into thrilling competition. Available in English, Hebrew, Swedish, and Japanese.</div>
+    </div>
+
+    <button class="btn" id="copyBtn" onclick="copyDescription(this)">Copy Description</button>
+  </div>
+
+  <script>
+    function copyTitle(btn) {
+      const title = "LexiClash: The Ultimate Word Battle";
+      navigator.clipboard.writeText(title).then(() => {
+        btn.textContent = "Copied!";
+        btn.classList.add("copied");
+        setTimeout(() => {
+          btn.textContent = "Copy Title";
+          btn.classList.remove("copied");
+        }, 2000);
+      });
+    }
+
+    function copyDescription(btn) {
+      const text = document.getElementById("description").textContent;
+      navigator.clipboard.writeText(text).then(() => {
+        btn.textContent = "Copied!";
+        btn.classList.add("copied");
+        setTimeout(() => {
+          btn.textContent = "Copy Description";
+          btn.classList.remove("copied");
+        }, 2000);
+      });
+    }
+  </script>
+</body>
+</html>
