@@ -20,6 +20,7 @@ export const metadata = {
     // Help Google find and display favicon
     icons: {
         icon: [
+            { url: 'https://www.lexiclash.live/favicon.svg', type: 'image/svg+xml' },
             { url: 'https://www.lexiclash.live/favicon.ico', sizes: '48x48 32x32 16x16', type: 'image/x-icon' },
             { url: 'https://www.lexiclash.live/icon-192.png', sizes: '192x192', type: 'image/png' },
         ],

@@ -80,6 +80,7 @@ export async function generateMetadata({ params }) {
         },
         icons: {
             icon: [
+                { url: 'https://www.lexiclash.live/favicon.svg', type: 'image/svg+xml' },
                 { url: 'https://www.lexiclash.live/favicon.ico', sizes: '48x48 32x32 16x16', type: 'image/x-icon' },
                 { url: 'https://www.lexiclash.live/icon-48.png', sizes: '48x48', type: 'image/png' },
                 { url: 'https://www.lexiclash.live/icon-96.png', sizes: '96x96', type: 'image/png' },
@@ -235,6 +236,7 @@ export default async function LocaleLayout({ children, params }) {
                 {/* Load Google Fonts at runtime */}
                 <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Rubik:wght@400;500;600;700&display=swap" rel="stylesheet" />
                 {/* Favicon and icons with absolute URLs for better Google crawlability */}
+                <link rel="icon" href="https://www.lexiclash.live/favicon.svg" type="image/svg+xml" />
                 <link rel="icon" href="https://www.lexiclash.live/favicon.ico" sizes="48x48 32x32 16x16" type="image/x-icon" />
                 <link rel="shortcut icon" href="https://www.lexiclash.live/favicon.ico" type="image/x-icon" />
                 <link rel="icon" type="image/png" sizes="16x16" href="https://www.lexiclash.live/icon-48.png" />
