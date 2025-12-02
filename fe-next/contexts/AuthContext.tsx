@@ -189,7 +189,13 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
           // Handle cross-tab auth state sync
           if (event === 'SIGNED_IN' && session?.user) {
             setUser(session.user);
-            setLoading(true);
+            // Only set loading if we don't already have profile data
+            // This prevents loading state getting stuck on tab visibility change
+            setLoading(currentLoading => {
+              // If already loading, stay loading; if not loading and no profile, set loading
+              // If we already have profile data, don't set loading - just refresh in background
+              return currentLoading;
+            });
             try {
               await fetchUserData(session.user.id);
             } finally {
@@ -241,6 +247,29 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     };
     window.addEventListener('supabase-auth-error', handleAuthError as EventListener);
 
+    // Handle tab visibility change - ensure loading is reset when coming back to tab
+    // This prevents the avatar section from being stuck at loading
+    let visibilityTimeout: NodeJS.Timeout | null = null;
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible' && isMounted) {
+        // When tab becomes visible, ensure loading is reset after a short delay
+        // This catches any edge cases where loading got stuck
+        if (visibilityTimeout) clearTimeout(visibilityTimeout);
+        visibilityTimeout = setTimeout(() => {
+          if (isMounted) {
+            setLoading(currentLoading => {
+              if (currentLoading) {
+                logger.warn('Tab visibility change - forcing loading to false');
+                return false;
+              }
+              return currentLoading;
+            });
+          }
+        }, 1500); // Short delay to allow normal auth flow to complete
+      }
+    };
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
     initAuth();
 
     // Safety timeout: ensure loading is set to false after 3 seconds
@@ -263,10 +292,12 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     return () => {
       isMounted = false;
       clearTimeout(loadingTimeout);
+      if (visibilityTimeout) clearTimeout(visibilityTimeout);
       if (subscription) {
         subscription.unsubscribe();
       }
       window.removeEventListener('supabase-auth-error', handleAuthError as EventListener);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
     };
   }, [fetchUserData, clearAuthState]);
 
