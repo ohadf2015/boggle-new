@@ -1,7 +1,7 @@
 {
   "short_name": "LexiClash",
-  "name": "LexiClash - משחק מילים מהיר לקבוצות",
-  "description": "משחק מילים מהיר וממכר לקבוצות. מושלם למסיבות, ימי גיבוש ומשפחה",
+  "name": "LexiClash - Educational Word Game | משחק מילים חינוכי",
+  "description": "Free educational word game for vocabulary building and language learning. Perfect for classrooms, ESL, and family game night. | משחק מילים חינוכי להעשרת אוצר מילים ולימוד שפות",
   "lang": "he",
   "dir": "rtl",
   "icons": [
@@ -50,6 +50,18 @@
   "background_color": "#4a4a7a",
   "categories": [
     "games",
-    "entertainment"
-  ]
+    "education",
+    "entertainment",
+    "kids",
+    "puzzle"
+  ],
+  "screenshots": [
+    {
+      "src": "/og-image-en.jpg",
+      "sizes": "1200x630",
+      "type": "image/jpeg",
+      "label": "LexiClash Educational Word Game"
+    }
+  ],
+  "iarc_rating_id": "E"
 }
