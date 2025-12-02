@@ -88,9 +88,22 @@ export const LanguageProvider = ({ children, initialLanguage }: LanguageProvider
         languageRef.current = language;
     }, [language]);
 
-    // After mount, check for client-side preferences
+    // After mount, sync localStorage with URL locale
+    // URL is the source of truth - don't override explicit URL locale with stored preferences
     useEffect(() => {
         mountedRef.current = true;
+
+        // Get the locale from the URL path
+        const urlLocale = pathname ? parseLocaleFromPath(pathname) : null;
+
+        // If URL has an explicit locale, that's the source of truth
+        // Don't change language state - the URL dictates the language
+        if (urlLocale) {
+            return;
+        }
+
+        // Only if there's NO locale in URL (shouldn't happen with middleware, but fallback)
+        // do we check stored preferences
         const currentLang = languageRef.current;
 
         // Check localStorage for user's explicit preference
