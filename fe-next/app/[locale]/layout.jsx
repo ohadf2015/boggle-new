@@ -1,22 +1,6 @@
-import { Fredoka, Rubik } from 'next/font/google';
 import { translations } from '@/translations';
 import { Providers } from '../providers';
 import Footer from '@/components/Footer';
-
-// Optimize fonts with next/font
-const fredoka = Fredoka({
-  subsets: ['latin', 'hebrew'],
-  weight: ['400', '500', '600', '700'],
-  display: 'swap',
-  variable: '--font-fredoka',
-});
-
-const rubik = Rubik({
-  subsets: ['latin', 'hebrew'],
-  weight: ['400', '500', '600', '700'],
-  display: 'swap',
-  variable: '--font-rubik',
-});
 
 // Force dynamic rendering - prevent static generation
 export const dynamic = 'force-dynamic';
@@ -207,7 +191,7 @@ export default async function LocaleLayout({ children, params }) {
     ];
 
     return (
-        <html lang={locale} dir={dir} className={`${fredoka.variable} ${rubik.variable}`}>
+        <html lang={locale} dir={dir}>
             <head>
                 <meta charSet="utf-8" />
                 {/* Preconnect hints for faster resource loading on slow connections */}
@@ -217,6 +201,8 @@ export default async function LocaleLayout({ children, params }) {
                 <link rel="dns-prefetch" href="https://fonts.googleapis.com" />
                 <link rel="dns-prefetch" href="https://fonts.gstatic.com" />
                 <link rel="dns-prefetch" href="https://hdtmpkicuxvtmvrmtybx.supabase.co" />
+                {/* Load Google Fonts at runtime */}
+                <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Rubik:wght@400;500;600;700&display=swap" rel="stylesheet" />
                 <link rel="icon" href="/favicon.ico" sizes="48x48 32x32 16x16" />
                 <link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png" />
                 <link rel="icon" type="image/png" sizes="512x512" href="/icon-512.png" />

@@ -7,8 +7,7 @@ import { HiSpeakerWave } from 'react-icons/hi2';
 import { useMusic } from '../contexts/MusicContext';
 import { useSoundEffects } from '../contexts/SoundEffectsContext';
 import { useLanguage } from '../contexts/LanguageContext';
-import { Button as ButtonComponent } from './ui/button.jsx';
-const Button = ButtonComponent as any;
+import { Button } from './ui/button';
 
 /**
  * MusicControls - Neo-Brutalist styled volume controls with separate music and SFX sliders

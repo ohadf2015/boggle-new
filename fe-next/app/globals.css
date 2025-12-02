@@ -7,6 +7,10 @@
    ==================================== */
 
 :root {
+  /* Font Family Variables */
+  --font-fredoka: 'Fredoka', sans-serif;
+  --font-rubik: 'Rubik', sans-serif;
+
   /* Neo-Brutalist Color Palette */
   --neo-yellow: #FFE135;
   --neo-yellow-hover: #FFD000;
