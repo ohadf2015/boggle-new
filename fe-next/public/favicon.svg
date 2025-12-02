@@ -1,10 +1,26 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32">
   <defs>
     <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:#667eea"/>
-      <stop offset="100%" style="stop-color:#764ba2"/>
+      <stop offset="0%" style="stop-color:#9333ea"/>
+      <stop offset="100%" style="stop-color:#db2777"/>
+    </linearGradient>
+    <linearGradient id="text" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#fde047"/>
+      <stop offset="100%" style="stop-color:#f97316"/>
     </linearGradient>
   </defs>
-  <rect width="32" height="32" rx="6" fill="url(#bg)"/>
-  <text x="16" y="23" font-family="Arial, sans-serif" font-size="18" font-weight="bold" fill="white" text-anchor="middle">LC</text>
+  <!-- Background -->
+  <rect width="32" height="32" rx="4" fill="url(#bg)"/>
+  <!-- LEXI text -->
+  <text x="16" y="13" font-family="Arial Black, Arial, sans-serif" font-size="8" font-weight="900" fill="url(#text)" text-anchor="middle" transform="rotate(-3 16 12)">LEXI</text>
+  <!-- CLASH text -->
+  <text x="16" y="22" font-family="Arial Black, Arial, sans-serif" font-size="8" font-weight="900" fill="url(#text)" text-anchor="middle">CLASH</text>
+  <!-- Lightning bolts -->
+  <path d="M3 8 L5 12 L4 12 L6 16 L3 11 L4 11 Z" fill="#fde047"/>
+  <path d="M29 8 L27 12 L28 12 L26 16 L29 11 L28 11 Z" fill="#fde047"/>
+  <!-- Sparkles -->
+  <circle cx="5" cy="5" r="1" fill="#fde047"/>
+  <circle cx="27" cy="5" r="1" fill="#fde047"/>
+  <circle cx="4" cy="26" r="0.8" fill="#fde047"/>
+  <circle cx="28" cy="26" r="0.8" fill="#fde047"/>
 </svg>
