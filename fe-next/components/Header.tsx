@@ -1,5 +1,7 @@
 import React, { memo, useCallback, useMemo } from 'react';
 import { motion } from 'framer-motion';
+import { FaChartBar } from 'react-icons/fa';
+import Link from 'next/link';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useAuth } from '../contexts/AuthContext';
 import { cn } from '../lib/utils';
@@ -20,7 +22,7 @@ interface HeaderProps {
  */
 const Header = memo<HeaderProps>(({ className = '' }) => {
     const { t, language } = useLanguage();
-    const { isAuthenticated, profile } = useAuth();
+    const { isAuthenticated, isAdmin, profile } = useAuth();
 
     // Get font family based on language (memoized)
     const fontFamily = useMemo(() => {
@@ -109,8 +111,28 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                     </h1>
                 </motion.button>
 
-                {/* Controls: Level + Music + Auth/Settings */}
+                {/* Controls: Admin + Level + Music + Auth/Settings */}
                 <div className="flex items-center gap-1.5 sm:gap-3 flex-shrink-0 min-w-0">
+                    {/* Admin Dashboard Link - only shown for admin users */}
+                    {isAdmin && (
+                        <Link
+                            href={`/${language}/admin`}
+                            className="
+                                flex items-center justify-center
+                                w-8 h-8 sm:w-10 sm:h-10
+                                bg-neo-purple text-white
+                                border-2 sm:border-3 border-neo-black
+                                rounded-neo
+                                shadow-hard
+                                hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-hard-lg
+                                active:translate-x-[2px] active:translate-y-[2px] active:shadow-none
+                                transition-all duration-100
+                            "
+                            title="Admin Dashboard"
+                        >
+                            <FaChartBar className="text-sm sm:text-base" />
+                        </Link>
+                    )}
                     {/* Show level badge for authenticated users - hidden on very small screens */}
                     {isAuthenticated && profile?.current_level && (
                         <div className="hidden xs:block">

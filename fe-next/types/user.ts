@@ -36,6 +36,7 @@ export interface UserProfile {
   stats: UserStats;
   achievements: Achievement[];
   isGuest: boolean;
+  isAdmin?: boolean;
 }
 
 export interface UserStats {
