@@ -115,7 +115,7 @@ async function cacheGeodata(ip, data) {
   const redis = getRedisClient();
   if (redis) {
     try {
-      await redis.setEx(`geo:${ip}`, GEOLOCATION_CACHE_TTL, JSON.stringify(data));
+      await redis.setex(`geo:${ip}`, GEOLOCATION_CACHE_TTL, JSON.stringify(data));
     } catch (error) {
       console.warn('[GEOLOCATION] Redis cache write error:', error.message);
     }

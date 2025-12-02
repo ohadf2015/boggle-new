@@ -6,12 +6,15 @@ import { calculateTier, getTierProgress, TIER_COLORS, TIER_ICONS, TierName, Tier
 import { useLanguage } from '../contexts/LanguageContext';
 
 /**
- * Achievement type
+ * Achievement type - supports both localized and unlocalized formats
+ * Unlocalized format: { key, icon } - backend sends this, frontend localizes
+ * Localized format: { name, description, icon } - legacy/backwards compatibility
  */
 interface Achievement {
   icon: string;
-  name: string;
-  description: string;
+  key?: string;        // Unlocalized format - used to look up translation
+  name?: string;       // Localized format (legacy)
+  description?: string; // Localized format (legacy)
 }
 
 /**
@@ -34,6 +37,24 @@ export const AchievementBadge = memo<AchievementBadgeProps>(({ achievement, inde
   const [open, setOpen] = useState(false);
   const { t } = useLanguage();
   const isTouchDevice = useRef(false);
+
+  // Localize achievement using player's language
+  // Achievement can have either { key, icon } (unlocalized) or { name, description, icon } (legacy localized)
+  const localizedAchievement = useMemo(() => {
+    if (achievement.key) {
+      return {
+        icon: achievement.icon,
+        name: t(`achievements.${achievement.key}.name`) || achievement.key,
+        description: t(`achievements.${achievement.key}.description`) || ''
+      };
+    }
+    // Legacy format: already has name and description
+    return {
+      icon: achievement.icon,
+      name: achievement.name || '',
+      description: achievement.description || ''
+    };
+  }, [achievement, t]);
 
   const handleTouchStart = () => {
     isTouchDevice.current = true;
@@ -99,8 +120,8 @@ export const AchievementBadge = memo<AchievementBadgeProps>(({ achievement, inde
                 boxShadow: tierColors?.glow ? `0 0 8px ${tierColors.glow}` : undefined,
               }}
             >
-              <span className="mr-1">{achievement.icon}</span>
-              {achievement.name}
+              <span className="mr-1">{localizedAchievement.icon}</span>
+              {localizedAchievement.name}
             </Badge>
             {/* Tier indicator badge */}
             {showTier && tier && (
@@ -121,8 +142,8 @@ export const AchievementBadge = memo<AchievementBadgeProps>(({ achievement, inde
           onPointerDownOutside={() => setOpen(false)}
         >
           <div>
-            <p className="font-black uppercase text-neo-white tracking-wide">{achievement.name}</p>
-            <p className="text-xs font-bold text-neo-cyan mt-1">{achievement.description}</p>
+            <p className="font-black uppercase text-neo-white tracking-wide">{localizedAchievement.name}</p>
+            <p className="text-xs font-bold text-neo-cyan mt-1">{localizedAchievement.description}</p>
 
             {/* Tier progress section */}
             {showTier && count > 0 && (

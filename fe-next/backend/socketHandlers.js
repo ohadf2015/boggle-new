@@ -68,7 +68,7 @@ const { validateWordOnBoard, makePositionsMap } = require('./modules/wordValidat
 const { isWordOnBoardAsync } = require('./modules/wordValidatorPool');
 const { isProfane, cleanProfanity } = require('./utils/profanityFilter');
 const { calculateWordScore, calculateGameScores } = require('./modules/scoringEngine');
-const { checkAndAwardAchievements, getPlayerAchievements, ACHIEVEMENTS, getLocalizedAchievements, awardFinalAchievements } = require('./modules/achievementManager');
+const { checkAndAwardAchievements, getPlayerAchievements, ACHIEVEMENTS, ACHIEVEMENT_ICONS, getLocalizedAchievements, awardFinalAchievements } = require('./modules/achievementManager');
 const { calculatePlayerTitles } = require('./modules/playerTitlesManager');
 const { isDictionaryWord, getAvailableDictionaries, addApprovedWord, normalizeWord, getRandomLongWords } = require('./dictionary');
 const { incrementWordApproval } = require('./redisClient');
@@ -604,12 +604,12 @@ function initializeSocketHandlers(io) {
         socket.emit('updateLeaderboard', { leaderboard });
 
         // Send current achievements to late-joiner (including reconnecting players)
+        // Send unlocalized achievements (key + icon) - frontend will localize using player's language
         const playerAchievementKeys = game.playerAchievements?.[username] || [];
         if (playerAchievementKeys.length > 0) {
-          const localizedAchievements = getLocalizedAchievements(game.language || 'he');
           const achievements = playerAchievementKeys
-            .map(key => localizedAchievements[key])
-            .filter(Boolean);
+            .map(key => ({ key, icon: ACHIEVEMENT_ICONS[key] }))
+            .filter(a => a.icon); // Filter out any unknown achievement keys
 
           logger.debug('SOCKET', `Syncing ${achievements.length} achievements to late-joiner ${username}`);
           socket.emit('liveAchievementUnlocked', { achievements });
@@ -909,7 +909,7 @@ function initializeSocketHandlers(io) {
           logger.debug('ACHIEVEMENT', `Checking live achievements for ${username} after word "${normalizedWord}"`);
           const achievements = checkAndAwardAchievements(gameCode, username, normalizedWord);
           if (achievements.length > 0) {
-            logger.debug('ACHIEVEMENT', `Emitting ${achievements.length} achievements to ${username}: ${achievements.map(a => a.name || a).join(', ')}`);
+            logger.debug('ACHIEVEMENT', `Emitting ${achievements.length} achievements to ${username}: ${achievements.map(a => a.key).join(', ')}`);
             socket.emit('liveAchievementUnlocked', { achievements });
           }
         } else {
@@ -1330,15 +1330,16 @@ function initializeSocketHandlers(io) {
           ? validWordsInList.reduce((longest, w) => w.word.length > longest.length ? w.word : longest, '')
           : '';
 
-        // Get localized achievements for this player
+        // Get unlocalized achievements for this player (key + icon) - frontend will localize using player's language
         const playerAchievementKeys = game.playerAchievements?.[username] || [];
-        const localizedAchievements = getLocalizedAchievements(game.language || 'he');
-        const playerAchievements = playerAchievementKeys.map(key => localizedAchievements[key]).filter(Boolean);
+        const playerAchievements = playerAchievementKeys
+          .map(key => ({ key, icon: ACHIEVEMENT_ICONS[key] }))
+          .filter(a => a.icon); // Filter out any unknown achievement keys
 
-        // Check for missing translations
+        // Check for missing achievements
         if (playerAchievementKeys.length !== playerAchievements.length) {
-          const missingKeys = playerAchievementKeys.filter(key => !localizedAchievements[key]);
-          logger.warn('RESULTS', `Missing achievement translations for ${username}`, missingKeys);
+          const missingKeys = playerAchievementKeys.filter(key => !ACHIEVEMENT_ICONS[key]);
+          logger.warn('RESULTS', `Missing achievement icons for ${username}`, missingKeys);
         }
 
         return {

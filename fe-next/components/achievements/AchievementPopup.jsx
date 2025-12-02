@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import confetti from 'canvas-confetti';
 import { useLanguage } from '../../contexts/LanguageContext';
@@ -15,6 +15,24 @@ const AchievementPopup = ({ achievement, onComplete }) => {
   const { playAchievementSound } = useSoundEffects();
   const [progress, setProgress] = useState(0);
   const displayDuration = 3000; // 3 seconds
+
+  // Localize achievement using player's language
+  // Achievement can have either { key, icon } (unlocalized) or { name, description, icon } (legacy localized)
+  const localizedAchievement = useMemo(() => {
+    if (!achievement) return null;
+
+    // If achievement has a key, localize it using the player's language
+    if (achievement.key) {
+      return {
+        icon: achievement.icon,
+        name: t(`achievements.${achievement.key}.name`) || achievement.key,
+        description: t(`achievements.${achievement.key}.description`) || ''
+      };
+    }
+
+    // Legacy format: already has name and description (backwards compatibility)
+    return achievement;
+  }, [achievement, t]);
 
   useEffect(() => {
     if (!achievement) return;
@@ -47,7 +65,7 @@ const AchievementPopup = ({ achievement, onComplete }) => {
     return () => clearInterval(interval);
   }, [achievement, onComplete, playAchievementSound]);
 
-  if (!achievement) return null;
+  if (!localizedAchievement) return null;
 
   return (
     <AnimatePresence>
@@ -76,7 +94,7 @@ const AchievementPopup = ({ achievement, onComplete }) => {
               >
                 <div className="w-10 h-10 bg-neo-cyan border-2 border-neo-black shadow-hard rounded-md flex items-center justify-center flex-shrink-0">
                   <span className="text-xl">
-                    {achievement.icon}
+                    {localizedAchievement.icon}
                   </span>
                 </div>
               </motion.div>
@@ -89,7 +107,7 @@ const AchievementPopup = ({ achievement, onComplete }) => {
                   transition={{ delay: 0.15 }}
                   className="text-sm font-black uppercase text-neo-yellow truncate"
                 >
-                  {achievement.name}
+                  {localizedAchievement.name}
                 </motion.h3>
                 <motion.p
                   initial={{ x: 10, opacity: 0 }}
@@ -97,7 +115,7 @@ const AchievementPopup = ({ achievement, onComplete }) => {
                   transition={{ delay: 0.2 }}
                   className="text-xs font-bold text-neo-white/90 line-clamp-1"
                 >
-                  {achievement.description}
+                  {localizedAchievement.description}
                 </motion.p>
               </div>
 
