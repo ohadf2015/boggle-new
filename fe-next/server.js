@@ -15,6 +15,7 @@ const { initializeSocketHandlers } = require("./backend/socketHandlers");
 const { restoreTournamentsFromRedis } = require("./backend/modules/tournamentManager");
 const { cleanupStaleGames, cleanupEmptyRooms } = require("./backend/modules/gameStateManager");
 const { pool: wordValidatorPool } = require("./backend/modules/wordValidatorPool");
+const { geolocationMiddleware, getCountryFromRequest, getClientIP } = require("./backend/utils/geolocation");
 
 // Track cleanup timers for graceful shutdown
 const cleanupTimers = new Set();
@@ -113,6 +114,14 @@ app.prepare().then(() => {
 
     next();
   });
+
+  // IP Geolocation middleware
+  // Adds x-country-code header for Next.js middleware to use
+  // Also attaches geoData to request for route handlers
+  server.use(geolocationMiddleware({
+    skipPaths: ['/health', '/metrics', '/_next', '/favicon.ico'],
+    pathFilter: ['/', '/api/geolocation'] // Only run on root and geolocation endpoint
+  }));
 
   // Socket.IO connection logging
   io.engine.on("connection_error", (err) => {
@@ -240,6 +249,28 @@ app.prepare().then(() => {
     } catch (error) {
       console.error('[API] Leaderboard error:', error);
       res.status(500).json({ error: 'Internal server error' });
+    }
+  });
+
+  // =============================================
+  // GEOLOCATION API ENDPOINT
+  // =============================================
+
+  // GET /api/geolocation - Get geolocation data for the requesting client
+  server.get('/api/geolocation', async (req, res) => {
+    try {
+      const geoData = await getCountryFromRequest(req);
+      res.json({
+        success: true,
+        ...geoData
+      });
+    } catch (error) {
+      console.error('[API] Geolocation error:', error);
+      res.status(500).json({
+        success: false,
+        error: 'Failed to get geolocation',
+        countryCode: null
+      });
     }
   });
 
@@ -710,13 +741,39 @@ app.prepare().then(() => {
 
       // Manual redirect for root path (since middleware might be skipped in custom server)
       if (pathname === '/') {
-        const acceptLanguage = req.headers['accept-language'];
+        // Country-to-locale mapping
+        const countryToLocale = {
+          IL: 'he', // Israel
+          US: 'en', GB: 'en', CA: 'en', AU: 'en', NZ: 'en', IE: 'en', ZA: 'en', IN: 'en', PH: 'en', SG: 'en',
+          SE: 'sv', FI: 'sv', // Sweden, Finland
+          JP: 'ja' // Japan
+        };
+        const supportedLocales = ['he', 'en', 'sv', 'ja'];
         let locale = 'he'; // Default
 
-        if (acceptLanguage) {
-          const browserLang = acceptLanguage.split(',')[0].split('-')[0];
-          if (['en', 'he'].includes(browserLang)) {
-            locale = browserLang;
+        // Priority 1: Cookie preference
+        const cookies = req.headers.cookie;
+        const cookieLocale = cookies?.split(';').find(c => c.trim().startsWith('boggle_language='))?.split('=')[1];
+        if (cookieLocale && supportedLocales.includes(cookieLocale)) {
+          locale = cookieLocale;
+        }
+        // Priority 2: IP Geolocation (from middleware)
+        else if (req.geoData?.countryCode && countryToLocale[req.geoData.countryCode]) {
+          locale = countryToLocale[req.geoData.countryCode];
+          console.log(`[Redirect] Detected country ${req.geoData.countryCode} -> locale ${locale}`);
+        }
+        // Priority 3: x-country-code header (from CDN or geolocation middleware)
+        else if (req.headers['x-country-code'] && countryToLocale[req.headers['x-country-code']]) {
+          locale = countryToLocale[req.headers['x-country-code']];
+        }
+        // Priority 4: Accept-Language header
+        else {
+          const acceptLanguage = req.headers['accept-language'];
+          if (acceptLanguage) {
+            const browserLang = acceptLanguage.split(',')[0].split('-')[0].toLowerCase();
+            if (supportedLocales.includes(browserLang)) {
+              locale = browserLang;
+            }
           }
         }
 

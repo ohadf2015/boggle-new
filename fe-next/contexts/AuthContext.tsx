@@ -15,6 +15,28 @@ import { getGuestSessionId, getGuestStats, clearGuestData, hashToken } from '../
 import logger from '@/utils/logger';
 import type { User } from '@supabase/supabase-js';
 
+// Fetch geolocation data from our API
+async function fetchGeolocation(): Promise<{ countryCode: string | null; country?: string; city?: string }> {
+  try {
+    const response = await fetch('/api/geolocation', {
+      method: 'GET',
+      headers: { 'Accept': 'application/json' },
+    });
+    if (!response.ok) {
+      return { countryCode: null };
+    }
+    const data = await response.json();
+    return {
+      countryCode: data.countryCode || null,
+      country: data.country,
+      city: data.city,
+    };
+  } catch (error) {
+    logger.warn('Failed to fetch geolocation:', error);
+    return { countryCode: null };
+  }
+}
+
 export interface ProfileData {
   id: string;
   username: string;
@@ -31,6 +53,7 @@ export interface ProfileData {
   achievement_counts?: Record<string, number>;
   current_level?: number;
   is_admin?: boolean;
+  country_code?: string | null;
   created_at?: string;
   updated_at?: string;
 }
@@ -89,6 +112,22 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
     if (profileData) {
       setProfile(profileData);
+
+      // If user doesn't have country_code yet, fetch and update it
+      if (!profileData.country_code) {
+        fetchGeolocation().then(async (geoData) => {
+          if (geoData.countryCode) {
+            const { data: updatedProfile } = await updateProfile(userId, {
+              country_code: geoData.countryCode
+            });
+            if (updatedProfile) {
+              setProfile(updatedProfile);
+            }
+          }
+        }).catch((err) => {
+          logger.warn('Failed to update country_code:', err);
+        });
+      }
     }
 
     // Fetch ranked progress
@@ -327,6 +366,9 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       profilePictureProvider = 'google';
     }
 
+    // Fetch geolocation data for analytics
+    const geoData = await fetchGeolocation();
+
     const profileData: Partial<ProfileData> = {
       id: user.id,
       username,
@@ -334,7 +376,8 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       avatar_emoji: avatarEmoji || '🐶',
       avatar_color: avatarColor || '#4ECDC4',
       profile_picture_url: profilePictureUrl,
-      profile_picture_provider: profilePictureProvider
+      profile_picture_provider: profilePictureProvider,
+      country_code: geoData.countryCode
     };
 
     // Check if there's a guest session to merge
