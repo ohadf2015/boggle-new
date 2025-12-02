@@ -83,7 +83,10 @@ const {
   // Hybrid validation (cost-saving) - used at game end for batch validation
   filterWordsForAIValidation,
   resetGameAIValidationCount,
-  cleanupGameTracking
+  cleanupGameTracking,
+  // Community validation checks - auto-validate words with positive community scores
+  isWordCommunityValid,
+  isWordValidForScoring
 } = require('./modules/communityWordManager');
 const { validateWordsWithAI, isAIServiceAvailable } = require('./modules/aiValidationService');
 const gameStartCoordinator = require('./utils/gameStartCoordinator');
@@ -851,10 +854,22 @@ function initializeSocketHandlers(io) {
           return;
         }
 
-        // Check dictionary first to determine if auto-validated
+        // Check dictionary and community validation to determine if auto-validated
+        // Words are auto-validated if they are:
+        // 1. In the dictionary, OR
+        // 2. Community-validated (net_score >= 6), OR
+        // 3. Have a positive validation score (net_score > 0) from previous games
         const isInDictionary = isDictionaryWord(normalizedWord, game.language);
+        const isCommunityValidated = isWordCommunityValid(normalizedWord, game.language);
+        const hasPositiveScore = isWordValidForScoring(normalizedWord, game.language);
+        const shouldAutoValidate = isInDictionary || isCommunityValidated || hasPositiveScore;
 
-        if (isInDictionary) {
+        if (shouldAutoValidate) {
+          // Log the validation source for debugging
+          if (!isInDictionary && (isCommunityValidated || hasPositiveScore)) {
+            logger.debug('COMMUNITY_VALIDATION', `Word "${normalizedWord}" auto-validated via community: communityValid=${isCommunityValidated}, positiveScore=${hasPositiveScore}`);
+          }
+
           // Calculate score with combo multiplier
           // Clamp combo level to reasonable bounds (0-10) to prevent abuse
           const safeComboLevel = Math.max(0, Math.min(10, parseInt(comboLevel) || 0));
@@ -1371,14 +1386,17 @@ function initializeSocketHandlers(io) {
       logger.debug('SOCKET', `Sent validationComplete to host for game ${gameCode} - ${emitSuccess ? 'SUCCESS' : 'FAILED'}`);
 
       // Track host-approved words for community dictionary promotion
-      // For words that were NOT in the dictionary but approved by host
+      // For words that were NOT in the dictionary AND not already community-validated
       const language = game.language || 'en';
       const hostUserId = game.users[game.hostUsername]?.authUserId || null;
       const approvedNonDictionaryWords = validations.filter(v => {
         if (!v.isValid) return false;
-        // Check if word was NOT in the original dictionary (host manually approved it)
+        // Check if word was NOT in the original dictionary AND not community-validated
         const isInDictionary = isDictionaryWord(v.word, language);
-        return !isInDictionary;
+        const isCommunityValidated = isWordCommunityValid(v.word, language);
+        const hasPositiveScore = isWordValidForScoring(v.word, language);
+        // Only count as "new" approval if not already validated by any method
+        return !isInDictionary && !isCommunityValidated && !hasPositiveScore;
       });
 
       // Process each approved non-dictionary word
@@ -2212,20 +2230,24 @@ async function calculateAndBroadcastFinalScores(io, gameCode) {
     words.forEach(word => allUniqueWords.add(word));
   });
 
-  // Separate dictionary words from non-dictionary words
+  // Separate validated words (dictionary OR community-validated) from non-validated words
   const dictionaryValidatedWords = new Set();
+  const communityValidatedWords = new Set();
   const nonDictionaryWords = [];
   const language = game.language || 'en';
 
   for (const word of allUniqueWords) {
     if (isDictionaryWord(word, language)) {
       dictionaryValidatedWords.add(word);
+    } else if (isWordCommunityValid(word, language) || isWordValidForScoring(word, language)) {
+      // Community-validated words (net_score >= 6 or positive score) are auto-valid
+      communityValidatedWords.add(word);
     } else {
       nonDictionaryWords.push(word);
     }
   }
 
-  logger.info('AI_VALIDATION', `Game ${gameCode}: ${allUniqueWords.size} unique words, ${dictionaryValidatedWords.size} in dictionary, ${nonDictionaryWords.length} need AI validation`);
+  logger.info('AI_VALIDATION', `Game ${gameCode}: ${allUniqueWords.size} unique words, ${dictionaryValidatedWords.size} in dictionary, ${communityValidatedWords.size} community-validated, ${nonDictionaryWords.length} need AI validation`);
 
   // AI validation for non-dictionary words
   const aiValidatedWords = new Map(); // word -> { isValid, isAiVerified }
@@ -2306,21 +2328,23 @@ async function calculateAndBroadcastFinalScores(io, gameCode) {
 
     playerWords.forEach(word => {
       // Word is valid if:
-      // 1. In dictionary (includes community-validated with 6+ net votes)
-      // 2. OR AI validated as valid
+      // 1. In dictionary, OR
+      // 2. Community-validated (net_score >= 6 or positive score), OR
+      // 3. AI validated as valid
       const inDictionary = dictionaryValidatedWords.has(word);
+      const inCommunityValidated = communityValidatedWords.has(word);
       const aiResult = aiValidatedWords.get(word);
       const isAiValid = aiResult?.isValid || false;
-      const isValid = inDictionary || isAiValid;
+      const isValid = inDictionary || inCommunityValidated || isAiValid;
       const isDuplicate = wordCountMap[word] > 1;
 
       // Word is pending validation ONLY if:
-      // - Not in dictionary
+      // - Not in dictionary AND not community-validated
       // - AI did NOT check this word (aiResult is undefined) - NOT if AI explicitly rejected it
       // - Is in the list of non-dictionary words that would be sent to community
       // Note: If AI checked the word and said invalid, it's just invalid - no question mark
       const aiDidNotCheck = !aiResult; // AI didn't check if aiResult is undefined
-      const isPendingValidation = !inDictionary && aiDidNotCheck && nonDictionaryWords.includes(word);
+      const isPendingValidation = !inDictionary && !inCommunityValidated && aiDidNotCheck && nonDictionaryWords.includes(word);
 
       // Look up score and combo bonus from word details
       const wordDetail = playerWordDetailsList.find(wd => wd.word === word);
