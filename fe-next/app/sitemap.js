@@ -11,9 +11,20 @@ export default function sitemap() {
     ja: `${baseUrl}/ja`,
   };
 
+  // Common images for sitemap (helps Google discover and index images)
+  const commonImages = [
+    `${baseUrl}/og-image.jpg`,
+    `${baseUrl}/og-image-en.jpg`,
+    `${baseUrl}/og-image-he.jpg`,
+    `${baseUrl}/favicon.ico`,
+    `${baseUrl}/icon-192.png`,
+    `${baseUrl}/icon-512.png`,
+    `${baseUrl}/apple-touch-icon.png`,
+  ];
+
   const routes = [];
 
-  // Home pages for each locale
+  // Home pages for each locale with comprehensive image entries
   routes.push({
     url: baseUrl,
     lastModified: now,
@@ -22,7 +33,7 @@ export default function sitemap() {
     alternates: {
       languages: languageAlternates,
     },
-    images: [`${baseUrl}/lexiclash.jpg`],
+    images: [...commonImages, `${baseUrl}/og-image-he.jpg`],
   });
 
   routes.push({
@@ -33,7 +44,7 @@ export default function sitemap() {
     alternates: {
       languages: languageAlternates,
     },
-    images: [`${baseUrl}/lexiclash.jpg`],
+    images: [...commonImages, `${baseUrl}/og-image-en.jpg`],
   });
 
   routes.push({
@@ -44,7 +55,7 @@ export default function sitemap() {
     alternates: {
       languages: languageAlternates,
     },
-    images: [`${baseUrl}/lexiclash.jpg`],
+    images: [...commonImages, `${baseUrl}/og-image-en.jpg`],
   });
 
   routes.push({
@@ -55,7 +66,7 @@ export default function sitemap() {
     alternates: {
       languages: languageAlternates,
     },
-    images: [`${baseUrl}/lexiclash.jpg`],
+    images: [...commonImages, `${baseUrl}/og-image-en.jpg`],
   });
 
   // Leaderboard pages for all locales
