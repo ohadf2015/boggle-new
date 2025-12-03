@@ -9,6 +9,17 @@ import { SoundEffectsProvider } from '@/contexts/SoundEffectsContext';
 import { AchievementQueueProvider } from '@/components/achievements';
 import { Toaster } from 'react-hot-toast';
 import ErrorBoundary from './components/ErrorBoundary';
+import { initUtmCapture } from '@/utils/utmCapture';
+
+// Initialize UTM capture immediately
+let utmCaptureInitialized = false;
+const initUtm = () => {
+    if (utmCaptureInitialized) return;
+    if (typeof window === 'undefined') return;
+
+    utmCaptureInitialized = true;
+    initUtmCapture();
+};
 
 // Lazy load LogRocket after user interaction to save ~100KB on initial load
 let logRocketInitialized = false;
@@ -23,6 +34,12 @@ const initLogRocket = () => {
 };
 
 export function Providers({ children, lang }) {
+    // Initialize UTM capture immediately on mount
+    // This captures UTM params and referrer from the initial page load
+    useEffect(() => {
+        initUtm();
+    }, []);
+
     // Defer LogRocket initialization for slow connections
     // Load after 3 seconds or on first user interaction, whichever comes first
     useEffect(() => {

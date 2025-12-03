@@ -4,6 +4,8 @@
  */
 
 import logger from '@/utils/logger';
+import { getStoredUtmData } from './utmCapture';
+import { getGuestSessionId, getGuestName } from './guestManager';
 
 // Growth event types for tracking viral loops and engagement
 export type GrowthEvent =
@@ -299,8 +301,11 @@ export const generateReferralCode = (userId?: string): string => {
 
 /**
  * Get share URL with referral tracking
+ * @param gameCode - The game code
+ * @param referralCode - Optional referral code
+ * @param utmSource - UTM source for tracking (defaults to 'referral')
  */
-export const getShareUrlWithTracking = (gameCode: string, referralCode?: string): string => {
+export const getShareUrlWithTracking = (gameCode: string, referralCode?: string, utmSource: string = 'referral'): string => {
   if (typeof window === 'undefined') return '';
 
   const baseUrl = window.location.origin;
@@ -311,7 +316,94 @@ export const getShareUrlWithTracking = (gameCode: string, referralCode?: string)
     params.set('ref', referralCode);
   }
 
+  // Add UTM tracking for analytics
+  params.set('utm_source', utmSource);
+  params.set('utm_medium', 'share');
+
   return `${baseUrl}?${params.toString()}`;
+};
+
+/**
+ * Track analytics event to server (for guest player tracking)
+ * This sends events to the backend for database storage
+ */
+export const trackAnalyticsEvent = async (
+  eventType: string,
+  guestName?: string,
+  metadata: Record<string, unknown> = {}
+): Promise<void> => {
+  if (typeof window === 'undefined') return;
+
+  try {
+    const utmData = getStoredUtmData();
+    const sessionId = getGuestSessionId();
+    const storedGuestName = getGuestName();
+
+    const payload = {
+      event_type: eventType,
+      session_id: sessionId,
+      guest_name: guestName || storedGuestName || null,
+      utm_source: utmData?.utm_source || utmData?.ref || null,
+      utm_medium: utmData?.utm_medium || null,
+      utm_campaign: utmData?.utm_campaign || null,
+      referrer: utmData?.referrer || null,
+      metadata,
+    };
+
+    // Fire and forget - don't block on response
+    fetch('/api/analytics/track', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    }).catch((err) => {
+      logger.warn('[ANALYTICS] Failed to track event:', err);
+    });
+  } catch (error) {
+    logger.warn('[ANALYTICS] Error tracking event:', error);
+  }
+};
+
+/**
+ * Track guest player joining a game
+ */
+export const trackGuestJoin = (
+  guestName: string,
+  gameCode: string,
+  language?: string
+): void => {
+  trackAnalyticsEvent('guest_join', guestName, { gameCode, language });
+  trackGrowthEvent('room_joined_via_link', { gameCode, isGuest: true });
+};
+
+/**
+ * Track guest player game completion
+ */
+export const trackGuestGameComplete = (
+  guestName: string,
+  gameCode: string,
+  score: number,
+  wordCount: number,
+  isWinner: boolean
+): void => {
+  trackAnalyticsEvent('guest_game_complete', guestName, {
+    gameCode,
+    score,
+    wordCount,
+    isWinner,
+  });
+};
+
+/**
+ * Track page view with UTM data
+ */
+export const trackPageView = (path?: string): void => {
+  if (typeof window === 'undefined') return;
+
+  const guestName = getGuestName();
+  trackAnalyticsEvent('page_view', guestName || undefined, {
+    path: path || window.location.pathname,
+    search: window.location.search,
+  });
 };
 
 const growthTracking = {
@@ -325,6 +417,10 @@ const growthTracking = {
   generateReferralCode,
   getShareUrlWithTracking,
   getReferralSource,
+  trackAnalyticsEvent,
+  trackGuestJoin,
+  trackGuestGameComplete,
+  trackPageView,
 };
 
 export default growthTracking;

@@ -12,6 +12,7 @@ import {
   isSupabaseConfigured
 } from '../lib/supabase';
 import { getGuestSessionId, getGuestStats, clearGuestData, hashToken } from '../utils/guestManager';
+import { getUtmDataForProfile } from '../utils/utmCapture';
 import logger from '@/utils/logger';
 import type { User } from '@supabase/supabase-js';
 
@@ -54,6 +55,10 @@ export interface ProfileData {
   current_level?: number;
   is_admin?: boolean;
   country_code?: string | null;
+  utm_source?: string | null;
+  utm_medium?: string | null;
+  utm_campaign?: string | null;
+  referrer?: string | null;
   created_at?: string;
   updated_at?: string;
 }
@@ -369,6 +374,9 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     // Fetch geolocation data for analytics
     const geoData = await fetchGeolocation();
 
+    // Get UTM and referral data captured during user's first visit
+    const utmData = getUtmDataForProfile();
+
     const profileData: Partial<ProfileData> = {
       id: user.id,
       username,
@@ -377,7 +385,11 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       avatar_color: avatarColor || '#4ECDC4',
       profile_picture_url: profilePictureUrl,
       profile_picture_provider: profilePictureProvider,
-      country_code: geoData.countryCode
+      country_code: geoData.countryCode,
+      utm_source: utmData.utm_source,
+      utm_medium: utmData.utm_medium,
+      utm_campaign: utmData.utm_campaign,
+      referrer: utmData.referrer,
     };
 
     // Check if there's a guest session to merge
