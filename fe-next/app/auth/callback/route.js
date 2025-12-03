@@ -61,8 +61,17 @@ export async function GET(request) {
   const errorParam = requestUrl.searchParams.get('error');
   const errorDescription = requestUrl.searchParams.get('error_description');
 
-  // Detect the user's preferred locale
-  const locale = getPreferredLocale(request);
+  // Priority 1: Use locale from query param (passed from OAuth redirect)
+  // This preserves the user's locale from before they started the OAuth flow
+  const localeParam = requestUrl.searchParams.get('locale');
+
+  // Detect the user's preferred locale (fallback if not in query param)
+  let locale;
+  if (localeParam && locales.includes(localeParam)) {
+    locale = localeParam;
+  } else {
+    locale = getPreferredLocale(request);
+  }
 
   // Get the correct origin (handles proxy scenarios)
   const origin = getOrigin(request);
