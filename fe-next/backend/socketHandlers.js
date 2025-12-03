@@ -2461,18 +2461,19 @@ async function calculateAndBroadcastFinalScores(io, gameCode) {
   }
 
   // Record game results to Supabase
-  await recordGameResultsToSupabase(gameCode, scoresArray, game);
+  await recordGameResultsToSupabase(io, gameCode, scoresArray, game);
 
   logger.info('FINAL_SCORES', `Final scores broadcast for game ${gameCode}`);
 }
 
 /**
  * Record game results to Supabase for leaderboard and stats
+ * @param {object} io - Socket.IO server instance
  * @param {string} gameCode - Game code
  * @param {array} scoresArray - Array of player scores with metadata
  * @param {object} game - Game object
  */
-async function recordGameResultsToSupabase(gameCode, scoresArray, game) {
+async function recordGameResultsToSupabase(io, gameCode, scoresArray, game) {
   if (!isSupabaseConfigured()) {
     logger.debug('SUPABASE', `Supabase not configured, skipping stats save for game ${gameCode}`);
     return;
