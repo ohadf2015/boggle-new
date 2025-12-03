@@ -63,7 +63,9 @@ function AuthCallbackContent() {
 
         if (code) {
           logger.log('Auth callback: Exchanging code for session');
-          const { error } = await supabase.auth.exchangeCodeForSession(code);
+          // IMPORTANT: Extract both data and error - the session is returned directly
+          // in data.session, so we don't need to call getSession() again
+          const { data, error } = await supabase.auth.exchangeCodeForSession(code);
 
           if (error) {
             // Check if error is because code was already used (by detectSessionInUrl)
@@ -82,10 +84,18 @@ function AuthCallbackContent() {
             return;
           }
 
-          // Successfully exchanged code - get session to confirm
+          // Successfully exchanged code - use the session returned directly from exchangeCodeForSession
+          // This avoids timing issues where getSession() might not immediately return the new session
+          if (data?.session) {
+            logger.log('Auth callback: Session established successfully from code exchange');
+            router.replace(next);
+            return;
+          }
+
+          // Fallback: If somehow no session in response, try getSession() as backup
           const { data: sessionData } = await supabase.auth.getSession();
           if (sessionData?.session) {
-            logger.log('Auth callback: Session established successfully');
+            logger.log('Auth callback: Session found in fallback getSession()');
             router.replace(next);
             return;
           }
