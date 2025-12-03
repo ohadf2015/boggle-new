@@ -92,15 +92,33 @@ function AuthCallbackContent() {
         }
 
         // Check for implicit flow tokens in hash fragment
+        // Note: detectSessionInUrl is disabled in our Supabase client, so we must
+        // manually extract and set the session from hash tokens
         const hashParams = new URLSearchParams(window.location.hash.substring(1));
         const accessToken = hashParams.get('access_token');
+        const refreshToken = hashParams.get('refresh_token');
 
         if (accessToken) {
-          // Wait a moment for Supabase to process the hash
-          await new Promise(resolve => setTimeout(resolve, 500));
-          const { data: hashData } = await supabase.auth.getSession();
-          if (hashData?.session) {
-            logger.log('Auth callback: Session from hash tokens');
+          logger.log('Auth callback: Found access_token in hash, setting session manually');
+
+          // Manually set the session since detectSessionInUrl is disabled
+          const { data: sessionData, error: sessionError } = await supabase.auth.setSession({
+            access_token: accessToken,
+            refresh_token: refreshToken || ''
+          });
+
+          if (sessionError) {
+            logger.error('Auth callback: Error setting session from hash tokens:', sessionError);
+            router.replace(`/${locale}?auth_error=true`);
+            return;
+          }
+
+          if (sessionData?.session) {
+            logger.log('Auth callback: Session established from hash tokens');
+            // Clear the hash from URL for cleaner look and security
+            if (typeof window !== 'undefined') {
+              window.history.replaceState(null, '', window.location.pathname + window.location.search);
+            }
             router.replace(next);
             return;
           }
