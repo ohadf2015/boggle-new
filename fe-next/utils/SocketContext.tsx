@@ -3,6 +3,8 @@
 import { createContext, useContext, useEffect, useState, useCallback, useRef, ReactNode } from 'react';
 import { io, Socket } from 'socket.io-client';
 import logger from '@/utils/logger';
+import { getSocketUrl, isMobile } from '@/lib/config';
+import { supabase } from '@/lib/supabase';
 import type { LetterGrid, Language, Avatar } from '@/types';
 
 // Socket.IO Context Value Type
@@ -10,6 +12,7 @@ export interface SocketContextValue {
   socket: Socket | null;
   isConnected: boolean;
   connectionError: string | null;
+  updateAuthToken: (token: string | null) => void;
 }
 
 // Socket.IO Context
@@ -28,111 +31,181 @@ interface SocketProviderProps {
 }
 
 /**
+ * Get the current Supabase access token
+ * Returns null if user is not authenticated
+ */
+async function getAccessToken(): Promise<string | null> {
+  if (!supabase) return null;
+
+  try {
+    const { data: { session } } = await supabase.auth.getSession();
+    return session?.access_token || null;
+  } catch (error) {
+    logger.warn('[SOCKET.IO] Failed to get access token:', error);
+    return null;
+  }
+}
+
+/**
  * Socket.IO Provider Component
- * Manages the Socket.IO connection lifecycle
+ * Manages the Socket.IO connection lifecycle with JWT authentication
  */
 export function SocketProvider({ children }: SocketProviderProps) {
   const [socket, setSocket] = useState<Socket | null>(null);
   const [isConnected, setIsConnected] = useState<boolean>(false);
   const [connectionError, setConnectionError] = useState<string | null>(null);
   const socketRef = useRef<Socket | null>(null);
+  const authTokenRef = useRef<string | null>(null);
+
+  // Function to update auth token and reconnect if needed
+  const updateAuthToken = useCallback((token: string | null) => {
+    authTokenRef.current = token;
+
+    // If socket is connected, update the auth and reconnect to apply new token
+    if (socketRef.current?.connected) {
+      logger.log('[SOCKET.IO] Auth token updated, reconnecting...');
+      socketRef.current.disconnect();
+      socketRef.current.connect();
+    }
+  }, []);
 
   useEffect(() => {
-    // Get the WebSocket URL from environment or construct it
-    const protocol = typeof window !== 'undefined' && window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-    const wsHost = process.env.NEXT_PUBLIC_WS_URL ||
-      (typeof window !== 'undefined' ? `${window.location.protocol}//${window.location.host}` : 'http://localhost:3001');
+    // Get the WebSocket URL from centralized config
+    const wsHost = getSocketUrl();
+    const isMobileApp = isMobile();
 
-    // Create Socket.IO client
-    const socketInstance = io(wsHost, {
-      transports: ['websocket', 'polling'],
-      reconnectionAttempts: SOCKET_CONFIG.reconnectionAttempts,
-      reconnectionDelay: SOCKET_CONFIG.reconnectionDelay,
-      reconnectionDelayMax: SOCKET_CONFIG.reconnectionDelayMax,
-      timeout: SOCKET_CONFIG.timeout,
-      autoConnect: true,
-      forceNew: false,
-    });
+    logger.log(`[SOCKET.IO] Connecting to ${wsHost} (mobile: ${isMobileApp})`);
 
-    socketRef.current = socketInstance;
+    // Initialize with current auth token
+    const initSocket = async () => {
+      // Get initial auth token
+      const initialToken = await getAccessToken();
+      authTokenRef.current = initialToken;
 
-    // Connection event handlers
-    socketInstance.on('connect', () => {
-      logger.log('[SOCKET.IO] Connected:', socketInstance.id);
-      setIsConnected(true);
-      setConnectionError(null);
-    });
+      // Create Socket.IO client with JWT authentication
+      const socketInstance = io(wsHost, {
+        transports: ['websocket', 'polling'],
+        reconnectionAttempts: SOCKET_CONFIG.reconnectionAttempts,
+        reconnectionDelay: SOCKET_CONFIG.reconnectionDelay,
+        reconnectionDelayMax: SOCKET_CONFIG.reconnectionDelayMax,
+        timeout: SOCKET_CONFIG.timeout,
+        autoConnect: true,
+        forceNew: false,
+        // Pass JWT token in auth handshake for mobile authentication
+        // This replaces cookie-based auth which doesn't work in Capacitor
+        auth: (cb) => {
+          cb({
+            token: authTokenRef.current,
+            platform: isMobileApp ? 'mobile' : 'web',
+          });
+        },
+        // For mobile, we need withCredentials false since cookies don't work
+        withCredentials: !isMobileApp,
+      });
 
-    socketInstance.on('disconnect', (reason: string) => {
-      logger.log('[SOCKET.IO] Disconnected:', reason);
-      setIsConnected(false);
+      socketRef.current = socketInstance;
 
-      if (reason === 'io server disconnect') {
-        // Server disconnected us, try to reconnect
-        socketInstance.connect();
-      }
-    });
+      // Connection event handlers
+      socketInstance.on('connect', () => {
+        logger.log('[SOCKET.IO] Connected:', socketInstance.id);
+        setIsConnected(true);
+        setConnectionError(null);
+      });
 
-    socketInstance.on('connect_error', (error: Error) => {
-      logger.error('[SOCKET.IO] Connection error:', error.message);
-      setConnectionError(error.message);
-      setIsConnected(false);
-    });
+      socketInstance.on('disconnect', (reason: string) => {
+        logger.log('[SOCKET.IO] Disconnected:', reason);
+        setIsConnected(false);
 
-    socketInstance.on('reconnect', (attemptNumber: number) => {
-      logger.log('[SOCKET.IO] Reconnected after', attemptNumber, 'attempts');
-      setIsConnected(true);
-      setConnectionError(null);
-    });
+        if (reason === 'io server disconnect') {
+          // Server disconnected us, try to reconnect
+          socketInstance.connect();
+        }
+      });
 
-    socketInstance.on('reconnect_attempt', (attemptNumber: number) => {
-      logger.log('[SOCKET.IO] Reconnection attempt:', attemptNumber);
-    });
+      socketInstance.on('connect_error', (error: Error) => {
+        logger.error('[SOCKET.IO] Connection error:', error.message);
+        setConnectionError(error.message);
+        setIsConnected(false);
+      });
 
-    socketInstance.on('reconnect_error', (error: Error) => {
-      logger.error('[SOCKET.IO] Reconnection error:', error.message);
-    });
+      socketInstance.on('reconnect', (attemptNumber: number) => {
+        logger.log('[SOCKET.IO] Reconnected after', attemptNumber, 'attempts');
+        setIsConnected(true);
+        setConnectionError(null);
+      });
 
-    socketInstance.on('reconnect_failed', () => {
-      logger.error('[SOCKET.IO] Reconnection failed after all attempts');
-      setConnectionError('Failed to reconnect to server');
-    });
+      socketInstance.on('reconnect_attempt', (attemptNumber: number) => {
+        logger.log('[SOCKET.IO] Reconnection attempt:', attemptNumber);
+      });
 
-    // Handle server shutdown notification (for zero-downtime deployments)
-    socketInstance.on('serverShutdown', ({ reconnectIn, message }: { reconnectIn?: number; message: string }) => {
-      logger.log('[SOCKET.IO] Server shutdown notification:', message);
-      // Disconnect gracefully and schedule reconnection
-      socketInstance.disconnect();
-      setTimeout(() => {
-        logger.log('[SOCKET.IO] Attempting reconnection after server restart');
-        socketInstance.connect();
-      }, reconnectIn || 5000);
-    });
+      socketInstance.on('reconnect_error', (error: Error) => {
+        logger.error('[SOCKET.IO] Reconnection error:', error.message);
+      });
 
-    // Catch any unhandled error events
-    socketInstance.on('error', (error: unknown) => {
-      logger.error('[SOCKET.IO] Socket error event:', error);
-      // Log additional context if error is empty
-      if (!error || (typeof error === 'object' && Object.keys(error).length === 0)) {
-        logger.error('[SOCKET.IO] Received empty error - checking socket state');
-        logger.error('[SOCKET.IO] Connected:', socketInstance.connected);
-        logger.error('[SOCKET.IO] ID:', socketInstance.id);
-      }
-    });
+      socketInstance.on('reconnect_failed', () => {
+        logger.error('[SOCKET.IO] Reconnection failed after all attempts');
+        setConnectionError('Failed to reconnect to server');
+      });
 
-    // Schedule setSocket asynchronously to avoid synchronous setState in effect
-    Promise.resolve().then(() => setSocket(socketInstance));
+      // Handle server shutdown notification (for zero-downtime deployments)
+      socketInstance.on('serverShutdown', ({ reconnectIn, message }: { reconnectIn?: number; message: string }) => {
+        logger.log('[SOCKET.IO] Server shutdown notification:', message);
+        // Disconnect gracefully and schedule reconnection
+        socketInstance.disconnect();
+        setTimeout(() => {
+          logger.log('[SOCKET.IO] Attempting reconnection after server restart');
+          socketInstance.connect();
+        }, reconnectIn || 5000);
+      });
+
+      // Catch any unhandled error events
+      socketInstance.on('error', (error: unknown) => {
+        logger.error('[SOCKET.IO] Socket error event:', error);
+        // Log additional context if error is empty
+        if (!error || (typeof error === 'object' && Object.keys(error).length === 0)) {
+          logger.error('[SOCKET.IO] Received empty error - checking socket state');
+          logger.error('[SOCKET.IO] Connected:', socketInstance.connected);
+          logger.error('[SOCKET.IO] ID:', socketInstance.id);
+        }
+      });
+
+      // Schedule setSocket asynchronously to avoid synchronous setState in effect
+      Promise.resolve().then(() => setSocket(socketInstance));
+    };
+
+    // Initialize socket connection
+    initSocket();
+
+    // Listen for Supabase auth state changes to update socket auth token
+    let authSubscription: { unsubscribe: () => void } | null = null;
+
+    if (supabase) {
+      const { data } = supabase.auth.onAuthStateChange(async (event, session) => {
+        const newToken = session?.access_token || null;
+        logger.log(`[SOCKET.IO] Auth state changed: ${event}, token: ${newToken ? 'present' : 'none'}`);
+
+        if (authTokenRef.current !== newToken) {
+          updateAuthToken(newToken);
+        }
+      });
+      authSubscription = data.subscription;
+    }
 
     // Cleanup on unmount
     return () => {
       logger.log('[SOCKET.IO] Cleaning up socket connection');
-      socketInstance.removeAllListeners();
-      socketInstance.disconnect();
+      if (socketRef.current) {
+        socketRef.current.removeAllListeners();
+        socketRef.current.disconnect();
+      }
+      if (authSubscription) {
+        authSubscription.unsubscribe();
+      }
     };
-  }, []);
+  }, [updateAuthToken]);
 
   return (
-    <SocketContext.Provider value={{ socket, isConnected, connectionError }}>
+    <SocketContext.Provider value={{ socket, isConnected, connectionError, updateAuthToken }}>
       {children}
     </SocketContext.Provider>
   );

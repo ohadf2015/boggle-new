@@ -28,16 +28,48 @@ const PORT = process.env.PORT || 3001;
 const HOST = process.env.HOST || "0.0.0.0";
 const CORS_ORIGIN = process.env.CORS_ORIGIN || "*";
 
+// Mobile platform origins for Capacitor support
+const MOBILE_ORIGINS = [
+  'capacitor://localhost',      // iOS Capacitor
+  'http://localhost',           // Android Capacitor
+  'ionic://localhost',          // Ionic fallback
+  'http://localhost:3000',      // Development
+];
+
+/**
+ * Build the CORS allowed origins list
+ * Includes configured origins + mobile platform origins
+ */
+function getAllowedOrigins() {
+  if (CORS_ORIGIN === '*') {
+    return true; // Allow all
+  }
+
+  const configuredOrigins = CORS_ORIGIN.split(',').map(o => o.trim()).filter(Boolean);
+  const allOrigins = [...configuredOrigins, ...MOBILE_ORIGINS];
+
+  // Return unique origins
+  return [...new Set(allOrigins)];
+}
+
 app.prepare().then(() => {
   const server = express();
   const httpServer = http.createServer(server);
 
+  // Import JWT verification for socket auth
+  const { verifyJwt, getUserProfile } = require('./backend/modules/supabaseServer');
+
+  // Build allowed origins (includes mobile platforms)
+  const allowedOrigins = getAllowedOrigins();
+
   // Socket.IO server configuration
   const io = new Server(httpServer, {
     cors: {
-      origin: CORS_ORIGIN === '*' ? true : CORS_ORIGIN.split(','),
+      origin: allowedOrigins,
       methods: ["GET", "POST"],
-      credentials: true
+      credentials: true,
+      // Allow requests without origin header (mobile apps)
+      allowEIO3: true,
     },
     // Performance optimizations
     perMessageDeflate: {
@@ -61,6 +93,63 @@ app.prepare().then(() => {
     allowUpgrades: true
   });
 
+  // Socket.IO authentication middleware
+  // Verifies JWT token from handshake and attaches user to socket session
+  io.use(async (socket, next) => {
+    try {
+      const { token, platform } = socket.handshake.auth || {};
+
+      // Log connection attempt with platform info
+      console.log(`[SOCKET.IO] Connection attempt from ${platform || 'web'} (origin: ${socket.handshake.headers.origin || 'none'})`);
+
+      // If no token, allow as guest
+      if (!token) {
+        socket.data = { authUser: null, platform: platform || 'web', isGuest: true };
+        return next();
+      }
+
+      // Verify JWT token with Supabase
+      const { user, error } = await verifyJwt(token);
+
+      if (error) {
+        console.warn(`[SOCKET.IO] JWT verification failed: ${error.message}`);
+        // Don't reject - allow as guest for graceful degradation
+        socket.data = { authUser: null, platform: platform || 'web', isGuest: true, authError: error.message };
+        return next();
+      }
+
+      if (user) {
+        // Fetch profile for additional user data
+        const { profile } = await getUserProfile(user.id);
+
+        socket.data = {
+          authUser: {
+            id: user.id,
+            email: user.email,
+            username: profile?.username,
+            displayName: profile?.display_name,
+            avatarEmoji: profile?.avatar_emoji,
+            avatarColor: profile?.avatar_color,
+            isAdmin: profile?.is_admin || false,
+          },
+          platform: platform || 'web',
+          isGuest: false,
+        };
+
+        console.log(`[SOCKET.IO] Authenticated user: ${user.id} (${profile?.username || 'no profile'})`);
+      } else {
+        socket.data = { authUser: null, platform: platform || 'web', isGuest: true };
+      }
+
+      next();
+    } catch (err) {
+      console.error('[SOCKET.IO] Auth middleware error:', err);
+      // Don't reject - allow as guest for resilience
+      socket.data = { authUser: null, platform: 'web', isGuest: true, authError: err.message };
+      next();
+    }
+  });
+
   // Initialize Socket.IO event handlers
   initializeSocketHandlers(io);
 
@@ -68,17 +157,39 @@ app.prepare().then(() => {
   server.disable('x-powered-by');
 
   // SECURITY: Configure CORS properly for production
+  // Includes mobile platform origins (capacitor://, ionic://)
   const corsOptions = {
-    origin: CORS_ORIGIN === '*' && !dev
-      ? false // Reject wildcard in production
-      : CORS_ORIGIN === '*' ? true : CORS_ORIGIN.split(','),
-    credentials: true
+    origin: (origin, callback) => {
+      // Allow requests with no origin (mobile apps, server-to-server, curl, etc.)
+      if (!origin) {
+        return callback(null, true);
+      }
+
+      // In development or if CORS_ORIGIN is '*', allow all
+      if (dev || CORS_ORIGIN === '*') {
+        return callback(null, true);
+      }
+
+      // Check against allowed origins (includes mobile platforms)
+      if (allowedOrigins === true || allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      }
+
+      // Reject unknown origins
+      console.warn(`[CORS] Rejected origin: ${origin}`);
+      return callback(new Error('Not allowed by CORS'), false);
+    },
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
   };
 
   if (!dev && CORS_ORIGIN === '*') {
     console.warn('WARNING: CORS is set to wildcard (*) in production. This is insecure!');
     console.warn('Please set CORS_ORIGIN environment variable to your production domain.');
   }
+
+  console.log(`[CORS] Configured with origins: ${allowedOrigins === true ? 'ALL' : allowedOrigins.join(', ')}`);
 
   server.use(cors(corsOptions));
   server.use(express.json());

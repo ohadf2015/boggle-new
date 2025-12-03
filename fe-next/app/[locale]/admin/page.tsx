@@ -14,6 +14,7 @@ import { useTheme } from '@/utils/ThemeContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/lib/supabase';
+import { apiUrl } from '@/lib/config';
 import { cn } from '@/lib/utils';
 import toast from 'react-hot-toast';
 
@@ -143,12 +144,12 @@ export default function AdminDashboard() {
     try {
       // Fetch all data in parallel
       const [statsRes, realtimeRes, countriesRes, sourcesRes, dailyRes, playersRes] = await Promise.all([
-        fetch('/api/admin/stats', { headers }),
-        fetch('/api/admin/realtime', { headers }),
-        fetch('/api/admin/players/countries', { headers }),
-        fetch('/api/admin/players/sources', { headers }),
-        fetch('/api/admin/activity/daily?days=30', { headers }),
-        fetch('/api/admin/players/top?limit=20', { headers }),
+        fetch(apiUrl('/api/admin/stats'), { headers }),
+        fetch(apiUrl('/api/admin/realtime'), { headers }),
+        fetch(apiUrl('/api/admin/players/countries'), { headers }),
+        fetch(apiUrl('/api/admin/players/sources'), { headers }),
+        fetch(apiUrl('/api/admin/activity/daily?days=30'), { headers }),
+        fetch(apiUrl('/api/admin/players/top?limit=20'), { headers }),
       ]);
 
       if (!statsRes.ok) {
@@ -194,7 +195,7 @@ export default function AdminDashboard() {
       if (!token) return;
 
       try {
-        const res = await fetch('/api/admin/realtime', {
+        const res = await fetch(apiUrl('/api/admin/realtime'), {
           headers: { 'Authorization': `Bearer ${token}` }
         });
         if (res.ok) {

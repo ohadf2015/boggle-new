@@ -13,13 +13,14 @@ import {
 } from '../lib/supabase';
 import { getGuestSessionId, getGuestStats, clearGuestData, hashToken } from '../utils/guestManager';
 import { getUtmDataForProfile } from '../utils/utmCapture';
+import { apiUrl } from '../lib/config';
 import logger from '@/utils/logger';
 import type { User } from '@supabase/supabase-js';
 
 // Fetch geolocation data from our API
 async function fetchGeolocation(): Promise<{ countryCode: string | null; country?: string; city?: string }> {
   try {
-    const response = await fetch('/api/geolocation', {
+    const response = await fetch(apiUrl('/api/geolocation'), {
       method: 'GET',
       headers: { 'Accept': 'application/json' },
     });

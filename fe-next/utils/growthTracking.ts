@@ -4,6 +4,7 @@
  */
 
 import logger from '@/utils/logger';
+import { apiUrl } from '@/lib/config';
 import { getStoredUtmData } from './utmCapture';
 import { getGuestSessionId, getGuestName } from './guestManager';
 
@@ -351,7 +352,7 @@ export const trackAnalyticsEvent = async (
     };
 
     // Fire and forget - don't block on response
-    fetch('/api/analytics/track', {
+    fetch(apiUrl('/api/analytics/track'), {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload),

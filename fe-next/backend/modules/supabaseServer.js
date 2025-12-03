@@ -636,6 +636,73 @@ async function updateRankedMmr(participants) {
   }
 }
 
+/**
+ * Verify a Supabase JWT token and return the user
+ * Used for Socket.IO authentication (mobile apps can't use cookies)
+ * @param {string} token - The JWT access token from Supabase
+ * @returns {object} - { user, error }
+ */
+async function verifyJwt(token) {
+  if (!token) {
+    return { user: null, error: null }; // No token = guest user (not an error)
+  }
+
+  const client = getSupabase();
+  if (!client) {
+    return { user: null, error: { message: 'Supabase not configured' } };
+  }
+
+  try {
+    // Use Supabase Admin to verify the token
+    const { data: { user }, error } = await client.auth.getUser(token);
+
+    if (error) {
+      logger.warn('SUPABASE', `JWT verification failed: ${error.message}`);
+      return { user: null, error };
+    }
+
+    if (!user) {
+      return { user: null, error: { message: 'Invalid token - no user found' } };
+    }
+
+    logger.debug('SUPABASE', `JWT verified for user: ${user.id}`);
+    return { user, error: null };
+  } catch (err) {
+    logger.error('SUPABASE', 'JWT verification error:', err);
+    return { user: null, error: { message: err.message || 'Token verification failed' } };
+  }
+}
+
+/**
+ * Get user profile by ID (for socket session enrichment)
+ * @param {string} userId - The user's UUID
+ * @returns {object} - { profile, error }
+ */
+async function getUserProfile(userId) {
+  const client = getSupabase();
+  if (!client) {
+    return { profile: null, error: { message: 'Supabase not configured' } };
+  }
+
+  try {
+    const { data: profile, error } = await client
+      .from('profiles')
+      .select('id, username, display_name, avatar_emoji, avatar_color, is_admin')
+      .eq('id', userId)
+      .single();
+
+    if (error && error.code !== 'PGRST116') {
+      logger.warn('SUPABASE', `Profile fetch failed for ${userId}: ${error.message}`);
+      return { profile: null, error };
+    }
+
+    return { profile: profile || null, error: null };
+  } catch (err) {
+    logger.error('SUPABASE', 'Profile fetch error:', err);
+    return { profile: null, error: { message: err.message || 'Profile fetch failed' } };
+  }
+}
+
 module.exports = {
   getSupabase,
   isSupabaseConfigured,
@@ -647,5 +714,7 @@ module.exports = {
   updateGuestStats,
   processGameResults,
   updateRankedMmr,
-  saveHostApprovedWord
+  saveHostApprovedWord,
+  verifyJwt,
+  getUserProfile
 };
