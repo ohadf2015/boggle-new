@@ -1,4 +1,4 @@
-import { createClient } from '@supabase/supabase-js';
+import { createBrowserClient } from '@supabase/ssr';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import logger from '@/utils/logger';
 
@@ -9,17 +9,9 @@ if (!supabaseUrl || !supabaseAnonKey) {
   logger.warn('Supabase credentials not configured. Auth features will be disabled.');
 }
 
+// Browser client using @supabase/ssr for proper cookie-based session handling
 export const supabase: SupabaseClient | null = supabaseUrl && supabaseAnonKey
-  ? createClient(supabaseUrl, supabaseAnonKey, {
-      auth: {
-        autoRefreshToken: true,
-        persistSession: true,
-        // Disable auto-detection - we manually handle auth callback at /auth/callback
-        // This prevents race conditions where Supabase tries to exchange the code
-        // before our callback component mounts
-        detectSessionInUrl: false
-      }
-    })
+  ? createBrowserClient(supabaseUrl, supabaseAnonKey)
   : null;
 
 // Auth helper functions
