@@ -1,4 +1,4 @@
-export const translations = {
+const translations = {
   en: {
     flag: '🇺🇸',
     name: 'English',
@@ -4083,7 +4083,5 @@ export const translations = {
   }
 };
 
-// CommonJS export for backend compatibility
-if (typeof module !== 'undefined' && module.exports) {
-  module.exports = { translations };
-}
+// CommonJS export - works with both require() and Next.js import
+module.exports = { translations };
