@@ -41,19 +41,42 @@ function AuthCallbackContent() {
           return;
         }
 
-        // Check for PKCE code in query params (from server redirect)
-        const code = searchParams.get('code');
         // Ensure next URL has locale prefix
         let next = searchParams.get('next') || `/${locale}`;
         if (next === '/') {
           next = `/${locale}`;
         }
 
+        // IMPORTANT: Check for existing session FIRST
+        // Supabase's detectSessionInUrl may have already exchanged the code
+        // before this component mounted. Checking session first prevents
+        // double-exchange errors.
+        const { data: existingSession } = await supabase.auth.getSession();
+        if (existingSession?.session) {
+          logger.log('Auth callback: Session already exists, redirecting');
+          router.replace(next);
+          return;
+        }
+
+        // Check for PKCE code in query params (from server redirect)
+        const code = searchParams.get('code');
+
         if (code) {
           logger.log('Auth callback: Exchanging code for session');
           const { error } = await supabase.auth.exchangeCodeForSession(code);
 
           if (error) {
+            // Check if error is because code was already used (by detectSessionInUrl)
+            // In this case, try to get session again as it might have been set
+            if (error.message?.includes('code') || error.message?.includes('expired') || error.message?.includes('invalid')) {
+              logger.warn('Auth callback: Code exchange failed, checking for existing session');
+              const { data: retrySession } = await supabase.auth.getSession();
+              if (retrySession?.session) {
+                logger.log('Auth callback: Found session after failed exchange');
+                router.replace(next);
+                return;
+              }
+            }
             logger.error('Auth callback: Code exchange error:', error);
             router.replace(`/${locale}?auth_error=true`);
             return;
@@ -61,27 +84,11 @@ function AuthCallbackContent() {
 
           // Successfully exchanged code - get session to confirm
           const { data: sessionData } = await supabase.auth.getSession();
-          if (sessionData.session) {
+          if (sessionData?.session) {
             logger.log('Auth callback: Session established successfully');
             router.replace(next);
             return;
           }
-        }
-
-        // Check for existing session (might have been set by detectSessionInUrl)
-        const { data, error } = await supabase.auth.getSession();
-
-        if (error) {
-          logger.error('Auth callback error:', error);
-          router.replace(`/${locale}?auth_error=true`);
-          return;
-        }
-
-        if (data.session) {
-          // Successfully authenticated
-          logger.log('Auth callback: Found existing session');
-          router.replace(`/${locale}`);
-          return;
         }
 
         // Check for implicit flow tokens in hash fragment
@@ -92,11 +99,20 @@ function AuthCallbackContent() {
           // Wait a moment for Supabase to process the hash
           await new Promise(resolve => setTimeout(resolve, 500));
           const { data: hashData } = await supabase.auth.getSession();
-          if (hashData.session) {
+          if (hashData?.session) {
             logger.log('Auth callback: Session from hash tokens');
-            router.replace(`/${locale}`);
+            router.replace(next);
             return;
           }
+        }
+
+        // Final check for session - might have been set asynchronously
+        await new Promise(resolve => setTimeout(resolve, 300));
+        const { data: finalCheck } = await supabase.auth.getSession();
+        if (finalCheck?.session) {
+          logger.log('Auth callback: Session found in final check');
+          router.replace(next);
+          return;
         }
 
         // Fallback: redirect to home with error
