@@ -1,14 +1,19 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter, useSearchParams, useParams } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import logger from '@/utils/logger';
+import { defaultLocale } from '@/lib/i18n';
 
 export default function AuthCallbackPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const params = useParams();
   const hasHandledCallback = useRef(false);
+
+  // Get locale from URL params, fallback to default
+  const locale = params?.locale || defaultLocale;
 
   useEffect(() => {
     // Prevent double-handling
@@ -19,13 +24,17 @@ export default function AuthCallbackPage() {
       try {
         if (!supabase) {
           logger.error('Supabase not configured');
-          router.replace('/?auth_error=true');
+          router.replace(`/${locale}?auth_error=true`);
           return;
         }
 
         // Check for PKCE code in query params (from server redirect)
         const code = searchParams.get('code');
-        const next = searchParams.get('next') || '/';
+        // Ensure next URL has locale prefix
+        let next = searchParams.get('next') || `/${locale}`;
+        if (next === '/') {
+          next = `/${locale}`;
+        }
 
         if (code) {
           logger.log('Auth callback: Exchanging code for session');
@@ -33,7 +42,7 @@ export default function AuthCallbackPage() {
 
           if (error) {
             logger.error('Auth callback: Code exchange error:', error);
-            router.replace('/?auth_error=true');
+            router.replace(`/${locale}?auth_error=true`);
             return;
           }
 
@@ -51,14 +60,14 @@ export default function AuthCallbackPage() {
 
         if (error) {
           logger.error('Auth callback error:', error);
-          router.replace('/?auth_error=true');
+          router.replace(`/${locale}?auth_error=true`);
           return;
         }
 
         if (data.session) {
           // Successfully authenticated
           logger.log('Auth callback: Found existing session');
-          router.replace('/');
+          router.replace(`/${locale}`);
           return;
         }
 
@@ -72,22 +81,22 @@ export default function AuthCallbackPage() {
           const { data: hashData } = await supabase.auth.getSession();
           if (hashData.session) {
             logger.log('Auth callback: Session from hash tokens');
-            router.replace('/');
+            router.replace(`/${locale}`);
             return;
           }
         }
 
         // Fallback: redirect to home with error
         logger.warn('Auth callback: No session found, redirecting with error');
-        router.replace('/?auth_error=true');
+        router.replace(`/${locale}?auth_error=true`);
       } catch (err) {
         logger.error('Auth callback exception:', err);
-        router.replace('/?auth_error=true');
+        router.replace(`/${locale}?auth_error=true`);
       }
     };
 
     handleCallback();
-  }, [router, searchParams]);
+  }, [router, searchParams, locale]);
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-purple-900 to-purple-950">
