@@ -106,12 +106,73 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   const [isSupabaseEnabled, setIsSupabaseEnabled] = useState<boolean>(false);
 
   // Define fetchUserData before useEffect to fix "variable used before declaration" error
-  const fetchUserData = useCallback(async (userId: string) => {
+  const fetchUserData = useCallback(async (userId: string, userMetadata?: Record<string, unknown>) => {
     // Fetch profile
     const { data: profileData, error: profileError } = await getProfile(userId);
 
     if (profileError && (profileError as { code?: string }).code === 'PGRST116') {
-      // Profile doesn't exist, will be created on first sign in
+      // Profile doesn't exist - auto-create a minimal profile so auth works
+      // User can update their username/avatar later via profile settings
+      logger.info('Profile not found, creating minimal profile for user:', userId);
+
+      // Extract profile picture from OAuth provider if available
+      let profilePictureUrl: string | null = null;
+      let profilePictureProvider: string | null = null;
+      if (userMetadata?.avatar_url) {
+        profilePictureUrl = userMetadata.avatar_url as string;
+        profilePictureProvider = 'oauth';
+      } else if (userMetadata?.picture) {
+        profilePictureUrl = userMetadata.picture as string;
+        profilePictureProvider = 'google';
+      }
+
+      // Generate a temporary username from the user ID
+      const tempUsername = `player_${userId.substring(0, 8)}`;
+
+      // Get display name from OAuth provider if available
+      const displayName = (userMetadata?.full_name as string) ||
+                          (userMetadata?.name as string) ||
+                          tempUsername;
+
+      const { data: newProfile, error: createError } = await createProfile({
+        id: userId,
+        username: tempUsername,
+        display_name: displayName,
+        avatar_emoji: '😀',
+        avatar_color: '#6366f1',
+        profile_picture_url: profilePictureUrl,
+        profile_picture_provider: profilePictureProvider,
+      });
+
+      if (createError) {
+        logger.error('Failed to create profile:', createError);
+        return;
+      }
+
+      if (newProfile) {
+        logger.info('Created minimal profile for user:', userId);
+        setProfile(newProfile);
+
+        // Fetch geolocation and update in background
+        fetchGeolocation().then(async (geoData) => {
+          if (geoData.countryCode) {
+            const { data: updatedProfile } = await updateProfile(userId, {
+              country_code: geoData.countryCode
+            });
+            if (updatedProfile) {
+              setProfile(updatedProfile);
+            }
+          }
+        }).catch((err) => {
+          logger.warn('Failed to update country_code:', err);
+        });
+      }
+
+      // Fetch ranked progress for new user (will likely be empty)
+      const { data: rankedData } = await getRankedProgress(userId);
+      if (rankedData) {
+        setRankedProgress(rankedData);
+      }
       return;
     }
 
@@ -207,7 +268,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         } else if (session?.user) {
           setUser(session.user);
           // Fetch user data in background, don't block loading state
-          fetchUserData(session.user.id).catch((err) => {
+          fetchUserData(session.user.id, session.user.user_metadata).catch((err) => {
             logger.warn('Failed to fetch user data:', err.message);
           });
         }
@@ -243,7 +304,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
               return currentLoading;
             });
             try {
-              await fetchUserData(session.user.id);
+              await fetchUserData(session.user.id, session.user.user_metadata);
             } finally {
               if (isMounted) {
                 setLoading(false);
@@ -268,7 +329,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
             if (session?.user) {
               setUser(session.user);
               try {
-                await fetchUserData(session.user.id);
+                await fetchUserData(session.user.id, session.user.user_metadata);
               } finally {
                 if (isMounted) {
                   setLoading(false);
@@ -349,7 +410,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
   const refreshProfile = useCallback(async () => {
     if (user?.id) {
-      await fetchUserData(user.id);
+      await fetchUserData(user.id, user.user_metadata);
     }
   }, [user, fetchUserData]);
 
