@@ -933,6 +933,26 @@ app.prepare().then(() => {
 
       // Manual redirect for root path (since middleware might be skipped in custom server)
       if (pathname === '/') {
+        // Detect social media crawlers that need OG meta tags
+        // These crawlers often don't follow redirects when fetching link previews
+        const userAgent = (req.headers['user-agent'] || '').toLowerCase();
+        const isSocialCrawler =
+          userAgent.includes('whatsapp') ||
+          userAgent.includes('facebookexternalhit') ||
+          userAgent.includes('facebot') ||
+          userAgent.includes('twitterbot') ||
+          userAgent.includes('linkedinbot') ||
+          userAgent.includes('slackbot') ||
+          userAgent.includes('telegrambot') ||
+          userAgent.includes('discordbot') ||
+          userAgent.includes('pinterest') ||
+          userAgent.includes('redditbot') ||
+          userAgent.includes('embedly') ||
+          userAgent.includes('quora link preview') ||
+          userAgent.includes('outbrain') ||
+          userAgent.includes('vkshare') ||
+          userAgent.includes('w3c_validator');
+
         // Country-to-locale mapping
         const countryToLocale = {
           IL: 'he', // Israel
@@ -971,10 +991,22 @@ app.prepare().then(() => {
 
         // Preserve query params (e.g., ?room=1234) during redirect
         const queryString = parsedUrl.search || '';
-        console.log(`[Redirect] Root path redirect: ${req.url} -> /${locale}${queryString}`);
-        res.writeHead(307, { Location: `/${locale}${queryString}` });
-        res.end();
-        return;
+
+        // For social media crawlers: internally rewrite to locale path (no redirect)
+        // This ensures they receive the page with proper OG meta tags for link previews
+        if (isSocialCrawler) {
+          console.log(`[Crawler] Social crawler detected: ${userAgent.substring(0, 50)}... -> rewriting to /${locale}${queryString}`);
+          // Rewrite the URL internally so Next.js serves the locale page with OG tags
+          parsedUrl.pathname = `/${locale}`;
+          req.url = `/${locale}${queryString}`;
+          // Fall through to handle() below instead of redirecting
+        } else {
+          // For regular users: redirect to locale path
+          console.log(`[Redirect] Root path redirect: ${req.url} -> /${locale}${queryString}`);
+          res.writeHead(307, { Location: `/${locale}${queryString}` });
+          res.end();
+          return;
+        }
       }
 
       // Set x-powered-by to Next.js to reassure user

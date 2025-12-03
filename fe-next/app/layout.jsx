@@ -6,6 +6,32 @@ export const metadata = {
         default: 'LexiClash - Educational Word Game | Vocabulary Builder | לקסיקלאש',
         template: '%s | LexiClash',
     },
+    description: 'Play LexiClash - the multiplayer word game that builds vocabulary! Challenge friends, join rooms, and improve your language skills.',
+    // Open Graph meta tags for social sharing (WhatsApp, Facebook, etc.)
+    // These are essential for link previews when sharing root URLs like lexiclash.live?room=1234
+    openGraph: {
+        type: 'website',
+        locale: 'en_US',
+        url: 'https://www.lexiclash.live',
+        title: 'LexiClash - Multiplayer Word Game',
+        description: 'Play LexiClash - the multiplayer word game that builds vocabulary! Challenge friends and improve your language skills.',
+        siteName: 'LexiClash',
+        images: [
+            {
+                url: 'https://www.lexiclash.live/og-image-en.jpg',
+                width: 1200,
+                height: 630,
+                alt: 'LexiClash - Multiplayer Word Game',
+            },
+        ],
+    },
+    // Twitter Card meta tags
+    twitter: {
+        card: 'summary_large_image',
+        title: 'LexiClash - Multiplayer Word Game',
+        description: 'Play LexiClash - the multiplayer word game that builds vocabulary! Challenge friends and improve your language skills.',
+        images: ['https://www.lexiclash.live/og-image-en.jpg'],
+    },
     robots: {
         index: true,
         follow: true,
