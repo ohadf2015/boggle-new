@@ -372,22 +372,25 @@ const ShareWinPrompt: React.FC<ShareWinPromptProps> = ({
     return pickRandom(getViralPrompts());
   }, [language]);
 
-  // Handle WhatsApp share
+  // Handle WhatsApp share - use whatsapp utm_source for tracking
   const handleWhatsAppShare = () => {
     trackShare('whatsapp', gameCode);
 
+    // Generate message with whatsapp utm_source
     const referralCode = generateReferralCode();
-    const url = getShareUrlWithTracking(gameCode, referralCode);
-    const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(shareMessage)}`;
+    const url = getShareUrlWithTracking(gameCode, referralCode, 'whatsapp');
+    // Replace URL in share message with the whatsapp-tracked URL
+    const messageWithTracking = shareMessage.replace(/https?:\/\/[^\s]+/, url);
+    const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(messageWithTracking)}`;
     window.open(whatsappUrl, '_blank');
   };
 
-  // Handle copy link
+  // Handle copy link - use copy utm_source for tracking
   const handleCopyLink = async () => {
     trackShare('copy', gameCode);
 
     const referralCode = generateReferralCode();
-    const url = getShareUrlWithTracking(gameCode, referralCode);
+    const url = getShareUrlWithTracking(gameCode, referralCode, 'copy');
 
     try {
       await navigator.clipboard.writeText(url);
@@ -399,16 +402,18 @@ const ShareWinPrompt: React.FC<ShareWinPromptProps> = ({
     }
   };
 
-  // Handle native share (if available)
+  // Handle native share (if available) - use native_share utm_source
   const handleNativeShare = async () => {
     if (navigator.share) {
       trackShare('native', gameCode);
 
       try {
+        const referralCode = generateReferralCode();
+        const url = getShareUrlWithTracking(gameCode, referralCode, 'native_share');
         await navigator.share({
           title: 'LexiClash',
-          text: shareMessage,
-          url: getShareUrlWithTracking(gameCode, generateReferralCode()),
+          text: shareMessage.replace(/https?:\/\/[^\s]+/, url),
+          url: url,
         });
       } catch {
         // User cancelled or error

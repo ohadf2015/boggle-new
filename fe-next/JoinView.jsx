@@ -20,6 +20,8 @@ import LogRocket from 'logrocket';
 import { validateUsername, validateRoomName, validateGameCode, sanitizeInput } from './utils/validation';
 import { useValidation } from './hooks/useValidation';
 import { generateRoomCode as generateCode } from './utils/utils';
+import { setGuestName } from './utils/guestManager';
+import { trackGuestJoin } from './utils/growthTracking';
 
 // Dynamic imports for heavy animation components (reduces initial bundle by ~50KB)
 const HowToPlay = dynamic(() => import('./components/HowToPlay'), { ssr: false });
@@ -184,6 +186,11 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
         role: 'host',
         gameCode: gameCode,
       });
+      // Store guest name and track analytics for guest hosts (non-authenticated)
+      if (!isAuthenticated) {
+        setGuestName(rn.trim());
+        trackGuestJoin(rn.trim(), gameCode, roomLanguage);
+      }
     } else {
       // Player needs username
       const un = sanitizeInput(username, 20);
@@ -208,6 +215,11 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
         role: 'player',
         gameCode: gameCode,
       });
+      // Store guest name and track analytics for guest players (non-authenticated)
+      if (!isAuthenticated) {
+        setGuestName(un.trim());
+        trackGuestJoin(un.trim(), gameCode, language);
+      }
     }
 
     handleJoin(mode === 'host', roomLanguage);
@@ -250,6 +262,11 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
       role: 'player',
       gameCode: gameCode,
     });
+    // Store guest name and track analytics for guest players (non-authenticated)
+    if (!isAuthenticated) {
+      setGuestName(un.trim());
+      trackGuestJoin(un.trim(), gameCode, language);
+    }
     handleJoin(false); // Always join mode for quick join
   };
 

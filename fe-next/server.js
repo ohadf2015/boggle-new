@@ -522,50 +522,112 @@ app.prepare().then(() => {
   });
 
   // GET /api/admin/players/sources - Get player acquisition sources (UTM)
+  // Combines data from profiles (registered users) and analytics_events (guests)
   server.get('/api/admin/players/sources', adminAuth, async (_req, res) => {
     try {
       const supabase = getSupabase();
-      const { data, error } = await supabase
+
+      // Get registered user data from profiles
+      const { data: profileData, error: profileError } = await supabase
         .from('profiles')
         .select('utm_source, utm_medium, utm_campaign, referrer');
 
-      if (error) throw error;
+      if (profileError) throw profileError;
 
-      const sourceCounts = {};
-      const mediumCounts = {};
-      const campaignCounts = {};
-      const referrerCounts = {};
+      // Get analytics events for guest players
+      const { data: eventData, error: eventError } = await supabase
+        .from('analytics_events')
+        .select('utm_source, utm_medium, utm_campaign, referrer, metadata')
+        .not('metadata->guest_name', 'is', null);
 
-      data?.forEach(p => {
+      // Process even if eventError (table might not exist yet)
+      if (eventError) {
+        console.warn('[ADMIN API] Analytics events query failed:', eventError.message);
+      }
+
+      const sourceCounts = { registered: {}, guests: {} };
+      const mediumCounts = { registered: {}, guests: {} };
+      const campaignCounts = { registered: {}, guests: {} };
+      const referrerCounts = { registered: {}, guests: {} };
+      const guestNames = {};
+
+      // Process registered user data
+      profileData?.forEach(p => {
         if (p.utm_source) {
-          sourceCounts[p.utm_source] = (sourceCounts[p.utm_source] || 0) + 1;
+          sourceCounts.registered[p.utm_source] = (sourceCounts.registered[p.utm_source] || 0) + 1;
         }
         if (p.utm_medium) {
-          mediumCounts[p.utm_medium] = (mediumCounts[p.utm_medium] || 0) + 1;
+          mediumCounts.registered[p.utm_medium] = (mediumCounts.registered[p.utm_medium] || 0) + 1;
         }
         if (p.utm_campaign) {
-          campaignCounts[p.utm_campaign] = (campaignCounts[p.utm_campaign] || 0) + 1;
+          campaignCounts.registered[p.utm_campaign] = (campaignCounts.registered[p.utm_campaign] || 0) + 1;
         }
         if (p.referrer) {
-          // Extract domain from referrer
           try {
             const domain = new URL(p.referrer).hostname;
-            referrerCounts[domain] = (referrerCounts[domain] || 0) + 1;
+            referrerCounts.registered[domain] = (referrerCounts.registered[domain] || 0) + 1;
           } catch {
-            referrerCounts[p.referrer] = (referrerCounts[p.referrer] || 0) + 1;
+            referrerCounts.registered[p.referrer] = (referrerCounts.registered[p.referrer] || 0) + 1;
           }
         }
       });
+
+      // Process guest player data from analytics events
+      eventData?.forEach(event => {
+        const guestName = event.metadata?.guest_name;
+        if (guestName && !guestNames[guestName]) {
+          guestNames[guestName] = true; // Track unique guests
+
+          const source = event.utm_source || 'direct';
+          sourceCounts.guests[source] = (sourceCounts.guests[source] || 0) + 1;
+
+          if (event.utm_medium) {
+            mediumCounts.guests[event.utm_medium] = (mediumCounts.guests[event.utm_medium] || 0) + 1;
+          }
+          if (event.utm_campaign) {
+            campaignCounts.guests[event.utm_campaign] = (campaignCounts.guests[event.utm_campaign] || 0) + 1;
+          }
+          if (event.referrer) {
+            try {
+              const domain = new URL(event.referrer).hostname;
+              referrerCounts.guests[domain] = (referrerCounts.guests[domain] || 0) + 1;
+            } catch {
+              referrerCounts.guests[event.referrer] = (referrerCounts.guests[event.referrer] || 0) + 1;
+            }
+          }
+        }
+      });
+
+      // Combine registered and guest counts
+      const combineCounts = (registered, guests) => {
+        const combined = { ...registered };
+        Object.entries(guests).forEach(([key, count]) => {
+          combined[key] = (combined[key] || 0) + count;
+        });
+        return combined;
+      };
 
       const sortByCount = (obj) => Object.entries(obj)
         .sort((a, b) => b[1] - a[1])
         .map(([name, count]) => ({ name, count }));
 
+      const totalSources = combineCounts(sourceCounts.registered, sourceCounts.guests);
+      const totalMediums = combineCounts(mediumCounts.registered, mediumCounts.guests);
+      const totalCampaigns = combineCounts(campaignCounts.registered, campaignCounts.guests);
+      const totalReferrers = combineCounts(referrerCounts.registered, referrerCounts.guests);
+
       res.json({
-        sources: sortByCount(sourceCounts),
-        mediums: sortByCount(mediumCounts),
-        campaigns: sortByCount(campaignCounts),
-        referrers: sortByCount(referrerCounts),
+        sources: sortByCount(totalSources),
+        mediums: sortByCount(totalMediums),
+        campaigns: sortByCount(totalCampaigns),
+        referrers: sortByCount(totalReferrers),
+        // Breakdown by user type
+        breakdown: {
+          registeredUsers: profileData?.length || 0,
+          guestPlayers: Object.keys(guestNames).length,
+          registeredSources: sortByCount(sourceCounts.registered),
+          guestSources: sortByCount(sourceCounts.guests),
+        },
       });
     } catch (error) {
       console.error('[ADMIN API] Sources error:', error);
@@ -735,6 +797,124 @@ app.prepare().then(() => {
     } catch (error) {
       console.error('[ADMIN API] Realtime error:', error);
       res.status(500).json({ error: 'Failed to fetch realtime stats' });
+    }
+  });
+
+  // POST /api/analytics/track - Track analytics events (including guest players)
+  server.post('/api/analytics/track', async (req, res) => {
+    try {
+      const supabase = getSupabase();
+      const {
+        event_type,
+        session_id,
+        guest_name,
+        utm_source,
+        utm_medium,
+        utm_campaign,
+        referrer,
+        metadata = {}
+      } = req.body;
+
+      if (!event_type) {
+        return res.status(400).json({ error: 'event_type is required' });
+      }
+
+      // Get country from geolocation if available
+      const country_code = req.geoData?.countryCode || req.headers['x-country-code'] || null;
+
+      // Include guest_name in metadata for tracking
+      const enrichedMetadata = {
+        ...metadata,
+        guest_name: guest_name || null,
+        user_agent: req.headers['user-agent'] || null,
+      };
+
+      const { data, error } = await supabase
+        .from('analytics_events')
+        .insert({
+          event_type,
+          session_id: session_id || null,
+          country_code,
+          utm_source: utm_source || null,
+          utm_medium: utm_medium || null,
+          utm_campaign: utm_campaign || null,
+          referrer: referrer || null,
+          metadata: enrichedMetadata,
+        })
+        .select()
+        .single();
+
+      if (error) {
+        console.error('[ANALYTICS API] Track error:', error);
+        // Don't fail the request for analytics errors
+        return res.json({ success: false, error: error.message });
+      }
+
+      res.json({ success: true, event_id: data?.id });
+    } catch (error) {
+      console.error('[ANALYTICS API] Track error:', error);
+      res.json({ success: false, error: 'Failed to track event' });
+    }
+  });
+
+  // GET /api/admin/analytics/guest-players - Get guest player statistics
+  server.get('/api/admin/analytics/guest-players', adminAuth, async (req, res) => {
+    try {
+      const supabase = getSupabase();
+      const limit = Math.min(parseInt(req.query.limit) || 100, 500);
+
+      // Get analytics events with guest names
+      const { data: events, error } = await supabase
+        .from('analytics_events')
+        .select('metadata, utm_source, utm_medium, utm_campaign, referrer, country_code, created_at')
+        .not('metadata->guest_name', 'is', null)
+        .order('created_at', { ascending: false })
+        .limit(limit);
+
+      if (error) throw error;
+
+      // Aggregate by guest name
+      const guestStats = {};
+      events?.forEach(event => {
+        const guestName = event.metadata?.guest_name;
+        if (!guestName) return;
+
+        if (!guestStats[guestName]) {
+          guestStats[guestName] = {
+            name: guestName,
+            events: 0,
+            utm_source: event.utm_source,
+            utm_medium: event.utm_medium,
+            referrer: event.referrer,
+            country_code: event.country_code,
+            first_seen: event.created_at,
+            last_seen: event.created_at,
+          };
+        }
+        guestStats[guestName].events++;
+        guestStats[guestName].last_seen = event.created_at;
+      });
+
+      // Convert to array and sort by events
+      const guests = Object.values(guestStats).sort((a, b) => b.events - a.events);
+
+      // Count by UTM source
+      const sourceStats = {};
+      guests.forEach(guest => {
+        const source = guest.utm_source || 'direct';
+        sourceStats[source] = (sourceStats[source] || 0) + 1;
+      });
+
+      res.json({
+        guests,
+        totalGuests: guests.length,
+        bySource: Object.entries(sourceStats)
+          .sort((a, b) => b[1] - a[1])
+          .map(([source, count]) => ({ source, count })),
+      });
+    } catch (error) {
+      console.error('[ADMIN API] Guest players error:', error);
+      res.status(500).json({ error: 'Failed to fetch guest player data' });
     }
   });
 
