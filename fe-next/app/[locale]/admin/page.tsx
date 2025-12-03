@@ -217,8 +217,12 @@ export default function AdminDashboard() {
     toast.success('Dashboard refreshed');
   };
 
-  // Not authenticated or not admin
-  if (!authLoading && (!user || !isAdmin)) {
+  // Still loading profile - wait before showing access denied
+  // This prevents showing "Access Required" while profile is still being fetched
+  const isProfileLoading = !authLoading && user && !profile;
+
+  // Not authenticated or not admin (but only check after profile has loaded)
+  if (!authLoading && !isProfileLoading && (!user || !isAdmin)) {
     return (
       <div className={cn(
         'min-h-screen',
@@ -258,8 +262,8 @@ export default function AdminDashboard() {
     );
   }
 
-  // Loading state
-  if (authLoading || loading) {
+  // Loading state - includes profile loading
+  if (authLoading || loading || isProfileLoading) {
     return (
       <div className={cn(
         'min-h-screen',

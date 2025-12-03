@@ -29,6 +29,7 @@ const PlayerInGameView = ({
   letterGrid,
   shufflingGrid,
   gameActive,
+  showStartAnimation,
   remainingTime,
   gameLanguage,
   minWordLength,
@@ -227,7 +228,7 @@ const PlayerInGameView = ({
                   <GridComponent
                     key={letterGrid ? 'game-grid' : 'waiting-grid'}
                     grid={letterGrid || shufflingGrid}
-                    interactive={gameActive}
+                    interactive={gameActive && !showStartAnimation}
                     animateOnMount={!!letterGrid}
                     onWordSubmit={handleGridWordSubmit}
                     playerView={true}

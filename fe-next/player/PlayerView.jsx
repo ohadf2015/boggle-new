@@ -324,6 +324,7 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode, pe
         letterGrid={letterGrid}
         shufflingGrid={shufflingGrid}
         gameActive={gameActive}
+        showStartAnimation={showStartAnimation}
         remainingTime={remainingTime}
         gameLanguage={gameLanguage}
         minWordLength={minWordLength}

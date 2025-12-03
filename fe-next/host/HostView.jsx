@@ -464,6 +464,7 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
           comboLevel={comboLevel}
           comboLevelRef={comboLevelRef}
           hostPlaying={hostPlaying}
+          showStartAnimation={showStartAnimation}
           hostFoundWords={hostFoundWords}
           onWordSubmit={handleHostWordSubmit}
           playersReady={playersReady}
