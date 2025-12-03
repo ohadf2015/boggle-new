@@ -4082,3 +4082,8 @@ export const translations = {
     }
   }
 };
+
+// CommonJS export for backend compatibility
+if (typeof module \!== 'undefined' && module.exports) {
+  module.exports = { translations };
+}
