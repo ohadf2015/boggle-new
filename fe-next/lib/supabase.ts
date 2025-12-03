@@ -14,7 +14,10 @@ export const supabase: SupabaseClient | null = supabaseUrl && supabaseAnonKey
       auth: {
         autoRefreshToken: true,
         persistSession: true,
-        detectSessionInUrl: true
+        // Disable auto-detection - we manually handle auth callback at /auth/callback
+        // This prevents race conditions where Supabase tries to exchange the code
+        // before our callback component mounts
+        detectSessionInUrl: false
       }
     })
   : null;
