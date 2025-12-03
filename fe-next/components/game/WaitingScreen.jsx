@@ -1,7 +1,8 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FaUsers, FaCrown, FaDoorOpen, FaLink, FaWhatsapp, FaQrcode } from 'react-icons/fa';
+import { FaUsers, FaCrown, FaLink, FaWhatsapp, FaQrcode } from 'react-icons/fa';
 import { Button } from '../ui/button';
+import ExitRoomButton from '../ExitRoomButton';
 import { Card } from '../ui/card';
 import { Badge } from '../ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '../ui/dialog';
@@ -39,15 +40,7 @@ const WaitingScreen = ({
 
       {/* Top Bar with Exit Button */}
       <div className="w-full max-w-6xl flex justify-end mb-4">
-        <Button
-          type="button"
-          onClick={onExitRoom}
-          size="sm"
-          className="shadow-lg hover:scale-105 transition-transform bg-red-500 hover:bg-red-600 border border-red-400/30 hover:shadow-[0_0_15px_rgba(239,68,68,0.5)] cursor-pointer"
-        >
-          <FaDoorOpen className="mr-2" />
-          {t(isHost ? 'hostView.exitRoom' : 'playerView.exit')}
-        </Button>
+        <ExitRoomButton onClick={onExitRoom} label={t(isHost ? 'hostView.exitRoom' : 'playerView.exit')} />
       </div>
 
       {/* Main Layout */}

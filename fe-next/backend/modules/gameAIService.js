@@ -12,8 +12,9 @@
 const { VertexAI } = require('@google-cloud/vertexai');
 const { createClient } = require('@supabase/supabase-js');
 
-// Minimum confidence threshold for AI to approve a word (85%)
-const MIN_CONFIDENCE_THRESHOLD = 85;
+// Minimum confidence threshold for AI to approve a word (90%)
+// Increased from 85% to be more strict about word validation
+const MIN_CONFIDENCE_THRESHOLD = 90;
 
 // =============================================================================
 // Credential Parsing (Railway ENV-based)
@@ -302,44 +303,48 @@ Do NOT reject words just because they use regular letters instead of final forms
     const responseLanguageNote = `
 RESPONSE LANGUAGE: Provide the "reason" field in ${languageName}. The reason should be a brief, clear explanation in ${languageName}.`;
 
-    const prompt = `You are a word validator for a Boggle-style word game. Your task is to determine if a word is valid with a confidence score.
+    const prompt = `You are a STRICT word validator for a Boggle-style word game. Your task is to determine if a word is valid. BE CONSERVATIVE - when in doubt, REJECT.
 
 LANGUAGE: ${languageName} (${language})
 WORD TO VALIDATE: "${word}"
 ${hebrewFinalLettersNote}
-VALIDATION RULES:
-1. The word must be a REAL word or name that exists in ${languageName}
-2. ACCEPT: Common dictionary words, verbs in any conjugation, nouns (singular/plural), adjectives, adverbs
-3. ACCEPT: Well-established slang that appears in dictionaries
-4. ACCEPT: Common first names (e.g., "David", "Sarah", "Mohammed") - names ARE allowed
-5. ACCEPT: Well-known place names, country names, city names (e.g., "Paris", "Japan", "London")
-6. ACCEPT: Well-known acronyms that are commonly used (e.g., "NASA", "FIFA", "NATO")
-7. REJECT: Words with spaces, hyphens, or special characters
-8. REJECT: Random letter combinations that aren't real words
-9. REJECT: Gibberish or misspellings - the word must be spelled correctly
-10. When in doubt about obscure words, reject them
+STRICT VALIDATION RULES:
+1. The word MUST be a REAL word that exists in a standard ${languageName} dictionary
+2. ACCEPT: Common dictionary words - nouns, verbs (any conjugation), adjectives, adverbs that appear in standard dictionaries
+3. ACCEPT: Plural forms of real nouns (e.g., "cats", "dogs")
+4. ACCEPT: Common verb conjugations of real verbs
+5. ACCEPT: Very well-known proper nouns ONLY if they have become common words (e.g., "google" as a verb)
+6. REJECT: Random letter combinations - if it looks like random letters, REJECT IT
+7. REJECT: Made-up words or nonsense syllables
+8. REJECT: Misspellings - even small typos make a word INVALID
+9. REJECT: Obscure technical jargon unless it's widely recognized
+10. REJECT: Slang that doesn't appear in major dictionaries
+11. REJECT: Most proper nouns (names of people, specific places, brands) - these are NOT valid Boggle words
+12. REJECT: Abbreviations and acronyms (e.g., "NASA", "FIFA") - these are NOT dictionary words
+13. REJECT: Words with spaces, hyphens, apostrophes, or special characters
+14. When in doubt, REJECT - it's better to reject a valid obscure word than accept a fake one
 
-IMPORTANT SPELLING CHECK: Make sure the word is spelled correctly. Common misspellings should be REJECTED.
+CRITICAL: This is a word game. Only accept words that a reasonable person would find in a standard dictionary. Random letter sequences like "xyz", "qwp", "trf" are ALWAYS invalid. Short nonsense like "aa", "bb", gibberish syllables are INVALID.
 
 CONFIDENCE SCORE (0-100):
-- 95-100: Absolutely certain - common, well-known word or name
-- 85-94: Very confident - established word/name, may be less common
-- 70-84: Moderately confident - possibly valid but uncertain
-- Below 70: Not confident - likely invalid, misspelled, or very obscure
+- 95-100: Absolutely certain - very common dictionary word
+- 90-94: Very confident - established dictionary word
+- 80-89: Somewhat confident - valid but less common
+- Below 80: Not confident enough - REJECT
 
-The word is case-insensitive (ignore capitalization).
+The word is case-insensitive.
 ${responseLanguageNote}
 
 Respond with ONLY a valid JSON object in this exact format:
 { "isValid": boolean, "reason": "brief explanation in ${languageName}", "confidence": number }
 
 Example responses for ${languageName}:
-{ "isValid": true, "reason": "${isHebrew ? 'שם עצם נפוץ' : `Common ${languageName} noun`}", "confidence": 98 }
-{ "isValid": true, "reason": "${isHebrew ? 'שם פרטי נפוץ' : 'Common first name'}", "confidence": 95 }
-{ "isValid": true, "reason": "${isHebrew ? 'שם עיר ידועה' : 'Well-known city name'}", "confidence": 96 }
-{ "isValid": false, "reason": "${isHebrew ? 'שגיאת כתיב' : "Misspelling of 'beautiful'"}", "confidence": 92 }
-{ "isValid": false, "reason": "${isHebrew ? 'לא מילה מוכרת' : `Not a recognized ${languageName} word`}", "confidence": 88 }
-{ "isValid": false, "reason": "${isHebrew ? 'צירוף אותיות אקראי' : 'Random letter combination'}", "confidence": 95 }`;
+{ "isValid": true, "reason": "${isHebrew ? 'שם עצם נפוץ במילון' : `Common dictionary ${languageName} noun`}", "confidence": 98 }
+{ "isValid": true, "reason": "${isHebrew ? 'פועל נפוץ' : `Common ${languageName} verb`}", "confidence": 96 }
+{ "isValid": false, "reason": "${isHebrew ? 'שגיאת כתיב' : "Misspelling - not a valid word"}", "confidence": 95 }
+{ "isValid": false, "reason": "${isHebrew ? 'לא מילה במילון' : `Not found in ${languageName} dictionary`}", "confidence": 92 }
+{ "isValid": false, "reason": "${isHebrew ? 'צירוף אותיות אקראי' : 'Random letter combination - not a word'}", "confidence": 98 }
+{ "isValid": false, "reason": "${isHebrew ? 'שם פרטי - לא מילה במילון' : 'Proper noun - not a dictionary word'}", "confidence": 90 }`;
 
     try {
       const result = await this.model.generateContent(prompt);
@@ -726,23 +731,32 @@ Do NOT reject words just because they use regular letters instead of final forms
     const responseLanguageNote = `
 RESPONSE LANGUAGE: Provide all "reason" fields in ${languageName}. Each reason should be a brief, clear explanation in ${languageName}.`;
 
-    const prompt = `You are a word validator for a Boggle-style word game. Validate ALL of these ${words.length} words in ${languageName}.
+    const prompt = `You are a STRICT word validator for a Boggle-style word game. Validate ALL of these ${words.length} words in ${languageName}. BE CONSERVATIVE - when in doubt, REJECT.
 
 WORDS TO VALIDATE:
 ${wordList}
 ${hebrewFinalLettersNote}
-VALIDATION RULES:
-1. The word must be a REAL word or name that exists in ${languageName}
-2. ACCEPT: Common dictionary words, verbs in any conjugation, nouns (singular/plural), adjectives, adverbs
-3. ACCEPT: Well-established slang that appears in dictionaries
-4. ACCEPT: Common first names (e.g., "David", "Sarah") - names ARE allowed
-5. ACCEPT: Well-known place names, country names, city names
-6. ACCEPT: Well-known acronyms that are commonly used (e.g., "NASA", "FIFA", "NATO")
-7. REJECT: Random letter combinations that aren't real words
-8. REJECT: Misspellings - words must be spelled correctly
-9. When in doubt about obscure words, reject them
+STRICT VALIDATION RULES:
+1. The word MUST be a REAL word that exists in a standard ${languageName} dictionary
+2. ACCEPT: Common dictionary words - nouns, verbs (any conjugation), adjectives, adverbs that appear in standard dictionaries
+3. ACCEPT: Plural forms of real nouns (e.g., "cats", "dogs")
+4. ACCEPT: Common verb conjugations of real verbs
+5. REJECT: Random letter combinations - if it looks like random letters, REJECT IT
+6. REJECT: Made-up words or nonsense syllables
+7. REJECT: Misspellings - even small typos make a word INVALID
+8. REJECT: Obscure technical jargon unless widely recognized
+9. REJECT: Slang that doesn't appear in major dictionaries
+10. REJECT: Proper nouns (names of people, specific places, brands) - NOT valid Boggle words
+11. REJECT: Abbreviations and acronyms (e.g., "NASA", "FIFA") - NOT dictionary words
+12. When in doubt, REJECT - it's better to reject a valid obscure word than accept a fake one
 
-IMPORTANT: Check spelling carefully. Misspelled words should be REJECTED.
+CRITICAL: This is a word game. Only accept words found in a standard dictionary. Random letter sequences are ALWAYS invalid. Short nonsense syllables are INVALID.
+
+CONFIDENCE SCORING:
+- 95-100: Absolutely certain - very common dictionary word
+- 90-94: Very confident - established dictionary word
+- 80-89: Somewhat confident - valid but less common
+- Below 80: Not confident enough - REJECT
 ${responseLanguageNote}
 
 Respond with ONLY a valid JSON array with one object per word, in the same order as the input.
@@ -750,10 +764,11 @@ Each object must have: { "word": string, "isValid": boolean, "reason": string (i
 
 Example response format for ${languageName}:
 [
-  { "word": "${isHebrew ? 'חתול' : 'cat'}", "isValid": true, "reason": "${isHebrew ? 'שם עצם נפוץ' : 'Common English noun'}", "confidence": 99 },
-  { "word": "${isHebrew ? 'דוד' : 'david'}", "isValid": true, "reason": "${isHebrew ? 'שם פרטי נפוץ' : 'Common first name'}", "confidence": 95 },
-  { "word": "xyz", "isValid": false, "reason": "${isHebrew ? 'צירוף אותיות אקראי' : 'Random letter combination'}", "confidence": 95 },
-  { "word": "${isHebrew ? 'יפהה' : 'beutiful'}", "isValid": false, "reason": "${isHebrew ? 'שגיאת כתיב' : "Misspelling of 'beautiful'"}", "confidence": 92 }
+  { "word": "${isHebrew ? 'חתול' : 'cat'}", "isValid": true, "reason": "${isHebrew ? 'שם עצם נפוץ במילון' : 'Common dictionary noun'}", "confidence": 99 },
+  { "word": "${isHebrew ? 'רץ' : 'running'}", "isValid": true, "reason": "${isHebrew ? 'פועל נפוץ' : 'Common verb form'}", "confidence": 97 },
+  { "word": "xyz", "isValid": false, "reason": "${isHebrew ? 'צירוף אותיות אקראי' : 'Random letter combination - not a word'}", "confidence": 99 },
+  { "word": "${isHebrew ? 'דוד' : 'david'}", "isValid": false, "reason": "${isHebrew ? 'שם פרטי - לא מילה במילון' : 'Proper noun - not a dictionary word'}", "confidence": 92 },
+  { "word": "${isHebrew ? 'יפהה' : 'beutiful'}", "isValid": false, "reason": "${isHebrew ? 'שגיאת כתיב' : "Misspelling - not a valid word"}", "confidence": 95 }
 ]`;
 
     try {

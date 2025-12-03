@@ -1,7 +1,8 @@
 import React, { useMemo, useEffect, useState, useCallback, useRef } from 'react';
 import dynamic from 'next/dynamic';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FaTrophy, FaSignOutAlt, FaStar, FaUser, FaFire, FaChartBar } from 'react-icons/fa';
+import { FaTrophy, FaStar, FaFire, FaChartBar, FaDoorOpen } from 'react-icons/fa';
+import ExitRoomButton from './components/ExitRoomButton';
 import confetti from 'canvas-confetti';
 import { useLanguage } from './contexts/LanguageContext';
 import { useAuth } from './contexts/AuthContext';
@@ -438,14 +439,7 @@ const ResultsPage = ({ finalScores, letterGrid, gameCode, onReturnToRoom, userna
     <div className="min-h-screen bg-gradient-to-b from-slate-50 via-slate-100 to-slate-200 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 flex flex-col overflow-auto transition-colors duration-300 px-1 py-3 sm:px-4 sm:py-4 md:p-8">
       {/* Top Bar with Exit Button */}
       <div className="w-full max-w-4xl mx-auto flex justify-end mb-4">
-        <Button
-          onClick={handleExitRoom}
-          size="sm"
-          className="shadow-lg hover:scale-105 transition-transform bg-red-500 hover:bg-red-600 border border-red-400/30 hover:shadow-[0_0_15px_rgba(239,68,68,0.5)]"
-        >
-          <FaSignOutAlt className="mr-2" />
-          {t('results.exitRoom')}
-        </Button>
+        <ExitRoomButton onClick={handleExitRoom} label={t('results.exitRoom')} />
       </div>
 
       {/* Main Content Area */}
@@ -607,7 +601,7 @@ const ResultsPage = ({ finalScores, letterGrid, gameCode, onReturnToRoom, userna
                       onClick={handleExitRoom}
                       className="w-full sm:w-auto bg-neo-red text-neo-cream font-black text-lg px-8 py-3 uppercase border-4 border-neo-black rounded-neo shadow-hard hover:shadow-hard-lg transition-all flex items-center justify-center gap-2"
                     >
-                      <FaSignOutAlt />
+                      <FaDoorOpen />
                       {t('results.leaveRoom')}
                     </button>
                   </motion.div>

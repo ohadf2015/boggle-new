@@ -48,7 +48,7 @@ const XpBreakdownCard = memo<XpBreakdownCardProps>(({ xpGainedData, levelUpData,
       transition={{ delay: 0.5, type: 'spring', stiffness: 200, damping: 20 }}
       className={cn(
         "mt-4 p-4 rounded-neo border-3 border-neo-black shadow-hard",
-        levelUpData ? "bg-gradient-to-br from-neo-yellow via-neo-orange to-neo-pink" : "bg-gradient-to-br from-neo-purple/20 to-neo-pink/20"
+        levelUpData ? "bg-gradient-to-br from-neo-yellow via-neo-orange to-neo-pink" : "bg-neo-cream dark:bg-slate-700"
       )}
     >
       {/* Header */}
@@ -61,7 +61,7 @@ const XpBreakdownCard = memo<XpBreakdownCardProps>(({ xpGainedData, levelUpData,
           >
             ⭐
           </motion.span>
-          <h4 className="font-black text-neo-black uppercase text-sm">
+          <h4 className="font-black text-neo-black dark:text-neo-cream uppercase text-sm">
             {t('xp.xpGained') || 'XP Gained'}
           </h4>
         </div>
@@ -84,25 +84,25 @@ const XpBreakdownCard = memo<XpBreakdownCardProps>(({ xpGainedData, levelUpData,
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.6 + index * 0.1 }}
             className={cn(
-              "flex items-center justify-between px-2 py-1 rounded-neo border-2 border-neo-black/30",
-              item.highlight ? "bg-neo-yellow" : "bg-neo-cream/50"
+              "flex items-center justify-between px-2 py-1 rounded-neo border-2 border-neo-black/30 dark:border-neo-cream/30",
+              item.highlight ? "bg-neo-yellow" : "bg-neo-cream/50 dark:bg-slate-600/50"
             )}
           >
-            <span className="flex items-center gap-2 text-sm font-bold text-neo-black">
+            <span className="flex items-center gap-2 text-sm font-bold text-neo-black dark:text-neo-cream">
               <span>{item.icon}</span>
               {item.label}
             </span>
-            <span className="font-black text-neo-black">+{item.value}</span>
+            <span className="font-black text-neo-black dark:text-neo-cream">+{item.value}</span>
           </motion.div>
         ))}
       </div>
 
       {/* Level info */}
-      <div className="flex items-center justify-between pt-2 border-t-2 border-neo-black/20">
-        <span className="text-xs font-bold text-neo-black/70 uppercase">
+      <div className="flex items-center justify-between pt-2 border-t-2 border-neo-black/20 dark:border-neo-cream/20">
+        <span className="text-xs font-bold text-neo-black/70 dark:text-neo-cream/70 uppercase">
           {t('xp.level') || 'Level'} {newLevel}
         </span>
-        <span className="text-xs font-bold text-neo-black/70">
+        <span className="text-xs font-bold text-neo-black/70 dark:text-neo-cream/70">
           {t('xp.totalXpEarned') || 'Total XP'}: {newTotalXp.toLocaleString()}
         </span>
       </div>

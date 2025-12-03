@@ -1,11 +1,11 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { FaDoorOpen, FaTrophy } from 'react-icons/fa';
-import { Button } from '../../components/ui/button';
+import { FaTrophy } from 'react-icons/fa';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '../../components/ui/alert-dialog';
 import RoomChat from '../../components/RoomChat';
 import Avatar from '../../components/Avatar';
 import SlotMachineText from '../../components/SlotMachineText';
+import ExitRoomButton from '../../components/ExitRoomButton';
 
 const PlayerWaitingResultsView = ({
   username,
@@ -23,15 +23,7 @@ const PlayerWaitingResultsView = ({
 
       {/* Exit Button */}
       <div className="w-full max-w-md mx-auto flex justify-end mb-4 relative z-50">
-        <Button
-          type="button"
-          onClick={onExitRoom}
-          size="sm"
-          className="bg-neo-red text-neo-white border-4 border-neo-black shadow-hard hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-hard-lg active:translate-x-[2px] active:translate-y-[2px] active:shadow-none font-black"
-        >
-          <FaDoorOpen className="mr-2" />
-          {t('playerView.exit')}
-        </Button>
+        <ExitRoomButton onClick={onExitRoom} label={t('playerView.exit')} />
       </div>
 
       {/* Centered Content */}
