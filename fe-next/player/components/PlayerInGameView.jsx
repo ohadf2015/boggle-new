@@ -1,7 +1,8 @@
 import React, { useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FaDoorOpen, FaTrophy, FaRandom } from 'react-icons/fa';
+import { FaTrophy, FaRandom } from 'react-icons/fa';
 import { Button } from '../../components/ui/button';
+import ExitRoomButton from '../../components/ExitRoomButton';
 import { Card, CardContent } from '../../components/ui/card';
 import { Badge } from '../../components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '../../components/ui/dialog';
@@ -119,15 +120,7 @@ const PlayerInGameView = ({
 
       {/* Top Bar */}
       <div className="w-full max-w-7xl mx-auto flex items-center justify-between mb-1">
-        <Button
-          type="button"
-          onClick={onExitRoom}
-          size="sm"
-          className="shadow-lg hover:scale-105 transition-transform bg-red-500 hover:bg-red-600 border border-red-400/30 hover:shadow-[0_0_15px_rgba(239,68,68,0.5)] cursor-pointer relative z-50"
-        >
-          <FaDoorOpen className="mr-2" />
-          {t('playerView.exit')}
-        </Button>
+        <ExitRoomButton onClick={onExitRoom} label={t('playerView.exit')} className="relative z-50" />
       </div>
 
       {/* Timer */}
