@@ -4,7 +4,7 @@ import { useEffect, useRef, Suspense } from 'react';
 import { useRouter, useSearchParams, useParams } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import logger from '@/utils/logger';
-import { defaultLocale } from '@/lib/i18n';
+import { defaultLocale, locales } from '@/lib/i18n';
 
 // Loading UI component
 function LoadingUI() {
@@ -41,10 +41,14 @@ function AuthCallbackContent() {
           return;
         }
 
-        // Ensure next URL has locale prefix
+        // Ensure next URL has the correct locale prefix
         let next = searchParams.get('next') || `/${locale}`;
         if (next === '/') {
           next = `/${locale}`;
+        } else if (!next.startsWith(`/${locale}`)) {
+          // If next URL has a different locale or no locale, update it to use current locale
+          const pathWithoutLocale = next.replace(/^\/(he|en|sv|ja)/, '');
+          next = `/${locale}${pathWithoutLocale || ''}`;
         }
 
         // IMPORTANT: Check for existing session FIRST
