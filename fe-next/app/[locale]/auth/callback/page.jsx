@@ -1,12 +1,25 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, Suspense } from 'react';
 import { useRouter, useSearchParams, useParams } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import logger from '@/utils/logger';
 import { defaultLocale } from '@/lib/i18n';
 
-export default function AuthCallbackPage() {
+// Loading UI component
+function LoadingUI() {
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-purple-900 to-purple-950">
+      <div className="text-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-4 border-purple-400 border-t-transparent mx-auto mb-4"></div>
+        <p className="text-white text-lg">Completing sign in...</p>
+      </div>
+    </div>
+  );
+}
+
+// Inner component that uses useSearchParams - must be wrapped in Suspense
+function AuthCallbackContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const params = useParams();
@@ -98,12 +111,14 @@ export default function AuthCallbackPage() {
     handleCallback();
   }, [router, searchParams, locale]);
 
+  return <LoadingUI />;
+}
+
+// Main export with Suspense boundary - required for useSearchParams in Next.js App Router
+export default function AuthCallbackPage() {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-purple-900 to-purple-950">
-      <div className="text-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-4 border-purple-400 border-t-transparent mx-auto mb-4"></div>
-        <p className="text-white text-lg">Completing sign in...</p>
-      </div>
-    </div>
+    <Suspense fallback={<LoadingUI />}>
+      <AuthCallbackContent />
+    </Suspense>
   );
 }

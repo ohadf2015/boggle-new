@@ -4,7 +4,8 @@ import { locales, defaultLocale } from '@/lib/i18n';
 // Helper to detect user's preferred locale from request
 function getPreferredLocale(request) {
   // First, check for locale cookie (set by the app when user changes language)
-  const localeCookie = request.cookies.get('NEXT_LOCALE')?.value;
+  // The app uses 'boggle_language' cookie for language preference
+  const localeCookie = request.cookies.get('boggle_language')?.value;
   if (localeCookie && locales.includes(localeCookie)) {
     return localeCookie;
   }
@@ -28,6 +29,29 @@ function getPreferredLocale(request) {
   return defaultLocale;
 }
 
+// Helper to get the correct origin when behind a proxy
+function getOrigin(request) {
+  // Check for forwarded headers (set by proxies/load balancers)
+  const forwardedHost = request.headers.get('x-forwarded-host');
+  const forwardedProto = request.headers.get('x-forwarded-proto') || 'https';
+
+  if (forwardedHost) {
+    return `${forwardedProto}://${forwardedHost}`;
+  }
+
+  // Check for host header
+  const host = request.headers.get('host');
+  if (host) {
+    // Determine protocol - assume https in production
+    const proto = host.includes('localhost') ? 'http' : 'https';
+    return `${proto}://${host}`;
+  }
+
+  // Fallback to URL origin
+  const requestUrl = new URL(request.url);
+  return requestUrl.origin;
+}
+
 // This route handles OAuth callback by redirecting to the client-side page
 // which properly exchanges the code and establishes the session client-side
 export async function GET(request) {
@@ -40,9 +64,12 @@ export async function GET(request) {
   // Detect the user's preferred locale
   const locale = getPreferredLocale(request);
 
+  // Get the correct origin (handles proxy scenarios)
+  const origin = getOrigin(request);
+
   // Handle OAuth errors from provider
   if (errorParam) {
-    const errorUrl = new URL(`/${locale}`, requestUrl.origin);
+    const errorUrl = new URL(`/${locale}`, origin);
     errorUrl.searchParams.set('auth_error', 'true');
     if (errorDescription) {
       errorUrl.searchParams.set('error_message', errorDescription);
@@ -53,7 +80,7 @@ export async function GET(request) {
   if (code) {
     // Redirect to client-side callback page which will handle the code exchange
     // This ensures the session is properly stored in browser storage
-    const clientCallbackUrl = new URL(`/${locale}/auth/callback`, requestUrl.origin);
+    const clientCallbackUrl = new URL(`/${locale}/auth/callback`, origin);
     clientCallbackUrl.searchParams.set('code', code);
     if (next && next !== '/') {
       clientCallbackUrl.searchParams.set('next', next);
@@ -62,5 +89,5 @@ export async function GET(request) {
   }
 
   // No code provided - redirect to home with locale
-  return NextResponse.redirect(new URL(`/${locale}`, requestUrl.origin));
+  return NextResponse.redirect(new URL(`/${locale}`, origin));
 }
