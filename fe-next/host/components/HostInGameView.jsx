@@ -31,6 +31,7 @@ const HostInGameView = ({
 
   // Host playing state
   hostPlaying,
+  showStartAnimation,
   hostFoundWords,
   onWordSubmit,
 
@@ -181,7 +182,7 @@ const HostInGameView = ({
             <GridComponent
               key={hostPlaying ? 'host-playing-grid' : 'host-spectating-grid'}
               grid={tableData}
-              interactive={hostPlaying}
+              interactive={hostPlaying && !showStartAnimation}
               animateOnMount={true}
               onWordSubmit={handleWordSubmit}
               playerView={hostPlaying}

@@ -109,7 +109,10 @@ const AutoRejoinTimer: React.FC<AutoRejoinTimerProps> = ({
         animate={{ y: 0, opacity: 1, scale: 1 }}
         exit={{ y: 100, opacity: 0, scale: 0.9 }}
         transition={{ type: 'spring', stiffness: 300, damping: 25 }}
-        className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 mx-4 max-w-[calc(100%-2rem)]"
+        className="fixed left-1/2 -translate-x-1/2 z-50 mx-4 max-w-[calc(100%-2rem)] w-auto"
+        style={{
+          bottom: 'max(2.5rem, calc(2rem + env(safe-area-inset-bottom, 0px)))'
+        }}
       >
         <div className="bg-neo-cyan border-4 border-neo-black rounded-neo-lg shadow-hard-xl p-4 flex flex-col items-center gap-3">
           {/* Row 1: Text label */}
