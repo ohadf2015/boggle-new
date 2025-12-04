@@ -800,6 +800,172 @@ app.prepare().then(() => {
     }
   });
 
+  // =============================================
+  // BOT WORD MANAGEMENT ENDPOINTS
+  // =============================================
+
+  // GET /api/admin/bot-words - Get bot words with negative votes for review
+  server.get('/api/admin/bot-words', adminAuth, async (req, res) => {
+    try {
+      const supabase = getSupabase();
+      const language = req.query.language || null;
+
+      // Query bot words with vote counts (uses the bot_words_for_review view if available)
+      // Fallback to manual query if view doesn't exist
+      let query = supabase
+        .from('word_votes')
+        .select('word, language, vote_type, created_at, game_code')
+        .eq('is_bot_word', true);
+
+      if (language) {
+        query = query.eq('language', language);
+      }
+
+      const { data: votes, error } = await query;
+
+      if (error) {
+        // If is_bot_word column doesn't exist yet, return empty
+        if (error.message?.includes('is_bot_word')) {
+          return res.json({ words: [], message: 'Bot word tracking not yet enabled. Run migration 013.' });
+        }
+        throw error;
+      }
+
+      // Aggregate votes by word
+      const wordStats = {};
+      votes?.forEach(vote => {
+        const key = `${vote.word}:${vote.language}`;
+        if (!wordStats[key]) {
+          wordStats[key] = {
+            word: vote.word,
+            language: vote.language,
+            likes: 0,
+            dislikes: 0,
+            gameCodes: new Set(),
+            firstSeen: vote.created_at,
+            lastSeen: vote.created_at
+          };
+        }
+        if (vote.vote_type === 'like') {
+          wordStats[key].likes++;
+        } else {
+          wordStats[key].dislikes++;
+        }
+        wordStats[key].gameCodes.add(vote.game_code);
+        if (vote.created_at < wordStats[key].firstSeen) {
+          wordStats[key].firstSeen = vote.created_at;
+        }
+        if (vote.created_at > wordStats[key].lastSeen) {
+          wordStats[key].lastSeen = vote.created_at;
+        }
+      });
+
+      // Convert to array and sort by dislikes
+      const words = Object.values(wordStats)
+        .map(w => ({
+          ...w,
+          gameCodes: Array.from(w.gameCodes),
+          netScore: w.likes - w.dislikes
+        }))
+        .filter(w => w.dislikes > 0) // Only show words with negative votes
+        .sort((a, b) => b.dislikes - a.dislikes);
+
+      res.json({ words });
+    } catch (error) {
+      console.error('[ADMIN API] Bot words error:', error);
+      res.status(500).json({ error: 'Failed to fetch bot words' });
+    }
+  });
+
+  // GET /api/admin/bot-blacklist - Get the bot word blacklist
+  server.get('/api/admin/bot-blacklist', adminAuth, async (req, res) => {
+    try {
+      const supabase = getSupabase();
+      const language = req.query.language || null;
+
+      let query = supabase
+        .from('bot_word_blacklist')
+        .select('id, word, language, reason, created_at')
+        .order('created_at', { ascending: false });
+
+      if (language) {
+        query = query.eq('language', language);
+      }
+
+      const { data, error } = await query;
+
+      if (error) {
+        // If table doesn't exist yet, return empty
+        if (error.message?.includes('does not exist') || error.code === '42P01') {
+          return res.json({ blacklist: [], message: 'Blacklist table not yet created. Run migration 013.' });
+        }
+        throw error;
+      }
+
+      res.json({ blacklist: data || [] });
+    } catch (error) {
+      console.error('[ADMIN API] Bot blacklist error:', error);
+      res.status(500).json({ error: 'Failed to fetch bot blacklist' });
+    }
+  });
+
+  // POST /api/admin/bot-blacklist - Add a word to the blacklist
+  server.post('/api/admin/bot-blacklist', adminAuth, async (req, res) => {
+    try {
+      const supabase = getSupabase();
+      const { word, language, reason } = req.body;
+
+      if (!word || !language) {
+        return res.status(400).json({ error: 'word and language are required' });
+      }
+
+      const { data, error } = await supabase
+        .from('bot_word_blacklist')
+        .insert({
+          word: word.toLowerCase().trim(),
+          language,
+          reason: reason || null,
+          blacklisted_by: req.adminUser.id
+        })
+        .select()
+        .single();
+
+      if (error) {
+        if (error.code === '23505') { // Unique violation
+          return res.status(409).json({ error: 'Word already blacklisted' });
+        }
+        throw error;
+      }
+
+      console.log(`[ADMIN] Word "${word}" (${language}) blacklisted by admin`);
+      res.json({ success: true, blacklistEntry: data });
+    } catch (error) {
+      console.error('[ADMIN API] Add blacklist error:', error);
+      res.status(500).json({ error: 'Failed to add word to blacklist' });
+    }
+  });
+
+  // DELETE /api/admin/bot-blacklist/:id - Remove a word from the blacklist
+  server.delete('/api/admin/bot-blacklist/:id', adminAuth, async (req, res) => {
+    try {
+      const supabase = getSupabase();
+      const { id } = req.params;
+
+      const { error } = await supabase
+        .from('bot_word_blacklist')
+        .delete()
+        .eq('id', id);
+
+      if (error) throw error;
+
+      console.log(`[ADMIN] Blacklist entry ${id} removed by admin`);
+      res.json({ success: true });
+    } catch (error) {
+      console.error('[ADMIN API] Delete blacklist error:', error);
+      res.status(500).json({ error: 'Failed to remove word from blacklist' });
+    }
+  });
+
   // POST /api/analytics/track - Track analytics events (including guest players)
   server.post('/api/analytics/track', async (req, res) => {
     try {

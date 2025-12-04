@@ -1050,7 +1050,7 @@ function initializeSocketHandlers(io) {
         return;
       }
 
-      // Record the vote
+      // Record the vote (track if this is a bot word for admin review)
       const result = await recordVote({
         word,
         language: game.language || 'en',
@@ -1058,7 +1058,8 @@ function initializeSocketHandlers(io) {
         guestId,
         gameCode,
         voteType,
-        submitter: data.submittedBy || 'unknown'
+        submitter: data.submittedBy || 'unknown',
+        isBotWord: data.isBot === true
       });
 
       if (result.success) {
@@ -2849,8 +2850,10 @@ function startBotsForGame(io, gameCode, letterGrid, language, timerSeconds) {
     }
 
     // Add word to player's list with score and combo data
+    // Mark as bot word so it can be voted on by players
     addPlayerWord(gameCode, username, word, {
       autoValidated: true,
+      isBot: true,
       score: score,
       comboBonus: score - (word.length - 1),
       comboLevel: comboLevel

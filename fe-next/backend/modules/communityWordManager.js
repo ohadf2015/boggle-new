@@ -187,9 +187,10 @@ function addToCommunityCache(word, language) {
  * @param {string} params.gameCode - Game where vote occurred
  * @param {string} params.voteType - 'like' or 'dislike'
  * @param {string} params.submitter - Username who submitted the word
+ * @param {boolean} params.isBotWord - Whether this word was submitted by a bot
  * @returns {object} - { success, isNowValid, error }
  */
-async function recordVote({ word, language, userId, guestId, gameCode, voteType, submitter }) {
+async function recordVote({ word, language, userId, guestId, gameCode, voteType, submitter, isBotWord = false }) {
   const client = getSupabase();
   if (!client) {
     return { success: false, isNowValid: false, error: 'Supabase not configured' };
@@ -204,7 +205,8 @@ async function recordVote({ word, language, userId, guestId, gameCode, voteType,
       word: normalizedWord,
       language: lang,
       game_code: gameCode,
-      vote_type: voteType
+      vote_type: voteType,
+      is_bot_word: isBotWord  // Track if this vote is for a bot-submitted word
     };
 
     // Set either user_id or guest_id
@@ -428,8 +430,9 @@ function isWordValidForScoring(word, language) {
 
 /**
  * Get non-dictionary words from a game that need feedback
+ * Also includes bot words which can be voted on by players
  * @param {object} game - Game object with playerWordDetails
- * @returns {array} - Array of { word, submittedBy, submitterAvatar }
+ * @returns {array} - Array of { word, submittedBy, submitterAvatar, isBot }
  */
 function collectNonDictionaryWords(game) {
   const nonDictWords = [];
@@ -438,21 +441,30 @@ function collectNonDictionaryWords(game) {
   // Iterate through all players' word details
   for (const [username, wordDetails] of Object.entries(game.playerWordDetails || {})) {
     for (const detail of wordDetails || []) {
-      // Only include words that:
-      // 1. Were NOT auto-validated (not in dictionary)
-      // 2. Are on the board (valid path)
-      // 3. Haven't been seen yet (dedupe)
-      // 4. Are NOT already community-validated
-      if (!detail.autoValidated &&
+      // Include words that meet either criteria:
+      // A) Non-dictionary words (for community validation):
+      //    1. Were NOT auto-validated (not in dictionary)
+      //    2. Are on the board (valid path)
+      //    3. Haven't been seen yet (dedupe)
+      //    4. Are NOT already community-validated
+      // B) Bot words (for player feedback on bot's word choices):
+      //    1. Were submitted by a bot
+      //    2. Haven't been seen yet (dedupe)
+
+      const isNonDictWord = !detail.autoValidated &&
           detail.onBoard !== false &&
           !seenWords.has(detail.word) &&
-          !isWordCommunityValid(detail.word, game.language)) {
+          !isWordCommunityValid(detail.word, game.language);
 
+      const isBotWord = detail.isBot === true && !seenWords.has(detail.word);
+
+      if (isNonDictWord || isBotWord) {
         seenWords.add(detail.word);
         nonDictWords.push({
           word: detail.word,
           submittedBy: username,
-          submitterAvatar: game.users?.[username]?.avatar || null
+          submitterAvatar: game.users?.[username]?.avatar || null,
+          isBot: detail.isBot === true
         });
       }
     }
@@ -580,10 +592,11 @@ function getWordsForPlayer(nonDictWords, excludeUsername, language, count = SELF
   }
 
   // Return clean word data (remove internal priority fields)
-  return selected.map(({ word, submittedBy, submitterAvatar, netScore, likes, dislikes }) => ({
+  return selected.map(({ word, submittedBy, submitterAvatar, isBot, netScore, likes, dislikes }) => ({
     word,
     submittedBy,
     submitterAvatar,
+    isBot: isBot || false,
     // Include vote info so UI can show progress toward validation
     voteInfo: {
       netScore: netScore || 0,
