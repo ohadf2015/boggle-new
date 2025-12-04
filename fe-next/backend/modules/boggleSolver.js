@@ -1,0 +1,285 @@
+/**
+ * Boggle Solver
+ * Finds all valid words on a Boggle grid using DFS traversal and dictionary lookup
+ */
+
+const { isDictionaryWord, normalizeWord } = require('../dictionary');
+const { normalizeHebrewLetter } = require('./wordValidator');
+
+// Direction vectors for 8-way adjacent movement
+const DIRECTIONS = [
+  [-1, -1], [-1, 0], [-1, 1],  // up-left, up, up-right
+  [0, -1],           [0, 1],   // left, right
+  [1, -1],  [1, 0],  [1, 1]    // down-left, down, down-right
+];
+
+/**
+ * Build a trie from a Set of words for efficient prefix lookup
+ * @param {Set} wordSet - Set of valid words
+ * @returns {object} - Trie root node
+ */
+function buildTrie(wordSet) {
+  const root = {};
+
+  for (const word of wordSet) {
+    let node = root;
+    for (const char of word) {
+      if (!node[char]) {
+        node[char] = {};
+      }
+      node = node[char];
+    }
+    node.isWord = true;
+  }
+
+  return root;
+}
+
+/**
+ * Check if a prefix exists in the trie
+ * @param {object} trie - Trie root node
+ * @param {string} prefix - Prefix to check
+ * @returns {object|null} - Node at prefix end or null if not found
+ */
+function getTrieNode(trie, prefix) {
+  let node = trie;
+  for (const char of prefix) {
+    if (!node[char]) return null;
+    node = node[char];
+  }
+  return node;
+}
+
+/**
+ * Find all valid words on a Boggle grid
+ * @param {string[][]} grid - 2D grid of letters
+ * @param {string} language - Language code ('en', 'he', 'sv', 'ja')
+ * @param {object} options - Options { minLength, maxLength, maxWords, trie }
+ * @returns {string[]} - Array of found words sorted by length (longest first)
+ */
+function findAllWords(grid, language, options = {}) {
+  const {
+    minLength = 3,
+    maxLength = 15,
+    maxWords = 500, // Limit to prevent memory issues
+    trie = null // Can pass pre-built trie for efficiency
+  } = options;
+
+  if (!grid || grid.length === 0 || !grid[0] || grid[0].length === 0) {
+    return [];
+  }
+
+  const rows = grid.length;
+  const cols = grid[0].length;
+  const foundWords = new Set();
+
+  // Normalize grid letters
+  const normalizedGrid = grid.map(row =>
+    row.map(cell => {
+      const letter = String(cell).toLowerCase();
+      return language === 'he' ? normalizeHebrewLetter(letter) : letter;
+    })
+  );
+
+  /**
+   * DFS to find words starting from a cell
+   */
+  function dfs(row, col, currentWord, visited, trieNode) {
+    // Stop if we've found enough words
+    if (foundWords.size >= maxWords) return;
+
+    // Stop if word is too long
+    if (currentWord.length > maxLength) return;
+
+    // Check if current word is valid
+    if (currentWord.length >= minLength) {
+      if (trieNode) {
+        // Using trie - check if this is a complete word
+        if (trieNode.isWord) {
+          foundWords.add(currentWord);
+        }
+      } else {
+        // Using dictionary lookup
+        if (isDictionaryWord(currentWord, language)) {
+          foundWords.add(currentWord);
+        }
+      }
+    }
+
+    // Continue exploring neighbors
+    for (const [dx, dy] of DIRECTIONS) {
+      const newRow = row + dx;
+      const newCol = col + dy;
+
+      // Check bounds
+      if (newRow < 0 || newRow >= rows || newCol < 0 || newCol >= cols) continue;
+
+      // Check if already visited in this path
+      const key = `${newRow},${newCol}`;
+      if (visited.has(key)) continue;
+
+      const nextChar = normalizedGrid[newRow][newCol];
+      const nextWord = currentWord + nextChar;
+
+      // If using trie, check if prefix exists (prune early)
+      if (trieNode) {
+        const nextNode = trieNode[nextChar];
+        if (!nextNode) continue; // No words with this prefix
+
+        visited.add(key);
+        dfs(newRow, newCol, nextWord, visited, nextNode);
+        visited.delete(key);
+      } else {
+        // Without trie, we must explore all paths
+        visited.add(key);
+        dfs(newRow, newCol, nextWord, visited, null);
+        visited.delete(key);
+      }
+    }
+  }
+
+  // Start DFS from each cell
+  for (let row = 0; row < rows; row++) {
+    for (let col = 0; col < cols; col++) {
+      if (foundWords.size >= maxWords) break;
+
+      const startChar = normalizedGrid[row][col];
+      const visited = new Set([`${row},${col}`]);
+
+      if (trie) {
+        const startNode = trie[startChar];
+        if (startNode) {
+          dfs(row, col, startChar, visited, startNode);
+        }
+      } else {
+        dfs(row, col, startChar, visited, null);
+      }
+    }
+  }
+
+  // Sort by length (longest first), then alphabetically
+  return Array.from(foundWords).sort((a, b) => {
+    if (b.length !== a.length) return b.length - a.length;
+    return a.localeCompare(b);
+  });
+}
+
+/**
+ * Find words with scoring potential for bots
+ * Returns words categorized by difficulty
+ * @param {string[][]} grid - 2D grid of letters
+ * @param {string} language - Language code
+ * @param {object} options - Options for word finding
+ * @returns {object} - { easy: [], medium: [], hard: [] }
+ */
+function findWordsForBots(grid, language, options = {}) {
+  const allWords = findAllWords(grid, language, {
+    minLength: options.minLength || 3,
+    maxLength: options.maxLength || 10,
+    maxWords: 300
+  });
+
+  // Categorize by difficulty based on word length
+  const result = {
+    easy: [],    // 3-4 letter words
+    medium: [],  // 4-5 letter words
+    hard: []     // 6+ letter words
+  };
+
+  for (const word of allWords) {
+    const len = word.length;
+    if (len <= 4) {
+      result.easy.push(word);
+    }
+    if (len >= 4 && len <= 5) {
+      result.medium.push(word);
+    }
+    if (len >= 5) {
+      result.hard.push(word);
+    }
+  }
+
+  // Shuffle each category to add variety
+  result.easy = shuffleArray(result.easy);
+  result.medium = shuffleArray(result.medium);
+  result.hard = shuffleArray(result.hard);
+
+  return result;
+}
+
+/**
+ * Shuffle an array (Fisher-Yates)
+ */
+function shuffleArray(array) {
+  const shuffled = [...array];
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  }
+  return shuffled;
+}
+
+/**
+ * Get path of a word on the grid (for UI highlighting)
+ * @param {string} word - Word to find
+ * @param {string[][]} grid - 2D grid
+ * @param {string} language - Language code
+ * @returns {Array|null} - Array of {row, col} or null if not found
+ */
+function getWordPath(word, grid, language) {
+  if (!word || !grid || grid.length === 0) return null;
+
+  const rows = grid.length;
+  const cols = grid[0].length;
+  const normalizedWord = normalizeWord(word, language);
+
+  // Normalize grid
+  const normalizedGrid = grid.map(row =>
+    row.map(cell => {
+      const letter = String(cell).toLowerCase();
+      return language === 'he' ? normalizeHebrewLetter(letter) : letter;
+    })
+  );
+
+  function dfs(row, col, index, path, visited) {
+    if (index === normalizedWord.length) return path;
+
+    if (row < 0 || row >= rows || col < 0 || col >= cols) return null;
+
+    const key = `${row},${col}`;
+    if (visited.has(key)) return null;
+
+    if (normalizedGrid[row][col] !== normalizedWord[index]) return null;
+
+    visited.add(key);
+    path.push({ row, col });
+
+    for (const [dx, dy] of DIRECTIONS) {
+      const result = dfs(row + dx, col + dy, index + 1, path, visited);
+      if (result) return result;
+    }
+
+    visited.delete(key);
+    path.pop();
+    return null;
+  }
+
+  // Try starting from each cell
+  for (let row = 0; row < rows; row++) {
+    for (let col = 0; col < cols; col++) {
+      const path = dfs(row, col, 0, [], new Set());
+      if (path) return path;
+    }
+  }
+
+  return null;
+}
+
+module.exports = {
+  findAllWords,
+  findWordsForBots,
+  getWordPath,
+  buildTrie,
+  getTrieNode,
+  shuffleArray
+};

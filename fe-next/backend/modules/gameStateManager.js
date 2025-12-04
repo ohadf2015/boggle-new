@@ -351,6 +351,9 @@ function getGameUsers(gameCode) {
     presenceStatus: data.presenceStatus || 'active',
     isWindowFocused: data.isWindowFocused !== false,
     lastActivityAt: data.lastActivityAt || Date.now(),
+    // Include bot information
+    isBot: data.isBot || false,
+    botDifficulty: data.botDifficulty || null,
   }));
 }
 
