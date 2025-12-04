@@ -31,10 +31,10 @@ const BOT_CONFIG = {
       typingSpeed: 200,
     },
     hard: {
-      minDelay: 1500,
-      maxDelay: 5000,
-      startDelay: 1000,
-      typingSpeed: 100,
+      minDelay: 2500,
+      maxDelay: 7000,
+      startDelay: 1500,
+      typingSpeed: 150,
     }
   },
   // Word selection configuration
@@ -54,11 +54,11 @@ const BOT_CONFIG = {
       wrongWordChance: 0.08,  // 8% wrong word chance
     },
     hard: {
-      maxWordLength: 12,
-      wordsPerMinute: 8,
+      maxWordLength: 8,
+      wordsPerMinute: 5,
       focusOnShort: false,
-      missChance: 0.02,
-      wrongWordChance: 0.03,  // 3% wrong word chance (experts make fewer mistakes)
+      missChance: 0.08,
+      wrongWordChance: 0.05,  // 5% wrong word chance (experts make fewer mistakes)
     }
   },
   // Bot appearance
