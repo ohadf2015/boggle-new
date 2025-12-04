@@ -6,7 +6,7 @@
 
 const { findWordsForBots } = require('./boggleSolver');
 const { calculateWordScore } = require('./scoringEngine');
-const { getPopularPlayerWords } = require('./supabaseServer');
+const { getPopularPlayerWords, getSupabase } = require('./supabaseServer');
 const logger = require('../utils/logger');
 
 // Cache for player words per language (refreshed periodically)
@@ -14,9 +14,14 @@ const playerWordsCache = new Map();
 const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
 const MAX_PLAYER_WORDS_CACHE_SIZE = 10; // Limit languages cached to prevent memory bloat
 
+// Cache for blacklisted words (words bots should not use)
+const blacklistCache = new Map();
+const BLACKLIST_CACHE_TTL = 10 * 60 * 1000; // 10 minutes
+
 // Bot configuration constants
 const BOT_CONFIG = {
   // Timing ranges in milliseconds (simulates human thinking/typing)
+  // Medium and hard bots are intentionally slower to feel more realistic
   TIMING: {
     easy: {
       minDelay: 4000,    // Minimum time between words
@@ -25,19 +30,20 @@ const BOT_CONFIG = {
       typingSpeed: 300,  // Base ms per character "typing"
     },
     medium: {
-      minDelay: 2500,
-      maxDelay: 8000,
-      startDelay: 2000,
-      typingSpeed: 200,
+      minDelay: 3500,    // Increased from 2500 - more realistic thinking time
+      maxDelay: 10000,   // Increased from 8000 - occasional longer pauses
+      startDelay: 2500,  // Increased from 2000 - takes time to scan the board
+      typingSpeed: 250,  // Increased from 200 - more realistic typing
     },
     hard: {
-      minDelay: 2500,
-      maxDelay: 7000,
-      startDelay: 1500,
-      typingSpeed: 150,
+      minDelay: 3000,    // Increased from 2500 - still thinks before acting
+      maxDelay: 9000,    // Increased from 7000 - occasional pondering
+      startDelay: 2000,  // Increased from 1500 - scans board first
+      typingSpeed: 200,  // Increased from 150 - more human-like typing
     }
   },
   // Word selection configuration
+  // Medium and hard bots find fewer words per minute for more realistic gameplay
   WORDS: {
     easy: {
       maxWordLength: 5,       // Only find shorter words
@@ -48,16 +54,16 @@ const BOT_CONFIG = {
     },
     medium: {
       maxWordLength: 7,
-      wordsPerMinute: 5,
+      wordsPerMinute: 4,      // Reduced from 5 - more realistic pace
       focusOnShort: false,
-      missChance: 0.08,
+      missChance: 0.10,       // Increased from 0.08 - more realistic mistakes
       wrongWordChance: 0.08,  // 8% wrong word chance
     },
     hard: {
       maxWordLength: 8,
-      wordsPerMinute: 5,
+      wordsPerMinute: 4,      // Reduced from 5 - even experts take time
       focusOnShort: false,
-      missChance: 0.08,
+      missChance: 0.10,       // Increased from 0.08 - more realistic
       wrongWordChance: 0.05,  // 5% wrong word chance (experts make fewer mistakes)
     }
   },
@@ -421,6 +427,49 @@ async function getCachedPlayerWords(language) {
 }
 
 /**
+ * Get cached blacklist for a language, refreshing if needed
+ * @param {string} language - Language code
+ * @returns {Promise<Set<string>>} - Set of blacklisted words
+ */
+async function getCachedBlacklist(language) {
+  const cacheEntry = blacklistCache.get(language);
+  const now = Date.now();
+
+  if (cacheEntry && (now - cacheEntry.timestamp) < BLACKLIST_CACHE_TTL) {
+    return cacheEntry.words;
+  }
+
+  // Fetch fresh data from database
+  try {
+    const supabase = getSupabase();
+    if (!supabase) {
+      return new Set();
+    }
+
+    const { data, error } = await supabase
+      .from('bot_word_blacklist')
+      .select('word')
+      .eq('language', language);
+
+    if (error) {
+      // Table might not exist yet
+      if (error.message?.includes('does not exist') || error.code === '42P01') {
+        return new Set();
+      }
+      throw error;
+    }
+
+    const words = new Set((data || []).map(row => row.word.toLowerCase()));
+    blacklistCache.set(language, { words, timestamp: now });
+    logger.debug('BOT', `Refreshed blacklist cache for ${language}: ${words.size} words`);
+    return words;
+  } catch (err) {
+    logger.debug('BOT', `Failed to fetch blacklist: ${err.message}`);
+    return cacheEntry?.words || new Set();
+  }
+}
+
+/**
  * Prepare bot for a game - find words and set up submission queue
  * @param {object} bot - Bot object
  * @param {string[][]} grid - Letter grid
@@ -462,6 +511,21 @@ async function prepareBotWords(bot, grid, language) {
 
   // Apply miss chance (simulate human errors - sometimes don't find obvious words)
   wordPool = wordPool.filter(() => Math.random() > config.missChance);
+
+  // Filter out blacklisted words (words that admins have marked as invalid for bots)
+  try {
+    const blacklist = await getCachedBlacklist(language);
+    if (blacklist.size > 0) {
+      const beforeCount = wordPool.length;
+      wordPool = wordPool.filter(word => !blacklist.has(word.toLowerCase()));
+      const filtered = beforeCount - wordPool.length;
+      if (filtered > 0) {
+        logger.debug('BOT', `Bot "${bot.username}" filtered out ${filtered} blacklisted words`);
+      }
+    }
+  } catch (err) {
+    logger.debug('BOT', `Failed to apply blacklist filter: ${err.message}`);
+  }
 
   // Prioritize player-submitted words (words that real players have found before)
   // This makes bots feel more human-like by selecting words humans actually use

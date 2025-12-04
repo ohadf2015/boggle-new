@@ -37,6 +37,13 @@ interface LevelUpData {
   newTitles: string[];
 }
 
+interface LeaderboardEntry {
+  username: string;
+  score: number;
+  wordCount: number;
+  avatar?: any;
+}
+
 interface UseHostSocketEventsProps {
   socket: Socket | null;
   t: (key: string) => string;
@@ -270,6 +277,28 @@ const useHostSocketEvents = ({
           [data.username]: data.score
         }));
       }
+    };
+
+    // Handle leaderboard updates from server (for player word submissions)
+    const handleUpdateLeaderboard = (data: { leaderboard: LeaderboardEntry[] }) => {
+      if (!data.leaderboard || !Array.isArray(data.leaderboard)) return;
+
+      // Update player scores and word counts from leaderboard data
+      const newScores: Record<string, number> = {};
+      const newWordCounts: Record<string, number> = {};
+
+      data.leaderboard.forEach((entry: LeaderboardEntry) => {
+        newScores[entry.username] = entry.score;
+        newWordCounts[entry.username] = entry.wordCount;
+      });
+
+      setPlayerScores(newScores);
+      setPlayerWordCounts(newWordCounts);
+    };
+
+    // Handle leaderboard updates from bot word submissions (same format, different event name)
+    const handleLeaderboardUpdate = (data: { leaderboard: LeaderboardEntry[] }) => {
+      handleUpdateLeaderboard(data);
     };
 
     const handleAchievementUnlocked = (data: any) => {
@@ -608,6 +637,8 @@ const useHostSocketEvents = ({
     socket.on('playerPresenceUpdate', handlePlayerPresenceUpdate);
     socket.on('playerJoinedLate', handlePlayerJoinedLate);
     socket.on('playerFoundWord', handlePlayerFoundWord);
+    socket.on('updateLeaderboard', handleUpdateLeaderboard);
+    socket.on('leaderboardUpdate', handleLeaderboardUpdate);
     socket.on('achievementUnlocked', handleAchievementUnlocked);
     socket.on('liveAchievementUnlocked', handleLiveAchievementUnlocked);
     socket.on('validationComplete', handleValidationComplete);
@@ -637,6 +668,8 @@ const useHostSocketEvents = ({
       socket.off('playerPresenceUpdate', handlePlayerPresenceUpdate);
       socket.off('playerJoinedLate', handlePlayerJoinedLate);
       socket.off('playerFoundWord', handlePlayerFoundWord);
+      socket.off('updateLeaderboard', handleUpdateLeaderboard);
+      socket.off('leaderboardUpdate', handleLeaderboardUpdate);
       socket.off('achievementUnlocked', handleAchievementUnlocked);
       socket.off('liveAchievementUnlocked', handleLiveAchievementUnlocked);
       socket.off('validationComplete', handleValidationComplete);

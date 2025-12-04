@@ -284,6 +284,14 @@ const awardFinalAchievements = (game, users) => {
       return;
     }
 
+    // Skip bots - they don't get achievements to avoid cluttering the UI
+    // and because their performance is programmatic, not skill-based
+    const userData = game.users?.[username];
+    if (userData?.isBot) {
+      logger.debug('ACHIEVEMENT', `Skipping achievements for bot ${username}`);
+      return;
+    }
+
     const allWords = game.playerWordDetails[username];
     const validWords = allWords.filter(w => w.validated === true);
     const currentAchievements = game.playerAchievements[username];
