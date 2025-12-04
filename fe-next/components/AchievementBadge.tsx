@@ -32,13 +32,14 @@ interface AchievementBadgeProps {
  * Features: Thick borders, hard shadows, bold uppercase text, vibrant colors
  * Tiers: Bronze (1+), Silver (10+), Gold (50+), Platinum (200+)
  * Memoized to prevent unnecessary re-renders in lists
+ * Note: Achievements always use the user's UI language preference, not game language
  */
 export const AchievementBadge = memo<AchievementBadgeProps>(({ achievement, index = 0, count = 0, showTier = false }) => {
   const [open, setOpen] = useState(false);
   const { t } = useLanguage();
   const isTouchDevice = useRef(false);
 
-  // Localize achievement using player's language
+  // Localize achievement using user's UI language preference
   // Achievement can have either { key, icon } (unlocalized) or { name, description, icon } (legacy localized)
   const localizedAchievement = useMemo(() => {
     if (achievement.key) {

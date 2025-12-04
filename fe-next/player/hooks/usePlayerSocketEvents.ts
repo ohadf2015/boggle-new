@@ -204,14 +204,21 @@ const usePlayerSocketEvents = ({
       if (data.language) setGameLanguage(data.language);
       if (data.minWordLength) setMinWordLength(data.minWordLength);
       setGameActive(true);
-      setShowStartAnimation(true);
+
+      // Skip countdown animation for late joiners - they should start playing immediately
+      if (!data.lateJoin) {
+        setShowStartAnimation(true);
+      }
 
       if (data.messageId && !data.skipAck) {
         socket.emit('startGameAck', { messageId: data.messageId });
         logger.log('[PLAYER] Sent startGameAck for messageId:', data.messageId);
       }
 
-      neoSuccessToast(t('common.gameStarted'), { id: 'game-started', icon: '🚀', duration: 3000 });
+      const toastMessage = data.lateJoin
+        ? (t('common.joinedGame') || 'Joined game!')
+        : t('common.gameStarted');
+      neoSuccessToast(toastMessage, { id: 'game-started', icon: data.lateJoin ? '🎮' : '🚀', duration: 3000 });
     };
 
     const handleEndGame = () => {
@@ -365,9 +372,10 @@ const usePlayerSocketEvents = ({
 
       const hasGrid = letterGrid || data.letterGrid;
       if (!gameActive && data.remainingTime > 0 && hasGrid) {
-        logger.log('[PLAYER] Timer started on server, activating game (remainingTime:', data.remainingTime, ')');
+        logger.log('[PLAYER] Timer started on server, activating game via timeUpdate (late join, remainingTime:', data.remainingTime, ')');
         setGameActive(true);
-        setShowStartAnimation(true);
+        // Skip countdown animation for late joiners syncing via timeUpdate - start immediately
+        // Don't show countdown animation since they're joining mid-game
       }
 
       if (data.remainingTime <= 0) {

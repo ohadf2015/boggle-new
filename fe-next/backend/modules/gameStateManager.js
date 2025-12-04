@@ -758,6 +758,41 @@ function trackAiApprovedWord(gameCode, word, submitter, score, confidence) {
 }
 
 /**
+ * Track a bot-submitted word for potential peer validation
+ * Bot words appear in the "is this real word?" modal and can be blacklisted if rejected
+ * @param {string} gameCode - Game code
+ * @param {string} word - The word submitted by bot
+ * @param {string} botUsername - Bot username
+ * @param {number} score - Score for this word
+ */
+function trackBotWord(gameCode, word, botUsername, score) {
+  const game = games[gameCode];
+  if (!game) return;
+
+  // Track bot words separately for potential validation
+  if (!game.botWords) {
+    game.botWords = [];
+  }
+
+  // Also add to aiApprovedWords pool so they can be shown in peer validation
+  // Bot words mix with AI-validated words for community validation
+  if (!game.aiApprovedWords) {
+    game.aiApprovedWords = [];
+  }
+
+  const wordData = {
+    word: word.toLowerCase(),
+    submitter: botUsername,
+    score,
+    isBot: true, // Mark as bot word for blacklist handling
+    timestamp: Date.now()
+  };
+
+  game.botWords.push(wordData);
+  game.aiApprovedWords.push(wordData);
+}
+
+/**
  * Select a random AI-approved word for peer validation
  * Excludes words from a specific submitter if needed
  * @param {string} gameCode - Game code
@@ -824,7 +859,8 @@ function recordPeerValidationVote(gameCode, username, isValid) {
     validVotes: votes.filter(v => v === 'valid').length,
     shouldReject,
     word: game.peerValidationWord.word,
-    submitter: game.peerValidationWord.submitter
+    submitter: game.peerValidationWord.submitter,
+    isBot: game.peerValidationWord.isBot || false // Track if it's a bot word for blacklisting
   };
 }
 
@@ -1108,6 +1144,7 @@ module.exports = {
 
   // AI word peer validation
   trackAiApprovedWord,
+  trackBotWord,
   selectWordForPeerValidation,
   recordPeerValidationVote,
   getPeerValidationWord,

@@ -67,7 +67,7 @@ const BOT_CONFIG = {
       wrongWordChance: 0.05,  // 5% wrong word chance (experts make fewer mistakes)
     }
   },
-  // Bot appearance
+  // Bot appearance - More variety and personality
   AVATARS: [
     { emoji: '🤖', color: '#60a5fa' },
     { emoji: '🦾', color: '#34d399' },
@@ -79,12 +79,70 @@ const BOT_CONFIG = {
     { emoji: '🌟', color: '#facc15' },
     { emoji: '🚀', color: '#38bdf8' },
     { emoji: '🎲', color: '#4ade80' },
+    // More personality-driven avatars
+    { emoji: '🦊', color: '#fb923c' },
+    { emoji: '🐺', color: '#6b7280' },
+    { emoji: '🦁', color: '#f59e0b' },
+    { emoji: '🐙', color: '#ec4899' },
+    { emoji: '🦉', color: '#8b5cf6' },
+    { emoji: '🐲', color: '#22c55e' },
+    { emoji: '🦄', color: '#f472b6' },
+    { emoji: '🐬', color: '#06b6d4' },
+    { emoji: '🦅', color: '#78716c' },
+    { emoji: '🐝', color: '#eab308' },
+    { emoji: '🦋', color: '#14b8a6' },
+    { emoji: '🌸', color: '#f9a8d4' },
+    { emoji: '🔥', color: '#ef4444' },
+    { emoji: '💎', color: '#67e8f9' },
+    { emoji: '🎭', color: '#a855f7' },
   ],
-  // Bot names (with difficulty modifier)
+  // Bot names (with difficulty modifier) - More personality and variety
   NAMES: {
-    easy: ['Rookie', 'Newbie', 'Learner', 'Novice', 'Beginner', 'Starter', 'Junior', 'Trainee'],
-    medium: ['Player', 'Gamer', 'Challenger', 'Competitor', 'Contender', 'Rival', 'Fighter'],
-    hard: ['Expert', 'Master', 'Pro', 'Champion', 'Elite', 'Ace', 'Legend', 'Titan', 'Wizard'],
+    easy: [
+      'Rookie', 'Newbie', 'Learner', 'Novice', 'Beginner', 'Starter', 'Junior', 'Trainee',
+      'Padawan', 'Grasshopper', 'Apprentice', 'Cub', 'Fledgling', 'Seedling', 'Sprout',
+      'Curious Cat', 'Word Pup', 'Letter Bug', 'Tiny Thinker', 'Baby Steps'
+    ],
+    medium: [
+      'Player', 'Gamer', 'Challenger', 'Competitor', 'Contender', 'Rival', 'Fighter',
+      'Wordsmith', 'Letter Hunter', 'Puzzle Pro', 'Grid Gazer', 'Word Warrior',
+      'Scrabbler', 'Speller', 'Vocab Vulture', 'Syllable Seeker', 'Alpha Hunter',
+      'Word Wrangler', 'Letter Lasso', 'Boggle Buddy', 'Grid Guru'
+    ],
+    hard: [
+      'Expert', 'Master', 'Pro', 'Champion', 'Elite', 'Ace', 'Legend', 'Titan', 'Wizard',
+      'Word Wizard', 'Lexicon Lord', 'Grammar Guru', 'Vocab Victor', 'Alpha King',
+      'Dictionary Demon', 'Spelling Sage', 'Letter Legend', 'Word Whiz', 'Boggle Boss',
+      'Grid Genius', 'Puzzle Phantom', 'Cerebral Storm', 'Mind Master', 'Brain Blitz'
+    ],
+  },
+  // Bot personality traits (affects behavior patterns)
+  PERSONALITIES: {
+    // Aggressive bots submit words faster with smaller gaps
+    aggressive: {
+      delayMultiplier: 0.75,
+      burstChance: 0.3,      // Chance to submit multiple words quickly
+      comboFocus: true,      // Tries to maintain combo
+    },
+    // Methodical bots take their time but are more consistent
+    methodical: {
+      delayMultiplier: 1.25,
+      burstChance: 0.1,
+      comboFocus: false,
+    },
+    // Streaky bots have periods of intense activity followed by pauses
+    streaky: {
+      delayMultiplier: 1.0,
+      burstChance: 0.5,      // Higher burst chance
+      pauseChance: 0.2,      // Sometimes takes long pauses
+      comboFocus: true,
+    },
+    // Steady bots maintain consistent pacing
+    steady: {
+      delayMultiplier: 1.0,
+      burstChance: 0.15,
+      comboFocus: false,
+    }
   }
 };
 
@@ -141,6 +199,15 @@ function getRandomAvatar(existingAvatars = []) {
  * @param {object} existingUsers - Object with existing usernames
  * @returns {object} - Bot player object
  */
+/**
+ * Get a random personality type for a bot
+ * Different personalities create varied playing styles
+ */
+function getRandomPersonality() {
+  const personalities = Object.keys(BOT_CONFIG.PERSONALITIES);
+  return personalities[Math.floor(Math.random() * personalities.length)];
+}
+
 function createBot(gameCode, difficulty = 'medium', existingUsers = {}) {
   const existingNames = Object.keys(existingUsers);
   const existingAvatars = Object.values(existingUsers).map(u => u.avatar);
@@ -148,12 +215,15 @@ function createBot(gameCode, difficulty = 'medium', existingUsers = {}) {
   const botId = generateBotId(gameCode);
   const botName = generateBotName(difficulty, existingNames);
   const avatar = getRandomAvatar(existingAvatars);
+  const personality = getRandomPersonality();
+  const personalityTraits = BOT_CONFIG.PERSONALITIES[personality];
 
   const bot = {
     id: botId,
     username: botName,
     avatar,
     difficulty,
+    personality,        // Bot's playing style personality
     isBot: true,
     // Game state
     wordsToFind: [],       // Queue of words the bot will submit
@@ -161,16 +231,25 @@ function createBot(gameCode, difficulty = 'medium', existingUsers = {}) {
     currentWordIndex: 0,
     score: 0,
     comboLevel: 0,
+    // Personality-adjusted state
+    inBurstMode: false,    // Currently in a burst of quick submissions
+    burstWordsRemaining: 0,
     // Timing state
     nextWordTime: null,
     activeTimers: new Set(), // FIXED: Use Set instead of array for O(1) add/delete
     isActive: false,
-    // Statistics (for human-like variation)
-    avgThinkingTime: BOT_CONFIG.TIMING[difficulty].minDelay +
-      Math.random() * (BOT_CONFIG.TIMING[difficulty].maxDelay - BOT_CONFIG.TIMING[difficulty].minDelay),
+    // Statistics (for human-like variation) - adjusted by personality
+    avgThinkingTime: (BOT_CONFIG.TIMING[difficulty].minDelay +
+      Math.random() * (BOT_CONFIG.TIMING[difficulty].maxDelay - BOT_CONFIG.TIMING[difficulty].minDelay)) *
+      personalityTraits.delayMultiplier,
     typingSpeed: BOT_CONFIG.TIMING[difficulty].typingSpeed * (0.8 + Math.random() * 0.4),
+    // Personality traits
+    burstChance: personalityTraits.burstChance,
+    pauseChance: personalityTraits.pauseChance || 0,
+    comboFocus: personalityTraits.comboFocus,
   };
 
+  logger.debug('BOT', `Created ${difficulty} bot "${botName}" with ${personality} personality`);
   return bot;
 }
 
@@ -603,11 +682,36 @@ async function prepareBotWords(bot, grid, language) {
 
 /**
  * Calculate delay until next word submission (human-like timing)
+ * Now uses bot personality traits for more varied behavior
  * @param {object} bot - Bot object
  * @returns {number} - Delay in milliseconds
  */
 function calculateNextDelay(bot) {
   const timing = BOT_CONFIG.TIMING[bot.difficulty] || BOT_CONFIG.TIMING.medium;
+
+  // Check if bot should enter burst mode (rapid word submissions)
+  if (!bot.inBurstMode && Math.random() < (bot.burstChance || 0.15)) {
+    bot.inBurstMode = true;
+    bot.burstWordsRemaining = 2 + Math.floor(Math.random() * 3); // 2-4 words in burst
+    logger.debug('BOT', `Bot "${bot.username}" entering burst mode (${bot.burstWordsRemaining} words)`);
+  }
+
+  // Handle burst mode - much faster submissions
+  if (bot.inBurstMode && bot.burstWordsRemaining > 0) {
+    bot.burstWordsRemaining--;
+    if (bot.burstWordsRemaining === 0) {
+      bot.inBurstMode = false;
+      logger.debug('BOT', `Bot "${bot.username}" exiting burst mode`);
+    }
+    // Very short delay during burst (like a player who spotted multiple words)
+    return Math.round(500 + Math.random() * 1500);
+  }
+
+  // Check for pause (streaky personality trait)
+  if (bot.pauseChance && Math.random() < bot.pauseChance) {
+    logger.debug('BOT', `Bot "${bot.username}" taking a thinking pause`);
+    return Math.round(8000 + Math.random() * 7000); // 8-15 second pause
+  }
 
   // Base delay with randomization
   let delay = timing.minDelay + Math.random() * (timing.maxDelay - timing.minDelay);
@@ -619,13 +723,15 @@ function calculateNextDelay(bot) {
   }
 
   // Add occasional "thinking" pauses (humans sometimes pause)
-  if (Math.random() < 0.15) {
+  if (Math.random() < 0.12) {
     delay += 1000 + Math.random() * 3000;
   }
 
   // Slight speed up as combo builds (humans get into rhythm)
+  // Combo-focused bots get more speed boost
   if (bot.comboLevel > 0) {
-    delay *= Math.max(0.6, 1 - (bot.comboLevel * 0.05));
+    const comboSpeedBoost = bot.comboFocus ? 0.07 : 0.05;
+    delay *= Math.max(0.5, 1 - (bot.comboLevel * comboSpeedBoost));
   }
 
   // Add small random variation to prevent patterns
@@ -849,6 +955,52 @@ function clearBotManagerCaches() {
   logger.info('BOT', `Cleared bot manager caches: ${playerWordsCount} player words cache entries`);
 }
 
+/**
+ * Add a word to the bot blacklist - called when players reject a bot word
+ * Words in the blacklist will not be used by bots in future games
+ * @param {string} word - Word to blacklist
+ * @param {string} language - Game language
+ * @returns {Promise<boolean>} Success status
+ */
+async function addWordToBlacklist(word, language) {
+  try {
+    const supabase = getSupabase();
+    if (!supabase) {
+      logger.warn('BOT', `Cannot add "${word}" to blacklist - Supabase not configured`);
+      return false;
+    }
+
+    const normalizedWord = word.toLowerCase().trim();
+
+    // Insert into bot_word_blacklist table
+    const { error } = await supabase
+      .from('bot_word_blacklist')
+      .insert({
+        word: normalizedWord,
+        language: language || 'en',
+        created_at: new Date().toISOString()
+      });
+
+    if (error) {
+      // Ignore duplicate errors (word already blacklisted)
+      if (error.code === '23505') {
+        logger.debug('BOT', `Word "${normalizedWord}" already in blacklist for ${language}`);
+        return true;
+      }
+      throw error;
+    }
+
+    // Clear the blacklist cache for this language so it's refreshed
+    blacklistCache.delete(language || 'en');
+
+    logger.info('BOT', `Added "${normalizedWord}" to bot blacklist for ${language}`);
+    return true;
+  } catch (error) {
+    logger.error('BOT', `Failed to add "${word}" to blacklist: ${error.message}`);
+    return false;
+  }
+}
+
 module.exports = {
   // Bot management
   addBot,
@@ -873,6 +1025,9 @@ module.exports = {
   getBotManagerStats,
   clearBotManagerCaches,
   cleanupPlayerWordsCache,
+
+  // Blacklist management
+  addWordToBlacklist,
 
   // Configuration
   BOT_CONFIG,

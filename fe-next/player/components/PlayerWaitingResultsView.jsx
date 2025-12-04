@@ -1,5 +1,5 @@
-import React from 'react';
-import { motion } from 'framer-motion';
+import React, { useState, useEffect, useMemo } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { FaTrophy } from 'react-icons/fa';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '../../components/ui/alert-dialog';
 import RoomChat from '../../components/RoomChat';
@@ -17,7 +17,61 @@ const PlayerWaitingResultsView = ({
   setShowExitConfirm,
   onExitRoom,
   onConfirmExit,
+  foundWords = [], // Words found by the player for validation display
 }) => {
+  // Stage of the validation process - cycles through stages
+  const [stage, setStage] = useState(0);
+  // Current word being "validated"
+  const [currentWordIndex, setCurrentWordIndex] = useState(0);
+  // Simulated progress percentage
+  const [progress, setProgress] = useState(0);
+
+  // Validation stages with messages
+  const validationStages = useMemo(() => [
+    { key: 'scanning', icon: '🔍' },
+    { key: 'checking', icon: '📚' },
+    { key: 'verifying', icon: '🤖' },
+    { key: 'scoring', icon: '⚡' },
+    { key: 'finalizing', icon: '✨' },
+  ], []);
+
+  // Get safe words list (extract word string from object if needed)
+  const words = useMemo(() => {
+    if (!foundWords || foundWords.length === 0) return [];
+    return foundWords.slice(0, 15).map(w => typeof w === 'string' ? w : w.word).filter(Boolean);
+  }, [foundWords]);
+
+  // Cycle through validation stages
+  useEffect(() => {
+    const stageInterval = setInterval(() => {
+      setStage(prev => (prev + 1) % validationStages.length);
+    }, 3500);
+    return () => clearInterval(stageInterval);
+  }, [validationStages.length]);
+
+  // Cycle through words being validated
+  useEffect(() => {
+    if (words.length === 0) return;
+    const wordInterval = setInterval(() => {
+      setCurrentWordIndex(prev => (prev + 1) % words.length);
+    }, 800);
+    return () => clearInterval(wordInterval);
+  }, [words.length]);
+
+  // Simulate progress
+  useEffect(() => {
+    const progressInterval = setInterval(() => {
+      setProgress(prev => {
+        if (prev >= 95) return 30 + Math.random() * 30;
+        return Math.min(95, prev + Math.random() * 15);
+      });
+    }, 600);
+    return () => clearInterval(progressInterval);
+  }, []);
+
+  const currentStage = validationStages[stage];
+  const currentWord = words[currentWordIndex];
+
   return (
     <div className="min-h-screen bg-neo-cream dark:bg-slate-900 p-3 sm:p-4 md:p-8 flex flex-col transition-colors duration-300">
 
@@ -29,48 +83,106 @@ const PlayerWaitingResultsView = ({
       {/* Centered Content */}
       <div className="flex-1 flex items-center justify-center">
         <div className="max-w-2xl w-full space-y-4 sm:space-y-6 md:space-y-8">
-          {/* Waiting for Results Message */}
+          {/* Waiting for Results Message - Fixed height container to prevent CLS */}
           <motion.div
-            initial={{ scale: 0.9, opacity: 0, rotate: -2 }}
-            animate={{ scale: 1, opacity: 1, rotate: 0 }}
+            initial={{ scale: 0.9, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
             className="text-center"
           >
-            <div className="bg-neo-yellow border-4 border-neo-black shadow-hard-lg p-6 sm:p-8 md:p-10 rotate-[1deg]">
-              {/* Hourglass Animation */}
-              <div className="mb-6">
+            <div className="bg-neo-yellow border-4 border-neo-black shadow-hard-lg p-6 sm:p-8 md:p-10">
+              {/* Brain/Processing Animation - Static container to prevent CLS */}
+              <div className="mb-6 h-[80px] flex items-center justify-center">
                 <motion.div
-                  animate={{ rotate: [0, 10, -10, 0] }}
+                  animate={{ scale: [1, 1.05, 1] }}
                   transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-                  className="inline-block bg-neo-pink border-4 border-neo-black shadow-hard p-3"
+                  className="inline-block bg-neo-pink border-4 border-neo-black shadow-hard p-4"
                 >
-                  <div className="relative w-12 h-16 flex flex-col items-center">
-                    <div className="w-0 h-0 border-l-[20px] border-r-[20px] border-t-[24px] border-l-transparent border-r-transparent border-t-neo-black" />
-                    <div className="w-2 h-1 bg-neo-black -my-[2px] z-10" />
-                    <div className="w-0 h-0 border-l-[20px] border-r-[20px] border-b-[24px] border-l-transparent border-r-transparent border-b-neo-black" />
+                  <AnimatePresence mode="wait">
                     <motion.div
-                      animate={{ y: [0, 20, 0], opacity: [1, 1, 0] }}
-                      transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
-                      className="absolute top-[24px] w-1 h-2 bg-neo-cyan"
-                    />
-                  </div>
+                      key={stage}
+                      initial={{ scale: 0.8, opacity: 0 }}
+                      animate={{ scale: 1, opacity: 1 }}
+                      exit={{ scale: 0.8, opacity: 0 }}
+                      transition={{ duration: 0.2 }}
+                      className="text-4xl"
+                    >
+                      {currentStage.icon}
+                    </motion.div>
+                  </AnimatePresence>
                 </motion.div>
               </div>
 
-              <div className="bg-neo-black text-neo-white px-6 py-4 font-black uppercase text-2xl md:text-3xl tracking-wider shadow-hard border-4 border-neo-black mb-4">
-                {t('playerView.calculatingScores') || t('playerView.waitingForResults')}
+              {/* Main status message - Fixed height to prevent CLS */}
+              <div className="bg-neo-black text-neo-white px-6 py-4 font-black uppercase text-xl md:text-2xl tracking-wider shadow-hard border-4 border-neo-black mb-4 min-h-[70px] flex items-center justify-center">
+                <AnimatePresence mode="wait">
+                  <motion.div
+                    key={stage}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    transition={{ duration: 0.3 }}
+                    className="flex items-center justify-center gap-3"
+                  >
+                    <span>{t(`playerView.validation.${currentStage.key}`) || currentStage.key}</span>
+                  </motion.div>
+                </AnimatePresence>
               </div>
 
-              <p className="text-neo-black font-bold text-base uppercase tracking-wide">
-                {t('playerView.aiValidating') || 'AI is checking your words...'}
-              </p>
+              {/* Progress bar - Visual feedback */}
+              <div className="relative h-4 bg-neo-cream border-3 border-neo-black overflow-hidden mb-4">
+                <motion.div
+                  className="absolute inset-y-0 left-0 bg-neo-cyan"
+                  initial={{ width: '0%' }}
+                  animate={{ width: `${progress}%` }}
+                  transition={{ duration: 0.5, ease: 'easeOut' }}
+                />
+                {/* Animated stripes */}
+                <div
+                  className="absolute inset-0 opacity-30"
+                  style={{
+                    backgroundImage: 'repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(0,0,0,0.1) 10px, rgba(0,0,0,0.1) 20px)',
+                    animation: 'stripe-move 1s linear infinite',
+                  }}
+                />
+              </div>
 
-              <div className="flex gap-3 mt-6 justify-center">
+              {/* Current word being validated - Fixed height container */}
+              {words.length > 0 && (
+                <div className="flex items-center justify-center gap-2 h-[40px]">
+                  <span className="text-neo-black font-bold text-sm uppercase tracking-wide">
+                    {t('playerView.validatingWord') || 'Checking:'}
+                  </span>
+                  <AnimatePresence mode="wait">
+                    <motion.span
+                      key={currentWord}
+                      initial={{ opacity: 0, scale: 0.8 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      exit={{ opacity: 0, scale: 0.8 }}
+                      transition={{ duration: 0.2 }}
+                      className="bg-neo-purple text-neo-white px-3 py-1 font-black text-lg uppercase border-3 border-neo-black shadow-hard-sm"
+                    >
+                      {currentWord}
+                    </motion.span>
+                  </AnimatePresence>
+                </div>
+              )}
+
+              {/* Processing indicators - More subtle animation */}
+              <div className="flex gap-3 mt-4 justify-center">
                 {[0, 1, 2].map((i) => (
                   <motion.div
                     key={i}
-                    animate={{ scale: [1, 1.3, 1], y: [0, -8, 0] }}
-                    transition={{ duration: 1.2, repeat: Infinity, delay: i * 0.2 }}
-                    className="w-4 h-4 bg-neo-black border-2 border-neo-black"
+                    animate={{
+                      scale: [1, 1.15, 1],
+                      opacity: [0.5, 1, 0.5],
+                    }}
+                    transition={{
+                      duration: 1.5,
+                      repeat: Infinity,
+                      delay: i * 0.2,
+                      ease: 'easeInOut',
+                    }}
+                    className="w-3 h-3 bg-neo-black rounded-full"
                   />
                 ))}
               </div>
@@ -80,10 +192,9 @@ const PlayerWaitingResultsView = ({
           {/* Leaderboard */}
           {leaderboard.length > 0 && (
             <motion.div
-              initial={{ y: 20, opacity: 0, rotate: 1 }}
-              animate={{ y: 0, opacity: 1, rotate: 0 }}
+              initial={{ y: 20, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
               transition={{ delay: 0.2 }}
-              className="rotate-[-0.5deg]"
             >
               <div className="bg-neo-cream border-4 border-neo-black shadow-hard-lg overflow-hidden">
                 <div className="py-3 px-4 border-b-4 border-neo-black bg-neo-purple">
@@ -144,10 +255,9 @@ const PlayerWaitingResultsView = ({
 
           {/* Chat Section */}
           <motion.div
-            initial={{ y: 20, opacity: 0, rotate: -1 }}
-            animate={{ y: 0, opacity: 1, rotate: 0 }}
+            initial={{ y: 20, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
             transition={{ delay: 0.3 }}
-            className="rotate-[0.5deg]"
           >
             <RoomChat
               username={username}
@@ -183,6 +293,14 @@ const PlayerWaitingResultsView = ({
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* CSS for stripe animation */}
+      <style jsx>{`
+        @keyframes stripe-move {
+          0% { background-position: 0 0; }
+          100% { background-position: 40px 0; }
+        }
+      `}</style>
     </div>
   );
 };
