@@ -1,9 +1,7 @@
--- =============================================
 -- BOT WORD TRACKING
 -- Migration: 013_add_bot_word_tracking
 -- Track which votes are for bot-submitted words
 -- Allows admins to review and blacklist problematic bot words
--- =============================================
 
 -- Add is_bot_word column to word_votes table
 ALTER TABLE word_votes ADD COLUMN IF NOT EXISTS is_bot_word BOOLEAN DEFAULT FALSE;
@@ -12,7 +10,8 @@ ALTER TABLE word_votes ADD COLUMN IF NOT EXISTS is_bot_word BOOLEAN DEFAULT FALS
 CREATE INDEX IF NOT EXISTS idx_word_votes_bot ON word_votes(is_bot_word) WHERE is_bot_word = TRUE;
 
 -- Create a view for admin to see bot words with negative votes
-CREATE OR REPLACE VIEW bot_words_for_review AS
+DROP VIEW IF EXISTS bot_words_for_review;
+CREATE VIEW bot_words_for_review AS
 SELECT
     wv.word,
     wv.language,
@@ -30,10 +29,8 @@ ORDER BY COUNT(*) FILTER (WHERE wv.vote_type = 'dislike') DESC;
 
 COMMENT ON VIEW bot_words_for_review IS 'Bot-submitted words with negative votes for admin review';
 
--- =============================================
 -- BOT WORD BLACKLIST TABLE
 -- Words that bots should not use (marked as invalid by admin)
--- =============================================
 CREATE TABLE IF NOT EXISTS bot_word_blacklist (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     word TEXT NOT NULL,
@@ -41,7 +38,6 @@ CREATE TABLE IF NOT EXISTS bot_word_blacklist (
     blacklisted_by UUID REFERENCES profiles(id),
     reason TEXT,
     created_at TIMESTAMPTZ DEFAULT NOW(),
-
     CONSTRAINT unique_blacklist_word_lang UNIQUE (word, language)
 );
 
