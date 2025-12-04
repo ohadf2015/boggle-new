@@ -611,13 +611,13 @@ const usePlayerSocketEvents = ({
       logger.log('[PLAYER] Player connection status changed:', data);
       if (data.connectionStatus === 'weak') {
         // Show a subtle warning toast for weak connection
-        neoInfoToast(data.message || `${data.username} has weak connection`, {
+        neoInfoToast(data.message || `${data.username} ${t('playerView.weakConnection') || 'has weak connection'}`, {
           icon: '📶',
           duration: 4000
         });
       } else if (data.connectionStatus === 'stable') {
         // Connection recovered
-        neoSuccessToast(data.message || `${data.username}'s connection recovered`, {
+        neoSuccessToast(data.message || `${data.username} ${t('playerView.connectionRecovered') || 'connection recovered'}`, {
           icon: '✅',
           duration: 2000
         });
