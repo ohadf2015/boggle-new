@@ -179,6 +179,13 @@ function findWordsForBots(grid, language, options = {}) {
     maxWords: 300
   });
 
+  // Filter to only solid words (no excessive duplicate letters)
+  // Allow max 2 of same letter for short words, 3 for longer words
+  const solidWords = allWords.filter(word => {
+    const maxDupes = word.length >= 6 ? 3 : 2;
+    return isSolidWord(word, maxDupes);
+  });
+
   // Categorize by difficulty based on word length
   const result = {
     easy: [],    // 3-4 letter words
@@ -186,7 +193,7 @@ function findWordsForBots(grid, language, options = {}) {
     hard: []     // 6+ letter words
   };
 
-  for (const word of allWords) {
+  for (const word of solidWords) {
     const len = word.length;
     if (len <= 4) {
       result.easy.push(word);
@@ -217,6 +224,29 @@ function shuffleArray(array) {
     [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
   }
   return shuffled;
+}
+
+/**
+ * Check if a word is "solid" - doesn't have too many duplicate letters
+ * Words with excessive duplicates (like "aaaa", "mississippi") are often obscure
+ * @param {string} word - Word to check
+ * @param {number} maxDuplicates - Maximum allowed occurrences of any single letter (default: 2)
+ * @returns {boolean} - True if word is solid (acceptable)
+ */
+function isSolidWord(word, maxDuplicates = 2) {
+  if (!word || word.length < 3) return false;
+
+  // Count letter occurrences
+  const letterCounts = {};
+  for (const char of word.toLowerCase()) {
+    letterCounts[char] = (letterCounts[char] || 0) + 1;
+    // Quick exit if any letter exceeds max
+    if (letterCounts[char] > maxDuplicates) {
+      return false;
+    }
+  }
+
+  return true;
 }
 
 /**
@@ -281,5 +311,6 @@ module.exports = {
   getWordPath,
   buildTrie,
   getTrieNode,
-  shuffleArray
+  shuffleArray,
+  isSolidWord
 };
