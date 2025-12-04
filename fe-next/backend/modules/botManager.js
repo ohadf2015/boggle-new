@@ -434,10 +434,8 @@ function calculateNextDelay(bot) {
  * @param {number} gameDuration - Game duration in seconds
  */
 function startBot(bot, grid, language, onWordSubmit, gameDuration) {
-  // Prepare words if not already done
-  if (bot.wordsToFind.length === 0) {
-    prepareBotWords(bot, grid, language);
-  }
+  // Always prepare fresh words for the new grid (fixes bots not finding words after first game)
+  prepareBotWords(bot, grid, language);
 
   bot.isActive = true;
   const timing = BOT_CONFIG.TIMING[bot.difficulty] || BOT_CONFIG.TIMING.medium;
