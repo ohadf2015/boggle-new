@@ -138,12 +138,14 @@ async function updatePlayerStats(playerId, gameStats) {
   // Update casual/ranked game counts
   if (gameStats.isRanked) {
     updates.ranked_games = (profile.ranked_games || 0) + 1;
-    // Only count as win if placement === 1 AND more than 1 player (no solo wins)
-    if (gameStats.placement === 1 && (gameStats.totalPlayers || 0) > 1) {
-      updates.ranked_wins = (profile.ranked_wins || 0) + 1;
-    }
   } else {
     updates.casual_games = (profile.casual_games || 0) + 1;
+  }
+
+  // Count wins for ALL games (both casual and ranked)
+  // Only count as win if placement === 1 AND more than 1 player (no solo wins)
+  if (gameStats.placement === 1 && (gameStats.totalPlayers || 0) > 1) {
+    updates.ranked_wins = (profile.ranked_wins || 0) + 1;
   }
 
   // Update longest word if this game had a longer one
