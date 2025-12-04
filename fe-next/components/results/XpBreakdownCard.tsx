@@ -31,8 +31,10 @@ interface XpBreakdownCardProps {
 }
 
 const XpBreakdownCard = memo<XpBreakdownCardProps>(({ xpGainedData, levelUpData, isWinner }) => {
-  const { t } = useLanguage();
+  const { t, dir } = useLanguage();
   const { xpBreakdown, xpEarned, newTotalXp, newLevel } = xpGainedData;
+  // Arrow direction for level up indicator - flip for RTL
+  const levelArrow = dir === 'rtl' ? '←' : '→';
 
   const breakdownItems = [
     { key: 'gameCompletion', label: t('xp.baseXp') || 'Base XP', value: xpBreakdown.gameCompletion, icon: '🎮' },
@@ -126,7 +128,7 @@ const XpBreakdownCard = memo<XpBreakdownCardProps>(({ xpGainedData, levelUpData,
             {t('xp.levelUp') || 'Level Up!'}
           </p>
           <p className="font-bold text-neo-black text-lg">
-            {levelUpData.oldLevel} → {levelUpData.newLevel}
+            {levelUpData.oldLevel} {levelArrow} {levelUpData.newLevel}
           </p>
           {levelUpData.newTitles && levelUpData.newTitles.length > 0 && (
             <motion.p

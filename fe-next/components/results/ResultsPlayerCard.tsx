@@ -184,10 +184,13 @@ const WordChip = memo<WordChipProps>(({ wordObj, playerCount }) => {
     </span>
   );
 
+  // Determine the reason to display - prefer aiReason for AI-rejected words
+  const displayReason = aiReason || invalidReason;
+
   return (
     <div className="relative group">
-      {/* Wrap invalid words with tooltip showing the reason */}
-      {!isValid && !isDuplicate && !isPending && invalidReason ? (
+      {/* Wrap invalid words with tooltip showing the reason (invalidReason or aiReason) */}
+      {!isValid && !isDuplicate && !isPending && displayReason ? (
         <TooltipProvider delayDuration={0}>
           <Tooltip>
             <TooltipTrigger asChild>
@@ -195,9 +198,15 @@ const WordChip = memo<WordChipProps>(({ wordObj, playerCount }) => {
             </TooltipTrigger>
             <TooltipContent
               side="top"
-              className="bg-neo-red border-2 border-neo-black shadow-hard rounded-neo p-2 max-w-[200px]"
+              className="bg-neo-red border-2 border-neo-black shadow-hard rounded-neo p-2 max-w-[250px]"
             >
-              <p className="text-xs font-bold text-neo-cream">{invalidReason}</p>
+              {isAiVerified && (
+                <p className="text-[10px] font-bold text-neo-yellow mb-1 flex items-center gap-1">
+                  <span className="px-1 py-0.5 bg-neo-purple rounded border border-neo-black">AI</span>
+                  {t('results.aiRejected') || 'Rejected by AI'}
+                </p>
+              )}
+              <p className="text-xs font-bold text-neo-cream">{displayReason}</p>
             </TooltipContent>
           </Tooltip>
         </TooltipProvider>
@@ -216,7 +225,9 @@ const WordChip = memo<WordChipProps>(({ wordObj, playerCount }) => {
 WordChip.displayName = 'WordChip';
 
 const ResultsPlayerCard: React.FC<ResultsPlayerCardProps> = ({ player, index, allPlayerWords, currentUsername, isWinner, xpGainedData, levelUpData }) => {
-  const { t } = useLanguage();
+  const { t, dir } = useLanguage();
+  // Arrow direction for level up indicator - flip for RTL
+  const levelArrow = dir === 'rtl' ? '←' : '→';
 
   // Check if this is the current player
   const isCurrentPlayer = currentUsername && player.username === currentUsername;
@@ -463,7 +474,7 @@ const ResultsPlayerCard: React.FC<ResultsPlayerCardProps> = ({ player, index, al
                 transition={{ delay: 0.4, type: 'spring', stiffness: 200, damping: 10 }}
                 className="bg-neo-yellow border-2 border-neo-black rounded-neo px-2 py-0.5 shadow-hard-sm text-neo-black flex items-center gap-1"
               >
-                <span className="text-xs font-black">🎉 {t('results.levelUp') || 'Level Up!'} {levelUpData.oldLevel} → {levelUpData.newLevel}</span>
+                <span className="text-xs font-black">🎉 {t('results.levelUp') || 'Level Up!'} {levelUpData.oldLevel} {levelArrow} {levelUpData.newLevel}</span>
               </motion.div>
             )}
           </div>
