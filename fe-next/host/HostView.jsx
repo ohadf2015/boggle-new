@@ -161,6 +161,26 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
     }
   }, [remainingTime, gameStarted, playCountdownBeep]);
 
+  // Client-side countdown timer - decrements remainingTime every second
+  // Server broadcasts time updates every ~10 seconds, so we interpolate locally
+  useEffect(() => {
+    if (!gameStarted || remainingTime === null || remainingTime <= 0) {
+      return;
+    }
+
+    const intervalId = setInterval(() => {
+      setRemainingTime(prev => {
+        if (prev === null || prev <= 0) {
+          clearInterval(intervalId);
+          return prev;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    return () => clearInterval(intervalId);
+  }, [gameStarted, remainingTime === null, remainingTime <= 0]);
+
   // Update players list from props
   useEffect(() => {
     setPlayersReady(initialPlayers);

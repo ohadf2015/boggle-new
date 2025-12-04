@@ -144,6 +144,26 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode, pe
     }
   }, [remainingTime, gameActive, playCountdownBeep]);
 
+  // Client-side countdown timer - decrements remainingTime every second
+  // Server broadcasts time updates every ~10 seconds, so we interpolate locally
+  useEffect(() => {
+    if (!gameActive || remainingTime === null || remainingTime <= 0) {
+      return;
+    }
+
+    const intervalId = setInterval(() => {
+      setRemainingTime(prev => {
+        if (prev === null || prev <= 0) {
+          clearInterval(intervalId);
+          return prev;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    return () => clearInterval(intervalId);
+  }, [gameActive, remainingTime === null, remainingTime <= 0]);
+
   // Keep refs in sync
   useEffect(() => {
     comboLevelRef.current = comboLevel;
