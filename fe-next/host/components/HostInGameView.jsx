@@ -7,7 +7,6 @@ import GridComponent from '../../components/GridComponent';
 import CircularTimer from '../../components/CircularTimer';
 import RoomChat from '../../components/RoomChat';
 import Avatar from '../../components/Avatar';
-import SlotMachineText from '../../components/SlotMachineText';
 import PresenceIndicator from '../../components/PresenceIndicator';
 import { wordErrorToast } from '../../components/NeoToast';
 import { applyHebrewFinalLetters } from '../../utils/utils';
@@ -246,7 +245,7 @@ const HostInGameView = ({
                   <div className="flex-1 min-w-0">
                     <div className="font-black truncate text-sm flex items-center gap-1">
                       {player.isHost && <FaCrown className="text-neo-yellow" style={{ filter: 'drop-shadow(1px 1px 0px var(--neo-black))' }} />}
-                      <SlotMachineText text={player.username} />
+                      <span>{player.username}</span>
                     </div>
                     <div className="text-xs font-bold">{player.wordCount} {t('hostView.words') || 'words'}</div>
                   </div>

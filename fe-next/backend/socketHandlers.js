@@ -43,6 +43,7 @@ const {
   checkUserConnectionHealth,
   // AI word peer validation
   trackAiApprovedWord,
+  trackBotWord,
   selectWordForPeerValidation,
   recordPeerValidationVote,
   getPeerValidationWord,
@@ -503,8 +504,7 @@ function initializeSocketHandlers(io) {
 
           // Notify room that player reconnected
           broadcastToRoom(io, getGameRoom(gameCode), 'playerReconnected', {
-            username,
-            message: `${username} reconnected`
+            username
           });
         }
 
@@ -1153,6 +1153,17 @@ function initializeSocketHandlers(io) {
           const scoreRemoved = removePeerRejectedWordScore(gameCode, result.word, result.submitter);
 
           logger.info('PEER_VALIDATION', `Word "${result.word}" rejected by peers (${result.invalidVotes} invalid votes). Removed ${scoreRemoved} points from ${result.submitter}`);
+
+          // If it's a bot word, add to blacklist so bots won't use it in future games
+          if (result.isBot && game.language) {
+            botManager.addWordToBlacklist(result.word, game.language)
+              .then(success => {
+                if (success) {
+                  logger.info('BOT', `Bot word "${result.word}" added to blacklist for ${game.language}`);
+                }
+              })
+              .catch(err => logger.warn('BOT', `Failed to blacklist bot word "${result.word}": ${err.message}`));
+          }
 
           // Notify all players about the peer rejection
           broadcastToRoom(io, getGameRoom(gameCode), 'peerValidationResult', {
@@ -1904,9 +1915,7 @@ function initializeSocketHandlers(io) {
         // No grace period for intentional host exit
         timerManager.clearGameTimer(gameCode);
 
-        broadcastToRoom(io, getGameRoom(gameCode), 'hostLeftRoomClosing', {
-          message: 'Host has left the room. Room is closing.'
-        });
+        broadcastToRoom(io, getGameRoom(gameCode), 'hostLeftRoomClosing', {});
 
         deleteGame(gameCode);
         io.emit('activeRooms', { rooms: getActiveRooms() });
@@ -1922,8 +1931,7 @@ function initializeSocketHandlers(io) {
 
         // Broadcast player left notification
         broadcastToRoom(io, getGameRoom(gameCode), 'playerLeft', {
-          username,
-          message: `${username} has left the room`
+          username
         });
 
         // Update user list for remaining players
@@ -1984,7 +1992,6 @@ function initializeSocketHandlers(io) {
 
         // Notify players that host disconnected (for UI feedback)
         broadcastToRoom(io, getGameRoom(gameCode), 'hostDisconnected', {
-          message: 'Host disconnected. Waiting for reconnection...',
           gracePeriodMs: HOST_RECONNECT_GRACE_PERIOD_MS
         });
 
@@ -2015,8 +2022,7 @@ function initializeSocketHandlers(io) {
 
               // Notify all players about host transfer
               broadcastToRoom(io, getGameRoom(gameCode), 'hostTransferred', {
-                newHost: newHostUsername,
-                message: `${newHostUsername} is now the host`
+                newHost: newHostUsername
               });
 
               // Update user list
@@ -2030,9 +2036,7 @@ function initializeSocketHandlers(io) {
               removeUserFromGame(gameCode, username);
               timerManager.clearGameTimer(gameCode);
 
-              broadcastToRoom(io, getGameRoom(gameCode), 'hostLeftRoomClosing', {
-                message: 'Host disconnected and no other players available. Room is closing.'
-              });
+              broadcastToRoom(io, getGameRoom(gameCode), 'hostLeftRoomClosing', {});
 
               deleteGame(gameCode);
               io.emit('activeRooms', { rooms: getActiveRooms() });
@@ -2065,8 +2069,7 @@ function initializeSocketHandlers(io) {
               cleanupPlayerData(currentGame, username);
 
               broadcastToRoom(io, getGameRoom(gameCode), 'playerLeft', {
-                username,
-                message: `${username} disconnected`
+                username
               });
 
               broadcastToRoom(io, getGameRoom(gameCode), 'updateUsers', {
@@ -2106,7 +2109,6 @@ function initializeSocketHandlers(io) {
         // Notify room that player is reconnecting
         broadcastToRoom(io, getGameRoom(gameCode), 'playerDisconnected', {
           username,
-          message: `${username} disconnected. Waiting for reconnection...`,
           gracePeriodMs: PLAYER_RECONNECT_GRACE_PERIOD_MS
         });
       }
@@ -2875,6 +2877,10 @@ function startBotsForGame(io, gameCode, letterGrid, language, timerSeconds) {
     getLeaderboardThrottled(gameCode, (leaderboard) => {
       broadcastToRoom(io, getGameRoom(gameCode), 'leaderboardUpdate', { leaderboard });
     });
+
+    // Track bot word for peer validation - bot words randomly appear in the
+    // "is this real word?" modal and affect the blacklist for the game language
+    trackBotWord(gameCode, word, username, score);
 
     logger.debug('BOT', `Bot "${username}" submitted "${word}" (score: ${score}) in game ${gameCode}`);
   };

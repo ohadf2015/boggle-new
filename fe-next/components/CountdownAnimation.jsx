@@ -1,17 +1,33 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
+// Vibration helper - safely handles devices without vibration support
+const vibrate = (pattern) => {
+  if (typeof navigator !== 'undefined' && navigator.vibrate) {
+    try {
+      navigator.vibrate(pattern);
+    } catch {
+      // Vibration not supported or blocked
+    }
+  }
+};
+
 const CountdownAnimation = ({ onComplete, duration = 3000 }) => {
   const [count, setCount] = useState(3);
 
   useEffect(() => {
     if (count === 0) {
+      // Vibrate with a stronger pattern on GO!
+      vibrate([100, 50, 100, 50, 200]);
       // Countdown finished, trigger completion
       const timer = setTimeout(() => {
         onComplete?.();
       }, 300);
       return () => clearTimeout(timer);
     }
+
+    // Vibrate on each count (short pulse, intensity increases as countdown progresses)
+    vibrate(50 + (3 - count) * 30);
 
     // Decrease count every second
     const timer = setTimeout(() => {

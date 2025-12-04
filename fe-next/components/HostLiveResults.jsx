@@ -125,13 +125,9 @@ const HostLiveResults = ({ players, gameLanguage, remainingTime }) => {
               <div className="flex items-center justify-between">
                 {/* Rank & Name */}
                 <div className="flex items-center gap-3">
-                  <motion.div
-                    animate={index < 3 ? { rotate: [0, -10, 10, -10, 0] } : {}}
-                    transition={index < 3 ? { duration: 2, repeat: Infinity, repeatDelay: 5 } : {}}
-                    className="text-3xl font-bold"
-                  >
+                  <div className="text-3xl font-bold">
                     {getRankIcon(index)}
-                  </motion.div>
+                  </div>
                   <Avatar
                     profilePictureUrl={player.avatar?.profilePictureUrl}
                     avatarEmoji={player.avatar?.emoji}
@@ -150,9 +146,7 @@ const HostLiveResults = ({ players, gameLanguage, remainingTime }) => {
                 </div>
 
                 {/* Score */}
-                <motion.div
-                  animate={index === 0 ? { scale: [1, 1.1, 1] } : {}}
-                  transition={index === 0 ? { duration: 1.5, repeat: Infinity } : {}}
+                <div
                   className={cn(
                     "text-4xl font-black",
                     index === 0 && "text-yellow-500",
@@ -162,7 +156,7 @@ const HostLiveResults = ({ players, gameLanguage, remainingTime }) => {
                   )}
                 >
                   {player.score}
-                </motion.div>
+                </div>
               </div>
 
               {/* Achievements Preview */}

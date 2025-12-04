@@ -12,7 +12,6 @@ import CircularTimer from '../../components/CircularTimer';
 import RoomChat from '../../components/RoomChat';
 import TournamentStandings from '../../components/TournamentStandings';
 import Avatar from '../../components/Avatar';
-import SlotMachineText from '../../components/SlotMachineText';
 import { applyHebrewFinalLetters } from '../../utils/utils';
 import { wordErrorToast } from '../../components/NeoToast';
 import { useSoundEffects } from '../../contexts/SoundEffectsContext';
@@ -308,7 +307,7 @@ const PlayerInGameView = ({
                       />
                       <div className="flex-1 min-w-0">
                         <div className={`font-black truncate text-base flex items-center gap-2 ${dir === 'rtl' ? 'flex-row-reverse' : ''}`}>
-                          <SlotMachineText text={player.username} />
+                          <span>{player.username}</span>
                           {isMe && (
                             <span className="text-xs bg-neo-black text-neo-cream px-2 py-0.5 rounded-neo font-bold">
                               ({t('playerView.me')})
