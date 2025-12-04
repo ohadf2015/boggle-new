@@ -211,6 +211,16 @@ const HostPreGameView = ({
               setTournamentRounds={setTournamentRounds}
             />
 
+            {/* Bot Controls - Always visible */}
+            <div className="pt-2 border-t border-neo-cream/20">
+              <BotControls
+                socket={socket}
+                gameCode={gameCode}
+                players={playersReady}
+                disabled={false}
+              />
+            </div>
+
             {/* Advanced Settings Toggle */}
             <button
               type="button"
@@ -321,16 +331,6 @@ const HostPreGameView = ({
                         );
                       })}
                     </div>
-                  </div>
-
-                  {/* Bot Controls */}
-                  <div className="pt-2 border-t border-neo-cream/20">
-                    <BotControls
-                      socket={socket}
-                      gameCode={gameCode}
-                      players={playersReady}
-                      disabled={false}
-                    />
                   </div>
                 </motion.div>
               )}
