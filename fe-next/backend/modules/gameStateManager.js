@@ -529,24 +529,35 @@ function getAllGames() {
 
 /**
  * Get active rooms for lobby display
- * Filters out rooms with no players
+ * Filters out rooms with no human players (bots don't count)
  * @returns {array} - Array of room info
  */
 function getActiveRooms() {
   return Object.values(games)
-    .filter(game => Object.keys(game.users).length > 0) // Only show rooms with players
-    .map(game => ({
-      gameCode: game.gameCode,
-      roomName: game.roomName,
-      playerCount: Object.keys(game.users).length,
-      gameState: game.gameState,
-      language: game.language
-    }));
+    .filter(game => {
+      // Only show rooms with active human players (bots don't count)
+      const humanPlayers = Object.values(game.users).filter(user => !user.isBot);
+      return humanPlayers.length > 0;
+    })
+    .map(game => {
+      // Count only human players for display
+      const humanPlayerCount = Object.values(game.users).filter(user => !user.isBot).length;
+      return {
+        gameCode: game.gameCode,
+        roomName: game.roomName,
+        playerCount: humanPlayerCount,
+        gameState: game.gameState,
+        language: game.language
+      };
+    });
 }
 
 /**
- * Get empty rooms (rooms with no active players)
- * A room is considered empty if it has no users, or if all users are marked as disconnected
+ * Get empty rooms (rooms with no active human players)
+ * A room is considered empty if:
+ * - It has no users at all
+ * - All users are marked as disconnected
+ * - Only bots remain (no active human players)
  * @returns {array} - Array of game codes for empty rooms
  */
 function getEmptyRooms() {
@@ -555,9 +566,9 @@ function getEmptyRooms() {
       const users = Object.values(game.users);
       // Room is empty if no users at all
       if (users.length === 0) return true;
-      // Room is empty if all users are disconnected (e.g., host in grace period with no other players)
-      const activeUsers = users.filter(user => !user.disconnected);
-      return activeUsers.length === 0;
+      // Room is empty if no active human players (bots don't count as real players)
+      const activeHumanUsers = users.filter(user => !user.disconnected && !user.isBot);
+      return activeHumanUsers.length === 0;
     })
     .map(game => game.gameCode);
 }
