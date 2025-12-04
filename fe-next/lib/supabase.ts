@@ -10,8 +10,16 @@ if (!supabaseUrl || !supabaseAnonKey) {
 }
 
 // Browser client using @supabase/ssr for proper cookie-based session handling
+// CRITICAL: detectSessionInUrl must be false to prevent race condition in auth callback
+// When true (default), Supabase auto-detects and exchanges the auth code in background,
+// which races with our manual exchangeCodeForSession() call in the callback page.
 export const supabase: SupabaseClient | null = supabaseUrl && supabaseAnonKey
-  ? createBrowserClient(supabaseUrl, supabaseAnonKey)
+  ? createBrowserClient(supabaseUrl, supabaseAnonKey, {
+      auth: {
+        detectSessionInUrl: false,
+        flowType: 'pkce'
+      }
+    })
   : null;
 
 // Helper to get the current locale from the URL path

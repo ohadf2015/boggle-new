@@ -139,7 +139,8 @@ function AuthCallbackContent() {
         }
 
         // Final check for session - might have been set asynchronously
-        await new Promise(resolve => setTimeout(resolve, 300));
+        // Use longer timeout for slow connections/mobile networks
+        await new Promise(resolve => setTimeout(resolve, 1000));
         const { data: finalCheck } = await supabase.auth.getSession();
         if (finalCheck?.session) {
           logger.log('Auth callback: Session found in final check');
