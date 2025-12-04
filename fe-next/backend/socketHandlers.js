@@ -1994,9 +1994,9 @@ function initializeSocketHandlers(io) {
             // Host didn't reconnect within grace period
             logger.info('SOCKET', `Host reconnect grace period expired for game ${gameCode}`);
 
-            // Try to transfer host to another player
+            // Try to transfer host to another human player (exclude bots)
             const otherPlayers = Object.entries(currentGame.users)
-              .filter(([uname, userData]) => uname !== username && !userData.disconnected)
+              .filter(([uname, userData]) => uname !== username && !userData.disconnected && !userData.isBot)
               .sort((a, b) => a[1].joinedAt - b[1].joinedAt); // Sort by join time (oldest first)
 
             if (otherPlayers.length > 0) {
