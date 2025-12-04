@@ -1,6 +1,6 @@
 import React, { useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FaClock, FaUsers, FaQrcode, FaWhatsapp, FaLink, FaCog, FaPlus, FaMinus, FaCrown, FaChevronDown, FaChevronUp, FaTrophy } from 'react-icons/fa';
+import { FaClock, FaUsers, FaQrcode, FaWhatsapp, FaLink, FaCog, FaPlus, FaMinus, FaCrown, FaChevronDown, FaChevronUp, FaTrophy, FaRobot } from 'react-icons/fa';
 import { Button } from '../../components/ui/button';
 import { Card } from '../../components/ui/card';
 import { Badge } from '../../components/ui/badge';
@@ -12,9 +12,11 @@ import Avatar from '../../components/Avatar';
 import RoomChat from '../../components/RoomChat';
 import GameTypeSelector from '../../components/GameTypeSelector';
 import PresenceIndicator from '../../components/PresenceIndicator';
+import BotControls from '../../components/BotControls';
 import { copyJoinUrl, shareViaWhatsApp } from '../../utils/share';
 import { DIFFICULTIES, MIN_WORD_LENGTH_OPTIONS } from '../../utils/consts';
 import { cn } from '../../lib/utils';
+import { useSocket } from '../../utils/SocketContext';
 
 const HostPreGameView = ({
   // Core props
@@ -59,6 +61,7 @@ const HostPreGameView = ({
   // Loading states
   tournamentCreating,
 }) => {
+  const { socket } = useSocket();
   const [showAdvancedSettings, setShowAdvancedSettings] = useState(false);
 
   // Memoized handlers
@@ -319,6 +322,16 @@ const HostPreGameView = ({
                       })}
                     </div>
                   </div>
+
+                  {/* Bot Controls */}
+                  <div className="pt-2 border-t border-neo-cream/20">
+                    <BotControls
+                      socket={socket}
+                      gameCode={gameCode}
+                      players={playersReady}
+                      disabled={false}
+                    />
+                  </div>
                 </motion.div>
               )}
             </AnimatePresence>
@@ -350,6 +363,7 @@ const HostPreGameView = ({
                 const isHostPlayer = typeof player === 'object' ? player.isHost : false;
                 const presenceStatus = typeof player === 'object' ? player.presenceStatus : 'active';
                 const isWindowFocused = typeof player === 'object' ? player.isWindowFocused : true;
+                const isBot = typeof player === 'object' ? player.isBot : false;
                 const isMe = playerUsername === username;
 
                 return (
@@ -363,9 +377,11 @@ const HostPreGameView = ({
                     <Badge
                       className={cn(
                         "font-black px-3 py-2 text-base w-full justify-between border-3 border-neo-black shadow-hard-sm",
-                        isHostPlayer ? "bg-neo-yellow text-neo-black" : "bg-neo-cream text-neo-black"
+                        isHostPlayer ? "bg-neo-yellow text-neo-black" :
+                        isBot ? "bg-neo-cyan/80 text-neo-black" :
+                        "bg-neo-cream text-neo-black"
                       )}
-                      style={avatar?.color && !isHostPlayer ? { backgroundColor: avatar.color } : {}}
+                      style={avatar?.color && !isHostPlayer && !isBot ? { backgroundColor: avatar.color } : {}}
                     >
                       <div className="flex items-center gap-2">
                         <Avatar
@@ -375,6 +391,7 @@ const HostPreGameView = ({
                           size="sm"
                         />
                         {isHostPlayer && <FaCrown className="text-neo-black" />}
+                        {isBot && <FaRobot className="text-neo-black" />}
                         <SlotMachineText text={playerUsername} />
                       </div>
                       <div className="flex items-center gap-2">
@@ -383,7 +400,7 @@ const HostPreGameView = ({
                             {playerWordCounts[playerUsername] || 0}
                           </span>
                         )}
-                        {!isMe && (
+                        {!isMe && !isBot && (
                           <PresenceIndicator
                             status={presenceStatus}
                             isWindowFocused={isWindowFocused}

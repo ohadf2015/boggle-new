@@ -100,6 +100,7 @@ const { inc, incPerGame, ensureGame } = require('./utils/metrics');
 const { DIFFICULTIES } = require('../utils/consts');
 const { generateRandomAvatar, generateRoomCode } = require('../utils/utils');
 const logger = require('./utils/logger');
+const botManager = require('./modules/botManager');
 
 // Game configuration constants
 const MAX_PLAYERS_PER_ROOM = 50; // Maximum number of players allowed in a single room
@@ -1186,6 +1187,177 @@ function initializeSocketHandlers(io) {
       endGame(io, gameCode);
     });
 
+    // ============================================
+    // BOT MANAGEMENT HANDLERS
+    // ============================================
+
+    // Handle adding a bot to the room (host only)
+    socket.on('addBot', (data) => {
+      if (!checkRateLimit(socket.id)) {
+        socket.emit('rateLimited');
+        return;
+      }
+
+      const { difficulty = 'medium' } = data || {};
+      const gameCode = getGameBySocketId(socket.id);
+
+      if (!gameCode) {
+        emitError(socket, ErrorMessages.NOT_IN_GAME);
+        return;
+      }
+
+      const game = getGame(gameCode);
+      if (!game) {
+        emitError(socket, ErrorMessages.GAME_NOT_FOUND);
+        return;
+      }
+
+      // Verify sender is host
+      if (game.hostSocketId !== socket.id) {
+        emitError(socket, 'Only the host can add bots');
+        return;
+      }
+
+      // Check if game is already in progress
+      if (game.gameState === 'in-progress') {
+        emitError(socket, 'Cannot add bots during a game');
+        return;
+      }
+
+      // Check player limit
+      const currentPlayerCount = Object.keys(game.users).length;
+      const currentBotCount = botManager.getGameBots(gameCode).length;
+      if (currentPlayerCount + currentBotCount >= MAX_PLAYERS_PER_ROOM) {
+        emitError(socket, 'Room is full');
+        return;
+      }
+
+      // Create the bot
+      const bot = botManager.addBot(gameCode, difficulty, game.users);
+
+      // Add bot to game as a user (so it shows in player list)
+      addUserToGame(gameCode, bot.username, `bot-${bot.id}`, {
+        avatar: bot.avatar,
+        isHost: false,
+        playerId: bot.id,
+        isBot: true
+      });
+
+      // Mark the user as a bot in the game state
+      if (game.users[bot.username]) {
+        game.users[bot.username].isBot = true;
+        game.users[bot.username].botDifficulty = bot.difficulty;
+      }
+
+      logger.info('BOT', `Bot "${bot.username}" (${difficulty}) added to game ${gameCode}`);
+
+      // Broadcast updated users list to all players
+      broadcastToRoom(io, getGameRoom(gameCode), 'updateUsers', {
+        users: getGameUsers(gameCode)
+      });
+
+      // Confirm bot addition to host
+      socket.emit('botAdded', {
+        success: true,
+        bot: {
+          id: bot.id,
+          username: bot.username,
+          difficulty: bot.difficulty,
+          avatar: bot.avatar
+        }
+      });
+
+      // Update active rooms
+      io.emit('activeRooms', { rooms: getActiveRooms() });
+    });
+
+    // Handle removing a bot from the room (host only)
+    socket.on('removeBot', (data) => {
+      if (!checkRateLimit(socket.id)) {
+        socket.emit('rateLimited');
+        return;
+      }
+
+      const { botUsername } = data || {};
+      const gameCode = getGameBySocketId(socket.id);
+
+      if (!gameCode) {
+        emitError(socket, ErrorMessages.NOT_IN_GAME);
+        return;
+      }
+
+      const game = getGame(gameCode);
+      if (!game) {
+        emitError(socket, ErrorMessages.GAME_NOT_FOUND);
+        return;
+      }
+
+      // Verify sender is host
+      if (game.hostSocketId !== socket.id) {
+        emitError(socket, 'Only the host can remove bots');
+        return;
+      }
+
+      // Check if game is already in progress
+      if (game.gameState === 'in-progress') {
+        emitError(socket, 'Cannot remove bots during a game');
+        return;
+      }
+
+      // Find and remove the bot
+      const bot = botManager.getBotByUsername(gameCode, botUsername);
+      if (!bot) {
+        emitError(socket, 'Bot not found');
+        return;
+      }
+
+      // Remove bot from bot manager
+      botManager.removeBot(gameCode, botUsername);
+
+      // Remove bot from game users
+      removeUserFromGame(gameCode, botUsername);
+
+      logger.info('BOT', `Bot "${botUsername}" removed from game ${gameCode}`);
+
+      // Broadcast updated users list
+      broadcastToRoom(io, getGameRoom(gameCode), 'updateUsers', {
+        users: getGameUsers(gameCode)
+      });
+
+      // Confirm removal to host
+      socket.emit('botRemoved', {
+        success: true,
+        botUsername
+      });
+
+      // Update active rooms
+      io.emit('activeRooms', { rooms: getActiveRooms() });
+    });
+
+    // Handle getting bot list for a game
+    socket.on('getBots', () => {
+      const gameCode = getGameBySocketId(socket.id);
+      if (!gameCode) {
+        socket.emit('botList', { bots: [] });
+        return;
+      }
+
+      const bots = botManager.getGameBots(gameCode);
+      socket.emit('botList', {
+        bots: bots.map(bot => ({
+          id: bot.id,
+          username: bot.username,
+          difficulty: bot.difficulty,
+          avatar: bot.avatar,
+          isActive: bot.isActive
+        }))
+      });
+    });
+
+    // ============================================
+    // END BOT MANAGEMENT HANDLERS
+    // ============================================
+
     // Handle validate words (host validation)
     socket.on('validateWords', async (data) => {
       if (!checkRateLimit(socket.id)) {
@@ -2045,6 +2217,9 @@ function startGameTimer(io, gameCode, timerSeconds) {
 
   timerManager.setGameTimer(gameCode, timerId);
 
+  // Start bots if any are in the game
+  startBotsForGame(io, gameCode, game.letterGrid, game.language, timerSeconds);
+
   // Broadcast that game has officially started (timer running)
   broadcastToRoom(io, getGameRoom(gameCode), 'startGame', {
     timerSeconds: remainingTime
@@ -2060,6 +2235,9 @@ async function endGame(io, gameCode) {
 
   // Stop timer
   timerManager.clearGameTimer(gameCode);
+
+  // Stop all bots
+  botManager.stopAllBots(gameCode);
 
   // Clean up AI validation tracking for this game (hybrid cost-saving)
   cleanupGameTracking(gameCode);
@@ -2576,6 +2754,72 @@ async function recordGameResultsToSupabase(io, gameCode, scoresArray, game) {
       ? { name: error.name, message: error.message, stack: error.stack }
       : (error?.message || error?.code || error?.error || String(error) || 'Unknown error');
     logger.error('SUPABASE', `Error recording game results for ${gameCode}`, errorDetails);
+  }
+}
+
+/**
+ * Start all bots for a game
+ * @param {object} io - Socket.IO server instance
+ * @param {string} gameCode - Game code
+ * @param {string[][]} letterGrid - Letter grid
+ * @param {string} language - Game language
+ * @param {number} timerSeconds - Game duration in seconds
+ */
+function startBotsForGame(io, gameCode, letterGrid, language, timerSeconds) {
+  const bots = botManager.getGameBots(gameCode);
+  if (bots.length === 0) return;
+
+  const game = getGame(gameCode);
+  if (!game) return;
+
+  logger.info('BOT', `Starting ${bots.length} bots for game ${gameCode}`);
+
+  // Create callback for when bot submits a word
+  const onBotWordSubmit = (submission) => {
+    const { username, word, score, comboLevel } = submission;
+
+    // Validate the bot is still in the game
+    const currentGame = getGame(gameCode);
+    if (!currentGame || currentGame.gameState !== 'in-progress') {
+      return;
+    }
+
+    // Check if word was already submitted by this bot
+    if (playerHasWord(gameCode, username, word)) {
+      return;
+    }
+
+    // Add word to player's list with score and combo data
+    addPlayerWord(gameCode, username, word, {
+      autoValidated: true,
+      score: score,
+      comboBonus: score - (word.length - 1),
+      comboLevel: comboLevel
+    });
+
+    // Update score
+    updatePlayerScore(gameCode, username, score, true);
+
+    // Broadcast word submission to all players
+    broadcastToRoom(io, getGameRoom(gameCode), 'wordSubmitted', {
+      username: username,
+      word: word,
+      score: score,
+      comboLevel: comboLevel,
+      isBot: true
+    });
+
+    // Update leaderboard (throttled)
+    getLeaderboardThrottled(gameCode, (leaderboard) => {
+      broadcastToRoom(io, getGameRoom(gameCode), 'leaderboardUpdate', { leaderboard });
+    });
+
+    logger.debug('BOT', `Bot "${username}" submitted "${word}" (score: ${score}) in game ${gameCode}`);
+  };
+
+  // Start each bot
+  for (const bot of bots) {
+    botManager.startBot(bot, letterGrid, language, onBotWordSubmit, timerSeconds);
   }
 }
 
