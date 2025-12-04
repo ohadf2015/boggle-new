@@ -387,17 +387,19 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
         t={t}
       />
 
-      {/* Top Bar with Exit Button */}
-      <div className="w-full max-w-6xl flex justify-end mb-4">
-        <Button
-          onClick={handleExitRoom}
-          size="sm"
-          className="shadow-lg hover:scale-105 transition-transform bg-red-500 hover:bg-red-600 border border-red-400/30 hover:shadow-[0_0_15px_rgba(239,68,68,0.5)]"
-        >
-          <FaSignOutAlt className="mr-2" />
-          {t('hostView.exitRoom')}
-        </Button>
-      </div>
+      {/* Top Bar with Exit Button - Hidden when waiting for results (WaitingResultsView has its own) */}
+      {!waitingForResults && (
+        <div className="w-full max-w-6xl flex justify-end mb-4">
+          <Button
+            onClick={handleExitRoom}
+            size="sm"
+            className="shadow-lg hover:scale-105 transition-transform bg-red-500 hover:bg-red-600 border border-red-400/30 hover:shadow-[0_0_15px_rgba(239,68,68,0.5)]"
+          >
+            <FaSignOutAlt className="mr-2" />
+            {t('hostView.exitRoom')}
+          </Button>
+        </div>
+      )}
 
       {/* Waiting for Results View */}
       {waitingForResults && (

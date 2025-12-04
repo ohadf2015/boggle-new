@@ -109,24 +109,28 @@ const AutoRejoinTimer: React.FC<AutoRejoinTimerProps> = ({
         animate={{ y: 0, opacity: 1, scale: 1 }}
         exit={{ y: 100, opacity: 0, scale: 0.9 }}
         transition={{ type: 'spring', stiffness: 300, damping: 25 }}
-        className="fixed left-1/2 -translate-x-1/2 z-50 mx-4 max-w-[calc(100%-2rem)] w-auto"
+        className="fixed inset-x-0 bottom-0 z-[100] flex justify-center pointer-events-none"
         style={{
-          bottom: 'max(2.5rem, calc(2rem + env(safe-area-inset-bottom, 0px)))'
+          paddingBottom: 'max(1rem, env(safe-area-inset-bottom, 0px))'
         }}
       >
-        <div className="bg-neo-cyan border-4 border-neo-black rounded-neo-lg shadow-hard-xl p-4 flex flex-col items-center gap-3">
-          {/* Row 1: Text label */}
+        <div className="bg-neo-cyan border-4 border-neo-black rounded-neo-lg shadow-hard-xl p-3 sm:p-4 flex flex-col items-center gap-2 sm:gap-3 mx-4 pointer-events-auto">
+          {/* Row 1: Text label with countdown */}
           <div className="flex items-center gap-2">
-            <FaClock className="text-neo-black" />
+            <FaClock className="text-neo-black text-sm sm:text-base" />
             <span className="font-bold text-neo-black text-sm sm:text-base whitespace-nowrap">
               {t('results.autoRejoinIn') || 'Auto-rejoin in'}
+            </span>
+            {/* Countdown number - visible inline on mobile */}
+            <span className="text-lg sm:text-xl font-black text-neo-black bg-neo-cream border-2 border-neo-black rounded-neo px-2 py-0.5 sm:hidden">
+              {countdown}s
             </span>
           </div>
 
           {/* Row 2: Timer and buttons */}
-          <div className="flex items-center gap-4">
-            {/* Circular countdown timer */}
-            <div className="relative w-14 h-14 flex-shrink-0">
+          <div className="flex items-center gap-3 sm:gap-4">
+            {/* Circular countdown timer - hidden on small screens, shown on larger */}
+            <div className="relative w-12 h-12 sm:w-14 sm:h-14 flex-shrink-0 hidden sm:block">
               <svg className="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
                 {/* Background circle */}
                 <circle
@@ -154,7 +158,7 @@ const AutoRejoinTimer: React.FC<AutoRejoinTimerProps> = ({
               </svg>
               {/* Countdown number */}
               <div className="absolute inset-0 flex items-center justify-center">
-                <span className="text-xl font-black text-neo-black">{countdown}</span>
+                <span className="text-lg sm:text-xl font-black text-neo-black">{countdown}</span>
               </div>
             </div>
 
@@ -165,7 +169,7 @@ const AutoRejoinTimer: React.FC<AutoRejoinTimerProps> = ({
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={handleRejoinNow}
-                className="flex items-center gap-1 px-3 py-1.5 bg-neo-yellow border-3 border-neo-black rounded-neo shadow-hard-sm font-bold text-neo-black text-sm uppercase hover:shadow-hard transition-all"
+                className="flex items-center gap-1 px-2.5 sm:px-3 py-1 sm:py-1.5 bg-neo-yellow border-3 border-neo-black rounded-neo shadow-hard-sm font-bold text-neo-black text-xs sm:text-sm uppercase hover:shadow-hard transition-all"
               >
                 <FaPlay className="text-xs" />
                 <span>{t('results.rejoinNow') || 'Rejoin Now'}</span>
@@ -176,7 +180,7 @@ const AutoRejoinTimer: React.FC<AutoRejoinTimerProps> = ({
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={handleDismiss}
-                className="flex items-center gap-1 px-3 py-1.5 bg-neo-cream border-3 border-neo-black rounded-neo shadow-hard-sm font-bold text-neo-black text-sm uppercase hover:shadow-hard transition-all"
+                className="flex items-center gap-1 px-2.5 sm:px-3 py-1 sm:py-1.5 bg-neo-cream border-3 border-neo-black rounded-neo shadow-hard-sm font-bold text-neo-black text-xs sm:text-sm uppercase hover:shadow-hard transition-all"
               >
                 <FaTimes className="text-xs" />
                 <span>{t('common.dismiss') || 'Dismiss'}</span>
