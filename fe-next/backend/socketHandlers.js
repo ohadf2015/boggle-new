@@ -2210,18 +2210,34 @@ function startGameTimer(io, gameCode, timerSeconds) {
   // Clear any existing timer
   timerManager.clearGameTimer(gameCode);
 
+  // OPTIMIZATION: Track last broadcast time to reduce socket messages
+  // Only broadcast at key intervals instead of every second
+  // Clients use local countdown between broadcasts
+  let lastBroadcastTime = remainingTime;
+
   // Create interval for time updates
   const timerId = setInterval(() => {
     remainingTime -= intervalMs / 1000;
 
-    // Update remaining time in game state for late joiners
+    // Update remaining time in game state for late joiners (internal only, cheap)
     updateGame(gameCode, { remainingTime });
 
-    // Broadcast time update with game state for late joiners
-    const currentGame = getGame(gameCode);
-    broadcastToRoom(io, getGameRoom(gameCode), 'timeUpdate', {
-      remainingTime
-    });
+    // OPTIMIZATION: Smart broadcasting to reduce network overhead
+    // - Every 10 seconds during normal play
+    // - Every second in the last 10 seconds (countdown urgency)
+    // - At key time milestones (60s, 30s, 10s remaining)
+    const shouldBroadcast =
+      remainingTime <= 10 || // Last 10 seconds: every second
+      remainingTime <= 0 || // Game end
+      (lastBroadcastTime - remainingTime >= 10) || // Every 10 seconds
+      remainingTime === 60 || remainingTime === 30; // Key milestones
+
+    if (shouldBroadcast) {
+      broadcastToRoom(io, getGameRoom(gameCode), 'timeUpdate', {
+        remainingTime
+      });
+      lastBroadcastTime = remainingTime;
+    }
 
     if (remainingTime <= 0) {
       timerManager.clearGameTimer(gameCode);
@@ -2408,39 +2424,46 @@ async function calculateAndBroadcastFinalScores(io, gameCode) {
   }
 
   logger.info('FINAL_SCORES', `Calculating final scores for game ${gameCode}`);
+  const language = game.language || 'en';
 
-  // Build word count map to detect duplicates across all players
-  const wordCountMap = {};
-  Object.values(game.playerWords || {}).forEach(words => {
-    words.forEach(word => {
-      wordCountMap[word] = (wordCountMap[word] || 0) + 1;
-    });
-  });
-
-  // Collect all unique words that need validation
-  const allUniqueWords = new Set();
-  Object.values(game.playerWords || {}).forEach(words => {
-    words.forEach(word => allUniqueWords.add(word));
-  });
-
-  // Separate validated words (dictionary OR community-validated) from non-validated words
+  // OPTIMIZATION: Single pass through all player words to build all needed data structures
+  // Previously: 3 separate iterations (count, collect unique, categorize)
+  // Now: 1 iteration that builds everything at once
+  const wordCountMap = {};           // word -> count (for duplicate detection)
+  const wordToSubmitters = new Map(); // word -> [usernames] (for AI tracking)
   const dictionaryValidatedWords = new Set();
   const communityValidatedWords = new Set();
   const nonDictionaryWords = [];
-  const language = game.language || 'en';
+  const seenWords = new Set();       // Track unique words we've already categorized
 
-  for (const word of allUniqueWords) {
-    if (isDictionaryWord(word, language)) {
-      dictionaryValidatedWords.add(word);
-    } else if (isWordCommunityValid(word, language) || isWordValidForScoring(word, language)) {
-      // Community-validated words (net_score >= 6 or positive score) are auto-valid
-      communityValidatedWords.add(word);
-    } else {
-      nonDictionaryWords.push(word);
+  for (const [username, words] of Object.entries(game.playerWords || {})) {
+    for (const word of words) {
+      // Count for duplicate detection
+      wordCountMap[word] = (wordCountMap[word] || 0) + 1;
+
+      // Track submitters for AI-approved word tracking (O(1) lookup later)
+      if (!wordToSubmitters.has(word)) {
+        wordToSubmitters.set(word, []);
+      }
+      wordToSubmitters.get(word).push(username);
+
+      // Categorize word (only once per unique word)
+      if (!seenWords.has(word)) {
+        seenWords.add(word);
+
+        if (isDictionaryWord(word, language)) {
+          dictionaryValidatedWords.add(word);
+        } else if (isWordCommunityValid(word, language) || isWordValidForScoring(word, language)) {
+          // Community-validated words (net_score >= 6 or positive score) are auto-valid
+          communityValidatedWords.add(word);
+        } else {
+          nonDictionaryWords.push(word);
+        }
+      }
     }
   }
 
-  logger.info('AI_VALIDATION', `Game ${gameCode}: ${allUniqueWords.size} unique words, ${dictionaryValidatedWords.size} in dictionary, ${communityValidatedWords.size} community-validated, ${nonDictionaryWords.length} need AI validation`);
+  logger.info('AI_VALIDATION', `Game ${gameCode}: ${seenWords.size} unique words, ${dictionaryValidatedWords.size} in dictionary, ${communityValidatedWords.size} community-validated, ${nonDictionaryWords.length} need AI validation`);
 
   // AI validation for non-dictionary words
   const aiValidatedWords = new Map(); // word -> { isValid, isAiVerified }
@@ -2483,14 +2506,15 @@ async function calculateAndBroadcastFinalScores(io, gameCode) {
               if (result.isAiVerified) aiVerifiedCount++;
 
               // Track AI-approved word for peer validation
-              // Find which player submitted this word
-              for (const [username, words] of Object.entries(game.playerWords || {})) {
-                if (words.includes(word)) {
-                  const wordDetail = game.playerWordDetails?.[username]?.find(wd => wd.word === word);
-                  const wordScore = wordDetail?.score || calculateWordScore(word, wordDetail?.comboLevel || 0);
-                  trackAiApprovedWord(gameCode, word, username, wordScore, result.confidence || 85);
-                  break;
-                }
+              // OPTIMIZATION: Use pre-built wordToSubmitters map instead of nested loop
+              // Previously: O(words * players) nested loop with includes()
+              // Now: O(1) lookup
+              const submitters = wordToSubmitters.get(word);
+              if (submitters && submitters.length > 0) {
+                const username = submitters[0]; // First submitter
+                const wordDetail = game.playerWordDetails?.[username]?.find(wd => wd.word === word);
+                const wordScore = wordDetail?.score || calculateWordScore(word, wordDetail?.comboLevel || 0);
+                trackAiApprovedWord(gameCode, word, username, wordScore, result.confidence || 85);
               }
             }
           }
@@ -2513,9 +2537,26 @@ async function calculateAndBroadcastFinalScores(io, gameCode) {
   const validatedScores = {};
   const playerWordObjects = {};
 
+  // OPTIMIZATION: Convert nonDictionaryWords array to Set for O(1) lookup
+  // Previously: O(n) array.includes() for each word
+  // Now: O(1) Set.has()
+  const nonDictionaryWordsSet = new Set(nonDictionaryWords);
+
+  // OPTIMIZATION: Pre-build wordDetail maps for O(1) lookups
+  // Previously: O(n) array.find() for each word
+  // Now: O(1) Map.get()
+  const playerWordDetailMaps = {};
+  for (const [username, details] of Object.entries(game.playerWordDetails || {})) {
+    const detailMap = new Map();
+    for (const detail of details) {
+      detailMap.set(detail.word, detail);
+    }
+    playerWordDetailMaps[username] = detailMap;
+  }
+
   Object.keys(game.users).forEach(username => {
     const playerWords = game.playerWords?.[username] || [];
-    const playerWordDetailsList = game.playerWordDetails?.[username] || [];
+    const wordDetailMap = playerWordDetailMaps[username] || new Map();
     let score = 0;
     const wordObjects = [];
 
@@ -2537,10 +2578,10 @@ async function calculateAndBroadcastFinalScores(io, gameCode) {
       // - Is in the list of non-dictionary words that would be sent to community
       // Note: If AI checked the word and said invalid, it's just invalid - no question mark
       const aiDidNotCheck = !aiResult; // AI didn't check if aiResult is undefined
-      const isPendingValidation = !inDictionary && !inCommunityValidated && aiDidNotCheck && nonDictionaryWords.includes(word);
+      const isPendingValidation = !inDictionary && !inCommunityValidated && aiDidNotCheck && nonDictionaryWordsSet.has(word);
 
-      // Look up score and combo bonus from word details
-      const wordDetail = playerWordDetailsList.find(wd => wd.word === word);
+      // OPTIMIZATION: O(1) Map lookup instead of O(n) array.find()
+      const wordDetail = wordDetailMap.get(word);
       const comboBonus = wordDetail?.comboBonus || 0;
       const storedComboLevel = wordDetail?.comboLevel || 0;
 
@@ -2594,6 +2635,11 @@ async function calculateAndBroadcastFinalScores(io, gameCode) {
   const usernames = Object.keys(game.users);
   awardFinalAchievements(game, usernames);
 
+  // OPTIMIZATION: Get localized achievements ONCE outside the loop
+  // Previously: Called getLocalizedAchievements() for each player
+  // Now: Single call, reused for all players
+  const localizedAchievements = getLocalizedAchievements(language);
+
   // Convert scores to array format for frontend
   const scoresArray = Object.entries(validatedScores).map(([username, score]) => {
     const allWords = playerWordObjects[username] || [];
@@ -2602,9 +2648,8 @@ async function calculateAndBroadcastFinalScores(io, gameCode) {
       ? validWords.reduce((longest, w) => w.word.length > longest.length ? w.word : longest, '')
       : '';
 
-    // Get localized achievements for this player
+    // Get localized achievements for this player (using pre-fetched localizedAchievements)
     const playerAchievementKeys = game.playerAchievements?.[username] || [];
-    const localizedAchievements = getLocalizedAchievements(game.language || 'he');
     const playerAchievements = playerAchievementKeys.map(key => localizedAchievements[key]).filter(Boolean);
 
     return {

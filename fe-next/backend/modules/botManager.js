@@ -12,6 +12,7 @@ const logger = require('../utils/logger');
 // Cache for player words per language (refreshed periodically)
 const playerWordsCache = new Map();
 const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
+const MAX_PLAYER_WORDS_CACHE_SIZE = 10; // Limit languages cached to prevent memory bloat
 
 // Bot configuration constants
 const BOT_CONFIG = {
@@ -156,7 +157,7 @@ function createBot(gameCode, difficulty = 'medium', existingUsers = {}) {
     comboLevel: 0,
     // Timing state
     nextWordTime: null,
-    timers: [],            // Active setTimeout IDs for cleanup
+    activeTimers: new Set(), // FIXED: Use Set instead of array for O(1) add/delete
     isActive: false,
     // Statistics (for human-like variation)
     avgThinkingTime: BOT_CONFIG.TIMING[difficulty].minDelay +
@@ -165,6 +166,40 @@ function createBot(gameCode, difficulty = 'medium', existingUsers = {}) {
   };
 
   return bot;
+}
+
+/**
+ * Create a self-cleaning timeout for a bot
+ * The timer removes itself from the Set when it fires or is cleared
+ * @param {object} bot - Bot object
+ * @param {function} callback - Function to execute
+ * @param {number} delay - Delay in ms
+ * @returns {number} - Timer ID
+ */
+function setBotTimeout(bot, callback, delay) {
+  const timerId = setTimeout(() => {
+    // Remove self from active timers when fired
+    bot.activeTimers.delete(timerId);
+    // Only execute if bot is still active
+    if (bot.isActive) {
+      callback();
+    }
+  }, delay);
+
+  bot.activeTimers.add(timerId);
+  return timerId;
+}
+
+/**
+ * Clear a specific bot timer
+ * @param {object} bot - Bot object
+ * @param {number} timerId - Timer ID to clear
+ */
+function clearBotTimeout(bot, timerId) {
+  if (bot.activeTimers.has(timerId)) {
+    clearTimeout(timerId);
+    bot.activeTimers.delete(timerId);
+  }
 }
 
 /**
@@ -322,6 +357,40 @@ function generateWrongWords(grid, count) {
 }
 
 /**
+ * Clean up expired entries from playerWordsCache
+ * Called periodically to prevent memory bloat
+ */
+function cleanupPlayerWordsCache() {
+  const now = Date.now();
+  let deleted = 0;
+
+  for (const [language, entry] of playerWordsCache.entries()) {
+    if (now - entry.timestamp > CACHE_TTL * 2) { // Keep for 2x TTL before deleting
+      playerWordsCache.delete(language);
+      deleted++;
+    }
+  }
+
+  // If still too many entries, remove oldest
+  if (playerWordsCache.size > MAX_PLAYER_WORDS_CACHE_SIZE) {
+    const entries = Array.from(playerWordsCache.entries())
+      .sort((a, b) => a[1].timestamp - b[1].timestamp);
+
+    const toRemove = entries.slice(0, playerWordsCache.size - MAX_PLAYER_WORDS_CACHE_SIZE);
+    for (const [language] of toRemove) {
+      playerWordsCache.delete(language);
+      deleted++;
+    }
+  }
+
+  if (deleted > 0) {
+    logger.debug('BOT', `Cleaned up ${deleted} expired player words cache entries`);
+  }
+
+  return deleted;
+}
+
+/**
  * Get cached player words for a language, refreshing if needed
  * @param {string} language - Language code
  * @returns {Promise<string[]>} - Array of popular player words
@@ -332,6 +401,11 @@ async function getCachedPlayerWords(language) {
 
   if (cacheEntry && (now - cacheEntry.timestamp) < CACHE_TTL) {
     return cacheEntry.words;
+  }
+
+  // Periodically cleanup (10% chance per call)
+  if (Math.random() < 0.1) {
+    cleanupPlayerWordsCache();
   }
 
   // Fetch fresh data
@@ -521,11 +595,10 @@ async function startBot(bot, grid, language, onWordSubmit, gameDuration) {
   // Schedule first word after initial delay
   const firstWordDelay = timing.startDelay + Math.random() * 2000;
 
-  const timer = setTimeout(() => {
+  // Use self-cleaning timeout to prevent memory leak
+  setBotTimeout(bot, () => {
     scheduleNextWord(bot, onWordSubmit, gameDuration * 1000 - firstWordDelay);
   }, firstWordDelay);
-
-  bot.timers.push(timer);
 
   logger.info('BOT', `Bot "${bot.username}" started playing (${bot.wordsToFind.length} words queued)`);
 }
@@ -547,22 +620,18 @@ function scheduleNextWord(bot, onWordSubmit, remainingTime) {
   if (delay > remainingTime - 1000) {
     // Try to submit one last quick word if possible
     if (remainingTime > 2000 && bot.currentWordIndex < bot.wordsToFind.length) {
-      const timer = setTimeout(() => {
+      setBotTimeout(bot, () => {
         submitBotWord(bot, onWordSubmit);
       }, Math.min(remainingTime - 1500, 1000));
-      bot.timers.push(timer);
     }
     return;
   }
 
-  const timer = setTimeout(() => {
-    if (!bot.isActive) return;
-
+  setBotTimeout(bot, () => {
     submitBotWord(bot, onWordSubmit);
     scheduleNextWord(bot, onWordSubmit, remainingTime - delay);
   }, delay);
 
-  bot.timers.push(timer);
   bot.nextWordTime = Date.now() + delay;
 }
 
@@ -612,11 +681,13 @@ function submitBotWord(bot, onWordSubmit) {
 function stopBot(bot) {
   bot.isActive = false;
 
-  // Clear all scheduled timers
-  for (const timer of bot.timers) {
-    clearTimeout(timer);
+  // Clear all scheduled timers (activeTimers is a Set for O(1) operations)
+  for (const timerId of bot.activeTimers) {
+    clearTimeout(timerId);
   }
-  bot.timers = [];
+  bot.activeTimers.clear();
+
+  logger.debug('BOT', `Stopped bot "${bot.username}"`);
 }
 
 /**
@@ -677,6 +748,43 @@ function getBotStats(gameCode, username) {
   };
 }
 
+/**
+ * Get bot manager statistics for monitoring
+ * @returns {object} - Cache and active bot statistics
+ */
+function getBotManagerStats() {
+  let totalActiveBots = 0;
+  let totalActiveTimers = 0;
+  let gameCount = gameBots.size;
+
+  for (const [gameCode, bots] of gameBots.entries()) {
+    for (const bot of bots.values()) {
+      if (bot.isActive) {
+        totalActiveBots++;
+        totalActiveTimers += bot.activeTimers.size;
+      }
+    }
+  }
+
+  return {
+    activeGames: gameCount,
+    activeBots: totalActiveBots,
+    activeTimers: totalActiveTimers,
+    playerWordsCacheSize: playerWordsCache.size,
+    playerWordsCacheLanguages: Array.from(playerWordsCache.keys())
+  };
+}
+
+/**
+ * Clear all bot manager caches (useful for testing or memory cleanup)
+ */
+function clearBotManagerCaches() {
+  const playerWordsCount = playerWordsCache.size;
+  playerWordsCache.clear();
+
+  logger.info('BOT', `Cleared bot manager caches: ${playerWordsCount} player words cache entries`);
+}
+
 module.exports = {
   // Bot management
   addBot,
@@ -696,6 +804,11 @@ module.exports = {
   // Bot state
   resetBotCombo,
   getBotStats,
+
+  // Cache management and monitoring
+  getBotManagerStats,
+  clearBotManagerCaches,
+  cleanupPlayerWordsCache,
 
   // Configuration
   BOT_CONFIG,

@@ -1,10 +1,16 @@
 /**
  * Boggle Solver
  * Finds all valid words on a Boggle grid using DFS traversal and dictionary lookup
+ *
+ * Performance optimizations:
+ * - Trie-based prefix pruning for exponentially faster search
+ * - Per-language trie caching to avoid rebuilding
+ * - Grid-based result caching to avoid re-solving same boards
  */
 
-const { isDictionaryWord, normalizeWord } = require('../dictionary');
+const { isDictionaryWord, normalizeWord, dictionary } = require('../dictionary');
 const { normalizeHebrewLetter } = require('./wordValidator');
+const logger = require('../utils/logger');
 
 // Direction vectors for 8-way adjacent movement
 const DIRECTIONS = [
@@ -12,6 +18,108 @@ const DIRECTIONS = [
   [0, -1],           [0, 1],   // left, right
   [1, -1],  [1, 0],  [1, 1]    // down-left, down, down-right
 ];
+
+// ============================================================================
+// TRIE CACHING FOR CPU OPTIMIZATION
+// Building a trie from ~275k words is expensive (~100ms), so we cache per language
+// ============================================================================
+const trieCache = new Map(); // language -> { trie, timestamp }
+const TRIE_CACHE_TTL = 30 * 60 * 1000; // 30 minutes - dictionaries rarely change
+
+/**
+ * Get or build a cached trie for a language
+ * @param {string} language - Language code
+ * @returns {object|null} - Trie root or null if dictionary not available
+ */
+function getCachedTrie(language) {
+  const cached = trieCache.get(language);
+  const now = Date.now();
+
+  if (cached && (now - cached.timestamp) < TRIE_CACHE_TTL) {
+    return cached.trie;
+  }
+
+  // Get the dictionary set for this language
+  let wordSet;
+  switch (language) {
+    case 'en':
+      wordSet = dictionary.englishWords;
+      break;
+    case 'he':
+      wordSet = dictionary.hebrewWords;
+      break;
+    case 'sv':
+      wordSet = dictionary.swedishWords;
+      break;
+    case 'ja':
+      wordSet = dictionary.japaneseWords;
+      break;
+    default:
+      wordSet = dictionary.englishWords;
+  }
+
+  if (!wordSet || wordSet.size === 0) {
+    logger.warn('SOLVER', `No dictionary available for language: ${language}`);
+    return null;
+  }
+
+  // Build trie
+  const startTime = Date.now();
+  const trie = buildTrie(wordSet);
+  const buildTime = Date.now() - startTime;
+
+  logger.debug('SOLVER', `Built trie for ${language} with ${wordSet.size} words in ${buildTime}ms`);
+
+  trieCache.set(language, { trie, timestamp: now });
+  return trie;
+}
+
+// ============================================================================
+// GRID RESULT CACHING
+// Same grid + language = same words, so cache the results
+// ============================================================================
+const gridCache = new Map(); // gridKey -> { words, timestamp }
+const GRID_CACHE_TTL = 10 * 60 * 1000; // 10 minutes
+const MAX_GRID_CACHE_SIZE = 50; // Limit cache entries to prevent memory bloat
+
+/**
+ * Generate a cache key from a grid
+ */
+function getGridCacheKey(grid, language) {
+  const gridStr = grid.map(row => row.join('')).join('|');
+  return `${language}:${gridStr}`;
+}
+
+/**
+ * Clean up expired grid cache entries
+ */
+function cleanupGridCache() {
+  const now = Date.now();
+  let deleted = 0;
+
+  for (const [key, entry] of gridCache.entries()) {
+    if (now - entry.timestamp > GRID_CACHE_TTL) {
+      gridCache.delete(key);
+      deleted++;
+    }
+  }
+
+  // If still too many, remove oldest entries
+  if (gridCache.size > MAX_GRID_CACHE_SIZE) {
+    const entries = Array.from(gridCache.entries())
+      .sort((a, b) => a[1].timestamp - b[1].timestamp);
+
+    const toRemove = entries.slice(0, gridCache.size - MAX_GRID_CACHE_SIZE);
+    for (const [key] of toRemove) {
+      gridCache.delete(key);
+      deleted++;
+    }
+  }
+
+  if (deleted > 0) {
+    logger.debug('SOLVER', `Cleaned up ${deleted} expired grid cache entries`);
+  }
+}
 
 /**
  * Build a trie from a Set of words for efficient prefix lookup
@@ -167,21 +275,66 @@ function findAllWords(grid, language, options = {}) {
 /**
  * Find words with scoring potential for bots
  * Returns words categorized by difficulty
+ *
+ * OPTIMIZED: Uses cached trie for O(prefix) pruning instead of O(8^n) exhaustive search
+ * OPTIMIZED: Caches results per grid to avoid re-solving identical boards
+ *
  * @param {string[][]} grid - 2D grid of letters
  * @param {string} language - Language code
  * @param {object} options - Options for word finding
  * @returns {object} - { easy: [], medium: [], hard: [] }
  */
 function findWordsForBots(grid, language, options = {}) {
-  const allWords = findAllWords(grid, language, {
-    minLength: options.minLength || 3,
-    maxLength: options.maxLength || 10,
-    maxWords: 300
-  });
+  const minLength = options.minLength || 3;
+  const maxLength = options.maxLength || 10;
 
-  // Filter to only solid words (no excessive duplicate letters)
-  // Allow max 2 of same letter for short words, 3 for longer words
-  const solidWords = allWords.filter(word => {
+  // Check grid cache first - same grid = same words
+  const cacheKey = getGridCacheKey(grid, language);
+  const cached = gridCache.get(cacheKey);
+  const now = Date.now();
+
+  if (cached && (now - cached.timestamp) < GRID_CACHE_TTL) {
+    logger.debug('SOLVER', `Cache hit for grid (${language}), reusing ${cached.allWords.length} words`);
+    // Filter cached words by current options and return categorized
+    return categorizeWords(cached.allWords, minLength, maxLength);
+  }
+
+  // Get cached trie for this language - CRITICAL for CPU optimization
+  const trie = getCachedTrie(language);
+
+  const startTime = Date.now();
+  const allWords = findAllWords(grid, language, {
+    minLength: 3, // Always find from 3 to cache broadly
+    maxLength: 12, // Find longer words for caching
+    maxWords: 400,
+    trie // Pass trie for exponential speedup via prefix pruning
+  });
+  const solveTime = Date.now() - startTime;
+
+  logger.debug('SOLVER', `Found ${allWords.length} words for ${language} grid in ${solveTime}ms`);
+
+  // Cache the raw results
+  gridCache.set(cacheKey, { allWords, timestamp: now });
+
+  // Periodically cleanup old cache entries
+  if (Math.random() < 0.1) { // 10% chance to cleanup on each call
+    cleanupGridCache();
+  }
+
+  return categorizeWords(allWords, minLength, maxLength);
+}
+
+/**
+ * Categorize words by difficulty and filter by length
+ * @param {string[]} allWords - All found words
+ * @param {number} minLength - Minimum word length
+ * @param {number} maxLength - Maximum word length
+ * @returns {object} - { easy: [], medium: [], hard: [] }
+ */
+function categorizeWords(allWords, minLength, maxLength) {
+  // Filter by length and solid words (no excessive duplicate letters)
+  const filteredWords = allWords.filter(word => {
+    if (word.length < minLength || word.length > maxLength) return false;
     const maxDupes = word.length >= 6 ? 3 : 2;
     return isSolidWord(word, maxDupes);
   });
@@ -193,7 +346,7 @@ function findWordsForBots(grid, language, options = {}) {
     hard: []     // 6+ letter words
   };
 
-  for (const word of solidWords) {
+  for (const word of filteredWords) {
     const len = word.length;
     if (len <= 4) {
       result.easy.push(word);
@@ -305,6 +458,35 @@ function getWordPath(word, grid, language) {
   return null;
 }
 
+/**
+ * Clear all solver caches (useful for testing or memory cleanup)
+ */
+function clearSolverCaches() {
+  const trieCount = trieCache.size;
+  const gridCount = gridCache.size;
+
+  trieCache.clear();
+  gridCache.clear();
+
+  logger.info('SOLVER', `Cleared solver caches: ${trieCount} tries, ${gridCount} grids`);
+}
+
+/**
+ * Get cache statistics for monitoring
+ */
+function getSolverCacheStats() {
+  return {
+    trieCache: {
+      size: trieCache.size,
+      languages: Array.from(trieCache.keys())
+    },
+    gridCache: {
+      size: gridCache.size,
+      maxSize: MAX_GRID_CACHE_SIZE
+    }
+  };
+}
+
 module.exports = {
   findAllWords,
   findWordsForBots,
@@ -312,5 +494,9 @@ module.exports = {
   buildTrie,
   getTrieNode,
   shuffleArray,
-  isSolidWord
+  isSolidWord,
+  // Cache management
+  clearSolverCaches,
+  getSolverCacheStats,
+  getCachedTrie
 };
