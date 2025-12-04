@@ -38,18 +38,21 @@ const BOT_CONFIG = {
       wordsPerMinute: 3,      // Average words found per minute
       focusOnShort: true,     // Prefer 3-4 letter words
       missChance: 0.15,       // 15% chance to "miss" a word (realistic errors)
+      wrongWordChance: 0.12,  // 12% chance to submit a wrong word (like humans do)
     },
     medium: {
       maxWordLength: 7,
       wordsPerMinute: 5,
       focusOnShort: false,
       missChance: 0.08,
+      wrongWordChance: 0.08,  // 8% wrong word chance
     },
     hard: {
       maxWordLength: 12,
       wordsPerMinute: 8,
       focusOnShort: false,
       missChance: 0.02,
+      wrongWordChance: 0.03,  // 3% wrong word chance (experts make fewer mistakes)
     }
   },
   // Bot appearance
@@ -256,6 +259,64 @@ function isBot(gameCode, username) {
 }
 
 /**
+ * Generate fake/wrong words from the grid that look real but aren't in dictionary
+ * This simulates human behavior of trying words that "look correct"
+ * @param {string[][]} grid - Letter grid
+ * @param {number} count - Number of wrong words to generate
+ * @returns {string[]} - Array of fake words
+ */
+function generateWrongWords(grid, count) {
+  if (!grid || !grid.length || !grid[0] || count <= 0) return [];
+
+  const rows = grid.length;
+  const cols = grid[0].length;
+  const wrongWords = [];
+  const directions = [
+    [-1, -1], [-1, 0], [-1, 1],
+    [0, -1],           [0, 1],
+    [1, -1],  [1, 0],  [1, 1]
+  ];
+
+  // Generate random paths on the grid to create fake words
+  for (let attempt = 0; attempt < count * 3 && wrongWords.length < count; attempt++) {
+    const wordLength = 3 + Math.floor(Math.random() * 4); // 3-6 letters
+    let word = '';
+    const visited = new Set();
+
+    // Start from random position
+    let row = Math.floor(Math.random() * rows);
+    let col = Math.floor(Math.random() * cols);
+
+    for (let i = 0; i < wordLength; i++) {
+      const key = `${row},${col}`;
+      if (visited.has(key) || row < 0 || row >= rows || col < 0 || col >= cols) break;
+
+      visited.add(key);
+      word += grid[row][col].toLowerCase();
+
+      // Move to random adjacent cell
+      const validMoves = directions.filter(([dr, dc]) => {
+        const nr = row + dr;
+        const nc = col + dc;
+        return nr >= 0 && nr < rows && nc >= 0 && nc < cols && !visited.has(`${nr},${nc}`);
+      });
+
+      if (validMoves.length === 0) break;
+      const [dr, dc] = validMoves[Math.floor(Math.random() * validMoves.length)];
+      row += dr;
+      col += dc;
+    }
+
+    // Only add if word is long enough and not already in list
+    if (word.length >= 3 && !wrongWords.includes(word)) {
+      wrongWords.push(word);
+    }
+  }
+
+  return wrongWords;
+}
+
+/**
  * Prepare bot for a game - find words and set up submission queue
  * @param {object} bot - Bot object
  * @param {string[][]} grid - Letter grid
@@ -297,6 +358,24 @@ function prepareBotWords(bot, grid, language) {
 
   // Apply miss chance (simulate human errors - sometimes don't find obvious words)
   wordPool = wordPool.filter(() => Math.random() > config.missChance);
+
+  // Generate and insert wrong words (like humans trying words that "look right")
+  const wrongWordChance = config.wrongWordChance || 0;
+  if (wrongWordChance > 0) {
+    const wrongWordCount = Math.ceil(wordPool.length * wrongWordChance);
+    const wrongWords = generateWrongWords(grid, wrongWordCount);
+
+    // Mark wrong words and insert them at random positions
+    for (const wrongWord of wrongWords) {
+      // Don't add if it's accidentally a real word in our pool
+      if (!wordPool.includes(wrongWord)) {
+        const insertPos = Math.floor(Math.random() * wordPool.length);
+        wordPool.splice(insertPos, 0, wrongWord);
+      }
+    }
+
+    logger.debug('BOT', `Bot "${bot.username}" will try ${wrongWords.length} wrong words`);
+  }
 
   // Shuffle to add variety (humans don't find words in order)
   for (let i = wordPool.length - 1; i > 0; i--) {
