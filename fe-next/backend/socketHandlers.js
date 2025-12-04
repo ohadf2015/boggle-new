@@ -49,7 +49,7 @@ const {
   removePeerRejectedWordScore
 } = require('./modules/gameStateManager');
 
-const { processGameResults, isSupabaseConfigured, saveHostApprovedWord } = require('./modules/supabaseServer');
+const { processGameResults, isSupabaseConfigured, saveHostApprovedWord, savePlayerWord } = require('./modules/supabaseServer');
 const { invalidateLeaderboardCaches } = require('./redisClient');
 
 const {
@@ -892,6 +892,20 @@ function initializeSocketHandlers(io) {
             comboBonus: comboBonus,
             comboLevel: safeComboLevel
           });
+
+          // Save valid word to database for bot learning (async, don't block)
+          // Only save dictionary words to ensure quality data
+          if (isInDictionary && isSupabaseConfigured()) {
+            const userData = game.users?.[username];
+            savePlayerWord({
+              word: normalizedWord,
+              language: game.language || 'en',
+              gameCode,
+              playerId: userData?.authUserId || null
+            }).catch(err => {
+              logger.debug('PLAYER_WORDS', `Failed to save player word: ${err.message}`);
+            });
+          }
 
           updatePlayerScore(gameCode, username, wordScore, true);
 
@@ -2817,9 +2831,10 @@ function startBotsForGame(io, gameCode, letterGrid, language, timerSeconds) {
     logger.debug('BOT', `Bot "${username}" submitted "${word}" (score: ${score}) in game ${gameCode}`);
   };
 
-  // Start each bot
+  // Start each bot (async but don't block - bots will start playing as soon as they're ready)
   for (const bot of bots) {
-    botManager.startBot(bot, letterGrid, language, onBotWordSubmit, timerSeconds);
+    botManager.startBot(bot, letterGrid, language, onBotWordSubmit, timerSeconds)
+      .catch(err => logger.error('BOT', `Failed to start bot "${bot.username}": ${err.message}`));
   }
 }
 

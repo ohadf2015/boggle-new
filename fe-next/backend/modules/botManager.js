@@ -6,7 +6,12 @@
 
 const { findWordsForBots } = require('./boggleSolver');
 const { calculateWordScore } = require('./scoringEngine');
+const { getPopularPlayerWords } = require('./supabaseServer');
 const logger = require('../utils/logger');
+
+// Cache for player words per language (refreshed periodically)
+const playerWordsCache = new Map();
+const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
 
 // Bot configuration constants
 const BOT_CONFIG = {
@@ -317,12 +322,37 @@ function generateWrongWords(grid, count) {
 }
 
 /**
+ * Get cached player words for a language, refreshing if needed
+ * @param {string} language - Language code
+ * @returns {Promise<string[]>} - Array of popular player words
+ */
+async function getCachedPlayerWords(language) {
+  const cacheEntry = playerWordsCache.get(language);
+  const now = Date.now();
+
+  if (cacheEntry && (now - cacheEntry.timestamp) < CACHE_TTL) {
+    return cacheEntry.words;
+  }
+
+  // Fetch fresh data
+  try {
+    const { data: words } = await getPopularPlayerWords(language, 500);
+    playerWordsCache.set(language, { words, timestamp: now });
+    logger.debug('BOT', `Refreshed player words cache for ${language}: ${words.length} words`);
+    return words;
+  } catch (err) {
+    logger.debug('BOT', `Failed to fetch player words: ${err.message}`);
+    return cacheEntry?.words || [];
+  }
+}
+
+/**
  * Prepare bot for a game - find words and set up submission queue
  * @param {object} bot - Bot object
  * @param {string[][]} grid - Letter grid
  * @param {string} language - Game language
  */
-function prepareBotWords(bot, grid, language) {
+async function prepareBotWords(bot, grid, language) {
   const config = BOT_CONFIG.WORDS[bot.difficulty] || BOT_CONFIG.WORDS.medium;
 
   // Find words using the solver
@@ -359,6 +389,53 @@ function prepareBotWords(bot, grid, language) {
   // Apply miss chance (simulate human errors - sometimes don't find obvious words)
   wordPool = wordPool.filter(() => Math.random() > config.missChance);
 
+  // Prioritize player-submitted words (words that real players have found before)
+  // This makes bots feel more human-like by selecting words humans actually use
+  try {
+    const playerWords = await getCachedPlayerWords(language);
+    if (playerWords.length > 0) {
+      const wordPoolSet = new Set(wordPool);
+      const prioritizedWords = [];
+      const otherWords = [];
+
+      for (const word of wordPool) {
+        if (playerWords.includes(word)) {
+          prioritizedWords.push(word);
+        } else {
+          otherWords.push(word);
+        }
+      }
+
+      // Shuffle prioritized words among themselves, then put them first
+      for (let i = prioritizedWords.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [prioritizedWords[i], prioritizedWords[j]] = [prioritizedWords[j], prioritizedWords[i]];
+      }
+
+      // Shuffle remaining words
+      for (let i = otherWords.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [otherWords[i], otherWords[j]] = [otherWords[j], otherWords[i]];
+      }
+
+      // Combine: prioritized words first, then others
+      wordPool = [...prioritizedWords, ...otherWords];
+
+      if (prioritizedWords.length > 0) {
+        logger.debug('BOT', `Bot "${bot.username}" prioritizing ${prioritizedWords.length} player-submitted words`);
+      }
+    }
+  } catch (err) {
+    // If prioritization fails, just continue with shuffled pool
+    logger.debug('BOT', `Player word prioritization failed: ${err.message}`);
+
+    // Shuffle to add variety (humans don't find words in order)
+    for (let i = wordPool.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [wordPool[i], wordPool[j]] = [wordPool[j], wordPool[i]];
+    }
+  }
+
   // Generate and insert wrong words (like humans trying words that "look right")
   const wrongWordChance = config.wrongWordChance || 0;
   if (wrongWordChance > 0) {
@@ -375,12 +452,6 @@ function prepareBotWords(bot, grid, language) {
     }
 
     logger.debug('BOT', `Bot "${bot.username}" will try ${wrongWords.length} wrong words`);
-  }
-
-  // Shuffle to add variety (humans don't find words in order)
-  for (let i = wordPool.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [wordPool[i], wordPool[j]] = [wordPool[j], wordPool[i]];
   }
 
   bot.wordsToFind = wordPool;
@@ -433,9 +504,9 @@ function calculateNextDelay(bot) {
  * @param {function} onWordSubmit - Callback when bot submits a word
  * @param {number} gameDuration - Game duration in seconds
  */
-function startBot(bot, grid, language, onWordSubmit, gameDuration) {
+async function startBot(bot, grid, language, onWordSubmit, gameDuration) {
   // Always prepare fresh words for the new grid (fixes bots not finding words after first game)
-  prepareBotWords(bot, grid, language);
+  await prepareBotWords(bot, grid, language);
 
   bot.isActive = true;
   const timing = BOT_CONFIG.TIMING[bot.difficulty] || BOT_CONFIG.TIMING.medium;
