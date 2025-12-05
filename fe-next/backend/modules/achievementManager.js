@@ -41,6 +41,18 @@ const ACHIEVEMENT_ICONS = {
   PHOTO_FINISH: '📸',         // Win by less than 5 points in multiplayer
   UNDERDOG: '🐕',             // Come from behind to win (was trailing at halftime)
   CLUTCH_PLAYER: '💪',        // Find 3+ valid words in the last 10 seconds
+
+  // LIFETIME/CAREER ACHIEVEMENTS (tracked across all games)
+  VETERAN: '🎖️',              // Play 50 games total
+  CENTURION: '💯',            // Play 100 games total
+  WORD_COLLECTOR: '📚',       // Find 1000 total valid words across all games
+  WORD_HOARDER: '🗃️',         // Find 5000 total valid words across all games
+  CHAMPION: '🏅',             // Win 25 games total
+  LEGEND: '👑',               // Win 100 games total
+  POINT_MASTER: '💰',         // Accumulate 10000 total points
+  POINT_KING: '💎',           // Accumulate 50000 total points
+  DEDICATION: '🔥',           // Play games on 7 different days
+  LOYAL_PLAYER: '⭐',         // Play games on 30 different days
 };
 
 // Get localized achievements based on locale
@@ -99,8 +111,8 @@ const checkLiveAchievements = (game, username, word, timeSinceStart) => {
     return { key, icon: ACHIEVEMENT_ICONS[key] };
   };
 
-  // First Blood - first valid word in the game (LIVE)
-  if (!game.firstWordFound && isCurrentWordValid && !achievements.includes('FIRST_BLOOD')) {
+  // First Blood - first 4+ letter valid word in the game (LIVE) - must show skill
+  if (!game.firstWordFound && isCurrentWordValid && word.length >= 4 && !achievements.includes('FIRST_BLOOD')) {
     game.firstWordFound = true;
     newAchievements.push(addAchievementAndReturn('FIRST_BLOOD'));
   }
@@ -115,29 +127,42 @@ const checkLiveAchievements = (game, username, word, timeSinceStart) => {
     newAchievements.push(addAchievementAndReturn('TREASURE_HUNTER'));
   }
 
-  // Quick Thinker - valid word within 2 seconds (LIVE) - VERY HARD
-  if (timeSinceStart <= 2 && isCurrentWordValid && !achievements.includes('QUICK_THINKER')) {
+  // Get game duration for time-scaled achievements (default 180 seconds = 3 minutes)
+  const gameDuration = game.gameDuration || 180;
+  // Scale thresholds based on game duration (normalize to 180s baseline)
+  const timeScale = gameDuration / 180;
+  // Half-game time (50% of game duration)
+  const halfGameTime = gameDuration * 0.5;
+  // First sixth of game (for Lightning Round, ~17% of game)
+  const earlyGameTime = gameDuration * 0.17;
+
+  // Quick Thinker - valid word within first 1.5% of game (LIVE) - VERY HARD
+  const quickThinkerTime = Math.max(2, gameDuration * 0.015);
+  if (timeSinceStart <= quickThinkerTime && isCurrentWordValid && !achievements.includes('QUICK_THINKER')) {
     newAchievements.push(addAchievementAndReturn('QUICK_THINKER'));
   }
 
-  // Speed Demon - 25 valid words in 90 seconds (LIVE) - VERY HARD
-  if (validatedWordCount >= 25 && timeSinceStart <= 90 && !achievements.includes('SPEED_DEMON')) {
+  // Speed Demon - scaled word count in first half of game (LIVE) - ELITE
+  // Base: 28 words in 90s for 180s game = ~0.31 words/sec
+  // Scale requirement: Math.ceil(28 * timeScale) words in halfGameTime
+  const speedDemonThreshold = Math.ceil(28 * timeScale);
+  if (validatedWordCount >= speedDemonThreshold && timeSinceStart <= halfGameTime && !achievements.includes('SPEED_DEMON')) {
     newAchievements.push(addAchievementAndReturn('SPEED_DEMON'));
   }
 
-  // Combo King - reach combo level 15+ (LIVE) - VERY HARD (now based on actual combo, not word count)
+  // Combo King - reach combo level 18+ (LIVE) - ELITE (now based on actual combo, not word count)
   const currentComboForKing = game.playerCombos?.[username] || 0;
-  if (currentComboForKing >= 15 && !achievements.includes('COMBO_KING')) {
+  if (currentComboForKing >= 18 && !achievements.includes('COMBO_KING')) {
     newAchievements.push(addAchievementAndReturn('COMBO_KING'));
   }
 
-  // Wordsmith - 30 valid words (LIVE) - HARDER
-  if (validatedWordCount >= 30 && !achievements.includes('WORDSMITH')) {
+  // Wordsmith - 35 valid words (LIVE) - HARD
+  if (validatedWordCount >= 35 && !achievements.includes('WORDSMITH')) {
     newAchievements.push(addAchievementAndReturn('WORDSMITH'));
   }
 
-  // Lexicon - 40+ valid words (LIVE) - VERY HARD
-  if (validatedWordCount >= 40 && !achievements.includes('LEXICON')) {
+  // Lexicon - 45+ valid words (LIVE) - ELITE
+  if (validatedWordCount >= 45 && !achievements.includes('LEXICON')) {
     newAchievements.push(addAchievementAndReturn('LEXICON'));
   }
 
@@ -162,8 +187,10 @@ const checkLiveAchievements = (game, username, word, timeSinceStart) => {
     newAchievements.push(addAchievementAndReturn('RARE_GEM'));
   }
 
-  // Lightning Round - 12 valid words in first 30 seconds (LIVE) - VERY HARD
-  if (validatedWordCount >= 12 && timeSinceStart <= 30 && !achievements.includes('LIGHTNING_ROUND')) {
+  // Lightning Round - scaled word count in first ~17% of game (LIVE) - ELITE
+  // Base: 15 words in 30s for 180s game
+  const lightningThreshold = Math.ceil(15 * timeScale);
+  if (validatedWordCount >= lightningThreshold && timeSinceStart <= earlyGameTime && !achievements.includes('LIGHTNING_ROUND')) {
     newAchievements.push(addAchievementAndReturn('LIGHTNING_ROUND'));
   }
 
@@ -178,9 +205,10 @@ const checkLiveAchievements = (game, username, word, timeSinceStart) => {
     newAchievements.push(addAchievementAndReturn('STREAK_MASTER'));
   }
 
-  // Comeback Kid - valid word in last 3 seconds (LIVE) - VERY HARD
-  const gameDuration = game.gameDuration || 180; // Default 3 minutes
-  if (timeSinceStart >= (gameDuration - 3) && isCurrentWordValid && !achievements.includes('COMEBACK_KID')) {
+  // Comeback Kid - valid word in last 2% of game (LIVE) - VERY HARD
+  // For 180s game = last 3.6s, for 60s game = last 1.2s (min 2s)
+  const comebackTime = Math.max(2, gameDuration * 0.02);
+  if (timeSinceStart >= (gameDuration - comebackTime) && isCurrentWordValid && !achievements.includes('COMEBACK_KID')) {
     newAchievements.push(addAchievementAndReturn('COMEBACK_KID'));
   }
 
@@ -207,8 +235,10 @@ const checkLiveAchievements = (game, username, word, timeSinceStart) => {
     newAchievements.push(addAchievementAndReturn('WORD_ARCHITECT'));
   }
 
-  // Speed Legend - 30 words in 90 seconds (LIVE) - ELITE
-  if (validatedWordCount >= 30 && timeSinceStart <= 90 && !achievements.includes('SPEED_LEGEND')) {
+  // Speed Legend - scaled word count in first half of game (LIVE) - ELITE
+  // Base: 30 words in 90s for 180s game
+  const speedLegendThreshold = Math.ceil(30 * timeScale);
+  if (validatedWordCount >= speedLegendThreshold && timeSinceStart <= halfGameTime && !achievements.includes('SPEED_LEGEND')) {
     newAchievements.push(addAchievementAndReturn('SPEED_LEGEND'));
   }
 
@@ -314,37 +344,47 @@ const awardFinalAchievements = (game, users) => {
     // timing-based achievements awarded during live gameplay and are preserved
     // during validation. They are NOT recalculated here.
 
+    // Get game duration for time-scaled achievements (default 180 seconds = 3 minutes)
+    const gameDuration = game.gameDuration || 180;
+    const timeScale = gameDuration / 180;
+    const halfGameTime = gameDuration * 0.5;
+    const earlyGameTime = gameDuration * 0.17;
+
     // Word Master - 7+ letter word (validated)
     if (validWords.some(w => w.word.length >= 7)) {
       addAchievement('WORD_MASTER');
     }
 
-    // Speed Demon - 25 valid words in 90 seconds - VERY HARD
-    const wordsIn90Sec = validWords.filter(w => w.timeSinceStart <= 90);
-    if (wordsIn90Sec.length >= 25) {
+    // Speed Demon - scaled word count in first half of game - ELITE
+    const speedDemonThreshold = Math.ceil(28 * timeScale);
+    const wordsInHalfGame = validWords.filter(w => w.timeSinceStart <= halfGameTime);
+    if (wordsInHalfGame.length >= speedDemonThreshold) {
       addAchievement('SPEED_DEMON');
     }
 
-    // Lexicon - 40+ valid words - VERY HARD
-    if (validWords.length >= 40) {
+    // Lexicon - 45+ valid words (scales slightly with game time) - ELITE
+    const lexiconThreshold = Math.ceil(45 * timeScale);
+    if (validWords.length >= lexiconThreshold) {
       addAchievement('LEXICON');
     }
 
     // Combo King is now checked live (based on combo level, not word count)
 
-    // Perfectionist - all words valid AND at least 20 words (not trivial) - HARDER
-    if (allWords.length >= 20 && allWords.every(w => w.validated === true)) {
+    // Perfectionist - all words valid AND scaled word count (not trivial) - HARD
+    const perfectionistThreshold = Math.ceil(25 * timeScale);
+    if (allWords.length >= perfectionistThreshold && allWords.every(w => w.validated === true)) {
       addAchievement('PERFECTIONIST');
     }
 
-    // Wordsmith - 30+ valid words - HARDER
-    if (validWords.length >= 30) {
+    // Wordsmith - scaled word count - HARD
+    const wordsmithThreshold = Math.ceil(35 * timeScale);
+    if (validWords.length >= wordsmithThreshold) {
       addAchievement('WORDSMITH');
     }
 
-    // Diverse Vocabulary - found words of at least 6 different lengths - HARDER
+    // Diverse Vocabulary - found words of at least 7 different lengths - HARD
     const uniqueLengths = new Set(validWords.map(w => w.word.length));
-    if (uniqueLengths.size >= 6) {
+    if (uniqueLengths.size >= 7) {
       addAchievement('DIVERSE_VOCABULARY');
     }
 
@@ -360,30 +400,33 @@ const awardFinalAchievements = (game, users) => {
       addAchievement('RARE_GEM');
     }
 
-    // Explorer - found words of 7+ different lengths (validated) - HARDER
-    if (uniqueLengths.size >= 7) {
+    // Explorer - found words of 8+ different lengths (validated) - ELITE
+    if (uniqueLengths.size >= 8) {
       addAchievement('EXPLORER');
     }
 
-    // Dictionary Diver - 50+ valid words - VERY HARD
-    if (validWords.length >= 50) {
+    // Dictionary Diver - scaled word count - VERY HARD
+    const dictionaryDiverThreshold = Math.ceil(50 * timeScale);
+    if (validWords.length >= dictionaryDiverThreshold) {
       addAchievement('DICTIONARY_DIVER');
     }
 
-    // Unstoppable - 55+ valid words - VERY HARD
-    if (validWords.length >= 55) {
+    // Unstoppable - scaled word count - VERY HARD
+    const unstoppableThreshold = Math.ceil(55 * timeScale);
+    if (validWords.length >= unstoppableThreshold) {
       addAchievement('UNSTOPPABLE');
     }
 
-    // Lightning Round - 12 valid words in first 30 seconds - VERY HARD
-    const wordsIn30Sec = validWords.filter(w => w.timeSinceStart <= 30);
-    if (wordsIn30Sec.length >= 12) {
+    // Lightning Round - scaled word count in first ~17% of game - ELITE
+    const lightningThreshold = Math.ceil(15 * timeScale);
+    const wordsInEarlyGame = validWords.filter(w => w.timeSinceStart <= earlyGameTime);
+    if (wordsInEarlyGame.length >= lightningThreshold) {
       addAchievement('LIGHTNING_ROUND');
     }
 
-    // Comeback Kid - found a valid word in the last 3 seconds - VERY HARD
-    const gameDuration = game.gameDuration || 180; // Default 3 minutes
-    if (validWords.some(w => w.timeSinceStart >= (gameDuration - 3))) {
+    // Comeback Kid - found a valid word in last 2% of game - VERY HARD
+    const comebackTime = Math.max(2, gameDuration * 0.02);
+    if (validWords.some(w => w.timeSinceStart >= (gameDuration - comebackTime))) {
       addAchievement('COMEBACK_KID');
     }
 
@@ -409,18 +452,21 @@ const awardFinalAchievements = (game, users) => {
       addAchievement('WORD_ARCHITECT');
     }
 
-    // Speed Legend - 30 words in 90 seconds - ELITE
-    if (wordsIn90Sec.length >= 30) {
+    // Speed Legend - scaled word count in first half of game - ELITE
+    const speedLegendThreshold = Math.ceil(30 * timeScale);
+    if (wordsInHalfGame.length >= speedLegendThreshold) {
       addAchievement('SPEED_LEGEND');
     }
 
-    // Vocabulary Titan - 60+ valid words - ELITE
-    if (validWords.length >= 60) {
+    // Vocabulary Titan - scaled word count - ELITE
+    const vocabularyTitanThreshold = Math.ceil(60 * timeScale);
+    if (validWords.length >= vocabularyTitanThreshold) {
       addAchievement('VOCABULARY_TITAN');
     }
 
-    // Precision Master - 30+ words with 100% accuracy - ELITE
-    if (allWords.length >= 30 && allWords.every(w => w.validated === true)) {
+    // Precision Master - scaled word count with 100% accuracy - ELITE
+    const precisionThreshold = Math.ceil(35 * timeScale);
+    if (allWords.length >= precisionThreshold && allWords.every(w => w.validated === true)) {
       addAchievement('PRECISION_MASTER');
     }
 
@@ -437,14 +483,16 @@ const awardFinalAchievements = (game, users) => {
 
     // NEW COMPETITIVE/STYLE ACHIEVEMENTS
 
-    // Minimalist - All valid words are 4+ letters (no 2-3 letter words), min 15 words
-    if (validWords.length >= 15 && validWords.every(w => w.word.length >= 4)) {
+    // Minimalist - All valid words are 4+ letters (no 2-3 letter words), scaled word count - HARD
+    const minimalistThreshold = Math.ceil(20 * timeScale);
+    if (validWords.length >= minimalistThreshold && validWords.every(w => w.word.length >= 4)) {
       addAchievement('MINIMALIST');
     }
 
-    // Clutch Player - 3+ valid words in the last 10 seconds
-    const gameDurationClutch = game.gameDuration || 180;
-    const clutchWords = validWords.filter(w => w.timeSinceStart >= (gameDurationClutch - 10));
+    // Clutch Player - 3+ valid words in last 6% of game
+    // For 180s game = last ~10s, for 60s game = last ~4s
+    const clutchTime = Math.max(3, gameDuration * 0.06);
+    const clutchWords = validWords.filter(w => w.timeSinceStart >= (gameDuration - clutchTime));
     if (clutchWords.length >= 3) {
       addAchievement('CLUTCH_PLAYER');
     }
@@ -512,12 +560,100 @@ const awardFinalAchievements = (game, users) => {
   }
 };
 
+/**
+ * Check and award lifetime/career achievements based on cumulative stats
+ * This should be called after updating the user's stats in the database
+ * @param {Object} userStats - The user's cumulative stats
+ * @param {number} userStats.gamesPlayed - Total games played
+ * @param {number} userStats.gamesWon - Total games won
+ * @param {number} userStats.totalWordsFound - Total valid words found across all games
+ * @param {number} userStats.totalScore - Total points accumulated
+ * @param {number} userStats.uniqueDaysPlayed - Number of unique days played (optional)
+ * @param {Array} existingAchievements - Array of achievement keys already earned
+ * @returns {Array} Array of newly awarded lifetime achievements
+ */
+const checkLifetimeAchievements = (userStats, existingAchievements = []) => {
+  const newAchievements = [];
+  const existing = new Set(existingAchievements);
+
+  const addIfNew = (key) => {
+    if (!existing.has(key)) {
+      newAchievements.push({ key, icon: ACHIEVEMENT_ICONS[key] });
+      existing.add(key);
+    }
+  };
+
+  // Games played achievements
+  if (userStats.gamesPlayed >= 50) {
+    addIfNew('VETERAN');
+  }
+  if (userStats.gamesPlayed >= 100) {
+    addIfNew('CENTURION');
+  }
+
+  // Words found achievements
+  if (userStats.totalWordsFound >= 1000) {
+    addIfNew('WORD_COLLECTOR');
+  }
+  if (userStats.totalWordsFound >= 5000) {
+    addIfNew('WORD_HOARDER');
+  }
+
+  // Games won achievements
+  if (userStats.gamesWon >= 25) {
+    addIfNew('CHAMPION');
+  }
+  if (userStats.gamesWon >= 100) {
+    addIfNew('LEGEND');
+  }
+
+  // Points accumulated achievements
+  if (userStats.totalScore >= 10000) {
+    addIfNew('POINT_MASTER');
+  }
+  if (userStats.totalScore >= 50000) {
+    addIfNew('POINT_KING');
+  }
+
+  // Days played achievements (if tracking unique days)
+  if (userStats.uniqueDaysPlayed) {
+    if (userStats.uniqueDaysPlayed >= 7) {
+      addIfNew('DEDICATION');
+    }
+    if (userStats.uniqueDaysPlayed >= 30) {
+      addIfNew('LOYAL_PLAYER');
+    }
+  }
+
+  if (newAchievements.length > 0) {
+    logger.debug('ACHIEVEMENT', `Lifetime achievements earned: ${newAchievements.map(a => a.key).join(', ')}`);
+  }
+
+  return newAchievements;
+};
+
+// Export lifetime achievement thresholds for UI display
+const LIFETIME_ACHIEVEMENT_THRESHOLDS = {
+  VETERAN: { stat: 'gamesPlayed', threshold: 50 },
+  CENTURION: { stat: 'gamesPlayed', threshold: 100 },
+  WORD_COLLECTOR: { stat: 'totalWordsFound', threshold: 1000 },
+  WORD_HOARDER: { stat: 'totalWordsFound', threshold: 5000 },
+  CHAMPION: { stat: 'gamesWon', threshold: 25 },
+  LEGEND: { stat: 'gamesWon', threshold: 100 },
+  POINT_MASTER: { stat: 'totalScore', threshold: 10000 },
+  POINT_KING: { stat: 'totalScore', threshold: 50000 },
+  DEDICATION: { stat: 'uniqueDaysPlayed', threshold: 7 },
+  LOYAL_PLAYER: { stat: 'uniqueDaysPlayed', threshold: 30 },
+};
+
 module.exports = {
   ACHIEVEMENTS,
   ACHIEVEMENT_ICONS,
   getLocalizedAchievements,
   checkLiveAchievements,
   awardFinalAchievements,
+  checkLifetimeAchievements,
+  LIFETIME_ACHIEVEMENT_THRESHOLDS,
   // Additional exports for socketHandlers.js compatibility
   checkAndAwardAchievements,
   getPlayerAchievements

@@ -43,9 +43,9 @@ const ResultsWinnerBanner = ({ winner, isCurrentUserWinner }) => {
 
   return (
     <motion.div
-      initial={{ scale: 0.9, opacity: 0, rotate: -3 }}
-      animate={{ scale: 1, opacity: 1, rotate: 0 }}
-      transition={{ duration: 0.4, ease: [0.68, -0.55, 0.265, 1.55] }}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.4 }}
       className="mb-4 sm:mb-6 md:mb-8 relative w-full"
     >
       {/* Neo-Brutalist Main Container */}

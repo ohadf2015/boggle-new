@@ -1,4 +1,4 @@
-import React, { useState, useMemo, memo } from 'react';
+import React, { useState, useMemo, memo, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { AchievementBadge } from '../AchievementBadge';
 import PlayerInsights from './PlayerInsights';
@@ -7,7 +7,7 @@ import { useLanguage } from '../../contexts/LanguageContext';
 import { cn } from '../../lib/utils';
 import { applyHebrewFinalLetters } from '../../utils/utils';
 import { calculatePlayerInsights } from '../../utils/gameInsights';
-import { ChevronDown, ChevronUp } from 'lucide-react';
+import { ChevronDown, ChevronUp, X } from 'lucide-react';
 import Avatar from '../Avatar';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../ui/tooltip';
 import logger from '@/utils/logger';
@@ -86,6 +86,9 @@ interface WordChipProps {
 
 const WordChip = memo<WordChipProps>(({ wordObj, playerCount }) => {
   const { t } = useLanguage();
+  // State for mobile tooltip - shows on tap
+  const [showMobileTooltip, setShowMobileTooltip] = useState(false);
+
   const isDuplicate = wordObj.isDuplicate;
   const isValid = wordObj.validated;
   const isAiVerified = wordObj.isAiVerified;
@@ -96,6 +99,27 @@ const WordChip = memo<WordChipProps>(({ wordObj, playerCount }) => {
   const comboBonus = wordObj.comboBonus || 0;
 
   const label = displayWord;
+
+  // Determine the reason to display - prefer aiReason for AI-rejected words
+  const displayReason = aiReason || invalidReason;
+
+  // Check if this word should have a touchable tooltip
+  const hasInvalidReason = !isValid && !isDuplicate && !isPending && displayReason;
+
+  // Handle touch/click for mobile tooltip
+  const handleTouchStart = useCallback((e: React.MouseEvent | React.TouchEvent) => {
+    if (hasInvalidReason) {
+      e.preventDefault();
+      e.stopPropagation();
+      setShowMobileTooltip(true);
+    }
+  }, [hasInvalidReason]);
+
+  const handleCloseTooltip = useCallback((e: React.MouseEvent | React.TouchEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setShowMobileTooltip(false);
+  }, []);
 
   // Get color based on score - Neo-Brutalist solid colors
   const getBackgroundColor = (): string => {
@@ -121,14 +145,25 @@ const WordChip = memo<WordChipProps>(({ wordObj, playerCount }) => {
         isDuplicate && "line-through opacity-80",
         !isDuplicate && !isValid && !isPending && "opacity-70",
         isPending && "animate-pulse",
-        !isValid && !isDuplicate && !isPending && invalidReason && "cursor-help"
+        hasInvalidReason && "cursor-pointer active:scale-95"
       )}
       style={{
         backgroundColor: getBackgroundColor(),
         color: getTextColor(),
       }}
+      onClick={handleTouchStart}
+      onTouchEnd={handleTouchStart}
+      role={hasInvalidReason ? "button" : undefined}
+      aria-label={hasInvalidReason ? `${displayWord}: ${displayReason}` : undefined}
+      tabIndex={hasInvalidReason ? 0 : undefined}
     >
       {label}
+      {/* Show info icon for invalid words with reason - indicates it's tappable */}
+      {hasInvalidReason && (
+        <span className="text-[10px] px-1 py-0.5 bg-neo-cream/20 rounded border border-neo-cream/30 font-black">
+          ℹ️
+        </span>
+      )}
       {/* Show combo bonus indicator */}
       {comboBonus > 0 && !isDuplicate && isValid && (
         <span className="text-[10px] px-1 py-0.5 bg-neo-yellow text-neo-black rounded border border-neo-black font-black">
@@ -184,13 +219,10 @@ const WordChip = memo<WordChipProps>(({ wordObj, playerCount }) => {
     </span>
   );
 
-  // Determine the reason to display - prefer aiReason for AI-rejected words
-  const displayReason = aiReason || invalidReason;
-
   return (
     <div className="relative group">
-      {/* Wrap invalid words with tooltip showing the reason (invalidReason or aiReason) */}
-      {!isValid && !isDuplicate && !isPending && displayReason ? (
+      {/* Desktop: Show tooltip on hover for invalid words */}
+      {hasInvalidReason ? (
         <TooltipProvider delayDuration={0}>
           <Tooltip>
             <TooltipTrigger asChild>
@@ -198,7 +230,7 @@ const WordChip = memo<WordChipProps>(({ wordObj, playerCount }) => {
             </TooltipTrigger>
             <TooltipContent
               side="top"
-              className="bg-neo-red border-2 border-neo-black shadow-hard rounded-neo p-2 max-w-[250px]"
+              className="bg-neo-red border-2 border-neo-black shadow-hard rounded-neo p-2 max-w-[250px] hidden sm:block"
             >
               {isAiVerified && (
                 <p className="text-[10px] font-bold text-neo-yellow mb-1 flex items-center gap-1">
@@ -213,6 +245,69 @@ const WordChip = memo<WordChipProps>(({ wordObj, playerCount }) => {
       ) : (
         chipContent
       )}
+
+      {/* Mobile: Show tooltip popup when tapped */}
+      <AnimatePresence>
+        {showMobileTooltip && hasInvalidReason && (
+          <>
+            {/* Backdrop to close tooltip on tap outside */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 z-[100] bg-black/20"
+              onClick={handleCloseTooltip}
+              onTouchEnd={handleCloseTooltip}
+            />
+            {/* Tooltip popup */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9, y: -10 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.9, y: -10 }}
+              transition={{ duration: 0.15 }}
+              className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 z-[101] min-w-[200px] max-w-[280px]"
+            >
+              <div className="bg-neo-red border-3 border-neo-black shadow-hard-lg rounded-neo p-3 relative">
+                {/* Close button */}
+                <button
+                  onClick={handleCloseTooltip}
+                  onTouchEnd={handleCloseTooltip}
+                  className="absolute -top-2 -right-2 w-6 h-6 bg-neo-cream border-2 border-neo-black rounded-full flex items-center justify-center shadow-hard-sm"
+                  aria-label="Close"
+                >
+                  <X className="w-3 h-3 text-neo-black" />
+                </button>
+
+                {/* Word being explained */}
+                <p className="text-sm font-black text-neo-cream uppercase mb-2 border-b border-neo-cream/30 pb-1">
+                  "{displayWord}"
+                </p>
+
+                {/* AI rejection indicator */}
+                {isAiVerified && (
+                  <p className="text-[11px] font-bold text-neo-yellow mb-2 flex items-center gap-1">
+                    <span className="px-1.5 py-0.5 bg-neo-purple rounded border border-neo-black text-neo-cream">AI</span>
+                    {t('results.aiRejected') || 'Rejected by AI'}
+                  </p>
+                )}
+
+                {/* Reason */}
+                <p className="text-sm font-bold text-neo-cream leading-snug">
+                  {displayReason}
+                </p>
+
+                {/* Tap hint */}
+                <p className="text-[10px] text-neo-cream/60 mt-2 text-center">
+                  {t('results.tapToClose') || 'Tap anywhere to close'}
+                </p>
+              </div>
+              {/* Arrow pointing down */}
+              <div className="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-[8px] border-l-transparent border-r-[8px] border-r-transparent border-t-[8px] border-t-neo-black" />
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
+
       {isDuplicate && playerCount > 1 && (
         <span className="absolute -top-2 end-[-8px] bg-neo-black text-neo-cream text-[10px] px-1.5 py-0.5 min-w-[18px] h-[18px] flex items-center justify-center font-black border-2 border-neo-black rounded-neo">
           {playerCount}
@@ -344,9 +439,10 @@ const ResultsPlayerCard: React.FC<ResultsPlayerCardProps> = ({ player, index, al
 
   return (
     <motion.div
-      initial={{ x: -20, opacity: 0, rotate: -2 }}
-      animate={{ x: 0, opacity: 1, rotate: index % 2 === 0 ? 1 : -1 }}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
       transition={{ delay: Math.min(index * 0.05, 0.3), duration: 0.3 }}
+      style={{ transform: `rotate(${index % 2 === 0 ? 1 : -1}deg)` }}
     >
       {/* Neo-Brutalist Card */}
       <div

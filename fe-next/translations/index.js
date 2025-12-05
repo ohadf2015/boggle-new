@@ -395,6 +395,8 @@ const translations = {
       needsVerification: 'Needs Verification',
       autoVerified: 'Auto-Verified',
       aiVerified: 'Verified by AI',
+      aiRejected: 'Rejected by AI',
+      tapToClose: 'Tap anywhere to close',
       showHeatmap: 'Show Heatmap',
       hideHeatmap: 'Hide Heatmap',
       startNewGame: 'Start New Game',
@@ -667,6 +669,47 @@ const translations = {
       CLUTCH_PLAYER: {
         name: 'Clutch Player',
         description: 'Found 3+ words in the last 10 seconds'
+      },
+      // Lifetime/Career Achievements
+      VETERAN: {
+        name: 'Veteran',
+        description: 'Played 50 games total'
+      },
+      CENTURION: {
+        name: 'Centurion',
+        description: 'Played 100 games total'
+      },
+      WORD_COLLECTOR: {
+        name: 'Word Collector',
+        description: 'Found 1000 total valid words'
+      },
+      WORD_HOARDER: {
+        name: 'Word Hoarder',
+        description: 'Found 5000 total valid words'
+      },
+      CHAMPION: {
+        name: 'Champion',
+        description: 'Won 25 games total'
+      },
+      LEGEND: {
+        name: 'Legend',
+        description: 'Won 100 games total'
+      },
+      POINT_MASTER: {
+        name: 'Point Master',
+        description: 'Accumulated 10,000 total points'
+      },
+      POINT_KING: {
+        name: 'Point King',
+        description: 'Accumulated 50,000 total points'
+      },
+      DEDICATION: {
+        name: 'Dedication',
+        description: 'Played on 7 different days'
+      },
+      LOYAL_PLAYER: {
+        name: 'Loyal Player',
+        description: 'Played on 30 different days'
       }
     },
     achievementTiers: {
@@ -1488,6 +1531,8 @@ const translations = {
       needsVerification: 'דורש אימות',
       autoVerified: 'אומת אוטומטית',
       aiVerified: 'אומת על ידי AI',
+      aiRejected: 'נדחה על ידי AI',
+      tapToClose: 'לחץ בכל מקום לסגירה',
       showHeatmap: 'הצג מפת חום',
       hideHeatmap: 'הסתר מפת חום',
       startNewGame: 'התחל משחק חדש',
@@ -1755,6 +1800,47 @@ const translations = {
       CLUTCH_PLAYER: {
         name: 'שחקן קלאץ\'',
         description: 'מצא 3+ מילים ב-10 השניות האחרונות'
+      },
+      // הישגי קריירה
+      VETERAN: {
+        name: 'ותיק',
+        description: 'שיחק 50 משחקים'
+      },
+      CENTURION: {
+        name: 'סנטוריון',
+        description: 'שיחק 100 משחקים'
+      },
+      WORD_COLLECTOR: {
+        name: 'אספן מילים',
+        description: 'מצא 1000 מילים תקינות סה"כ'
+      },
+      WORD_HOARDER: {
+        name: 'אוגר מילים',
+        description: 'מצא 5000 מילים תקינות סה"כ'
+      },
+      CHAMPION: {
+        name: 'אלוף',
+        description: 'ניצח 25 משחקים'
+      },
+      LEGEND: {
+        name: 'אגדה',
+        description: 'ניצח 100 משחקים'
+      },
+      POINT_MASTER: {
+        name: 'אדון הנקודות',
+        description: 'צבר 10,000 נקודות סה"כ'
+      },
+      POINT_KING: {
+        name: 'מלך הנקודות',
+        description: 'צבר 50,000 נקודות סה"כ'
+      },
+      DEDICATION: {
+        name: 'מסירות',
+        description: 'שיחק ב-7 ימים שונים'
+      },
+      LOYAL_PLAYER: {
+        name: 'שחקן נאמן',
+        description: 'שיחק ב-30 ימים שונים'
       }
     },
     achievementTiers: {
@@ -2575,6 +2661,8 @@ const translations = {
       needsVerification: 'Behöver Verifiering',
       autoVerified: 'Automatiskt Verifierad',
       aiVerified: 'Verifierad av AI',
+      aiRejected: 'Avvisad av AI',
+      tapToClose: 'Tryck var som helst för att stänga',
       showHeatmap: 'Visa värmekarta',
       hideHeatmap: 'Dölj värmekarta',
       startNewGame: 'Starta nytt spel',
@@ -2847,6 +2935,47 @@ const translations = {
       CLUTCH_PLAYER: {
         name: 'Clutch-spelare',
         description: 'Hittade 3+ ord under sista 10 sekunderna'
+      },
+      // Livstidsprestationer
+      VETERAN: {
+        name: 'Veteran',
+        description: 'Spelade 50 spel totalt'
+      },
+      CENTURION: {
+        name: 'Centurion',
+        description: 'Spelade 100 spel totalt'
+      },
+      WORD_COLLECTOR: {
+        name: 'Ordsamlare',
+        description: 'Hittade 1000 giltiga ord totalt'
+      },
+      WORD_HOARDER: {
+        name: 'Ordhoarder',
+        description: 'Hittade 5000 giltiga ord totalt'
+      },
+      CHAMPION: {
+        name: 'Mästare',
+        description: 'Vann 25 spel totalt'
+      },
+      LEGEND: {
+        name: 'Legend',
+        description: 'Vann 100 spel totalt'
+      },
+      POINT_MASTER: {
+        name: 'Poängmästare',
+        description: 'Samlade 10 000 poäng totalt'
+      },
+      POINT_KING: {
+        name: 'Poängkung',
+        description: 'Samlade 50 000 poäng totalt'
+      },
+      DEDICATION: {
+        name: 'Hängivenhet',
+        description: 'Spelade på 7 olika dagar'
+      },
+      LOYAL_PLAYER: {
+        name: 'Lojal spelare',
+        description: 'Spelade på 30 olika dagar'
       }
     },
     achievementTiers: {
@@ -3664,6 +3793,8 @@ const translations = {
       needsVerification: '検証が必要',
       autoVerified: '自動検証済み',
       aiVerified: 'AIで検証済み',
+      aiRejected: 'AIにより却下',
+      tapToClose: 'どこかをタップして閉じる',
       showHeatmap: 'ヒートマップを表示',
       hideHeatmap: 'ヒートマップを非表示',
       startNewGame: '新しいゲームを開始',
@@ -3871,6 +4002,47 @@ const translations = {
       CLUTCH_PLAYER: {
         name: 'クラッチプレイヤー',
         description: '最後の10秒で3つ以上の単語を発見'
+      },
+      // 生涯実績
+      VETERAN: {
+        name: 'ベテラン',
+        description: '合計50ゲームをプレイ'
+      },
+      CENTURION: {
+        name: 'センチュリオン',
+        description: '合計100ゲームをプレイ'
+      },
+      WORD_COLLECTOR: {
+        name: '言葉コレクター',
+        description: '合計1000の有効な単語を発見'
+      },
+      WORD_HOARDER: {
+        name: '言葉ハンター',
+        description: '合計5000の有効な単語を発見'
+      },
+      CHAMPION: {
+        name: 'チャンピオン',
+        description: '合計25ゲームに勝利'
+      },
+      LEGEND: {
+        name: 'レジェンド',
+        description: '合計100ゲームに勝利'
+      },
+      POINT_MASTER: {
+        name: 'ポイントマスター',
+        description: '合計10,000ポイントを獲得'
+      },
+      POINT_KING: {
+        name: 'ポイントキング',
+        description: '合計50,000ポイントを獲得'
+      },
+      DEDICATION: {
+        name: '献身',
+        description: '7日間にわたってプレイ'
+      },
+      LOYAL_PLAYER: {
+        name: '忠実なプレイヤー',
+        description: '30日間にわたってプレイ'
       }
     },
     achievementTiers: {
