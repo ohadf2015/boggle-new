@@ -370,7 +370,24 @@ async function calculateAndBroadcastFinalScores(io, gameCode) {
  */
 async function recordGameResultsToSupabase(io, gameCode, scoresArray, game) {
   try {
-    const results = await processGameResults(gameCode, scoresArray, game);
+    // Build userAuthMap from game.users
+    const userAuthMap = {};
+    for (const [username, userData] of Object.entries(game.users || {})) {
+      userAuthMap[username] = {
+        authUserId: userData.authUserId || null,
+        guestTokenHash: userData.guestTokenHash || null,
+        socketId: userData.socketId || null
+      };
+    }
+
+    // Build gameInfo from game object
+    const gameInfo = {
+      language: game.language || 'en',
+      isRanked: game.isRanked || false,
+      timePlayed: game.timerSeconds || 0
+    };
+
+    const results = await processGameResults(gameCode, scoresArray, gameInfo, userAuthMap);
     logger.info('SUPABASE', `Game ${gameCode} results recorded`);
 
     // Invalidate leaderboard caches
@@ -401,11 +418,11 @@ function startBotsForGame(io, gameCode, letterGrid, language, timerSeconds) {
   const { addPlayerWord, updatePlayerScore, trackBotWord } = require('../modules/gameStateManager');
 
   for (const bot of bots) {
-    botManager.startBot(bot.id, letterGrid, language, timerSeconds, async (botId, word, score) => {
-      const currentBot = botManager.getBot(botId);
-      if (!currentBot) return;
+    botManager.startBot(bot, letterGrid, language, async (botId, word, score) => {
+      // Use the bot from closure - it's the same bot object
+      if (!bot || !bot.isActive) return;
 
-      addPlayerWord(gameCode, currentBot.username, word, {
+      addPlayerWord(gameCode, bot.username, word, {
         autoValidated: true,
         score,
         comboBonus: 0,
@@ -413,12 +430,12 @@ function startBotsForGame(io, gameCode, letterGrid, language, timerSeconds) {
         isBot: true
       });
 
-      trackBotWord(gameCode, word, currentBot.username, score);
-      updatePlayerScore(gameCode, currentBot.username, score, true);
+      trackBotWord(gameCode, word, bot.username, score);
+      updatePlayerScore(gameCode, bot.username, score, true);
 
       const leaderboard = getLeaderboard(gameCode);
       broadcastToRoom(io, getGameRoom(gameCode), 'updateLeaderboard', { leaderboard });
-    });
+    }, timerSeconds);
   }
 }
 
