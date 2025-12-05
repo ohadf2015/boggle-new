@@ -173,6 +173,16 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode, pe
     lastWordTimeRef.current = lastWordTime;
   }, [lastWordTime]);
 
+  // Activate game when countdown animation completes (3-2-1-GO!)
+  // This ensures the animation plays BEFORE the game board appears
+  useEffect(() => {
+    // Check if animation just finished and we have game data ready
+    if (!showStartAnimation && letterGrid && remainingTime > 0 && !gameActive && !waitingForResults) {
+      logger.log('[PLAYER] Countdown animation complete, activating game');
+      setGameActive(true);
+    }
+  }, [showStartAnimation, letterGrid, remainingTime, gameActive, waitingForResults]);
+
   // Clear shuffling grid when game starts
   useEffect(() => {
     if (gameActive) {
@@ -212,7 +222,8 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode, pe
       if (pendingGameStart.timerSeconds) setRemainingTime(pendingGameStart.timerSeconds);
       if (pendingGameStart.language) setGameLanguage(pendingGameStart.language);
       if (pendingGameStart.minWordLength) setMinWordLength(pendingGameStart.minWordLength);
-      setGameActive(true);
+      // Don't set gameActive here - let the countdown animation play first
+      // Game will activate when animation completes via the effect above
       setShowStartAnimation(true);
 
       if (pendingGameStart.messageId) {
