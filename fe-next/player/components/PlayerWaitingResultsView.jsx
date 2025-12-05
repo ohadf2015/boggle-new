@@ -167,19 +167,18 @@ const PlayerWaitingResultsView = ({
                 </div>
               )}
 
-              {/* Processing indicators - More subtle animation */}
+              {/* Processing indicators - Opacity-only animation to prevent layout shift */}
               <div className="flex gap-3 mt-4 justify-center">
                 {[0, 1, 2].map((i) => (
                   <motion.div
                     key={i}
                     animate={{
-                      scale: [1, 1.15, 1],
-                      opacity: [0.5, 1, 0.5],
+                      opacity: [0.3, 1, 0.3],
                     }}
                     transition={{
                       duration: 1.5,
                       repeat: Infinity,
-                      delay: i * 0.2,
+                      delay: i * 0.3,
                       ease: 'easeInOut',
                     }}
                     className="w-3 h-3 bg-neo-black rounded-full"
@@ -220,15 +219,13 @@ const PlayerWaitingResultsView = ({
                     return (
                       <motion.div
                         key={player.username}
-                        layout
                         initial={isNewPlayer ? { opacity: 0 } : false}
                         animate={{ opacity: 1 }}
                         transition={{
-                          layout: { type: 'spring', stiffness: 300, damping: 30 },
-                          opacity: isNewPlayer ? { duration: 0.2, delay: index * 0.05 } : { duration: 0 }
+                          opacity: isNewPlayer ? { duration: 0.3, delay: index * 0.05 } : { duration: 0 }
                         }}
                         className={`flex items-center gap-3 p-3 rounded-neo border-3 border-neo-black shadow-hard-sm transition-colors
-                          hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-hard
+                          hover:brightness-110
                           ${getRankStyle()} ${dir === 'rtl' ? 'flex-row-reverse' : ''}`}
                       >
                         <div className="w-10 h-10 rounded-neo flex items-center justify-center font-black text-lg bg-neo-black text-neo-white border-2 border-neo-black">

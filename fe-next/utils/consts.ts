@@ -104,11 +104,9 @@ export const kanjiCompounds: string[] = [
 ];
 
 export const DIFFICULTIES: DifficultySettings = {
-  EASY: { nameKey: 'difficulty.easy', rows: 4, cols: 4 },
-  MEDIUM: { nameKey: 'difficulty.medium', rows: 5, cols: 5 },
-  HARD: { nameKey: 'difficulty.hard', rows: 7, cols: 7 },
-  EXPERT: { nameKey: 'difficulty.expert', rows: 9, cols: 9 },
-  MASTER: { nameKey: 'difficulty.master', rows: 11, cols: 11 },
+  EASY: { nameKey: 'difficulty.easy', rows: 5, cols: 5 },
+  MEDIUM: { nameKey: 'difficulty.medium', rows: 7, cols: 7 },
+  HARD: { nameKey: 'difficulty.hard', rows: 11, cols: 11 },
 };
 
 export const DEFAULT_DIFFICULTY = 'MEDIUM' as const;
@@ -120,8 +118,6 @@ export const DIFFICULTY_TIMERS: Record<string, number> = {
   EASY: 60,     // 1 minute - small board, quick games
   MEDIUM: 60,   // 1 minute - default, fast-paced
   HARD: 120,    // 2 minutes - larger board
-  EXPERT: 180,  // 3 minutes - large board, more searching
-  MASTER: 240,  // 4 minutes - massive board, extensive exploration
 };
 
 export const DEFAULT_TIMER = 60; // 1 minute
