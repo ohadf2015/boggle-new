@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useCallback, useRef, memo, useMemo } from 'react';
 import GoRipplesAnimation from '../components/GoRipplesAnimation';
 import { useSocket } from '../utils/SocketContext';
 import { clearSessionPreservingUsername } from '../utils/session';
@@ -18,7 +18,11 @@ import PlayerInGameView from './components/PlayerInGameView';
 // Custom hooks
 import usePlayerSocketEvents from './hooks/usePlayerSocketEvents';
 
-const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode, pendingGameStart, onGameStartConsumed }) => {
+/**
+ * PlayerView - Main player component managing game state and views
+ * Memoized to prevent unnecessary re-renders from parent updates
+ */
+const PlayerView = memo(({ onShowResults, initialPlayers = [], username, gameCode, pendingGameStart, onGameStartConsumed }) => {
   const { t, dir } = useLanguage();
   const { socket } = useSocket();
   const { fadeToTrack, stopMusic, TRACKS } = useMusic();
@@ -151,8 +155,10 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode, pe
 
   // Client-side countdown timer - decrements remainingTime every second
   // Server broadcasts time updates every ~10 seconds, so we interpolate locally
+  // Note: We only depend on gameActive, not remainingTime, to avoid restarting
+  // the interval on every tick. The interval's closure handles the countdown.
   useEffect(() => {
-    if (!gameActive || remainingTime === null || remainingTime <= 0) {
+    if (!gameActive) {
       return;
     }
 
@@ -167,7 +173,7 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode, pe
     }, 1000);
 
     return () => clearInterval(intervalId);
-  }, [gameActive, remainingTime === null, remainingTime <= 0]);
+  }, [gameActive]);
 
   // Keep refs in sync
   useEffect(() => {
@@ -382,6 +388,9 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode, pe
       />
     </>
   );
-};
+});
+
+// Display name for debugging in React DevTools
+PlayerView.displayName = 'PlayerView';
 
 export default PlayerView;

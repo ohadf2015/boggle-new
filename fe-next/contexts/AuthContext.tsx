@@ -1,6 +1,6 @@
 'use client';
 
-import React, { createContext, useState, useContext, useEffect, useCallback, ReactNode } from 'react';
+import React, { createContext, useState, useContext, useEffect, useCallback, useMemo, ReactNode } from 'react';
 import {
   supabase,
   getProfile,
@@ -500,22 +500,28 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     return { data, error };
   };
 
-  // Check if user can play ranked
-  const canPlayRanked = (): boolean => {
+  // Memoize computed values to prevent recalculation on every render
+  const canPlayRanked = useMemo((): boolean => {
     if (!profile) return false;
     if (rankedProgress?.unlocked_at) return true;
     return (rankedProgress?.casual_games_played || 0) >= 10;
-  };
+  }, [profile, rankedProgress?.unlocked_at, rankedProgress?.casual_games_played]);
 
-  // Get games until ranked unlock
-  const gamesUntilRanked = (): number => {
+  const gamesUntilRanked = useMemo((): number => {
     if (!profile) return 10;
     if (rankedProgress?.unlocked_at) return 0;
     const played = rankedProgress?.casual_games_played || 0;
     return Math.max(0, 10 - played);
-  };
+  }, [profile, rankedProgress?.unlocked_at, rankedProgress?.casual_games_played]);
 
-  const value: AuthContextValue = {
+  const isAuthenticated = useMemo(() => !!user && !!profile, [user, profile]);
+  const isGuest = useMemo(() => !user, [user]);
+  const isAdmin = useMemo(() => !!profile?.is_admin, [profile?.is_admin]);
+
+  // Memoize the context value to prevent unnecessary re-renders of all consumers
+  // This is critical for performance - without this, every state change causes all
+  // consumers (Header, GamePage, ProfilePage, etc.) to re-render
+  const value: AuthContextValue = useMemo(() => ({
     // State
     user,
     profile,
@@ -523,18 +529,31 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     loading,
     isSupabaseEnabled,
 
-    // Computed
-    isAuthenticated: !!user && !!profile,
-    isGuest: !user,
-    isAdmin: !!profile?.is_admin,
-    canPlayRanked: canPlayRanked(),
-    gamesUntilRanked: gamesUntilRanked(),
+    // Computed (memoized above)
+    isAuthenticated,
+    isGuest,
+    isAdmin,
+    canPlayRanked,
+    gamesUntilRanked,
 
     // Actions
     setupProfile,
     updateProfile: updateUserProfile,
     refreshProfile
-  };
+  }), [
+    user,
+    profile,
+    rankedProgress,
+    loading,
+    isSupabaseEnabled,
+    isAuthenticated,
+    isGuest,
+    isAdmin,
+    canPlayRanked,
+    gamesUntilRanked,
+    // Note: setupProfile, updateUserProfile, refreshProfile are stable due to their definitions
+    refreshProfile
+  ]);
 
   return (
     <AuthContext.Provider value={value}>
