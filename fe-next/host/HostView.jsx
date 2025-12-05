@@ -44,7 +44,7 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
   const [difficulty, setDifficulty] = useState(DEFAULT_DIFFICULTY);
   const [minWordLength, setMinWordLength] = useState(DEFAULT_MIN_WORD_LENGTH);
   const [tableData, setTableData] = useState(generateRandomTable());
-  const [timerValue, setTimerValue] = useState(1);
+  const [timerValue, setTimerValue] = useState(3); // 3 minutes default (matches HARD difficulty)
   const [timerDirection, setTimerDirection] = useState(0);
   const [remainingTime, setRemainingTime] = useState(null);
   const [gameStarted, setGameStarted] = useState(false);

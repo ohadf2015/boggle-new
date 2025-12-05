@@ -70,6 +70,10 @@ const translations = {
       pending: 'Pending',
       xpGained: 'XP',
     },
+    combo: {
+      shieldUsed: '🛡️ Combo Shield Used!',
+      shieldEarned: '🛡️ Shield Earned!',
+    },
     bots: {
       title: 'AI Bots',
       easy: 'Easy',
@@ -642,7 +646,27 @@ const translations = {
       },
       LONG_WORD_CHAIN: {
         name: 'Long Word Chain',
-        description: '3 consecutive words of 6+ letters'
+        description: '4 consecutive words of 6+ letters'
+      },
+      MINIMALIST: {
+        name: 'Minimalist',
+        description: 'Won with only 4+ letter words (15+ words)'
+      },
+      WORD_SNIPER: {
+        name: 'Word Sniper',
+        description: 'Found 5+ unique words no one else found'
+      },
+      PHOTO_FINISH: {
+        name: 'Photo Finish',
+        description: 'Won by less than 5 points'
+      },
+      UNDERDOG: {
+        name: 'Underdog',
+        description: 'Came from behind to win'
+      },
+      CLUTCH_PLAYER: {
+        name: 'Clutch Player',
+        description: 'Found 3+ words in the last 10 seconds'
       }
     },
     achievementTiers: {
@@ -1138,6 +1162,10 @@ const translations = {
       comboBonus: 'קומבו!',
       pending: 'ממתין',
       xpGained: 'XP',
+    },
+    combo: {
+      shieldUsed: '🛡️ מגן קומבו נוצל!',
+      shieldEarned: '🛡️ מגן נפתח!',
     },
     bots: {
       title: 'בוטים',
@@ -1706,7 +1734,27 @@ const translations = {
       },
       LONG_WORD_CHAIN: {
         name: 'שרשרת מילים ארוכות',
-        description: '3 מילים רצופות בנות 6+ אותיות'
+        description: '4 מילים רצופות בנות 6+ אותיות'
+      },
+      MINIMALIST: {
+        name: 'מינימליסט',
+        description: 'ניצחון עם מילים של 4+ אותיות בלבד (15+ מילים)'
+      },
+      WORD_SNIPER: {
+        name: 'צלף מילים',
+        description: 'מצא 5+ מילים ייחודיות שאף אחד אחר לא מצא'
+      },
+      PHOTO_FINISH: {
+        name: 'פוטו פיניש',
+        description: 'ניצחון בפחות מ-5 נקודות הפרש'
+      },
+      UNDERDOG: {
+        name: 'אאוטסיידר',
+        description: 'ניצחון לאחר פיגור באמצע המשחק'
+      },
+      CLUTCH_PLAYER: {
+        name: 'שחקן קלאץ\'',
+        description: 'מצא 3+ מילים ב-10 השניות האחרונות'
       }
     },
     achievementTiers: {
@@ -2201,6 +2249,10 @@ const translations = {
       comboBonus: 'kombo!',
       pending: 'Väntar',
       xpGained: 'XP',
+    },
+    combo: {
+      shieldUsed: '🛡️ Kombosköld använd!',
+      shieldEarned: '🛡️ Sköld upplåst!',
     },
     bots: {
       title: 'AI-bottar',
@@ -2774,7 +2826,27 @@ const translations = {
       },
       LONG_WORD_CHAIN: {
         name: 'Lång Ordkedja',
-        description: '3 konsekutiva ord med 6+ bokstäver'
+        description: '4 konsekutiva ord med 6+ bokstäver'
+      },
+      MINIMALIST: {
+        name: 'Minimalist',
+        description: 'Vann med endast 4+ bokstavsord (15+ ord)'
+      },
+      WORD_SNIPER: {
+        name: 'Ordprickskytt',
+        description: 'Hittade 5+ unika ord som ingen annan hittade'
+      },
+      PHOTO_FINISH: {
+        name: 'Fotofinish',
+        description: 'Vann med mindre än 5 poängs marginal'
+      },
+      UNDERDOG: {
+        name: 'Underdog',
+        description: 'Kom från underläge för att vinna'
+      },
+      CLUTCH_PLAYER: {
+        name: 'Clutch-spelare',
+        description: 'Hittade 3+ ord under sista 10 sekunderna'
       }
     },
     achievementTiers: {
@@ -3266,6 +3338,10 @@ const translations = {
       comboBonus: 'コンボ！',
       pending: '保留中',
       xpGained: 'XP',
+    },
+    combo: {
+      shieldUsed: '🛡️ コンボシールド使用！',
+      shieldEarned: '🛡️ シールド獲得！',
     },
     bots: {
       title: 'AIボット',
@@ -3774,7 +3850,27 @@ const translations = {
       },
       LONG_WORD_CHAIN: {
         name: 'ロングワードチェーン',
-        description: '6文字以上の単語を3つ連続で'
+        description: '6文字以上の単語を4つ連続で'
+      },
+      MINIMALIST: {
+        name: 'ミニマリスト',
+        description: '4文字以上の単語のみで勝利（15単語以上）'
+      },
+      WORD_SNIPER: {
+        name: 'ワードスナイパー',
+        description: '他の誰も見つけなかったユニークな単語を5つ以上発見'
+      },
+      PHOTO_FINISH: {
+        name: 'フォトフィニッシュ',
+        description: '5ポイント未満の差で勝利'
+      },
+      UNDERDOG: {
+        name: 'アンダードッグ',
+        description: '後れを取っていたが逆転勝利'
+      },
+      CLUTCH_PLAYER: {
+        name: 'クラッチプレイヤー',
+        description: '最後の10秒で3つ以上の単語を発見'
       }
     },
     achievementTiers: {
