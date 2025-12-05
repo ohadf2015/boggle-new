@@ -714,6 +714,7 @@ function addPlayerWord(gameCode, username, word, options = {}) {
       validated: validatedStatus,
       autoValidated: options.autoValidated || false,
       onBoard: true,
+      isBot: options.isBot || false,
     });
   }
 }
