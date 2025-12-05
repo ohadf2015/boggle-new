@@ -2,7 +2,7 @@
  * User and Authentication Type Definitions
  */
 
-import type { Avatar } from './game';
+import type { Avatar } from '../shared/types/game';
 
 export interface Session {
   gameCode: string;

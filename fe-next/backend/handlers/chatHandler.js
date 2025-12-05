@@ -10,6 +10,7 @@ const { emitError, ErrorMessages } = require('../utils/errorHandler');
 const { checkRateLimit } = require('../utils/rateLimiter');
 const { inc } = require('../utils/metrics');
 const { isSocketMigrating } = require('./shared');
+const { validatePayload, chatMessageSchema } = require('../utils/socketValidation');
 
 // Rate limit weight for chat
 const CHAT_WEIGHT = parseInt(process.env.RATE_WEIGHT_CHAT || '1');
@@ -43,7 +44,14 @@ function registerChatHandlers(io, socket) {
       return;
     }
 
-    const { message, gameCode: providedGameCode } = data;
+    // Validate payload
+    const validation = validatePayload(chatMessageSchema, data);
+    if (!validation.success) {
+      emitError(socket, `Invalid request: ${validation.error}`);
+      return;
+    }
+
+    const { message, gameCode: providedGameCode } = validation.data;
     const gameCode = providedGameCode || getGameBySocketId(socket.id);
     const username = getUsernameBySocketId(socket.id);
 

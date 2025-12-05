@@ -1,56 +1,19 @@
 /**
  * Central Type Export File
  * Re-exports all type definitions for easy importing
+ *
+ * CONSOLIDATED: Core game and socket types now come from shared/types/
+ * Frontend-specific types (user, api) remain in this directory
  */
 
-// Game types
-export type {
-  Language,
-  GameState,
-  DifficultyLevel,
-  Difficulty,
-  DifficultySettings,
-  LetterGrid,
-  GridPosition,
-  Avatar,
-  User,
-  WordSubmission,
-  PlayerScore,
-  Game,
-  ActiveRoom,
-  MinWordLengthOption,
-} from './game';
+// ==================== Shared Types (Game & Socket) ====================
+// These are the canonical type definitions shared between frontend and backend
+export * from '../shared/types/game';
+export * from '../shared/types/socket';
 
-// Socket types
-export type {
-  SocketAction,
-  BaseSocketMessage,
-  CreateGameMessage,
-  JoinGameMessage,
-  StartGameMessage,
-  EndGameMessage,
-  CloseRoomMessage,
-  ResetGameMessage,
-  SubmitWordMessage,
-  SendAnswerMessage,
-  ValidateWordsMessage,
-  GetActiveRoomsMessage,
-  ChatMessage,
-  HeartbeatMessage,
-  UpdatePresenceMessage,
-  SocketMessage,
-  UpdateUsersEvent,
-  GameStartedEvent,
-  WordSubmittedEvent,
-  GameOverEvent,
-  ScoresEvent,
-  ActiveRoomsEvent,
-  AchievementUnlockedEvent,
-  ErrorEvent,
-  PresenceUpdateEvent,
-} from './socket';
+// ==================== Frontend-Specific Types ====================
 
-// User types
+// User types (frontend auth context)
 export type {
   Session,
   AuthUser,
@@ -59,10 +22,10 @@ export type {
   UserStats,
   Achievement,
   Leaderboard,
-  LeaderboardEntry,
+  // Note: LeaderboardEntry is now in shared/types/game.ts
 } from './user';
 
-// API types
+// API types (frontend API calls)
 export type {
   ApiResponse,
   ApiError,
@@ -74,3 +37,9 @@ export type {
   GetActiveRoomsResponse,
   ValidateWordResponse,
 } from './api';
+
+// ==================== Re-exports for backwards compatibility ====================
+// These aliases ensure existing imports continue to work
+
+// Re-export User type with an alias since shared/types uses GameUser
+export type { GameUser as User } from '../shared/types/game';
