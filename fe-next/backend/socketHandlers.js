@@ -79,6 +79,7 @@ const {
   getWordForPlayer,
   getWordsForPlayer,
   recordVote,
+  recordWordSubmission,  // Save valid words to word_scores table
   updatePendingCache,
   SELF_HEALING_CONFIG,
   // Hybrid validation (cost-saving) - used at game end for batch validation
@@ -887,18 +888,30 @@ function initializeSocketHandlers(io) {
             comboLevel: safeComboLevel
           });
 
-          // Save valid word to database for bot learning (async, don't block)
-          // Only save dictionary words to ensure quality data
-          if (isInDictionary && isSupabaseConfigured()) {
-            const userData = game.users?.[username];
-            savePlayerWord({
+          // Save valid word to word_scores table (async, don't block)
+          // This records all validated words to build community validation data
+          if (isSupabaseConfigured()) {
+            recordWordSubmission({
               word: normalizedWord,
               language: game.language || 'en',
               gameCode,
-              playerId: userData?.authUserId || null
+              submittedBy: username
             }).catch(err => {
-              logger.debug('PLAYER_WORDS', `Failed to save player word: ${err.message}`);
+              logger.debug('WORD_SCORES', `Failed to record word submission: ${err.message}`);
             });
+
+            // Also save dictionary words to player_words for bot learning
+            if (isInDictionary) {
+              const userData = game.users?.[username];
+              savePlayerWord({
+                word: normalizedWord,
+                language: game.language || 'en',
+                gameCode,
+                playerId: userData?.authUserId || null
+              }).catch(err => {
+                logger.debug('PLAYER_WORDS', `Failed to save player word: ${err.message}`);
+              });
+            }
           }
 
           updatePlayerScore(gameCode, username, wordScore, true);
