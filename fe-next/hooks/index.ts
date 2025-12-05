@@ -14,5 +14,13 @@ export { usePresence } from './usePresence';
 export { useValidation } from './useValidation';
 export { useWinStreak } from './useWinStreak';
 
-// Data hooks
-export { useSupabaseRealtime } from './useSupabaseRealtime';
+// Data hooks (Supabase realtime)
+export {
+  useLeaderboard,
+  useUserRank,
+  useProfile,
+  useGameHistory,
+  usePlayerSearch,
+  useGameRoom,
+  useConnectionHealth,
+} from './useSupabaseRealtime';

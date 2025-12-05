@@ -165,16 +165,15 @@ export const ClientEventSchemas = {
 
 // ==================== Validation Helper ====================
 
+type ClientEventName = keyof typeof ClientEventSchemas;
+
 /**
  * Validates socket event data against its schema
  * @param event - The event name
  * @param data - The event data to validate
- * @returns Validated and typed data, or throws ZodError
+ * @returns Validated data, or throws ZodError
  */
-export function validateSocketEvent<T extends keyof typeof ClientEventSchemas>(
-  event: T,
-  data: unknown
-): z.infer<typeof ClientEventSchemas[T]> {
+export function validateSocketEvent(event: ClientEventName, data: unknown): unknown {
   const schema = ClientEventSchemas[event];
   if (!schema) {
     throw new Error(`No schema defined for event: ${event}`);
@@ -185,10 +184,10 @@ export function validateSocketEvent<T extends keyof typeof ClientEventSchemas>(
 /**
  * Safe validation that returns a result object instead of throwing
  */
-export function safeValidateSocketEvent<T extends keyof typeof ClientEventSchemas>(
-  event: T,
+export function safeValidateSocketEvent(
+  event: ClientEventName,
   data: unknown
-): { success: true; data: z.infer<typeof ClientEventSchemas[T]> } | { success: false; error: z.ZodError } {
+): { success: true; data: unknown } | { success: false; error: z.ZodError } {
   const schema = ClientEventSchemas[event];
   if (!schema) {
     return {

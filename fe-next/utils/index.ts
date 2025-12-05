@@ -13,7 +13,15 @@ export * from './guestManager';
 
 // Game utilities
 export * from './validation';
-export * from './clientWordValidator';
+// clientWordValidator has duplicate normalizeHebrewWord - export specific items
+export {
+  normalizeWord,
+  getLanguageRegex,
+  validateWordLocally,
+  calculatePredictedScore,
+  couldBeOnBoard,
+  type ClientValidationResult,
+} from './clientWordValidator';
 export * from './gameInsights';
 export * from './achievementTiers';
 
