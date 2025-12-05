@@ -111,7 +111,25 @@ export const DIFFICULTIES: DifficultySettings = {
   MASTER: { nameKey: 'difficulty.master', rows: 11, cols: 11 },
 };
 
-export const DEFAULT_DIFFICULTY = 'HARD' as const;
+export const DEFAULT_DIFFICULTY = 'MEDIUM' as const;
+
+// Recommended timer durations per difficulty (in seconds)
+// Larger boards need more time to explore effectively
+// Host can override these defaults
+export const DIFFICULTY_TIMERS: Record<string, number> = {
+  EASY: 60,     // 1 minute - small board, quick games
+  MEDIUM: 60,   // 1 minute - default, fast-paced
+  HARD: 120,    // 2 minutes - larger board
+  EXPERT: 180,  // 3 minutes - large board, more searching
+  MASTER: 240,  // 4 minutes - massive board, extensive exploration
+};
+
+export const DEFAULT_TIMER = 60; // 1 minute
+
+// Get recommended timer for a difficulty level
+export const getRecommendedTimer = (difficulty: string): number => {
+  return DIFFICULTY_TIMERS[difficulty] || DEFAULT_TIMER;
+};
 
 // Adaptive deadzone threshold for directional locking
 // Smaller threshold for more responsive selection

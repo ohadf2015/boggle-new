@@ -336,16 +336,17 @@ function initializeSocketHandlers(io) {
       const { language, boardSize } = data;
 
       // Calculate how many words to provide based on board size
-      // Aim for roughly 1 word per 8 cells, with a minimum of 3 and maximum of 15
-      const rows = boardSize?.rows || 7;
-      const cols = boardSize?.cols || 7;
+      // Aim for roughly 1 word per 3-4 cells for denser coverage
+      // Minimum 5 words, maximum 35 words
+      const rows = boardSize?.rows || 5;
+      const cols = boardSize?.cols || 5;
       const totalCells = rows * cols;
-      const wordCount = Math.min(15, Math.max(3, Math.floor(totalCells / 6)));
+      const wordCount = Math.min(35, Math.max(5, Math.floor(totalCells / 3)));
 
       // Get random long words from the dictionary
-      // Min length 4, max length based on board size (but capped at 8 for playability)
+      // Min length 3 for more options, max length based on board size
       const maxWordLen = Math.min(8, Math.max(rows, cols));
-      const words = getRandomLongWords(language || 'en', wordCount, 4, maxWordLen);
+      const words = getRandomLongWords(language || 'en', wordCount, 3, maxWordLen);
 
       socket.emit('wordsForBoard', { words });
     });

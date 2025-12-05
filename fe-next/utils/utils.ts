@@ -140,9 +140,10 @@ function generateTableWithEmbeddedWords(
   const usedCells = new Set<string>();
 
   // Calculate how many words to embed based on board size
-  // Aim for roughly 1 word per 8-10 cells
+  // Aim for roughly 1 word per 3-4 cells for denser coverage
+  // This ensures players have plenty of valid words to find
   const totalCells = rows * cols;
-  const targetWords = Math.min(wordsToEmbed.length, Math.max(2, Math.floor(totalCells / 8)));
+  const targetWords = Math.min(wordsToEmbed.length, Math.max(4, Math.floor(totalCells / 3)));
 
   // Filter words to only include valid letters for the language
   // For Hebrew, this removes punctuation marks like gershayim (״) and geresh (׳)

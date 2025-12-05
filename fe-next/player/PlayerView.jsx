@@ -62,6 +62,9 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode, pe
   const comboLevelRef = useRef(0);
   const lastWordTimeRef = useRef(null);
 
+  // Combo shield system - protects combo from 1 wrong word per 10 valid words
+  const comboShieldsUsedRef = useRef(0);
+
   // Tournament state
   const [tournamentData, setTournamentData] = useState(null);
   const [tournamentStandings, setTournamentStandings] = useState([]);
@@ -117,6 +120,8 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode, pe
     setComboLevel,
     setLastWordTime,
     comboTimeoutRef,
+    comboShieldsUsedRef,
+    foundWords,
     intentionalExitRef,
   });
 

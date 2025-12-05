@@ -104,6 +104,10 @@ interface UsePlayerSocketEventsProps {
   setLastWordTime: React.Dispatch<React.SetStateAction<number | null>>;
   comboTimeoutRef: MutableRefObject<NodeJS.Timeout | null>;
 
+  // Combo shield system - protects combo from wrong words
+  comboShieldsUsedRef: MutableRefObject<number>;
+  foundWords: FoundWord[];
+
   // Exit ref
   intentionalExitRef: MutableRefObject<boolean>;
 }
@@ -158,11 +162,46 @@ const usePlayerSocketEvents = ({
   setLastWordTime,
   comboTimeoutRef,
 
+  // Combo shield system
+  comboShieldsUsedRef,
+  foundWords,
+
   // Exit ref
   intentionalExitRef,
 }: UsePlayerSocketEventsProps): void => {
-  // Reset combo helper
+  // Combo shield constants
+  const VALID_WORDS_PER_SHIELD = 10; // Earn 1 shield per 10 valid words
+
+  // Calculate available shields based on valid words found
+  const getAvailableShields = useCallback(() => {
+    const validWordCount = foundWords.filter(w => w.isValid === true).length;
+    const totalShields = Math.floor(validWordCount / VALID_WORDS_PER_SHIELD);
+    return Math.max(0, totalShields - comboShieldsUsedRef.current);
+  }, [foundWords, comboShieldsUsedRef]);
+
+  // Reset combo helper - now checks for available shields first
   const resetCombo = useCallback(() => {
+    const currentCombo = comboLevelRef.current;
+
+    // Only use shield if we have an active combo worth protecting
+    if (currentCombo > 0) {
+      const availableShields = getAvailableShields();
+
+      if (availableShields > 0) {
+        // Use a shield instead of resetting combo
+        comboShieldsUsedRef.current += 1;
+
+        // Show shield used notification
+        neoInfoToast(t('combo.shieldUsed') || '🛡️ Combo Shield Used!', {
+          duration: 2000,
+        });
+
+        logger.log('[COMBO] Shield used, combo preserved at level', currentCombo);
+        return; // Don't reset combo
+      }
+    }
+
+    // No shield available or no combo to protect - reset normally
     setComboLevel(0);
     comboLevelRef.current = 0;
     setLastWordTime(null);
@@ -170,7 +209,7 @@ const usePlayerSocketEvents = ({
     if (comboTimeoutRef.current) {
       clearTimeout(comboTimeoutRef.current);
     }
-  }, [setComboLevel, setLastWordTime, comboLevelRef, lastWordTimeRef, comboTimeoutRef]);
+  }, [setComboLevel, setLastWordTime, comboLevelRef, lastWordTimeRef, comboTimeoutRef, getAvailableShields, comboShieldsUsedRef, t]);
 
   // Use a ref for onShowResults to avoid stale closure issues during game end race condition
   // This ensures the validatedScores event handler always has access to the latest callback
@@ -204,6 +243,8 @@ const usePlayerSocketEvents = ({
       setWasInActiveGame(true);
       setFoundWords([]);
       setAchievements([]);
+      // Reset combo shields for new game
+      comboShieldsUsedRef.current = 0;
       if (data.letterGrid) setLetterGrid(data.letterGrid);
       if (data.timerSeconds) setRemainingTime(data.timerSeconds);
       if (data.language) setGameLanguage(data.language);

@@ -28,12 +28,19 @@ const ACHIEVEMENT_ICONS = {
   ANAGRAM_ARTIST: '🔀',
   LETTER_POPPER: '🎈',
   // New elite achievements
-  WORD_ARCHITECT: '🏛️',      // Find 3 words of 7+ letters
-  SPEED_LEGEND: '🏎️',        // 25 words in 90 seconds
-  COMBO_GOD: '👑',            // Reach 20+ combo streak
-  VOCABULARY_TITAN: '🗿',     // 50+ valid words
-  PRECISION_MASTER: '🎯',     // 25+ words with 100% accuracy
-  LONG_WORD_CHAIN: '🔗',      // 3 consecutive words of 6+ letters
+  WORD_ARCHITECT: '🏛️',      // Find 5 words of 7+ letters
+  SPEED_LEGEND: '🏎️',        // 30 words in 90 seconds
+  COMBO_GOD: '👑',            // Reach 25+ combo streak
+  VOCABULARY_TITAN: '🗿',     // 60+ valid words
+  PRECISION_MASTER: '🎯',     // 30+ words with 100% accuracy
+  LONG_WORD_CHAIN: '🔗',      // 4 consecutive words of 6+ letters
+
+  // New competitive/style achievements
+  MINIMALIST: '🎯',           // Win with only 4+ letter words (no 2-3 letter words)
+  WORD_SNIPER: '🔫',          // Find 5+ unique words no other player found
+  PHOTO_FINISH: '📸',         // Win by less than 5 points in multiplayer
+  UNDERDOG: '🐕',             // Come from behind to win (was trailing at halftime)
+  CLUTCH_PLAYER: '💪',        // Find 3+ valid words in the last 10 seconds
 };
 
 // Get localized achievements based on locale
@@ -428,9 +435,81 @@ const awardFinalAchievements = (game, users) => {
       }
     }
 
+    // NEW COMPETITIVE/STYLE ACHIEVEMENTS
+
+    // Minimalist - All valid words are 4+ letters (no 2-3 letter words), min 15 words
+    if (validWords.length >= 15 && validWords.every(w => w.word.length >= 4)) {
+      addAchievement('MINIMALIST');
+    }
+
+    // Clutch Player - 3+ valid words in the last 10 seconds
+    const gameDurationClutch = game.gameDuration || 180;
+    const clutchWords = validWords.filter(w => w.timeSinceStart >= (gameDurationClutch - 10));
+    if (clutchWords.length >= 3) {
+      addAchievement('CLUTCH_PLAYER');
+    }
+
     // Note: COMBO_KING, COMBO_GOD, STREAK_MASTER are combo-based achievements
     // that are primarily awarded during live gameplay
+    // Note: WORD_SNIPER, PHOTO_FINISH, UNDERDOG require cross-player comparison
+    // and are handled separately after all players are processed
   });
+
+  // Cross-player achievements (require comparing all players)
+  const allPlayerWords = {};
+  const playerScores = {};
+
+  users.forEach(username => {
+    const userData = game.users?.[username];
+    if (userData?.isBot) return; // Skip bots
+
+    const validWords = (game.playerWordDetails[username] || [])
+      .filter(w => w.validated === true)
+      .map(w => w.word.toLowerCase());
+    allPlayerWords[username] = new Set(validWords);
+
+    // Calculate total score for this player
+    let score = 0;
+    validWords.forEach(word => {
+      score += word.length - 1; // Base score
+    });
+    playerScores[username] = score;
+  });
+
+  const humanPlayers = users.filter(u => !game.users?.[u]?.isBot);
+
+  // Only award competitive achievements in multiplayer
+  if (humanPlayers.length > 1) {
+    // Find all words found by each player and count occurrences
+    const wordOccurrences = {};
+    Object.values(allPlayerWords).forEach(wordSet => {
+      wordSet.forEach(word => {
+        wordOccurrences[word] = (wordOccurrences[word] || 0) + 1;
+      });
+    });
+
+    humanPlayers.forEach(username => {
+      const playerWordSet = allPlayerWords[username] || new Set();
+      const currentAchievements = game.playerAchievements[username];
+
+      // Word Sniper - 5+ unique words no other player found
+      const uniqueWords = [...playerWordSet].filter(word => wordOccurrences[word] === 1);
+      if (uniqueWords.length >= 5 && !currentAchievements.includes('WORD_SNIPER')) {
+        currentAchievements.push('WORD_SNIPER');
+      }
+
+      // Photo Finish - Win by less than 5 points
+      const myScore = playerScores[username] || 0;
+      const otherScores = Object.entries(playerScores)
+        .filter(([u]) => u !== username)
+        .map(([, s]) => s);
+      const maxOtherScore = Math.max(...otherScores, 0);
+
+      if (myScore > maxOtherScore && myScore - maxOtherScore < 5 && !currentAchievements.includes('PHOTO_FINISH')) {
+        currentAchievements.push('PHOTO_FINISH');
+      }
+    });
+  }
 };
 
 module.exports = {

@@ -14,7 +14,7 @@ import GameTypeSelector from '../../components/GameTypeSelector';
 import PresenceIndicator from '../../components/PresenceIndicator';
 import BotControls from '../../components/BotControls';
 import { copyJoinUrl, shareViaWhatsApp } from '../../utils/share';
-import { DIFFICULTIES, MIN_WORD_LENGTH_OPTIONS } from '../../utils/consts';
+import { DIFFICULTIES, MIN_WORD_LENGTH_OPTIONS, getRecommendedTimer } from '../../utils/consts';
 import { cn } from '../../lib/utils';
 import { useSocket } from '../../utils/SocketContext';
 
@@ -89,7 +89,12 @@ const HostPreGameView = ({
 
   const handleSetDifficulty = useCallback((key) => {
     setDifficulty(key);
-  }, [setDifficulty]);
+    // Auto-adjust timer to recommended value for this difficulty
+    const recommendedSeconds = getRecommendedTimer(key);
+    const recommendedMinutes = Math.round(recommendedSeconds / 60);
+    setTimerValue(recommendedMinutes);
+    setTimerDirection(0); // Reset animation direction
+  }, [setDifficulty, setTimerValue, setTimerDirection]);
 
   const handleSetMinWordLength = useCallback((value) => {
     setMinWordLength(value);
