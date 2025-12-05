@@ -7,7 +7,7 @@ export type Language = 'he' | 'en' | 'sv' | 'ja' | 'es' | 'fr' | 'de';
 
 export type GameState = 'waiting' | 'in-progress' | 'finished' | 'validating';
 
-export type DifficultyLevel = 'EASY' | 'MEDIUM' | 'HARD' | 'EXPERT' | 'MASTER';
+export type DifficultyLevel = 'EASY' | 'MEDIUM' | 'HARD';
 
 export interface Difficulty {
   nameKey: string;
@@ -19,8 +19,6 @@ export interface DifficultySettings {
   EASY: Difficulty;
   MEDIUM: Difficulty;
   HARD: Difficulty;
-  EXPERT: Difficulty;
-  MASTER: Difficulty;
 }
 
 export type LetterGrid = string[][];

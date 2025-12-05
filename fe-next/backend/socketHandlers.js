@@ -2599,6 +2599,22 @@ async function calculateAndBroadcastFinalScores(io, gameCode) {
         score += wordScore;
       }
 
+      // Determine invalid reason for rejected words
+      // Priority: AI reason > default "Not found in dictionary"
+      let invalidReasonText = undefined;
+      if (!isValid && !isPendingValidation) {
+        if (aiResult?.reason) {
+          // AI provided a specific reason for rejection
+          invalidReasonText = aiResult.reason;
+        } else if (aiResult && !aiResult.isValid) {
+          // AI checked and rejected but no specific reason
+          invalidReasonText = 'Invalid word';
+        } else {
+          // Not in dictionary and AI didn't check
+          invalidReasonText = 'Not found in dictionary';
+        }
+      }
+
       wordObjects.push({
         word: word,
         score: isDuplicate ? 0 : wordScore,
@@ -2609,7 +2625,7 @@ async function calculateAndBroadcastFinalScores(io, gameCode) {
         isPendingValidation: isPendingValidation, // New flag for pending community validation
         isAiVerified: aiResult?.isAiVerified || wordDetail?.isAiVerified || false,  // Track if AI verified
         aiReason: aiResult?.reason || undefined,  // AI's reason for validating/invalidating (shown in tooltip)
-        invalidReason: !isValid && aiResult?.reason ? aiResult.reason : undefined  // Reason for invalid words (in game language)
+        invalidReason: invalidReasonText  // Reason for invalid words (shown in tooltip)
       });
     });
 

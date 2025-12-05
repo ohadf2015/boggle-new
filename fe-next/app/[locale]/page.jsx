@@ -579,6 +579,16 @@ export default function GamePage() {
       }
     });
 
+    // Handle rate limiting - user is sending too many requests
+    newSocket.on('rateLimited', () => {
+      logger.warn('[SOCKET.IO] Rate limited by server');
+      setIsJoining(false); // Clear loading state
+      toast.error(t('errors.rateLimited') || 'Too many requests. Please wait a moment and try again.', {
+        icon: '⏳',
+        duration: 4000,
+      });
+    });
+
     newSocket.on('hostTransferred', (data) => {
       if (data.newHost === username) {
         setIsHost(true);
@@ -815,11 +825,12 @@ export default function GamePage() {
       });
     }, 10000);
 
-    // Clear safety timeout when response is received (via joined/error events)
+    // Clear safety timeout when response is received (via joined/error/rateLimited events)
     const clearSafetyTimeout = () => clearTimeout(safetyTimeout);
     socket.once('joined', clearSafetyTimeout);
     socket.once('error', clearSafetyTimeout);
     socket.once('joinedAsSpectator', clearSafetyTimeout);
+    socket.once('rateLimited', clearSafetyTimeout);
 
     // Use overrideGameCode if provided, otherwise use state gameCode
     const codeToUse = overrideGameCode || gameCode;
