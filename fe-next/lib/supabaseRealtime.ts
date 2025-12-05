@@ -1,17 +1,59 @@
 /**
  * Supabase Real-time Subscriptions
  * Handles live updates for leaderboard and profile changes
+ *
+ * Optimizations:
+ * - Singleton pattern for shared subscriptions (leaderboard)
+ * - Debounced callbacks to prevent excessive refetches
+ * - Connection health monitoring with exponential backoff
+ * - Proper cleanup and deduplication
  */
 
-import { RealtimeChannel } from '@supabase/supabase-js';
+import { RealtimeChannel, REALTIME_SUBSCRIBE_STATES } from '@supabase/supabase-js';
 import { supabase } from './supabase';
 import logger from '@/utils/logger';
 
 // Active subscriptions tracking
 const activeSubscriptions = new Map<string, RealtimeChannel>();
 
+// Subscriber callbacks for shared subscriptions
+const leaderboardCallbacks = new Set<(payload: any) => void>();
+const leaderboardStatusCallbacks = new Set<(status: string) => void>();
+
+// Debounce timers
+const debounceTimers = new Map<string, NodeJS.Timeout>();
+
+// Connection state
+let connectionRetryCount = 0;
+const MAX_RETRY_COUNT = 5;
+const BASE_RETRY_DELAY = 1000;
+
 interface SubscriptionOptions {
   onStatusChange?: (status: string) => void;
+  debounceMs?: number; // Debounce delay for callbacks
+}
+
+/**
+ * Calculate exponential backoff delay with jitter
+ */
+function getRetryDelay(attempt: number): number {
+  const exponentialDelay = BASE_RETRY_DELAY * Math.pow(2, attempt);
+  const jitter = Math.random() * 1000;
+  return Math.min(exponentialDelay + jitter, 30000); // Max 30 seconds
+}
+
+/**
+ * Debounce helper - coalesces rapid calls into a single call
+ */
+function debounce(key: string, callback: () => void, delay: number): void {
+  const existing = debounceTimers.get(key);
+  if (existing) {
+    clearTimeout(existing);
+  }
+  debounceTimers.set(key, setTimeout(() => {
+    debounceTimers.delete(key);
+    callback();
+  }, delay));
 }
 
 interface GameRoomHandlers {
@@ -27,8 +69,76 @@ interface GameRoomChannel {
 }
 
 /**
- * Subscribe to leaderboard changes
- * @param onUpdate - Callback when leaderboard changes
+ * Get or create the shared leaderboard channel (singleton pattern)
+ * This ensures only one WebSocket subscription for leaderboard across all consumers
+ */
+function getOrCreateLeaderboardChannel(): RealtimeChannel | null {
+  if (!supabase) {
+    logger.warn('[Realtime] Supabase not configured');
+    return null;
+  }
+
+  const channelName = 'leaderboard-shared';
+
+  // Return existing channel if already created
+  if (activeSubscriptions.has(channelName)) {
+    return activeSubscriptions.get(channelName)!;
+  }
+
+  logger.log('[Realtime] Creating shared leaderboard channel');
+
+  const channel = supabase
+    .channel(channelName)
+    .on(
+      'postgres_changes',
+      {
+        event: 'UPDATE', // Only listen to updates, not inserts (new players don't affect existing ranks immediately)
+        schema: 'public',
+        table: 'leaderboard'
+      },
+      (payload) => {
+        logger.log('[Realtime] Leaderboard update:', payload.eventType);
+        // Notify all subscribers with debouncing per callback
+        leaderboardCallbacks.forEach(callback => {
+          debounce(`leaderboard-callback-${callback.toString().slice(0, 50)}`, () => callback(payload), 500);
+        });
+      }
+    )
+    .subscribe((status) => {
+      logger.log('[Realtime] Leaderboard subscription status:', status);
+
+      // Handle connection recovery
+      if (status === REALTIME_SUBSCRIBE_STATES.CHANNEL_ERROR || status === REALTIME_SUBSCRIBE_STATES.TIMED_OUT) {
+        if (connectionRetryCount < MAX_RETRY_COUNT) {
+          const delay = getRetryDelay(connectionRetryCount);
+          logger.warn(`[Realtime] Leaderboard connection failed, retrying in ${delay}ms (attempt ${connectionRetryCount + 1}/${MAX_RETRY_COUNT})`);
+          connectionRetryCount++;
+          setTimeout(() => {
+            // Remove and recreate channel
+            activeSubscriptions.delete(channelName);
+            supabase.removeChannel(channel);
+            getOrCreateLeaderboardChannel();
+          }, delay);
+        } else {
+          logger.error('[Realtime] Leaderboard connection failed after max retries');
+        }
+      } else if (status === REALTIME_SUBSCRIBE_STATES.SUBSCRIBED) {
+        connectionRetryCount = 0; // Reset on successful connection
+      }
+
+      // Notify all status subscribers
+      leaderboardStatusCallbacks.forEach(callback => callback(status));
+    });
+
+  activeSubscriptions.set(channelName, channel);
+  return channel;
+}
+
+/**
+ * Subscribe to leaderboard changes (uses shared singleton channel)
+ * Multiple consumers share the same WebSocket subscription
+ *
+ * @param onUpdate - Callback when leaderboard changes (debounced by default)
  * @param options - Subscription options
  * @returns Unsubscribe function
  */
@@ -36,40 +146,37 @@ export function subscribeToLeaderboard(
   onUpdate: (payload: any) => void,
   options: SubscriptionOptions = {}
 ): () => void {
-  if (!supabase) {
-    logger.warn('[Realtime] Supabase not configured');
+  const channel = getOrCreateLeaderboardChannel();
+
+  if (!channel) {
     return () => {};
   }
 
-  const channelName = `leaderboard-${Date.now()}`;
+  // Add callback to the set
+  leaderboardCallbacks.add(onUpdate);
 
-  const channel = supabase
-    .channel(channelName)
-    .on(
-      'postgres_changes',
-      {
-        event: '*',
-        schema: 'public',
-        table: 'leaderboard'
-      },
-      (payload) => {
-        logger.log('[Realtime] Leaderboard change:', payload.eventType);
-        onUpdate(payload);
-      }
-    )
-    .subscribe((status) => {
-      logger.log('[Realtime] Leaderboard subscription status:', status);
-      if (options.onStatusChange) {
-        options.onStatusChange(status);
-      }
-    });
-
-  activeSubscriptions.set(channelName, channel);
+  if (options.onStatusChange) {
+    leaderboardStatusCallbacks.add(options.onStatusChange);
+  }
 
   return () => {
-    logger.log('[Realtime] Unsubscribing from leaderboard');
-    supabase.removeChannel(channel);
-    activeSubscriptions.delete(channelName);
+    logger.log('[Realtime] Removing leaderboard subscriber');
+    leaderboardCallbacks.delete(onUpdate);
+
+    if (options.onStatusChange) {
+      leaderboardStatusCallbacks.delete(options.onStatusChange);
+    }
+
+    // Only remove the channel if no more subscribers
+    if (leaderboardCallbacks.size === 0) {
+      logger.log('[Realtime] No more leaderboard subscribers, cleaning up channel');
+      const channelName = 'leaderboard-shared';
+      const existingChannel = activeSubscriptions.get(channelName);
+      if (existingChannel && supabase) {
+        supabase.removeChannel(existingChannel);
+        activeSubscriptions.delete(channelName);
+      }
+    }
   };
 }
 
@@ -260,10 +367,40 @@ export function getActiveSubscriptions(): string[] {
  */
 export function cleanupAllSubscriptions(): void {
   logger.log(`[Realtime] Cleaning up ${activeSubscriptions.size} subscriptions`);
-  for (const [name, channel] of activeSubscriptions) {
+
+  // Clear all debounce timers
+  debounceTimers.forEach((timer) => {
+    clearTimeout(timer);
+  });
+  debounceTimers.clear();
+
+  // Clear callback sets
+  leaderboardCallbacks.clear();
+  leaderboardStatusCallbacks.clear();
+
+  // Remove all channels
+  activeSubscriptions.forEach((channel) => {
     supabase?.removeChannel(channel);
-  }
+  });
   activeSubscriptions.clear();
+
+  // Reset connection state
+  connectionRetryCount = 0;
+}
+
+/**
+ * Get subscription statistics for monitoring
+ */
+export function getSubscriptionStats(): {
+  activeChannels: number;
+  leaderboardSubscribers: number;
+  pendingDebounces: number;
+} {
+  return {
+    activeChannels: activeSubscriptions.size,
+    leaderboardSubscribers: leaderboardCallbacks.size,
+    pendingDebounces: debounceTimers.size
+  };
 }
 
 // Cleanup on page unload
