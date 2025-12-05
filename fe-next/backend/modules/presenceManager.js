@@ -198,6 +198,32 @@ function isUserDisconnected(game, username) {
   return !health.healthy;
 }
 
+/**
+ * Mark host as active (called on keepalive)
+ * @param {object} game - Game object
+ */
+function markHostActive(game) {
+  if (!game) return;
+
+  game.hostLastActiveAt = Date.now();
+  game.hostStatus = 'active';
+  game.lastActivity = Date.now();
+}
+
+/**
+ * Reactivate host after being idle
+ * @param {object} game - Game object
+ * @returns {boolean} - Whether reactivation succeeded
+ */
+function reactivateHost(game) {
+  if (!game) return false;
+
+  game.hostLastActiveAt = Date.now();
+  game.hostStatus = 'active';
+  game.lastActivity = Date.now();
+  return true;
+}
+
 module.exports = {
   // Presence tracking
   updateUserPresence,
@@ -207,6 +233,10 @@ module.exports = {
   getPresenceConfig,
   getUsersWithPresence,
   isUserDisconnected,
+
+  // Host presence
+  markHostActive,
+  reactivateHost,
 
   // Export config for reference
   PRESENCE_CONFIG,

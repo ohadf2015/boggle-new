@@ -1,7 +1,5 @@
 // Scoring calculation utilities
 
-const { getGame, getLeaderboard } = require('./gameStateManager');
-
 // Get combo multiplier based on combo level
 // Higher combo levels give better multipliers
 // Combo 0-2: x1.0 (no bonus for small combos)
@@ -63,34 +61,89 @@ const calculateWordScore = (word, comboLevel = 0) => {
 
 /**
  * Calculate final game scores for all players
- * @param {string} gameCode - Game code
- * @returns {object} - Score data for all players
+ * @param {object} game - Game object
+ * @param {object} wordCountMap - Map of word to count across all players
+ * @param {Set} dictionaryValidatedWords - Words validated by dictionary
+ * @param {Set} communityValidatedWords - Words validated by community
+ * @param {Map} aiValidatedWords - Words validated by AI with isValid status
+ * @returns {array} - Array of player score objects
  */
-const calculateGameScores = (gameCode) => {
-  const game = getGame(gameCode);
-  if (!game) return {};
+const calculateGameScores = (game, wordCountMap = {}, dictionaryValidatedWords = new Set(), communityValidatedWords = new Set(), aiValidatedWords = new Map()) => {
+  if (!game) return [];
 
-  const scores = {};
+  const results = [];
   const playerWords = game.playerWords || {};
+  const playerWordDetails = game.playerWordDetails || {};
 
   for (const [username, words] of Object.entries(playerWords)) {
     const uniqueWords = [...new Set(words)];
     let totalScore = 0;
+    const wordDetails = [];
 
-    const wordScores = uniqueWords.map(word => {
-      const score = calculateWordScore(word);
-      totalScore += score;
-      return { word, score };
-    });
+    for (const word of uniqueWords) {
+      // Determine if word is valid and get validation source
+      let validated = false;
+      let inDictionary = false;
+      let validationSource = 'none';
 
-    scores[username] = {
+      if (dictionaryValidatedWords.has(word)) {
+        validated = true;
+        inDictionary = true;
+        validationSource = 'dictionary';
+      } else if (communityValidatedWords.has(word)) {
+        validated = true;
+        validationSource = 'community';
+      } else if (aiValidatedWords.has(word)) {
+        const aiResult = aiValidatedWords.get(word);
+        validated = aiResult.isValid;
+        validationSource = aiResult.isAiVerified ? 'ai' : aiResult.source || 'cached';
+      }
+
+      // Check if word is unique (only one player submitted it)
+      const isUnique = (wordCountMap[word] || 0) === 1;
+
+      // Get pre-calculated score from word details if available
+      const existingDetails = (playerWordDetails[username] || []).find(d => d.word === word);
+      let score = 0;
+
+      if (validated) {
+        if (existingDetails && typeof existingDetails.score === 'number') {
+          score = existingDetails.score;
+        } else {
+          score = calculateWordScore(word, 0);
+        }
+        totalScore += score;
+      }
+
+      wordDetails.push({
+        word,
+        score,
+        validated,
+        inDictionary,
+        validationSource,
+        isUnique,
+        comboBonus: existingDetails?.comboBonus || 0
+      });
+    }
+
+    // Get user data for avatar
+    const userData = game.users?.[username] || {};
+
+    results.push({
+      username,
       totalScore,
-      words: wordScores,
-      wordCount: uniqueWords.length
-    };
+      wordDetails,
+      wordCount: uniqueWords.length,
+      avatar: userData.avatar || null,
+      isBot: userData.isBot || false,
+      achievements: game.playerAchievements?.[username] || []
+    });
   }
 
-  return scores;
+  // Sort by total score descending
+  results.sort((a, b) => b.totalScore - a.totalScore);
+
+  return results;
 };
 
 module.exports = {
