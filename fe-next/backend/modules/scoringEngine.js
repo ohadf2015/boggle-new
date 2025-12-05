@@ -122,6 +122,7 @@ const calculateGameScores = (game, wordCountMap = {}, dictionaryValidatedWords =
         inDictionary,
         validationSource,
         isUnique,
+        isDuplicate: !isUnique, // Frontend expects isDuplicate (inverse of isUnique)
         comboBonus: existingDetails?.comboBonus || 0
       });
     }
@@ -131,8 +132,10 @@ const calculateGameScores = (game, wordCountMap = {}, dictionaryValidatedWords =
 
     results.push({
       username,
-      totalScore,
-      wordDetails,
+      score: totalScore, // Frontend expects 'score' not 'totalScore'
+      totalScore, // Keep for backwards compatibility with other usages
+      allWords: wordDetails, // Frontend expects 'allWords' not 'wordDetails'
+      wordDetails, // Keep for backwards compatibility with other usages
       wordCount: uniqueWords.length,
       avatar: userData.avatar || null,
       isBot: userData.isBot || false,
