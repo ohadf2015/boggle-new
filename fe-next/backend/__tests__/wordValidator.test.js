@@ -156,7 +156,8 @@ describe('Word Validator', () => {
     });
 
     test('normalizes entire Hebrew word', () => {
-      expect(normalizeHebrewWord('שלום')).toBe('שלום');
+      // Final ם (mem sofit) gets normalized to מ (regular mem)
+      expect(normalizeHebrewWord('שלום')).toBe('שלומ');
       expect(normalizeHebrewWord('ילדים')).toBe('ילדימ'); // Final מ becomes מ
     });
 
