@@ -208,10 +208,14 @@ const usePlayerSocketEvents = ({
       if (data.timerSeconds) setRemainingTime(data.timerSeconds);
       if (data.language) setGameLanguage(data.language);
       if (data.minWordLength) setMinWordLength(data.minWordLength);
-      setGameActive(true);
 
-      // Skip countdown animation for late joiners - they should start playing immediately
-      if (!data.lateJoin) {
+      // For late joiners: activate game immediately (no countdown animation)
+      // For regular players: delay activation until countdown animation completes
+      // This is handled in PlayerView.jsx via useEffect watching showStartAnimation
+      if (data.lateJoin) {
+        setGameActive(true);
+      } else {
+        // Show countdown animation - game will activate when animation completes
         setShowStartAnimation(true);
       }
 

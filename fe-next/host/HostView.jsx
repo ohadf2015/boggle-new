@@ -186,6 +186,16 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
     setPlayersReady(initialPlayers);
   }, [initialPlayers]);
 
+  // Activate game when countdown animation completes (3-2-1-GO!)
+  // This ensures the animation plays BEFORE the game board appears
+  useEffect(() => {
+    // Check if animation just finished and we have game data ready
+    if (!showStartAnimation && tableData && remainingTime > 0 && !gameStarted && !waitingForResults) {
+      logger.log('[HOST] Countdown animation complete, activating game');
+      setGameStarted(true);
+    }
+  }, [showStartAnimation, tableData, remainingTime, gameStarted, waitingForResults]);
+
   // Request words for board embedding
   useEffect(() => {
     if (!socket) return;
@@ -282,7 +292,8 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
     setTableData(newTable);
     const seconds = timerValue * 60;
     setRemainingTime(seconds);
-    setGameStarted(true);
+    // Don't set gameStarted here - let the countdown animation play first
+    // Game will activate when animation completes via the useEffect below
     setShowStartAnimation(true);
     setPlayerWordCounts({});
     setPlayerScores({});

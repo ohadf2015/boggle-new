@@ -437,7 +437,8 @@ const useHostSocketEvents = ({
       if (data.timerSeconds !== undefined) {
         setRemainingTime(data.timerSeconds);
       }
-      setGameStarted(true);
+      // Don't set gameStarted here - let the countdown animation play first
+      // Game will activate when animation completes via useEffect in HostView
       setWaitingForResults(false); // Reset waiting state when new game starts
       waitingStartTimeRef.current = null; // Reset waiting state tracking
       setShowStartAnimation(true);
