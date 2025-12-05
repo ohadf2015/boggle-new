@@ -86,8 +86,9 @@ const PlayerWaitingResultsView = ({
         <div className="max-w-2xl w-full space-y-4 sm:space-y-6 md:space-y-8">
           {/* Waiting for Results Message - Fixed height container to prevent CLS */}
           <motion.div
-            initial={{ scale: 0.9, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.3 }}
             className="text-center"
           >
             <div className="bg-neo-yellow border-4 border-neo-black shadow-hard-lg p-6 sm:p-8 md:p-10">
@@ -193,9 +194,9 @@ const PlayerWaitingResultsView = ({
           {/* Leaderboard */}
           {leaderboard.length > 0 && (
             <motion.div
-              initial={{ y: 20, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              transition={{ delay: 0.2 }}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.3, delay: 0.1 }}
             >
               <div className="bg-neo-cream border-4 border-neo-black shadow-hard-lg overflow-hidden">
                 <div className="py-3 px-4 border-b-4 border-neo-black bg-neo-purple">
@@ -216,9 +217,9 @@ const PlayerWaitingResultsView = ({
                     return (
                       <motion.div
                         key={player.username}
-                        initial={{ x: 50, opacity: 0 }}
-                        animate={{ x: 0, opacity: 1 }}
-                        transition={{ delay: index * 0.1 }}
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ duration: 0.2, delay: index * 0.05 }}
                         className={`flex items-center gap-3 p-3 rounded-neo border-3 border-neo-black shadow-hard-sm transition-all
                           hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-hard
                           ${getRankStyle()} ${dir === 'rtl' ? 'flex-row-reverse' : ''}`}
@@ -256,9 +257,9 @@ const PlayerWaitingResultsView = ({
 
           {/* Chat Section */}
           <motion.div
-            initial={{ y: 20, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ delay: 0.3 }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.3, delay: 0.2 }}
           >
             <RoomChat
               username={username}

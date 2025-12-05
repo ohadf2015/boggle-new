@@ -459,8 +459,8 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
         />
       )}
 
-      {/* Pre-Game View */}
-      {!gameStarted && !waitingForResults && (
+      {/* Pre-Game View - hidden when countdown animation is playing or waiting for results */}
+      {!gameStarted && !waitingForResults && !showStartAnimation && (
         <HostPreGameView
           gameCode={gameCode}
           roomLanguage={roomLanguage}

@@ -523,6 +523,12 @@ function calculateWordPriority(wordData) {
     priority += 20;
   }
 
+  // Factor 5: Bot words get high priority for validation
+  // Players should validate bot word choices to help improve bot quality
+  if (wordData.isBot) {
+    priority += 80; // High priority to ensure bot words appear in validation queue
+  }
+
   return priority;
 }
 
@@ -555,10 +561,13 @@ function getWordsForPlayer(nonDictWords, excludeUsername, language, count = SELF
     // Get vote stats from cache or use defaults
     const voteStats = cached || { likes: 0, dislikes: 0, netScore: 0, aiApproved: false };
 
+    // Include isBot flag in priority calculation so bot words get prioritized
+    const priorityData = { ...voteStats, isBot: wordData.isBot === true };
+
     return {
       ...wordData,
       ...voteStats,
-      priority: calculateWordPriority(voteStats),
+      priority: calculateWordPriority(priorityData),
       normalized
     };
   });
