@@ -1080,28 +1080,29 @@ function clearSocketMappings(socketId) {
   return { gameCode, username };
 }
 
-// Legacy compatibility exports (for gradual migration)
-const gameWs = socketToGame;
-const wsUsername = socketToUsername;
-const getUsernameFromWs = getUsernameBySocketId;
-const getGameCodeFromUsername = (username) => {
-  for (const [gameCode, game] of Object.entries(games)) {
-    if (game.users[username]) {
-      return gameCode;
-    }
-  }
-  return null;
-};
-const getWsHostFromGameCode = (gameCode) => games[gameCode]?.hostSocketId;
-const getWsFromUsername = getSocketIdByUsername;
-const getTournamentIdFromGame = (gameCode) => games[gameCode]?.tournamentId || null;
-const setTournamentIdForGame = (gameCode, tournamentId) => {
+// Tournament management helpers
+/**
+ * Get tournament ID for a game
+ * @param {string} gameCode - Game code
+ * @returns {string|null} - Tournament ID or null
+ */
+function getTournamentIdFromGame(gameCode) {
+  return games[gameCode]?.tournamentId || null;
+}
+
+/**
+ * Set tournament ID for a game
+ * @param {string} gameCode - Game code
+ * @param {string|null} tournamentId - Tournament ID to set
+ * @returns {boolean} - Whether the operation succeeded
+ */
+function setTournamentIdForGame(gameCode, tournamentId) {
   if (games[gameCode]) {
     games[gameCode].tournamentId = tournamentId;
     return true;
   }
   return false;
-};
+}
 
 module.exports = {
   // Game CRUD
@@ -1167,13 +1168,7 @@ module.exports = {
   removeAuthUserConnection,
   clearSocketMappings,
 
-  // Legacy compatibility
-  gameWs,
-  wsUsername,
-  getUsernameFromWs,
-  getGameCodeFromUsername,
-  getWsHostFromGameCode,
-  getWsFromUsername,
+  // Tournament management
   getTournamentIdFromGame,
   setTournamentIdForGame
 };

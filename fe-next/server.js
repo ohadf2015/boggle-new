@@ -1,36 +1,42 @@
-// server.js - Socket.IO Server
+// server.js - Socket.IO Server (Refactored)
 require("dotenv").config();
 const express = require("express");
 const http = require("http");
 const { Server } = require("socket.io");
-const path = require("path");
 const next = require("next");
 const cors = require("cors");
 const { createAdapter } = require("@socket.io/redis-adapter");
 
 // Backend imports
-const { initRedis, closeRedis, createPubSubClients, getRedisMetrics } = require("./backend/redisClient");
+const { initRedis, closeRedis, createPubSubClients } = require("./backend/redisClient");
 const dictionary = require("./backend/dictionary");
 const { initializeSocketHandlers } = require("./backend/socketHandlers");
 const { restoreTournamentsFromRedis } = require("./backend/modules/tournamentManager");
-const { cleanupStaleGames, cleanupEmptyRooms } = require("./backend/modules/gameStateManager");
+const { cleanupStaleGames, cleanupEmptyRooms, getActiveRooms } = require("./backend/modules/gameStateManager");
 const { pool: wordValidatorPool } = require("./backend/modules/wordValidatorPool");
-const { geolocationMiddleware, getCountryFromRequest, getClientIP } = require("./backend/utils/geolocation");
+const { geolocationMiddleware, getCountryFromRequest } = require("./backend/utils/geolocation");
+const { setEventLoopLag } = require("./backend/utils/metrics");
+
+// Route modules
+const adminRoutes = require("./backend/routes/admin");
+const leaderboardRoutes = require("./backend/routes/leaderboard");
+const analyticsRoutes = require("./backend/routes/analytics");
+const geolocationRoutes = require("./backend/routes/geolocation");
 
 // Track cleanup timers for graceful shutdown
 const cleanupTimers = new Set();
 
 const dev = process.env.NODE_ENV !== "production";
-const app = next({ dev });
-const handle = app.getRequestHandler();
+const nextApp = next({ dev });
+const handle = nextApp.getRequestHandler();
 
 const PORT = process.env.PORT || 3001;
 const HOST = process.env.HOST || "0.0.0.0";
 const CORS_ORIGIN = process.env.CORS_ORIGIN || "*";
 
-app.prepare().then(() => {
-  const server = express();
-  const httpServer = http.createServer(server);
+nextApp.prepare().then(() => {
+  const app = express();
+  const httpServer = http.createServer(app);
 
   // Socket.IO server configuration
   const io = new Server(httpServer, {
@@ -41,50 +47,51 @@ app.prepare().then(() => {
     },
     // Performance optimizations
     perMessageDeflate: {
-      threshold: 1024, // Only compress messages > 1KB
-      zlibDeflateOptions: {
-        chunkSize: 1024,
-        memLevel: 7,
-        level: 3
-      },
-      zlibInflateOptions: {
-        chunkSize: 10 * 1024
-      }
+      threshold: 1024,
+      zlibDeflateOptions: { chunkSize: 1024, memLevel: 7, level: 3 },
+      zlibInflateOptions: { chunkSize: 10 * 1024 }
     },
-    // Connection settings
     pingTimeout: 60000,
     pingInterval: 25000,
     upgradeTimeout: 30000,
-    maxHttpBufferSize: 100 * 1024, // 100KB max message size
-    // Transport configuration
+    maxHttpBufferSize: 100 * 1024,
     transports: ['websocket', 'polling'],
     allowUpgrades: true
   });
 
+  // Store io instance on app for route modules to access
+  app.set('io', io);
+
   // Initialize Socket.IO event handlers
   initializeSocketHandlers(io);
 
-  // Middleware
-  server.disable('x-powered-by');
+  // =============================================
+  // MIDDLEWARE CONFIGURATION
+  // =============================================
 
-  // SECURITY: Configure CORS properly for production
+  app.disable('x-powered-by');
+
+  // SECURITY: Configure CORS - fail closed in production with wildcard
   const corsOptions = {
-    origin: CORS_ORIGIN === '*' && !dev
-      ? false // Reject wildcard in production
-      : CORS_ORIGIN === '*' ? true : CORS_ORIGIN.split(','),
+    origin: (() => {
+      if (CORS_ORIGIN === '*') {
+        if (!dev) {
+          console.error('FATAL: CORS_ORIGIN=* is not allowed in production. Set explicit origins.');
+          // In production, reject wildcard CORS for security
+          return false;
+        }
+        return true; // Allow wildcard only in development
+      }
+      return CORS_ORIGIN.split(',');
+    })(),
     credentials: true
   };
 
-  if (!dev && CORS_ORIGIN === '*') {
-    console.warn('WARNING: CORS is set to wildcard (*) in production. This is insecure!');
-    console.warn('Please set CORS_ORIGIN environment variable to your production domain.');
-  }
+  app.use(cors(corsOptions));
+  app.use(express.json());
 
-  server.use(cors(corsOptions));
-  server.use(express.json());
-
-  // SECURITY: Add security headers
-  server.use((req, res, next) => {
+  // Security headers middleware
+  app.use((req, res, next) => {
     const cspDev = "default-src 'self'; " +
       "script-src 'self' 'unsafe-inline' 'unsafe-eval'; " +
       "style-src 'self' 'unsafe-inline'; " +
@@ -99,15 +106,13 @@ app.prepare().then(() => {
       "font-src 'self' data:; " +
       "connect-src 'self' ws: wss:; " +
       "frame-ancestors 'none';";
-    res.setHeader('Content-Security-Policy', dev ? cspDev : cspProd);
 
-    // Additional security headers
+    res.setHeader('Content-Security-Policy', dev ? cspDev : cspProd);
     res.setHeader('X-Content-Type-Options', 'nosniff');
     res.setHeader('X-Frame-Options', 'DENY');
     res.setHeader('X-XSS-Protection', '1; mode=block');
     res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
 
-    // HSTS for production
     if (!dev) {
       res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
     }
@@ -116,19 +121,20 @@ app.prepare().then(() => {
   });
 
   // IP Geolocation middleware
-  // Adds x-country-code header for Next.js middleware to use
-  // Also attaches geoData to request for route handlers
-  server.use(geolocationMiddleware({
+  app.use(geolocationMiddleware({
     skipPaths: ['/health', '/metrics', '/_next', '/favicon.ico'],
-    pathFilter: ['/', '/api/geolocation'] // Only run on root and geolocation endpoint
+    pathFilter: ['/', '/api/geolocation']
   }));
 
-  // Socket.IO connection logging
+  // =============================================
+  // SOCKET.IO MONITORING
+  // =============================================
+
   io.engine.on("connection_error", (err) => {
     console.error('[SOCKET.IO] Connection error:', err.req?.url, err.code, err.message);
   });
 
-  // Log connection stats periodically (tracked for graceful shutdown)
+  // Log connection stats periodically
   const statsTimer = setInterval(() => {
     const socketCount = io.sockets.sockets.size;
     if (socketCount > 0) {
@@ -137,45 +143,45 @@ app.prepare().then(() => {
   }, 60000);
   cleanupTimers.add(statsTimer);
 
-  // Cleanup stale games periodically (tracked for graceful shutdown)
+  // Cleanup stale games every 5 minutes
   const staleGamesTimer = setInterval(() => {
     const cleaned = cleanupStaleGames();
     if (cleaned > 0) {
       console.log(`[CLEANUP] Removed ${cleaned} stale games`);
     }
-  }, 5 * 60 * 1000); // Every 5 minutes
+  }, 5 * 60 * 1000);
   cleanupTimers.add(staleGamesTimer);
 
-  // Cleanup empty rooms more frequently (tracked for graceful shutdown)
+  // Cleanup empty rooms every 30 seconds
   const emptyRoomsTimer = setInterval(() => {
     const cleaned = cleanupEmptyRooms();
     if (cleaned > 0) {
       console.log(`[CLEANUP] Removed ${cleaned} empty room(s)`);
-      io.emit('activeRooms', { rooms: require('./backend/modules/gameStateManager').getActiveRooms() });
+      io.emit('activeRooms', { rooms: getActiveRooms() });
     }
-  }, 30 * 1000); // Every 30 seconds
+  }, 30 * 1000);
   cleanupTimers.add(emptyRoomsTimer);
 
-  // Health check endpoint (responds immediately, doesn't depend on Redis/DB)
-  server.get('/health', (_req, res) => {
+  // =============================================
+  // HEALTH & METRICS ENDPOINTS
+  // =============================================
+
+  const { isRedisAvailable, getRedisMetrics } = require('./backend/redisClient');
+  const { getAllGames } = require('./backend/modules/gameStateManager');
+  const { getMetrics, getRoomMetrics, resetAll } = require('./backend/utils/metrics');
+
+  app.get('/health', (_req, res) => {
     res.status(200).json({ status: 'ok', timestamp: Date.now() });
   });
 
-  // Scaling readiness endpoint - shows whether horizontal scaling is enabled
-  server.get('/health/scaling', (_req, res) => {
-    const { isRedisAvailable } = require('./backend/redisClient');
-    const { getAllGames } = require('./backend/modules/gameStateManager');
-
+  app.get('/health/scaling', (_req, res) => {
     const games = getAllGames();
-    const hasRedisAdapter = !!io.pubClient;
-    const redisAvailable = isRedisAvailable();
-
     res.json({
       status: 'ok',
       scaling: {
-        horizontalReady: hasRedisAdapter && redisAvailable,
-        redisAdapter: hasRedisAdapter,
-        redisAvailable: redisAvailable,
+        horizontalReady: !!io.pubClient && isRedisAvailable(),
+        redisAdapter: !!io.pubClient,
+        redisAvailable: isRedisAvailable(),
         instanceId: process.env.RAILWAY_REPLICA_ID || process.env.HOSTNAME || 'local'
       },
       stats: {
@@ -187,997 +193,44 @@ app.prepare().then(() => {
     });
   });
 
-  // Metrics endpoint
-  const { getMetrics, getRoomMetrics, resetAll, setEventLoopLag } = require('./backend/utils/metrics');
-  server.get('/metrics', (_req, res) => {
-    res.json(getMetrics());
-  });
-  server.get('/metrics/rooms', (_req, res) => {
-    res.json(getRoomMetrics());
-  });
-  server.get('/metrics/reset', (_req, res) => {
-    resetAll();
-    res.json({ ok: true });
-  });
-
-  // Redis metrics endpoint
-  server.get('/metrics/redis', async (_req, res) => {
+  app.get('/metrics', (_req, res) => res.json(getMetrics()));
+  app.get('/metrics/rooms', (_req, res) => res.json(getRoomMetrics()));
+  app.get('/metrics/reset', (_req, res) => { resetAll(); res.json({ ok: true }); });
+  app.get('/metrics/redis', async (_req, res) => {
     try {
-      const metrics = await getRedisMetrics();
-      res.json(metrics);
+      res.json(await getRedisMetrics());
     } catch (error) {
       res.status(500).json({ error: error.message });
     }
   });
 
-  // Leaderboard API endpoints
-  const { getSupabase, isSupabaseConfigured } = require('./backend/modules/supabaseServer');
-  const { getCachedLeaderboardTop100, cacheLeaderboardTop100, getCachedUserRank, cacheUserRank } = require('./backend/redisClient');
-
-  // GET /api/leaderboard - Get top 100 leaderboard
-  server.get('/api/leaderboard', async (_req, res) => {
-    try {
-      if (!isSupabaseConfigured()) {
-        return res.status(503).json({ error: 'Leaderboard service not available' });
-      }
-
-      // Try cache first
-      const cached = await getCachedLeaderboardTop100();
-      if (cached) {
-        return res.json({ data: cached, cached: true });
-      }
-
-      // Fetch from Supabase
-      const supabase = getSupabase();
-      const { data, error } = await supabase
-        .from('leaderboard')
-        .select('player_id, username, avatar_emoji, avatar_color, total_score, games_played, games_won, ranked_mmr')
-        .order('total_score', { ascending: false })
-        .limit(100);
-
-      if (error) {
-        console.error('[API] Leaderboard fetch error:', error);
-        return res.status(500).json({ error: 'Failed to fetch leaderboard' });
-      }
-
-      // Cache the result
-      if (data) {
-        await cacheLeaderboardTop100(data);
-      }
-
-      res.json({ data: data || [], cached: false });
-    } catch (error) {
-      console.error('[API] Leaderboard error:', error);
-      res.status(500).json({ error: 'Internal server error' });
-    }
-  });
-
   // =============================================
-  // GEOLOCATION API ENDPOINT
+  // API ROUTES (Modular)
   // =============================================
 
-  // GET /api/geolocation - Get geolocation data for the requesting client
-  server.get('/api/geolocation', async (req, res) => {
-    try {
-      // First check if middleware already populated geoData (more efficient)
-      if (req.geoData && req.geoData.countryCode) {
-        return res.json({
-          success: true,
-          ...req.geoData
-        });
-      }
-
-      // Fallback to fetching geolocation if middleware didn't run or failed
-      const geoData = await getCountryFromRequest(req);
-      res.json({
-        success: true,
-        ...geoData
-      });
-    } catch (error) {
-      console.error('[API] Geolocation error:', error);
-      // Return a graceful response with null countryCode instead of 500 error
-      // This allows the client to continue functioning without geolocation
-      res.json({
-        success: false,
-        error: 'Failed to get geolocation',
-        countryCode: null,
-        source: 'error'
-      });
-    }
-  });
-
-  // GET /api/leaderboard/rank/:userId - Get a specific user's rank
-  server.get('/api/leaderboard/rank/:userId', async (req, res) => {
-    try {
-      if (!isSupabaseConfigured()) {
-        return res.status(503).json({ error: 'Leaderboard service not available' });
-      }
-
-      const { userId } = req.params;
-      if (!userId) {
-        return res.status(400).json({ error: 'User ID required' });
-      }
-
-      // Try cache first
-      const cached = await getCachedUserRank(userId);
-      if (cached) {
-        return res.json({ data: cached, cached: true });
-      }
-
-      // Fetch from Supabase using a window function to get rank
-      const supabase = getSupabase();
-
-      // First get the user's total score
-      const { data: userData, error: userError } = await supabase
-        .from('leaderboard')
-        .select('player_id, username, total_score, games_played')
-        .eq('player_id', userId)
-        .single();
-
-      if (userError || !userData) {
-        return res.status(404).json({ error: 'User not found in leaderboard' });
-      }
-
-      // Count how many users have a higher score to get rank
-      const { count, error: countError } = await supabase
-        .from('leaderboard')
-        .select('*', { count: 'exact', head: true })
-        .gt('total_score', userData.total_score);
-
-      if (countError) {
-        console.error('[API] Rank count error:', countError);
-        return res.status(500).json({ error: 'Failed to calculate rank' });
-      }
-
-      const rankData = {
-        ...userData,
-        rank_position: (count || 0) + 1
-      };
-
-      // Cache the result
-      await cacheUserRank(userId, rankData);
-
-      res.json({ data: rankData, cached: false });
-    } catch (error) {
-      console.error('[API] User rank error:', error);
-      res.status(500).json({ error: 'Internal server error' });
-    }
-  });
+  app.use('/api/leaderboard', leaderboardRoutes);
+  app.use('/api/geolocation', geolocationRoutes);
+  app.use('/api/analytics', analyticsRoutes);
+  app.use('/api/admin', adminRoutes);
 
   // =============================================
-  // ADMIN API ENDPOINTS
+  // NEXT.JS REQUEST HANDLER
   // =============================================
 
-  // Admin authentication middleware
-  const adminAuth = async (req, res, next) => {
-    const authHeader = req.headers.authorization;
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      return res.status(401).json({ error: 'Missing authorization header' });
-    }
-
-    const token = authHeader.substring(7);
-    if (!isSupabaseConfigured()) {
-      return res.status(503).json({ error: 'Auth service not available' });
-    }
-
-    try {
-      const supabase = getSupabase();
-      // Verify the JWT and get user
-      const { data: { user }, error: authError } = await supabase.auth.getUser(token);
-
-      if (authError || !user) {
-        return res.status(401).json({ error: 'Invalid token' });
-      }
-
-      // Check if user is admin
-      const { data: profile, error: profileError } = await supabase
-        .from('profiles')
-        .select('is_admin')
-        .eq('id', user.id)
-        .single();
-
-      if (profileError || !profile?.is_admin) {
-        return res.status(403).json({ error: 'Admin access required' });
-      }
-
-      req.adminUser = user;
-      next();
-    } catch (error) {
-      console.error('[ADMIN API] Auth error:', error);
-      return res.status(500).json({ error: 'Authentication failed' });
-    }
-  };
-
-  // GET /api/admin/stats - Get main dashboard stats
-  server.get('/api/admin/stats', adminAuth, async (_req, res) => {
-    try {
-      const supabase = getSupabase();
-      const now = new Date();
-      const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate()).toISOString();
-      const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000).toISOString();
-      const monthAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000).toISOString();
-
-      // Get total unique players
-      const { count: totalPlayers } = await supabase
-        .from('profiles')
-        .select('*', { count: 'exact', head: true });
-
-      // Get total games played
-      const { count: totalGames } = await supabase
-        .from('game_results')
-        .select('*', { count: 'exact', head: true });
-
-      // Get games today
-      const { count: gamesToday } = await supabase
-        .from('game_results')
-        .select('*', { count: 'exact', head: true })
-        .gte('created_at', todayStart);
-
-      // Get unique players today
-      const { data: todayPlayersData } = await supabase
-        .from('game_results')
-        .select('player_id')
-        .gte('created_at', todayStart);
-      const uniquePlayersToday = new Set(todayPlayersData?.map(r => r.player_id)).size;
-
-      // Get unique players this week
-      const { data: weekPlayersData } = await supabase
-        .from('game_results')
-        .select('player_id')
-        .gte('created_at', weekAgo);
-      const uniquePlayersWeek = new Set(weekPlayersData?.map(r => r.player_id)).size;
-
-      // Get unique players this month
-      const { data: monthPlayersData } = await supabase
-        .from('game_results')
-        .select('player_id')
-        .gte('created_at', monthAgo);
-      const uniquePlayersMonth = new Set(monthPlayersData?.map(r => r.player_id)).size;
-
-      // Get cumulative game time (in hours)
-      const { data: timeData } = await supabase
-        .from('profiles')
-        .select('total_time_played');
-      const totalGameTimeSeconds = timeData?.reduce((sum, p) => sum + (p.total_time_played || 0), 0) || 0;
-      const totalGameTimeHours = Math.round(totalGameTimeSeconds / 3600 * 10) / 10;
-
-      // Get new signups today
-      const { count: signupsToday } = await supabase
-        .from('profiles')
-        .select('*', { count: 'exact', head: true })
-        .gte('created_at', todayStart);
-
-      // Get new signups this week
-      const { count: signupsWeek } = await supabase
-        .from('profiles')
-        .select('*', { count: 'exact', head: true })
-        .gte('created_at', weekAgo);
-
-      // Get total words found
-      const { data: wordsData } = await supabase
-        .from('profiles')
-        .select('total_words');
-      const totalWords = wordsData?.reduce((sum, p) => sum + (p.total_words || 0), 0) || 0;
-
-      // Get games by language
-      const { data: langData } = await supabase
-        .from('game_results')
-        .select('language');
-      const languageCounts = {};
-      langData?.forEach(g => {
-        const lang = g.language || 'en';
-        languageCounts[lang] = (languageCounts[lang] || 0) + 1;
-      });
-
-      res.json({
-        overview: {
-          totalPlayers: totalPlayers || 0,
-          totalGames: totalGames || 0,
-          totalGameTimeHours,
-          totalWords,
-        },
-        activity: {
-          gamesToday: gamesToday || 0,
-          uniquePlayersToday,
-          uniquePlayersWeek,
-          uniquePlayersMonth,
-          signupsToday: signupsToday || 0,
-          signupsWeek: signupsWeek || 0,
-        },
-        languages: languageCounts,
-      });
-    } catch (error) {
-      console.error('[ADMIN API] Stats error:', error);
-      res.status(500).json({ error: 'Failed to fetch stats' });
-    }
-  });
-
-  // GET /api/admin/players/countries - Get player distribution by country
-  server.get('/api/admin/players/countries', adminAuth, async (_req, res) => {
-    try {
-      const supabase = getSupabase();
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('country_code')
-        .not('country_code', 'is', null);
-
-      if (error) throw error;
-
-      const countryCounts = {};
-      data?.forEach(p => {
-        const country = p.country_code || 'Unknown';
-        countryCounts[country] = (countryCounts[country] || 0) + 1;
-      });
-
-      // Sort by count descending
-      const sorted = Object.entries(countryCounts)
-        .sort((a, b) => b[1] - a[1])
-        .map(([country, count]) => ({ country, count }));
-
-      res.json({ countries: sorted });
-    } catch (error) {
-      console.error('[ADMIN API] Countries error:', error);
-      res.status(500).json({ error: 'Failed to fetch country data' });
-    }
-  });
-
-  // GET /api/admin/players/sources - Get player acquisition sources (UTM)
-  // Combines data from profiles (registered users) and analytics_events (guests)
-  server.get('/api/admin/players/sources', adminAuth, async (_req, res) => {
-    try {
-      const supabase = getSupabase();
-
-      // Get registered user data from profiles
-      const { data: profileData, error: profileError } = await supabase
-        .from('profiles')
-        .select('utm_source, utm_medium, utm_campaign, referrer');
-
-      if (profileError) throw profileError;
-
-      // Get analytics events for guest players
-      const { data: eventData, error: eventError } = await supabase
-        .from('analytics_events')
-        .select('utm_source, utm_medium, utm_campaign, referrer, metadata')
-        .not('metadata->guest_name', 'is', null);
-
-      // Process even if eventError (table might not exist yet)
-      if (eventError) {
-        console.warn('[ADMIN API] Analytics events query failed:', eventError.message);
-      }
-
-      const sourceCounts = { registered: {}, guests: {} };
-      const mediumCounts = { registered: {}, guests: {} };
-      const campaignCounts = { registered: {}, guests: {} };
-      const referrerCounts = { registered: {}, guests: {} };
-      const guestNames = {};
-
-      // Process registered user data
-      profileData?.forEach(p => {
-        if (p.utm_source) {
-          sourceCounts.registered[p.utm_source] = (sourceCounts.registered[p.utm_source] || 0) + 1;
-        }
-        if (p.utm_medium) {
-          mediumCounts.registered[p.utm_medium] = (mediumCounts.registered[p.utm_medium] || 0) + 1;
-        }
-        if (p.utm_campaign) {
-          campaignCounts.registered[p.utm_campaign] = (campaignCounts.registered[p.utm_campaign] || 0) + 1;
-        }
-        if (p.referrer) {
-          try {
-            const domain = new URL(p.referrer).hostname;
-            referrerCounts.registered[domain] = (referrerCounts.registered[domain] || 0) + 1;
-          } catch {
-            referrerCounts.registered[p.referrer] = (referrerCounts.registered[p.referrer] || 0) + 1;
-          }
-        }
-      });
-
-      // Process guest player data from analytics events
-      eventData?.forEach(event => {
-        const guestName = event.metadata?.guest_name;
-        if (guestName && !guestNames[guestName]) {
-          guestNames[guestName] = true; // Track unique guests
-
-          const source = event.utm_source || 'direct';
-          sourceCounts.guests[source] = (sourceCounts.guests[source] || 0) + 1;
-
-          if (event.utm_medium) {
-            mediumCounts.guests[event.utm_medium] = (mediumCounts.guests[event.utm_medium] || 0) + 1;
-          }
-          if (event.utm_campaign) {
-            campaignCounts.guests[event.utm_campaign] = (campaignCounts.guests[event.utm_campaign] || 0) + 1;
-          }
-          if (event.referrer) {
-            try {
-              const domain = new URL(event.referrer).hostname;
-              referrerCounts.guests[domain] = (referrerCounts.guests[domain] || 0) + 1;
-            } catch {
-              referrerCounts.guests[event.referrer] = (referrerCounts.guests[event.referrer] || 0) + 1;
-            }
-          }
-        }
-      });
-
-      // Combine registered and guest counts
-      const combineCounts = (registered, guests) => {
-        const combined = { ...registered };
-        Object.entries(guests).forEach(([key, count]) => {
-          combined[key] = (combined[key] || 0) + count;
-        });
-        return combined;
-      };
-
-      const sortByCount = (obj) => Object.entries(obj)
-        .sort((a, b) => b[1] - a[1])
-        .map(([name, count]) => ({ name, count }));
-
-      const totalSources = combineCounts(sourceCounts.registered, sourceCounts.guests);
-      const totalMediums = combineCounts(mediumCounts.registered, mediumCounts.guests);
-      const totalCampaigns = combineCounts(campaignCounts.registered, campaignCounts.guests);
-      const totalReferrers = combineCounts(referrerCounts.registered, referrerCounts.guests);
-
-      res.json({
-        sources: sortByCount(totalSources),
-        mediums: sortByCount(totalMediums),
-        campaigns: sortByCount(totalCampaigns),
-        referrers: sortByCount(totalReferrers),
-        // Breakdown by user type
-        breakdown: {
-          registeredUsers: profileData?.length || 0,
-          guestPlayers: Object.keys(guestNames).length,
-          registeredSources: sortByCount(sourceCounts.registered),
-          guestSources: sortByCount(sourceCounts.guests),
-        },
-      });
-    } catch (error) {
-      console.error('[ADMIN API] Sources error:', error);
-      res.status(500).json({ error: 'Failed to fetch source data' });
-    }
-  });
-
-  // GET /api/admin/players/top - Get top players by score
-  server.get('/api/admin/players/top', adminAuth, async (req, res) => {
-    try {
-      const limit = Math.min(parseInt(req.query.limit) || 50, 100);
-      const supabase = getSupabase();
-
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('id, username, display_name, avatar_emoji, avatar_color, total_score, total_games, total_words, total_time_played, ranked_mmr, current_level, created_at')
-        .order('total_score', { ascending: false })
-        .limit(limit);
-
-      if (error) throw error;
-
-      res.json({ players: data || [] });
-    } catch (error) {
-      console.error('[ADMIN API] Top players error:', error);
-      res.status(500).json({ error: 'Failed to fetch top players' });
-    }
-  });
-
-  // GET /api/admin/players/recent - Get recently active players
-  server.get('/api/admin/players/recent', adminAuth, async (req, res) => {
-    try {
-      const limit = Math.min(parseInt(req.query.limit) || 50, 100);
-      const supabase = getSupabase();
-
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('id, username, display_name, avatar_emoji, avatar_color, total_score, total_games, last_game_at, created_at')
-        .order('last_game_at', { ascending: false, nullsFirst: false })
-        .limit(limit);
-
-      if (error) throw error;
-
-      res.json({ players: data || [] });
-    } catch (error) {
-      console.error('[ADMIN API] Recent players error:', error);
-      res.status(500).json({ error: 'Failed to fetch recent players' });
-    }
-  });
-
-  // GET /api/admin/games/history - Get recent games history
-  server.get('/api/admin/games/history', adminAuth, async (req, res) => {
-    try {
-      const limit = Math.min(parseInt(req.query.limit) || 100, 500);
-      const supabase = getSupabase();
-
-      const { data, error } = await supabase
-        .from('game_results')
-        .select(`
-          id,
-          game_code,
-          score,
-          word_count,
-          placement,
-          is_ranked,
-          language,
-          time_played,
-          created_at,
-          player_id,
-          profiles:player_id (username, display_name)
-        `)
-        .order('created_at', { ascending: false })
-        .limit(limit);
-
-      if (error) throw error;
-
-      res.json({ games: data || [] });
-    } catch (error) {
-      console.error('[ADMIN API] Games history error:', error);
-      res.status(500).json({ error: 'Failed to fetch games history' });
-    }
-  });
-
-  // GET /api/admin/activity/daily - Get daily activity for charts
-  server.get('/api/admin/activity/daily', adminAuth, async (req, res) => {
-    try {
-      const days = Math.min(parseInt(req.query.days) || 30, 90);
-      const supabase = getSupabase();
-
-      // Get all games in the date range
-      const startDate = new Date();
-      startDate.setDate(startDate.getDate() - days);
-
-      const { data: gamesData, error: gamesError } = await supabase
-        .from('game_results')
-        .select('created_at, player_id')
-        .gte('created_at', startDate.toISOString());
-
-      if (gamesError) throw gamesError;
-
-      // Get all signups in the date range
-      const { data: signupsData, error: signupsError } = await supabase
-        .from('profiles')
-        .select('created_at')
-        .gte('created_at', startDate.toISOString());
-
-      if (signupsError) throw signupsError;
-
-      // Aggregate by day
-      const dailyData = {};
-      for (let i = 0; i < days; i++) {
-        const date = new Date();
-        date.setDate(date.getDate() - i);
-        const dateStr = date.toISOString().split('T')[0];
-        dailyData[dateStr] = { games: 0, uniquePlayers: new Set(), signups: 0 };
-      }
-
-      gamesData?.forEach(game => {
-        const dateStr = game.created_at.split('T')[0];
-        if (dailyData[dateStr]) {
-          dailyData[dateStr].games++;
-          dailyData[dateStr].uniquePlayers.add(game.player_id);
-        }
-      });
-
-      signupsData?.forEach(profile => {
-        const dateStr = profile.created_at.split('T')[0];
-        if (dailyData[dateStr]) {
-          dailyData[dateStr].signups++;
-        }
-      });
-
-      // Convert to array and format
-      const result = Object.entries(dailyData)
-        .map(([date, data]) => ({
-          date,
-          games: data.games,
-          uniquePlayers: data.uniquePlayers.size,
-          signups: data.signups,
-        }))
-        .sort((a, b) => a.date.localeCompare(b.date));
-
-      res.json({ daily: result });
-    } catch (error) {
-      console.error('[ADMIN API] Daily activity error:', error);
-      res.status(500).json({ error: 'Failed to fetch daily activity' });
-    }
-  });
-
-  // GET /api/admin/realtime - Get current realtime stats
-  server.get('/api/admin/realtime', adminAuth, async (_req, res) => {
-    try {
-      const { getAllGames } = require('./backend/modules/gameStateManager');
-      const games = getAllGames();
-
-      const activeRooms = games.length;
-      const playersOnline = games.reduce((sum, g) => sum + g.playerCount, 0);
-      const gamesInProgress = games.filter(g => g.status === 'playing').length;
-      const socketConnections = io.sockets.sockets.size;
-
-      res.json({
-        activeRooms,
-        playersOnline,
-        gamesInProgress,
-        socketConnections,
-        timestamp: Date.now(),
-      });
-    } catch (error) {
-      console.error('[ADMIN API] Realtime error:', error);
-      res.status(500).json({ error: 'Failed to fetch realtime stats' });
-    }
-  });
-
-  // =============================================
-  // BOT WORD MANAGEMENT ENDPOINTS
-  // =============================================
-
-  // GET /api/admin/bot-words - Get bot words with negative votes for review
-  server.get('/api/admin/bot-words', adminAuth, async (req, res) => {
-    try {
-      const supabase = getSupabase();
-      const language = req.query.language || null;
-
-      // Query bot words with vote counts (uses the bot_words_for_review view if available)
-      // Fallback to manual query if view doesn't exist
-      let query = supabase
-        .from('word_votes')
-        .select('word, language, vote_type, created_at, game_code')
-        .eq('is_bot_word', true);
-
-      if (language) {
-        query = query.eq('language', language);
-      }
-
-      const { data: votes, error } = await query;
-
-      if (error) {
-        // If is_bot_word column doesn't exist yet, return empty
-        if (error.message?.includes('is_bot_word')) {
-          return res.json({ words: [], message: 'Bot word tracking not yet enabled. Run migration 013.' });
-        }
-        throw error;
-      }
-
-      // Aggregate votes by word
-      const wordStats = {};
-      votes?.forEach(vote => {
-        const key = `${vote.word}:${vote.language}`;
-        if (!wordStats[key]) {
-          wordStats[key] = {
-            word: vote.word,
-            language: vote.language,
-            likes: 0,
-            dislikes: 0,
-            gameCodes: new Set(),
-            firstSeen: vote.created_at,
-            lastSeen: vote.created_at
-          };
-        }
-        if (vote.vote_type === 'like') {
-          wordStats[key].likes++;
-        } else {
-          wordStats[key].dislikes++;
-        }
-        wordStats[key].gameCodes.add(vote.game_code);
-        if (vote.created_at < wordStats[key].firstSeen) {
-          wordStats[key].firstSeen = vote.created_at;
-        }
-        if (vote.created_at > wordStats[key].lastSeen) {
-          wordStats[key].lastSeen = vote.created_at;
-        }
-      });
-
-      // Convert to array and sort by dislikes
-      const words = Object.values(wordStats)
-        .map(w => ({
-          ...w,
-          gameCodes: Array.from(w.gameCodes),
-          netScore: w.likes - w.dislikes
-        }))
-        .filter(w => w.dislikes > 0) // Only show words with negative votes
-        .sort((a, b) => b.dislikes - a.dislikes);
-
-      res.json({ words });
-    } catch (error) {
-      console.error('[ADMIN API] Bot words error:', error);
-      res.status(500).json({ error: 'Failed to fetch bot words' });
-    }
-  });
-
-  // GET /api/admin/bot-blacklist - Get the bot word blacklist
-  server.get('/api/admin/bot-blacklist', adminAuth, async (req, res) => {
-    try {
-      const supabase = getSupabase();
-      const language = req.query.language || null;
-
-      let query = supabase
-        .from('bot_word_blacklist')
-        .select('id, word, language, reason, created_at')
-        .order('created_at', { ascending: false });
-
-      if (language) {
-        query = query.eq('language', language);
-      }
-
-      const { data, error } = await query;
-
-      if (error) {
-        // If table doesn't exist yet, return empty
-        if (error.message?.includes('does not exist') || error.code === '42P01') {
-          return res.json({ blacklist: [], message: 'Blacklist table not yet created. Run migration 013.' });
-        }
-        throw error;
-      }
-
-      res.json({ blacklist: data || [] });
-    } catch (error) {
-      console.error('[ADMIN API] Bot blacklist error:', error);
-      res.status(500).json({ error: 'Failed to fetch bot blacklist' });
-    }
-  });
-
-  // POST /api/admin/bot-blacklist - Add a word to the blacklist
-  server.post('/api/admin/bot-blacklist', adminAuth, async (req, res) => {
-    try {
-      const supabase = getSupabase();
-      const { word, language, reason } = req.body;
-
-      if (!word || !language) {
-        return res.status(400).json({ error: 'word and language are required' });
-      }
-
-      const { data, error } = await supabase
-        .from('bot_word_blacklist')
-        .insert({
-          word: word.toLowerCase().trim(),
-          language,
-          reason: reason || null,
-          blacklisted_by: req.adminUser.id
-        })
-        .select()
-        .single();
-
-      if (error) {
-        if (error.code === '23505') { // Unique violation
-          return res.status(409).json({ error: 'Word already blacklisted' });
-        }
-        throw error;
-      }
-
-      console.log(`[ADMIN] Word "${word}" (${language}) blacklisted by admin`);
-      res.json({ success: true, blacklistEntry: data });
-    } catch (error) {
-      console.error('[ADMIN API] Add blacklist error:', error);
-      res.status(500).json({ error: 'Failed to add word to blacklist' });
-    }
-  });
-
-  // DELETE /api/admin/bot-blacklist/:id - Remove a word from the blacklist
-  server.delete('/api/admin/bot-blacklist/:id', adminAuth, async (req, res) => {
-    try {
-      const supabase = getSupabase();
-      const { id } = req.params;
-
-      const { error } = await supabase
-        .from('bot_word_blacklist')
-        .delete()
-        .eq('id', id);
-
-      if (error) throw error;
-
-      console.log(`[ADMIN] Blacklist entry ${id} removed by admin`);
-      res.json({ success: true });
-    } catch (error) {
-      console.error('[ADMIN API] Delete blacklist error:', error);
-      res.status(500).json({ error: 'Failed to remove word from blacklist' });
-    }
-  });
-
-  // POST /api/analytics/track - Track analytics events (including guest players)
-  server.post('/api/analytics/track', async (req, res) => {
-    try {
-      const supabase = getSupabase();
-      const {
-        event_type,
-        session_id,
-        guest_name,
-        utm_source,
-        utm_medium,
-        utm_campaign,
-        referrer,
-        metadata = {}
-      } = req.body;
-
-      if (!event_type) {
-        return res.status(400).json({ error: 'event_type is required' });
-      }
-
-      // Get country from geolocation if available
-      const country_code = req.geoData?.countryCode || req.headers['x-country-code'] || null;
-
-      // Include guest_name in metadata for tracking
-      const enrichedMetadata = {
-        ...metadata,
-        guest_name: guest_name || null,
-        user_agent: req.headers['user-agent'] || null,
-      };
-
-      const { data, error } = await supabase
-        .from('analytics_events')
-        .insert({
-          event_type,
-          session_id: session_id || null,
-          country_code,
-          utm_source: utm_source || null,
-          utm_medium: utm_medium || null,
-          utm_campaign: utm_campaign || null,
-          referrer: referrer || null,
-          metadata: enrichedMetadata,
-        })
-        .select()
-        .single();
-
-      if (error) {
-        console.error('[ANALYTICS API] Track error:', error);
-        // Don't fail the request for analytics errors
-        return res.json({ success: false, error: error.message });
-      }
-
-      res.json({ success: true, event_id: data?.id });
-    } catch (error) {
-      console.error('[ANALYTICS API] Track error:', error);
-      res.json({ success: false, error: 'Failed to track event' });
-    }
-  });
-
-  // GET /api/admin/analytics/guest-players - Get guest player statistics
-  server.get('/api/admin/analytics/guest-players', adminAuth, async (req, res) => {
-    try {
-      const supabase = getSupabase();
-      const limit = Math.min(parseInt(req.query.limit) || 100, 500);
-
-      // Get analytics events with guest names
-      const { data: events, error } = await supabase
-        .from('analytics_events')
-        .select('metadata, utm_source, utm_medium, utm_campaign, referrer, country_code, created_at')
-        .not('metadata->guest_name', 'is', null)
-        .order('created_at', { ascending: false })
-        .limit(limit);
-
-      if (error) throw error;
-
-      // Aggregate by guest name
-      const guestStats = {};
-      events?.forEach(event => {
-        const guestName = event.metadata?.guest_name;
-        if (!guestName) return;
-
-        if (!guestStats[guestName]) {
-          guestStats[guestName] = {
-            name: guestName,
-            events: 0,
-            utm_source: event.utm_source,
-            utm_medium: event.utm_medium,
-            referrer: event.referrer,
-            country_code: event.country_code,
-            first_seen: event.created_at,
-            last_seen: event.created_at,
-          };
-        }
-        guestStats[guestName].events++;
-        guestStats[guestName].last_seen = event.created_at;
-      });
-
-      // Convert to array and sort by events
-      const guests = Object.values(guestStats).sort((a, b) => b.events - a.events);
-
-      // Count by UTM source
-      const sourceStats = {};
-      guests.forEach(guest => {
-        const source = guest.utm_source || 'direct';
-        sourceStats[source] = (sourceStats[source] || 0) + 1;
-      });
-
-      res.json({
-        guests,
-        totalGuests: guests.length,
-        bySource: Object.entries(sourceStats)
-          .sort((a, b) => b[1] - a[1])
-          .map(([source, count]) => ({ source, count })),
-      });
-    } catch (error) {
-      console.error('[ADMIN API] Guest players error:', error);
-      res.status(500).json({ error: 'Failed to fetch guest player data' });
-    }
-  });
-
-  // Next.js handler for all other routes
-  server.use(async (req, res) => {
+  app.use(async (req, res) => {
     try {
       const parsedUrl = require('url').parse(req.url, true);
-      const { pathname, query } = parsedUrl;
+      const { pathname } = parsedUrl;
 
       console.log(`[Request] ${req.method} ${req.url} | pathname: ${pathname}`);
 
-      // Note: Locale-prefixed auth callbacks (e.g., /he/auth/callback) are now handled
-      // by the client-side page at app/[locale]/auth/callback/page.jsx
-      // This is necessary because hash fragments (#access_token=...) are not sent to the server,
-      // so we need client-side JavaScript to process the OAuth implicit flow response.
-
-      // Manual redirect for root path (since middleware might be skipped in custom server)
+      // Handle root path locale redirect
       if (pathname === '/') {
-        // Detect social media crawlers that need OG meta tags
-        // These crawlers often don't follow redirects when fetching link previews
-        const userAgent = (req.headers['user-agent'] || '').toLowerCase();
-        const isSocialCrawler =
-          userAgent.includes('whatsapp') ||
-          userAgent.includes('facebookexternalhit') ||
-          userAgent.includes('facebot') ||
-          userAgent.includes('twitterbot') ||
-          userAgent.includes('linkedinbot') ||
-          userAgent.includes('slackbot') ||
-          userAgent.includes('telegrambot') ||
-          userAgent.includes('discordbot') ||
-          userAgent.includes('pinterest') ||
-          userAgent.includes('redditbot') ||
-          userAgent.includes('embedly') ||
-          userAgent.includes('quora link preview') ||
-          userAgent.includes('outbrain') ||
-          userAgent.includes('vkshare') ||
-          userAgent.includes('w3c_validator');
-
-        // Country-to-locale mapping
-        const countryToLocale = {
-          IL: 'he', // Israel
-          US: 'en', GB: 'en', CA: 'en', AU: 'en', NZ: 'en', IE: 'en', ZA: 'en', IN: 'en', PH: 'en', SG: 'en',
-          SE: 'sv', FI: 'sv', // Sweden, Finland
-          JP: 'ja' // Japan
-        };
-        const supportedLocales = ['he', 'en', 'sv', 'ja'];
-        let locale = 'he'; // Default
-
-        // Priority 1: Cookie preference
-        const cookies = req.headers.cookie;
-        const cookieLocale = cookies?.split(';').find(c => c.trim().startsWith('boggle_language='))?.split('=')[1];
-        if (cookieLocale && supportedLocales.includes(cookieLocale)) {
-          locale = cookieLocale;
-        }
-        // Priority 2: IP Geolocation (from middleware)
-        else if (req.geoData?.countryCode && countryToLocale[req.geoData.countryCode]) {
-          locale = countryToLocale[req.geoData.countryCode];
-          console.log(`[Redirect] Detected country ${req.geoData.countryCode} -> locale ${locale}`);
-        }
-        // Priority 3: x-country-code header (from CDN or geolocation middleware)
-        else if (req.headers['x-country-code'] && countryToLocale[req.headers['x-country-code']]) {
-          locale = countryToLocale[req.headers['x-country-code']];
-        }
-        // Priority 4: Accept-Language header
-        else {
-          const acceptLanguage = req.headers['accept-language'];
-          if (acceptLanguage) {
-            const browserLang = acceptLanguage.split(',')[0].split('-')[0].toLowerCase();
-            if (supportedLocales.includes(browserLang)) {
-              locale = browserLang;
-            }
-          }
-        }
-
-        // Preserve query params (e.g., ?room=1234) during redirect
-        const queryString = parsedUrl.search || '';
-
-        // For social media crawlers: internally rewrite to locale path (no redirect)
-        // This ensures they receive the page with proper OG meta tags for link previews
-        if (isSocialCrawler) {
-          console.log(`[Crawler] Social crawler detected: ${userAgent.substring(0, 50)}... -> rewriting to /${locale}${queryString}`);
-          // Rewrite the URL internally so Next.js serves the locale page with OG tags
-          parsedUrl.pathname = `/${locale}`;
-          req.url = `/${locale}${queryString}`;
-          // Fall through to handle() below instead of redirecting
-        } else {
-          // For regular users: redirect to locale path
-          console.log(`[Redirect] Root path redirect: ${req.url} -> /${locale}${queryString}`);
-          res.writeHead(307, { Location: `/${locale}${queryString}` });
-          res.end();
-          return;
-        }
+        const redirectResult = handleLocaleRedirect(req, res, parsedUrl);
+        if (redirectResult) return;
       }
 
-      // Set x-powered-by to Next.js to reassure user
       res.setHeader('X-Powered-By', 'Next.js');
-
       await handle(req, res, parsedUrl);
     } catch (err) {
       console.error('Error occurred handling', req.url, err);
@@ -1186,38 +239,27 @@ app.prepare().then(() => {
     }
   });
 
-  // Start server
+  // =============================================
+  // SERVER STARTUP
+  // =============================================
+
   async function startServer() {
     const redisConnected = await initRedis();
 
     // Set up Socket.IO Redis adapter for horizontal scaling
-    // Reuses existing Redis connection via createPubSubClients()
     if (redisConnected) {
       try {
         const clients = createPubSubClients();
-
         if (clients) {
           const { pubClient, subClient } = clients;
-
-          // Connect the duplicated clients
-          await Promise.all([
-            pubClient.connect(),
-            subClient.connect()
-          ]);
-
+          await Promise.all([pubClient.connect(), subClient.connect()]);
           io.adapter(createAdapter(pubClient, subClient));
           console.log('[SOCKET.IO] Redis adapter enabled - horizontal scaling ready');
-
-          // Store adapter clients for cleanup
           io.pubClient = pubClient;
           io.subClient = subClient;
-        } else {
-          console.warn('[SOCKET.IO] Could not create pub/sub clients');
-          console.log('[SOCKET.IO] Running in single instance mode');
         }
       } catch (error) {
         console.warn('[SOCKET.IO] Could not set up Redis adapter:', error.message);
-        console.warn('[SOCKET.IO] Continuing without Redis adapter (single instance mode)');
       }
     } else {
       console.log('[SOCKET.IO] Running in single instance mode (no Redis adapter)');
@@ -1230,18 +272,19 @@ app.prepare().then(() => {
       console.error('Failed to restore tournaments:', error);
     }
 
+    // Load dictionaries
     try {
       await dictionary.load();
     } catch (error) {
       console.error('Failed to load dictionaries:', error);
     }
 
-    // Warm up worker pool for word validation (prevents cold start latency)
+    // Warm up worker pool
     try {
       await wordValidatorPool.initialize();
       console.log('[WORKER POOL] Worker pool warmed up');
     } catch (error) {
-      console.warn('[WORKER POOL] Failed to warm up worker pool:', error.message);
+      console.warn('[WORKER POOL] Failed to warm up:', error.message);
     }
 
     httpServer.listen(PORT, HOST, () => {
@@ -1251,7 +294,10 @@ app.prepare().then(() => {
     });
   }
 
-  // Graceful shutdown with connection draining
+  // =============================================
+  // GRACEFUL SHUTDOWN
+  // =============================================
+
   let isShuttingDown = false;
   const shutdown = async () => {
     if (isShuttingDown) return;
@@ -1259,7 +305,7 @@ app.prepare().then(() => {
 
     console.log('[SHUTDOWN] Starting graceful shutdown...');
 
-    // Clear all cleanup timers to prevent memory leaks
+    // Clear all cleanup timers
     console.log(`[SHUTDOWN] Clearing ${cleanupTimers.size} cleanup timers...`);
     for (const timer of cleanupTimers) {
       clearInterval(timer);
@@ -1267,15 +313,10 @@ app.prepare().then(() => {
     cleanupTimers.clear();
 
     // Stop accepting new connections
-    httpServer.close(() => {
-      console.log('[SHUTDOWN] HTTP server closed');
-    });
+    httpServer.close(() => console.log('[SHUTDOWN] HTTP server closed'));
 
-    // Notify all connected clients about the shutdown
+    // Notify clients
     io.emit('serverShutdown', { reconnectIn: 5000, message: 'Server is restarting' });
-    console.log('[SHUTDOWN] Notified clients of shutdown');
-
-    // Give clients a moment to receive the notification
     await new Promise(resolve => setTimeout(resolve, 1000));
 
     // Shutdown worker pool
@@ -1286,32 +327,21 @@ app.prepare().then(() => {
       console.error('[SHUTDOWN] Error closing worker pool:', err.message);
     }
 
-    // Close all socket connections
-    io.close(() => {
-      console.log('[SHUTDOWN] Socket.IO server closed');
-    });
+    // Close socket connections
+    io.close(() => console.log('[SHUTDOWN] Socket.IO server closed'));
 
-    // Clean up Redis adapter clients if they exist
+    // Clean up Redis adapter clients
     if (io.pubClient) {
-      try {
-        await io.pubClient.quit();
-        console.log('[SHUTDOWN] Redis pub client closed');
-      } catch (err) {
-        console.error('[SHUTDOWN] Error closing pub client:', err.message);
-      }
+      try { await io.pubClient.quit(); console.log('[SHUTDOWN] Redis pub client closed'); }
+      catch (err) { console.error('[SHUTDOWN] Error closing pub client:', err.message); }
     }
     if (io.subClient) {
-      try {
-        await io.subClient.quit();
-        console.log('[SHUTDOWN] Redis sub client closed');
-      } catch (err) {
-        console.error('[SHUTDOWN] Error closing sub client:', err.message);
-      }
+      try { await io.subClient.quit(); console.log('[SHUTDOWN] Redis sub client closed'); }
+      catch (err) { console.error('[SHUTDOWN] Error closing sub client:', err.message); }
     }
 
     await closeRedis();
 
-    // Force exit after timeout if graceful shutdown takes too long
     setTimeout(() => {
       console.log('[SHUTDOWN] Forcing exit after timeout');
       process.exit(0);
@@ -1338,3 +368,71 @@ app.prepare().then(() => {
 
   startServer();
 });
+
+// =============================================
+// HELPER: Locale Redirect for Root Path
+// =============================================
+
+function handleLocaleRedirect(req, res, parsedUrl) {
+  const userAgent = (req.headers['user-agent'] || '').toLowerCase();
+
+  // Detect social media crawlers
+  const isSocialCrawler = [
+    'whatsapp', 'facebookexternalhit', 'facebot', 'twitterbot',
+    'linkedinbot', 'slackbot', 'telegrambot', 'discordbot',
+    'pinterest', 'redditbot', 'embedly', 'quora link preview',
+    'outbrain', 'vkshare', 'w3c_validator'
+  ].some(bot => userAgent.includes(bot));
+
+  // Country-to-locale mapping
+  const countryToLocale = {
+    IL: 'he', US: 'en', GB: 'en', CA: 'en', AU: 'en', NZ: 'en',
+    IE: 'en', ZA: 'en', IN: 'en', PH: 'en', SG: 'en',
+    SE: 'sv', FI: 'sv', JP: 'ja'
+  };
+  const supportedLocales = ['he', 'en', 'sv', 'ja'];
+
+  // Determine locale
+  let locale = 'he'; // Default
+
+  // Priority 1: Cookie preference
+  const cookies = req.headers.cookie;
+  const cookieLocale = cookies?.split(';').find(c => c.trim().startsWith('boggle_language='))?.split('=')[1];
+  if (cookieLocale && supportedLocales.includes(cookieLocale)) {
+    locale = cookieLocale;
+  }
+  // Priority 2: IP Geolocation
+  else if (req.geoData?.countryCode && countryToLocale[req.geoData.countryCode]) {
+    locale = countryToLocale[req.geoData.countryCode];
+  }
+  // Priority 3: x-country-code header
+  else if (req.headers['x-country-code'] && countryToLocale[req.headers['x-country-code']]) {
+    locale = countryToLocale[req.headers['x-country-code']];
+  }
+  // Priority 4: Accept-Language header
+  else {
+    const acceptLanguage = req.headers['accept-language'];
+    if (acceptLanguage) {
+      const browserLang = acceptLanguage.split(',')[0].split('-')[0].toLowerCase();
+      if (supportedLocales.includes(browserLang)) {
+        locale = browserLang;
+      }
+    }
+  }
+
+  const queryString = parsedUrl.search || '';
+
+  // For social crawlers: rewrite internally
+  if (isSocialCrawler) {
+    console.log(`[Crawler] Social crawler detected -> rewriting to /${locale}${queryString}`);
+    parsedUrl.pathname = `/${locale}`;
+    req.url = `/${locale}${queryString}`;
+    return false; // Continue to Next.js handler
+  }
+
+  // For regular users: redirect
+  console.log(`[Redirect] Root path redirect: ${req.url} -> /${locale}${queryString}`);
+  res.writeHead(307, { Location: `/${locale}${queryString}` });
+  res.end();
+  return true; // Request handled
+}

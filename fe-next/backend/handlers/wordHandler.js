@@ -32,6 +32,7 @@ const { inc, incPerGame } = require('../utils/metrics');
 const botManager = require('../modules/botManager');
 const logger = require('../utils/logger');
 const { isSocketMigrating } = require('./shared');
+const { validatePayload, submitWordSchema, submitWordVoteSchema, submitPeerValidationVoteSchema } = require('../utils/socketValidation');
 
 // Rate limit weights
 const SUBMIT_WORD_WEIGHT = parseInt(process.env.RATE_WEIGHT_SUBMITWORD || '1');
@@ -52,8 +53,15 @@ function registerWordHandlers(io, socket) {
       return;
     }
 
+    // Validate payload
+    const validation = validatePayload(submitWordSchema, data);
+    if (!validation.success) {
+      emitError(socket, `Invalid request: ${validation.error}`);
+      return;
+    }
+
     try {
-      const { word, comboLevel = 0 } = data;
+      const { word, comboLevel = 0 } = validation.data;
 
       const gameCode = getGameBySocketId(socket.id);
       const username = getUsernameBySocketId(socket.id);
@@ -138,11 +146,18 @@ function registerWordHandlers(io, socket) {
       return;
     }
 
-    const { word, voteType, gameCode: providedGameCode } = data;
+    // Validate payload
+    const validation = validatePayload(submitWordVoteSchema, data);
+    if (!validation.success) {
+      socket.emit('voteRecorded', { word: data?.word, success: false, error: 'Invalid request' });
+      return;
+    }
+
+    const { word, voteType, gameCode: providedGameCode } = validation.data;
     const gameCode = providedGameCode || getGameBySocketId(socket.id);
     const username = getUsernameBySocketId(socket.id);
 
-    if (!gameCode || !word || !voteType) return;
+    if (!gameCode) return;
 
     const game = getGame(gameCode);
     if (!game) return;
@@ -187,11 +202,18 @@ function registerWordHandlers(io, socket) {
       return;
     }
 
-    const { word, isValid, gameCode: providedGameCode } = data;
+    // Validate payload
+    const validation = validatePayload(submitPeerValidationVoteSchema, data);
+    if (!validation.success) {
+      socket.emit('peerVoteRecorded', { word: data?.word, success: false, error: 'Invalid request' });
+      return;
+    }
+
+    const { word, isValid, gameCode: providedGameCode } = validation.data;
     const gameCode = providedGameCode || getGameBySocketId(socket.id);
     const username = getUsernameBySocketId(socket.id);
 
-    if (!gameCode || word === undefined || isValid === undefined) return;
+    if (!gameCode) return;
 
     const game = getGame(gameCode);
     if (!game) return;
