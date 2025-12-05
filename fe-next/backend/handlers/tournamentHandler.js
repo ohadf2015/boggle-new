@@ -9,7 +9,7 @@ const {
   getUsernameBySocketId,
   getGameUsers,
   updateGame,
-  setTournamentId
+  setTournamentIdForGame
 } = require('../modules/gameStateManager');
 
 const { broadcastToRoom, getGameRoom, safeEmit } = require('../utils/socketHelpers');
@@ -66,7 +66,7 @@ function registerTournamentHandlers(io, socket) {
 
     // Create tournament
     const tournament = tournamentManager.createTournament(name || 'Tournament', totalRounds || 3, players);
-    setTournamentId(gameCode, tournament.id);
+    setTournamentIdForGame(gameCode, tournament.id);
 
     // Broadcast tournament created
     broadcastToRoom(io, getGameRoom(gameCode), 'tournamentCreated', {
@@ -260,7 +260,7 @@ function registerTournamentHandlers(io, socket) {
 
     // Cancel tournament
     tournamentManager.cancelTournament(tournamentId);
-    setTournamentId(gameCode, null);
+    setTournamentIdForGame(gameCode, null);
 
     // Broadcast cancellation
     broadcastToRoom(io, getGameRoom(gameCode), 'tournamentCancelled', {

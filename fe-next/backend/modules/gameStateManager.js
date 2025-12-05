@@ -242,6 +242,16 @@ function getPresenceConfig() {
   return presenceManager.getPresenceConfig();
 }
 
+function markHostActive(gameCode) {
+  const game = games[gameCode];
+  return presenceManager.markHostActive(game);
+}
+
+function reactivateHost(gameCode) {
+  const game = games[gameCode];
+  return presenceManager.reactivateHost(game);
+}
+
 // ==========================================
 // Peer Validation (delegated to peerValidationManager)
 // ==========================================
@@ -485,6 +495,8 @@ module.exports = {
   markUserActivity,
   getPresenceConfig,
   checkUserConnectionHealth,
+  markHostActive,
+  reactivateHost,
 
   // Auth user tracking (from userManager)
   getAuthUserConnection,

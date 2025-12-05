@@ -8,7 +8,7 @@ const {
   getGameBySocketId,
   getUsernameBySocketId,
   updateUserPresence,
-  recordUserHeartbeat
+  updateUserHeartbeat
 } = require('../modules/gameStateManager');
 
 const { broadcastToRoom, getGameRoom } = require('../utils/socketHelpers');
@@ -62,7 +62,7 @@ function registerPresenceHandlers(io, socket) {
     if (!gameCode || !username) return;
 
     // Record heartbeat
-    recordUserHeartbeat(gameCode, username);
+    updateUserHeartbeat(gameCode, username);
   });
 }
 
