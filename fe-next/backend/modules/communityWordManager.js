@@ -163,6 +163,53 @@ function isWordCommunityValid(word, language) {
 }
 
 /**
+ * Unified word validation function - checks all validation sources in one call
+ * This is the primary function to use for determining if a word should be auto-validated
+ *
+ * Validation sources (checked in order):
+ * 1. Static dictionary (highest trust)
+ * 2. Community-validated (net_score >= 6, prominently valid)
+ * 3. Positive community score (net_score > 0, valid for scoring)
+ *
+ * @param {string} word - The word to check
+ * @param {string} language - Language code
+ * @returns {{ isValid: boolean, source: string }} - Validation result with source
+ *   source values: 'dictionary', 'community_prominent', 'community_positive', 'none'
+ */
+function isWordAutoValid(word, language) {
+  const lang = language || 'en';
+  const normalized = normalizeWord(word, lang);
+
+  // 1. Check static dictionary first (most trusted source)
+  // Lazy require to avoid circular dependency
+  try {
+    const { isDictionaryWordOnly } = require('../dictionary');
+    if (isDictionaryWordOnly(normalized, lang)) {
+      return { isValid: true, source: 'dictionary' };
+    }
+  } catch (e) {
+    // Dictionary not available yet (during initial load)
+  }
+
+  // 2. Check community-validated words (net_score >= PROMINENT_THRESHOLD)
+  const communitySet = communityValidWords[lang];
+  if (communitySet && communitySet.has(normalized)) {
+    return { isValid: true, source: 'community_prominent' };
+  }
+
+  // 3. Check pending cache for positive score (net_score > VALID_THRESHOLD)
+  const pendingCache = wordsPendingVotes[lang];
+  if (pendingCache) {
+    const cached = pendingCache.get(normalized);
+    if (cached && cached.netScore > VALID_THRESHOLD) {
+      return { isValid: true, source: 'community_positive' };
+    }
+  }
+
+  return { isValid: false, source: 'none' };
+}
+
+/**
  * Add a word to the community-valid cache (when it crosses the PROMINENT_THRESHOLD)
  * @param {string} word - The word to add
  * @param {string} language - Language code
@@ -959,6 +1006,7 @@ function filterWordsForAIValidation(words, language, gameCode) {
 module.exports = {
   loadCommunityWords,
   isWordCommunityValid,
+  isWordAutoValid,  // Unified validation function - use this instead of multiple calls
   addToCommunityCache,
   recordVote,
   recordAIVote,
