@@ -18,6 +18,7 @@ const PlayerWaitingResultsView = ({
   onExitRoom,
   onConfirmExit,
   foundWords = [], // Words found by the player for validation display
+  isHost = false, // Whether this is being shown to the host
 }) => {
   // Stage of the validation process - cycles through stages
   const [stage, setStage] = useState(0);
@@ -77,7 +78,7 @@ const PlayerWaitingResultsView = ({
 
       {/* Exit Button */}
       <div className="w-full max-w-md mx-auto flex justify-end mb-4 relative z-50">
-        <ExitRoomButton onClick={onExitRoom} label={t('playerView.exit')} />
+        <ExitRoomButton onClick={onExitRoom} label={isHost ? t('hostView.exitRoom') : t('playerView.exit')} />
       </div>
 
       {/* Centered Content */}
@@ -261,7 +262,7 @@ const PlayerWaitingResultsView = ({
           >
             <RoomChat
               username={username}
-              isHost={false}
+              isHost={isHost}
               gameCode={gameCode}
               className="min-h-[300px]"
             />
@@ -274,10 +275,12 @@ const PlayerWaitingResultsView = ({
         <AlertDialogContent className="bg-white dark:bg-slate-800 border-red-500/30">
           <AlertDialogHeader>
             <AlertDialogTitle className="text-slate-900 dark:text-white">
-              {t('playerView.exitConfirmation')}
+              {t('playerView.exitConfirmation') || 'Exit Room?'}
             </AlertDialogTitle>
             <AlertDialogDescription className="text-slate-600 dark:text-gray-300">
-              {t('playerView.exitWarning')}
+              {isHost
+                ? (t('hostView.exitWarning') || 'Are you sure you want to exit? This will close the room for all players.')
+                : t('playerView.exitWarning')}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

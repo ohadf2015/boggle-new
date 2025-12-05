@@ -18,7 +18,7 @@ import logger from '@/utils/logger';
 // Extracted components
 import HostPreGameView from './components/HostPreGameView';
 import HostInGameView from './components/HostInGameView';
-import HostWaitingResultsView from './components/HostWaitingResultsView';
+import PlayerWaitingResultsView from '../player/components/PlayerWaitingResultsView';
 import {
   QRCodeDialog,
   FinalScoresModal,
@@ -423,16 +423,28 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
 
       {/* Waiting for Results View */}
       {waitingForResults && (
-        <HostWaitingResultsView
+        <PlayerWaitingResultsView
           username={username}
           gameCode={gameCode}
           t={t}
-          playersReady={playersReady}
-          playerScores={playerScores}
+          dir={dir}
+          leaderboard={playersReady
+            .map(player => {
+              const name = typeof player === 'string' ? player : player.username;
+              return {
+                username: name,
+                score: playerScores[name] || 0,
+                wordCount: playerWordCounts[name] || 0,
+                avatar: typeof player === 'object' ? player.avatar : null,
+              };
+            })
+            .sort((a, b) => b.score - a.score)}
+          foundWords={hostFoundWords}
           showExitConfirm={showExitConfirm}
           setShowExitConfirm={setShowExitConfirm}
           onExitRoom={handleExitRoom}
           onConfirmExit={confirmExitRoom}
+          isHost={true}
         />
       )}
 
