@@ -808,7 +808,7 @@ function shouldUseAIValidation(word, language, gameCode) {
         logger.debug('CommunityWords', `Skipping AI for "${word}" - community rejected (netScore: ${cached.netScore})`);
         return {
           shouldValidate: false,
-          reason: 'community_rejected',
+          reason: 'Community rejected this word',
           alternativeResult: { isValid: false, source: 'community' }
         };
       }
@@ -831,7 +831,7 @@ function shouldUseAIValidation(word, language, gameCode) {
     logger.debug('CommunityWords', `AI limit reached for game ${gameCode} (${currentCount}/${SELF_HEALING_CONFIG.MAX_AI_VALIDATIONS_PER_GAME})`);
     return {
       shouldValidate: false,
-      reason: 'ai_limit_reached',
+      reason: 'Could not verify - validation limit reached',
       alternativeResult: { isValid: false, source: 'limit_reached' }
     };
   }
@@ -840,7 +840,7 @@ function shouldUseAIValidation(word, language, gameCode) {
   if (normalized.length < SELF_HEALING_CONFIG.MIN_WORD_LENGTH_FOR_AI) {
     return {
       shouldValidate: false,
-      reason: 'word_too_short',
+      reason: 'Word too short',
       alternativeResult: { isValid: false, source: 'too_short' }
     };
   }
@@ -850,7 +850,7 @@ function shouldUseAIValidation(word, language, gameCode) {
     logger.debug('CommunityWords', `Skipping AI for "${word}" - looks like gibberish`);
     return {
       shouldValidate: false,
-      reason: 'looks_gibberish',
+      reason: 'Not a valid word',
       alternativeResult: { isValid: false, source: 'pattern_rejected' }
     };
   }
@@ -942,7 +942,7 @@ function filterWordsForAIValidation(words, language, gameCode) {
       skippedWords.set(word, {
         isValid: false,
         source: 'limit_reached',
-        reason: 'AI validation limit reached'
+        reason: 'Could not verify - validation limit reached'
       });
       continue;
     }

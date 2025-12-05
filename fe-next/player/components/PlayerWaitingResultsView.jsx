@@ -92,36 +92,32 @@ const PlayerWaitingResultsView = ({
             className="text-center"
           >
             <div className="bg-neo-yellow border-4 border-neo-black shadow-hard-lg p-6 sm:p-8 md:p-10">
-              {/* Brain/Processing Animation - Static container to prevent CLS */}
+              {/* Brain/Processing Animation - Static container, opacity-only animation to prevent CLS */}
               <div className="mb-6 h-[80px] flex items-center justify-center">
-                <motion.div
-                  animate={{ scale: [1, 1.05, 1] }}
-                  transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-                  className="inline-block bg-neo-pink border-4 border-neo-black shadow-hard p-4"
-                >
+                <div className="inline-block bg-neo-pink border-4 border-neo-black shadow-hard p-4">
                   <AnimatePresence mode="wait">
                     <motion.div
                       key={stage}
-                      initial={{ scale: 0.8, opacity: 0 }}
-                      animate={{ scale: 1, opacity: 1 }}
-                      exit={{ scale: 0.8, opacity: 0 }}
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
                       transition={{ duration: 0.2 }}
                       className="text-4xl"
                     >
                       {currentStage.icon}
                     </motion.div>
                   </AnimatePresence>
-                </motion.div>
+                </div>
               </div>
 
-              {/* Main status message - Fixed height to prevent CLS */}
+              {/* Main status message - Fixed height to prevent CLS, opacity-only animation */}
               <div className="bg-neo-black text-neo-white px-6 py-4 font-black uppercase text-xl md:text-2xl tracking-wider shadow-hard border-4 border-neo-black mb-4 min-h-[70px] flex items-center justify-center">
                 <AnimatePresence mode="wait">
                   <motion.div
                     key={stage}
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -10 }}
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
                     transition={{ duration: 0.3 }}
                     className="flex items-center justify-center gap-3"
                   >
@@ -148,7 +144,7 @@ const PlayerWaitingResultsView = ({
                 />
               </div>
 
-              {/* Current word being validated - Fixed height container */}
+              {/* Current word being validated - Fixed height container, opacity-only animation */}
               {words.length > 0 && (
                 <div className="flex items-center justify-center gap-2 h-[40px]">
                   <span className="text-neo-black font-bold text-sm uppercase tracking-wide">
@@ -157,9 +153,9 @@ const PlayerWaitingResultsView = ({
                   <AnimatePresence mode="wait">
                     <motion.span
                       key={currentWord}
-                      initial={{ opacity: 0, scale: 0.8 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      exit={{ opacity: 0, scale: 0.8 }}
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
                       transition={{ duration: 0.2 }}
                       className="bg-neo-purple text-neo-white px-3 py-1 font-black text-lg uppercase border-3 border-neo-black shadow-hard-sm"
                     >
