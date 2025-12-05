@@ -307,6 +307,7 @@ const PlayerView = ({ onShowResults, initialPlayers = [], username, gameCode, pe
           t={t}
           dir={dir}
           leaderboard={leaderboard}
+          foundWords={foundWords}
           showExitConfirm={showExitConfirm}
           setShowExitConfirm={setShowExitConfirm}
           onExitRoom={handleExitRoom}
