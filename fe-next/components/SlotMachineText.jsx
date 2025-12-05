@@ -1,20 +1,43 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 
 const SlotMachineText = ({ text, duration = 1000 }) => {
-    const [displayedText, setDisplayedText] = useState('');
-    const [isAnimating, setIsAnimating] = useState(true);
-    const [glowIntensity, setGlowIntensity] = useState(0);
+    const [displayedText, setDisplayedText] = useState(text);
+    const [isAnimating, setIsAnimating] = useState(false);
+    const [glowIntensity, setGlowIntensity] = useState(1);
+
+    // Track if we've already animated this text to prevent re-animation on parent re-renders
+    const hasAnimatedRef = useRef(new Set());
+    const lastTextRef = useRef(text);
 
     // Include Hebrew characters for better support
     const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789אבגדהוזחטיכלמנסעפצקרשת!@#$%^&*()';
 
     useEffect(() => {
+        // Only animate if this is a new text we haven't animated before
+        if (hasAnimatedRef.current.has(text)) {
+            // Already animated this text, just display it without animation
+            setDisplayedText(text);
+            setIsAnimating(false);
+            setGlowIntensity(1);
+            return;
+        }
+
+        // If text actually changed to something new, animate it
+        const isNewText = lastTextRef.current !== text;
+        lastTextRef.current = text;
+
+        // Mark this text as animated
+        hasAnimatedRef.current.add(text);
+
+        // Only run animation for new, unseen text
+        if (!isNewText && hasAnimatedRef.current.size > 1) {
+            setDisplayedText(text);
+            return;
+        }
+
         let startTime = Date.now();
         let animationFrame;
-        // Defer state update to avoid synchronous setState
-        Promise.resolve().then(() => {
-            setIsAnimating(true);
-        });
+        setIsAnimating(true);
 
         const animate = () => {
             const now = Date.now();
