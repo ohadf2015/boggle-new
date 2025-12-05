@@ -752,6 +752,13 @@ async function startBot(bot, grid, language, onWordSubmit, gameDuration) {
   // Always prepare fresh words for the new grid (fixes bots not finding words after first game)
   await prepareBotWords(bot, grid, language);
 
+  // Safety check: ensure wordsToFind was set by prepareBotWords
+  if (!bot.wordsToFind || !Array.isArray(bot.wordsToFind)) {
+    logger.warn('BOT', `Bot "${bot.username}" has no words to find, skipping`);
+    bot.wordsToFind = [];
+    return;
+  }
+
   bot.isActive = true;
   const timing = BOT_CONFIG.TIMING[bot.difficulty] || BOT_CONFIG.TIMING.medium;
 
