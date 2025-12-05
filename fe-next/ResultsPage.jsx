@@ -83,9 +83,9 @@ const LetterGrid = ({ letterGrid, heatMapData, showHeatmap, onToggleHeatmap }) =
       {/* Heatmap Toggle Button - Always visible */}
       {heatMapData && heatMapData.maxCount > 0 && (
         <motion.button
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3 }}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.3, duration: 0.3 }}
           onClick={onToggleHeatmap}
           className={`mb-3 mx-auto flex items-center gap-2 px-4 py-2 rounded-neo border-3 border-neo-black font-bold text-sm uppercase transition-all shadow-hard-sm hover:shadow-hard hover:translate-x-[-1px] hover:translate-y-[-1px] active:translate-x-[1px] active:translate-y-[1px] active:shadow-hard-pressed ${
             showHeatmap
@@ -452,9 +452,9 @@ const ResultsPage = ({ finalScores, letterGrid, gameCode, onReturnToRoom, userna
           {/* Letter Grid */}
           {letterGrid && (
             <motion.div
-              initial={{ y: 20, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              transition={{ delay: 0.1 }}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.1, duration: 0.3 }}
               className="mb-6 px-0 sm:px-4"
             >
               <LetterGrid
@@ -468,9 +468,9 @@ const ResultsPage = ({ finalScores, letterGrid, gameCode, onReturnToRoom, userna
 
           {/* Final Scores Title */}
           <motion.div
-            initial={{ y: 20, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ delay: 0.2 }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.2, duration: 0.3 }}
             className="flex items-center justify-center gap-3 mb-6"
           >
             <motion.div
@@ -554,10 +554,11 @@ const ResultsPage = ({ finalScores, letterGrid, gameCode, onReturnToRoom, userna
         {/* Play Again Section - Neo-Brutalist */}
         {gameCode && onReturnToRoom && (
           <motion.div
-            initial={{ y: 30, opacity: 0, rotate: -2 }}
-            animate={{ y: 0, opacity: 1, rotate: 1 }}
-            transition={{ delay: 0.5 + sortedScores.length * 0.1 }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.5 + sortedScores.length * 0.1, duration: 0.3 }}
             className="mt-8 max-w-4xl mx-auto"
+            style={{ transform: 'rotate(1deg)' }}
           >
             <div className="p-5 sm:p-6 bg-neo-cyan border-4 border-neo-black rounded-neo-lg shadow-hard-xl relative overflow-hidden">
               {/* Halftone texture pattern */}
