@@ -71,7 +71,7 @@ const { isProfane, cleanProfanity } = require('./utils/profanityFilter');
 const { calculateWordScore, calculateGameScores } = require('./modules/scoringEngine');
 const { checkAndAwardAchievements, getPlayerAchievements, ACHIEVEMENTS, ACHIEVEMENT_ICONS, getLocalizedAchievements, awardFinalAchievements } = require('./modules/achievementManager');
 const { calculatePlayerTitles } = require('./modules/playerTitlesManager');
-const { isDictionaryWord, getAvailableDictionaries, addApprovedWord, normalizeWord, getRandomLongWords } = require('./dictionary');
+const { isDictionaryWordOnly, getAvailableDictionaries, addApprovedWord, normalizeWord, getRandomLongWords } = require('./dictionary');
 const { incrementWordApproval } = require('./redisClient');
 const {
   loadCommunityWords,
@@ -79,15 +79,15 @@ const {
   getWordForPlayer,
   getWordsForPlayer,
   recordVote,
+  recordWordSubmission,  // Save valid words to word_scores table
   updatePendingCache,
   SELF_HEALING_CONFIG,
   // Hybrid validation (cost-saving) - used at game end for batch validation
   filterWordsForAIValidation,
   resetGameAIValidationCount,
   cleanupGameTracking,
-  // Community validation checks - auto-validate words with positive community scores
-  isWordCommunityValid,
-  isWordValidForScoring
+  // Unified word validation - checks dictionary + word_scores table in one call
+  isWordAutoValid
 } = require('./modules/communityWordManager');
 const { validateWordsWithAI, isAIServiceAvailable } = require('./modules/aiValidationService');
 const gameStartCoordinator = require('./utils/gameStartCoordinator');
@@ -855,20 +855,15 @@ function initializeSocketHandlers(io) {
           return;
         }
 
-        // Check dictionary and community validation to determine if auto-validated
-        // Words are auto-validated if they are:
-        // 1. In the dictionary, OR
-        // 2. Community-validated (net_score >= 6), OR
-        // 3. Have a positive validation score (net_score > 0) from previous games
-        const isInDictionary = isDictionaryWord(normalizedWord, game.language);
-        const isCommunityValidated = isWordCommunityValid(normalizedWord, game.language);
-        const hasPositiveScore = isWordValidForScoring(normalizedWord, game.language);
-        const shouldAutoValidate = isInDictionary || isCommunityValidated || hasPositiveScore;
+        // Use unified validation - checks dictionary + word_scores table in one call
+        const validationResult = isWordAutoValid(normalizedWord, game.language);
+        const shouldAutoValidate = validationResult.isValid;
+        const isInDictionary = validationResult.source === 'dictionary';
 
         if (shouldAutoValidate) {
           // Log the validation source for debugging
-          if (!isInDictionary && (isCommunityValidated || hasPositiveScore)) {
-            logger.debug('COMMUNITY_VALIDATION', `Word "${normalizedWord}" auto-validated via community: communityValid=${isCommunityValidated}, positiveScore=${hasPositiveScore}`);
+          if (validationResult.source !== 'dictionary') {
+            logger.debug('COMMUNITY_VALIDATION', `Word "${normalizedWord}" auto-validated via ${validationResult.source}`);
           }
 
           // Calculate score with combo multiplier
@@ -893,18 +888,30 @@ function initializeSocketHandlers(io) {
             comboLevel: safeComboLevel
           });
 
-          // Save valid word to database for bot learning (async, don't block)
-          // Only save dictionary words to ensure quality data
-          if (isInDictionary && isSupabaseConfigured()) {
-            const userData = game.users?.[username];
-            savePlayerWord({
+          // Save valid word to word_scores table (async, don't block)
+          // This records all validated words to build community validation data
+          if (isSupabaseConfigured()) {
+            recordWordSubmission({
               word: normalizedWord,
               language: game.language || 'en',
               gameCode,
-              playerId: userData?.authUserId || null
+              submittedBy: username
             }).catch(err => {
-              logger.debug('PLAYER_WORDS', `Failed to save player word: ${err.message}`);
+              logger.debug('WORD_SCORES', `Failed to record word submission: ${err.message}`);
             });
+
+            // Also save dictionary words to player_words for bot learning
+            if (isInDictionary) {
+              const userData = game.users?.[username];
+              savePlayerWord({
+                word: normalizedWord,
+                language: game.language || 'en',
+                gameCode,
+                playerId: userData?.authUserId || null
+              }).catch(err => {
+                logger.debug('PLAYER_WORDS', `Failed to save player word: ${err.message}`);
+              });
+            }
           }
 
           updatePlayerScore(gameCode, username, wordScore, true);
@@ -1590,12 +1597,9 @@ function initializeSocketHandlers(io) {
       const hostUserId = game.users[game.hostUsername]?.authUserId || null;
       const approvedNonDictionaryWords = validations.filter(v => {
         if (!v.isValid) return false;
-        // Check if word was NOT in the original dictionary AND not community-validated
-        const isInDictionary = isDictionaryWord(v.word, language);
-        const isCommunityValidated = isWordCommunityValid(v.word, language);
-        const hasPositiveScore = isWordValidForScoring(v.word, language);
-        // Only count as "new" approval if not already validated by any method
-        return !isInDictionary && !isCommunityValidated && !hasPositiveScore;
+        // Check if word was NOT already validated by any method
+        const validationResult = isWordAutoValid(v.word, language);
+        return !validationResult.isValid;
       });
 
       // Process each approved non-dictionary word
@@ -2454,11 +2458,14 @@ async function calculateAndBroadcastFinalScores(io, gameCode) {
       if (!seenWords.has(word)) {
         seenWords.add(word);
 
-        if (isDictionaryWord(word, language)) {
-          dictionaryValidatedWords.add(word);
-        } else if (isWordCommunityValid(word, language) || isWordValidForScoring(word, language)) {
-          // Community-validated words (net_score >= 6 or positive score) are auto-valid
-          communityValidatedWords.add(word);
+        const validationResult = isWordAutoValid(word, language);
+        if (validationResult.isValid) {
+          if (validationResult.source === 'dictionary') {
+            dictionaryValidatedWords.add(word);
+          } else {
+            // Community-validated words (net_score >= 6 or positive score) are auto-valid
+            communityValidatedWords.add(word);
+          }
         } else {
           nonDictionaryWords.push(word);
         }

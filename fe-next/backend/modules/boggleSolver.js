@@ -8,7 +8,7 @@
  * - Grid-based result caching to avoid re-solving same boards
  */
 
-const { isDictionaryWord, normalizeWord, dictionary } = require('../dictionary');
+const { isDictionaryWordOnly, normalizeWord, dictionary } = require('../dictionary');
 const { normalizeHebrewLetter } = require('./wordValidator');
 const logger = require('../utils/logger');
 
@@ -207,8 +207,8 @@ function findAllWords(grid, language, options = {}) {
           foundWords.add(currentWord);
         }
       } else {
-        // Using dictionary lookup
-        if (isDictionaryWord(currentWord, language)) {
+        // Using dictionary lookup (static dictionary only for bot word finding)
+        if (isDictionaryWordOnly(currentWord, language)) {
           foundWords.add(currentWord);
         }
       }

@@ -261,9 +261,12 @@ class Dictionary {
     }
   }
 
-  isValidWord(word, language) {
+  /**
+   * Check if word is in static dictionary only (no community validation)
+   * Use this for pure dictionary lookups without word_scores table
+   */
+  isValidWordDictionaryOnly(word, language) {
     if (!this.loaded) {
-      // If dictionaries aren't loaded, treat all words as unknown (require manual validation)
       return null;
     }
 
@@ -282,7 +285,7 @@ class Dictionary {
         break;
 
       case 'ja':
-        normalizedWord = word; // Japanese doesn't need case normalization
+        normalizedWord = word;
         dictionary = this.japaneseWords;
         break;
 
@@ -293,18 +296,30 @@ class Dictionary {
         break;
     }
 
+    return dictionary.has(normalizedWord);
+  }
+
+  /**
+   * Check if word is valid (static dictionary + community validated)
+   * This is the legacy function - prefer using isWordAutoValid from communityWordManager
+   */
+  isValidWord(word, language) {
+    if (!this.loaded) {
+      return null;
+    }
+
     // Check static dictionary first
-    if (dictionary.has(normalizedWord)) {
+    if (this.isValidWordDictionaryOnly(word, language)) {
       return true;
     }
 
-    // Check community-validated words (words with 6+ net votes)
+    // Check community-validated words via word_scores table
     // Lazy require to avoid circular dependency
     try {
-      const { isWordCommunityValid } = require('./modules/communityWordManager');
-      if (isWordCommunityValid(normalizedWord, language)) {
-        return true;
-      }
+      const { isWordAutoValid } = require('./modules/communityWordManager');
+      const result = isWordAutoValid(word, language);
+      // Return true if valid from any community source
+      return result.isValid && result.source !== 'dictionary';
     } catch (e) {
       // Community word manager not available yet (during initial load)
     }
@@ -402,6 +417,11 @@ function isDictionaryWord(word, language) {
   return dictionary.isValidWord(word, language);
 }
 
+// Check static dictionary only (no community validation from word_scores table)
+function isDictionaryWordOnly(word, language) {
+  return dictionary.isValidWordDictionaryOnly(word, language);
+}
+
 function getAvailableDictionaries() {
   return ['en', 'he', 'sv', 'ja'];
 }
@@ -472,6 +492,7 @@ async function addApprovedWord(word, language) {
 module.exports = {
   dictionary,
   isDictionaryWord,
+  isDictionaryWordOnly,  // Static dictionary check only (no word_scores table)
   getAvailableDictionaries,
   normalizeHebrewWord,
   normalizeWord,
@@ -479,6 +500,7 @@ module.exports = {
   // Also export the dictionary instance as default for backward compatibility
   load: () => dictionary.load(),
   isValidWord: (word, language) => dictionary.isValidWord(word, language),
+  isValidWordDictionaryOnly: (word, language) => dictionary.isValidWordDictionaryOnly(word, language),
   isValidEnglishWord: (word) => dictionary.isValidEnglishWord(word),
   isValidHebrewWord: (word) => dictionary.isValidHebrewWord(word),
   isValidSwedishWord: (word) => dictionary.isValidSwedishWord(word),

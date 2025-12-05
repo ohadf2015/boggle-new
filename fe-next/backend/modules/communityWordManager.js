@@ -163,6 +163,53 @@ function isWordCommunityValid(word, language) {
 }
 
 /**
+ * Unified word validation function - checks all validation sources in one call
+ * This is the primary function to use for determining if a word should be auto-validated
+ *
+ * Validation sources (checked in order):
+ * 1. Static dictionary (highest trust)
+ * 2. Community-validated (net_score >= 6, prominently valid)
+ * 3. Positive community score (net_score > 0, valid for scoring)
+ *
+ * @param {string} word - The word to check
+ * @param {string} language - Language code
+ * @returns {{ isValid: boolean, source: string }} - Validation result with source
+ *   source values: 'dictionary', 'community_prominent', 'community_positive', 'none'
+ */
+function isWordAutoValid(word, language) {
+  const lang = language || 'en';
+  const normalized = normalizeWord(word, lang);
+
+  // 1. Check static dictionary first (most trusted source)
+  // Lazy require to avoid circular dependency
+  try {
+    const { isDictionaryWordOnly } = require('../dictionary');
+    if (isDictionaryWordOnly(normalized, lang)) {
+      return { isValid: true, source: 'dictionary' };
+    }
+  } catch (e) {
+    // Dictionary not available yet (during initial load)
+  }
+
+  // 2. Check community-validated words (net_score >= PROMINENT_THRESHOLD)
+  const communitySet = communityValidWords[lang];
+  if (communitySet && communitySet.has(normalized)) {
+    return { isValid: true, source: 'community_prominent' };
+  }
+
+  // 3. Check pending cache for positive score (net_score > VALID_THRESHOLD)
+  const pendingCache = wordsPendingVotes[lang];
+  if (pendingCache) {
+    const cached = pendingCache.get(normalized);
+    if (cached && cached.netScore > VALID_THRESHOLD) {
+      return { isValid: true, source: 'community_positive' };
+    }
+  }
+
+  return { isValid: false, source: 'none' };
+}
+
+/**
  * Add a word to the community-valid cache (when it crosses the PROMINENT_THRESHOLD)
  * @param {string} word - The word to add
  * @param {string} language - Language code
@@ -175,6 +222,113 @@ function addToCommunityCache(word, language) {
   const normalized = normalizeWord(word, lang);
   set.add(normalized);
   logger.debug('CommunityWords', `Word "${word}" (${lang}) added to community cache`);
+}
+
+/**
+ * Record a successful word submission to word_scores table
+ * This tracks that a word was validated and used in a game, contributing to community validation
+ * Each successful submission adds 1 point to likes_count
+ *
+ * @param {object} params - Submission parameters
+ * @param {string} params.word - The word that was validated
+ * @param {string} params.language - Language code
+ * @param {string} params.gameCode - Game where word was submitted
+ * @param {string} params.submittedBy - Username who submitted (optional, for tracking)
+ * @returns {object} - { success, netScore, isProminentlyValid, error }
+ */
+async function recordWordSubmission({ word, language, gameCode, submittedBy }) {
+  const client = getSupabase();
+  if (!client) {
+    return { success: false, netScore: 0, isProminentlyValid: false, error: 'Supabase not configured' };
+  }
+
+  const normalizedWord = normalizeWord(word, language || 'en');
+  const lang = language || 'en';
+
+  try {
+    // First, try to get existing record
+    const { data: existing, error: fetchError } = await client
+      .from('word_scores')
+      .select('likes_count, dislikes_count, net_score, is_potentially_valid')
+      .eq('word', normalizedWord)
+      .eq('language', lang)
+      .single();
+
+    if (fetchError && fetchError.code !== 'PGRST116') { // PGRST116 = no rows returned
+      logger.error('CommunityWords', `Error fetching word score: ${fetchError.message}`);
+      return { success: false, netScore: 0, isProminentlyValid: false, error: fetchError.message };
+    }
+
+    // Calculate new likes count (add 1 for successful submission)
+    const currentLikes = existing?.likes_count || 0;
+    const currentDislikes = existing?.dislikes_count || 0;
+    const newLikes = currentLikes + 1;
+    const newNetScore = newLikes - currentDislikes;
+
+    // Upsert the record
+    const { error: upsertError } = await client
+      .from('word_scores')
+      .upsert({
+        word: normalizedWord,
+        language: lang,
+        likes_count: newLikes,
+        dislikes_count: currentDislikes,
+        first_submitter: existing ? undefined : submittedBy,
+        last_voted_at: new Date().toISOString()
+      }, {
+        onConflict: 'word,language'
+      });
+
+    if (upsertError) {
+      logger.error('CommunityWords', `Error recording word submission: ${upsertError.message}`);
+      return { success: false, netScore: 0, isProminentlyValid: false, error: upsertError.message };
+    }
+
+    const isProminentlyValid = newNetScore >= PROMINENT_THRESHOLD;
+
+    // If word crossed the prominent threshold, add to cache
+    if (isProminentlyValid && !communityValidWords[lang]?.has(normalizedWord)) {
+      addToCommunityCache(normalizedWord, lang);
+      logger.info('CommunityWords', `Word "${word}" (${lang}) reached ${PROMINENT_THRESHOLD}+ via submission! Now prominently valid.`);
+    }
+
+    // Update pending cache
+    updatePendingCacheInternal(normalizedWord, lang, newLikes, currentDislikes, newNetScore);
+
+    logger.debug('CommunityWords', `Word submission recorded: "${word}" (${lang}) - netScore: ${newNetScore}`);
+
+    return {
+      success: true,
+      netScore: newNetScore,
+      isProminentlyValid,
+      error: null
+    };
+
+  } catch (err) {
+    logger.error('CommunityWords', `Unexpected error recording word submission: ${err}`);
+    return { success: false, netScore: 0, isProminentlyValid: false, error: err.message };
+  }
+}
+
+/**
+ * Internal function to update pending cache with specific values
+ */
+function updatePendingCacheInternal(normalizedWord, lang, likes, dislikes, netScore) {
+  const cache = wordsPendingVotes[lang];
+  if (!cache) return;
+
+  if (netScore >= PROMINENT_THRESHOLD) {
+    // Remove from pending, it's now prominently valid
+    cache.delete(normalizedWord);
+  } else {
+    cache.set(normalizedWord, {
+      likes,
+      dislikes,
+      netScore,
+      aiApproved: false,
+      lastVoted: Date.now()
+    });
+  }
 }
 
 /**
@@ -959,9 +1113,11 @@ function filterWordsForAIValidation(words, language, gameCode) {
 module.exports = {
   loadCommunityWords,
   isWordCommunityValid,
+  isWordAutoValid,  // Unified validation function - use this instead of multiple calls
   addToCommunityCache,
   recordVote,
   recordAIVote,
+  recordWordSubmission,  // Record successful word submissions to word_scores
   collectNonDictionaryWords,
   getWordForPlayer,
   getWordsForPlayer,
