@@ -3,9 +3,6 @@
  */
 
 module.exports = {
-  // Use ts-jest for TypeScript support
-  preset: 'ts-jest/presets/js-with-ts',
-
   // Test environment
   testEnvironment: 'node',
 
@@ -25,14 +22,13 @@ module.exports = {
     '^@/(.*)$': '<rootDir>/../$1'
   },
 
-  // Transform settings
-  transform: {
-    '^.+\\.tsx?$': ['ts-jest', {
-      tsconfig: './tsconfig.json',
-      // Allow JS files
-      allowJs: true
-    }],
-  },
+  // No transform needed for JS tests
+  transform: {},
+
+  // Ignore patterns for transform
+  transformIgnorePatterns: [
+    '/node_modules/'
+  ],
 
   // Files to collect coverage from
   collectCoverageFrom: [
