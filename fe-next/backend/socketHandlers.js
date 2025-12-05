@@ -2481,7 +2481,8 @@ async function calculateAndBroadcastFinalScores(io, gameCode) {
       aiValidatedWords.set(word, {
         isValid: result.isValid,
         isAiVerified: false,
-        source: result.source
+        source: result.source,
+        reason: result.reason  // Include reason for tooltip display
       });
     }
 
