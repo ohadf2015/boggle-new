@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { FaTrophy } from 'react-icons/fa';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '../../components/ui/alert-dialog';
@@ -18,17 +18,22 @@ const HostWaitingResultsView = ({
   onExitRoom,
   onConfirmExit,
 }) => {
-  // Build leaderboard from player scores
-  const leaderboard = playersReady
-    .map(player => {
-      const name = typeof player === 'string' ? player : player.username;
-      return {
-        username: name,
-        score: playerScores[name] || 0,
-        avatar: typeof player === 'object' ? player.avatar : null,
-      };
-    })
-    .sort((a, b) => b.score - a.score);
+  // Track which players have already been animated
+  const animatedPlayersRef = useRef(new Set());
+
+  // Memoize leaderboard calculation to prevent re-renders when data hasn't changed
+  const leaderboard = useMemo(() => {
+    return playersReady
+      .map(player => {
+        const name = typeof player === 'string' ? player : player.username;
+        return {
+          username: name,
+          score: playerScores[name] || 0,
+          avatar: typeof player === 'object' ? player.avatar : null,
+        };
+      })
+      .sort((a, b) => b.score - a.score);
+  }, [playersReady, playerScores]);
 
   return (
     <div className="min-h-screen bg-neo-cream dark:bg-slate-900 p-3 sm:p-4 md:p-8 flex flex-col transition-colors duration-300">
@@ -107,6 +112,11 @@ const HostWaitingResultsView = ({
                 <div className="p-3 space-y-2 max-h-[300px] overflow-y-auto">
                   {leaderboard.map((player, index) => {
                     const isMe = player.username === username;
+                    // Track if this player has already been animated
+                    const isNewPlayer = !animatedPlayersRef.current.has(player.username);
+                    if (isNewPlayer) {
+                      animatedPlayersRef.current.add(player.username);
+                    }
                     const getRankStyle = () => {
                       if (index === 0) return 'bg-neo-yellow text-neo-black';
                       if (index === 1) return 'bg-slate-300 text-neo-black';
@@ -116,10 +126,15 @@ const HostWaitingResultsView = ({
                     return (
                       <motion.div
                         key={player.username}
-                        initial={{ x: 50, opacity: 0 }}
+                        layout
+                        initial={isNewPlayer ? { x: 50, opacity: 0 } : false}
                         animate={{ x: 0, opacity: 1 }}
-                        transition={{ delay: index * 0.1 }}
-                        className={`flex items-center gap-3 p-3 rounded-neo border-3 border-neo-black shadow-hard-sm transition-all
+                        transition={{
+                          layout: { type: 'spring', stiffness: 300, damping: 30 },
+                          opacity: { duration: 0.2 },
+                          x: isNewPlayer ? { duration: 0.3, delay: index * 0.05 } : { duration: 0 }
+                        }}
+                        className={`flex items-center gap-3 p-3 rounded-neo border-3 border-neo-black shadow-hard-sm transition-colors
                           hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-hard
                           ${getRankStyle()}`}
                       >

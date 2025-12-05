@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FaTrophy } from 'react-icons/fa';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '../../components/ui/alert-dialog';
@@ -26,6 +26,8 @@ const PlayerWaitingResultsView = ({
   const [currentWordIndex, setCurrentWordIndex] = useState(0);
   // Simulated progress percentage
   const [progress, setProgress] = useState(0);
+  // Track which players have already been animated to prevent re-animations
+  const animatedPlayersRef = useRef(new Set());
 
   // Validation stages with messages
   const validationStages = useMemo(() => [
@@ -204,6 +206,11 @@ const PlayerWaitingResultsView = ({
                 <div className="p-3 space-y-2 max-h-[300px] overflow-y-auto">
                   {leaderboard.map((player, index) => {
                     const isMe = player.username === username;
+                    // Track if this player has already been animated
+                    const isNewPlayer = !animatedPlayersRef.current.has(player.username);
+                    if (isNewPlayer) {
+                      animatedPlayersRef.current.add(player.username);
+                    }
                     const getRankStyle = () => {
                       if (index === 0) return 'bg-neo-yellow text-neo-black';
                       if (index === 1) return 'bg-slate-300 text-neo-black';
@@ -213,10 +220,14 @@ const PlayerWaitingResultsView = ({
                     return (
                       <motion.div
                         key={player.username}
-                        initial={{ opacity: 0 }}
+                        layout
+                        initial={isNewPlayer ? { opacity: 0 } : false}
                         animate={{ opacity: 1 }}
-                        transition={{ duration: 0.2, delay: index * 0.05 }}
-                        className={`flex items-center gap-3 p-3 rounded-neo border-3 border-neo-black shadow-hard-sm transition-all
+                        transition={{
+                          layout: { type: 'spring', stiffness: 300, damping: 30 },
+                          opacity: isNewPlayer ? { duration: 0.2, delay: index * 0.05 } : { duration: 0 }
+                        }}
+                        className={`flex items-center gap-3 p-3 rounded-neo border-3 border-neo-black shadow-hard-sm transition-colors
                           hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-hard
                           ${getRankStyle()} ${dir === 'rtl' ? 'flex-row-reverse' : ''}`}
                       >
