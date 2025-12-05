@@ -51,6 +51,13 @@ const { getRandomLongWords } = require('../dictionary');
 const { ACHIEVEMENT_ICONS } = require('../modules/achievementManager');
 const logger = require('../utils/logger');
 const { startGameTimer, endGame } = require('./shared');
+const {
+  validatePayload,
+  createGameSchema,
+  joinGameSchema,
+  startGameSchema,
+  leaveRoomSchema
+} = require('../utils/socketValidation');
 
 // Configuration
 const MAX_PLAYERS_PER_ROOM = 50;
@@ -70,15 +77,16 @@ function registerGameHandlers(io, socket) {
       return;
     }
 
-    const { gameCode, roomName, language, hostUsername, playerId, avatar, authUserId, guestTokenHash, isRanked, profilePictureUrl } = data;
-
-    logger.info('SOCKET', `Create game request: ${gameCode} by ${hostUsername}${isRanked ? ' (RANKED)' : ''}`);
-
-    // Validate game code
-    if (!gameCode || gameCode.length !== 4) {
-      emitError(socket, ErrorMessages.INVALID_GAME_CODE);
+    // Validate payload
+    const validation = validatePayload(createGameSchema, data);
+    if (!validation.success) {
+      emitError(socket, `Invalid request: ${validation.error}`);
       return;
     }
+
+    const { gameCode, roomName, language, hostUsername, playerId, avatar, authUserId, guestTokenHash, isRanked, profilePictureUrl } = validation.data;
+
+    logger.info('SOCKET', `Create game request: ${gameCode} by ${hostUsername}${isRanked ? ' (RANKED)' : ''}`);
 
     // Sanitize playerId
     const sanitizedPlayerId = playerId && typeof playerId === 'string'
@@ -174,14 +182,16 @@ function registerGameHandlers(io, socket) {
       return;
     }
 
-    const { gameCode, username, playerId, avatar, authUserId, guestTokenHash, profilePictureUrl } = data;
-
-    logger.info('SOCKET', `Join request: ${username} to game ${gameCode}`);
-
-    if (!gameCode || !username) {
-      emitError(socket, ErrorMessages.USERNAME_REQUIRED);
+    // Validate payload
+    const validation = validatePayload(joinGameSchema, data);
+    if (!validation.success) {
+      emitError(socket, `Invalid request: ${validation.error}`);
       return;
     }
+
+    const { gameCode, username, playerId, avatar, authUserId, guestTokenHash, profilePictureUrl } = validation.data;
+
+    logger.info('SOCKET', `Join request: ${username} to game ${gameCode}`);
 
     const game = getGame(gameCode);
     if (!game) {

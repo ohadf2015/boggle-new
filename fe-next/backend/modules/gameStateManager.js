@@ -1,36 +1,28 @@
 /**
  * Game State Manager
  * Centralized game state management for Socket.IO
- * Uses socket IDs instead of WebSocket references
+ *
+ * REFACTORED: Core functionality has been extracted into focused modules:
+ * - userManager.js - User CRUD, socket mappings, auth connections
+ * - scoreManager.js - Player scores, words, leaderboard
+ * - presenceManager.js - Presence status, heartbeat, connection health
+ * - peerValidationManager.js - AI word tracking, peer validation votes
+ *
+ * This file now acts as a facade, re-exporting all functionality for backwards compatibility.
  */
+
+// Import focused modules
+const userManager = require('./userManager');
+const scoreManager = require('./scoreManager');
+const presenceManager = require('./presenceManager');
+const peerValidationManager = require('./peerValidationManager');
 
 // Game storage - maps gameCode to game object
 const games = {};
 
-// Socket to game mapping - maps socket.id to gameCode
-const socketToGame = new Map();
-
-// Socket to username mapping - maps socket.id to username
-const socketToUsername = new Map();
-
-// Username to socket mapping - maps "gameCode:username" to socket.id
-const usernameToSocket = new Map();
-
-// Leaderboard throttling - maps gameCode to timeout ID
-const leaderboardThrottleTimers = {};
-
-// Presence tracking configuration
-const PRESENCE_CONFIG = {
-  IDLE_THRESHOLD: 30000,     // 30 seconds without activity = idle
-  AFK_THRESHOLD: 45000,      // 45 seconds without activity = afk (for testing, change to 120000 for production)
-  HEARTBEAT_TIMEOUT: 30000,  // 30 seconds without heartbeat = disconnected (increased for poor connections)
-  WEAK_CONNECTION_THRESHOLD: 15000, // 15 seconds without heartbeat = weak connection warning
-  MISSED_HEARTBEATS_FOR_WEAK: 2,    // Number of consecutive missed heartbeats before weak connection
-};
-
-// Track authenticated users across all games
-// Maps authUserId -> { gameCode, socketId, username, isHost, connectedAt }
-const authUserConnections = new Map();
+// ==========================================
+// Game CRUD Operations
+// ==========================================
 
 /**
  * Create a new game
@@ -93,7 +85,6 @@ function updateGame(gameCode, updates) {
  */
 function deleteGame(gameCode) {
   if (games[gameCode]) {
-    // Clean up user mappings
     const game = games[gameCode];
 
     // Clean up any active timeouts to prevent memory leaks
@@ -106,15 +97,12 @@ function deleteGame(gameCode) {
       game.validationTimeout = null;
     }
 
-    for (const username of Object.keys(game.users)) {
-      const key = `${gameCode}:${username}`;
-      const socketId = usernameToSocket.get(key);
-      if (socketId) {
-        socketToGame.delete(socketId);
-        socketToUsername.delete(socketId);
-        usernameToSocket.delete(key);
-      }
-    }
+    // Clean up user mappings using userManager
+    userManager.cleanupUserMappings(game, gameCode);
+
+    // Clean up leaderboard throttle state using scoreManager
+    scoreManager.clearLeaderboardThrottle(gameCode);
+
     delete games[gameCode];
   }
 }
@@ -128,389 +116,192 @@ function gameExists(gameCode) {
   return !!games[gameCode];
 }
 
-/**
- * Add a user to a game
- * @param {string} gameCode - Game code
- * @param {string} username - Username
- * @param {string} socketId - Socket ID
- * @param {object} options - Additional options
- * @returns {boolean} - Whether addition was successful
- */
+// ==========================================
+// User Management (delegated to userManager)
+// ==========================================
+
 function addUserToGame(gameCode, username, socketId, options = {}) {
   const game = games[gameCode];
-  if (!game) return false;
-
-  const { avatar = null, isHost = false, playerId = null, authUserId = null, guestTokenHash = null } = options;
-
-  // Store user data with auth context and presence tracking
-  game.users[username] = {
-    socketId,
-    avatar,
-    isHost,
-    playerId,
-    authUserId,        // Supabase user ID for authenticated users
-    guestTokenHash,    // Hashed guest token for guest users
-    joinedAt: Date.now(),
-    // Presence tracking
-    lastActivityAt: Date.now(),
-    lastHeartbeatAt: Date.now(),
-    isWindowFocused: true,
-    presenceStatus: 'active', // 'active' | 'idle' | 'afk'
-  };
-
-  // Initialize player tracking
-  if (!game.playerScores[username]) {
-    game.playerScores[username] = 0;
-  }
-  if (!game.playerWords[username]) {
-    game.playerWords[username] = [];
-  }
-  if (!game.playerAchievements[username]) {
-    game.playerAchievements[username] = [];
-  }
-  if (!game.playerWordDetails) {
-    game.playerWordDetails = {};
-  }
-  if (!game.playerWordDetails[username]) {
-    game.playerWordDetails[username] = [];
-  }
-
-  // Update mappings
-  socketToGame.set(socketId, gameCode);
-  socketToUsername.set(socketId, username);
-  usernameToSocket.set(`${gameCode}:${username}`, socketId);
-
-  // Track authenticated user globally for multi-tab detection
-  if (authUserId) {
-    setAuthUserConnection(authUserId, { gameCode, socketId, username, isHost });
-  }
-
-  game.lastActivity = Date.now();
-  return true;
+  return userManager.addUserToGame(game, gameCode, username, socketId, options);
 }
 
-/**
- * Remove a user from a game
- * @param {string} gameCode - Game code
- * @param {string} username - Username
- */
 function removeUserFromGame(gameCode, username) {
+  const game = games[gameCode];
+  userManager.removeUserFromGame(game, gameCode, username);
+}
+
+function removeUserBySocketId(socketId) {
+  return userManager.removeUserBySocketId(games, socketId, removeUserFromGame);
+}
+
+function getGameBySocketId(socketId) {
+  return userManager.getGameBySocketId(socketId);
+}
+
+function getUsernameBySocketId(socketId) {
+  return userManager.getUsernameBySocketId(socketId);
+}
+
+function getSocketIdByUsername(gameCode, username) {
+  return userManager.getSocketIdByUsername(gameCode, username);
+}
+
+function getUserBySocketId(socketId) {
+  return userManager.getUserBySocketId(games, socketId);
+}
+
+function updateUserSocketId(gameCode, username, newSocketId, authContext = null) {
+  const game = games[gameCode];
+  return userManager.updateUserSocketId(game, gameCode, username, newSocketId, authContext);
+}
+
+function getGameUsers(gameCode) {
+  const game = games[gameCode];
+  return userManager.getGameUsers(game);
+}
+
+function isHost(socketId) {
+  return userManager.isHost(games, socketId);
+}
+
+function updateHostSocketId(gameCode, newSocketId) {
+  const game = games[gameCode];
+  userManager.updateHostSocketId(game, newSocketId);
+}
+
+function getAuthUserConnection(authUserId) {
+  return userManager.getAuthUserConnection(authUserId);
+}
+
+function setAuthUserConnection(authUserId, connectionInfo) {
+  userManager.setAuthUserConnection(authUserId, connectionInfo);
+}
+
+function removeAuthUserConnection(authUserId) {
+  userManager.removeAuthUserConnection(authUserId);
+}
+
+function clearSocketMappings(socketId) {
+  return userManager.clearSocketMappings(socketId);
+}
+
+// ==========================================
+// Score Management (delegated to scoreManager)
+// ==========================================
+
+function addPlayerWord(gameCode, username, word, options = {}) {
+  const game = games[gameCode];
+  scoreManager.addPlayerWord(game, username, word, options);
+}
+
+function playerHasWord(gameCode, username, word) {
+  const game = games[gameCode];
+  return scoreManager.playerHasWord(game, username, word);
+}
+
+function updatePlayerScore(gameCode, username, score, isDelta = false) {
+  const game = games[gameCode];
+  scoreManager.updatePlayerScore(game, username, score, isDelta);
+}
+
+function getLeaderboard(gameCode) {
+  const game = games[gameCode];
+  return scoreManager.getLeaderboard(game);
+}
+
+function getLeaderboardThrottled(gameCode, broadcastFn, throttleMs = 500) {
+  const game = games[gameCode];
+  scoreManager.getLeaderboardThrottled(game, gameCode, broadcastFn, throttleMs);
+}
+
+// ==========================================
+// Presence Management (delegated to presenceManager)
+// ==========================================
+
+function updateUserPresence(gameCode, username, presenceData) {
+  const game = games[gameCode];
+  return presenceManager.updateUserPresence(game, username, presenceData);
+}
+
+function updateUserHeartbeat(gameCode, username) {
+  const game = games[gameCode];
+  return presenceManager.updateUserHeartbeat(game, username);
+}
+
+function checkUserConnectionHealth(gameCode, username) {
+  const game = games[gameCode];
+  return presenceManager.checkUserConnectionHealth(game, username);
+}
+
+function markUserActivity(gameCode, username) {
+  const game = games[gameCode];
+  presenceManager.markUserActivity(game, username);
+}
+
+function getPresenceConfig() {
+  return presenceManager.getPresenceConfig();
+}
+
+// ==========================================
+// Peer Validation (delegated to peerValidationManager)
+// ==========================================
+
+function trackAiApprovedWord(gameCode, word, submitter, score, confidence) {
+  const game = games[gameCode];
+  peerValidationManager.trackAiApprovedWord(game, word, submitter, score, confidence);
+}
+
+function trackBotWord(gameCode, word, botUsername, score) {
+  const game = games[gameCode];
+  peerValidationManager.trackBotWord(game, word, botUsername, score);
+}
+
+function selectWordForPeerValidation(gameCode) {
+  const game = games[gameCode];
+  return peerValidationManager.selectWordForPeerValidation(game);
+}
+
+function recordPeerValidationVote(gameCode, username, isValid) {
+  const game = games[gameCode];
+  return peerValidationManager.recordPeerValidationVote(game, username, isValid);
+}
+
+function getPeerValidationWord(gameCode) {
+  const game = games[gameCode];
+  return peerValidationManager.getPeerValidationWord(game);
+}
+
+function removePeerRejectedWordScore(gameCode, word, submitter) {
+  const game = games[gameCode];
+  return peerValidationManager.removePeerRejectedWordScore(game, word, submitter);
+}
+
+// ==========================================
+// Game State Operations
+// ==========================================
+
+/**
+ * Reset game state for a new round
+ * @param {string} gameCode - Game code
+ */
+function resetGameForNewRound(gameCode) {
   const game = games[gameCode];
   if (!game) return;
 
-  // Remove from global auth tracking before removing user data
-  const userData = game.users[username];
-  if (userData && userData.authUserId) {
-    removeAuthUserConnection(userData.authUserId);
-  }
+  // Reset scores using scoreManager
+  scoreManager.resetScoresForNewRound(game);
 
-  const key = `${gameCode}:${username}`;
-  const socketId = usernameToSocket.get(key);
+  // Reset peer validation
+  peerValidationManager.resetPeerValidation(game);
 
-  if (socketId) {
-    socketToGame.delete(socketId);
-    socketToUsername.delete(socketId);
-    usernameToSocket.delete(key);
-  }
-
-  delete game.users[username];
+  game.gameState = 'waiting';
+  game.letterGrid = null;
   game.lastActivity = Date.now();
 }
 
-/**
- * Remove a user by socket ID
- * @param {string} socketId - Socket ID
- * @returns {object|null} - Removed user info { gameCode, username } or null
- */
-function removeUserBySocketId(socketId) {
-  const gameCode = socketToGame.get(socketId);
-  const username = socketToUsername.get(socketId);
-
-  if (!gameCode || !username) return null;
-
-  removeUserFromGame(gameCode, username);
-
-  return { gameCode, username };
-}
-
-/**
- * Get user's game code by socket ID
- * @param {string} socketId - Socket ID
- * @returns {string|null} - Game code or null
- */
-function getGameBySocketId(socketId) {
-  return socketToGame.get(socketId) || null;
-}
-
-/**
- * Get username by socket ID
- * @param {string} socketId - Socket ID
- * @returns {string|null} - Username or null
- */
-function getUsernameBySocketId(socketId) {
-  return socketToUsername.get(socketId) || null;
-}
-
-/**
- * Get socket ID by username in a game
- * @param {string} gameCode - Game code
- * @param {string} username - Username
- * @returns {string|null} - Socket ID or null
- */
-function getSocketIdByUsername(gameCode, username) {
-  return usernameToSocket.get(`${gameCode}:${username}`) || null;
-}
-
-/**
- * Get user by socket ID
- * @param {string} socketId - Socket ID
- * @returns {object|null} - User data with gameCode and username
- */
-function getUserBySocketId(socketId) {
-  const gameCode = socketToGame.get(socketId);
-  const username = socketToUsername.get(socketId);
-
-  if (!gameCode || !username) return null;
-
-  const game = games[gameCode];
-  if (!game || !game.users[username]) return null;
-
-  return {
-    gameCode,
-    username,
-    ...game.users[username]
-  };
-}
-
-/**
- * Update a user's socket ID (for reconnection)
- * @param {string} gameCode - Game code
- * @param {string} username - Username
- * @param {string} newSocketId - New socket ID
- * @param {object} authContext - Optional auth context to update { authUserId, guestTokenHash }
- */
-function updateUserSocketId(gameCode, username, newSocketId, authContext = null) {
-  const game = games[gameCode];
-  if (!game || !game.users[username]) return false;
-
-  const oldSocketId = game.users[username].socketId;
-
-  // Clean up old mappings
-  if (oldSocketId) {
-    socketToGame.delete(oldSocketId);
-    socketToUsername.delete(oldSocketId);
-  }
-
-  // Update user data
-  game.users[username].socketId = newSocketId;
-
-  // Update auth context if provided (for reconnection with new auth state)
-  if (authContext) {
-    if (authContext.authUserId !== undefined) {
-      game.users[username].authUserId = authContext.authUserId;
-    }
-    if (authContext.guestTokenHash !== undefined) {
-      game.users[username].guestTokenHash = authContext.guestTokenHash;
-    }
-  }
-
-  // Set up new mappings
-  socketToGame.set(newSocketId, gameCode);
-  socketToUsername.set(newSocketId, username);
-  usernameToSocket.set(`${gameCode}:${username}`, newSocketId);
-
-  // Update auth user connection tracking
-  const authUserId = authContext?.authUserId || game.users[username]?.authUserId;
-  if (authUserId) {
-    setAuthUserConnection(authUserId, {
-      gameCode,
-      socketId: newSocketId,
-      username,
-      isHost: game.users[username]?.isHost || false
-    });
-  }
-
-  return true;
-}
-
-/**
- * Get all users in a game
- * @param {string} gameCode - Game code
- * @returns {array} - Array of user objects
- */
-function getGameUsers(gameCode) {
-  const game = games[gameCode];
-  if (!game) return [];
-
-  return Object.entries(game.users).map(([username, data]) => ({
-    username,
-    isHost: data.isHost,
-    avatar: data.avatar,
-    score: game.playerScores[username] || 0,
-    // Include presence information
-    presenceStatus: data.presenceStatus || 'active',
-    isWindowFocused: data.isWindowFocused !== false,
-    lastActivityAt: data.lastActivityAt || Date.now(),
-    // Include bot information
-    isBot: data.isBot || false,
-    botDifficulty: data.botDifficulty || null,
-  }));
-}
-
-/**
- * Update user presence status
- * @param {string} gameCode - Game code
- * @param {string} username - Username
- * @param {object} presenceData - { isWindowFocused, lastActivityAt, forceIdle }
- * @returns {string|null} - New presence status or null if user not found
- */
-function updateUserPresence(gameCode, username, presenceData) {
-  const game = games[gameCode];
-  if (!game || !game.users[username]) return null;
-
-  const user = game.users[username];
-  const now = Date.now();
-
-  // Update presence data
-  if (presenceData.isWindowFocused !== undefined) {
-    user.isWindowFocused = presenceData.isWindowFocused;
-  }
-  if (presenceData.lastActivityAt !== undefined) {
-    user.lastActivityAt = presenceData.lastActivityAt;
-  }
-
-  // Calculate presence status based on window focus and activity time
-  const timeSinceActivity = now - (user.lastActivityAt || now);
-  let newStatus = 'active';
-
-  // Check for AFK first (regardless of window focus - 2 minutes of inactivity)
-  if (timeSinceActivity >= PRESENCE_CONFIG.AFK_THRESHOLD) {
-    newStatus = 'afk';
-  }
-  // If not AFK, check if idle (either window not focused OR 30 seconds of inactivity)
-  else if (!user.isWindowFocused || presenceData.forceIdle || timeSinceActivity >= PRESENCE_CONFIG.IDLE_THRESHOLD) {
-    newStatus = 'idle';
-  }
-  // else stays 'active'
-
-  user.presenceStatus = newStatus;
-  return newStatus;
-}
-
-/**
- * Update user heartbeat (proves connection is alive)
- * @param {string} gameCode - Game code
- * @param {string} username - Username
- * @returns {object|null} - Connection status change info or null
- */
-function updateUserHeartbeat(gameCode, username) {
-  const game = games[gameCode];
-  if (!game || !game.users[username]) return null;
-
-  const user = game.users[username];
-  const now = Date.now();
-  const wasWeakConnection = user.connectionStatus === 'weak';
-
-  // Reset heartbeat tracking
-  user.lastHeartbeatAt = now;
-  user.missedHeartbeats = 0;
-  user.connectionStatus = 'stable';
-
-  // Return status change if connection was previously weak
-  if (wasWeakConnection) {
-    return {
-      statusChange: 'recovered',
-      previousStatus: 'weak',
-      newStatus: 'stable'
-    };
-  }
-  return null;
-}
-
-/**
- * Check user connection health based on heartbeats
- * @param {string} gameCode - Game code
- * @param {string} username - Username
- * @returns {object} - Connection health status
- */
-function checkUserConnectionHealth(gameCode, username) {
-  const game = games[gameCode];
-  if (!game || !game.users[username]) {
-    return { status: 'unknown', healthy: false };
-  }
-
-  const user = game.users[username];
-  const now = Date.now();
-  const timeSinceHeartbeat = now - (user.lastHeartbeatAt || now);
-
-  // Initialize tracking fields if needed
-  if (user.missedHeartbeats === undefined) {
-    user.missedHeartbeats = 0;
-  }
-  if (user.connectionStatus === undefined) {
-    user.connectionStatus = 'stable';
-  }
-
-  // Check if heartbeat is overdue
-  if (timeSinceHeartbeat >= PRESENCE_CONFIG.WEAK_CONNECTION_THRESHOLD) {
-    const expectedHeartbeats = Math.floor(timeSinceHeartbeat / 10000); // Heartbeats are every 10s
-    user.missedHeartbeats = Math.max(user.missedHeartbeats, expectedHeartbeats);
-
-    if (user.missedHeartbeats >= PRESENCE_CONFIG.MISSED_HEARTBEATS_FOR_WEAK) {
-      user.connectionStatus = 'weak';
-      return {
-        status: 'weak',
-        healthy: true, // Still healthy, just weak - don't disconnect yet
-        missedHeartbeats: user.missedHeartbeats,
-        timeSinceHeartbeat
-      };
-    }
-  }
-
-  // Check for complete timeout (still within grace period though)
-  if (timeSinceHeartbeat >= PRESENCE_CONFIG.HEARTBEAT_TIMEOUT) {
-    return {
-      status: 'timeout',
-      healthy: false,
-      missedHeartbeats: user.missedHeartbeats,
-      timeSinceHeartbeat
-    };
-  }
-
-  return {
-    status: user.connectionStatus || 'stable',
-    healthy: true,
-    missedHeartbeats: user.missedHeartbeats || 0,
-    timeSinceHeartbeat
-  };
-}
-
-/**
- * Mark user activity (reset idle timer)
- * @param {string} gameCode - Game code
- * @param {string} username - Username
- */
-function markUserActivity(gameCode, username) {
-  const game = games[gameCode];
-  if (!game || !game.users[username]) return;
-
-  const now = Date.now();
-  game.users[username].lastActivityAt = now;
-  game.users[username].lastHeartbeatAt = now;
-
-  // If user was idle/afk and window is focused, set back to active
-  if (game.users[username].isWindowFocused) {
-    game.users[username].presenceStatus = 'active';
-  }
-}
-
-/**
- * Get presence configuration
- * @returns {object} - Presence configuration
- */
-function getPresenceConfig() {
-  return { ...PRESENCE_CONFIG };
-}
+// ==========================================
+// Game Queries
+// ==========================================
 
 /**
  * Get all active games
@@ -554,10 +345,6 @@ function getActiveRooms() {
 
 /**
  * Get empty rooms (rooms with no active human players)
- * A room is considered empty if:
- * - It has no users at all
- * - All users are marked as disconnected
- * - Only bots remain (no active human players)
  * @returns {array} - Array of game codes for empty rooms
  */
 function getEmptyRooms() {
@@ -589,428 +376,8 @@ function cleanupEmptyRooms() {
 }
 
 /**
- * Check if user is host
- * @param {string} socketId - Socket ID
- * @returns {boolean}
- */
-function isHost(socketId) {
-  const gameCode = socketToGame.get(socketId);
-  if (!gameCode) return false;
-
-  const game = games[gameCode];
-  if (!game) return false;
-
-  return game.hostSocketId === socketId;
-}
-
-/**
- * Update host socket ID (for reconnection)
- * @param {string} gameCode - Game code
- * @param {string} newSocketId - New socket ID
- */
-function updateHostSocketId(gameCode, newSocketId) {
-  const game = games[gameCode];
-  if (game) {
-    game.hostSocketId = newSocketId;
-  }
-}
-
-/**
- * Reset game state for a new round
- * @param {string} gameCode - Game code
- */
-function resetGameForNewRound(gameCode) {
-  const game = games[gameCode];
-  if (!game) return;
-
-  // COMPLETELY clear all game data first to prevent stale data from previous games
-  // This is critical because playerWords/playerScores may contain entries
-  // for players who left the game during previous rounds
-  game.playerScores = {};
-  game.playerWords = {};
-  game.playerWordDetails = {};
-  game.playerAchievements = {};
-  game.playerCombos = {}; // Reset combo tracking for new round
-  game.firstWordFound = false; // Reset FIRST_BLOOD achievement flag
-  // Reset AI word peer validation tracking
-  game.aiApprovedWords = [];
-  game.peerValidationWord = null;
-  game.peerValidationVotes = {};
-
-  // Re-initialize scores/words only for CURRENT players in the room
-  for (const username of Object.keys(game.users)) {
-    game.playerScores[username] = 0;
-    game.playerWords[username] = [];
-    game.playerWordDetails[username] = [];
-    game.playerAchievements[username] = [];
-    game.playerCombos[username] = 0; // Initialize combo tracking
-  }
-
-  game.gameState = 'waiting';
-  game.letterGrid = null;
-  game.lastActivity = Date.now();
-}
-
-/**
- * Add a word to a player's list (both playerWords and playerWordDetails)
- * @param {string} gameCode - Game code
- * @param {string} username - Username
- * @param {string} word - Word to add
- * @param {Object} options - Additional word details
- * @param {boolean} options.autoValidated - Whether word was auto-validated
- * @param {boolean|null} options.validated - Explicit validation status (true/false/null)
- * @param {number} options.score - Score for this word (with combo if applicable)
- * @param {number} options.comboBonus - Combo bonus points earned
- * @param {number} options.comboLevel - Combo level when word was submitted
- */
-function addPlayerWord(gameCode, username, word, options = {}) {
-  const game = games[gameCode];
-  if (!game) return;
-
-  const normalizedWord = word.toLowerCase();
-
-  // Initialize playerWords if needed
-  if (!game.playerWords[username]) {
-    game.playerWords[username] = [];
-  }
-
-  // Initialize playerWordDetails if needed
-  if (!game.playerWordDetails) {
-    game.playerWordDetails = {};
-  }
-  if (!game.playerWordDetails[username]) {
-    game.playerWordDetails[username] = [];
-  }
-
-  // Only add if not already present
-  if (!game.playerWords[username].includes(normalizedWord)) {
-    game.playerWords[username].push(normalizedWord);
-
-    // Calculate time since game start
-    const currentTime = Date.now();
-    const timeSinceStart = game.startTime ? (currentTime - game.startTime) / 1000 : 0;
-
-    // Determine validated status:
-    // - If explicitly provided (true/false), use it
-    // - If autoValidated is true, set to true
-    // - Otherwise null (pending validation)
-    let validatedStatus;
-    if (options.validated !== undefined) {
-      validatedStatus = options.validated;
-    } else if (options.autoValidated) {
-      validatedStatus = true;
-    } else {
-      validatedStatus = null;
-    }
-
-    // Add to playerWordDetails for achievement tracking
-    game.playerWordDetails[username].push({
-      word: normalizedWord,
-      score: options.score || 0,
-      comboBonus: options.comboBonus || 0,
-      comboLevel: options.comboLevel || 0,
-      timestamp: currentTime,
-      timeSinceStart,
-      validated: validatedStatus,
-      autoValidated: options.autoValidated || false,
-      onBoard: true,
-      isBot: options.isBot || false,
-    });
-  }
-}
-
-/**
- * Check if player already has a word
- * @param {string} gameCode - Game code
- * @param {string} username - Username
- * @param {string} word - Word to check
- * @returns {boolean}
- */
-function playerHasWord(gameCode, username, word) {
-  const game = games[gameCode];
-  if (!game) return false;
-
-  return game.playerWords[username]?.includes(word.toLowerCase()) || false;
-}
-
-/**
- * Track an AI-approved word for potential peer validation
- * @param {string} gameCode - Game code
- * @param {string} word - The AI-approved word
- * @param {string} submitter - Username who submitted the word
- * @param {number} score - Score for this word
- * @param {number} confidence - AI confidence score (0-100)
- */
-function trackAiApprovedWord(gameCode, word, submitter, score, confidence) {
-  const game = games[gameCode];
-  if (!game) return;
-
-  if (!game.aiApprovedWords) {
-    game.aiApprovedWords = [];
-  }
-
-  game.aiApprovedWords.push({
-    word: word.toLowerCase(),
-    submitter,
-    score,
-    confidence,
-    timestamp: Date.now()
-  });
-}
-
-/**
- * Track a bot-submitted word for potential peer validation
- * Bot words appear in the "is this real word?" modal and can be blacklisted if rejected
- * @param {string} gameCode - Game code
- * @param {string} word - The word submitted by bot
- * @param {string} botUsername - Bot username
- * @param {number} score - Score for this word
- */
-function trackBotWord(gameCode, word, botUsername, score) {
-  const game = games[gameCode];
-  if (!game) return;
-
-  // Track bot words separately for potential validation
-  if (!game.botWords) {
-    game.botWords = [];
-  }
-
-  // Also add to aiApprovedWords pool so they can be shown in peer validation
-  // Bot words mix with AI-validated words for community validation
-  if (!game.aiApprovedWords) {
-    game.aiApprovedWords = [];
-  }
-
-  const wordData = {
-    word: word.toLowerCase(),
-    submitter: botUsername,
-    score,
-    isBot: true, // Mark as bot word for blacklist handling
-    timestamp: Date.now()
-  };
-
-  game.botWords.push(wordData);
-  game.aiApprovedWords.push(wordData);
-}
-
-/**
- * Select a random AI-approved word for peer validation
- * Excludes words from a specific submitter if needed
- * @param {string} gameCode - Game code
- * @returns {object|null} - The selected word object or null if none available
- */
-function selectWordForPeerValidation(gameCode) {
-  const game = games[gameCode];
-  if (!game || !game.aiApprovedWords || game.aiApprovedWords.length === 0) {
-    return null;
-  }
-
-  // Randomly select one word from the AI-approved list
-  const randomIndex = Math.floor(Math.random() * game.aiApprovedWords.length);
-  const selectedWord = game.aiApprovedWords[randomIndex];
-
-  game.peerValidationWord = selectedWord;
-  game.peerValidationVotes = {};
-
-  return selectedWord;
-}
-
-/**
- * Record a peer validation vote
- * @param {string} gameCode - Game code
- * @param {string} username - Username who is voting
- * @param {boolean} isValid - True if player thinks word is valid
- * @returns {object} - { success, totalVotes, invalidVotes, shouldReject }
- */
-function recordPeerValidationVote(gameCode, username, isValid) {
-  const game = games[gameCode];
-  if (!game || !game.peerValidationWord) {
-    return { success: false, error: 'No word for peer validation' };
-  }
-
-  // Don't allow the submitter to vote on their own word
-  if (username === game.peerValidationWord.submitter) {
-    return { success: false, error: 'Cannot vote on your own word' };
-  }
-
-  // Record the vote (only one vote per user)
-  if (!game.peerValidationVotes) {
-    game.peerValidationVotes = {};
-  }
-
-  // Only allow one vote per player
-  if (game.peerValidationVotes[username]) {
-    return { success: false, error: 'Already voted' };
-  }
-
-  game.peerValidationVotes[username] = isValid ? 'valid' : 'invalid';
-
-  // Count votes
-  const votes = Object.values(game.peerValidationVotes);
-  const invalidVotes = votes.filter(v => v === 'invalid').length;
-  const totalVotes = votes.length;
-
-  // Check if word should be rejected (more than 3 players said invalid)
-  const shouldReject = invalidVotes > 3;
-
-  return {
-    success: true,
-    totalVotes,
-    invalidVotes,
-    validVotes: votes.filter(v => v === 'valid').length,
-    shouldReject,
-    word: game.peerValidationWord.word,
-    submitter: game.peerValidationWord.submitter,
-    isBot: game.peerValidationWord.isBot || false // Track if it's a bot word for blacklisting
-  };
-}
-
-/**
- * Get the peer validation word info
- * @param {string} gameCode - Game code
- * @returns {object|null} - The peer validation word or null
- */
-function getPeerValidationWord(gameCode) {
-  const game = games[gameCode];
-  if (!game) return null;
-  return game.peerValidationWord || null;
-}
-
-/**
- * Remove score for a peer-rejected word
- * @param {string} gameCode - Game code
- * @param {string} word - The rejected word
- * @param {string} submitter - Username who submitted the word
- * @returns {number} - Score that was removed
- */
-function removePeerRejectedWordScore(gameCode, word, submitter) {
-  const game = games[gameCode];
-  if (!game) return 0;
-
-  // Find the word in playerWordDetails and mark as invalidated
-  const wordDetails = game.playerWordDetails?.[submitter] || [];
-  const wordDetail = wordDetails.find(wd => wd.word === word.toLowerCase());
-
-  if (!wordDetail) return 0;
-
-  const scoreRemoved = wordDetail.score || 0;
-
-  // Mark word as invalidated by peers
-  wordDetail.validated = false;
-  wordDetail.peerRejected = true;
-
-  // Subtract score from player
-  if (game.playerScores[submitter]) {
-    game.playerScores[submitter] = Math.max(0, game.playerScores[submitter] - scoreRemoved);
-  }
-
-  return scoreRemoved;
-}
-
-/**
- * Update player score
- * @param {string} gameCode - Game code
- * @param {string} username - Username
- * @param {number} score - New score or delta
- * @param {boolean} isDelta - Whether score is a delta to add
- */
-function updatePlayerScore(gameCode, username, score, isDelta = false) {
-  const game = games[gameCode];
-  if (!game) return;
-
-  if (!game.playerScores[username]) {
-    game.playerScores[username] = 0;
-  }
-
-  if (isDelta) {
-    game.playerScores[username] += score;
-  } else {
-    game.playerScores[username] = score;
-  }
-}
-
-/**
- * Get leaderboard for a game
- * @param {string} gameCode - Game code
- * @returns {array} - Sorted leaderboard
- */
-function getLeaderboard(gameCode) {
-  const game = games[gameCode];
-  if (!game) return [];
-
-  return Object.entries(game.playerScores)
-    .map(([username, score]) => ({
-      username,
-      score,
-      wordCount: game.playerWords[username]?.length || 0,
-      avatar: game.users[username]?.avatar
-    }))
-    .sort((a, b) => b.score - a.score);
-}
-
-/**
- * Get leaderboard with leading-edge throttling for immediate feedback
- * Uses a leading-edge pattern: broadcasts immediately on first call,
- * then throttles subsequent calls to prevent excessive updates.
- * This ensures players get immediate feedback while preventing broadcast storms.
- *
- * @param {string} gameCode - Game code
- * @param {function} broadcastFn - Function to call with leaderboard data
- * @param {number} throttleMs - Throttle duration in milliseconds (default 500ms)
- */
-const leaderboardLastBroadcast = {};
-const leaderboardPendingUpdate = {};
-
-function getLeaderboardThrottled(gameCode, broadcastFn, throttleMs = 500) {
-  const game = games[gameCode];
-  if (!game) return;
-
-  const now = Date.now();
-  const lastBroadcast = leaderboardLastBroadcast[gameCode] || 0;
-  const timeSinceLastBroadcast = now - lastBroadcast;
-
-  // If enough time has passed since last broadcast, send immediately (leading edge)
-  if (timeSinceLastBroadcast >= throttleMs) {
-    const leaderboard = getLeaderboard(gameCode);
-    if (broadcastFn && typeof broadcastFn === 'function') {
-      broadcastFn(leaderboard);
-    }
-    leaderboardLastBroadcast[gameCode] = now;
-
-    // Clear any pending trailing update since we just broadcasted
-    if (leaderboardThrottleTimers[gameCode]) {
-      clearTimeout(leaderboardThrottleTimers[gameCode]);
-      delete leaderboardThrottleTimers[gameCode];
-    }
-    leaderboardPendingUpdate[gameCode] = false;
-  } else {
-    // Within throttle window - mark that we have a pending update
-    leaderboardPendingUpdate[gameCode] = true;
-
-    // Set a trailing-edge timer to catch any updates during the throttle window
-    // Only set if not already set
-    if (!leaderboardThrottleTimers[gameCode]) {
-      const remainingTime = throttleMs - timeSinceLastBroadcast;
-      leaderboardThrottleTimers[gameCode] = setTimeout(() => {
-        // Only broadcast if there's actually a pending update
-        if (leaderboardPendingUpdate[gameCode]) {
-          const leaderboard = getLeaderboard(gameCode);
-          if (broadcastFn && typeof broadcastFn === 'function') {
-            broadcastFn(leaderboard);
-          }
-          leaderboardLastBroadcast[gameCode] = Date.now();
-          leaderboardPendingUpdate[gameCode] = false;
-        }
-        delete leaderboardThrottleTimers[gameCode];
-      }, remainingTime);
-    }
-  }
-}
-
-/**
  * Cleanup stale games (older than maxAge)
  * @param {number} maxAge - Maximum age in milliseconds (default 30 minutes)
- * NOTE: Reduced from 2 hours to 30 minutes to prevent memory leaks from abandoned games
  */
 function cleanupStaleGames(maxAge = 30 * 60 * 1000) {
   const now = Date.now();
@@ -1030,57 +397,10 @@ function cleanupStaleGames(maxAge = 30 * 60 * 1000) {
   return staleCodes.length;
 }
 
-/**
- * Get connection info for an authenticated user
- * @param {string} authUserId - Supabase auth user ID
- * @returns {object|null} - { gameCode, socketId, username, isHost, connectedAt } or null
- */
-function getAuthUserConnection(authUserId) {
-  if (!authUserId) return null;
-  return authUserConnections.get(authUserId) || null;
-}
+// ==========================================
+// Tournament Management
+// ==========================================
 
-/**
- * Set connection info for an authenticated user
- * @param {string} authUserId - Supabase auth user ID
- * @param {object} connectionInfo - { gameCode, socketId, username, isHost }
- */
-function setAuthUserConnection(authUserId, connectionInfo) {
-  if (!authUserId) return;
-  authUserConnections.set(authUserId, {
-    ...connectionInfo,
-    connectedAt: Date.now()
-  });
-}
-
-/**
- * Remove connection info for an authenticated user
- * @param {string} authUserId - Supabase auth user ID
- */
-function removeAuthUserConnection(authUserId) {
-  if (!authUserId) return;
-  authUserConnections.delete(authUserId);
-}
-
-/**
- * Clear socket mappings without removing user data (for disconnect grace period)
- * @param {string} socketId - Socket ID to clear
- * @returns {object|null} - { gameCode, username } or null
- */
-function clearSocketMappings(socketId) {
-  const gameCode = socketToGame.get(socketId);
-  const username = socketToUsername.get(socketId);
-
-  if (!gameCode || !username) return null;
-
-  socketToGame.delete(socketId);
-  socketToUsername.delete(socketId);
-  // Note: Don't delete usernameToSocket - user data remains valid for reconnection
-
-  return { gameCode, username };
-}
-
-// Tournament management helpers
 /**
  * Get tournament ID for a game
  * @param {string} gameCode - Game code
@@ -1104,6 +424,10 @@ function setTournamentIdForGame(gameCode, tournamentId) {
   return false;
 }
 
+// ==========================================
+// Module Exports
+// ==========================================
+
 module.exports = {
   // Game CRUD
   games,
@@ -1113,7 +437,7 @@ module.exports = {
   deleteGame,
   gameExists,
 
-  // User management
+  // User management (from userManager)
   addUserToGame,
   removeUserFromGame,
   removeUserBySocketId,
@@ -1137,14 +461,14 @@ module.exports = {
   // Game state
   resetGameForNewRound,
 
-  // Player data
+  // Player data (from scoreManager)
   addPlayerWord,
   playerHasWord,
   updatePlayerScore,
   getLeaderboard,
   getLeaderboardThrottled,
 
-  // AI word peer validation
+  // AI word peer validation (from peerValidationManager)
   trackAiApprovedWord,
   trackBotWord,
   selectWordForPeerValidation,
@@ -1155,14 +479,14 @@ module.exports = {
   // Cleanup
   cleanupStaleGames,
 
-  // Presence tracking
+  // Presence tracking (from presenceManager)
   updateUserPresence,
   updateUserHeartbeat,
   markUserActivity,
   getPresenceConfig,
   checkUserConnectionHealth,
 
-  // Auth user tracking
+  // Auth user tracking (from userManager)
   getAuthUserConnection,
   setAuthUserConnection,
   removeAuthUserConnection,

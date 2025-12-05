@@ -17,6 +17,7 @@ const { emitError, ErrorMessages } = require('../utils/errorHandler');
 const { checkRateLimit } = require('../utils/rateLimiter');
 const botManager = require('../modules/botManager');
 const logger = require('../utils/logger');
+const { validatePayload, addBotSchema, removeBotSchema } = require('../utils/socketValidation');
 
 // Configuration
 const MAX_PLAYERS_PER_ROOM = 50;
@@ -35,7 +36,14 @@ function registerBotHandlers(io, socket) {
       return;
     }
 
-    const { difficulty = 'medium' } = data || {};
+    // Validate payload
+    const validation = validatePayload(addBotSchema, data || {});
+    if (!validation.success) {
+      emitError(socket, `Invalid request: ${validation.error}`);
+      return;
+    }
+
+    const { difficulty = 'medium' } = validation.data;
     const gameCode = getGameBySocketId(socket.id);
 
     if (!gameCode) {
