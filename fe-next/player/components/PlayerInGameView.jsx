@@ -1,4 +1,4 @@
-import React, { useRef, useCallback } from 'react';
+import React, { useRef, useCallback, memo, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FaTrophy, FaRandom } from 'react-icons/fa';
 import { Button } from '../../components/ui/button';
@@ -17,7 +17,11 @@ import { wordErrorToast } from '../../components/NeoToast';
 import { useSoundEffects } from '../../contexts/SoundEffectsContext';
 import { validateWordLocally, couldBeOnBoard } from '../../utils/clientWordValidator';
 
-const PlayerInGameView = ({
+/**
+ * PlayerInGameView - Main game view for players during active gameplay
+ * Memoized to prevent unnecessary re-renders when parent state changes
+ */
+const PlayerInGameView = memo(({
   // Core props
   username,
   gameCode,
@@ -107,12 +111,21 @@ const PlayerInGameView = ({
     setWord('');
   };
 
-  const getRankStyle = (index) => {
+  // Memoize rank style function - prevents recreation on each render
+  const getRankStyle = useCallback((index) => {
     if (index === 0) return 'bg-neo-yellow text-neo-black border-neo-black';
     if (index === 1) return 'bg-slate-300 text-neo-black border-neo-black';
     if (index === 2) return 'bg-neo-orange text-neo-black border-neo-black';
     return 'bg-neo-cream text-neo-black border-neo-black';
-  };
+  }, []);
+
+  // Memoize leaderboard items to prevent re-rendering when other props change
+  const memoizedLeaderboard = useMemo(() => leaderboard.map((player, index) => ({
+    ...player,
+    rankStyle: getRankStyle(index),
+    isMe: player.username === username,
+    rankDisplay: index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : `#${index + 1}`
+  })), [leaderboard, username, getRankStyle]);
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-50 via-slate-100 to-slate-200 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 p-0 md:p-4 flex flex-col transition-colors duration-300">
@@ -284,9 +297,7 @@ const PlayerInGameView = ({
             </div>
             <div className="overflow-y-auto flex-1 p-3">
               <div className="space-y-2">
-                {leaderboard.map((player, index) => {
-                  const isMe = player.username === username;
-                  return (
+                {memoizedLeaderboard.map((player, index) => (
                     <motion.div
                       key={player.username}
                       initial={{ x: 50, opacity: 0 }}
@@ -294,10 +305,10 @@ const PlayerInGameView = ({
                       transition={{ delay: index * 0.05 }}
                       className={`flex items-center gap-3 p-2 rounded-neo border-3 shadow-hard-sm transition-all
                         hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-hard
-                        ${getRankStyle(index)} ${dir === 'rtl' ? 'flex-row-reverse' : ''}`}
+                        ${player.rankStyle} ${dir === 'rtl' ? 'flex-row-reverse' : ''}`}
                     >
                       <div className="w-10 h-10 rounded-neo flex items-center justify-center font-black text-lg bg-neo-black text-neo-cream border-2 border-neo-black">
-                        {index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : `#${index + 1}`}
+                        {player.rankDisplay}
                       </div>
                       <Avatar
                         profilePictureUrl={player.avatar?.profilePictureUrl}
@@ -308,7 +319,7 @@ const PlayerInGameView = ({
                       <div className="flex-1 min-w-0">
                         <div className={`font-black truncate text-base flex items-center gap-2 ${dir === 'rtl' ? 'flex-row-reverse' : ''}`}>
                           <span>{player.username}</span>
-                          {isMe && (
+                          {player.isMe && (
                             <span className="text-xs bg-neo-black text-neo-cream px-2 py-0.5 rounded-neo font-bold">
                               ({t('playerView.me')})
                             </span>
@@ -317,8 +328,7 @@ const PlayerInGameView = ({
                         <div className="text-sm font-bold">{player.score} pts</div>
                       </div>
                     </motion.div>
-                  );
-                })}
+                  ))}
                 {leaderboard.length === 0 && (
                   <p className="text-center text-neo-black/60 py-6 text-sm font-bold">
                     {t('playerView.noPlayersYet') || 'No players yet'}
@@ -392,6 +402,9 @@ const PlayerInGameView = ({
       </AlertDialog>
     </div>
   );
-};
+});
+
+// Display name for debugging
+PlayerInGameView.displayName = 'PlayerInGameView';
 
 export default PlayerInGameView;

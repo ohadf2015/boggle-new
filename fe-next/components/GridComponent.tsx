@@ -6,6 +6,23 @@ import type { LetterGrid, GridPosition, Language } from '@/types';
 
 const noOp = () => { };
 
+// Performance optimization: Detect if device can handle heavy animations
+const getPerformanceMode = (): 'full' | 'reduced' | 'minimal' => {
+    if (typeof window === 'undefined') return 'full';
+
+    // Check for low-end device indicators
+    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+    const hardwareConcurrency = navigator.hardwareConcurrency || 4;
+    const deviceMemory = (navigator as Navigator & { deviceMemory?: number }).deviceMemory || 8;
+
+    // Minimal animations for low-end devices
+    if (hardwareConcurrency <= 2 || deviceMemory <= 2) return 'minimal';
+    // Reduced animations for mid-range mobile
+    if (isMobile && (hardwareConcurrency <= 4 || deviceMemory <= 4)) return 'reduced';
+
+    return 'full';
+};
+
 interface CellPosition extends GridPosition {
   distanceFromCenter: number;
   cellRadius: number;
@@ -61,6 +78,7 @@ const GridComponent = memo<GridComponentProps>(({
     const [internalSelectedCells, setInternalSelectedCells] = useState<GridPosition[]>([]);
     const [fadingCells, setFadingCells] = useState<GridPosition[]>([]); // Track cells that are fading out
     const [reduceMotion, setReduceMotion] = useState(false);
+    const [performanceMode, setPerformanceMode] = useState<'full' | 'reduced' | 'minimal'>('full');
 
     const isTouchingRef = useRef<boolean>(false);
     const gridRef = useRef<HTMLDivElement>(null);
@@ -92,6 +110,11 @@ const GridComponent = memo<GridComponentProps>(({
         } catch {
             setReduceMotion(false);
         }
+    }, []);
+
+    // Detect device performance capabilities once on mount
+    useEffect(() => {
+        setPerformanceMode(getPerformanceMode());
     }, []);
 
     // Sequential fade-out animation for combo trail
@@ -802,12 +825,13 @@ const GridComponent = memo<GridComponentProps>(({
                                         transition={{ duration: 0.5, ease: "easeOut" }}
                                     />
 
-                                    {/* Enhanced fire burst for first selected cell (trail start) */}
-                                    {isFirstSelected && (
+                                    {/* Enhanced fire burst for first selected cell (trail start) - Performance optimized */}
+                                    {isFirstSelected && !reduceMotion && performanceMode !== 'minimal' && (
                                         <>
-                                            {/* Large fire burst particles - reduced for performance */}
-                                            {[...Array(14)].map((_, idx) => {
-                                                const angle = (idx * 25.7) * (Math.PI / 180); // 360/14 ≈ 25.7
+                                            {/* Fire burst particles - count varies by performance mode */}
+                                            {[...Array(performanceMode === 'full' ? 8 : 4)].map((_, idx) => {
+                                                const particleCount = performanceMode === 'full' ? 8 : 4;
+                                                const angle = (idx * (360 / particleCount)) * (Math.PI / 180);
                                                 const distance = 25 + (idx % 2) * 5;
                                                 return (
                                                     <motion.div
@@ -823,7 +847,7 @@ const GridComponent = memo<GridComponentProps>(({
                                                             top: '50%',
                                                             marginLeft: '-6px',
                                                             marginTop: '-6px',
-                                                            boxShadow: '0 0 8px rgba(255, 107, 0, 0.8)'
+                                                            boxShadow: performanceMode === 'full' ? '0 0 8px rgba(255, 107, 0, 0.8)' : 'none'
                                                         }}
                                                         initial={{ scale: 0, opacity: 1, x: 0, y: 0 }}
                                                         animate={{
@@ -833,43 +857,44 @@ const GridComponent = memo<GridComponentProps>(({
                                                             y: Math.sin(angle) * distance
                                                         }}
                                                         transition={{
-                                                            duration: 0.8,
+                                                            duration: 0.6,
                                                             ease: "easeOut",
-                                                            delay: idx * 0.015
+                                                            delay: idx * 0.02
                                                         }}
                                                     />
                                                 );
                                             })}
 
-                                            {/* Pulsing glow at start */}
-                                            <motion.div
-                                                className="absolute inset-0 pointer-events-none"
-                                                style={{
-                                                    background: 'radial-gradient(circle, rgba(255,107,0,0.6), transparent 60%)',
-                                                    filter: 'blur(8px)',
-                                                    borderRadius: '8px'
-                                                }}
-                                                animate={{
-                                                    scale: [1, 1.8, 1],
-                                                    opacity: [0.8, 0.4, 0.8],
-                                                }}
-                                                transition={{
-                                                    duration: 0.4,
-                                                    repeat: Infinity,
-                                                    ease: "easeInOut"
-                                                }}
-                                            />
+                                            {/* Pulsing glow at start - only on full performance */}
+                                            {performanceMode === 'full' && (
+                                                <motion.div
+                                                    className="absolute inset-0 pointer-events-none"
+                                                    style={{
+                                                        background: 'radial-gradient(circle, rgba(255,107,0,0.6), transparent 60%)',
+                                                        filter: 'blur(8px)',
+                                                        borderRadius: '8px'
+                                                    }}
+                                                    animate={{
+                                                        scale: [1, 1.8, 1],
+                                                        opacity: [0.8, 0.4, 0.8],
+                                                    }}
+                                                    transition={{
+                                                        duration: 0.4,
+                                                        repeat: 2, // Limited repeats instead of Infinity
+                                                        ease: "easeInOut"
+                                                    }}
+                                                />
+                                            )}
 
-                                            {/* Continuous sparks emanating from start */}
-                                            {[...Array(6)].map((_, idx) => {
-                                                const angle = (idx * 60) * (Math.PI / 180);
+                                            {/* Sparks - reduced count for performance */}
+                                            {performanceMode === 'full' && [...Array(4)].map((_, idx) => {
+                                                const angle = (idx * 90) * (Math.PI / 180);
                                                 return (
                                                     <motion.div
                                                         key={`spark-${idx}`}
                                                         className="absolute w-1.5 h-1.5 rounded-full pointer-events-none"
                                                         style={{
                                                             background: 'radial-gradient(circle, #ffff00, #ff6b00)',
-                                                            filter: 'blur(0.5px)',
                                                             left: '50%',
                                                             top: '50%',
                                                             marginLeft: '-3px',
@@ -883,9 +908,9 @@ const GridComponent = memo<GridComponentProps>(({
                                                         }}
                                                         transition={{
                                                             duration: 0.5,
-                                                            repeat: Infinity,
+                                                            repeat: 2, // Limited repeats
                                                             ease: "easeOut",
-                                                            delay: idx * 0.08
+                                                            delay: idx * 0.1
                                                         }}
                                                     />
                                                 );
@@ -893,11 +918,13 @@ const GridComponent = memo<GridComponentProps>(({
                                         </>
                                     )}
 
-                                    {/* Fire particles - reduced for performance */}
+                                    {/* Fire particles - performance optimized with reduced counts */}
+                                    {!reduceMotion && performanceMode !== 'minimal' && (
                                     <>
-                                        {/* Center burst particles */}
-                                        {[...Array(7)].map((_, idx) => {
-                                            const angle = (idx * 51.4) * (Math.PI / 180); // 360/7 ≈ 51.4
+                                        {/* Center burst particles - count based on performance */}
+                                        {[...Array(performanceMode === 'full' ? 6 : 4)].map((_, idx) => {
+                                            const count = performanceMode === 'full' ? 6 : 4;
+                                            const angle = (idx * (360 / count)) * (Math.PI / 180);
                                             const distance = 15 + (comboLevel * 3);
                                             return (
                                                 <motion.div
@@ -922,14 +949,14 @@ const GridComponent = memo<GridComponentProps>(({
                                                     transition={{
                                                         duration: 0.4,
                                                         ease: "easeOut",
-                                                        delay: idx * 0.015
+                                                        delay: idx * 0.02
                                                     }}
                                                 />
                                             );
                                         })}
 
-                                        {/* Corner fire particles for combo */}
-                                        {comboLevel > 0 && (
+                                        {/* Corner fire particles for combo - only on full performance */}
+                                        {comboLevel > 0 && performanceMode === 'full' && (
                                         <>
                                             {/* Top-right fire particle */}
                                             <motion.div
@@ -946,54 +973,12 @@ const GridComponent = memo<GridComponentProps>(({
                                                 }}
                                                 transition={{
                                                     duration: 0.4,
-                                                    repeat: Infinity,
+                                                    repeat: 3, // Limited repeats instead of Infinity
                                                     ease: "easeInOut"
                                                 }}
                                             />
 
-                                            {/* Top-left fire particle */}
-                                            <motion.div
-                                                className="absolute -top-1 -left-1 w-2 h-2 rounded-full pointer-events-none"
-                                                style={{
-                                                    background: 'radial-gradient(circle, #ffaa00, #ff6b00)',
-                                                    filter: 'blur(1px)'
-                                                }}
-                                                initial={{ scale: 0, opacity: 0 }}
-                                                animate={{
-                                                    scale: [1, 1.3, 1],
-                                                    opacity: [0.7, 1, 0.7],
-                                                    y: [-3, -5, -3],
-                                                }}
-                                                transition={{
-                                                    duration: 0.45,
-                                                    repeat: Infinity,
-                                                    ease: "easeInOut",
-                                                    delay: 0.1
-                                                }}
-                                            />
-
-                                            {/* Bottom-right fire particle */}
-                                            <motion.div
-                                                className="absolute -bottom-1 -right-1 w-2 h-2 rounded-full pointer-events-none"
-                                                style={{
-                                                    background: 'radial-gradient(circle, #ff9500, #ff5500)',
-                                                    filter: 'blur(1px)'
-                                                }}
-                                                initial={{ scale: 0, opacity: 0 }}
-                                                animate={{
-                                                    scale: [1, 1.4, 1],
-                                                    opacity: [0.6, 0.9, 0.6],
-                                                    y: [2, 4, 2],
-                                                }}
-                                                transition={{
-                                                    duration: 0.42,
-                                                    repeat: Infinity,
-                                                    ease: "easeInOut",
-                                                    delay: 0.2
-                                                }}
-                                            />
-
-                                            {/* Bottom-left fire particle */}
+                                            {/* Bottom-left fire particle - reduced to 2 corner particles */}
                                             <motion.div
                                                 className="absolute -bottom-1 -left-1 w-2 h-2 rounded-full pointer-events-none"
                                                 style={{
@@ -1008,14 +993,14 @@ const GridComponent = memo<GridComponentProps>(({
                                                 }}
                                                 transition={{
                                                     duration: 0.5,
-                                                    repeat: Infinity,
+                                                    repeat: 3, // Limited repeats
                                                     ease: "easeInOut",
-                                                    delay: 0.3
+                                                    delay: 0.2
                                                 }}
                                             />
 
                                             {/* Pulsing glow effect for high combos */}
-                                            {comboLevel >= 2 && (
+                                            {comboLevel >= 3 && (
                                                 <motion.div
                                                     className="absolute inset-0 pointer-events-none"
                                                     style={{
@@ -1029,7 +1014,7 @@ const GridComponent = memo<GridComponentProps>(({
                                                     }}
                                                     transition={{
                                                         duration: 0.6,
-                                                        repeat: Infinity,
+                                                        repeat: 3, // Limited repeats
                                                         ease: "easeInOut"
                                                     }}
                                                 />
@@ -1037,6 +1022,7 @@ const GridComponent = memo<GridComponentProps>(({
                                         </>
                                     )}
                                 </>
+                                    )}
                             </>
                             )}
                             {/* Heat map glow overlay for results page */}
