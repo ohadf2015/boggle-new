@@ -111,6 +111,9 @@ async function endGame(io, gameCode) {
   // Update game state
   updateGame(gameCode, { gameState: 'finished' });
 
+  // Notify clients that game has ended (sets up waiting state)
+  broadcastToRoom(io, getGameRoom(gameCode), 'endGame', {});
+
   logger.info('GAME', `Game ${gameCode} ending, calculating final scores`);
 
   // Calculate and broadcast final scores
@@ -331,9 +334,12 @@ async function calculateAndBroadcastFinalScores(io, gameCode) {
   }
 
   // Award final achievements
+  const usernames = finalScores.map(p => p.username);
+  awardFinalAchievements(game, usernames);
+
+  // Copy achievements to player results
   for (const playerResult of finalScores) {
-    const achievements = awardFinalAchievements(gameCode, playerResult.username, finalScores);
-    playerResult.achievements = achievements;
+    playerResult.achievements = game.playerAchievements?.[playerResult.username] || [];
   }
 
   // Calculate player titles
@@ -342,8 +348,13 @@ async function calculateAndBroadcastFinalScores(io, gameCode) {
     playerResult.titles = titles[playerResult.username] || [];
   }
 
-  // Broadcast results
-  broadcastToRoom(io, getGameRoom(gameCode), 'gameOver', {
+  // Broadcast results to all clients
+  // Host expects 'validationComplete', players expect 'validatedScores'
+  broadcastToRoom(io, getGameRoom(gameCode), 'validatedScores', {
+    scores: finalScores,
+    letterGrid: game.letterGrid
+  });
+  broadcastToRoom(io, getGameRoom(gameCode), 'validationComplete', {
     scores: finalScores,
     letterGrid: game.letterGrid
   });
