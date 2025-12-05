@@ -220,6 +220,7 @@ function createBot(gameCode, difficulty = 'medium', existingUsers = {}) {
 
   const bot = {
     id: botId,
+    gameCode,           // Game this bot belongs to
     username: botName,
     avatar,
     difficulty,
@@ -355,6 +356,20 @@ function getGameBots(gameCode) {
   const bots = gameBots.get(gameCode);
   if (!bots) return [];
   return Array.from(bots.values());
+}
+
+/**
+ * Get a bot by ID (searches across all games)
+ * @param {string} botId - Bot ID
+ * @returns {object|null} - Bot object or null
+ */
+function getBot(botId) {
+  for (const bots of gameBots.values()) {
+    if (bots.has(botId)) {
+      return bots.get(botId);
+    }
+  }
+  return null;
 }
 
 /**
@@ -1005,6 +1020,7 @@ module.exports = {
   // Bot management
   addBot,
   removeBot,
+  getBot,
   getGameBots,
   getBotByUsername,
   isBot,

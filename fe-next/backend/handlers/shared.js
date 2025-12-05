@@ -401,7 +401,7 @@ function startBotsForGame(io, gameCode, letterGrid, language, timerSeconds) {
   const { addPlayerWord, updatePlayerScore, trackBotWord } = require('../modules/gameStateManager');
 
   for (const bot of bots) {
-    botManager.startBot(bot.id, letterGrid, language, timerSeconds, async (botId, word, score) => {
+    botManager.startBot(bot, letterGrid, language, async (botId, word, score) => {
       const currentBot = botManager.getBot(botId);
       if (!currentBot) return;
 
@@ -418,7 +418,7 @@ function startBotsForGame(io, gameCode, letterGrid, language, timerSeconds) {
 
       const leaderboard = getLeaderboard(gameCode);
       broadcastToRoom(io, getGameRoom(gameCode), 'updateLeaderboard', { leaderboard });
-    });
+    }, timerSeconds);
   }
 }
 
