@@ -217,6 +217,11 @@ const useHostSocketEvents = ({
     tableDataRef.current = tableData;
   }, [onShowResults, tableData]);
 
+  // Track when we entered waiting state to prevent flickering
+  // Ensures minimum display time for the calculation screen
+  const waitingStartTimeRef = useRef<number | null>(null);
+  const MINIMUM_WAITING_TIME_MS = 1500; // Minimum time to show the calculation screen
+
   useEffect(() => {
     if (!socket) return;
 
@@ -340,33 +345,54 @@ const useHostSocketEvents = ({
     // Handle validation complete (after word feedback voting timeout)
     const handleValidationComplete = (data: any) => {
       logger.log('[HOST] Received validationComplete event:', data);
-      // Use refs to get the latest values to avoid stale closure issues
-      const currentOnShowResults = onShowResultsRef.current;
-      const currentTableData = tableDataRef.current;
-      logger.log('[HOST] onShowResults defined:', !!currentOnShowResults);
-      logger.log('[HOST] tableData available:', !!currentTableData);
 
-      // Clear waiting state - results are ready
-      setWaitingForResults(false);
+      // Calculate time elapsed since entering waiting state
+      const now = Date.now();
+      const waitingStartTime = waitingStartTimeRef.current || now;
+      const timeElapsed = now - waitingStartTime;
+      const remainingWaitTime = Math.max(0, MINIMUM_WAITING_TIME_MS - timeElapsed);
 
-      confetti({
-        particleCount: 150,
-        spread: 80,
-        origin: { y: 0.6 },
-      });
-      neoSuccessToast(t('hostView.gameComplete') || 'Game complete!', {
-        icon: '🎉',
-        duration: 3000,
-      });
-      if (currentOnShowResults) {
-        logger.log('[HOST] Calling onShowResults with scores');
-        currentOnShowResults({
-          scores: data.scores,
-          letterGrid: currentTableData
+      logger.log(`[HOST] Time elapsed in waiting: ${timeElapsed}ms, remaining wait: ${remainingWaitTime}ms`);
+
+      // Helper to show results
+      const showResults = () => {
+        // Use refs to get the latest values to avoid stale closure issues
+        const currentOnShowResults = onShowResultsRef.current;
+        const currentTableData = tableDataRef.current;
+        logger.log('[HOST] onShowResults defined:', !!currentOnShowResults);
+        logger.log('[HOST] tableData available:', !!currentTableData);
+
+        // Clear waiting state - results are ready
+        setWaitingForResults(false);
+        waitingStartTimeRef.current = null; // Reset for next game
+
+        confetti({
+          particleCount: 150,
+          spread: 80,
+          origin: { y: 0.6 },
         });
+        neoSuccessToast(t('hostView.gameComplete') || 'Game complete!', {
+          icon: '🎉',
+          duration: 3000,
+        });
+        if (currentOnShowResults) {
+          logger.log('[HOST] Calling onShowResults with scores');
+          currentOnShowResults({
+            scores: data.scores,
+            letterGrid: currentTableData
+          });
+        } else {
+          logger.log('[HOST] onShowResults not defined, setting finalScores in modal');
+          setFinalScores(data.scores);
+        }
+      };
+
+      // Ensure minimum display time for the calculation screen to prevent flickering
+      if (remainingWaitTime > 0) {
+        logger.log(`[HOST] Waiting ${remainingWaitTime}ms before showing results`);
+        setTimeout(showResults, remainingWaitTime);
       } else {
-        logger.log('[HOST] onShowResults not defined, setting finalScores in modal');
-        setFinalScores(data.scores);
+        showResults();
       }
     };
 
@@ -387,6 +413,10 @@ const useHostSocketEvents = ({
       setRemainingTime(data.remainingTime);
       if (data.remainingTime === 0 && gameStarted) {
         setGameStarted(false);
+        // Track when we entered waiting state for minimum display time
+        if (!waitingStartTimeRef.current) {
+          waitingStartTimeRef.current = Date.now();
+        }
         setWaitingForResults(true); // Show loading state while calculating scores
         confetti({
           particleCount: 150,
@@ -409,6 +439,7 @@ const useHostSocketEvents = ({
       }
       setGameStarted(true);
       setWaitingForResults(false); // Reset waiting state when new game starts
+      waitingStartTimeRef.current = null; // Reset waiting state tracking
       setShowStartAnimation(true);
       setPlayerWordCounts({});
       setPlayerScores({});

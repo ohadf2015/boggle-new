@@ -179,6 +179,11 @@ const usePlayerSocketEvents = ({
     onShowResultsRef.current = onShowResults;
   }, [onShowResults]);
 
+  // Track when we entered waiting state to prevent flickering
+  // Ensures minimum display time for the calculation screen
+  const waitingStartTimeRef = useRef<number | null>(null);
+  const MINIMUM_WAITING_TIME_MS = 1500; // Minimum time to show the calculation screen
+
   useEffect(() => {
     if (!socket) return;
 
@@ -227,6 +232,10 @@ const usePlayerSocketEvents = ({
       setRemainingTime(0);
       if (wasInActiveGame) {
         logger.log('[PLAYER] Setting waitingForResults to true');
+        // Track when we entered waiting state for minimum display time
+        if (!waitingStartTimeRef.current) {
+          waitingStartTimeRef.current = Date.now();
+        }
         setWaitingForResults(true);
       }
     };
@@ -380,6 +389,10 @@ const usePlayerSocketEvents = ({
 
       if (data.remainingTime <= 0) {
         setGameActive(false);
+        // Track when we entered waiting state for minimum display time
+        if (!waitingStartTimeRef.current) {
+          waitingStartTimeRef.current = Date.now();
+        }
         setWaitingForResults(true);
       }
     };
@@ -417,19 +430,41 @@ const usePlayerSocketEvents = ({
 
     const handleValidatedScores = (data: any) => {
       logger.log('[PLAYER] Received validatedScores event:', data);
-      setWaitingForResults(false);
-      setShowWordFeedback(false);
-      setWordToVote(null);
-      // Use ref to get the latest onShowResults callback to avoid stale closure issues
-      const currentOnShowResults = onShowResultsRef.current;
-      if (currentOnShowResults) {
-        logger.log('[PLAYER] Calling onShowResults with scores');
-        currentOnShowResults({
-          scores: data.scores,
-          letterGrid: data.letterGrid,
-        });
+
+      // Calculate time elapsed since entering waiting state
+      const now = Date.now();
+      const waitingStartTime = waitingStartTimeRef.current || now;
+      const timeElapsed = now - waitingStartTime;
+      const remainingWaitTime = Math.max(0, MINIMUM_WAITING_TIME_MS - timeElapsed);
+
+      logger.log(`[PLAYER] Time elapsed in waiting: ${timeElapsed}ms, remaining wait: ${remainingWaitTime}ms`);
+
+      // Helper to show results
+      const showResults = () => {
+        setWaitingForResults(false);
+        setShowWordFeedback(false);
+        setWordToVote(null);
+        waitingStartTimeRef.current = null; // Reset for next game
+
+        // Use ref to get the latest onShowResults callback to avoid stale closure issues
+        const currentOnShowResults = onShowResultsRef.current;
+        if (currentOnShowResults) {
+          logger.log('[PLAYER] Calling onShowResults with scores');
+          currentOnShowResults({
+            scores: data.scores,
+            letterGrid: data.letterGrid,
+          });
+        } else {
+          logger.warn('[PLAYER] onShowResults is not defined!');
+        }
+      };
+
+      // Ensure minimum display time for the calculation screen to prevent flickering
+      if (remainingWaitTime > 0) {
+        logger.log(`[PLAYER] Waiting ${remainingWaitTime}ms before showing results`);
+        setTimeout(showResults, remainingWaitTime);
       } else {
-        logger.warn('[PLAYER] onShowResults is not defined!');
+        showResults();
       }
     };
 
@@ -437,16 +472,35 @@ const usePlayerSocketEvents = ({
       // Legacy handler - finalScores is no longer used in the new flow
       // The new flow uses validatedScores which is handled by handleValidatedScores
       logger.log('[PLAYER] Received legacy finalScores event (deprecated):', data);
-      setWaitingForResults(false);
-      setShowWordFeedback(false);
-      setWordToVote(null);
-      // Use ref to get the latest onShowResults callback
-      const currentOnShowResults = onShowResultsRef.current;
-      if (currentOnShowResults) {
-        currentOnShowResults({
-          scores: data.scores,
-          letterGrid: letterGrid,
-        });
+
+      // Calculate time elapsed since entering waiting state
+      const now = Date.now();
+      const waitingStartTime = waitingStartTimeRef.current || now;
+      const timeElapsed = now - waitingStartTime;
+      const remainingWaitTime = Math.max(0, MINIMUM_WAITING_TIME_MS - timeElapsed);
+
+      // Helper to show results
+      const showResults = () => {
+        setWaitingForResults(false);
+        setShowWordFeedback(false);
+        setWordToVote(null);
+        waitingStartTimeRef.current = null; // Reset for next game
+
+        // Use ref to get the latest onShowResults callback
+        const currentOnShowResults = onShowResultsRef.current;
+        if (currentOnShowResults) {
+          currentOnShowResults({
+            scores: data.scores,
+            letterGrid: letterGrid,
+          });
+        }
+      };
+
+      // Ensure minimum display time for the calculation screen to prevent flickering
+      if (remainingWaitTime > 0) {
+        setTimeout(showResults, remainingWaitTime);
+      } else {
+        showResults();
       }
     };
 
@@ -469,6 +523,7 @@ const usePlayerSocketEvents = ({
       setRemainingTime(null);
       setWaitingForResults(false);
       setLetterGrid(null);
+      waitingStartTimeRef.current = null; // Reset waiting state tracking
       neoSuccessToast(data.message || t('common.newGameReady'), { icon: '🔄', duration: 3000 });
     };
 
