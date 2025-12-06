@@ -165,25 +165,35 @@ export const RoomList: React.FC<RoomListProps> = ({
   );
 };
 
+/**
+ * Enhanced skeleton loader for room list
+ * Uses CSS skeleton classes for consistent shimmer animation
+ */
 const LoadingSkeleton: React.FC = () => (
-  <div className="space-y-2">
-    {[1, 2].map((i) => (
+  <div className="space-y-3" role="status" aria-label="Loading rooms">
+    {[1, 2, 3].map((i) => (
       <div
         key={i}
-        className="w-full p-3 rounded-neo bg-neo-navy/50 border-3 border-neo-cream/20 animate-pulse"
+        className="w-full p-3 rounded-neo border-3 border-neo-cream/20 skeleton"
+        style={{ animationDelay: `${i * 0.15}s` }}
       >
         <div className="flex items-center justify-between gap-3">
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-neo-cream/20 rounded-neo" />
+            {/* Flag skeleton */}
+            <div className="w-8 h-8 rounded-neo bg-neo-cream/10" />
             <div>
-              <div className="h-5 w-24 bg-neo-cream/20 rounded-neo mb-1" />
-              <div className="h-3 w-16 bg-neo-cream/10 rounded-neo" />
+              {/* Room name skeleton */}
+              <div className="h-5 w-28 rounded-neo bg-neo-cream/15 mb-1" />
+              {/* Host code skeleton */}
+              <div className="h-3 w-20 rounded-neo bg-neo-cream/10" />
             </div>
           </div>
-          <div className="h-5 w-16 bg-neo-cream/20 rounded-neo" />
+          {/* Player count badge skeleton */}
+          <div className="h-6 w-20 rounded-md bg-neo-cream/15" />
         </div>
       </div>
     ))}
+    <span className="sr-only">Loading available rooms...</span>
   </div>
 );
 
