@@ -583,10 +583,10 @@ const JoinModeFields: React.FC<JoinModeFieldsProps> = ({
             if (gameCodeError) setGameCodeError(false);
           }}
           required
-          placeholder={t('validation.enterFourDigitCode')}
-          maxLength={4}
-          pattern="[0-9]*"
-          inputMode="numeric"
+          placeholder={t('validation.enterGameCode')}
+          maxLength={10}
+          pattern="[A-Za-z0-9]*"
+          inputMode="text"
           aria-invalid={showGameCodeError ? 'true' : undefined}
           aria-describedby={showGameCodeError ? 'gameCode-error' : undefined}
           className={cn(
@@ -802,10 +802,10 @@ const HostModeFields: React.FC<HostModeFieldsProps> = ({
               if (gameCodeError) setGameCodeError(false);
             }}
             required
-            placeholder={t('validation.fourDigitCode')}
-            maxLength={4}
-            pattern="[0-9]*"
-            inputMode="numeric"
+            placeholder={t('validation.enterGameCode')}
+            maxLength={10}
+            pattern="[A-Za-z0-9]*"
+            inputMode="text"
             aria-invalid={showGameCodeError ? 'true' : undefined}
             aria-describedby={showGameCodeError ? 'host-gameCode-error' : 'host-gameCode-hint'}
             className={cn(
