@@ -9,6 +9,7 @@ import type { LetterGrid, Language, Avatar } from '@/types';
 export interface SocketContextValue {
   socket: Socket | null;
   isConnected: boolean;
+  isReconnecting: boolean;
   connectionError: string | null;
 }
 
@@ -34,6 +35,7 @@ interface SocketProviderProps {
 export function SocketProvider({ children }: SocketProviderProps) {
   const [socket, setSocket] = useState<Socket | null>(null);
   const [isConnected, setIsConnected] = useState<boolean>(false);
+  const [isReconnecting, setIsReconnecting] = useState<boolean>(false);
   const [connectionError, setConnectionError] = useState<string | null>(null);
   const socketRef = useRef<Socket | null>(null);
 
@@ -60,6 +62,7 @@ export function SocketProvider({ children }: SocketProviderProps) {
     socketInstance.on('connect', () => {
       logger.log('[SOCKET.IO] Connected:', socketInstance.id);
       setIsConnected(true);
+      setIsReconnecting(false);
       setConnectionError(null);
     });
 
@@ -82,11 +85,13 @@ export function SocketProvider({ children }: SocketProviderProps) {
     socketInstance.on('reconnect', (attemptNumber: number) => {
       logger.log('[SOCKET.IO] Reconnected after', attemptNumber, 'attempts');
       setIsConnected(true);
+      setIsReconnecting(false);
       setConnectionError(null);
     });
 
     socketInstance.on('reconnect_attempt', (attemptNumber: number) => {
       logger.log('[SOCKET.IO] Reconnection attempt:', attemptNumber);
+      setIsReconnecting(true);
     });
 
     socketInstance.on('reconnect_error', (error: Error) => {
@@ -95,6 +100,7 @@ export function SocketProvider({ children }: SocketProviderProps) {
 
     socketInstance.on('reconnect_failed', () => {
       logger.error('[SOCKET.IO] Reconnection failed after all attempts');
+      setIsReconnecting(false);
       setConnectionError('Failed to reconnect to server');
     });
 
@@ -132,7 +138,7 @@ export function SocketProvider({ children }: SocketProviderProps) {
   }, []);
 
   return (
-    <SocketContext.Provider value={{ socket, isConnected, connectionError }}>
+    <SocketContext.Provider value={{ socket, isConnected, isReconnecting, connectionError }}>
       {children}
     </SocketContext.Provider>
   );
