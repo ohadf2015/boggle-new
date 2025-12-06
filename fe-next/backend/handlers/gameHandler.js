@@ -58,9 +58,7 @@ const {
   startGameSchema,
   leaveRoomSchema
 } = require('../utils/socketValidation');
-
-// Configuration
-const MAX_PLAYERS_PER_ROOM = 50;
+const { MAX_PLAYERS_PER_ROOM } = require('../utils/consts');
 
 /**
  * Register game-related socket event handlers
