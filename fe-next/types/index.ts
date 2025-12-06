@@ -38,6 +38,19 @@ export type {
   ValidateWordResponse,
 } from './api';
 
+// Component prop types
+export type {
+  JoinViewProps,
+  JoinMode,
+  ResultsPageProps,
+  PlayerResult,
+  HeatMapData,
+  WordToVote,
+  XpGainedData,
+  LevelUpData,
+  GridPosition,
+} from './components';
+
 // ==================== Re-exports for backwards compatibility ====================
 // These aliases ensure existing imports continue to work
 

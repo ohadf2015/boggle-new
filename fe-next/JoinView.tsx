@@ -1,4 +1,6 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+'use client';
+
+import React, { useState, useEffect, useRef, useCallback, FormEvent, ChangeEvent } from 'react';
 import dynamic from 'next/dynamic';
 import { motion } from 'framer-motion';
 import { FaGamepad, FaCrown, FaUser, FaDice, FaSync, FaQrcode, FaWhatsapp, FaLink, FaQuestionCircle } from 'react-icons/fa';
@@ -22,6 +24,8 @@ import { useValidation } from './hooks/useValidation';
 import { generateRoomCode as generateCode } from './utils/utils';
 import { setGuestName } from './utils/guestManager';
 import { trackGuestJoin } from './utils/growthTracking';
+import type { JoinViewProps, JoinMode } from './types/components';
+import type { Language } from './shared/types/game';
 
 // Dynamic imports for heavy animation components (reduces initial bundle by ~50KB)
 const HowToPlay = dynamic(() => import('./components/HowToPlay'), { ssr: false });
@@ -32,29 +36,47 @@ const Particles = dynamic(() => import('./components/Particles'), { ssr: false }
 // Import helper for first-time player detection
 import { isFirstTimePlayer, markTutorialSeen } from './components/NewPlayerWelcome';
 
-const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, error, activeRooms, refreshRooms, prefilledRoom, roomName, setRoomName, isAutoJoining, roomsLoading, isAuthenticated, displayName, isProfileLoading, isJoining = false }) => {
+const JoinView: React.FC<JoinViewProps> = ({
+  handleJoin,
+  gameCode,
+  username,
+  setGameCode,
+  setUsername,
+  error,
+  activeRooms,
+  refreshRooms,
+  prefilledRoom,
+  roomName,
+  setRoomName,
+  isAutoJoining,
+  roomsLoading,
+  isAuthenticated,
+  displayName,
+  isProfileLoading,
+  isJoining = false
+}) => {
   const { t, language, dir } = useLanguage();
-  const [mode, setMode] = useState('join'); // 'join' or 'host'
-  const [showQR, setShowQR] = useState(false);
-  const [showHowToPlay, setShowHowToPlay] = useState(false);
-  const [showNewPlayerWelcome, setShowNewPlayerWelcome] = useState(false);
-  const [usernameError, setUsernameError] = useState(false);
-  const [roomNameError, setRoomNameError] = useState(false);
-  const [gameCodeError, setGameCodeError] = useState(false);
-  const [usernameErrorKey, setUsernameErrorKey] = useState(null);
-  const [roomNameErrorKey, setRoomNameErrorKey] = useState(null);
-  const [gameCodeErrorKey, setGameCodeErrorKey] = useState(null);
-  const [showFullForm, setShowFullForm] = useState(!prefilledRoom); // Show simplified form if room is prefilled
-  const [roomLanguage, setRoomLanguage] = useState(language); // Separate state for room/game language
-  const [mobileRoomsExpanded, setMobileRoomsExpanded] = useState(false); // Mobile rooms list expansion
-  const usernameInputRef = useRef(null);
-  const prevPrefilledRoomRef = useRef(prefilledRoom);
+  const [mode, setMode] = useState<JoinMode>('join');
+  const [showQR, setShowQR] = useState<boolean>(false);
+  const [showHowToPlay, setShowHowToPlay] = useState<boolean>(false);
+  const [showNewPlayerWelcome, setShowNewPlayerWelcome] = useState<boolean>(false);
+  const [usernameError, setUsernameError] = useState<boolean>(false);
+  const [roomNameError, setRoomNameError] = useState<boolean>(false);
+  const [gameCodeError, setGameCodeError] = useState<boolean>(false);
+  const [usernameErrorKey, setUsernameErrorKey] = useState<string | null>(null);
+  const [roomNameErrorKey, setRoomNameErrorKey] = useState<string | null>(null);
+  const [gameCodeErrorKey, setGameCodeErrorKey] = useState<string | null>(null);
+  const [showFullForm, setShowFullForm] = useState<boolean>(!prefilledRoom);
+  const [roomLanguage, setRoomLanguage] = useState<Language>(language as Language);
+  const [mobileRoomsExpanded, setMobileRoomsExpanded] = useState<boolean>(false);
+  const usernameInputRef = useRef<HTMLInputElement>(null);
+  const prevPrefilledRoomRef = useRef<string | null>(prefilledRoom);
   const { notifyError } = useValidation(t);
-  const hasAutoSwitchedToHostRef = useRef(false);
-  const hasCheckedFirstTimePlayerRef = useRef(false);
+  const hasAutoSwitchedToHostRef = useRef<boolean>(false);
+  const hasCheckedFirstTimePlayerRef = useRef<boolean>(false);
 
   // Define handleModeChange before effects that use it
-  const handleModeChange = useCallback((newMode) => {
+  const handleModeChange = useCallback((newMode: JoinMode | null) => {
     if (newMode) {
       setMode(newMode);
       // Auto-generate code when switching to host mode
@@ -151,7 +173,7 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
     setShowQR(false);
   }, []);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     // Validate based on mode
@@ -225,7 +247,7 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
     handleJoin(mode === 'host', roomLanguage);
   };
 
-  const handleRoomSelect = (roomCode) => {
+  const handleRoomSelect = (roomCode: string) => {
     // Check if clicking the same room that's already selected
     const isSameRoom = gameCode === roomCode;
 
@@ -244,7 +266,7 @@ const JoinView = ({ handleJoin, gameCode, username, setGameCode, setUsername, er
     }
   };
 
-  const handleQuickJoin = (e) => {
+  const handleQuickJoin = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const un = sanitizeInput(username, 20);
     const { isValid: userOk, error: userErr } = validateUsername(un);

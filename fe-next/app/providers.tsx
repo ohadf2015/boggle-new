@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect } from 'react';
+import React, { useEffect, ReactNode, useMemo } from 'react';
 import { ThemeProvider } from '@/utils/ThemeContext';
 import { LanguageProvider } from '@/contexts/LanguageContext';
 import { AuthProvider } from '@/contexts/AuthContext';
@@ -10,6 +10,12 @@ import { AchievementQueueProvider } from '@/components/achievements';
 import { Toaster } from 'react-hot-toast';
 import ErrorBoundary from './components/ErrorBoundary';
 import { initUtmCapture } from '@/utils/utmCapture';
+import { composeProviders } from '@/utils/composeProviders';
+
+interface ProvidersProps {
+  children: ReactNode;
+  lang: string;
+}
 
 // Initialize UTM capture immediately on module load
 // This MUST happen before React hydration to capture UTM params before any navigation
@@ -40,7 +46,20 @@ const initLogRocket = () => {
     });
 };
 
-export function Providers({ children, lang }) {
+// Composed provider groups for cleaner organization
+// Audio providers (Music + Sound Effects)
+const AudioProviders = composeProviders([
+    [MusicProvider as React.ComponentType<{ children: ReactNode }>, {}],
+    [SoundEffectsProvider as React.ComponentType<{ children: ReactNode }>, {}],
+]);
+
+// Game-related providers (Achievements + Auth)
+const GameProviders = composeProviders([
+    [AchievementQueueProvider as React.ComponentType<{ children: ReactNode }>, {}],
+    [AuthProvider as React.ComponentType<{ children: ReactNode }>, {}],
+]);
+
+export function Providers({ children, lang }: ProvidersProps) {
     // Note: UTM capture now happens at module load (above) for earlier execution
     // The useEffect below is kept as a safety fallback in case module-level execution fails
 
@@ -49,7 +68,7 @@ export function Providers({ children, lang }) {
     useEffect(() => {
         const timeoutId = setTimeout(initLogRocket, 3000);
 
-        const events = ['click', 'touchstart', 'keydown'];
+        const events = ['click', 'touchstart', 'keydown'] as const;
         const handleInteraction = () => {
             clearTimeout(timeoutId);
             initLogRocket();
@@ -75,15 +94,11 @@ export function Providers({ children, lang }) {
             <>
                 <ThemeProvider>
                     <LanguageProvider initialLanguage={lang}>
-                        <MusicProvider>
-                            <SoundEffectsProvider>
-                                <AchievementQueueProvider>
-                                    <AuthProvider>
-                                        {children}
-                                    </AuthProvider>
-                                </AchievementQueueProvider>
-                            </SoundEffectsProvider>
-                        </MusicProvider>
+                        <AudioProviders>
+                            <GameProviders>
+                                {children}
+                            </GameProviders>
+                        </AudioProviders>
                     </LanguageProvider>
                 </ThemeProvider>
                 <Toaster

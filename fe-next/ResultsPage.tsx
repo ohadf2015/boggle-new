@@ -1,3 +1,5 @@
+'use client';
+
 import React, { useMemo, useEffect, useState, useCallback, useRef } from 'react';
 import dynamic from 'next/dynamic';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -14,6 +16,8 @@ import { useWinStreak } from './hooks/useWinStreak';
 import { trackGameCompletion, trackStreakMilestone } from './utils/growthTracking';
 import logger from './utils/logger';
 import { levelUpToast } from './components/NeoToast';
+import type { ResultsPageProps, PlayerResult, HeatMapData, WordToVote, XpGainedData, LevelUpData, GridPosition } from './types/components';
+import type { LetterGrid as LetterGridType } from './shared/types/game';
 
 // Dynamic imports for heavy components (loaded after initial render)
 const GridComponent = dynamic(() => import('./components/GridComponent'), { ssr: false });
@@ -28,12 +32,20 @@ const XpBreakdownCard = dynamic(() => import('./components/results/XpBreakdownCa
 const AutoRejoinTimer = dynamic(() => import('./components/results/AutoRejoinTimer'), { ssr: false });
 
 // Helper functions for finding word paths on the board (client-side version)
-const normalizeHebrewLetter = (letter) => {
-  const finalToRegular = { 'ץ': 'צ', 'ך': 'כ', 'ם': 'מ', 'ן': 'נ', 'ף': 'פ' };
+const normalizeHebrewLetter = (letter: string): string => {
+  const finalToRegular: Record<string, string> = { 'ץ': 'צ', 'ך': 'כ', 'ם': 'מ', 'ן': 'נ', 'ף': 'פ' };
   return finalToRegular[letter] || letter;
 };
 
-const searchWordPath = (board, word, row, col, index, visited, path) => {
+const searchWordPath = (
+  board: string[][],
+  word: string,
+  row: number,
+  col: number,
+  index: number,
+  visited: Set<string>,
+  path: GridPosition[]
+): GridPosition[] | null => {
   if (index === word.length) return [...path];
   if (row < 0 || row >= board.length || col < 0 || col >= board[0].length) return null;
 
@@ -60,7 +72,7 @@ const searchWordPath = (board, word, row, col, index, visited, path) => {
   return null;
 };
 
-const getWordPath = (word, board) => {
+const getWordPath = (word: string, board: string[][] | null): GridPosition[] | null => {
   if (!word || !board || board.length === 0) return null;
   const wordNormalized = word.toLowerCase().split('').map(normalizeHebrewLetter).join('');
   const firstChar = wordNormalized[0];
@@ -76,7 +88,14 @@ const getWordPath = (word, board) => {
   return null;
 };
 
-const LetterGrid = ({ letterGrid, heatMapData, showHeatmap, onToggleHeatmap }) => {
+interface LetterGridProps {
+  letterGrid: LetterGridType | null;
+  heatMapData: HeatMapData | null;
+  showHeatmap: boolean;
+  onToggleHeatmap: () => void;
+}
+
+const LetterGrid: React.FC<LetterGridProps> = ({ letterGrid, heatMapData, showHeatmap, onToggleHeatmap }) => {
   const { t } = useLanguage();
   return (
     <div className="w-full">
@@ -126,32 +145,32 @@ const LetterGrid = ({ letterGrid, heatMapData, showHeatmap, onToggleHeatmap }) =
   );
 };
 
-const ResultsPage = ({ finalScores, letterGrid, gameCode, onReturnToRoom, username, socket }) => {
+const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, letterGrid, gameCode, onReturnToRoom, username, socket }) => {
   const { t, language } = useLanguage();
   const { user, isAuthenticated } = useAuth();
-  const [showExitConfirm, setShowExitConfirm] = useState(false);
-  const [showAuthModal, setShowAuthModal] = useState(false);
-  const [showFirstWinModal, setShowFirstWinModal] = useState(false);
-  const [hasShownUpgradePrompt, setHasShownUpgradePrompt] = useState(false);
-  const [showHeatmap, setShowHeatmap] = useState(false);
+  const [showExitConfirm, setShowExitConfirm] = useState<boolean>(false);
+  const [showAuthModal, setShowAuthModal] = useState<boolean>(false);
+  const [showFirstWinModal, setShowFirstWinModal] = useState<boolean>(false);
+  const [hasShownUpgradePrompt, setHasShownUpgradePrompt] = useState<boolean>(false);
+  const [showHeatmap, setShowHeatmap] = useState<boolean>(false);
 
   // Use refs for values that don't need to trigger re-renders
-  const hasUpdatedStatsRef = useRef(false);
-  const hasTrackedGameRef = useRef(false);
+  const hasUpdatedStatsRef = useRef<boolean>(false);
+  const hasTrackedGameRef = useRef<boolean>(false);
   // previousStreak needs to be state since it's used in render
-  const [previousStreak, setPreviousStreak] = useState(0);
+  const [previousStreak, setPreviousStreak] = useState<number>(0);
 
   // Word feedback state for crowd-sourced word validation (self-healing system)
-  const [showWordFeedback, setShowWordFeedback] = useState(false);
-  const [wordToVote, setWordToVote] = useState(null);
-  const [wordQueue, setWordQueue] = useState([]); // Multiple words for self-healing
+  const [showWordFeedback, setShowWordFeedback] = useState<boolean>(false);
+  const [wordToVote, setWordToVote] = useState<WordToVote | null>(null);
+  const [wordQueue, setWordQueue] = useState<WordToVote[]>([]);
 
   // XP and Level state (received via socket after game ends)
-  const [xpGainedData, setXpGainedData] = useState(null);
-  const [levelUpData, setLevelUpData] = useState(null);
+  const [xpGainedData, setXpGainedData] = useState<XpGainedData | null>(null);
+  const [levelUpData, setLevelUpData] = useState<LevelUpData | null>(null);
 
   // Auto-rejoin timer state
-  const [autoRejoinDismissed, setAutoRejoinDismissed] = useState(false);
+  const [autoRejoinDismissed, setAutoRejoinDismissed] = useState<boolean>(false);
 
   // Win streak tracking
   const { currentStreak, bestStreak, recordWin } = useWinStreak();
