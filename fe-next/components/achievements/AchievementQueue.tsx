@@ -34,7 +34,7 @@ const AchievementQueue = ({ children }: AchievementQueueProps): React.ReactEleme
     isDisplayingRef.current = true;
     const [next, ...rest] = queueRef.current;
     setQueue(rest);
-    setCurrentAchievement(next);
+    setCurrentAchievement(next ?? null);
   }, []);
 
   // Handle popup complete
@@ -108,7 +108,7 @@ export const AchievementQueueProvider = ({ children }: AchievementQueueProviderP
     isDisplayingRef.current = true;
     const [next, ...rest] = queueRef.current;
     setQueue(rest);
-    setCurrentAchievement(next);
+    setCurrentAchievement(next ?? null);
   }, []);
 
   const handlePopupComplete = useCallback(() => {

@@ -172,12 +172,13 @@ const MenuAnimation: React.FC<MenuAnimationProps> = ({ className = '' }) => {
   // Generate a single letter (only call client-side after mount)
   const generateLetter = useCallback((index: number): Letter => {
     const letterSet = getLetterSet();
-    const colorScheme = BRUTALIST_COLORS[Math.floor(Math.random() * BRUTALIST_COLORS.length)];
+    const colorScheme = BRUTALIST_COLORS[Math.floor(Math.random() * BRUTALIST_COLORS.length)] ?? { bg: '#00bcd4', border: '#0097a7' };
     const width = window.innerWidth;
     const height = window.innerHeight;
+    const char = letterSet[Math.floor(Math.random() * letterSet.length)] ?? 'A';
     return {
       id: `letter-${index}-${Date.now()}-${Math.random()}`,
-      char: letterSet[Math.floor(Math.random() * letterSet.length)],
+      char,
       x: Math.random() * width,
       y: Math.random() * height,
       targetX: Math.random() * width,

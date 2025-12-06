@@ -261,6 +261,10 @@ const GridComponent = memo<GridComponentProps>(({
 
         if (row < 0 || row >= rows || col < 0 || col >= cols) return null;
 
+        const gridRow = grid[row];
+        const letter = gridRow?.[col];
+        if (!letter) return null;
+
         // Calculate cell center for distance checking
         const cellCenterX = col * cellWithGapWidth + cellWidth / 2;
         const cellCenterY = row * cellWithGapHeight + cellHeight / 2;
@@ -272,7 +276,7 @@ const GridComponent = memo<GridComponentProps>(({
         return {
             row,
             col,
-            letter: grid[row][col],
+            letter,
             distanceFromCenter,
             cellRadius: Math.min(cellWidth, cellHeight) / 2
         };
@@ -300,6 +304,7 @@ const GridComponent = memo<GridComponentProps>(({
 
         // Store initial touch position for deadzone detection
         const touch = 'touches' in event ? event.touches?.[0] : event;
+        if (!touch) return;
         startPosRef.current = { x: touch.clientX, y: touch.clientY };
 
         // Store start cell for reference
@@ -319,6 +324,7 @@ const GridComponent = memo<GridComponentProps>(({
         if ('cancelable' in e && e.cancelable) e.preventDefault();
 
         const touch = 'touches' in e ? e.touches[0] : e;
+        if (!touch) return;
         const touchX = touch.clientX;
         const touchY = touch.clientY;
 
@@ -736,7 +742,8 @@ const GridComponent = memo<GridComponentProps>(({
             {grid.map((row, i) =>
                 row.map((cell, j) => {
                     const isSelected = selectedCells.some(c => c.row === i && c.col === j);
-                    const isFirstSelected = selectedCells.length > 0 && selectedCells[0].row === i && selectedCells[0].col === j;
+                    const firstSelected = selectedCells[0];
+                    const isFirstSelected = firstSelected !== undefined && firstSelected.row === i && firstSelected.col === j;
                     const isFading = fadingCells.some(c => c.row === i && c.col === j);
                     return (
                         <motion.div

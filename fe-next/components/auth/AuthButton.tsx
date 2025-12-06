@@ -40,7 +40,7 @@ const AuthButton = (): React.ReactElement | null => {
   const [isSigningOut, setIsSigningOut] = useState<boolean>(false);
   const [isLanguageExpanded, setIsLanguageExpanded] = useState<boolean>(false);
 
-  const currentLang = languages.find(l => l.code === language) || languages[0];
+  const currentLang = languages.find(l => l.code === language) ?? languages[0] ?? { code: 'en', flag: '🇺🇸', name: 'English' };
 
   // Don't render if Supabase is not configured
   if (!isSupabaseEnabled) return null;

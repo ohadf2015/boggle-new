@@ -263,6 +263,7 @@ const RoomChat: React.FC<RoomChatProps> = ({ username, isHost, gameCode, classNa
             >
               {virtualizer.getVirtualItems().map((virtualItem) => {
                 const msg = messages[virtualItem.index];
+                if (!msg) return null;
                 const isOwnMessage = msg.username === username || (isHost && msg.isHost);
                 return (
                   <div

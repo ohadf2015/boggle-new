@@ -45,18 +45,24 @@ const searchWordPath = (
   path: GridPosition[]
 ): GridPosition[] | null => {
   if (index === word.length) return [...path];
-  if (row < 0 || row >= board.length || col < 0 || col >= board[0].length) return null;
+  const firstRow = board[0];
+  if (!firstRow || row < 0 || row >= board.length || col < 0 || col >= firstRow.length) return null;
 
   const cellKey = `${row},${col}`;
   if (visited.has(cellKey)) return null;
 
-  const cellNormalized = normalizeHebrewLetter(board[row][col].toLowerCase());
-  if (cellNormalized !== word[index]) return null;
+  const boardRow = board[row];
+  const cell = boardRow?.[col];
+  const targetChar = word[index];
+  if (!cell || !targetChar) return null;
+
+  const cellNormalized = normalizeHebrewLetter(cell.toLowerCase());
+  if (cellNormalized !== targetChar) return null;
 
   visited.add(cellKey);
   path.push({ row, col });
 
-  const directions = [[-1, -1], [-1, 0], [-1, 1], [0, -1], [0, 1], [1, -1], [1, 0], [1, 1]];
+  const directions: [number, number][] = [[-1, -1], [-1, 0], [-1, 1], [0, -1], [0, 1], [1, -1], [1, 0], [1, 1]];
   for (const [dx, dy] of directions) {
     const result = searchWordPath(board, word, row + dx, col + dy, index + 1, visited, path);
     if (result) {
@@ -71,13 +77,19 @@ const searchWordPath = (
 };
 
 const getWordPath = (word: string, board: string[][] | null): GridPosition[] | null => {
-  if (!word || !board || board.length === 0) return null;
+  const firstRow = board?.[0];
+  if (!word || !board || board.length === 0 || !firstRow) return null;
   const wordNormalized = word.toLowerCase().split('').map(normalizeHebrewLetter).join('');
   const firstChar = wordNormalized[0];
+  if (!firstChar) return null;
 
   for (let i = 0; i < board.length; i++) {
-    for (let j = 0; j < board[0].length; j++) {
-      if (normalizeHebrewLetter(board[i][j].toLowerCase()) === firstChar) {
+    const boardRow = board[i];
+    if (!boardRow) continue;
+    for (let j = 0; j < firstRow.length; j++) {
+      const cell = boardRow[j];
+      if (!cell) continue;
+      if (normalizeHebrewLetter(cell.toLowerCase()) === firstChar) {
         const path = searchWordPath(board, wordNormalized, i, j, 0, new Set(), []);
         if (path) return path;
       }

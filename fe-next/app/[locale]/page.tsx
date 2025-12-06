@@ -208,8 +208,9 @@ export default function GamePage(): React.JSX.Element {
         const isPageRefresh = (() => {
           try {
             const navEntries = performance.getEntriesByType('navigation') as PerformanceNavigationTiming[];
-            if (navEntries.length > 0) {
-              return navEntries[0].type === 'reload';
+            const firstEntry = navEntries[0];
+            if (firstEntry) {
+              return firstEntry.type === 'reload';
             }
             // Fallback for older browsers
             return performance.navigation?.type === 1;
