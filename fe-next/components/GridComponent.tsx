@@ -24,8 +24,13 @@ const getPerformanceMode = (): 'full' | 'reduced' | 'minimal' => {
 };
 
 interface CellPosition extends GridPosition {
+  letter: string;
   distanceFromCenter: number;
   cellRadius: number;
+}
+
+interface SelectedCell extends GridPosition {
+  letter: string;
 }
 
 interface HeatMapData {
@@ -37,7 +42,7 @@ interface GridComponentProps {
   grid: LetterGrid;
   interactive?: boolean;
   onWordSubmit?: (word: string) => void;
-  selectedCells?: GridPosition[];
+  selectedCells?: SelectedCell[];
   className?: string;
   largeText?: boolean;
   comboLevel?: number;
@@ -75,7 +80,7 @@ const GridComponent = memo<GridComponentProps>(({
     animateOnMount = false, // When true, adds a slot machine style cascade animation on initial render
     heatMapData = null // { cellUsageCounts: { "row,col": count }, maxCount: number } for results heat map
 }) => {
-    const [internalSelectedCells, setInternalSelectedCells] = useState<GridPosition[]>([]);
+    const [internalSelectedCells, setInternalSelectedCells] = useState<SelectedCell[]>([]);
     const [fadingCells, setFadingCells] = useState<GridPosition[]>([]); // Track cells that are fading out
     const [reduceMotion, setReduceMotion] = useState(false);
     const [performanceMode, setPerformanceMode] = useState<'full' | 'reduced' | 'minimal'>('full');
@@ -85,7 +90,7 @@ const GridComponent = memo<GridComponentProps>(({
     const startPosRef = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
     const hasMovedRef = useRef<boolean>(false);
     const autoSubmitTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-    const startCellRef = useRef<GridPosition | null>(null);
+    const startCellRef = useRef<SelectedCell | null>(null);
     const fadeTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
     // Use external control if provided, otherwise internal state

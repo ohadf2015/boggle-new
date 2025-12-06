@@ -11,7 +11,8 @@ import { cn } from '../../lib/utils';
 import toast from 'react-hot-toast';
 
 interface Achievement {
-  id: string;
+  id?: string;
+  key?: string;
   icon?: string;
   name?: string;
 }

@@ -83,12 +83,21 @@ export interface WordSubmission {
 export interface WordDetail {
   word: string;
   score: number;
-  autoValidated: boolean;
+  validated: boolean;
+  isDuplicate: boolean;
+  autoValidated?: boolean;
   comboBonus?: number;
   comboLevel?: number;
-  validated?: boolean;
   validatedByCommunity?: boolean;
   isBot?: boolean;
+  isAiVerified?: boolean;
+  isPendingValidation?: boolean;
+  potentialScore?: number;
+  invalidReason?: string;
+  aiReason?: string;
+  inDictionary?: boolean;
+  validationSource?: 'dictionary' | 'community' | 'ai' | 'cached' | 'none';
+  isUnique?: boolean;
 }
 
 export interface AiApprovedWord {

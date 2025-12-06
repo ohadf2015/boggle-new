@@ -196,7 +196,7 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, letterGrid, game
 
       if (currentPlayerData) {
         const validWords = currentPlayerData.allWords?.filter(w => w.validated && w.score > 0) || [];
-        const longestValidWord = validWords.reduce((longest, w) =>
+        const longestValidWord = validWords.reduce<string | null>((longest, w) =>
           w.word.length > (longest?.length || 0) ? w.word : longest, null
         );
 
@@ -205,7 +205,7 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, letterGrid, game
           wordCount: validWords.length,
           longestWord: longestValidWord,
           isWinner: isCurrentUserWinner,
-          achievements: currentPlayerData.achievements || []
+          achievements: (currentPlayerData.achievements || []).map(a => a.key || a.name || '')
         });
         hasUpdatedStatsRef.current = true;
       }

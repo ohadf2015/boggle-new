@@ -49,18 +49,30 @@ export type JoinMode = 'join' | 'host';
 
 // ==================== ResultsPage Types ====================
 
+export interface GameAchievement {
+  icon: string;
+  key?: string;
+  name?: string;
+  description?: string;
+}
+
 export interface PlayerResult {
   username: string;
   score: number;
-  avatar: Avatar;
-  isHost: boolean;
+  avatar?: Avatar & { profilePictureUrl?: string };
+  isHost?: boolean;
   allWords?: WordDetail[];
-  achievements?: string[];
+  achievements?: GameAchievement[];
   uniqueWords?: string[];
   invalidWords?: string[];
   wordsFoundCount?: number;
   rank?: number;
   isBot?: boolean;
+  title?: {
+    icon: string;
+    name: string;
+    description: string;
+  };
 }
 
 export interface ResultsPageProps {
@@ -79,21 +91,45 @@ export interface ResultsPageProps {
 }
 
 export interface HeatMapData {
-  grid: number[][];
+  cellUsageCounts: Record<string, number>;
   maxCount: number;
+}
+
+export interface VoteInfo {
+  netScore?: number;
+  totalVotes?: number;
+  votesNeeded?: number;
+  isValidForScoring?: boolean;
+  approvalCount?: number;
+  disapprovalCount?: number;
+  requiredApprovals?: number;
 }
 
 export interface WordToVote {
   word: string;
-  submitter: string;
-  score: number;
+  submittedBy: string;
+  submitterAvatar?: { emoji: string; color: string } | null;
+  voteInfo?: VoteInfo;
+  timeoutSeconds: number;
+  gameCode: string;
+  language: string;
 }
 
 // ==================== XP/Level Types ====================
 
 export interface XpGainedData {
-  totalXp: number;
-  breakdown: {
+  xpEarned: number;
+  xpBreakdown: {
+    gameCompletion: number;
+    scoreXp: number;
+    winBonus: number;
+    achievementXp: number;
+  };
+  newTotalXp: number;
+  newLevel: number;
+  // Legacy properties for backwards compatibility
+  totalXp?: number;
+  breakdown?: {
     gameCompletion: number;
     scoreXp: number;
     winBonus: number;
@@ -104,6 +140,7 @@ export interface XpGainedData {
 export interface LevelUpData {
   oldLevel: number;
   newLevel: number;
+  levelsGained: number;
   newTitles: string[];
 }
 

@@ -44,7 +44,7 @@ interface GameAchievement {
 interface Player {
   username: string;
   score: number;
-  allWords: WordObject[];
+  allWords?: WordObject[];
   achievements?: GameAchievement[];
   avatar?: AvatarType & { profilePictureUrl?: string };
   title?: Title;

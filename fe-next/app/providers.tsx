@@ -12,9 +12,11 @@ import ErrorBoundary from './components/ErrorBoundary';
 import { initUtmCapture } from '@/utils/utmCapture';
 import { composeProviders } from '@/utils/composeProviders';
 
+import type { Language } from '@/shared/types/game';
+
 interface ProvidersProps {
   children: ReactNode;
-  lang: string;
+  lang: Language;
 }
 
 // Initialize UTM capture immediately on module load
