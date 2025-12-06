@@ -22,6 +22,7 @@ const {
 
 const { loadCommunityWords } = require('./modules/communityWordManager');
 const { cleanupEmptyRooms } = require('./modules/gameStateManager');
+const { initRateLimit, resetRateLimit, isIpBlocked, RateLimiter } = require('./utils/rateLimiter');
 const logger = require('./utils/logger');
 
 /**
@@ -48,10 +49,28 @@ function initializeSocketHandlers(io) {
 
   // Handle new connections
   io.on('connection', (socket) => {
-    logger.info('SOCKET', `New connection: ${socket.id}`);
+    const clientIp = RateLimiter.getClientIp(socket);
+
+    // Check if IP is blocked before allowing connection
+    if (isIpBlocked(clientIp)) {
+      logger.warn('SOCKET', `Blocked IP ${clientIp} attempted connection - rejecting`);
+      socket.emit('error', { message: 'Too many requests. Please try again later.' });
+      socket.disconnect(true);
+      return;
+    }
+
+    // Initialize rate limiting for this socket with IP tracking
+    initRateLimit(socket);
+
+    logger.info('SOCKET', `New connection: ${socket.id} from IP: ${clientIp}`);
 
     // Register all event handlers for this socket
     registerAllHandlers(io, socket);
+
+    // Clean up rate limiting on disconnect
+    socket.on('disconnect', () => {
+      resetRateLimit(socket.id);
+    });
   });
 
   logger.info('SOCKET', 'Socket handlers initialized');

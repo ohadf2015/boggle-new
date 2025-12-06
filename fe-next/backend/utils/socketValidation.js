@@ -1,15 +1,20 @@
 /**
  * Socket Event Validation
- * CommonJS bridge for shared Zod schemas
+ * CommonJS bridge for shared Zod schemas with centralized error handling
  *
- * This module imports schemas from the shared TypeScript module and provides
- * CommonJS exports for use in the backend handlers.
+ * This module re-implements schemas from shared/schemas/socketSchemas.ts for
+ * CommonJS compatibility, and integrates with the centralized error handling system.
  *
- * IMPORTANT: All schema definitions live in shared/schemas/socketSchemas.ts
- * Do not add duplicate schemas here - add them to the shared module instead.
+ * Features:
+ * - Zod schema validation for all socket events
+ * - Integration with AppError and ErrorCodes
+ * - Validation middleware for socket handlers
+ * - Detailed error messages with field-level feedback
  */
 
 const { z } = require('zod');
+const { ErrorCodes, AppError, emitError } = require('./errorHandler');
+const logger = require('./logger');
 
 // ==================== Base Schemas ====================
 // Re-implemented in JS for Node.js compatibility (mirrors shared/schemas/socketSchemas.ts)
@@ -247,7 +252,7 @@ const eventSchemas = {
  * Validate a socket event payload against a schema
  * @param {z.ZodSchema} schema - Zod schema to validate against
  * @param {unknown} data - Data to validate
- * @returns {{ success: boolean, data?: any, error?: string }}
+ * @returns {{ success: boolean, data?: any, error?: string, fields?: Object }}
  */
 function validatePayload(schema, data) {
   try {
@@ -255,36 +260,89 @@ function validatePayload(schema, data) {
     if (result.success) {
       return { success: true, data: result.data };
     }
-    // Format Zod error message
-    const errorMessages = result.error.errors
-      .map(e => `${e.path.join('.')}: ${e.message}`)
-      .join(', ');
-    return { success: false, error: errorMessages };
+
+    // Format Zod error message with field details
+    const fields = {};
+    const errorMessages = result.error.errors.map(e => {
+      const path = e.path.join('.');
+      fields[path] = e.message;
+      return `${path}: ${e.message}`;
+    });
+
+    return {
+      success: false,
+      error: errorMessages.join(', '),
+      fields
+    };
   } catch (error) {
     return { success: false, error: error.message || 'Validation failed' };
   }
 }
 
 /**
- * Create a validated event handler wrapper
- * @param {z.ZodSchema} schema - Zod schema for validation
- * @param {Function} handler - Event handler function
+ * Validate and emit error if validation fails (integrated with error handler)
+ * @param {z.ZodSchema} schema - Zod schema to validate against
+ * @param {unknown} data - Data to validate
  * @param {Socket} socket - Socket for error emission
+ * @param {string} eventName - Event name for logging
+ * @returns {{ success: boolean, data?: any }}
+ */
+function validateWithError(schema, data, socket, eventName = 'unknown') {
+  const result = validatePayload(schema, data);
+
+  if (!result.success) {
+    logger.debug('VALIDATION', `Validation failed for ${eventName}`, {
+      error: result.error,
+      fields: result.fields
+    });
+
+    emitError(socket, ErrorCodes.VALIDATION_INVALID_PAYLOAD, {
+      message: `Invalid ${eventName} payload: ${result.error}`,
+      details: result.fields
+    });
+
+    return { success: false };
+  }
+
+  return { success: true, data: result.data };
+}
+
+/**
+ * Create a validated event handler wrapper with error handling
+ * @param {z.ZodSchema} schema - Zod schema for validation
+ * @param {Function} handler - Event handler function (receives validated data)
+ * @param {Socket} socket - Socket for error emission
+ * @param {string} eventName - Event name for logging
  * @returns {Function} - Wrapped handler with validation
  */
-function withValidation(schema, handler, socket) {
+function withValidation(schema, handler, socket, eventName = 'unknown') {
   return async (data) => {
-    const result = validatePayload(schema, data);
+    const result = validateWithError(schema, data, socket, eventName);
     if (!result.success) {
-      if (socket && typeof socket.emit === 'function') {
-        socket.emit('error', {
-          message: `Invalid payload: ${result.error}`,
-          code: 'VALIDATION_ERROR'
-        });
-      }
       return;
     }
     return handler(result.data);
+  };
+}
+
+/**
+ * Create a validation middleware for socket events
+ * Returns a function that validates input and calls the handler if valid
+ * @param {string} eventName - Name of the socket event
+ * @returns {Function} - Middleware function
+ */
+function createValidationMiddleware(eventName) {
+  const schema = eventSchemas[eventName];
+  if (!schema) {
+    logger.warn('VALIDATION', `No schema found for event: ${eventName}`);
+    return (socket, data, handler) => handler(data);
+  }
+
+  return (socket, data, handler) => {
+    const result = validateWithError(schema, data, socket, eventName);
+    if (result.success) {
+      return handler(result.data);
+    }
   };
 }
 
@@ -295,6 +353,28 @@ function withValidation(schema, handler, socket) {
  */
 function getEventSchema(eventName) {
   return eventSchemas[eventName] || null;
+}
+
+/**
+ * Check if an event has a registered schema
+ * @param {string} eventName - Name of the socket event
+ * @returns {boolean}
+ */
+function hasSchema(eventName) {
+  return eventName in eventSchemas;
+}
+
+/**
+ * Create a validation error (AppError)
+ * @param {string} message - Error message
+ * @param {Object} fields - Field-level errors
+ * @returns {AppError}
+ */
+function createValidationError(message, fields) {
+  return new AppError(ErrorCodes.VALIDATION_FAILED, {
+    message,
+    details: fields
+  });
 }
 
 // ==================== Module Exports ====================
@@ -341,6 +421,10 @@ module.exports = {
 
   // Validation utilities
   validatePayload,
+  validateWithError,
   withValidation,
+  createValidationMiddleware,
   getEventSchema,
+  hasSchema,
+  createValidationError,
 };
