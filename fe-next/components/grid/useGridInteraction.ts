@@ -14,7 +14,7 @@ interface UseGridInteractionProps {
   comboLevel: number;
   onWordSubmit?: (word: string) => void;
   externalSelectedCells?: SelectedCell[];
-  gridRef: React.RefObject<HTMLDivElement>;
+  gridRef: React.RefObject<HTMLDivElement | null>;
 }
 
 interface UseGridInteractionReturn {
