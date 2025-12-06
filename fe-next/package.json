@@ -4,7 +4,8 @@
   "private": true,
   "scripts": {
     "dev": "node server.js",
-    "build": "next build",
+    "build": "npm run build:schemas && next build",
+    "build:schemas": "tsc --project backend/tsconfig.schemas.json",
     "start": "node server.js",
     "lint": "eslint",
     "test": "npm run test:backend && npm run test:frontend",

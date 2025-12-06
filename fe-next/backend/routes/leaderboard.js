@@ -1,12 +1,16 @@
 /**
  * Leaderboard API Routes
  * Handles /api/leaderboard/* endpoints
+ *
+ * Features request coalescing to prevent thundering herd problems
+ * when cache expires and multiple requests hit simultaneously.
  */
 
 const express = require('express');
 const router = express.Router();
 const { getSupabase, isSupabaseConfigured } = require('../modules/supabaseServer');
 const { getCachedLeaderboardTop100, cacheLeaderboardTop100, getCachedUserRank, cacheUserRank } = require('../redisClient');
+const { coalesce } = require('../utils/requestCoalescing');
 const logger = require('../utils/logger');
 
 /**
@@ -25,25 +29,36 @@ router.get('/', async (_req, res) => {
       return res.json({ data: cached, cached: true });
     }
 
-    // Fetch from Supabase
-    const supabase = getSupabase();
-    const { data, error } = await supabase
-      .from('leaderboard')
-      .select('player_id, username, avatar_emoji, avatar_color, total_score, games_played, games_won, ranked_mmr')
-      .order('total_score', { ascending: false })
-      .limit(100);
+    // Use request coalescing to prevent thundering herd when cache expires
+    // Multiple simultaneous requests will share a single database fetch
+    const result = await coalesce('leaderboard:top100', async () => {
+      // Double-check cache in case another request just populated it
+      const recheck = await getCachedLeaderboardTop100();
+      if (recheck) {
+        return { data: recheck, cached: true, coalesced: true };
+      }
 
-    if (error) {
-      logger.error('API', `Leaderboard fetch error: ${error.message}`);
-      return res.status(500).json({ error: 'Failed to fetch leaderboard' });
-    }
+      // Fetch from Supabase
+      const supabase = getSupabase();
+      const { data, error } = await supabase
+        .from('leaderboard')
+        .select('player_id, username, avatar_emoji, avatar_color, total_score, games_played, games_won, ranked_mmr')
+        .order('total_score', { ascending: false })
+        .limit(100);
 
-    // Cache the result
-    if (data) {
-      await cacheLeaderboardTop100(data);
-    }
+      if (error) {
+        throw new Error(`Leaderboard fetch error: ${error.message}`);
+      }
 
-    res.json({ data: data || [], cached: false });
+      // Cache the result
+      if (data) {
+        await cacheLeaderboardTop100(data);
+      }
+
+      return { data: data || [], cached: false };
+    });
+
+    res.json(result);
   } catch (error) {
     logger.error('API', `Leaderboard error: ${error.message}`);
     res.status(500).json({ error: 'Internal server error' });
@@ -71,41 +86,55 @@ router.get('/rank/:userId', async (req, res) => {
       return res.json({ data: cached, cached: true });
     }
 
-    // Fetch from Supabase
-    const supabase = getSupabase();
+    // Use request coalescing per userId to prevent duplicate fetches
+    const result = await coalesce(`leaderboard:rank:${userId}`, async () => {
+      // Double-check cache
+      const recheck = await getCachedUserRank(userId);
+      if (recheck) {
+        return { data: recheck, cached: true, coalesced: true };
+      }
 
-    // First get the user's total score
-    const { data: userData, error: userError } = await supabase
-      .from('leaderboard')
-      .select('player_id, username, total_score, games_played')
-      .eq('player_id', userId)
-      .single();
+      // Fetch from Supabase
+      const supabase = getSupabase();
 
-    if (userError || !userData) {
-      return res.status(404).json({ error: 'User not found in leaderboard' });
-    }
+      // First get the user's total score
+      const { data: userData, error: userError } = await supabase
+        .from('leaderboard')
+        .select('player_id, username, total_score, games_played')
+        .eq('player_id', userId)
+        .single();
 
-    // Count how many users have a higher score to get rank
-    const { count, error: countError } = await supabase
-      .from('leaderboard')
-      .select('*', { count: 'exact', head: true })
-      .gt('total_score', userData.total_score);
+      if (userError || !userData) {
+        throw { status: 404, message: 'User not found in leaderboard' };
+      }
 
-    if (countError) {
-      logger.error('API', `Rank count error: ${countError.message}`);
-      return res.status(500).json({ error: 'Failed to calculate rank' });
-    }
+      // Count how many users have a higher score to get rank
+      const { count, error: countError } = await supabase
+        .from('leaderboard')
+        .select('*', { count: 'exact', head: true })
+        .gt('total_score', userData.total_score);
 
-    const rankData = {
-      ...userData,
-      rank_position: (count || 0) + 1
-    };
+      if (countError) {
+        throw new Error(`Rank count error: ${countError.message}`);
+      }
 
-    // Cache the result
-    await cacheUserRank(userId, rankData);
+      const rankData = {
+        ...userData,
+        rank_position: (count || 0) + 1
+      };
 
-    res.json({ data: rankData, cached: false });
+      // Cache the result
+      await cacheUserRank(userId, rankData);
+
+      return { data: rankData, cached: false };
+    });
+
+    res.json(result);
   } catch (error) {
+    // Handle custom error with status
+    if (error.status) {
+      return res.status(error.status).json({ error: error.message });
+    }
     logger.error('API', `User rank error: ${error.message}`);
     res.status(500).json({ error: 'Internal server error' });
   }
