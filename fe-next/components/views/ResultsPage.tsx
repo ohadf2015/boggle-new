@@ -4,30 +4,30 @@ import React, { useMemo, useEffect, useState, useCallback, useRef } from 'react'
 import dynamic from 'next/dynamic';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FaTrophy, FaStar, FaFire, FaChartBar, FaDoorOpen } from 'react-icons/fa';
-import ExitRoomButton from './components/ExitRoomButton';
+import ExitRoomButton from '@/components/ExitRoomButton';
 import confetti from 'canvas-confetti';
-import { useLanguage } from './contexts/LanguageContext';
-import { useAuth } from './contexts/AuthContext';
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from './components/ui/alert-dialog';
-import { clearSessionPreservingUsername } from './utils/session';
-import { shouldShowUpgradePrompt, getGuestStatsSummary, updateGuestStatsAfterGame, isFirstWin } from './utils/guestManager';
-import { useWinStreak } from './hooks/useWinStreak';
-import { trackGameCompletion, trackStreakMilestone } from './utils/growthTracking';
-import logger from './utils/logger';
-import { levelUpToast } from './components/NeoToast';
-import type { ResultsPageProps, HeatMapData, WordToVote, XpGainedData, LevelUpData, GridPosition } from './types/components';
-import type { LetterGrid as LetterGridType } from './shared/types/game';
+import { useLanguage } from '@/contexts/LanguageContext';
+import { useAuth } from '@/contexts/AuthContext';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
+import { clearSessionPreservingUsername } from '@/utils/session';
+import { shouldShowUpgradePrompt, getGuestStatsSummary, updateGuestStatsAfterGame, isFirstWin } from '@/utils/guestManager';
+import { useWinStreak } from '@/hooks/useWinStreak';
+import { trackGameCompletion, trackStreakMilestone } from '@/utils/growthTracking';
+import logger from '@/utils/logger';
+import { levelUpToast } from '@/components/NeoToast';
+import type { ResultsPageProps, HeatMapData, WordToVote, XpGainedData, LevelUpData, GridPosition } from '@/types/components';
+import type { LetterGrid as LetterGridType } from '@/shared/types/game';
 
 // Dynamic imports for heavy components (loaded after initial render)
-const GridComponent = dynamic(() => import('./components/GridComponent'), { ssr: false });
-const ResultsPlayerCard = dynamic(() => import('./components/results/ResultsPlayerCard'), { ssr: false });
-const ResultsWinnerBanner = dynamic(() => import('./components/results/ResultsWinnerBanner'), { ssr: false });
-const AuthModal = dynamic(() => import('./components/auth/AuthModal'), { ssr: false });
-const FirstWinSignupModal = dynamic(() => import('./components/auth/FirstWinSignupModal'), { ssr: false });
-const ShareWinPrompt = dynamic(() => import('./components/results/ShareWinPrompt'), { ssr: false });
-const WinStreakDisplay = dynamic(() => import('./components/results/WinStreakDisplay'), { ssr: false });
-const WordFeedbackModal = dynamic(() => import('./components/voting/WordFeedbackModal'), { ssr: false });
-const AutoRejoinTimer = dynamic(() => import('./components/results/AutoRejoinTimer'), { ssr: false });
+const GridComponent = dynamic(() => import('@/components/GridComponent'), { ssr: false });
+const ResultsPlayerCard = dynamic(() => import('@/components/results/ResultsPlayerCard'), { ssr: false });
+const ResultsWinnerBanner = dynamic(() => import('@/components/results/ResultsWinnerBanner'), { ssr: false });
+const AuthModal = dynamic(() => import('@/components/auth/AuthModal'), { ssr: false });
+const FirstWinSignupModal = dynamic(() => import('@/components/auth/FirstWinSignupModal'), { ssr: false });
+const ShareWinPrompt = dynamic(() => import('@/components/results/ShareWinPrompt'), { ssr: false });
+const WinStreakDisplay = dynamic(() => import('@/components/results/WinStreakDisplay'), { ssr: false });
+const WordFeedbackModal = dynamic(() => import('@/components/voting/WordFeedbackModal'), { ssr: false });
+const AutoRejoinTimer = dynamic(() => import('@/components/results/AutoRejoinTimer'), { ssr: false });
 
 // Helper functions for finding word paths on the board (client-side version)
 const normalizeHebrewLetter = (letter: string): string => {
@@ -157,7 +157,7 @@ const LetterGrid: React.FC<LetterGridProps> = ({ letterGrid, heatMapData, showHe
   );
 };
 
-const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, letterGrid, gameCode, onReturnToRoom, username, socket }) => {
+const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, letterGrid, gameCode, onReturnToRoom, username, socket, achievements }) => {
   const { t } = useLanguage();
   const { isAuthenticated } = useAuth();
   const [showExitConfirm, setShowExitConfirm] = useState<boolean>(false);
@@ -217,12 +217,14 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, letterGrid, game
           wordCount: validWords.length,
           longestWord: longestValidWord ?? undefined,
           isWinner: isCurrentUserWinner,
-          achievements: (currentPlayerData.achievements || []).map(a => a.key || a.name || '')
+          achievements: (currentPlayerData.achievements || achievements || []).map(a =>
+            typeof a === 'string' ? a : (a.key || a.name || '')
+          )
         });
         hasUpdatedStatsRef.current = true;
       }
     }
-  }, [isAuthenticated, finalScores, username, isCurrentUserWinner]);
+  }, [isAuthenticated, finalScores, username, isCurrentUserWinner, achievements]);
 
   // Track game completion and record win streak (only once)
   useEffect(() => {
@@ -474,7 +476,7 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, letterGrid, game
       socket.off('xpGained', handleXpGained);
       socket.off('levelUp', handleLevelUp);
     };
-  }, [socket]);
+  }, [socket, t]);
 
   // Handle word feedback vote (supports multi-word queue from self-healing system)
   const handleVote = useCallback((voteType: 'like' | 'dislike', votedWord?: string) => {
@@ -615,7 +617,7 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, letterGrid, game
                 username={username}
                 score={currentPlayerData.score || 0}
                 wordCount={currentPlayerData.allWords?.filter(w => w.validated && w.score > 0).length || 0}
-                achievements={currentPlayerData.achievements || []}
+                achievements={currentPlayerData.achievements || achievements || []}
                 gameCode={gameCode}
                 streakDays={isCurrentUserWinner ? currentStreak : 0}
                 compact={!isCurrentUserWinner}
