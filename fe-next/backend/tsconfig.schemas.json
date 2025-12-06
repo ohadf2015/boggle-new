@@ -24,8 +24,10 @@
   },
   "include": [
     "./utils/schemas.ts",
+    "./modules/scoringEngine.ts",
     "../shared/schemas/*.ts",
-    "../shared/types/*.ts"
+    "../shared/types/*.ts",
+    "../shared/stateMachines/*.ts"
   ],
   "exclude": [
     "node_modules",

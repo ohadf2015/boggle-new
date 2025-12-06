@@ -458,13 +458,123 @@ function removePeerRejectedWordScore(gameCode, word, submitter) {
 // Game State Operations
 // ==========================================
 
+// Import state machine utilities
+const { canTransition, transition, getValidEvents } = require('../utils/gameStateMachine');
+
+/**
+ * Safely transition game state using state machine guards
+ * Prevents invalid state transitions like 'waiting' -> 'finished'
+ *
+ * @param {string} gameCode - Game code
+ * @param {string} eventType - Event type (START, END, TIMEOUT, VALIDATE, RESET, etc.)
+ * @param {object} options - Additional options
+ * @param {boolean} options.immediate - Whether to persist immediately (default: false)
+ * @returns {{ success: boolean, previousState: string|null, newState: string|null, error?: string }}
+ */
+function transitionGameState(gameCode, eventType, options = {}) {
+  const game = games[gameCode];
+  if (!game) {
+    return {
+      success: false,
+      previousState: null,
+      newState: null,
+      error: `Game ${gameCode} not found`,
+    };
+  }
+
+  const currentState = game.gameState;
+  const result = transition(currentState, eventType);
+
+  if (!result.success) {
+    logger.warn('GAME_STATE', `Invalid transition for ${gameCode}: ${currentState} -> ${eventType}`);
+    return {
+      success: false,
+      previousState: currentState,
+      newState: null,
+      error: result.error,
+    };
+  }
+
+  // Apply the transition
+  game.gameState = result.newState;
+  game.lastActivity = Date.now();
+
+  logger.info('GAME_STATE', `Game ${gameCode}: ${currentState} -> ${result.newState} (${eventType})`);
+
+  // Persist to Redis
+  if (options.immediate) {
+    persistGameStateNow(gameCode);
+  } else {
+    persistGameState(gameCode);
+  }
+
+  return {
+    success: true,
+    previousState: currentState,
+    newState: result.newState,
+  };
+}
+
+/**
+ * Check if a state transition is valid without performing it
+ * @param {string} gameCode - Game code
+ * @param {string} eventType - Event type to check
+ * @returns {boolean} True if transition would be valid
+ */
+function canTransitionGameState(gameCode, eventType) {
+  const game = games[gameCode];
+  if (!game) return false;
+  return canTransition(game.gameState, eventType);
+}
+
+/**
+ * Get valid events for the current game state
+ * @param {string} gameCode - Game code
+ * @returns {string[]} Array of valid event types
+ */
+function getValidGameEvents(gameCode) {
+  const game = games[gameCode];
+  if (!game) return [];
+  return getValidEvents(game.gameState);
+}
+
 /**
  * Reset game state for a new round
+ * Uses state machine to ensure valid transition
  * @param {string} gameCode - Game code
+ * @returns {boolean} True if reset succeeded
  */
 function resetGameForNewRound(gameCode) {
   const game = games[gameCode];
-  if (!game) return;
+  if (!game) return false;
+
+  // Try to transition to waiting state
+  // Accept RESET from 'finished' or SKIP_VALIDATION from 'finished'
+  let transitionSuccess = false;
+  const currentState = game.gameState;
+
+  if (currentState === 'finished') {
+    const result = transition(currentState, 'RESET');
+    transitionSuccess = result.success;
+    if (result.success) {
+      game.gameState = result.newState;
+    }
+  } else if (currentState === 'validating') {
+    const result = transition(currentState, 'VALIDATION_COMPLETE');
+    transitionSuccess = result.success;
+    if (result.success) {
+      game.gameState = result.newState;
+    }
+  } else if (currentState === 'waiting') {
+    // Already in waiting, no transition needed
+    transitionSuccess = true;
+  } else {
+    // For 'in-progress', we need to end first then reset
+    // This shouldn't happen normally, but handle it gracefully
+    logger.warn('GAME_STATE', `Reset called in unexpected state: ${currentState}`);
+    game.gameState = 'waiting';
+    transitionSuccess = true;
+  }
 
   // Reset scores using scoreManager
   scoreManager.resetScoresForNewRound(game);
@@ -472,9 +582,13 @@ function resetGameForNewRound(gameCode) {
   // Reset peer validation
   peerValidationManager.resetPeerValidation(game);
 
-  game.gameState = 'waiting';
   game.letterGrid = null;
   game.lastActivity = Date.now();
+
+  // Persist the change
+  persistGameState(gameCode);
+
+  return transitionSuccess;
 }
 
 // ==========================================
@@ -686,7 +800,10 @@ module.exports = {
   isHost,
   updateHostSocketId,
 
-  // Game state
+  // Game state transitions (state machine)
+  transitionGameState,
+  canTransitionGameState,
+  getValidGameEvents,
   resetGameForNewRound,
 
   // Player data (from scoreManager)
