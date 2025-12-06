@@ -53,6 +53,7 @@ export interface Achievement {
   id: string;
   name: string;
   description: string;
+  icon: string;
   unlockedAt: string;
   tier?: 'bronze' | 'silver' | 'gold';
 }

@@ -16,7 +16,7 @@ import { useAchievementQueue } from '../components/achievements';
 import { DIFFICULTIES, DEFAULT_DIFFICULTY, DEFAULT_MIN_WORD_LENGTH } from '../utils/consts';
 import { usePresence } from '../hooks/usePresence';
 import logger from '@/utils/logger';
-import type { LetterGrid, Language, DifficultyLevel, Avatar, WordDetail, LeaderboardEntry } from '@/types';
+import type { LetterGrid, Language, DifficultyLevel, Avatar, WordDetail, LeaderboardEntry, PlayerResult } from '@/types';
 
 // Extracted components
 import HostPreGameView from './components/HostPreGameView';
@@ -469,8 +469,8 @@ const HostView: React.FC<HostViewProps> = memo(({
       <FinalScoresModal
         open={!!finalScores}
         onOpenChange={() => setFinalScores(null)}
-        finalScores={finalScores}
-        tournamentData={tournamentData}
+        finalScores={(finalScores?.players ?? []) as unknown as PlayerResult[]}
+        tournamentData={tournamentData as Parameters<typeof FinalScoresModal>[0]['tournamentData']}
         username={username}
         t={t}
         onStartNewGame={handleStartNewGame}
