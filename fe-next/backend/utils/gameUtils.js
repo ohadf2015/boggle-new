@@ -3,20 +3,18 @@
  * CommonJS version of frontend utils for use in backend handlers
  */
 
-// ==========================================
-// Constants
-// ==========================================
+// Import shared constants
+const {
+  AVATAR_COLORS,
+  AVATAR_EMOJIS,
+  DIFFICULTIES,
+  DEFAULT_DIFFICULTY,
+  generateRandomAvatar
+} = require('./consts');
 
-const AVATAR_COLORS = [
-  '#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEAA7',
-  '#DDA0DD', '#98D8C8', '#F7DC6F', '#BB8FCE', '#85C1E9',
-  '#F8B500', '#00CED1', '#FF69B4', '#32CD32', '#FF4500'
-];
-
-const AVATAR_EMOJIS = [
-  '😀', '😎', '🤓', '🧐', '🤠', '👻', '🤖', '👽', '🦊', '🐱',
-  '🐶', '🦁', '🐯', '🐻', '🐼', '🐨', '🦄', '🐲', '🦋', '🌟'
-];
+// ==========================================
+// Letter Constants (language-specific)
+// ==========================================
 
 const hebrewLetters = [
   "א", "ב", "ג", "ד", "ה", "ו", "ז", "ח", "ט", "י",
@@ -49,13 +47,7 @@ const kanjiCompounds = [
   "父母", "兄弟", "友人", "王国", "天地", "山川", "海空"
 ];
 
-const DIFFICULTIES = {
-  EASY: { rows: 4, cols: 4 },
-  MEDIUM: { rows: 5, cols: 5 },
-  HARD: { rows: 6, cols: 6 }
-};
-
-const DEFAULT_DIFFICULTY = 'MEDIUM';
+// Note: DIFFICULTIES and DEFAULT_DIFFICULTY are imported from consts.js
 
 // Valid Hebrew letters set for filtering
 const validHebrewLettersSet = new Set([
@@ -68,16 +60,7 @@ const validHebrewLettersSet = new Set([
 // Utility Functions
 // ==========================================
 
-/**
- * Generate a random avatar with emoji and color
- * @returns {{ emoji: string, color: string }}
- */
-function generateRandomAvatar() {
-  return {
-    color: AVATAR_COLORS[Math.floor(Math.random() * AVATAR_COLORS.length)],
-    emoji: AVATAR_EMOJIS[Math.floor(Math.random() * AVATAR_EMOJIS.length)]
-  };
-}
+// Note: generateRandomAvatar is imported from consts.js
 
 /**
  * Generate a random 4-digit room code
