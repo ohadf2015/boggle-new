@@ -104,8 +104,8 @@ export const wordAcceptedToast = (word: string, options: WordAcceptedOptions = {
             <span className="font-black uppercase tracking-wide text-neo-black">
               {word}
             </span>
-            {/* Show score if provided */}
-            {typeof score === 'number' && (
+            {/* Show score if provided and greater than 0 */}
+            {typeof score === 'number' && score > 0 && (
               <motion.span
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }}

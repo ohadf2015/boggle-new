@@ -115,7 +115,7 @@ const submitWordSchema = compiledSchemas?.submitWordSchema || z.object({
 const submitWordVoteSchema = compiledSchemas?.submitWordVoteSchema || z.object({
   gameCode: gameCodeSchema.optional(),
   word: wordSchema,
-  voteType: z.enum(['valid', 'invalid']).optional(),
+  voteType: z.enum(['like', 'dislike']).optional(),
   isValid: z.boolean().optional(),
   language: languageSchema.optional(),
   submittedBy: usernameSchema.optional(),

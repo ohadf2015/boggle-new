@@ -313,7 +313,8 @@ async function calculateAndBroadcastFinalScores(io, gameCode) {
             aiValidatedWords.set(result.word, {
               isValid: result.isValid,
               isAiVerified: true,
-              confidence: result.confidence
+              confidence: result.confidence,
+              reason: result.reason // Include AI's reason for validation/rejection
             });
           }
         } catch (err) {
