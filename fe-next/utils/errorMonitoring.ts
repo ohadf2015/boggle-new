@@ -298,7 +298,9 @@ export function trackEvent(
 
   if (IS_PRODUCTION && isInitialized && LOGROCKET_APP_ID) {
     try {
-      LogRocket.track(eventName, data);
+      // Cast to LogRocket's expected type - values should be primitives or arrays of primitives
+      const trackData = data as { [key: string]: string | number | boolean | string[] | number[] | boolean[] | undefined | null };
+      LogRocket.track(eventName, trackData);
     } catch (error) {
       console.error('[ErrorMonitoring] Failed to track event:', error);
     }
