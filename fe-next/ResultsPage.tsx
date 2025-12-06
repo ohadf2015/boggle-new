@@ -196,14 +196,14 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, letterGrid, game
 
       if (currentPlayerData) {
         const validWords = currentPlayerData.allWords?.filter(w => w.validated && w.score > 0) || [];
-        const longestValidWord = validWords.reduce<string | null>((longest, w) =>
-          w.word.length > (longest?.length || 0) ? w.word : longest, null
+        const longestValidWord = validWords.reduce<string | undefined>((longest, w) =>
+          w.word.length > (longest?.length || 0) ? w.word : longest, undefined
         );
 
         updateGuestStatsAfterGame({
           score: typeof currentPlayerData.score === 'number' ? currentPlayerData.score : 0,
           wordCount: validWords.length,
-          longestWord: longestValidWord,
+          longestWord: longestValidWord ?? undefined,
           isWinner: isCurrentUserWinner,
           achievements: (currentPlayerData.achievements || []).map(a => a.key || a.name || '')
         });
@@ -305,11 +305,35 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, letterGrid, game
   };
 
   // Create a map of all player words for duplicate detection
+  // Using 'any' here as the exact WordObject type varies between components
   const allPlayerWords = useMemo(() => {
-    const wordMap: Record<string, Array<{ word: string; validated?: boolean; score?: number }>> = {};
+    const wordMap: Record<string, Array<{
+      word: string;
+      score: number;
+      validated: boolean;
+      isDuplicate: boolean;
+      comboBonus?: number;
+      isAiVerified?: boolean;
+      isPendingValidation?: boolean;
+      potentialScore?: number;
+      invalidReason?: string;
+      aiReason?: string;
+    }>> = {};
     if (finalScores) {
       finalScores.forEach(player => {
-        wordMap[player.username] = player.allWords || [];
+        // Map allWords with required fields, defaulting isDuplicate to false
+        wordMap[player.username] = (player.allWords || []).map(w => ({
+          word: w.word,
+          score: w.score ?? 0,
+          validated: w.validated ?? false,
+          isDuplicate: (w as { isDuplicate?: boolean }).isDuplicate ?? false,
+          comboBonus: (w as { comboBonus?: number }).comboBonus,
+          isAiVerified: (w as { isAiVerified?: boolean }).isAiVerified,
+          isPendingValidation: (w as { isPendingValidation?: boolean }).isPendingValidation,
+          potentialScore: (w as { potentialScore?: number }).potentialScore,
+          invalidReason: (w as { invalidReason?: string }).invalidReason,
+          aiReason: (w as { aiReason?: string }).aiReason,
+        }));
       });
     }
     return wordMap;
@@ -366,7 +390,7 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, letterGrid, game
       word: string;
       submittedBy: string;
       submitterAvatar?: { emoji: string; color: string } | null;
-      voteInfo?: { votesFor: number; votesAgainst: number };
+      voteInfo?: { votesFor?: number; votesAgainst?: number; approvalCount?: number; disapprovalCount?: number };
       timeoutSeconds?: number;
       gameCode: string;
       language: string;
@@ -380,11 +404,17 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, letterGrid, game
         logger.log('[RESULTS] Word queue with', data.wordQueue.length, 'words for voting');
       }
 
+      // Transform voteInfo to match expected VoteInfo interface
+      const transformedVoteInfo = data.voteInfo ? {
+        approvalCount: data.voteInfo.votesFor ?? data.voteInfo.approvalCount,
+        disapprovalCount: data.voteInfo.votesAgainst ?? data.voteInfo.disapprovalCount
+      } : undefined;
+
       setWordToVote({
         word: data.word,
         submittedBy: data.submittedBy,
         submitterAvatar: data.submitterAvatar,
-        voteInfo: data.voteInfo,
+        voteInfo: transformedVoteInfo,
         timeoutSeconds: data.timeoutSeconds || 10,
         gameCode: data.gameCode,
         language: data.language
@@ -435,18 +465,21 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, letterGrid, game
   }, [socket]);
 
   // Handle word feedback vote (supports multi-word queue from self-healing system)
-  const handleVote = useCallback((voteType: 'valid' | 'invalid', votedWord?: string) => {
+  const handleVote = useCallback((voteType: 'like' | 'dislike', votedWord?: string) => {
     if (!socket || !wordToVote) return;
 
     // Use the specific word being voted on, or fall back to current word
     const wordToSubmit = votedWord || wordToVote.word;
 
-    logger.log('[RESULTS] Submitting vote:', { word: wordToSubmit, voteType });
+    // Map 'like'/'dislike' to 'valid'/'invalid' for backend
+    const backendVoteType = voteType === 'like' ? 'valid' : 'invalid';
+
+    logger.log('[RESULTS] Submitting vote:', { word: wordToSubmit, voteType: backendVoteType });
     socket.emit('submitWordVote', {
       word: wordToSubmit,
       language: wordToVote.language,
       gameCode: wordToVote.gameCode,
-      voteType,
+      voteType: backendVoteType,
       submittedBy: wordToVote.submittedBy
     });
 
@@ -684,9 +717,12 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, letterGrid, game
         isOpen={showWordFeedback && wordToVote !== null}
         word={wordToVote?.word || ''}
         submittedBy={wordToVote?.submittedBy || ''}
-        submitterAvatar={wordToVote?.submitterAvatar}
+        submitterAvatar={wordToVote?.submitterAvatar ?? undefined}
         voteInfo={wordToVote?.voteInfo}
-        wordQueue={wordQueue}
+        wordQueue={wordQueue.map(w => ({
+          ...w,
+          submitterAvatar: w.submitterAvatar ?? undefined
+        }))}
         timeoutSeconds={wordToVote?.timeoutSeconds || 15}
         onVote={handleVote}
         onSkip={handleFeedbackSkip}

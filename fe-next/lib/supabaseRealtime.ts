@@ -116,7 +116,7 @@ function getOrCreateLeaderboardChannel(): RealtimeChannel | null {
           setTimeout(() => {
             // Remove and recreate channel
             activeSubscriptions.delete(channelName);
-            supabase.removeChannel(channel);
+            supabase?.removeChannel(channel);
             getOrCreateLeaderboardChannel();
           }, delay);
         } else {
@@ -173,7 +173,7 @@ export function subscribeToLeaderboard(
       const channelName = 'leaderboard-shared';
       const existingChannel = activeSubscriptions.get(channelName);
       if (existingChannel && supabase) {
-        supabase.removeChannel(existingChannel);
+        supabase?.removeChannel(existingChannel);
         activeSubscriptions.delete(channelName);
       }
     }
@@ -202,7 +202,7 @@ export function subscribeToProfile(
     return () => {
       const existing = activeSubscriptions.get(channelName);
       if (existing) {
-        supabase.removeChannel(existing);
+        supabase?.removeChannel(existing);
         activeSubscriptions.delete(channelName);
       }
     };
@@ -231,7 +231,7 @@ export function subscribeToProfile(
 
   return () => {
     logger.log('[Realtime] Unsubscribing from profile');
-    supabase.removeChannel(channel);
+    supabase?.removeChannel(channel);
     activeSubscriptions.delete(channelName);
   };
 }
@@ -272,7 +272,7 @@ export function subscribeToGameResults(
   activeSubscriptions.set(channelName, channel);
 
   return () => {
-    supabase.removeChannel(channel);
+    supabase?.removeChannel(channel);
     activeSubscriptions.delete(channelName);
   };
 }
@@ -348,7 +348,7 @@ export function createGameRoomChannel(
       return channel.untrack();
     },
     unsubscribe: () => {
-      supabase.removeChannel(channel);
+      supabase?.removeChannel(channel);
       activeSubscriptions.delete(channelName);
     }
   };

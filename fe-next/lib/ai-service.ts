@@ -290,7 +290,7 @@ class GameAIService {
       const { error: updateError } = await this.supabaseAdmin
         .from('community_words')
         .update({
-          approval_count: this.supabaseAdmin.rpc ? undefined : 1, // Will be incremented via raw SQL if needed
+          approval_count: typeof this.supabaseAdmin.rpc === 'function' ? undefined : 1, // Will be incremented via raw SQL if needed
           last_approved_at: now,
         })
         .eq('word', word)

@@ -627,7 +627,7 @@ const ShareWinPrompt: React.FC<ShareWinPromptProps> = ({
           </motion.button>
 
           {/* Native share button (mobile) */}
-          {typeof navigator !== 'undefined' && navigator.share && (
+          {typeof navigator !== 'undefined' && typeof navigator.share === 'function' && (
             <motion.button
               whileHover={{ scale: 1.03, y: -2 }}
               whileTap={{ scale: 0.97 }}

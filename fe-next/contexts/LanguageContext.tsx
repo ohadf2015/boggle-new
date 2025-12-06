@@ -175,7 +175,8 @@ export const LanguageProvider = ({ children, initialLanguage }: LanguageProvider
 
     const t = (path: string, params: Record<string, string | number> = {}): string => {
         const keys = path.split('.');
-        let current: unknown = translations[language] || translations['he']; // Fallback to Hebrew if language is invalid
+        // Use type assertion since Language type may include values not in translations
+        let current: unknown = (translations as Record<string, unknown>)[language] || translations['he']; // Fallback to Hebrew if language is invalid
 
         if (!current) {
             logger.warn(`Translation missing for language: ${language}`);
@@ -210,8 +211,8 @@ export const LanguageProvider = ({ children, initialLanguage }: LanguageProvider
         language,
         setLanguage,
         t,
-        dir: (translations[language] as { direction?: 'rtl' | 'ltr' })?.direction || 'rtl',
-        currentFlag: (translations[language] as { flag?: string })?.flag || '🇮🇱'
+        dir: ((translations as Record<string, { direction?: 'rtl' | 'ltr' }>)[language])?.direction || 'rtl',
+        currentFlag: ((translations as Record<string, { flag?: string }>)[language])?.flag || '🇮🇱'
     };
 
     return (

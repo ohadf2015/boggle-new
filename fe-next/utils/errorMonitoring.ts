@@ -125,7 +125,7 @@ export function identifyUser(user: UserIdentity): void {
     try {
       LogRocket.identify(user.id, {
         name: user.name || 'Anonymous',
-        email: user.email,
+        ...(user.email && { email: user.email }),
         isGuest: user.isGuest || false,
         ...user.traits,
       });
@@ -194,13 +194,18 @@ export function trackError(
   // Log to LogRocket in production
   if (IS_PRODUCTION && isInitialized && LOGROCKET_APP_ID) {
     try {
+      // Filter out undefined values for LogRocket compatibility
+      const filteredLogData = Object.fromEntries(
+        Object.entries(logData).filter(([, v]) => v !== undefined)
+      ) as Record<string, string | number | boolean>;
+
       LogRocket.captureException(errorObj, {
         tags: {
           category,
           severity,
           component: component || 'unknown',
         },
-        extra: logData,
+        extra: filteredLogData,
       });
     } catch (e) {
       console.error('[ErrorMonitoring] Failed to capture exception:', e);

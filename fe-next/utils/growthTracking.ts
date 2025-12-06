@@ -109,7 +109,7 @@ export const trackGrowthEvent = (event: GrowthEvent, data: GrowthEventData = {})
     ...data,
     timestamp: Date.now(),
     sessionId: getSessionId(),
-    referralSource: data.referralSource || getReferralSource(),
+    referralSource: data.referralSource || getReferralSource() || undefined,
   };
 
   // Log to console in development

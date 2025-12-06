@@ -555,6 +555,7 @@ export function useConnectionHealth(interval = 30000): ConnectionHealth {
       const timer = setInterval(checkHealth, interval);
       return () => clearInterval(timer);
     }
+    return undefined;
   }, [interval, checkHealth]);
 
   return { ...health, check: checkHealth };

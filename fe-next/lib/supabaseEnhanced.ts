@@ -186,7 +186,7 @@ export async function batchQueries(queries: QueryConfig[]): Promise<{ data: any;
   const results = await Promise.allSettled(
     queries.map(async (query) => {
       return withRetry(async () => {
-        let q: any = supabase.from(query.table);
+        let q: any = supabase!.from(query.table);
 
         switch (query.method) {
           case 'select':
@@ -310,7 +310,7 @@ export const profileOperations = {
     );
 
     if (error) return { available: false, error };
-    return { available: data.length === 0, error: null };
+    return { available: (data?.length ?? 0) === 0, error: null };
   }
 };
 

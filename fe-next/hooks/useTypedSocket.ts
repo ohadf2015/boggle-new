@@ -425,7 +425,7 @@ export function useTypedSocket(options: UseTypedSocketOptions = {}): UseTypedSoc
 
     if (!handlersRef.current[SERVER_EVENTS.ERROR]) {
       socket.on(SERVER_EVENTS.ERROR, errorHandler);
-      registeredHandlers.push([SERVER_EVENTS.ERROR, errorHandler]);
+      registeredHandlers.push([SERVER_EVENTS.ERROR, errorHandler as (...args: unknown[]) => void]);
     }
 
     // Cleanup on unmount
