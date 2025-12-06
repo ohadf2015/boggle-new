@@ -38,7 +38,8 @@ const avatarSchema = compiledSchemas?.avatarSchema || z.object({
 const gameCodeSchema = compiledSchemas?.gameCodeSchema || z.string()
   .min(4, 'Game code must be at least 4 characters')
   .max(10, 'Game code must be at most 10 characters')
-  .regex(/^[A-Za-z0-9]+$/, 'Game code must be alphanumeric');
+  .regex(/^[A-Za-z0-9]+$/, 'Game code must be alphanumeric')
+  .transform(s => s.toUpperCase()); // Normalize to uppercase for consistency
 
 const usernameSchema = compiledSchemas?.usernameSchema || z.string()
   .min(1, 'Username is required')

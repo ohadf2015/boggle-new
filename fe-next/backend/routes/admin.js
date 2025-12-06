@@ -11,9 +11,18 @@
 
 const express = require('express');
 const router = express.Router();
+const { z } = require('zod');
 const { getSupabase, isSupabaseConfigured } = require('../modules/supabaseServer');
 const { getAllGames } = require('../modules/gameStateManager');
 const logger = require('../utils/logger');
+
+// ==================== Request Validation Schemas ====================
+
+const blacklistAddSchema = z.object({
+  word: z.string().min(1).max(50).transform(s => s.toLowerCase().trim()),
+  language: z.enum(['en', 'he', 'sv', 'ja', 'es', 'fr', 'de']),
+  reason: z.string().max(200).optional().nullable(),
+});
 
 // ==================== Rate Limiting ====================
 
@@ -703,16 +712,22 @@ router.get('/bot-blacklist', async (req, res) => {
 router.post('/bot-blacklist', async (req, res) => {
   try {
     const supabase = getSupabase();
-    const { word, language, reason } = req.body;
 
-    if (!word || !language) {
-      return res.status(400).json({ error: 'word and language are required' });
+    // Validate request body
+    const validation = blacklistAddSchema.safeParse(req.body);
+    if (!validation.success) {
+      return res.status(400).json({
+        error: 'Invalid request',
+        details: validation.error.errors.map(e => `${e.path.join('.')}: ${e.message}`)
+      });
     }
+
+    const { word, language, reason } = validation.data;
 
     const { data, error } = await supabase
       .from('bot_word_blacklist')
       .insert({
-        word: word.toLowerCase().trim(),
+        word,
         language,
         reason: reason || null,
         blacklisted_by: req.adminUser.id
