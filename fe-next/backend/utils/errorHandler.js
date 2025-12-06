@@ -494,7 +494,11 @@ function isAppError(error) {
 
 /**
  * Legacy error messages for backwards compatibility
- * @deprecated Use ErrorCodes instead
+ * @deprecated Use ErrorCodes + createError() instead. Will be removed in v2.0.
+ *
+ * Migration guide:
+ *   Before: emitError(socket, ErrorMessages.GAME_NOT_FOUND)
+ *   After:  emitAppError(socket, createError(ErrorCodes.GAME_NOT_FOUND))
  */
 const ErrorMessages = {
   INVALID_GAME_CODE: ErrorRegistry[ErrorCodes.GAME_INVALID_CODE].message,
@@ -509,6 +513,16 @@ const ErrorMessages = {
   INVALID_MESSAGE: 'Invalid message',
   GAME_NOT_IN_PROGRESS: ErrorRegistry[ErrorCodes.GAME_NOT_IN_PROGRESS].message
 };
+
+// Log deprecation warning once in development
+let errorMessagesWarningShown = false;
+function getErrorMessages() {
+  if (process.env.NODE_ENV === 'development' && !errorMessagesWarningShown) {
+    console.warn('[DEPRECATION] ErrorMessages is deprecated. Use ErrorCodes + createError() instead.');
+    errorMessagesWarningShown = true;
+  }
+  return ErrorMessages;
+}
 
 // ==========================================
 // Exports

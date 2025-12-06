@@ -39,6 +39,7 @@ const { ACHIEVEMENT_ICONS } = require('../modules/achievementManager');
 const logger = require('../utils/logger');
 const { validatePayload, joinGameSchema, leaveRoomSchema } = require('../utils/socketValidation');
 const { MAX_PLAYERS_PER_ROOM } = require('../utils/consts');
+const { isInProgress, canJoinFreely, shouldSendGameState } = require('../utils/gameStateMachine');
 
 /**
  * Register player join/leave socket event handlers
@@ -76,8 +77,8 @@ function registerPlayerJoinHandlers(io, socket) {
       await handleExistingAuthConnectionJoin(io, socket, authUserId, gameCode, username);
     }
 
-    // Block late joins for ranked games
-    if (game.isRanked && game.gameState === 'in-progress' && !game.allowLateJoin) {
+    // Block late joins for ranked games (use state machine helper)
+    if (game.isRanked && isInProgress(game.gameState) && !game.allowLateJoin) {
       const existingSocketId = getSocketIdByUsername(gameCode, username);
       if (!existingSocketId) {
         emitError(socket, 'Cannot join ranked game in progress');
@@ -129,8 +130,8 @@ function registerPlayerJoinHandlers(io, socket) {
       users: getGameUsers(gameCode)
     });
 
-    // If game is in progress, send current state
-    if (game.gameState === 'in-progress') {
+    // If game is in progress, send current state (use state machine helper)
+    if (shouldSendGameState(game.gameState)) {
       handleLateJoin(socket, game, gameCode, username);
     }
 
@@ -281,7 +282,8 @@ function handleReconnection(io, socket, game, gameCode, username, authUserId, gu
     users: getGameUsers(gameCode)
   });
 
-  if (game.gameState === 'in-progress') {
+  // Send game state on reconnection if game is in progress (use state machine helper)
+  if (isInProgress(game.gameState)) {
     socket.emit('startGame', {
       letterGrid: game.letterGrid,
       timerSeconds: game.remainingTime || game.timerSeconds,
