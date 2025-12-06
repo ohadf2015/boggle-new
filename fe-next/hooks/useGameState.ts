@@ -4,18 +4,16 @@
  * This hook centralizes common game state used across PlayerView and HostView,
  * reducing prop drilling and ensuring consistent state management.
  *
- * Architecture Pattern: Custom Hook with Reducer-like state management
+ * Architecture Pattern: useReducer for predictable state updates
  */
 
-import { useState, useCallback, useRef, useMemo } from 'react';
+import { useReducer, useCallback, useRef, useMemo } from 'react';
 import type {
   LetterGrid,
   Avatar,
-  GameState,
   Language,
   LeaderboardEntry,
   WordDetail,
-  TournamentStanding as SharedTournamentStanding,
 } from '@/shared/types/game';
 
 // ==========================================
@@ -104,6 +102,224 @@ export interface GameStateValues {
   levelUpData: LevelUpData | null;
 }
 
+// ==========================================
+// Action Types
+// ==========================================
+
+type GameStateAction =
+  // Core game actions
+  | { type: 'SET_GAME_ACTIVE'; payload: boolean }
+  | { type: 'SET_LETTER_GRID'; payload: LetterGrid | null }
+  | { type: 'SET_REMAINING_TIME'; payload: number | null }
+  | { type: 'UPDATE_REMAINING_TIME'; payload: (prev: number | null) => number | null }
+  | { type: 'SET_GAME_LANGUAGE'; payload: Language | null }
+  | { type: 'SET_MIN_WORD_LENGTH'; payload: number }
+  // Player actions
+  | { type: 'SET_PLAYERS'; payload: Player[] | ((prev: Player[]) => Player[]) }
+  | { type: 'UPDATE_PLAYER'; payload: { username: string; updates: Partial<Player> } }
+  | { type: 'ADD_PLAYER'; payload: Player }
+  | { type: 'REMOVE_PLAYER'; payload: string }
+  | { type: 'SET_LEADERBOARD'; payload: LeaderboardEntry[] }
+  // Word actions
+  | { type: 'ADD_FOUND_WORD'; payload: WordDetail }
+  | { type: 'SET_FOUND_WORDS'; payload: WordDetail[] }
+  | { type: 'ADD_ACHIEVEMENT'; payload: string }
+  | { type: 'SET_ACHIEVEMENTS'; payload: string[] }
+  // UI actions
+  | { type: 'SET_WAITING_FOR_RESULTS'; payload: boolean }
+  | { type: 'SET_SHOW_START_ANIMATION'; payload: boolean }
+  | { type: 'SET_SHUFFLING_GRID'; payload: LetterGrid | null }
+  | { type: 'SET_HIGHLIGHTED_CELLS'; payload: Array<{ row: number; col: number }> }
+  // Combo actions
+  | { type: 'INCREMENT_COMBO' }
+  | { type: 'RESET_COMBO' }
+  | { type: 'USE_COMBO_SHIELD' }
+  | { type: 'UPDATE_LAST_WORD_TIME' }
+  // Tournament actions
+  | { type: 'SET_TOURNAMENT_DATA'; payload: TournamentData | null }
+  | { type: 'SET_TOURNAMENT_STANDINGS'; payload: TournamentStanding[] }
+  | { type: 'SET_SHOW_TOURNAMENT_STANDINGS'; payload: boolean }
+  // XP/Level actions
+  | { type: 'SET_XP_GAINED_DATA'; payload: XpGainedData | null }
+  | { type: 'SET_LEVEL_UP_DATA'; payload: LevelUpData | null }
+  // Reset actions
+  | { type: 'RESET_FOR_NEW_ROUND' }
+  | { type: 'RESET_ALL' };
+
+// ==========================================
+// Default Values
+// ==========================================
+
+const DEFAULT_COMBO_STATE: ComboState = {
+  level: 0,
+  lastWordTime: null,
+  shieldsUsed: 0,
+};
+
+const INITIAL_STATE: GameStateValues = {
+  gameActive: false,
+  letterGrid: null,
+  remainingTime: null,
+  gameLanguage: null,
+  minWordLength: 2,
+  players: [],
+  leaderboard: [],
+  foundWords: [],
+  achievements: [],
+  waitingForResults: false,
+  showStartAnimation: false,
+  shufflingGrid: null,
+  highlightedCells: [],
+  combo: DEFAULT_COMBO_STATE,
+  tournamentData: null,
+  tournamentStandings: [],
+  showTournamentStandings: false,
+  xpGainedData: null,
+  levelUpData: null,
+};
+
+const COMBO_SHIELD_INTERVAL = 10; // Earn shield every 10 valid words
+
+// ==========================================
+// Reducer
+// ==========================================
+
+function gameStateReducer(state: GameStateValues, action: GameStateAction): GameStateValues {
+  switch (action.type) {
+    // Core game actions
+    case 'SET_GAME_ACTIVE':
+      return { ...state, gameActive: action.payload };
+    case 'SET_LETTER_GRID':
+      return { ...state, letterGrid: action.payload };
+    case 'SET_REMAINING_TIME':
+      return { ...state, remainingTime: action.payload };
+    case 'UPDATE_REMAINING_TIME':
+      return { ...state, remainingTime: action.payload(state.remainingTime) };
+    case 'SET_GAME_LANGUAGE':
+      return { ...state, gameLanguage: action.payload };
+    case 'SET_MIN_WORD_LENGTH':
+      return { ...state, minWordLength: action.payload };
+
+    // Player actions
+    case 'SET_PLAYERS':
+      return {
+        ...state,
+        players: typeof action.payload === 'function' ? action.payload(state.players) : action.payload,
+      };
+    case 'UPDATE_PLAYER':
+      return {
+        ...state,
+        players: state.players.map(p =>
+          p.username === action.payload.username ? { ...p, ...action.payload.updates } : p
+        ),
+      };
+    case 'ADD_PLAYER': {
+      const existingIndex = state.players.findIndex(p => p.username === action.payload.username);
+      if (existingIndex >= 0) {
+        const updatedPlayers = [...state.players];
+        updatedPlayers[existingIndex] = { ...updatedPlayers[existingIndex], ...action.payload };
+        return { ...state, players: updatedPlayers };
+      }
+      return { ...state, players: [...state.players, action.payload] };
+    }
+    case 'REMOVE_PLAYER':
+      return { ...state, players: state.players.filter(p => p.username !== action.payload) };
+    case 'SET_LEADERBOARD':
+      return { ...state, leaderboard: action.payload };
+
+    // Word actions
+    case 'ADD_FOUND_WORD': {
+      const wordExists = state.foundWords.some(
+        w => w.word.toLowerCase() === action.payload.word.toLowerCase()
+      );
+      if (wordExists) return state;
+      return { ...state, foundWords: [...state.foundWords, action.payload] };
+    }
+    case 'SET_FOUND_WORDS':
+      return { ...state, foundWords: action.payload };
+    case 'ADD_ACHIEVEMENT':
+      if (state.achievements.includes(action.payload)) return state;
+      return { ...state, achievements: [...state.achievements, action.payload] };
+    case 'SET_ACHIEVEMENTS':
+      return { ...state, achievements: action.payload };
+
+    // UI actions
+    case 'SET_WAITING_FOR_RESULTS':
+      return { ...state, waitingForResults: action.payload };
+    case 'SET_SHOW_START_ANIMATION':
+      return { ...state, showStartAnimation: action.payload };
+    case 'SET_SHUFFLING_GRID':
+      return { ...state, shufflingGrid: action.payload };
+    case 'SET_HIGHLIGHTED_CELLS':
+      return { ...state, highlightedCells: action.payload };
+
+    // Combo actions
+    case 'INCREMENT_COMBO':
+      return {
+        ...state,
+        combo: {
+          ...state.combo,
+          level: state.combo.level + 1,
+          lastWordTime: Date.now(),
+        },
+      };
+    case 'RESET_COMBO':
+      return { ...state, combo: { ...state.combo, level: 0 } };
+    case 'USE_COMBO_SHIELD': {
+      const validWordCount = state.foundWords.filter(w => w.validated !== false).length;
+      const availableShields = Math.floor(validWordCount / COMBO_SHIELD_INTERVAL);
+      if (state.combo.shieldsUsed < availableShields) {
+        return { ...state, combo: { ...state.combo, shieldsUsed: state.combo.shieldsUsed + 1 } };
+      }
+      return state;
+    }
+    case 'UPDATE_LAST_WORD_TIME':
+      return { ...state, combo: { ...state.combo, lastWordTime: Date.now() } };
+
+    // Tournament actions
+    case 'SET_TOURNAMENT_DATA':
+      return { ...state, tournamentData: action.payload };
+    case 'SET_TOURNAMENT_STANDINGS':
+      return { ...state, tournamentStandings: action.payload };
+    case 'SET_SHOW_TOURNAMENT_STANDINGS':
+      return { ...state, showTournamentStandings: action.payload };
+
+    // XP/Level actions
+    case 'SET_XP_GAINED_DATA':
+      return { ...state, xpGainedData: action.payload };
+    case 'SET_LEVEL_UP_DATA':
+      return { ...state, levelUpData: action.payload };
+
+    // Reset actions
+    case 'RESET_FOR_NEW_ROUND':
+      return {
+        ...state,
+        gameActive: false,
+        letterGrid: null,
+        remainingTime: null,
+        foundWords: [],
+        achievements: [],
+        waitingForResults: false,
+        showStartAnimation: false,
+        shufflingGrid: null,
+        highlightedCells: [],
+        combo: DEFAULT_COMBO_STATE,
+        leaderboard: [],
+        xpGainedData: null,
+        levelUpData: null,
+      };
+    case 'RESET_ALL':
+      return INITIAL_STATE;
+
+    default:
+      return state;
+  }
+}
+
+// ==========================================
+// Action Interfaces
+// ==========================================
+
 export interface GameStateActions {
   // Core game actions
   setGameActive: (active: boolean) => void;
@@ -161,55 +377,17 @@ export interface UseGameStateReturn extends GameStateValues, GameStateActions {
 }
 
 // ==========================================
-// Default Values
+// Constants
 // ==========================================
 
-const DEFAULT_COMBO_STATE: ComboState = {
-  level: 0,
-  lastWordTime: null,
-  shieldsUsed: 0,
-};
-
 const COMBO_TIMEOUT_MS = 8000; // 8 seconds to maintain combo
-const COMBO_SHIELD_INTERVAL = 10; // Earn shield every 10 valid words
 
 // ==========================================
 // Hook Implementation
 // ==========================================
 
 export function useGameState(): UseGameStateReturn {
-  // Core game state
-  const [gameActive, setGameActive] = useState(false);
-  const [letterGrid, setLetterGrid] = useState<LetterGrid | null>(null);
-  const [remainingTime, setRemainingTime] = useState<number | null>(null);
-  const [gameLanguage, setGameLanguage] = useState<Language | null>(null);
-  const [minWordLength, setMinWordLength] = useState(2);
-
-  // Player state
-  const [players, setPlayers] = useState<Player[]>([]);
-  const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
-
-  // Word state
-  const [foundWords, setFoundWords] = useState<WordDetail[]>([]);
-  const [achievements, setAchievements] = useState<string[]>([]);
-
-  // UI state
-  const [waitingForResults, setWaitingForResults] = useState(false);
-  const [showStartAnimation, setShowStartAnimation] = useState(false);
-  const [shufflingGrid, setShufflingGrid] = useState<LetterGrid | null>(null);
-  const [highlightedCells, setHighlightedCells] = useState<Array<{ row: number; col: number }>>([]);
-
-  // Combo state
-  const [combo, setCombo] = useState<ComboState>(DEFAULT_COMBO_STATE);
-
-  // Tournament state
-  const [tournamentData, setTournamentData] = useState<TournamentData | null>(null);
-  const [tournamentStandings, setTournamentStandings] = useState<TournamentStanding[]>([]);
-  const [showTournamentStandings, setShowTournamentStandings] = useState(false);
-
-  // XP/Level state
-  const [xpGainedData, setXpGainedData] = useState<XpGainedData | null>(null);
-  const [levelUpData, setLevelUpData] = useState<LevelUpData | null>(null);
+  const [state, dispatch] = useReducer(gameStateReducer, INITIAL_STATE);
 
   // Refs for use in callbacks
   const comboLevelRef = useRef(0);
@@ -217,57 +395,88 @@ export function useGameState(): UseGameStateReturn {
   const comboTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // Keep refs in sync with state
-  comboLevelRef.current = combo.level;
-  lastWordTimeRef.current = combo.lastWordTime;
+  comboLevelRef.current = state.combo.level;
+  lastWordTimeRef.current = state.combo.lastWordTime;
 
   // ==========================================
-  // Player Actions
+  // Action Creators
   // ==========================================
+
+  const setGameActive = useCallback((active: boolean) => {
+    dispatch({ type: 'SET_GAME_ACTIVE', payload: active });
+  }, []);
+
+  const setLetterGrid = useCallback((grid: LetterGrid | null) => {
+    dispatch({ type: 'SET_LETTER_GRID', payload: grid });
+  }, []);
+
+  const setRemainingTime = useCallback((time: number | null | ((prev: number | null) => number | null)) => {
+    if (typeof time === 'function') {
+      dispatch({ type: 'UPDATE_REMAINING_TIME', payload: time });
+    } else {
+      dispatch({ type: 'SET_REMAINING_TIME', payload: time });
+    }
+  }, []);
+
+  const setGameLanguage = useCallback((language: Language | null) => {
+    dispatch({ type: 'SET_GAME_LANGUAGE', payload: language });
+  }, []);
+
+  const setMinWordLength = useCallback((length: number) => {
+    dispatch({ type: 'SET_MIN_WORD_LENGTH', payload: length });
+  }, []);
+
+  const setPlayers = useCallback((players: Player[] | ((prev: Player[]) => Player[])) => {
+    dispatch({ type: 'SET_PLAYERS', payload: players });
+  }, []);
 
   const updatePlayer = useCallback((username: string, updates: Partial<Player>) => {
-    setPlayers(prev => prev.map(p =>
-      p.username === username ? { ...p, ...updates } : p
-    ));
+    dispatch({ type: 'UPDATE_PLAYER', payload: { username, updates } });
   }, []);
 
   const addPlayer = useCallback((player: Player) => {
-    setPlayers(prev => {
-      // Don't add if already exists
-      if (prev.some(p => p.username === player.username)) {
-        return prev.map(p => p.username === player.username ? { ...p, ...player } : p);
-      }
-      return [...prev, player];
-    });
+    dispatch({ type: 'ADD_PLAYER', payload: player });
   }, []);
 
   const removePlayer = useCallback((username: string) => {
-    setPlayers(prev => prev.filter(p => p.username !== username));
+    dispatch({ type: 'REMOVE_PLAYER', payload: username });
   }, []);
 
-  // ==========================================
-  // Word Actions
-  // ==========================================
+  const setLeaderboard = useCallback((entries: LeaderboardEntry[]) => {
+    dispatch({ type: 'SET_LEADERBOARD', payload: entries });
+  }, []);
 
   const addFoundWord = useCallback((word: WordDetail) => {
-    setFoundWords(prev => {
-      // Don't add duplicates
-      if (prev.some(w => w.word.toLowerCase() === word.word.toLowerCase())) {
-        return prev;
-      }
-      return [...prev, word];
-    });
+    dispatch({ type: 'ADD_FOUND_WORD', payload: word });
+  }, []);
+
+  const setFoundWords = useCallback((words: WordDetail[]) => {
+    dispatch({ type: 'SET_FOUND_WORDS', payload: words });
   }, []);
 
   const addAchievement = useCallback((achievement: string) => {
-    setAchievements(prev => {
-      if (prev.includes(achievement)) return prev;
-      return [...prev, achievement];
-    });
+    dispatch({ type: 'ADD_ACHIEVEMENT', payload: achievement });
   }, []);
 
-  // ==========================================
-  // Combo Actions
-  // ==========================================
+  const setAchievements = useCallback((achievements: string[]) => {
+    dispatch({ type: 'SET_ACHIEVEMENTS', payload: achievements });
+  }, []);
+
+  const setWaitingForResults = useCallback((waiting: boolean) => {
+    dispatch({ type: 'SET_WAITING_FOR_RESULTS', payload: waiting });
+  }, []);
+
+  const setShowStartAnimation = useCallback((show: boolean) => {
+    dispatch({ type: 'SET_SHOW_START_ANIMATION', payload: show });
+  }, []);
+
+  const setShufflingGrid = useCallback((grid: LetterGrid | null) => {
+    dispatch({ type: 'SET_SHUFFLING_GRID', payload: grid });
+  }, []);
+
+  const setHighlightedCells = useCallback((cells: Array<{ row: number; col: number }>) => {
+    dispatch({ type: 'SET_HIGHLIGHTED_CELLS', payload: cells });
+  }, []);
 
   const incrementCombo = useCallback(() => {
     // Clear existing timeout
@@ -275,15 +484,11 @@ export function useGameState(): UseGameStateReturn {
       clearTimeout(comboTimeoutRef.current);
     }
 
-    setCombo(prev => ({
-      ...prev,
-      level: prev.level + 1,
-      lastWordTime: Date.now(),
-    }));
+    dispatch({ type: 'INCREMENT_COMBO' });
 
     // Set new timeout to reset combo
     comboTimeoutRef.current = setTimeout(() => {
-      setCombo(prev => ({ ...prev, level: 0 }));
+      dispatch({ type: 'RESET_COMBO' });
     }, COMBO_TIMEOUT_MS);
   }, []);
 
@@ -292,85 +497,68 @@ export function useGameState(): UseGameStateReturn {
       clearTimeout(comboTimeoutRef.current);
       comboTimeoutRef.current = null;
     }
-    setCombo(prev => ({ ...prev, level: 0 }));
+    dispatch({ type: 'RESET_COMBO' });
   }, []);
 
   const useComboShield = useCallback((): boolean => {
     // Check if player has earned a shield (1 per 10 valid words)
-    const validWordCount = foundWords.filter(w => w.validated !== false).length;
+    const validWordCount = state.foundWords.filter(w => w.validated !== false).length;
     const availableShields = Math.floor(validWordCount / COMBO_SHIELD_INTERVAL);
 
-    if (combo.shieldsUsed < availableShields) {
-      setCombo(prev => ({ ...prev, shieldsUsed: prev.shieldsUsed + 1 }));
+    if (state.combo.shieldsUsed < availableShields) {
+      dispatch({ type: 'USE_COMBO_SHIELD' });
       return true; // Shield used successfully
     }
     return false; // No shield available
-  }, [foundWords, combo.shieldsUsed]);
+  }, [state.foundWords, state.combo.shieldsUsed]);
 
   const updateLastWordTime = useCallback(() => {
-    setCombo(prev => ({ ...prev, lastWordTime: Date.now() }));
+    dispatch({ type: 'UPDATE_LAST_WORD_TIME' });
   }, []);
 
-  // ==========================================
-  // Reset Actions
-  // ==========================================
+  const setTournamentData = useCallback((data: TournamentData | null) => {
+    dispatch({ type: 'SET_TOURNAMENT_DATA', payload: data });
+  }, []);
+
+  const setTournamentStandings = useCallback((standings: TournamentStanding[]) => {
+    dispatch({ type: 'SET_TOURNAMENT_STANDINGS', payload: standings });
+  }, []);
+
+  const setShowTournamentStandings = useCallback((show: boolean) => {
+    dispatch({ type: 'SET_SHOW_TOURNAMENT_STANDINGS', payload: show });
+  }, []);
+
+  const setXpGainedData = useCallback((data: XpGainedData | null) => {
+    dispatch({ type: 'SET_XP_GAINED_DATA', payload: data });
+  }, []);
+
+  const setLevelUpData = useCallback((data: LevelUpData | null) => {
+    dispatch({ type: 'SET_LEVEL_UP_DATA', payload: data });
+  }, []);
 
   const resetForNewRound = useCallback(() => {
-    setGameActive(false);
-    setLetterGrid(null);
-    setRemainingTime(null);
-    setFoundWords([]);
-    setAchievements([]);
-    setWaitingForResults(false);
-    setShowStartAnimation(false);
-    setShufflingGrid(null);
-    setHighlightedCells([]);
-    setCombo(DEFAULT_COMBO_STATE);
-    setLeaderboard([]);
-    setXpGainedData(null);
-    setLevelUpData(null);
-
     if (comboTimeoutRef.current) {
       clearTimeout(comboTimeoutRef.current);
       comboTimeoutRef.current = null;
     }
+    dispatch({ type: 'RESET_FOR_NEW_ROUND' });
   }, []);
 
   const resetAll = useCallback(() => {
-    resetForNewRound();
-    setPlayers([]);
-    setGameLanguage(null);
-    setMinWordLength(2);
-    setTournamentData(null);
-    setTournamentStandings([]);
-    setShowTournamentStandings(false);
-  }, [resetForNewRound]);
+    if (comboTimeoutRef.current) {
+      clearTimeout(comboTimeoutRef.current);
+      comboTimeoutRef.current = null;
+    }
+    dispatch({ type: 'RESET_ALL' });
+  }, []);
 
   // ==========================================
   // Return Value
   // ==========================================
 
   return useMemo(() => ({
-    // State values
-    gameActive,
-    letterGrid,
-    remainingTime,
-    gameLanguage,
-    minWordLength,
-    players,
-    leaderboard,
-    foundWords,
-    achievements,
-    waitingForResults,
-    showStartAnimation,
-    shufflingGrid,
-    highlightedCells,
-    combo,
-    tournamentData,
-    tournamentStandings,
-    showTournamentStandings,
-    xpGainedData,
-    levelUpData,
+    // State values (spread from reducer state)
+    ...state,
 
     // Actions
     setGameActive,
@@ -410,34 +598,34 @@ export function useGameState(): UseGameStateReturn {
       comboTimeout: comboTimeoutRef,
     },
   }), [
-    gameActive,
-    letterGrid,
-    remainingTime,
-    gameLanguage,
-    minWordLength,
-    players,
-    leaderboard,
-    foundWords,
-    achievements,
-    waitingForResults,
-    showStartAnimation,
-    shufflingGrid,
-    highlightedCells,
-    combo,
-    tournamentData,
-    tournamentStandings,
-    showTournamentStandings,
-    xpGainedData,
-    levelUpData,
+    state,
+    setGameActive,
+    setLetterGrid,
+    setRemainingTime,
+    setGameLanguage,
+    setMinWordLength,
+    setPlayers,
     updatePlayer,
     addPlayer,
     removePlayer,
+    setLeaderboard,
     addFoundWord,
+    setFoundWords,
     addAchievement,
+    setAchievements,
+    setWaitingForResults,
+    setShowStartAnimation,
+    setShufflingGrid,
+    setHighlightedCells,
     incrementCombo,
     resetCombo,
     useComboShield,
     updateLastWordTime,
+    setTournamentData,
+    setTournamentStandings,
+    setShowTournamentStandings,
+    setXpGainedData,
+    setLevelUpData,
     resetForNewRound,
     resetAll,
   ]);
