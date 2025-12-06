@@ -485,15 +485,13 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, letterGrid, game
     // Use the specific word being voted on, or fall back to current word
     const wordToSubmit = votedWord || wordToVote.word;
 
-    // Map 'like'/'dislike' to 'valid'/'invalid' for backend
-    const backendVoteType = voteType === 'like' ? 'valid' : 'invalid';
-
-    logger.log('[RESULTS] Submitting vote:', { word: wordToSubmit, voteType: backendVoteType });
+    // Send 'like'/'dislike' directly - database expects these values
+    logger.log('[RESULTS] Submitting vote:', { word: wordToSubmit, voteType });
     socket.emit('submitWordVote', {
       word: wordToSubmit,
       language: wordToVote.language,
       gameCode: wordToVote.gameCode,
-      voteType: backendVoteType,
+      voteType: voteType,
       submittedBy: wordToVote.submittedBy
     });
 

@@ -321,12 +321,12 @@ const awardFinalAchievements = (game, users) => {
       return;
     }
 
-    // Skip bots - they don't get achievements to avoid cluttering the UI
-    // and because their performance is programmatic, not skill-based
+    // Bots can also earn achievements - this makes the game more competitive
+    // and shows bot performance in results
     const userData = game.users?.[username];
-    if (userData?.isBot) {
-      logger.debug('ACHIEVEMENT', `Skipping achievements for bot ${username}`);
-      return;
+    const isBot = userData?.isBot === true;
+    if (isBot) {
+      logger.debug('ACHIEVEMENT', `Calculating achievements for bot ${username}`);
     }
 
     const allWords = game.playerWordDetails[username];

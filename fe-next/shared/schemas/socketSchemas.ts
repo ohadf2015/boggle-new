@@ -117,12 +117,13 @@ export const SubmitWordSchema = z.object({
 });
 
 /**
- * submitWordVote event payload - voting on AI-validated words
+ * submitWordVote event payload - voting on community words
+ * Note: voteType must be 'like' or 'dislike' to match database constraint
  */
 export const SubmitWordVoteSchema = z.object({
   gameCode: GameCodeSchema.optional(),
   word: WordSchema,
-  voteType: z.enum(['valid', 'invalid']).optional(),
+  voteType: z.enum(['like', 'dislike']).optional(),
   isValid: z.boolean().optional(),
   language: LanguageSchema.optional(),
   submittedBy: UsernameSchema.optional(),
