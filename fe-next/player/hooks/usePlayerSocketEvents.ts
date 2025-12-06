@@ -6,6 +6,7 @@ import toast from 'react-hot-toast';
 import { wordAcceptedToast, wordNeedsValidationToast, wordAIValidatingToast, wordErrorToast, neoSuccessToast, neoErrorToast, neoInfoToast } from '../../components/NeoToast';
 import { clearSessionPreservingUsername } from '../../utils/session';
 import logger from '@/utils/logger';
+import type { Language } from '@/types';
 
 interface FoundWord {
   word: string;
@@ -60,11 +61,11 @@ interface LevelUpData {
 interface UsePlayerSocketEventsProps {
   socket: Socket | null;
   t: (key: string) => string;
-  inputRef: RefObject<HTMLInputElement>;
+  inputRef: RefObject<HTMLInputElement | null>;
   wasInActiveGame: boolean;
   gameActive: boolean;
   letterGrid: any;
-  gameLanguage: string | null;
+  gameLanguage: Language | null;
   username: string;
   queueAchievement: (achievement: any) => void;
   playComboSound: (level: number) => void;
@@ -80,7 +81,7 @@ interface UsePlayerSocketEventsProps {
   setLetterGrid: React.Dispatch<React.SetStateAction<any>>;
   setRemainingTime: React.Dispatch<React.SetStateAction<number | null>>;
   setMinWordLength: React.Dispatch<React.SetStateAction<number>>;
-  setGameLanguage: React.Dispatch<React.SetStateAction<string | null>>;
+  setGameLanguage: React.Dispatch<React.SetStateAction<Language | null>>;
   setGameActive: React.Dispatch<React.SetStateAction<boolean>>;
   setShowStartAnimation: React.Dispatch<React.SetStateAction<boolean>>;
   setWaitingForResults: React.Dispatch<React.SetStateAction<boolean>>;
