@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, ReactNode, useMemo } from 'react';
+import React, { useEffect, ReactNode } from 'react';
 import { ThemeProvider } from '@/utils/ThemeContext';
 import { LanguageProvider } from '@/contexts/LanguageContext';
 import { AuthProvider } from '@/contexts/AuthContext';

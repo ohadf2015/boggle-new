@@ -56,6 +56,7 @@ const GoRipplesAnimation: React.FC<GoRipplesAnimationProps> = ({ onComplete }) =
       }, 800);
       return () => clearTimeout(timer);
     }
+    return undefined;
   }, [count, onComplete]);
 
   if (!isVisible) return null;

@@ -1,8 +1,8 @@
-import React, { useState, useRef, useEffect, useCallback, useMemo, memo } from 'react';
+import React, { useState, useRef, useEffect, useCallback, memo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '../lib/utils';
 import { getDeadzoneThreshold } from '../utils/consts';
-import type { LetterGrid, GridPosition, Language } from '@/types';
+import type { LetterGrid, GridPosition } from '@/types';
 
 const noOp = () => { };
 
@@ -114,6 +114,7 @@ const GridComponent = memo<GridComponentProps>(({
             return () => mq.removeEventListener?.('change', handler);
         } catch {
             setReduceMotion(false);
+            return undefined;
         }
     }, []);
 

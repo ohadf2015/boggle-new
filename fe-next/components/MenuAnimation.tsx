@@ -149,7 +149,7 @@ const MenuAnimation: React.FC<MenuAnimationProps> = ({ className = '' }) => {
   const [letters, setLetters] = useState<Letter[]>([]);
   const [explosions, setExplosions] = useState<Explosion[]>([]);
   const explosionCounterRef = useRef(0);
-  const [poppedCount, setPoppedCount] = useState(0);
+  const [, setPoppedCount] = useState(0);
   const [showAchievement, setShowAchievement] = useState<Achievement | null>(null);
   const achievementShownRef = useRef(false);
   const [mounted, setMounted] = useState(false);

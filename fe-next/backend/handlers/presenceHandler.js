@@ -76,9 +76,9 @@ function startConnectionHealthCheck(io) {
   const STALE_THRESHOLD = 60000; // 1 minute without heartbeat
 
   setInterval(() => {
-    const { games } = require('../modules/gameStateManager');
+    const { forEachGame } = require('../modules/gameStateManager');
 
-    for (const [gameCode, game] of Object.entries(games)) {
+    forEachGame((gameCode, game) => {
       for (const [username, userData] of Object.entries(game.users || {})) {
         // Skip if user is already marked disconnected
         if (userData.disconnected) continue;
@@ -94,7 +94,7 @@ function startConnectionHealthCheck(io) {
           logger.debug('PRESENCE', `User ${username} in game ${gameCode} may be stale (${Math.round((now - lastHeartbeat) / 1000)}s since last heartbeat)`);
         }
       }
-    }
+    });
   }, HEALTH_CHECK_INTERVAL);
 }
 

@@ -289,7 +289,7 @@ function tryPlaceWordSnake(
   const path: Array<{ r: number; c: number; char: string; key: string }> = [];
   const visited = new Set<string>();
 
-  function dfs(row, col, index) {
+  function dfs(row: number, col: number, index: number): boolean {
     // Success - placed entire word
     if (index === wordLen) {
       return true;

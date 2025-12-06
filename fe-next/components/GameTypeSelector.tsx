@@ -1,4 +1,4 @@
-import React, { useCallback, memo } from 'react';
+import { useCallback, memo } from 'react';
 import { motion } from 'framer-motion';
 import { FaGamepad, FaTrophy, FaMinus, FaPlus, FaLock } from 'react-icons/fa';
 import { IconType } from 'react-icons';

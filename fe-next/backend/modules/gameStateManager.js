@@ -603,17 +603,51 @@ function setTournamentIdForGame(gameCode, tournamentId) {
 }
 
 // ==========================================
+// Encapsulation Helpers
+// ==========================================
+
+/**
+ * Get count of active games (for metrics)
+ * @returns {number} - Number of active games
+ */
+function getGameCount() {
+  return Object.keys(games).length;
+}
+
+/**
+ * Get all game codes (for iteration)
+ * @returns {string[]} - Array of game codes
+ */
+function getAllGameCodes() {
+  return Object.keys(games);
+}
+
+/**
+ * Iterate over all games with a callback
+ * Provides safe access without exposing internal state
+ * @param {function} callback - Function to call with (gameCode, game) for each game
+ */
+function forEachGame(callback) {
+  for (const [gameCode, game] of Object.entries(games)) {
+    callback(gameCode, game);
+  }
+}
+
+// ==========================================
 // Module Exports
 // ==========================================
 
 module.exports = {
-  // Game CRUD
-  games,
+  // Game CRUD - NOTE: games object is NOT exported to maintain encapsulation
+  // Use getGame(), getAllGames(), forEachGame() instead of direct access
   createGame,
   getGame,
   updateGame,
   deleteGame,
   gameExists,
+  getGameCount,
+  getAllGameCodes,
+  forEachGame,
 
   // User management (from userManager)
   addUserToGame,
@@ -680,5 +714,14 @@ module.exports = {
   persistGameState,
   persistGameStateNow,
   restoreGameFromRedis,
-  getAllGameCodesFromRedis
+  getAllGameCodesFromRedis,
+
+  // TEST ONLY - Direct access to games object for test verification
+  // DO NOT use in production code - use getGame(), forEachGame() instead
+  get games() {
+    if (process.env.NODE_ENV !== 'test') {
+      console.warn('[gameStateManager] Direct access to games object is deprecated. Use getGame() or forEachGame() instead.');
+    }
+    return games;
+  }
 };

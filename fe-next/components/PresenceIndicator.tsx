@@ -54,7 +54,7 @@ const PresenceIndicator: React.FC<PresenceIndicatorProps> = ({
   size = 'md',
   showTooltip = true,
   className = '',
-  overlay = false,
+  overlay: _overlay = false,
 }) => {
   const [tooltipVisible, setTooltipVisible] = useState(false);
   const tooltipTimeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -293,7 +293,7 @@ export const PresenceBadge: React.FC<PresenceBadgeProps> = ({
   status = 'active',
   isWindowFocused = true,
   showText = true,
-  size = 'md',
+  size: _size = 'md',
   className = '',
 }) => {
   // Determine effective status

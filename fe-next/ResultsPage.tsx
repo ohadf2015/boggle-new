@@ -9,14 +9,13 @@ import confetti from 'canvas-confetti';
 import { useLanguage } from './contexts/LanguageContext';
 import { useAuth } from './contexts/AuthContext';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from './components/ui/alert-dialog';
-import { Button } from './components/ui/button';
 import { clearSessionPreservingUsername } from './utils/session';
 import { shouldShowUpgradePrompt, getGuestStatsSummary, updateGuestStatsAfterGame, isFirstWin } from './utils/guestManager';
 import { useWinStreak } from './hooks/useWinStreak';
 import { trackGameCompletion, trackStreakMilestone } from './utils/growthTracking';
 import logger from './utils/logger';
 import { levelUpToast } from './components/NeoToast';
-import type { ResultsPageProps, PlayerResult, HeatMapData, WordToVote, XpGainedData, LevelUpData, GridPosition } from './types/components';
+import type { ResultsPageProps, HeatMapData, WordToVote, XpGainedData, LevelUpData, GridPosition } from './types/components';
 import type { LetterGrid as LetterGridType } from './shared/types/game';
 
 // Dynamic imports for heavy components (loaded after initial render)
@@ -28,7 +27,6 @@ const FirstWinSignupModal = dynamic(() => import('./components/auth/FirstWinSign
 const ShareWinPrompt = dynamic(() => import('./components/results/ShareWinPrompt'), { ssr: false });
 const WinStreakDisplay = dynamic(() => import('./components/results/WinStreakDisplay'), { ssr: false });
 const WordFeedbackModal = dynamic(() => import('./components/voting/WordFeedbackModal'), { ssr: false });
-const XpBreakdownCard = dynamic(() => import('./components/results/XpBreakdownCard'), { ssr: false });
 const AutoRejoinTimer = dynamic(() => import('./components/results/AutoRejoinTimer'), { ssr: false });
 
 // Helper functions for finding word paths on the board (client-side version)
@@ -131,12 +129,14 @@ const LetterGrid: React.FC<LetterGridProps> = ({ letterGrid, heatMapData, showHe
             <div className="w-full max-w-full mx-auto p-2 sm:p-3 rounded-xl bg-gradient-to-br from-slate-800/40 to-slate-900/40 dark:from-slate-800/40 dark:to-slate-900/40 border-2 border-cyan-500/50 shadow-[0_4px_24px_rgba(6,182,212,0.3)] relative overflow-hidden">
               {/* Glass glare effect */}
               <div className="absolute inset-0 bg-gradient-to-br from-white/20 via-transparent to-transparent pointer-events-none" />
+              {letterGrid && (
               <GridComponent
                 grid={letterGrid}
                 interactive={false}
                 className="w-full relative z-10"
                 heatMapData={heatMapData}
               />
+            )}
             </div>
           </motion.div>
         )}
@@ -146,8 +146,8 @@ const LetterGrid: React.FC<LetterGridProps> = ({ letterGrid, heatMapData, showHe
 };
 
 const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, letterGrid, gameCode, onReturnToRoom, username, socket }) => {
-  const { t, language } = useLanguage();
-  const { user, isAuthenticated } = useAuth();
+  const { t } = useLanguage();
+  const { isAuthenticated } = useAuth();
   const [showExitConfirm, setShowExitConfirm] = useState<boolean>(false);
   const [showAuthModal, setShowAuthModal] = useState<boolean>(false);
   const [showFirstWinModal, setShowFirstWinModal] = useState<boolean>(false);
@@ -196,14 +196,14 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, letterGrid, game
 
       if (currentPlayerData) {
         const validWords = currentPlayerData.allWords?.filter(w => w.validated && w.score > 0) || [];
-        const longestValidWord = validWords.reduce<string | null>((longest, w) =>
-          w.word.length > (longest?.length || 0) ? w.word : longest, null
+        const longestValidWord = validWords.reduce<string | undefined>((longest, w) =>
+          w.word.length > (longest?.length || 0) ? w.word : longest, undefined
         );
 
         updateGuestStatsAfterGame({
-          score: currentPlayerData.score || 0,
+          score: typeof currentPlayerData.score === 'number' ? currentPlayerData.score : 0,
           wordCount: validWords.length,
-          longestWord: longestValidWord,
+          longestWord: longestValidWord ?? undefined,
           isWinner: isCurrentUserWinner,
           achievements: (currentPlayerData.achievements || []).map(a => a.key || a.name || '')
         });
@@ -305,11 +305,35 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, letterGrid, game
   };
 
   // Create a map of all player words for duplicate detection
+  // Using 'any' here as the exact WordObject type varies between components
   const allPlayerWords = useMemo(() => {
-    const wordMap = {};
+    const wordMap: Record<string, Array<{
+      word: string;
+      score: number;
+      validated: boolean;
+      isDuplicate: boolean;
+      comboBonus?: number;
+      isAiVerified?: boolean;
+      isPendingValidation?: boolean;
+      potentialScore?: number;
+      invalidReason?: string;
+      aiReason?: string;
+    }>> = {};
     if (finalScores) {
       finalScores.forEach(player => {
-        wordMap[player.username] = player.allWords || [];
+        // Map allWords with required fields, defaulting isDuplicate to false
+        wordMap[player.username] = (player.allWords || []).map(w => ({
+          word: w.word,
+          score: w.score ?? 0,
+          validated: w.validated ?? false,
+          isDuplicate: (w as { isDuplicate?: boolean }).isDuplicate ?? false,
+          comboBonus: (w as { comboBonus?: number }).comboBonus,
+          isAiVerified: (w as { isAiVerified?: boolean }).isAiVerified,
+          isPendingValidation: (w as { isPendingValidation?: boolean }).isPendingValidation,
+          potentialScore: (w as { potentialScore?: number }).potentialScore,
+          invalidReason: (w as { invalidReason?: string }).invalidReason,
+          aiReason: (w as { aiReason?: string }).aiReason,
+        }));
       });
     }
     return wordMap;
@@ -319,7 +343,7 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, letterGrid, game
   const heatMapData = useMemo(() => {
     if (!finalScores || !letterGrid) return null;
 
-    const cellUsageCounts = {};
+    const cellUsageCounts: Record<string, number> = {};
     let maxCount = 0;
 
     // Collect all unique valid words from all players
@@ -362,7 +386,16 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, letterGrid, game
   useEffect(() => {
     if (!socket) return;
 
-    const handleShowWordFeedback = (data) => {
+    const handleShowWordFeedback = (data: {
+      word: string;
+      submittedBy: string;
+      submitterAvatar?: { emoji: string; color: string } | null;
+      voteInfo?: { votesFor?: number; votesAgainst?: number; approvalCount?: number; disapprovalCount?: number };
+      timeoutSeconds?: number;
+      gameCode: string;
+      language: string;
+      wordQueue?: WordToVote[];
+    }) => {
       logger.log('[RESULTS] Received word feedback request:', data);
 
       // Handle new word queue format (self-healing system)
@@ -371,11 +404,17 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, letterGrid, game
         logger.log('[RESULTS] Word queue with', data.wordQueue.length, 'words for voting');
       }
 
+      // Transform voteInfo to match expected VoteInfo interface
+      const transformedVoteInfo = data.voteInfo ? {
+        approvalCount: data.voteInfo.votesFor ?? data.voteInfo.approvalCount,
+        disapprovalCount: data.voteInfo.votesAgainst ?? data.voteInfo.disapprovalCount
+      } : undefined;
+
       setWordToVote({
         word: data.word,
         submittedBy: data.submittedBy,
         submitterAvatar: data.submitterAvatar,
-        voteInfo: data.voteInfo,
+        voteInfo: transformedVoteInfo,
         timeoutSeconds: data.timeoutSeconds || 10,
         gameCode: data.gameCode,
         language: data.language
@@ -383,17 +422,17 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, letterGrid, game
       setShowWordFeedback(true);
     };
 
-    const handleVoteRecorded = (data) => {
+    const handleVoteRecorded = (data: { success: boolean; message?: string }) => {
       logger.log('[RESULTS] Vote recorded:', data);
     };
 
     // XP and Level Up handlers
-    const handleXpGained = (data) => {
+    const handleXpGained = (data: XpGainedData) => {
       logger.log('[RESULTS] XP gained:', data);
       setXpGainedData(data);
     };
 
-    const handleLevelUp = (data) => {
+    const handleLevelUp = (data: LevelUpData) => {
       logger.log('[RESULTS] Level up!', data);
       setLevelUpData(data);
       // Celebratory confetti for level up
@@ -426,18 +465,21 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, letterGrid, game
   }, [socket]);
 
   // Handle word feedback vote (supports multi-word queue from self-healing system)
-  const handleVote = useCallback((voteType, votedWord) => {
+  const handleVote = useCallback((voteType: 'like' | 'dislike', votedWord?: string) => {
     if (!socket || !wordToVote) return;
 
     // Use the specific word being voted on, or fall back to current word
     const wordToSubmit = votedWord || wordToVote.word;
 
-    logger.log('[RESULTS] Submitting vote:', { word: wordToSubmit, voteType });
+    // Map 'like'/'dislike' to 'valid'/'invalid' for backend
+    const backendVoteType = voteType === 'like' ? 'valid' : 'invalid';
+
+    logger.log('[RESULTS] Submitting vote:', { word: wordToSubmit, voteType: backendVoteType });
     socket.emit('submitWordVote', {
       word: wordToSubmit,
       language: wordToVote.language,
       gameCode: wordToVote.gameCode,
-      voteType,
+      voteType: backendVoteType,
       submittedBy: wordToVote.submittedBy
     });
 
@@ -675,9 +717,12 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, letterGrid, game
         isOpen={showWordFeedback && wordToVote !== null}
         word={wordToVote?.word || ''}
         submittedBy={wordToVote?.submittedBy || ''}
-        submitterAvatar={wordToVote?.submitterAvatar}
+        submitterAvatar={wordToVote?.submitterAvatar ?? undefined}
         voteInfo={wordToVote?.voteInfo}
-        wordQueue={wordQueue}
+        wordQueue={wordQueue.map(w => ({
+          ...w,
+          submitterAvatar: w.submitterAvatar ?? undefined
+        }))}
         timeoutSeconds={wordToVote?.timeoutSeconds || 15}
         onVote={handleVote}
         onSkip={handleFeedbackSkip}

@@ -352,7 +352,7 @@ const ResultsPlayerCard: React.FC<ResultsPlayerCardProps> = ({ player, index, al
 
     // Debug logging for combo bonus calculation
     if (totalComboBonus > 0) {
-      logger.log(`[RESULTS] ${player.username} combo bonus: ${totalComboBonus} from ${validWords.filter(w => w.comboBonus > 0).length} words with bonuses`);
+      logger.log(`[RESULTS] ${player.username} combo bonus: ${totalComboBonus} from ${validWords.filter(w => (w.comboBonus ?? 0) > 0).length} words with bonuses`);
     }
 
     // Group valid words by points

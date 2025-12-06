@@ -79,6 +79,7 @@ const WinStreakDisplay: React.FC<WinStreakDisplayProps> = ({
       const timer = setTimeout(() => setShowMilestone(false), 3000);
       return () => clearTimeout(timer);
     }
+    return undefined;
   }, [isNewMilestone, tierChanged, isNewBest]);
 
   if (currentStreak === 0) return null;
