@@ -65,7 +65,7 @@ const calculateWordScore = (word, comboLevel = 0) => {
  * @param {object} wordCountMap - Map of word to count across all players
  * @param {Set} dictionaryValidatedWords - Words validated by dictionary
  * @param {Set} communityValidatedWords - Words validated by community
- * @param {Map} aiValidatedWords - Words validated by AI with isValid status
+ * @param {Map} aiValidatedWords - Words validated by AI with isValid status and reason
  * @returns {array} - Array of player score objects
  */
 const calculateGameScores = (game, wordCountMap = {}, dictionaryValidatedWords = new Set(), communityValidatedWords = new Set(), aiValidatedWords = new Map()) => {
@@ -85,6 +85,8 @@ const calculateGameScores = (game, wordCountMap = {}, dictionaryValidatedWords =
       let validated = false;
       let inDictionary = false;
       let validationSource = 'none';
+      let isAiVerified = false;
+      let aiReason = null;
 
       if (dictionaryValidatedWords.has(word)) {
         validated = true;
@@ -96,7 +98,9 @@ const calculateGameScores = (game, wordCountMap = {}, dictionaryValidatedWords =
       } else if (aiValidatedWords.has(word)) {
         const aiResult = aiValidatedWords.get(word);
         validated = aiResult.isValid;
+        isAiVerified = aiResult.isAiVerified === true;
         validationSource = aiResult.isAiVerified ? 'ai' : aiResult.source || 'cached';
+        aiReason = aiResult.reason || null;
       }
 
       // Check if word is unique (only one player submitted it)
@@ -115,7 +119,7 @@ const calculateGameScores = (game, wordCountMap = {}, dictionaryValidatedWords =
         totalScore += score;
       }
 
-      wordDetails.push({
+      const wordDetail = {
         word,
         score,
         validated,
@@ -123,8 +127,16 @@ const calculateGameScores = (game, wordCountMap = {}, dictionaryValidatedWords =
         validationSource,
         isUnique,
         isDuplicate: !isUnique, // Frontend expects isDuplicate (inverse of isUnique)
-        comboBonus: existingDetails?.comboBonus || 0
-      });
+        comboBonus: existingDetails?.comboBonus || 0,
+        isAiVerified
+      };
+
+      // Only add aiReason if present (for invalid AI-verified words or valid ones with explanation)
+      if (aiReason) {
+        wordDetail.aiReason = aiReason;
+      }
+
+      wordDetails.push(wordDetail);
     }
 
     // Get user data for avatar
