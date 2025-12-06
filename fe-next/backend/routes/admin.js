@@ -1,6 +1,12 @@
 /**
  * Admin API Routes
  * Handles all /api/admin/* endpoints for the admin dashboard
+ *
+ * Security features:
+ * - JWT authentication via Supabase
+ * - Admin role verification
+ * - Rate limiting per IP
+ * - Audit logging for sensitive operations
  */
 
 const express = require('express');
@@ -9,19 +15,111 @@ const { getSupabase, isSupabaseConfigured } = require('../modules/supabaseServer
 const { getAllGames } = require('../modules/gameStateManager');
 const logger = require('../utils/logger');
 
+// ==================== Rate Limiting ====================
+
+/**
+ * Simple in-memory rate limiter for admin endpoints
+ * More restrictive than general API rate limiting
+ */
+const adminRateLimiter = {
+  requests: new Map(),
+  maxRequests: 100,       // Max requests per window
+  windowMs: 60 * 1000,    // 1 minute window
+
+  isAllowed(ip) {
+    const now = Date.now();
+    const key = `admin:${ip}`;
+
+    if (!this.requests.has(key)) {
+      this.requests.set(key, { count: 1, resetAt: now + this.windowMs });
+      return true;
+    }
+
+    const record = this.requests.get(key);
+    if (now > record.resetAt) {
+      record.count = 1;
+      record.resetAt = now + this.windowMs;
+      return true;
+    }
+
+    if (record.count >= this.maxRequests) {
+      logger.warn('ADMIN_API', `Rate limit exceeded for IP: ${ip}`);
+      return false;
+    }
+
+    record.count++;
+    return true;
+  },
+
+  // Cleanup old entries every 5 minutes
+  cleanup() {
+    const now = Date.now();
+    for (const [key, record] of this.requests) {
+      if (now > record.resetAt + this.windowMs) {
+        this.requests.delete(key);
+      }
+    }
+  }
+};
+
+// Run cleanup periodically
+setInterval(() => adminRateLimiter.cleanup(), 5 * 60 * 1000);
+
+// ==================== Audit Logging ====================
+
+/**
+ * Log admin actions for audit trail
+ */
+function auditLog(adminUser, action, details = {}) {
+  logger.info('ADMIN_AUDIT', JSON.stringify({
+    timestamp: new Date().toISOString(),
+    adminId: adminUser?.id || 'unknown',
+    adminEmail: adminUser?.email || 'unknown',
+    action,
+    details,
+  }));
+}
+
+// ==================== Middleware ====================
+
+/**
+ * Rate limiting middleware for admin routes
+ */
+function adminRateLimit(req, res, next) {
+  const ip = req.headers['x-forwarded-for']?.split(',')[0]?.trim() ||
+             req.headers['x-real-ip'] ||
+             req.socket.remoteAddress ||
+             'unknown';
+
+  if (!adminRateLimiter.isAllowed(ip)) {
+    return res.status(429).json({
+      error: 'Too many requests',
+      retryAfter: 60
+    });
+  }
+
+  next();
+}
+
 /**
  * Admin authentication middleware
  * Verifies JWT token and checks for admin role
  */
 async function adminAuth(req, res, next) {
+  // Generate request ID for tracing
+  const requestId = `admin-${Date.now()}-${Math.random().toString(36).substring(7)}`;
+  req.requestId = requestId;
+  res.setHeader('X-Request-Id', requestId);
+
   const authHeader = req.headers.authorization;
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    return res.status(401).json({ error: 'Missing authorization header' });
+    logger.warn('ADMIN_API', `Missing auth header [${requestId}]`);
+    return res.status(401).json({ error: 'Missing authorization header', requestId });
   }
 
   const token = authHeader.substring(7);
   if (!isSupabaseConfigured()) {
-    return res.status(503).json({ error: 'Auth service not available' });
+    return res.status(503).json({ error: 'Auth service not available', requestId });
   }
 
   try {
@@ -30,29 +128,36 @@ async function adminAuth(req, res, next) {
     const { data: { user }, error: authError } = await supabase.auth.getUser(token);
 
     if (authError || !user) {
-      return res.status(401).json({ error: 'Invalid token' });
+      logger.warn('ADMIN_API', `Invalid token [${requestId}]`);
+      return res.status(401).json({ error: 'Invalid token', requestId });
     }
 
-    // Check if user is admin
+    // Check if user is admin - server-side verification
     const { data: profile, error: profileError } = await supabase
       .from('profiles')
-      .select('is_admin')
+      .select('is_admin, username')
       .eq('id', user.id)
       .single();
 
     if (profileError || !profile?.is_admin) {
-      return res.status(403).json({ error: 'Admin access required' });
+      logger.warn('ADMIN_API', `Non-admin access attempt by ${user.email} [${requestId}]`);
+      return res.status(403).json({ error: 'Admin access required', requestId });
     }
 
-    req.adminUser = user;
+    req.adminUser = { ...user, username: profile.username };
+
+    // Log successful admin access
+    logger.debug('ADMIN_API', `Admin access: ${user.email} -> ${req.method} ${req.path} [${requestId}]`);
+
     next();
   } catch (error) {
-    logger.error('ADMIN_API', `Auth error: ${error.message}`);
-    return res.status(500).json({ error: 'Authentication failed' });
+    logger.error('ADMIN_API', `Auth error: ${error.message} [${requestId}]`);
+    return res.status(500).json({ error: 'Authentication failed', requestId });
   }
 }
 
-// Apply admin auth to all routes
+// Apply rate limiting first, then auth
+router.use(adminRateLimit);
 router.use(adminAuth);
 
 /**
@@ -622,7 +727,8 @@ router.post('/bot-blacklist', async (req, res) => {
       throw error;
     }
 
-    logger.info('ADMIN', `Word "${word}" (${language}) blacklisted by admin`);
+    // Audit log for security trail
+    auditLog(req.adminUser, 'BLACKLIST_ADD', { word, language, reason, entryId: data.id });
     res.json({ success: true, blacklistEntry: data });
   } catch (error) {
     logger.error('ADMIN_API', `Add blacklist error: ${error.message}`);
@@ -646,7 +752,8 @@ router.delete('/bot-blacklist/:id', async (req, res) => {
 
     if (error) throw error;
 
-    logger.info('ADMIN', `Blacklist entry ${id} removed by admin`);
+    // Audit log for security trail
+    auditLog(req.adminUser, 'BLACKLIST_REMOVE', { entryId: id });
     res.json({ success: true });
   } catch (error) {
     logger.error('ADMIN_API', `Delete blacklist error: ${error.message}`);
