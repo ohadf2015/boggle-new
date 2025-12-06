@@ -1,4 +1,6 @@
-import React, { useState, useEffect, useCallback, useRef, memo, useMemo } from 'react';
+'use client';
+
+import React, { useState, useEffect, useCallback, useRef, memo } from 'react';
 import GoRipplesAnimation from '../components/GoRipplesAnimation';
 import { useSocket } from '../utils/SocketContext';
 import { clearSessionPreservingUsername } from '../utils/session';
@@ -8,82 +10,168 @@ import { useSoundEffects } from '../contexts/SoundEffectsContext';
 import { useAchievementQueue } from '../components/achievements';
 import { usePresence } from '../hooks/usePresence';
 import logger from '@/utils/logger';
+import type { LetterGrid, Language, Avatar, GridPosition } from '@/types';
 
 // Extracted components
 import PlayerWaitingView from './components/PlayerWaitingView';
 import PlayerWaitingResultsView from './components/PlayerWaitingResultsView';
 import PlayerInGameView from './components/PlayerInGameView';
-// Word feedback modal is now on ResultsPage
 
 // Custom hooks
 import usePlayerSocketEvents from './hooks/usePlayerSocketEvents';
+
+// ==========================================
+// Type Definitions
+// ==========================================
+
+interface Player {
+  username: string;
+  avatar?: Avatar;
+  isHost?: boolean;
+  isBot?: boolean;
+  presence?: 'active' | 'idle' | 'afk';
+  disconnected?: boolean;
+}
+
+interface FoundWord {
+  word: string;
+  isValid: boolean | null;
+  score?: number;
+  duplicate?: boolean;
+}
+
+interface LeaderboardEntry {
+  username: string;
+  score: number;
+  wordCount?: number;
+  avatar?: Avatar;
+}
+
+interface TournamentData {
+  id: string;
+  name: string;
+  totalRounds: number;
+  currentRound: number;
+  status: 'created' | 'in-progress' | 'completed' | 'cancelled';
+}
+
+interface TournamentStanding {
+  username: string;
+  totalScore: number;
+  roundsPlayed: number;
+  avatar?: Avatar;
+}
+
+interface PendingGameStart {
+  letterGrid?: LetterGrid;
+  timerSeconds?: number;
+  language?: Language;
+  minWordLength?: number;
+  messageId?: string;
+}
+
+interface XpGainedData {
+  totalXp: number;
+  breakdown: {
+    gameCompletion: number;
+    scoreXp: number;
+    winBonus: number;
+    achievementXp: number;
+  };
+}
+
+interface LevelUpData {
+  oldLevel: number;
+  newLevel: number;
+  newTitles: string[];
+}
+
+interface PlayerViewProps {
+  onShowResults: (data: unknown) => void;
+  initialPlayers?: Player[];
+  username: string;
+  gameCode: string;
+  pendingGameStart?: PendingGameStart | null;
+  onGameStartConsumed?: () => void;
+}
+
+// ==========================================
+// Component
+// ==========================================
 
 /**
  * PlayerView - Main player component managing game state and views
  * Memoized to prevent unnecessary re-renders from parent updates
  */
-const PlayerView = memo(({ onShowResults, initialPlayers = [], username, gameCode, pendingGameStart, onGameStartConsumed }) => {
+const PlayerView: React.FC<PlayerViewProps> = memo(({
+  onShowResults,
+  initialPlayers = [],
+  username,
+  gameCode,
+  pendingGameStart,
+  onGameStartConsumed
+}) => {
   const { t, dir } = useLanguage();
   const { socket } = useSocket();
   const { fadeToTrack, stopMusic, TRACKS } = useMusic();
   const { playComboSound, playCountdownBeep } = useSoundEffects();
   const { queueAchievement } = useAchievementQueue();
-  const inputRef = useRef(null);
-  const intentionalExitRef = useRef(false);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const intentionalExitRef = useRef<boolean>(false);
 
   // Enable presence tracking
   usePresence({ enabled: !!gameCode });
 
   // Game state
-  const [word, setWord] = useState('');
-  const [foundWords, setFoundWords] = useState([]);
-  const [leaderboard, setLeaderboard] = useState([]);
-  const [gameActive, setGameActive] = useState(false);
-  const [achievements, setAchievements] = useState([]);
-  const [letterGrid, setLetterGrid] = useState(null);
-  const [remainingTime, setRemainingTime] = useState(null);
-  const [waitingForResults, setWaitingForResults] = useState(false);
-  const [showStartAnimation, setShowStartAnimation] = useState(false);
-  const [minWordLength, setMinWordLength] = useState(2);
+  const [word, setWord] = useState<string>('');
+  const [foundWords, setFoundWords] = useState<FoundWord[]>([]);
+  const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
+  const [gameActive, setGameActive] = useState<boolean>(false);
+  const [achievements, setAchievements] = useState<string[]>([]);
+  const [letterGrid, setLetterGrid] = useState<LetterGrid | null>(null);
+  const [remainingTime, setRemainingTime] = useState<number | null>(null);
+  const [waitingForResults, setWaitingForResults] = useState<boolean>(false);
+  const [showStartAnimation, setShowStartAnimation] = useState<boolean>(false);
+  const [minWordLength, setMinWordLength] = useState<number>(2);
 
   // Player state
-  const [playersReady, setPlayersReady] = useState(initialPlayers);
-  const [shufflingGrid, setShufflingGrid] = useState(null);
-  const [highlightedCells, setHighlightedCells] = useState([]);
-  const [gameLanguage, setGameLanguage] = useState(null);
+  const [playersReady, setPlayersReady] = useState<Player[]>(initialPlayers);
+  const [shufflingGrid, setShufflingGrid] = useState<LetterGrid | null>(null);
+  const [highlightedCells, setHighlightedCells] = useState<GridPosition[]>([]);
+  const [gameLanguage, setGameLanguage] = useState<Language | null>(null);
 
   // UI state
-  const [showQR, setShowQR] = useState(false);
-  const [showExitConfirm, setShowExitConfirm] = useState(false);
+  const [showQR, setShowQR] = useState<boolean>(false);
+  const [showExitConfirm, setShowExitConfirm] = useState<boolean>(false);
 
   // Track active game session
-  const [wasInActiveGame, setWasInActiveGame] = useState(false);
+  const [wasInActiveGame, setWasInActiveGame] = useState<boolean>(false);
 
   // Combo system
-  const [comboLevel, setComboLevel] = useState(0);
-  const [lastWordTime, setLastWordTime] = useState(null);
-  const comboTimeoutRef = useRef(null);
-  const comboLevelRef = useRef(0);
-  const lastWordTimeRef = useRef(null);
+  const [comboLevel, setComboLevel] = useState<number>(0);
+  const [lastWordTime, setLastWordTime] = useState<number | null>(null);
+  const comboTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const comboLevelRef = useRef<number>(0);
+  const lastWordTimeRef = useRef<number | null>(null);
 
-  // Combo shield system - protects combo from 1 wrong word per 10 valid words
-  const comboShieldsUsedRef = useRef(0);
+  // Combo shield system
+  const comboShieldsUsedRef = useRef<number>(0);
 
   // Tournament state
-  const [tournamentData, setTournamentData] = useState(null);
-  const [tournamentStandings, setTournamentStandings] = useState([]);
-  const [showTournamentStandings, setShowTournamentStandings] = useState(false);
+  const [tournamentData, setTournamentData] = useState<TournamentData | null>(null);
+  const [tournamentStandings, setTournamentStandings] = useState<TournamentStanding[]>([]);
+  const [showTournamentStandings, setShowTournamentStandings] = useState<boolean>(false);
 
   // Word feedback state
-  const [showWordFeedback, setShowWordFeedback] = useState(false);
-  const [wordToVote, setWordToVote] = useState(null);
+  const [showWordFeedback, setShowWordFeedback] = useState<boolean>(false);
+  const [wordToVote, setWordToVote] = useState<string | null>(null);
 
-  // XP and Level state (for passing to results)
-  const [xpGainedData, setXpGainedData] = useState(null);
-  const [levelUpData, setLevelUpData] = useState(null);
+  // XP and Level state
+  const [xpGainedData, setXpGainedData] = useState<XpGainedData | null>(null);
+  const [levelUpData, setLevelUpData] = useState<LevelUpData | null>(null);
 
   // Music ref
-  const hasTriggeredUrgentMusicRef = useRef(false);
+  const hasTriggeredUrgentMusicRef = useRef<boolean>(false);
 
   // Use custom hook for socket events
   usePlayerSocketEvents({
@@ -153,10 +241,7 @@ const PlayerView = memo(({ onShowResults, initialPlayers = [], username, gameCod
     }
   }, [remainingTime, gameActive, playCountdownBeep]);
 
-  // Client-side countdown timer - decrements remainingTime every second
-  // Server broadcasts time updates every ~10 seconds, so we interpolate locally
-  // Note: We only depend on gameActive, not remainingTime, to avoid restarting
-  // the interval on every tick. The interval's closure handles the countdown.
+  // Client-side countdown timer
   useEffect(() => {
     if (!gameActive) {
       return;
@@ -184,11 +269,9 @@ const PlayerView = memo(({ onShowResults, initialPlayers = [], username, gameCod
     lastWordTimeRef.current = lastWordTime;
   }, [lastWordTime]);
 
-  // Activate game when countdown animation completes (3-2-1-GO!)
-  // This ensures the animation plays BEFORE the game board appears
+  // Activate game when countdown animation completes
   useEffect(() => {
-    // Check if animation just finished and we have game data ready
-    if (!showStartAnimation && letterGrid && remainingTime > 0 && !gameActive && !waitingForResults) {
+    if (!showStartAnimation && letterGrid && remainingTime && remainingTime > 0 && !gameActive && !waitingForResults) {
       logger.log('[PLAYER] Countdown animation complete, activating game');
       setGameActive(true);
     }
@@ -233,8 +316,6 @@ const PlayerView = memo(({ onShowResults, initialPlayers = [], username, gameCod
       if (pendingGameStart.timerSeconds) setRemainingTime(pendingGameStart.timerSeconds);
       if (pendingGameStart.language) setGameLanguage(pendingGameStart.language);
       if (pendingGameStart.minWordLength) setMinWordLength(pendingGameStart.minWordLength);
-      // Don't set gameActive here - let the countdown animation play first
-      // Game will activate when animation completes via the effect above
       setShowStartAnimation(true);
 
       if (pendingGameStart.messageId) {
@@ -251,7 +332,7 @@ const PlayerView = memo(({ onShowResults, initialPlayers = [], username, gameCod
     const shouldWarn = gameActive || foundWords.length > 0 || waitingForResults;
     if (!shouldWarn) return;
 
-    const handleBeforeUnload = (e) => {
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
       if (intentionalExitRef.current) return;
       e.preventDefault();
       e.returnValue = '';
@@ -263,7 +344,7 @@ const PlayerView = memo(({ onShowResults, initialPlayers = [], username, gameCod
   }, [gameActive, foundWords.length, waitingForResults]);
 
   // Exit handlers
-  const handleExitRoom = useCallback((e) => {
+  const handleExitRoom = useCallback((e?: React.MouseEvent) => {
     if (e) {
       e.preventDefault();
       e.stopPropagation();
@@ -298,14 +379,12 @@ const PlayerView = memo(({ onShowResults, initialPlayers = [], username, gameCod
     }, 200);
   }, [socket, gameCode, username]);
 
-  // Word submission handler - adds word to list, server will update isValid
-  const handleWordSubmit = useCallback((formedWord) => {
+  // Word submission handler
+  const handleWordSubmit = useCallback((formedWord: string) => {
     setFoundWords(prev => [...prev, { word: formedWord, isValid: null }]);
   }, []);
 
   // Render appropriate view
-  // Note: waitingForResults state should transition quickly to results page
-  // Word feedback modal is now shown on the ResultsPage instead
   if (waitingForResults) {
     return (
       <>
@@ -390,7 +469,6 @@ const PlayerView = memo(({ onShowResults, initialPlayers = [], username, gameCod
   );
 });
 
-// Display name for debugging in React DevTools
 PlayerView.displayName = 'PlayerView';
 
 export default PlayerView;

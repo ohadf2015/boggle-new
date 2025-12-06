@@ -1,4 +1,6 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+'use client';
+
+import React, { useState, useEffect, useRef, useCallback, memo } from 'react';
 import { FaSignOutAlt } from 'react-icons/fa';
 import { Button } from '../components/ui/button';
 import { neoSuccessToast, neoErrorToast, neoInfoToast } from '../components/NeoToast';
@@ -14,6 +16,7 @@ import { useAchievementQueue } from '../components/achievements';
 import { DIFFICULTIES, DEFAULT_DIFFICULTY, DEFAULT_MIN_WORD_LENGTH } from '../utils/consts';
 import { usePresence } from '../hooks/usePresence';
 import logger from '@/utils/logger';
+import type { LetterGrid, Language, DifficultyLevel, Avatar, WordDetail, LeaderboardEntry } from '@/types';
 
 // Extracted components
 import HostPreGameView from './components/HostPreGameView';
@@ -29,75 +32,140 @@ import {
 // Custom hooks
 import useHostSocketEvents from './hooks/useHostSocketEvents';
 
-const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [], username, onShowResults }) => {
+// ==========================================
+// Type Definitions
+// ==========================================
+
+interface Player {
+  username: string;
+  avatar?: Avatar;
+  isHost?: boolean;
+  isBot?: boolean;
+  presence?: 'active' | 'idle' | 'afk';
+  disconnected?: boolean;
+}
+
+interface TournamentData {
+  id: string;
+  name: string;
+  totalRounds: number;
+  currentRound: number;
+  status: 'created' | 'in-progress' | 'completed' | 'cancelled';
+}
+
+interface FinalScoresData {
+  players: Array<{
+    username: string;
+    score: number;
+    wordsFound: number;
+    avatar?: Avatar;
+  }>;
+  gameCode: string;
+}
+
+interface XpGainedData {
+  totalXp: number;
+  breakdown: {
+    gameCompletion: number;
+    scoreXp: number;
+    winBonus: number;
+    achievementXp: number;
+  };
+}
+
+interface LevelUpData {
+  oldLevel: number;
+  newLevel: number;
+  newTitles: string[];
+}
+
+interface HostViewProps {
+  gameCode: string;
+  roomLanguage?: Language;
+  initialPlayers?: Player[];
+  username: string;
+  onShowResults: (data: unknown) => void;
+}
+
+// ==========================================
+// Component
+// ==========================================
+
+const HostView: React.FC<HostViewProps> = memo(({
+  gameCode,
+  roomLanguage: roomLanguageProp,
+  initialPlayers = [],
+  username,
+  onShowResults
+}) => {
   const { t, language, dir } = useLanguage();
   const { socket } = useSocket();
   const { fadeToTrack, stopMusic, TRACKS } = useMusic();
   const { playComboSound, playCountdownBeep } = useSoundEffects();
   const { queueAchievement } = useAchievementQueue();
-  const intentionalExitRef = useRef(false);
+  const intentionalExitRef = useRef<boolean>(false);
 
   // Enable presence tracking
   usePresence({ enabled: !!gameCode });
 
   // Game settings state
-  const [difficulty, setDifficulty] = useState(DEFAULT_DIFFICULTY);
-  const [minWordLength, setMinWordLength] = useState(DEFAULT_MIN_WORD_LENGTH);
-  const [tableData, setTableData] = useState(generateRandomTable());
-  const [timerValue, setTimerValue] = useState(1); // 1 minute default (matches MEDIUM difficulty)
-  const [timerDirection, setTimerDirection] = useState(0);
-  const [remainingTime, setRemainingTime] = useState(null);
-  const [gameStarted, setGameStarted] = useState(false);
-  const [roomLanguage] = useState(roomLanguageProp || language);
+  const [difficulty, setDifficulty] = useState<DifficultyLevel>(DEFAULT_DIFFICULTY);
+  const [minWordLength, setMinWordLength] = useState<number>(DEFAULT_MIN_WORD_LENGTH);
+  const [tableData, setTableData] = useState<LetterGrid>(generateRandomTable());
+  const [timerValue, setTimerValue] = useState<number>(1);
+  const [timerDirection, setTimerDirection] = useState<number>(0);
+  const [remainingTime, setRemainingTime] = useState<number | null>(null);
+  const [gameStarted, setGameStarted] = useState<boolean>(false);
+  const [roomLanguage] = useState<Language>((roomLanguageProp || language) as Language);
 
   // Player state
-  const [playersReady, setPlayersReady] = useState(initialPlayers);
-  const [playerWordCounts, setPlayerWordCounts] = useState({});
-  const [playerScores, setPlayerScores] = useState({});
-  const [playerAchievements, setPlayerAchievements] = useState({});
+  const [playersReady, setPlayersReady] = useState<Player[]>(initialPlayers);
+  const [playerWordCounts, setPlayerWordCounts] = useState<Record<string, number>>({});
+  const [playerScores, setPlayerScores] = useState<Record<string, number>>({});
+  const [playerAchievements, setPlayerAchievements] = useState<Record<string, string[]>>({});
 
   // Scores state
-  const [finalScores, setFinalScores] = useState(null);
+  const [finalScores, setFinalScores] = useState<FinalScoresData | null>(null);
 
   // UI state
-  const [showQR, setShowQR] = useState(false);
-  const [showStartAnimation, setShowStartAnimation] = useState(false);
-  const [showExitConfirm, setShowExitConfirm] = useState(false);
-  const [showCancelTournamentDialog, setShowCancelTournamentDialog] = useState(false);
-  const [waitingForResults, setWaitingForResults] = useState(false);
+  const [showQR, setShowQR] = useState<boolean>(false);
+  const [showStartAnimation, setShowStartAnimation] = useState<boolean>(false);
+  const [showExitConfirm, setShowExitConfirm] = useState<boolean>(false);
+  const [showCancelTournamentDialog, setShowCancelTournamentDialog] = useState<boolean>(false);
+  const [waitingForResults, setWaitingForResults] = useState<boolean>(false);
 
   // Host playing state
-  const [hostPlaying, setHostPlaying] = useState(true);
-  const [hostFoundWords, setHostFoundWords] = useState([]);
-  const [hostAchievements, setHostAchievements] = useState([]);
+  const [hostPlaying, setHostPlaying] = useState<boolean>(true);
+  const [hostFoundWords, setHostFoundWords] = useState<string[]>([]);
+  const [hostAchievements, setHostAchievements] = useState<string[]>([]);
 
   // Tournament state
-  const [gameType, setGameType] = useState('regular');
-  const [tournamentRounds, setTournamentRounds] = useState(3);
-  const [tournamentData, setTournamentData] = useState(null);
-  const [tournamentCreating, setTournamentCreating] = useState(false);
-  const tournamentTimeoutRef = useRef(null);
+  const [gameType, setGameType] = useState<'regular' | 'tournament'>('regular');
+  const [tournamentRounds, setTournamentRounds] = useState<number>(3);
+  const [tournamentData, setTournamentData] = useState<TournamentData | null>(null);
+  const [tournamentCreating, setTournamentCreating] = useState<boolean>(false);
+  const tournamentTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // Animation state
-  const [shufflingGrid, setShufflingGrid] = useState(null);
-  const [highlightedCells, setHighlightedCells] = useState([]);
+  const [shufflingGrid, setShufflingGrid] = useState<LetterGrid | null>(null);
+  const [highlightedCells, setHighlightedCells] = useState<Array<{ row: number; col: number }>>([]);
 
   // Combo system state
-  const [comboLevel, setComboLevel] = useState(0);
-  const [lastWordTime, setLastWordTime] = useState(null);
-  const comboTimeoutRef = useRef(null);
-  const comboLevelRef = useRef(0);
-  const lastWordTimeRef = useRef(null);
+  const [comboLevel, setComboLevel] = useState<number>(0);
+  const [lastWordTime, setLastWordTime] = useState<number | null>(null);
+  const comboTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const comboLevelRef = useRef<number>(0);
+  const lastWordTimeRef = useRef<number | null>(null);
 
   // Words for board embedding
-  const [wordsForBoard, setWordsForBoard] = useState([]);
+  const [wordsForBoard, setWordsForBoard] = useState<string[]>([]);
 
-  // XP and Level state (for passing to results)
-  const [xpGainedData, setXpGainedData] = useState(null);
-  const [levelUpData, setLevelUpData] = useState(null);
+  // XP and Level state
+  const [xpGainedData, setXpGainedData] = useState<XpGainedData | null>(null);
+  const [levelUpData, setLevelUpData] = useState<LevelUpData | null>(null);
 
   // Urgent music ref
-  const hasTriggeredUrgentMusicRef = useRef(false);
+  const hasTriggeredUrgentMusicRef = useRef<boolean>(false);
 
   // Use custom hook for socket events
   useHostSocketEvents({
@@ -161,8 +229,7 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
     }
   }, [remainingTime, gameStarted, playCountdownBeep]);
 
-  // Client-side countdown timer - decrements remainingTime every second
-  // Server broadcasts time updates every ~10 seconds, so we interpolate locally
+  // Client-side countdown timer
   useEffect(() => {
     if (!gameStarted || remainingTime === null || remainingTime <= 0) {
       return;
@@ -186,11 +253,9 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
     setPlayersReady(initialPlayers);
   }, [initialPlayers]);
 
-  // Activate game when countdown animation completes (3-2-1-GO!)
-  // This ensures the animation plays BEFORE the game board appears
+  // Activate game when countdown animation completes
   useEffect(() => {
-    // Check if animation just finished and we have game data ready
-    if (!showStartAnimation && tableData && remainingTime > 0 && !gameStarted && !waitingForResults) {
+    if (!showStartAnimation && tableData && remainingTime && remainingTime > 0 && !gameStarted && !waitingForResults) {
       logger.log('[HOST] Countdown animation complete, activating game');
       setGameStarted(true);
     }
@@ -224,7 +289,7 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
     const cols = DIFFICULTIES[difficulty].cols;
 
     const interval = setInterval(() => {
-      const randomGrid = generateRandomTable(rows, cols, currentLang);
+      const randomGrid = generateRandomTable(rows, cols, currentLang as Language);
       setShufflingGrid(randomGrid);
       setHighlightedCells([]);
 
@@ -244,7 +309,7 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
     const shouldWarn = playersReady.length > 0 || gameStarted;
     if (!shouldWarn) return;
 
-    const handleBeforeUnload = (e) => {
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
       if (intentionalExitRef.current) return;
       e.preventDefault();
       e.returnValue = '';
@@ -261,7 +326,7 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
 
     if (gameType === 'tournament' && !tournamentData) {
       setTournamentCreating(true);
-      socket.emit('createTournament', {
+      socket?.emit('createTournament', {
         name: 'Tournament',
         totalRounds: tournamentRounds,
         timerSeconds: timerValue * 60,
@@ -282,7 +347,7 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
     }
 
     if (gameType === 'tournament' && tournamentData) {
-      socket.emit('startTournamentRound');
+      socket?.emit('startTournamentRound');
       return;
     }
 
@@ -292,15 +357,13 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
     setTableData(newTable);
     const seconds = timerValue * 60;
     setRemainingTime(seconds);
-    // Don't set gameStarted here - let the countdown animation play first
-    // Game will activate when animation completes via the useEffect below
     setShowStartAnimation(true);
     setPlayerWordCounts({});
     setPlayerScores({});
     setHostFoundWords([]);
     setHostAchievements([]);
 
-    socket.emit('startGame', {
+    socket?.emit('startGame', {
       letterGrid: newTable,
       timerSeconds: seconds,
       language: roomLanguage,
@@ -315,7 +378,7 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
   }, [playersReady, gameType, tournamentData, socket, t, timerValue, difficulty, roomLanguage, wordsForBoard, hostPlaying, minWordLength, tournamentRounds]);
 
   const stopGame = useCallback(() => {
-    socket.emit('endGame', { gameCode });
+    socket?.emit('endGame', { gameCode });
     setRemainingTime(null);
     setGameStarted(false);
     neoInfoToast(t('hostView.gameStopped'), { icon: '⏹️' });
@@ -328,9 +391,9 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
   const confirmExitRoom = useCallback(() => {
     intentionalExitRef.current = true;
     clearSessionPreservingUsername(username);
-    socket.emit('closeRoom', { gameCode });
+    socket?.emit('closeRoom', { gameCode });
     setTimeout(() => {
-      socket.disconnect();
+      socket?.disconnect();
       window.location.reload();
     }, 100);
   }, [socket, gameCode, username]);
@@ -347,12 +410,12 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
     });
   }, [socket, tournamentData, t]);
 
-  const handleHostWordSubmit = useCallback((formedWord) => {
+  const handleHostWordSubmit = useCallback((formedWord: string) => {
     setHostFoundWords(prev => [...prev, formedWord]);
   }, []);
 
   const handleStartNewGame = useCallback(() => {
-    socket.emit('resetGame');
+    socket?.emit('resetGame');
     setFinalScores(null);
     setGameStarted(false);
     setWaitingForResults(false);
@@ -373,8 +436,24 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
 
   const handleNextRound = useCallback(() => {
     setFinalScores(null);
-    socket.emit('startTournamentRound');
+    socket?.emit('startTournamentRound');
   }, [socket]);
+
+  const handleShowQR = useCallback(() => setShowQR(true), []);
+  const handleCancelTournamentDialog = useCallback(() => setShowCancelTournamentDialog(true), []);
+
+  // Build leaderboard for waiting view
+  const leaderboard = playersReady
+    .map(player => {
+      const name = typeof player === 'string' ? player : player.username;
+      return {
+        username: name,
+        score: playerScores[name] || 0,
+        wordCount: playerWordCounts[name] || 0,
+        avatar: typeof player === 'object' ? player.avatar : undefined,
+      };
+    })
+    .sort((a, b) => b.score - a.score);
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-50 via-slate-100 to-slate-200 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 flex flex-col items-center p-2 sm:p-4 md:p-6 lg:p-8 overflow-auto transition-colors duration-300">
@@ -418,7 +497,7 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
         t={t}
       />
 
-      {/* Top Bar with Exit Button - Hidden when waiting for results (WaitingResultsView has its own) */}
+      {/* Top Bar with Exit Button */}
       {!waitingForResults && (
         <div className="w-full max-w-6xl flex justify-end mb-4">
           <Button
@@ -439,17 +518,7 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
           gameCode={gameCode}
           t={t}
           dir={dir}
-          leaderboard={playersReady
-            .map(player => {
-              const name = typeof player === 'string' ? player : player.username;
-              return {
-                username: name,
-                score: playerScores[name] || 0,
-                wordCount: playerWordCounts[name] || 0,
-                avatar: typeof player === 'object' ? player.avatar : null,
-              };
-            })
-            .sort((a, b) => b.score - a.score)}
+          leaderboard={leaderboard}
           foundWords={hostFoundWords}
           showExitConfirm={showExitConfirm}
           setShowExitConfirm={setShowExitConfirm}
@@ -459,12 +528,12 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
         />
       )}
 
-      {/* Pre-Game View - hidden when countdown animation is playing or waiting for results */}
+      {/* Pre-Game View */}
       {!gameStarted && !waitingForResults && !showStartAnimation && (
         <HostPreGameView
           gameCode={gameCode}
           roomLanguage={roomLanguage}
-          language={language}
+          language={language as Language}
           username={username}
           t={t}
           timerValue={timerValue}
@@ -488,9 +557,9 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
           highlightedCells={highlightedCells}
           tableData={tableData}
           onStartGame={startGame}
-          onShowQR={() => setShowQR(true)}
+          onShowQR={handleShowQR}
           onExitRoom={handleExitRoom}
-          onCancelTournament={() => setShowCancelTournamentDialog(true)}
+          onCancelTournament={handleCancelTournamentDialog}
           tournamentCreating={tournamentCreating}
         />
       )}
@@ -521,6 +590,8 @@ const HostView = ({ gameCode, roomLanguage: roomLanguageProp, initialPlayers = [
       )}
     </div>
   );
-};
+});
+
+HostView.displayName = 'HostView';
 
 export default HostView;
