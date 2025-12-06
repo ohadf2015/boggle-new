@@ -49,10 +49,15 @@ export interface ProfileData {
   total_games?: number;
   total_score?: number;
   total_words?: number;
+  total_xp?: number;
+  total_time_played?: number;
   longest_word?: string | null;
   longest_word_length?: number;
   achievement_counts?: Record<string, number>;
   current_level?: number;
+  ranked_wins?: number;
+  ranked_mmr?: number;
+  casual_games?: number;
   is_admin?: boolean;
   country_code?: string | null;
   utm_source?: string | null;

@@ -252,6 +252,7 @@ const MenuAnimation: React.FC<MenuAnimationProps> = ({ className = '' }) => {
             id: 'LETTER_POPPER',
             name: t('achievements.LETTER_POPPER.name'),
             description: t('achievements.LETTER_POPPER.description'),
+            icon: '🎈',
             unlockedAt: new Date().toISOString(),
             tier: 'bronze',
           };

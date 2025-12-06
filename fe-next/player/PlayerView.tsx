@@ -10,7 +10,7 @@ import { useSoundEffects } from '../contexts/SoundEffectsContext';
 import { useAchievementQueue } from '../components/achievements';
 import { usePresence } from '../hooks/usePresence';
 import logger from '@/utils/logger';
-import type { LetterGrid, Language, Avatar, GridPosition } from '@/types';
+import type { LetterGrid, Language, Avatar, GridPosition, TournamentStanding } from '@/types';
 
 // Extracted components
 import PlayerWaitingView from './components/PlayerWaitingView';
@@ -54,12 +54,6 @@ interface TournamentData {
   isComplete?: boolean;
 }
 
-interface TournamentStanding {
-  username: string;
-  totalScore: number;
-  roundsPlayed: number;
-  avatar?: Avatar;
-}
 
 interface PendingGameStart {
   letterGrid?: LetterGrid;
