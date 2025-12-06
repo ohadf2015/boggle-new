@@ -9,6 +9,10 @@
  * - peerValidationManager.js - AI word tracking, peer validation votes
  *
  * This file now acts as a facade, re-exporting all functionality for backwards compatibility.
+ *
+ * REDIS PERSISTENCE: Game state is persisted to Redis for:
+ * - Recovery after server restarts
+ * - Cross-instance state sharing in scaled deployments
  */
 
 // Import focused modules
@@ -17,8 +21,151 @@ const scoreManager = require('./scoreManager');
 const presenceManager = require('./presenceManager');
 const peerValidationManager = require('./peerValidationManager');
 
+// Redis client for persistence (lazy import to avoid circular dependencies)
+let redisClient = null;
+function getRedisClient() {
+  if (!redisClient) {
+    try {
+      redisClient = require('../redisClient');
+    } catch (e) {
+      // Redis not available, persistence disabled
+      redisClient = { saveGameState: () => {}, getGameState: () => null, deleteGameState: () => {} };
+    }
+  }
+  return redisClient;
+}
+
+const logger = require('../utils/logger');
+
+// Debounce timers for persistence
+const persistTimers = {};
+const PERSIST_DEBOUNCE_MS = 1000; // Debounce persistence calls by 1 second
+
 // Game storage - maps gameCode to game object
 const games = {};
+
+// ==========================================
+// Redis Persistence Functions
+// ==========================================
+
+/**
+ * Persist game state to Redis (debounced)
+ * @param {string} gameCode - Game code to persist
+ */
+function persistGameState(gameCode) {
+  // Clear any existing timer for this game
+  if (persistTimers[gameCode]) {
+    clearTimeout(persistTimers[gameCode]);
+  }
+
+  // Set a new timer to persist after debounce period
+  persistTimers[gameCode] = setTimeout(async () => {
+    const game = games[gameCode];
+    if (!game) {
+      delete persistTimers[gameCode];
+      return;
+    }
+
+    try {
+      await getRedisClient().saveGameState(gameCode, game);
+      logger.debug('PERSIST', `Game ${gameCode} persisted to Redis`);
+    } catch (error) {
+      logger.error('PERSIST', `Failed to persist game ${gameCode}`, error);
+    }
+
+    delete persistTimers[gameCode];
+  }, PERSIST_DEBOUNCE_MS);
+}
+
+/**
+ * Immediately persist game state (no debounce)
+ * Used for critical state changes like game end
+ * @param {string} gameCode - Game code to persist
+ */
+async function persistGameStateNow(gameCode) {
+  // Clear any pending timer
+  if (persistTimers[gameCode]) {
+    clearTimeout(persistTimers[gameCode]);
+    delete persistTimers[gameCode];
+  }
+
+  const game = games[gameCode];
+  if (!game) return;
+
+  try {
+    await getRedisClient().saveGameState(gameCode, game);
+    logger.debug('PERSIST', `Game ${gameCode} immediately persisted to Redis`);
+  } catch (error) {
+    logger.error('PERSIST', `Failed to persist game ${gameCode}`, error);
+  }
+}
+
+/**
+ * Restore game state from Redis
+ * @param {string} gameCode - Game code to restore
+ * @returns {object|null} - Restored game state or null
+ */
+async function restoreGameFromRedis(gameCode) {
+  try {
+    const redisState = await getRedisClient().getGameState(gameCode);
+    if (!redisState) {
+      return null;
+    }
+
+    logger.info('PERSIST', `Restoring game ${gameCode} from Redis`);
+
+    // Create a minimal game object from Redis state
+    // Note: We can't restore socket connections, so restored games
+    // need players to reconnect
+    games[gameCode] = {
+      gameCode,
+      hostSocketId: null, // Socket connections need to be re-established
+      hostUsername: null,
+      roomName: redisState.roomName,
+      language: redisState.language || 'en',
+      users: {}, // Users must reconnect
+      playerScores: redisState.playerScores || {},
+      playerWords: redisState.playerWords || {},
+      playerAchievements: redisState.playerAchievements || {},
+      playerCombos: {},
+      gameState: redisState.gameState || 'waiting',
+      letterGrid: redisState.letterGrid,
+      timerSeconds: redisState.timerSeconds || 180,
+      tournamentId: redisState.tournamentId,
+      reconnectionTimeout: null,
+      isRanked: false,
+      allowLateJoin: true,
+      aiApprovedWords: [],
+      peerValidationWord: null,
+      peerValidationVotes: {},
+      createdAt: Date.now(),
+      lastActivity: Date.now(),
+      restoredFromRedis: true
+    };
+
+    return games[gameCode];
+  } catch (error) {
+    logger.error('PERSIST', `Failed to restore game ${gameCode} from Redis`, error);
+    return null;
+  }
+}
+
+/**
+ * Get all game codes from Redis (for recovery after restart)
+ * @returns {Promise<string[]>} - Array of game codes
+ */
+async function getAllGameCodesFromRedis() {
+  try {
+    const redis = getRedisClient();
+    if (redis.getAllGameKeys) {
+      return await redis.getAllGameKeys();
+    }
+    return [];
+  } catch (error) {
+    logger.error('PERSIST', 'Failed to get game codes from Redis', error);
+    return [];
+  }
+}
 
 // ==========================================
 // Game CRUD Operations
@@ -56,6 +203,10 @@ function createGame(gameCode, gameData) {
     createdAt: Date.now(),
     lastActivity: Date.now()
   };
+
+  // Persist to Redis (debounced)
+  persistGameState(gameCode);
+
   return games[gameCode];
 }
 
@@ -72,10 +223,18 @@ function getGame(gameCode) {
  * Update a game
  * @param {string} gameCode - Game code
  * @param {object} updates - Updates to apply
+ * @param {boolean} immediate - Whether to persist immediately (default: false)
  */
-function updateGame(gameCode, updates) {
+function updateGame(gameCode, updates, immediate = false) {
   if (games[gameCode]) {
     Object.assign(games[gameCode], updates, { lastActivity: Date.now() });
+
+    // Persist to Redis
+    if (immediate) {
+      persistGameStateNow(gameCode);
+    } else {
+      persistGameState(gameCode);
+    }
   }
 }
 
@@ -97,11 +256,20 @@ function deleteGame(gameCode) {
       game.validationTimeout = null;
     }
 
+    // Cancel any pending persistence
+    if (persistTimers[gameCode]) {
+      clearTimeout(persistTimers[gameCode]);
+      delete persistTimers[gameCode];
+    }
+
     // Clean up user mappings using userManager
     userManager.cleanupUserMappings(game, gameCode);
 
     // Clean up leaderboard throttle state using scoreManager
     scoreManager.clearLeaderboardThrottle(gameCode);
+
+    // Delete from Redis (async, don't wait)
+    getRedisClient().deleteGameState?.(gameCode);
 
     delete games[gameCode];
   }
@@ -506,5 +674,11 @@ module.exports = {
 
   // Tournament management
   getTournamentIdFromGame,
-  setTournamentIdForGame
+  setTournamentIdForGame,
+
+  // Redis persistence
+  persistGameState,
+  persistGameStateNow,
+  restoreGameFromRedis,
+  getAllGameCodesFromRedis
 };
