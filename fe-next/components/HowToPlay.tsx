@@ -122,7 +122,7 @@ const InteractiveGridDemo: React.FC<InteractiveGridDemoProps> = ({ t, dir }) => 
   const [totalScore, setTotalScore] = useState(0);
   const [autoPlay, setAutoPlay] = useState(true);
 
-  const currentDemo = demoSequence[currentWordIndex];
+  const currentDemo = demoSequence[currentWordIndex] ?? demoSequence[0] ?? { word: '', path: [], points: 0 };
 
   // Calculate combo multiplier
   const getComboMultiplier = (combo: number): number => {
@@ -138,6 +138,7 @@ const InteractiveGridDemo: React.FC<InteractiveGridDemoProps> = ({ t, dir }) => 
     setIsAnimating(true);
     setShowSuccess(false);
     const currentWord = demoSequence[currentWordIndex];
+    if (!currentWord) return;
 
     // Animate path step by step
     currentWord.path.forEach((cell, index) => {
@@ -273,12 +274,18 @@ const InteractiveGridDemo: React.FC<InteractiveGridDemoProps> = ({ t, dir }) => 
           <svg className="absolute inset-0 pointer-events-none" style={{ margin: '8px' }}>
             {selectedCells.slice(1).map((cell, i) => {
               const prev = selectedCells[i];
+              if (!prev) return null;
+              const prevCol = prev[1];
+              const prevRow = prev[0];
+              const cellCol = cell[1];
+              const cellRow = cell[0];
+              if (prevCol === undefined || prevRow === undefined || cellCol === undefined || cellRow === undefined) return null;
               const cellSize = 52;
               const gap = 6;
-              const x1 = prev[1] * (cellSize + gap) + cellSize / 2;
-              const y1 = prev[0] * (cellSize + gap) + cellSize / 2;
-              const x2 = cell[1] * (cellSize + gap) + cellSize / 2;
-              const y2 = cell[0] * (cellSize + gap) + cellSize / 2;
+              const x1 = prevCol * (cellSize + gap) + cellSize / 2;
+              const y1 = prevRow * (cellSize + gap) + cellSize / 2;
+              const x2 = cellCol * (cellSize + gap) + cellSize / 2;
+              const y2 = cellRow * (cellSize + gap) + cellSize / 2;
 
               return (
                 <motion.line
@@ -402,6 +409,10 @@ const ComboVisualizer: React.FC<ComboVisualizerProps> = ({ t }) => {
     return 5;
   };
 
+  const getCurrentTierData = (): ComboTier => {
+    return comboTiers[getCurrentTier()] ?? comboTiers[0] ?? { level: '0', multiplier: '1.0x', color: 'bg-gray-400', bonus: '' };
+  };
+
   return (
     <div className="space-y-4">
       {/* Combo Meter */}
@@ -423,7 +434,7 @@ const ComboVisualizer: React.FC<ComboVisualizerProps> = ({ t }) => {
 
         <div className="h-4 bg-neo-black/10 rounded-neo-pill border-2 border-neo-black overflow-hidden">
           <motion.div
-            className={`h-full ${comboTiers[getCurrentTier()].color}`}
+            className={`h-full ${getCurrentTierData().color}`}
             initial={{ width: 0 }}
             animate={{ width: `${Math.min(comboLevel * 8.3, 100)}%` }}
             transition={{ type: 'spring', stiffness: 100 }}
@@ -436,8 +447,8 @@ const ComboVisualizer: React.FC<ComboVisualizerProps> = ({ t }) => {
             animate={{ opacity: 1, y: 0 }}
             className="mt-2 text-center"
           >
-            <Badge className={`${comboTiers[getCurrentTier()].color} text-neo-black border-2 border-neo-black font-bold`}>
-              {comboTiers[getCurrentTier()].multiplier} {t('howToPlay.combo.multiplier')}
+            <Badge className={`${getCurrentTierData().color} text-neo-black border-2 border-neo-black font-bold`}>
+              {getCurrentTierData().multiplier} {t('howToPlay.combo.multiplier')}
             </Badge>
           </motion.div>
         )}
@@ -668,9 +679,12 @@ const HowToPlay: React.FC<HowToPlayProps> = ({ onClose }) => {
   const nextStep = (): void => setCurrentStep((prev) => Math.min(prev + 1, steps.length - 1));
   const prevStep = (): void => setCurrentStep((prev) => Math.max(prev - 1, 0));
   const isRTL = dir === 'rtl';
+  const activeStep = steps[currentStep] ?? steps[0];
 
   const renderStepContent = (): React.ReactNode => {
-    switch (steps[currentStep].id) {
+    const step = steps[currentStep];
+    if (!step) return null;
+    switch (step.id) {
       case 'basics':
         return (
           <div className="space-y-3 sm:space-y-4">
@@ -812,11 +826,11 @@ const HowToPlay: React.FC<HowToPlayProps> = ({ onClose }) => {
         key={currentStep}
         initial={{ opacity: 0, x: isRTL ? -20 : 20 }}
         animate={{ opacity: 1, x: 0 }}
-        className={`${steps[currentStep].color} rounded-neo border-2 sm:border-3 border-neo-black p-3 sm:p-4 mb-3 sm:mb-4 shadow-hard`}
+        className={`${activeStep?.color ?? 'bg-neo-cyan'} rounded-neo border-2 sm:border-3 border-neo-black p-3 sm:p-4 mb-3 sm:mb-4 shadow-hard`}
       >
         <h3 className="text-base sm:text-xl font-black text-neo-black flex items-center gap-2">
-          {React.createElement(steps[currentStep].icon, { className: 'text-sm sm:text-base' })}
-          {steps[currentStep].title}
+          {activeStep && React.createElement(activeStep.icon, { className: 'text-sm sm:text-base' })}
+          {activeStep?.title}
         </h3>
       </motion.div>
 

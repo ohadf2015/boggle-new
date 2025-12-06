@@ -79,7 +79,7 @@ const AIValidationProgress: React.FC<AIValidationProgressProps> = ({
     return () => clearInterval(progressInterval);
   }, []);
 
-  const currentStage: ValidationStage = validationStages[stage];
+  const currentStage: ValidationStage = validationStages[stage] ?? { key: 'scanning', icon: '🔍', fallback: 'Processing...' };
   const currentWord: string | undefined = words[currentWordIndex];
 
   return (

@@ -49,7 +49,7 @@ const SlotMachineCell: React.FC<SlotMachineCellProps> = ({
 
   // Generate random letter for spinning effect
   const getRandomLetter = useCallback((): string => {
-    return charSet[Math.floor(Math.random() * charSet.length)];
+    return charSet[Math.floor(Math.random() * charSet.length)] ?? 'A';
   }, [charSet]);
 
   // Cleanup on unmount

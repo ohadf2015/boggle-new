@@ -4,10 +4,17 @@ import type { Language, LetterGrid, GridPosition, Avatar } from "@/types";
 // Utilities for LexiClash game
 
 /**
- * Generate a random 4-digit room code
+ * Generate a random 6-character alphanumeric room code
+ * Using 6 characters gives 2.17 billion combinations (36^6)
+ * vs 10,000 combinations for 4-digit numeric codes
  */
 export function generateRoomCode(): string {
-  return Math.floor(1000 + Math.random() * 9000).toString();
+  const chars = '0123456789ABCDEFGHJKLMNPQRSTUVWXYZ'; // Excludes I, O to avoid confusion
+  let code = '';
+  for (let i = 0; i < 6; i++) {
+    code += chars.charAt(Math.floor(Math.random() * chars.length));
+  }
+  return code;
 }
 
 /**

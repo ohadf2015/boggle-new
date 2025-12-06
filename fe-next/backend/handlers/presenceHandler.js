@@ -13,6 +13,7 @@ const {
 
 const { broadcastToRoom, getGameRoom } = require('../utils/socketHelpers');
 const logger = require('../utils/logger');
+const { validatePayload, presenceUpdateSchema, heartbeatSchema } = require('../utils/socketValidation');
 
 /**
  * Register presence-related socket event handlers
@@ -28,7 +29,14 @@ function registerPresenceHandlers(io, socket) {
 
   // Handle presence update (active/idle/afk status)
   socket.on('presenceUpdate', (data) => {
-    const { status } = data;
+    // Validate payload using standard schema
+    const validation = validatePayload(presenceUpdateSchema, data);
+    if (!validation.success) {
+      logger.debug('PRESENCE', `Invalid presenceUpdate payload: ${validation.error}`);
+      return;
+    }
+
+    const { status } = validation.data;
     const gameCode = getGameBySocketId(socket.id);
     const username = getUsernameBySocketId(socket.id);
 
@@ -36,10 +44,6 @@ function registerPresenceHandlers(io, socket) {
 
     const game = getGame(gameCode);
     if (!game) return;
-
-    // Validate status
-    const validStatuses = ['active', 'idle', 'afk'];
-    if (!validStatuses.includes(status)) return;
 
     // Update user presence
     updateUserPresence(gameCode, username, status);
