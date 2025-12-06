@@ -7,6 +7,7 @@ import { io, Socket } from 'socket.io-client';
 import Header from '@/components/Header';
 import ErrorBoundary from '@/app/components/ErrorBoundary';
 import FeatureErrorBoundary from '@/components/FeatureErrorBoundary';
+import { ConnectionDot } from '@/components/ConnectionStatusIndicator';
 import { SocketContext } from '@/utils/SocketContext';
 import { saveSession, getSession, clearSession, clearSessionPreservingUsername } from '@/utils/session';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -1009,9 +1010,19 @@ export default function GamePage(): React.JSX.Element {
 
   return (
     <SocketContext.Provider value={socketContextValue}>
+      {/* Skip to content link for keyboard/screen reader users */}
+      <a href="#main-content" className="skip-to-content">
+        Skip to main content
+      </a>
+
+      {/* Connection status indicator */}
+      <ConnectionDot />
+
       <Header />
       <ErrorBoundary>
-        {renderView()}
+        <div id="main-content" tabIndex={-1}>
+          {renderView()}
+        </div>
       </ErrorBoundary>
     </SocketContext.Provider>
   );

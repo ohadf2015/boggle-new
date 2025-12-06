@@ -18,6 +18,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import LogRocket from 'logrocket';
 import { validateUsername, validateRoomName, validateGameCode, sanitizeInput } from '@/utils/validation';
 import { useValidation } from '@/hooks/useValidation';
+import { useDebouncedValidation, getValidationClasses } from '@/hooks/useDebouncedValidation';
 import { generateRoomCode as generateCode } from '@/utils/utils';
 import { setGuestName } from '@/utils/guestManager';
 import { trackGuestJoin } from '@/utils/growthTracking';
@@ -540,77 +541,122 @@ const JoinModeFields: React.FC<JoinModeFieldsProps> = ({
   isAuthenticated,
   displayName,
   t,
-}) => (
-  <>
-    <motion.div
-      initial={{ x: -50, opacity: 0 }}
-      animate={{ x: 0, opacity: 1 }}
-      transition={{ duration: 0.3 }}
-      className="space-y-2"
-    >
-      <Label htmlFor="gameCode" className="text-slate-700 dark:text-gray-300">{t('hostView.roomCode')}</Label>
-      <Input
-        id="gameCode"
-        value={gameCode}
-        onChange={(e) => {
-          setGameCode(e.target.value);
-          if (gameCodeError) setGameCodeError(false);
-        }}
-        required
-        placeholder={t('validation.enterFourDigitCode')}
-        maxLength={4}
-        pattern="[0-9]*"
-        inputMode="numeric"
-        className={cn(
-          "bg-slate-100 dark:bg-slate-700/50 border-slate-200 dark:border-slate-600 text-slate-900 dark:text-white placeholder:text-slate-500 dark:placeholder:text-gray-400",
-          gameCodeError && "border-red-500 bg-red-900/30 focus-visible:ring-red-500"
-        )}
-      />
-      {gameCodeError && (
-        <p className="text-sm text-red-400">{t(gameCodeErrorKey || 'validation.gameCodeInvalid')}</p>
-      )}
-    </motion.div>
+}) => {
+  // Real-time validation with debounce
+  const gameCodeValidation = useDebouncedValidation(gameCode, {
+    validate: validateGameCode,
+    delay: 200,
+    minLength: 1,
+  });
 
-    {/* Username field for guest users */}
-    {!isAuthenticated && (
+  const usernameValidation = useDebouncedValidation(username, {
+    validate: validateUsername,
+    delay: 300,
+    minLength: 1,
+  });
+
+  // Combine real-time and submit-time errors
+  const showGameCodeError = gameCodeError || gameCodeValidation.hasError;
+  const showUsernameError = usernameError || usernameValidation.hasError;
+  const gameCodeErrorMessage = gameCodeErrorKey || gameCodeValidation.errorKey;
+  const usernameErrorMessage = usernameErrorKey || usernameValidation.errorKey;
+
+  return (
+    <>
       <motion.div
-        animate={usernameError ? { x: [-10, 10, -10, 10, 0] } : {}}
-        transition={{ duration: 0.4 }}
+        initial={{ x: -50, opacity: 0 }}
+        animate={{ x: 0, opacity: 1 }}
+        transition={{ duration: 0.3 }}
         className="space-y-2"
       >
-        <Label htmlFor="username-main" className="text-slate-700 dark:text-gray-300">{t('joinView.playerNamePlaceholder')}</Label>
+        <Label htmlFor="gameCode" className="text-slate-700 dark:text-gray-300 flex items-center gap-2">
+          {t('hostView.roomCode')}
+          {gameCodeValidation.state === 'valid' && (
+            <span className="text-neo-lime text-xs">&#10003;</span>
+          )}
+        </Label>
         <Input
-          id="username-main"
-          value={username}
+          id="gameCode"
+          value={gameCode}
           onChange={(e) => {
-            setUsername(sanitizeInput(e.target.value, 20));
-            if (usernameError) setUsernameError(false);
+            setGameCode(e.target.value);
+            if (gameCodeError) setGameCodeError(false);
           }}
           required
+          placeholder={t('validation.enterFourDigitCode')}
+          maxLength={4}
+          pattern="[0-9]*"
+          inputMode="numeric"
+          aria-invalid={showGameCodeError ? 'true' : undefined}
+          aria-describedby={showGameCodeError ? 'gameCode-error' : undefined}
           className={cn(
-            "bg-slate-100 dark:bg-slate-700/50 border-slate-200 dark:border-slate-600 text-slate-900 dark:text-white placeholder:text-slate-500 dark:placeholder:text-gray-400",
-            usernameError && "border-red-500 bg-red-900/30 focus-visible:ring-red-500"
+            "bg-slate-100 dark:bg-slate-700/50 border-slate-200 dark:border-slate-600 text-slate-900 dark:text-white placeholder:text-slate-500 dark:placeholder:text-gray-400 transition-colors",
+            getValidationClasses(
+              gameCodeError ? 'invalid' : gameCodeValidation.state,
+              showGameCodeError ? "border-red-500 bg-red-900/30 focus-visible:ring-red-500" : ""
+            )
           )}
-          placeholder={t('joinView.playerNamePlaceholder')}
-          maxLength={20}
         />
-        {usernameError && (
-          <p className="text-sm text-red-400">{t(usernameErrorKey || 'validation.usernameRequired')}</p>
+        {showGameCodeError && (
+          <p id="gameCode-error" className="text-sm text-red-400" role="alert">
+            {t(gameCodeErrorMessage || 'validation.gameCodeInvalid')}
+          </p>
         )}
       </motion.div>
-    )}
 
-    {/* Show "Joining as" for authenticated users */}
-    {isAuthenticated && displayName && (
-      <div className="p-3 rounded-neo bg-neo-navy border-3 border-neo-cyan/50 shadow-hard-sm">
-        <p className="text-sm text-neo-cream font-bold">
-          {t('joinView.joiningAs') || 'Joining as'}{' '}
-          <span className="text-neo-cyan">{displayName}</span>
-        </p>
-      </div>
-    )}
-  </>
-);
+      {/* Username field for guest users */}
+      {!isAuthenticated && (
+        <motion.div
+          animate={usernameError ? { x: [-10, 10, -10, 10, 0] } : {}}
+          transition={{ duration: 0.4 }}
+          className="space-y-2"
+        >
+          <Label htmlFor="username-main" className="text-slate-700 dark:text-gray-300 flex items-center gap-2">
+            {t('joinView.playerNamePlaceholder')}
+            {usernameValidation.state === 'valid' && (
+              <span className="text-neo-lime text-xs">&#10003;</span>
+            )}
+          </Label>
+          <Input
+            id="username-main"
+            value={username}
+            onChange={(e) => {
+              setUsername(sanitizeInput(e.target.value, 20));
+              if (usernameError) setUsernameError(false);
+            }}
+            required
+            aria-invalid={showUsernameError ? 'true' : undefined}
+            aria-describedby={showUsernameError ? 'username-error' : undefined}
+            className={cn(
+              "bg-slate-100 dark:bg-slate-700/50 border-slate-200 dark:border-slate-600 text-slate-900 dark:text-white placeholder:text-slate-500 dark:placeholder:text-gray-400 transition-colors",
+              getValidationClasses(
+                usernameError ? 'invalid' : usernameValidation.state,
+                showUsernameError ? "border-red-500 bg-red-900/30 focus-visible:ring-red-500" : ""
+              )
+            )}
+            placeholder={t('joinView.playerNamePlaceholder')}
+            maxLength={20}
+          />
+          {showUsernameError && (
+            <p id="username-error" className="text-sm text-red-400" role="alert">
+              {t(usernameErrorMessage || 'validation.usernameRequired')}
+            </p>
+          )}
+        </motion.div>
+      )}
+
+      {/* Show "Joining as" for authenticated users */}
+      {isAuthenticated && displayName && (
+        <div className="p-3 rounded-neo bg-neo-navy border-3 border-neo-cyan/50 shadow-hard-sm">
+          <p className="text-sm text-neo-cream font-bold">
+            {t('joinView.joiningAs') || 'Joining as'}{' '}
+            <span className="text-neo-cyan">{displayName}</span>
+          </p>
+        </div>
+      )}
+    </>
+  );
+};
 
 interface HostModeFieldsProps {
   gameCode: string;
@@ -646,110 +692,159 @@ const HostModeFields: React.FC<HostModeFieldsProps> = ({
   displayName,
   isProfileLoading,
   t,
-}) => (
-  <>
-    {/* Host Player Name - show for guests OR authenticated users without displayName */}
-    {(!isAuthenticated || !displayName) && !isProfileLoading && (
+}) => {
+  // Real-time validation with debounce
+  const roomNameValidation = useDebouncedValidation(roomName, {
+    validate: validateRoomName,
+    delay: 300,
+    minLength: 1,
+  });
+
+  const gameCodeValidation = useDebouncedValidation(gameCode, {
+    validate: validateGameCode,
+    delay: 200,
+    minLength: 1,
+  });
+
+  // Combine real-time and submit-time errors
+  const showRoomNameError = roomNameError || roomNameValidation.hasError;
+  const showGameCodeError = gameCodeError || gameCodeValidation.hasError;
+  const roomNameErrorMessage = roomNameErrorKey || roomNameValidation.errorKey;
+  const gameCodeErrorMessage = gameCodeErrorKey || gameCodeValidation.errorKey;
+
+  return (
+    <>
+      {/* Host Player Name - show for guests OR authenticated users without displayName */}
+      {(!isAuthenticated || !displayName) && !isProfileLoading && (
+        <motion.div
+          initial={{ x: 50, opacity: 0 }}
+          animate={{ x: 0, opacity: 1 }}
+          transition={{ duration: 0.3 }}
+          className="space-y-2"
+        >
+          <Label htmlFor="roomName" className="text-slate-700 dark:text-gray-300 flex items-center gap-2">
+            {t('joinView.yourName')}
+            {roomNameValidation.state === 'valid' && (
+              <span className="text-neo-lime text-xs">&#10003;</span>
+            )}
+          </Label>
+          <Input
+            id="roomName"
+            value={roomName}
+            onChange={(e) => {
+              setRoomName(sanitizeInput(e.target.value, 30));
+              if (roomNameError) setRoomNameError(false);
+            }}
+            required
+            aria-invalid={showRoomNameError ? 'true' : undefined}
+            aria-describedby={showRoomNameError ? 'roomName-error' : 'roomName-hint'}
+            className={cn(
+              "bg-slate-100 dark:bg-slate-700/50 border-slate-200 dark:border-slate-600 text-slate-900 dark:text-white placeholder:text-slate-500 dark:placeholder:text-gray-400 transition-colors",
+              getValidationClasses(
+                roomNameError ? 'invalid' : roomNameValidation.state,
+                showRoomNameError ? "border-red-500 bg-red-900/30 focus-visible:ring-red-500" : ""
+              )
+            )}
+            placeholder={t('joinView.enterYourName')}
+            maxLength={30}
+          />
+          {showRoomNameError && (
+            <p id="roomName-error" className="text-sm text-red-400" role="alert">
+              {t(roomNameErrorMessage || 'joinView.pleaseEnterYourName')}
+            </p>
+          )}
+          {!showRoomNameError && (
+            <p id="roomName-hint" className="text-sm text-slate-500 dark:text-gray-400">
+              {t('joinView.playerAndRoomName')}
+            </p>
+          )}
+        </motion.div>
+      )}
+
+      {/* Show loading indicator when profile is loading */}
+      {isAuthenticated && !displayName && isProfileLoading && (
+        <div className="p-3 rounded-lg bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800">
+          <p className="text-sm text-amber-600 dark:text-amber-400">
+            {t('joinView.loadingProfile') || 'Loading your profile...'}
+          </p>
+        </div>
+      )}
+
+      {/* Show "Hosting as" for authenticated users in host mode */}
+      {isAuthenticated && displayName && (
+        <div className="p-3 rounded-lg bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800">
+          <p className="text-sm text-slate-600 dark:text-gray-400">
+            {t('joinView.hostingAs') || 'Hosting as'}{' '}
+            <span className="font-semibold text-purple-600 dark:text-purple-400">{displayName}</span>
+          </p>
+        </div>
+      )}
+
+      {/* Room Code */}
       <motion.div
         initial={{ x: 50, opacity: 0 }}
         animate={{ x: 0, opacity: 1 }}
-        transition={{ duration: 0.3 }}
+        transition={{ duration: 0.3, delay: 0.1 }}
         className="space-y-2"
       >
-        <Label htmlFor="roomName" className="text-slate-700 dark:text-gray-300">{t('joinView.yourName')}</Label>
-        <Input
-          id="roomName"
-          value={roomName}
-          onChange={(e) => {
-            setRoomName(sanitizeInput(e.target.value, 30));
-            if (roomNameError) setRoomNameError(false);
-          }}
-          required
-          className={cn(
-            "bg-slate-100 dark:bg-slate-700/50 border-slate-200 dark:border-slate-600 text-slate-900 dark:text-white placeholder:text-slate-500 dark:placeholder:text-gray-400",
-            roomNameError && "border-red-500 bg-red-900/30 focus-visible:ring-red-500"
+        <Label htmlFor="gameCode" className="text-slate-700 dark:text-gray-300 flex items-center gap-2">
+          {t('hostView.roomCode')}
+          {gameCodeValidation.state === 'valid' && (
+            <span className="text-neo-lime text-xs">&#10003;</span>
           )}
-          placeholder={t('joinView.enterYourName')}
-          maxLength={30}
-        />
-        {roomNameError && (
-          <p className="text-sm text-red-400">{t(roomNameErrorKey || 'joinView.pleaseEnterYourName')}</p>
+        </Label>
+        <div className="flex gap-2">
+          <Input
+            id="gameCode"
+            value={gameCode}
+            onChange={(e) => {
+              setGameCode(e.target.value);
+              if (gameCodeError) setGameCodeError(false);
+            }}
+            required
+            placeholder={t('validation.fourDigitCode')}
+            maxLength={4}
+            pattern="[0-9]*"
+            inputMode="numeric"
+            aria-invalid={showGameCodeError ? 'true' : undefined}
+            aria-describedby={showGameCodeError ? 'host-gameCode-error' : 'host-gameCode-hint'}
+            className={cn(
+              "flex-1 bg-slate-100 dark:bg-slate-700/50 border-slate-200 dark:border-slate-600 text-slate-900 dark:text-white placeholder:text-slate-500 dark:placeholder:text-gray-400 transition-colors",
+              getValidationClasses(
+                gameCodeError ? 'invalid' : gameCodeValidation.state,
+                showGameCodeError ? "border-red-500 bg-red-900/30 focus-visible:ring-red-500" : ""
+              )
+            )}
+          />
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  type="button"
+                  onClick={generateRoomCode}
+                  size="icon"
+                  className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-400 hover:to-pink-400 hover:shadow-[0_0_15px_rgba(168,85,247,0.5)]"
+                >
+                  <FaDice />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>{t('joinView.generateNewCode')}</TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        </div>
+        {showGameCodeError && (
+          <p id="host-gameCode-error" className="text-sm text-red-400" role="alert">
+            {t(gameCodeErrorMessage || 'validation.gameCodeInvalid')}
+          </p>
         )}
-        {!roomNameError && (
-          <p className="text-sm text-slate-500 dark:text-gray-400">{t('joinView.playerAndRoomName')}</p>
+        {!showGameCodeError && (
+          <p id="host-gameCode-hint" className="text-sm text-slate-500 dark:text-gray-400">
+            {t('validation.codeHelper')}
+          </p>
         )}
       </motion.div>
-    )}
-
-    {/* Show loading indicator when profile is loading */}
-    {isAuthenticated && !displayName && isProfileLoading && (
-      <div className="p-3 rounded-lg bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800">
-        <p className="text-sm text-amber-600 dark:text-amber-400">
-          {t('joinView.loadingProfile') || 'Loading your profile...'}
-        </p>
-      </div>
-    )}
-
-    {/* Show "Hosting as" for authenticated users in host mode */}
-    {isAuthenticated && displayName && (
-      <div className="p-3 rounded-lg bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800">
-        <p className="text-sm text-slate-600 dark:text-gray-400">
-          {t('joinView.hostingAs') || 'Hosting as'}{' '}
-          <span className="font-semibold text-purple-600 dark:text-purple-400">{displayName}</span>
-        </p>
-      </div>
-    )}
-
-    {/* Room Code */}
-    <motion.div
-      initial={{ x: 50, opacity: 0 }}
-      animate={{ x: 0, opacity: 1 }}
-      transition={{ duration: 0.3, delay: 0.1 }}
-      className="space-y-2"
-    >
-      <Label htmlFor="gameCode" className="text-slate-700 dark:text-gray-300">{t('hostView.roomCode')}</Label>
-      <div className="flex gap-2">
-        <Input
-          id="gameCode"
-          value={gameCode}
-          onChange={(e) => {
-            setGameCode(e.target.value);
-            if (gameCodeError) setGameCodeError(false);
-          }}
-          required
-          placeholder={t('validation.fourDigitCode')}
-          maxLength={4}
-          pattern="[0-9]*"
-          inputMode="numeric"
-          className={cn(
-            "flex-1 bg-slate-100 dark:bg-slate-700/50 border-slate-200 dark:border-slate-600 text-slate-900 dark:text-white placeholder:text-slate-500 dark:placeholder:text-gray-400",
-            gameCodeError && "border-red-500 bg-red-900/30 focus-visible:ring-red-500"
-          )}
-        />
-        {gameCodeError && (
-          <p className="text-sm text-red-400">{t(gameCodeErrorKey || 'validation.gameCodeInvalid')}</p>
-        )}
-        <TooltipProvider>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button
-                type="button"
-                onClick={generateRoomCode}
-                size="icon"
-                className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-400 hover:to-pink-400 hover:shadow-[0_0_15px_rgba(168,85,247,0.5)]"
-              >
-                <FaDice />
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent>{t('joinView.generateNewCode')}</TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
-      </div>
-      <p className="text-sm text-slate-500 dark:text-gray-400">
-        {t('validation.codeHelper')}
-      </p>
-    </motion.div>
-  </>
-);
+    </>
+  );
+};
 
 export default JoinView;
