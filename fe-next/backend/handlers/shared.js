@@ -337,9 +337,13 @@ async function calculateAndBroadcastFinalScores(io, gameCode) {
   const usernames = finalScores.map(p => p.username);
   awardFinalAchievements(game, usernames);
 
-  // Copy achievements to player results
+  // Copy achievements to player results (convert keys to objects with icons)
   for (const playerResult of finalScores) {
-    playerResult.achievements = game.playerAchievements?.[playerResult.username] || [];
+    const achievementKeys = game.playerAchievements?.[playerResult.username] || [];
+    playerResult.achievements = achievementKeys.map(key => ({
+      key,
+      icon: ACHIEVEMENT_ICONS[key] || '🏅'
+    }));
   }
 
   // Calculate player titles
