@@ -33,10 +33,10 @@ const getBrowserLanguage = (): Language | null => {
 
     for (const lang of browserLanguages) {
         // Get the primary language code (e.g., 'en' from 'en-US')
-        const primaryLang = lang.split('-')[0].toLowerCase();
+        const primaryLang = lang.split('-')[0]?.toLowerCase();
 
         // Check if we support this language
-        if (locales.includes(primaryLang as Language)) {
+        if (primaryLang && locales.includes(primaryLang as Language)) {
             return primaryLang as Language;
         }
     }

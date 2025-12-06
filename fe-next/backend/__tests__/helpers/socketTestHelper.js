@@ -372,7 +372,7 @@ function createTestEnvironment() {
      * @returns {Object}
      */
     createGameData(overrides = {}) {
-      const code = `TEST${Math.random().toString(36).substring(2, 6).toUpperCase()}`;
+      const code = `TS${Math.random().toString(36).substring(2, 8).toUpperCase()}`;
       return {
         gameCode: code,
         roomName: `Test Room ${code}`,

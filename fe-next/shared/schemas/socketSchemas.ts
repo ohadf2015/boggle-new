@@ -20,7 +20,7 @@ export const AvatarSchema = z.object({
 });
 
 export const GameCodeSchema = z.string()
-  .min(4, 'Game code must be at least 4 characters')
+  .min(6, 'Game code must be at least 6 characters')
   .max(10, 'Game code must be at most 10 characters')
   .regex(/^[A-Za-z0-9]+$/, 'Game code must be alphanumeric');
 

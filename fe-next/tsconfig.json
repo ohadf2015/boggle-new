@@ -29,7 +29,7 @@
     "noUnusedParameters": false,
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,
-    "noUncheckedIndexedAccess": false, // TODO: Enable after fixing all array access patterns
+    "noUncheckedIndexedAccess": false, // TODO: Enable after fixing remaining array access patterns
 
     "skipLibCheck": true,
     "incremental": true,

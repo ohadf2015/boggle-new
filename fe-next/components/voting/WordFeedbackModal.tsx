@@ -95,7 +95,7 @@ const WordFeedbackModal = memo<WordFeedbackModalProps>(({
   const prevWordRef = useRef<string | null>(null);
 
   // Get current word from queue or fall back to single word prop
-  const currentWord = wordQueue.length > 0 ? wordQueue[currentWordIndex] : { word, submittedBy, submitterAvatar, voteInfo };
+  const currentWord = (wordQueue.length > 0 ? wordQueue[currentWordIndex] : undefined) ?? { word, submittedBy, submitterAvatar, voteInfo };
   const totalWords = wordQueue.length > 0 ? wordQueue.length : 1;
   const hasMoreWords = currentWordIndex < totalWords - 1;
 
@@ -107,7 +107,7 @@ const WordFeedbackModal = memo<WordFeedbackModalProps>(({
       const validSentences = sentences.filter(s => s && !s.startsWith('wordFeedback.'));
       if (validSentences.length > 0) {
         const randomIndex = Math.floor(Math.random() * validSentences.length);
-        setEncouragementSentence(validSentences[randomIndex]);
+        setEncouragementSentence(validSentences[randomIndex] ?? '');
       } else {
         setEncouragementSentence(`${currentWord.submittedBy} claims "${currentWord.word}" is totally a word...`);
       }

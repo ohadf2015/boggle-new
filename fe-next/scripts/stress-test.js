@@ -20,7 +20,7 @@ const OUT_FILE = arg('out', '');
 const englishDict = LANGUAGE === 'en' ? new Set(require('an-array-of-english-words').map(w => w.toLowerCase())) : null;
 
 function randomCode() {
-  return Math.random().toString(36).toUpperCase().slice(2, 6);
+  return Math.random().toString(36).toUpperCase().slice(2, 8);
 }
 
 function makeGrid(rows = 6, cols = 6) {

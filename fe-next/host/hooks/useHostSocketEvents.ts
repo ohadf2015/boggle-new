@@ -237,7 +237,7 @@ const useHostSocketEvents = ({
         const filtered: Record<string, number> = {};
         Object.keys(prev).forEach(uname => {
           if (currentUsernames.has(uname)) {
-            filtered[uname] = prev[uname];
+            filtered[uname] = prev[uname] ?? 0;
           }
         });
         return filtered;
@@ -247,7 +247,7 @@ const useHostSocketEvents = ({
         const filtered: Record<string, number> = {};
         Object.keys(prev).forEach(uname => {
           if (currentUsernames.has(uname)) {
-            filtered[uname] = prev[uname];
+            filtered[uname] = prev[uname] ?? 0;
           }
         });
         return filtered;
@@ -257,7 +257,7 @@ const useHostSocketEvents = ({
         const filtered: Record<string, any[]> = {};
         Object.keys(prev).forEach(uname => {
           if (currentUsernames.has(uname)) {
-            filtered[uname] = prev[uname];
+            filtered[uname] = prev[uname] ?? [];
           }
         });
         return filtered;

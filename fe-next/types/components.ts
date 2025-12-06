@@ -88,6 +88,8 @@ export interface ResultsPageProps {
   username: string;
   /** Socket.IO connection */
   socket: Socket | null;
+  /** Player achievements from the game */
+  achievements?: GameAchievement[];
 }
 
 export interface HeatMapData {

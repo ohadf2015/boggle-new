@@ -13,6 +13,11 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../ui/
 import logger from '@/utils/logger';
 import { POINT_COLORS } from '../../utils/consts';
 import type { Avatar as AvatarType } from '@/types';
+
+// Helper to safely get point color with fallback
+const getPointColor = (points: number): string => {
+  return POINT_COLORS[points] ?? POINT_COLORS[8] ?? 'var(--neo-pink)';
+};
 import XpBreakdownCard from './XpBreakdownCard';
 
 interface WordObject {
@@ -126,7 +131,7 @@ const WordChip = memo<WordChipProps>(({ wordObj, playerCount }) => {
     if (isDuplicate) return 'var(--neo-orange)';
     if (isPending) return 'var(--neo-purple)'; // Pending = purple (awaiting community vote)
     if (!isValid) return 'var(--neo-red, #ef4444)';
-    return POINT_COLORS[wordObj.score] || POINT_COLORS[8];
+    return getPointColor(wordObj.score);
   };
 
   // Get text color based on background - ensure readability
@@ -367,7 +372,10 @@ const ResultsPlayerCard: React.FC<ResultsPlayerCardProps> = ({ player, index, al
 
     // Sort words alphabetically within each point group
     Object.keys(wordsByPoints).forEach(points => {
-      wordsByPoints[Number(points)].sort((a, b) => a.word.localeCompare(b.word));
+      const wordList = wordsByPoints[Number(points)];
+      if (wordList) {
+        wordList.sort((a, b) => a.word.localeCompare(b.word));
+      }
     });
 
     // Sort duplicate and invalid words alphabetically
@@ -616,20 +624,22 @@ const ResultsPlayerCard: React.FC<ResultsPlayerCardProps> = ({ player, index, al
                         {t('results.validWords') || 'Valid Words'} ({Object.values(wordsByPoints).flat().length})
                       </div>
                       <div className="space-y-2">
-                        {sortedPointGroups.map(points => (
-                          <div key={`points-${points}`} className="rounded-neo p-2 border-l-4 border-neo-black bg-white/50 dark:bg-slate-700/50" style={{ borderLeftColor: POINT_COLORS[points] || POINT_COLORS[8] }}>
+                        {sortedPointGroups.map(points => {
+                          const wordsForPoints = wordsByPoints[points] ?? [];
+                          return (
+                          <div key={`points-${points}`} className="rounded-neo p-2 border-l-4 border-neo-black bg-white/50 dark:bg-slate-700/50" style={{ borderLeftColor: getPointColor(points) }}>
                             <div className="text-xs font-black mb-1.5 flex items-center gap-2 text-neo-black dark:text-neo-cream uppercase">
                               <span className="px-2 py-0.5 rounded-neo flex items-center justify-center font-black text-xs border-2 border-neo-black"
                                     style={{
-                                      backgroundColor: POINT_COLORS[points] || POINT_COLORS[8],
+                                      backgroundColor: getPointColor(points),
                                       color: (points === 2 || points === 3) ? 'var(--neo-black)' : 'var(--neo-cream)'
                                     }}>
                                 {points} {t('results.points') || 'pts'}
                               </span>
-                              <span>{wordsByPoints[points].length} {t('hostView.words') || 'words'}</span>
+                              <span>{wordsForPoints.length} {t('hostView.words') || 'words'}</span>
                             </div>
                             <div className="flex flex-wrap gap-1.5">
-                              {wordsByPoints[points].map((wordObj, i) => (
+                              {wordsForPoints.map((wordObj, i) => (
                                 <WordChip
                                   key={`${points}-${i}`}
                                   wordObj={wordObj}
@@ -638,7 +648,8 @@ const ResultsPlayerCard: React.FC<ResultsPlayerCardProps> = ({ player, index, al
                               ))}
                             </div>
                           </div>
-                        ))}
+                          );
+                        })}
                       </div>
                     </div>
                   )}
