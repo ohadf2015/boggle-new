@@ -1,4 +1,4 @@
-import React, { useState, memo, useCallback, useMemo, useRef } from 'react';
+import React, { useState, memo, useMemo, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { Badge } from './ui/badge';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './ui/tooltip';

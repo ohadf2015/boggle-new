@@ -1,4 +1,4 @@
-import React, { memo, useCallback, useMemo } from 'react';
+import { memo, useCallback, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { FaChartBar } from 'react-icons/fa';
 import Link from 'next/link';

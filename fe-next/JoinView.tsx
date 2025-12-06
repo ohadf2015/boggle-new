@@ -1,9 +1,9 @@
 'use client';
 
-import React, { useState, useEffect, useRef, useCallback, FormEvent, ChangeEvent } from 'react';
+import React, { useState, useEffect, useRef, useCallback, FormEvent } from 'react';
 import dynamic from 'next/dynamic';
 import { motion } from 'framer-motion';
-import { FaGamepad, FaCrown, FaUser, FaDice, FaSync, FaQrcode, FaWhatsapp, FaLink, FaQuestionCircle } from 'react-icons/fa';
+import { FaGamepad, FaCrown, FaUser, FaDice, FaSync, FaQrcode, FaQuestionCircle } from 'react-icons/fa';
 import { QRCodeSVG } from 'qrcode.react';
 import { Button } from './components/ui/button';
 import { Input } from './components/ui/input';
@@ -14,9 +14,8 @@ import { Alert, AlertDescription } from './components/ui/alert';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from './components/ui/dialog';
 import { ToggleGroup, ToggleGroupItem } from './components/ui/toggle-group';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './components/ui/tooltip';
-import ShareButton from './components/ShareButton';
 import { cn } from './lib/utils';
-import { copyJoinUrl, shareViaWhatsApp, getJoinUrl } from './utils/share';
+import { getJoinUrl } from './utils/share';
 import { useLanguage } from './contexts/LanguageContext';
 import LogRocket from 'logrocket';
 import { validateUsername, validateRoomName, validateGameCode, sanitizeInput } from './utils/validation';
@@ -63,9 +62,9 @@ const JoinView: React.FC<JoinViewProps> = ({
   const [usernameError, setUsernameError] = useState<boolean>(false);
   const [roomNameError, setRoomNameError] = useState<boolean>(false);
   const [gameCodeError, setGameCodeError] = useState<boolean>(false);
-  const [usernameErrorKey, setUsernameErrorKey] = useState<string | null>(null);
-  const [roomNameErrorKey, setRoomNameErrorKey] = useState<string | null>(null);
-  const [gameCodeErrorKey, setGameCodeErrorKey] = useState<string | null>(null);
+  const [usernameErrorKey, setUsernameErrorKey] = useState<string | undefined>(undefined);
+  const [roomNameErrorKey, setRoomNameErrorKey] = useState<string | undefined>(undefined);
+  const [gameCodeErrorKey, setGameCodeErrorKey] = useState<string | undefined>(undefined);
   const [showFullForm, setShowFullForm] = useState<boolean>(!prefilledRoom);
   const [roomLanguage, setRoomLanguage] = useState<Language>(language as Language);
   const [mobileRoomsExpanded, setMobileRoomsExpanded] = useState<boolean>(false);
@@ -76,9 +75,9 @@ const JoinView: React.FC<JoinViewProps> = ({
   const hasCheckedFirstTimePlayerRef = useRef<boolean>(false);
 
   // Define handleModeChange before effects that use it
-  const handleModeChange = useCallback((newMode: JoinMode | null) => {
-    if (newMode) {
-      setMode(newMode);
+  const handleModeChange = useCallback((newMode: string) => {
+    if (newMode && (newMode === 'join' || newMode === 'host')) {
+      setMode(newMode as JoinMode);
       // Auto-generate code when switching to host mode
       if (newMode === 'host') {
         setGameCode(generateCode());
