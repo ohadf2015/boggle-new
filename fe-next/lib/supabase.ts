@@ -27,8 +27,9 @@ function getCurrentLocale(): string | null {
   if (typeof window === 'undefined') return null;
   const pathSegments = window.location.pathname.split('/').filter(Boolean);
   const locales = ['he', 'en', 'sv', 'ja'];
-  if (pathSegments.length > 0 && locales.includes(pathSegments[0])) {
-    return pathSegments[0];
+  const firstSegment = pathSegments[0];
+  if (firstSegment && locales.includes(firstSegment)) {
+    return firstSegment;
   }
   return null;
 }

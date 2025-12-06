@@ -180,10 +180,13 @@ export const trackShare = (method: 'whatsapp' | 'copy' | 'qr' | 'native', gameCo
     native: 'share_link_copied',
   };
 
-  trackGrowthEvent(eventMap[method], {
-    shareMethod: method,
-    gameCode,
-  });
+  const event = eventMap[method];
+  if (event) {
+    trackGrowthEvent(event, {
+      shareMethod: method,
+      gameCode,
+    });
+  }
 };
 
 /**

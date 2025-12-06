@@ -22,8 +22,8 @@ export function generateRoomCode(): string {
  */
 export function generateRandomAvatar(): Avatar {
   return {
-    color: AVATAR_COLORS[Math.floor(Math.random() * AVATAR_COLORS.length)],
-    emoji: AVATAR_EMOJIS[Math.floor(Math.random() * AVATAR_EMOJIS.length)]
+    color: AVATAR_COLORS[Math.floor(Math.random() * AVATAR_COLORS.length)] ?? '#FF6B6B',
+    emoji: AVATAR_EMOJIS[Math.floor(Math.random() * AVATAR_EMOJIS.length)] ?? '🎮'
   };
 }
 
@@ -86,7 +86,7 @@ export function applyHebrewFinalLetters(word: string): string {
 
   const chars = word.split('');
   const lastChar = chars[chars.length - 1];
-  if (regularToFinal[lastChar]) {
+  if (lastChar && regularToFinal[lastChar]) {
     chars[chars.length - 1] = regularToFinal[lastChar];
   }
 
@@ -122,11 +122,11 @@ export function generateRandomTable(
       return generateTableWithEmbeddedWords(rows, cols, letters, wordsToEmbed, language);
     }
 
-    const newTable = [];
+    const newTable: string[][] = [];
     for (let i = 0; i < rows; i++) {
-      const row = [];
+      const row: string[] = [];
       for (let j = 0; j < cols; j++) {
-        const randomLetter = letters[Math.floor(Math.random() * letters.length)];
+        const randomLetter = letters[Math.floor(Math.random() * letters.length)] ?? 'A';
         row.push(randomLetter);
       }
       newTable.push(row);

@@ -77,8 +77,8 @@ export const validateGameCode = (gameCode: string): ValidationResult => {
 
   const trimmed = gameCode.trim();
 
-  // Must be 4-10 characters, alphanumeric only (matches backend validation)
-  if (trimmed.length < 4 || trimmed.length > 10) {
+  // Must be 6-10 characters, alphanumeric only (matches backend validation)
+  if (trimmed.length < 6 || trimmed.length > 10) {
     return { isValid: false, error: 'validation.gameCodeInvalid' };
   }
 

@@ -265,8 +265,14 @@ const VIRAL_PROMPTS_DE = [
   "Zeit herauszufinden, wer der schlaue Freund ist!",
 ];
 
-// Helper to pick random item from array
-const pickRandom = <T,>(arr: T[]): T => arr[Math.floor(Math.random() * arr.length)];
+// Helper to pick random item from array (assumes non-empty array)
+const pickRandom = <T,>(arr: T[]): T => {
+  const item = arr[Math.floor(Math.random() * arr.length)];
+  if (item === undefined) {
+    throw new Error('pickRandom called with empty array');
+  }
+  return item;
+};
 
 const ShareWinPrompt: React.FC<ShareWinPromptProps> = ({
   isWinner,

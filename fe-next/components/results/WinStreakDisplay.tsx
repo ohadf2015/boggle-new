@@ -26,8 +26,9 @@ const STREAK_TIERS = [
 
 const getStreakTier = (streak: number) => {
   for (let i = STREAK_TIERS.length - 1; i >= 0; i--) {
-    if (streak >= STREAK_TIERS[i].min) {
-      return STREAK_TIERS[i];
+    const tier = STREAK_TIERS[i];
+    if (tier && streak >= tier.min) {
+      return tier;
     }
   }
   return null;

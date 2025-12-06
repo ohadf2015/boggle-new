@@ -111,7 +111,7 @@ const PlayerWaitingResultsView: React.FC<PlayerWaitingResultsViewProps> = ({
     return () => clearInterval(progressInterval);
   }, []);
 
-  const currentStage = validationStages[stage];
+  const currentStage = validationStages[stage] ?? validationStages[0]!;
   const currentWord = words[currentWordIndex];
 
   return (

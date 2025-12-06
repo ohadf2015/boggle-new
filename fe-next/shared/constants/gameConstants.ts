@@ -97,8 +97,8 @@ export const AVATAR_EMOJIS: string[] = [
  */
 export function generateRandomAvatar(): { emoji: string; color: string } {
   return {
-    color: AVATAR_COLORS[Math.floor(Math.random() * AVATAR_COLORS.length)],
-    emoji: AVATAR_EMOJIS[Math.floor(Math.random() * AVATAR_EMOJIS.length)]
+    color: AVATAR_COLORS[Math.floor(Math.random() * AVATAR_COLORS.length)] ?? '#FF6B6B',
+    emoji: AVATAR_EMOJIS[Math.floor(Math.random() * AVATAR_EMOJIS.length)] ?? '🎮'
   };
 }
 
@@ -149,8 +149,8 @@ export const POINT_COLORS: Record<number, string> = {
  * Get color for a word score
  */
 export function getPointColor(score: number): string {
-  if (score >= 8) return POINT_COLORS[8];
-  return POINT_COLORS[score] || POINT_COLORS[1];
+  if (score >= 8) return POINT_COLORS[8] ?? 'var(--neo-pink)';
+  return POINT_COLORS[score] ?? POINT_COLORS[1] ?? 'var(--neo-gray)';
 }
 
 // ==================== Connection Constants ====================
