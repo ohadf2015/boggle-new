@@ -3,7 +3,8 @@
  * Central export for all socket event handlers
  */
 
-const { registerGameHandlers, MAX_PLAYERS_PER_ROOM } = require('./gameHandler');
+const { registerGameHandlers } = require('./gameHandler');
+const { MAX_PLAYERS_PER_ROOM } = require('../utils/consts');
 const { registerWordHandlers } = require('./wordHandler');
 const { registerChatHandlers } = require('./chatHandler');
 const { registerBotHandlers } = require('./botHandler');
