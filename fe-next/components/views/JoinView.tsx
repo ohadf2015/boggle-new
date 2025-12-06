@@ -5,24 +5,24 @@ import dynamic from 'next/dynamic';
 import { motion } from 'framer-motion';
 import { FaGamepad, FaCrown, FaUser, FaDice, FaSync, FaQrcode, FaQuestionCircle } from 'react-icons/fa';
 import { QRCodeSVG } from 'qrcode.react';
-import { Button } from './components/ui/button';
-import { Input } from './components/ui/input';
-import { Label } from './components/ui/label';
-import { Card, CardContent, CardHeader } from './components/ui/card';
-import { Alert, AlertDescription } from './components/ui/alert';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from './components/ui/dialog';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './components/ui/tooltip';
-import { cn } from './lib/utils';
-import { getJoinUrl } from './utils/share';
-import { useLanguage } from './contexts/LanguageContext';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { cn } from '@/lib/utils';
+import { getJoinUrl } from '@/utils/share';
+import { useLanguage } from '@/contexts/LanguageContext';
 import LogRocket from 'logrocket';
-import { validateUsername, validateRoomName, validateGameCode, sanitizeInput } from './utils/validation';
-import { useValidation } from './hooks/useValidation';
-import { generateRoomCode as generateCode } from './utils/utils';
-import { setGuestName } from './utils/guestManager';
-import { trackGuestJoin } from './utils/growthTracking';
-import type { JoinViewProps, JoinMode } from './types/components';
-import type { Language } from './shared/types/game';
+import { validateUsername, validateRoomName, validateGameCode, sanitizeInput } from '@/utils/validation';
+import { useValidation } from '@/hooks/useValidation';
+import { generateRoomCode as generateCode } from '@/utils/utils';
+import { setGuestName } from '@/utils/guestManager';
+import { trackGuestJoin } from '@/utils/growthTracking';
+import type { JoinViewProps, JoinMode } from '@/types/components';
+import type { Language } from '@/shared/types/game';
 
 // Extracted sub-components
 import {
@@ -31,16 +31,16 @@ import {
   RoomList,
   LanguageSelector,
   ModeSelector,
-} from './components/join';
+} from '@/components/join';
 
 // Dynamic imports for heavy animation components
-const HowToPlay = dynamic(() => import('./components/HowToPlay'), { ssr: false });
-const NewPlayerWelcome = dynamic(() => import('./components/NewPlayerWelcome'), { ssr: false });
-const MenuAnimation = dynamic(() => import('./components/MenuAnimation'), { ssr: false });
-const Particles = dynamic(() => import('./components/Particles'), { ssr: false });
+const HowToPlay = dynamic(() => import('@/components/HowToPlay'), { ssr: false });
+const NewPlayerWelcome = dynamic(() => import('@/components/NewPlayerWelcome'), { ssr: false });
+const MenuAnimation = dynamic(() => import('@/components/MenuAnimation'), { ssr: false });
+const Particles = dynamic(() => import('@/components/Particles'), { ssr: false });
 
 // Import helper for first-time player detection
-import { isFirstTimePlayer, markTutorialSeen } from './components/NewPlayerWelcome';
+import { isFirstTimePlayer, markTutorialSeen } from '@/components/NewPlayerWelcome';
 
 const JoinView: React.FC<JoinViewProps> = ({
   handleJoin,

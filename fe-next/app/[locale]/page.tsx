@@ -55,12 +55,12 @@ const PlayerView = nextDynamic(() => import('@/player/PlayerView'), {
   ssr: false,
 });
 
-const JoinView = nextDynamic(() => import('@/JoinView'), {
+const JoinView = nextDynamic(() => import('@/components/views/JoinView'), {
   loading: () => <ViewLoadingSkeleton />,
   ssr: false,
 });
 
-const ResultsPage = nextDynamic(() => import('@/ResultsPage'), {
+const ResultsPage = nextDynamic(() => import('@/components/views/ResultsPage'), {
   loading: () => <ViewLoadingSkeleton />,
   ssr: false,
 });
