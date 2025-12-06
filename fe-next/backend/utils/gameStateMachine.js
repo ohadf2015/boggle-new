@@ -2,18 +2,22 @@
  * Game State Machine Utility
  *
  * Provides safe state transitions for game lifecycle.
- * Wraps XState for use in CommonJS backend code.
+ * This is a lightweight implementation that mirrors the XState machine
+ * in shared/stateMachines/gameMachine.ts for use in CommonJS backend code.
  *
  * Usage:
- *   const { canTransition, transition, getValidEvents } = require('./gameStateMachine');
+ *   const { canTransition, transition, getValidEvents, isInProgress } = require('./gameStateMachine');
  *
  *   // Check if transition is valid
  *   if (canTransition('waiting', 'START')) {
- *     const newState = transition('waiting', 'START');
+ *     const result = transition('waiting', 'START');
+ *   }
+ *
+ *   // Check current state
+ *   if (isInProgress(game.gameState)) {
+ *     // game is active
  *   }
  */
-
-const { createActor } = require('xstate');
 
 // ==========================================
 // State Mappings
@@ -160,10 +164,91 @@ function isValidState(state) {
 }
 
 // ==========================================
+// State Check Helpers
+// ==========================================
+
+/**
+ * Check if game is in waiting state (lobby)
+ * @param {string} state - Current game state
+ * @returns {boolean}
+ */
+function isWaiting(state) {
+  return state === 'waiting';
+}
+
+/**
+ * Check if game is in progress (active play)
+ * @param {string} state - Current game state
+ * @returns {boolean}
+ */
+function isInProgress(state) {
+  return state === 'in-progress';
+}
+
+/**
+ * Check if game is finished (results phase)
+ * @param {string} state - Current game state
+ * @returns {boolean}
+ */
+function isFinished(state) {
+  return state === 'finished';
+}
+
+/**
+ * Check if game is in validation phase
+ * @param {string} state - Current game state
+ * @returns {boolean}
+ */
+function isValidating(state) {
+  return state === 'validating';
+}
+
+/**
+ * Check if game can accept word submissions (only during active play)
+ * @param {string} state - Current game state
+ * @returns {boolean}
+ */
+function canSubmitWords(state) {
+  return isInProgress(state);
+}
+
+/**
+ * Check if game can be started (only from waiting state)
+ * @param {string} state - Current game state
+ * @returns {boolean}
+ */
+function canStartGame(state) {
+  return isWaiting(state);
+}
+
+/**
+ * Check if players can freely join (not ranked in-progress)
+ * @param {object} game - Game object with gameState and isRanked
+ * @returns {boolean}
+ */
+function canJoinFreely(game) {
+  if (!game) return false;
+  if (isWaiting(game.gameState)) return true;
+  if (isInProgress(game.gameState) && !game.isRanked) return true;
+  if (isInProgress(game.gameState) && game.allowLateJoin) return true;
+  return false;
+}
+
+/**
+ * Check if late join should send game state to player
+ * @param {string} state - Current game state
+ * @returns {boolean}
+ */
+function shouldSendGameState(state) {
+  return isInProgress(state);
+}
+
+// ==========================================
 // Exports
 // ==========================================
 
 module.exports = {
+  // Core transition functions
   canTransition,
   transition,
   getTransitionTarget,
@@ -172,4 +257,14 @@ module.exports = {
   isValidState,
   toMachineState,
   toStorageState,
+
+  // State check helpers
+  isWaiting,
+  isInProgress,
+  isFinished,
+  isValidating,
+  canSubmitWords,
+  canStartGame,
+  canJoinFreely,
+  shouldSendGameState,
 };

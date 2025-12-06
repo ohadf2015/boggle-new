@@ -242,6 +242,60 @@ export const SettingsErrorBoundary: React.FC<{ children: ReactNode; onReset?: ()
 );
 
 /**
+ * Error boundary for chat/messaging components
+ */
+export const ChatErrorBoundary: React.FC<{ children: ReactNode; onReset?: () => void }> = ({
+  children,
+  onReset,
+}) => (
+  <FeatureErrorBoundary
+    featureName="Chat"
+    icon={<FaExclamationTriangle />}
+    showRetry={true}
+    showHomeButton={false}
+    onReset={onReset}
+  >
+    {children}
+  </FeatureErrorBoundary>
+);
+
+/**
+ * Error boundary for grid/board components
+ */
+export const GridErrorBoundary: React.FC<{ children: ReactNode; onReset?: () => void }> = ({
+  children,
+  onReset,
+}) => (
+  <FeatureErrorBoundary
+    featureName="Game Board"
+    icon={<FaGamepad />}
+    showRetry={true}
+    showHomeButton={true}
+    onReset={onReset}
+  >
+    {children}
+  </FeatureErrorBoundary>
+);
+
+/**
+ * Error boundary for authentication/profile components
+ */
+export const AuthErrorBoundary: React.FC<{ children: ReactNode; onReset?: () => void }> = ({
+  children,
+  onReset,
+}) => (
+  <FeatureErrorBoundary
+    featureName="Authentication"
+    icon={<FaExclamationTriangle />}
+    showRetry={true}
+    showHomeButton={true}
+    onReset={onReset}
+  >
+    {children}
+  </FeatureErrorBoundary>
+);
+
+/**
  * Inline error boundary for non-critical UI sections
  * Shows a minimal error state without disrupting the entire page
  */
@@ -269,6 +323,53 @@ export class InlineErrorBoundary extends Component<
         <div className="p-2 text-center text-sm text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-800 rounded">
           {this.props.fallbackMessage || 'Unable to load this section'}
         </div>
+      );
+    }
+    return this.props.children;
+  }
+}
+
+/**
+ * Suspense-compatible error boundary with loading state
+ * Useful for components that use React.lazy or data fetching
+ */
+interface SuspenseErrorBoundaryProps {
+  children: ReactNode;
+  fallback?: ReactNode;
+  loadingFallback?: ReactNode;
+  onError?: (error: Error, errorInfo: ErrorInfo) => void;
+}
+
+export class SuspenseErrorBoundary extends Component<SuspenseErrorBoundaryProps, ErrorBoundaryState> {
+  constructor(props: SuspenseErrorBoundaryProps) {
+    super(props);
+    this.state = { hasError: false, error: null, errorInfo: null };
+  }
+
+  static getDerivedStateFromError(_error: Error): Partial<ErrorBoundaryState> {
+    return { hasError: true };
+  }
+
+  componentDidCatch(error: Error, errorInfo: ErrorInfo): void {
+    logger.error('SuspenseErrorBoundary caught an error:', error, errorInfo);
+    this.setState({ error, errorInfo });
+    this.props.onError?.(error, errorInfo);
+  }
+
+  handleReset = (): void => {
+    this.setState({ hasError: false, error: null, errorInfo: null });
+  };
+
+  render(): ReactNode {
+    if (this.state.hasError) {
+      if (this.props.fallback) {
+        return this.props.fallback;
+      }
+      return (
+        <DefaultErrorFallback
+          error={this.state.error}
+          onReset={this.handleReset}
+        />
       );
     }
     return this.props.children;

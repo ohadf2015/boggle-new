@@ -18,6 +18,7 @@ const { checkRateLimit } = require('../utils/rateLimiter');
 const botManager = require('../modules/botManager');
 const logger = require('../utils/logger');
 const { validatePayload, addBotSchema, removeBotSchema } = require('../utils/socketValidation');
+const { isInProgress } = require('../utils/gameStateMachine');
 
 // Configuration
 const MAX_PLAYERS_PER_ROOM = 50;
@@ -63,8 +64,8 @@ function registerBotHandlers(io, socket) {
       return;
     }
 
-    // Check if game is in progress
-    if (game.gameState === 'in-progress') {
+    // Check if game is in progress (use state machine helper)
+    if (isInProgress(game.gameState)) {
       emitError(socket, 'Cannot add bots during a game');
       return;
     }
@@ -142,8 +143,8 @@ function registerBotHandlers(io, socket) {
       return;
     }
 
-    // Check if game is in progress
-    if (game.gameState === 'in-progress') {
+    // Check if game is in progress (use state machine helper)
+    if (isInProgress(game.gameState)) {
       emitError(socket, 'Cannot remove bots during a game');
       return;
     }

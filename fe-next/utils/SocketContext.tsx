@@ -336,16 +336,38 @@ export function useGameSocket(): GameSocketOperations {
   };
 }
 
-// Legacy compatibility - export useWebSocket as alias
+// ==========================================
+// Legacy Compatibility Exports
+// ==========================================
+
+/**
+ * @deprecated Use useSocket() instead. Will be removed in v2.0.
+ *
+ * Migration guide:
+ *   Before: const socket = useWebSocket();
+ *   After:  const { socket } = useSocket();
+ */
 export const useWebSocket = (): Socket | null => {
+  if (process.env.NODE_ENV === 'development') {
+    // Use console.warn only on first render via a static flag
+    if (typeof window !== 'undefined' && !(window as { __useWebSocketDeprecated?: boolean }).__useWebSocketDeprecated) {
+      console.warn('[DEPRECATION] useWebSocket is deprecated. Use useSocket() instead.');
+      (window as { __useWebSocketDeprecated?: boolean }).__useWebSocketDeprecated = true;
+    }
+  }
   const { socket } = useSocket();
   return socket;
 };
 
+/**
+ * @deprecated Use useSocketOptional() instead. Will be removed in v2.0.
+ */
 export const useWebSocketOptional = (): Socket | null => {
   const context = useContext(SocketContext);
   return context?.socket || null;
 };
 
-// Legacy WebSocketContext export for backwards compatibility
+/**
+ * @deprecated Use SocketContext directly. Will be removed in v2.0.
+ */
 export const WebSocketContext = SocketContext;
