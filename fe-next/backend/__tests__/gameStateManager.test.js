@@ -30,15 +30,15 @@ const {
   updateUserHeartbeat,
   markUserActivity,
   getPresenceConfig,
+  clearAllGames,
 } = require('../modules/gameStateManager');
 
 describe('Game State Manager', () => {
 
   // Clean up after each test
   afterEach(() => {
-    // Clean up all games created during tests
-    const { games } = require('../modules/gameStateManager');
-    Object.keys(games).forEach(code => deleteGame(code));
+    // Clean up all games created during tests using the proper API
+    clearAllGames();
   });
 
   describe('Game CRUD Operations', () => {

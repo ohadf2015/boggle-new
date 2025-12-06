@@ -3,9 +3,10 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import nextDynamic from 'next/dynamic';
 import toast from 'react-hot-toast';
-import { io } from 'socket.io-client';
+import { io, Socket } from 'socket.io-client';
 import Header from '@/components/Header';
 import ErrorBoundary from '@/app/components/ErrorBoundary';
+import FeatureErrorBoundary from '@/components/FeatureErrorBoundary';
 import { SocketContext } from '@/utils/SocketContext';
 import { saveSession, getSession, clearSession, clearSessionPreservingUsername } from '@/utils/session';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -14,6 +15,34 @@ import { useMusic } from '@/contexts/MusicContext';
 import { getGuestSessionId, hashToken } from '@/utils/guestManager';
 import { getSession as getSupabaseSession } from '@/lib/supabase';
 import logger from '@/utils/logger';
+import type { Language, ActiveRoom } from '@/shared/types/game';
+
+interface JoinedEventData {
+  gameCode: string;
+  username: string;
+  isHost: boolean;
+  language?: Language;
+}
+
+interface ResultsData {
+  scores: Array<{
+    username: string;
+    score: number;
+    words: string[];
+  }>;
+  letterGrid: string[][];
+}
+
+interface GameStartData {
+  letterGrid: string[][];
+  timerSeconds: number;
+  language: Language;
+}
+
+interface ErrorData {
+  message?: string;
+  code?: string;
+}
 
 // Dynamic imports for code splitting - only load when needed
 const HostView = nextDynamic(() => import('@/host/HostView'), {
@@ -66,9 +95,9 @@ const SOCKET_CONFIG = {
 };
 
 // Singleton socket instance
-let globalSocketInstance = null;
+let globalSocketInstance: Socket | null = null;
 
-const getSocketURL = () => {
+const getSocketURL = (): string => {
   if (process.env.NEXT_PUBLIC_WS_URL) {
     // Convert ws:// to http:// for Socket.IO
     return process.env.NEXT_PUBLIC_WS_URL.replace(/^ws:/, 'http:').replace(/^wss:/, 'https:');
@@ -85,30 +114,30 @@ const getSocketURL = () => {
   return `${protocol}//${host}`;
 };
 
-export default function GamePage() {
-  const [gameCode, setGameCode] = useState('');
-  const [username, setUsername] = useState('');
-  const [roomName, setRoomName] = useState('');
-  const [isActive, setIsActive] = useState(false);
-  const [isHost, setIsHost] = useState(false);
-  const [error, setError] = useState('');
-  const [activeRooms, setActiveRooms] = useState([]);
-  const [showResults, setShowResults] = useState(false);
-  const [resultsData, setResultsData] = useState(null);
-  const [attemptingReconnect, setAttemptingReconnect] = useState(false);
-  const [roomLanguage, setRoomLanguage] = useState(null);
-  const [playersInRoom, setPlayersInRoom] = useState([]);
-  const [socket, setSocket] = useState(null);
-  const [isConnected, setIsConnected] = useState(false);
-  const [roomsLoading, setRoomsLoading] = useState(true); // Track rooms loading state
-  const [pendingGameStart, setPendingGameStart] = useState(null); // Store game start data for players returning from results
-  const [isJoining, setIsJoining] = useState(false); // Track join/create loading state
-  const [authLoadingStartTime, setAuthLoadingStartTime] = useState(null); // Track when auth loading started
+export default function GamePage(): React.JSX.Element {
+  const [gameCode, setGameCode] = useState<string>('');
+  const [username, setUsername] = useState<string>('');
+  const [roomName, setRoomName] = useState<string>('');
+  const [isActive, setIsActive] = useState<boolean>(false);
+  const [isHost, setIsHost] = useState<boolean>(false);
+  const [error, setError] = useState<string>('');
+  const [activeRooms, setActiveRooms] = useState<ActiveRoom[]>([]);
+  const [showResults, setShowResults] = useState<boolean>(false);
+  const [resultsData, setResultsData] = useState<ResultsData | null>(null);
+  const [attemptingReconnect, setAttemptingReconnect] = useState<boolean>(false);
+  const [roomLanguage, setRoomLanguage] = useState<Language | null>(null);
+  const [playersInRoom, setPlayersInRoom] = useState<Array<{ username: string; score?: number }>>([]);
+  const [socket, setSocket] = useState<Socket | null>(null);
+  const [isConnected, setIsConnected] = useState<boolean>(false);
+  const [roomsLoading, setRoomsLoading] = useState<boolean>(true); // Track rooms loading state
+  const [pendingGameStart, setPendingGameStart] = useState<GameStartData | null>(null); // Store game start data for players returning from results
+  const [isJoining, setIsJoining] = useState<boolean>(false); // Track join/create loading state
+  const [authLoadingStartTime, setAuthLoadingStartTime] = useState<number | null>(null); // Track when auth loading started
 
-  const socketRef = useRef(null);
-  const attemptingReconnectRef = useRef(attemptingReconnect);
-  const hostKeepAliveIntervalRef = useRef(null);
-  const wasConnectedRef = useRef(false);
+  const socketRef = useRef<Socket | null>(null);
+  const attemptingReconnectRef = useRef<boolean>(attemptingReconnect);
+  const hostKeepAliveIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const wasConnectedRef = useRef<boolean>(false);
 
   const { t, language } = useLanguage();
   const { user, isAuthenticated, isSupabaseEnabled, profile, loading, refreshProfile } = useAuth();
@@ -178,7 +207,7 @@ export default function GamePage() {
         // Check if user arrived via refresh (reload) vs navigation
         const isPageRefresh = (() => {
           try {
-            const navEntries = performance.getEntriesByType('navigation');
+            const navEntries = performance.getEntriesByType('navigation') as PerformanceNavigationTiming[];
             if (navEntries.length > 0) {
               return navEntries[0].type === 'reload';
             }
@@ -256,21 +285,22 @@ export default function GamePage() {
 
     // Use existing socket if available
     if (globalSocketInstance && globalSocketInstance.connected) {
-      socketRef.current = globalSocketInstance;
+      const existingSocket = globalSocketInstance;
+      socketRef.current = existingSocket;
       // Defer state updates to avoid calling setState directly within effect
       Promise.resolve().then(() => {
-        setSocket(globalSocketInstance);
+        setSocket(existingSocket);
         setIsConnected(true);
         // Request active rooms since we're reusing an existing connection
-        globalSocketInstance.emit('getActiveRooms');
+        existingSocket.emit('getActiveRooms');
       });
 
       // Set up activeRooms listener for existing socket
-      const handleActiveRooms = (data) => {
+      const handleActiveRooms = (data: { rooms?: ActiveRoom[] }) => {
         setActiveRooms(data.rooms || []);
         setRoomsLoading(false);
       };
-      globalSocketInstance.on('activeRooms', handleActiveRooms);
+      existingSocket.on('activeRooms', handleActiveRooms);
 
       // Fallback timeout for rooms loading - show UI faster on slow connections
       const roomsLoadingTimeout = setTimeout(() => {
@@ -279,7 +309,7 @@ export default function GamePage() {
 
       return () => {
         clearTimeout(roomsLoadingTimeout);
-        globalSocketInstance.off('activeRooms', handleActiveRooms);
+        existingSocket.off('activeRooms', handleActiveRooms);
       };
     }
 
@@ -531,7 +561,7 @@ export default function GamePage() {
     // Handle session migration (another tab took over)
     newSocket.on('sessionMigrated', (data) => {
       logger.log('[SOCKET.IO] Session migrated:', data);
-      toast.info(data.message || 'Your session was moved to another tab', {
+      toast(data.message || 'Your session was moved to another tab', {
         icon: '🔄',
         duration: 5000,
       });
@@ -550,7 +580,7 @@ export default function GamePage() {
       setAttemptingReconnect(false);
       setShouldAutoJoin(false);
 
-      toast.info(t('common.roomFull') || 'Room is full. You joined as a spectator.', {
+      toast(t('common.roomFull') || 'Room is full. You joined as a spectator.', {
         icon: '👀',
         duration: 5000,
       });
@@ -597,11 +627,11 @@ export default function GamePage() {
           username,
           isHost: true,
           roomName: roomName || username,
-          language: roomLanguage,
+          language: roomLanguage || 'en',
         });
         toast.success(t('hostView.youAreNowHost'), { duration: 5000, icon: '👑' });
       } else {
-        toast.info(`${data.newHost} ${t('hostView.newHostAssigned')}`, { duration: 3000, icon: '🔄' });
+        toast(`${data.newHost} ${t('hostView.newHostAssigned')}`, { duration: 3000, icon: '🔄' });
       }
     });
 
@@ -715,6 +745,7 @@ export default function GamePage() {
       }, 200);
       return () => clearTimeout(autoJoinTimeout);
     }
+    return undefined;
   }, [shouldAutoJoin, prefilledRoomCode, username, isActive, attemptingReconnect, socket, isConnected, getAuthContext, profile]);
 
   // Session reconnection
@@ -784,7 +815,7 @@ export default function GamePage() {
     return () => clearTimeout(reconnectTimeout);
   }, [attemptingReconnect, isActive, socket, isConnected, language, getAuthContext, profile]);
 
-  const handleJoin = useCallback(async (isHostMode, roomLang, overrideGameCode) => {
+  const handleJoin = useCallback(async (isHostMode: boolean, roomLang?: Language | null, overrideGameCode?: string) => {
     if (!socket || !isConnected) {
       setError(t('errors.notConnected') || 'Not connected to server');
       toast.error(t('common.notConnected') || 'Not connected to server', {
@@ -898,8 +929,8 @@ export default function GamePage() {
     setPendingGameStart(null);
   }, []);
 
-  const handleShowResults = useCallback((data) => {
-    setResultsData(data);
+  const handleShowResults = useCallback((data: unknown) => {
+    setResultsData(data as ResultsData);
     setShowResults(true);
   }, []);
 
@@ -908,62 +939,70 @@ export default function GamePage() {
     socket,
     isConnected,
     connectionError: error,
+    isReconnecting: attemptingReconnect,
   };
 
   const renderView = () => {
     if (showResults) {
       return (
-        <ResultsPage
-          finalScores={resultsData?.scores}
-          letterGrid={resultsData?.letterGrid}
-          gameCode={gameCode}
-          onReturnToRoom={handleReturnToRoom}
-          username={username}
-          socket={socket}
-        />
+        <FeatureErrorBoundary featureName="Results">
+          <ResultsPage
+            finalScores={resultsData?.scores ?? null}
+            letterGrid={resultsData?.letterGrid ?? null}
+            gameCode={gameCode}
+            onReturnToRoom={handleReturnToRoom}
+            username={username}
+            socket={socket}
+          />
+        </FeatureErrorBoundary>
       );
     }
 
     if (!isActive) {
       return (
-        <JoinView
-          handleJoin={handleJoin}
-          gameCode={gameCode}
-          username={username}
-          roomName={roomName}
-          setGameCode={setGameCode}
-          setUsername={setUsername}
-          setRoomName={setRoomName}
-          error={error}
-          activeRooms={activeRooms}
-          refreshRooms={refreshRooms}
-          prefilledRoom={prefilledRoomCode}
-          isAutoJoining={shouldAutoJoin}
-          roomsLoading={roomsLoading}
-          isAuthenticated={isAuthenticated}
-          displayName={profile?.display_name}
-          isProfileLoading={loading}
-          isJoining={isJoining}
-        />
+        <FeatureErrorBoundary featureName="Lobby">
+          <JoinView
+            handleJoin={handleJoin}
+            gameCode={gameCode}
+            username={username}
+            roomName={roomName}
+            setGameCode={setGameCode}
+            setUsername={setUsername}
+            setRoomName={setRoomName}
+            error={error}
+            activeRooms={activeRooms}
+            refreshRooms={refreshRooms}
+            prefilledRoom={prefilledRoomCode}
+            isAutoJoining={shouldAutoJoin}
+            roomsLoading={roomsLoading}
+            isAuthenticated={isAuthenticated}
+            displayName={profile?.display_name ?? ''}
+            isProfileLoading={loading}
+            isJoining={isJoining}
+          />
+        </FeatureErrorBoundary>
       );
     }
 
     if (isHost) {
-      return <HostView gameCode={gameCode} roomLanguage={roomLanguage} initialPlayers={playersInRoom} username={username} onShowResults={handleShowResults} />;
+      return (
+        <FeatureErrorBoundary featureName="Host Game">
+          <HostView gameCode={gameCode} roomLanguage={roomLanguage ?? undefined} initialPlayers={playersInRoom} username={username} onShowResults={handleShowResults} />
+        </FeatureErrorBoundary>
+      );
     }
 
     return (
-      <PlayerView
-        handleJoin={handleJoin}
-        gameCode={gameCode}
-        username={username}
-        setGameCode={setGameCode}
-        setUsername={setUsername}
-        onShowResults={handleShowResults}
-        initialPlayers={playersInRoom}
-        pendingGameStart={pendingGameStart}
-        onGameStartConsumed={() => setPendingGameStart(null)}
-      />
+      <FeatureErrorBoundary featureName="Player Game">
+        <PlayerView
+          gameCode={gameCode}
+          username={username}
+          onShowResults={handleShowResults}
+          initialPlayers={playersInRoom}
+          pendingGameStart={pendingGameStart}
+          onGameStartConsumed={() => setPendingGameStart(null)}
+        />
+      </FeatureErrorBoundary>
     );
   };
 

@@ -633,6 +633,22 @@ function forEachGame(callback) {
   }
 }
 
+/**
+ * Clear all games - TEST ONLY
+ * This function is intended for test cleanup only
+ * @throws {Error} - If called outside of test environment
+ */
+function clearAllGames() {
+  if (process.env.NODE_ENV !== 'test') {
+    throw new Error('[gameStateManager] clearAllGames() can only be called in test environment');
+  }
+  const gameCodes = Object.keys(games);
+  for (const code of gameCodes) {
+    deleteGame(code);
+  }
+  return gameCodes.length;
+}
+
 // ==========================================
 // Module Exports
 // ==========================================
@@ -690,6 +706,7 @@ module.exports = {
 
   // Cleanup
   cleanupStaleGames,
+  clearAllGames,
 
   // Presence tracking (from presenceManager)
   updateUserPresence,
@@ -717,10 +734,10 @@ module.exports = {
   getAllGameCodesFromRedis,
 
   // TEST ONLY - Direct access to games object for test verification
-  // DO NOT use in production code - use getGame(), forEachGame() instead
+  // DO NOT use in production code - use getGame(), forEachGame(), clearAllGames() instead
   get games() {
     if (process.env.NODE_ENV !== 'test') {
-      console.warn('[gameStateManager] Direct access to games object is deprecated. Use getGame() or forEachGame() instead.');
+      throw new Error('[gameStateManager] Direct access to games object is not allowed. Use getGame(), getAllGameCodes(), forEachGame(), or clearAllGames() instead.');
     }
     return games;
   }

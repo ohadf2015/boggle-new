@@ -4,7 +4,6 @@
  */
 
 const {
-  games,
   createGame,
   getGame,
   updateGame,

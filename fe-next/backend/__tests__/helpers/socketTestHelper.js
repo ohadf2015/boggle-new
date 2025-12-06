@@ -304,15 +304,8 @@ function createTestEnvironment() {
   // Clean up game state between tests
   const cleanupGameState = () => {
     try {
-      const { games } = require('../../modules/gameStateManager');
-      Object.keys(games).forEach(code => {
-        try {
-          const { deleteGame } = require('../../modules/gameStateManager');
-          deleteGame(code);
-        } catch (e) {
-          // Ignore cleanup errors
-        }
-      });
+      const { clearAllGames } = require('../../modules/gameStateManager');
+      clearAllGames();
     } catch (e) {
       // Module not loaded yet, nothing to clean
     }
