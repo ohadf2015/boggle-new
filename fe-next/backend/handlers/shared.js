@@ -3,7 +3,7 @@
  * Common functions used across multiple socket handlers
  */
 
-const { getGame, updateGame, getTournamentIdFromGame, getLeaderboard } = require('../modules/gameStateManager');
+const { getGame, updateGame, getTournamentIdFromGame, getLeaderboard, transitionGameState } = require('../modules/gameStateManager');
 const { broadcastToRoom, getGameRoom, getSocketById, safeEmit } = require('../utils/socketHelpers');
 const { calculateWordScore, calculateGameScores } = require('../modules/scoringEngine');
 const { awardFinalAchievements, checkAndAwardAchievements, getLocalizedAchievements, ACHIEVEMENT_ICONS } = require('../modules/achievementManager');
@@ -108,8 +108,12 @@ async function endGame(io, gameCode) {
   // Clean up AI validation tracking
   cleanupGameTracking(gameCode);
 
-  // Update game state
-  updateGame(gameCode, { gameState: 'finished' });
+  // Transition game state using state machine (guards against invalid transitions)
+  const transitionResult = transitionGameState(gameCode, 'END', { immediate: true });
+  if (!transitionResult.success) {
+    logger.warn('GAME', `Failed to end game ${gameCode}: ${transitionResult.error}`);
+    return;
+  }
 
   // Notify clients that game has ended (sets up waiting state)
   broadcastToRoom(io, getGameRoom(gameCode), 'endGame', {});

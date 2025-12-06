@@ -15,7 +15,9 @@ const {
   getGameUsers,
   getActiveRooms,
   resetGameForNewRound,
-  getAuthUserConnection
+  getAuthUserConnection,
+  transitionGameState,
+  canTransitionGameState
 } = require('../modules/gameStateManager');
 
 const {
@@ -180,8 +182,15 @@ function registerGameLifecycleHandlers(io, socket) {
       return;
     }
 
+    // Check if game can be started (must be in 'waiting' state)
+    if (!canTransitionGameState(gameCode, 'START')) {
+      emitError(socket, 'Game cannot be started from current state');
+      return;
+    }
+
     const validTimer = Math.max(30, Math.min(600, parseInt(timerSeconds) || 180));
 
+    // Update game settings first
     updateGame(gameCode, {
       letterGrid,
       timerSeconds: validTimer,
@@ -189,9 +198,16 @@ function registerGameLifecycleHandlers(io, socket) {
       gameDuration: validTimer,
       language: language || game.language,
       minWordLength: minWordLength || 2,
-      gameState: 'in-progress',
       gameStartedAt: Date.now()
     });
+
+    // Transition state using state machine
+    const transitionResult = transitionGameState(gameCode, 'START');
+    if (!transitionResult.success) {
+      logger.error('SOCKET', `Failed to start game ${gameCode}: ${transitionResult.error}`);
+      emitError(socket, 'Failed to start game');
+      return;
+    }
 
     // Precompute letter positions
     const positions = makePositionsMap(letterGrid);
