@@ -4,7 +4,6 @@
  */
 
 const {
-  games,
   getGame,
   getGameBySocketId,
   getUsernameBySocketId,
