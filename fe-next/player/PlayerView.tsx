@@ -35,9 +35,10 @@ interface Player {
 
 interface FoundWord {
   word: string;
-  isValid: boolean | null;
+  isValid?: boolean | null;
   score?: number;
   duplicate?: boolean;
+  timestamp?: number;
 }
 
 interface LeaderboardEntry {
@@ -48,11 +49,9 @@ interface LeaderboardEntry {
 }
 
 interface TournamentData {
-  id: string;
-  name: string;
-  totalRounds: number;
-  currentRound: number;
-  status: 'created' | 'in-progress' | 'completed' | 'cancelled';
+  currentRound?: number;
+  totalRounds?: number;
+  isComplete?: boolean;
 }
 
 interface TournamentStanding {
@@ -70,19 +69,35 @@ interface PendingGameStart {
   messageId?: string;
 }
 
+interface WordToVote {
+  word: string;
+  submittedBy: string;
+  submitterAvatar?: {
+    emoji?: string;
+    color?: string;
+    profilePictureUrl?: string;
+  };
+  timeoutSeconds: number;
+  gameCode: string;
+  language: string;
+}
+
 interface XpGainedData {
-  totalXp: number;
-  breakdown: {
+  xpEarned: number;
+  xpBreakdown: {
     gameCompletion: number;
     scoreXp: number;
     winBonus: number;
     achievementXp: number;
   };
+  newTotalXp: number;
+  newLevel: number;
 }
 
 interface LevelUpData {
   oldLevel: number;
   newLevel: number;
+  levelsGained: number;
   newTitles: string[];
 }
 
@@ -164,7 +179,7 @@ const PlayerView: React.FC<PlayerViewProps> = memo(({
 
   // Word feedback state
   const [showWordFeedback, setShowWordFeedback] = useState<boolean>(false);
-  const [wordToVote, setWordToVote] = useState<string | null>(null);
+  const [wordToVote, setWordToVote] = useState<WordToVote | null>(null);
 
   // XP and Level state
   const [xpGainedData, setXpGainedData] = useState<XpGainedData | null>(null);
@@ -397,7 +412,7 @@ const PlayerView: React.FC<PlayerViewProps> = memo(({
           t={t}
           dir={dir}
           leaderboard={leaderboard}
-          foundWords={foundWords}
+          foundWords={foundWords as never[]}
           showExitConfirm={showExitConfirm}
           setShowExitConfirm={setShowExitConfirm}
           onExitRoom={handleExitRoom}

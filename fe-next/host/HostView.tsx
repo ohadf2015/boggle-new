@@ -46,11 +46,10 @@ interface Player {
 }
 
 interface TournamentData {
-  id: string;
-  name: string;
-  totalRounds: number;
-  currentRound: number;
-  status: 'created' | 'in-progress' | 'completed' | 'cancelled';
+  currentRound?: number;
+  totalRounds?: number;
+  standings?: unknown[];
+  isComplete?: boolean;
 }
 
 interface FinalScoresData {
@@ -64,18 +63,21 @@ interface FinalScoresData {
 }
 
 interface XpGainedData {
-  totalXp: number;
-  breakdown: {
+  xpEarned: number;
+  xpBreakdown: {
     gameCompletion: number;
     scoreXp: number;
     winBonus: number;
     achievementXp: number;
   };
+  newTotalXp: number;
+  newLevel: number;
 }
 
 interface LevelUpData {
   oldLevel: number;
   newLevel: number;
+  levelsGained: number;
   newTitles: string[];
 }
 
@@ -246,7 +248,7 @@ const HostView: React.FC<HostViewProps> = memo(({
     }, 1000);
 
     return () => clearInterval(intervalId);
-  }, [gameStarted, remainingTime === null, remainingTime <= 0]);
+  }, [gameStarted, remainingTime === null, remainingTime !== null && remainingTime <= 0]);
 
   // Update players list from props
   useEffect(() => {
@@ -519,7 +521,7 @@ const HostView: React.FC<HostViewProps> = memo(({
           t={t}
           dir={dir}
           leaderboard={leaderboard}
-          foundWords={hostFoundWords}
+          foundWords={hostFoundWords as never[]}
           showExitConfirm={showExitConfirm}
           setShowExitConfirm={setShowExitConfirm}
           onExitRoom={handleExitRoom}
