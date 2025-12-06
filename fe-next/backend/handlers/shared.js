@@ -418,20 +418,29 @@ function startBotsForGame(io, gameCode, letterGrid, language, timerSeconds) {
   const { addPlayerWord, updatePlayerScore, trackBotWord } = require('../modules/gameStateManager');
 
   for (const bot of bots) {
-    botManager.startBot(bot, letterGrid, language, async (botId, word, score) => {
+    botManager.startBot(bot, letterGrid, language, async (submission) => {
+      // Destructure the submission object from botManager
+      const { botId, username, word, score, comboLevel } = submission;
+
       // Use the bot from closure - it's the same bot object
       if (!bot || !bot.isActive) return;
 
-      addPlayerWord(gameCode, bot.username, word, {
+      // Safety check: ensure word is valid
+      if (!word || typeof word !== 'string') {
+        logger.warn('BOT', `Bot "${username}" submitted invalid word: ${word}`);
+        return;
+      }
+
+      addPlayerWord(gameCode, username, word, {
         autoValidated: true,
         score,
         comboBonus: 0,
-        comboLevel: 0,
+        comboLevel: comboLevel || 0,
         isBot: true
       });
 
-      trackBotWord(gameCode, word, bot.username, score);
-      updatePlayerScore(gameCode, bot.username, score, true);
+      trackBotWord(gameCode, word, username, score);
+      updatePlayerScore(gameCode, username, score, true);
 
       const leaderboard = getLeaderboard(gameCode);
       broadcastToRoom(io, getGameRoom(gameCode), 'updateLeaderboard', { leaderboard });

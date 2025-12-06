@@ -24,6 +24,12 @@ const leaderboardPendingUpdate = {};
 function addPlayerWord(game, username, word, options = {}) {
   if (!game) return;
 
+  // Defensive check: ensure word is a valid string
+  if (!word || typeof word !== 'string') {
+    console.warn(`[SCORE] addPlayerWord called with invalid word: ${word} for user ${username}`);
+    return;
+  }
+
   const normalizedWord = word.toLowerCase();
 
   // Initialize playerWords if needed
@@ -85,6 +91,7 @@ function addPlayerWord(game, username, word, options = {}) {
  */
 function playerHasWord(game, username, word) {
   if (!game) return false;
+  if (!word || typeof word !== 'string') return false;
   return game.playerWords[username]?.includes(word.toLowerCase()) || false;
 }
 
