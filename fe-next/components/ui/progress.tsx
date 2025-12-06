@@ -1,6 +1,6 @@
 import * as React from "react";
 import * as ProgressPrimitive from "@radix-ui/react-progress";
-import { cva } from "class-variance-authority";
+import { cva, type VariantProps } from "class-variance-authority";
 
 import { cn } from "../../lib/utils";
 
@@ -49,7 +49,15 @@ const indicatorVariants = cva(
   }
 );
 
-const Progress = React.forwardRef(({ className, value, size, variant, ...props }, ref) => (
+interface ProgressProps
+  extends React.ComponentPropsWithoutRef<typeof ProgressPrimitive.Root>,
+    VariantProps<typeof progressVariants>,
+    VariantProps<typeof indicatorVariants> {}
+
+const Progress = React.forwardRef<
+  React.ElementRef<typeof ProgressPrimitive.Root>,
+  ProgressProps
+>(({ className, value, size, variant, ...props }, ref) => (
   <ProgressPrimitive.Root
     ref={ref}
     className={cn(

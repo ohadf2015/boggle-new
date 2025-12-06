@@ -19,10 +19,13 @@ interface AvatarData {
  * Vote info for showing progress toward validation
  */
 interface VoteInfo {
-  netScore: number;
-  totalVotes: number;
-  votesNeeded: number;
+  netScore?: number;
+  totalVotes?: number;
+  votesNeeded?: number;
   isValidForScoring?: boolean; // True if word has positive ratio (valid for scoring but not prominently validated)
+  approvalCount?: number;
+  disapprovalCount?: number;
+  requiredApprovals?: number;
 }
 
 /**

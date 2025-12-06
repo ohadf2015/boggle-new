@@ -31,7 +31,7 @@ const JoinView = nextDynamic(() => import('@/JoinView'), {
   ssr: false,
 });
 
-const ResultsPage = nextDynamic(() => import('@/ResultsPage.jsx'), {
+const ResultsPage = nextDynamic(() => import('@/ResultsPage'), {
   loading: () => <ViewLoadingSkeleton />,
   ssr: false,
 });

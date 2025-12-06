@@ -4,7 +4,10 @@ import * as ScrollAreaPrimitive from "@radix-ui/react-scroll-area"
 import { cn } from "../../lib/utils"
 
 // Neo-Brutalist ScrollArea
-const ScrollArea = React.forwardRef(({ className, children, ...props }, ref) => (
+const ScrollArea = React.forwardRef<
+  React.ElementRef<typeof ScrollAreaPrimitive.Root>,
+  React.ComponentPropsWithoutRef<typeof ScrollAreaPrimitive.Root>
+>(({ className, children, ...props }, ref) => (
   <ScrollAreaPrimitive.Root
     ref={ref}
     className={cn("relative overflow-hidden", className)}
@@ -20,7 +23,10 @@ const ScrollArea = React.forwardRef(({ className, children, ...props }, ref) => 
 ScrollArea.displayName = ScrollAreaPrimitive.Root.displayName
 
 // Neo-Brutalist ScrollBar: Thick, visible, chunky
-const ScrollBar = React.forwardRef(({ className, orientation = "vertical", ...props }, ref) => (
+const ScrollBar = React.forwardRef<
+  React.ElementRef<typeof ScrollAreaPrimitive.ScrollAreaScrollbar>,
+  React.ComponentPropsWithoutRef<typeof ScrollAreaPrimitive.ScrollAreaScrollbar>
+>(({ className, orientation = "vertical", ...props }, ref) => (
   <ScrollAreaPrimitive.ScrollAreaScrollbar
     ref={ref}
     orientation={orientation}
