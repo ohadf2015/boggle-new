@@ -116,7 +116,7 @@ export const wordAcceptedToast = (word: string, options: WordAcceptedOptions = {
               </motion.span>
             )}
             {/* Show combo bonus if present */}
-            {comboBonus && comboBonus > 0 && (
+            {comboBonus > 0 && (
               <motion.span
                 initial={{ scale: 0, rotate: -10 }}
                 animate={{ scale: 1, rotate: 0 }}

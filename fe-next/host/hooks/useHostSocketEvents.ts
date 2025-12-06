@@ -664,6 +664,31 @@ const useHostSocketEvents = ({
       });
     };
 
+    // Handle game reset for new round
+    const handleResetGame = (data: any) => {
+      logger.log('[HOST] Game reset received');
+      setGameStarted(false);
+      setRemainingTime(null);
+      setWaitingForResults(false);
+      setTableData(null);
+      setHostFoundWords([]);
+      setHostAchievements([]);
+      setPlayerWordCounts({});
+      setPlayerScores({});
+      setPlayerAchievements({});
+      setFinalScores(null);
+      waitingStartTimeRef.current = null;
+      // Reset combo state
+      setComboLevel(0);
+      comboLevelRef.current = 0;
+      setLastWordTime(null);
+      lastWordTimeRef.current = null;
+      if (comboTimeoutRef.current) {
+        clearTimeout(comboTimeoutRef.current);
+      }
+      neoSuccessToast(data?.message || t('common.newGameReady') || 'New game ready!', { icon: '🔄', duration: 3000 });
+    };
+
     // Register all event listeners
     socket.on('updateUsers', handleUpdateUsers);
     socket.on('playerPresenceUpdate', handlePlayerPresenceUpdate);
@@ -694,6 +719,7 @@ const useHostSocketEvents = ({
     socket.on('playerLeft', handlePlayerLeft);
     socket.on('xpGained', handleXpGained);
     socket.on('levelUp', handleLevelUp);
+    socket.on('resetGame', handleResetGame);
 
     return () => {
       socket.off('updateUsers', handleUpdateUsers);
@@ -725,6 +751,7 @@ const useHostSocketEvents = ({
       socket.off('playerLeft', handlePlayerLeft);
       socket.off('xpGained', handleXpGained);
       socket.off('levelUp', handleLevelUp);
+      socket.off('resetGame', handleResetGame);
     };
   }, [
     socket,

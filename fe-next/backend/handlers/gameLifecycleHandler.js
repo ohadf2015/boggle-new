@@ -312,7 +312,7 @@ function registerGameLifecycleHandlers(io, socket) {
     timerManager.clearGameTimer(gameCode);
     resetGameForNewRound(gameCode);
 
-    broadcastToRoom(io, getGameRoom(gameCode), 'gameReset', {
+    broadcastToRoom(io, getGameRoom(gameCode), 'resetGame', {
       users: getGameUsers(gameCode)
     });
 
