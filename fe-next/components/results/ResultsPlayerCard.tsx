@@ -14,6 +14,66 @@ import logger from '@/utils/logger';
 import { POINT_COLORS } from '../../utils/consts';
 import type { Avatar as AvatarType } from '@/types';
 
+// Lifetime/career achievement keys that should NOT be shown in game results
+// These are cumulative achievements that don't apply to a single round
+const LIFETIME_ACHIEVEMENT_KEYS = new Set([
+  'VETERAN',        // 50 games played
+  'CENTURION',      // 100 games played
+  'WORD_COLLECTOR', // 1000 total words
+  'WORD_HOARDER',   // 5000 total words
+  'CHAMPION',       // 25 wins
+  'LEGEND',         // 100 wins
+  'POINT_MASTER',   // 10000 total points
+  'POINT_KING',     // 50000 total points
+  'DEDICATION',     // 7 unique days
+  'LOYAL_PLAYER',   // 30 unique days
+]);
+
+// Achievement thresholds for validation (base thresholds, may scale with game duration)
+const ACHIEVEMENT_WORD_THRESHOLDS: Record<string, number> = {
+  'WORDSMITH': 20,      // Scaled: ~35 words
+  'LEXICON': 30,        // Scaled: ~45 words
+  'UNSTOPPABLE': 40,    // Scaled: ~55 words
+  'VOCABULARY_TITAN': 45, // Scaled: ~60 words
+};
+
+/**
+ * Filter achievements to only show game-specific achievements
+ * Excludes lifetime/career achievements and achievements that don't match player's round stats
+ */
+const filterGameAchievements = (
+  achievements: GameAchievement[],
+  allWords?: WordObject[]
+): GameAchievement[] => {
+  if (!achievements || !Array.isArray(achievements)) return [];
+
+  const validWordCount = allWords
+    ? allWords.filter(w => w && !w.isDuplicate && w.validated).length
+    : 0;
+
+  return achievements.filter(ach => {
+    const key = ach.key || ach.name || '';
+
+    // Filter out lifetime achievements - these should not appear in round results
+    if (LIFETIME_ACHIEVEMENT_KEYS.has(key)) {
+      logger.debug(`[RESULTS] Filtering out lifetime achievement: ${key}`);
+      return false;
+    }
+
+    // Validate word-count-based achievements against actual round stats
+    // Use a generous threshold (50% of base) to account for time scaling
+    const threshold = ACHIEVEMENT_WORD_THRESHOLDS[key];
+    if (threshold && validWordCount < threshold * 0.5) {
+      // Achievement requires more words than player actually found
+      // This suggests stale data from a previous game
+      logger.warn(`[RESULTS] Filtering out invalid achievement: ${key} (${validWordCount} words < ${threshold * 0.5} threshold)`);
+      return false;
+    }
+
+    return true;
+  });
+};
+
 // Helper to safely get point color with fallback
 const getPointColor = (points: number): string => {
   return POINT_COLORS[points] ?? POINT_COLORS[8] ?? 'var(--neo-pink)';
@@ -398,6 +458,12 @@ const ResultsPlayerCard: React.FC<ResultsPlayerCardProps> = ({ player, index, al
     return calculatePlayerInsights(player.allWords, 180, player.score);
   }, [isCurrentPlayer, player.allWords, player.score]);
 
+  // Filter out lifetime achievements and validate against player's actual round stats
+  // This prevents showing stale achievements from previous games
+  const gameAchievements = useMemo(() => {
+    return filterGameAchievements(player.achievements || [], player.allWords);
+  }, [player.achievements, player.allWords]);
+
   const showWinnerMessage = isCurrentPlayer && isWinner;
 
   // Calculate how many players found each word
@@ -706,13 +772,14 @@ const ResultsPlayerCard: React.FC<ResultsPlayerCardProps> = ({ player, index, al
         )}
 
         {/* Achievements Section - Neo-Brutalist */}
-        {player.achievements && player.achievements.length > 0 && (
+        {/* Only show game-specific achievements, filtered to exclude lifetime/career achievements */}
+        {gameAchievements.length > 0 && (
           <div className="mt-3 pt-3 sm:mt-4 sm:pt-4 border-t-4 border-neo-black relative z-10">
             <p className="text-sm font-black mb-2 text-neo-purple uppercase">
               {t('hostView.achievements')}:
             </p>
             <div className="flex flex-wrap gap-2">
-              {player.achievements.map((ach, i) => (
+              {gameAchievements.map((ach, i) => (
                 <AchievementBadge key={i} achievement={ach} index={i} />
               ))}
             </div>
