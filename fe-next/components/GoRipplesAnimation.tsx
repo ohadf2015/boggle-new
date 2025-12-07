@@ -28,9 +28,9 @@ const GoRipplesAnimation: React.FC<GoRipplesAnimationProps> = ({ onComplete }) =
   const [showFlash, setShowFlash] = useState(false);
   const { playCountdownBeep } = useSoundEffects();
 
-  // Memoize particles to prevent re-generation on each render
-  const particles = useMemo(() => generateParticles(16), []);
-  const goParticles = useMemo(() => generateParticles(24), []);
+  // Memoize particles to prevent re-generation on each render - reduced count for cleaner animation
+  const particles = useMemo(() => generateParticles(10), []);
+  const goParticles = useMemo(() => generateParticles(16), []);
 
   // Play beep for each countdown number
   useEffect(() => {
@@ -180,49 +180,45 @@ const GoRipplesAnimation: React.FC<GoRipplesAnimationProps> = ({ onComplete }) =
           key={count}
           initial={{ scale: 0, opacity: 0, rotate: -10 }}
           animate={{
-            scale: isGo ? [0, 1.3, 1.1] : [0, 1.15, 1],
+            scale: isGo ? [0, 1.2, 1.1] : [0, 1.1, 1],
             opacity: 1,
-            rotate: isGo ? [10, -5, 0] : [5, -2, 0]
+            rotate: isGo ? [10, -3, 0] : [3, -1, 0]
           }}
-          exit={{ scale: 1.5, opacity: 0, rotate: 5 }}
+          exit={{ scale: 1.3, opacity: 0, rotate: 3 }}
           transition={{
-            duration: isGo ? 0.4 : 0.25,
+            duration: isGo ? 0.35 : 0.22,
             times: [0, 0.6, 1],
             ease: "easeOut"
           }}
           className={`relative px-8 py-4 border-4 border-neo-black rounded-neo ${
             isGo
-              ? 'bg-gradient-to-r from-neo-yellow via-neo-orange to-neo-yellow bg-[length:200%_100%] animate-pulse'
+              ? 'bg-gradient-to-r from-neo-yellow via-neo-orange to-neo-yellow bg-[length:200%_100%]'
               : 'bg-neo-yellow'
           }`}
           style={{
             boxShadow: isGo
-              ? '8px 8px 0px var(--neo-black), 0 0 40px rgba(251, 213, 53, 0.6), 0 0 80px rgba(255, 107, 53, 0.4)'
+              ? '8px 8px 0px var(--neo-black), 0 0 30px rgba(251, 213, 53, 0.5)'
               : '6px 6px 0px var(--neo-black)'
           }}
         >
-          {/* Inner glow for GO */}
+          {/* Inner glow for GO - reduced pulsing */}
           {isGo && (
             <motion.div
               className="absolute inset-0 rounded-neo"
-              animate={{ opacity: [0.5, 1, 0.5] }}
-              transition={{ duration: 0.3, repeat: 2 }}
+              initial={{ opacity: 0.3 }}
+              animate={{ opacity: 0.5 }}
+              transition={{ duration: 0.4 }}
               style={{
-                background: 'radial-gradient(circle, rgba(255,255,255,0.4) 0%, transparent 70%)',
+                background: 'radial-gradient(circle, rgba(255,255,255,0.3) 0%, transparent 70%)',
               }}
             />
           )}
 
           <motion.span
             animate={isGo ? {
-              scale: [1, 1.05, 1],
-              textShadow: [
-                '3px 3px 0px var(--neo-cyan)',
-                '4px 4px 0px var(--neo-cyan), 0 0 20px rgba(0, 255, 255, 0.8)',
-                '3px 3px 0px var(--neo-cyan)'
-              ]
+              scale: [1, 1.02, 1],
             } : {}}
-            transition={{ duration: 0.2, repeat: isGo ? 2 : 0 }}
+            transition={{ duration: 0.3, repeat: 1 }}
             className={`relative z-10 font-black text-neo-black ${
               isGo ? 'text-6xl sm:text-8xl' : 'text-5xl sm:text-7xl'
             }`}
@@ -231,12 +227,12 @@ const GoRipplesAnimation: React.FC<GoRipplesAnimationProps> = ({ onComplete }) =
             {count > 0 ? count : 'GO!'}
           </motion.span>
 
-          {/* Shake effect for numbers */}
+          {/* Subtle shake effect for numbers - reduced intensity */}
           {count > 0 && (
             <motion.div
               className="absolute inset-0"
-              animate={{ x: [0, -2, 2, -2, 0], y: [0, 1, -1, 1, 0] }}
-              transition={{ duration: 0.1, delay: 0.15 }}
+              animate={{ x: [0, -1, 1, 0], y: [0, 0.5, -0.5, 0] }}
+              transition={{ duration: 0.08, delay: 0.12 }}
             />
           )}
         </motion.div>

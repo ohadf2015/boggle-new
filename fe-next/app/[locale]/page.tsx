@@ -16,6 +16,7 @@ import { useMusic } from '@/contexts/MusicContext';
 import { getGuestSessionId, hashToken } from '@/utils/guestManager';
 import { getSession as getSupabaseSession } from '@/lib/supabase';
 import logger from '@/utils/logger';
+import { getRandomDefaultName } from '@/utils/defaultNames';
 import type { Language, ActiveRoom } from '@/shared/types/game';
 
 interface JoinedEventData {
@@ -235,20 +236,30 @@ export default function GamePage(): React.JSX.Element {
       } else if (joiningNewRoomViaInvitation) {
         if (savedUsername) {
           setUsername(savedUsername);
+        } else {
+          // Set a fun random default name for guests
+          setUsername(getRandomDefaultName(language));
         }
       } else if (savedSession?.username) {
         setUsername(savedSession.username);
       } else if (savedUsername) {
         setUsername(savedUsername);
+      } else {
+        // Set a fun random default name for new guests
+        setUsername(getRandomDefaultName(language));
       }
 
+      // Also set roomName for hosting if not already set
       if (!joiningNewRoomViaInvitation && savedSession?.roomName) {
         setRoomName(savedSession.roomName);
+      } else if (!savedSession?.roomName && !roomFromUrl) {
+        // Set a fun random default name for host room name
+        setRoomName(getRandomDefaultName(language));
       }
     };
 
     Promise.resolve().then(initializeState);
-  }, []);
+  }, [language]);
 
   // Set username and roomName from profile display_name for authenticated users
   // Uses fallback chain from OAuth metadata if profile hasn't loaded yet

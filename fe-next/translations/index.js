@@ -204,6 +204,23 @@ const translations = {
       joining: 'Joining...',
       creating: 'Creating...',
       playersOnline: 'online',
+      // Funny default player names - randomly selected as suggestions
+      defaultPlayerNames: [
+        'Sneaky Pickle', 'Captain Chaos', 'Disco Potato', 'Fluffy Thunder', 'Cosmic Banana',
+        'Ninja Waffle', 'Professor Pancake', 'Sir Giggles', 'Lady Noodle', 'Baron Von Snack',
+        'Wizard Wombat', 'Turbo Turtle', 'Sergeant Socks', 'Duke Donut', 'Princess Pretzel',
+        'Count Crumbs', 'Admiral Avocado', 'General Giggles', 'Captain Cookie', 'Major Muffin',
+        'Jolly Jellybean', 'Bouncy Bear', 'Zippy Zebra', 'Silly Salmon', 'Giggly Goose',
+        'Wacky Walrus', 'Peppy Penguin', 'Loopy Llama', 'Dizzy Dragon', 'Funky Flamingo',
+        'Jazzy Jaguar', 'Quirky Quokka', 'Rowdy Raccoon', 'Sassy Sloth', 'Tiny Tornado',
+        'Wobbly Wizard', 'Zany Zucchini', 'Bubbly Badger', 'Crispy Cactus', 'Dapper Duck',
+        'Eager Eagle', 'Fizzy Fox', 'Groovy Gecko', 'Happy Hippo', 'Icy Iguana',
+        'Jumpy Jackal', 'Kooky Koala', 'Lucky Lemur', 'Merry Moose', 'Noble Newt',
+        'Plucky Panda', 'Quick Quail', 'Rusty Robot', 'Sparkly Spider', 'Twisty Taco',
+        'Upbeat Unicorn', 'Vivid Vulture', 'Wiggly Worm', 'Yappy Yak', 'Zippy Zombie',
+        'Artsy Armadillo', 'Breezy Buffalo', 'Chatty Chipmunk', 'Dandy Dolphin', 'Elfy Elephant',
+        'Feisty Frog', 'Giddy Giraffe', 'Humble Hamster', 'Itchy Ibex', 'Jittery Jellyfish',
+      ],
     },
     hostView: {
       waitingForPlayers: 'Waiting for players...',
@@ -1345,6 +1362,23 @@ const translations = {
       joining: 'מצטרף...',
       creating: 'יוצר...',
       playersOnline: 'מחוברים',
+      // שמות שחקנים מצחיקים - נבחרים באקראי כהצעות
+      defaultPlayerNames: [
+        'טופו מקולקל', 'סמי סביב', 'ברכה', 'בתיה', 'שמשון הגיבור',
+        'מלפפון מטורף', 'קפטן קוגל', 'פרופסור פלאפל', 'נינג׳ה נודניק', 'דיסקו דג',
+        'בננה בלגן', 'וופל ויזארד', 'סרג׳נט סביבון', 'דוכס דונאט', 'נסיכת פרעצל',
+        'רוזמרי רעשן', 'אדמירל אבוקדו', 'גנרל גיחוך', 'קפטן עוגייה', 'מייג׳ור מאפין',
+        'ג׳לי ג׳ולי', 'דוב דובדבן', 'זברה זריזה', 'סלמון סחרחר', 'אווז אבסורדי',
+        'קונג פו קצפת', 'פינגווין פזיז', 'לאמה לוליינית', 'דרקון דפוק', 'פלמינגו פאנקי',
+        'יגואר ג׳אזי', 'קוואקה קירקסית', 'רקון רועש', 'עצלן עצבני', 'טורנדו טיפשי',
+        'קוסם קופצני', 'זוקיני זנזני', 'גירית גמישה', 'קקטוס קריספי', 'ברווז דנדי',
+        'נשר נלהב', 'שועל שמח', 'גקו גרובי', 'היפו היפי', 'איגואנה קפואה',
+        'תן תזזיתי', 'קואלה קוקי', 'למור לאקי', 'מוס מרי', 'טריטון נובל',
+        'פנדה פלאקי', 'שליו שקי', 'רובוט חלוד', 'עכביש ניצוץ', 'טאקו טויסטי',
+        'חד קרן אופטימי', 'נשר נמרץ', 'תולעת מתפתלת', 'יאק יפיפה', 'זומבי זריז',
+        'ארמדילו אמן', 'באפלו בריזי', 'צ׳יפמאנק צ׳טי', 'דולפין דנדי', 'פיל אלפי',
+        'צפרדע פייטנית', 'ג׳ירפה ג׳ידית', 'אוגר הומבל', 'יעל גרדנית', 'מדוזה ג׳יטרית',
+      ],
     },
     hostView: {
       waitingForPlayers: 'ממתין לשחקנים...',
@@ -2480,6 +2514,23 @@ const translations = {
       joining: 'Går med...',
       creating: 'Skapar...',
       playersOnline: 'online',
+      // Roliga standardnamn för spelare - slumpmässigt föreslagna
+      defaultPlayerNames: [
+        'Smansen Fnansen', 'Kapten Kaos', 'Dansen Diskansen', 'Flansen Flansen', 'Koansen Koansen',
+        'Nansen Ninansen', 'Profansen Pannansen', 'Herr Fansen', 'Fru Nudansen', 'Baron Snackansen',
+        'Trollansen', 'Turbo Sköldansen', 'Sergantn Sockansen', 'Hertansen', 'Prinsessan Kringlansen',
+        'Greven Smulansen', 'Admiral Avokansen', 'General Skrattansen', 'Kapten Kakansen', 'Major Muffansen',
+        'Glansen Gelansen', 'Studsansen Björnansen', 'Snabbansen Zebansen', 'Dumansen Laxansen', 'Fnittransen Gåsansen',
+        'Galnansen Valrossansen', 'Peppansen Pingvinansen', 'Loansen Llamansen', 'Yrransen Drakansen', 'Funkansen Flamingansen',
+        'Jazzansen Jaguaransen', 'Kvirkansen Quokkansen', 'Vildansen Tvättbjörnansen', 'Fräckansen Sengångansen', 'Lansen Tornadansen',
+        'Vinglansen Trollkarlansen', 'Zansen Zucchinansen', 'Bubblansen Grävlingansen', 'Krispansen Kaktusansen', 'Fiffansen Ankansen',
+        'Ivransen Örnansen', 'Fräsansen Rävansen', 'Groovansen Geckansen', 'Gladansen Flodansen', 'Isansen Leguanansen',
+        'Hoppansen Schakalansen', 'Tokansen Koalansen', 'Turansen Lemuransen', 'Muntransen Älgansen', 'Finansen Salamandansen',
+        'Pluckansen Pandansen', 'Kvickansen Vaktelansen', 'Rostansen Robotansen', 'Glittransen Spindansen', 'Vridansen Tacansen',
+        'Optimistansen Enhörningansen', 'Livansen Gamansen', 'Slingransen Maskansen', 'Jappansen Jakansen', 'Rappansen Zombieansen',
+        'Konstansen Bältdjuransen', 'Brisansen Buffelansen', 'Pratlansen Jordekorransen', 'Dandansen Delfinansen', 'Elefantansen Ansen',
+        'Fightansen Grodansen', 'Gladansen Giraffansen', 'Ödmjukansen Hamsteransen', 'Klådansen Stenbockansen', 'Nervansen Manetansen',
+      ],
     },
     hostView: {
       waitingForPlayers: 'Väntar på spelare...',
@@ -3617,6 +3668,23 @@ const translations = {
       joining: '参加中...',
       creating: '作成中...',
       playersOnline: 'オンライン',
+      // 面白いデフォルトプレイヤー名 - ランダムに提案されます
+      defaultPlayerNames: [
+        'こっそりピクルス', 'カオス船長', 'ディスコポテト', 'ふわふわサンダー', 'コスミックバナナ',
+        'ニンジャワッフル', 'パンケーキ教授', 'くすくす殿', 'ヌードル姫', 'スナック男爵',
+        'ウォンバット魔法使い', 'ターボ亀', 'ソックス軍曹', 'ドーナツ公爵', 'プレッツェル王女',
+        'パンくず伯爵', 'アボカド提督', 'くすくす将軍', 'クッキー船長', 'マフィン少佐',
+        'ジョリージェリービーンズ', 'バウンシーベア', 'ジッピーゼブラ', 'シリーサーモン', 'ギグリーグース',
+        'ワッキーウォーラス', 'ペッピーペンギン', 'ルーピーラマ', 'ディジードラゴン', 'ファンキーフラミンゴ',
+        'ジャジージャガー', 'クワーキークオッカ', 'ラウディラクーン', 'サッシースロス', 'タイニートルネード',
+        'ウォブリーウィザード', 'ゼイニーズッキーニ', 'バブリーバジャー', 'クリスピーカクタス', 'ダッパーダック',
+        'イーガーイーグル', 'フィジーフォックス', 'グルービーゲッコー', 'ハッピーヒッポ', 'アイシーイグアナ',
+        'ジャンピージャッカル', 'クーキーコアラ', 'ラッキーレムール', 'メリームース', 'ノーブルニュート',
+        'プラッキーパンダ', 'クイッククエイル', 'ラスティロボット', 'スパークリースパイダー', 'ツイスティタコ',
+        'アップビートユニコーン', 'ビビッドバルチャー', 'ウィグリーワーム', 'ヤッピーヤク', 'ジッピーゾンビ',
+        'アーティーアルマジロ', 'ブリージーバッファロー', 'チャッティーチップマンク', 'ダンディードルフィン', 'エルフィーエレファント',
+        'ファイスティーフロッグ', 'ギディージラフ', 'ハンブルハムスター', 'イッチーアイベックス', 'ジッタリージェリーフィッシュ',
+      ],
     },
     hostView: {
       waitingForPlayers: 'プレイヤーを待っています...',
@@ -3873,6 +3941,7 @@ const translations = {
         longWordMaster: '📏 ロングワードマスター - 7文字以上の単語を見つける',
         perfectionist: '💎 完璧主義者 - あなたの単語の100％が有効',
         earlyBird: '🐦 早起き鳥 - 最初の1分で3つの単語を見つける',
+        examples: '実績の例',
       },
       tipsTitle: '勝つためのヒント 💡',
       tips: {
@@ -3884,6 +3953,70 @@ const translations = {
       },
       readyToPlay: '準備はいいですか？プレイを始めましょう！ 🎮',
       funForFamily: '家族全員のための魅力的で楽しいゲーム - 完全無料！',
+      letters: '文字',
+      pts: 'ポイント',
+      // Step-based tutorial sections
+      steps: {
+        basics: {
+          title: 'ゲームの基本',
+          description: 'LexiClashは、高速マルチプレイヤーワードゲームです。友達と競争して、文字のグリッド上で単語を見つけましょう！',
+        },
+        grid: {
+          title: '単語の見つけ方',
+          description: 'スワイプまたはクリックで隣接する文字を繋げて単語を作ります。文字は8つの方向すべて（水平、垂直、斜め）で繋がります！',
+        },
+        scoring: {
+          title: 'スコアリングシステム',
+          description: '長い単語ほど多くのポイントを獲得できます！最初の文字以降、各文字がスコアに1ポイント追加されます。',
+        },
+        combo: {
+          title: 'コンボシステム',
+          description: '素早く単語を送信してコンボ倍率を構築しましょう！単語を見つけるのが速いほど、ボーナスが大きくなります。',
+        },
+        xp: {
+          title: 'XP & レベル',
+          description: 'ゲームごとにXPを獲得してレベルアップし、新しい称号をアンロックしましょう。勝利ボーナスと実績がXPを増やします！',
+        },
+        achievements: {
+          title: '実績',
+          description: '特別な功績で実績をアンロック！各実績は複数回獲得してティアをアップグレードできます。',
+        },
+      },
+      // Interactive demo translations
+      demo: {
+        watchAnimation: 'グリッド上で単語がどのように形成されるかをご覧ください',
+        autoPlay: '自動',
+        replay: 'リプレイ',
+        tryIt: '自分で文字をドラッグしてみてください！',
+        gridExample: 'グリッド上で単語をトレースする例',
+        traceExample: '文字をトレースして単語を形成 - T→O→N→D',
+      },
+      // Combo system translations
+      combo: {
+        currentCombo: '現在のコンボ',
+        multiplier: '倍率',
+        noBonus: 'ボーナスなし',
+        tryIt: 'コンボをシミュレート',
+        building: 'コンボを構築中...',
+        tip: 'コンボを維持するために、5秒以内に単語を送信してください！',
+      },
+      // XP system translations
+      xp: {
+        howToEarn: 'XPの獲得方法',
+        base: 'ゲームを完了',
+        score: 'ポイントを獲得',
+        win: 'ゲームに勝利',
+        achievement: '実績をアンロック',
+        unlockTitles: 'レベルアップで称号をアンロック',
+      },
+      // New player welcome
+      newPlayer: {
+        welcomeTitle: 'LexiClashへようこそ！',
+        welcomeMessage: '初めてのようですね。遊び方のクイックツアーを見ますか？',
+        showTutorial: '遊び方を教えて',
+        skipTutorial: '自分でやってみる',
+        dontShowAgain: '再表示しない',
+      },
     },
     achievements: {
       FIRST_BLOOD: {

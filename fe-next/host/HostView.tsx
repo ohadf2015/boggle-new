@@ -566,8 +566,8 @@ const HostView: React.FC<HostViewProps> = memo(({
         />
       )}
 
-      {/* In-Game View */}
-      {gameStarted && !waitingForResults && (
+      {/* In-Game View - show during countdown animation when we have game data */}
+      {((gameStarted || (showStartAnimation && tableData)) && !waitingForResults) && (
         <HostInGameView
           gameCode={gameCode}
           username={username}
