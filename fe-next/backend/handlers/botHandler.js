@@ -78,8 +78,8 @@ function registerBotHandlers(io, socket) {
       return;
     }
 
-    // Create the bot
-    const bot = botManager.addBot(gameCode, difficulty, game.users);
+    // Create the bot with the game's language for localized names
+    const bot = botManager.addBot(gameCode, difficulty, game.users, game.language || 'en');
 
     // Add bot as a user
     addUserToGame(gameCode, bot.username, `bot-${bot.id}`, {

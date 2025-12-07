@@ -46,10 +46,17 @@ function generateBotId(gameCode) {
 }
 
 /**
- * Generate a bot name based on difficulty
+ * Generate a bot name based on difficulty and language
+ * @param {string} difficulty - Bot difficulty level
+ * @param {string[]} existingNames - Names already in use
+ * @param {string} language - Game/board language (en, he, sv, ja)
  */
-function generateBotName(difficulty, existingNames = []) {
-  const namePool = BOT_CONFIG.NAMES[difficulty] || BOT_CONFIG.NAMES.medium;
+function generateBotName(difficulty, existingNames = [], language = 'en') {
+  // Get language-specific names, fallback to English if language not found
+  const langNames = BOT_CONFIG.NAMES[language] || BOT_CONFIG.NAMES.en;
+  const namePool = langNames[difficulty] || langNames.medium;
+  const botSuffix = langNames.botSuffix || 'Bot';
+
   const availableNames = namePool.filter(n => !existingNames.some(existing =>
     existing.toLowerCase().includes(n.toLowerCase())
   ));
@@ -58,9 +65,9 @@ function generateBotName(difficulty, existingNames = []) {
     ? availableNames[Math.floor(Math.random() * availableNames.length)]
     : namePool[Math.floor(Math.random() * namePool.length)];
 
-  // Add "Bot" suffix and maybe a number
+  // Add localized "Bot" suffix and maybe a number
   const suffix = Math.random() > 0.5 ? ` ${Math.floor(Math.random() * 99) + 1}` : '';
-  return `${baseName} Bot${suffix}`.trim();
+  return `${baseName} ${botSuffix}${suffix}`.trim();
 }
 
 /**
@@ -89,14 +96,15 @@ function getRandomPersonality() {
  * @param {string} gameCode - Game code
  * @param {string} difficulty - 'easy', 'medium', or 'hard'
  * @param {object} existingUsers - Object with existing usernames
+ * @param {string} language - Game/board language (en, he, sv, ja)
  * @returns {object} - Bot player object
  */
-function createBot(gameCode, difficulty = 'medium', existingUsers = {}) {
+function createBot(gameCode, difficulty = 'medium', existingUsers = {}, language = 'en') {
   const existingNames = Object.keys(existingUsers);
   const existingAvatars = Object.values(existingUsers).map(u => u.avatar);
 
   const botId = generateBotId(gameCode);
-  const botName = generateBotName(difficulty, existingNames);
+  const botName = generateBotName(difficulty, existingNames, language);
   const avatar = getRandomAvatar(existingAvatars);
   const personality = getRandomPersonality();
   const personalityTraits = BOT_CONFIG.PERSONALITIES[personality];
@@ -190,14 +198,15 @@ function initializeGameBots(gameCode) {
  * @param {string} gameCode - Game code
  * @param {string} difficulty - Bot difficulty
  * @param {object} existingUsers - Existing users in the game
+ * @param {string} language - Game/board language (en, he, sv, ja)
  * @returns {object} - The created bot
  */
-function addBot(gameCode, difficulty = 'medium', existingUsers = {}) {
+function addBot(gameCode, difficulty = 'medium', existingUsers = {}, language = 'en') {
   const bots = initializeGameBots(gameCode);
-  const bot = createBot(gameCode, difficulty, existingUsers);
+  const bot = createBot(gameCode, difficulty, existingUsers, language);
 
   bots.set(bot.id, bot);
-  logger.info('BOT', `Added ${difficulty} bot "${bot.username}" to game ${gameCode}`);
+  logger.info('BOT', `Added ${difficulty} bot "${bot.username}" (${language}) to game ${gameCode}`);
 
   return bot;
 }

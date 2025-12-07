@@ -86,25 +86,84 @@ const BOT_CONFIG = {
     { emoji: '🎭', color: '#a855f7' },
   ],
 
-  // Bot names (with difficulty modifier) - More personality and variety
+  // Bot names by language and difficulty - Localized for each supported language
   NAMES: {
-    easy: [
-      'Rookie', 'Newbie', 'Learner', 'Novice', 'Beginner', 'Starter', 'Junior', 'Trainee',
-      'Padawan', 'Grasshopper', 'Apprentice', 'Cub', 'Fledgling', 'Seedling', 'Sprout',
-      'Curious Cat', 'Word Pup', 'Letter Bug', 'Tiny Thinker', 'Baby Steps'
-    ],
-    medium: [
-      'Player', 'Gamer', 'Challenger', 'Competitor', 'Contender', 'Rival', 'Fighter',
-      'Wordsmith', 'Letter Hunter', 'Puzzle Pro', 'Grid Gazer', 'Word Warrior',
-      'Scrabbler', 'Speller', 'Vocab Vulture', 'Syllable Seeker', 'Alpha Hunter',
-      'Word Wrangler', 'Letter Lasso', 'Boggle Buddy', 'Grid Guru'
-    ],
-    hard: [
-      'Expert', 'Master', 'Pro', 'Champion', 'Elite', 'Ace', 'Legend', 'Titan', 'Wizard',
-      'Word Wizard', 'Lexicon Lord', 'Grammar Guru', 'Vocab Victor', 'Alpha King',
-      'Dictionary Demon', 'Spelling Sage', 'Letter Legend', 'Word Whiz', 'Boggle Boss',
-      'Grid Genius', 'Puzzle Phantom', 'Cerebral Storm', 'Mind Master', 'Brain Blitz'
-    ],
+    en: {
+      easy: [
+        'Rookie', 'Newbie', 'Learner', 'Novice', 'Beginner', 'Starter', 'Junior', 'Trainee',
+        'Padawan', 'Grasshopper', 'Apprentice', 'Cub', 'Fledgling', 'Seedling', 'Sprout',
+        'Curious Cat', 'Word Pup', 'Letter Bug', 'Tiny Thinker', 'Baby Steps'
+      ],
+      medium: [
+        'Player', 'Gamer', 'Challenger', 'Competitor', 'Contender', 'Rival', 'Fighter',
+        'Wordsmith', 'Letter Hunter', 'Puzzle Pro', 'Grid Gazer', 'Word Warrior',
+        'Scrabbler', 'Speller', 'Vocab Vulture', 'Syllable Seeker', 'Alpha Hunter',
+        'Word Wrangler', 'Letter Lasso', 'Boggle Buddy', 'Grid Guru'
+      ],
+      hard: [
+        'Expert', 'Master', 'Pro', 'Champion', 'Elite', 'Ace', 'Legend', 'Titan', 'Wizard',
+        'Word Wizard', 'Lexicon Lord', 'Grammar Guru', 'Vocab Victor', 'Alpha King',
+        'Dictionary Demon', 'Spelling Sage', 'Letter Legend', 'Word Whiz', 'Boggle Boss',
+        'Grid Genius', 'Puzzle Phantom', 'Cerebral Storm', 'Mind Master', 'Brain Blitz'
+      ],
+      botSuffix: 'Bot',
+    },
+    he: {
+      easy: [
+        'טירון', 'מתחיל', 'חניך', 'טופי', 'גורי', 'פיפי', 'מומו', 'לולו',
+        'בייבי', 'קטנצ׳יק', 'שושי', 'מושי', 'פופי', 'דודו', 'גוגו',
+        'ציפי', 'מיקי', 'קיקי', 'ביבי', 'נוני'
+      ],
+      medium: [
+        'שחקן', 'מתחרה', 'לוחם', 'גיבור', 'אלוף', 'מילון', 'חכמולי',
+        'בלש', 'צייד', 'ג׳וקר', 'שועל', 'נמר', 'דוב', 'זאב', 'אריה',
+        'נשר', 'פנתר', 'טיגריס', 'קוברה', 'פיראט'
+      ],
+      hard: [
+        'מומחה', 'אלוף', 'גאון', 'מאסטר', 'אגדה', 'טיטאן', 'קוסם',
+        'מלך המילים', 'שליט', 'אימפרטור', 'סמוראי', 'נינג׳ה', 'ויקינג',
+        'גלדיאטור', 'ספרטני', 'לוחם עילית', 'אליפון', 'מכונה', 'טרמינטור', 'רובוקופ'
+      ],
+      botSuffix: 'בוט',
+    },
+    sv: {
+      easy: [
+        'Nybörjare', 'Lansen', 'Elansen', 'Smansen', 'Lilansen', 'Plutansen',
+        'Gulansen', 'Kansen', 'Transen', 'Snansen', 'Blansen', 'Pransen',
+        'Gnansen', 'Dransen', 'Fransen', 'Kransen', 'Stansen', 'Bransen', 'Gransen', 'Vransen'
+      ],
+      medium: [
+        'Spansen', 'Utansen', 'Jansen', 'Mansen', 'Fjansen', 'Ordansen',
+        'Bokansen', 'Klansen', 'Skansen', 'Svansen', 'Slansen', 'Plansen',
+        'Glansen', 'Flansen', 'Blansen', 'Vransen', 'Knansen', 'Snansen', 'Transen', 'Bransen'
+      ],
+      hard: [
+        'Expertansen', 'Mästansen', 'Champansen', 'Legendansen', 'Titanansen',
+        'Trollkarlansen', 'Ordmästaransen', 'Geniansen', 'Vikingansen', 'Drakeansen',
+        'Lejonansen', 'Örnansen', 'Vargansen', 'Björnansen', 'Tigeransen',
+        'Panteransen', 'Falkenansen', 'Havköansen', 'Kondoransen', 'Enhörningansen'
+      ],
+      botSuffix: 'Bot',
+    },
+    ja: {
+      easy: [
+        'ルーキー', 'ビギナー', 'トレイニー', 'コネコ', 'コイヌ', 'ヒヨコ',
+        'タマゴ', 'モモ', 'サクラ', 'ハナ', 'ユキ', 'ソラ',
+        'リン', 'ミク', 'アオイ', 'カエデ', 'ツバキ', 'ウメ', 'キク', 'アヤメ'
+      ],
+      medium: [
+        'プレイヤー', 'ゲーマー', 'チャレンジャー', 'ファイター', 'ハンター',
+        'タヌキ', 'キツネ', 'ウサギ', 'シカ', 'クマ', 'オオカミ',
+        'トラ', 'ヒョウ', 'リュウ', 'フェニックス', 'カッパ', 'テング', 'オニ', 'ニンジャ', 'サムライ'
+      ],
+      hard: [
+        'マスター', 'エキスパート', 'チャンピオン', 'レジェンド', 'タイタン',
+        'ウィザード', 'ワードマスター', 'ジーニアス', 'ショーグン', 'ダイミョウ',
+        'カイザー', 'エンペラー', 'キング', 'ドラゴン', 'フェニックス',
+        'ライジン', 'フウジン', 'スサノオ', 'アマテラス', 'ツクヨミ'
+      ],
+      botSuffix: 'ボット',
+    },
   },
 
   // Bot personality traits (affects behavior patterns)
