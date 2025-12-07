@@ -234,21 +234,23 @@ function updateUserSocketId(game, gameCode, username, newSocketId, authContext =
  * @returns {array} - Array of user objects
  */
 function getGameUsers(game) {
-  if (!game) return [];
+  if (!game || !game.users) return [];
 
-  return Object.entries(game.users).map(([username, data]) => ({
-    username,
-    isHost: data.isHost,
-    avatar: data.avatar,
-    score: game.playerScores[username] || 0,
-    // Include presence information
-    presenceStatus: data.presenceStatus || 'active',
-    isWindowFocused: data.isWindowFocused !== false,
-    lastActivityAt: data.lastActivityAt || Date.now(),
-    // Include bot information
-    isBot: data.isBot || false,
-    botDifficulty: data.botDifficulty || null,
-  }));
+  return Object.entries(game.users)
+    .filter(([, data]) => data != null)
+    .map(([username, data]) => ({
+      username,
+      isHost: data.isHost,
+      avatar: data.avatar,
+      score: game.playerScores?.[username] || 0,
+      // Include presence information
+      presenceStatus: data.presenceStatus || 'active',
+      isWindowFocused: data.isWindowFocused !== false,
+      lastActivityAt: data.lastActivityAt || Date.now(),
+      // Include bot information
+      isBot: data.isBot || false,
+      botDifficulty: data.botDifficulty || null,
+    }));
 }
 
 /**
