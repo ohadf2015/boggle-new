@@ -20,8 +20,32 @@ export default function Footer(): React.ReactElement {
             {t('legal.copyright')}
           </p>
 
-          {/* Legal Links */}
+          {/* Site Links */}
           <nav className="flex items-center gap-3 flex-wrap justify-center sm:justify-start">
+            <Link
+              href={`/${language}/rules`}
+              className="
+                text-sm font-bold uppercase tracking-wide
+                text-neo-cream/70 hover:text-neo-cyan
+                transition-colors duration-100
+                hover:underline underline-offset-4 decoration-2
+              "
+            >
+              {t('footer.howToPlay') || 'How to Play'}
+            </Link>
+            <span className="text-neo-cream/40 font-black">•</span>
+            <Link
+              href={`/${language}/leaderboard`}
+              className="
+                text-sm font-bold uppercase tracking-wide
+                text-neo-cream/70 hover:text-neo-cyan
+                transition-colors duration-100
+                hover:underline underline-offset-4 decoration-2
+              "
+            >
+              {t('footer.leaderboard') || 'Leaderboard'}
+            </Link>
+            <span className="text-neo-cream/40 font-black">•</span>
             <Link
               href={`/${language}/legal/terms`}
               className="

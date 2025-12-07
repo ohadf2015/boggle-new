@@ -5,33 +5,33 @@ import type { ReactNode } from 'react';
 export const metadata: Metadata = {
     metadataBase: new URL('https://www.lexiclash.live'),
     title: {
-        default: 'LexiClash - Educational Word Game | Vocabulary Builder | לקסיקלאש',
+        default: 'LexiClash - Real-Time Multiplayer Word Strategy Game',
         template: '%s | LexiClash',
     },
-    description: 'Play LexiClash - the multiplayer word game that builds vocabulary! Challenge friends, join rooms, and improve your language skills.',
-    // Open Graph meta tags for social sharing (WhatsApp, Facebook, etc.)
+    description: 'Compete in real-time word battles against friends. LexiClash is a fast-paced multiplayer strategy game. Play for free now.',
+    // Open Graph meta tags for social sharing (WhatsApp, Facebook, Discord, etc.)
     // These are essential for link previews when sharing root URLs like lexiclash.live?room=1234
     openGraph: {
         type: 'website',
         locale: 'en_US',
         url: 'https://www.lexiclash.live',
-        title: 'LexiClash - Multiplayer Word Game',
-        description: 'Play LexiClash - the multiplayer word game that builds vocabulary! Challenge friends and improve your language skills.',
+        title: 'LexiClash - Real-Time Multiplayer Word Strategy Game',
+        description: 'Compete in real-time word battles against friends. LexiClash is a fast-paced multiplayer strategy game. Play for free now.',
         siteName: 'LexiClash',
         images: [
             {
                 url: 'https://www.lexiclash.live/og-image-en.jpg',
                 width: 1200,
                 height: 630,
-                alt: 'LexiClash - Multiplayer Word Game',
+                alt: 'LexiClash - Real-Time Multiplayer Word Strategy Game',
             },
         ],
     },
     // Twitter Card meta tags
     twitter: {
         card: 'summary_large_image',
-        title: 'LexiClash - Multiplayer Word Game',
-        description: 'Play LexiClash - the multiplayer word game that builds vocabulary! Challenge friends and improve your language skills.',
+        title: 'LexiClash - Real-Time Multiplayer Word Strategy Game',
+        description: 'Compete in real-time word battles against friends. LexiClash is a fast-paced multiplayer strategy game. Play for free now.',
         images: ['https://www.lexiclash.live/og-image-en.jpg'],
     },
     robots: {
