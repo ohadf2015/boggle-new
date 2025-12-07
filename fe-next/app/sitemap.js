@@ -69,6 +69,26 @@ export default function sitemap() {
     images: [...commonImages, `${baseUrl}/og-image-en.jpg`],
   });
 
+  // Rules pages for all locales (Game mechanics, How to Play)
+  locales.forEach((locale) => {
+    const localePath = locale === 'he' ? '' : `/${locale}`;
+    routes.push({
+      url: `${baseUrl}${localePath}/rules`,
+      lastModified: now,
+      changeFrequency: 'monthly',
+      priority: 0.7,
+      alternates: {
+        languages: {
+          'x-default': `${baseUrl}/rules`,
+          he: `${baseUrl}/he/rules`,
+          en: `${baseUrl}/en/rules`,
+          sv: `${baseUrl}/sv/rules`,
+          ja: `${baseUrl}/ja/rules`,
+        },
+      },
+    });
+  });
+
   // Leaderboard pages for all locales
   locales.forEach((locale) => {
     const localePath = locale === 'he' ? '' : `/${locale}`;
