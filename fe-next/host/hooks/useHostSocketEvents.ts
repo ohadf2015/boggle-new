@@ -413,6 +413,7 @@ const useHostSocketEvents = ({
       setRemainingTime(data.remainingTime);
       if (data.remainingTime === 0 && gameStarted) {
         setGameStarted(false);
+        setShowStartAnimation(false); // Clear any lingering animation to prevent double loaders
         // Track when we entered waiting state for minimum display time
         if (!waitingStartTimeRef.current) {
           waitingStartTimeRef.current = Date.now();
