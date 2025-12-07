@@ -422,27 +422,32 @@ const PlayerView: React.FC<PlayerViewProps> = memo(({
   const showGameView = gameActive || (showStartAnimation && hasGameData);
 
   if (!showGameView && !waitingForResults) {
-    return (
-      <>
-        {showStartAnimation && (
+    // When countdown animation is active, only show the countdown overlay
+    // Don't render PlayerWaitingView underneath to avoid double loaders
+    if (showStartAnimation) {
+      return (
+        <div className="min-h-screen bg-gradient-to-b from-slate-50 via-slate-100 to-slate-200 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 flex items-center justify-center">
           <GoRipplesAnimation onComplete={() => setShowStartAnimation(false)} />
-        )}
-        <PlayerWaitingView
-          gameCode={gameCode}
-          gameLanguage={gameLanguage}
-          username={username}
-          t={t}
-          playersReady={playersReady}
-          shufflingGrid={shufflingGrid}
-          highlightedCells={highlightedCells}
-          showQR={showQR}
-          setShowQR={setShowQR}
-          showExitConfirm={showExitConfirm}
-          setShowExitConfirm={setShowExitConfirm}
-          onExitRoom={handleExitRoom}
-          onConfirmExit={confirmExitRoom}
-        />
-      </>
+        </div>
+      );
+    }
+
+    return (
+      <PlayerWaitingView
+        gameCode={gameCode}
+        gameLanguage={gameLanguage}
+        username={username}
+        t={t}
+        playersReady={playersReady}
+        shufflingGrid={shufflingGrid}
+        highlightedCells={highlightedCells}
+        showQR={showQR}
+        setShowQR={setShowQR}
+        showExitConfirm={showExitConfirm}
+        setShowExitConfirm={setShowExitConfirm}
+        onExitRoom={handleExitRoom}
+        onConfirmExit={confirmExitRoom}
+      />
     );
   }
 
