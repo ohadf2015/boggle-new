@@ -22,6 +22,7 @@ const PRESENCE_CONFIG = {
  */
 function updateUserPresence(game, username, presenceData) {
   if (!game || !game.users[username]) return null;
+  if (!presenceData) return null;
 
   const user = game.users[username];
   const now = Date.now();
@@ -170,16 +171,18 @@ function getPresenceConfig() {
  * @returns {array} - Array of users with presence info
  */
 function getUsersWithPresence(game) {
-  if (!game) return [];
+  if (!game || !game.users) return [];
 
-  return Object.entries(game.users).map(([username, user]) => ({
-    username,
-    presenceStatus: user.presenceStatus || 'active',
-    isWindowFocused: user.isWindowFocused !== false,
-    lastActivityAt: user.lastActivityAt,
-    lastHeartbeatAt: user.lastHeartbeatAt,
-    connectionStatus: user.connectionStatus || 'stable',
-  }));
+  return Object.entries(game.users)
+    .filter(([, user]) => user != null)
+    .map(([username, user]) => ({
+      username,
+      presenceStatus: user.presenceStatus || 'active',
+      isWindowFocused: user.isWindowFocused !== false,
+      lastActivityAt: user.lastActivityAt,
+      lastHeartbeatAt: user.lastHeartbeatAt,
+      connectionStatus: user.connectionStatus || 'stable',
+    }));
 }
 
 /**

@@ -670,7 +670,9 @@ const usePlayerSocketEvents = ({
     };
 
     const handlePlayerPresenceUpdate = (data: any) => {
+      if (!data) return;
       const { username: playerUsername, presenceStatus, isWindowFocused } = data;
+      if (!playerUsername) return;
       setPlayersReady(prev => {
         return prev.map(player => {
           const name = typeof player === 'string' ? player : player.username;
