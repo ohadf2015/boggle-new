@@ -1129,6 +1129,11 @@ const translations = {
       validForScoring: 'Counts as valid! Help add it to dictionary.',
       moreForDictionary: 'more for dictionary',
     },
+    footer: {
+      howToPlay: 'How to Play',
+      leaderboard: 'Leaderboard',
+      interactiveTutorial: 'Interactive Tutorial',
+    },
     support: {
       kofiWinner: 'Feeling Generous, Champ?',
       kofiFooter: 'Buy Us a Coffee',
@@ -2258,6 +2263,11 @@ const translations = {
       votesNeeded: 'עוד {count} הצבעות לאישור',
       validForScoring: 'נחשב כמילה! עזור להוסיף למילון.',
       moreForDictionary: 'עוד להוספה למילון',
+    },
+    footer: {
+      howToPlay: 'איך משחקים',
+      leaderboard: 'טבלת מובילים',
+      interactiveTutorial: 'מדריך אינטראקטיבי',
     },
     support: {
       kofiWinner: 'מרגיש נדיב, אלוף?',
@@ -3392,6 +3402,11 @@ const translations = {
       validForScoring: 'Räknas som giltigt! Hjälp till att lägga till i ordboken.',
       moreForDictionary: 'mer till ordbok',
     },
+    footer: {
+      howToPlay: 'Hur man spelar',
+      leaderboard: 'Topplista',
+      interactiveTutorial: 'Interaktiv handledning',
+    },
     support: {
       kofiWinner: 'Känn dig generös, mästare?',
       kofiFooter: 'Köp oss en kaffe',
@@ -4458,6 +4473,11 @@ const translations = {
       votesNeeded: 'あと{count}票で承認',
       validForScoring: '有効とカウント！辞書に追加するお手伝いを。',
       moreForDictionary: 'あと辞書に追加まで',
+    },
+    footer: {
+      howToPlay: '遊び方',
+      leaderboard: 'ランキング',
+      interactiveTutorial: 'インタラクティブチュートリアル',
     },
     support: {
       kofiWinner: '勝者の余裕で応援してね！',
