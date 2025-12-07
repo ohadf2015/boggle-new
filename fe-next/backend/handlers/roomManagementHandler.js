@@ -17,6 +17,7 @@ const {
 
 const { checkRateLimit } = require('../utils/rateLimiter');
 const timerManager = require('../utils/timerManager');
+const botManager = require('../modules/botManager');
 const logger = require('../utils/logger');
 
 /**
@@ -40,6 +41,7 @@ function registerRoomManagementHandlers(io, socket) {
     if (!game || game.hostSocketId !== socket.id) return;
 
     timerManager.clearGameTimer(gameCode);
+    botManager.cleanupGameBots(gameCode);
 
     broadcastToRoom(io, getGameRoom(gameCode), 'roomClosed', {});
     deleteGame(gameCode);

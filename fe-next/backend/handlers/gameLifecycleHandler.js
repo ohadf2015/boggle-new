@@ -42,6 +42,7 @@ const { getRandomLongWords } = require('../dictionary');
 const logger = require('../utils/logger');
 const { startGameTimer, endGame } = require('./shared');
 const { validatePayload, createGameSchema, startGameSchema } = require('../utils/socketValidation');
+const botManager = require('../modules/botManager');
 
 /**
  * Register game lifecycle socket event handlers
@@ -310,6 +311,10 @@ function registerGameLifecycleHandlers(io, socket) {
     }
 
     timerManager.clearGameTimer(gameCode);
+
+    // Clean up bots from previous game to prevent stale state
+    botManager.cleanupGameBots(gameCode);
+
     resetGameForNewRound(gameCode);
 
     broadcastToRoom(io, getGameRoom(gameCode), 'resetGame', {
