@@ -30,11 +30,13 @@ const LIFETIME_ACHIEVEMENT_KEYS = new Set([
 ]);
 
 // Achievement thresholds for validation (base thresholds, may scale with game duration)
+// These are set to 50% of the actual thresholds to account for time scaling
 const ACHIEVEMENT_WORD_THRESHOLDS: Record<string, number> = {
-  'WORDSMITH': 20,      // Scaled: ~35 words
-  'LEXICON': 30,        // Scaled: ~45 words
-  'UNSTOPPABLE': 40,    // Scaled: ~55 words
-  'VOCABULARY_TITAN': 45, // Scaled: ~60 words
+  'WORDSMITH': 25,          // Actual: ~50 words (scaled)
+  'LEXICON': 32,            // Actual: ~65 words (scaled)
+  'UNSTOPPABLE': 37,        // Actual: ~75 words (scaled)
+  'VOCABULARY_TITAN': 42,   // Actual: ~85 words (scaled)
+  'DICTIONARY_DIVER': 32,   // Actual: ~65 words (scaled)
 };
 
 /**

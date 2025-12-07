@@ -154,26 +154,26 @@ const checkLiveAchievements = (game, username, word, timeSinceStart) => {
   }
 
   // Speed Demon - scaled word count in first half of game (LIVE) - ELITE
-  // Base: 28 words in 90s for 180s game = ~0.31 words/sec
-  // Scale requirement: Math.ceil(28 * timeScale) words in halfGameTime
-  const speedDemonThreshold = Math.ceil(28 * timeScale);
+  // Base: 40 words in 90s for 180s game = ~0.44 words/sec (HARDER)
+  // Scale requirement: Math.ceil(40 * timeScale) words in halfGameTime
+  const speedDemonThreshold = Math.ceil(40 * timeScale);
   if (validatedWordCount >= speedDemonThreshold && timeSinceStart <= halfGameTime && !achievements.includes('SPEED_DEMON')) {
     newAchievements.push(addAchievementAndReturn('SPEED_DEMON'));
   }
 
-  // Combo King - reach combo level 18+ (LIVE) - ELITE (now based on actual combo, not word count)
+  // Combo King - reach combo level 25+ (LIVE) - ELITE (now based on actual combo, not word count) (HARDER)
   const currentComboForKing = game.playerCombos?.[username] || 0;
-  if (currentComboForKing >= 18 && !achievements.includes('COMBO_KING')) {
+  if (currentComboForKing >= 25 && !achievements.includes('COMBO_KING')) {
     newAchievements.push(addAchievementAndReturn('COMBO_KING'));
   }
 
-  // Wordsmith - 35 valid words (LIVE) - HARD
-  if (validatedWordCount >= 35 && !achievements.includes('WORDSMITH')) {
+  // Wordsmith - 50 valid words (LIVE) - HARD (HARDER - was 35)
+  if (validatedWordCount >= 50 && !achievements.includes('WORDSMITH')) {
     newAchievements.push(addAchievementAndReturn('WORDSMITH'));
   }
 
-  // Lexicon - 45+ valid words (LIVE) - ELITE
-  if (validatedWordCount >= 45 && !achievements.includes('LEXICON')) {
+  // Lexicon - 65+ valid words (LIVE) - ELITE (HARDER - was 45)
+  if (validatedWordCount >= 65 && !achievements.includes('LEXICON')) {
     newAchievements.push(addAchievementAndReturn('LEXICON'));
   }
 
@@ -198,21 +198,21 @@ const checkLiveAchievements = (game, username, word, timeSinceStart) => {
     newAchievements.push(addAchievementAndReturn('RARE_GEM'));
   }
 
-  // Lightning Round - scaled word count in first ~17% of game (LIVE) - ELITE
-  // Base: 15 words in 30s for 180s game
-  const lightningThreshold = Math.ceil(15 * timeScale);
+  // Lightning Round - scaled word count in first ~17% of game (LIVE) - ELITE (HARDER)
+  // Base: 20 words in 30s for 180s game (was 15)
+  const lightningThreshold = Math.ceil(20 * timeScale);
   if (validatedWordCount >= lightningThreshold && timeSinceStart <= earlyGameTime && !achievements.includes('LIGHTNING_ROUND')) {
     newAchievements.push(addAchievementAndReturn('LIGHTNING_ROUND'));
   }
 
-  // Unstoppable - 55+ valid words (LIVE) - VERY HARD
-  if (validatedWordCount >= 55 && !achievements.includes('UNSTOPPABLE')) {
+  // Unstoppable - 75+ valid words (LIVE) - VERY HARD (HARDER - was 55)
+  if (validatedWordCount >= 75 && !achievements.includes('UNSTOPPABLE')) {
     newAchievements.push(addAchievementAndReturn('UNSTOPPABLE'));
   }
 
-  // Streak Master - 22+ combo streak (LIVE) - VERY HARD
+  // Streak Master - 30+ combo streak (LIVE) - VERY HARD (HARDER - was 22)
   const currentCombo = game.playerCombos?.[username] || 0;
-  if (currentCombo >= 22 && !achievements.includes('STREAK_MASTER')) {
+  if (currentCombo >= 30 && !achievements.includes('STREAK_MASTER')) {
     newAchievements.push(addAchievementAndReturn('STREAK_MASTER'));
   }
 
@@ -240,26 +240,26 @@ const checkLiveAchievements = (game, username, word, timeSinceStart) => {
 
   // NEW ELITE ACHIEVEMENTS
 
-  // Word Architect - 5 words of 7+ letters (LIVE) - ELITE
+  // Word Architect - 7 words of 7+ letters (LIVE) - ELITE (HARDER - was 5)
   const longWords = validatedWordDetails.filter(w => w.word.length >= 7);
-  if (longWords.length >= 5 && !achievements.includes('WORD_ARCHITECT')) {
+  if (longWords.length >= 7 && !achievements.includes('WORD_ARCHITECT')) {
     newAchievements.push(addAchievementAndReturn('WORD_ARCHITECT'));
   }
 
-  // Speed Legend - scaled word count in first half of game (LIVE) - ELITE
-  // Base: 30 words in 90s for 180s game
-  const speedLegendThreshold = Math.ceil(30 * timeScale);
+  // Speed Legend - scaled word count in first half of game (LIVE) - ELITE (HARDER)
+  // Base: 50 words in 90s for 180s game (was 30)
+  const speedLegendThreshold = Math.ceil(50 * timeScale);
   if (validatedWordCount >= speedLegendThreshold && timeSinceStart <= halfGameTime && !achievements.includes('SPEED_LEGEND')) {
     newAchievements.push(addAchievementAndReturn('SPEED_LEGEND'));
   }
 
-  // Combo God - 25+ combo streak (LIVE) - ELITE
-  if (currentCombo >= 25 && !achievements.includes('COMBO_GOD')) {
+  // Combo God - 35+ combo streak (LIVE) - ELITE (HARDER - was 25)
+  if (currentCombo >= 35 && !achievements.includes('COMBO_GOD')) {
     newAchievements.push(addAchievementAndReturn('COMBO_GOD'));
   }
 
-  // Vocabulary Titan - 60+ valid words (LIVE) - ELITE
-  if (validatedWordCount >= 60 && !achievements.includes('VOCABULARY_TITAN')) {
+  // Vocabulary Titan - 85+ valid words (LIVE) - ELITE (HARDER - was 60)
+  if (validatedWordCount >= 85 && !achievements.includes('VOCABULARY_TITAN')) {
     newAchievements.push(addAchievementAndReturn('VOCABULARY_TITAN'));
   }
 
@@ -377,29 +377,29 @@ const awardFinalAchievements = (game, users) => {
       addAchievement('WORD_MASTER');
     }
 
-    // Speed Demon - scaled word count in first half of game - ELITE
-    const speedDemonThreshold = Math.ceil(28 * timeScale);
+    // Speed Demon - scaled word count in first half of game - ELITE (HARDER)
+    const speedDemonThreshold = Math.ceil(40 * timeScale);
     const wordsInHalfGame = validWords.filter(w => w.timeSinceStart <= halfGameTime);
     if (wordsInHalfGame.length >= speedDemonThreshold) {
       addAchievement('SPEED_DEMON');
     }
 
-    // Lexicon - 45+ valid words (scales slightly with game time) - ELITE
-    const lexiconThreshold = Math.ceil(45 * timeScale);
+    // Lexicon - 65+ valid words (scales slightly with game time) - ELITE (HARDER - was 45)
+    const lexiconThreshold = Math.ceil(65 * timeScale);
     if (validWords.length >= lexiconThreshold) {
       addAchievement('LEXICON');
     }
 
-    // Combo King is now checked live (based on combo level, not word count)
+    // Combo King is now checked live (based on combo level 25+, not word count)
 
-    // Perfectionist - all words valid AND scaled word count (not trivial) - HARD
-    const perfectionistThreshold = Math.ceil(25 * timeScale);
+    // Perfectionist - all words valid AND scaled word count (not trivial) - HARD (HARDER)
+    const perfectionistThreshold = Math.ceil(35 * timeScale);
     if (allWords.length >= perfectionistThreshold && allWords.every(w => w.validated === true)) {
       addAchievement('PERFECTIONIST');
     }
 
-    // Wordsmith - scaled word count - HARD
-    const wordsmithThreshold = Math.ceil(35 * timeScale);
+    // Wordsmith - scaled word count - HARD (HARDER - was 35)
+    const wordsmithThreshold = Math.ceil(50 * timeScale);
     if (validWords.length >= wordsmithThreshold) {
       addAchievement('WORDSMITH');
     }
@@ -427,20 +427,20 @@ const awardFinalAchievements = (game, users) => {
       addAchievement('EXPLORER');
     }
 
-    // Dictionary Diver - scaled word count - VERY HARD
-    const dictionaryDiverThreshold = Math.ceil(50 * timeScale);
+    // Dictionary Diver - scaled word count - VERY HARD (HARDER)
+    const dictionaryDiverThreshold = Math.ceil(65 * timeScale);
     if (validWords.length >= dictionaryDiverThreshold) {
       addAchievement('DICTIONARY_DIVER');
     }
 
-    // Unstoppable - scaled word count - VERY HARD
-    const unstoppableThreshold = Math.ceil(55 * timeScale);
+    // Unstoppable - scaled word count - VERY HARD (HARDER - was 55)
+    const unstoppableThreshold = Math.ceil(75 * timeScale);
     if (validWords.length >= unstoppableThreshold) {
       addAchievement('UNSTOPPABLE');
     }
 
-    // Lightning Round - scaled word count in first ~17% of game - ELITE
-    const lightningThreshold = Math.ceil(15 * timeScale);
+    // Lightning Round - scaled word count in first ~17% of game - ELITE (HARDER)
+    const lightningThreshold = Math.ceil(20 * timeScale);
     const wordsInEarlyGame = validWords.filter(w => w.timeSinceStart <= earlyGameTime);
     if (wordsInEarlyGame.length >= lightningThreshold) {
       addAchievement('LIGHTNING_ROUND');
@@ -468,26 +468,26 @@ const awardFinalAchievements = (game, users) => {
 
     // NEW ELITE ACHIEVEMENTS (Final check)
 
-    // Word Architect - 5 words of 7+ letters
+    // Word Architect - 7 words of 7+ letters (HARDER - was 5)
     const longWords = validWords.filter(w => w.word.length >= 7);
-    if (longWords.length >= 5) {
+    if (longWords.length >= 7) {
       addAchievement('WORD_ARCHITECT');
     }
 
-    // Speed Legend - scaled word count in first half of game - ELITE
-    const speedLegendThreshold = Math.ceil(30 * timeScale);
+    // Speed Legend - scaled word count in first half of game - ELITE (HARDER)
+    const speedLegendThreshold = Math.ceil(50 * timeScale);
     if (wordsInHalfGame.length >= speedLegendThreshold) {
       addAchievement('SPEED_LEGEND');
     }
 
-    // Vocabulary Titan - scaled word count - ELITE
-    const vocabularyTitanThreshold = Math.ceil(60 * timeScale);
+    // Vocabulary Titan - scaled word count - ELITE (HARDER - was 60)
+    const vocabularyTitanThreshold = Math.ceil(85 * timeScale);
     if (validWords.length >= vocabularyTitanThreshold) {
       addAchievement('VOCABULARY_TITAN');
     }
 
-    // Precision Master - scaled word count with 100% accuracy - ELITE
-    const precisionThreshold = Math.ceil(35 * timeScale);
+    // Precision Master - scaled word count with 100% accuracy - ELITE (HARDER)
+    const precisionThreshold = Math.ceil(45 * timeScale);
     if (allWords.length >= precisionThreshold && allWords.every(w => w.validated === true)) {
       addAchievement('PRECISION_MASTER');
     }
