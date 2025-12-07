@@ -416,7 +416,12 @@ const PlayerView: React.FC<PlayerViewProps> = memo(({
     );
   }
 
-  if (!gameActive && !waitingForResults) {
+  // Show game board during countdown animation when we have letterGrid
+  // This allows players to see the board while countdown is active
+  const hasGameData = letterGrid && remainingTime !== null && remainingTime > 0;
+  const showGameView = gameActive || (showStartAnimation && hasGameData);
+
+  if (!showGameView && !waitingForResults) {
     return (
       <>
         {showStartAnimation && (

@@ -1,18 +1,24 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
+import dynamic from 'next/dynamic';
 import { motion } from 'framer-motion';
-import { FaGamepad, FaTrophy, FaLightbulb, FaClock, FaUsers, FaStar, FaArrowLeft, FaPlay } from 'react-icons/fa';
+import { FaGamepad, FaTrophy, FaLightbulb, FaClock, FaUsers, FaStar, FaArrowLeft, FaPlay, FaHandPointer } from 'react-icons/fa';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 
+// Dynamically import HowToPlay to reduce initial bundle size
+const HowToPlay = dynamic(() => import('@/components/HowToPlay'), { ssr: false });
+
 export default function RulesPage(): React.JSX.Element {
-    const { language, dir } = useLanguage();
+    const { language, dir, t } = useLanguage();
+    const [showInteractiveTutorial, setShowInteractiveTutorial] = useState(false);
 
     const fadeInUp = {
         initial: { opacity: 0, y: 20 },
@@ -42,7 +48,7 @@ export default function RulesPage(): React.JSX.Element {
 
                 {/* Quick Start CTA */}
                 <motion.div
-                    className="flex justify-center mb-8"
+                    className="flex flex-col sm:flex-row justify-center gap-4 mb-8"
                     initial={{ opacity: 0, scale: 0.9 }}
                     animate={{ opacity: 1, scale: 1 }}
                     transition={{ delay: 0.2, duration: 0.4 }}
@@ -50,13 +56,32 @@ export default function RulesPage(): React.JSX.Element {
                     <Link href={`/${language}`}>
                         <Button
                             size="lg"
-                            className="bg-neo-cyan text-neo-black hover:bg-neo-cyan/90 font-bold text-lg px-8 py-6"
+                            className="bg-neo-cyan text-neo-black hover:bg-neo-cyan/90 font-bold text-lg px-8 py-6 w-full sm:w-auto"
                         >
                             <FaPlay className="mr-2" />
                             Play Now - It&apos;s Free!
                         </Button>
                     </Link>
+                    <Button
+                        size="lg"
+                        variant="outline"
+                        onClick={() => setShowInteractiveTutorial(true)}
+                        className="border-3 border-neo-black bg-neo-lime hover:bg-neo-lime/90 text-neo-black font-bold text-lg px-8 py-6 w-full sm:w-auto"
+                    >
+                        <FaHandPointer className="mr-2" />
+                        {t('footer.interactiveTutorial') || 'Interactive Tutorial'}
+                    </Button>
                 </motion.div>
+
+                {/* Interactive Tutorial Dialog */}
+                <Dialog open={showInteractiveTutorial} onOpenChange={setShowInteractiveTutorial}>
+                    <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+                        <DialogHeader>
+                            <DialogTitle className="sr-only">{t('howToPlay.title')}</DialogTitle>
+                        </DialogHeader>
+                        <HowToPlay onClose={() => setShowInteractiveTutorial(false)} />
+                    </DialogContent>
+                </Dialog>
 
                 {/* How to Play Section */}
                 <motion.section

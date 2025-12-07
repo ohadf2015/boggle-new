@@ -572,6 +572,27 @@ const usePlayerSocketEvents = ({
       setWaitingForResults(false);
       setLetterGrid(null);
       waitingStartTimeRef.current = null; // Reset waiting state tracking
+
+      // Reset combo state for new game
+      setComboLevel(0);
+      comboLevelRef.current = 0;
+      setLastWordTime(null);
+      lastWordTimeRef.current = null;
+      if (comboTimeoutRef.current) {
+        clearTimeout(comboTimeoutRef.current);
+        comboTimeoutRef.current = null;
+      }
+      comboShieldsUsedRef.current = 0;
+
+      // Reset tournament state
+      setTournamentData(null);
+      setTournamentStandings([]);
+      setShowTournamentStandings(false);
+
+      // Reset XP/Level state
+      setXpGainedData(null);
+      setLevelUpData(null);
+
       neoSuccessToast(data.message || t('common.newGameReady'), { icon: '🔄', duration: 3000 });
     };
 
