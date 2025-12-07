@@ -87,6 +87,13 @@ const ACHIEVEMENTS = getLocalizedAchievements('he');
 
 // Check and award LIVE achievements during gameplay (selective achievements only)
 const checkLiveAchievements = (game, username, word, timeSinceStart) => {
+  // Ensure playerAchievements is initialized (defensive check for bots and edge cases)
+  if (!game.playerAchievements) {
+    game.playerAchievements = {};
+  }
+  if (!game.playerAchievements[username]) {
+    game.playerAchievements[username] = [];
+  }
   const achievements = game.playerAchievements[username];
   const newAchievements = [];
 
@@ -95,15 +102,19 @@ const checkLiveAchievements = (game, username, word, timeSinceStart) => {
   // Get all word details for this player
   const allWordDetails = game.playerWordDetails?.[username] || [];
 
-  // Filter to only count validated words (validated !== false)
-  // Words with validated=null are pending (not yet rejected), so we count them for live achievements
-  // Words with validated=false are explicitly rejected (wrong words)
-  const validatedWordDetails = allWordDetails.filter(w => w.validated !== false);
+  // Filter to only count ACTUALLY validated words (validated === true OR autoValidated === true)
+  // This prevents awarding achievements for pending words that may later be rejected
+  // Words with validated=null are pending and should NOT count for word-count achievements
+  const validatedWordDetails = allWordDetails.filter(w => w.validated === true || w.autoValidated === true);
   const validatedWordCount = validatedWordDetails.length;
 
-  // Check if the current word being submitted is validated (not rejected)
+  // Check if the current word being submitted is auto-validated (in dictionary)
+  // or has been validated. For current word, we check if it's auto-validated since
+  // manual validation happens asynchronously
   const currentWordDetails = allWordDetails.find(w => w.word.toLowerCase() === word.toLowerCase());
-  const isCurrentWordValid = currentWordDetails ? currentWordDetails.validated !== false : true;
+  const isCurrentWordValid = currentWordDetails
+    ? (currentWordDetails.validated === true || currentWordDetails.autoValidated === true)
+    : false;
 
   // Helper to add achievement - returns unlocalized object with key and icon
   const addAchievementAndReturn = (key) => {
@@ -314,11 +325,22 @@ const getPlayerAchievements = (gameCode, username) => {
 // Award final achievements after validation (post-game)
 const awardFinalAchievements = (game, users) => {
   logger.debug('ACHIEVEMENT', `Awarding final achievements for ${users.length} players`);
+
+  // Ensure playerAchievements is initialized (defensive check)
+  if (!game.playerAchievements) {
+    game.playerAchievements = {};
+  }
+
   users.forEach(username => {
     // Safety check: ensure player data exists
     if (!game.playerWordDetails[username]) {
       logger.warn('ACHIEVEMENT', `Player ${username} missing word details during achievement calculation`);
       return;
+    }
+
+    // Initialize playerAchievements for this user if needed (bots and edge cases)
+    if (!game.playerAchievements[username]) {
+      game.playerAchievements[username] = [];
     }
 
     // Bots can also earn achievements - this makes the game more competitive

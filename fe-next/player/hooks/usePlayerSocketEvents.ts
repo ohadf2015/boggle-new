@@ -276,6 +276,7 @@ const usePlayerSocketEvents = ({
       logger.log('[PLAYER] Received endGame event, wasInActiveGame:', wasInActiveGame);
       setGameActive(false);
       setRemainingTime(0);
+      setShowStartAnimation(false); // Clear any lingering animation to prevent double loaders
       if (wasInActiveGame) {
         logger.log('[PLAYER] Setting waitingForResults to true');
         // Track when we entered waiting state for minimum display time
@@ -435,6 +436,7 @@ const usePlayerSocketEvents = ({
 
       if (data.remainingTime <= 0) {
         setGameActive(false);
+        setShowStartAnimation(false); // Clear any lingering animation to prevent double loaders
         // Track when we entered waiting state for minimum display time
         if (!waitingStartTimeRef.current) {
           waitingStartTimeRef.current = Date.now();

@@ -45,6 +45,14 @@ function addPlayerWord(game, username, word, options = {}) {
     game.playerWordDetails[username] = [];
   }
 
+  // Initialize playerAchievements if needed (important for bots and late joiners)
+  if (!game.playerAchievements) {
+    game.playerAchievements = {};
+  }
+  if (!game.playerAchievements[username]) {
+    game.playerAchievements[username] = [];
+  }
+
   // Only add if not already present
   if (!game.playerWords[username].includes(normalizedWord)) {
     game.playerWords[username].push(normalizedWord);
