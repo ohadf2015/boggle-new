@@ -3873,6 +3873,7 @@ const translations = {
         longWordMaster: '📏 ロングワードマスター - 7文字以上の単語を見つける',
         perfectionist: '💎 完璧主義者 - あなたの単語の100％が有効',
         earlyBird: '🐦 早起き鳥 - 最初の1分で3つの単語を見つける',
+        examples: '実績の例',
       },
       tipsTitle: '勝つためのヒント 💡',
       tips: {
@@ -3884,6 +3885,70 @@ const translations = {
       },
       readyToPlay: '準備はいいですか？プレイを始めましょう！ 🎮',
       funForFamily: '家族全員のための魅力的で楽しいゲーム - 完全無料！',
+      letters: '文字',
+      pts: 'ポイント',
+      // Step-based tutorial sections
+      steps: {
+        basics: {
+          title: 'ゲームの基本',
+          description: 'LexiClashは、高速マルチプレイヤーワードゲームです。友達と競争して、文字のグリッド上で単語を見つけましょう！',
+        },
+        grid: {
+          title: '単語の見つけ方',
+          description: 'スワイプまたはクリックで隣接する文字を繋げて単語を作ります。文字は8つの方向すべて（水平、垂直、斜め）で繋がります！',
+        },
+        scoring: {
+          title: 'スコアリングシステム',
+          description: '長い単語ほど多くのポイントを獲得できます！最初の文字以降、各文字がスコアに1ポイント追加されます。',
+        },
+        combo: {
+          title: 'コンボシステム',
+          description: '素早く単語を送信してコンボ倍率を構築しましょう！単語を見つけるのが速いほど、ボーナスが大きくなります。',
+        },
+        xp: {
+          title: 'XP & レベル',
+          description: 'ゲームごとにXPを獲得してレベルアップし、新しい称号をアンロックしましょう。勝利ボーナスと実績がXPを増やします！',
+        },
+        achievements: {
+          title: '実績',
+          description: '特別な功績で実績をアンロック！各実績は複数回獲得してティアをアップグレードできます。',
+        },
+      },
+      // Interactive demo translations
+      demo: {
+        watchAnimation: 'グリッド上で単語がどのように形成されるかをご覧ください',
+        autoPlay: '自動',
+        replay: 'リプレイ',
+        tryIt: '自分で文字をドラッグしてみてください！',
+        gridExample: 'グリッド上で単語をトレースする例',
+        traceExample: '文字をトレースして単語を形成 - T→O→N→D',
+      },
+      // Combo system translations
+      combo: {
+        currentCombo: '現在のコンボ',
+        multiplier: '倍率',
+        noBonus: 'ボーナスなし',
+        tryIt: 'コンボをシミュレート',
+        building: 'コンボを構築中...',
+        tip: 'コンボを維持するために、5秒以内に単語を送信してください！',
+      },
+      // XP system translations
+      xp: {
+        howToEarn: 'XPの獲得方法',
+        base: 'ゲームを完了',
+        score: 'ポイントを獲得',
+        win: 'ゲームに勝利',
+        achievement: '実績をアンロック',
+        unlockTitles: 'レベルアップで称号をアンロック',
+      },
+      // New player welcome
+      newPlayer: {
+        welcomeTitle: 'LexiClashへようこそ！',
+        welcomeMessage: '初めてのようですね。遊び方のクイックツアーを見ますか？',
+        showTutorial: '遊び方を教えて',
+        skipTutorial: '自分でやってみる',
+        dontShowAgain: '再表示しない',
+      },
     },
     achievements: {
       FIRST_BLOOD: {
