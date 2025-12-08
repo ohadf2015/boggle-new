@@ -324,13 +324,20 @@ async function calculateAndBroadcastFinalScores(io, gameCode) {
     }
   }
 
+  // Get player count for duplicate rule logic
+  const playerCount = Object.keys(game.users || {}).length;
+
+  // Disable duplicate rule for large rooms (more than 7 players)
+  const duplicateRuleDisabled = playerCount > 7;
+
   // Calculate final scores
   const finalScores = calculateGameScores(
     game,
     wordCountMap,
     dictionaryValidatedWords,
     communityValidatedWords,
-    aiValidatedWords
+    aiValidatedWords,
+    { playerCount }
   );
 
   // Update game state with final scores
@@ -359,13 +366,18 @@ async function calculateAndBroadcastFinalScores(io, gameCode) {
 
   // Broadcast results to all clients
   // Host expects 'validationComplete', players expect 'validatedScores'
+  // Include duplicateRuleDisabled flag so frontend can display a notice
   broadcastToRoom(io, getGameRoom(gameCode), 'validatedScores', {
     scores: finalScores,
-    letterGrid: game.letterGrid
+    letterGrid: game.letterGrid,
+    duplicateRuleDisabled,
+    playerCount
   });
   broadcastToRoom(io, getGameRoom(gameCode), 'validationComplete', {
     scores: finalScores,
-    letterGrid: game.letterGrid
+    letterGrid: game.letterGrid,
+    duplicateRuleDisabled,
+    playerCount
   });
 
   // Record to database

@@ -501,6 +501,8 @@ const usePlayerSocketEvents = ({
           currentOnShowResults({
             scores: data.scores,
             letterGrid: data.letterGrid,
+            duplicateRuleDisabled: data.duplicateRuleDisabled,
+            playerCount: data.playerCount,
           });
         } else {
           logger.warn('[PLAYER] onShowResults is not defined!');

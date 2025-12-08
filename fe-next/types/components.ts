@@ -90,6 +90,10 @@ export interface ResultsPageProps {
   socket: Socket | null;
   /** Player achievements from the game */
   achievements?: GameAchievement[];
+  /** Whether duplicate word rule is disabled (for rooms with >7 players) */
+  duplicateRuleDisabled?: boolean;
+  /** Number of players in the game */
+  playerCount?: number;
 }
 
 export interface HeatMapData {
