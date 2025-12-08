@@ -417,19 +417,15 @@ const HostView: React.FC<HostViewProps> = memo(({
   }, []);
 
   const handleStartNewGame = useCallback(() => {
+    // Emit reset to server - the socket handler (handleResetGame in useHostSocketEvents)
+    // will handle resetting game state when server confirms
     socket?.emit('resetGame');
-    setFinalScores(null);
-    setGameStarted(false);
-    setWaitingForResults(false);
-    setRemainingTime(null);
-    setTournamentData(null);
+
+    // Reset UI settings that aren't passed to the socket events hook
     setGameType('regular');
-    setPlayerWordCounts({});
-    setPlayerScores({});
-    setHostFoundWords([]);
-    setHostAchievements([]);
     setTimerValue(1);
 
+    // Show immediate feedback to host
     neoSuccessToast(`${t('common.newGameReady')}`, {
       icon: '🔄',
       duration: 2000,
