@@ -53,7 +53,7 @@ interface UseHostSocketEventsProps {
   username: string;
   queueAchievement: (achievement: any) => void;
   playComboSound: (level: number) => void;
-  onShowResults?: (data: { scores: any; letterGrid: any }) => void;
+  onShowResults?: (data: { scores: any; letterGrid: any; duplicateRuleDisabled?: boolean; playerCount?: number }) => void;
 
   // State setters
   setPlayersReady: React.Dispatch<React.SetStateAction<Player[]>>;
@@ -675,6 +675,7 @@ const useHostSocketEvents = ({
       setGameStarted(false);
       setRemainingTime(null);
       setWaitingForResults(false);
+      setShowStartAnimation(false); // Reset animation state for new game
       setTableData(null);
       setHostFoundWords([]);
       setHostAchievements([]);

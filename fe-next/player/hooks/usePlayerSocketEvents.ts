@@ -69,7 +69,7 @@ interface UsePlayerSocketEventsProps {
   username: string;
   queueAchievement: (achievement: any) => void;
   playComboSound: (level: number) => void;
-  onShowResults?: (data: { scores: any; letterGrid: any }) => void;
+  onShowResults?: (data: { scores: any; letterGrid: any; duplicateRuleDisabled?: boolean; playerCount?: number }) => void;
 
   // State setters
   setPlayersReady: React.Dispatch<React.SetStateAction<Player[]>>;
@@ -573,6 +573,7 @@ const usePlayerSocketEvents = ({
       setRemainingTime(null);
       setWaitingForResults(false);
       setLetterGrid(null);
+      setShowStartAnimation(false); // Reset animation state for new game
       waitingStartTimeRef.current = null; // Reset waiting state tracking
 
       // Reset combo state for new game
