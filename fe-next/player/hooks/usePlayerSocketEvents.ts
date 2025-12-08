@@ -584,6 +584,10 @@ const usePlayerSocketEvents = ({
       }
       comboShieldsUsedRef.current = 0;
 
+      // Reset word feedback state (close modal if open)
+      setShowWordFeedback(false);
+      setWordToVote(null);
+
       // Reset tournament state
       setTournamentData(null);
       setTournamentStandings([]);

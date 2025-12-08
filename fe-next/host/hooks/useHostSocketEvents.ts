@@ -689,7 +689,14 @@ const useHostSocketEvents = ({
       if (comboTimeoutRef.current) {
         clearTimeout(comboTimeoutRef.current);
       }
-      neoSuccessToast(data?.message || t('common.newGameReady') || 'New game ready!', { icon: '🔄', duration: 3000 });
+      // Reset tournament state
+      setTournamentData(null);
+      setTournamentCreating(false);
+      // Reset XP/Level state for new game
+      setXpGainedData(null);
+      setLevelUpData(null);
+      // Note: Toast is shown in handleStartNewGame for immediate feedback to host
+      // Players will receive their toast from their own handleResetGame handler
     };
 
     // Register all event listeners
