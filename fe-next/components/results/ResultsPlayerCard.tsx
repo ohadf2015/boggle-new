@@ -144,6 +144,8 @@ interface ResultsPlayerCardProps {
   isWinner: boolean;
   xpGainedData?: XpGainedData | null;
   levelUpData?: LevelUpData | null;
+  /** Whether duplicate word rule is disabled (for rooms with >7 players) */
+  duplicateRuleDisabled?: boolean;
 }
 
 interface WordChipProps {
@@ -386,7 +388,7 @@ const WordChip = memo<WordChipProps>(({ wordObj, playerCount }) => {
 
 WordChip.displayName = 'WordChip';
 
-const ResultsPlayerCard: React.FC<ResultsPlayerCardProps> = ({ player, index, allPlayerWords, currentUsername, isWinner, xpGainedData, levelUpData }) => {
+const ResultsPlayerCard: React.FC<ResultsPlayerCardProps> = ({ player, index, allPlayerWords, currentUsername, isWinner, xpGainedData, levelUpData, duplicateRuleDisabled }) => {
   const { t, dir } = useLanguage();
   // Arrow direction for level up indicator - flip for RTL
   const levelArrow = dir === 'rtl' ? '←' : '→';

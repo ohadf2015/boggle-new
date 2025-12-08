@@ -423,6 +423,8 @@ const translations = {
       wordValidated: 'Word validated! You earned ${score} points!',
       autoRejoinIn: 'Auto-rejoin in',
       rejoinNow: 'Rejoin Now',
+      largeRoomMode: 'Large Room Mode',
+      duplicateRuleDisabled: 'With 8+ players, duplicate words still count!',
     },
     playerTitles: {
       champion: { name: 'Champion', icon: '👑', description: 'Winner of the game' },
@@ -1581,6 +1583,8 @@ const translations = {
       wordValidated: 'המילה אושרה! קיבלת ${score} נקודות!',
       autoRejoinIn: 'חזרה אוטומטית בעוד',
       rejoinNow: 'חזור עכשיו',
+      largeRoomMode: 'מצב חדר גדול',
+      duplicateRuleDisabled: 'עם 8+ שחקנים, מילים כפולות עדיין נספרות!',
     },
     playerTitles: {
       champion: { name: 'אלוף', icon: '👑', description: 'מנצח המשחק' },
@@ -2733,6 +2737,8 @@ const translations = {
       wordValidated: 'Ordet validerat! Du fick ${score} poäng!',
       autoRejoinIn: 'Automatiskt återansluter om',
       rejoinNow: 'Återanslut nu',
+      largeRoomMode: 'Stort rumsläge',
+      duplicateRuleDisabled: 'Med 8+ spelare räknas dubblettord fortfarande!',
     },
     playerTitles: {
       champion: { name: 'Mästare', icon: '👑', description: 'Spelets vinnare' },
@@ -3887,6 +3893,8 @@ const translations = {
       wordValidated: '単語が承認されました！${score}ポイント獲得！',
       autoRejoinIn: '自動再参加まで',
       rejoinNow: '今すぐ再参加',
+      largeRoomMode: '大規模ルームモード',
+      duplicateRuleDisabled: '8人以上のプレイヤーでは、重複単語もカウントされます！',
     },
     playerTitles: {
       champion: { name: 'チャンピオン', icon: '👑', description: 'ゲームの勝者' },

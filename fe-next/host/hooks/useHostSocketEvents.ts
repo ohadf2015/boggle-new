@@ -379,7 +379,9 @@ const useHostSocketEvents = ({
           logger.log('[HOST] Calling onShowResults with scores');
           currentOnShowResults({
             scores: data.scores,
-            letterGrid: currentTableData
+            letterGrid: currentTableData,
+            duplicateRuleDisabled: data.duplicateRuleDisabled,
+            playerCount: data.playerCount,
           });
         } else {
           logger.log('[HOST] onShowResults not defined, setting finalScores in modal');

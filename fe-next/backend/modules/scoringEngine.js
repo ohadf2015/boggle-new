@@ -66,9 +66,15 @@ const calculateWordScore = (word, comboLevel = 0) => {
  * @param {Set} dictionaryValidatedWords - Words validated by dictionary
  * @param {Set} communityValidatedWords - Words validated by community
  * @param {Map} aiValidatedWords - Words validated by AI with isValid status and reason
+ * @param {object} options - Additional options
+ * @param {number} options.playerCount - Number of players in the game (used to disable duplicate rule for large rooms)
  * @returns {array} - Array of player score objects
  */
-const calculateGameScores = (game, wordCountMap = {}, dictionaryValidatedWords = new Set(), communityValidatedWords = new Set(), aiValidatedWords = new Map()) => {
+const calculateGameScores = (game, wordCountMap = {}, dictionaryValidatedWords = new Set(), communityValidatedWords = new Set(), aiValidatedWords = new Map(), options = {}) => {
+  const { playerCount = 0 } = options;
+
+  // Disable duplicate rule for large rooms (more than 7 players)
+  const duplicateRuleDisabled = playerCount > 7;
   if (!game) return [];
 
   const results = [];
@@ -104,7 +110,8 @@ const calculateGameScores = (game, wordCountMap = {}, dictionaryValidatedWords =
       }
 
       // Check if word is unique (only one player submitted it)
-      const isUnique = (wordCountMap[word] || 0) === 1;
+      // When duplicate rule is disabled (large rooms with >7 players), treat all words as unique
+      const isUnique = duplicateRuleDisabled || (wordCountMap[word] || 0) === 1;
 
       // Get pre-calculated score from word details if available
       const existingDetails = (playerWordDetails[username] || []).find(d => d.word === word);

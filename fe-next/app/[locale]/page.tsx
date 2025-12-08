@@ -33,6 +33,10 @@ interface ResultsData {
     words: string[];
   }>;
   letterGrid: string[][];
+  /** Whether duplicate word rule is disabled (for rooms with >7 players) */
+  duplicateRuleDisabled?: boolean;
+  /** Number of players in the game */
+  playerCount?: number;
 }
 
 interface GameStartData {
@@ -966,6 +970,8 @@ export default function GamePage(): React.JSX.Element {
             onReturnToRoom={handleReturnToRoom}
             username={username}
             socket={socket}
+            duplicateRuleDisabled={resultsData?.duplicateRuleDisabled}
+            playerCount={resultsData?.playerCount}
           />
         </FeatureErrorBoundary>
       );

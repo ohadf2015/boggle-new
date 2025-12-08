@@ -157,7 +157,7 @@ const LetterGrid: React.FC<LetterGridProps> = ({ letterGrid, heatMapData, showHe
   );
 };
 
-const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, letterGrid, gameCode, onReturnToRoom, username, socket, achievements }) => {
+const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, letterGrid, gameCode, onReturnToRoom, username, socket, achievements, duplicateRuleDisabled, playerCount }) => {
   const { t } = useLanguage();
   const { isAuthenticated } = useAuth();
   const [showExitConfirm, setShowExitConfirm] = useState<boolean>(false);
@@ -563,6 +563,29 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, letterGrid, game
             </motion.div>
           </motion.div>
 
+          {/* Large Room Notice - Duplicate rule disabled */}
+          {duplicateRuleDisabled && (
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3, duration: 0.3 }}
+              className="mb-4 mx-auto max-w-md"
+            >
+              <div className="bg-neo-cyan border-3 border-neo-black rounded-neo p-3 shadow-hard text-center">
+                <div className="flex items-center justify-center gap-2">
+                  <span className="text-lg">👥</span>
+                  <span className="font-black text-neo-black text-sm uppercase">
+                    {t('results.largeRoomMode') || 'Large Room Mode'}
+                  </span>
+                  <span className="text-lg">👥</span>
+                </div>
+                <p className="text-xs text-neo-black mt-1 font-bold">
+                  {t('results.duplicateRuleDisabled') || `With ${playerCount || '8+'} players, duplicate words still count!`}
+                </p>
+              </div>
+            </motion.div>
+          )}
+
         </div>
 
         {/* Player Results Cards */}
@@ -577,6 +600,7 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, letterGrid, game
               isWinner={index === 0}
               xpGainedData={player.username === username ? xpGainedData : null}
               levelUpData={player.username === username ? levelUpData : null}
+              duplicateRuleDisabled={duplicateRuleDisabled}
             />
           ))}
         </div>
