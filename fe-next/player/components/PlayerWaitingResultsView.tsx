@@ -241,7 +241,7 @@ const PlayerWaitingResultsView: React.FC<PlayerWaitingResultsViewProps> = ({
                     {t('playerView.leaderboard')}
                   </h3>
                 </div>
-                <div className="p-3 space-y-2 max-h-[300px] overflow-y-auto">
+                <div className="p-3 space-y-2 max-h-[250px] sm:max-h-[300px] md:max-h-[400px] overflow-y-auto">
                   {leaderboard.map((player, index) => {
                     const isMe = player.username === username;
                     // Track if this player has already been animated

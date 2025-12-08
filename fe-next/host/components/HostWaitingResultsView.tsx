@@ -18,6 +18,7 @@ interface PlayerData {
 interface LeaderboardPlayer {
   username: string;
   score: number;
+  wordCount?: number;
   avatar: AvatarType | null;
 }
 
@@ -25,8 +26,10 @@ interface HostWaitingResultsViewProps {
   username: string;
   gameCode: string;
   t: (path: string, params?: Record<string, string | number>) => string;
+  dir: 'rtl' | 'ltr';
   playersReady: (string | PlayerData)[];
   playerScores: Record<string, number>;
+  playerWordCounts?: Record<string, number>;
   showExitConfirm: boolean;
   setShowExitConfirm: (show: boolean) => void;
   onExitRoom: () => void;
@@ -39,8 +42,10 @@ const HostWaitingResultsView: React.FC<HostWaitingResultsViewProps> = ({
   username,
   gameCode,
   t,
+  dir,
   playersReady,
   playerScores,
+  playerWordCounts = {},
   showExitConfirm,
   setShowExitConfirm,
   onExitRoom,
@@ -57,11 +62,12 @@ const HostWaitingResultsView: React.FC<HostWaitingResultsViewProps> = ({
         return {
           username: name,
           score: playerScores[name] || 0,
+          wordCount: playerWordCounts[name] || 0,
           avatar: typeof player === 'object' ? player.avatar : null,
         };
       })
       .sort((a, b) => b.score - a.score);
-  }, [playersReady, playerScores]);
+  }, [playersReady, playerScores, playerWordCounts]);
 
   return (
     <div className="min-h-screen bg-neo-cream dark:bg-slate-900 p-3 sm:p-4 md:p-8 flex flex-col transition-colors duration-300">
@@ -74,13 +80,14 @@ const HostWaitingResultsView: React.FC<HostWaitingResultsViewProps> = ({
       {/* Centered Content */}
       <div className="flex-1 flex items-center justify-center">
         <div className="max-w-2xl w-full space-y-4 sm:space-y-6 md:space-y-8">
-          {/* Waiting for Results Message */}
+          {/* Waiting for Results Message - Fixed height container to prevent CLS */}
           <motion.div
-            initial={{ scale: 0.9, opacity: 0, rotate: -2 }}
-            animate={{ scale: 1, opacity: 1, rotate: 0 }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.3 }}
             className="text-center"
           >
-            <div className="bg-neo-yellow border-4 border-neo-black shadow-hard-lg p-6 sm:p-8 md:p-10 rotate-[1deg]">
+            <div className="bg-neo-yellow border-4 border-neo-black shadow-hard-lg p-6 sm:p-8 md:p-10">
               {/* Hourglass Animation */}
               <div className="mb-6">
                 <motion.div
@@ -101,7 +108,7 @@ const HostWaitingResultsView: React.FC<HostWaitingResultsViewProps> = ({
                 </motion.div>
               </div>
 
-              <div className="bg-neo-black text-neo-white px-6 py-4 font-black uppercase text-2xl md:text-3xl tracking-wider shadow-hard border-4 border-neo-black mb-4">
+              <div className="bg-neo-black text-neo-white px-6 py-4 font-black uppercase text-xl md:text-2xl tracking-wider shadow-hard border-4 border-neo-black mb-4 min-h-[70px] flex items-center justify-center">
                 {t('playerView.calculatingScores') || t('playerView.waitingForResults') || 'Calculating scores...'}
               </div>
 
@@ -125,10 +132,9 @@ const HostWaitingResultsView: React.FC<HostWaitingResultsViewProps> = ({
           {/* Leaderboard */}
           {leaderboard.length > 0 && (
             <motion.div
-              initial={{ y: 20, opacity: 0, rotate: 1 }}
-              animate={{ y: 0, opacity: 1, rotate: 0 }}
-              transition={{ delay: 0.2 }}
-              className="rotate-[-0.5deg]"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.3, delay: 0.1 }}
             >
               <div className="bg-neo-cream border-4 border-neo-black shadow-hard-lg overflow-hidden">
                 <div className="py-3 px-4 border-b-4 border-neo-black bg-neo-purple">
@@ -137,7 +143,7 @@ const HostWaitingResultsView: React.FC<HostWaitingResultsViewProps> = ({
                     {t('playerView.leaderboard') || 'Leaderboard'}
                   </h3>
                 </div>
-                <div className="p-3 space-y-2 max-h-[300px] overflow-y-auto">
+                <div className="p-3 space-y-2 max-h-[250px] sm:max-h-[300px] md:max-h-[400px] overflow-y-auto">
                   {leaderboard.map((player, index) => {
                     const isMe = player.username === username;
                     // Track if this player has already been animated
@@ -154,17 +160,14 @@ const HostWaitingResultsView: React.FC<HostWaitingResultsViewProps> = ({
                     return (
                       <motion.div
                         key={player.username}
-                        layout
-                        initial={isNewPlayer ? { x: 50, opacity: 0 } : false}
-                        animate={{ x: 0, opacity: 1 }}
+                        initial={isNewPlayer ? { opacity: 0 } : false}
+                        animate={{ opacity: 1 }}
                         transition={{
-                          layout: { type: 'spring', stiffness: 300, damping: 30 },
-                          opacity: { duration: 0.2 },
-                          x: isNewPlayer ? { duration: 0.3, delay: index * 0.05 } : { duration: 0 }
+                          opacity: isNewPlayer ? { duration: 0.3, delay: index * 0.05 } : { duration: 0 }
                         }}
                         className={`flex items-center gap-3 p-3 rounded-neo border-3 border-neo-black shadow-hard-sm transition-colors
-                          hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-hard
-                          ${getRankStyle()}`}
+                          hover:brightness-110
+                          ${getRankStyle()} ${dir === 'rtl' ? 'flex-row-reverse' : ''}`}
                       >
                         <div className="w-10 h-10 rounded-neo flex items-center justify-center font-black text-lg bg-neo-black text-neo-white border-2 border-neo-black">
                           {index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : `#${index + 1}`}
@@ -176,7 +179,7 @@ const HostWaitingResultsView: React.FC<HostWaitingResultsViewProps> = ({
                           size="md"
                         />
                         <div className="flex-1">
-                          <div className="font-black flex items-center gap-2">
+                          <div className={`font-black flex items-center gap-2 ${dir === 'rtl' ? 'flex-row-reverse' : ''}`}>
                             <SlotMachineText text={player.username} />
                             {isMe && (
                               <span className="text-xs bg-neo-black text-neo-white px-2 py-0.5 rounded-neo font-bold border-2 border-neo-black">
@@ -184,6 +187,7 @@ const HostWaitingResultsView: React.FC<HostWaitingResultsViewProps> = ({
                               </span>
                             )}
                           </div>
+                          <div className="text-sm font-bold opacity-75">{player.wordCount} {t('playerView.wordCount')}</div>
                         </div>
                         <div className="text-2xl font-black">
                           {player.score}
@@ -198,10 +202,9 @@ const HostWaitingResultsView: React.FC<HostWaitingResultsViewProps> = ({
 
           {/* Chat Section */}
           <motion.div
-            initial={{ y: 20, opacity: 0, rotate: -1 }}
-            animate={{ y: 0, opacity: 1, rotate: 0 }}
-            transition={{ delay: 0.3 }}
-            className="rotate-[0.5deg]"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.3, delay: 0.2 }}
           >
             <RoomChat
               username={username}
