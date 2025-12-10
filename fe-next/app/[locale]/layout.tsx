@@ -134,23 +134,19 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
 
     // Structured data for Google (JSON-LD)
     const structuredData = [
-        // WebApplication schema with educational focus
+        // WebApplication schema - competitive multiplayer word game
         {
             '@context': 'https://schema.org',
-            '@type': ['WebApplication', 'VideoGame', 'LearningResource'],
+            '@type': ['WebApplication', 'VideoGame'],
             '@id': 'https://www.lexiclash.live/#webapp',
             name: 'LexiClash',
-            alternateName: ['LexiClash Educational Word Game', 'LexiClash Vocabulary Builder', 'לקסיקלאש'],
+            alternateName: ['LexiClash Multiplayer Word Game', 'LexiClash Word Battle', 'לקסיקלאש'],
             applicationCategory: 'GameApplication',
-            applicationSubCategory: 'Educational Word Game',
-            educationalUse: ['Language Learning', 'Vocabulary Building', 'Classroom Activity', 'Spelling Practice'],
-            educationalLevel: ['Beginner', 'Intermediate', 'Advanced'],
-            learningResourceType: ['Game', 'Interactive Resource'],
-            teaches: ['Vocabulary', 'Spelling', 'Word Recognition', 'Language Skills'],
+            applicationSubCategory: 'Multiplayer Word Game',
             typicalAgeRange: '6-99',
             audience: {
-                '@type': 'EducationalAudience',
-                educationalRole: ['student', 'teacher', 'parent'],
+                '@type': 'PeopleAudience',
+                suggestedMinAge: 6,
             },
             operatingSystem: 'Any',
             browserRequirements: 'Requires JavaScript. Requires HTML5.',
@@ -185,25 +181,24 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
             ],
             featureList: [
                 'Real-time multiplayer gameplay',
-                'Educational vocabulary building',
+                'Fast-paced competitive word battles',
                 'Multiple language support (Hebrew, English, Swedish, Japanese)',
-                'ESL and language learning support',
-                'Classroom-friendly activities',
                 'Live leaderboard and rankings',
                 'Achievement system',
                 'Room-based multiplayer',
                 'QR code sharing',
                 'Cross-platform compatibility',
-                'No download required'
+                'No download required',
+                'Vocabulary building bonus'
             ],
-            genre: ['Educational Game', 'Word Game', 'Puzzle', 'Multiplayer', 'Party Game', 'Brain Training'],
+            genre: ['Word Game', 'Puzzle', 'Multiplayer', 'Party Game', 'Competitive Game', 'Brain Training'],
             playMode: ['MultiPlayer', 'CoOp'],
             author: {
                 '@type': 'Organization',
                 name: 'LexiClash',
                 url: 'https://www.lexiclash.live',
             },
-            keywords: 'educational word game, vocabulary builder, language learning, ESL game, classroom game, spelling game',
+            keywords: 'multiplayer word game, real-time word battle, competitive word game, party game, word puzzle',
         },
         // Organization schema
         {
@@ -230,6 +225,78 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
                 '@id': 'https://www.lexiclash.live/#organization',
             },
             inLanguage: [languageCode, 'he', 'en', 'sv', 'ja'],
+        },
+        // FAQ schema - common questions users ask AI assistants and search engines
+        {
+            '@context': 'https://schema.org',
+            '@type': 'FAQPage',
+            '@id': 'https://www.lexiclash.live/#faq',
+            mainEntity: [
+                {
+                    '@type': 'Question',
+                    name: 'What is a good multiplayer word game for parties?',
+                    acceptedAnswer: {
+                        '@type': 'Answer',
+                        text: 'LexiClash is a fast-paced multiplayer word game perfect for parties. Players compete in real-time to find words on a shared letter grid. It works on any device with no download required - just share a room code or QR code with friends and start playing instantly. Great for 2-20+ players!',
+                    },
+                },
+                {
+                    '@type': 'Question',
+                    name: 'What is a free online game like Boggle I can play with friends?',
+                    acceptedAnswer: {
+                        '@type': 'Answer',
+                        text: 'LexiClash is a free online word game similar to Boggle that you can play with friends in real-time. It features competitive multiplayer gameplay, live leaderboards, and supports multiple languages including English, Hebrew, Swedish, and Japanese. No account required - just create a room and share the link!',
+                    },
+                },
+                {
+                    '@type': 'Question',
+                    name: 'What are good team building games for remote teams?',
+                    acceptedAnswer: {
+                        '@type': 'Answer',
+                        text: 'LexiClash is an excellent team building game for remote teams. It\'s a real-time multiplayer word game that works in any browser - no downloads needed. Teams can compete against each other, and the fast-paced gameplay keeps everyone engaged. Perfect for virtual team events and icebreakers.',
+                    },
+                },
+                {
+                    '@type': 'Question',
+                    name: 'What is a fun word game for family game night?',
+                    acceptedAnswer: {
+                        '@type': 'Answer',
+                        text: 'LexiClash is perfect for family game night! It\'s a multiplayer word game where everyone races to find words on a letter grid. Suitable for ages 6 and up, it\'s free to play, works on phones and computers, and the whole family can join with a simple room code. Great for building vocabulary while having fun!',
+                    },
+                },
+                {
+                    '@type': 'Question',
+                    name: 'Is there a free alternative to Kahoot for word games?',
+                    acceptedAnswer: {
+                        '@type': 'Answer',
+                        text: 'Yes! LexiClash is a free multiplayer word game similar to Kahoot\'s competitive style. Players join rooms and compete in real-time word battles. It\'s great for classrooms, parties, and casual play. No subscription needed - completely free with support for Hebrew, English, Swedish, and Japanese.',
+                    },
+                },
+                {
+                    '@type': 'Question',
+                    name: 'What is a good browser game that doesn\'t require download?',
+                    acceptedAnswer: {
+                        '@type': 'Answer',
+                        text: 'LexiClash is a great browser-based multiplayer word game that requires no download. Just visit lexiclash.live, create or join a room, and start playing instantly. It works on desktop, tablet, and mobile browsers. Perfect for quick gaming sessions with friends!',
+                    },
+                },
+                {
+                    '@type': 'Question',
+                    name: 'What multiplayer games can I play on my phone with friends?',
+                    acceptedAnswer: {
+                        '@type': 'Answer',
+                        text: 'LexiClash is a multiplayer word game you can play on your phone with friends. It\'s browser-based so there\'s nothing to install. Create a room, share the code or QR code with friends, and compete in real-time word battles. Supports unlimited players and works across all devices!',
+                    },
+                },
+                {
+                    '@type': 'Question',
+                    name: 'What is a good game like Alias to play online?',
+                    acceptedAnswer: {
+                        '@type': 'Answer',
+                        text: 'LexiClash offers a similar competitive word game experience to Alias but playable online. It\'s a fast-paced multiplayer game where you find words against the clock while competing with friends. Free to play, no download required, and available in multiple languages.',
+                    },
+                },
+            ],
         },
     ];
 
