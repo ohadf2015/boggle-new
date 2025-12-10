@@ -134,23 +134,19 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
 
     // Structured data for Google (JSON-LD)
     const structuredData = [
-        // WebApplication schema with educational focus
+        // WebApplication schema - competitive multiplayer word game
         {
             '@context': 'https://schema.org',
-            '@type': ['WebApplication', 'VideoGame', 'LearningResource'],
+            '@type': ['WebApplication', 'VideoGame'],
             '@id': 'https://www.lexiclash.live/#webapp',
             name: 'LexiClash',
-            alternateName: ['LexiClash Educational Word Game', 'LexiClash Vocabulary Builder', 'לקסיקלאש'],
+            alternateName: ['LexiClash Multiplayer Word Game', 'LexiClash Word Battle', 'לקסיקלאש'],
             applicationCategory: 'GameApplication',
-            applicationSubCategory: 'Educational Word Game',
-            educationalUse: ['Language Learning', 'Vocabulary Building', 'Classroom Activity', 'Spelling Practice'],
-            educationalLevel: ['Beginner', 'Intermediate', 'Advanced'],
-            learningResourceType: ['Game', 'Interactive Resource'],
-            teaches: ['Vocabulary', 'Spelling', 'Word Recognition', 'Language Skills'],
+            applicationSubCategory: 'Multiplayer Word Game',
             typicalAgeRange: '6-99',
             audience: {
-                '@type': 'EducationalAudience',
-                educationalRole: ['student', 'teacher', 'parent'],
+                '@type': 'PeopleAudience',
+                suggestedMinAge: 6,
             },
             operatingSystem: 'Any',
             browserRequirements: 'Requires JavaScript. Requires HTML5.',
@@ -185,25 +181,24 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
             ],
             featureList: [
                 'Real-time multiplayer gameplay',
-                'Educational vocabulary building',
+                'Fast-paced competitive word battles',
                 'Multiple language support (Hebrew, English, Swedish, Japanese)',
-                'ESL and language learning support',
-                'Classroom-friendly activities',
                 'Live leaderboard and rankings',
                 'Achievement system',
                 'Room-based multiplayer',
                 'QR code sharing',
                 'Cross-platform compatibility',
-                'No download required'
+                'No download required',
+                'Vocabulary building bonus'
             ],
-            genre: ['Educational Game', 'Word Game', 'Puzzle', 'Multiplayer', 'Party Game', 'Brain Training'],
+            genre: ['Word Game', 'Puzzle', 'Multiplayer', 'Party Game', 'Competitive Game', 'Brain Training'],
             playMode: ['MultiPlayer', 'CoOp'],
             author: {
                 '@type': 'Organization',
                 name: 'LexiClash',
                 url: 'https://www.lexiclash.live',
             },
-            keywords: 'educational word game, vocabulary builder, language learning, ESL game, classroom game, spelling game',
+            keywords: 'multiplayer word game, real-time word battle, competitive word game, party game, word puzzle',
         },
         // Organization schema
         {
