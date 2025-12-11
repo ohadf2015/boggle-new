@@ -226,6 +226,29 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
             },
             inLanguage: [languageCode, 'he', 'en', 'sv', 'ja'],
         },
+        // WebPage schema - marks the main page as the primary entry point
+        {
+            '@context': 'https://schema.org',
+            '@type': 'WebPage',
+            '@id': `https://www.lexiclash.live${localePath}#webpage`,
+            url: `https://www.lexiclash.live${localePath}`,
+            name: seo.title,
+            description: seo.description,
+            isPartOf: {
+                '@id': 'https://www.lexiclash.live/#website',
+            },
+            about: {
+                '@id': 'https://www.lexiclash.live/#webapp',
+            },
+            primaryImageOfPage: {
+                '@type': 'ImageObject',
+                url: 'https://www.lexiclash.live/og-image-en.jpg',
+            },
+            mainContentOfPage: {
+                '@type': 'WebPageElement',
+                cssSelector: 'main',
+            },
+        },
         // FAQ schema - common questions users ask AI assistants and search engines
         {
             '@context': 'https://schema.org',

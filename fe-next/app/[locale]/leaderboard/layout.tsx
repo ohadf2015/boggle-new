@@ -51,13 +51,69 @@ export async function generateMetadata({ params }: LayoutParams): Promise<Metada
         ja: 'https://www.lexiclash.live/ja/leaderboard',
       },
     },
+    robots: {
+      index: true,
+      follow: true,
+    },
   };
 }
 
 interface LeaderboardLayoutProps {
   children: ReactNode;
+  params: Promise<{ locale: string }>;
 }
 
-export default function LeaderboardLayout({ children }: LeaderboardLayoutProps): ReactNode {
-  return children;
+export default async function LeaderboardLayout({ children, params }: LeaderboardLayoutProps): Promise<ReactNode> {
+  const { locale } = await params;
+  const localePath = locale === 'he' ? '' : `/${locale}`;
+
+  // Breadcrumb structured data - shows page hierarchy for search engines
+  const breadcrumbSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    '@id': `https://www.lexiclash.live${localePath}/leaderboard#breadcrumb`,
+    itemListElement: [
+      {
+        '@type': 'ListItem',
+        position: 1,
+        name: 'LexiClash',
+        item: `https://www.lexiclash.live${localePath}`,
+      },
+      {
+        '@type': 'ListItem',
+        position: 2,
+        name: 'Leaderboard',
+        item: `https://www.lexiclash.live${localePath}/leaderboard`,
+      },
+    ],
+  };
+
+  // WebPage schema - identifies this page as subordinate to the main site
+  const webPageSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'WebPage',
+    '@id': `https://www.lexiclash.live${localePath}/leaderboard#webpage`,
+    url: `https://www.lexiclash.live${localePath}/leaderboard`,
+    name: 'Leaderboard - LexiClash',
+    description: 'View the top LexiClash players and their scores. See where you rank among word game champions.',
+    isPartOf: {
+      '@id': 'https://www.lexiclash.live/#website',
+    },
+    breadcrumb: {
+      '@id': `https://www.lexiclash.live${localePath}/leaderboard#breadcrumb`,
+    },
+    about: {
+      '@id': 'https://www.lexiclash.live/#webapp',
+    },
+  };
+
+  return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify([breadcrumbSchema, webPageSchema]) }}
+      />
+      {children}
+    </>
+  );
 }
