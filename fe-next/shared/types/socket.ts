@@ -61,6 +61,16 @@ export interface ClientToServerEvents {
 
   // Hint events (single-player mode)
   requestHint: () => void;
+
+  // Engagement events
+  'engagement:getDailyChallenges': (data: { playerId: string }) => void;
+  'engagement:claimChallengeReward': (data: { playerId: string; challengeId: string }) => void;
+  'engagement:getCalendarStatus': (data: { playerId: string }) => void;
+  'engagement:claimCalendarReward': (data: { playerId: string }) => void;
+  'engagement:getComebackStatus': (data: { playerId: string }) => void;
+  'engagement:claimComebackBonus': (data: { playerId: string }) => void;
+  'engagement:getStatus': (data: { playerId: string }) => void;
+  'engagement:recordLogin': (data: { playerId: string }) => void;
 }
 
 // ==================== Hint Types ====================
@@ -153,6 +163,27 @@ export interface ServerToClientEvents {
   hintResponse: (data: HintPayload) => void;
   hintError: (data: { message: string; code?: string }) => void;
   hintAvailable: (data: { available: boolean; hintsRemaining: number }) => void;
+
+  // XP and Level events
+  xpGained: (data: XpGainedPayload) => void;
+  levelUp: (data: LevelUpPayload) => void;
+
+  // Engagement events
+  'engagement:dailyChallenges': (data: { challenges: DailyChallenge[] }) => void;
+  'engagement:challengeProgress': (data: { progress: ChallengeProgress[] }) => void;
+  'engagement:challengeCompleted': (data: { completed: CompletedChallenge[] }) => void;
+  'engagement:rewardClaimed': (data: ChallengeRewardResult) => void;
+  'engagement:loginResult': (data: LoginResult) => void;
+  'engagement:calendarStatus': (data: CalendarStatus) => void;
+  'engagement:calendarRewardClaimed': (data: CalendarRewardResult) => void;
+  'engagement:comebackAvailable': (data: ComebackStatus) => void;
+  'engagement:comebackStatus': (data: ComebackStatus) => void;
+  'engagement:comebackClaimed': (data: ComebackClaimResult) => void;
+  'engagement:nearMisses': (data: { nearMisses: NearMiss[] }) => void;
+  'engagement:oneMoreGame': (data: { prompt: OneMoreGamePrompt }) => void;
+  'engagement:mysteryReward': (data: { reward: MysteryReward }) => void;
+  'engagement:status': (data: EngagementStatus) => void;
+  'engagement:error': (data: { message: string }) => void;
 }
 
 // ==================== Payload Types ====================
@@ -346,4 +377,151 @@ export interface TournamentStandingsPayload {
 export interface TournamentInfoPayload {
   tournament: TournamentInfo;
   standings: TournamentStanding[];
+}
+
+// ==================== XP and Level Types ====================
+
+export interface XpBreakdown {
+  gameCompletion: number;
+  scoreXp: number;
+  winBonus: number;
+  achievementXp: number;
+}
+
+export interface XpGainedPayload {
+  xpEarned: number;
+  xpBreakdown: XpBreakdown;
+  newTotalXp: number;
+  newLevel: number;
+}
+
+export interface LevelUpPayload {
+  oldLevel: number;
+  newLevel: number;
+  levelsGained: number;
+  newTitles: string[];
+}
+
+// ==================== Engagement Types ====================
+
+export interface DailyChallenge {
+  id: string;
+  type: string;
+  title: string;
+  description: string;
+  target: number;
+  current: number;
+  tier: 'easy' | 'medium' | 'hard';
+  xpReward: number;
+  completed: boolean;
+  claimed: boolean;
+}
+
+export interface ChallengeProgress {
+  challengeId: string;
+  current: number;
+  target: number;
+}
+
+export interface CompletedChallenge {
+  challengeId: string;
+  type: string;
+  title: string;
+  xpReward: number;
+}
+
+export interface ChallengeRewardResult {
+  success: boolean;
+  reward?: {
+    xp: number;
+    totalXp: number;
+    streakMultiplier: number;
+  };
+  error?: string;
+}
+
+export interface LoginResult {
+  streak: number;
+  streakBonus?: {
+    xpMultiplier: number;
+    badge?: string;
+    title?: string;
+    avatarFrame?: string;
+  };
+  milestoneReached?: number;
+  nextMilestone?: number;
+}
+
+export interface CalendarStatus {
+  currentDay: number;
+  claimedDays: number[];
+  todayClaimable: boolean;
+  rewards: CalendarReward[];
+}
+
+export interface CalendarReward {
+  day: number;
+  type: 'xp' | 'badge' | 'title' | 'avatar_frame';
+  value: string | number;
+  claimed: boolean;
+  isMilestone: boolean;
+}
+
+export interface CalendarRewardResult {
+  success: boolean;
+  reward?: {
+    day: number;
+    type: string;
+    value: string | number;
+  };
+  error?: string;
+}
+
+export interface ComebackStatus {
+  eligible: boolean;
+  daysAway?: number;
+  xpMultiplier?: number;
+  expiresAt?: string;
+}
+
+export interface ComebackClaimResult {
+  success: boolean;
+  bonus?: {
+    xpMultiplier: number;
+    expiresAt: string;
+  };
+  error?: string;
+}
+
+export interface NearMiss {
+  achievementKey: string;
+  achievementTitle: string;
+  current: number;
+  target: number;
+  percentComplete: number;
+}
+
+export interface OneMoreGamePrompt {
+  type: string;
+  message: string;
+  incentive?: string;
+}
+
+export interface MysteryReward {
+  type: 'xp' | 'badge' | 'title' | 'cosmetic';
+  value: string | number;
+  display: string;
+  rarity: 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary';
+}
+
+export interface EngagementStatus {
+  streak: number;
+  streakMultiplier: number;
+  calendarDay: number;
+  comebackEligible: boolean;
+  dailyChallenges?: DailyChallenge[];
+  challengeStats?: {
+    completed: number;
+    total: number;
+  };
 }

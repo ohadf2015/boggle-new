@@ -32,6 +32,7 @@ const { inc, incPerGame } = require('../utils/metrics');
 const botManager = require('../modules/botManager');
 const logger = require('../utils/logger');
 const { isSocketMigrating } = require('./shared');
+const { processLongWordEngagement } = require('./engagementHandler');
 const { validatePayload, submitWordSchema, submitWordVoteSchema, submitPeerValidationVoteSchema } = require('../utils/socketValidation');
 
 // Rate limit weights
@@ -298,6 +299,15 @@ function handleValidatedWord(io, socket, game, gameCode, username, normalizedWor
   const achievements = checkAndAwardAchievements(gameCode, username, normalizedWord);
   if (achievements.length > 0) {
     socket.emit('liveAchievementUnlocked', { achievements });
+  }
+
+  // Process long word engagement (8+ letters triggers mystery reward chance)
+  if (normalizedWord.length >= 8) {
+    const userData = game.users?.[username];
+    if (userData?.authUserId) {
+      processLongWordEngagement(socket, userData.authUserId, normalizedWord, gameCode)
+        .catch(err => logger.debug('ENGAGEMENT', `Long word engagement error: ${err.message}`));
+    }
   }
 }
 
