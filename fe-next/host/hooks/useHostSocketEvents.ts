@@ -197,13 +197,11 @@ const useHostSocketEvents = ({
       resetCombo();
     }
 
-    const baseScore = data.word.length - 1;
-    const comboBonus = (data.score || baseScore) - baseScore;
-
+    // Show toast with score from server (matches player behavior)
     wordAcceptedToast(data.word, {
-      score: data.score || baseScore,
-      comboBonus: comboBonus > 0 ? comboBonus : 0,
-      comboLevel: newComboLevel,
+      score: data.score || (data.word.length - 1),
+      comboBonus: data.comboBonus || 0,
+      comboLevel: data.comboLevel || 0,
       comboBonusLabel: t('common.comboBonus'),
       duration: 2000
     });
@@ -433,7 +431,26 @@ const useHostSocketEvents = ({
       }
     };
 
-    const handleGameStarted = (data: any) => {
+    // Handle explicit game end broadcast from server
+    // This ensures the host transitions to results even if timeUpdate is missed
+    const handleEndGame = () => {
+      logger.log('[HOST] Received endGame event');
+      if (gameStarted) {
+        setGameStarted(false);
+        setRemainingTime(0);
+        setShowStartAnimation(false);
+        if (!waitingStartTimeRef.current) {
+          waitingStartTimeRef.current = Date.now();
+        }
+        setWaitingForResults(true);
+      }
+    };
+
+    // Handle game start broadcast from server
+    // Note: Host also receives this event when they start the game (in addition to setting state locally)
+    // This ensures state is properly synchronized when starting subsequent games
+    const handleStartGame = (data: any) => {
+      logger.log('[HOST] Received startGame event from server');
       if (data.letterGrid) {
         setTableData(data.letterGrid);
       }
@@ -449,6 +466,17 @@ const useHostSocketEvents = ({
       setPlayerScores({});
       setHostFoundWords([]);
       setHostAchievements([]);
+      // Reset combo state for new game
+      setComboLevel(0);
+      comboLevelRef.current = 0;
+      setLastWordTime(null);
+      lastWordTimeRef.current = null;
+      if (comboTimeoutRef.current) {
+        clearTimeout(comboTimeoutRef.current);
+      }
+      // Reset XP/Level state for new game
+      setXpGainedData(null);
+      setLevelUpData(null);
     };
 
     const handleWordAlreadyFound = (data: any) => {
@@ -505,6 +533,20 @@ const useHostSocketEvents = ({
       if (hostPlaying) {
         wordNeedsValidationToast(data.word, { pendingLabel: t('common.pending'), duration: 3000 });
         // Word stays in list - host can decide whether to validate it
+        resetCombo();
+      }
+    };
+
+    const handleWordTooShort = (data: any) => {
+      if (hostPlaying) {
+        const msg = t('playerView.wordTooShortMin')
+          ? t('playerView.wordTooShortMin').replace('${min}', data.minLength)
+          : `Word too short! (min ${data.minLength} letters)`;
+        wordErrorToast(msg, { duration: 2000 });
+        if (data?.word) {
+          const wordLower = data.word.toLowerCase();
+          setHostFoundWords(prev => prev.filter(w => w.toLowerCase() !== wordLower));
+        }
         resetCombo();
       }
     };
@@ -714,12 +756,14 @@ const useHostSocketEvents = ({
     socket.on('validationComplete', handleValidationComplete);
     socket.on('roomClosedDueToInactivity', handleRoomClosedDueToInactivity);
     socket.on('timeUpdate', handleTimeUpdate);
-    socket.on('gameStarted', handleGameStarted);
+    socket.on('endGame', handleEndGame);
+    socket.on('startGame', handleStartGame);
     socket.on('wordAccepted', handleWordAccepted);
     socket.on('wordAlreadyFound', handleWordAlreadyFound);
     socket.on('wordNotOnBoard', handleWordNotOnBoard);
     socket.on('wordRejected', handleWordRejected);
     socket.on('wordNeedsValidation', handleWordNeedsValidation);
+    socket.on('wordTooShort', handleWordTooShort);
     socket.on('tournamentCreated', handleTournamentCreated);
     socket.on('tournamentRoundStarting', handleTournamentRoundStarting);
     socket.on('tournamentRoundCompleted', handleTournamentRoundCompleted);
@@ -746,12 +790,14 @@ const useHostSocketEvents = ({
       socket.off('validationComplete', handleValidationComplete);
       socket.off('roomClosedDueToInactivity', handleRoomClosedDueToInactivity);
       socket.off('timeUpdate', handleTimeUpdate);
-      socket.off('gameStarted', handleGameStarted);
+      socket.off('endGame', handleEndGame);
+      socket.off('startGame', handleStartGame);
       socket.off('wordAccepted', handleWordAccepted);
       socket.off('wordAlreadyFound', handleWordAlreadyFound);
       socket.off('wordNotOnBoard', handleWordNotOnBoard);
       socket.off('wordRejected', handleWordRejected);
       socket.off('wordNeedsValidation', handleWordNeedsValidation);
+      socket.off('wordTooShort', handleWordTooShort);
       socket.off('tournamentCreated', handleTournamentCreated);
       socket.off('tournamentRoundStarting', handleTournamentRoundStarting);
       socket.off('tournamentRoundCompleted', handleTournamentRoundCompleted);
