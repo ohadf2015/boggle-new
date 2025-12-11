@@ -171,8 +171,8 @@ function registerBotHandlers(io, socket) {
 
     const removedUsername = botToRemove.username;
 
-    // Remove bot from manager
-    botManager.removeBot(botToRemove.id);
+    // Remove bot from manager - pass both gameCode and botId
+    botManager.removeBot(gameCode, botToRemove.id);
 
     // Remove from game users
     removeUserFromGame(gameCode, removedUsername);
