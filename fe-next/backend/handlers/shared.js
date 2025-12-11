@@ -85,10 +85,9 @@ function startGameTimer(io, gameCode, timerSeconds) {
   // Start bots if any are in the game
   startBotsForGame(io, gameCode, game.letterGrid, game.language, timerSeconds);
 
-  // Broadcast that game has officially started
-  broadcastToRoom(io, getGameRoom(gameCode), 'startGame', {
-    timerSeconds: remainingTime
-  });
+  // NOTE: We do NOT broadcast 'startGame' here anymore.
+  // The game start has already been broadcast from gameLifecycleHandler with all necessary data.
+  // A second broadcast was causing issues with the second game in the same room getting stuck.
 }
 
 /**

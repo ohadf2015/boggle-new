@@ -132,16 +132,6 @@ const PlayerView: React.FC<PlayerViewProps> = memo(({
   // Enable presence tracking
   usePresence({ enabled: !!gameCode });
 
-  // Calculate human player count (exclude bots)
-  const humanPlayerCount = playersReady.filter(p => !p.isBot && !p.disconnected).length;
-
-  // Enable hints for single-player mode
-  const hints = useHints({
-    socket,
-    playerCount: humanPlayerCount,
-    gameActive,
-  });
-
   // Game state
   const [word, setWord] = useState<string>('');
   const [foundWords, setFoundWords] = useState<FoundWord[]>([]);
@@ -156,6 +146,16 @@ const PlayerView: React.FC<PlayerViewProps> = memo(({
 
   // Player state
   const [playersReady, setPlayersReady] = useState<Player[]>(initialPlayers);
+
+  // Calculate human player count (exclude bots)
+  const humanPlayerCount = playersReady.filter(p => !p.isBot && !p.disconnected).length;
+
+  // Enable hints for single-player mode
+  const hints = useHints({
+    socket,
+    playerCount: humanPlayerCount,
+    gameActive,
+  });
   const [shufflingGrid, setShufflingGrid] = useState<LetterGrid | null>(null);
   const [highlightedCells, setHighlightedCells] = useState<GridPosition[]>([]);
   const [gameLanguage, setGameLanguage] = useState<Language | null>(null);
