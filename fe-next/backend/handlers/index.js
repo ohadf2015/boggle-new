@@ -14,6 +14,12 @@ const { registerHostHandlers } = require('./hostHandler');
 const { registerConnectionHandlers } = require('./connectionHandler');
 const { registerHintHandlers } = require('./hintHandler');
 const {
+  registerEngagementHandlers,
+  processGameEndEngagement,
+  processLongWordEngagement,
+  processAchievementEngagement,
+} = require('./engagementHandler');
+const {
   startGameTimer,
   endGame,
   calculateAndBroadcastFinalScores,
@@ -35,6 +41,7 @@ function registerAllHandlers(io, socket) {
   registerHostHandlers(io, socket);
   registerConnectionHandlers(io, socket);
   registerHintHandlers(io, socket);
+  registerEngagementHandlers(io, socket);
 }
 
 module.exports = {
@@ -51,6 +58,12 @@ module.exports = {
   registerHostHandlers,
   registerConnectionHandlers,
   registerHintHandlers,
+  registerEngagementHandlers,
+
+  // Engagement utilities (for use in other handlers)
+  processGameEndEngagement,
+  processLongWordEngagement,
+  processAchievementEngagement,
 
   // Shared utilities
   startGameTimer,

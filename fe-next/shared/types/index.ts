@@ -8,3 +8,6 @@ export * from './game';
 
 // Socket event types
 export * from './socket';
+
+// Engagement system types
+export * from './engagement';
