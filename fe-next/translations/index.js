@@ -370,6 +370,15 @@ const translations = {
         finalizing: 'Finalizing results...',
       },
     },
+    hints: {
+      hint: 'Hint',
+      getHint: 'Get Hint',
+      loading: 'Getting hint...',
+      noHints: 'No hints left',
+      letters: 'letters',
+      startsWith: 'Starts with:',
+      tapToDismiss: 'Tap to dismiss',
+    },
     achievementPopup: {
       unlocked: 'Achievement Unlocked!',
       tapToDismiss: 'Tap to dismiss',
@@ -1530,6 +1539,15 @@ const translations = {
         finalizing: 'מסיים תוצאות...',
       },
     },
+    hints: {
+      hint: 'רמז',
+      getHint: 'קבל רמז',
+      loading: 'מקבל רמז...',
+      noHints: 'אין רמזים נותרים',
+      letters: 'אותיות',
+      startsWith: 'מתחיל ב:',
+      tapToDismiss: 'הקש לסגירה',
+    },
     achievementPopup: {
       unlocked: 'הישג נפתח!',
       tapToDismiss: 'הקש לסגירה',
@@ -2683,6 +2701,15 @@ const translations = {
         scoring: 'Beräknar poäng...',
         finalizing: 'Slutför resultat...',
       },
+    },
+    hints: {
+      hint: 'Ledtråd',
+      getHint: 'Få ledtråd',
+      loading: 'Hämtar ledtråd...',
+      noHints: 'Inga ledtrådar kvar',
+      letters: 'bokstäver',
+      startsWith: 'Börjar med:',
+      tapToDismiss: 'Tryck för att stänga',
     },
     achievementPopup: {
       unlocked: 'Prestation upplåst!',
@@ -3839,6 +3866,15 @@ const translations = {
         scoring: 'スコアを計算中...',
         finalizing: '結果を確定中...',
       },
+    },
+    hints: {
+      hint: 'ヒント',
+      getHint: 'ヒントを得る',
+      loading: 'ヒント取得中...',
+      noHints: 'ヒント残りなし',
+      letters: '文字',
+      startsWith: '最初の文字:',
+      tapToDismiss: 'タップして閉じる',
     },
     achievementPopup: {
       unlocked: '実績解除！',

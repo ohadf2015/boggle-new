@@ -29,6 +29,29 @@ const MIN_CONFIDENCE_THRESHOLD = 85;
 
 const ThemedWordsResponseSchema = z.array(z.string());
 
+const HintResponseSchema = z.object({
+  hint: z.string(),
+  difficulty: z.enum(['easy', 'medium', 'hard']),
+});
+
+// =============================================================================
+// Token Usage Tracking
+// =============================================================================
+
+interface TokenUsageStats {
+  totalInputTokens: number;
+  totalOutputTokens: number;
+  requestCount: number;
+  lastReset: number;
+  estimatedCost: number; // in USD
+}
+
+// Gemini 1.5 Flash pricing (as of 2024): ~$0.075 per 1M input, ~$0.30 per 1M output
+const TOKEN_COSTS = {
+  input: 0.000000075,   // per token
+  output: 0.0000003,    // per token
+};
+
 // =============================================================================
 // Types
 // =============================================================================
@@ -62,6 +85,26 @@ interface CommunityWord {
   promoted_to_dictionary: boolean;
   first_approved_at: string;
 }
+
+interface HintRequest {
+  word: string;
+  language: string;
+  foundWords: string[];
+}
+
+interface HintResult {
+  hint: string;
+  hintType: 'definition' | 'firstLetter' | 'length' | 'category';
+  targetWord: string;
+  error?: string;
+}
+
+// Retry configuration
+const RETRY_CONFIG = {
+  maxRetries: 3,
+  baseDelayMs: 1000,
+  maxDelayMs: 8000,
+};
 
 // =============================================================================
 // Credential Parsing (Railway ENV-based)
@@ -156,8 +199,117 @@ class GameAIService {
   private initialized = false;
   private initError: Error | null = null;
 
+  // Token usage tracking
+  private tokenUsage: TokenUsageStats = {
+    totalInputTokens: 0,
+    totalOutputTokens: 0,
+    requestCount: 0,
+    lastReset: Date.now(),
+    estimatedCost: 0,
+  };
+
+  // Hint cache to avoid regenerating same hints
+  private hintCache: Map<string, { hint: HintResult; timestamp: number }> = new Map();
+  private readonly HINT_CACHE_TTL = 5 * 60 * 1000; // 5 minutes
+
   constructor() {
     // Lazy initialization - will be called on first use
+  }
+
+  // ===========================================================================
+  // Token Usage Tracking
+  // ===========================================================================
+
+  /**
+   * Track token usage from API response
+   */
+  private trackTokenUsage(inputTokens: number, outputTokens: number): void {
+    this.tokenUsage.totalInputTokens += inputTokens;
+    this.tokenUsage.totalOutputTokens += outputTokens;
+    this.tokenUsage.requestCount++;
+    this.tokenUsage.estimatedCost =
+      (this.tokenUsage.totalInputTokens * TOKEN_COSTS.input) +
+      (this.tokenUsage.totalOutputTokens * TOKEN_COSTS.output);
+  }
+
+  /**
+   * Get current token usage statistics
+   */
+  getTokenUsage(): TokenUsageStats {
+    return { ...this.tokenUsage };
+  }
+
+  /**
+   * Reset token usage statistics
+   */
+  resetTokenUsage(): void {
+    this.tokenUsage = {
+      totalInputTokens: 0,
+      totalOutputTokens: 0,
+      requestCount: 0,
+      lastReset: Date.now(),
+      estimatedCost: 0,
+    };
+  }
+
+  // ===========================================================================
+  // Retry Logic with Exponential Backoff
+  // ===========================================================================
+
+  /**
+   * Execute an async function with retry logic
+   */
+  private async withRetry<T>(
+    operation: () => Promise<T>,
+    operationName: string
+  ): Promise<T> {
+    let lastError: Error | null = null;
+
+    for (let attempt = 0; attempt < RETRY_CONFIG.maxRetries; attempt++) {
+      try {
+        return await operation();
+      } catch (error) {
+        lastError = error as Error;
+        const isRetryable = this.isRetryableError(error);
+
+        if (!isRetryable || attempt === RETRY_CONFIG.maxRetries - 1) {
+          console.error(`[GameAIService] ${operationName} failed after ${attempt + 1} attempts:`, error);
+          throw error;
+        }
+
+        const delay = Math.min(
+          RETRY_CONFIG.baseDelayMs * Math.pow(2, attempt),
+          RETRY_CONFIG.maxDelayMs
+        );
+
+        console.warn(`[GameAIService] ${operationName} attempt ${attempt + 1} failed, retrying in ${delay}ms`);
+        await this.sleep(delay);
+      }
+    }
+
+    throw lastError;
+  }
+
+  /**
+   * Check if an error is retryable (network errors, rate limits, etc.)
+   */
+  private isRetryableError(error: unknown): boolean {
+    if (error instanceof Error) {
+      const message = error.message.toLowerCase();
+      return (
+        message.includes('network') ||
+        message.includes('timeout') ||
+        message.includes('rate limit') ||
+        message.includes('429') ||
+        message.includes('503') ||
+        message.includes('unavailable')
+      );
+    }
+    return false;
+  }
+
+  private sleep(ms: number): Promise<void> {
+    return new Promise(resolve => setTimeout(resolve, ms));
   }
 
   /**
@@ -582,6 +734,206 @@ Example responses for ${languageName}:
   }
 
   // ===========================================================================
+  // Feature C: AI Hints for Single Player Mode
+  // ===========================================================================
+
+  /**
+   * Generate a hint for a word the player hasn't found yet.
+   * Uses AI to create engaging, helpful hints without giving away the answer.
+   *
+   * @param targetWord - The word to generate a hint for
+   * @param language - Language code
+   * @param hintLevel - Difficulty level (1=easy/vague, 2=medium, 3=hard/specific)
+   * @returns HintResult with the generated hint
+   */
+  async generateHint(
+    targetWord: string,
+    language: string = 'en',
+    hintLevel: 1 | 2 | 3 = 2
+  ): Promise<HintResult> {
+    await this.initialize();
+
+    if (!this.model) {
+      return {
+        hint: `The word has ${targetWord.length} letters`,
+        hintType: 'length',
+        targetWord,
+        error: 'AI not initialized',
+      };
+    }
+
+    // Check cache first
+    const cacheKey = `${targetWord}:${language}:${hintLevel}`;
+    const cached = this.hintCache.get(cacheKey);
+    if (cached && Date.now() - cached.timestamp < this.HINT_CACHE_TTL) {
+      return cached.hint;
+    }
+
+    const languageNames: Record<string, string> = {
+      en: 'English',
+      he: 'Hebrew',
+      sv: 'Swedish',
+      es: 'Spanish',
+      fr: 'French',
+      de: 'German',
+    };
+
+    const languageName = languageNames[language] || 'English';
+    const firstLetter = targetWord[0].toUpperCase();
+    const wordLength = targetWord.length;
+
+    // Optimized prompt - concise to reduce tokens
+    const prompt = `Give a short hint for the ${languageName} word "${targetWord}" in a word game.
+
+Hint level: ${hintLevel === 1 ? 'vague' : hintLevel === 2 ? 'moderate' : 'specific'}
+
+Rules:
+- Max 15 words
+- In ${languageName}
+- Don't use the word itself
+- Don't use rhymes
+
+Respond JSON only: {"hint":"your hint","difficulty":"${hintLevel === 1 ? 'easy' : hintLevel === 2 ? 'medium' : 'hard'}"}`;
+
+    try {
+      const result = await this.withRetry(async () => {
+        const response = await this.model!.generateContent(prompt);
+        return response;
+      }, 'generateHint');
+
+      const response = result.response;
+      const text = response.candidates?.[0]?.content?.parts?.[0]?.text || '';
+
+      // Track token usage (estimate based on content length)
+      const inputTokens = Math.ceil(prompt.length / 4);
+      const outputTokens = Math.ceil(text.length / 4);
+      this.trackTokenUsage(inputTokens, outputTokens);
+
+      // Extract JSON
+      const jsonMatch = text.match(/\{[\s\S]*\}/);
+      if (!jsonMatch) {
+        // Fallback to basic hint
+        const fallbackHint: HintResult = {
+          hint: `${wordLength}-letter word starting with "${firstLetter}"`,
+          hintType: 'firstLetter',
+          targetWord,
+        };
+        return fallbackHint;
+      }
+
+      const parsed = JSON.parse(jsonMatch[0]);
+      const validated = HintResponseSchema.parse(parsed);
+
+      const hintResult: HintResult = {
+        hint: validated.hint,
+        hintType: 'definition',
+        targetWord,
+      };
+
+      // Cache the result
+      this.hintCache.set(cacheKey, { hint: hintResult, timestamp: Date.now() });
+
+      return hintResult;
+    } catch (error) {
+      console.error('[GameAIService] generateHint error:', error);
+
+      // Return graceful fallback
+      return {
+        hint: `Look for a ${wordLength}-letter word starting with "${firstLetter}"`,
+        hintType: 'firstLetter',
+        targetWord,
+        error: error instanceof Error ? error.message : 'Unknown error',
+      };
+    }
+  }
+
+  /**
+   * Generate a simple hint without AI (faster, no API call)
+   * Used when AI is unavailable or for rate limiting
+   */
+  generateSimpleHint(
+    targetWord: string,
+    hintLevel: 1 | 2 | 3 = 2
+  ): HintResult {
+    const length = targetWord.length;
+    const firstLetter = targetWord[0].toUpperCase();
+    const lastLetter = targetWord[targetWord.length - 1].toUpperCase();
+
+    let hint: string;
+    let hintType: HintResult['hintType'];
+
+    switch (hintLevel) {
+      case 1: // Easy - just length
+        hint = `There's a ${length}-letter word you haven't found`;
+        hintType = 'length';
+        break;
+      case 2: // Medium - length + first letter
+        hint = `Look for a ${length}-letter word starting with "${firstLetter}"`;
+        hintType = 'firstLetter';
+        break;
+      case 3: // Hard - length + first + last letter
+        hint = `${length} letters: "${firstLetter}" ... "${lastLetter}"`;
+        hintType = 'firstLetter';
+        break;
+      default:
+        hint = `There's a ${length}-letter word available`;
+        hintType = 'length';
+    }
+
+    return {
+      hint,
+      hintType,
+      targetWord,
+    };
+  }
+
+  /**
+   * Get a hint for a random unfound word
+   * Used by the hint handler to pick a word and generate hint
+   */
+  async getHintForUnfoundWord(
+    availableWords: string[],
+    foundWords: string[],
+    language: string = 'en',
+    preferLonger: boolean = true
+  ): Promise<HintResult | null> {
+    // Filter out already found words
+    const unfoundWords = availableWords.filter(
+      w => !foundWords.includes(w.toLowerCase())
+    );
+
+    if (unfoundWords.length === 0) {
+      return null;
+    }
+
+    // Sort by length if preferring longer words (more points)
+    if (preferLonger) {
+      unfoundWords.sort((a, b) => b.length - a.length);
+    }
+
+    // Pick from top candidates (longer words)
+    const candidates = unfoundWords.slice(0, Math.min(10, unfoundWords.length));
+    const targetWord = candidates[Math.floor(Math.random() * candidates.length)];
+
+    // Determine hint level based on word length
+    const hintLevel: 1 | 2 | 3 = targetWord.length <= 4 ? 1 : targetWord.length <= 6 ? 2 : 3;
+
+    // Try AI hint, fall back to simple hint
+    try {
+      return await this.generateHint(targetWord, language, hintLevel);
+    } catch {
+      return this.generateSimpleHint(targetWord, hintLevel);
+    }
+  }
+
+  /**
+   * Clear the hint cache
+   */
+  clearHintCache(): void {
+    this.hintCache.clear();
+  }
+
+  // ===========================================================================
   // Utility Methods
   // ===========================================================================
 
@@ -644,7 +996,7 @@ Example responses for ${languageName}:
 export const gameAIService = new GameAIService();
 
 // Export types for consumers
-export type { WordValidationResult, CommunityWord };
+export type { WordValidationResult, CommunityWord, HintResult, TokenUsageStats };
 
 // Export class for testing
 export { GameAIService };

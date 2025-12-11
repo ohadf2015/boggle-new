@@ -25,6 +25,7 @@ const { validateWordsWithAI, isAIServiceAvailable } = require('../modules/aiVali
 const timerManager = require('../utils/timerManager');
 const tournamentManager = require('../modules/tournamentManager');
 const botManager = require('../modules/botManager');
+const { clearGameHintState } = require('./hintHandler');
 const logger = require('../utils/logger');
 
 /**
@@ -107,6 +108,9 @@ async function endGame(io, gameCode) {
 
   // Clean up AI validation tracking
   cleanupGameTracking(gameCode);
+
+  // Clear hint state for this game
+  clearGameHintState(gameCode);
 
   // Transition game state using state machine (guards against invalid transitions)
   const transitionResult = transitionGameState(gameCode, 'END', { immediate: true });

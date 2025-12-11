@@ -13,11 +13,28 @@ import CircularTimer from '../../components/CircularTimer';
 import RoomChat from '../../components/RoomChat';
 import TournamentStandings from '../../components/TournamentStandings';
 import Avatar from '../../components/Avatar';
+import HintButton from '../../components/HintButton';
 import { applyHebrewFinalLetters } from '../../utils/utils';
 import { wordErrorToast } from '../../components/NeoToast';
 import { useSoundEffects } from '../../contexts/SoundEffectsContext';
 import { validateWordLocally, couldBeOnBoard } from '../../utils/clientWordValidator';
 import type { LetterGrid, Language, Avatar as AvatarType, TournamentStanding } from '@/shared/types/game';
+
+// ==================== Hint Types ====================
+
+interface HintsState {
+  hint: string | null;
+  hintType: 'definition' | 'firstLetter' | 'length' | 'category' | null;
+  hintsRemaining: number;
+  wordLength?: number;
+  firstLetter?: string;
+  isLoading: boolean;
+  error: string | null;
+  isAvailable: boolean;
+  isSinglePlayer: boolean;
+  requestHint: () => void;
+  clearHint: () => void;
+}
 
 // ==================== Type Definitions ====================
 
@@ -81,6 +98,9 @@ interface PlayerInGameViewProps {
   onConfirmExit: () => void;
   onWordSubmit: (word: string) => void;
   setWord: (word: string) => void;
+
+  // Hints (single-player mode)
+  hints?: HintsState;
 }
 
 // ==================== Component ====================
@@ -127,6 +147,9 @@ const PlayerInGameView = memo<PlayerInGameViewProps>(({
   onConfirmExit,
   onWordSubmit,
   setWord,
+
+  // Hints
+  hints,
 }): React.ReactElement => {
   const wordListRef = useRef<HTMLDivElement | null>(null);
   const { playWordAcceptedSound } = useSoundEffects();
@@ -203,6 +226,25 @@ const PlayerInGameView = memo<PlayerInGameViewProps>(({
       {/* Top Bar */}
       <div className="w-full max-w-7xl mx-auto flex items-center justify-between mb-1">
         <ExitRoomButton onClick={onExitRoom} label={t('playerView.exit')} className="relative z-50" />
+
+        {/* Hint Button - Single Player Mode Only */}
+        {hints && hints.isSinglePlayer && (
+          <HintButton
+            hint={hints.hint}
+            hintType={hints.hintType}
+            hintsRemaining={hints.hintsRemaining}
+            wordLength={hints.wordLength}
+            firstLetter={hints.firstLetter}
+            isLoading={hints.isLoading}
+            error={hints.error}
+            isAvailable={hints.isAvailable}
+            isSinglePlayer={hints.isSinglePlayer}
+            gameActive={gameActive}
+            onRequestHint={hints.requestHint}
+            onClearHint={hints.clearHint}
+            t={t}
+          />
+        )}
       </div>
 
       {/* Timer */}

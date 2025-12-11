@@ -9,6 +9,7 @@ import { useMusic } from '../contexts/MusicContext';
 import { useSoundEffects } from '../contexts/SoundEffectsContext';
 import { useAchievementQueue } from '../components/achievements';
 import { usePresence } from '../hooks/usePresence';
+import { useHints } from '../hooks/useHints';
 import logger from '@/utils/logger';
 import type { LetterGrid, Language, Avatar, GridPosition, TournamentStanding } from '@/types';
 
@@ -130,6 +131,16 @@ const PlayerView: React.FC<PlayerViewProps> = memo(({
 
   // Enable presence tracking
   usePresence({ enabled: !!gameCode });
+
+  // Calculate human player count (exclude bots)
+  const humanPlayerCount = playersReady.filter(p => !p.isBot && !p.disconnected).length;
+
+  // Enable hints for single-player mode
+  const hints = useHints({
+    socket,
+    playerCount: humanPlayerCount,
+    gameActive,
+  });
 
   // Game state
   const [word, setWord] = useState<string>('');
@@ -483,6 +494,7 @@ const PlayerView: React.FC<PlayerViewProps> = memo(({
         onConfirmExit={confirmExitRoom}
         onWordSubmit={handleWordSubmit}
         setWord={setWord}
+        hints={hints}
       />
     </>
   );

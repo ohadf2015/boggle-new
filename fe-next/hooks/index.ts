@@ -13,6 +13,7 @@ export { useSafeTimeout } from './useSafeTimeout';
 export { usePresence } from './usePresence';
 export { useValidation } from './useValidation';
 export { useWinStreak } from './useWinStreak';
+export { useHints } from './useHints';
 
 // Data hooks (Supabase realtime)
 export {
