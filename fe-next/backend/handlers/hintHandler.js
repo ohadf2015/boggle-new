@@ -1,0 +1,281 @@
+/**
+ * Hint Handler
+ * Provides AI-powered hints for single-player mode.
+ *
+ * Features:
+ * - Only available when 1 human player in room (bots don't count)
+ * - Limited hints per game (default: 3)
+ * - Uses boggleSolver to find available words, AI for hint generation
+ */
+
+const {
+  getGame,
+  getGameBySocketId,
+  getUsernameBySocketId,
+} = require('../modules/gameStateManager');
+
+const { findWordsForBots, getCachedTrie } = require('../modules/boggleSolver');
+const { safeEmit } = require('../utils/socketHelpers');
+const { checkRateLimit } = require('../utils/rateLimiter');
+const logger = require('../utils/logger');
+
+// Configuration
+const HINTS_PER_GAME = 3;
+const HINT_COOLDOWN_MS = 10000; // 10 seconds between hints
+
+// Track hints per game: gameCode -> { hintsUsed: number, lastHintTime: number }
+const gameHintState = new Map();
+
+/**
+ * Check if hints are available for this game/player
+ */
+function canUseHint(gameCode, game) {
+  // Must be in active game
+  if (game.gameState !== 'in-progress') {
+    return { available: false, reason: 'Game not in progress' };
+  }
+
+  // Count human players (exclude bots)
+  const humanPlayers = Object.values(game.users).filter(u => !u.isBot && !u.disconnected);
+  if (humanPlayers.length > 1) {
+    return { available: false, reason: 'Hints only available in single-player mode' };
+  }
+
+  // Check hint limit
+  const hintState = gameHintState.get(gameCode) || { hintsUsed: 0, lastHintTime: 0 };
+  if (hintState.hintsUsed >= HINTS_PER_GAME) {
+    return { available: false, reason: 'No hints remaining' };
+  }
+
+  // Check cooldown
+  const now = Date.now();
+  if (now - hintState.lastHintTime < HINT_COOLDOWN_MS) {
+    const waitTime = Math.ceil((HINT_COOLDOWN_MS - (now - hintState.lastHintTime)) / 1000);
+    return { available: false, reason: `Wait ${waitTime}s for next hint` };
+  }
+
+  return {
+    available: true,
+    hintsRemaining: HINTS_PER_GAME - hintState.hintsUsed,
+  };
+}
+
+/**
+ * Get available words on the current board that player hasn't found
+ */
+function getUnfoundWords(game, username) {
+  if (!game.letterGrid) return [];
+
+  const language = game.language || 'en';
+  const minLength = game.minWordLength || 3;
+
+  // Get all valid words on board using boggleSolver
+  const wordsResult = findWordsForBots(game.letterGrid, language, { minLength });
+
+  // Combine all difficulty levels
+  const allWords = [
+    ...wordsResult.easy,
+    ...wordsResult.medium,
+    ...wordsResult.hard,
+  ];
+
+  // Filter out words player already found
+  const playerWords = game.playerWords?.[username] || [];
+  const foundWordsLower = playerWords.map(w => w.toLowerCase());
+
+  const unfoundWords = allWords.filter(
+    word => !foundWordsLower.includes(word.toLowerCase())
+  );
+
+  return unfoundWords;
+}
+
+/**
+ * Generate a hint for an unfound word
+ * Uses AI if available, falls back to simple hints
+ */
+async function generateHintForWord(targetWord, language) {
+  const length = targetWord.length;
+  const firstLetter = targetWord[0].toUpperCase();
+  const lastLetter = targetWord[targetWord.length - 1].toUpperCase();
+
+  // Try to use AI service if available
+  try {
+    // Dynamic import to avoid circular dependencies
+    const aiServicePath = require.resolve('../../lib/ai-service');
+    delete require.cache[aiServicePath]; // Clear cache for fresh import
+
+    // Try importing the AI service
+    const { gameAIService } = await import('../../lib/ai-service.js');
+
+    if (await gameAIService.isConfigured()) {
+      const hintLevel = length <= 4 ? 1 : length <= 6 ? 2 : 3;
+      const result = await gameAIService.generateHint(targetWord, language, hintLevel);
+
+      return {
+        hint: result.hint,
+        hintType: result.hintType,
+        wordLength: length,
+        firstLetter: firstLetter,
+      };
+    }
+  } catch (error) {
+    logger.debug('HINT', `AI hint unavailable, using simple hint: ${error.message}`);
+  }
+
+  // Fallback: Simple hint without AI
+  // Pick random hint type for variety
+  const hintTypes = [
+    {
+      hint: `Look for a ${length}-letter word starting with "${firstLetter}"`,
+      hintType: 'firstLetter',
+    },
+    {
+      hint: `There's a ${length}-letter word you haven't found yet`,
+      hintType: 'length',
+    },
+    {
+      hint: `${length} letters: starts with "${firstLetter}", ends with "${lastLetter}"`,
+      hintType: 'firstLetter',
+    },
+  ];
+
+  const selected = hintTypes[Math.floor(Math.random() * hintTypes.length)];
+
+  return {
+    hint: selected.hint,
+    hintType: selected.hintType,
+    wordLength: length,
+    firstLetter: firstLetter,
+  };
+}
+
+/**
+ * Register hint socket event handlers
+ * @param {Server} io - Socket.IO server instance
+ * @param {Socket} socket - Socket.IO socket instance
+ */
+function registerHintHandlers(io, socket) {
+
+  socket.on('requestHint', async () => {
+    // Rate limiting
+    if (!checkRateLimit(socket.id)) {
+      socket.emit('rateLimited');
+      return;
+    }
+
+    const gameCode = getGameBySocketId(socket.id);
+    if (!gameCode) {
+      safeEmit(socket, 'hintError', {
+        message: 'Not in a game',
+        code: 'NOT_IN_GAME',
+      });
+      return;
+    }
+
+    const game = getGame(gameCode);
+    if (!game) {
+      safeEmit(socket, 'hintError', {
+        message: 'Game not found',
+        code: 'GAME_NOT_FOUND',
+      });
+      return;
+    }
+
+    const username = getUsernameBySocketId(socket.id);
+    if (!username) {
+      safeEmit(socket, 'hintError', {
+        message: 'Player not found',
+        code: 'PLAYER_NOT_FOUND',
+      });
+      return;
+    }
+
+    // Check if hints are available
+    const hintCheck = canUseHint(gameCode, game);
+    if (!hintCheck.available) {
+      safeEmit(socket, 'hintError', {
+        message: hintCheck.reason,
+        code: 'HINT_UNAVAILABLE',
+      });
+      return;
+    }
+
+    // Get unfound words
+    const unfoundWords = getUnfoundWords(game, username);
+    if (unfoundWords.length === 0) {
+      safeEmit(socket, 'hintError', {
+        message: 'No more words to hint!',
+        code: 'NO_WORDS_LEFT',
+      });
+      return;
+    }
+
+    // Sort by length (prefer longer words = more points)
+    unfoundWords.sort((a, b) => b.length - a.length);
+
+    // Pick from top 10 longest words randomly for variety
+    const topCandidates = unfoundWords.slice(0, Math.min(10, unfoundWords.length));
+    const targetWord = topCandidates[Math.floor(Math.random() * topCandidates.length)];
+
+    logger.info('HINT', `Generating hint for "${targetWord}" (${unfoundWords.length} unfound words)`);
+
+    try {
+      // Generate hint
+      const hintData = await generateHintForWord(targetWord, game.language || 'en');
+
+      // Update hint state
+      const hintState = gameHintState.get(gameCode) || { hintsUsed: 0, lastHintTime: 0 };
+      hintState.hintsUsed++;
+      hintState.lastHintTime = Date.now();
+      gameHintState.set(gameCode, hintState);
+
+      const hintsRemaining = HINTS_PER_GAME - hintState.hintsUsed;
+
+      // Send hint to player
+      safeEmit(socket, 'hintResponse', {
+        hint: hintData.hint,
+        hintType: hintData.hintType,
+        hintsRemaining,
+        wordLength: hintData.wordLength,
+        firstLetter: hintData.firstLetter,
+      });
+
+      logger.info('HINT', `Sent hint to ${username} (${hintsRemaining} remaining)`);
+
+    } catch (error) {
+      logger.error('HINT', 'Failed to generate hint', error);
+      safeEmit(socket, 'hintError', {
+        message: 'Failed to generate hint',
+        code: 'HINT_ERROR',
+      });
+    }
+  });
+}
+
+/**
+ * Clear hint state for a game (call on game reset/end)
+ */
+function clearGameHintState(gameCode) {
+  gameHintState.delete(gameCode);
+}
+
+/**
+ * Get current hint state for a game
+ */
+function getGameHintState(gameCode) {
+  const state = gameHintState.get(gameCode) || { hintsUsed: 0, lastHintTime: 0 };
+  return {
+    ...state,
+    hintsRemaining: HINTS_PER_GAME - state.hintsUsed,
+    maxHints: HINTS_PER_GAME,
+  };
+}
+
+module.exports = {
+  registerHintHandlers,
+  clearGameHintState,
+  getGameHintState,
+  canUseHint,
+  HINTS_PER_GAME,
+};

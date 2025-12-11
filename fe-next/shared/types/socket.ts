@@ -58,6 +58,19 @@ export interface ClientToServerEvents {
   // Host events
   hostKeepAlive: () => void;
   hostReactivate: () => void;
+
+  // Hint events (single-player mode)
+  requestHint: () => void;
+}
+
+// ==================== Hint Types ====================
+
+export interface HintPayload {
+  hint: string;
+  hintType: 'definition' | 'firstLetter' | 'length' | 'category';
+  hintsRemaining: number;
+  wordLength?: number;
+  firstLetter?: string;
 }
 
 // ==================== Server → Client Events ====================
@@ -135,6 +148,11 @@ export interface ServerToClientEvents {
   hostDisconnected: (data: { message: string; gracePeriodMs: number }) => void;
   hostLeftRoomClosing: (data: { message: string }) => void;
   hostReactivated: (data: { success: boolean }) => void;
+
+  // Hint events (single-player mode)
+  hintResponse: (data: HintPayload) => void;
+  hintError: (data: { message: string; code?: string }) => void;
+  hintAvailable: (data: { available: boolean; hintsRemaining: number }) => void;
 }
 
 // ==================== Payload Types ====================

@@ -12,6 +12,7 @@ const { registerTournamentHandlers } = require('./tournamentHandler');
 const { registerPresenceHandlers, startConnectionHealthCheck } = require('./presenceHandler');
 const { registerHostHandlers } = require('./hostHandler');
 const { registerConnectionHandlers } = require('./connectionHandler');
+const { registerHintHandlers } = require('./hintHandler');
 const {
   startGameTimer,
   endGame,
@@ -33,6 +34,7 @@ function registerAllHandlers(io, socket) {
   registerPresenceHandlers(io, socket);
   registerHostHandlers(io, socket);
   registerConnectionHandlers(io, socket);
+  registerHintHandlers(io, socket);
 }
 
 module.exports = {
@@ -48,6 +50,7 @@ module.exports = {
   registerPresenceHandlers,
   registerHostHandlers,
   registerConnectionHandlers,
+  registerHintHandlers,
 
   // Shared utilities
   startGameTimer,
