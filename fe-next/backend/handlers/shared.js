@@ -11,6 +11,7 @@ const { calculatePlayerTitles } = require('../modules/playerTitlesManager');
 const { isDictionaryWord, addApprovedWord } = require('../dictionary');
 const { processGameResults, isSupabaseConfigured } = require('../modules/supabaseServer');
 const { invalidateLeaderboardCaches, incrementWordApproval } = require('../redisClient');
+const { processGameEndEngagement, processAchievementEngagement } = require('./engagementHandler');
 const {
   collectNonDictionaryWords,
   getWordsForPlayer,
@@ -390,7 +391,7 @@ async function calculateAndBroadcastFinalScores(io, gameCode) {
 }
 
 /**
- * Record game results to Supabase
+ * Record game results to Supabase and emit XP/engagement events
  */
 async function recordGameResultsToSupabase(io, gameCode, scoresArray, game) {
   try {
@@ -413,6 +414,71 @@ async function recordGameResultsToSupabase(io, gameCode, scoresArray, game) {
 
     const results = await processGameResults(gameCode, scoresArray, gameInfo, userAuthMap);
     logger.info('SUPABASE', `Game ${gameCode} results recorded`);
+
+    // Emit XP events to each player
+    if (results.xpResults) {
+      for (const [username, xpInfo] of Object.entries(results.xpResults)) {
+        if (xpInfo.socketId) {
+          const playerSocket = getSocketById(io, xpInfo.socketId);
+          if (playerSocket) {
+            // Emit XP gained event
+            safeEmit(playerSocket, 'xpGained', {
+              xpEarned: xpInfo.xpEarned,
+              xpBreakdown: xpInfo.xpBreakdown,
+              newTotalXp: xpInfo.newTotalXp,
+              newLevel: xpInfo.newLevel,
+            });
+            logger.debug('XP', `Emitted xpGained to ${username}: +${xpInfo.xpEarned} XP`);
+
+            // Emit level up event if applicable
+            if (xpInfo.leveledUp) {
+              safeEmit(playerSocket, 'levelUp', {
+                oldLevel: xpInfo.oldLevel,
+                newLevel: xpInfo.newLevel,
+                levelsGained: xpInfo.levelsGained,
+                newTitles: xpInfo.newTitles || [],
+              });
+              logger.info('XP', `Emitted levelUp to ${username}: ${xpInfo.oldLevel} -> ${xpInfo.newLevel}`);
+            }
+          }
+        }
+      }
+    }
+
+    // Process engagement events for each player
+    const playerCount = scoresArray.length;
+    const sortedScores = [...scoresArray].sort((a, b) => b.totalScore - a.totalScore);
+    const winnerUsername = sortedScores[0]?.username;
+
+    for (const playerResult of scoresArray) {
+      const userData = game.users?.[playerResult.username];
+      if (!userData) continue;
+
+      const playerSocket = getSocketById(io, userData.socketId);
+      const playerId = userData.authUserId;
+
+      // Build game stats for engagement processing
+      const gameStats = {
+        score: playerResult.totalScore || 0,
+        wordCount: playerResult.wordDetails?.length || 0,
+        longestWord: playerResult.wordDetails?.reduce((max, w) =>
+          (w.word?.length || 0) > (max?.length || 0) ? w.word : max, '') || '',
+        isWinner: playerResult.username === winnerUsername && playerCount > 1,
+        placement: sortedScores.findIndex(p => p.username === playerResult.username) + 1,
+        playerCount,
+        achievements: playerResult.achievements?.map(a => a.key) || [],
+      };
+
+      // Process engagement (daily challenges, near-misses, mystery rewards)
+      if (playerSocket && playerId) {
+        await processGameEndEngagement(playerSocket, playerId, gameStats, gameCode);
+
+        // Process achievement engagement for mystery rewards
+        for (const achievement of (playerResult.achievements || [])) {
+          await processAchievementEngagement(playerSocket, playerId, achievement.key, gameCode);
+        }
+      }
+    }
 
     // Invalidate leaderboard caches
     await invalidateLeaderboardCaches();
