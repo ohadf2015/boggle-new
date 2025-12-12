@@ -150,11 +150,11 @@ function registerBotHandlers(io, socket) {
     }
 
     // Find bot by ID or username
+    const bots = botManager.getGameBots(gameCode);
     let botToRemove = null;
     if (botId) {
-      botToRemove = botManager.getBot(botId);
+      botToRemove = bots.find(b => b.id === botId);
     } else if (botUsername) {
-      const bots = botManager.getGameBots(gameCode);
       botToRemove = bots.find(b => b.username === botUsername);
     }
 
