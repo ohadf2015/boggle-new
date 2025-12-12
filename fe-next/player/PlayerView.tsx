@@ -444,21 +444,23 @@ const PlayerView: React.FC<PlayerViewProps> = memo(({
     }
 
     return (
-      <PlayerWaitingView
-        gameCode={gameCode}
-        gameLanguage={gameLanguage}
-        username={username}
-        t={t}
-        playersReady={playersReady}
-        shufflingGrid={shufflingGrid}
-        highlightedCells={highlightedCells}
-        showQR={showQR}
-        setShowQR={setShowQR}
-        showExitConfirm={showExitConfirm}
-        setShowExitConfirm={setShowExitConfirm}
-        onExitRoom={handleExitRoom}
-        onConfirmExit={confirmExitRoom}
-      />
+      <div className="min-h-screen bg-gradient-to-b from-slate-50 via-slate-100 to-slate-200 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 flex flex-col items-center p-2 sm:p-4 md:p-6 lg:p-8 overflow-auto transition-colors duration-300">
+        <PlayerWaitingView
+          gameCode={gameCode}
+          gameLanguage={gameLanguage}
+          username={username}
+          t={t}
+          playersReady={playersReady}
+          shufflingGrid={shufflingGrid}
+          highlightedCells={highlightedCells}
+          showQR={showQR}
+          setShowQR={setShowQR}
+          showExitConfirm={showExitConfirm}
+          setShowExitConfirm={setShowExitConfirm}
+          onExitRoom={handleExitRoom}
+          onConfirmExit={confirmExitRoom}
+        />
+      </div>
     );
   }
 

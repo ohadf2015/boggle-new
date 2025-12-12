@@ -4,7 +4,7 @@
  * one-more-game prompts, and variable ratio mystery rewards
  */
 
-const { createClient } = require('./supabaseServer');
+const { getSupabase } = require('./supabaseServer');
 
 // ==================== STREAK SYSTEM ====================
 
@@ -23,7 +23,7 @@ const STREAK_BONUSES = {
  * @returns {Promise<Object>} - Streak info and any rewards
  */
 async function recordLogin(playerId) {
-  const supabase = createClient();
+  const supabase = getSupabase();
   const today = new Date().toISOString().split('T')[0];
 
   // Get or create engagement record
@@ -198,7 +198,7 @@ const CALENDAR_REWARDS = [
  * Get calendar status for player
  */
 async function getCalendarStatus(playerId) {
-  const supabase = createClient();
+  const supabase = getSupabase();
   const now = new Date();
   const currentMonth = now.getMonth() + 1;
   const currentYear = now.getFullYear();
@@ -248,7 +248,7 @@ async function getCalendarStatus(playerId) {
  * Claim calendar reward for today
  */
 async function claimCalendarReward(playerId) {
-  const supabase = createClient();
+  const supabase = getSupabase();
   const status = await getCalendarStatus(playerId);
 
   if (!status.canClaimToday) {
@@ -282,7 +282,7 @@ async function claimCalendarReward(playerId) {
  * Apply a reward to player
  */
 async function applyReward(playerId, reward) {
-  const supabase = createClient();
+  const supabase = getSupabase();
 
   switch (reward.type) {
     case 'xp':
@@ -331,7 +331,7 @@ const COMEBACK_TIERS = [
  * Check and apply come-back bonuses
  */
 async function checkComebackBonus(playerId) {
-  const supabase = createClient();
+  const supabase = getSupabase();
 
   const { data: engagement } = await supabase
     .from('player_engagement')
@@ -380,7 +380,7 @@ async function checkComebackBonus(playerId) {
  * Claim come-back bonus
  */
 async function claimComebackBonus(playerId) {
-  const supabase = createClient();
+  const supabase = getSupabase();
   const bonusInfo = await checkComebackBonus(playerId);
 
   if (!bonusInfo.eligible) {
@@ -703,7 +703,7 @@ async function rollMysteryBox(playerId, rarity) {
  * Log mystery reward to database
  */
 async function logMysteryReward(playerId, gameCode, reward) {
-  const supabase = createClient();
+  const supabase = getSupabase();
 
   await supabase.from('mystery_rewards_log').insert({
     player_id: playerId,
@@ -724,7 +724,7 @@ function getDaysInMonth(month, year) {
  * Get full engagement status for a player
  */
 async function getEngagementStatus(playerId) {
-  const supabase = createClient();
+  const supabase = getSupabase();
 
   const { data: engagement } = await supabase
     .from('player_engagement')

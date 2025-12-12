@@ -3,7 +3,7 @@
  * Generates and tracks daily challenges for player engagement
  */
 
-const { createClient } = require('./supabaseServer');
+const { getSupabase } = require('./supabaseServer');
 
 // Challenge type definitions
 const CHALLENGE_TYPES = {
@@ -86,7 +86,7 @@ const CHALLENGE_TEMPLATES = {
  * @returns {Promise<Array>} - Array of generated challenges
  */
 async function generateDailyChallenges(playerId) {
-  const supabase = createClient();
+  const supabase = getSupabase();
   const today = new Date().toISOString().split('T')[0];
 
   // Check if challenges already exist for today
@@ -149,7 +149,7 @@ async function generateDailyChallenges(playerId) {
  * @returns {Promise<Object>} - Updated challenges and any completions
  */
 async function updateChallengeProgress(playerId, gameStats) {
-  const supabase = createClient();
+  const supabase = getSupabase();
   const today = new Date().toISOString().split('T')[0];
 
   // Get today's challenges
@@ -254,7 +254,7 @@ async function updateChallengeProgress(playerId, gameStats) {
  * @returns {Promise<Object>} - Reward details
  */
 async function claimChallengeReward(playerId, challengeId) {
-  const supabase = createClient();
+  const supabase = getSupabase();
 
   // Get the challenge
   const { data: challenge, error: fetchError } = await supabase
@@ -322,7 +322,7 @@ async function claimChallengeReward(playerId, challengeId) {
  * @returns {Promise<Array>} - Today's challenges
  */
 async function getTodaysChallenges(playerId) {
-  const supabase = createClient();
+  const supabase = getSupabase();
   const today = new Date().toISOString().split('T')[0];
 
   // First, ensure challenges exist
@@ -369,7 +369,7 @@ function shuffleArray(array) {
  * @returns {Promise<Object>} - Completion stats
  */
 async function getChallengeStats(playerId) {
-  const supabase = createClient();
+  const supabase = getSupabase();
 
   const { data: completed } = await supabase
     .from('daily_challenges')
