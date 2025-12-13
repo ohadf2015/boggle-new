@@ -337,15 +337,17 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
                 {/* Load Google Fonts at runtime */}
                 <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Rubik:wght@400;500;600;700&display=swap" rel="stylesheet" />
                 {/* Favicon and icons with absolute URLs for better Google crawlability */}
+                {/* SVG favicon for modern browsers (scalable, crisp at any size) */}
                 <link rel="icon" href="https://www.lexiclash.live/favicon.svg" type="image/svg+xml" />
+                {/* ICO fallback for older browsers - contains 16x16, 32x32, 48x48 */}
                 <link rel="icon" href="https://www.lexiclash.live/favicon.ico" sizes="48x48 32x32 16x16" type="image/x-icon" />
-                <link rel="shortcut icon" href="https://www.lexiclash.live/favicon.ico" type="image/x-icon" />
-                <link rel="icon" type="image/png" sizes="16x16" href="https://www.lexiclash.live/icon-48.png" />
-                <link rel="icon" type="image/png" sizes="32x32" href="https://www.lexiclash.live/icon-48.png" />
+                {/* PNG icons at Google-recommended sizes (multiples of 48px) */}
                 <link rel="icon" type="image/png" sizes="48x48" href="https://www.lexiclash.live/icon-48.png" />
                 <link rel="icon" type="image/png" sizes="96x96" href="https://www.lexiclash.live/icon-96.png" />
+                <link rel="icon" type="image/png" sizes="144x144" href="https://www.lexiclash.live/icon-144.png" />
                 <link rel="icon" type="image/png" sizes="192x192" href="https://www.lexiclash.live/icon-192.png" />
                 <link rel="icon" type="image/png" sizes="512x512" href="https://www.lexiclash.live/icon-512.png" />
+                {/* Apple touch icons for iOS devices */}
                 <link rel="apple-touch-icon" sizes="180x180" href="https://www.lexiclash.live/apple-touch-icon.png" />
                 <link rel="apple-touch-icon" sizes="152x152" href="https://www.lexiclash.live/icon-144.png" />
                 <link rel="apple-touch-icon" sizes="144x144" href="https://www.lexiclash.live/icon-144.png" />
