@@ -8,22 +8,24 @@ const { calculateGameXp, getLevelFromXp, checkLevelUp, getTitleForLevel } = requ
 const logger = require('../utils/logger');
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+// Use service role key to bypass RLS for server-side operations
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
 // Log configuration status at startup
-logger.info('SUPABASE', `Configuration status: URL=${!!supabaseUrl}, AnonKey=${!!supabaseAnonKey}`);
-if (!supabaseUrl || !supabaseAnonKey) {
-  logger.warn('SUPABASE', 'Supabase not fully configured. Stats will not be saved to database.');
+logger.info('SUPABASE', `Configuration status: URL=${!!supabaseUrl}, ServiceKey=${!!supabaseServiceKey}`);
+if (!supabaseUrl || !supabaseServiceKey) {
+  logger.warn('SUPABASE', 'Supabase not fully configured (missing URL or SUPABASE_SERVICE_ROLE_KEY). Stats will not be saved to database.');
 }
 
 let supabase = null;
 
 /**
  * Initialize Supabase client (lazy initialization)
+ * Uses service role key to bypass RLS for server-side operations
  */
 function getSupabase() {
-  if (!supabase && supabaseUrl && supabaseAnonKey) {
-    supabase = createClient(supabaseUrl, supabaseAnonKey, {
+  if (!supabase && supabaseUrl && supabaseServiceKey) {
+    supabase = createClient(supabaseUrl, supabaseServiceKey, {
       auth: {
         autoRefreshToken: false,
         persistSession: false
@@ -37,7 +39,7 @@ function getSupabase() {
  * Check if Supabase is configured
  */
 function isSupabaseConfigured() {
-  return !!(supabaseUrl && supabaseAnonKey);
+  return !!(supabaseUrl && supabaseServiceKey);
 }
 
 /**
@@ -136,12 +138,14 @@ async function updatePlayerStats(playerId, gameStats) {
   // Update casual/ranked game counts
   if (gameStats.isRanked) {
     updates.ranked_games = (profile.ranked_games || 0) + 1;
-    // Only count as win if placement === 1 AND more than 1 player (no solo wins)
-    if (gameStats.placement === 1 && (gameStats.totalPlayers || 0) > 1) {
-      updates.ranked_wins = (profile.ranked_wins || 0) + 1;
-    }
   } else {
     updates.casual_games = (profile.casual_games || 0) + 1;
+  }
+
+  // Count wins for ALL games (both casual and ranked)
+  // Only count as win if placement === 1 AND more than 1 player (no solo wins)
+  if (gameStats.placement === 1 && (gameStats.totalPlayers || 0) > 1) {
+    updates.ranked_wins = (profile.ranked_wins || 0) + 1;
   }
 
   // Update longest word if this game had a longer one
@@ -236,7 +240,7 @@ async function updateLeaderboardEntry(playerId) {
   // Get updated profile stats
   const { data: profile, error: fetchError } = await client
     .from('profiles')
-    .select('username, avatar_emoji, avatar_color, total_score, total_games, ranked_wins, ranked_mmr')
+    .select('username, display_name, avatar_emoji, avatar_color, total_score, total_games, ranked_wins, ranked_mmr')
     .eq('id', playerId)
     .single();
 
@@ -248,6 +252,7 @@ async function updateLeaderboardEntry(playerId) {
     .upsert({
       player_id: playerId,
       username: profile.username,
+      display_name: profile.display_name,
       avatar_emoji: profile.avatar_emoji,
       avatar_color: profile.avatar_color,
       total_score: profile.total_score || 0,
@@ -591,6 +596,151 @@ async function saveHostApprovedWord({ word, language, gameCode, hostUserId, prom
 }
 
 /**
+ * Save a valid player word to the database for bot learning
+ * @param {object} params - Word submission data
+ * @param {string} params.word - The word that was submitted
+ * @param {string} params.language - Language code (en, he, sv, ja)
+ * @param {string} params.gameCode - Game where submission happened
+ * @param {string|null} params.playerId - UUID of player who submitted (null if guest)
+ * @returns {object} - { data, error, isNewWord }
+ */
+async function savePlayerWord({ word, language, gameCode, playerId }) {
+  const client = getSupabase();
+  if (!client) return { data: null, error: { message: 'Supabase not configured' }, isNewWord: false };
+
+  // Normalize word
+  const normalizedWord = word.toLowerCase().trim();
+
+  try {
+    // Check if word already exists
+    const { data: existing, error: fetchError } = await client
+      .from('player_words')
+      .select('id, times_submitted')
+      .eq('word', normalizedWord)
+      .eq('language', language)
+      .single();
+
+    if (fetchError && fetchError.code !== 'PGRST116') {
+      // PGRST116 = not found, which is fine
+      logger.error('SUPABASE', `Error checking existing player word "${normalizedWord}"`, fetchError.message);
+      return { data: null, error: fetchError, isNewWord: false };
+    }
+
+    let wordRecord;
+    let isNewWord = false;
+
+    if (existing) {
+      // Word exists - update submission count
+      const { data: updated, error: updateError } = await client
+        .from('player_words')
+        .update({
+          times_submitted: existing.times_submitted + 1,
+          last_submitted_by: playerId,
+          last_submitted_in_game: gameCode,
+          last_submitted_at: new Date().toISOString()
+        })
+        .eq('id', existing.id)
+        .select()
+        .single();
+
+      if (updateError) {
+        logger.error('SUPABASE', `Error updating player word "${normalizedWord}"`, updateError.message);
+        return { data: null, error: updateError, isNewWord: false };
+      }
+
+      wordRecord = updated;
+    } else {
+      // New word - insert
+      isNewWord = true;
+      const { data: inserted, error: insertError } = await client
+        .from('player_words')
+        .insert({
+          word: normalizedWord,
+          language,
+          times_submitted: 1,
+          first_submitted_by: playerId,
+          first_submitted_in_game: gameCode,
+          last_submitted_by: playerId,
+          last_submitted_in_game: gameCode
+        })
+        .select()
+        .single();
+
+      if (insertError) {
+        logger.error('SUPABASE', `Error inserting player word "${normalizedWord}"`, insertError.message);
+        return { data: null, error: insertError, isNewWord: false };
+      }
+
+      wordRecord = inserted;
+    }
+
+    logger.debug('SUPABASE', `${isNewWord ? 'Saved new' : 'Updated'} player word "${normalizedWord}" (${language}) - times submitted: ${wordRecord?.times_submitted || 1}`);
+    return { data: wordRecord, error: null, isNewWord };
+
+  } catch (err) {
+    logger.error('SUPABASE', `Unexpected error saving player word "${normalizedWord}"`, err);
+    return { data: null, error: { message: err.message || 'Unexpected error' }, isNewWord: false };
+  }
+}
+
+/**
+ * Get popular player words for a language (for bot word selection)
+ * @param {string} language - Language code (en, he, sv, ja)
+ * @param {number} limit - Maximum number of words to return
+ * @returns {object} - { data: string[], error }
+ */
+async function getPopularPlayerWords(language, limit = 500) {
+  const client = getSupabase();
+  if (!client) return { data: [], error: { message: 'Supabase not configured' } };
+
+  try {
+    const { data, error } = await client
+      .from('player_words')
+      .select('word, times_submitted')
+      .eq('language', language)
+      .order('times_submitted', { ascending: false })
+      .limit(limit);
+
+    if (error) {
+      logger.error('SUPABASE', `Error fetching popular player words for ${language}`, error.message);
+      return { data: [], error };
+    }
+
+    // Return just the words array
+    const words = data.map(row => row.word);
+    logger.debug('SUPABASE', `Fetched ${words.length} popular player words for ${language}`);
+    return { data: words, error: null };
+
+  } catch (err) {
+    logger.error('SUPABASE', `Unexpected error fetching player words`, err);
+    return { data: [], error: { message: err.message || 'Unexpected error' } };
+  }
+}
+
+/**
+ * Increment bot usage counter for a word
+ * @param {string} word - The word that was used by bot
+ * @param {string} language - Language code
+ */
+async function incrementBotWordUsage(word, language) {
+  const client = getSupabase();
+  if (!client) return;
+
+  const normalizedWord = word.toLowerCase().trim();
+
+  try {
+    // Update times_found_by_bots
+    await client.rpc('increment_bot_word_usage', {
+      p_word: normalizedWord,
+      p_language: language
+    });
+  } catch (err) {
+    // Silently fail - this is not critical
+    logger.debug('SUPABASE', `Could not increment bot usage for "${normalizedWord}": ${err.message}`);
+  }
+}
+
+/**
  * Update MMR for ranked game participants
  * @param {array} participants - Array of { playerId, placement, currentMmr }
  */
@@ -644,5 +794,8 @@ module.exports = {
   updateGuestStats,
   processGameResults,
   updateRankedMmr,
-  saveHostApprovedWord
+  saveHostApprovedWord,
+  savePlayerWord,
+  getPopularPlayerWords,
+  incrementBotWordUsage
 };

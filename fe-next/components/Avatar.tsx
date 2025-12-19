@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, memo } from 'react';
+import { useState, useEffect, memo } from 'react';
 import Image from 'next/image';
 
 /**
@@ -71,6 +71,8 @@ const Avatar = memo<AvatarProps>(({
           className="object-cover"
           onError={() => setImageError(true)}
           referrerPolicy="no-referrer"
+          loading="lazy"
+          priority={false}
         />
       </div>
     );

@@ -107,7 +107,7 @@ const CubeCrashAnimation: React.FC<CubeCrashAnimationProps> = ({ onComplete }) =
           {/* Multiple shockwave rings for cooler effect */}
           {phase === 'shockwave' && (
             <>
-              {[0, 0.15, 0.3].map((delay, index) => (
+              {[0, 0.15, 0.3].map((delay) => (
                 <motion.div
                   key={`shockwave-${delay}`}
                   className="absolute w-32 h-32 border-4 border-cyan-400 rounded-full"

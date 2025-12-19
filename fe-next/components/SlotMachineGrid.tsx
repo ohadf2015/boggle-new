@@ -9,12 +9,13 @@ import 'animate.css';
 const DURATION_VARIATIONS = (() => {
   const variations: number[][] = [];
   for (let r = 0; r < 20; r++) {
-    variations[r] = [];
+    const row: number[] = [];
     for (let c = 0; c < 20; c++) {
       // Use deterministic pseudo-random based on position
       const seed = (r * 20 + c) * 17 % 150;
-      variations[r][c] = seed;
+      row.push(seed);
     }
+    variations.push(row);
   }
   return variations;
 })();
@@ -23,12 +24,13 @@ const DURATION_VARIATIONS = (() => {
 const RANDOM_DELAYS = (() => {
   const delays: number[][] = [];
   for (let r = 0; r < 20; r++) {
-    delays[r] = [];
+    const row: number[] = [];
     for (let c = 0; c < 20; c++) {
       // Use deterministic pseudo-random based on position
       const seed = ((r * 20 + c) * 31 + 7) % 400;
-      delays[r][c] = seed;
+      row.push(seed);
     }
+    delays.push(row);
   }
   return delays;
 })();

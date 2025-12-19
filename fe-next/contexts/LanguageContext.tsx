@@ -33,10 +33,10 @@ const getBrowserLanguage = (): Language | null => {
 
     for (const lang of browserLanguages) {
         // Get the primary language code (e.g., 'en' from 'en-US')
-        const primaryLang = lang.split('-')[0].toLowerCase();
+        const primaryLang = lang.split('-')[0]?.toLowerCase();
 
         // Check if we support this language
-        if (locales.includes(primaryLang as Language)) {
+        if (primaryLang && locales.includes(primaryLang as Language)) {
             return primaryLang as Language;
         }
     }
@@ -88,9 +88,22 @@ export const LanguageProvider = ({ children, initialLanguage }: LanguageProvider
         languageRef.current = language;
     }, [language]);
 
-    // After mount, check for client-side preferences
+    // After mount, sync localStorage with URL locale
+    // URL is the source of truth - don't override explicit URL locale with stored preferences
     useEffect(() => {
         mountedRef.current = true;
+
+        // Get the locale from the URL path
+        const urlLocale = pathname ? parseLocaleFromPath(pathname) : null;
+
+        // If URL has an explicit locale, that's the source of truth
+        // Don't change language state - the URL dictates the language
+        if (urlLocale) {
+            return;
+        }
+
+        // Only if there's NO locale in URL (shouldn't happen with middleware, but fallback)
+        // do we check stored preferences
         const currentLang = languageRef.current;
 
         // Check localStorage for user's explicit preference
@@ -126,9 +139,11 @@ export const LanguageProvider = ({ children, initialLanguage }: LanguageProvider
     }, [initialLanguage, pathname]);
 
     useEffect(() => {
-        // Save to localStorage
+        // Save to localStorage AND cookie (middleware reads cookie)
         if (typeof window !== 'undefined') {
             localStorage.setItem('boggle_language', language);
+            // Set cookie with 1-year expiry for server-side middleware
+            document.cookie = `boggle_language=${language}; path=/; max-age=${60 * 60 * 24 * 365}; SameSite=Lax`;
         }
     }, [language]);
 
@@ -136,14 +151,21 @@ export const LanguageProvider = ({ children, initialLanguage }: LanguageProvider
         if (newLang !== language) {
             setLanguageState(newLang);
 
-            // Navigate to new locale preserving path
+            // Also update cookie immediately for server-side consistency
+            if (typeof document !== 'undefined') {
+                document.cookie = `boggle_language=${newLang}; path=/; max-age=${60 * 60 * 24 * 365}; SameSite=Lax`;
+            }
+
+            // Navigate to new locale preserving FULL path (everything after locale)
             const segments = pathname.split('/');
-            // segments[0] is empty string
+            // segments[0] is empty string, segments[1] is locale
             const currentLocale = segments[1];
 
             if (locales.includes(currentLocale as Language)) {
                 segments[1] = newLang;
-                router.push(segments.join('/'));
+                // Join segments and ensure we have a valid path
+                const newPath = segments.join('/') || `/${newLang}`;
+                router.push(newPath);
             } else {
                 // Fallback if locale is missing (shouldn't happen with middleware)
                 router.push(`/${newLang}${pathname}`);
@@ -153,7 +175,8 @@ export const LanguageProvider = ({ children, initialLanguage }: LanguageProvider
 
     const t = (path: string, params: Record<string, string | number> = {}): string => {
         const keys = path.split('.');
-        let current: unknown = translations[language] || translations['he']; // Fallback to Hebrew if language is invalid
+        // Use type assertion since Language type may include values not in translations
+        let current: unknown = (translations as Record<string, unknown>)[language] || translations['he']; // Fallback to Hebrew if language is invalid
 
         if (!current) {
             logger.warn(`Translation missing for language: ${language}`);
@@ -168,11 +191,17 @@ export const LanguageProvider = ({ children, initialLanguage }: LanguageProvider
             current = (current as Record<string, unknown>)[key];
         }
 
-        // Replace template variables like ${varName} with params
+        // Replace template variables like ${varName} or {varName} with params
         if (typeof current === 'string' && Object.keys(params).length > 0) {
-            return current.replace(/\$\{(\w+)\}/g, (match, key) => {
+            // First handle ${varName} format
+            let result = current.replace(/\$\{(\w+)\}/g, (match, key) => {
                 return params[key] !== undefined ? String(params[key]) : match;
             });
+            // Then handle {varName} format (for translations with curly braces only)
+            result = result.replace(/\{(\w+)\}/g, (match, key) => {
+                return params[key] !== undefined ? String(params[key]) : match;
+            });
+            return result;
         }
 
         return typeof current === 'string' ? current : path;
@@ -182,8 +211,8 @@ export const LanguageProvider = ({ children, initialLanguage }: LanguageProvider
         language,
         setLanguage,
         t,
-        dir: (translations[language] as { direction?: 'rtl' | 'ltr' })?.direction || 'rtl',
-        currentFlag: (translations[language] as { flag?: string })?.flag || '🇮🇱'
+        dir: ((translations as Record<string, { direction?: 'rtl' | 'ltr' }>)[language])?.direction || 'rtl',
+        currentFlag: ((translations as Record<string, { flag?: string }>)[language])?.flag || '🇮🇱'
     };
 
     return (

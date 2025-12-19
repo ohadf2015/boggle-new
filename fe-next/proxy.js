@@ -1,5 +1,32 @@
 import { NextResponse } from 'next/server';
+import { createServerClient } from '@supabase/ssr';
 import { locales, defaultLocale, countryToLocale } from './lib/i18n';
+
+// Create Supabase client for auth token refresh
+function createSupabaseClient(request) {
+  let supabaseResponse = NextResponse.next({ request });
+
+  const supabase = createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+    {
+      cookies: {
+        getAll() {
+          return request.cookies.getAll();
+        },
+        setAll(cookiesToSet) {
+          cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value));
+          supabaseResponse = NextResponse.next({ request });
+          cookiesToSet.forEach(({ name, value, options }) =>
+            supabaseResponse.cookies.set(name, value, options)
+          );
+        },
+      },
+    }
+  );
+
+  return { supabase, supabaseResponse: () => supabaseResponse };
+}
 
 // Get locale from Accept-Language header
 function getLocaleFromAcceptLanguage(acceptLanguage) {
@@ -56,21 +83,46 @@ function getLocaleFromGeo(request) {
   return null;
 }
 
-export function proxy(request) {
+export async function proxy(request) {
   const { pathname } = request.nextUrl;
+
+  // Refresh Supabase auth tokens if configured
+  // This must happen on every request to keep the session alive
+  let supabaseResponse = null;
+  if (process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+    const { supabase, supabaseResponse: getSupabaseResponse } = createSupabaseClient(request);
+
+    // IMPORTANT: Do not run code between createServerClient and supabase.auth.getUser()
+    // A simple mistake could make it very hard to debug issues with users being randomly logged out
+    await supabase.auth.getUser();
+
+    supabaseResponse = getSupabaseResponse();
+  }
 
   // Check if the pathname already has a locale
   const pathnameHasLocale = locales.some(
     (locale) => pathname.startsWith(`/${locale}/`) || pathname === `/${locale}`
   );
 
-  if (pathnameHasLocale) return;
+  if (pathnameHasLocale) {
+    // Return supabase response to preserve refreshed cookies, or continue normally
+    return supabaseResponse || undefined;
+  }
 
   // Check for user's explicit language preference cookie
   const cookieLocale = request.cookies.get('boggle_language')?.value;
   if (cookieLocale && locales.includes(cookieLocale)) {
     request.nextUrl.pathname = `/${cookieLocale}${pathname === '/' ? '' : pathname}`;
-    return NextResponse.redirect(request.nextUrl);
+    const response = NextResponse.redirect(request.nextUrl);
+
+    // Copy supabase auth cookies to redirect response
+    if (supabaseResponse) {
+      supabaseResponse.cookies.getAll().forEach(cookie => {
+        response.cookies.set(cookie.name, cookie.value, cookie);
+      });
+    }
+
+    return response;
   }
 
   // Determine locale based on location (priority order):
@@ -93,6 +145,13 @@ export function proxy(request) {
     maxAge: 60 * 60 * 24 * 30, // 30 days
     path: '/',
   });
+
+  // Copy supabase auth cookies to redirect response
+  if (supabaseResponse) {
+    supabaseResponse.cookies.getAll().forEach(cookie => {
+      response.cookies.set(cookie.name, cookie.value, cookie);
+    });
+  }
 
   return response;
 }

@@ -9,18 +9,19 @@ import type { LetterGrid, Language, Avatar } from '@/types';
 export interface SocketContextValue {
   socket: Socket | null;
   isConnected: boolean;
+  isReconnecting: boolean;
   connectionError: string | null;
 }
 
 // Socket.IO Context
 export const SocketContext = createContext<SocketContextValue | null>(null);
 
-// Configuration
+// Configuration - increased for better handling of poor network conditions
 const SOCKET_CONFIG = {
-  reconnectionAttempts: 10,
+  reconnectionAttempts: 20,        // Increased from 10 for poor connections
   reconnectionDelay: 1000,
-  reconnectionDelayMax: 30000,
-  timeout: 20000,
+  reconnectionDelayMax: 45000,     // Increased from 30000 for longer grace period
+  timeout: 30000,                  // Increased from 20000 for slow connections
 };
 
 interface SocketProviderProps {
@@ -34,6 +35,7 @@ interface SocketProviderProps {
 export function SocketProvider({ children }: SocketProviderProps) {
   const [socket, setSocket] = useState<Socket | null>(null);
   const [isConnected, setIsConnected] = useState<boolean>(false);
+  const [isReconnecting, setIsReconnecting] = useState<boolean>(false);
   const [connectionError, setConnectionError] = useState<string | null>(null);
   const socketRef = useRef<Socket | null>(null);
 
@@ -60,6 +62,7 @@ export function SocketProvider({ children }: SocketProviderProps) {
     socketInstance.on('connect', () => {
       logger.log('[SOCKET.IO] Connected:', socketInstance.id);
       setIsConnected(true);
+      setIsReconnecting(false);
       setConnectionError(null);
     });
 
@@ -82,11 +85,13 @@ export function SocketProvider({ children }: SocketProviderProps) {
     socketInstance.on('reconnect', (attemptNumber: number) => {
       logger.log('[SOCKET.IO] Reconnected after', attemptNumber, 'attempts');
       setIsConnected(true);
+      setIsReconnecting(false);
       setConnectionError(null);
     });
 
     socketInstance.on('reconnect_attempt', (attemptNumber: number) => {
       logger.log('[SOCKET.IO] Reconnection attempt:', attemptNumber);
+      setIsReconnecting(true);
     });
 
     socketInstance.on('reconnect_error', (error: Error) => {
@@ -95,6 +100,7 @@ export function SocketProvider({ children }: SocketProviderProps) {
 
     socketInstance.on('reconnect_failed', () => {
       logger.error('[SOCKET.IO] Reconnection failed after all attempts');
+      setIsReconnecting(false);
       setConnectionError('Failed to reconnect to server');
     });
 
@@ -132,7 +138,7 @@ export function SocketProvider({ children }: SocketProviderProps) {
   }, []);
 
   return (
-    <SocketContext.Provider value={{ socket, isConnected, connectionError }}>
+    <SocketContext.Provider value={{ socket, isConnected, isReconnecting, connectionError }}>
       {children}
     </SocketContext.Provider>
   );
@@ -330,16 +336,38 @@ export function useGameSocket(): GameSocketOperations {
   };
 }
 
-// Legacy compatibility - export useWebSocket as alias
+// ==========================================
+// Legacy Compatibility Exports
+// ==========================================
+
+/**
+ * @deprecated Use useSocket() instead. Will be removed in v2.0.
+ *
+ * Migration guide:
+ *   Before: const socket = useWebSocket();
+ *   After:  const { socket } = useSocket();
+ */
 export const useWebSocket = (): Socket | null => {
+  if (process.env.NODE_ENV === 'development') {
+    // Use console.warn only on first render via a static flag
+    if (typeof window !== 'undefined' && !(window as { __useWebSocketDeprecated?: boolean }).__useWebSocketDeprecated) {
+      console.warn('[DEPRECATION] useWebSocket is deprecated. Use useSocket() instead.');
+      (window as { __useWebSocketDeprecated?: boolean }).__useWebSocketDeprecated = true;
+    }
+  }
   const { socket } = useSocket();
   return socket;
 };
 
+/**
+ * @deprecated Use useSocketOptional() instead. Will be removed in v2.0.
+ */
 export const useWebSocketOptional = (): Socket | null => {
   const context = useContext(SocketContext);
   return context?.socket || null;
 };
 
-// Legacy WebSocketContext export for backwards compatibility
+/**
+ * @deprecated Use SocketContext directly. Will be removed in v2.0.
+ */
 export const WebSocketContext = SocketContext;

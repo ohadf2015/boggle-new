@@ -7,6 +7,7 @@ import logger from '@/utils/logger';
 
 const GUEST_SESSION_KEY = 'boggle_guest_session_id';
 const GUEST_STATS_KEY = 'boggle_guest_stats';
+const GUEST_NAME_KEY = 'boggle_guest_name';
 
 export interface GuestStats {
   games: number;
@@ -16,6 +17,8 @@ export interface GuestStats {
   longestWord: string | null;
   achievementCounts: Record<string, number>;
   createdAt: number;
+  // Guest player name for tracking
+  guestName?: string | null;
 }
 
 export interface GameResult {
@@ -159,6 +162,7 @@ export function clearGuestData(): void {
 
   localStorage.removeItem(GUEST_SESSION_KEY);
   localStorage.removeItem(GUEST_STATS_KEY);
+  localStorage.removeItem(GUEST_NAME_KEY);
 }
 
 /**
@@ -216,3 +220,39 @@ export function getGuestCasualGamesCount(): number {
   const stats = getGuestStats();
   return stats.games || 0;
 }
+
+/**
+ * Store guest player name for analytics tracking
+ */
+export function setGuestName(name: string): void {
+  if (typeof window === 'undefined') return;
+
+  try {
+    localStorage.setItem(GUEST_NAME_KEY, name);
+    // Also update in stats
+    const stats = getGuestStats();
+    stats.guestName = name;
+    saveGuestStats(stats);
+  } catch (error) {
+    logger.error('Error saving guest name:', error);
+  }
+}
+
+/**
+ * Get stored guest player name
+ */
+export function getGuestName(): string | null {
+  if (typeof window === 'undefined') return null;
+
+  try {
+    // First check dedicated key
+    const name = localStorage.getItem(GUEST_NAME_KEY);
+    if (name) return name;
+    // Fall back to stats
+    const stats = getGuestStats();
+    return stats.guestName || null;
+  } catch {
+    return null;
+  }
+}
+

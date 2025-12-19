@@ -3,7 +3,7 @@
  */
 
 import type { UserProfile, Leaderboard } from './user';
-import type { Game, ActiveRoom } from './game';
+import type { Game, ActiveRoom } from '../shared/types/game';
 
 export interface ApiResponse<T = unknown> {
   success: boolean;

@@ -1,34 +1,175 @@
 /**
  * Game State Manager
  * Centralized game state management for Socket.IO
- * Uses socket IDs instead of WebSocket references
+ *
+ * REFACTORED: Core functionality has been extracted into focused modules:
+ * - userManager.js - User CRUD, socket mappings, auth connections
+ * - scoreManager.js - Player scores, words, leaderboard
+ * - presenceManager.js - Presence status, heartbeat, connection health
+ * - peerValidationManager.js - AI word tracking, peer validation votes
+ *
+ * This file now acts as a facade, re-exporting all functionality for backwards compatibility.
+ *
+ * REDIS PERSISTENCE: Game state is persisted to Redis for:
+ * - Recovery after server restarts
+ * - Cross-instance state sharing in scaled deployments
  */
+
+// Import focused modules
+const userManager = require('./userManager');
+const scoreManager = require('./scoreManager');
+const presenceManager = require('./presenceManager');
+const peerValidationManager = require('./peerValidationManager');
+
+// Redis client for persistence (lazy import to avoid circular dependencies)
+let redisClient = null;
+function getRedisClient() {
+  if (!redisClient) {
+    try {
+      redisClient = require('../redisClient');
+    } catch (e) {
+      // Redis not available, persistence disabled
+      redisClient = { saveGameState: () => {}, getGameState: () => null, deleteGameState: () => {} };
+    }
+  }
+  return redisClient;
+}
+
+const logger = require('../utils/logger');
+
+// Debounce timers for persistence
+const persistTimers = {};
+const PERSIST_DEBOUNCE_MS = 1000; // Debounce persistence calls by 1 second
 
 // Game storage - maps gameCode to game object
 const games = {};
 
-// Socket to game mapping - maps socket.id to gameCode
-const socketToGame = new Map();
+// ==========================================
+// Redis Persistence Functions
+// ==========================================
 
-// Socket to username mapping - maps socket.id to username
-const socketToUsername = new Map();
+/**
+ * Persist game state to Redis (debounced)
+ * @param {string} gameCode - Game code to persist
+ */
+function persistGameState(gameCode) {
+  // Clear any existing timer for this game
+  if (persistTimers[gameCode]) {
+    clearTimeout(persistTimers[gameCode]);
+  }
 
-// Username to socket mapping - maps "gameCode:username" to socket.id
-const usernameToSocket = new Map();
+  // Set a new timer to persist after debounce period
+  persistTimers[gameCode] = setTimeout(async () => {
+    const game = games[gameCode];
+    if (!game) {
+      delete persistTimers[gameCode];
+      return;
+    }
 
-// Leaderboard throttling - maps gameCode to timeout ID
-const leaderboardThrottleTimers = {};
+    try {
+      await getRedisClient().saveGameState(gameCode, game);
+      logger.debug('PERSIST', `Game ${gameCode} persisted to Redis`);
+    } catch (error) {
+      logger.error('PERSIST', `Failed to persist game ${gameCode}`, error);
+    }
 
-// Presence tracking configuration
-const PRESENCE_CONFIG = {
-  IDLE_THRESHOLD: 30000,     // 30 seconds without activity = idle
-  AFK_THRESHOLD: 45000,      // 45 seconds without activity = afk (for testing, change to 120000 for production)
-  HEARTBEAT_TIMEOUT: 15000,  // 15 seconds without heartbeat = disconnected
-};
+    delete persistTimers[gameCode];
+  }, PERSIST_DEBOUNCE_MS);
+}
 
-// Track authenticated users across all games
-// Maps authUserId -> { gameCode, socketId, username, isHost, connectedAt }
-const authUserConnections = new Map();
+/**
+ * Immediately persist game state (no debounce)
+ * Used for critical state changes like game end
+ * @param {string} gameCode - Game code to persist
+ */
+async function persistGameStateNow(gameCode) {
+  // Clear any pending timer
+  if (persistTimers[gameCode]) {
+    clearTimeout(persistTimers[gameCode]);
+    delete persistTimers[gameCode];
+  }
+
+  const game = games[gameCode];
+  if (!game) return;
+
+  try {
+    await getRedisClient().saveGameState(gameCode, game);
+    logger.debug('PERSIST', `Game ${gameCode} immediately persisted to Redis`);
+  } catch (error) {
+    logger.error('PERSIST', `Failed to persist game ${gameCode}`, error);
+  }
+}
+
+/**
+ * Restore game state from Redis
+ * @param {string} gameCode - Game code to restore
+ * @returns {object|null} - Restored game state or null
+ */
+async function restoreGameFromRedis(gameCode) {
+  try {
+    const redisState = await getRedisClient().getGameState(gameCode);
+    if (!redisState) {
+      return null;
+    }
+
+    logger.info('PERSIST', `Restoring game ${gameCode} from Redis`);
+
+    // Create a minimal game object from Redis state
+    // Note: We can't restore socket connections, so restored games
+    // need players to reconnect
+    games[gameCode] = {
+      gameCode,
+      hostSocketId: null, // Socket connections need to be re-established
+      hostUsername: null,
+      roomName: redisState.roomName,
+      language: redisState.language || 'en',
+      users: {}, // Users must reconnect
+      playerScores: redisState.playerScores || {},
+      playerWords: redisState.playerWords || {},
+      playerAchievements: redisState.playerAchievements || {},
+      playerCombos: {},
+      gameState: redisState.gameState || 'waiting',
+      letterGrid: redisState.letterGrid,
+      timerSeconds: redisState.timerSeconds || 180,
+      tournamentId: redisState.tournamentId,
+      reconnectionTimeout: null,
+      isRanked: false,
+      allowLateJoin: true,
+      aiApprovedWords: [],
+      peerValidationWord: null,
+      peerValidationVotes: {},
+      createdAt: Date.now(),
+      lastActivity: Date.now(),
+      restoredFromRedis: true
+    };
+
+    return games[gameCode];
+  } catch (error) {
+    logger.error('PERSIST', `Failed to restore game ${gameCode} from Redis`, error);
+    return null;
+  }
+}
+
+/**
+ * Get all game codes from Redis (for recovery after restart)
+ * @returns {Promise<string[]>} - Array of game codes
+ */
+async function getAllGameCodesFromRedis() {
+  try {
+    const redis = getRedisClient();
+    if (redis.getAllGameKeys) {
+      return await redis.getAllGameKeys();
+    }
+    return [];
+  } catch (error) {
+    logger.error('PERSIST', 'Failed to get game codes from Redis', error);
+    return [];
+  }
+}
+
+// ==========================================
+// Game CRUD Operations
+// ==========================================
 
 /**
  * Create a new game
@@ -55,9 +196,17 @@ function createGame(gameCode, gameData) {
     reconnectionTimeout: null, // Store timeout ID for host reconnection grace period
     isRanked: gameData.isRanked || false, // Ranked mode flag
     allowLateJoin: gameData.allowLateJoin !== false, // Allow late joins (default true, false for ranked)
+    // AI-approved words tracking for peer validation
+    aiApprovedWords: [], // Array of { word, submitter, score, confidence }
+    peerValidationWord: null, // The randomly selected AI-approved word for peer validation
+    peerValidationVotes: {}, // username -> 'valid' | 'invalid'
     createdAt: Date.now(),
     lastActivity: Date.now()
   };
+
+  // Persist to Redis (debounced)
+  persistGameState(gameCode);
+
   return games[gameCode];
 }
 
@@ -74,10 +223,18 @@ function getGame(gameCode) {
  * Update a game
  * @param {string} gameCode - Game code
  * @param {object} updates - Updates to apply
+ * @param {boolean} immediate - Whether to persist immediately (default: false)
  */
-function updateGame(gameCode, updates) {
+function updateGame(gameCode, updates, immediate = false) {
   if (games[gameCode]) {
     Object.assign(games[gameCode], updates, { lastActivity: Date.now() });
+
+    // Persist to Redis
+    if (immediate) {
+      persistGameStateNow(gameCode);
+    } else {
+      persistGameState(gameCode);
+    }
   }
 }
 
@@ -87,7 +244,6 @@ function updateGame(gameCode, updates) {
  */
 function deleteGame(gameCode) {
   if (games[gameCode]) {
-    // Clean up user mappings
     const game = games[gameCode];
 
     // Clean up any active timeouts to prevent memory leaks
@@ -100,15 +256,21 @@ function deleteGame(gameCode) {
       game.validationTimeout = null;
     }
 
-    for (const username of Object.keys(game.users)) {
-      const key = `${gameCode}:${username}`;
-      const socketId = usernameToSocket.get(key);
-      if (socketId) {
-        socketToGame.delete(socketId);
-        socketToUsername.delete(socketId);
-        usernameToSocket.delete(key);
-      }
+    // Cancel any pending persistence
+    if (persistTimers[gameCode]) {
+      clearTimeout(persistTimers[gameCode]);
+      delete persistTimers[gameCode];
     }
+
+    // Clean up user mappings using userManager
+    userManager.cleanupUserMappings(game, gameCode);
+
+    // Clean up leaderboard throttle state using scoreManager
+    scoreManager.clearLeaderboardThrottle(gameCode);
+
+    // Delete from Redis (async, don't wait)
+    getRedisClient().deleteGameState?.(gameCode);
+
     delete games[gameCode];
   }
 }
@@ -122,310 +284,316 @@ function gameExists(gameCode) {
   return !!games[gameCode];
 }
 
-/**
- * Add a user to a game
- * @param {string} gameCode - Game code
- * @param {string} username - Username
- * @param {string} socketId - Socket ID
- * @param {object} options - Additional options
- * @returns {boolean} - Whether addition was successful
- */
+// ==========================================
+// User Management (delegated to userManager)
+// ==========================================
+
 function addUserToGame(gameCode, username, socketId, options = {}) {
+  const game = games[gameCode];
+  return userManager.addUserToGame(game, gameCode, username, socketId, options);
+}
+
+function removeUserFromGame(gameCode, username) {
+  const game = games[gameCode];
+  userManager.removeUserFromGame(game, gameCode, username);
+}
+
+function removeUserBySocketId(socketId) {
+  return userManager.removeUserBySocketId(games, socketId, removeUserFromGame);
+}
+
+function getGameBySocketId(socketId) {
+  return userManager.getGameBySocketId(socketId);
+}
+
+function getUsernameBySocketId(socketId) {
+  return userManager.getUsernameBySocketId(socketId);
+}
+
+function getSocketIdByUsername(gameCode, username) {
+  return userManager.getSocketIdByUsername(gameCode, username);
+}
+
+function getUserBySocketId(socketId) {
+  return userManager.getUserBySocketId(games, socketId);
+}
+
+function updateUserSocketId(gameCode, username, newSocketId, authContext = null) {
+  const game = games[gameCode];
+  return userManager.updateUserSocketId(game, gameCode, username, newSocketId, authContext);
+}
+
+function getGameUsers(gameCode) {
+  const game = games[gameCode];
+  return userManager.getGameUsers(game);
+}
+
+function isHost(socketId) {
+  return userManager.isHost(games, socketId);
+}
+
+function updateHostSocketId(gameCode, newSocketId) {
+  const game = games[gameCode];
+  userManager.updateHostSocketId(game, newSocketId);
+}
+
+function getAuthUserConnection(authUserId) {
+  return userManager.getAuthUserConnection(authUserId);
+}
+
+function setAuthUserConnection(authUserId, connectionInfo) {
+  userManager.setAuthUserConnection(authUserId, connectionInfo);
+}
+
+function removeAuthUserConnection(authUserId) {
+  userManager.removeAuthUserConnection(authUserId);
+}
+
+function clearSocketMappings(socketId) {
+  return userManager.clearSocketMappings(socketId);
+}
+
+// ==========================================
+// Score Management (delegated to scoreManager)
+// ==========================================
+
+function addPlayerWord(gameCode, username, word, options = {}) {
+  const game = games[gameCode];
+  scoreManager.addPlayerWord(game, username, word, options);
+}
+
+function playerHasWord(gameCode, username, word) {
+  const game = games[gameCode];
+  return scoreManager.playerHasWord(game, username, word);
+}
+
+function updatePlayerScore(gameCode, username, score, isDelta = false) {
+  const game = games[gameCode];
+  scoreManager.updatePlayerScore(game, username, score, isDelta);
+}
+
+function getLeaderboard(gameCode) {
+  const game = games[gameCode];
+  return scoreManager.getLeaderboard(game);
+}
+
+function getLeaderboardThrottled(gameCode, broadcastFn, throttleMs = 500) {
+  const game = games[gameCode];
+  scoreManager.getLeaderboardThrottled(game, gameCode, broadcastFn, throttleMs);
+}
+
+// ==========================================
+// Presence Management (delegated to presenceManager)
+// ==========================================
+
+function updateUserPresence(gameCode, username, presenceData) {
+  const game = games[gameCode];
+  return presenceManager.updateUserPresence(game, username, presenceData);
+}
+
+function updateUserHeartbeat(gameCode, username) {
+  const game = games[gameCode];
+  return presenceManager.updateUserHeartbeat(game, username);
+}
+
+function checkUserConnectionHealth(gameCode, username) {
+  const game = games[gameCode];
+  return presenceManager.checkUserConnectionHealth(game, username);
+}
+
+function markUserActivity(gameCode, username) {
+  const game = games[gameCode];
+  presenceManager.markUserActivity(game, username);
+}
+
+function getPresenceConfig() {
+  return presenceManager.getPresenceConfig();
+}
+
+function markHostActive(gameCode) {
+  const game = games[gameCode];
+  return presenceManager.markHostActive(game);
+}
+
+function reactivateHost(gameCode) {
+  const game = games[gameCode];
+  return presenceManager.reactivateHost(game);
+}
+
+// ==========================================
+// Peer Validation (delegated to peerValidationManager)
+// ==========================================
+
+function trackAiApprovedWord(gameCode, word, submitter, score, confidence) {
+  const game = games[gameCode];
+  peerValidationManager.trackAiApprovedWord(game, word, submitter, score, confidence);
+}
+
+function trackBotWord(gameCode, word, botUsername, score) {
+  const game = games[gameCode];
+  peerValidationManager.trackBotWord(game, word, botUsername, score);
+}
+
+function selectWordForPeerValidation(gameCode) {
+  const game = games[gameCode];
+  return peerValidationManager.selectWordForPeerValidation(game);
+}
+
+function recordPeerValidationVote(gameCode, username, isValid) {
+  const game = games[gameCode];
+  return peerValidationManager.recordPeerValidationVote(game, username, isValid);
+}
+
+function getPeerValidationWord(gameCode) {
+  const game = games[gameCode];
+  return peerValidationManager.getPeerValidationWord(game);
+}
+
+function removePeerRejectedWordScore(gameCode, word, submitter) {
+  const game = games[gameCode];
+  return peerValidationManager.removePeerRejectedWordScore(game, word, submitter);
+}
+
+// ==========================================
+// Game State Operations
+// ==========================================
+
+// Import state machine utilities
+const { canTransition, transition, getValidEvents } = require('../utils/gameStateMachine');
+
+/**
+ * Safely transition game state using state machine guards
+ * Prevents invalid state transitions like 'waiting' -> 'finished'
+ *
+ * @param {string} gameCode - Game code
+ * @param {string} eventType - Event type (START, END, TIMEOUT, VALIDATE, RESET, etc.)
+ * @param {object} options - Additional options
+ * @param {boolean} options.immediate - Whether to persist immediately (default: false)
+ * @returns {{ success: boolean, previousState: string|null, newState: string|null, error?: string }}
+ */
+function transitionGameState(gameCode, eventType, options = {}) {
+  const game = games[gameCode];
+  if (!game) {
+    return {
+      success: false,
+      previousState: null,
+      newState: null,
+      error: `Game ${gameCode} not found`,
+    };
+  }
+
+  const currentState = game.gameState;
+  const result = transition(currentState, eventType);
+
+  if (!result.success) {
+    logger.warn('GAME_STATE', `Invalid transition for ${gameCode}: ${currentState} -> ${eventType}`);
+    return {
+      success: false,
+      previousState: currentState,
+      newState: null,
+      error: result.error,
+    };
+  }
+
+  // Apply the transition
+  game.gameState = result.newState;
+  game.lastActivity = Date.now();
+
+  logger.info('GAME_STATE', `Game ${gameCode}: ${currentState} -> ${result.newState} (${eventType})`);
+
+  // Persist to Redis
+  if (options.immediate) {
+    persistGameStateNow(gameCode);
+  } else {
+    persistGameState(gameCode);
+  }
+
+  return {
+    success: true,
+    previousState: currentState,
+    newState: result.newState,
+  };
+}
+
+/**
+ * Check if a state transition is valid without performing it
+ * @param {string} gameCode - Game code
+ * @param {string} eventType - Event type to check
+ * @returns {boolean} True if transition would be valid
+ */
+function canTransitionGameState(gameCode, eventType) {
+  const game = games[gameCode];
+  if (!game) return false;
+  return canTransition(game.gameState, eventType);
+}
+
+/**
+ * Get valid events for the current game state
+ * @param {string} gameCode - Game code
+ * @returns {string[]} Array of valid event types
+ */
+function getValidGameEvents(gameCode) {
+  const game = games[gameCode];
+  if (!game) return [];
+  return getValidEvents(game.gameState);
+}
+
+/**
+ * Reset game state for a new round
+ * Uses state machine to ensure valid transition
+ * @param {string} gameCode - Game code
+ * @returns {boolean} True if reset succeeded
+ */
+function resetGameForNewRound(gameCode) {
   const game = games[gameCode];
   if (!game) return false;
 
-  const { avatar = null, isHost = false, playerId = null, authUserId = null, guestTokenHash = null } = options;
+  // Try to transition to waiting state
+  // Accept RESET from 'finished' or SKIP_VALIDATION from 'finished'
+  let transitionSuccess = false;
+  const currentState = game.gameState;
 
-  // Store user data with auth context and presence tracking
-  game.users[username] = {
-    socketId,
-    avatar,
-    isHost,
-    playerId,
-    authUserId,        // Supabase user ID for authenticated users
-    guestTokenHash,    // Hashed guest token for guest users
-    joinedAt: Date.now(),
-    // Presence tracking
-    lastActivityAt: Date.now(),
-    lastHeartbeatAt: Date.now(),
-    isWindowFocused: true,
-    presenceStatus: 'active', // 'active' | 'idle' | 'afk'
-  };
-
-  // Initialize player tracking
-  if (!game.playerScores[username]) {
-    game.playerScores[username] = 0;
-  }
-  if (!game.playerWords[username]) {
-    game.playerWords[username] = [];
-  }
-  if (!game.playerAchievements[username]) {
-    game.playerAchievements[username] = [];
-  }
-  if (!game.playerWordDetails) {
-    game.playerWordDetails = {};
-  }
-  if (!game.playerWordDetails[username]) {
-    game.playerWordDetails[username] = [];
-  }
-
-  // Update mappings
-  socketToGame.set(socketId, gameCode);
-  socketToUsername.set(socketId, username);
-  usernameToSocket.set(`${gameCode}:${username}`, socketId);
-
-  // Track authenticated user globally for multi-tab detection
-  if (authUserId) {
-    setAuthUserConnection(authUserId, { gameCode, socketId, username, isHost });
-  }
-
-  game.lastActivity = Date.now();
-  return true;
-}
-
-/**
- * Remove a user from a game
- * @param {string} gameCode - Game code
- * @param {string} username - Username
- */
-function removeUserFromGame(gameCode, username) {
-  const game = games[gameCode];
-  if (!game) return;
-
-  // Remove from global auth tracking before removing user data
-  const userData = game.users[username];
-  if (userData && userData.authUserId) {
-    removeAuthUserConnection(userData.authUserId);
-  }
-
-  const key = `${gameCode}:${username}`;
-  const socketId = usernameToSocket.get(key);
-
-  if (socketId) {
-    socketToGame.delete(socketId);
-    socketToUsername.delete(socketId);
-    usernameToSocket.delete(key);
-  }
-
-  delete game.users[username];
-  game.lastActivity = Date.now();
-}
-
-/**
- * Remove a user by socket ID
- * @param {string} socketId - Socket ID
- * @returns {object|null} - Removed user info { gameCode, username } or null
- */
-function removeUserBySocketId(socketId) {
-  const gameCode = socketToGame.get(socketId);
-  const username = socketToUsername.get(socketId);
-
-  if (!gameCode || !username) return null;
-
-  removeUserFromGame(gameCode, username);
-
-  return { gameCode, username };
-}
-
-/**
- * Get user's game code by socket ID
- * @param {string} socketId - Socket ID
- * @returns {string|null} - Game code or null
- */
-function getGameBySocketId(socketId) {
-  return socketToGame.get(socketId) || null;
-}
-
-/**
- * Get username by socket ID
- * @param {string} socketId - Socket ID
- * @returns {string|null} - Username or null
- */
-function getUsernameBySocketId(socketId) {
-  return socketToUsername.get(socketId) || null;
-}
-
-/**
- * Get socket ID by username in a game
- * @param {string} gameCode - Game code
- * @param {string} username - Username
- * @returns {string|null} - Socket ID or null
- */
-function getSocketIdByUsername(gameCode, username) {
-  return usernameToSocket.get(`${gameCode}:${username}`) || null;
-}
-
-/**
- * Get user by socket ID
- * @param {string} socketId - Socket ID
- * @returns {object|null} - User data with gameCode and username
- */
-function getUserBySocketId(socketId) {
-  const gameCode = socketToGame.get(socketId);
-  const username = socketToUsername.get(socketId);
-
-  if (!gameCode || !username) return null;
-
-  const game = games[gameCode];
-  if (!game || !game.users[username]) return null;
-
-  return {
-    gameCode,
-    username,
-    ...game.users[username]
-  };
-}
-
-/**
- * Update a user's socket ID (for reconnection)
- * @param {string} gameCode - Game code
- * @param {string} username - Username
- * @param {string} newSocketId - New socket ID
- * @param {object} authContext - Optional auth context to update { authUserId, guestTokenHash }
- */
-function updateUserSocketId(gameCode, username, newSocketId, authContext = null) {
-  const game = games[gameCode];
-  if (!game || !game.users[username]) return false;
-
-  const oldSocketId = game.users[username].socketId;
-
-  // Clean up old mappings
-  if (oldSocketId) {
-    socketToGame.delete(oldSocketId);
-    socketToUsername.delete(oldSocketId);
-  }
-
-  // Update user data
-  game.users[username].socketId = newSocketId;
-
-  // Update auth context if provided (for reconnection with new auth state)
-  if (authContext) {
-    if (authContext.authUserId !== undefined) {
-      game.users[username].authUserId = authContext.authUserId;
+  if (currentState === 'finished') {
+    const result = transition(currentState, 'RESET');
+    transitionSuccess = result.success;
+    if (result.success) {
+      game.gameState = result.newState;
     }
-    if (authContext.guestTokenHash !== undefined) {
-      game.users[username].guestTokenHash = authContext.guestTokenHash;
+  } else if (currentState === 'validating') {
+    const result = transition(currentState, 'VALIDATION_COMPLETE');
+    transitionSuccess = result.success;
+    if (result.success) {
+      game.gameState = result.newState;
     }
+  } else if (currentState === 'waiting') {
+    // Already in waiting, no transition needed
+    transitionSuccess = true;
+  } else {
+    // For 'in-progress', we need to end first then reset
+    // This shouldn't happen normally, but handle it gracefully
+    logger.warn('GAME_STATE', `Reset called in unexpected state: ${currentState}`);
+    game.gameState = 'waiting';
+    transitionSuccess = true;
   }
 
-  // Set up new mappings
-  socketToGame.set(newSocketId, gameCode);
-  socketToUsername.set(newSocketId, username);
-  usernameToSocket.set(`${gameCode}:${username}`, newSocketId);
+  // Reset scores using scoreManager
+  scoreManager.resetScoresForNewRound(game);
 
-  // Update auth user connection tracking
-  const authUserId = authContext?.authUserId || game.users[username]?.authUserId;
-  if (authUserId) {
-    setAuthUserConnection(authUserId, {
-      gameCode,
-      socketId: newSocketId,
-      username,
-      isHost: game.users[username]?.isHost || false
-    });
-  }
+  // Reset peer validation
+  peerValidationManager.resetPeerValidation(game);
 
-  return true;
+  game.letterGrid = null;
+  game.lastActivity = Date.now();
+
+  // Persist the change
+  persistGameState(gameCode);
+
+  return transitionSuccess;
 }
 
-/**
- * Get all users in a game
- * @param {string} gameCode - Game code
- * @returns {array} - Array of user objects
- */
-function getGameUsers(gameCode) {
-  const game = games[gameCode];
-  if (!game) return [];
-
-  return Object.entries(game.users).map(([username, data]) => ({
-    username,
-    isHost: data.isHost,
-    avatar: data.avatar,
-    score: game.playerScores[username] || 0,
-    // Include presence information
-    presenceStatus: data.presenceStatus || 'active',
-    isWindowFocused: data.isWindowFocused !== false,
-    lastActivityAt: data.lastActivityAt || Date.now(),
-  }));
-}
-
-/**
- * Update user presence status
- * @param {string} gameCode - Game code
- * @param {string} username - Username
- * @param {object} presenceData - { isWindowFocused, lastActivityAt, forceIdle }
- * @returns {string|null} - New presence status or null if user not found
- */
-function updateUserPresence(gameCode, username, presenceData) {
-  const game = games[gameCode];
-  if (!game || !game.users[username]) return null;
-
-  const user = game.users[username];
-  const now = Date.now();
-
-  // Update presence data
-  if (presenceData.isWindowFocused !== undefined) {
-    user.isWindowFocused = presenceData.isWindowFocused;
-  }
-  if (presenceData.lastActivityAt !== undefined) {
-    user.lastActivityAt = presenceData.lastActivityAt;
-  }
-
-  // Calculate presence status based on window focus and activity time
-  const timeSinceActivity = now - (user.lastActivityAt || now);
-  let newStatus = 'active';
-
-  // Check for AFK first (regardless of window focus - 2 minutes of inactivity)
-  if (timeSinceActivity >= PRESENCE_CONFIG.AFK_THRESHOLD) {
-    newStatus = 'afk';
-  }
-  // If not AFK, check if idle (either window not focused OR 30 seconds of inactivity)
-  else if (!user.isWindowFocused || presenceData.forceIdle || timeSinceActivity >= PRESENCE_CONFIG.IDLE_THRESHOLD) {
-    newStatus = 'idle';
-  }
-  // else stays 'active'
-
-  user.presenceStatus = newStatus;
-  return newStatus;
-}
-
-/**
- * Update user heartbeat (proves connection is alive)
- * @param {string} gameCode - Game code
- * @param {string} username - Username
- */
-function updateUserHeartbeat(gameCode, username) {
-  const game = games[gameCode];
-  if (!game || !game.users[username]) return;
-
-  game.users[username].lastHeartbeatAt = Date.now();
-}
-
-/**
- * Mark user activity (reset idle timer)
- * @param {string} gameCode - Game code
- * @param {string} username - Username
- */
-function markUserActivity(gameCode, username) {
-  const game = games[gameCode];
-  if (!game || !game.users[username]) return;
-
-  const now = Date.now();
-  game.users[username].lastActivityAt = now;
-  game.users[username].lastHeartbeatAt = now;
-
-  // If user was idle/afk and window is focused, set back to active
-  if (game.users[username].isWindowFocused) {
-    game.users[username].presenceStatus = 'active';
-  }
-}
-
-/**
- * Get presence configuration
- * @returns {object} - Presence configuration
- */
-function getPresenceConfig() {
-  return { ...PRESENCE_CONFIG };
-}
+// ==========================================
+// Game Queries
+// ==========================================
 
 /**
  * Get all active games
@@ -444,24 +612,31 @@ function getAllGames() {
 
 /**
  * Get active rooms for lobby display
- * Filters out rooms with no players
+ * Filters out rooms with no human players (bots don't count)
  * @returns {array} - Array of room info
  */
 function getActiveRooms() {
   return Object.values(games)
-    .filter(game => Object.keys(game.users).length > 0) // Only show rooms with players
-    .map(game => ({
-      gameCode: game.gameCode,
-      roomName: game.roomName,
-      playerCount: Object.keys(game.users).length,
-      gameState: game.gameState,
-      language: game.language
-    }));
+    .filter(game => {
+      // Only show rooms with active human players (bots don't count)
+      const humanPlayers = Object.values(game.users).filter(user => !user.isBot);
+      return humanPlayers.length > 0;
+    })
+    .map(game => {
+      // Count only human players for display
+      const humanPlayerCount = Object.values(game.users).filter(user => !user.isBot).length;
+      return {
+        gameCode: game.gameCode,
+        roomName: game.roomName,
+        playerCount: humanPlayerCount,
+        gameState: game.gameState,
+        language: game.language
+      };
+    });
 }
 
 /**
- * Get empty rooms (rooms with no active players)
- * A room is considered empty if it has no users, or if all users are marked as disconnected
+ * Get empty rooms (rooms with no active human players)
  * @returns {array} - Array of game codes for empty rooms
  */
 function getEmptyRooms() {
@@ -470,9 +645,9 @@ function getEmptyRooms() {
       const users = Object.values(game.users);
       // Room is empty if no users at all
       if (users.length === 0) return true;
-      // Room is empty if all users are disconnected (e.g., host in grace period with no other players)
-      const activeUsers = users.filter(user => !user.disconnected);
-      return activeUsers.length === 0;
+      // Room is empty if no active human players (bots don't count as real players)
+      const activeHumanUsers = users.filter(user => !user.disconnected && !user.isBot);
+      return activeHumanUsers.length === 0;
     })
     .map(game => game.gameCode);
 }
@@ -493,249 +668,8 @@ function cleanupEmptyRooms() {
 }
 
 /**
- * Check if user is host
- * @param {string} socketId - Socket ID
- * @returns {boolean}
- */
-function isHost(socketId) {
-  const gameCode = socketToGame.get(socketId);
-  if (!gameCode) return false;
-
-  const game = games[gameCode];
-  if (!game) return false;
-
-  return game.hostSocketId === socketId;
-}
-
-/**
- * Update host socket ID (for reconnection)
- * @param {string} gameCode - Game code
- * @param {string} newSocketId - New socket ID
- */
-function updateHostSocketId(gameCode, newSocketId) {
-  const game = games[gameCode];
-  if (game) {
-    game.hostSocketId = newSocketId;
-  }
-}
-
-/**
- * Reset game state for a new round
- * @param {string} gameCode - Game code
- */
-function resetGameForNewRound(gameCode) {
-  const game = games[gameCode];
-  if (!game) return;
-
-  // COMPLETELY clear all game data first to prevent stale data from previous games
-  // This is critical because playerWords/playerScores may contain entries
-  // for players who left the game during previous rounds
-  game.playerScores = {};
-  game.playerWords = {};
-  game.playerWordDetails = {};
-  game.playerAchievements = {};
-  game.playerCombos = {}; // Reset combo tracking for new round
-  game.firstWordFound = false; // Reset FIRST_BLOOD achievement flag
-
-  // Re-initialize scores/words only for CURRENT players in the room
-  for (const username of Object.keys(game.users)) {
-    game.playerScores[username] = 0;
-    game.playerWords[username] = [];
-    game.playerWordDetails[username] = [];
-    game.playerAchievements[username] = [];
-    game.playerCombos[username] = 0; // Initialize combo tracking
-  }
-
-  game.gameState = 'waiting';
-  game.letterGrid = null;
-  game.lastActivity = Date.now();
-}
-
-/**
- * Add a word to a player's list (both playerWords and playerWordDetails)
- * @param {string} gameCode - Game code
- * @param {string} username - Username
- * @param {string} word - Word to add
- * @param {Object} options - Additional word details
- * @param {boolean} options.autoValidated - Whether word was auto-validated
- * @param {boolean|null} options.validated - Explicit validation status (true/false/null)
- * @param {number} options.score - Score for this word (with combo if applicable)
- * @param {number} options.comboBonus - Combo bonus points earned
- * @param {number} options.comboLevel - Combo level when word was submitted
- */
-function addPlayerWord(gameCode, username, word, options = {}) {
-  const game = games[gameCode];
-  if (!game) return;
-
-  const normalizedWord = word.toLowerCase();
-
-  // Initialize playerWords if needed
-  if (!game.playerWords[username]) {
-    game.playerWords[username] = [];
-  }
-
-  // Initialize playerWordDetails if needed
-  if (!game.playerWordDetails) {
-    game.playerWordDetails = {};
-  }
-  if (!game.playerWordDetails[username]) {
-    game.playerWordDetails[username] = [];
-  }
-
-  // Only add if not already present
-  if (!game.playerWords[username].includes(normalizedWord)) {
-    game.playerWords[username].push(normalizedWord);
-
-    // Calculate time since game start
-    const currentTime = Date.now();
-    const timeSinceStart = game.startTime ? (currentTime - game.startTime) / 1000 : 0;
-
-    // Determine validated status:
-    // - If explicitly provided (true/false), use it
-    // - If autoValidated is true, set to true
-    // - Otherwise null (pending validation)
-    let validatedStatus;
-    if (options.validated !== undefined) {
-      validatedStatus = options.validated;
-    } else if (options.autoValidated) {
-      validatedStatus = true;
-    } else {
-      validatedStatus = null;
-    }
-
-    // Add to playerWordDetails for achievement tracking
-    game.playerWordDetails[username].push({
-      word: normalizedWord,
-      score: options.score || 0,
-      comboBonus: options.comboBonus || 0,
-      comboLevel: options.comboLevel || 0,
-      timestamp: currentTime,
-      timeSinceStart,
-      validated: validatedStatus,
-      autoValidated: options.autoValidated || false,
-      onBoard: true,
-    });
-  }
-}
-
-/**
- * Check if player already has a word
- * @param {string} gameCode - Game code
- * @param {string} username - Username
- * @param {string} word - Word to check
- * @returns {boolean}
- */
-function playerHasWord(gameCode, username, word) {
-  const game = games[gameCode];
-  if (!game) return false;
-
-  return game.playerWords[username]?.includes(word.toLowerCase()) || false;
-}
-
-/**
- * Update player score
- * @param {string} gameCode - Game code
- * @param {string} username - Username
- * @param {number} score - New score or delta
- * @param {boolean} isDelta - Whether score is a delta to add
- */
-function updatePlayerScore(gameCode, username, score, isDelta = false) {
-  const game = games[gameCode];
-  if (!game) return;
-
-  if (!game.playerScores[username]) {
-    game.playerScores[username] = 0;
-  }
-
-  if (isDelta) {
-    game.playerScores[username] += score;
-  } else {
-    game.playerScores[username] = score;
-  }
-}
-
-/**
- * Get leaderboard for a game
- * @param {string} gameCode - Game code
- * @returns {array} - Sorted leaderboard
- */
-function getLeaderboard(gameCode) {
-  const game = games[gameCode];
-  if (!game) return [];
-
-  return Object.entries(game.playerScores)
-    .map(([username, score]) => ({
-      username,
-      score,
-      wordCount: game.playerWords[username]?.length || 0,
-      avatar: game.users[username]?.avatar
-    }))
-    .sort((a, b) => b.score - a.score);
-}
-
-/**
- * Get leaderboard with leading-edge throttling for immediate feedback
- * Uses a leading-edge pattern: broadcasts immediately on first call,
- * then throttles subsequent calls to prevent excessive updates.
- * This ensures players get immediate feedback while preventing broadcast storms.
- *
- * @param {string} gameCode - Game code
- * @param {function} broadcastFn - Function to call with leaderboard data
- * @param {number} throttleMs - Throttle duration in milliseconds (default 500ms)
- */
-const leaderboardLastBroadcast = {};
-const leaderboardPendingUpdate = {};
-
-function getLeaderboardThrottled(gameCode, broadcastFn, throttleMs = 500) {
-  const game = games[gameCode];
-  if (!game) return;
-
-  const now = Date.now();
-  const lastBroadcast = leaderboardLastBroadcast[gameCode] || 0;
-  const timeSinceLastBroadcast = now - lastBroadcast;
-
-  // If enough time has passed since last broadcast, send immediately (leading edge)
-  if (timeSinceLastBroadcast >= throttleMs) {
-    const leaderboard = getLeaderboard(gameCode);
-    if (broadcastFn && typeof broadcastFn === 'function') {
-      broadcastFn(leaderboard);
-    }
-    leaderboardLastBroadcast[gameCode] = now;
-
-    // Clear any pending trailing update since we just broadcasted
-    if (leaderboardThrottleTimers[gameCode]) {
-      clearTimeout(leaderboardThrottleTimers[gameCode]);
-      delete leaderboardThrottleTimers[gameCode];
-    }
-    leaderboardPendingUpdate[gameCode] = false;
-  } else {
-    // Within throttle window - mark that we have a pending update
-    leaderboardPendingUpdate[gameCode] = true;
-
-    // Set a trailing-edge timer to catch any updates during the throttle window
-    // Only set if not already set
-    if (!leaderboardThrottleTimers[gameCode]) {
-      const remainingTime = throttleMs - timeSinceLastBroadcast;
-      leaderboardThrottleTimers[gameCode] = setTimeout(() => {
-        // Only broadcast if there's actually a pending update
-        if (leaderboardPendingUpdate[gameCode]) {
-          const leaderboard = getLeaderboard(gameCode);
-          if (broadcastFn && typeof broadcastFn === 'function') {
-            broadcastFn(leaderboard);
-          }
-          leaderboardLastBroadcast[gameCode] = Date.now();
-          leaderboardPendingUpdate[gameCode] = false;
-        }
-        delete leaderboardThrottleTimers[gameCode];
-      }, remainingTime);
-    }
-  }
-}
-
-/**
  * Cleanup stale games (older than maxAge)
  * @param {number} maxAge - Maximum age in milliseconds (default 30 minutes)
- * NOTE: Reduced from 2 hours to 30 minutes to prevent memory leaks from abandoned games
  */
 function cleanupStaleGames(maxAge = 30 * 60 * 1000) {
   const now = Date.now();
@@ -755,89 +689,97 @@ function cleanupStaleGames(maxAge = 30 * 60 * 1000) {
   return staleCodes.length;
 }
 
+// ==========================================
+// Tournament Management
+// ==========================================
+
 /**
- * Get connection info for an authenticated user
- * @param {string} authUserId - Supabase auth user ID
- * @returns {object|null} - { gameCode, socketId, username, isHost, connectedAt } or null
+ * Get tournament ID for a game
+ * @param {string} gameCode - Game code
+ * @returns {string|null} - Tournament ID or null
  */
-function getAuthUserConnection(authUserId) {
-  if (!authUserId) return null;
-  return authUserConnections.get(authUserId) || null;
+function getTournamentIdFromGame(gameCode) {
+  return games[gameCode]?.tournamentId || null;
 }
 
 /**
- * Set connection info for an authenticated user
- * @param {string} authUserId - Supabase auth user ID
- * @param {object} connectionInfo - { gameCode, socketId, username, isHost }
+ * Set tournament ID for a game
+ * @param {string} gameCode - Game code
+ * @param {string|null} tournamentId - Tournament ID to set
+ * @returns {boolean} - Whether the operation succeeded
  */
-function setAuthUserConnection(authUserId, connectionInfo) {
-  if (!authUserId) return;
-  authUserConnections.set(authUserId, {
-    ...connectionInfo,
-    connectedAt: Date.now()
-  });
-}
-
-/**
- * Remove connection info for an authenticated user
- * @param {string} authUserId - Supabase auth user ID
- */
-function removeAuthUserConnection(authUserId) {
-  if (!authUserId) return;
-  authUserConnections.delete(authUserId);
-}
-
-/**
- * Clear socket mappings without removing user data (for disconnect grace period)
- * @param {string} socketId - Socket ID to clear
- * @returns {object|null} - { gameCode, username } or null
- */
-function clearSocketMappings(socketId) {
-  const gameCode = socketToGame.get(socketId);
-  const username = socketToUsername.get(socketId);
-
-  if (!gameCode || !username) return null;
-
-  socketToGame.delete(socketId);
-  socketToUsername.delete(socketId);
-  // Note: Don't delete usernameToSocket - user data remains valid for reconnection
-
-  return { gameCode, username };
-}
-
-// Legacy compatibility exports (for gradual migration)
-const gameWs = socketToGame;
-const wsUsername = socketToUsername;
-const getUsernameFromWs = getUsernameBySocketId;
-const getGameCodeFromUsername = (username) => {
-  for (const [gameCode, game] of Object.entries(games)) {
-    if (game.users[username]) {
-      return gameCode;
-    }
-  }
-  return null;
-};
-const getWsHostFromGameCode = (gameCode) => games[gameCode]?.hostSocketId;
-const getWsFromUsername = getSocketIdByUsername;
-const getTournamentIdFromGame = (gameCode) => games[gameCode]?.tournamentId || null;
-const setTournamentIdForGame = (gameCode, tournamentId) => {
+function setTournamentIdForGame(gameCode, tournamentId) {
   if (games[gameCode]) {
     games[gameCode].tournamentId = tournamentId;
     return true;
   }
   return false;
-};
+}
+
+// ==========================================
+// Encapsulation Helpers
+// ==========================================
+
+/**
+ * Get count of active games (for metrics)
+ * @returns {number} - Number of active games
+ */
+function getGameCount() {
+  return Object.keys(games).length;
+}
+
+/**
+ * Get all game codes (for iteration)
+ * @returns {string[]} - Array of game codes
+ */
+function getAllGameCodes() {
+  return Object.keys(games);
+}
+
+/**
+ * Iterate over all games with a callback
+ * Provides safe access without exposing internal state
+ * @param {function} callback - Function to call with (gameCode, game) for each game
+ */
+function forEachGame(callback) {
+  for (const [gameCode, game] of Object.entries(games)) {
+    callback(gameCode, game);
+  }
+}
+
+/**
+ * Clear all games - TEST ONLY
+ * This function is intended for test cleanup only
+ * @throws {Error} - If called outside of test environment
+ */
+function clearAllGames() {
+  if (process.env.NODE_ENV !== 'test') {
+    throw new Error('[gameStateManager] clearAllGames() can only be called in test environment');
+  }
+  const gameCodes = Object.keys(games);
+  for (const code of gameCodes) {
+    deleteGame(code);
+  }
+  return gameCodes.length;
+}
+
+// ==========================================
+// Module Exports
+// ==========================================
 
 module.exports = {
-  // Game CRUD
-  games,
+  // Game CRUD - NOTE: games object is NOT exported to maintain encapsulation
+  // Use getGame(), getAllGames(), forEachGame() instead of direct access
   createGame,
   getGame,
   updateGame,
   deleteGame,
   gameExists,
+  getGameCount,
+  getAllGameCodes,
+  forEachGame,
 
-  // User management
+  // User management (from userManager)
   addUserToGame,
   removeUserFromGame,
   removeUserBySocketId,
@@ -858,38 +800,62 @@ module.exports = {
   isHost,
   updateHostSocketId,
 
-  // Game state
+  // Game state transitions (state machine)
+  transitionGameState,
+  canTransitionGameState,
+  getValidGameEvents,
   resetGameForNewRound,
 
-  // Player data
+  // Player data (from scoreManager)
   addPlayerWord,
   playerHasWord,
   updatePlayerScore,
   getLeaderboard,
   getLeaderboardThrottled,
 
+  // AI word peer validation (from peerValidationManager)
+  trackAiApprovedWord,
+  trackBotWord,
+  selectWordForPeerValidation,
+  recordPeerValidationVote,
+  getPeerValidationWord,
+  removePeerRejectedWordScore,
+
   // Cleanup
   cleanupStaleGames,
+  clearAllGames,
 
-  // Presence tracking
+  // Presence tracking (from presenceManager)
   updateUserPresence,
   updateUserHeartbeat,
   markUserActivity,
   getPresenceConfig,
+  checkUserConnectionHealth,
+  markHostActive,
+  reactivateHost,
 
-  // Auth user tracking
+  // Auth user tracking (from userManager)
   getAuthUserConnection,
   setAuthUserConnection,
   removeAuthUserConnection,
   clearSocketMappings,
 
-  // Legacy compatibility
-  gameWs,
-  wsUsername,
-  getUsernameFromWs,
-  getGameCodeFromUsername,
-  getWsHostFromGameCode,
-  getWsFromUsername,
+  // Tournament management
   getTournamentIdFromGame,
-  setTournamentIdForGame
+  setTournamentIdForGame,
+
+  // Redis persistence
+  persistGameState,
+  persistGameStateNow,
+  restoreGameFromRedis,
+  getAllGameCodesFromRedis,
+
+  // TEST ONLY - Direct access to games object for test verification
+  // DO NOT use in production code - use getGame(), forEachGame(), clearAllGames() instead
+  get games() {
+    if (process.env.NODE_ENV !== 'test') {
+      throw new Error('[gameStateManager] Direct access to games object is not allowed. Use getGame(), getAllGameCodes(), forEachGame(), or clearAllGames() instead.');
+    }
+    return games;
+  }
 };

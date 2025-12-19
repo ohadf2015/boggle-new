@@ -6,18 +6,18 @@ import { getSpeedPatternDisplay, SPEED_PATTERNS, SpeedPattern } from '../../util
 import { cn } from '../../lib/utils';
 
 interface PlayerInsightsData {
-  totalValidWords: number;
-  longestWord: string;
+  totalValidWords?: number;
+  longestWord: string | null;
   longestWordLength: number;
   wordsPerMinute: number;
   averageWordLength: number;
-  mostCommonLength: number;
+  mostCommonLength: number | null;
   mostCommonLengthCount: number;
   speedPattern: SpeedPattern;
   earlyGameWords: number;
   midGameWords: number;
   lateGameWords: number;
-  accuracy: number;
+  accuracy?: number;
 }
 
 interface PlayerInsightsProps {
@@ -39,12 +39,12 @@ interface InsightCard {
  */
 function generatePlayerStory(insights: PlayerInsightsData, t: (key: string) => string): { headline: string; story: string; emoji: string } {
   const {
-    totalValidWords,
+    totalValidWords = 0,
     longestWordLength,
     wordsPerMinute,
     averageWordLength,
     speedPattern,
-    accuracy
+    accuracy = 0
   } = insights;
 
   // Determine player archetype based on stats
@@ -414,7 +414,7 @@ const PlayerInsights: React.FC<PlayerInsightsProps> = ({ insights }) => {
       </motion.div>
 
       {/* Accuracy indicator */}
-      {insights.accuracy < 100 && (
+      {insights.accuracy !== undefined && insights.accuracy < 100 && (
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}

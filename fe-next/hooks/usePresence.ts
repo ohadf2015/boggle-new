@@ -19,12 +19,14 @@ interface UsePresenceReturn {
 
 /**
  * Configuration for presence tracking
+ * Tuned for better handling of poor network conditions
  */
 const PRESENCE_CONFIG = {
-  HEARTBEAT_INTERVAL: 10000,  // Send heartbeat every 10 seconds
+  HEARTBEAT_INTERVAL: 8000,   // Send heartbeat every 8 seconds (more frequent for poor connections)
   ACTIVITY_DEBOUNCE: 1000,    // Debounce activity events by 1 second
   IDLE_CHECK_INTERVAL: 5000,  // Check idle status every 5 seconds
   IDLE_THRESHOLD: 30000,      // 30 seconds = idle
+  RETRY_HEARTBEAT_INTERVAL: 3000, // Retry heartbeat faster when reconnecting
 };
 
 /**

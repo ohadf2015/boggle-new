@@ -62,6 +62,7 @@ const FirstWinSignupModal: React.FC<FirstWinSignupModalProps> = ({ isOpen, onClo
       }, 300);
       return () => clearTimeout(timer);
     }
+    return undefined;
   }, [isOpen]);
 
   const handleSignIn = async (provider: 'google' | 'discord') => {

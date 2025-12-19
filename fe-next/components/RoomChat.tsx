@@ -19,7 +19,6 @@ import { useLanguage } from '../contexts/LanguageContext';
 import { useSoundEffects } from '../contexts/SoundEffectsContext';
 import { FaPaperPlane, FaComments, FaBell } from 'react-icons/fa';
 import toast from 'react-hot-toast';
-import logger from '@/utils/logger';
 
 const MAX_CHAT_HEIGHT = 300; // Max height in pixels
 const ESTIMATED_MESSAGE_HEIGHT = 60; // Estimated height per message
@@ -264,6 +263,7 @@ const RoomChat: React.FC<RoomChatProps> = ({ username, isHost, gameCode, classNa
             >
               {virtualizer.getVirtualItems().map((virtualItem) => {
                 const msg = messages[virtualItem.index];
+                if (!msg) return null;
                 const isOwnMessage = msg.username === username || (isHost && msg.isHost);
                 return (
                   <div
@@ -319,7 +319,7 @@ const RoomChat: React.FC<RoomChatProps> = ({ username, isHost, gameCode, classNa
           <Input
             ref={inputRef}
             value={inputMessage}
-            onChange={(e) => setInputMessage(e.target.value)}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setInputMessage(e.target.value)}
             onKeyDown={handleKeyDown}
             onFocus={handleInputFocus}
             placeholder={t('chat.placeholder') || 'Type a message...'}

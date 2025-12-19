@@ -7,6 +7,10 @@
    ==================================== */
 
 :root {
+  /* Font Family Variables */
+  --font-fredoka: 'Fredoka', sans-serif;
+  --font-rubik: 'Rubik', sans-serif;
+
   /* Neo-Brutalist Color Palette */
   --neo-yellow: #FFE135;
   --neo-yellow-hover: #FFD000;
@@ -973,5 +977,392 @@ body {
 
   100% {
     background-position: 0% 50%;
+  }
+}
+
+/* ====================================
+   MOBILE UX IMPROVEMENTS
+   ==================================== */
+
+/* Safe Area Insets for notched devices */
+:root {
+  --safe-area-top: env(safe-area-inset-top, 0px);
+  --safe-area-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-area-left: env(safe-area-inset-left, 0px);
+  --safe-area-right: env(safe-area-inset-right, 0px);
+}
+
+/* Safe area utility classes */
+.safe-area-top {
+  padding-top: var(--safe-area-top);
+}
+
+.safe-area-bottom {
+  padding-bottom: var(--safe-area-bottom);
+}
+
+.safe-area-left {
+  padding-left: var(--safe-area-left);
+}
+
+.safe-area-right {
+  padding-right: var(--safe-area-right);
+}
+
+.safe-area-inset {
+  padding-top: var(--safe-area-top);
+  padding-bottom: var(--safe-area-bottom);
+  padding-left: var(--safe-area-left);
+  padding-right: var(--safe-area-right);
+}
+
+/* Fixed bottom elements with safe area */
+.fixed-bottom-safe {
+  bottom: max(var(--safe-area-bottom), 16px);
+}
+
+/* Mobile-optimized touch targets (minimum 44x44px per WCAG) */
+@layer base {
+  input,
+  select,
+  button,
+  [role="button"],
+  .touch-target {
+    min-height: 44px;
+  }
+
+  /* Prevent iOS zoom on input focus (requires 16px min font) */
+  input,
+  select,
+  textarea {
+    font-size: max(16px, 1rem);
+  }
+}
+
+/* Touch action utilities for game interactions */
+.touch-none {
+  touch-action: none;
+}
+
+.touch-pan-x {
+  touch-action: pan-x;
+}
+
+.touch-pan-y {
+  touch-action: pan-y;
+}
+
+.touch-manipulation {
+  touch-action: manipulation;
+}
+
+/* Game grid - prevent all browser gestures */
+.game-grid,
+[role="grid"] {
+  touch-action: none;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+}
+
+/* Scrollable areas - allow vertical scroll only */
+.scrollable-area {
+  touch-action: pan-y;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* ====================================
+   ENHANCED FOCUS & ACCESSIBILITY
+   ==================================== */
+
+/* Enhanced focus ring for all interactive elements */
+@layer base {
+  /* Default focus ring */
+  *:focus-visible {
+    outline: 3px solid var(--neo-cyan);
+    outline-offset: 2px;
+  }
+
+  /* Focus ring for dark backgrounds */
+  .focus-ring-light:focus-visible {
+    outline-color: var(--neo-yellow);
+  }
+
+  /* No focus ring for mouse users */
+  *:focus:not(:focus-visible) {
+    outline: none;
+  }
+}
+
+/* Skip to content link */
+.skip-to-content {
+  position: absolute;
+  top: -100%;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 9999;
+  padding: 1rem 2rem;
+  background: var(--neo-yellow);
+  color: var(--neo-black);
+  font-weight: 700;
+  text-transform: uppercase;
+  border: 3px solid var(--neo-black);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-md);
+  transition: top 0.2s ease;
+}
+
+.skip-to-content:focus {
+  top: 1rem;
+}
+
+/* ====================================
+   CONNECTION STATUS INDICATOR
+   ==================================== */
+
+.connection-indicator {
+  position: fixed;
+  top: 8px;
+  right: 8px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 2px solid var(--neo-black);
+  z-index: 9998;
+  transition: background-color 0.3s ease;
+}
+
+.connection-indicator--connected {
+  background-color: var(--neo-lime);
+}
+
+.connection-indicator--connecting {
+  background-color: var(--neo-yellow);
+  animation: pulse 1s ease-in-out infinite;
+}
+
+.connection-indicator--disconnected {
+  background-color: var(--neo-red);
+}
+
+.connection-indicator--reconnecting {
+  background-color: var(--neo-orange);
+  animation: pulse 0.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.6;
+    transform: scale(0.9);
+  }
+}
+
+/* ====================================
+   SKELETON LOADING STATES
+   ==================================== */
+
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--neo-navy-light) 25%,
+    var(--neo-gray) 50%,
+    var(--neo-navy-light) 75%
+  );
+  background-size: 200% 100%;
+  animation: skeleton-shimmer 1.5s ease-in-out infinite;
+  border-radius: var(--radius);
+}
+
+.skeleton-text {
+  height: 1em;
+  margin-bottom: 0.5em;
+}
+
+.skeleton-card {
+  height: 80px;
+  border: 3px solid var(--neo-black);
+  border-radius: var(--radius-lg);
+}
+
+.skeleton-avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: 3px solid var(--neo-black);
+}
+
+@keyframes skeleton-shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+/* Respect reduced motion for skeleton */
+@media (prefers-reduced-motion: reduce) {
+  .skeleton {
+    animation: none;
+    background: var(--neo-navy-light);
+  }
+}
+
+/* ====================================
+   OPTIMISTIC UI FEEDBACK
+   ==================================== */
+
+/* Pending word state */
+.word-pending {
+  opacity: 0.7;
+  position: relative;
+}
+
+.word-pending::after {
+  content: '';
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 12px;
+  height: 12px;
+  border: 2px solid var(--neo-cyan);
+  border-top-color: transparent;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: translateY(-50%) rotate(360deg);
+  }
+}
+
+/* Valid word confirmation */
+.word-valid {
+  animation: word-accept 0.3s ease-out;
+}
+
+@keyframes word-accept {
+  0% {
+    transform: scale(1);
+    background-color: var(--neo-lime);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+  100% {
+    transform: scale(1);
+    background-color: transparent;
+  }
+}
+
+/* Invalid word rejection */
+.word-invalid {
+  animation: word-reject 0.4s ease-out;
+}
+
+@keyframes word-reject {
+  0%, 100% {
+    transform: translateX(0);
+  }
+  20%, 60% {
+    transform: translateX(-5px);
+  }
+  40%, 80% {
+    transform: translateX(5px);
+  }
+}
+
+/* ====================================
+   FLOATING SCORE ANIMATION
+   ==================================== */
+
+.score-popup {
+  position: absolute;
+  pointer-events: none;
+  font-weight: 900;
+  font-size: 1.5rem;
+  color: var(--neo-yellow);
+  text-shadow:
+    2px 2px 0 var(--neo-black),
+    -1px -1px 0 var(--neo-black),
+    1px -1px 0 var(--neo-black),
+    -1px 1px 0 var(--neo-black);
+  animation: score-float 0.8s ease-out forwards;
+  z-index: 100;
+}
+
+@keyframes score-float {
+  0% {
+    opacity: 1;
+    transform: translateY(0) scale(0.5);
+  }
+  50% {
+    transform: translateY(-30px) scale(1.2);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-50px) scale(1);
+  }
+}
+
+/* ====================================
+   KEYBOARD VISIBILITY HELPERS
+   ==================================== */
+
+/* Add padding when virtual keyboard is open */
+.keyboard-open {
+  padding-bottom: var(--keyboard-height, 0px);
+}
+
+/* Ensure form inputs are visible when keyboard opens */
+.keyboard-scroll-target {
+  scroll-margin-bottom: calc(var(--keyboard-height, 0px) + 20px);
+}
+
+/* ====================================
+   RESPONSIVE IMPROVEMENTS
+   ==================================== */
+
+/* Extra small screens (< 360px) */
+@media (max-width: 359px) {
+  .game-board-frame {
+    padding: 4px;
+  }
+
+  .text-responsive-sm {
+    font-size: 0.75rem;
+  }
+}
+
+/* Landscape mobile optimization */
+@media (max-height: 500px) and (orientation: landscape) {
+  .game-board-frame {
+    width: min(100%, 85vw);
+    max-width: min(100%, 85vw);
+    height: 90vh;
+    aspect-ratio: auto;
+  }
+
+  .hide-landscape {
+    display: none;
+  }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  :root {
+    --neo-black: #000000;
+    --border-neo: 4px;
+    --border-neo-thick: 5px;
+  }
+
+  *:focus-visible {
+    outline-width: 4px;
   }
 }

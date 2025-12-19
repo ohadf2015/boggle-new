@@ -14,12 +14,24 @@ const hebrewFinalLetters = {
   'ץ': 'צ'
 };
 
+// Valid Hebrew letters (aleph to tav, including final forms)
+const validHebrewLetters = new Set([
+  'א', 'ב', 'ג', 'ד', 'ה', 'ו', 'ז', 'ח', 'ט', 'י',
+  'כ', 'ך', 'ל', 'מ', 'ם', 'נ', 'ן', 'ס', 'ע', 'פ',
+  'ף', 'צ', 'ץ', 'ק', 'ר', 'ש', 'ת'
+]);
+
 function normalizeHebrewLetter(letter) {
   return hebrewFinalLetters[letter] || letter;
 }
 
 function normalizeHebrewWord(word) {
   return word.split('').map(normalizeHebrewLetter).join('');
+}
+
+// Check if a word contains only valid Hebrew letters (no punctuation like gershayim ״ or geresh ׳)
+function isValidHebrewWordForBoard(word) {
+  return word.split('').every(char => validHebrewLetters.has(char));
 }
 
 class Dictionary {
@@ -148,13 +160,29 @@ class Dictionary {
 
           if (arrayMatch) {
             const arrayContent = arrayMatch[1];
+
+            // Helper function to decode JavaScript escape sequences (e.g., \xE5 -> å)
+            const decodeJsEscapes = (str) => {
+              // Convert \xNN to \u00NN for JSON compatibility
+              const jsonCompatible = str.replace(/\\x([0-9A-Fa-f]{2})/g, '\\u00$1');
+              try {
+                return JSON.parse(jsonCompatible);
+              } catch {
+                return null;
+              }
+            };
+
+            // Valid Swedish word pattern - only alphabetic characters (including å, ä, ö)
+            const validSwedishWordPattern = /^[a-zåäöéàü]+$/i;
+
             const words = arrayContent
               .split(',')
               .map(line => {
-                const match = line.trim().match(/^"(.*)"$/);
-                return match ? match[1] : null;
+                const trimmed = line.trim();
+                if (!trimmed.startsWith('"') || !trimmed.endsWith('"')) return null;
+                return decodeJsEscapes(trimmed);
               })
-              .filter(w => w && w.length > 1);
+              .filter(w => w && w.length > 1 && validSwedishWordPattern.test(w));
 
             this.swedishWords = new Set(words.map(w => w.toLowerCase()));
             const swedishMainCount = this.swedishWords.size;
@@ -324,10 +352,13 @@ class Dictionary {
   getRandomLongWords(language, count = 5, minLength = 4, maxLength = 8) {
     let dictionary;
     let normalizer = (w) => w;
+    let validator = () => true; // Default: accept all words
 
     switch (language) {
       case 'he':
         dictionary = this.hebrewWords;
+        // Filter out words with non-Hebrew characters (like gershayim ״ or geresh ׳)
+        validator = isValidHebrewWordForBoard;
         break;
       case 'sv':
         dictionary = this.swedishWords;
@@ -348,9 +379,9 @@ class Dictionary {
       return [];
     }
 
-    // Filter words by length - convert Set to Array and filter
+    // Filter words by length and validity (for Hebrew, exclude words with punctuation)
     const filteredWords = Array.from(dictionary).filter(
-      w => w.length >= minLength && w.length <= maxLength
+      w => w.length >= minLength && w.length <= maxLength && validator(w)
     );
 
     if (filteredWords.length === 0) {

@@ -942,6 +942,189 @@ async function getRedisMetrics() {
 }
 
 // ==========================================
+// Distributed Locking for Game State Mutations
+// ==========================================
+
+const LOCK_PREFIX = `${REDIS_PREFIX}:${REDIS_VERSION}:lock`;
+const DEFAULT_LOCK_TTL = 10000; // 10 seconds
+const LOCK_RETRY_DELAY = 50; // 50ms between retries
+const MAX_LOCK_RETRIES = 20; // Max 20 retries (1 second total)
+
+/**
+ * Acquire a distributed lock for a game
+ * Uses Redis SET NX PX pattern (Redlock single-instance)
+ *
+ * @param {string} gameCode - Game code to lock
+ * @param {string} lockId - Unique identifier for this lock holder (e.g., socket.id)
+ * @param {number} ttlMs - Lock TTL in milliseconds (default: 10000)
+ * @returns {Promise<boolean>} - True if lock acquired, false otherwise
+ */
+async function acquireGameLock(gameCode, lockId, ttlMs = DEFAULT_LOCK_TTL) {
+  if (!isRedisAvailable || !redisClient) {
+    // In single-instance mode without Redis, always succeed
+    return true;
+  }
+
+  const lockKey = `${LOCK_PREFIX}:game:${gameCode}`;
+
+  for (let attempt = 0; attempt < MAX_LOCK_RETRIES; attempt++) {
+    try {
+      // SET key value NX PX milliseconds
+      // NX = only set if key doesn't exist
+      // PX = set expiry in milliseconds
+      const result = await circuitBreaker.execute(() =>
+        redisClient.set(lockKey, lockId, 'NX', 'PX', ttlMs)
+      );
+
+      if (result === 'OK') {
+        logger.debug('LOCK', `Acquired lock for game ${gameCode} (holder: ${lockId.substring(0, 8)})`);
+        return true;
+      }
+
+      // Lock not acquired, wait and retry
+      await new Promise(resolve => setTimeout(resolve, LOCK_RETRY_DELAY));
+    } catch (error) {
+      logger.error('LOCK', `Error acquiring lock for game ${gameCode}: ${error.message}`);
+      return false;
+    }
+  }
+
+  logger.warn('LOCK', `Failed to acquire lock for game ${gameCode} after ${MAX_LOCK_RETRIES} attempts`);
+  return false;
+}
+
+/**
+ * Release a distributed lock for a game
+ * Only releases if the lock is held by the specified lockId
+ *
+ * @param {string} gameCode - Game code to unlock
+ * @param {string} lockId - Unique identifier of the lock holder
+ * @returns {Promise<boolean>} - True if lock released, false otherwise
+ */
+async function releaseGameLock(gameCode, lockId) {
+  if (!isRedisAvailable || !redisClient) {
+    return true;
+  }
+
+  const lockKey = `${LOCK_PREFIX}:game:${gameCode}`;
+
+  // Lua script to atomically check and delete
+  // Only delete if the value matches our lockId
+  const releaseScript = `
+    if redis.call('GET', KEYS[1]) == ARGV[1] then
+      return redis.call('DEL', KEYS[1])
+    else
+      return 0
+    end
+  `;
+
+  try {
+    const result = await circuitBreaker.execute(() =>
+      redisClient.eval(releaseScript, 1, lockKey, lockId)
+    );
+
+    if (result === 1) {
+      logger.debug('LOCK', `Released lock for game ${gameCode} (holder: ${lockId.substring(0, 8)})`);
+      return true;
+    } else {
+      logger.debug('LOCK', `Lock for game ${gameCode} not held by ${lockId.substring(0, 8)} (or already expired)`);
+      return false;
+    }
+  } catch (error) {
+    logger.error('LOCK', `Error releasing lock for game ${gameCode}: ${error.message}`);
+    return false;
+  }
+}
+
+/**
+ * Extend a lock's TTL
+ * Useful for long-running operations
+ *
+ * @param {string} gameCode - Game code
+ * @param {string} lockId - Lock holder ID
+ * @param {number} ttlMs - New TTL in milliseconds
+ * @returns {Promise<boolean>} - True if extended, false otherwise
+ */
+async function extendGameLock(gameCode, lockId, ttlMs = DEFAULT_LOCK_TTL) {
+  if (!isRedisAvailable || !redisClient) {
+    return true;
+  }
+
+  const lockKey = `${LOCK_PREFIX}:game:${gameCode}`;
+
+  // Lua script to atomically check and extend
+  const extendScript = `
+    if redis.call('GET', KEYS[1]) == ARGV[1] then
+      return redis.call('PEXPIRE', KEYS[1], ARGV[2])
+    else
+      return 0
+    end
+  `;
+
+  try {
+    const result = await circuitBreaker.execute(() =>
+      redisClient.eval(extendScript, 1, lockKey, lockId, ttlMs)
+    );
+
+    return result === 1;
+  } catch (error) {
+    logger.error('LOCK', `Error extending lock for game ${gameCode}: ${error.message}`);
+    return false;
+  }
+}
+
+/**
+ * Execute a function with a distributed lock
+ * Automatically acquires lock before execution and releases after
+ *
+ * @param {string} gameCode - Game code to lock
+ * @param {string} lockId - Unique lock holder ID
+ * @param {Function} fn - Async function to execute while holding lock
+ * @param {number} ttlMs - Lock TTL
+ * @returns {Promise<{success: boolean, result: any, error: Error|null}>}
+ */
+async function withGameLock(gameCode, lockId, fn, ttlMs = DEFAULT_LOCK_TTL) {
+  const acquired = await acquireGameLock(gameCode, lockId, ttlMs);
+
+  if (!acquired) {
+    return {
+      success: false,
+      result: null,
+      error: new Error(`Failed to acquire lock for game ${gameCode}`),
+    };
+  }
+
+  try {
+    const result = await fn();
+    return { success: true, result, error: null };
+  } catch (error) {
+    return { success: false, result: null, error };
+  } finally {
+    await releaseGameLock(gameCode, lockId);
+  }
+}
+
+/**
+ * Check if a lock exists for a game
+ * @param {string} gameCode - Game code
+ * @returns {Promise<string|null>} - Lock holder ID or null
+ */
+async function getGameLockHolder(gameCode) {
+  if (!isRedisAvailable || !redisClient) {
+    return null;
+  }
+
+  const lockKey = `${LOCK_PREFIX}:game:${gameCode}`;
+
+  try {
+    return await circuitBreaker.execute(() => redisClient.get(lockKey));
+  } catch (error) {
+    logger.error('LOCK', `Error checking lock for game ${gameCode}: ${error.message}`);
+    return null;
+  }
+}
+
+// ==========================================
 // Connection Management
 // ==========================================
 
@@ -1028,6 +1211,13 @@ module.exports = {
   healthCheck,
   getRedisHealth,
   getRedisMetrics,
+
+  // Distributed locking
+  acquireGameLock,
+  releaseGameLock,
+  extendGameLock,
+  withGameLock,
+  getGameLockHolder,
 
   // Configuration exports (for external use)
   TTL_CONFIG,

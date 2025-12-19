@@ -1,4 +1,4 @@
-import React, { useState, useMemo, memo } from 'react';
+import React, { useState, useMemo, memo, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { AchievementBadge } from '../AchievementBadge';
 import PlayerInsights from './PlayerInsights';
@@ -7,12 +7,79 @@ import { useLanguage } from '../../contexts/LanguageContext';
 import { cn } from '../../lib/utils';
 import { applyHebrewFinalLetters } from '../../utils/utils';
 import { calculatePlayerInsights } from '../../utils/gameInsights';
-import { ChevronDown, ChevronUp } from 'lucide-react';
+import { ChevronDown, ChevronUp, X } from 'lucide-react';
 import Avatar from '../Avatar';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../ui/tooltip';
 import logger from '@/utils/logger';
 import { POINT_COLORS } from '../../utils/consts';
 import type { Avatar as AvatarType } from '@/types';
+
+// Lifetime/career achievement keys that should NOT be shown in game results
+// These are cumulative achievements that don't apply to a single round
+const LIFETIME_ACHIEVEMENT_KEYS = new Set([
+  'VETERAN',        // 50 games played
+  'CENTURION',      // 100 games played
+  'WORD_COLLECTOR', // 1000 total words
+  'WORD_HOARDER',   // 5000 total words
+  'CHAMPION',       // 25 wins
+  'LEGEND',         // 100 wins
+  'POINT_MASTER',   // 10000 total points
+  'POINT_KING',     // 50000 total points
+  'DEDICATION',     // 7 unique days
+  'LOYAL_PLAYER',   // 30 unique days
+]);
+
+// Achievement thresholds for validation (base thresholds, may scale with game duration)
+// These are set to 50% of the actual thresholds to account for time scaling
+const ACHIEVEMENT_WORD_THRESHOLDS: Record<string, number> = {
+  'WORDSMITH': 25,          // Actual: ~50 words (scaled)
+  'LEXICON': 32,            // Actual: ~65 words (scaled)
+  'UNSTOPPABLE': 37,        // Actual: ~75 words (scaled)
+  'VOCABULARY_TITAN': 42,   // Actual: ~85 words (scaled)
+  'DICTIONARY_DIVER': 32,   // Actual: ~65 words (scaled)
+};
+
+/**
+ * Filter achievements to only show game-specific achievements
+ * Excludes lifetime/career achievements and achievements that don't match player's round stats
+ */
+const filterGameAchievements = (
+  achievements: GameAchievement[],
+  allWords?: WordObject[]
+): GameAchievement[] => {
+  if (!achievements || !Array.isArray(achievements)) return [];
+
+  const validWordCount = allWords
+    ? allWords.filter(w => w && !w.isDuplicate && w.validated).length
+    : 0;
+
+  return achievements.filter(ach => {
+    const key = ach.key || ach.name || '';
+
+    // Filter out lifetime achievements - these should not appear in round results
+    if (LIFETIME_ACHIEVEMENT_KEYS.has(key)) {
+      logger.debug(`[RESULTS] Filtering out lifetime achievement: ${key}`);
+      return false;
+    }
+
+    // Validate word-count-based achievements against actual round stats
+    // Use a generous threshold (50% of base) to account for time scaling
+    const threshold = ACHIEVEMENT_WORD_THRESHOLDS[key];
+    if (threshold && validWordCount < threshold * 0.5) {
+      // Achievement requires more words than player actually found
+      // This suggests stale data from a previous game
+      logger.warn(`[RESULTS] Filtering out invalid achievement: ${key} (${validWordCount} words < ${threshold * 0.5} threshold)`);
+      return false;
+    }
+
+    return true;
+  });
+};
+
+// Helper to safely get point color with fallback
+const getPointColor = (points: number): string => {
+  return POINT_COLORS[points] ?? POINT_COLORS[8] ?? 'var(--neo-pink)';
+};
 import XpBreakdownCard from './XpBreakdownCard';
 
 interface WordObject {
@@ -21,6 +88,11 @@ interface WordObject {
   validated: boolean;
   isDuplicate: boolean;
   comboBonus?: number;
+  isAiVerified?: boolean;
+  isPendingValidation?: boolean;
+  potentialScore?: number;
+  invalidReason?: string;
+  aiReason?: string; // AI's reason for validating/invalidating the word
 }
 
 interface Title {
@@ -30,16 +102,16 @@ interface Title {
 }
 
 interface GameAchievement {
-  id: string;
-  name: string;
-  description: string;
   icon: string; // Required for game achievements
+  key?: string;        // Unlocalized format - frontend will localize
+  name?: string;       // Legacy localized format
+  description?: string; // Legacy localized format
 }
 
 interface Player {
   username: string;
   score: number;
-  allWords: WordObject[];
+  allWords?: WordObject[];
   achievements?: GameAchievement[];
   avatar?: AvatarType & { profilePictureUrl?: string };
   title?: Title;
@@ -72,6 +144,8 @@ interface ResultsPlayerCardProps {
   isWinner: boolean;
   xpGainedData?: XpGainedData | null;
   levelUpData?: LevelUpData | null;
+  /** Whether duplicate word rule is disabled (for rooms with >7 players) */
+  duplicateRuleDisabled?: boolean;
 }
 
 interface WordChipProps {
@@ -80,49 +154,229 @@ interface WordChipProps {
 }
 
 const WordChip = memo<WordChipProps>(({ wordObj, playerCount }) => {
+  const { t } = useLanguage();
+  // State for mobile tooltip - shows on tap
+  const [showMobileTooltip, setShowMobileTooltip] = useState(false);
+
   const isDuplicate = wordObj.isDuplicate;
   const isValid = wordObj.validated;
+  const isAiVerified = wordObj.isAiVerified;
+  const isPending = wordObj.isPendingValidation;
+  const invalidReason = wordObj.invalidReason;
+  const aiReason = wordObj.aiReason;
   const displayWord = applyHebrewFinalLetters(wordObj.word);
   const comboBonus = wordObj.comboBonus || 0;
 
   const label = displayWord;
 
+  // Determine the reason to display - prefer aiReason for AI-rejected words
+  const displayReason = aiReason || invalidReason;
+
+  // Check if this word should have a touchable tooltip
+  const hasInvalidReason = !isValid && !isDuplicate && !isPending && displayReason;
+
+  // Handle touch/click for mobile tooltip
+  const handleTouchStart = useCallback((e: React.MouseEvent | React.TouchEvent) => {
+    if (hasInvalidReason) {
+      e.preventDefault();
+      e.stopPropagation();
+      setShowMobileTooltip(true);
+    }
+  }, [hasInvalidReason]);
+
+  const handleCloseTooltip = useCallback((e: React.MouseEvent | React.TouchEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setShowMobileTooltip(false);
+  }, []);
+
   // Get color based on score - Neo-Brutalist solid colors
   const getBackgroundColor = (): string => {
     if (isDuplicate) return 'var(--neo-orange)';
+    if (isPending) return 'var(--neo-purple)'; // Pending = purple (awaiting community vote)
     if (!isValid) return 'var(--neo-red, #ef4444)';
-    return POINT_COLORS[wordObj.score] || POINT_COLORS[8];
+    return getPointColor(wordObj.score);
   };
 
   // Get text color based on background - ensure readability
   const getTextColor = (): string => {
-    if (isDuplicate || !isValid) return 'var(--neo-cream)';
+    if (isDuplicate || !isValid || isPending) return 'var(--neo-cream)';
     // For cyan backgrounds (2-3 point words), use dark text for better contrast
     if (wordObj.score === 2 || wordObj.score === 3) return 'var(--neo-black)';
     return 'var(--neo-cream)';
   };
 
+  // Render the word chip content
+  const chipContent = (
+    <span
+      className={cn(
+        "inline-flex items-center gap-1 px-2 py-1 text-sm font-black uppercase border-2 border-neo-black rounded-neo shadow-hard-sm transition-all hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-hard",
+        isDuplicate && "line-through opacity-80",
+        !isDuplicate && !isValid && !isPending && "opacity-70",
+        isPending && "animate-pulse",
+        hasInvalidReason && "cursor-pointer active:scale-95"
+      )}
+      style={{
+        backgroundColor: getBackgroundColor(),
+        color: getTextColor(),
+      }}
+      onClick={handleTouchStart}
+      onTouchEnd={handleTouchStart}
+      role={hasInvalidReason ? "button" : undefined}
+      aria-label={hasInvalidReason ? `${displayWord}: ${displayReason}` : undefined}
+      tabIndex={hasInvalidReason ? 0 : undefined}
+    >
+      {label}
+      {/* Show info icon for invalid words with reason - indicates it's tappable */}
+      {hasInvalidReason && (
+        <span className="text-[10px] px-1 py-0.5 bg-neo-cream/20 rounded border border-neo-cream/30 font-black">
+          ℹ️
+        </span>
+      )}
+      {/* Show combo bonus indicator */}
+      {comboBonus > 0 && !isDuplicate && isValid && (
+        <span className="text-[10px] px-1 py-0.5 bg-neo-yellow text-neo-black rounded border border-neo-black font-black">
+          +{comboBonus}
+        </span>
+      )}
+      {/* Show pending validation indicator */}
+      {isPending && !isDuplicate && (
+        <TooltipProvider delayDuration={0}>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <span className="text-[10px] px-1 py-0.5 bg-neo-yellow text-neo-black rounded border border-neo-black font-black cursor-help">
+                ?
+              </span>
+            </TooltipTrigger>
+            <TooltipContent
+              side="top"
+              className="bg-neo-purple border-2 border-neo-black shadow-hard rounded-neo p-2"
+            >
+              <p className="text-xs font-bold text-neo-cream">
+                {t('results.pendingValidation') || 'Pending community validation'}
+                {wordObj.potentialScore && (
+                  <span className="block text-neo-yellow mt-1">
+                    {t('results.potentialScore', { score: String(wordObj.potentialScore) }) || `+${wordObj.potentialScore} pts if approved`}
+                  </span>
+                )}
+              </p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+      )}
+      {/* Show AI verification indicator with reason tooltip */}
+      {isAiVerified && isValid && !isDuplicate && (
+        <TooltipProvider delayDuration={0}>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <span className="text-[10px] px-1 py-0.5 bg-neo-purple text-neo-cream rounded border border-neo-black font-black cursor-help">
+                AI
+              </span>
+            </TooltipTrigger>
+            <TooltipContent
+              side="top"
+              className="bg-neo-purple border-2 border-neo-black shadow-hard rounded-neo p-2 max-w-[250px]"
+            >
+              <p className="text-xs font-bold text-neo-cream">{t('results.aiVerified') || 'Verified by AI'}</p>
+              {aiReason && (
+                <p className="text-xs text-neo-yellow mt-1">{aiReason}</p>
+              )}
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+      )}
+    </span>
+  );
+
   return (
     <div className="relative group">
-      <span
-        className={cn(
-          "inline-flex items-center gap-1 px-2 py-1 text-sm font-black uppercase border-2 border-neo-black rounded-neo shadow-hard-sm transition-all hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-hard",
-          isDuplicate && "line-through opacity-80",
-          !isDuplicate && !isValid && "opacity-70"
+      {/* Desktop: Show tooltip on hover for invalid words */}
+      {hasInvalidReason ? (
+        <TooltipProvider delayDuration={0}>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              {chipContent}
+            </TooltipTrigger>
+            <TooltipContent
+              side="top"
+              className="bg-neo-red border-2 border-neo-black shadow-hard rounded-neo p-2 max-w-[250px] hidden sm:block"
+            >
+              {isAiVerified && (
+                <p className="text-[10px] font-bold text-neo-yellow mb-1 flex items-center gap-1">
+                  <span className="px-1 py-0.5 bg-neo-purple rounded border border-neo-black">AI</span>
+                  {t('results.aiRejected') || 'Rejected by AI'}
+                </p>
+              )}
+              <p className="text-xs font-bold text-neo-cream">{displayReason}</p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+      ) : (
+        chipContent
+      )}
+
+      {/* Mobile: Show tooltip popup when tapped */}
+      <AnimatePresence>
+        {showMobileTooltip && hasInvalidReason && (
+          <>
+            {/* Backdrop to close tooltip on tap outside */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 z-[100] bg-black/20"
+              onClick={handleCloseTooltip}
+              onTouchEnd={handleCloseTooltip}
+            />
+            {/* Tooltip popup */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9, y: -10 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.9, y: -10 }}
+              transition={{ duration: 0.15 }}
+              className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 z-[101] min-w-[200px] max-w-[280px]"
+            >
+              <div className="bg-neo-red border-3 border-neo-black shadow-hard-lg rounded-neo p-3 relative">
+                {/* Close button */}
+                <button
+                  onClick={handleCloseTooltip}
+                  onTouchEnd={handleCloseTooltip}
+                  className="absolute -top-2 -right-2 w-6 h-6 bg-neo-cream border-2 border-neo-black rounded-full flex items-center justify-center shadow-hard-sm"
+                  aria-label="Close"
+                >
+                  <X className="w-3 h-3 text-neo-black" />
+                </button>
+
+                {/* Word being explained */}
+                <p className="text-sm font-black text-neo-cream uppercase mb-2 border-b border-neo-cream/30 pb-1">
+                  "{displayWord}"
+                </p>
+
+                {/* AI rejection indicator */}
+                {isAiVerified && (
+                  <p className="text-[11px] font-bold text-neo-yellow mb-2 flex items-center gap-1">
+                    <span className="px-1.5 py-0.5 bg-neo-purple rounded border border-neo-black text-neo-cream">AI</span>
+                    {t('results.aiRejected') || 'Rejected by AI'}
+                  </p>
+                )}
+
+                {/* Reason */}
+                <p className="text-sm font-bold text-neo-cream leading-snug">
+                  {displayReason}
+                </p>
+
+                {/* Tap hint */}
+                <p className="text-[10px] text-neo-cream/60 mt-2 text-center">
+                  {t('results.tapToClose') || 'Tap anywhere to close'}
+                </p>
+              </div>
+              {/* Arrow pointing down */}
+              <div className="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-[8px] border-l-transparent border-r-[8px] border-r-transparent border-t-[8px] border-t-neo-black" />
+            </motion.div>
+          </>
         )}
-        style={{
-          backgroundColor: getBackgroundColor(),
-          color: getTextColor(),
-        }}
-      >
-        {label}
-        {/* Show combo bonus indicator */}
-        {comboBonus > 0 && !isDuplicate && isValid && (
-          <span className="text-[10px] px-1 py-0.5 bg-neo-yellow text-neo-black rounded border border-neo-black font-black">
-            +{comboBonus}
-          </span>
-        )}
-      </span>
+      </AnimatePresence>
+
       {isDuplicate && playerCount > 1 && (
         <span className="absolute -top-2 end-[-8px] bg-neo-black text-neo-cream text-[10px] px-1.5 py-0.5 min-w-[18px] h-[18px] flex items-center justify-center font-black border-2 border-neo-black rounded-neo">
           {playerCount}
@@ -134,8 +388,10 @@ const WordChip = memo<WordChipProps>(({ wordObj, playerCount }) => {
 
 WordChip.displayName = 'WordChip';
 
-const ResultsPlayerCard: React.FC<ResultsPlayerCardProps> = ({ player, index, allPlayerWords, currentUsername, isWinner, xpGainedData, levelUpData }) => {
-  const { t } = useLanguage();
+const ResultsPlayerCard: React.FC<ResultsPlayerCardProps> = ({ player, index, allPlayerWords, currentUsername, isWinner, xpGainedData, levelUpData, duplicateRuleDisabled }) => {
+  const { t, dir } = useLanguage();
+  // Arrow direction for level up indicator - flip for RTL
+  const levelArrow = dir === 'rtl' ? '←' : '→';
 
   // Check if this is the current player
   const isCurrentPlayer = currentUsername && player.username === currentUsername;
@@ -165,7 +421,7 @@ const ResultsPlayerCard: React.FC<ResultsPlayerCardProps> = ({ player, index, al
 
     // Debug logging for combo bonus calculation
     if (totalComboBonus > 0) {
-      logger.log(`[RESULTS] ${player.username} combo bonus: ${totalComboBonus} from ${validWords.filter(w => w.comboBonus > 0).length} words with bonuses`);
+      logger.log(`[RESULTS] ${player.username} combo bonus: ${totalComboBonus} from ${validWords.filter(w => (w.comboBonus ?? 0) > 0).length} words with bonuses`);
     }
 
     // Group valid words by points
@@ -180,7 +436,10 @@ const ResultsPlayerCard: React.FC<ResultsPlayerCardProps> = ({ player, index, al
 
     // Sort words alphabetically within each point group
     Object.keys(wordsByPoints).forEach(points => {
-      wordsByPoints[Number(points)].sort((a, b) => a.word.localeCompare(b.word));
+      const wordList = wordsByPoints[Number(points)];
+      if (wordList) {
+        wordList.sort((a, b) => a.word.localeCompare(b.word));
+      }
     });
 
     // Sort duplicate and invalid words alphabetically
@@ -202,6 +461,12 @@ const ResultsPlayerCard: React.FC<ResultsPlayerCardProps> = ({ player, index, al
     }
     return calculatePlayerInsights(player.allWords, 180, player.score);
   }, [isCurrentPlayer, player.allWords, player.score]);
+
+  // Filter out lifetime achievements and validate against player's actual round stats
+  // This prevents showing stale achievements from previous games
+  const gameAchievements = useMemo(() => {
+    return filterGameAchievements(player.achievements || [], player.allWords);
+  }, [player.achievements, player.allWords]);
 
   const showWinnerMessage = isCurrentPlayer && isWinner;
 
@@ -252,9 +517,10 @@ const ResultsPlayerCard: React.FC<ResultsPlayerCardProps> = ({ player, index, al
 
   return (
     <motion.div
-      initial={{ x: -20, opacity: 0, rotate: -2 }}
-      animate={{ x: 0, opacity: 1, rotate: index % 2 === 0 ? 1 : -1 }}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
       transition={{ delay: Math.min(index * 0.05, 0.3), duration: 0.3 }}
+      style={{ transform: `rotate(${index % 2 === 0 ? 1 : -1}deg)` }}
     >
       {/* Neo-Brutalist Card */}
       <div
@@ -382,7 +648,7 @@ const ResultsPlayerCard: React.FC<ResultsPlayerCardProps> = ({ player, index, al
                 transition={{ delay: 0.4, type: 'spring', stiffness: 200, damping: 10 }}
                 className="bg-neo-yellow border-2 border-neo-black rounded-neo px-2 py-0.5 shadow-hard-sm text-neo-black flex items-center gap-1"
               >
-                <span className="text-xs font-black">🎉 {t('results.levelUp') || 'Level Up!'} {levelUpData.oldLevel} → {levelUpData.newLevel}</span>
+                <span className="text-xs font-black">🎉 {t('results.levelUp') || 'Level Up!'} {levelUpData.oldLevel} {levelArrow} {levelUpData.newLevel}</span>
               </motion.div>
             )}
           </div>
@@ -428,20 +694,22 @@ const ResultsPlayerCard: React.FC<ResultsPlayerCardProps> = ({ player, index, al
                         {t('results.validWords') || 'Valid Words'} ({Object.values(wordsByPoints).flat().length})
                       </div>
                       <div className="space-y-2">
-                        {sortedPointGroups.map(points => (
-                          <div key={`points-${points}`} className="rounded-neo p-2 border-l-4 border-neo-black bg-white/50 dark:bg-slate-700/50" style={{ borderLeftColor: POINT_COLORS[points] || POINT_COLORS[8] }}>
+                        {sortedPointGroups.map(points => {
+                          const wordsForPoints = wordsByPoints[points] ?? [];
+                          return (
+                          <div key={`points-${points}`} className="rounded-neo p-2 border-l-4 border-neo-black bg-white/50 dark:bg-slate-700/50" style={{ borderLeftColor: getPointColor(points) }}>
                             <div className="text-xs font-black mb-1.5 flex items-center gap-2 text-neo-black dark:text-neo-cream uppercase">
                               <span className="px-2 py-0.5 rounded-neo flex items-center justify-center font-black text-xs border-2 border-neo-black"
                                     style={{
-                                      backgroundColor: POINT_COLORS[points] || POINT_COLORS[8],
+                                      backgroundColor: getPointColor(points),
                                       color: (points === 2 || points === 3) ? 'var(--neo-black)' : 'var(--neo-cream)'
                                     }}>
                                 {points} {t('results.points') || 'pts'}
                               </span>
-                              <span>{wordsByPoints[points].length} {t('hostView.words') || 'words'}</span>
+                              <span>{wordsForPoints.length} {t('hostView.words') || 'words'}</span>
                             </div>
                             <div className="flex flex-wrap gap-1.5">
-                              {wordsByPoints[points].map((wordObj, i) => (
+                              {wordsForPoints.map((wordObj, i) => (
                                 <WordChip
                                   key={`${points}-${i}`}
                                   wordObj={wordObj}
@@ -450,7 +718,8 @@ const ResultsPlayerCard: React.FC<ResultsPlayerCardProps> = ({ player, index, al
                               ))}
                             </div>
                           </div>
-                        ))}
+                          );
+                        })}
                       </div>
                     </div>
                   )}
@@ -507,13 +776,14 @@ const ResultsPlayerCard: React.FC<ResultsPlayerCardProps> = ({ player, index, al
         )}
 
         {/* Achievements Section - Neo-Brutalist */}
-        {player.achievements && player.achievements.length > 0 && (
+        {/* Only show game-specific achievements, filtered to exclude lifetime/career achievements */}
+        {gameAchievements.length > 0 && (
           <div className="mt-3 pt-3 sm:mt-4 sm:pt-4 border-t-4 border-neo-black relative z-10">
             <p className="text-sm font-black mb-2 text-neo-purple uppercase">
               {t('hostView.achievements')}:
             </p>
             <div className="flex flex-wrap gap-2">
-              {player.achievements.map((ach, i) => (
+              {gameAchievements.map((ach, i) => (
                 <AchievementBadge key={i} achievement={ach} index={i} />
               ))}
             </div>

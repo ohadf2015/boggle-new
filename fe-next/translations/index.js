@@ -1,4 +1,4 @@
-export const translations = {
+const translations = {
   en: {
     flag: '🇺🇸',
     name: 'English',
@@ -8,13 +8,13 @@ export const translations = {
       clash: 'Clash',
     },
     seo: {
-      title: 'LexiClash - Free Multiplayer Word Game | Play Online Now',
-      description: 'Looking for fun indoor activities? Play our free multiplayer word game similar to Alias and Kahoot! Find words on a letter grid and compete with friends in real-time. Perfect Christmas activity for kids and the whole family. No download needed - create a room, invite friends, and race to find the most words. Great for family game night and party entertainment.',
-      keywords: 'word game online, multiplayer word game, free online game, indoor activities, Christmas activities for kids, family game night, party games, word puzzle game, group games online, holiday games, team building games, games to play with friends, no download games, boggle style game, alias game, kahoot alternative, alias online',
-      ogTitle: 'LexiClash - Free Multiplayer Word Game for Family & Friends',
-      ogDescription: 'Find words on a letter grid and compete with friends in real-time! Perfect Christmas activity for kids and the whole family. No download - create a room and race to find the most words together.',
-      twitterTitle: 'LexiClash - Free Multiplayer Word Game for Family & Friends',
-      twitterDescription: 'Find words on a letter grid and compete with friends in real-time! Perfect Christmas activity for kids and the whole family. No download - create a room and race to find the most words together.',
+      title: 'LexiClash - Fast-Paced Multiplayer Word Game | Compete in Real-Time',
+      description: 'Race against friends in thrilling real-time word battles! LexiClash is a fast-paced multiplayer word game where every second counts. Find words, outsmart opponents, and climb the leaderboard. Perfect for parties, game nights, and friendly competition. Also great for building vocabulary while having fun! Play free in 4 languages - no download needed.',
+      keywords: 'multiplayer word game, real-time word game, online word battle, party word game, competitive word game, fast-paced word game, word puzzle multiplayer, boggle online, alias game, kahoot alternative, family game night, party games, team building games, word competition, live word game, word race game, vocabulary game, language learning game, ESL game online, brain training game, free online game',
+      ogTitle: 'LexiClash - Fast-Paced Multiplayer Word Game | Compete in Real-Time',
+      ogDescription: 'Race against friends in thrilling real-time word battles! Find words fast, outsmart opponents, climb the leaderboard. Perfect for parties and game nights. Play free in 4 languages!',
+      twitterTitle: 'LexiClash - Fast-Paced Multiplayer Word Game | Compete in Real-Time',
+      twitterDescription: 'Race against friends in thrilling real-time word battles! Find words fast, outsmart opponents, climb the leaderboard. Perfect for parties and game nights. Play free in 4 languages!',
       locale: 'en_US',
       language: 'English',
       leaderboard: {
@@ -49,6 +49,7 @@ export const translations = {
       next: 'Next',
       confirm: 'Confirm',
       cancel: 'Cancel',
+      dismiss: 'Dismiss',
       selectUILanguage: 'Interface Language',
       close: 'Close',
       understood: 'Got it, let\'s play!',
@@ -59,6 +60,7 @@ export const translations = {
       notConnected: 'Not connected to server',
       duplicateWarning: 'Words found by multiple players don\'t count',
       gameStarted: 'Game Started!',
+      joinedGame: 'Joined game!',
       newGameReady: 'New game starting!',
       lightMode: 'Light Mode',
       darkMode: 'Dark Mode',
@@ -67,6 +69,28 @@ export const translations = {
       comboBonus: 'combo!',
       pending: 'Pending',
       xpGained: 'XP',
+    },
+    combo: {
+      shieldUsed: '🛡️ Combo Shield Used!',
+      shieldEarned: '🛡️ Shield Earned!',
+    },
+    bots: {
+      title: 'AI Bots',
+      easy: 'Easy',
+      medium: 'Medium',
+      hard: 'Hard',
+      easyDesc: '3-5 letter words, slower pace',
+      mediumDesc: 'Balanced mix of words',
+      hardDesc: 'Long words, fast pace',
+      selectDifficulty: 'Choose Difficulty',
+      addBot: 'Add Bot',
+      adding: 'Adding...',
+      remove: 'Remove bot',
+      removeError: 'Failed to remove bot',
+      currentBots: 'Bots in Room',
+      quickAdd: 'Add',
+      emptyState: 'Add bots to practice or fill the room!',
+      helpText: 'Bots find and submit words automatically during the game.',
     },
     music: {
       volume: 'Volume',
@@ -120,7 +144,7 @@ export const translations = {
       roomNameTooLong: 'Room name cannot exceed 30 characters',
       roomNameInvalidChars: 'Room name contains invalid characters',
       gameCodeRequired: 'Game code is required',
-      gameCodeInvalid: 'Game code must be 4 digits',
+      gameCodeInvalid: 'Game code must be 6-10 alphanumeric characters',
       wordRequired: 'Word is required',
       wordTooLong: 'Word is too long',
       wordInvalidChars: 'Word contains invalid characters',
@@ -180,6 +204,23 @@ export const translations = {
       joining: 'Joining...',
       creating: 'Creating...',
       playersOnline: 'online',
+      // Funny default player names - randomly selected as suggestions
+      defaultPlayerNames: [
+        'Sneaky Pickle', 'Captain Chaos', 'Disco Potato', 'Fluffy Thunder', 'Cosmic Banana',
+        'Ninja Waffle', 'Professor Pancake', 'Sir Giggles', 'Lady Noodle', 'Baron Von Snack',
+        'Wizard Wombat', 'Turbo Turtle', 'Sergeant Socks', 'Duke Donut', 'Princess Pretzel',
+        'Count Crumbs', 'Admiral Avocado', 'General Giggles', 'Captain Cookie', 'Major Muffin',
+        'Jolly Jellybean', 'Bouncy Bear', 'Zippy Zebra', 'Silly Salmon', 'Giggly Goose',
+        'Wacky Walrus', 'Peppy Penguin', 'Loopy Llama', 'Dizzy Dragon', 'Funky Flamingo',
+        'Jazzy Jaguar', 'Quirky Quokka', 'Rowdy Raccoon', 'Sassy Sloth', 'Tiny Tornado',
+        'Wobbly Wizard', 'Zany Zucchini', 'Bubbly Badger', 'Crispy Cactus', 'Dapper Duck',
+        'Eager Eagle', 'Fizzy Fox', 'Groovy Gecko', 'Happy Hippo', 'Icy Iguana',
+        'Jumpy Jackal', 'Kooky Koala', 'Lucky Lemur', 'Merry Moose', 'Noble Newt',
+        'Plucky Panda', 'Quick Quail', 'Rusty Robot', 'Sparkly Spider', 'Twisty Taco',
+        'Upbeat Unicorn', 'Vivid Vulture', 'Wiggly Worm', 'Yappy Yak', 'Zippy Zombie',
+        'Artsy Armadillo', 'Breezy Buffalo', 'Chatty Chipmunk', 'Dandy Dolphin', 'Elfy Elephant',
+        'Feisty Frog', 'Giddy Giraffe', 'Humble Hamster', 'Itchy Ibex', 'Jittery Jellyfish',
+      ],
     },
     hostView: {
       waitingForPlayers: 'Waiting for players...',
@@ -290,6 +331,8 @@ export const translations = {
       add: 'Add',
       enterWord: 'Enter word...',
       waitingForResults: 'Waiting for results...',
+      calculatingScores: 'Calculating Scores...',
+      aiValidating: 'AI is checking your words...',
       leaderboard: 'Leaderboard',
       noPlayersYet: 'No players yet',
       wordSubmitted: 'Submitted',
@@ -313,8 +356,28 @@ export const translations = {
       disconnected: 'disconnected. Waiting for reconnection...',
       reconnected: 'reconnected',
       leftRoom: 'left the room',
+      weakConnection: 'has weak connection',
+      connectionRecovered: 'connection recovered',
       sessionMovedToAnotherTab: 'Session moved to another tab',
       sessionMovedToAnotherRoom: 'Session moved to another room',
+      aiValidating: 'AI checking...',
+      validatingWord: 'Checking:',
+      validation: {
+        scanning: 'Scanning words...',
+        checking: 'Checking dictionary...',
+        verifying: 'AI verifying...',
+        scoring: 'Calculating scores...',
+        finalizing: 'Finalizing results...',
+      },
+    },
+    hints: {
+      hint: 'Hint',
+      getHint: 'Get Hint',
+      loading: 'Getting hint...',
+      noHints: 'No hints left',
+      letters: 'letters',
+      startsWith: 'Starts with:',
+      tapToDismiss: 'Tap to dismiss',
     },
     achievementPopup: {
       unlocked: 'Achievement Unlocked!',
@@ -357,10 +420,20 @@ export const translations = {
       otherPlayers: 'Other Players',
       needsVerification: 'Needs Verification',
       autoVerified: 'Auto-Verified',
+      aiVerified: 'Verified by AI',
+      aiRejected: 'Rejected by AI',
+      tapToClose: 'Tap anywhere to close',
       showHeatmap: 'Show Heatmap',
       hideHeatmap: 'Hide Heatmap',
       startNewGame: 'Start New Game',
       levelUp: 'Level Up!',
+      pendingValidation: 'Pending community validation',
+      potentialScore: '+${score} pts if approved',
+      wordValidated: 'Word validated! You earned ${score} points!',
+      autoRejoinIn: 'Auto-rejoin in',
+      rejoinNow: 'Rejoin Now',
+      largeRoomMode: 'Large Room Mode',
+      duplicateRuleDisabled: 'With 8+ players, duplicate words still count!',
     },
     playerTitles: {
       champion: { name: 'Champion', icon: '👑', description: 'Winner of the game' },
@@ -385,7 +458,7 @@ export const translations = {
     howToPlay: {
       title: 'How to Play LexiClash?',
       description: 'LexiClash is a fast-paced word game where you race against time to find as many words as possible on a grid of letters. The longer the word, the more points you earn!',
-      descriptionNote: 'Words must be at least 2 letters long and must be in the selected game language.',
+      descriptionNote: 'Words must be at least 2 letters long. Names, places, and well-known acronyms are allowed!',
       createOrJoinTitle: 'Create or Join a Game',
       createOrJoinDesc: 'The host creates a room and shares the code. Players join using the code.',
       hostStartsTitle: 'Host Starts the Game',
@@ -603,7 +676,68 @@ export const translations = {
       },
       LONG_WORD_CHAIN: {
         name: 'Long Word Chain',
-        description: '3 consecutive words of 6+ letters'
+        description: '4 consecutive words of 6+ letters'
+      },
+      MINIMALIST: {
+        name: 'Minimalist',
+        description: 'Won with only 4+ letter words (15+ words)'
+      },
+      WORD_SNIPER: {
+        name: 'Word Sniper',
+        description: 'Found 5+ unique words no one else found'
+      },
+      PHOTO_FINISH: {
+        name: 'Photo Finish',
+        description: 'Won by less than 5 points'
+      },
+      UNDERDOG: {
+        name: 'Underdog',
+        description: 'Came from behind to win'
+      },
+      CLUTCH_PLAYER: {
+        name: 'Clutch Player',
+        description: 'Found 3+ words in the last 10 seconds'
+      },
+      // Lifetime/Career Achievements
+      VETERAN: {
+        name: 'Veteran',
+        description: 'Played 50 games total'
+      },
+      CENTURION: {
+        name: 'Centurion',
+        description: 'Played 100 games total'
+      },
+      WORD_COLLECTOR: {
+        name: 'Word Collector',
+        description: 'Found 1000 total valid words'
+      },
+      WORD_HOARDER: {
+        name: 'Word Hoarder',
+        description: 'Found 5000 total valid words'
+      },
+      CHAMPION: {
+        name: 'Champion',
+        description: 'Won 25 games total'
+      },
+      LEGEND: {
+        name: 'Legend',
+        description: 'Won 100 games total'
+      },
+      POINT_MASTER: {
+        name: 'Point Master',
+        description: 'Accumulated 10,000 total points'
+      },
+      POINT_KING: {
+        name: 'Point King',
+        description: 'Accumulated 50,000 total points'
+      },
+      DEDICATION: {
+        name: 'Dedication',
+        description: 'Played on 7 different days'
+      },
+      LOYAL_PLAYER: {
+        name: 'Loyal Player',
+        description: 'Played on 30 different days'
       }
     },
     achievementTiers: {
@@ -994,18 +1128,44 @@ export const translations = {
     },
     wordFeedback: {
       title: 'Word Jury Duty',
+      dictionaryTitle: 'Build Our Dictionary',
       question: 'Is this a real word?',
       submittedBy: 'Submitted by',
       thumbsUp: 'Legit!',
       thumbsDown: 'Nope',
       skipHint: 'Press ESC to skip',
-      thankYou: 'Thanks for voting!',
+      thankYou: 'Thanks for helping!',
       witty1: '{player} claims "{word}" is totally a word...',
       witty2: 'Real word or creative genius? You decide!',
       witty3: '{player} found "{word}" in their brain dictionary',
       witty4: 'Webster called, they want to know about "{word}"',
       witty5: 'Sounds legit... or does it?',
+      witty6: 'Is "{word}" a stroke of genius or madness?',
+      witty7: '{player} swears this is a real word!',
+      witty8: 'The dictionary committee awaits your verdict on "{word}"',
       nowValid: 'is now a valid word!',
+      dictionary1: 'Help us build a better dictionary!',
+      dictionary2: 'Your vote makes words official!',
+      dictionary3: 'Every vote improves the game!',
+      dictionary4: 'Be the word judge!',
+      dictionary5: 'Shape our dictionary together!',
+      notAWord: 'Not a word',
+      realWord: 'Real word!',
+      nextWord: 'Next word...',
+      almostApproved: 'Almost approved!',
+      votesNeeded: '{count} more votes to approve',
+      validForScoring: 'Counts as valid! Help add it to dictionary.',
+      moreForDictionary: 'more for dictionary',
+    },
+    footer: {
+      howToPlay: 'How to Play',
+      leaderboard: 'Leaderboard',
+      interactiveTutorial: 'Interactive Tutorial',
+    },
+    support: {
+      kofiWinner: 'Feeling Generous, Champ?',
+      kofiFooter: 'Buy Us a Coffee',
+      kofiTooltip: 'Support LexiClash development',
     }
   },
   he: {
@@ -1017,13 +1177,13 @@ export const translations = {
       clash: 'קלאש',
     },
     seo: {
-      title: 'לקסיקלאש - משחק מילים אונליין חינם | פעילות לחנוכה לכל המשפחה',
-      description: 'מחפשים פעילות ביתית מהנה? משחק מילים קבוצתי בחינם בסגנון אליאס וקהוט! מצאו מילים על לוח אותיות והתחרו מול חברים בזמן אמת. פעילות מושלמת לחנוכה לילדים ולכל המשפחה. ללא התקנה - פתחו חדר, הזמינו חברים ומי שמוצא הכי הרבה מילים מנצח!',
-      keywords: 'משחק מילים, משחק מילים אונליין, פעילות לחנוכה, פעילות ביתית, משחק לילדים, משחק משפחתי, משחק קבוצתי, משחק חינם, פעילות לילדים בבית, משחק מסיבה, ערב משפחתי, משחק רב משתתפים, משחק בעברית, פעילות חורף, משחק לחופשה, לוח אותיות, אליאס, קהוט, משחק כמו אליאס',
-      ogTitle: 'לקסיקלאש - משחק מילים קבוצתי חינם למשפחה וחברים',
-      ogDescription: 'מצאו מילים על לוח אותיות והתחרו מול חברים בזמן אמת! פעילות מושלמת לחנוכה לילדים ולכל המשפחה. ללא התקנה - פתחו חדר ומי שמוצא הכי הרבה מילים מנצח!',
-      twitterTitle: 'לקסיקלאש - משחק מילים קבוצתי חינם למשפחה וחברים',
-      twitterDescription: 'מצאו מילים על לוח אותיות והתחרו מול חברים בזמן אמת! פעילות מושלמת לחנוכה לילדים ולכל המשפחה. ללא התקנה - פתחו חדר ומי שמוצא הכי הרבה מילים מנצח!',
+      title: 'לקסיקלאש - משחק מילים מהיר ומרתק | התחרו בזמן אמת',
+      description: 'התחרו נגד חברים בקרבות מילים מרגשים בזמן אמת! לקסיקלאש הוא משחק מילים מהיר שבו כל שנייה חשובה. מצאו מילים, נצחו את היריבים וטפסו בטבלת המובילים. מושלם למסיבות, ערבי משחקים ותחרויות ידידותיות. גם מעולה להעשרת אוצר מילים תוך כדי הנאה! שחקו בחינם ב-4 שפות - ללא התקנה.',
+      keywords: 'משחק מילים מרובה משתתפים, משחק מילים בזמן אמת, קרב מילים אונליין, משחק מילים למסיבות, משחק מילים תחרותי, משחק מילים מהיר, אליאס, קהוט, משחק כמו אליאס, ערב משפחתי, משחק מסיבה, משחק קבוצתי, תחרות מילים, משחק מילים חי, מירוץ מילים, משחק אוצר מילים, משחק חינם, משחק לילדים, משחק משפחתי, פעילות לחנוכה, פעילות ביתית, משחק בעברית',
+      ogTitle: 'לקסיקלאש - משחק מילים מהיר ומרתק | התחרו בזמן אמת',
+      ogDescription: 'התחרו נגד חברים בקרבות מילים מרגשים בזמן אמת! מצאו מילים במהירות, נצחו את היריבים וטפסו בדירוג. מושלם למסיבות וערבי משחקים. שחקו בחינם ב-4 שפות!',
+      twitterTitle: 'לקסיקלאש - משחק מילים מהיר ומרתק | התחרו בזמן אמת',
+      twitterDescription: 'התחרו נגד חברים בקרבות מילים מרגשים בזמן אמת! מצאו מילים במהירות, נצחו את היריבים וטפסו בדירוג. מושלם למסיבות וערבי משחקים. שחקו בחינם ב-4 שפות!',
       locale: 'he_IL',
       language: 'Hebrew',
       leaderboard: {
@@ -1058,6 +1218,7 @@ export const translations = {
       next: 'הבא',
       confirm: 'אישור',
       cancel: 'ביטול',
+      dismiss: 'בטל',
       selectUILanguage: 'שפת ממשק',
       close: 'סגור',
       understood: 'הבנתי, בוא נשחק!',
@@ -1068,6 +1229,7 @@ export const translations = {
       notConnected: 'לא מחובר לשרת',
       duplicateWarning: 'מילים שנמצאו על ידי מספר שחקנים לא נספרות',
       gameStarted: 'המשחק התחיל!',
+      joinedGame: 'הצטרפת למשחק!',
       newGameReady: 'מתחיל משחק חדש!',
       lightMode: 'מצב בהיר',
       darkMode: 'מצב כהה',
@@ -1076,6 +1238,28 @@ export const translations = {
       comboBonus: 'קומבו!',
       pending: 'ממתין',
       xpGained: 'XP',
+    },
+    combo: {
+      shieldUsed: '🛡️ מגן קומבו נוצל!',
+      shieldEarned: '🛡️ מגן נפתח!',
+    },
+    bots: {
+      title: 'בוטים',
+      easy: 'קל',
+      medium: 'בינוני',
+      hard: 'קשה',
+      easyDesc: 'מילים של 3-5 אותיות, קצב איטי',
+      mediumDesc: 'מיקס מאוזן של מילים',
+      hardDesc: 'מילים ארוכות, קצב מהיר',
+      selectDifficulty: 'בחר רמת קושי',
+      addBot: 'הוסף בוט',
+      adding: 'מוסיף...',
+      remove: 'הסר בוט',
+      removeError: 'נכשל בהסרת הבוט',
+      currentBots: 'בוטים בחדר',
+      quickAdd: 'הוסף',
+      emptyState: 'הוסיפו בוטים להתאמן או למלא את החדר!',
+      helpText: 'בוטים מוצאים ושולחים מילים אוטומטית במשחק.',
     },
     music: {
       volume: 'עוצמה',
@@ -1129,7 +1313,7 @@ export const translations = {
       roomNameTooLong: 'שם החדר לא יכול לעבור 30 תווים',
       roomNameInvalidChars: 'שם החדר מכיל תווים לא חוקיים',
       gameCodeRequired: 'נדרש קוד משחק',
-      gameCodeInvalid: 'קוד המשחק חייב להיות בן 4 ספרות',
+      gameCodeInvalid: 'קוד המשחק חייב להכיל 6-10 תווים אלפאנומריים',
       wordRequired: 'נדרשת מילה',
       wordTooLong: 'המילה ארוכה מדי',
       wordInvalidChars: 'המילה מכילה תווים לא חוקיים',
@@ -1189,6 +1373,23 @@ export const translations = {
       joining: 'מצטרף...',
       creating: 'יוצר...',
       playersOnline: 'מחוברים',
+      // שמות שחקנים מצחיקים - נבחרים באקראי כהצעות
+      defaultPlayerNames: [
+        'טופו מקולקל', 'סמי סביב', 'ברכה', 'בתיה', 'שמשון הגיבור',
+        'מלפפון מטורף', 'קפטן קוגל', 'פרופסור פלאפל', 'נינג׳ה נודניק', 'דיסקו דג',
+        'בננה בלגן', 'וופל ויזארד', 'סרג׳נט סביבון', 'דוכס דונאט', 'נסיכת פרעצל',
+        'רוזמרי רעשן', 'אדמירל אבוקדו', 'גנרל גיחוך', 'קפטן עוגייה', 'מייג׳ור מאפין',
+        'ג׳לי ג׳ולי', 'דוב דובדבן', 'זברה זריזה', 'סלמון סחרחר', 'אווז אבסורדי',
+        'קונג פו קצפת', 'פינגווין פזיז', 'לאמה לוליינית', 'דרקון דפוק', 'פלמינגו פאנקי',
+        'יגואר ג׳אזי', 'קוואקה קירקסית', 'רקון רועש', 'עצלן עצבני', 'טורנדו טיפשי',
+        'קוסם קופצני', 'זוקיני זנזני', 'גירית גמישה', 'קקטוס קריספי', 'ברווז דנדי',
+        'נשר נלהב', 'שועל שמח', 'גקו גרובי', 'היפו היפי', 'איגואנה קפואה',
+        'תן תזזיתי', 'קואלה קוקי', 'למור לאקי', 'מוס מרי', 'טריטון נובל',
+        'פנדה פלאקי', 'שליו שקי', 'רובוט חלוד', 'עכביש ניצוץ', 'טאקו טויסטי',
+        'חד קרן אופטימי', 'נשר נמרץ', 'תולעת מתפתלת', 'יאק יפיפה', 'זומבי זריז',
+        'ארמדילו אמן', 'באפלו בריזי', 'צ׳יפמאנק צ׳טי', 'דולפין דנדי', 'פיל אלפי',
+        'צפרדע פייטנית', 'ג׳ירפה ג׳ידית', 'אוגר הומבל', 'יעל גרדנית', 'מדוזה ג׳יטרית',
+      ],
     },
     hostView: {
       waitingForPlayers: 'ממתין לשחקנים...',
@@ -1299,6 +1500,8 @@ export const translations = {
       add: 'הוסף',
       enterWord: 'הזן מילה...',
       waitingForResults: 'ממתין לתוצאות...',
+      calculatingScores: 'מחשב תוצאות...',
+      aiValidating: 'AI בודק את המילים שלך...',
       leaderboard: 'טבלת המובילים',
       noPlayersYet: 'אין שחקנים עדיין',
       wordSubmitted: 'נשלח',
@@ -1322,8 +1525,28 @@ export const translations = {
       disconnected: 'התנתק. ממתין לחיבור מחדש...',
       reconnected: 'התחבר מחדש',
       leftRoom: 'עזב את החדר',
+      weakConnection: 'חיבור חלש',
+      connectionRecovered: 'החיבור התאושש',
       sessionMovedToAnotherTab: 'החיבור עבר ללשונית אחרת',
       sessionMovedToAnotherRoom: 'החיבור עבר לחדר אחר',
+      aiValidating: 'AI בודק...',
+      validatingWord: 'בודק:',
+      validation: {
+        scanning: 'סורק מילים...',
+        checking: 'בודק במילון...',
+        verifying: 'AI מאמת...',
+        scoring: 'מחשב ניקוד...',
+        finalizing: 'מסיים תוצאות...',
+      },
+    },
+    hints: {
+      hint: 'רמז',
+      getHint: 'קבל רמז',
+      loading: 'מקבל רמז...',
+      noHints: 'אין רמזים נותרים',
+      letters: 'אותיות',
+      startsWith: 'מתחיל ב:',
+      tapToDismiss: 'הקש לסגירה',
     },
     achievementPopup: {
       unlocked: 'הישג נפתח!',
@@ -1366,10 +1589,20 @@ export const translations = {
       otherPlayers: 'שחקנים אחרים',
       needsVerification: 'דורש אימות',
       autoVerified: 'אומת אוטומטית',
+      aiVerified: 'אומת על ידי AI',
+      aiRejected: 'נדחה על ידי AI',
+      tapToClose: 'לחץ בכל מקום לסגירה',
       showHeatmap: 'הצג מפת חום',
       hideHeatmap: 'הסתר מפת חום',
       startNewGame: 'התחל משחק חדש',
       levelUp: 'עליית רמה!',
+      pendingValidation: 'ממתין לאימות קהילתי',
+      potentialScore: '+${score} נק\' אם יאושר',
+      wordValidated: 'המילה אושרה! קיבלת ${score} נקודות!',
+      autoRejoinIn: 'חזרה אוטומטית בעוד',
+      rejoinNow: 'חזור עכשיו',
+      largeRoomMode: 'מצב חדר גדול',
+      duplicateRuleDisabled: 'עם 8+ שחקנים, מילים כפולות עדיין נספרות!',
     },
     playerTitles: {
       champion: { name: 'אלוף', icon: '👑', description: 'מנצח המשחק' },
@@ -1394,7 +1627,7 @@ export const translations = {
     howToPlay: {
       title: 'איך משחקים בלקסיקלאש?',
       description: 'לקסיקלאש הוא משחק מילים מהיר בו אתם מתחרים בזמן כדי למצוא כמה שיותר מילים על לוח אותיות. ככל שהמילה ארוכה יותר, כך תקבלו יותר נקודות!',
-      descriptionNote: 'מילים חייבות להיות לפחות בנות 2 אותיות וחייבות להיות בשפת המשחק הנבחרת.',
+      descriptionNote: 'מילים חייבות להיות לפחות בנות 2 אותיות. שמות, מקומות וראשי תיבות מוכרים מותרים!',
       createOrJoinTitle: 'צרו או הצטרפו למשחק',
       createOrJoinDesc: 'המארח יוצר חדר ומשתף את הקוד. השחקנים מצטרפים באמצעות הקוד.',
       hostStartsTitle: 'המארח מתחיל את המשחק',
@@ -1607,7 +1840,68 @@ export const translations = {
       },
       LONG_WORD_CHAIN: {
         name: 'שרשרת מילים ארוכות',
-        description: '3 מילים רצופות בנות 6+ אותיות'
+        description: '4 מילים רצופות בנות 6+ אותיות'
+      },
+      MINIMALIST: {
+        name: 'מינימליסט',
+        description: 'ניצחון עם מילים של 4+ אותיות בלבד (15+ מילים)'
+      },
+      WORD_SNIPER: {
+        name: 'צלף מילים',
+        description: 'מצא 5+ מילים ייחודיות שאף אחד אחר לא מצא'
+      },
+      PHOTO_FINISH: {
+        name: 'פוטו פיניש',
+        description: 'ניצחון בפחות מ-5 נקודות הפרש'
+      },
+      UNDERDOG: {
+        name: 'אאוטסיידר',
+        description: 'ניצחון לאחר פיגור באמצע המשחק'
+      },
+      CLUTCH_PLAYER: {
+        name: 'שחקן קלאץ\'',
+        description: 'מצא 3+ מילים ב-10 השניות האחרונות'
+      },
+      // הישגי קריירה
+      VETERAN: {
+        name: 'ותיק',
+        description: 'שיחק 50 משחקים'
+      },
+      CENTURION: {
+        name: 'סנטוריון',
+        description: 'שיחק 100 משחקים'
+      },
+      WORD_COLLECTOR: {
+        name: 'אספן מילים',
+        description: 'מצא 1000 מילים תקינות סה"כ'
+      },
+      WORD_HOARDER: {
+        name: 'אוגר מילים',
+        description: 'מצא 5000 מילים תקינות סה"כ'
+      },
+      CHAMPION: {
+        name: 'אלוף',
+        description: 'ניצח 25 משחקים'
+      },
+      LEGEND: {
+        name: 'אגדה',
+        description: 'ניצח 100 משחקים'
+      },
+      POINT_MASTER: {
+        name: 'אדון הנקודות',
+        description: 'צבר 10,000 נקודות סה"כ'
+      },
+      POINT_KING: {
+        name: 'מלך הנקודות',
+        description: 'צבר 50,000 נקודות סה"כ'
+      },
+      DEDICATION: {
+        name: 'מסירות',
+        description: 'שיחק ב-7 ימים שונים'
+      },
+      LOYAL_PLAYER: {
+        name: 'שחקן נאמן',
+        description: 'שיחק ב-30 ימים שונים'
       }
     },
     achievementTiers: {
@@ -1997,18 +2291,44 @@ export const translations = {
     },
     wordFeedback: {
       title: 'בית דין למילים',
+      dictionaryTitle: 'בנה את המילון שלנו',
       question: 'האם זו מילה אמיתית?',
       submittedBy: 'נשלח על ידי',
       thumbsUp: 'לגיטימי!',
       thumbsDown: 'לא',
       skipHint: 'לחץ ESC לדילוג',
-      thankYou: 'תודה על ההצבעה!',
+      thankYou: 'תודה על העזרה!',
       witty1: '{player} טוען ש"{word}" היא מילה לגמרי...',
       witty2: 'מילה אמיתית או יצירתיות? אתה מחליט!',
       witty3: '{player} מצא את "{word}" במילון שלו',
       witty4: 'האקדמיה ללשון התקשרה, רוצים לדעת על "{word}"',
       witty5: 'נשמע לגיטימי... או לא?',
+      witty6: 'האם "{word}" הברקה גאונית או שגעון?',
+      witty7: '{player} נשבע שזו מילה אמיתית!',
+      witty8: 'ועדת המילון מחכה להחלטתך על "{word}"',
       nowValid: 'היא עכשיו מילה חוקית!',
+      dictionary1: 'עזור לנו לבנות מילון טוב יותר!',
+      dictionary2: 'ההצבעה שלך הופכת מילים לרשמיות!',
+      dictionary3: 'כל הצבעה משפרת את המשחק!',
+      dictionary4: 'היה שופט המילים!',
+      dictionary5: 'בנה את המילון שלנו ביחד!',
+      notAWord: 'לא מילה',
+      realWord: 'מילה אמיתית!',
+      nextWord: 'מילה הבאה...',
+      almostApproved: 'כמעט מאושר!',
+      votesNeeded: 'עוד {count} הצבעות לאישור',
+      validForScoring: 'נחשב כמילה! עזור להוסיף למילון.',
+      moreForDictionary: 'עוד להוספה למילון',
+    },
+    footer: {
+      howToPlay: 'איך משחקים',
+      leaderboard: 'טבלת מובילים',
+      interactiveTutorial: 'מדריך אינטראקטיבי',
+    },
+    support: {
+      kofiWinner: 'מרגיש נדיב, אלוף?',
+      kofiFooter: 'קנה לנו קפה',
+      kofiTooltip: 'תמוך בפיתוח לקסיקלאש',
     }
   },
   sv: {
@@ -2020,13 +2340,13 @@ export const translations = {
       clash: 'Clash',
     },
     seo: {
-      title: 'LexiClash - Multiplayer Word Game Online | Spela gratis nu',
-      description: 'LexiClash - Snabbt multiplayer-ordspel liknande Alias och Kahoot, perfekt för fester, teambuilding och familjekul! Hitta ord, tävla i realtid. Gratis onlinespel - ingen nedladdning krävs!',
-      keywords: 'LexiClash, ordspel, multiplayer, onlinespel, festspel, teambuilding, familjespel, ordpussel, gratis spel, alias spel, kahoot alternativ, alias online',
-      ogTitle: 'LexiClash - Multiplayer ordspel',
-      ogDescription: 'LexiClash - Snabbt multiplayer-ordspel perfekt för fester, teambuilding och familjekul! Hitta ord, tävla i realtid. Gratis onlinespel - ingen nedladdning krävs!',
-      twitterTitle: 'LexiClash - Multiplayer ordspel',
-      twitterDescription: 'LexiClash - Snabbt multiplayer-ordspel perfekt för fester, teambuilding och familjekul! Hitta ord, tävla i realtid. Gratis onlinespel - ingen nedladdning krävs!',
+      title: 'LexiClash - Snabbt Multiplayer Ordspel | Tävla i Realtid',
+      description: 'Tävla mot vänner i spännande ordstrider i realtid! LexiClash är ett snabbt multiplayer-ordspel där varje sekund räknas. Hitta ord, överträffa motståndarna och klättra på topplistan. Perfekt för fester, spelkvällar och vänskaplig tävling. Också bra för att bygga ordförråd medan du har kul! Spela gratis på 4 språk - ingen nedladdning krävs.',
+      keywords: 'multiplayer ordspel, realtids ordspel, online ordstrid, festspel, tävlings ordspel, snabbt ordspel, ordpussel multiplayer, alias spel, kahoot alternativ, familjespelkväll, festspel, teambuilding, ordtävling, live ordspel, ordrace, ordförrådsspel, gratis onlinespel',
+      ogTitle: 'LexiClash - Snabbt Multiplayer Ordspel | Tävla i Realtid',
+      ogDescription: 'Tävla mot vänner i spännande ordstrider i realtid! Hitta ord snabbt, överträffa motståndarna, klättra på topplistan. Perfekt för fester och spelkvällar. Spela gratis på 4 språk!',
+      twitterTitle: 'LexiClash - Snabbt Multiplayer Ordspel | Tävla i Realtid',
+      twitterDescription: 'Tävla mot vänner i spännande ordstrider i realtid! Hitta ord snabbt, överträffa motståndarna, klättra på topplistan. Perfekt för fester och spelkvällar. Spela gratis på 4 språk!',
       locale: 'sv_SE',
       language: 'Swedish',
       leaderboard: {
@@ -2058,8 +2378,10 @@ export const translations = {
       loading: 'Laddar...',
       error: 'Fel',
       back: 'Tillbaka',
+      next: 'Nästa',
       confirm: 'Bekräfta',
       cancel: 'Avbryt',
+      dismiss: 'Avfärda',
       selectUILanguage: 'Gränssnittsspråk',
       close: 'Stäng',
       understood: 'Förstått, låt oss spela!',
@@ -2070,6 +2392,7 @@ export const translations = {
       notConnected: 'Inte ansluten till servern',
       duplicateWarning: 'Ord som hittas av flera spelare räknas inte',
       gameStarted: 'Spelet startat!',
+      joinedGame: 'Gick med i spelet!',
       newGameReady: 'Startar nytt spel!',
       lightMode: 'Ljust läge',
       darkMode: 'Mörkt läge',
@@ -2078,6 +2401,28 @@ export const translations = {
       comboBonus: 'kombo!',
       pending: 'Väntar',
       xpGained: 'XP',
+    },
+    combo: {
+      shieldUsed: '🛡️ Kombosköld använd!',
+      shieldEarned: '🛡️ Sköld upplåst!',
+    },
+    bots: {
+      title: 'AI-bottar',
+      easy: 'Lätt',
+      medium: 'Mellan',
+      hard: 'Svår',
+      easyDesc: '3-5 bokstavsord, långsamt tempo',
+      mediumDesc: 'Balanserad blandning av ord',
+      hardDesc: 'Långa ord, snabbt tempo',
+      selectDifficulty: 'Välj svårighetsgrad',
+      addBot: 'Lägg till bot',
+      adding: 'Lägger till...',
+      remove: 'Ta bort bot',
+      removeError: 'Kunde inte ta bort bot',
+      currentBots: 'Bottar i rummet',
+      quickAdd: 'Lägg till',
+      emptyState: 'Lägg till bottar för att öva eller fylla rummet!',
+      helpText: 'Bottar hittar och skickar in ord automatiskt under spelet.',
     },
     music: {
       volume: 'Volym',
@@ -2131,7 +2476,7 @@ export const translations = {
       roomNameTooLong: 'Rumsnamn får inte överstiga 30 tecken',
       roomNameInvalidChars: 'Rumsnamn innehåller ogiltiga tecken',
       gameCodeRequired: 'Spelkod krävs',
-      gameCodeInvalid: 'Spelkod måste vara 4 siffror',
+      gameCodeInvalid: 'Spelkod måste vara 6-10 alfanumeriska tecken',
       wordRequired: 'Ord krävs',
       wordTooLong: 'Ordet är för långt',
       wordInvalidChars: 'Ordet innehåller ogiltiga tecken',
@@ -2191,6 +2536,23 @@ export const translations = {
       joining: 'Går med...',
       creating: 'Skapar...',
       playersOnline: 'online',
+      // Roliga standardnamn för spelare - slumpmässigt föreslagna
+      defaultPlayerNames: [
+        'Smansen Fnansen', 'Kapten Kaos', 'Dansen Diskansen', 'Flansen Flansen', 'Koansen Koansen',
+        'Nansen Ninansen', 'Profansen Pannansen', 'Herr Fansen', 'Fru Nudansen', 'Baron Snackansen',
+        'Trollansen', 'Turbo Sköldansen', 'Sergantn Sockansen', 'Hertansen', 'Prinsessan Kringlansen',
+        'Greven Smulansen', 'Admiral Avokansen', 'General Skrattansen', 'Kapten Kakansen', 'Major Muffansen',
+        'Glansen Gelansen', 'Studsansen Björnansen', 'Snabbansen Zebansen', 'Dumansen Laxansen', 'Fnittransen Gåsansen',
+        'Galnansen Valrossansen', 'Peppansen Pingvinansen', 'Loansen Llamansen', 'Yrransen Drakansen', 'Funkansen Flamingansen',
+        'Jazzansen Jaguaransen', 'Kvirkansen Quokkansen', 'Vildansen Tvättbjörnansen', 'Fräckansen Sengångansen', 'Lansen Tornadansen',
+        'Vinglansen Trollkarlansen', 'Zansen Zucchinansen', 'Bubblansen Grävlingansen', 'Krispansen Kaktusansen', 'Fiffansen Ankansen',
+        'Ivransen Örnansen', 'Fräsansen Rävansen', 'Groovansen Geckansen', 'Gladansen Flodansen', 'Isansen Leguanansen',
+        'Hoppansen Schakalansen', 'Tokansen Koalansen', 'Turansen Lemuransen', 'Muntransen Älgansen', 'Finansen Salamandansen',
+        'Pluckansen Pandansen', 'Kvickansen Vaktelansen', 'Rostansen Robotansen', 'Glittransen Spindansen', 'Vridansen Tacansen',
+        'Optimistansen Enhörningansen', 'Livansen Gamansen', 'Slingransen Maskansen', 'Jappansen Jakansen', 'Rappansen Zombieansen',
+        'Konstansen Bältdjuransen', 'Brisansen Buffelansen', 'Pratlansen Jordekorransen', 'Dandansen Delfinansen', 'Elefantansen Ansen',
+        'Fightansen Grodansen', 'Gladansen Giraffansen', 'Ödmjukansen Hamsteransen', 'Klådansen Stenbockansen', 'Nervansen Manetansen',
+      ],
     },
     hostView: {
       waitingForPlayers: 'Väntar på spelare...',
@@ -2301,6 +2663,8 @@ export const translations = {
       add: 'Lägg till',
       enterWord: 'Ange ord...',
       waitingForResults: 'Väntar på resultat...',
+      calculatingScores: 'Beräknar poäng...',
+      aiValidating: 'AI kontrollerar dina ord...',
       leaderboard: 'Topplista',
       noPlayersYet: 'Inga spelare ännu',
       wordSubmitted: 'Skickat',
@@ -2324,8 +2688,28 @@ export const translations = {
       disconnected: 'kopplades bort. Väntar på återanslutning...',
       reconnected: 'återansluten',
       leftRoom: 'lämnade rummet',
+      weakConnection: 'har svag anslutning',
+      connectionRecovered: 'anslutningen återställd',
       sessionMovedToAnotherTab: 'Sessionen flyttades till en annan flik',
       sessionMovedToAnotherRoom: 'Sessionen flyttades till ett annat rum',
+      aiValidating: 'AI kontrollerar...',
+      validatingWord: 'Kontrollerar:',
+      validation: {
+        scanning: 'Skannar ord...',
+        checking: 'Kollar ordbok...',
+        verifying: 'AI verifierar...',
+        scoring: 'Beräknar poäng...',
+        finalizing: 'Slutför resultat...',
+      },
+    },
+    hints: {
+      hint: 'Ledtråd',
+      getHint: 'Få ledtråd',
+      loading: 'Hämtar ledtråd...',
+      noHints: 'Inga ledtrådar kvar',
+      letters: 'bokstäver',
+      startsWith: 'Börjar med:',
+      tapToDismiss: 'Tryck för att stänga',
     },
     achievementPopup: {
       unlocked: 'Prestation upplåst!',
@@ -2368,10 +2752,20 @@ export const translations = {
       otherPlayers: 'Andra spelare',
       needsVerification: 'Behöver Verifiering',
       autoVerified: 'Automatiskt Verifierad',
+      aiVerified: 'Verifierad av AI',
+      aiRejected: 'Avvisad av AI',
+      tapToClose: 'Tryck var som helst för att stänga',
       showHeatmap: 'Visa värmekarta',
       hideHeatmap: 'Dölj värmekarta',
       startNewGame: 'Starta nytt spel',
       levelUp: 'Nivå upp!',
+      pendingValidation: 'Väntar på gemenskapens validering',
+      potentialScore: '+${score} poäng om godkänt',
+      wordValidated: 'Ordet validerat! Du fick ${score} poäng!',
+      autoRejoinIn: 'Automatiskt återansluter om',
+      rejoinNow: 'Återanslut nu',
+      largeRoomMode: 'Stort rumsläge',
+      duplicateRuleDisabled: 'Med 8+ spelare räknas dubblettord fortfarande!',
     },
     playerTitles: {
       champion: { name: 'Mästare', icon: '👑', description: 'Spelets vinnare' },
@@ -2396,7 +2790,7 @@ export const translations = {
     howToPlay: {
       title: 'Hur spelar man LexiClash?',
       description: 'LexiClash är ett snabbt ordspel där du tävlar mot klockan för att hitta så många ord som möjligt på ett bokstavsrutnät. Ju längre ord, desto fler poäng!',
-      descriptionNote: 'Ord måste vara minst 2 bokstäver långa och på det valda spelspråket.',
+      descriptionNote: 'Ord måste vara minst 2 bokstäver långa. Namn, platser och kända akronymer är tillåtna!',
       createOrJoinTitle: 'Skapa eller gå med i ett spel',
       createOrJoinDesc: 'Värden skapar ett rum och delar koden. Spelare går med med koden.',
       hostStartsTitle: 'Värden startar spelet',
@@ -2426,6 +2820,7 @@ export const translations = {
         longWordMaster: '📏 Långordsmästare - Hitta ett ord med 7+ bokstäver',
         perfectionist: '💎 Perfektionist - 100% av dina ord är giltiga',
         earlyBird: '🐦 Morgonpiggen - Hitta 3 ord på första minuten',
+        examples: 'Exempel på prestationer',
       },
       tipsTitle: 'Tips för att vinna 💡',
       tips: {
@@ -2437,6 +2832,70 @@ export const translations = {
       },
       readyToPlay: 'Redo? Låt oss börja spela! 🎮',
       funForFamily: 'Ett engagerande och roligt spel för hela familjen - helt gratis!',
+      letters: 'bokstäver',
+      pts: 'poäng',
+      // Step-based tutorial sections
+      steps: {
+        basics: {
+          title: 'Spelgrunder',
+          description: 'LexiClash är ett snabbt multiplayer-ordspel. Tävla mot vänner om att hitta ord på ett bokstavsrutnät!',
+        },
+        grid: {
+          title: 'Hitta ord',
+          description: 'Svep eller klicka på angränsande bokstäver för att bilda ord. Bokstäver kopplas ihop i alla 8 riktningar - horisontellt, vertikalt och diagonalt!',
+        },
+        scoring: {
+          title: 'Poängsystem',
+          description: 'Längre ord ger fler poäng! Varje bokstav utöver den första ger en poäng till din totala poäng.',
+        },
+        combo: {
+          title: 'Kombosystem',
+          description: 'Skicka ord snabbt för att bygga kombomultiplikatorer! Ju snabbare du hittar ord, desto större bonus.',
+        },
+        xp: {
+          title: 'XP & Nivåer',
+          description: 'Tjäna XP från varje spel för att stiga i nivå och låsa upp nya titlar. Vinstbonusar och prestationer ökar din XP!',
+        },
+        achievements: {
+          title: 'Prestationer',
+          description: 'Lås upp prestationer för speciella bedrifter! Varje prestation kan tjänas flera gånger för att uppgradera dess nivå.',
+        },
+      },
+      // Interactive demo translations
+      demo: {
+        watchAnimation: 'Se hur ord bildas på rutnätet',
+        autoPlay: 'Auto',
+        replay: 'Spela om',
+        tryIt: 'Prova att dra bokstäver själv!',
+        gridExample: 'Exempel på att spåra ett ord på rutnätet',
+        traceExample: 'Spåra bokstäver för att bilda ord - T→O→N→D',
+      },
+      // Combo system translations
+      combo: {
+        currentCombo: 'Nuvarande Kombo',
+        multiplier: 'multiplikator',
+        noBonus: 'Ingen bonus',
+        tryIt: 'Simulera Kombo',
+        building: 'Bygger kombo...',
+        tip: 'Skicka ord inom 5 sekunder från varandra för att behålla din kombo!',
+      },
+      // XP system translations
+      xp: {
+        howToEarn: 'Hur man tjänar XP',
+        base: 'Slutför ett spel',
+        score: 'Få poäng',
+        win: 'Vinn spelet',
+        achievement: 'Lås upp prestationer',
+        unlockTitles: 'Lås upp titlar när du stiger i nivå',
+      },
+      // New player welcome
+      newPlayer: {
+        welcomeTitle: 'Välkommen till LexiClash!',
+        welcomeMessage: 'Det verkar som att det här är din första gång här. Vill du ha en snabb genomgång av hur man spelar?',
+        showTutorial: 'Visa mig hur',
+        skipTutorial: 'Jag klarar mig',
+        dontShowAgain: 'Visa inte detta igen',
+      },
     },
     achievements: {
       FIRST_BLOOD: {
@@ -2549,7 +3008,68 @@ export const translations = {
       },
       LONG_WORD_CHAIN: {
         name: 'Lång Ordkedja',
-        description: '3 konsekutiva ord med 6+ bokstäver'
+        description: '4 konsekutiva ord med 6+ bokstäver'
+      },
+      MINIMALIST: {
+        name: 'Minimalist',
+        description: 'Vann med endast 4+ bokstavsord (15+ ord)'
+      },
+      WORD_SNIPER: {
+        name: 'Ordprickskytt',
+        description: 'Hittade 5+ unika ord som ingen annan hittade'
+      },
+      PHOTO_FINISH: {
+        name: 'Fotofinish',
+        description: 'Vann med mindre än 5 poängs marginal'
+      },
+      UNDERDOG: {
+        name: 'Underdog',
+        description: 'Kom från underläge för att vinna'
+      },
+      CLUTCH_PLAYER: {
+        name: 'Clutch-spelare',
+        description: 'Hittade 3+ ord under sista 10 sekunderna'
+      },
+      // Livstidsprestationer
+      VETERAN: {
+        name: 'Veteran',
+        description: 'Spelade 50 spel totalt'
+      },
+      CENTURION: {
+        name: 'Centurion',
+        description: 'Spelade 100 spel totalt'
+      },
+      WORD_COLLECTOR: {
+        name: 'Ordsamlare',
+        description: 'Hittade 1000 giltiga ord totalt'
+      },
+      WORD_HOARDER: {
+        name: 'Ordhoarder',
+        description: 'Hittade 5000 giltiga ord totalt'
+      },
+      CHAMPION: {
+        name: 'Mästare',
+        description: 'Vann 25 spel totalt'
+      },
+      LEGEND: {
+        name: 'Legend',
+        description: 'Vann 100 spel totalt'
+      },
+      POINT_MASTER: {
+        name: 'Poängmästare',
+        description: 'Samlade 10 000 poäng totalt'
+      },
+      POINT_KING: {
+        name: 'Poängkung',
+        description: 'Samlade 50 000 poäng totalt'
+      },
+      DEDICATION: {
+        name: 'Hängivenhet',
+        description: 'Spelade på 7 olika dagar'
+      },
+      LOYAL_PLAYER: {
+        name: 'Lojal spelare',
+        description: 'Spelade på 30 olika dagar'
       }
     },
     achievementTiers: {
@@ -2937,18 +3457,44 @@ export const translations = {
     },
     wordFeedback: {
       title: 'Ordjury',
+      dictionaryTitle: 'Bygg vår ordbok',
       question: 'Är detta ett riktigt ord?',
       submittedBy: 'Skickad av',
       thumbsUp: 'Giltig!',
       thumbsDown: 'Nej',
       skipHint: 'Tryck ESC för att hoppa över',
-      thankYou: 'Tack för din röst!',
+      thankYou: 'Tack för hjälpen!',
       witty1: '{player} påstår att "{word}" är ett riktigt ord...',
       witty2: 'Riktigt ord eller kreativt geni? Du bestämmer!',
       witty3: '{player} hittade "{word}" i sin hjärnordbok',
       witty4: 'Svenska Akademien ringde, de vill veta om "{word}"',
       witty5: 'Låter legit... eller?',
+      witty6: 'Är "{word}" ett genidrag eller galenskap?',
+      witty7: '{player} svär att detta är ett riktigt ord!',
+      witty8: 'Ordbokskommittén väntar på din dom över "{word}"',
       nowValid: 'är nu ett giltigt ord!',
+      dictionary1: 'Hjälp oss bygga en bättre ordbok!',
+      dictionary2: 'Din röst gör ord officiella!',
+      dictionary3: 'Varje röst förbättrar spelet!',
+      dictionary4: 'Var orddomaren!',
+      dictionary5: 'Forma vår ordbok tillsammans!',
+      notAWord: 'Inte ett ord',
+      realWord: 'Riktigt ord!',
+      nextWord: 'Nästa ord...',
+      almostApproved: 'Nästan godkänt!',
+      votesNeeded: '{count} röster till för att godkänna',
+      validForScoring: 'Räknas som giltigt! Hjälp till att lägga till i ordboken.',
+      moreForDictionary: 'mer till ordbok',
+    },
+    footer: {
+      howToPlay: 'Hur man spelar',
+      leaderboard: 'Topplista',
+      interactiveTutorial: 'Interaktiv handledning',
+    },
+    support: {
+      kofiWinner: 'Känn dig generös, mästare?',
+      kofiFooter: 'Köp oss en kaffe',
+      kofiTooltip: 'Stöd LexiClash-utveckling',
     }
   },
   ja: {
@@ -2960,13 +3506,13 @@ export const translations = {
       clash: 'Clash',
     },
     seo: {
-      title: 'LexiClash - オンライン マルチプレイヤー ワードゲーム | 今すぐ無料でプレイ',
-      description: 'LexiClash - AliasやKahootのような、パーティー、チームビルディング、家族での楽しみに最適な、速いペースのマルチプレイヤーワードゲーム！単語を見つけ、リアルタイムで競争しましょう。無料オンラインゲーム - ダウンロード不要！',
-      keywords: 'LexiClash, ワードゲーム, マルチプレイヤーゲーム, オンラインゲーム, パーティーゲーム, チームビルディングゲーム, ファミリーゲーム, ワードパズル, 無料オンラインゲーム, リアルタイムマルチプレイヤー, Alias, Kahoot, エイリアスゲーム',
-      ogTitle: 'LexiClash - マルチプレイヤーワードゲーム',
-      ogDescription: 'LexiClash - パーティー、チームビルディング、家族での楽しみに最適な、速いペースのマルチプレイヤーワードゲーム！単語を見つけ、リアルタイムで競争しましょう。無料オンラインゲーム - ダウンロード不要！',
-      twitterTitle: 'LexiClash - マルチプレイヤーワードゲーム',
-      twitterDescription: 'LexiClash - パーティー、チームビルディング、家族での楽しみに最適な、速いペースのマルチプレイヤーワードゲーム！単語を見つけ、リアルタイムで競争しましょう。無料オンラインゲーム - ダウンロード不要！',
+      title: 'LexiClash - スリル満点のマルチプレイヤーワードゲーム | リアルタイム対戦',
+      description: '友達とスリリングなリアルタイムワードバトルで競い合おう！LexiClashは一秒一秒が勝負の速いマルチプレイヤーワードゲーム。単語を見つけ、相手を出し抜き、リーダーボードを駆け上がれ。パーティー、ゲームナイト、友達との対戦に最適。楽しみながら語彙力も鍛えられる！4言語対応で無料プレイ - ダウンロード不要！',
+      keywords: 'マルチプレイヤーワードゲーム, リアルタイムワードゲーム, オンラインワードバトル, パーティーゲーム, 対戦ワードゲーム, 速いワードゲーム, ワードパズルマルチプレイヤー, Alias, Kahoot, ファミリーゲームナイト, チームビルディング, 単語対戦, ライブワードゲーム, ワードレース, 語彙ゲーム, 無料オンラインゲーム',
+      ogTitle: 'LexiClash - スリル満点のマルチプレイヤーワードゲーム | リアルタイム対戦',
+      ogDescription: '友達とスリリングなリアルタイムワードバトルで競い合おう！素早く単語を見つけ、相手を出し抜き、ランキング上位を目指せ。パーティーやゲームナイトに最適。4言語対応で無料プレイ！',
+      twitterTitle: 'LexiClash - スリル満点のマルチプレイヤーワードゲーム | リアルタイム対戦',
+      twitterDescription: '友達とスリリングなリアルタイムワードバトルで競い合おう！素早く単語を見つけ、相手を出し抜き、ランキング上位を目指せ。パーティーやゲームナイトに最適。4言語対応で無料プレイ！',
       locale: 'ja_JP',
       language: 'Japanese',
       leaderboard: {
@@ -3000,6 +3546,7 @@ export const translations = {
       back: '戻る',
       confirm: '確認',
       cancel: 'キャンセル',
+      dismiss: '閉じる',
       selectUILanguage: 'インターフェース言語',
       close: '閉じる',
       understood: 'わかりました、プレイしましょう！',
@@ -3010,6 +3557,7 @@ export const translations = {
       notConnected: 'サーバーに接続されていません',
       duplicateWarning: '複数のプレイヤーが見つけた単語はカウントされません',
       gameStarted: 'ゲーム開始！',
+      joinedGame: 'ゲームに参加しました！',
       newGameReady: '新しいゲームを開始します！',
       lightMode: 'ライトモード',
       darkMode: 'ダークモード',
@@ -3018,6 +3566,28 @@ export const translations = {
       comboBonus: 'コンボ！',
       pending: '保留中',
       xpGained: 'XP',
+    },
+    combo: {
+      shieldUsed: '🛡️ コンボシールド使用！',
+      shieldEarned: '🛡️ シールド獲得！',
+    },
+    bots: {
+      title: 'AIボット',
+      easy: '簡単',
+      medium: '普通',
+      hard: '難しい',
+      easyDesc: '3-5文字、ゆっくりペース',
+      mediumDesc: 'バランスの取れた単語',
+      hardDesc: '長い単語、速いペース',
+      selectDifficulty: '難易度を選択',
+      addBot: 'ボットを追加',
+      adding: '追加中...',
+      remove: 'ボットを削除',
+      removeError: 'ボットの削除に失敗しました',
+      currentBots: 'ルーム内のボット',
+      quickAdd: '追加',
+      emptyState: '練習や部屋を埋めるためにボットを追加！',
+      helpText: 'ボットはゲーム中に自動的に単語を見つけて提出します。',
     },
     music: {
       volume: '音量',
@@ -3071,7 +3641,7 @@ export const translations = {
       roomNameTooLong: 'ルーム名は30文字を超えることはできません',
       roomNameInvalidChars: 'ルーム名に無効な文字が含まれています',
       gameCodeRequired: 'ゲームコードが必要です',
-      gameCodeInvalid: 'ゲームコードは4桁である必要があります',
+      gameCodeInvalid: 'ゲームコードは6〜10文字の英数字である必要があります',
       wordRequired: '単語が必要です',
       wordTooLong: '単語が長すぎます',
       wordInvalidChars: '単語に無効な文字が含まれています',
@@ -3131,6 +3701,23 @@ export const translations = {
       joining: '参加中...',
       creating: '作成中...',
       playersOnline: 'オンライン',
+      // 面白いデフォルトプレイヤー名 - ランダムに提案されます
+      defaultPlayerNames: [
+        'こっそりピクルス', 'カオス船長', 'ディスコポテト', 'ふわふわサンダー', 'コスミックバナナ',
+        'ニンジャワッフル', 'パンケーキ教授', 'くすくす殿', 'ヌードル姫', 'スナック男爵',
+        'ウォンバット魔法使い', 'ターボ亀', 'ソックス軍曹', 'ドーナツ公爵', 'プレッツェル王女',
+        'パンくず伯爵', 'アボカド提督', 'くすくす将軍', 'クッキー船長', 'マフィン少佐',
+        'ジョリージェリービーンズ', 'バウンシーベア', 'ジッピーゼブラ', 'シリーサーモン', 'ギグリーグース',
+        'ワッキーウォーラス', 'ペッピーペンギン', 'ルーピーラマ', 'ディジードラゴン', 'ファンキーフラミンゴ',
+        'ジャジージャガー', 'クワーキークオッカ', 'ラウディラクーン', 'サッシースロス', 'タイニートルネード',
+        'ウォブリーウィザード', 'ゼイニーズッキーニ', 'バブリーバジャー', 'クリスピーカクタス', 'ダッパーダック',
+        'イーガーイーグル', 'フィジーフォックス', 'グルービーゲッコー', 'ハッピーヒッポ', 'アイシーイグアナ',
+        'ジャンピージャッカル', 'クーキーコアラ', 'ラッキーレムール', 'メリームース', 'ノーブルニュート',
+        'プラッキーパンダ', 'クイッククエイル', 'ラスティロボット', 'スパークリースパイダー', 'ツイスティタコ',
+        'アップビートユニコーン', 'ビビッドバルチャー', 'ウィグリーワーム', 'ヤッピーヤク', 'ジッピーゾンビ',
+        'アーティーアルマジロ', 'ブリージーバッファロー', 'チャッティーチップマンク', 'ダンディードルフィン', 'エルフィーエレファント',
+        'ファイスティーフロッグ', 'ギディージラフ', 'ハンブルハムスター', 'イッチーアイベックス', 'ジッタリージェリーフィッシュ',
+      ],
     },
     hostView: {
       waitingForPlayers: 'プレイヤーを待っています...',
@@ -3241,6 +3828,8 @@ export const translations = {
       add: '追加',
       enterWord: '単語を入力...',
       waitingForResults: '結果を待っています...',
+      calculatingScores: 'スコアを計算中...',
+      aiValidating: 'AIがあなたの単語を確認中...',
       leaderboard: 'リーダーボード',
       noPlayersYet: 'まだプレイヤーがいません',
       wordSubmitted: '送信済み',
@@ -3264,8 +3853,28 @@ export const translations = {
       disconnected: 'が切断されました。再接続を待っています...',
       reconnected: '再接続しました',
       leftRoom: 'がルームを退出しました',
+      weakConnection: 'の接続が不安定です',
+      connectionRecovered: 'の接続が回復しました',
       sessionMovedToAnotherTab: 'セッションが別のタブに移動しました',
       sessionMovedToAnotherRoom: 'セッションが別のルームに移動しました',
+      aiValidating: 'AIが確認中...',
+      validatingWord: '確認中:',
+      validation: {
+        scanning: '単語をスキャン中...',
+        checking: '辞書を確認中...',
+        verifying: 'AIが検証中...',
+        scoring: 'スコアを計算中...',
+        finalizing: '結果を確定中...',
+      },
+    },
+    hints: {
+      hint: 'ヒント',
+      getHint: 'ヒントを得る',
+      loading: 'ヒント取得中...',
+      noHints: 'ヒント残りなし',
+      letters: '文字',
+      startsWith: '最初の文字:',
+      tapToDismiss: 'タップして閉じる',
     },
     achievementPopup: {
       unlocked: '実績解除！',
@@ -3308,10 +3917,20 @@ export const translations = {
       otherPlayers: '他のプレイヤー',
       needsVerification: '検証が必要',
       autoVerified: '自動検証済み',
+      aiVerified: 'AIで検証済み',
+      aiRejected: 'AIにより却下',
+      tapToClose: 'どこかをタップして閉じる',
       showHeatmap: 'ヒートマップを表示',
       hideHeatmap: 'ヒートマップを非表示',
       startNewGame: '新しいゲームを開始',
       levelUp: 'レベルアップ!',
+      pendingValidation: 'コミュニティ検証待ち',
+      potentialScore: '承認されれば+${score}ポイント',
+      wordValidated: '単語が承認されました！${score}ポイント獲得！',
+      autoRejoinIn: '自動再参加まで',
+      rejoinNow: '今すぐ再参加',
+      largeRoomMode: '大規模ルームモード',
+      duplicateRuleDisabled: '8人以上のプレイヤーでは、重複単語もカウントされます！',
     },
     playerTitles: {
       champion: { name: 'チャンピオン', icon: '👑', description: 'ゲームの勝者' },
@@ -3336,7 +3955,7 @@ export const translations = {
     howToPlay: {
       title: 'LexiClashの遊び方',
       description: 'LexiClashは、文字のグリッド上でできるだけ多くの単語を見つけるために時間と競う、速いペースのワードゲームです。単語が長いほど、獲得できるポイントが多くなります！',
-      descriptionNote: '単語は少なくとも2文字で、選択したゲーム言語である必要があります。',
+      descriptionNote: '単語は少なくとも2文字である必要があります。名前、場所、有名な頭字語も使用できます！',
       createOrJoinTitle: 'ゲームを作成または参加',
       createOrJoinDesc: 'ホストがルームを作成してコードを共有します。プレイヤーはコードを使用して参加します。',
       hostStartsTitle: 'ホストがゲームを開始',
@@ -3366,6 +3985,7 @@ export const translations = {
         longWordMaster: '📏 ロングワードマスター - 7文字以上の単語を見つける',
         perfectionist: '💎 完璧主義者 - あなたの単語の100％が有効',
         earlyBird: '🐦 早起き鳥 - 最初の1分で3つの単語を見つける',
+        examples: '実績の例',
       },
       tipsTitle: '勝つためのヒント 💡',
       tips: {
@@ -3377,6 +3997,70 @@ export const translations = {
       },
       readyToPlay: '準備はいいですか？プレイを始めましょう！ 🎮',
       funForFamily: '家族全員のための魅力的で楽しいゲーム - 完全無料！',
+      letters: '文字',
+      pts: 'ポイント',
+      // Step-based tutorial sections
+      steps: {
+        basics: {
+          title: 'ゲームの基本',
+          description: 'LexiClashは、高速マルチプレイヤーワードゲームです。友達と競争して、文字のグリッド上で単語を見つけましょう！',
+        },
+        grid: {
+          title: '単語の見つけ方',
+          description: 'スワイプまたはクリックで隣接する文字を繋げて単語を作ります。文字は8つの方向すべて（水平、垂直、斜め）で繋がります！',
+        },
+        scoring: {
+          title: 'スコアリングシステム',
+          description: '長い単語ほど多くのポイントを獲得できます！最初の文字以降、各文字がスコアに1ポイント追加されます。',
+        },
+        combo: {
+          title: 'コンボシステム',
+          description: '素早く単語を送信してコンボ倍率を構築しましょう！単語を見つけるのが速いほど、ボーナスが大きくなります。',
+        },
+        xp: {
+          title: 'XP & レベル',
+          description: 'ゲームごとにXPを獲得してレベルアップし、新しい称号をアンロックしましょう。勝利ボーナスと実績がXPを増やします！',
+        },
+        achievements: {
+          title: '実績',
+          description: '特別な功績で実績をアンロック！各実績は複数回獲得してティアをアップグレードできます。',
+        },
+      },
+      // Interactive demo translations
+      demo: {
+        watchAnimation: 'グリッド上で単語がどのように形成されるかをご覧ください',
+        autoPlay: '自動',
+        replay: 'リプレイ',
+        tryIt: '自分で文字をドラッグしてみてください！',
+        gridExample: 'グリッド上で単語をトレースする例',
+        traceExample: '文字をトレースして単語を形成 - T→O→N→D',
+      },
+      // Combo system translations
+      combo: {
+        currentCombo: '現在のコンボ',
+        multiplier: '倍率',
+        noBonus: 'ボーナスなし',
+        tryIt: 'コンボをシミュレート',
+        building: 'コンボを構築中...',
+        tip: 'コンボを維持するために、5秒以内に単語を送信してください！',
+      },
+      // XP system translations
+      xp: {
+        howToEarn: 'XPの獲得方法',
+        base: 'ゲームを完了',
+        score: 'ポイントを獲得',
+        win: 'ゲームに勝利',
+        achievement: '実績をアンロック',
+        unlockTitles: 'レベルアップで称号をアンロック',
+      },
+      // New player welcome
+      newPlayer: {
+        welcomeTitle: 'LexiClashへようこそ！',
+        welcomeMessage: '初めてのようですね。遊び方のクイックツアーを見ますか？',
+        showTutorial: '遊び方を教えて',
+        skipTutorial: '自分でやってみる',
+        dontShowAgain: '再表示しない',
+      },
     },
     achievements: {
       FIRST_BLOOD: {
@@ -3489,7 +4173,68 @@ export const translations = {
       },
       LONG_WORD_CHAIN: {
         name: 'ロングワードチェーン',
-        description: '6文字以上の単語を3つ連続で'
+        description: '6文字以上の単語を4つ連続で'
+      },
+      MINIMALIST: {
+        name: 'ミニマリスト',
+        description: '4文字以上の単語のみで勝利（15単語以上）'
+      },
+      WORD_SNIPER: {
+        name: 'ワードスナイパー',
+        description: '他の誰も見つけなかったユニークな単語を5つ以上発見'
+      },
+      PHOTO_FINISH: {
+        name: 'フォトフィニッシュ',
+        description: '5ポイント未満の差で勝利'
+      },
+      UNDERDOG: {
+        name: 'アンダードッグ',
+        description: '後れを取っていたが逆転勝利'
+      },
+      CLUTCH_PLAYER: {
+        name: 'クラッチプレイヤー',
+        description: '最後の10秒で3つ以上の単語を発見'
+      },
+      // 生涯実績
+      VETERAN: {
+        name: 'ベテラン',
+        description: '合計50ゲームをプレイ'
+      },
+      CENTURION: {
+        name: 'センチュリオン',
+        description: '合計100ゲームをプレイ'
+      },
+      WORD_COLLECTOR: {
+        name: '言葉コレクター',
+        description: '合計1000の有効な単語を発見'
+      },
+      WORD_HOARDER: {
+        name: '言葉ハンター',
+        description: '合計5000の有効な単語を発見'
+      },
+      CHAMPION: {
+        name: 'チャンピオン',
+        description: '合計25ゲームに勝利'
+      },
+      LEGEND: {
+        name: 'レジェンド',
+        description: '合計100ゲームに勝利'
+      },
+      POINT_MASTER: {
+        name: 'ポイントマスター',
+        description: '合計10,000ポイントを獲得'
+      },
+      POINT_KING: {
+        name: 'ポイントキング',
+        description: '合計50,000ポイントを獲得'
+      },
+      DEDICATION: {
+        name: '献身',
+        description: '7日間にわたってプレイ'
+      },
+      LOYAL_PLAYER: {
+        name: '忠実なプレイヤー',
+        description: '30日間にわたってプレイ'
       }
     },
     achievementTiers: {
@@ -3877,18 +4622,47 @@ export const translations = {
     },
     wordFeedback: {
       title: '言葉の審査',
+      dictionaryTitle: '辞書を作ろう',
       question: 'これは本当の言葉ですか？',
       submittedBy: '提出者',
       thumbsUp: '正解！',
       thumbsDown: '不正解',
       skipHint: 'ESCでスキップ',
-      thankYou: '投票ありがとう！',
+      thankYou: 'ご協力ありがとう！',
       witty1: '{player}は「{word}」が本当の言葉だと主張しています...',
       witty2: '本当の言葉？それとも創造性？あなたが決めて！',
       witty3: '{player}は「{word}」を脳の辞書で見つけました',
       witty4: '辞書編集者が電話してきました、「{word}」について知りたいそうです',
       witty5: '正しそうに聞こえる...本当に？',
+      witty6: '「{word}」は天才のひらめき？それとも狂気？',
+      witty7: '{player}はこれが本物の言葉だと誓っています！',
+      witty8: '辞書委員会があなたの判定を待っています「{word}」',
       nowValid: 'は有効な単語になりました！',
+      dictionary1: 'より良い辞書を作るお手伝いを！',
+      dictionary2: 'あなたの投票で言葉が公式に！',
+      dictionary3: '投票するたびにゲームが改善！',
+      dictionary4: '言葉の審判になろう！',
+      dictionary5: '一緒に辞書を作ろう！',
+      notAWord: '言葉じゃない',
+      realWord: '本物の言葉！',
+      nextWord: '次の言葉...',
+      almostApproved: 'もう少しで承認！',
+      votesNeeded: 'あと{count}票で承認',
+      validForScoring: '有効とカウント！辞書に追加するお手伝いを。',
+      moreForDictionary: 'あと辞書に追加まで',
+    },
+    footer: {
+      howToPlay: '遊び方',
+      leaderboard: 'ランキング',
+      interactiveTutorial: 'インタラクティブチュートリアル',
+    },
+    support: {
+      kofiWinner: '勝者の余裕で応援してね！',
+      kofiFooter: 'コーヒーをおごる',
+      kofiTooltip: 'LexiClashの開発を応援',
     }
   }
 };
+
+// CommonJS export - works with both require() and Next.js import
+module.exports = { translations };

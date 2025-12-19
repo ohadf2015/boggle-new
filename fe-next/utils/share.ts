@@ -9,23 +9,31 @@ type TranslationFunction = (key: string) => string;
 /**
  * Get the join URL for a game room
  * @param gameCode - The game code
+ * @param utmSource - Optional UTM source to track where link came from
  * @returns The full URL to join the game
  */
-export const getJoinUrl = (gameCode: string): string => {
+export const getJoinUrl = (gameCode: string, utmSource?: string): string => {
   if (typeof window === 'undefined') return '';
   if (!gameCode) return '';
   const publicUrl = process.env.REACT_APP_PUBLIC_URL || window.location.origin;
-  return `${publicUrl}?room=${gameCode}`;
+  const params = new URLSearchParams();
+  params.set('room', gameCode);
+  if (utmSource) {
+    params.set('utm_source', utmSource);
+    params.set('utm_medium', 'share');
+  }
+  return `${publicUrl}?${params.toString()}`;
 };
 
 /**
  * Copy the join URL to clipboard
  * @param gameCode - The game code
  * @param t - Translation function (optional for backward compatibility)
+ * @param utmSource - UTM source for tracking (defaults to 'copy')
  * @returns Success status
  */
-export const copyJoinUrl = async (gameCode: string, t: TranslationFunction | null = null): Promise<boolean> => {
-  const url = getJoinUrl(gameCode);
+export const copyJoinUrl = async (gameCode: string, t: TranslationFunction | null = null, utmSource: string = 'copy'): Promise<boolean> => {
+  const url = getJoinUrl(gameCode, utmSource);
 
   try {
     await navigator.clipboard.writeText(url);
@@ -52,7 +60,8 @@ export const copyJoinUrl = async (gameCode: string, t: TranslationFunction | nul
  * @param t - Translation function
  */
 export const shareViaWhatsApp = (gameCode: string, roomName: string = '', t: TranslationFunction): void => {
-  const url = getJoinUrl(gameCode);
+  // Use utm_source=whatsapp to track shares from WhatsApp
+  const url = getJoinUrl(gameCode, 'whatsapp');
 
   const roomText = roomName ? `\n${t('share.room')}: ${roomName}` : '';
   const message = `🎮 ${t('share.inviteMessage')}\n${roomText}\n${t('share.code')}: ${gameCode}\n\n${t('share.joinViaLink')}:\n${url}`;
@@ -103,14 +112,16 @@ export interface GameResultForShare {
  * @param gameCode - The game code
  * @param result - Game result data
  * @param language - Language code ('en', 'he', 'sv', 'ja')
+ * @param utmSource - UTM source for tracking (defaults to 'whatsapp')
  * @returns Personalized share message
  */
 export const generatePersonalizedShareMessage = (
   gameCode: string,
   result: GameResultForShare,
-  language: string = 'en'
+  language: string = 'en',
+  utmSource: string = 'whatsapp'
 ): string => {
-  const url = getJoinUrl(gameCode);
+  const url = getJoinUrl(gameCode, utmSource);
   const { score, wordCount, isWinner, achievements = [], longestWord, streakDays } = result;
 
   // Score-based emoji
@@ -204,14 +215,16 @@ export const shareResultsViaWhatsApp = (
  * @param gameCode - The game code
  * @param result - Game result data
  * @param language - Language code
+ * @param utmSource - UTM source for tracking (defaults to 'share')
  * @returns Array of message variants
  */
 export const getShareMessageVariants = (
   gameCode: string,
   result: GameResultForShare,
-  language: string = 'en'
+  language: string = 'en',
+  utmSource: string = 'share'
 ): string[] => {
-  const url = getJoinUrl(gameCode);
+  const url = getJoinUrl(gameCode, utmSource);
   const { score, wordCount, isWinner } = result;
 
   if (language === 'he') {

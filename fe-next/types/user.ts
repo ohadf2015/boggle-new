@@ -2,7 +2,7 @@
  * User and Authentication Type Definitions
  */
 
-import type { Avatar } from './game';
+import type { Avatar } from '../shared/types/game';
 
 export interface Session {
   gameCode: string;
@@ -36,6 +36,7 @@ export interface UserProfile {
   stats: UserStats;
   achievements: Achievement[];
   isGuest: boolean;
+  isAdmin?: boolean;
 }
 
 export interface UserStats {
@@ -52,6 +53,7 @@ export interface Achievement {
   id: string;
   name: string;
   description: string;
+  icon: string;
   unlockedAt: string;
   tier?: 'bronze' | 'silver' | 'gold';
 }

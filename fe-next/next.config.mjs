@@ -6,6 +6,11 @@ const __dirname = path.dirname(__filename);
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  // Enable system TLS certs for Turbopack to fetch Google Fonts
+  experimental: {
+    turbopackUseSystemTlsCerts: true,
+  },
+
   // Image optimization enabled with modern formats
   images: {
     formats: ['image/avif', 'image/webp'],

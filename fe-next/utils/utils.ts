@@ -4,10 +4,17 @@ import type { Language, LetterGrid, GridPosition, Avatar } from "@/types";
 // Utilities for LexiClash game
 
 /**
- * Generate a random 4-digit room code
+ * Generate a random 6-character alphanumeric room code
+ * Using 6 characters gives 2.17 billion combinations (36^6)
+ * vs 10,000 combinations for 4-digit numeric codes
  */
 export function generateRoomCode(): string {
-  return Math.floor(1000 + Math.random() * 9000).toString();
+  const chars = '0123456789ABCDEFGHJKLMNPQRSTUVWXYZ'; // Excludes I, O to avoid confusion
+  let code = '';
+  for (let i = 0; i < 6; i++) {
+    code += chars.charAt(Math.floor(Math.random() * chars.length));
+  }
+  return code;
 }
 
 /**
@@ -15,8 +22,8 @@ export function generateRoomCode(): string {
  */
 export function generateRandomAvatar(): Avatar {
   return {
-    color: AVATAR_COLORS[Math.floor(Math.random() * AVATAR_COLORS.length)],
-    emoji: AVATAR_EMOJIS[Math.floor(Math.random() * AVATAR_EMOJIS.length)]
+    color: AVATAR_COLORS[Math.floor(Math.random() * AVATAR_COLORS.length)] ?? '#FF6B6B',
+    emoji: AVATAR_EMOJIS[Math.floor(Math.random() * AVATAR_EMOJIS.length)] ?? '🎮'
   };
 }
 
@@ -32,6 +39,27 @@ export function normalizeHebrewLetter(letter: string): string {
     'ף': 'פ'
   };
   return finalToRegular[letter] || letter;
+}
+
+// Valid Hebrew letters (aleph to tav, including final forms)
+const validHebrewLettersSet = new Set([
+  'א', 'ב', 'ג', 'ד', 'ה', 'ו', 'ז', 'ח', 'ט', 'י',
+  'כ', 'ך', 'ל', 'מ', 'ם', 'נ', 'ן', 'ס', 'ע', 'פ',
+  'ף', 'צ', 'ץ', 'ק', 'ר', 'ש', 'ת'
+]);
+
+/**
+ * Check if a character is a valid Hebrew letter (no punctuation like gershayim ״ or geresh ׳)
+ */
+export function isValidHebrewLetter(char: string): boolean {
+  return validHebrewLettersSet.has(char);
+}
+
+/**
+ * Filter a Hebrew word to only include valid letters (removes punctuation marks)
+ */
+export function filterHebrewWord(word: string): string {
+  return word.split('').filter(isValidHebrewLetter).join('');
 }
 
 /**
@@ -58,7 +86,7 @@ export function applyHebrewFinalLetters(word: string): string {
 
   const chars = word.split('');
   const lastChar = chars[chars.length - 1];
-  if (regularToFinal[lastChar]) {
+  if (lastChar && regularToFinal[lastChar]) {
     chars[chars.length - 1] = regularToFinal[lastChar];
   }
 
@@ -94,11 +122,11 @@ export function generateRandomTable(
       return generateTableWithEmbeddedWords(rows, cols, letters, wordsToEmbed, language);
     }
 
-    const newTable = [];
+    const newTable: string[][] = [];
     for (let i = 0; i < rows; i++) {
-      const row = [];
+      const row: string[] = [];
       for (let j = 0; j < cols; j++) {
-        const randomLetter = letters[Math.floor(Math.random() * letters.length)];
+        const randomLetter = letters[Math.floor(Math.random() * letters.length)] ?? 'A';
         row.push(randomLetter);
       }
       newTable.push(row);
@@ -119,12 +147,19 @@ function generateTableWithEmbeddedWords(
   const usedCells = new Set<string>();
 
   // Calculate how many words to embed based on board size
-  // Aim for roughly 1 word per 8-10 cells
+  // Aim for roughly 1 word per 3-4 cells for denser coverage
+  // This ensures players have plenty of valid words to find
   const totalCells = rows * cols;
-  const targetWords = Math.min(wordsToEmbed.length, Math.max(2, Math.floor(totalCells / 8)));
+  const targetWords = Math.min(wordsToEmbed.length, Math.max(4, Math.floor(totalCells / 3)));
+
+  // Filter words to only include valid letters for the language
+  // For Hebrew, this removes punctuation marks like gershayim (״) and geresh (׳)
+  const cleanedWords = language === 'he'
+    ? wordsToEmbed.map(filterHebrewWord).filter(w => w.length >= 2)
+    : wordsToEmbed;
 
   // Sort words by length (longer first) for better placement
-  const sortedWords = [...wordsToEmbed].sort((a, b) => b.length - a.length);
+  const sortedWords = [...cleanedWords].sort((a, b) => b.length - a.length);
 
   let embeddedCount = 0;
 
@@ -261,7 +296,7 @@ function tryPlaceWordSnake(
   const path: Array<{ r: number; c: number; char: string; key: string }> = [];
   const visited = new Set<string>();
 
-  function dfs(row, col, index) {
+  function dfs(row: number, col: number, index: number): boolean {
     // Success - placed entire word
     if (index === wordLen) {
       return true;

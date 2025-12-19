@@ -122,7 +122,7 @@ export function MusicProvider({ children }: MusicProviderProps) {
                 src: [src],
                 loop: false, // All tracks use manual crossfade looping for smooth transitions
                 volume: 0,
-                preload: true,
+                preload: false, // Defer loading for slow connections - load on demand
                 // Using Web Audio API (html5: false) for better autoplay support
                 // html5 mode has stricter autoplay restrictions on some browsers
                 html5: false,
@@ -268,6 +268,12 @@ export function MusicProvider({ children }: MusicProviderProps) {
         if (!newHowl) {
             logger.warn(`[Music] Track not found: ${trackKey}`);
             return;
+        }
+
+        // Load the track on-demand if not loaded yet (lazy loading for slow connections)
+        if (newHowl.state() === 'unloaded') {
+            logger.log('[Music] Loading track on demand:', trackKey);
+            newHowl.load();
         }
 
         // If same track, just ensure it's playing (use ref to avoid dependency)

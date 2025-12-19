@@ -4,7 +4,7 @@
 
 export interface ValidationResult {
   isValid: boolean;
-  error: string | null;
+  error?: string;
 }
 
 /**
@@ -33,7 +33,7 @@ export const validateUsername = (username: string): ValidationResult => {
     return { isValid: false, error: 'validation.usernameInvalidChars' };
   }
 
-  return { isValid: true, error: null };
+  return { isValid: true };
 };
 
 /**
@@ -62,7 +62,7 @@ export const validateRoomName = (roomName: string): ValidationResult => {
     return { isValid: false, error: 'validation.roomNameInvalidChars' };
   }
 
-  return { isValid: true, error: null };
+  return { isValid: true };
 };
 
 /**
@@ -77,11 +77,16 @@ export const validateGameCode = (gameCode: string): ValidationResult => {
 
   const trimmed = gameCode.trim();
 
-  if (!/^\d{4}$/.test(trimmed)) {
+  // Must be 6-10 characters, alphanumeric only (matches backend validation)
+  if (trimmed.length < 6 || trimmed.length > 10) {
     return { isValid: false, error: 'validation.gameCodeInvalid' };
   }
 
-  return { isValid: true, error: null };
+  if (!/^[A-Za-z0-9]+$/.test(trimmed)) {
+    return { isValid: false, error: 'validation.gameCodeInvalid' };
+  }
+
+  return { isValid: true };
 };
 
 /**
@@ -130,5 +135,5 @@ export const validateWord = (word: string): ValidationResult => {
     return { isValid: false, error: 'validation.wordInvalidChars' };
   }
 
-  return { isValid: true, error: null };
+  return { isValid: true };
 };

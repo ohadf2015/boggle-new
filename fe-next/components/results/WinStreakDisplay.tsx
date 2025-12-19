@@ -26,8 +26,9 @@ const STREAK_TIERS = [
 
 const getStreakTier = (streak: number) => {
   for (let i = STREAK_TIERS.length - 1; i >= 0; i--) {
-    if (streak >= STREAK_TIERS[i].min) {
-      return STREAK_TIERS[i];
+    const tier = STREAK_TIERS[i];
+    if (tier && streak >= tier.min) {
+      return tier;
     }
   }
   return null;
@@ -79,6 +80,7 @@ const WinStreakDisplay: React.FC<WinStreakDisplayProps> = ({
       const timer = setTimeout(() => setShowMilestone(false), 3000);
       return () => clearTimeout(timer);
     }
+    return undefined;
   }, [isNewMilestone, tierChanged, isNewBest]);
 
   if (currentStreak === 0) return null;

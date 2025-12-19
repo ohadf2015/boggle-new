@@ -63,9 +63,16 @@ function getEncouragingMessage(isCurrentPlayer: boolean, t: (key: string) => str
     },
   ];
 
-  // Pick a random message
+  // Pick a random message (array has 5 items, always valid)
   const randomIndex = Math.floor(Math.random() * messages.length);
-  return messages[randomIndex];
+  const selected = messages[randomIndex];
+  // Fallback to first message if somehow undefined (shouldn't happen with fixed array)
+  return selected ?? {
+    emoji: '🌟',
+    headline: 'Keep Going!',
+    message: 'Every round is a new opportunity.',
+    tip: 'Tip: Start with 3-letter words.',
+  };
 }
 
 /**

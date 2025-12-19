@@ -1,107 +1,270 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-
-interface Ripple {
-  delay: number;
-  scale: number;
-  duration: number;
-}
+import { useSoundEffects } from '../contexts/SoundEffectsContext';
 
 interface GoRipplesAnimationProps {
   onComplete?: () => void;
 }
 
+// Generate random particles for explosion effect
+const generateParticles = (count: number) => {
+  return Array.from({ length: count }, (_, i) => ({
+    id: i,
+    angle: (i / count) * 360,
+    distance: 80 + Math.random() * 120,
+    size: 8 + Math.random() * 16,
+    delay: Math.random() * 0.1,
+    duration: 0.5 + Math.random() * 0.3,
+  }));
+};
+
+/**
+ * Exciting pre-game countdown with sound and visual effects
+ * Shows dramatic 3-2-1 countdown with particles and screen flash for "GO!"
+ */
 const GoRipplesAnimation: React.FC<GoRipplesAnimationProps> = ({ onComplete }) => {
   const [isVisible, setIsVisible] = useState(true);
+  const [count, setCount] = useState(3);
+  const [showFlash, setShowFlash] = useState(false);
+  const { playCountdownBeep } = useSoundEffects();
 
+  // Memoize particles to prevent re-generation on each render - reduced count for cleaner animation
+  const particles = useMemo(() => generateParticles(10), []);
+  const goParticles = useMemo(() => generateParticles(16), []);
+
+  // Play beep for each countdown number
   useEffect(() => {
-    // Complete animation after 2 seconds
-    const completeTimer = setTimeout(() => {
-      setIsVisible(false);
-      if (onComplete) onComplete();
-    }, 2000);
+    if (count > 0) {
+      playCountdownBeep(count);
+    }
+  }, [count, playCountdownBeep]);
 
-    return () => {
-      clearTimeout(completeTimer);
-    };
-  }, [onComplete]);
+  // Countdown logic
+  useEffect(() => {
+    if (count > 0) {
+      const timer = setTimeout(() => setCount(count - 1), 700);
+      return () => clearTimeout(timer);
+    } else if (count === 0) {
+      // Flash effect for GO!
+      setShowFlash(true);
+      setTimeout(() => setShowFlash(false), 150);
 
-  // Neo-Brutalist ripple waves - solid borders, no fade
-  const ripples: Ripple[] = [
-    { delay: 0, scale: 6, duration: 1.2 },
-    { delay: 0.15, scale: 6, duration: 1.2 },
-    { delay: 0.3, scale: 6, duration: 1.2 },
-    { delay: 0.45, scale: 6, duration: 1.2 },
-  ];
+      // Show "GO!" briefly then complete
+      const timer = setTimeout(() => {
+        setIsVisible(false);
+        onComplete?.();
+      }, 800);
+      return () => clearTimeout(timer);
+    }
+    return undefined;
+  }, [count, onComplete]);
+
+  if (!isVisible) return null;
+
+  const isGo = count === 0;
 
   return (
-    <AnimatePresence>
-      {isVisible && (
+    <div className="fixed inset-0 z-50 flex items-center justify-center pointer-events-none overflow-hidden">
+      {/* Screen flash effect for GO! */}
+      <AnimatePresence>
+        {showFlash && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.15 }}
+            className="absolute inset-0 bg-white z-40"
+          />
+        )}
+      </AnimatePresence>
+
+      {/* Background pulse rings */}
+      <AnimatePresence>
+        {isGo && (
+          <>
+            {[0, 1, 2].map((ring) => (
+              <motion.div
+                key={`ring-${ring}`}
+                initial={{ scale: 0.3, opacity: 0.8 }}
+                animate={{ scale: 3, opacity: 0 }}
+                transition={{ duration: 0.8, delay: ring * 0.1, ease: "easeOut" }}
+                className="absolute rounded-full border-4 border-neo-yellow"
+                style={{ width: 150, height: 150 }}
+              />
+            ))}
+          </>
+        )}
+      </AnimatePresence>
+
+      {/* Particle explosion for numbers */}
+      <AnimatePresence>
+        {count > 0 && (
+          <>
+            {particles.map((particle) => (
+              <motion.div
+                key={`particle-${count}-${particle.id}`}
+                initial={{
+                  scale: 0,
+                  opacity: 1,
+                  x: 0,
+                  y: 0
+                }}
+                animate={{
+                  scale: [0, 1, 0],
+                  opacity: [1, 0.8, 0],
+                  x: Math.cos(particle.angle * Math.PI / 180) * particle.distance,
+                  y: Math.sin(particle.angle * Math.PI / 180) * particle.distance
+                }}
+                transition={{
+                  duration: particle.duration,
+                  delay: particle.delay,
+                  ease: "easeOut"
+                }}
+                className="absolute rounded-full"
+                style={{
+                  width: particle.size,
+                  height: particle.size,
+                  background: 'linear-gradient(135deg, var(--neo-yellow), var(--neo-orange))',
+                  boxShadow: '0 0 10px rgba(251, 213, 53, 0.6)'
+                }}
+              />
+            ))}
+          </>
+        )}
+      </AnimatePresence>
+
+      {/* GO! particle explosion - more intense */}
+      <AnimatePresence>
+        {isGo && (
+          <>
+            {goParticles.map((particle) => (
+              <motion.div
+                key={`go-particle-${particle.id}`}
+                initial={{
+                  scale: 0,
+                  opacity: 1,
+                  x: 0,
+                  y: 0
+                }}
+                animate={{
+                  scale: [0, 1.5, 0],
+                  opacity: [1, 0.9, 0],
+                  x: Math.cos(particle.angle * Math.PI / 180) * (particle.distance * 1.5),
+                  y: Math.sin(particle.angle * Math.PI / 180) * (particle.distance * 1.5)
+                }}
+                transition={{
+                  duration: particle.duration + 0.2,
+                  delay: particle.delay,
+                  ease: "easeOut"
+                }}
+                className="absolute rounded-full"
+                style={{
+                  width: particle.size * 1.2,
+                  height: particle.size * 1.2,
+                  background: particle.id % 3 === 0
+                    ? 'linear-gradient(135deg, #FF3366, #FF6B35)'
+                    : particle.id % 3 === 1
+                    ? 'linear-gradient(135deg, #FFE135, #FF6B35)'
+                    : 'linear-gradient(135deg, #00FFFF, #BFFF00)',
+                  boxShadow: '0 0 15px rgba(255, 107, 53, 0.8)'
+                }}
+              />
+            ))}
+          </>
+        )}
+      </AnimatePresence>
+
+      {/* Main countdown/GO text */}
+      <AnimatePresence mode="wait">
         <motion.div
-          className="fixed inset-0 z-50 flex items-center justify-center pointer-events-none overflow-hidden"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.2 }}
+          key={count}
+          initial={{ scale: 0, opacity: 0, rotate: -10 }}
+          animate={{
+            scale: isGo ? [0, 1.2, 1.1] : [0, 1.1, 1],
+            opacity: 1,
+            rotate: isGo ? [10, -3, 0] : [3, -1, 0]
+          }}
+          exit={{ scale: 1.3, opacity: 0, rotate: 3 }}
+          transition={{
+            duration: isGo ? 0.35 : 0.22,
+            times: [0, 0.6, 1],
+            ease: "easeOut"
+          }}
+          className={`relative px-8 py-4 border-4 border-neo-black rounded-neo ${
+            isGo
+              ? 'bg-gradient-to-r from-neo-yellow via-neo-orange to-neo-yellow bg-[length:200%_100%]'
+              : 'bg-neo-yellow'
+          }`}
+          style={{
+            boxShadow: isGo
+              ? '8px 8px 0px var(--neo-black), 0 0 30px rgba(251, 213, 53, 0.5)'
+              : '6px 6px 0px var(--neo-black)'
+          }}
         >
-          {/* Neo-Brutalist ripple waves - thick black borders */}
-          {ripples.map((ripple, index) => (
+          {/* Inner glow for GO - reduced pulsing */}
+          {isGo && (
             <motion.div
-              key={`ripple-${index}`}
-              className="absolute rounded-neo-lg border-4 border-neo-black"
+              className="absolute inset-0 rounded-neo"
+              initial={{ opacity: 0.3 }}
+              animate={{ opacity: 0.5 }}
+              transition={{ duration: 0.4 }}
               style={{
-                width: '120px',
-                height: '120px',
-                backgroundColor: index % 2 === 0 ? 'var(--neo-yellow)' : 'var(--neo-cyan)',
-              }}
-              initial={{ scale: 0, opacity: 1, rotate: -10 }}
-              animate={{
-                scale: ripple.scale,
-                opacity: [1, 0.8, 0],
-                rotate: 10,
-              }}
-              transition={{
-                delay: ripple.delay,
-                duration: ripple.duration,
-                ease: [0.68, -0.55, 0.265, 1.55]
+                background: 'radial-gradient(circle, rgba(255,255,255,0.3) 0%, transparent 70%)',
               }}
             />
-          ))}
+          )}
 
-          {/* Neo-Brutalist GO text */}
-          <motion.div
-            className="absolute z-10"
-            initial={{ scale: 0, opacity: 0, rotate: -15 }}
-            animate={{
-              scale: [0, 1.3, 1],
-              opacity: [0, 1, 1, 0],
-              rotate: [-15, 5, 0],
-            }}
-            transition={{
-              duration: 2,
-              times: [0, 0.3, 0.7, 1],
-              ease: [0.68, -0.55, 0.265, 1.55]
-            }}
+          <motion.span
+            animate={isGo ? {
+              scale: [1, 1.02, 1],
+            } : {}}
+            transition={{ duration: 0.3, repeat: 1 }}
+            className={`relative z-10 font-black text-neo-black ${
+              isGo ? 'text-6xl sm:text-8xl' : 'text-5xl sm:text-7xl'
+            }`}
+            style={{ textShadow: '3px 3px 0px var(--neo-cyan)' }}
           >
-            {/* Background shape for text */}
-            <div
-              className="relative bg-neo-yellow border-4 border-neo-black rounded-neo-lg shadow-hard-xl px-8 py-4"
-              style={{ transform: 'rotate(-2deg)' }}
-            >
-              <h1
-                className="text-8xl sm:text-9xl font-black text-neo-black uppercase"
-                style={{
-                  textShadow: '4px 4px 0px var(--neo-cyan)',
-                  letterSpacing: '0.05em',
-                }}
-              >
-                GO!
-              </h1>
-            </div>
-          </motion.div>
+            {count > 0 ? count : 'GO!'}
+          </motion.span>
+
+          {/* Subtle shake effect for numbers - reduced intensity */}
+          {count > 0 && (
+            <motion.div
+              className="absolute inset-0"
+              animate={{ x: [0, -1, 1, 0], y: [0, 0.5, -0.5, 0] }}
+              transition={{ duration: 0.08, delay: 0.12 }}
+            />
+          )}
         </motion.div>
-      )}
-    </AnimatePresence>
+      </AnimatePresence>
+
+      {/* Star burst effect for GO */}
+      <AnimatePresence>
+        {isGo && (
+          <>
+            {[...Array(8)].map((_, i) => (
+              <motion.div
+                key={`star-${i}`}
+                initial={{ scale: 0, opacity: 1, rotate: i * 45 }}
+                animate={{
+                  scale: [0, 1.5],
+                  opacity: [1, 0],
+                  rotate: i * 45 + 15
+                }}
+                transition={{ duration: 0.6, delay: 0.1 }}
+                className="absolute"
+                style={{
+                  width: 4,
+                  height: 60,
+                  background: 'linear-gradient(to top, transparent, var(--neo-yellow), transparent)',
+                  transformOrigin: 'center 100px'
+                }}
+              />
+            ))}
+          </>
+        )}
+      </AnimatePresence>
+    </div>
   );
 };
 

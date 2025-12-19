@@ -2,9 +2,11 @@ import { useEffect, useCallback, useRef, MutableRefObject, RefObject } from 'rea
 import { Socket } from 'socket.io-client';
 import confetti from 'canvas-confetti';
 import gsap from 'gsap';
-import { wordAcceptedToast, wordNeedsValidationToast, wordErrorToast, neoSuccessToast, neoErrorToast, neoInfoToast } from '../../components/NeoToast';
+import toast from 'react-hot-toast';
+import { wordAcceptedToast, wordNeedsValidationToast, wordAIValidatingToast, wordErrorToast, neoSuccessToast, neoErrorToast, neoInfoToast } from '../../components/NeoToast';
 import { clearSessionPreservingUsername } from '../../utils/session';
 import logger from '@/utils/logger';
+import type { Language } from '@/types';
 
 interface FoundWord {
   word: string;
@@ -59,15 +61,15 @@ interface LevelUpData {
 interface UsePlayerSocketEventsProps {
   socket: Socket | null;
   t: (key: string) => string;
-  inputRef: RefObject<HTMLInputElement>;
+  inputRef: RefObject<HTMLInputElement | null>;
   wasInActiveGame: boolean;
   gameActive: boolean;
   letterGrid: any;
-  gameLanguage: string | null;
+  gameLanguage: Language | null;
   username: string;
   queueAchievement: (achievement: any) => void;
   playComboSound: (level: number) => void;
-  onShowResults?: (data: { scores: any; letterGrid: any }) => void;
+  onShowResults?: (data: { scores: any; letterGrid: any; duplicateRuleDisabled?: boolean; playerCount?: number }) => void;
 
   // State setters
   setPlayersReady: React.Dispatch<React.SetStateAction<Player[]>>;
@@ -79,7 +81,7 @@ interface UsePlayerSocketEventsProps {
   setLetterGrid: React.Dispatch<React.SetStateAction<any>>;
   setRemainingTime: React.Dispatch<React.SetStateAction<number | null>>;
   setMinWordLength: React.Dispatch<React.SetStateAction<number>>;
-  setGameLanguage: React.Dispatch<React.SetStateAction<string | null>>;
+  setGameLanguage: React.Dispatch<React.SetStateAction<Language | null>>;
   setGameActive: React.Dispatch<React.SetStateAction<boolean>>;
   setShowStartAnimation: React.Dispatch<React.SetStateAction<boolean>>;
   setWaitingForResults: React.Dispatch<React.SetStateAction<boolean>>;
@@ -102,6 +104,10 @@ interface UsePlayerSocketEventsProps {
   setComboLevel: React.Dispatch<React.SetStateAction<number>>;
   setLastWordTime: React.Dispatch<React.SetStateAction<number | null>>;
   comboTimeoutRef: MutableRefObject<NodeJS.Timeout | null>;
+
+  // Combo shield system - protects combo from wrong words
+  comboShieldsUsedRef: MutableRefObject<number>;
+  foundWords: FoundWord[];
 
   // Exit ref
   intentionalExitRef: MutableRefObject<boolean>;
@@ -157,11 +163,46 @@ const usePlayerSocketEvents = ({
   setLastWordTime,
   comboTimeoutRef,
 
+  // Combo shield system
+  comboShieldsUsedRef,
+  foundWords,
+
   // Exit ref
   intentionalExitRef,
 }: UsePlayerSocketEventsProps): void => {
-  // Reset combo helper
+  // Combo shield constants
+  const VALID_WORDS_PER_SHIELD = 10; // Earn 1 shield per 10 valid words
+
+  // Calculate available shields based on valid words found
+  const getAvailableShields = useCallback(() => {
+    const validWordCount = foundWords.filter(w => w.isValid === true).length;
+    const totalShields = Math.floor(validWordCount / VALID_WORDS_PER_SHIELD);
+    return Math.max(0, totalShields - comboShieldsUsedRef.current);
+  }, [foundWords, comboShieldsUsedRef]);
+
+  // Reset combo helper - now checks for available shields first
   const resetCombo = useCallback(() => {
+    const currentCombo = comboLevelRef.current;
+
+    // Only use shield if we have an active combo worth protecting
+    if (currentCombo > 0) {
+      const availableShields = getAvailableShields();
+
+      if (availableShields > 0) {
+        // Use a shield instead of resetting combo
+        comboShieldsUsedRef.current += 1;
+
+        // Show shield used notification
+        neoInfoToast(t('combo.shieldUsed') || '🛡️ Combo Shield Used!', {
+          duration: 2000,
+        });
+
+        logger.log('[COMBO] Shield used, combo preserved at level', currentCombo);
+        return; // Don't reset combo
+      }
+    }
+
+    // No shield available or no combo to protect - reset normally
     setComboLevel(0);
     comboLevelRef.current = 0;
     setLastWordTime(null);
@@ -169,7 +210,7 @@ const usePlayerSocketEvents = ({
     if (comboTimeoutRef.current) {
       clearTimeout(comboTimeoutRef.current);
     }
-  }, [setComboLevel, setLastWordTime, comboLevelRef, lastWordTimeRef, comboTimeoutRef]);
+  }, [setComboLevel, setLastWordTime, comboLevelRef, lastWordTimeRef, comboTimeoutRef, getAvailableShields, comboShieldsUsedRef, t]);
 
   // Use a ref for onShowResults to avoid stale closure issues during game end race condition
   // This ensures the validatedScores event handler always has access to the latest callback
@@ -177,6 +218,11 @@ const usePlayerSocketEvents = ({
   useEffect(() => {
     onShowResultsRef.current = onShowResults;
   }, [onShowResults]);
+
+  // Track when we entered waiting state to prevent flickering
+  // Ensures minimum display time for the calculation screen
+  const waitingStartTimeRef = useRef<number | null>(null);
+  const MINIMUM_WAITING_TIME_MS = 1500; // Minimum time to show the calculation screen
 
   useEffect(() => {
     if (!socket) return;
@@ -198,32 +244,53 @@ const usePlayerSocketEvents = ({
       setWasInActiveGame(true);
       setFoundWords([]);
       setAchievements([]);
+      // Reset combo shields for new game
+      comboShieldsUsedRef.current = 0;
       if (data.letterGrid) setLetterGrid(data.letterGrid);
       if (data.timerSeconds) setRemainingTime(data.timerSeconds);
       if (data.language) setGameLanguage(data.language);
       if (data.minWordLength) setMinWordLength(data.minWordLength);
-      setGameActive(true);
-      setShowStartAnimation(true);
+
+      // For late joiners: activate game immediately (no countdown animation)
+      // For regular players: delay activation until countdown animation completes
+      // This is handled in PlayerView.jsx via useEffect watching showStartAnimation
+      if (data.lateJoin) {
+        setGameActive(true);
+      } else {
+        // Show countdown animation - game will activate when animation completes
+        setShowStartAnimation(true);
+      }
 
       if (data.messageId && !data.skipAck) {
         socket.emit('startGameAck', { messageId: data.messageId });
         logger.log('[PLAYER] Sent startGameAck for messageId:', data.messageId);
       }
 
-      neoSuccessToast(t('common.gameStarted'), { id: 'game-started', icon: '🚀', duration: 3000 });
+      const toastMessage = data.lateJoin
+        ? (t('common.joinedGame') || 'Joined game!')
+        : t('common.gameStarted');
+      neoSuccessToast(toastMessage, { id: 'game-started', icon: data.lateJoin ? '🎮' : '🚀', duration: 3000 });
     };
 
     const handleEndGame = () => {
       logger.log('[PLAYER] Received endGame event, wasInActiveGame:', wasInActiveGame);
       setGameActive(false);
       setRemainingTime(0);
+      setShowStartAnimation(false); // Clear any lingering animation to prevent double loaders
       if (wasInActiveGame) {
         logger.log('[PLAYER] Setting waitingForResults to true');
+        // Track when we entered waiting state for minimum display time
+        if (!waitingStartTimeRef.current) {
+          waitingStartTimeRef.current = Date.now();
+        }
         setWaitingForResults(true);
       }
     };
 
     const handleWordAccepted = (data: any) => {
+      // Dismiss any AI validation toast for this word
+      toast.dismiss(`ai-validating-${data.word.toLowerCase()}`);
+
       if (inputRef.current) {
         gsap.fromTo(inputRef.current,
           { scale: 1.1, borderColor: '#4ade80' },
@@ -242,6 +309,7 @@ const usePlayerSocketEvents = ({
       let newComboLevel = 0;
 
       if (data.autoValidated) {
+        // Word was in dictionary - combo can continue
         const currentComboLevel = comboLevelRef.current;
         const currentLastWordTime = lastWordTimeRef.current;
 
@@ -270,6 +338,9 @@ const usePlayerSocketEvents = ({
           setLastWordTime(null);
           lastWordTimeRef.current = null;
         }, comboTimeout);
+      } else {
+        // Word was NOT in dictionary (AI-validated or host-validated) - reset combo
+        resetCombo();
       }
 
       // Show toast with score from server
@@ -287,6 +358,15 @@ const usePlayerSocketEvents = ({
       // Word stays in list with isValid: null (pending validation)
       // No need to update state since it's already null
       resetCombo();
+    };
+
+    const handleWordValidatingWithAI = (data: any) => {
+      // Show AI validation indicator toast
+      wordAIValidatingToast(data.word, {
+        aiValidatingLabel: t('playerView.aiValidating') || 'AI checking...',
+        duration: 15000 // Will be dismissed when validation completes
+      });
+      logger.log('[PLAYER] AI is validating word:', data.word);
     };
 
     const handleWordAlreadyFound = (data: any) => {
@@ -325,6 +405,9 @@ const usePlayerSocketEvents = ({
     };
 
     const handleWordRejected = (data: any) => {
+      // Dismiss any AI validation toast for this word
+      toast.dismiss(`ai-validating-${data.word.toLowerCase()}`);
+
       wordErrorToast(t('playerView.wordRejected') || 'Word rejected', { duration: 2000 });
       setFoundWords(prev => prev.filter(fw =>
         fw.word.toLowerCase() !== data.word.toLowerCase()
@@ -345,13 +428,19 @@ const usePlayerSocketEvents = ({
 
       const hasGrid = letterGrid || data.letterGrid;
       if (!gameActive && data.remainingTime > 0 && hasGrid) {
-        logger.log('[PLAYER] Timer started on server, activating game (remainingTime:', data.remainingTime, ')');
+        logger.log('[PLAYER] Timer started on server, activating game via timeUpdate (late join, remainingTime:', data.remainingTime, ')');
         setGameActive(true);
-        setShowStartAnimation(true);
+        // Skip countdown animation for late joiners syncing via timeUpdate - start immediately
+        // Don't show countdown animation since they're joining mid-game
       }
 
       if (data.remainingTime <= 0) {
         setGameActive(false);
+        setShowStartAnimation(false); // Clear any lingering animation to prevent double loaders
+        // Track when we entered waiting state for minimum display time
+        if (!waitingStartTimeRef.current) {
+          waitingStartTimeRef.current = Date.now();
+        }
         setWaitingForResults(true);
       }
     };
@@ -366,18 +455,21 @@ const usePlayerSocketEvents = ({
         return;
       }
 
+      // Achievements now use { key, icon } format - frontend will localize using player's language
       logger.log(`[PLAYER] Received ${data.achievements.length} live achievements:`,
-        data.achievements.map((a: any) => a?.name || 'unknown').join(', '));
+        data.achievements.map((a: any) => a?.key || a?.name || 'unknown').join(', '));
 
       data.achievements.forEach((achievement: any) => {
-        if (achievement && achievement.name) {
+        // Check for key (new format) or name (legacy format)
+        if (achievement && (achievement.key || achievement.name)) {
           queueAchievement(achievement);
         } else {
           logger.warn('[PLAYER] Skipping invalid achievement object:', achievement);
         }
       });
 
-      const validAchievements = data.achievements.filter((a: any) => a && a.name);
+      // Filter valid achievements - check for key or name
+      const validAchievements = data.achievements.filter((a: any) => a && (a.key || a.name));
       if (validAchievements.length > 0) {
         setAchievements(prev => [...prev, ...validAchievements]);
         logger.log(`[PLAYER] Added ${validAchievements.length} valid achievements to state`);
@@ -386,19 +478,43 @@ const usePlayerSocketEvents = ({
 
     const handleValidatedScores = (data: any) => {
       logger.log('[PLAYER] Received validatedScores event:', data);
-      setWaitingForResults(false);
-      setShowWordFeedback(false);
-      setWordToVote(null);
-      // Use ref to get the latest onShowResults callback to avoid stale closure issues
-      const currentOnShowResults = onShowResultsRef.current;
-      if (currentOnShowResults) {
-        logger.log('[PLAYER] Calling onShowResults with scores');
-        currentOnShowResults({
-          scores: data.scores,
-          letterGrid: data.letterGrid,
-        });
+
+      // Calculate time elapsed since entering waiting state
+      const now = Date.now();
+      const waitingStartTime = waitingStartTimeRef.current || now;
+      const timeElapsed = now - waitingStartTime;
+      const remainingWaitTime = Math.max(0, MINIMUM_WAITING_TIME_MS - timeElapsed);
+
+      logger.log(`[PLAYER] Time elapsed in waiting: ${timeElapsed}ms, remaining wait: ${remainingWaitTime}ms`);
+
+      // Helper to show results
+      const showResults = () => {
+        setWaitingForResults(false);
+        setShowWordFeedback(false);
+        setWordToVote(null);
+        waitingStartTimeRef.current = null; // Reset for next game
+
+        // Use ref to get the latest onShowResults callback to avoid stale closure issues
+        const currentOnShowResults = onShowResultsRef.current;
+        if (currentOnShowResults) {
+          logger.log('[PLAYER] Calling onShowResults with scores');
+          currentOnShowResults({
+            scores: data.scores,
+            letterGrid: data.letterGrid,
+            duplicateRuleDisabled: data.duplicateRuleDisabled,
+            playerCount: data.playerCount,
+          });
+        } else {
+          logger.warn('[PLAYER] onShowResults is not defined!');
+        }
+      };
+
+      // Ensure minimum display time for the calculation screen to prevent flickering
+      if (remainingWaitTime > 0) {
+        logger.log(`[PLAYER] Waiting ${remainingWaitTime}ms before showing results`);
+        setTimeout(showResults, remainingWaitTime);
       } else {
-        logger.warn('[PLAYER] onShowResults is not defined!');
+        showResults();
       }
     };
 
@@ -406,16 +522,35 @@ const usePlayerSocketEvents = ({
       // Legacy handler - finalScores is no longer used in the new flow
       // The new flow uses validatedScores which is handled by handleValidatedScores
       logger.log('[PLAYER] Received legacy finalScores event (deprecated):', data);
-      setWaitingForResults(false);
-      setShowWordFeedback(false);
-      setWordToVote(null);
-      // Use ref to get the latest onShowResults callback
-      const currentOnShowResults = onShowResultsRef.current;
-      if (currentOnShowResults) {
-        currentOnShowResults({
-          scores: data.scores,
-          letterGrid: letterGrid,
-        });
+
+      // Calculate time elapsed since entering waiting state
+      const now = Date.now();
+      const waitingStartTime = waitingStartTimeRef.current || now;
+      const timeElapsed = now - waitingStartTime;
+      const remainingWaitTime = Math.max(0, MINIMUM_WAITING_TIME_MS - timeElapsed);
+
+      // Helper to show results
+      const showResults = () => {
+        setWaitingForResults(false);
+        setShowWordFeedback(false);
+        setWordToVote(null);
+        waitingStartTimeRef.current = null; // Reset for next game
+
+        // Use ref to get the latest onShowResults callback
+        const currentOnShowResults = onShowResultsRef.current;
+        if (currentOnShowResults) {
+          currentOnShowResults({
+            scores: data.scores,
+            letterGrid: letterGrid,
+          });
+        }
+      };
+
+      // Ensure minimum display time for the calculation screen to prevent flickering
+      if (remainingWaitTime > 0) {
+        setTimeout(showResults, remainingWaitTime);
+      } else {
+        showResults();
       }
     };
 
@@ -438,6 +573,33 @@ const usePlayerSocketEvents = ({
       setRemainingTime(null);
       setWaitingForResults(false);
       setLetterGrid(null);
+      setShowStartAnimation(false); // Reset animation state for new game
+      waitingStartTimeRef.current = null; // Reset waiting state tracking
+
+      // Reset combo state for new game
+      setComboLevel(0);
+      comboLevelRef.current = 0;
+      setLastWordTime(null);
+      lastWordTimeRef.current = null;
+      if (comboTimeoutRef.current) {
+        clearTimeout(comboTimeoutRef.current);
+        comboTimeoutRef.current = null;
+      }
+      comboShieldsUsedRef.current = 0;
+
+      // Reset word feedback state (close modal if open)
+      setShowWordFeedback(false);
+      setWordToVote(null);
+
+      // Reset tournament state
+      setTournamentData(null);
+      setTournamentStandings([]);
+      setShowTournamentStandings(false);
+
+      // Reset XP/Level state
+      setXpGainedData(null);
+      setLevelUpData(null);
+
       neoSuccessToast(data.message || t('common.newGameReady'), { icon: '🔄', duration: 3000 });
     };
 
@@ -536,7 +698,9 @@ const usePlayerSocketEvents = ({
     };
 
     const handlePlayerPresenceUpdate = (data: any) => {
+      if (!data) return;
       const { username: playerUsername, presenceStatus, isWindowFocused } = data;
+      if (!playerUsername) return;
       setPlayersReady(prev => {
         return prev.map(player => {
           const name = typeof player === 'string' ? player : player.username;
@@ -582,6 +746,23 @@ const usePlayerSocketEvents = ({
         icon: '✅',
         duration: 2000
       });
+    };
+
+    const handlePlayerConnectionStatusChanged = (data: { username: string; connectionStatus: 'weak' | 'stable'; message: string }) => {
+      logger.log('[PLAYER] Player connection status changed:', data);
+      if (data.connectionStatus === 'weak') {
+        // Show a subtle warning toast for weak connection
+        neoInfoToast(data.message || `${data.username} ${t('playerView.weakConnection') || 'has weak connection'}`, {
+          icon: '📶',
+          duration: 4000
+        });
+      } else if (data.connectionStatus === 'stable') {
+        // Connection recovered
+        neoSuccessToast(data.message || `${data.username} ${t('playerView.connectionRecovered') || 'connection recovered'}`, {
+          icon: '✅',
+          duration: 2000
+        });
+      }
     };
 
     const handlePlayerLeft = (data: any) => {
@@ -649,6 +830,7 @@ const usePlayerSocketEvents = ({
     socket.on('endGame', handleEndGame);
     socket.on('wordAccepted', handleWordAccepted);
     socket.on('wordNeedsValidation', handleWordNeedsValidation);
+    socket.on('wordValidatingWithAI', handleWordValidatingWithAI);
     socket.on('wordAlreadyFound', handleWordAlreadyFound);
     socket.on('wordNotOnBoard', handleWordNotOnBoard);
     socket.on('wordTooShort', handleWordTooShort);
@@ -675,6 +857,7 @@ const usePlayerSocketEvents = ({
     socket.on('hostTransferred', handleHostTransferred);
     socket.on('playerDisconnected', handlePlayerDisconnected);
     socket.on('playerReconnected', handlePlayerReconnected);
+    socket.on('playerConnectionStatusChanged', handlePlayerConnectionStatusChanged);
     socket.on('playerLeft', handlePlayerLeft);
     socket.on('sessionTakenOver', handleSessionTakenOver);
     socket.on('sessionMigrated', handleSessionMigrated);
@@ -689,6 +872,7 @@ const usePlayerSocketEvents = ({
       socket.off('endGame', handleEndGame);
       socket.off('wordAccepted', handleWordAccepted);
       socket.off('wordNeedsValidation', handleWordNeedsValidation);
+      socket.off('wordValidatingWithAI', handleWordValidatingWithAI);
       socket.off('wordAlreadyFound', handleWordAlreadyFound);
       socket.off('wordNotOnBoard', handleWordNotOnBoard);
       socket.off('wordTooShort', handleWordTooShort);
@@ -715,6 +899,7 @@ const usePlayerSocketEvents = ({
       socket.off('hostTransferred', handleHostTransferred);
       socket.off('playerDisconnected', handlePlayerDisconnected);
       socket.off('playerReconnected', handlePlayerReconnected);
+      socket.off('playerConnectionStatusChanged', handlePlayerConnectionStatusChanged);
       socket.off('playerLeft', handlePlayerLeft);
       socket.off('sessionTakenOver', handleSessionTakenOver);
       socket.off('sessionMigrated', handleSessionMigrated);

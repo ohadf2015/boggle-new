@@ -1,4 +1,5 @@
-import { createClient, SupabaseClient } from '@supabase/supabase-js';
+import { createBrowserClient } from '@supabase/ssr';
+import type { SupabaseClient } from '@supabase/supabase-js';
 import logger from '@/utils/logger';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -8,30 +9,61 @@ if (!supabaseUrl || !supabaseAnonKey) {
   logger.warn('Supabase credentials not configured. Auth features will be disabled.');
 }
 
+// Browser client using @supabase/ssr for proper cookie-based session handling
+// CRITICAL: detectSessionInUrl must be false to prevent race condition in auth callback
+// When true (default), Supabase auto-detects and exchanges the auth code in background,
+// which races with our manual exchangeCodeForSession() call in the callback page.
 export const supabase: SupabaseClient | null = supabaseUrl && supabaseAnonKey
-  ? createClient(supabaseUrl, supabaseAnonKey, {
+  ? createBrowserClient(supabaseUrl, supabaseAnonKey, {
       auth: {
-        autoRefreshToken: true,
-        persistSession: true,
-        detectSessionInUrl: true
+        detectSessionInUrl: false,
+        flowType: 'pkce'
       }
     })
   : null;
 
+// Helper to get the current locale from the URL path
+function getCurrentLocale(): string | null {
+  if (typeof window === 'undefined') return null;
+  const pathSegments = window.location.pathname.split('/').filter(Boolean);
+  const locales = ['he', 'en', 'sv', 'ja'];
+  const firstSegment = pathSegments[0];
+  if (firstSegment && locales.includes(firstSegment)) {
+    return firstSegment;
+  }
+  return null;
+}
+
 // Auth helper functions
 export async function signInWithGoogle() {
   if (!supabase) return { error: { message: 'Supabase not configured' } };
+
+  // Include current locale in the callback URL so we can redirect back correctly
+  const currentLocale = getCurrentLocale();
+  const redirectUrl = new URL('/auth/callback', window.location.origin);
+  if (currentLocale) {
+    redirectUrl.searchParams.set('locale', currentLocale);
+  }
+
   return supabase.auth.signInWithOAuth({
     provider: 'google',
-    options: { redirectTo: `${window.location.origin}/auth/callback` }
+    options: { redirectTo: redirectUrl.toString() }
   });
 }
 
 export async function signInWithDiscord() {
   if (!supabase) return { error: { message: 'Supabase not configured' } };
+
+  // Include current locale in the callback URL so we can redirect back correctly
+  const currentLocale = getCurrentLocale();
+  const redirectUrl = new URL('/auth/callback', window.location.origin);
+  if (currentLocale) {
+    redirectUrl.searchParams.set('locale', currentLocale);
+  }
+
   return supabase.auth.signInWithOAuth({
     provider: 'discord',
-    options: { redirectTo: `${window.location.origin}/auth/callback` }
+    options: { redirectTo: redirectUrl.toString() }
   });
 }
 
