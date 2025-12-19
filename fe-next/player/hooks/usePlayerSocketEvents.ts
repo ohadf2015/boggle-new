@@ -111,6 +111,9 @@ interface UsePlayerSocketEventsProps {
 
   // Exit ref
   intentionalExitRef: MutableRefObject<boolean>;
+
+  // Callback when game starts (for music synchronization)
+  onGameStart?: () => void;
 }
 
 /**
@@ -169,6 +172,9 @@ const usePlayerSocketEvents = ({
 
   // Exit ref
   intentionalExitRef,
+
+  // Music callback
+  onGameStart,
 }: UsePlayerSocketEventsProps): void => {
   // Combo shield constants
   const VALID_WORDS_PER_SHIELD = 10; // Earn 1 shield per 10 valid words
@@ -278,6 +284,10 @@ const usePlayerSocketEvents = ({
         socket.emit('startGameAck', { messageId: data.messageId });
         logger.log('[PLAYER] Sent startGameAck for messageId:', data.messageId);
       }
+
+      // Trigger music immediately for better synchronization across clients
+      // Music starts when startGame event is received, not when animation completes
+      onGameStart?.();
 
       const toastMessage = data.lateJoin
         ? (t('common.joinedGame') || 'Joined game!')

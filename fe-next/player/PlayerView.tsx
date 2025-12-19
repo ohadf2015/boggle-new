@@ -235,15 +235,21 @@ const PlayerView: React.FC<PlayerViewProps> = memo(({
     comboShieldsUsedRef,
     foundWords,
     intentionalExitRef,
-  });
-
-  // Music effects
-  useEffect(() => {
-    if (gameActive) {
+    // Start music immediately when startGame event is received for better synchronization
+    onGameStart: () => {
       fadeToTrack(TRACKS.IN_GAME, 800, 800);
       hasTriggeredUrgentMusicRef.current = false;
+    },
+  });
+
+  // Reset urgent music ref when game becomes active (for urgent music trigger)
+  useEffect(() => {
+    if (gameActive) {
+      // Note: Music is now started in onGameStart callback for better synchronization
+      // This effect only resets the urgent music ref as a safety measure
+      hasTriggeredUrgentMusicRef.current = false;
     }
-  }, [gameActive, fadeToTrack, TRACKS]);
+  }, [gameActive]);
 
   useEffect(() => {
     if (gameActive && remainingTime !== null && remainingTime <= 20 && remainingTime > 0 && !hasTriggeredUrgentMusicRef.current) {
@@ -338,6 +344,10 @@ const PlayerView: React.FC<PlayerViewProps> = memo(({
       if (pendingGameStart.minWordLength) setMinWordLength(pendingGameStart.minWordLength);
       setShowStartAnimation(true);
 
+      // Trigger music immediately for synchronization (same as onGameStart callback)
+      fadeToTrack(TRACKS.IN_GAME, 800, 800);
+      hasTriggeredUrgentMusicRef.current = false;
+
       if (pendingGameStart.messageId) {
         socket.emit('startGameAck', { messageId: pendingGameStart.messageId });
         logger.log('[PLAYER] Sent startGameAck for pending game start, messageId:', pendingGameStart.messageId);
@@ -345,7 +355,7 @@ const PlayerView: React.FC<PlayerViewProps> = memo(({
 
       onGameStartConsumed();
     }
-  }, [pendingGameStart, socket, onGameStartConsumed]);
+  }, [pendingGameStart, socket, onGameStartConsumed, fadeToTrack, TRACKS]);
 
   // Prevent accidental page refresh
   useEffect(() => {

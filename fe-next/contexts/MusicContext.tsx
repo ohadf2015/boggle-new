@@ -178,9 +178,34 @@ export function MusicProvider({ children }: MusicProviderProps) {
         };
     }, []);
 
-    // Track if we paused music due to tab visibility (to know whether to resume)
+    // Track if we paused music due to tab visibility or window blur (to know whether to resume)
     const pausedByVisibilityRef = useRef(false);
+    const pausedByBlurRef = useRef(false);
     const volumeBeforePauseRef = useRef<number>(0);
+
+    // Helper to mute music (used by both visibility and blur handlers)
+    const muteMusic = useCallback((reason: string) => {
+        if (currentHowlRef.current && currentHowlRef.current.playing()) {
+            volumeBeforePauseRef.current = currentHowlRef.current.volume();
+            currentHowlRef.current.volume(0);
+            logger.log(`[Music] ${reason} - muting music`);
+            return true;
+        }
+        return false;
+    }, []);
+
+    // Helper to restore music volume
+    const restoreMusic = useCallback((reason: string) => {
+        if (currentHowlRef.current) {
+            // Resume AudioContext if needed
+            if (audioUnlockedRef.current && Howler.ctx && Howler.ctx.state === 'suspended') {
+                Howler.ctx.resume();
+            }
+            const targetVolume = isMutedRef.current ? 0 : volumeRef.current;
+            currentHowlRef.current.volume(targetVolume);
+            logger.log(`[Music] ${reason} - restoring music volume`);
+        }
+    }, []);
 
     // Handle tab visibility - pause music when hidden, resume when visible
     useEffect(() => {
@@ -188,34 +213,50 @@ export function MusicProvider({ children }: MusicProviderProps) {
 
         const handleVisibilityChange = () => {
             if (document.visibilityState === 'hidden') {
-                // Tab is hidden - pause/mute the music
-                if (currentHowlRef.current && currentHowlRef.current.playing()) {
-                    volumeBeforePauseRef.current = currentHowlRef.current.volume();
-                    currentHowlRef.current.volume(0);
+                if (muteMusic('Tab hidden')) {
                     pausedByVisibilityRef.current = true;
-                    logger.log('[Music] Tab hidden - muting music');
                 }
             } else if (document.visibilityState === 'visible') {
-                // Tab is visible again - resume AudioContext and restore volume
-                if (audioUnlockedRef.current) {
-                    if (Howler.ctx && Howler.ctx.state === 'suspended') {
-                        Howler.ctx.resume();
-                    }
-                }
-
                 // Restore volume if we paused due to visibility
-                if (pausedByVisibilityRef.current && currentHowlRef.current) {
-                    const targetVolume = isMutedRef.current ? 0 : volumeRef.current;
-                    currentHowlRef.current.volume(targetVolume);
+                if (pausedByVisibilityRef.current) {
+                    restoreMusic('Tab visible');
                     pausedByVisibilityRef.current = false;
-                    logger.log('[Music] Tab visible - restoring music volume');
                 }
             }
         };
 
         document.addEventListener('visibilitychange', handleVisibilityChange);
         return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
-    }, []);
+    }, [muteMusic, restoreMusic]);
+
+    // Handle window focus/blur - pause music when window loses focus, resume when focused
+    useEffect(() => {
+        if (typeof window === 'undefined') return;
+
+        const handleBlur = () => {
+            // Only mute if tab is visible (blur means window lost focus, not tab switch)
+            if (document.visibilityState === 'visible') {
+                if (muteMusic('Window blur')) {
+                    pausedByBlurRef.current = true;
+                }
+            }
+        };
+
+        const handleFocus = () => {
+            // Restore volume if we paused due to blur
+            if (pausedByBlurRef.current) {
+                restoreMusic('Window focus');
+                pausedByBlurRef.current = false;
+            }
+        };
+
+        window.addEventListener('blur', handleBlur);
+        window.addEventListener('focus', handleFocus);
+        return () => {
+            window.removeEventListener('blur', handleBlur);
+            window.removeEventListener('focus', handleFocus);
+        };
+    }, [muteMusic, restoreMusic]);
 
     // Persist settings to localStorage (volume and mute only, NOT audioUnlocked)
     useEffect(() => {

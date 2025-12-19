@@ -91,6 +91,9 @@ interface UseHostSocketEventsProps {
 
   // Exit ref
   intentionalExitRef: MutableRefObject<boolean>;
+
+  // Callback when game starts (for music synchronization)
+  onGameStart?: () => void;
 }
 
 /**
@@ -143,6 +146,9 @@ const useHostSocketEvents = ({
 
   // Exit ref
   intentionalExitRef,
+
+  // Music callback
+  onGameStart,
 }: UseHostSocketEventsProps): void => {
   // Reset combo helper - defined first since handleWordAccepted depends on it
   const resetCombo = useCallback(() => {
@@ -484,6 +490,10 @@ const useHostSocketEvents = ({
         socket.emit('startGameAck', { messageId: data.messageId });
         logger.log('[HOST] Sent startGameAck for messageId:', data.messageId);
       }
+
+      // Trigger music immediately for better synchronization across clients
+      // Music starts when startGame event is received, not when animation completes
+      onGameStart?.();
     };
 
     const handleWordAlreadyFound = (data: any) => {

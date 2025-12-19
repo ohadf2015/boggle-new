@@ -374,7 +374,6 @@ const BotControls: React.FC<BotControlsProps> = ({
               style={{ backgroundColor: bot.avatar?.color || '#60a5fa' }}
               title={bot.username}
             >
-              {bot.avatar?.emoji || '🤖'}
             </motion.div>
           ))}
           {bots.length > 5 && (

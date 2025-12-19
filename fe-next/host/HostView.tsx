@@ -205,15 +205,21 @@ const HostView: React.FC<HostViewProps> = memo(({
     tournamentTimeoutRef,
     tournamentData,
     intentionalExitRef,
-  });
-
-  // Music effects
-  useEffect(() => {
-    if (gameStarted) {
+    // Start music immediately when startGame event is received for better synchronization
+    onGameStart: () => {
       fadeToTrack(TRACKS.IN_GAME, 800, 800);
       hasTriggeredUrgentMusicRef.current = false;
+    },
+  });
+
+  // Reset urgent music ref when game becomes active (for urgent music trigger)
+  useEffect(() => {
+    if (gameStarted) {
+      // Note: Music is now started in onGameStart callback for better synchronization
+      // This effect only resets the urgent music ref as a safety measure
+      hasTriggeredUrgentMusicRef.current = false;
     }
-  }, [gameStarted, fadeToTrack, TRACKS]);
+  }, [gameStarted]);
 
   useEffect(() => {
     if (gameStarted && remainingTime !== null && remainingTime <= 20 && remainingTime > 0 && !hasTriggeredUrgentMusicRef.current) {

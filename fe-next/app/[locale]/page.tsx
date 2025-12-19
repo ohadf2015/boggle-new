@@ -495,9 +495,20 @@ export default function GamePage(): React.JSX.Element {
       setRoomsLoading(false);
     }, SOCKET_CONFIG.ROOMS_LOADING_TIMEOUT);
 
+    // Debug handler to check server-side game state
+    newSocket.on('debugGameStateResponse', (data) => {
+      logger.log('[DEBUG] Server game state:', data);
+    });
+
     newSocket.on('error', (data) => {
       logger.error('[SOCKET.IO] Error:', data);
       setIsJoining(false); // Clear loading state on any error
+
+      // If error is about game not in progress, query server for actual state
+      if (data?.code === 'GAME_NOT_IN_PROGRESS' || data?.message?.includes('not in progress')) {
+        logger.error('[SOCKET.IO] Game state mismatch - querying server for actual state');
+        newSocket.emit('debugGameState');
+      }
 
       // Log additional debug info to help diagnose empty errors
       if (!data || Object.keys(data).length === 0) {
@@ -570,6 +581,9 @@ export default function GamePage(): React.JSX.Element {
     // Note: Toast notification is handled by PlayerView/HostView to avoid duplicates
     newSocket.on('resetGame', () => {
       logger.log('[SOCKET.IO] Game reset - staying in room for new game');
+      // Update ref SYNCHRONOUSLY before state change to prevent race condition
+      // where startGame arrives before the ref useEffect updates
+      showResultsRef.current = false;
       setShowResults(false);
       setResultsData(null);
       // Toast notification is handled by PlayerView/HostView to avoid duplicates

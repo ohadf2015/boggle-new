@@ -184,7 +184,11 @@ function registerGameLifecycleHandlers(io, socket) {
     }
 
     // Check if game can be started (must be in 'waiting' state)
+    const currentGameState = game.gameState;
+    logger.info('SOCKET', `Starting game ${gameCode} - current state: ${currentGameState}`);
+
     if (!canTransitionGameState(gameCode, 'START')) {
+      logger.error('SOCKET', `Cannot start game ${gameCode} from state: ${currentGameState}`);
       emitError(socket, 'Game cannot be started from current state');
       return;
     }
@@ -286,6 +290,21 @@ function registerGameLifecycleHandlers(io, socket) {
     endGame(io, gameCode);
   });
 
+  // Debug: Get current game state (for debugging sync issues)
+  socket.on('debugGameState', () => {
+    const gameCode = getGameBySocketId(socket.id);
+    const game = gameCode ? getGame(gameCode) : null;
+    socket.emit('debugGameStateResponse', {
+      gameCode,
+      gameState: game?.gameState || 'NO_GAME',
+      hostSocketId: game?.hostSocketId,
+      mySocketId: socket.id,
+      playerCount: game ? Object.keys(game.users || {}).length : 0,
+      timestamp: Date.now()
+    });
+    logger.info('DEBUG', `Game state query for ${gameCode}: ${game?.gameState || 'NO_GAME'}`);
+  });
+
   // Handle reset game
   socket.on('resetGame', () => {
     if (!checkRateLimit(socket.id)) {
@@ -310,6 +329,7 @@ function registerGameLifecycleHandlers(io, socket) {
       return;
     }
 
+    const stateBeforeReset = game.gameState;
     timerManager.clearGameTimer(gameCode);
 
     // Clean up game start coordinator to prevent stale acknowledgment state
@@ -318,13 +338,18 @@ function registerGameLifecycleHandlers(io, socket) {
     // Clean up bots from previous game to prevent stale state
     botManager.cleanupGameBots(gameCode);
 
-    resetGameForNewRound(gameCode);
+    const resetSuccess = resetGameForNewRound(gameCode);
+    const stateAfterReset = getGame(gameCode)?.gameState;
+
+    logger.info('SOCKET', `Game ${gameCode} reset: ${stateBeforeReset} -> ${stateAfterReset} (success: ${resetSuccess})`);
+
+    if (!resetSuccess) {
+      logger.error('SOCKET', `Failed to reset game ${gameCode} from state ${stateBeforeReset}`);
+    }
 
     broadcastToRoom(io, getGameRoom(gameCode), 'resetGame', {
       users: getGameUsers(gameCode)
     });
-
-    logger.info('SOCKET', `Game ${gameCode} reset by host`);
   });
 }
 
