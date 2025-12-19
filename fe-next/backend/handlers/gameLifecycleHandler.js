@@ -236,7 +236,8 @@ function registerGameLifecycleHandlers(io, socket) {
       timerSeconds: validTimer,
       language: language || game.language,
       minWordLength: minWordLength || 2,
-      messageId
+      messageId,
+      gameSessionId: game.gameSessionId
     });
 
     // Set acknowledgment timeout
@@ -339,7 +340,8 @@ function registerGameLifecycleHandlers(io, socket) {
     botManager.cleanupGameBots(gameCode);
 
     const resetSuccess = resetGameForNewRound(gameCode);
-    const stateAfterReset = getGame(gameCode)?.gameState;
+    const gameAfterReset = getGame(gameCode);
+    const stateAfterReset = gameAfterReset?.gameState;
 
     logger.info('SOCKET', `Game ${gameCode} reset: ${stateBeforeReset} -> ${stateAfterReset} (success: ${resetSuccess})`);
 
@@ -348,7 +350,8 @@ function registerGameLifecycleHandlers(io, socket) {
     }
 
     broadcastToRoom(io, getGameRoom(gameCode), 'resetGame', {
-      users: getGameUsers(gameCode)
+      users: getGameUsers(gameCode),
+      gameSessionId: gameAfterReset?.gameSessionId
     });
   });
 }

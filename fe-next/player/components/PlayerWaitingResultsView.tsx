@@ -89,7 +89,7 @@ const PlayerWaitingResultsView: React.FC<PlayerWaitingResultsViewProps> = ({
   useEffect(() => {
     const stageInterval = setInterval(() => {
       setStage(prev => (prev + 1) % validationStages.length);
-    }, 3500);
+    }, 2000); // Faster cycling for snappier feel
     return () => clearInterval(stageInterval);
   }, [validationStages.length]);
 
@@ -124,195 +124,199 @@ const PlayerWaitingResultsView: React.FC<PlayerWaitingResultsViewProps> = ({
         <ExitRoomButton onClick={onExitRoom} label={isHost ? t('hostView.exitRoom') : t('playerView.exit')} />
       </div>
 
-      {/* Centered Content */}
-      <div className="flex-1 flex items-center justify-center">
-        <div className="max-w-6xl w-full space-y-4 sm:space-y-6 md:space-y-8">
-          {/* Waiting for Results Message - Fixed height container to prevent CLS */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.3 }}
-            className="text-center"
-          >
-            <div className="bg-neo-yellow border-4 border-neo-black shadow-hard-lg p-6 sm:p-8 md:p-10">
-              {/* Brain/Processing Animation - Static container, opacity-only animation to prevent CLS */}
-              <div className="mb-6 h-[80px] flex items-center justify-center">
-                <div className="inline-block bg-neo-pink border-4 border-neo-black shadow-hard p-4">
+      {/* Centered Content - responsive grid on large screens */}
+      <div className="flex-1 flex items-start lg:items-center justify-center py-4">
+        <div className="max-w-7xl w-full grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6 xl:gap-8">
+          {/* Left column: Validation status + Leaderboard */}
+          <div className="space-y-4 sm:space-y-6">
+            {/* Waiting for Results Message - Fixed height container to prevent CLS */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.3 }}
+              className="text-center"
+            >
+              <div className="bg-neo-yellow border-4 border-neo-black shadow-hard-lg p-4 sm:p-6 lg:p-8">
+                {/* Brain/Processing Animation - Static container, opacity-only animation to prevent CLS */}
+                <div className="mb-4 lg:mb-6 h-[60px] lg:h-[80px] flex items-center justify-center">
+                  <div className="inline-block bg-neo-pink border-4 border-neo-black shadow-hard p-3 lg:p-4">
+                    <AnimatePresence mode="wait">
+                      <motion.div
+                        key={stage}
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        transition={{ duration: 0.2 }}
+                        className="text-3xl lg:text-4xl"
+                      >
+                        {currentStage.icon}
+                      </motion.div>
+                    </AnimatePresence>
+                  </div>
+                </div>
+
+                {/* Main status message - Fixed height to prevent CLS, opacity-only animation */}
+                <div className="bg-neo-black text-neo-white px-4 lg:px-6 py-3 lg:py-4 font-black uppercase text-lg lg:text-xl xl:text-2xl tracking-wider shadow-hard border-4 border-neo-black mb-3 lg:mb-4 min-h-[50px] lg:min-h-[70px] flex items-center justify-center">
                   <AnimatePresence mode="wait">
                     <motion.div
                       key={stage}
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
                       exit={{ opacity: 0 }}
-                      transition={{ duration: 0.2 }}
-                      className="text-4xl"
+                      transition={{ duration: 0.3 }}
+                      className="flex items-center justify-center gap-3"
                     >
-                      {currentStage.icon}
+                      <span>{t(`playerView.validation.${currentStage.key}`) || currentStage.key}</span>
                     </motion.div>
                   </AnimatePresence>
                 </div>
-              </div>
 
-              {/* Main status message - Fixed height to prevent CLS, opacity-only animation */}
-              <div className="bg-neo-black text-neo-white px-6 py-4 font-black uppercase text-xl md:text-2xl tracking-wider shadow-hard border-4 border-neo-black mb-4 min-h-[70px] flex items-center justify-center">
-                <AnimatePresence mode="wait">
+                {/* Progress bar - Visual feedback */}
+                <div className="relative h-3 lg:h-4 bg-neo-cream border-3 border-neo-black overflow-hidden mb-3 lg:mb-4">
                   <motion.div
-                    key={stage}
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    transition={{ duration: 0.3 }}
-                    className="flex items-center justify-center gap-3"
-                  >
-                    <span>{t(`playerView.validation.${currentStage.key}`) || currentStage.key}</span>
-                  </motion.div>
-                </AnimatePresence>
-              </div>
-
-              {/* Progress bar - Visual feedback */}
-              <div className="relative h-4 bg-neo-cream border-3 border-neo-black overflow-hidden mb-4">
-                <motion.div
-                  className="absolute inset-y-0 left-0 bg-neo-cyan"
-                  initial={{ width: '0%' }}
-                  animate={{ width: `${progress}%` }}
-                  transition={{ duration: 0.5, ease: 'easeOut' }}
-                />
-                {/* Animated stripes */}
-                <div
-                  className="absolute inset-0 opacity-30"
-                  style={{
-                    backgroundImage: 'repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(0,0,0,0.1) 10px, rgba(0,0,0,0.1) 20px)',
-                    animation: 'stripe-move 1s linear infinite',
-                  }}
-                />
-              </div>
-
-              {/* Current word being validated - Fixed height container, opacity-only animation */}
-              {words.length > 0 && (
-                <div className="flex items-center justify-center gap-2 h-[40px]">
-                  <span className="text-neo-black font-bold text-sm uppercase tracking-wide">
-                    {t('playerView.validatingWord') || 'Checking:'}
-                  </span>
-                  <AnimatePresence mode="wait">
-                    <motion.span
-                      key={currentWord}
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      exit={{ opacity: 0 }}
-                      transition={{ duration: 0.2 }}
-                      className="bg-neo-purple text-neo-white px-3 py-1 font-black text-lg uppercase border-3 border-neo-black shadow-hard-sm"
-                    >
-                      {currentWord}
-                    </motion.span>
-                  </AnimatePresence>
-                </div>
-              )}
-
-              {/* Processing indicators - Opacity-only animation to prevent layout shift */}
-              <div className="flex gap-3 mt-4 justify-center">
-                {[0, 1, 2].map((i) => (
-                  <motion.div
-                    key={i}
-                    animate={{
-                      opacity: [0.3, 1, 0.3],
-                    }}
-                    transition={{
-                      duration: 1.5,
-                      repeat: Infinity,
-                      delay: i * 0.3,
-                      ease: 'easeInOut',
-                    }}
-                    className="w-3 h-3 bg-neo-black rounded-full"
+                    className="absolute inset-y-0 left-0 bg-neo-cyan"
+                    initial={{ width: '0%' }}
+                    animate={{ width: `${progress}%` }}
+                    transition={{ duration: 0.5, ease: 'easeOut' }}
                   />
-                ))}
-              </div>
-            </div>
-          </motion.div>
-
-          {/* Leaderboard */}
-          {leaderboard.length > 0 && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.3, delay: 0.1 }}
-            >
-              <div className="bg-neo-cream border-4 border-neo-black shadow-hard-lg overflow-hidden">
-                <div className="py-3 px-4 border-b-4 border-neo-black bg-neo-purple">
-                  <h3 className="flex items-center gap-2 text-neo-white text-xl uppercase tracking-wider font-black">
-                    <FaTrophy className="text-neo-yellow" style={{ filter: 'drop-shadow(2px 2px 0px var(--neo-black))' }} />
-                    {t('playerView.leaderboard')}
-                  </h3>
+                  {/* Animated stripes */}
+                  <div
+                    className="absolute inset-0 opacity-30"
+                    style={{
+                      backgroundImage: 'repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(0,0,0,0.1) 10px, rgba(0,0,0,0.1) 20px)',
+                      animation: 'stripe-move 1s linear infinite',
+                    }}
+                  />
                 </div>
-                <div className="p-3 space-y-2 max-h-[250px] sm:max-h-[300px] md:max-h-[400px] overflow-y-auto">
-                  {leaderboard.map((player, index) => {
-                    const isMe = player.username === username;
-                    // Track if this player has already been animated
-                    const isNewPlayer = !animatedPlayersRef.current.has(player.username);
-                    if (isNewPlayer) {
-                      animatedPlayersRef.current.add(player.username);
-                    }
-                    const getRankStyle = (): string => {
-                      if (index === 0) return 'bg-neo-yellow text-neo-black';
-                      if (index === 1) return 'bg-slate-300 text-neo-black';
-                      if (index === 2) return 'bg-neo-orange text-neo-black';
-                      return 'bg-neo-cream text-neo-black border-neo-black border-3';
-                    };
-                    return (
-                      <motion.div
-                        key={player.username}
-                        initial={isNewPlayer ? { opacity: 0 } : false}
+
+                {/* Current word being validated - Fixed height container, opacity-only animation */}
+                {words.length > 0 && (
+                  <div className="flex items-center justify-center gap-2 h-[36px] lg:h-[40px]">
+                    <span className="text-neo-black font-bold text-xs lg:text-sm uppercase tracking-wide">
+                      {t('playerView.validatingWord') || 'Checking:'}
+                    </span>
+                    <AnimatePresence mode="wait">
+                      <motion.span
+                        key={currentWord}
+                        initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
-                        transition={{
-                          opacity: isNewPlayer ? { duration: 0.3, delay: index * 0.05 } : { duration: 0 }
-                        }}
-                        className={`flex items-center gap-3 p-3 rounded-neo border-3 border-neo-black shadow-hard-sm transition-colors
-                          hover:brightness-110
-                          ${getRankStyle()} ${dir === 'rtl' ? 'flex-row-reverse' : ''}`}
+                        exit={{ opacity: 0 }}
+                        transition={{ duration: 0.2 }}
+                        className="bg-neo-purple text-neo-white px-2 lg:px-3 py-1 font-black text-base lg:text-lg uppercase border-3 border-neo-black shadow-hard-sm"
                       >
-                        <div className="w-10 h-10 rounded-neo flex items-center justify-center font-black text-lg bg-neo-black text-neo-white border-2 border-neo-black">
-                          {index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : `#${index + 1}`}
-                        </div>
-                        <Avatar
-                          profilePictureUrl={player.avatar?.profilePictureUrl ?? undefined}
-                          avatarEmoji={player.avatar?.emoji}
-                          avatarColor={player.avatar?.color}
-                          size="md"
-                        />
-                        <div className="flex-1">
-                          <div className={`font-black flex items-center gap-2 ${dir === 'rtl' ? 'flex-row-reverse' : ''}`}>
-                            <SlotMachineText text={player.username} />
-                            {player.isHost && <FaCrown className="text-neo-yellow text-sm" style={{ filter: 'drop-shadow(1px 1px 0px var(--neo-black))' }} />}
-                            {player.isBot && <FaRobot className="text-neo-cyan text-sm" />}
-                            {isMe && (
-                              <span className="text-xs bg-neo-black text-neo-white px-2 py-0.5 rounded-neo font-bold border-2 border-neo-black">
-                                ({t('playerView.me')})
-                              </span>
-                            )}
-                          </div>
-                          <div className="text-sm font-bold opacity-75">{player.wordCount} {t('playerView.wordCount')}</div>
-                        </div>
-                        <div className="text-2xl font-black">
-                          {player.score}
-                        </div>
-                      </motion.div>
-                    );
-                  })}
+                        {currentWord}
+                      </motion.span>
+                    </AnimatePresence>
+                  </div>
+                )}
+
+                {/* Processing indicators - Opacity-only animation to prevent layout shift */}
+                <div className="flex gap-2 lg:gap-3 mt-3 lg:mt-4 justify-center">
+                  {[0, 1, 2].map((i) => (
+                    <motion.div
+                      key={i}
+                      animate={{
+                        opacity: [0.3, 1, 0.3],
+                      }}
+                      transition={{
+                        duration: 1.5,
+                        repeat: Infinity,
+                        delay: i * 0.3,
+                        ease: 'easeInOut',
+                      }}
+                      className="w-2.5 h-2.5 lg:w-3 lg:h-3 bg-neo-black rounded-full"
+                    />
+                  ))}
                 </div>
               </div>
             </motion.div>
-          )}
 
-          {/* Chat Section */}
+            {/* Leaderboard */}
+            {leaderboard.length > 0 && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.3, delay: 0.1 }}
+              >
+                <div className="bg-neo-cream border-4 border-neo-black shadow-hard-lg overflow-hidden">
+                  <div className="py-2 lg:py-3 px-3 lg:px-4 border-b-4 border-neo-black bg-neo-purple">
+                    <h3 className="flex items-center gap-2 text-neo-white text-lg lg:text-xl uppercase tracking-wider font-black">
+                      <FaTrophy className="text-neo-yellow" style={{ filter: 'drop-shadow(2px 2px 0px var(--neo-black))' }} />
+                      {t('playerView.leaderboard')}
+                    </h3>
+                  </div>
+                  <div className="p-2 lg:p-3 space-y-2 max-h-[200px] sm:max-h-[250px] lg:max-h-[350px] xl:max-h-[400px] overflow-y-auto">
+                    {leaderboard.map((player, index) => {
+                      const isMe = player.username === username;
+                      // Track if this player has already been animated
+                      const isNewPlayer = !animatedPlayersRef.current.has(player.username);
+                      if (isNewPlayer) {
+                        animatedPlayersRef.current.add(player.username);
+                      }
+                      const getRankStyle = (): string => {
+                        if (index === 0) return 'bg-neo-yellow text-neo-black';
+                        if (index === 1) return 'bg-slate-300 text-neo-black';
+                        if (index === 2) return 'bg-neo-orange text-neo-black';
+                        return 'bg-neo-cream text-neo-black border-neo-black border-3';
+                      };
+                      return (
+                        <motion.div
+                          key={player.username}
+                          initial={isNewPlayer ? { opacity: 0 } : false}
+                          animate={{ opacity: 1 }}
+                          transition={{
+                            opacity: isNewPlayer ? { duration: 0.3, delay: index * 0.05 } : { duration: 0 }
+                          }}
+                          className={`flex items-center gap-2 lg:gap-3 p-2 lg:p-3 rounded-neo border-3 border-neo-black shadow-hard-sm transition-colors
+                            hover:brightness-110
+                            ${getRankStyle()} ${dir === 'rtl' ? 'flex-row-reverse' : ''}`}
+                        >
+                          <div className="w-8 h-8 lg:w-10 lg:h-10 rounded-neo flex items-center justify-center font-black text-sm lg:text-lg bg-neo-black text-neo-white border-2 border-neo-black">
+                            {index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : `#${index + 1}`}
+                          </div>
+                          <Avatar
+                            profilePictureUrl={player.avatar?.profilePictureUrl ?? undefined}
+                            avatarEmoji={player.avatar?.emoji}
+                            avatarColor={player.avatar?.color}
+                            size="md"
+                          />
+                          <div className="flex-1 min-w-0">
+                            <div className={`font-black flex items-center gap-1 lg:gap-2 ${dir === 'rtl' ? 'flex-row-reverse' : ''}`}>
+                              <span className="truncate"><SlotMachineText text={player.username} /></span>
+                              {player.isHost && <FaCrown className="text-neo-yellow text-xs lg:text-sm flex-shrink-0" style={{ filter: 'drop-shadow(1px 1px 0px var(--neo-black))' }} />}
+                              {player.isBot && <FaRobot className="text-neo-cyan text-xs lg:text-sm flex-shrink-0" />}
+                              {isMe && (
+                                <span className="text-[10px] lg:text-xs bg-neo-black text-neo-white px-1.5 lg:px-2 py-0.5 rounded-neo font-bold border-2 border-neo-black flex-shrink-0">
+                                  ({t('playerView.me')})
+                                </span>
+                              )}
+                            </div>
+                            <div className="text-xs lg:text-sm font-bold opacity-75">{player.wordCount} {t('playerView.wordCount')}</div>
+                          </div>
+                          <div className="text-xl lg:text-2xl font-black flex-shrink-0">
+                            {player.score}
+                          </div>
+                        </motion.div>
+                      );
+                    })}
+                  </div>
+                </div>
+              </motion.div>
+            )}
+          </div>
+
+          {/* Right column: Chat Section */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.3, delay: 0.2 }}
+            className="lg:h-full"
           >
             <RoomChat
               username={username}
               isHost={isHost}
               gameCode={gameCode}
-              className="min-h-[300px]"
+              className="min-h-[250px] lg:min-h-[400px] xl:min-h-[500px] lg:h-full"
             />
           </motion.div>
         </div>

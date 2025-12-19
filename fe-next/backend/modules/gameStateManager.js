@@ -201,7 +201,9 @@ function createGame(gameCode, gameData) {
     peerValidationWord: null, // The randomly selected AI-approved word for peer validation
     peerValidationVotes: {}, // username -> 'valid' | 'invalid'
     createdAt: Date.now(),
-    lastActivity: Date.now()
+    lastActivity: Date.now(),
+    // Game session ID - increments on each reset to help clients ignore stale events
+    gameSessionId: 0
   };
 
   // Persist to Redis (debounced)
@@ -585,6 +587,9 @@ function resetGameForNewRound(gameCode) {
   game.letterGrid = null;
   game.lastActivity = Date.now();
   game.gameEndedAt = null; // Clear end timestamp for new game
+
+  // Increment game session ID to help clients ignore stale events from previous games
+  game.gameSessionId = (game.gameSessionId || 0) + 1;
 
   // Persist the change
   persistGameState(gameCode);

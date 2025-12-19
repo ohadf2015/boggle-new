@@ -51,7 +51,7 @@ const AIValidationProgress: React.FC<AIValidationProgressProps> = ({
   useEffect(() => {
     const stageInterval = setInterval(() => {
       setStage(prev => (prev + 1) % validationStages.length);
-    }, 3500);
+    }, 2000); // Faster cycling for snappier feel
 
     return () => clearInterval(stageInterval);
   }, [validationStages.length]);

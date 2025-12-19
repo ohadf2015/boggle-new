@@ -243,6 +243,9 @@ const usePlayerSocketEvents = ({
   const waitingStartTimeRef = useRef<number | null>(null);
   const MINIMUM_WAITING_TIME_MS = 1500; // Minimum time to show the calculation screen
 
+  // Track game session ID to ignore stale events from previous game sessions
+  const gameSessionIdRef = useRef<number>(0);
+
   useEffect(() => {
     if (!socket) return;
 
@@ -265,6 +268,10 @@ const usePlayerSocketEvents = ({
       setAchievements([]);
       // Reset combo shields for new game
       comboShieldsUsedRef.current = 0;
+      // Track game session ID to identify and ignore stale events
+      if (data.gameSessionId !== undefined) {
+        gameSessionIdRef.current = data.gameSessionId;
+      }
       if (data.letterGrid) setLetterGrid(data.letterGrid);
       if (data.timerSeconds) setRemainingTime(data.timerSeconds);
       if (data.language) setGameLanguage(data.language);
@@ -441,6 +448,13 @@ const usePlayerSocketEvents = ({
     };
 
     const handleTimeUpdate = (data: any) => {
+      // Ignore stale timeUpdate events from previous game sessions
+      // This prevents race conditions when late timeUpdate from game N arrives after game N+1 has started
+      if (data.gameSessionId !== undefined && data.gameSessionId !== gameSessionIdRef.current) {
+        logger.log('[PLAYER] Ignoring stale timeUpdate from old session:', data.gameSessionId, 'vs current:', gameSessionIdRef.current);
+        return;
+      }
+
       setRemainingTime(data.remainingTime);
 
       if (data.letterGrid && !letterGrid) {
@@ -613,6 +627,11 @@ const usePlayerSocketEvents = ({
         comboTimeoutRef.current = null;
       }
       comboShieldsUsedRef.current = 0;
+
+      // Track game session ID from reset event
+      if (data.gameSessionId !== undefined) {
+        gameSessionIdRef.current = data.gameSessionId;
+      }
 
       // Reset word feedback state (close modal if open)
       setShowWordFeedback(false);

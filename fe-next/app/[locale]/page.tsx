@@ -16,7 +16,7 @@ import { useMusic } from '@/contexts/MusicContext';
 import { getGuestSessionId, hashToken } from '@/utils/guestManager';
 import { getSession as getSupabaseSession } from '@/lib/supabase';
 import logger from '@/utils/logger';
-import { getRandomDefaultName } from '@/utils/defaultNames';
+import { getRandomDefaultNameWithAvatar, getAvatarForName } from '@/utils/defaultNames';
 import type { Language, ActiveRoom } from '@/shared/types/game';
 
 interface JoinedEventData {
@@ -123,6 +123,7 @@ const getSocketURL = (): string => {
 export default function GamePage(): React.JSX.Element {
   const [gameCode, setGameCode] = useState<string>('');
   const [username, setUsername] = useState<string>('');
+  const [guestAvatar, setGuestAvatar] = useState<{ emoji: string; color: string } | null>(null);
   const [roomName, setRoomName] = useState<string>('');
   const [isActive, setIsActive] = useState<boolean>(false);
   const [isHost, setIsHost] = useState<boolean>(false);
@@ -237,21 +238,29 @@ export default function GamePage(): React.JSX.Element {
       }
 
       if (roomFromUrl && savedUsername) {
-        // Already set above
+        // Already set above, derive avatar from name
+        setGuestAvatar(getAvatarForName(savedUsername));
       } else if (joiningNewRoomViaInvitation) {
         if (savedUsername) {
           setUsername(savedUsername);
+          setGuestAvatar(getAvatarForName(savedUsername));
         } else {
-          // Set a fun random default name for guests
-          setUsername(getRandomDefaultName(language));
+          // Set a fun random default name for guests with matching avatar
+          const { name, avatar } = getRandomDefaultNameWithAvatar(language);
+          setUsername(name);
+          setGuestAvatar(avatar);
         }
       } else if (savedSession?.username) {
         setUsername(savedSession.username);
+        setGuestAvatar(getAvatarForName(savedSession.username));
       } else if (savedUsername) {
         setUsername(savedUsername);
+        setGuestAvatar(getAvatarForName(savedUsername));
       } else {
-        // Set a fun random default name for new guests
-        setUsername(getRandomDefaultName(language));
+        // Set a fun random default name for new guests with matching avatar
+        const { name, avatar } = getRandomDefaultNameWithAvatar(language);
+        setUsername(name);
+        setGuestAvatar(avatar);
       }
 
       // Also set roomName for hosting if not already set
@@ -259,7 +268,8 @@ export default function GamePage(): React.JSX.Element {
         setRoomName(savedSession.roomName);
       } else if (!savedSession?.roomName && !roomFromUrl) {
         // Set a fun random default name for host room name
-        setRoomName(getRandomDefaultName(language));
+        const { name } = getRandomDefaultNameWithAvatar(language);
+        setRoomName(name);
       }
     };
 
@@ -405,12 +415,20 @@ export default function GamePage(): React.JSX.Element {
                 language: savedSession.language || language,
                 hostUsername: savedSession.username || savedSession.roomName,
                 ...authContext,
+                avatar: profile ? {
+                  emoji: profile.avatar_emoji,
+                  color: profile.avatar_color,
+                } : (guestAvatar || getAvatarForName(savedSession.username || savedSession.roomName || '')),
               });
             } else {
               newSocket.emit('join', {
                 gameCode: savedSession.gameCode,
                 username: savedSession.username,
                 ...authContext,
+                avatar: profile ? {
+                  emoji: profile.avatar_emoji,
+                  color: profile.avatar_color,
+                } : (guestAvatar || getAvatarForName(savedSession.username || '')),
               });
             }
           });
@@ -781,7 +799,7 @@ export default function GamePage(): React.JSX.Element {
             avatar: currentProfile ? {
               emoji: currentProfile.avatar_emoji,
               color: currentProfile.avatar_color,
-            } : undefined,
+            } : (guestAvatar || getAvatarForName(currentUsername)),
             profilePictureUrl: currentProfile?.profile_picture_url,
           });
           setShouldAutoJoin(false);
@@ -790,7 +808,7 @@ export default function GamePage(): React.JSX.Element {
       return () => clearTimeout(autoJoinTimeout);
     }
     return undefined;
-  }, [shouldAutoJoin, prefilledRoomCode, username, isActive, attemptingReconnect, socket, isConnected, getAuthContext, profile]);
+  }, [shouldAutoJoin, prefilledRoomCode, username, isActive, attemptingReconnect, socket, isConnected, getAuthContext, profile, guestAvatar]);
 
   // Session reconnection
   useEffect(() => {
@@ -834,7 +852,7 @@ export default function GamePage(): React.JSX.Element {
           avatar: profile ? {
             emoji: profile.avatar_emoji,
             color: profile.avatar_color,
-          } : undefined,
+          } : (guestAvatar || getAvatarForName(savedSession.roomName)),
           profilePictureUrl: profile?.profile_picture_url,
         });
       } else {
@@ -850,14 +868,14 @@ export default function GamePage(): React.JSX.Element {
           avatar: profile ? {
             emoji: profile.avatar_emoji,
             color: profile.avatar_color,
-          } : undefined,
+          } : (guestAvatar || getAvatarForName(savedSession.username)),
           profilePictureUrl: profile?.profile_picture_url,
         });
       }
     }, 500);
 
     return () => clearTimeout(reconnectTimeout);
-  }, [attemptingReconnect, isActive, socket, isConnected, language, getAuthContext, profile]);
+  }, [attemptingReconnect, isActive, socket, isConnected, language, getAuthContext, profile, guestAvatar]);
 
   const handleJoin = useCallback(async (isHostMode: boolean, roomLang?: Language | null, overrideGameCode?: string) => {
     if (!socket || !isConnected) {
@@ -942,7 +960,7 @@ export default function GamePage(): React.JSX.Element {
         avatar: profile ? {
           emoji: profile.avatar_emoji,
           color: profile.avatar_color,
-        } : undefined,
+        } : (guestAvatar || getAvatarForName(roomName)),
         profilePictureUrl: profile?.profile_picture_url,
       });
     } else {
@@ -954,11 +972,11 @@ export default function GamePage(): React.JSX.Element {
         avatar: profile ? {
           emoji: profile.avatar_emoji,
           color: profile.avatar_color,
-        } : undefined,
+        } : (guestAvatar || getAvatarForName(username)),
         profilePictureUrl: profile?.profile_picture_url,
       });
     }
-  }, [socket, isConnected, gameCode, username, roomName, language, t, isSupabaseEnabled, user, profile, loading, authLoadingStartTime]);
+  }, [socket, isConnected, gameCode, username, roomName, language, t, isSupabaseEnabled, user, profile, loading, authLoadingStartTime, guestAvatar]);
 
   const refreshRooms = useCallback(() => {
     if (socket && isConnected) {

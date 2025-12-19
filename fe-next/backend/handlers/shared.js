@@ -70,7 +70,8 @@ function startGameTimer(io, gameCode, timerSeconds) {
 
     if (shouldBroadcast) {
       broadcastToRoom(io, getGameRoom(gameCode), 'timeUpdate', {
-        remainingTime
+        remainingTime,
+        gameSessionId: game.gameSessionId
       });
       lastBroadcastTime = remainingTime;
     }
