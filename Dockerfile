@@ -3,6 +3,9 @@ FROM node:20-alpine AS builder
 
 WORKDIR /app
 
+# Set production environment for build
+ENV NODE_ENV=production
+
 # Copy package files
 COPY fe-next/package*.json ./
 
@@ -20,6 +23,9 @@ FROM node:20-alpine
 
 WORKDIR /app
 
+# Set production environment
+ENV NODE_ENV=production
+
 # Install curl for healthcheck and bash for scripts
 RUN apk add --no-cache curl bash
 
@@ -33,12 +39,14 @@ COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/.next ./.next
 COPY --from=builder /app/public ./public
 COPY --from=builder /app/server.js ./
+COPY --from=builder /app/server ./server
 COPY --from=builder /app/backend ./backend
 COPY --from=builder /app/utils ./utils
 COPY --from=builder /app/contexts ./contexts
 COPY --from=builder /app/lib ./lib
 COPY --from=builder /app/hooks ./hooks
 COPY --from=builder /app/supabase ./supabase
+COPY --from=builder /app/next.config.mjs ./
 
 # Copy scripts
 COPY scripts/docker-migrate.sh ./scripts/docker-migrate.sh
