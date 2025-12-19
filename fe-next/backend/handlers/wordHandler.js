@@ -26,7 +26,7 @@ const { checkAndAwardAchievements, ACHIEVEMENT_ICONS } = require('../modules/ach
 const { isDictionaryWord } = require('../dictionary');
 const { isSupabaseConfigured, savePlayerWord } = require('../modules/supabaseServer');
 const { recordVote, updatePendingCache, isWordCommunityValid, isWordValidForScoring } = require('../modules/communityWordManager');
-const { emitError, ErrorMessages } = require('../utils/errorHandler');
+const { emitError, ErrorMessages, ErrorCodes } = require('../utils/errorHandler');
 const { checkRateLimit } = require('../utils/rateLimiter');
 const { inc, incPerGame } = require('../utils/metrics');
 const botManager = require('../modules/botManager');
@@ -74,7 +74,16 @@ function registerWordHandlers(io, socket) {
 
       const game = getGame(gameCode);
       if (!game || game.gameState !== 'in-progress') {
-        emitError(socket, ErrorMessages.GAME_NOT_IN_PROGRESS);
+        // Log detailed state for debugging second-game-in-room issues
+        logger.warn('WORD', `Word submission rejected - game state issue`, {
+          gameCode,
+          username,
+          word,
+          gameExists: !!game,
+          gameState: game?.gameState || 'NO_GAME',
+          socketId: socket.id
+        });
+        emitError(socket, ErrorCodes.GAME_NOT_IN_PROGRESS);
         return;
       }
 

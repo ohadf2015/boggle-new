@@ -118,13 +118,13 @@ const PlayerWaitingResultsView: React.FC<PlayerWaitingResultsViewProps> = ({
     <div className="min-h-screen bg-neo-cream dark:bg-slate-900 p-3 sm:p-4 md:p-8 flex flex-col transition-colors duration-300">
 
       {/* Exit Button */}
-      <div className="w-full max-w-md mx-auto flex justify-end mb-4 relative z-50">
+      <div className="w-full max-w-2xl lg:max-w-4xl xl:max-w-5xl mx-auto flex justify-end mb-4 relative z-50">
         <ExitRoomButton onClick={onExitRoom} label={isHost ? t('hostView.exitRoom') : t('playerView.exit')} />
       </div>
 
       {/* Centered Content */}
       <div className="flex-1 flex items-center justify-center">
-        <div className="max-w-2xl w-full space-y-4 sm:space-y-6 md:space-y-8">
+        <div className="max-w-2xl lg:max-w-4xl xl:max-w-5xl w-full space-y-4 sm:space-y-6 md:space-y-8">
           {/* Waiting for Results Message - Fixed height container to prevent CLS */}
           <motion.div
             initial={{ opacity: 0 }}

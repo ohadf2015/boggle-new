@@ -144,6 +144,7 @@ export default function GamePage(): React.JSX.Element {
   const attemptingReconnectRef = useRef<boolean>(attemptingReconnect);
   const hostKeepAliveIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const wasConnectedRef = useRef<boolean>(false);
+  const showResultsRef = useRef<boolean>(showResults);
 
   const { t, language } = useLanguage();
   const { user, isAuthenticated, isSupabaseEnabled, profile, loading, refreshProfile } = useAuth();
@@ -295,6 +296,10 @@ export default function GamePage(): React.JSX.Element {
   useEffect(() => {
     attemptingReconnectRef.current = attemptingReconnect;
   }, [attemptingReconnect]);
+
+  useEffect(() => {
+    showResultsRef.current = showResults;
+  }, [showResults]);
 
   // Initialize Socket.IO connection
   useEffect(() => {
@@ -544,12 +549,20 @@ export default function GamePage(): React.JSX.Element {
     // Auto-join next game if player is viewing results
     // Store game start data so PlayerView can use it when re-mounted
     // Note: The actual "Game Started" toast is shown by PlayerView/HostView components
+    // IMPORTANT: Only handle here when viewing results to avoid double-processing
+    // with usePlayerSocketEvents which handles the event directly when PlayerView is active
     newSocket.on('startGame', (data) => {
-      logger.log('[SOCKET.IO] New game starting - auto-joining from results', data);
-      // Store the game start data for PlayerView to consume when it mounts
-      setPendingGameStart(data);
-      setShowResults(false);
-      setResultsData(null);
+      // Only handle if player is currently viewing results (needs to transition back to game)
+      // When PlayerView is already active, usePlayerSocketEvents handles the event directly
+      if (showResultsRef.current) {
+        logger.log('[SOCKET.IO] New game starting - auto-joining from results', data);
+        // Store the game start data for PlayerView to consume when it mounts
+        setPendingGameStart(data);
+        setShowResults(false);
+        setResultsData(null);
+      } else {
+        logger.log('[SOCKET.IO] startGame received but not viewing results - handled by PlayerView/HostView');
+      }
       // Toast notification is handled by PlayerView/HostView to avoid duplicates
     });
 

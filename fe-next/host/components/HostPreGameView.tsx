@@ -428,11 +428,11 @@ const HostPreGameView: React.FC<HostPreGameViewProps> = ({
 
         {/* Players List - RIGHT */}
         <Card className="lg:w-[350px] h-auto p-3 sm:p-4 md:p-6 flex flex-col bg-slate-800/95 text-neo-white border-4 border-neo-black shadow-hard-lg">
-          <h3 className="text-lg font-black uppercase text-neo-cream mb-4 flex items-center gap-2 flex-shrink-0">
-            <FaUsers className="text-neo-pink" />
+          <h3 className="text-base font-bold uppercase text-neo-cream/80 mb-3 flex items-center gap-2 flex-shrink-0">
+            <FaUsers className="text-neo-pink/80" />
             {t('hostView.playersJoined')} ({playersReady.length})
           </h3>
-          <div className="flex flex-col gap-3 flex-1 overflow-y-auto">
+          <div className="flex flex-col gap-1.5 flex-1 overflow-y-auto">
             <AnimatePresence>
               {playersReady.map((player, index) => {
                 const playerUsername = typeof player === 'string' ? player : player.username;
@@ -446,34 +446,33 @@ const HostPreGameView: React.FC<HostPreGameViewProps> = ({
                 return (
                   <motion.div
                     key={playerUsername}
-                    initial={{ scale: 0, opacity: 0, rotate: -5 }}
-                    animate={{ scale: 1, opacity: 1, rotate: 0 }}
-                    exit={{ scale: 0, opacity: 0 }}
-                    transition={{ delay: index * 0.05 }}
+                    initial={{ x: -10, opacity: 0 }}
+                    animate={{ x: 0, opacity: 1 }}
+                    exit={{ x: 10, opacity: 0 }}
+                    transition={{ delay: index * 0.03, duration: 0.2 }}
                   >
-                    <Badge
+                    <div
                       className={cn(
-                        "font-black px-3 py-2 text-base w-full justify-between border-3 border-neo-black shadow-hard-sm",
-                        isHostPlayer ? "bg-neo-yellow text-neo-black" :
-                        isBot ? "bg-neo-cyan/80 text-neo-black" :
-                        "bg-neo-cream text-neo-black"
+                        "flex items-center justify-between px-3 py-2 rounded-lg transition-colors",
+                        "bg-white/5 hover:bg-white/10"
                       )}
-                      style={avatar?.color && !isHostPlayer && !isBot ? { backgroundColor: avatar.color } : {}}
                     >
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-2.5">
                         <Avatar
                           profilePictureUrl={avatar?.profilePictureUrl ?? undefined}
                           avatarEmoji={avatar?.emoji}
                           avatarColor={avatar?.color}
                           size="sm"
                         />
-                        {isHostPlayer && <FaCrown className="text-neo-black" />}
-                        {isBot && <FaRobot className="text-neo-black" />}
-                        <SlotMachineText text={playerUsername} />
+                        <span className="font-medium text-neo-cream/90">
+                          <SlotMachineText text={playerUsername} />
+                        </span>
+                        {isHostPlayer && <FaCrown className="text-neo-yellow/80 text-sm" />}
+                        {isBot && <FaRobot className="text-neo-cyan/70 text-sm" />}
                       </div>
                       <div className="flex items-center gap-2">
                         {playerWordCounts && playerWordCounts[playerUsername] !== undefined && (
-                          <span className="bg-neo-black/20 px-2 py-0.5 rounded-neo text-sm font-black">
+                          <span className="text-neo-cream/50 text-sm font-medium">
                             {playerWordCounts[playerUsername] || 0}
                           </span>
                         )}
@@ -485,14 +484,14 @@ const HostPreGameView: React.FC<HostPreGameViewProps> = ({
                           />
                         )}
                       </div>
-                    </Badge>
+                    </div>
                   </motion.div>
                 );
               })}
             </AnimatePresence>
           </div>
           {playersReady.length === 0 && (
-            <p className="text-sm text-center text-neo-cream/60 font-bold mt-2">
+            <p className="text-sm text-center text-neo-cream/40 font-medium mt-2">
               {t('hostView.waitingForPlayers')}
             </p>
           )}

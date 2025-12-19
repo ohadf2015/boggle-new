@@ -206,7 +206,7 @@ const GridComponent = memo<GridComponentProps>(({
                   onMouseDown={(e) => handleMouseDown(i, j, cell, e)}
                   initial={animateOnMount
                     ? { scale: 0, opacity: 0, rotateX: -90, y: -20 }
-                    : { scale: 0.8, opacity: 0 }
+                    : false
                   }
                   animate={{
                     scale: isSelected ? 1.08 : (isFading ? 1.04 : 1),
@@ -221,7 +221,7 @@ const GridComponent = memo<GridComponentProps>(({
                       ? 0.1
                       : (animateOnMount && !isSelected
                         ? 0.5
-                        : (isSelected ? 0.12 : 0.6)),
+                        : (isSelected ? 0.12 : 0.15)),
                     ease: animateOnMount ? [0.34, 1.56, 0.64, 1] : "easeOut",
                     delay: reduceMotion ? 0 : (animateOnMount ? (i + j) * 0.04 : 0),
                     scale: isSelected ? { type: "spring", stiffness: reduceMotion ? 200 : 350, damping: reduceMotion ? 30 : 22 } : undefined
