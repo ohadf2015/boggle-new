@@ -145,7 +145,7 @@ const HostInGameView: React.FC<HostInGameViewProps> = ({
     if (!socket) return;
     socket.emit('submitWord', {
       word: formedWord.toLowerCase(),
-      comboLevel: comboLevelRef.current,
+      comboLevel: Math.min(comboLevelRef.current, 10),
     });
 
     // Add to local found words list

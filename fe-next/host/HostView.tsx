@@ -472,7 +472,12 @@ const HostView: React.FC<HostViewProps> = memo(({
       {/* Dialogs */}
       <FinalScoresModal
         open={!!finalScores}
-        onOpenChange={() => setFinalScores(null)}
+        onOpenChange={(open) => {
+          if (!open) {
+            socket?.emit('resetGame');
+            setFinalScores(null);
+          }
+        }}
         finalScores={(finalScores?.players ?? []) as unknown as PlayerResult[]}
         tournamentData={tournamentData as Parameters<typeof FinalScoresModal>[0]['tournamentData']}
         username={username}

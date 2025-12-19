@@ -206,7 +206,7 @@ const PlayerInGameView = memo<PlayerInGameViewProps>(({
     if (!socket || !gameActive) return;
     socket.emit('submitWord', {
       word: formedWord.toLowerCase(),
-      comboLevel: comboLevelRef.current,
+      comboLevel: Math.min(comboLevelRef.current, 10),
     });
 
     // Add to local found words list (will be updated by server response)
