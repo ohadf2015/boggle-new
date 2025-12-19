@@ -107,6 +107,17 @@ function generateRandomPlayerName(existingNames = [], language = 'en') {
 }
 
 /**
+ * Get a random generic avatar for OAuth users
+ * These avatars are neutral and work with any name
+ * @returns {{ emoji: string, color: string }}
+ */
+function getRandomGenericAvatar() {
+  const avatars = BOT_CONFIG.GENERIC_AVATARS;
+  const avatar = avatars[Math.floor(Math.random() * avatars.length)];
+  return { emoji: avatar.emoji, color: avatar.color };
+}
+
+/**
  * Get a random personality type for a bot
  */
 function getRandomPersonality() {
@@ -518,6 +529,9 @@ module.exports = {
 
   // Player name generation (for players without custom names)
   generateRandomPlayerName,
+
+  // Generic avatar for OAuth users (neutral avatars that work with any name)
+  getRandomGenericAvatar,
 
   // Configuration (re-exported for backwards compatibility)
   BOT_CONFIG,

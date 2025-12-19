@@ -362,6 +362,31 @@ const BOT_CONFIG = {
     ],
   },
 
+  // Generic avatars for OAuth users whose names don't come from the fun name pool
+  // These are neutral face/people emojis that work with any name
+  GENERIC_AVATARS: [
+    { emoji: '😊', color: '#fcd34d' },
+    { emoji: '😎', color: '#1f2937' },
+    { emoji: '🙂', color: '#fef08a' },
+    { emoji: '😄', color: '#86efac' },
+    { emoji: '🤗', color: '#f9a8d4' },
+    { emoji: '😁', color: '#67e8f9' },
+    { emoji: '🥳', color: '#a78bfa' },
+    { emoji: '😺', color: '#fb923c' },
+    { emoji: '🌟', color: '#facc15' },
+    { emoji: '✨', color: '#c4b5fd' },
+    { emoji: '🎯', color: '#f87171' },
+    { emoji: '🎨', color: '#38bdf8' },
+    { emoji: '🎮', color: '#a855f7' },
+    { emoji: '🚀', color: '#22c55e' },
+    { emoji: '💫', color: '#fbbf24' },
+    { emoji: '🌈', color: '#ec4899' },
+    { emoji: '⭐', color: '#fcd34d' },
+    { emoji: '🎪', color: '#f472b6' },
+    { emoji: '🎭', color: '#8b5cf6' },
+    { emoji: '🎸', color: '#dc2626' },
+  ],
+
   // Bot personality traits (affects behavior patterns)
   PERSONALITIES: {
     // Aggressive bots submit words faster with smaller gaps

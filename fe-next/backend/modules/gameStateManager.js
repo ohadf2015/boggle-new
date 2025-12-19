@@ -584,6 +584,7 @@ function resetGameForNewRound(gameCode) {
 
   game.letterGrid = null;
   game.lastActivity = Date.now();
+  game.gameEndedAt = null; // Clear end timestamp for new game
 
   // Persist the change
   persistGameState(gameCode);

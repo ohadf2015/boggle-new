@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FaTrophy } from 'react-icons/fa';
+import { FaTrophy, FaCrown, FaRobot } from 'react-icons/fa';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '../../components/ui/alert-dialog';
 import RoomChat from '../../components/RoomChat';
 import Avatar from '../../components/Avatar';
@@ -23,6 +23,8 @@ interface LeaderboardEntry {
   score: number;
   wordCount?: number;
   avatar?: AvatarType;
+  isHost?: boolean;
+  isBot?: boolean;
 }
 
 interface ValidationStage {
@@ -118,13 +120,13 @@ const PlayerWaitingResultsView: React.FC<PlayerWaitingResultsViewProps> = ({
     <div className="min-h-screen bg-neo-cream dark:bg-slate-900 p-3 sm:p-4 md:p-8 flex flex-col transition-colors duration-300">
 
       {/* Exit Button */}
-      <div className="w-full max-w-2xl lg:max-w-4xl xl:max-w-5xl mx-auto flex justify-end mb-4 relative z-50">
+      <div className="w-full max-w-6xl mx-auto flex justify-end mb-4 relative z-50">
         <ExitRoomButton onClick={onExitRoom} label={isHost ? t('hostView.exitRoom') : t('playerView.exit')} />
       </div>
 
       {/* Centered Content */}
       <div className="flex-1 flex items-center justify-center">
-        <div className="max-w-2xl lg:max-w-4xl xl:max-w-5xl w-full space-y-4 sm:space-y-6 md:space-y-8">
+        <div className="max-w-6xl w-full space-y-4 sm:space-y-6 md:space-y-8">
           {/* Waiting for Results Message - Fixed height container to prevent CLS */}
           <motion.div
             initial={{ opacity: 0 }}
@@ -279,6 +281,8 @@ const PlayerWaitingResultsView: React.FC<PlayerWaitingResultsViewProps> = ({
                         <div className="flex-1">
                           <div className={`font-black flex items-center gap-2 ${dir === 'rtl' ? 'flex-row-reverse' : ''}`}>
                             <SlotMachineText text={player.username} />
+                            {player.isHost && <FaCrown className="text-neo-yellow text-sm" style={{ filter: 'drop-shadow(1px 1px 0px var(--neo-black))' }} />}
+                            {player.isBot && <FaRobot className="text-neo-cyan text-sm" />}
                             {isMe && (
                               <span className="text-xs bg-neo-black text-neo-white px-2 py-0.5 rounded-neo font-bold border-2 border-neo-black">
                                 ({t('playerView.me')})

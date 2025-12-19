@@ -119,6 +119,9 @@ async function endGame(io, gameCode) {
     return;
   }
 
+  // Record end timestamp for grace period handling
+  game.gameEndedAt = Date.now();
+
   // Notify clients that game has ended (sets up waiting state)
   broadcastToRoom(io, getGameRoom(gameCode), 'endGame', {});
 

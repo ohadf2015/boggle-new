@@ -59,6 +59,25 @@ async function fetchRandomPlayerName(language = 'en'): Promise<{ name: string; a
   }
 }
 
+// Fetch a random generic avatar for OAuth users (neutral avatars that work with any name)
+async function fetchRandomGenericAvatar(): Promise<{ emoji: string; color: string }> {
+  try {
+    const response = await fetch('/api/random-avatar', {
+      method: 'GET',
+      headers: { 'Accept': 'application/json' },
+    });
+    if (!response.ok) {
+      throw new Error('Failed to fetch random avatar');
+    }
+    const data = await response.json();
+    return data.avatar;
+  } catch (error) {
+    logger.warn('Failed to fetch random avatar, using fallback:', error);
+    // Fallback to a neutral emoji
+    return { emoji: '😊', color: '#6366f1' };
+  }
+}
+
 export interface ProfileData {
   id: string;
   username: string;
@@ -163,13 +182,13 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       let displayName: string;
 
       if (oauthDisplayName) {
-        // OAuth provided a display name - use it, but still get a fun avatar
+        // OAuth provided a display name - use it with a generic avatar
+        // Generic avatars are neutral and work with any name (unlike themed player names)
         username = oauthDisplayName;
         displayName = oauthDisplayName;
-        // Get a random avatar for OAuth users (their name is already set)
-        const randomData = await fetchRandomPlayerName();
-        avatarEmoji = randomData.avatar.emoji;
-        avatarColor = randomData.avatar.color;
+        const genericAvatar = await fetchRandomGenericAvatar();
+        avatarEmoji = genericAvatar.emoji;
+        avatarColor = genericAvatar.color;
       } else {
         // No OAuth display name - generate a fun random name with suited avatar
         const randomData = await fetchRandomPlayerName();

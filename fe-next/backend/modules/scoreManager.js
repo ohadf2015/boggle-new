@@ -137,7 +137,9 @@ function getLeaderboard(game) {
       username,
       score,
       wordCount: game.playerWords[username]?.length || 0,
-      avatar: game.users[username]?.avatar
+      avatar: game.users[username]?.avatar,
+      isHost: game.users[username]?.isHost || false,
+      isBot: game.users[username]?.isBot || false
     }))
     .sort((a, b) => b.score - a.score);
 }

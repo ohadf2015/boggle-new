@@ -47,6 +47,8 @@ interface LeaderboardEntry {
   score: number;
   wordCount?: number;
   avatar?: Avatar;
+  isHost?: boolean;
+  isBot?: boolean;
 }
 
 interface TournamentData {

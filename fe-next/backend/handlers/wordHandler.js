@@ -73,7 +73,15 @@ function registerWordHandlers(io, socket) {
       }
 
       const game = getGame(gameCode);
-      if (!game || game.gameState !== 'in-progress') {
+
+      // Grace period: Allow word submissions for 1.5 seconds after game ends
+      // This handles network latency where client submits before receiving endGame event
+      const GRACE_PERIOD_MS = 1500;
+      const isWithinGracePeriod = game?.gameEndedAt &&
+        (Date.now() - game.gameEndedAt) < GRACE_PERIOD_MS &&
+        game.gameState === 'finished';
+
+      if (!game || (game.gameState !== 'in-progress' && !isWithinGracePeriod)) {
         // Log detailed state for debugging second-game-in-room issues
         logger.warn('WORD', `Word submission rejected - game state issue`, {
           gameCode,
@@ -81,10 +89,22 @@ function registerWordHandlers(io, socket) {
           word,
           gameExists: !!game,
           gameState: game?.gameState || 'NO_GAME',
+          gameEndedAt: game?.gameEndedAt,
+          timeSinceEnd: game?.gameEndedAt ? Date.now() - game.gameEndedAt : null,
           socketId: socket.id
         });
         emitError(socket, ErrorCodes.GAME_NOT_IN_PROGRESS);
         return;
+      }
+
+      // Log if accepted during grace period
+      if (isWithinGracePeriod) {
+        logger.info('WORD', `Word accepted during grace period`, {
+          gameCode,
+          username,
+          word,
+          timeSinceEnd: Date.now() - game.gameEndedAt
+        });
       }
 
       markUserActivity(gameCode, username);

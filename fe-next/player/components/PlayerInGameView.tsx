@@ -51,6 +51,8 @@ interface LeaderboardEntry {
   score: number;
   wordCount?: number;
   avatar?: AvatarType;
+  isHost?: boolean;
+  isBot?: boolean;
 }
 
 interface TournamentData {
@@ -200,7 +202,8 @@ const PlayerInGameView = memo<PlayerInGameViewProps>(({
     playWordAcceptedSound();
 
     // Submit to server for actual validation
-    if (!socket) return;
+    // Check both socket AND gameActive to prevent race condition when game ends
+    if (!socket || !gameActive) return;
     socket.emit('submitWord', {
       word: formedWord.toLowerCase(),
       comboLevel: comboLevelRef.current,
