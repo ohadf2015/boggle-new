@@ -93,10 +93,10 @@ export interface PlayerViewActions {
   resetPlayerState: () => void;
 }
 
-export interface UsePlayerViewStateReturn extends UseGameStateReturn {
+export interface UsePlayerViewStateReturn extends Omit<UseGameStateReturn, 'foundWords'> {
   // Player-specific state
   playersReady: Player[];
-  foundWords: FoundWord[];
+  foundWords: FoundWord[];  // Overrides UseGameStateReturn.foundWords with player-specific type
   wasInActiveGame: boolean;
   shufflingGrid: LetterGrid | null;
 

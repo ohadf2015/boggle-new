@@ -34,3 +34,5 @@ Execute comprehensive architectural analysis with actionable improvement recomme
 **Quality Assessment**: Code organization, documentation adequacy, team communication patterns, technical debt evaluation.
 
 **Output**: Detailed architecture assessment with specific improvement recommendations, refactoring strategies, and implementation roadmap.
+
+implement a structured approach to deliver a thorough architecture review tailored to the project's needs and verify improvements align with best practices, verify build is passing, and run tests to ensure no regressions.
