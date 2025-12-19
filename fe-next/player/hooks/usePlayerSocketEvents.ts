@@ -219,6 +219,19 @@ const usePlayerSocketEvents = ({
     onShowResultsRef.current = onShowResults;
   }, [onShowResults]);
 
+  // Use refs for wasInActiveGame and gameActive to avoid socket listener re-registration
+  // When these values change, we don't want to tear down and re-register all listeners
+  // which can cause race conditions where events are missed during the transition
+  const wasInActiveGameRef = useRef(wasInActiveGame);
+  useEffect(() => {
+    wasInActiveGameRef.current = wasInActiveGame;
+  }, [wasInActiveGame]);
+
+  const gameActiveRef = useRef(gameActive);
+  useEffect(() => {
+    gameActiveRef.current = gameActive;
+  }, [gameActive]);
+
   // Track when we entered waiting state to prevent flickering
   // Ensures minimum display time for the calculation screen
   const waitingStartTimeRef = useRef<number | null>(null);
@@ -273,11 +286,13 @@ const usePlayerSocketEvents = ({
     };
 
     const handleEndGame = () => {
-      logger.log('[PLAYER] Received endGame event, wasInActiveGame:', wasInActiveGame);
+      // Use ref to get current value without causing listener re-registration
+      const wasActive = wasInActiveGameRef.current;
+      logger.log('[PLAYER] Received endGame event, wasInActiveGame:', wasActive);
       setGameActive(false);
       setRemainingTime(0);
       setShowStartAnimation(false); // Clear any lingering animation to prevent double loaders
-      if (wasInActiveGame) {
+      if (wasActive) {
         logger.log('[PLAYER] Setting waitingForResults to true');
         // Track when we entered waiting state for minimum display time
         if (!waitingStartTimeRef.current) {
@@ -426,8 +441,10 @@ const usePlayerSocketEvents = ({
         setGameLanguage(data.language);
       }
 
+      // Use ref to get current value without causing listener re-registration
+      const isGameActive = gameActiveRef.current;
       const hasGrid = letterGrid || data.letterGrid;
-      if (!gameActive && data.remainingTime > 0 && hasGrid) {
+      if (!isGameActive && data.remainingTime > 0 && hasGrid) {
         logger.log('[PLAYER] Timer started on server, activating game via timeUpdate (late join, remainingTime:', data.remainingTime, ')');
         setGameActive(true);
         // Skip countdown animation for late joiners syncing via timeUpdate - start immediately
@@ -910,8 +927,8 @@ const usePlayerSocketEvents = ({
     socket,
     t,
     inputRef,
-    wasInActiveGame,
-    gameActive,
+    // wasInActiveGame and gameActive removed - using refs to avoid listener re-registration race condition
+    // When these values change rapidly (reset -> start game), we don't want to tear down and re-register all listeners
     letterGrid,
     gameLanguage,
     username,
