@@ -38,6 +38,27 @@ async function fetchGeolocation(): Promise<{ countryCode: string | null; country
   }
 }
 
+// Fetch a random player name with suited avatar
+async function fetchRandomPlayerName(language = 'en'): Promise<{ name: string; avatar: { emoji: string; color: string } }> {
+  try {
+    const response = await fetch(`/api/random-name?language=${language}`, {
+      method: 'GET',
+      headers: { 'Accept': 'application/json' },
+    });
+    if (!response.ok) {
+      throw new Error('Failed to fetch random name');
+    }
+    return await response.json();
+  } catch (error) {
+    logger.warn('Failed to fetch random name, using fallback:', error);
+    // Fallback to simple random name
+    return {
+      name: `Player ${Math.floor(Math.random() * 1000)}`,
+      avatar: { emoji: '😀', color: '#6366f1' },
+    };
+  }
+}
+
 export interface ProfileData {
   id: string;
   username: string;
@@ -131,20 +152,39 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         profilePictureProvider = 'google';
       }
 
-      // Generate a temporary username from the user ID
-      const tempUsername = `player_${userId.substring(0, 8)}`;
-
       // Get display name from OAuth provider if available
-      const displayName = (userMetadata?.full_name as string) ||
-                          (userMetadata?.name as string) ||
-                          tempUsername;
+      const oauthDisplayName = (userMetadata?.full_name as string) ||
+                               (userMetadata?.name as string);
+
+      // Generate username and avatar: use OAuth name if available, otherwise get a fun random name
+      let username: string;
+      let avatarEmoji: string;
+      let avatarColor: string;
+      let displayName: string;
+
+      if (oauthDisplayName) {
+        // OAuth provided a display name - use it, but still get a fun avatar
+        username = oauthDisplayName;
+        displayName = oauthDisplayName;
+        // Get a random avatar for OAuth users (their name is already set)
+        const randomData = await fetchRandomPlayerName();
+        avatarEmoji = randomData.avatar.emoji;
+        avatarColor = randomData.avatar.color;
+      } else {
+        // No OAuth display name - generate a fun random name with suited avatar
+        const randomData = await fetchRandomPlayerName();
+        username = randomData.name;
+        displayName = randomData.name;
+        avatarEmoji = randomData.avatar.emoji;
+        avatarColor = randomData.avatar.color;
+      }
 
       const { data: newProfile, error: createError } = await createProfile({
         id: userId,
-        username: tempUsername,
+        username,
         display_name: displayName,
-        avatar_emoji: '😀',
-        avatar_color: '#6366f1',
+        avatar_emoji: avatarEmoji,
+        avatar_color: avatarColor,
         profile_picture_url: profilePictureUrl,
         profile_picture_provider: profilePictureProvider,
       });

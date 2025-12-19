@@ -477,6 +477,13 @@ const useHostSocketEvents = ({
       // Reset XP/Level state for new game
       setXpGainedData(null);
       setLevelUpData(null);
+
+      // Send acknowledgment to server (same as players do)
+      // This ensures the host is counted in the acknowledgment system
+      if (data.messageId && !data.skipAck) {
+        socket.emit('startGameAck', { messageId: data.messageId });
+        logger.log('[HOST] Sent startGameAck for messageId:', data.messageId);
+      }
     };
 
     const handleWordAlreadyFound = (data: any) => {

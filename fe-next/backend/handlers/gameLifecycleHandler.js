@@ -312,6 +312,9 @@ function registerGameLifecycleHandlers(io, socket) {
 
     timerManager.clearGameTimer(gameCode);
 
+    // Clean up game start coordinator to prevent stale acknowledgment state
+    gameStartCoordinator.cleanupSequence(gameCode);
+
     // Clean up bots from previous game to prevent stale state
     botManager.cleanupGameBots(gameCode);
 

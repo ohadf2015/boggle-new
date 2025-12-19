@@ -46,10 +46,12 @@ function generateBotId(gameCode) {
 }
 
 /**
- * Generate a bot name based on difficulty and language
+ * Generate a bot name and avatar based on difficulty and language
+ * Each bot name has a suited emoji that becomes its avatar
  * @param {string} difficulty - Bot difficulty level
  * @param {string[]} existingNames - Names already in use
  * @param {string} language - Game/board language (en, he, sv, ja)
+ * @returns {{ name: string, avatar: { emoji: string, color: string } }}
  */
 function generateBotName(difficulty, existingNames = [], language = 'en') {
   // Get language-specific names, fallback to English if language not found
@@ -57,30 +59,51 @@ function generateBotName(difficulty, existingNames = [], language = 'en') {
   const namePool = langNames[difficulty] || langNames.medium;
   const botSuffix = langNames.botSuffix || 'Bot';
 
-  const availableNames = namePool.filter(n => !existingNames.some(existing =>
-    existing.toLowerCase().includes(n.toLowerCase())
-  ));
+  // Filter out names already in use (compare by name property)
+  const availableEntries = namePool.filter(entry =>
+    !existingNames.some(existing =>
+      existing.toLowerCase().includes(entry.name.toLowerCase())
+    )
+  );
 
-  const baseName = availableNames.length > 0
-    ? availableNames[Math.floor(Math.random() * availableNames.length)]
+  // Pick a random entry (or fallback to any if all used)
+  const entry = availableEntries.length > 0
+    ? availableEntries[Math.floor(Math.random() * availableEntries.length)]
     : namePool[Math.floor(Math.random() * namePool.length)];
 
   // Add localized "Bot" suffix and maybe a number
   const suffix = Math.random() > 0.5 ? ` ${Math.floor(Math.random() * 99) + 1}` : '';
-  return `${baseName} ${botSuffix}${suffix}`.trim();
+
+  return {
+    name: `${entry.name} ${botSuffix}${suffix}`.trim(),
+    avatar: { emoji: entry.emoji, color: entry.color },
+  };
 }
 
 /**
- * Get a random avatar for the bot
+ * Generate a random player name with suited avatar
+ * For players who don't set their own name
+ * @param {string[]} existingNames - Names already in use
+ * @param {string} language - Language for names (en, he, sv, ja)
+ * @returns {{ name: string, avatar: { emoji: string, color: string } }}
  */
-function getRandomAvatar(existingAvatars = []) {
-  const availableAvatars = BOT_CONFIG.AVATARS.filter(a =>
-    !existingAvatars.some(existing => existing?.emoji === a.emoji)
+function generateRandomPlayerName(existingNames = [], language = 'en') {
+  const namePool = BOT_CONFIG.PLAYER_NAMES[language] || BOT_CONFIG.PLAYER_NAMES.en;
+
+  // Filter out names already in use
+  const availableEntries = namePool.filter(entry =>
+    !existingNames.includes(entry.name)
   );
 
-  return availableAvatars.length > 0
-    ? availableAvatars[Math.floor(Math.random() * availableAvatars.length)]
-    : BOT_CONFIG.AVATARS[Math.floor(Math.random() * BOT_CONFIG.AVATARS.length)];
+  // Pick a random entry (or fallback to any if all used)
+  const entry = availableEntries.length > 0
+    ? availableEntries[Math.floor(Math.random() * availableEntries.length)]
+    : namePool[Math.floor(Math.random() * namePool.length)];
+
+  return {
+    name: entry.name,
+    avatar: { emoji: entry.emoji, color: entry.color },
+  };
 }
 
 /**
@@ -101,11 +124,10 @@ function getRandomPersonality() {
  */
 function createBot(gameCode, difficulty = 'medium', existingUsers = {}, language = 'en') {
   const existingNames = Object.keys(existingUsers);
-  const existingAvatars = Object.values(existingUsers).map(u => u.avatar);
 
   const botId = generateBotId(gameCode);
-  const botName = generateBotName(difficulty, existingNames, language);
-  const avatar = getRandomAvatar(existingAvatars);
+  // generateBotName now returns both name and suited avatar
+  const { name: botName, avatar } = generateBotName(difficulty, existingNames, language);
   const personality = getRandomPersonality();
   const personalityTraits = BOT_CONFIG.PERSONALITIES[personality];
 
@@ -493,6 +515,9 @@ module.exports = {
 
   // Blacklist management
   addWordToBlacklist,
+
+  // Player name generation (for players without custom names)
+  generateRandomPlayerName,
 
   // Configuration (re-exported for backwards compatibility)
   BOT_CONFIG,

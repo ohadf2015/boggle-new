@@ -61,12 +61,12 @@ const QuickJoinView: React.FC<QuickJoinViewProps> = React.memo(({
   }, [setUsername, usernameError, onUsernameErrorClear]);
 
   return (
-    <div className="min-h-screen bg-neo-black pt-4 flex flex-col items-center justify-center p-2 sm:p-4 md:p-6">
+    <div className="min-h-screen bg-neo-black pt-4 flex flex-col items-center justify-center p-2 sm:p-4 md:p-6 relative">
       <motion.div
         initial={{ scale: 0, rotate: -3 }}
         animate={{ scale: 1, rotate: 1 }}
         transition={{ type: 'spring', stiffness: 260, damping: 20 }}
-        className="w-full max-w-md"
+        className="w-full max-w-md relative z-10"
       >
         <Card className="bg-neo-navy border-4 border-neo-cream rounded-neo shadow-hard">
           <CardHeader className="text-center space-y-4">

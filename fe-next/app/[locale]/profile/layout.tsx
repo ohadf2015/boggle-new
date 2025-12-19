@@ -14,7 +14,8 @@ export async function generateMetadata({ params }: LayoutParams): Promise<Metada
   const seo = translations[validLocale]?.seo?.profile || translations.en.seo.profile;
   const baseSeo = translations[validLocale]?.seo || translations.en.seo;
 
-  const localePath = locale === 'he' ? '' : `/${locale}`;
+  // Always use explicit locale path for SEO consistency
+  const localePath = `/${locale}`;
 
   return {
     title: seo.title,
@@ -44,7 +45,7 @@ export async function generateMetadata({ params }: LayoutParams): Promise<Metada
     alternates: {
       canonical: `https://www.lexiclash.live${localePath}/profile`,
       languages: {
-        'x-default': 'https://www.lexiclash.live/profile',
+        'x-default': 'https://www.lexiclash.live/en/profile',
         he: 'https://www.lexiclash.live/he/profile',
         en: 'https://www.lexiclash.live/en/profile',
         sv: 'https://www.lexiclash.live/sv/profile',
@@ -65,7 +66,8 @@ interface ProfileLayoutProps {
 
 export default async function ProfileLayout({ children, params }: ProfileLayoutProps): Promise<ReactNode> {
   const { locale } = await params;
-  const localePath = locale === 'he' ? '' : `/${locale}`;
+  // Always use explicit locale path for SEO consistency
+  const localePath = `/${locale}`;
 
   // Breadcrumb structured data - shows page hierarchy for search engines
   const breadcrumbSchema = {

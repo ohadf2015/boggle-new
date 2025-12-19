@@ -1,4 +1,4 @@
-import React, { useRef, useCallback, memo, useMemo } from 'react';
+import React, { useRef, useCallback, memo, useMemo, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FaTrophy, FaRandom } from 'react-icons/fa';
 import type { Socket } from 'socket.io-client';
@@ -153,6 +153,13 @@ const PlayerInGameView = memo<PlayerInGameViewProps>(({
 }): React.ReactElement => {
   const wordListRef = useRef<HTMLDivElement | null>(null);
   const { playWordAcceptedSound } = useSoundEffects();
+
+  // Track if grid animation has already played - only animate on first mount
+  const hasAnimatedRef = useRef(false);
+  useEffect(() => {
+    // Mark as animated after first render
+    hasAnimatedRef.current = true;
+  }, []);
 
   // Memoized handler for closing tournament standings
   const handleCloseTournamentStandings = useCallback(() => {
@@ -346,7 +353,7 @@ const PlayerInGameView = memo<PlayerInGameViewProps>(({
                     key={letterGrid ? 'game-grid' : 'waiting-grid'}
                     grid={(letterGrid || shufflingGrid)!}
                     interactive={gameActive && !showStartAnimation}
-                    animateOnMount={!!letterGrid}
+                    animateOnMount={!!letterGrid && !hasAnimatedRef.current}
                     onWordSubmit={handleGridWordSubmit}
                     comboLevel={comboLevel}
                   />

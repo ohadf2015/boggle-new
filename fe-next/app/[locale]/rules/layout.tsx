@@ -7,7 +7,8 @@ interface LayoutParams {
 
 export async function generateMetadata({ params }: LayoutParams): Promise<Metadata> {
     const { locale } = await params;
-    const localePath = locale === 'he' ? '' : `/${locale}`;
+    // Always use explicit locale path for SEO consistency
+    const localePath = `/${locale}`;
 
     return {
         title: 'How to Play LexiClash - Game Rules & Strategy Guide',
@@ -27,7 +28,7 @@ export async function generateMetadata({ params }: LayoutParams): Promise<Metada
         alternates: {
             canonical: `https://www.lexiclash.live${localePath}/rules`,
             languages: {
-                'x-default': 'https://www.lexiclash.live/rules',
+                'x-default': 'https://www.lexiclash.live/en/rules',
                 he: 'https://www.lexiclash.live/he/rules',
                 en: 'https://www.lexiclash.live/en/rules',
                 sv: 'https://www.lexiclash.live/sv/rules',
@@ -48,7 +49,8 @@ interface RulesLayoutProps {
 
 export default async function RulesLayout({ children, params }: RulesLayoutProps): Promise<ReactNode> {
     const { locale } = await params;
-    const localePath = locale === 'he' ? '' : `/${locale}`;
+    // Always use explicit locale path for SEO consistency
+    const localePath = `/${locale}`;
 
     // Breadcrumb structured data - shows page hierarchy for search engines
     const breadcrumbSchema = {

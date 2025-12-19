@@ -14,7 +14,8 @@ export async function generateMetadata({ params }: LayoutParams): Promise<Metada
   const seo = translations[validLocale]?.seo?.leaderboard || translations.en.seo.leaderboard;
   const baseSeo = translations[validLocale]?.seo || translations.en.seo;
 
-  const localePath = locale === 'he' ? '' : `/${locale}`;
+  // Always use explicit locale path for SEO consistency
+  const localePath = `/${locale}`;
 
   return {
     title: seo.title,
@@ -44,7 +45,7 @@ export async function generateMetadata({ params }: LayoutParams): Promise<Metada
     alternates: {
       canonical: `https://www.lexiclash.live${localePath}/leaderboard`,
       languages: {
-        'x-default': 'https://www.lexiclash.live/leaderboard',
+        'x-default': 'https://www.lexiclash.live/en/leaderboard',
         he: 'https://www.lexiclash.live/he/leaderboard',
         en: 'https://www.lexiclash.live/en/leaderboard',
         sv: 'https://www.lexiclash.live/sv/leaderboard',
@@ -65,7 +66,8 @@ interface LeaderboardLayoutProps {
 
 export default async function LeaderboardLayout({ children, params }: LeaderboardLayoutProps): Promise<ReactNode> {
   const { locale } = await params;
-  const localePath = locale === 'he' ? '' : `/${locale}`;
+  // Always use explicit locale path for SEO consistency
+  const localePath = `/${locale}`;
 
   // Breadcrumb structured data - shows page hierarchy for search engines
   const breadcrumbSchema = {

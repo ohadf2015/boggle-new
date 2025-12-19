@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FaTrophy, FaCrown } from 'react-icons/fa';
 import { Card, CardContent } from '../../components/ui/card';
@@ -97,6 +97,13 @@ const HostInGameView: React.FC<HostInGameViewProps> = ({
   socket,
 }): React.ReactElement => {
   const { playWordAcceptedSound } = useSoundEffects();
+
+  // Track if grid animation has already played - only animate on first mount
+  const hasAnimatedRef = useRef(false);
+  useEffect(() => {
+    // Mark as animated after first render
+    hasAnimatedRef.current = true;
+  }, []);
 
   const handleWordSubmit = (formedWord: string): void => {
     if (!hostPlaying) return;
@@ -237,7 +244,7 @@ const HostInGameView: React.FC<HostInGameViewProps> = ({
               key={hostPlaying ? 'host-playing-grid' : 'host-spectating-grid'}
               grid={tableData}
               interactive={hostPlaying && !showStartAnimation}
-              animateOnMount={true}
+              animateOnMount={!hasAnimatedRef.current}
               onWordSubmit={handleWordSubmit}
               comboLevel={comboLevel}
             />

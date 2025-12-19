@@ -328,13 +328,13 @@ const WordChip = memo<WordChipProps>(({ wordObj, playerCount }) => {
               onClick={handleCloseTooltip}
               onTouchEnd={handleCloseTooltip}
             />
-            {/* Tooltip popup */}
+            {/* Tooltip popup - positioned in viewport center on mobile to avoid edge overflow */}
             <motion.div
-              initial={{ opacity: 0, scale: 0.9, y: -10 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.9, y: -10 }}
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.9 }}
               transition={{ duration: 0.15 }}
-              className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 z-[101] min-w-[200px] max-w-[280px]"
+              className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-[101] w-[min(280px,calc(100vw-32px))]"
             >
               <div className="bg-neo-red border-3 border-neo-black shadow-hard-lg rounded-neo p-3 relative">
                 {/* Close button */}
@@ -370,8 +370,6 @@ const WordChip = memo<WordChipProps>(({ wordObj, playerCount }) => {
                   {t('results.tapToClose') || 'Tap anywhere to close'}
                 </p>
               </div>
-              {/* Arrow pointing down */}
-              <div className="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-[8px] border-l-transparent border-r-[8px] border-r-transparent border-t-[8px] border-t-neo-black" />
             </motion.div>
           </>
         )}

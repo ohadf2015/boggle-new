@@ -788,6 +788,26 @@ Example response format for ${languageName}:
 
       const jsonMatch = cleanText.match(/\[[\s\S]*\]/);
       if (!jsonMatch) {
+        // Try to salvage partial results from truncated JSON array
+        // Look for array start and try to extract complete objects
+        const partialArrayMatch = cleanText.match(/\[\s*([\s\S]*)/);
+        if (partialArrayMatch) {
+          const partialResults = this.extractPartialJsonResults(partialArrayMatch[1], words);
+          if (partialResults.length > 0) {
+            console.warn(`[GameAIService] Extracted ${partialResults.length}/${words.length} results from truncated response`);
+            // Map partial results back to word order
+            const resultMap = new Map();
+            for (const item of partialResults) {
+              if (item && typeof item.word === 'string') {
+                resultMap.set(item.word.toLowerCase().trim(), item);
+              }
+            }
+            return words.map(word => {
+              const result = resultMap.get(word.toLowerCase().trim());
+              return result || { isValid: false, reason: 'AI response truncated - word not validated', confidence: 0 };
+            });
+          }
+        }
         // Log the full response when extraction fails to help debug
         console.error('[GameAIService] Could not extract JSON array from batch AI response. Full response:', text);
         // Return all as invalid
@@ -798,6 +818,21 @@ Example response format for ${languageName}:
       try {
         parsed = JSON.parse(jsonMatch[0]);
       } catch (parseError) {
+        // Try to extract partial results from malformed JSON
+        const partialResults = this.extractPartialJsonResults(jsonMatch[0], words);
+        if (partialResults.length > 0) {
+          console.warn(`[GameAIService] Extracted ${partialResults.length}/${words.length} results from malformed JSON`);
+          const resultMap = new Map();
+          for (const item of partialResults) {
+            if (item && typeof item.word === 'string') {
+              resultMap.set(item.word.toLowerCase().trim(), item);
+            }
+          }
+          return words.map(word => {
+            const result = resultMap.get(word.toLowerCase().trim());
+            return result || { isValid: false, reason: 'AI response malformed - word not validated', confidence: 0 };
+          });
+        }
         console.warn('[GameAIService] JSON parse error in batch validation:', parseError.message);
         return words.map(w => ({ isValid: false, reason: 'Failed to parse AI response', confidence: 0 }));
       }
@@ -837,6 +872,45 @@ Example response format for ${languageName}:
       console.error('[GameAIService] Batch AI validation error:', error);
       throw error;
     }
+  }
+
+  /**
+   * Extract complete JSON objects from a potentially truncated or malformed JSON array string.
+   * Used to salvage partial results when AI response is cut off.
+   * @param {string} jsonContent - The content of a JSON array (without outer brackets)
+   * @param {string[]} expectedWords - Words we're trying to validate
+   * @returns {Array<{word: string, isValid: boolean, reason: string, confidence: number}>}
+   */
+  extractPartialJsonResults(jsonContent, expectedWords) {
+    const results = [];
+    // Match complete JSON objects with word, isValid, reason, and confidence fields
+    // This regex matches objects that have at least word and isValid fields complete
+    const objectPattern = /\{\s*"word"\s*:\s*"([^"]+)"\s*,\s*"isValid"\s*:\s*(true|false)(?:\s*,\s*"reason"\s*:\s*"([^"]*)")?(?:\s*,\s*"confidence"\s*:\s*(\d+))?\s*\}/g;
+
+    let match;
+    while ((match = objectPattern.exec(jsonContent)) !== null) {
+      const word = match[1];
+      const isValid = match[2] === 'true';
+      const reason = match[3] || (isValid ? 'Valid word' : 'Invalid word');
+      const confidence = match[4] ? parseInt(match[4], 10) : 50;
+
+      // Apply confidence threshold
+      let finalIsValid = isValid;
+      let finalReason = reason;
+      if (isValid && confidence < MIN_CONFIDENCE_THRESHOLD) {
+        finalIsValid = false;
+        finalReason = `Confidence too low (${confidence}%) - need ${MIN_CONFIDENCE_THRESHOLD}%+ to approve`;
+      }
+
+      results.push({
+        word,
+        isValid: finalIsValid,
+        reason: finalReason,
+        confidence
+      });
+    }
+
+    return results;
   }
 
   /**

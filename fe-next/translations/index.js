@@ -41,6 +41,12 @@ const translations = {
         ogTitle: 'Privacy Policy - LexiClash',
         ogDescription: 'Learn how LexiClash protects your privacy and handles your data securely.',
       },
+      legal: {
+        title: 'Legal Information | LexiClash',
+        description: 'LexiClash legal information - Access our Terms of Service and Privacy Policy. Learn about your rights and how we protect your data.',
+        ogTitle: 'Legal Information - LexiClash',
+        ogDescription: 'Access LexiClash Terms of Service and Privacy Policy.',
+      },
     },
     common: {
       loading: 'Loading...',
@@ -906,6 +912,13 @@ const translations = {
       lastUpdated: 'Last updated',
       copyright: '© 2025 LexiClash Ltd. All rights reserved.',
       allRightsReserved: 'All rights reserved.',
+      // Legal index page
+      index: {
+        title: 'Legal Information',
+        intro: 'Review our legal documents to understand your rights and how we protect your data when using LexiClash.',
+        termsDescription: 'Read our Terms of Service to understand the rules and guidelines for using LexiClash.',
+        privacyDescription: 'Learn how we collect, use, and protect your personal information.',
+      },
       // Terms of Service sections
       terms: {
         title: 'Terms of Service',
@@ -1209,6 +1222,12 @@ const translations = {
         description: 'מדיניות הפרטיות של לקסיקלאש - למדו כיצד אנו אוספים, משתמשים ומגנים על הנתונים שלכם. אנו שמים בראש סדר העדיפויות את הפרטיות שלכם ומשתמשים באמצעי אבטחה בתקן התעשייה.',
         ogTitle: 'מדיניות פרטיות - לקסיקלאש',
         ogDescription: 'למדו כיצד לקסיקלאש מגן על הפרטיות שלכם ומטפל בנתונים שלכם בצורה מאובטחת.',
+      },
+      legal: {
+        title: 'מידע משפטי | לקסיקלאש',
+        description: 'מידע משפטי של לקסיקלאש - גשו לתנאי השימוש ומדיניות הפרטיות שלנו. למדו על הזכויות שלכם וכיצד אנו מגנים על הנתונים שלכם.',
+        ogTitle: 'מידע משפטי - לקסיקלאש',
+        ogDescription: 'גשו לתנאי השימוש ומדיניות הפרטיות של לקסיקלאש.',
       },
     },
     common: {
@@ -2069,6 +2088,13 @@ const translations = {
       lastUpdated: 'עודכן לאחרונה',
       copyright: '© 2025 LexiClash Ltd. כל הזכויות שמורות.',
       allRightsReserved: 'כל הזכויות שמורות.',
+      // Legal index page
+      index: {
+        title: 'מידע משפטי',
+        intro: 'עיינו במסמכים המשפטיים שלנו כדי להבין את הזכויות שלכם וכיצד אנו מגנים על הנתונים שלכם בעת השימוש בלקסיקלאש.',
+        termsDescription: 'קראו את תנאי השימוש שלנו כדי להבין את הכללים וההנחיות לשימוש בלקסיקלאש.',
+        privacyDescription: 'למדו כיצד אנו אוספים, משתמשים ומגנים על המידע האישי שלכם.',
+      },
       // Terms of Service sections
       terms: {
         title: 'תנאי שימוש',
@@ -2372,6 +2398,12 @@ const translations = {
         description: 'LexiClash integritetspolicy - Lär dig hur vi samlar in, använder och skyddar dina data. Vi prioriterar din integritet och använder branschstandardiserade säkerhetsåtgärder.',
         ogTitle: 'Integritetspolicy - LexiClash',
         ogDescription: 'Lär dig hur LexiClash skyddar din integritet och hanterar dina data säkert.',
+      },
+      legal: {
+        title: 'Juridisk information | LexiClash',
+        description: 'LexiClash juridisk information - Få tillgång till våra användarvillkor och integritetspolicy. Lär dig om dina rättigheter och hur vi skyddar dina data.',
+        ogTitle: 'Juridisk information - LexiClash',
+        ogDescription: 'Få tillgång till LexiClash användarvillkor och integritetspolicy.',
       },
     },
     common: {
@@ -3295,6 +3327,13 @@ const translations = {
       lastUpdated: 'Senast uppdaterad',
       copyright: '© 2025 LexiClash Ltd. Alla rättigheter förbehållna.',
       allRightsReserved: 'Alla rättigheter förbehållna.',
+      // Legal index page
+      index: {
+        title: 'Juridisk information',
+        intro: 'Granska våra juridiska dokument för att förstå dina rättigheter och hur vi skyddar dina data när du använder LexiClash.',
+        termsDescription: 'Läs våra användarvillkor för att förstå reglerna och riktlinjerna för att använda LexiClash.',
+        privacyDescription: 'Lär dig hur vi samlar in, använder och skyddar din personliga information.',
+      },
       terms: {
         title: 'Användarvillkor',
         intro: 'Välkommen till LexiClash. Dessa användarvillkor reglerar din användning av vår multiplayer-ordspelsplattform på lexiclash.live.',
@@ -3538,6 +3577,12 @@ const translations = {
         description: 'LexiClashプライバシーポリシー - データの収集、使用、保護方法を学びましょう。私たちはあなたのプライバシーを優先し、業界標準のセキュリティ対策を使用しています。',
         ogTitle: 'プライバシーポリシー - LexiClash',
         ogDescription: 'LexiClashがあなたのプライバシーをどのように保護し、データを安全に処理するかを学びましょう。',
+      },
+      legal: {
+        title: '法的情報 | LexiClash',
+        description: 'LexiClash法的情報 - 利用規約とプライバシーポリシーにアクセス。あなたの権利と私たちがどのようにデータを保護するかを学びましょう。',
+        ogTitle: '法的情報 - LexiClash',
+        ogDescription: 'LexiClash利用規約とプライバシーポリシーにアクセス。',
       },
     },
     common: {
@@ -4460,6 +4505,13 @@ const translations = {
       lastUpdated: '最終更新日',
       copyright: '© 2025 LexiClash Ltd. All rights reserved.',
       allRightsReserved: 'All rights reserved.',
+      // Legal index page
+      index: {
+        title: '法的情報',
+        intro: 'LexiClashをご利用いただく際の権利と、私たちがどのようにお客様のデータを保護するかを理解するため、法的文書をご確認ください。',
+        termsDescription: 'LexiClashのご利用に関するルールとガイドラインを理解するため、利用規約をお読みください。',
+        privacyDescription: '私たちがどのようにお客様の個人情報を収集、使用、保護するかをご確認ください。',
+      },
       terms: {
         title: '利用規約',
         intro: 'LexiClashへようこそ。この利用規約は、lexiclash.liveでのマルチプレイヤーワードゲームプラットフォームの使用を規定します。',

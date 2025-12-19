@@ -232,8 +232,10 @@ const HostView: React.FC<HostViewProps> = memo(({
   }, [remainingTime, gameStarted, playCountdownBeep]);
 
   // Client-side countdown timer
+  // Only depends on gameStarted to avoid issues with boolean expressions in dependency array
+  // The interval handles its own cleanup when remainingTime reaches 0
   useEffect(() => {
-    if (!gameStarted || remainingTime === null || remainingTime <= 0) {
+    if (!gameStarted) {
       return;
     }
 
@@ -248,7 +250,7 @@ const HostView: React.FC<HostViewProps> = memo(({
     }, 1000);
 
     return () => clearInterval(intervalId);
-  }, [gameStarted, remainingTime === null, remainingTime !== null && remainingTime <= 0]);
+  }, [gameStarted]);
 
   // Update players list from props
   useEffect(() => {

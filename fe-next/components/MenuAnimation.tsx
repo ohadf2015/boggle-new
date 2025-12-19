@@ -274,7 +274,7 @@ const MenuAnimation: React.FC<MenuAnimationProps> = ({ className = '' }) => {
     <div
       className={`fixed inset-0 overflow-hidden ${className}`}
       style={{
-        zIndex: 0,
+        zIndex: -1,
         direction: 'ltr',
         pointerEvents: 'none', // Container doesn't block clicks
       }}
@@ -337,6 +337,7 @@ const MenuAnimation: React.FC<MenuAnimationProps> = ({ className = '' }) => {
               direction: 'ltr',
               position: 'absolute',
               lineHeight: 1,
+              zIndex: -1, // Stay behind UI elements
               pointerEvents: 'auto', // Letters are clickable
             }}
           >

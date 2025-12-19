@@ -33,13 +33,9 @@ export const AutoJoiningState: React.FC<AutoJoiningStateProps> = ({
         <Card className="bg-neo-navy border-4 border-neo-cream rounded-neo shadow-hard">
           <CardHeader className="text-center space-y-4">
             <div className="flex justify-center">
-              <motion.div
-                animate={{ rotate: 360 }}
-                transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
-                className="p-4 bg-neo-cyan rounded-neo border-3 border-neo-black shadow-hard-sm"
-              >
+              <div className="p-4 bg-neo-cyan rounded-neo border-3 border-neo-black shadow-hard-sm">
                 <FaGamepad size={48} className="text-neo-black" />
-              </motion.div>
+              </div>
             </div>
             <CardTitle className="text-2xl sm:text-3xl font-black uppercase text-neo-cream tracking-tight">
               {t('joinView.joiningRoom')}
@@ -69,27 +65,24 @@ export const AutoJoiningState: React.FC<AutoJoiningStateProps> = ({
 
             {/* Loading animation */}
             <div className="flex justify-center py-4">
-              <motion.div
-                className="flex space-x-3"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-              >
+              <div className="flex space-x-3">
                 {[0, 1, 2].map((i) => (
                   <motion.div
                     key={i}
                     className="w-4 h-4 bg-neo-cyan border-2 border-neo-black rounded-neo"
                     animate={{
-                      y: [-8, 8, -8],
-                      rotate: [0, 180, 360],
+                      scale: [1, 1.3, 1],
+                      opacity: [0.5, 1, 0.5],
                     }}
                     transition={{
-                      duration: 1,
+                      duration: 1.2,
                       repeat: Infinity,
-                      delay: i * 0.2,
+                      delay: i * 0.15,
+                      ease: "easeInOut",
                     }}
                   />
                 ))}
-              </motion.div>
+              </div>
             </div>
 
             <p className="text-center text-neo-cream/60 text-sm font-bold uppercase">

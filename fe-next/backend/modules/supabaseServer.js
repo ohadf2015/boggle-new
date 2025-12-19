@@ -7,6 +7,15 @@ const { createClient } = require('@supabase/supabase-js');
 const { calculateGameXp, getLevelFromXp, checkLevelUp, getTitleForLevel } = require('./xpManager');
 const logger = require('../utils/logger');
 
+// Lazy import to avoid circular dependency with botManager
+let _generateRandomPlayerName = null;
+function getRandomPlayerNameGenerator() {
+  if (!_generateRandomPlayerName) {
+    _generateRandomPlayerName = require('./botManager').generateRandomPlayerName;
+  }
+  return _generateRandomPlayerName;
+}
+
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 // Use service role key to bypass RLS for server-side operations
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
@@ -100,15 +109,18 @@ async function updatePlayerStats(playerId, gameStats) {
       logger.info('SUPABASE', `Profile not found for ${playerId}, creating minimal profile for stats tracking`);
 
       // Create a minimal profile so we can track stats
-      // User will need to complete profile setup later to set username, avatar, etc.
+      // Generate a fun random name with suited avatar instead of boring "player_XXXXXXXX"
+      const generateRandomPlayerName = getRandomPlayerNameGenerator();
+      const randomPlayerData = generateRandomPlayerName([], 'en');
+
       const { data: newProfile, error: createError } = await client
         .from('profiles')
         .insert({
           id: playerId,
-          username: `player_${playerId.substring(0, 8)}`, // Temporary username
-          display_name: 'New Player',
-          avatar_emoji: '😀',
-          avatar_color: '#6366f1'
+          username: randomPlayerData.name,
+          display_name: randomPlayerData.name,
+          avatar_emoji: randomPlayerData.avatar.emoji,
+          avatar_color: randomPlayerData.avatar.color
         })
         .select()
         .single();

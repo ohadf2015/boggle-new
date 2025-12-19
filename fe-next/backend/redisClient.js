@@ -1162,6 +1162,16 @@ function createPubSubClients() {
     const pubClient = redisClient.duplicate();
     const subClient = redisClient.duplicate();
 
+    // Add error handlers to prevent "missing 'error' handler" warnings
+    // These clients are used by Socket.IO adapter and need their own error handling
+    pubClient.on('error', (err) => {
+      logger.warn('REDIS', `Pub client error: ${err.message}`);
+    });
+
+    subClient.on('error', (err) => {
+      logger.warn('REDIS', `Sub client error: ${err.message}`);
+    });
+
     return { pubClient, subClient };
   } catch (error) {
     logger.error('REDIS', `Failed to create pub/sub clients: ${error.message}`);

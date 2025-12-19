@@ -11,10 +11,10 @@ interface LayoutParams {
 export async function generateMetadata({ params }: LayoutParams): Promise<Metadata> {
   const { locale } = await params;
   const validLocale = (locale in translations ? locale : 'en') as Locale;
-  const seo = translations[validLocale]?.seo?.privacy || translations.en.seo.privacy;
+  const seo = translations[validLocale]?.seo?.legal || translations.en.seo.legal;
   const baseSeo = translations[validLocale]?.seo || translations.en.seo;
 
-  // Always use explicit locale path for SEO consistency
+  // Always use explicit locale path for consistent canonicals
   const localePath = `/${locale}`;
 
   return {
@@ -23,7 +23,7 @@ export async function generateMetadata({ params }: LayoutParams): Promise<Metada
     openGraph: {
       type: 'website',
       locale: baseSeo.locale,
-      url: `https://www.lexiclash.live${localePath}/legal/privacy`,
+      url: `https://www.lexiclash.live${localePath}/legal`,
       title: seo.ogTitle,
       description: seo.ogDescription,
       siteName: 'LexiClash',
@@ -43,13 +43,13 @@ export async function generateMetadata({ params }: LayoutParams): Promise<Metada
       images: ['https://www.lexiclash.live/lexiclash.jpg'],
     },
     alternates: {
-      canonical: `https://www.lexiclash.live${localePath}/legal/privacy`,
+      canonical: `https://www.lexiclash.live${localePath}/legal`,
       languages: {
-        'x-default': 'https://www.lexiclash.live/en/legal/privacy',
-        he: 'https://www.lexiclash.live/he/legal/privacy',
-        en: 'https://www.lexiclash.live/en/legal/privacy',
-        sv: 'https://www.lexiclash.live/sv/legal/privacy',
-        ja: 'https://www.lexiclash.live/ja/legal/privacy',
+        'x-default': 'https://www.lexiclash.live/en/legal',
+        he: 'https://www.lexiclash.live/he/legal',
+        en: 'https://www.lexiclash.live/en/legal',
+        sv: 'https://www.lexiclash.live/sv/legal',
+        ja: 'https://www.lexiclash.live/ja/legal',
       },
     },
     robots: {
@@ -59,14 +59,13 @@ export async function generateMetadata({ params }: LayoutParams): Promise<Metada
   };
 }
 
-interface PrivacyLayoutProps {
+interface LegalLayoutProps {
   children: ReactNode;
   params: Promise<{ locale: string }>;
 }
 
-export default async function PrivacyLayout({ children, params }: PrivacyLayoutProps): Promise<ReactNode> {
+export default async function LegalLayout({ children, params }: LegalLayoutProps): Promise<ReactNode> {
   const { locale } = await params;
-  // Always use explicit locale path for SEO consistency
   const localePath = `/${locale}`;
 
   // Breadcrumb structured data
@@ -85,12 +84,6 @@ export default async function PrivacyLayout({ children, params }: PrivacyLayoutP
         position: 2,
         name: 'Legal',
         item: `https://www.lexiclash.live${localePath}/legal`,
-      },
-      {
-        '@type': 'ListItem',
-        position: 3,
-        name: 'Privacy Policy',
-        item: `https://www.lexiclash.live${localePath}/legal/privacy`,
       },
     ],
   };

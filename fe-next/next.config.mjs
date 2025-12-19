@@ -11,6 +11,59 @@ const nextConfig = {
     turbopackUseSystemTlsCerts: true,
   },
 
+  // SEO: Redirect non-www to www and ensure consistent URLs
+  async redirects() {
+    return [
+      // Redirect non-www to www (handled by hosting platform like Vercel/Railway)
+      // This is a fallback for any requests that slip through
+      {
+        source: '/:path*',
+        has: [
+          {
+            type: 'host',
+            value: 'lexiclash.live',
+          },
+        ],
+        destination: 'https://www.lexiclash.live/:path*',
+        permanent: true,
+      },
+      // Redirect bare /legal path without locale to default locale
+      {
+        source: '/legal',
+        destination: '/en/legal',
+        permanent: true,
+      },
+      {
+        source: '/legal/terms',
+        destination: '/en/legal/terms',
+        permanent: true,
+      },
+      {
+        source: '/legal/privacy',
+        destination: '/en/legal/privacy',
+        permanent: true,
+      },
+      // Redirect bare /rules path without locale to default locale
+      {
+        source: '/rules',
+        destination: '/en/rules',
+        permanent: true,
+      },
+      // Redirect bare /leaderboard path without locale to default locale
+      {
+        source: '/leaderboard',
+        destination: '/en/leaderboard',
+        permanent: true,
+      },
+      // Redirect bare /profile path without locale to default locale
+      {
+        source: '/profile',
+        destination: '/en/profile',
+        permanent: true,
+      },
+    ];
+  },
+
   // Image optimization enabled with modern formats
   images: {
     formats: ['image/avif', 'image/webp'],

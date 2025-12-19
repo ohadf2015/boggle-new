@@ -17,6 +17,7 @@ interface LocaleLayoutProps {
 }
 
 // Helper function to get locale-specific URL path
+// Always returns explicit locale path for SEO consistency
 function getLocalePath(locale: string): string {
     switch (locale) {
         case 'en':
@@ -28,7 +29,7 @@ function getLocalePath(locale: string): string {
         case 'he':
             return '/he';
         default:
-            return '';
+            return '/en'; // Default to English for SEO
     }
 }
 
@@ -108,7 +109,7 @@ export async function generateMetadata({ params }: LocaleLayoutProps): Promise<M
         alternates: {
             canonical: `https://www.lexiclash.live${localePath}`,
             languages: {
-                'x-default': 'https://www.lexiclash.live',
+                'x-default': 'https://www.lexiclash.live/en',
                 he: 'https://www.lexiclash.live/he',
                 en: 'https://www.lexiclash.live/en',
                 sv: 'https://www.lexiclash.live/sv',
