@@ -337,37 +337,6 @@ export function useGameSocket(): GameSocketOperations {
 }
 
 // ==========================================
-// Legacy Compatibility Exports
+// Note: Legacy exports (useWebSocket, useWebSocketOptional, WebSocketContext)
+// were removed in v2.0. Use the current exports above instead.
 // ==========================================
-
-/**
- * @deprecated Use useSocket() instead. Will be removed in v2.0.
- *
- * Migration guide:
- *   Before: const socket = useWebSocket();
- *   After:  const { socket } = useSocket();
- */
-export const useWebSocket = (): Socket | null => {
-  if (process.env.NODE_ENV === 'development') {
-    // Use console.warn only on first render via a static flag
-    if (typeof window !== 'undefined' && !(window as { __useWebSocketDeprecated?: boolean }).__useWebSocketDeprecated) {
-      console.warn('[DEPRECATION] useWebSocket is deprecated. Use useSocket() instead.');
-      (window as { __useWebSocketDeprecated?: boolean }).__useWebSocketDeprecated = true;
-    }
-  }
-  const { socket } = useSocket();
-  return socket;
-};
-
-/**
- * @deprecated Use useSocketOptional() instead. Will be removed in v2.0.
- */
-export const useWebSocketOptional = (): Socket | null => {
-  const context = useContext(SocketContext);
-  return context?.socket || null;
-};
-
-/**
- * @deprecated Use SocketContext directly. Will be removed in v2.0.
- */
-export const WebSocketContext = SocketContext;
