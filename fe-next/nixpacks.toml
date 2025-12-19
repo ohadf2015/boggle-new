@@ -1,0 +1,23 @@
+[phases.setup]
+nixPkgs = ['nodejs_20']
+aptPkgs = []
+
+[phases.install]
+dependsOn = ['setup']
+cmds = [
+    'npm ci --prefer-offline --no-audit --no-fund --loglevel=error'
+]
+cacheDirectories = ['node_modules', '.next/cache']
+
+[phases.build]
+dependsOn = ['install']
+cmds = [
+    'npm run build --loglevel=error'
+]
+
+[start]
+cmd = 'npm start'
+
+[variables]
+NODE_ENV = 'production'
+NPM_CONFIG_LOGLEVEL = 'error'
