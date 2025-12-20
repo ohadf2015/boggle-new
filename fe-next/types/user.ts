@@ -2,7 +2,7 @@
  * User and Authentication Type Definitions
  */
 
-import type { Avatar } from '../shared/types/game';
+import type { Avatar, LeaderboardEntry } from '../shared/types/game';
 
 export interface Session {
   gameCode: string;
@@ -64,12 +64,5 @@ export interface Leaderboard {
   lastUpdated: number;
 }
 
-export interface LeaderboardEntry {
-  rank: number;
-  username: string;
-  avatar: Avatar;
-  score: number;
-  gamesPlayed: number;
-  gamesWon: number;
-  achievements: number;
-}
+// Re-export LeaderboardEntry from shared types for consistency
+export type { LeaderboardEntry };

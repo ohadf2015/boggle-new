@@ -123,7 +123,8 @@ function registerBotHandlers(io, socket) {
       return;
     }
 
-    const { botId, username: botUsername } = data || {};
+    const { botId, botUsername, username } = data || {};
+    const botUsernameToFind = botUsername || username;
     const gameCode = getGameBySocketId(socket.id);
 
     if (!gameCode) {
@@ -154,8 +155,8 @@ function registerBotHandlers(io, socket) {
     let botToRemove = null;
     if (botId) {
       botToRemove = bots.find(b => b.id === botId);
-    } else if (botUsername) {
-      botToRemove = bots.find(b => b.username === botUsername);
+    } else if (botUsernameToFind) {
+      botToRemove = bots.find(b => b.username === botUsernameToFind);
     }
 
     if (!botToRemove) {

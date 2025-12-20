@@ -17,7 +17,6 @@ jest.mock('next/image', () => ({
     onError?: () => void;
     [key: string]: unknown;
   }) => {
-    // eslint-disable-next-line @next/next/no-img-element
     return (
       <img
         src={src}

@@ -19,13 +19,6 @@ import logger from '@/utils/logger';
 import { getRandomDefaultNameWithAvatar, getAvatarForName } from '@/utils/defaultNames';
 import type { Language, ActiveRoom } from '@/shared/types/game';
 
-interface JoinedEventData {
-  gameCode: string;
-  username: string;
-  isHost: boolean;
-  language?: Language;
-}
-
 interface ResultsData {
   scores: Array<{
     username: string;
@@ -43,11 +36,6 @@ interface GameStartData {
   letterGrid: string[][];
   timerSeconds: number;
   language: Language;
-}
-
-interface ErrorData {
-  message?: string;
-  code?: string;
 }
 
 // Dynamic imports for code splitting - only load when needed
@@ -93,8 +81,6 @@ const SOCKET_CONFIG = {
   RECONNECTION_ATTEMPTS: 10,
   RECONNECTION_DELAY: 1000,
   RECONNECTION_DELAY_MAX: 30000,
-  PING_INTERVAL: 25000,
-  PING_TIMEOUT: 60000,
   HOST_KEEP_ALIVE_INTERVAL: 30000,
   CONNECTION_TIMEOUT: 15000, // Reduced from 20s for faster feedback on slow connections
   ROOMS_LOADING_TIMEOUT: 3000, // Reduced timeout for active rooms - show UI faster
