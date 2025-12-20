@@ -10,6 +10,7 @@ import CircularTimer from '@/components/CircularTimer';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import { useGameMusic } from '@/hooks/useGameMusic';
+import { useMusic } from '@/contexts/MusicContext';
 import { generateRandomTable, applyHebrewFinalLetters } from '@/utils/utils';
 import { DIFFICULTIES } from '@/utils/consts';
 import { cn } from '@/lib/utils';
@@ -50,6 +51,7 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
 }) => {
   const { t } = useLanguage();
   const { playWordAcceptedSound, playComboSound } = useSoundEffects();
+  const { stopMusic } = useMusic();
   const [grid, setGrid] = useState<LetterGrid | null>(null);
   const [foundWords, setFoundWords] = useState<FoundWord[]>([]);
   const [score, setScore] = useState(0);
@@ -68,6 +70,13 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
   const validWordCountRef = useRef(0); // Track valid words for combo
   const gameStartTimeRef = useRef<number>(Date.now()); // Track when game started for pace analysis
   const maxComboRef = useRef(0); // Track max combo achieved for final achievements
+
+  // Abuse detection: track submission timestamps (like multiplayer's spamDetector)
+  const submissionTimestampsRef = useRef<number[]>([]);
+  const SPAM_WINDOW_MS = 10000; // 10-second window
+  const SPAM_WARNING_THRESHOLD = 15; // Warn at 15 submissions in 10s
+  const SPAM_COOLDOWN_THRESHOLD = 25; // Block at 25 submissions in 10s
+  const spamCooldownUntilRef = useRef<number>(0);
 
   // Refs for latest values (to avoid stale closures)
   const scoreRef = useRef(score);
@@ -93,6 +102,13 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
     isPaused: isPaused || isGameOver || settings.mode === 'practice',
     enabled: settings.mode !== 'practice', // No timed music in practice mode
   });
+
+  // Stop music when component unmounts (e.g., when player quits)
+  useEffect(() => {
+    return () => {
+      stopMusic(500); // Fade out quickly on unmount
+    };
+  }, [stopMusic]);
 
   // Generate grid on mount
   useEffect(() => {
@@ -321,6 +337,38 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
   const handleWordSubmit = useCallback((word: string) => {
     const normalizedWord = word.toLowerCase().trim();
     const minWordLength = 2;
+    const now = Date.now();
+
+    // Abuse detection: check if on cooldown
+    if (spamCooldownUntilRef.current > now) {
+      const remaining = Math.ceil((spamCooldownUntilRef.current - now) / 1000);
+      wordErrorToast(t('playerView.slowDown') || `Slow down! Wait ${remaining}s`, { duration: 1500 });
+      return;
+    }
+
+    // Prune old timestamps and add new one
+    submissionTimestampsRef.current = submissionTimestampsRef.current.filter(
+      ts => now - ts < SPAM_WINDOW_MS
+    );
+    submissionTimestampsRef.current.push(now);
+
+    const submissionCount = submissionTimestampsRef.current.length;
+
+    // Check for spam cooldown
+    if (submissionCount >= SPAM_COOLDOWN_THRESHOLD) {
+      spamCooldownUntilRef.current = now + 3000; // 3-second cooldown
+      wordErrorToast(t('playerView.tooFast') || 'Too fast! 3s cooldown', { duration: 2000 });
+      // Reset combo on spam cooldown
+      if (comboTimeoutRef.current) clearTimeout(comboTimeoutRef.current);
+      setComboLevel(0);
+      validWordCountRef.current = 0;
+      return;
+    }
+
+    // Warning for approaching limit
+    if (submissionCount === SPAM_WARNING_THRESHOLD) {
+      wordErrorToast(t('playerView.submittingTooFast') || 'Submitting too fast!', { duration: 1500 });
+    }
 
     // Step 1: Local validation (quick checks) - same as multiplayer
     const localValidation = validateWordLocally(
@@ -363,7 +411,6 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
     const currentCombo = comboLevelRef.current;
     const baseScore = calculateWordScore(normalizedWord.length, 0); // Base score without combo
     const fullScore = calculateWordScore(normalizedWord.length, currentCombo); // Score with combo
-    const now = Date.now();
     const timeSinceStart = (now - gameStartTimeRef.current) / 1000;
 
     // Step 4: Add word with pending state and BASE score (no combo yet)

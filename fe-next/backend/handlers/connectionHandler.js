@@ -11,7 +11,8 @@ const {
   getGameUsers,
   getActiveRooms,
   deleteGame,
-  updateHostSocketId
+  updateHostSocketId,
+  isRoomEmpty
 } = require('../modules/gameStateManager');
 
 const {
@@ -125,6 +126,17 @@ function handlePlayerDisconnect(io, socket, game, gameCode, username, reason) {
   if (userData?.isBot) {
     // Remove bot immediately
     removeUserFromGame(gameCode, username);
+
+    // Check if room is now empty and close it immediately
+    if (isRoomEmpty(gameCode)) {
+      logger.info('SOCKET', `Room ${gameCode} is empty after bot ${username} removed - closing immediately`);
+      timerManager.clearGameTimer(gameCode);
+      botManager.stopAllBots(gameCode);
+      deleteGame(gameCode);
+      io.emit('activeRooms', { rooms: getActiveRooms() });
+      return;
+    }
+
     broadcastToRoom(io, getGameRoom(gameCode), 'updateUsers', {
       users: getGameUsers(gameCode)
     });
@@ -154,6 +166,16 @@ function handlePlayerDisconnect(io, socket, game, gameCode, username, reason) {
         // Clean up player data
         cleanupPlayerData(gameCode, username);
         removeUserFromGame(gameCode, username);
+
+        // Check if room is now empty and close it immediately
+        if (isRoomEmpty(gameCode)) {
+          logger.info('SOCKET', `Room ${gameCode} is empty after ${username} timeout - closing immediately`);
+          timerManager.clearGameTimer(gameCode);
+          botManager.stopAllBots(gameCode);
+          deleteGame(gameCode);
+          io.emit('activeRooms', { rooms: getActiveRooms() });
+          return;
+        }
 
         // Notify remaining players
         broadcastToRoom(io, getGameRoom(gameCode), 'playerLeft', {

@@ -63,15 +63,15 @@ const ResultsWinnerBanner: React.FC<ResultsWinnerBannerProps> = ({ winner, isCur
     >
       {/* Neo-Brutalist Main Container */}
       <div
-        className="relative bg-neo-yellow border-4 border-neo-black rounded-neo-lg shadow-hard-xl overflow-hidden"
+        className="relative bg-neo-yellow border-4 border-neo-black rounded-neo-lg shadow-hard-xl overflow-hidden texture-halftone-comic-dense"
         style={{ transform: 'rotate(-1deg)' }}
       >
-        {/* Halftone texture pattern */}
+        {/* Comic-style halftone texture pattern - subtle for winner banner */}
         <div
-          className="absolute inset-0 pointer-events-none opacity-10"
+          className="absolute inset-0 pointer-events-none opacity-[0.06]"
           style={{
-            backgroundImage: `radial-gradient(circle, var(--neo-black) 1px, transparent 1px)`,
-            backgroundSize: '8px 8px',
+            backgroundImage: `radial-gradient(circle, rgb(var(--neo-black)) 1px, transparent 1px)`,
+            backgroundSize: '12px 12px',
           }}
         />
 

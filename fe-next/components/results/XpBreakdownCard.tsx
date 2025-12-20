@@ -49,12 +49,20 @@ const XpBreakdownCard = memo<XpBreakdownCardProps>(({ xpGainedData, levelUpData,
       animate={{ opacity: 1, y: 0, scale: 1 }}
       transition={{ delay: 0.5, type: 'spring', stiffness: 200, damping: 20 }}
       className={cn(
-        "mt-4 p-4 rounded-neo border-3 border-neo-black shadow-hard",
+        "mt-4 p-4 rounded-neo border-3 border-neo-black shadow-hard relative overflow-hidden texture-halftone-comic-light",
         levelUpData ? "bg-gradient-to-br from-neo-yellow via-neo-orange to-neo-pink" : "bg-neo-cream dark:bg-slate-700"
       )}
     >
+      {/* Comic-style halftone dots */}
+      <div
+        className="absolute inset-0 pointer-events-none opacity-[0.04]"
+        style={{
+          backgroundImage: `radial-gradient(circle, rgb(var(--neo-black)) 1px, transparent 1px)`,
+          backgroundSize: '12px 12px',
+        }}
+      />
       {/* Header */}
-      <div className="flex items-center justify-between mb-3">
+      <div className="flex items-center justify-between mb-3 relative z-10">
         <div className="flex items-center gap-2">
           <motion.span
             animate={{ rotate: [0, 10, -10, 0], scale: [1, 1.1, 1] }}
@@ -78,7 +86,7 @@ const XpBreakdownCard = memo<XpBreakdownCardProps>(({ xpGainedData, levelUpData,
       </div>
 
       {/* Breakdown items */}
-      <div className="space-y-2 mb-3">
+      <div className="space-y-2 mb-3 relative z-10">
         {breakdownItems.map((item, index) => (
           <motion.div
             key={item.key}
@@ -100,7 +108,7 @@ const XpBreakdownCard = memo<XpBreakdownCardProps>(({ xpGainedData, levelUpData,
       </div>
 
       {/* Level info */}
-      <div className="flex items-center justify-between pt-2 border-t-2 border-neo-black/20 dark:border-neo-cream/20">
+      <div className="flex items-center justify-between pt-2 border-t-2 border-neo-black/20 dark:border-neo-cream/20 relative z-10">
         <span className="text-xs font-bold text-neo-black/70 dark:text-neo-cream/70 uppercase">
           {t('xp.level') || 'Level'} {newLevel}
         </span>
@@ -115,7 +123,7 @@ const XpBreakdownCard = memo<XpBreakdownCardProps>(({ xpGainedData, levelUpData,
           initial={{ opacity: 0, scale: 0.8, y: 10 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           transition={{ delay: 0.9, type: 'spring', stiffness: 200 }}
-          className="mt-3 p-3 bg-neo-yellow border-3 border-neo-black rounded-neo shadow-hard-sm text-center"
+          className="mt-3 p-3 bg-neo-yellow border-3 border-neo-black rounded-neo shadow-hard-sm text-center relative z-10"
         >
           <motion.div
             animate={{ scale: [1, 1.1, 1] }}

@@ -642,6 +642,23 @@ function getActiveRooms() {
 }
 
 /**
+ * Check if a specific room is empty (no active human players)
+ * @param {string} gameCode - Game code to check
+ * @returns {boolean} - True if room is empty or doesn't exist
+ */
+function isRoomEmpty(gameCode) {
+  const game = games[gameCode];
+  if (!game) return true;
+
+  const users = Object.values(game.users);
+  // Room is empty if no users at all
+  if (users.length === 0) return true;
+  // Room is empty if no active human players (bots don't count as real players)
+  const activeHumanUsers = users.filter(user => !user.disconnected && !user.isBot);
+  return activeHumanUsers.length === 0;
+}
+
+/**
  * Get empty rooms (rooms with no active human players)
  * @returns {array} - Array of game codes for empty rooms
  */
@@ -800,6 +817,7 @@ module.exports = {
   getAllGames,
   getActiveRooms,
   getEmptyRooms,
+  isRoomEmpty,
   cleanupEmptyRooms,
 
   // Host management

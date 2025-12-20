@@ -495,9 +495,19 @@ const ShareWinPrompt: React.FC<ShareWinPromptProps> = ({
               : 'bg-gradient-to-br from-yellow-50 via-amber-50 to-orange-50 border-yellow-400 shadow-[4px_4px_0px_rgba(250,204,21,0.5)]'
             : isDarkMode
             ? 'bg-gradient-to-br from-cyan-900/30 via-blue-900/20 to-indigo-900/30 border-cyan-400/50 shadow-[4px_4px_0px_rgba(34,211,238,0.3)]'
-            : 'bg-gradient-to-br from-cyan-50 via-blue-50 to-indigo-50 border-cyan-400 shadow-[4px_4px_0px_rgba(34,211,238,0.4)]'
+            : 'bg-gradient-to-br from-cyan-50 via-blue-50 to-indigo-50 border-cyan-400 shadow-[4px_4px_0px_rgba(34,211,238,0.4)]',
+          // Add comic-style halftone pattern
+          'texture-halftone-comic-light'
         )}
       >
+        {/* Comic-style halftone dots overlay */}
+        <div
+          className="absolute inset-0 pointer-events-none opacity-[0.04]"
+          style={{
+            backgroundImage: `radial-gradient(circle, ${isDarkMode ? 'rgba(255,255,255,0.3)' : 'rgb(var(--neo-black))'} 1px, transparent 1px)`,
+            backgroundSize: '12px 12px',
+          }}
+        />
         {/* Background decoration */}
         <div className="absolute top-0 right-0 w-40 h-40 bg-gradient-to-bl from-white/15 to-transparent rounded-full blur-3xl pointer-events-none" />
         <div className="absolute bottom-0 left-0 w-32 h-32 bg-gradient-to-tr from-white/10 to-transparent rounded-full blur-2xl pointer-events-none" />

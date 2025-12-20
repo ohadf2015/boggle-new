@@ -283,15 +283,15 @@ const PlayerInsights: React.FC<PlayerInsightsProps> = ({ insights }) => {
           className={cn(
             'mb-4 p-4 rounded-neo border-3 border-neo-black',
             'bg-gradient-to-br from-neo-purple to-neo-purple-light',
-            'shadow-hard relative overflow-hidden'
+            'shadow-hard relative overflow-hidden texture-halftone-comic-dense'
           )}
         >
-          {/* Subtle halftone pattern */}
+          {/* Comic-style halftone pattern - subtle for featured card */}
           <div
-            className="absolute inset-0 pointer-events-none opacity-10"
+            className="absolute inset-0 pointer-events-none opacity-[0.08]"
             style={{
               backgroundImage: `radial-gradient(circle, var(--neo-cream) 1px, transparent 1px)`,
-              backgroundSize: '8px 8px',
+              backgroundSize: '12px 12px',
             }}
           />
           <div className="relative z-10">

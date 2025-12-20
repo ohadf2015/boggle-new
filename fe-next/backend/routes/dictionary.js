@@ -7,17 +7,26 @@
 const express = require('express');
 const router = express.Router();
 const logger = require('../utils/logger');
+const { createEndpointLimiter } = require('../utils/apiRateLimiter');
 
 // Import the same dictionary used by multiplayer
 const { isDictionaryWord, dictionary } = require('../dictionary');
 const { isWordCommunityValid, isWordValidForScoring } = require('../modules/communityWordManager');
+
+// Rate limit: 300 requests per minute per IP
+// Higher limit to accommodate multiple users on same network (family, office, cafe)
+const dictionaryRateLimiter = createEndpointLimiter({
+  maxRequests: 300,
+  windowMs: 60000,
+  blockDurationMs: 300000, // 5 min block if abused
+});
 
 /**
  * POST /api/dictionary/check
  * Same validation as multiplayer's wordHandler.js (lines 226-230)
  * Checks: dictionary → community validated → positive score
  */
-router.post('/check', async (req, res) => {
+router.post('/check', dictionaryRateLimiter, async (req, res) => {
   const { word, language = 'en' } = req.body;
 
   if (!word || typeof word !== 'string') {

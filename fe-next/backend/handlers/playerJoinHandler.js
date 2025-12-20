@@ -16,7 +16,8 @@ const {
   updateUserSocketId,
   getLeaderboard,
   getTournamentIdFromGame,
-  getAuthUserConnection
+  getAuthUserConnection,
+  isRoomEmpty
 } = require('../modules/gameStateManager');
 
 const {
@@ -33,6 +34,7 @@ const {
 const { emitError, ErrorMessages } = require('../utils/errorHandler');
 const { checkRateLimit } = require('../utils/rateLimiter');
 const timerManager = require('../utils/timerManager');
+const botManager = require('../modules/botManager');
 const tournamentManager = require('../modules/tournamentManager');
 const { generateRandomAvatar } = require('../utils/gameUtils');
 const { ACHIEVEMENT_ICONS } = require('../modules/achievementManager');
@@ -157,14 +159,23 @@ function registerPlayerJoinHandlers(io, socket) {
     removeUserFromGame(gameCode, username);
     leaveRoom(socket, getGameRoom(gameCode));
 
+    socket.emit('leftRoom', { success: true });
+    logger.info('SOCKET', `${username} left room ${gameCode}`);
+
+    // Check if room is now empty and close it immediately
+    if (isRoomEmpty(gameCode)) {
+      logger.info('SOCKET', `Room ${gameCode} is empty after ${username} left - closing immediately`);
+      timerManager.clearGameTimer(gameCode);
+      botManager.stopAllBots(gameCode);
+      deleteGame(gameCode);
+      io.emit('activeRooms', { rooms: getActiveRooms() });
+      return;
+    }
+
     broadcastToRoom(io, getGameRoom(gameCode), 'updateUsers', {
       users: getGameUsers(gameCode)
     });
-
-    socket.emit('leftRoom', { success: true });
     io.emit('activeRooms', { rooms: getActiveRooms() });
-
-    logger.info('SOCKET', `${username} left room ${gameCode}`);
   });
 }
 

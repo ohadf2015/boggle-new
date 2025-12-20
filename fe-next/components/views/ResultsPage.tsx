@@ -668,13 +668,13 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, letterGrid, game
             className="mt-8 max-w-4xl mx-auto"
             style={{ transform: 'rotate(1deg)' }}
           >
-            <div className="p-5 sm:p-6 bg-neo-cyan border-4 border-neo-black rounded-neo-lg shadow-hard-xl relative overflow-hidden">
-              {/* Halftone texture pattern */}
+            <div className="p-5 sm:p-6 bg-neo-cyan border-4 border-neo-black rounded-neo-lg shadow-hard-xl relative overflow-hidden texture-halftone-comic">
+              {/* Comic-style halftone texture pattern */}
               <div
-                className="absolute inset-0 pointer-events-none opacity-10"
+                className="absolute inset-0 pointer-events-none opacity-[0.05]"
                 style={{
-                  backgroundImage: `radial-gradient(circle, var(--neo-black) 1px, transparent 1px)`,
-                  backgroundSize: '8px 8px',
+                  backgroundImage: `radial-gradient(circle, rgb(var(--neo-black)) 1px, transparent 1px)`,
+                  backgroundSize: '12px 12px',
                 }}
               />
               <div className="text-center space-y-4 relative z-10">

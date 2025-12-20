@@ -76,6 +76,7 @@ const translations = {
       pending: 'Pending',
       xpGained: 'XP',
       score: 'Score',
+      points: 'points',
       combo: 'Combo',
       quit: 'Quit',
       foundWords: 'Found Words',
@@ -231,22 +232,17 @@ const translations = {
       joining: 'Joining...',
       creating: 'Creating...',
       playersOnline: 'online',
-      // Funny default player names - randomly selected as suggestions
+      // Funny default player names - [Adjective] + [Food/Animal]
       defaultPlayerNames: [
-        'Sneaky Pickle', 'Captain Chaos', 'Disco Potato', 'Fluffy Thunder', 'Cosmic Banana',
-        'Ninja Waffle', 'Professor Pancake', 'Sir Giggles', 'Lady Noodle', 'Baron Von Snack',
-        'Wizard Wombat', 'Turbo Turtle', 'Sergeant Socks', 'Duke Donut', 'Princess Pretzel',
-        'Count Crumbs', 'Admiral Avocado', 'General Giggles', 'Captain Cookie', 'Major Muffin',
-        'Jolly Jellybean', 'Bouncy Bear', 'Zippy Zebra', 'Silly Salmon', 'Giggly Goose',
-        'Wacky Walrus', 'Peppy Penguin', 'Loopy Llama', 'Dizzy Dragon', 'Funky Flamingo',
-        'Jazzy Jaguar', 'Quirky Quokka', 'Rowdy Raccoon', 'Sassy Sloth', 'Tiny Tornado',
-        'Wobbly Wizard', 'Zany Zucchini', 'Bubbly Badger', 'Crispy Cactus', 'Dapper Duck',
-        'Eager Eagle', 'Fizzy Fox', 'Groovy Gecko', 'Happy Hippo', 'Icy Iguana',
-        'Jumpy Jackal', 'Kooky Koala', 'Lucky Lemur', 'Merry Moose', 'Noble Newt',
-        'Plucky Panda', 'Quick Quail', 'Rusty Robot', 'Sparkly Spider', 'Twisty Taco',
-        'Upbeat Unicorn', 'Vivid Vulture', 'Wiggly Worm', 'Yappy Yak', 'Zippy Zombie',
-        'Artsy Armadillo', 'Breezy Buffalo', 'Chatty Chipmunk', 'Dandy Dolphin', 'Elfy Elephant',
-        'Feisty Frog', 'Giddy Giraffe', 'Humble Hamster', 'Itchy Ibex', 'Jittery Jellyfish',
+        // Adjective + Food
+        'Sneaky Pickle', 'Disco Potato', 'Cosmic Banana', 'Fluffy Waffle', 'Crispy Taco',
+        'Squishy Mochi', 'Twisty Pretzel', 'Chunky Cookie', 'Gooey Donut', 'Zesty Avocado',
+        'Chewy Noodle', 'Crunchy Falafel', 'Zany Zucchini',
+        // Adjective + Animal
+        'Silly Salmon', 'Giggly Goose', 'Wacky Walrus', 'Peppy Penguin', 'Loopy Llama',
+        'Dizzy Dragon', 'Funky Flamingo', 'Bouncy Bear', 'Zippy Zebra', 'Sassy Sloth',
+        'Quirky Quokka', 'Jolly Jellyfish', 'Rowdy Raccoon', 'Fizzy Fox', 'Happy Hippo',
+        'Kooky Koala',
       ],
     },
     hostView: {
@@ -1341,6 +1337,7 @@ const translations = {
       pending: 'ממתין',
       xpGained: 'XP',
       score: 'ניקוד',
+      points: 'נקודות',
       combo: 'קומבו',
       quit: 'יציאה',
       foundWords: 'מילים שנמצאו',
@@ -1497,21 +1494,16 @@ const translations = {
       creating: 'יוצר...',
       playersOnline: 'מחוברים',
       // שמות שחקנים מצחיקים - נבחרים באקראי כהצעות
+      // Funny default player names - [Adjective] + [Food/Animal]
       defaultPlayerNames: [
-        'טופו מקולקל', 'סמי סביב', 'ברכה', 'בתיה', 'שמשון הגיבור',
-        'מלפפון מטורף', 'קפטן קוגל', 'פרופסור פלאפל', 'נינג׳ה נודניק', 'דיסקו דג',
-        'בננה בלגן', 'וופל ויזארד', 'סרג׳נט סביבון', 'דוכס דונאט', 'נסיכת פרעצל',
-        'רוזמרי רעשן', 'אדמירל אבוקדו', 'גנרל גיחוך', 'קפטן עוגייה', 'מייג׳ור מאפין',
-        'ג׳לי ג׳ולי', 'דוב דובדבן', 'זברה זריזה', 'סלמון סחרחר', 'אווז אבסורדי',
-        'קונג פו קצפת', 'פינגווין פזיז', 'לאמה לוליינית', 'דרקון דפוק', 'פלמינגו פאנקי',
-        'יגואר ג׳אזי', 'קוואקה קירקסית', 'רקון רועש', 'עצלן עצבני', 'טורנדו טיפשי',
-        'קוסם קופצני', 'זוקיני זנזני', 'גירית גמישה', 'קקטוס קריספי', 'ברווז דנדי',
-        'נשר נלהב', 'שועל שמח', 'גקו גרובי', 'היפו היפי', 'איגואנה קפואה',
-        'תן תזזיתי', 'קואלה קוקי', 'למור לאקי', 'מוס מרי', 'טריטון נובל',
-        'פנדה פלאקי', 'שליו שקי', 'רובוט חלוד', 'עכביש ניצוץ', 'טאקו טויסטי',
-        'חד קרן אופטימי', 'נשר נמרץ', 'תולעת מתפתלת', 'יאק יפיפה', 'זומבי זריז',
-        'ארמדילו אמן', 'באפלו בריזי', 'צ׳יפמאנק צ׳טי', 'דולפין דנדי', 'פיל אלפי',
-        'צפרדע פייטנית', 'ג׳ירפה ג׳ידית', 'אוגר הומבל', 'יעל גרדנית', 'מדוזה ג׳יטרית',
+        // Adjective + Food (Hebrew)
+        'מלפפון חמקמק', 'תפוח אדמה דיסקו', 'בננה קוסמית', 'וופל פלאפי', 'טאקו קריספי',
+        'מוצ׳י סקוושי', 'בייגלה מפותל', 'עוגייה צ׳אנקית', 'דונאט דביק', 'אבוקדו זסטי',
+        'נודל לעיס', 'פלאפל קריספי',
+        // Adjective + Animal (Hebrew)
+        'סלמון סילי', 'אווז צחקני', 'כלב ים משוגע', 'פינגווין פפי', 'למה לופי',
+        'דרקון מסוחרר', 'פלמינגו פאנקי', 'דוב קופצני', 'זברה זיפי', 'עצלן חצוף',
+        'קואלה משונה', 'מדוזה עליזה', 'רקון רועש', 'שועל פיזי', 'היפו שמח',
       ],
     },
     hostView: {
@@ -2600,6 +2592,7 @@ const translations = {
       pending: 'Väntar',
       xpGained: 'XP',
       score: 'Poäng',
+      points: 'poäng',
       combo: 'Kombo',
       quit: 'Avsluta',
       foundWords: 'Hittade ord',
@@ -2755,22 +2748,15 @@ const translations = {
       joining: 'Går med...',
       creating: 'Skapar...',
       playersOnline: 'online',
-      // Roliga standardnamn för spelare - slumpmässigt föreslagna
+      // Roliga standardnamn för spelare - [Adjective] + [Food/Animal]
       defaultPlayerNames: [
-        'Smansen Fnansen', 'Kapten Kaos', 'Dansen Diskansen', 'Flansen Flansen', 'Koansen Koansen',
-        'Nansen Ninansen', 'Profansen Pannansen', 'Herr Fansen', 'Fru Nudansen', 'Baron Snackansen',
-        'Trollansen', 'Turbo Sköldansen', 'Sergantn Sockansen', 'Hertansen', 'Prinsessan Kringlansen',
-        'Greven Smulansen', 'Admiral Avokansen', 'General Skrattansen', 'Kapten Kakansen', 'Major Muffansen',
-        'Glansen Gelansen', 'Studsansen Björnansen', 'Snabbansen Zebansen', 'Dumansen Laxansen', 'Fnittransen Gåsansen',
-        'Galnansen Valrossansen', 'Peppansen Pingvinansen', 'Loansen Llamansen', 'Yrransen Drakansen', 'Funkansen Flamingansen',
-        'Jazzansen Jaguaransen', 'Kvirkansen Quokkansen', 'Vildansen Tvättbjörnansen', 'Fräckansen Sengångansen', 'Lansen Tornadansen',
-        'Vinglansen Trollkarlansen', 'Zansen Zucchinansen', 'Bubblansen Grävlingansen', 'Krispansen Kaktusansen', 'Fiffansen Ankansen',
-        'Ivransen Örnansen', 'Fräsansen Rävansen', 'Groovansen Geckansen', 'Gladansen Flodansen', 'Isansen Leguanansen',
-        'Hoppansen Schakalansen', 'Tokansen Koalansen', 'Turansen Lemuransen', 'Muntransen Älgansen', 'Finansen Salamandansen',
-        'Pluckansen Pandansen', 'Kvickansen Vaktelansen', 'Rostansen Robotansen', 'Glittransen Spindansen', 'Vridansen Tacansen',
-        'Optimistansen Enhörningansen', 'Livansen Gamansen', 'Slingransen Maskansen', 'Jappansen Jakansen', 'Rappansen Zombieansen',
-        'Konstansen Bältdjuransen', 'Brisansen Buffelansen', 'Pratlansen Jordekorransen', 'Dandansen Delfinansen', 'Elefantansen Ansen',
-        'Fightansen Grodansen', 'Gladansen Giraffansen', 'Ödmjukansen Hamsteransen', 'Klådansen Stenbockansen', 'Nervansen Manetansen',
+        // Adjective + Food (Swedish)
+        'Smyg Gurka', 'Disco Potatis', 'Kosmisk Banan', 'Fluffig Våffla', 'Krispig Taco',
+        'Mjuk Mochi', 'Vriden Kringla', 'Chunky Kaka', 'Kladdig Munk', 'Pigg Avokado', 'Seg Nudel',
+        // Adjective + Animal (Swedish)
+        'Fånig Lax', 'Fnissig Gås', 'Galen Valross', 'Pigg Pingvin', 'Loopy Lama',
+        'Yr Drake', 'Funky Flamingo', 'Studsig Björn', 'Snabb Zebra', 'Fräck Sengångare',
+        'Knasig Koala', 'Glad Manet', 'Vild Tvättbjörn', 'Fräsig Räv', 'Glad Flodhäst',
       ],
     },
     hostView: {
@@ -3861,6 +3847,7 @@ const translations = {
       pending: '保留中',
       xpGained: 'XP',
       score: 'スコア',
+      points: 'ポイント',
       combo: 'コンボ',
       quit: '終了',
       foundWords: '発見した単語',
@@ -4016,22 +4003,15 @@ const translations = {
       joining: '参加中...',
       creating: '作成中...',
       playersOnline: 'オンライン',
-      // 面白いデフォルトプレイヤー名 - ランダムに提案されます
+      // 面白いデフォルトプレイヤー名 - [Adjective] + [Food/Animal]
       defaultPlayerNames: [
-        'こっそりピクルス', 'カオス船長', 'ディスコポテト', 'ふわふわサンダー', 'コスミックバナナ',
-        'ニンジャワッフル', 'パンケーキ教授', 'くすくす殿', 'ヌードル姫', 'スナック男爵',
-        'ウォンバット魔法使い', 'ターボ亀', 'ソックス軍曹', 'ドーナツ公爵', 'プレッツェル王女',
-        'パンくず伯爵', 'アボカド提督', 'くすくす将軍', 'クッキー船長', 'マフィン少佐',
-        'ジョリージェリービーンズ', 'バウンシーベア', 'ジッピーゼブラ', 'シリーサーモン', 'ギグリーグース',
-        'ワッキーウォーラス', 'ペッピーペンギン', 'ルーピーラマ', 'ディジードラゴン', 'ファンキーフラミンゴ',
-        'ジャジージャガー', 'クワーキークオッカ', 'ラウディラクーン', 'サッシースロス', 'タイニートルネード',
-        'ウォブリーウィザード', 'ゼイニーズッキーニ', 'バブリーバジャー', 'クリスピーカクタス', 'ダッパーダック',
-        'イーガーイーグル', 'フィジーフォックス', 'グルービーゲッコー', 'ハッピーヒッポ', 'アイシーイグアナ',
-        'ジャンピージャッカル', 'クーキーコアラ', 'ラッキーレムール', 'メリームース', 'ノーブルニュート',
-        'プラッキーパンダ', 'クイッククエイル', 'ラスティロボット', 'スパークリースパイダー', 'ツイスティタコ',
-        'アップビートユニコーン', 'ビビッドバルチャー', 'ウィグリーワーム', 'ヤッピーヤク', 'ジッピーゾンビ',
-        'アーティーアルマジロ', 'ブリージーバッファロー', 'チャッティーチップマンク', 'ダンディードルフィン', 'エルフィーエレファント',
-        'ファイスティーフロッグ', 'ギディージラフ', 'ハンブルハムスター', 'イッチーアイベックス', 'ジッタリージェリーフィッシュ',
+        // Adjective + Food (Japanese)
+        'こっそりピクルス', 'ディスコポテト', 'コズミックバナナ', 'ふわふわワッフル', 'カリカリタコス',
+        'もちもちモチ', 'ねじねじプレッツェル', 'ザクザククッキー', 'とろとろドーナツ', 'ピリピリアボカド', 'もちもちヌードル',
+        // Adjective + Animal (Japanese)
+        'おバカサーモン', 'くすくすガチョウ', 'おかしなセイウチ', 'ペッピーペンギン', 'ルーピーラマ',
+        'くるくるドラゴン', 'ファンキーフラミンゴ', 'ぴょんぴょんクマ', 'びゅんびゅんシマウマ', 'おませなナマケモノ',
+        'へんてこコアラ', 'ハッピークラゲ', 'やんちゃアライグマ', 'シュワシュワキツネ', 'ハッピーカバ',
       ],
     },
     hostView: {

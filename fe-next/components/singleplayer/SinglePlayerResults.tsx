@@ -289,18 +289,27 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
         </motion.div>
       )}
 
-      {/* Score Display - Large and prominent */}
+      {/* Score Display - Large and prominent with comic dots */}
       <motion.div
         initial={{ scale: 0 }}
         animate={{ scale: 1 }}
         transition={{ type: 'spring', delay: 0.3 }}
         className="text-center py-6"
       >
-        <div className="inline-block bg-gradient-to-br from-neo-cyan to-cyan-400 rounded-neo-lg border-4 border-neo-black shadow-hard-lg px-10 py-6">
-          <div className="text-6xl font-black text-neo-black">
+        <div className="inline-block bg-gradient-to-br from-neo-cyan to-cyan-400 rounded-neo-lg border-4 border-neo-black shadow-hard-lg px-10 py-6 relative overflow-hidden texture-halftone-comic">
+          {/* Comic-style halftone overlay */}
+          <div
+            className="absolute inset-0 pointer-events-none"
+            style={{
+              backgroundImage: `radial-gradient(circle, rgb(var(--neo-black)) 1px, transparent 1px)`,
+              backgroundSize: '12px 12px',
+              opacity: 0.05,
+            }}
+          />
+          <div className="relative z-10 text-6xl font-black text-neo-black">
             {results.playerScore}
           </div>
-          <div className="text-sm font-bold uppercase text-neo-black/70 mt-1">
+          <div className="relative z-10 text-sm font-bold uppercase text-neo-black/70 mt-1">
             {results.playerWords.length} {t('common.words') || 'words'}
           </div>
         </div>

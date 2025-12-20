@@ -221,6 +221,54 @@ body {
     border-radius: inherit;
   }
 
+  /* Comic-style halftone - subtle dots like in comic books */
+  .texture-halftone-comic {
+    position: relative;
+  }
+  .texture-halftone-comic::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: radial-gradient(circle, rgb(var(--neo-black)) 1px, transparent 1px);
+    background-size: 12px 12px;
+    opacity: 0.06;
+    pointer-events: none;
+    z-index: 1;
+    border-radius: inherit;
+  }
+
+  /* Comic halftone variant for light backgrounds */
+  .texture-halftone-comic-light {
+    position: relative;
+  }
+  .texture-halftone-comic-light::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: radial-gradient(circle, rgb(var(--neo-black)) 1px, transparent 1px);
+    background-size: 12px 12px;
+    opacity: 0.04;
+    pointer-events: none;
+    z-index: 1;
+    border-radius: inherit;
+  }
+
+  /* Dense comic halftone for featured/hero sections */
+  .texture-halftone-comic-dense {
+    position: relative;
+  }
+  .texture-halftone-comic-dense::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: radial-gradient(circle, rgb(var(--neo-black)) 1.5px, transparent 1.5px);
+    background-size: 10px 10px;
+    opacity: 0.08;
+    pointer-events: none;
+    z-index: 1;
+    border-radius: inherit;
+  }
+
   /* Neo-Brutalist Tilt Classes */
   .neo-tilt-left {
     transform: rotate(-2deg);

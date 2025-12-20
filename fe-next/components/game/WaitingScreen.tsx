@@ -63,8 +63,16 @@ const WaitingScreen: React.FC<WaitingScreenProps> = ({
       <div className="flex flex-col gap-3 sm:gap-4 md:gap-6 w-full max-w-6xl">
 
         {/* Row 1: Room Code + Language + Share Buttons */}
-        <Card className="bg-slate-800/95 text-neo-white p-3 sm:p-4 md:p-6 border-4 border-neo-black shadow-hard-lg">
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+        <Card className="bg-slate-800/95 text-neo-white p-3 sm:p-4 md:p-6 border-4 border-neo-black shadow-hard-lg relative overflow-hidden texture-halftone-comic">
+          {/* Comic-style halftone dots */}
+          <div
+            className="absolute inset-0 pointer-events-none opacity-[0.03]"
+            style={{
+              backgroundImage: `radial-gradient(circle, rgba(255,255,255,0.3) 1px, transparent 1px)`,
+              backgroundSize: '12px 12px',
+            }}
+          />
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 relative z-10">
             {/* Room Code and Language */}
             <div className="flex flex-col items-center sm:items-start gap-2">
               <div className="flex items-center gap-3">
@@ -183,12 +191,20 @@ const WaitingScreen: React.FC<WaitingScreenProps> = ({
           )}
 
           {/* RIGHT SIDE: Players List - Neo-Brutalist Dark */}
-          <Card className="lg:w-[350px] h-auto p-3 sm:p-4 md:p-6 flex flex-col bg-slate-800/95 text-neo-white border-4 border-neo-black shadow-hard-lg">
-            <h3 className="text-lg font-black uppercase text-neo-cream mb-4 flex items-center gap-2 flex-shrink-0">
+          <Card className="lg:w-[350px] h-auto p-3 sm:p-4 md:p-6 flex flex-col bg-slate-800/95 text-neo-white border-4 border-neo-black shadow-hard-lg relative overflow-hidden texture-halftone-comic">
+            {/* Comic-style halftone dots */}
+            <div
+              className="absolute inset-0 pointer-events-none opacity-[0.025]"
+              style={{
+                backgroundImage: `radial-gradient(circle, rgba(255,255,255,0.3) 1px, transparent 1px)`,
+                backgroundSize: '12px 12px',
+              }}
+            />
+            <h3 className="text-lg font-black uppercase text-neo-cream mb-4 flex items-center gap-2 flex-shrink-0 relative z-10">
               <FaUsers className="text-neo-pink" />
               {t(isHost ? 'hostView.playersJoined' : 'playerView.players')} ({playersReady.length})
             </h3>
-            <div className="flex flex-col gap-3 flex-1 overflow-y-auto">
+            <div className="flex flex-col gap-3 flex-1 overflow-y-auto relative z-10">
               {playersReady.map((player, index) => {
                 const playerUsername = player.username;
                 const avatar = player.avatar;
@@ -230,7 +246,7 @@ const WaitingScreen: React.FC<WaitingScreenProps> = ({
               })}
             </div>
             {playersReady.length === 0 && (
-              <p className="text-sm text-center text-neo-cream/60 font-bold mt-2">
+              <p className="text-sm text-center text-neo-cream/60 font-bold mt-2 relative z-10">
                 {t('hostView.waitingForPlayers')}
               </p>
             )}
@@ -240,7 +256,15 @@ const WaitingScreen: React.FC<WaitingScreenProps> = ({
         {/* Row 3: Letter Grid + Chat */}
         <div className="flex flex-col lg:flex-row gap-3 sm:gap-4 md:gap-6">
           {/* Letter Grid - LEFT */}
-          <Card className="flex-1 p-1 sm:p-3 flex flex-col items-center bg-slate-800/95 border-4 border-neo-black shadow-hard-lg">
+          <Card className="flex-1 p-1 sm:p-3 flex flex-col items-center bg-slate-800/95 border-4 border-neo-black shadow-hard-lg relative overflow-hidden texture-halftone-comic">
+            {/* Comic-style halftone dots */}
+            <div
+              className="absolute inset-0 pointer-events-none opacity-[0.02]"
+              style={{
+                backgroundImage: `radial-gradient(circle, rgba(255,255,255,0.3) 1px, transparent 1px)`,
+                backgroundSize: '12px 12px',
+              }}
+            />
             <div className="w-full flex justify-center items-center transition-all duration-500 aspect-square max-w-full">
               <div className="w-full h-full flex items-center justify-center">
                 {shufflingGrid ? (

@@ -5,8 +5,23 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
+import { checkApiRateLimit, rateLimitResponse } from '@/lib/apiRateLimit';
+
+// Rate limit config: 100 requests per minute per IP (AI endpoint)
+// Higher limit to accommodate multiple users on same network
+const RATE_LIMIT_CONFIG = {
+  maxRequests: 100,
+  windowMs: 60000,
+  blockDurationMs: 300000, // 5 min block if abused
+};
 
 export async function POST(request: NextRequest) {
+  // Check rate limit
+  const rateLimit = checkApiRateLimit(request, 'validate-word-ai', RATE_LIMIT_CONFIG);
+  if (!rateLimit.success) {
+    return rateLimitResponse(rateLimit);
+  }
+
   let body: { word: string; language: string };
 
   try {

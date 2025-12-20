@@ -149,12 +149,20 @@ const WinStreakDisplay: React.FC<WinStreakDisplayProps> = ({
       animate={{ opacity: 1, scale: 1, y: 0 }}
       transition={{ type: 'spring', damping: 15, stiffness: 200 }}
       className={cn(
-        'relative p-4 rounded-xl border-2 overflow-hidden',
+        'relative p-4 rounded-xl border-2 overflow-hidden texture-halftone-comic-light',
         colors.bg,
         colors.border,
         showMilestone && `shadow-lg ${colors.glow}`
       )}
     >
+      {/* Comic-style halftone dots */}
+      <div
+        className="absolute inset-0 pointer-events-none opacity-[0.03]"
+        style={{
+          backgroundImage: `radial-gradient(circle, ${isDarkMode ? 'rgba(255,255,255,0.3)' : 'rgb(var(--neo-black))'} 1px, transparent 1px)`,
+          backgroundSize: '12px 12px',
+        }}
+      />
       {/* Background glow for milestones */}
       <AnimatePresence>
         {showMilestone && (

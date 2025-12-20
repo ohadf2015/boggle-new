@@ -114,9 +114,17 @@ const AutoRejoinTimer: React.FC<AutoRejoinTimerProps> = ({
           paddingBottom: 'max(1rem, env(safe-area-inset-bottom, 0px))'
         }}
       >
-        <div className="bg-neo-cyan border-4 border-neo-black rounded-neo-lg shadow-hard-xl p-3 sm:p-4 flex flex-col items-center gap-2 sm:gap-3 mx-4 pointer-events-auto">
+        <div className="bg-neo-cyan border-4 border-neo-black rounded-neo-lg shadow-hard-xl p-3 sm:p-4 flex flex-col items-center gap-2 sm:gap-3 mx-4 pointer-events-auto relative overflow-hidden texture-halftone-comic">
+          {/* Comic-style halftone dots */}
+          <div
+            className="absolute inset-0 pointer-events-none opacity-[0.05]"
+            style={{
+              backgroundImage: `radial-gradient(circle, rgb(var(--neo-black)) 1px, transparent 1px)`,
+              backgroundSize: '12px 12px',
+            }}
+          />
           {/* Row 1: Text label with countdown */}
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 relative z-10">
             <FaClock className="text-neo-black text-sm sm:text-base" />
             <span className="font-bold text-neo-black text-sm sm:text-base whitespace-nowrap">
               {t('results.autoRejoinIn') || 'Auto-rejoin in'}
@@ -128,7 +136,7 @@ const AutoRejoinTimer: React.FC<AutoRejoinTimerProps> = ({
           </div>
 
           {/* Row 2: Timer and buttons */}
-          <div className="flex items-center gap-3 sm:gap-4">
+          <div className="flex items-center gap-3 sm:gap-4 relative z-10">
             {/* Circular countdown timer - hidden on small screens, shown on larger */}
             <div className="relative w-12 h-12 sm:w-14 sm:h-14 flex-shrink-0 hidden sm:block">
               <svg className="w-full h-full transform -rotate-90" viewBox="0 0 100 100">

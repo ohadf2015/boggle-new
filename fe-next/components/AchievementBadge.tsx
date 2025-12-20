@@ -116,8 +116,8 @@ export const AchievementBadge = memo<AchievementBadgeProps>(({ achievement, inde
                         transition-all duration-100 cursor-pointer touch-manipulation"
               style={{
                 backgroundColor: tierColors?.bg || 'var(--neo-cyan)',
-                borderColor: tierColors?.border || 'var(--neo-black)',
-                color: tierColors?.text || 'var(--neo-black)',
+                borderColor: tierColors?.border || 'rgb(var(--neo-black))',
+                color: tierColors?.text || 'rgb(var(--neo-black))',
                 boxShadow: tierColors?.glow ? `0 0 8px ${tierColors.glow}` : undefined,
               }}
             >

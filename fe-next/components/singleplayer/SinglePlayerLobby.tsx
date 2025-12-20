@@ -197,7 +197,15 @@ const SinglePlayerLobby: React.FC<SinglePlayerLobbyProps> = ({
               className="mb-4"
             >
               {currentHighScore ? (
-                <div className="p-4 bg-gradient-to-br from-neo-yellow via-yellow-300 to-neo-orange rounded-neo-lg border-4 border-neo-black shadow-hard relative overflow-hidden">
+                <div className="p-4 bg-gradient-to-br from-neo-yellow via-yellow-300 to-neo-orange rounded-neo-lg border-4 border-neo-black shadow-hard relative overflow-hidden texture-halftone-comic">
+                  {/* Comic-style halftone dots */}
+                  <div
+                    className="absolute inset-0 pointer-events-none opacity-[0.05]"
+                    style={{
+                      backgroundImage: `radial-gradient(circle, rgb(var(--neo-black)) 1px, transparent 1px)`,
+                      backgroundSize: '12px 12px',
+                    }}
+                  />
                   {/* Trophy background decoration */}
                   <div className="absolute -right-4 -top-4 opacity-10">
                     <FaTrophy className="w-24 h-24 text-neo-black" />
@@ -430,6 +438,7 @@ const SinglePlayerLobby: React.FC<SinglePlayerLobbyProps> = ({
       {/* Start Game Button */}
       <Button
         size="lg"
+        variant="success"
         className="w-full text-lg py-6 shadow-hard hover:shadow-hard-lg"
         onClick={handleStartGame}
       >

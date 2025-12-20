@@ -547,12 +547,17 @@ const ResultsPlayerCard: React.FC<ResultsPlayerCardProps> = ({ player, index, al
           "p-4 sm:p-5 md:p-6 border-4 transition-all duration-200 rounded-neo-lg shadow-hard-lg relative overflow-hidden",
           "hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-hard-xl",
           getCardStyle(),
-          isWordsExpanded && "ring-4 ring-neo-cyan"
+          isWordsExpanded && "ring-4 ring-neo-cyan",
+          // Add comic-style halftone for winner card (more prominent)
+          index === 0 && "texture-halftone-comic"
         )}
       >
-        {/* Halftone texture pattern */}
+        {/* Halftone texture pattern - more prominent for winner, subtle for others */}
         <div
-          className="absolute inset-0 pointer-events-none opacity-5"
+          className={cn(
+            "absolute inset-0 pointer-events-none",
+            index === 0 ? "opacity-0" : "opacity-5" // Winner uses CSS class pattern instead
+          )}
           style={{
             backgroundImage: `radial-gradient(circle, var(--neo-black) 1px, transparent 1px)`,
             backgroundSize: '6px 6px',

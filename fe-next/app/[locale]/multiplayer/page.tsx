@@ -508,7 +508,12 @@ export default function MultiplayerPage(): React.JSX.Element {
       setIsJoining(false); // Clear loading state on any error
 
       // Handle empty error objects (Socket.IO internal errors) - log as debug, not error
-      if (!data || Object.keys(data).length === 0) {
+      // Also handle Error instances that may appear as {} when logged
+      const isEmptyError = !data ||
+        (typeof data === 'object' && Object.keys(data).length === 0) ||
+        (data instanceof Error && !data.message);
+
+      if (isEmptyError) {
         logger.debug('[SOCKET.IO] Received empty error object (internal Socket.IO event)', {
           connected: newSocket.connected,
           id: newSocket.id
