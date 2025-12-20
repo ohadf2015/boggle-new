@@ -26,6 +26,7 @@ export interface WordData {
   word: string;
   validated?: boolean;
   timestamp?: number;
+  timeSinceStart?: number; // Seconds since game start - more accurate for pace analysis
   score?: number;
 }
 
@@ -168,8 +169,21 @@ export function calculatePlayerInsights(
  * @returns Speed pattern and breakdown
  */
 function analyzeSpeedPattern(words: WordData[], gameDuration: number): SpeedPatternAnalysis {
-  if (!words.length || !words[0]?.timestamp) {
-    // No timestamp data, return equal distribution
+  if (!words.length) {
+    return {
+      speedPattern: SPEED_PATTERNS.STEADY,
+      earlyGameWords: 0,
+      midGameWords: 0,
+      lateGameWords: 0,
+    };
+  }
+
+  // Check if we have timing data (prefer timeSinceStart, fall back to timestamp)
+  const hasTimeSinceStart = words.some(w => typeof w.timeSinceStart === 'number');
+  const hasTimestamp = words.some(w => typeof w.timestamp === 'number');
+
+  if (!hasTimeSinceStart && !hasTimestamp) {
+    // No timing data available, return equal distribution
     const third = Math.ceil(words.length / 3);
     return {
       speedPattern: SPEED_PATTERNS.STEADY,
@@ -185,22 +199,38 @@ function analyzeSpeedPattern(words: WordData[], gameDuration: number): SpeedPatt
   let midGameWords = 0;
   let lateGameWords = 0;
 
-  // Find the earliest timestamp to calculate relative times
-  const timestamps = words.map(w => w.timestamp).filter((t): t is number => t !== undefined);
-  const startTime = Math.min(...timestamps);
+  if (hasTimeSinceStart) {
+    // Use timeSinceStart directly (already in seconds from game start)
+    words.forEach(word => {
+      const elapsedSeconds = word.timeSinceStart;
+      if (typeof elapsedSeconds !== 'number') return;
 
-  words.forEach(word => {
-    if (!word.timestamp) return;
-    const elapsedSeconds = (word.timestamp - startTime) / 1000;
+      if (elapsedSeconds < thirdDuration) {
+        earlyGameWords++;
+      } else if (elapsedSeconds < thirdDuration * 2) {
+        midGameWords++;
+      } else {
+        lateGameWords++;
+      }
+    });
+  } else {
+    // Fall back to timestamp calculation (convert ms to relative seconds)
+    const timestamps = words.map(w => w.timestamp).filter((t): t is number => t !== undefined);
+    const startTime = Math.min(...timestamps);
 
-    if (elapsedSeconds < thirdDuration) {
-      earlyGameWords++;
-    } else if (elapsedSeconds < thirdDuration * 2) {
-      midGameWords++;
-    } else {
-      lateGameWords++;
-    }
-  });
+    words.forEach(word => {
+      if (typeof word.timestamp !== 'number') return;
+      const elapsedSeconds = (word.timestamp - startTime) / 1000;
+
+      if (elapsedSeconds < thirdDuration) {
+        earlyGameWords++;
+      } else if (elapsedSeconds < thirdDuration * 2) {
+        midGameWords++;
+      } else {
+        lateGameWords++;
+      }
+    });
+  }
 
   // Determine speed pattern with more nuanced detection
   const speedPattern = determineSpeedPattern(earlyGameWords, midGameWords, lateGameWords);

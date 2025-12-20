@@ -86,7 +86,7 @@ const HintButton = memo<HintButtonProps>(({
             >
               {/* Header */}
               <div className="flex items-center gap-2 mb-2">
-                <FaLightbulb className="text-neo-yellow text-lg" style={{ filter: 'drop-shadow(1px 1px 0px var(--neo-black))' }} />
+                <FaLightbulb className="text-neo-yellow text-lg" style={{ filter: 'drop-shadow(1px 1px 0px rgb(var(--neo-black)))' }} />
                 <span className="font-black text-neo-black uppercase text-sm">
                   {t('hints.hint') || 'Hint'}
                 </span>

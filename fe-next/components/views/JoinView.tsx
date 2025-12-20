@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useRef, useCallback, FormEvent } from 'react';
 import dynamic from 'next/dynamic';
+import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { FaGamepad, FaCrown, FaUser, FaDice, FaSync, FaQrcode, FaQuestionCircle } from 'react-icons/fa';
 import { QRCodeSVG } from 'qrcode.react';
@@ -35,13 +36,12 @@ import {
 } from '@/components/join';
 
 // Dynamic imports for heavy animation components
-const HowToPlay = dynamic(() => import('@/components/HowToPlay'), { ssr: false });
 const NewPlayerWelcome = dynamic(() => import('@/components/NewPlayerWelcome'), { ssr: false });
 const MenuAnimation = dynamic(() => import('@/components/MenuAnimation'), { ssr: false });
 const Particles = dynamic(() => import('@/components/Particles'), { ssr: false });
 
 // Import helper for first-time player detection
-import { isFirstTimePlayer, markTutorialSeen } from '@/components/NewPlayerWelcome';
+import { isFirstTimePlayer } from '@/components/NewPlayerWelcome';
 
 const JoinView: React.FC<JoinViewProps> = ({
   handleJoin,
@@ -65,7 +65,6 @@ const JoinView: React.FC<JoinViewProps> = ({
   const { t, language, dir } = useLanguage();
   const [mode, setMode] = useState<JoinMode>('join');
   const [showQR, setShowQR] = useState<boolean>(false);
-  const [showHowToPlay, setShowHowToPlay] = useState<boolean>(false);
   const [showNewPlayerWelcome, setShowNewPlayerWelcome] = useState<boolean>(false);
   const [usernameError, setUsernameError] = useState<boolean>(false);
   const [roomNameError, setRoomNameError] = useState<boolean>(false);
@@ -142,14 +141,7 @@ const JoinView: React.FC<JoinViewProps> = ({
     setUsername('');
   }, [setGameCode, setUsername]);
 
-  const handleShowHowToPlay = useCallback(() => setShowHowToPlay(true), []);
-  const handleCloseHowToPlay = useCallback(() => setShowHowToPlay(false), []);
   const handleCloseNewPlayerWelcome = useCallback(() => setShowNewPlayerWelcome(false), []);
-  const handleNewPlayerShowTutorial = useCallback(() => {
-    setShowNewPlayerWelcome(false);
-    markTutorialSeen();
-    setShowHowToPlay(true);
-  }, []);
   const handleCloseQR = useCallback(() => setShowQR(false), []);
 
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
@@ -422,7 +414,7 @@ const JoinView: React.FC<JoinViewProps> = ({
         />
       </div>
 
-      {/* Floating How to Play Button */}
+      {/* Floating How to Play Button - Links to rules page */}
       <motion.div
         initial={{ opacity: 0, scale: 0 }}
         animate={{ opacity: 1, scale: 1 }}
@@ -432,13 +424,14 @@ const JoinView: React.FC<JoinViewProps> = ({
         <TooltipProvider>
           <Tooltip>
             <TooltipTrigger asChild>
-              <Button
-                onClick={handleShowHowToPlay}
-                size="lg"
-                className="rounded-full w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-r from-teal-500 to-cyan-500 hover:from-teal-400 hover:to-cyan-400 shadow-2xl hover:shadow-[0_0_25px_rgba(20,184,166,0.6)] p-0"
-              >
-                <FaQuestionCircle className="text-xl sm:text-2xl" />
-              </Button>
+              <Link href={`/${language}/rules`}>
+                <Button
+                  size="lg"
+                  className="rounded-full w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-r from-teal-500 to-cyan-500 hover:from-teal-400 hover:to-cyan-400 shadow-2xl hover:shadow-[0_0_25px_rgba(20,184,166,0.6)] p-0"
+                >
+                  <FaQuestionCircle className="text-xl sm:text-2xl" />
+                </Button>
+              </Link>
             </TooltipTrigger>
             <TooltipContent side="right">{t('joinView.howToPlay')}</TooltipContent>
           </Tooltip>
@@ -449,18 +442,8 @@ const JoinView: React.FC<JoinViewProps> = ({
       <NewPlayerWelcome
         isOpen={showNewPlayerWelcome}
         onClose={handleCloseNewPlayerWelcome}
-        onShowTutorial={handleNewPlayerShowTutorial}
+        rulesPageUrl={`/${language}/rules`}
       />
-
-      {/* How to Play Dialog */}
-      <Dialog open={showHowToPlay} onOpenChange={setShowHowToPlay}>
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle className="sr-only">{t('joinView.howToPlayTitle')}</DialogTitle>
-          </DialogHeader>
-          <HowToPlay onClose={handleCloseHowToPlay} />
-        </DialogContent>
-      </Dialog>
 
       {/* QR Code Dialog */}
       <Dialog open={showQR} onOpenChange={setShowQR}>

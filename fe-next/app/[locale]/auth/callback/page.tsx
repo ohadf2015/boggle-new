@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, Suspense } from 'react';
+import { useEffect, useRef, Suspense, useCallback } from 'react';
 import { useRouter, useSearchParams, useParams } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import logger from '@/utils/logger';
@@ -18,47 +18,168 @@ function LoadingUI(): React.ReactNode {
   );
 }
 
+// Cross-tab coordination keys
+const AUTH_CODE_LOCK_KEY = 'boggle_auth_code_lock';
+const AUTH_CODE_LOCK_TIMEOUT = 15000; // 15 seconds max lock time
+
 // Inner component that uses useSearchParams - must be wrapped in Suspense
 function AuthCallbackContent(): React.ReactNode {
   const router = useRouter();
   const searchParams = useSearchParams();
   const params = useParams();
   const hasHandledCallback = useRef<boolean>(false);
+  const storageListenerCleanup = useRef<(() => void) | null>(null);
 
   // Get locale from URL params, fallback to default
   const locale = (params?.locale as string) || defaultLocale;
 
+  // Helper to get redirect URL
+  const getRedirectUrl = useCallback(() => {
+    let next = searchParams.get('next') || `/${locale}`;
+    if (next === '/') {
+      next = `/${locale}`;
+    } else if (!next.startsWith(`/${locale}`)) {
+      const pathWithoutLocale = next.replace(/^\/(he|en|sv|ja)/, '');
+      next = `/${locale}${pathWithoutLocale || ''}`;
+    }
+    return next;
+  }, [searchParams, locale]);
+
+  // Helper to safely redirect (clears URL params and navigates)
+  const safeRedirect = useCallback((url: string) => {
+    // Clean up any storage listeners
+    if (storageListenerCleanup.current) {
+      storageListenerCleanup.current();
+      storageListenerCleanup.current = null;
+    }
+    // Clear URL params to prevent reprocessing on back navigation
+    window.history.replaceState(null, '', window.location.pathname);
+    router.replace(url);
+  }, [router]);
+
+  // Check if another tab has locked this code
+  const isCodeLocked = useCallback((code: string): boolean => {
+    try {
+      const lockData = localStorage.getItem(AUTH_CODE_LOCK_KEY);
+      if (!lockData) return false;
+
+      const lock = JSON.parse(lockData);
+      // Check if lock is for this code and still valid
+      if (lock.code === code && Date.now() - lock.timestamp < AUTH_CODE_LOCK_TIMEOUT) {
+        return true;
+      }
+      // Clear stale lock
+      localStorage.removeItem(AUTH_CODE_LOCK_KEY);
+      return false;
+    } catch {
+      return false;
+    }
+  }, []);
+
+  // Lock the code for this tab
+  const lockCode = useCallback((code: string): boolean => {
+    try {
+      // Double-check lock before acquiring
+      if (isCodeLocked(code)) {
+        return false;
+      }
+      localStorage.setItem(AUTH_CODE_LOCK_KEY, JSON.stringify({
+        code,
+        timestamp: Date.now()
+      }));
+      return true;
+    } catch {
+      return true; // Proceed if localStorage fails
+    }
+  }, [isCodeLocked]);
+
+  // Release the code lock
+  const releaseLock = useCallback(() => {
+    try {
+      localStorage.removeItem(AUTH_CODE_LOCK_KEY);
+    } catch {
+      // Ignore errors
+    }
+  }, []);
+
+  // Poll for session when another tab is handling the code
+  const waitForSessionFromOtherTab = useCallback(async (next: string, maxWaitMs = 10000): Promise<boolean> => {
+    if (!supabase) return false;
+
+    const startTime = Date.now();
+    const pollInterval = 500; // Check every 500ms
+
+    return new Promise((resolve) => {
+      // Listen for storage events (session changes from other tabs)
+      const storageHandler = async () => {
+        if (!supabase) return;
+        const { data } = await supabase.auth.getSession();
+        if (data?.session) {
+          logger.log('Auth callback: Session detected from other tab via storage event');
+          cleanup();
+          safeRedirect(next);
+          resolve(true);
+        }
+      };
+
+      window.addEventListener('storage', storageHandler);
+
+      // Also poll periodically in case storage events are missed
+      const pollTimer = setInterval(async () => {
+        if (Date.now() - startTime >= maxWaitMs) {
+          cleanup();
+          resolve(false);
+          return;
+        }
+
+        if (!supabase) return;
+        const { data } = await supabase.auth.getSession();
+        if (data?.session) {
+          logger.log('Auth callback: Session detected from other tab via polling');
+          cleanup();
+          safeRedirect(next);
+          resolve(true);
+        }
+      }, pollInterval);
+
+      // Also set a timeout as a final fallback
+      const timeoutTimer = setTimeout(() => {
+        cleanup();
+        resolve(false);
+      }, maxWaitMs);
+
+      const cleanup = () => {
+        window.removeEventListener('storage', storageHandler);
+        clearInterval(pollTimer);
+        clearTimeout(timeoutTimer);
+      };
+
+      // Store cleanup function for component unmount
+      storageListenerCleanup.current = cleanup;
+    });
+  }, [safeRedirect]);
+
   useEffect(() => {
-    // Prevent double-handling
+    // Prevent double-handling within same tab
     if (hasHandledCallback.current) return;
     hasHandledCallback.current = true;
 
     const handleCallback = async (): Promise<void> => {
+      const next = getRedirectUrl();
+
       try {
         if (!supabase) {
           logger.error('Supabase not configured');
-          router.replace(`/${locale}?auth_error=true`);
+          safeRedirect(`/${locale}?auth_error=true`);
           return;
         }
 
-        // Ensure next URL has the correct locale prefix
-        let next = searchParams.get('next') || `/${locale}`;
-        if (next === '/') {
-          next = `/${locale}`;
-        } else if (!next.startsWith(`/${locale}`)) {
-          // If next URL has a different locale or no locale, update it to use current locale
-          const pathWithoutLocale = next.replace(/^\/(he|en|sv|ja)/, '');
-          next = `/${locale}${pathWithoutLocale || ''}`;
-        }
-
         // IMPORTANT: Check for existing session FIRST
-        // Supabase's detectSessionInUrl may have already exchanged the code
-        // before this component mounted. Checking session first prevents
-        // double-exchange errors.
+        // This handles the case where another tab already completed the auth
         const { data: existingSession } = await supabase.auth.getSession();
         if (existingSession?.session) {
           logger.log('Auth callback: Session already exists, redirecting');
-          router.replace(next);
+          safeRedirect(next);
           return;
         }
 
@@ -66,25 +187,69 @@ function AuthCallbackContent(): React.ReactNode {
         const code = searchParams.get('code');
 
         if (code) {
+          // CROSS-TAB COORDINATION: Check if another tab is handling this code
+          if (isCodeLocked(code)) {
+            logger.log('Auth callback: Code is being handled by another tab, waiting for session');
+            const gotSession = await waitForSessionFromOtherTab(next);
+            if (!gotSession) {
+              // Another tab had the lock but we never got a session - check one more time
+              const { data: finalCheck } = await supabase.auth.getSession();
+              if (finalCheck?.session) {
+                logger.log('Auth callback: Session found after waiting for other tab');
+                safeRedirect(next);
+                return;
+              }
+              logger.warn('Auth callback: Timed out waiting for session from other tab');
+              safeRedirect(`/${locale}?auth_error=true`);
+            }
+            return;
+          }
+
+          // Try to acquire lock for this code
+          const gotLock = lockCode(code);
+          if (!gotLock) {
+            // Another tab just acquired the lock
+            logger.log('Auth callback: Another tab just acquired lock, waiting for session');
+            const gotSession = await waitForSessionFromOtherTab(next);
+            if (!gotSession) {
+              const { data: finalCheck } = await supabase.auth.getSession();
+              if (finalCheck?.session) {
+                safeRedirect(next);
+                return;
+              }
+              safeRedirect(`/${locale}?auth_error=true`);
+            }
+            return;
+          }
+
           logger.log('Auth callback: Exchanging code for session');
           // IMPORTANT: Extract both data and error - the session is returned directly
           // in data.session, so we don't need to call getSession() again
           const { data, error } = await supabase.auth.exchangeCodeForSession(code);
 
+          // Release lock after exchange attempt
+          releaseLock();
+
           if (error) {
-            // Check if error is because code was already used (by detectSessionInUrl)
-            // In this case, try to get session again as it might have been set
+            // Check if error is because code was already used (by another tab)
+            // In this case, wait and poll for session as other tab should have it
             if (error.message?.includes('code') || error.message?.includes('expired') || error.message?.includes('invalid')) {
-              logger.warn('Auth callback: Code exchange failed, checking for existing session');
+              logger.warn('Auth callback: Code exchange failed (possibly used by another tab), waiting for session');
+
+              // Poll for session with retries - another tab may have succeeded
+              const gotSession = await waitForSessionFromOtherTab(next, 5000);
+              if (gotSession) return;
+
+              // One final check
               const { data: retrySession } = await supabase.auth.getSession();
               if (retrySession?.session) {
                 logger.log('Auth callback: Found session after failed exchange');
-                router.replace(next);
+                safeRedirect(next);
                 return;
               }
             }
             logger.error('Auth callback: Code exchange error:', error);
-            router.replace(`/${locale}?auth_error=true`);
+            safeRedirect(`/${locale}?auth_error=true`);
             return;
           }
 
@@ -92,7 +257,7 @@ function AuthCallbackContent(): React.ReactNode {
           // This avoids timing issues where getSession() might not immediately return the new session
           if (data?.session) {
             logger.log('Auth callback: Session established successfully from code exchange');
-            router.replace(next);
+            safeRedirect(next);
             return;
           }
 
@@ -100,7 +265,7 @@ function AuthCallbackContent(): React.ReactNode {
           const { data: sessionData } = await supabase.auth.getSession();
           if (sessionData?.session) {
             logger.log('Auth callback: Session found in fallback getSession()');
-            router.replace(next);
+            safeRedirect(next);
             return;
           }
         }
@@ -123,17 +288,13 @@ function AuthCallbackContent(): React.ReactNode {
 
           if (sessionError) {
             logger.error('Auth callback: Error setting session from hash tokens:', sessionError);
-            router.replace(`/${locale}?auth_error=true`);
+            safeRedirect(`/${locale}?auth_error=true`);
             return;
           }
 
           if (sessionData?.session) {
             logger.log('Auth callback: Session established from hash tokens');
-            // Clear the hash from URL for cleaner look and security
-            if (typeof window !== 'undefined') {
-              window.history.replaceState(null, '', window.location.pathname + window.location.search);
-            }
-            router.replace(next);
+            safeRedirect(next);
             return;
           }
         }
@@ -144,21 +305,29 @@ function AuthCallbackContent(): React.ReactNode {
         const { data: finalCheck } = await supabase.auth.getSession();
         if (finalCheck?.session) {
           logger.log('Auth callback: Session found in final check');
-          router.replace(next);
+          safeRedirect(next);
           return;
         }
 
         // Fallback: redirect to home with error
         logger.warn('Auth callback: No session found, redirecting with error');
-        router.replace(`/${locale}?auth_error=true`);
+        safeRedirect(`/${locale}?auth_error=true`);
       } catch (err) {
         logger.error('Auth callback exception:', err);
-        router.replace(`/${locale}?auth_error=true`);
+        releaseLock();
+        safeRedirect(`/${locale}?auth_error=true`);
       }
     };
 
     handleCallback();
-  }, [router, searchParams, locale]);
+
+    // Cleanup on unmount
+    return () => {
+      if (storageListenerCleanup.current) {
+        storageListenerCleanup.current();
+      }
+    };
+  }, [router, searchParams, locale, getRedirectUrl, safeRedirect, isCodeLocked, lockCode, releaseLock, waitForSessionFromOtherTab]);
 
   return <LoadingUI />;
 }

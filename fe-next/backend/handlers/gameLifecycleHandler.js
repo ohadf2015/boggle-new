@@ -356,8 +356,9 @@ function registerGameLifecycleHandlers(io, socket) {
     // Clean up game start coordinator to prevent stale acknowledgment state
     gameStartCoordinator.cleanupSequence(gameCode);
 
-    // Clean up bots from previous game to prevent stale state
-    botManager.cleanupGameBots(gameCode);
+    // Stop bots but keep them in the game - they will be restarted when new game begins
+    // Note: cleanupGameBots would delete all bots, causing them to not play in subsequent games
+    botManager.stopAllBots(gameCode);
 
     const resetSuccess = resetGameForNewRound(gameCode);
     const gameAfterReset = getGame(gameCode);

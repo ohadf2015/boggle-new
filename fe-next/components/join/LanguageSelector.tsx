@@ -35,7 +35,7 @@ export const LanguageSelector: React.FC<LanguageSelectorProps> = ({
 
   return (
     <div className="space-y-2">
-      <CardDescription className="text-sm sm:text-base font-bold uppercase text-neo-cream">
+      <CardDescription className="text-sm font-bold uppercase text-neo-black/70 dark:text-neo-white/70">
         {t('joinView.selectLanguage')}
       </CardDescription>
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3">
@@ -48,7 +48,7 @@ export const LanguageSelector: React.FC<LanguageSelectorProps> = ({
               "flex flex-col items-center gap-1 p-3 rounded-neo border-3 transition-all duration-100",
               selectedLanguage === option.code
                 ? "bg-neo-cyan border-neo-cyan text-neo-black shadow-hard"
-                : "bg-white border-neo-black text-neo-black shadow-hard-sm hover:shadow-hard hover:translate-x-[-1px] hover:translate-y-[-1px] hover:border-neo-cyan"
+                : "bg-white dark:bg-slate-600 border-neo-black dark:border-slate-500 text-neo-black dark:text-neo-white shadow-hard-sm hover:shadow-hard hover:translate-x-[-1px] hover:translate-y-[-1px] hover:border-neo-cyan"
             )}
           >
             <span className="text-2xl">{option.flag}</span>

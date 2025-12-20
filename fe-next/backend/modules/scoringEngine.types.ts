@@ -28,6 +28,11 @@ export interface WordDetail {
   isUnique: boolean;
   isDuplicate: boolean;
   comboBonus: number;
+  isAiVerified?: boolean;
+  aiReason?: string;
+  // Timing data for pace analysis
+  timestamp?: number | null;
+  timeSinceStart?: number | null;
 }
 
 export interface PlayerScoreResult {
@@ -50,7 +55,13 @@ export interface GameUser {
 
 export interface GameForScoring {
   playerWords?: Record<string, string[]>;
-  playerWordDetails?: Record<string, Array<{ word: string; score?: number; comboBonus?: number }>>;
+  playerWordDetails?: Record<string, Array<{
+    word: string;
+    score?: number;
+    comboBonus?: number;
+    timestamp?: number;
+    timeSinceStart?: number;
+  }>>;
   playerAchievements?: Record<string, string[]>;
   users?: Record<string, GameUser>;
 }

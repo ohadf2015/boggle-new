@@ -186,3 +186,87 @@ export function couldBeOnBoard(word: string, letterGrid: string[][] | null, lang
 
   return true; // All letters available, might be valid path
 }
+
+/**
+ * Build a map of letter positions on the board for efficient path finding
+ */
+function makePositionsMap(board: string[][], language: string): Map<string, [number, number][]> {
+  const positions = new Map<string, [number, number][]>();
+  if (!board || board.length === 0) return positions;
+
+  for (let i = 0; i < board.length; i++) {
+    for (let j = 0; j < board[0].length; j++) {
+      const ch = normalizeWord(String(board[i][j]), language);
+      if (!positions.has(ch)) positions.set(ch, []);
+      positions.get(ch)!.push([i, j]);
+    }
+  }
+  return positions;
+}
+
+/**
+ * DFS search for word path on board with 8-directional adjacency
+ */
+function searchWord(
+  board: string[][],
+  word: string,
+  row: number,
+  col: number,
+  index: number,
+  visited: Set<string>,
+  language: string
+): boolean {
+  if (index === word.length) return true;
+
+  if (row < 0 || row >= board.length || col < 0 || col >= board[0].length) return false;
+
+  const cellKey = `${row},${col}`;
+  if (visited.has(cellKey)) return false;
+
+  const cellNormalized = normalizeWord(board[row][col], language);
+  if (cellNormalized !== word[index]) return false;
+
+  visited.add(cellKey);
+
+  // All 8 adjacent directions: horizontal, vertical, and diagonal
+  const allDirections: [number, number][] = [
+    [-1, -1], [-1, 0], [-1, 1],  // up-left, up, up-right
+    [0, -1],           [0, 1],   // left, right
+    [1, -1],  [1, 0],  [1, 1]    // down-left, down, down-right
+  ];
+
+  for (const [dx, dy] of allDirections) {
+    if (searchWord(board, word, row + dx, col + dy, index + 1, visited, language)) {
+      visited.delete(cellKey);
+      return true;
+    }
+  }
+
+  visited.delete(cellKey);
+  return false;
+}
+
+/**
+ * Check if a word exists on the board as a valid path
+ * Uses DFS to find adjacent cell path (8-directional)
+ * This is the authoritative validation - same logic as backend
+ */
+export function isWordOnBoard(word: string, letterGrid: string[][] | null, language: string): boolean {
+  if (!letterGrid || !word || letterGrid.length === 0) return false;
+
+  // Normalize the word for comparison
+  const wordNormalized = normalizeWord(word, language);
+
+  // Find all starting positions (cells with the first letter)
+  const posMap = makePositionsMap(letterGrid, language);
+  const startPositions = posMap.get(wordNormalized[0]) || [];
+
+  // Try to find the word starting from each position
+  for (const [startRow, startCol] of startPositions) {
+    if (searchWord(letterGrid, wordNormalized, startRow, startCol, 0, new Set(), language)) {
+      return true;
+    }
+  }
+
+  return false;
+}

@@ -58,7 +58,7 @@ export const LiveLeaderboard = memo<LiveLeaderboardProps>(({
     >
       <div className="py-3 px-4 border-b-4 border-neo-black bg-neo-purple">
         <h3 className="flex items-center gap-2 text-neo-cream text-base uppercase tracking-widest font-black">
-          <FaTrophy className="text-neo-yellow" style={{ filter: 'drop-shadow(2px 2px 0px var(--neo-black))' }} />
+          <FaTrophy className="text-neo-yellow" style={{ filter: 'drop-shadow(2px 2px 0px rgb(var(--neo-black)))' }} />
           {t('playerView.leaderboard')}
         </h3>
       </div>
@@ -84,7 +84,7 @@ export const LiveLeaderboard = memo<LiveLeaderboardProps>(({
                 size="md"
               />
               <div className="flex-1 min-w-0">
-                <div className={`font-black truncate text-base flex items-center gap-2 ${dir === 'rtl' ? 'flex-row-reverse' : ''}`}>
+                <div className={`font-black truncate text-base flex items-center gap-2 text-neo-black ${dir === 'rtl' ? 'flex-row-reverse' : ''}`}>
                   <span>{player.username}</span>
                   {player.isMe && (
                     <span className="text-xs bg-neo-black text-neo-cream px-2 py-0.5 rounded-neo font-bold">
@@ -92,7 +92,7 @@ export const LiveLeaderboard = memo<LiveLeaderboardProps>(({
                     </span>
                   )}
                 </div>
-                <div className="text-sm font-bold">{player.score} pts</div>
+                <div className="text-sm font-bold text-neo-black">{player.score} pts</div>
               </div>
             </motion.div>
           ))}

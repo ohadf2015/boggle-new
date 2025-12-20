@@ -144,6 +144,7 @@ function createBot(gameCode, difficulty = 'medium', existingUsers = {}, language
 
   const bot = {
     id: botId,
+    gameCode,
     username: botName,
     avatar,
     difficulty,

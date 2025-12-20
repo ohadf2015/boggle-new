@@ -9,19 +9,14 @@ import { Button } from '../ui/button';
 import { getJoinUrl } from '../../utils/share';
 import { useLanguage } from '../../contexts/LanguageContext';
 
-const HowToPlay = dynamic(() => import('../HowToPlay'), { ssr: false });
 const NewPlayerWelcome = dynamic(() => import('../NewPlayerWelcome'), { ssr: false });
 
 interface JoinViewDialogsProps {
   gameCode: string;
-  showHowToPlay: boolean;
   showNewPlayerWelcome: boolean;
   showQR: boolean;
-  onCloseHowToPlay: () => void;
   onCloseNewPlayerWelcome: () => void;
-  onNewPlayerShowTutorial: () => void;
   onCloseQR: () => void;
-  onSetShowHowToPlay: (value: boolean) => void;
   onSetShowQR: (value: boolean) => void;
 }
 
@@ -30,17 +25,13 @@ interface JoinViewDialogsProps {
  */
 const JoinViewDialogs: React.FC<JoinViewDialogsProps> = React.memo(({
   gameCode,
-  showHowToPlay,
   showNewPlayerWelcome,
   showQR,
-  onCloseHowToPlay,
   onCloseNewPlayerWelcome,
-  onNewPlayerShowTutorial,
   onCloseQR,
-  onSetShowHowToPlay,
   onSetShowQR
 }) => {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const joinUrl = getJoinUrl(gameCode);
 
   return (
@@ -49,18 +40,8 @@ const JoinViewDialogs: React.FC<JoinViewDialogsProps> = React.memo(({
       <NewPlayerWelcome
         isOpen={showNewPlayerWelcome}
         onClose={onCloseNewPlayerWelcome}
-        onShowTutorial={onNewPlayerShowTutorial}
+        rulesPageUrl={`/${language}/rules`}
       />
-
-      {/* How to Play Dialog */}
-      <Dialog open={showHowToPlay} onOpenChange={onSetShowHowToPlay}>
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle className="sr-only">{t('joinView.howToPlayTitle')}</DialogTitle>
-          </DialogHeader>
-          <HowToPlay onClose={onCloseHowToPlay} />
-        </DialogContent>
-      </Dialog>
 
       {/* QR Code Dialog */}
       <Dialog open={showQR} onOpenChange={onSetShowQR}>

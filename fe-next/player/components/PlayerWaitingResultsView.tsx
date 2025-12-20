@@ -120,13 +120,13 @@ const PlayerWaitingResultsView: React.FC<PlayerWaitingResultsViewProps> = ({
     <div className="min-h-screen bg-neo-cream dark:bg-slate-900 p-3 sm:p-4 md:p-8 flex flex-col transition-colors duration-300">
 
       {/* Exit Button */}
-      <div className="w-full max-w-6xl mx-auto flex justify-end mb-4 relative z-50">
+      <div className="w-full flex justify-end mb-4 relative z-50">
         <ExitRoomButton onClick={onExitRoom} label={isHost ? t('hostView.exitRoom') : t('playerView.exit')} />
       </div>
 
-      {/* Centered Content - responsive grid on large screens */}
+      {/* Centered Content - responsive grid on large screens, full width on desktop */}
       <div className="flex-1 flex items-start lg:items-center justify-center py-4">
-        <div className="max-w-7xl w-full grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6 xl:gap-8">
+        <div className="w-full grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6 xl:gap-8">
           {/* Left column: Validation status + Leaderboard */}
           <div className="space-y-4 sm:space-y-6">
             {/* Waiting for Results Message - Fixed height container to prevent CLS */}
@@ -241,7 +241,7 @@ const PlayerWaitingResultsView: React.FC<PlayerWaitingResultsViewProps> = ({
                 <div className="bg-neo-cream border-4 border-neo-black shadow-hard-lg overflow-hidden">
                   <div className="py-2 lg:py-3 px-3 lg:px-4 border-b-4 border-neo-black bg-neo-purple">
                     <h3 className="flex items-center gap-2 text-neo-white text-lg lg:text-xl uppercase tracking-wider font-black">
-                      <FaTrophy className="text-neo-yellow" style={{ filter: 'drop-shadow(2px 2px 0px var(--neo-black))' }} />
+                      <FaTrophy className="text-neo-yellow" style={{ filter: 'drop-shadow(2px 2px 0px rgb(var(--neo-black)))' }} />
                       {t('playerView.leaderboard')}
                     </h3>
                   </div>
@@ -283,7 +283,7 @@ const PlayerWaitingResultsView: React.FC<PlayerWaitingResultsViewProps> = ({
                           <div className="flex-1 min-w-0">
                             <div className={`font-black flex items-center gap-1 lg:gap-2 ${dir === 'rtl' ? 'flex-row-reverse' : ''}`}>
                               <span className="truncate"><SlotMachineText text={player.username} /></span>
-                              {player.isHost && <FaCrown className="text-neo-yellow text-xs lg:text-sm flex-shrink-0" style={{ filter: 'drop-shadow(1px 1px 0px var(--neo-black))' }} />}
+                              {player.isHost && <FaCrown className="text-neo-yellow text-xs lg:text-sm flex-shrink-0" style={{ filter: 'drop-shadow(1px 1px 0px rgb(var(--neo-black)))' }} />}
                               {player.isBot && <FaRobot className="text-neo-cyan text-xs lg:text-sm flex-shrink-0" />}
                               {isMe && (
                                 <span className="text-[10px] lg:text-xs bg-neo-black text-neo-white px-1.5 lg:px-2 py-0.5 rounded-neo font-bold border-2 border-neo-black flex-shrink-0">

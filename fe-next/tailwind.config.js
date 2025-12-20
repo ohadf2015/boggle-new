@@ -47,8 +47,8 @@ module.exports = {
           lime: "var(--neo-lime)",
           red: "var(--neo-red)",
           cream: "var(--neo-cream)",
-          black: "var(--neo-black)",
-          white: "var(--neo-white)",
+          black: "rgb(var(--neo-black) / <alpha-value>)",
+          white: "rgb(var(--neo-white) / <alpha-value>)",
           gray: "var(--neo-gray)",
         },
         // Brand colors for social auth
@@ -153,13 +153,13 @@ module.exports = {
       },
       // Hard Shadow Utilities (NO blur - Neo-Brutalist style)
       boxShadow: {
-        'hard-sm': '2px 2px 0px var(--neo-black)',
-        'hard': '4px 4px 0px var(--neo-black)',
-        'hard-md': '4px 4px 0px var(--neo-black)',
-        'hard-lg': '6px 6px 0px var(--neo-black)',
-        'hard-xl': '8px 8px 0px var(--neo-black)',
-        'hard-2xl': '10px 10px 0px var(--neo-black)',
-        'hard-pressed': '2px 2px 0px var(--neo-black)',
+        'hard-sm': '2px 2px 0px rgb(var(--neo-black))',
+        'hard': '4px 4px 0px rgb(var(--neo-black))',
+        'hard-md': '4px 4px 0px rgb(var(--neo-black))',
+        'hard-lg': '6px 6px 0px rgb(var(--neo-black))',
+        'hard-xl': '8px 8px 0px rgb(var(--neo-black))',
+        'hard-2xl': '10px 10px 0px rgb(var(--neo-black))',
+        'hard-pressed': '2px 2px 0px rgb(var(--neo-black))',
         // Colored hard shadows
         'hard-yellow': '4px 4px 0px var(--neo-yellow)',
         'hard-pink': '4px 4px 0px var(--neo-pink)',
@@ -200,8 +200,8 @@ module.exports = {
         },
         // Neo-Brutalist animations
         "neo-press": {
-          "0%": { transform: "translate(0, 0)", boxShadow: "4px 4px 0px var(--neo-black)" },
-          "100%": { transform: "translate(2px, 2px)", boxShadow: "2px 2px 0px var(--neo-black)" },
+          "0%": { transform: "translate(0, 0)", boxShadow: "4px 4px 0px rgb(var(--neo-black))" },
+          "100%": { transform: "translate(2px, 2px)", boxShadow: "2px 2px 0px rgb(var(--neo-black))" },
         },
         "neo-wobble": {
           "0%, 100%": { transform: "rotate(-2deg)" },

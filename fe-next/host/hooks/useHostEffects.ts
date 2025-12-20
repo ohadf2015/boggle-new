@@ -184,21 +184,6 @@ export function useHostEffects(options: UseHostEffectsOptions): void {
     setHighlightedCells,
   ]);
 
-  // Prevent accidental page refresh
-  useEffect(() => {
-    const shouldWarn = playersCount > 0 || gameStarted;
-    if (!shouldWarn) return;
-
-    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
-      if (intentionalExitRef.current) return;
-      e.preventDefault();
-      e.returnValue = '';
-      return '';
-    };
-
-    window.addEventListener('beforeunload', handleBeforeUnload);
-    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
-  }, [playersCount, gameStarted, intentionalExitRef]);
 }
 
 export default useHostEffects;

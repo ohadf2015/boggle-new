@@ -33,6 +33,7 @@ const adminRoutes = require('../backend/routes/admin');
 const leaderboardRoutes = require('../backend/routes/leaderboard');
 const analyticsRoutes = require('../backend/routes/analytics');
 const geolocationRoutes = require('../backend/routes/geolocation');
+const dictionaryRoutes = require('../backend/routes/dictionary');
 
 // Configuration
 const dev = process.env.NODE_ENV !== 'production';
@@ -72,6 +73,7 @@ async function start() {
   app.use('/api/geolocation', geolocationRoutes);
   app.use('/api/analytics', analyticsRoutes);
   app.use('/api/admin', adminRoutes);
+  app.use('/api/dictionary', dictionaryRoutes);
 
   // Next.js request handler (catch-all)
   app.use(async (req, res) => {

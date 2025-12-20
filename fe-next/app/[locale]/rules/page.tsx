@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import Link from 'next/link';
 import dynamic from 'next/dynamic';
 import { motion } from 'framer-motion';
@@ -11,14 +11,18 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { cn } from '@/lib/utils';
 
 // Dynamically import HowToPlay to reduce initial bundle size
 const HowToPlay = dynamic(() => import('@/components/HowToPlay'), { ssr: false });
 
 export default function RulesPage(): React.JSX.Element {
     const { language, dir, t } = useLanguage();
+    const tutorialRef = useRef<HTMLElement>(null);
     const [showInteractiveTutorial, setShowInteractiveTutorial] = useState(false);
+
+    const scrollToTutorial = () => {
+        tutorialRef.current?.scrollIntoView({ behavior: 'smooth' });
+    };
 
     const fadeInUp = {
         initial: { opacity: 0, y: 20 },
@@ -65,23 +69,13 @@ export default function RulesPage(): React.JSX.Element {
                     <Button
                         size="lg"
                         variant="outline"
-                        onClick={() => setShowInteractiveTutorial(true)}
+                        onClick={scrollToTutorial}
                         className="border-3 border-neo-black bg-neo-lime hover:bg-neo-lime/90 text-neo-black font-bold text-lg px-8 py-6 w-full sm:w-auto"
                     >
                         <FaHandPointer className="mr-2" />
                         {t('footer.interactiveTutorial') || 'Interactive Tutorial'}
                     </Button>
                 </motion.div>
-
-                {/* Interactive Tutorial Dialog */}
-                <Dialog open={showInteractiveTutorial} onOpenChange={setShowInteractiveTutorial}>
-                    <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-                        <DialogHeader>
-                            <DialogTitle className="sr-only">{t('howToPlay.title')}</DialogTitle>
-                        </DialogHeader>
-                        <HowToPlay onClose={() => setShowInteractiveTutorial(false)} />
-                    </DialogContent>
-                </Dialog>
 
                 {/* How to Play Section */}
                 <motion.section
@@ -93,7 +87,7 @@ export default function RulesPage(): React.JSX.Element {
                         <CardHeader className="bg-neo-cyan/20 border-b-4 border-neo-black">
                             <CardTitle className="flex items-center gap-3 text-2xl sm:text-3xl font-black text-slate-900 dark:text-white">
                                 <FaGamepad className="text-neo-cyan" />
-                                <h2>How to Play</h2>
+                                {t('howToPlay.title')}
                             </CardTitle>
                         </CardHeader>
                         <CardContent className="p-6 space-y-6">
@@ -158,7 +152,7 @@ export default function RulesPage(): React.JSX.Element {
                         <CardHeader className="bg-neo-pink/20 border-b-4 border-neo-black">
                             <CardTitle className="flex items-center gap-3 text-2xl sm:text-3xl font-black text-slate-900 dark:text-white">
                                 <FaTrophy className="text-neo-yellow" />
-                                <h2>Scoring System</h2>
+                                {t('howToPlay.scoringSystemTitle')}
                             </CardTitle>
                         </CardHeader>
                         <CardContent className="p-6 space-y-6">
@@ -231,7 +225,7 @@ export default function RulesPage(): React.JSX.Element {
                         <CardHeader className="bg-neo-purple/20 border-b-4 border-neo-black">
                             <CardTitle className="flex items-center gap-3 text-2xl sm:text-3xl font-black text-slate-900 dark:text-white">
                                 <FaLightbulb className="text-neo-yellow" />
-                                <h2>Winning Strategies</h2>
+                                {t('howToPlay.tipsTitle')}
                             </CardTitle>
                         </CardHeader>
                         <CardContent className="p-6 space-y-6">
@@ -320,7 +314,7 @@ export default function RulesPage(): React.JSX.Element {
                         <CardHeader className="bg-neo-lime/20 border-b-4 border-neo-black">
                             <CardTitle className="flex items-center gap-3 text-2xl sm:text-3xl font-black text-slate-900 dark:text-white">
                                 <FaStar className="text-neo-yellow" />
-                                <h2>Game Features</h2>
+                                {t('howToPlay.gameFeaturesTitle')}
                             </CardTitle>
                         </CardHeader>
                         <CardContent className="p-6">
@@ -361,6 +355,32 @@ export default function RulesPage(): React.JSX.Element {
                                         Generate QR codes to instantly invite friends to your game room.
                                     </p>
                                 </div>
+                            </div>
+                        </CardContent>
+                    </Card>
+                </motion.section>
+
+                {/* Interactive Tutorial Section */}
+                <motion.section
+                    ref={tutorialRef}
+                    id="interactive-tutorial"
+                    className="mb-10 scroll-mt-24"
+                    {...fadeInUp}
+                    transition={{ delay: 0.7 }}
+                >
+                    <Card className="border-4 border-neo-black shadow-hard-lg bg-white dark:bg-slate-800">
+                        <CardHeader className="bg-neo-yellow/20 border-b-4 border-neo-black">
+                            <CardTitle className="flex items-center gap-3 text-2xl sm:text-3xl font-black text-slate-900 dark:text-white">
+                                <FaHandPointer className="text-neo-pink" />
+                                {t('footer.interactiveTutorial') || 'Interactive Tutorial'}
+                            </CardTitle>
+                        </CardHeader>
+                        <CardContent className="p-6">
+                            <p className="text-lg text-slate-700 dark:text-slate-300 leading-relaxed mb-6">
+                                {t('howToPlay.description')}
+                            </p>
+                            <div className="bg-gradient-to-br from-neo-cyan/10 to-neo-pink/10 rounded-neo border-3 border-neo-black p-4">
+                                <HowToPlay onClose={() => {}} />
                             </div>
                         </CardContent>
                     </Card>

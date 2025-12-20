@@ -347,6 +347,9 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, letterGrid, game
           potentialScore: (w as { potentialScore?: number }).potentialScore,
           invalidReason: (w as { invalidReason?: string }).invalidReason,
           aiReason: (w as { aiReason?: string }).aiReason,
+          // Include timing data for pace analysis in PlayerInsights
+          timestamp: (w as { timestamp?: number }).timestamp,
+          timeSinceStart: (w as { timeSinceStart?: number }).timeSinceStart,
         }));
       });
     }
@@ -509,7 +512,15 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, letterGrid, game
 
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-50 via-slate-100 to-slate-200 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 flex flex-col overflow-auto transition-colors duration-300 px-1 py-3 sm:px-4 sm:py-4 md:p-8">
+    <div className="min-h-screen bg-gradient-to-b from-slate-50 via-slate-100 to-slate-200 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 flex flex-col overflow-auto transition-colors duration-300 px-1 py-3 sm:px-4 sm:py-4 md:p-8 relative">
+      {/* Neo-brutalist halftone dot pattern overlay */}
+      <div
+        className="fixed inset-0 pointer-events-none opacity-10 dark:opacity-[0.08]"
+        style={{
+          backgroundImage: `radial-gradient(circle, var(--neo-black) 1px, transparent 1px)`,
+          backgroundSize: '8px 8px',
+        }}
+      />
       {/* Top Bar with Exit Button */}
       <div className="w-full max-w-4xl mx-auto flex justify-end mb-4">
         <ExitRoomButton onClick={handleExitRoom} label={t('results.exitRoom')} />

@@ -14,6 +14,8 @@ const Card = React.forwardRef<HTMLDivElement, CardProps>(
       className={cn(
         // Neo-Brutalist card styling
         "rounded-neo-lg border-4 border-neo-black bg-neo-cream text-neo-black",
+        // Dark mode - use dark background
+        "dark:bg-slate-800 dark:text-neo-white dark:border-slate-600",
         "shadow-hard-lg h-full",
         // Optional tilt for playfulness
         tilt === "left" && "rotate-[-2deg]",
@@ -78,7 +80,7 @@ const CardDescription = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <p
     ref={ref}
-    className={cn("text-sm text-neo-black/70", className)}
+    className={cn("text-sm text-neo-black/70 dark:text-neo-white/70", className)}
     {...props}
   />
 ));

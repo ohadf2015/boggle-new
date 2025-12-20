@@ -24,8 +24,9 @@ const WordValidationResponseSchema = z.object({
   confidence: z.number().min(0).max(100),
 });
 
-// Minimum confidence threshold for AI to approve a word (85%)
-const MIN_CONFIDENCE_THRESHOLD = 85;
+// Minimum confidence threshold for AI to approve a word (70%)
+// Lowered to allow abbreviations, slang, and known names
+const MIN_CONFIDENCE_THRESHOLD = 70;
 
 const ThemedWordsResponseSchema = z.array(z.string());
 
@@ -105,6 +106,103 @@ const RETRY_CONFIG = {
   baseDelayMs: 1000,
   maxDelayMs: 8000,
 };
+
+// =============================================================================
+// In-Memory LRU Cache for Word Validations
+// =============================================================================
+
+interface CacheEntry {
+  result: { isValid: boolean; reason?: string };
+  timestamp: number;
+}
+
+const VALIDATION_CACHE_CONFIG = {
+  maxSize: 5000,
+  ttlMs: 30 * 60 * 1000, // 30 minutes
+  cleanupInterval: 5 * 60 * 1000, // 5 minutes
+};
+
+/**
+ * Simple LRU cache for word validations to reduce API calls
+ */
+class WordValidationCache {
+  private cache = new Map<string, CacheEntry>();
+  private hits = 0;
+  private misses = 0;
+  private lastCleanup = Date.now();
+
+  private getKey(word: string, language: string): string {
+    return `${language}:${word.toLowerCase().trim()}`;
+  }
+
+  get(word: string, language: string): { isValid: boolean; reason?: string } | null {
+    const key = this.getKey(word, language);
+    const entry = this.cache.get(key);
+
+    if (!entry) {
+      this.misses++;
+      return null;
+    }
+
+    if (Date.now() - entry.timestamp > VALIDATION_CACHE_CONFIG.ttlMs) {
+      this.cache.delete(key);
+      this.misses++;
+      return null;
+    }
+
+    // LRU: move to end
+    this.cache.delete(key);
+    this.cache.set(key, entry);
+    this.hits++;
+
+    return entry.result;
+  }
+
+  set(word: string, language: string, result: { isValid: boolean; reason?: string }): void {
+    const key = this.getKey(word, language);
+
+    if (this.cache.size >= VALIDATION_CACHE_CONFIG.maxSize) {
+      const oldestKey = this.cache.keys().next().value;
+      if (oldestKey) this.cache.delete(oldestKey);
+    }
+
+    this.cache.set(key, { result, timestamp: Date.now() });
+    this.maybeCleanup();
+  }
+
+  private maybeCleanup(): void {
+    const now = Date.now();
+    if (now - this.lastCleanup < VALIDATION_CACHE_CONFIG.cleanupInterval) return;
+
+    this.lastCleanup = now;
+    const entries = Array.from(this.cache.entries());
+    for (const [key, entry] of entries) {
+      if (now - entry.timestamp > VALIDATION_CACHE_CONFIG.ttlMs) {
+        this.cache.delete(key);
+      }
+    }
+  }
+
+  getStats(): { size: number; hits: number; misses: number; hitRate: string } {
+    const total = this.hits + this.misses;
+    const hitRate = total > 0 ? ((this.hits / total) * 100).toFixed(1) : '0';
+    return {
+      size: this.cache.size,
+      hits: this.hits,
+      misses: this.misses,
+      hitRate: `${hitRate}%`,
+    };
+  }
+
+  clear(): void {
+    this.cache.clear();
+    this.hits = 0;
+    this.misses = 0;
+  }
+}
+
+// Global validation cache instance
+const validationCache = new WordValidationCache();
 
 // =============================================================================
 // Credential Parsing (Railway ENV-based)
@@ -273,7 +371,8 @@ class GameAIService {
         const isRetryable = this.isRetryableError(error);
 
         if (!isRetryable || attempt === RETRY_CONFIG.maxRetries - 1) {
-          console.error(`[GameAIService] ${operationName} failed after ${attempt + 1} attempts:`, error);
+          const msg = error instanceof Error ? error.message : 'Unknown error';
+          console.error(`[GameAIService] ${operationName} failed after ${attempt + 1} attempts:`, msg);
           throw error;
         }
 
@@ -353,7 +452,8 @@ class GameAIService {
       console.log('[GameAIService] Initialized successfully');
     } catch (error) {
       this.initError = error as Error;
-      console.error('[GameAIService] Initialization failed:', error);
+      const msg = error instanceof Error ? error.message : 'Unknown initialization error';
+      console.error('[GameAIService] Initialization failed:', msg);
       throw error;
     }
   }
@@ -500,44 +600,34 @@ Do NOT reject words just because they use regular letters instead of final forms
     const responseLanguageNote = `
 RESPONSE LANGUAGE: Provide the "reason" field in ${languageName}. The reason should be a brief, clear explanation in ${languageName}.`;
 
-    const prompt = `You are a word validator for a Boggle-style word game. Your task is to determine if a word is valid with a confidence score.
+    const prompt = `You are a word validator for a Boggle word game. Be FAIR but filter out gibberish.
 
 LANGUAGE: ${languageName} (${language})
-WORD TO VALIDATE: "${word}"
+WORD: "${word}"
 ${hebrewFinalLettersNote}
 VALIDATION RULES:
-1. The word must be a REAL word or name that exists in ${languageName}
-2. ACCEPT: Common dictionary words, verbs in any conjugation, nouns (singular/plural), adjectives, adverbs
-3. ACCEPT: Well-established slang that appears in dictionaries
-4. ACCEPT: Common first names (e.g., "David", "Sarah", "Mohammed") - names ARE allowed
-5. ACCEPT: Well-known place names, country names, city names (e.g., "Paris", "Japan", "London")
-6. ACCEPT: Well-known acronyms that are commonly used (e.g., "NASA", "FIFA", "NATO")
-7. REJECT: Words with spaces, hyphens, or special characters
-8. REJECT: Random letter combinations that aren't real words
-9. REJECT: Gibberish or misspellings - the word must be spelled correctly
-10. When in doubt about obscure words, reject them
+1. ACCEPT: Real words in ${languageName} dictionaries
+2. ACCEPT: Common nouns, verbs (any conjugation), adjectives, adverbs
+3. ACCEPT: Plural forms and verb conjugations
+4. ACCEPT: Well-known abbreviations and acronyms (NASA, FIFA, LOL, USA, etc.)
+5. ACCEPT: Popular and widely-recognized slang (cool, chill, vibe, etc.)
+6. ACCEPT: Famous people's names (Einstein, Shakespeare, Mozart, etc.)
+7. ACCEPT: Well-known place names (Paris, Tokyo, Amazon, etc.)
+8. ACCEPT: Common brand names that became words (xerox, google, uber, etc.)
+9. REJECT: Random letter combinations that don't mean anything
+10. REJECT: Made-up nonsense words
+11. REJECT: Obvious misspellings
+12. REJECT: Words with spaces, hyphens, apostrophes
 
-IMPORTANT SPELLING CHECK: Make sure the word is spelled correctly. Common misspellings should be REJECTED.
-
-CONFIDENCE SCORE (0-100):
-- 95-100: Absolutely certain - common, well-known word or name
-- 85-94: Very confident - established word/name, may be less common
-- 70-84: Moderately confident - possibly valid but uncertain
-- Below 70: Not confident - likely invalid, misspelled, or very obscure
-
-The word is case-insensitive (ignore capitalization).
+CONFIDENCE (0-100):
+- 95-100: Very common word or well-known term
+- 85-94: Recognized word, name, or slang
+- 70-84: Valid but less common
+- Below 70: Uncertain - REJECT
 ${responseLanguageNote}
 
-Respond with ONLY a valid JSON object in this exact format:
-{ "isValid": boolean, "reason": "brief explanation in ${languageName}", "confidence": number }
-
-Example responses for ${languageName}:
-{ "isValid": true, "reason": "${isHebrew ? 'שם עצם נפוץ' : `Common ${languageName} noun`}", "confidence": 98 }
-{ "isValid": true, "reason": "${isHebrew ? 'שם פרטי נפוץ' : 'Common first name'}", "confidence": 95 }
-{ "isValid": true, "reason": "${isHebrew ? 'ראשי תיבות ידועים' : 'Well-known acronym'}", "confidence": 96 }
-{ "isValid": false, "reason": "${isHebrew ? 'שגיאת כתיב' : 'Misspelling'}", "confidence": 92 }
-{ "isValid": false, "reason": "${isHebrew ? 'לא מילה מוכרת' : `Not a recognized ${languageName} word`}", "confidence": 88 }
-{ "isValid": false, "reason": "${isHebrew ? 'צירוף אותיות אקראי' : 'Random letter combination'}", "confidence": 95 }`;
+Respond with ONLY valid JSON (no markdown):
+{"isValid": boolean, "reason": "brief ${languageName} explanation", "confidence": number}`;
 
     try {
       const result = await this.model.generateContent(prompt);
@@ -571,7 +661,8 @@ Example responses for ${languageName}:
         console.error('[GameAIService] AI response schema validation failed:', error.issues);
         return { isValid: false, reason: 'Invalid AI response format', confidence: 0 };
       }
-      console.error('[GameAIService] AI validation error:', error);
+      const msg = error instanceof Error ? error.message : 'Unknown error';
+      console.error('[GameAIService] AI validation error:', msg);
       throw error;
     }
   }
@@ -595,44 +686,62 @@ Example responses for ${languageName}:
     word: string,
     language: string = 'en'
   ): Promise<WordValidationResult> {
-    // Ensure initialized
-    await this.initialize();
-
     // Step 1: Normalization
     const normalizedWord = word.toLowerCase().trim();
 
-    // Basic validation
-    if (!normalizedWord || normalizedWord.length < 3) {
+    // Basic validation (2 letters minimum for single player mode)
+    if (!normalizedWord || normalizedWord.length < 2) {
       return {
         isValid: false,
-        reason: 'Word must be at least 3 characters',
+        reason: 'Word must be at least 2 characters',
         source: 'database',
       };
     }
 
     try {
-      // Step 2: Fast Check - community_words (host/AI approved)
+      // Ensure initialized (inside try-catch to handle missing credentials gracefully)
+      await this.initialize();
+      // Step 2: Check in-memory cache first (fastest)
+      const cached = validationCache.get(normalizedWord, language);
+      if (cached) {
+        return {
+          ...cached,
+          source: 'database' as const, // Cache hit = no AI call
+        };
+      }
+
+      // Step 3: Fast Check - community_words (host/AI approved)
       const inCommunityWords = await this.checkCommunityWords(normalizedWord, language);
       if (inCommunityWords) {
+        const result = { isValid: true };
+        validationCache.set(normalizedWord, language, result);
         return {
           isValid: true,
           source: 'database',
         };
       }
 
-      // Step 3: Fast Check - word_scores (crowd-validated)
+      // Step 4: Fast Check - word_scores (crowd-validated)
       const inWordScores = await this.checkWordScores(normalizedWord, language);
       if (inWordScores) {
+        const result = { isValid: true };
+        validationCache.set(normalizedWord, language, result);
         return {
           isValid: true,
           source: 'database',
         };
       }
 
-      // Step 4: Slow Check (AI)
+      // Step 5: Slow Check (AI)
       const aiResult = await this.validateWithAI(normalizedWord, language);
 
-      // Step 5: Persistence (Learning Loop) - Only save valid words
+      // Cache the AI result
+      validationCache.set(normalizedWord, language, {
+        isValid: aiResult.isValid,
+        reason: aiResult.reason,
+      });
+
+      // Step 6: Persistence (Learning Loop) - Only save valid words
       if (aiResult.isValid) {
         // Fire and forget - don't block on save
         this.saveToCommunityWords(normalizedWord, language).catch((err) => {
@@ -640,22 +749,73 @@ Example responses for ${languageName}:
         });
       }
 
-      // Step 6: Return result
+      // Step 7: Return result
       return {
         isValid: aiResult.isValid,
         reason: aiResult.reason,
         source: 'ai',
       };
     } catch (error) {
+      // Safely extract error message without disturbing any Response bodies
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-      console.error('[GameAIService] validateAndSaveWord error:', error);
+      console.error('[GameAIService] validateAndSaveWord error:', errorMessage);
 
       return {
         isValid: false,
-        reason: 'Validation failed',
+        reason: 'Validation service unavailable',
         source: 'ai',
         error: errorMessage,
       };
+    }
+  }
+
+  /**
+   * Fast check: Only check cache and database, NO AI call.
+   * Used during gameplay for instant validation like multiplayer's dictionary check.
+   * Words not found in cache/database are marked as 'unknown' for AI validation at game end.
+   *
+   * @param word - The word to check
+   * @param language - Language code
+   * @returns { isValid: true/false, source: 'database'|'unknown' }
+   */
+  async checkDatabaseOnly(
+    word: string,
+    language: string = 'en'
+  ): Promise<{ isValid: boolean; source: 'database' | 'unknown' }> {
+    const normalizedWord = word.toLowerCase().trim();
+
+    if (!normalizedWord || normalizedWord.length < 2) {
+      return { isValid: false, source: 'database' };
+    }
+
+    try {
+      await this.initialize();
+
+      // Check in-memory cache first (fastest)
+      const cached = validationCache.get(normalizedWord, language);
+      if (cached) {
+        return { isValid: cached.isValid, source: 'database' };
+      }
+
+      // Check community_words (host/AI approved)
+      const inCommunityWords = await this.checkCommunityWords(normalizedWord, language);
+      if (inCommunityWords) {
+        validationCache.set(normalizedWord, language, { isValid: true });
+        return { isValid: true, source: 'database' };
+      }
+
+      // Check word_scores (crowd-validated)
+      const inWordScores = await this.checkWordScores(normalizedWord, language);
+      if (inWordScores) {
+        validationCache.set(normalizedWord, language, { isValid: true });
+        return { isValid: true, source: 'database' };
+      }
+
+      // Not in database - needs AI validation at game end
+      return { isValid: false, source: 'unknown' };
+    } catch (error) {
+      console.error('[GameAIService] checkDatabaseOnly error:', error);
+      return { isValid: false, source: 'unknown' };
     }
   }
 
@@ -979,12 +1139,31 @@ Respond JSON only: {"hint":"your hint","difficulty":"${hintLevel === 1 ? 'easy' 
     vertexAI: boolean;
     supabase: boolean;
     error: string | null;
+    tokenUsage: TokenUsageStats;
+    cacheStats: { size: number; hits: number; misses: number; hitRate: string };
   } {
     return {
       vertexAI: this.vertexAI !== null,
       supabase: this.supabaseAdmin !== null,
       error: this.initError?.message || null,
+      tokenUsage: this.getTokenUsage(),
+      cacheStats: validationCache.getStats(),
     };
+  }
+
+  /**
+   * Get validation cache statistics
+   */
+  getCacheStats(): { size: number; hits: number; misses: number; hitRate: string } {
+    return validationCache.getStats();
+  }
+
+  /**
+   * Clear the validation cache
+   */
+  clearValidationCache(): void {
+    validationCache.clear();
+    console.log('[GameAIService] Validation cache cleared');
   }
 }
 

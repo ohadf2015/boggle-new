@@ -135,7 +135,10 @@ const calculateGameScores = (game, wordCountMap = {}, dictionaryValidatedWords =
         isUnique,
         isDuplicate: !isUnique, // Frontend expects isDuplicate (inverse of isUnique)
         comboBonus: existingDetails?.comboBonus || 0,
-        isAiVerified
+        isAiVerified,
+        // Include timestamp for pace analysis in PlayerInsights
+        timestamp: existingDetails?.timestamp || null,
+        timeSinceStart: existingDetails?.timeSinceStart || null
       };
 
       // Only add aiReason if present (for invalid AI-verified words or valid ones with explanation)

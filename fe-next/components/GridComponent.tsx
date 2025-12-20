@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect, memo } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { cn } from '../lib/utils';
 import type { LetterGrid, GridPosition } from '@/types';
 
@@ -9,6 +9,7 @@ import {
   getHeatMapStyle,
   useGridInteraction,
   getPerformanceMode,
+  ComboIndicator,
   type SelectedCell,
   type HeatMapData,
   type PerformanceMode,
@@ -100,62 +101,8 @@ const GridComponent = memo<GridComponentProps>(({
 
   return (
     <div className="relative w-full h-full flex items-center justify-center bg-slate-900">
-      {/* Combo Indicator - Jumps through screen like GO animation */}
-      <AnimatePresence mode="wait">
-        {comboLevel > 0 && comboColors.text && (
-          <motion.div
-            key={`combo-${comboLevel}`}
-            initial={{ scale: 0, opacity: 0, x: '-50%', y: '-50%' }}
-            animate={{
-              scale: [0, 1.5, 1.2],
-              opacity: comboColors.flicker ? [0, 1, 0.7, 1, 0.8, 1, 0] : [0, 1, 0],
-              x: ['-50%', '-50%', '-50%'],
-              y: ['-50%', '-50%', '-150%']
-            }}
-            exit={{
-              scale: 0,
-              opacity: 0,
-              transition: { duration: 0.1 }
-            }}
-            transition={{
-              duration: comboColors.flicker ? 1.2 : 0.8,
-              times: comboColors.flicker ? [0, 0.2, 0.3, 0.5, 0.7, 0.9, 1] : [0, 0.4, 1],
-              ease: "easeOut"
-            }}
-            className="fixed top-1/2 left-1/2 z-50 pointer-events-none"
-            style={{ transform: 'translate(-50%, -50%)' }}
-          >
-            <motion.div
-              className={cn(
-                "px-6 py-3 rounded-full font-extrabold text-3xl md:text-4xl text-white backdrop-blur-sm",
-                !comboColors.isRainbow && `bg-gradient-to-r`,
-                comboColors.shadow,
-                "border-4 border-white/40"
-              )}
-              animate={comboColors.flicker ? {
-                backgroundPosition: ['0% 50%', '100% 50%', '0% 50%'],
-              } : {}}
-              transition={comboColors.flicker ? {
-                duration: 1,
-                repeat: Infinity,
-                ease: "linear"
-              } : {}}
-              style={{
-                filter: comboColors.isRainbow
-                  ? 'drop-shadow(0 0 30px rgba(255, 255, 255, 1))'
-                  : 'drop-shadow(0 0 20px rgba(251, 146, 60, 0.8))',
-                ...(comboColors.isRainbow && {
-                  background: 'linear-gradient(90deg, #ef4444, #f97316, #eab308, #22c55e, #06b6d4, #3b82f6, #8b5cf6, #ec4899, #ef4444)',
-                  backgroundSize: '300% 100%',
-                  animation: 'rainbow-shift 1.5s linear infinite'
-                })
-              }}
-            >
-              {comboColors.isRainbow ? '🌈' : '🔥'} {comboColors.text}
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      {/* Combo Indicator - New juicy animation with particles and glow */}
+      <ComboIndicator comboLevel={comboLevel} reduceMotion={reduceMotion} />
 
       {/* NEO-BRUTALIST: Clean frame wrapper */}
       <div className="game-board-frame relative">
@@ -209,22 +156,21 @@ const GridComponent = memo<GridComponentProps>(({
                     : false
                   }
                   animate={{
-                    scale: isSelected ? 1.08 : (isFading ? 1.04 : 1),
+                    scale: isSelected ? 1.05 : (isFading ? 1.02 : 1),
                     opacity: 1,
-                    rotate: reduceMotion ? 0 : ((isSelected || isFading) ? [0, -5, 5, 0] : 0),
+                    rotate: reduceMotion ? 0 : (isSelected ? [0, -1.5, 1.5, 0] : 0),
                     rotateX: 0,
-                    y: isSelected ? -2 : 0
+                    y: isSelected ? -2 : 0,
                   }}
                   whileTap={{ scale: 0.95 }}
                   transition={{
                     duration: reduceMotion
-                      ? 0.1
+                      ? 0.08
                       : (animateOnMount && !isSelected
-                        ? 0.5
-                        : (isSelected ? 0.12 : 0.15)),
-                    ease: animateOnMount ? [0.34, 1.56, 0.64, 1] : "easeOut",
-                    delay: reduceMotion ? 0 : (animateOnMount ? (i + j) * 0.04 : 0),
-                    scale: isSelected ? { type: "spring", stiffness: reduceMotion ? 200 : 350, damping: reduceMotion ? 30 : 22 } : undefined
+                        ? 0.4
+                        : (isSelected ? 0.15 : 0.12)),
+                    ease: "easeInOut",
+                    delay: reduceMotion ? 0 : (animateOnMount ? (i + j) * 0.03 : 0),
                   }}
                   className={cn(
                     "aspect-square flex items-center justify-center font-black cursor-pointer relative overflow-hidden",
@@ -238,75 +184,124 @@ const GridComponent = memo<GridComponentProps>(({
                     comboLevel > 0 ? "duration-300" : "duration-100"
                   )}
                   style={{
-                    borderRadius: '4px',
+                    borderRadius: '6px',
                     fontSize: 'var(--cell-font-size)',
+                    // Dynamic glow based on combo level
+                    ...(isSelected && {
+                      boxShadow: comboColors.isRainbow
+                        ? '0 0 20px rgba(255, 51, 102, 0.6), 0 0 40px rgba(0, 255, 255, 0.4), 6px 6px 0 #000'
+                        : comboLevel >= 5
+                        ? '0 0 15px rgba(255, 107, 53, 0.7), 0 0 30px rgba(255, 51, 102, 0.4), 5px 5px 0 #000'
+                        : comboLevel >= 3
+                        ? '0 0 12px rgba(255, 107, 53, 0.5), 4px 4px 0 #000'
+                        : '0 0 8px rgba(255, 200, 100, 0.4), 4px 4px 0 #000',
+                    }),
                     ...(isSelected && comboColors.isRainbow ? {
-                      background: 'linear-gradient(135deg, #FF3366, #FF6B35, #FFE135, #BFFF00, #00FFFF, #FF1493, #4a1c6a)',
-                      backgroundSize: '400% 400%',
+                      background: 'linear-gradient(135deg, #FF3366, #FF6B35, #FFE135, #BFFF00, #00FFFF, #FF1493, #8B5CF6)',
+                      backgroundSize: '300% 300%',
                       animation: comboColors.strobe
-                        ? (comboColors.intenseStrobe ? 'rainbow-cell 0.8s ease infinite, strobe-intense 0.12s infinite alternate' : 'rainbow-cell 1.2s ease infinite, strobe-light 0.2s infinite alternate')
-                        : 'rainbow-cell 1.5s ease infinite'
+                        ? (comboColors.intenseStrobe
+                          ? 'rainbow-cell 0.6s ease infinite, strobe-intense 0.1s infinite alternate'
+                          : 'rainbow-cell 1s ease infinite, strobe-light 0.15s infinite alternate')
+                        : 'rainbow-cell 1.2s ease infinite'
+                    } : isSelected && comboLevel >= 5 ? {
+                      background: 'linear-gradient(135deg, #FF6B35, #FF3366, #FF6B35)',
+                      backgroundSize: '200% 200%',
+                      animation: 'gradient-x 1.5s ease infinite'
+                    } : isSelected && comboLevel >= 3 ? {
+                      background: 'linear-gradient(135deg, #F97316, #EF4444)',
                     } : isSelected && comboColors.flicker ? {
-                      animation: 'flicker 0.12s infinite alternate'
+                      animation: 'flicker 0.1s infinite alternate'
                     } : {})
                   }}
                 >
                   {/* Ripple effect on selection */}
                   {isSelected && (
                     <>
+                      {/* Primary ripple */}
                       <motion.div
-                        className="absolute inset-0 bg-white/40"
-                        style={{ borderRadius: '8px' }}
-                        initial={{ scale: 0.5, opacity: 0.8 }}
+                        className="absolute inset-0"
+                        style={{
+                          borderRadius: '6px',
+                          background: comboLevel >= 5
+                            ? 'radial-gradient(circle, rgba(255,107,53,0.5), transparent 70%)'
+                            : 'radial-gradient(circle, rgba(255,255,255,0.5), transparent 70%)',
+                        }}
+                        initial={{ scale: 0.3, opacity: 1 }}
                         animate={{ scale: 2.5, opacity: 0 }}
-                        transition={{ duration: 0.4, ease: "easeOut" }}
+                        transition={{ duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] }}
                       />
+                      {/* Secondary glow pulse */}
                       <motion.div
                         className="absolute inset-0 pointer-events-none"
                         style={{
-                          background: 'radial-gradient(circle at center, rgba(255, 255, 255, 0.9), transparent 70%)',
-                          filter: 'blur(2px)',
-                          borderRadius: '8px'
+                          background: comboColors.isRainbow
+                            ? 'radial-gradient(circle at center, rgba(255, 51, 102, 0.8), rgba(0, 255, 255, 0.4) 50%, transparent 70%)'
+                            : 'radial-gradient(circle at center, rgba(255, 255, 255, 0.9), transparent 60%)',
+                          filter: 'blur(3px)',
+                          borderRadius: '6px'
                         }}
                         initial={{ scale: 0, opacity: 1 }}
-                        animate={{ scale: [0, 1.5, 0], opacity: [1, 0.5, 0] }}
-                        transition={{ duration: 0.5, ease: "easeOut" }}
+                        animate={{ scale: [0, 1.3, 1.5], opacity: [1, 0.6, 0] }}
+                        transition={{ duration: 0.6, ease: [0.25, 0.46, 0.45, 0.94] }}
                       />
+                      {/* Combo level glow ring */}
+                      {comboLevel >= 3 && !reduceMotion && (
+                        <motion.div
+                          className="absolute inset-[-4px] pointer-events-none"
+                          style={{
+                            borderRadius: '10px',
+                            border: comboColors.isRainbow
+                              ? '2px solid rgba(255, 51, 102, 0.8)'
+                              : '2px solid rgba(255, 107, 53, 0.6)',
+                            boxShadow: comboColors.isRainbow
+                              ? '0 0 10px rgba(255, 51, 102, 0.5), inset 0 0 10px rgba(0, 255, 255, 0.3)'
+                              : '0 0 8px rgba(255, 107, 53, 0.4)',
+                          }}
+                          initial={{ scale: 0.8, opacity: 0 }}
+                          animate={{ scale: [0.9, 1.1, 1], opacity: [0, 1, 0.6] }}
+                          transition={{ duration: 0.4, ease: 'easeOut' }}
+                        />
+                      )}
 
-                      {/* Fire effects - performance optimized */}
+                      {/* Sparkle burst - first letter gets extra flair */}
                       {isFirstSelected && !reduceMotion && performanceMode !== 'minimal' && (
                         <>
-                          {[...Array(performanceMode === 'full' ? 8 : 4)].map((_, idx) => {
-                            const particleCount = performanceMode === 'full' ? 8 : 4;
-                            const angle = (idx * (360 / particleCount)) * (Math.PI / 180);
-                            const distance = 25 + (idx % 2) * 5;
+                          {[...Array(performanceMode === 'full' ? 10 : 6)].map((_, idx) => {
+                            const particleCount = performanceMode === 'full' ? 10 : 6;
+                            const angle = (idx * (360 / particleCount) + (idx % 2) * 15) * (Math.PI / 180);
+                            const distance = 28 + (idx % 3) * 8;
+                            const colors = comboColors.isRainbow
+                              ? ['#FF3366', '#FFE135', '#00FFFF', '#FF1493', '#BFFF00']
+                              : ['#FFD700', '#FF6B35', '#FF3366', '#FFA500'];
                             return (
                               <motion.div
                                 key={`first-burst-${idx}`}
-                                className="absolute w-3 h-3 rounded-full pointer-events-none"
+                                className="absolute pointer-events-none"
                                 style={{
-                                  background: idx % 3 === 0
-                                    ? 'radial-gradient(circle, #ffff00, #ff6b00)'
-                                    : idx % 3 === 1
-                                    ? 'radial-gradient(circle, #ff6b00, #ff0000)'
-                                    : 'radial-gradient(circle, #ff9500, #ff5500)',
+                                  width: 6 + (idx % 2) * 2,
+                                  height: 6 + (idx % 2) * 2,
+                                  background: colors[idx % colors.length],
+                                  borderRadius: idx % 2 === 0 ? '50%' : '2px',
                                   left: '50%',
                                   top: '50%',
-                                  marginLeft: '-6px',
-                                  marginTop: '-6px',
-                                  boxShadow: performanceMode === 'full' ? '0 0 8px rgba(255, 107, 0, 0.8)' : 'none'
+                                  marginLeft: -3 - (idx % 2),
+                                  marginTop: -3 - (idx % 2),
+                                  boxShadow: `0 0 6px ${colors[idx % colors.length]}`,
+                                  transform: `rotate(${idx * 45}deg)`,
                                 }}
                                 initial={{ scale: 0, opacity: 1, x: 0, y: 0 }}
                                 animate={{
-                                  scale: [1, 2, 0],
-                                  opacity: [1, 0.9, 0],
+                                  scale: [0, 1.5, 1, 0],
+                                  opacity: [0, 1, 0.8, 0],
                                   x: Math.cos(angle) * distance,
-                                  y: Math.sin(angle) * distance
+                                  y: Math.sin(angle) * distance,
+                                  rotate: [0, 180, 360],
                                 }}
                                 transition={{
-                                  duration: 0.6,
-                                  ease: "easeOut",
-                                  delay: idx * 0.02
+                                  duration: 0.5,
+                                  ease: [0.25, 0.46, 0.45, 0.94],
+                                  delay: idx * 0.025
                                 }}
                               />
                             );
@@ -314,36 +309,44 @@ const GridComponent = memo<GridComponentProps>(({
                         </>
                       )}
 
-                      {/* Center burst particles */}
+                      {/* Center burst particles - scale with combo */}
                       {!reduceMotion && performanceMode !== 'minimal' && (
                         <>
-                          {[...Array(performanceMode === 'full' ? 6 : 4)].map((_, idx) => {
-                            const count = performanceMode === 'full' ? 6 : 4;
-                            const angle = (idx * (360 / count)) * (Math.PI / 180);
-                            const distance = 15 + (comboLevel * 3);
+                          {[...Array(performanceMode === 'full' ? 8 : 5)].map((_, idx) => {
+                            const count = performanceMode === 'full' ? 8 : 5;
+                            const angle = (idx * (360 / count) + 22.5) * (Math.PI / 180);
+                            const distance = 12 + Math.min(comboLevel * 2.5, 20);
+                            const particleColor = comboColors.isRainbow
+                              ? ['#FF1493', '#00FFFF', '#FFE135'][idx % 3]
+                              : comboLevel >= 5
+                              ? '#FF3366'
+                              : comboLevel >= 3
+                              ? '#FF6B35'
+                              : '#FFA500';
                             return (
                               <motion.div
                                 key={`burst-${idx}`}
-                                className="absolute w-2 h-2 rounded-full pointer-events-none"
+                                className="absolute rounded-full pointer-events-none"
                                 style={{
-                                  background: comboLevel > 0
-                                    ? 'radial-gradient(circle, #ff6b00, #ff0000)'
-                                    : 'radial-gradient(circle, #fbbf24, #f97316)',
+                                  width: 5,
+                                  height: 5,
+                                  background: particleColor,
                                   left: '50%',
                                   top: '50%',
-                                  marginLeft: '-4px',
-                                  marginTop: '-4px'
+                                  marginLeft: -2.5,
+                                  marginTop: -2.5,
+                                  boxShadow: `0 0 4px ${particleColor}`,
                                 }}
                                 initial={{ scale: 0, opacity: 1, x: 0, y: 0 }}
                                 animate={{
-                                  scale: [0.5, 1.5, 0],
-                                  opacity: [1, 0.8, 0],
+                                  scale: [0, 1.2, 0.8, 0],
+                                  opacity: [0, 1, 0.7, 0],
                                   x: Math.cos(angle) * distance,
                                   y: Math.sin(angle) * distance
                                 }}
                                 transition={{
                                   duration: 0.4,
-                                  ease: "easeOut",
+                                  ease: [0.25, 0.46, 0.45, 0.94],
                                   delay: idx * 0.02
                                 }}
                               />

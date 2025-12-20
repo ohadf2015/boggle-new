@@ -73,15 +73,17 @@ const HostWaitingResultsView: React.FC<HostWaitingResultsViewProps> = ({
     <div className="min-h-screen bg-neo-cream dark:bg-slate-900 p-3 sm:p-4 md:p-8 flex flex-col transition-colors duration-300">
 
       {/* Exit Button */}
-      <div className="w-full max-w-2xl lg:max-w-4xl xl:max-w-5xl mx-auto flex justify-end mb-4 relative z-50">
+      <div className="w-full flex justify-end mb-4 relative z-50">
         <ExitRoomButton onClick={onExitRoom} label={t('hostView.exitRoom')} />
       </div>
 
-      {/* Centered Content */}
-      <div className="flex-1 flex items-center justify-center">
-        <div className="max-w-2xl lg:max-w-4xl xl:max-w-5xl w-full space-y-4 sm:space-y-6 md:space-y-8">
-          {/* Waiting for Results Message - Fixed height container to prevent CLS */}
-          <motion.div
+      {/* Centered Content - full width on desktop */}
+      <div className="flex-1 flex items-start lg:items-center justify-center py-4">
+        <div className="w-full grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6 xl:gap-8">
+          {/* Left column: Validation status + Leaderboard */}
+          <div className="space-y-4 sm:space-y-6">
+            {/* Waiting for Results Message - Fixed height container to prevent CLS */}
+            <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.3 }}
@@ -139,11 +141,11 @@ const HostWaitingResultsView: React.FC<HostWaitingResultsViewProps> = ({
               <div className="bg-neo-cream border-4 border-neo-black shadow-hard-lg overflow-hidden">
                 <div className="py-3 px-4 border-b-4 border-neo-black bg-neo-purple">
                   <h3 className="flex items-center gap-2 text-neo-white text-xl uppercase tracking-wider font-black">
-                    <FaTrophy className="text-neo-yellow" style={{ filter: 'drop-shadow(2px 2px 0px var(--neo-black))' }} />
+                    <FaTrophy className="text-neo-yellow" style={{ filter: 'drop-shadow(2px 2px 0px rgb(var(--neo-black)))' }} />
                     {t('playerView.leaderboard') || 'Leaderboard'}
                   </h3>
                 </div>
-                <div className="p-3 space-y-2 max-h-[250px] sm:max-h-[300px] md:max-h-[400px] overflow-y-auto">
+                <div className="p-2 lg:p-3 space-y-2 max-h-[200px] sm:max-h-[250px] lg:max-h-[350px] xl:max-h-[400px] overflow-y-auto">
                   {leaderboard.map((player, index) => {
                     const isMe = player.username === username;
                     // Track if this player has already been animated
@@ -199,18 +201,20 @@ const HostWaitingResultsView: React.FC<HostWaitingResultsViewProps> = ({
               </div>
             </motion.div>
           )}
+          </div>
 
-          {/* Chat Section */}
+          {/* Right column: Chat Section */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.3, delay: 0.2 }}
+            className="lg:h-full"
           >
             <RoomChat
               username={username}
               isHost={true}
               gameCode={gameCode}
-              className="min-h-[300px]"
+              className="min-h-[250px] lg:min-h-[400px] xl:min-h-[500px] lg:h-full"
             />
           </motion.div>
         </div>

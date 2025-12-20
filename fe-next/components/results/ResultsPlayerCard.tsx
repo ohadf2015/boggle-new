@@ -93,6 +93,9 @@ interface WordObject {
   potentialScore?: number;
   invalidReason?: string;
   aiReason?: string; // AI's reason for validating/invalidating the word
+  // Timestamp for pace analysis in PlayerInsights
+  timestamp?: number;
+  timeSinceStart?: number;
 }
 
 interface Title {
@@ -457,7 +460,25 @@ const ResultsPlayerCard: React.FC<ResultsPlayerCardProps> = ({ player, index, al
     if (!isCurrentPlayer || !player.allWords || player.allWords.length === 0) {
       return null;
     }
-    return calculatePlayerInsights(player.allWords, 180, player.score);
+
+    // Calculate effective game duration from word timing data
+    // Use the maximum timeSinceStart as a proxy for game duration
+    // This is more accurate than a fixed value since it reflects actual play time
+    let gameDuration = 180; // Default fallback
+    const timeSinceStartValues = player.allWords
+      .map(w => w.timeSinceStart)
+      .filter((t): t is number => typeof t === 'number' && t > 0);
+
+    if (timeSinceStartValues.length > 0) {
+      const maxTimeSinceStart = Math.max(...timeSinceStartValues);
+      // Round up to nearest 30 seconds to get a reasonable game duration estimate
+      // Add a small buffer (10 seconds) since last word might not be at the very end
+      gameDuration = Math.ceil((maxTimeSinceStart + 10) / 30) * 30;
+      // Ensure minimum of 60 seconds for pace calculation
+      gameDuration = Math.max(gameDuration, 60);
+    }
+
+    return calculatePlayerInsights(player.allWords, gameDuration, player.score);
   }, [isCurrentPlayer, player.allWords, player.score]);
 
   // Filter out lifetime achievements and validate against player's actual round stats

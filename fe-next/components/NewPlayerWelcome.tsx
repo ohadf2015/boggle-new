@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { FaGamepad, FaPlay, FaTimes, FaStar, FaFire, FaTrophy } from 'react-icons/fa';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogBody, DialogFooter } from './ui/dialog';
@@ -26,7 +27,7 @@ export const markTutorialSeen = (): void => {
 interface NewPlayerWelcomeProps {
   isOpen: boolean;
   onClose: () => void;
-  onShowTutorial: () => void;
+  rulesPageUrl: string;
 }
 
 interface FeatureItem {
@@ -42,20 +43,20 @@ interface FeatureItem {
 const NewPlayerWelcome: React.FC<NewPlayerWelcomeProps> = ({
   isOpen,
   onClose,
-  onShowTutorial,
+  rulesPageUrl,
 }): React.ReactElement => {
   const { t, dir } = useLanguage();
   const [dontShowAgain, setDontShowAgain] = useState<boolean>(false);
+
+  const handleSkip = (): void => {
+    markTutorialSeen();
+    onClose();
+  };
 
   const handleShowTutorial = (): void => {
     if (dontShowAgain) {
       markTutorialSeen();
     }
-    onShowTutorial();
-  };
-
-  const handleSkip = (): void => {
-    markTutorialSeen();
     onClose();
   };
 
@@ -162,14 +163,15 @@ const NewPlayerWelcome: React.FC<NewPlayerWelcomeProps> = ({
             <FaTimes className={`${dir === 'rtl' ? 'ml-2' : 'mr-2'}`} />
             {t('howToPlay.newPlayer.skipTutorial')}
           </Button>
-          <Button
-            variant="outline"
-            onClick={handleShowTutorial}
-            className="bg-neo-lime flex-1 text-sm sm:text-base"
-          >
-            <FaPlay className={`${dir === 'rtl' ? 'ml-2' : 'mr-2'}`} />
-            {t('howToPlay.newPlayer.showTutorial')}
-          </Button>
+          <Link href={rulesPageUrl} onClick={handleShowTutorial} className="flex-1">
+            <Button
+              variant="outline"
+              className="bg-neo-lime w-full text-sm sm:text-base"
+            >
+              <FaPlay className={`${dir === 'rtl' ? 'ml-2' : 'mr-2'}`} />
+              {t('howToPlay.newPlayer.showTutorial')}
+            </Button>
+          </Link>
         </DialogFooter>
       </DialogContent>
     </Dialog>

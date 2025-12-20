@@ -9,3 +9,4 @@ export { getHeatMapStyle } from './heatMap';
 export type { HeatMapStyle } from './heatMap';
 export { useGridInteraction } from './useGridInteraction';
 export { getPerformanceMode } from './performanceUtils';
+export { default as ComboIndicator } from './ComboIndicator';

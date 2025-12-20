@@ -189,15 +189,3 @@ export const createFocusTrap = (element: HTMLElement | null): (() => void) => {
     element.removeEventListener('keydown', handleTabKey);
   };
 };
-
-/**
- * Skip to main content link helper
- * @param mainContentId - ID of main content element
- */
-export const skipToMainContent = (mainContentId: string = 'main-content'): void => {
-  const mainContent = document.getElementById(mainContentId);
-  if (mainContent) {
-    mainContent.focus();
-    mainContent.scrollIntoView();
-  }
-};

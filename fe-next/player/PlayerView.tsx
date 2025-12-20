@@ -20,6 +20,7 @@ import PlayerInGameView from './components/PlayerInGameView';
 
 // Custom hooks
 import usePlayerSocketEvents from './hooks/usePlayerSocketEvents';
+import { resetComboState } from '@/shared/utils/comboUtils';
 
 // ==========================================
 // Type Definitions
@@ -359,22 +360,6 @@ const PlayerView: React.FC<PlayerViewProps> = memo(({
     }
   }, [pendingGameStart, socket, onGameStartConsumed, fadeToTrack, TRACKS]);
 
-  // Prevent accidental page refresh
-  useEffect(() => {
-    const shouldWarn = gameActive || foundWords.length > 0 || waitingForResults;
-    if (!shouldWarn) return;
-
-    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
-      if (intentionalExitRef.current) return;
-      e.preventDefault();
-      e.returnValue = '';
-      return '';
-    };
-
-    window.addEventListener('beforeunload', handleBeforeUnload);
-    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
-  }, [gameActive, foundWords.length, waitingForResults]);
-
   // Exit handlers
   const handleExitRoom = useCallback((e?: React.MouseEvent) => {
     if (e) {
@@ -414,6 +399,14 @@ const PlayerView: React.FC<PlayerViewProps> = memo(({
   // Word submission handler
   const handleWordSubmit = useCallback((formedWord: string) => {
     setFoundWords(prev => [...prev, { word: formedWord, isValid: null }]);
+  }, []);
+
+  // Reset combo handler (for client-side duplicate detection)
+  const handleResetCombo = useCallback(() => {
+    resetComboState(
+      { comboLevelRef, lastWordTimeRef, comboTimeoutRef },
+      { setComboLevel, setLastWordTime }
+    );
   }, []);
 
   // Render appropriate view
@@ -509,6 +502,7 @@ const PlayerView: React.FC<PlayerViewProps> = memo(({
         onConfirmExit={confirmExitRoom}
         onWordSubmit={handleWordSubmit}
         setWord={setWord}
+        onResetCombo={handleResetCombo}
         hints={hints}
       />
     </>

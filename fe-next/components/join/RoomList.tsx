@@ -224,7 +224,7 @@ const EmptyRoomsState: React.FC<EmptyRoomsStateProps> = ({
       <FaGamepad size={48} className="text-neo-cream/30" />
     </div>
     <div>
-      <p className="text-base font-bold uppercase text-black">{t('joinView.noRooms')}</p>
+      <p className="text-base font-bold uppercase">{t('joinView.noRooms')}</p>
     </div>
   </div>
 );

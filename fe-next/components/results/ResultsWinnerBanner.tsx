@@ -103,7 +103,7 @@ const ResultsWinnerBanner: React.FC<ResultsWinnerBannerProps> = ({ winner, isCur
                 <FaCrown
                   className="text-5xl sm:text-6xl md:text-7xl text-neo-yellow"
                   style={{
-                    filter: 'drop-shadow(3px 3px 0px var(--neo-black))',
+                    filter: 'drop-shadow(3px 3px 0px rgb(var(--neo-black)))',
                   }}
                 />
               </div>
@@ -120,7 +120,7 @@ const ResultsWinnerBanner: React.FC<ResultsWinnerBannerProps> = ({ winner, isCur
             >
               <span
                 className="inline-block bg-neo-pink text-neo-cream text-2xl sm:text-3xl md:text-4xl font-black uppercase px-4 py-2 border-4 border-neo-black rounded-neo shadow-hard"
-                style={{ textShadow: '2px 2px 0px var(--neo-black)' }}
+                style={{ textShadow: '2px 2px 0px rgb(var(--neo-black))' }}
               >
                 {t('results.youWon')}
               </span>
@@ -235,7 +235,7 @@ const ResultsWinnerBanner: React.FC<ResultsWinnerBannerProps> = ({ winner, isCur
                   transition-shadow
                   cursor-pointer
                 "
-                style={{ textShadow: '1px 1px 0px var(--neo-black)' }}
+                style={{ textShadow: '1px 1px 0px rgb(var(--neo-black))' }}
               >
                 <motion.span
                   animate={{

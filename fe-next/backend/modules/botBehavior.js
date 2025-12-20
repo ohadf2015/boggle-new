@@ -327,6 +327,9 @@ async function prepareBotWords(bot, grid, language) {
   bot.currentWordIndex = 0;
   bot.score = 0;
   bot.comboLevel = 0;
+  // Reset burst mode state for clean start each game
+  bot.inBurstMode = false;
+  bot.burstWordsRemaining = 0;
 
   logger.debug('BOT', `Bot "${bot.username}" prepared ${wordPool.length} words to find`);
 }

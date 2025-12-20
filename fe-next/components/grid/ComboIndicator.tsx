@@ -1,0 +1,360 @@
+'use client';
+
+import React, { useEffect, useState, useMemo } from 'react';
+import { motion, AnimatePresence, useAnimation } from 'framer-motion';
+import { cn } from '../../lib/utils';
+import { getComboColors } from './comboColors';
+
+interface ComboIndicatorProps {
+  comboLevel: number;
+  reduceMotion?: boolean;
+}
+
+// Total animation duration - badge shows then auto-dismisses
+const TOTAL_DURATION = 2800; // ms - visible long enough to appreciate
+const ENTRANCE_DURATION = 0.3; // seconds - quick pop in
+const VISIBLE_DURATION = 1400; // ms - hold time at full visibility
+const EXIT_DURATION = 0.2; // seconds - fast exit
+
+// Sparkle particle component
+const Sparkle: React.FC<{
+  delay: number;
+  angle: number;
+  distance: number;
+  color: string;
+  size?: number;
+}> = ({ delay, angle, distance, color, size = 8 }) => (
+  <motion.div
+    className="absolute pointer-events-none"
+    style={{
+      width: size,
+      height: size,
+      left: '50%',
+      top: '50%',
+      marginLeft: -size / 2,
+      marginTop: -size / 2,
+    }}
+    initial={{ scale: 0, opacity: 0, x: 0, y: 0, rotate: 0 }}
+    animate={{
+      scale: [0, 1.2, 0.8, 0],
+      opacity: [0, 1, 0.6, 0],
+      x: Math.cos(angle) * distance,
+      y: Math.sin(angle) * distance,
+      rotate: [0, 180, 360],
+    }}
+    transition={{
+      duration: 0.6, // Match longer timing
+      delay,
+      ease: [0.25, 0.46, 0.45, 0.94],
+    }}
+  >
+    <svg viewBox="0 0 24 24" fill={color} className="w-full h-full drop-shadow-lg">
+      <path d="M12 0L14.59 9.41L24 12L14.59 14.59L12 24L9.41 14.59L0 12L9.41 9.41L12 0Z" />
+    </svg>
+  </motion.div>
+);
+
+// Confetti particle for high combos
+const Confetti: React.FC<{
+  delay: number;
+  startX: number;
+  color: string;
+}> = ({ delay, startX, color }) => (
+  <motion.div
+    className="absolute w-2 h-3 pointer-events-none"
+    style={{
+      left: '50%',
+      top: '50%',
+      marginLeft: startX,
+      backgroundColor: color,
+      borderRadius: 2,
+    }}
+    initial={{ y: 0, x: 0, rotate: 0, opacity: 1 }}
+    animate={{
+      y: [-10, -50, -30],
+      x: [0, startX * 1.5, startX * 2],
+      rotate: [0, 360, 540],
+      opacity: [1, 0.8, 0],
+    }}
+    transition={{
+      duration: 0.7, // Match longer timing
+      delay,
+      ease: 'easeOut',
+    }}
+  />
+);
+
+// Glow ring component - synced with badge timing
+const GlowRing: React.FC<{
+  delay: number;
+  color: string;
+  scale?: number;
+}> = ({ delay, color, scale = 2 }) => (
+  <motion.div
+    className="absolute rounded-full pointer-events-none"
+    style={{
+      width: 120,
+      height: 60,
+      left: '50%',
+      top: '50%',
+      marginLeft: -60,
+      marginTop: -30,
+      border: `2px solid ${color}`,
+      boxShadow: `0 0 15px ${color}, 0 0 30px ${color}`,
+    }}
+    initial={{ scale: 0.5, opacity: 0 }}
+    animate={{
+      scale: [0.5, scale],
+      opacity: [0.8, 0],
+    }}
+    transition={{
+      duration: 0.5, // Slightly longer to match new timing
+      delay,
+      ease: 'easeOut',
+    }}
+  />
+);
+
+const ComboIndicator: React.FC<ComboIndicatorProps> = ({
+  comboLevel,
+  reduceMotion = false,
+}) => {
+  const comboColors = getComboColors(comboLevel);
+  const controls = useAnimation();
+  const [visibleCombo, setVisibleCombo] = useState<number | null>(null);
+  const [animationKey, setAnimationKey] = useState(0);
+
+  // Memoize random values for sparkles to prevent recalculation
+  const sparkleData = useMemo(() => {
+    const isHighCombo = comboLevel >= 5;
+    const count = isHighCombo ? 12 : 6;
+    return [...Array(count)].map((_, i) => ({
+      angle: (i * (360 / count) + (Math.random() - 0.5) * 30) * (Math.PI / 180),
+      distance: 50 + Math.random() * 30,
+    }));
+  }, [comboLevel, animationKey]);
+
+  // Show combo indicator and auto-dismiss
+  useEffect(() => {
+    if (comboLevel > 0 && comboColors.text) {
+      setVisibleCombo(comboLevel);
+      setAnimationKey((k) => k + 1);
+
+      // Auto-dismiss after animation completes
+      const timer = setTimeout(() => {
+        setVisibleCombo(null);
+      }, TOTAL_DURATION);
+
+      return () => clearTimeout(timer);
+    }
+    return undefined;
+  }, [comboLevel, comboColors.text]);
+
+  // Screen shake for high combos
+  useEffect(() => {
+    if (comboLevel >= 5 && !reduceMotion) {
+      const shakeIntensity = Math.min((comboLevel - 4) * 1.5, 6);
+      controls.start({
+        x: [0, -shakeIntensity, shakeIntensity, -shakeIntensity, 0],
+        transition: { duration: 0.25, ease: 'easeInOut' },
+      });
+    }
+  }, [comboLevel, controls, reduceMotion]);
+
+  if (!visibleCombo || !comboColors.text) return null;
+
+  const isHighCombo = visibleCombo >= 5;
+  const isVeryHighCombo = visibleCombo >= 7;
+  const isInsaneCombo = visibleCombo >= 10;
+  const isRainbow = comboColors.isRainbow;
+
+  // Show actual combo count, not capped
+  const displayText = `+${visibleCombo}`;
+
+  const sparkleColors = isRainbow
+    ? ['#FF3366', '#FFE135', '#00FFFF', '#FF1493', '#BFFF00']
+    : ['#FFD700', '#FF6B35', '#FF3366', '#FFE135'];
+  const confettiColors = ['#FF3366', '#00FFFF', '#FFE135', '#BFFF00', '#FF6B35', '#FF1493'];
+
+  // Scale effects with combo level
+  const confettiCount = Math.min(8 + (visibleCombo - 5) * 3, 24); // 8 at level 5, up to 24
+  const extraGlowRings = Math.min(Math.floor((visibleCombo - 5) / 2), 3); // Extra rings for high combos
+
+  return (
+    <AnimatePresence mode="wait">
+      <motion.div
+        key={`combo-${animationKey}`}
+        className="fixed top-1/2 left-1/2 z-50 pointer-events-none"
+        style={{ transform: 'translate(-50%, -50%)' }}
+        initial={{ opacity: 1 }}
+        animate={controls}
+        exit={{ opacity: 0 }}
+      >
+        {/* Glow rings - scale with combo level */}
+        {!reduceMotion && (
+          <>
+            <GlowRing delay={0} color={isRainbow ? '#FF1493' : '#FF6B35'} scale={2} />
+            <GlowRing delay={0.08} color={isRainbow ? '#00FFFF' : '#FFD700'} scale={2.5} />
+            {isHighCombo && <GlowRing delay={0.15} color="#FFFFFF" scale={3} />}
+            {isVeryHighCombo && <GlowRing delay={0.2} color="#FF3366" scale={3.5} />}
+            {isInsaneCombo && <GlowRing delay={0.25} color="#00FFFF" scale={4} />}
+          </>
+        )}
+
+        {/* Sparkle particles */}
+        {!reduceMotion && (
+          <>
+            {sparkleData.map((data, i) => (
+              <Sparkle
+                key={`sparkle-${animationKey}-${i}`}
+                delay={i * 0.02}
+                angle={data.angle}
+                distance={data.distance}
+                color={sparkleColors[i % sparkleColors.length]}
+                size={isHighCombo ? 10 : 7}
+              />
+            ))}
+          </>
+        )}
+
+        {/* Confetti for high combos - scales with level */}
+        {!reduceMotion && isHighCombo && (
+          <>
+            {[...Array(confettiCount)].map((_, i) => (
+              <Confetti
+                key={`confetti-${animationKey}-${i}`}
+                delay={i * 0.02}
+                startX={(i - confettiCount / 2) * 8}
+                color={confettiColors[i % confettiColors.length]}
+              />
+            ))}
+          </>
+        )}
+
+        {/* Main combo badge */}
+        <motion.div
+          initial={{
+            scale: 0,
+            opacity: 0,
+            rotate: -10,
+            y: 15,
+          }}
+          animate={{
+            // Quick pop in (0-12%), hold steady (12-90%), fast exit (90-100%)
+            scale: [0, 1.2, 1.1, 1.1, 0],
+            opacity: [0, 1, 1, 1, 0],
+            rotate: [-10, 4, 0, 0, 8],
+            y: [15, -3, 0, 0, -50],
+          }}
+          transition={{
+            duration: TOTAL_DURATION / 1000,
+            times: [0, 0.12, 0.18, 0.9, 1], // 12% entrance, 72% hold, 10% exit
+            ease: [0.34, 1.56, 0.64, 1],
+          }}
+          className="relative"
+        >
+          {/* Badge content */}
+          <motion.div
+            className={cn(
+              'px-5 py-2.5 rounded-full font-extrabold text-2xl md:text-3xl text-white backdrop-blur-sm relative overflow-hidden',
+              !isRainbow && 'bg-gradient-to-r from-orange-500 via-red-500 to-pink-500',
+              comboColors.shadow,
+              'border-3 border-white/50'
+            )}
+            style={{
+              filter: isRainbow
+                ? 'drop-shadow(0 0 20px rgba(255, 255, 255, 0.9))'
+                : 'drop-shadow(0 0 15px rgba(251, 146, 60, 0.7))',
+              ...(isRainbow && {
+                background:
+                  'linear-gradient(90deg, #ef4444, #f97316, #eab308, #22c55e, #06b6d4, #3b82f6, #8b5cf6, #ec4899, #ef4444)',
+                backgroundSize: '300% 100%',
+                animation: reduceMotion ? 'none' : 'rainbow-shift 1s linear infinite',
+              }),
+            }}
+          >
+            {/* Shimmer overlay */}
+            {!reduceMotion && (
+              <motion.div
+                className="absolute inset-0 rounded-full pointer-events-none overflow-hidden"
+                style={{ zIndex: 5 }}
+              >
+                <motion.div
+                  className="absolute inset-0"
+                  style={{
+                    background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.35), transparent)',
+                    width: '200%',
+                    marginLeft: '-100%',
+                  }}
+                  animate={{ marginLeft: ['-100%', '100%'] }}
+                  transition={{
+                    duration: 0.5,
+                    delay: 0.1,
+                    ease: 'easeInOut',
+                  }}
+                />
+              </motion.div>
+            )}
+
+            {/* Emoji */}
+            <motion.span
+              className="relative z-10"
+              initial={{ scale: 0.5, rotate: -20 }}
+              animate={{ scale: 1, rotate: 0 }}
+              transition={{
+                duration: 0.25,
+                delay: 0.05,
+                ease: [0.34, 1.56, 0.64, 1],
+              }}
+            >
+              {isRainbow ? '🌈' : '🔥'}
+            </motion.span>
+
+            {/* Combo text - shows actual count */}
+            <motion.span
+              className="relative z-10 ml-1.5"
+              initial={{ opacity: 0, x: -10 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.1, duration: 0.2 }}
+            >
+              {displayText}
+            </motion.span>
+          </motion.div>
+
+          {/* Streak text for high combos */}
+          {isHighCombo && (
+            <motion.div
+              className="absolute -bottom-7 left-1/2 whitespace-nowrap"
+              initial={{ opacity: 0, scale: 0.8, y: 5 }}
+              animate={{ opacity: [0, 1, 1, 0], scale: [0.8, 1.1, 1, 0.9], y: [5, 0, 0, -5] }}
+              transition={{
+                duration: TOTAL_DURATION / 1000,
+                times: [0, 0.12, 0.9, 1], // Match badge timing
+              }}
+              style={{ transform: 'translateX(-50%)' }}
+            >
+              <span
+                className="text-sm font-black uppercase tracking-wide px-3 py-1 rounded-neo"
+                style={{
+                  background: isInsaneCombo
+                    ? 'linear-gradient(135deg, #FF1493, #00FFFF, #FFE135)'
+                    : isVeryHighCombo
+                    ? 'linear-gradient(135deg, #FF3366, #FF6B35)'
+                    : '#1a1a2e',
+                  color: '#FFFFFF',
+                  textShadow: '0 2px 4px rgba(0,0,0,0.8)',
+                  border: '3px solid #000',
+                  boxShadow: '3px 3px 0 #000',
+                }}
+              >
+                {isInsaneCombo ? `🏆 LEGENDARY x${visibleCombo}!` : isVeryHighCombo ? '🔥 ON FIRE!' : 'COMBO'}
+              </span>
+            </motion.div>
+          )}
+        </motion.div>
+      </motion.div>
+    </AnimatePresence>
+  );
+};
+
+export default ComboIndicator;

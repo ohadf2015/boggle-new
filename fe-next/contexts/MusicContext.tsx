@@ -289,6 +289,9 @@ export function MusicProvider({ children }: MusicProviderProps) {
     // Queue for track requests made before audio is unlocked
     const pendingUnlockTrackRef = useRef<PendingTrack | null>(null);
 
+    // Ref to track the pending unlock timeout so we can cancel it if needed
+    const pendingUnlockTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
     // Ref to hold fadeToTrack for recursive calls
     const fadeToTrackRef = useRef<((trackKey: TrackKey, fadeOutMs?: number, fadeInMs?: number) => void) | null>(null);
 
@@ -303,6 +306,14 @@ export function MusicProvider({ children }: MusicProviderProps) {
             logger.log('[Music] Audio not unlocked, queueing track:', trackKey);
             pendingUnlockTrackRef.current = { trackKey, fadeOutMs, fadeInMs };
             return;
+        }
+
+        // Cancel any pending unlock timeout since we're now playing a new track
+        // This prevents the old pending track from overriding the new one
+        if (pendingUnlockTimeoutRef.current) {
+            clearTimeout(pendingUnlockTimeoutRef.current);
+            pendingUnlockTimeoutRef.current = null;
+            logger.log('[Music] Cancelled pending unlock timeout for new track:', trackKey);
         }
 
         const newHowl = howlsRef.current[trackKey];
@@ -409,7 +420,9 @@ export function MusicProvider({ children }: MusicProviderProps) {
                 pendingUnlockTrackRef.current = null;
                 logger.log('[Music] Playing pending track:', trackKey);
                 // Small delay to ensure AudioContext is fully ready
-                setTimeout(() => {
+                // Store the timeout so it can be cancelled if a new track is requested
+                pendingUnlockTimeoutRef.current = setTimeout(() => {
+                    pendingUnlockTimeoutRef.current = null;
                     fadeToTrack(trackKey, fadeOutMs, fadeInMs);
                 }, 100);
             }

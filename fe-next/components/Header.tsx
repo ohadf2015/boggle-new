@@ -82,7 +82,7 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                         <span
                             className="text-white"
                             style={{
-                                textShadow: '3px 3px 0px var(--neo-black), -1px -1px 0px var(--neo-black), 1px -1px 0px var(--neo-black), -1px 1px 0px var(--neo-black)',
+                                textShadow: '3px 3px 0px rgb(var(--neo-black)), -1px -1px 0px rgb(var(--neo-black)), 1px -1px 0px rgb(var(--neo-black)), -1px 1px 0px rgb(var(--neo-black))',
                             }}
                         >
                             {t('logo.lexi')}
@@ -103,7 +103,7 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                             className="text-white italic"
                             style={{
                                 transform: 'skewX(-8deg)',
-                                textShadow: '3px 3px 0px var(--neo-black), -1px -1px 0px var(--neo-black), 1px -1px 0px var(--neo-black), -1px 1px 0px var(--neo-black)',
+                                textShadow: '3px 3px 0px rgb(var(--neo-black)), -1px -1px 0px rgb(var(--neo-black)), 1px -1px 0px rgb(var(--neo-black)), -1px 1px 0px rgb(var(--neo-black))',
                             }}
                         >
                             {t('logo.clash')}

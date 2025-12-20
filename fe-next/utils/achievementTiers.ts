@@ -28,7 +28,7 @@ export const TIER_COLORS: Record<TierName, TierColors> = {
   BRONZE: {
     bg: '#CD7F32',
     border: '#8B4513',
-    text: '#FFFFFF',
+    text: '#000000',
     glow: 'rgba(205, 127, 50, 0.5)',
   },
   SILVER: {
