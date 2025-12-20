@@ -80,6 +80,13 @@ const translations = {
       shieldUsed: '🛡️ Combo Shield Used!',
       shieldEarned: '🛡️ Shield Earned!',
     },
+    spam: {
+      warning: 'Slow down! Too many invalid words',
+      penalty: 'Points deducted: -${points}',
+      cooldown: 'Blocked for ${seconds}s - slow down!',
+      cooldownEnd: 'You can submit words again',
+      blockedWord: 'Wait ${seconds}s before submitting',
+    },
     bots: {
       title: 'AI Bots',
       easy: 'Easy',
@@ -1262,6 +1269,13 @@ const translations = {
       shieldUsed: '🛡️ מגן קומבו נוצל!',
       shieldEarned: '🛡️ מגן נפתח!',
     },
+    spam: {
+      warning: 'לאט! יותר מדי מילים לא תקינות',
+      penalty: 'נקודות הופחתו: -${points}',
+      cooldown: 'חסום ל-${seconds} שניות - האט!',
+      cooldownEnd: 'אפשר לשלוח מילים שוב',
+      blockedWord: 'המתן ${seconds} שניות לפני שליחה',
+    },
     bots: {
       title: 'בוטים',
       easy: 'קל',
@@ -2437,6 +2451,13 @@ const translations = {
     combo: {
       shieldUsed: '🛡️ Kombosköld använd!',
       shieldEarned: '🛡️ Sköld upplåst!',
+    },
+    spam: {
+      warning: 'Sakta ner! För många ogiltiga ord',
+      penalty: 'Poäng avdragna: -${points}',
+      cooldown: 'Blockerad i ${seconds}s - sakta ner!',
+      cooldownEnd: 'Du kan skicka ord igen',
+      blockedWord: 'Vänta ${seconds}s innan du skickar',
     },
     bots: {
       title: 'AI-bottar',
@@ -3615,6 +3636,13 @@ const translations = {
     combo: {
       shieldUsed: '🛡️ コンボシールド使用！',
       shieldEarned: '🛡️ シールド獲得！',
+    },
+    spam: {
+      warning: 'スローダウン！無効な単語が多すぎます',
+      penalty: 'ポイント減少: -${points}',
+      cooldown: '${seconds}秒間ブロック - ゆっくり！',
+      cooldownEnd: '単語を送信できます',
+      blockedWord: '送信まで${seconds}秒お待ちください',
     },
     bots: {
       title: 'AIボット',

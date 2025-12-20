@@ -111,20 +111,8 @@ export async function createProfile(profile: Record<string, any>) {
     .single();
 }
 
-// Check if username is available
-export async function checkUsernameAvailable(username: string) {
-  if (!supabase) return { available: false, error: { message: 'Supabase not configured' } };
-  const { data, error } = await supabase
-    .from('profiles')
-    .select('id')
-    .ilike('username', username)
-    .limit(1);
 
-  if (error) return { available: false, error };
-  return { available: data.length === 0, error: null };
-}
-
-// Leaderboard helpers
+// Leaderboard helpers - used by backend and hooks
 export async function getLeaderboard(limit = 100, offset = 0) {
   if (!supabase) return { data: [], error: { message: 'Supabase not configured' } };
   return supabase
@@ -143,15 +131,7 @@ export async function getUserRank(userId: string) {
     .maybeSingle();
 }
 
-// Guest token helpers
-export async function createGuestToken(tokenHash: string, stats: Record<string, any> = {}) {
-  if (!supabase) return { data: null, error: { message: 'Supabase not configured' } };
-  return supabase
-    .from('guest_tokens')
-    .insert({ token_hash: tokenHash, stats })
-    .select()
-    .single();
-}
+// Guest token helpers - used by backend
 
 export async function getGuestToken(tokenHash: string) {
   if (!supabase) return { data: null, error: { message: 'Supabase not configured' } };
@@ -163,6 +143,7 @@ export async function getGuestToken(tokenHash: string) {
     .single();
 }
 
+// Used by backend and components/views/ResultsPage.tsx
 export async function updateGuestStats(tokenHash: string, stats: Record<string, any>) {
   if (!supabase) return { data: null, error: { message: 'Supabase not configured' } };
   return supabase
@@ -198,26 +179,6 @@ export async function isSupabaseConfigured(): Promise<boolean> {
   return !!supabase;
 }
 
-// Helper to check and handle refresh token errors
-export function isRefreshTokenError(error: { code?: string; message?: string } | null): boolean {
-  if (!error) return false;
-  const errorCode = error.code?.toLowerCase() || '';
-  const errorMessage = error.message?.toLowerCase() || '';
-  return (
-    errorCode === 'refresh_token_not_found' ||
-    errorMessage.includes('refresh token not found') ||
-    errorMessage.includes('invalid refresh token') ||
-    errorCode === 'bad_jwt' ||
-    errorMessage.includes('jwt expired')
-  );
-}
-
-// Dispatch auth error event for centralized handling
-export function dispatchAuthError(error: { code?: string; message?: string }): void {
-  if (typeof window !== 'undefined') {
-    window.dispatchEvent(new CustomEvent('supabase-auth-error', { detail: error }));
-  }
-}
 
 // Profile picture storage functions
 export async function uploadProfilePicture(userId: string, file: File) {

@@ -49,7 +49,7 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
             animate={{ y: 0, opacity: 1, rotate: 0 }}
             transition={{ duration: 0.4, ease: [0.68, -0.55, 0.265, 1.55] }}
             className={cn(
-                "w-full mb-2 sm:mb-4 px-3 sm:px-4 pt-3 sm:pt-4 sticky top-0 z-50",
+                "w-full mb-2 sm:mb-4 px-3 sm:px-4 pt-3 sm:pt-4 pb-2 sticky top-0 z-50 bg-slate-50 dark:bg-slate-900",
                 className
             )}
         >

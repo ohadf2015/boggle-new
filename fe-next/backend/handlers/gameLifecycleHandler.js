@@ -43,6 +43,7 @@ const logger = require('../utils/logger');
 const { startGameTimer, endGame } = require('./shared');
 const { validatePayload, createGameSchema, startGameSchema } = require('../utils/socketValidation');
 const botManager = require('../modules/botManager');
+const { spamDetector } = require('../modules/spamDetector');
 
 /**
  * Register game lifecycle socket event handlers
@@ -442,6 +443,9 @@ function initializePlayerData(game, gameCode) {
   const users = getGameUsers(gameCode);
   const playerUsernames = users.map(u => u.username);
   const gameForInit = getGame(gameCode);
+
+  // Clear spam detection data from previous game
+  spamDetector.clearGame(gameCode);
 
   if (gameForInit) {
     if (!gameForInit.playerWordDetails) gameForInit.playerWordDetails = {};

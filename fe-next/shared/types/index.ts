@@ -9,6 +9,9 @@ export * from './game';
 // Socket event types (includes engagement payload types)
 export * from './socket';
 
+// Spam detection types
+export * from './spam';
+
 // Engagement system types - export only unique types not already in socket.ts
 // The socket.ts file contains simplified versions of engagement types for socket payloads
 // For full engagement types, import directly from './engagement'

@@ -144,4 +144,4 @@ export function getValidationClasses(
   return `${baseClasses} ${stateClasses[state]}`.trim();
 }
 
-export default useDebouncedValidation;
+// Default export removed - use named export instead
