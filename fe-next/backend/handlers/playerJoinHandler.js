@@ -324,6 +324,7 @@ function handleLateJoin(socket, game, gameCode, username) {
     const achievements = playerAchievementKeys
       .map(key => ({ key, icon: ACHIEVEMENT_ICONS[key] }))
       .filter(a => a.icon);
+    logger.info('ACHIEVEMENT', `Late join: Resending ${achievements.length} achievements to ${username}: ${playerAchievementKeys.join(', ')} (gameState: ${game.gameState})`);
     socket.emit('liveAchievementUnlocked', { achievements });
   }
 }

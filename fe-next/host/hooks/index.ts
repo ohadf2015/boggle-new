@@ -22,3 +22,5 @@ export {
   type ComboState,
   type XpState
 } from './useHostViewState';
+export { default as useHostGameActions, type UseHostGameActionsReturn } from './useHostGameActions';
+export { default as useHostEffects } from './useHostEffects';

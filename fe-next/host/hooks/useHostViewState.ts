@@ -143,21 +143,21 @@ export interface UseHostViewStateOptions {
 export interface UseHostViewStateReturn {
   // Settings
   settings: GameSettings;
-  setDifficulty: (d: DifficultyLevel) => void;
-  setMinWordLength: (l: number) => void;
-  setTimerValue: (v: number) => void;
-  setTimerDirection: (d: number) => void;
-  setHostPlaying: (p: boolean) => void;
-  setGameType: (t: 'regular' | 'tournament') => void;
-  setTournamentRounds: (r: number) => void;
+  setDifficulty: React.Dispatch<React.SetStateAction<DifficultyLevel>>;
+  setMinWordLength: React.Dispatch<React.SetStateAction<number>>;
+  setTimerValue: React.Dispatch<React.SetStateAction<number>>;
+  setTimerDirection: React.Dispatch<React.SetStateAction<number>>;
+  setHostPlaying: React.Dispatch<React.SetStateAction<boolean>>;
+  setGameType: React.Dispatch<React.SetStateAction<'regular' | 'tournament'>>;
+  setTournamentRounds: React.Dispatch<React.SetStateAction<number>>;
 
   // Runtime
   runtime: GameRuntimeState;
-  setGameStarted: (s: boolean) => void;
-  setTableData: (t: LetterGrid) => void;
+  setGameStarted: React.Dispatch<React.SetStateAction<boolean>>;
+  setTableData: React.Dispatch<React.SetStateAction<LetterGrid>>;
   setRemainingTime: React.Dispatch<React.SetStateAction<number | null>>;
-  setWaitingForResults: (w: boolean) => void;
-  setShowStartAnimation: (s: boolean) => void;
+  setWaitingForResults: React.Dispatch<React.SetStateAction<boolean>>;
+  setShowStartAnimation: React.Dispatch<React.SetStateAction<boolean>>;
 
   // Player tracking
   players: PlayerTrackingState;
@@ -175,19 +175,19 @@ export interface UseHostViewStateReturn {
   // Tournament
   tournament: TournamentState;
   setTournamentData: React.Dispatch<React.SetStateAction<TournamentData | null>>;
-  setTournamentCreating: (c: boolean) => void;
+  setTournamentCreating: React.Dispatch<React.SetStateAction<boolean>>;
   setFinalScores: React.Dispatch<React.SetStateAction<FinalScoresData | null>>;
 
   // Animation
   animation: AnimationState;
-  setShufflingGrid: (g: LetterGrid | null) => void;
-  setHighlightedCells: (c: Array<{ row: number; col: number }>) => void;
+  setShufflingGrid: React.Dispatch<React.SetStateAction<LetterGrid | null>>;
+  setHighlightedCells: React.Dispatch<React.SetStateAction<Array<{ row: number; col: number }>>>;
 
   // UI
   ui: HostUIState;
-  setShowQR: (s: boolean) => void;
-  setShowExitConfirm: (s: boolean) => void;
-  setShowCancelTournamentDialog: (s: boolean) => void;
+  setShowQR: React.Dispatch<React.SetStateAction<boolean>>;
+  setShowExitConfirm: React.Dispatch<React.SetStateAction<boolean>>;
+  setShowCancelTournamentDialog: React.Dispatch<React.SetStateAction<boolean>>;
 
   // Combo
   combo: ComboState;
@@ -218,6 +218,7 @@ export interface UseHostViewStateReturn {
 
   // Actions
   resetForNewGame: () => void;
+  resetUrgentMusicRef: () => void;
   generateNewTable: () => LetterGrid;
 }
 
@@ -434,6 +435,10 @@ export function useHostViewState(options: UseHostViewStateOptions = {}): UseHost
     }
   }, []);
 
+  const resetUrgentMusicRef = useCallback(() => {
+    hasTriggeredUrgentMusicRef.current = false;
+  }, []);
+
   // ==========================================
   // Return
   // ==========================================
@@ -508,6 +513,7 @@ export function useHostViewState(options: UseHostViewStateOptions = {}): UseHost
 
     // Actions
     resetForNewGame,
+    resetUrgentMusicRef,
     generateNewTable,
   }), [
     settings,
@@ -525,6 +531,7 @@ export function useHostViewState(options: UseHostViewStateOptions = {}): UseHost
     wordsForBoard,
     addHostFoundWord,
     resetForNewGame,
+    resetUrgentMusicRef,
     generateNewTable,
   ]);
 }

@@ -187,10 +187,25 @@ function registerGameLifecycleHandlers(io, socket) {
     const currentGameState = game.gameState;
     logger.info('SOCKET', `Starting game ${gameCode} - current state: ${currentGameState}`);
 
+    // Self-healing: if not in 'waiting' state, force a reset first
+    // This handles race conditions between async endGame and rapid reset/start clicks
     if (!canTransitionGameState(gameCode, 'START')) {
-      logger.error('SOCKET', `Cannot start game ${gameCode} from state: ${currentGameState}`);
-      emitError(socket, 'Game cannot be started from current state');
-      return;
+      logger.warn('SOCKET', `Game ${gameCode} in unexpected state ${currentGameState}, auto-resetting before start`);
+
+      // Clear any lingering timers/state from previous game
+      timerManager.clearGameTimer(gameCode);
+      gameStartCoordinator.cleanupSequence(gameCode);
+      botManager.cleanupGameBots(gameCode);
+
+      // Force reset to 'waiting' state - try proper reset first, fallback to direct state change
+      const resetSuccess = resetGameForNewRound(gameCode);
+      if (!resetSuccess) {
+        // Fallback: directly force state to 'waiting'
+        logger.warn('SOCKET', `resetGameForNewRound failed for ${gameCode}, forcing state to waiting`);
+        game.gameState = 'waiting';
+      }
+
+      logger.info('SOCKET', `Game ${gameCode} auto-reset successful, state now: ${game.gameState}`);
     }
 
     const validTimer = Math.max(30, Math.min(600, parseInt(timerSeconds) || 180));

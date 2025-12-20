@@ -418,7 +418,7 @@ export default function GamePage(): React.JSX.Element {
                 avatar: profile ? {
                   emoji: profile.avatar_emoji,
                   color: profile.avatar_color,
-                } : (guestAvatar || getAvatarForName(savedSession.username || savedSession.roomName || '')),
+                } : getAvatarForName(savedSession.username || savedSession.roomName || ''),
               });
             } else {
               newSocket.emit('join', {
@@ -428,7 +428,7 @@ export default function GamePage(): React.JSX.Element {
                 avatar: profile ? {
                   emoji: profile.avatar_emoji,
                   color: profile.avatar_color,
-                } : (guestAvatar || getAvatarForName(savedSession.username || '')),
+                } : getAvatarForName(savedSession.username || ''),
               });
             }
           });
@@ -519,22 +519,24 @@ export default function GamePage(): React.JSX.Element {
     });
 
     newSocket.on('error', (data) => {
-      logger.error('[SOCKET.IO] Error:', data);
       setIsJoining(false); // Clear loading state on any error
+
+      // Handle empty error objects (Socket.IO internal errors) - log as debug, not error
+      if (!data || Object.keys(data).length === 0) {
+        logger.debug('[SOCKET.IO] Received empty error object (internal Socket.IO event)', {
+          connected: newSocket.connected,
+          id: newSocket.id
+        });
+        return; // Don't process empty errors further
+      }
+
+      // Log meaningful errors
+      logger.error('[SOCKET.IO] Error:', data);
 
       // If error is about game not in progress, query server for actual state
       if (data?.code === 'GAME_NOT_IN_PROGRESS' || data?.message?.includes('not in progress')) {
         logger.error('[SOCKET.IO] Game state mismatch - querying server for actual state');
         newSocket.emit('debugGameState');
-      }
-
-      // Log additional debug info to help diagnose empty errors
-      if (!data || Object.keys(data).length === 0) {
-        logger.error('[SOCKET.IO] Received empty error object - this may be a Socket.IO internal error');
-        logger.error('[SOCKET.IO] Socket state:', {
-          connected: newSocket.connected,
-          id: newSocket.id
-        });
       }
 
       // Handle specific error cases
@@ -799,7 +801,7 @@ export default function GamePage(): React.JSX.Element {
             avatar: currentProfile ? {
               emoji: currentProfile.avatar_emoji,
               color: currentProfile.avatar_color,
-            } : (guestAvatar || getAvatarForName(currentUsername)),
+            } : getAvatarForName(currentUsername),
             profilePictureUrl: currentProfile?.profile_picture_url,
           });
           setShouldAutoJoin(false);
@@ -808,7 +810,7 @@ export default function GamePage(): React.JSX.Element {
       return () => clearTimeout(autoJoinTimeout);
     }
     return undefined;
-  }, [shouldAutoJoin, prefilledRoomCode, username, isActive, attemptingReconnect, socket, isConnected, getAuthContext, profile, guestAvatar]);
+  }, [shouldAutoJoin, prefilledRoomCode, username, isActive, attemptingReconnect, socket, isConnected, getAuthContext, profile]);
 
   // Session reconnection
   useEffect(() => {
@@ -852,7 +854,7 @@ export default function GamePage(): React.JSX.Element {
           avatar: profile ? {
             emoji: profile.avatar_emoji,
             color: profile.avatar_color,
-          } : (guestAvatar || getAvatarForName(savedSession.roomName)),
+          } : getAvatarForName(savedSession.roomName),
           profilePictureUrl: profile?.profile_picture_url,
         });
       } else {
@@ -868,14 +870,14 @@ export default function GamePage(): React.JSX.Element {
           avatar: profile ? {
             emoji: profile.avatar_emoji,
             color: profile.avatar_color,
-          } : (guestAvatar || getAvatarForName(savedSession.username)),
+          } : getAvatarForName(savedSession.username),
           profilePictureUrl: profile?.profile_picture_url,
         });
       }
     }, 500);
 
     return () => clearTimeout(reconnectTimeout);
-  }, [attemptingReconnect, isActive, socket, isConnected, language, getAuthContext, profile, guestAvatar]);
+  }, [attemptingReconnect, isActive, socket, isConnected, language, getAuthContext, profile]);
 
   const handleJoin = useCallback(async (isHostMode: boolean, roomLang?: Language | null, overrideGameCode?: string) => {
     if (!socket || !isConnected) {
@@ -960,7 +962,7 @@ export default function GamePage(): React.JSX.Element {
         avatar: profile ? {
           emoji: profile.avatar_emoji,
           color: profile.avatar_color,
-        } : (guestAvatar || getAvatarForName(roomName)),
+        } : getAvatarForName(roomName),
         profilePictureUrl: profile?.profile_picture_url,
       });
     } else {
@@ -972,11 +974,11 @@ export default function GamePage(): React.JSX.Element {
         avatar: profile ? {
           emoji: profile.avatar_emoji,
           color: profile.avatar_color,
-        } : (guestAvatar || getAvatarForName(username)),
+        } : getAvatarForName(username),
         profilePictureUrl: profile?.profile_picture_url,
       });
     }
-  }, [socket, isConnected, gameCode, username, roomName, language, t, isSupabaseEnabled, user, profile, loading, authLoadingStartTime, guestAvatar]);
+  }, [socket, isConnected, gameCode, username, roomName, language, t, isSupabaseEnabled, user, profile, loading, authLoadingStartTime]);
 
   const refreshRooms = useCallback(() => {
     if (socket && isConnected) {

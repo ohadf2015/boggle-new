@@ -122,8 +122,10 @@ const checkLiveAchievements = (game, username, word, timeSinceStart) => {
     return { key, icon: ACHIEVEMENT_ICONS[key] };
   };
 
-  // First Blood - first 4+ letter valid word in the game (LIVE) - must show skill
-  if (!game.firstWordFound && isCurrentWordValid && word.length >= 4 && !achievements.includes('FIRST_BLOOD')) {
+  // First Blood - first valid word meeting minimum length requirement (LIVE)
+  // Uses the game's configured minimum word length (default 2)
+  const minWordLength = game.minWordLength || 2;
+  if (!game.firstWordFound && isCurrentWordValid && word.length >= minWordLength && !achievements.includes('FIRST_BLOOD')) {
     game.firstWordFound = true;
     newAchievements.push(addAchievementAndReturn('FIRST_BLOOD'));
   }
