@@ -72,10 +72,6 @@ interface LevelUpOptions {
   duration?: number;
 }
 
-interface XpGainedOptions {
-  breakdown?: string;
-  duration?: number;
-}
 
 // Neo-Brutalist Word Accepted Toast
 export const wordAcceptedToast = (word: string, options: WordAcceptedOptions = {}): string => {
@@ -435,51 +431,6 @@ export const levelUpToast = (oldLevel: number, newLevel: number, options: LevelU
   );
 };
 
-// Neo-Brutalist XP Gained Toast
-export const xpGainedToast = (xpAmount: number, options: XpGainedOptions = {}): string => {
-  return toast.custom(
-    (t) => (
-      <AnimatePresence>
-        {t.visible && (
-          <motion.div
-            initial={{ y: -20, opacity: 0, scale: 0.9 }}
-            animate={{ y: 0, opacity: 1, scale: 1 }}
-            exit={{ y: -10, opacity: 0, scale: 0.95 }}
-            transition={{ type: 'spring', stiffness: 400, damping: 25 }}
-            className="flex items-center gap-3 px-4 py-3 rounded-neo bg-gradient-to-r from-neo-purple to-neo-pink border-3 border-neo-black shadow-hard"
-            style={{ minWidth: '180px', pointerEvents: 'auto' }}
-          >
-            <motion.span
-              animate={{ rotate: [0, 20, -20, 0], scale: [1, 1.2, 1] }}
-              transition={{ duration: 0.5, repeat: 1 }}
-              className="text-2xl"
-            >
-              ⭐
-            </motion.span>
-            <span className="font-black uppercase tracking-wide text-neo-cream">
-              +{xpAmount} XP
-            </span>
-            {options.breakdown && (
-              <motion.span
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.2 }}
-                className="text-xs text-neo-cream/80"
-              >
-                {options.breakdown}
-              </motion.span>
-            )}
-          </motion.div>
-        )}
-      </AnimatePresence>
-    ),
-    {
-      duration: options.duration || 3000,
-      position: 'top-center',
-    }
-  );
-};
-
 // Neo-Brutalist Info Toast
 export const neoInfoToast = (message: string, options: NeoToastOptions = {}): string => {
   return toast.custom(
@@ -518,16 +469,51 @@ export const neoInfoToast = (message: string, options: NeoToastOptions = {}): st
   );
 };
 
-const NeoToast = {
-  wordAccepted: wordAcceptedToast,
-  wordNeedsValidation: wordNeedsValidationToast,
-  wordAIValidating: wordAIValidatingToast,
-  wordError: wordErrorToast,
-  success: neoSuccessToast,
-  error: neoErrorToast,
-  info: neoInfoToast,
-  levelUp: levelUpToast,
-  xpGained: xpGainedToast,
+// Neo-Brutalist Warning Toast
+export const neoWarningToast = (message: string, options: NeoToastOptions = {}): string => {
+  return toast.custom(
+    (t) => (
+      <AnimatePresence>
+        {t.visible && (
+          <motion.div
+            initial={{ y: -20, opacity: 0, scale: 0.9 }}
+            animate={{
+              y: 0,
+              opacity: 1,
+              scale: 1,
+              x: [0, -2, 2, -2, 0]
+            }}
+            exit={{ y: -10, opacity: 0, scale: 0.95 }}
+            transition={{
+              type: 'spring',
+              stiffness: 400,
+              damping: 25,
+              x: { duration: 0.3, delay: 0.1 }
+            }}
+            className="flex items-center gap-3 px-4 py-3 rounded-lg bg-neo-orange border-3 border-neo-black shadow-hard"
+            style={{ pointerEvents: 'auto' }}
+          >
+            {options.icon && (
+              <motion.span
+                initial={{ scale: 0 }}
+                animate={{ scale: [1, 1.2, 1] }}
+                transition={{ delay: 0.1, type: 'spring', repeat: 1 }}
+                className="text-2xl"
+              >
+                {options.icon}
+              </motion.span>
+            )}
+            <span className="font-black uppercase tracking-wide text-neo-black">
+              {message}
+            </span>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    ),
+    {
+      duration: options.duration || 4000,
+      position: 'top-center',
+    }
+  );
 };
 
-export default NeoToast;

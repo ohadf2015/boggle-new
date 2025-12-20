@@ -224,4 +224,4 @@ export const useWinStreak = () => {
   };
 };
 
-export default useWinStreak;
+// Default export removed - use named export instead

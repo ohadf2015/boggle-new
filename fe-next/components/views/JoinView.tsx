@@ -404,12 +404,6 @@ const JoinView: React.FC<JoinViewProps> = ({
                   </Button>
                 </motion.div>
               </form>
-
-              <div className="text-center space-y-3">
-                <p className="text-sm text-slate-600 dark:text-gray-400">
-                  {mode === 'host' ? t('joinView.createGameInstructions') : t('validation.enterGameCode')}
-                </p>
-              </div>
             </CardContent>
           </Card>
         </motion.div>

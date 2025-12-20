@@ -225,7 +225,6 @@ const EmptyRoomsState: React.FC<EmptyRoomsStateProps> = ({
     </div>
     <div>
       <p className="text-base font-bold uppercase text-black">{t('joinView.noRooms')}</p>
-      <p className="text-sm mt-1 text-black/70">{t('joinView.createNewRoom')}</p>
     </div>
   </div>
 );

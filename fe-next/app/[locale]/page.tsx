@@ -6,7 +6,7 @@ import toast from 'react-hot-toast';
 import { io, Socket } from 'socket.io-client';
 import Header from '@/components/Header';
 import ErrorBoundary from '@/app/components/ErrorBoundary';
-import FeatureErrorBoundary from '@/components/FeatureErrorBoundary';
+import { FeatureErrorBoundary } from '@/components/ErrorBoundaries';
 import { ConnectionDot } from '@/components/ConnectionStatusIndicator';
 import { SocketContext } from '@/utils/SocketContext';
 import { saveSession, getSession, clearSession, clearSessionPreservingUsername } from '@/utils/session';

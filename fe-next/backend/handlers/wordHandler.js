@@ -34,9 +34,73 @@ const logger = require('../utils/logger');
 const { isSocketMigrating } = require('./shared');
 const { processLongWordEngagement } = require('./engagementHandler');
 const { validatePayload, submitWordSchema, submitWordVoteSchema, submitPeerValidationVoteSchema } = require('../utils/socketValidation');
+const { spamDetector, PenaltyTier, InvalidReason } = require('../modules/spamDetector');
 
 // Rate limit weights
 const SUBMIT_WORD_WEIGHT = parseInt(process.env.RATE_WEIGHT_SUBMITWORD || '1');
+
+/**
+ * Handle spam detection after an invalid word submission
+ * Records the invalid word and applies progressive penalties
+ * @param {Socket} socket - Socket.IO socket instance
+ * @param {string} gameCode - Game code
+ * @param {string} username - Player username
+ * @param {string} word - The invalid word
+ * @param {string} reason - Reason for invalidity
+ * @param {object} game - Game object (for score updates)
+ */
+function handleSpamDetection(socket, gameCode, username, word, reason, game) {
+  const result = spamDetector.recordInvalidWord(gameCode, username, word, reason);
+
+  // Only emit events when tier changes or penalties apply
+  switch (result.tier) {
+    case PenaltyTier.WARNING:
+      if (result.message === 'warning') {
+        socket.emit('spamWarning', {
+          invalidCount: result.invalidCount,
+          message: 'slow_down_too_many_invalid_words',
+          tier: 'warning'
+        });
+      }
+      break;
+
+    case PenaltyTier.PENALTY:
+      if (result.penaltyApplied > 0) {
+        // Apply point deduction
+        const currentScore = game.playerScores?.[username] || 0;
+        const newScore = Math.max(0, currentScore - result.penaltyApplied);
+        updatePlayerScore(gameCode, username, newScore, false);
+
+        socket.emit('spamPenalty', {
+          invalidCount: result.invalidCount,
+          pointsDeducted: result.penaltyApplied,
+          totalPenaltyPoints: result.totalPenaltyPoints,
+          newScore: newScore,
+          tier: 'penalty'
+        });
+
+        logger.info('SPAM', `Deducted ${result.penaltyApplied} points from ${username} (new score: ${newScore})`);
+      }
+      break;
+
+    case PenaltyTier.COOLDOWN:
+      if (result.cooldownDuration > 0) {
+        socket.emit('spamCooldown', {
+          invalidCount: result.invalidCount,
+          duration: result.cooldownDuration,
+          tier: 'cooldown'
+        });
+
+        // Schedule cooldown end notification
+        setTimeout(() => {
+          socket.emit('spamCooldownEnd', {
+            message: 'cooldown_ended_you_can_submit_words_again'
+          });
+        }, result.cooldownDuration);
+      }
+      break;
+  }
+}
 
 /**
  * Register word-related socket event handlers
@@ -66,6 +130,16 @@ function registerWordHandlers(io, socket) {
 
       const gameCode = getGameBySocketId(socket.id);
       const username = getUsernameBySocketId(socket.id);
+
+      // Check for spam cooldown
+      if (gameCode && username && spamDetector.isOnCooldown(gameCode, username)) {
+        const remainingMs = spamDetector.getRemainingCooldown(gameCode, username);
+        socket.emit('wordBlockedByCooldown', {
+          word: word,
+          remainingMs: remainingMs
+        });
+        return;
+      }
 
       if (!gameCode || !username || !word) {
         emitError(socket, ErrorMessages.INVALID_WORD_SUBMISSION);
@@ -117,6 +191,7 @@ function registerWordHandlers(io, socket) {
           word: normalizedWord,
           reason: 'inappropriate'
         });
+        handleSpamDetection(socket, gameCode, username, normalizedWord, InvalidReason.PROFANITY, game);
         return;
       }
 
@@ -127,12 +202,14 @@ function registerWordHandlers(io, socket) {
           word: normalizedWord,
           minLength: minLength
         });
+        handleSpamDetection(socket, gameCode, username, normalizedWord, InvalidReason.TOO_SHORT, game);
         return;
       }
 
       // Check if already found
       if (playerHasWord(gameCode, username, normalizedWord)) {
         socket.emit('wordAlreadyFound', { word: normalizedWord });
+        // Note: Not counted as spam - could be UX issue where user didn't see feedback
         return;
       }
 
@@ -142,6 +219,7 @@ function registerWordHandlers(io, socket) {
         inc('wordNotOnBoard');
         incPerGame(gameCode, 'wordNotOnBoard');
         socket.emit('wordNotOnBoard', { word: normalizedWord });
+        handleSpamDetection(socket, gameCode, username, normalizedWord, InvalidReason.NOT_ON_BOARD, game);
         return;
       }
 

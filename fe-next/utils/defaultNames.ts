@@ -191,16 +191,6 @@ export function getAvatarForName(name: string): { emoji: string; color: string }
 }
 
 /**
- * Get a random default player name from the translations
- * @param language - The UI language (en, he, sv, ja)
- * @returns A random funny player name
- * @deprecated Use getRandomDefaultNameWithAvatar instead for proper avatar matching
- */
-export function getRandomDefaultName(language: string = 'en'): string {
-  return getRandomDefaultNameWithAvatar(language).name;
-}
-
-/**
  * Get a random default player name with matching avatar from the translations
  * @param language - The UI language (en, he, sv, ja)
  * @returns An object with name and matching avatar
@@ -228,22 +218,6 @@ export function getRandomDefaultNameWithAvatar(language: string = 'en'): NameWit
     name,
     avatar: getAvatarForName(name),
   };
-}
-
-/**
- * Get a random default player name, ensuring it's unique from existing names
- * @param language - The UI language
- * @param existingNames - Array of names already in use
- * @param maxAttempts - Maximum attempts to find a unique name
- * @returns A random unique funny player name
- * @deprecated Use getUniqueRandomDefaultNameWithAvatar instead for proper avatar matching
- */
-export function getUniqueRandomDefaultName(
-  language: string = 'en',
-  existingNames: string[] = [],
-  maxAttempts: number = 10
-): string {
-  return getUniqueRandomDefaultNameWithAvatar(language, existingNames, maxAttempts).name;
 }
 
 /**

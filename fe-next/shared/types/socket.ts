@@ -14,6 +14,14 @@ import type {
   WordDetail
 } from './game';
 
+import type {
+  SpamWarningPayload,
+  SpamPenaltyPayload,
+  SpamCooldownPayload,
+  SpamCooldownEndPayload,
+  WordBlockedByCooldownPayload
+} from './spam';
+
 // ==================== Client → Server Events ====================
 
 export interface ClientToServerEvents {
@@ -118,6 +126,13 @@ export interface ServerToClientEvents {
   wordValidatedByVotes: (data: { word: string; score: number; newTotalScore: number }) => void;
   wordBecameValid: (data: { word: string; language: string }) => void;
   voteRecorded: (data: { word: string; success: boolean; error?: string }) => void;
+  wordBlockedByCooldown: (data: WordBlockedByCooldownPayload) => void;
+
+  // Spam detection events (private to player)
+  spamWarning: (data: SpamWarningPayload) => void;
+  spamPenalty: (data: SpamPenaltyPayload) => void;
+  spamCooldown: (data: SpamCooldownPayload) => void;
+  spamCooldownEnd: (data: SpamCooldownEndPayload) => void;
 
   // Leaderboard events
   updateLeaderboard: (data: { leaderboard: LeaderboardEntry[] }) => void;

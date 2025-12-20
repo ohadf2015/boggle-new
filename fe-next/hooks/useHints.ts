@@ -161,4 +161,4 @@ export function useHints({ socket, playerCount, gameActive }: UseHintsOptions) {
   };
 }
 
-export default useHints;
+// Default export removed - use named export instead

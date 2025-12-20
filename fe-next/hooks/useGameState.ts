@@ -631,4 +631,4 @@ export function useGameState(): UseGameStateReturn {
   ]);
 }
 
-export default useGameState;
+// Default export removed - use named export instead
