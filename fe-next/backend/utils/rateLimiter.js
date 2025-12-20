@@ -11,11 +11,20 @@ const logger = require('./logger');
  */
 class RateLimiter {
   constructor(options = {}) {
+    // Per-socket limit: 150 messages per 10 seconds (15 msg/sec per user)
+    // Typical usage: ~5-10 msg/sec during active gameplay
     this.maxMessages = options.maxMessages || 150;
     this.windowMs = options.windowMs || 10000;
-    this.ipMaxMessages = options.ipMaxMessages || 500; // Higher limit for IP (multiple users behind NAT)
+
+    // Per-IP limit: 4500 messages per 10 seconds (450 msg/sec shared)
+    // This accommodates ~30 users playing simultaneously from same WiFi/NAT
+    // (e.g., family game night, office, school networks, gaming cafes)
+    // Each user can use their full 150 msg/10sec allocation without hitting IP limit
+    this.ipMaxMessages = options.ipMaxMessages || 4500;
     this.ipWindowMs = options.ipWindowMs || 10000;
-    this.blockDurationMs = options.blockDurationMs || 60000; // 1 minute block after exceeding limit
+
+    // Block duration after exceeding limit
+    this.blockDurationMs = options.blockDurationMs || 60000; // 1 minute block
 
     // Separate tracking for different identifiers
     this.socketClients = new Map();  // Socket ID -> rate data
@@ -23,7 +32,9 @@ class RateLimiter {
     this.blockedIps = new Map();     // IP address -> block expiry timestamp
 
     // Cleanup stale entries every minute
+    // Use unref() so the interval doesn't prevent process exit (important for tests)
     this.cleanupInterval = setInterval(() => this._cleanup(), 60000);
+    this.cleanupInterval.unref();
   }
 
   /**
@@ -286,9 +297,10 @@ class RateLimiter {
 }
 
 // Create singleton instance with configurable options
+// These can be overridden via environment variables
 const maxMessages = parseInt(process.env.RATE_MAX_MESSAGES || '150');
 const windowMs = parseInt(process.env.RATE_WINDOW_MS || '10000');
-const ipMaxMessages = parseInt(process.env.RATE_IP_MAX_MESSAGES || '500');
+const ipMaxMessages = parseInt(process.env.RATE_IP_MAX_MESSAGES || '4500'); // Supports ~30 users on same WiFi
 const blockDurationMs = parseInt(process.env.RATE_BLOCK_DURATION_MS || '60000');
 
 const rateLimiterInstance = new RateLimiter({

@@ -36,26 +36,29 @@ describe('Base Schemas', () => {
 
   describe('gameCodeSchema', () => {
     it('should accept valid game codes', () => {
-      expect(gameCodeSchema.safeParse('ABCD').success).toBe(true);
-      expect(gameCodeSchema.safeParse('abcd').success).toBe(true);
-      expect(gameCodeSchema.safeParse('Ab12').success).toBe(true);
+      // Game codes must be 6-10 alphanumeric characters
+      expect(gameCodeSchema.safeParse('ABCDEF').success).toBe(true);
+      expect(gameCodeSchema.safeParse('abcdef').success).toBe(true);
+      expect(gameCodeSchema.safeParse('Ab12Cd').success).toBe(true);
       expect(gameCodeSchema.safeParse('ABCDEFGHIJ').success).toBe(true);
     });
 
     it('should reject too short codes', () => {
-      const result = gameCodeSchema.safeParse('ABC');
+      // Less than 6 characters should fail
+      const result = gameCodeSchema.safeParse('ABCDE');
       expect(result.success).toBe(false);
     });
 
     it('should reject too long codes', () => {
+      // More than 10 characters should fail
       const result = gameCodeSchema.safeParse('ABCDEFGHIJK');
       expect(result.success).toBe(false);
     });
 
     it('should reject non-alphanumeric codes', () => {
-      expect(gameCodeSchema.safeParse('AB-CD').success).toBe(false);
-      expect(gameCodeSchema.safeParse('AB CD').success).toBe(false);
-      expect(gameCodeSchema.safeParse('AB_CD').success).toBe(false);
+      expect(gameCodeSchema.safeParse('ABC-DEF').success).toBe(false);
+      expect(gameCodeSchema.safeParse('ABC DEF').success).toBe(false);
+      expect(gameCodeSchema.safeParse('ABC_DEF').success).toBe(false);
     });
   });
 
@@ -95,7 +98,7 @@ describe('Event Schemas', () => {
   describe('createGameSchema', () => {
     it('should validate complete create game payload', () => {
       const payload = {
-        gameCode: 'ABCD',
+        gameCode: 'ABCDEF',
         roomName: 'Test Room',
         language: 'en',
         hostUsername: 'Host',
@@ -111,7 +114,7 @@ describe('Event Schemas', () => {
 
     it('should apply defaults', () => {
       const payload = {
-        gameCode: 'ABCD'
+        gameCode: 'ABCDEF'
       };
 
       const result = createGameSchema.safeParse(payload);
@@ -133,7 +136,7 @@ describe('Event Schemas', () => {
   describe('joinGameSchema', () => {
     it('should validate join payload', () => {
       const payload = {
-        gameCode: 'ABCD',
+        gameCode: 'ABCDEF',
         username: 'Player1'
       };
 
@@ -143,7 +146,7 @@ describe('Event Schemas', () => {
 
     it('should reject missing username', () => {
       const payload = {
-        gameCode: 'ABCD'
+        gameCode: 'ABCDEF'
       };
 
       const result = joinGameSchema.safeParse(payload);
@@ -192,18 +195,18 @@ describe('Event Schemas', () => {
 describe('validatePayload', () => {
   it('should return success with valid data', () => {
     const result = validatePayload(joinGameSchema, {
-      gameCode: 'ABCD',
+      gameCode: 'ABCDEF',
       username: 'Player1'
     });
 
     expect(result.success).toBe(true);
     expect(result.data).toBeDefined();
-    expect(result.data.gameCode).toBe('ABCD');
+    expect(result.data.gameCode).toBe('ABCDEF');
   });
 
   it('should return error with invalid data', () => {
     const result = validatePayload(joinGameSchema, {
-      gameCode: 'AB', // too short
+      gameCode: 'ABCDE', // too short (needs 6+)
       username: 'Player1'
     });
 
@@ -215,8 +218,8 @@ describe('validatePayload', () => {
 
   it('should handle multiple validation errors', () => {
     const result = validatePayload(joinGameSchema, {
-      gameCode: 'AB', // too short
-      username: ''    // empty
+      gameCode: 'ABCDE', // too short (needs 6+)
+      username: ''       // empty
     });
 
     expect(result.success).toBe(false);
@@ -242,7 +245,7 @@ describe('validateWithError', () => {
 
   it('should return success and data on valid input', () => {
     const result = validateWithError(joinGameSchema, {
-      gameCode: 'ABCD',
+      gameCode: 'ABCDEF',
       username: 'Player1'
     }, mockSocket, 'join');
 
@@ -253,7 +256,7 @@ describe('validateWithError', () => {
 
   it('should emit error on invalid input', () => {
     const result = validateWithError(joinGameSchema, {
-      gameCode: 'AB',
+      gameCode: 'ABCDE', // too short (needs 6+)
       username: 'Player1'
     }, mockSocket, 'join');
 

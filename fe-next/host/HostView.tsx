@@ -425,18 +425,28 @@ const HostView: React.FC<HostViewProps> = memo(({
   }, []);
 
   const handleStartNewGame = useCallback(() => {
-    // Emit reset to server - the socket handler (handleResetGame in useHostSocketEvents)
-    // will handle resetting game state when server confirms
-    socket?.emit('resetGame');
+    // Emit reset to server with callback to ensure state is synchronized
+    socket?.emit('resetGame', {}, (response: { success: boolean; error?: string; gameState?: string }) => {
+      if (response?.success) {
+        // Server confirmed reset - now safe to update UI
+        setFinalScores(null);
+        setGameType('regular');
+        setTimerValue(1);
 
-    // Reset UI settings that aren't passed to the socket events hook
-    setGameType('regular');
-    setTimerValue(1);
+        neoSuccessToast(`${t('common.newGameReady')}`, {
+          icon: '🔄',
+          duration: 2000,
+        });
 
-    // Show immediate feedback to host
-    neoSuccessToast(`${t('common.newGameReady')}`, {
-      icon: '🔄',
-      duration: 2000,
+        logger.log('[HOST] Game reset confirmed by server, state:', response.gameState);
+      } else {
+        // Reset failed - show error
+        neoErrorToast(t('hostView.resetFailed') || 'Failed to reset game', {
+          icon: '❌',
+          duration: 3000,
+        });
+        logger.error('[HOST] Game reset failed:', response?.error);
+      }
     });
   }, [socket, t]);
 
@@ -474,7 +484,8 @@ const HostView: React.FC<HostViewProps> = memo(({
         open={!!finalScores}
         onOpenChange={(open) => {
           if (!open) {
-            socket?.emit('resetGame');
+            // Only clear local state - resetGame is emitted by handleStartNewGame
+            // to avoid double emission race condition
             setFinalScores(null);
           }
         }}

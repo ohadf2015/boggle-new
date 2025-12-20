@@ -258,10 +258,12 @@ const eventSchemas = compiledSchemas?.eventSchemas || {
  * Validate a socket event payload against a schema
  */
 function validatePayload(schema, data) {
-  if (compiledSchemas?.validatePayload) {
-    return compiledSchemas.validatePayload(schema, data);
+  // Handle null/undefined schema gracefully
+  if (!schema) {
+    return { success: false, error: 'Invalid schema provided', fields: {} };
   }
 
+  // Use inline validation (more reliable than compiled for field extraction)
   try {
     const result = schema.safeParse(data);
     if (result.success) {
@@ -270,7 +272,7 @@ function validatePayload(schema, data) {
 
     const fields = {};
     const errorMessages = (result.error.errors || result.error.issues || []).map(e => {
-      const path = e.path.join('.');
+      const path = e.path.join('.') || 'value';
       fields[path] = e.message;
       return `${path}: ${e.message}`;
     });
@@ -281,7 +283,7 @@ function validatePayload(schema, data) {
       fields
     };
   } catch (error) {
-    return { success: false, error: error.message || 'Validation failed' };
+    return { success: false, error: error.message || 'Validation failed', fields: {} };
   }
 }
 

@@ -126,38 +126,55 @@ describe('RateLimiter', () => {
   });
 
   describe('IP Rate Limiting', () => {
+    let ipRateLimiter;
+
+    beforeEach(() => {
+      // Use separate config for IP tests: high socket limit, low IP limit
+      // This ensures IP limit triggers before socket limit
+      ipRateLimiter = new RateLimiter({
+        maxMessages: 100,      // High socket limit (won't trigger)
+        windowMs: 1000,
+        ipMaxMessages: 10,     // Low IP limit (will trigger)
+        blockDurationMs: 5000
+      });
+    });
+
+    afterEach(() => {
+      ipRateLimiter.shutdown();
+    });
+
     it('should track rate limits by IP', () => {
       // Two sockets from same IP
-      rateLimiter.initClient('socket1', '192.168.1.1');
-      rateLimiter.initClient('socket2', '192.168.1.1');
+      ipRateLimiter.initClient('socket1', '192.168.1.1');
+      ipRateLimiter.initClient('socket2', '192.168.1.1');
 
-      // Each socket can send 5 messages
+      // Each socket sends 5 messages (total 10 = IP limit)
       for (let i = 0; i < 5; i++) {
-        rateLimiter.isRateLimited('socket1');
-        rateLimiter.isRateLimited('socket2');
+        ipRateLimiter.isRateLimited('socket1');
+        ipRateLimiter.isRateLimited('socket2');
       }
 
       // Total IP messages = 10, which is the IP limit
       // Next request should trigger IP block
-      const result = rateLimiter.isRateLimited('socket1');
+      const result = ipRateLimiter.isRateLimited('socket1');
       expect(result.limited).toBe(true);
       expect(result.reason).toBe('ip_limit');
     });
 
     it('should block IP after exceeding limit', () => {
-      rateLimiter.initClient('socket1', '192.168.1.1');
+      ipRateLimiter.initClient('socket1', '192.168.1.1');
 
-      // Exceed IP limit
+      // Exceed IP limit (11 messages > 10 limit)
       for (let i = 0; i < 11; i++) {
-        rateLimiter.isRateLimited('socket1');
+        ipRateLimiter.isRateLimited('socket1');
       }
 
       // IP should be blocked
-      expect(rateLimiter.isIpBlocked('192.168.1.1')).toBe(true);
+      expect(ipRateLimiter.isIpBlocked('192.168.1.1')).toBe(true);
 
       // New socket from same IP should be blocked immediately
-      rateLimiter.initClient('socket2', '192.168.1.1');
-      const result = rateLimiter.isRateLimited('socket2');
+      ipRateLimiter.initClient('socket2', '192.168.1.1');
+      const result = ipRateLimiter.isRateLimited('socket2');
       expect(result.limited).toBe(true);
       expect(result.reason).toBe('ip_blocked');
     });

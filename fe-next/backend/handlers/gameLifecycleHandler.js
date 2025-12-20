@@ -307,26 +307,30 @@ function registerGameLifecycleHandlers(io, socket) {
   });
 
   // Handle reset game
-  socket.on('resetGame', () => {
+  socket.on('resetGame', (data, callback) => {
     if (!checkRateLimit(socket.id)) {
       socket.emit('rateLimited');
+      if (typeof callback === 'function') callback({ success: false, error: 'Rate limited' });
       return;
     }
 
     const gameCode = getGameBySocketId(socket.id);
     if (!gameCode) {
       emitError(socket, ErrorMessages.NOT_IN_GAME);
+      if (typeof callback === 'function') callback({ success: false, error: 'Not in game' });
       return;
     }
 
     const game = getGame(gameCode);
     if (!game) {
       emitError(socket, ErrorMessages.GAME_NOT_FOUND);
+      if (typeof callback === 'function') callback({ success: false, error: 'Game not found' });
       return;
     }
 
     if (game.hostSocketId !== socket.id) {
       emitError(socket, 'Only host can reset the game');
+      if (typeof callback === 'function') callback({ success: false, error: 'Only host can reset' });
       return;
     }
 
@@ -347,12 +351,19 @@ function registerGameLifecycleHandlers(io, socket) {
 
     if (!resetSuccess) {
       logger.error('SOCKET', `Failed to reset game ${gameCode} from state ${stateBeforeReset}`);
+      if (typeof callback === 'function') callback({ success: false, error: 'Reset failed' });
+      return;
     }
 
     broadcastToRoom(io, getGameRoom(gameCode), 'resetGame', {
       users: getGameUsers(gameCode),
       gameSessionId: gameAfterReset?.gameSessionId
     });
+
+    // Acknowledge successful reset to the host
+    if (typeof callback === 'function') {
+      callback({ success: true, gameState: stateAfterReset });
+    }
   });
 }
 
