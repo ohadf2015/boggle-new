@@ -99,14 +99,14 @@
 }
 
 body {
-  background: var(--background);
+  background: #0f172a; /* slate-900 - matches page gradients */
   color: var(--foreground);
   font-family: var(--font-rubik), 'Rubik', Arial, Helvetica, sans-serif;
   margin: 0;
   padding: 0;
   /* Halftone texture overlay on body */
   background-image: var(--halftone-pattern);
-  background-color: var(--neo-navy);
+  background-color: #0f172a; /* slate-900 */
 }
 
 * {

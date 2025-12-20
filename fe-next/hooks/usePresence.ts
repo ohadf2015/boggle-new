@@ -249,4 +249,4 @@ export function usePresence({ enabled = true }: PresenceOptions = {}): UsePresen
   };
 }
 
-export default usePresence;
+// Default export removed - use named export instead

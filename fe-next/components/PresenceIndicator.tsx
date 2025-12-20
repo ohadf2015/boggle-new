@@ -42,7 +42,6 @@ interface PresenceIndicatorProps {
   size?: PresenceSize;
   showTooltip?: boolean;
   className?: string;
-  overlay?: boolean;
 }
 
 /**
@@ -54,7 +53,6 @@ const PresenceIndicator: React.FC<PresenceIndicatorProps> = ({
   size = 'md',
   showTooltip = true,
   className = '',
-  overlay: _overlay = false,
 }) => {
   const [tooltipVisible, setTooltipVisible] = useState(false);
   const tooltipTimeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -271,75 +269,6 @@ const PresenceIndicator: React.FC<PresenceIndicatorProps> = ({
           </motion.div>
         )}
       </AnimatePresence>
-    </div>
-  );
-};
-
-/**
- * PresenceBadge Props
- */
-interface PresenceBadgeProps {
-  status?: PresenceStatus;
-  isWindowFocused?: boolean;
-  showText?: boolean;
-  size?: PresenceSize;
-  className?: string;
-}
-
-/**
- * PresenceBadge - A more detailed presence indicator with text
- */
-export const PresenceBadge: React.FC<PresenceBadgeProps> = ({
-  status = 'active',
-  isWindowFocused = true,
-  showText = true,
-  size: _size = 'md',
-  className = '',
-}) => {
-  // Determine effective status
-  const effectiveStatus: PresenceStatus = !isWindowFocused && status === 'active' ? 'idle' : status;
-
-  interface BadgeConfig {
-    bg: string;
-    text: string;
-    label: string;
-  }
-
-  const badgeConfig: Record<PresenceStatus, BadgeConfig> = {
-    active: {
-      bg: 'bg-green-500/20',
-      text: 'text-green-400',
-      label: 'Online',
-    },
-    idle: {
-      bg: 'bg-yellow-500/20',
-      text: 'text-yellow-400',
-      label: 'Away',
-    },
-    afk: {
-      bg: 'bg-slate-500/20',
-      text: 'text-slate-400',
-      label: 'AFK',
-    },
-  };
-
-  const config = badgeConfig[effectiveStatus] || badgeConfig.active;
-
-  return (
-    <div
-      className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full ${config.bg} ${className}`}
-    >
-      <PresenceIndicator
-        status={status}
-        isWindowFocused={isWindowFocused}
-        size="sm"
-        showTooltip={false}
-      />
-      {showText && (
-        <span className={`text-xs font-medium ${config.text}`}>
-          {config.label}
-        </span>
-      )}
     </div>
   );
 };
