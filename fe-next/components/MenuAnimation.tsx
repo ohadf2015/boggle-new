@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useLanguage } from '../contexts/LanguageContext';
-import { hebrewLetters, englishLetters, swedishLetters, japaneseLetters } from '../utils/consts';
+import { hebrewLetters, englishLetters, swedishLetters, spanishLetters, japaneseLetters } from '../utils/consts';
 import AchievementPopup from './achievements/AchievementPopup';
 import type { Achievement } from '@/types';
 
@@ -161,6 +161,8 @@ const MenuAnimation: React.FC<MenuAnimationProps> = ({ className = '' }) => {
         return hebrewLetters;
       case 'sv':
         return swedishLetters;
+      case 'es':
+        return spanishLetters;
       case 'ja':
         return japaneseLetters;
       case 'en':

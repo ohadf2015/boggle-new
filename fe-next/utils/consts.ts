@@ -29,6 +29,9 @@ export const englishLetters: string[] = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
 
 export const swedishLetters: string[] = 'ABCDEFGHIJKLMNOPQRSTUVWXYZÅÄÖ'.split('');
 
+// Spanish letters - standard Latin alphabet plus Ñ
+export const spanishLetters: string[] = 'ABCDEFGHIJKLMNÑOPQRSTUVWXYZ'.split('');
+
 export const japaneseLetters: string[] = [
   // Common kanji for word games
   "日", "本", "人", "年", "月", "火", "水", "木", "金", "土",

@@ -1,5 +1,6 @@
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { withSentryConfig } from '@sentry/nextjs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -120,4 +121,13 @@ const nextConfig = {
   },
 };
 
-export default nextConfig;
+// Sentry configuration - only needs NEXT_PUBLIC_SENTRY_DSN to work
+// Source map upload options are optional (for better stack traces in Sentry dashboard)
+export default withSentryConfig(nextConfig, {
+  org: process.env.SENTRY_ORG,
+  project: process.env.SENTRY_PROJECT,
+  authToken: process.env.SENTRY_AUTH_TOKEN,
+  silent: true,
+  hideSourceMaps: true,
+  disableLogger: true,
+});

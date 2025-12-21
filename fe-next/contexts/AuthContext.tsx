@@ -14,6 +14,7 @@ import {
 import { getGuestSessionId, clearGuestData, hashToken } from '../utils/guestManager';
 import { getUtmDataForProfile } from '../utils/utmCapture';
 import logger from '@/utils/logger';
+import { setSentryUser, clearSentryUser } from '@/utils/sentry';
 import type { User } from '@supabase/supabase-js';
 
 // Fetch geolocation data from our API
@@ -477,6 +478,15 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       await fetchUserData(user.id, user.user_metadata);
     }
   }, [user, fetchUserData]);
+
+  // Sync user context with Sentry for error tracking
+  useEffect(() => {
+    if (user && profile) {
+      setSentryUser(user, profile);
+    } else {
+      clearSentryUser();
+    }
+  }, [user, profile]);
 
   // Create profile after OAuth sign up
   const setupProfile = async (username: string, avatarEmoji?: string, avatarColor?: string) => {

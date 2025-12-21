@@ -44,6 +44,7 @@ const { startGameTimer, endGame } = require('./shared');
 const { validatePayload, createGameSchema, startGameSchema } = require('../utils/socketValidation');
 const botManager = require('../modules/botManager');
 const { spamDetector } = require('../modules/spamDetector');
+const { notifyRoomCreated, notifyGameStarted } = require('../modules/notificationService');
 
 /**
  * Register game lifecycle socket event handlers
@@ -144,6 +145,16 @@ function registerGameLifecycleHandlers(io, socket) {
     }
 
     logger.info('SOCKET', `Game ${gameCode} created by ${hostUsername}`);
+
+    // Fire-and-forget notification
+    notifyRoomCreated({
+      gameCode,
+      roomName: roomName || gameCode,
+      language: language || 'en',
+      hostUsername: hostUsername || 'Host',
+      isAuthenticated: !!authUserId,
+      isRanked: isRanked || false
+    }).catch(() => {}); // Swallow errors - never block game flow
   });
 
   // Handle request for words to embed in board
@@ -262,6 +273,16 @@ function registerGameLifecycleHandlers(io, socket) {
     });
 
     logger.info('SOCKET', `Game ${gameCode} starting with ${playerUsernames.length} players`);
+
+    // Fire-and-forget notification
+    notifyGameStarted({
+      gameCode,
+      roomName: game.roomName,
+      language: language || game.language,
+      playerCount: playerUsernames.length,
+      timerSeconds: validTimer,
+      isRanked: game.isRanked || false
+    }).catch(() => {}); // Swallow errors - never block game flow
   });
 
   // Handle start game acknowledgment

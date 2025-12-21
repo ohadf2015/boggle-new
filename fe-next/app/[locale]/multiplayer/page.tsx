@@ -242,21 +242,16 @@ export default function MultiplayerPage(): React.JSX.Element {
       } else if (savedUsername) {
         setUsername(savedUsername);
         setGuestAvatar(getAvatarForName(savedUsername));
-      } else {
-        // Set a fun random default name for new guests with matching avatar
-        const { name, avatar } = getRandomDefaultNameWithAvatar(language);
-        setUsername(name);
-        setGuestAvatar(avatar);
       }
+      // Note: We don't set random guest names here anymore
+      // For guests without saved names, the auth effect or handleJoin will handle it
+      // This prevents authenticated users from briefly seeing random guest names
 
       // Also set roomName for hosting if not already set
       if (!joiningNewRoomViaInvitation && savedSession?.roomName) {
         setRoomName(savedSession.roomName);
-      } else if (!savedSession?.roomName && !roomFromUrl) {
-        // Set a fun random default name for host room name
-        const { name } = getRandomDefaultNameWithAvatar(language);
-        setRoomName(name);
       }
+      // Note: We don't set random room names here anymore for the same reason
     };
 
     Promise.resolve().then(initializeState);
@@ -264,22 +259,42 @@ export default function MultiplayerPage(): React.JSX.Element {
 
   // Set username and roomName from profile display_name for authenticated users
   // Uses fallback chain from OAuth metadata if profile hasn't loaded yet
+  // For guests without saved names, generate random names only after auth is confirmed
+  const hasSetRandomNameRef = useRef<boolean>(false);
   useEffect(() => {
-    if (!user) return;
+    // Wait for auth to finish loading
+    if (loading) return;
 
-    // Fallback chain for display name
-    const displayName =
-      profile?.display_name ||                    // Best: profile display name
-      user?.user_metadata?.full_name ||           // Good: OAuth full name
-      user?.user_metadata?.name ||                // Okay: OAuth name
-      user?.email?.split('@')[0] ||               // Fallback: email prefix
-      '';
+    if (user) {
+      // Authenticated user - use display name from profile/OAuth
+      const displayName =
+        profile?.display_name ||                    // Best: profile display name
+        user?.user_metadata?.full_name ||           // Good: OAuth full name
+        user?.user_metadata?.name ||                // Okay: OAuth name
+        user?.email?.split('@')[0] ||               // Fallback: email prefix
+        '';
 
-    if (displayName) {
-      setUsername(displayName);
-      setRoomName(displayName);
+      if (displayName) {
+        setUsername(displayName);
+        setRoomName(displayName);
+      }
+    } else if (!hasSetRandomNameRef.current) {
+      // Guest user - check if we need to generate a random name
+      // Use ref to prevent setting random names multiple times
+      const savedUsername = typeof window !== 'undefined'
+        ? localStorage.getItem('boggle_username') || ''
+        : '';
+
+      if (!savedUsername.trim()) {
+        // No saved username - generate a fun random name
+        const { name, avatar } = getRandomDefaultNameWithAvatar(language);
+        setUsername(name);
+        setRoomName(name);
+        setGuestAvatar(avatar);
+        hasSetRandomNameRef.current = true;
+      }
     }
-  }, [user, profile?.display_name]);
+  }, [user, profile?.display_name, loading, language]);
 
   // Refresh profile on mount for authenticated users to get latest display_name
   useEffect(() => {

@@ -357,12 +357,12 @@ const BotControls: React.FC<BotControlsProps> = ({
         )}
       </AnimatePresence>
 
-      {/* Collapsed State - Show bot avatars preview */}
+      {/* Collapsed State - Show bot avatars preview with emoji and name */}
       {!isExpanded && bots.length > 0 && (
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          className="flex items-center gap-1 pl-6"
+          className="flex items-center gap-2 pl-6 flex-wrap"
         >
           {bots.slice(0, 5).map((bot, index) => (
             <motion.div
@@ -370,10 +370,18 @@ const BotControls: React.FC<BotControlsProps> = ({
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
               transition={{ delay: index * 0.05 }}
-              className="w-6 h-6 rounded-full flex items-center justify-center text-xs border border-neo-black"
-              style={{ backgroundColor: bot.avatar?.color || '#60a5fa' }}
+              className="flex items-center gap-1 bg-neo-black/30 rounded-full px-2 py-0.5 border border-neo-cream/20"
               title={bot.username}
             >
+              <span
+                className="w-5 h-5 rounded-full flex items-center justify-center text-xs shrink-0"
+                style={{ backgroundColor: bot.avatar?.color || '#60a5fa' }}
+              >
+                {bot.avatar?.emoji || '🤖'}
+              </span>
+              <span className="text-xs text-neo-cream/80 font-medium truncate max-w-[80px]">
+                {bot.username}
+              </span>
             </motion.div>
           ))}
           {bots.length > 5 && (

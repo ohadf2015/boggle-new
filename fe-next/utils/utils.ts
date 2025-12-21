@@ -1,4 +1,4 @@
-import { hebrewLetters, swedishLetters, japaneseLetters, kanjiCompounds, DIFFICULTIES, DEFAULT_DIFFICULTY, AVATAR_COLORS, AVATAR_EMOJIS } from "./consts";
+import { hebrewLetters, swedishLetters, spanishLetters, japaneseLetters, kanjiCompounds, DIFFICULTIES, DEFAULT_DIFFICULTY, AVATAR_COLORS, AVATAR_EMOJIS } from "./consts";
 import type { Language, LetterGrid, GridPosition, Avatar } from "@/types";
 
 // Utilities for LexiClash game
@@ -110,6 +110,8 @@ export function generateRandomTable(
       letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
     } else if (language === 'sv') {
       letters = swedishLetters;
+    } else if (language === 'es') {
+      letters = spanishLetters;
     } else if (language === 'ja') {
       // For Japanese, generate a board with embedded Kanji compounds
       return generateJapaneseTable(rows, cols);
@@ -362,10 +364,10 @@ function tryPlaceWordSnake(
 
 // Normalize letter for board display based on language
 function normalizeLetterForBoard(letter: string, language: Language): string {
-  if (language === 'en' || language === 'sv') {
+  if (language === 'en' || language === 'sv' || language === 'es') {
     return letter.toUpperCase();
   }
-  return letter; // Hebrew stays as-is
+  return letter; // Hebrew and Japanese stay as-is
 }
 
 // Generate a Japanese board with embedded Kanji compounds

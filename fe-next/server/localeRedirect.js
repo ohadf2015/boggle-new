@@ -7,10 +7,15 @@
 const COUNTRY_TO_LOCALE = {
   IL: 'he', US: 'en', GB: 'en', CA: 'en', AU: 'en', NZ: 'en',
   IE: 'en', ZA: 'en', IN: 'en', PH: 'en', SG: 'en',
-  SE: 'sv', FI: 'sv', JP: 'ja'
+  SE: 'sv', FI: 'sv', JP: 'ja',
+  // Spanish-speaking countries
+  ES: 'es', MX: 'es', AR: 'es', CO: 'es', CL: 'es', PE: 'es',
+  VE: 'es', EC: 'es', GT: 'es', CU: 'es', BO: 'es', DO: 'es',
+  HN: 'es', PY: 'es', SV: 'es', NI: 'es', CR: 'es', PA: 'es',
+  UY: 'es', PR: 'es', GQ: 'es'
 };
 
-const SUPPORTED_LOCALES = ['he', 'en', 'sv', 'ja'];
+const SUPPORTED_LOCALES = ['he', 'en', 'sv', 'ja', 'es'];
 const DEFAULT_LOCALE = 'he';
 
 // Social media crawler user agents

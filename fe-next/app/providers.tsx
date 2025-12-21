@@ -12,6 +12,7 @@ import { Toaster } from 'react-hot-toast';
 import ErrorBoundary from './components/ErrorBoundary';
 import { initUtmCapture } from '@/utils/utmCapture';
 import { composeProviders } from '@/utils/composeProviders';
+import { linkLogRocketSession } from '@/utils/sentry';
 
 import type { Language } from '@/shared/types/game';
 
@@ -46,6 +47,8 @@ const initLogRocket = () => {
     logRocketInitialized = true;
     import('logrocket').then(({ default: LogRocket }) => {
         LogRocket.init('ioiov9/lexiclash');
+        // Link LogRocket session to Sentry for error replay correlation
+        linkLogRocketSession();
     });
 };
 

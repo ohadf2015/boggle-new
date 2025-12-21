@@ -323,6 +323,10 @@ function isBot(gameCode, username) {
  * @param {number} gameDuration - Game duration in seconds
  */
 async function startBot(bot, grid, language, onWordSubmit, gameDuration) {
+  // Ensure bot is stopped and all timers are cleared before starting new round
+  // This fixes bots not submitting after the first game
+  stopBot(bot);
+
   // Prepare fresh words for the new grid
   await prepareBotWords(bot, grid, language);
 

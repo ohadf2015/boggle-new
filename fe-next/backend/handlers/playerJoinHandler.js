@@ -42,6 +42,7 @@ const logger = require('../utils/logger');
 const { validatePayload, joinGameSchema, leaveRoomSchema } = require('../utils/socketValidation');
 const { MAX_PLAYERS_PER_ROOM } = require('../utils/consts');
 const { isInProgress, canJoinFreely, shouldSendGameState } = require('../utils/gameStateMachine');
+const { notifyPlayerJoined } = require('../modules/notificationService');
 
 /**
  * Register player join/leave socket event handlers
@@ -152,6 +153,17 @@ function registerPlayerJoinHandlers(io, socket) {
     io.emit('activeRooms', { rooms: getActiveRooms() });
 
     logger.info('SOCKET', `${username} joined game ${gameCode}`);
+
+    // Fire-and-forget notification
+    notifyPlayerJoined({
+      gameCode,
+      roomName: game.roomName,
+      language: game.language,
+      playerCount: Object.keys(game.users).length
+    }, {
+      username,
+      isAuthenticated: !!authUserId
+    }).catch(() => {}); // Swallow errors - never block game flow
   });
 
   // Handle leave room

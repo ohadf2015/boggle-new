@@ -10,6 +10,7 @@ import {
   useGridInteraction,
   getPerformanceMode,
   ComboIndicator,
+  ComboExplanationTooltip,
   type SelectedCell,
   type HeatMapData,
   type PerformanceMode,
@@ -105,6 +106,9 @@ const GridComponent = memo<GridComponentProps>(({
     <div className="relative w-full h-full flex items-center justify-center bg-slate-900">
       {/* Combo Indicator - New juicy animation with particles and glow */}
       <ComboIndicator comboLevel={comboLevel} reduceMotion={reduceMotion} />
+
+      {/* First-time combo explanation tooltip */}
+      <ComboExplanationTooltip comboLevel={comboLevel} />
 
       {/* NEO-BRUTALIST: Clean frame wrapper */}
       <div className="game-board-frame relative">

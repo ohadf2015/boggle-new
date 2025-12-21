@@ -23,6 +23,9 @@ const hebrewLetters = [
 
 const swedishLetters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZÅÄÖ'.split('');
 
+// Spanish letters - standard Latin alphabet plus Ñ
+const spanishLetters = 'ABCDEFGHIJKLMNÑOPQRSTUVWXYZ'.split('');
+
 const japaneseLetters = [
   "日", "本", "人", "年", "月", "火", "水", "木", "金", "土",
   "一", "二", "三", "四", "五", "六", "七", "八", "九", "十",
@@ -86,7 +89,7 @@ function filterHebrewWord(word) {
  * @returns {string}
  */
 function normalizeLetterForBoard(letter, language) {
-  if (language === 'en' || language === 'sv') {
+  if (language === 'en' || language === 'sv' || language === 'es') {
     return letter.toUpperCase();
   }
   return letter;
@@ -116,6 +119,8 @@ function generateRandomTable(rows = null, cols = null, language = 'he', wordsToE
     letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
   } else if (language === 'sv') {
     letters = swedishLetters;
+  } else if (language === 'es') {
+    letters = spanishLetters;
   } else if (language === 'ja') {
     return generateJapaneseTable(rows, cols);
   } else {
@@ -422,6 +427,7 @@ module.exports = {
   DEFAULT_DIFFICULTY,
   hebrewLetters,
   swedishLetters,
+  spanishLetters,
   japaneseLetters,
   kanjiCompounds,
 

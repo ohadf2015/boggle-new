@@ -4,7 +4,7 @@ import React, { useState, useEffect, useRef, useCallback, FormEvent } from 'reac
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
-import { FaCrown, FaUser, FaDice, FaSync, FaQrcode, FaQuestionCircle } from 'react-icons/fa';
+import { FaCrown, FaUser, FaDice, FaSync, FaQrcode, FaQuestionCircle, FaPaste } from 'react-icons/fa';
 import { QRCodeSVG } from 'qrcode.react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -73,7 +73,12 @@ const JoinView: React.FC<JoinViewProps> = ({
   const [roomNameErrorKey, setRoomNameErrorKey] = useState<string | undefined>(undefined);
   const [gameCodeErrorKey, setGameCodeErrorKey] = useState<string | undefined>(undefined);
   const [showFullForm, setShowFullForm] = useState<boolean>(!prefilledRoom);
-  const [roomLanguage, setRoomLanguage] = useState<Language>(language as Language);
+  // Map UI language to valid game language (game only supports en, he, sv, ja)
+  const validGameLanguages: Language[] = ['en', 'he', 'sv', 'ja'];
+  const defaultGameLanguage: Language = validGameLanguages.includes(language as Language)
+    ? (language as Language)
+    : 'en';
+  const [roomLanguage, setRoomLanguage] = useState<Language>(defaultGameLanguage);
   const [mobileRoomsExpanded, setMobileRoomsExpanded] = useState<boolean>(false);
   const prevPrefilledRoomRef = useRef<string | null>(prefilledRoom);
   const { notifyError } = useValidation(t);
@@ -554,31 +559,66 @@ const JoinModeFields: React.FC<JoinModeFieldsProps> = ({
             <span className="text-neo-lime text-xs">&#10003;</span>
           )}
         </Label>
-        <Input
-          id="gameCode"
-          value={gameCode}
-          onChange={(e) => {
-            setGameCode(e.target.value);
-            if (gameCodeError) setGameCodeError(false);
-          }}
-          required
-          placeholder={t('validation.enterGameCode')}
-          maxLength={10}
-          pattern="[A-Za-z0-9]*"
-          inputMode="text"
-          aria-invalid={showGameCodeError ? 'true' : undefined}
-          aria-describedby={showGameCodeError ? 'gameCode-error' : undefined}
-          className={cn(
-            "bg-slate-100 dark:bg-slate-700/50 border-slate-200 dark:border-slate-600 text-slate-900 dark:text-white placeholder:text-slate-500 dark:placeholder:text-gray-400 transition-colors",
-            getValidationClasses(
-              gameCodeError ? 'invalid' : gameCodeValidation.state,
-              showGameCodeError ? "border-red-500 bg-red-900/30 focus-visible:ring-red-500" : ""
-            )
-          )}
-        />
+        <div className="flex gap-2">
+          <Input
+            id="gameCode"
+            value={gameCode}
+            onChange={(e) => {
+              setGameCode(e.target.value);
+              if (gameCodeError) setGameCodeError(false);
+            }}
+            required
+            placeholder={t('validation.enterGameCode')}
+            maxLength={10}
+            pattern="[A-Za-z0-9]*"
+            inputMode="text"
+            aria-invalid={showGameCodeError ? 'true' : undefined}
+            aria-describedby={showGameCodeError ? 'gameCode-error' : 'gameCode-hint'}
+            className={cn(
+              "flex-1 bg-slate-100 dark:bg-slate-700/50 border-slate-200 dark:border-slate-600 text-slate-900 dark:text-white placeholder:text-slate-500 dark:placeholder:text-gray-400 transition-colors",
+              getValidationClasses(
+                gameCodeError ? 'invalid' : gameCodeValidation.state,
+                showGameCodeError ? "border-red-500 bg-red-900/30 focus-visible:ring-red-500" : ""
+              )
+            )}
+          />
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  type="button"
+                  size="icon"
+                  variant="outline"
+                  onClick={async () => {
+                    try {
+                      const text = await navigator.clipboard.readText();
+                      const cleaned = text.trim().replace(/[^A-Za-z0-9]/g, '').slice(0, 10);
+                      if (cleaned) {
+                        setGameCode(cleaned);
+                        if (gameCodeError) setGameCodeError(false);
+                      }
+                    } catch {
+                      // Clipboard API not available or permission denied
+                    }
+                  }}
+                  className="bg-neo-cream text-neo-black shrink-0"
+                  aria-label={t('joinView.pasteCode') || 'Paste room code'}
+                >
+                  <FaPaste />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>{t('joinView.pasteCode') || 'Paste code'}</TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        </div>
         {showGameCodeError && (
           <p id="gameCode-error" className="text-sm text-red-400" role="alert">
             {t(gameCodeErrorMessage || 'validation.gameCodeInvalid')}
+          </p>
+        )}
+        {!showGameCodeError && (
+          <p id="gameCode-hint" className="text-xs text-slate-500 dark:text-gray-400">
+            {t('validation.gameCodeHint') || '6-10 alphanumeric characters'}
           </p>
         )}
       </motion.div>

@@ -1,6 +1,6 @@
-import { memo, useCallback, useMemo } from 'react';
-import { motion } from 'framer-motion';
-import { FaChartBar } from 'react-icons/fa';
+import { memo, useCallback, useMemo, useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { FaChartBar, FaGlobe } from 'react-icons/fa';
 import Link from 'next/link';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useAuth } from '../contexts/AuthContext';
@@ -8,6 +8,7 @@ import { cn } from '../lib/utils';
 import AuthButton from './auth/AuthButton';
 import MusicControls from './MusicControls';
 import LevelBadge from './LevelBadge';
+import type { Language } from '../shared/types/game';
 
 /**
  * Header Props
@@ -16,13 +17,22 @@ interface HeaderProps {
   className?: string;
 }
 
+// Language options for the switcher
+const LANGUAGE_OPTIONS: { code: Language; flag: string; name: string }[] = [
+  { code: 'en', flag: '🇺🇸', name: 'English' },
+  { code: 'he', flag: '🇮🇱', name: 'עברית' },
+  { code: 'sv', flag: '🇸🇪', name: 'Svenska' },
+  { code: 'ja', flag: '🇯🇵', name: '日本語' },
+];
+
 /**
  * Header - Neo-Brutalist styled main site header
  * Memoized to prevent unnecessary re-renders
  */
 const Header = memo<HeaderProps>(({ className = '' }) => {
-    const { t, language } = useLanguage();
+    const { t, language, setLanguage, currentFlag } = useLanguage();
     const { isAuthenticated, isAdmin, profile } = useAuth();
+    const [showLangDropdown, setShowLangDropdown] = useState(false);
 
     // Get font family based on language (memoized)
     const fontFamily = useMemo(() => {
@@ -111,8 +121,68 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                     </h1>
                 </motion.button>
 
-                {/* Controls: Admin + Level + Music + Auth/Settings */}
+                {/* Controls: Language + Admin + Level + Music + Auth/Settings */}
                 <div className="flex items-center gap-1.5 sm:gap-3 flex-shrink-0 min-w-0">
+                    {/* Language Switcher */}
+                    <div
+                        className="relative"
+                        onMouseEnter={() => setShowLangDropdown(true)}
+                        onMouseLeave={() => setShowLangDropdown(false)}
+                    >
+                        <button
+                            onClick={() => setShowLangDropdown(!showLangDropdown)}
+                            className={cn(
+                                "flex items-center justify-center gap-1",
+                                "w-8 h-8 sm:w-10 sm:h-10",
+                                "bg-neo-cream text-neo-black",
+                                "border-2 sm:border-3 border-neo-black",
+                                "rounded-neo shadow-hard",
+                                "hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-hard-lg",
+                                "active:translate-x-[1px] active:translate-y-[1px] active:shadow-hard-sm",
+                                "transition-all duration-100"
+                            )}
+                            aria-label={t('common.changeLanguage') || 'Change language'}
+                            aria-expanded={showLangDropdown}
+                            aria-haspopup="listbox"
+                        >
+                            <span className="text-base sm:text-lg">{currentFlag}</span>
+                        </button>
+
+                        <AnimatePresence>
+                            {showLangDropdown && (
+                                <motion.div
+                                    initial={{ opacity: 0, y: -5, scale: 0.95 }}
+                                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                                    exit={{ opacity: 0, y: -5, scale: 0.95 }}
+                                    transition={{ duration: 0.15 }}
+                                    className="absolute top-full right-0 mt-2 z-50 bg-neo-cream border-3 border-neo-black rounded-neo shadow-hard-lg overflow-hidden min-w-[120px]"
+                                    role="listbox"
+                                    aria-label={t('common.selectLanguage') || 'Select language'}
+                                >
+                                    {LANGUAGE_OPTIONS.map((option) => (
+                                        <button
+                                            key={option.code}
+                                            onClick={() => {
+                                                setLanguage(option.code);
+                                                setShowLangDropdown(false);
+                                            }}
+                                            className={cn(
+                                                "w-full flex items-center gap-2 px-3 py-2 text-sm font-bold",
+                                                "hover:bg-neo-cyan transition-colors",
+                                                language === option.code && "bg-neo-cyan"
+                                            )}
+                                            role="option"
+                                            aria-selected={language === option.code}
+                                        >
+                                            <span>{option.flag}</span>
+                                            <span className="text-neo-black">{option.name}</span>
+                                        </button>
+                                    ))}
+                                </motion.div>
+                            )}
+                        </AnimatePresence>
+                    </div>
+
                     {/* Admin Dashboard Link - only shown for admin users */}
                     {isAdmin && (
                         <Link
@@ -128,9 +198,9 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                                 active:translate-x-[2px] active:translate-y-[2px] active:shadow-none
                                 transition-all duration-100
                             "
-                            title="Admin Dashboard"
+                            aria-label={t('common.adminDashboard') || 'Admin Dashboard'}
                         >
-                            <FaChartBar className="text-sm sm:text-base" />
+                            <FaChartBar className="text-sm sm:text-base" aria-hidden="true" />
                         </Link>
                     )}
                     {/* Show level badge for authenticated users - hidden on very small screens */}

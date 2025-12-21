@@ -40,6 +40,7 @@ class Dictionary {
     this.hebrewWords = new Set();
     this.swedishWords = new Set();
     this.japaneseWords = new Set();
+    this.spanishWords = new Set();
     this.kanjiCompounds = []; // Array of valid Kanji compounds for board generation
     this.loaded = false;
   }
@@ -61,6 +62,7 @@ class Dictionary {
       const swedishApprovedFilePath = path.join(__dirname, 'swedish_words_approved.txt');
       const kanjiFilePath = path.join(__dirname, 'kanji_compounds.txt');
       const japaneseApprovedFilePath = path.join(__dirname, 'japanese_words_approved.txt');
+      const spanishApprovedFilePath = path.join(__dirname, 'spanish_words_approved.txt');
 
       // Helper to safely read a file (returns empty string if not exists)
       const safeReadFile = async (filePath) => {
@@ -83,6 +85,7 @@ class Dictionary {
         swedishApprovedContent,
         kanjiContent,
         japaneseApprovedContent,
+        spanishApprovedContent,
       ] = await Promise.all([
         safeReadFile(hebrewFilePath),
         safeReadFile(hebrewApprovedFilePath),
@@ -91,6 +94,7 @@ class Dictionary {
         safeReadFile(swedishApprovedFilePath),
         safeReadFile(kanjiFilePath),
         safeReadFile(japaneseApprovedFilePath),
+        safeReadFile(spanishApprovedFilePath),
       ]);
 
       // Process English words (synchronous require, but fast)
@@ -252,6 +256,32 @@ class Dictionary {
         }
       }
 
+      // Process Spanish words (from npm package, similar to English)
+      const spanishWords = require('an-array-of-spanish-words');
+      this.spanishWords = new Set(spanishWords.map(w => w.toLowerCase()));
+      const spanishMainCount = this.spanishWords.size;
+      logger.debug('DICT', `Loaded ${spanishMainCount} Spanish words from main dictionary`);
+
+      // Process community-approved Spanish words
+      if (spanishApprovedContent) {
+        const approvedWords = spanishApprovedContent
+          .split('\n')
+          .map(w => w.trim().toLowerCase())
+          .filter(w => w.length > 0);
+
+        let spanishApprovedCount = 0;
+        for (const word of approvedWords) {
+          if (!this.spanishWords.has(word)) {
+            this.spanishWords.add(word);
+            spanishApprovedCount++;
+          }
+        }
+        if (spanishApprovedCount > 0) {
+          logger.debug('DICT', `Loaded ${spanishApprovedCount} community-approved Spanish words`);
+        }
+      }
+      logger.debug('DICT', `Total Spanish words: ${this.spanishWords.size}`);
+
       this.loaded = true;
       const loadTime = Date.now() - startTime;
       logger.info('DICT', `All dictionaries loaded in ${loadTime}ms`);
@@ -284,6 +314,11 @@ class Dictionary {
       case 'ja':
         normalizedWord = word; // Japanese doesn't need case normalization
         dictionary = this.japaneseWords;
+        break;
+
+      case 'es':
+        normalizedWord = word.toLowerCase();
+        dictionary = this.spanishWords;
         break;
 
       case 'en':
@@ -328,6 +363,10 @@ class Dictionary {
     return this.isValidWord(word, 'ja');
   }
 
+  isValidSpanishWord(word) {
+    return this.isValidWord(word, 'es');
+  }
+
   // Get random Kanji compounds for board generation
   getRandomKanjiCompounds(count = 5, minLength = 2, maxLength = 4) {
     if (!this.kanjiCompounds || this.kanjiCompounds.length === 0) {
@@ -368,6 +407,10 @@ class Dictionary {
         dictionary = this.englishWords;
         normalizer = (w) => w.toUpperCase(); // English board uses uppercase
         break;
+      case 'es':
+        dictionary = this.spanishWords;
+        normalizer = (w) => w.toUpperCase(); // Spanish board uses uppercase
+        break;
       case 'ja':
         // Japanese uses Kanji compounds, handled separately
         return this.getRandomKanjiCompounds(count, minLength, maxLength);
@@ -403,7 +446,7 @@ function isDictionaryWord(word, language) {
 }
 
 function getAvailableDictionaries() {
-  return ['en', 'he', 'sv', 'ja'];
+  return ['en', 'he', 'sv', 'ja', 'es'];
 }
 
 // Normalize word based on language
@@ -415,6 +458,7 @@ function normalizeWord(word, language) {
       return word; // Japanese doesn't need normalization
     case 'en':
     case 'sv':
+    case 'es':
     default:
       return word.toLowerCase();
   }
@@ -438,6 +482,10 @@ function getLanguageConfig(language) {
     ja: {
       dictionary: dictionary.japaneseWords,
       approvedFile: 'japanese_words_approved.txt'
+    },
+    es: {
+      dictionary: dictionary.spanishWords,
+      approvedFile: 'spanish_words_approved.txt'
     }
   };
   return configs[language] || configs.en;
@@ -483,6 +531,7 @@ module.exports = {
   isValidHebrewWord: (word) => dictionary.isValidHebrewWord(word),
   isValidSwedishWord: (word) => dictionary.isValidSwedishWord(word),
   isValidJapaneseWord: (word) => dictionary.isValidJapaneseWord(word),
+  isValidSpanishWord: (word) => dictionary.isValidSpanishWord(word),
   getRandomKanjiCompounds: (count, minLength, maxLength) => dictionary.getRandomKanjiCompounds(count, minLength, maxLength),
   getRandomLongWords: (language, count, minLength, maxLength) => dictionary.getRandomLongWords(language, count, minLength, maxLength)
 };

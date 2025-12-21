@@ -145,13 +145,14 @@ function registerBotHandlers(io, socket) {
     }
 
     // Check if game is in progress (use state machine helper)
+    // Allow removal in waiting, finished, or validating states
     if (isInProgress(game.gameState)) {
       emitError(socket, 'Cannot remove bots during a game');
       return;
     }
 
-    // Find bot by ID or username
-    const bots = botManager.getGameBots(gameCode);
+    // Find bot by ID or username - check both botManager and game.users
+    let bots = botManager.getGameBots(gameCode);
     let botToRemove = null;
     if (botId) {
       botToRemove = bots.find(b => b.id === botId);
@@ -159,21 +160,41 @@ function registerBotHandlers(io, socket) {
       botToRemove = bots.find(b => b.username === botUsernameToFind);
     }
 
+    // If bot not found in botManager, try to find in game.users as fallback
+    // This handles edge cases where state might be out of sync
+    if (!botToRemove && botUsernameToFind && game.users[botUsernameToFind]?.isBot) {
+      logger.warn('BOT', `Bot "${botUsernameToFind}" not in botManager, removing from game.users only`);
+      removeUserFromGame(gameCode, botUsernameToFind);
+
+      // Broadcast updates
+      broadcastToRoom(io, getGameRoom(gameCode), 'updateUsers', {
+        users: getGameUsers(gameCode)
+      });
+
+      socket.emit('botRemoved', {
+        success: true,
+        username: botUsernameToFind
+      });
+
+      io.emit('activeRooms', { rooms: getActiveRooms() });
+      return;
+    }
+
     if (!botToRemove) {
       emitError(socket, 'Bot not found');
       return;
     }
 
-    // Verify bot belongs to this game
-    if (botToRemove.gameCode !== gameCode) {
+    // Verify bot belongs to this game (skip if gameCode is undefined - older bot format)
+    if (botToRemove.gameCode && botToRemove.gameCode !== gameCode) {
       emitError(socket, 'Bot does not belong to this game');
       return;
     }
 
     const removedUsername = botToRemove.username;
 
-    // Remove bot from manager - pass both gameCode and botId
-    botManager.removeBot(gameCode, botToRemove.id);
+    // Remove bot from manager - pass both gameCode and bot identifier
+    botManager.removeBot(gameCode, botToRemove.id || botToRemove.username);
 
     // Remove from game users
     removeUserFromGame(gameCode, removedUsername);
