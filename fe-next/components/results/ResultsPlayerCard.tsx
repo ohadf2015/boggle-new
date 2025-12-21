@@ -204,8 +204,13 @@ const WordChip = memo<WordChipProps>(({ wordObj, playerCount }) => {
   // Get text color based on background - ensure readability
   const getTextColor = (): string => {
     if (isDuplicate || !isValid || isPending) return 'var(--neo-cream)';
-    // For cyan backgrounds (2-3 point words), use dark text for better contrast
-    if (wordObj.score === 2 || wordObj.score === 3) return 'var(--neo-black)';
+    // For bright backgrounds, use dark text for better contrast
+    // Score 1 (gray), 2-3 (cyan), 4 (orange), 7-8 (pink) need dark text
+    // Score 5-6 (purple) is dark so white text works
+    const score = wordObj.score;
+    if (score === 1 || score === 2 || score === 3 || score === 4 || score >= 7) {
+      return 'var(--neo-black)';
+    }
     return 'var(--neo-cream)';
   };
 
@@ -252,8 +257,9 @@ const WordChip = memo<WordChipProps>(({ wordObj, playerCount }) => {
               </span>
             </TooltipTrigger>
             <TooltipContent
-              side="top"
-              className="bg-neo-purple border-2 border-neo-black shadow-hard rounded-neo p-2"
+              side="bottom"
+              sideOffset={8}
+              className="bg-neo-purple border-2 border-neo-black shadow-hard rounded-neo p-2 z-[200]"
             >
               <p className="text-xs font-bold text-neo-cream">
                 {t('results.pendingValidation') || 'Pending community validation'}
@@ -277,8 +283,9 @@ const WordChip = memo<WordChipProps>(({ wordObj, playerCount }) => {
               </span>
             </TooltipTrigger>
             <TooltipContent
-              side="top"
-              className="bg-neo-purple border-2 border-neo-black shadow-hard rounded-neo p-2 max-w-[250px]"
+              side="bottom"
+              sideOffset={8}
+              className="bg-neo-purple border-2 border-neo-black shadow-hard rounded-neo p-2 max-w-[250px] z-[200]"
             >
               <p className="text-xs font-bold text-neo-cream">{t('results.aiVerified') || 'Verified by AI'}</p>
               {aiReason && (
@@ -301,8 +308,9 @@ const WordChip = memo<WordChipProps>(({ wordObj, playerCount }) => {
               {chipContent}
             </TooltipTrigger>
             <TooltipContent
-              side="top"
-              className="bg-neo-red border-2 border-neo-black shadow-hard rounded-neo p-2 max-w-[250px] hidden sm:block"
+              side="bottom"
+              sideOffset={8}
+              className="bg-neo-red border-2 border-neo-black shadow-hard rounded-neo p-2 max-w-[250px] hidden sm:block z-[200]"
             >
               {isAiVerified && (
                 <p className="text-[10px] font-bold text-neo-yellow mb-1 flex items-center gap-1">
