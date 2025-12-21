@@ -4,6 +4,7 @@ import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FaArrowLeft, FaPause, FaPlay, FaCrown } from 'react-icons/fa';
 import { TrendingUp, Target, Zap } from 'lucide-react';
+import { HelpPanel, HelpButton } from '@/components/game/HelpPanel';
 import { Button } from '@/components/ui/button';
 import GridComponent from '@/components/GridComponent';
 import CircularTimer from '@/components/CircularTimer';
@@ -63,6 +64,7 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
   const [botScores, setBotScores] = useState<Record<string, number>>({});
   const [botWords, setBotWords] = useState<Record<string, string[]>>({});
   const [isGameOver, setIsGameOver] = useState(false);
+  const [isHelpOpen, setIsHelpOpen] = useState(false);
 
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const comboTimeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -229,13 +231,14 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
       const results: SinglePlayerResultsData = {
         playerScore: finalScore,
         playerWords: validWords.map(w => w.word),
-        playerWordData: validWords.map(w => ({
+        // Include ALL words (valid and invalid) so results page can display invalid words too
+        playerWordData: finalWords.map(w => ({
           word: w.word,
-          score: w.score,
+          score: w.isValid ? w.score : 0,
           timestamp: w.timestamp,
           timeSinceStart: w.timeSinceStart,
-          isValid: true,
-          comboBonus: w.comboBonus || 0,
+          isValid: w.isValid === true,
+          comboBonus: w.isValid ? (w.comboBonus || 0) : 0,
         })),
         gameDuration: settings.timerSeconds,
         botScores: settings.bots.map(bot => ({
@@ -787,6 +790,18 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
           </div>
         </div>
       )}
+
+      {/* Help Button - fixed position */}
+      <HelpButton
+        onClick={() => setIsHelpOpen(true)}
+        className="fixed bottom-20 right-4 z-40"
+      />
+
+      {/* Help Panel - bottom sheet */}
+      <HelpPanel
+        isOpen={isHelpOpen}
+        onClose={() => setIsHelpOpen(false)}
+      />
     </div>
   );
 };

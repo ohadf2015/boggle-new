@@ -29,8 +29,10 @@ export const englishLetters: string[] = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
 
 export const swedishLetters: string[] = 'ABCDEFGHIJKLMNOPQRSTUVWXYZÅÄÖ'.split('');
 
-// Spanish letters - standard Latin alphabet plus Ñ
-export const spanishLetters: string[] = 'ABCDEFGHIJKLMNÑOPQRSTUVWXYZ'.split('');
+// Spanish letters - standard Latin alphabet plus Ñ and accented vowels
+export const spanishBaseLetters: string[] = 'ABCDEFGHIJKLMNÑOPQRSTUVWXYZ'.split('');
+export const spanishAccentedLetters: string[] = ['Á', 'É', 'Í', 'Ó', 'Ú', 'Ü'];
+export const spanishLetters: string[] = [...spanishBaseLetters, ...spanishAccentedLetters];
 
 export const japaneseLetters: string[] = [
   // Common kanji for word games
@@ -133,12 +135,12 @@ export const getRecommendedTimer = (difficulty: string): number => {
 // Adaptive deadzone threshold for directional locking
 // Smaller threshold for more responsive selection
 export const getDeadzoneThreshold = (): number => {
-  if (typeof window === 'undefined') return 15;
+  if (typeof window === 'undefined') return 10;
   const screenWidth = window.innerWidth;
-  if (screenWidth < 375) return 20;  // Small phones (iPhone SE)
-  if (screenWidth < 414) return 18;  // Regular phones
-  if (screenWidth < 768) return 15;  // Large phones
-  return 12;                          // Tablets and desktop
+  if (screenWidth < 375) return 14;  // Small phones (iPhone SE)
+  if (screenWidth < 414) return 12;  // Regular phones
+  if (screenWidth < 768) return 10;  // Large phones
+  return 8;                           // Tablets and desktop
 };
 
 // Minimum word length options

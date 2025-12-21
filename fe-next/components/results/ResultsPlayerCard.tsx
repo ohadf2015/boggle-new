@@ -398,9 +398,10 @@ const WordChip = memo<WordChipProps>(({ wordObj, playerCount }) => {
 WordChip.displayName = 'WordChip';
 
 const ResultsPlayerCard: React.FC<ResultsPlayerCardProps> = ({ player, index, allPlayerWords, currentUsername, isWinner, xpGainedData, levelUpData, duplicateRuleDisabled }) => {
-  const { t, dir } = useLanguage();
-  // Arrow direction for level up indicator - flip for RTL
-  const levelArrow = dir === 'rtl' ? '←' : '→';
+  const { t } = useLanguage();
+  // Arrow for level up indicator - always use → to show progression/increase
+  // The arrow represents "going up" regardless of text direction
+  const levelArrow = '→';
 
   // Check if this is the current player
   const isCurrentPlayer = currentUsername && player.username === currentUsername;
@@ -416,9 +417,17 @@ const ResultsPlayerCard: React.FC<ResultsPlayerCardProps> = ({ player, index, al
   const avatar = player.avatar || null;
 
   // Memoize expensive word categorization and grouping at component level (not inside JSX)
-  const { duplicateWords, invalidWords, wordsByPoints, sortedPointGroups, totalComboBonus } = useMemo(() => {
+  const { duplicateWords, invalidWords, validWords, wordsByPoints, sortedPointGroups, totalComboBonus, summaryStats } = useMemo(() => {
     if (!player.allWords || player.allWords.length === 0) {
-      return { duplicateWords: [], invalidWords: [], wordsByPoints: {}, sortedPointGroups: [], totalComboBonus: 0 };
+      return {
+        duplicateWords: [] as WordObject[],
+        invalidWords: [] as WordObject[],
+        validWords: [] as WordObject[],
+        wordsByPoints: {} as Record<number, WordObject[]>,
+        sortedPointGroups: [] as number[],
+        totalComboBonus: 0,
+        summaryStats: null
+      };
     }
 
     const duplicateWords = player.allWords.filter(w => w && w.isDuplicate);
@@ -460,7 +469,26 @@ const ResultsPlayerCard: React.FC<ResultsPlayerCardProps> = ({ player, index, al
       .map(Number)
       .sort((a, b) => b - a);
 
-    return { duplicateWords, invalidWords, wordsByPoints, sortedPointGroups, totalComboBonus };
+    // Calculate summary statistics
+    const longestWord = validWords.reduce((max, w) =>
+      w.word.length > max.length ? w.word : max, '');
+    const avgWordLength = validWords.length > 0
+      ? (validWords.reduce((sum, w) => sum + w.word.length, 0) / validWords.length).toFixed(1)
+      : '0';
+    const accuracy = player.allWords.length > 0
+      ? Math.round((validWords.length / player.allWords.length) * 100)
+      : 0;
+
+    const summaryStats = {
+      totalWords: player.allWords.length,
+      validCount: validWords.length,
+      longestWord: longestWord ? applyHebrewFinalLetters(longestWord) : '-',
+      longestWordLength: longestWord.length,
+      avgWordLength,
+      accuracy,
+    };
+
+    return { duplicateWords, invalidWords, validWords, wordsByPoints, sortedPointGroups, totalComboBonus, summaryStats };
   }, [player.allWords, player.username]);
 
   // Calculate player insights (only for current player to avoid unnecessary computation)
@@ -718,6 +746,42 @@ const ResultsPlayerCard: React.FC<ResultsPlayerCardProps> = ({ player, index, al
                 )}
                 {player.allWords && player.allWords.length > 0 && (
                 <div className="space-y-3 pt-3">
+                  {/* Summary Stats Card - Quick glance performance overview */}
+                  {summaryStats && (
+                    <motion.div
+                      initial={{ opacity: 0, y: -10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="bg-neo-cyan/20 border-2 border-neo-cyan rounded-neo p-3"
+                    >
+                      <div className="grid grid-cols-3 gap-2 text-center">
+                        <div>
+                          <div className="text-xl sm:text-2xl font-black text-neo-black dark:text-neo-cream">
+                            {summaryStats.validCount}
+                          </div>
+                          <div className="text-[10px] sm:text-xs uppercase text-neo-black/70 dark:text-neo-cream/70 font-bold">
+                            {t('results.validWords') || 'Valid'}
+                          </div>
+                        </div>
+                        <div>
+                          <div className="text-lg sm:text-xl font-black text-neo-cyan uppercase">
+                            {summaryStats.longestWord}
+                          </div>
+                          <div className="text-[10px] sm:text-xs uppercase text-neo-black/70 dark:text-neo-cream/70 font-bold">
+                            {t('results.longest') || 'Longest'}
+                          </div>
+                        </div>
+                        <div>
+                          <div className="text-xl sm:text-2xl font-black text-neo-purple">
+                            {summaryStats.accuracy}%
+                          </div>
+                          <div className="text-[10px] sm:text-xs uppercase text-neo-black/70 dark:text-neo-cream/70 font-bold">
+                            {t('results.accuracy') || 'Accuracy'}
+                          </div>
+                        </div>
+                      </div>
+                    </motion.div>
+                  )}
+
                   {/* Valid Words Grouped by Points - Neo-Brutalist */}
                   {sortedPointGroups.length > 0 && (
                     <div className="bg-neo-cream dark:bg-slate-800 rounded-neo p-3 border-3 border-neo-black shadow-hard-sm">

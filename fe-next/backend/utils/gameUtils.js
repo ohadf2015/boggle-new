@@ -23,8 +23,19 @@ const hebrewLetters = [
 
 const swedishLetters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZÅÄÖ'.split('');
 
-// Spanish letters - standard Latin alphabet plus Ñ
-const spanishLetters = 'ABCDEFGHIJKLMNÑOPQRSTUVWXYZ'.split('');
+// Spanish letters - standard Latin alphabet plus Ñ and accented vowels
+const spanishBaseLetters = 'ABCDEFGHIJKLMNÑOPQRSTUVWXYZ'.split('');
+const spanishAccentedLetters = ['Á', 'É', 'Í', 'Ó', 'Ú', 'Ü'];
+const spanishLetters = [...spanishBaseLetters, ...spanishAccentedLetters];
+
+// Weighted letter pool for Spanish board generation
+// Regular vowels appear 3x more often than accented vowels for better playability
+const spanishLetterPool = [
+  ...spanishBaseLetters,
+  ...spanishBaseLetters.filter(l => 'AEIOU'.includes(l)),
+  ...spanishBaseLetters.filter(l => 'AEIOU'.includes(l)),
+  ...spanishAccentedLetters
+];
 
 const japaneseLetters = [
   "日", "本", "人", "年", "月", "火", "水", "木", "金", "土",
@@ -57,6 +68,16 @@ const validHebrewLettersSet = new Set([
   'א', 'ב', 'ג', 'ד', 'ה', 'ו', 'ז', 'ח', 'ט', 'י',
   'כ', 'ך', 'ל', 'מ', 'ם', 'נ', 'ן', 'ס', 'ע', 'פ',
   'ף', 'צ', 'ץ', 'ק', 'ר', 'ש', 'ת'
+]);
+
+// Valid Spanish letters set for filtering (includes accented vowels)
+const validSpanishLettersSet = new Set([
+  'A', 'Á', 'B', 'C', 'D', 'E', 'É', 'F', 'G', 'H', 'I', 'Í',
+  'J', 'K', 'L', 'M', 'N', 'Ñ', 'O', 'Ó', 'P', 'Q', 'R', 'S',
+  'T', 'U', 'Ú', 'Ü', 'V', 'W', 'X', 'Y', 'Z',
+  'a', 'á', 'b', 'c', 'd', 'e', 'é', 'f', 'g', 'h', 'i', 'í',
+  'j', 'k', 'l', 'm', 'n', 'ñ', 'o', 'ó', 'p', 'q', 'r', 's',
+  't', 'u', 'ú', 'ü', 'v', 'w', 'x', 'y', 'z'
 ]);
 
 // ==========================================
@@ -120,7 +141,7 @@ function generateRandomTable(rows = null, cols = null, language = 'he', wordsToE
   } else if (language === 'sv') {
     letters = swedishLetters;
   } else if (language === 'es') {
-    letters = spanishLetters;
+    letters = spanishLetterPool;
   } else if (language === 'ja') {
     return generateJapaneseTable(rows, cols);
   } else {
@@ -428,6 +449,9 @@ module.exports = {
   hebrewLetters,
   swedishLetters,
   spanishLetters,
+  spanishLetterPool,
+  spanishAccentedLetters,
+  validSpanishLettersSet,
   japaneseLetters,
   kanjiCompounds,
 

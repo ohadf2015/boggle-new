@@ -28,6 +28,7 @@ interface UseGridInteractionReturn {
   handleMouseMove: (e: React.MouseEvent<HTMLDivElement>) => void;
   handleKeyDown: (e: React.KeyboardEvent<HTMLDivElement>) => void;
   startSequentialFadeOut: (isCombo?: boolean) => void;
+  undoLastCell: () => void;
 }
 
 // Selection threshold - must be within this % of cell center to select
@@ -502,6 +503,16 @@ export function useGridInteraction({
     return () => window.removeEventListener('pointerdown', handlePointerDown);
   }, []);
 
+  // Undo last selected cell - can be called from button or keyboard
+  const undoLastCell = useCallback(() => {
+    if (selectedCells.length > 0) {
+      setSelectedCells(selectedCells.slice(0, -1));
+      if (window.navigator?.vibrate) {
+        window.navigator.vibrate(15);
+      }
+    }
+  }, [selectedCells, setSelectedCells]);
+
   return {
     selectedCells,
     fadingCells,
@@ -513,5 +524,6 @@ export function useGridInteraction({
     handleMouseMove,
     handleKeyDown,
     startSequentialFadeOut,
+    undoLastCell,
   };
 }

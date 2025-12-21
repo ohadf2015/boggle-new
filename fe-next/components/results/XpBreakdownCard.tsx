@@ -31,10 +31,11 @@ interface XpBreakdownCardProps {
 }
 
 const XpBreakdownCard = memo<XpBreakdownCardProps>(({ xpGainedData, levelUpData, isWinner }) => {
-  const { t, dir } = useLanguage();
+  const { t } = useLanguage();
   const { xpBreakdown, xpEarned, newTotalXp, newLevel } = xpGainedData;
-  // Arrow direction for level up indicator - flip for RTL
-  const levelArrow = dir === 'rtl' ? '←' : '→';
+  // Arrow for level up indicator - always use → to show progression/increase
+  // The arrow represents "going up" regardless of text direction
+  const levelArrow = '→';
 
   const breakdownItems = [
     { key: 'gameCompletion', label: t('xp.baseXp') || 'Base XP', value: xpBreakdown.gameCompletion, icon: '🎮' },

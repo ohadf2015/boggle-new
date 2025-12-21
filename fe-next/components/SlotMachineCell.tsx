@@ -8,7 +8,7 @@ const CHAR_SETS: Record<Language, string> = {
   he: 'אבגדהוזחטיכלמנסעפצקרשת',
   sv: 'ABCDEFGHIJKLMNOPQRSTUVWXYZÅÄÖ',
   ja: '日本人年月火水木金土一二三四五六七八九十大小中上下',
-  es: 'ABCDEFGHIJKLMNOPQRSTUVWXYZÑ',
+  es: 'ABCDEFGHIJKLMNÑOPQRSTUVWXYZÁÉÍÓÚÜ',
   fr: 'ABCDEFGHIJKLMNOPQRSTUVWXYZÀÂÆÇÉÈÊËÏÎÔÙÛÜŸ',
   de: 'ABCDEFGHIJKLMNOPQRSTUVWXYZÄÖÜß',
 };

@@ -9,7 +9,7 @@
  */
 
 const { isDictionaryWord, normalizeWord, dictionary } = require('../dictionary');
-const { normalizeHebrewLetter } = require('./wordValidator');
+const { normalizeHebrewLetter, normalizeSpanishLetter } = require('./wordValidator');
 const logger = require('../utils/logger');
 
 // Direction vectors for 8-way adjacent movement
@@ -53,6 +53,9 @@ function getCachedTrie(language) {
       break;
     case 'ja':
       wordSet = dictionary.japaneseWords;
+      break;
+    case 'es':
+      wordSet = dictionary.spanishWords;
       break;
     default:
       wordSet = dictionary.englishWords;
@@ -181,11 +184,13 @@ function findAllWords(grid, language, options = {}) {
   const cols = grid[0].length;
   const foundWords = new Set();
 
-  // Normalize grid letters
+  // Normalize grid letters based on language
   const normalizedGrid = grid.map(row =>
     row.map(cell => {
       const letter = String(cell).toLowerCase();
-      return language === 'he' ? normalizeHebrewLetter(letter) : letter;
+      if (language === 'he') return normalizeHebrewLetter(letter);
+      if (language === 'es') return normalizeSpanishLetter(letter);
+      return letter;
     })
   );
 
@@ -416,11 +421,13 @@ function getWordPath(word, grid, language) {
   const cols = grid[0].length;
   const normalizedWord = normalizeWord(word, language);
 
-  // Normalize grid
+  // Normalize grid based on language
   const normalizedGrid = grid.map(row =>
     row.map(cell => {
       const letter = String(cell).toLowerCase();
-      return language === 'he' ? normalizeHebrewLetter(letter) : letter;
+      if (language === 'he') return normalizeHebrewLetter(letter);
+      if (language === 'es') return normalizeSpanishLetter(letter);
+      return letter;
     })
   );
 

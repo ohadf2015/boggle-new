@@ -389,7 +389,7 @@ body {
     box-shadow: var(--shadow-xl);
     border-radius: var(--radius-lg);
     /* No rotation - keep grid perfectly straight */
-    padding: 16px;
+    padding: 10px;
     /* Constrain to a perfect square */
     width: min(100%, 80vh);
     max-width: min(100%, 80vh);
@@ -409,7 +409,7 @@ body {
   /* On smaller screens, reduce padding to maximize board size */
   @media (max-width: 768px) {
     .game-board-frame {
-      padding: 6px;
+      padding: 4px;
       /* On mobile, use full width but still square */
       width: 100%;
       max-width: 100%;
@@ -1513,7 +1513,7 @@ body {
 /* Extra small screens (< 360px) */
 @media (max-width: 359px) {
   .game-board-frame {
-    padding: 4px;
+    padding: 2px;
   }
 
   .text-responsive-sm {

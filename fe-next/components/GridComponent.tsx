@@ -1,6 +1,7 @@
-import React, { useState, useRef, useEffect, memo } from 'react';
-import { motion } from 'framer-motion';
+import React, { useState, useRef, useEffect, memo, useMemo } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '../lib/utils';
+import { Undo2 } from 'lucide-react';
 import type { LetterGrid, GridPosition } from '@/types';
 
 // Import extracted utilities
@@ -64,6 +65,7 @@ const GridComponent = memo<GridComponentProps>(({
     handleMouseDown,
     handleMouseMove,
     handleKeyDown,
+    undoLastCell,
   } = useGridInteraction({
     grid,
     interactive,
@@ -72,6 +74,51 @@ const GridComponent = memo<GridComponentProps>(({
     externalSelectedCells,
     gridRef,
   });
+
+  // Calculate the word being formed from selected cells
+  const formedWord = useMemo(() => {
+    return selectedCells.map(c => c.letter).join('');
+  }, [selectedCells]);
+
+  // Calculate adjacent cells for highlighting hints
+  const adjacentHintCells = useMemo(() => {
+    if (selectedCells.length === 0) return new Set<string>();
+    const lastCell = selectedCells[selectedCells.length - 1];
+    if (!lastCell) return new Set<string>();
+
+    const hints = new Set<string>();
+    for (let dr = -1; dr <= 1; dr++) {
+      for (let dc = -1; dc <= 1; dc++) {
+        if (dr === 0 && dc === 0) continue;
+        const newRow = lastCell.row + dr;
+        const newCol = lastCell.col + dc;
+        if (newRow >= 0 && newRow < grid.length &&
+            newCol >= 0 && newCol < (grid[0]?.length || 0)) {
+          // Only hint cells that aren't already selected
+          const isAlreadySelected = selectedCells.some(c => c.row === newRow && c.col === newCol);
+          if (!isAlreadySelected) {
+            hints.add(`${newRow}-${newCol}`);
+          }
+        }
+      }
+    }
+    return hints;
+  }, [selectedCells, grid]);
+
+  // Calculate cell positions for SVG path lines
+  const cellPositions = useMemo(() => {
+    if (!gridRef.current || selectedCells.length < 2) return [];
+
+    const gridRect = gridRef.current.getBoundingClientRect();
+    const cols = grid[0]?.length || 4;
+    const cellWidth = gridRect.width / cols;
+    const cellHeight = gridRect.height / grid.length;
+
+    return selectedCells.map(cell => ({
+      x: (cell.col + 0.5) * cellWidth,
+      y: (cell.row + 0.5) * cellHeight,
+    }));
+  }, [selectedCells, grid, gridRef]);
 
   // Auto-focus on grid when game becomes interactive
   useEffect(() => {
@@ -104,6 +151,45 @@ const GridComponent = memo<GridComponentProps>(({
 
   return (
     <div className="relative w-full h-full flex items-center justify-center bg-slate-900">
+      {/* Word Preview - shows forming word above grid */}
+      <AnimatePresence>
+        {interactive && selectedCells.length > 0 && (
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            className="absolute top-2 sm:top-4 left-1/2 transform -translate-x-1/2 z-30"
+          >
+            <div className="bg-neo-cyan border-3 border-neo-black rounded-neo px-4 py-2 shadow-hard flex items-center gap-2">
+              <span className="font-black text-xl sm:text-2xl text-neo-black uppercase tracking-wide">
+                {formedWord}
+              </span>
+              <span className="text-xs font-bold text-neo-black/60 bg-neo-black/10 px-1.5 py-0.5 rounded">
+                {selectedCells.length} letters
+              </span>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Undo Button - visible when cells are selected */}
+      <AnimatePresence>
+        {interactive && selectedCells.length > 0 && (
+          <motion.button
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.8 }}
+            onClick={undoLastCell}
+            className="absolute top-2 sm:top-4 right-2 sm:right-4 z-30 bg-neo-orange border-3 border-neo-black rounded-neo px-3 py-2 shadow-hard hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-hard-lg active:translate-x-[1px] active:translate-y-[1px] active:shadow-hard-pressed transition-all flex items-center gap-1.5"
+            aria-label="Undo last letter (Backspace)"
+            title="Undo last letter (Backspace)"
+          >
+            <Undo2 className="w-4 h-4 sm:w-5 sm:h-5 text-neo-black" />
+            <span className="hidden sm:inline text-sm font-black text-neo-black">Undo</span>
+          </motion.button>
+        )}
+      </AnimatePresence>
+
       {/* Combo Indicator - New juicy animation with particles and glow */}
       <ComboIndicator comboLevel={comboLevel} reduceMotion={reduceMotion} />
 
@@ -118,7 +204,7 @@ const GridComponent = memo<GridComponentProps>(({
           dir="ltr"
           className={cn(
             "grid touch-none select-none relative rounded-neo w-full h-full",
-            isLargeGrid ? "gap-1 sm:gap-1" : "gap-1 sm:gap-1.5",
+            isLargeGrid ? "gap-0.5 sm:gap-0.5" : "gap-1 sm:gap-1.5",
             "bg-neo-cream border-2 border-neo-black/20",
             className
           )}
@@ -138,6 +224,35 @@ const GridComponent = memo<GridComponentProps>(({
           onMouseMove={handleMouseMove}
           onKeyDown={handleKeyDown}
         >
+          {/* SVG Overlay for selection path lines */}
+          {interactive && selectedCells.length >= 2 && !reduceMotion && (
+            <svg
+              className="absolute inset-0 pointer-events-none z-20"
+              style={{ width: '100%', height: '100%' }}
+            >
+              {cellPositions.map((pos, idx) => {
+                if (idx === 0) return null;
+                const prev = cellPositions[idx - 1];
+                if (!prev) return null;
+                return (
+                  <motion.line
+                    key={`path-${idx}`}
+                    x1={prev.x}
+                    y1={prev.y}
+                    x2={pos.x}
+                    y2={pos.y}
+                    stroke={comboLevel >= 3 ? '#FF6B35' : '#00FFFF'}
+                    strokeWidth={comboLevel >= 5 ? 6 : 4}
+                    strokeLinecap="round"
+                    strokeOpacity={0.7}
+                    initial={{ pathLength: 0, opacity: 0 }}
+                    animate={{ pathLength: 1, opacity: 0.7 }}
+                    transition={{ duration: 0.15 }}
+                  />
+                );
+              })}
+            </svg>
+          )}
           {grid.map((row, i) =>
             row.map((cell, j) => {
               const isSelected = selectedCells.some(c => c.row === i && c.col === j);
@@ -146,6 +261,7 @@ const GridComponent = memo<GridComponentProps>(({
               const isFading = fadingCells.some(c => c.row === i && c.col === j);
               const isFocused = focusedCell?.row === i && focusedCell?.col === j;
               const heatStyle = getHeatMapStyle(i, j, heatMapData);
+              const isAdjacentHint = adjacentHintCells.has(`${i}-${j}`);
 
               return (
                 <motion.div
@@ -188,6 +304,8 @@ const GridComponent = memo<GridComponentProps>(({
                         ? `${comboColors.textColor || 'text-neo-black'} ${comboColors.border} z-10 ${comboColors.shadow}`
                         : `${comboColors.bg} ${comboColors.textColor || 'text-neo-black'} border-3 ${comboColors.border} z-10 ${comboColors.shadow}`
                       : "bg-neo-white text-neo-black border-3 border-neo-black shadow-hard-sm hover:shadow-hard hover:translate-x-[-1px] hover:translate-y-[-1px] active:translate-x-[1px] active:translate-y-[1px] active:shadow-hard-pressed",
+                    // Adjacent cell hint - subtle glow indicating valid next selection
+                    isAdjacentHint && !isSelected && "ring-2 ring-neo-yellow/70 ring-offset-1 ring-offset-neo-cream",
                     // Keyboard focus indicator
                     isFocused && !isSelected && "ring-4 ring-neo-cyan ring-offset-2 ring-offset-neo-cream z-20",
                     "transition-all",

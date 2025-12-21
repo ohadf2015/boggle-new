@@ -450,6 +450,7 @@ export default function MultiplayerPage(): React.JSX.Element {
     newSocket.on('disconnect', (reason) => {
       logger.log('[SOCKET.IO] Disconnected:', reason);
       setIsConnected(false);
+      setIsJoining(false); // Clear joining state on disconnect to prevent stuck button
 
       if (reason === 'io server disconnect') {
         newSocket.connect();
@@ -459,6 +460,7 @@ export default function MultiplayerPage(): React.JSX.Element {
     newSocket.on('connect_error', (error) => {
       logger.error('[SOCKET.IO] Connection error:', error.message);
       setError(t('errors.unstableConnection') || 'Connection error');
+      setIsJoining(false); // Clear joining state on connection error
     });
 
     newSocket.on('reconnect', (attemptNumber) => {
@@ -473,6 +475,7 @@ export default function MultiplayerPage(): React.JSX.Element {
     newSocket.on('reconnect_failed', () => {
       logger.error('[SOCKET.IO] Reconnection failed');
       setError(t('errors.connectionLost') || 'Connection lost');
+      setIsJoining(false); // Clear joining state on reconnection failure
     });
 
     // Game events

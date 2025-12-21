@@ -18,6 +18,25 @@ export function normalizeHebrewWord(word: string): string {
   return word.split('').map(letter => hebrewFinalLetters[letter] || letter).join('');
 }
 
+// Spanish accent normalization - matches backend
+// Accented vowels are normalized to base vowels for dictionary lookup
+// Note: Ñ is kept as-is since it exists in the dictionary as a distinct letter
+const spanishAccentMap: Record<string, string> = {
+  'á': 'a', 'é': 'e', 'í': 'i', 'ó': 'o', 'ú': 'u', 'ü': 'u'
+};
+
+export function normalizeSpanishLetter(letter: string): string {
+  const lower = letter.toLowerCase();
+  return spanishAccentMap[lower] || lower;
+}
+
+export function normalizeSpanishWord(word: string): string {
+  return word.split('').map(c => {
+    const lower = c.toLowerCase();
+    return spanishAccentMap[lower] || lower;
+  }).join('');
+}
+
 /**
  * Normalize word based on language (matches backend normalization)
  */
@@ -25,6 +44,8 @@ export function normalizeWord(word: string, language: string): string {
   switch (language) {
     case 'he':
       return normalizeHebrewWord(word);
+    case 'es':
+      return normalizeSpanishWord(word);
     case 'ja':
       return word; // Japanese doesn't need normalization
     case 'en':
@@ -43,6 +64,8 @@ export function getLanguageRegex(language: string): RegExp {
       return /^[\u0590-\u05FF]+$/;
     case 'sv':
       return /^[a-zA-ZåäöÅÄÖ]+$/;
+    case 'es':
+      return /^[a-zA-ZáéíóúüñÁÉÍÓÚÜÑ]+$/;
     case 'ja':
       return /^[\u3040-\u309F\u30A0-\u30FF\u4E00-\u9FAF]+$/;
     case 'en':

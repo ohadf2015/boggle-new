@@ -34,6 +34,24 @@ function isValidHebrewWordForBoard(word) {
   return word.split('').every(char => validHebrewLetters.has(char));
 }
 
+// Spanish accent normalization - accented vowels to base vowels for dictionary lookup
+// Note: Ñ is kept as-is since it exists in the dictionary as a distinct letter
+const spanishAccentMap = {
+  'á': 'a', 'é': 'e', 'í': 'i', 'ó': 'o', 'ú': 'u', 'ü': 'u'
+};
+
+function normalizeSpanishLetter(letter) {
+  const lower = letter.toLowerCase();
+  return spanishAccentMap[lower] || lower;
+}
+
+function normalizeSpanishWord(word) {
+  return word.split('').map(c => {
+    const lower = c.toLowerCase();
+    return spanishAccentMap[lower] || lower;
+  }).join('');
+}
+
 class Dictionary {
   constructor() {
     this.englishWords = new Set();
@@ -317,7 +335,7 @@ class Dictionary {
         break;
 
       case 'es':
-        normalizedWord = word.toLowerCase();
+        normalizedWord = normalizeSpanishWord(word);
         dictionary = this.spanishWords;
         break;
 
@@ -454,11 +472,12 @@ function normalizeWord(word, language) {
   switch (language) {
     case 'he':
       return normalizeHebrewWord(word);
+    case 'es':
+      return normalizeSpanishWord(word);
     case 'ja':
       return word; // Japanese doesn't need normalization
     case 'en':
     case 'sv':
-    case 'es':
     default:
       return word.toLowerCase();
   }
@@ -522,6 +541,8 @@ module.exports = {
   isDictionaryWord,
   getAvailableDictionaries,
   normalizeHebrewWord,
+  normalizeSpanishLetter,
+  normalizeSpanishWord,
   normalizeWord,
   addApprovedWord,
   // Also export the dictionary instance as default for backward compatibility
