@@ -898,6 +898,21 @@ export default function MultiplayerPage(): React.JSX.Element {
       logger.warn('[AUTH] Auth loading timed out, proceeding without profile');
     }
 
+    // Compute the correct username at join time to avoid stale state issues
+    // When authenticated, always prefer the profile/OAuth display name over any generated guest name
+    const effectiveUsername = user
+      ? (profile?.display_name ||
+         user?.user_metadata?.full_name ||
+         user?.user_metadata?.name ||
+         user?.email?.split('@')[0] ||
+         username)
+      : username;
+
+    // Also update state to keep it in sync for future use
+    if (effectiveUsername !== username) {
+      setUsername(effectiveUsername);
+    }
+
     setError('');
     setIsJoining(true); // Show loading state
 
@@ -931,7 +946,7 @@ export default function MultiplayerPage(): React.JSX.Element {
       if (user?.id) {
         // Authenticated user (has Supabase auth, regardless of profile status)
         authUserId = user.id;
-        logger.log('[AUTH] Joining as authenticated user:', { authUserId, username, hasProfile: !!profile });
+        logger.log('[AUTH] Joining as authenticated user:', { authUserId, username: effectiveUsername, hasProfile: !!profile });
       } else {
         // Guest user - get or create guest session
         const guestSessionId = getGuestSessionId();
@@ -943,29 +958,31 @@ export default function MultiplayerPage(): React.JSX.Element {
     }
 
     if (isHostMode) {
+      // For hosts, the username is the effective username (authenticated name or room name)
+      const hostDisplayName = user ? effectiveUsername : roomName;
       socket.emit('createGame', {
         gameCode: codeToUse,
-        roomName,
-        hostUsername: roomName,
+        roomName: hostDisplayName,
+        hostUsername: hostDisplayName,
         language: roomLang || language,
         authUserId,
         guestTokenHash,
         avatar: profile ? {
           emoji: profile.avatar_emoji,
           color: profile.avatar_color,
-        } : getAvatarForName(roomName),
+        } : getAvatarForName(hostDisplayName),
         profilePictureUrl: profile?.profile_picture_url,
       });
     } else {
       socket.emit('join', {
         gameCode: codeToUse,
-        username,
+        username: effectiveUsername,
         authUserId,
         guestTokenHash,
         avatar: profile ? {
           emoji: profile.avatar_emoji,
           color: profile.avatar_color,
-        } : getAvatarForName(username),
+        } : getAvatarForName(effectiveUsername),
         profilePictureUrl: profile?.profile_picture_url,
       });
     }
