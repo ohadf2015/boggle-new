@@ -475,14 +475,26 @@ export default function RulesPage(): React.JSX.Element {
                     </div>
                 </motion.div>
 
-                {/* Back to Home Link */}
+                {/* Back to Home Button */}
                 <div className="text-center pb-8">
-                    <Link
-                        href={`/${language}`}
-                        className="inline-flex items-center gap-2 text-neo-cyan hover:underline font-medium"
-                    >
-                        <FaArrowLeft />
-                        {t('rules.backToHome')}
+                    <Link href={`/${language}`}>
+                        <motion.button
+                            whileHover={{ x: -4 }}
+                            whileTap={{ scale: 0.95 }}
+                            className="
+                                inline-flex items-center gap-2 sm:gap-3
+                                px-5 sm:px-6 py-2.5 sm:py-3
+                                bg-neo-cream text-neo-black
+                                font-bold text-base sm:text-lg
+                                border-3 border-neo-black
+                                rounded-neo shadow-hard
+                                hover:bg-neo-yellow
+                                transition-colors duration-100
+                            "
+                        >
+                            <FaArrowLeft />
+                            {t('rules.backToHome')}
+                        </motion.button>
                     </Link>
                 </div>
             </main>

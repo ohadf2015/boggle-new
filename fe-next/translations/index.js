@@ -557,6 +557,7 @@ const translations = {
       demo: {
         watchAnimation: 'Watch how words are formed on the grid',
         autoPlay: 'Auto',
+        pause: 'Pause',
         replay: 'Replay',
         tryIt: 'Try dragging letters yourself!',
         gridExample: 'Example of tracing a word on the grid',
@@ -1095,7 +1096,8 @@ const translations = {
       winRate: 'Win Rate',
       yourRank: 'Your Rank',
       topPercent: 'Top ${percent}%',
-      noRankYet: 'Play games to get ranked!'
+      noRankYet: 'Play games to get ranked!',
+      viewLeaderboard: 'View Leaderboard'
     },
     ranked: {
       title: 'Ranked Mode',
@@ -1876,6 +1878,7 @@ const translations = {
       demo: {
         watchAnimation: 'צפו כיצד מילים נוצרות על הלוח',
         autoPlay: 'אוטו',
+        pause: 'השהה',
         replay: 'שחזר',
         tryIt: 'נסו לגרור אותיות בעצמכם!',
         gridExample: 'דוגמה לציור מילה על הלוח',
@@ -2410,7 +2413,8 @@ const translations = {
       winRate: 'אחוז ניצחונות',
       yourRank: 'הדירוג שלך',
       topPercent: '${percent}% העליונים',
-      noRankYet: 'שחק משחקים כדי להיכנס לדירוג!'
+      noRankYet: 'שחק משחקים כדי להיכנס לדירוג!',
+      viewLeaderboard: 'צפייה בטבלת מובילים'
     },
     ranked: {
       title: 'מצב מדורג',
@@ -3191,6 +3195,7 @@ const translations = {
       demo: {
         watchAnimation: 'Se hur ord bildas på rutnätet',
         autoPlay: 'Auto',
+        pause: 'Pausa',
         replay: 'Spela om',
         tryIt: 'Prova att dra bokstäver själv!',
         gridExample: 'Exempel på att spåra ett ord på rutnätet',
@@ -3597,7 +3602,8 @@ const translations = {
       winRate: 'Vinstprocent',
       yourRank: 'Din rank',
       topPercent: 'Topp ${percent}%',
-      noRankYet: 'Spela för att bli rankad!'
+      noRankYet: 'Spela för att bli rankad!',
+      viewLeaderboard: 'Visa topplista'
     },
     ranked: {
       title: 'Rankat läge',
@@ -4506,6 +4512,7 @@ const translations = {
       demo: {
         watchAnimation: 'グリッド上で単語がどのように形成されるかをご覧ください',
         autoPlay: '自動',
+        pause: '一時停止',
         replay: 'リプレイ',
         tryIt: '自分で文字をドラッグしてみてください！',
         gridExample: 'グリッド上で単語をトレースする例',
@@ -4912,7 +4919,8 @@ const translations = {
       winRate: '勝率',
       yourRank: 'あなたのランク',
       topPercent: 'トップ${percent}%',
-      noRankYet: 'ゲームをプレイしてランク入り!'
+      noRankYet: 'ゲームをプレイしてランク入り!',
+      viewLeaderboard: 'リーダーボードを見る'
     },
     ranked: {
       title: 'ランクマッチ',

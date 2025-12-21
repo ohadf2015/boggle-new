@@ -1,8 +1,9 @@
 'use client';
 
 import React, { useEffect } from 'react';
+import Link from 'next/link';
 import { motion } from 'framer-motion';
-import { FaUser, FaUsers, FaRobot, FaBullseye, FaTrophy, FaDoorOpen, FaCrown, FaMedal } from 'react-icons/fa';
+import { FaUser, FaUsers, FaRobot, FaBullseye, FaTrophy, FaDoorOpen, FaCrown, FaMedal, FaQuestionCircle } from 'react-icons/fa';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useMusic } from '@/contexts/MusicContext';
 import ModeCard from './ModeCard';
@@ -81,12 +82,38 @@ const LandingView: React.FC = () => {
           />
         </motion.div>
 
+        {/* How to Play Button */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.3 }}
+          className="flex justify-center mt-8 sm:mt-10"
+        >
+          <Link
+            href={`/${language}/rules`}
+            className="
+              inline-flex items-center gap-2 sm:gap-3
+              px-5 sm:px-6 py-2.5 sm:py-3
+              bg-neo-yellow text-neo-black
+              font-bold text-base sm:text-lg
+              border-3 border-neo-black
+              rounded-neo shadow-hard
+              hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-hard-lg
+              active:translate-x-[2px] active:translate-y-[2px] active:shadow-none
+              transition-all duration-100
+            "
+          >
+            <FaQuestionCircle className="text-lg sm:text-xl" />
+            {t('joinView.howToPlay') || 'How to Play?'}
+          </Link>
+        </motion.div>
+
         {/* Footer hint */}
         <motion.p
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.5, delay: 0.4 }}
-          className="text-center text-sm text-neo-black/50 dark:text-neo-white/50 mt-8 sm:mt-12"
+          className="text-center text-sm text-neo-black/50 dark:text-neo-white/50 mt-6 sm:mt-8"
         >
           {t('landing.hint') || 'New to the game? Start with Single Player to learn the ropes!'}
         </motion.p>

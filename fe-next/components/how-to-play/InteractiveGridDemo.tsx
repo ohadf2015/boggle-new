@@ -114,7 +114,7 @@ export const InteractiveGridDemo: React.FC<InteractiveGridDemoProps> = ({ t, dir
   };
 
   return (
-    <div className="flex flex-col items-center gap-3 sm:gap-4 p-2">
+    <div className="flex flex-col items-center gap-3 sm:gap-4 p-2 overflow-hidden">
       {/* Combo & Score Display */}
       <div className="flex items-center gap-2 sm:gap-3 flex-wrap justify-center min-h-[28px]">
         {comboCount > 0 && (
@@ -145,7 +145,7 @@ export const InteractiveGridDemo: React.FC<InteractiveGridDemoProps> = ({ t, dir
       </div>
 
       {/* Demo Grid */}
-      <div className="relative">
+      <div className="relative overflow-hidden p-2">
         <div className="grid grid-cols-3 gap-1.5 sm:gap-2 p-3 sm:p-4 bg-gradient-to-br from-neo-navy/10 to-neo-purple/10 rounded-xl border-3 sm:border-4 border-neo-black shadow-hard-lg">
           {demoGrid.map((row, rowIndex) => (
             row.map((letter, colIndex) => {
