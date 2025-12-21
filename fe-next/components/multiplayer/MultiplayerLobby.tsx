@@ -80,7 +80,8 @@ const MultiplayerLobby: React.FC<MultiplayerLobbyProps> = ({
   const [roomNameErrorKey, setRoomNameErrorKey] = useState<string | undefined>();
   const [gameCodeErrorKey, setGameCodeErrorKey] = useState<string | undefined>();
   const [roomLanguage, setRoomLanguage] = useState<Language>(language as Language);
-  const [mobileRoomsExpanded, setMobileRoomsExpanded] = useState(false);
+  // Auto-expand room list on mobile when rooms are available
+  const [mobileRoomsExpanded, setMobileRoomsExpanded] = useState(activeRooms.length > 0);
   const hasAutoSwitchedToHostRef = useRef(false);
   const { notifyError } = useValidation(t);
 
@@ -110,6 +111,13 @@ const MultiplayerLobby: React.FC<MultiplayerLobbyProps> = ({
       hasAutoSwitchedToHostRef.current = false;
     }
   }, [roomsLoading, activeRooms.length, mode, handleModeChange, prefilledRoom]);
+
+  // Auto-expand room list on mobile when rooms become available
+  useEffect(() => {
+    if (!roomsLoading && activeRooms.length > 0 && !mobileRoomsExpanded) {
+      setMobileRoomsExpanded(true);
+    }
+  }, [roomsLoading, activeRooms.length, mobileRoomsExpanded]);
 
   // Handle prefilled room from URL
   useEffect(() => {

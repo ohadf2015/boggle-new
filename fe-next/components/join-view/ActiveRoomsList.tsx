@@ -35,6 +35,7 @@ const LANGUAGE_FLAGS: Record<string, string> = {
   sv: '\u{1F1F8}\u{1F1EA}',
   ja: '\u{1F1EF}\u{1F1F5}',
   en: '\u{1F1FA}\u{1F1F8}',
+  es: '\u{1F1EA}\u{1F1F8}',
 };
 
 /**
@@ -69,6 +70,7 @@ const ActiveRoomsList: React.FC<ActiveRoomsListProps> = React.memo(({
       sv: t('joinView.swedish'),
       ja: t('joinView.japanese'),
       en: t('joinView.english'),
+      es: t('joinView.spanish'),
     };
     return titles[lang] || t('joinView.english');
   }, [t]);

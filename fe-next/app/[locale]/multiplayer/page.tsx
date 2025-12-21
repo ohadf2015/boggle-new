@@ -59,6 +59,11 @@ const ResultsPage = nextDynamic(() => import('@/components/views/ResultsPage'), 
   ssr: false,
 });
 
+const QuickJoinView = nextDynamic(() => import('@/components/join-view/QuickJoinView'), {
+  loading: () => <ViewLoadingSkeleton />,
+  ssr: false,
+});
+
 // Loading skeleton component
 function ViewLoadingSkeleton() {
   return (
@@ -149,6 +154,10 @@ export default function MultiplayerPage(): React.JSX.Element {
   // Track if we should auto-join (prefilled room + existing username)
   const [shouldAutoJoin, setShouldAutoJoin] = useState(false);
   const [prefilledRoomCode, setPrefilledRoomCode] = useState('');
+  // State for QuickJoinView
+  const [usernameError, setUsernameError] = useState(false);
+  const [usernameErrorKey, setUsernameErrorKey] = useState<string | undefined>();
+  const [showFullForm, setShowFullForm] = useState(false); // Track if user wants to see full form instead of quick join
 
   // Music transitions based on game state
   // Note: We always call playTrack/fadeToTrack even if audio isn't unlocked yet
@@ -1021,6 +1030,28 @@ export default function MultiplayerPage(): React.JSX.Element {
     setShowResults(true);
   }, []);
 
+  // QuickJoinView handlers
+  const handleQuickJoinSubmit = useCallback((e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    // Validate username
+    if (!username || username.trim().length < 2) {
+      setUsernameError(true);
+      setUsernameErrorKey('validation.usernameTooShort');
+      return;
+    }
+    // Join the prefilled room
+    handleJoin(false, null, prefilledRoomCode);
+  }, [username, prefilledRoomCode, handleJoin]);
+
+  const handleShowFullForm = useCallback(() => {
+    setShowFullForm(true);
+  }, []);
+
+  const handleUsernameErrorClear = useCallback(() => {
+    setUsernameError(false);
+    setUsernameErrorKey(undefined);
+  }, []);
+
   // Create context value
   const socketContextValue = {
     socket,
@@ -1048,6 +1079,28 @@ export default function MultiplayerPage(): React.JSX.Element {
     }
 
     if (!isActive) {
+      // Show QuickJoinView when there's a prefilled room code and user hasn't clicked to show full form
+      if (prefilledRoomCode && !showFullForm && !error) {
+        return (
+          <FeatureErrorBoundary featureName="Quick Join">
+            <QuickJoinView
+              gameCode={prefilledRoomCode}
+              username={username}
+              setUsername={setUsername}
+              error={error}
+              isJoining={isJoining}
+              isAuthenticated={isAuthenticated}
+              displayName={profile?.display_name ?? null}
+              usernameError={usernameError}
+              usernameErrorKey={usernameErrorKey}
+              onUsernameErrorClear={handleUsernameErrorClear}
+              onJoin={handleJoin}
+              onQuickJoinSubmit={handleQuickJoinSubmit}
+              onShowFullForm={handleShowFullForm}
+            />
+          </FeatureErrorBoundary>
+        );
+      }
       return (
         <FeatureErrorBoundary featureName="Lobby">
           <MultiplayerLobby
