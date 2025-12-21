@@ -22,6 +22,7 @@ const LANGUAGE_OPTIONS: LanguageOption[] = [
   { code: 'he', flag: '🇮🇱', labelKey: 'joinView.hebrew' },
   { code: 'sv', flag: '🇸🇪', labelKey: 'joinView.swedish' },
   { code: 'ja', flag: '🇯🇵', labelKey: 'joinView.japanese' },
+  { code: 'es', flag: '🇪🇸', labelKey: 'joinView.spanish' },
 ];
 
 /**
@@ -38,7 +39,7 @@ export const LanguageSelector: React.FC<LanguageSelectorProps> = ({
       <CardDescription className="text-sm font-bold uppercase text-neo-black/70 dark:text-neo-white/70">
         {t('joinView.selectLanguage')}
       </CardDescription>
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3">
+      <div className="grid grid-cols-2 sm:grid-cols-5 gap-2 sm:gap-3">
         {LANGUAGE_OPTIONS.map((option) => (
           <button
             key={option.code}

@@ -322,6 +322,71 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
                         text: 'LexiClash offers a similar competitive word game experience to Alias but playable online. It\'s a fast-paced multiplayer game where you find words against the clock while competing with friends. Free to play, no download required, and available in multiple languages.',
                     },
                 },
+                // Additional FAQ questions for better search coverage
+                {
+                    '@type': 'Question',
+                    name: 'How do you play LexiClash?',
+                    acceptedAnswer: {
+                        '@type': 'Answer',
+                        text: 'In LexiClash, players compete to find words on a letter grid. Swipe or click adjacent letters to form words - the longer the word, the more points you earn. Build combos by finding words quickly for bonus multipliers. Games typically last 3 minutes. Create a room, share the code with friends, and compete in real-time!',
+                    },
+                },
+                {
+                    '@type': 'Question',
+                    name: 'Is LexiClash free to play?',
+                    acceptedAnswer: {
+                        '@type': 'Answer',
+                        text: 'Yes, LexiClash is completely free to play! No subscription, no in-app purchases required. Just visit lexiclash.live, create a room, and start playing. The game works in any browser on desktop, tablet, or mobile devices.',
+                    },
+                },
+                {
+                    '@type': 'Question',
+                    name: 'What languages does LexiClash support?',
+                    acceptedAnswer: {
+                        '@type': 'Answer',
+                        text: 'LexiClash supports 4 languages: English, Hebrew, Swedish, and Japanese. Each language has its own dictionary for word validation. You can switch languages from the game settings. The interface is also available in all supported languages.',
+                    },
+                },
+                {
+                    '@type': 'Question',
+                    name: 'How many players can play LexiClash at once?',
+                    acceptedAnswer: {
+                        '@type': 'Answer',
+                        text: 'LexiClash supports 2 to 20+ players in a single room! Perfect for small groups or large parties. All players see the same letter grid and compete in real-time. The live leaderboard shows everyone\'s score as the game progresses.',
+                    },
+                },
+                {
+                    '@type': 'Question',
+                    name: 'Can I play LexiClash offline?',
+                    acceptedAnswer: {
+                        '@type': 'Answer',
+                        text: 'LexiClash is primarily an online multiplayer game requiring internet connection. However, the Progressive Web App (PWA) features allow the game to load even with spotty connection once cached. For offline word practice, try the single-player mode which has reduced connectivity requirements.',
+                    },
+                },
+                {
+                    '@type': 'Question',
+                    name: 'How do I join a friend\'s LexiClash game?',
+                    acceptedAnswer: {
+                        '@type': 'Answer',
+                        text: 'To join a friend\'s game: 1) Get the room code or QR code from your friend, 2) Go to lexiclash.live, 3) Click "Join Room", 4) Enter the room code or scan the QR code. You\'ll join instantly and can start competing when the host starts the game!',
+                    },
+                },
+                {
+                    '@type': 'Question',
+                    name: 'Are there achievements in LexiClash?',
+                    acceptedAnswer: {
+                        '@type': 'Answer',
+                        text: 'Yes! LexiClash has 35+ achievements across categories like speed, combos, word length, and milestones. Unlock badges for finding long words, building high combos, or reaching career milestones. Track your progress on the profile page and compete on the leaderboard!',
+                    },
+                },
+                {
+                    '@type': 'Question',
+                    name: 'What devices can play LexiClash?',
+                    acceptedAnswer: {
+                        '@type': 'Answer',
+                        text: 'LexiClash works on any device with a modern web browser! Play on desktop computers, laptops, tablets, and smartphones. No app download needed - just visit lexiclash.live. The game is optimized for touch screens and supports both portrait and landscape orientations on mobile.',
+                    },
+                },
             ],
         },
     ];

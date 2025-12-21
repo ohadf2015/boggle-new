@@ -22,6 +22,7 @@ const LANGUAGE_OPTIONS: LanguageOption[] = [
   { code: 'he', flag: '\u{1F1EE}\u{1F1F1}', labelKey: 'joinView.hebrew' },
   { code: 'sv', flag: '\u{1F1F8}\u{1F1EA}', labelKey: 'joinView.swedish' },
   { code: 'ja', flag: '\u{1F1EF}\u{1F1F5}', labelKey: 'joinView.japanese' },
+  { code: 'es', flag: '\u{1F1EA}\u{1F1F8}', labelKey: 'joinView.spanish' },
 ];
 
 /**
@@ -42,7 +43,7 @@ const LanguageSelector: React.FC<LanguageSelectorProps> = React.memo(({
       <CardDescription className="text-sm sm:text-base font-bold uppercase text-neo-cream">
         {t('joinView.selectLanguage')}
       </CardDescription>
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3">
+      <div className="grid grid-cols-2 sm:grid-cols-5 gap-2 sm:gap-3">
         {LANGUAGE_OPTIONS.map(({ code, flag, labelKey }) => (
           <button
             key={code}

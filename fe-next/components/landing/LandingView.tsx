@@ -8,6 +8,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { useMusic } from '@/contexts/MusicContext';
 import ModeCard from './ModeCard';
 import Header from '@/components/Header';
+import SocialProof from '@/components/SocialProof';
 
 /**
  * LandingView - Main landing page with game mode selection
@@ -28,6 +29,9 @@ const LandingView: React.FC = () => {
     <div className="min-h-screen bg-gradient-to-b from-slate-50 via-slate-100 to-slate-200 dark:from-neo-navy dark:via-neo-navy-light dark:to-neo-navy">
       {/* Header */}
       <Header />
+
+      {/* Social Proof Banner - Live player activity */}
+      <SocialProof variant="banner" />
 
       {/* Main content */}
       <main className="max-w-6xl mx-auto px-4 sm:px-6 py-8 sm:py-12">

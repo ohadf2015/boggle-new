@@ -38,9 +38,9 @@ const buttonVariants = cva(
         ].join(" "),
         // Secondary: Orange accent
         secondary: "bg-neo-orange text-neo-black hover:bg-neo-orange-hover",
-        // Ghost: Minimal, no shadow
+        // Ghost: Minimal, with visible border for accessibility
         ghost: [
-          "bg-transparent text-neo-white border-2 border-transparent shadow-none",
+          "bg-transparent text-neo-white border-3 border-neo-white/20 shadow-none",
           "hover:bg-neo-navy-light hover:border-neo-black hover:shadow-hard-sm",
           "hover:translate-x-0 hover:translate-y-0",
           "active:translate-x-0 active:translate-y-0 active:shadow-none",

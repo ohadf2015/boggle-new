@@ -212,7 +212,11 @@ const MultiplayerLobby: React.FC<MultiplayerLobbyProps> = ({
           </h1>
         </motion.div>
 
-        <div className="flex flex-col lg:flex-row gap-6">
+        {/* On mobile: show room list first (top) when rooms exist, form first when empty */}
+        <div className={cn(
+          "flex gap-6 lg:flex-row",
+          activeRooms.length > 0 ? "flex-col-reverse" : "flex-col"
+        )}>
           {/* Main Form */}
           <motion.div
             initial={{ x: -30, opacity: 0 }}

@@ -19,6 +19,7 @@ import { useLanguage } from '../contexts/LanguageContext';
 import { useSoundEffects } from '../contexts/SoundEffectsContext';
 import { FaPaperPlane, FaComments, FaBell } from 'react-icons/fa';
 import toast from 'react-hot-toast';
+import { useAnnouncer } from './GameAnnouncer';
 
 const MAX_CHAT_HEIGHT = 300; // Max height in pixels
 const ESTIMATED_MESSAGE_HEIGHT = 60; // Estimated height per message
@@ -49,9 +50,11 @@ const RoomChat: React.FC<RoomChatProps> = ({ username, isHost, gameCode, classNa
   const { t } = useLanguage();
   const { socket } = useSocket();
   const { playMessageSound } = useSoundEffects();
+  const { announce } = useAnnouncer();
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [inputMessage, setInputMessage] = useState('');
   const [unreadCount, setUnreadCount] = useState(0);
+  const [latestAnnouncement, setLatestAnnouncement] = useState('');
   const parentRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -85,6 +88,11 @@ const RoomChat: React.FC<RoomChatProps> = ({ username, isHost, gameCode, classNa
 
       // Play notification sound
       playMessageSound();
+
+      // Announce for screen readers
+      const announcementText = `${data.username} says: ${data.message}`;
+      setLatestAnnouncement(announcementText);
+      announce(announcementText);
 
       // Show toast notification with click to scroll
       const newMessageIndex = messages.length; // Index of the new message (will be added after this)
@@ -332,11 +340,23 @@ const RoomChat: React.FC<RoomChatProps> = ({ username, isHost, gameCode, classNa
             size="icon"
             variant="cyan"
             className="flex-shrink-0"
+            aria-label={t('chat.send') || 'Send message'}
           >
-            <FaPaperPlane />
+            <FaPaperPlane aria-hidden="true" />
           </Button>
         </div>
       </CardContent>
+
+      {/* Screen reader live region for chat announcements */}
+      <div
+        role="log"
+        aria-live="polite"
+        aria-atomic="false"
+        aria-label={t('chat.newMessages') || 'New chat messages'}
+        className="sr-only"
+      >
+        {latestAnnouncement}
+      </div>
     </div>
   );
 };

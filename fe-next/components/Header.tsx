@@ -23,6 +23,7 @@ const LANGUAGE_OPTIONS: { code: Language; flag: string; name: string }[] = [
   { code: 'he', flag: '🇮🇱', name: 'עברית' },
   { code: 'sv', flag: '🇸🇪', name: 'Svenska' },
   { code: 'ja', flag: '🇯🇵', name: '日本語' },
+  { code: 'es', flag: '🇪🇸', name: 'Español' },
 ];
 
 /**
@@ -43,6 +44,7 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                 return "'Noto Sans JP', 'Rubik', sans-serif";
             case 'sv':
             case 'en':
+            case 'es':
             default:
                 return "'Fredoka', 'Rubik', sans-serif";
         }

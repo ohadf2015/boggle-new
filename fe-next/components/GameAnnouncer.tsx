@@ -18,6 +18,9 @@ interface AnnouncerContextType {
   announceCombo: (level: number) => void;
   announceGameState: (state: 'started' | 'ended' | 'paused' | 'resumed') => void;
   announceConnection: (status: 'connected' | 'disconnected' | 'reconnecting') => void;
+  announceLeaderboard: (playerName: string, position: number, score: number) => void;
+  announcePlayerJoin: (playerName: string) => void;
+  announcePlayerLeave: (playerName: string) => void;
 }
 
 const AnnouncerContext = createContext<AnnouncerContextType | null>(null);
@@ -32,6 +35,9 @@ export const useAnnouncer = () => {
       announceCombo: () => {},
       announceGameState: () => {},
       announceConnection: () => {},
+      announceLeaderboard: () => {},
+      announcePlayerJoin: () => {},
+      announcePlayerLeave: () => {},
     };
   }
   return context;
@@ -120,12 +126,31 @@ export const GameAnnouncerProvider: React.FC<GameAnnouncerProviderProps> = ({ ch
     announce(messages[status], status === 'disconnected' ? 'assertive' : 'polite');
   }, [announce]);
 
+  const announceLeaderboard = useCallback((playerName: string, position: number, score: number) => {
+    // Only announce significant position changes (top 3)
+    if (position <= 3) {
+      const ordinal = position === 1 ? '1st' : position === 2 ? '2nd' : '3rd';
+      announce(`${playerName} is now in ${ordinal} place with ${score} points`);
+    }
+  }, [announce]);
+
+  const announcePlayerJoin = useCallback((playerName: string) => {
+    announce(`${playerName} joined the game`);
+  }, [announce]);
+
+  const announcePlayerLeave = useCallback((playerName: string) => {
+    announce(`${playerName} left the game`);
+  }, [announce]);
+
   const contextValue: AnnouncerContextType = {
     announce,
     announceWordResult,
     announceCombo,
     announceGameState,
     announceConnection,
+    announceLeaderboard,
+    announcePlayerJoin,
+    announcePlayerLeave,
   };
 
   return (

@@ -917,6 +917,21 @@ body {
    ENHANCED COMBO ANIMATIONS (Full Juice)
    ==================================== */
 
+/* GPU optimization for frequently animated elements */
+.combo-badge,
+.combo-container,
+.score-popup,
+.word-valid,
+.word-invalid,
+[data-animate="true"] {
+  will-change: transform, opacity;
+}
+
+/* Remove will-change after animation completes to free GPU memory */
+.animation-complete {
+  will-change: auto;
+}
+
 /* Combo badge entrance with spring overshoot */
 @keyframes combo-entrance {
   0% {
