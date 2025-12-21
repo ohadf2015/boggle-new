@@ -3,7 +3,7 @@
 import React, { useState, useCallback, useEffect, useRef, FormEvent } from 'react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
-import { FaCrown, FaUser, FaDice, FaArrowLeft } from 'react-icons/fa';
+import { FaCrown, FaUser, FaDice, FaArrowLeft, FaCopy, FaCheck } from 'react-icons/fa';
 import { QRCodeSVG } from 'qrcode.react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -82,8 +82,29 @@ const MultiplayerLobby: React.FC<MultiplayerLobbyProps> = ({
   const [roomLanguage, setRoomLanguage] = useState<Language>(language as Language);
   // Auto-expand room list on mobile when rooms are available
   const [mobileRoomsExpanded, setMobileRoomsExpanded] = useState(activeRooms.length > 0);
+  const [codeCopied, setCodeCopied] = useState(false);
   const hasAutoSwitchedToHostRef = useRef(false);
   const { notifyError } = useValidation(t);
+
+  // Copy room code to clipboard
+  const copyRoomCode = useCallback(async () => {
+    if (!gameCode) return;
+    try {
+      await navigator.clipboard.writeText(gameCode);
+      setCodeCopied(true);
+      setTimeout(() => setCodeCopied(false), 2000);
+    } catch (err) {
+      // Fallback for older browsers
+      const textArea = document.createElement('textarea');
+      textArea.value = gameCode;
+      document.body.appendChild(textArea);
+      textArea.select();
+      document.execCommand('copy');
+      document.body.removeChild(textArea);
+      setCodeCopied(true);
+      setTimeout(() => setCodeCopied(false), 2000);
+    }
+  }, [gameCode]);
 
   // Debounced validation
   const usernameValidation = useDebouncedValidation(username, { validate: validateUsername, delay: 300 });
@@ -283,6 +304,16 @@ const MultiplayerLobby: React.FC<MultiplayerLobbyProps> = ({
                               gameCodeError && 'border-neo-red'
                             )}
                           />
+                          <Button
+                            type="button"
+                            variant={codeCopied ? 'success' : 'outline'}
+                            size="icon"
+                            onClick={copyRoomCode}
+                            title={codeCopied ? (t('common.copied') || 'Copied!') : (t('common.copyCode') || 'Copy code')}
+                            aria-label={codeCopied ? 'Code copied' : 'Copy room code'}
+                          >
+                            {codeCopied ? <FaCheck /> : <FaCopy />}
+                          </Button>
                           <Button
                             type="button"
                             variant="secondary"
