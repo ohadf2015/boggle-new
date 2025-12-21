@@ -64,7 +64,7 @@ function registerPlayerJoinHandlers(io, socket) {
       return;
     }
 
-    const { gameCode, username, playerId, avatar, authUserId, guestTokenHash, profilePictureUrl } = validation.data;
+    let { gameCode, username, playerId, avatar, authUserId, guestTokenHash, profilePictureUrl } = validation.data;
 
     logger.info('SOCKET', `Join request: ${username} to game ${gameCode}`);
 
@@ -74,9 +74,14 @@ function registerPlayerJoinHandlers(io, socket) {
       return;
     }
 
-    // Handle multi-tab detection
+    // Handle multi-tab detection and existing auth connection
     if (authUserId) {
-      await handleExistingAuthConnectionJoin(io, socket, authUserId, gameCode, username);
+      const authResult = await handleExistingAuthConnectionJoin(io, socket, authUserId, gameCode, username);
+      // If user is reconnecting to same game, use their existing username to prevent duplicates
+      if (authResult.handled && authResult.existingUsername) {
+        logger.info('SOCKET', `Using existing username "${authResult.existingUsername}" instead of "${username}" for auth user reconnection`);
+        username = authResult.existingUsername;
+      }
     }
 
     // Block late joins for ranked games (use state machine helper)
@@ -185,10 +190,11 @@ function registerPlayerJoinHandlers(io, socket) {
 
 /**
  * Handle existing authenticated connection when joining a game
+ * @returns {object} - { handled: boolean, existingUsername?: string, isHost?: boolean }
  */
 async function handleExistingAuthConnectionJoin(io, socket, authUserId, gameCode, username) {
   const existingConnection = getAuthUserConnection(authUserId);
-  if (!existingConnection) return;
+  if (!existingConnection) return { handled: false };
 
   const isSameSocket = existingConnection.socketId === socket.id;
 
@@ -207,7 +213,13 @@ async function handleExistingAuthConnectionJoin(io, socket, authUserId, gameCode
         }, 100);
       }
     }
-    return;
+    // Return existing username to prevent creating duplicate user
+    logger.info('SOCKET', `Auth user ${authUserId} reconnecting to same game ${gameCode}, using existing username: ${existingConnection.username}`);
+    return {
+      handled: true,
+      existingUsername: existingConnection.username,
+      isHost: existingConnection.isHost
+    };
   }
 
   if (!isSameSocket) {
@@ -236,17 +248,29 @@ async function handleExistingAuthConnectionJoin(io, socket, authUserId, gameCode
     }
   } else {
     removeUserFromGame(existingConnection.gameCode, existingConnection.username);
-    const oldGame = getGame(existingConnection.gameCode);
-    if (oldGame) {
-      broadcastToRoom(io, getGameRoom(existingConnection.gameCode), 'updateUsers', {
-        users: getGameUsers(existingConnection.gameCode)
-      });
+
+    // Check if the old room is now empty and close it immediately
+    if (isRoomEmpty(existingConnection.gameCode)) {
+      logger.info('SOCKET', `Room ${existingConnection.gameCode} is empty after ${existingConnection.username} left to join ${gameCode} - closing immediately`);
+      timerManager.clearGameTimer(existingConnection.gameCode);
+      botManager.stopAllBots(existingConnection.gameCode);
+      deleteGame(existingConnection.gameCode);
+      io.emit('activeRooms', { rooms: getActiveRooms() });
+    } else {
+      const oldGame = getGame(existingConnection.gameCode);
+      if (oldGame) {
+        broadcastToRoom(io, getGameRoom(existingConnection.gameCode), 'updateUsers', {
+          users: getGameUsers(existingConnection.gameCode)
+        });
+      }
     }
   }
 
   if (isSameSocket) {
     leaveRoom(socket, getGameRoom(existingConnection.gameCode));
   }
+
+  return { handled: false };
 }
 
 /**
