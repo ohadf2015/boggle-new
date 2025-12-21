@@ -44,6 +44,7 @@ export const RoomList: React.FC<RoomListProps> = ({
       case 'he': return '🇮🇱';
       case 'sv': return '🇸🇪';
       case 'ja': return '🇯🇵';
+      case 'es': return '🇪🇸';
       default: return '🇺🇸';
     }
   };
@@ -53,6 +54,7 @@ export const RoomList: React.FC<RoomListProps> = ({
       case 'he': return t('joinView.hebrew');
       case 'sv': return t('joinView.swedish');
       case 'ja': return t('joinView.japanese');
+      case 'es': return t('joinView.spanish');
       default: return t('joinView.english');
     }
   };
