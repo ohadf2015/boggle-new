@@ -8,6 +8,7 @@ import { MusicProvider } from '@/contexts/MusicContext';
 import { SoundEffectsProvider } from '@/contexts/SoundEffectsContext';
 import { AchievementQueueProvider } from '@/components/achievements';
 import { GameAnnouncerProvider } from '@/components/GameAnnouncer';
+import { SocketProvider } from '@/utils/SocketContext';
 import { Toaster } from 'react-hot-toast';
 import ErrorBoundary from './components/ErrorBoundary';
 import { initUtmCapture } from '@/utils/utmCapture';
@@ -101,11 +102,13 @@ export function Providers({ children, lang }: ProvidersProps) {
             <>
                 <ThemeProvider>
                     <LanguageProvider initialLanguage={lang}>
-                        <AudioProviders>
-                            <GameProviders>
-                                {children}
-                            </GameProviders>
-                        </AudioProviders>
+                        <SocketProvider>
+                            <AudioProviders>
+                                <GameProviders>
+                                    {children}
+                                </GameProviders>
+                            </AudioProviders>
+                        </SocketProvider>
                     </LanguageProvider>
                 </ThemeProvider>
                 <Toaster
