@@ -8,13 +8,13 @@
  * - Offline fallback page
  */
 
-const CACHE_VERSION = 'lexiclash-v1';
+const CACHE_VERSION = 'lexiclash-v2'; // Bumped version to force cache refresh
 const STATIC_CACHE = `${CACHE_VERSION}-static`;
 const DYNAMIC_CACHE = `${CACHE_VERSION}-dynamic`;
 
 // Static assets to cache on install (app shell)
+// NOTE: Do NOT cache '/' as it's a redirect route, not actual content
 const STATIC_ASSETS = [
-  '/',
   '/manifest.json',
   '/favicon.svg',
   '/favicon.ico',
@@ -102,8 +102,9 @@ async function cacheFirst(request) {
     }
     return response;
   } catch {
-    // Return offline fallback if available
-    return caches.match('/');
+    // For static assets, just let the browser handle the network error
+    // Don't return undefined or a fallback that might not exist
+    return new Response('Offline', { status: 503, statusText: 'Service Unavailable' });
   }
 }
 
@@ -113,21 +114,27 @@ async function cacheFirst(request) {
 async function networkFirst(request) {
   try {
     const response = await fetch(request);
-    if (response.ok) {
+    // Cache successful responses (but not redirects or errors)
+    if (response.ok && response.status === 200) {
       const cache = await caches.open(DYNAMIC_CACHE);
       cache.put(request, response.clone());
     }
     return response;
-  } catch {
+  } catch (error) {
+    // Network failed - try cache
     const cached = await caches.match(request);
     if (cached) {
       return cached;
     }
-    // Return offline page for navigation requests
+    // No cache available - return a proper error response instead of throwing
+    // This prevents net::ERR_FAILED by always returning a valid Response
     if (request.mode === 'navigate') {
-      return caches.match('/');
+      return new Response(
+        '<!DOCTYPE html><html><head><meta charset="utf-8"><title>Offline</title></head><body style="font-family:system-ui;text-align:center;padding:50px"><h1>You are offline</h1><p>Please check your internet connection and try again.</p><button onclick="location.reload()">Retry</button></body></html>',
+        { status: 503, statusText: 'Service Unavailable', headers: { 'Content-Type': 'text/html' } }
+      );
     }
-    throw new Error('No cached response available');
+    return new Response('Network error', { status: 503, statusText: 'Service Unavailable' });
   }
 }
 
@@ -145,6 +152,12 @@ self.addEventListener('fetch', (event) => {
 
   // Skip WebSocket and socket.io
   if (url.pathname.includes('socket.io') || url.protocol === 'ws:' || url.protocol === 'wss:') {
+    return;
+  }
+
+  // Skip auth-related routes - these should NEVER be cached or intercepted
+  // to prevent authentication flow issues
+  if (url.pathname.includes('/auth/')) {
     return;
   }
 
