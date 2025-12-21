@@ -1423,6 +1423,50 @@ body {
 }
 
 /* ====================================
+   GLOBAL REDUCED MOTION SUPPORT
+   ====================================
+   For users who prefer reduced motion, disable all non-essential animations.
+   This includes CSS animations, transitions, and sets a flag for JavaScript.
+*/
+@media (prefers-reduced-motion: reduce) {
+  /* Disable all CSS animations globally */
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  /* Disable specific game animations */
+  .combo-entrance,
+  .starburst,
+  .flicker,
+  .rainbow-cell,
+  .strobe-light,
+  .strobe-intense,
+  .glow-ring-expand,
+  .board-wobble,
+  .gradient-x,
+  .gradient-xy {
+    animation: none !important;
+  }
+
+  /* Keep essential visual feedback (no motion, just static states) */
+  .shadow-hard:hover,
+  .shadow-hard:focus {
+    transform: none;
+    box-shadow: var(--shadow-md);
+  }
+
+  /* Disable confetti and particle effects */
+  canvas[data-confetti] {
+    display: none !important;
+  }
+}
+
+/* ====================================
    OPTIMISTIC UI FEEDBACK
    ==================================== */
 

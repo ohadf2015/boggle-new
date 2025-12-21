@@ -1,6 +1,6 @@
 'use client';
 
-import React, { ReactNode, useRef, useEffect, useCallback, useMemo, memo } from 'react';
+import React, { ReactNode, useRef, useEffect, useCallback, useMemo, memo, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FaTrophy, FaCrown } from 'react-icons/fa';
 import type { Socket } from 'socket.io-client';
@@ -14,6 +14,7 @@ import GridComponent from '../GridComponent';
 import CircularTimer from '../CircularTimer';
 import RoomChat from '../RoomChat';
 import HintButton from '../HintButton';
+import { HelpPanel, HelpButton } from './HelpPanel';
 import { applyHebrewFinalLetters } from '../../utils/utils';
 import { wordErrorToast } from '../NeoToast';
 import { useSoundEffects } from '../../contexts/SoundEffectsContext';
@@ -153,6 +154,9 @@ const InGameScreen = memo<InGameScreenProps>(({
   const { playWordAcceptedSound } = useSoundEffects();
   const { announceWordResult } = useAnnouncer();
 
+  // Help panel state for discoverability
+  const [showHelpPanel, setShowHelpPanel] = useState(false);
+
   // Track if grid animation has already played
   const hasAnimatedRef = useRef(false);
   useEffect(() => {
@@ -283,7 +287,13 @@ const InGameScreen = memo<InGameScreenProps>(({
             t={t}
           />
         )}
+
+        {/* Help Button - For discoverability (both single and multiplayer) */}
+        <HelpButton onClick={() => setShowHelpPanel(true)} className="ml-auto" />
       </div>
+
+      {/* Help Panel - Accessible from anywhere */}
+      <HelpPanel isOpen={showHelpPanel} onClose={() => setShowHelpPanel(false)} />
 
       {/* Left Column: Found Words (Desktop only, only when playing) */}
       {isPlaying && (
