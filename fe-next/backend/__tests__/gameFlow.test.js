@@ -3,19 +3,41 @@
  * Tests the complete game lifecycle from creation to results
  */
 
-const { createGame, createUser, startGame, endGame, getGame } = require('../modules/gameStateManager');
+const { createGame, getGame, deleteGame, clearAllGames } = require('../modules/gameStateManager');
 const { validateWordOnBoard } = require('../modules/wordValidator');
 const { calculateWordScore } = require('../modules/scoringEngine');
-const { addBot, getGameBots, startBot, cleanupGameBots } = require('../modules/botManager');
+const { addBot, getGameBots, cleanupGameBots } = require('../modules/botManager');
+
+// Helper to create game data matching the actual API
+function createGameData(hostUsername, options = {}) {
+  return {
+    hostSocketId: options.socketId || 'test-socket-id',
+    hostUsername,
+    hostPlayerId: options.playerId || null,
+    roomName: options.roomName || hostUsername + "'s Room",
+    language: options.language || 'en',
+    isRanked: options.isRanked || false
+  };
+}
 
 describe('Game Flow Integration', () => {
 
   afterEach(() => {
     // Clean up any test games
+    const testCodes = ['TEST123', 'TEST001', 'TEST002', 'TEST003', 'TEST010',
+                       'TEST011', 'TEST030', 'TEST031', 'TEST032', 'TEST033', 'TEST040'];
+    testCodes.forEach(code => {
+      try {
+        cleanupGameBots(code);
+      } catch (e) {
+        // Ignore cleanup errors
+      }
+    });
+    // Clear all games in test environment
     try {
-      cleanupGameBots('TEST123');
+      clearAllGames();
     } catch (e) {
-      // Ignore cleanup errors
+      // Ignore if not in test environment
     }
   });
 
@@ -23,33 +45,30 @@ describe('Game Flow Integration', () => {
 
     test('creates game with valid host user', () => {
       const gameCode = 'TEST001';
-      const hostUser = createUser('HostPlayer', null);
-      const game = createGame(gameCode, hostUser);
+      const gameData = createGameData('HostPlayer');
+      const game = createGame(gameCode, gameData);
 
       expect(game).toBeDefined();
       expect(game.gameCode).toBe(gameCode);
-      expect(game.gameState).toBe('lobby');
-      expect(game.host).toBe('HostPlayer');
-      expect(Object.keys(game.users)).toHaveLength(1);
+      expect(game.gameState).toBe('waiting');
+      expect(game.hostUsername).toBe('HostPlayer');
     });
 
-    test('game has valid letter grid', () => {
+    test('game has letter grid as null initially', () => {
       const gameCode = 'TEST002';
-      const hostUser = createUser('HostPlayer', null);
-      const game = createGame(gameCode, hostUser);
+      const gameData = createGameData('HostPlayer');
+      const game = createGame(gameCode, gameData);
 
-      expect(game.letterGrid).toBeDefined();
-      expect(Array.isArray(game.letterGrid)).toBe(true);
-      expect(game.letterGrid.length).toBeGreaterThan(0);
-      expect(game.letterGrid[0].length).toBeGreaterThan(0);
+      // letterGrid is null until game starts
+      expect(game.letterGrid).toBeNull();
     });
 
     test('game settings have defaults', () => {
       const gameCode = 'TEST003';
-      const hostUser = createUser('HostPlayer', null);
-      const game = createGame(gameCode, hostUser);
+      const gameData = createGameData('HostPlayer');
+      const game = createGame(gameCode, gameData);
 
-      expect(game.gameDuration).toBeGreaterThan(0);
+      expect(game.timerSeconds).toBeGreaterThan(0);
       expect(game.language).toBeDefined();
     });
 
@@ -59,24 +78,22 @@ describe('Game Flow Integration', () => {
 
     test('adds players to game', () => {
       const gameCode = 'TEST010';
-      const hostUser = createUser('HostPlayer', null);
-      const game = createGame(gameCode, hostUser);
+      const gameData = createGameData('HostPlayer');
+      const game = createGame(gameCode, gameData);
 
       // Add second player
-      const player2 = createUser('Player2', null);
-      game.users['Player2'] = player2;
+      game.users['Player2'] = { socketId: 'socket-2', avatar: '🎮' };
 
-      expect(Object.keys(game.users)).toHaveLength(2);
+      expect(Object.keys(game.users)).toHaveLength(1);
       expect(game.users['Player2']).toBeDefined();
     });
 
     test('host is correctly identified', () => {
       const gameCode = 'TEST011';
-      const hostUser = createUser('HostPlayer', null);
-      const game = createGame(gameCode, hostUser);
+      const gameData = createGameData('HostPlayer');
+      const game = createGame(gameCode, gameData);
 
-      expect(game.host).toBe('HostPlayer');
-      expect(game.users['HostPlayer']).toBeDefined();
+      expect(game.hostUsername).toBe('HostPlayer');
     });
 
   });
@@ -130,38 +147,41 @@ describe('Game Flow Integration', () => {
   describe('Scoring System', () => {
 
     test('calculates score based on word length', () => {
-      // 3-letter words
-      expect(calculateWordScore('cat', 0)).toBe(1);
+      // New scoring formula: baseScore = length - 1 (each letter beyond first = 1 point)
+      // 3-letter words: 3-1 = 2
+      expect(calculateWordScore('cat', 0)).toBe(2);
 
-      // 4-letter words
-      expect(calculateWordScore('cats', 0)).toBe(1);
+      // 4-letter words: 4-1 = 3
+      expect(calculateWordScore('cats', 0)).toBe(3);
 
-      // 5-letter words
-      expect(calculateWordScore('catch', 0)).toBe(2);
+      // 5-letter words: 5-1 = 4
+      expect(calculateWordScore('catch', 0)).toBe(4);
 
-      // 6-letter words
-      expect(calculateWordScore('cactus', 0)).toBe(3);
+      // 6-letter words: 6-1 = 5
+      expect(calculateWordScore('cactus', 0)).toBe(5);
 
-      // 7-letter words
-      expect(calculateWordScore('cabinet', 0)).toBe(5);
+      // 7-letter words: 7-1 = 6
+      expect(calculateWordScore('cabinet', 0)).toBe(6);
 
-      // 8+ letter words
-      expect(calculateWordScore('cabinets', 0)).toBe(11);
+      // 8 letter words: 8-1 = 7
+      expect(calculateWordScore('cabinets', 0)).toBe(7);
     });
 
     test('applies combo multiplier', () => {
-      const baseScore = calculateWordScore('cat', 0);
-      const comboScore = calculateWordScore('cat', 3);
+      // With combo 5 on a 3-letter word: baseScore = 2, bonus = floor(5 * 0.2) = 1
+      const baseScore = calculateWordScore('cat', 0);  // 2
+      const comboScore = calculateWordScore('cat', 5); // 2 + 1 = 3
 
       expect(comboScore).toBeGreaterThan(baseScore);
     });
 
-    test('combo bonus caps at level 5', () => {
-      const level5Score = calculateWordScore('cat', 5);
-      const level10Score = calculateWordScore('cat', 10);
+    test('combo bonus caps at level 10', () => {
+      // For 3-letter words, bonus = floor(comboLevel * 0.2), caps at combo level 10
+      const level10Score = calculateWordScore('cat', 10); // 2 + floor(10*0.2) = 2 + 2 = 4
+      const level11Score = calculateWordScore('cat', 11); // 2 + floor(10*0.2) = 2 + 2 = 4 (capped)
 
-      // Both should have same bonus since combo caps at +5
-      expect(level5Score).toBe(level10Score);
+      // Both should have same bonus since combo base caps at 10
+      expect(level10Score).toBe(level11Score);
     });
 
   });
@@ -227,16 +247,16 @@ describe('Game Flow Integration', () => {
     test('simulates full game lifecycle', () => {
       // 1. Create game
       const gameCode = 'TEST040';
-      const hostUser = createUser('HostPlayer', null);
-      const game = createGame(gameCode, hostUser);
+      const gameData = createGameData('HostPlayer');
+      const game = createGame(gameCode, gameData);
 
-      expect(game.gameState).toBe('lobby');
+      expect(game.gameState).toBe('waiting');
 
       // 2. Add players
-      game.users['Player2'] = createUser('Player2', null);
-      game.users['Player3'] = createUser('Player3', null);
+      game.users['Player2'] = { socketId: 'socket-2', avatar: '🎮' };
+      game.users['Player3'] = { socketId: 'socket-3', avatar: '🎯' };
 
-      expect(Object.keys(game.users)).toHaveLength(3);
+      expect(Object.keys(game.users)).toHaveLength(2);
 
       // 3. Add a bot
       const bot = addBot(gameCode, 'medium', game.users);
@@ -246,25 +266,33 @@ describe('Game Flow Integration', () => {
         isBot: true
       };
 
-      expect(Object.keys(game.users)).toHaveLength(4);
+      expect(Object.keys(game.users)).toHaveLength(3);
 
-      // 4. Start game
-      game.gameState = 'playing';
+      // 4. Start game (set state and grid)
+      game.gameState = 'in-progress';
+      game.letterGrid = [
+        ['T', 'E', 'S', 'T'],
+        ['W', 'O', 'R', 'D'],
+        ['G', 'A', 'M', 'E'],
+        ['P', 'L', 'A', 'Y']
+      ];
       game.gameStartTime = Date.now();
 
-      expect(game.gameState).toBe('playing');
+      expect(game.gameState).toBe('in-progress');
 
       // 5. Simulate word submissions
       const testWord = 'test';
       if (validateWordOnBoard(testWord, game.letterGrid)) {
         const score = calculateWordScore(testWord, 0);
-        game.users['HostPlayer'].score = (game.users['HostPlayer'].score || 0) + score;
+        game.playerScores['HostPlayer'] = (game.playerScores['HostPlayer'] || 0) + score;
       }
 
-      // 6. End game
-      game.gameState = 'ended';
+      expect(game.playerScores['HostPlayer']).toBeGreaterThan(0);
 
-      expect(game.gameState).toBe('ended');
+      // 6. End game
+      game.gameState = 'finished';
+
+      expect(game.gameState).toBe('finished');
 
       // 7. Cleanup
       cleanupGameBots(gameCode);

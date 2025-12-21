@@ -10,7 +10,7 @@
  * - Efficient dependency tracking
  */
 
-import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import {
   subscribeToLeaderboard
 } from '../lib/supabaseRealtime';

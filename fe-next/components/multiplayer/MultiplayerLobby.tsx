@@ -3,7 +3,7 @@
 import React, { useState, useCallback, useEffect, useRef, FormEvent } from 'react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
-import { FaCrown, FaUser, FaDice, FaQrcode, FaArrowLeft } from 'react-icons/fa';
+import { FaCrown, FaUser, FaDice, FaArrowLeft } from 'react-icons/fa';
 import { QRCodeSVG } from 'qrcode.react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';

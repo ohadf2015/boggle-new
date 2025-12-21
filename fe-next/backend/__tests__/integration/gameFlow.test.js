@@ -219,7 +219,8 @@ describe('Game Flow Integration', () => {
 
       await hostSocket.receiveEvent('resetGame', {});
 
-      expect(hostSocket.getEmittedEvents()).toContainEvent('gameReset');
+      // Handler broadcasts 'resetGame' event, not 'gameReset'
+      expect(hostSocket.getEmittedEvents()).toContainEvent('resetGame');
     });
   });
 

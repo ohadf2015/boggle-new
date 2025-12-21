@@ -11,7 +11,7 @@ import {
   updateProfile,
   isSupabaseConfigured
 } from '../lib/supabase';
-import { getGuestSessionId, getGuestStats, clearGuestData, hashToken } from '../utils/guestManager';
+import { getGuestSessionId, clearGuestData, hashToken } from '../utils/guestManager';
 import { getUtmDataForProfile } from '../utils/utmCapture';
 import logger from '@/utils/logger';
 import type { User } from '@supabase/supabase-js';

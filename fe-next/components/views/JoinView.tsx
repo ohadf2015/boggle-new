@@ -4,7 +4,7 @@ import React, { useState, useEffect, useRef, useCallback, FormEvent } from 'reac
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
-import { FaGamepad, FaCrown, FaUser, FaDice, FaSync, FaQrcode, FaQuestionCircle } from 'react-icons/fa';
+import { FaCrown, FaUser, FaDice, FaSync, FaQrcode, FaQuestionCircle } from 'react-icons/fa';
 import { QRCodeSVG } from 'qrcode.react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';

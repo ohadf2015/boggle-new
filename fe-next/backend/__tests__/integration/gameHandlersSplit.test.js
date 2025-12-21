@@ -190,7 +190,8 @@ describe('Game Lifecycle Handler', () => {
 
       await socket.receiveEvent('resetGame', {});
 
-      expect(socket.getEmittedEvents()).toContainEvent('gameReset');
+      // Handler broadcasts 'resetGame' event
+      expect(socket.getEmittedEvents()).toContainEvent('resetGame');
     });
 
     test('non-host cannot reset game', async () => {
@@ -560,7 +561,7 @@ describe('Handler Integration', () => {
     // 6. Host resets for new round
     hostSocket.clearTracking();
     await hostSocket.receiveEvent('resetGame', {});
-    expect(hostSocket.wasEventEmitted('gameReset')).toBe(true);
+    expect(hostSocket.wasEventEmitted('resetGame')).toBe(true);
 
     // 7. Host closes room
     hostSocket.clearTracking();
