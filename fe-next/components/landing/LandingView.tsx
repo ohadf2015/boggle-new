@@ -45,7 +45,7 @@ const LandingView: React.FC = () => {
           <h1 className="text-3xl sm:text-4xl md:text-5xl font-black uppercase tracking-tight text-neo-black dark:text-neo-white mb-4">
             {t('landing.chooseMode') || 'Choose Your Mode'}
           </h1>
-          <p className="text-lg sm:text-xl font-medium text-neo-black/70 dark:text-neo-white/70 max-w-2xl mx-auto">
+          <p className="text-lg sm:text-xl font-medium text-neo-black/80 dark:text-neo-white/85 max-w-2xl mx-auto">
             {t('landing.subtitle') || 'Play solo to practice and beat your high scores, or compete with friends in real-time multiplayer!'}
           </p>
         </motion.div>
@@ -117,7 +117,7 @@ const LandingView: React.FC = () => {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.5, delay: 0.4 }}
-          className="text-center text-sm text-neo-black/50 dark:text-neo-white/50 mt-6 sm:mt-8"
+          className="text-center text-sm text-neo-black/70 dark:text-neo-white/70 mt-6 sm:mt-8"
         >
           {t('landing.hint') || 'New to the game? Start with Single Player to learn the ropes!'}
         </motion.p>

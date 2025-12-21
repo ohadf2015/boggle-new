@@ -1255,6 +1255,20 @@ body {
   textarea {
     font-size: max(16px, 1rem);
   }
+
+  /* Game grid cells: enforce minimum touch target size for accessibility */
+  .game-board-frame [role="gridcell"] {
+    min-width: 40px;
+    min-height: 40px;
+  }
+
+  /* On mobile, enforce stricter minimum for better touch accuracy */
+  @media (max-width: 768px) {
+    .game-board-frame [role="gridcell"] {
+      min-width: 44px;
+      min-height: 44px;
+    }
+  }
 }
 
 /* Touch action utilities for game interactions */

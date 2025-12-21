@@ -271,7 +271,7 @@ const GridComponent = memo<GridComponentProps>(({
                   data-letter={cell}
                   role="gridcell"
                   aria-selected={isSelected}
-                  aria-label={`Letter ${cell}`}
+                  aria-label={`Row ${i + 1}, Column ${j + 1}: Letter ${cell}`}
                   tabIndex={interactive ? 0 : -1}
                   onTouchStart={(e) => handleTouchStart(i, j, cell, e)}
                   onMouseDown={(e) => handleMouseDown(i, j, cell, e)}
