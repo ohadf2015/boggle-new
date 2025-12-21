@@ -258,7 +258,7 @@ const InteractiveGridDemo: React.FC<InteractiveGridDemoProps> = ({ t, dir }) => 
                     <motion.span
                       initial={{ scale: 0 }}
                       animate={{ scale: 1 }}
-                      className="absolute -top-1 -right-1 w-4 h-4 sm:w-5 sm:h-5 bg-neo-pink text-neo-white text-[10px] sm:text-xs font-bold rounded-full flex items-center justify-center border-2 border-neo-black"
+                      className={`absolute -top-1 ${dir === 'rtl' ? '-left-1' : '-right-1'} w-4 h-4 sm:w-5 sm:h-5 bg-neo-pink text-neo-white text-[10px] sm:text-xs font-bold rounded-full flex items-center justify-center border-2 border-neo-black`}
                     >
                       {cellIndex + 1}
                     </motion.span>
@@ -271,7 +271,7 @@ const InteractiveGridDemo: React.FC<InteractiveGridDemoProps> = ({ t, dir }) => 
 
         {/* Connection Lines SVG Overlay */}
         {selectedCells.length > 1 && (
-          <svg className="absolute inset-0 pointer-events-none" style={{ margin: '8px' }}>
+          <svg className="absolute inset-0 pointer-events-none z-20" style={{ margin: '8px' }}>
             {selectedCells.slice(1).map((cell, i) => {
               const prev = selectedCells[i];
               if (!prev) return null;
@@ -282,9 +282,19 @@ const InteractiveGridDemo: React.FC<InteractiveGridDemoProps> = ({ t, dir }) => 
               if (prevCol === undefined || prevRow === undefined || cellCol === undefined || cellRow === undefined) return null;
               const cellSize = 52;
               const gap = 6;
-              const x1 = prevCol * (cellSize + gap) + cellSize / 2;
+              const numCols = 3;
+              const gridContentWidth = numCols * cellSize + (numCols - 1) * gap;
+              const isRTL = dir === 'rtl';
+
+              // Calculate x coordinates (flip for RTL to match CSS grid direction)
+              const getX = (col: number): number => {
+                const ltrX = col * (cellSize + gap) + cellSize / 2;
+                return isRTL ? gridContentWidth - ltrX : ltrX;
+              };
+
+              const x1 = getX(prevCol);
               const y1 = prevRow * (cellSize + gap) + cellSize / 2;
-              const x2 = cellCol * (cellSize + gap) + cellSize / 2;
+              const x2 = getX(cellCol);
               const y2 = cellRow * (cellSize + gap) + cellSize / 2;
 
               return (

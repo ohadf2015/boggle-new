@@ -3,6 +3,7 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import toast from 'react-hot-toast';
+import { applyHebrewFinalLetters } from '@/utils/utils';
 
 /**
  * Neo-Brutalist Toast Component
@@ -98,7 +99,7 @@ export const wordAcceptedToast = (word: string, options: WordAcceptedOptions = {
               ✓
             </motion.span>
             <span className="font-black uppercase tracking-wide text-neo-black">
-              {word}
+              {applyHebrewFinalLetters(word)}
             </span>
             {/* Show score if provided and greater than 0 */}
             {typeof score === 'number' && score > 0 && (
@@ -155,7 +156,7 @@ export const wordNeedsValidationToast = (word: string, options: WordNeedsValidat
               ⏳
             </motion.span>
             <span className="font-black uppercase tracking-wide text-neo-black">
-              {word}
+              {applyHebrewFinalLetters(word)}
             </span>
             <span className="text-xs font-bold text-neo-black/70 uppercase">
               {options.pendingLabel || 'Pending'}
@@ -194,7 +195,7 @@ export const wordAIValidatingToast = (word: string, options: WordAIValidatingOpt
             </motion.span>
             <div className="flex flex-col">
               <span className="font-black uppercase tracking-wide text-neo-cream">
-                {word}
+                {applyHebrewFinalLetters(word)}
               </span>
               <span className="text-xs font-bold text-neo-cream/80 uppercase">
                 {options.aiValidatingLabel || 'AI checking...'}

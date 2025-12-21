@@ -1,24 +1,22 @@
 'use client';
 
-import React, { useRef, useState } from 'react';
+import React, { useRef } from 'react';
 import Link from 'next/link';
 import dynamic from 'next/dynamic';
 import { motion } from 'framer-motion';
-import { FaGamepad, FaTrophy, FaLightbulb, FaClock, FaUsers, FaStar, FaArrowLeft, FaPlay, FaHandPointer } from 'react-icons/fa';
+import { FaGamepad, FaTrophy, FaLightbulb, FaClock, FaUsers, FaStar, FaArrowLeft, FaPlay, FaHandPointer, FaRobot, FaBook, FaChartLine } from 'react-icons/fa';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { useLanguage } from '@/contexts/LanguageContext';
 
-// Dynamically import HowToPlay to reduce initial bundle size
-const HowToPlay = dynamic(() => import('@/components/HowToPlay'), { ssr: false });
+// Dynamically import InteractiveGridDemo
+const InteractiveGridDemo = dynamic(() => import('@/components/how-to-play/InteractiveGridDemo'), { ssr: false });
 
 export default function RulesPage(): React.JSX.Element {
     const { language, dir, t } = useLanguage();
     const tutorialRef = useRef<HTMLElement>(null);
-    const [showInteractiveTutorial, setShowInteractiveTutorial] = useState(false);
 
     const scrollToTutorial = () => {
         tutorialRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -43,10 +41,10 @@ export default function RulesPage(): React.JSX.Element {
                     transition={{ duration: 0.6 }}
                 >
                     <h1 className="text-3xl sm:text-4xl md:text-5xl font-black text-slate-900 dark:text-white mb-4">
-                        LexiClash: Real-Time Word Battle
+                        {t('rules.pageTitle')}
                     </h1>
-                    <p className="text-lg sm:text-xl text-slate-600 dark:text-slate-300 max-w-2xl mx-auto">
-                        Master the art of word hunting in this fast-paced multiplayer strategy game
+                    <p className="text-lg sm:text-xl text-slate-600 dark:text-slate-200 max-w-2xl mx-auto">
+                        {t('rules.pageSubtitle')}
                     </p>
                 </motion.div>
 
@@ -62,8 +60,8 @@ export default function RulesPage(): React.JSX.Element {
                             size="lg"
                             className="bg-neo-cyan text-neo-black hover:bg-neo-cyan/90 font-bold text-lg px-8 py-6 w-full sm:w-auto"
                         >
-                            <FaPlay className="mr-2" />
-                            Play Now - It&apos;s Free!
+                            <FaPlay className={dir === 'rtl' ? 'ml-2' : 'mr-2'} />
+                            {t('rules.playNowFree')}
                         </Button>
                     </Link>
                     <Button
@@ -72,16 +70,42 @@ export default function RulesPage(): React.JSX.Element {
                         onClick={scrollToTutorial}
                         className="border-3 border-neo-black bg-neo-lime hover:bg-neo-lime/90 text-neo-black font-bold text-lg px-8 py-6 w-full sm:w-auto"
                     >
-                        <FaHandPointer className="mr-2" />
-                        {t('footer.interactiveTutorial') || 'Interactive Tutorial'}
+                        <FaHandPointer className={dir === 'rtl' ? 'ml-2' : 'mr-2'} />
+                        {t('footer.interactiveTutorial')}
                     </Button>
                 </motion.div>
+
+                {/* Interactive Demo at Top */}
+                <motion.section
+                    ref={tutorialRef}
+                    id="interactive-tutorial"
+                    className="mb-10 scroll-mt-24"
+                    {...fadeInUp}
+                    transition={{ delay: 0.3 }}
+                >
+                    <Card className="border-4 border-neo-black shadow-hard-lg bg-white dark:bg-slate-800">
+                        <CardHeader className="bg-neo-yellow/20 border-b-4 border-neo-black">
+                            <CardTitle className="flex items-center gap-3 text-2xl sm:text-3xl font-black text-slate-900 dark:text-white">
+                                <FaHandPointer className="text-neo-pink" />
+                                {t('footer.interactiveTutorial')}
+                            </CardTitle>
+                        </CardHeader>
+                        <CardContent className="p-6">
+                            <p className="text-lg text-slate-700 dark:text-slate-200 leading-relaxed mb-6">
+                                {t('howToPlay.description')}
+                            </p>
+                            <div className="bg-gradient-to-br from-neo-cyan/10 to-neo-pink/10 rounded-neo border-3 border-neo-black p-4 flex justify-center">
+                                <InteractiveGridDemo t={t} dir={dir} />
+                            </div>
+                        </CardContent>
+                    </Card>
+                </motion.section>
 
                 {/* How to Play Section */}
                 <motion.section
                     className="mb-10"
                     {...fadeInUp}
-                    transition={{ delay: 0.3 }}
+                    transition={{ delay: 0.4 }}
                 >
                     <Card className="border-4 border-neo-black shadow-hard-lg bg-white dark:bg-slate-800">
                         <CardHeader className="bg-neo-cyan/20 border-b-4 border-neo-black">
@@ -91,52 +115,115 @@ export default function RulesPage(): React.JSX.Element {
                             </CardTitle>
                         </CardHeader>
                         <CardContent className="p-6 space-y-6">
-                            <p className="text-lg text-slate-700 dark:text-slate-300 leading-relaxed">
-                                LexiClash is a real-time multiplayer word game where players compete to find as many words as possible
-                                from a grid of letters. Think of it as a competitive, digital version of classic word-finding games,
-                                but with a modern twist that allows you to play with friends anywhere in the world.
+                            <p className="text-lg text-slate-700 dark:text-slate-200 leading-relaxed">
+                                {t('rules.howToPlayIntro')}
                             </p>
 
                             <div className="grid gap-4 sm:grid-cols-2">
                                 <div className="p-4 rounded-neo bg-neo-lime/10 border-3 border-neo-black">
                                     <div className="flex items-center gap-2 mb-2">
                                         <FaUsers className="text-neo-purple text-xl" />
-                                        <h3 className="font-bold text-lg text-slate-900 dark:text-white">Join or Create a Room</h3>
+                                        <h3 className="font-bold text-lg text-slate-900 dark:text-white">{t('rules.joinOrCreate')}</h3>
                                     </div>
-                                    <p className="text-slate-600 dark:text-slate-400">
-                                        Create your own game room or join an existing one using a room code. Share the code with friends to invite them instantly.
+                                    <p className="text-slate-600 dark:text-slate-300">
+                                        {t('rules.joinOrCreateDesc')}
                                     </p>
                                 </div>
 
                                 <div className="p-4 rounded-neo bg-neo-pink/10 border-3 border-neo-black">
                                     <div className="flex items-center gap-2 mb-2">
                                         <FaClock className="text-neo-pink text-xl" />
-                                        <h3 className="font-bold text-lg text-slate-900 dark:text-white">Race Against Time</h3>
+                                        <h3 className="font-bold text-lg text-slate-900 dark:text-white">{t('rules.raceAgainstTime')}</h3>
                                     </div>
-                                    <p className="text-slate-600 dark:text-slate-400">
-                                        When the game starts, you have a limited time (typically 90 seconds) to find as many valid words as possible from the letter grid.
+                                    <p className="text-slate-600 dark:text-slate-300">
+                                        {t('rules.raceAgainstTimeDesc')}
                                     </p>
                                 </div>
 
                                 <div className="p-4 rounded-neo bg-neo-cyan/10 border-3 border-neo-black">
                                     <div className="flex items-center gap-2 mb-2">
                                         <span className="text-2xl">🔤</span>
-                                        <h3 className="font-bold text-lg text-slate-900 dark:text-white">Swipe to Form Words</h3>
+                                        <h3 className="font-bold text-lg text-slate-900 dark:text-white">{t('rules.swipeToForm')}</h3>
                                     </div>
-                                    <p className="text-slate-600 dark:text-slate-400">
-                                        Connect adjacent letters by swiping or clicking to form words. Letters must be connected horizontally, vertically, or diagonally.
+                                    <p className="text-slate-600 dark:text-slate-300">
+                                        {t('rules.swipeToFormDesc')}
                                     </p>
                                 </div>
 
                                 <div className="p-4 rounded-neo bg-neo-purple/10 border-3 border-neo-black">
                                     <div className="flex items-center gap-2 mb-2">
                                         <FaTrophy className="text-neo-yellow text-xl" />
-                                        <h3 className="font-bold text-lg text-slate-900 dark:text-white">Compete & Win</h3>
+                                        <h3 className="font-bold text-lg text-slate-900 dark:text-white">{t('rules.competeAndWin')}</h3>
                                     </div>
-                                    <p className="text-slate-600 dark:text-slate-400">
-                                        The player with the highest score when time runs out wins! Play multiple rounds to determine the ultimate word champion.
+                                    <p className="text-slate-600 dark:text-slate-300">
+                                        {t('rules.competeAndWinDesc')}
                                     </p>
                                 </div>
+                            </div>
+                        </CardContent>
+                    </Card>
+                </motion.section>
+
+                {/* Single Player Modes Section */}
+                <motion.section
+                    className="mb-10"
+                    {...fadeInUp}
+                    transition={{ delay: 0.45 }}
+                >
+                    <Card className="border-4 border-neo-black shadow-hard-lg bg-white dark:bg-slate-800">
+                        <CardHeader className="bg-neo-orange/20 border-b-4 border-neo-black">
+                            <CardTitle className="flex items-center gap-3 text-2xl sm:text-3xl font-black text-slate-900 dark:text-white">
+                                <FaRobot className="text-neo-orange" />
+                                {t('rules.singlePlayerTitle')}
+                            </CardTitle>
+                        </CardHeader>
+                        <CardContent className="p-6 space-y-6">
+                            <p className="text-lg text-slate-700 dark:text-slate-200 leading-relaxed">
+                                {t('rules.singlePlayerIntro')}
+                            </p>
+
+                            <div className="grid gap-4 sm:grid-cols-3">
+                                <div className="p-4 rounded-neo bg-neo-cyan/10 border-3 border-neo-black">
+                                    <div className="flex items-center gap-2 mb-2">
+                                        <FaRobot className="text-neo-cyan text-xl" />
+                                        <h3 className="font-bold text-lg text-slate-900 dark:text-white">{t('rules.soloVsBots')}</h3>
+                                    </div>
+                                    <p className="text-slate-600 dark:text-slate-300 text-sm">
+                                        {t('rules.soloVsBotsDesc')}
+                                    </p>
+                                </div>
+
+                                <div className="p-4 rounded-neo bg-neo-lime/10 border-3 border-neo-black">
+                                    <div className="flex items-center gap-2 mb-2">
+                                        <FaBook className="text-neo-lime text-xl" />
+                                        <h3 className="font-bold text-lg text-slate-900 dark:text-white">{t('rules.practiceMode')}</h3>
+                                    </div>
+                                    <p className="text-slate-600 dark:text-slate-300 text-sm">
+                                        {t('rules.practiceModeDesc')}
+                                    </p>
+                                </div>
+
+                                <div className="p-4 rounded-neo bg-neo-yellow/10 border-3 border-neo-black">
+                                    <div className="flex items-center gap-2 mb-2">
+                                        <FaChartLine className="text-neo-yellow text-xl" />
+                                        <h3 className="font-bold text-lg text-slate-900 dark:text-white">{t('rules.challengeMode')}</h3>
+                                    </div>
+                                    <p className="text-slate-600 dark:text-slate-300 text-sm">
+                                        {t('rules.challengeModeDesc')}
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div className="flex justify-center">
+                                <Link href={`/${language}/singleplayer`}>
+                                    <Button
+                                        size="lg"
+                                        className="bg-neo-orange text-neo-black hover:bg-neo-orange/90 font-bold"
+                                    >
+                                        <FaPlay className={dir === 'rtl' ? 'ml-2' : 'mr-2'} />
+                                        {t('landing.singlePlayer')}
+                                    </Button>
+                                </Link>
                             </div>
                         </CardContent>
                     </Card>
@@ -146,7 +233,7 @@ export default function RulesPage(): React.JSX.Element {
                 <motion.section
                     className="mb-10"
                     {...fadeInUp}
-                    transition={{ delay: 0.4 }}
+                    transition={{ delay: 0.5 }}
                 >
                     <Card className="border-4 border-neo-black shadow-hard-lg bg-white dark:bg-slate-800">
                         <CardHeader className="bg-neo-pink/20 border-b-4 border-neo-black">
@@ -156,59 +243,57 @@ export default function RulesPage(): React.JSX.Element {
                             </CardTitle>
                         </CardHeader>
                         <CardContent className="p-6 space-y-6">
-                            <p className="text-lg text-slate-700 dark:text-slate-300 leading-relaxed">
-                                In LexiClash, longer words earn you more points. The scoring system rewards strategic players
-                                who hunt for longer, more complex words rather than just submitting many short words.
+                            <p className="text-lg text-slate-700 dark:text-slate-200 leading-relaxed">
+                                {t('rules.scoringIntro')}
                             </p>
 
                             <div className="overflow-x-auto">
                                 <table className="w-full border-collapse">
                                     <thead>
                                         <tr className="bg-neo-navy text-white">
-                                            <th className="p-3 text-left border-2 border-neo-black font-bold">Word Length</th>
-                                            <th className="p-3 text-left border-2 border-neo-black font-bold">Points</th>
-                                            <th className="p-3 text-left border-2 border-neo-black font-bold">Example</th>
+                                            <th className="p-3 text-left border-2 border-neo-black font-bold">{t('rules.wordLength')}</th>
+                                            <th className="p-3 text-left border-2 border-neo-black font-bold">{t('rules.points')}</th>
+                                            <th className="p-3 text-left border-2 border-neo-black font-bold">{t('rules.example')}</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         <tr className="bg-white dark:bg-slate-700">
-                                            <td className="p-3 border-2 border-neo-black">3 letters</td>
-                                            <td className="p-3 border-2 border-neo-black font-bold text-neo-cyan">1 point</td>
-                                            <td className="p-3 border-2 border-neo-black text-slate-600 dark:text-slate-300">CAT, DOG, RUN</td>
+                                            <td className="p-3 border-2 border-neo-black text-slate-900 dark:text-slate-100">3 {t('howToPlay.letters')}</td>
+                                            <td className="p-3 border-2 border-neo-black font-bold text-neo-cyan">1 {t('howToPlay.pts')}</td>
+                                            <td className="p-3 border-2 border-neo-black text-slate-600 dark:text-slate-200">CAT, DOG, RUN</td>
                                         </tr>
                                         <tr className="bg-slate-50 dark:bg-slate-600">
-                                            <td className="p-3 border-2 border-neo-black">4 letters</td>
-                                            <td className="p-3 border-2 border-neo-black font-bold text-neo-cyan">1 point</td>
-                                            <td className="p-3 border-2 border-neo-black text-slate-600 dark:text-slate-300">GAME, PLAY, WORD</td>
+                                            <td className="p-3 border-2 border-neo-black text-slate-900 dark:text-slate-100">4 {t('howToPlay.letters')}</td>
+                                            <td className="p-3 border-2 border-neo-black font-bold text-neo-cyan">1 {t('howToPlay.pts')}</td>
+                                            <td className="p-3 border-2 border-neo-black text-slate-600 dark:text-slate-200">GAME, PLAY, WORD</td>
                                         </tr>
                                         <tr className="bg-white dark:bg-slate-700">
-                                            <td className="p-3 border-2 border-neo-black">5 letters</td>
-                                            <td className="p-3 border-2 border-neo-black font-bold text-neo-lime">2 points</td>
-                                            <td className="p-3 border-2 border-neo-black text-slate-600 dark:text-slate-300">CLASH, SCORE, BRAIN</td>
+                                            <td className="p-3 border-2 border-neo-black text-slate-900 dark:text-slate-100">5 {t('howToPlay.letters')}</td>
+                                            <td className="p-3 border-2 border-neo-black font-bold text-neo-lime">2 {t('howToPlay.pts')}</td>
+                                            <td className="p-3 border-2 border-neo-black text-slate-600 dark:text-slate-200">CLASH, SCORE, BRAIN</td>
                                         </tr>
                                         <tr className="bg-slate-50 dark:bg-slate-600">
-                                            <td className="p-3 border-2 border-neo-black">6 letters</td>
-                                            <td className="p-3 border-2 border-neo-black font-bold text-neo-purple">3 points</td>
-                                            <td className="p-3 border-2 border-neo-black text-slate-600 dark:text-slate-300">PLAYER, WINNER, BATTLE</td>
+                                            <td className="p-3 border-2 border-neo-black text-slate-900 dark:text-slate-100">6 {t('howToPlay.letters')}</td>
+                                            <td className="p-3 border-2 border-neo-black font-bold text-neo-purple">3 {t('howToPlay.pts')}</td>
+                                            <td className="p-3 border-2 border-neo-black text-slate-600 dark:text-slate-200">PLAYER, WINNER, BATTLE</td>
                                         </tr>
                                         <tr className="bg-white dark:bg-slate-700">
-                                            <td className="p-3 border-2 border-neo-black">7 letters</td>
-                                            <td className="p-3 border-2 border-neo-black font-bold text-neo-pink">5 points</td>
-                                            <td className="p-3 border-2 border-neo-black text-slate-600 dark:text-slate-300">LETTERS, VICTORY, COMPETE</td>
+                                            <td className="p-3 border-2 border-neo-black text-slate-900 dark:text-slate-100">7 {t('howToPlay.letters')}</td>
+                                            <td className="p-3 border-2 border-neo-black font-bold text-neo-pink">5 {t('howToPlay.pts')}</td>
+                                            <td className="p-3 border-2 border-neo-black text-slate-600 dark:text-slate-200">LETTERS, VICTORY, COMPETE</td>
                                         </tr>
                                         <tr className="bg-slate-50 dark:bg-slate-600">
-                                            <td className="p-3 border-2 border-neo-black">8+ letters</td>
-                                            <td className="p-3 border-2 border-neo-black font-bold text-neo-yellow">11+ points</td>
-                                            <td className="p-3 border-2 border-neo-black text-slate-600 dark:text-slate-300">CHAMPION, STRATEGY, LEGENDARY</td>
+                                            <td className="p-3 border-2 border-neo-black text-slate-900 dark:text-slate-100">8+ {t('howToPlay.letters')}</td>
+                                            <td className="p-3 border-2 border-neo-black font-bold text-neo-yellow">11+ {t('howToPlay.pts')}</td>
+                                            <td className="p-3 border-2 border-neo-black text-slate-600 dark:text-slate-200">CHAMPION, STRATEGY</td>
                                         </tr>
                                     </tbody>
                                 </table>
                             </div>
 
                             <div className="p-4 rounded-neo bg-neo-yellow/20 border-3 border-neo-black">
-                                <p className="text-slate-700 dark:text-slate-300">
-                                    <strong>Pro Tip:</strong> Focus on finding 5-7 letter words for the best point-to-time ratio.
-                                    While 8+ letter words give massive points, they&apos;re rare and time-consuming to find!
+                                <p className="text-slate-700 dark:text-slate-200">
+                                    <strong>{t('rules.proTip')}:</strong> {t('rules.proTipText')}
                                 </p>
                             </div>
                         </CardContent>
@@ -219,7 +304,7 @@ export default function RulesPage(): React.JSX.Element {
                 <motion.section
                     className="mb-10"
                     {...fadeInUp}
-                    transition={{ delay: 0.5 }}
+                    transition={{ delay: 0.55 }}
                 >
                     <Card className="border-4 border-neo-black shadow-hard-lg bg-white dark:bg-slate-800">
                         <CardHeader className="bg-neo-purple/20 border-b-4 border-neo-black">
@@ -229,9 +314,8 @@ export default function RulesPage(): React.JSX.Element {
                             </CardTitle>
                         </CardHeader>
                         <CardContent className="p-6 space-y-6">
-                            <p className="text-lg text-slate-700 dark:text-slate-300 leading-relaxed">
-                                Becoming a LexiClash champion requires more than just a good vocabulary. Here are proven strategies
-                                used by top players to dominate their opponents and climb the leaderboard.
+                            <p className="text-lg text-slate-700 dark:text-slate-200 leading-relaxed">
+                                {t('rules.strategiesIntro')}
                             </p>
 
                             <div className="space-y-4">
@@ -240,10 +324,9 @@ export default function RulesPage(): React.JSX.Element {
                                         1
                                     </div>
                                     <div>
-                                        <h3 className="font-bold text-lg text-slate-900 dark:text-white mb-1">Scan for Prefixes and Suffixes</h3>
-                                        <p className="text-slate-600 dark:text-slate-400">
-                                            Look for common word parts like &quot;UN-&quot;, &quot;RE-&quot;, &quot;-ING&quot;, &quot;-ED&quot;, and &quot;-TION&quot;.
-                                            These can help you quickly identify longer words hiding in the grid.
+                                        <h3 className="font-bold text-lg text-slate-900 dark:text-white mb-1">{t('rules.scanPrefixes')}</h3>
+                                        <p className="text-slate-600 dark:text-slate-300">
+                                            {t('rules.scanPrefixesDesc')}
                                         </p>
                                     </div>
                                 </div>
@@ -253,10 +336,9 @@ export default function RulesPage(): React.JSX.Element {
                                         2
                                     </div>
                                     <div>
-                                        <h3 className="font-bold text-lg text-slate-900 dark:text-white mb-1">Start from Vowels</h3>
-                                        <p className="text-slate-600 dark:text-slate-400">
-                                            Most English words contain vowels. Start by locating A, E, I, O, U on the grid
-                                            and build words around them for faster word discovery.
+                                        <h3 className="font-bold text-lg text-slate-900 dark:text-white mb-1">{t('rules.startFromVowels')}</h3>
+                                        <p className="text-slate-600 dark:text-slate-300">
+                                            {t('rules.startFromVowelsDesc')}
                                         </p>
                                     </div>
                                 </div>
@@ -266,10 +348,9 @@ export default function RulesPage(): React.JSX.Element {
                                         3
                                     </div>
                                     <div>
-                                        <h3 className="font-bold text-lg text-slate-900 dark:text-white mb-1">Think in Word Families</h3>
-                                        <p className="text-slate-600 dark:text-slate-400">
-                                            When you find a word like &quot;PLAY&quot;, immediately check for variations: &quot;PLAYS&quot;, &quot;PLAYER&quot;,
-                                            &quot;PLAYING&quot;, &quot;PLAYED&quot;. This technique can quickly multiply your score.
+                                        <h3 className="font-bold text-lg text-slate-900 dark:text-white mb-1">{t('rules.thinkWordFamilies')}</h3>
+                                        <p className="text-slate-600 dark:text-slate-300">
+                                            {t('rules.thinkWordFamiliesDesc')}
                                         </p>
                                     </div>
                                 </div>
@@ -279,10 +360,9 @@ export default function RulesPage(): React.JSX.Element {
                                         4
                                     </div>
                                     <div>
-                                        <h3 className="font-bold text-lg text-slate-900 dark:text-white mb-1">Don&apos;t Overthink Short Words</h3>
-                                        <p className="text-slate-600 dark:text-slate-400">
-                                            Submit obvious 3-4 letter words quickly without hesitation. They add up fast and
-                                            give you a solid foundation while you search for longer, higher-scoring words.
+                                        <h3 className="font-bold text-lg text-slate-900 dark:text-white mb-1">{t('rules.dontOverthink')}</h3>
+                                        <p className="text-slate-600 dark:text-slate-300">
+                                            {t('rules.dontOverthinkDesc')}
                                         </p>
                                     </div>
                                 </div>
@@ -292,10 +372,9 @@ export default function RulesPage(): React.JSX.Element {
                                         5
                                     </div>
                                     <div>
-                                        <h3 className="font-bold text-lg text-slate-900 dark:text-white mb-1">Practice Pattern Recognition</h3>
-                                        <p className="text-slate-600 dark:text-slate-400">
-                                            The more you play, the faster you&apos;ll recognize common letter patterns. Regular practice
-                                            trains your brain to spot words almost instantly, giving you a significant edge.
+                                        <h3 className="font-bold text-lg text-slate-900 dark:text-white mb-1">{t('rules.practicePatterns')}</h3>
+                                        <p className="text-slate-600 dark:text-slate-300">
+                                            {t('rules.practicePatternsDesc')}
                                         </p>
                                     </div>
                                 </div>
@@ -320,67 +399,41 @@ export default function RulesPage(): React.JSX.Element {
                         <CardContent className="p-6">
                             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                                 <div className="p-4 rounded-neo bg-white dark:bg-slate-700 border-3 border-neo-black shadow-hard">
-                                    <h3 className="font-bold text-lg text-slate-900 dark:text-white mb-2">Multi-Language Support</h3>
-                                    <p className="text-slate-600 dark:text-slate-400 text-sm">
-                                        Play in English, Hebrew, Swedish, or Japanese. Perfect for language learners!
+                                    <h3 className="font-bold text-lg text-slate-900 dark:text-white mb-2">{t('rules.multiLanguage')}</h3>
+                                    <p className="text-slate-600 dark:text-slate-300 text-sm">
+                                        {t('rules.multiLanguageDesc')}
                                     </p>
                                 </div>
                                 <div className="p-4 rounded-neo bg-white dark:bg-slate-700 border-3 border-neo-black shadow-hard">
-                                    <h3 className="font-bold text-lg text-slate-900 dark:text-white mb-2">Real-Time Multiplayer</h3>
-                                    <p className="text-slate-600 dark:text-slate-400 text-sm">
-                                        Compete against friends or players worldwide in real-time word battles.
+                                    <h3 className="font-bold text-lg text-slate-900 dark:text-white mb-2">{t('rules.realTimeMultiplayer')}</h3>
+                                    <p className="text-slate-600 dark:text-slate-300 text-sm">
+                                        {t('rules.realTimeMultiplayerDesc')}
                                     </p>
                                 </div>
                                 <div className="p-4 rounded-neo bg-white dark:bg-slate-700 border-3 border-neo-black shadow-hard">
-                                    <h3 className="font-bold text-lg text-slate-900 dark:text-white mb-2">Achievements & Levels</h3>
-                                    <p className="text-slate-600 dark:text-slate-400 text-sm">
-                                        Earn XP, unlock achievements, and climb the ranks as you improve.
+                                    <h3 className="font-bold text-lg text-slate-900 dark:text-white mb-2">{t('rules.achievementsLevels')}</h3>
+                                    <p className="text-slate-600 dark:text-slate-300 text-sm">
+                                        {t('rules.achievementsLevelsDesc')}
                                     </p>
                                 </div>
                                 <div className="p-4 rounded-neo bg-white dark:bg-slate-700 border-3 border-neo-black shadow-hard">
-                                    <h3 className="font-bold text-lg text-slate-900 dark:text-white mb-2">Leaderboards</h3>
-                                    <p className="text-slate-600 dark:text-slate-400 text-sm">
-                                        Track your progress and see how you rank against other players globally.
+                                    <h3 className="font-bold text-lg text-slate-900 dark:text-white mb-2">{t('rules.leaderboards')}</h3>
+                                    <p className="text-slate-600 dark:text-slate-300 text-sm">
+                                        {t('rules.leaderboardsDesc')}
                                     </p>
                                 </div>
                                 <div className="p-4 rounded-neo bg-white dark:bg-slate-700 border-3 border-neo-black shadow-hard">
-                                    <h3 className="font-bold text-lg text-slate-900 dark:text-white mb-2">No Download Required</h3>
-                                    <p className="text-slate-600 dark:text-slate-400 text-sm">
-                                        Play instantly in your browser on any device - desktop, tablet, or mobile.
+                                    <h3 className="font-bold text-lg text-slate-900 dark:text-white mb-2">{t('rules.noDownload')}</h3>
+                                    <p className="text-slate-600 dark:text-slate-300 text-sm">
+                                        {t('rules.noDownloadDesc')}
                                     </p>
                                 </div>
                                 <div className="p-4 rounded-neo bg-white dark:bg-slate-700 border-3 border-neo-black shadow-hard">
-                                    <h3 className="font-bold text-lg text-slate-900 dark:text-white mb-2">QR Code Sharing</h3>
-                                    <p className="text-slate-600 dark:text-slate-400 text-sm">
-                                        Generate QR codes to instantly invite friends to your game room.
+                                    <h3 className="font-bold text-lg text-slate-900 dark:text-white mb-2">{t('rules.qrSharing')}</h3>
+                                    <p className="text-slate-600 dark:text-slate-300 text-sm">
+                                        {t('rules.qrSharingDesc')}
                                     </p>
                                 </div>
-                            </div>
-                        </CardContent>
-                    </Card>
-                </motion.section>
-
-                {/* Interactive Tutorial Section */}
-                <motion.section
-                    ref={tutorialRef}
-                    id="interactive-tutorial"
-                    className="mb-10 scroll-mt-24"
-                    {...fadeInUp}
-                    transition={{ delay: 0.7 }}
-                >
-                    <Card className="border-4 border-neo-black shadow-hard-lg bg-white dark:bg-slate-800">
-                        <CardHeader className="bg-neo-yellow/20 border-b-4 border-neo-black">
-                            <CardTitle className="flex items-center gap-3 text-2xl sm:text-3xl font-black text-slate-900 dark:text-white">
-                                <FaHandPointer className="text-neo-pink" />
-                                {t('footer.interactiveTutorial') || 'Interactive Tutorial'}
-                            </CardTitle>
-                        </CardHeader>
-                        <CardContent className="p-6">
-                            <p className="text-lg text-slate-700 dark:text-slate-300 leading-relaxed mb-6">
-                                {t('howToPlay.description')}
-                            </p>
-                            <div className="bg-gradient-to-br from-neo-cyan/10 to-neo-pink/10 rounded-neo border-3 border-neo-black p-4">
-                                <HowToPlay onClose={() => {}} />
                             </div>
                         </CardContent>
                     </Card>
@@ -394,11 +447,10 @@ export default function RulesPage(): React.JSX.Element {
                     transition={{ delay: 0.7, duration: 0.4 }}
                 >
                     <h2 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white mb-4">
-                        Ready to Test Your Word Skills?
+                        {t('rules.readyToTest')}
                     </h2>
-                    <p className="text-lg text-slate-600 dark:text-slate-300 mb-6 max-w-xl mx-auto">
-                        Join thousands of players in the ultimate word battle experience. Create a room,
-                        invite your friends, and see who has the best vocabulary!
+                    <p className="text-lg text-slate-600 dark:text-slate-200 mb-6 max-w-xl mx-auto">
+                        {t('rules.readyToTestDesc')}
                     </p>
                     <div className="flex flex-col sm:flex-row gap-4 justify-center">
                         <Link href={`/${language}`}>
@@ -406,8 +458,8 @@ export default function RulesPage(): React.JSX.Element {
                                 size="lg"
                                 className="bg-neo-cyan text-neo-black hover:bg-neo-cyan/90 font-bold text-lg px-8 py-6 w-full sm:w-auto"
                             >
-                                <FaPlay className="mr-2" />
-                                Start Playing Now
+                                <FaPlay className={dir === 'rtl' ? 'ml-2' : 'mr-2'} />
+                                {t('rules.startPlaying')}
                             </Button>
                         </Link>
                         <Link href={`/${language}/leaderboard`}>
@@ -416,8 +468,8 @@ export default function RulesPage(): React.JSX.Element {
                                 variant="outline"
                                 className="border-3 border-neo-black font-bold text-lg px-8 py-6 w-full sm:w-auto"
                             >
-                                <FaTrophy className="mr-2" />
-                                View Leaderboard
+                                <FaTrophy className={dir === 'rtl' ? 'ml-2' : 'mr-2'} />
+                                {t('leaderboard.viewLeaderboard')}
                             </Button>
                         </Link>
                     </div>
@@ -430,7 +482,7 @@ export default function RulesPage(): React.JSX.Element {
                         className="inline-flex items-center gap-2 text-neo-cyan hover:underline font-medium"
                     >
                         <FaArrowLeft />
-                        Back to Home
+                        {t('rules.backToHome')}
                     </Link>
                 </div>
             </main>
