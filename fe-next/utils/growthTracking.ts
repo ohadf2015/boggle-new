@@ -58,7 +58,7 @@ export interface GrowthEventData {
   wordCount?: number;
   achievementId?: string;
   achievementTier?: string;
-  shareMethod?: 'whatsapp' | 'copy' | 'qr' | 'native';
+  shareMethod?: 'whatsapp' | 'copy' | 'qr' | 'native' | 'facebook' | 'telegram';
   referralSource?: string;
   streakDays?: number;
   position?: number; // Leaderboard position
@@ -172,12 +172,14 @@ const storeEventLocally = (event: GrowthEvent, data: GrowthEventData): void => {
 /**
  * Track share event with method
  */
-export const trackShare = (method: 'whatsapp' | 'copy' | 'qr' | 'native', gameCode?: string): void => {
+export const trackShare = (method: 'whatsapp' | 'copy' | 'qr' | 'native' | 'facebook' | 'telegram', gameCode?: string): void => {
   const eventMap: Record<string, GrowthEvent> = {
     whatsapp: 'share_whatsapp_clicked',
     copy: 'share_link_copied',
     qr: 'share_qr_generated',
     native: 'share_link_copied',
+    facebook: 'share_link_copied',
+    telegram: 'share_link_copied',
   };
 
   const event = eventMap[method];

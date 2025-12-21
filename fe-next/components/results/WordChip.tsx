@@ -72,7 +72,8 @@ const WordChip = memo<WordChipProps>(({ wordObj, playerCount }) => {
   const chipContent = (
     <span
       className={cn(
-        "inline-flex items-center gap-1 px-2 py-1 text-sm font-black uppercase border-2 border-neo-black rounded-neo shadow-hard-sm transition-all hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-hard",
+        // Increased padding for 44px minimum touch target (WCAG 2.1 AA)
+        "inline-flex items-center gap-1.5 px-3 py-2.5 min-h-[44px] text-sm font-black uppercase border-2 border-neo-black rounded-neo shadow-hard-sm transition-all hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-hard",
         isDuplicate && "line-through opacity-80",
         !isDuplicate && !isValid && !isPending && "opacity-70",
         isPending && "animate-pulse",
@@ -91,13 +92,13 @@ const WordChip = memo<WordChipProps>(({ wordObj, playerCount }) => {
       {label}
       {/* Show info icon for invalid words with reason - indicates it's tappable */}
       {hasInvalidReason && (
-        <span className="text-[10px] px-1 py-0.5 bg-neo-cream/20 rounded border border-neo-cream/30 font-black">
+        <span className="text-xs w-5 h-5 flex items-center justify-center bg-neo-cream/20 rounded border border-neo-cream/30 font-black">
           ℹ️
         </span>
       )}
       {/* Show combo bonus indicator */}
       {comboBonus > 0 && !isDuplicate && isValid && (
-        <span className="text-[10px] px-1 py-0.5 bg-neo-yellow text-neo-black rounded border border-neo-black font-black">
+        <span className="text-xs px-1.5 py-0.5 bg-neo-yellow text-neo-black rounded border border-neo-black font-black">
           +{comboBonus}
         </span>
       )}
@@ -106,7 +107,7 @@ const WordChip = memo<WordChipProps>(({ wordObj, playerCount }) => {
         <TooltipProvider delayDuration={0}>
           <Tooltip>
             <TooltipTrigger asChild>
-              <span className="text-[10px] px-1 py-0.5 bg-neo-yellow text-neo-black rounded border border-neo-black font-black cursor-help">
+              <span className="text-xs px-1.5 py-0.5 bg-neo-yellow text-neo-black rounded border border-neo-black font-black cursor-help">
                 ?
               </span>
             </TooltipTrigger>
@@ -131,7 +132,7 @@ const WordChip = memo<WordChipProps>(({ wordObj, playerCount }) => {
         <TooltipProvider delayDuration={0}>
           <Tooltip>
             <TooltipTrigger asChild>
-              <span className="text-[10px] px-1 py-0.5 bg-neo-purple text-neo-cream rounded border border-neo-black font-black cursor-help">
+              <span className="text-xs px-1.5 py-0.5 bg-neo-purple text-neo-cream rounded border border-neo-black font-black cursor-help">
                 AI
               </span>
             </TooltipTrigger>

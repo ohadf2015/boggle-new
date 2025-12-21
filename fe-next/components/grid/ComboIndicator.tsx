@@ -4,10 +4,11 @@ import React, { useEffect, useState, useMemo } from 'react';
 import { motion, AnimatePresence, useAnimation } from 'framer-motion';
 import { cn } from '../../lib/utils';
 import { getComboColors } from './comboColors';
+import { useReducedMotion } from '../../utils/accessibility';
 
 interface ComboIndicatorProps {
   comboLevel: number;
-  reduceMotion?: boolean;
+  reduceMotion?: boolean; // Can still override via prop
 }
 
 // Total animation duration - badge shows then auto-dismisses
@@ -117,8 +118,12 @@ const GlowRing: React.FC<{
 
 const ComboIndicator: React.FC<ComboIndicatorProps> = ({
   comboLevel,
-  reduceMotion = false,
+  reduceMotion: reduceMotionProp,
 }) => {
+  // Use system preference, but allow prop override
+  const systemReducedMotion = useReducedMotion();
+  const reduceMotion = reduceMotionProp ?? systemReducedMotion;
+
   const comboColors = getComboColors(comboLevel);
   const controls = useAnimation();
   const [visibleCombo, setVisibleCombo] = useState<number | null>(null);

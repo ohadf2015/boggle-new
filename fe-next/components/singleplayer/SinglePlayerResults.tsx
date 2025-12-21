@@ -32,6 +32,7 @@ interface SinglePlayerResultsProps {
   results: SinglePlayerResultsData;
   mode: SinglePlayerMode;
   onPlayAgain: () => void;
+  onQuickRematch?: () => void;
   onBackToLobby: () => void;
 }
 
@@ -43,10 +44,12 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
   results,
   mode,
   onPlayAgain,
+  onQuickRematch,
   onBackToLobby,
 }) => {
   const { t } = useLanguage();
   const [showGrid, setShowGrid] = useState(false);
+  const [expandedBot, setExpandedBot] = useState<string | null>(null);
 
   // Calculate rankings for solo-bots mode
   const allParticipants = [
@@ -109,6 +112,35 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
 
     return { wordsByPoints, sortedPointGroups, invalidWords, totalComboBonus };
   }, [results.playerWordData]);
+
+  // Process bot words for display (bot words are like "word3", "word4" meaning length 3, 4, etc.)
+  const botWordDetails = useMemo(() => {
+    return results.botScores.map(bot => {
+      const wordsByLength: Record<number, number> = {};
+      let totalWords = 0;
+
+      bot.words.forEach(word => {
+        // Extract length from simulated word names like "word3", "word4"
+        const match = word.match(/word(\d+)/);
+        const length = match ? parseInt(match[1], 10) : word.length;
+        wordsByLength[length] = (wordsByLength[length] || 0) + 1;
+        totalWords++;
+      });
+
+      // Sort by length descending
+      const sortedLengths = Object.keys(wordsByLength)
+        .map(Number)
+        .sort((a, b) => b - a);
+
+      return {
+        name: bot.name,
+        score: bot.score,
+        totalWords,
+        wordsByLength,
+        sortedLengths,
+      };
+    });
+  }, [results.botScores]);
 
   // Celebration effect on mount
   useEffect(() => {
@@ -530,6 +562,104 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
         </Card>
       )}
 
+      {/* Bot Words Details (solo-bots mode) - Expandable sections for each bot */}
+      {mode === 'solo-bots' && botWordDetails.length > 0 && (
+        <Card className="border-4 border-neo-black dark:border-slate-600 shadow-hard-lg">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-sm uppercase tracking-wide text-neo-black/70 dark:text-neo-white/70">
+              <FaRobot className="text-neo-purple" />
+              {t('singlePlayer.botDetails') || 'Bot Performance Details'}
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            {botWordDetails.map((bot, botIndex) => (
+              <motion.div
+                key={bot.name}
+                initial={{ opacity: 0, x: -10 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: botIndex * 0.1 }}
+                className="border-3 border-neo-black dark:border-slate-500 rounded-neo overflow-hidden"
+              >
+                {/* Bot header - clickable to expand */}
+                <button
+                  onClick={() => setExpandedBot(expandedBot === bot.name ? null : bot.name)}
+                  className="w-full flex items-center justify-between p-3 bg-neo-cream dark:bg-slate-700 hover:bg-neo-cream/80 dark:hover:bg-slate-600 transition-colors"
+                >
+                  <div className="flex items-center gap-3">
+                    <FaRobot className="text-neo-black/50 dark:text-white/50" />
+                    <span className="font-black text-neo-black dark:text-white">{bot.name}</span>
+                    <span className="text-xs bg-neo-black/10 dark:bg-white/10 px-2 py-0.5 rounded-full font-bold">
+                      {bot.totalWords} {t('hostView.words') || 'words'}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <span className="text-xl font-black text-neo-black dark:text-white">{bot.score}</span>
+                    <motion.span
+                      animate={{ rotate: expandedBot === bot.name ? 180 : 0 }}
+                      transition={{ duration: 0.2 }}
+                      className="text-neo-black/50 dark:text-white/50"
+                    >
+                      ▼
+                    </motion.span>
+                  </div>
+                </button>
+
+                {/* Expanded bot details */}
+                <AnimatePresence>
+                  {expandedBot === bot.name && (
+                    <motion.div
+                      initial={{ height: 0, opacity: 0 }}
+                      animate={{ height: 'auto', opacity: 1 }}
+                      exit={{ height: 0, opacity: 0 }}
+                      transition={{ duration: 0.2 }}
+                      className="overflow-hidden"
+                    >
+                      <div className="p-3 bg-white dark:bg-slate-800 border-t-2 border-neo-black/20 dark:border-slate-600">
+                        <div className="text-xs font-bold uppercase text-neo-black/60 dark:text-white/60 mb-2">
+                          {t('singlePlayer.wordsByLength') || 'Words by Length'}
+                        </div>
+                        <div className="flex flex-wrap gap-2">
+                          {bot.sortedLengths.map(length => {
+                            const count = bot.wordsByLength[length] || 0;
+                            const points = Math.max(length - 1, 1);
+                            return (
+                              <div
+                                key={length}
+                                className="flex items-center gap-1.5 px-2 py-1 rounded-neo border-2 border-neo-black shadow-hard-sm"
+                                style={{ backgroundColor: getPointColor(points) }}
+                              >
+                                <span
+                                  className="font-black text-sm"
+                                  style={{ color: getTextColor(points) }}
+                                >
+                                  {length}-letter
+                                </span>
+                                <span
+                                  className="text-xs px-1.5 py-0.5 bg-neo-black/20 rounded font-bold"
+                                  style={{ color: getTextColor(points) }}
+                                >
+                                  ×{count}
+                                </span>
+                              </div>
+                            );
+                          })}
+                        </div>
+                        {/* Score breakdown */}
+                        <div className="mt-3 pt-2 border-t border-neo-black/10 dark:border-white/10">
+                          <div className="text-xs text-neo-black/60 dark:text-white/60">
+                            {t('singlePlayer.totalScore') || 'Total Score'}: <span className="font-black text-neo-black dark:text-white">{bot.score}</span>
+                          </div>
+                        </div>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </motion.div>
+            ))}
+          </CardContent>
+        </Card>
+      )}
+
       {/* Grid preview - Toggle button style */}
       <motion.button
         onClick={() => setShowGrid(!showGrid)}
@@ -563,25 +693,40 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
         )}
       </AnimatePresence>
 
-      {/* Action buttons - Enhanced */}
-      <div className="flex gap-4 pt-4">
-        <Button
-          variant="secondary"
-          size="lg"
-          className="flex-1 py-4 text-lg shadow-hard hover:shadow-hard-lg border-3"
-          onClick={onBackToLobby}
-        >
-          <FaHome className="mr-2" />
-          {t('common.lobby') || 'Lobby'}
-        </Button>
-        <Button
-          size="lg"
-          className="flex-1 py-4 text-lg shadow-hard hover:shadow-hard-lg border-3 bg-neo-cyan hover:bg-neo-cyan/90"
-          onClick={onPlayAgain}
-        >
-          <FaRedo className="mr-2" />
-          {t('common.playAgain') || 'Play Again'}
-        </Button>
+      {/* Action buttons - Enhanced with Quick Rematch */}
+      <div className="flex flex-col gap-3 pt-4">
+        {/* Primary action: Quick Rematch - same settings, new game immediately */}
+        {onQuickRematch && (
+          <Button
+            size="lg"
+            className="w-full py-4 text-lg shadow-hard hover:shadow-hard-lg border-3 bg-neo-yellow hover:bg-neo-yellow/90 text-neo-black font-black uppercase tracking-wide"
+            onClick={onQuickRematch}
+          >
+            <FaRedo className="mr-2" />
+            {t('common.quickRematch') || 'Quick Rematch'}
+          </Button>
+        )}
+        {/* Secondary actions row */}
+        <div className="flex gap-3">
+          <Button
+            variant="secondary"
+            size="lg"
+            className="flex-1 py-3 shadow-hard hover:shadow-hard-lg border-3"
+            onClick={onBackToLobby}
+          >
+            <FaHome className="mr-2" />
+            {t('common.lobby') || 'Lobby'}
+          </Button>
+          <Button
+            variant="outline"
+            size="lg"
+            className="flex-1 py-3 shadow-hard hover:shadow-hard-lg border-3"
+            onClick={onPlayAgain}
+          >
+            <FaRedo className="mr-2" />
+            {t('common.changeSettings') || 'Change Settings'}
+          </Button>
+        </div>
       </div>
     </motion.div>
   );

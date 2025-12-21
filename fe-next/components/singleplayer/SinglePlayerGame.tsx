@@ -161,6 +161,7 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
             body: JSON.stringify({
               words: pendingWords.map(pw => pw.word),
               language: settings.language,
+              minWordLength: 2, // Default minimum word length for single player
             }),
           });
           const result = await response.json();
@@ -388,6 +389,10 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
       }
       wordErrorToast(msg, { duration: 1000 });
       announceWordResult(normalizedWord, false, undefined, msg);
+      // Reset combo on invalid word submission (consistent with multiplayer behavior)
+      if (comboTimeoutRef.current) clearTimeout(comboTimeoutRef.current);
+      setComboLevel(0);
+      validWordCountRef.current = 0;
       return;
     }
 
@@ -396,6 +401,10 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
       const notOnBoardMsg = t('playerView.wordNotOnBoard') || 'Word not on board';
       wordErrorToast(notOnBoardMsg, { duration: 1500 });
       announceWordResult(normalizedWord, false, undefined, notOnBoardMsg);
+      // Reset combo on invalid word submission (consistent with multiplayer behavior)
+      if (comboTimeoutRef.current) clearTimeout(comboTimeoutRef.current);
+      setComboLevel(0);
+      validWordCountRef.current = 0;
       return;
     }
 

@@ -2,11 +2,12 @@
 
 import React, { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FaWhatsapp, FaLink, FaShare, FaTrophy, FaFire, FaTimes } from 'react-icons/fa';
+import { FaWhatsapp, FaLink, FaShare, FaTrophy, FaFire, FaTimes, FaFacebook, FaTelegram } from 'react-icons/fa';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { useTheme } from '../../utils/ThemeContext';
-import { getJoinUrl, copyJoinUrl, shareViaWhatsApp } from '../../utils/share';
+import { getJoinUrl, copyJoinUrl, shareViaWhatsApp, shareViaFacebook, shareViaTelegram } from '../../utils/share';
 import { trackShare, getShareUrlWithTracking, generateReferralCode } from '../../utils/growthTracking';
+import { trackShareVariantClick } from '../../utils/share';
 import { cn } from '../../lib/utils';
 import toast from 'react-hot-toast';
 
@@ -291,8 +292,8 @@ const ShareWinPrompt: React.FC<ShareWinPromptProps> = ({
   const [isExpanded, setIsExpanded] = useState(!compact);
   const [copied, setCopied] = useState(false);
 
-  // Generate witty personalized share message
-  const shareMessage = useMemo(() => {
+  // Generate witty personalized share message and track variant
+  const { shareMessage, variantId } = useMemo(() => {
     const referralCode = generateReferralCode();
     const url = getShareUrlWithTracking(gameCode, referralCode);
 
@@ -334,20 +335,26 @@ const ShareWinPrompt: React.FC<ShareWinPromptProps> = ({
     };
 
     let baseMessage: string;
+    let tier: string;
 
     if (isWinner) {
       const messages = getWinnerMessages();
       if (score > 150) {
         baseMessage = pickRandom(messages.legendary);
+        tier = 'legendary';
       } else if (score > 100) {
         baseMessage = pickRandom(messages.amazing);
+        tier = 'amazing';
       } else if (score > 50) {
         baseMessage = pickRandom(messages.good);
+        tier = 'good';
       } else {
         baseMessage = pickRandom(messages.normal);
+        tier = 'normal';
       }
     } else {
       baseMessage = pickRandom(getLoserMessages());
+      tier = 'loser';
     }
 
     // Replace placeholders
@@ -360,8 +367,10 @@ const ShareWinPrompt: React.FC<ShareWinPromptProps> = ({
       ? `\n${wordCount} מילים${achievementIcons ? ` ${achievementIcons}` : ''}`
       : `\n${wordCount} words found${achievementIcons ? ` ${achievementIcons}` : ''}`;
 
-    // Compose final message
-    return `${baseMessage}${isWinner ? statsLine : ''}${streakText}\n\n${url}`;
+    // Compose final message with variant ID for A/B tracking
+    const currentVariantId = `${language}_${tier}`;
+    const message = `${baseMessage}${isWinner ? statsLine : ''}${streakText}\n\n${url}`;
+    return { shareMessage: message, variantId: currentVariantId };
   }, [isWinner, score, wordCount, achievements, gameCode, language, streakDays]);
 
   // Random viral prompt based on language
@@ -382,6 +391,7 @@ const ShareWinPrompt: React.FC<ShareWinPromptProps> = ({
   // Handle WhatsApp share - use whatsapp utm_source for tracking
   const handleWhatsAppShare = () => {
     trackShare('whatsapp', gameCode);
+    trackShareVariantClick(variantId);
 
     // Generate message with whatsapp utm_source
     const referralCode = generateReferralCode();
@@ -395,6 +405,7 @@ const ShareWinPrompt: React.FC<ShareWinPromptProps> = ({
   // Handle copy link - use copy utm_source for tracking
   const handleCopyLink = async () => {
     trackShare('copy', gameCode);
+    trackShareVariantClick(variantId);
 
     const referralCode = generateReferralCode();
     const url = getShareUrlWithTracking(gameCode, referralCode, 'copy');
@@ -413,6 +424,7 @@ const ShareWinPrompt: React.FC<ShareWinPromptProps> = ({
   const handleNativeShare = async () => {
     if (navigator.share) {
       trackShare('native', gameCode);
+      trackShareVariantClick(variantId);
 
       try {
         const referralCode = generateReferralCode();
@@ -428,6 +440,28 @@ const ShareWinPrompt: React.FC<ShareWinPromptProps> = ({
     } else {
       handleCopyLink();
     }
+  };
+
+  // Handle Facebook share - use facebook utm_source for tracking
+  const handleFacebookShare = () => {
+    trackShare('facebook', gameCode);
+    trackShareVariantClick(variantId);
+
+    const referralCode = generateReferralCode();
+    const url = getShareUrlWithTracking(gameCode, referralCode, 'facebook');
+    shareViaFacebook(url);
+  };
+
+  // Handle Telegram share - use telegram utm_source for tracking
+  const handleTelegramShare = () => {
+    trackShare('telegram', gameCode);
+    trackShareVariantClick(variantId);
+
+    const referralCode = generateReferralCode();
+    const url = getShareUrlWithTracking(gameCode, referralCode, 'telegram');
+    // Replace URL in share message with the telegram-tracked URL
+    const messageWithTracking = shareMessage.replace(/https?:\/\/[^\s]+/, url);
+    shareViaTelegram(messageWithTracking, url);
   };
 
   // Don't show for non-winners unless they have a good score
@@ -449,7 +483,7 @@ const ShareWinPrompt: React.FC<ShareWinPromptProps> = ({
         <span className={cn('text-sm font-bold', isDarkMode ? 'text-cyan-300' : 'text-cyan-700')}>
           {language === 'he' ? 'הזמינו חברים לקרב! 🎯' : 'Recruit challengers! 🎯'}
         </span>
-        <div className="flex gap-2">
+        <div className="flex gap-2 flex-wrap justify-center">
           <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
@@ -458,6 +492,24 @@ const ShareWinPrompt: React.FC<ShareWinPromptProps> = ({
           >
             <FaWhatsapp size={14} />
             <span className="hidden sm:inline">{language === 'he' ? 'וואטסאפ' : 'WhatsApp'}</span>
+          </motion.button>
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={handleFacebookShare}
+            className="flex items-center gap-1.5 px-3 py-2 bg-[#1877F2] hover:bg-[#166fe5] text-white text-sm font-bold rounded-lg border-2 border-[#0d65d9] shadow-[2px_2px_0px_#0d65d9] transition-all"
+          >
+            <FaFacebook size={14} />
+            <span className="hidden sm:inline">Facebook</span>
+          </motion.button>
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={handleTelegramShare}
+            className="flex items-center gap-1.5 px-3 py-2 bg-[#0088cc] hover:bg-[#007ab8] text-white text-sm font-bold rounded-lg border-2 border-[#006699] shadow-[2px_2px_0px_#006699] transition-all"
+          >
+            <FaTelegram size={14} />
+            <span className="hidden sm:inline">Telegram</span>
           </motion.button>
           <motion.button
             whileHover={{ scale: 1.05 }}
@@ -614,7 +666,7 @@ const ShareWinPrompt: React.FC<ShareWinPromptProps> = ({
         </div>
 
         {/* Share buttons */}
-        <div className="flex flex-col sm:flex-row gap-3">
+        <div className="grid grid-cols-2 sm:flex sm:flex-row gap-3">
           <motion.button
             whileHover={{ scale: 1.03, y: -2 }}
             whileTap={{ scale: 0.97 }}
@@ -622,7 +674,27 @@ const ShareWinPrompt: React.FC<ShareWinPromptProps> = ({
             className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-[#25D366] hover:bg-[#1ebe5d] text-white font-black text-sm uppercase tracking-wide rounded-xl border-2 border-[#1a9e4a] shadow-[3px_3px_0px_#1a9e4a] hover:shadow-[1px_1px_0px_#1a9e4a] transition-all duration-150"
           >
             <FaWhatsapp size={20} />
-            <span>{language === 'he' ? 'שתפו בוואטסאפ' : 'Send on WhatsApp'}</span>
+            <span className="hidden sm:inline">{language === 'he' ? 'וואטסאפ' : 'WhatsApp'}</span>
+          </motion.button>
+
+          <motion.button
+            whileHover={{ scale: 1.03, y: -2 }}
+            whileTap={{ scale: 0.97 }}
+            onClick={handleFacebookShare}
+            className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-[#1877F2] hover:bg-[#166fe5] text-white font-black text-sm uppercase tracking-wide rounded-xl border-2 border-[#0d65d9] shadow-[3px_3px_0px_#0d65d9] hover:shadow-[1px_1px_0px_#0d65d9] transition-all duration-150"
+          >
+            <FaFacebook size={20} />
+            <span className="hidden sm:inline">Facebook</span>
+          </motion.button>
+
+          <motion.button
+            whileHover={{ scale: 1.03, y: -2 }}
+            whileTap={{ scale: 0.97 }}
+            onClick={handleTelegramShare}
+            className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-[#0088cc] hover:bg-[#007ab8] text-white font-black text-sm uppercase tracking-wide rounded-xl border-2 border-[#006699] shadow-[3px_3px_0px_#006699] hover:shadow-[1px_1px_0px_#006699] transition-all duration-150"
+          >
+            <FaTelegram size={20} />
+            <span className="hidden sm:inline">Telegram</span>
           </motion.button>
 
           <motion.button
@@ -639,7 +711,7 @@ const ShareWinPrompt: React.FC<ShareWinPromptProps> = ({
             )}
           >
             <FaLink size={16} />
-            <span>{copied ? (language === 'he' ? 'הועתק!' : 'Copied!') : (language === 'he' ? 'העתק לינק' : 'Copy Link')}</span>
+            <span className="hidden sm:inline">{copied ? (language === 'he' ? 'הועתק!' : 'Copied!') : (language === 'he' ? 'לינק' : 'Link')}</span>
           </motion.button>
 
           {/* Native share button (mobile) */}
@@ -649,7 +721,7 @@ const ShareWinPrompt: React.FC<ShareWinPromptProps> = ({
               whileTap={{ scale: 0.97 }}
               onClick={handleNativeShare}
               className={cn(
-                'sm:hidden flex items-center justify-center gap-2 px-4 py-3 font-black text-sm uppercase tracking-wide rounded-xl border-2 transition-all duration-150',
+                'col-span-2 sm:hidden flex items-center justify-center gap-2 px-4 py-3 font-black text-sm uppercase tracking-wide rounded-xl border-2 transition-all duration-150',
                 isDarkMode
                   ? 'bg-blue-600 hover:bg-blue-500 text-white border-blue-800 shadow-[3px_3px_0px_#1e40af]'
                   : 'bg-blue-500 hover:bg-blue-400 text-white border-blue-700 shadow-[3px_3px_0px_#1d4ed8]'

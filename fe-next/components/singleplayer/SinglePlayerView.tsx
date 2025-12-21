@@ -134,6 +134,15 @@ const SinglePlayerView: React.FC = () => {
     setPhase('lobby');
   };
 
+  // Quick rematch - immediately start a new game with same settings
+  const handleQuickRematch = () => {
+    setResultsData(null);
+    // Reset grid to null so a new grid is generated
+    setGameState(prev => ({ ...prev, grid: null }));
+    // Immediately go to playing phase
+    setPhase('playing');
+  };
+
   const handleBackToLobby = () => {
     setResultsData(null);
     setPhase('lobby');
@@ -165,6 +174,7 @@ const SinglePlayerView: React.FC = () => {
             results={resultsData}
             mode={gameState.mode}
             onPlayAgain={handlePlayAgain}
+            onQuickRematch={handleQuickRematch}
             onBackToLobby={handleBackToLobby}
           />
         )}

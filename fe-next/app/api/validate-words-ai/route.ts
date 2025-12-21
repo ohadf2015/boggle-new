@@ -32,7 +32,7 @@ export async function POST(request: NextRequest) {
     return rateLimitResponse(rateLimit);
   }
 
-  let body: { words: string[]; language: string };
+  let body: { words: string[]; language: string; minWordLength?: number };
 
   try {
     body = await request.json();
@@ -44,7 +44,7 @@ export async function POST(request: NextRequest) {
     }, { status: 400 });
   }
 
-  const { words, language = 'en' } = body;
+  const { words, language = 'en', minWordLength = 2 } = body;
 
   if (!Array.isArray(words) || words.length === 0) {
     return NextResponse.json({
@@ -64,9 +64,9 @@ export async function POST(request: NextRequest) {
     }, { status: 400 });
   }
 
-  // Normalize words
+  // Normalize words (filter by minWordLength setting)
   const normalizedWords = words
-    .filter(w => typeof w === 'string' && w.trim().length >= 2)
+    .filter(w => typeof w === 'string' && w.trim().length >= minWordLength)
     .map(w => w.toLowerCase().trim());
 
   if (normalizedWords.length === 0) {
@@ -78,7 +78,7 @@ export async function POST(request: NextRequest) {
 
   try {
     const { gameAIService } = await import('@/lib/ai-service');
-    const aiResults = await gameAIService.validateWords(normalizedWords, language);
+    const aiResults = await gameAIService.validateWords(normalizedWords, language, minWordLength);
 
     const results: ValidationResult[] = normalizedWords.map((word, index) => ({
       word,

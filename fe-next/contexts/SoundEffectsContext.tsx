@@ -4,6 +4,7 @@ import React, { createContext, useContext, useEffect, useRef, useCallback, useSt
 import { Howl } from 'howler';
 import { useMusic } from './MusicContext';
 import logger from '@/utils/logger';
+import { hapticAchievement, hapticForComboLevel } from '@/utils/haptics';
 
 interface SoundEffectOptions {
   volume?: number;
@@ -197,11 +198,13 @@ export function SoundEffectsProvider({ children }: SoundEffectsProviderProps) {
     const volumeBoost = Math.min(0.6 + (comboLevel * 0.03), 1.0);
 
     playSound('combo', { rate, volume: volumeBoost });
+    hapticForComboLevel(comboLevel);
   }, [audioUnlocked, isMuted, sfxMuted, playSound]);
 
-  // Play achievement unlock sound
+  // Play achievement unlock sound with haptic feedback
   const playAchievementSound = useCallback(() => {
     playSound('achievement', { volume: 0.8 });
+    hapticAchievement();
   }, [playSound]);
 
   // Play word accepted sound

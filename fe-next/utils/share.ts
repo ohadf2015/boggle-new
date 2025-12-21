@@ -71,6 +71,32 @@ export const shareViaWhatsApp = (gameCode: string, roomName: string = '', t: Tra
 };
 
 /**
+ * Share game via Facebook
+ * Opens Facebook's share dialog with the game URL
+ * @param url - The URL to share (with UTM params)
+ */
+export const shareViaFacebook = (url: string): void => {
+  // Facebook share dialog - uses sharer.php for simple URL sharing
+  // Note: Facebook doesn't support pre-filled text in sharer, only URL
+  const facebookUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`;
+  window.open(facebookUrl, '_blank', 'width=600,height=400');
+};
+
+/**
+ * Share game via Telegram
+ * Opens Telegram's share dialog with message and URL
+ * @param message - The message to share
+ * @param url - The URL to include (optional, can be part of message)
+ */
+export const shareViaTelegram = (message: string, url?: string): void => {
+  // Telegram share URL format - supports both text and url params
+  const telegramUrl = url
+    ? `https://t.me/share/url?url=${encodeURIComponent(url)}&text=${encodeURIComponent(message)}`
+    : `https://t.me/share/url?text=${encodeURIComponent(message)}`;
+  window.open(telegramUrl, '_blank', 'width=600,height=400');
+};
+
+/**
  * Copy the game code to clipboard
  * @param gameCode - The game code
  * @param t - Translation function (optional for backward compatibility)
@@ -211,12 +237,182 @@ export const shareResultsViaWhatsApp = (
 };
 
 /**
+ * A/B Testing Infrastructure for Share Messages
+ */
+
+export interface ShareVariant {
+  id: string;
+  message: string;
+  tone: 'challenge' | 'achievement' | 'social' | 'competitive';
+}
+
+interface VariantPerformance {
+  variantId: string;
+  shown: number;
+  clicked: number;
+  converted: number; // User who received shared link joined
+}
+
+const VARIANT_STORAGE_KEY = 'lexiclash_share_variant';
+const PERFORMANCE_STORAGE_KEY = 'lexiclash_variant_performance';
+
+/**
+ * Get or assign a consistent variant bucket for the user
+ * Users see the same variant style for consistency
+ */
+const getUserVariantBucket = (): number => {
+  if (typeof window === 'undefined') return 0;
+
+  const stored = localStorage.getItem(VARIANT_STORAGE_KEY);
+  if (stored) {
+    const parsed = parseInt(stored, 10);
+    if (!isNaN(parsed)) return parsed;
+  }
+
+  // Assign new bucket (0-3 for 4 variant types)
+  const bucket = Math.floor(Math.random() * 4);
+  localStorage.setItem(VARIANT_STORAGE_KEY, bucket.toString());
+  return bucket;
+};
+
+/**
+ * Track variant performance locally
+ */
+const trackVariantEvent = (variantId: string, event: 'shown' | 'clicked' | 'converted'): void => {
+  if (typeof window === 'undefined') return;
+
+  try {
+    const stored = localStorage.getItem(PERFORMANCE_STORAGE_KEY);
+    const performance: Record<string, VariantPerformance> = stored ? JSON.parse(stored) : {};
+
+    if (!performance[variantId]) {
+      performance[variantId] = { variantId, shown: 0, clicked: 0, converted: 0 };
+    }
+
+    if (event === 'shown') performance[variantId].shown++;
+    if (event === 'clicked') performance[variantId].clicked++;
+    if (event === 'converted') performance[variantId].converted++;
+
+    localStorage.setItem(PERFORMANCE_STORAGE_KEY, JSON.stringify(performance));
+  } catch {
+    // Storage full or unavailable
+  }
+};
+
+/**
+ * Get variant performance data for analytics
+ */
+export const getVariantPerformance = (): VariantPerformance[] => {
+  if (typeof window === 'undefined') return [];
+
+  try {
+    const stored = localStorage.getItem(PERFORMANCE_STORAGE_KEY);
+    if (!stored) return [];
+    const performance: Record<string, VariantPerformance> = JSON.parse(stored);
+    return Object.values(performance);
+  } catch {
+    return [];
+  }
+};
+
+/**
+ * Generate share message variants for all languages
+ */
+const generateVariants = (
+  gameCode: string,
+  result: GameResultForShare,
+  language: string,
+  utmSource: string
+): ShareVariant[] => {
+  const url = getJoinUrl(gameCode, utmSource);
+  const { score, wordCount, isWinner, longestWord } = result;
+
+  // Language-specific variants with different tones
+  const variants: Record<string, ShareVariant[]> = {
+    en: [
+      { id: 'en_challenge', tone: 'challenge', message: `🎮 Just found ${wordCount} words in LexiClash! Can you beat that?\n${url}` },
+      { id: 'en_achievement', tone: 'achievement', message: `🏆 ${score} points in LexiClash${longestWord ? ` (longest: ${longestWord})` : ''}!\n${url}` },
+      { id: 'en_social', tone: 'social', message: `⚡ Playing LexiClash - it's addictive! Join me:\n${url}` },
+      { id: 'en_competitive', tone: 'competitive', message: `📚 Word ${isWinner ? 'champion' : 'master'} here! Think you can beat ${score} points?\n${url}` },
+    ],
+    he: [
+      { id: 'he_challenge', tone: 'challenge', message: `🎮 מצאתי ${wordCount} מילים ב-LexiClash! תצליחו יותר?\n${url}` },
+      { id: 'he_achievement', tone: 'achievement', message: `🏆 השגתי ${score} נקודות${longestWord ? ` (הכי ארוכה: ${longestWord})` : ''}!\n${url}` },
+      { id: 'he_social', tone: 'social', message: `⚡ משחק ממכר! הצטרפו ל-LexiClash:\n${url}` },
+      { id: 'he_competitive', tone: 'competitive', message: `📚 ${isWinner ? 'אלוף' : 'שחקן'} מילים! מי ינצח ${score} נקודות?\n${url}` },
+    ],
+    sv: [
+      { id: 'sv_challenge', tone: 'challenge', message: `🎮 Hittade ${wordCount} ord i LexiClash! Kan du slå det?\n${url}` },
+      { id: 'sv_achievement', tone: 'achievement', message: `🏆 ${score} poäng i LexiClash!\n${url}` },
+      { id: 'sv_social', tone: 'social', message: `⚡ Spelar LexiClash - det är beroendeframkallande! Gå med:\n${url}` },
+      { id: 'sv_competitive', tone: 'competitive', message: `📚 Ord${isWinner ? 'mästare' : 'entusiast'} här! Slå ${score} poäng?\n${url}` },
+    ],
+    ja: [
+      { id: 'ja_challenge', tone: 'challenge', message: `🎮 LexiClashで${wordCount}語見つけた！勝てる？\n${url}` },
+      { id: 'ja_achievement', tone: 'achievement', message: `🏆 LexiClashで${score}ポイント獲得！\n${url}` },
+      { id: 'ja_social', tone: 'social', message: `⚡ LexiClash面白い！一緒に遊ぼう：\n${url}` },
+      { id: 'ja_competitive', tone: 'competitive', message: `📚 ${isWinner ? 'チャンピオン' : '挑戦者'}！${score}ポイント超えられる？\n${url}` },
+    ],
+    es: [
+      { id: 'es_challenge', tone: 'challenge', message: `🎮 ¡Encontré ${wordCount} palabras en LexiClash! ¿Puedes superarlo?\n${url}` },
+      { id: 'es_achievement', tone: 'achievement', message: `🏆 ¡${score} puntos en LexiClash${longestWord ? ` (más larga: ${longestWord})` : ''}!\n${url}` },
+      { id: 'es_social', tone: 'social', message: `⚡ ¡LexiClash es adictivo! Únete:\n${url}` },
+      { id: 'es_competitive', tone: 'competitive', message: `📚 ¡${isWinner ? 'Campeón' : 'Maestro'} de palabras! ¿Puedes superar ${score} puntos?\n${url}` },
+    ],
+  };
+
+  return variants[language] || variants.en;
+};
+
+/**
+ * Get the optimal share message variant for the user
+ * Uses consistent bucketing for A/B testing
+ * @param gameCode - The game code
+ * @param result - Game result data
+ * @param language - Language code
+ * @param utmSource - UTM source for tracking
+ * @returns Selected variant with tracking
+ */
+export const getOptimalShareVariant = (
+  gameCode: string,
+  result: GameResultForShare,
+  language: string = 'en',
+  utmSource: string = 'share'
+): ShareVariant => {
+  const variants = generateVariants(gameCode, result, language, utmSource);
+  const bucket = getUserVariantBucket();
+  const variant = variants[bucket % variants.length];
+
+  // Track that this variant was shown
+  trackVariantEvent(variant.id, 'shown');
+
+  return variant;
+};
+
+/**
+ * Track when a share variant was clicked (user actually shared)
+ */
+export const trackShareVariantClick = (variantId: string): void => {
+  trackVariantEvent(variantId, 'clicked');
+};
+
+/**
+ * Track when a share led to a conversion (new player joined)
+ * Call this when detecting a user came from a shared link
+ */
+export const trackShareConversion = (variantId?: string): void => {
+  if (!variantId) return;
+  trackVariantEvent(variantId, 'converted');
+};
+
+/**
  * Generate random share message variants for A/B testing
  * @param gameCode - The game code
  * @param result - Game result data
  * @param language - Language code
  * @param utmSource - UTM source for tracking (defaults to 'share')
  * @returns Array of message variants
+ * @deprecated Use getOptimalShareVariant for better A/B testing
  */
 export const getShareMessageVariants = (
   gameCode: string,
@@ -224,21 +420,6 @@ export const getShareMessageVariants = (
   language: string = 'en',
   utmSource: string = 'share'
 ): string[] => {
-  const url = getJoinUrl(gameCode, utmSource);
-  const { score, wordCount, isWinner } = result;
-
-  if (language === 'he') {
-    return [
-      `🎮 מצאתי ${wordCount} מילים ב-LexiClash! תצליחו יותר?\n${url}`,
-      `⚡ מבחן מהירות: מצאתי מילים מהר יותר מהחברים שלי! הצטרפו:\n${url}`,
-      `📚 ${isWinner ? 'אלוף' : 'שחקן'} מילים פה! בואו ל-LexiClash:\n${url}`,
-    ];
-  }
-
-  return [
-    `🎮 Just found ${wordCount} words in LexiClash! Can you beat that?\n${url}`,
-    `⚡ Speed test: I found words faster than my friends! Join me:\n${url}`,
-    `📚 Word ${isWinner ? 'champion' : 'enthusiast'} here! Join me in LexiClash:\n${url}`,
-    `🏆 ${score} points in LexiClash - beat my score!\n${url}`,
-  ];
+  const variants = generateVariants(gameCode, result, language, utmSource);
+  return variants.map(v => v.message);
 };

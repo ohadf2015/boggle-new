@@ -680,20 +680,22 @@ Respond with ONLY valid JSON (no markdown):
    *
    * @param word - The word to validate
    * @param language - Language code (e.g., 'en', 'sv')
+   * @param minWordLength - Minimum word length (defaults to 2)
    * @returns Validation result with source indicator
    */
   async validateAndSaveWord(
     word: string,
-    language: string = 'en'
+    language: string = 'en',
+    minWordLength: number = 2
   ): Promise<WordValidationResult> {
     // Step 1: Normalization
     const normalizedWord = word.toLowerCase().trim();
 
-    // Basic validation (2 letters minimum for single player mode)
-    if (!normalizedWord || normalizedWord.length < 2) {
+    // Basic validation (uses room's minimum word length setting)
+    if (!normalizedWord || normalizedWord.length < minWordLength) {
       return {
         isValid: false,
-        reason: 'Word must be at least 2 characters',
+        reason: `Word must be at least ${minWordLength} characters`,
         source: 'database',
       };
     }
@@ -776,15 +778,17 @@ Respond with ONLY valid JSON (no markdown):
    *
    * @param word - The word to check
    * @param language - Language code
+   * @param minWordLength - Minimum word length (defaults to 2)
    * @returns { isValid: true/false, source: 'database'|'unknown' }
    */
   async checkDatabaseOnly(
     word: string,
-    language: string = 'en'
+    language: string = 'en',
+    minWordLength: number = 2
   ): Promise<{ isValid: boolean; source: 'database' | 'unknown' }> {
     const normalizedWord = word.toLowerCase().trim();
 
-    if (!normalizedWord || normalizedWord.length < 2) {
+    if (!normalizedWord || normalizedWord.length < minWordLength) {
       return { isValid: false, source: 'database' };
     }
 
@@ -1100,10 +1104,14 @@ Respond JSON only: {"hint":"your hint","difficulty":"${hintLevel === 1 ? 'easy' 
   /**
    * Batch validate multiple words.
    * Useful for validating all words at end of a game round.
+   * @param words - Array of words to validate
+   * @param language - Language code (e.g., 'en', 'sv')
+   * @param minWordLength - Minimum word length (defaults to 2)
    */
   async validateWords(
     words: string[],
-    language: string = 'en'
+    language: string = 'en',
+    minWordLength: number = 2
   ): Promise<WordValidationResult[]> {
     // Process in parallel with concurrency limit
     const BATCH_SIZE = 5;
@@ -1112,7 +1120,7 @@ Respond JSON only: {"hint":"your hint","difficulty":"${hintLevel === 1 ? 'easy' 
     for (let i = 0; i < words.length; i += BATCH_SIZE) {
       const batch = words.slice(i, i + BATCH_SIZE);
       const batchResults = await Promise.all(
-        batch.map((word) => this.validateAndSaveWord(word, language))
+        batch.map((word) => this.validateAndSaveWord(word, language, minWordLength))
       );
       results.push(...batchResults);
     }

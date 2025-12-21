@@ -1,6 +1,7 @@
 import { memo } from 'react';
 import { motion } from 'framer-motion';
 import { useLanguage } from '../contexts/LanguageContext';
+import { useReducedMotion } from '../utils/accessibility';
 
 /**
  * CircularTimer Props
@@ -13,9 +14,11 @@ interface CircularTimerProps {
 /**
  * CircularTimer - Neo-Brutalist styled countdown timer
  * Memoized to prevent unnecessary re-renders when parent updates
+ * Respects prefers-reduced-motion for accessibility
  */
 const CircularTimer = memo<CircularTimerProps>(({ remainingTime, totalTime = 180 }) => {
   const { t } = useLanguage();
+  const reduceMotion = useReducedMotion();
 
   // Calculate the progress percentage
   const progress = totalTime > 0 ? (remainingTime / totalTime) * 100 : 0;
@@ -38,9 +41,9 @@ const CircularTimer = memo<CircularTimerProps>(({ remainingTime, totalTime = 180
 
   return (
     <motion.div
-      initial={{ scale: 0, opacity: 0, rotate: -10 }}
+      initial={reduceMotion ? { opacity: 1 } : { scale: 0, opacity: 0, rotate: -10 }}
       animate={{ scale: 1, opacity: 1, rotate: 0 }}
-      transition={{ duration: 0.4, ease: [0.68, -0.55, 0.265, 1.55] }}
+      transition={reduceMotion ? { duration: 0 } : { duration: 0.4, ease: [0.68, -0.55, 0.265, 1.55] }}
       className="flex items-center justify-center"
     >
       {/* Neo-Brutalist frame */}
@@ -110,8 +113,8 @@ const CircularTimer = memo<CircularTimerProps>(({ remainingTime, totalTime = 180
           {/* Timer text in the center */}
           <div className="absolute inset-0 flex items-center justify-center">
             <motion.div
-              animate={isLowTime ? { scale: [1, 1.1, 1] } : {}}
-              transition={{ duration: 0.5, repeat: isLowTime ? Infinity : 0 }}
+              animate={isLowTime && !reduceMotion ? { scale: [1, 1.1, 1] } : {}}
+              transition={{ duration: 0.5, repeat: isLowTime && !reduceMotion ? Infinity : 0 }}
               className="text-3xl font-black text-neo-black"
               style={{
                 textShadow: isLowTime
@@ -127,8 +130,9 @@ const CircularTimer = memo<CircularTimerProps>(({ remainingTime, totalTime = 180
         {/* Low time warning badge */}
         {isLowTime && (
           <motion.div
-            initial={{ scale: 0, rotate: -20 }}
-            animate={{ scale: 1, rotate: 12 }}
+            initial={reduceMotion ? { opacity: 1 } : { scale: 0, rotate: -20 }}
+            animate={{ scale: 1, rotate: reduceMotion ? 0 : 12, opacity: 1 }}
+            transition={reduceMotion ? { duration: 0 } : undefined}
             className="
               absolute -top-2 -right-2 z-10
               px-2 py-1

@@ -295,6 +295,7 @@ const MultiplayerLobby: React.FC<MultiplayerLobbyProps> = ({
                       {/* Create Room Button */}
                       <Button
                         type="submit"
+                        variant="success"
                         className="w-full"
                         size="lg"
                         disabled={isJoining}
