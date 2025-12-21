@@ -20,11 +20,13 @@ interface UseGridInteractionProps {
 interface UseGridInteractionReturn {
   selectedCells: SelectedCell[];
   fadingCells: GridPosition[];
+  focusedCell: GridPosition | null;
   handleTouchStart: (rowIndex: number, colIndex: number, letter: string, event: React.TouchEvent<HTMLDivElement> | React.MouseEvent<HTMLDivElement>) => void;
   handleTouchMove: (e: TouchEvent | MouseEvent) => void;
   handleTouchEnd: () => void;
   handleMouseDown: (rowIndex: number, colIndex: number, letter: string, event: React.MouseEvent<HTMLDivElement>) => void;
   handleMouseMove: (e: React.MouseEvent<HTMLDivElement>) => void;
+  handleKeyDown: (e: React.KeyboardEvent<HTMLDivElement>) => void;
   startSequentialFadeOut: (isCombo?: boolean) => void;
 }
 
@@ -43,6 +45,8 @@ export function useGridInteraction({
 }: UseGridInteractionProps): UseGridInteractionReturn {
   const [internalSelectedCells, setInternalSelectedCells] = useState<SelectedCell[]>([]);
   const [fadingCells, setFadingCells] = useState<GridPosition[]>([]);
+  const [focusedCell, setFocusedCell] = useState<GridPosition | null>(null);
+  const [isKeyboardMode, setIsKeyboardMode] = useState<boolean>(false);
 
   const isTouchingRef = useRef<boolean>(false);
   const startPosRef = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
@@ -374,14 +378,140 @@ export function useGridInteraction({
     return () => window.removeEventListener('mouseup', handleMouseUp);
   }, [selectedCells]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  // Keyboard navigation handler
+  const handleKeyDown = useCallback((e: React.KeyboardEvent<HTMLDivElement>) => {
+    if (!interactive) return;
+
+    const rows = grid.length;
+    const cols = grid[0]?.length || 4;
+
+    // Initialize focused cell if not set
+    if (focusedCell === null && ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', ' ', 'Enter'].includes(e.key)) {
+      setFocusedCell({ row: 0, col: 0 });
+      setIsKeyboardMode(true);
+      e.preventDefault();
+      return;
+    }
+
+    if (!focusedCell) return;
+
+    let newRow = focusedCell.row;
+    let newCol = focusedCell.col;
+
+    switch (e.key) {
+      case 'ArrowUp':
+        newRow = Math.max(0, focusedCell.row - 1);
+        e.preventDefault();
+        break;
+      case 'ArrowDown':
+        newRow = Math.min(rows - 1, focusedCell.row + 1);
+        e.preventDefault();
+        break;
+      case 'ArrowLeft':
+        newCol = Math.max(0, focusedCell.col - 1);
+        e.preventDefault();
+        break;
+      case 'ArrowRight':
+        newCol = Math.min(cols - 1, focusedCell.col + 1);
+        e.preventDefault();
+        break;
+      case ' ': // Space to select/deselect cell
+      case 'Enter': {
+        e.preventDefault();
+        const letter = grid[focusedCell.row]?.[focusedCell.col];
+        if (!letter) return;
+
+        // If Enter with cells selected, submit the word
+        if (e.key === 'Enter' && selectedCells.length > 0) {
+          const formedWord = selectedCells.map(c => c.letter).join('');
+          if (onWordSubmit) {
+            onWordSubmit(formedWord);
+          }
+          // Haptic feedback
+          if (window.navigator?.vibrate) {
+            window.navigator.vibrate(50);
+          }
+          if (comboLevel > 0) {
+            startSequentialFadeOut(true);
+          } else {
+            setTimeout(() => setSelectedCells([]), 500);
+          }
+          return;
+        }
+
+        // Check if cell is already selected
+        const existingIndex = selectedCells.findIndex(
+          c => c.row === focusedCell.row && c.col === focusedCell.col
+        );
+
+        if (existingIndex !== -1) {
+          // Deselect: remove this cell and all after it (backtracking)
+          setSelectedCells(selectedCells.slice(0, existingIndex));
+          if (window.navigator?.vibrate) window.navigator.vibrate(15);
+        } else {
+          // Select: check if adjacent to last selected cell (or first cell)
+          const lastCell = selectedCells[selectedCells.length - 1];
+          const isAdjacent = lastCell
+            ? isAdjacentCell(lastCell, focusedCell)
+            : true; // First cell is always valid
+
+          if (isAdjacent) {
+            setSelectedCells([...selectedCells, { row: focusedCell.row, col: focusedCell.col, letter }]);
+            if (window.navigator?.vibrate) {
+              window.navigator.vibrate(30);
+            }
+          }
+        }
+        return;
+      }
+      case 'Escape':
+        // Clear selection
+        setSelectedCells([]);
+        setFocusedCell(null);
+        setIsKeyboardMode(false);
+        e.preventDefault();
+        return;
+      case 'Backspace':
+      case 'Delete':
+        // Remove last selected cell
+        if (selectedCells.length > 0) {
+          setSelectedCells(selectedCells.slice(0, -1));
+          if (window.navigator?.vibrate) window.navigator.vibrate(15);
+        }
+        e.preventDefault();
+        return;
+      default:
+        return;
+    }
+
+    // Update focused cell
+    if (newRow !== focusedCell.row || newCol !== focusedCell.col) {
+      setFocusedCell({ row: newRow, col: newCol });
+      setIsKeyboardMode(true);
+      // Haptic feedback for navigation
+      if (window.navigator?.vibrate) window.navigator.vibrate(10);
+    }
+  }, [interactive, grid, focusedCell, selectedCells, comboLevel, onWordSubmit, startSequentialFadeOut, setSelectedCells, isAdjacentCell]);
+
+  // Reset keyboard mode on touch/mouse interaction
+  useEffect(() => {
+    const handlePointerDown = () => {
+      setIsKeyboardMode(false);
+    };
+    window.addEventListener('pointerdown', handlePointerDown);
+    return () => window.removeEventListener('pointerdown', handlePointerDown);
+  }, []);
+
   return {
     selectedCells,
     fadingCells,
+    focusedCell,
     handleTouchStart,
     handleTouchMove,
     handleTouchEnd,
     handleMouseDown,
     handleMouseMove,
+    handleKeyDown,
     startSequentialFadeOut,
   };
 }

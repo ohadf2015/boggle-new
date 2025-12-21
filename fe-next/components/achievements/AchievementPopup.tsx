@@ -3,8 +3,11 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import confetti from 'canvas-confetti';
+import { FaShare } from 'react-icons/fa';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { useSoundEffects } from '../../contexts/SoundEffectsContext';
+import { getAchievementShareUrl, shareWithOgImage } from '../../utils/ogShare';
+import { gameEvents } from '../GoogleAnalytics';
 import type { AchievementPayload } from '@/shared/types/socket';
 
 interface LocalizedAchievement {
@@ -31,10 +34,48 @@ interface AchievementPopupProps {
  * Features: Thick borders, hard shadows, bold uppercase text, vibrant colors
  */
 const AchievementPopup = ({ achievement, onComplete }: AchievementPopupProps): React.ReactElement | null => {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const { playAchievementSound } = useSoundEffects();
   const [progress, setProgress] = useState<number>(0);
+  const [showShareHint, setShowShareHint] = useState(false);
   const displayDuration = 3000; // 3 seconds
+
+  // Handle share button click
+  const handleShare = async (e: React.MouseEvent) => {
+    e.stopPropagation(); // Prevent closing the popup
+
+    const achievementKey = 'key' in achievement ? achievement.key : achievement.name;
+    const achievementName = 'key' in achievement
+      ? t(`achievements.${achievement.key}.name`) || achievement.key
+      : achievement.name;
+
+    // Track the share
+    gameEvents.achievementUnlock(achievementKey);
+    gameEvents.share('social', 'achievement');
+
+    // Generate share URL with OG image
+    const ogImageUrl = getAchievementShareUrl(achievementKey, language);
+
+    const shareText = language === 'he'
+      ? `🏆 פתחתי את ההישג "${achievementName}" ב-LexiClash! בוא לשחק גם!`
+      : `🏆 I just unlocked "${achievementName}" in LexiClash! Come play!`;
+
+    const shared = await shareWithOgImage({
+      title: `LexiClash - ${achievementName}`,
+      text: shareText,
+      url: typeof window !== 'undefined' ? window.location.origin : 'https://www.lexiclash.live',
+      imageUrl: ogImageUrl,
+    });
+
+    if (!shared && typeof navigator !== 'undefined' && navigator.clipboard) {
+      // Fallback to copying link
+      await navigator.clipboard.writeText(
+        `${shareText}\n\n${typeof window !== 'undefined' ? window.location.origin : 'https://www.lexiclash.live'}`
+      );
+      setShowShareHint(true);
+      setTimeout(() => setShowShareHint(false), 2000);
+    }
+  };
 
   // Localize achievement using player's language
   // Achievement can have either { key, icon } (unlocalized) or { name, description, icon } (legacy localized)
@@ -139,14 +180,28 @@ const AchievementPopup = ({ achievement, onComplete }: AchievementPopupProps): R
                 </motion.p>
               </div>
 
-              {/* Close button */}
+              {/* Action buttons */}
               <motion.div
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }}
                 transition={{ delay: 0.3 }}
-                className="flex-shrink-0"
+                className="flex-shrink-0 flex gap-1.5"
               >
-                <div className="w-6 h-6 bg-neo-pink border-2 border-neo-black rounded flex items-center justify-center text-xs font-black">
+                {/* Share button */}
+                <button
+                  onClick={handleShare}
+                  className="relative w-6 h-6 bg-neo-cyan border-2 border-neo-black rounded flex items-center justify-center text-xs font-black hover:bg-neo-lime transition-colors"
+                  title={language === 'he' ? 'שתף' : 'Share'}
+                >
+                  <FaShare size={10} />
+                  {showShareHint && (
+                    <span className="absolute -bottom-6 left-1/2 -translate-x-1/2 text-[10px] whitespace-nowrap bg-neo-black text-neo-white px-1.5 py-0.5 rounded">
+                      {language === 'he' ? 'הועתק!' : 'Copied!'}
+                    </span>
+                  )}
+                </button>
+                {/* Close button */}
+                <div className="w-6 h-6 bg-neo-pink border-2 border-neo-black rounded flex items-center justify-center text-xs font-black cursor-pointer hover:bg-neo-red transition-colors">
                   ✕
                 </div>
               </motion.div>

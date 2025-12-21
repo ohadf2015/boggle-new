@@ -7,6 +7,7 @@ import { AuthProvider } from '@/contexts/AuthContext';
 import { MusicProvider } from '@/contexts/MusicContext';
 import { SoundEffectsProvider } from '@/contexts/SoundEffectsContext';
 import { AchievementQueueProvider } from '@/components/achievements';
+import { GameAnnouncerProvider } from '@/components/GameAnnouncer';
 import { Toaster } from 'react-hot-toast';
 import ErrorBoundary from './components/ErrorBoundary';
 import { initUtmCapture } from '@/utils/utmCapture';
@@ -55,8 +56,9 @@ const AudioProviders = composeProviders([
     [SoundEffectsProvider as React.ComponentType<{ children: ReactNode }>, {}],
 ]);
 
-// Game-related providers (Achievements + Auth)
+// Game-related providers (Achievements + Auth + Announcer)
 const GameProviders = composeProviders([
+    [GameAnnouncerProvider as React.ComponentType<{ children: ReactNode }>, {}],
     [AchievementQueueProvider as React.ComponentType<{ children: ReactNode }>, {}],
     [AuthProvider as React.ComponentType<{ children: ReactNode }>, {}],
 ]);

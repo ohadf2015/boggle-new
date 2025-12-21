@@ -16,6 +16,7 @@ import { DIFFICULTIES } from '@/utils/consts';
 import { cn } from '@/lib/utils';
 import { validateWordLocally, isWordOnBoard } from '@/utils/clientWordValidator';
 import { wordErrorToast, wordAcceptedToast, wordNeedsValidationToast } from '@/components/NeoToast';
+import { useAnnouncer } from '@/components/GameAnnouncer';
 import {
   calculateFinalAchievements,
   type WordData as AchievementWordData,
@@ -51,6 +52,7 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
 }) => {
   const { t } = useLanguage();
   const { playWordAcceptedSound, playComboSound } = useSoundEffects();
+  const { announceWordResult, announceCombo } = useAnnouncer();
   const { stopMusic } = useMusic();
   const [grid, setGrid] = useState<LetterGrid | null>(null);
   const [foundWords, setFoundWords] = useState<FoundWord[]>([]);
@@ -385,19 +387,24 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
         msg = msg.replace('${min}', String(localValidation.errorParams.min));
       }
       wordErrorToast(msg, { duration: 1000 });
+      announceWordResult(normalizedWord, false, undefined, msg);
       return;
     }
 
     // Step 2: Check if word exists as a valid path on the board - same as multiplayer
     if (!isWordOnBoard(normalizedWord, grid, settings.language)) {
-      wordErrorToast(t('playerView.wordNotOnBoard') || 'Word not on board', { duration: 1500 });
+      const notOnBoardMsg = t('playerView.wordNotOnBoard') || 'Word not on board';
+      wordErrorToast(notOnBoardMsg, { duration: 1500 });
+      announceWordResult(normalizedWord, false, undefined, notOnBoardMsg);
       return;
     }
 
     // Step 3: Check for duplicates - same as multiplayer
     // MUST reset combo when duplicate is submitted (consistent with multiplayer behavior)
     if (foundWordsSetRef.current.has(normalizedWord)) {
-      wordErrorToast(t('playerView.wordAlreadyFound') || 'Already found!', { duration: 1000 });
+      const alreadyFoundMsg = t('playerView.wordAlreadyFound') || 'Already found!';
+      wordErrorToast(alreadyFoundMsg, { duration: 1000 });
+      announceWordResult(normalizedWord, false, undefined, alreadyFoundMsg);
       // Reset combo on duplicate submission
       if (comboTimeoutRef.current) clearTimeout(comboTimeoutRef.current);
       setComboLevel(0);
@@ -468,6 +475,9 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
             score: fullScore,
             comboLevel: currentCombo > 0 ? currentCombo : undefined,
           });
+          // Announce for screen readers
+          announceWordResult(normalizedWord, true, fullScore);
+          announceCombo(currentCombo + 1);
         } else {
           // Word NOT in dictionary - stays pending for AI validation at game end
           // BREAK combo (exactly like multiplayer's handlePendingWord)
@@ -487,7 +497,7 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
         validWordCountRef.current = 0;
         wordNeedsValidationToast(normalizedWord.toUpperCase());
       });
-  }, [settings.language, grid, foundWords, t, playWordAcceptedSound, playComboSound]);
+  }, [settings.language, grid, foundWords, t, playWordAcceptedSound, playComboSound, announceWordResult, announceCombo]);
 
   const handleFinishPractice = useCallback(() => {
     setIsGameOver(true);

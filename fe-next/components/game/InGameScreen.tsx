@@ -17,6 +17,7 @@ import HintButton from '../HintButton';
 import { applyHebrewFinalLetters } from '../../utils/utils';
 import { wordErrorToast } from '../NeoToast';
 import { useSoundEffects } from '../../contexts/SoundEffectsContext';
+import { useAnnouncer } from '../GameAnnouncer';
 import { validateWordLocally, couldBeOnBoard } from '../../utils/clientWordValidator';
 import type { LetterGrid, Language, Avatar as AvatarType, PresenceStatus } from '@/shared/types/game';
 
@@ -149,6 +150,7 @@ const InGameScreen = memo<InGameScreenProps>(({
   children,
 }) => {
   const { playWordAcceptedSound } = useSoundEffects();
+  const { announceWordResult } = useAnnouncer();
 
   // Track if grid animation has already played
   const hasAnimatedRef = useRef(false);
@@ -202,6 +204,8 @@ const InGameScreen = memo<InGameScreenProps>(({
         msg = t(errorKey) || errorKey;
       }
       wordErrorToast(msg, { duration: 1000 });
+      // Announce rejection for screen readers
+      announceWordResult(formedWord, false, undefined, msg);
       // Reset combo if duplicate word
       if (validation.errorKey === 'playerView.wordAlreadyFound' && onResetCombo) {
         onResetCombo();
@@ -211,7 +215,9 @@ const InGameScreen = memo<InGameScreenProps>(({
 
     // Check if word can be on board
     if (!couldBeOnBoard(formedWord, letterGrid, currentLang)) {
-      wordErrorToast(t('playerView.wordNotOnBoard'), { duration: 1500 });
+      const notOnBoardMsg = t('playerView.wordNotOnBoard');
+      wordErrorToast(notOnBoardMsg, { duration: 1500 });
+      announceWordResult(formedWord, false, undefined, notOnBoardMsg);
       return;
     }
 

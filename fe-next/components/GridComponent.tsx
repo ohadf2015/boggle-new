@@ -56,11 +56,13 @@ const GridComponent = memo<GridComponentProps>(({
   const {
     selectedCells,
     fadingCells,
+    focusedCell,
     handleTouchStart,
     handleTouchMove,
     handleTouchEnd,
     handleMouseDown,
     handleMouseMove,
+    handleKeyDown,
   } = useGridInteraction({
     grid,
     interactive,
@@ -130,6 +132,7 @@ const GridComponent = memo<GridComponentProps>(({
           onTouchMove={handleTouchMove as unknown as React.TouchEventHandler}
           onTouchEnd={handleTouchEnd}
           onMouseMove={handleMouseMove}
+          onKeyDown={handleKeyDown}
         >
           {grid.map((row, i) =>
             row.map((cell, j) => {
@@ -137,6 +140,7 @@ const GridComponent = memo<GridComponentProps>(({
               const firstSelected = selectedCells[0];
               const isFirstSelected = firstSelected !== undefined && firstSelected.row === i && firstSelected.col === j;
               const isFading = fadingCells.some(c => c.row === i && c.col === j);
+              const isFocused = focusedCell?.row === i && focusedCell?.col === j;
               const heatStyle = getHeatMapStyle(i, j, heatMapData);
 
               return (
@@ -180,6 +184,8 @@ const GridComponent = memo<GridComponentProps>(({
                         ? `${comboColors.textColor || 'text-neo-black'} ${comboColors.border} z-10 ${comboColors.shadow}`
                         : `${comboColors.bg} ${comboColors.textColor || 'text-neo-black'} border-3 ${comboColors.border} z-10 ${comboColors.shadow}`
                       : "bg-neo-white text-neo-black border-3 border-neo-black shadow-hard-sm hover:shadow-hard hover:translate-x-[-1px] hover:translate-y-[-1px] active:translate-x-[1px] active:translate-y-[1px] active:shadow-hard-pressed",
+                    // Keyboard focus indicator
+                    isFocused && !isSelected && "ring-4 ring-neo-cyan ring-offset-2 ring-offset-neo-cream z-20",
                     "transition-all",
                     comboLevel > 0 ? "duration-300" : "duration-100"
                   )}

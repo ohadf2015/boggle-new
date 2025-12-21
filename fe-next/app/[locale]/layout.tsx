@@ -3,6 +3,8 @@ import type { ReactNode } from 'react';
 import { translations } from '@/translations';
 import { Providers } from '../providers';
 import Footer from '@/components/Footer';
+import GoogleAnalytics from '@/components/GoogleAnalytics';
+import ServiceWorkerRegistration from '@/components/ServiceWorkerRegistration';
 
 // Force dynamic rendering - prevent static generation
 export const dynamic = 'force-dynamic';
@@ -365,6 +367,8 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
                 <meta name="apple-mobile-web-app-title" content="LexiClash" />
             </head>
             <body className="antialiased flex flex-col min-h-screen" suppressHydrationWarning>
+                <GoogleAnalytics />
+                <ServiceWorkerRegistration />
                 <Providers lang={validLocale}>
                     <main className="flex-grow">{children}</main>
                     <Footer />

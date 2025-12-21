@@ -60,6 +60,38 @@ interface WordErrorOptions {
   duration?: number;
 }
 
+/**
+ * Word rejection reasons with user-friendly messages
+ */
+export type WordRejectionReason =
+  | 'not_in_dictionary'
+  | 'already_found'
+  | 'too_short'
+  | 'invalid_path'
+  | 'outside_board'
+  | 'not_connected'
+  | 'duplicate'
+  | 'timeout'
+  | 'unknown';
+
+const REJECTION_MESSAGES: Record<WordRejectionReason, { icon: string; message: string }> = {
+  not_in_dictionary: { icon: '📖', message: 'Not in dictionary' },
+  already_found: { icon: '🔄', message: 'Already found this word' },
+  too_short: { icon: '📏', message: 'Word too short' },
+  invalid_path: { icon: '🚫', message: 'Invalid letter path' },
+  outside_board: { icon: '⬜', message: 'Letters not on board' },
+  not_connected: { icon: '🔗', message: 'Letters not connected' },
+  duplicate: { icon: '👥', message: 'Already submitted' },
+  timeout: { icon: '⏱️', message: 'Validation timeout' },
+  unknown: { icon: '❓', message: 'Word not accepted' },
+};
+
+interface WordRejectedOptions {
+  reason?: WordRejectionReason;
+  customMessage?: string;
+  duration?: number;
+}
+
 interface NeoToastOptions {
   icon?: string | React.ReactNode;
   id?: string;
@@ -218,6 +250,69 @@ export const wordAIValidatingToast = (word: string, options: WordAIValidatingOpt
     {
       id: `ai-validating-${word}`, // Unique ID for this word to allow dismissal
       duration: options.duration || 10000, // Longer duration since AI validation can take time
+      position: 'top-center',
+    }
+  );
+};
+
+// Neo-Brutalist Word Rejected Toast (with detailed reason)
+export const wordRejectedToast = (word: string, options: WordRejectedOptions = {}): string => {
+  const { reason = 'unknown', customMessage, duration } = options;
+  const rejectionInfo = REJECTION_MESSAGES[reason];
+  const displayMessage = customMessage || rejectionInfo.message;
+
+  return toast.custom(
+    (t) => (
+      <AnimatePresence>
+        {t.visible && (
+          <motion.div
+            initial={{ y: -20, opacity: 0, scale: 0.9, x: 0 }}
+            animate={{
+              y: 0,
+              opacity: 1,
+              scale: 1,
+              x: [0, -5, 5, -5, 5, 0]
+            }}
+            exit={{ y: -10, opacity: 0, scale: 0.95 }}
+            transition={{
+              type: 'spring',
+              stiffness: 400,
+              damping: 25,
+              x: { duration: 0.4, delay: 0.1 }
+            }}
+            className="flex items-center gap-3 px-4 py-3 rounded-lg bg-neo-red border-3 border-neo-black shadow-hard"
+            style={{ minWidth: '240px', pointerEvents: 'auto' }}
+          >
+            <motion.span
+              initial={{ scale: 0, rotate: -90 }}
+              animate={{ scale: 1, rotate: 0 }}
+              transition={{ delay: 0.1, type: 'spring', stiffness: 400, damping: 15 }}
+              className="text-2xl"
+            >
+              {rejectionInfo.icon}
+            </motion.span>
+            <div className="flex flex-col gap-0.5">
+              <span className="font-black uppercase tracking-wide text-neo-white">
+                {applyHebrewFinalLetters(word)}
+              </span>
+              <span className="text-xs font-bold text-neo-white/80 uppercase">
+                {displayMessage}
+              </span>
+            </div>
+            <motion.span
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              transition={{ delay: 0.15, type: 'spring', stiffness: 400, damping: 15 }}
+              className="text-xl ml-auto"
+            >
+              ✗
+            </motion.span>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    ),
+    {
+      duration: duration || 3000,
       position: 'top-center',
     }
   );
