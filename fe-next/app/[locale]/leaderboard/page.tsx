@@ -5,6 +5,7 @@ import { motion } from 'framer-motion';
 import { FaTrophy, FaMedal, FaArrowLeft, FaSync } from 'react-icons/fa';
 import { useRouter } from 'next/navigation';
 import Header from '@/components/Header';
+import AutoHideHeader from '@/components/AutoHideHeader';
 import { Button } from '@/components/ui/button';
 import { useTheme } from '@/utils/ThemeContext';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -58,10 +59,10 @@ export default function LeaderboardPage(): React.ReactNode {
   if (!isSupabaseEnabled) {
     return (
       <div className={cn(
-        'min-h-screen',
+        isLandscape ? 'h-screen overflow-y-auto' : 'min-h-screen',
         isDarkMode ? 'bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900' : 'bg-gradient-to-br from-blue-50 via-white to-purple-50'
       )}>
-        <Header />
+        <AutoHideHeader />
         <div className="max-w-4xl mx-auto px-4 py-8">
           <div className="text-center py-12">
             <FaTrophy className="mx-auto text-6xl text-gray-400 mb-4" />
@@ -95,7 +96,7 @@ export default function LeaderboardPage(): React.ReactNode {
       isLandscape ? 'h-screen overflow-y-auto' : 'min-h-screen',
       isDarkMode ? 'bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900' : 'bg-gradient-to-br from-blue-50 via-white to-purple-50'
     )}>
-      {!isLandscape && <Header />}
+      <AutoHideHeader />
 
       <div className={cn(
         "max-w-4xl mx-auto px-4",

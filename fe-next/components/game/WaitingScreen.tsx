@@ -72,14 +72,37 @@ const WaitingScreen: React.FC<WaitingScreenProps> = ({
             </Badge>
           )}
 
-          {/* Share Button - compact */}
+          {/* Share Buttons - compact row */}
+          <div className="flex gap-1">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => copyJoinUrl(gameCode, t)}
+              className="w-8 h-8 p-0 bg-neo-yellow/90 hover:bg-neo-yellow border-2 border-neo-black rounded-neo"
+              title={t('hostView.copyLink')}
+            >
+              <FaLink className="text-[10px] text-neo-black" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => shareViaWhatsApp(gameCode, '', t)}
+              className="w-8 h-8 p-0 bg-neo-green/90 hover:bg-neo-green border-2 border-neo-black rounded-neo"
+              title={t('hostView.shareWhatsapp')}
+            >
+              <FaWhatsapp className="text-[10px] text-neo-black" />
+            </Button>
+          </div>
+
+          {/* QR Code Button */}
           <Button
             variant="ghost"
             size="sm"
-            onClick={() => copyJoinUrl(gameCode, t)}
-            className="w-10 h-10 p-0 bg-neo-yellow/90 hover:bg-neo-yellow border-2 border-neo-black rounded-neo"
+            onClick={() => setShowQR(true)}
+            className="w-10 h-10 p-0 bg-neo-purple/90 hover:bg-neo-purple border-2 border-neo-black rounded-neo"
+            title={t('hostView.qrCode')}
           >
-            <FaLink className="text-xs text-neo-black" />
+            <FaQrcode className="text-xs text-neo-cream" />
           </Button>
 
           {/* Exit Button */}
@@ -126,6 +149,19 @@ const WaitingScreen: React.FC<WaitingScreenProps> = ({
             <div className="flex-shrink-0 [&_button]:h-10 [&_button]:text-sm [&_button]:px-3 [&_>*]:p-2 [&_>*]:gap-2 [&_h3]:hidden [&_p]:hidden [&_.space-y-4]:space-y-2 [&_.space-y-6]:space-y-2">
               {gameSettings}
             </div>
+          )}
+
+          {/* Waiting indicator for non-host players */}
+          {!isHost && (
+            <motion.div
+              animate={{ opacity: [0.7, 1, 0.7] }}
+              transition={{ duration: 2, repeat: Infinity }}
+              className="bg-neo-cyan/20 border-2 border-neo-cyan/50 rounded-neo px-2 py-1 text-center"
+            >
+              <span className="text-[9px] font-bold text-neo-cyan uppercase">
+                {t('playerView.waitForGameStart')}
+              </span>
+            </motion.div>
           )}
 
           {/* Players Header */}

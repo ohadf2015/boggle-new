@@ -5,6 +5,7 @@ import { motion } from 'framer-motion';
 import { FaUser, FaArrowLeft, FaEdit, FaGamepad, FaTrophy, FaStar, FaCamera, FaTimes, FaCheck, FaClock, FaPlay } from 'react-icons/fa';
 import { useRouter } from 'next/navigation';
 import Header from '@/components/Header';
+import AutoHideHeader from '@/components/AutoHideHeader';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useTheme } from '@/utils/ThemeContext';
@@ -222,10 +223,10 @@ export default function ProfilePage(): React.ReactNode {
   if (!loading && !isAuthenticated) {
     return (
       <div className={cn(
-        'min-h-screen',
+        isLandscape ? 'h-screen overflow-y-auto' : 'min-h-screen',
         isDarkMode ? 'bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900' : 'bg-gradient-to-br from-blue-50 via-white to-purple-50'
       )}>
-        <Header />
+        <AutoHideHeader />
         <div className="max-w-4xl mx-auto px-4 py-8">
           <div className="text-center py-12">
             <FaUser className="mx-auto text-6xl text-gray-400 mb-4" />
@@ -282,10 +283,10 @@ export default function ProfilePage(): React.ReactNode {
   if (loading) {
     return (
       <div className={cn(
-        'min-h-screen',
+        isLandscape ? 'h-screen overflow-y-auto' : 'min-h-screen',
         isDarkMode ? 'bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900' : 'bg-gradient-to-br from-blue-50 via-white to-purple-50'
       )}>
-        <Header />
+        <AutoHideHeader />
         <div className="max-w-4xl mx-auto px-4 py-8">
           <div className="flex justify-center py-12">
             <div className="w-8 h-8 border-4 border-cyan-500 border-t-transparent rounded-full animate-spin" />
@@ -301,7 +302,7 @@ export default function ProfilePage(): React.ReactNode {
       isLandscape ? 'h-screen overflow-y-auto' : 'min-h-screen',
       isDarkMode ? 'bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900' : 'bg-gradient-to-br from-blue-50 via-white to-purple-50'
     )}>
-      {!isLandscape && <Header />}
+      <AutoHideHeader />
 
       <div className={cn(
         "max-w-4xl mx-auto px-4",

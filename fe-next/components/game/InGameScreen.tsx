@@ -146,7 +146,7 @@ const InGameScreen = memo<InGameScreenProps>(({
     enabled: isLandscape,
   });
 
-  // Show controls on scroll/touch in landscape mode
+  // Show controls on scroll/touch/mousemove in landscape mode
   useEffect(() => {
     if (!isLandscape) return;
 
@@ -155,11 +155,13 @@ const InGameScreen = memo<InGameScreenProps>(({
     window.addEventListener('scroll', handleInteraction, { passive: true });
     window.addEventListener('touchstart', handleInteraction, { passive: true });
     window.addEventListener('touchmove', handleInteraction, { passive: true });
+    window.addEventListener('mousemove', handleInteraction, { passive: true });
 
     return () => {
       window.removeEventListener('scroll', handleInteraction);
       window.removeEventListener('touchstart', handleInteraction);
       window.removeEventListener('touchmove', handleInteraction);
+      window.removeEventListener('mousemove', handleInteraction);
     };
   }, [isLandscape, showControls]);
 
@@ -381,11 +383,11 @@ const InGameScreen = memo<InGameScreenProps>(({
               }
             }}
           >
-            {/* Exit Button - left */}
+            {/* Exit Button - left (min 40px for better touch targets) */}
             {onExitRoom && (
               <button
                 onClick={onExitRoom}
-                className="w-8 h-8 bg-neo-red/90 border-2 border-neo-black rounded-neo text-neo-cream text-sm font-bold shadow-hard-sm flex items-center justify-center hover:bg-neo-red active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all"
+                className="w-10 h-10 bg-neo-red/90 border-2 border-neo-black rounded-neo text-neo-cream text-base font-bold shadow-hard-sm flex items-center justify-center hover:bg-neo-red active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all"
                 aria-label={t('playerView.exit') || 'Exit'}
               >
                 ✕
@@ -394,10 +396,10 @@ const InGameScreen = memo<InGameScreenProps>(({
 
             {/* Right side buttons */}
             <div className="flex items-center gap-2">
-              {/* Help Button */}
+              {/* Help Button (min 40px for better touch targets) */}
               <button
                 onClick={() => setShowHelpPanel(true)}
-                className="w-8 h-8 bg-neo-purple/90 border-2 border-neo-black rounded-neo text-neo-cream text-sm font-bold shadow-hard-sm flex items-center justify-center hover:bg-neo-purple active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all"
+                className="w-10 h-10 bg-neo-purple/90 border-2 border-neo-black rounded-neo text-neo-cream text-base font-bold shadow-hard-sm flex items-center justify-center hover:bg-neo-purple active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all"
                 aria-label={t('help.title') || 'Help'}
               >
                 ?
@@ -405,9 +407,14 @@ const InGameScreen = memo<InGameScreenProps>(({
 
               {/* Pin indicator */}
               {controlsPinned && (
-                <div className="w-6 h-6 bg-neo-yellow/90 border-2 border-neo-black rounded-neo text-neo-black text-xs font-bold shadow-hard-sm flex items-center justify-center">
+                <button
+                  onClick={toggleControlsPin}
+                  className="w-8 h-8 bg-neo-yellow/90 border-2 border-neo-black rounded-neo text-neo-black text-sm font-bold shadow-hard-sm flex items-center justify-center hover:bg-neo-yellow cursor-pointer"
+                  title="Unpin controls"
+                  aria-label="Unpin controls"
+                >
                   📌
-                </div>
+                </button>
               )}
             </div>
           </motion.div>
@@ -440,9 +447,9 @@ const InGameScreen = memo<InGameScreenProps>(({
             </motion.div>
           )}
 
-          {/* Center: Grid (takes maximum space - full viewport height) */}
-          <div className="flex items-center justify-center w-full h-full px-10 py-1 landscape-grid-container">
-            <div className="w-full h-full max-h-[100vh] flex items-center justify-center">
+          {/* Center: Grid (takes maximum space - constrained to square aspect ratio) */}
+          <div className="flex items-center justify-center w-full h-full px-12 py-1 landscape-grid-container">
+            <div className="w-full h-full max-h-[100vh] max-w-[100vh] flex items-center justify-center aspect-square">
               <GridComponent
                 key={isPlaying ? 'playing-grid-landscape' : 'spectating-grid-landscape'}
                 grid={letterGrid}

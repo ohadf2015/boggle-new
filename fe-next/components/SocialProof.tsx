@@ -31,13 +31,19 @@ const SocialProof: React.FC<SocialProofProps> = ({
   });
 
   // Stable offset that doesn't change on re-renders (small boost for social proof)
-  const [stableOffset] = useState(() => ({
-    players: Math.floor(Math.random() * 5) + 3, // 3-8 base offset (realistic)
-    games: Math.floor(Math.random() * 2) + 1,   // 1-3 base offset (realistic)
-  }));
+  // Initialize with 0 to avoid hydration mismatch, then set random values client-side
+  const [stableOffset, setStableOffset] = useState({ players: 0, games: 0 });
 
   // Small fluctuation for natural-looking changes (updates every 30 seconds)
   const [fluctuation, setFluctuation] = useState({ players: 0, games: 0 });
+
+  // Set random offsets only after hydration to avoid mismatch
+  useEffect(() => {
+    setStableOffset({
+      players: Math.floor(Math.random() * 5) + 3, // 3-8 base offset (realistic)
+      games: Math.floor(Math.random() * 2) + 1,   // 1-3 base offset (realistic)
+    });
+  }, []);
 
   useEffect(() => {
     const updateFluctuation = () => {
