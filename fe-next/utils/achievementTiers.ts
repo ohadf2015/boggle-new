@@ -20,9 +20,6 @@ export interface TierColors {
   glow: string;
 }
 
-// Alias for backwards compatibility
-export type TierColor = TierColors;
-
 // Tier display colors (for neo-brutalist design)
 export const TIER_COLORS: Record<TierName, TierColors> = {
   BRONZE: {

@@ -15,6 +15,7 @@ import type {
   LeaderboardEntry,
   WordDetail,
 } from '@/shared/types/game';
+import { COMBO_SHIELD_INTERVAL } from '@/utils/consts';
 
 // ==========================================
 // Type Definitions
@@ -177,8 +178,6 @@ const INITIAL_STATE: GameStateValues = {
   xpGainedData: null,
   levelUpData: null,
 };
-
-const COMBO_SHIELD_INTERVAL = 10; // Earn shield every 10 valid words
 
 // ==========================================
 // Reducer

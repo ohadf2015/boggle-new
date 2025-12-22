@@ -100,6 +100,7 @@ const translations = {
       rotateLandscape: 'Rotate for better gameplay!',
       dontShowAgain: "Don't show again",
       landscapeMode: 'Landscape Mode',
+      rank: 'Rank',
     },
     help: {
       title: 'Quick Help',
@@ -1365,6 +1366,10 @@ const translations = {
       challengeMode: 'Challenge Mode',
       challengeModeDesc: 'Beat your personal high scores and track your improvement over time. Compete against yourself!',
     },
+    social: {
+      playersOnline: 'players online',
+      gamesNow: 'games happening now',
+    },
   },
   he: {
     flag: '🇮🇱',
@@ -1467,6 +1472,7 @@ const translations = {
       rotateLandscape: 'סובב לחוויה טובה יותר!',
       dontShowAgain: 'אל תציג שוב',
       landscapeMode: 'מצב אופקי',
+      rank: 'דירוג',
     },
     help: {
       title: 'עזרה מהירה',
@@ -2726,6 +2732,10 @@ const translations = {
       challengeMode: 'מצב אתגר',
       challengeModeDesc: 'שברו את השיאים האישיים שלכם ועקבו אחר ההתקדמות לאורך זמן. התחרו נגד עצמכם!',
     },
+    social: {
+      playersOnline: 'שחקנים מחוברים',
+      gamesNow: 'משחקים מתקיימים עכשיו',
+    },
   },
   sv: {
     flag: '🇸🇪',
@@ -2828,6 +2838,7 @@ const translations = {
       rotateLandscape: 'Rotera för bättre spelupplevelse!',
       dontShowAgain: 'Visa inte igen',
       landscapeMode: 'Liggande läge',
+      rank: 'Rank',
     },
     help: {
       title: 'Snabbhjälp',
@@ -4088,6 +4099,10 @@ const translations = {
       challengeMode: 'Utmaningsläge',
       challengeModeDesc: 'Slå dina personliga rekord och följ din förbättring över tid. Tävla mot dig själv!',
     },
+    social: {
+      playersOnline: 'spelare online',
+      gamesNow: 'spel pågår nu',
+    },
   },
   ja: {
     flag: '🇯🇵',
@@ -4189,6 +4204,7 @@ const translations = {
       rotateLandscape: '横向きでより良いプレイを！',
       dontShowAgain: '今後表示しない',
       landscapeMode: '横向きモード',
+      rank: 'ランク',
     },
     help: {
       title: 'クイックヘルプ',
@@ -5449,6 +5465,10 @@ const translations = {
       challengeMode: 'チャレンジモード',
       challengeModeDesc: '自分の最高記録を破り、時間とともに上達を追跡。自分自身と競争！',
     },
+    social: {
+      playersOnline: 'オンラインプレイヤー',
+      gamesNow: '進行中のゲーム',
+    },
   },
   es: {
     flag: '🇪🇸',
@@ -5549,6 +5569,7 @@ const translations = {
       rotateLandscape: '¡Gira para mejor experiencia!',
       dontShowAgain: 'No mostrar de nuevo',
       landscapeMode: 'Modo Horizontal',
+      rank: 'Puesto',
     },
     help: {
       title: 'Ayuda Rápida',
@@ -6538,6 +6559,10 @@ const translations = {
       practiceModeDesc: 'Tómate tu tiempo sin temporizador. Perfecto para aprender nuevas palabras.',
       challengeMode: 'Modo Desafío',
       challengeModeDesc: 'Supera tus récords personales y rastrea tu mejora con el tiempo.',
+    },
+    social: {
+      playersOnline: 'jugadores en línea',
+      gamesNow: 'partidas en curso',
     },
   }
 };

@@ -119,8 +119,16 @@ const WaitingScreen: React.FC<WaitingScreenProps> = ({
           )}
         </div>
 
-        {/* Right column: Players list */}
-        <div className="w-32 flex flex-col gap-1 overflow-hidden flex-shrink-0">
+        {/* Right column: Players list + Game Settings (Host) */}
+        <div className="w-40 flex flex-col gap-2 overflow-hidden flex-shrink-0">
+          {/* Game Settings for Host - includes Start Game button */}
+          {isHost && gameSettings && (
+            <div className="flex-shrink-0 [&_button]:h-10 [&_button]:text-sm [&_button]:px-3 [&_>*]:p-2 [&_>*]:gap-2 [&_h3]:hidden [&_p]:hidden [&_.space-y-4]:space-y-2 [&_.space-y-6]:space-y-2">
+              {gameSettings}
+            </div>
+          )}
+
+          {/* Players Header */}
           <div className="text-xs font-black uppercase text-neo-cream text-center flex items-center justify-center gap-1">
             <FaUsers className="text-neo-pink" />
             <span>{playersReady.length}</span>

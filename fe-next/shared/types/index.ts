@@ -6,6 +6,9 @@
 // Game types
 export * from './game';
 
+// View types (used by Host and Player views)
+export * from './view';
+
 // Socket event types (includes engagement payload types)
 export * from './socket';
 

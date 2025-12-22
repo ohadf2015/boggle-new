@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FaTrophy, FaMedal, FaRedo, FaHome, FaRobot, FaChartBar, FaCrown, FaStar, FaAward } from 'react-icons/fa';
 import { Sparkles, TrendingUp, Target } from 'lucide-react';
@@ -9,13 +9,13 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import GridComponent from '@/components/GridComponent';
 import PlayerInsights from '@/components/results/PlayerInsights';
 import { AchievementBadge } from '@/components/AchievementBadge';
-import { calculatePlayerInsights, WordData } from '@/utils/gameInsights';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 import confetti from 'canvas-confetti';
 import { POINT_COLORS } from '@/utils/consts';
 import { useMobileLandscape } from '@/hooks/useMobileLandscape';
-import type { SinglePlayerResultsData, SinglePlayerMode, PlayerWordData } from './SinglePlayerView';
+import type { SinglePlayerResultsData, SinglePlayerMode } from './SinglePlayerView';
+import { useResultsData } from './results';
 
 // Helper to safely get point color with fallback
 const getPointColor = (points: number): string => {
@@ -53,96 +53,18 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
   const [showGrid, setShowGrid] = useState(false);
   const [expandedBot, setExpandedBot] = useState<string | null>(null);
 
-  // Calculate rankings for solo-bots mode
-  const allParticipants = [
-    { name: t('common.you') || 'You', score: results.playerScore, isPlayer: true },
-    ...results.botScores.map(bot => ({ name: bot.name, score: bot.score, isPlayer: false })),
-  ].sort((a, b) => b.score - a.score);
-
-  const playerRank = allParticipants.findIndex(p => p.isPlayer) + 1;
-  const isWinner = playerRank === 1;
-
-  // Calculate player insights from word data
-  const playerInsights = useMemo(() => {
-    if (!results.playerWordData?.length) return null;
-
-    const wordData: WordData[] = results.playerWordData.map(w => ({
-      word: w.word,
-      validated: w.isValid,
-      timestamp: w.timestamp,
-      timeSinceStart: w.timeSinceStart,
-      score: w.score,
-    }));
-
-    return calculatePlayerInsights(wordData, results.gameDuration, results.playerScore);
-  }, [results.playerWordData, results.gameDuration, results.playerScore]);
-
-  // Group words by points for display (like multiplayer results)
-  const { wordsByPoints, sortedPointGroups, invalidWords, totalComboBonus } = useMemo(() => {
-    if (!results.playerWordData?.length) {
-      return { wordsByPoints: {} as Record<number, PlayerWordData[]>, sortedPointGroups: [] as number[], invalidWords: [] as PlayerWordData[], totalComboBonus: 0 };
-    }
-
-    const validWords = results.playerWordData.filter(w => w.isValid);
-    const invalidWords = results.playerWordData.filter(w => !w.isValid);
-
-    // Calculate total combo bonus from all valid words
-    const totalComboBonus = validWords.reduce((sum, w) => sum + (w.comboBonus || 0), 0);
-
-    // Group valid words by points
-    const wordsByPoints: Record<number, PlayerWordData[]> = {};
-    validWords.forEach(wordObj => {
-      const points = wordObj.score || 0;
-      if (!wordsByPoints[points]) {
-        wordsByPoints[points] = [];
-      }
-      wordsByPoints[points].push(wordObj);
-    });
-
-    // Sort words alphabetically within each point group
-    Object.keys(wordsByPoints).forEach(points => {
-      const wordList = wordsByPoints[Number(points)];
-      if (wordList) {
-        wordList.sort((a, b) => a.word.localeCompare(b.word));
-      }
-    });
-
-    // Sort point groups in descending order
-    const sortedPointGroups = Object.keys(wordsByPoints)
-      .map(Number)
-      .sort((a, b) => b - a);
-
-    return { wordsByPoints, sortedPointGroups, invalidWords, totalComboBonus };
-  }, [results.playerWordData]);
-
-  // Process bot words for display (bot words are like "word3", "word4" meaning length 3, 4, etc.)
-  const botWordDetails = useMemo(() => {
-    return results.botScores.map(bot => {
-      const wordsByLength: Record<number, number> = {};
-      let totalWords = 0;
-
-      bot.words.forEach(word => {
-        // Extract length from simulated word names like "word3", "word4"
-        const match = word.match(/word(\d+)/);
-        const length = match ? parseInt(match[1], 10) : word.length;
-        wordsByLength[length] = (wordsByLength[length] || 0) + 1;
-        totalWords++;
-      });
-
-      // Sort by length descending
-      const sortedLengths = Object.keys(wordsByLength)
-        .map(Number)
-        .sort((a, b) => b - a);
-
-      return {
-        name: bot.name,
-        score: bot.score,
-        totalWords,
-        wordsByLength,
-        sortedLengths,
-      };
-    });
-  }, [results.botScores]);
+  // Use extracted hook for data processing
+  const {
+    allParticipants,
+    playerRank,
+    isWinner,
+    playerInsights,
+    wordsByPoints,
+    sortedPointGroups,
+    invalidWords,
+    totalComboBonus,
+    botWordDetails,
+  } = useResultsData(results, t);
 
   // Celebration effect on mount
   useEffect(() => {

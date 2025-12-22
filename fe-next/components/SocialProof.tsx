@@ -30,10 +30,10 @@ const SocialProof: React.FC<SocialProofProps> = ({
     recentHighScore: null as { username: string; score: number } | null,
   });
 
-  // Stable offset that doesn't change on re-renders (makes numbers look more realistic)
+  // Stable offset that doesn't change on re-renders (small boost for social proof)
   const [stableOffset] = useState(() => ({
-    players: Math.floor(Math.random() * 15) + 35, // 35-50 base offset
-    games: Math.floor(Math.random() * 3) + 4,     // 4-7 base offset
+    players: Math.floor(Math.random() * 5) + 3, // 3-8 base offset (realistic)
+    games: Math.floor(Math.random() * 2) + 1,   // 1-3 base offset (realistic)
   }));
 
   // Small fluctuation for natural-looking changes (updates every 30 seconds)
@@ -42,8 +42,8 @@ const SocialProof: React.FC<SocialProofProps> = ({
   useEffect(() => {
     const updateFluctuation = () => {
       setFluctuation({
-        players: Math.floor(Math.random() * 7) - 3, // -3 to +3
-        games: Math.floor(Math.random() * 3) - 1,   // -1 to +1
+        players: Math.floor(Math.random() * 5) - 2, // -2 to +2
+        games: Math.floor(Math.random() * 2) - 1,   // -1 to 0
       });
     };
 

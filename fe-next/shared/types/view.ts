@@ -48,14 +48,34 @@ export interface LiveLeaderboardEntry {
   isBot?: boolean;
 }
 
+/**
+ * Extended leaderboard entry with presence information
+ */
+export interface ExtendedLeaderboardPlayer extends LiveLeaderboardEntry {
+  presenceStatus?: PresenceStatus;
+  isWindowFocused?: boolean;
+}
+
 // ==================== Tournament Types ====================
 
 /**
- * Tournament data displayed in views
+ * Tournament data displayed in views (simplified)
  */
 export interface ViewTournamentData {
   currentRound?: number;
   totalRounds?: number;
+  isComplete?: boolean;
+}
+
+/**
+ * Full tournament data with all fields
+ */
+export interface TournamentData {
+  id?: string;
+  name?: string;
+  currentRound?: number;
+  totalRounds?: number;
+  status?: 'created' | 'in-progress' | 'completed' | 'cancelled';
   isComplete?: boolean;
 }
 

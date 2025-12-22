@@ -180,3 +180,33 @@ export const POINT_COLORS: Record<number, string> = {
   7: 'var(--neo-pink)',    // 8 letters
   8: 'var(--neo-pink)',    // 9+ letters (premium/rare)
 };
+
+// ==================== Combo System ====================
+
+// Time in ms to maintain combo between words (8 seconds)
+export const COMBO_TIMEOUT_MS = 8000;
+
+// Number of valid words needed to earn a combo shield
+export const COMBO_SHIELD_INTERVAL = 10;
+
+// ==================== Validation Limits ====================
+
+// Username constraints
+export const USERNAME_MIN_LENGTH = 2;
+export const USERNAME_MAX_LENGTH = 20;
+
+// Room name constraints
+export const ROOM_NAME_MIN_LENGTH = 2;
+export const ROOM_NAME_MAX_LENGTH = 30;
+
+// Game code constraints
+export const GAME_CODE_MIN_LENGTH = 6;
+export const GAME_CODE_MAX_LENGTH = 10;
+
+// Word constraints
+export const WORD_MIN_LENGTH = 2;
+export const WORD_MAX_LENGTH = 20;
+
+// Pattern for valid username/room name characters
+// Allows: letters, numbers, spaces, Hebrew, Japanese, Chinese, Latin Extended, and special chars ._-
+export const NAME_VALID_PATTERN = /^[a-zA-Z0-9\s\u0590-\u05FF\u3040-\u30FF\u4E00-\u9FFF\u00C0-\u024F._-]+$/;

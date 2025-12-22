@@ -17,126 +17,17 @@ import logger from '@/utils/logger';
 import { setSentryUser, clearSentryUser } from '@/utils/sentry';
 import type { User } from '@supabase/supabase-js';
 
-// Fetch geolocation data from our API
-async function fetchGeolocation(): Promise<{ countryCode: string | null; country?: string; city?: string }> {
-  try {
-    const response = await fetch('/api/geolocation', {
-      method: 'GET',
-      headers: { 'Accept': 'application/json' },
-    });
-    if (!response.ok) {
-      return { countryCode: null };
-    }
-    const data = await response.json();
-    return {
-      countryCode: data.countryCode || null,
-      country: data.country,
-      city: data.city,
-    };
-  } catch (error) {
-    logger.warn('Failed to fetch geolocation:', error);
-    return { countryCode: null };
-  }
-}
+// Import types and utils from auth module
+import type { ProfileData, RankedProgress, AuthContextValue } from './auth';
+import {
+  fetchGeolocation,
+  fetchRandomPlayerName,
+  fetchRandomGenericAvatar,
+  isRefreshTokenError,
+} from './auth';
 
-// Fetch a random player name with suited avatar
-async function fetchRandomPlayerName(language = 'en'): Promise<{ name: string; avatar: { emoji: string; color: string } }> {
-  try {
-    const response = await fetch(`/api/random-name?language=${language}`, {
-      method: 'GET',
-      headers: { 'Accept': 'application/json' },
-    });
-    if (!response.ok) {
-      throw new Error('Failed to fetch random name');
-    }
-    return await response.json();
-  } catch (error) {
-    logger.warn('Failed to fetch random name, using fallback:', error);
-    // Fallback to simple random name
-    return {
-      name: `Player ${Math.floor(Math.random() * 1000)}`,
-      avatar: { emoji: '😀', color: '#6366f1' },
-    };
-  }
-}
-
-// Fetch a random generic avatar for OAuth users (neutral avatars that work with any name)
-async function fetchRandomGenericAvatar(): Promise<{ emoji: string; color: string }> {
-  try {
-    const response = await fetch('/api/random-avatar', {
-      method: 'GET',
-      headers: { 'Accept': 'application/json' },
-    });
-    if (!response.ok) {
-      throw new Error('Failed to fetch random avatar');
-    }
-    const data = await response.json();
-    return data.avatar;
-  } catch (error) {
-    logger.warn('Failed to fetch random avatar, using fallback:', error);
-    // Fallback to a neutral emoji
-    return { emoji: '😊', color: '#6366f1' };
-  }
-}
-
-export interface ProfileData {
-  id: string;
-  username: string;
-  display_name?: string;
-  avatar_emoji?: string;
-  avatar_color?: string;
-  profile_picture_url?: string | null;
-  profile_picture_provider?: string | null;
-  total_games?: number;
-  total_score?: number;
-  total_words?: number;
-  total_xp?: number;
-  total_time_played?: number;
-  longest_word?: string | null;
-  longest_word_length?: number;
-  achievement_counts?: Record<string, number>;
-  current_level?: number;
-  ranked_wins?: number;
-  ranked_mmr?: number;
-  casual_games?: number;
-  is_admin?: boolean;
-  country_code?: string | null;
-  utm_source?: string | null;
-  utm_medium?: string | null;
-  utm_campaign?: string | null;
-  referrer?: string | null;
-  created_at?: string;
-  updated_at?: string;
-}
-
-export interface RankedProgress {
-  user_id: string;
-  casual_games_played: number;
-  unlocked_at?: string | null;
-  current_rating?: number;
-  ranked_games_played?: number;
-}
-
-export interface AuthContextValue {
-  // State
-  user: User | null;
-  profile: ProfileData | null;
-  rankedProgress: RankedProgress | null;
-  loading: boolean;
-  isSupabaseEnabled: boolean;
-
-  // Computed
-  isAuthenticated: boolean;
-  isGuest: boolean;
-  isAdmin: boolean;
-  canPlayRanked: boolean;
-  gamesUntilRanked: number;
-
-  // Actions
-  setupProfile: (username: string, avatarEmoji?: string, avatarColor?: string) => Promise<{ data: ProfileData | null; error: { message: string } | null }>;
-  updateProfile: (updates: Partial<ProfileData>) => Promise<{ data: ProfileData | null; error: { message: string } | null }>;
-  refreshProfile: () => Promise<void>;
-}
+// Re-export types for consumers
+export type { ProfileData, RankedProgress, AuthContextValue } from './auth';
 
 const AuthContext = createContext<AuthContextValue | null>(null);
 
@@ -267,20 +158,6 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       setRankedProgress(rankedData);
     }
   }, []);
-
-  // Helper to check if error is a refresh token error
-  const isRefreshTokenError = (error: { code?: string; message?: string } | null): boolean => {
-    if (!error) return false;
-    const errorCode = error.code?.toLowerCase() || '';
-    const errorMessage = error.message?.toLowerCase() || '';
-    return (
-      errorCode === 'refresh_token_not_found' ||
-      errorMessage.includes('refresh token not found') ||
-      errorMessage.includes('invalid refresh token') ||
-      errorCode === 'bad_jwt' ||
-      errorMessage.includes('jwt expired')
-    );
-  };
 
   // Helper to clear auth state and sign out
   const clearAuthState = useCallback(async (reason: string) => {

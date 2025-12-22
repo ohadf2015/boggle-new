@@ -21,36 +21,16 @@ import { useSoundEffects } from '../../contexts/SoundEffectsContext';
 import { useAnnouncer } from '../GameAnnouncer';
 import { validateWordLocally, couldBeOnBoard } from '../../utils/clientWordValidator';
 import { hapticForWordScore, hapticError } from '../../utils/haptics';
-import type { LetterGrid, Language, Avatar as AvatarType, PresenceStatus } from '@/shared/types/game';
+import type { LetterGrid, Language } from '@/shared/types/game';
+import type {
+  FoundWord,
+  ExtendedLeaderboardPlayer as LeaderboardPlayer,
+  TournamentData,
+} from '@/shared/types/view';
 import { useMobileLandscape } from '@/hooks/useMobileLandscape';
+import { useAutoHideControls } from '@/hooks/useAutoHideControls';
 
 // ==================== Types ====================
-
-interface FoundWord {
-  word: string;
-  isValid?: boolean | null;
-  score?: number;
-  duplicate?: boolean;
-  timestamp?: number;
-}
-
-interface LeaderboardPlayer {
-  username: string;
-  score: number;
-  wordCount?: number;
-  isHost?: boolean;
-  isBot?: boolean;
-  avatar?: AvatarType;
-  presenceStatus?: PresenceStatus;
-  isWindowFocused?: boolean;
-}
-
-interface TournamentData {
-  name?: string;
-  currentRound?: number;
-  totalRounds?: number;
-  status?: 'created' | 'in-progress' | 'completed' | 'cancelled';
-}
 
 interface HintsState {
   hint: string | null;
@@ -158,6 +138,30 @@ const InGameScreen = memo<InGameScreenProps>(({
 
   // Help panel state for discoverability
   const [showHelpPanel, setShowHelpPanel] = useState(false);
+
+  // Auto-hide controls for landscape mode
+  const { isVisible: controlsVisible, isPinned: controlsPinned, show: showControls, togglePin: toggleControlsPin } = useAutoHideControls({
+    hideDelay: 3000,
+    initialHidden: true,
+    enabled: isLandscape,
+  });
+
+  // Show controls on scroll/touch in landscape mode
+  useEffect(() => {
+    if (!isLandscape) return;
+
+    const handleInteraction = () => showControls();
+
+    window.addEventListener('scroll', handleInteraction, { passive: true });
+    window.addEventListener('touchstart', handleInteraction, { passive: true });
+    window.addEventListener('touchmove', handleInteraction, { passive: true });
+
+    return () => {
+      window.removeEventListener('scroll', handleInteraction);
+      window.removeEventListener('touchstart', handleInteraction);
+      window.removeEventListener('touchmove', handleInteraction);
+    };
+  }, [isLandscape, showControls]);
 
   // Track if grid animation has already played
   const hasAnimatedRef = useRef(false);
@@ -296,7 +300,7 @@ const InGameScreen = memo<InGameScreenProps>(({
                   #{playerData.rank}
                 </div>
                 <div className="text-[7px] font-bold uppercase opacity-80">
-                  Rank
+                  {t('common.rank') || 'Rank'}
                 </div>
               </motion.div>
             )}
@@ -362,8 +366,22 @@ const InGameScreen = memo<InGameScreenProps>(({
             </AnimatePresence>
           </div>
 
-          {/* Top Controls - Exit + Help (minimal, top corners) */}
-          <div className="absolute top-2 left-2 z-30">
+          {/* Top Controls - Exit + Help (auto-hide in landscape) */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: controlsVisible || controlsPinned ? 1 : 0 }}
+            transition={{ duration: 0.3 }}
+            className={`absolute top-0 left-0 right-0 z-30 flex justify-between items-start p-2 ${
+              controlsVisible || controlsPinned ? 'pointer-events-auto' : 'pointer-events-none'
+            }`}
+            onClick={(e) => {
+              // Only toggle pin if clicking the container itself, not buttons
+              if (e.target === e.currentTarget) {
+                toggleControlsPin();
+              }
+            }}
+          >
+            {/* Exit Button - left */}
             {onExitRoom && (
               <button
                 onClick={onExitRoom}
@@ -373,21 +391,58 @@ const InGameScreen = memo<InGameScreenProps>(({
                 ✕
               </button>
             )}
-          </div>
 
-          <div className="absolute top-2 right-2 z-30">
-            <button
-              onClick={() => setShowHelpPanel(true)}
-              className="w-8 h-8 bg-neo-purple/90 border-2 border-neo-black rounded-neo text-neo-cream text-sm font-bold shadow-hard-sm flex items-center justify-center hover:bg-neo-purple active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all"
-              aria-label={t('help.title') || 'Help'}
+            {/* Right side buttons */}
+            <div className="flex items-center gap-2">
+              {/* Help Button */}
+              <button
+                onClick={() => setShowHelpPanel(true)}
+                className="w-8 h-8 bg-neo-purple/90 border-2 border-neo-black rounded-neo text-neo-cream text-sm font-bold shadow-hard-sm flex items-center justify-center hover:bg-neo-purple active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all"
+                aria-label={t('help.title') || 'Help'}
+              >
+                ?
+              </button>
+
+              {/* Pin indicator */}
+              {controlsPinned && (
+                <div className="w-6 h-6 bg-neo-yellow/90 border-2 border-neo-black rounded-neo text-neo-black text-xs font-bold shadow-hard-sm flex items-center justify-center">
+                  📌
+                </div>
+              )}
+            </div>
+          </motion.div>
+
+          {/* Hint Button - Single Player Mode Only (auto-hide with controls) */}
+          {hints && hints.isSinglePlayer && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: controlsVisible || controlsPinned ? 1 : 0 }}
+              transition={{ duration: 0.3 }}
+              className={`absolute bottom-2 right-2 z-30 ${
+                controlsVisible || controlsPinned ? 'pointer-events-auto' : 'pointer-events-none'
+              }`}
             >
-              ?
-            </button>
-          </div>
+              <HintButton
+                hint={hints.hint}
+                hintType={hints.hintType}
+                hintsRemaining={hints.hintsRemaining}
+                wordLength={hints.wordLength}
+                firstLetter={hints.firstLetter}
+                isLoading={hints.isLoading}
+                error={hints.error}
+                isAvailable={hints.isAvailable}
+                isSinglePlayer={hints.isSinglePlayer}
+                gameActive={gameActive}
+                onRequestHint={hints.requestHint}
+                onClearHint={hints.clearHint}
+                t={t}
+              />
+            </motion.div>
+          )}
 
           {/* Center: Grid (takes maximum space) */}
-          <div className="flex items-center justify-center w-full h-full px-16 py-2">
-            <div className="w-full h-full max-h-[92vh] flex items-center justify-center">
+          <div className="flex items-center justify-center w-full h-full px-10 py-1">
+            <div className="w-full h-full max-h-[95vh] flex items-center justify-center">
               <GridComponent
                 key={isPlaying ? 'playing-grid-landscape' : 'spectating-grid-landscape'}
                 grid={letterGrid}

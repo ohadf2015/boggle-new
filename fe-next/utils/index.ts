@@ -18,7 +18,6 @@ export {
   normalizeWord,
   getLanguageRegex,
   validateWordLocally,
-  calculatePredictedScore,
   couldBeOnBoard,
   type ClientValidationResult,
 } from './clientWordValidator';

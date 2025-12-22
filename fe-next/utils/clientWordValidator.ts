@@ -137,51 +137,6 @@ export function validateWordLocally(
 }
 
 /**
- * Get combo bonus based on combo level and word length
- * Combo bonus scales with word length to reward longer words in combos
- * Formula: comboBonus = floor(baseBonus * wordLengthFactor)
- * wordLengthFactor: 3 letters = 0.1, 4 letters = 0.3, 5 letters = 0.7, 6 letters = 1.0, 7+ letters = 1.5
- */
-function getComboBonus(comboLevel: number, wordLength: number): number {
-  if (comboLevel <= 2) return 0; // No bonus for combos 0-2
-
-  // Word length factor - longer words get much better combo bonuses
-  // Short words get minimal combo benefit to discourage short word spam
-  let wordLengthFactor: number;
-  if (wordLength <= 3) {
-    wordLengthFactor = 0.1;  // Very short words - almost no combo bonus
-  } else if (wordLength === 4) {
-    wordLengthFactor = 0.3;  // Short words - small combo bonus
-  } else if (wordLength === 5) {
-    wordLengthFactor = 0.7;  // Medium words
-  } else if (wordLength === 6) {
-    wordLengthFactor = 1.0;  // Good words
-  } else {
-    wordLengthFactor = 1.5;  // Long words (7+) - full combo bonus
-  }
-
-  // Base bonus scales with combo level (caps at 8)
-  const baseBonus = Math.min(comboLevel - 2, 8);
-
-  return Math.floor(baseBonus * wordLengthFactor);
-}
-
-/**
- * Calculate predicted score for a word (matches backend scoring)
- */
-export function calculatePredictedScore(word: string, comboLevel: number = 0): { baseScore: number; comboBonus: number; totalScore: number } {
-  // Base score: word length - 1 (minimum 1)
-  const baseScore = Math.max(word.length - 1, 1);
-
-  // Combo bonus: scales with word length (longer words benefit more)
-  const comboBonus = getComboBonus(comboLevel, word.length);
-
-  const totalScore = baseScore + comboBonus;
-
-  return { baseScore, comboBonus, totalScore };
-}
-
-/**
  * Check if a word can possibly be on the board
  * This is a simple heuristic - actual path validation happens on server
  * Returns true if the word MIGHT be on the board (for optimistic UI)

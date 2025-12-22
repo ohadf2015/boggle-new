@@ -12,6 +12,13 @@ import { usePresence } from '../hooks/usePresence';
 import { useHints } from '../hooks/useHints';
 import logger from '@/utils/logger';
 import type { LetterGrid, Language, Avatar, GridPosition, TournamentStanding } from '@/types';
+import type {
+  FoundWord,
+  LiveLeaderboardEntry as LeaderboardEntry,
+  ViewTournamentData as TournamentData,
+  XpGainedData,
+  LevelUpData,
+} from '@/shared/types/view';
 
 // Extracted components
 import PlayerWaitingView from './components/PlayerWaitingView';
@@ -35,30 +42,6 @@ interface Player {
   disconnected?: boolean;
 }
 
-interface FoundWord {
-  word: string;
-  isValid?: boolean | null;
-  score?: number;
-  duplicate?: boolean;
-  timestamp?: number;
-}
-
-interface LeaderboardEntry {
-  username: string;
-  score: number;
-  wordCount?: number;
-  avatar?: Avatar;
-  isHost?: boolean;
-  isBot?: boolean;
-}
-
-interface TournamentData {
-  currentRound?: number;
-  totalRounds?: number;
-  isComplete?: boolean;
-}
-
-
 interface PendingGameStart {
   letterGrid?: LetterGrid;
   timerSeconds?: number;
@@ -78,25 +61,6 @@ interface WordToVote {
   timeoutSeconds: number;
   gameCode: string;
   language: string;
-}
-
-interface XpGainedData {
-  xpEarned: number;
-  xpBreakdown: {
-    gameCompletion: number;
-    scoreXp: number;
-    winBonus: number;
-    achievementXp: number;
-  };
-  newTotalXp: number;
-  newLevel: number;
-}
-
-interface LevelUpData {
-  oldLevel: number;
-  newLevel: number;
-  levelsGained: number;
-  newTitles: string[];
 }
 
 interface PlayerViewProps {

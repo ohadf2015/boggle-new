@@ -2,6 +2,18 @@
  * Validation utility functions for form inputs
  */
 
+import {
+  USERNAME_MIN_LENGTH,
+  USERNAME_MAX_LENGTH,
+  ROOM_NAME_MIN_LENGTH,
+  ROOM_NAME_MAX_LENGTH,
+  GAME_CODE_MIN_LENGTH,
+  GAME_CODE_MAX_LENGTH,
+  WORD_MIN_LENGTH,
+  WORD_MAX_LENGTH,
+  NAME_VALID_PATTERN,
+} from './consts';
+
 export interface ValidationResult {
   isValid: boolean;
   error?: string;
@@ -19,17 +31,15 @@ export const validateUsername = (username: string): ValidationResult => {
 
   const trimmed = username.trim();
 
-  if (trimmed.length < 2) {
+  if (trimmed.length < USERNAME_MIN_LENGTH) {
     return { isValid: false, error: 'validation.usernameTooShort' };
   }
 
-  if (trimmed.length > 20) {
+  if (trimmed.length > USERNAME_MAX_LENGTH) {
     return { isValid: false, error: 'validation.usernameTooLong' };
   }
 
-  // Allow letters, numbers, spaces, and common special characters
-  const validPattern = /^[a-zA-Z0-9\s\u0590-\u05FF\u3040-\u30FF\u4E00-\u9FFF\u00C0-\u024F._-]+$/;
-  if (!validPattern.test(trimmed)) {
+  if (!NAME_VALID_PATTERN.test(trimmed)) {
     return { isValid: false, error: 'validation.usernameInvalidChars' };
   }
 
@@ -48,17 +58,15 @@ export const validateRoomName = (roomName: string): ValidationResult => {
 
   const trimmed = roomName.trim();
 
-  if (trimmed.length < 2) {
+  if (trimmed.length < ROOM_NAME_MIN_LENGTH) {
     return { isValid: false, error: 'validation.roomNameTooShort' };
   }
 
-  if (trimmed.length > 30) {
+  if (trimmed.length > ROOM_NAME_MAX_LENGTH) {
     return { isValid: false, error: 'validation.roomNameTooLong' };
   }
 
-  // Allow letters, numbers, spaces, and common special characters
-  const validPattern = /^[a-zA-Z0-9\s\u0590-\u05FF\u3040-\u30FF\u4E00-\u9FFF\u00C0-\u024F._-]+$/;
-  if (!validPattern.test(trimmed)) {
+  if (!NAME_VALID_PATTERN.test(trimmed)) {
     return { isValid: false, error: 'validation.roomNameInvalidChars' };
   }
 
@@ -78,7 +86,7 @@ export const validateGameCode = (gameCode: string): ValidationResult => {
   const trimmed = gameCode.trim();
 
   // Must be 6-10 characters, alphanumeric only (matches backend validation)
-  if (trimmed.length < 6 || trimmed.length > 10) {
+  if (trimmed.length < GAME_CODE_MIN_LENGTH || trimmed.length > GAME_CODE_MAX_LENGTH) {
     return { isValid: false, error: 'validation.gameCodeInvalid' };
   }
 
@@ -121,11 +129,11 @@ export const validateWord = (word: string): ValidationResult => {
 
   const trimmed = word.trim();
 
-  if (trimmed.length < 2) {
+  if (trimmed.length < WORD_MIN_LENGTH) {
     return { isValid: false, error: 'playerView.wordTooShort' };
   }
 
-  if (trimmed.length > 20) {
+  if (trimmed.length > WORD_MAX_LENGTH) {
     return { isValid: false, error: 'validation.wordTooLong' };
   }
 
