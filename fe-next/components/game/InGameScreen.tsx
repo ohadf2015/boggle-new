@@ -273,8 +273,8 @@ const InGameScreen = memo<InGameScreenProps>(({
       <>
         <HelpPanel isOpen={showHelpPanel} onClose={() => setShowHelpPanel(false)} />
 
-        {/* Full-screen landscape container with grid centered */}
-        <div className="relative flex items-center justify-center w-full h-full overflow-hidden bg-slate-900">
+        {/* Full-screen landscape container with grid centered - uses full viewport */}
+        <div className="relative flex items-center justify-center w-full h-screen overflow-hidden bg-slate-900 landscape-full-height">
 
           {/* Left Side Stats - Timer + Rank (overlaid on left edge) */}
           <div className="absolute left-2 top-1/2 -translate-y-1/2 flex flex-col items-center gap-2 z-20">
@@ -440,9 +440,9 @@ const InGameScreen = memo<InGameScreenProps>(({
             </motion.div>
           )}
 
-          {/* Center: Grid (takes maximum space) */}
-          <div className="flex items-center justify-center w-full h-full px-10 py-1">
-            <div className="w-full h-full max-h-[95vh] flex items-center justify-center">
+          {/* Center: Grid (takes maximum space - full viewport height) */}
+          <div className="flex items-center justify-center w-full h-full px-10 py-1 landscape-grid-container">
+            <div className="w-full h-full max-h-[100vh] flex items-center justify-center">
               <GridComponent
                 key={isPlaying ? 'playing-grid-landscape' : 'spectating-grid-landscape'}
                 grid={letterGrid}

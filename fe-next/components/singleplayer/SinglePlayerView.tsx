@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useMemo } from 'react';
-import Header from '@/components/Header';
+import AutoHideHeader from '@/components/AutoHideHeader';
 import SinglePlayerLobby from './SinglePlayerLobby';
 import SinglePlayerGame from './SinglePlayerGame';
 import SinglePlayerResults from './SinglePlayerResults';
@@ -150,9 +150,9 @@ const SinglePlayerView: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-50 via-slate-100 to-slate-200 dark:from-neo-navy dark:via-neo-navy-light dark:to-neo-navy">
-      <Header />
+      <AutoHideHeader />
 
-      <main className="max-w-6xl mx-auto px-4 sm:px-6 py-8">
+      <main className="max-w-6xl mx-auto px-4 sm:px-6 py-8 landscape-content">
         {phase === 'lobby' && (
           <SinglePlayerLobby
             initialSettings={gameState}

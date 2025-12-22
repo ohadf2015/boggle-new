@@ -4,7 +4,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import nextDynamic from 'next/dynamic';
 import toast from 'react-hot-toast';
 import { io, Socket } from 'socket.io-client';
-import Header from '@/components/Header';
+import AutoHideHeader from '@/components/AutoHideHeader';
 import ErrorBoundary from '@/app/components/ErrorBoundary';
 import { FeatureErrorBoundary } from '@/components/ErrorBoundaries';
 import { ConnectionDot } from '@/components/ConnectionStatusIndicator';
@@ -1156,7 +1156,7 @@ export default function MultiplayerPage(): React.JSX.Element {
       {/* Connection status indicator */}
       <ConnectionDot />
 
-      <Header />
+      <AutoHideHeader />
       <ErrorBoundary>
         <div id="main-content" tabIndex={-1}>
           {renderView()}

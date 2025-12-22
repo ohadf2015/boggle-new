@@ -1675,6 +1675,35 @@ body {
   }
 }
 
+/* Full-height landscape grid (when header is hidden) */
+@media (orientation: landscape) and (max-height: 600px) {
+  /* Content container for full height */
+  .landscape-content {
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+  }
+
+  /* Game board frame maximized for full height when no header */
+  .game-board-frame-full {
+    width: min(100%, 95vh);
+    max-width: min(100%, 95vh);
+    height: auto;
+    aspect-ratio: 1 / 1;
+    padding: 4px;
+  }
+
+  /* In-game container uses full viewport */
+  .landscape-full-height {
+    height: 100vh;
+    max-height: 100vh;
+  }
+
+  /* Grid container maximized */
+  .landscape-grid-container {
+    max-height: 100vh;
+  }
+}
+
 /* Very short landscape screens (phones in landscape) */
 @media (orientation: landscape) and (max-height: 450px) {
   .game-board-frame {
@@ -1682,6 +1711,13 @@ body {
     width: min(100%, 88vh);
     max-width: min(100%, 88vh);
     padding: 4px;
+  }
+
+  /* Full-height mode - even larger on short screens */
+  .game-board-frame-full {
+    width: min(100%, 98vh);
+    max-width: min(100%, 98vh);
+    padding: 2px;
   }
 
   /* Even more compact for very short screens */

@@ -56,7 +56,7 @@ const WaitingScreen: React.FC<WaitingScreenProps> = ({
   // Landscape mode layout - 3-column: room info | grid | players
   if (isLandscape) {
     return (
-      <div className="relative flex h-screen w-full overflow-hidden bg-slate-900 p-2 gap-2">
+      <div className="relative flex h-screen w-full overflow-hidden bg-slate-900 p-2 gap-2 landscape-full-height">
         {/* Left column: Room info + Exit */}
         <div className="flex flex-col items-center gap-2 w-24 flex-shrink-0">
           {/* Room Code */}
@@ -93,20 +93,20 @@ const WaitingScreen: React.FC<WaitingScreenProps> = ({
           </Button>
         </div>
 
-        {/* Center: Grid Preview - maximized */}
-        <div className="flex-1 flex items-center justify-center">
+        {/* Center: Grid Preview - maximized for full viewport */}
+        <div className="flex-1 flex items-center justify-center landscape-grid-container">
           {shufflingGrid ? (
             <SlotMachineGrid
               grid={shufflingGrid}
               highlightedCells={highlightedCells}
               language={gameLanguage || 'en'}
-              className="max-h-[90vh] max-w-[90vh]"
+              className="max-h-[100vh] max-w-[100vh]"
               animationDuration={600}
               staggerDelay={40}
               animationPattern="cascade"
             />
           ) : (
-            <div className="w-[80vh] max-w-full aspect-square grid grid-cols-4 gap-2 p-4">
+            <div className="w-[95vh] max-w-full aspect-square grid grid-cols-4 gap-2 p-4">
               {Array.from({ length: 16 }).map((_, i) => (
                 <motion.div
                   key={i}
