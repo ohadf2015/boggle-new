@@ -287,7 +287,7 @@ const ResultsPlayerCard: React.FC<ResultsPlayerCardProps> = ({ player, index, al
             {/* Left: Rank + Avatar + Username with key badges */}
             <div className="flex items-center gap-2 min-w-0 flex-1">
               <div className={cn(
-                "w-10 h-10 sm:w-12 sm:h-12 rounded-neo flex items-center justify-center text-xl sm:text-2xl font-black border-3 shadow-hard-sm flex-shrink-0",
+                "w-11 h-11 sm:w-12 sm:h-12 rounded-neo flex items-center justify-center text-lg sm:text-2xl font-black border-3 shadow-hard-sm flex-shrink-0",
                 getRankBoxStyle()
               )}>
                 {getRankIcon()}

@@ -278,95 +278,110 @@ const InGameScreen = memo<InGameScreenProps>(({
         {/* Full-screen landscape container with grid centered - uses full viewport */}
         <div className="relative flex items-center justify-center w-full h-screen overflow-hidden bg-slate-900 landscape-full-height">
 
-          {/* Left Side Stats - Timer + Rank (overlaid on left edge) */}
-          <div className="absolute left-2 top-1/2 -translate-y-1/2 flex flex-col items-center gap-2 z-20">
-            {/* Timer - Compact circular */}
-            {remainingTime !== null && (
-              <div className="flex justify-center">
+          {/* Left Side Stats - Consolidated Panel (Timer + Stats) */}
+          <div className="absolute left-2 top-1/2 -translate-y-1/2 z-20">
+            <div className="bg-neo-cream/95 border-3 border-neo-black rounded-neo shadow-hard p-2 flex flex-col items-center gap-2">
+              {/* Timer - Compact circular */}
+              {remainingTime !== null && (
                 <CircularTimer
                   remainingTime={remainingTime}
                   totalTime={timerValue * 60}
                   size="sm"
                 />
-              </div>
-            )}
+              )}
 
-            {/* Rank Badge (if in multiplayer) */}
-            {isPlaying && playerData.rank && playerData.rank > 0 && leaderboard.length > 1 && (
-              <motion.div
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
-                className="bg-neo-purple text-neo-cream border-2 border-neo-black rounded-neo shadow-hard-sm px-2 py-1 text-center"
-              >
-                <div className="text-sm font-black leading-tight">
-                  #{playerData.rank}
-                </div>
-                <div className="text-[7px] font-bold uppercase opacity-80">
-                  {t('common.rank') || 'Rank'}
-                </div>
-              </motion.div>
-            )}
+              {/* Stats Row - Rank & Words side by side when both exist */}
+              {isPlaying && (
+                <div className="flex items-center gap-1.5">
+                  {/* Rank Badge (if in multiplayer) */}
+                  {playerData.rank && playerData.rank > 0 && leaderboard.length > 1 && (
+                    <motion.div
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 1 }}
+                      className="bg-neo-purple text-neo-cream border-2 border-neo-black rounded-neo shadow-hard-sm px-2 py-1 text-center min-w-[40px]"
+                    >
+                      <div className="text-sm font-black leading-tight">
+                        #{playerData.rank}
+                      </div>
+                    </motion.div>
+                  )}
 
-            {/* Words count - minimal */}
-            {isPlaying && (
-              <div className="bg-neo-cream/90 border-2 border-neo-black rounded-neo shadow-hard-sm px-2 py-1 text-center">
-                <div className="text-sm font-black text-neo-black leading-tight">
-                  {normalizedFoundWords.length}
+                  {/* Words count */}
+                  <div className="bg-neo-navy text-neo-cream border-2 border-neo-black rounded-neo shadow-hard-sm px-2 py-1 text-center min-w-[40px]">
+                    <div className="text-sm font-black leading-tight">
+                      {normalizedFoundWords.length}
+                    </div>
+                  </div>
                 </div>
-                <div className="text-[7px] font-bold uppercase text-neo-black/70">
-                  {t('common.words') || 'Words'}
-                </div>
-              </div>
-            )}
+              )}
+            </div>
           </div>
 
-          {/* Right Side Stats - Score + Combo (overlaid on right edge) */}
-          <div className="absolute right-2 top-1/2 -translate-y-1/2 flex flex-col items-center gap-2 z-20">
-            {/* Score - Compact */}
-            {isPlaying && (
+          {/* Right Side Stats - Consolidated Score Panel */}
+          {isPlaying && (
+            <div className="absolute right-2 top-1/2 -translate-y-1/2 z-20">
               <motion.div
-                initial={{ scale: 0, rotate: -5 }}
-                animate={{ scale: 1, rotate: 2 }}
-                className="bg-neo-yellow border-2 border-neo-black rounded-neo shadow-hard-sm px-3 py-1.5 text-center"
+                initial={{ scale: 0, rotate: -2 }}
+                animate={{ scale: 1, rotate: 1 }}
+                className="bg-neo-yellow border-3 border-neo-black rounded-neo shadow-hard p-2 flex flex-col items-center gap-1.5"
               >
+                {/* Score */}
                 <motion.div
                   key={playerData.score}
-                  initial={{ scale: 1.3 }}
+                  initial={{ scale: 1.2 }}
                   animate={{ scale: 1 }}
-                  className="text-xl font-black text-neo-black leading-tight"
+                  className="text-2xl font-black text-neo-black leading-none"
                 >
                   {playerData.score}
                 </motion.div>
-                <div className="text-[8px] font-bold uppercase text-neo-black/70">
-                  {t('common.score') || 'Score'}
-                </div>
-              </motion.div>
-            )}
 
-            {/* Combo - Compact (only when active) */}
-            <AnimatePresence>
-              {isPlaying && comboLevel > 1 && (
-                <motion.div
-                  initial={{ scale: 0, rotate: 5 }}
-                  animate={{ scale: 1, rotate: -2 }}
-                  exit={{ scale: 0, rotate: 10 }}
-                  className="bg-neo-cyan border-2 border-neo-black rounded-neo shadow-hard-sm px-3 py-1.5 text-center"
-                >
-                  <motion.div
-                    key={comboLevel}
-                    initial={{ scale: 1.5 }}
-                    animate={{ scale: 1 }}
-                    className="text-xl font-black text-neo-black leading-tight"
-                  >
-                    x{comboLevel}
-                  </motion.div>
-                  <div className="text-[8px] font-bold uppercase text-neo-black/70">
-                    {t('common.combo') || 'Combo'}
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </div>
+                {/* Combo indicator (inline when active) */}
+                <AnimatePresence>
+                  {comboLevel > 1 && (
+                    <motion.div
+                      initial={{ scale: 0, opacity: 0 }}
+                      animate={{ scale: 1, opacity: 1 }}
+                      exit={{ scale: 0, opacity: 0 }}
+                      className="bg-neo-cyan border-2 border-neo-black rounded-neo px-2 py-0.5 flex items-center gap-1"
+                    >
+                      <span className="text-xs font-black text-neo-black">🔥</span>
+                      <motion.span
+                        key={comboLevel}
+                        initial={{ scale: 1.3 }}
+                        animate={{ scale: 1 }}
+                        className="text-sm font-black text-neo-black"
+                      >
+                        x{comboLevel}
+                      </motion.span>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </motion.div>
+            </div>
+          )}
+
+          {/* Hidden Controls Indicator - Shows when controls are auto-hidden */}
+          <AnimatePresence>
+            {!(controlsVisible || controlsPinned) && (
+              <motion.button
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.8 }}
+                onClick={showControls}
+                className="absolute top-3 right-3 z-40 flex items-center gap-1.5 px-2.5 py-1.5 bg-neo-navy/80 border-2 border-neo-cream/30 rounded-neo shadow-hard-sm backdrop-blur-sm cursor-pointer hover:bg-neo-navy hover:border-neo-cream/50 transition-colors min-h-[44px] min-w-[44px]"
+                aria-label={t('common.showControls') || 'Tap to show controls'}
+              >
+                <motion.span
+                  animate={{ opacity: [0.5, 1, 0.5] }}
+                  transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+                  className="w-2 h-2 rounded-full bg-neo-cyan"
+                />
+                <span className="text-xs font-bold text-neo-cream/80 uppercase tracking-wide">
+                  {t('common.menu') || 'Menu'}
+                </span>
+              </motion.button>
+            )}
+          </AnimatePresence>
 
           {/* Top Controls - Exit + Help (auto-hide in landscape) */}
           <motion.div
@@ -548,7 +563,7 @@ const InGameScreen = memo<InGameScreenProps>(({
                   })}
                 </AnimatePresence>
                 {normalizedFoundWords.length === 0 && (
-                  <p className="text-center text-neo-black/60 py-6 text-sm font-bold">
+                  <p className="text-center text-neo-black/80 py-6 text-sm font-bold">
                     {t('playerView.noWordsYet') || 'No words found yet'}
                   </p>
                 )}
@@ -580,7 +595,7 @@ const InGameScreen = memo<InGameScreenProps>(({
                   >
                     {playerData.score}
                   </motion.div>
-                  <div className="text-[9px] md:text-[10px] font-bold uppercase tracking-wider text-neo-black/70">
+                  <div className="text-[10px] md:text-xs font-bold uppercase tracking-wider text-neo-black">
                     {t('common.score') || 'Score'}
                   </div>
                 </div>
@@ -623,7 +638,7 @@ const InGameScreen = memo<InGameScreenProps>(({
                         >
                           x{comboLevel}
                         </motion.div>
-                        <div className="text-[9px] md:text-[10px] font-bold uppercase tracking-wider text-neo-black/70">
+                        <div className="text-[10px] md:text-xs font-bold uppercase tracking-wider text-neo-black">
                           {t('common.combo') || 'Combo'}
                         </div>
                       </div>

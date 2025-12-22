@@ -101,6 +101,8 @@ const translations = {
       dontShowAgain: "Don't show again",
       landscapeMode: 'Landscape Mode',
       rank: 'Rank',
+      menu: 'Menu',
+      showControls: 'Tap to show controls',
     },
     help: {
       title: 'Quick Help',
@@ -1475,6 +1477,8 @@ const translations = {
       dontShowAgain: 'אל תציג שוב',
       landscapeMode: 'מצב אופקי',
       rank: 'דירוג',
+      menu: 'תפריט',
+      showControls: 'הקש להצגת פקדים',
     },
     help: {
       title: 'עזרה מהירה',
@@ -2843,6 +2847,8 @@ const translations = {
       dontShowAgain: 'Visa inte igen',
       landscapeMode: 'Liggande läge',
       rank: 'Rank',
+      menu: 'Meny',
+      showControls: 'Tryck för att visa kontroller',
     },
     help: {
       title: 'Snabbhjälp',
@@ -4211,6 +4217,8 @@ const translations = {
       dontShowAgain: '今後表示しない',
       landscapeMode: '横向きモード',
       rank: 'ランク',
+      menu: 'メニュー',
+      showControls: 'タップしてコントロールを表示',
     },
     help: {
       title: 'クイックヘルプ',
@@ -5578,6 +5586,8 @@ const translations = {
       dontShowAgain: 'No mostrar de nuevo',
       landscapeMode: 'Modo Horizontal',
       rank: 'Puesto',
+      menu: 'Menú',
+      showControls: 'Toca para mostrar controles',
     },
     help: {
       title: 'Ayuda Rápida',

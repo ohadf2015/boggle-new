@@ -135,6 +135,16 @@ const GridComponent = memo<GridComponentProps>(({
 
   return (
     <div className="relative w-full h-full flex items-center justify-center bg-slate-900">
+      {/* ARIA live region for screen reader announcements of word being formed */}
+      <div
+        className="sr-only"
+        role="status"
+        aria-live="polite"
+        aria-atomic="true"
+      >
+        {interactive && formedWord.length > 0 ? `Current word: ${formedWord}, ${selectedCells.length} letters` : ''}
+      </div>
+
       {/* Word Preview - Fixed at top of screen, doesn't affect grid layout */}
       <AnimatePresence>
         {interactive && selectedCells.length > 0 && (
@@ -144,12 +154,13 @@ const GridComponent = memo<GridComponentProps>(({
             exit={{ opacity: 0, y: -10, scale: 0.95 }}
             transition={{ type: 'spring', stiffness: 400, damping: 25 }}
             className="fixed top-2 left-1/2 -translate-x-1/2 z-50 pointer-events-none"
+            aria-hidden="true"
           >
             <div className="bg-neo-cyan border-3 border-neo-black rounded-neo px-4 py-2 shadow-hard flex items-center gap-2 whitespace-nowrap">
               <span className="font-black text-xl sm:text-2xl text-neo-black uppercase tracking-wide">
                 {formedWord}
               </span>
-              <span className="text-xs font-bold text-neo-black/60 bg-neo-black/10 px-1.5 py-0.5 rounded">
+              <span className="text-xs font-bold text-neo-black bg-neo-black/15 px-1.5 py-0.5 rounded">
                 {selectedCells.length}
               </span>
             </div>
