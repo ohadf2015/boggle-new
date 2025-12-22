@@ -470,7 +470,7 @@ test.describe('Enhanced Comprehensive UI Testing', () => {
         await page.setViewportSize({ width: bp.width, height: bp.height });
         await page.waitForTimeout(500);
 
-        await assertNoHorizontalScroll(page, size.width, `Rules page at ${size.name}`);
+        await assertNoHorizontalScroll(page, bp.width, `Breakpoint ${bp.name}`);
 
         await page.screenshot({
           path: `test-results/breakpoint-${bp.name}-${bp.width}x${bp.height}.png`,

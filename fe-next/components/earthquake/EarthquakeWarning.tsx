@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useLanguage } from '@/contexts/LanguageContext';
 
@@ -16,6 +16,11 @@ interface EarthquakeWarningProps {
  */
 export const EarthquakeWarning: React.FC<EarthquakeWarningProps> = ({ isVisible }) => {
   const { t } = useLanguage();
+
+  // Generate random distances for particle effects (once on mount)
+  const [distances] = useState(() =>
+    Array.from({ length: 8 }, () => 100 + Math.random() * 50)
+  );
 
   // Announce for screen readers when warning appears
   useEffect(() => {
@@ -33,6 +38,7 @@ export const EarthquakeWarning: React.FC<EarthquakeWarningProps> = ({ isVisible 
         document.body.removeChild(announcement);
       };
     }
+    return undefined;
   }, [isVisible, t]);
 
   return (
@@ -124,9 +130,8 @@ export const EarthquakeWarning: React.FC<EarthquakeWarningProps> = ({ isVisible 
           </motion.div>
 
           {/* Particle effects - warning sparkles */}
-          {[...Array(8)].map((_, i) => {
+          {distances.map((distance, i) => {
             const angle = (i * 45) * (Math.PI / 180);
-            const distance = 100 + Math.random() * 50;
             return (
               <motion.div
                 key={i}
