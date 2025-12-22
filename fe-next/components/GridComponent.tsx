@@ -105,20 +105,6 @@ const GridComponent = memo<GridComponentProps>(({
     return hints;
   }, [selectedCells, grid]);
 
-  // Calculate cell positions for flame trail - uses the grid's bounding rect
-  const cellPositions = useMemo(() => {
-    if (!gridRef.current || selectedCells.length < 2) return [];
-
-    const gridRect = gridRef.current.getBoundingClientRect();
-    const cols = grid[0]?.length || 4;
-    const cellWidth = gridRect.width / cols;
-    const cellHeight = gridRect.height / grid.length;
-
-    return selectedCells.map(cell => ({
-      x: (cell.col + 0.5) * cellWidth,
-      y: (cell.row + 0.5) * cellHeight,
-    }));
-  }, [selectedCells, grid, gridRef]);
 
   // Auto-focus on grid when game becomes interactive
   useEffect(() => {
@@ -157,16 +143,16 @@ const GridComponent = memo<GridComponentProps>(({
       {/* First-time combo explanation tooltip */}
       <ComboExplanationTooltip comboLevel={comboLevel} />
 
-      {/* NEO-BRUTALIST: Clean frame wrapper */}
-      <div className="game-board-frame relative">
-        {/* Word Preview - positioned above the board */}
-        <AnimatePresence>
+      {/* Word Preview - fixed position above board, reserves space to prevent layout shift */}
+      <div className="h-12 sm:h-14 flex items-center justify-center mb-2">
+        <AnimatePresence mode="wait">
           {interactive && selectedCells.length > 0 && (
             <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              className="absolute -top-14 sm:-top-16 left-1/2 transform -translate-x-1/2 z-30"
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              transition={{ duration: 0.15 }}
+              className="flex items-center gap-2"
             >
               <div className="bg-neo-cyan border-3 border-neo-black rounded-neo px-4 py-2 shadow-hard flex items-center gap-2 whitespace-nowrap">
                 <span className="font-black text-xl sm:text-2xl text-neo-black uppercase tracking-wide">
@@ -176,135 +162,26 @@ const GridComponent = memo<GridComponentProps>(({
                   {selectedCells.length} letters
                 </span>
               </div>
+              {/* Undo Button - inline with word preview */}
+              <motion.button
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.8 }}
+                onClick={undoLastCell}
+                className="bg-neo-orange border-3 border-neo-black rounded-neo px-3 py-2 shadow-hard hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-hard-lg active:translate-x-[1px] active:translate-y-[1px] active:shadow-hard-pressed transition-all flex items-center gap-1.5"
+                aria-label="Undo last letter (Backspace)"
+                title="Undo last letter (Backspace)"
+              >
+                <Undo2 className="w-4 h-4 sm:w-5 sm:h-5 text-neo-black" />
+                <span className="hidden sm:inline text-sm font-black text-neo-black">Undo</span>
+              </motion.button>
             </motion.div>
           )}
         </AnimatePresence>
+      </div>
 
-        {/* Undo Button - positioned above the board, right side */}
-        <AnimatePresence>
-          {interactive && selectedCells.length > 0 && (
-            <motion.button
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.8 }}
-              onClick={undoLastCell}
-              className="absolute -top-14 sm:-top-16 right-0 z-30 bg-neo-orange border-3 border-neo-black rounded-neo px-3 py-2 shadow-hard hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-hard-lg active:translate-x-[1px] active:translate-y-[1px] active:shadow-hard-pressed transition-all flex items-center gap-1.5"
-              aria-label="Undo last letter (Backspace)"
-              title="Undo last letter (Backspace)"
-            >
-              <Undo2 className="w-4 h-4 sm:w-5 sm:h-5 text-neo-black" />
-              <span className="hidden sm:inline text-sm font-black text-neo-black">Undo</span>
-            </motion.button>
-          )}
-        </AnimatePresence>
-
-        {/* Flame Trail SVG - positioned outside grid to prevent interference */}
-        {interactive && cellPositions.length >= 2 && !reduceMotion && (
-          <svg
-            className="absolute inset-0 pointer-events-none overflow-visible"
-            style={{
-              width: '100%',
-              height: '100%',
-              zIndex: 15,
-              padding: '10px', // Match game-board-frame padding
-              boxSizing: 'border-box',
-            }}
-          >
-            <defs>
-              {/* Flame gradient */}
-              <linearGradient id="flameGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                <stop offset="0%" stopColor="#FFE135" stopOpacity="0.9" />
-                <stop offset="40%" stopColor="#FF6B35" stopOpacity="0.85" />
-                <stop offset="100%" stopColor="#FF3366" stopOpacity="0.8" />
-              </linearGradient>
-              {/* Glow filter */}
-              <filter id="flameGlow" x="-50%" y="-50%" width="200%" height="200%">
-                <feGaussianBlur stdDeviation="3" result="blur" />
-                <feComposite in="SourceGraphic" in2="blur" operator="over" />
-              </filter>
-              {/* Intense glow for combo */}
-              <filter id="flameGlowIntense" x="-50%" y="-50%" width="200%" height="200%">
-                <feGaussianBlur stdDeviation="5" result="blur" />
-                <feComposite in="SourceGraphic" in2="blur" operator="over" />
-              </filter>
-            </defs>
-
-            {/* Outer glow layer */}
-            {cellPositions.map((pos, idx) => {
-              if (idx === 0) return null;
-              const prev = cellPositions[idx - 1];
-              if (!prev) return null;
-              return (
-                <motion.line
-                  key={`glow-${idx}`}
-                  x1={prev.x}
-                  y1={prev.y}
-                  x2={pos.x}
-                  y2={pos.y}
-                  stroke={comboLevel >= 5 ? '#FF3366' : '#FF6B35'}
-                  strokeWidth={comboLevel >= 5 ? 12 : 8}
-                  strokeLinecap="round"
-                  strokeOpacity={0.4}
-                  filter={comboLevel >= 3 ? 'url(#flameGlowIntense)' : 'url(#flameGlow)'}
-                  initial={{ pathLength: 0, opacity: 0 }}
-                  animate={{ pathLength: 1, opacity: [0.3, 0.5, 0.3] }}
-                  transition={{
-                    pathLength: { duration: 0.15 },
-                    opacity: { duration: 0.4, repeat: Infinity, ease: 'easeInOut' }
-                  }}
-                />
-              );
-            })}
-
-            {/* Main flame line */}
-            {cellPositions.map((pos, idx) => {
-              if (idx === 0) return null;
-              const prev = cellPositions[idx - 1];
-              if (!prev) return null;
-              return (
-                <motion.line
-                  key={`flame-${idx}`}
-                  x1={prev.x}
-                  y1={prev.y}
-                  x2={pos.x}
-                  y2={pos.y}
-                  stroke="url(#flameGradient)"
-                  strokeWidth={comboLevel >= 5 ? 6 : 4}
-                  strokeLinecap="round"
-                  initial={{ pathLength: 0, opacity: 0 }}
-                  animate={{ pathLength: 1, opacity: 0.9 }}
-                  transition={{ duration: 0.12 }}
-                />
-              );
-            })}
-
-            {/* Inner bright core */}
-            {cellPositions.map((pos, idx) => {
-              if (idx === 0) return null;
-              const prev = cellPositions[idx - 1];
-              if (!prev) return null;
-              return (
-                <motion.line
-                  key={`core-${idx}`}
-                  x1={prev.x}
-                  y1={prev.y}
-                  x2={pos.x}
-                  y2={pos.y}
-                  stroke="#FFFBE6"
-                  strokeWidth={comboLevel >= 5 ? 2 : 1.5}
-                  strokeLinecap="round"
-                  strokeOpacity={0.9}
-                  initial={{ pathLength: 0, opacity: 0 }}
-                  animate={{ pathLength: 1, opacity: [0.7, 1, 0.7] }}
-                  transition={{
-                    pathLength: { duration: 0.1 },
-                    opacity: { duration: 0.3, repeat: Infinity, ease: 'easeInOut' }
-                  }}
-                />
-              );
-            })}
-          </svg>
-        )}
+      {/* NEO-BRUTALIST: Clean frame wrapper */}
+      <div className="game-board-frame relative">
 
         {/* Inner grid container */}
         <div

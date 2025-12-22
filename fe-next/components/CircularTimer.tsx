@@ -9,22 +9,31 @@ import { useReducedMotion } from '../utils/accessibility';
 interface CircularTimerProps {
   remainingTime: number;
   totalTime?: number;
+  /** Size variant: 'sm' for compact landscape mode, 'md' (default) for normal */
+  size?: 'sm' | 'md';
 }
+
+// Size configurations
+const SIZES = {
+  sm: { svgSize: 70, radius: 26, strokeWidth: 6, textSize: 'text-lg', frameClasses: 'p-1.5 border-2', badgeClasses: 'hidden' },
+  md: { svgSize: 120, radius: 45, strokeWidth: 10, textSize: 'text-3xl', frameClasses: 'p-3 border-4', badgeClasses: '' },
+};
 
 /**
  * CircularTimer - Neo-Brutalist styled countdown timer
  * Memoized to prevent unnecessary re-renders when parent updates
  * Respects prefers-reduced-motion for accessibility
  */
-const CircularTimer = memo<CircularTimerProps>(({ remainingTime, totalTime = 180 }) => {
+const CircularTimer = memo<CircularTimerProps>(({ remainingTime, totalTime = 180, size = 'md' }) => {
   const { t } = useLanguage();
   const reduceMotion = useReducedMotion();
+  const config = SIZES[size];
 
   // Calculate the progress percentage
   const progress = totalTime > 0 ? (remainingTime / totalTime) * 100 : 0;
 
   // Calculate the stroke dash offset for the circular progress
-  const radius = 45;
+  const radius = config.radius;
   const circumference = 2 * Math.PI * radius;
   const strokeDashoffset = circumference - (progress / 100) * circumference;
 
@@ -39,6 +48,8 @@ const CircularTimer = memo<CircularTimerProps>(({ remainingTime, totalTime = 180
   // Determine color based on remaining time (20 seconds to match music transition)
   const isLowTime = remainingTime <= 20;
 
+  const svgCenter = config.svgSize / 2;
+
   return (
     <motion.div
       initial={reduceMotion ? { opacity: 1 } : { scale: 0, opacity: 0, rotate: -10 }}
@@ -48,48 +59,49 @@ const CircularTimer = memo<CircularTimerProps>(({ remainingTime, totalTime = 180
     >
       {/* Neo-Brutalist frame */}
       <div
-        className="
-          relative p-3
+        className={`
+          relative
           bg-neo-cream
-          border-4 border-neo-black
+          border-neo-black
           rounded-neo-lg
-          shadow-hard-lg
-        "
-        style={{ transform: 'rotate(-2deg)' }}
+          ${size === 'sm' ? 'shadow-hard-sm' : 'shadow-hard-lg'}
+          ${config.frameClasses}
+        `}
+        style={{ transform: size === 'sm' ? 'rotate(-1deg)' : 'rotate(-2deg)' }}
       >
-        <div className="relative" style={{ transform: 'rotate(2deg)' }}>
-          <svg width="120" height="120" className="transform -rotate-90">
+        <div className="relative" style={{ transform: size === 'sm' ? 'rotate(1deg)' : 'rotate(2deg)' }}>
+          <svg width={config.svgSize} height={config.svgSize} className="transform -rotate-90">
             {/* Neo-Brutalist: Solid colors instead of gradients */}
 
             {/* Background circle - thick black stroke */}
             <circle
-              cx="60"
-              cy="60"
+              cx={svgCenter}
+              cy={svgCenter}
               r={radius}
               stroke="var(--neo-black)"
-              strokeWidth="4"
+              strokeWidth={size === 'sm' ? 2 : 4}
               fill="none"
               opacity="0.2"
             />
 
             {/* Inner background circle */}
             <circle
-              cx="60"
-              cy="60"
-              r={radius - 6}
+              cx={svgCenter}
+              cy={svgCenter}
+              r={radius - (size === 'sm' ? 3 : 6)}
               stroke="var(--neo-black)"
-              strokeWidth="12"
+              strokeWidth={size === 'sm' ? 6 : 12}
               fill="none"
               opacity="0.1"
             />
 
             {/* Progress circle - solid Neo-Brutalist colors */}
             <motion.circle
-              cx="60"
-              cy="60"
+              cx={svgCenter}
+              cy={svgCenter}
               r={radius}
               stroke={isLowTime ? 'var(--neo-red)' : 'var(--neo-cyan)'}
-              strokeWidth="10"
+              strokeWidth={config.strokeWidth}
               fill="none"
               strokeLinecap="square"
               strokeDasharray={circumference}
@@ -101,11 +113,11 @@ const CircularTimer = memo<CircularTimerProps>(({ remainingTime, totalTime = 180
 
             {/* Outer ring */}
             <circle
-              cx="60"
-              cy="60"
-              r={radius + 4}
+              cx={svgCenter}
+              cy={svgCenter}
+              r={radius + (size === 'sm' ? 2 : 4)}
               stroke="var(--neo-black)"
-              strokeWidth="3"
+              strokeWidth={size === 'sm' ? 2 : 3}
               fill="none"
             />
           </svg>
@@ -115,11 +127,11 @@ const CircularTimer = memo<CircularTimerProps>(({ remainingTime, totalTime = 180
             <motion.div
               animate={isLowTime && !reduceMotion ? { scale: [1, 1.1, 1] } : {}}
               transition={{ duration: 0.5, repeat: isLowTime && !reduceMotion ? Infinity : 0 }}
-              className="text-3xl font-black text-neo-black"
+              className={`${config.textSize} font-black text-neo-black`}
               style={{
                 textShadow: isLowTime
-                  ? '2px 2px 0px var(--neo-red)'
-                  : '2px 2px 0px var(--neo-cyan)',
+                  ? `${size === 'sm' ? '1px 1px' : '2px 2px'} 0px var(--neo-red)`
+                  : `${size === 'sm' ? '1px 1px' : '2px 2px'} 0px var(--neo-cyan)`,
               }}
             >
               {formatTime(remainingTime)}
@@ -127,13 +139,13 @@ const CircularTimer = memo<CircularTimerProps>(({ remainingTime, totalTime = 180
           </div>
         </div>
 
-        {/* Low time warning badge */}
+        {/* Low time warning badge - hidden on small size */}
         {isLowTime && (
           <motion.div
             initial={reduceMotion ? { opacity: 1 } : { scale: 0, rotate: -20 }}
             animate={{ scale: 1, rotate: reduceMotion ? 0 : 12, opacity: 1 }}
             transition={reduceMotion ? { duration: 0 } : undefined}
-            className="
+            className={`
               absolute -top-2 -right-2 z-10
               px-2 py-1
               bg-neo-red text-neo-cream
@@ -142,7 +154,8 @@ const CircularTimer = memo<CircularTimerProps>(({ remainingTime, totalTime = 180
               rounded-neo
               shadow-hard-sm
               whitespace-nowrap
-            "
+              ${config.badgeClasses}
+            `}
           >
             {t('common.hurry')}
           </motion.div>
