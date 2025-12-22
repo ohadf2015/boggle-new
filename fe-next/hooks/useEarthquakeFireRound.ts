@@ -40,6 +40,8 @@ export function useEarthquakeFireRound(
     onEarthquakeShake,
     onFireRoundStart,
     onFireRoundEnd,
+    onTimerPause,
+    onTimerResume,
     socket,
     isHost = false,
     gameSessionId,
@@ -149,9 +151,11 @@ export function useEarthquakeFireRound(
     // Phase 1: WARNING (2 seconds)
     setEarthquakeState('warning');
     onEarthquakeStart?.();
+    onTimerPause?.(); // Pause game timer during warning
 
     warningTimeoutRef.current = setTimeout(() => {
       console.log('[Earthquake] SHAKE phase');
+      onTimerResume?.(); // Resume game timer when shake starts
 
       // Phase 2: SHAKING (1 second)
       setEarthquakeState('shaking');
@@ -196,6 +200,8 @@ export function useEarthquakeFireRound(
     onEarthquakeShake,
     onFireRoundStart,
     onFireRoundEnd,
+    onTimerPause,
+    onTimerResume,
   ]);
 
   // Monitor time remaining and trigger earthquake at the right moment

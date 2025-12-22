@@ -62,6 +62,8 @@ export interface UseEarthquakeFireRoundOptions {
   onEarthquakeShake?: () => void;
   onFireRoundStart?: () => void;
   onFireRoundEnd?: () => void;
+  onTimerPause?: () => void;
+  onTimerResume?: () => void;
 
   // Multiplayer-specific
   socket?: Socket | null;

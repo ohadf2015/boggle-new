@@ -15,6 +15,7 @@ interface UseGridInteractionProps {
   onWordSubmit?: (word: string) => void;
   externalSelectedCells?: SelectedCell[];
   gridRef: React.RefObject<HTMLDivElement | null>;
+  fireRoundActive?: boolean;
 }
 
 interface UseGridInteractionReturn {
@@ -43,6 +44,7 @@ export function useGridInteraction({
   onWordSubmit,
   externalSelectedCells,
   gridRef,
+  fireRoundActive = false,
 }: UseGridInteractionProps): UseGridInteractionReturn {
   const [internalSelectedCells, setInternalSelectedCells] = useState<SelectedCell[]>([]);
   const [fadingCells, setFadingCells] = useState<GridPosition[]>([]);
@@ -61,11 +63,11 @@ export function useGridInteraction({
   const setSelectedCells = externalSelectedCells ? noOp : setInternalSelectedCells;
 
   // Check if two cells are adjacent (8 directions including diagonals)
-  const isAdjacentCell = (cell1: GridPosition, cell2: GridPosition): boolean => {
+  const isAdjacentCell = useCallback((cell1: GridPosition, cell2: GridPosition): boolean => {
     const rowDiff = Math.abs(cell1.row - cell2.row);
     const colDiff = Math.abs(cell1.col - cell2.col);
     return rowDiff <= 1 && colDiff <= 1 && (rowDiff > 0 || colDiff > 0);
-  };
+  }, []);
 
   // Get cell at touch position with cell center distance info
   const getCellAtPosition = useCallback((touchX: number, touchY: number): CellPosition | null => {
@@ -233,9 +235,9 @@ export function useGridInteraction({
     // Initialize selection
     setSelectedCells([{ row: rowIndex, col: colIndex, letter }]);
 
-    // Haptic feedback
+    // Haptic feedback - reduced intensity when not in fire round
     if (window.navigator && window.navigator.vibrate) {
-      window.navigator.vibrate(30);
+      window.navigator.vibrate(fireRoundActive ? 30 : 10);
     }
   };
 
@@ -284,7 +286,7 @@ export function useGridInteraction({
       const newSelection = selectedCells.slice(0, existingIndex + 1);
       if (newSelection.length !== selectedCells.length) {
         setSelectedCells(newSelection);
-        if (window.navigator?.vibrate) window.navigator.vibrate(15);
+        if (window.navigator?.vibrate) window.navigator.vibrate(fireRoundActive ? 15 : 5);
       }
       return;
     }
@@ -294,7 +296,9 @@ export function useGridInteraction({
       const newSelection = [...selectedCells, { row: currentCell.row, col: currentCell.col, letter: currentCell.letter }];
       setSelectedCells(newSelection);
       if (window.navigator?.vibrate) {
-        const intensity = Math.min(20 + newSelection.length * 3 + comboLevel * 5, 60);
+        const intensity = fireRoundActive
+          ? Math.min(20 + newSelection.length * 3 + comboLevel * 5, 60)
+          : Math.min(10 + newSelection.length * 1, 20);
         window.navigator.vibrate(intensity);
       }
     }
@@ -321,20 +325,40 @@ export function useGridInteraction({
       // Haptic feedback based on word length and combo
       if (window.navigator && window.navigator.vibrate) {
         const wordLength = selectedCells.length;
-        if (comboLevel > 0) {
-          if (comboLevel >= 7) {
-            window.navigator.vibrate([100, 50, 100, 50, 100, 50, 150]);
-          } else if (comboLevel >= 5) {
-            window.navigator.vibrate([80, 40, 80, 40, 120]);
-          } else if (comboLevel >= 3) {
-            window.navigator.vibrate([60, 40, 60, 40, 100]);
-          } else if (comboLevel >= 1) {
-            window.navigator.vibrate([50, 30, 50, 30, 80]);
+        if (fireRoundActive) {
+          // Full intensity haptics during fire round
+          if (comboLevel > 0) {
+            if (comboLevel >= 7) {
+              window.navigator.vibrate([100, 50, 100, 50, 100, 50, 150]);
+            } else if (comboLevel >= 5) {
+              window.navigator.vibrate([80, 40, 80, 40, 120]);
+            } else if (comboLevel >= 3) {
+              window.navigator.vibrate([60, 40, 60, 40, 100]);
+            } else if (comboLevel >= 1) {
+              window.navigator.vibrate([50, 30, 50, 30, 80]);
+            }
+          } else if (wordLength >= 6) {
+            window.navigator.vibrate([40, 30, 60]);
+          } else if (wordLength >= 3) {
+            window.navigator.vibrate(50);
           }
-        } else if (wordLength >= 6) {
-          window.navigator.vibrate([40, 30, 60]);
-        } else if (wordLength >= 3) {
-          window.navigator.vibrate(50);
+        } else {
+          // Reduced haptics when not in fire round
+          if (comboLevel > 0) {
+            if (comboLevel >= 7) {
+              window.navigator.vibrate([30, 20, 30]);
+            } else if (comboLevel >= 5) {
+              window.navigator.vibrate([25, 15, 25]);
+            } else if (comboLevel >= 3) {
+              window.navigator.vibrate([20, 10, 20]);
+            } else if (comboLevel >= 1) {
+              window.navigator.vibrate([15, 10, 15]);
+            }
+          } else if (wordLength >= 6) {
+            window.navigator.vibrate(20);
+          } else if (wordLength >= 3) {
+            window.navigator.vibrate(15);
+          }
         }
       }
 
@@ -430,7 +454,7 @@ export function useGridInteraction({
           }
           // Haptic feedback
           if (window.navigator?.vibrate) {
-            window.navigator.vibrate(50);
+            window.navigator.vibrate(fireRoundActive ? 50 : 15);
           }
           if (comboLevel > 0) {
             startSequentialFadeOut(true);
@@ -448,7 +472,7 @@ export function useGridInteraction({
         if (existingIndex !== -1) {
           // Deselect: remove this cell and all after it (backtracking)
           setSelectedCells(selectedCells.slice(0, existingIndex));
-          if (window.navigator?.vibrate) window.navigator.vibrate(15);
+          if (window.navigator?.vibrate) window.navigator.vibrate(fireRoundActive ? 15 : 5);
         } else {
           // Select: check if adjacent to last selected cell (or first cell)
           const lastCell = selectedCells[selectedCells.length - 1];
@@ -459,7 +483,7 @@ export function useGridInteraction({
           if (isAdjacent) {
             setSelectedCells([...selectedCells, { row: focusedCell.row, col: focusedCell.col, letter }]);
             if (window.navigator?.vibrate) {
-              window.navigator.vibrate(30);
+              window.navigator.vibrate(fireRoundActive ? 30 : 10);
             }
           }
         }
@@ -477,7 +501,7 @@ export function useGridInteraction({
         // Remove last selected cell
         if (selectedCells.length > 0) {
           setSelectedCells(selectedCells.slice(0, -1));
-          if (window.navigator?.vibrate) window.navigator.vibrate(15);
+          if (window.navigator?.vibrate) window.navigator.vibrate(fireRoundActive ? 15 : 5);
         }
         e.preventDefault();
         return;
@@ -492,7 +516,7 @@ export function useGridInteraction({
       // Haptic feedback for navigation
       if (window.navigator?.vibrate) window.navigator.vibrate(10);
     }
-  }, [interactive, grid, focusedCell, selectedCells, comboLevel, onWordSubmit, startSequentialFadeOut, setSelectedCells, isAdjacentCell]);
+  }, [interactive, grid, focusedCell, selectedCells, comboLevel, onWordSubmit, startSequentialFadeOut, setSelectedCells, isAdjacentCell, fireRoundActive]);
 
   // Reset keyboard mode on touch/mouse interaction
   useEffect(() => {
@@ -508,10 +532,10 @@ export function useGridInteraction({
     if (selectedCells.length > 0) {
       setSelectedCells(selectedCells.slice(0, -1));
       if (window.navigator?.vibrate) {
-        window.navigator.vibrate(15);
+        window.navigator.vibrate(fireRoundActive ? 15 : 5);
       }
     }
-  }, [selectedCells, setSelectedCells]);
+  }, [selectedCells, setSelectedCells, fireRoundActive]);
 
   return {
     selectedCells,

@@ -86,6 +86,7 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
   const validWordCountRef = useRef(0); // Track valid words for combo
   const gameStartTimeRef = useRef<number>(Date.now()); // Track when game started for pace analysis
   const maxComboRef = useRef(0); // Track max combo achieved for final achievements
+  const isEarthquakePausedRef = useRef(false); // Track earthquake timer pause
 
   // Abuse detection: track submission timestamps (like multiplayer's spamDetector)
   const submissionTimestampsRef = useRef<number[]>([]);
@@ -126,6 +127,20 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
     };
   }, [stopMusic]);
 
+  // Earthquake timer pause handlers
+  const handleEarthquakeTimerPause = useCallback(() => {
+    isEarthquakePausedRef.current = true;
+    if (timerRef.current) {
+      clearInterval(timerRef.current);
+      timerRef.current = null;
+    }
+  }, []);
+
+  const handleEarthquakeTimerResume = useCallback(() => {
+    isEarthquakePausedRef.current = false;
+    // Timer will automatically restart in the next tick via useEffect
+  }, []);
+
   // Earthquake/Fire Round feature
   const {
     earthquakeState,
@@ -145,17 +160,19 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
       foundWordsSetRef.current.clear();
     },
     onEarthquakeStart: () => {
-      // Play earthquake rumble sound and haptic feedback
+      // Play earthquake rumble sound with enhanced haptic feedback
       playEarthquakeRumble();
       if (typeof window !== 'undefined' && 'vibrate' in navigator) {
-        navigator.vibrate([100, 50, 100]); // Light vibration pattern
+        // More dramatic vibration pattern for warning
+        navigator.vibrate([150, 100, 150, 100, 200]);
       }
     },
     onEarthquakeShake: () => {
-      // Play earthquake shake sound and heavy haptic
+      // Play earthquake shake sound with brutal haptic
       playEarthquakeShake();
       if (typeof window !== 'undefined' && 'vibrate' in navigator) {
-        navigator.vibrate([200, 100, 200, 100, 200]); // Heavy shake pattern
+        // Brutal shake pattern - longer and more intense
+        navigator.vibrate([300, 150, 300, 150, 400, 150, 300]);
       }
     },
     onFireRoundStart: () => {
@@ -170,6 +187,8 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
       // Stop fire round ambient sound
       stopFireCrackleLoop();
     },
+    onTimerPause: handleEarthquakeTimerPause,
+    onTimerResume: handleEarthquakeTimerResume,
   });
 
   // Generate grid on mount
@@ -316,10 +335,10 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
     finalizeAndEndGame();
   }, [isGameOver, settings.bots, settings.language, onGameEnd]);
 
-  // Timer effect
+  // Timer effect - handles both manual pause and earthquake pause
   useEffect(() => {
     if (settings.mode === 'practice') return;
-    if (isPaused || remainingTime <= 0 || isGameOver) return;
+    if (isPaused || remainingTime <= 0 || isGameOver || isEarthquakePausedRef.current) return;
 
     timerRef.current = setInterval(() => {
       setRemainingTime(prev => {
@@ -336,7 +355,7 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
     return () => {
       if (timerRef.current) clearInterval(timerRef.current);
     };
-  }, [isPaused, settings.mode, isGameOver]);
+  }, [isPaused, settings.mode, isGameOver, remainingTime]);
 
   // Bot simulation effect
   useEffect(() => {

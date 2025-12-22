@@ -75,6 +75,7 @@ const GridComponent = memo<GridComponentProps>(({
     onWordSubmit,
     externalSelectedCells,
     gridRef,
+    fireRoundActive,
   });
 
   // Calculate the word being formed from selected cells
@@ -107,20 +108,33 @@ const GridComponent = memo<GridComponentProps>(({
     return hints;
   }, [selectedCells, grid]);
 
-  // Fire Round: Random glowing cells
+  // Fire Round: Random glowing cells with rainbow cycling
   const [glowingCells, setGlowingCells] = useState<Set<string>>(new Set());
+  const [cellColorIndices, setCellColorIndices] = useState<Map<string, number>>(new Map());
+
+  // Rainbow colors for dance floor effect
+  const RAINBOW_COLORS = [
+    '#FF1493', // Deep Pink
+    '#FF6B35', // Orange
+    '#FFD700', // Gold
+    '#00FF00', // Lime
+    '#00FFFF', // Cyan
+    '#8B5CF6', // Purple
+    '#FF3366', // Hot Pink
+  ];
 
   // Randomize glowing cells when fire round is active (optimized for performance)
   useEffect(() => {
     if (!fireRoundActive) {
       setGlowingCells(new Set());
+      setCellColorIndices(new Map());
       return;
     }
 
     let animationFrameId: number;
     let lastUpdate = 0;
-    const updateInterval = 3000; // Reduced frequency: every 3 seconds
-    const MAX_GLOW_CELLS = 6; // Maximum 6 cells glowing at once
+    const updateInterval = 300; // Very fast: 300ms for dance floor effect
+    const MAX_GLOW_CELLS = 8; // More cells for better dance floor coverage
 
     // Check if a cell is adjacent to any already-selected cells
     const isAdjacentToSelected = (row: number, col: number, selected: Set<string>): boolean => {
@@ -139,11 +153,12 @@ const GridComponent = memo<GridComponentProps>(({
       return neighbors.some(neighbor => selected.has(neighbor));
     };
 
-    // Select up to 6 cells that are NOT adjacent to each other (disco-style distribution)
+    // Select up to 8 cells that are NOT adjacent to each other (disco-style distribution)
     const randomizeGlow = () => {
       const rows = grid.length;
       const cols = grid[0]?.length || 0;
       const selected = new Set<string>();
+      const colorMap = new Map<string, number>();
 
       // Create array of all possible positions
       const allPositions: Array<{ row: number; col: number }> = [];
@@ -161,11 +176,15 @@ const GridComponent = memo<GridComponentProps>(({
         if (selected.size >= MAX_GLOW_CELLS) break;
 
         if (!isAdjacentToSelected(pos.row, pos.col, selected)) {
-          selected.add(`${pos.row}-${pos.col}`);
+          const cellKey = `${pos.row}-${pos.col}`;
+          selected.add(cellKey);
+          // Assign random rainbow color index to each cell
+          colorMap.set(cellKey, Math.floor(Math.random() * RAINBOW_COLORS.length));
         }
       }
 
       setGlowingCells(selected);
+      setCellColorIndices(colorMap);
     };
 
     // Initial randomization
@@ -291,14 +310,25 @@ const GridComponent = memo<GridComponentProps>(({
         >
           {grid.map((row, i) =>
             row.map((cell, j) => {
+              const cellKey = `${i}-${j}`;
               const isSelected = selectedCells.some(c => c.row === i && c.col === j);
               const firstSelected = selectedCells[0];
               const isFirstSelected = firstSelected !== undefined && firstSelected.row === i && firstSelected.col === j;
               const isFading = fadingCells.some(c => c.row === i && c.col === j);
               const isFocused = focusedCell?.row === i && focusedCell?.col === j;
               const heatStyle = getHeatMapStyle(i, j, heatMapData);
-              const isAdjacentHint = adjacentHintCells.has(`${i}-${j}`);
-              const isGlowing = glowingCells.has(`${i}-${j}`);
+              const isAdjacentHint = adjacentHintCells.has(cellKey);
+              const isGlowing = glowingCells.has(cellKey);
+              const glowColorIndex = cellColorIndices.get(cellKey) ?? 0;
+              const glowColor = RAINBOW_COLORS[glowColorIndex];
+
+              // Individual shake physics for each letter during earthquake
+              const shakeOffset = earthquakeShaking ? {
+                x: (Math.random() - 0.5) * 150,
+                y: (Math.random() - 0.5) * 150,
+                rotate: (Math.random() - 0.5) * 360,
+                scale: 0.8 + Math.random() * 0.4,
+              } : { x: 0, y: 0, rotate: 0, scale: 1 };
 
               return (
                 <motion.div
@@ -316,15 +346,30 @@ const GridComponent = memo<GridComponentProps>(({
                     ? { scale: 0, opacity: 0, rotateX: -90, y: -20 }
                     : false
                   }
-                  animate={{
+                  animate={earthquakeShaking ? {
+                    // Brutal shake: letters fly in random directions
+                    x: shakeOffset.x,
+                    y: shakeOffset.y,
+                    rotate: shakeOffset.rotate,
+                    scale: shakeOffset.scale,
+                    opacity: 0.7,
+                  } : {
                     scale: isSelected ? 1.05 : (isFading ? 1.02 : 1),
                     opacity: 1,
                     rotate: reduceMotion ? 0 : (isSelected ? [0, -1.5, 1.5, 0] : 0),
                     rotateX: 0,
                     y: isSelected ? -2 : 0,
+                    x: 0,
                   }}
                   whileTap={{ scale: 0.95 }}
-                  transition={{
+                  transition={earthquakeShaking ? {
+                    // Chaotic flying motion during shake
+                    type: 'spring',
+                    stiffness: 50,
+                    damping: 8,
+                    mass: 0.5,
+                  } : {
+                    // Elastic snap-back after shake or normal animation
                     duration: reduceMotion
                       ? 0.08
                       : (animateOnMount && !isSelected
@@ -332,6 +377,9 @@ const GridComponent = memo<GridComponentProps>(({
                         : (isSelected ? 0.15 : 0.12)),
                     ease: "easeInOut",
                     delay: reduceMotion ? 0 : (animateOnMount ? (i + j) * 0.03 : 0),
+                    type: 'spring',
+                    stiffness: 200,
+                    damping: 15,
                   }}
                   className={cn(
                     "aspect-square flex items-center justify-center font-black cursor-pointer relative overflow-hidden",
@@ -345,14 +393,20 @@ const GridComponent = memo<GridComponentProps>(({
                     isAdjacentHint && !isSelected && "ring-2 ring-neo-yellow/70 ring-offset-1 ring-offset-neo-cream",
                     // Keyboard focus indicator
                     isFocused && !isSelected && "ring-4 ring-neo-cyan ring-offset-2 ring-offset-neo-cream z-20",
-                    // Fire round glow - random cells glow during fire round
-                    isGlowing && fireRoundActive && !isSelected && "fire-glow",
+                    // Transition controls (no longer using fire-glow CSS class)
                     "transition-all",
                     comboLevel > 0 ? "duration-300" : "duration-100"
                   )}
                   style={{
                     borderRadius: '6px',
                     fontSize: 'var(--cell-font-size)',
+                    // Rainbow dance floor effect during fire round (no solid fill)
+                    ...(isGlowing && fireRoundActive && !isSelected && {
+                      background: glowColor,
+                      boxShadow: `0 0 20px ${glowColor}, 0 0 40px ${glowColor}80, 4px 4px 0 #000`,
+                      animation: 'rainbow-pulse 0.6s ease-in-out infinite',
+                      willChange: 'transform, box-shadow',
+                    }),
                     // Dynamic glow based on combo level
                     ...(isSelected && {
                       boxShadow: comboColors.isRainbow

@@ -167,7 +167,9 @@ const InGameScreen = memo<InGameScreenProps>(({
 
     const handleInteraction = (e: Event) => {
       // Don't show controls if interacting with the grid/board or side stat panels
-      const target = e.target as HTMLElement;
+      const target = e.target;
+      if (!(target instanceof Element)) return;
+
       if (target.closest('.landscape-grid-container') ||
           target.closest('.game-board-frame-landscape') ||
           target.closest('.landscape-side-panel')) {
