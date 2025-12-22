@@ -1,0 +1,101 @@
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - link "Skip to main content" [ref=e2] [cursor=pointer]:
+    - /url: "#main-content"
+  - main [ref=e3]:
+    - generic [ref=e4]:
+      - generic [ref=e6]:
+        - button "Go to Home" [ref=e7] [cursor=pointer]:
+          - heading "Lexi ⚡ Clash" [level=1] [ref=e8]:
+            - generic [ref=e9]: Lexi
+            - generic [ref=e10]: ⚡
+            - generic [ref=e11]: Clash
+        - generic [ref=e12]:
+          - button "Change Language" [ref=e14] [cursor=pointer]:
+            - generic [ref=e15]: 🇺🇸
+          - group "Music Controls" [ref=e16]:
+            - button "Mute" [pressed] [ref=e17] [cursor=pointer]:
+              - img
+          - generic [ref=e18]:
+            - button [ref=e19] [cursor=pointer]:
+              - img
+            - button [ref=e21] [cursor=pointer]:
+              - img
+              - img
+      - generic [ref=e25]:
+        - generic [ref=e26]:
+          - img [ref=e30]
+          - generic [ref=e32]: "7"
+        - generic:
+          - img
+          - generic: "2"
+      - main [ref=e34]:
+        - generic [ref=e35]:
+          - heading "Choose Your Mode" [level=1] [ref=e36]
+          - paragraph [ref=e37]: Play solo to practice and beat your high scores, or compete with friends in real-time multiplayer!
+        - generic [ref=e38]:
+          - link "Single Player Practice at your own pace or challenge yourself! Solo vs Bots Practice Mode Challenges & High Scores" [ref=e39] [cursor=pointer]:
+            - /url: /en/singleplayer
+            - generic [ref=e40]:
+              - generic [ref=e41]:
+                - img [ref=e44]
+                - img [ref=e47]
+              - heading "Single Player" [level=2] [ref=e49]
+              - paragraph [ref=e50]: Practice at your own pace or challenge yourself!
+              - generic [ref=e51]:
+                - generic [ref=e52]:
+                  - img [ref=e54]
+                  - generic: Solo vs Bots
+                - generic [ref=e56]:
+                  - img [ref=e58]
+                  - generic: Practice Mode
+                - generic [ref=e60]:
+                  - img [ref=e62]
+                  - generic: Challenges & High Scores
+          - link "Multiplayer Compete with friends in real-time! Join Rooms Host Games Tournaments" [ref=e65] [cursor=pointer]:
+            - /url: /en/multiplayer
+            - generic [ref=e66]:
+              - generic [ref=e67]:
+                - img [ref=e70]
+                - img [ref=e73]
+              - heading "Multiplayer" [level=2] [ref=e75]
+              - paragraph [ref=e76]: Compete with friends in real-time!
+              - generic [ref=e77]:
+                - generic [ref=e78]:
+                  - img [ref=e80]
+                  - generic: Join Rooms
+                - generic [ref=e82]:
+                  - img [ref=e84]
+                  - generic: Host Games
+                - generic [ref=e86]:
+                  - img [ref=e88]
+                  - generic: Tournaments
+        - link "How to play?" [ref=e92] [cursor=pointer]:
+          - /url: /en/rules
+          - img [ref=e93]
+          - text: How to play?
+        - paragraph [ref=e95]: New to the game? Start with Single Player to learn the ropes!
+  - contentinfo [ref=e96]:
+    - generic [ref=e98]:
+      - paragraph [ref=e99]: © 2025 LexiClash Ltd. All rights reserved.
+      - navigation "Footer navigation" [ref=e100]:
+        - link "How to Play" [ref=e101] [cursor=pointer]:
+          - /url: /en/rules
+        - link "Leaderboard" [ref=e102] [cursor=pointer]:
+          - /url: /en/leaderboard
+        - link "Terms of Service" [ref=e103] [cursor=pointer]:
+          - /url: /en/legal/terms
+        - link "Privacy Policy" [ref=e104] [cursor=pointer]:
+          - /url: /en/legal/privacy
+        - link "Buy Us a Coffee" [ref=e105] [cursor=pointer]:
+          - /url: https://ko-fi.com/lexiclash
+          - img [ref=e106]
+          - generic [ref=e108]: Buy Us a Coffee
+  - status [ref=e109]
+  - alert [ref=e110]
+  - button "Open Next.js Dev Tools" [ref=e116] [cursor=pointer]:
+    - img [ref=e117]
+  - alert [ref=e120]
+```

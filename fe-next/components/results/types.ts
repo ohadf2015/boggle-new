@@ -11,6 +11,8 @@ export interface WordObject {
   potentialScore?: number;
   invalidReason?: string;
   aiReason?: string;
+  timestamp?: number;
+  timeSinceStart?: number;
 }
 
 export interface Title {

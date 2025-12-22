@@ -30,15 +30,20 @@ const LandingView: React.FC = () => {
   // Landscape mode - compact horizontal layout
   if (isLandscape) {
     return (
-      <div className="flex h-screen w-full items-center justify-center bg-slate-900 p-4 gap-4">
+      <main
+        className="flex h-screen w-full items-center justify-center bg-slate-900 p-4 gap-4"
+        role="main"
+        aria-label="Game mode selection"
+      >
         {/* Single Player */}
         <Link
           href={`/${language}/singleplayer`}
           className="flex-1 flex flex-col items-center justify-center gap-2 p-4 bg-gradient-to-br from-neo-cyan to-cyan-400 border-3 border-neo-black rounded-neo shadow-hard hover:shadow-hard-lg hover:translate-x-[-2px] hover:translate-y-[-2px] transition-all h-full max-h-[80vh]"
+          aria-label={`${t('landing.singlePlayer') || 'Single Player'} - ${t('landing.singlePlayerDesc') || 'Practice at your own pace'}`}
         >
-          <FaUser className="text-4xl text-neo-black" />
+          <FaUser className="text-4xl text-neo-black" aria-hidden="true" />
           <span className="text-lg font-black uppercase text-neo-black">{t('landing.singlePlayer') || 'Single Player'}</span>
-          <div className="flex gap-2 text-xs">
+          <div className="flex gap-2 text-xs" aria-hidden="true">
             <span className="bg-neo-black/20 px-2 py-1 rounded-neo font-bold"><FaRobot className="inline mr-1" />Bots</span>
             <span className="bg-neo-black/20 px-2 py-1 rounded-neo font-bold"><FaTrophy className="inline mr-1" />Challenges</span>
           </div>
@@ -48,10 +53,11 @@ const LandingView: React.FC = () => {
         <Link
           href={`/${language}/multiplayer`}
           className="flex-1 flex flex-col items-center justify-center gap-2 p-4 bg-gradient-to-br from-neo-pink to-pink-400 border-3 border-neo-black rounded-neo shadow-hard hover:shadow-hard-lg hover:translate-x-[-2px] hover:translate-y-[-2px] transition-all h-full max-h-[80vh]"
+          aria-label={`${t('landing.multiplayer') || 'Multiplayer'} - ${t('landing.multiplayerDesc') || 'Compete with friends'}`}
         >
-          <FaUsers className="text-4xl text-neo-black" />
+          <FaUsers className="text-4xl text-neo-black" aria-hidden="true" />
           <span className="text-lg font-black uppercase text-neo-black">{t('landing.multiplayer') || 'Multiplayer'}</span>
-          <div className="flex gap-2 text-xs">
+          <div className="flex gap-2 text-xs" aria-hidden="true">
             <span className="bg-neo-black/20 px-2 py-1 rounded-neo font-bold"><FaDoorOpen className="inline mr-1" />Rooms</span>
             <span className="bg-neo-black/20 px-2 py-1 rounded-neo font-bold"><FaCrown className="inline mr-1" />Host</span>
           </div>
@@ -60,12 +66,13 @@ const LandingView: React.FC = () => {
         {/* How to Play - compact */}
         <Link
           href={`/${language}/rules`}
-          className="absolute bottom-2 right-2 flex items-center gap-1 px-3 py-2 bg-neo-yellow text-neo-black font-bold text-sm border-2 border-neo-black rounded-neo"
+          className="absolute bottom-2 right-2 flex items-center gap-1 px-3 py-2 bg-neo-yellow text-neo-black font-bold text-sm border-2 border-neo-black rounded-neo min-h-[44px]"
+          aria-label={t('joinView.howToPlay') || 'How to Play'}
         >
-          <FaQuestionCircle />
+          <FaQuestionCircle aria-hidden="true" />
           <span className="hidden sm:inline">{t('joinView.howToPlay') || 'How to Play'}</span>
         </Link>
-      </div>
+      </main>
     );
   }
 

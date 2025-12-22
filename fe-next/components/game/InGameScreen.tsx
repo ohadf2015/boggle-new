@@ -383,11 +383,11 @@ const InGameScreen = memo<InGameScreenProps>(({
               }
             }}
           >
-            {/* Exit Button - left (min 40px for better touch targets) */}
+            {/* Exit Button - left (44px WCAG minimum touch target) */}
             {onExitRoom && (
               <button
                 onClick={onExitRoom}
-                className="w-10 h-10 bg-neo-red/90 border-2 border-neo-black rounded-neo text-neo-cream text-base font-bold shadow-hard-sm flex items-center justify-center hover:bg-neo-red active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all"
+                className="w-11 h-11 bg-neo-red/90 border-2 border-neo-black rounded-neo text-neo-cream text-base font-bold shadow-hard-sm flex items-center justify-center hover:bg-neo-red active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all"
                 aria-label={t('playerView.exit') || 'Exit'}
               >
                 ✕
@@ -396,20 +396,20 @@ const InGameScreen = memo<InGameScreenProps>(({
 
             {/* Right side buttons */}
             <div className="flex items-center gap-2">
-              {/* Help Button (min 40px for better touch targets) */}
+              {/* Help Button (44px WCAG minimum touch target) */}
               <button
                 onClick={() => setShowHelpPanel(true)}
-                className="w-10 h-10 bg-neo-purple/90 border-2 border-neo-black rounded-neo text-neo-cream text-base font-bold shadow-hard-sm flex items-center justify-center hover:bg-neo-purple active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all"
+                className="w-11 h-11 bg-neo-purple/90 border-2 border-neo-black rounded-neo text-neo-cream text-base font-bold shadow-hard-sm flex items-center justify-center hover:bg-neo-purple active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all"
                 aria-label={t('help.title') || 'Help'}
               >
                 ?
               </button>
 
-              {/* Pin indicator */}
+              {/* Pin indicator (44px WCAG minimum touch target) */}
               {controlsPinned && (
                 <button
                   onClick={toggleControlsPin}
-                  className="w-8 h-8 bg-neo-yellow/90 border-2 border-neo-black rounded-neo text-neo-black text-sm font-bold shadow-hard-sm flex items-center justify-center hover:bg-neo-yellow cursor-pointer"
+                  className="w-11 h-11 bg-neo-yellow/90 border-2 border-neo-black rounded-neo text-neo-black text-sm font-bold shadow-hard-sm flex items-center justify-center hover:bg-neo-yellow cursor-pointer"
                   title="Unpin controls"
                   aria-label="Unpin controls"
                 >

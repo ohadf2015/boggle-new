@@ -18,8 +18,8 @@
   --neo-orange-hover: #FF5722;
   --neo-pink: #FF1493;
   --neo-pink-light: #FF69B4;
-  --neo-purple: #4a1c6a;
-  --neo-purple-light: #6b2d8c;
+  --neo-purple: #8b5cf6;
+  --neo-purple-light: #a78bfa;
   --neo-navy: #1a1a2e;
   --neo-navy-light: #16213e;
   --neo-cyan: #00FFFF;
@@ -65,7 +65,7 @@
   --secondary: var(--neo-orange);
   --secondary-foreground: rgb(var(--neo-black));
   --muted: var(--neo-navy-light);
-  --muted-foreground: #b8b8d0;
+  --muted-foreground: #c8c8e0;
   --accent: var(--neo-pink);
   --accent-foreground: rgb(var(--neo-white));
   --destructive: var(--neo-red);

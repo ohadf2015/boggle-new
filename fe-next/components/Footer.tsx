@@ -20,11 +20,16 @@ export default function Footer(): React.ReactElement {
             {t('legal.copyright')}
           </p>
 
-          {/* Site Links */}
-          <nav className="flex items-center gap-3 flex-wrap justify-center sm:justify-start">
+          {/* Site Links - min-h-[44px] for touch targets */}
+          <nav
+            className="flex items-center gap-1 sm:gap-2 flex-wrap justify-center sm:justify-start"
+            role="navigation"
+            aria-label="Footer navigation"
+          >
             <Link
               href={`/${language}/rules`}
               className="
+                min-h-[44px] px-2 flex items-center
                 text-sm font-bold uppercase tracking-wide
                 text-neo-cream/70 hover:text-neo-cyan
                 transition-colors duration-100
@@ -33,10 +38,11 @@ export default function Footer(): React.ReactElement {
             >
               {t('footer.howToPlay') || 'How to Play'}
             </Link>
-            <span className="text-neo-cream/40 font-black">•</span>
+            <span className="text-neo-cream/40 font-black hidden sm:inline">•</span>
             <Link
               href={`/${language}/leaderboard`}
               className="
+                min-h-[44px] px-2 flex items-center
                 text-sm font-bold uppercase tracking-wide
                 text-neo-cream/70 hover:text-neo-cyan
                 transition-colors duration-100
@@ -45,10 +51,11 @@ export default function Footer(): React.ReactElement {
             >
               {t('footer.leaderboard') || 'Leaderboard'}
             </Link>
-            <span className="text-neo-cream/40 font-black">•</span>
+            <span className="text-neo-cream/40 font-black hidden sm:inline">•</span>
             <Link
               href={`/${language}/legal/terms`}
               className="
+                min-h-[44px] px-2 flex items-center
                 text-sm font-bold uppercase tracking-wide
                 text-neo-cream/70 hover:text-neo-yellow
                 transition-colors duration-100
@@ -57,10 +64,11 @@ export default function Footer(): React.ReactElement {
             >
               {t('legal.termsOfService')}
             </Link>
-            <span className="text-neo-cream/40 font-black">•</span>
+            <span className="text-neo-cream/40 font-black hidden sm:inline">•</span>
             <Link
               href={`/${language}/legal/privacy`}
               className="
+                min-h-[44px] px-2 flex items-center
                 text-sm font-bold uppercase tracking-wide
                 text-neo-cream/70 hover:text-neo-yellow
                 transition-colors duration-100
@@ -69,14 +77,14 @@ export default function Footer(): React.ReactElement {
             >
               {t('legal.privacyPolicy')}
             </Link>
-            <span className="text-neo-cream/40 font-black">•</span>
+            <span className="text-neo-cream/40 font-black hidden sm:inline">•</span>
             <a
               href="https://ko-fi.com/lexiclash"
               target="_blank"
               rel="noopener noreferrer"
               title={t('support.kofiTooltip')}
               className="
-                inline-flex items-center gap-1.5
+                min-h-[44px] px-2 inline-flex items-center gap-1.5
                 text-sm font-bold uppercase tracking-wide
                 text-neo-pink hover:text-neo-yellow
                 transition-colors duration-100

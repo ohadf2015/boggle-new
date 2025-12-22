@@ -135,7 +135,7 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                             onClick={() => setShowLangDropdown(!showLangDropdown)}
                             className={cn(
                                 "flex items-center justify-center gap-1",
-                                "w-8 h-8 sm:w-10 sm:h-10",
+                                "w-11 h-11 sm:w-11 sm:h-11",
                                 "bg-neo-cream text-neo-black",
                                 "border-2 sm:border-3 border-neo-black",
                                 "rounded-neo shadow-hard",
@@ -147,7 +147,7 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                             aria-expanded={showLangDropdown}
                             aria-haspopup="listbox"
                         >
-                            <span className="text-base sm:text-lg">{currentFlag}</span>
+                            <span className="text-lg sm:text-xl">{currentFlag}</span>
                         </button>
 
                         <AnimatePresence>
@@ -191,7 +191,7 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                             href={`/${language}/admin`}
                             className="
                                 flex items-center justify-center
-                                w-8 h-8 sm:w-10 sm:h-10
+                                w-11 h-11
                                 bg-neo-purple text-white
                                 border-2 sm:border-3 border-neo-black
                                 rounded-neo
@@ -202,7 +202,7 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                             "
                             aria-label={t('common.adminDashboard') || 'Admin Dashboard'}
                         >
-                            <FaChartBar className="text-sm sm:text-base" aria-hidden="true" />
+                            <FaChartBar className="text-base" aria-hidden="true" />
                         </Link>
                     )}
                     {/* Show level badge for authenticated users - hidden on very small screens */}
