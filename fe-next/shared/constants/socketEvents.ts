@@ -44,6 +44,9 @@ export const CLIENT_EVENTS = {
   TRANSFER_HOST: 'transferHost',
   UPDATE_GAME_SETTINGS: 'updateGameSettings',
 
+  // Earthquake/Fire Round
+  TRIGGER_EARTHQUAKE: 'triggerEarthquake',
+
   // Rooms
   GET_ACTIVE_ROOMS: 'getActiveRooms',
 
@@ -131,6 +134,12 @@ export const SERVER_EVENTS = {
   TOURNAMENT_ROUND_COMPLETED: 'tournamentRoundCompleted',
   TOURNAMENT_COMPLETE: 'tournamentComplete',
   TOURNAMENT_CANCELLED: 'tournamentCancelled',
+
+  // Earthquake/Fire Round
+  EARTHQUAKE_WARNING: 'earthquakeWarning',
+  EARTHQUAKE_SHAKE: 'earthquakeShake',
+  FIRE_ROUND_START: 'fireRoundStart',
+  FIRE_ROUND_END: 'fireRoundEnd',
 
   // Rooms
   ACTIVE_ROOMS: 'activeRooms',

@@ -26,7 +26,7 @@ const Sparkle: React.FC<{
   size?: number;
 }> = ({ delay, angle, distance, color, size = 8 }) => (
   <motion.div
-    className="absolute pointer-events-none"
+    className="absolute pointer-events-none combo-sparkle"
     style={{
       width: size,
       height: size,
@@ -44,7 +44,7 @@ const Sparkle: React.FC<{
       rotate: [0, 180, 360],
     }}
     transition={{
-      duration: 0.6, // Match longer timing
+      duration: 0.6,
       delay,
       ease: [0.25, 0.46, 0.45, 0.94],
     }}
@@ -62,7 +62,7 @@ const Confetti: React.FC<{
   color: string;
 }> = ({ delay, startX, color }) => (
   <motion.div
-    className="absolute w-2 h-3 pointer-events-none"
+    className="absolute w-2 h-3 pointer-events-none combo-confetti"
     style={{
       left: '50%',
       top: '50%',
@@ -78,7 +78,7 @@ const Confetti: React.FC<{
       opacity: [1, 0.8, 0],
     }}
     transition={{
-      duration: 0.7, // Match longer timing
+      duration: 0.7,
       delay,
       ease: 'easeOut',
     }}
@@ -92,7 +92,7 @@ const GlowRing: React.FC<{
   scale?: number;
 }> = ({ delay, color, scale = 2 }) => (
   <motion.div
-    className="absolute rounded-full pointer-events-none"
+    className="absolute rounded-full pointer-events-none combo-glow-ring"
     style={{
       width: 120,
       height: 60,
@@ -109,7 +109,7 @@ const GlowRing: React.FC<{
       opacity: [0.8, 0],
     }}
     transition={{
-      duration: 0.5, // Slightly longer to match new timing
+      duration: 0.5,
       delay,
       ease: 'easeOut',
     }}
@@ -130,9 +130,12 @@ const ComboIndicator: React.FC<ComboIndicatorProps> = ({
   const [animationKey, setAnimationKey] = useState(0);
 
   // Memoize random values for sparkles to prevent recalculation
+  // Reduce sparkle count at very high levels to maintain performance
   const sparkleData = useMemo(() => {
     const isHighCombo = comboLevel >= 5;
-    const count = isHighCombo ? 12 : 6;
+    const isExtremeCombo = comboLevel >= 15;
+    // Reduce sparkles at extreme levels to prevent performance issues
+    const count = isExtremeCombo ? 8 : isHighCombo ? 12 : 6;
     return [...Array(count)].map((_, i) => ({
       angle: (i * (360 / count) + (Math.random() - 0.5) * 30) * (Math.PI / 180),
       distance: 50 + Math.random() * 30,
@@ -155,10 +158,14 @@ const ComboIndicator: React.FC<ComboIndicatorProps> = ({
     return undefined;
   }, [comboLevel, comboColors.text]);
 
-  // Screen shake for high combos
+  // Screen shake for high combos - reduce intensity at extreme levels for performance
   useEffect(() => {
     if (comboLevel >= 5 && !reduceMotion) {
-      const shakeIntensity = Math.min((comboLevel - 4) * 1.5, 6);
+      // Cap shake intensity at extreme levels to prevent performance issues
+      const isExtremeCombo = comboLevel >= 15;
+      const shakeIntensity = isExtremeCombo 
+        ? 4 
+        : Math.min((comboLevel - 4) * 1.5, 6);
       controls.start({
         x: [0, -shakeIntensity, shakeIntensity, -shakeIntensity, 0],
         transition: { duration: 0.25, ease: 'easeInOut' },
@@ -171,6 +178,7 @@ const ComboIndicator: React.FC<ComboIndicatorProps> = ({
   const isHighCombo = visibleCombo >= 5;
   const isVeryHighCombo = visibleCombo >= 7;
   const isInsaneCombo = visibleCombo >= 10;
+  const isExtremeCombo = visibleCombo >= 15;
   const isRainbow = comboColors.isRainbow;
 
   // Show actual combo count, not capped
@@ -181,28 +189,32 @@ const ComboIndicator: React.FC<ComboIndicatorProps> = ({
     : ['#FFD700', '#FF6B35', '#FF3366', '#FFE135'];
   const confettiColors = ['#FF3366', '#00FFFF', '#FFE135', '#BFFF00', '#FF6B35', '#FF1493'];
 
-  // Scale effects with combo level
-  const confettiCount = Math.min(8 + (visibleCombo - 5) * 3, 24); // 8 at level 5, up to 24
-  const extraGlowRings = Math.min(Math.floor((visibleCombo - 5) / 2), 3); // Extra rings for high combos
+  // Scale effects with combo level, but cap aggressively at very high levels for performance
+  // Cap confetti at 16 for extreme combos to prevent performance issues
+  const confettiCount = isExtremeCombo 
+    ? 16 
+    : Math.min(8 + (visibleCombo - 5) * 3, 24); // 8 at level 5, up to 24
+  const extraGlowRings = Math.min(Math.floor((visibleCombo - 5) / 2), 3);
 
   return (
     <AnimatePresence mode="wait">
       <motion.div
         key={`combo-${animationKey}`}
-        className="fixed top-1/2 left-1/2 z-50 pointer-events-none"
+        className="fixed top-1/2 left-1/2 z-50 pointer-events-none combo-indicator-container"
+        data-extreme={isExtremeCombo}
         style={{ transform: 'translate(-50%, -50%)' }}
         initial={{ opacity: 1 }}
         animate={controls}
         exit={{ opacity: 0 }}
       >
-        {/* Glow rings - scale with combo level */}
+        {/* Glow rings - scale with combo level, reduce at extreme levels for performance */}
         {!reduceMotion && (
           <>
             <GlowRing delay={0} color={isRainbow ? '#FF1493' : '#FF6B35'} scale={2} />
             <GlowRing delay={0.08} color={isRainbow ? '#00FFFF' : '#FFD700'} scale={2.5} />
             {isHighCombo && <GlowRing delay={0.15} color="#FFFFFF" scale={3} />}
-            {isVeryHighCombo && <GlowRing delay={0.2} color="#FF3366" scale={3.5} />}
-            {isInsaneCombo && <GlowRing delay={0.25} color="#00FFFF" scale={4} />}
+            {isVeryHighCombo && !isExtremeCombo && <GlowRing delay={0.2} color="#FF3366" scale={3.5} />}
+            {isInsaneCombo && !isExtremeCombo && <GlowRing delay={0.25} color="#00FFFF" scale={4} />}
           </>
         )}
 
@@ -274,12 +286,13 @@ const ComboIndicator: React.FC<ComboIndicatorProps> = ({
                 background:
                   'linear-gradient(90deg, #ef4444, #f97316, #eab308, #22c55e, #06b6d4, #3b82f6, #8b5cf6, #ec4899, #ef4444)',
                 backgroundSize: '300% 100%',
-                animation: reduceMotion ? 'none' : 'rainbow-shift 1s linear infinite',
+                // Disable infinite animation at extreme levels to prevent performance issues
+                animation: reduceMotion || isExtremeCombo ? 'none' : 'rainbow-shift 1s linear infinite',
               }),
             }}
           >
-            {/* Shimmer overlay */}
-            {!reduceMotion && (
+            {/* Shimmer overlay - disable at extreme levels for performance */}
+            {!reduceMotion && !isExtremeCombo && (
               <motion.div
                 className="absolute inset-0 rounded-full pointer-events-none overflow-hidden"
                 style={{ zIndex: 5 }}

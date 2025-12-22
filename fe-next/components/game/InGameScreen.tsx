@@ -12,6 +12,7 @@ import PresenceIndicator from '../PresenceIndicator';
 import GridComponent from '../GridComponent';
 import CircularTimer from '../CircularTimer';
 import RoomChat from '../RoomChat';
+import { EarthquakeWarning, FireRoundIndicator } from '../earthquake';
 import HintButton from '../HintButton';
 import { HelpPanel, HelpButton } from './HelpPanel';
 import LandscapeIndicator from '../LandscapeIndicator';
@@ -82,6 +83,11 @@ interface InGameScreenProps {
   // Hints (single-player mode)
   hints?: HintsState;
 
+  // Earthquake/Fire Round
+  earthquakeState?: 'idle' | 'warning' | 'shaking' | 'fire-round';
+  fireRoundActive?: boolean;
+  fireRoundRemaining?: number;
+
   // Achievement dock (rendered outside this component)
   children?: ReactNode;
 }
@@ -129,6 +135,11 @@ const InGameScreen = memo<InGameScreenProps>(({
   // Hints
   hints,
 
+  // Earthquake/Fire Round
+  earthquakeState = 'idle',
+  fireRoundActive = false,
+  fireRoundRemaining = 0,
+
   // Achievement dock
   children,
 }) => {
@@ -138,6 +149,9 @@ const InGameScreen = memo<InGameScreenProps>(({
 
   // Help panel state for discoverability
   const [showHelpPanel, setShowHelpPanel] = useState(false);
+
+  // Viewport height detection for very short landscape screens
+  const [viewportHeight, setViewportHeight] = useState(0);
 
   // Auto-hide controls for landscape mode
   const { isVisible: controlsVisible, isPinned: controlsPinned, show: showControls, togglePin: toggleControlsPin } = useAutoHideControls({
@@ -164,6 +178,18 @@ const InGameScreen = memo<InGameScreenProps>(({
       window.removeEventListener('mousemove', handleInteraction);
     };
   }, [isLandscape, showControls]);
+
+  // Track viewport height for responsive landscape adjustments
+  useEffect(() => {
+    const updateHeight = () => setViewportHeight(window.innerHeight);
+    updateHeight();
+    window.addEventListener('resize', updateHeight);
+    window.addEventListener('orientationchange', updateHeight);
+    return () => {
+      window.removeEventListener('resize', updateHeight);
+      window.removeEventListener('orientationchange', updateHeight);
+    };
+  }, []);
 
   // Track if grid animation has already played
   const hasAnimatedRef = useRef(false);
@@ -268,12 +294,24 @@ const InGameScreen = memo<InGameScreenProps>(({
     rankDisplay: index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : `#${index + 1}`
   })), [leaderboard, username, getRankStyle]);
 
+  // Check for very short landscape screens to prevent panel overlap
+  const isVeryShortLandscape = isLandscape && viewportHeight > 0 && viewportHeight < 350;
+
   // ==================== Landscape Layout ====================
   // In landscape mobile mode, use a maximized grid layout with stats on sides
   if (isLandscape) {
     return (
       <>
         <HelpPanel isOpen={showHelpPanel} onClose={() => setShowHelpPanel(false)} />
+
+        {/* Earthquake Warning Overlay */}
+        <EarthquakeWarning isVisible={earthquakeState === 'warning'} />
+
+        {/* Fire Round Indicator */}
+        <FireRoundIndicator
+          isActive={fireRoundActive}
+          remainingSeconds={fireRoundRemaining}
+        />
 
         {/* Full-screen landscape container with grid centered - uses full viewport */}
         <div className="relative flex items-center justify-center w-full h-screen overflow-hidden bg-slate-900 landscape-full-height">
@@ -323,7 +361,7 @@ const InGameScreen = memo<InGameScreenProps>(({
               <motion.div
                 initial={{ scale: 0, rotate: -2 }}
                 animate={{ scale: 1, rotate: 1 }}
-                className="bg-neo-yellow border-3 border-neo-black rounded-neo shadow-hard p-2 flex flex-col items-center gap-1.5"
+                className="bg-neo-cream border-3 border-neo-black rounded-neo shadow-hard p-2 flex flex-col items-center gap-1.5"
               >
                 {/* Score */}
                 <motion.div
@@ -462,9 +500,9 @@ const InGameScreen = memo<InGameScreenProps>(({
             </motion.div>
           )}
 
-          {/* Center: Grid (takes maximum space - constrained to square aspect ratio) */}
-          <div className="flex items-center justify-center w-full h-full px-12 py-1 landscape-grid-container">
-            <div className="w-full h-full max-h-[100vh] max-w-[100vh] flex items-center justify-center aspect-square">
+          {/* Center: Grid (takes full height in landscape - properly sized for mobile) */}
+          <div className={`flex items-center justify-center w-full h-full ${isVeryShortLandscape ? 'px-4' : 'px-3'} py-0.5 landscape-grid-container`}>
+            <div className="h-full flex items-center justify-center game-board-frame-landscape" style={{ aspectRatio: '1/1' }}>
               <GridComponent
                 key={isPlaying ? 'playing-grid-landscape' : 'spectating-grid-landscape'}
                 grid={letterGrid}
@@ -472,6 +510,9 @@ const InGameScreen = memo<InGameScreenProps>(({
                 animateOnMount={!hasAnimatedRef.current}
                 onWordSubmit={handleGridWordSubmit}
                 comboLevel={comboLevel}
+                largeText
+                fireRoundActive={fireRoundActive}
+                earthquakeShaking={earthquakeState === 'shaking'}
               />
             </div>
           </div>
@@ -488,6 +529,15 @@ const InGameScreen = memo<InGameScreenProps>(({
     <>
       {/* Landscape mode suggestion banner for mobile portrait users */}
       <LandscapeIndicator />
+
+      {/* Earthquake Warning Overlay */}
+      <EarthquakeWarning isVisible={earthquakeState === 'warning'} />
+
+      {/* Fire Round Indicator */}
+      <FireRoundIndicator
+        isActive={fireRoundActive}
+        remainingSeconds={fireRoundRemaining}
+      />
 
       <div className="flex flex-col lg:flex-row gap-1 md:gap-2 flex-grow w-full overflow-hidden transition-all duration-500 ease-in-out">
 
@@ -692,6 +742,8 @@ const InGameScreen = memo<InGameScreenProps>(({
               animateOnMount={!hasAnimatedRef.current}
               onWordSubmit={handleGridWordSubmit}
               comboLevel={comboLevel}
+              fireRoundActive={fireRoundActive}
+              earthquakeShaking={earthquakeState === 'shaking'}
             />
           </CardContent>
         </Card>

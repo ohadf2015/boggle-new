@@ -194,6 +194,19 @@ body {
     border: var(--border-neo-thick) solid rgb(var(--neo-black));
   }
 
+  /* Fire Glow Utility - Applied to grid cells during fire round */
+  .fire-glow {
+    animation: fire-glow 0.8s ease-in-out infinite !important;
+    background: linear-gradient(135deg, #FF6B35, #FF3366) !important;
+    will-change: transform, opacity;
+    transform: translateZ(0); /* Force GPU acceleration */
+  }
+
+  /* Earthquake Shake Utility - Applied to grid container */
+  .earthquake-shake {
+    animation: earthquake-shake 0.6s ease-in-out;
+  }
+
   /* Texture Overlays */
   .texture-halftone {
     position: relative;
@@ -932,6 +945,22 @@ body {
   will-change: auto;
 }
 
+/* Performance optimizations for combo animations */
+.combo-indicator-container,
+.combo-sparkle,
+.combo-confetti,
+.combo-glow-ring {
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  perspective: 1000px;
+}
+
+/* Limit compositing layers at extreme combo levels */
+.combo-indicator-container[data-extreme="true"] .combo-sparkle,
+.combo-indicator-container[data-extreme="true"] .combo-confetti {
+  will-change: auto;
+}
+
 /* Combo badge entrance with spring overshoot */
 @keyframes combo-entrance {
   0% {
@@ -1144,6 +1173,106 @@ body {
 
   100% {
     background-position: -200% 0;
+  }
+}
+
+/* ====================================
+   EARTHQUAKE/FIRE ROUND ANIMATIONS
+   ==================================== */
+
+/* Earthquake shake - more violent than combo-shake */
+@keyframes earthquake-shake {
+  0%, 100% {
+    transform: translateX(0) translateY(0) rotate(0deg);
+  }
+  10% {
+    transform: translateX(-8px) translateY(-3px) rotate(-0.8deg);
+  }
+  20% {
+    transform: translateX(8px) translateY(4px) rotate(0.8deg);
+  }
+  30% {
+    transform: translateX(-6px) translateY(-2px) rotate(-0.5deg);
+  }
+  40% {
+    transform: translateX(6px) translateY(3px) rotate(0.5deg);
+  }
+  50% {
+    transform: translateX(-4px) translateY(-1px) rotate(-0.3deg);
+  }
+  60% {
+    transform: translateX(4px) translateY(2px) rotate(0.3deg);
+  }
+  70% {
+    transform: translateX(-2px) translateY(-1px) rotate(-0.2deg);
+  }
+  80% {
+    transform: translateX(2px) translateY(1px) rotate(0.2deg);
+  }
+  90% {
+    transform: translateX(-1px) translateY(0) rotate(-0.1deg);
+  }
+}
+
+/* Fire glow - lightweight pulsing effect for letters during fire round */
+@keyframes fire-glow {
+  0%, 100% {
+    transform: translateZ(0) scale(1);
+    opacity: 0.9;
+    box-shadow: 0 0 8px rgba(255, 107, 53, 0.6);
+  }
+  50% {
+    transform: translateZ(0) scale(1.05);
+    opacity: 1;
+    box-shadow: 0 0 15px rgba(255, 107, 53, 0.9),
+                0 0 25px rgba(255, 51, 102, 0.5);
+  }
+}
+
+/* Warning pulse - for earthquake warning overlay */
+@keyframes warning-pulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0.95;
+  }
+  50% {
+    transform: scale(1.05);
+    opacity: 1;
+  }
+}
+
+/* Fire round badge pulse */
+@keyframes fire-badge-pulse {
+  0%, 100% {
+    transform: scale(1) rotate(-1deg);
+    box-shadow: 0 0 20px rgba(255, 107, 53, 0.6),
+                4px 4px 0 rgb(var(--neo-black));
+  }
+  50% {
+    transform: scale(1.08) rotate(1deg);
+    box-shadow: 0 0 30px rgba(255, 107, 53, 0.9),
+                0 0 50px rgba(255, 51, 102, 0.5),
+                5px 5px 0 rgb(var(--neo-black));
+  }
+}
+
+/* Flame flicker effect */
+@keyframes flame-flicker {
+  0%, 100% {
+    opacity: 1;
+    transform: translateY(0) scaleY(1);
+  }
+  25% {
+    opacity: 0.9;
+    transform: translateY(-2px) scaleY(1.05);
+  }
+  50% {
+    opacity: 0.95;
+    transform: translateY(-1px) scaleY(0.98);
+  }
+  75% {
+    opacity: 0.92;
+    transform: translateY(-3px) scaleY(1.03);
   }
 }
 
@@ -1600,14 +1729,29 @@ body {
 
 /* Landscape orientation on mobile devices */
 @media (orientation: landscape) and (max-height: 600px) {
+  /* Landscape wrapper - sizes the grid container to take full available height */
+  .game-board-frame-landscape {
+    height: 100%;
+    height: 100dvh;
+    max-height: 100dvh;
+    width: auto;
+  }
+
   /* Game board frame adjustments for landscape - maximized for playability */
   .game-board-frame {
-    /* Maximized to 85vh for largest possible grid in landscape */
-    width: min(100%, 85vh);
-    max-width: min(100%, 85vh);
-    height: auto;
+    /* Maximized to 94vh for largest possible grid in landscape using dynamic vh */
+    width: min(100%, 94dvh);
+    max-width: min(100%, 94dvh);
+    height: 94dvh;
+    max-height: 94dvh;
     aspect-ratio: 1 / 1;
     padding: 6px;
+  }
+
+  /* Ensure grid cells have adequate minimum size in landscape */
+  .game-board-frame [role="gridcell"] {
+    min-width: 36px;
+    min-height: 36px;
   }
 
   /* Stack game UI vertically in landscape */
@@ -1706,18 +1850,36 @@ body {
 
 /* Very short landscape screens (phones in landscape) */
 @media (orientation: landscape) and (max-height: 450px) {
+  /* Landscape wrapper for very short screens */
+  .game-board-frame-landscape {
+    height: 100%;
+    height: 100dvh;
+    max-height: 100dvh;
+    width: auto;
+  }
+
   .game-board-frame {
-    /* Maximized to 88vh for best playability on short screens */
-    width: min(100%, 88vh);
-    max-width: min(100%, 88vh);
+    /* Maximized to 96dvh for best playability on short screens */
+    width: min(100%, 96dvh);
+    max-width: min(100%, 96dvh);
+    height: 96dvh;
+    max-height: 96dvh;
     padding: 4px;
   }
 
   /* Full-height mode - even larger on short screens */
   .game-board-frame-full {
-    width: min(100%, 98vh);
-    max-width: min(100%, 98vh);
-    padding: 2px;
+    width: min(100%, 98dvh);
+    max-width: min(100%, 98dvh);
+    height: 98dvh;
+    max-height: 98dvh;
+    padding: 4px;
+  }
+
+  /* Ensure grid cells are still readable on very short screens */
+  .game-board-frame [role="gridcell"] {
+    min-width: 32px;
+    min-height: 32px;
   }
 
   /* Even more compact for very short screens */
@@ -1737,16 +1899,6 @@ body {
   .game-board-frame {
     width: min(100%, 60vh);
     max-width: min(100%, 60vh);
-  }
-}
-
-/* Legacy landscape support */
-@media (max-height: 500px) and (orientation: landscape) {
-  .game-board-frame {
-    width: min(100%, 50vh);
-    max-width: min(100%, 50vh);
-    height: auto;
-    aspect-ratio: 1 / 1;
   }
 }
 

@@ -53,6 +53,11 @@ interface UsePlayerGameEventsProps {
   setXpGainedData: React.Dispatch<React.SetStateAction<XpGainedPayload | null>>;
   setLevelUpData: React.Dispatch<React.SetStateAction<LevelUpPayload | null>>;
 
+  // Earthquake/Fire Round state setters
+  setEarthquakeState: React.Dispatch<React.SetStateAction<'idle' | 'warning' | 'shaking' | 'fire-round'>>;
+  setFireRoundActive: React.Dispatch<React.SetStateAction<boolean>>;
+  setFireRoundRemaining: React.Dispatch<React.SetStateAction<number>>;
+
   // Combo refs (for reset)
   comboLevelRef: MutableRefObject<number>;
   lastWordTimeRef: MutableRefObject<number | null>;
@@ -100,6 +105,9 @@ export function usePlayerGameEvents({
   setWordToVote,
   setXpGainedData,
   setLevelUpData,
+  setEarthquakeState,
+  setFireRoundActive,
+  setFireRoundRemaining,
   comboLevelRef,
   lastWordTimeRef,
   setComboLevel,
@@ -297,6 +305,63 @@ export function usePlayerGameEvents({
       neoSuccessToast(data.message || t('common.newGameReady'), { icon: '🔄', duration: 3000 });
     };
 
+    // Earthquake/Fire Round event handlers
+    const handleEarthquakeWarning = (data: any) => {
+      if (data.gameSessionId !== undefined && data.gameSessionId !== gameSessionIdRef.current) {
+        logger.log('[PLAYER] Ignoring stale earthquakeWarning from old session');
+        return;
+      }
+      logger.log('[PLAYER] Earthquake warning received');
+      setEarthquakeState('warning');
+    };
+
+    const handleEarthquakeShake = (data: any) => {
+      if (data.gameSessionId !== undefined && data.gameSessionId !== gameSessionIdRef.current) {
+        logger.log('[PLAYER] Ignoring stale earthquakeShake from old session');
+        return;
+      }
+      logger.log('[PLAYER] Earthquake shake received');
+      setEarthquakeState('shaking');
+    };
+
+    const handleFireRoundStart = (data: any) => {
+      if (data.gameSessionId !== undefined && data.gameSessionId !== gameSessionIdRef.current) {
+        logger.log('[PLAYER] Ignoring stale fireRoundStart from old session');
+        return;
+      }
+      logger.log('[PLAYER] Fire round started - grid:', data.grid);
+
+      // Update grid with new fire round grid
+      if (data.grid) {
+        setLetterGrid(data.grid);
+      }
+
+      setEarthquakeState('fire-round');
+      setFireRoundActive(true);
+      setFireRoundRemaining(data.duration || 15);
+
+      // Start countdown
+      let remaining = data.duration || 15;
+      const countdownInterval = setInterval(() => {
+        remaining -= 1;
+        setFireRoundRemaining(remaining);
+        if (remaining <= 0) {
+          clearInterval(countdownInterval);
+        }
+      }, 1000);
+    };
+
+    const handleFireRoundEnd = (data: any) => {
+      if (data.gameSessionId !== undefined && data.gameSessionId !== gameSessionIdRef.current) {
+        logger.log('[PLAYER] Ignoring stale fireRoundEnd from old session');
+        return;
+      }
+      logger.log('[PLAYER] Fire round ended');
+      setEarthquakeState('idle');
+      setFireRoundActive(false);
+      setFireRoundRemaining(0);
+    };
+
     // Register listeners
     socket.on('startGame', handleStartGame);
     socket.on('endGame', handleEndGame);
@@ -305,6 +370,10 @@ export function usePlayerGameEvents({
     socket.on('finalScores', handleFinalScores);
     socket.on('resetGame', handleResetGame);
     socket.on('hostLeftRoomClosing', handleHostLeftRoomClosing);
+    socket.on('earthquakeWarning', handleEarthquakeWarning);
+    socket.on('earthquakeShake', handleEarthquakeShake);
+    socket.on('fireRoundStart', handleFireRoundStart);
+    socket.on('fireRoundEnd', handleFireRoundEnd);
 
     return () => {
       socket.off('startGame', handleStartGame);
@@ -314,6 +383,10 @@ export function usePlayerGameEvents({
       socket.off('finalScores', handleFinalScores);
       socket.off('resetGame', handleResetGame);
       socket.off('hostLeftRoomClosing', handleHostLeftRoomClosing);
+      socket.off('earthquakeWarning', handleEarthquakeWarning);
+      socket.off('earthquakeShake', handleEarthquakeShake);
+      socket.off('fireRoundStart', handleFireRoundStart);
+      socket.off('fireRoundEnd', handleFireRoundEnd);
     };
   }, [
     socket,
@@ -344,6 +417,9 @@ export function usePlayerGameEvents({
     setLastWordTime,
     comboTimeoutRef,
     comboShieldsUsedRef,
+    setEarthquakeState,
+    setFireRoundActive,
+    setFireRoundRemaining,
     handleHostLeftRoomClosing,
     onGameStart,
   ]);

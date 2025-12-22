@@ -22,6 +22,12 @@ interface SoundEffectsContextType {
   playWordAcceptedSound: () => void;
   playCountdownBeep: (secondsRemaining: number) => void;
   playMessageSound: () => void;
+  // Earthquake/Fire Round sounds
+  playEarthquakeRumble: () => void;
+  playEarthquakeShake: () => void;
+  playFireRoundStart: () => void;
+  startFireCrackleLoop: () => void;
+  stopFireCrackleLoop: () => void;
 }
 
 interface SfxSettings {
@@ -38,6 +44,11 @@ const SOUND_EFFECTS = {
   wordAccepted: '/sounds/word-accepted.wav',
   countdownBeep: '/sounds/countdown-beep.wav',
   message: '/sounds/message.mp3',
+  // Earthquake/Fire Round sounds (user will provide custom files)
+  earthquakeRumble: '/sounds/earthquake-rumble.wav',
+  earthquakeShake: '/sounds/earthquake-shake.wav',
+  fireRoundStart: '/sounds/fire-round-start.wav',
+  fireCrackleLoop: '/sounds/fire-crackle-loop.wav',
 } as const;
 
 const SFX_STORAGE_KEY = 'boggle_sfx_settings';
@@ -51,6 +62,7 @@ export function SoundEffectsProvider({ children }: SoundEffectsProviderProps) {
   const soundsRef = useRef<Record<string, Howl>>({});
   const soundsLoadedRef = useRef(false);
   const isTabVisibleRef = useRef(true);
+  const fireCrackleLoopIdRef = useRef<number | null>(null); // Track fire crackle loop sound ID
 
   // Separate volume state for sound effects
   const [sfxVolume, setSfxVolumeState] = useState<number>(() => {
@@ -230,6 +242,73 @@ export function SoundEffectsProvider({ children }: SoundEffectsProviderProps) {
     playSound('message', { volume: 0.5 });
   }, [playSound]);
 
+  // Earthquake/Fire Round sound effects
+
+  // Play earthquake rumble (warning phase - 2 seconds)
+  const playEarthquakeRumble = useCallback(() => {
+    playSound('earthquakeRumble', { volume: 0.7 });
+  }, [playSound]);
+
+  // Play earthquake shake (shake phase - 1 second)
+  const playEarthquakeShake = useCallback(() => {
+    playSound('earthquakeShake', { volume: 0.8 });
+  }, [playSound]);
+
+  // Play fire round start sound
+  const playFireRoundStart = useCallback(() => {
+    playSound('fireRoundStart', { volume: 0.8 });
+  }, [playSound]);
+
+  // Start fire crackle ambient loop (plays for 15 seconds)
+  const startFireCrackleLoop = useCallback(() => {
+    if (!audioUnlocked || isMuted || sfxMuted || !isTabVisibleRef.current) return;
+
+    const howl = soundsRef.current['fireCrackleLoop'];
+    if (!howl) {
+      logger.warn('[SFX] Fire crackle loop sound not found');
+      return;
+    }
+
+    // Stop any existing loop
+    if (fireCrackleLoopIdRef.current !== null) {
+      howl.stop(fireCrackleLoopIdRef.current);
+      fireCrackleLoopIdRef.current = null;
+    }
+
+    // Load on-demand if needed
+    if (howl.state() === 'unloaded') {
+      logger.log('[SFX] Loading fire crackle loop on demand');
+      howl.load();
+    }
+
+    // Configure as loop
+    howl.loop(true);
+    howl.volume(0.3 * sfxVolume); // Lower volume for ambient sound
+
+    // Play and store sound ID
+    const soundId = howl.play();
+    fireCrackleLoopIdRef.current = soundId;
+
+    logger.log('[SFX] Started fire crackle loop');
+  }, [audioUnlocked, isMuted, sfxMuted, sfxVolume]);
+
+  // Stop fire crackle ambient loop
+  const stopFireCrackleLoop = useCallback(() => {
+    const howl = soundsRef.current['fireCrackleLoop'];
+    if (!howl || fireCrackleLoopIdRef.current === null) return;
+
+    // Fade out and stop
+    howl.fade(howl.volume(), 0, 500, fireCrackleLoopIdRef.current);
+    setTimeout(() => {
+      if (fireCrackleLoopIdRef.current !== null) {
+        howl.stop(fireCrackleLoopIdRef.current);
+        howl.loop(false); // Reset loop setting
+        fireCrackleLoopIdRef.current = null;
+        logger.log('[SFX] Stopped fire crackle loop');
+      }
+    }, 500);
+  }, []);
+
   const value: SoundEffectsContextType = {
     // Volume state
     sfxVolume,
@@ -243,6 +322,12 @@ export function SoundEffectsProvider({ children }: SoundEffectsProviderProps) {
     playWordAcceptedSound,
     playCountdownBeep,
     playMessageSound,
+    // Earthquake/Fire Round sounds
+    playEarthquakeRumble,
+    playEarthquakeShake,
+    playFireRoundStart,
+    startFireCrackleLoop,
+    stopFireCrackleLoop,
   };
 
   return (

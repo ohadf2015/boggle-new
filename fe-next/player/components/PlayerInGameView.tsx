@@ -95,6 +95,11 @@ interface PlayerInGameViewProps {
 
   // Hints (single-player mode)
   hints?: HintsState;
+
+  // Earthquake/Fire Round
+  earthquakeState?: 'idle' | 'warning' | 'shaking' | 'fire-round';
+  fireRoundActive?: boolean;
+  fireRoundRemaining?: number;
 }
 
 // ==================== Component ====================
@@ -144,6 +149,11 @@ const PlayerInGameView = memo<PlayerInGameViewProps>(({
 
   // Hints
   hints,
+
+  // Earthquake/Fire Round
+  earthquakeState,
+  fireRoundActive,
+  fireRoundRemaining,
 }): React.ReactElement => {
 
   // Memoized handler for closing tournament standings
@@ -234,6 +244,11 @@ const PlayerInGameView = memo<PlayerInGameViewProps>(({
 
         // Hints
         hints={hints}
+
+        // Earthquake/Fire Round
+        earthquakeState={earthquakeState}
+        fireRoundActive={fireRoundActive}
+        fireRoundRemaining={fireRoundRemaining}
       />
 
       {/* Tournament Standings Modal */}

@@ -157,6 +157,11 @@ const PlayerView: React.FC<PlayerViewProps> = memo(({
   const [xpGainedData, setXpGainedData] = useState<XpGainedData | null>(null);
   const [levelUpData, setLevelUpData] = useState<LevelUpData | null>(null);
 
+  // Earthquake/Fire Round state
+  const [earthquakeState, setEarthquakeState] = useState<'idle' | 'warning' | 'shaking' | 'fire-round'>('idle');
+  const [fireRoundActive, setFireRoundActive] = useState(false);
+  const [fireRoundRemaining, setFireRoundRemaining] = useState(0);
+
   // Music ref
   const hasTriggeredUrgentMusicRef = useRef<boolean>(false);
 
@@ -194,6 +199,9 @@ const PlayerView: React.FC<PlayerViewProps> = memo(({
     setWordToVote,
     setXpGainedData,
     setLevelUpData,
+    setEarthquakeState,
+    setFireRoundActive,
+    setFireRoundRemaining,
     comboLevelRef,
     lastWordTimeRef,
     setComboLevel,
@@ -468,6 +476,9 @@ const PlayerView: React.FC<PlayerViewProps> = memo(({
         setWord={setWord}
         onResetCombo={handleResetCombo}
         hints={hints}
+        earthquakeState={earthquakeState}
+        fireRoundActive={fireRoundActive}
+        fireRoundRemaining={fireRoundRemaining}
       />
     </>
   );

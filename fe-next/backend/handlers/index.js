@@ -19,6 +19,7 @@ const {
   processLongWordEngagement,
   processAchievementEngagement,
 } = require('./engagementHandler');
+const { registerEarthquakeHandlers, clearGameEarthquakeState } = require('./earthquakeHandler');
 const {
   startGameTimer,
   endGame,
@@ -42,6 +43,7 @@ function registerAllHandlers(io, socket) {
   registerConnectionHandlers(io, socket);
   registerHintHandlers(io, socket);
   registerEngagementHandlers(io, socket);
+  registerEarthquakeHandlers(io, socket);
 }
 
 module.exports = {
@@ -59,6 +61,7 @@ module.exports = {
   registerConnectionHandlers,
   registerHintHandlers,
   registerEngagementHandlers,
+  registerEarthquakeHandlers,
 
   // Engagement utilities (for use in other handlers)
   processGameEndEngagement,
@@ -71,6 +74,7 @@ module.exports = {
   calculateAndBroadcastFinalScores,
   isSocketMigrating,
   startConnectionHealthCheck,
+  clearGameEarthquakeState,
 
   // Configuration
   MAX_PLAYERS_PER_ROOM

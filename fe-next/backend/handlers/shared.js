@@ -113,6 +113,10 @@ async function endGame(io, gameCode) {
   // Clear hint state for this game
   clearGameHintState(gameCode);
 
+  // Clear earthquake state for this game
+  const { clearGameEarthquakeState } = require('./earthquakeHandler');
+  clearGameEarthquakeState(gameCode);
+
   // Transition game state using state machine (guards against invalid transitions)
   const transitionResult = transitionGameState(gameCode, 'END', { immediate: true });
   if (!transitionResult.success) {

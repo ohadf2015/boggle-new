@@ -90,6 +90,11 @@ interface UsePlayerSocketEventsProps {
   setXpGainedData: React.Dispatch<React.SetStateAction<XpGainedPayload | null>>;
   setLevelUpData: React.Dispatch<React.SetStateAction<LevelUpPayload | null>>;
 
+  // Earthquake/Fire Round state setters
+  setEarthquakeState: React.Dispatch<React.SetStateAction<'idle' | 'warning' | 'shaking' | 'fire-round'>>;
+  setFireRoundActive: React.Dispatch<React.SetStateAction<boolean>>;
+  setFireRoundRemaining: React.Dispatch<React.SetStateAction<number>>;
+
   // Combo refs and setters
   comboLevelRef: MutableRefObject<number>;
   lastWordTimeRef: MutableRefObject<number | null>;
@@ -150,6 +155,11 @@ const usePlayerSocketEvents = ({
   setXpGainedData,
   setLevelUpData,
 
+  // Earthquake/Fire Round state setters
+  setEarthquakeState,
+  setFireRoundActive,
+  setFireRoundRemaining,
+
   // Combo refs and setters
   comboLevelRef,
   lastWordTimeRef,
@@ -193,6 +203,9 @@ const usePlayerSocketEvents = ({
     setWordToVote,
     setXpGainedData,
     setLevelUpData,
+    setEarthquakeState,
+    setFireRoundActive,
+    setFireRoundRemaining,
     comboLevelRef,
     lastWordTimeRef,
     setComboLevel,

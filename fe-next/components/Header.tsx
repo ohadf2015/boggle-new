@@ -1,6 +1,6 @@
 import { memo, useCallback, useMemo, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FaChartBar, FaGlobe } from 'react-icons/fa';
+import { FaChartBar } from 'react-icons/fa';
 import Link from 'next/link';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useAuth } from '../contexts/AuthContext';
@@ -70,7 +70,7 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                 className="
                     max-w-6xl mx-auto
                     flex items-center justify-between
-                    px-4 sm:px-6 py-3 sm:py-4
+                    px-2 xs:px-4 sm:px-6 py-2 xs:py-3 sm:py-4
                     bg-neo-cyan-muted
                     border-4 border-neo-black
                     shadow-hard-lg
@@ -80,7 +80,7 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
             >
                 {/* Logo */}
                 <motion.button
-                    className="flex items-center gap-2 sm:gap-3 cursor-pointer bg-transparent border-none p-0 min-w-0 flex-shrink"
+                    className="flex items-center gap-1 xs:gap-2 sm:gap-3 cursor-pointer bg-transparent border-none p-0 flex-shrink-0"
                     onClick={handleLogoClick}
                     whileHover={{ x: -2, y: -2 }}
                     whileTap={{ x: 2, y: 2 }}
@@ -124,7 +124,7 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                 </motion.button>
 
                 {/* Controls: Language + Admin + Level + Music + Auth/Settings */}
-                <div className="flex items-center gap-1.5 sm:gap-3 flex-shrink-0 min-w-0">
+                <div className="flex items-center gap-1 xs:gap-1.5 sm:gap-3 flex-shrink-0">
                     {/* Language Switcher */}
                     <div
                         className="relative"
@@ -135,7 +135,7 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                             onClick={() => setShowLangDropdown(!showLangDropdown)}
                             className={cn(
                                 "flex items-center justify-center gap-1",
-                                "w-11 h-11 sm:w-11 sm:h-11",
+                                "w-9 h-9 xs:w-10 xs:h-10 sm:w-11 sm:h-11",
                                 "bg-neo-cream text-neo-black",
                                 "border-2 sm:border-3 border-neo-black",
                                 "rounded-neo shadow-hard",
@@ -191,7 +191,7 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                             href={`/${language}/admin`}
                             className="
                                 flex items-center justify-center
-                                w-11 h-11
+                                w-9 h-9 xs:w-10 xs:h-10 sm:w-11 sm:h-11
                                 bg-neo-purple text-white
                                 border-2 sm:border-3 border-neo-black
                                 rounded-neo

@@ -26,6 +26,8 @@ interface GridComponentProps {
   comboLevel?: number;
   animateOnMount?: boolean;
   heatMapData?: HeatMapData | null;
+  fireRoundActive?: boolean;
+  earthquakeShaking?: boolean;
 }
 
 /**
@@ -48,6 +50,8 @@ const GridComponent = memo<GridComponentProps>(({
   comboLevel = 0,
   animateOnMount = false,
   heatMapData = null,
+  fireRoundActive = false,
+  earthquakeShaking = false,
 }) => {
   const [reduceMotion, setReduceMotion] = useState(false);
   const [performanceMode, setPerformanceMode] = useState<PerformanceMode>('full');
@@ -103,6 +107,87 @@ const GridComponent = memo<GridComponentProps>(({
     return hints;
   }, [selectedCells, grid]);
 
+  // Fire Round: Random glowing cells
+  const [glowingCells, setGlowingCells] = useState<Set<string>>(new Set());
+
+  // Randomize glowing cells when fire round is active (optimized for performance)
+  useEffect(() => {
+    if (!fireRoundActive) {
+      setGlowingCells(new Set());
+      return;
+    }
+
+    let animationFrameId: number;
+    let lastUpdate = 0;
+    const updateInterval = 3000; // Reduced frequency: every 3 seconds
+    const MAX_GLOW_CELLS = 6; // Maximum 6 cells glowing at once
+
+    // Check if a cell is adjacent to any already-selected cells
+    const isAdjacentToSelected = (row: number, col: number, selected: Set<string>): boolean => {
+      // Check all 8 surrounding cells (including diagonals)
+      const neighbors = [
+        `${row - 1}-${col}`,     // top
+        `${row + 1}-${col}`,     // bottom
+        `${row}-${col - 1}`,     // left
+        `${row}-${col + 1}`,     // right
+        `${row - 1}-${col - 1}`, // top-left
+        `${row - 1}-${col + 1}`, // top-right
+        `${row + 1}-${col - 1}`, // bottom-left
+        `${row + 1}-${col + 1}`, // bottom-right
+      ];
+
+      return neighbors.some(neighbor => selected.has(neighbor));
+    };
+
+    // Select up to 6 cells that are NOT adjacent to each other (disco-style distribution)
+    const randomizeGlow = () => {
+      const rows = grid.length;
+      const cols = grid[0]?.length || 0;
+      const selected = new Set<string>();
+
+      // Create array of all possible positions
+      const allPositions: Array<{ row: number; col: number }> = [];
+      for (let i = 0; i < rows; i++) {
+        for (let j = 0; j < cols; j++) {
+          allPositions.push({ row: i, col: j });
+        }
+      }
+
+      // Shuffle positions for random selection
+      const shuffled = allPositions.sort(() => Math.random() - 0.5);
+
+      // Select cells ensuring they're not adjacent
+      for (const pos of shuffled) {
+        if (selected.size >= MAX_GLOW_CELLS) break;
+
+        if (!isAdjacentToSelected(pos.row, pos.col, selected)) {
+          selected.add(`${pos.row}-${pos.col}`);
+        }
+      }
+
+      setGlowingCells(selected);
+    };
+
+    // Initial randomization
+    randomizeGlow();
+
+    // Use requestAnimationFrame for smoother updates
+    const animate = (timestamp: number) => {
+      if (timestamp - lastUpdate >= updateInterval) {
+        randomizeGlow();
+        lastUpdate = timestamp;
+      }
+      animationFrameId = requestAnimationFrame(animate);
+    };
+
+    animationFrameId = requestAnimationFrame(animate);
+
+    return () => {
+      if (animationFrameId) {
+        cancelAnimationFrame(animationFrameId);
+      }
+    };
+  }, [fireRoundActive, grid]);
 
   // Auto-focus on grid when game becomes interactive
   useEffect(() => {
@@ -183,8 +268,9 @@ const GridComponent = memo<GridComponentProps>(({
           dir="ltr"
           className={cn(
             "grid touch-none select-none relative rounded-neo w-full h-full",
-            isLargeGrid ? "gap-0.5 sm:gap-0.5" : "gap-1 sm:gap-1.5",
+            isLargeGrid ? "gap-1 sm:gap-1" : "gap-1.5 sm:gap-2",
             "bg-neo-cream border-2 border-neo-black/20",
+            earthquakeShaking && "earthquake-shake",
             className
           )}
           style={{
@@ -192,7 +278,7 @@ const GridComponent = memo<GridComponentProps>(({
             gridTemplateRows: `repeat(${grid.length || 4}, minmax(0, 1fr))`,
             backgroundImage: 'var(--halftone-pattern)',
             backgroundColor: 'var(--neo-cream)',
-            ['--cell-font-size' as string]: `calc((100cqw / ${grid[0]?.length || 4}) * ${largeText ? 0.55 : 0.50})`,
+            ['--cell-font-size' as string]: `calc((100cqw / ${grid[0]?.length || 4}) * ${largeText ? 0.70 : 0.50})`,
             containerType: 'size',
           }}
           role="grid"
@@ -212,6 +298,7 @@ const GridComponent = memo<GridComponentProps>(({
               const isFocused = focusedCell?.row === i && focusedCell?.col === j;
               const heatStyle = getHeatMapStyle(i, j, heatMapData);
               const isAdjacentHint = adjacentHintCells.has(`${i}-${j}`);
+              const isGlowing = glowingCells.has(`${i}-${j}`);
 
               return (
                 <motion.div
@@ -258,6 +345,8 @@ const GridComponent = memo<GridComponentProps>(({
                     isAdjacentHint && !isSelected && "ring-2 ring-neo-yellow/70 ring-offset-1 ring-offset-neo-cream",
                     // Keyboard focus indicator
                     isFocused && !isSelected && "ring-4 ring-neo-cyan ring-offset-2 ring-offset-neo-cream z-20",
+                    // Fire round glow - random cells glow during fire round
+                    isGlowing && fireRoundActive && !isSelected && "fire-glow",
                     "transition-all",
                     comboLevel > 0 ? "duration-300" : "duration-100"
                   )}
@@ -277,11 +366,8 @@ const GridComponent = memo<GridComponentProps>(({
                     ...(isSelected && comboColors.isRainbow ? {
                       background: 'linear-gradient(135deg, #FF3366, #FF6B35, #FFE135, #BFFF00, #00FFFF, #FF1493, #8B5CF6)',
                       backgroundSize: '300% 300%',
-                      animation: comboColors.strobe
-                        ? (comboColors.intenseStrobe
-                          ? 'rainbow-cell 0.6s ease infinite, strobe-intense 0.1s infinite alternate'
-                          : 'rainbow-cell 1s ease infinite, strobe-light 0.15s infinite alternate')
-                        : 'rainbow-cell 1.2s ease infinite'
+                      // Removed strobe effects for accessibility - slow rainbow animation only
+                      animation: reduceMotion ? 'none' : 'rainbow-cell 2s ease infinite'
                     } : isSelected && comboLevel >= 5 ? {
                       background: 'linear-gradient(135deg, #FF6B35, #FF3366, #FF6B35)',
                       backgroundSize: '200% 200%',

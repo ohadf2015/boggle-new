@@ -27,7 +27,7 @@
       - generic [ref=e25]:
         - generic [ref=e26]:
           - img [ref=e30]
-          - generic [ref=e32]: "6"
+          - generic [ref=e32]: "2"
         - generic [ref=e34]:
           - img [ref=e35]
           - generic [ref=e37]: "1"

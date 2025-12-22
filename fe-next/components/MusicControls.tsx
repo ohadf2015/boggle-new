@@ -78,7 +78,7 @@ const MusicControls: React.FC = memo(() => {
         variant="outline"
         size="icon"
         onClick={handleClick}
-        className="relative bg-neo-cream text-neo-black"
+        className="relative bg-neo-cream text-neo-black w-9 h-9 xs:w-10 xs:h-10 sm:w-11 sm:h-11"
         aria-label={isMuted ? (t('music.unmute') || 'Unmute') : (t('music.mute') || 'Mute')}
         aria-pressed={!isMuted}
       >

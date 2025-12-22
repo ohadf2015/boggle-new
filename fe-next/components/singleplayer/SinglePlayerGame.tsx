@@ -8,10 +8,12 @@ import { HelpPanel, HelpButton } from '@/components/game/HelpPanel';
 import { Button } from '@/components/ui/button';
 import GridComponent from '@/components/GridComponent';
 import CircularTimer from '@/components/CircularTimer';
+import { EarthquakeWarning, FireRoundIndicator } from '@/components/earthquake';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import { useGameMusic } from '@/hooks/useGameMusic';
 import { useMusic } from '@/contexts/MusicContext';
+import { useEarthquakeFireRound } from '@/hooks/useEarthquakeFireRound';
 import { generateRandomTable, applyHebrewFinalLetters } from '@/utils/utils';
 import { DIFFICULTIES } from '@/utils/consts';
 import { cn } from '@/lib/utils';
@@ -53,7 +55,15 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
   onQuit,
 }) => {
   const { t } = useLanguage();
-  const { playWordAcceptedSound, playComboSound } = useSoundEffects();
+  const {
+    playWordAcceptedSound,
+    playComboSound,
+    playEarthquakeRumble,
+    playEarthquakeShake,
+    playFireRoundStart,
+    startFireCrackleLoop,
+    stopFireCrackleLoop,
+  } = useSoundEffects();
   const { announceWordResult, announceCombo } = useAnnouncer();
   const { stopMusic } = useMusic();
   const isLandscape = useMobileLandscape();
@@ -115,6 +125,52 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
       stopMusic(500); // Fade out quickly on unmount
     };
   }, [stopMusic]);
+
+  // Earthquake/Fire Round feature
+  const {
+    earthquakeState,
+    fireRoundActive,
+    fireRoundRemaining,
+    getScoreMultiplier,
+  } = useEarthquakeFireRound({
+    enabled: settings.mode !== 'practice',
+    gameDurationSeconds: settings.timerSeconds,
+    currentTimeSeconds: remainingTime,
+    language: settings.language,
+    difficulty: settings.difficulty,
+    mode: 'singleplayer',
+    onGridRegenerate: (newGrid) => {
+      setGrid(newGrid);
+      // Clear found words set when grid regenerates
+      foundWordsSetRef.current.clear();
+    },
+    onEarthquakeStart: () => {
+      // Play earthquake rumble sound and haptic feedback
+      playEarthquakeRumble();
+      if (typeof window !== 'undefined' && 'vibrate' in navigator) {
+        navigator.vibrate([100, 50, 100]); // Light vibration pattern
+      }
+    },
+    onEarthquakeShake: () => {
+      // Play earthquake shake sound and heavy haptic
+      playEarthquakeShake();
+      if (typeof window !== 'undefined' && 'vibrate' in navigator) {
+        navigator.vibrate([200, 100, 200, 100, 200]); // Heavy shake pattern
+      }
+    },
+    onFireRoundStart: () => {
+      // Play fire round sounds and heavy haptic
+      playFireRoundStart();
+      startFireCrackleLoop();
+      if (typeof window !== 'undefined' && 'vibrate' in navigator) {
+        navigator.vibrate(200);
+      }
+    },
+    onFireRoundEnd: () => {
+      // Stop fire round ambient sound
+      stopFireCrackleLoop();
+    },
+  });
 
   // Generate grid on mount
   useEffect(() => {
@@ -338,7 +394,9 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
     const baseScore = Math.max(wordLength - 1, 1);
     // Combo bonus scales with combo level (only applies after first word)
     const comboBonus = currentComboLevel > 0 ? Math.floor(baseScore * (currentComboLevel * 0.1)) : 0;
-    return baseScore + comboBonus;
+    // Fire round multiplier (2x during fire round, 1x otherwise)
+    const multiplier = getScoreMultiplier();
+    return (baseScore + comboBonus) * multiplier;
   };
 
 
@@ -539,6 +597,16 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
 
     return (
       <div className="relative flex items-center justify-center w-full h-full min-h-screen overflow-hidden bg-slate-900">
+        {/* Earthquake Warning Overlay */}
+        <EarthquakeWarning
+          isVisible={earthquakeState === 'warning'}
+        />
+
+        {/* Fire Round Indicator */}
+        <FireRoundIndicator
+          isActive={fireRoundActive}
+          remainingSeconds={fireRoundRemaining}
+        />
         {/* Left side: Timer + Score */}
         <div className="absolute left-2 top-1/2 -translate-y-1/2 flex flex-col items-center gap-2 z-20">
           {settings.mode !== 'practice' && (
@@ -634,15 +702,19 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
           />
         </div>
 
-        {/* Center: Grid - maximized */}
-        <div className="flex items-center justify-center w-full h-full px-16 py-2">
-          <GridComponent
-            grid={grid}
-            interactive={!isPaused}
-            onWordSubmit={handleWordSubmit}
-            comboLevel={comboLevel}
-            largeText
-          />
+        {/* Center: Grid - maximized for landscape */}
+        <div className="flex items-center justify-center w-full h-full px-3 py-0.5 landscape-grid-container">
+          <div className="h-full flex items-center justify-center game-board-frame-landscape" style={{ aspectRatio: '1/1' }}>
+            <GridComponent
+              grid={grid}
+              interactive={!isPaused}
+              onWordSubmit={handleWordSubmit}
+              comboLevel={comboLevel}
+              largeText
+              fireRoundActive={fireRoundActive}
+              earthquakeShaking={earthquakeState === 'shaking'}
+            />
+          </div>
         </div>
 
         {/* Help Panel */}
@@ -656,6 +728,17 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
 
   return (
     <div className="space-y-4">
+      {/* Earthquake Warning Overlay */}
+      <EarthquakeWarning
+        isVisible={earthquakeState === 'warning'}
+      />
+
+      {/* Fire Round Indicator */}
+      <FireRoundIndicator
+        isActive={fireRoundActive}
+        remainingSeconds={fireRoundRemaining}
+      />
+
       {/* Header with controls */}
       <div className="flex items-center justify-between px-4">
         <Button variant="ghost" size="sm" onClick={onQuit}>
@@ -834,6 +917,8 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
           onWordSubmit={handleWordSubmit}
           comboLevel={comboLevel}
           largeText
+          fireRoundActive={fireRoundActive}
+          earthquakeShaking={earthquakeState === 'shaking'}
         />
       </div>
 

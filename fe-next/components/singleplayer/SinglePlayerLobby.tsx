@@ -208,7 +208,7 @@ const SinglePlayerLobby: React.FC<SinglePlayerLobbyProps> = ({
             <div>
               <label className="text-xs font-bold uppercase text-neo-white mb-1 block">{t('singlePlayer.timer') || 'Timer'}</label>
               <div className="flex gap-1">
-                {[2, 3, 5].map(min => (
+                {[1, 2, 3].map(min => (
                   <button
                     key={min}
                     onClick={() => setTimerMinutes(min)}
@@ -234,24 +234,53 @@ const SinglePlayerLobby: React.FC<SinglePlayerLobbyProps> = ({
           {mode === 'solo-bots' && (
             <div>
               <div className="flex items-center justify-between mb-1">
-                <label className="text-xs font-bold uppercase text-neo-white">{t('singlePlayer.opponents') || 'Opponents'}</label>
-                {bots.length < 5 && (
-                  <button onClick={addBot} className="text-xs bg-neo-lime px-2 py-1 rounded-neo border border-neo-black font-bold">
-                    <FaPlus className="inline mr-1" />Add
+                <label className="text-xs font-bold uppercase text-neo-white flex items-center gap-1">
+                  <FaRobot />
+                  {t('singlePlayer.opponents') || 'Opponents'}
+                </label>
+              </div>
+              <div className="flex gap-1 items-center mb-2">
+                {(['easy', 'medium', 'hard'] as BotDifficulty[]).map(diff => (
+                  <button
+                    key={diff}
+                    onClick={() => setSelectedBotDifficulty(diff)}
+                    className={cn(
+                      'px-2 py-1 rounded text-[10px] font-bold uppercase border-2 border-neo-black/30 text-neo-black flex-1',
+                      selectedBotDifficulty === diff
+                        ? BOT_DIFFICULTY_CONFIG[diff].color
+                        : 'bg-white hover:bg-slate-100'
+                    )}
+                  >
+                    {t(BOT_DIFFICULTY_CONFIG[diff].labelKey) || diff}
                   </button>
-                )}
-              </div>
-              <div className="flex flex-wrap gap-1">
-                {bots.map(bot => (
-                  <Badge key={bot.id} className="flex items-center gap-1 text-[10px]">
-                    <FaRobot />
-                    {bot.name}
-                    <button onClick={() => removeBot(bot.id)} className="ml-1 opacity-60 hover:opacity-100">
-                      <FaTimes className="text-[8px]" />
-                    </button>
-                  </Badge>
                 ))}
+                <button
+                  onClick={addBot}
+                  disabled={bots.length >= 5}
+                  className="px-2 py-1 text-xs bg-neo-lime hover:bg-neo-lime/80 disabled:opacity-50 disabled:cursor-not-allowed rounded-neo border border-neo-black font-bold"
+                >
+                  <FaPlus className="inline" />
+                </button>
               </div>
+              {bots.length > 0 ? (
+                <div className="flex flex-wrap gap-1">
+                  {bots.map(bot => (
+                    <Badge
+                      key={bot.id}
+                      className={cn('text-[10px] flex items-center gap-1', BOT_DIFFICULTY_CONFIG[bot.difficulty].color)}
+                    >
+                      {bot.name}
+                      <button onClick={() => removeBot(bot.id)} className="ml-1 hover:text-neo-red">
+                        <FaTimes className="text-[8px]" />
+                      </button>
+                    </Badge>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-[10px] text-neo-white/50 italic text-center">
+                  {t('singlePlayer.noBots') || 'Tap + to add bot opponents'}
+                </p>
+              )}
             </div>
           )}
 
@@ -261,7 +290,7 @@ const SinglePlayerLobby: React.FC<SinglePlayerLobbyProps> = ({
             className="w-full h-12 font-black uppercase text-lg bg-neo-yellow hover:bg-neo-yellow/90 text-neo-black border-3 border-neo-black mt-auto"
           >
             <FaPlay className="mr-2" />
-            {t('common.start') || 'Start Game'}
+            {t('singlePlayer.startGame') || 'Start Game'}
           </Button>
         </div>
       </div>
