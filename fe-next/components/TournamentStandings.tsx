@@ -52,13 +52,13 @@ const TournamentStandings: React.FC<TournamentStandingsProps> = ({
   const getPlacementColor = (placement: number): string => {
     switch (placement) {
       case 1:
-        return 'from-yellow-400 to-amber-500';
+        return 'bg-neo-yellow text-neo-black';
       case 2:
-        return 'from-gray-300 to-gray-400';
+        return 'bg-slate-300 text-neo-black';
       case 3:
-        return 'from-amber-500 to-amber-600';
+        return 'bg-neo-orange text-neo-black';
       default:
-        return 'from-purple-500 to-pink-500';
+        return 'bg-neo-purple text-neo-cream';
     }
   };
 
@@ -102,11 +102,11 @@ const TournamentStandings: React.FC<TournamentStandingsProps> = ({
                       : 'border-purple-500/30 shadow-md'
                   )}
                 >
-                  {/* Background gradient for top 3 */}
+                  {/* Background solid color for top 3 - Neo-Brutalist */}
                   {isTopThree && (
                     <div
                       className={cn(
-                        'absolute inset-0 bg-gradient-to-r opacity-10',
+                        'absolute inset-0 opacity-10',
                         getPlacementColor(placement)
                       )}
                     />
@@ -162,9 +162,7 @@ const TournamentStandings: React.FC<TournamentStandingsProps> = ({
                       <Badge
                         className={cn(
                           'text-lg font-bold px-3 py-1',
-                          isTopThree
-                            ? `bg-gradient-to-r ${getPlacementColor(placement)} text-white`
-                            : 'bg-gradient-to-r from-purple-500 to-pink-500 text-white'
+                          getPlacementColor(placement)
                         )}
                       >
                         {player.totalScore}
@@ -186,16 +184,16 @@ const TournamentStandings: React.FC<TournamentStandingsProps> = ({
             initial={{ scale: 0, rotate: -10 }}
             animate={{ scale: 1, rotate: 0 }}
             transition={{ type: 'spring', duration: 0.5 }}
-            className="text-center p-4 bg-gradient-to-r from-yellow-400 to-amber-500 rounded-lg shadow-xl"
+            className="text-center p-4 bg-neo-yellow rounded-lg shadow-xl border-3 border-neo-black"
           >
-            <FaStar className="text-white text-3xl mx-auto mb-2 animate-pulse" />
-            <p className="text-sm font-medium text-yellow-900">
+            <FaStar className="text-neo-black text-3xl mx-auto mb-2 animate-pulse" />
+            <p className="text-sm font-medium text-neo-black">
               {t('hostView.tournamentWinner')}
             </p>
-            <p className="text-2xl font-bold text-white mt-1">
+            <p className="text-2xl font-bold text-neo-black mt-1">
               {standings[0].username}
             </p>
-            <p className="text-lg font-semibold text-yellow-100">
+            <p className="text-lg font-semibold text-neo-black">
               {standings[0].totalScore} {t('hostView.totalScore').toLowerCase()}
             </p>
           </motion.div>

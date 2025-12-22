@@ -375,7 +375,7 @@ const ResultsPlayerCard: React.FC<ResultsPlayerCardProps> = ({ player, index, al
                 initial={{ scale: 0, opacity: 0, x: -20 }}
                 animate={{ scale: 1, opacity: 1, x: 0 }}
                 transition={{ delay: 0.3, type: 'spring', stiffness: 300 }}
-                className="bg-gradient-to-r from-neo-purple to-neo-pink border-2 border-neo-black rounded-neo px-2 py-0.5 shadow-hard-sm text-neo-cream flex items-center gap-1"
+                className="bg-neo-purple border-2 border-neo-black rounded-neo px-2 py-0.5 shadow-hard-sm text-neo-cream flex items-center gap-1"
               >
                 <span className="text-xs font-black">⭐ +{xpGainedData.xpEarned} XP</span>
               </motion.div>
@@ -439,7 +439,7 @@ const ResultsPlayerCard: React.FC<ResultsPlayerCardProps> = ({ player, index, al
                           <div className="text-xl sm:text-2xl font-black text-neo-black dark:text-neo-cream">
                             {summaryStats.validCount}
                           </div>
-                          <div className="text-[10px] sm:text-xs uppercase text-neo-black/70 dark:text-neo-cream/70 font-bold">
+                          <div className="text-[10px] sm:text-xs uppercase text-neo-black/90 dark:text-neo-cream/90 font-bold">
                             {t('results.validWords') || 'Valid'}
                           </div>
                         </div>
@@ -447,7 +447,7 @@ const ResultsPlayerCard: React.FC<ResultsPlayerCardProps> = ({ player, index, al
                           <div className="text-lg sm:text-xl font-black text-neo-cyan uppercase">
                             {summaryStats.longestWord}
                           </div>
-                          <div className="text-[10px] sm:text-xs uppercase text-neo-black/70 dark:text-neo-cream/70 font-bold">
+                          <div className="text-[10px] sm:text-xs uppercase text-neo-black/90 dark:text-neo-cream/90 font-bold">
                             {t('results.longest') || 'Longest'}
                           </div>
                         </div>
@@ -455,7 +455,7 @@ const ResultsPlayerCard: React.FC<ResultsPlayerCardProps> = ({ player, index, al
                           <div className="text-xl sm:text-2xl font-black text-neo-purple">
                             {summaryStats.accuracy}%
                           </div>
-                          <div className="text-[10px] sm:text-xs uppercase text-neo-black/70 dark:text-neo-cream/70 font-bold">
+                          <div className="text-[10px] sm:text-xs uppercase text-neo-black/90 dark:text-neo-cream/90 font-bold">
                             {t('results.accuracy') || 'Accuracy'}
                           </div>
                         </div>

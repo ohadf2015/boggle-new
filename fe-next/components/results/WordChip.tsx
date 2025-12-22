@@ -56,7 +56,7 @@ const WordChip = memo<WordChipProps>(({ wordObj, playerCount }) => {
   const getBackgroundColor = (): string => {
     if (isDuplicate) return 'var(--neo-orange)';
     if (isPending) return 'var(--neo-purple)';
-    if (!isValid) return 'var(--neo-red, #ef4444)';
+    if (!isValid) return '#DC2626'; // Darker red for 4.6:1 contrast with cream text
     return getPointColor(wordObj.score);
   };
 
@@ -72,8 +72,8 @@ const WordChip = memo<WordChipProps>(({ wordObj, playerCount }) => {
   const chipContent = (
     <span
       className={cn(
-        // Increased padding for 44px minimum touch target (WCAG 2.1 AA)
-        "inline-flex items-center gap-1.5 px-3 py-2.5 min-h-[44px] text-sm font-black uppercase border-2 border-neo-black rounded-neo shadow-hard-sm transition-all hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-hard",
+        // Increased padding for 48px minimum touch target to account for borders (WCAG 2.1 AA)
+        "inline-flex items-center gap-1.5 px-4 py-3 min-h-[48px] text-sm font-black uppercase border-2 border-neo-black rounded-neo shadow-hard-sm transition-all hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-hard",
         isDuplicate && "line-through opacity-80",
         !isDuplicate && !isValid && !isPending && "opacity-70",
         isPending && "animate-pulse",
@@ -92,7 +92,7 @@ const WordChip = memo<WordChipProps>(({ wordObj, playerCount }) => {
       {label}
       {/* Show info icon for invalid words with reason - indicates it's tappable */}
       {hasInvalidReason && (
-        <span className="text-xs w-5 h-5 flex items-center justify-center bg-neo-cream/20 rounded border border-neo-cream/30 font-black">
+        <span className="text-xs w-8 h-8 min-w-[44px] min-h-[44px] flex items-center justify-center bg-neo-cream/20 rounded border border-neo-cream/30 font-black">
           ℹ️
         </span>
       )}

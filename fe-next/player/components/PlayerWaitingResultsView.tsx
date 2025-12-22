@@ -202,7 +202,7 @@ const PlayerWaitingResultsView: React.FC<PlayerWaitingResultsViewProps> = ({
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
                         transition={{ duration: 0.2 }}
-                        className="bg-neo-purple text-neo-white px-2 lg:px-3 py-1 font-black text-base lg:text-lg uppercase border-3 border-neo-black shadow-hard-sm"
+                        className="bg-neo-purple text-neo-cream px-2 lg:px-3 py-1 font-black text-base lg:text-lg uppercase border-3 border-neo-black shadow-hard-sm"
                       >
                         {currentWord}
                       </motion.span>

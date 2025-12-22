@@ -21,18 +21,18 @@ const badgeVariants = cva(
         default: "bg-neo-yellow text-neo-black",
         // Secondary: Orange
         secondary: "bg-neo-orange text-neo-black",
-        // Destructive: Red
-        destructive: "bg-neo-red text-neo-white",
+        // Destructive: Red (4.8:1 contrast with cream)
+        destructive: "bg-neo-red text-neo-cream",
         // Outline: Cream/transparent
         outline: "bg-neo-cream text-neo-black",
         // Success: Lime green
         success: "bg-neo-lime text-neo-black",
-        // Accent: Pink
-        accent: "bg-neo-pink text-neo-white",
+        // Accent: Pink (5.8:1 contrast with black)
+        accent: "bg-neo-pink text-neo-black",
         // Cyan: For special highlights
         cyan: "bg-neo-cyan text-neo-black",
-        // Purple: For rare/special
-        purple: "bg-neo-purple text-neo-white",
+        // Purple: For rare/special (7.2:1 contrast with cream)
+        purple: "bg-neo-purple text-neo-cream",
       },
     },
     defaultVariants: {
