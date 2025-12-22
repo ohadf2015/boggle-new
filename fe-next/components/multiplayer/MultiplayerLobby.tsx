@@ -244,88 +244,90 @@ const MultiplayerLobby: React.FC<MultiplayerLobbyProps> = ({
           )}
 
           {/* Form fields */}
-          <form onSubmit={handleSubmit} className="space-y-3 flex-1">
-            {mode === 'host' ? (
-              <>
-                {/* Room Name */}
-                <div>
-                  <Label htmlFor="roomName" className="text-sm font-bold uppercase text-neo-white mb-1 block">
-                    {t('joinView.roomNamePlaceholder') || 'Room Name'}
-                  </Label>
-                  <Input
-                    id="roomName"
-                    value={roomName}
-                    onChange={(e) => { setRoomName(e.target.value); setRoomNameError(false); }}
-                    placeholder={displayName || t('validation.enterRoomName') || 'Enter room name'}
-                    className={cn("h-11 text-base", roomNameError && 'border-neo-red')}
-                  />
-                </div>
-
-                {/* Game Code */}
-                <div>
-                  <Label htmlFor="gameCode" className="text-sm font-bold uppercase text-neo-white mb-1 block">
-                    {t('hostView.roomCode') || 'Room Code'}
-                  </Label>
-                  <div className="flex gap-2">
+          <form onSubmit={handleSubmit} className="flex flex-col space-y-3 flex-1 min-h-0">
+            <div className="flex-1 overflow-y-auto space-y-3">
+              {mode === 'host' ? (
+                <>
+                  {/* Room Name */}
+                  <div>
+                    <Label htmlFor="roomName" className="text-sm font-bold uppercase text-neo-white mb-1 block">
+                      {t('joinView.roomNamePlaceholder') || 'Room Name'}
+                    </Label>
                     <Input
-                      id="gameCode"
+                      id="roomName"
+                      value={roomName}
+                      onChange={(e) => { setRoomName(e.target.value); setRoomNameError(false); }}
+                      placeholder={displayName || t('validation.enterRoomName') || 'Enter room name'}
+                      className={cn("h-11 text-base", roomNameError && 'border-neo-red')}
+                    />
+                  </div>
+
+                  {/* Game Code */}
+                  <div>
+                    <Label htmlFor="gameCode" className="text-sm font-bold uppercase text-neo-white mb-1 block">
+                      {t('hostView.roomCode') || 'Room Code'}
+                    </Label>
+                    <div className="flex gap-2">
+                      <Input
+                        id="gameCode"
+                        value={gameCode}
+                        onChange={(e) => { setGameCode(e.target.value.toUpperCase()); setGameCodeError(false); }}
+                        className="h-11 text-base font-mono flex-1"
+                      />
+                      <Button type="button" variant="secondary" size="sm" onClick={generateRoomCode} className="h-11 w-11 px-0">
+                        <FaDice />
+                      </Button>
+                    </div>
+                  </div>
+
+                  {/* Language */}
+                  <div>
+                    <Label className="text-sm font-bold uppercase text-neo-white mb-1 block">
+                      {t('joinView.language') || 'Language'}
+                    </Label>
+                    <LanguageSelector selectedLanguage={roomLanguage} onLanguageChange={setRoomLanguage} />
+                  </div>
+                </>
+              ) : (
+                <>
+                  {/* Join: Game Code */}
+                  <div>
+                    <Label htmlFor="gameCodeJoin" className="text-sm font-bold uppercase text-neo-white mb-1 block">
+                      {t('joinView.roomCode') || 'Room Code'}
+                    </Label>
+                    <Input
+                      id="gameCodeJoin"
                       value={gameCode}
                       onChange={(e) => { setGameCode(e.target.value.toUpperCase()); setGameCodeError(false); }}
-                      className="h-11 text-base font-mono flex-1"
+                      placeholder="XXXX"
+                      className={cn("h-11 text-base font-mono", gameCodeError && 'border-neo-red')}
                     />
-                    <Button type="button" variant="secondary" size="sm" onClick={generateRoomCode} className="h-11 w-11 px-0">
-                      <FaDice />
-                    </Button>
                   </div>
-                </div>
+                </>
+              )}
 
-                {/* Language */}
+              {/* Username */}
+              {!isAuthenticated && (
                 <div>
-                  <Label className="text-sm font-bold uppercase text-neo-white mb-1 block">
-                    {t('joinView.language') || 'Language'}
-                  </Label>
-                  <LanguageSelector selectedLanguage={roomLanguage} onLanguageChange={setRoomLanguage} />
-                </div>
-              </>
-            ) : (
-              <>
-                {/* Join: Game Code */}
-                <div>
-                  <Label htmlFor="gameCodeJoin" className="text-sm font-bold uppercase text-neo-white mb-1 block">
-                    {t('joinView.roomCode') || 'Room Code'}
+                  <Label htmlFor="username" className="text-sm font-bold uppercase text-neo-white mb-1 block">
+                    {t('joinView.nickname') || 'Nickname'}
                   </Label>
                   <Input
-                    id="gameCodeJoin"
-                    value={gameCode}
-                    onChange={(e) => { setGameCode(e.target.value.toUpperCase()); setGameCodeError(false); }}
-                    placeholder="XXXX"
-                    className={cn("h-11 text-base font-mono", gameCodeError && 'border-neo-red')}
+                    id="username"
+                    value={username}
+                    onChange={(e) => { setUsername(e.target.value); setUsernameError(false); }}
+                    placeholder={t('joinView.nicknamePlaceholder') || 'Enter nickname'}
+                    className={cn("h-11 text-base", usernameError && 'border-neo-red')}
                   />
                 </div>
-              </>
-            )}
+              )}
+            </div>
 
-            {/* Username */}
-            {!isAuthenticated && (
-              <div>
-                <Label htmlFor="username" className="text-sm font-bold uppercase text-neo-white mb-1 block">
-                  {t('joinView.nickname') || 'Nickname'}
-                </Label>
-                <Input
-                  id="username"
-                  value={username}
-                  onChange={(e) => { setUsername(e.target.value); setUsernameError(false); }}
-                  placeholder={t('joinView.nicknamePlaceholder') || 'Enter nickname'}
-                  className={cn("h-11 text-base", usernameError && 'border-neo-red')}
-                />
-              </div>
-            )}
-
-            {/* Submit Button */}
+            {/* Submit Button - fixed at bottom */}
             <Button
               type="submit"
               disabled={isJoining}
-              className="w-full h-12 font-black uppercase text-base bg-neo-yellow hover:bg-neo-yellow/90 text-neo-black border-3 border-neo-black shadow-hard hover:shadow-hard-lg transition-all"
+              className="w-full h-12 font-black uppercase text-base bg-neo-yellow hover:bg-neo-yellow/90 text-neo-black border-3 border-neo-black shadow-hard hover:shadow-hard-lg transition-all flex-shrink-0"
             >
               {mode === 'host' ? <FaCrown className="mr-2" /> : <FaUser className="mr-2" />}
               {isJoining ? (t('common.loading') || 'Loading...') : mode === 'host' ? (t('joinView.createRoom') || 'Create Room') : (t('joinView.joinRoom') || 'Join Room')}
