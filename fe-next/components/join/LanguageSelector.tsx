@@ -39,21 +39,21 @@ export const LanguageSelector: React.FC<LanguageSelectorProps> = ({
       <CardDescription className="text-sm font-bold uppercase text-neo-black/70 dark:text-neo-white/70">
         {t('joinView.selectLanguage')}
       </CardDescription>
-      <div className="grid grid-cols-2 sm:grid-cols-5 gap-2 sm:gap-3">
+      <div className="flex flex-wrap gap-1.5 sm:gap-2">
         {LANGUAGE_OPTIONS.map((option) => (
           <button
             key={option.code}
             type="button"
             onClick={() => onLanguageChange(option.code)}
             className={cn(
-              "flex flex-col items-center gap-1 p-3 rounded-neo border-3 transition-all duration-100",
+              "flex items-center gap-1.5 py-1.5 px-2.5 rounded-neo border-3 transition-all duration-100",
               selectedLanguage === option.code
-                ? "bg-neo-cyan border-neo-cyan text-neo-black shadow-hard"
+                ? "bg-neo-cyan border-neo-cyan text-neo-black shadow-hard-sm"
                 : "bg-white dark:bg-slate-600 border-neo-black dark:border-slate-500 text-neo-black dark:text-neo-white shadow-hard-sm hover:shadow-hard hover:translate-x-[-1px] hover:translate-y-[-1px] hover:border-neo-cyan"
             )}
           >
-            <span className="text-2xl">{option.flag}</span>
-            <span className="font-bold text-xs uppercase">{t(option.labelKey)}</span>
+            <span className="text-base leading-none">{option.flag}</span>
+            <span className="font-bold text-[10px] uppercase leading-none">{t(option.labelKey)}</span>
           </button>
         ))}
       </div>

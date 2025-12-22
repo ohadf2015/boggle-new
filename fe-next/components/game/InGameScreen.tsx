@@ -4,7 +4,6 @@ import React, { ReactNode, useRef, useEffect, useCallback, useMemo, memo, useSta
 import { motion, AnimatePresence } from 'framer-motion';
 import { FaTrophy, FaCrown } from 'react-icons/fa';
 import type { Socket } from 'socket.io-client';
-import { Button } from '../ui/button';
 import { Badge } from '../ui/badge';
 import { Card, CardContent } from '../ui/card';
 import ExitRoomButton from '../ExitRoomButton';
@@ -23,37 +22,7 @@ import { useAnnouncer } from '../GameAnnouncer';
 import { validateWordLocally, couldBeOnBoard } from '../../utils/clientWordValidator';
 import { hapticForWordScore, hapticError } from '../../utils/haptics';
 import type { LetterGrid, Language, Avatar as AvatarType, PresenceStatus } from '@/shared/types/game';
-
-// ==================== Hooks ====================
-
-/**
- * Hook to detect mobile landscape mode
- * Returns true when on mobile/tablet in landscape orientation
- */
-function useMobileLandscape(): boolean {
-  const [isLandscape, setIsLandscape] = useState(false);
-
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
-
-    const checkLandscape = () => {
-      const isLandscapeMode = window.innerWidth > window.innerHeight;
-      const isMobileHeight = window.innerHeight <= 600;
-      setIsLandscape(isLandscapeMode && isMobileHeight);
-    };
-
-    checkLandscape();
-    window.addEventListener('resize', checkLandscape);
-    window.addEventListener('orientationchange', checkLandscape);
-
-    return () => {
-      window.removeEventListener('resize', checkLandscape);
-      window.removeEventListener('orientationchange', checkLandscape);
-    };
-  }, []);
-
-  return isLandscape;
-}
+import { useMobileLandscape } from '@/hooks/useMobileLandscape';
 
 // ==================== Types ====================
 
@@ -294,25 +263,18 @@ const InGameScreen = memo<InGameScreenProps>(({
   })), [leaderboard, username, getRankStyle]);
 
   // ==================== Landscape Layout ====================
-  // In landscape mobile mode, use a compact horizontal layout
+  // In landscape mobile mode, use a maximized grid layout with stats on sides
   if (isLandscape) {
     return (
       <>
         <HelpPanel isOpen={showHelpPanel} onClose={() => setShowHelpPanel(false)} />
 
-        <div className="flex flex-row gap-2 flex-grow w-full h-full overflow-hidden p-landscape-compact">
-          {/* Left Column: Timer + Score + Words (compact) */}
-          <div className="flex flex-col gap-1 w-24 flex-shrink-0">
-            {/* Exit Button - Small */}
-            {onExitRoom && (
-              <ExitRoomButton
-                onClick={onExitRoom}
-                label={t('playerView.exit')}
-                className="!py-1 !px-2 text-xs"
-              />
-            )}
+        {/* Full-screen landscape container with grid centered */}
+        <div className="relative flex items-center justify-center w-full h-full overflow-hidden bg-slate-900">
 
-            {/* Timer - Compact */}
+          {/* Left Side Stats - Timer + Rank (overlaid on left edge) */}
+          <div className="absolute left-2 top-1/2 -translate-y-1/2 flex flex-col items-center gap-2 z-20">
+            {/* Timer - Compact circular */}
             {remainingTime !== null && (
               <div className="flex justify-center">
                 <CircularTimer
@@ -323,110 +285,117 @@ const InGameScreen = memo<InGameScreenProps>(({
               </div>
             )}
 
-            {/* Score - Compact */}
-            {isPlaying && (
-              <div className="bg-neo-yellow border-2 border-neo-black rounded-neo shadow-hard-sm px-2 py-1 text-center">
-                <div className="text-lg font-black text-neo-black leading-tight">
-                  {playerData.score}
-                </div>
-                <div className="text-[8px] font-bold uppercase text-neo-black/70">
-                  {t('common.score') || 'Score'}
-                </div>
-              </div>
-            )}
-
-            {/* Combo - Compact */}
-            {isPlaying && comboLevel > 1 && (
+            {/* Rank Badge (if in multiplayer) */}
+            {isPlaying && playerData.rank && playerData.rank > 0 && leaderboard.length > 1 && (
               <motion.div
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }}
-                className="bg-neo-cyan border-2 border-neo-black rounded-neo shadow-hard-sm px-2 py-1 text-center"
+                className="bg-neo-purple text-neo-cream border-2 border-neo-black rounded-neo shadow-hard-sm px-2 py-1 text-center"
               >
-                <div className="text-lg font-black text-neo-black leading-tight">
-                  x{comboLevel}
+                <div className="text-sm font-black leading-tight">
+                  #{playerData.rank}
                 </div>
-                <div className="text-[8px] font-bold uppercase text-neo-black/70">
-                  {t('common.combo') || 'Combo'}
+                <div className="text-[7px] font-bold uppercase opacity-80">
+                  Rank
                 </div>
               </motion.div>
             )}
 
-            {/* Word count - Compact */}
+            {/* Words count - minimal */}
             {isPlaying && (
-              <div className="bg-neo-cream border-2 border-neo-black rounded-neo shadow-hard-sm px-2 py-1 text-center">
-                <div className="text-lg font-black text-neo-black leading-tight">
+              <div className="bg-neo-cream/90 border-2 border-neo-black rounded-neo shadow-hard-sm px-2 py-1 text-center">
+                <div className="text-sm font-black text-neo-black leading-tight">
                   {normalizedFoundWords.length}
                 </div>
-                <div className="text-[8px] font-bold uppercase text-neo-black/70">
+                <div className="text-[7px] font-bold uppercase text-neo-black/70">
                   {t('common.words') || 'Words'}
                 </div>
               </div>
             )}
+          </div>
 
-            {/* Help Button - Small */}
+          {/* Right Side Stats - Score + Combo (overlaid on right edge) */}
+          <div className="absolute right-2 top-1/2 -translate-y-1/2 flex flex-col items-center gap-2 z-20">
+            {/* Score - Compact */}
+            {isPlaying && (
+              <motion.div
+                initial={{ scale: 0, rotate: -5 }}
+                animate={{ scale: 1, rotate: 2 }}
+                className="bg-neo-yellow border-2 border-neo-black rounded-neo shadow-hard-sm px-3 py-1.5 text-center"
+              >
+                <motion.div
+                  key={playerData.score}
+                  initial={{ scale: 1.3 }}
+                  animate={{ scale: 1 }}
+                  className="text-xl font-black text-neo-black leading-tight"
+                >
+                  {playerData.score}
+                </motion.div>
+                <div className="text-[8px] font-bold uppercase text-neo-black/70">
+                  {t('common.score') || 'Score'}
+                </div>
+              </motion.div>
+            )}
+
+            {/* Combo - Compact (only when active) */}
+            <AnimatePresence>
+              {isPlaying && comboLevel > 1 && (
+                <motion.div
+                  initial={{ scale: 0, rotate: 5 }}
+                  animate={{ scale: 1, rotate: -2 }}
+                  exit={{ scale: 0, rotate: 10 }}
+                  className="bg-neo-cyan border-2 border-neo-black rounded-neo shadow-hard-sm px-3 py-1.5 text-center"
+                >
+                  <motion.div
+                    key={comboLevel}
+                    initial={{ scale: 1.5 }}
+                    animate={{ scale: 1 }}
+                    className="text-xl font-black text-neo-black leading-tight"
+                  >
+                    x{comboLevel}
+                  </motion.div>
+                  <div className="text-[8px] font-bold uppercase text-neo-black/70">
+                    {t('common.combo') || 'Combo'}
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+
+          {/* Top Controls - Exit + Help (minimal, top corners) */}
+          <div className="absolute top-2 left-2 z-30">
+            {onExitRoom && (
+              <button
+                onClick={onExitRoom}
+                className="w-8 h-8 bg-neo-red/90 border-2 border-neo-black rounded-neo text-neo-cream text-sm font-bold shadow-hard-sm flex items-center justify-center hover:bg-neo-red active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all"
+                aria-label={t('playerView.exit') || 'Exit'}
+              >
+                ✕
+              </button>
+            )}
+          </div>
+
+          <div className="absolute top-2 right-2 z-30">
             <button
               onClick={() => setShowHelpPanel(true)}
-              className="w-full py-1 bg-neo-purple border-2 border-neo-black rounded-neo text-neo-cream text-xs font-bold shadow-hard-sm"
+              className="w-8 h-8 bg-neo-purple/90 border-2 border-neo-black rounded-neo text-neo-cream text-sm font-bold shadow-hard-sm flex items-center justify-center hover:bg-neo-purple active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all"
               aria-label={t('help.title') || 'Help'}
             >
               ?
             </button>
           </div>
 
-          {/* Center: Grid (takes most space) */}
-          <div className="flex-1 flex items-center justify-center min-w-0">
-            <Card className="bg-slate-900 border-0 shadow-none flex items-center justify-center w-full h-full max-h-[90vh]">
-              <CardContent className="flex items-center justify-center p-1">
-                <GridComponent
-                  key={isPlaying ? 'playing-grid-landscape' : 'spectating-grid-landscape'}
-                  grid={letterGrid}
-                  interactive={isPlaying && !showStartAnimation}
-                  animateOnMount={!hasAnimatedRef.current}
-                  onWordSubmit={handleGridWordSubmit}
-                  comboLevel={comboLevel}
-                />
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* Right Column: Leaderboard (compact) */}
-          <div className="w-32 flex-shrink-0 flex flex-col overflow-hidden">
-            <div
-              className="bg-neo-cream border-2 border-neo-black rounded-neo shadow-hard flex flex-col overflow-hidden h-full"
-              style={{ transform: 'rotate(-0.5deg)' }}
-            >
-              {/* Header - Compact */}
-              <div className="py-1 px-2 border-b-2 border-neo-black bg-neo-purple">
-                <h3 className="flex items-center gap-1 text-neo-cream text-xs uppercase tracking-wider font-black">
-                  <FaTrophy className="text-neo-yellow text-[10px]" />
-                  {t('playerView.leaderboard')}
-                </h3>
-              </div>
-              {/* Content - Scrollable */}
-              <div className="overflow-y-auto flex-1 p-1">
-                <div className="space-y-1">
-                  {memoizedLeaderboard.slice(0, 5).map((player, index) => (
-                    <div
-                      key={player.username}
-                      className={`flex items-center gap-1 p-1 rounded-neo border border-neo-black text-[10px]
-                        ${player.rankStyle} ${dir === 'rtl' ? 'flex-row-reverse' : ''}`}
-                    >
-                      {/* Rank */}
-                      <span className="font-black w-4 text-center">
-                        {player.rankDisplay}
-                      </span>
-                      {/* Name */}
-                      <span className={`flex-1 truncate font-bold ${player.isMe ? 'underline' : ''}`}>
-                        {player.username}
-                      </span>
-                      {/* Score */}
-                      <span className="font-black">
-                        {player.score}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              </div>
+          {/* Center: Grid (takes maximum space) */}
+          <div className="flex items-center justify-center w-full h-full px-16 py-2">
+            <div className="w-full h-full max-h-[92vh] flex items-center justify-center">
+              <GridComponent
+                key={isPlaying ? 'playing-grid-landscape' : 'spectating-grid-landscape'}
+                grid={letterGrid}
+                interactive={isPlaying && !showStartAnimation}
+                animateOnMount={!hasAnimatedRef.current}
+                onWordSubmit={handleGridWordSubmit}
+                comboLevel={comboLevel}
+              />
             </div>
           </div>
         </div>

@@ -14,6 +14,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 import confetti from 'canvas-confetti';
 import { POINT_COLORS } from '@/utils/consts';
+import { useMobileLandscape } from '@/hooks/useMobileLandscape';
 import type { SinglePlayerResultsData, SinglePlayerMode, PlayerWordData } from './SinglePlayerView';
 
 // Helper to safely get point color with fallback
@@ -48,6 +49,7 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
   onBackToLobby,
 }) => {
   const { t } = useLanguage();
+  const isLandscape = useMobileLandscape();
   const [showGrid, setShowGrid] = useState(false);
   const [expandedBot, setExpandedBot] = useState<string | null>(null);
 
@@ -170,6 +172,162 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
     if (rank === 3) return 'bg-gradient-to-r from-amber-200/50 to-amber-100/50 dark:from-amber-800/30 dark:to-amber-700/30 border-amber-300 dark:border-amber-600';
     return 'border-neo-black/20 dark:border-slate-500 bg-white dark:bg-slate-700';
   };
+
+  // Landscape mode layout - 2-column: score/grid left, words/actions right
+  if (isLandscape) {
+    const validWordCount = results.playerWordData?.filter(w => w.isValid).length || 0;
+
+    return (
+      <div className="flex h-screen w-full overflow-hidden bg-slate-900 p-2 gap-2">
+        {/* Left column: Victory banner + Score + Grid */}
+        <div className="w-1/2 flex flex-col items-center gap-2 overflow-y-auto">
+          {/* Victory/Defeat indicator - compact */}
+          <div className={cn(
+            'w-full text-center py-2 rounded-neo border-2 border-neo-black',
+            isWinner || results.isNewHighScore
+              ? 'bg-gradient-to-r from-neo-yellow to-yellow-300'
+              : 'bg-neo-cream dark:bg-slate-700'
+          )}>
+            <div className="flex items-center justify-center gap-2">
+              {isWinner ? (
+                <FaTrophy className="text-xl text-neo-black" />
+              ) : results.isNewHighScore ? (
+                <FaCrown className="text-xl text-neo-black" />
+              ) : (
+                <span className="font-black text-neo-black">#{playerRank}</span>
+              )}
+              <span className="font-black text-sm uppercase text-neo-black">
+                {results.isNewHighScore
+                  ? (t('singlePlayer.newHighScore') || 'New High Score!')
+                  : isWinner
+                    ? (t('singlePlayer.victory') || 'Victory!')
+                    : (t('singlePlayer.gameOver') || 'Game Over')}
+              </span>
+            </div>
+          </div>
+
+          {/* Score display - compact */}
+          <div className="flex items-center gap-4">
+            <div className="bg-neo-yellow border-2 border-neo-black rounded-neo px-4 py-2 text-center shadow-hard-sm">
+              <div className="text-2xl font-black text-neo-black">{results.playerScore}</div>
+              <div className="text-[8px] font-bold uppercase text-neo-black/70">{t('common.score') || 'Score'}</div>
+            </div>
+            <div className="bg-neo-cream border-2 border-neo-black rounded-neo px-3 py-2 text-center">
+              <div className="text-lg font-black text-neo-black">{validWordCount}</div>
+              <div className="text-[8px] font-bold uppercase text-neo-black/70">{t('common.words') || 'Words'}</div>
+            </div>
+          </div>
+
+          {/* Grid toggle + Grid */}
+          {results.grid && (
+            <div className="w-full max-w-[50vh]">
+              <button
+                onClick={() => setShowGrid(!showGrid)}
+                className={cn(
+                  'mb-2 mx-auto flex items-center gap-1 px-3 py-1 rounded-neo border-2 border-neo-black font-bold text-xs uppercase',
+                  showGrid ? 'bg-neo-cyan text-neo-black' : 'bg-neo-cream text-neo-black'
+                )}
+              >
+                <FaChartBar className="text-sm" />
+                <span>{showGrid ? 'Hide' : 'Show'} Grid</span>
+              </button>
+              {showGrid && (
+                <GridComponent grid={results.grid} interactive={false} className="w-full" />
+              )}
+            </div>
+          )}
+
+          {/* Achievements - compact */}
+          {results.achievements && results.achievements.length > 0 && (
+            <div className="flex flex-wrap gap-1 justify-center">
+              {results.achievements.slice(0, 3).map((achievement, i) => (
+                <AchievementBadge key={i} achievement={achievement} index={i} />
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Right column: Words + Bot scores + Actions */}
+        <div className="w-1/2 flex flex-col gap-2 overflow-y-auto">
+          {/* Words by points - compact */}
+          <div className="bg-neo-cream dark:bg-slate-800 border-2 border-neo-black rounded-neo p-2 flex-1 overflow-y-auto">
+            <h3 className="text-xs font-black uppercase text-neo-black/70 dark:text-neo-white/70 mb-2">
+              {t('results.yourWords') || 'Your Words'}
+            </h3>
+            <div className="space-y-1">
+              {sortedPointGroups.map(points => {
+                const words = wordsByPoints[points] || [];
+                if (words.length === 0) return null;
+                return (
+                  <div key={points} className="flex flex-wrap gap-1">
+                    {words.map(w => (
+                      <span
+                        key={w.word}
+                        className="px-2 py-0.5 rounded-neo border border-neo-black text-[10px] font-bold"
+                        style={{ backgroundColor: getPointColor(points), color: getTextColor(points) }}
+                      >
+                        {w.word.toUpperCase()} +{w.score}
+                      </span>
+                    ))}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Bot rankings - compact (for solo-bots mode) */}
+          {mode === 'solo-bots' && allParticipants.length > 1 && (
+            <div className="bg-neo-cream dark:bg-slate-800 border-2 border-neo-black rounded-neo p-2">
+              <h3 className="text-xs font-black uppercase text-neo-black/70 dark:text-neo-white/70 mb-1">
+                {t('results.rankings') || 'Rankings'}
+              </h3>
+              <div className="space-y-1">
+                {allParticipants.slice(0, 4).map((p, i) => (
+                  <div
+                    key={p.name}
+                    className={cn(
+                      'flex items-center justify-between px-2 py-1 rounded-neo border border-neo-black text-[10px]',
+                      getRankBgColor(i + 1, p.isPlayer)
+                    )}
+                  >
+                    <span className="flex items-center gap-1">
+                      {getRankIcon(i + 1)}
+                      <span className="font-bold">{p.name}</span>
+                      {p.isPlayer && <span className="text-[8px] opacity-60">(you)</span>}
+                    </span>
+                    <span className="font-black">{p.score}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Action buttons */}
+          <div className="flex gap-2 mt-auto">
+            {onQuickRematch && (
+              <Button
+                size="sm"
+                className="flex-1 py-2 bg-neo-yellow hover:bg-neo-yellow/90 text-neo-black font-bold text-xs border-2 border-neo-black"
+                onClick={onQuickRematch}
+              >
+                <FaRedo className="mr-1 text-xs" />
+                {t('common.rematch') || 'Rematch'}
+              </Button>
+            )}
+            <Button
+              variant="secondary"
+              size="sm"
+              className="flex-1 py-2 font-bold text-xs border-2 border-neo-black"
+              onClick={onBackToLobby}
+            >
+              <FaHome className="mr-1 text-xs" />
+              {t('common.lobby') || 'Lobby'}
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <motion.div

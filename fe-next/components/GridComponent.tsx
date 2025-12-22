@@ -1,7 +1,6 @@
 import React, { useState, useRef, useEffect, memo, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '../lib/utils';
-import { Undo2 } from 'lucide-react';
 import type { LetterGrid, GridPosition } from '@/types';
 
 // Import extracted utilities
@@ -65,7 +64,6 @@ const GridComponent = memo<GridComponentProps>(({
     handleMouseDown,
     handleMouseMove,
     handleKeyDown,
-    undoLastCell,
   } = useGridInteraction({
     grid,
     interactive,
@@ -137,48 +135,33 @@ const GridComponent = memo<GridComponentProps>(({
 
   return (
     <div className="relative w-full h-full flex items-center justify-center bg-slate-900">
+      {/* Word Preview - Fixed at top of screen, doesn't affect grid layout */}
+      <AnimatePresence>
+        {interactive && selectedCells.length > 0 && (
+          <motion.div
+            initial={{ opacity: 0, y: -20, scale: 0.9 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -10, scale: 0.95 }}
+            transition={{ type: 'spring', stiffness: 400, damping: 25 }}
+            className="fixed top-2 left-1/2 -translate-x-1/2 z-50 pointer-events-none"
+          >
+            <div className="bg-neo-cyan border-3 border-neo-black rounded-neo px-4 py-2 shadow-hard flex items-center gap-2 whitespace-nowrap">
+              <span className="font-black text-xl sm:text-2xl text-neo-black uppercase tracking-wide">
+                {formedWord}
+              </span>
+              <span className="text-xs font-bold text-neo-black/60 bg-neo-black/10 px-1.5 py-0.5 rounded">
+                {selectedCells.length}
+              </span>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* Combo Indicator - New juicy animation with particles and glow */}
       <ComboIndicator comboLevel={comboLevel} reduceMotion={reduceMotion} />
 
       {/* First-time combo explanation tooltip */}
       <ComboExplanationTooltip comboLevel={comboLevel} />
-
-      {/* Word Preview - fixed position above board, reserves space to prevent layout shift */}
-      <div className="h-12 sm:h-14 flex items-center justify-center mb-2">
-        <AnimatePresence mode="wait">
-          {interactive && selectedCells.length > 0 && (
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.95 }}
-              transition={{ duration: 0.15 }}
-              className="flex items-center gap-2"
-            >
-              <div className="bg-neo-cyan border-3 border-neo-black rounded-neo px-4 py-2 shadow-hard flex items-center gap-2 whitespace-nowrap">
-                <span className="font-black text-xl sm:text-2xl text-neo-black uppercase tracking-wide">
-                  {formedWord}
-                </span>
-                <span className="text-xs font-bold text-neo-black/60 bg-neo-black/10 px-1.5 py-0.5 rounded">
-                  {selectedCells.length} letters
-                </span>
-              </div>
-              {/* Undo Button - inline with word preview */}
-              <motion.button
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.8 }}
-                onClick={undoLastCell}
-                className="bg-neo-orange border-3 border-neo-black rounded-neo px-3 py-2 shadow-hard hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-hard-lg active:translate-x-[1px] active:translate-y-[1px] active:shadow-hard-pressed transition-all flex items-center gap-1.5"
-                aria-label="Undo last letter (Backspace)"
-                title="Undo last letter (Backspace)"
-              >
-                <Undo2 className="w-4 h-4 sm:w-5 sm:h-5 text-neo-black" />
-                <span className="hidden sm:inline text-sm font-black text-neo-black">Undo</span>
-              </motion.button>
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </div>
 
       {/* NEO-BRUTALIST: Clean frame wrapper */}
       <div className="game-board-frame relative">

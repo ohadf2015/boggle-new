@@ -24,6 +24,7 @@ import {
 } from '@/utils/singlePlayerAchievements';
 import type { SinglePlayerGameState, SinglePlayerResultsData, BotOpponent } from './SinglePlayerView';
 import type { LetterGrid } from '@/shared/types/game';
+import { useMobileLandscape } from '@/hooks/useMobileLandscape';
 
 interface SinglePlayerGameProps {
   settings: SinglePlayerGameState;
@@ -55,6 +56,7 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
   const { playWordAcceptedSound, playComboSound } = useSoundEffects();
   const { announceWordResult, announceCombo } = useAnnouncer();
   const { stopMusic } = useMusic();
+  const isLandscape = useMobileLandscape();
   const [grid, setGrid] = useState<LetterGrid | null>(null);
   const [foundWords, setFoundWords] = useState<FoundWord[]>([]);
   const [score, setScore] = useState(0);
@@ -527,6 +529,127 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
             {t('common.loading') || 'Loading...'}
           </p>
         </div>
+      </div>
+    );
+  }
+
+  // Landscape mode layout - maximized grid with minimal chrome
+  if (isLandscape) {
+    const validWordCount = foundWords.filter(fw => fw.isValid === true).length;
+
+    return (
+      <div className="relative flex items-center justify-center w-full h-full min-h-screen overflow-hidden bg-slate-900">
+        {/* Left side: Timer + Score */}
+        <div className="absolute left-2 top-1/2 -translate-y-1/2 flex flex-col items-center gap-2 z-20">
+          {settings.mode !== 'practice' && (
+            <CircularTimer
+              remainingTime={remainingTime}
+              totalTime={settings.timerSeconds}
+              size="sm"
+            />
+          )}
+          <div className="bg-neo-yellow border-2 border-neo-black rounded-neo shadow-hard-sm px-2 py-1 text-center">
+            <motion.div
+              key={score}
+              initial={{ scale: 1.2 }}
+              animate={{ scale: 1 }}
+              className="text-sm font-black text-neo-black"
+            >
+              {score}
+            </motion.div>
+            <div className="text-[7px] font-bold uppercase text-neo-black/70">
+              {t('common.score') || 'Score'}
+            </div>
+          </div>
+        </div>
+
+        {/* Right side: Words count + Combo */}
+        <div className="absolute right-2 top-1/2 -translate-y-1/2 flex flex-col items-center gap-2 z-20">
+          <div className="bg-neo-cream/90 border-2 border-neo-black rounded-neo shadow-hard-sm px-2 py-1 text-center">
+            <div className="text-sm font-black text-neo-black">{validWordCount}</div>
+            <div className="text-[7px] font-bold uppercase text-neo-black/70">
+              {t('common.words') || 'Words'}
+            </div>
+          </div>
+          <AnimatePresence>
+            {comboLevel > 1 && (
+              <motion.div
+                initial={{ scale: 0, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0, opacity: 0 }}
+                className="bg-neo-cyan border-2 border-neo-black rounded-neo shadow-hard-sm px-2 py-1 text-center"
+              >
+                <motion.div
+                  key={comboLevel}
+                  initial={{ scale: 1.3 }}
+                  animate={{ scale: 1 }}
+                  className="text-sm font-black text-neo-black"
+                >
+                  x{comboLevel}
+                </motion.div>
+                <div className="text-[7px] font-bold uppercase text-neo-black/70">
+                  {t('common.combo') || 'Combo'}
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+
+        {/* Top-left: Quit button */}
+        <div className="absolute top-2 left-2 z-30">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={onQuit}
+            className="w-8 h-8 p-0 bg-neo-red/90 hover:bg-neo-red border-2 border-neo-black rounded-neo"
+          >
+            <FaArrowLeft className="text-xs text-neo-black" />
+          </Button>
+        </div>
+
+        {/* Top-right: Pause/Help buttons */}
+        <div className="absolute top-2 right-2 z-30 flex gap-1">
+          {settings.mode !== 'practice' ? (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setIsPaused(!isPaused)}
+              className="w-8 h-8 p-0 bg-neo-cream/90 hover:bg-neo-cream border-2 border-neo-black rounded-neo"
+            >
+              {isPaused ? <FaPlay className="text-xs text-neo-black" /> : <FaPause className="text-xs text-neo-black" />}
+            </Button>
+          ) : (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleFinishPractice}
+              className="px-2 h-8 bg-neo-lime/90 hover:bg-neo-lime border-2 border-neo-black rounded-neo text-xs font-bold text-neo-black"
+            >
+              {t('singlePlayer.finish') || 'Finish'}
+            </Button>
+          )}
+          <HelpButton
+            onClick={() => setIsHelpOpen(true)}
+            className="w-8 h-8"
+          />
+        </div>
+
+        {/* Center: Grid - maximized */}
+        <div className="flex items-center justify-center w-full h-full px-16 py-2">
+          <GridComponent
+            grid={grid}
+            interactive={!isPaused}
+            onWordSubmit={handleWordSubmit}
+            comboLevel={comboLevel}
+            largeText
+          />
+        </div>
+
+        {/* Help Panel */}
+        <HelpPanel
+          isOpen={isHelpOpen}
+          onClose={() => setIsHelpOpen(false)}
+        />
       </div>
     );
   }

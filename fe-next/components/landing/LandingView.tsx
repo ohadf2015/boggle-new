@@ -6,6 +6,7 @@ import { motion } from 'framer-motion';
 import { FaUser, FaUsers, FaRobot, FaBullseye, FaTrophy, FaDoorOpen, FaCrown, FaMedal, FaQuestionCircle } from 'react-icons/fa';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useMusic } from '@/contexts/MusicContext';
+import { useMobileLandscape } from '@/hooks/useMobileLandscape';
 import ModeCard from './ModeCard';
 import Header from '@/components/Header';
 import SocialProof from '@/components/SocialProof';
@@ -17,6 +18,7 @@ import SocialProof from '@/components/SocialProof';
 const LandingView: React.FC = () => {
   const { t, language } = useLanguage();
   const { playTrack, TRACKS } = useMusic();
+  const isLandscape = useMobileLandscape();
 
   // Play lobby music on landing page (same as multiplayer lobby)
   // Note: We always call playTrack even if audio isn't unlocked yet
@@ -24,6 +26,48 @@ const LandingView: React.FC = () => {
   useEffect(() => {
     playTrack(TRACKS.LOBBY);
   }, [playTrack, TRACKS]);
+
+  // Landscape mode - compact horizontal layout
+  if (isLandscape) {
+    return (
+      <div className="flex h-screen w-full items-center justify-center bg-slate-900 p-4 gap-4">
+        {/* Single Player */}
+        <Link
+          href={`/${language}/singleplayer`}
+          className="flex-1 flex flex-col items-center justify-center gap-2 p-4 bg-gradient-to-br from-neo-cyan to-cyan-400 border-3 border-neo-black rounded-neo shadow-hard hover:shadow-hard-lg hover:translate-x-[-2px] hover:translate-y-[-2px] transition-all h-full max-h-[80vh]"
+        >
+          <FaUser className="text-4xl text-neo-black" />
+          <span className="text-lg font-black uppercase text-neo-black">{t('landing.singlePlayer') || 'Single Player'}</span>
+          <div className="flex gap-2 text-xs">
+            <span className="bg-neo-black/20 px-2 py-1 rounded-neo font-bold"><FaRobot className="inline mr-1" />Bots</span>
+            <span className="bg-neo-black/20 px-2 py-1 rounded-neo font-bold"><FaTrophy className="inline mr-1" />Challenges</span>
+          </div>
+        </Link>
+
+        {/* Multiplayer */}
+        <Link
+          href={`/${language}/multiplayer`}
+          className="flex-1 flex flex-col items-center justify-center gap-2 p-4 bg-gradient-to-br from-neo-pink to-pink-400 border-3 border-neo-black rounded-neo shadow-hard hover:shadow-hard-lg hover:translate-x-[-2px] hover:translate-y-[-2px] transition-all h-full max-h-[80vh]"
+        >
+          <FaUsers className="text-4xl text-neo-black" />
+          <span className="text-lg font-black uppercase text-neo-black">{t('landing.multiplayer') || 'Multiplayer'}</span>
+          <div className="flex gap-2 text-xs">
+            <span className="bg-neo-black/20 px-2 py-1 rounded-neo font-bold"><FaDoorOpen className="inline mr-1" />Rooms</span>
+            <span className="bg-neo-black/20 px-2 py-1 rounded-neo font-bold"><FaCrown className="inline mr-1" />Host</span>
+          </div>
+        </Link>
+
+        {/* How to Play - compact */}
+        <Link
+          href={`/${language}/rules`}
+          className="absolute bottom-2 right-2 flex items-center gap-1 px-3 py-2 bg-neo-yellow text-neo-black font-bold text-sm border-2 border-neo-black rounded-neo"
+        >
+          <FaQuestionCircle />
+          <span className="hidden sm:inline">{t('joinView.howToPlay') || 'How to Play'}</span>
+        </Link>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-50 via-slate-100 to-slate-200 dark:from-neo-navy dark:via-neo-navy-light dark:to-neo-navy">

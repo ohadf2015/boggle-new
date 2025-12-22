@@ -13,6 +13,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 import { DIFFICULTIES } from '@/utils/consts';
 import { getHighScore, getProgressStats, getAllTimeBest } from './highScoreManager';
+import { useMobileLandscape } from '@/hooks/useMobileLandscape';
 import type { DifficultyLevel, Language } from '@/shared/types/game';
 import type { SinglePlayerGameState, SinglePlayerMode, BotOpponent } from './SinglePlayerView';
 
@@ -67,6 +68,7 @@ const SinglePlayerLobby: React.FC<SinglePlayerLobbyProps> = ({
   onStartGame,
 }) => {
   const { t, language: currentLanguage } = useLanguage();
+  const isLandscape = useMobileLandscape();
 
   // Game settings state
   const [mode, setMode] = useState<SinglePlayerMode>(initialSettings.mode);
@@ -116,6 +118,155 @@ const SinglePlayerLobby: React.FC<SinglePlayerLobbyProps> = ({
   );
   const allTimeBest = useMemo(() => getAllTimeBest(), []);
   const progressStats = useMemo(() => getProgressStats(), []);
+
+  // Landscape mode layout - 2-column: mode selection left, settings + start right
+  if (isLandscape) {
+    return (
+      <div className="flex h-screen w-full overflow-hidden bg-slate-900 p-2 gap-2">
+        {/* Left column: Mode Selection */}
+        <div className="w-1/2 flex flex-col gap-2 overflow-y-auto">
+          {/* Header with back */}
+          <div className="flex items-center gap-2">
+            <Link
+              href="/"
+              className="w-8 h-8 flex items-center justify-center rounded-neo border-2 border-neo-black bg-neo-cream"
+            >
+              <FaArrowLeft className="text-xs text-neo-black" />
+            </Link>
+            <h1 className="text-lg font-black uppercase text-neo-white flex-1">
+              {t('landing.singlePlayer') || 'Single Player'}
+            </h1>
+          </div>
+
+          {/* Mode buttons - vertical */}
+          <div className="flex flex-col gap-2">
+            {(Object.keys(MODE_CONFIG) as SinglePlayerMode[]).map(modeKey => {
+              const config = MODE_CONFIG[modeKey];
+              const isSelected = mode === modeKey;
+              const IconComponent = config.Icon;
+
+              return (
+                <button
+                  key={modeKey}
+                  onClick={() => setMode(modeKey)}
+                  className={cn(
+                    'flex items-center gap-3 p-3 rounded-neo border-2 transition-all',
+                    isSelected
+                      ? `bg-gradient-to-r ${config.color} ${config.selectedBorder} text-neo-black`
+                      : 'bg-neo-cream dark:bg-slate-700 border-neo-black text-neo-black dark:text-neo-white'
+                  )}
+                >
+                  <IconComponent className="w-6 h-6 flex-shrink-0" />
+                  <span className="text-sm font-black uppercase">{t(config.labelKey) || modeKey}</span>
+                </button>
+              );
+            })}
+          </div>
+
+          {/* Challenge mode high score */}
+          {mode === 'challenge' && currentHighScore !== null && (
+            <div className="bg-neo-yellow border-2 border-neo-black rounded-neo p-2 text-center">
+              <div className="flex items-center justify-center gap-2">
+                <FaCrown className="text-neo-black" />
+                <span className="font-black text-neo-black">{currentHighScore.score}</span>
+              </div>
+              <div className="text-[10px] font-bold text-neo-black/70 uppercase">{t('challenge.recordToBeat') || 'Record to Beat'}</div>
+            </div>
+          )}
+        </div>
+
+        {/* Right column: Settings + Start */}
+        <div className="w-1/2 flex flex-col gap-2 overflow-y-auto">
+          {/* Difficulty */}
+          <div>
+            <label className="text-xs font-bold uppercase text-neo-white mb-1 block">{t('singlePlayer.difficulty') || 'Difficulty'}</label>
+            <div className="flex gap-1">
+              {(['EASY', 'MEDIUM', 'HARD'] as DifficultyLevel[]).map(diff => (
+                <button
+                  key={diff}
+                  onClick={() => setDifficulty(diff)}
+                  className={cn(
+                    'flex-1 py-2 rounded-neo border-2 border-neo-black text-xs font-bold uppercase',
+                    difficulty === diff
+                      ? diff === 'EASY' ? 'bg-neo-lime text-neo-black' : diff === 'MEDIUM' ? 'bg-neo-yellow text-neo-black' : 'bg-neo-red text-white'
+                      : 'bg-neo-cream text-neo-black'
+                  )}
+                >
+                  {t(`difficulty.${diff.toLowerCase()}`) || diff}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Grid size info */}
+          <div className="text-xs text-neo-white/70 text-center">
+            {difficultyConfig.rows}x{difficultyConfig.cols} grid
+          </div>
+
+          {/* Timer (not for practice mode) */}
+          {mode !== 'practice' && (
+            <div>
+              <label className="text-xs font-bold uppercase text-neo-white mb-1 block">{t('singlePlayer.timer') || 'Timer'}</label>
+              <div className="flex gap-1">
+                {[2, 3, 5].map(min => (
+                  <button
+                    key={min}
+                    onClick={() => setTimerMinutes(min)}
+                    className={cn(
+                      'flex-1 py-2 rounded-neo border-2 border-neo-black text-xs font-bold',
+                      timerMinutes === min ? 'bg-neo-cyan text-neo-black' : 'bg-neo-cream text-neo-black'
+                    )}
+                  >
+                    {min} min
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Language */}
+          <div>
+            <label className="text-xs font-bold uppercase text-neo-white mb-1 block">{t('joinView.language') || 'Language'}</label>
+            <LanguageSelector selectedLanguage={gameLanguage} onLanguageChange={setGameLanguage} />
+          </div>
+
+          {/* Bots (for solo-bots mode) */}
+          {mode === 'solo-bots' && (
+            <div>
+              <div className="flex items-center justify-between mb-1">
+                <label className="text-xs font-bold uppercase text-neo-white">{t('singlePlayer.opponents') || 'Opponents'}</label>
+                {bots.length < 5 && (
+                  <button onClick={addBot} className="text-xs bg-neo-lime px-2 py-1 rounded-neo border border-neo-black font-bold">
+                    <FaPlus className="inline mr-1" />Add
+                  </button>
+                )}
+              </div>
+              <div className="flex flex-wrap gap-1">
+                {bots.map(bot => (
+                  <Badge key={bot.id} className="flex items-center gap-1 text-[10px]">
+                    <FaRobot />
+                    {bot.name}
+                    <button onClick={() => removeBot(bot.id)} className="ml-1 opacity-60 hover:opacity-100">
+                      <FaTimes className="text-[8px]" />
+                    </button>
+                  </Badge>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Start Button */}
+          <Button
+            onClick={handleStartGame}
+            className="w-full h-12 font-black uppercase text-lg bg-neo-yellow hover:bg-neo-yellow/90 text-neo-black border-3 border-neo-black mt-auto"
+          >
+            <FaPlay className="mr-2" />
+            {t('common.start') || 'Start Game'}
+          </Button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <motion.div

@@ -17,6 +17,7 @@ import logger from '@/utils/logger';
 import { levelUpToast } from '@/components/NeoToast';
 import type { ResultsPageProps, HeatMapData, WordToVote, XpGainedData, LevelUpData, GridPosition } from '@/types/components';
 import type { LetterGrid as LetterGridType } from '@/shared/types/game';
+import { useMobileLandscape } from '@/hooks/useMobileLandscape';
 
 // Dynamic imports for heavy components (loaded after initial render)
 const GridComponent = dynamic(() => import('@/components/GridComponent'), { ssr: false });
@@ -160,6 +161,7 @@ const LetterGrid: React.FC<LetterGridProps> = ({ letterGrid, heatMapData, showHe
 const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, letterGrid, gameCode, onReturnToRoom, username, socket, achievements, duplicateRuleDisabled, playerCount }) => {
   const { t } = useLanguage();
   const { isAuthenticated } = useAuth();
+  const isLandscape = useMobileLandscape();
   const [showExitConfirm, setShowExitConfirm] = useState<boolean>(false);
   const [showAuthModal, setShowAuthModal] = useState<boolean>(false);
   const [showFirstWinModal, setShowFirstWinModal] = useState<boolean>(false);
@@ -510,6 +512,126 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, letterGrid, game
     setWordQueue([]); // Clear the queue
   }, []);
 
+  // Landscape mode layout - 2-column: winner/grid left, player cards right
+  if (isLandscape) {
+    return (
+      <div className="flex h-screen w-full overflow-hidden bg-slate-900 p-2 gap-2">
+        {/* Left column: Winner + Grid */}
+        <div className="w-1/2 flex flex-col items-center justify-start gap-2 overflow-y-auto">
+          {/* Exit button - compact */}
+          <div className="w-full flex justify-end">
+            <ExitRoomButton onClick={handleExitRoom} label="" className="w-8 h-8 p-0" />
+          </div>
+
+          {/* Winner Banner - compact */}
+          {winner && (
+            <div className="w-full max-w-xs">
+              <ResultsWinnerBanner winner={winner} isCurrentUserWinner={winner.username === username} />
+            </div>
+          )}
+
+          {/* Grid with heatmap toggle */}
+          {letterGrid && heatMapData && heatMapData.maxCount > 0 && (
+            <div className="w-full max-w-[60vh]">
+              <button
+                onClick={() => setShowHeatmap(prev => !prev)}
+                className={`mb-2 mx-auto flex items-center gap-1 px-3 py-1 rounded-neo border-2 border-neo-black font-bold text-xs uppercase ${
+                  showHeatmap ? 'bg-neo-orange text-neo-black' : 'bg-neo-cream text-neo-black'
+                }`}
+              >
+                <FaFire className={`text-sm ${showHeatmap ? 'text-neo-red' : 'text-neo-black/60'}`} />
+                <span>{showHeatmap ? 'Hide' : 'Show'} Heatmap</span>
+              </button>
+              {showHeatmap && (
+                <GridComponent
+                  grid={letterGrid}
+                  interactive={false}
+                  className="w-full"
+                  heatMapData={heatMapData}
+                />
+              )}
+            </div>
+          )}
+        </div>
+
+        {/* Right column: Player cards + Actions */}
+        <div className="w-1/2 flex flex-col gap-2 overflow-y-auto">
+          {/* Final Scores Title - compact */}
+          <div className="flex items-center justify-center gap-2">
+            <FaTrophy className="text-lg text-yellow-500" />
+            <h2 className="text-lg font-black text-yellow-400">{t('results.finalScores')}</h2>
+          </div>
+
+          {/* Player Cards - compact */}
+          <div className="space-y-2 flex-1 overflow-y-auto">
+            {sortedScores.map((player, index) => (
+              <ResultsPlayerCard
+                key={player.username}
+                player={player}
+                index={index}
+                allPlayerWords={allPlayerWords}
+                currentUsername={username}
+                isWinner={index === 0}
+                xpGainedData={player.username === username ? xpGainedData : null}
+                levelUpData={player.username === username ? levelUpData : null}
+                duplicateRuleDisabled={duplicateRuleDisabled}
+              />
+            ))}
+          </div>
+
+          {/* Action Buttons */}
+          {gameCode && onReturnToRoom && (
+            <div className="flex gap-2 mt-2">
+              <button
+                onClick={onReturnToRoom}
+                className="flex-1 bg-neo-yellow text-neo-black font-bold text-sm py-2 px-3 uppercase border-2 border-neo-black rounded-neo shadow-hard-sm flex items-center justify-center gap-1"
+              >
+                <FaStar className="text-xs" />
+                {t('results.stayInRoom')}
+              </button>
+              <button
+                onClick={handleExitRoom}
+                className="flex-1 bg-neo-red text-neo-cream font-bold text-sm py-2 px-3 uppercase border-2 border-neo-black rounded-neo shadow-hard-sm flex items-center justify-center gap-1"
+              >
+                <FaDoorOpen className="text-xs" />
+                {t('results.leaveRoom')}
+              </button>
+            </div>
+          )}
+        </div>
+
+        {/* Exit Confirmation Dialog */}
+        <AlertDialog open={showExitConfirm} onOpenChange={setShowExitConfirm}>
+          <AlertDialogContent className="bg-white dark:bg-slate-800 border-red-500/30">
+            <AlertDialogHeader>
+              <AlertDialogTitle>{t('playerView.exitConfirmation')}</AlertDialogTitle>
+              <AlertDialogDescription>{t('results.exitWarning')}</AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>{t('common.cancel')}</AlertDialogCancel>
+              <AlertDialogAction onClick={confirmExitRoom} className="bg-red-500 hover:bg-red-600">
+                {t('common.confirm')}
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+
+        {/* Word Feedback Modal */}
+        <WordFeedbackModal
+          isOpen={showWordFeedback && wordToVote !== null}
+          word={wordToVote?.word || ''}
+          submittedBy={wordToVote?.submittedBy || ''}
+          submitterAvatar={wordToVote?.submitterAvatar ?? undefined}
+          voteInfo={wordToVote?.voteInfo}
+          wordQueue={wordQueue.map(w => ({ ...w, submitterAvatar: w.submitterAvatar ?? undefined }))}
+          timeoutSeconds={wordToVote?.timeoutSeconds || 15}
+          onVote={handleVote}
+          onSkip={handleFeedbackSkip}
+          onTimeout={handleFeedbackSkip}
+        />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-50 via-slate-100 to-slate-200 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 flex flex-col overflow-auto transition-colors duration-300 px-1 py-3 sm:px-4 sm:py-4 md:p-8 relative">

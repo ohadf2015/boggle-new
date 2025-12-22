@@ -10,6 +10,7 @@ import { useTheme } from '@/utils/ThemeContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLeaderboard, useUserRank } from '@/hooks/useSupabaseRealtime';
+import { useMobileLandscape } from '@/hooks/useMobileLandscape';
 import { cn } from '@/lib/utils';
 
 interface LeaderboardEntry {
@@ -27,6 +28,7 @@ export default function LeaderboardPage(): React.ReactNode {
   const { t, language } = useLanguage();
   const { user, profile, isSupabaseEnabled } = useAuth();
   const router = useRouter();
+  const isLandscape = useMobileLandscape();
   const isDarkMode = theme === 'dark';
 
   // Use real-time hooks for live leaderboard updates
@@ -90,12 +92,15 @@ export default function LeaderboardPage(): React.ReactNode {
 
   return (
     <div className={cn(
-      'min-h-screen',
+      isLandscape ? 'h-screen overflow-y-auto' : 'min-h-screen',
       isDarkMode ? 'bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900' : 'bg-gradient-to-br from-blue-50 via-white to-purple-50'
     )}>
-      <Header />
+      {!isLandscape && <Header />}
 
-      <div className="max-w-4xl mx-auto px-4 py-8">
+      <div className={cn(
+        "max-w-4xl mx-auto px-4",
+        isLandscape ? "py-2" : "py-8"
+      )}>
         {/* Page Title */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}

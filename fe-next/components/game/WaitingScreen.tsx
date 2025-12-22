@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { FaUsers, FaCrown, FaLink, FaWhatsapp, FaQrcode } from 'react-icons/fa';
+import { FaUsers, FaCrown, FaLink, FaWhatsapp, FaQrcode, FaTimes } from 'react-icons/fa';
 import { Button } from '../ui/button';
 import ExitRoomButton from '../ExitRoomButton';
 import { Card } from '../ui/card';
@@ -14,6 +14,7 @@ import RoomChat from '../RoomChat';
 import ShareButton from '../ShareButton';
 import { copyJoinUrl, shareViaWhatsApp, getJoinUrl } from '../../utils/share';
 import { useLanguage } from '../../contexts/LanguageContext';
+import { useMobileLandscape } from '@/hooks/useMobileLandscape';
 import type { Language, LetterGrid, GameUser, GridPosition } from '@/shared/types';
 
 interface WaitingScreenProps {
@@ -50,6 +51,139 @@ const WaitingScreen: React.FC<WaitingScreenProps> = ({
   gameSettings = null, // Component to render game settings (host only)
 }) => {
   const { t } = useLanguage();
+  const isLandscape = useMobileLandscape();
+
+  // Landscape mode layout - 3-column: room info | grid | players
+  if (isLandscape) {
+    return (
+      <div className="relative flex h-screen w-full overflow-hidden bg-slate-900 p-2 gap-2">
+        {/* Left column: Room info + Exit */}
+        <div className="flex flex-col items-center gap-2 w-24 flex-shrink-0">
+          {/* Room Code */}
+          <div className="bg-neo-cyan border-2 border-neo-black rounded-neo p-2 text-center shadow-hard-sm">
+            <div className="text-[8px] font-bold uppercase text-neo-black/70">Room</div>
+            <div className="text-lg font-black text-neo-black">{gameCode}</div>
+          </div>
+
+          {/* Language Badge */}
+          {gameLanguage && (
+            <Badge className="text-xs px-2 py-1 bg-neo-cream text-neo-black border-2 border-neo-black">
+              {gameLanguage === 'he' ? '🇮🇱' : gameLanguage === 'sv' ? '🇸🇪' : gameLanguage === 'ja' ? '🇯🇵' : '🇺🇸'}
+            </Badge>
+          )}
+
+          {/* Share Button - compact */}
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => copyJoinUrl(gameCode, t)}
+            className="w-10 h-10 p-0 bg-neo-yellow/90 hover:bg-neo-yellow border-2 border-neo-black rounded-neo"
+          >
+            <FaLink className="text-xs text-neo-black" />
+          </Button>
+
+          {/* Exit Button */}
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={onExitRoom}
+            className="w-10 h-10 p-0 bg-neo-red/90 hover:bg-neo-red border-2 border-neo-black rounded-neo mt-auto"
+          >
+            <FaTimes className="text-sm text-neo-black" />
+          </Button>
+        </div>
+
+        {/* Center: Grid Preview - maximized */}
+        <div className="flex-1 flex items-center justify-center">
+          {shufflingGrid ? (
+            <SlotMachineGrid
+              grid={shufflingGrid}
+              highlightedCells={highlightedCells}
+              language={gameLanguage || 'en'}
+              className="max-h-[90vh] max-w-[90vh]"
+              animationDuration={600}
+              staggerDelay={40}
+              animationPattern="cascade"
+            />
+          ) : (
+            <div className="w-[80vh] max-w-full aspect-square grid grid-cols-4 gap-2 p-4">
+              {Array.from({ length: 16 }).map((_, i) => (
+                <motion.div
+                  key={i}
+                  className="aspect-square rounded-lg bg-slate-700/50"
+                  animate={{ opacity: [0.3, 0.6, 0.3] }}
+                  transition={{ duration: 1.5, repeat: Infinity, delay: i * 0.05 }}
+                />
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Right column: Players list */}
+        <div className="w-32 flex flex-col gap-1 overflow-hidden flex-shrink-0">
+          <div className="text-xs font-black uppercase text-neo-cream text-center flex items-center justify-center gap-1">
+            <FaUsers className="text-neo-pink" />
+            <span>{playersReady.length}</span>
+          </div>
+          <div className="flex-1 overflow-y-auto space-y-1">
+            {playersReady.map((player) => {
+              const playerUsername = player.username;
+              const avatar = player.avatar;
+              const playerIsHost = player.isHost;
+              const isMe = playerUsername === username;
+
+              return (
+                <Badge
+                  key={playerUsername}
+                  className={`text-[10px] font-bold px-2 py-1 w-full truncate border-2 border-neo-black ${
+                    playerIsHost ? "bg-neo-yellow text-neo-black" : "bg-neo-cream text-neo-black"
+                  }`}
+                  style={avatar?.color && !playerIsHost ? { backgroundColor: avatar.color } : {}}
+                >
+                  <div className="flex items-center gap-1 w-full truncate">
+                    {avatar?.emoji && <span className="text-xs">{avatar.emoji}</span>}
+                    {playerIsHost && <FaCrown className="text-[8px] flex-shrink-0" />}
+                    <span className="truncate">{playerUsername}</span>
+                    {isMe && <span className="text-[8px] opacity-70">(me)</span>}
+                  </div>
+                </Badge>
+              );
+            })}
+          </div>
+          {playersReady.length === 0 && (
+            <p className="text-[10px] text-center text-neo-cream/60 font-bold">
+              {t('hostView.waitingForPlayers')}
+            </p>
+          )}
+        </div>
+
+        {/* QR Code Dialog - same as portrait */}
+        <Dialog open={showQR} onOpenChange={setShowQR}>
+          <DialogContent className="sm:max-w-md bg-white dark:bg-slate-800 border-cyan-500/30">
+            <DialogHeader>
+              <DialogTitle className="text-center text-cyan-600 dark:text-cyan-300 flex items-center justify-center gap-2">
+                <FaQrcode />
+                {t(isHost ? 'hostView.qrCode' : 'joinView.qrCodeTitle')}
+              </DialogTitle>
+            </DialogHeader>
+            <div className="flex flex-col items-center gap-4 py-4">
+              <div className="p-6 bg-white rounded-lg shadow-md">
+                <QRCodeSVG value={getJoinUrl(gameCode)} size={200} level="H" includeMargin />
+              </div>
+              <h4 className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-400">
+                {gameCode}
+              </h4>
+            </div>
+            <DialogFooter className="sm:justify-center">
+              <Button onClick={() => setShowQR(false)} className="w-full">
+                {t('common.close')}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-50 via-slate-100 to-slate-200 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 flex flex-col items-center p-2 sm:p-4 md:p-6 lg:p-8 overflow-auto transition-colors duration-300">

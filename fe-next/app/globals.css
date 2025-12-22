@@ -1600,14 +1600,14 @@ body {
 
 /* Landscape orientation on mobile devices */
 @media (orientation: landscape) and (max-height: 600px) {
-  /* Game board frame adjustments for landscape - optimized for playability */
+  /* Game board frame adjustments for landscape - maximized for playability */
   .game-board-frame {
-    /* Increased from 50vh to 58vh for better touch targets */
-    width: min(100%, 58vh);
-    max-width: min(100%, 58vh);
+    /* Maximized to 85vh for largest possible grid in landscape */
+    width: min(100%, 85vh);
+    max-width: min(100%, 85vh);
     height: auto;
     aspect-ratio: 1 / 1;
-    padding: 8px;
+    padding: 6px;
   }
 
   /* Stack game UI vertically in landscape */
@@ -1678,9 +1678,9 @@ body {
 /* Very short landscape screens (phones in landscape) */
 @media (orientation: landscape) and (max-height: 450px) {
   .game-board-frame {
-    /* Increased from 45vh to 55vh for better playability */
-    width: min(100%, 55vh);
-    max-width: min(100%, 55vh);
+    /* Maximized to 88vh for best playability on short screens */
+    width: min(100%, 88vh);
+    max-width: min(100%, 88vh);
     padding: 4px;
   }
 

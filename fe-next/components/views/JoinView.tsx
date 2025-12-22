@@ -25,6 +25,7 @@ import { setGuestName } from '@/utils/guestManager';
 import { trackGuestJoin } from '@/utils/growthTracking';
 import type { JoinViewProps, JoinMode } from '@/types/components';
 import type { Language } from '@/shared/types/game';
+import { useMobileLandscape } from '@/hooks/useMobileLandscape';
 
 // Extracted sub-components
 import {
@@ -63,6 +64,7 @@ const JoinView: React.FC<JoinViewProps> = ({
   isJoining = false
 }) => {
   const { t, language, dir } = useLanguage();
+  const isLandscape = useMobileLandscape();
   const [mode, setMode] = useState<JoinMode>('join');
   const [showQR, setShowQR] = useState<boolean>(false);
   const [showNewPlayerWelcome, setShowNewPlayerWelcome] = useState<boolean>(false);
@@ -266,6 +268,99 @@ const JoinView: React.FC<JoinViewProps> = ({
         />
         <MenuAnimation />
       </>
+    );
+  }
+
+  // Landscape mode layout - 2-column: form left, room list right
+  if (isLandscape) {
+    return (
+      <div dir={dir} className="flex h-screen w-full overflow-hidden bg-slate-900 p-2 gap-2">
+        {/* Left column: Form */}
+        <div className="w-1/2 flex flex-col gap-2 overflow-y-auto">
+          {/* Mode Selector */}
+          <ModeSelector mode={mode} onModeChange={handleModeChange} />
+
+          {/* Error */}
+          {error && (
+            <Alert variant="destructive" className="py-1">
+              <AlertDescription className="text-xs">{error}</AlertDescription>
+            </Alert>
+          )}
+
+          {/* Form */}
+          <form onSubmit={handleSubmit} className="space-y-2 flex-1">
+            {mode === 'host' ? (
+              <>
+                <div>
+                  <Label className="text-xs font-bold uppercase text-neo-white">{t('joinView.roomNamePlaceholder') || 'Room Name'}</Label>
+                  <Input
+                    value={roomName}
+                    onChange={(e) => { setRoomName(e.target.value); setRoomNameError(false); }}
+                    placeholder={displayName || 'Enter room name'}
+                    className={cn("h-9 text-sm", roomNameError && 'border-neo-red')}
+                  />
+                </div>
+                <div>
+                  <Label className="text-xs font-bold uppercase text-neo-white">{t('hostView.roomCode') || 'Room Code'}</Label>
+                  <div className="flex gap-1">
+                    <Input value={gameCode} onChange={(e) => setGameCode(e.target.value.toUpperCase())} className="h-9 text-sm font-mono flex-1" />
+                    <Button type="button" variant="secondary" size="sm" onClick={generateRoomCode} className="h-9 px-2"><FaDice /></Button>
+                  </div>
+                </div>
+                <div>
+                  <Label className="text-xs font-bold uppercase text-neo-white">{t('joinView.language') || 'Language'}</Label>
+                  <LanguageSelector selectedLanguage={roomLanguage} onLanguageChange={setRoomLanguage} />
+                </div>
+              </>
+            ) : (
+              <div>
+                <Label className="text-xs font-bold uppercase text-neo-white">{t('joinView.roomCode') || 'Room Code'}</Label>
+                <Input
+                  value={gameCode}
+                  onChange={(e) => { setGameCode(e.target.value.toUpperCase()); setGameCodeError(false); }}
+                  placeholder="XXXX"
+                  className={cn("h-9 text-sm font-mono", gameCodeError && 'border-neo-red')}
+                />
+              </div>
+            )}
+
+            {!isAuthenticated && (
+              <div>
+                <Label className="text-xs font-bold uppercase text-neo-white">{t('joinView.nickname') || 'Nickname'}</Label>
+                <Input
+                  value={username}
+                  onChange={(e) => { setUsername(e.target.value); setUsernameError(false); }}
+                  placeholder={t('joinView.nicknamePlaceholder') || 'Enter nickname'}
+                  className={cn("h-9 text-sm", usernameError && 'border-neo-red')}
+                />
+              </div>
+            )}
+
+            <Button type="submit" disabled={isJoining} className="w-full h-10 font-bold uppercase bg-neo-yellow hover:bg-neo-yellow/90 text-neo-black border-2 border-neo-black">
+              {mode === 'host' ? <FaCrown className="mr-2" /> : <FaUser className="mr-2" />}
+              {isJoining ? (t('common.loading') || 'Loading...') : mode === 'host' ? (t('joinView.createRoom') || 'Create') : (t('joinView.joinRoom') || 'Join')}
+            </Button>
+          </form>
+        </div>
+
+        {/* Right column: Room List */}
+        <div className="w-1/2 flex flex-col gap-2 overflow-hidden">
+          <h2 className="text-xs font-black uppercase text-neo-white text-center">{t('joinView.activeRooms') || 'Active Rooms'}</h2>
+          <div className="flex-1 overflow-y-auto bg-slate-800 rounded-neo border-2 border-neo-black p-2">
+            <RoomList
+              activeRooms={activeRooms}
+              onRoomSelect={handleRoomSelect}
+              selectedGameCode={gameCode}
+              roomsLoading={roomsLoading}
+              onRefresh={refreshRooms}
+              onSwitchToHostMode={() => setMode('host')}
+              isJoinMode={mode === 'join'}
+              mobileExpanded={true}
+              onToggleMobileExpand={() => {}}
+            />
+          </div>
+        </div>
+      </div>
     );
   }
 

@@ -11,6 +11,7 @@ import { Label } from '../ui/label';
 import { cn } from '../../lib/utils';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { sanitizeInput } from '../../utils/validation';
+import { useMobileLandscape } from '@/hooks/useMobileLandscape';
 
 const MenuAnimation = dynamic(() => import('../MenuAnimation'), { ssr: false });
 
@@ -49,6 +50,7 @@ const QuickJoinView: React.FC<QuickJoinViewProps> = React.memo(({
   onShowFullForm
 }) => {
   const { t } = useLanguage();
+  const isLandscape = useMobileLandscape();
   const usernameInputRef = useRef<HTMLInputElement>(null);
 
   const handleJoinGuest = useCallback(() => {
@@ -59,6 +61,72 @@ const QuickJoinView: React.FC<QuickJoinViewProps> = React.memo(({
     setUsername(sanitizeInput(e.target.value, 20));
     if (usernameError) onUsernameErrorClear();
   }, [setUsername, usernameError, onUsernameErrorClear]);
+
+  // Landscape mode - horizontal layout
+  if (isLandscape) {
+    return (
+      <div className="flex h-screen w-full items-center justify-center bg-slate-900 p-4">
+        <div className="flex gap-4 items-center w-full max-w-2xl">
+          {/* Room info */}
+          <div className="flex flex-col items-center gap-2">
+            <FaGamepad className="text-3xl text-neo-cyan" />
+            <div className="bg-neo-pink text-neo-white font-black uppercase rounded-neo border-2 border-neo-black px-4 py-2">
+              {t('joinView.room')} {gameCode}
+            </div>
+          </div>
+
+          {/* Form */}
+          <div className="flex-1">
+            {error && (
+              <div className="mb-2 p-2 bg-neo-pink/20 border-2 border-neo-pink rounded-neo">
+                <p className="text-neo-pink font-bold text-xs">{error}</p>
+              </div>
+            )}
+
+            {isAuthenticated && displayName ? (
+              <div className="flex gap-2 items-end">
+                <div className="flex-1">
+                  <Label className="text-xs font-bold uppercase text-neo-cream">{t('joinView.joiningAs') || 'Joining as'}</Label>
+                  <Input
+                    value={username || displayName}
+                    onChange={(e) => setUsername(sanitizeInput(e.target.value, 20))}
+                    className="h-10 text-sm font-bold text-center bg-neo-navy border-2 border-neo-cyan/50 text-neo-cyan"
+                  />
+                </div>
+                <Button onClick={handleJoinGuest} disabled={isJoining} className="h-10 px-6 bg-neo-lime text-neo-black font-bold border-2 border-neo-black">
+                  <FaGamepad className="mr-2" />
+                  {isJoining ? t('joinView.joining') : t('joinView.joinGame')}
+                </Button>
+              </div>
+            ) : (
+              <form onSubmit={onQuickJoinSubmit} className="flex gap-2 items-end">
+                <div className="flex-1">
+                  <Label className="text-xs font-bold uppercase text-neo-cream">{t('joinView.enterNameToPlay')}</Label>
+                  <Input
+                    ref={usernameInputRef}
+                    value={username}
+                    onChange={handleUsernameChange}
+                    required
+                    autoFocus
+                    className={cn("h-10 text-sm bg-neo-cream text-neo-black font-bold border-2 border-neo-black", usernameError && "border-neo-pink")}
+                    placeholder={t('joinView.playerNamePlaceholder')}
+                  />
+                </div>
+                <Button type="submit" disabled={!username || isJoining} className="h-10 px-6 bg-neo-lime text-neo-black font-bold border-2 border-neo-black">
+                  <FaGamepad className="mr-2" />
+                  {isJoining ? t('joinView.joining') : t('joinView.joinGame')}
+                </Button>
+              </form>
+            )}
+
+            <button type="button" onClick={onShowFullForm} className="mt-2 text-xs text-neo-cyan font-bold uppercase underline">
+              {t('joinView.wantToHostOrJoinOther')}
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-neo-black pt-4 flex flex-col items-center justify-center p-2 sm:p-4 md:p-6 relative">

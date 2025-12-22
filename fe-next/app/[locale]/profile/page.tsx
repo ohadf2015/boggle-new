@@ -21,6 +21,7 @@ import { cn } from '@/lib/utils';
 import toast from 'react-hot-toast';
 import logger from '@/utils/logger';
 import { getSession } from '@/utils/session';
+import { useMobileLandscape } from '@/hooks/useMobileLandscape';
 
 interface Achievement {
   icon: string;
@@ -89,6 +90,7 @@ export default function ProfilePage(): React.ReactNode {
   const { t, language } = useLanguage();
   const { user, profile, isAuthenticated, loading, canPlayRanked, gamesUntilRanked, updateProfile, refreshProfile } = useAuth();
   const router = useRouter();
+  const isLandscape = useMobileLandscape();
   const isDarkMode = theme === 'dark';
 
   const [showAuthModal, setShowAuthModal] = useState<boolean>(false);
@@ -296,12 +298,15 @@ export default function ProfilePage(): React.ReactNode {
   // Authenticated profile view
   return (
     <div className={cn(
-      'min-h-screen',
+      isLandscape ? 'h-screen overflow-y-auto' : 'min-h-screen',
       isDarkMode ? 'bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900' : 'bg-gradient-to-br from-blue-50 via-white to-purple-50'
     )}>
-      <Header />
+      {!isLandscape && <Header />}
 
-      <div className="max-w-4xl mx-auto px-4 py-8">
+      <div className={cn(
+        "max-w-4xl mx-auto px-4",
+        isLandscape ? "py-2" : "py-8"
+      )}>
         {/* Profile Header */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
