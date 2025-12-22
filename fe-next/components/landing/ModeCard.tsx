@@ -129,7 +129,7 @@ const ModeCard: React.FC<ModeCardProps> = ({
         </h2>
 
         {/* Description */}
-        <p className="text-sm sm:text-base font-medium text-neo-black mb-5">
+        <p className="text-base sm:text-lg font-medium text-neo-black mb-5">
           {description}
         </p>
 

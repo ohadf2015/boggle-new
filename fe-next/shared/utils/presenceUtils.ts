@@ -3,13 +3,9 @@
  * Shared logic for player presence updates
  */
 
-// ==================== Types ====================
+import type { Player } from '@/hooks/useGameState';
 
-export interface Player {
-  username: string;
-  presenceStatus?: string;
-  isWindowFocused?: boolean;
-}
+// ==================== Types ====================
 
 export interface PresenceUpdateData {
   username: string;
@@ -21,7 +17,8 @@ export interface PresenceUpdateData {
 
 /**
  * Update player presence in the players list
- * Handles both string and object player formats
+ * Preserves all existing player properties while updating presence
+ * Maps presenceStatus to the presence field expected by Player type
  */
 export function updatePlayerPresence(
   players: Player[],
@@ -31,17 +28,20 @@ export function updatePlayerPresence(
     return players;
   }
 
-  const { username: playerUsername, presenceStatus, isWindowFocused } = data;
+  const { username: playerUsername, presenceStatus } = data;
 
   return players.map(player => {
-    const name = typeof player === 'string' ? player : player.username;
+    if (player.username === playerUsername) {
+      // Preserve all existing properties, map presenceStatus to presence
+      const updates: Partial<Player> = {};
+      if (presenceStatus === 'active' || presenceStatus === 'idle' || presenceStatus === 'afk') {
+        updates.presence = presenceStatus;
+      }
 
-    if (name === playerUsername) {
-      const newPlayer: Player =
-        typeof player === 'string'
-          ? { username: player, presenceStatus, isWindowFocused }
-          : { ...player, presenceStatus, isWindowFocused };
-      return newPlayer;
+      return {
+        ...player,
+        ...updates,
+      };
     }
 
     return player;

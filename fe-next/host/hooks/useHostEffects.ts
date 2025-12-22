@@ -15,7 +15,7 @@ import { generateRandomTable } from '@/utils/utils';
 import { DIFFICULTIES } from '@/utils/consts';
 import logger from '@/utils/logger';
 import type { Language, LetterGrid, DifficultyLevel } from '@/types';
-import type { Player } from './useHostViewState';
+import type { Player } from '@/hooks/useGameState';
 
 interface UseHostEffectsOptions {
   socket: Socket | null;

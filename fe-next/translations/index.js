@@ -210,6 +210,8 @@ const translations = {
       refreshPage: 'Refresh Page',
       connectionTimeout: 'Connection timeout',
       rateLimited: 'Too many requests. Please slow down.',
+      connectionLost: 'Connection lost',
+      notConnected: 'Not connected to server',
     },
     validation: {
       usernameRequired: 'Username is required! Please fill in the field',
@@ -1631,6 +1633,8 @@ const translations = {
       refreshPage: 'רענן דף',
       connectionTimeout: 'תם זמן החיבור',
       rateLimited: 'יותר מדי בקשות. אנא האט.',
+      connectionLost: 'החיבור אבד',
+      notConnected: 'לא מחובר לשרת',
     },
     validation: {
       usernameRequired: 'שם משתמש נדרש! אנא מלא את השדה',
@@ -3046,6 +3050,8 @@ const translations = {
       refreshPage: 'Uppdatera sidan',
       connectionTimeout: 'Anslutningen gick ut',
       rateLimited: 'För många förfrågningar. Vänligen sakta ner.',
+      connectionLost: 'Anslutningen förlorad',
+      notConnected: 'Inte ansluten till servern',
     },
     validation: {
       usernameRequired: 'Användarnamn krävs! Fyll i fältet',
@@ -4304,6 +4310,7 @@ const translations = {
       loading: '読み込み中...',
       error: 'エラー',
       back: '戻る',
+      next: '次へ',
       confirm: '確認',
       cancel: 'キャンセル',
       dismiss: '閉じる',
@@ -4461,6 +4468,8 @@ const translations = {
       refreshPage: 'ページを更新',
       connectionTimeout: '接続タイムアウト',
       rateLimited: 'リクエストが多すぎます。速度を落としてください。',
+      connectionLost: '接続が失われました',
+      notConnected: 'サーバーに接続されていません',
     },
     validation: {
       usernameRequired: 'ユーザー名が必要です！フィールドに入力してください',
@@ -5725,6 +5734,8 @@ const translations = {
       dismiss: 'Descartar',
       selectUILanguage: 'Idioma de Interfaz',
       close: 'Cerrar',
+      changeLanguage: 'Cambiar idioma',
+      adminDashboard: 'Panel de administración',
       understood: '¡Entendido, a jugar!',
       refresh: 'Actualizar',
       reconnecting: 'Reconectando al juego...',
@@ -5802,6 +5813,8 @@ const translations = {
     combo: {
       shieldUsed: '🛡️ ¡Escudo de Combo Usado!',
       shieldEarned: '🛡️ ¡Escudo Ganado!',
+      explanationTitle: 'Explicación de combos',
+      explanationText: 'Los combos aumentan cuando encuentras múltiples palabras seguidas sin pausas. ¡Cuanto mayor sea tu combo, más XP ganarás!',
     },
     earthquake: {
       warning: '¡Terremoto!',
@@ -5873,6 +5886,8 @@ const translations = {
       refreshPage: 'Actualizar Página',
       connectionTimeout: 'Tiempo de conexión agotado',
       rateLimited: 'Demasiadas solicitudes. Por favor, reduce la velocidad.',
+      connectionLost: 'Conexión perdida',
+      notConnected: 'No conectado al servidor',
     },
     validation: {
       usernameRequired: '¡Se requiere nombre de usuario! Por favor completa el campo',
@@ -5950,6 +5965,7 @@ const translations = {
       connectingToRoom: 'Conectando a la sala...',
       enterRoom: 'Entrar a la Sala',
       joinGame: 'Unirse al Juego',
+      pasteCode: 'Pegar código',
       joiningAs: 'Uniéndose como',
       hostingAs: 'Siendo anfitrión como',
       tapToChangeDisplayName: 'Toca para cambiar el nombre',
@@ -6538,6 +6554,120 @@ const translations = {
         intro: 'Revisa nuestros documentos legales para entender tus derechos.',
         termsDescription: 'Lee nuestros Términos de Servicio.',
         privacyDescription: 'Aprende cómo recopilamos y protegemos tu información personal.',
+      },
+      terms: {
+        title: 'Términos de Servicio',
+        intro: 'Estos Términos de Servicio rigen su uso de LexiClash.',
+        acceptance: {
+          title: 'Aceptación de Términos',
+          content: 'Al acceder y usar LexiClash, usted acepta estar sujeto a estos Términos de Servicio.',
+        },
+        service: {
+          title: 'Descripción del Servicio',
+          content: 'LexiClash es un juego de palabras multijugador en tiempo real.',
+        },
+        accounts: {
+          title: 'Cuentas de Usuario',
+          content: 'Puede ser necesario crear una cuenta para acceder a ciertas funciones.',
+        },
+        conduct: {
+          title: 'Conducta del Usuario',
+          content: 'Usted acepta no usar el servicio para fines ilegales.',
+        },
+        contentLicense: {
+          title: 'Licencia de Contenido',
+          content: 'Usted conserva la propiedad de cualquier contenido que envíe.',
+        },
+        intellectualProperty: {
+          title: 'Propiedad Intelectual',
+          content: 'El juego y todo su contenido son propiedad de sus respectivos dueños.',
+        },
+        disclaimers: {
+          title: 'Descargos de Responsabilidad',
+          content: 'El servicio se proporciona "tal cual" sin garantías de ningún tipo.',
+        },
+        liability: {
+          title: 'Limitación de Responsabilidad',
+          content: 'No seremos responsables por daños indirectos, incidentales o consecuentes.',
+        },
+        indemnification: {
+          title: 'Indemnización',
+          content: 'Usted acepta indemnizarnos contra reclamos derivados de su uso del servicio.',
+        },
+        termination: {
+          title: 'Terminación',
+          content: 'Podemos terminar o suspender su acceso inmediatamente sin previo aviso.',
+        },
+        governingLaw: {
+          title: 'Ley Aplicable',
+          content: 'Estos términos se rigen por las leyes aplicables.',
+        },
+        disputes: {
+          title: 'Resolución de Disputas',
+          content: 'Cualquier disputa se resolverá mediante arbitraje vinculante.',
+        },
+        modifications: {
+          title: 'Modificaciones',
+          content: 'Nos reservamos el derecho de modificar estos términos en cualquier momento.',
+        },
+        severability: {
+          title: 'Divisibilidad',
+          content: 'Si alguna disposición es inválida, las demás permanecerán en pleno vigor.',
+        },
+      },
+      privacy: {
+        title: 'Política de Privacidad',
+        intro: 'Su privacidad es importante para nosotros.',
+        infoCollected: {
+          title: 'Información que Recopilamos',
+          content: 'Recopilamos varios tipos de información.',
+          profile: 'Información de perfil (nombre de usuario, avatar)',
+          gameState: 'Datos del estado del juego (puntuaciones, progreso)',
+          stats: 'Estadísticas de juego y logros',
+          oauth: 'Información de autenticación OAuth (Google, Discord)',
+          analytics: 'Datos de análisis y uso',
+        },
+        howWeUse: {
+          title: 'Cómo Usamos Su Información',
+          content: 'Usamos su información para proporcionar y mejorar nuestro servicio.',
+        },
+        thirdParties: {
+          title: 'Servicios de Terceros',
+          content: 'Usamos los siguientes servicios de terceros:',
+          supabase: 'Supabase (autenticación y base de datos)',
+          google: 'Google OAuth (autenticación)',
+          discord: 'Discord OAuth (autenticación)',
+          logrocket: 'LogRocket (análisis y registro de errores)',
+          noSale: 'No vendemos su información personal a terceros.',
+        },
+        cookies: {
+          title: 'Cookies y Almacenamiento Local',
+          content: 'Usamos cookies y almacenamiento local del navegador para mantener su sesión.',
+        },
+        security: {
+          title: 'Seguridad de Datos',
+          content: 'Implementamos medidas de seguridad estándar de la industria.',
+        },
+        dataRetention: {
+          title: 'Retención de Datos',
+          content: 'Retenemos sus datos mientras su cuenta esté activa.',
+        },
+        yourRights: {
+          title: 'Sus Derechos',
+          content: 'Usted tiene derecho a acceder, corregir o eliminar su información personal.',
+        },
+        international: {
+          title: 'Transferencias Internacionales',
+          content: 'Su información puede ser transferida y almacenada en servidores ubicados fuera de su país.',
+        },
+        changes: {
+          title: 'Cambios a Esta Política',
+          content: 'Podemos actualizar esta política de privacidad ocasionalmente.',
+        },
+        governingLaw: {
+          title: 'Ley Aplicable',
+          content: 'Esta política se rige por las leyes aplicables.',
+        },
       },
     },
     profile: {

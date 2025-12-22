@@ -17,12 +17,7 @@ import {
   useHostTournamentEvents,
 } from './socket';
 import type { XpGainedPayload, LevelUpPayload, AchievementPayload } from '@/shared/types/socket';
-
-interface Player {
-  username: string;
-  presenceStatus?: string;
-  isWindowFocused?: boolean;
-}
+import type { Player } from '@/hooks/useGameState';
 
 interface TournamentData {
   currentRound?: number;

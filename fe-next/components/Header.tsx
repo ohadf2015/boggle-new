@@ -67,17 +67,17 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
         >
             {/* NEO-BRUTALIST Header Bar */}
             <div
-                className="
-                    max-w-6xl mx-auto
-                    flex items-center justify-between
-                    px-1 xs:px-2 sm:px-4 md:px-6 py-2 xs:py-3 sm:py-4
-                    bg-neo-cyan-muted
-                    border-4 border-neo-black
-                    shadow-hard-lg
-                    rounded-neo-lg
-                    transition-all duration-100
-                    min-w-0
-                "
+                className={cn(
+                    "max-w-6xl mx-auto",
+                    "flex items-center justify-between",
+                    "px-1 xs:px-2 sm:px-4 md:px-6 py-2 xs:py-3 sm:py-4",
+                    "bg-neo-cyan-muted",
+                    "border-4 border-neo-black",
+                    "shadow-hard-lg",
+                    "rounded-neo-lg",
+                    "transition-all duration-100",
+                    "min-w-0"
+                )}
             >
                 {/* Logo */}
                 <motion.button
@@ -88,7 +88,7 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                     aria-label={t('common.goToHome') || 'Go to home page'}
                 >
                     <h1
-                        className="text-lg xs:text-xl sm:text-2xl md:text-4xl font-black uppercase tracking-tight flex items-center gap-0.5 xs:gap-1 flex-shrink min-w-0"
+                        className="text-lg xs:text-xl sm:text-2xl md:text-4xl font-black uppercase tracking-tight flex items-center gap-0.5 xs:gap-1 flex-shrink min-w-0 landscape:text-base landscape:xs:text-lg landscape:sm:text-xl"
                         style={{ fontFamily }}
                     >
                         {/* LEXI - Neo-Brutalist white with black shadow */}

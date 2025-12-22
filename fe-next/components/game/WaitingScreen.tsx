@@ -53,44 +53,44 @@ const WaitingScreen: React.FC<WaitingScreenProps> = ({
   const { t } = useLanguage();
   const isLandscape = useMobileLandscape();
 
-  // Landscape mode layout - 3-column: room info | grid | players
+  // Landscape mode layout - optimized 3-column: room info | grid | players
   if (isLandscape) {
     return (
-      <div className="relative flex h-screen w-full overflow-hidden bg-slate-900 p-2 gap-2 landscape-full-height">
+      <div className="relative flex h-screen w-full overflow-hidden bg-slate-900 p-3 gap-3 landscape-full-height">
         {/* Left column: Room info + Exit */}
-        <div className="flex flex-col items-center gap-2 w-24 flex-shrink-0">
+        <div className="flex flex-col items-center gap-3 w-28 flex-shrink-0">
           {/* Room Code */}
-          <div className="bg-neo-cyan border-2 border-neo-black rounded-neo p-2 text-center shadow-hard-sm">
-            <div className="text-[8px] font-bold uppercase text-neo-black/70">Room</div>
-            <div className="text-lg font-black text-neo-black">{gameCode}</div>
+          <div className="bg-neo-cyan border-3 border-neo-black rounded-neo p-3 text-center shadow-hard w-full">
+            <div className="text-xs font-bold uppercase text-neo-black/70 mb-1">Room</div>
+            <div className="text-2xl font-black text-neo-black">{gameCode}</div>
           </div>
 
           {/* Language Badge */}
           {gameLanguage && (
-            <Badge className="text-xs px-2 py-1 bg-neo-cream text-neo-black border-2 border-neo-black">
+            <Badge className="text-sm px-3 py-1.5 bg-neo-cream text-neo-black border-3 border-neo-black w-full text-center">
               {gameLanguage === 'he' ? '🇮🇱' : gameLanguage === 'sv' ? '🇸🇪' : gameLanguage === 'ja' ? '🇯🇵' : '🇺🇸'}
             </Badge>
           )}
 
-          {/* Share Buttons - compact row */}
-          <div className="flex gap-1">
+          {/* Share Buttons - compact column */}
+          <div className="flex flex-col gap-2 w-full">
             <Button
               variant="ghost"
               size="sm"
               onClick={() => copyJoinUrl(gameCode, t)}
-              className="w-8 h-8 p-0 bg-neo-yellow/90 hover:bg-neo-yellow border-2 border-neo-black rounded-neo"
+              className="w-full h-12 min-h-[48px] p-0 bg-neo-yellow/90 hover:bg-neo-yellow border-3 border-neo-black rounded-neo flex items-center justify-center shadow-hard"
               title={t('hostView.copyLink')}
             >
-              <FaLink className="text-[10px] text-neo-black" />
+              <FaLink className="text-base text-neo-black" />
             </Button>
             <Button
               variant="ghost"
               size="sm"
               onClick={() => shareViaWhatsApp(gameCode, '', t)}
-              className="w-8 h-8 p-0 bg-neo-green/90 hover:bg-neo-green border-2 border-neo-black rounded-neo"
+              className="w-full h-12 min-h-[48px] p-0 bg-neo-green/90 hover:bg-neo-green border-3 border-neo-black rounded-neo flex items-center justify-center shadow-hard"
               title={t('hostView.shareWhatsapp')}
             >
-              <FaWhatsapp className="text-[10px] text-neo-black" />
+              <FaWhatsapp className="text-base text-neo-black" />
             </Button>
           </div>
 
@@ -99,10 +99,10 @@ const WaitingScreen: React.FC<WaitingScreenProps> = ({
             variant="ghost"
             size="sm"
             onClick={() => setShowQR(true)}
-            className="w-10 h-10 p-0 bg-neo-purple/90 hover:bg-neo-purple border-2 border-neo-black rounded-neo"
+            className="w-full h-12 min-h-[48px] p-0 bg-neo-purple/90 hover:bg-neo-purple border-3 border-neo-black rounded-neo flex items-center justify-center shadow-hard"
             title={t('hostView.qrCode')}
           >
-            <FaQrcode className="text-xs text-neo-cream" />
+            <FaQrcode className="text-base text-neo-cream" />
           </Button>
 
           {/* Exit Button */}
@@ -110,9 +110,9 @@ const WaitingScreen: React.FC<WaitingScreenProps> = ({
             variant="ghost"
             size="sm"
             onClick={onExitRoom}
-            className="w-10 h-10 p-0 bg-neo-red/90 hover:bg-neo-red border-2 border-neo-black rounded-neo mt-auto"
+            className="w-full h-12 min-h-[48px] p-0 bg-neo-red/90 hover:bg-neo-red border-3 border-neo-black rounded-neo mt-auto flex items-center justify-center shadow-hard"
           >
-            <FaTimes className="text-sm text-neo-black" />
+            <FaTimes className="text-base text-neo-black" />
           </Button>
         </div>
 
@@ -123,13 +123,13 @@ const WaitingScreen: React.FC<WaitingScreenProps> = ({
               grid={shufflingGrid}
               highlightedCells={highlightedCells}
               language={gameLanguage || 'en'}
-              className="max-h-[100vh] max-w-[100vh]"
+              className="max-h-[95vh] max-w-[95vh]"
               animationDuration={600}
               staggerDelay={40}
               animationPattern="cascade"
             />
           ) : (
-            <div className="w-[95vh] max-w-full aspect-square grid grid-cols-4 gap-2 p-4">
+            <div className="w-[95vh] max-w-full aspect-square grid grid-cols-4 gap-3 p-4">
               {Array.from({ length: 16 }).map((_, i) => (
                 <motion.div
                   key={i}
@@ -143,10 +143,10 @@ const WaitingScreen: React.FC<WaitingScreenProps> = ({
         </div>
 
         {/* Right column: Players list + Game Settings (Host) */}
-        <div className="w-40 flex flex-col gap-2 overflow-hidden flex-shrink-0">
+        <div className="w-48 flex flex-col gap-3 overflow-hidden flex-shrink-0">
           {/* Game Settings for Host - includes Start Game button */}
           {isHost && gameSettings && (
-            <div className="flex-shrink-0 [&_button]:h-10 [&_button]:text-sm [&_button]:px-3 [&_>*]:p-2 [&_>*]:gap-2 [&_h3]:hidden [&_p]:hidden [&_.space-y-4]:space-y-2 [&_.space-y-6]:space-y-2">
+            <div className="flex-shrink-0 [&_button]:h-11 [&_button]:text-sm [&_button]:px-3 [&_>*]:p-3 [&_>*]:gap-2 [&_h3]:hidden [&_p]:hidden [&_.space-y-4]:space-y-2 [&_.space-y-6]:space-y-2">
               {gameSettings}
             </div>
           )}
@@ -156,20 +156,20 @@ const WaitingScreen: React.FC<WaitingScreenProps> = ({
             <motion.div
               animate={{ opacity: [0.7, 1, 0.7] }}
               transition={{ duration: 2, repeat: Infinity }}
-              className="bg-neo-cyan/20 border-2 border-neo-cyan/50 rounded-neo px-2 py-1 text-center"
+              className="bg-neo-cyan/20 border-3 border-neo-cyan/50 rounded-neo px-3 py-2 text-center"
             >
-              <span className="text-[9px] font-bold text-neo-cyan uppercase">
+              <span className="text-xs font-bold text-neo-cyan uppercase">
                 {t('playerView.waitForGameStart')}
               </span>
             </motion.div>
           )}
 
           {/* Players Header */}
-          <div className="text-xs font-black uppercase text-neo-cream text-center flex items-center justify-center gap-1">
-            <FaUsers className="text-neo-pink" />
+          <div className="text-sm font-black uppercase text-neo-cream text-center flex items-center justify-center gap-2">
+            <FaUsers className="text-neo-pink text-base" />
             <span>{playersReady.length}</span>
           </div>
-          <div className="flex-1 overflow-y-auto space-y-1">
+          <div className="flex-1 overflow-y-auto space-y-2">
             {playersReady.map((player) => {
               const playerUsername = player.username;
               const avatar = player.avatar;
@@ -179,23 +179,23 @@ const WaitingScreen: React.FC<WaitingScreenProps> = ({
               return (
                 <Badge
                   key={playerUsername}
-                  className={`text-[10px] font-bold px-2 py-1 w-full truncate border-2 border-neo-black ${
+                  className={`text-xs font-bold px-3 py-2 w-full truncate border-3 border-neo-black shadow-hard-sm ${
                     playerIsHost ? "bg-neo-yellow text-neo-black" : "bg-neo-cream text-neo-black"
                   }`}
                   style={avatar?.color && !playerIsHost ? { backgroundColor: avatar.color } : {}}
                 >
-                  <div className="flex items-center gap-1 w-full truncate">
-                    {avatar?.emoji && <span className="text-xs">{avatar.emoji}</span>}
-                    {playerIsHost && <FaCrown className="text-[8px] flex-shrink-0" />}
+                  <div className="flex items-center gap-2 w-full truncate">
+                    {avatar?.emoji && <span className="text-sm">{avatar.emoji}</span>}
+                    {playerIsHost && <FaCrown className="text-[10px] flex-shrink-0" />}
                     <span className="truncate">{playerUsername}</span>
-                    {isMe && <span className="text-[8px] opacity-70">(me)</span>}
+                    {isMe && <span className="text-[9px] opacity-70">(me)</span>}
                   </div>
                 </Badge>
               );
             })}
           </div>
           {playersReady.length === 0 && (
-            <p className="text-[10px] text-center text-neo-cream/60 font-bold">
+            <p className="text-xs text-center text-neo-cream/60 font-bold">
               {t('hostView.waitingForPlayers')}
             </p>
           )}

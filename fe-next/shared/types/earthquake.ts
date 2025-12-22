@@ -25,13 +25,13 @@ export interface EarthquakeConfig {
  */
 export const DEFAULT_EARTHQUAKE_CONFIG: EarthquakeConfig = {
   enabled: true,
-  triggerPercentageMin: 0.76, // Last 24% of game
+  triggerPercentageMin: 0.65, // Last 35% of game (adjusted to work with 1-minute games)
   triggerPercentageMax: 1.0,
   warningDurationMs: 2000,
   shakeDurationMs: 1000,
   fireRoundDurationSeconds: 15,
   scoreMultiplier: 2.0,
-  minGameDurationSeconds: 60,
+  minGameDurationSeconds: 45, // Support games as short as 45 seconds
 };
 
 /**

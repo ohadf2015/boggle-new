@@ -12,6 +12,7 @@ import { useSoundEffects } from '../contexts/SoundEffectsContext';
 import { useAchievementQueue } from '../components/achievements';
 import { DIFFICULTIES } from '../utils/consts';
 import { usePresence } from '../hooks/usePresence';
+import { useEarthquakeFireRound } from '../hooks/useEarthquakeFireRound';
 import type { Language, PlayerResult } from '@/types';
 
 // Extracted components
@@ -191,6 +192,38 @@ const HostView: React.FC<HostViewProps> = memo(({
     });
   }, [socket, state.settings.difficulty, state.roomLanguage]);
 
+  // Earthquake/Fire Round feature for multiplayer
+  const {
+    earthquakeState,
+    fireRoundActive,
+    fireRoundRemaining,
+  } = useEarthquakeFireRound({
+    enabled: runtime.gameStarted && !runtime.waitingForResults,
+    gameDurationSeconds: state.settings.timerValue * 60,
+    currentTimeSeconds: runtime.remainingTime || 0,
+    language: state.roomLanguage,
+    difficulty: state.settings.difficulty,
+    mode: 'multiplayer',
+    isHost: true,
+    socket: socket,
+    gameSessionId: gameCode,
+    onGridRegenerate: (newGrid) => {
+      state.setTableData(newGrid);
+    },
+    onEarthquakeStart: () => {
+      // Sound effects handled by client-side event listeners
+    },
+    onEarthquakeShake: () => {
+      // Sound effects handled by client-side event listeners
+    },
+    onFireRoundStart: () => {
+      // Sound effects handled by client-side event listeners
+    },
+    onFireRoundEnd: () => {
+      // Sound effects handled by client-side event listeners
+    },
+  });
+
   // Build leaderboard for waiting view
   const leaderboard = state.players.playersReady
     .map((player) => {
@@ -342,6 +375,9 @@ const HostView: React.FC<HostViewProps> = memo(({
           playerWordCounts={players.playerWordCounts}
           onStopGame={actions.stopGame}
           socket={socket}
+          earthquakeState={earthquakeState}
+          fireRoundActive={fireRoundActive}
+          fireRoundRemaining={fireRoundRemaining}
         />
       )}
     </div>

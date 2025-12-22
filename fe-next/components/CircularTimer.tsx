@@ -149,7 +149,7 @@ const CircularTimer = memo<CircularTimerProps>(({ remainingTime, totalTime = 180
               absolute -top-2 -right-2 z-10
               px-2 py-1
               bg-neo-red text-neo-cream
-              text-[10px] font-black uppercase
+              text-xs font-black uppercase
               border-2 border-neo-black
               rounded-neo
               shadow-hard-sm

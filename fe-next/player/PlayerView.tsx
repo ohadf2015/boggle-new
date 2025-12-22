@@ -165,41 +165,18 @@ const PlayerView: React.FC<PlayerViewProps> = memo(({
   // Music ref
   const hasTriggeredUrgentMusicRef = useRef<boolean>(false);
 
-  // Use custom hook for socket events
+  // Use custom hook for socket events (now uses GameStateContext - no more prop drilling!)
   usePlayerSocketEvents({
     socket,
     t,
     inputRef,
-    wasInActiveGame,
-    gameActive,
-    letterGrid,
-    gameLanguage,
     username,
     queueAchievement,
     playComboSound,
     fireRoundActive,
     onShowResults,
-    setPlayersReady,
-    setShufflingGrid,
-    setHighlightedCells,
-    setWasInActiveGame,
-    setFoundWords,
-    setAchievements,
-    setLetterGrid,
-    setRemainingTime,
-    setMinWordLength,
-    setGameLanguage,
-    setGameActive,
-    setShowStartAnimation,
-    setWaitingForResults,
-    setLeaderboard,
-    setTournamentData,
-    setTournamentStandings,
-    setShowTournamentStandings,
     setShowWordFeedback,
     setWordToVote,
-    setXpGainedData,
-    setLevelUpData,
     setEarthquakeState,
     setFireRoundActive,
     setFireRoundRemaining,
@@ -209,7 +186,6 @@ const PlayerView: React.FC<PlayerViewProps> = memo(({
     setLastWordTime,
     comboTimeoutRef,
     comboShieldsUsedRef,
-    foundWords,
     intentionalExitRef,
     // Start music immediately when startGame event is received for better synchronization
     onGameStart: () => {

@@ -63,10 +63,10 @@ export function HelpPanel({ isOpen, onClose }: HelpPanelProps) {
               </div>
               <button
                 onClick={onClose}
-                className="w-8 h-8 flex items-center justify-center bg-neo-cream border-2 border-neo-black rounded-neo shadow-hard-sm hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-hard transition-all"
+                className="w-11 h-11 min-w-[44px] min-h-[44px] flex items-center justify-center bg-neo-cream border-2 border-neo-black rounded-neo shadow-hard-sm hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-hard transition-all"
                 aria-label="Close"
               >
-                <X className="w-4 h-4 text-neo-black" />
+                <X className="w-5 h-5 text-neo-black" />
               </button>
             </div>
 

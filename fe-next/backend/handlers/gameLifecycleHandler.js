@@ -176,7 +176,7 @@ function registerGameLifecycleHandlers(io, socket) {
       return;
     }
 
-    const { letterGrid, timerSeconds, language, minWordLength } = data;
+    const { letterGrid, timerSeconds, language, minWordLength, difficulty } = data;
     const gameCode = getGameBySocketId(socket.id);
 
     if (!gameCode) {
@@ -230,6 +230,7 @@ function registerGameLifecycleHandlers(io, socket) {
       gameDuration: validTimer,
       language: language || game.language,
       minWordLength: minWordLength || 2,
+      difficulty: difficulty || 'MEDIUM',
       gameStartedAt: Date.now()
     });
 

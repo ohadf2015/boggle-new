@@ -1,26 +1,18 @@
 /**
  * Player Tournament Events Hook
  * Handles tournament-related socket events
+ *
+ * REFACTORED: Now uses GameStateContext instead of prop drilling
  */
 import { useEffect } from 'react';
 import { Socket } from 'socket.io-client';
 import { neoSuccessToast, neoErrorToast, neoInfoToast } from '../../../components/NeoToast';
 import { triggerTournamentCompleteCelebration } from '@/shared/utils/gameEventUtils';
-
-interface TournamentData {
-  currentRound?: number;
-  totalRounds?: number;
-  isComplete?: boolean;
-}
+import { useGameStateContext } from '@/contexts/GameStateContext';
 
 interface UsePlayerTournamentEventsProps {
   socket: Socket | null;
   t: (key: string) => string;
-
-  // State setters
-  setTournamentData: React.Dispatch<React.SetStateAction<TournamentData | null>>;
-  setTournamentStandings: React.Dispatch<React.SetStateAction<any[]>>;
-  setShowTournamentStandings: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 /**
@@ -29,10 +21,9 @@ interface UsePlayerTournamentEventsProps {
 export function usePlayerTournamentEvents({
   socket,
   t,
-  setTournamentData,
-  setTournamentStandings,
-  setShowTournamentStandings,
 }: UsePlayerTournamentEventsProps): void {
+  // Get state setters from context (no more prop drilling!)
+  const { setTournamentData, setTournamentStandings, setShowTournamentStandings } = useGameStateContext();
   useEffect(() => {
     if (!socket) return;
 
@@ -99,11 +90,6 @@ export function usePlayerTournamentEvents({
       socket.off('tournamentComplete', handleTournamentComplete);
       socket.off('tournamentCancelled', handleTournamentCancelled);
     };
-  }, [
-    socket,
-    t,
-    setTournamentData,
-    setTournamentStandings,
-    setShowTournamentStandings,
-  ]);
+    // Setters are stable from context (wrapped in useCallback), no need in deps
+  }, [socket, t, setTournamentData, setTournamentStandings, setShowTournamentStandings]);
 }

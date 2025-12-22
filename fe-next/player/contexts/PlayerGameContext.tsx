@@ -2,7 +2,7 @@
 
 import React, { createContext, useContext, ReactNode } from 'react';
 import { usePlayerViewState, UsePlayerViewStateReturn } from '../hooks/usePlayerViewState';
-import type { Player } from '../hooks/usePlayerViewState';
+import type { Player } from '@/hooks/useGameState';
 
 /**
  * PlayerGameContext - React Context wrapper for usePlayerViewState

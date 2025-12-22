@@ -12,12 +12,7 @@ import { createPlayerPresenceHandler } from '@/shared/utils/presenceUtils';
 import logger from '@/utils/logger';
 import type { XpGainedPayload, LevelUpPayload, AchievementPayload } from '@/shared/types/socket';
 import type { LeaderboardEntry } from '@/shared/types/game';
-
-interface Player {
-  username: string;
-  presenceStatus?: string;
-  isWindowFocused?: boolean;
-}
+import type { Player } from '@/hooks/useGameState';
 
 interface UseHostPlayerEventsProps {
   socket: Socket | null;

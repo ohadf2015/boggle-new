@@ -27,49 +27,49 @@ const LandingView: React.FC = () => {
     playTrack(TRACKS.LOBBY);
   }, [playTrack, TRACKS]);
 
-  // Landscape mode - compact horizontal layout
+  // Landscape mode - optimized horizontal layout
   if (isLandscape) {
     return (
       <main
-        className="flex h-screen w-full items-center justify-center bg-slate-900 p-2 sm:p-4 gap-2 sm:gap-4 overflow-x-hidden"
+        className="flex h-screen w-full items-center justify-center bg-slate-900 p-3 gap-4 overflow-x-hidden landscape-full-height"
         role="main"
         aria-label="Game mode selection"
       >
         {/* Single Player */}
         <Link
           href={`/${language}/singleplayer`}
-          className="flex-1 flex flex-col items-center justify-center gap-2 p-4 bg-gradient-to-br from-neo-cyan to-cyan-400 border-3 border-neo-black rounded-neo shadow-hard hover:shadow-hard-lg hover:translate-x-[-2px] hover:translate-y-[-2px] transition-all h-full max-h-[80vh]"
+          className="flex-1 flex flex-col items-center justify-center gap-3 p-6 bg-gradient-to-br from-neo-cyan to-cyan-400 border-4 border-neo-black rounded-neo shadow-hard hover:shadow-hard-lg hover:translate-x-[-2px] hover:translate-y-[-2px] active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-sm transition-all h-full max-h-[90vh] min-h-[300px]"
           aria-label={`${t('landing.singlePlayer') || 'Single Player'} - ${t('landing.singlePlayerDesc') || 'Practice at your own pace'}`}
         >
-          <FaUser className="text-4xl text-neo-black" aria-hidden="true" />
-          <span className="text-lg font-black uppercase text-neo-black">{t('landing.singlePlayer') || 'Single Player'}</span>
-          <div className="flex gap-2 text-xs" aria-hidden="true">
-            <span className="bg-neo-black/20 px-2 py-1 rounded-neo font-bold"><FaRobot className="inline mr-1" />Bots</span>
-            <span className="bg-neo-black/20 px-2 py-1 rounded-neo font-bold"><FaTrophy className="inline mr-1" />Challenges</span>
+          <FaUser className="text-5xl text-neo-black" aria-hidden="true" />
+          <span className="text-xl font-black uppercase text-neo-black text-center">{t('landing.singlePlayer') || 'Single Player'}</span>
+          <div className="flex flex-col gap-2 text-sm" aria-hidden="true">
+            <span className="bg-neo-black/20 px-3 py-1.5 rounded-neo font-bold text-center"><FaRobot className="inline mr-1" />Bots</span>
+            <span className="bg-neo-black/20 px-3 py-1.5 rounded-neo font-bold text-center"><FaTrophy className="inline mr-1" />Challenges</span>
           </div>
         </Link>
 
         {/* Multiplayer */}
         <Link
           href={`/${language}/multiplayer`}
-          className="flex-1 flex flex-col items-center justify-center gap-2 p-4 bg-gradient-to-br from-neo-pink to-pink-400 border-3 border-neo-black rounded-neo shadow-hard hover:shadow-hard-lg hover:translate-x-[-2px] hover:translate-y-[-2px] transition-all h-full max-h-[80vh]"
+          className="flex-1 flex flex-col items-center justify-center gap-3 p-6 bg-gradient-to-br from-neo-pink to-pink-400 border-4 border-neo-black rounded-neo shadow-hard hover:shadow-hard-lg hover:translate-x-[-2px] hover:translate-y-[-2px] active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-sm transition-all h-full max-h-[90vh] min-h-[300px]"
           aria-label={`${t('landing.multiplayer') || 'Multiplayer'} - ${t('landing.multiplayerDesc') || 'Compete with friends'}`}
         >
-          <FaUsers className="text-4xl text-neo-black" aria-hidden="true" />
-          <span className="text-lg font-black uppercase text-neo-black">{t('landing.multiplayer') || 'Multiplayer'}</span>
-          <div className="flex gap-2 text-xs" aria-hidden="true">
-            <span className="bg-neo-black/20 px-2 py-1 rounded-neo font-bold"><FaDoorOpen className="inline mr-1" />Rooms</span>
-            <span className="bg-neo-black/20 px-2 py-1 rounded-neo font-bold"><FaCrown className="inline mr-1" />Host</span>
+          <FaUsers className="text-5xl text-neo-black" aria-hidden="true" />
+          <span className="text-xl font-black uppercase text-neo-black text-center">{t('landing.multiplayer') || 'Multiplayer'}</span>
+          <div className="flex flex-col gap-2 text-sm" aria-hidden="true">
+            <span className="bg-neo-black/20 px-3 py-1.5 rounded-neo font-bold text-center"><FaDoorOpen className="inline mr-1" />Rooms</span>
+            <span className="bg-neo-black/20 px-3 py-1.5 rounded-neo font-bold text-center"><FaCrown className="inline mr-1" />Host</span>
           </div>
         </Link>
 
-        {/* How to Play - compact */}
+        {/* How to Play - compact, always visible */}
         <Link
           href={`/${language}/rules`}
-          className="absolute bottom-2 right-2 flex items-center gap-1 px-3 py-2 bg-neo-yellow text-neo-black font-bold text-sm border-2 border-neo-black rounded-neo min-h-[44px]"
+          className="absolute bottom-4 right-4 flex items-center gap-2 px-4 py-3 bg-neo-yellow text-neo-black font-bold text-lg border-3 border-neo-black rounded-neo min-h-[48px] shadow-hard hover:shadow-hard-lg hover:translate-x-[-1px] hover:translate-y-[-1px] active:translate-x-[1px] active:translate-y-[1px] active:shadow-hard-sm transition-all z-10"
           aria-label={t('joinView.howToPlay') || 'How to Play'}
         >
-          <FaQuestionCircle aria-hidden="true" />
+          <FaQuestionCircle className="text-lg" aria-hidden="true" />
           <span className="hidden sm:inline">{t('joinView.howToPlay') || 'How to Play'}</span>
         </Link>
       </main>

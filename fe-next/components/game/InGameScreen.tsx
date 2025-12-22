@@ -153,22 +153,24 @@ const InGameScreen = memo<InGameScreenProps>(({
   // Viewport height detection for very short landscape screens
   const [viewportHeight, setViewportHeight] = useState(0);
 
-  // Auto-hide controls for landscape mode
+  // Auto-hide controls for landscape mode - REDUCED hide delay for faster auto-hide
   const { isVisible: controlsVisible, isPinned: controlsPinned, show: showControls, togglePin: toggleControlsPin } = useAutoHideControls({
-    hideDelay: 3000,
+    hideDelay: 1500, // Reduced from 3000ms to 1500ms for faster auto-hide
     initialHidden: true,
     enabled: isLandscape,
   });
 
   // Show controls on scroll/touch/mousemove in landscape mode
-  // BUT NOT when interacting with the game board
+  // BUT NOT when interacting with the game board or side panels
   useEffect(() => {
     if (!isLandscape) return;
 
     const handleInteraction = (e: Event) => {
-      // Don't show controls if interacting with the grid/board
+      // Don't show controls if interacting with the grid/board or side stat panels
       const target = e.target as HTMLElement;
-      if (target.closest('.landscape-grid-container') || target.closest('.game-board-frame-landscape')) {
+      if (target.closest('.landscape-grid-container') ||
+          target.closest('.game-board-frame-landscape') ||
+          target.closest('.landscape-side-panel')) {
         return;
       }
       showControls();
@@ -324,37 +326,37 @@ const InGameScreen = memo<InGameScreenProps>(({
         {/* Full-screen landscape container with grid centered - uses full viewport */}
         <div className="relative flex items-center justify-center w-full h-screen overflow-hidden bg-slate-900 landscape-full-height">
 
-          {/* Left Side Stats - Consolidated Panel (Timer + Stats) */}
-          <div className="absolute left-2 top-1/2 -translate-y-1/2 z-20">
-            <div className="bg-neo-cream/95 border-3 border-neo-black rounded-neo shadow-hard p-2 flex flex-col items-center gap-2">
-              {/* Timer - Compact circular */}
+          {/* Left Side Stats - Consolidated Panel (Timer + Stats) - ENLARGED FOR LANDSCAPE */}
+          <div className="absolute left-2 top-1/2 -translate-y-1/2 z-40 landscape-side-panel">
+            <div className="bg-neo-cream/95 border-4 border-neo-black rounded-neo shadow-hard-lg p-3 flex flex-col items-center gap-3">
+              {/* Timer - Larger for better visibility */}
               {remainingTime !== null && (
                 <CircularTimer
                   remainingTime={remainingTime}
                   totalTime={timerValue * 60}
-                  size="sm"
+                  size="md"
                 />
               )}
 
-              {/* Stats Row - Rank & Words side by side when both exist */}
+              {/* Stats Row - Rank & Words side by side when both exist - ENLARGED */}
               {isPlaying && (
-                <div className="flex items-center gap-1.5">
-                  {/* Rank Badge (if in multiplayer) */}
+                <div className="flex items-center gap-2">
+                  {/* Rank Badge (if in multiplayer) - LARGER */}
                   {playerData.rank && playerData.rank > 0 && leaderboard.length > 1 && (
                     <motion.div
                       initial={{ scale: 0 }}
                       animate={{ scale: 1 }}
-                      className="bg-neo-purple text-neo-cream border-2 border-neo-black rounded-neo shadow-hard-sm px-2 py-1 text-center min-w-[40px]"
+                      className="bg-neo-purple text-neo-cream border-3 border-neo-black rounded-neo shadow-hard px-3 py-2 text-center min-w-[56px]"
                     >
-                      <div className="text-sm font-black leading-tight">
+                      <div className="text-lg font-black leading-tight">
                         #{playerData.rank}
                       </div>
                     </motion.div>
                   )}
 
-                  {/* Words count */}
-                  <div className="bg-neo-navy text-neo-cream border-2 border-neo-black rounded-neo shadow-hard-sm px-2 py-1 text-center min-w-[40px]">
-                    <div className="text-sm font-black leading-tight">
+                  {/* Words count - LARGER */}
+                  <div className="bg-neo-navy text-neo-cream border-3 border-neo-black rounded-neo shadow-hard px-3 py-2 text-center min-w-[56px]">
+                    <div className="text-lg font-black leading-tight">
                       {normalizedFoundWords.length}
                     </div>
                   </div>
@@ -363,39 +365,39 @@ const InGameScreen = memo<InGameScreenProps>(({
             </div>
           </div>
 
-          {/* Right Side Stats - Consolidated Score Panel */}
+          {/* Right Side Stats - Consolidated Score Panel - ENLARGED FOR LANDSCAPE */}
           {isPlaying && (
-            <div className="absolute right-2 top-1/2 -translate-y-1/2 z-20">
+            <div className="absolute right-2 top-1/2 -translate-y-1/2 z-40 landscape-side-panel">
               <motion.div
                 initial={{ scale: 0, rotate: -2 }}
                 animate={{ scale: 1, rotate: 1 }}
-                className="bg-neo-cream border-3 border-neo-black rounded-neo shadow-hard p-2 flex flex-col items-center gap-1.5"
+                className="bg-neo-cream border-4 border-neo-black rounded-neo shadow-hard-lg p-3 flex flex-col items-center gap-2"
               >
-                {/* Score */}
+                {/* Score - MUCH LARGER */}
                 <motion.div
                   key={playerData.score}
                   initial={{ scale: 1.2 }}
                   animate={{ scale: 1 }}
-                  className="text-2xl font-black text-neo-black leading-none"
+                  className="text-4xl font-black text-neo-black leading-none"
                 >
                   {playerData.score}
                 </motion.div>
 
-                {/* Combo indicator (inline when active) */}
+                {/* Combo indicator (inline when active) - LARGER */}
                 <AnimatePresence>
                   {comboLevel > 1 && (
                     <motion.div
                       initial={{ scale: 0, opacity: 0 }}
                       animate={{ scale: 1, opacity: 1 }}
                       exit={{ scale: 0, opacity: 0 }}
-                      className="bg-neo-cyan border-2 border-neo-black rounded-neo px-2 py-0.5 flex items-center gap-1"
+                      className="bg-neo-cyan border-3 border-neo-black rounded-neo px-3 py-1.5 flex items-center gap-1.5"
                     >
-                      <span className="text-xs font-black text-neo-black">🔥</span>
+                      <span className="text-base font-black text-neo-black">🔥</span>
                       <motion.span
                         key={comboLevel}
                         initial={{ scale: 1.3 }}
                         animate={{ scale: 1 }}
-                        className="text-sm font-black text-neo-black"
+                        className="text-lg font-black text-neo-black"
                       >
                         x{comboLevel}
                       </motion.span>
@@ -406,49 +408,51 @@ const InGameScreen = memo<InGameScreenProps>(({
             </div>
           )}
 
-          {/* Hidden Controls Indicator - Shows when controls are auto-hidden */}
+          {/* Hidden Controls Indicator - Shows when controls are auto-hidden - ENLARGED */}
           <AnimatePresence>
             {!(controlsVisible || controlsPinned) && (
               <motion.button
                 initial={{ opacity: 0, scale: 0.8 }}
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.8 }}
-                onClick={showControls}
-                className="absolute top-3 right-3 z-40 flex items-center gap-1.5 px-2.5 py-1.5 bg-neo-navy border-2 border-neo-cream rounded-neo shadow-hard-sm cursor-pointer hover:bg-neo-purple transition-colors min-h-[44px] min-w-[44px]"
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  showControls();
+                }}
+                className="absolute top-3 right-3 z-40 flex items-center gap-2 px-4 py-3 bg-neo-navy border-3 border-neo-cream rounded-neo shadow-hard cursor-pointer hover:bg-neo-purple active:shadow-hard-sm transition-all min-h-[56px] min-w-[56px]"
                 aria-label={t('common.showControls') || 'Tap to show controls'}
               >
                 <motion.span
                   animate={{ opacity: [0.5, 1, 0.5] }}
                   transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
-                  className="w-2 h-2 rounded-full bg-neo-cyan"
+                  className="w-3 h-3 rounded-full bg-neo-cyan"
                 />
-                <span className="text-xs font-bold text-neo-cream uppercase tracking-wide">
+                <span className="text-sm font-bold text-neo-cream uppercase tracking-wide">
                   {t('common.menu') || 'Menu'}
                 </span>
               </motion.button>
             )}
           </AnimatePresence>
 
-          {/* Top Controls - Exit + Help (auto-hide in landscape) */}
+          {/* Top Controls - Exit + Help - AUTO-HIDE with ENLARGED BUTTONS */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: controlsVisible || controlsPinned ? 1 : 0 }}
-            transition={{ duration: 0.3 }}
-            className={`absolute top-0 left-0 right-0 z-30 flex justify-between items-start p-2 ${
+            transition={{ duration: 0.2 }}
+            className={`absolute top-0 left-0 right-0 z-30 flex justify-between items-start p-3 ${
               controlsVisible || controlsPinned ? 'pointer-events-auto' : 'pointer-events-none'
             }`}
-            onClick={(e) => {
-              // Only toggle pin if clicking the container itself, not buttons
-              if (e.target === e.currentTarget) {
-                toggleControlsPin();
-              }
-            }}
           >
-            {/* Exit Button - left (44px WCAG minimum touch target) */}
+            {/* Exit Button - left - LARGER (56px for better touch target) */}
             {onExitRoom && (
               <button
-                onClick={onExitRoom}
-                className="w-11 h-11 bg-neo-red border-2 border-neo-black rounded-neo text-neo-cream text-base font-bold shadow-hard-sm flex items-center justify-center hover:brightness-110 active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all"
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  onExitRoom();
+                }}
+                className="w-14 h-14 bg-neo-red border-3 border-neo-black rounded-neo text-neo-cream text-xl font-bold shadow-hard flex items-center justify-center hover:brightness-110 active:translate-x-[1px] active:translate-y-[1px] active:shadow-hard-sm transition-all"
                 aria-label={t('playerView.exit') || 'Exit'}
               >
                 ✕
@@ -457,36 +461,28 @@ const InGameScreen = memo<InGameScreenProps>(({
 
             {/* Right side buttons */}
             <div className="flex items-center gap-2">
-              {/* Help Button (44px WCAG minimum touch target) */}
+              {/* Help Button - LARGER (56px for better touch target) */}
               <button
-                onClick={() => setShowHelpPanel(true)}
-                className="w-11 h-11 bg-neo-purple border-2 border-neo-black rounded-neo text-neo-cream text-base font-bold shadow-hard-sm flex items-center justify-center hover:brightness-110 active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all"
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  setShowHelpPanel(true);
+                }}
+                className="w-14 h-14 bg-neo-purple border-3 border-neo-black rounded-neo text-neo-cream text-xl font-bold shadow-hard flex items-center justify-center hover:brightness-110 active:translate-x-[1px] active:translate-y-[1px] active:shadow-hard-sm transition-all"
                 aria-label={t('help.title') || 'Help'}
               >
                 ?
               </button>
-
-              {/* Pin indicator (44px WCAG minimum touch target) */}
-              {controlsPinned && (
-                <button
-                  onClick={toggleControlsPin}
-                  className="w-11 h-11 bg-neo-yellow border-2 border-neo-black rounded-neo text-neo-black text-sm font-bold shadow-hard-sm flex items-center justify-center hover:brightness-110 cursor-pointer"
-                  title="Unpin controls"
-                  aria-label="Unpin controls"
-                >
-                  📌
-                </button>
-              )}
             </div>
           </motion.div>
 
-          {/* Hint Button - Single Player Mode Only (auto-hide with controls) */}
+          {/* Hint Button - Single Player Mode Only (auto-hide with controls, faster fade) */}
           {hints && hints.isSinglePlayer && (
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: controlsVisible || controlsPinned ? 1 : 0 }}
-              transition={{ duration: 0.3 }}
-              className={`absolute bottom-2 right-2 z-30 ${
+              transition={{ duration: 0.2 }}
+              className={`absolute bottom-3 right-3 z-30 ${
                 controlsVisible || controlsPinned ? 'pointer-events-auto' : 'pointer-events-none'
               }`}
             >
@@ -653,7 +649,7 @@ const InGameScreen = memo<InGameScreenProps>(({
                   >
                     {playerData.score}
                   </motion.div>
-                  <div className="text-[10px] md:text-xs font-bold uppercase tracking-wider text-neo-black">
+                  <div className="text-xs md:text-sm font-bold uppercase tracking-wider text-neo-black">
                     {t('common.score') || 'Score'}
                   </div>
                 </div>
@@ -696,7 +692,7 @@ const InGameScreen = memo<InGameScreenProps>(({
                         >
                           x{comboLevel}
                         </motion.div>
-                        <div className="text-[10px] md:text-xs font-bold uppercase tracking-wider text-neo-black">
+                        <div className="text-xs md:text-sm font-bold uppercase tracking-wider text-neo-black">
                           {t('common.combo') || 'Combo'}
                         </div>
                       </div>
@@ -820,7 +816,7 @@ const InGameScreen = memo<InGameScreenProps>(({
                       {player.isHost && <FaCrown className="text-neo-yellow flex-shrink-0" style={{ filter: 'drop-shadow(1px 1px 0px rgb(var(--neo-black)))' }} />}
                       <span className="truncate">{player.username}</span>
                       {player.isMe && (
-                        <span className="text-[10px] bg-neo-black text-neo-cream px-1.5 py-0.5 rounded-neo font-bold flex-shrink-0">
+                        <span className="text-xs bg-neo-black text-neo-cream px-1.5 py-0.5 rounded-neo font-bold flex-shrink-0">
                           {t('playerView.me') || 'YOU'}
                         </span>
                       )}
@@ -843,7 +839,7 @@ const InGameScreen = memo<InGameScreenProps>(({
                       <div className="text-lg font-black text-neo-black leading-none">
                         {player.score}
                       </div>
-                      <div className="text-[9px] font-bold text-neo-black/60 uppercase">pts</div>
+                      <div className="text-xs font-bold text-neo-black/60 uppercase">pts</div>
                     </div>
                   </div>
                 </motion.div>

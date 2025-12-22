@@ -7,7 +7,6 @@ export { default as useHostSocketEvents } from './useHostSocketEvents';
 export {
   default as useHostViewState,
   type UseHostViewStateReturn,
-  type Player,
   type TournamentData,
   type FinalScoresData,
   type XpGainedData,
@@ -22,5 +21,7 @@ export {
   type ComboState,
   type XpState
 } from './useHostViewState';
+// Player type is now imported from @/hooks/useGameState
+export type { Player } from '@/hooks/useGameState';
 export { default as useHostGameActions, type UseHostGameActionsReturn } from './useHostGameActions';
 export { default as useHostEffects } from './useHostEffects';

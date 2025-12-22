@@ -12,21 +12,11 @@ import { useState, useCallback, useMemo, useRef, MutableRefObject } from 'react'
 import { generateRandomTable } from '@/utils/utils';
 import { DIFFICULTIES, DEFAULT_DIFFICULTY, DEFAULT_MIN_WORD_LENGTH } from '@/utils/consts';
 import type { Language, LetterGrid, DifficultyLevel, Avatar } from '@/types';
+import type { Player } from '@/hooks/useGameState';
 
 // ==========================================
 // Type Definitions
 // ==========================================
-
-export interface Player {
-  username: string;
-  avatar?: Avatar;
-  isHost?: boolean;
-  isBot?: boolean;
-  presence?: 'active' | 'idle' | 'afk';
-  disconnected?: boolean;
-  presenceStatus?: string;
-  isWindowFocused?: boolean;
-}
 
 export interface TournamentData {
   currentRound?: number;

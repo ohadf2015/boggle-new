@@ -7,3 +7,27 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 *.next
+
+# Test artifacts and reports
+test-results/
+playwright-report/
+coverage/
+.nyc_output/
+*.lcov
+
+# Test media (screenshots, videos, traces)
+**/*-test-results/
+**/*.spec.png
+**/*.spec.jpg
+**/*.spec.jpeg
+**/*.test.png
+**/*.test.jpg
+**/*.test.jpeg
+**/test-*.png
+**/test-*.jpg
+**/test-*.jpeg
+**/screenshot-*.png
+**/trace-*.zip
+**/*.webm
+**/*.mp4
+**/*.mov

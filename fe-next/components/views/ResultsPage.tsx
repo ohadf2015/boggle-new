@@ -520,7 +520,7 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, letterGrid, game
         <div className="w-1/2 flex flex-col items-center justify-start gap-2 overflow-y-auto">
           {/* Exit button - compact */}
           <div className="w-full flex justify-end">
-            <ExitRoomButton onClick={handleExitRoom} label="" className="w-8 h-8 p-0" />
+            <ExitRoomButton onClick={handleExitRoom} label="" className="w-11 h-11 min-w-[44px] min-h-[44px] p-0" />
           </div>
 
           {/* Winner Banner - compact */}

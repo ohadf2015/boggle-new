@@ -129,7 +129,7 @@ const LandscapeIndicator = memo<LandscapeIndicatorProps>(({ className = '' }) =>
               <button
                 onClick={handleDismiss}
                 aria-label={t('common.dismiss') || 'Dismiss'}
-                className="flex-shrink-0 w-8 h-8 bg-neo-cream border-2 border-neo-black rounded-neo flex items-center justify-center shadow-hard-sm hover:shadow-hard hover:translate-x-[-1px] hover:translate-y-[-1px] active:shadow-none active:translate-x-[1px] active:translate-y-[1px] transition-all duration-100"
+                className="flex-shrink-0 w-11 h-11 min-w-[44px] min-h-[44px] bg-neo-cream border-2 border-neo-black rounded-neo flex items-center justify-center shadow-hard-sm hover:shadow-hard hover:translate-x-[-1px] hover:translate-y-[-1px] active:shadow-none active:translate-x-[1px] active:translate-y-[1px] transition-all duration-100"
               >
                 <FaTimes className="text-sm text-neo-black" />
               </button>

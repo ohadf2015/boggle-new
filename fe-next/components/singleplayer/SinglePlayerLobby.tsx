@@ -119,27 +119,27 @@ const SinglePlayerLobby: React.FC<SinglePlayerLobbyProps> = ({
   const allTimeBest = useMemo(() => getAllTimeBest(), []);
   const progressStats = useMemo(() => getProgressStats(), []);
 
-  // Landscape mode layout - 2-column: mode selection left, settings + start right
+  // Landscape mode layout - optimized 2-column: mode selection left, settings + start right
   if (isLandscape) {
     return (
-      <div className="flex h-screen w-full overflow-hidden bg-slate-900 p-2 gap-2">
+      <div className="flex h-screen w-full overflow-hidden bg-slate-900 p-3 gap-4 landscape-full-height">
         {/* Left column: Mode Selection */}
-        <div className="w-1/2 flex flex-col gap-2 overflow-y-auto">
+        <div className="w-[40%] flex flex-col gap-3 overflow-y-auto">
           {/* Header with back */}
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-3">
             <Link
               href="/"
-              className="w-8 h-8 flex items-center justify-center rounded-neo border-2 border-neo-black bg-neo-cream"
+              className="w-12 h-12 min-w-[48px] min-h-[48px] flex items-center justify-center rounded-neo border-3 border-neo-black bg-neo-cream shadow-hard hover:shadow-hard-lg transition-all"
             >
-              <FaArrowLeft className="text-xs text-neo-black" />
+              <FaArrowLeft className="text-sm text-neo-black" />
             </Link>
-            <h1 className="text-lg font-black uppercase text-neo-white flex-1">
+            <h1 className="text-xl font-black uppercase text-neo-white flex-1">
               {t('landing.singlePlayer') || 'Single Player'}
             </h1>
           </div>
 
           {/* Mode buttons - vertical */}
-          <div className="flex flex-col gap-2">
+          <div className="flex flex-col gap-3">
             {(Object.keys(MODE_CONFIG) as SinglePlayerMode[]).map(modeKey => {
               const config = MODE_CONFIG[modeKey];
               const isSelected = mode === modeKey;
@@ -150,14 +150,14 @@ const SinglePlayerLobby: React.FC<SinglePlayerLobbyProps> = ({
                   key={modeKey}
                   onClick={() => setMode(modeKey)}
                   className={cn(
-                    'flex items-center gap-3 p-3 rounded-neo border-2 transition-all',
+                    'flex items-center gap-4 p-4 rounded-neo border-3 transition-all shadow-hard hover:shadow-hard-lg',
                     isSelected
                       ? `bg-gradient-to-r ${config.color} ${config.selectedBorder} text-neo-black`
                       : 'bg-neo-cream dark:bg-slate-700 border-neo-black text-neo-black dark:text-neo-white'
                   )}
                 >
-                  <IconComponent className="w-6 h-6 flex-shrink-0" />
-                  <span className="text-sm font-black uppercase">{t(config.labelKey) || modeKey}</span>
+                  <IconComponent className="w-8 h-8 flex-shrink-0" />
+                  <span className="text-base font-black uppercase">{t(config.labelKey) || modeKey}</span>
                 </button>
               );
             })}
@@ -165,28 +165,28 @@ const SinglePlayerLobby: React.FC<SinglePlayerLobbyProps> = ({
 
           {/* Challenge mode high score */}
           {mode === 'challenge' && currentHighScore !== null && (
-            <div className="bg-neo-yellow border-2 border-neo-black rounded-neo p-2 text-center">
-              <div className="flex items-center justify-center gap-2">
-                <FaCrown className="text-neo-black" />
-                <span className="font-black text-neo-black">{currentHighScore.score}</span>
+            <div className="bg-neo-yellow border-3 border-neo-black rounded-neo p-3 text-center shadow-hard">
+              <div className="flex items-center justify-center gap-2 mb-1">
+                <FaCrown className="text-neo-black text-lg" />
+                <span className="font-black text-neo-black text-xl">{currentHighScore.score}</span>
               </div>
-              <div className="text-[10px] font-bold text-neo-black/70 uppercase">{t('challenge.recordToBeat') || 'Record to Beat'}</div>
+              <div className="text-xs font-bold text-neo-black/70 uppercase">{t('challenge.recordToBeat') || 'Record to Beat'}</div>
             </div>
           )}
         </div>
 
         {/* Right column: Settings + Start */}
-        <div className="w-1/2 flex flex-col gap-2 overflow-y-auto">
+        <div className="w-[60%] flex flex-col gap-3 overflow-y-auto">
           {/* Difficulty */}
           <div>
-            <label className="text-xs font-bold uppercase text-neo-white mb-1 block">{t('singlePlayer.difficulty') || 'Difficulty'}</label>
-            <div className="flex gap-1">
+            <label className="text-sm font-bold uppercase text-neo-white mb-2 block">{t('singlePlayer.difficulty') || 'Difficulty'}</label>
+            <div className="flex gap-2">
               {(['EASY', 'MEDIUM', 'HARD'] as DifficultyLevel[]).map(diff => (
                 <button
                   key={diff}
                   onClick={() => setDifficulty(diff)}
                   className={cn(
-                    'flex-1 py-2 rounded-neo border-2 border-neo-black text-xs font-bold uppercase',
+                    'flex-1 py-3 rounded-neo border-3 border-neo-black text-sm font-bold uppercase shadow-hard hover:shadow-hard-lg transition-all',
                     difficulty === diff
                       ? diff === 'EASY' ? 'bg-neo-lime text-neo-black' : diff === 'MEDIUM' ? 'bg-neo-yellow text-neo-black' : 'bg-neo-red text-white'
                       : 'bg-neo-cream text-neo-black'
@@ -199,21 +199,21 @@ const SinglePlayerLobby: React.FC<SinglePlayerLobbyProps> = ({
           </div>
 
           {/* Grid size info */}
-          <div className="text-xs text-neo-white/70 text-center">
+          <div className="text-sm text-neo-white/70 text-center font-bold">
             {difficultyConfig.rows}x{difficultyConfig.cols} grid
           </div>
 
           {/* Timer (not for practice mode) */}
           {mode !== 'practice' && (
             <div>
-              <label className="text-xs font-bold uppercase text-neo-white mb-1 block">{t('singlePlayer.timer') || 'Timer'}</label>
-              <div className="flex gap-1">
+              <label className="text-sm font-bold uppercase text-neo-white mb-2 block">{t('singlePlayer.timer') || 'Timer'}</label>
+              <div className="flex gap-2">
                 {[1, 2, 3].map(min => (
                   <button
                     key={min}
                     onClick={() => setTimerMinutes(min)}
                     className={cn(
-                      'flex-1 py-2 rounded-neo border-2 border-neo-black text-xs font-bold',
+                      'flex-1 py-3 rounded-neo border-3 border-neo-black text-sm font-bold shadow-hard hover:shadow-hard-lg transition-all',
                       timerMinutes === min ? 'bg-neo-cyan text-neo-black' : 'bg-neo-cream text-neo-black'
                     )}
                   >
@@ -226,26 +226,26 @@ const SinglePlayerLobby: React.FC<SinglePlayerLobbyProps> = ({
 
           {/* Language */}
           <div>
-            <label className="text-xs font-bold uppercase text-neo-white mb-1 block">{t('joinView.language') || 'Language'}</label>
+            <label className="text-sm font-bold uppercase text-neo-white mb-2 block">{t('joinView.language') || 'Language'}</label>
             <LanguageSelector selectedLanguage={gameLanguage} onLanguageChange={setGameLanguage} />
           </div>
 
           {/* Bots (for solo-bots mode) */}
           {mode === 'solo-bots' && (
             <div>
-              <div className="flex items-center justify-between mb-1">
-                <label className="text-xs font-bold uppercase text-neo-white flex items-center gap-1">
-                  <FaRobot />
+              <div className="flex items-center justify-between mb-2">
+                <label className="text-sm font-bold uppercase text-neo-white flex items-center gap-2">
+                  <FaRobot className="text-base" />
                   {t('singlePlayer.opponents') || 'Opponents'}
                 </label>
               </div>
-              <div className="flex gap-1 items-center mb-2">
+              <div className="flex gap-2 items-center mb-2">
                 {(['easy', 'medium', 'hard'] as BotDifficulty[]).map(diff => (
                   <button
                     key={diff}
                     onClick={() => setSelectedBotDifficulty(diff)}
                     className={cn(
-                      'px-2 py-1 rounded text-[10px] font-bold uppercase border-2 border-neo-black/30 text-neo-black flex-1',
+                      'px-3 py-2 rounded text-xs font-bold uppercase border-2 border-neo-black/30 text-neo-black flex-1',
                       selectedBotDifficulty === diff
                         ? BOT_DIFFICULTY_CONFIG[diff].color
                         : 'bg-white hover:bg-slate-100'
@@ -257,27 +257,27 @@ const SinglePlayerLobby: React.FC<SinglePlayerLobbyProps> = ({
                 <button
                   onClick={addBot}
                   disabled={bots.length >= 5}
-                  className="px-2 py-1 text-xs bg-neo-lime hover:bg-neo-lime/80 disabled:opacity-50 disabled:cursor-not-allowed rounded-neo border border-neo-black font-bold"
+                  className="px-3 py-2 text-sm bg-neo-lime hover:bg-neo-lime/80 disabled:opacity-50 disabled:cursor-not-allowed rounded-neo border-2 border-neo-black font-bold shadow-hard"
                 >
                   <FaPlus className="inline" />
                 </button>
               </div>
               {bots.length > 0 ? (
-                <div className="flex flex-wrap gap-1">
+                <div className="flex flex-wrap gap-2">
                   {bots.map(bot => (
                     <Badge
                       key={bot.id}
-                      className={cn('text-[10px] flex items-center gap-1', BOT_DIFFICULTY_CONFIG[bot.difficulty].color)}
+                      className={cn('text-xs flex items-center gap-1 px-2 py-1', BOT_DIFFICULTY_CONFIG[bot.difficulty].color)}
                     >
                       {bot.name}
                       <button onClick={() => removeBot(bot.id)} className="ml-1 hover:text-neo-red">
-                        <FaTimes className="text-[8px]" />
+                        <FaTimes className="text-[10px]" />
                       </button>
                     </Badge>
                   ))}
                 </div>
               ) : (
-                <p className="text-[10px] text-neo-white/50 italic text-center">
+                <p className="text-xs text-neo-white/50 italic text-center">
                   {t('singlePlayer.noBots') || 'Tap + to add bot opponents'}
                 </p>
               )}
@@ -287,9 +287,9 @@ const SinglePlayerLobby: React.FC<SinglePlayerLobbyProps> = ({
           {/* Start Button */}
           <Button
             onClick={handleStartGame}
-            className="w-full h-12 font-black uppercase text-lg bg-neo-yellow hover:bg-neo-yellow/90 text-neo-black border-3 border-neo-black mt-auto"
+            className="w-full h-14 font-black uppercase text-lg bg-neo-yellow hover:bg-neo-yellow/90 text-neo-black border-4 border-neo-black shadow-hard hover:shadow-hard-lg transition-all mt-auto"
           >
-            <FaPlay className="mr-2" />
+            <FaPlay className="mr-2 text-xl" />
             {t('singlePlayer.startGame') || 'Start Game'}
           </Button>
         </div>

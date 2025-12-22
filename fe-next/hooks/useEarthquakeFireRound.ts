@@ -16,7 +16,7 @@ import { DEFAULT_EARTHQUAKE_CONFIG } from '@/shared/types/earthquake';
  * Manages earthquake/fire round feature for both single-player and multiplayer modes.
  *
  * Features:
- * - Triggers randomly in last 24% of game (76-100% elapsed), but at least 20 sec before end
+ * - Triggers randomly in last 35% of game (65-100% elapsed), with dynamic buffer before end
  * - Warning phase (2s) → Shake phase (1s) → Fire round (15s)
  * - 2x score multiplier during fire round
  * - Complete grid regeneration with new embedded words
@@ -74,13 +74,15 @@ export function useEarthquakeFireRound(
       return;
     }
 
-    // Calculate trigger window: 76% elapsed to (total - 20 sec) elapsed
-    // Min: 76% of game has elapsed (last 24% window)
+    // Calculate trigger window: 70% elapsed to (total - buffer) elapsed
+    // Min: configured % of game has elapsed (e.g., 70% = last 30% window)
     const minTriggerElapsed = gameDurationSeconds * config.triggerPercentageMin;
-    // Max: At least 20 seconds before game ends
+    // Max: Leave enough buffer for earthquake + fire round (18s total) + safety margin
+    // Use dynamic buffer: 18s minimum, or 20s for longer games
+    const bufferSeconds = Math.max(18, Math.min(20, gameDurationSeconds * 0.25));
     const maxTriggerElapsed = Math.min(
       gameDurationSeconds * config.triggerPercentageMax,
-      gameDurationSeconds - 20
+      gameDurationSeconds - bufferSeconds
     );
 
     // Ensure we have a valid window

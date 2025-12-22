@@ -15,6 +15,7 @@ import type {
   LeaderboardEntry,
   WordDetail,
 } from '@/shared/types/game';
+import type { XpGainedPayload, LevelUpPayload, AchievementPayload } from '@/shared/types/socket';
 import { COMBO_SHIELD_INTERVAL } from '@/utils/consts';
 
 // ==========================================
@@ -23,8 +24,8 @@ import { COMBO_SHIELD_INTERVAL } from '@/utils/consts';
 
 export interface Player {
   username: string;
-  avatar: Avatar;
-  isHost: boolean;
+  avatar?: Avatar;
+  isHost?: boolean;
   isBot?: boolean;
   presence?: 'active' | 'idle' | 'afk';
   disconnected?: boolean;
@@ -52,21 +53,9 @@ export interface TournamentStanding {
   roundScores: number[];
 }
 
-export interface XpGainedData {
-  totalXp: number;
-  breakdown: {
-    gameCompletion: number;
-    scoreXp: number;
-    winBonus: number;
-    achievementXp: number;
-  };
-}
-
-export interface LevelUpData {
-  oldLevel: number;
-  newLevel: number;
-  newTitles: string[];
-}
+// XP and Level types are now imported from @/shared/types/socket
+// export type XpGainedData = XpGainedPayload;
+// export type LevelUpData = LevelUpPayload;
 
 export interface GameStateValues {
   // Core game state
@@ -82,7 +71,7 @@ export interface GameStateValues {
 
   // Word state
   foundWords: WordDetail[];
-  achievements: string[];
+  achievements: AchievementPayload[];
 
   // UI state
   waitingForResults: boolean;
@@ -99,8 +88,8 @@ export interface GameStateValues {
   showTournamentStandings: boolean;
 
   // XP/Level state
-  xpGainedData: XpGainedData | null;
-  levelUpData: LevelUpData | null;
+  xpGainedData: XpGainedPayload | null;
+  levelUpData: LevelUpPayload | null;
 }
 
 // ==========================================
@@ -124,8 +113,8 @@ type GameStateAction =
   // Word actions
   | { type: 'ADD_FOUND_WORD'; payload: WordDetail }
   | { type: 'SET_FOUND_WORDS'; payload: WordDetail[] }
-  | { type: 'ADD_ACHIEVEMENT'; payload: string }
-  | { type: 'SET_ACHIEVEMENTS'; payload: string[] }
+  | { type: 'ADD_ACHIEVEMENT'; payload: AchievementPayload }
+  | { type: 'SET_ACHIEVEMENTS'; payload: AchievementPayload[] }
   // UI actions
   | { type: 'SET_WAITING_FOR_RESULTS'; payload: boolean }
   | { type: 'SET_SHOW_START_ANIMATION'; payload: boolean }
@@ -141,8 +130,8 @@ type GameStateAction =
   | { type: 'SET_TOURNAMENT_STANDINGS'; payload: TournamentStanding[] }
   | { type: 'SET_SHOW_TOURNAMENT_STANDINGS'; payload: boolean }
   // XP/Level actions
-  | { type: 'SET_XP_GAINED_DATA'; payload: XpGainedData | null }
-  | { type: 'SET_LEVEL_UP_DATA'; payload: LevelUpData | null }
+  | { type: 'SET_XP_GAINED_DATA'; payload: XpGainedPayload | null }
+  | { type: 'SET_LEVEL_UP_DATA'; payload: LevelUpPayload | null }
   // Reset actions
   | { type: 'RESET_FOR_NEW_ROUND' }
   | { type: 'RESET_ALL' };
@@ -237,7 +226,7 @@ function gameStateReducer(state: GameStateValues, action: GameStateAction): Game
     case 'SET_FOUND_WORDS':
       return { ...state, foundWords: action.payload };
     case 'ADD_ACHIEVEMENT':
-      if (state.achievements.includes(action.payload)) return state;
+      if (state.achievements.some(a => a.key === action.payload.key)) return state;
       return { ...state, achievements: [...state.achievements, action.payload] };
     case 'SET_ACHIEVEMENTS':
       return { ...state, achievements: action.payload };
@@ -321,30 +310,30 @@ function gameStateReducer(state: GameStateValues, action: GameStateAction): Game
 
 export interface GameStateActions {
   // Core game actions
-  setGameActive: (active: boolean) => void;
-  setLetterGrid: (grid: LetterGrid | null) => void;
-  setRemainingTime: (time: number | null | ((prev: number | null) => number | null)) => void;
-  setGameLanguage: (language: Language | null) => void;
-  setMinWordLength: (length: number) => void;
+  setGameActive: React.Dispatch<React.SetStateAction<boolean>>;
+  setLetterGrid: React.Dispatch<React.SetStateAction<LetterGrid | null>>;
+  setRemainingTime: React.Dispatch<React.SetStateAction<number | null>>;
+  setGameLanguage: React.Dispatch<React.SetStateAction<Language | null>>;
+  setMinWordLength: React.Dispatch<React.SetStateAction<number>>;
 
   // Player actions
-  setPlayers: (players: Player[] | ((prev: Player[]) => Player[])) => void;
+  setPlayers: React.Dispatch<React.SetStateAction<Player[]>>;
   updatePlayer: (username: string, updates: Partial<Player>) => void;
   addPlayer: (player: Player) => void;
   removePlayer: (username: string) => void;
-  setLeaderboard: (entries: LeaderboardEntry[]) => void;
+  setLeaderboard: React.Dispatch<React.SetStateAction<LeaderboardEntry[]>>;
 
   // Word actions
   addFoundWord: (word: WordDetail) => void;
-  setFoundWords: (words: WordDetail[]) => void;
-  addAchievement: (achievement: string) => void;
-  setAchievements: (achievements: string[]) => void;
+  setFoundWords: React.Dispatch<React.SetStateAction<WordDetail[]>>;
+  addAchievement: (achievement: AchievementPayload) => void;
+  setAchievements: React.Dispatch<React.SetStateAction<AchievementPayload[]>>;
 
   // UI actions
-  setWaitingForResults: (waiting: boolean) => void;
-  setShowStartAnimation: (show: boolean) => void;
-  setShufflingGrid: (grid: LetterGrid | null) => void;
-  setHighlightedCells: (cells: Array<{ row: number; col: number }>) => void;
+  setWaitingForResults: React.Dispatch<React.SetStateAction<boolean>>;
+  setShowStartAnimation: React.Dispatch<React.SetStateAction<boolean>>;
+  setShufflingGrid: React.Dispatch<React.SetStateAction<LetterGrid | null>>;
+  setHighlightedCells: React.Dispatch<React.SetStateAction<Array<{ row: number; col: number }>>>;
 
   // Combo actions
   incrementCombo: () => void;
@@ -353,13 +342,13 @@ export interface GameStateActions {
   updateLastWordTime: () => void;
 
   // Tournament actions
-  setTournamentData: (data: TournamentData | null) => void;
-  setTournamentStandings: (standings: TournamentStanding[]) => void;
-  setShowTournamentStandings: (show: boolean) => void;
+  setTournamentData: React.Dispatch<React.SetStateAction<TournamentData | null>>;
+  setTournamentStandings: React.Dispatch<React.SetStateAction<TournamentStanding[]>>;
+  setShowTournamentStandings: React.Dispatch<React.SetStateAction<boolean>>;
 
   // XP/Level actions
-  setXpGainedData: (data: XpGainedData | null) => void;
-  setLevelUpData: (data: LevelUpData | null) => void;
+  setXpGainedData: React.Dispatch<React.SetStateAction<XpGainedPayload | null>>;
+  setLevelUpData: React.Dispatch<React.SetStateAction<LevelUpPayload | null>>;
 
   // Reset actions
   resetForNewRound: () => void;
@@ -401,33 +390,35 @@ export function useGameState(): UseGameStateReturn {
   // Action Creators
   // ==========================================
 
-  const setGameActive = useCallback((active: boolean) => {
-    dispatch({ type: 'SET_GAME_ACTIVE', payload: active });
-  }, []);
+  const setGameActive = useCallback((value: React.SetStateAction<boolean>) => {
+    const newValue = typeof value === 'function' ? value(state.gameActive) : value;
+    dispatch({ type: 'SET_GAME_ACTIVE', payload: newValue });
+  }, [state.gameActive]);
 
-  const setLetterGrid = useCallback((grid: LetterGrid | null) => {
-    dispatch({ type: 'SET_LETTER_GRID', payload: grid });
-  }, []);
+  const setLetterGrid = useCallback((value: React.SetStateAction<LetterGrid | null>) => {
+    const newValue = typeof value === 'function' ? value(state.letterGrid) : value;
+    dispatch({ type: 'SET_LETTER_GRID', payload: newValue });
+  }, [state.letterGrid]);
 
-  const setRemainingTime = useCallback((time: number | null | ((prev: number | null) => number | null)) => {
-    if (typeof time === 'function') {
-      dispatch({ type: 'UPDATE_REMAINING_TIME', payload: time });
-    } else {
-      dispatch({ type: 'SET_REMAINING_TIME', payload: time });
-    }
-  }, []);
+  const setRemainingTime = useCallback((value: React.SetStateAction<number | null>) => {
+    const newValue = typeof value === 'function' ? value(state.remainingTime) : value;
+    dispatch({ type: 'SET_REMAINING_TIME', payload: newValue });
+  }, [state.remainingTime]);
 
-  const setGameLanguage = useCallback((language: Language | null) => {
-    dispatch({ type: 'SET_GAME_LANGUAGE', payload: language });
-  }, []);
+  const setGameLanguage = useCallback((value: React.SetStateAction<Language | null>) => {
+    const newValue = typeof value === 'function' ? value(state.gameLanguage) : value;
+    dispatch({ type: 'SET_GAME_LANGUAGE', payload: newValue });
+  }, [state.gameLanguage]);
 
-  const setMinWordLength = useCallback((length: number) => {
-    dispatch({ type: 'SET_MIN_WORD_LENGTH', payload: length });
-  }, []);
+  const setMinWordLength = useCallback((value: React.SetStateAction<number>) => {
+    const newValue = typeof value === 'function' ? value(state.minWordLength) : value;
+    dispatch({ type: 'SET_MIN_WORD_LENGTH', payload: newValue });
+  }, [state.minWordLength]);
 
-  const setPlayers = useCallback((players: Player[] | ((prev: Player[]) => Player[])) => {
-    dispatch({ type: 'SET_PLAYERS', payload: players });
-  }, []);
+  const setPlayers = useCallback((value: React.SetStateAction<Player[]>) => {
+    const newValue = typeof value === 'function' ? value(state.players) : value;
+    dispatch({ type: 'SET_PLAYERS', payload: newValue });
+  }, [state.players]);
 
   const updatePlayer = useCallback((username: string, updates: Partial<Player>) => {
     dispatch({ type: 'UPDATE_PLAYER', payload: { username, updates } });
@@ -441,41 +432,48 @@ export function useGameState(): UseGameStateReturn {
     dispatch({ type: 'REMOVE_PLAYER', payload: username });
   }, []);
 
-  const setLeaderboard = useCallback((entries: LeaderboardEntry[]) => {
-    dispatch({ type: 'SET_LEADERBOARD', payload: entries });
-  }, []);
+  const setLeaderboard = useCallback((value: React.SetStateAction<LeaderboardEntry[]>) => {
+    const newValue = typeof value === 'function' ? value(state.leaderboard) : value;
+    dispatch({ type: 'SET_LEADERBOARD', payload: newValue });
+  }, [state.leaderboard]);
 
   const addFoundWord = useCallback((word: WordDetail) => {
     dispatch({ type: 'ADD_FOUND_WORD', payload: word });
   }, []);
 
-  const setFoundWords = useCallback((words: WordDetail[]) => {
-    dispatch({ type: 'SET_FOUND_WORDS', payload: words });
-  }, []);
+  const setFoundWords = useCallback((value: React.SetStateAction<WordDetail[]>) => {
+    const newValue = typeof value === 'function' ? value(state.foundWords) : value;
+    dispatch({ type: 'SET_FOUND_WORDS', payload: newValue });
+  }, [state.foundWords]);
 
-  const addAchievement = useCallback((achievement: string) => {
+  const addAchievement = useCallback((achievement: AchievementPayload) => {
     dispatch({ type: 'ADD_ACHIEVEMENT', payload: achievement });
   }, []);
 
-  const setAchievements = useCallback((achievements: string[]) => {
-    dispatch({ type: 'SET_ACHIEVEMENTS', payload: achievements });
-  }, []);
+  const setAchievements = useCallback((value: React.SetStateAction<AchievementPayload[]>) => {
+    const newValue = typeof value === 'function' ? value(state.achievements) : value;
+    dispatch({ type: 'SET_ACHIEVEMENTS', payload: newValue });
+  }, [state.achievements]);
 
-  const setWaitingForResults = useCallback((waiting: boolean) => {
-    dispatch({ type: 'SET_WAITING_FOR_RESULTS', payload: waiting });
-  }, []);
+  const setWaitingForResults = useCallback((value: React.SetStateAction<boolean>) => {
+    const newValue = typeof value === 'function' ? value(state.waitingForResults) : value;
+    dispatch({ type: 'SET_WAITING_FOR_RESULTS', payload: newValue });
+  }, [state.waitingForResults]);
 
-  const setShowStartAnimation = useCallback((show: boolean) => {
-    dispatch({ type: 'SET_SHOW_START_ANIMATION', payload: show });
-  }, []);
+  const setShowStartAnimation = useCallback((value: React.SetStateAction<boolean>) => {
+    const newValue = typeof value === 'function' ? value(state.showStartAnimation) : value;
+    dispatch({ type: 'SET_SHOW_START_ANIMATION', payload: newValue });
+  }, [state.showStartAnimation]);
 
-  const setShufflingGrid = useCallback((grid: LetterGrid | null) => {
-    dispatch({ type: 'SET_SHUFFLING_GRID', payload: grid });
-  }, []);
+  const setShufflingGrid = useCallback((value: React.SetStateAction<LetterGrid | null>) => {
+    const newValue = typeof value === 'function' ? value(state.shufflingGrid) : value;
+    dispatch({ type: 'SET_SHUFFLING_GRID', payload: newValue });
+  }, [state.shufflingGrid]);
 
-  const setHighlightedCells = useCallback((cells: Array<{ row: number; col: number }>) => {
-    dispatch({ type: 'SET_HIGHLIGHTED_CELLS', payload: cells });
-  }, []);
+  const setHighlightedCells = useCallback((value: React.SetStateAction<Array<{ row: number; col: number }>>) => {
+    const newValue = typeof value === 'function' ? value(state.highlightedCells) : value;
+    dispatch({ type: 'SET_HIGHLIGHTED_CELLS', payload: newValue });
+  }, [state.highlightedCells]);
 
   const incrementCombo = useCallback(() => {
     // Clear existing timeout
@@ -515,25 +513,30 @@ export function useGameState(): UseGameStateReturn {
     dispatch({ type: 'UPDATE_LAST_WORD_TIME' });
   }, []);
 
-  const setTournamentData = useCallback((data: TournamentData | null) => {
-    dispatch({ type: 'SET_TOURNAMENT_DATA', payload: data });
-  }, []);
+  const setTournamentData = useCallback((value: React.SetStateAction<TournamentData | null>) => {
+    const newValue = typeof value === 'function' ? value(state.tournamentData) : value;
+    dispatch({ type: 'SET_TOURNAMENT_DATA', payload: newValue });
+  }, [state.tournamentData]);
 
-  const setTournamentStandings = useCallback((standings: TournamentStanding[]) => {
-    dispatch({ type: 'SET_TOURNAMENT_STANDINGS', payload: standings });
-  }, []);
+  const setTournamentStandings = useCallback((value: React.SetStateAction<TournamentStanding[]>) => {
+    const newValue = typeof value === 'function' ? value(state.tournamentStandings) : value;
+    dispatch({ type: 'SET_TOURNAMENT_STANDINGS', payload: newValue });
+  }, [state.tournamentStandings]);
 
-  const setShowTournamentStandings = useCallback((show: boolean) => {
-    dispatch({ type: 'SET_SHOW_TOURNAMENT_STANDINGS', payload: show });
-  }, []);
+  const setShowTournamentStandings = useCallback((value: React.SetStateAction<boolean>) => {
+    const newValue = typeof value === 'function' ? value(state.showTournamentStandings) : value;
+    dispatch({ type: 'SET_SHOW_TOURNAMENT_STANDINGS', payload: newValue });
+  }, [state.showTournamentStandings]);
 
-  const setXpGainedData = useCallback((data: XpGainedData | null) => {
-    dispatch({ type: 'SET_XP_GAINED_DATA', payload: data });
-  }, []);
+  const setXpGainedData = useCallback((value: React.SetStateAction<XpGainedPayload | null>) => {
+    const newValue = typeof value === 'function' ? value(state.xpGainedData) : value;
+    dispatch({ type: 'SET_XP_GAINED_DATA', payload: newValue });
+  }, [state.xpGainedData]);
 
-  const setLevelUpData = useCallback((data: LevelUpData | null) => {
-    dispatch({ type: 'SET_LEVEL_UP_DATA', payload: data });
-  }, []);
+  const setLevelUpData = useCallback((value: React.SetStateAction<LevelUpPayload | null>) => {
+    const newValue = typeof value === 'function' ? value(state.levelUpData) : value;
+    dispatch({ type: 'SET_LEVEL_UP_DATA', payload: newValue });
+  }, [state.levelUpData]);
 
   const resetForNewRound = useCallback(() => {
     if (comboTimeoutRef.current) {

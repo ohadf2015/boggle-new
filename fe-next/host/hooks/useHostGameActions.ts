@@ -166,6 +166,7 @@ export function useHostGameActions(options: UseHostGameActionsOptions): UseHostG
       language: roomLanguage,
       hostPlaying: hostPlaying,
       minWordLength: minWordLength,
+      difficulty: difficulty,
     });
 
     neoSuccessToast(t('common.gameStarted'), {

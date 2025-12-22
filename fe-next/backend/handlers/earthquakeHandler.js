@@ -3,7 +3,7 @@
  * Coordinates earthquake/fire round events for multiplayer games.
  *
  * Features:
- * - Host-initiated earthquake trigger (76-100% of game elapsed, at least 20 sec before end)
+ * - Host-initiated earthquake trigger (65-100% of game elapsed, with dynamic buffer before end)
  * - Synchronized earthquake sequence across all players:
  *   1. Warning phase (2 seconds)
  *   2. Shake phase (1 second)
@@ -134,8 +134,8 @@ function executeEarthquakeSequence(io, gameCode, game) {
   // Phase 3: FIRE ROUND START (after 3 seconds = 2s warning + 1s shake)
   const fireStartTimer = setTimeout(() => {
     // Generate new grid based on game settings
-    const difficulty = game.difficulty || 'medium';
-    const difficultyConfig = DIFFICULTIES[difficulty] || DIFFICULTIES.medium;
+    const difficulty = game.difficulty || 'MEDIUM';
+    const difficultyConfig = DIFFICULTIES[difficulty] || DIFFICULTIES.MEDIUM;
     const language = game.language || 'en';
 
     // Generate new grid with embedded words

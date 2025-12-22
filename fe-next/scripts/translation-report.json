@@ -2,41 +2,15 @@
   "summary": {
     "totalKeysInCode": 705,
     "keyCountByLanguage": {
-      "en": 1118,
-      "he": 1118,
-      "sv": 1118,
-      "ja": 1117,
-      "es": 1025
+      "en": 1120,
+      "he": 1120,
+      "sv": 1120,
+      "ja": 1120,
+      "es": 1120
     },
-    "missingFromEnglish": 3
+    "missingFromEnglish": 1
   },
   "missingFromEnglish": [
-    {
-      "key": "errors.connectionLost",
-      "usages": [
-        {
-          "file": "app/[locale]/multiplayer/page.tsx",
-          "line": 477
-        },
-        {
-          "file": "app/[locale]/multiplayer/page.tsx",
-          "line": 477
-        }
-      ]
-    },
-    {
-      "key": "errors.notConnected",
-      "usages": [
-        {
-          "file": "app/[locale]/multiplayer/page.tsx",
-          "line": 902
-        },
-        {
-          "file": "app/[locale]/multiplayer/page.tsx",
-          "line": 902
-        }
-      ]
-    },
     {
       "key": "key",
       "usages": [
@@ -82,104 +56,8 @@
   "missingByLanguage": {
     "he": [],
     "sv": [],
-    "ja": [
-      "common.next"
-    ],
-    "es": [
-      "common.changeLanguage",
-      "common.adminDashboard",
-      "combo.explanationTitle",
-      "combo.explanationText",
-      "joinView.pasteCode",
-      "hostView.creatingTournament",
-      "hostView.increaseRounds",
-      "hostView.decreaseRounds",
-      "hostView.resetFailed",
-      "playerView.rankings",
-      "playerView.showLeaderboard",
-      "playerView.slowDown",
-      "playerView.submittingTooFast",
-      "playerView.words",
-      "chat.send",
-      "chat.newMessages",
-      "results.rankings",
-      "results.yourWords",
-      "howToPlay.demo.play",
-      "legal.terms.title",
-      "legal.terms.intro",
-      "legal.terms.acceptance.title",
-      "legal.terms.acceptance.content",
-      "legal.terms.service.title",
-      "legal.terms.service.content",
-      "legal.terms.accounts.title",
-      "legal.terms.accounts.content",
-      "legal.terms.conduct.title",
-      "legal.terms.conduct.content",
-      "legal.terms.contentLicense.title",
-      "legal.terms.contentLicense.content",
-      "legal.terms.intellectualProperty.title",
-      "legal.terms.intellectualProperty.content",
-      "legal.terms.disclaimers.title",
-      "legal.terms.disclaimers.content",
-      "legal.terms.liability.title",
-      "legal.terms.liability.content",
-      "legal.terms.indemnification.title",
-      "legal.terms.indemnification.content",
-      "legal.terms.termination.title",
-      "legal.terms.termination.content",
-      "legal.terms.modifications.title",
-      "legal.terms.modifications.content",
-      "legal.terms.governingLaw.title",
-      "legal.terms.governingLaw.content",
-      "legal.terms.disputes.title",
-      "legal.terms.disputes.content",
-      "legal.terms.severability.title",
-      "legal.terms.severability.content",
-      "legal.privacy.title",
-      "legal.privacy.intro",
-      "legal.privacy.infoCollected.title",
-      "legal.privacy.infoCollected.content",
-      "legal.privacy.infoCollected.oauth",
-      "legal.privacy.infoCollected.profile",
-      "legal.privacy.infoCollected.stats",
-      "legal.privacy.infoCollected.gameState",
-      "legal.privacy.infoCollected.analytics",
-      "legal.privacy.howWeUse.title",
-      "legal.privacy.howWeUse.content",
-      "legal.privacy.thirdParties.title",
-      "legal.privacy.thirdParties.content",
-      "legal.privacy.thirdParties.supabase",
-      "legal.privacy.thirdParties.logrocket",
-      "legal.privacy.thirdParties.google",
-      "legal.privacy.thirdParties.discord",
-      "legal.privacy.thirdParties.noSale",
-      "legal.privacy.cookies.title",
-      "legal.privacy.cookies.content",
-      "legal.privacy.dataRetention.title",
-      "legal.privacy.dataRetention.content",
-      "legal.privacy.security.title",
-      "legal.privacy.security.content",
-      "legal.privacy.yourRights.title",
-      "legal.privacy.yourRights.content",
-      "legal.privacy.international.title",
-      "legal.privacy.international.content",
-      "legal.privacy.changes.title",
-      "legal.privacy.changes.content",
-      "legal.privacy.governingLaw.title",
-      "legal.privacy.governingLaw.content",
-      "singlePlayer.botDetails",
-      "singlePlayer.difficulty",
-      "singlePlayer.timer",
-      "singlePlayer.totalScore",
-      "singlePlayer.wordsByLength",
-      "challenge.settingRecord",
-      "challenge.aheadOfRecord",
-      "challenge.behindRecord",
-      "challenge.tiedWithRecord",
-      "social.games",
-      "social.newRecord",
-      "social.online"
-    ]
+    "ja": [],
+    "es": []
   },
   "keysNotInEnglish": {
     "he": [],

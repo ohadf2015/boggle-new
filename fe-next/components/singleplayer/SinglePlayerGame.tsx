@@ -626,7 +626,7 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
             >
               {score}
             </motion.div>
-            <div className="text-[7px] font-bold uppercase text-neo-black/70">
+            <div className="text-xs font-bold uppercase text-neo-black/70">
               {t('common.score') || 'Score'}
             </div>
           </div>
@@ -636,7 +636,7 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
         <div className="absolute right-2 top-1/2 -translate-y-1/2 flex flex-col items-center gap-2 z-20">
           <div className="bg-neo-cream border-2 border-neo-black rounded-neo shadow-hard-sm px-2 py-1 text-center">
             <div className="text-sm font-black text-neo-black">{validWordCount}</div>
-            <div className="text-[7px] font-bold uppercase text-neo-black/70">
+            <div className="text-xs font-bold uppercase text-neo-black/70">
               {t('common.words') || 'Words'}
             </div>
           </div>
@@ -656,7 +656,7 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
                 >
                   x{comboLevel}
                 </motion.div>
-                <div className="text-[7px] font-bold uppercase text-neo-black/70">
+                <div className="text-xs font-bold uppercase text-neo-black/70">
                   {t('common.combo') || 'Combo'}
                 </div>
               </motion.div>
@@ -670,9 +670,9 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
             variant="ghost"
             size="sm"
             onClick={onQuit}
-            className="w-8 h-8 p-0 bg-neo-red hover:brightness-110 border-2 border-neo-black rounded-neo"
+            className="w-11 h-11 p-0 bg-neo-red hover:brightness-110 border-2 border-neo-black rounded-neo flex items-center justify-center"
           >
-            <FaArrowLeft className="text-xs text-neo-cream" />
+            <FaArrowLeft className="text-sm text-neo-cream" />
           </Button>
         </div>
 
@@ -683,23 +683,23 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
               variant="ghost"
               size="sm"
               onClick={() => setIsPaused(!isPaused)}
-              className="w-8 h-8 p-0 bg-neo-cream hover:brightness-110 border-2 border-neo-black rounded-neo"
+              className="w-11 h-11 p-0 bg-neo-cream hover:brightness-110 border-2 border-neo-black rounded-neo flex items-center justify-center"
             >
-              {isPaused ? <FaPlay className="text-xs text-neo-black" /> : <FaPause className="text-xs text-neo-black" />}
+              {isPaused ? <FaPlay className="text-sm text-neo-black" /> : <FaPause className="text-sm text-neo-black" />}
             </Button>
           ) : (
             <Button
               variant="ghost"
               size="sm"
               onClick={handleFinishPractice}
-              className="px-2 h-8 bg-neo-lime hover:brightness-110 border-2 border-neo-black rounded-neo text-xs font-bold text-neo-black"
+              className="px-3 h-11 min-h-[44px] bg-neo-lime hover:brightness-110 border-2 border-neo-black rounded-neo text-sm font-bold text-neo-black"
             >
               {t('singlePlayer.finish') || 'Finish'}
             </Button>
           )}
           <HelpButton
             onClick={() => setIsHelpOpen(true)}
-            className="w-8 h-8"
+            className="w-11 h-11"
           />
         </div>
 
@@ -782,7 +782,7 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
             >
               {score}
             </motion.div>
-            <div className="text-[10px] font-bold uppercase tracking-wider text-neo-black/70">
+            <div className="text-xs font-bold uppercase tracking-wider text-neo-black/70">
               {t('common.score') || 'Score'}
             </div>
           </div>
@@ -819,7 +819,7 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
                   >
                     x{comboLevel}
                   </motion.div>
-                  <div className="text-[10px] font-bold uppercase tracking-wider text-neo-black/70">
+                  <div className="text-xs font-bold uppercase tracking-wider text-neo-black/70">
                     {t('common.combo') || 'Combo'}
                   </div>
                 </div>

@@ -1,6 +1,9 @@
 /**
  * Player Game Events Hook
  * Handles core game lifecycle socket events: startGame, endGame, timeUpdate, resetGame, results
+ *
+ * REFACTORED: Now uses GameStateContext instead of massive prop drilling
+ * Reduced from 20+ state setter props to just a few local state props
  */
 import { useEffect, useRef, useMemo, MutableRefObject } from 'react';
 import { Socket } from 'socket.io-client';
@@ -11,54 +14,24 @@ import {
   sendStartGameAck,
   createHostLeftRoomClosingHandler,
 } from '@/shared/utils/gameEventUtils';
+import { useGameStateContext } from '@/contexts/GameStateContext';
 import logger from '@/utils/logger';
-import type { Language } from '@/types';
-import type { XpGainedPayload, LevelUpPayload, StartGameBroadcast } from '@/shared/types/socket';
-
-interface FoundWord {
-  word: string;
-  isValid?: boolean | null;
-  timestamp?: number;
-}
+import type { StartGameBroadcast } from '@/shared/types/socket';
 
 interface UsePlayerGameEventsProps {
   socket: Socket | null;
   t: (key: string) => string;
-  letterGrid: any;
-  gameLanguage: Language | null;
   username: string;
   onShowResults?: (data: { scores: any; letterGrid: any; duplicateRuleDisabled?: boolean; playerCount?: number }) => void;
 
-  // State setters
-  setWasInActiveGame: React.Dispatch<React.SetStateAction<boolean>>;
-  setFoundWords: React.Dispatch<React.SetStateAction<FoundWord[]>>;
-  setAchievements: React.Dispatch<React.SetStateAction<any[]>>;
-  setLetterGrid: React.Dispatch<React.SetStateAction<any>>;
-  setRemainingTime: React.Dispatch<React.SetStateAction<number | null>>;
-  setMinWordLength: React.Dispatch<React.SetStateAction<number>>;
-  setGameLanguage: React.Dispatch<React.SetStateAction<Language | null>>;
-  setGameActive: React.Dispatch<React.SetStateAction<boolean>>;
-  setShowStartAnimation: React.Dispatch<React.SetStateAction<boolean>>;
-  setWaitingForResults: React.Dispatch<React.SetStateAction<boolean>>;
-  setLeaderboard: React.Dispatch<React.SetStateAction<any[]>>;
-  setTournamentData: React.Dispatch<React.SetStateAction<any>>;
-  setTournamentStandings: React.Dispatch<React.SetStateAction<any[]>>;
-  setShowTournamentStandings: React.Dispatch<React.SetStateAction<boolean>>;
-
-  // Word feedback state setters
+  // Local state (not in GameState context)
   setShowWordFeedback: React.Dispatch<React.SetStateAction<boolean>>;
   setWordToVote: React.Dispatch<React.SetStateAction<any>>;
-
-  // XP state setters
-  setXpGainedData: React.Dispatch<React.SetStateAction<XpGainedPayload | null>>;
-  setLevelUpData: React.Dispatch<React.SetStateAction<LevelUpPayload | null>>;
-
-  // Earthquake/Fire Round state setters
   setEarthquakeState: React.Dispatch<React.SetStateAction<'idle' | 'warning' | 'shaking' | 'fire-round'>>;
   setFireRoundActive: React.Dispatch<React.SetStateAction<boolean>>;
   setFireRoundRemaining: React.Dispatch<React.SetStateAction<number>>;
 
-  // Combo refs (for reset)
+  // Combo refs (TODO: refactor to use context actions)
   comboLevelRef: MutableRefObject<number>;
   lastWordTimeRef: MutableRefObject<number | null>;
   setComboLevel: React.Dispatch<React.SetStateAction<number>>;
@@ -83,28 +56,10 @@ interface UsePlayerGameEventsReturn {
 export function usePlayerGameEvents({
   socket,
   t,
-  letterGrid,
-  gameLanguage,
   username,
   onShowResults,
-  setWasInActiveGame,
-  setFoundWords,
-  setAchievements,
-  setLetterGrid,
-  setRemainingTime,
-  setMinWordLength,
-  setGameLanguage,
-  setGameActive,
-  setShowStartAnimation,
-  setWaitingForResults,
-  setLeaderboard,
-  setTournamentData,
-  setTournamentStandings,
-  setShowTournamentStandings,
   setShowWordFeedback,
   setWordToVote,
-  setXpGainedData,
-  setLevelUpData,
   setEarthquakeState,
   setFireRoundActive,
   setFireRoundRemaining,
@@ -117,6 +72,33 @@ export function usePlayerGameEvents({
   intentionalExitRef,
   onGameStart,
 }: UsePlayerGameEventsProps): UsePlayerGameEventsReturn {
+  // Get all game state and setters from context (no more massive prop drilling!)
+  const {
+    letterGrid,
+    gameLanguage,
+    setFoundWords,
+    setAchievements,
+    setLetterGrid,
+    setRemainingTime,
+    setMinWordLength,
+    setGameLanguage,
+    setGameActive,
+    setShowStartAnimation,
+    setWaitingForResults,
+    setLeaderboard,
+    setTournamentData,
+    setTournamentStandings,
+    setShowTournamentStandings,
+    setXpGainedData,
+    setLevelUpData,
+  } = useGameStateContext();
+
+  // Track if was in active game (TODO: move to GameState context)
+  const setWasInActiveGame = useRef<(value: boolean) => void>(() => {});
+  const wasInActiveGameValue = useRef(false);
+  setWasInActiveGame.current = (value: boolean) => {
+    wasInActiveGameValue.current = value;
+  };
   // Use refs to avoid stale closure issues
   const onShowResultsRef = useRef(onShowResults);
   useEffect(() => {
@@ -143,7 +125,7 @@ export function usePlayerGameEvents({
     if (!socket) return;
 
     const handleStartGame = (data: StartGameBroadcast) => {
-      setWasInActiveGame(true);
+      setWasInActiveGame.current(true);
       wasInActiveGameRef.current = true;
       setFoundWords([]);
       setAchievements([]);
@@ -272,7 +254,7 @@ export function usePlayerGameEvents({
     const handleResetGame = (data: any) => {
       setGameActive(false);
       gameActiveRef.current = false;
-      setWasInActiveGame(false);
+      setWasInActiveGame.current(false);
       wasInActiveGameRef.current = false;
       setFoundWords([]);
       setAchievements([]);
@@ -388,12 +370,12 @@ export function usePlayerGameEvents({
       socket.off('fireRoundStart', handleFireRoundStart);
       socket.off('fireRoundEnd', handleFireRoundEnd);
     };
+    // Setters from context are stable (wrapped in useCallback), no need in deps
   }, [
     socket,
     t,
     letterGrid,
     gameLanguage,
-    setWasInActiveGame,
     setFoundWords,
     setAchievements,
     setLetterGrid,

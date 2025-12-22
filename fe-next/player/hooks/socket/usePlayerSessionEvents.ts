@@ -1,6 +1,8 @@
 /**
  * Player Session Events Hook
  * Handles connection, presence, achievements, XP, and error events
+ *
+ * REFACTORED: Now uses GameStateContext instead of prop drilling
  */
 import { useEffect, useMemo, MutableRefObject } from 'react';
 import { Socket } from 'socket.io-client';
@@ -10,33 +12,15 @@ import { processAchievements } from '@/shared/utils/achievementUtils';
 import { createXpGainedHandler, createLevelUpHandler } from '@/shared/utils/xpUtils';
 import { createConnectionHandlers } from '@/shared/utils/connectionUtils';
 import { createPlayerPresenceHandler } from '@/shared/utils/presenceUtils';
+import { useGameStateContext } from '@/contexts/GameStateContext';
 import logger from '@/utils/logger';
-import type { XpGainedPayload, LevelUpPayload, AchievementPayload } from '@/shared/types/socket';
-
-interface Player {
-  username: string;
-  presenceStatus?: string;
-  isWindowFocused?: boolean;
-}
+import type { AchievementPayload } from '@/shared/types/socket';
 
 interface UsePlayerSessionEventsProps {
   socket: Socket | null;
   t: (key: string) => string;
   username: string;
   queueAchievement: (achievement: AchievementPayload) => void;
-
-  // State setters
-  setPlayersReady: React.Dispatch<React.SetStateAction<Player[]>>;
-  setShufflingGrid: React.Dispatch<React.SetStateAction<any>>;
-  setHighlightedCells: React.Dispatch<React.SetStateAction<any>>;
-  setAchievements: React.Dispatch<React.SetStateAction<any[]>>;
-  setLeaderboard: React.Dispatch<React.SetStateAction<any[]>>;
-
-  // XP state setters
-  setXpGainedData: React.Dispatch<React.SetStateAction<XpGainedPayload | null>>;
-  setLevelUpData: React.Dispatch<React.SetStateAction<LevelUpPayload | null>>;
-
-  // Exit ref
   intentionalExitRef: MutableRefObject<boolean>;
 }
 
@@ -48,15 +32,18 @@ export function usePlayerSessionEvents({
   t,
   username,
   queueAchievement,
-  setPlayersReady,
-  setShufflingGrid,
-  setHighlightedCells,
-  setAchievements,
-  setLeaderboard,
-  setXpGainedData,
-  setLevelUpData,
   intentionalExitRef,
 }: UsePlayerSessionEventsProps): void {
+  // Get state setters from context (no more prop drilling!)
+  const {
+    setPlayers: setPlayersReady,
+    setShufflingGrid,
+    setHighlightedCells,
+    setAchievements,
+    setLeaderboard,
+    setXpGainedData,
+    setLevelUpData,
+  } = useGameStateContext();
   // Create memoized handlers using shared utilities
   const connectionHandlers = useMemo(
     () => createConnectionHandlers(t, 'PLAYER'),
@@ -192,6 +179,7 @@ export function usePlayerSessionEvents({
       socket.off('error', handleError);
       socket.off('rateLimited', handleRateLimited);
     };
+    // Setters are stable from context (wrapped in useCallback)
   }, [
     socket,
     t,
@@ -202,6 +190,8 @@ export function usePlayerSessionEvents({
     setHighlightedCells,
     setAchievements,
     setLeaderboard,
+    setXpGainedData,
+    setLevelUpData,
     intentionalExitRef,
     handlePlayerDisconnected,
     handlePlayerReconnected,

@@ -1,6 +1,9 @@
 /**
  * Player Word Events Hook
  * Handles word submission socket events and combo system
+ *
+ * REFACTORED: Now uses GameStateContext for state management
+ * NOTE: Combo refs still passed as props for performance (to be refactored later)
  */
 import { useEffect, useCallback, MutableRefObject, RefObject } from 'react';
 import { Socket } from 'socket.io-client';
@@ -16,6 +19,7 @@ import {
   neoWarningToast,
 } from '../../../components/NeoToast';
 import { calculateComboChainWindow, calculateComboTimeout, resetComboState } from '@/shared/utils/comboUtils';
+import { useGameStateContext } from '@/contexts/GameStateContext';
 import logger from '@/utils/logger';
 import type { WordAcceptedPayload } from '@/shared/types/socket';
 import type {
@@ -26,37 +30,18 @@ import type {
   WordBlockedByCooldownPayload
 } from '@/shared/types/spam';
 
-interface FoundWord {
-  word: string;
-  isValid?: boolean | null;
-  timestamp?: number;
-}
-
-interface WordToVote {
-  word: string;
-  submittedBy: string;
-  submitterAvatar?: any;
-  timeoutSeconds: number;
-  gameCode: string;
-  language: string;
-}
-
 interface UsePlayerWordEventsProps {
   socket: Socket | null;
   t: (key: string) => string;
   inputRef: RefObject<HTMLInputElement | null>;
   playComboSound: (level: number) => void;
-  foundWords: FoundWord[];
   fireRoundActive?: boolean;
 
-  // State setters
-  setFoundWords: React.Dispatch<React.SetStateAction<FoundWord[]>>;
-
-  // Word feedback state setters
+  // Word feedback state (local to PlayerView, not in GameState)
   setShowWordFeedback: React.Dispatch<React.SetStateAction<boolean>>;
-  setWordToVote: React.Dispatch<React.SetStateAction<WordToVote | null>>;
+  setWordToVote: React.Dispatch<React.SetStateAction<any>>;
 
-  // Combo refs and setters
+  // Combo refs and setters (TODO: refactor to use context actions)
   comboLevelRef: MutableRefObject<number>;
   lastWordTimeRef: MutableRefObject<number | null>;
   setComboLevel: React.Dispatch<React.SetStateAction<number>>;
@@ -76,9 +61,7 @@ export function usePlayerWordEvents({
   t,
   inputRef,
   playComboSound,
-  foundWords,
   fireRoundActive = false,
-  setFoundWords,
   setShowWordFeedback,
   setWordToVote,
   comboLevelRef,
@@ -88,9 +71,11 @@ export function usePlayerWordEvents({
   comboTimeoutRef,
   comboShieldsUsedRef,
 }: UsePlayerWordEventsProps): void {
+  // Get foundWords state from context (no more prop drilling!)
+  const { foundWords, setFoundWords } = useGameStateContext();
   // Calculate available shields
   const getAvailableShields = useCallback(() => {
-    const validWordCount = foundWords.filter(w => w.isValid === true).length;
+    const validWordCount = foundWords.filter(w => w.validated === true).length;
     const totalShields = Math.floor(validWordCount / VALID_WORDS_PER_SHIELD);
     return Math.max(0, totalShields - comboShieldsUsedRef.current);
   }, [foundWords, comboShieldsUsedRef]);
@@ -135,7 +120,7 @@ export function usePlayerWordEvents({
       // Update found words - mark as valid
       setFoundWords(prev => prev.map(fw =>
         fw.word.toLowerCase() === data.word.toLowerCase()
-          ? { ...fw, isValid: true }
+          ? { ...fw, validated: true }
           : fw
       ));
 
@@ -202,7 +187,7 @@ export function usePlayerWordEvents({
       wordErrorToast(t('playerView.wordAlreadyFound'), { duration: 2000 });
       if (data?.word) {
         setFoundWords(prev => prev.filter(fw => {
-          if (fw.word.toLowerCase() === data.word.toLowerCase() && fw.isValid === null) {
+          if (fw.word.toLowerCase() === data.word.toLowerCase() && !fw.validated) {
             return false;
           }
           return true;
@@ -215,7 +200,7 @@ export function usePlayerWordEvents({
       wordErrorToast(t('playerView.wordNotOnBoard'), { duration: 3000 });
       setFoundWords(prev => prev.map(fw =>
         fw.word.toLowerCase() === data.word.toLowerCase()
-          ? { ...fw, isValid: false }
+          ? { ...fw, validated: false }
           : fw
       ));
       resetCombo();
@@ -357,6 +342,7 @@ export function usePlayerWordEvents({
       socket.off('spamCooldownEnd', handleSpamCooldownEnd);
       socket.off('wordBlockedByCooldown', handleWordBlockedByCooldown);
     };
+    // setFoundWords is stable from context (wrapped in useCallback)
   }, [
     socket,
     t,

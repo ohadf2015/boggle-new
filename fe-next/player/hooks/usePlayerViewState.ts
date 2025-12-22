@@ -9,7 +9,7 @@
  */
 
 import { useState, useCallback, useRef, useMemo, MutableRefObject, RefObject } from 'react';
-import { useGameState, type UseGameStateReturn } from '@/hooks/useGameState';
+import { useGameState, type UseGameStateReturn, type Player } from '@/hooks/useGameState';
 import type { Language, Avatar, GridPosition, LetterGrid } from '@/types';
 
 // ==========================================
@@ -22,17 +22,6 @@ export interface FoundWord {
   score?: number;
   duplicate?: boolean;
   timestamp?: number;
-}
-
-export interface Player {
-  username: string;
-  avatar?: Avatar;
-  isHost?: boolean;
-  isBot?: boolean;
-  presence?: 'active' | 'idle' | 'afk';
-  disconnected?: boolean;
-  presenceStatus?: string;
-  isWindowFocused?: boolean;
 }
 
 export interface WordToVote {

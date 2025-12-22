@@ -214,21 +214,21 @@ const MultiplayerLobby: React.FC<MultiplayerLobbyProps> = ({
     }
   }, [gameCode, username, setGameCode, handleJoin]);
 
-  // Landscape mode layout - 2-column: form left, room list right
+  // Landscape mode layout - optimized 2-column: form left, room list right
   if (isLandscape) {
     return (
-      <div dir={dir} className="flex h-screen w-full overflow-hidden bg-slate-900 p-2 gap-2">
+      <div dir={dir} className="flex h-screen w-full overflow-hidden bg-slate-900 p-3 gap-4 landscape-full-height">
         {/* Left column: Form */}
-        <div className="w-1/2 flex flex-col gap-2 overflow-y-auto">
+        <div className="w-[45%] flex flex-col gap-3 overflow-y-auto">
           {/* Header with back + title */}
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-3">
             <Link
               href="/"
-              className="w-8 h-8 flex items-center justify-center rounded-neo border-2 border-neo-black bg-neo-cream"
+              className="w-12 h-12 min-w-[48px] min-h-[48px] flex items-center justify-center rounded-neo border-3 border-neo-black bg-neo-cream shadow-hard hover:shadow-hard-lg transition-all"
             >
-              <FaArrowLeft className="text-xs text-neo-black rtl:rotate-180" />
+              <FaArrowLeft className="text-sm text-neo-black rtl:rotate-180" />
             </Link>
-            <h1 className="text-lg font-black uppercase text-neo-white flex-1">
+            <h1 className="text-xl font-black uppercase text-neo-white flex-1">
               {t('landing.multiplayer') || 'Multiplayer'}
             </h1>
           </div>
@@ -238,18 +238,18 @@ const MultiplayerLobby: React.FC<MultiplayerLobbyProps> = ({
 
           {/* Error */}
           {error && (
-            <Alert variant="destructive" className="py-1">
-              <AlertDescription className="text-xs">{error}</AlertDescription>
+            <Alert variant="destructive" className="py-2">
+              <AlertDescription className="text-sm">{error}</AlertDescription>
             </Alert>
           )}
 
           {/* Form fields */}
-          <form onSubmit={handleSubmit} className="space-y-2 flex-1">
+          <form onSubmit={handleSubmit} className="space-y-3 flex-1">
             {mode === 'host' ? (
               <>
                 {/* Room Name */}
                 <div>
-                  <Label htmlFor="roomName" className="text-xs font-bold uppercase text-neo-white">
+                  <Label htmlFor="roomName" className="text-sm font-bold uppercase text-neo-white mb-1 block">
                     {t('joinView.roomNamePlaceholder') || 'Room Name'}
                   </Label>
                   <Input
@@ -257,23 +257,23 @@ const MultiplayerLobby: React.FC<MultiplayerLobbyProps> = ({
                     value={roomName}
                     onChange={(e) => { setRoomName(e.target.value); setRoomNameError(false); }}
                     placeholder={displayName || t('validation.enterRoomName') || 'Enter room name'}
-                    className={cn("h-9 text-sm", roomNameError && 'border-neo-red')}
+                    className={cn("h-11 text-base", roomNameError && 'border-neo-red')}
                   />
                 </div>
 
                 {/* Game Code */}
                 <div>
-                  <Label htmlFor="gameCode" className="text-xs font-bold uppercase text-neo-white">
+                  <Label htmlFor="gameCode" className="text-sm font-bold uppercase text-neo-white mb-1 block">
                     {t('hostView.roomCode') || 'Room Code'}
                   </Label>
-                  <div className="flex gap-1">
+                  <div className="flex gap-2">
                     <Input
                       id="gameCode"
                       value={gameCode}
                       onChange={(e) => { setGameCode(e.target.value.toUpperCase()); setGameCodeError(false); }}
-                      className="h-9 text-sm font-mono flex-1"
+                      className="h-11 text-base font-mono flex-1"
                     />
-                    <Button type="button" variant="secondary" size="sm" onClick={generateRoomCode} className="h-9 px-2">
+                    <Button type="button" variant="secondary" size="sm" onClick={generateRoomCode} className="h-11 w-11 px-0">
                       <FaDice />
                     </Button>
                   </div>
@@ -281,7 +281,7 @@ const MultiplayerLobby: React.FC<MultiplayerLobbyProps> = ({
 
                 {/* Language */}
                 <div>
-                  <Label className="text-xs font-bold uppercase text-neo-white">
+                  <Label className="text-sm font-bold uppercase text-neo-white mb-1 block">
                     {t('joinView.language') || 'Language'}
                   </Label>
                   <LanguageSelector selectedLanguage={roomLanguage} onLanguageChange={setRoomLanguage} />
@@ -291,7 +291,7 @@ const MultiplayerLobby: React.FC<MultiplayerLobbyProps> = ({
               <>
                 {/* Join: Game Code */}
                 <div>
-                  <Label htmlFor="gameCodeJoin" className="text-xs font-bold uppercase text-neo-white">
+                  <Label htmlFor="gameCodeJoin" className="text-sm font-bold uppercase text-neo-white mb-1 block">
                     {t('joinView.roomCode') || 'Room Code'}
                   </Label>
                   <Input
@@ -299,7 +299,7 @@ const MultiplayerLobby: React.FC<MultiplayerLobbyProps> = ({
                     value={gameCode}
                     onChange={(e) => { setGameCode(e.target.value.toUpperCase()); setGameCodeError(false); }}
                     placeholder="XXXX"
-                    className={cn("h-9 text-sm font-mono", gameCodeError && 'border-neo-red')}
+                    className={cn("h-11 text-base font-mono", gameCodeError && 'border-neo-red')}
                   />
                 </div>
               </>
@@ -308,7 +308,7 @@ const MultiplayerLobby: React.FC<MultiplayerLobbyProps> = ({
             {/* Username */}
             {!isAuthenticated && (
               <div>
-                <Label htmlFor="username" className="text-xs font-bold uppercase text-neo-white">
+                <Label htmlFor="username" className="text-sm font-bold uppercase text-neo-white mb-1 block">
                   {t('joinView.nickname') || 'Nickname'}
                 </Label>
                 <Input
@@ -316,7 +316,7 @@ const MultiplayerLobby: React.FC<MultiplayerLobbyProps> = ({
                   value={username}
                   onChange={(e) => { setUsername(e.target.value); setUsernameError(false); }}
                   placeholder={t('joinView.nicknamePlaceholder') || 'Enter nickname'}
-                  className={cn("h-9 text-sm", usernameError && 'border-neo-red')}
+                  className={cn("h-11 text-base", usernameError && 'border-neo-red')}
                 />
               </div>
             )}
@@ -325,7 +325,7 @@ const MultiplayerLobby: React.FC<MultiplayerLobbyProps> = ({
             <Button
               type="submit"
               disabled={isJoining}
-              className="w-full h-10 font-bold uppercase bg-neo-yellow hover:bg-neo-yellow/90 text-neo-black border-2 border-neo-black"
+              className="w-full h-12 font-black uppercase text-base bg-neo-yellow hover:bg-neo-yellow/90 text-neo-black border-3 border-neo-black shadow-hard hover:shadow-hard-lg transition-all"
             >
               {mode === 'host' ? <FaCrown className="mr-2" /> : <FaUser className="mr-2" />}
               {isJoining ? (t('common.loading') || 'Loading...') : mode === 'host' ? (t('joinView.createRoom') || 'Create Room') : (t('joinView.joinRoom') || 'Join Room')}
@@ -334,11 +334,11 @@ const MultiplayerLobby: React.FC<MultiplayerLobbyProps> = ({
         </div>
 
         {/* Right column: Room List */}
-        <div className="w-1/2 flex flex-col gap-2 overflow-hidden">
-          <h2 className="text-xs font-black uppercase text-neo-white text-center">
+        <div className="w-[55%] flex flex-col gap-3 overflow-hidden">
+          <h2 className="text-base font-black uppercase text-neo-white text-center">
             {t('joinView.activeRooms') || 'Active Rooms'}
           </h2>
-          <div className="flex-1 overflow-y-auto bg-slate-800 rounded-neo border-2 border-neo-black p-2">
+          <div className="flex-1 overflow-y-auto bg-slate-800 rounded-neo border-3 border-neo-black p-3 shadow-hard">
             <RoomList
               activeRooms={activeRooms}
               onRoomSelect={handleRoomSelect}

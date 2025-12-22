@@ -1734,6 +1734,67 @@ body {
 
 /* Landscape orientation on mobile devices */
 @media (orientation: landscape) and (max-height: 600px) {
+  /* Prevent horizontal scrolling */
+  html, body {
+    overflow-x: hidden;
+    max-width: 100vw;
+  }
+  
+  * {
+    max-width: 100%;
+  }
+
+  /* Prevent elements from being positioned outside viewport */
+  body {
+    position: relative;
+    min-height: 100vh;
+    min-height: 100dvh;
+  }
+
+  /* Fix negative positioning issues */
+  main, header, footer {
+    position: relative;
+  }
+
+  /* Ensure no content extends beyond viewport */
+  .overflow-x-hidden {
+    overflow-x: hidden !important;
+  }
+
+  /* Improved spacing for landscape forms */
+  form {
+    gap: 0.75rem;
+  }
+
+  /* Better input sizing in landscape */
+  input[type="text"],
+  input[type="number"],
+  select {
+    font-size: 16px !important;
+    min-height: 48px !important;
+  }
+
+  /* Improved button sizing */
+  button:not(.icon-only) {
+    min-height: 48px;
+    padding: 0.75rem 1rem;
+  }
+
+  /* Better card spacing */
+  .card {
+    padding: 1rem;
+    gap: 0.75rem;
+  }
+
+  /* Improved text readability */
+  .text-sm {
+    font-size: 0.875rem;
+  }
+
+  .text-xs {
+    font-size: 0.75rem;
+  }
+
   /* Landscape wrapper - sizes the grid container to take full available height */
   .game-board-frame-landscape {
     height: 100%;
@@ -1753,10 +1814,10 @@ body {
     padding: 4px;
   }
 
-  /* Ensure grid cells have adequate minimum size in landscape */
+  /* Ensure grid cells have adequate minimum size in landscape - WCAG 2.1 AA compliant */
   .game-board-frame [role="gridcell"] {
-    min-width: 36px;
-    min-height: 36px;
+    min-width: 44px;
+    min-height: 44px;
   }
 
   /* Stack game UI vertically in landscape */
@@ -1779,9 +1840,25 @@ body {
   }
 
   /* Compact header in landscape */
-  .header-landscape-compact {
-    padding-top: 0.25rem;
-    padding-bottom: 0.25rem;
+  header {
+    padding-top: 0.5rem !important;
+    padding-bottom: 0.5rem !important;
+    margin-bottom: 0 !important;
+  }
+
+  header > div {
+    padding: 0.5rem 0.75rem !important;
+    border-width: 2px !important;
+  }
+
+  header h1 {
+    font-size: 1rem !important;
+  }
+
+  header button, header a {
+    min-width: 40px !important;
+    min-height: 40px !important;
+    padding: 0.375rem !important;
   }
 
   /* Timer positioning for landscape */
@@ -1821,6 +1898,61 @@ body {
 
   .text-landscape-xs {
     font-size: 0.75rem;
+  }
+
+  /* Better spacing for landscape */
+  .landscape-spacing-compact {
+    padding: 0.5rem;
+    gap: 0.5rem;
+  }
+
+  /* Header auto-hide in landscape */
+  header {
+    transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out;
+  }
+
+  header.landscape-hidden {
+    transform: translateY(-100%);
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  /* Better button spacing in landscape */
+  button, a[role="button"] {
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  /* Compact form elements */
+  input, select, textarea {
+    min-height: 44px;
+    font-size: 16px;
+  }
+
+  /* Better scrollbar for landscape */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 3px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.5);
+  }
+
+  /* Prevent text selection issues in landscape */
+  * {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  /* Better focus states for landscape */
+  *:focus-visible {
+    outline: 3px solid var(--neo-cyan);
+    outline-offset: 2px;
   }
 }
 
@@ -1881,10 +2013,11 @@ body {
     padding: 4px;
   }
 
-  /* Ensure grid cells are still readable on very short screens */
+  /* Ensure grid cells are still readable on very short screens - but still meet touch target minimum */
   .game-board-frame [role="gridcell"] {
-    min-width: 32px;
-    min-height: 32px;
+    min-width: 44px;
+    min-height: 44px;
+    font-size: 0.875rem;
   }
 
   /* Even more compact for very short screens */
@@ -1895,6 +2028,29 @@ body {
 
   /* Hide more elements on very short screens */
   .hide-ultra-landscape {
+    display: none !important;
+  }
+
+  /* Ultra-compact text */
+  .text-ultra-compact {
+    font-size: 0.7rem;
+    line-height: 1.2;
+  }
+
+  /* Smaller buttons but still touchable */
+  button, a[role="button"] {
+    min-height: 40px;
+    min-width: 40px;
+    padding: 0.375rem 0.75rem;
+  }
+
+  /* Compact header */
+  header {
+    padding: 0.25rem 0.5rem;
+  }
+
+  /* Hide decorative elements */
+  .decorative-landscape {
     display: none !important;
   }
 }
