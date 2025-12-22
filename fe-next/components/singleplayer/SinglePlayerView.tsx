@@ -152,7 +152,7 @@ const SinglePlayerView: React.FC = () => {
     <div className="min-h-screen bg-gradient-to-b from-slate-50 via-slate-100 to-slate-200 dark:from-neo-navy dark:via-neo-navy-light dark:to-neo-navy">
       <AutoHideHeader />
 
-      <main className="max-w-6xl mx-auto px-4 sm:px-6 py-8 landscape-content">
+      <main className="max-w-6xl mx-auto px-2 xs:px-4 sm:px-6 py-8 landscape-content overflow-x-hidden">
         {phase === 'lobby' && (
           <SinglePlayerLobby
             initialSettings={gameState}

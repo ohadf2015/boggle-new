@@ -98,12 +98,17 @@
   --avatar-15: #FF6F61;
 }
 
+html {
+  overflow-x: hidden;
+}
+
 body {
   background: #0f172a; /* slate-900 - matches page gradients */
   color: var(--foreground);
   font-family: var(--font-rubik), 'Rubik', Arial, Helvetica, sans-serif;
   margin: 0;
   padding: 0;
+  overflow-x: hidden;
   /* Halftone texture overlay on body */
   background-image: var(--halftone-pattern);
   background-color: #0f172a; /* slate-900 */
@@ -932,6 +937,22 @@ body {
   will-change: auto;
 }
 
+/* Performance optimizations for combo animations */
+.combo-indicator-container,
+.combo-sparkle,
+.combo-confetti,
+.combo-glow-ring {
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  perspective: 1000px;
+}
+
+/* Limit compositing layers at extreme combo levels */
+.combo-indicator-container[data-extreme="true"] .combo-sparkle,
+.combo-indicator-container[data-extreme="true"] .combo-confetti {
+  will-change: auto;
+}
+
 /* Combo badge entrance with spring overshoot */
 @keyframes combo-entrance {
   0% {
@@ -1600,14 +1621,23 @@ body {
 
 /* Landscape orientation on mobile devices */
 @media (orientation: landscape) and (max-height: 600px) {
+  /* Landscape wrapper - sizes the grid container to take full available height */
+  .game-board-frame-landscape {
+    height: 100%;
+    height: 100dvh;
+    max-height: 100dvh;
+    width: auto;
+  }
+
   /* Game board frame adjustments for landscape - maximized for playability */
   .game-board-frame {
-    /* Maximized to 85vh for largest possible grid in landscape */
-    width: min(100%, 85vh);
-    max-width: min(100%, 85vh);
-    height: auto;
+    /* Maximized to 92vh for largest possible grid in landscape using dynamic vh */
+    width: min(100%, 92dvh);
+    max-width: min(100%, 92dvh);
+    height: 92dvh;
+    max-height: 92dvh;
     aspect-ratio: 1 / 1;
-    padding: 6px;
+    padding: 4px;
   }
 
   /* Stack game UI vertically in landscape */
@@ -1706,17 +1736,29 @@ body {
 
 /* Very short landscape screens (phones in landscape) */
 @media (orientation: landscape) and (max-height: 450px) {
+  /* Landscape wrapper for very short screens */
+  .game-board-frame-landscape {
+    height: 100%;
+    height: 100dvh;
+    max-height: 100dvh;
+    width: auto;
+  }
+
   .game-board-frame {
-    /* Maximized to 88vh for best playability on short screens */
-    width: min(100%, 88vh);
-    max-width: min(100%, 88vh);
-    padding: 4px;
+    /* Maximized to 96dvh for best playability on short screens */
+    width: min(100%, 96dvh);
+    max-width: min(100%, 96dvh);
+    height: 96dvh;
+    max-height: 96dvh;
+    padding: 2px;
   }
 
   /* Full-height mode - even larger on short screens */
   .game-board-frame-full {
-    width: min(100%, 98vh);
-    max-width: min(100%, 98vh);
+    width: min(100%, 98dvh);
+    max-width: min(100%, 98dvh);
+    height: 98dvh;
+    max-height: 98dvh;
     padding: 2px;
   }
 
@@ -1737,16 +1779,6 @@ body {
   .game-board-frame {
     width: min(100%, 60vh);
     max-width: min(100%, 60vh);
-  }
-}
-
-/* Legacy landscape support */
-@media (max-height: 500px) and (orientation: landscape) {
-  .game-board-frame {
-    width: min(100%, 50vh);
-    max-width: min(100%, 50vh);
-    height: auto;
-    aspect-ratio: 1 / 1;
   }
 }
 
