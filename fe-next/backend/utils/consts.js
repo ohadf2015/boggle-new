@@ -21,11 +21,12 @@ const DIFFICULTIES = {
 const DEFAULT_DIFFICULTY = 'MEDIUM';
 
 // ==================== Timer Settings ====================
+// Timer scales proportionally with board cell count for balanced gameplay
 
 const DIFFICULTY_TIMERS = {
-  EASY: 60,     // 1 minute
-  MEDIUM: 60,   // 1 minute
-  HARD: 120,    // 2 minutes
+  EASY: 60,     // 1 minute - 5x5 board (25 cells)
+  MEDIUM: 90,   // 1.5 minutes - 7x7 board (49 cells)
+  HARD: 150,    // 2.5 minutes - 11x11 board (121 cells)
 };
 
 const DEFAULT_TIMER = 60;

@@ -30,6 +30,29 @@ const SocialProof: React.FC<SocialProofProps> = ({
     recentHighScore: null as { username: string; score: number } | null,
   });
 
+  // Stable offset that doesn't change on re-renders (makes numbers look more realistic)
+  const [stableOffset] = useState(() => ({
+    players: Math.floor(Math.random() * 15) + 35, // 35-50 base offset
+    games: Math.floor(Math.random() * 3) + 4,     // 4-7 base offset
+  }));
+
+  // Small fluctuation for natural-looking changes (updates every 30 seconds)
+  const [fluctuation, setFluctuation] = useState({ players: 0, games: 0 });
+
+  useEffect(() => {
+    const updateFluctuation = () => {
+      setFluctuation({
+        players: Math.floor(Math.random() * 7) - 3, // -3 to +3
+        games: Math.floor(Math.random() * 3) - 1,   // -1 to +1
+      });
+    };
+
+    updateFluctuation();
+    const interval = setInterval(updateFluctuation, 30000); // Every 30s for subtle changes
+
+    return () => clearInterval(interval);
+  }, []);
+
   // Listen for global stats updates from backend
   useEffect(() => {
     if (!socket || !isConnected) return;
@@ -56,10 +79,11 @@ const SocialProof: React.FC<SocialProofProps> = ({
     };
   }, [socket, isConnected]);
 
-  // Show placeholder values when not connected (creates FOMO effect)
+  // Add offset to real stats to make social proof more compelling
+  // Offset is stable + small fluctuation for natural-looking changes
   const displayStats = {
-    playersOnline: stats.playersOnline || Math.floor(Math.random() * 50) + 20,
-    gamesActive: stats.gamesActive || Math.floor(Math.random() * 10) + 3,
+    playersOnline: Math.max(1, (stats.playersOnline || 0) + stableOffset.players + fluctuation.players),
+    gamesActive: Math.max(1, (stats.gamesActive || 0) + stableOffset.games + fluctuation.games),
     recentHighScore: stats.recentHighScore,
   };
 

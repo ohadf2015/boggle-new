@@ -638,7 +638,8 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, letterGrid, game
           )}
 
           {/* Share Prompt - Compact inline for non-winners, full for winners */}
-          {currentPlayerData && gameCode && (isCurrentUserWinner || currentPlayerData.score >= 50) && (
+          {/* Show for winners OR anyone with 30+ score to increase viral reach */}
+          {currentPlayerData && gameCode && (isCurrentUserWinner || currentPlayerData.score >= 30) && (
             <motion.div
               initial={{ opacity: 0, y: 10 }}
               whileInView={{ opacity: 1, y: 0 }}

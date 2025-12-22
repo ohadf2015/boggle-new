@@ -36,11 +36,12 @@ export type DifficultyLevel = keyof typeof DIFFICULTIES;
 /**
  * Recommended timer durations per difficulty (in seconds)
  * Larger boards need more time to explore effectively
+ * Timer scales proportionally with board cell count for balanced gameplay
  */
 export const DIFFICULTY_TIMERS: Record<DifficultyLevel, number> = {
-  EASY: 60,     // 1 minute - small board, quick games
-  MEDIUM: 60,   // 1 minute - default, fast-paced
-  HARD: 120,    // 2 minutes - larger board
+  EASY: 60,     // 1 minute - 5x5 board (25 cells)
+  MEDIUM: 90,   // 1.5 minutes - 7x7 board (49 cells)
+  HARD: 150,    // 2.5 minutes - 11x11 board (121 cells)
 };
 
 export const DEFAULT_TIMER = 60; // 1 minute

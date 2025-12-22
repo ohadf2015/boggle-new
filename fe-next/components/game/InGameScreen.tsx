@@ -15,6 +15,7 @@ import CircularTimer from '../CircularTimer';
 import RoomChat from '../RoomChat';
 import HintButton from '../HintButton';
 import { HelpPanel, HelpButton } from './HelpPanel';
+import LandscapeIndicator from '../LandscapeIndicator';
 import { applyHebrewFinalLetters } from '../../utils/utils';
 import { wordErrorToast } from '../NeoToast';
 import { useSoundEffects } from '../../contexts/SoundEffectsContext';
@@ -261,7 +262,11 @@ const InGameScreen = memo<InGameScreenProps>(({
   })), [leaderboard, username, getRankStyle]);
 
   return (
-    <div className="flex flex-col lg:flex-row gap-1 md:gap-2 flex-grow w-full overflow-hidden transition-all duration-500 ease-in-out">
+    <>
+      {/* Landscape mode suggestion banner for mobile portrait users */}
+      <LandscapeIndicator />
+
+      <div className="flex flex-col lg:flex-row gap-1 md:gap-2 flex-grow w-full overflow-hidden transition-all duration-500 ease-in-out">
 
       {/* Top Bar - Only on mobile, integrated into parent on desktop */}
       <div className="lg:hidden w-full flex items-center justify-between mb-1 px-2">
@@ -580,6 +585,7 @@ const InGameScreen = memo<InGameScreenProps>(({
         </div>
       </div>
     </div>
+    </>
   );
 });
 

@@ -97,6 +97,9 @@ const translations = {
       tapToDismiss: 'Tap to dismiss',
       copied: 'Copied!',
       copyCode: 'Copy code',
+      rotateLandscape: 'Rotate for better gameplay!',
+      dontShowAgain: "Don't show again",
+      landscapeMode: 'Landscape Mode',
     },
     combo: {
       shieldUsed: '🛡️ Combo Shield Used!',
@@ -470,6 +473,8 @@ const translations = {
       rejoinNow: 'Rejoin Now',
       largeRoomMode: 'Large Room Mode',
       duplicateRuleDisabled: 'With 8+ players, duplicate words still count!',
+      longest: 'Longest',
+      accuracy: 'Accuracy',
     },
     playerTitles: {
       champion: { name: 'Champion', icon: '👑', description: 'Winner of the game' },
@@ -1433,6 +1438,9 @@ const translations = {
       tapToDismiss: 'הקש לסגירה',
       copied: 'הועתק!',
       copyCode: 'העתק קוד',
+      rotateLandscape: 'סובב לחוויה טובה יותר!',
+      dontShowAgain: 'אל תציג שוב',
+      landscapeMode: 'מצב אופקי',
     },
     combo: {
       shieldUsed: '🛡️ מגן קומבו נוצל!',
@@ -1806,6 +1814,8 @@ const translations = {
       rejoinNow: 'חזור עכשיו',
       largeRoomMode: 'מצב חדר גדול',
       duplicateRuleDisabled: 'עם 8+ שחקנים, מילים כפולות עדיין נספרות!',
+      longest: 'הארוכה ביותר',
+      accuracy: 'דיוק',
     },
     playerTitles: {
       champion: { name: 'אלוף', icon: '👑', description: 'מנצח המשחק' },
@@ -2763,6 +2773,9 @@ const translations = {
       tapToDismiss: 'Tryck för att stänga',
       copied: 'Kopierad!',
       copyCode: 'Kopiera kod',
+      rotateLandscape: 'Rotera för bättre spelupplevelse!',
+      dontShowAgain: 'Visa inte igen',
+      landscapeMode: 'Liggande läge',
     },
     combo: {
       shieldUsed: '🛡️ Kombosköld använd!',
@@ -3134,6 +3147,8 @@ const translations = {
       rejoinNow: 'Återanslut nu',
       largeRoomMode: 'Stort rumsläge',
       duplicateRuleDisabled: 'Med 8+ spelare räknas dubblettord fortfarande!',
+      longest: 'Längsta',
+      accuracy: 'Precision',
     },
     playerTitles: {
       champion: { name: 'Mästare', icon: '👑', description: 'Spelets vinnare' },
@@ -4093,6 +4108,9 @@ const translations = {
       tapToDismiss: 'タップして閉じる',
       copied: 'コピーしました！',
       copyCode: 'コードをコピー',
+      rotateLandscape: '横向きでより良いプレイを！',
+      dontShowAgain: '今後表示しない',
+      landscapeMode: '横向きモード',
     },
     combo: {
       shieldUsed: '🛡️ コンボシールド使用！',
@@ -4464,6 +4482,8 @@ const translations = {
       rejoinNow: '今すぐ再参加',
       largeRoomMode: '大規模ルームモード',
       duplicateRuleDisabled: '8人以上のプレイヤーでは、重複単語もカウントされます！',
+      longest: '最長',
+      accuracy: '正確性',
     },
     playerTitles: {
       champion: { name: 'チャンピオン', icon: '👑', description: 'ゲームの勝者' },
@@ -5422,6 +5442,9 @@ const translations = {
       tapToDismiss: 'Toca para cerrar',
       copied: '¡Copiado!',
       copyCode: 'Copiar código',
+      rotateLandscape: '¡Gira para mejor experiencia!',
+      dontShowAgain: 'No mostrar de nuevo',
+      landscapeMode: 'Modo Horizontal',
     },
     combo: {
       shieldUsed: '🛡️ ¡Escudo de Combo Usado!',
@@ -5786,6 +5809,8 @@ const translations = {
       rejoinNow: 'Unirse Ahora',
       largeRoomMode: 'Modo Sala Grande',
       duplicateRuleDisabled: '¡Con 8+ jugadores, las palabras duplicadas sí cuentan!',
+      longest: 'Más Larga',
+      accuracy: 'Precisión',
     },
     playerTitles: {
       champion: { name: 'Campeón', icon: '👑', description: 'Ganador del juego' },

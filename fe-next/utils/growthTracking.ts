@@ -6,6 +6,7 @@
 import logger from '@/utils/logger';
 import { getStoredUtmData } from './utmCapture';
 import { getGuestSessionId, getGuestName } from './guestManager';
+import { trackEvent as trackGA4Event } from '@/components/GoogleAnalytics';
 
 // Growth event types for tracking viral loops and engagement
 export type GrowthEvent =
@@ -133,6 +134,16 @@ export const trackGrowthEvent = (event: GrowthEvent, data: GrowthEventData = {})
       // Silently fail if LogRocket not properly initialized
     }
   }
+
+  // Send to GA4 for unified analytics
+  // Convert GrowthEventData to Record<string, string | number | boolean>
+  const ga4Data: Record<string, string | number | boolean> = {};
+  for (const [key, value] of Object.entries(enrichedData)) {
+    if (typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean') {
+      ga4Data[key] = value;
+    }
+  }
+  trackGA4Event(`growth_${event}`, ga4Data);
 
   // Store key events in localStorage for analysis
   storeEventLocally(event, enrichedData);
