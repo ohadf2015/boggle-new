@@ -192,6 +192,9 @@ const HostView: React.FC<HostViewProps> = memo(({
     });
   }, [socket, state.settings.difficulty, state.roomLanguage]);
 
+  // Destructure for cleaner JSX
+  const { runtime, settings, players, tournament, animation, ui, hostPlaying: hostPlayingState, combo } = state;
+
   // Earthquake/Fire Round feature for multiplayer
   const {
     earthquakeState,
@@ -236,9 +239,6 @@ const HostView: React.FC<HostViewProps> = memo(({
       };
     })
     .sort((a, b) => b.score - a.score);
-
-  // Destructure for cleaner JSX
-  const { runtime, settings, players, tournament, animation, ui, hostPlaying: hostPlayingState, combo } = state;
 
   // Detect when we have active game data (covers countdown and transition to active game)
   const hasActiveGameData = runtime.tableData && runtime.remainingTime !== null && runtime.remainingTime > 0;
