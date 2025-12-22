@@ -61,6 +61,7 @@ interface UsePlayerSocketEventsProps {
   username: string;
   queueAchievement: (achievement: AchievementPayload) => void;
   playComboSound: (level: number) => void;
+  fireRoundActive?: boolean;
   onShowResults?: (data: { scores: any; letterGrid: any; duplicateRuleDisabled?: boolean; playerCount?: number }) => void;
 
   // State setters
@@ -126,6 +127,7 @@ const usePlayerSocketEvents = ({
   username,
   queueAchievement,
   playComboSound,
+  fireRoundActive = false,
   onShowResults,
 
   // State setters
@@ -223,6 +225,7 @@ const usePlayerSocketEvents = ({
     inputRef,
     playComboSound,
     foundWords,
+    fireRoundActive,
     setFoundWords,
     setShowWordFeedback,
     setWordToVote,

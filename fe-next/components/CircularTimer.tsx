@@ -15,7 +15,7 @@ interface CircularTimerProps {
 
 // Size configurations
 const SIZES = {
-  sm: { svgSize: 70, radius: 26, strokeWidth: 6, textSize: 'text-lg', frameClasses: 'p-1.5 border-2', badgeClasses: 'hidden' },
+  sm: { svgSize: 100, radius: 38, strokeWidth: 8, textSize: 'text-2xl', frameClasses: 'p-2 border-3', badgeClasses: 'hidden' },
   md: { svgSize: 120, radius: 45, strokeWidth: 10, textSize: 'text-3xl', frameClasses: 'p-3 border-4', badgeClasses: '' },
 };
 

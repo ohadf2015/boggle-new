@@ -546,6 +546,7 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
           wordAcceptedToast(normalizedWord.toUpperCase(), {
             score: fullScore,
             comboLevel: currentCombo > 0 ? currentCombo : undefined,
+            fireRoundActive,
           });
           // Announce for screen readers
           announceWordResult(normalizedWord, true, fullScore);
@@ -633,7 +634,7 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
 
         {/* Right side: Words count + Combo */}
         <div className="absolute right-2 top-1/2 -translate-y-1/2 flex flex-col items-center gap-2 z-20">
-          <div className="bg-neo-cream/90 border-2 border-neo-black rounded-neo shadow-hard-sm px-2 py-1 text-center">
+          <div className="bg-neo-cream border-2 border-neo-black rounded-neo shadow-hard-sm px-2 py-1 text-center">
             <div className="text-sm font-black text-neo-black">{validWordCount}</div>
             <div className="text-[7px] font-bold uppercase text-neo-black/70">
               {t('common.words') || 'Words'}
@@ -669,9 +670,9 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
             variant="ghost"
             size="sm"
             onClick={onQuit}
-            className="w-8 h-8 p-0 bg-neo-red/90 hover:bg-neo-red border-2 border-neo-black rounded-neo"
+            className="w-8 h-8 p-0 bg-neo-red hover:brightness-110 border-2 border-neo-black rounded-neo"
           >
-            <FaArrowLeft className="text-xs text-neo-black" />
+            <FaArrowLeft className="text-xs text-neo-cream" />
           </Button>
         </div>
 
@@ -682,7 +683,7 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
               variant="ghost"
               size="sm"
               onClick={() => setIsPaused(!isPaused)}
-              className="w-8 h-8 p-0 bg-neo-cream/90 hover:bg-neo-cream border-2 border-neo-black rounded-neo"
+              className="w-8 h-8 p-0 bg-neo-cream hover:brightness-110 border-2 border-neo-black rounded-neo"
             >
               {isPaused ? <FaPlay className="text-xs text-neo-black" /> : <FaPause className="text-xs text-neo-black" />}
             </Button>
@@ -691,7 +692,7 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
               variant="ghost"
               size="sm"
               onClick={handleFinishPractice}
-              className="px-2 h-8 bg-neo-lime/90 hover:bg-neo-lime border-2 border-neo-black rounded-neo text-xs font-bold text-neo-black"
+              className="px-2 h-8 bg-neo-lime hover:brightness-110 border-2 border-neo-black rounded-neo text-xs font-bold text-neo-black"
             >
               {t('singlePlayer.finish') || 'Finish'}
             </Button>

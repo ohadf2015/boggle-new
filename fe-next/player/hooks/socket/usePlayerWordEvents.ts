@@ -47,6 +47,7 @@ interface UsePlayerWordEventsProps {
   inputRef: RefObject<HTMLInputElement | null>;
   playComboSound: (level: number) => void;
   foundWords: FoundWord[];
+  fireRoundActive?: boolean;
 
   // State setters
   setFoundWords: React.Dispatch<React.SetStateAction<FoundWord[]>>;
@@ -76,6 +77,7 @@ export function usePlayerWordEvents({
   inputRef,
   playComboSound,
   foundWords,
+  fireRoundActive = false,
   setFoundWords,
   setShowWordFeedback,
   setWordToVote,
@@ -178,6 +180,7 @@ export function usePlayerWordEvents({
         comboBonus: data.comboBonus || 0,
         comboLevel: data.comboLevel || 0,
         comboBonusLabel: t('common.comboBonus'),
+        fireRoundActive,
         duration: 2000
       });
     };

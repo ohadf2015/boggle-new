@@ -103,6 +103,10 @@ const translations = {
       rank: 'Rank',
       menu: 'Menu',
       showControls: 'Tap to show controls',
+      loadingProfile: 'Loading profile...',
+      rematch: 'Rematch',
+      roomFull: 'Room is full. You joined as a spectator.',
+      selectLanguage: 'Select language',
     },
     help: {
       title: 'Quick Help',
@@ -135,6 +139,12 @@ const translations = {
       shieldEarned: '🛡️ Shield Earned!',
       explanationTitle: '🔥 Combo Power!',
       explanationText: 'Find words quickly to build combos! Higher combos = bigger score multipliers. Keep the streak going!',
+    },
+    earthquake: {
+      warning: 'Earthquake!',
+      brace: 'Brace yourself!',
+      fireRound: 'Fire Round',
+      multiplier: '2× Multiplier',
     },
     spam: {
       warning: 'Slow down! Too many invalid words',
@@ -169,6 +179,8 @@ const translations = {
       unmute: 'Unmute',
       clickToEnable: 'Click anywhere to enable music',
       controls: 'Music Controls',
+      musicVolumeSlider: 'Music volume slider',
+      sfxVolumeSlider: 'Sound effects volume slider',
     },
     share: {
       linkCopied: 'Link copied! 📋',
@@ -196,6 +208,8 @@ const translations = {
       unexpectedError: 'The game encountered an unexpected error. Please try refreshing the page.',
       errorDetails: 'Error Details',
       refreshPage: 'Refresh Page',
+      connectionTimeout: 'Connection timeout',
+      rateLimited: 'Too many requests. Please slow down.',
     },
     validation: {
       usernameRequired: 'Username is required! Please fill in the field',
@@ -217,6 +231,7 @@ const translations = {
       wordRequired: 'Word is required',
       wordTooLong: 'Word is too long',
       wordInvalidChars: 'Word contains invalid characters',
+      gameCodeHint: 'Enter the game code shared by the host',
     },
     difficulty: {
       easy: 'Easy',
@@ -279,6 +294,10 @@ const translations = {
       joining: 'Joining...',
       creating: 'Creating...',
       playersOnline: 'online',
+      loadingProfile: 'Loading profile...',
+      nickname: 'Nickname',
+      nicknamePlaceholder: 'Enter your nickname',
+      roomCode: 'Room Code',
       // Funny default player names - [Adjective] + [Food/Animal]
       defaultPlayerNames: [
         // Adjective + Food
@@ -374,6 +393,10 @@ const translations = {
       betweenRoundsStandings: 'Current Standings',
       nextRoundIn: 'Next round starts in',
       startNow: 'Start Now',
+      creatingTournament: 'Creating tournament...',
+      increaseRounds: 'Increase number of rounds',
+      decreaseRounds: 'Decrease number of rounds',
+      resetFailed: 'Failed to reset game',
     },
     playerView: {
       waitingForHost: 'Waiting for host to start...',
@@ -439,6 +462,11 @@ const translations = {
         scoring: 'Calculating scores...',
         finalizing: 'Finalizing results...',
       },
+      rankings: 'Rankings',
+      showLeaderboard: 'Show leaderboard',
+      slowDown: 'Slow down! Words are being processed.',
+      submittingTooFast: 'You\'re submitting words too fast',
+      words: 'Words',
     },
     hints: {
       hint: 'Hint',
@@ -461,6 +489,8 @@ const translations = {
       placeholder: 'Type a message...',
       noMessages: 'No messages yet',
       startChatting: 'Start chatting!',
+      send: 'Send message',
+      newMessages: 'New chat messages',
     },
     results: {
       gameOver: 'Game Over',
@@ -506,6 +536,8 @@ const translations = {
       duplicateRuleDisabled: 'With 8+ players, duplicate words still count!',
       longest: 'Longest',
       accuracy: 'Accuracy',
+      rankings: 'Rankings',
+      yourWords: 'Your Words',
     },
     playerTitles: {
       champion: { name: 'Champion', icon: '👑', description: 'Winner of the game' },
@@ -611,6 +643,7 @@ const translations = {
         tryIt: 'Try dragging letters yourself!',
         gridExample: 'Example of tracing a word on the grid',
         traceExample: 'Trace letters to form words - T→O→N→D',
+        play: 'Play Demo',
       },
       // Combo system translations
       combo: {
@@ -1290,6 +1323,11 @@ const translations = {
       challengeComplete: 'Challenge Complete',
       noWordsFound: 'No words found',
       achievementsNotSaved: 'Achievements in single player mode are not saved to your profile.',
+      botDetails: 'Bot Details',
+      difficulty: 'Difficulty',
+      timer: 'Timer',
+      totalScore: 'Total Score',
+      wordsByLength: 'Words by Length',
     },
     challenge: {
       yourRecord: 'Your Record',
@@ -1309,6 +1347,10 @@ const translations = {
       improvement: 'improvement',
       firstRecord: 'First Record Set!',
       shortOf: '{diff} points short of your record',
+      settingRecord: 'Setting your first record!',
+      aheadOfRecord: '+{diff} ahead of record!',
+      behindRecord: '{diff} to beat your record',
+      tiedWithRecord: 'Tied with your record!',
     },
     rules: {
       pageTitle: 'LexiClash: Real-Time Word Battle',
@@ -1373,6 +1415,9 @@ const translations = {
     social: {
       playersOnline: 'players online',
       gamesNow: 'games happening now',
+      games: 'games',
+      newRecord: 'New record!',
+      online: 'online',
     },
   },
   he: {
@@ -1479,6 +1524,10 @@ const translations = {
       rank: 'דירוג',
       menu: 'תפריט',
       showControls: 'הקש להצגת פקדים',
+      loadingProfile: 'טוען פרופיל...',
+      rematch: 'משחק חוזר',
+      roomFull: 'החדר מלא. הצטרפת כצופה.',
+      selectLanguage: 'בחר שפה',
     },
     help: {
       title: 'עזרה מהירה',
@@ -1511,6 +1560,12 @@ const translations = {
       shieldEarned: '🛡️ מגן נפתח!',
       explanationTitle: '🔥 כוח הקומבו!',
       explanationText: 'מצאו מילים מהר כדי לבנות קומבו! קומבו גבוה = מכפיל ניקוד גדול. שמרו על הרצף!',
+    },
+    earthquake: {
+      warning: 'רעידת אדמה!',
+      brace: 'התכוננו!',
+      fireRound: 'סיבוב אש',
+      multiplier: 'מכפיל ×2',
     },
     spam: {
       warning: 'לאט! יותר מדי מילים לא תקינות',
@@ -1545,6 +1600,8 @@ const translations = {
       unmute: 'בטל השתקה',
       clickToEnable: 'לחצו כדי להפעיל מוזיקה',
       controls: 'בקרות מוזיקה',
+      musicVolumeSlider: 'החלקת עוצמת מוזיקה',
+      sfxVolumeSlider: 'החלקת עוצמת אפקטים',
     },
     share: {
       linkCopied: 'הקישור הועתק ללוח! 📋',
@@ -1572,6 +1629,8 @@ const translations = {
       unexpectedError: 'המשחק נתקל בשגיאה בלתי צפויה. אנא נסה לרענן את הדף.',
       errorDetails: 'פרטי שגיאה',
       refreshPage: 'רענן דף',
+      connectionTimeout: 'תם זמן החיבור',
+      rateLimited: 'יותר מדי בקשות. אנא האט.',
     },
     validation: {
       usernameRequired: 'שם משתמש נדרש! אנא מלא את השדה',
@@ -1593,6 +1652,7 @@ const translations = {
       wordRequired: 'נדרשת מילה',
       wordTooLong: 'המילה ארוכה מדי',
       wordInvalidChars: 'המילה מכילה תווים לא חוקיים',
+      gameCodeHint: 'הכנס את קוד המשחק ששותף על ידי המארח',
     },
     difficulty: {
       easy: 'קל',
@@ -1655,6 +1715,10 @@ const translations = {
       joining: 'מצטרף...',
       creating: 'יוצר...',
       playersOnline: 'מחוברים',
+      loadingProfile: 'טוען פרופיל...',
+      nickname: 'כינוי',
+      nicknamePlaceholder: 'הכנס את הכינוי שלך',
+      roomCode: 'קוד חדר',
       // שמות שחקנים מצחיקים - נבחרים באקראי כהצעות
       // Funny default player names - [Adjective] + [Food/Animal]
       defaultPlayerNames: [
@@ -1750,6 +1814,10 @@ const translations = {
       betweenRoundsStandings: 'דירוג נוכחי',
       nextRoundIn: 'הסיבוב הבא מתחיל בעוד',
       startNow: 'התחל עכשיו',
+      creatingTournament: 'יוצר טורניר...',
+      increaseRounds: 'הגדל מספר סיבובים',
+      decreaseRounds: 'הקטן מספר סיבובים',
+      resetFailed: 'איפוס המשחק נכשל',
     },
     playerView: {
       waitingForHost: 'ממתין למארח שיתחיל...',
@@ -1815,6 +1883,11 @@ const translations = {
         scoring: 'מחשב ניקוד...',
         finalizing: 'מסיים תוצאות...',
       },
+      rankings: 'דירוגים',
+      showLeaderboard: 'הצג לוח מובילים',
+      slowDown: 'האט! המילים מעובדות.',
+      submittingTooFast: 'אתה שולח מילים מהר מדי',
+      words: 'מילים',
     },
     hints: {
       hint: 'רמז',
@@ -1837,6 +1910,8 @@ const translations = {
       placeholder: 'הקלד הודעה...',
       noMessages: 'אין הודעות עדיין',
       startChatting: 'התחילו לשוחח!',
+      send: 'שלח הודעה',
+      newMessages: 'הודעות צ\'אט חדשות',
     },
     results: {
       gameOver: 'המשחק נגמר',
@@ -1882,6 +1957,8 @@ const translations = {
       duplicateRuleDisabled: 'עם 8+ שחקנים, מילים כפולות עדיין נספרות!',
       longest: 'הארוכה ביותר',
       accuracy: 'דיוק',
+      rankings: 'דירוגים',
+      yourWords: 'המילים שלך',
     },
     playerTitles: {
       champion: { name: 'אלוף', icon: '👑', description: 'מנצח המשחק' },
@@ -1985,6 +2062,7 @@ const translations = {
         tryIt: 'נסו לגרור אותיות בעצמכם!',
         gridExample: 'דוגמה לציור מילה על הלוח',
         traceExample: 'עקבו אחר אותיות כדי ליצור מילים - T→O→N→D',
+        play: 'נגן הדגמה',
       },
       combo: {
         currentCombo: 'קומבו נוכחי',
@@ -2660,6 +2738,11 @@ const translations = {
       challengeComplete: 'האתגר הושלם',
       noWordsFound: 'לא נמצאו מילים',
       achievementsNotSaved: 'הישגים במצב שחקן יחיד לא נשמרים בפרופיל שלך.',
+      botDetails: 'פרטי בוט',
+      difficulty: 'קושי',
+      timer: 'טיימר',
+      totalScore: 'ניקוד כולל',
+      wordsByLength: 'מילים לפי אורך',
     },
     challenge: {
       yourRecord: 'השיא שלך',
@@ -2679,6 +2762,10 @@ const translations = {
       improvement: 'שיפור',
       firstRecord: 'נקבע שיא ראשון!',
       shortOf: '{diff} נקודות מהשיא שלך',
+      settingRecord: 'קובע את השיא הראשון שלך!',
+      aheadOfRecord: '+{diff} מעל השיא!',
+      behindRecord: '{diff} להכות את השיא שלך',
+      tiedWithRecord: 'שוויון עם השיא שלך!',
     },
     rules: {
       pageTitle: 'לקסיקלאש: קרב מילים בזמן אמת',
@@ -2743,6 +2830,9 @@ const translations = {
     social: {
       playersOnline: 'שחקנים מחוברים',
       gamesNow: 'משחקים מתקיימים עכשיו',
+      games: 'משחקים',
+      newRecord: 'שיא חדש!',
+      online: 'מחוברים',
     },
   },
   sv: {
@@ -2849,6 +2939,10 @@ const translations = {
       rank: 'Rank',
       menu: 'Meny',
       showControls: 'Tryck för att visa kontroller',
+      loadingProfile: 'Laddar profil...',
+      rematch: 'Returmatch',
+      roomFull: 'Rummet är fullt. Du gick med som åskådare.',
+      selectLanguage: 'Välj språk',
     },
     help: {
       title: 'Snabbhjälp',
@@ -2881,6 +2975,12 @@ const translations = {
       shieldEarned: '🛡️ Sköld upplåst!',
       explanationTitle: '🔥 Kombokraft!',
       explanationText: 'Hitta ord snabbt för att bygga kombon! Högre kombo = större poängmultiplikator. Håll igång serien!',
+    },
+    earthquake: {
+      warning: 'Jordbävning!',
+      brace: 'Spänn dig!',
+      fireRound: 'Eldrunda',
+      multiplier: '2× Multiplikator',
     },
     spam: {
       warning: 'Sakta ner! För många ogiltiga ord',
@@ -2915,6 +3015,8 @@ const translations = {
       unmute: 'Ljud på',
       clickToEnable: 'Klicka för att aktivera musik',
       controls: 'Musikkontroller',
+      musicVolumeSlider: 'Musikvolymreglage',
+      sfxVolumeSlider: 'Ljudeffektvolymreglage',
     },
     share: {
       linkCopied: 'Länk kopierad! 📋',
@@ -2942,6 +3044,8 @@ const translations = {
       unexpectedError: 'Spelet stötte på ett oväntat fel. Försök uppdatera sidan.',
       errorDetails: 'Feldetaljer',
       refreshPage: 'Uppdatera sidan',
+      connectionTimeout: 'Anslutningen gick ut',
+      rateLimited: 'För många förfrågningar. Vänligen sakta ner.',
     },
     validation: {
       usernameRequired: 'Användarnamn krävs! Fyll i fältet',
@@ -2963,6 +3067,7 @@ const translations = {
       wordRequired: 'Ord krävs',
       wordTooLong: 'Ordet är för långt',
       wordInvalidChars: 'Ordet innehåller ogiltiga tecken',
+      gameCodeHint: 'Ange spelkoden som delades av värden',
     },
     difficulty: {
       easy: 'Lätt',
@@ -3025,6 +3130,10 @@ const translations = {
       joining: 'Går med...',
       creating: 'Skapar...',
       playersOnline: 'online',
+      loadingProfile: 'Laddar profil...',
+      nickname: 'Smeknamn',
+      nicknamePlaceholder: 'Ange ditt smeknamn',
+      roomCode: 'Rumskod',
       // Roliga standardnamn för spelare - [Adjective] + [Food/Animal]
       defaultPlayerNames: [
         // Adjective + Food (Swedish)
@@ -3118,6 +3227,10 @@ const translations = {
       betweenRoundsStandings: 'Aktuell ställning',
       nextRoundIn: 'Nästa omgång börjar om',
       startNow: 'Starta nu',
+      creatingTournament: 'Skapar turnering...',
+      increaseRounds: 'Öka antal omgångar',
+      decreaseRounds: 'Minska antal omgångar',
+      resetFailed: 'Misslyckades att återställa spelet',
     },
     playerView: {
       waitingForHost: 'Väntar på att värden ska starta...',
@@ -3183,6 +3296,11 @@ const translations = {
         scoring: 'Beräknar poäng...',
         finalizing: 'Slutför resultat...',
       },
+      rankings: 'Rankningar',
+      showLeaderboard: 'Visa topplistan',
+      slowDown: 'Sakta ner! Ord bearbetas.',
+      submittingTooFast: 'Du skickar ord för snabbt',
+      words: 'Ord',
     },
     hints: {
       hint: 'Ledtråd',
@@ -3205,6 +3323,8 @@ const translations = {
       placeholder: 'Skriv ett meddelande...',
       noMessages: 'Inga meddelanden ännu',
       startChatting: 'Börja chatta!',
+      send: 'Skicka meddelande',
+      newMessages: 'Nya chattmeddelanden',
     },
     results: {
       gameOver: 'Spelet slut',
@@ -3250,6 +3370,8 @@ const translations = {
       duplicateRuleDisabled: 'Med 8+ spelare räknas dubblettord fortfarande!',
       longest: 'Längsta',
       accuracy: 'Precision',
+      rankings: 'Rankningar',
+      yourWords: 'Dina ord',
     },
     playerTitles: {
       champion: { name: 'Mästare', icon: '👑', description: 'Spelets vinnare' },
@@ -3355,6 +3477,7 @@ const translations = {
         tryIt: 'Prova att dra bokstäver själv!',
         gridExample: 'Exempel på att spåra ett ord på rutnätet',
         traceExample: 'Spåra bokstäver för att bilda ord - T→O→N→D',
+        play: 'Spela demo',
       },
       // Combo system translations
       combo: {
@@ -4031,6 +4154,11 @@ const translations = {
       challengeComplete: 'Utmaning slutförd',
       noWordsFound: 'Inga ord hittade',
       achievementsNotSaved: 'Prestationer i enspelarläge sparas inte till din profil.',
+      botDetails: 'Bot-detaljer',
+      difficulty: 'Svårighetsgrad',
+      timer: 'Timer',
+      totalScore: 'Totalpoäng',
+      wordsByLength: 'Ord efter längd',
     },
     challenge: {
       yourRecord: 'Ditt rekord',
@@ -4050,6 +4178,10 @@ const translations = {
       improvement: 'förbättring',
       firstRecord: 'Första rekord satt!',
       shortOf: '{diff} poäng från ditt rekord',
+      settingRecord: 'Sätter ditt första rekord!',
+      aheadOfRecord: '+{diff} före rekordet!',
+      behindRecord: '{diff} för att slå ditt rekord',
+      tiedWithRecord: 'Lika med ditt rekord!',
     },
     rules: {
       pageTitle: 'LexiClash: Ordstrid i Realtid',
@@ -4114,6 +4246,9 @@ const translations = {
     social: {
       playersOnline: 'spelare online',
       gamesNow: 'spel pågår nu',
+      games: 'spel',
+      newRecord: 'Nytt rekord!',
+      online: 'online',
     },
   },
   ja: {
@@ -4219,6 +4354,10 @@ const translations = {
       rank: 'ランク',
       menu: 'メニュー',
       showControls: 'タップしてコントロールを表示',
+      loadingProfile: 'プロフィールを読み込み中...',
+      rematch: '再戦',
+      roomFull: 'ルームが満員です。観戦者として参加しました。',
+      selectLanguage: '言語を選択',
     },
     help: {
       title: 'クイックヘルプ',
@@ -4251,6 +4390,12 @@ const translations = {
       shieldEarned: '🛡️ シールド獲得！',
       explanationTitle: '🔥 コンボパワー！',
       explanationText: '素早く単語を見つけてコンボを築こう！コンボが高いほどスコア倍率アップ。連続を維持しよう！',
+    },
+    earthquake: {
+      warning: '地震！',
+      brace: '準備して！',
+      fireRound: 'ファイアラウンド',
+      multiplier: '2倍マルチプライヤー',
     },
     spam: {
       warning: 'スローダウン！無効な単語が多すぎます',
@@ -4285,6 +4430,8 @@ const translations = {
       unmute: 'ミュート解除',
       clickToEnable: 'クリックして音楽を有効にする',
       controls: '音楽コントロール',
+      musicVolumeSlider: '音楽ボリュームスライダー',
+      sfxVolumeSlider: '効果音ボリュームスライダー',
     },
     share: {
       linkCopied: 'リンクをコピーしました！📋',
@@ -4312,6 +4459,8 @@ const translations = {
       unexpectedError: 'ゲームで予期しないエラーが発生しました。ページを更新してみてください。',
       errorDetails: 'エラーの詳細',
       refreshPage: 'ページを更新',
+      connectionTimeout: '接続タイムアウト',
+      rateLimited: 'リクエストが多すぎます。速度を落としてください。',
     },
     validation: {
       usernameRequired: 'ユーザー名が必要です！フィールドに入力してください',
@@ -4333,6 +4482,7 @@ const translations = {
       wordRequired: '単語が必要です',
       wordTooLong: '単語が長すぎます',
       wordInvalidChars: '単語に無効な文字が含まれています',
+      gameCodeHint: 'ホストが共有したゲームコードを入力してください',
     },
     difficulty: {
       easy: '簡単',
@@ -4395,6 +4545,10 @@ const translations = {
       joining: '参加中...',
       creating: '作成中...',
       playersOnline: 'オンライン',
+      loadingProfile: 'プロフィールを読み込み中...',
+      nickname: 'ニックネーム',
+      nicknamePlaceholder: 'ニックネームを入力',
+      roomCode: 'ルームコード',
       // 面白いデフォルトプレイヤー名 - [Adjective] + [Food/Animal]
       defaultPlayerNames: [
         // Adjective + Food (Japanese)
@@ -4488,6 +4642,10 @@ const translations = {
       betweenRoundsStandings: '現在の順位',
       nextRoundIn: '次のラウンド開始まで',
       startNow: '今すぐ開始',
+      creatingTournament: 'トーナメント作成中...',
+      increaseRounds: 'ラウンド数を増やす',
+      decreaseRounds: 'ラウンド数を減らす',
+      resetFailed: 'ゲームのリセットに失敗しました',
     },
     playerView: {
       waitingForHost: 'ホストが開始するのを待っています...',
@@ -4553,6 +4711,11 @@ const translations = {
         scoring: 'スコアを計算中...',
         finalizing: '結果を確定中...',
       },
+      rankings: 'ランキング',
+      showLeaderboard: 'リーダーボードを表示',
+      slowDown: '速度を落としてください！単語を処理中です。',
+      submittingTooFast: '単語を送信するのが速すぎます',
+      words: '単語',
     },
     hints: {
       hint: 'ヒント',
@@ -4575,6 +4738,8 @@ const translations = {
       placeholder: 'メッセージを入力...',
       noMessages: 'まだメッセージがありません',
       startChatting: 'チャットを始めましょう！',
+      send: 'メッセージを送信',
+      newMessages: '新しいチャットメッセージ',
     },
     results: {
       gameOver: 'ゲームオーバー',
@@ -4620,6 +4785,8 @@ const translations = {
       duplicateRuleDisabled: '8人以上のプレイヤーでは、重複単語もカウントされます！',
       longest: '最長',
       accuracy: '正確性',
+      rankings: 'ランキング',
+      yourWords: 'あなたの単語',
     },
     playerTitles: {
       champion: { name: 'チャンピオン', icon: '👑', description: 'ゲームの勝者' },
@@ -4725,6 +4892,7 @@ const translations = {
         tryIt: '自分で文字をドラッグしてみてください！',
         gridExample: 'グリッド上で単語をトレースする例',
         traceExample: '文字をトレースして単語を形成 - T→O→N→D',
+        play: 'デモを再生',
       },
       // Combo system translations
       combo: {
@@ -5401,6 +5569,11 @@ const translations = {
       challengeComplete: 'チャレンジ完了',
       noWordsFound: '単語が見つかりません',
       achievementsNotSaved: 'シングルプレイヤーモードの実績はプロフィールに保存されません。',
+      botDetails: 'ボット詳細',
+      difficulty: '難易度',
+      timer: 'タイマー',
+      totalScore: '合計スコア',
+      wordsByLength: '長さ別の単語',
     },
     challenge: {
       yourRecord: 'あなたの記録',
@@ -5420,6 +5593,10 @@ const translations = {
       improvement: '改善',
       firstRecord: '初記録達成！',
       shortOf: '記録まであと{diff}点',
+      settingRecord: '初めての記録を設定中！',
+      aheadOfRecord: '記録より+{diff}リード！',
+      behindRecord: '記録を破るまであと{diff}',
+      tiedWithRecord: '記録と同点！',
     },
     rules: {
       pageTitle: 'LexiClash: リアルタイム単語バトル',
@@ -5484,6 +5661,9 @@ const translations = {
     social: {
       playersOnline: 'オンラインプレイヤー',
       gamesNow: '進行中のゲーム',
+      games: 'ゲーム',
+      newRecord: '新記録！',
+      online: 'オンライン',
     },
   },
   es: {
@@ -5588,6 +5768,10 @@ const translations = {
       rank: 'Puesto',
       menu: 'Menú',
       showControls: 'Toca para mostrar controles',
+      loadingProfile: 'Cargando perfil...',
+      rematch: 'Revancha',
+      roomFull: 'La sala está llena. Te has unido como espectador.',
+      selectLanguage: 'Seleccionar idioma',
     },
     help: {
       title: 'Ayuda Rápida',
@@ -5618,6 +5802,12 @@ const translations = {
     combo: {
       shieldUsed: '🛡️ ¡Escudo de Combo Usado!',
       shieldEarned: '🛡️ ¡Escudo Ganado!',
+    },
+    earthquake: {
+      warning: '¡Terremoto!',
+      brace: '¡Prepárate!',
+      fireRound: 'Ronda de Fuego',
+      multiplier: 'Multiplicador ×2',
     },
     spam: {
       warning: '¡Más despacio! Demasiadas palabras inválidas',
@@ -5652,6 +5842,8 @@ const translations = {
       unmute: 'Activar sonido',
       clickToEnable: 'Haz clic en cualquier lugar para activar la música',
       controls: 'Controles de Música',
+      musicVolumeSlider: 'Control de volumen de música',
+      sfxVolumeSlider: 'Control de volumen de efectos de sonido',
     },
     share: {
       linkCopied: '¡Enlace copiado! 📋',
@@ -5679,6 +5871,8 @@ const translations = {
       unexpectedError: 'El juego encontró un error inesperado. Por favor intenta actualizar la página.',
       errorDetails: 'Detalles del Error',
       refreshPage: 'Actualizar Página',
+      connectionTimeout: 'Tiempo de conexión agotado',
+      rateLimited: 'Demasiadas solicitudes. Por favor, reduce la velocidad.',
     },
     validation: {
       usernameRequired: '¡Se requiere nombre de usuario! Por favor completa el campo',
@@ -5700,6 +5894,7 @@ const translations = {
       wordRequired: 'Se requiere palabra',
       wordTooLong: 'La palabra es demasiado larga',
       wordInvalidChars: 'La palabra contiene caracteres inválidos',
+      gameCodeHint: 'Ingresa el código de juego compartido por el anfitrión',
     },
     difficulty: {
       easy: 'Fácil',
@@ -5761,6 +5956,10 @@ const translations = {
       joining: 'Uniéndose...',
       creating: 'Creando...',
       playersOnline: 'en línea',
+      loadingProfile: 'Cargando perfil...',
+      nickname: 'Apodo',
+      nicknamePlaceholder: 'Ingresa tu apodo',
+      roomCode: 'Código de sala',
       defaultPlayerNames: [
         'Pepinillo Astuto', 'Papa Disco', 'Banana Cósmica', 'Waffle Esponjoso', 'Taco Crujiente',
         'Mochi Suave', 'Pretzel Retorcido', 'Galleta Gruesa', 'Donut Pegajoso', 'Aguacate Picante',
@@ -5851,6 +6050,10 @@ const translations = {
       betweenRoundsStandings: 'Clasificación Actual',
       nextRoundIn: 'Siguiente ronda comienza en',
       startNow: 'Comenzar Ahora',
+      creatingTournament: 'Creando torneo...',
+      increaseRounds: 'Aumentar número de rondas',
+      decreaseRounds: 'Disminuir número de rondas',
+      resetFailed: 'Error al reiniciar el juego',
     },
     playerView: {
       waitingForHost: 'Esperando que el anfitrión inicie...',
@@ -5915,6 +6118,11 @@ const translations = {
         scoring: 'Calculando puntuaciones...',
         finalizing: 'Finalizando resultados...',
       },
+      rankings: 'Clasificaciones',
+      showLeaderboard: 'Mostrar tabla de líderes',
+      slowDown: '¡Más despacio! Las palabras se están procesando.',
+      submittingTooFast: 'Estás enviando palabras demasiado rápido',
+      words: 'Palabras',
     },
     hints: {
       hint: 'Pista',
@@ -5937,6 +6145,8 @@ const translations = {
       placeholder: 'Escribe un mensaje...',
       noMessages: 'Aún no hay mensajes',
       startChatting: '¡Comienza a chatear!',
+      send: 'Enviar mensaje',
+      newMessages: 'Nuevos mensajes de chat',
     },
     results: {
       gameOver: 'Juego Terminado',
@@ -5982,6 +6192,8 @@ const translations = {
       duplicateRuleDisabled: '¡Con 8+ jugadores, las palabras duplicadas sí cuentan!',
       longest: 'Más Larga',
       accuracy: 'Precisión',
+      rankings: 'Clasificaciones',
+      yourWords: 'Tus palabras',
     },
     playerTitles: {
       champion: { name: 'Campeón', icon: '👑', description: 'Ganador del juego' },
@@ -6085,6 +6297,7 @@ const translations = {
         tryIt: '¡Intenta arrastrar letras tú mismo!',
         gridExample: 'Ejemplo de trazar una palabra en el tablero',
         traceExample: 'Traza letras para formar palabras',
+        play: 'Reproducir demo',
       },
       combo: {
         currentCombo: 'Combo Actual',
@@ -6505,6 +6718,11 @@ const translations = {
       challengeComplete: 'Desafío Completo',
       noWordsFound: 'No se encontraron palabras',
       achievementsNotSaved: 'Los logros en modo un jugador no se guardan en tu perfil.',
+      botDetails: 'Detalles del bot',
+      difficulty: 'Dificultad',
+      timer: 'Temporizador',
+      totalScore: 'Puntuación total',
+      wordsByLength: 'Palabras por longitud',
     },
     challenge: {
       yourRecord: 'Tu Récord',
@@ -6524,6 +6742,10 @@ const translations = {
       improvement: 'mejora',
       firstRecord: '¡Primer Récord Establecido!',
       shortOf: '{diff} puntos por debajo de tu récord',
+      settingRecord: '¡Estableciendo tu primer récord!',
+      aheadOfRecord: '¡+{diff} por delante del récord!',
+      behindRecord: '{diff} para superar tu récord',
+      tiedWithRecord: '¡Empatado con tu récord!',
     },
     rules: {
       pageTitle: 'LexiClash: Batalla de Palabras en Tiempo Real',
@@ -6583,6 +6805,9 @@ const translations = {
     social: {
       playersOnline: 'jugadores en línea',
       gamesNow: 'partidas en curso',
+      games: 'juegos',
+      newRecord: '¡Nuevo récord!',
+      online: 'en línea',
     },
   }
 };

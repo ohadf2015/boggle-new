@@ -25,7 +25,7 @@ export interface EarthquakeConfig {
  */
 export const DEFAULT_EARTHQUAKE_CONFIG: EarthquakeConfig = {
   enabled: true,
-  triggerPercentageMin: 0.8,
+  triggerPercentageMin: 0.76, // Last 24% of game
   triggerPercentageMax: 1.0,
   warningDurationMs: 2000,
   shakeDurationMs: 1000,

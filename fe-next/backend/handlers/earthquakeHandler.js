@@ -3,7 +3,7 @@
  * Coordinates earthquake/fire round events for multiplayer games.
  *
  * Features:
- * - Host-initiated earthquake trigger (80-100% of game elapsed)
+ * - Host-initiated earthquake trigger (76-100% of game elapsed, at least 20 sec before end)
  * - Synchronized earthquake sequence across all players:
  *   1. Warning phase (2 seconds)
  *   2. Shake phase (1 second)

@@ -8,7 +8,6 @@ import { FaGamepad, FaTrophy, FaLightbulb, FaClock, FaUsers, FaStar, FaArrowLeft
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import Header from '@/components/Header';
-import Footer from '@/components/Footer';
 import { useLanguage } from '@/contexts/LanguageContext';
 
 // Dynamically import InteractiveGridDemo
@@ -498,8 +497,6 @@ export default function RulesPage(): React.JSX.Element {
                     </Link>
                 </div>
             </main>
-
-            <Footer />
         </div>
     );
 }

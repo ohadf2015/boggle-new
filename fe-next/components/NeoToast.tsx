@@ -43,6 +43,7 @@ interface WordAcceptedOptions {
   comboBonus?: number;
   comboLevel?: number;
   comboBonusLabel?: string;
+  fireRoundActive?: boolean;
   duration?: number;
 }
 
@@ -108,7 +109,7 @@ interface LevelUpOptions {
 
 // Neo-Brutalist Word Accepted Toast
 export const wordAcceptedToast = (word: string, options: WordAcceptedOptions = {}): string => {
-  const { score, comboBonus, comboLevel, duration } = options;
+  const { score, comboBonus, comboLevel, fireRoundActive, duration } = options;
 
   return toast.custom(
     (t) => (
@@ -142,6 +143,17 @@ export const wordAcceptedToast = (word: string, options: WordAcceptedOptions = {
                 className="px-2 py-1 bg-neo-cyan border-2 border-neo-black rounded font-black text-sm text-neo-black"
               >
                 +{score}
+              </motion.span>
+            )}
+            {/* Show fire round 2x multiplier badge */}
+            {fireRoundActive && (
+              <motion.span
+                initial={{ scale: 0, rotate: -10 }}
+                animate={{ scale: 1, rotate: 0 }}
+                transition={{ delay: 0.2, type: 'spring', stiffness: 400, damping: 15 }}
+                className="px-2 py-1 bg-gradient-to-r from-neo-orange to-neo-red border-2 border-neo-black rounded font-black text-xs text-neo-cream"
+              >
+                🔥 ×2
               </motion.span>
             )}
             {/* Show combo bonus if present */}

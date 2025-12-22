@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import Header from './Header';
 import { useMobileLandscape } from '../hooks/useMobileLandscape';
 import { useAutoHideControls } from '../hooks/useAutoHideControls';
+import { useScrollDirection } from '../hooks/useScrollDirection';
 
 interface AutoHideHeaderProps {
   className?: string;
@@ -18,13 +19,19 @@ interface AutoHideHeaderProps {
  * Behavior:
  * - Portrait/Desktop: Header is always visible (normal behavior)
  * - Landscape Mobile: Header auto-hides after 3 seconds
- *   - Shows on touch/scroll/mousemove
+ *   - Shows ONLY when scrolling UP
  *   - Can be pinned to stay visible (click header or Ctrl+H/Cmd+H)
  *   - Slides up/down with animation (respects prefers-reduced-motion)
  */
 export function AutoHideHeader({ className, onVisibilityChange }: AutoHideHeaderProps) {
   const isLandscape = useMobileLandscape();
   const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
+
+  // Track scroll direction for landscape mode
+  const { scrollDirection } = useScrollDirection({
+    threshold: 10,
+    enabled: isLandscape,
+  });
 
   // Check for reduced motion preference
   useEffect(() => {
@@ -55,24 +62,15 @@ export function AutoHideHeader({ className, onVisibilityChange }: AutoHideHeader
     }
   }, [isLandscape, isVisible, isPinned, onVisibilityChange]);
 
-  // Show header on scroll/touch/mousemove in landscape mode
+  // Show header ONLY when scrolling UP in landscape mode
   useEffect(() => {
     if (!isLandscape) return;
 
-    const handleInteraction = () => showHeader();
-
-    window.addEventListener('scroll', handleInteraction, { passive: true });
-    window.addEventListener('touchstart', handleInteraction, { passive: true });
-    window.addEventListener('touchmove', handleInteraction, { passive: true });
-    window.addEventListener('mousemove', handleInteraction, { passive: true });
-
-    return () => {
-      window.removeEventListener('scroll', handleInteraction);
-      window.removeEventListener('touchstart', handleInteraction);
-      window.removeEventListener('touchmove', handleInteraction);
-      window.removeEventListener('mousemove', handleInteraction);
-    };
-  }, [isLandscape, showHeader]);
+    // Only show header when scrolling up
+    if (scrollDirection === 'up') {
+      showHeader();
+    }
+  }, [isLandscape, scrollDirection, showHeader]);
 
   // Keyboard shortcut (Ctrl+H / Cmd+H) to toggle header visibility
   useEffect(() => {
@@ -102,7 +100,7 @@ export function AutoHideHeader({ className, onVisibilityChange }: AutoHideHeader
     <>
       {/* ARIA live region for screen reader announcements */}
       <div role="status" aria-live="polite" className="sr-only">
-        {headerVisible ? 'Header visible' : 'Header hidden. Press Ctrl+H to show.'}
+        {headerVisible ? 'Header visible' : 'Header hidden. Scroll up or press Ctrl+H to show.'}
       </div>
 
       {/* Fixed header container for landscape */}
@@ -144,13 +142,12 @@ export function AutoHideHeader({ className, onVisibilityChange }: AutoHideHeader
         )}
       </AnimatePresence>
 
-      {/* Touch target to reveal header when hidden */}
+      {/* Touch target to reveal header when hidden (scroll up also works) */}
       {!headerVisible && (
         <button
           className="fixed top-0 left-0 right-0 h-12 z-40 bg-transparent border-none cursor-pointer"
-          onTouchStart={showHeader}
           onClick={showHeader}
-          aria-label="Show header (or press Ctrl+H)"
+          aria-label="Show header (scroll up or press Ctrl+H)"
         />
       )}
     </>

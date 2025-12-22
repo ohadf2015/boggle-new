@@ -13,6 +13,7 @@ interface UseHostWordEventsProps {
   t: (key: string) => string;
   hostPlaying: boolean;
   playComboSound: (level: number) => void;
+  fireRoundActive?: boolean;
 
   // State setters
   setHostFoundWords: React.Dispatch<React.SetStateAction<string[]>>;
@@ -34,6 +35,7 @@ export function useHostWordEvents({
   t,
   hostPlaying,
   playComboSound,
+  fireRoundActive = false,
   setHostFoundWords,
   setWordsForBoard,
   comboLevelRef,
@@ -98,6 +100,7 @@ export function useHostWordEvents({
       comboBonus: data.comboBonus || 0,
       comboLevel: data.comboLevel || 0,
       comboBonusLabel: t('common.comboBonus'),
+      fireRoundActive,
       duration: 2000
     });
   }, [hostPlaying, playComboSound, setComboLevel, setLastWordTime, comboLevelRef, lastWordTimeRef, comboTimeoutRef, t, resetCombo]);

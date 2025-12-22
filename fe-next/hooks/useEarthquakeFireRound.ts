@@ -16,7 +16,7 @@ import { DEFAULT_EARTHQUAKE_CONFIG } from '@/shared/types/earthquake';
  * Manages earthquake/fire round feature for both single-player and multiplayer modes.
  *
  * Features:
- * - Triggers randomly in last 20% of game (80-100% elapsed)
+ * - Triggers randomly in last 24% of game (76-100% elapsed), but at least 20 sec before end
  * - Warning phase (2s) → Shake phase (1s) → Fire round (15s)
  * - 2x score multiplier during fire round
  * - Complete grid regeneration with new embedded words
@@ -64,7 +64,7 @@ export function useEarthquakeFireRound(
   const warningTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const shakeTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Calculate trigger time (random time in last 20% of game)
+  // Calculate trigger time (random time in last 24% of game, but at least 20 sec before end)
   useEffect(() => {
     if (!enabled || triggerTimeRef.current !== null) return;
 
@@ -74,9 +74,21 @@ export function useEarthquakeFireRound(
       return;
     }
 
-    // Calculate random trigger time between 80-100% of game elapsed
+    // Calculate trigger window: 76% elapsed to (total - 20 sec) elapsed
+    // Min: 76% of game has elapsed (last 24% window)
     const minTriggerElapsed = gameDurationSeconds * config.triggerPercentageMin;
-    const maxTriggerElapsed = gameDurationSeconds * config.triggerPercentageMax;
+    // Max: At least 20 seconds before game ends
+    const maxTriggerElapsed = Math.min(
+      gameDurationSeconds * config.triggerPercentageMax,
+      gameDurationSeconds - 20
+    );
+
+    // Ensure we have a valid window
+    if (maxTriggerElapsed <= minTriggerElapsed) {
+      console.log('[Earthquake] Invalid trigger window, earthquake disabled');
+      return;
+    }
+
     const randomElapsed =
       minTriggerElapsed + Math.random() * (maxTriggerElapsed - minTriggerElapsed);
 

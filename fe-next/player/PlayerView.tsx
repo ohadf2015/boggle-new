@@ -177,6 +177,7 @@ const PlayerView: React.FC<PlayerViewProps> = memo(({
     username,
     queueAchievement,
     playComboSound,
+    fireRoundActive,
     onShowResults,
     setPlayersReady,
     setShufflingGrid,

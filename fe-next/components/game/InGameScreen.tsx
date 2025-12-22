@@ -161,10 +161,18 @@ const InGameScreen = memo<InGameScreenProps>(({
   });
 
   // Show controls on scroll/touch/mousemove in landscape mode
+  // BUT NOT when interacting with the game board
   useEffect(() => {
     if (!isLandscape) return;
 
-    const handleInteraction = () => showControls();
+    const handleInteraction = (e: Event) => {
+      // Don't show controls if interacting with the grid/board
+      const target = e.target as HTMLElement;
+      if (target.closest('.landscape-grid-container') || target.closest('.game-board-frame-landscape')) {
+        return;
+      }
+      showControls();
+    };
 
     window.addEventListener('scroll', handleInteraction, { passive: true });
     window.addEventListener('touchstart', handleInteraction, { passive: true });
@@ -406,7 +414,7 @@ const InGameScreen = memo<InGameScreenProps>(({
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.8 }}
                 onClick={showControls}
-                className="absolute top-3 right-3 z-40 flex items-center gap-1.5 px-2.5 py-1.5 bg-neo-navy/80 border-2 border-neo-cream/30 rounded-neo shadow-hard-sm backdrop-blur-sm cursor-pointer hover:bg-neo-navy hover:border-neo-cream/50 transition-colors min-h-[44px] min-w-[44px]"
+                className="absolute top-3 right-3 z-40 flex items-center gap-1.5 px-2.5 py-1.5 bg-neo-navy border-2 border-neo-cream rounded-neo shadow-hard-sm cursor-pointer hover:bg-neo-purple transition-colors min-h-[44px] min-w-[44px]"
                 aria-label={t('common.showControls') || 'Tap to show controls'}
               >
                 <motion.span
@@ -414,7 +422,7 @@ const InGameScreen = memo<InGameScreenProps>(({
                   transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
                   className="w-2 h-2 rounded-full bg-neo-cyan"
                 />
-                <span className="text-xs font-bold text-neo-cream/80 uppercase tracking-wide">
+                <span className="text-xs font-bold text-neo-cream uppercase tracking-wide">
                   {t('common.menu') || 'Menu'}
                 </span>
               </motion.button>
@@ -440,7 +448,7 @@ const InGameScreen = memo<InGameScreenProps>(({
             {onExitRoom && (
               <button
                 onClick={onExitRoom}
-                className="w-11 h-11 bg-neo-red/90 border-2 border-neo-black rounded-neo text-neo-cream text-base font-bold shadow-hard-sm flex items-center justify-center hover:bg-neo-red active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all"
+                className="w-11 h-11 bg-neo-red border-2 border-neo-black rounded-neo text-neo-cream text-base font-bold shadow-hard-sm flex items-center justify-center hover:brightness-110 active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all"
                 aria-label={t('playerView.exit') || 'Exit'}
               >
                 ✕
@@ -452,7 +460,7 @@ const InGameScreen = memo<InGameScreenProps>(({
               {/* Help Button (44px WCAG minimum touch target) */}
               <button
                 onClick={() => setShowHelpPanel(true)}
-                className="w-11 h-11 bg-neo-purple/90 border-2 border-neo-black rounded-neo text-neo-cream text-base font-bold shadow-hard-sm flex items-center justify-center hover:bg-neo-purple active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all"
+                className="w-11 h-11 bg-neo-purple border-2 border-neo-black rounded-neo text-neo-cream text-base font-bold shadow-hard-sm flex items-center justify-center hover:brightness-110 active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all"
                 aria-label={t('help.title') || 'Help'}
               >
                 ?
@@ -462,7 +470,7 @@ const InGameScreen = memo<InGameScreenProps>(({
               {controlsPinned && (
                 <button
                   onClick={toggleControlsPin}
-                  className="w-11 h-11 bg-neo-yellow/90 border-2 border-neo-black rounded-neo text-neo-black text-sm font-bold shadow-hard-sm flex items-center justify-center hover:bg-neo-yellow cursor-pointer"
+                  className="w-11 h-11 bg-neo-yellow border-2 border-neo-black rounded-neo text-neo-black text-sm font-bold shadow-hard-sm flex items-center justify-center hover:brightness-110 cursor-pointer"
                   title="Unpin controls"
                   aria-label="Unpin controls"
                 >
