@@ -91,7 +91,7 @@ export function useEarthquakeFireRound(
 
   // Generate new grid for fire round
   const generateNewGrid = useCallback(() => {
-    const difficultyConfig = DIFFICULTIES[difficulty] || DIFFICULTIES.medium;
+    const difficultyConfig = DIFFICULTIES[difficulty] || DIFFICULTIES.MEDIUM;
     const newGrid = generateRandomTable(
       difficultyConfig.rows,
       difficultyConfig.cols,

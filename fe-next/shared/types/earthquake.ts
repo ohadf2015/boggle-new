@@ -1,4 +1,4 @@
-import type { LetterGrid, Language } from '@/types';
+import type { LetterGrid, Language, DifficultyLevel } from '@/types';
 import type { Socket } from 'socket.io-client';
 
 /**
@@ -53,7 +53,7 @@ export interface UseEarthquakeFireRoundOptions {
   gameDurationSeconds: number;
   currentTimeSeconds: number;
   language: Language;
-  difficulty: string;
+  difficulty: DifficultyLevel;
 
   // Mode-specific
   mode: 'singleplayer' | 'multiplayer';
