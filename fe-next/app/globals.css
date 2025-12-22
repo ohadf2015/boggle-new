@@ -98,12 +98,17 @@
   --avatar-15: #FF6F61;
 }
 
+html {
+  overflow-x: hidden;
+}
+
 body {
   background: #0f172a; /* slate-900 - matches page gradients */
   color: var(--foreground);
   font-family: var(--font-rubik), 'Rubik', Arial, Helvetica, sans-serif;
   margin: 0;
   padding: 0;
+  overflow-x: hidden;
   /* Halftone texture overlay on body */
   background-image: var(--halftone-pattern);
   background-color: #0f172a; /* slate-900 */
@@ -1745,7 +1750,7 @@ body {
     height: 94dvh;
     max-height: 94dvh;
     aspect-ratio: 1 / 1;
-    padding: 6px;
+    padding: 4px;
   }
 
   /* Ensure grid cells have adequate minimum size in landscape */
@@ -1864,7 +1869,7 @@ body {
     max-width: min(100%, 96dvh);
     height: 96dvh;
     max-height: 96dvh;
-    padding: 4px;
+    padding: 2px;
   }
 
   /* Full-height mode - even larger on short screens */

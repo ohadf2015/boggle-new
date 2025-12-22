@@ -61,7 +61,7 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
             animate={{ y: 0, opacity: 1, rotate: 0 }}
             transition={{ duration: 0.4, ease: [0.68, -0.55, 0.265, 1.55] }}
             className={cn(
-                "w-full mb-2 sm:mb-4 px-3 sm:px-4 pt-3 sm:pt-4 pb-2 sticky top-0 z-50 bg-slate-50 dark:bg-slate-900",
+                "w-full mb-2 sm:mb-4 px-2 xs:px-3 sm:px-4 pt-3 sm:pt-4 pb-2 sticky top-0 z-50 bg-slate-50 dark:bg-slate-900 overflow-x-hidden",
                 className
             )}
         >
@@ -70,12 +70,13 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                 className="
                     max-w-6xl mx-auto
                     flex items-center justify-between
-                    px-2 xs:px-4 sm:px-6 py-2 xs:py-3 sm:py-4
+                    px-1 xs:px-2 sm:px-4 md:px-6 py-2 xs:py-3 sm:py-4
                     bg-neo-cyan-muted
                     border-4 border-neo-black
                     shadow-hard-lg
                     rounded-neo-lg
                     transition-all duration-100
+                    min-w-0
                 "
             >
                 {/* Logo */}
@@ -87,7 +88,7 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                     aria-label={t('common.goToHome') || 'Go to home page'}
                 >
                     <h1
-                        className="text-xl xs:text-2xl sm:text-4xl font-black uppercase tracking-tight flex items-center gap-0.5 xs:gap-1"
+                        className="text-lg xs:text-xl sm:text-2xl md:text-4xl font-black uppercase tracking-tight flex items-center gap-0.5 xs:gap-1 flex-shrink min-w-0"
                         style={{ fontFamily }}
                     >
                         {/* LEXI - Neo-Brutalist white with black shadow */}
@@ -124,7 +125,7 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                 </motion.button>
 
                 {/* Controls: Language + Admin + Level + Music + Auth/Settings */}
-                <div className="flex items-center gap-1 xs:gap-1.5 sm:gap-3 flex-shrink-0">
+                <div className="flex items-center gap-0.5 xs:gap-1 sm:gap-1.5 md:gap-3 flex-shrink-0 min-w-0">
                     {/* Language Switcher */}
                     <div
                         className="relative"
@@ -135,7 +136,7 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                             onClick={() => setShowLangDropdown(!showLangDropdown)}
                             className={cn(
                                 "flex items-center justify-center gap-1",
-                                "w-9 h-9 xs:w-10 xs:h-10 sm:w-11 sm:h-11",
+                                "min-w-[44px] min-h-[44px] w-11 h-11 xs:w-12 xs:h-12 sm:w-11 sm:h-11",
                                 "bg-neo-cream text-neo-black",
                                 "border-2 sm:border-3 border-neo-black",
                                 "rounded-neo shadow-hard",
@@ -191,7 +192,7 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                             href={`/${language}/admin`}
                             className="
                                 flex items-center justify-center
-                                w-9 h-9 xs:w-10 xs:h-10 sm:w-11 sm:h-11
+                                min-w-[44px] min-h-[44px] w-11 h-11 xs:w-12 xs:h-12 sm:w-11 sm:h-11
                                 bg-neo-purple text-white
                                 border-2 sm:border-3 border-neo-black
                                 rounded-neo

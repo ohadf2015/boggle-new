@@ -31,7 +31,7 @@ const LandingView: React.FC = () => {
   if (isLandscape) {
     return (
       <main
-        className="flex h-screen w-full items-center justify-center bg-slate-900 p-4 gap-4"
+        className="flex h-screen w-full items-center justify-center bg-slate-900 p-2 sm:p-4 gap-2 sm:gap-4 overflow-x-hidden"
         role="main"
         aria-label="Game mode selection"
       >
@@ -85,7 +85,7 @@ const LandingView: React.FC = () => {
       <SocialProof variant="banner" />
 
       {/* Main content */}
-      <main className="max-w-6xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
+      <main className="max-w-6xl mx-auto px-2 xs:px-4 sm:px-6 py-8 sm:py-12 overflow-x-hidden">
         {/* Hero section */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
