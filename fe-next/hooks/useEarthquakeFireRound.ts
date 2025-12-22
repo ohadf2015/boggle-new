@@ -155,7 +155,6 @@ export function useEarthquakeFireRound(
 
     warningTimeoutRef.current = setTimeout(() => {
       console.log('[Earthquake] SHAKE phase');
-      onTimerResume?.(); // Resume game timer when shake starts
 
       // Phase 2: SHAKING (1 second)
       setEarthquakeState('shaking');
@@ -172,6 +171,9 @@ export function useEarthquakeFireRound(
         setFireRoundActive(true);
         setFireRoundRemaining(config.fireRoundDurationSeconds);
         onFireRoundStart?.();
+
+        // Resume game timer AFTER new letters are in place
+        onTimerResume?.();
 
         // Start fire round countdown
         let remaining = config.fireRoundDurationSeconds;

@@ -94,6 +94,11 @@ Follow this systematic approach to refactor code: **$ARGUMENTS**
     - Test integration with dependent systems
     - Verify all functionality works as expected
     - Test edge cases and error scenarios
+    - **Run multiplayer e2e tests** (critical for multiplayer features):
+      ```bash
+      cd fe-next && npx playwright test e2e/multiplayer-game-start.spec.ts --project=chromium --timeout=120000
+      ```
+      Required: 5/6 tests must pass (late join test may fail independently)
 
 15. **Code Review Preparation**
     - Review all changes for quality and consistency

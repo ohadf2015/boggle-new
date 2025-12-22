@@ -69,7 +69,7 @@ const LandingView: React.FC = () => {
           className="absolute bottom-4 right-4 flex items-center gap-2 px-4 py-3 bg-neo-yellow text-neo-black font-bold text-lg border-3 border-neo-black rounded-neo min-h-[48px] shadow-hard hover:shadow-hard-lg hover:translate-x-[-1px] hover:translate-y-[-1px] active:translate-x-[1px] active:translate-y-[1px] active:shadow-hard-sm transition-all z-10"
           aria-label={t('joinView.howToPlay') || 'How to Play'}
         >
-          <FaQuestionCircle className="text-lg" aria-hidden="true" />
+          <FaQuestionCircle className="w-5 h-5 sm:w-6 sm:h-6" aria-hidden="true" />
           <span className="hidden sm:inline">{t('joinView.howToPlay') || 'How to Play'}</span>
         </Link>
       </main>
@@ -158,7 +158,7 @@ const LandingView: React.FC = () => {
               transition-all duration-100
             "
           >
-            <FaQuestionCircle className="text-lg sm:text-xl" />
+            <FaQuestionCircle className="w-5 h-5 sm:w-6 sm:h-6" />
             {t('joinView.howToPlay') || 'How to Play?'}
           </Link>
         </motion.div>

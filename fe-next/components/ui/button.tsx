@@ -21,8 +21,9 @@ const buttonVariants = cva(
     "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy",
     // Disabled state
     "disabled:pointer-events-none disabled:opacity-50 disabled:translate-x-0 disabled:translate-y-0",
-    // SVG icons
-    "[&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
+    // SVG icons - responsive sizes
+    "[&_svg]:pointer-events-none [&_svg]:shrink-0",
+    "[&_svg]:w-5 [&_svg]:h-5",
   ].join(" "),
   {
     variants: {
@@ -59,10 +60,10 @@ const buttonVariants = cva(
         cyan: "bg-neo-cyan text-neo-black hover:brightness-110",
       },
       size: {
-        default: "h-11 px-5 py-2",
-        sm: "h-9 px-4 text-xs",
-        lg: "h-14 px-8 text-base",
-        icon: "h-11 w-11 p-0",
+        default: "h-11 px-5 py-2 [&_svg]:w-5 [&_svg]:h-5",
+        sm: "h-9 px-4 text-xs [&_svg]:w-4 [&_svg]:h-4",
+        lg: "h-14 px-8 text-base [&_svg]:w-6 [&_svg]:h-6",
+        icon: "h-11 w-11 p-0 [&_svg]:w-5 [&_svg]:h-5",
       },
     },
     defaultVariants: {

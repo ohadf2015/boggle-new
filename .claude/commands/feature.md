@@ -132,7 +132,13 @@ Clean up while keeping tests green.
    npm test
    ```
 
-4. Show summary of changes:
+4. **Run multiplayer e2e tests** (if changes affect multiplayer, socket events, or game state):
+   ```bash
+   cd fe-next && npx playwright test e2e/multiplayer-game-start.spec.ts --project=chromium --timeout=120000
+   ```
+   Expected: 5/6 tests pass (verifies multiplayer sync fix remains working)
+
+5. Show summary of changes:
    ```bash
    git diff --stat
    ```

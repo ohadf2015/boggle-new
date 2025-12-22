@@ -148,7 +148,17 @@ function handlePlayerDisconnect(io, socket, game, gameCode, username, reason) {
     game.users[username].disconnected = true;
     game.users[username].disconnectedAt = Date.now();
 
-    // Notify other players
+    // Check if room is now empty (all players disconnected)
+    if (isRoomEmpty(gameCode)) {
+      logger.info('SOCKET', `Room ${gameCode} is empty after ${username} disconnected - closing immediately`);
+      timerManager.clearGameTimer(gameCode);
+      botManager.stopAllBots(gameCode);
+      deleteGame(gameCode);
+      io.emit('activeRooms', { rooms: getActiveRooms() });
+      return;
+    }
+
+    // Room still has active players - notify and start reconnection grace period
     broadcastToRoom(io, getGameRoom(gameCode), 'playerDisconnected', {
       username,
       message: `${username} disconnected. Waiting for reconnection...`
@@ -164,7 +174,7 @@ function handlePlayerDisconnect(io, socket, game, gameCode, username, reason) {
         logger.info('SOCKET', `Player ${username} reconnection timeout - removing from game ${gameCode}`);
 
         // Clean up player data
-        cleanupPlayerData(gameCode, username);
+        cleanupPlayerData(currentGame, username);
         removeUserFromGame(gameCode, username);
 
         // Check if room is now empty and close it immediately

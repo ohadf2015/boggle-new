@@ -17,7 +17,8 @@ const {
   resetGameForNewRound,
   getAuthUserConnection,
   transitionGameState,
-  canTransitionGameState
+  canTransitionGameState,
+  isRoomEmpty
 } = require('../modules/gameStateManager');
 
 const {
@@ -446,11 +447,21 @@ async function handleExistingAuthConnection(io, socket, authUserId, gameCode) {
   } else {
     const { removeUserFromGame } = require('../modules/gameStateManager');
     removeUserFromGame(existingConnection.gameCode, existingConnection.username);
-    const oldGame = getGame(existingConnection.gameCode);
-    if (oldGame) {
-      broadcastToRoom(io, getGameRoom(existingConnection.gameCode), 'updateUsers', {
-        users: getGameUsers(existingConnection.gameCode)
-      });
+
+    // Check if old room is now empty and close it immediately
+    if (isRoomEmpty(existingConnection.gameCode)) {
+      logger.info('SOCKET', `Old room ${existingConnection.gameCode} is empty after player switch - closing immediately`);
+      timerManager.clearGameTimer(existingConnection.gameCode);
+      botManager.stopAllBots(existingConnection.gameCode);
+      deleteGame(existingConnection.gameCode);
+      io.emit('activeRooms', { rooms: getActiveRooms() });
+    } else {
+      const oldGame = getGame(existingConnection.gameCode);
+      if (oldGame) {
+        broadcastToRoom(io, getGameRoom(existingConnection.gameCode), 'updateUsers', {
+          users: getGameUsers(existingConnection.gameCode)
+        });
+      }
     }
   }
 

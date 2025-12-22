@@ -112,15 +112,15 @@ const GridComponent = memo<GridComponentProps>(({
   const [glowingCells, setGlowingCells] = useState<Set<string>>(new Set());
   const [cellColorIndices, setCellColorIndices] = useState<Map<string, number>>(new Map());
 
-  // Rainbow colors for dance floor effect
+  // Rainbow colors for dance floor effect - Soft pastels for gentle party atmosphere
   const RAINBOW_COLORS = [
-    '#FF1493', // Deep Pink
-    '#FF6B35', // Orange
-    '#FFD700', // Gold
-    '#00FF00', // Lime
-    '#00FFFF', // Cyan
-    '#8B5CF6', // Purple
-    '#FF3366', // Hot Pink
+    '#FFB3D9', // Soft pink
+    '#FFB380', // Peachy orange
+    '#FFE680', // Gentle yellow
+    '#B3FFB3', // Mint green
+    '#B3E5FF', // Sky blue
+    '#D9B3FF', // Lavender
+    '#FFD1DC', // Rose
   ];
 
   // Randomize glowing cells when fire round is active (optimized for performance)
@@ -133,8 +133,8 @@ const GridComponent = memo<GridComponentProps>(({
 
     let animationFrameId: number;
     let lastUpdate = 0;
-    const updateInterval = 300; // Very fast: 300ms for dance floor effect
-    const MAX_GLOW_CELLS = 8; // More cells for better dance floor coverage
+    const updateInterval = 1200; // Gentle: 1200ms for relaxed party feel
+    const MAX_GLOW_CELLS = 5; // Fewer cells for subtle, non-distracting effect
 
     // Check if a cell is adjacent to any already-selected cells
     const isAdjacentToSelected = (row: number, col: number, selected: Set<string>): boolean => {
@@ -403,8 +403,8 @@ const GridComponent = memo<GridComponentProps>(({
                     // Rainbow dance floor effect during fire round (no solid fill)
                     ...(isGlowing && fireRoundActive && !isSelected && {
                       background: glowColor,
-                      boxShadow: `0 0 20px ${glowColor}, 0 0 40px ${glowColor}80, 4px 4px 0 #000`,
-                      animation: 'rainbow-pulse 0.6s ease-in-out infinite',
+                      boxShadow: `0 0 8px ${glowColor}60, 0 0 16px ${glowColor}30, 4px 4px 0 #000`,
+                      animation: 'rainbow-pulse 1.5s ease-in-out infinite',
                       willChange: 'transform, box-shadow',
                     }),
                     // Dynamic glow based on combo level

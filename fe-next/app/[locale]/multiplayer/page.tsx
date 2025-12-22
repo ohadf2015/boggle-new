@@ -595,22 +595,21 @@ export default function MultiplayerPage(): React.JSX.Element {
       }
     });
 
-    // Auto-join next game if player is viewing results
-    // Store game start data so PlayerView can use it when re-mounted
+    // Handle game start at page level to avoid race conditions
+    // Store game start data so PlayerView can consume it when it mounts or updates
+    // This ensures the event is captured even if PlayerView is still loading (dynamic import)
     // Note: The actual "Game Started" toast is shown by PlayerView/HostView components
-    // IMPORTANT: Only handle here when viewing results to avoid double-processing
-    // with usePlayerSocketEvents which handles the event directly when PlayerView is active
     newSocket.on('startGame', (data) => {
-      // Only handle if player is currently viewing results (needs to transition back to game)
-      // When PlayerView is already active, usePlayerSocketEvents handles the event directly
+      logger.log('[SOCKET.IO] startGame received:', data);
+
+      // Always store pending game start data for PlayerView to consume
+      setPendingGameStart(data);
+
+      // If viewing results, transition back to game
       if (showResultsRef.current) {
-        logger.log('[SOCKET.IO] New game starting - auto-joining from results', data);
-        // Store the game start data for PlayerView to consume when it mounts
-        setPendingGameStart(data);
+        logger.log('[SOCKET.IO] Closing results to start new game');
         setShowResults(false);
         setResultsData(null);
-      } else {
-        logger.log('[SOCKET.IO] startGame received but not viewing results - handled by PlayerView/HostView');
       }
       // Toast notification is handled by PlayerView/HostView to avoid duplicates
     });

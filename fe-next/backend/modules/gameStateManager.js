@@ -185,6 +185,7 @@ function createGame(gameCode, gameData) {
     roomName: gameData.roomName || gameCode,
     language: gameData.language || 'en',
     users: {}, // username -> { socketId, avatar, isHost, authUserId, guestTokenHash }
+    spectators: {}, // username -> { socketId, avatar, authUserId, guestTokenHash }
     playerScores: {},
     playerWords: {},
     playerAchievements: {},
@@ -624,13 +625,13 @@ function getAllGames() {
 function getActiveRooms() {
   return Object.values(games)
     .filter(game => {
-      // Only show rooms with active human players (bots don't count)
-      const humanPlayers = Object.values(game.users).filter(user => !user.isBot);
+      // Only show rooms with active human players (bots and disconnected players don't count)
+      const humanPlayers = Object.values(game.users).filter(user => !user.isBot && !user.disconnected);
       return humanPlayers.length > 0;
     })
     .map(game => {
-      // Count only human players for display
-      const humanPlayerCount = Object.values(game.users).filter(user => !user.isBot).length;
+      // Count only active human players for display (exclude disconnected)
+      const humanPlayerCount = Object.values(game.users).filter(user => !user.isBot && !user.disconnected).length;
       return {
         gameCode: game.gameCode,
         roomName: game.roomName,
@@ -787,6 +788,108 @@ function clearAllGames() {
 }
 
 // ==========================================
+// Spectator Management
+// ==========================================
+
+/**
+ * Add a spectator to a game
+ * @param {string} gameCode - Game code
+ * @param {string} username - Spectator username
+ * @param {string} socketId - Socket ID
+ * @param {object} options - Additional spectator data (avatar, authUserId, guestTokenHash)
+ */
+function addSpectatorToGame(gameCode, username, socketId, options = {}) {
+  const game = getGame(gameCode);
+  if (!game) return;
+
+  game.spectators[username] = {
+    socketId,
+    avatar: options.avatar || null,
+    authUserId: options.authUserId || null,
+    guestTokenHash: options.guestTokenHash || null,
+    joinedAt: Date.now()
+  };
+
+  persistGameState(gameCode);
+}
+
+/**
+ * Remove a spectator from a game
+ * @param {string} gameCode - Game code
+ * @param {string} username - Spectator username
+ */
+function removeSpectatorFromGame(gameCode, username) {
+  const game = getGame(gameCode);
+  if (!game) return;
+
+  delete game.spectators[username];
+  persistGameState(gameCode);
+}
+
+/**
+ * Get all spectators in a game
+ * @param {string} gameCode - Game code
+ * @returns {Array} - Array of spectator objects with username
+ */
+function getGameSpectators(gameCode) {
+  const game = getGame(gameCode);
+  if (!game) return [];
+
+  return Object.keys(game.spectators).map(username => ({
+    username,
+    ...game.spectators[username]
+  }));
+}
+
+/**
+ * Upgrade a spectator to active player
+ * @param {string} gameCode - Game code
+ * @param {string} username - Spectator username
+ * @returns {boolean} - True if upgrade successful, false otherwise
+ */
+function upgradeSpectatorToPlayer(gameCode, username) {
+  const game = getGame(gameCode);
+  if (!game || !game.spectators[username]) {
+    return false;
+  }
+
+  const { MAX_PLAYERS_PER_ROOM } = require('../utils/consts');
+
+  // Check if room has space
+  if (Object.keys(game.users).length >= MAX_PLAYERS_PER_ROOM) {
+    return false;
+  }
+
+  // Move spectator to users
+  const spectatorData = game.spectators[username];
+  game.users[username] = {
+    socketId: spectatorData.socketId,
+    avatar: spectatorData.avatar,
+    isHost: false,
+    authUserId: spectatorData.authUserId,
+    guestTokenHash: spectatorData.guestTokenHash
+  };
+
+  // Remove from spectators
+  delete game.spectators[username];
+
+  persistGameState(gameCode);
+  return true;
+}
+
+/**
+ * Check if a user is a spectator
+ * @param {string} gameCode - Game code
+ * @param {string} username - Username to check
+ * @returns {boolean} - True if user is a spectator
+ */
+function isSpectator(gameCode, username) {
+  const game = getGame(gameCode);
+  if (!game) return false;
+  return !!game.spectators[username];
+}
+
+// ==========================================
 // Module Exports
 // ==========================================
 
@@ -812,6 +915,13 @@ module.exports = {
   getUserBySocketId,
   updateUserSocketId,
   getGameUsers,
+
+  // Spectator management
+  addSpectatorToGame,
+  removeSpectatorFromGame,
+  getGameSpectators,
+  upgradeSpectatorToPlayer,
+  isSpectator,
 
   // Game queries
   getAllGames,

@@ -9,13 +9,16 @@ const {
   addUserToGame,
   removeUserFromGame,
   getGameUsers,
-  getActiveRooms
+  getActiveRooms,
+  deleteGame,
+  isRoomEmpty
 } = require('../modules/gameStateManager');
 
 const { broadcastToRoom, getGameRoom } = require('../utils/socketHelpers');
 const { emitError, ErrorMessages } = require('../utils/errorHandler');
 const { checkRateLimit } = require('../utils/rateLimiter');
 const botManager = require('../modules/botManager');
+const timerManager = require('../utils/timerManager');
 const logger = require('../utils/logger');
 const { validatePayload, addBotSchema, removeBotSchema } = require('../utils/socketValidation');
 const { isInProgress } = require('../utils/gameStateMachine');
@@ -166,6 +169,20 @@ function registerBotHandlers(io, socket) {
       logger.warn('BOT', `Bot "${botUsernameToFind}" not in botManager, removing from game.users only`);
       removeUserFromGame(gameCode, botUsernameToFind);
 
+      // Check if room is now empty and close it immediately
+      if (isRoomEmpty(gameCode)) {
+        logger.info('BOT', `Room ${gameCode} is empty after bot removal - closing immediately`);
+        timerManager.clearGameTimer(gameCode);
+        botManager.stopAllBots(gameCode);
+        deleteGame(gameCode);
+        io.emit('activeRooms', { rooms: getActiveRooms() });
+        socket.emit('botRemoved', {
+          success: true,
+          username: botUsernameToFind
+        });
+        return;
+      }
+
       // Broadcast updates
       broadcastToRoom(io, getGameRoom(gameCode), 'updateUsers', {
         users: getGameUsers(gameCode)
@@ -200,6 +217,21 @@ function registerBotHandlers(io, socket) {
     removeUserFromGame(gameCode, removedUsername);
 
     logger.info('BOT', `Bot "${removedUsername}" removed from game ${gameCode}`);
+
+    // Check if room is now empty and close it immediately
+    if (isRoomEmpty(gameCode)) {
+      logger.info('BOT', `Room ${gameCode} is empty after bot "${removedUsername}" removal - closing immediately`);
+      timerManager.clearGameTimer(gameCode);
+      botManager.stopAllBots(gameCode);
+      deleteGame(gameCode);
+      io.emit('activeRooms', { rooms: getActiveRooms() });
+      socket.emit('botRemoved', {
+        success: true,
+        botId: botToRemove.id,
+        username: removedUsername
+      });
+      return;
+    }
 
     // Broadcast updates
     broadcastToRoom(io, getGameRoom(gameCode), 'updateUsers', {

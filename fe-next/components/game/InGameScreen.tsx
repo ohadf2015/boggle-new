@@ -15,7 +15,6 @@ import RoomChat from '../RoomChat';
 import { EarthquakeWarning, FireRoundIndicator } from '../earthquake';
 import HintButton from '../HintButton';
 import { HelpPanel, HelpButton } from './HelpPanel';
-import LandscapeIndicator from '../LandscapeIndicator';
 import { applyHebrewFinalLetters } from '../../utils/utils';
 import { wordErrorToast } from '../NeoToast';
 import { useSoundEffects } from '../../contexts/SoundEffectsContext';
@@ -29,7 +28,6 @@ import type {
   TournamentData,
 } from '@/shared/types/view';
 import { useMobileLandscape } from '@/hooks/useMobileLandscape';
-import { useAutoHideControls } from '@/hooks/useAutoHideControls';
 
 // ==================== Types ====================
 
@@ -152,44 +150,6 @@ const InGameScreen = memo<InGameScreenProps>(({
 
   // Viewport height detection for very short landscape screens
   const [viewportHeight, setViewportHeight] = useState(0);
-
-  // Auto-hide controls for landscape mode - REDUCED hide delay for faster auto-hide
-  const { isVisible: controlsVisible, isPinned: controlsPinned, show: showControls, togglePin: toggleControlsPin } = useAutoHideControls({
-    hideDelay: 1500, // Reduced from 3000ms to 1500ms for faster auto-hide
-    initialHidden: true,
-    enabled: isLandscape,
-  });
-
-  // Show controls on scroll/touch/mousemove in landscape mode
-  // BUT NOT when interacting with the game board or side panels
-  useEffect(() => {
-    if (!isLandscape) return;
-
-    const handleInteraction = (e: Event) => {
-      // Don't show controls if interacting with the grid/board or side stat panels
-      const target = e.target;
-      if (!(target instanceof Element)) return;
-
-      if (target.closest('.landscape-grid-container') ||
-          target.closest('.game-board-frame-landscape') ||
-          target.closest('.landscape-side-panel')) {
-        return;
-      }
-      showControls();
-    };
-
-    window.addEventListener('scroll', handleInteraction, { passive: true });
-    window.addEventListener('touchstart', handleInteraction, { passive: true });
-    window.addEventListener('touchmove', handleInteraction, { passive: true });
-    window.addEventListener('mousemove', handleInteraction, { passive: true });
-
-    return () => {
-      window.removeEventListener('scroll', handleInteraction);
-      window.removeEventListener('touchstart', handleInteraction);
-      window.removeEventListener('touchmove', handleInteraction);
-      window.removeEventListener('mousemove', handleInteraction);
-    };
-  }, [isLandscape, showControls]);
 
   // Track viewport height for responsive landscape adjustments
   useEffect(() => {
@@ -410,84 +370,10 @@ const InGameScreen = memo<InGameScreenProps>(({
             </div>
           )}
 
-          {/* Hidden Controls Indicator - Shows when controls are auto-hidden - ENLARGED */}
-          <AnimatePresence>
-            {!(controlsVisible || controlsPinned) && (
-              <motion.button
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.8 }}
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  showControls();
-                }}
-                className="absolute top-3 right-3 z-40 flex items-center gap-2 px-4 py-3 bg-neo-navy border-3 border-neo-cream rounded-neo shadow-hard cursor-pointer hover:bg-neo-purple active:shadow-hard-sm transition-all min-h-[56px] min-w-[56px]"
-                aria-label={t('common.showControls') || 'Tap to show controls'}
-              >
-                <motion.span
-                  animate={{ opacity: [0.5, 1, 0.5] }}
-                  transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
-                  className="w-3 h-3 rounded-full bg-neo-cyan"
-                />
-                <span className="text-sm font-bold text-neo-cream uppercase tracking-wide">
-                  {t('common.menu') || 'Menu'}
-                </span>
-              </motion.button>
-            )}
-          </AnimatePresence>
 
-          {/* Top Controls - Exit + Help - AUTO-HIDE with ENLARGED BUTTONS */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: controlsVisible || controlsPinned ? 1 : 0 }}
-            transition={{ duration: 0.2 }}
-            className={`absolute top-0 left-0 right-0 z-30 flex justify-between items-start p-3 ${
-              controlsVisible || controlsPinned ? 'pointer-events-auto' : 'pointer-events-none'
-            }`}
-          >
-            {/* Exit Button - left - LARGER (56px for better touch target) */}
-            {onExitRoom && (
-              <button
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  onExitRoom();
-                }}
-                className="w-14 h-14 bg-neo-red border-3 border-neo-black rounded-neo text-neo-cream text-xl font-bold shadow-hard flex items-center justify-center hover:brightness-110 active:translate-x-[1px] active:translate-y-[1px] active:shadow-hard-sm transition-all"
-                aria-label={t('playerView.exit') || 'Exit'}
-              >
-                ✕
-              </button>
-            )}
-
-            {/* Right side buttons */}
-            <div className="flex items-center gap-2">
-              {/* Help Button - LARGER (56px for better touch target) */}
-              <button
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  setShowHelpPanel(true);
-                }}
-                className="w-14 h-14 bg-neo-purple border-3 border-neo-black rounded-neo text-neo-cream text-xl font-bold shadow-hard flex items-center justify-center hover:brightness-110 active:translate-x-[1px] active:translate-y-[1px] active:shadow-hard-sm transition-all"
-                aria-label={t('help.title') || 'Help'}
-              >
-                ?
-              </button>
-            </div>
-          </motion.div>
-
-          {/* Hint Button - Single Player Mode Only (auto-hide with controls, faster fade) */}
+          {/* Hint Button - Single Player Mode Only (always visible in landscape) */}
           {hints && hints.isSinglePlayer && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: controlsVisible || controlsPinned ? 1 : 0 }}
-              transition={{ duration: 0.2 }}
-              className={`absolute bottom-3 right-3 z-30 ${
-                controlsVisible || controlsPinned ? 'pointer-events-auto' : 'pointer-events-none'
-              }`}
-            >
+            <div className="absolute bottom-3 right-3 z-30">
               <HintButton
                 hint={hints.hint}
                 hintType={hints.hintType}
@@ -503,7 +389,7 @@ const InGameScreen = memo<InGameScreenProps>(({
                 onClearHint={hints.clearHint}
                 t={t}
               />
-            </motion.div>
+            </div>
           )}
 
           {/* Center: Grid (takes full height in landscape - properly sized for mobile) */}
@@ -533,9 +419,6 @@ const InGameScreen = memo<InGameScreenProps>(({
   // ==================== Portrait/Desktop Layout ====================
   return (
     <>
-      {/* Landscape mode suggestion banner for mobile portrait users */}
-      <LandscapeIndicator />
-
       {/* Earthquake Warning Overlay */}
       <EarthquakeWarning isVisible={earthquakeState === 'warning'} />
 

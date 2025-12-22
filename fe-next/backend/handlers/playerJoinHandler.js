@@ -17,7 +17,11 @@ const {
   getLeaderboard,
   getTournamentIdFromGame,
   getAuthUserConnection,
-  isRoomEmpty
+  isRoomEmpty,
+  addSpectatorToGame,
+  getGameSpectators,
+  upgradeSpectatorToPlayer,
+  isSpectator
 } = require('../modules/gameStateManager');
 
 const {
@@ -99,14 +103,30 @@ function registerPlayerJoinHandlers(io, socket) {
 
     // Check player limit
     if (!existingSocketId && Object.keys(game.users).length >= MAX_PLAYERS_PER_ROOM) {
+      // Add as spectator
+      const userAvatar = avatar || generateRandomAvatar();
+      addSpectatorToGame(gameCode, username, socket.id, {
+        avatar: { ...userAvatar, profilePictureUrl: profilePictureUrl || null },
+        authUserId: authUserId || null,
+        guestTokenHash: guestTokenHash || null
+      });
+
       joinRoom(socket, getGameRoom(gameCode));
       socket.emit('joinedAsSpectator', {
         success: true,
         gameCode,
         spectator: true,
         roomName: game.roomName,
-        language: game.language
+        language: game.language,
+        username
       });
+
+      // Broadcast spectator list update
+      broadcastToRoom(io, getGameRoom(gameCode), 'spectatorList', {
+        spectators: getGameSpectators(gameCode)
+      });
+
+      logger.info('SOCKET', `${username} joined as spectator in game ${gameCode}`);
       return;
     }
 
@@ -193,6 +213,67 @@ function registerPlayerJoinHandlers(io, socket) {
       users: getGameUsers(gameCode)
     });
     io.emit('activeRooms', { rooms: getActiveRooms() });
+  });
+
+  // Handle spectator upgrade to player
+  socket.on('upgradeToPlayer', ({ gameCode }) => {
+    if (!gameCode) return;
+
+    const game = getGame(gameCode);
+    if (!game) {
+      emitError(socket, ErrorMessages.GAME_NOT_FOUND);
+      return;
+    }
+
+    // Find spectator by socket ID
+    const spectators = getGameSpectators(gameCode);
+    const spectator = spectators.find(s => s.socketId === socket.id);
+
+    if (!spectator) {
+      emitError(socket, 'You are not a spectator in this game');
+      return;
+    }
+
+    const username = spectator.username;
+
+    // Check if room has space
+    if (Object.keys(game.users).length >= MAX_PLAYERS_PER_ROOM) {
+      emitError(socket, 'Room is still full. Please wait for a slot to open.');
+      return;
+    }
+
+    // Upgrade spectator to player
+    const success = upgradeSpectatorToPlayer(gameCode, username);
+
+    if (!success) {
+      emitError(socket, 'Failed to join game');
+      return;
+    }
+
+    logger.info('SOCKET', `Spectator ${username} upgraded to player in game ${gameCode}`);
+
+    // Notify the upgraded player
+    const isLateJoin = isInProgress(game.gameState);
+    socket.emit('spectatorUpgraded', {
+      success: true,
+      username,
+      users: getGameUsers(gameCode),
+      isHost: false,
+      lateJoin: isLateJoin
+    });
+
+    // If game is in progress, send current state
+    if (isLateJoin) {
+      handleLateJoin(socket, game, gameCode, username);
+    }
+
+    // Broadcast updates to room
+    broadcastToRoom(io, getGameRoom(gameCode), 'updateUsers', {
+      users: getGameUsers(gameCode)
+    });
+    broadcastToRoom(io, getGameRoom(gameCode), 'spectatorList', {
+      spectators: getGameSpectators(gameCode)
+    });
   });
 }
 

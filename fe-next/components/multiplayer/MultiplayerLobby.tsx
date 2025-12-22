@@ -20,6 +20,7 @@ import { useDebouncedValidation, getValidationClasses } from '@/hooks/useDebounc
 import { generateRoomCode as generateCode } from '@/utils/utils';
 import type { Language, ActiveRoom } from '@/shared/types/game';
 import { useMobileLandscape } from '@/hooks/useMobileLandscape';
+import LandscapeIndicator from '@/components/LandscapeIndicator';
 import {
   RoomList,
   LanguageSelector,
@@ -217,7 +218,11 @@ const MultiplayerLobby: React.FC<MultiplayerLobbyProps> = ({
   // Landscape mode layout - optimized 2-column: form left, room list right
   if (isLandscape) {
     return (
-      <div dir={dir} className="flex h-screen w-full overflow-hidden bg-slate-900 p-3 gap-4 landscape-full-height">
+      <>
+        {/* Landscape mode suggestion banner */}
+        <LandscapeIndicator />
+
+        <div dir={dir} className="flex h-screen w-full overflow-hidden bg-slate-900 p-3 gap-4 landscape-full-height">
         {/* Left column: Form */}
         <div className="w-[45%] flex flex-col gap-3 overflow-y-auto">
           {/* Header with back + title */}
@@ -329,7 +334,7 @@ const MultiplayerLobby: React.FC<MultiplayerLobbyProps> = ({
               disabled={isJoining}
               className="w-full h-12 font-black uppercase text-base bg-neo-yellow hover:bg-neo-yellow/90 text-neo-black border-3 border-neo-black shadow-hard hover:shadow-hard-lg transition-all flex-shrink-0"
             >
-              {mode === 'host' ? <FaCrown className="mr-2" /> : <FaUser className="mr-2" />}
+              {mode === 'host' ? <FaCrown className="mr-2 w-5 h-5" /> : <FaUser className="mr-2 w-5 h-5" />}
               {isJoining ? (t('common.loading') || 'Loading...') : mode === 'host' ? (t('joinView.createRoom') || 'Create Room') : (t('joinView.joinRoom') || 'Join Room')}
             </Button>
           </form>
@@ -355,33 +360,38 @@ const MultiplayerLobby: React.FC<MultiplayerLobbyProps> = ({
           </div>
         </div>
       </div>
+      </>
     );
   }
 
   return (
-    <div dir={dir} className="min-h-screen bg-gradient-to-b from-slate-50 via-slate-100 to-slate-200 dark:from-neo-navy dark:via-neo-navy-light dark:to-neo-navy">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8">
+    <>
+      {/* Landscape mode suggestion banner */}
+      <LandscapeIndicator />
+
+      <div dir={dir} className="min-h-screen bg-gradient-to-b from-slate-50 via-slate-100 to-slate-200 dark:from-neo-navy dark:via-neo-navy-light dark:to-neo-navy flex flex-col">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 py-4 sm:py-6 flex-1 flex flex-col min-h-0">
         {/* Title with back button */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="relative flex items-center justify-center mb-6"
+          className="relative flex items-center justify-center mb-3 sm:mb-4 flex-shrink-0"
         >
           <Link
             href="/"
             className="absolute start-0 flex items-center gap-2 px-3 py-2 rounded-neo border-3 border-neo-black dark:border-slate-600 bg-neo-cream dark:bg-slate-700 shadow-hard hover:shadow-hard-lg hover:translate-x-[-2px] hover:translate-y-[-2px] transition-all text-neo-black dark:text-neo-white text-sm font-bold"
           >
-            <FaArrowLeft className="w-4 h-4 rtl:rotate-180" />
+            <FaArrowLeft className="w-5 h-5 rtl:rotate-180" />
             <span className="hidden sm:inline">{t('common.back') || 'Back'}</span>
           </Link>
-          <h1 className="text-3xl sm:text-4xl font-black uppercase text-center text-neo-black dark:text-neo-white">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-black uppercase text-center text-neo-black dark:text-neo-white">
             {t('landing.multiplayer') || 'Multiplayer'}
           </h1>
         </motion.div>
 
         {/* On mobile: show room list first (top) when rooms exist, form first when empty */}
         <div className={cn(
-          "flex gap-6 lg:flex-row",
+          "flex gap-3 sm:gap-4 lg:gap-6 lg:flex-row flex-1 min-h-0",
           activeRooms.length > 0 ? "flex-col-reverse" : "flex-col"
         )}>
           {/* Main Form */}
@@ -606,6 +616,7 @@ const MultiplayerLobby: React.FC<MultiplayerLobbyProps> = ({
         </DialogContent>
       </Dialog>
     </div>
+    </>
   );
 };
 

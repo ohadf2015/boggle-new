@@ -235,9 +235,9 @@ export function useGridInteraction({
     // Initialize selection
     setSelectedCells([{ row: rowIndex, col: colIndex, letter }]);
 
-    // Haptic feedback - reduced intensity when not in fire round
+    // Haptic feedback - light tap feedback
     if (window.navigator && window.navigator.vibrate) {
-      window.navigator.vibrate(fireRoundActive ? 30 : 10);
+      window.navigator.vibrate(fireRoundActive ? 15 : 8);
     }
   };
 
@@ -286,7 +286,7 @@ export function useGridInteraction({
       const newSelection = selectedCells.slice(0, existingIndex + 1);
       if (newSelection.length !== selectedCells.length) {
         setSelectedCells(newSelection);
-        if (window.navigator?.vibrate) window.navigator.vibrate(fireRoundActive ? 15 : 5);
+        if (window.navigator?.vibrate) window.navigator.vibrate(fireRoundActive ? 8 : 3);
       }
       return;
     }
@@ -295,11 +295,9 @@ export function useGridInteraction({
     if (isAdjacentCell(lastCell, currentCell)) {
       const newSelection = [...selectedCells, { row: currentCell.row, col: currentCell.col, letter: currentCell.letter }];
       setSelectedCells(newSelection);
+      // Smooth, consistent haptic during drag - not increasing with word length
       if (window.navigator?.vibrate) {
-        const intensity = fireRoundActive
-          ? Math.min(20 + newSelection.length * 3 + comboLevel * 5, 60)
-          : Math.min(10 + newSelection.length * 1, 20);
-        window.navigator.vibrate(intensity);
+        window.navigator.vibrate(fireRoundActive ? 12 : 6);
       }
     }
   };

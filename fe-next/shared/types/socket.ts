@@ -79,6 +79,9 @@ export interface ClientToServerEvents {
   'engagement:claimComebackBonus': (data: { playerId: string }) => void;
   'engagement:getStatus': (data: { playerId: string }) => void;
   'engagement:recordLogin': (data: { playerId: string }) => void;
+
+  // Spectator events
+  upgradeToPlayer: (data: { gameCode: string }) => void;
 }
 
 // ==================== Hint Types ====================
@@ -199,6 +202,10 @@ export interface ServerToClientEvents {
   'engagement:mysteryReward': (data: { reward: MysteryReward }) => void;
   'engagement:status': (data: EngagementStatus) => void;
   'engagement:error': (data: { message: string }) => void;
+
+  // Spectator events
+  spectatorUpgraded: (data: SpectatorUpgradedPayload) => void;
+  spectatorList: (data: { spectators: GameUser[] }) => void;
 }
 
 // ==================== Payload Types ====================
@@ -539,4 +546,14 @@ export interface EngagementStatus {
     completed: number;
     total: number;
   };
+}
+
+// ==================== Spectator Types ====================
+
+export interface SpectatorUpgradedPayload {
+  success: boolean;
+  username: string;
+  users: GameUser[];
+  isHost: boolean;
+  lateJoin?: boolean;
 }
