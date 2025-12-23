@@ -36,6 +36,7 @@ interface UseHostGameEventsProps {
   setHostAchievements: React.Dispatch<React.SetStateAction<any[]>>;
   setTournamentData: React.Dispatch<React.SetStateAction<any>>;
   setTournamentCreating: React.Dispatch<React.SetStateAction<boolean>>;
+  setShufflingGrid: React.Dispatch<React.SetStateAction<any>>;
 
   // XP state setters
   setXpGainedData: React.Dispatch<React.SetStateAction<XpGainedPayload | null>>;
@@ -86,6 +87,7 @@ export function useHostGameEvents({
   setHostAchievements,
   setTournamentData,
   setTournamentCreating,
+  setShufflingGrid,
   setXpGainedData,
   setLevelUpData,
   setEarthquakeState,
@@ -243,6 +245,7 @@ export function useHostGameEvents({
       setShowStartAnimation(false);
       setTableData(null);
       tableDataRef.current = null;
+      setShufflingGrid(null);
       setHostFoundWords([]);
       setHostAchievements([]);
       setPlayerWordCounts({});
@@ -356,6 +359,7 @@ export function useHostGameEvents({
     setHostAchievements,
     setTournamentData,
     setTournamentCreating,
+    setShufflingGrid,
     setXpGainedData,
     setLevelUpData,
     setEarthquakeState,

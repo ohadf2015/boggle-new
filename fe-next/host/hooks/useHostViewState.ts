@@ -407,6 +407,7 @@ export function useHostViewState(options: UseHostViewStateOptions = {}): UseHost
     setRemainingTime(null);
     setWaitingForResults(false);
     setShowStartAnimation(false);
+    setShufflingGrid(null);
     setPlayerWordCounts({});
     setPlayerScores({});
     setPlayerAchievements({});

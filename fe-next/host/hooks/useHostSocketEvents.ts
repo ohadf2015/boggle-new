@@ -51,6 +51,7 @@ interface UseHostSocketEventsProps {
   setHostAchievements: React.Dispatch<React.SetStateAction<any[]>>;
   setTournamentData: React.Dispatch<React.SetStateAction<TournamentData | null>>;
   setTournamentCreating: React.Dispatch<React.SetStateAction<boolean>>;
+  setShufflingGrid: React.Dispatch<React.SetStateAction<any>>;
   setWordsForBoard: React.Dispatch<React.SetStateAction<string[]>>;
 
   // XP state setters
@@ -111,6 +112,7 @@ const useHostSocketEvents = ({
   setHostAchievements,
   setTournamentData,
   setTournamentCreating,
+  setShufflingGrid,
   setWordsForBoard,
 
   // XP state setters
@@ -160,6 +162,7 @@ const useHostSocketEvents = ({
     setHostAchievements,
     setTournamentData,
     setTournamentCreating,
+    setShufflingGrid,
     setXpGainedData,
     setLevelUpData,
     setEarthquakeState,

@@ -281,18 +281,20 @@ const GridComponent = memo<GridComponentProps>(({
       {/* NEO-BRUTALIST: Clean frame wrapper */}
       <div className="game-board-frame relative">
 
-        {/* Inner grid container */}
+        {/* Inner grid container - using absolute positioning to ensure proper dimensions with container queries */}
         <div
           ref={gridRef}
           dir="ltr"
           className={cn(
-            "grid touch-none select-none relative rounded-neo w-full h-full",
+            "grid touch-none select-none rounded-neo",
             isLargeGrid ? "gap-1 sm:gap-1" : "gap-1.5 sm:gap-2",
             "bg-neo-cream border-2 border-neo-black/20",
             earthquakeShaking && "earthquake-shake",
             className
           )}
           style={{
+            position: 'absolute',
+            inset: '0',
             gridTemplateColumns: `repeat(${grid[0]?.length || 4}, minmax(0, 1fr))`,
             gridTemplateRows: `repeat(${grid.length || 4}, minmax(0, 1fr))`,
             backgroundImage: 'var(--halftone-pattern)',
@@ -380,6 +382,14 @@ const GridComponent = memo<GridComponentProps>(({
                     type: 'spring',
                     stiffness: 200,
                     damping: 15,
+                    // Use tween for rotate since spring only supports 2 keyframes
+                    rotate: {
+                      type: 'tween',
+                      duration: 0.3,
+                      ease: "easeInOut",
+                      repeat: Infinity,
+                      repeatType: "mirror",
+                    },
                   }}
                   className={cn(
                     "aspect-square flex items-center justify-center font-black cursor-pointer relative overflow-hidden",

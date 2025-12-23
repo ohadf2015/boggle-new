@@ -86,6 +86,7 @@ export function usePlayerGameEvents({
     setShowStartAnimation,
     setWaitingForResults,
     setLeaderboard,
+    setShufflingGrid,
     setTournamentData,
     setTournamentStandings,
     setShowTournamentStandings,
@@ -262,6 +263,7 @@ export function usePlayerGameEvents({
       setRemainingTime(null);
       setWaitingForResults(false);
       setLetterGrid(null);
+      setShufflingGrid(null);
       setShowStartAnimation(false);
       waitingStartTimeRef.current = null;
 
@@ -386,6 +388,7 @@ export function usePlayerGameEvents({
     setShowStartAnimation,
     setWaitingForResults,
     setLeaderboard,
+    setShufflingGrid,
     setTournamentData,
     setTournamentStandings,
     setShowTournamentStandings,

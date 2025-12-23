@@ -491,9 +491,6 @@ const InGameScreen = memo<InGameScreenProps>(({
                 interactive={isPlaying && !showStartAnimation}
                 animateOnMount={!hasAnimatedRef.current}
                 onWordSubmit={handleGridWordSubmit}
-                onWordChange={handleWordChange}
-                hideWordPreview={isPlaying}
-                hideComboIndicator={true}
                 comboLevel={comboLevel}
                 largeText
                 fireRoundActive={fireRoundActive}
@@ -610,12 +607,15 @@ const InGameScreen = memo<InGameScreenProps>(({
         {/* Stats row - Score, Combo (conditional), Timer - clean layout with better hierarchy */}
         {remainingTime !== null && (
           <div className="flex items-center justify-center gap-4 md:gap-6 mb-2" role="status" aria-label="Game status">
-            {/* Score (left position - primary feedback) */}
+            {/* Score (left position - primary feedback) - vibrant yellow/lime gradient */}
             {isPlaying && (
               <motion.div
                 initial={{ scale: 0, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
-                className="relative bg-neo-cream border-3 border-neo-black rounded-neo shadow-hard-lg px-3 md:px-4 py-1.5 min-w-[70px] md:min-w-[90px]"
+                className="relative border-3 border-neo-black rounded-neo shadow-hard-lg px-3 md:px-4 py-1.5 min-w-[70px] md:min-w-[90px]"
+                style={{
+                  background: 'linear-gradient(135deg, #FFE135 0%, #BFFF00 100%)',
+                }}
               >
                 <div className="text-center">
                   <motion.div
@@ -623,10 +623,11 @@ const InGameScreen = memo<InGameScreenProps>(({
                     initial={{ scale: 1.3 }}
                     animate={{ scale: 1 }}
                     className="text-xl md:text-2xl font-black text-neo-black leading-tight"
+                    style={{ textShadow: '1px 1px 0px rgba(255,255,255,0.5)' }}
                   >
                     {playerData.score}
                   </motion.div>
-                  <div className="text-[10px] md:text-xs font-bold uppercase tracking-wider text-neo-black/70">
+                  <div className="text-[10px] md:text-xs font-bold uppercase tracking-wider text-neo-black/80">
                     {t('common.score') || 'Score'}
                   </div>
                 </div>
@@ -703,9 +704,6 @@ const InGameScreen = memo<InGameScreenProps>(({
               interactive={isPlaying && !showStartAnimation}
               animateOnMount={!hasAnimatedRef.current}
               onWordSubmit={handleGridWordSubmit}
-              onWordChange={handleWordChange}
-              hideWordPreview={isPlaying}
-              hideComboIndicator={true}
               comboLevel={comboLevel}
               fireRoundActive={fireRoundActive}
               earthquakeShaking={earthquakeState === 'shaking'}

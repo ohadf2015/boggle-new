@@ -103,6 +103,7 @@ const HostView: React.FC<HostViewProps> = memo(({
     setHostAchievements: state.setHostAchievements,
     setTournamentData: state.setTournamentData,
     setTournamentCreating: state.setTournamentCreating,
+    setShufflingGrid: state.setShufflingGrid,
     setWordsForBoard: state.setWordsForBoard,
     setXpGainedData: state.setXpGainedData,
     setLevelUpData: state.setLevelUpData,

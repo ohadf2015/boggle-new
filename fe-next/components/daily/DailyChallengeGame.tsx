@@ -546,9 +546,6 @@ const DailyChallengeGame: React.FC<DailyChallengeGameProps> = ({
           grid={grid}
           interactive={true}
           onWordSubmit={handleWordSubmit}
-          onWordChange={handleWordChange}
-          hideWordPreview
-          hideComboIndicator
           comboLevel={comboLevel}
         />
       </div>
