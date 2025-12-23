@@ -1991,7 +1991,8 @@ body {
   background-color: rgba(0, 0, 0, 0.3);
 }
 
-  /* Prevent text selection issues in landscape */
+/* Prevent text selection issues in landscape */
+@media (orientation: landscape) {
   * {
     -webkit-tap-highlight-color: transparent;
   }
