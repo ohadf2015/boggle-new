@@ -86,7 +86,7 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
   const validWordCountRef = useRef(0); // Track valid words for combo
   const gameStartTimeRef = useRef<number>(Date.now()); // Track when game started for pace analysis
   const maxComboRef = useRef(0); // Track max combo achieved for final achievements
-  const isEarthquakePausedRef = useRef(false); // Track earthquake timer pause
+  const [isEarthquakePaused, setIsEarthquakePaused] = useState(false); // Track earthquake timer pause
 
   // Abuse detection: track submission timestamps (like multiplayer's spamDetector)
   const submissionTimestampsRef = useRef<number[]>([]);
@@ -129,7 +129,7 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
 
   // Earthquake timer pause handlers
   const handleEarthquakeTimerPause = useCallback(() => {
-    isEarthquakePausedRef.current = true;
+    setIsEarthquakePaused(true);
     if (timerRef.current) {
       clearInterval(timerRef.current);
       timerRef.current = null;
@@ -137,7 +137,7 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
   }, []);
 
   const handleEarthquakeTimerResume = useCallback(() => {
-    isEarthquakePausedRef.current = false;
+    setIsEarthquakePaused(false);
     // Timer will automatically restart in the next tick via useEffect
   }, []);
 
@@ -338,7 +338,7 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
   // Timer effect - handles both manual pause and earthquake pause
   useEffect(() => {
     if (settings.mode === 'practice') return;
-    if (isPaused || remainingTime <= 0 || isGameOver || isEarthquakePausedRef.current) return;
+    if (isPaused || remainingTime <= 0 || isGameOver || isEarthquakePaused) return;
 
     timerRef.current = setInterval(() => {
       setRemainingTime(prev => {
@@ -355,7 +355,7 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
     return () => {
       if (timerRef.current) clearInterval(timerRef.current);
     };
-  }, [isPaused, settings.mode, isGameOver, remainingTime]);
+  }, [isPaused, settings.mode, isGameOver, remainingTime, isEarthquakePaused]);
 
   // Bot simulation effect
   useEffect(() => {

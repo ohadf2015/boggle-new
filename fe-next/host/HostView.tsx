@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, memo } from 'react';
+import React, { useEffect, useState, memo } from 'react';
 import { FaSignOutAlt } from 'react-icons/fa';
 import { Button } from '../components/ui/button';
 import GoRipplesAnimation from '../components/GoRipplesAnimation';
@@ -101,6 +101,9 @@ const HostView: React.FC<HostViewProps> = memo(({
     setWordsForBoard: state.setWordsForBoard,
     setXpGainedData: state.setXpGainedData,
     setLevelUpData: state.setLevelUpData,
+    setEarthquakeState: setEarthquakeState,
+    setFireRoundActive: setFireRoundActive,
+    setFireRoundRemaining: setFireRoundRemaining,
     setWaitingForResults: state.setWaitingForResults,
     comboLevelRef: state.comboRefs.levelRef,
     lastWordTimeRef: state.comboRefs.lastWordTimeRef,
@@ -195,12 +198,13 @@ const HostView: React.FC<HostViewProps> = memo(({
   // Destructure for cleaner JSX
   const { runtime, settings, players, tournament, animation, ui, hostPlaying: hostPlayingState, combo } = state;
 
-  // Earthquake/Fire Round feature for multiplayer
-  const {
-    earthquakeState,
-    fireRoundActive,
-    fireRoundRemaining,
-  } = useEarthquakeFireRound({
+  // Earthquake/Fire Round state (managed via socket events)
+  const [earthquakeState, setEarthquakeState] = useState<'idle' | 'warning' | 'shaking' | 'fire-round'>('idle');
+  const [fireRoundActive, setFireRoundActive] = useState(false);
+  const [fireRoundRemaining, setFireRoundRemaining] = useState(0);
+
+  // Earthquake/Fire Round feature for multiplayer (only for triggering, state managed via socket events)
+  useEarthquakeFireRound({
     enabled: runtime.gameStarted && !runtime.waitingForResults,
     gameDurationSeconds: state.settings.timerValue * 60,
     currentTimeSeconds: runtime.remainingTime || 0,
@@ -210,20 +214,20 @@ const HostView: React.FC<HostViewProps> = memo(({
     isHost: true,
     socket: socket,
     gameSessionId: gameCode,
-    onGridRegenerate: (newGrid) => {
-      state.setTableData(newGrid);
+    onGridRegenerate: () => {
+      // Grid regeneration handled by socket event (fireRoundStart)
     },
     onEarthquakeStart: () => {
-      // Sound effects handled by client-side event listeners
+      // State updates handled by socket events
     },
     onEarthquakeShake: () => {
-      // Sound effects handled by client-side event listeners
+      // State updates handled by socket events
     },
     onFireRoundStart: () => {
-      // Sound effects handled by client-side event listeners
+      // State updates handled by socket events
     },
     onFireRoundEnd: () => {
-      // Sound effects handled by client-side event listeners
+      // State updates handled by socket events
     },
   });
 

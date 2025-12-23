@@ -79,10 +79,10 @@ const filterGameAchievements = (
 };
 
 const ResultsPlayerCard: React.FC<ResultsPlayerCardProps> = ({ player, index, allPlayerWords, currentUsername, isWinner, xpGainedData, levelUpData, duplicateRuleDisabled }) => {
-  const { t } = useLanguage();
-  // Arrow for level up indicator - always use → to show progression/increase
-  // The arrow represents "going up" regardless of text direction
-  const levelArrow = '→';
+  const { t, dir } = useLanguage();
+  // Arrow for level up indicator - use ← in RTL and → in LTR to show progression
+  // In RTL languages, left arrow indicates "going up/forward"
+  const levelArrow = dir === 'rtl' ? '←' : '→';
 
   // Check if this is the current player
   const isCurrentPlayer = currentUsername && player.username === currentUsername;
@@ -444,7 +444,7 @@ const ResultsPlayerCard: React.FC<ResultsPlayerCardProps> = ({ player, index, al
                           </div>
                         </div>
                         <div>
-                          <div className="text-lg sm:text-xl font-black text-neo-cyan uppercase">
+                          <div className="text-lg sm:text-xl font-black text-neo-black dark:text-neo-cream uppercase">
                             {summaryStats.longestWord}
                           </div>
                           <div className="text-[10px] sm:text-xs uppercase text-neo-black/90 dark:text-neo-cream/90 font-bold">
@@ -452,7 +452,7 @@ const ResultsPlayerCard: React.FC<ResultsPlayerCardProps> = ({ player, index, al
                           </div>
                         </div>
                         <div>
-                          <div className="text-xl sm:text-2xl font-black text-neo-purple">
+                          <div className="text-xl sm:text-2xl font-black text-neo-black dark:text-neo-cream">
                             {summaryStats.accuracy}%
                           </div>
                           <div className="text-[10px] sm:text-xs uppercase text-neo-black/90 dark:text-neo-cream/90 font-bold">
@@ -479,7 +479,7 @@ const ResultsPlayerCard: React.FC<ResultsPlayerCardProps> = ({ player, index, al
                               <span className="px-2 py-0.5 rounded-neo flex items-center justify-center font-black text-xs border-2 border-neo-black"
                                     style={{
                                       backgroundColor: getPointColor(points),
-                                      color: (points === 2 || points === 3) ? 'var(--neo-black)' : 'var(--neo-cream)'
+                                      color: (points === 2 || points === 3 || points === 5 || points === 6) ? 'var(--neo-black)' : 'var(--neo-cream)'
                                     }}>
                                 {points} {t('results.points') || 'pts'}
                               </span>

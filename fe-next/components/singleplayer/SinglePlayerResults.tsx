@@ -24,8 +24,8 @@ const getPointColor = (points: number): string => {
 
 // Get text color based on background - ensure readability
 const getTextColor = (points: number): string => {
-  // For cyan backgrounds (2-3 point words), use dark text for better contrast
-  if (points === 2 || points === 3) return 'rgb(var(--neo-black))';
+  // For cyan backgrounds (2-3 point words) and purple (5-6 point words), use dark text for better contrast
+  if (points === 2 || points === 3 || points === 5 || points === 6) return 'rgb(var(--neo-black))';
   return 'var(--neo-cream)';
 };
 

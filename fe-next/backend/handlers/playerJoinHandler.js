@@ -193,11 +193,33 @@ function registerPlayerJoinHandlers(io, socket) {
     const game = getGame(gameCode);
     if (!game) return;
 
-    removeUserFromGame(gameCode, username);
-    leaveRoom(socket, getGameRoom(gameCode));
+    // If game is in progress or finished, mark as disconnected instead of removing
+    // This allows the player to rejoin and continue
+    if (isInProgress(game.gameState) || game.gameState === 'finished') {
+      if (game.users[username]) {
+        game.users[username].disconnected = true;
+        game.users[username].disconnectedAt = Date.now();
 
+        logger.info('SOCKET', `${username} left room ${gameCode} (game in progress - marked as disconnected, can rejoin)`);
+
+        broadcastToRoom(io, getGameRoom(gameCode), 'playerLeft', {
+          username,
+          message: `${username} left the room`
+        });
+
+        // Update spectator list in case slot opened
+        broadcastToRoom(io, getGameRoom(gameCode), 'spectatorList', {
+          spectators: getGameSpectators(gameCode)
+        });
+      }
+    } else {
+      // Game not started yet - fully remove user
+      removeUserFromGame(gameCode, username);
+      logger.info('SOCKET', `${username} left room ${gameCode} (waiting state - fully removed)`);
+    }
+
+    leaveRoom(socket, getGameRoom(gameCode));
     socket.emit('leftRoom', { success: true });
-    logger.info('SOCKET', `${username} left room ${gameCode}`);
 
     // Check if room is now empty and close it immediately
     if (isRoomEmpty(gameCode)) {

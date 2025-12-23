@@ -31,11 +31,11 @@ interface XpBreakdownCardProps {
 }
 
 const XpBreakdownCard = memo<XpBreakdownCardProps>(({ xpGainedData, levelUpData, isWinner }) => {
-  const { t } = useLanguage();
+  const { t, dir } = useLanguage();
   const { xpBreakdown, xpEarned, newTotalXp, newLevel } = xpGainedData;
-  // Arrow for level up indicator - always use → to show progression/increase
-  // The arrow represents "going up" regardless of text direction
-  const levelArrow = '→';
+  // Arrow for level up indicator - use ← in RTL and → in LTR to show progression
+  // In RTL languages, left arrow indicates "going up/forward"
+  const levelArrow = dir === 'rtl' ? '←' : '→';
 
   const breakdownItems = [
     { key: 'gameCompletion', label: t('xp.baseXp') || 'Base XP', value: xpBreakdown.gameCompletion, icon: '🎮' },
@@ -109,11 +109,11 @@ const XpBreakdownCard = memo<XpBreakdownCardProps>(({ xpGainedData, levelUpData,
       </div>
 
       {/* Level info */}
-      <div className="flex items-center justify-between pt-2 border-t-2 border-neo-black/20 dark:border-neo-cream/20 relative z-10">
-        <span className="text-xs font-bold text-neo-black/70 dark:text-neo-cream/70 uppercase">
+      <div className="flex items-center justify-between pt-2 border-t-2 border-neo-black/20 dark:border-neo-cream/30 relative z-10">
+        <span className="text-xs font-bold text-neo-black/70 dark:text-neo-cream uppercase">
           {t('xp.level') || 'Level'} {newLevel}
         </span>
-        <span className="text-xs font-bold text-neo-black/70 dark:text-neo-cream/70">
+        <span className="text-xs font-bold text-neo-black/70 dark:text-neo-cream">
           {t('xp.totalXpEarned') || 'Total XP'}: {newTotalXp.toLocaleString()}
         </span>
       </div>

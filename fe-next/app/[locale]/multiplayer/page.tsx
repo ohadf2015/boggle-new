@@ -132,6 +132,12 @@ export default function MultiplayerPage(): React.JSX.Element {
   const [isJoining, setIsJoining] = useState<boolean>(false); // Track join/create loading state
   const [authLoadingStartTime, setAuthLoadingStartTime] = useState<number | null>(null); // Track when auth loading started
 
+  // Late joiner & spectator state
+  const [isSpectator, setIsSpectator] = useState<boolean>(false);
+  const [isLateJoiner, setIsLateJoiner] = useState<boolean>(false);
+  const [showLateJoinerWelcome, setShowLateJoinerWelcome] = useState<boolean>(false);
+  const [spectators, setSpectators] = useState<Array<{ username: string; socketId: string; avatar: any }>>([]);
+
   const socketRef = useRef<Socket | null>(null);
   const attemptingReconnectRef = useRef<boolean>(attemptingReconnect);
   const hostKeepAliveIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -519,6 +525,53 @@ export default function MultiplayerPage(): React.JSX.Element {
     newSocket.on('activeRooms', (data) => {
       setActiveRooms(data.rooms || []);
       setRoomsLoading(false);
+    });
+
+    // Spectator & Late Joiner events
+    newSocket.on('joinedAsSpectator', (data) => {
+      logger.log('[SPECTATOR] Joined as spectator:', data);
+      setIsSpectator(true);
+      setGameCode(data.gameCode);
+      setRoomName(data.roomName);
+      setRoomLanguage(data.language);
+      setIsJoining(false);
+
+      saveSession({
+        gameCode: data.gameCode,
+        username: data.username || username,
+        isHost: false,
+        roomName: data.roomName,
+        language: data.language,
+      });
+
+      toast(t('spectator.youAreSpectating') || 'Watching as spectator', {
+        duration: 4000,
+        icon: '👀',
+      });
+    });
+
+    newSocket.on('spectatorList', (data) => {
+      logger.log('[SPECTATOR] Spectator list updated:', data.spectators?.length || 0);
+      setSpectators(data.spectators || []);
+    });
+
+    newSocket.on('spectatorUpgraded', (data) => {
+      if (data.success && data.username === username) {
+        logger.log('[SPECTATOR] Upgraded to player, late join:', data.lateJoin);
+        setIsSpectator(false);
+        setIsActive(true);
+        setPlayersInRoom(data.users || []);
+
+        if (data.lateJoin) {
+          setIsLateJoiner(true);
+          setShowLateJoinerWelcome(true);
+        }
+
+        toast.success(t('spectator.upgraded') || 'You can now play!', {
+          duration: 3000,
+          icon: '🎮',
+        });
+      }
     });
 
     // Fallback: if rooms don't load quickly, stop showing loading state for better UX on slow connections
@@ -1020,6 +1073,16 @@ export default function MultiplayerPage(): React.JSX.Element {
       socket.emit('getActiveRooms');
     }
   }, [socket, isConnected]);
+
+  const handleUpgradeToPlayer = useCallback(() => {
+    if (!socket || !gameCode) {
+      logger.warn('[SPECTATOR] Cannot upgrade: no socket or gameCode');
+      return;
+    }
+
+    logger.info('[SPECTATOR] Requesting upgrade to player in game:', gameCode);
+    socket.emit('upgradeToPlayer', { gameCode });
+  }, [socket, gameCode]);
 
   const handleReturnToRoom = useCallback(() => {
     setShowResults(false);

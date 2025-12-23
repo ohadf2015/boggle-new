@@ -57,6 +57,11 @@ interface UseHostSocketEventsProps {
   setXpGainedData: React.Dispatch<React.SetStateAction<XpGainedPayload | null>>;
   setLevelUpData: React.Dispatch<React.SetStateAction<LevelUpPayload | null>>;
 
+  // Earthquake state setters
+  setEarthquakeState: React.Dispatch<React.SetStateAction<'idle' | 'warning' | 'shaking' | 'fire-round'>>;
+  setFireRoundActive: React.Dispatch<React.SetStateAction<boolean>>;
+  setFireRoundRemaining: React.Dispatch<React.SetStateAction<number>>;
+
   // Results waiting state
   setWaitingForResults: React.Dispatch<React.SetStateAction<boolean>>;
 
@@ -111,6 +116,11 @@ const useHostSocketEvents = ({
   // XP state setters
   setXpGainedData,
   setLevelUpData,
+
+  // Earthquake state setters
+  setEarthquakeState,
+  setFireRoundActive,
+  setFireRoundRemaining,
 
   // Results waiting state
   setWaitingForResults,

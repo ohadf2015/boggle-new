@@ -63,8 +63,8 @@ const WordChip = memo<WordChipProps>(({ wordObj, playerCount }) => {
   // Get text color based on background - ensure readability
   const getTextColor = (): string => {
     if (isDuplicate || !isValid || isPending) return 'var(--neo-cream)';
-    // For cyan backgrounds (2-3 point words), use dark text for better contrast
-    if (wordObj.score === 2 || wordObj.score === 3) return 'var(--neo-black)';
+    // For cyan backgrounds (2-3 point words) and purple (5-6 point words), use dark text for better contrast
+    if (wordObj.score === 2 || wordObj.score === 3 || wordObj.score === 5 || wordObj.score === 6) return 'var(--neo-black)';
     return 'var(--neo-cream)';
   };
 

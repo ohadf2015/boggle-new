@@ -284,15 +284,28 @@ const PlayerView: React.FC<PlayerViewProps> = memo(({
 
   // Handle pending game start
   useEffect(() => {
-    if (pendingGameStart && socket && onGameStartConsumed) {
-      logger.log('[PLAYER] Processing pending game start from results page:', pendingGameStart);
+    if (!pendingGameStart || !socket || !onGameStartConsumed) {
+      return;
+    }
 
-      setWasInActiveGame(true);
-      setFoundWords([]);
-      setAchievements([]);
+    logger.log('[PLAYER] Processing pending game start:', pendingGameStart);
+
+    setWasInActiveGame(true);
+    setFoundWords([]);
+    setAchievements([]);
+
+    // For late joins, show waiting screen briefly before starting animation
+    // This gives visual confirmation that the player successfully joined the room
+    const isLateJoin = pendingGameStart.messageId?.startsWith('late-join-');
+    const delay = isLateJoin ? 1500 : 0; // 1.5 second delay for late joins to show room code
+
+    // Set game language immediately so waiting screen shows correct language
+    if (pendingGameStart.language) setGameLanguage(pendingGameStart.language);
+
+    const startGame = () => {
+      // Set game data and start animation
       if (pendingGameStart.letterGrid) setLetterGrid(pendingGameStart.letterGrid);
       if (pendingGameStart.timerSeconds) setRemainingTime(pendingGameStart.timerSeconds);
-      if (pendingGameStart.language) setGameLanguage(pendingGameStart.language);
       if (pendingGameStart.minWordLength) setMinWordLength(pendingGameStart.minWordLength);
       setShowStartAnimation(true);
 
@@ -304,8 +317,17 @@ const PlayerView: React.FC<PlayerViewProps> = memo(({
         socket.emit('startGameAck', { messageId: pendingGameStart.messageId });
         logger.log('[PLAYER] Sent startGameAck for pending game start, messageId:', pendingGameStart.messageId);
       }
+    };
 
-      onGameStartConsumed();
+    onGameStartConsumed();
+
+    if (delay > 0) {
+      // Late join - delay to show waiting screen briefly
+      const startAnimationTimer = setTimeout(startGame, delay);
+      return () => clearTimeout(startAnimationTimer);
+    } else {
+      // Normal game start - no delay
+      startGame();
     }
   }, [pendingGameStart, socket, onGameStartConsumed, fadeToTrack, TRACKS]);
 
