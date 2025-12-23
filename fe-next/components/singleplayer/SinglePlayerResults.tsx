@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import dynamic from 'next/dynamic';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FaTrophy, FaMedal, FaRedo, FaHome, FaRobot, FaChartBar, FaCrown, FaStar, FaAward } from 'react-icons/fa';
+import { FaTrophy, FaMedal, FaRedo, FaHome, FaRobot, FaChartBar, FaCrown, FaStar, FaAward, FaCog } from 'react-icons/fa';
 import { Sparkles, TrendingUp, Target } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -266,27 +266,38 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
             </div>
           )}
 
-          {/* Action buttons */}
-          <div className="flex gap-2 mt-auto">
+          {/* Action buttons - landscape compact layout */}
+          <div className="flex flex-col gap-2 mt-auto">
             {onQuickRematch && (
               <Button
                 size="sm"
-                className="flex-1 py-2 bg-neo-yellow hover:bg-neo-yellow/90 text-neo-black font-bold text-xs border-2 border-neo-black"
+                className="w-full py-2 bg-neo-yellow hover:bg-neo-yellow/90 text-neo-black font-bold text-xs border-2 border-neo-black"
                 onClick={onQuickRematch}
               >
-                <FaRedo className="mr-1 text-xs" />
+                <FaRedo className="me-1 text-xs" />
                 {t('common.rematch') || 'Rematch'}
               </Button>
             )}
-            <Button
-              variant="secondary"
-              size="sm"
-              className="flex-1 py-2 font-bold text-xs border-2 border-neo-black"
-              onClick={onBackToLobby}
-            >
-              <FaHome className="mr-1 text-xs" />
-              {t('common.lobby') || 'Lobby'}
-            </Button>
+            <div className="flex gap-2">
+              <Button
+                variant="cyan"
+                size="sm"
+                className="flex-1 py-2 font-bold text-xs border-2 border-neo-black"
+                onClick={onPlayAgain}
+              >
+                <FaCog className="me-1 text-xs" />
+                {t('common.settings') || 'Settings'}
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                className="flex-1 py-2 font-bold text-xs border-2 border-neo-black"
+                onClick={onBackToLobby}
+              >
+                <FaHome className="me-1 text-xs" />
+                {t('common.lobby') || 'Lobby'}
+              </Button>
+            </div>
           </div>
         </div>
 
@@ -869,40 +880,44 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
         )}
       </AnimatePresence>
 
-      {/* Action buttons - Enhanced with Quick Rematch */}
+      {/* Action buttons - Clear visual hierarchy */}
       <div className="flex flex-col gap-3 pt-4">
-        {/* Primary action: Quick Rematch - same settings, new game immediately */}
+        {/* Primary CTA: Quick Rematch - most prominent, animated pulse */}
         {onQuickRematch && (
-          <Button
-            size="lg"
-            className="w-full py-4 text-lg shadow-hard hover:shadow-hard-lg border-3 bg-neo-yellow hover:bg-neo-yellow/90 text-neo-black font-black uppercase tracking-wide"
-            onClick={onQuickRematch}
+          <motion.div
+            animate={{ scale: [1, 1.02, 1] }}
+            transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
           >
-            <FaRedo className="mr-2" />
-            {t('common.quickRematch') || 'Quick Rematch'}
-          </Button>
+            <Button
+              size="lg"
+              className="w-full py-5 text-xl shadow-hard-lg hover:shadow-hard-xl border-4 bg-neo-yellow hover:bg-neo-yellow/90 text-neo-black font-black uppercase tracking-wider"
+              onClick={onQuickRematch}
+            >
+              <FaRedo className="me-2 text-2xl" />
+              {t('common.quickRematch') || 'Quick Rematch'}
+            </Button>
+          </motion.div>
         )}
-        {/* Secondary actions row */}
-        <div className="flex gap-3">
-          <Button
-            variant="secondary"
-            size="lg"
-            className="flex-1 py-3 shadow-hard hover:shadow-hard-lg border-3"
-            onClick={onBackToLobby}
-          >
-            <FaHome className="mr-2" />
-            {t('common.lobby') || 'Lobby'}
-          </Button>
-          <Button
-            variant="outline"
-            size="lg"
-            className="flex-1 py-3 shadow-hard hover:shadow-hard-lg border-3"
-            onClick={onPlayAgain}
-          >
-            <FaRedo className="mr-2" />
-            {t('common.changeSettings') || 'Change Settings'}
-          </Button>
-        </div>
+        {/* Secondary: Settings & Play Again - clear customization intent */}
+        <Button
+          variant="cyan"
+          size="lg"
+          className="w-full py-3 shadow-hard hover:shadow-hard-lg border-3"
+          onClick={onPlayAgain}
+        >
+          <FaCog className="me-2" />
+          {t('common.settingsAndPlay') || 'Settings & Play Again'}
+        </Button>
+        {/* Tertiary: Back to Lobby - least prominent exit action */}
+        <Button
+          variant="outline"
+          size="lg"
+          className="w-full py-3 shadow-hard hover:shadow-hard-lg border-3"
+          onClick={onBackToLobby}
+        >
+          <FaHome className="me-2" />
+          {t('common.backToLobby') || 'Back to Lobby'}
+        </Button>
       </div>
 
       {/* Signup prompt for guests who have played multiple games */}
