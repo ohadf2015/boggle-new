@@ -51,12 +51,13 @@ const getComboBonus = (comboLevel, wordLength = 4) => {
 // Calculate score based on word length - 1 point per letter beyond the first
 // This gives every letter value: 2 letters = 1 point, 3 letters = 2 points, 4 letters = 3 points, etc.
 // Combo bonus is applied based on word length (longer words benefit more from combos)
-const calculateWordScore = (word, comboLevel = 0) => {
+// Fire round multiplier (2x during earthquake fire round) is applied to the final score
+const calculateWordScore = (word, comboLevel = 0, fireRoundMultiplier = 1) => {
   const length = word.length;
   if (length === 1) return 0; // Single letters not allowed
   const baseScore = length - 1; // Each letter beyond the first gets 1 point
   const bonus = getComboBonus(comboLevel, length);
-  return baseScore + bonus;
+  return (baseScore + bonus) * fireRoundMultiplier;
 };
 
 /**
@@ -138,7 +139,10 @@ const calculateGameScores = (game, wordCountMap = {}, dictionaryValidatedWords =
         isAiVerified,
         // Include timestamp for pace analysis in PlayerInsights
         timestamp: existingDetails?.timestamp || null,
-        timeSinceStart: existingDetails?.timeSinceStart || null
+        timeSinceStart: existingDetails?.timeSinceStart || null,
+        // Include fire round data for results display
+        fireRoundMultiplier: existingDetails?.fireRoundMultiplier || 1,
+        fireRoundBonus: existingDetails?.fireRoundBonus || 0
       };
 
       // Only add aiReason if present (for invalid AI-verified words or valid ones with explanation)

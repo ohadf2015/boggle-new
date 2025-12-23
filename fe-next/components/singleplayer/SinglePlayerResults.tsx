@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
+import dynamic from 'next/dynamic';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FaTrophy, FaMedal, FaRedo, FaHome, FaRobot, FaChartBar, FaCrown, FaStar, FaAward } from 'react-icons/fa';
 import { Sparkles, TrendingUp, Target } from 'lucide-react';
@@ -10,24 +11,21 @@ import GridComponent from '@/components/GridComponent';
 import PlayerInsights from '@/components/results/PlayerInsights';
 import { AchievementBadge } from '@/components/AchievementBadge';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useAuth } from '@/contexts/AuthContext';
 import { cn } from '@/lib/utils';
 import confetti from 'canvas-confetti';
-import { POINT_COLORS } from '@/utils/consts';
 import { useMobileLandscape } from '@/hooks/useMobileLandscape';
+import { updateGuestStatsAfterGame, getGuestStats } from '@/utils/guestManager';
+import { getPointColor, getTextColor } from '@/components/results/utils';
+import { getRankBgColor } from '@/utils/rankingStyles';
 import type { SinglePlayerResultsData, SinglePlayerMode } from './SinglePlayerView';
 import { useResultsData } from './results';
 
-// Helper to safely get point color with fallback
-const getPointColor = (points: number): string => {
-  return POINT_COLORS[points] ?? POINT_COLORS[8] ?? 'var(--neo-pink)';
-};
+// Dynamic import for signup modal
+const FirstWinSignupModal = dynamic(() => import('@/components/auth/FirstWinSignupModal'), { ssr: false });
 
-// Get text color based on background - ensure readability
-const getTextColor = (points: number): string => {
-  // For cyan backgrounds (2-3 point words) and purple (5-6 point words), use dark text for better contrast
-  if (points === 2 || points === 3 || points === 5 || points === 6) return 'rgb(var(--neo-black))';
-  return 'var(--neo-cream)';
-};
+// Session storage key for tracking if signup prompt was shown
+const SIGNUP_PROMPT_SHOWN_KEY = 'boggle_sp_signup_shown';
 
 interface SinglePlayerResultsProps {
   results: SinglePlayerResultsData;
@@ -49,9 +47,14 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
   onBackToLobby,
 }) => {
   const { t } = useLanguage();
+  const { isAuthenticated } = useAuth();
   const isLandscape = useMobileLandscape();
   const [showGrid, setShowGrid] = useState(false);
   const [expandedBot, setExpandedBot] = useState<string | null>(null);
+  const [showSignupModal, setShowSignupModal] = useState(false);
+
+  // Refs to prevent duplicate stat updates
+  const hasUpdatedStatsRef = useRef(false);
 
   // Use extracted hook for data processing
   const {
@@ -77,6 +80,53 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
     }
   }, [isWinner, results.isNewHighScore]);
 
+  // Update guest stats for single player games (only for unauthenticated users)
+  useEffect(() => {
+    if (isAuthenticated || hasUpdatedStatsRef.current) return;
+
+    // Get the longest valid word from player's words
+    const validWords = results.playerWordData?.filter(w => w.isValid) || [];
+    const longestWord = validWords.reduce<string | undefined>(
+      (longest, w) => (w.word.length > (longest?.length || 0) ? w.word : longest),
+      undefined
+    );
+
+    // Update guest stats
+    updateGuestStatsAfterGame({
+      score: results.playerScore,
+      wordCount: validWords.length,
+      longestWord,
+      isWinner: isWinner,
+      achievements: results.achievements?.map(a => a.key) || []
+    });
+
+    hasUpdatedStatsRef.current = true;
+  }, [isAuthenticated, results, isWinner]);
+
+  // Show signup prompt for guests who have played 2+ games
+  useEffect(() => {
+    // Skip if authenticated or modal already shown this session
+    if (isAuthenticated) return;
+    if (typeof window === 'undefined') return;
+
+    // Check if already shown this session
+    const alreadyShown = sessionStorage.getItem(SIGNUP_PROMPT_SHOWN_KEY);
+    if (alreadyShown) return;
+
+    // Check if user has played 2+ games total
+    const stats = getGuestStats();
+    if ((stats.games || 0) < 2) return;
+
+    // Show modal after 2 seconds delay
+    const timer = setTimeout(() => {
+      setShowSignupModal(true);
+      sessionStorage.setItem(SIGNUP_PROMPT_SHOWN_KEY, 'true');
+    }, 2000);
+
+    return () => clearTimeout(timer);
+  }, [isAuthenticated]);
+
+  // getRankIcon returns React elements - kept local as it's component-specific
   const getRankIcon = (rank: number) => {
     if (rank === 1) return <FaTrophy className="text-neo-yellow text-xl" />;
     if (rank === 2) return <FaMedal className="text-slate-500 dark:text-slate-300 text-xl" />;
@@ -84,16 +134,7 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
     return <span className="text-neo-black/50 dark:text-white/50 font-bold">#{rank}</span>;
   };
 
-  const getRankBgColor = (rank: number, isPlayer: boolean) => {
-    if (isPlayer) {
-      if (rank === 1) return 'bg-gradient-to-r from-neo-yellow to-yellow-300 border-neo-yellow';
-      return 'bg-neo-cyan/20 dark:bg-neo-cyan/30 border-neo-cyan';
-    }
-    if (rank === 1) return 'bg-gradient-to-r from-neo-yellow/30 to-yellow-200/30 dark:from-neo-yellow/20 dark:to-yellow-200/20 border-neo-yellow/50';
-    if (rank === 2) return 'bg-gradient-to-r from-gray-200 to-gray-100 dark:from-slate-600 dark:to-slate-700 border-gray-300 dark:border-slate-500';
-    if (rank === 3) return 'bg-gradient-to-r from-amber-200/50 to-amber-100/50 dark:from-amber-800/30 dark:to-amber-700/30 border-amber-300 dark:border-amber-600';
-    return 'border-neo-black/20 dark:border-slate-500 bg-white dark:bg-slate-700';
-  };
+  // getRankBgColor imported from @/utils/rankingStyles
 
   // Landscape mode layout - 2-column: score/grid left, words/actions right
   if (isLandscape) {
@@ -247,6 +288,13 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
             </Button>
           </div>
         </div>
+
+        {/* Signup prompt for guests who have played multiple games */}
+        <FirstWinSignupModal
+          isOpen={showSignupModal}
+          onClose={() => setShowSignupModal(false)}
+          variant="multiGames"
+        />
       </div>
     );
   }
@@ -808,6 +856,13 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
           </Button>
         </div>
       </div>
+
+      {/* Signup prompt for guests who have played multiple games */}
+      <FirstWinSignupModal
+        isOpen={showSignupModal}
+        onClose={() => setShowSignupModal(false)}
+        variant="multiGames"
+      />
     </motion.div>
   );
 };

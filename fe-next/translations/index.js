@@ -1031,6 +1031,10 @@ const translations = {
         },
         statsTeaser: 'You\'ve played ${games} game(s) and scored ${score} points!',
         maybeLater: 'Maybe later'
+      },
+      multiGames: {
+        title: 'You\'re Getting Good!',
+        subtitle: 'Sign up to save your progress and track your achievements!'
       }
     },
     legal: {
@@ -1444,6 +1448,32 @@ const translations = {
       games: 'games',
       newRecord: 'New record!',
       online: 'online',
+    },
+    daily: {
+      title: 'Daily Challenge',
+      badge: 'DAILY CHALLENGE',
+      puzzleNumber: 'Daily #{number}',
+      timeLimit: 'Time Limit',
+      attempt: 'Attempt',
+      playButton: "Play Today's Puzzle",
+      nextPuzzleIn: 'Next puzzle in:',
+      samePuzzle: 'Same puzzle for everyone worldwide. Share your results to challenge friends!',
+      alreadyPlayed: 'Already Played Today',
+      yourScore: 'Your Score',
+      completed: 'Completed!',
+      quitConfirm: "Are you sure you want to quit? Your progress will be lost and you won't be able to play today's puzzle again.",
+      wordsFound: '{count} words found',
+      streak: 'Streak',
+      streakDays: '{count} Day Streak!',
+      shareScore: 'Share Your Score',
+      copyToClipboard: 'Copy to Clipboard',
+      copiedToClipboard: 'Copied to clipboard!',
+      home: 'Home',
+      close: 'Close',
+      bannerTitle: 'Daily #{number}',
+      bannerSubtitle: 'Same puzzle for everyone. Share your score!',
+      playNow: 'PLAY NOW',
+      loading: 'Loading Daily Challenge...',
     },
   },
   he: {
@@ -2467,6 +2497,16 @@ const translations = {
         benefitsTitle: 'הירשם כדי לקבל:',
         benefits: {
           trackProgress: 'מעקב אחר הסטטיסטיקות, הניצחונות וההישגים שלך',
+          leaderboard: 'להתחרות בטבלת המובילים',
+          playWithFriends: 'לאתגר חברים ולבנות את המוניטין שלך'
+        },
+        statsTeaser: 'שיחקת ${games} משחק(ים) וצברת ${score} נקודות!',
+        maybeLater: 'אולי אחר כך'
+      },
+      multiGames: {
+        title: 'אתה משתפר!',
+        subtitle: 'הירשם כדי לשמור את ההתקדמות שלך ולעקוב אחר ההישגים!',
+        features: {
           leaderboard: 'התחרות בטבלת המובילים העולמית',
           playWithFriends: 'אתגר חברים ובנה את המוניטין שלך'
         },
@@ -2885,6 +2925,32 @@ const translations = {
       games: 'משחקים',
       newRecord: 'שיא חדש!',
       online: 'מחוברים',
+    },
+    daily: {
+      title: 'אתגר יומי',
+      badge: 'אתגר יומי',
+      puzzleNumber: 'יומי #{number}',
+      timeLimit: 'מגבלת זמן',
+      attempt: 'ניסיון',
+      playButton: 'שחקו את החידה של היום',
+      nextPuzzleIn: 'החידה הבאה בעוד:',
+      samePuzzle: 'אותה חידה לכולם בעולם. שתפו את התוצאות שלכם לאתגר חברים!',
+      alreadyPlayed: 'כבר שיחקתם היום',
+      yourScore: 'הניקוד שלכם',
+      completed: 'הושלם!',
+      quitConfirm: 'בטוחים שאתם רוצים לצאת? ההתקדמות תאבד ולא תוכלו לשחק שוב את החידה של היום.',
+      wordsFound: 'נמצאו {count} מילים',
+      streak: 'רצף',
+      streakDays: 'רצף של {count} ימים!',
+      shareScore: 'שתפו את הניקוד',
+      copyToClipboard: 'העתק ללוח',
+      copiedToClipboard: 'הועתק ללוח!',
+      home: 'בית',
+      close: 'סגור',
+      bannerTitle: 'יומי #{number}',
+      bannerSubtitle: 'אותה חידה לכולם. שתפו את הניקוד!',
+      playNow: 'שחקו עכשיו',
+      loading: 'טוען אתגר יומי...',
     },
   },
   sv: {
@@ -3916,6 +3982,10 @@ const translations = {
         },
         statsTeaser: 'Du har spelat ${games} spel och fått ${score} poäng!',
         maybeLater: 'Kanske senare'
+      },
+      multiGames: {
+        title: 'Du blir bättre!',
+        subtitle: 'Registrera dig för att spara din framsteg och följa dina prestationer!'
       }
     },
     profile: {
@@ -4327,6 +4397,32 @@ const translations = {
       games: 'spel',
       newRecord: 'Nytt rekord!',
       online: 'online',
+    },
+    daily: {
+      title: 'Daglig utmaning',
+      badge: 'DAGLIG UTMANING',
+      puzzleNumber: 'Daglig #{number}',
+      timeLimit: 'Tidsgräns',
+      attempt: 'Försök',
+      playButton: 'Spela dagens pussel',
+      nextPuzzleIn: 'Nästa pussel om:',
+      samePuzzle: 'Samma pussel för alla världen över. Dela dina resultat för att utmana vänner!',
+      alreadyPlayed: 'Redan spelat idag',
+      yourScore: 'Din poäng',
+      completed: 'Klart!',
+      quitConfirm: 'Är du säker på att du vill avsluta? Dina framsteg går förlorade och du kommer inte kunna spela dagens pussel igen.',
+      wordsFound: '{count} ord hittade',
+      streak: 'Streak',
+      streakDays: '{count} dagars streak!',
+      shareScore: 'Dela din poäng',
+      copyToClipboard: 'Kopiera till urklipp',
+      copiedToClipboard: 'Kopierad till urklipp!',
+      home: 'Hem',
+      close: 'Stäng',
+      bannerTitle: 'Daglig #{number}',
+      bannerSubtitle: 'Samma pussel för alla. Dela din poäng!',
+      playNow: 'SPELA NU',
+      loading: 'Laddar daglig utmaning...',
     },
   },
   ja: {
@@ -5358,6 +5454,10 @@ const translations = {
         },
         statsTeaser: '${games}ゲームをプレイして${score}ポイントを獲得しました!',
         maybeLater: 'また今度'
+      },
+      multiGames: {
+        title: '上達しています！',
+        subtitle: '登録して進捗を保存し、実績を追跡しましょう！'
       }
     },
     profile: {
@@ -5769,6 +5869,32 @@ const translations = {
       games: 'ゲーム',
       newRecord: '新記録！',
       online: 'オンライン',
+    },
+    daily: {
+      title: 'デイリーチャレンジ',
+      badge: 'デイリーチャレンジ',
+      puzzleNumber: 'デイリー #{number}',
+      timeLimit: '制限時間',
+      attempt: '挑戦',
+      playButton: '今日のパズルをプレイ',
+      nextPuzzleIn: '次のパズルまで:',
+      samePuzzle: '世界中で同じパズル。結果をシェアして友達に挑戦！',
+      alreadyPlayed: '今日はプレイ済み',
+      yourScore: 'あなたのスコア',
+      completed: '完了！',
+      quitConfirm: '本当に終了しますか？進捗が失われ、今日のパズルは再プレイできません。',
+      wordsFound: '{count}語発見',
+      streak: 'ストリーク',
+      streakDays: '{count}日連続！',
+      shareScore: 'スコアをシェア',
+      copyToClipboard: 'クリップボードにコピー',
+      copiedToClipboard: 'コピーしました！',
+      home: 'ホーム',
+      close: '閉じる',
+      bannerTitle: 'デイリー #{number}',
+      bannerSubtitle: '世界共通のパズル。スコアをシェア！',
+      playNow: '今すぐプレイ',
+      loading: 'デイリーチャレンジを読み込み中...',
     },
   },
   es: {
@@ -6636,6 +6762,10 @@ const translations = {
         },
         statsTeaser: '¡Has jugado ${games} juego(s) y anotado ${score} puntos!',
         maybeLater: 'Quizás después'
+      },
+      multiGames: {
+        title: '¡Estás mejorando!',
+        subtitle: '¡Regístrate para guardar tu progreso y seguir tus logros!'
       }
     },
     legal: {
@@ -7034,6 +7164,32 @@ const translations = {
       games: 'juegos',
       newRecord: '¡Nuevo récord!',
       online: 'en línea',
+    },
+    daily: {
+      title: 'Desafío Diario',
+      badge: 'DESAFÍO DIARIO',
+      puzzleNumber: 'Diario #{number}',
+      timeLimit: 'Límite de Tiempo',
+      attempt: 'Intento',
+      playButton: 'Jugar el Puzzle de Hoy',
+      nextPuzzleIn: 'Próximo puzzle en:',
+      samePuzzle: 'Mismo puzzle para todos en el mundo. ¡Comparte tus resultados para desafiar a amigos!',
+      alreadyPlayed: 'Ya Jugaste Hoy',
+      yourScore: 'Tu Puntuación',
+      completed: '¡Completado!',
+      quitConfirm: '¿Seguro que quieres salir? Perderás tu progreso y no podrás jugar el puzzle de hoy de nuevo.',
+      wordsFound: '{count} palabras encontradas',
+      streak: 'Racha',
+      streakDays: '¡Racha de {count} días!',
+      shareScore: 'Comparte tu Puntuación',
+      copyToClipboard: 'Copiar al portapapeles',
+      copiedToClipboard: '¡Copiado al portapapeles!',
+      home: 'Inicio',
+      close: 'Cerrar',
+      bannerTitle: 'Diario #{number}',
+      bannerSubtitle: 'Mismo puzzle para todos. ¡Comparte tu puntuación!',
+      playNow: 'JUGAR AHORA',
+      loading: 'Cargando Desafío Diario...',
     },
   }
 };

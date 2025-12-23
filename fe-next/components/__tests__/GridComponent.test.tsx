@@ -7,19 +7,29 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import GridComponent from '../GridComponent';
+import { LanguageProvider } from '@/contexts/LanguageContext';
 
 // Mock framer-motion to avoid animation issues in tests
 jest.mock('framer-motion', () => ({
   motion: {
-    div: ({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>) => (
+    div: ({ children, initial, animate, exit, whileTap, transition, ...props }: React.PropsWithChildren<Record<string, unknown>>) => (
       <div {...props}>{children}</div>
     ),
-    span: ({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>) => (
+    span: ({ children, initial, animate, exit, whileTap, transition, ...props }: React.PropsWithChildren<Record<string, unknown>>) => (
       <span {...props}>{children}</span>
     ),
   },
   AnimatePresence: ({ children }: React.PropsWithChildren) => <>{children}</>,
+  useAnimation: () => ({
+    start: jest.fn(),
+    stop: jest.fn(),
+    set: jest.fn(),
+  }),
 }));
+
+const TestWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => (
+  <LanguageProvider>{children}</LanguageProvider>
+);
 
 describe('GridComponent', () => {
   const mockGrid = [
@@ -30,7 +40,7 @@ describe('GridComponent', () => {
 
   describe('rendering', () => {
     it('renders all letters in the grid', () => {
-      render(<GridComponent grid={mockGrid} />);
+      render(<GridComponent grid={mockGrid} />, { wrapper: TestWrapper });
 
       // Check that all letters are rendered
       mockGrid.flat().forEach((letter) => {
@@ -39,7 +49,7 @@ describe('GridComponent', () => {
     });
 
     it('renders correct number of cells', () => {
-      render(<GridComponent grid={mockGrid} />);
+      render(<GridComponent grid={mockGrid} />, { wrapper: TestWrapper });
 
       // Should have 9 cells (3x3 grid)
       const cells = screen.getAllByText(/^[A-I]$/);
@@ -48,7 +58,8 @@ describe('GridComponent', () => {
 
     it('renders with custom className', () => {
       const { container } = render(
-        <GridComponent grid={mockGrid} className="custom-class" />
+        <GridComponent grid={mockGrid} className="custom-class" />,
+        { wrapper: TestWrapper }
       );
 
       // Component should render (className is passed to inner element)
@@ -65,7 +76,7 @@ describe('GridComponent', () => {
         ['M', 'N', 'O', 'P'],
       ];
 
-      render(<GridComponent grid={grid4x4} />);
+      render(<GridComponent grid={grid4x4} />, { wrapper: TestWrapper });
 
       const cells = screen.getAllByText(/^[A-P]$/);
       expect(cells).toHaveLength(16);
@@ -78,7 +89,7 @@ describe('GridComponent', () => {
         )
       );
 
-      render(<GridComponent grid={grid6x6} />);
+      render(<GridComponent grid={grid6x6} />, { wrapper: TestWrapper });
 
       // Should render all 36 cells
       const allCells = screen.getAllByText(/^[A-Z]$/);
@@ -88,14 +99,14 @@ describe('GridComponent', () => {
 
   describe('interactive mode', () => {
     it('renders in non-interactive mode by default', () => {
-      const { container } = render(<GridComponent grid={mockGrid} />);
+      const { container } = render(<GridComponent grid={mockGrid} />, { wrapper: TestWrapper });
 
       // Grid cells exist even in non-interactive mode (for display)
       expect(container.firstChild).toBeInTheDocument();
     });
 
     it('renders in interactive mode when prop is true', () => {
-      render(<GridComponent grid={mockGrid} interactive={true} />);
+      render(<GridComponent grid={mockGrid} interactive={true} />, { wrapper: TestWrapper });
 
       // In interactive mode, the grid should be focusable
       const focusableElements = document.querySelectorAll('[tabindex]');
@@ -106,7 +117,8 @@ describe('GridComponent', () => {
   describe('visual states', () => {
     it('applies large text styles when largeText is true', () => {
       const { container } = render(
-        <GridComponent grid={mockGrid} largeText={true} />
+        <GridComponent grid={mockGrid} largeText={true} />,
+        { wrapper: TestWrapper }
       );
 
       // Should have larger font size class
@@ -116,7 +128,8 @@ describe('GridComponent', () => {
 
     it('applies combo level colors', () => {
       const { container } = render(
-        <GridComponent grid={mockGrid} comboLevel={3} />
+        <GridComponent grid={mockGrid} comboLevel={3} />,
+        { wrapper: TestWrapper }
       );
 
       // Component should render with combo styles
@@ -132,7 +145,8 @@ describe('GridComponent', () => {
       ];
 
       const { container } = render(
-        <GridComponent grid={mockGrid} selectedCells={selectedCells} />
+        <GridComponent grid={mockGrid} selectedCells={selectedCells} />,
+        { wrapper: TestWrapper }
       );
 
       // Should render without errors
@@ -145,13 +159,13 @@ describe('GridComponent', () => {
       const emptyGrid: string[][] = [];
 
       // Should not throw
-      expect(() => render(<GridComponent grid={emptyGrid} />)).not.toThrow();
+      expect(() => render(<GridComponent grid={emptyGrid} />, { wrapper: TestWrapper })).not.toThrow();
     });
 
     it('handles single cell grid', () => {
       const singleCellGrid = [['A']];
 
-      render(<GridComponent grid={singleCellGrid} />);
+      render(<GridComponent grid={singleCellGrid} />, { wrapper: TestWrapper });
 
       expect(screen.getByText('A')).toBeInTheDocument();
     });
@@ -163,7 +177,7 @@ describe('GridComponent', () => {
         ['שׁ', 'あ', '漢'],
       ];
 
-      render(<GridComponent grid={specialGrid} />);
+      render(<GridComponent grid={specialGrid} />, { wrapper: TestWrapper });
 
       expect(screen.getByText('Qu')).toBeInTheDocument();
       expect(screen.getByText('ä')).toBeInTheDocument();
@@ -172,7 +186,7 @@ describe('GridComponent', () => {
 
   describe('accessibility', () => {
     it('has proper semantic structure', () => {
-      const { container } = render(<GridComponent grid={mockGrid} />);
+      const { container } = render(<GridComponent grid={mockGrid} />, { wrapper: TestWrapper });
 
       // Should have a containing element
       expect(container.firstChild).toBeInTheDocument();

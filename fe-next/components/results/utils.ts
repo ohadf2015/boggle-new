@@ -67,3 +67,12 @@ export function filterGameAchievements(
 export function getPointColor(points: number): string {
   return POINT_COLORS[points] ?? POINT_COLORS[8] ?? 'var(--neo-pink)';
 }
+
+/**
+ * Get text color based on background - ensure readability
+ * For cyan backgrounds (2-3 point words) and purple (5-6 point words), use dark text
+ */
+export function getTextColor(points: number): string {
+  if (points === 2 || points === 3 || points === 5 || points === 6) return 'rgb(var(--neo-black))';
+  return 'var(--neo-cream)';
+}

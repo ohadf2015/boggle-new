@@ -1,8 +1,9 @@
 'use client';
 
-import React, { memo, useMemo, useCallback } from 'react';
+import React, { memo, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { FaTrophy } from 'react-icons/fa';
+import { getRankStyle, getRankIconString } from '@/utils/rankingStyles';
 import Avatar from '../../../components/Avatar';
 import type { Avatar as AvatarType } from '@/shared/types/game';
 
@@ -35,21 +36,13 @@ export const LiveLeaderboard = memo<LiveLeaderboardProps>(({
   dir,
   compact = false,
 }) => {
-  // Memoize rank style function
-  const getRankStyle = useCallback((index: number): string => {
-    if (index === 0) return 'bg-neo-yellow text-neo-black border-neo-black';
-    if (index === 1) return 'bg-slate-300 text-neo-black border-neo-black';
-    if (index === 2) return 'bg-neo-orange text-neo-black border-neo-black';
-    return 'bg-neo-cream text-neo-black border-neo-black';
-  }, []);
-
-  // Memoize leaderboard items
+  // Memoize leaderboard items with centralized ranking utilities
   const memoizedLeaderboard = useMemo(() => leaderboard.map((player, index) => ({
     ...player,
     rankStyle: getRankStyle(index),
     isMe: player.username === username,
-    rankDisplay: index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : `#${index + 1}`
-  })), [leaderboard, username, getRankStyle]);
+    rankDisplay: getRankIconString(index)
+  })), [leaderboard, username]);
 
   return (
     <div

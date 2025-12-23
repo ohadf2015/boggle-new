@@ -4,6 +4,7 @@ import React, { useState, memo, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FaTrophy, FaCrown, FaChevronUp, FaChevronDown } from 'react-icons/fa';
 import { cn } from '@/lib/utils';
+import { getRankIconString, getRankStyle } from '@/utils/rankingStyles';
 import Avatar from '../Avatar';
 import { MobileDrawer } from '../layout/MobileDrawer';
 import type { Avatar as AvatarType, PresenceStatus } from '@/shared/types/game';
@@ -51,21 +52,7 @@ const MobileLeaderboard = memo<MobileLeaderboardProps>(({
   // Get top 3 players for mini-view
   const top3 = useMemo(() => leaderboard.slice(0, 3), [leaderboard]);
 
-  // Rank emojis
-  const getRankEmoji = (index: number) => {
-    if (index === 0) return '🥇';
-    if (index === 1) return '🥈';
-    if (index === 2) return '🥉';
-    return `#${index + 1}`;
-  };
-
-  // Rank style
-  const getRankStyle = (index: number) => {
-    if (index === 0) return 'bg-neo-yellow text-neo-black';
-    if (index === 1) return 'bg-slate-300 text-neo-black';
-    if (index === 2) return 'bg-neo-orange text-neo-black';
-    return 'bg-neo-cream text-neo-black';
-  };
+  // Ranking utilities imported from @/utils/rankingStyles
 
   if (leaderboard.length === 0) return null;
 
@@ -114,7 +101,7 @@ const MobileLeaderboard = memo<MobileLeaderboardProps>(({
                 )}
               >
                 <span className="font-black w-5 text-center text-[10px]">
-                  {getRankEmoji(index)}
+                  {getRankIconString(index)}
                 </span>
                 <span className="flex-1 font-bold truncate max-w-[60px] text-[11px]">
                   {player.username === currentUsername ? (t('playerView.me') || 'You') : player.username}
@@ -165,7 +152,7 @@ const MobileLeaderboard = memo<MobileLeaderboardProps>(({
             >
               {/* Rank badge */}
               <div className="w-9 h-9 rounded-neo flex items-center justify-center font-black text-base bg-neo-black text-neo-cream border-2 border-neo-black">
-                {getRankEmoji(index)}
+                {getRankIconString(index)}
               </div>
 
               {/* Avatar */}

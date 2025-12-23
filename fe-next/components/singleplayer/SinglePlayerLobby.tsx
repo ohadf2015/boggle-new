@@ -276,7 +276,11 @@ const SinglePlayerLobby: React.FC<SinglePlayerLobbyProps> = ({
                         className={cn('text-xs flex items-center gap-1 px-2 py-1', BOT_DIFFICULTY_CONFIG[bot.difficulty].color)}
                       >
                         {bot.name}
-                        <button onClick={() => removeBot(bot.id)} className="ml-1 hover:text-neo-red">
+                        <button 
+                          onClick={() => removeBot(bot.id)} 
+                          className="ml-1 hover:text-neo-red min-w-[32px] min-h-[32px] flex items-center justify-center"
+                          aria-label={`Remove ${bot.name}`}
+                        >
                           <FaTimes className="text-[10px]" />
                         </button>
                       </Badge>
@@ -521,7 +525,11 @@ const SinglePlayerLobby: React.FC<SinglePlayerLobbyProps> = ({
                       className={cn('text-xs', BOT_DIFFICULTY_CONFIG[bot.difficulty].color)}
                     >
                       {bot.name}
-                      <button onClick={() => removeBot(bot.id)} className="ml-1 hover:text-neo-red">
+                      <button 
+                        onClick={() => removeBot(bot.id)} 
+                        className="ml-1 hover:text-neo-red min-w-[32px] min-h-[32px] flex items-center justify-center"
+                        aria-label={`Remove ${bot.name}`}
+                      >
                         <FaTimes className="w-3.5 h-3.5" />
                       </button>
                     </Badge>

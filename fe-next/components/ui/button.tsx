@@ -61,9 +61,9 @@ const buttonVariants = cva(
       },
       size: {
         default: "h-11 px-5 py-2 [&_svg]:w-5 [&_svg]:h-5",
-        sm: "h-9 px-4 text-xs [&_svg]:w-4 [&_svg]:h-4",
+        sm: "min-h-[44px] h-9 sm:h-9 px-4 text-xs [&_svg]:w-4 [&_svg]:h-4",
         lg: "h-14 px-8 text-base [&_svg]:w-6 [&_svg]:h-6",
-        icon: "h-11 w-11 p-0 [&_svg]:w-5 [&_svg]:h-5",
+        icon: "h-11 w-11 min-w-[44px] min-h-[44px] p-0 [&_svg]:w-5 [&_svg]:h-5",
       },
     },
     defaultVariants: {

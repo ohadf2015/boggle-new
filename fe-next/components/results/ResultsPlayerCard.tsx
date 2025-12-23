@@ -11,9 +11,9 @@ import { ChevronDown, ChevronUp } from 'lucide-react';
 import Avatar from '../Avatar';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../ui/tooltip';
 import logger from '@/utils/logger';
-import WordChip from './WordChip';
 import XpBreakdownCard from './XpBreakdownCard';
-import { getPointColor } from './utils';
+import { WordPointsGroup, SharedWordsSection, InvalidWordsSection } from './WordPointsGroup';
+import { getRankIconString, getRankBoxStyle, getCardStyle } from '../../utils/rankingStyles';
 import type { WordObject, GameAchievement, ResultsPlayerCardProps } from './types';
 
 // Lifetime/career achievement keys that should NOT be shown in game results
@@ -98,7 +98,7 @@ const ResultsPlayerCard: React.FC<ResultsPlayerCardProps> = ({ player, index, al
   const avatar = player.avatar || null;
 
   // Memoize expensive word categorization and grouping at component level (not inside JSX)
-  const { duplicateWords, invalidWords, validWords, wordsByPoints, sortedPointGroups, totalComboBonus, summaryStats } = useMemo(() => {
+  const { duplicateWords, invalidWords, validWords, wordsByPoints, sortedPointGroups, totalComboBonus, totalFireRoundBonus, summaryStats } = useMemo(() => {
     if (!player.allWords || player.allWords.length === 0) {
       return {
         duplicateWords: [] as WordObject[],
@@ -107,6 +107,7 @@ const ResultsPlayerCard: React.FC<ResultsPlayerCardProps> = ({ player, index, al
         wordsByPoints: {} as Record<number, WordObject[]>,
         sortedPointGroups: [] as number[],
         totalComboBonus: 0,
+        totalFireRoundBonus: 0,
         summaryStats: null
       };
     }
@@ -118,9 +119,17 @@ const ResultsPlayerCard: React.FC<ResultsPlayerCardProps> = ({ player, index, al
     // Calculate total combo bonus from all valid non-duplicate words
     const totalComboBonus = validWords.reduce((sum, w) => sum + (w.comboBonus || 0), 0);
 
+    // Calculate total fire round bonus from all valid non-duplicate words
+    const totalFireRoundBonus = validWords.reduce((sum, w) => sum + (w.fireRoundBonus || 0), 0);
+
     // Debug logging for combo bonus calculation
     if (totalComboBonus > 0) {
       logger.log(`[RESULTS] ${player.username} combo bonus: ${totalComboBonus} from ${validWords.filter(w => (w.comboBonus ?? 0) > 0).length} words with bonuses`);
+    }
+
+    // Debug logging for fire round bonus calculation
+    if (totalFireRoundBonus > 0) {
+      logger.log(`[RESULTS] ${player.username} fire round bonus: ${totalFireRoundBonus} from ${validWords.filter(w => (w.fireRoundBonus ?? 0) > 0).length} words`);
     }
 
     // Group valid words by points
@@ -169,7 +178,7 @@ const ResultsPlayerCard: React.FC<ResultsPlayerCardProps> = ({ player, index, al
       accuracy,
     };
 
-    return { duplicateWords, invalidWords, validWords, wordsByPoints, sortedPointGroups, totalComboBonus, summaryStats };
+    return { duplicateWords, invalidWords, validWords, wordsByPoints, sortedPointGroups, totalComboBonus, totalFireRoundBonus, summaryStats };
   }, [player.allWords, player.username]);
 
   // Calculate player insights (only for current player to avoid unnecessary computation)
@@ -218,38 +227,10 @@ const ResultsPlayerCard: React.FC<ResultsPlayerCardProps> = ({ player, index, al
     return count;
   };
 
-  // Determine rank styling
-  const getRankIcon = (): string => {
-    if (index === 0) return '🥇';
-    if (index === 1) return '🥈';
-    if (index === 2) return '🥉';
-    return `#${index + 1}`;
-  };
-
-  // Neo-Brutalist rank box styling - solid colors, no gradients
-  const getRankBoxStyle = (): string => {
-    if (index === 0) {
-      // Gold
-      return 'bg-neo-yellow border-neo-black';
-    }
-    if (index === 1) {
-      // Silver
-      return 'bg-slate-300 border-neo-black';
-    }
-    if (index === 2) {
-      // Bronze
-      return 'bg-neo-orange border-neo-black';
-    }
-    return 'bg-neo-cream border-neo-black';
-  };
-
-  // Neo-Brutalist card styling - solid colors, hard shadows
-  const getCardStyle = (): string => {
-    if (index === 0) return 'bg-neo-yellow border-neo-black';
-    if (index === 1) return 'bg-slate-200 border-neo-black';
-    if (index === 2) return 'bg-neo-orange border-neo-black';
-    return 'bg-neo-cream border-neo-black';
-  };
+  // Use centralized ranking utilities
+  const rankIcon = getRankIconString(index);
+  const rankBoxStyleClass = getRankBoxStyle(index);
+  const cardStyleClass = getCardStyle(index);
 
   return (
     <motion.div
@@ -263,7 +244,7 @@ const ResultsPlayerCard: React.FC<ResultsPlayerCardProps> = ({ player, index, al
         className={cn(
           "p-4 sm:p-5 md:p-6 border-4 transition-all duration-200 rounded-neo-lg shadow-hard-lg relative overflow-hidden",
           "hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-hard-xl",
-          getCardStyle(),
+          cardStyleClass,
           isWordsExpanded && "ring-4 ring-neo-cyan",
           // Add comic-style halftone for winner card (more prominent)
           index === 0 && "texture-halftone-comic"
@@ -288,9 +269,9 @@ const ResultsPlayerCard: React.FC<ResultsPlayerCardProps> = ({ player, index, al
             <div className="flex items-center gap-2 min-w-0 flex-1">
               <div className={cn(
                 "w-11 h-11 sm:w-12 sm:h-12 rounded-neo flex items-center justify-center text-lg sm:text-2xl font-black border-3 shadow-hard-sm flex-shrink-0",
-                getRankBoxStyle()
+                rankBoxStyleClass
               )}>
-                {getRankIcon()}
+                {rankIcon}
               </div>
               <Avatar
                 profilePictureUrl={avatar?.profilePictureUrl}
@@ -365,7 +346,19 @@ const ResultsPlayerCard: React.FC<ResultsPlayerCardProps> = ({ player, index, al
                 transition={{ delay: 0.2, type: 'spring', stiffness: 300 }}
                 className="bg-neo-orange border-2 border-neo-black rounded-neo px-2 py-0.5 shadow-hard-sm text-neo-black flex items-center gap-1"
               >
-                <span className="text-xs font-black">🔥 {t('results.comboBonus')}: +{totalComboBonus}</span>
+                <span className="text-xs font-black">⚡ {t('results.comboBonus')}: +{totalComboBonus}</span>
+              </motion.div>
+            )}
+
+            {/* Fire Round Bonus */}
+            {totalFireRoundBonus > 0 && (
+              <motion.div
+                initial={{ scale: 0, rotate: -10 }}
+                animate={{ scale: 1, rotate: 3 }}
+                transition={{ delay: 0.25, type: 'spring', stiffness: 300 }}
+                className="bg-neo-red border-2 border-neo-black rounded-neo px-2 py-0.5 shadow-hard-sm text-neo-cream flex items-center gap-1"
+              >
+                <span className="text-xs font-black">🔥 {t('results.fireRoundBonus') || 'Fire Round'}: +{totalFireRoundBonus}</span>
               </motion.div>
             )}
 
@@ -463,81 +456,29 @@ const ResultsPlayerCard: React.FC<ResultsPlayerCardProps> = ({ player, index, al
                     </motion.div>
                   )}
 
-                  {/* Valid Words Grouped by Points - Neo-Brutalist */}
-                  {sortedPointGroups.length > 0 && (
-                    <div className="bg-neo-cream dark:bg-slate-800 rounded-neo p-3 border-3 border-neo-black shadow-hard-sm">
-                      <div className="text-sm font-black text-neo-black dark:text-neo-cream mb-3 flex items-center gap-2 uppercase">
-                        <span className="bg-neo-cyan text-neo-black px-2 py-0.5 rounded-neo border-2 border-neo-black">✓</span>
-                        {t('results.validWords') || 'Valid Words'} ({Object.values(wordsByPoints).flat().length})
-                      </div>
-                      <div className="space-y-2">
-                        {sortedPointGroups.map(points => {
-                          const wordsForPoints = wordsByPoints[points] ?? [];
-                          return (
-                          <div key={`points-${points}`} className="rounded-neo p-2 border-l-4 border-neo-black bg-white/50 dark:bg-slate-700/50" style={{ borderLeftColor: getPointColor(points) }}>
-                            <div className="text-xs font-black mb-1.5 flex items-center gap-2 text-neo-black dark:text-neo-cream uppercase">
-                              <span className="px-2 py-0.5 rounded-neo flex items-center justify-center font-black text-xs border-2 border-neo-black"
-                                    style={{
-                                      backgroundColor: getPointColor(points),
-                                      color: (points === 2 || points === 3 || points === 5 || points === 6) ? 'var(--neo-black)' : 'var(--neo-cream)'
-                                    }}>
-                                {points} {t('results.points') || 'pts'}
-                              </span>
-                              <span>{wordsForPoints.length} {t('hostView.words') || 'words'}</span>
-                            </div>
-                            <div className="flex flex-wrap gap-1.5">
-                              {wordsForPoints.map((wordObj, i) => (
-                                <WordChip
-                                  key={`${points}-${i}`}
-                                  wordObj={wordObj}
-                                  playerCount={getPlayerCountForWord(wordObj.word)}
-                                />
-                              ))}
-                            </div>
-                          </div>
-                          );
-                        })}
-                      </div>
-                    </div>
-                  )}
+                  {/* Valid Words Grouped by Points - Using reusable component */}
+                  <WordPointsGroup
+                    wordsByPoints={wordsByPoints}
+                    sortedPointGroups={sortedPointGroups}
+                    t={t}
+                    getPlayerCountForWord={getPlayerCountForWord}
+                    mode="chip"
+                  />
 
-                  {/* Duplicate Words - Neo-Brutalist */}
-                  {duplicateWords.length > 0 && (
-                    <div className="bg-neo-cream dark:bg-slate-800 rounded-neo p-3 border-3 border-neo-black shadow-hard-sm">
-                      <div className="text-sm font-black text-neo-black dark:text-neo-cream mb-2 flex items-center gap-2 uppercase">
-                        <span className="bg-neo-orange text-neo-black px-2 py-0.5 rounded-neo border-2 border-neo-black">👥</span>
-                        {t('results.shared') || 'Shared Words'} ({duplicateWords.length})
-                      </div>
-                      <div className="flex flex-wrap gap-1.5">
-                        {duplicateWords.map((wordObj, i) => (
-                          <WordChip
-                            key={`duplicate-${i}`}
-                            wordObj={wordObj}
-                            playerCount={getPlayerCountForWord(wordObj.word)}
-                          />
-                        ))}
-                      </div>
-                    </div>
-                  )}
+                  {/* Shared/Duplicate Words - Using reusable component */}
+                  <SharedWordsSection
+                    duplicateWords={duplicateWords}
+                    t={t}
+                    getPlayerCountForWord={getPlayerCountForWord}
+                  />
 
-                  {/* Invalid Words - Neo-Brutalist */}
-                  {invalidWords.length > 0 && (
-                    <div className="bg-neo-cream dark:bg-slate-800 rounded-neo p-3 border-3 border-neo-black shadow-hard-sm">
-                      <div className="text-sm font-black text-neo-black/70 dark:text-neo-cream/70 mb-2 flex items-center gap-2 uppercase">
-                        <span className="bg-neo-gray text-neo-cream px-2 py-0.5 rounded-neo border-2 border-neo-black">✗</span>
-                        {t('results.invalid') || 'Invalid Words'} ({invalidWords.length})
-                      </div>
-                      <div className="flex flex-wrap gap-1.5">
-                        {invalidWords.map((wordObj, i) => (
-                          <WordChip
-                            key={`invalid-${i}`}
-                            wordObj={wordObj}
-                            playerCount={getPlayerCountForWord(wordObj.word)}
-                          />
-                        ))}
-                      </div>
-                    </div>
-                  )}
+                  {/* Invalid Words - Using reusable component */}
+                  <InvalidWordsSection
+                    invalidWords={invalidWords}
+                    t={t}
+                    getPlayerCountForWord={getPlayerCountForWord}
+                    mode="chip"
+                  />
                 </div>
                 )}
               </motion.div>

@@ -20,6 +20,8 @@ import { cn } from '../../lib/utils';
 interface FirstWinSignupModalProps {
   isOpen: boolean;
   onClose: () => void;
+  /** Variant: 'firstWin' for win celebration, 'multiGames' for engagement after multiple games */
+  variant?: 'firstWin' | 'multiGames';
 }
 
 interface GuestStats {
@@ -39,7 +41,7 @@ interface Benefit {
   key: string;
 }
 
-const FirstWinSignupModal: React.FC<FirstWinSignupModalProps> = ({ isOpen, onClose }) => {
+const FirstWinSignupModal: React.FC<FirstWinSignupModalProps> = ({ isOpen, onClose, variant = 'firstWin' }) => {
   const { theme } = useTheme();
   const { t, language } = useLanguage();
   const isDarkMode = theme === 'dark';
@@ -47,10 +49,11 @@ const FirstWinSignupModal: React.FC<FirstWinSignupModalProps> = ({ isOpen, onClo
   const [error, setError] = useState<string | null>(null);
 
   const guestStats: GuestStats = getGuestStatsSummary();
+  const isMultiGamesVariant = variant === 'multiGames';
 
-  // Trigger celebratory confetti when modal opens
+  // Trigger celebratory confetti when modal opens (only for firstWin variant)
   useEffect(() => {
-    if (isOpen) {
+    if (isOpen && !isMultiGamesVariant) {
       // Delay confetti slightly for better effect
       const timer = setTimeout(() => {
         confetti({
@@ -63,7 +66,7 @@ const FirstWinSignupModal: React.FC<FirstWinSignupModalProps> = ({ isOpen, onClo
       return () => clearTimeout(timer);
     }
     return undefined;
-  }, [isOpen]);
+  }, [isOpen, isMultiGamesVariant]);
 
   const handleSignIn = async (provider: 'google' | 'discord') => {
     setIsLoading(provider);
@@ -192,13 +195,17 @@ const FirstWinSignupModal: React.FC<FirstWinSignupModalProps> = ({ isOpen, onClo
                 ? 'text-transparent bg-clip-text bg-gradient-to-r from-yellow-300 via-orange-300 to-yellow-400'
                 : 'text-transparent bg-clip-text bg-gradient-to-r from-yellow-500 via-orange-500 to-yellow-600'
             )}>
-              {t('auth.firstWin.title')}
+              {isMultiGamesVariant
+                ? (t('auth.multiGames.title') || 'You\'re Getting Good!')
+                : t('auth.firstWin.title')}
             </h2>
             <p className={cn(
               'text-sm',
               isDarkMode ? 'text-gray-300' : 'text-gray-600'
             )}>
-              {t('auth.firstWin.subtitle')}
+              {isMultiGamesVariant
+                ? (t('auth.multiGames.subtitle') || 'Sign up to save your progress and track your achievements!')
+                : t('auth.firstWin.subtitle')}
             </p>
           </motion.div>
 

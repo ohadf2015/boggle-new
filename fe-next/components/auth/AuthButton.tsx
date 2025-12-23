@@ -72,7 +72,7 @@ const AuthButton = (): React.ReactElement | null => {
           onClick={() => setShowUserMenu(!showUserMenu)}
           onBlur={() => setTimeout(() => { setShowUserMenu(false); setIsLanguageExpanded(false); }, 200)}
           className={cn(
-            'flex items-center gap-1 sm:gap-2 rounded-full transition-all duration-300 px-2 sm:px-3',
+            'flex items-center gap-1 sm:gap-2 rounded-full transition-all duration-300 px-2 sm:px-3 min-h-[44px]',
             isDarkMode
               ? 'bg-slate-800 text-cyan-300 hover:bg-slate-700 hover:shadow-[0_0_15px_rgba(6,182,212,0.3)] border-slate-700'
               : 'bg-white text-cyan-600 hover:bg-gray-50 hover:shadow-[0_0_15px_rgba(6,182,212,0.2)] border-gray-200'
@@ -271,7 +271,7 @@ const AuthButton = (): React.ReactElement | null => {
           size="sm"
           onClick={() => setShowAuthModal(true)}
           className={cn(
-            'flex items-center gap-2 rounded-full font-bold transition-all duration-300',
+            'flex items-center gap-2 rounded-full font-bold transition-all duration-300 min-h-[44px]',
             isDarkMode
               ? 'bg-neo-cyan text-neo-black hover:bg-cyan-400 hover:shadow-[0_0_15px_rgba(6,182,212,0.5)] border-2 border-neo-black'
               : 'bg-neo-cyan text-neo-black hover:bg-cyan-400 hover:shadow-[0_0_15px_rgba(6,182,212,0.4)] border-2 border-neo-black'
@@ -289,7 +289,7 @@ const AuthButton = (): React.ReactElement | null => {
             onClick={() => setShowUserMenu(!showUserMenu)}
             onBlur={() => setTimeout(() => { setShowUserMenu(false); setIsLanguageExpanded(false); }, 200)}
             className={cn(
-              'flex items-center gap-2 rounded-full transition-all duration-300',
+              'flex items-center gap-2 rounded-full transition-all duration-300 min-h-[44px]',
               isDarkMode
                 ? 'bg-slate-800 text-cyan-300 hover:bg-slate-700 hover:shadow-[0_0_15px_rgba(6,182,212,0.3)] border-slate-700'
                 : 'bg-white text-cyan-600 hover:bg-gray-50 hover:shadow-[0_0_15px_rgba(6,182,212,0.2)] border-gray-200'

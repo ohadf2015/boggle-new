@@ -102,6 +102,31 @@ const WordChip = memo<WordChipProps>(({ wordObj, playerCount }) => {
           +{comboBonus}
         </span>
       )}
+      {/* Show fire round multiplier indicator */}
+      {wordObj.fireRoundMultiplier && wordObj.fireRoundMultiplier > 1 && !isDuplicate && isValid && (
+        <TooltipProvider delayDuration={0}>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <span className="text-xs px-1.5 py-0.5 bg-neo-orange text-neo-black rounded border border-neo-black font-black cursor-help animate-pulse">
+                🔥 2×
+              </span>
+            </TooltipTrigger>
+            <TooltipContent
+              side="top"
+              className="bg-neo-orange border-2 border-neo-black shadow-hard rounded-neo p-2"
+            >
+              <p className="text-xs font-bold text-neo-black">
+                {t('results.fireRoundBonus') || 'Fire Round Bonus!'}
+                {wordObj.fireRoundBonus && (
+                  <span className="block text-neo-red mt-1 font-black">
+                    +{wordObj.fireRoundBonus} {t('results.points') || 'pts'}
+                  </span>
+                )}
+              </p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+      )}
       {/* Show pending validation indicator */}
       {isPending && !isDuplicate && (
         <TooltipProvider delayDuration={0}>

@@ -13,6 +13,8 @@ export interface WordObject {
   aiReason?: string;
   timestamp?: number;
   timeSinceStart?: number;
+  fireRoundMultiplier?: number;
+  fireRoundBonus?: number;
 }
 
 export interface Title {

@@ -59,11 +59,17 @@ global.ResizeObserver = jest.fn().mockImplementation(() => ({
 }));
 
 // Mock IntersectionObserver
-global.IntersectionObserver = jest.fn().mockImplementation(() => ({
-  observe: jest.fn(),
-  unobserve: jest.fn(),
-  disconnect: jest.fn(),
-}));
+global.IntersectionObserver = class IntersectionObserver {
+  constructor(callback) {
+    this.callback = callback;
+    this.observe = jest.fn();
+    this.unobserve = jest.fn();
+    this.disconnect = jest.fn();
+    this.root = null;
+    this.rootMargin = '';
+    this.thresholds = [];
+  }
+};
 
 // Mock requestAnimationFrame
 global.requestAnimationFrame = jest.fn(callback => setTimeout(callback, 0));

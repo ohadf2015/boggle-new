@@ -21,6 +21,7 @@ import { useSoundEffects } from '../../contexts/SoundEffectsContext';
 import { useAnnouncer } from '../GameAnnouncer';
 import { validateWordLocally, couldBeOnBoard } from '../../utils/clientWordValidator';
 import { hapticForWordScore, hapticError } from '../../utils/haptics';
+import { getRankStyle, getRankIconString } from '../../utils/rankingStyles';
 import type { LetterGrid, Language } from '@/shared/types/game';
 import type {
   FoundWord,
@@ -244,27 +245,20 @@ const InGameScreen = memo<InGameScreenProps>(({
     socket.emit('submitWord', {
       word: formedWord.toLowerCase(),
       comboLevel: Math.min(effectiveComboLevelRef.current, 10),
+      fireRoundActive,
     });
 
     // Add to local found words
     onWordSubmit?.(formedWord);
-  }, [isPlaying, gameLanguage, minWordLength, normalizedFoundWords, letterGrid, gameActive, socket, effectiveComboLevelRef, onWordSubmit, onResetCombo, t, playWordAcceptedSound]);
+  }, [isPlaying, gameLanguage, minWordLength, normalizedFoundWords, letterGrid, gameActive, socket, effectiveComboLevelRef, onWordSubmit, onResetCombo, t, playWordAcceptedSound, fireRoundActive]);
 
-  // Get rank style for leaderboard
-  const getRankStyle = useCallback((index: number): string => {
-    if (index === 0) return 'bg-neo-yellow text-neo-black border-neo-black';
-    if (index === 1) return 'bg-slate-300 text-neo-black border-neo-black';
-    if (index === 2) return 'bg-neo-orange text-neo-black border-neo-black';
-    return 'bg-neo-cream text-neo-black border-neo-black';
-  }, []);
-
-  // Memoize leaderboard items
+  // Memoize leaderboard items with centralized ranking utilities
   const memoizedLeaderboard = useMemo(() => leaderboard.map((player, index) => ({
     ...player,
     rankStyle: getRankStyle(index),
     isMe: player.username === username,
-    rankDisplay: index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : `#${index + 1}`
-  })), [leaderboard, username, getRankStyle]);
+    rankDisplay: getRankIconString(index)
+  })), [leaderboard, username]);
 
   // Check for very short landscape screens to prevent panel overlap
   const isVeryShortLandscape = isLandscape && viewportHeight > 0 && viewportHeight < 350;

@@ -5,73 +5,35 @@
  * Server remains the source of truth, but we show immediate feedback.
  */
 
-// Hebrew letter normalization - matches backend
-const hebrewFinalLetters: Record<string, string> = {
-  'ך': 'כ',
-  'ם': 'מ',
-  'ן': 'נ',
-  'ף': 'פ',
-  'ץ': 'צ'
-};
+// Import normalization functions from shared module
+import {
+  normalizeHebrewWord as _normalizeHebrewWord,
+  normalizeSpanishLetter as _normalizeSpanishLetter,
+  normalizeSpanishWord as _normalizeSpanishWord,
+  normalizeWord as _normalizeWord,
+  getLanguageRegex as _getLanguageRegex,
+} from '@/shared/utils/wordNormalization';
+import type { Language } from '@/shared/types/game';
 
+// Re-export for backwards compatibility with string language type
 export function normalizeHebrewWord(word: string): string {
-  return word.split('').map(letter => hebrewFinalLetters[letter] || letter).join('');
+  return _normalizeHebrewWord(word);
 }
 
-// Spanish accent normalization - matches backend
-// Accented vowels are normalized to base vowels for dictionary lookup
-// Note: Ñ is kept as-is since it exists in the dictionary as a distinct letter
-const spanishAccentMap: Record<string, string> = {
-  'á': 'a', 'é': 'e', 'í': 'i', 'ó': 'o', 'ú': 'u', 'ü': 'u'
-};
-
 export function normalizeSpanishLetter(letter: string): string {
-  const lower = letter.toLowerCase();
-  return spanishAccentMap[lower] || lower;
+  return _normalizeSpanishLetter(letter);
 }
 
 export function normalizeSpanishWord(word: string): string {
-  return word.split('').map(c => {
-    const lower = c.toLowerCase();
-    return spanishAccentMap[lower] || lower;
-  }).join('');
+  return _normalizeSpanishWord(word);
 }
 
-/**
- * Normalize word based on language (matches backend normalization)
- */
 export function normalizeWord(word: string, language: string): string {
-  switch (language) {
-    case 'he':
-      return normalizeHebrewWord(word);
-    case 'es':
-      return normalizeSpanishWord(word);
-    case 'ja':
-      return word; // Japanese doesn't need normalization
-    case 'en':
-    case 'sv':
-    default:
-      return word.toLowerCase();
-  }
+  return _normalizeWord(word, language as Language);
 }
 
-/**
- * Get the regex pattern for valid characters in a language
- */
 export function getLanguageRegex(language: string): RegExp {
-  switch (language) {
-    case 'he':
-      return /^[\u0590-\u05FF]+$/;
-    case 'sv':
-      return /^[a-zA-ZåäöÅÄÖ]+$/;
-    case 'es':
-      return /^[a-zA-ZáéíóúüñÁÉÍÓÚÜÑ]+$/;
-    case 'ja':
-      return /^[\u3040-\u309F\u30A0-\u30FF\u4E00-\u9FAF]+$/;
-    case 'en':
-    default:
-      return /^[a-zA-Z]+$/;
-  }
+  return _getLanguageRegex(language as Language);
 }
 
 /**

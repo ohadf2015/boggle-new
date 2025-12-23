@@ -126,7 +126,7 @@ function registerWordHandlers(io, socket) {
     }
 
     try {
-      const { word, comboLevel = 0 } = validation.data;
+      const { word, comboLevel = 0, fireRoundActive = false } = validation.data;
 
       const gameCode = getGameBySocketId(socket.id);
       const username = getUsernameBySocketId(socket.id);
@@ -230,9 +230,9 @@ function registerWordHandlers(io, socket) {
       const shouldAutoValidate = isInDictionary || isCommunityValidated || hasPositiveScore;
 
       if (shouldAutoValidate) {
-        handleValidatedWord(io, socket, game, gameCode, username, normalizedWord, comboLevel, isInDictionary);
+        handleValidatedWord(io, socket, game, gameCode, username, normalizedWord, comboLevel, isInDictionary, fireRoundActive);
       } else {
-        handlePendingWord(socket, game, gameCode, username, normalizedWord, comboLevel);
+        handlePendingWord(socket, game, gameCode, username, normalizedWord, comboLevel, fireRoundActive);
       }
 
       // Update leaderboard
@@ -359,11 +359,16 @@ function registerWordHandlers(io, socket) {
 
 // Helper functions
 
-function handleValidatedWord(io, socket, game, gameCode, username, normalizedWord, comboLevel, isInDictionary) {
+function handleValidatedWord(io, socket, game, gameCode, username, normalizedWord, comboLevel, isInDictionary, fireRoundActive = false) {
   const safeComboLevel = Math.max(0, Math.min(10, parseInt(comboLevel) || 0));
+  const fireRoundMultiplier = fireRoundActive ? 2 : 1;
   const baseScore = normalizedWord.length - 1;
-  const wordScore = calculateWordScore(normalizedWord, safeComboLevel);
-  const comboBonus = wordScore - baseScore;
+  const wordScore = calculateWordScore(normalizedWord, safeComboLevel, fireRoundMultiplier);
+  // Calculate combo bonus without fire round multiplier for display purposes
+  const scoreWithoutMultiplier = calculateWordScore(normalizedWord, safeComboLevel, 1);
+  const comboBonus = scoreWithoutMultiplier - baseScore;
+  // Fire round bonus is the additional points from the 2x multiplier
+  const fireRoundBonus = fireRoundActive ? scoreWithoutMultiplier : 0;
 
   if (!game.playerCombos) game.playerCombos = {};
   game.playerCombos[username] = safeComboLevel;
@@ -372,7 +377,9 @@ function handleValidatedWord(io, socket, game, gameCode, username, normalizedWor
     autoValidated: true,
     score: wordScore,
     comboBonus: comboBonus,
-    comboLevel: safeComboLevel
+    comboLevel: safeComboLevel,
+    fireRoundMultiplier: fireRoundMultiplier,
+    fireRoundBonus: fireRoundBonus
   });
 
   // Save to database if dictionary word
@@ -399,6 +406,9 @@ function handleValidatedWord(io, socket, game, gameCode, username, normalizedWor
     baseScore: baseScore,
     comboBonus: comboBonus,
     comboLevel: safeComboLevel,
+    fireRoundActive: fireRoundActive,
+    fireRoundMultiplier: fireRoundMultiplier,
+    fireRoundBonus: fireRoundBonus,
     autoValidated: true
   });
 
@@ -419,11 +429,15 @@ function handleValidatedWord(io, socket, game, gameCode, username, normalizedWor
   }
 }
 
-function handlePendingWord(socket, game, gameCode, username, normalizedWord, comboLevel) {
+function handlePendingWord(socket, game, gameCode, username, normalizedWord, comboLevel, fireRoundActive = false) {
   const safeComboLevel = Math.max(0, Math.min(10, parseInt(comboLevel) || 0));
+  const fireRoundMultiplier = fireRoundActive ? 2 : 1;
   const baseScore = normalizedWord.length - 1;
-  const potentialScore = calculateWordScore(normalizedWord, safeComboLevel);
-  const comboBonus = potentialScore - baseScore;
+  // Calculate potential score with fire round multiplier
+  const potentialScore = calculateWordScore(normalizedWord, safeComboLevel, fireRoundMultiplier);
+  const scoreWithoutMultiplier = calculateWordScore(normalizedWord, safeComboLevel, 1);
+  const comboBonus = scoreWithoutMultiplier - baseScore;
+  const fireRoundBonus = fireRoundActive ? scoreWithoutMultiplier : 0;
 
   if (!game.playerCombos) game.playerCombos = {};
   game.playerCombos[username] = safeComboLevel;
@@ -431,8 +445,11 @@ function handlePendingWord(socket, game, gameCode, username, normalizedWord, com
   addPlayerWord(gameCode, username, normalizedWord, {
     autoValidated: false,
     score: 0,
+    potentialScore: potentialScore,
     comboBonus: comboBonus,
-    comboLevel: safeComboLevel
+    comboLevel: safeComboLevel,
+    fireRoundMultiplier: fireRoundMultiplier,
+    fireRoundBonus: fireRoundBonus
   });
 
   inc('wordNeedsValidation');

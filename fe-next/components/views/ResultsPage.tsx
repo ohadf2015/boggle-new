@@ -15,7 +15,8 @@ import { useWinStreak } from '@/hooks/useWinStreak';
 import { trackGameCompletion, trackStreakMilestone } from '@/utils/growthTracking';
 import logger from '@/utils/logger';
 import { levelUpToast } from '@/components/NeoToast';
-import type { ResultsPageProps, HeatMapData, WordToVote, XpGainedData, LevelUpData, GridPosition } from '@/types/components';
+import { getWordPath } from '@/utils/wordPath';
+import type { ResultsPageProps, HeatMapData, WordToVote, XpGainedData, LevelUpData } from '@/types/components';
 import type { LetterGrid as LetterGridType } from '@/shared/types/game';
 import { useMobileLandscape } from '@/hooks/useMobileLandscape';
 
@@ -29,75 +30,6 @@ const ShareWinPrompt = dynamic(() => import('@/components/results/ShareWinPrompt
 const WinStreakDisplay = dynamic(() => import('@/components/results/WinStreakDisplay'), { ssr: false });
 const WordFeedbackModal = dynamic(() => import('@/components/voting/WordFeedbackModal'), { ssr: false });
 const AutoRejoinTimer = dynamic(() => import('@/components/results/AutoRejoinTimer'), { ssr: false });
-
-// Helper functions for finding word paths on the board (client-side version)
-const normalizeHebrewLetter = (letter: string): string => {
-  const finalToRegular: Record<string, string> = { 'ץ': 'צ', 'ך': 'כ', 'ם': 'מ', 'ן': 'נ', 'ף': 'פ' };
-  return finalToRegular[letter] || letter;
-};
-
-const searchWordPath = (
-  board: string[][],
-  word: string,
-  row: number,
-  col: number,
-  index: number,
-  visited: Set<string>,
-  path: GridPosition[]
-): GridPosition[] | null => {
-  if (index === word.length) return [...path];
-  const firstRow = board[0];
-  if (!firstRow || row < 0 || row >= board.length || col < 0 || col >= firstRow.length) return null;
-
-  const cellKey = `${row},${col}`;
-  if (visited.has(cellKey)) return null;
-
-  const boardRow = board[row];
-  const cell = boardRow?.[col];
-  const targetChar = word[index];
-  if (!cell || !targetChar) return null;
-
-  const cellNormalized = normalizeHebrewLetter(cell.toLowerCase());
-  if (cellNormalized !== targetChar) return null;
-
-  visited.add(cellKey);
-  path.push({ row, col });
-
-  const directions: [number, number][] = [[-1, -1], [-1, 0], [-1, 1], [0, -1], [0, 1], [1, -1], [1, 0], [1, 1]];
-  for (const [dx, dy] of directions) {
-    const result = searchWordPath(board, word, row + dx, col + dy, index + 1, visited, path);
-    if (result) {
-      visited.delete(cellKey);
-      return result;
-    }
-  }
-
-  visited.delete(cellKey);
-  path.pop();
-  return null;
-};
-
-const getWordPath = (word: string, board: string[][] | null): GridPosition[] | null => {
-  const firstRow = board?.[0];
-  if (!word || !board || board.length === 0 || !firstRow) return null;
-  const wordNormalized = word.toLowerCase().split('').map(normalizeHebrewLetter).join('');
-  const firstChar = wordNormalized[0];
-  if (!firstChar) return null;
-
-  for (let i = 0; i < board.length; i++) {
-    const boardRow = board[i];
-    if (!boardRow) continue;
-    for (let j = 0; j < firstRow.length; j++) {
-      const cell = boardRow[j];
-      if (!cell) continue;
-      if (normalizeHebrewLetter(cell.toLowerCase()) === firstChar) {
-        const path = searchWordPath(board, wordNormalized, i, j, 0, new Set(), []);
-        if (path) return path;
-      }
-    }
-  }
-  return null;
-};
 
 interface LetterGridProps {
   letterGrid: LetterGridType | null;

@@ -110,6 +110,7 @@ const submitWordSchema = compiledSchemas?.submitWordSchema || z.object({
   word: wordSchema,
   path: z.array(gridPositionSchema).optional(),
   comboLevel: z.number().int().min(0).max(10).optional(),
+  fireRoundActive: z.boolean().optional().default(false),
 });
 
 const submitWordVoteSchema = compiledSchemas?.submitWordVoteSchema || z.object({

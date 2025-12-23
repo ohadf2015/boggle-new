@@ -1,6 +1,6 @@
 'use client';
 
-import React, { ReactNode, ComponentType, ReactElement } from 'react';
+import { ReactNode, ComponentType, ReactElement } from 'react';
 
 /**
  * Provider configuration - a tuple of [Provider, props]
@@ -33,23 +33,3 @@ export function composeProviders(providers: ProviderConfig[]) {
   };
 }
 
-/**
- * Alternative: Create a composed provider component directly
- * Useful for grouping related providers together
- */
-export function createProviderGroup(
-  name: string,
-  providers: ProviderConfig[]
-): ComponentType<{ children: ReactNode }> {
-  const ProviderGroup = ({ children }: { children: ReactNode }) => {
-    return providers.reduceRight(
-      (acc: ReactNode, [Provider, props = {}]) => (
-        <Provider {...props}>{acc}</Provider>
-      ),
-      children
-    ) as ReactElement;
-  };
-
-  ProviderGroup.displayName = name;
-  return ProviderGroup;
-}

@@ -80,9 +80,3 @@ export const clearSessionPreservingUsername = (username?: string): void => {
   Cookies.remove(SESSION_COOKIE_NAME);
 };
 
-/**
- * Check if a valid session exists
- */
-export const hasValidSession = (): boolean => {
-  return getSession() !== null;
-};

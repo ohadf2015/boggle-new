@@ -4,6 +4,7 @@ import { FaTrophy, FaCrown, FaRobot } from 'react-icons/fa';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '../../components/ui/alert-dialog';
 import RoomChat from '../../components/RoomChat';
 import Avatar from '../../components/Avatar';
+import { getRankStyle, getRankIconString } from '@/utils/rankingStyles';
 import SlotMachineText from '../../components/SlotMachineText';
 import ExitRoomButton from '../../components/ExitRoomButton';
 import type { Avatar as AvatarType } from '@/shared/types/game';
@@ -253,12 +254,6 @@ const PlayerWaitingResultsView: React.FC<PlayerWaitingResultsViewProps> = ({
                       if (isNewPlayer) {
                         animatedPlayersRef.current.add(player.username);
                       }
-                      const getRankStyle = (): string => {
-                        if (index === 0) return 'bg-neo-yellow text-neo-black';
-                        if (index === 1) return 'bg-slate-300 text-neo-black';
-                        if (index === 2) return 'bg-neo-orange text-neo-black';
-                        return 'bg-neo-cream text-neo-black border-neo-black border-3';
-                      };
                       return (
                         <motion.div
                           key={player.username}
@@ -269,10 +264,10 @@ const PlayerWaitingResultsView: React.FC<PlayerWaitingResultsViewProps> = ({
                           }}
                           className={`flex items-center gap-2 lg:gap-3 p-2 lg:p-3 rounded-neo border-3 border-neo-black shadow-hard-sm transition-colors
                             hover:brightness-110
-                            ${getRankStyle()} ${dir === 'rtl' ? 'flex-row-reverse' : ''}`}
+                            ${getRankStyle(index)} ${dir === 'rtl' ? 'flex-row-reverse' : ''}`}
                         >
                           <div className="w-8 h-8 lg:w-10 lg:h-10 rounded-neo flex items-center justify-center font-black text-sm lg:text-lg bg-neo-black text-neo-white border-2 border-neo-black">
-                            {index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : `#${index + 1}`}
+                            {getRankIconString(index)}
                           </div>
                           <Avatar
                             profilePictureUrl={player.avatar?.profilePictureUrl ?? undefined}

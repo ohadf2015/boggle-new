@@ -9,6 +9,9 @@ export type ValidationResult = {
 
 export type ValidationState = 'idle' | 'validating' | 'valid' | 'invalid';
 
+/** Type for validation functions used with useDebouncedValidation */
+export type ValidationFunction = (value: string) => ValidationResult;
+
 interface UseDebouncedValidationOptions {
   /** Debounce delay in milliseconds (default: 300ms) */
   delay?: number;
