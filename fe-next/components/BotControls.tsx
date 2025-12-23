@@ -139,38 +139,15 @@ const BotControls: React.FC<BotControlsProps> = ({
   return (
     <div className="space-y-2">
       {/* Header - Compact */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <FaRobot className="text-neo-cyan text-sm" />
-          <span className="text-xs font-bold uppercase text-neo-cream/80">
-            {t('bots.title') || 'AI Bots'}
-          </span>
-          {bots.length > 0 && (
-            <Badge className="bg-neo-cyan text-neo-black text-[10px] px-1.5 py-0 font-bold">
-              {bots.length}
-            </Badge>
-          )}
-        </div>
-
-        {/* Quick Add Button */}
-        {canAddMore && (
-          <motion.button
-            type="button"
-            onClick={handleQuickAdd}
-            disabled={isAdding || disabled}
-            whileTap={{ scale: 0.95 }}
-            className={cn(
-              "flex items-center gap-1 px-2 py-1 rounded-neo text-xs font-bold",
-              "bg-neo-cyan text-neo-black border-2 border-neo-black shadow-hard-sm",
-              "hover:shadow-hard hover:translate-x-[-1px] hover:translate-y-[-1px]",
-              "active:shadow-none active:translate-x-[1px] active:translate-y-[1px]",
-              "transition-all duration-100",
-              (isAdding || disabled) && "opacity-50 cursor-not-allowed"
-            )}
-          >
-            <FaPlus size={8} />
-            {isAdding ? '...' : (t('bots.quickAdd') || 'Add')}
-          </motion.button>
+      <div className="flex items-center gap-2">
+        <FaRobot className="text-neo-cyan text-sm" />
+        <span className="text-xs font-bold uppercase text-neo-cream/80">
+          {t('bots.title') || 'AI Bots'}
+        </span>
+        {bots.length > 0 && (
+          <Badge className="bg-neo-cyan text-neo-black text-[10px] px-1.5 py-0 font-bold">
+            {bots.length}
+          </Badge>
         )}
       </div>
 
@@ -188,10 +165,10 @@ const BotControls: React.FC<BotControlsProps> = ({
         )}
       </AnimatePresence>
 
-      {/* Difficulty Selection - Inline compact */}
-      <div className="flex items-center gap-1.5 flex-wrap">
-        <span className="text-[10px] font-bold uppercase text-neo-cream/60">
-          {t('bots.selectDifficulty') || 'Difficulty'}:
+      {/* Difficulty Selection + Add Button - Same row */}
+      <div className="flex items-center gap-2 flex-wrap">
+        <span className="text-[10px] font-bold uppercase text-neo-cream/70">
+          {t('bots.selectDifficulty') || 'Level'}:
         </span>
         {BOT_DIFFICULTIES.map((diff) => {
           const isSelected = selectedDifficulty === diff.value;
@@ -202,16 +179,37 @@ const BotControls: React.FC<BotControlsProps> = ({
               onClick={() => setSelectedDifficulty(diff.value)}
               whileTap={{ scale: 0.95 }}
               className={cn(
-                "px-1.5 py-0.5 rounded text-[10px] font-bold transition-all duration-100 border border-neo-black",
+                "px-2 py-1 rounded-neo text-[11px] font-bold transition-all duration-100 border-2 border-neo-black",
                 isSelected
-                  ? `${diff.color} shadow-none`
-                  : "bg-neo-cream/80 text-neo-black hover:bg-neo-cream"
+                  ? `${diff.color} shadow-none translate-x-[1px] translate-y-[1px]`
+                  : "bg-neo-cream text-neo-black shadow-hard-sm hover:shadow-hard"
               )}
             >
               {t(diff.labelKey) || diff.value}
             </motion.button>
           );
         })}
+
+        {/* Add Button - Right next to difficulty */}
+        {canAddMore && (
+          <motion.button
+            type="button"
+            onClick={handleQuickAdd}
+            disabled={isAdding || disabled}
+            whileTap={{ scale: 0.95 }}
+            className={cn(
+              "flex items-center gap-1 px-2 py-1 rounded-neo text-[11px] font-bold ml-1",
+              "bg-neo-cyan text-neo-black border-2 border-neo-black shadow-hard-sm",
+              "hover:shadow-hard hover:translate-x-[-1px] hover:translate-y-[-1px]",
+              "active:shadow-none active:translate-x-[1px] active:translate-y-[1px]",
+              "transition-all duration-100",
+              (isAdding || disabled) && "opacity-50 cursor-not-allowed"
+            )}
+          >
+            <FaPlus size={8} />
+            {isAdding ? '...' : (t('bots.add') || '+')}
+          </motion.button>
+        )}
       </div>
 
       {/* Current Bots List - Compact */}
