@@ -74,6 +74,11 @@ const HostView: React.FC<HostViewProps> = memo(({
     defaultLanguage: language as Language,
   });
 
+  // Earthquake/Fire Round state (managed via socket events)
+  const [earthquakeState, setEarthquakeState] = useState<'idle' | 'warning' | 'shaking' | 'fire-round'>('idle');
+  const [fireRoundActive, setFireRoundActive] = useState(false);
+  const [fireRoundRemaining, setFireRoundRemaining] = useState(0);
+
   // Socket event handling
   useHostSocketEvents({
     socket,
@@ -197,11 +202,6 @@ const HostView: React.FC<HostViewProps> = memo(({
 
   // Destructure for cleaner JSX
   const { runtime, settings, players, tournament, animation, ui, hostPlaying: hostPlayingState, combo } = state;
-
-  // Earthquake/Fire Round state (managed via socket events)
-  const [earthquakeState, setEarthquakeState] = useState<'idle' | 'warning' | 'shaking' | 'fire-round'>('idle');
-  const [fireRoundActive, setFireRoundActive] = useState(false);
-  const [fireRoundRemaining, setFireRoundRemaining] = useState(0);
 
   // Earthquake/Fire Round feature for multiplayer (only for triggering, state managed via socket events)
   useEarthquakeFireRound({
