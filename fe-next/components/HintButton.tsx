@@ -56,7 +56,7 @@ const HintButton = memo<HintButtonProps>(({
           ${isLoading ? 'animate-pulse' : ''}
           ${hintsRemaining > 0
             ? 'bg-neo-yellow border-neo-black text-neo-black hover:bg-neo-orange hover:shadow-hard-sm'
-            : 'bg-gray-300 border-gray-400 text-gray-500 cursor-not-allowed'}
+            : 'bg-gray-300 border-gray-400 text-gray-600 cursor-not-allowed'}
           border-2 rounded-neo font-bold text-sm transition-all
         `}
       >
@@ -115,7 +115,7 @@ const HintButton = memo<HintButtonProps>(({
               )}
 
               {/* Tap to dismiss */}
-              <div className="mt-2 text-xs text-neo-black/50 text-center">
+              <div className="mt-2 text-xs text-neo-black/70 text-center">
                 {t('hints.tapToDismiss') || 'Tap to dismiss'}
               </div>
             </div>

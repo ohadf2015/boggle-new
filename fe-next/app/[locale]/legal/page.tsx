@@ -62,7 +62,7 @@ export default function LegalIndexPage(): React.ReactElement {
                 </h2>
                 <p className={cn(
                   'text-sm',
-                  isDarkMode ? 'text-gray-400' : 'text-gray-600'
+                  isDarkMode ? 'text-gray-600' : 'text-gray-600'
                 )}>
                   {t(page.descriptionKey)}
                 </p>

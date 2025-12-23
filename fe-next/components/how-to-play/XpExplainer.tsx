@@ -89,7 +89,7 @@ export const XpExplainer: React.FC<XpExplainerProps> = ({ t }) => {
               <span className="text-lg">{title.icon}</span>
               <div>
                 <div className="font-semibold text-neo-black">{title.name}</div>
-                <div className="text-xs text-neo-black/60">{t('xp.level')} {title.level}</div>
+                <div className="text-xs text-neo-black/75">{t('xp.level')} {title.level}</div>
               </div>
             </div>
           ))}

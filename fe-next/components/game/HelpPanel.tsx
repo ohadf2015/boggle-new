@@ -179,7 +179,7 @@ export function HelpPanel({ isOpen, onClose }: HelpPanelProps) {
               </section>
 
               {/* Tap to close hint on mobile */}
-              <p className="text-center text-xs text-neo-black/50 sm:hidden">
+              <p className="text-center text-xs text-neo-black/70 sm:hidden">
                 {t('help.swipeDownToClose') || 'Swipe down to close'}
               </p>
             </div>

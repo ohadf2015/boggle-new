@@ -189,7 +189,7 @@ const GameTypeSelector = memo<GameTypeSelectorProps>(({
               className={cn(
                 "w-10 h-10 rounded-neo border-2 flex items-center justify-center transition-all font-black",
                 tournamentRounds <= 2
-                  ? "bg-neo-gray/50 text-neo-cream/60 border-neo-cream/30 cursor-not-allowed"
+                  ? "bg-neo-gray/50 text-neo-cream/75 border-neo-cream/30 cursor-not-allowed"
                   : "bg-neo-cream text-neo-black border-neo-black shadow-hard-sm hover:shadow-hard"
               )}
             >
@@ -214,7 +214,7 @@ const GameTypeSelector = memo<GameTypeSelectorProps>(({
               className={cn(
                 "w-10 h-10 rounded-neo border-2 flex items-center justify-center transition-all font-black",
                 tournamentRounds >= 5
-                  ? "bg-neo-gray/50 text-neo-cream/60 border-neo-cream/30 cursor-not-allowed"
+                  ? "bg-neo-gray/50 text-neo-cream/75 border-neo-cream/30 cursor-not-allowed"
                   : "bg-neo-cream text-neo-black border-neo-black shadow-hard-sm hover:shadow-hard"
               )}
             >

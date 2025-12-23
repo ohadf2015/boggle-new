@@ -173,7 +173,7 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
             <motion.p
               animate={{ opacity: [0.6, 1, 0.6] }}
               transition={{ duration: 2, repeat: Infinity }}
-              className="text-neo-cream/60 font-bold text-sm mt-4 uppercase tracking-wide"
+              className="text-neo-cream/75 font-bold text-sm mt-4 uppercase tracking-wide"
             >
               {t('playerView.waitingForHostToStart') || 'Waiting for host to start the game...'}
             </motion.p>
@@ -235,7 +235,7 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
                         {isHostPlayer && <FaCrown className="text-neo-yellow/80 text-sm" />}
                         {isBot && <FaRobot className="text-neo-cyan/70 text-sm" />}
                         {isMe && (
-                          <span className="text-xs text-neo-cream/50 font-medium">
+                          <span className="text-xs text-neo-cream/70 font-medium">
                             ({t('playerView.me')})
                           </span>
                         )}
@@ -254,7 +254,7 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
             </AnimatePresence>
           </div>
           {playersReady.length === 0 && (
-            <p className="text-sm text-center text-neo-cream/40 font-medium mt-2">
+            <p className="text-sm text-center text-neo-cream/75 font-medium mt-2">
               {t('hostView.waitingForPlayers')}
             </p>
           )}
@@ -321,7 +321,7 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
             <p className="text-sm text-center text-neo-black/70 font-bold">
               {t('joinView.scanToJoin')} {gameCode}
             </p>
-            <p className="text-xs text-center text-neo-black/50">
+            <p className="text-xs text-center text-neo-black/70">
               {getJoinUrl(gameCode)}
             </p>
           </div>

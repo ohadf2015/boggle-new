@@ -19,6 +19,7 @@ export interface ProcessedResultsData {
   sortedPointGroups: number[];
   invalidWords: PlayerWordData[];
   totalComboBonus: number;
+  totalFireRoundBonus: number;
 }
 
 export function useResultsData(results: SinglePlayerResultsData, t: (key: string) => string) {
@@ -56,6 +57,7 @@ export function useResultsData(results: SinglePlayerResultsData, t: (key: string
         sortedPointGroups: [],
         invalidWords: [],
         totalComboBonus: 0,
+        totalFireRoundBonus: 0,
       };
     }
 
@@ -63,6 +65,7 @@ export function useResultsData(results: SinglePlayerResultsData, t: (key: string
     const invalidWords = results.playerWordData.filter(w => !w.isValid);
 
     const totalComboBonus = validWords.reduce((sum, w) => sum + (w.comboBonus || 0), 0);
+    const totalFireRoundBonus = validWords.reduce((sum, w) => sum + (w.fireRoundBonus || 0), 0);
 
     const wordsByPoints: Record<number, PlayerWordData[]> = {};
     validWords.forEach(wordObj => {
@@ -85,7 +88,7 @@ export function useResultsData(results: SinglePlayerResultsData, t: (key: string
       .map(Number)
       .sort((a, b) => b - a);
 
-    return { wordsByPoints, sortedPointGroups, invalidWords, totalComboBonus };
+    return { wordsByPoints, sortedPointGroups, invalidWords, totalComboBonus, totalFireRoundBonus };
   }, [results.playerWordData]);
 
   // Process bot words for display

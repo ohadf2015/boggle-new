@@ -74,7 +74,7 @@ function ViewLoadingSkeleton() {
           <div className="absolute inset-0 border-4 border-cyan-500/30 rounded-full" />
           <div className="absolute inset-0 border-4 border-transparent border-t-cyan-500 rounded-full animate-spin" />
         </div>
-        <p className="text-gray-400 text-sm">Loading game...</p>
+        <p className="text-gray-600 text-sm">Loading game...</p>
       </div>
     </div>
   );

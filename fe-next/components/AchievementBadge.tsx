@@ -161,7 +161,7 @@ export const AchievementBadge = memo<AchievementBadgeProps>(({ achievement, inde
                 {/* Progress to next tier */}
                 {!tierProgress.isMaxTier && tierProgress.nextTier && (
                   <div className="mt-1">
-                    <div className="flex justify-between text-[10px] text-neo-white/60 mb-0.5">
+                    <div className="flex justify-between text-[10px] text-neo-white/75 mb-0.5">
                       <span>{tierProgress.currentCount}/{tierProgress.nextThreshold}</span>
                       <span>{TIER_ICONS[tierProgress.nextTier]} {getTierName(tierProgress.nextTier)}</span>
                     </div>

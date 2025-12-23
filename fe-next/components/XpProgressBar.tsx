@@ -99,7 +99,7 @@ const XpProgressBar = memo<XpProgressBarProps>(({
             {t('xp.level') || 'Level'} {progress.currentLevel}
           </span>
           {showNumbers && !progress.isMaxLevel && (
-            <span className="text-xs font-bold text-neo-black/60 dark:text-neo-cream/60">
+            <span className="text-xs font-bold text-neo-black/75 dark:text-neo-cream/75">
               {progress.xpInCurrentLevel.toLocaleString()} / {progress.xpNeededForNextLevel.toLocaleString()} XP
             </span>
           )}
@@ -149,10 +149,10 @@ const XpProgressBar = memo<XpProgressBarProps>(({
       {/* Compact mode shows level inline */}
       {compact && (
         <div className="flex items-center justify-between mt-0.5">
-          <span className="text-[10px] font-bold text-neo-black/60 dark:text-neo-cream/60">
+          <span className="text-[10px] font-bold text-neo-black/75 dark:text-neo-cream/75">
             Lv {progress.currentLevel}
           </span>
-          <span className="text-[10px] font-bold text-neo-black/60 dark:text-neo-cream/60">
+          <span className="text-[10px] font-bold text-neo-black/75 dark:text-neo-cream/75">
             {progress.progressPercent}%
           </span>
         </div>

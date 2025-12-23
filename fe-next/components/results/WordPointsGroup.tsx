@@ -77,6 +77,12 @@ const SimpleWordSpan = memo<{
       }}
     >
       {wordObj.word}
+      {/* Show fire round bonus indicator (earthquake 2x) */}
+      {(wordObj.fireRoundBonus ?? 0) > 0 && (
+        <span className="text-[10px] px-1 py-0.5 bg-neo-orange text-neo-black rounded border border-neo-black font-black" title="Fire Round 2x Bonus">
+          🔥+{wordObj.fireRoundBonus}
+        </span>
+      )}
       {/* Show combo bonus indicator */}
       {(wordObj.comboBonus ?? 0) > 0 && (
         <span className="text-[10px] px-1 py-0.5 bg-neo-yellow text-neo-black rounded border border-neo-black font-black">

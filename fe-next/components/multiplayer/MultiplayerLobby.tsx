@@ -608,7 +608,7 @@ const MultiplayerLobby: React.FC<MultiplayerLobbyProps> = ({
                 level="M"
               />
             </div>
-            <p className="text-center text-sm text-neo-black/60">
+            <p className="text-center text-sm text-neo-black/75">
               {t('joinView.scanToJoin') || 'Scan the code to join or use code'}{' '}
               <span className="font-mono font-bold">{gameCode}</span>
             </p>

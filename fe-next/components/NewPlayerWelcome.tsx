@@ -148,7 +148,7 @@ const NewPlayerWelcome: React.FC<NewPlayerWelcomeProps> = ({
               onChange={(e) => setDontShowAgain(e.target.checked)}
               className="w-4 h-4 rounded border-2 border-neo-black accent-neo-pink"
             />
-            <span className="text-xs sm:text-sm text-neo-black/60">
+            <span className="text-xs sm:text-sm text-neo-black/75">
               {t('howToPlay.newPlayer.dontShowAgain')}
             </span>
           </label>

@@ -91,7 +91,7 @@ const JoinModeFields: React.FC<JoinModeFieldsProps> = ({
             aria-invalid={showGameCodeError ? 'true' : undefined}
             aria-describedby={showGameCodeError ? 'gameCode-error' : 'gameCode-hint'}
             className={cn(
-              "flex-1 bg-slate-100 dark:bg-slate-700/50 border-slate-200 dark:border-slate-600 text-slate-900 dark:text-white placeholder:text-slate-500 dark:placeholder:text-gray-400 transition-colors",
+              "flex-1 bg-slate-100 dark:bg-slate-700/50 border-slate-200 dark:border-slate-600 text-slate-900 dark:text-white placeholder:text-slate-500 dark:placeholder:text-gray-600 transition-colors",
               getValidationClasses(
                 gameCodeError ? 'invalid' : gameCodeValidation.state,
                 showGameCodeError ? "border-red-500 bg-red-900/30 focus-visible:ring-red-500" : ""
@@ -133,7 +133,7 @@ const JoinModeFields: React.FC<JoinModeFieldsProps> = ({
           </p>
         )}
         {!showGameCodeError && (
-          <p id="gameCode-hint" className="text-xs text-slate-500 dark:text-gray-400">
+          <p id="gameCode-hint" className="text-xs text-slate-500 dark:text-gray-300">
             {t('validation.gameCodeHint') || '6-10 alphanumeric characters'}
           </p>
         )}
@@ -163,7 +163,7 @@ const JoinModeFields: React.FC<JoinModeFieldsProps> = ({
             aria-invalid={showUsernameError ? 'true' : undefined}
             aria-describedby={showUsernameError ? 'username-error' : undefined}
             className={cn(
-              "bg-slate-100 dark:bg-slate-700/50 border-slate-200 dark:border-slate-600 text-slate-900 dark:text-white placeholder:text-slate-500 dark:placeholder:text-gray-400 transition-colors",
+              "bg-slate-100 dark:bg-slate-700/50 border-slate-200 dark:border-slate-600 text-slate-900 dark:text-white placeholder:text-slate-500 dark:placeholder:text-gray-600 transition-colors",
               getValidationClasses(
                 usernameError ? 'invalid' : usernameValidation.state,
                 showUsernameError ? "border-red-500 bg-red-900/30 focus-visible:ring-red-500" : ""

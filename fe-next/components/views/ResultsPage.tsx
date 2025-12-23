@@ -55,9 +55,9 @@ const LetterGrid: React.FC<LetterGridProps> = ({ letterGrid, heatMapData, showHe
               : 'bg-neo-cream text-neo-black'
           }`}
         >
-          <FaFire className={`text-lg ${showHeatmap ? 'text-neo-red' : 'text-neo-black/60'}`} />
+          <FaFire className={`text-lg ${showHeatmap ? 'text-neo-red' : 'text-neo-black/75'}`} />
           <span>{showHeatmap ? (t('results.hideHeatmap') || 'Hide Heatmap') : (t('results.showHeatmap') || 'Show Heatmap')}</span>
-          <FaChartBar className={`text-lg ${showHeatmap ? 'text-neo-black' : 'text-neo-black/60'}`} />
+          <FaChartBar className={`text-lg ${showHeatmap ? 'text-neo-black' : 'text-neo-black/75'}`} />
         </motion.button>
       )}
 
@@ -261,6 +261,7 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, letterGrid, game
       validated: boolean;
       isDuplicate: boolean;
       comboBonus?: number;
+      fireRoundBonus?: number;
       isAiVerified?: boolean;
       isPendingValidation?: boolean;
       potentialScore?: number;
@@ -276,6 +277,7 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, letterGrid, game
           validated: w.validated ?? false,
           isDuplicate: (w as { isDuplicate?: boolean }).isDuplicate ?? false,
           comboBonus: (w as { comboBonus?: number }).comboBonus,
+          fireRoundBonus: (w as { fireRoundBonus?: number }).fireRoundBonus,
           isAiVerified: (w as { isAiVerified?: boolean }).isAiVerified,
           isPendingValidation: (w as { isPendingValidation?: boolean }).isPendingValidation,
           potentialScore: (w as { potentialScore?: number }).potentialScore,
@@ -471,7 +473,7 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, letterGrid, game
                   showHeatmap ? 'bg-neo-orange text-neo-black' : 'bg-neo-cream text-neo-black'
                 }`}
               >
-                <FaFire className={`text-sm ${showHeatmap ? 'text-neo-red' : 'text-neo-black/60'}`} />
+                <FaFire className={`text-sm ${showHeatmap ? 'text-neo-red' : 'text-neo-black/75'}`} />
                 <span>{showHeatmap ? 'Hide' : 'Show'} Heatmap</span>
               </button>
               {showHeatmap && (

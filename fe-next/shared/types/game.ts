@@ -88,6 +88,8 @@ export interface WordDetail {
   autoValidated?: boolean;
   comboBonus?: number;
   comboLevel?: number;
+  fireRoundBonus?: number;
+  fireRoundMultiplier?: number;
   validatedByCommunity?: boolean;
   isBot?: boolean;
   isAiVerified?: boolean;

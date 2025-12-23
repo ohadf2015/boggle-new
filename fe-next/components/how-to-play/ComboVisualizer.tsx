@@ -71,7 +71,7 @@ export const ComboVisualizer: React.FC<ComboVisualizerProps> = ({ t }) => {
       <div className="relative bg-neo-cream rounded-neo border-3 border-neo-black p-4 shadow-hard-sm">
         <div className="flex items-center justify-between mb-3">
           <span className="font-bold text-neo-black flex items-center gap-2">
-            <FaFire className={comboLevel > 2 ? 'text-neo-orange animate-pulse' : 'text-gray-400'} />
+            <FaFire className={comboLevel > 2 ? 'text-neo-orange animate-pulse' : 'text-gray-600'} />
             {t('howToPlay.combo.currentCombo')}
           </span>
           <motion.span
@@ -134,7 +134,7 @@ export const ComboVisualizer: React.FC<ComboVisualizerProps> = ({ t }) => {
         {isAnimating ? t('howToPlay.combo.building') : t('howToPlay.combo.tryIt')}
       </Button>
 
-      <p className="text-sm text-neo-black/60 text-center">
+      <p className="text-sm text-neo-black/75 text-center">
         {t('howToPlay.combo.tip')}
       </p>
     </div>

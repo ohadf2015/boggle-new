@@ -12,7 +12,7 @@ export default function GlobalNotFound() {
             <h2 className="text-2xl font-bold text-white mb-2">
               Page Not Found
             </h2>
-            <p className="text-gray-400 mb-6">
+            <p className="text-gray-600 mb-6">
               The page you&apos;re looking for doesn&apos;t exist or has been moved.
             </p>
             <Link

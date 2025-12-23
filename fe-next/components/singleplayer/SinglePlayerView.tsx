@@ -37,6 +37,7 @@ export interface PlayerWordData {
   timeSinceStart: number;
   isValid: boolean;
   comboBonus?: number;
+  fireRoundBonus?: number; // Extra points from 2x fire round multiplier
 }
 
 export interface SinglePlayerAchievement {

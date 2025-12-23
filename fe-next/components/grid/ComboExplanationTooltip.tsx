@@ -115,7 +115,7 @@ const ComboExplanationTooltip: React.FC<ComboExplanationTooltipProps> = ({
             </div>
 
             {/* Tap to dismiss hint */}
-            <p className="text-center text-[10px] text-neo-black/50 mt-2 uppercase tracking-wider">
+            <p className="text-center text-[10px] text-neo-black/70 mt-2 uppercase tracking-wider">
               {t('common.tapToDismiss') || 'Tap to dismiss'}
             </p>
           </div>

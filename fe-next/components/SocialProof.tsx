@@ -134,7 +134,7 @@ const SocialProof: React.FC<SocialProofProps> = ({
         <div className="flex items-center gap-1.5 text-neo-orange">
           <FaGamepad className="w-3.5 h-3.5" />
           <span className="font-bold">{displayStats.gamesActive}</span>
-          <span className="text-neo-white/60">{t('social.games') || 'games'}</span>
+          <span className="text-neo-white/75">{t('social.games') || 'games'}</span>
         </div>
       </div>
     );
@@ -215,7 +215,7 @@ const SocialProof: React.FC<SocialProofProps> = ({
                 <span className="font-black text-neo-yellow">
                   {displayStats.recentHighScore.score}
                 </span>
-                <span className="text-neo-white/60 text-sm">
+                <span className="text-neo-white/75 text-sm">
                   by @{displayStats.recentHighScore.username}
                 </span>
               </motion.div>

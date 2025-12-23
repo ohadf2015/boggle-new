@@ -41,7 +41,7 @@ const TournamentStandings: React.FC<TournamentStandingsProps> = ({
       case 1:
         return <FaTrophy className="text-yellow-500 text-2xl" />;
       case 2:
-        return <FaMedal className="text-gray-400 text-xl" />;
+        return <FaMedal className="text-gray-600 text-xl" />;
       case 3:
         return <FaMedal className="text-amber-600 text-xl" />;
       default:
@@ -167,7 +167,7 @@ const TournamentStandings: React.FC<TournamentStandingsProps> = ({
                       >
                         {player.totalScore}
                       </Badge>
-                      <p className="text-xs text-slate-600 dark:text-slate-400 mt-1">
+                      <p className="text-xs text-slate-600 dark:text-slate-300 mt-1">
                         {t('hostView.totalScore')}
                       </p>
                     </div>

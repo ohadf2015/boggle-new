@@ -12,7 +12,7 @@ const DailyChallenge = dynamic(() => import('@/components/daily/DailyChallenge')
           <div className="absolute inset-0 border-4 border-neo-yellow/30 rounded-full" />
           <div className="absolute inset-0 border-4 border-transparent border-t-neo-yellow rounded-full animate-spin" />
         </div>
-        <p className="text-gray-600 dark:text-gray-400 text-sm">Loading Daily Challenge...</p>
+        <p className="text-gray-600 dark:text-gray-300 text-sm">Loading Daily Challenge...</p>
       </div>
     </div>
   ),

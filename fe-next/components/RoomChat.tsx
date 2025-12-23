@@ -256,7 +256,7 @@ const RoomChat: React.FC<RoomChatProps> = ({ username, isHost, gameCode, classNa
                 <div className="bg-neo-black text-neo-white px-4 py-2 font-black uppercase text-sm tracking-wider rotate-[1deg] shadow-hard-sm border-2 border-neo-black">
                   {t('chat.noMessages') || 'No messages yet'}
                 </div>
-                <p className="text-neo-black/60 font-bold text-xs mt-3 uppercase tracking-wide">
+                <p className="text-neo-black/75 font-bold text-xs mt-3 uppercase tracking-wide">
                   {t('chat.startChatting') || 'Start chatting!'}
                 </p>
               </motion.div>
@@ -300,7 +300,7 @@ const RoomChat: React.FC<RoomChatProps> = ({ username, isHost, gameCode, classNa
                         >
                           {msg.username}
                         </Badge>
-                        <span className="text-xs text-neo-black/50 font-medium">
+                        <span className="text-xs text-neo-black/70 font-medium">
                           {formatTime(msg.timestamp)}
                         </span>
                       </div>

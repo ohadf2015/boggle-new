@@ -48,7 +48,7 @@ export default function LegalPageLayout({
           </h1>
           <p className={cn(
             'text-sm',
-            isDarkMode ? 'text-gray-400' : 'text-gray-500'
+            isDarkMode ? 'text-gray-600' : 'text-gray-600'
           )}>
             {t('legal.lastUpdated')}: {lastUpdated}
           </p>
@@ -98,7 +98,7 @@ export default function LegalPageLayout({
         {/* Copyright Footer */}
         <footer className={cn(
           'mt-12 pt-6 border-t text-center text-sm',
-          isDarkMode ? 'border-slate-700 text-gray-500' : 'border-gray-200 text-gray-400'
+          isDarkMode ? 'border-slate-700 text-gray-600' : 'border-gray-200 text-gray-600'
         )}>
           {t('legal.copyright')}
         </footer>

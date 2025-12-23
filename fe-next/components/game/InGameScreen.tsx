@@ -365,9 +365,28 @@ const InGameScreen = memo<InGameScreenProps>(({
           )}
 
 
-          {/* Hint Button - Single Player Mode Only (always visible in landscape) */}
+          {/* Top-right: Help button */}
+          <div className="absolute top-2 right-2 z-30">
+            <HelpButton
+              onClick={() => setShowHelpPanel(true)}
+              className="w-11 h-11"
+            />
+          </div>
+
+          {/* Bottom-left: Exit button */}
+          {onExitRoom && (
+            <div className="absolute bottom-2 left-2 z-30">
+              <ExitRoomButton
+                onClick={onExitRoom}
+                label={t('playerView.exit')}
+                className="w-12 h-12"
+              />
+            </div>
+          )}
+
+          {/* Bottom-right: Hint Button - Single Player Mode Only */}
           {hints && hints.isSinglePlayer && (
-            <div className="absolute bottom-3 right-3 z-30">
+            <div className="absolute bottom-2 right-2 z-30">
               <HintButton
                 hint={hints.hint}
                 hintType={hints.hintType}
@@ -639,7 +658,7 @@ const InGameScreen = memo<InGameScreenProps>(({
                 <div className="text-center text-lg text-teal-600 dark:text-teal-300 font-bold">
                   {normalizedFoundWords.length} {t('playerView.wordsFound') || 'words found'}
                 </div>
-                <div className="text-center text-xs text-slate-500 dark:text-slate-400 mt-1">
+                <div className="text-center text-xs text-slate-500 dark:text-slate-300 mt-1">
                   {t('playerView.swipeToFormWords') || 'Swipe on the board to form words'}
                 </div>
               </CardContent>
@@ -718,13 +737,13 @@ const InGameScreen = memo<InGameScreenProps>(({
                       <div className="text-lg font-black text-neo-black leading-none">
                         {player.score}
                       </div>
-                      <div className="text-xs font-bold text-neo-black/60 uppercase">pts</div>
+                      <div className="text-xs font-bold text-neo-black/75 uppercase">pts</div>
                     </div>
                   </div>
                 </motion.div>
               ))}
               {leaderboard.length === 0 && (
-                <p className="text-center text-neo-black/60 py-6 text-sm font-bold">
+                <p className="text-center text-neo-black/75 py-6 text-sm font-bold">
                   {t('hostView.waitingForPlayers') || 'Waiting for players...'}
                 </p>
               )}

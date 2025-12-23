@@ -195,7 +195,7 @@ const WaitingScreen: React.FC<WaitingScreenProps> = ({
             })}
           </div>
           {playersReady.length === 0 && (
-            <p className="text-xs text-center text-neo-cream/60 font-bold">
+            <p className="text-xs text-center text-neo-cream/75 font-bold">
               {t('hostView.waitingForPlayers')}
             </p>
           )}
@@ -424,7 +424,7 @@ const WaitingScreen: React.FC<WaitingScreenProps> = ({
               })}
             </div>
             {playersReady.length === 0 && (
-              <p className="text-sm text-center text-neo-cream/60 font-bold mt-2 relative z-10">
+              <p className="text-sm text-center text-neo-cream/75 font-bold mt-2 relative z-10">
                 {t('hostView.waitingForPlayers')}
               </p>
             )}
@@ -500,7 +500,7 @@ const WaitingScreen: React.FC<WaitingScreenProps> = ({
             <h4 className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-400">
               {gameCode}
             </h4>
-            <p className="text-sm text-center text-slate-500 dark:text-slate-400">
+            <p className="text-sm text-center text-slate-500 dark:text-slate-300">
               {t(isHost ? 'hostView.scanQr' : 'joinView.scanToJoin')} {gameCode}
             </p>
             <p className="text-xs text-center text-slate-500">

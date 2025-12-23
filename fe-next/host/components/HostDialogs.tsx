@@ -47,7 +47,7 @@ export const QRCodeDialog: React.FC<QRCodeDialogProps> = ({
           <QRCodeSVG value={getJoinUrl(gameCode)} size={250} level="H" />
         </div>
         <h4 className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-400">{gameCode}</h4>
-        <p className="text-sm text-center text-slate-500 dark:text-slate-400">
+        <p className="text-sm text-center text-slate-500 dark:text-slate-300">
           {t('hostView.scanQr')} {gameCode}
         </p>
         <p className="text-xs text-center text-slate-500">

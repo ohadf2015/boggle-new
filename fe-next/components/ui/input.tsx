@@ -20,7 +20,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
           // Inset shadow for depth
           "shadow-[inset_2px_2px_0px_rgba(0,0,0,0.1)]",
           // Placeholder styling
-          "placeholder:text-neo-black/40 dark:placeholder:text-neo-white/40 placeholder:font-normal",
+          "placeholder:text-neo-black/70 dark:placeholder:text-neo-white/75 placeholder:font-normal",
           // Focus state with cyan ring
           "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy",
           // Focus: slight "press" effect

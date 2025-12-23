@@ -570,7 +570,7 @@ const ShareWinPrompt: React.FC<ShareWinPromptProps> = ({
             onClick={onClose}
             className={cn(
               'absolute top-2 right-2 p-1.5 rounded-full transition-colors',
-              isDarkMode ? 'hover:bg-white/10 text-gray-400' : 'hover:bg-black/5 text-gray-500'
+              isDarkMode ? 'hover:bg-white/10 text-gray-300' : 'hover:bg-black/5 text-gray-600'
             )}
           >
             <FaTimes size={14} />
@@ -639,7 +639,7 @@ const ShareWinPrompt: React.FC<ShareWinPromptProps> = ({
             <div className={cn('text-2xl font-black', isDarkMode ? 'text-yellow-400' : 'text-yellow-600')}>
               {score}
             </div>
-            <div className={cn('text-xs font-bold uppercase tracking-wide', isDarkMode ? 'text-gray-400' : 'text-gray-500')}>
+            <div className={cn('text-xs font-bold uppercase tracking-wide', isDarkMode ? 'text-gray-300' : 'text-gray-600')}>
               {language === 'he' ? 'נקודות' : 'pts'}
             </div>
           </div>
@@ -648,7 +648,7 @@ const ShareWinPrompt: React.FC<ShareWinPromptProps> = ({
             <div className={cn('text-2xl font-black', isDarkMode ? 'text-cyan-400' : 'text-cyan-600')}>
               {wordCount}
             </div>
-            <div className={cn('text-xs font-bold uppercase tracking-wide', isDarkMode ? 'text-gray-400' : 'text-gray-500')}>
+            <div className={cn('text-xs font-bold uppercase tracking-wide', isDarkMode ? 'text-gray-300' : 'text-gray-600')}>
               {language === 'he' ? 'מילים' : 'words'}
             </div>
           </div>
@@ -657,7 +657,7 @@ const ShareWinPrompt: React.FC<ShareWinPromptProps> = ({
               <div className={cn('w-0.5 h-10 rounded-full', isDarkMode ? 'bg-white/20' : 'bg-gray-300')} />
               <div className="text-center px-3">
                 <div className="text-2xl">{achievements.slice(0, 3).map(a => a.icon || '🏆').join('')}</div>
-                <div className={cn('text-xs font-bold uppercase tracking-wide', isDarkMode ? 'text-gray-400' : 'text-gray-500')}>
+                <div className={cn('text-xs font-bold uppercase tracking-wide', isDarkMode ? 'text-gray-300' : 'text-gray-600')}>
                   {achievements.length} {language === 'he' ? 'הישגים' : 'badges'}
                 </div>
               </div>

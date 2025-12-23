@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import AutoHideHeader from '@/components/AutoHideHeader';
 import DailyChallengeGame from './DailyChallengeGame';
 import DailyChallengeResults from './DailyChallengeResults';
+import DailyLeaderboard from './DailyLeaderboard';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useMobileLandscape } from '@/hooks/useMobileLandscape';
 import {
@@ -188,7 +189,7 @@ const DailyChallenge: React.FC = () => {
                 <div className="absolute inset-0 border-4 border-neo-yellow/30 rounded-full" />
                 <div className="absolute inset-0 border-4 border-transparent border-t-neo-yellow rounded-full animate-spin" />
               </div>
-              <p className="text-gray-600 dark:text-gray-400 text-sm">{t('daily.loading')}</p>
+              <p className="text-gray-600 dark:text-gray-300 text-sm">{t('daily.loading')}</p>
             </div>
           </motion.div>
         )}
@@ -303,7 +304,7 @@ const DailyReadyScreen: React.FC<DailyReadyScreenProps> = ({
           variant="ghost"
           size="sm"
           onClick={onBack}
-          className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
+          className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white"
         >
           <FaArrowLeft className="mr-2" />
           {t('daily.home')}
@@ -385,7 +386,7 @@ const DailyReadyScreen: React.FC<DailyReadyScreenProps> = ({
           <h1 className="text-6xl md:text-7xl font-black text-neo-black dark:text-white">
             #{puzzleNumber}
           </h1>
-          <p className="text-lg text-gray-600 dark:text-gray-400 mt-2">
+          <p className="text-lg text-gray-600 dark:text-gray-300 mt-2">
             {formattedDate}
           </p>
         </motion.div>
@@ -417,7 +418,7 @@ const DailyReadyScreen: React.FC<DailyReadyScreenProps> = ({
             <div className="text-2xl font-black text-neo-black dark:text-white">
               {Math.floor(DAILY_CHALLENGE_DURATION / 60)}:{(DAILY_CHALLENGE_DURATION % 60).toString().padStart(2, '0')}
             </div>
-            <div className="text-xs text-gray-500 dark:text-gray-400 uppercase">
+            <div className="text-xs text-gray-600 dark:text-gray-300 uppercase">
               {t('daily.timeLimit')}
             </div>
           </div>
@@ -427,7 +428,7 @@ const DailyReadyScreen: React.FC<DailyReadyScreenProps> = ({
             <div className="text-2xl font-black text-neo-black dark:text-white">
               1
             </div>
-            <div className="text-xs text-gray-500 dark:text-gray-400 uppercase">
+            <div className="text-xs text-gray-600 dark:text-gray-300 uppercase">
               {t('daily.attempt')}
             </div>
           </div>
@@ -438,7 +439,7 @@ const DailyReadyScreen: React.FC<DailyReadyScreenProps> = ({
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.5 }}
-          className="text-sm text-gray-500 dark:text-gray-400"
+          className="text-sm text-gray-600 dark:text-gray-300"
         >
           {t('daily.samePuzzle')}
         </motion.p>
@@ -462,9 +463,25 @@ const DailyReadyScreen: React.FC<DailyReadyScreenProps> = ({
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.7 }}
-          className="text-xs text-gray-400 dark:text-gray-500"
+          className="text-xs text-gray-600 dark:text-gray-300"
         >
           {t('daily.nextPuzzleIn')} {countdown}
+        </motion.div>
+
+        {/* Today's Players Leaderboard */}
+        <motion.div
+          initial={{ y: 20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 0.8 }}
+          className="mt-6"
+        >
+          <DailyLeaderboard
+            puzzleDate={puzzleDate}
+            language={language}
+            maxVisible={5}
+            compact
+            t={t}
+          />
         </motion.div>
       </div>
     </motion.div>

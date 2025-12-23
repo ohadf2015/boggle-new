@@ -90,7 +90,7 @@ export const LiveLeaderboard = memo<LiveLeaderboardProps>(({
             </motion.div>
           ))}
           {leaderboard.length === 0 && (
-            <p className="text-center text-neo-black/60 py-6 text-sm font-bold">
+            <p className="text-center text-neo-black/75 py-6 text-sm font-bold">
               {t('playerView.noPlayersYet') || 'No players yet'}
             </p>
           )}

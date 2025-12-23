@@ -149,7 +149,7 @@ export class FeatureErrorBoundary extends Component<FeatureErrorBoundaryProps, E
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            <p className="text-sm text-gray-600 dark:text-gray-400">
+            <p className="text-sm text-gray-600 dark:text-gray-300">
               We encountered an issue with {featureName.toLowerCase()}. This has been logged for review.
             </p>
             {process.env.NODE_ENV === 'development' && this.state.error && (

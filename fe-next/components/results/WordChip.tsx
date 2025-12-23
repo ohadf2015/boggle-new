@@ -259,7 +259,7 @@ const WordChip = memo<WordChipProps>(({ wordObj, playerCount }) => {
                 </p>
 
                 {/* Tap hint */}
-                <p className="text-[10px] text-neo-cream/60 mt-2 text-center">
+                <p className="text-[10px] text-neo-cream/75 mt-2 text-center">
                   {t('results.tapToClose') || 'Tap anywhere to close'}
                 </p>
               </div>

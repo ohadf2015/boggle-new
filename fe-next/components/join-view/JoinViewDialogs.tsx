@@ -60,7 +60,7 @@ const JoinViewDialogs: React.FC<JoinViewDialogsProps> = React.memo(({
             <p className="text-sm text-center text-slate-600 dark:text-gray-300">
               {t('joinView.scanToJoin')} {gameCode}
             </p>
-            <p className="text-xs text-center text-slate-500 dark:text-gray-400 mt-2">
+            <p className="text-xs text-center text-slate-500 dark:text-gray-300 mt-2">
               {joinUrl}
             </p>
           </div>

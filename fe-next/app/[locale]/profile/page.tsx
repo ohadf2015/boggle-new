@@ -229,7 +229,7 @@ export default function ProfilePage(): React.ReactNode {
         <AutoHideHeader />
         <div className="max-w-4xl mx-auto px-4 py-8">
           <div className="text-center py-12">
-            <FaUser className="mx-auto text-6xl text-gray-400 mb-4" />
+            <FaUser className="mx-auto text-6xl text-gray-600 mb-4" />
             <h2 className={cn(
               'text-2xl font-bold mb-2',
               isDarkMode ? 'text-white' : 'text-gray-900'
@@ -238,7 +238,7 @@ export default function ProfilePage(): React.ReactNode {
             </h2>
             <p className={cn(
               'text-lg mb-6',
-              isDarkMode ? 'text-gray-400' : 'text-gray-600'
+              isDarkMode ? 'text-gray-600' : 'text-gray-600'
             )}>
               {t('auth.upgradePrompt')}
             </p>
@@ -420,7 +420,7 @@ export default function ProfilePage(): React.ReactNode {
                     onClick={startEditingName}
                     className={cn(
                       'p-1 rounded hover:bg-gray-200 dark:hover:bg-slate-700 transition-colors',
-                      isDarkMode ? 'text-gray-400' : 'text-gray-500'
+                      isDarkMode ? 'text-gray-600' : 'text-gray-600'
                     )}
                     title={t('profile.editName') || 'Edit Name'}
                   >
@@ -430,7 +430,7 @@ export default function ProfilePage(): React.ReactNode {
               )}
               <p className={cn(
                 'text-sm',
-                isDarkMode ? 'text-gray-400' : 'text-gray-500'
+                isDarkMode ? 'text-gray-600' : 'text-gray-600'
               )}>
                 {t('profile.memberSince')} {profile?.created_at ? new Date(profile.created_at).toLocaleDateString() : '—'}
               </p>
@@ -475,7 +475,7 @@ export default function ProfilePage(): React.ReactNode {
             )}>
               <p className={cn(
                 'text-sm font-medium',
-                isDarkMode ? 'text-gray-400' : 'text-gray-600'
+                isDarkMode ? 'text-gray-600' : 'text-gray-600'
               )}>
                 {t('xp.totalXpEarned') || 'Total XP Earned'}: <span className={cn(
                   'font-bold',
@@ -559,7 +559,7 @@ export default function ProfilePage(): React.ReactNode {
                 </p>
                 <p className={cn(
                   'text-sm',
-                  isDarkMode ? 'text-gray-400' : 'text-gray-600'
+                  isDarkMode ? 'text-gray-600' : 'text-gray-600'
                 )}>
                   MMR: {profile?.ranked_mmr || 1000}
                 </p>
@@ -570,7 +570,7 @@ export default function ProfilePage(): React.ReactNode {
               <div className="flex justify-between mb-2">
                 <span className={cn(
                   'text-sm',
-                  isDarkMode ? 'text-gray-400' : 'text-gray-600'
+                  isDarkMode ? 'text-gray-600' : 'text-gray-600'
                 )}>
                   {t('ranked.unlockProgress', { current: profile?.casual_games || 0, required: 10 })}
                 </span>
@@ -592,7 +592,7 @@ export default function ProfilePage(): React.ReactNode {
               </div>
               <p className={cn(
                 'mt-2 text-sm',
-                isDarkMode ? 'text-gray-500' : 'text-gray-500'
+                isDarkMode ? 'text-gray-600' : 'text-gray-600'
               )}>
                 {t('ranked.playMoreToUnlock', { count: gamesUntilRanked })}
               </p>
@@ -717,7 +717,7 @@ function StatCard({ icon, label, value, isDarkMode, highlight = false }: StatCar
         'text-2xl mb-2',
         highlight
           ? isDarkMode ? 'text-cyan-400' : 'text-cyan-600'
-          : isDarkMode ? 'text-gray-400' : 'text-gray-500'
+          : isDarkMode ? 'text-gray-600' : 'text-gray-600'
       )}>
         {icon}
       </div>
@@ -731,7 +731,7 @@ function StatCard({ icon, label, value, isDarkMode, highlight = false }: StatCar
       </p>
       <p className={cn(
         'text-xs',
-        isDarkMode ? 'text-gray-500' : 'text-gray-500'
+        isDarkMode ? 'text-gray-600' : 'text-gray-600'
       )}>
         {label}
       </p>

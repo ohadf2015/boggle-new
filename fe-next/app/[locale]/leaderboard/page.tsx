@@ -52,7 +52,7 @@ export default function LeaderboardPage(): React.ReactNode {
       case 3:
         return <span className="text-2xl">🥉</span>;
       default:
-        return <span className="text-lg font-bold text-gray-500">#{rank}</span>;
+        return <span className="text-lg font-bold text-gray-600">#{rank}</span>;
     }
   };
 
@@ -65,7 +65,7 @@ export default function LeaderboardPage(): React.ReactNode {
         <AutoHideHeader />
         <div className="max-w-4xl mx-auto px-4 py-8">
           <div className="text-center py-12">
-            <FaTrophy className="mx-auto text-6xl text-gray-400 mb-4" />
+            <FaTrophy className="mx-auto text-6xl text-gray-600 mb-4" />
             <h2 className={cn(
               'text-2xl font-bold mb-2',
               isDarkMode ? 'text-white' : 'text-gray-900'
@@ -74,7 +74,7 @@ export default function LeaderboardPage(): React.ReactNode {
             </h2>
             <p className={cn(
               'text-lg',
-              isDarkMode ? 'text-gray-400' : 'text-gray-600'
+              isDarkMode ? 'text-gray-600' : 'text-gray-600'
             )}>
               Coming soon! Leaderboard feature is being set up.
             </p>
@@ -117,7 +117,7 @@ export default function LeaderboardPage(): React.ReactNode {
           </h1>
           <div className="flex items-center justify-center gap-3 mt-2">
             <p className={cn(
-              isDarkMode ? 'text-gray-400' : 'text-gray-600'
+              isDarkMode ? 'text-gray-600' : 'text-gray-600'
             )}>
               {t('leaderboard.allTime')}
             </p>
@@ -129,7 +129,7 @@ export default function LeaderboardPage(): React.ReactNode {
               )} />
               <span className={cn(
                 'text-xs',
-                isDarkMode ? 'text-gray-500' : 'text-gray-400'
+                isDarkMode ? 'text-gray-600' : 'text-gray-600'
               )}>
                 {subscriptionStatus === 'SUBSCRIBED' ? 'Live' : 'Connecting...'}
               </span>
@@ -147,7 +147,7 @@ export default function LeaderboardPage(): React.ReactNode {
               <FaSync className={cn(
                 'w-3 h-3',
                 loading && 'animate-spin',
-                isDarkMode ? 'text-gray-400' : 'text-gray-500'
+                isDarkMode ? 'text-gray-600' : 'text-gray-600'
               )} />
             </Button>
           </div>
@@ -176,7 +176,7 @@ export default function LeaderboardPage(): React.ReactNode {
                 <div>
                   <p className={cn(
                     'text-sm',
-                    isDarkMode ? 'text-gray-400' : 'text-gray-600'
+                    isDarkMode ? 'text-gray-600' : 'text-gray-600'
                   )}>
                     {t('leaderboard.yourRank')}
                   </p>
@@ -191,7 +191,7 @@ export default function LeaderboardPage(): React.ReactNode {
               <div className="text-right">
                 <p className={cn(
                   'text-sm',
-                  isDarkMode ? 'text-gray-400' : 'text-gray-600'
+                  isDarkMode ? 'text-gray-600' : 'text-gray-600'
                 )}>
                   {t('leaderboard.score')}
                 </p>
@@ -253,7 +253,7 @@ export default function LeaderboardPage(): React.ReactNode {
                   isDarkMode ? 'text-gray-600' : 'text-gray-300'
                 )} />
                 <p className={cn(
-                  isDarkMode ? 'text-gray-400' : 'text-gray-500'
+                  isDarkMode ? 'text-gray-600' : 'text-gray-600'
                 )}>
                   {t('leaderboard.noRankYet')}
                 </p>
@@ -308,7 +308,7 @@ export default function LeaderboardPage(): React.ReactNode {
                       </div>
                       <div className={cn(
                         'col-span-3 text-right',
-                        isDarkMode ? 'text-gray-400' : 'text-gray-600'
+                        isDarkMode ? 'text-gray-600' : 'text-gray-600'
                       )}>
                         {entry.games_played || 0}
                       </div>

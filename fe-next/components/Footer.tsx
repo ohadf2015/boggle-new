@@ -16,7 +16,7 @@ export default function Footer(): React.ReactElement {
       <div className="max-w-6xl mx-auto">
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
           {/* Copyright */}
-          <p className="text-sm font-medium text-neo-cream/60">
+          <p className="text-sm font-medium text-neo-cream/75">
             {t('legal.copyright')}
           </p>
 
@@ -38,7 +38,7 @@ export default function Footer(): React.ReactElement {
             >
               {t('footer.howToPlay') || 'How to Play'}
             </Link>
-            <span className="text-neo-cream/40 font-black hidden sm:inline">•</span>
+            <span className="text-neo-cream/70 font-black hidden sm:inline">•</span>
             <Link
               href={`/${language}/leaderboard`}
               className="
@@ -51,7 +51,7 @@ export default function Footer(): React.ReactElement {
             >
               {t('footer.leaderboard') || 'Leaderboard'}
             </Link>
-            <span className="text-neo-cream/40 font-black hidden sm:inline">•</span>
+            <span className="text-neo-cream/70 font-black hidden sm:inline">•</span>
             <Link
               href={`/${language}/legal/terms`}
               className="
@@ -64,7 +64,7 @@ export default function Footer(): React.ReactElement {
             >
               {t('legal.termsOfService')}
             </Link>
-            <span className="text-neo-cream/40 font-black hidden sm:inline">•</span>
+            <span className="text-neo-cream/70 font-black hidden sm:inline">•</span>
             <Link
               href={`/${language}/legal/privacy`}
               className="
@@ -77,7 +77,7 @@ export default function Footer(): React.ReactElement {
             >
               {t('legal.privacyPolicy')}
             </Link>
-            <span className="text-neo-cream/40 font-black hidden sm:inline">•</span>
+            <span className="text-neo-cream/70 font-black hidden sm:inline">•</span>
             <a
               href="https://ko-fi.com/lexiclash"
               target="_blank"

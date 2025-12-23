@@ -117,10 +117,17 @@ export function usePlayerWordEvents({
         );
       }
 
-      // Update found words - mark as valid
+      // Update found words - mark as valid and store score/bonus data from server
       setFoundWords(prev => prev.map(fw =>
         fw.word.toLowerCase() === data.word.toLowerCase()
-          ? { ...fw, validated: true }
+          ? {
+              ...fw,
+              validated: true,
+              score: data.score ?? fw.score,
+              comboBonus: data.comboBonus ?? 0,
+              fireRoundBonus: data.fireRoundBonus ?? 0,
+              fireRoundMultiplier: data.fireRoundMultiplier ?? 1,
+            }
           : fw
       ));
 

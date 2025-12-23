@@ -124,7 +124,7 @@ export const InteractiveGridDemo: React.FC<InteractiveGridDemoProps> = ({ t, dir
             animate={{ scale: 1, opacity: 1, y: 0 }}
             className="flex items-center gap-1.5"
           >
-            <FaFire className={`text-lg ${comboCount >= 3 ? 'text-neo-orange animate-pulse drop-shadow-[0_0_8px_rgba(255,140,0,0.7)]' : 'text-gray-400'}`} />
+            <FaFire className={`text-lg ${comboCount >= 3 ? 'text-neo-orange animate-pulse drop-shadow-[0_0_8px_rgba(255,140,0,0.7)]' : 'text-gray-600'}`} />
             <Badge className={`${comboCount >= 3 ? 'bg-neo-orange shadow-[0_0_12px_rgba(255,140,0,0.5)]' : 'bg-gray-300'} text-neo-black border-2 border-neo-black font-bold text-xs sm:text-sm px-2 py-0.5`}>
               {comboCount}x Combo {comboCount >= 3 && `(${getComboMultiplier(comboCount)}×)`}
             </Badge>

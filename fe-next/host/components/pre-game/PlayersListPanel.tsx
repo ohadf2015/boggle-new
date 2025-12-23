@@ -83,7 +83,7 @@ export const PlayersListPanel = memo<PlayersListPanelProps>(({
                   </div>
                   <div className="flex items-center gap-2">
                     {playerWordCounts && playerWordCounts[playerUsername] !== undefined && (
-                      <span className="text-neo-cream/50 text-sm font-medium">
+                      <span className="text-neo-cream/70 text-sm font-medium">
                         {playerWordCounts[playerUsername] || 0}
                       </span>
                     )}
@@ -102,7 +102,7 @@ export const PlayersListPanel = memo<PlayersListPanelProps>(({
         </AnimatePresence>
       </div>
       {players.length === 0 && (
-        <p className="text-sm text-center text-neo-cream/40 font-medium mt-2">
+        <p className="text-sm text-center text-neo-cream/75 font-medium mt-2">
           {t('hostView.waitingForPlayers')}
         </p>
       )}

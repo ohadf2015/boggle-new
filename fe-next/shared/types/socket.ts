@@ -277,6 +277,9 @@ export interface WordAcceptedPayload {
   comboBonus: number;
   comboLevel: number;
   autoValidated: boolean;
+  fireRoundActive?: boolean;
+  fireRoundMultiplier?: number;
+  fireRoundBonus?: number;
 }
 
 export interface AchievementPayload {

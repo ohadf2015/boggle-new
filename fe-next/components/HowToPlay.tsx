@@ -160,7 +160,7 @@ const InteractiveGridDemo: React.FC<InteractiveGridDemoProps> = ({ t, dir }) => 
             animate={{ scale: 1, opacity: 1 }}
             className="flex items-center gap-1"
           >
-            <FaFire className={`${comboCount >= 3 ? 'text-neo-orange animate-pulse' : 'text-gray-400'}`} />
+            <FaFire className={`${comboCount >= 3 ? 'text-neo-orange animate-pulse' : 'text-gray-600'}`} />
             <Badge className={`${comboCount >= 3 ? 'bg-neo-orange' : 'bg-gray-300'} text-neo-black border-2 border-neo-black font-bold text-xs`}>
               {comboCount}x Combo {comboCount >= 3 && `(${getComboMultiplier(comboCount)}×)`}
             </Badge>
@@ -305,7 +305,7 @@ const InteractiveGridDemo: React.FC<InteractiveGridDemoProps> = ({ t, dir }) => 
 
       {/* Instructions & Controls */}
       <div className="flex items-center gap-2">
-        <p className="text-[10px] sm:text-xs text-neo-black/60 font-medium">
+        <p className="text-[10px] sm:text-xs text-neo-black/75 font-medium">
           {t('howToPlay.demo.watchAnimation')}
         </p>
         <Button
@@ -543,7 +543,7 @@ const HowToPlay: React.FC<HowToPlayProps> = ({ onClose }) => {
           <span className="hidden xs:inline">{t('common.back')}</span>
         </Button>
 
-        <span className="text-xs sm:text-sm font-bold text-neo-black/60 flex-shrink-0">
+        <span className="text-xs sm:text-sm font-bold text-neo-black/75 flex-shrink-0">
           {currentStep + 1} / {steps.length}
         </span>
 

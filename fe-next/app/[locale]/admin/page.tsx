@@ -240,7 +240,7 @@ export default function AdminDashboard() {
             </h2>
             <p className={cn(
               'text-lg mb-6',
-              isDarkMode ? 'text-gray-400' : 'text-gray-600'
+              isDarkMode ? 'text-gray-600' : 'text-gray-600'
             )}>
               You don't have permission to access this page.
             </p>
@@ -298,7 +298,7 @@ export default function AdminDashboard() {
             </h1>
             <p className={cn(
               'text-sm',
-              isDarkMode ? 'text-gray-400' : 'text-gray-600'
+              isDarkMode ? 'text-gray-600' : 'text-gray-600'
             )}>
               Welcome, {profile?.display_name || profile?.username}
             </p>
@@ -375,7 +375,7 @@ export default function AdminDashboard() {
                     ? 'bg-cyan-600 text-white'
                     : 'bg-cyan-500 text-white'
                   : isDarkMode
-                    ? 'bg-slate-800 text-gray-400 hover:bg-slate-700'
+                    ? 'bg-slate-800 text-gray-600 hover:bg-slate-700'
                     : 'bg-white text-gray-600 hover:bg-gray-100 border border-gray-200'
               )}
             >
@@ -493,7 +493,7 @@ export default function AdminDashboard() {
                             <span className={isDarkMode ? 'text-gray-300' : 'text-gray-700'}>
                               {LANGUAGE_NAMES[lang] || lang}
                             </span>
-                            <span className={isDarkMode ? 'text-gray-400' : 'text-gray-500'}>
+                            <span className={isDarkMode ? 'text-gray-600' : 'text-gray-600'}>
                               {count.toLocaleString()} ({percentage}%)
                             </span>
                           </div>
@@ -551,7 +551,7 @@ export default function AdminDashboard() {
                           </div>
                           <span className={cn(
                             'font-medium',
-                            isDarkMode ? 'text-gray-400' : 'text-gray-600'
+                            isDarkMode ? 'text-gray-600' : 'text-gray-600'
                           )}>
                             {item.count} ({percentage}%)
                           </span>
@@ -562,7 +562,7 @@ export default function AdminDashboard() {
                 ) : (
                   <p className={cn(
                     'text-center py-4',
-                    isDarkMode ? 'text-gray-500' : 'text-gray-400'
+                    isDarkMode ? 'text-gray-600' : 'text-gray-600'
                   )}>
                     No country data available yet
                   </p>
@@ -596,12 +596,12 @@ export default function AdminDashboard() {
                     'text-left border-b',
                     isDarkMode ? 'border-slate-700' : 'border-gray-200'
                   )}>
-                    <th className={cn('pb-2 pr-4', isDarkMode ? 'text-gray-400' : 'text-gray-600')}>#</th>
-                    <th className={cn('pb-2 pr-4', isDarkMode ? 'text-gray-400' : 'text-gray-600')}>Player</th>
-                    <th className={cn('pb-2 pr-4 text-right', isDarkMode ? 'text-gray-400' : 'text-gray-600')}>Score</th>
-                    <th className={cn('pb-2 pr-4 text-right hidden sm:table-cell', isDarkMode ? 'text-gray-400' : 'text-gray-600')}>Games</th>
-                    <th className={cn('pb-2 pr-4 text-right hidden md:table-cell', isDarkMode ? 'text-gray-400' : 'text-gray-600')}>Words</th>
-                    <th className={cn('pb-2 text-right hidden lg:table-cell', isDarkMode ? 'text-gray-400' : 'text-gray-600')}>Time</th>
+                    <th className={cn('pb-2 pr-4', isDarkMode ? 'text-gray-600' : 'text-gray-600')}>#</th>
+                    <th className={cn('pb-2 pr-4', isDarkMode ? 'text-gray-600' : 'text-gray-600')}>Player</th>
+                    <th className={cn('pb-2 pr-4 text-right', isDarkMode ? 'text-gray-600' : 'text-gray-600')}>Score</th>
+                    <th className={cn('pb-2 pr-4 text-right hidden sm:table-cell', isDarkMode ? 'text-gray-600' : 'text-gray-600')}>Games</th>
+                    <th className={cn('pb-2 pr-4 text-right hidden md:table-cell', isDarkMode ? 'text-gray-600' : 'text-gray-600')}>Words</th>
+                    <th className={cn('pb-2 text-right hidden lg:table-cell', isDarkMode ? 'text-gray-600' : 'text-gray-600')}>Time</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -613,7 +613,7 @@ export default function AdminDashboard() {
                         isDarkMode ? 'border-slate-700' : 'border-gray-100'
                       )}
                     >
-                      <td className={cn('py-3 pr-4', isDarkMode ? 'text-gray-400' : 'text-gray-600')}>
+                      <td className={cn('py-3 pr-4', isDarkMode ? 'text-gray-600' : 'text-gray-600')}>
                         {index + 1}
                       </td>
                       <td className="py-3 pr-4">
@@ -632,13 +632,13 @@ export default function AdminDashboard() {
                       <td className={cn('py-3 pr-4 text-right font-medium', isDarkMode ? 'text-cyan-400' : 'text-cyan-600')}>
                         {player.total_score.toLocaleString()}
                       </td>
-                      <td className={cn('py-3 pr-4 text-right hidden sm:table-cell', isDarkMode ? 'text-gray-400' : 'text-gray-600')}>
+                      <td className={cn('py-3 pr-4 text-right hidden sm:table-cell', isDarkMode ? 'text-gray-600' : 'text-gray-600')}>
                         {player.total_games}
                       </td>
-                      <td className={cn('py-3 pr-4 text-right hidden md:table-cell', isDarkMode ? 'text-gray-400' : 'text-gray-600')}>
+                      <td className={cn('py-3 pr-4 text-right hidden md:table-cell', isDarkMode ? 'text-gray-600' : 'text-gray-600')}>
                         {player.total_words?.toLocaleString() || 0}
                       </td>
-                      <td className={cn('py-3 text-right hidden lg:table-cell', isDarkMode ? 'text-gray-400' : 'text-gray-600')}>
+                      <td className={cn('py-3 text-right hidden lg:table-cell', isDarkMode ? 'text-gray-600' : 'text-gray-600')}>
                         {formatTime(player.total_time_played || 0)}
                       </td>
                     </tr>
@@ -711,7 +711,7 @@ export default function AdminDashboard() {
                   <div key={day.date} className="flex items-center gap-4">
                     <div className={cn(
                       'w-24 text-sm',
-                      isDarkMode ? 'text-gray-400' : 'text-gray-600'
+                      isDarkMode ? 'text-gray-600' : 'text-gray-600'
                     )}>
                       {new Date(day.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
                     </div>
@@ -732,7 +732,7 @@ export default function AdminDashboard() {
                     </div>
                     <div className={cn(
                       'w-20 text-sm text-right',
-                      isDarkMode ? 'text-gray-500' : 'text-gray-500'
+                      isDarkMode ? 'text-gray-600' : 'text-gray-600'
                     )}>
                       {day.uniquePlayers} players
                     </div>
@@ -748,7 +748,7 @@ export default function AdminDashboard() {
             )}>
               <div className="flex items-center gap-2">
                 <div className="w-3 h-3 rounded bg-gradient-to-r from-cyan-500 to-blue-500" />
-                <span className={isDarkMode ? 'text-gray-400' : 'text-gray-600'}>Games played</span>
+                <span className={isDarkMode ? 'text-gray-600' : 'text-gray-600'}>Games played</span>
               </div>
             </div>
           </motion.div>
@@ -808,7 +808,7 @@ function StatCard({ icon, label, value, isDarkMode, color }: {
       </p>
       <p className={cn(
         'text-xs sm:text-sm',
-        isDarkMode ? 'text-gray-400' : 'text-gray-600'
+        isDarkMode ? 'text-gray-600' : 'text-gray-600'
       )}>
         {label}
       </p>
@@ -827,7 +827,7 @@ function SmallStatCard({ icon, label, value, isDarkMode }: {
       'rounded-xl p-4 border',
       isDarkMode ? 'bg-slate-800/50 border-slate-700' : 'bg-white border-gray-200 shadow-sm'
     )}>
-      <div className={cn('text-lg mb-1', isDarkMode ? 'text-gray-400' : 'text-gray-500')}>
+      <div className={cn('text-lg mb-1', isDarkMode ? 'text-gray-600' : 'text-gray-600')}>
         {icon}
       </div>
       <p className={cn(
@@ -838,7 +838,7 @@ function SmallStatCard({ icon, label, value, isDarkMode }: {
       </p>
       <p className={cn(
         'text-xs',
-        isDarkMode ? 'text-gray-500' : 'text-gray-500'
+        isDarkMode ? 'text-gray-600' : 'text-gray-600'
       )}>
         {label}
       </p>
@@ -865,7 +865,7 @@ function RealtimeStat({ icon, label, value, isDarkMode }: {
       </p>
       <p className={cn(
         'text-xs',
-        isDarkMode ? 'text-gray-500' : 'text-gray-500'
+        isDarkMode ? 'text-gray-600' : 'text-gray-600'
       )}>
         {label}
       </p>
@@ -916,7 +916,7 @@ function SourceCard({ title, icon, data, isDarkMode }: {
                 </span>
                 <span className={cn(
                   'font-medium whitespace-nowrap',
-                  isDarkMode ? 'text-gray-400' : 'text-gray-600'
+                  isDarkMode ? 'text-gray-600' : 'text-gray-600'
                 )}>
                   {item.count} ({percentage}%)
                 </span>
@@ -927,7 +927,7 @@ function SourceCard({ title, icon, data, isDarkMode }: {
       ) : (
         <p className={cn(
           'text-center py-4',
-          isDarkMode ? 'text-gray-500' : 'text-gray-400'
+          isDarkMode ? 'text-gray-600' : 'text-gray-600'
         )}>
           No data available yet
         </p>

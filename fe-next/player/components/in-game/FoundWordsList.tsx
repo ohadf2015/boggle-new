@@ -68,7 +68,7 @@ export const FoundWordsList = memo<FoundWordsListProps>(({
             })}
           </AnimatePresence>
           {foundWords.length === 0 && gameActive && (
-            <p className="text-center text-neo-black/60 py-6 text-sm font-bold">
+            <p className="text-center text-neo-black/75 py-6 text-sm font-bold">
               {t('playerView.noWordsYet') || 'No words found yet'}
             </p>
           )}

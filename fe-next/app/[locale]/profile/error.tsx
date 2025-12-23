@@ -21,7 +21,7 @@ export default function ProfileError({
           <h2 className="text-2xl font-bold text-white mb-2">
             Failed to load profile
           </h2>
-          <p className="text-gray-400 mb-6">
+          <p className="text-gray-600 mb-6">
             {error.message || 'Unable to load your profile. Please try again.'}
           </p>
           <button

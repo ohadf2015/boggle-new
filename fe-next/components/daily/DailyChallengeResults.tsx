@@ -9,9 +9,11 @@ import { Button } from '@/components/ui/button';
 import confetti from 'canvas-confetti';
 import {
   generateShareableResult,
+  getGuestFingerprint,
   type DailyChallengeResult,
   type DailyStreak,
 } from '@/utils/dailyChallenge';
+import DailyLeaderboard from './DailyLeaderboard';
 
 interface DailyChallengeResultsProps {
   result: DailyChallengeResult;
@@ -41,6 +43,42 @@ const DailyChallengeResults: React.FC<DailyChallengeResultsProps> = ({
 }) => {
   const [copied, setCopied] = useState(false);
   const [showSharePanel, setShowSharePanel] = useState(false);
+  const [guestFingerprint, setGuestFingerprint] = useState<string | null>(null);
+  const [leaderboardKey, setLeaderboardKey] = useState(0);
+
+  // Get guest fingerprint on mount
+  useEffect(() => {
+    getGuestFingerprint().then(setGuestFingerprint);
+  }, []);
+
+  // Submit result to backend when completing a new challenge
+  useEffect(() => {
+    if (isNewCompletion && result && guestFingerprint) {
+      const submitResult = async () => {
+        try {
+          await fetch('/api/daily-challenge/submit', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              puzzleDate: result.puzzleDate,
+              puzzleNumber: result.puzzleNumber,
+              language: result.language,
+              guestFingerprint,
+              score: result.score,
+              wordCount: result.wordCount,
+              wordsByLength: result.wordsByLength,
+              timeSeconds: result.timeSeconds,
+            }),
+          });
+          // Refresh the leaderboard after submission
+          setLeaderboardKey(prev => prev + 1);
+        } catch (err) {
+          console.error('Failed to submit daily result:', err);
+        }
+      };
+      submitResult();
+    }
+  }, [isNewCompletion, result, guestFingerprint]);
 
   // Fire confetti on new completion
   useEffect(() => {
@@ -140,7 +178,7 @@ const DailyChallengeResults: React.FC<DailyChallengeResultsProps> = ({
           variant="ghost"
           size="sm"
           onClick={onBack}
-          className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
+          className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white"
         >
           <FaArrowLeft className="mr-2" />
           {t('daily.home')}
@@ -178,13 +216,13 @@ const DailyChallengeResults: React.FC<DailyChallengeResultsProps> = ({
           animate={{ scale: 1, opacity: 1 }}
           transition={{ delay: 0.2 }}
         >
-          <div className="text-sm text-gray-500 dark:text-gray-400 uppercase font-bold">
+          <div className="text-sm text-gray-600 dark:text-gray-300 uppercase font-bold">
             {t('daily.puzzleNumber').replace('{number}', String(result.puzzleNumber))}
           </div>
           <div className="text-6xl md:text-7xl font-black text-neo-yellow mt-2">
             {result.score}
           </div>
-          <div className="text-gray-500 dark:text-gray-400">
+          <div className="text-gray-600 dark:text-gray-300">
             {t('common.points')}
           </div>
         </motion.div>
@@ -219,7 +257,7 @@ const DailyChallengeResults: React.FC<DailyChallengeResultsProps> = ({
             <div className="text-xl font-black text-neo-black dark:text-white">
               {result.wordCount}
             </div>
-            <div className="text-xs text-gray-500 dark:text-gray-400">
+            <div className="text-xs text-gray-600 dark:text-gray-300">
               {t('common.words')}
             </div>
           </div>
@@ -229,7 +267,7 @@ const DailyChallengeResults: React.FC<DailyChallengeResultsProps> = ({
             <div className="text-xl font-black text-neo-black dark:text-white">
               {streak?.currentStreak ?? 0}
             </div>
-            <div className="text-xs text-gray-500 dark:text-gray-400">
+            <div className="text-xs text-gray-600 dark:text-gray-300">
               {t('daily.streak')}
             </div>
           </div>
@@ -239,7 +277,7 @@ const DailyChallengeResults: React.FC<DailyChallengeResultsProps> = ({
             <div className="text-xl font-black text-neo-black dark:text-white">
               {Math.floor(result.timeSeconds / 60)}:{(result.timeSeconds % 60).toString().padStart(2, '0')}
             </div>
-            <div className="text-xs text-gray-500 dark:text-gray-400">
+            <div className="text-xs text-gray-600 dark:text-gray-300">
               {t('results.time')}
             </div>
           </div>
@@ -320,7 +358,7 @@ const DailyChallengeResults: React.FC<DailyChallengeResultsProps> = ({
             transition={{ delay: 0.7 }}
             className="text-left"
           >
-            <h3 className="text-sm font-bold text-gray-500 dark:text-gray-400 uppercase mb-2">
+            <h3 className="text-sm font-bold text-gray-600 dark:text-gray-300 uppercase mb-2">
               {t('common.wordsFound')} ({words.length})
             </h3>
             <div className="flex flex-wrap gap-1">
@@ -330,7 +368,7 @@ const DailyChallengeResults: React.FC<DailyChallengeResultsProps> = ({
                   className={`px-2 py-1 text-xs font-bold rounded border-2 border-neo-black ${
                     word === longestWord
                       ? 'bg-neo-yellow text-neo-black'
-                      : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300'
+                      : 'bg-gray-100 dark:bg-slate-700 text-gray-800 dark:text-gray-200'
                   }`}
                 >
                   {word}
@@ -347,9 +385,26 @@ const DailyChallengeResults: React.FC<DailyChallengeResultsProps> = ({
           transition={{ delay: 0.8 }}
           className="pt-4 border-t border-gray-200 dark:border-gray-700"
         >
-          <p className="text-sm text-gray-400 dark:text-gray-500">
+          <p className="text-sm text-gray-600 dark:text-gray-300">
             {t('daily.nextPuzzleIn')} <span className="font-bold text-neo-cyan">{countdown}</span>
           </p>
+        </motion.div>
+
+        {/* Today's Players Leaderboard */}
+        <motion.div
+          initial={{ y: 20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 0.9 }}
+          className="mt-6"
+        >
+          <DailyLeaderboard
+            key={leaderboardKey}
+            puzzleDate={result.puzzleDate}
+            language={result.language}
+            currentGuestFingerprint={guestFingerprint}
+            maxVisible={10}
+            t={t}
+          />
         </motion.div>
       </div>
 

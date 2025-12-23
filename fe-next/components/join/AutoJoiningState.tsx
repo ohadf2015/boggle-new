@@ -85,7 +85,7 @@ export const AutoJoiningState: React.FC<AutoJoiningStateProps> = ({
               </div>
             </div>
 
-            <p className="text-center text-neo-cream/60 text-sm font-bold uppercase">
+            <p className="text-center text-neo-cream/75 text-sm font-bold uppercase">
               {t('joinView.connectingToRoom')}
             </p>
           </CardContent>

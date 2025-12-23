@@ -316,7 +316,7 @@ const PlayerInsights: React.FC<PlayerInsightsProps> = ({ insights }) => {
         </motion.div>
       )}
 
-      <h4 className="text-sm font-black uppercase tracking-wide text-gray-700 mb-3">
+      <h4 className="text-sm font-black uppercase tracking-wide text-neo-black dark:text-neo-cream mb-3">
         {t('insights.yourStats') || 'Your Stats'}
       </h4>
 
@@ -352,7 +352,7 @@ const PlayerInsights: React.FC<PlayerInsightsProps> = ({ insights }) => {
                 {card.value}
               </div>
               {card.subValue && (
-                <div className="text-xs font-bold text-gray-500">
+                <div className="text-xs font-bold text-gray-600">
                   {card.subValue}
                 </div>
               )}
@@ -419,7 +419,7 @@ const PlayerInsights: React.FC<PlayerInsightsProps> = ({ insights }) => {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.5 }}
-          className="mt-2 text-[10px] font-bold text-gray-600 text-center"
+          className="mt-2 text-[10px] font-bold text-neo-black/80 dark:text-neo-cream/80 text-center"
         >
           {t('insights.accuracy') || 'Accuracy'}: {insights.accuracy}%
         </motion.div>

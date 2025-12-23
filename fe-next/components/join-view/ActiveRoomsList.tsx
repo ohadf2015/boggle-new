@@ -98,7 +98,7 @@ const ActiveRoomsList: React.FC<ActiveRoomsListProps> = React.memo(({
                 </Badge>
               )}
               {/* Mobile: Expand/collapse indicator */}
-              <span className="md:hidden text-slate-500 dark:text-slate-400 text-sm">
+              <span className="md:hidden text-slate-500 dark:text-slate-300 text-sm">
                 {mobileExpanded ? '\u25B2' : '\u25BC'}
               </span>
             </div>
@@ -184,7 +184,7 @@ interface EmptyStateProps {
 }
 
 const EmptyState: React.FC<EmptyStateProps> = React.memo(({ isJoinMode, onSwitchToHostMode, t }) => (
-  <div className="text-center py-6 text-neo-cream/60 space-y-4">
+  <div className="text-center py-6 text-neo-cream/75 space-y-4">
     {isJoinMode && (
       <motion.div whileHover={{ x: -2, y: -2 }} whileTap={{ x: 2, y: 2 }}>
         <Button
@@ -197,7 +197,7 @@ const EmptyState: React.FC<EmptyStateProps> = React.memo(({ isJoinMode, onSwitch
       </motion.div>
     )}
     <div className="flex justify-center">
-      <FaGamepad size={48} className="text-neo-cream/30" />
+      <FaGamepad size={48} className="text-neo-cream/75" />
     </div>
     <div>
       <p className="text-base font-bold uppercase text-black">{t('joinView.noRooms')}</p>
@@ -240,7 +240,7 @@ const RoomButton: React.FC<RoomButtonProps> = React.memo(({
           <div className={cn("font-black text-lg", isSelected ? "text-neo-black" : "text-neo-cream")}>
             {room.roomName || room.gameCode}
           </div>
-          <div className={cn("text-xs font-bold", isSelected ? "text-neo-black/60" : "text-neo-cream/60")}>
+          <div className={cn("text-xs font-bold", isSelected ? "text-neo-black/75" : "text-neo-cream/75")}>
             {t('joinView.host')}: {room.gameCode}
           </div>
         </div>

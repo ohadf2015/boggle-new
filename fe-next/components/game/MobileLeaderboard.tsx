@@ -86,7 +86,7 @@ const MobileLeaderboard = memo<MobileLeaderboardProps>(({
                 {t('playerView.rankings') || 'Rankings'}
               </span>
             </div>
-            <FaChevronUp className="text-neo-black/50 text-xs" />
+            <FaChevronUp className="text-neo-black/70 text-xs" />
           </div>
 
           {/* Top 3 Mini-List */}
@@ -114,7 +114,7 @@ const MobileLeaderboard = memo<MobileLeaderboardProps>(({
           {/* Player's rank if not in top 3 */}
           {playerData.rank && playerData.rank > 3 && (
             <>
-              <div className="text-center text-neo-black/30 text-[10px]">⋯</div>
+              <div className="text-center text-neo-black/75 text-[10px]">⋯</div>
               <div className="flex items-center gap-1.5 px-1.5 py-0.5 rounded-neo text-xs bg-neo-cyan ring-2 ring-neo-black">
                 <span className="font-black w-5 text-center text-[10px]">
                   #{playerData.rank}
@@ -184,7 +184,7 @@ const MobileLeaderboard = memo<MobileLeaderboardProps>(({
                 <div className="text-lg font-black text-neo-black leading-none">
                   {player.score}
                 </div>
-                <div className="text-[9px] font-bold text-neo-black/60 uppercase">pts</div>
+                <div className="text-[9px] font-bold text-neo-black/75 uppercase">pts</div>
               </div>
             </motion.div>
           ))}

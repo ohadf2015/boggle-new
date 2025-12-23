@@ -92,7 +92,7 @@ const HostModeFields: React.FC<HostModeFieldsProps> = ({
             aria-invalid={showRoomNameError ? 'true' : undefined}
             aria-describedby={showRoomNameError ? 'roomName-error' : 'roomName-hint'}
             className={cn(
-              "bg-slate-100 dark:bg-slate-700/50 border-slate-200 dark:border-slate-600 text-slate-900 dark:text-white placeholder:text-slate-500 dark:placeholder:text-gray-400 transition-colors",
+              "bg-slate-100 dark:bg-slate-700/50 border-slate-200 dark:border-slate-600 text-slate-900 dark:text-white placeholder:text-slate-500 dark:placeholder:text-gray-600 transition-colors",
               getValidationClasses(
                 roomNameError ? 'invalid' : roomNameValidation.state,
                 showRoomNameError ? "border-red-500 bg-red-900/30 focus-visible:ring-red-500" : ""
@@ -107,7 +107,7 @@ const HostModeFields: React.FC<HostModeFieldsProps> = ({
             </p>
           )}
           {!showRoomNameError && (
-            <p id="roomName-hint" className="text-sm text-slate-500 dark:text-gray-400">
+            <p id="roomName-hint" className="text-sm text-slate-500 dark:text-gray-300">
               {t('joinView.playerAndRoomName')}
             </p>
           )}
@@ -126,7 +126,7 @@ const HostModeFields: React.FC<HostModeFieldsProps> = ({
       {/* Show "Hosting as" for authenticated users in host mode */}
       {isAuthenticated && displayName && (
         <div className="p-3 rounded-lg bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800">
-          <p className="text-sm text-slate-600 dark:text-gray-400">
+          <p className="text-sm text-slate-600 dark:text-gray-300">
             {t('joinView.hostingAs') || 'Hosting as'}{' '}
             <span className="font-semibold text-purple-600 dark:text-purple-400">{displayName}</span>
           </p>
@@ -162,7 +162,7 @@ const HostModeFields: React.FC<HostModeFieldsProps> = ({
             aria-invalid={showGameCodeError ? 'true' : undefined}
             aria-describedby={showGameCodeError ? 'host-gameCode-error' : 'host-gameCode-hint'}
             className={cn(
-              "flex-1 bg-slate-100 dark:bg-slate-700/50 border-slate-200 dark:border-slate-600 text-slate-900 dark:text-white placeholder:text-slate-500 dark:placeholder:text-gray-400 transition-colors",
+              "flex-1 bg-slate-100 dark:bg-slate-700/50 border-slate-200 dark:border-slate-600 text-slate-900 dark:text-white placeholder:text-slate-500 dark:placeholder:text-gray-600 transition-colors",
               getValidationClasses(
                 gameCodeError ? 'invalid' : gameCodeValidation.state,
                 showGameCodeError ? "border-red-500 bg-red-900/30 focus-visible:ring-red-500" : ""
@@ -191,7 +191,7 @@ const HostModeFields: React.FC<HostModeFieldsProps> = ({
           </p>
         )}
         {!showGameCodeError && (
-          <p id="host-gameCode-hint" className="text-sm text-slate-500 dark:text-gray-400">
+          <p id="host-gameCode-hint" className="text-sm text-slate-500 dark:text-gray-300">
             {t('validation.codeHelper')}
           </p>
         )}

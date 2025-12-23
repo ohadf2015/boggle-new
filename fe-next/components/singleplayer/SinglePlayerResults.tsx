@@ -66,6 +66,7 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
     sortedPointGroups,
     invalidWords,
     totalComboBonus,
+    totalFireRoundBonus,
     botWordDetails,
   } = useResultsData(results, t);
 
@@ -131,7 +132,7 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
     if (rank === 1) return <FaTrophy className="text-neo-yellow text-xl" />;
     if (rank === 2) return <FaMedal className="text-slate-500 dark:text-slate-300 text-xl" />;
     if (rank === 3) return <FaMedal className="text-amber-600 text-xl" />;
-    return <span className="text-neo-black/50 dark:text-white/50 font-bold">#{rank}</span>;
+    return <span className="text-neo-black/70 dark:text-white/70 font-bold">#{rank}</span>;
   };
 
   // getRankBgColor imported from @/utils/rankingStyles
@@ -214,7 +215,7 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
         <div className="w-1/2 flex flex-col gap-2 overflow-y-auto">
           {/* Words by points - compact */}
           <div className="bg-neo-cream dark:bg-slate-800 border-2 border-neo-black rounded-neo p-2 flex-1 overflow-y-auto">
-            <h3 className="text-xs font-black uppercase text-neo-black/70 dark:text-neo-white/70 mb-2">
+            <h3 className="text-xs font-black uppercase text-neo-black/80 dark:text-neo-cream mb-2">
               {t('results.yourWords') || 'Your Words'}
             </h3>
             <div className="space-y-1">
@@ -241,7 +242,7 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
           {/* Bot rankings - compact (for solo-bots mode) */}
           {mode === 'solo-bots' && allParticipants.length > 1 && (
             <div className="bg-neo-cream dark:bg-slate-800 border-2 border-neo-black rounded-neo p-2">
-              <h3 className="text-xs font-black uppercase text-neo-black/70 dark:text-neo-white/70 mb-1">
+              <h3 className="text-xs font-black uppercase text-neo-black/80 dark:text-neo-cream mb-1">
                 {t('results.rankings') || 'Rankings'}
               </h3>
               <div className="space-y-1">
@@ -256,7 +257,7 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
                     <span className="flex items-center gap-1">
                       {getRankIcon(i + 1)}
                       <span className="font-bold">{p.name}</span>
-                      {p.isPlayer && <span className="text-[8px] opacity-60">(you)</span>}
+                      {p.isPlayer && <span className="text-[8px] opacity-75">(you)</span>}
                     </span>
                     <span className="font-black">{p.score}</span>
                   </div>
@@ -333,7 +334,7 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
             {isWinner ? (
               <FaTrophy className="text-6xl mx-auto mb-3 text-neo-black drop-shadow-[2px_2px_0px_rgba(0,0,0,0.2)]" />
             ) : (
-              <div className="text-6xl font-black text-neo-black/60 mb-3">#{playerRank}</div>
+              <div className="text-6xl font-black text-neo-black/75 mb-3">#{playerRank}</div>
             )}
           </motion.div>
           <h2 className="text-3xl font-black uppercase text-neo-black relative z-10" style={{ textShadow: isWinner ? '2px 2px 0px rgba(255,255,255,0.5)' : 'none' }}>
@@ -433,13 +434,13 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
             ) : (
               <>
                 <div className="flex items-center justify-center gap-3 mb-2">
-                  <Target className="w-10 h-10 text-neo-black/60 dark:text-neo-white/60" />
+                  <Target className="w-10 h-10 text-neo-black/75 dark:text-neo-cream/75" />
                 </div>
                 <h2 className="text-3xl font-black uppercase text-neo-black dark:text-neo-white">
                   {t('singlePlayer.challengeComplete') || 'Challenge Complete'}
                 </h2>
                 {results.previousHighScore && results.previousHighScore > results.playerScore && (
-                  <p className="mt-2 text-sm text-neo-black/60 dark:text-neo-white/60">
+                  <p className="mt-2 text-sm text-neo-black/80 dark:text-neo-cream/80">
                     {(t('challenge.shortOf') || '{diff} points short of your record').replace('{diff}', String(results.previousHighScore - results.playerScore))}
                   </p>
                 )}
@@ -473,19 +474,33 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
             {results.playerWords.length} {t('common.words') || 'words'}
           </div>
         </div>
-        {/* Combo bonus display */}
-        {totalComboBonus > 0 && (
-          <motion.div
-            initial={{ scale: 0, rotate: -10 }}
-            animate={{ scale: 1, rotate: 3 }}
-            transition={{ delay: 0.4, type: 'spring', stiffness: 300 }}
-            className="inline-block mt-3 bg-neo-orange border-3 border-neo-black rounded-neo px-4 py-2 shadow-hard"
-          >
-            <span className="text-sm font-black text-neo-black">
-              {t('results.comboBonus') || 'Combo Bonus'}: +{totalComboBonus}
-            </span>
-          </motion.div>
-        )}
+        {/* Fire round and Combo bonus displays */}
+        <div className="flex flex-wrap gap-2 justify-center mt-3">
+          {totalFireRoundBonus > 0 && (
+            <motion.div
+              initial={{ scale: 0, rotate: 5 }}
+              animate={{ scale: 1, rotate: -2 }}
+              transition={{ delay: 0.35, type: 'spring', stiffness: 300 }}
+              className="inline-block bg-gradient-to-r from-neo-orange to-red-400 border-3 border-neo-black rounded-neo px-4 py-2 shadow-hard"
+            >
+              <span className="text-sm font-black text-neo-black flex items-center gap-1">
+                🔥 {t('results.fireRoundBonus') || 'Fire Round'}: +{totalFireRoundBonus}
+              </span>
+            </motion.div>
+          )}
+          {totalComboBonus > 0 && (
+            <motion.div
+              initial={{ scale: 0, rotate: -10 }}
+              animate={{ scale: 1, rotate: 3 }}
+              transition={{ delay: 0.4, type: 'spring', stiffness: 300 }}
+              className="inline-block bg-neo-yellow border-3 border-neo-black rounded-neo px-4 py-2 shadow-hard"
+            >
+              <span className="text-sm font-black text-neo-black">
+                {t('results.comboBonus') || 'Combo Bonus'}: +{totalComboBonus}
+              </span>
+            </motion.div>
+          )}
+        </div>
       </motion.div>
 
       {/* Words found - Grouped by points like multiplayer results */}
@@ -537,6 +552,12 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
                                 }}
                               >
                                 {wordObj.word}
+                                {/* Show fire round bonus indicator (earthquake 2x) */}
+                                {(wordObj.fireRoundBonus ?? 0) > 0 && (
+                                  <span className="text-[10px] px-1 py-0.5 bg-neo-orange text-neo-black rounded border border-neo-black font-black" title="Fire Round 2x Bonus">
+                                    🔥+{wordObj.fireRoundBonus}
+                                  </span>
+                                )}
                                 {/* Show combo bonus indicator */}
                                 {(wordObj.comboBonus ?? 0) > 0 && (
                                   <span className="text-[10px] px-1 py-0.5 bg-neo-yellow text-neo-black rounded border border-neo-black font-black">
@@ -578,7 +599,7 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
               )}
             </div>
           ) : (
-            <span className="text-sm text-neo-black/40 dark:text-neo-white/40 italic">
+            <span className="text-sm text-neo-black/70 dark:text-neo-white/75 italic">
               {t('singlePlayer.noWordsFound') || 'No words found'}
             </span>
           )}
@@ -631,7 +652,7 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
                 ))}
               </div>
               {/* Note that achievements are not saved */}
-              <p className="text-xs text-neo-black/50 dark:text-neo-white/50 mt-3 italic">
+              <p className="text-xs text-neo-black/70 dark:text-neo-cream/70 mt-3 italic">
                 {t('singlePlayer.achievementsNotSaved') || 'Achievements in single player mode are not saved to your profile.'}
               </p>
             </CardContent>
@@ -666,7 +687,7 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
                       {getRankIcon(index + 1)}
                     </div>
                     <div className="flex items-center gap-2">
-                      {!participant.isPlayer && <FaRobot className="text-neo-black/40 dark:text-white/40 text-lg" />}
+                      {!participant.isPlayer && <FaRobot className="text-neo-black/70 dark:text-white/75 text-lg" />}
                       <span className={cn(
                         'font-black text-lg text-neo-black dark:text-white',
                         participant.isPlayer ? '' : 'text-neo-black/80 dark:text-white/80'
@@ -714,7 +735,7 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
                   className="w-full flex items-center justify-between p-3 bg-neo-cream dark:bg-slate-700 hover:bg-neo-cream/80 dark:hover:bg-slate-600 transition-colors"
                 >
                   <div className="flex items-center gap-3">
-                    <FaRobot className="text-neo-black/50 dark:text-white/50" />
+                    <FaRobot className="text-neo-black/70 dark:text-white/70" />
                     <span className="font-black text-neo-black dark:text-white">{bot.name}</span>
                     <span className="text-xs bg-neo-black/10 dark:bg-white/10 px-2 py-0.5 rounded-full font-bold">
                       {bot.totalWords} {t('hostView.words') || 'words'}
@@ -725,7 +746,7 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
                     <motion.span
                       animate={{ rotate: expandedBot === bot.name ? 180 : 0 }}
                       transition={{ duration: 0.2 }}
-                      className="text-neo-black/50 dark:text-white/50"
+                      className="text-neo-black/70 dark:text-white/70"
                     >
                       ▼
                     </motion.span>
@@ -743,7 +764,7 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
                       className="overflow-hidden"
                     >
                       <div className="p-3 bg-white dark:bg-slate-800 border-t-2 border-neo-black/20 dark:border-slate-600">
-                        <div className="text-xs font-bold uppercase text-neo-black/60 dark:text-white/60 mb-2">
+                        <div className="text-xs font-bold uppercase text-neo-black/80 dark:text-gray-300 mb-2">
                           {t('singlePlayer.wordsByLength') || 'Words by Length'}
                         </div>
                         <div className="flex flex-wrap gap-2">
@@ -774,7 +795,7 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
                         </div>
                         {/* Score breakdown */}
                         <div className="mt-3 pt-2 border-t border-neo-black/10 dark:border-white/10">
-                          <div className="text-xs text-neo-black/60 dark:text-white/60">
+                          <div className="text-xs text-neo-black/80 dark:text-gray-300">
                             {t('singlePlayer.totalScore') || 'Total Score'}: <span className="font-black text-neo-black dark:text-white">{bot.score}</span>
                           </div>
                         </div>

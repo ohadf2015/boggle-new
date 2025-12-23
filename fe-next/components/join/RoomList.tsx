@@ -82,7 +82,7 @@ export const RoomList: React.FC<RoomListProps> = ({
                 </Badge>
               )}
               {/* Mobile: Expand/collapse indicator */}
-              <span className="md:hidden text-slate-500 dark:text-slate-400 text-sm">
+              <span className="md:hidden text-slate-500 dark:text-slate-300 text-sm">
                 {mobileExpanded ? '▲' : '▼'}
               </span>
             </div>
@@ -147,7 +147,7 @@ export const RoomList: React.FC<RoomListProps> = ({
                         </div>
                         <div className={cn(
                           "text-xs font-bold",
-                          selectedGameCode === room.gameCode ? "text-neo-black/60" : "text-neo-cream/60"
+                          selectedGameCode === room.gameCode ? "text-neo-black/75" : "text-neo-cream/75"
                         )}>
                           {t('joinView.host')}: {room.gameCode}
                         </div>
@@ -210,7 +210,7 @@ const EmptyRoomsState: React.FC<EmptyRoomsStateProps> = ({
   onSwitchToHostMode,
   t,
 }) => (
-  <div className="text-center py-6 text-neo-cream/60 space-y-4">
+  <div className="text-center py-6 text-neo-cream/75 space-y-4">
     {isJoinMode && (
       <motion.div whileHover={{ x: -2, y: -2 }} whileTap={{ x: 2, y: 2 }}>
         <Button
@@ -223,7 +223,7 @@ const EmptyRoomsState: React.FC<EmptyRoomsStateProps> = ({
       </motion.div>
     )}
     <div className="flex justify-center">
-      <FaGamepad size={48} className="text-neo-cream/30" />
+      <FaGamepad size={48} className="text-neo-cream/75" />
     </div>
     <div>
       <p className="text-base font-bold uppercase">{t('joinView.noRooms')}</p>

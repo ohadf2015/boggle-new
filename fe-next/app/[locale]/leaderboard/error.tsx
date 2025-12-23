@@ -21,7 +21,7 @@ export default function LeaderboardError({
           <h2 className="text-2xl font-bold text-white mb-2">
             Failed to load leaderboard
           </h2>
-          <p className="text-gray-400 mb-6">
+          <p className="text-gray-600 mb-6">
             {error.message || 'Unable to fetch leaderboard data. Please try again.'}
           </p>
           <button

@@ -156,8 +156,8 @@ const NoWordsFoundView: React.FC<NoWordsFoundViewProps> = ({ isCurrentPlayer, pl
                 {encouragement.headline}
               </h3>
               <div className="flex items-center gap-1">
-                <Sparkles className="w-3 h-3 text-neo-black/60" />
-                <span className="text-xs font-bold text-neo-black/60 uppercase">
+                <Sparkles className="w-3 h-3 text-neo-black/75" />
+                <span className="text-xs font-bold text-neo-black/75 uppercase">
                   {t('noWords.keepGoing') || 'Keep going!'}
                 </span>
               </div>

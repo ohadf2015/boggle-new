@@ -56,10 +56,10 @@ export const AchievementTiers: React.FC<AchievementTiersProps> = ({ t }) => {
                 {tier.icon}
               </div>
               <span className="text-xs font-bold mt-1 text-neo-black">{tier.name}</span>
-              <span className="text-xs text-neo-black/60">×{tier.count}</span>
+              <span className="text-xs text-neo-black/75">×{tier.count}</span>
             </motion.div>
             {index < tiers.length - 1 && (
-              <FaChevronRight className="text-neo-black/40 flex-shrink-0" />
+              <FaChevronRight className="text-neo-black/70 flex-shrink-0" />
             )}
           </React.Fragment>
         ))}
@@ -81,7 +81,7 @@ export const AchievementTiers: React.FC<AchievementTiersProps> = ({ t }) => {
             <span className="text-2xl">{ach.icon}</span>
             <div>
               <div className="font-semibold text-neo-black text-sm">{ach.name}</div>
-              <div className="text-xs text-neo-black/60">{ach.desc}</div>
+              <div className="text-xs text-neo-black/75">{ach.desc}</div>
             </div>
           </motion.div>
         ))}

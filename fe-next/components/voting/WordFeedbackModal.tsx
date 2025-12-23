@@ -353,7 +353,7 @@ const WordFeedbackModal = memo<WordFeedbackModalProps>(({
                         <FaCheckCircle className="inline mr-1 text-neo-cyan" />
                         {t('wordFeedback.validForScoring') || 'Counts as valid! Help add it to dictionary.'}
                         {votesNeeded > 0 && (
-                          <span className="text-neo-black/50 ml-1">
+                          <span className="text-neo-black/70 ml-1">
                             ({votesNeeded} {t('wordFeedback.moreForDictionary') || 'more for dictionary'})
                           </span>
                         )}
@@ -458,7 +458,7 @@ const WordFeedbackModal = memo<WordFeedbackModalProps>(({
               </div>
 
               {/* Footer */}
-              <div className="flex justify-between items-center text-xs text-neo-black/60">
+              <div className="flex justify-between items-center text-xs text-neo-black/75">
                 <span>
                   {t('wordFeedback.skipHint') || 'Press ESC to skip'}
                 </span>

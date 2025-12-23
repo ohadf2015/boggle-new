@@ -208,7 +208,7 @@ const WinStreakDisplay: React.FC<WinStreakDisplayProps> = ({
               <div className={cn('text-xs font-medium', colors.text)}>
                 {tier.emoji} {tier.name}
                 {isNewBest && (
-                  <span className="ml-2 px-1.5 py-0.5 bg-yellow-500/20 text-yellow-500 rounded text-[10px] uppercase font-bold">
+                  <span className="ml-2 px-1.5 py-0.5 bg-yellow-400 text-yellow-900 rounded text-[10px] uppercase font-bold">
                     {t('growth.newBest') || 'New Best!'}
                   </span>
                 )}
@@ -220,12 +220,12 @@ const WinStreakDisplay: React.FC<WinStreakDisplayProps> = ({
         {/* Progress to next tier */}
         {nextTier && (
           <div className="text-right">
-            <div className={cn('text-xs', isDarkMode ? 'text-gray-400' : 'text-gray-500')}>
+            <div className={cn('text-xs', isDarkMode ? 'text-gray-300' : 'text-gray-600')}>
               {t('growth.nextTier') || 'Next tier'}
             </div>
             <div className="flex items-center gap-1.5">
               <span className="text-lg">{nextTier.emoji}</span>
-              <span className={cn('text-sm font-medium', isDarkMode ? 'text-gray-300' : 'text-gray-600')}>
+              <span className={cn('text-sm font-medium', isDarkMode ? 'text-gray-200' : 'text-gray-700')}>
                 {nextTier.min - currentStreak} {t('growth.winsAway') || 'wins away'}
               </span>
             </div>

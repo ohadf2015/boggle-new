@@ -227,11 +227,11 @@ const AuthenticatedQuickJoin: React.FC<AuthenticatedQuickJoinProps> = React.memo
         id="auth-display-name"
         value={username || displayName}
         onChange={(e) => setUsername(sanitizeInput(e.target.value, 20))}
-        className="w-full h-16 sm:h-14 text-xl sm:text-lg text-center font-black text-neo-cyan uppercase tracking-tight bg-neo-navy border-3 border-neo-cyan/50 rounded-neo shadow-hard-sm placeholder:text-neo-cyan/50 focus:border-neo-cyan focus:ring-0"
+        className="w-full h-16 sm:h-14 text-xl sm:text-lg text-center font-black text-neo-cyan uppercase tracking-tight bg-neo-navy border-3 border-neo-cyan/50 rounded-neo shadow-hard-sm placeholder:text-neo-cyan/70 focus:border-neo-cyan focus:ring-0"
         placeholder={displayName}
         maxLength={20}
       />
-      <p className="text-neo-cream/50 text-xs font-bold uppercase text-center">
+      <p className="text-neo-cream/70 text-xs font-bold uppercase text-center">
         {t('joinView.tapToChangeDisplayName') || 'Tap to change display name'}
       </p>
     </div>
@@ -315,7 +315,7 @@ const GuestQuickJoin: React.FC<GuestQuickJoinProps> = React.memo(({
         required
         autoFocus
         className={cn(
-          "h-14 text-lg bg-neo-cream text-neo-black font-bold border-3 border-neo-black rounded-neo shadow-hard-sm placeholder:text-neo-black/50 focus:border-neo-cyan focus:ring-0",
+          "h-14 text-lg bg-neo-cream text-neo-black font-bold border-3 border-neo-black rounded-neo shadow-hard-sm placeholder:text-neo-black/70 focus:border-neo-cyan focus:ring-0",
           usernameError && "border-neo-pink bg-neo-pink/20 text-neo-pink"
         )}
         placeholder={t('joinView.playerNamePlaceholder')}

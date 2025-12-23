@@ -160,7 +160,7 @@ const LandingView: React.FC = () => {
                         t('daily.bannerTitle').replace('{number}', String(dailyPuzzleNumber))
                       )}
                     </div>
-                    <div className="text-xs sm:text-sm font-medium text-neo-black/60">
+                    <div className="text-xs sm:text-sm font-medium text-neo-black/75">
                       {hasPlayedDaily
                         ? `${t('daily.nextPuzzleIn')} ${dailyCountdown}`
                         : t('daily.bannerSubtitle')}
@@ -170,7 +170,7 @@ const LandingView: React.FC = () => {
 
                 <div className="flex items-center">
                   <div className="hidden sm:block mr-3 text-right">
-                    <div className="text-xs font-bold text-neo-black/60 uppercase">
+                    <div className="text-xs font-bold text-neo-black/75 uppercase">
                       {hasPlayedDaily ? t('results.viewResults') : t('daily.playNow')}
                     </div>
                   </div>

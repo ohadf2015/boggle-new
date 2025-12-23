@@ -21,6 +21,7 @@ const {
 const { broadcastToRoom, getGameRoom } = require('../utils/socketHelpers');
 const { generateRandomTable } = require('../utils/gameUtils');
 const { DIFFICULTIES } = require('../utils/consts');
+const { makePositionsMap } = require('../modules/wordValidator');
 const logger = require('../utils/logger');
 
 // Earthquake configuration (matches frontend DEFAULT_EARTHQUAKE_CONFIG)
@@ -146,8 +147,13 @@ function executeEarthquakeSequence(io, gameCode, game) {
       [] // Empty array - let it generate random words to embed
     );
 
-    // Update game state with new grid
-    updateGame(gameCode, { letterGrid: newGrid });
+    // Generate new letter positions map for word validation
+    const newPositions = makePositionsMap(newGrid, language);
+
+    // Update game state with new grid AND positions map
+    // CRITICAL: letterPositions MUST be updated along with letterGrid
+    // otherwise word validation will fail (words won't be found on new grid)
+    updateGame(gameCode, { letterGrid: newGrid, letterPositions: newPositions });
 
     // Broadcast fire round start with new grid
     broadcastToRoom(io, room, 'fireRoundStart', {

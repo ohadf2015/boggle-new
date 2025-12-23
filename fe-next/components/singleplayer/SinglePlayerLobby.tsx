@@ -287,7 +287,7 @@ const SinglePlayerLobby: React.FC<SinglePlayerLobbyProps> = ({
                     ))}
                   </div>
                 ) : (
-                  <p className="text-xs text-neo-white/50 italic text-center">
+                  <p className="text-xs text-neo-white/70 italic text-center">
                     {t('singlePlayer.noBots') || 'Tap + to add bot opponents'}
                   </p>
                 )}
@@ -371,12 +371,12 @@ const SinglePlayerLobby: React.FC<SinglePlayerLobbyProps> = ({
               <h3 className="font-black text-lg uppercase">
                 {t(MODE_CONFIG[mode].labelKey) || mode}
               </h3>
-              <p className="text-sm text-neo-black/60 dark:text-neo-white/60">
+              <p className="text-sm text-neo-black/75 dark:text-neo-white/75">
                 {t(MODE_CONFIG[mode].descKey)}
               </p>
             </div>
             <div className="text-right">
-              <div className="text-xs uppercase text-neo-black/50 dark:text-neo-white/50">
+              <div className="text-xs uppercase text-neo-black/70 dark:text-neo-white/70">
                 {t('singlePlayer.selectDifficulty') || 'Grid'}
               </div>
               <div className="font-bold">
@@ -430,11 +430,11 @@ const SinglePlayerLobby: React.FC<SinglePlayerLobbyProps> = ({
                       <div className="flex-1 grid grid-cols-2 gap-1 sm:gap-2 text-center">
                         <div className="bg-white/30 rounded-neo px-1.5 sm:px-2 py-1 border-2 border-neo-black/20">
                           <div className="text-sm sm:text-base md:text-lg font-black text-neo-black">{currentHighScore.wordCount}</div>
-                          <div className="text-[9px] sm:text-[10px] font-bold text-neo-black/60 uppercase">{t('common.words') || 'words'}</div>
+                          <div className="text-[9px] sm:text-[10px] font-bold text-neo-black/75 uppercase">{t('common.words') || 'words'}</div>
                         </div>
                         <div className="bg-white/30 rounded-neo px-1.5 sm:px-2 py-1 border-2 border-neo-black/20">
                           <div className="text-xs sm:text-sm font-black text-neo-black uppercase truncate">{currentHighScore.longestWord}</div>
-                          <div className="text-[9px] sm:text-[10px] font-bold text-neo-black/60 uppercase">{t('challenge.longest') || 'longest'}</div>
+                          <div className="text-[9px] sm:text-[10px] font-bold text-neo-black/75 uppercase">{t('challenge.longest') || 'longest'}</div>
                         </div>
                       </div>
                     </div>
@@ -452,7 +452,7 @@ const SinglePlayerLobby: React.FC<SinglePlayerLobbyProps> = ({
                       {t('challenge.noRecord') || 'No Record Yet'}
                     </span>
                   </div>
-                  <p className="text-sm text-neo-black/60 dark:text-neo-white/60">
+                  <p className="text-sm text-neo-black/75 dark:text-neo-white/75">
                     {t('challenge.setFirst') || 'Set your first high score and start competing against yourself!'}
                   </p>
                 </div>
@@ -460,7 +460,7 @@ const SinglePlayerLobby: React.FC<SinglePlayerLobbyProps> = ({
 
               {/* Progress Stats */}
               {progressStats.totalGames > 0 && (
-                <div className="mt-3 flex items-center justify-center gap-4 text-xs text-neo-black/60 dark:text-neo-white/60">
+                <div className="mt-3 flex items-center justify-center gap-4 text-xs text-neo-black/75 dark:text-neo-white/75">
                   <span className="flex items-center gap-1">
                     <FaFire className="text-neo-orange" />
                     {progressStats.highScoreBeats} {t('challenge.recordsSet') || 'records set'}
@@ -472,7 +472,7 @@ const SinglePlayerLobby: React.FC<SinglePlayerLobbyProps> = ({
 
               {/* All-Time Best (if different from current config) */}
               {allTimeBest && currentHighScore && allTimeBest.score > currentHighScore.score && (
-                <div className="mt-2 text-center text-xs text-neo-black/50 dark:text-neo-white/50">
+                <div className="mt-2 text-center text-xs text-neo-black/70 dark:text-neo-white/70">
                   <span className="flex items-center justify-center gap-1">
                     <FaCrown className="text-neo-yellow text-sm" />
                     {t('challenge.allTimeBest') || 'All-time best'}: <span className="font-black">{allTimeBest.score}</span>
@@ -536,7 +536,7 @@ const SinglePlayerLobby: React.FC<SinglePlayerLobbyProps> = ({
                   ))}
                 </div>
               ) : (
-                <p className="text-xs text-neo-black/50 italic">
+                <p className="text-xs text-neo-black/70 italic">
                   {t('singlePlayer.noBots') || 'Tap + to add bot opponents'}
                 </p>
               )}
@@ -546,7 +546,7 @@ const SinglePlayerLobby: React.FC<SinglePlayerLobbyProps> = ({
           {/* Timer display for non-practice modes */}
           {mode !== 'practice' && (
             <div className="flex items-center justify-between text-sm mb-4">
-              <span className="text-neo-black/60 dark:text-neo-white/60">
+              <span className="text-neo-black/75 dark:text-neo-white/75">
                 {t('singlePlayer.gameTime') || 'Time'}
               </span>
               <div className="flex gap-1">
@@ -579,7 +579,7 @@ const SinglePlayerLobby: React.FC<SinglePlayerLobbyProps> = ({
           {/* Advanced Settings Toggle */}
           <button
             onClick={() => setShowAdvanced(!showAdvanced)}
-            className="w-full flex items-center justify-center gap-2 py-2 text-sm text-neo-black/60 dark:text-neo-white/60 hover:text-neo-black dark:hover:text-neo-white transition-colors"
+            className="w-full flex items-center justify-center gap-2 py-2 text-sm text-neo-black/75 dark:text-neo-white/75 hover:text-neo-black dark:hover:text-neo-white transition-colors"
           >
             <FaCog className={cn('transition-transform', showAdvanced && 'rotate-90')} />
             {t('common.advancedSettings') || 'Advanced Settings'}
@@ -620,7 +620,7 @@ const SinglePlayerLobby: React.FC<SinglePlayerLobbyProps> = ({
                             <div className="font-bold uppercase text-xs">
                               {t(config.nameKey) || level}
                             </div>
-                            <div className="text-xs text-neo-black/60 dark:text-neo-white/60">
+                            <div className="text-xs text-neo-black/75 dark:text-neo-white/75">
                               {config.rows}x{config.cols}
                             </div>
                           </button>

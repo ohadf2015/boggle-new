@@ -12,7 +12,7 @@ const SinglePlayerView = dynamic(() => import('@/components/singleplayer/SingleP
           <div className="absolute inset-0 border-4 border-cyan-500/30 rounded-full" />
           <div className="absolute inset-0 border-4 border-transparent border-t-cyan-500 rounded-full animate-spin" />
         </div>
-        <p className="text-gray-600 dark:text-gray-400 text-sm">Loading single player...</p>
+        <p className="text-gray-600 dark:text-gray-300 text-sm">Loading single player...</p>
       </div>
     </div>
   ),

@@ -51,6 +51,7 @@ interface FoundWord {
   timeSinceStart: number; // Seconds since game start for pace analysis
   isValid: boolean | null; // null = pending validation
   comboBonus?: number; // Combo bonus points earned
+  fireRoundBonus?: number; // Extra points from 2x fire round multiplier
 }
 
 /**
@@ -397,6 +398,7 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
           timeSinceStart: w.timeSinceStart,
           isValid: w.isValid === true,
           comboBonus: w.isValid ? (w.comboBonus || 0) : 0,
+          fireRoundBonus: w.isValid ? (w.fireRoundBonus || 0) : 0,
         })),
         gameDuration: settings.timerSeconds,
         botScores: settings.bots.map(bot => ({
@@ -616,11 +618,19 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
       .then(result => {
         if (result.isValid) {
           // Word is in dictionary/community - valid immediately (like multiplayer's handleValidatedWord)
-          // Update with FULL score (including combo bonus)
-          const comboBonus = fullScore - baseScore;
+          // Calculate combo bonus and fire round bonus separately
+          const wordLenScore = Math.max(normalizedWord.length - 1, 1);
+          const comboAmount = currentCombo > 0 ? Math.floor(wordLenScore * (currentCombo * 0.1)) : 0;
+          const scoreWithoutMultiplier = wordLenScore + comboAmount;
+          const multiplier = getScoreMultiplier();
+          // comboBonus is the raw combo bonus (without multiplier)
+          const comboBonus = comboAmount;
+          // fireRoundBonus is the extra points from doubling (when multiplier is 2x)
+          const fireRoundBonus = multiplier > 1 ? scoreWithoutMultiplier : 0;
+
           setFoundWords(prev => prev.map(fw =>
             fw.word === normalizedWord && fw.timestamp === now
-              ? { ...fw, isValid: true, score: fullScore, comboBonus }
+              ? { ...fw, isValid: true, score: fullScore, comboBonus, fireRoundBonus }
               : fw
           ));
 
@@ -687,7 +697,7 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
             <div className="absolute inset-0 border-4 border-cyan-500/30 rounded-full" />
             <div className="absolute inset-0 border-4 border-transparent border-t-cyan-500 rounded-full animate-spin" />
           </div>
-          <p className="text-gray-600 dark:text-gray-400 text-sm">
+          <p className="text-gray-600 dark:text-gray-300 text-sm">
             {t('common.loading') || 'Loading...'}
           </p>
         </div>
@@ -901,7 +911,7 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
                     <span>{t('landscape.tutorialHelp') || 'Top-right: Help & rules'}</span>
                   </div>
                 </div>
-                <div className="mt-4 pt-4 border-t-2 border-neo-black/20 text-sm text-neo-black/60">
+                <div className="mt-4 pt-4 border-t-2 border-neo-black/20 text-sm text-neo-black/75">
                   <p>{t('landscape.tutorialKeyboard') || 'Keyboard: Space = Pause, Esc = Quit, ? = Help'}</p>
                 </div>
                 <Button
@@ -1077,7 +1087,7 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
                       +{score - targetHighScore}
                     </motion.span>
                   ) : score < targetHighScore ? (
-                    <span className="font-bold text-neo-black/60 dark:text-neo-white/60">
+                    <span className="font-bold text-neo-black/75 dark:text-neo-white/75">
                       {targetHighScore - score} {t('challenge.toGo') || 'to go'}
                     </span>
                   ) : null}
@@ -1142,7 +1152,7 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
                   className={cn(
                     'px-3 py-1.5 rounded-neo border-2 text-sm font-bold shadow-hard-sm transition-all',
                     isPending
-                      ? 'bg-gray-200 text-gray-500 border-gray-400 animate-pulse'
+                      ? 'bg-gray-200 text-gray-600 border-gray-400 animate-pulse'
                       : isLatest
                         ? 'bg-neo-yellow text-neo-black border-neo-black'
                         : fw.word.length >= 6
@@ -1166,7 +1176,7 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
             })}
           </AnimatePresence>
           {foundWords.filter(fw => fw.isValid !== false).length === 0 && (
-            <span className="text-sm text-neo-black/40 dark:text-neo-white/40 italic">
+            <span className="text-sm text-neo-black/70 dark:text-neo-white/75 italic">
               {t('singlePlayer.noWordsYet') || 'No words found yet. Start swiping!'}
             </span>
           )}

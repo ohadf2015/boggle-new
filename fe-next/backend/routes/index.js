@@ -8,6 +8,7 @@ const leaderboardRoutes = require('./leaderboard');
 const analyticsRoutes = require('./analytics');
 const geolocationRoutes = require('./geolocation');
 const healthRoutes = require('./health');
+const dailyChallengeRoutes = require('./dailyChallenge');
 const {
   apiRateLimiter,
   strictRateLimiter,
@@ -30,6 +31,7 @@ function registerRoutes(app) {
   app.use('/api/leaderboard', leaderboardRoutes);
   app.use('/api/geolocation', geolocationRoutes);
   app.use('/api/analytics', analyticsRoutes);
+  app.use('/api/daily-challenge', dailyChallengeRoutes);
 
   // Admin API routes (requires admin auth + stricter rate limits)
   app.use('/api/admin', strictRateLimiter({ maxRequests: 30, windowMs: 60000 }), adminRoutes);
@@ -48,5 +50,6 @@ module.exports = {
   leaderboardRoutes,
   analyticsRoutes,
   geolocationRoutes,
-  healthRoutes
+  healthRoutes,
+  dailyChallengeRoutes
 };

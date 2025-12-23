@@ -230,7 +230,7 @@ const BotControls: React.FC<BotControlsProps> = ({
             <div className="space-y-4 bg-neo-black/20 rounded-neo p-3 border border-neo-cream/10">
               {/* Difficulty Selection */}
               <div className="space-y-2">
-                <label className="text-xs font-bold uppercase text-neo-cream/60">
+                <label className="text-xs font-bold uppercase text-neo-cream/80">
                   {t('bots.selectDifficulty') || 'Choose Difficulty'}
                 </label>
                 <div className="grid grid-cols-3 gap-2">
@@ -254,7 +254,7 @@ const BotControls: React.FC<BotControlsProps> = ({
                     );
                   })}
                 </div>
-                <p className="text-xs text-neo-cream/50 text-center">
+                <p className="text-xs text-neo-cream/70 text-center">
                   {t(BOT_DIFFICULTIES.find(d => d.value === selectedDifficulty)?.descKey || '') ||
                    BOT_DIFFICULTIES.find(d => d.value === selectedDifficulty)?.defaultDesc}
                 </p>
@@ -287,7 +287,7 @@ const BotControls: React.FC<BotControlsProps> = ({
               {/* Current Bots List */}
               {bots.length > 0 && (
                 <div className="space-y-2">
-                  <label className="text-xs font-bold uppercase text-neo-cream/60">
+                  <label className="text-xs font-bold uppercase text-neo-cream/80">
                     {t('bots.currentBots') || 'Bots in Room'} ({bots.length})
                   </label>
                   <div className="space-y-2 max-h-40 overflow-y-auto pr-1">
@@ -342,14 +342,14 @@ const BotControls: React.FC<BotControlsProps> = ({
               {/* Empty State / Help Text */}
               {bots.length === 0 && (
                 <div className="text-center py-2">
-                  <p className="text-xs text-neo-cream/50">
+                  <p className="text-xs text-neo-cream/70">
                     {t('bots.emptyState') || 'Add bots to practice or fill the room!'}
                   </p>
                 </div>
               )}
 
               {/* Info Text */}
-              <p className="text-xs text-neo-cream/40 text-center border-t border-neo-cream/10 pt-3">
+              <p className="text-xs text-neo-cream/75 text-center border-t border-neo-cream/10 pt-3">
                 {t('bots.helpText') || 'Bots find and submit words automatically during the game.'}
               </p>
             </div>
@@ -385,7 +385,7 @@ const BotControls: React.FC<BotControlsProps> = ({
             </motion.div>
           ))}
           {bots.length > 5 && (
-            <span className="text-xs text-neo-cream/50 ml-1">
+            <span className="text-xs text-neo-cream/70 ml-1">
               +{bots.length - 5}
             </span>
           )}
