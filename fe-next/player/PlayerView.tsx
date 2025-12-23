@@ -328,6 +328,7 @@ const PlayerView: React.FC<PlayerViewProps> = memo(({
     } else {
       // Normal game start - no delay
       startGame();
+      return;
     }
   }, [pendingGameStart, socket, onGameStartConsumed, fadeToTrack, TRACKS]);
 

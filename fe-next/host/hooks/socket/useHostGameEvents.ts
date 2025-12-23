@@ -41,6 +41,11 @@ interface UseHostGameEventsProps {
   setXpGainedData: React.Dispatch<React.SetStateAction<XpGainedPayload | null>>;
   setLevelUpData: React.Dispatch<React.SetStateAction<LevelUpPayload | null>>;
 
+  // Earthquake/Fire round state setters
+  setEarthquakeState: React.Dispatch<React.SetStateAction<'idle' | 'warning' | 'shaking' | 'fire-round'>>;
+  setFireRoundActive: React.Dispatch<React.SetStateAction<boolean>>;
+  setFireRoundRemaining: React.Dispatch<React.SetStateAction<number>>;
+
   // Combo refs and setters (for reset)
   comboLevelRef: MutableRefObject<number>;
   lastWordTimeRef: MutableRefObject<number | null>;
