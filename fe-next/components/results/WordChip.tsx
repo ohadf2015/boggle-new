@@ -192,7 +192,9 @@ const WordChip = memo<WordChipProps>(({ wordObj, playerCount }) => {
             </TooltipTrigger>
             <TooltipContent
               side="top"
-              className="bg-neo-red border-2 border-neo-black shadow-hard rounded-neo p-2 max-w-[250px] hidden sm:block"
+              sideOffset={4}
+              align="center"
+                className="z-[200] bg-neo-red border-2 border-neo-black shadow-hard rounded-neo p-2 max-w-[250px] hidden sm:block"
             >
               {isAiVerified && (
                 <p className="text-[10px] font-bold text-neo-yellow mb-1 flex items-center gap-1">
@@ -242,7 +244,7 @@ const WordChip = memo<WordChipProps>(({ wordObj, playerCount }) => {
 
                 {/* Word being explained */}
                 <p className="text-sm font-black text-neo-cream uppercase mb-2 border-b border-neo-cream/30 pb-1">
-                  "{displayWord}"
+                  &quot;{displayWord}&quot;
                 </p>
 
                 {/* AI rejection indicator */}
