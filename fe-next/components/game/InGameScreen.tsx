@@ -15,8 +15,8 @@ import RoomChat from '../RoomChat';
 import { EarthquakeWarning, FireRoundIndicator } from '../earthquake';
 import HintButton from '../HintButton';
 import { HelpPanel, HelpButton } from './HelpPanel';
-import WordFormingArea from './WordFormingArea';
-import GameNotificationArea, { type GameNotification } from './GameNotificationArea';
+import WordFormingArea, { type WordFeedback } from './WordFormingArea';
+import ComboDisplay from './ComboDisplay';
 import { applyHebrewFinalLetters } from '../../utils/utils';
 import { wordErrorToast } from '../NeoToast';
 import { useSoundEffects } from '../../contexts/SoundEffectsContext';
@@ -150,7 +150,14 @@ const InGameScreen = memo<InGameScreenProps>(({
   // Achievement dock
   children,
 }) => {
-  const { playWordAcceptedSound } = useSoundEffects();
+  const {
+    playWordAcceptedSound,
+    playEarthquakeRumble,
+    playEarthquakeShake,
+    playFireRoundStart,
+    startFireCrackleLoop,
+    stopFireCrackleLoop,
+  } = useSoundEffects();
   const { announceWordResult } = useAnnouncer();
   const isLandscape = useMobileLandscape();
 
@@ -161,8 +168,8 @@ const InGameScreen = memo<InGameScreenProps>(({
   const [formedWord, setFormedWord] = useState('');
   const [letterCount, setLetterCount] = useState(0);
 
-  // Notification state (for GameNotificationArea)
-  const [currentNotification, setCurrentNotification] = useState<GameNotification | null>(null);
+  // Feedback state (for WordFormingArea)
+  const [currentFeedback, setCurrentFeedback] = useState<WordFeedback | null>(null);
 
   // Viewport height detection for very short landscape screens
   const [viewportHeight, setViewportHeight] = useState(0);
@@ -178,6 +185,50 @@ const InGameScreen = memo<InGameScreenProps>(({
       window.removeEventListener('orientationchange', updateHeight);
     };
   }, []);
+
+  // Track previous earthquake state to detect transitions
+  const prevEarthquakeStateRef = useRef<typeof earthquakeState>('idle');
+  const prevFireRoundActiveRef = useRef(false);
+
+  // Earthquake/Fire Round sound effects for multiplayer (triggered by state changes from socket)
+  useEffect(() => {
+    const prevState = prevEarthquakeStateRef.current;
+    const prevFireActive = prevFireRoundActiveRef.current;
+
+    // Trigger sounds based on state transitions
+    if (earthquakeState === 'warning' && prevState !== 'warning') {
+      playEarthquakeRumble();
+      // Haptic feedback for warning
+      if (typeof window !== 'undefined' && 'vibrate' in navigator) {
+        navigator.vibrate([150, 100, 150, 100, 200]);
+      }
+    } else if (earthquakeState === 'shaking' && prevState !== 'shaking') {
+      playEarthquakeShake();
+      // Haptic feedback for shake
+      if (typeof window !== 'undefined' && 'vibrate' in navigator) {
+        navigator.vibrate([300, 150, 300, 150, 400, 150, 300]);
+      }
+    }
+
+    // Fire round start
+    if (fireRoundActive && !prevFireActive) {
+      playFireRoundStart();
+      startFireCrackleLoop();
+      // Haptic feedback for fire round
+      if (typeof window !== 'undefined' && 'vibrate' in navigator) {
+        navigator.vibrate(200);
+      }
+    }
+
+    // Fire round end
+    if (!fireRoundActive && prevFireActive) {
+      stopFireCrackleLoop();
+    }
+
+    // Update refs for next comparison
+    prevEarthquakeStateRef.current = earthquakeState;
+    prevFireRoundActiveRef.current = fireRoundActive;
+  }, [earthquakeState, fireRoundActive, playEarthquakeRumble, playEarthquakeShake, playFireRoundStart, startFireCrackleLoop, stopFireCrackleLoop]);
 
   // Track if grid animation has already played
   const hasAnimatedRef = useRef(false);
@@ -230,8 +281,8 @@ const InGameScreen = memo<InGameScreenProps>(({
         const errorKey = validation.errorKey ?? 'Invalid word';
         msg = t(errorKey) || errorKey;
       }
-      // Show notification in dedicated area
-      setCurrentNotification({
+      // Show feedback in WordFormingArea
+      setCurrentFeedback({
         id: `reject-${Date.now()}`,
         type: 'rejected',
         word: formedWord,
@@ -252,8 +303,8 @@ const InGameScreen = memo<InGameScreenProps>(({
     // Check if word can be on board
     if (!couldBeOnBoard(formedWord, letterGrid, currentLang)) {
       const notOnBoardMsg = t('playerView.wordNotOnBoard');
-      // Show notification in dedicated area
-      setCurrentNotification({
+      // Show feedback in WordFormingArea
+      setCurrentFeedback({
         id: `reject-${Date.now()}`,
         type: 'rejected',
         word: formedWord,
@@ -374,27 +425,8 @@ const InGameScreen = memo<InGameScreenProps>(({
                   {playerData.score}
                 </motion.div>
 
-                {/* Combo indicator (inline when active) - LARGER */}
-                <AnimatePresence>
-                  {comboLevel > 1 && (
-                    <motion.div
-                      initial={{ scale: 0, opacity: 0 }}
-                      animate={{ scale: 1, opacity: 1 }}
-                      exit={{ scale: 0, opacity: 0 }}
-                      className="bg-neo-cyan border-3 border-neo-black rounded-neo px-3 py-1.5 flex items-center gap-1.5"
-                    >
-                      <span className="text-base font-black text-neo-black">🔥</span>
-                      <motion.span
-                        key={comboLevel}
-                        initial={{ scale: 1.3 }}
-                        animate={{ scale: 1 }}
-                        className="text-lg font-black text-neo-black"
-                      >
-                        x{comboLevel}
-                      </motion.span>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
+                {/* Enhanced Combo Display */}
+                <ComboDisplay comboLevel={comboLevel} />
               </motion.div>
             </div>
           )}
@@ -442,20 +474,12 @@ const InGameScreen = memo<InGameScreenProps>(({
 
           {/* Center: Word Forming Area + Notification + Grid */}
           <div className={`flex flex-col items-center justify-center w-full h-full ${isVeryShortLandscape ? 'px-4' : 'px-3'} py-0.5 landscape-grid-container`}>
-            {/* Word Forming Area - Permanent space above grid */}
+            {/* Word Forming Area with integrated feedback */}
             {isPlaying && (
               <WordFormingArea
                 word={formedWord}
                 letterCount={letterCount}
-                compact
-                className="mb-0.5"
-              />
-            )}
-            {/* Notification Area - Shows word validation feedback and combo */}
-            {isPlaying && (
-              <GameNotificationArea
-                notification={currentNotification}
-                comboLevel={comboLevel}
+                feedback={currentFeedback}
                 compact
                 className="mb-0.5"
               />
@@ -469,7 +493,7 @@ const InGameScreen = memo<InGameScreenProps>(({
                 onWordSubmit={handleGridWordSubmit}
                 onWordChange={handleWordChange}
                 hideWordPreview={isPlaying}
-                hideComboIndicator={isPlaying}
+                hideComboIndicator={true}
                 comboLevel={comboLevel}
                 largeText
                 fireRoundActive={fireRoundActive}
@@ -582,28 +606,27 @@ const InGameScreen = memo<InGameScreenProps>(({
       )}
 
       {/* Center Column: Timer, Score, Grid */}
-      <div className="flex-1 flex flex-col gap-2 min-w-0 min-h-0">
-        {/* Timer with Score and Combo flanking it (when playing) */}
+      <div className="flex-1 flex flex-col min-w-0 min-h-0">
+        {/* Stats row - Score, Combo (conditional), Timer - clean layout with better hierarchy */}
         {remainingTime !== null && (
-          <div className="flex items-center justify-center gap-3 md:gap-6 mb-2">
-            {/* Score - Neo-Brutalist card (only when playing) */}
+          <div className="flex items-center justify-center gap-4 md:gap-6 mb-2" role="status" aria-label="Game status">
+            {/* Score (left position - primary feedback) */}
             {isPlaying && (
               <motion.div
-                initial={{ scale: 0, rotate: -5 }}
-                animate={{ scale: 1, rotate: -2 }}
-                className="relative bg-neo-yellow border-4 border-neo-black rounded-neo-lg shadow-hard px-3 md:px-5 py-2 min-w-[70px] md:min-w-[90px]"
+                initial={{ scale: 0, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                className="relative bg-neo-cream border-3 border-neo-black rounded-neo shadow-hard-lg px-3 md:px-4 py-1.5 min-w-[70px] md:min-w-[90px]"
               >
-                <div className="text-center" style={{ transform: 'rotate(2deg)' }}>
+                <div className="text-center">
                   <motion.div
                     key={playerData.score}
                     initial={{ scale: 1.3 }}
                     animate={{ scale: 1 }}
-                    className="text-xl md:text-2xl font-black text-neo-black"
-                    style={{ textShadow: '2px 2px 0px var(--neo-cream)' }}
+                    className="text-xl md:text-2xl font-black text-neo-black leading-tight"
                   >
                     {playerData.score}
                   </motion.div>
-                  <div className="text-xs md:text-sm font-bold uppercase tracking-wider text-neo-black">
+                  <div className="text-[10px] md:text-xs font-bold uppercase tracking-wider text-neo-black/70">
                     {t('common.score') || 'Score'}
                   </div>
                 </div>
@@ -616,47 +639,29 @@ const InGameScreen = memo<InGameScreenProps>(({
               </motion.div>
             )}
 
-            {/* Timer */}
+            {/* Combo (center - only shows when level >= 2) */}
+            {isPlaying && <ComboDisplay comboLevel={comboLevel} compact />}
+
+            {/* Timer (right position - constant awareness) */}
             <motion.div
               initial={{ scale: 0, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               className="relative z-10"
             >
-              <CircularTimer remainingTime={remainingTime} totalTime={timerValue * 60} />
+              <CircularTimer remainingTime={remainingTime} totalTime={timerValue * 60} size="sm" />
             </motion.div>
+          </div>
+        )}
 
-            {/* Combo - Neo-Brutalist card (only when playing and combo > 1) */}
-            {isPlaying && (
-              <div className="min-w-[70px] md:min-w-[90px]">
-                <AnimatePresence>
-                  {comboLevel > 1 && (
-                    <motion.div
-                      initial={{ scale: 0, rotate: 5, opacity: 0 }}
-                      animate={{ scale: 1, rotate: 2, opacity: 1 }}
-                      exit={{ scale: 0, rotate: 10, opacity: 0 }}
-                      className="relative bg-neo-cyan border-4 border-neo-black rounded-neo-lg shadow-hard px-3 md:px-5 py-2"
-                    >
-                      <div className="text-center" style={{ transform: 'rotate(-2deg)' }}>
-                        <motion.div
-                          key={comboLevel}
-                          initial={{ scale: 1.5 }}
-                          animate={{ scale: 1 }}
-                          className="text-xl md:text-2xl font-black text-neo-black"
-                          style={{ textShadow: '2px 2px 0px var(--neo-cream)' }}
-                        >
-                          x{comboLevel}
-                        </motion.div>
-                        <div className="text-xs md:text-sm font-bold uppercase tracking-wider text-neo-black">
-                          {t('common.combo') || 'Combo'}
-                        </div>
-                      </div>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-                {/* Placeholder when no combo to maintain layout */}
-                {comboLevel <= 1 && <div className="invisible px-3 md:px-5 py-2" />}
-              </div>
-            )}
+        {/* Word Forming Area with feedback - centered below timer */}
+        {isPlaying && (
+          <div className="flex items-center justify-center mb-1">
+            <WordFormingArea
+              word={formedWord}
+              letterCount={letterCount}
+              feedback={currentFeedback}
+              compact
+            />
           </div>
         )}
 
@@ -665,23 +670,23 @@ const InGameScreen = memo<InGameScreenProps>(({
           <motion.div
             initial={{ y: -20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
-            className="max-w-7xl mx-auto mb-2"
+            className="max-w-7xl mx-auto mb-1"
           >
             <Card className="bg-gradient-to-r from-purple-600/90 to-pink-600/90 dark:from-purple-700/90 dark:to-pink-700/90 backdrop-blur-md border border-purple-400/50 shadow-[0_0_20px_rgba(168,85,247,0.3)]">
-              <CardContent className="py-2 px-4">
-                <div className="flex items-center justify-between gap-4">
-                  <div className="flex items-center gap-3">
-                    <FaTrophy className="text-yellow-300 text-xl drop-shadow-[0_0_8px_rgba(251,191,36,0.6)]" />
+              <CardContent className="py-1 px-3">
+                <div className="flex items-center justify-between gap-2">
+                  <div className="flex items-center gap-2">
+                    <FaTrophy className="text-yellow-300 text-lg drop-shadow-[0_0_8px_rgba(251,191,36,0.6)]" />
                     <div>
-                      <div className="text-white font-bold text-sm md:text-base">
+                      <div className="text-white font-bold text-xs md:text-sm">
                         {tournamentData.name || t('hostView.tournament')}
                       </div>
-                      <div className="text-purple-100 text-xs md:text-sm">
+                      <div className="text-purple-100 text-[10px] md:text-xs">
                         {t('hostView.tournamentRound')} {tournamentData.currentRound || 1} / {tournamentData.totalRounds || 3}
                       </div>
                     </div>
                   </div>
-                  <Badge className="bg-white/20 text-white border-white/30 text-xs md:text-sm">
+                  <Badge className="bg-white/20 text-white border-white/30 text-[10px] md:text-xs">
                     {t('hostView.tournamentProgress')}
                   </Badge>
                 </div>
@@ -690,28 +695,9 @@ const InGameScreen = memo<InGameScreenProps>(({
           </motion.div>
         )}
 
-        {/* Word Forming Area - Permanent space above grid (portrait mode) */}
-        {isPlaying && (
-          <WordFormingArea
-            word={formedWord}
-            letterCount={letterCount}
-            className="mb-1"
-          />
-        )}
-
-        {/* Notification Area - Shows word validation feedback and combo */}
-        {isPlaying && (
-          <GameNotificationArea
-            notification={currentNotification}
-            comboLevel={comboLevel}
-            className="mb-2"
-          />
-        )}
-
-        {/* Grid */}
-        <Card className="bg-slate-900 dark:bg-slate-900 backdrop-blur-md border-0 md:border border-cyan-500/40 shadow-none md:shadow-[0_0_25px_rgba(6,182,212,0.2)] flex flex-col flex-grow overflow-hidden">
-          <CardContent className="flex-grow flex flex-col items-center justify-center p-1 md:p-2 bg-slate-900">
-            <GridComponent
+        {/* Grid - Direct connection to timer row */}
+        <div className="flex justify-center flex-grow">
+          <GridComponent
               key={isPlaying ? 'playing-grid' : 'spectating-grid'}
               grid={letterGrid}
               interactive={isPlaying && !showStartAnimation}
@@ -719,13 +705,12 @@ const InGameScreen = memo<InGameScreenProps>(({
               onWordSubmit={handleGridWordSubmit}
               onWordChange={handleWordChange}
               hideWordPreview={isPlaying}
-              hideComboIndicator={isPlaying}
+              hideComboIndicator={true}
               comboLevel={comboLevel}
               fireRoundActive={fireRoundActive}
               earthquakeShaking={earthquakeState === 'shaking'}
             />
-          </CardContent>
-        </Card>
+        </div>
 
         {/* Mobile: Word count display (when playing) */}
         {isPlaying && (
@@ -734,9 +719,6 @@ const InGameScreen = memo<InGameScreenProps>(({
               <CardContent className="p-3">
                 <div className="text-center text-lg text-teal-600 dark:text-teal-300 font-bold">
                   {normalizedFoundWords.length} {t('playerView.wordsFound') || 'words found'}
-                </div>
-                <div className="text-center text-xs text-slate-500 dark:text-slate-300 mt-1">
-                  {t('playerView.swipeToFormWords') || 'Swipe on the board to form words'}
                 </div>
               </CardContent>
             </Card>
