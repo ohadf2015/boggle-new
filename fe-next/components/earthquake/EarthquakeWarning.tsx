@@ -51,9 +51,9 @@ export const EarthquakeWarning: React.FC<EarthquakeWarningProps> = ({ isVisible 
           exit={{ opacity: 0 }}
           transition={{ duration: 0.2 }}
         >
-          {/* Semi-transparent backdrop */}
+          {/* Semi-transparent backdrop - pointer-events-none to allow word selection */}
           <motion.div
-            className="absolute inset-0 bg-neo-black/40 backdrop-blur-sm"
+            className="absolute inset-0 bg-neo-black/40 backdrop-blur-sm pointer-events-none"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
