@@ -137,6 +137,7 @@ const translations = {
       help: 'Help',
       pause: 'Pause',
       resume: 'Resume',
+      newGame: 'New Game',
     },
     game: {
       swipeToForm: 'Swipe letters',
@@ -436,6 +437,9 @@ const translations = {
       increaseRounds: 'Increase number of rounds',
       decreaseRounds: 'Decrease number of rounds',
       resetFailed: 'Failed to reset game',
+      decreaseTimer: 'Decrease timer',
+      increaseTimer: 'Increase timer',
+      moreSettings: 'More Settings',
     },
     playerView: {
       waitingForHost: 'Waiting for host to start...',
@@ -506,6 +510,9 @@ const translations = {
       slowDown: 'Slow down! Words are being processed.',
       submittingTooFast: 'You\'re submitting words too fast',
       words: 'Words',
+      alreadyFound: 'Already found',
+      invalidWord: 'Invalid word',
+      pendingValidation: 'Pending validation',
     },
     lateJoiner: {
       welcomeTitle: 'Game in Progress!',
@@ -1074,7 +1081,13 @@ const translations = {
       },
       multiGames: {
         title: 'You\'re Getting Good!',
-        subtitle: 'Sign up to save your progress and track your achievements!'
+        subtitle: 'Sign up to save your progress and track your achievements!',
+        features: {
+          leaderboard: 'Compete on the global leaderboard',
+          playWithFriends: 'Challenge friends and build your reputation'
+        },
+        statsTeaser: 'You\'ve played ${games} game(s) and scored ${score} points!',
+        maybeLater: 'Maybe later'
       }
     },
     legal: {
@@ -1401,6 +1414,7 @@ const translations = {
       quitConfirmTitle: 'Quit Game?',
       quitConfirmMessage: 'You will lose your current progress. Are you sure you want to quit?',
       gamePaused: 'Game paused',
+      botWords: 'Words Found',
     },
     landscape: {
       tutorialTitle: 'Landscape Controls',
@@ -1672,6 +1686,7 @@ const translations = {
       pause: 'השהה',
       resume: 'המשך',
       retry: 'נסה שוב',
+      newGame: 'משחק חדש',
     },
     game: {
       swipeToForm: 'החלק ליצירת מילה',
@@ -1971,6 +1986,9 @@ const translations = {
       increaseRounds: 'הגדל מספר סיבובים',
       decreaseRounds: 'הקטן מספר סיבובים',
       resetFailed: 'איפוס המשחק נכשל',
+      decreaseTimer: 'הקטן טיימר',
+      increaseTimer: 'הגדל טיימר',
+      moreSettings: 'הגדרות נוספות',
     },
     playerView: {
       waitingForHost: 'ממתין למארח שיתחיל...',
@@ -2041,6 +2059,9 @@ const translations = {
       slowDown: 'האט! המילים מעובדות.',
       submittingTooFast: 'אתה שולח מילים מהר מדי',
       words: 'מילים',
+      alreadyFound: 'כבר נמצא',
+      invalidWord: 'מילה לא חוקית',
+      pendingValidation: 'ממתין לאימות',
     },
     lateJoiner: {
       welcomeTitle: '!המשחק כבר התחיל',
@@ -2936,6 +2957,7 @@ const translations = {
       quitConfirmTitle: 'לצאת מהמשחק?',
       quitConfirmMessage: 'תאבד את ההתקדמות הנוכחית. בטוח שאתה רוצה לצאת?',
       gamePaused: 'המשחק מושהה',
+      botWords: 'מילים שנמצאו',
     },
     landscape: {
       tutorialTitle: 'פקדי מסך רחב',
@@ -3207,6 +3229,7 @@ const translations = {
       pause: 'Pausa',
       resume: 'Fortsätt',
       retry: 'Försök igen',
+      newGame: 'Nytt spel',
     },
     game: {
       swipeToForm: 'Svep bokstäver',
@@ -3504,6 +3527,9 @@ const translations = {
       increaseRounds: 'Öka antal omgångar',
       decreaseRounds: 'Minska antal omgångar',
       resetFailed: 'Misslyckades att återställa spelet',
+      decreaseTimer: 'Minska timer',
+      increaseTimer: 'Öka timer',
+      moreSettings: 'Fler inställningar',
     },
     playerView: {
       waitingForHost: 'Väntar på att värden ska starta...',
@@ -3574,6 +3600,9 @@ const translations = {
       slowDown: 'Sakta ner! Ord bearbetas.',
       submittingTooFast: 'Du skickar ord för snabbt',
       words: 'Ord',
+      alreadyFound: 'Redan hittad',
+      invalidWord: 'Ogiltigt ord',
+      pendingValidation: 'Väntar på validering',
     },
     lateJoiner: {
       welcomeTitle: 'Spelet pågår!',
@@ -4141,7 +4170,13 @@ const translations = {
       },
       multiGames: {
         title: 'Du blir bättre!',
-        subtitle: 'Registrera dig för att spara din framsteg och följa dina prestationer!'
+        subtitle: 'Registrera dig för att spara din framsteg och följa dina prestationer!',
+        features: {
+          leaderboard: 'Tävla på den globala topplistan',
+          playWithFriends: 'Utmana vänner och bygg ditt rykte'
+        },
+        statsTeaser: 'Du har spelat ${games} spel och fått ${score} poäng!',
+        maybeLater: 'Kanske senare'
       }
     },
     profile: {
@@ -4466,6 +4501,7 @@ const translations = {
       quitConfirmTitle: 'Avsluta spelet?',
       quitConfirmMessage: 'Du kommer förlora dina framsteg. Är du säker på att du vill avsluta?',
       gamePaused: 'Spelet pausat',
+      botWords: 'Hittade ord',
     },
     landscape: {
       tutorialTitle: 'Landskapskontroller',
@@ -4737,6 +4773,7 @@ const translations = {
       pause: '一時停止',
       resume: '再開',
       retry: '再試行',
+      newGame: '新しいゲーム',
     },
     game: {
       swipeToForm: '文字をスワイプ',
@@ -5034,6 +5071,9 @@ const translations = {
       increaseRounds: 'ラウンド数を増やす',
       decreaseRounds: 'ラウンド数を減らす',
       resetFailed: 'ゲームのリセットに失敗しました',
+      decreaseTimer: 'タイマーを減らす',
+      increaseTimer: 'タイマーを増やす',
+      moreSettings: 'その他の設定',
     },
     playerView: {
       waitingForHost: 'ホストが開始するのを待っています...',
@@ -5104,6 +5144,9 @@ const translations = {
       slowDown: '速度を落としてください！単語を処理中です。',
       submittingTooFast: '単語を送信するのが速すぎます',
       words: '単語',
+      alreadyFound: '既に発見済み',
+      invalidWord: '無効な単語',
+      pendingValidation: '検証待ち',
     },
     lateJoiner: {
       welcomeTitle: 'ゲーム進行中！',
@@ -5671,7 +5714,13 @@ const translations = {
       },
       multiGames: {
         title: '上達しています！',
-        subtitle: '登録して進捗を保存し、実績を追跡しましょう！'
+        subtitle: '登録して進捗を保存し、実績を追跡しましょう！',
+        features: {
+          leaderboard: 'グローバルランキングで競争',
+          playWithFriends: '友達に挑戦して評判を築く'
+        },
+        statsTeaser: '${games}ゲームをプレイして${score}ポイントを獲得しました！',
+        maybeLater: 'また今度'
       }
     },
     profile: {
@@ -5996,6 +6045,7 @@ const translations = {
       quitConfirmTitle: 'ゲームを終了しますか？',
       quitConfirmMessage: '現在の進捗が失われます。本当に終了しますか？',
       gamePaused: 'ゲーム一時停止中',
+      botWords: '発見した単語',
     },
     landscape: {
       tutorialTitle: '横画面コントロール',
@@ -6267,6 +6317,7 @@ const translations = {
       pause: 'Pausar',
       resume: 'Reanudar',
       retry: 'Reintentar',
+      newGame: 'Nuevo Juego',
     },
     game: {
       swipeToForm: 'Desliza letras',
@@ -6561,6 +6612,9 @@ const translations = {
       increaseRounds: 'Aumentar número de rondas',
       decreaseRounds: 'Disminuir número de rondas',
       resetFailed: 'Error al reiniciar el juego',
+      decreaseTimer: 'Disminuir temporizador',
+      increaseTimer: 'Aumentar temporizador',
+      moreSettings: 'Más Configuraciones',
     },
     playerView: {
       waitingForHost: 'Esperando que el anfitrión inicie...',
@@ -6630,6 +6684,9 @@ const translations = {
       slowDown: '¡Más despacio! Las palabras se están procesando.',
       submittingTooFast: 'Estás enviando palabras demasiado rápido',
       words: 'Palabras',
+      alreadyFound: 'Ya encontrada',
+      invalidWord: 'Palabra inválida',
+      pendingValidation: 'Validación pendiente',
     },
     hints: {
       hint: 'Pista',
@@ -7061,7 +7118,13 @@ const translations = {
       },
       multiGames: {
         title: '¡Estás mejorando!',
-        subtitle: '¡Regístrate para guardar tu progreso y seguir tus logros!'
+        subtitle: '¡Regístrate para guardar tu progreso y seguir tus logros!',
+        features: {
+          leaderboard: 'Compite en la clasificación global',
+          playWithFriends: 'Desafía a amigos y construye tu reputación'
+        },
+        statsTeaser: '¡Has jugado ${games} juego(s) y anotado ${score} puntos!',
+        maybeLater: 'Quizás después'
       }
     },
     legal: {
@@ -7378,6 +7441,7 @@ const translations = {
       quitConfirmTitle: '¿Salir del juego?',
       quitConfirmMessage: 'Perderás tu progreso actual. ¿Seguro que quieres salir?',
       gamePaused: 'Juego pausado',
+      botWords: 'Palabras encontradas',
     },
     landscape: {
       tutorialTitle: 'Controles en horizontal',

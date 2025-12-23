@@ -1,12 +1,12 @@
 {
   "summary": {
-    "totalKeysInCode": 763,
+    "totalKeysInCode": 764,
     "keyCountByLanguage": {
-      "en": 1205,
-      "he": 1209,
-      "sv": 1205,
-      "ja": 1205,
-      "es": 1205
+      "en": 1226,
+      "he": 1226,
+      "sv": 1226,
+      "ja": 1226,
+      "es": 1226
     },
     "missingFromEnglish": 1
   },
@@ -60,12 +60,7 @@
     "es": []
   },
   "keysNotInEnglish": {
-    "he": [
-      "auth.multiGames.features.leaderboard",
-      "auth.multiGames.features.playWithFriends",
-      "auth.multiGames.statsTeaser",
-      "auth.multiGames.maybeLater"
-    ],
+    "he": [],
     "sv": [],
     "ja": [],
     "es": []
