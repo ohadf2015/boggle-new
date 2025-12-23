@@ -134,6 +134,67 @@ export default function sitemap() {
     });
   });
 
+  // Game mode pages for all locales
+  // Singleplayer - Solo vs Bots, Practice, Challenge
+  locales.forEach((locale) => {
+    const localePath = `/${locale}`;
+    routes.push({
+      url: `${baseUrl}${localePath}/singleplayer`,
+      lastModified: now,
+      changeFrequency: 'weekly',
+      priority: 0.9,
+      alternates: {
+        languages: {
+          'x-default': `${baseUrl}/en/singleplayer`,
+          he: `${baseUrl}/he/singleplayer`,
+          en: `${baseUrl}/en/singleplayer`,
+          sv: `${baseUrl}/sv/singleplayer`,
+          ja: `${baseUrl}/ja/singleplayer`,
+        },
+      },
+    });
+  });
+
+  // Daily Challenge - Same puzzle for everyone worldwide each day
+  locales.forEach((locale) => {
+    const localePath = `/${locale}`;
+    routes.push({
+      url: `${baseUrl}${localePath}/daily`,
+      lastModified: now,
+      changeFrequency: 'daily',
+      priority: 0.9,
+      alternates: {
+        languages: {
+          'x-default': `${baseUrl}/en/daily`,
+          he: `${baseUrl}/he/daily`,
+          en: `${baseUrl}/en/daily`,
+          sv: `${baseUrl}/sv/daily`,
+          ja: `${baseUrl}/ja/daily`,
+        },
+      },
+    });
+  });
+
+  // Multiplayer - Real-time multiplayer word game
+  locales.forEach((locale) => {
+    const localePath = `/${locale}`;
+    routes.push({
+      url: `${baseUrl}${localePath}/multiplayer`,
+      lastModified: now,
+      changeFrequency: 'weekly',
+      priority: 0.9,
+      alternates: {
+        languages: {
+          'x-default': `${baseUrl}/en/multiplayer`,
+          he: `${baseUrl}/he/multiplayer`,
+          en: `${baseUrl}/en/multiplayer`,
+          sv: `${baseUrl}/sv/multiplayer`,
+          ja: `${baseUrl}/ja/multiplayer`,
+        },
+      },
+    });
+  });
+
   // Legal pages for all locales
   locales.forEach((locale) => {
     // Always use explicit locale path

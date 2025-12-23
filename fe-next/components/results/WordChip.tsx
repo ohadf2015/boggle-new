@@ -60,12 +60,17 @@ const WordChip = memo<WordChipProps>(({ wordObj, playerCount }) => {
     return getPointColor(wordObj.score);
   };
 
-  // Get text color based on background - ensure readability
+  // Get text color based on background - ensure WCAG AA contrast (4.5:1)
+  // Colors: 1=gray, 2-3=cyan, 4=orange, 5-6=purple, 7-8=pink
   const getTextColor = (): string => {
     if (isDuplicate || !isValid || isPending) return 'var(--neo-cream)';
-    // For cyan backgrounds (2-3 point words) and purple (5-6 point words), use dark text for better contrast
-    if (wordObj.score === 2 || wordObj.score === 3 || wordObj.score === 5 || wordObj.score === 6) return 'var(--neo-black)';
-    return 'var(--neo-cream)';
+    // All point colors need dark text for proper contrast:
+    // - cyan (2-3): bright color needs dark text
+    // - orange (4): bright color needs dark text
+    // - purple (5-6): medium-light needs dark text
+    // - pink (7-8): medium-light needs dark text
+    // - gray (1): light gray needs dark text
+    return 'var(--neo-black)';
   };
 
   // Render the word chip content

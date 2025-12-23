@@ -332,6 +332,7 @@ const DailyChallengeGame: React.FC<DailyChallengeGameProps> = ({
       )}>
         <GridComponent
           grid={grid}
+          interactive={true}
           onWordSubmit={handleWordSubmit}
           comboLevel={comboLevel}
         />

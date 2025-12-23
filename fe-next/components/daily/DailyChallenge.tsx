@@ -2,13 +2,14 @@
 
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FaArrowLeft } from 'react-icons/fa';
+import { FaArrowLeft, FaGlobe, FaChevronDown } from 'react-icons/fa';
 import { Trophy, Timer, Flame, Target } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import AutoHideHeader from '@/components/AutoHideHeader';
 import DailyChallengeGame from './DailyChallengeGame';
 import DailyChallengeResults from './DailyChallengeResults';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useMobileLandscape } from '@/hooks/useMobileLandscape';
 import {
   generateDailyGrid,
   getDailyChallengeDate,
@@ -44,7 +45,20 @@ interface DailyChallengeGameResult {
  * Same puzzle for everyone worldwide each day
  */
 const DailyChallenge: React.FC = () => {
-  const { t, language } = useLanguage();
+  const { t, language, setLanguage } = useLanguage();
+
+  // Get current language flag
+  const getCurrentFlag = (lang: Language) => {
+    const flags: Record<string, string> = {
+      en: '🇺🇸',
+      he: '🇮🇱',
+      sv: '🇸🇪',
+      ja: '🇯🇵',
+      es: '🇪🇸',
+    };
+    return flags[lang] || '🌐';
+  };
+  const isLandscape = useMobileLandscape();
 
   // Phase management
   const [phase, setPhase] = useState<DailyChallengePhase>('loading');
@@ -152,10 +166,13 @@ const DailyChallenge: React.FC = () => {
     window.location.href = `/${language}`;
   }, [language]);
 
+  // Hide header completely in landscape mode during gameplay (not just auto-hide)
+  const showHeader = !(phase === 'playing' && isLandscape);
+
   // Render based on phase
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-b from-slate-50 via-slate-100 to-slate-200 dark:from-neo-navy dark:via-neo-navy-light dark:to-neo-navy">
-      <AutoHideHeader />
+      {showHeader && <AutoHideHeader />}
 
       <AnimatePresence mode="wait">
         {phase === 'loading' && (
@@ -182,6 +199,9 @@ const DailyChallenge: React.FC = () => {
             puzzleDate={puzzleDate}
             streak={streak}
             countdown={countdown}
+            language={language as Language}
+            currentFlag={getCurrentFlag(language as Language)}
+            onLanguageChange={(lang) => setLanguage(lang)}
             onStart={handleStartGame}
             onBack={handleBack}
             t={t}
@@ -221,11 +241,23 @@ const DailyChallenge: React.FC = () => {
 // Ready Screen Component
 // ==========================================
 
+// Language options
+const LANGUAGE_OPTIONS: { code: Language; flag: string; name: string }[] = [
+  { code: 'en', flag: '🇺🇸', name: 'English' },
+  { code: 'he', flag: '🇮🇱', name: 'עברית' },
+  { code: 'sv', flag: '🇸🇪', name: 'Svenska' },
+  { code: 'ja', flag: '🇯🇵', name: '日本語' },
+  { code: 'es', flag: '🇪🇸', name: 'Español' },
+];
+
 interface DailyReadyScreenProps {
   puzzleNumber: number;
   puzzleDate: string;
   streak: DailyStreak | null;
   countdown: string;
+  language: Language;
+  currentFlag: string;
+  onLanguageChange: (lang: Language) => void;
   onStart: () => void;
   onBack: () => void;
   t: (key: string) => string;
@@ -236,10 +268,15 @@ const DailyReadyScreen: React.FC<DailyReadyScreenProps> = ({
   puzzleDate,
   streak,
   countdown,
+  language,
+  currentFlag,
+  onLanguageChange,
   onStart,
   onBack,
   t,
 }) => {
+  const [showLangDropdown, setShowLangDropdown] = useState(false);
+
   const formattedDate = useMemo(() => {
     try {
       return new Date(puzzleDate + 'T00:00:00Z').toLocaleDateString(undefined, {
@@ -271,6 +308,57 @@ const DailyReadyScreen: React.FC<DailyReadyScreenProps> = ({
           <FaArrowLeft className="mr-2" />
           {t('daily.home')}
         </Button>
+      </motion.div>
+
+      {/* Language Selector */}
+      <motion.div
+        className="absolute top-20 right-4"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.2 }}
+      >
+        <div className="relative">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setShowLangDropdown(!showLangDropdown)}
+            onBlur={() => setTimeout(() => setShowLangDropdown(false), 200)}
+            className="flex items-center gap-2 bg-neo-cream border-3 border-neo-black rounded-neo shadow-hard-sm hover:shadow-hard transition-all"
+          >
+            <span className="text-lg">{currentFlag}</span>
+            <FaGlobe className="w-4 h-4 text-neo-black" />
+            <FaChevronDown className={`w-3 h-3 text-neo-black transition-transform ${showLangDropdown ? 'rotate-180' : ''}`} />
+          </Button>
+
+          <AnimatePresence>
+            {showLangDropdown && (
+              <motion.div
+                initial={{ opacity: 0, y: -5, scale: 0.95 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, y: -5, scale: 0.95 }}
+                transition={{ duration: 0.15 }}
+                className="absolute top-full right-0 mt-2 z-[100] bg-neo-cream border-3 border-neo-black rounded-neo shadow-hard-lg overflow-hidden min-w-[140px]"
+                onMouseDown={(e) => e.preventDefault()}
+              >
+                {LANGUAGE_OPTIONS.map((option) => (
+                  <button
+                    key={option.code}
+                    onClick={() => {
+                      onLanguageChange(option.code);
+                      setShowLangDropdown(false);
+                    }}
+                    className={`w-full flex items-center gap-2 px-3 py-2 text-left hover:bg-neo-cyan/30 transition-colors ${
+                      language === option.code ? 'bg-neo-cyan/50 font-bold' : ''
+                    }`}
+                  >
+                    <span className="text-lg">{option.flag}</span>
+                    <span className="text-sm text-neo-black">{option.name}</span>
+                  </button>
+                ))}
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
       </motion.div>
 
       {/* Main content */}

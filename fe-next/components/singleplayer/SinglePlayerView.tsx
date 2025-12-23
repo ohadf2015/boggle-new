@@ -7,6 +7,7 @@ import SinglePlayerGame from './SinglePlayerGame';
 import SinglePlayerResults from './SinglePlayerResults';
 import { getHighScore, recordGameResult } from './highScoreManager';
 import { useGameMusic, type GamePhase } from '@/hooks/useGameMusic';
+import { useMobileLandscape } from '@/hooks/useMobileLandscape';
 import type { DifficultyLevel, Language, LetterGrid } from '@/shared/types/game';
 
 export type SinglePlayerMode = 'solo-bots' | 'practice' | 'challenge';
@@ -72,6 +73,7 @@ const DEFAULT_MEDIUM_BOT: BotOpponent = {
 
 const SinglePlayerView: React.FC = () => {
   const [phase, setPhase] = useState<SinglePlayerPhase>('lobby');
+  const isLandscape = useMobileLandscape();
   const [gameState, setGameState] = useState<SinglePlayerGameState>({
     mode: 'solo-bots',
     difficulty: 'MEDIUM',
@@ -148,9 +150,12 @@ const SinglePlayerView: React.FC = () => {
     setPhase('lobby');
   };
 
+  // Hide header completely in landscape mode during gameplay (not just auto-hide)
+  const showHeader = !(phase === 'playing' && isLandscape);
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-50 via-slate-100 to-slate-200 dark:from-neo-navy dark:via-neo-navy-light dark:to-neo-navy">
-      <AutoHideHeader />
+      {showHeader && <AutoHideHeader />}
 
       <main className="max-w-6xl mx-auto px-2 xs:px-4 sm:px-6 py-8 landscape-content overflow-x-hidden">
         {phase === 'lobby' && (

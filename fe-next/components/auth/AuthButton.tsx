@@ -100,7 +100,7 @@ const AuthButton = (): React.ReactElement | null => {
               transition={{ duration: 0.2 }}
               onMouseDown={(e) => e.preventDefault()}
               className={cn(
-                'absolute top-full mt-2 min-w-[180px] rounded-lg shadow-xl z-50',
+                'absolute top-full mt-2 min-w-[180px] rounded-lg shadow-xl z-[100]',
                 isRTL ? 'left-0' : 'right-0',
                 isDarkMode
                   ? 'bg-slate-800 border border-slate-700'
@@ -309,7 +309,7 @@ const AuthButton = (): React.ReactElement | null => {
               transition={{ duration: 0.2 }}
               onMouseDown={(e) => e.preventDefault()}
               className={cn(
-                'absolute top-full mt-2 min-w-[180px] rounded-lg shadow-xl z-50',
+                'absolute top-full mt-2 min-w-[180px] rounded-lg shadow-xl z-[100]',
                 isRTL ? 'left-0' : 'right-0',
                 isDarkMode
                   ? 'bg-slate-800 border border-slate-700'

@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { FaUser, FaCrown, FaDoorOpen, FaPlus } from 'react-icons/fa';
+import { FaCrown, FaDoorOpen } from 'react-icons/fa';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { useLanguage } from '@/contexts/LanguageContext';
 import type { JoinMode } from '@/types/components';
@@ -32,29 +32,21 @@ export const ModeSelector: React.FC<ModeSelectorProps> = ({
       >
         <ToggleGroupItem
           value="join"
-          className="flex-1 flex-col py-3 h-auto gap-1 data-[state=on]:bg-neo-cyan data-[state=on]:text-neo-black data-[state=on]:border-neo-black data-[state=on]:shadow-hard"
-          aria-describedby="join-mode-desc"
+          className="flex-1 py-3 h-auto data-[state=on]:bg-neo-cyan data-[state=on]:text-neo-black data-[state=on]:border-neo-black data-[state=on]:shadow-hard"
         >
           <div className="flex items-center gap-2">
             <FaDoorOpen className="text-lg" />
             <span className="font-bold">{t('joinView.joinRoom') || 'Join Room'}</span>
           </div>
-          <span id="join-mode-desc" className="text-xs font-normal opacity-80">
-            {t('joinView.joinDesc') || 'Enter code to join existing game'}
-          </span>
         </ToggleGroupItem>
         <ToggleGroupItem
           value="host"
-          className="flex-1 flex-col py-3 h-auto gap-1 data-[state=on]:bg-neo-pink data-[state=on]:text-neo-white data-[state=on]:border-neo-black data-[state=on]:shadow-hard"
-          aria-describedby="host-mode-desc"
+          className="flex-1 py-3 h-auto data-[state=on]:bg-neo-pink data-[state=on]:text-neo-white data-[state=on]:border-neo-black data-[state=on]:shadow-hard"
         >
           <div className="flex items-center gap-2">
             <FaCrown className="text-lg" />
             <span className="font-bold">{t('joinView.createRoom') || 'Create Room'}</span>
           </div>
-          <span id="host-mode-desc" className="text-xs font-normal opacity-80">
-            {t('joinView.hostDesc') || 'Start a new game as host'}
-          </span>
         </ToggleGroupItem>
       </ToggleGroup>
     </div>

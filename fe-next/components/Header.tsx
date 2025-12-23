@@ -158,7 +158,7 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                                     animate={{ opacity: 1, y: 0, scale: 1 }}
                                     exit={{ opacity: 0, y: -5, scale: 0.95 }}
                                     transition={{ duration: 0.15 }}
-                                    className="absolute top-full right-0 mt-2 z-50 bg-neo-cream border-3 border-neo-black rounded-neo shadow-hard-lg overflow-hidden min-w-[120px]"
+                                    className="absolute top-full right-0 mt-2 z-[100] bg-neo-cream border-3 border-neo-black rounded-neo shadow-hard-lg overflow-hidden min-w-[120px]"
                                     role="listbox"
                                     aria-label={t('common.selectLanguage') || 'Select language'}
                                 >

@@ -163,13 +163,13 @@ export function usePlayerGameEvents({
       gameActiveRef.current = false;
       setRemainingTime(0);
       setShowStartAnimation(false);
-      if (wasActive) {
-        logger.log('[PLAYER] Setting waitingForResults to true');
-        if (!waitingStartTimeRef.current) {
-          waitingStartTimeRef.current = Date.now();
-        }
-        setWaitingForResults(true);
+      // Always show validation screen when game ends, regardless of wasActive status
+      // This ensures players see the AI validation phase even if they joined late
+      logger.log('[PLAYER] Setting waitingForResults to true');
+      if (!waitingStartTimeRef.current) {
+        waitingStartTimeRef.current = Date.now();
       }
+      setWaitingForResults(true);
     };
 
     const handleTimeUpdate = (data: any) => {
