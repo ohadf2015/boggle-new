@@ -200,9 +200,8 @@ const ComboIndicator: React.FC<ComboIndicatorProps> = ({
     <AnimatePresence mode="wait">
       <motion.div
         key={`combo-${animationKey}`}
-        className="fixed top-1/2 left-1/2 z-50 pointer-events-none combo-indicator-container"
+        className="absolute top-0 left-0 right-0 z-[60] pointer-events-none combo-indicator-container flex items-center justify-center"
         data-extreme={isExtremeCombo}
-        style={{ transform: 'translate(-50%, -50%)' }}
         initial={{ opacity: 1 }}
         animate={controls}
         exit={{ opacity: 0 }}
