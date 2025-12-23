@@ -764,6 +764,33 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
                       className="overflow-hidden"
                     >
                       <div className="p-3 bg-white dark:bg-slate-800 border-t-2 border-neo-black/20 dark:border-slate-600">
+                        {/* Show actual bot words if available */}
+                        {bot.words && bot.words.length > 0 && (
+                          <div className="mb-3">
+                            <div className="text-xs font-bold uppercase text-neo-black/80 dark:text-gray-300 mb-2">
+                              {t('singlePlayer.botWords') || 'Words Found'}
+                            </div>
+                            <div className="flex flex-wrap gap-1.5">
+                              {bot.words.map((word, i) => {
+                                const points = Math.max(word.length - 1, 1);
+                                return (
+                                  <span
+                                    key={`${word}-${i}`}
+                                    className="inline-flex items-center gap-1 px-2 py-1 text-xs font-black uppercase border-2 border-neo-black rounded-neo shadow-hard-sm"
+                                    style={{
+                                      backgroundColor: getPointColor(points),
+                                      color: getTextColor(points)
+                                    }}
+                                  >
+                                    {word}
+                                    <span className="text-[10px] opacity-70">+{points}</span>
+                                  </span>
+                                );
+                              })}
+                            </div>
+                          </div>
+                        )}
+                        {/* Words by length summary */}
                         <div className="text-xs font-bold uppercase text-neo-black/80 dark:text-gray-300 mb-2">
                           {t('singlePlayer.wordsByLength') || 'Words by Length'}
                         </div>

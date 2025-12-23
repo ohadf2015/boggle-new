@@ -86,6 +86,14 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
   const [botScores, setBotScores] = useState<Record<string, number>>({});
   const [botWords, setBotWords] = useState<Record<string, string[]>>({});
   const [isGameOver, setIsGameOver] = useState(false);
+  // Available words from grid solver for bots to use
+  const [availableWords, setAvailableWords] = useState<{
+    easy: string[];
+    medium: string[];
+    hard: string[];
+  } | null>(null);
+  // Track which words each bot has already used
+  const botUsedWordsRef = useRef<Record<string, Set<string>>>({});
   const [isHelpOpen, setIsHelpOpen] = useState(false);
   const [showQuitConfirm, setShowQuitConfirm] = useState(false);
   const [showLandscapeTutorial, setShowLandscapeTutorial] = useState(false);
@@ -292,7 +300,41 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
     });
     setBotScores(initialBotScores);
     setBotWords(initialBotWords);
+
+    // Initialize bot used words tracking
+    const initialBotUsedWords: Record<string, Set<string>> = {};
+    settings.bots.forEach(bot => {
+      initialBotUsedWords[bot.id] = new Set();
+    });
+    botUsedWordsRef.current = initialBotUsedWords;
   }, [settings.difficulty, settings.language, settings.bots]);
+
+  // Fetch valid words from grid for bot simulation
+  useEffect(() => {
+    if (!grid || settings.mode !== 'solo-bots') return;
+
+    const fetchGridWords = async () => {
+      try {
+        const response = await fetch('/api/solve-grid', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            grid,
+            language: settings.language,
+          }),
+        });
+        const result = await response.json();
+        if (result.success && result.words) {
+          setAvailableWords(result.words);
+        }
+      } catch (error) {
+        console.error('Failed to fetch grid words for bots:', error);
+        // Bots will fall back to simulated words if this fails
+      }
+    };
+
+    fetchGridWords();
+  }, [grid, settings.language, settings.mode]);
 
   // Handle game over when isGameOver becomes true
   useEffect(() => {
@@ -470,6 +512,38 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
   };
 
   const simulateBotFindWord = useCallback((bot: BotOpponent) => {
+    // Try to use real words from the grid solver
+    if (availableWords) {
+      // Get words for this bot's difficulty
+      const wordPool = availableWords[bot.difficulty] || [];
+      const usedWords = botUsedWordsRef.current[bot.id] || new Set();
+
+      // Find an unused word
+      const unusedWords = wordPool.filter(w => !usedWords.has(w));
+
+      if (unusedWords.length > 0) {
+        // Pick a random unused word
+        const word = unusedWords[Math.floor(Math.random() * unusedWords.length)];
+        const wordScore = calculateWordScore(word.length, 0);
+
+        // Mark word as used by this bot
+        usedWords.add(word);
+        botUsedWordsRef.current[bot.id] = usedWords;
+
+        setBotScores(prev => ({
+          ...prev,
+          [bot.id]: (prev[bot.id] || 0) + wordScore,
+        }));
+
+        setBotWords(prev => ({
+          ...prev,
+          [bot.id]: [...(prev[bot.id] || []), word],
+        }));
+        return;
+      }
+    }
+
+    // Fallback: simulate with random word lengths if no words available
     const wordLengths = {
       easy: [3, 4, 5],
       medium: [4, 5, 6],
@@ -489,7 +563,7 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
       ...prev,
       [bot.id]: [...(prev[bot.id] || []), `word${length}`],
     }));
-  }, []);
+  }, [availableWords]);
 
   const calculateWordScore = (wordLength: number, currentComboLevel: number): number => {
     // Base score: word length - 1 (matches multiplayer scoring)

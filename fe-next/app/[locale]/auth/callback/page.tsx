@@ -21,6 +21,15 @@ function LoadingUI(): React.ReactNode {
 // Cross-tab coordination keys
 const AUTH_CODE_LOCK_KEY = 'boggle_auth_code_lock';
 const AUTH_CODE_LOCK_TIMEOUT = 15000; // 15 seconds max lock time
+const CODE_EXCHANGE_TIMEOUT = 15000; // 15 seconds timeout for code exchange
+
+// Helper to wrap a promise with a timeout
+function withTimeout<T>(promise: Promise<T>, ms: number, errorMessage: string): Promise<T> {
+  const timeoutPromise = new Promise<never>((_, reject) =>
+    setTimeout(() => reject(new Error(errorMessage)), ms)
+  );
+  return Promise.race([promise, timeoutPromise]);
+}
 
 // Inner component that uses useSearchParams - must be wrapped in Suspense
 function AuthCallbackContent(): React.ReactNode {
@@ -174,13 +183,20 @@ function AuthCallbackContent(): React.ReactNode {
           return;
         }
 
-        // IMPORTANT: Check for existing session FIRST
+        // IMPORTANT: Check for existing session FIRST with retry
         // This handles the case where another tab already completed the auth
-        const { data: existingSession } = await supabase.auth.getSession();
-        if (existingSession?.session) {
-          logger.log('Auth callback: Session already exists, redirecting');
-          safeRedirect(next);
-          return;
+        // Retry mechanism handles cookie sync timing issues across tabs
+        for (let attempt = 0; attempt < 3; attempt++) {
+          const { data: existingSession } = await supabase.auth.getSession();
+          if (existingSession?.session) {
+            logger.log(`Auth callback: Session already exists (attempt ${attempt + 1}), redirecting`);
+            safeRedirect(next);
+            return;
+          }
+          // Wait 300ms before retry to allow cookies to sync
+          if (attempt < 2) {
+            await new Promise(resolve => setTimeout(resolve, 300));
+          }
         }
 
         // Check for PKCE code in query params (from server redirect)
@@ -225,16 +241,26 @@ function AuthCallbackContent(): React.ReactNode {
           logger.log('Auth callback: Exchanging code for session');
           // IMPORTANT: Extract both data and error - the session is returned directly
           // in data.session, so we don't need to call getSession() again
-          const { data, error } = await supabase.auth.exchangeCodeForSession(code);
+          // Wrapped with timeout to prevent infinite hang if exchange fails silently
+          const { data, error } = await withTimeout(
+            supabase.auth.exchangeCodeForSession(code),
+            CODE_EXCHANGE_TIMEOUT,
+            'Code exchange timed out'
+          );
 
           // Release lock after exchange attempt
           releaseLock();
 
           if (error) {
-            // Check if error is because code was already used (by another tab)
+            // Check if error is because code was already used (by another tab) or timeout
             // In this case, wait and poll for session as other tab should have it
-            if (error.message?.includes('code') || error.message?.includes('expired') || error.message?.includes('invalid')) {
-              logger.warn('Auth callback: Code exchange failed (possibly used by another tab), waiting for session');
+            const isRecoverableError = error.message?.includes('code') ||
+                                        error.message?.includes('expired') ||
+                                        error.message?.includes('invalid') ||
+                                        error.message?.includes('timed out');
+
+            if (isRecoverableError) {
+              logger.warn('Auth callback: Code exchange failed (possibly used by another tab or timed out), waiting for session');
 
               // Poll for session with retries - another tab may have succeeded
               const gotSession = await waitForSessionFromOtherTab(next, 5000);
@@ -315,6 +341,17 @@ function AuthCallbackContent(): React.ReactNode {
       } catch (err) {
         logger.error('Auth callback exception:', err);
         releaseLock();
+
+        // Before giving up, check if another tab succeeded (timeout case)
+        if (supabase) {
+          const { data: recoverySession } = await supabase.auth.getSession();
+          if (recoverySession?.session) {
+            logger.log('Auth callback: Found session after exception, redirecting');
+            safeRedirect(getRedirectUrl());
+            return;
+          }
+        }
+
         safeRedirect(`/${locale}?auth_error=true`);
       }
     };

@@ -10,6 +10,7 @@ export interface BotWordDetail {
   name: string;
   score: number;
   totalWords: number;
+  words: string[]; // Actual words the bot found
   wordsByLength: Record<number, number>;
   sortedLengths: number[];
 }
@@ -96,11 +97,20 @@ export function useResultsData(results: SinglePlayerResultsData, t: (key: string
     return results.botScores.map(bot => {
       const wordsByLength: Record<number, number> = {};
       let totalWords = 0;
+      const actualWords: string[] = [];
 
       bot.words.forEach(word => {
-        const match = word.match(/word(\d+)/);
-        const length = match ? parseInt(match[1], 10) : word.length;
-        wordsByLength[length] = (wordsByLength[length] || 0) + 1;
+        // Check if this is a fallback format (word5, word6, etc.) or an actual word
+        const fallbackMatch = word.match(/^word(\d+)$/);
+        if (fallbackMatch) {
+          // Fallback format - just count by length
+          const length = parseInt(fallbackMatch[1], 10);
+          wordsByLength[length] = (wordsByLength[length] || 0) + 1;
+        } else {
+          // Actual word
+          actualWords.push(word);
+          wordsByLength[word.length] = (wordsByLength[word.length] || 0) + 1;
+        }
         totalWords++;
       });
 
@@ -112,6 +122,7 @@ export function useResultsData(results: SinglePlayerResultsData, t: (key: string
         name: bot.name,
         score: bot.score,
         totalWords,
+        words: actualWords,
         wordsByLength,
         sortedLengths,
       };

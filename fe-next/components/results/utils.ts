@@ -70,9 +70,11 @@ export function getPointColor(points: number): string {
 
 /**
  * Get text color based on background - ensure WCAG AA contrast (4.5:1)
- * All point color backgrounds need dark text for proper contrast
+ * Most point color backgrounds need dark text for proper contrast
  */
 export function getTextColor(points: number): string {
-  // All point colors (cyan, orange, purple, pink, gray) are light enough to need dark text
-  return 'rgb(var(--neo-black))';
+  // 1-point words have dark gray background (#2d2d44), need light text
+  if (points === 1) return 'var(--neo-cream)';
+  // Other point colors (cyan, orange, purple, pink) are light enough to need dark text
+  return 'var(--neo-black)';
 }
