@@ -24,13 +24,89 @@ const SOCKET_CONFIG = {
   timeout: 30000,                  // Increased from 20000 for slow connections
 };
 
+// Shared socket singleton to prevent duplicate connections across components
+let sharedSocketInstance: Socket | null = null;
+let sharedSocketRefCount = 0;
+
+/**
+ * Get the shared socket URL
+ */
+export const getSocketURL = (): string => {
+  if (process.env.NEXT_PUBLIC_WS_URL) {
+    // Convert ws:// to http:// for Socket.IO
+    return process.env.NEXT_PUBLIC_WS_URL.replace(/^ws:/, 'http:').replace(/^wss:/, 'https:');
+  }
+
+  if (process.env.NODE_ENV === 'development') {
+    return 'http://localhost:3001';
+  }
+
+  if (typeof window === 'undefined') return '';
+
+  const protocol = window.location.protocol;
+  const host = window.location.host;
+  return `${protocol}//${host}`;
+};
+
+/**
+ * Get or create the shared socket instance
+ * Uses reference counting to manage cleanup
+ */
+export function getSharedSocket(): Socket {
+  if (!sharedSocketInstance) {
+    const socketUrl = getSocketURL();
+    logger.log('[SOCKET.IO] Creating shared socket instance:', socketUrl);
+
+    sharedSocketInstance = io(socketUrl, {
+      transports: ['websocket', 'polling'],
+      reconnectionAttempts: SOCKET_CONFIG.reconnectionAttempts,
+      reconnectionDelay: SOCKET_CONFIG.reconnectionDelay,
+      reconnectionDelayMax: SOCKET_CONFIG.reconnectionDelayMax,
+      timeout: SOCKET_CONFIG.timeout,
+      autoConnect: true,
+      forceNew: false,
+    });
+  }
+  sharedSocketRefCount++;
+  return sharedSocketInstance;
+}
+
+/**
+ * Release a reference to the shared socket
+ * Socket is cleaned up when all references are released
+ */
+export function releaseSharedSocket(): void {
+  sharedSocketRefCount--;
+  if (sharedSocketRefCount <= 0 && sharedSocketInstance) {
+    logger.log('[SOCKET.IO] Cleaning up shared socket (no more references)');
+    sharedSocketInstance.removeAllListeners();
+    sharedSocketInstance.disconnect();
+    sharedSocketInstance = null;
+    sharedSocketRefCount = 0;
+  }
+}
+
+/**
+ * Check if shared socket exists and is connected
+ */
+export function hasConnectedSharedSocket(): boolean {
+  return sharedSocketInstance !== null && sharedSocketInstance.connected;
+}
+
+/**
+ * Get the shared socket if it exists (without incrementing ref count)
+ */
+export function getSharedSocketIfExists(): Socket | null {
+  return sharedSocketInstance;
+}
+
 interface SocketProviderProps {
   children: ReactNode;
 }
 
 /**
  * Socket.IO Provider Component
- * Manages the Socket.IO connection lifecycle
+ * Manages the Socket.IO connection lifecycle using shared singleton
  */
 export function SocketProvider({ children }: SocketProviderProps) {
   const [socket, setSocket] = useState<Socket | null>(null);
@@ -40,33 +116,19 @@ export function SocketProvider({ children }: SocketProviderProps) {
   const socketRef = useRef<Socket | null>(null);
 
   useEffect(() => {
-    // Get the WebSocket URL from environment or construct it
-    const protocol = typeof window !== 'undefined' && window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-    const wsHost = process.env.NEXT_PUBLIC_WS_URL ||
-      (typeof window !== 'undefined' ? `${window.location.protocol}//${window.location.host}` : 'http://localhost:3001');
-
-    // Create Socket.IO client
-    const socketInstance = io(wsHost, {
-      transports: ['websocket', 'polling'],
-      reconnectionAttempts: SOCKET_CONFIG.reconnectionAttempts,
-      reconnectionDelay: SOCKET_CONFIG.reconnectionDelay,
-      reconnectionDelayMax: SOCKET_CONFIG.reconnectionDelayMax,
-      timeout: SOCKET_CONFIG.timeout,
-      autoConnect: true,
-      forceNew: false,
-    });
-
+    // Use shared socket singleton
+    const socketInstance = getSharedSocket();
     socketRef.current = socketInstance;
 
     // Connection event handlers
-    socketInstance.on('connect', () => {
+    const handleConnect = () => {
       logger.log('[SOCKET.IO] Connected:', socketInstance.id);
       setIsConnected(true);
       setIsReconnecting(false);
       setConnectionError(null);
-    });
+    };
 
-    socketInstance.on('disconnect', (reason: string) => {
+    const handleDisconnect = (reason: string) => {
       logger.log('[SOCKET.IO] Disconnected:', reason);
       setIsConnected(false);
 
@@ -74,66 +136,84 @@ export function SocketProvider({ children }: SocketProviderProps) {
         // Server disconnected us, try to reconnect
         socketInstance.connect();
       }
-    });
+    };
 
-    socketInstance.on('connect_error', (error: Error) => {
+    const handleConnectError = (error: Error) => {
       logger.error('[SOCKET.IO] Connection error:', error.message);
       setConnectionError(error.message);
       setIsConnected(false);
-    });
+    };
 
-    socketInstance.on('reconnect', (attemptNumber: number) => {
+    const handleReconnect = (attemptNumber: number) => {
       logger.log('[SOCKET.IO] Reconnected after', attemptNumber, 'attempts');
       setIsConnected(true);
       setIsReconnecting(false);
       setConnectionError(null);
-    });
+    };
 
-    socketInstance.on('reconnect_attempt', (attemptNumber: number) => {
+    const handleReconnectAttempt = (attemptNumber: number) => {
       logger.log('[SOCKET.IO] Reconnection attempt:', attemptNumber);
       setIsReconnecting(true);
-    });
+    };
 
-    socketInstance.on('reconnect_error', (error: Error) => {
+    const handleReconnectError = (error: Error) => {
       logger.error('[SOCKET.IO] Reconnection error:', error.message);
-    });
+    };
 
-    socketInstance.on('reconnect_failed', () => {
+    const handleReconnectFailed = () => {
       logger.error('[SOCKET.IO] Reconnection failed after all attempts');
       setIsReconnecting(false);
       setConnectionError('Failed to reconnect to server');
-    });
+    };
 
-    // Handle server shutdown notification (for zero-downtime deployments)
-    socketInstance.on('serverShutdown', ({ reconnectIn, message }: { reconnectIn?: number; message: string }) => {
+    const handleServerShutdown = ({ reconnectIn, message }: { reconnectIn?: number; message: string }) => {
       logger.log('[SOCKET.IO] Server shutdown notification:', message);
-      // Disconnect gracefully and schedule reconnection
       socketInstance.disconnect();
       setTimeout(() => {
         logger.log('[SOCKET.IO] Attempting reconnection after server restart');
         socketInstance.connect();
       }, reconnectIn || 5000);
-    });
+    };
 
-    // Catch any unhandled error events
-    socketInstance.on('error', (error: unknown) => {
-      logger.error('[SOCKET.IO] Socket error event:', error);
-      // Log additional context if error is empty
-      if (!error || (typeof error === 'object' && Object.keys(error).length === 0)) {
-        logger.error('[SOCKET.IO] Received empty error - checking socket state');
-        logger.error('[SOCKET.IO] Connected:', socketInstance.connected);
-        logger.error('[SOCKET.IO] ID:', socketInstance.id);
+    const handleError = (error: unknown) => {
+      // Only log non-empty errors to reduce noise
+      if (error && typeof error === 'object' && Object.keys(error).length > 0) {
+        logger.error('[SOCKET.IO] Socket error event:', error);
       }
-    });
+    };
+
+    // Set up event listeners
+    socketInstance.on('connect', handleConnect);
+    socketInstance.on('disconnect', handleDisconnect);
+    socketInstance.on('connect_error', handleConnectError);
+    socketInstance.on('reconnect', handleReconnect);
+    socketInstance.on('reconnect_attempt', handleReconnectAttempt);
+    socketInstance.on('reconnect_error', handleReconnectError);
+    socketInstance.on('reconnect_failed', handleReconnectFailed);
+    socketInstance.on('serverShutdown', handleServerShutdown);
+    socketInstance.on('error', handleError);
+
+    // If already connected, update state immediately
+    if (socketInstance.connected) {
+      setIsConnected(true);
+    }
 
     // Schedule setSocket asynchronously to avoid synchronous setState in effect
     Promise.resolve().then(() => setSocket(socketInstance));
 
     // Cleanup on unmount
     return () => {
-      logger.log('[SOCKET.IO] Cleaning up socket connection');
-      socketInstance.removeAllListeners();
-      socketInstance.disconnect();
+      logger.log('[SOCKET.IO] SocketProvider cleaning up listeners');
+      socketInstance.off('connect', handleConnect);
+      socketInstance.off('disconnect', handleDisconnect);
+      socketInstance.off('connect_error', handleConnectError);
+      socketInstance.off('reconnect', handleReconnect);
+      socketInstance.off('reconnect_attempt', handleReconnectAttempt);
+      socketInstance.off('reconnect_error', handleReconnectError);
+      socketInstance.off('reconnect_failed', handleReconnectFailed);
+      socketInstance.off('serverShutdown', handleServerShutdown);
+      socketInstance.off('error', handleError);
+      releaseSharedSocket();
     };
   }, []);
 

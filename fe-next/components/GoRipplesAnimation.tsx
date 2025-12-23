@@ -42,7 +42,7 @@ const GoRipplesAnimation: React.FC<GoRipplesAnimationProps> = ({ onComplete }) =
   // Countdown logic
   useEffect(() => {
     if (count > 0) {
-      const timer = setTimeout(() => setCount(count - 1), 700);
+      const timer = setTimeout(() => setCount(count - 1), 1000);
       return () => clearTimeout(timer);
     } else if (count === 0) {
       // Flash effect for GO!

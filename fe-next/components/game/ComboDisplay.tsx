@@ -66,13 +66,13 @@ const ComboDisplay: React.FC<ComboDisplayProps> = ({
   const isMediumCombo = comboLevel >= 3;
   const isRainbow = comboColors.isRainbow;
 
-  // Memoize sparkle data for performance
+  // Memoize sparkle data for performance - reduced distance in compact mode to prevent overflow
   const sparkleData = useMemo(() => {
     if (comboLevel < 3) return [];
     const count = isHighCombo ? 6 : 4;
     return [...Array(count)].map((_, i) => ({
       angle: (i * (360 / count)) * (Math.PI / 180),
-      distance: compact ? 25 : 35,
+      distance: compact ? 15 : 35, // Reduced from 25 to 15 in compact mode
       delay: i * 0.2,
     }));
   }, [comboLevel, isHighCombo, compact]);
@@ -81,16 +81,16 @@ const ComboDisplay: React.FC<ComboDisplayProps> = ({
     ? ['#FF3366', '#FFE135', '#00FFFF', '#FF1493', '#BFFF00']
     : ['#FFD700', '#FF6B35', '#FF3366', '#FFE135'];
 
-  // Hide combo display when level is 0 or 1 (reduces visual noise)
-  if (comboLevel < 2) {
+  // Hide combo display only when level is 0 (show from first combo word)
+  if (comboLevel < 1) {
     return null;
   }
 
   return (
     <div
       className={cn(
-        'flex items-center justify-center relative',
-        compact ? 'min-w-[70px]' : 'min-w-[130px]',
+        'flex items-center justify-center relative overflow-visible',
+        compact ? 'min-w-[70px] max-w-[90px]' : 'min-w-[130px]',
         className
       )}
     >

@@ -66,6 +66,21 @@ export function useEarthquakeFireRound(
   const warningTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const shakeTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
+  // Reset refs when game session changes (new game started)
+  useEffect(() => {
+    console.log(`[Earthquake] Game session changed to ${gameSessionId}, resetting state`);
+    earthquakeTriggeredRef.current = false;
+    triggerTimeRef.current = null;
+    setEarthquakeState('idle');
+    setFireRoundActive(false);
+    setFireRoundRemaining(0);
+
+    // Clear any pending timers from previous session
+    if (warningTimeoutRef.current) clearTimeout(warningTimeoutRef.current);
+    if (shakeTimeoutRef.current) clearTimeout(shakeTimeoutRef.current);
+    if (fireRoundTimerRef.current) clearInterval(fireRoundTimerRef.current);
+  }, [gameSessionId]);
+
   // Calculate trigger time (random time in last 24% of game, but at least 20 sec before end)
   useEffect(() => {
     if (!enabled || triggerTimeRef.current !== null) return;
@@ -132,7 +147,7 @@ export function useEarthquakeFireRound(
     // For multiplayer hosts, emit socket event instead of executing locally
     if (mode === 'multiplayer' && isHost && socket) {
       const payload: TriggerEarthquakePayload = {
-        gameSessionId: gameSessionId || '',
+        gameSessionId: String(gameSessionId ?? ''),
         triggerTime: currentTimeSeconds,
       };
       console.log('[Earthquake] Host emitting triggerEarthquake event', payload);

@@ -71,7 +71,7 @@ const HostWaitingResultsView: React.FC<HostWaitingResultsViewProps> = ({
   }, [playersReady, playerScores, playerWordCounts]);
 
   return (
-    <div className="min-h-screen bg-neo-cream dark:bg-slate-900 p-3 sm:p-4 md:p-8 flex flex-col transition-colors duration-300">
+    <div className="min-h-screen w-full bg-neo-cream dark:bg-slate-900 p-3 sm:p-4 md:p-8 flex flex-col transition-colors duration-300">
 
       {/* Exit Button */}
       <div className="w-full flex justify-end mb-4 relative z-50">

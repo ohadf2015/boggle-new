@@ -3,12 +3,12 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import nextDynamic from 'next/dynamic';
 import toast from 'react-hot-toast';
-import { io, Socket } from 'socket.io-client';
+import { Socket } from 'socket.io-client';
 import AutoHideHeader from '@/components/AutoHideHeader';
 import ErrorBoundary from '@/app/components/ErrorBoundary';
 import { FeatureErrorBoundary } from '@/components/ErrorBoundaries';
 import { ConnectionDot } from '@/components/ConnectionStatusIndicator';
-import { SocketContext } from '@/utils/SocketContext';
+import { SocketContext, getSharedSocket, releaseSharedSocket, getSharedSocketIfExists, getSocketURL } from '@/utils/SocketContext';
 import { saveSession, getSession, clearSession, clearSessionPreservingUsername } from '@/utils/session';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
@@ -92,25 +92,8 @@ const SOCKET_CONFIG = {
   ROOMS_LOADING_TIMEOUT: 3000, // Reduced timeout for active rooms - show UI faster
 };
 
-// Singleton socket instance
-let globalSocketInstance: Socket | null = null;
-
-const getSocketURL = (): string => {
-  if (process.env.NEXT_PUBLIC_WS_URL) {
-    // Convert ws:// to http:// for Socket.IO
-    return process.env.NEXT_PUBLIC_WS_URL.replace(/^ws:/, 'http:').replace(/^wss:/, 'https:');
-  }
-
-  if (process.env.NODE_ENV === 'development') {
-    return 'http://localhost:3001';
-  }
-
-  if (typeof window === 'undefined') return '';
-
-  const protocol = window.location.protocol;
-  const host = window.location.host;
-  return `${protocol}//${host}`;
-};
+// Note: Socket singleton is now managed by SocketContext.tsx
+// Use getSharedSocket(), releaseSharedSocket(), and getSharedSocketIfExists()
 
 export default function MultiplayerPage(): React.JSX.Element {
   const [gameCode, setGameCode] = useState<string>('');
@@ -336,13 +319,13 @@ export default function MultiplayerPage(): React.JSX.Element {
     showResultsRef.current = showResults;
   }, [showResults]);
 
-  // Initialize Socket.IO connection
+  // Initialize Socket.IO connection using shared singleton
   useEffect(() => {
     if (typeof window === 'undefined') return;
 
-    // Use existing socket if available
-    if (globalSocketInstance && globalSocketInstance.connected) {
-      const existingSocket = globalSocketInstance;
+    // Use shared socket singleton (may already exist from SocketProvider or previous mount)
+    const existingSocket = getSharedSocketIfExists();
+    if (existingSocket && existingSocket.connected) {
       socketRef.current = existingSocket;
       // Defer state updates to avoid calling setState directly within effect
       Promise.resolve().then(() => {
@@ -370,19 +353,11 @@ export default function MultiplayerPage(): React.JSX.Element {
       };
     }
 
+    // Get or create shared socket instance
     const socketUrl = getSocketURL();
-    logger.log('[SOCKET.IO] Connecting to:', socketUrl);
+    logger.log('[SOCKET.IO] MultiplayerPage using shared socket:', socketUrl);
 
-    const newSocket = io(socketUrl, {
-      transports: ['websocket', 'polling'],
-      reconnectionAttempts: SOCKET_CONFIG.RECONNECTION_ATTEMPTS,
-      reconnectionDelay: SOCKET_CONFIG.RECONNECTION_DELAY,
-      reconnectionDelayMax: SOCKET_CONFIG.RECONNECTION_DELAY_MAX,
-      timeout: SOCKET_CONFIG.CONNECTION_TIMEOUT,
-      autoConnect: true,
-    });
-
-    globalSocketInstance = newSocket;
+    const newSocket = getSharedSocket();
     socketRef.current = newSocket;
 
     // Connection events
@@ -788,13 +763,32 @@ export default function MultiplayerPage(): React.JSX.Element {
     });
 
     return () => {
-      logger.log('[SOCKET.IO] Cleaning up');
+      logger.log('[SOCKET.IO] MultiplayerPage cleaning up');
       clearTimeout(roomsLoadingTimeout);
-      newSocket.removeAllListeners();
-      // Only keep socket connected if it's the global instance
-      if (!globalSocketInstance || globalSocketInstance !== newSocket) {
-        newSocket.disconnect();
-      }
+      // Remove this component's listeners but keep socket alive for other components
+      newSocket.off('connect');
+      newSocket.off('disconnect');
+      newSocket.off('connect_error');
+      newSocket.off('reconnect');
+      newSocket.off('reconnect_failed');
+      newSocket.off('joined');
+      newSocket.off('updateUsers');
+      newSocket.off('activeRooms');
+      newSocket.off('joinedAsSpectator');
+      newSocket.off('spectatorList');
+      newSocket.off('spectatorUpgraded');
+      newSocket.off('debugGameStateResponse');
+      newSocket.off('error');
+      newSocket.off('startGame');
+      newSocket.off('resetGame');
+      newSocket.off('hostLeftRoomClosing');
+      newSocket.off('sessionMigrated');
+      newSocket.off('warning');
+      newSocket.off('rateLimited');
+      newSocket.off('hostTransferred');
+      newSocket.off('pong');
+      // Release reference to shared socket (socket disconnects when all refs released)
+      releaseSharedSocket();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps -- gameCode, username, roomName, roomLanguage are used in handlers but shouldn't trigger socket recreation
   }, [t, language]);

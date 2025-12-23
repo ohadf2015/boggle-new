@@ -19,9 +19,9 @@ import { getWordPath } from '@/utils/wordPath';
 import type { ResultsPageProps, HeatMapData, WordToVote, XpGainedData, LevelUpData } from '@/types/components';
 import type { LetterGrid as LetterGridType } from '@/shared/types/game';
 import { useMobileLandscape } from '@/hooks/useMobileLandscape';
+import GridComponent from '@/components/GridComponent';
 
 // Dynamic imports for heavy components (loaded after initial render)
-const GridComponent = dynamic(() => import('@/components/GridComponent'), { ssr: false });
 const ResultsPlayerCard = dynamic(() => import('@/components/results/ResultsPlayerCard'), { ssr: false });
 const ResultsWinnerBanner = dynamic(() => import('@/components/results/ResultsWinnerBanner'), { ssr: false });
 const AuthModal = dynamic(() => import('@/components/auth/AuthModal'), { ssr: false });

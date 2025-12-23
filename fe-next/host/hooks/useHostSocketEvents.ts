@@ -142,9 +142,9 @@ const useHostSocketEvents = ({
 
   // Music callback
   onGameStart,
-}: UseHostSocketEventsProps): void => {
+}: UseHostSocketEventsProps): { gameSessionId: number } => {
   // Game lifecycle events
-  useHostGameEvents({
+  const { gameSessionId } = useHostGameEvents({
     socket,
     t,
     gameStarted,
@@ -216,6 +216,8 @@ const useHostSocketEvents = ({
     setTournamentCreating,
     tournamentTimeoutRef,
   });
+
+  return { gameSessionId };
 };
 
 export default useHostSocketEvents;

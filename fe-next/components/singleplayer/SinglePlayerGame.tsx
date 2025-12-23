@@ -790,6 +790,7 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
             word: normalizedWord.toUpperCase(),
             score: fullScore,
             fireRoundActive,
+            fireRoundBonus,
             timestamp: now,
           });
           // Announce for screen readers
@@ -1100,40 +1101,48 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
         )}
       </div>
 
-      {/* Timer row - Timer, Combo, Score all together */}
-      <div className="flex items-center justify-center gap-3 mb-1">
-        {/* Timer */}
+      {/* Stats row - Combo | Timer | Score - matches multiplayer layout */}
+      <div className="flex items-center justify-center gap-3 md:gap-4 mb-2" role="status" aria-label="Game status">
+        {/* Combo (left - shows when level >= 2, placeholder otherwise for layout balance) */}
+        <div className="min-w-[70px] md:min-w-[90px] flex justify-end">
+          <ComboDisplay comboLevel={combo.comboLevel} compact />
+        </div>
+
+        {/* Timer (center - always visible and prominent) */}
         {settings.mode !== 'practice' && (
-          <CircularTimer
-            remainingTime={timer.remainingTime}
-            totalTime={settings.timerSeconds}
-            size="sm"
-          />
+          <motion.div
+            initial={{ scale: 0, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            className="relative z-20"
+          >
+            <CircularTimer
+              remainingTime={timer.remainingTime}
+              totalTime={settings.timerSeconds}
+              size="md"
+            />
+          </motion.div>
         )}
 
-        {/* Combo next to timer */}
-        <ComboDisplay comboLevel={combo.comboLevel} />
-
-        {/* Score */}
+        {/* Score (right position) - vibrant yellow/lime gradient like multiplayer */}
         <motion.div
-          initial={{ scale: 0, rotate: -5 }}
-          animate={{ scale: 1, rotate: -2 }}
-          className="relative bg-neo-yellow border-3 border-neo-black rounded-neo shadow-hard px-2 py-1 min-w-[60px]"
+          initial={{ scale: 0, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          className="relative border-3 border-neo-black rounded-neo shadow-hard-lg px-3 md:px-4 py-1.5 min-w-[70px] md:min-w-[90px]"
+          style={{
+            background: 'linear-gradient(135deg, #FFE135 0%, #BFFF00 100%)',
+          }}
         >
-          <div
-            className="text-center"
-            style={{ transform: 'rotate(2deg)' }}
-          >
+          <div className="text-center">
             <motion.div
               key={score}
               initial={{ scale: 1.3 }}
               animate={{ scale: 1 }}
-              className="text-lg font-black text-neo-black"
-              style={{ textShadow: '1px 1px 0px var(--neo-cream)' }}
+              className="text-xl md:text-2xl font-black text-neo-black leading-tight"
+              style={{ textShadow: '1px 1px 0px rgba(255,255,255,0.5)' }}
             >
               {score}
             </motion.div>
-            <div className="text-[10px] font-bold uppercase tracking-wider text-neo-black/70">
+            <div className="text-[10px] md:text-xs font-bold uppercase tracking-wider text-neo-black/80">
               {t('common.score') || 'Score'}
             </div>
           </div>

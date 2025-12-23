@@ -2,7 +2,7 @@
  * Host Game Events Hook
  * Handles core game lifecycle socket events: startGame, endGame, timeUpdate, validationComplete, resetGame
  */
-import { useEffect, useCallback, useRef, useMemo, MutableRefObject } from 'react';
+import { useEffect, useCallback, useRef, useMemo, useState, MutableRefObject } from 'react';
 import { Socket } from 'socket.io-client';
 import { neoSuccessToast } from '../../../components/NeoToast';
 import { resetComboState as resetComboStateUtil } from '@/shared/utils/comboUtils';
@@ -64,6 +64,7 @@ interface UseHostGameEventsProps {
 
 interface UseHostGameEventsReturn {
   gameSessionIdRef: MutableRefObject<number>;
+  gameSessionId: number;
 }
 
 /**
@@ -115,6 +116,8 @@ export function useHostGameEvents({
 
   // Track game session ID to ignore stale events
   const gameSessionIdRef = useRef<number>(0);
+  // State version for triggering re-renders when session changes
+  const [gameSessionId, setGameSessionId] = useState<number>(0);
 
   // Helper to reset combo state using shared utility
   const resetComboState = useCallback(() => {
@@ -139,6 +142,7 @@ export function useHostGameEvents({
       // Track game session ID
       if ((data as any).gameSessionId !== undefined) {
         gameSessionIdRef.current = (data as any).gameSessionId;
+        setGameSessionId((data as any).gameSessionId);
       }
 
       if (data.letterGrid) {
@@ -237,6 +241,7 @@ export function useHostGameEvents({
 
       if (data.gameSessionId !== undefined) {
         gameSessionIdRef.current = data.gameSessionId;
+        setGameSessionId(data.gameSessionId);
       }
 
       setGameStarted(false);
@@ -370,5 +375,5 @@ export function useHostGameEvents({
     onGameStart,
   ]);
 
-  return { gameSessionIdRef };
+  return { gameSessionIdRef, gameSessionId };
 }

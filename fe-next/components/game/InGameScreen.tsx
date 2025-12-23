@@ -190,6 +190,13 @@ const InGameScreen = memo<InGameScreenProps>(({
   const prevEarthquakeStateRef = useRef<typeof earthquakeState>('idle');
   const prevFireRoundActiveRef = useRef(false);
 
+  // Track current fireRoundActive value via ref for use in callbacks
+  // This ensures the socket emit uses the latest value without waiting for re-render
+  const fireRoundActiveRef = useRef(fireRoundActive);
+  useEffect(() => {
+    fireRoundActiveRef.current = fireRoundActive;
+  }, [fireRoundActive]);
+
   // Earthquake/Fire Round sound effects for multiplayer (triggered by state changes from socket)
   useEffect(() => {
     const prevState = prevEarthquakeStateRef.current;
@@ -240,13 +247,14 @@ const InGameScreen = memo<InGameScreenProps>(({
   useEffect(() => {
     if (!socket || !isPlaying) return;
 
-    const handleWordAccepted = (data: { word: string; score: number; comboLevel?: number; fireRoundActive?: boolean }) => {
+    const handleWordAccepted = (data: { word: string; score: number; comboLevel?: number; fireRoundActive?: boolean; fireRoundBonus?: number }) => {
       setCurrentFeedback({
         id: `accepted-${Date.now()}`,
         type: 'accepted',
         word: data.word,
         score: data.score,
         fireRoundActive: data.fireRoundActive,
+        fireRoundBonus: data.fireRoundBonus,
         timestamp: Date.now(),
       });
     };
@@ -407,7 +415,7 @@ const InGameScreen = memo<InGameScreenProps>(({
     socket.emit('submitWord', {
       word: formedWord.toLowerCase(),
       comboLevel: Math.min(effectiveComboLevelRef.current, 10),
-      fireRoundActive,
+      fireRoundActive: fireRoundActiveRef.current,
     });
 
     // Add to local found words
@@ -514,8 +522,8 @@ const InGameScreen = memo<InGameScreenProps>(({
           )}
 
 
-          {/* Top-right: Help button */}
-          <div className="absolute top-2 right-2 z-30">
+          {/* Bottom-right: Help button (offset to avoid hint button) */}
+          <div className="absolute bottom-2 right-16 z-30">
             <HelpButton
               onClick={() => setShowHelpPanel(true)}
               className="w-11 h-11"
@@ -573,7 +581,10 @@ const InGameScreen = memo<InGameScreenProps>(({
                 interactive={isPlaying && !showStartAnimation}
                 animateOnMount={!hasAnimatedRef.current}
                 onWordSubmit={handleGridWordSubmit}
+                onWordChange={handleWordChange}
                 comboLevel={comboLevel}
+                hideComboIndicator={true}
+                hideWordPreview={true}
                 largeText
                 fireRoundActive={fireRoundActive}
                 earthquakeShaking={earthquakeState === 'shaking'}
@@ -626,9 +637,11 @@ const InGameScreen = memo<InGameScreenProps>(({
             t={t}
           />
         )}
+      </div>
 
-        {/* Help Button - For discoverability (both single and multiplayer) */}
-        <HelpButton onClick={() => setShowHelpPanel(true)} className="ml-auto" />
+      {/* Help Button - Fixed at bottom right on mobile */}
+      <div className="lg:hidden fixed bottom-4 right-4 z-50">
+        <HelpButton onClick={() => setShowHelpPanel(true)} />
       </div>
 
       {/* Help Panel - Accessible from anywhere */}
@@ -783,14 +796,17 @@ const InGameScreen = memo<InGameScreenProps>(({
         )}
 
         {/* Grid - Direct connection to timer row */}
-        <div className="flex justify-center flex-grow">
+        <div className="flex justify-center">
           <GridComponent
               key={isPlaying ? 'playing-grid' : 'spectating-grid'}
               grid={letterGrid}
               interactive={isPlaying && !showStartAnimation}
               animateOnMount={!hasAnimatedRef.current}
               onWordSubmit={handleGridWordSubmit}
+              onWordChange={handleWordChange}
               comboLevel={comboLevel}
+              hideComboIndicator={true}
+              hideWordPreview={true}
               fireRoundActive={fireRoundActive}
               earthquakeShaking={earthquakeState === 'shaking'}
             />

@@ -51,51 +51,55 @@ export const RoomCodeSection = memo<RoomCodeSectionProps>(({
   };
 
   return (
-    <Card className="bg-slate-800/95 text-neo-white p-3 sm:p-4 md:p-6 border-4 border-neo-black shadow-hard-lg">
-      <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+    <Card className="bg-slate-800/95 text-neo-white px-2 py-1.5 sm:px-3 sm:py-2 border-2 border-neo-black shadow-hard">
+      <div className="flex items-center justify-between gap-2">
         {/* Room Code and Language */}
-        <div className="flex flex-col items-center sm:items-start gap-2">
-          <div className="flex items-center gap-3">
-            <div className="text-center sm:text-left">
-              <p className="text-sm text-neo-cyan font-bold uppercase">{t('hostView.roomCode')}:</p>
-              <h2 className="text-3xl sm:text-4xl font-black tracking-wide text-neo-yellow">
-                {gameCode}
-              </h2>
-            </div>
-            <Badge className="text-base sm:text-lg px-3 py-1 bg-neo-cream text-neo-black border-3 border-neo-black shadow-hard-sm font-bold">
-              {getLanguageDisplay(roomLanguage)}
-            </Badge>
-            {tournamentData && (
-              <Badge className="text-sm px-3 py-1 bg-gradient-to-r from-amber-500 to-yellow-600 text-white border-0">
-                <FaTrophy className="mr-1" />
-                {t('hostView.tournamentMode')} - {t('hostView.tournamentRound')} {tournamentData.currentRound}/{tournamentData.totalRounds}
-              </Badge>
-            )}
+        <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5">
+            <span className="text-[10px] text-neo-cyan font-bold uppercase hidden sm:inline">{t('hostView.roomCode')}:</span>
+            <span className="text-lg sm:text-xl font-black tracking-wide text-neo-yellow">
+              {gameCode}
+            </span>
           </div>
+          <Badge className="text-xs px-1.5 py-0 bg-neo-cream text-neo-black border border-neo-black font-semibold">
+            {getLanguageDisplay(roomLanguage)}
+          </Badge>
+          {tournamentData && (
+            <Badge className="text-xs px-2 py-0 bg-gradient-to-r from-amber-500 to-yellow-600 text-white border-0">
+              <FaTrophy className="mr-1 text-[10px]" />
+              R{tournamentData.currentRound}/{tournamentData.totalRounds}
+            </Badge>
+          )}
         </div>
 
-        {/* Share Buttons */}
-        <div className="flex flex-wrap gap-2 justify-center">
+        {/* Share Buttons - compact row with tooltips on mobile */}
+        <div className="flex gap-1.5">
           <ShareButton
             variant="link"
             onClick={handleCopyLink}
-            icon={<FaLink />}
+            icon={<FaLink className="text-xs" />}
+            className="px-2 py-1 text-xs h-7"
+            tooltip={t('hostView.copyLink')}
           >
-            {t('hostView.copyLink')}
+            <span className="hidden md:inline">{t('hostView.copyLink')}</span>
           </ShareButton>
           <ShareButton
             variant="whatsapp"
             onClick={handleShareWhatsApp}
-            icon={<FaWhatsapp />}
+            icon={<FaWhatsapp className="text-xs" />}
+            className="px-2 py-1 text-xs h-7"
+            tooltip={t('hostView.shareWhatsapp')}
           >
-            {t('hostView.shareWhatsapp')}
+            <span className="hidden md:inline">{t('hostView.shareWhatsapp')}</span>
           </ShareButton>
           <ShareButton
             variant="qr"
             onClick={onShowQR}
-            icon={<FaQrcode />}
+            icon={<FaQrcode className="text-xs" />}
+            className="px-2 py-1 text-xs h-7"
+            tooltip={t('hostView.qrCode')}
           >
-            {t('hostView.qrCode')}
+            <span className="hidden md:inline">{t('hostView.qrCode')}</span>
           </ShareButton>
         </div>
       </div>

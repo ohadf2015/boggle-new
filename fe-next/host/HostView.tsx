@@ -83,7 +83,7 @@ const HostView: React.FC<HostViewProps> = memo(({
   const earthquakeMusicActiveRef = useRef<boolean>(false);
 
   // Socket event handling
-  useHostSocketEvents({
+  const { gameSessionId } = useHostSocketEvents({
     socket,
     t,
     hostPlaying: state.settings.hostPlaying,
@@ -220,7 +220,7 @@ const HostView: React.FC<HostViewProps> = memo(({
     mode: 'multiplayer',
     isHost: true,
     socket: socket,
-    gameSessionId: gameCode,
+    gameSessionId: gameSessionId,
     onGridRegenerate: () => {
       // Grid regeneration handled by socket event (fireRoundStart)
     },

@@ -28,6 +28,7 @@ export interface WordFeedback {
   score?: number;
   message?: string;
   fireRoundActive?: boolean;
+  fireRoundBonus?: number;
   timestamp: number;
 }
 
@@ -328,6 +329,7 @@ export function useWordSubmission(options: UseWordSubmissionOptions): WordSubmis
             word: normalizedWord.toUpperCase(),
             score: fullScore,
             fireRoundActive,
+            fireRoundBonus,
             timestamp: now,
           });
 

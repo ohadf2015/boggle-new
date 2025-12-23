@@ -106,7 +106,7 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                                 rotate: [0, -15, 15, -15, 15, 0],
                                 scale: [1, 1.3, 1]
                             }}
-                            transition={{ duration: 0.4, delay: 1, repeat: 3, repeatDelay: 5 }}
+                            transition={{ type: 'tween', duration: 0.4, delay: 1, repeat: 3, repeatDelay: 5 }}
                             className="text-base xs:text-xl sm:text-3xl"
                         >
                             ⚡

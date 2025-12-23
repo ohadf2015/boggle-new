@@ -20,6 +20,8 @@ const leaderboardPendingUpdate = {};
  * @param {number} options.score - Score for this word (with combo if applicable)
  * @param {number} options.comboBonus - Combo bonus points earned
  * @param {number} options.comboLevel - Combo level when word was submitted
+ * @param {number} options.fireRoundMultiplier - Fire round score multiplier (1 or 2)
+ * @param {number} options.fireRoundBonus - Extra points from fire round 2x multiplier
  */
 function addPlayerWord(game, username, word, options = {}) {
   if (!game) return;
@@ -86,6 +88,8 @@ function addPlayerWord(game, username, word, options = {}) {
       autoValidated: options.autoValidated || false,
       onBoard: true,
       isBot: options.isBot || false,
+      fireRoundMultiplier: options.fireRoundMultiplier || 1,
+      fireRoundBonus: options.fireRoundBonus || 0,
     });
   }
 }

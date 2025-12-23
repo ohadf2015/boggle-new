@@ -1,7 +1,8 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useSocket } from '@/utils/SocketContext';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -11,39 +12,57 @@ import { motion, AnimatePresence } from 'framer-motion';
 type ConnectionStatus = 'connected' | 'connecting' | 'reconnecting' | 'disconnected';
 
 /**
- * Status configuration for consistent styling and messaging
+ * Status configuration for consistent styling
  */
-const STATUS_CONFIG: Record<ConnectionStatus, {
+const STATUS_STYLE_CONFIG: Record<ConnectionStatus, {
   className: string;
-  label: string;
-  description: string;
   icon: string;
 }> = {
   connected: {
     className: 'connection-indicator--connected',
-    label: 'Connected',
-    description: 'Connected to game server',
     icon: '✓',
   },
   connecting: {
     className: 'connection-indicator--connecting',
-    label: 'Connecting',
-    description: 'Connecting to game server...',
     icon: '...',
   },
   reconnecting: {
     className: 'connection-indicator--reconnecting',
-    label: 'Reconnecting',
-    description: 'Connection lost, reconnecting...',
     icon: '↻',
   },
   disconnected: {
     className: 'connection-indicator--disconnected',
-    label: 'Disconnected',
-    description: 'Not connected to game server',
     icon: '✗',
   },
 };
+
+/**
+ * Hook to get translated status labels and descriptions
+ */
+function useStatusConfig(t: (key: string) => string) {
+  return useMemo(() => ({
+    connected: {
+      ...STATUS_STYLE_CONFIG.connected,
+      label: t('common.connected'),
+      description: t('common.connectedToServer'),
+    },
+    connecting: {
+      ...STATUS_STYLE_CONFIG.connecting,
+      label: t('common.connecting'),
+      description: t('common.connectingToServer'),
+    },
+    reconnecting: {
+      ...STATUS_STYLE_CONFIG.reconnecting,
+      label: t('common.reconnecting'),
+      description: t('common.reconnecting'),
+    },
+    disconnected: {
+      ...STATUS_STYLE_CONFIG.disconnected,
+      label: t('common.notConnected'),
+      description: t('common.notConnected'),
+    },
+  }), [t]);
+}
 
 /**
  * Minimal connection dot (just the indicator, no tooltip)
@@ -51,6 +70,8 @@ const STATUS_CONFIG: Record<ConnectionStatus, {
  */
 export const ConnectionDot: React.FC<{ className?: string }> = ({ className }) => {
   const { isConnected, isReconnecting, connectionError } = useSocket();
+  const { t } = useLanguage();
+  const statusConfig = useStatusConfig(t);
 
   const getStatus = (): ConnectionStatus => {
     if (isConnected) return 'connected';
@@ -66,13 +87,13 @@ export const ConnectionDot: React.FC<{ className?: string }> = ({ className }) =
     return null;
   }
 
-  const config = STATUS_CONFIG[status];
+  const config = statusConfig[status];
 
   return (
     <div
       className={cn('connection-indicator', config.className, className)}
       role="status"
-      aria-label={`Connection: ${config.label}`}
+      aria-label={`${config.label}`}
     />
   );
 };
@@ -93,6 +114,8 @@ export const ConnectionStatus: React.FC<ConnectionStatusProps> = ({
   compact = false,
 }) => {
   const { isConnected, isReconnecting, connectionError } = useSocket();
+  const { t } = useLanguage();
+  const statusConfig = useStatusConfig(t);
   const [showTooltip, setShowTooltip] = useState(false);
 
   const getStatus = (): ConnectionStatus => {
@@ -103,7 +126,7 @@ export const ConnectionStatus: React.FC<ConnectionStatusProps> = ({
   };
 
   const status = getStatus();
-  const config = STATUS_CONFIG[status];
+  const config = statusConfig[status];
 
   return (
     <div

@@ -112,13 +112,13 @@ const WordChip = memo<WordChipProps>(({ wordObj, playerCount }) => {
           +{comboBonus}
         </span>
       )}
-      {/* Show fire round multiplier indicator */}
-      {wordObj.fireRoundMultiplier && wordObj.fireRoundMultiplier > 1 && !isDuplicate && isValid && (
+      {/* Show fire round bonus indicator */}
+      {(wordObj.fireRoundBonus ?? 0) > 0 && !isDuplicate && isValid && (
         <TooltipProvider delayDuration={0}>
           <Tooltip>
             <TooltipTrigger asChild>
-              <span className="text-xs px-1.5 py-0.5 bg-neo-orange text-neo-black rounded border border-neo-black font-black cursor-help animate-pulse">
-                🔥 2×
+              <span className="text-xs px-1.5 py-0.5 bg-gradient-to-r from-orange-500 to-red-500 text-white rounded border border-neo-black font-black cursor-help">
+                🔥+{wordObj.fireRoundBonus}
               </span>
             </TooltipTrigger>
             <TooltipContent
@@ -127,11 +127,9 @@ const WordChip = memo<WordChipProps>(({ wordObj, playerCount }) => {
             >
               <p className="text-xs font-bold text-neo-black">
                 {t('results.fireRoundBonus') || 'Fire Round Bonus!'}
-                {wordObj.fireRoundBonus && (
-                  <span className="block text-neo-red mt-1 font-black">
-                    +{wordObj.fireRoundBonus} {t('results.points') || 'pts'}
-                  </span>
-                )}
+                <span className="block text-neo-red mt-1 font-black">
+                  2x {t('results.points') || 'points'} (+{wordObj.fireRoundBonus})
+                </span>
               </p>
             </TooltipContent>
           </Tooltip>
@@ -197,17 +195,15 @@ const WordChip = memo<WordChipProps>(({ wordObj, playerCount }) => {
             </TooltipTrigger>
             <TooltipContent
               side="top"
-              sideOffset={4}
-              align="center"
-                className="z-[200] bg-neo-red border-2 border-neo-black shadow-hard rounded-neo p-2 max-w-[200px] break-words hidden sm:block"
+              className="bg-neo-red text-neo-cream border-3 border-neo-black shadow-hard p-3 max-w-[200px]"
             >
               {isAiVerified && (
-                <p className="text-[10px] font-bold text-neo-yellow mb-1 flex items-center gap-1">
-                  <span className="px-1 py-0.5 bg-neo-purple rounded border border-neo-black">AI</span>
+                <p className="font-black text-xs uppercase flex items-center gap-1.5 mb-1.5 text-neo-yellow">
+                  <span className="px-1.5 py-0.5 bg-neo-purple rounded border border-neo-black text-neo-cream">AI</span>
                   {t('results.aiRejected') || 'Rejected by AI'}
                 </p>
               )}
-              <p className="text-xs font-bold text-neo-cream">{displayReason}</p>
+              <p className="text-sm font-bold">{displayReason}</p>
             </TooltipContent>
           </Tooltip>
         </TooltipProvider>

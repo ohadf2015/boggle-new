@@ -172,99 +172,103 @@ const HostPreGameView: React.FC<HostPreGameViewProps> = ({
   }, [setMinWordLength]);
 
   return (
-    <div className="flex flex-col gap-3 sm:gap-4 md:gap-6 w-full max-w-6xl">
-      {/* Row 1: Room Code + Language + Share */}
-      <Card className="bg-slate-800/95 text-neo-white p-3 sm:p-4 md:p-6 border-4 border-neo-black shadow-hard-lg">
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-          {/* Room Code and Language in same row */}
-          <div className="flex flex-col items-center sm:items-start gap-2">
-            <div className="flex items-center gap-3">
-              <div className="text-center sm:text-left">
-                <p className="text-sm text-neo-cyan font-bold uppercase">{t('hostView.roomCode')}:</p>
-                <h2 className="text-3xl sm:text-4xl font-black tracking-wide text-neo-yellow">
-                  {gameCode}
-                </h2>
-              </div>
-              <Badge className="text-base sm:text-lg px-3 py-1 bg-neo-cream text-neo-black border-3 border-neo-black shadow-hard-sm font-bold">
-                {roomLanguage === 'he' ? '🇮🇱 עברית' : roomLanguage === 'sv' ? '🇸🇪 Svenska' : roomLanguage === 'ja' ? '🇯🇵 日本語' : '🇺🇸 English'}
-              </Badge>
-              {tournamentData && (
-                <Badge className="text-sm px-3 py-1 bg-gradient-to-r from-amber-500 to-yellow-600 text-white border-0">
-                  <FaTrophy className="mr-1" />
-                  {t('hostView.tournamentMode')} - {t('hostView.tournamentRound')} {tournamentData.currentRound}/{tournamentData.totalRounds}
-                </Badge>
-              )}
+    <div className="flex flex-col gap-2 sm:gap-3 md:gap-4 w-full max-w-6xl">
+      {/* Row 1: Room Code + Language + Share - Ultra Compact Single Row */}
+      <Card className="bg-slate-800/95 text-neo-white px-2 py-1.5 sm:px-3 sm:py-2 border-2 border-neo-black shadow-hard">
+        <div className="flex items-center justify-between gap-2">
+          {/* Room Code and Language */}
+          <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1.5">
+              <span className="text-[10px] text-neo-cyan font-bold uppercase hidden sm:inline">{t('hostView.roomCode')}:</span>
+              <span className="text-lg sm:text-xl font-black tracking-wide text-neo-yellow">
+                {gameCode}
+              </span>
             </div>
+            <Badge className="text-xs px-1.5 py-0 bg-neo-cream text-neo-black border border-neo-black font-semibold">
+              {roomLanguage === 'he' ? '🇮🇱 עברית' : roomLanguage === 'sv' ? '🇸🇪 Svenska' : roomLanguage === 'ja' ? '🇯🇵 日本語' : '🇺🇸 English'}
+            </Badge>
+            {tournamentData && (
+              <Badge className="text-xs px-2 py-0 bg-gradient-to-r from-amber-500 to-yellow-600 text-white border-0">
+                <FaTrophy className="mr-1 text-[10px]" />
+                R{tournamentData.currentRound}/{tournamentData.totalRounds}
+              </Badge>
+            )}
           </div>
 
-          {/* Share Buttons */}
-          <div className="flex flex-wrap gap-2 justify-center">
+          {/* Share Buttons - compact row with tooltips on mobile */}
+          <div className="flex gap-1.5">
             <ShareButton
               variant="link"
               onClick={handleCopyLink}
-              icon={<FaLink />}
+              icon={<FaLink className="text-xs" />}
+              className="px-2 py-1 text-xs h-7"
+              tooltip={t('hostView.copyLink')}
             >
-              {t('hostView.copyLink')}
+              <span className="hidden md:inline">{t('hostView.copyLink')}</span>
             </ShareButton>
             <ShareButton
               variant="whatsapp"
               onClick={handleShareWhatsApp}
-              icon={<FaWhatsapp />}
+              icon={<FaWhatsapp className="text-xs" />}
+              className="px-2 py-1 text-xs h-7"
+              tooltip={t('hostView.shareWhatsapp')}
             >
-              {t('hostView.shareWhatsapp')}
+              <span className="hidden md:inline">{t('hostView.shareWhatsapp')}</span>
             </ShareButton>
             <ShareButton
               variant="qr"
               onClick={onShowQR}
-              icon={<FaQrcode />}
+              icon={<FaQrcode className="text-xs" />}
+              className="px-2 py-1 text-xs h-7"
+              tooltip={t('hostView.qrCode')}
             >
-              {t('hostView.qrCode')}
+              <span className="hidden md:inline">{t('hostView.qrCode')}</span>
             </ShareButton>
           </div>
         </div>
       </Card>
 
       {/* Row 2: Game Settings + Players List (side by side on desktop) */}
-      <div className="flex flex-col lg:flex-row lg:items-stretch gap-3 sm:gap-4 md:gap-6">
+      <div className="flex flex-col lg:flex-row lg:items-stretch gap-2 sm:gap-3 md:gap-4">
         {/* Game Settings - LEFT - Neo-Brutalist Dark */}
-        <Card className="flex-1 p-3 sm:p-4 md:p-5 bg-slate-800/95 text-neo-white border-4 border-neo-black shadow-hard-lg">
-          <h3 className="text-base font-black uppercase text-neo-cream mb-4 flex items-center gap-2">
-            <FaCog className="text-neo-cyan text-sm" />
+        <Card className="flex-1 p-2 sm:p-3 md:p-4 bg-slate-800/95 text-neo-white border-4 border-neo-black shadow-hard-lg">
+          <h3 className="text-sm font-black uppercase text-neo-cream mb-3 flex items-center gap-2">
+            <FaCog className="text-neo-cyan text-xs" />
             {t('hostView.gameSettings')}
           </h3>
-          <div className="w-full space-y-3 sm:space-y-4">
+          <div className="w-full space-y-2 sm:space-y-3">
             {/* Timer Input */}
-            <div className="space-y-2">
-              <label className="text-sm font-bold uppercase text-neo-cream flex items-center gap-2">
-                <FaClock className="text-neo-cyan text-sm" />
+            <div className="space-y-1.5">
+              <label className="text-xs font-bold uppercase text-neo-cream/90 flex items-center gap-1.5">
+                <FaClock className="text-neo-cyan text-xs" />
                 {t('hostView.roundDuration')}
               </label>
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-2">
                 {/* Minus Button */}
                 <button
                   type="button"
                   onClick={handleDecreaseTimer}
                   disabled={timerValue <= 1}
-                  className="w-10 h-10 flex items-center justify-center rounded-neo bg-neo-cream text-neo-black border-2 border-neo-black shadow-hard-sm hover:shadow-hard hover:translate-x-[-1px] hover:translate-y-[-1px] active:shadow-none active:translate-x-[1px] active:translate-y-[1px] transition-all duration-100 disabled:opacity-50 disabled:cursor-not-allowed font-black"
+                  className="w-9 h-9 flex items-center justify-center rounded-neo bg-neo-cream text-neo-black border-2 border-neo-black shadow-hard-sm hover:shadow-hard hover:translate-x-[-1px] hover:translate-y-[-1px] active:shadow-none active:translate-x-[1px] active:translate-y-[1px] transition-all duration-100 disabled:opacity-50 disabled:cursor-not-allowed font-black"
                 >
-                  <FaMinus size={14} />
+                  <FaMinus size={12} />
                 </button>
 
-                <div className="flex items-center gap-2">
-                  <div className="text-3xl font-black text-neo-yellow w-12 text-center overflow-hidden h-10 flex items-center justify-center">
+                <div className="flex items-center gap-1.5">
+                  <div className="text-2xl font-black text-neo-yellow w-10 text-center overflow-hidden h-9 flex items-center justify-center">
                     <AnimatePresence mode="popLayout">
                       <motion.span
                         key={timerValue}
-                        initial={{ y: timerDirection > 0 ? 20 : -20, opacity: 0 }}
+                        initial={{ y: timerDirection > 0 ? 16 : -16, opacity: 0 }}
                         animate={{ y: 0, opacity: 1 }}
-                        exit={{ y: timerDirection > 0 ? -20 : 20, opacity: 0 }}
+                        exit={{ y: timerDirection > 0 ? -16 : 16, opacity: 0 }}
                         transition={{ duration: 0.15, ease: 'easeOut' }}
                       >
                         {timerValue}
                       </motion.span>
                     </AnimatePresence>
                   </div>
-                  <span className="text-base text-neo-cream font-bold">{t('hostView.minutes')}</span>
+                  <span className="text-sm text-neo-cream font-bold">{t('hostView.minutes')}</span>
                 </div>
 
                 {/* Plus Button */}
@@ -272,9 +276,9 @@ const HostPreGameView: React.FC<HostPreGameViewProps> = ({
                   type="button"
                   onClick={handleIncreaseTimer}
                   disabled={timerValue >= 10}
-                  className="w-10 h-10 flex items-center justify-center rounded-neo bg-neo-cream text-neo-black border-2 border-neo-black shadow-hard-sm hover:shadow-hard hover:translate-x-[-1px] hover:translate-y-[-1px] active:shadow-none active:translate-x-[1px] active:translate-y-[1px] transition-all duration-100 disabled:opacity-50 disabled:cursor-not-allowed font-black"
+                  className="w-9 h-9 flex items-center justify-center rounded-neo bg-neo-cream text-neo-black border-2 border-neo-black shadow-hard-sm hover:shadow-hard hover:translate-x-[-1px] hover:translate-y-[-1px] active:shadow-none active:translate-x-[1px] active:translate-y-[1px] transition-all duration-100 disabled:opacity-50 disabled:cursor-not-allowed font-black"
                 >
-                  <FaPlus size={14} />
+                  <FaPlus size={12} />
                 </button>
               </div>
             </div>
@@ -301,12 +305,12 @@ const HostPreGameView: React.FC<HostPreGameViewProps> = ({
             <button
               type="button"
               onClick={handleToggleAdvancedSettings}
-              className="w-full flex items-center justify-between py-2 text-neo-cream/70 hover:text-neo-cream transition-colors duration-100"
+              className="w-full flex items-center justify-between py-1.5 text-neo-cream/70 hover:text-neo-cream transition-colors duration-100"
             >
-              <span className="text-sm font-bold uppercase">
+              <span className="text-xs font-bold uppercase">
                 {t('hostView.advancedSettings')}
               </span>
-              {showAdvancedSettings ? <FaChevronUp /> : <FaChevronDown />}
+              {showAdvancedSettings ? <FaChevronUp size={12} /> : <FaChevronDown size={12} />}
             </button>
 
             {/* Collapsible Advanced Settings */}
@@ -316,8 +320,8 @@ const HostPreGameView: React.FC<HostPreGameViewProps> = ({
                   initial={{ height: 0, opacity: 0 }}
                   animate={{ height: 'auto', opacity: 1 }}
                   exit={{ height: 0, opacity: 0 }}
-                  transition={{ duration: 0.3 }}
-                  className="overflow-hidden space-y-4"
+                  transition={{ duration: 0.2 }}
+                  className="overflow-hidden space-y-3"
                 >
                   {/* Host Play Option */}
                   <div className="flex items-center gap-3">
@@ -342,11 +346,11 @@ const HostPreGameView: React.FC<HostPreGameViewProps> = ({
                   )}
 
                   {/* Difficulty Selection */}
-                  <div className="space-y-2">
-                    <label className="text-sm font-bold uppercase text-neo-cream">
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-bold uppercase text-neo-cream/90">
                       {t('hostView.difficulty')}
                     </label>
-                    <div className="flex flex-wrap gap-2">
+                    <div className="flex flex-wrap gap-1.5">
                       {(Object.keys(DIFFICULTIES) as DifficultyLevel[]).map((key) => {
                         const isSelected = difficulty === key;
                         const difficultyColors: Record<string, string> = {
@@ -360,21 +364,18 @@ const HostPreGameView: React.FC<HostPreGameViewProps> = ({
                           <motion.button
                             key={key}
                             onClick={() => handleSetDifficulty(key)}
-                            whileHover={{ x: -1, y: -1 }}
-                            whileTap={{ x: 2, y: 2 }}
+                            whileTap={{ scale: 0.95 }}
                             className={cn(
-                              "px-3 py-2 rounded-neo font-bold transition-all duration-100 border-3 border-neo-black",
+                              "px-2 py-1.5 rounded-neo font-bold transition-all duration-100 border-2 border-neo-black text-xs",
                               isSelected
-                                ? `${difficultyColors[key] || 'bg-neo-cyan'} shadow-none translate-x-[2px] translate-y-[2px]`
+                                ? `${difficultyColors[key] || 'bg-neo-cyan'} shadow-none translate-x-[1px] translate-y-[1px]`
                                 : "bg-neo-cream text-neo-black shadow-hard-sm hover:shadow-hard"
                             )}
                           >
-                            <div className="flex flex-col items-center gap-0.5">
-                              <span className="font-black text-sm">{t(DIFFICULTIES[key].nameKey)}</span>
-                              <span className="text-xs font-bold opacity-80">
-                                ({DIFFICULTIES[key].rows}x{DIFFICULTIES[key].cols})
-                              </span>
-                            </div>
+                            <span className="font-black">{t(DIFFICULTIES[key].nameKey)}</span>
+                            <span className="text-[10px] font-bold opacity-70 ms-1">
+                              {DIFFICULTIES[key].rows}x{DIFFICULTIES[key].cols}
+                            </span>
                           </motion.button>
                         );
                       })}
@@ -382,27 +383,26 @@ const HostPreGameView: React.FC<HostPreGameViewProps> = ({
                   </div>
 
                   {/* Minimum Word Length Selection */}
-                  <div className="space-y-2">
-                    <label className="text-sm font-bold uppercase text-neo-cream">
-                      {t('hostView.minWordLength') || 'Minimum Word Length'}
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-bold uppercase text-neo-cream/90">
+                      {t('hostView.minWordLength') || 'Min Word Length'}
                     </label>
-                    <div className="flex gap-2">
+                    <div className="flex gap-1.5">
                       {MIN_WORD_LENGTH_OPTIONS.map((option) => {
                         const isSelected = minWordLength === option.value;
                         return (
                           <motion.button
                             key={option.value}
                             onClick={() => handleSetMinWordLength(option.value)}
-                            whileHover={{ x: -1, y: -1 }}
-                            whileTap={{ x: 2, y: 2 }}
+                            whileTap={{ scale: 0.95 }}
                             className={cn(
-                              "px-4 py-2 rounded-neo font-bold transition-all duration-100 border-3 border-neo-black",
+                              "px-3 py-1.5 rounded-neo font-bold transition-all duration-100 border-2 border-neo-black text-xs",
                               isSelected
-                                ? "bg-neo-cyan text-neo-black shadow-none translate-x-[2px] translate-y-[2px]"
+                                ? "bg-neo-cyan text-neo-black shadow-none translate-x-[1px] translate-y-[1px]"
                                 : "bg-neo-cream text-neo-black shadow-hard-sm hover:shadow-hard"
                             )}
                           >
-                            {t(option.labelKey) || `${option.value} letters`}
+                            {t(option.labelKey) || `${option.value}`}
                           </motion.button>
                         );
                       })}
@@ -413,11 +413,11 @@ const HostPreGameView: React.FC<HostPreGameViewProps> = ({
             </AnimatePresence>
 
             {/* Start Button */}
-            <div className="pt-2 flex justify-center">
+            <div className="pt-1 flex justify-center">
               <Button
                 onClick={onStartGame}
                 disabled={!timerValue || playersReady.length === 0 || tournamentCreating}
-                className="w-full max-w-xs h-11 text-base bg-neo-lime text-neo-black"
+                className="w-full max-w-xs h-10 text-sm bg-neo-lime text-neo-black font-black"
               >
                 {tournamentCreating ? t('hostView.creatingTournament') || 'Creating...' : t('hostView.startGame')}
               </Button>
@@ -426,12 +426,12 @@ const HostPreGameView: React.FC<HostPreGameViewProps> = ({
         </Card>
 
         {/* Players List - RIGHT */}
-        <Card className="lg:w-[350px] h-auto p-3 sm:p-4 md:p-6 flex flex-col bg-slate-800/95 text-neo-white border-4 border-neo-black shadow-hard-lg">
-          <h3 className="text-base font-bold uppercase text-neo-cream/80 mb-3 flex items-center gap-2 flex-shrink-0">
+        <Card className="lg:w-[320px] h-auto p-2 sm:p-3 md:p-4 flex flex-col bg-slate-800/95 text-neo-white border-4 border-neo-black shadow-hard-lg">
+          <h3 className="text-sm font-bold uppercase text-neo-cream/80 mb-2 flex items-center gap-2 flex-shrink-0">
             <FaUsers className="text-neo-pink/80" />
             {t('hostView.playersJoined')} ({playersReady.length})
           </h3>
-          <div className="flex flex-col gap-1.5 flex-1 overflow-y-auto">
+          <div className="flex flex-col gap-1 flex-1 overflow-y-auto">
             <AnimatePresence>
               {playersReady.map((player, index) => {
                 const playerUsername = typeof player === 'string' ? player : player.username;
@@ -452,7 +452,7 @@ const HostPreGameView: React.FC<HostPreGameViewProps> = ({
                   >
                     <div
                       className={cn(
-                        "flex items-center justify-between px-3 py-2 rounded-lg transition-colors",
+                        "flex items-center justify-between px-2.5 py-1.5 rounded-lg transition-colors",
                         "bg-white/5 hover:bg-white/10"
                       )}
                     >
@@ -503,7 +503,7 @@ const HostPreGameView: React.FC<HostPreGameViewProps> = ({
           username="Host"
           isHost={true}
           gameCode={gameCode}
-          className="h-full min-h-[400px]"
+          className="h-full min-h-[280px]"
         />
       </div>
     </div>

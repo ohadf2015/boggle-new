@@ -123,38 +123,31 @@ const GridComponent = memo<GridComponentProps>(({
     return hints;
   }, [selectedCells, grid]);
 
-  // Stable shake offsets for earthquake animation - only regenerate when earthquake starts
-  const [earthquakeKey, setEarthquakeKey] = useState(0);
-  const prevEarthquakeShaking = useRef(false);
+  // Stable shake offsets for earthquake animation
+  // Use ref to track previous state and store offsets persistently
+  const shakeOffsetsRef = useRef<Map<string, { x: number; y: number; rotate: number; scale: number }>>(new Map());
+  const prevEarthquakeShakingRef = useRef(false);
 
-  // Track when earthquake starts to regenerate offsets
-  useEffect(() => {
-    if (earthquakeShaking && !prevEarthquakeShaking.current) {
-      // Earthquake just started - generate new key to recalculate offsets
-      setEarthquakeKey(k => k + 1);
-    }
-    prevEarthquakeShaking.current = earthquakeShaking;
-  }, [earthquakeShaking]);
-
-  // Generate stable shake offsets for all cells
-  const shakeOffsets = useMemo(() => {
-    if (!earthquakeShaking) return null;
-    const offsets = new Map<string, { x: number; y: number; rotate: number; scale: number }>();
+  // Generate offsets synchronously during render when earthquake starts
+  // This ensures offsets are available immediately on the first render
+  if (earthquakeShaking && !prevEarthquakeShakingRef.current) {
+    // Earthquake just started - generate fresh random offsets
+    const newOffsets = new Map<string, { x: number; y: number; rotate: number; scale: number }>();
     const rows = grid.length;
     const cols = grid[0]?.length || 0;
     for (let i = 0; i < rows; i++) {
       for (let j = 0; j < cols; j++) {
-        offsets.set(`${i}-${j}`, {
-          x: (Math.random() - 0.5) * 100,
-          y: (Math.random() - 0.5) * 100,
-          rotate: (Math.random() - 0.5) * 180,
-          scale: 0.85 + Math.random() * 0.3,
+        newOffsets.set(`${i}-${j}`, {
+          x: (Math.random() - 0.5) * 200,
+          y: (Math.random() - 0.5) * 200,
+          rotate: (Math.random() - 0.5) * 360,
+          scale: 0.6 + Math.random() * 0.6,
         });
       }
     }
-    return offsets;
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [earthquakeShaking, earthquakeKey, grid.length, grid[0]?.length]);
+    shakeOffsetsRef.current = newOffsets;
+  }
+  prevEarthquakeShakingRef.current = earthquakeShaking;
 
   // Fire Round: Random glowing cells with rainbow cycling
   const [glowingCells, setGlowingCells] = useState<Set<string>>(new Set());
@@ -286,7 +279,7 @@ const GridComponent = memo<GridComponentProps>(({
   const comboColors = getComboColors(comboLevel);
 
   return (
-    <div className="relative w-full h-full flex items-center justify-center bg-slate-900">
+    <div className="relative w-full h-full flex items-center justify-center">
       {/* ARIA live region for screen reader announcements of word being formed */}
       <div
         className="sr-only"
@@ -376,9 +369,9 @@ const GridComponent = memo<GridComponentProps>(({
               const glowColorIndex = cellColorIndices.get(cellKey) ?? 0;
               const glowColor = RAINBOW_COLORS[glowColorIndex];
 
-              // Use stable shake offsets from memoized map
-              const shakeOffset = earthquakeShaking && shakeOffsets
-                ? shakeOffsets.get(cellKey) || { x: 0, y: 0, rotate: 0, scale: 1 }
+              // Use stable shake offsets from ref
+              const shakeOffset = earthquakeShaking
+                ? shakeOffsetsRef.current.get(cellKey) || { x: 0, y: 0, rotate: 0, scale: 1 }
                 : { x: 0, y: 0, rotate: 0, scale: 1 };
 
               return (
@@ -421,24 +414,10 @@ const GridComponent = memo<GridComponentProps>(({
                     mass: 0.5,
                   } : {
                     // Elastic snap-back after shake or normal animation
-                    duration: reduceMotion
-                      ? 0.08
-                      : (animateOnMount && !isSelected
-                        ? 0.4
-                        : (isSelected ? 0.15 : 0.12)),
-                    ease: "easeInOut",
-                    delay: reduceMotion ? 0 : (animateOnMount ? (i + j) * 0.03 : 0),
                     type: 'spring',
                     stiffness: 200,
                     damping: 15,
-                    // Use tween for rotate since spring only supports 2 keyframes
-                    rotate: {
-                      type: 'tween',
-                      duration: 0.3,
-                      ease: "easeInOut",
-                      repeat: Infinity,
-                      repeatType: "mirror",
-                    },
+                    delay: reduceMotion ? 0 : (animateOnMount ? (i + j) * 0.03 : 0),
                   }}
                   className={cn(
                     "aspect-square flex items-center justify-center font-black cursor-pointer relative overflow-hidden",

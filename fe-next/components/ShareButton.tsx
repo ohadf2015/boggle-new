@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { Button } from './ui/button';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './ui/tooltip';
 import { cn } from '../lib/utils';
 
 /**
@@ -29,6 +30,7 @@ interface ShareButtonProps {
   icon?: React.ReactNode;
   children: React.ReactNode;
   className?: string;
+  tooltip?: string;
 }
 
 const ShareButton: React.FC<ShareButtonProps> = ({
@@ -36,7 +38,8 @@ const ShareButton: React.FC<ShareButtonProps> = ({
   onClick,
   icon,
   children,
-  className
+  className,
+  tooltip
 }) => {
   const variantStyles: Record<ShareButtonVariant, VariantStyle> = {
     link: {
@@ -55,7 +58,7 @@ const ShareButton: React.FC<ShareButtonProps> = ({
 
   const selectedVariant = variantStyles[variant] || variantStyles.link;
 
-  return (
+  const button = (
     <Button
       variant="outline"
       size="sm"
@@ -67,10 +70,27 @@ const ShareButton: React.FC<ShareButtonProps> = ({
         className
       )}
     >
-      {icon && <span className="mr-2">{icon}</span>}
+      {icon && <span className="sm:mr-1.5">{icon}</span>}
       {children}
     </Button>
   );
+
+  if (tooltip) {
+    return (
+      <TooltipProvider>
+        <Tooltip delayDuration={300}>
+          <TooltipTrigger asChild>
+            {button}
+          </TooltipTrigger>
+          <TooltipContent side="bottom" className="md:hidden">
+            {tooltip}
+          </TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
+    );
+  }
+
+  return button;
 };
 
 export default ShareButton;

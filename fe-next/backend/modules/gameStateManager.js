@@ -585,6 +585,9 @@ function resetGameForNewRound(gameCode) {
   // Reset peer validation
   peerValidationManager.resetPeerValidation(game);
 
+  // Reset earthquake state for new round
+  game.earthquakeTriggered = false;
+
   game.letterGrid = null;
   game.lastActivity = Date.now();
   game.gameEndedAt = null; // Clear end timestamp for new game

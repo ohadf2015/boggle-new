@@ -35,7 +35,7 @@ export const FireRoundIndicator: React.FC<FireRoundIndicatorProps> = ({
     <AnimatePresence>
       {isActive && (
         <motion.div
-          className={`fixed z-40 ${positionClasses}`}
+          className={`fixed z-[60] ${positionClasses}`}
           initial={{ scale: 0, opacity: 0, y: -20 }}
           animate={{ scale: 1, opacity: 1, y: 0 }}
           exit={{ scale: 0, opacity: 0, y: -20 }}

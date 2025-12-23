@@ -729,11 +729,12 @@ class GameAIService {
     // Normalize
     const normalizedWord = word.toLowerCase().trim();
 
-    // Basic validation
-    if (!normalizedWord || normalizedWord.length < 3) {
+    // Basic validation - only reject empty words
+    // Let the AI validate even 2-letter words since game supports minWordLength=2
+    if (!normalizedWord) {
       return {
         isValid: false,
-        reason: 'Word must be at least 3 characters',
+        reason: 'Empty word',
         source: 'database',
       };
     }
@@ -948,9 +949,10 @@ class GameAIService {
     for (let i = 0; i < normalizedWords.length; i++) {
       const word = normalizedWords[i];
 
-      // Basic validation
-      if (!word || word.length < 3) {
-        results[i] = { isValid: false, reason: 'Word too short', source: 'database' };
+      // Basic validation - only reject empty words
+      // Let the AI validate even 2-letter words since game supports minWordLength=2
+      if (!word) {
+        results[i] = { isValid: false, reason: 'Empty word', source: 'database' };
         continue;
       }
 

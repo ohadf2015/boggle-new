@@ -1641,10 +1641,14 @@ body {
   border: 2px solid var(--neo-cyan);
   border-top-color: transparent;
   border-radius: 50%;
-  animation: spin 0.8s linear infinite;
+  animation: pending-spinner 0.8s linear infinite;
 }
 
-@keyframes spin {
+/* Use a unique name to avoid conflicting with Tailwind's animate-spin */
+@keyframes pending-spinner {
+  from {
+    transform: translateY(-50%) rotate(0deg);
+  }
   to {
     transform: translateY(-50%) rotate(360deg);
   }

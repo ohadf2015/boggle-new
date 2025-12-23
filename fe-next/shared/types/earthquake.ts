@@ -68,7 +68,7 @@ export interface UseEarthquakeFireRoundOptions {
   // Multiplayer-specific
   socket?: Socket | null;
   isHost?: boolean;
-  gameSessionId?: string;
+  gameSessionId?: string | number;
 
   // Optional config override
   config?: Partial<EarthquakeConfig>;
