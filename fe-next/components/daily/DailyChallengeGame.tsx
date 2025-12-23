@@ -5,6 +5,9 @@ import { motion } from 'framer-motion';
 import { FaTimes } from 'react-icons/fa';
 import GridComponent from '@/components/GridComponent';
 import CircularTimer from '@/components/CircularTimer';
+import WordFormingArea from '@/components/game/WordFormingArea';
+import GameNotificationArea, { type GameNotification } from '@/components/game/GameNotificationArea';
+import { HelpPanel, HelpButton } from '@/components/game/HelpPanel';
 import { Button } from '@/components/ui/button';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
@@ -67,6 +70,16 @@ const DailyChallengeGame: React.FC<DailyChallengeGameProps> = ({
   const [remainingTime, setRemainingTime] = useState(duration);
   const [comboLevel, setComboLevel] = useState(0);
   const [isGameOver, setIsGameOver] = useState(false);
+
+  // Word forming state (for external WordFormingArea)
+  const [formedWord, setFormedWord] = useState('');
+  const [letterCount, setLetterCount] = useState(0);
+
+  // Notification state (for GameNotificationArea)
+  const [currentNotification, setCurrentNotification] = useState<GameNotification | null>(null);
+
+  // Help panel state
+  const [isHelpOpen, setIsHelpOpen] = useState(false);
 
   // Refs
   const timerRef = useRef<NodeJS.Timeout | null>(null);
@@ -255,7 +268,14 @@ const DailyChallengeGame: React.FC<DailyChallengeGameProps> = ({
 
     // Check if already found
     if (foundWordsSetRef.current.has(lowerWord)) {
-      wordErrorToast(t('game.wordAlreadyFound') || 'Already found!');
+      const msg = t('game.wordAlreadyFound') || 'Already found!';
+      setCurrentNotification({
+        id: `reject-${now}`,
+        type: 'rejected',
+        word: normalizedWord,
+        message: msg,
+        timestamp: now,
+      });
       // Reset combo on duplicate
       if (comboTimeoutRef.current) clearTimeout(comboTimeoutRef.current);
       setComboLevel(0);
@@ -266,13 +286,27 @@ const DailyChallengeGame: React.FC<DailyChallengeGameProps> = ({
 
     // Check minimum length
     if (normalizedWord.length < 2) {
-      wordErrorToast(t('game.wordTooShort') || 'Too short!');
+      const msg = t('game.wordTooShort') || 'Too short!';
+      setCurrentNotification({
+        id: `reject-${now}`,
+        type: 'rejected',
+        word: normalizedWord,
+        message: msg,
+        timestamp: now,
+      });
       return;
     }
 
     // Check if word is on board
     if (!isWordOnBoard(normalizedWord, grid, language)) {
-      wordErrorToast(t('game.wordNotOnBoard') || 'Not on board!');
+      const msg = t('game.wordNotOnBoard') || 'Not on board!';
+      setCurrentNotification({
+        id: `reject-${now}`,
+        type: 'rejected',
+        word: normalizedWord,
+        message: msg,
+        timestamp: now,
+      });
       // Reset combo on invalid word
       if (comboTimeoutRef.current) clearTimeout(comboTimeoutRef.current);
       setComboLevel(0);
@@ -288,7 +322,13 @@ const DailyChallengeGame: React.FC<DailyChallengeGameProps> = ({
     if (!validation.isValid) {
       const errorKey = validation.errorKey ?? 'Invalid word';
       const msg = t(errorKey) || errorKey;
-      wordErrorToast(msg);
+      setCurrentNotification({
+        id: `reject-${now}`,
+        type: 'rejected',
+        word: normalizedWord,
+        message: msg,
+        timestamp: now,
+      });
       // Reset combo on invalid word
       if (comboTimeoutRef.current) clearTimeout(comboTimeoutRef.current);
       setComboLevel(0);
@@ -361,7 +401,15 @@ const DailyChallengeGame: React.FC<DailyChallengeGameProps> = ({
           playWordAcceptedSound?.();
         }
 
-        wordAcceptedToast(normalizedWord, { score: fullScore, comboLevel: newCombo > 1 ? newCombo : undefined });
+        // Show accepted notification
+        setCurrentNotification({
+          id: `accept-${now}`,
+          type: 'accepted',
+          word: normalizedWord.toUpperCase(),
+          score: fullScore,
+          comboLevel: newCombo > 1 ? newCombo : undefined,
+          timestamp: now,
+        });
       } else {
         // Word NOT in dictionary - stays pending for AI validation at game end
         // BREAK combo (like singleplayer)
@@ -370,8 +418,13 @@ const DailyChallengeGame: React.FC<DailyChallengeGameProps> = ({
         comboLevelRef.current = 0;
         lastWordTimeRef.current = null;
 
-        // Show pending toast
-        wordNeedsValidationToast(normalizedWord);
+        // Show pending notification
+        setCurrentNotification({
+          id: `pending-${now}`,
+          type: 'pending',
+          word: normalizedWord.toUpperCase(),
+          timestamp: now,
+        });
       }
     } catch {
       // On API error, treat as pending - also breaks combo
@@ -379,7 +432,12 @@ const DailyChallengeGame: React.FC<DailyChallengeGameProps> = ({
       setComboLevel(0);
       comboLevelRef.current = 0;
       lastWordTimeRef.current = null;
-      wordNeedsValidationToast(normalizedWord);
+      setCurrentNotification({
+        id: `pending-${Date.now()}`,
+        type: 'pending',
+        word: normalizedWord.toUpperCase(),
+        timestamp: Date.now(),
+      });
     }
   }, [isGameOver, language, grid, t, calculateWordScore, resetComboTimeout, playWordAcceptedSound, playComboSound]);
 
@@ -398,6 +456,12 @@ const DailyChallengeGame: React.FC<DailyChallengeGameProps> = ({
       onComplete(result);
     }
   }, [duration, remainingTime, onComplete, t]);
+
+  // Handle word forming changes from GridComponent
+  const handleWordChange = useCallback((word: string, count: number) => {
+    setFormedWord(word);
+    setLetterCount(count);
+  }, []);
 
   return (
     <motion.div
@@ -457,6 +521,22 @@ const DailyChallengeGame: React.FC<DailyChallengeGameProps> = ({
         </span>
       </div>
 
+      {/* Word Forming Area - Permanent space above grid */}
+      <WordFormingArea
+        word={formedWord}
+        letterCount={letterCount}
+        compact={isLandscape}
+        className="mb-1"
+      />
+
+      {/* Notification Area - Shows word validation feedback and combo */}
+      <GameNotificationArea
+        notification={currentNotification}
+        comboLevel={comboLevel}
+        compact={isLandscape}
+        className="mb-2"
+      />
+
       {/* Game Grid */}
       <div className={cn(
         "flex-1 flex items-center justify-center",
@@ -466,6 +546,9 @@ const DailyChallengeGame: React.FC<DailyChallengeGameProps> = ({
           grid={grid}
           interactive={true}
           onWordSubmit={handleWordSubmit}
+          onWordChange={handleWordChange}
+          hideWordPreview
+          hideComboIndicator
           comboLevel={comboLevel}
         />
       </div>
@@ -481,6 +564,18 @@ const DailyChallengeGame: React.FC<DailyChallengeGameProps> = ({
           )}
         </span>
       </div>
+
+      {/* Help Button - Fixed position */}
+      <HelpButton
+        onClick={() => setIsHelpOpen(true)}
+        className={isLandscape
+          ? "fixed top-4 right-4 z-30"
+          : "fixed bottom-24 right-4 z-40 safe-area-bottom"
+        }
+      />
+
+      {/* Help Panel */}
+      <HelpPanel isOpen={isHelpOpen} onClose={() => setIsHelpOpen(false)} />
     </motion.div>
   );
 };
