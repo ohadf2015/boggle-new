@@ -10,8 +10,6 @@ import { Socket } from 'socket.io-client';
 import gsap from 'gsap';
 import toast from 'react-hot-toast';
 import {
-  wordAcceptedToast,
-  wordNeedsValidationToast,
   wordAIValidatingToast,
   wordErrorToast,
   neoSuccessToast,
@@ -167,18 +165,12 @@ export function usePlayerWordEvents({
         resetCombo();
       }
 
-      wordAcceptedToast(data.word, {
-        score: data.score || (data.word.length - 1),
-        comboBonus: data.comboBonus || 0,
-        comboLevel: data.comboLevel || 0,
-        comboBonusLabel: t('common.comboBonus'),
-        fireRoundActive,
-        duration: 2000
-      });
+      // Note: WordFormingArea now handles word accepted feedback visually
+      // Toast removed to avoid duplicate notifications
     };
 
     const handleWordNeedsValidation = (data: any) => {
-      wordNeedsValidationToast(data.word, { pendingLabel: t('common.pending'), duration: 3000 });
+      // Note: WordFormingArea now handles pending feedback visually
       resetCombo();
     };
 
@@ -191,7 +183,7 @@ export function usePlayerWordEvents({
     };
 
     const handleWordAlreadyFound = (data: any) => {
-      wordErrorToast(t('playerView.wordAlreadyFound'), { duration: 2000 });
+      // Note: WordFormingArea now handles duplicate feedback visually
       if (data?.word) {
         setFoundWords(prev => prev.filter(fw => {
           if (fw.word.toLowerCase() === data.word.toLowerCase() && !fw.validated) {
@@ -204,7 +196,7 @@ export function usePlayerWordEvents({
     };
 
     const handleWordNotOnBoard = (data: any) => {
-      wordErrorToast(t('playerView.wordNotOnBoard'), { duration: 3000 });
+      // Note: WordFormingArea now handles rejected feedback visually
       setFoundWords(prev => prev.map(fw =>
         fw.word.toLowerCase() === data.word.toLowerCase()
           ? { ...fw, validated: false }
@@ -214,10 +206,7 @@ export function usePlayerWordEvents({
     };
 
     const handleWordTooShort = (data: any) => {
-      const msg = t('playerView.wordTooShortMin')
-        ? t('playerView.wordTooShortMin').replace('${min}', data.minLength)
-        : `Word too short! (min ${data.minLength} letters)`;
-      wordErrorToast(msg, { duration: 2000 });
+      // Note: WordFormingArea now handles rejected feedback visually
       setFoundWords(prev => prev.filter(fw =>
         fw.word.toLowerCase() !== data.word.toLowerCase()
       ));
@@ -226,7 +215,7 @@ export function usePlayerWordEvents({
 
     const handleWordRejected = (data: any) => {
       toast.dismiss(`ai-validating-${data.word.toLowerCase()}`);
-      wordErrorToast(t('playerView.wordRejected') || 'Word rejected', { duration: 2000 });
+      // Note: WordFormingArea now handles rejected feedback visually
       setFoundWords(prev => prev.filter(fw =>
         fw.word.toLowerCase() !== data.word.toLowerCase()
       ));

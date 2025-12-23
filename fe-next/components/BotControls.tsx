@@ -20,14 +20,14 @@ const BOT_DIFFICULTIES: BotDifficultyOption[] = [
   {
     value: 'easy',
     labelKey: 'bots.easy',
-    color: 'bg-neo-lime',
+    color: 'bg-neo-lime text-neo-black',
     descKey: 'bots.easyDesc',
     defaultDesc: '3-5 letter words, slower pace'
   },
   {
     value: 'medium',
     labelKey: 'bots.medium',
-    color: 'bg-neo-yellow',
+    color: 'bg-amber-400 text-neo-black',
     descKey: 'bots.mediumDesc',
     defaultDesc: 'Balanced mix of words'
   },
@@ -239,7 +239,7 @@ const BotControls: React.FC<BotControlsProps> = ({
                     "text-[8px] px-1 py-0 shrink-0",
                     bot.botDifficulty === 'easy' ? 'bg-neo-lime text-neo-black' :
                     bot.botDifficulty === 'hard' ? 'bg-neo-red text-white' :
-                    'bg-neo-yellow text-neo-black'
+                    'bg-amber-400 text-neo-black'
                   )}>
                     {(t(`bots.${bot.botDifficulty || 'medium'}`) || bot.botDifficulty || 'M').charAt(0)}
                   </Badge>

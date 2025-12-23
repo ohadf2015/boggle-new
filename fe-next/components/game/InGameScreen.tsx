@@ -686,10 +686,26 @@ const InGameScreen = memo<InGameScreenProps>(({
 
       {/* Center Column: Timer, Score, Grid */}
       <div className="flex-1 flex flex-col min-w-0 min-h-0">
-        {/* Stats row - Score, Combo (conditional), Timer - clean layout with better hierarchy */}
+        {/* Stats row - Combo | Timer | Score - timer always centered and visible */}
         {remainingTime !== null && (
-          <div className="flex items-center justify-center gap-4 md:gap-6 mb-2" role="status" aria-label="Game status">
-            {/* Score (left position - primary feedback) - vibrant yellow/lime gradient */}
+          <div className="flex items-center justify-center gap-3 md:gap-4 mb-2" role="status" aria-label="Game status">
+            {/* Combo (left - shows when level >= 2, placeholder otherwise for layout balance) */}
+            {isPlaying && (
+              <div className="min-w-[70px] md:min-w-[90px] flex justify-end">
+                <ComboDisplay comboLevel={comboLevel} compact />
+              </div>
+            )}
+
+            {/* Timer (center - always visible and prominent) */}
+            <motion.div
+              initial={{ scale: 0, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              className="relative z-20"
+            >
+              <CircularTimer remainingTime={remainingTime} totalTime={timerValue * 60} size="md" />
+            </motion.div>
+
+            {/* Score (right position) - vibrant yellow/lime gradient */}
             {isPlaying && (
               <motion.div
                 initial={{ scale: 0, opacity: 0 }}
@@ -721,18 +737,6 @@ const InGameScreen = memo<InGameScreenProps>(({
                 )}
               </motion.div>
             )}
-
-            {/* Combo (center - only shows when level >= 2) */}
-            {isPlaying && <ComboDisplay comboLevel={comboLevel} compact />}
-
-            {/* Timer (right position - constant awareness) */}
-            <motion.div
-              initial={{ scale: 0, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              className="relative z-10"
-            >
-              <CircularTimer remainingTime={remainingTime} totalTime={timerValue * 60} size="sm" />
-            </motion.div>
           </div>
         )}
 

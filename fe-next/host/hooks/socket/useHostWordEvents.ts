@@ -4,7 +4,7 @@
  */
 import { useEffect, useCallback, MutableRefObject } from 'react';
 import { Socket } from 'socket.io-client';
-import { wordAcceptedToast, wordNeedsValidationToast, wordErrorToast } from '../../../components/NeoToast';
+// Note: Word feedback toasts removed - WordFormingArea now handles visual feedback
 import { calculateComboChainWindow, calculateComboTimeout, resetComboState } from '@/shared/utils/comboUtils';
 import type { WordAcceptedPayload } from '@/shared/types/socket';
 
@@ -94,23 +94,17 @@ export function useHostWordEvents({
       resetCombo();
     }
 
-    // Show toast with score from server
-    wordAcceptedToast(data.word, {
-      score: data.score || (data.word.length - 1),
-      comboBonus: data.comboBonus || 0,
-      comboLevel: data.comboLevel || 0,
-      comboBonusLabel: t('common.comboBonus'),
-      fireRoundActive,
-      duration: 2000
-    });
-  }, [hostPlaying, playComboSound, setComboLevel, setLastWordTime, comboLevelRef, lastWordTimeRef, comboTimeoutRef, t, resetCombo]);
+    // Note: WordFormingArea now handles accepted feedback visually
+  }, [hostPlaying, playComboSound, setComboLevel, setLastWordTime, comboLevelRef, lastWordTimeRef, comboTimeoutRef, resetCombo]);
 
   useEffect(() => {
     if (!socket) return;
 
+    // Note: WordFormingArea now handles all word feedback visually
+    // These handlers only update state, no toasts
+
     const handleWordAlreadyFound = (data: any) => {
       if (hostPlaying) {
-        wordErrorToast(t('playerView.wordAlreadyFound'), { duration: 2000 });
         if (data?.word) {
           const wordLower = data.word.toLowerCase();
           setHostFoundWords(prev => {
@@ -133,7 +127,6 @@ export function useHostWordEvents({
 
     const handleWordNotOnBoard = (data: any) => {
       if (hostPlaying) {
-        wordErrorToast(t('playerView.wordNotOnBoard'), { duration: 3000 });
         if (data?.word) {
           const wordLower = data.word.toLowerCase();
           setHostFoundWords(prev => prev.filter(w => w.toLowerCase() !== wordLower));
@@ -144,10 +137,6 @@ export function useHostWordEvents({
 
     const handleWordRejected = (data: any) => {
       if (hostPlaying) {
-        const reason = data.reason === 'notInDictionary'
-          ? (t('playerView.notInDictionary') || 'Not in dictionary')
-          : (t('playerView.wordRejected') || 'Word rejected');
-        wordErrorToast(`${data.word}: ${reason}`, { duration: 3000 });
         if (data?.word) {
           const wordLower = data.word.toLowerCase();
           setHostFoundWords(prev => prev.filter(w => w.toLowerCase() !== wordLower));
@@ -156,19 +145,14 @@ export function useHostWordEvents({
       }
     };
 
-    const handleWordNeedsValidation = (data: any) => {
+    const handleWordNeedsValidation = () => {
       if (hostPlaying) {
-        wordNeedsValidationToast(data.word, { pendingLabel: t('common.pending'), duration: 3000 });
         resetCombo();
       }
     };
 
     const handleWordTooShort = (data: any) => {
       if (hostPlaying) {
-        const msg = t('playerView.wordTooShortMin')
-          ? t('playerView.wordTooShortMin').replace('${min}', data.minLength)
-          : `Word too short! (min ${data.minLength} letters)`;
-        wordErrorToast(msg, { duration: 2000 });
         if (data?.word) {
           const wordLower = data.word.toLowerCase();
           setHostFoundWords(prev => prev.filter(w => w.toLowerCase() !== wordLower));

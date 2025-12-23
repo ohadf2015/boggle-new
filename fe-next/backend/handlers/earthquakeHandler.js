@@ -85,13 +85,16 @@ function registerEarthquakeHandlers(io, socket) {
       return;
     }
 
-    // Verify earthquake hasn't already been triggered
+    // Atomically check and set earthquake flag to prevent race conditions
+    // Two hosts might emit triggerEarthquake at the same time
     if (game.earthquakeTriggered) {
-      logger.warn('EARTHQUAKE', `Earthquake already triggered for game ${gameCode}`);
+      logger.warn('EARTHQUAKE', `Earthquake already triggered for game ${gameCode}, ignoring duplicate`);
       return;
     }
 
-    // Mark earthquake as triggered in game state
+    // Mark as triggered IMMEDIATELY before any async work
+    // This prevents race conditions where two events check the flag simultaneously
+    game.earthquakeTriggered = true;
     updateGame(gameCode, { earthquakeTriggered: true });
 
     logger.info('EARTHQUAKE', `Host triggered earthquake for game ${gameCode} (triggerTime: ${triggerTime}s remaining)`);
