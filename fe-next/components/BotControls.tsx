@@ -198,7 +198,7 @@ const BotControls: React.FC<BotControlsProps> = ({
             disabled={isAdding || disabled}
             whileTap={{ scale: 0.95 }}
             className={cn(
-              "flex items-center gap-1 px-2 py-1 rounded-neo text-[11px] font-bold ml-1",
+              "flex items-center gap-1 px-2 py-1 rounded-neo text-[11px] font-bold",
               "bg-neo-cyan text-neo-black border-2 border-neo-black shadow-hard-sm",
               "hover:shadow-hard hover:translate-x-[-1px] hover:translate-y-[-1px]",
               "active:shadow-none active:translate-x-[1px] active:translate-y-[1px]",

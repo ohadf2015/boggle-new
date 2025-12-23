@@ -248,7 +248,7 @@ export const GameSettingsPanel = memo<GameSettingsPanelProps>(({
                           )}
                         >
                           <span className="font-black">{t(DIFFICULTIES[key].nameKey)}</span>
-                          <span className="text-[10px] font-bold opacity-70 ml-1">
+                          <span className="text-[10px] font-bold opacity-70 ms-1">
                             {DIFFICULTIES[key].rows}x{DIFFICULTIES[key].cols}
                           </span>
                         </motion.button>
