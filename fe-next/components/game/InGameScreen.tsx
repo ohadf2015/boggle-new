@@ -479,7 +479,7 @@ const InGameScreen = memo<InGameScreenProps>(({
       {isPlaying && (
         <div className="hidden lg:flex lg:flex-col lg:w-64 xl:w-80 gap-2 min-h-0">
           <div
-            className="bg-neo-cream border-4 border-neo-black rounded-neo-lg shadow-hard-lg flex flex-col min-h-0 max-h-[60vh] overflow-hidden"
+            className="bg-neo-cream border-4 border-neo-black rounded-neo-lg shadow-hard-lg flex flex-col min-h-0 max-h-[65vh] lg:max-h-[70vh] overflow-hidden"
             style={{ transform: 'rotate(1deg)' }}
           >
             {/* Header */}
@@ -489,7 +489,7 @@ const InGameScreen = memo<InGameScreenProps>(({
               </h3>
             </div>
             {/* Content */}
-            <div className="flex-1 overflow-y-auto p-3 min-h-0">
+            <div className="flex-1 overflow-y-auto p-3 min-h-0 custom-scrollbar">
               <div className="space-y-2">
                 <AnimatePresence>
                   {normalizedFoundWords.map((foundWordObj, index) => {
@@ -673,7 +673,7 @@ const InGameScreen = memo<InGameScreenProps>(({
       {/* Right Column: Live Leaderboard */}
       <div className="lg:w-64 xl:w-80 flex flex-col gap-2">
         <div
-          className="bg-neo-cream border-4 border-neo-black rounded-neo-lg shadow-hard-lg flex flex-col overflow-hidden max-h-[40vh] lg:max-h-none lg:flex-grow"
+          className="bg-neo-cream border-4 border-neo-black rounded-neo-lg shadow-hard-lg flex flex-col overflow-hidden max-h-[45vh] lg:max-h-none lg:flex-grow"
           style={{ transform: 'rotate(-1deg)' }}
         >
           {/* Header */}
@@ -684,7 +684,7 @@ const InGameScreen = memo<InGameScreenProps>(({
             </h3>
           </div>
           {/* Content */}
-          <div className="overflow-y-auto flex-1 p-3">
+          <div className="overflow-y-auto flex-1 p-3 custom-scrollbar">
             <div className="space-y-2">
               {memoizedLeaderboard.map((player, index) => (
                 <motion.div

@@ -1209,7 +1209,7 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
       {/* Help Button - fixed position */}
       <HelpButton
         onClick={() => setIsHelpOpen(true)}
-        className="fixed bottom-20 right-4 z-40"
+        className="fixed bottom-24 right-4 z-40 safe-area-bottom"
       />
 
       {/* Help Panel - bottom sheet */}

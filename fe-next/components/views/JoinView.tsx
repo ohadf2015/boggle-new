@@ -337,7 +337,7 @@ const JoinView: React.FC<JoinViewProps> = ({
               </div>
             )}
 
-            <Button type="submit" disabled={isJoining} className="w-full h-10 font-bold uppercase bg-neo-yellow hover:bg-neo-yellow/90 text-neo-black border-2 border-neo-black">
+            <Button type="submit" disabled={isJoining} className="w-full h-11 min-h-[44px] font-bold uppercase bg-neo-yellow hover:bg-neo-yellow/90 text-neo-black border-2 border-neo-black">
               {mode === 'host' ? <FaCrown className="mr-2" /> : <FaUser className="mr-2" />}
               {isJoining ? (t('common.loading') || 'Loading...') : mode === 'host' ? (t('joinView.createRoom') || 'Create') : (t('joinView.joinRoom') || 'Join')}
             </Button>
@@ -520,7 +520,7 @@ const JoinView: React.FC<JoinViewProps> = ({
         initial={{ opacity: 0, scale: 0 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ delay: 0.5, type: 'spring' }}
-        className="fixed bottom-6 left-6 z-50"
+        className="fixed bottom-6 left-6 z-50 safe-area-bottom"
       >
         <TooltipProvider>
           <Tooltip>

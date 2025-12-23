@@ -90,10 +90,10 @@ const QuickJoinView: React.FC<QuickJoinViewProps> = React.memo(({
                   <Input
                     value={username || displayName}
                     onChange={(e) => setUsername(sanitizeInput(e.target.value, 20))}
-                    className="h-10 text-sm font-bold text-center bg-neo-navy border-2 border-neo-cyan/50 text-neo-cyan"
+                    className="h-11 min-h-[44px] text-sm font-bold text-center bg-neo-navy border-2 border-neo-cyan/50 text-neo-cyan"
                   />
                 </div>
-                <Button onClick={handleJoinGuest} disabled={isJoining} className="h-10 px-6 bg-neo-lime text-neo-black font-bold border-2 border-neo-black">
+                <Button onClick={handleJoinGuest} disabled={isJoining} className="h-11 min-h-[44px] px-6 bg-neo-lime text-neo-black font-bold border-2 border-neo-black">
                   <FaGamepad className="mr-2" />
                   {isJoining ? t('joinView.joining') : t('joinView.joinGame')}
                 </Button>
@@ -108,11 +108,11 @@ const QuickJoinView: React.FC<QuickJoinViewProps> = React.memo(({
                     onChange={handleUsernameChange}
                     required
                     autoFocus
-                    className={cn("h-10 text-sm bg-neo-cream text-neo-black font-bold border-2 border-neo-black", usernameError && "border-neo-pink")}
+                    className={cn("h-11 min-h-[44px] text-sm bg-neo-cream text-neo-black font-bold border-2 border-neo-black", usernameError && "border-neo-pink")}
                     placeholder={t('joinView.playerNamePlaceholder')}
                   />
                 </div>
-                <Button type="submit" disabled={!username || isJoining} className="h-10 px-6 bg-neo-lime text-neo-black font-bold border-2 border-neo-black">
+                <Button type="submit" disabled={!username || isJoining} className="h-11 min-h-[44px] px-6 bg-neo-lime text-neo-black font-bold border-2 border-neo-black">
                   <FaGamepad className="mr-2" />
                   {isJoining ? t('joinView.joining') : t('joinView.joinGame')}
                 </Button>

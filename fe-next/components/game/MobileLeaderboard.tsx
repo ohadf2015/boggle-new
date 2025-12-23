@@ -63,7 +63,7 @@ const MobileLeaderboard = memo<MobileLeaderboardProps>(({
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         className={cn(
-          'lg:hidden fixed bottom-20 z-30',
+          'lg:hidden fixed bottom-24 z-30 safe-area-bottom',
           dir === 'rtl' ? 'left-3' : 'right-3'
         )}
       >
@@ -103,7 +103,7 @@ const MobileLeaderboard = memo<MobileLeaderboardProps>(({
                 <span className="font-black w-5 text-center text-[10px]">
                   {getRankIconString(index)}
                 </span>
-                <span className="flex-1 font-bold truncate max-w-[60px] text-[11px]">
+                <span className="flex-1 font-bold truncate max-w-[80px] text-[11px]">
                   {player.username === currentUsername ? (t('playerView.me') || 'You') : player.username}
                 </span>
                 <span className="font-black text-[11px]">{player.score}</span>
@@ -119,7 +119,7 @@ const MobileLeaderboard = memo<MobileLeaderboardProps>(({
                 <span className="font-black w-5 text-center text-[10px]">
                   #{playerData.rank}
                 </span>
-                <span className="flex-1 font-bold truncate max-w-[60px] text-[11px] text-neo-black">
+                <span className="flex-1 font-bold truncate max-w-[80px] text-[11px] text-neo-black">
                   {t('playerView.me') || 'You'}
                 </span>
                 <span className="font-black text-[11px] text-neo-black">{playerData.score}</span>

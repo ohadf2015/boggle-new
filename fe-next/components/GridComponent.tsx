@@ -257,7 +257,7 @@ const GridComponent = memo<GridComponentProps>(({
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -10, scale: 0.95 }}
             transition={{ type: 'spring', stiffness: 400, damping: 25 }}
-            className="fixed top-20 left-1/2 -translate-x-1/2 z-[90] pointer-events-none"
+            className="fixed top-24 left-1/2 -translate-x-1/2 z-[90] pointer-events-none"
             aria-hidden="true"
           >
             <div className="bg-neo-cyan border-3 border-neo-black rounded-neo px-4 py-2 shadow-hard flex items-center gap-2 whitespace-nowrap">

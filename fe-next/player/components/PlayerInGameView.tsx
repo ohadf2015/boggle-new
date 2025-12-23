@@ -185,8 +185,8 @@ const PlayerInGameView = memo<PlayerInGameViewProps>(({
     <div className="min-h-screen bg-gradient-to-b from-slate-50 via-slate-100 to-slate-200 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 p-0 md:p-4 flex flex-col transition-colors duration-300">
 
       {/* Top Bar - Desktop only */}
-      <div className="hidden lg:flex w-full max-w-7xl mx-auto items-center justify-between mb-1">
-        <ExitRoomButton onClick={onExitRoom} label={t('playerView.exit')} className="relative z-50" />
+      <div className="hidden lg:flex w-full max-w-7xl mx-auto items-center justify-between mb-1 pt-24">
+        <ExitRoomButton onClick={onExitRoom} label={t('playerView.exit')} className="relative z-[60]" />
 
         {/* Hint Button - Single Player Mode Only */}
         {hints && hints.isSinglePlayer && (

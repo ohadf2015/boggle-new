@@ -72,7 +72,7 @@ const ComboExplanationTooltip: React.FC<ComboExplanationTooltipProps> = ({
             stiffness: 300,
             damping: 25
           }}
-          className="fixed bottom-20 left-1/2 z-50 pointer-events-auto"
+          className="fixed bottom-24 left-1/2 z-50 pointer-events-auto safe-area-bottom"
           style={{ transform: 'translateX(-50%)' }}
         >
           <div

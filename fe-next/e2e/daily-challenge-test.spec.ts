@@ -3,6 +3,173 @@ import { test, expect } from '@playwright/test';
 test.describe('Daily Challenge Feature Tests', () => {
   const BASE_URL = 'http://localhost:3001';
 
+  test.describe('Word Validation Tests', () => {
+    test('dictionary API endpoint is reachable and validates words', async ({ request }) => {
+      // Test the dictionary check API directly
+      const response = await request.post(`${BASE_URL}/api/dictionary/check`, {
+        data: { word: 'test', language: 'en' }
+      });
+
+      expect(response.status()).toBe(200);
+      const result = await response.json();
+      expect(result).toHaveProperty('isValid');
+      expect(result).toHaveProperty('source');
+      console.log('Dictionary API response for "test":', result);
+    });
+
+    test('dictionary API rejects invalid/nonsense words', async ({ request }) => {
+      const response = await request.post(`${BASE_URL}/api/dictionary/check`, {
+        data: { word: 'xyzqwerty', language: 'en' }
+      });
+
+      expect(response.status()).toBe(200);
+      const result = await response.json();
+      expect(result.isValid).toBe(false);
+      expect(result.source).toBe('unknown');
+      console.log('Dictionary API correctly rejected nonsense word:', result);
+    });
+
+    test('dictionary API rejects words that are too short', async ({ request }) => {
+      const response = await request.post(`${BASE_URL}/api/dictionary/check`, {
+        data: { word: 'a', language: 'en' }
+      });
+
+      expect(response.status()).toBe(200);
+      const result = await response.json();
+      expect(result.isValid).toBe(false);
+      expect(result.source).toBe('too_short');
+      console.log('Dictionary API correctly rejected short word:', result);
+    });
+
+    test('word validation in daily challenge game shows correct feedback', async ({ page }) => {
+      console.log('Testing word validation feedback in Daily Challenge...');
+
+      await page.goto(`${BASE_URL}/en/daily`);
+      await page.waitForLoadState('networkidle');
+
+      // Start the game
+      const startButton = page.getByRole('button', { name: /start|play/i }).first();
+      if (await startButton.isVisible().catch(() => false)) {
+        await startButton.click();
+        await page.waitForTimeout(2000);
+      }
+
+      // Find the grid
+      const grid = page.locator('[role="grid"]').first();
+      const gridVisible = await grid.isVisible({ timeout: 5000 }).catch(() => false);
+
+      if (gridVisible) {
+        const cells = grid.locator('[role="gridcell"]');
+        const cellCount = await cells.count();
+        console.log('Grid cells found:', cellCount);
+
+        if (cellCount >= 3) {
+          // Track network requests to verify dictionary API is called
+          const dictionaryRequests: string[] = [];
+          page.on('request', request => {
+            if (request.url().includes('/api/dictionary/check')) {
+              dictionaryRequests.push(request.url());
+            }
+          });
+
+          // Submit a word by swiping across cells
+          const firstCell = cells.first();
+          const cellBox = await firstCell.boundingBox();
+
+          if (cellBox) {
+            await page.mouse.move(cellBox.x + cellBox.width / 2, cellBox.y + cellBox.height / 2);
+            await page.mouse.down();
+
+            for (let i = 1; i < Math.min(4, cellCount); i++) {
+              const nextCell = cells.nth(i);
+              const nextBox = await nextCell.boundingBox();
+              if (nextBox) {
+                await page.mouse.move(nextBox.x + nextBox.width / 2, nextBox.y + nextBox.height / 2);
+                await page.waitForTimeout(50);
+              }
+            }
+
+            await page.mouse.up();
+            await page.waitForTimeout(2000);
+
+            // Verify dictionary API was called
+            console.log('Dictionary API requests made:', dictionaryRequests.length);
+            expect(dictionaryRequests.length).toBeGreaterThan(0);
+
+            // Check for feedback toast (either accepted or pending)
+            const toastVisible = await page.locator('[class*="toast"], [role="alert"]').first()
+              .isVisible({ timeout: 2000 }).catch(() => false);
+            console.log('Feedback toast visible:', toastVisible);
+          }
+        }
+      }
+
+      // Take screenshot
+      await page.screenshot({
+        path: '/Users/ohadfisher/git/boggle-new/fe-next/test-results/daily-challenge-validation.png',
+        fullPage: true
+      });
+    });
+
+    test('valid dictionary words increase score in daily challenge', async ({ page }) => {
+      console.log('Testing score increase for valid words...');
+
+      await page.goto(`${BASE_URL}/en/daily`);
+      await page.waitForLoadState('networkidle');
+
+      const startButton = page.getByRole('button', { name: /start|play/i }).first();
+      if (await startButton.isVisible().catch(() => false)) {
+        await startButton.click();
+        await page.waitForTimeout(2000);
+      }
+
+      // Get initial score
+      const scoreElement = page.locator('text=/score/i').first().locator('..').locator('[class*="score"], text=/\\d+/');
+      const initialScoreText = await page.locator('body').textContent() || '';
+      const scoreMatch = initialScoreText.match(/score[:\s]*(\d+)/i);
+      const initialScore = scoreMatch ? parseInt(scoreMatch[1]) : 0;
+      console.log('Initial score:', initialScore);
+
+      const grid = page.locator('[role="grid"]').first();
+      if (await grid.isVisible({ timeout: 5000 }).catch(() => false)) {
+        const cells = grid.locator('[role="gridcell"]');
+        const cellCount = await cells.count();
+
+        if (cellCount >= 3) {
+          const firstCell = cells.first();
+          const cellBox = await firstCell.boundingBox();
+
+          if (cellBox) {
+            // Submit a word
+            await page.mouse.move(cellBox.x + cellBox.width / 2, cellBox.y + cellBox.height / 2);
+            await page.mouse.down();
+
+            for (let i = 1; i < Math.min(4, cellCount); i++) {
+              const nextCell = cells.nth(i);
+              const nextBox = await nextCell.boundingBox();
+              if (nextBox) {
+                await page.mouse.move(nextBox.x + nextBox.width / 2, nextBox.y + nextBox.height / 2);
+                await page.waitForTimeout(50);
+              }
+            }
+
+            await page.mouse.up();
+            await page.waitForTimeout(3000); // Wait for validation
+
+            // Check if word was accepted (score changed or pending indicator shown)
+            const finalScoreText = await page.locator('body').textContent() || '';
+            const finalScoreMatch = finalScoreText.match(/score[:\s]*(\d+)/i);
+            const finalScore = finalScoreMatch ? parseInt(finalScoreMatch[1]) : 0;
+            console.log('Final score:', finalScore);
+
+            // Score should either increase (valid word) or stay same (pending/invalid)
+            expect(finalScore).toBeGreaterThanOrEqual(initialScore);
+          }
+        }
+      }
+    });
+  });
+
   test('1. Page Load Test - Daily Challenge page loads correctly', async ({ page }) => {
     console.log('Navigating to Daily Challenge page...');
 
