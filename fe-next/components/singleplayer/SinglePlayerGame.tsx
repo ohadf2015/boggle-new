@@ -25,11 +25,13 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import { useGameMusic } from '@/hooks/useGameMusic';
 import { useEarthquakeFireRound } from '@/hooks/useEarthquakeFireRound';
+import { useComboSystem } from '@/hooks/useComboSystem';
+import { useGameTimer } from '@/hooks/useGameTimer';
 import { generateRandomTable, applyHebrewFinalLetters } from '@/utils/utils';
 import { DIFFICULTIES } from '@/utils/consts';
 import { cn } from '@/lib/utils';
 import { validateWordLocally, isWordOnBoard } from '@/utils/clientWordValidator';
-import { wordErrorToast, wordAcceptedToast, wordNeedsValidationToast } from '@/components/NeoToast';
+import { wordErrorToast } from '@/components/NeoToast';
 import { useAnnouncer } from '@/components/GameAnnouncer';
 import {
   calculateFinalAchievements,
@@ -80,9 +82,7 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
   const [grid, setGrid] = useState<LetterGrid | null>(null);
   const [foundWords, setFoundWords] = useState<FoundWord[]>([]);
   const [score, setScore] = useState(0);
-  const [remainingTime, setRemainingTime] = useState(settings.timerSeconds);
   const [isPaused, setIsPaused] = useState(false);
-  const [comboLevel, setComboLevel] = useState(0);
   const [botScores, setBotScores] = useState<Record<string, number>>({});
   const [botWords, setBotWords] = useState<Record<string, string[]>>({});
   const [isGameOver, setIsGameOver] = useState(false);
@@ -107,15 +107,39 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
   // Feedback state (for WordFormingArea)
   const [currentFeedback, setCurrentFeedback] = useState<WordFeedback | null>(null);
 
-  const timerRef = useRef<NodeJS.Timeout | null>(null);
-  const comboTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  // Earthquake pause state
+  const [isEarthquakePaused, setIsEarthquakePaused] = useState(false);
+
+  // === SHARED HOOKS ===
+
+  // Combo system - handles combo state, refs, and timeouts
+  const combo = useComboSystem({
+    onComboSound: (level) => {
+      if (level >= 2) {
+        playComboSound(level);
+      }
+    },
+    trackMaxCombo: true,
+  });
+
+  // Game timer - handles countdown with pause support
+  const timer = useGameTimer({
+    initialTime: settings.timerSeconds,
+    isPaused: isPaused || settings.mode === 'practice',
+    isExternallyPaused: isEarthquakePaused,
+    autoStart: settings.mode !== 'practice',
+    onTimeUp: () => {
+      if (!gameOverCalledRef.current) {
+        setIsGameOver(true);
+      }
+    },
+  });
+
+  // Remaining refs (not replaced by hooks)
   const botIntervalsRef = useRef<NodeJS.Timeout[]>([]);
   const foundWordsSetRef = useRef<Set<string>>(new Set());
   const gameOverCalledRef = useRef(false);
-  const validWordCountRef = useRef(0); // Track valid words for combo
   const gameStartTimeRef = useRef<number>(Date.now()); // Track when game started for pace analysis
-  const maxComboRef = useRef(0); // Track max combo achieved for final achievements
-  const [isEarthquakePaused, setIsEarthquakePaused] = useState(false); // Track earthquake timer pause
 
   // Abuse detection: track submission timestamps (like multiplayer's spamDetector)
   const submissionTimestampsRef = useRef<number[]>([]);
@@ -130,7 +154,6 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
   const botScoresRef = useRef(botScores);
   const botWordsRef = useRef(botWords);
   const gridRef = useRef(grid);
-  const comboLevelRef = useRef(comboLevel);
 
   // Keep refs in sync
   useEffect(() => { scoreRef.current = score; }, [score]);
@@ -138,7 +161,6 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
   useEffect(() => { botScoresRef.current = botScores; }, [botScores]);
   useEffect(() => { botWordsRef.current = botWords; }, [botWords]);
   useEffect(() => { gridRef.current = grid; }, [grid]);
-  useEffect(() => { comboLevelRef.current = comboLevel; }, [comboLevel]);
   useEffect(() => { availableWordsRef.current = availableWords; }, [availableWords]);
 
   // Track landscape orientation for ALL screen sizes (not just mobile)
@@ -215,18 +237,13 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
     }
   }, [score, onQuit]);
 
-  // Earthquake timer pause handlers
+  // Earthquake timer pause handlers (timer pause is handled by useGameTimer via isExternallyPaused)
   const handleEarthquakeTimerPause = useCallback(() => {
     setIsEarthquakePaused(true);
-    if (timerRef.current) {
-      clearInterval(timerRef.current);
-      timerRef.current = null;
-    }
   }, []);
 
   const handleEarthquakeTimerResume = useCallback(() => {
     setIsEarthquakePaused(false);
-    // Timer will automatically restart in the next tick via useEffect
   }, []);
 
   // Earthquake/Fire Round feature
@@ -238,7 +255,7 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
   } = useEarthquakeFireRound({
     enabled: settings.mode !== 'practice',
     gameDurationSeconds: settings.timerSeconds,
-    currentTimeSeconds: remainingTime,
+    currentTimeSeconds: timer.remainingTime,
     language: settings.language,
     difficulty: settings.difficulty,
     mode: 'singleplayer',
@@ -283,7 +300,7 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
   // Consistent with multiplayer: urgent music after 33% elapsed, bossa-arcade during earthquake
   useGameMusic({
     phase: 'playing',
-    remainingTime,
+    remainingTime: timer.remainingTime,
     totalTime: settings.timerSeconds,
     isPaused: isPaused || isGameOver || settings.mode === 'practice',
     enabled: settings.mode !== 'practice', // No timed music in practice mode
@@ -374,9 +391,7 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
 
     gameOverCalledRef.current = true;
 
-    // Clean up timers
-    if (timerRef.current) clearInterval(timerRef.current);
-    if (comboTimeoutRef.current) clearTimeout(comboTimeoutRef.current);
+    // Clean up bot intervals (timer and combo handled by hooks)
     botIntervalsRef.current.forEach(clearInterval);
 
     // Validate pending words with AI before ending (same as multiplayer)
@@ -468,7 +483,7 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
         validWordData,
         allWordData,
         settings.timerSeconds,
-        maxComboRef.current
+        combo.maxCombo
       );
 
       const results: SinglePlayerResultsData = {
@@ -502,37 +517,7 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
     finalizeAndEndGame();
   }, [isGameOver, settings.bots, settings.language, onGameEnd]);
 
-  // Timer effect - handles both manual pause and earthquake pause
-  // Note: remainingTime is NOT in dependency array to prevent interval recreation every tick
-  useEffect(() => {
-    if (settings.mode === 'practice') return;
-    if (isPaused || isGameOver || isEarthquakePaused) return;
-
-    timerRef.current = setInterval(() => {
-      setRemainingTime(prev => {
-        if (prev <= 0) {
-          // Already at 0, don't go negative
-          if (timerRef.current) clearInterval(timerRef.current);
-          return prev;
-        }
-        if (prev === 1) {
-          if (timerRef.current) clearInterval(timerRef.current);
-          // Trigger game over via state change, not direct call
-          setIsGameOver(true);
-          return 0;
-        }
-        return prev - 1;
-      });
-    }, 1000);
-
-    return () => {
-      if (timerRef.current) {
-        clearInterval(timerRef.current);
-        timerRef.current = null;
-      }
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- remainingTime intentionally excluded to prevent interval recreation every tick
-  }, [isPaused, settings.mode, isGameOver, isEarthquakePaused]);
+  // Timer is now handled by useGameTimer hook (lines 126-136)
 
   // Bot simulation effect - wait for availableWords before starting
   // This ensures bots use actual words from the grid solver instead of placeholders
@@ -660,9 +645,7 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
       spamCooldownUntilRef.current = now + 3000; // 3-second cooldown
       wordErrorToast(t('playerView.tooFast') || 'Too fast! 3s cooldown', { duration: 2000 });
       // Reset combo on spam cooldown
-      if (comboTimeoutRef.current) clearTimeout(comboTimeoutRef.current);
-      setComboLevel(0);
-      validWordCountRef.current = 0;
+      combo.resetCombo();
       return;
     }
 
@@ -695,9 +678,7 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
       });
       announceWordResult(normalizedWord, false, undefined, msg);
       // Reset combo on invalid word submission (consistent with multiplayer behavior)
-      if (comboTimeoutRef.current) clearTimeout(comboTimeoutRef.current);
-      setComboLevel(0);
-      validWordCountRef.current = 0;
+      combo.resetCombo();
       return;
     }
 
@@ -717,9 +698,7 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
       });
       announceWordResult(normalizedWord, false, undefined, notOnBoardMsg);
       // Reset combo on invalid word submission (consistent with multiplayer behavior)
-      if (comboTimeoutRef.current) clearTimeout(comboTimeoutRef.current);
-      setComboLevel(0);
-      validWordCountRef.current = 0;
+      combo.resetCombo();
       return;
     }
 
@@ -737,16 +716,14 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
       });
       announceWordResult(normalizedWord, false, undefined, alreadyFoundMsg);
       // Reset combo on duplicate submission
-      if (comboTimeoutRef.current) clearTimeout(comboTimeoutRef.current);
-      setComboLevel(0);
-      validWordCountRef.current = 0;
+      combo.resetCombo();
       return;
     }
 
     // Add to set immediately to prevent double submission
     foundWordsSetRef.current.add(normalizedWord);
 
-    const currentCombo = comboLevelRef.current;
+    const currentCombo = combo.comboLevelRef.current;
     const baseScore = calculateWordScore(normalizedWord.length, 0); // Base score without combo
     const fullScore = calculateWordScore(normalizedWord.length, currentCombo); // Score with combo
     const timeSinceStart = (now - gameStartTimeRef.current) / 1000;
@@ -799,20 +776,10 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
           setScore(prev => prev + fullScore);
           playWordAcceptedSound();
 
-          // Combo increases for validated words
-          validWordCountRef.current += 1;
-          if (comboTimeoutRef.current) clearTimeout(comboTimeoutRef.current);
-          setComboLevel(prev => {
-            const newCombo = prev + 1;
-            // Track max combo for achievements
-            if (newCombo > maxComboRef.current) {
-              maxComboRef.current = newCombo;
-            }
-            return newCombo;
-          });
-          comboTimeoutRef.current = setTimeout(() => setComboLevel(0), 8000);
+          // Combo increases for validated words (handled by hook)
+          combo.incrementCombo(true);
 
-          if (validWordCountRef.current > 1) {
+          if (combo.validWordCount > 1) {
             playComboSound(currentCombo + 1);
           }
 
@@ -832,9 +799,7 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
           // Word NOT in dictionary - stays pending for AI validation at game end
           // BREAK combo (exactly like multiplayer's handlePendingWord)
           // Word keeps base score only (no combo bonus since combo is broken)
-          if (comboTimeoutRef.current) clearTimeout(comboTimeoutRef.current);
-          setComboLevel(0);
-          validWordCountRef.current = 0;
+          combo.resetCombo();
 
           // Show pending notification in dedicated area
           setCurrentFeedback({
@@ -847,9 +812,7 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
       })
       .catch(() => {
         // On API error, treat as pending - also breaks combo
-        if (comboTimeoutRef.current) clearTimeout(comboTimeoutRef.current);
-        setComboLevel(0);
-        validWordCountRef.current = 0;
+        combo.resetCombo();
         setCurrentFeedback({
           id: `pending-${Date.now()}`,
           type: 'pending',
@@ -857,7 +820,7 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
           timestamp: Date.now(),
         });
       });
-  }, [settings.language, foundWords, t, playWordAcceptedSound, playComboSound, announceWordResult, announceCombo]);
+  }, [settings.language, foundWords, t, playWordAcceptedSound, playComboSound, announceWordResult, announceCombo, combo, getScoreMultiplier, fireRoundActive]);
 
   const handleFinishPractice = useCallback(() => {
     setIsGameOver(true);
@@ -905,7 +868,7 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
         <div className="absolute left-2 top-1/2 -translate-y-1/2 flex flex-col items-center gap-2 z-20">
           {settings.mode !== 'practice' && (
             <CircularTimer
-              remainingTime={remainingTime}
+              remainingTime={timer.remainingTime}
               totalTime={settings.timerSeconds}
               size="sm"
             />
@@ -933,11 +896,11 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
               {t('common.words') || 'Words'}
             </div>
           </div>
-          <ComboDisplay comboLevel={comboLevel} compact />
+          <ComboDisplay comboLevel={combo.comboLevel} compact />
         </div>
 
-        {/* Top-right: Help button */}
-        <div className="absolute top-2 right-2 z-30">
+        {/* Bottom-right: Help button (offset to avoid quit button) */}
+        <div className="absolute bottom-2 right-16 z-30">
           <HelpButton
             onClick={() => setIsHelpOpen(true)}
             className="w-11 h-11"
@@ -1002,7 +965,7 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
               onWordChange={handleWordChange}
               hideWordPreview
               hideComboIndicator={true}
-              comboLevel={comboLevel}
+              comboLevel={combo.comboLevel}
               largeText
               fireRoundActive={fireRoundActive}
               earthquakeShaking={earthquakeState === 'shaking'}
@@ -1142,14 +1105,14 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
         {/* Timer */}
         {settings.mode !== 'practice' && (
           <CircularTimer
-            remainingTime={remainingTime}
+            remainingTime={timer.remainingTime}
             totalTime={settings.timerSeconds}
             size="sm"
           />
         )}
 
         {/* Combo next to timer */}
-        <ComboDisplay comboLevel={comboLevel} />
+        <ComboDisplay comboLevel={combo.comboLevel} />
 
         {/* Score */}
         <motion.div
@@ -1277,7 +1240,7 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
           onWordChange={handleWordChange}
           hideWordPreview
           hideComboIndicator={true}
-          comboLevel={comboLevel}
+          comboLevel={combo.comboLevel}
           largeText
           fireRoundActive={fireRoundActive}
           earthquakeShaking={earthquakeState === 'shaking'}
