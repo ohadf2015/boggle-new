@@ -15,6 +15,8 @@ import RoomChat from '../RoomChat';
 import { EarthquakeWarning, FireRoundIndicator } from '../earthquake';
 import HintButton from '../HintButton';
 import { HelpPanel, HelpButton } from './HelpPanel';
+import WordFormingArea from './WordFormingArea';
+import GameNotificationArea, { type GameNotification } from './GameNotificationArea';
 import { applyHebrewFinalLetters } from '../../utils/utils';
 import { wordErrorToast } from '../NeoToast';
 import { useSoundEffects } from '../../contexts/SoundEffectsContext';
@@ -87,6 +89,9 @@ interface InGameScreenProps {
   fireRoundActive?: boolean;
   fireRoundRemaining?: number;
 
+  // Focus mode - hides leaderboard and chat during gameplay
+  gameplayFocusMode?: boolean;
+
   // Achievement dock (rendered outside this component)
   children?: ReactNode;
 }
@@ -139,6 +144,9 @@ const InGameScreen = memo<InGameScreenProps>(({
   fireRoundActive = false,
   fireRoundRemaining = 0,
 
+  // Focus mode
+  gameplayFocusMode = false,
+
   // Achievement dock
   children,
 }) => {
@@ -148,6 +156,13 @@ const InGameScreen = memo<InGameScreenProps>(({
 
   // Help panel state for discoverability
   const [showHelpPanel, setShowHelpPanel] = useState(false);
+
+  // Word forming state (for external WordFormingArea)
+  const [formedWord, setFormedWord] = useState('');
+  const [letterCount, setLetterCount] = useState(0);
+
+  // Notification state (for GameNotificationArea)
+  const [currentNotification, setCurrentNotification] = useState<GameNotification | null>(null);
 
   // Viewport height detection for very short landscape screens
   const [viewportHeight, setViewportHeight] = useState(0);
@@ -215,7 +230,14 @@ const InGameScreen = memo<InGameScreenProps>(({
         const errorKey = validation.errorKey ?? 'Invalid word';
         msg = t(errorKey) || errorKey;
       }
-      wordErrorToast(msg, { duration: 1000 });
+      // Show notification in dedicated area
+      setCurrentNotification({
+        id: `reject-${Date.now()}`,
+        type: 'rejected',
+        word: formedWord,
+        message: msg,
+        timestamp: Date.now(),
+      });
       // Haptic feedback for error
       hapticError();
       // Announce rejection for screen readers
@@ -230,7 +252,14 @@ const InGameScreen = memo<InGameScreenProps>(({
     // Check if word can be on board
     if (!couldBeOnBoard(formedWord, letterGrid, currentLang)) {
       const notOnBoardMsg = t('playerView.wordNotOnBoard');
-      wordErrorToast(notOnBoardMsg, { duration: 1500 });
+      // Show notification in dedicated area
+      setCurrentNotification({
+        id: `reject-${Date.now()}`,
+        type: 'rejected',
+        word: formedWord,
+        message: notOnBoardMsg,
+        timestamp: Date.now(),
+      });
       hapticError();
       announceWordResult(formedWord, false, undefined, notOnBoardMsg);
       return;
@@ -259,6 +288,12 @@ const InGameScreen = memo<InGameScreenProps>(({
     isMe: player.username === username,
     rankDisplay: getRankIconString(index)
   })), [leaderboard, username]);
+
+  // Handle word forming changes from GridComponent
+  const handleWordChange = useCallback((word: string, count: number) => {
+    setFormedWord(word);
+    setLetterCount(count);
+  }, []);
 
   // Check for very short landscape screens to prevent panel overlap
   const isVeryShortLandscape = isLandscape && viewportHeight > 0 && viewportHeight < 350;
@@ -405,15 +440,36 @@ const InGameScreen = memo<InGameScreenProps>(({
             </div>
           )}
 
-          {/* Center: Grid (takes full height in landscape - properly sized for mobile) */}
-          <div className={`flex items-center justify-center w-full h-full ${isVeryShortLandscape ? 'px-4' : 'px-3'} py-0.5 landscape-grid-container`}>
-            <div className="h-full flex items-center justify-center game-board-frame-landscape" style={{ aspectRatio: '1/1' }}>
+          {/* Center: Word Forming Area + Notification + Grid */}
+          <div className={`flex flex-col items-center justify-center w-full h-full ${isVeryShortLandscape ? 'px-4' : 'px-3'} py-0.5 landscape-grid-container`}>
+            {/* Word Forming Area - Permanent space above grid */}
+            {isPlaying && (
+              <WordFormingArea
+                word={formedWord}
+                letterCount={letterCount}
+                compact
+                className="mb-0.5"
+              />
+            )}
+            {/* Notification Area - Shows word validation feedback and combo */}
+            {isPlaying && (
+              <GameNotificationArea
+                notification={currentNotification}
+                comboLevel={comboLevel}
+                compact
+                className="mb-0.5"
+              />
+            )}
+            <div className="flex-1 flex items-center justify-center game-board-frame-landscape" style={{ aspectRatio: '1/1' }}>
               <GridComponent
                 key={isPlaying ? 'playing-grid-landscape' : 'spectating-grid-landscape'}
                 grid={letterGrid}
                 interactive={isPlaying && !showStartAnimation}
                 animateOnMount={!hasAnimatedRef.current}
                 onWordSubmit={handleGridWordSubmit}
+                onWordChange={handleWordChange}
+                hideWordPreview={isPlaying}
+                hideComboIndicator={isPlaying}
                 comboLevel={comboLevel}
                 largeText
                 fireRoundActive={fireRoundActive}
@@ -475,8 +531,8 @@ const InGameScreen = memo<InGameScreenProps>(({
       {/* Help Panel - Accessible from anywhere */}
       <HelpPanel isOpen={showHelpPanel} onClose={() => setShowHelpPanel(false)} />
 
-      {/* Left Column: Found Words (Desktop only, only when playing) */}
-      {isPlaying && (
+      {/* Left Column: Found Words (Desktop only, only when playing, hidden in focus mode) */}
+      {isPlaying && !gameplayFocusMode && (
         <div className="hidden lg:flex lg:flex-col lg:w-64 xl:w-80 gap-2 min-h-0">
           <div
             className="bg-neo-cream border-4 border-neo-black rounded-neo-lg shadow-hard-lg flex flex-col min-h-0 max-h-[65vh] lg:max-h-[70vh] overflow-hidden"
@@ -634,6 +690,24 @@ const InGameScreen = memo<InGameScreenProps>(({
           </motion.div>
         )}
 
+        {/* Word Forming Area - Permanent space above grid (portrait mode) */}
+        {isPlaying && (
+          <WordFormingArea
+            word={formedWord}
+            letterCount={letterCount}
+            className="mb-1"
+          />
+        )}
+
+        {/* Notification Area - Shows word validation feedback and combo */}
+        {isPlaying && (
+          <GameNotificationArea
+            notification={currentNotification}
+            comboLevel={comboLevel}
+            className="mb-2"
+          />
+        )}
+
         {/* Grid */}
         <Card className="bg-slate-900 dark:bg-slate-900 backdrop-blur-md border-0 md:border border-cyan-500/40 shadow-none md:shadow-[0_0_25px_rgba(6,182,212,0.2)] flex flex-col flex-grow overflow-hidden">
           <CardContent className="flex-grow flex flex-col items-center justify-center p-1 md:p-2 bg-slate-900">
@@ -643,6 +717,9 @@ const InGameScreen = memo<InGameScreenProps>(({
               interactive={isPlaying && !showStartAnimation}
               animateOnMount={!hasAnimatedRef.current}
               onWordSubmit={handleGridWordSubmit}
+              onWordChange={handleWordChange}
+              hideWordPreview={isPlaying}
+              hideComboIndicator={isPlaying}
               comboLevel={comboLevel}
               fireRoundActive={fireRoundActive}
               earthquakeShaking={earthquakeState === 'shaking'}
@@ -670,7 +747,8 @@ const InGameScreen = memo<InGameScreenProps>(({
         {children}
       </div>
 
-      {/* Right Column: Live Leaderboard */}
+      {/* Right Column: Live Leaderboard (hidden in focus mode) */}
+      {!gameplayFocusMode && (
       <div className="lg:w-64 xl:w-80 flex flex-col gap-2">
         <div
           className="bg-neo-cream border-4 border-neo-black rounded-neo-lg shadow-hard-lg flex flex-col overflow-hidden max-h-[45vh] lg:max-h-none lg:flex-grow"
@@ -761,6 +839,7 @@ const InGameScreen = memo<InGameScreenProps>(({
           />
         </div>
       </div>
+      )}
     </div>
     </>
   );
