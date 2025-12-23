@@ -242,7 +242,7 @@ const ResultsPlayerCard: React.FC<ResultsPlayerCardProps> = ({ player, index, al
       {/* Neo-Brutalist Card */}
       <div
         className={cn(
-          "p-4 sm:p-5 md:p-6 border-4 transition-all duration-200 rounded-neo-lg shadow-hard-lg relative overflow-hidden",
+          "p-3 sm:p-4 border-4 transition-all duration-200 rounded-neo-lg shadow-hard-lg relative overflow-hidden",
           "hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-hard-xl",
           cardStyleClass,
           isWordsExpanded && "ring-4 ring-neo-cyan",
@@ -390,7 +390,7 @@ const ResultsPlayerCard: React.FC<ResultsPlayerCardProps> = ({ player, index, al
 
 
         {/* Words Section - Always show, collapsible - Neo-Brutalist */}
-        <div className="mb-3 relative z-10">
+        <div className="mb-2 relative z-10">
           <button
             onClick={handleToggleExpand}
             className="w-full flex items-center justify-between p-2 rounded-neo text-sm font-black text-neo-black dark:text-neo-cream uppercase border-2 border-neo-black bg-neo-cream dark:bg-slate-700 shadow-hard-sm hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-hard transition-all"
@@ -419,36 +419,36 @@ const ResultsPlayerCard: React.FC<ResultsPlayerCardProps> = ({ player, index, al
                   />
                 )}
                 {player.allWords && player.allWords.length > 0 && (
-                <div className="space-y-3 pt-3">
+                <div className="space-y-2 pt-2">
                   {/* Summary Stats Card - Quick glance performance overview */}
                   {summaryStats && (
                     <motion.div
                       initial={{ opacity: 0, y: -10 }}
                       animate={{ opacity: 1, y: 0 }}
-                      className="bg-neo-cyan/20 border-2 border-neo-cyan rounded-neo p-3"
+                      className="bg-slate-800 border-2 border-neo-cyan rounded-neo p-2"
                     >
                       <div className="grid grid-cols-3 gap-2 text-center">
                         <div>
-                          <div className="text-xl sm:text-2xl font-black text-neo-black dark:text-neo-cream">
+                          <div className="text-xl sm:text-2xl font-black text-white">
                             {summaryStats.validCount}
                           </div>
-                          <div className="text-[10px] sm:text-xs uppercase text-neo-black/90 dark:text-neo-cream/90 font-bold">
+                          <div className="text-[10px] sm:text-xs uppercase text-white font-bold">
                             {t('results.validWords') || 'Valid'}
                           </div>
                         </div>
                         <div>
-                          <div className="text-lg sm:text-xl font-black text-neo-black dark:text-neo-cream uppercase">
+                          <div className="text-lg sm:text-xl font-black text-white uppercase">
                             {summaryStats.longestWord}
                           </div>
-                          <div className="text-[10px] sm:text-xs uppercase text-neo-black/90 dark:text-neo-cream/90 font-bold">
+                          <div className="text-[10px] sm:text-xs uppercase text-white font-bold">
                             {t('results.longest') || 'Longest'}
                           </div>
                         </div>
                         <div>
-                          <div className="text-xl sm:text-2xl font-black text-neo-black dark:text-neo-cream">
+                          <div className="text-xl sm:text-2xl font-black text-white">
                             {summaryStats.accuracy}%
                           </div>
-                          <div className="text-[10px] sm:text-xs uppercase text-neo-black/90 dark:text-neo-cream/90 font-bold">
+                          <div className="text-[10px] sm:text-xs uppercase text-white font-bold">
                             {t('results.accuracy') || 'Accuracy'}
                           </div>
                         </div>

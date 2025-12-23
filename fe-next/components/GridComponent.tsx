@@ -28,6 +28,12 @@ interface GridComponentProps {
   heatMapData?: HeatMapData | null;
   fireRoundActive?: boolean;
   earthquakeShaking?: boolean;
+  /** Callback when formed word changes - use for external word display */
+  onWordChange?: (word: string, letterCount: number) => void;
+  /** Hide the internal word preview (when using external WordFormingArea) */
+  hideWordPreview?: boolean;
+  /** Hide the internal combo indicator (when using external positioning) */
+  hideComboIndicator?: boolean;
 }
 
 /**
@@ -52,6 +58,9 @@ const GridComponent = memo<GridComponentProps>(({
   heatMapData = null,
   fireRoundActive = false,
   earthquakeShaking = false,
+  onWordChange,
+  hideWordPreview = false,
+  hideComboIndicator = false,
 }) => {
   const [reduceMotion, setReduceMotion] = useState(false);
   const [performanceMode, setPerformanceMode] = useState<PerformanceMode>('full');
@@ -63,7 +72,6 @@ const GridComponent = memo<GridComponentProps>(({
     fadingCells,
     focusedCell,
     handleTouchStart,
-    handleTouchMove,
     handleTouchEnd,
     handleMouseDown,
     handleMouseMove,
@@ -82,6 +90,13 @@ const GridComponent = memo<GridComponentProps>(({
   const formedWord = useMemo(() => {
     return selectedCells.map(c => c.letter).join('');
   }, [selectedCells]);
+
+  // Notify parent of word changes (for external WordFormingArea)
+  useEffect(() => {
+    if (onWordChange) {
+      onWordChange(formedWord, selectedCells.length);
+    }
+  }, [formedWord, selectedCells.length, onWordChange]);
 
   // Calculate adjacent cells for highlighting hints
   const adjacentHintCells = useMemo(() => {
@@ -107,6 +122,39 @@ const GridComponent = memo<GridComponentProps>(({
     }
     return hints;
   }, [selectedCells, grid]);
+
+  // Stable shake offsets for earthquake animation - only regenerate when earthquake starts
+  const [earthquakeKey, setEarthquakeKey] = useState(0);
+  const prevEarthquakeShaking = useRef(false);
+
+  // Track when earthquake starts to regenerate offsets
+  useEffect(() => {
+    if (earthquakeShaking && !prevEarthquakeShaking.current) {
+      // Earthquake just started - generate new key to recalculate offsets
+      setEarthquakeKey(k => k + 1);
+    }
+    prevEarthquakeShaking.current = earthquakeShaking;
+  }, [earthquakeShaking]);
+
+  // Generate stable shake offsets for all cells
+  const shakeOffsets = useMemo(() => {
+    if (!earthquakeShaking) return null;
+    const offsets = new Map<string, { x: number; y: number; rotate: number; scale: number }>();
+    const rows = grid.length;
+    const cols = grid[0]?.length || 0;
+    for (let i = 0; i < rows; i++) {
+      for (let j = 0; j < cols; j++) {
+        offsets.set(`${i}-${j}`, {
+          x: (Math.random() - 0.5) * 100,
+          y: (Math.random() - 0.5) * 100,
+          rotate: (Math.random() - 0.5) * 180,
+          scale: 0.85 + Math.random() * 0.3,
+        });
+      }
+    }
+    return offsets;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [earthquakeShaking, earthquakeKey, grid.length, grid[0]?.length]);
 
   // Fire Round: Random glowing cells with rainbow cycling
   const [glowingCells, setGlowingCells] = useState<Set<string>>(new Set());
@@ -250,30 +298,36 @@ const GridComponent = memo<GridComponentProps>(({
       </div>
 
       {/* Word Preview - Fixed below header, above the grid, doesn't affect grid layout */}
-      <AnimatePresence>
-        {interactive && selectedCells.length > 0 && (
-          <motion.div
-            initial={{ opacity: 0, y: -20, scale: 0.9 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: -10, scale: 0.95 }}
-            transition={{ type: 'spring', stiffness: 400, damping: 25 }}
-            className="fixed top-24 left-1/2 -translate-x-1/2 z-[90] pointer-events-none"
-            aria-hidden="true"
-          >
-            <div className="bg-neo-cyan border-3 border-neo-black rounded-neo px-4 py-2 shadow-hard flex items-center gap-2 whitespace-nowrap">
-              <span className="font-black text-xl sm:text-2xl text-neo-black uppercase tracking-wide">
-                {formedWord}
-              </span>
-              <span className="text-xs font-bold text-neo-black bg-neo-black/15 px-1.5 py-0.5 rounded">
-                {selectedCells.length}
-              </span>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      {/* Can be hidden when using external WordFormingArea component */}
+      {!hideWordPreview && (
+        <AnimatePresence>
+          {interactive && selectedCells.length > 0 && (
+            <motion.div
+              initial={{ opacity: 0, y: -20, scale: 0.9 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: -10, scale: 0.95 }}
+              transition={{ type: 'spring', stiffness: 400, damping: 25 }}
+              className="fixed top-24 left-1/2 -translate-x-1/2 z-[90] pointer-events-none"
+              aria-hidden="true"
+            >
+              <div className="bg-neo-cyan border-3 border-neo-black rounded-neo px-4 py-2 shadow-hard flex items-center gap-2 whitespace-nowrap">
+                <span className="font-black text-xl sm:text-2xl text-neo-black uppercase tracking-wide">
+                  {formedWord}
+                </span>
+                <span className="text-xs font-bold text-neo-black bg-neo-black/15 px-1.5 py-0.5 rounded">
+                  {selectedCells.length}
+                </span>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      )}
 
       {/* Combo Indicator - New juicy animation with particles and glow */}
-      <ComboIndicator comboLevel={comboLevel} reduceMotion={reduceMotion} />
+      {/* Can be hidden when using external positioning */}
+      {!hideComboIndicator && (
+        <ComboIndicator comboLevel={comboLevel} reduceMotion={reduceMotion} />
+      )}
 
       {/* First-time combo explanation tooltip */}
       <ComboExplanationTooltip comboLevel={comboLevel} />
@@ -286,14 +340,13 @@ const GridComponent = memo<GridComponentProps>(({
           ref={gridRef}
           dir="ltr"
           className={cn(
-            "grid touch-none select-none rounded-neo",
+            "grid touch-none select-none absolute rounded-neo",
             isLargeGrid ? "gap-1 sm:gap-1" : "gap-1.5 sm:gap-2",
             "bg-neo-cream border-2 border-neo-black/20",
             earthquakeShaking && "earthquake-shake",
             className
           )}
           style={{
-            position: 'absolute',
             inset: '0',
             gridTemplateColumns: `repeat(${grid[0]?.length || 4}, minmax(0, 1fr))`,
             gridTemplateRows: `repeat(${grid.length || 4}, minmax(0, 1fr))`,
@@ -305,7 +358,6 @@ const GridComponent = memo<GridComponentProps>(({
           role="grid"
           aria-label="Letter grid"
           tabIndex={interactive ? 0 : -1}
-          onTouchMove={handleTouchMove as unknown as React.TouchEventHandler}
           onTouchEnd={handleTouchEnd}
           onMouseMove={handleMouseMove}
           onKeyDown={handleKeyDown}
@@ -324,13 +376,10 @@ const GridComponent = memo<GridComponentProps>(({
               const glowColorIndex = cellColorIndices.get(cellKey) ?? 0;
               const glowColor = RAINBOW_COLORS[glowColorIndex];
 
-              // Individual shake physics for each letter during earthquake
-              const shakeOffset = earthquakeShaking ? {
-                x: (Math.random() - 0.5) * 150,
-                y: (Math.random() - 0.5) * 150,
-                rotate: (Math.random() - 0.5) * 360,
-                scale: 0.8 + Math.random() * 0.4,
-              } : { x: 0, y: 0, rotate: 0, scale: 1 };
+              // Use stable shake offsets from memoized map
+              const shakeOffset = earthquakeShaking && shakeOffsets
+                ? shakeOffsets.get(cellKey) || { x: 0, y: 0, rotate: 0, scale: 1 }
+                : { x: 0, y: 0, rotate: 0, scale: 1 };
 
               return (
                 <motion.div
@@ -358,7 +407,7 @@ const GridComponent = memo<GridComponentProps>(({
                   } : {
                     scale: isSelected ? 1.05 : (isFading ? 1.02 : 1),
                     opacity: 1,
-                    rotate: reduceMotion ? 0 : (isSelected ? [0, -1.5, 1.5, 0] : 0),
+                    rotate: 0,
                     rotateX: 0,
                     y: isSelected ? -2 : 0,
                     x: 0,
@@ -585,39 +634,15 @@ const GridComponent = memo<GridComponentProps>(({
                     </>
                   )}
 
-                  {/* Heat map glow overlay */}
+                  {/* Heat map glow overlay - solid fill without negative insets to avoid clipping artifacts */}
                   {heatStyle && (
-                    <>
-                      <div
-                        className="absolute pointer-events-none"
-                        style={{
-                          inset: '-50%',
-                          background: `radial-gradient(circle, rgba(${heatStyle.r}, ${heatStyle.g}, ${heatStyle.b}, ${0.5 + heatStyle.t * 0.3}) 0%, rgba(${heatStyle.r}, ${heatStyle.g}, ${heatStyle.b}, 0.1) 50%, transparent 70%)`,
-                          filter: `blur(${8 + heatStyle.t * 12}px)`,
-                          zIndex: 5
-                        }}
-                      />
-                      <div
-                        className="absolute pointer-events-none"
-                        style={{
-                          inset: '-20%',
-                          background: `radial-gradient(circle, rgba(${heatStyle.r}, ${heatStyle.g}, ${heatStyle.b}, ${0.6 + heatStyle.t * 0.35}) 0%, rgba(${heatStyle.r}, ${heatStyle.g}, ${heatStyle.b}, 0.2) 60%, transparent 80%)`,
-                          filter: `blur(${3 + heatStyle.t * 5}px)`,
-                          zIndex: 6
-                        }}
-                      />
-                      {heatStyle.t > 0.5 && (
-                        <div
-                          className="absolute pointer-events-none"
-                          style={{
-                            inset: '10%',
-                            background: `radial-gradient(circle, rgba(255, ${Math.round(200 + heatStyle.t * 55)}, ${Math.round(heatStyle.t * 200)}, ${0.4 + heatStyle.t * 0.4}) 0%, transparent 70%)`,
-                            filter: `blur(${2 + heatStyle.t * 3}px)`,
-                            zIndex: 7
-                          }}
-                        />
-                      )}
-                    </>
+                    <div
+                      className="absolute inset-0 pointer-events-none rounded-[6px]"
+                      style={{
+                        background: `radial-gradient(ellipse at center, rgba(${heatStyle.r}, ${heatStyle.g}, ${heatStyle.b}, ${0.6 + heatStyle.t * 0.3}) 0%, rgba(${heatStyle.r}, ${heatStyle.g}, ${heatStyle.b}, ${0.3 + heatStyle.t * 0.2}) 50%, rgba(${heatStyle.r}, ${heatStyle.g}, ${heatStyle.b}, ${0.1 + heatStyle.t * 0.1}) 100%)`,
+                        zIndex: 1
+                      }}
+                    />
                   )}
                   {cell}
                 </motion.div>

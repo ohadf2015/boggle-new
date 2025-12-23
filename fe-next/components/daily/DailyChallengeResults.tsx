@@ -10,10 +10,13 @@ import confetti from 'canvas-confetti';
 import {
   generateShareableResult,
   getGuestFingerprint,
+  getGuestDailyPlayer,
   type DailyChallengeResult,
   type DailyStreak,
+  type GuestDailyPlayer,
 } from '@/utils/dailyChallenge';
 import DailyLeaderboard from './DailyLeaderboard';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface DailyChallengeResultsProps {
   result: DailyChallengeResult;
@@ -44,32 +47,59 @@ const DailyChallengeResults: React.FC<DailyChallengeResultsProps> = ({
   const [copied, setCopied] = useState(false);
   const [showSharePanel, setShowSharePanel] = useState(false);
   const [guestFingerprint, setGuestFingerprint] = useState<string | null>(null);
+  const [guestPlayer, setGuestPlayer] = useState<GuestDailyPlayer | null>(null);
   const [leaderboardKey, setLeaderboardKey] = useState(0);
+  const { profile, isAuthenticated } = useAuth();
 
-  // Get guest fingerprint on mount
+  // Get guest fingerprint and player info on mount
   useEffect(() => {
     getGuestFingerprint().then(setGuestFingerprint);
-  }, []);
+    // Get guest player info for display in leaderboard
+    if (!isAuthenticated) {
+      getGuestDailyPlayer().then(setGuestPlayer);
+    }
+  }, [isAuthenticated]);
 
   // Submit result to backend when completing a new challenge
   useEffect(() => {
-    if (isNewCompletion && result && guestFingerprint) {
+    // Wait for guestFingerprint, and either profile (authenticated) or guestPlayer (guest)
+    const hasPlayerInfo = isAuthenticated ? !!profile : !!guestPlayer;
+    if (isNewCompletion && result && guestFingerprint && hasPlayerInfo) {
       const submitResult = async () => {
         try {
-          await fetch('/api/daily-challenge/submit', {
+          // Get player display info
+          const displayName = isAuthenticated && profile
+            ? profile.display_name || profile.username
+            : guestPlayer?.displayName || 'Guest';
+          const avatarEmoji = isAuthenticated && profile
+            ? profile.avatar_emoji
+            : guestPlayer?.avatarEmoji || '🎯';
+          const avatarColor = isAuthenticated && profile
+            ? profile.avatar_color
+            : guestPlayer?.avatarColor || '#6366f1';
+
+          const response = await fetch('/api/daily-challenge/submit', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
               puzzleDate: result.puzzleDate,
               puzzleNumber: result.puzzleNumber,
               language: result.language,
-              guestFingerprint,
+              playerId: isAuthenticated && profile ? profile.id : null,
+              guestFingerprint: !isAuthenticated ? guestFingerprint : null,
+              displayName,
+              avatarEmoji,
+              avatarColor,
               score: result.score,
               wordCount: result.wordCount,
               wordsByLength: result.wordsByLength,
               timeSeconds: result.timeSeconds,
+              longestWord,
             }),
           });
+          if (!response.ok) {
+            console.error('Failed to submit daily result:', await response.text());
+          }
           // Refresh the leaderboard after submission
           setLeaderboardKey(prev => prev + 1);
         } catch (err) {
@@ -78,7 +108,7 @@ const DailyChallengeResults: React.FC<DailyChallengeResultsProps> = ({
       };
       submitResult();
     }
-  }, [isNewCompletion, result, guestFingerprint]);
+  }, [isNewCompletion, result, guestFingerprint, longestWord, isAuthenticated, profile, guestPlayer]);
 
   // Fire confetti on new completion
   useEffect(() => {
@@ -173,7 +203,7 @@ const DailyChallengeResults: React.FC<DailyChallengeResultsProps> = ({
       className="flex-1 flex flex-col items-center justify-start p-4 overflow-y-auto"
     >
       {/* Back button */}
-      <motion.div className="absolute top-20 left-4">
+      <motion.div className="absolute top-24 sm:top-28 left-4">
         <Button
           variant="ghost"
           size="sm"
@@ -275,7 +305,7 @@ const DailyChallengeResults: React.FC<DailyChallengeResultsProps> = ({
           <div className="bg-white dark:bg-neo-navy-light rounded-neo border-3 border-neo-black dark:border-white/20 p-3 shadow-hard-sm">
             <Clock className="w-5 h-5 mx-auto mb-1 text-neo-purple" />
             <div className="text-xl font-black text-neo-black dark:text-white">
-              {Math.floor(result.timeSeconds / 60)}:{(result.timeSeconds % 60).toString().padStart(2, '0')}
+              {Math.floor(result.timeSeconds / 60)}<span className="text-sm font-bold text-gray-500">m</span> {(result.timeSeconds % 60).toString().padStart(2, '0')}<span className="text-sm font-bold text-gray-500">s</span>
             </div>
             <div className="text-xs text-gray-600 dark:text-gray-300">
               {t('results.time')}
@@ -401,7 +431,8 @@ const DailyChallengeResults: React.FC<DailyChallengeResultsProps> = ({
             key={leaderboardKey}
             puzzleDate={result.puzzleDate}
             language={result.language}
-            currentGuestFingerprint={guestFingerprint}
+            currentPlayerId={isAuthenticated && profile ? profile.id : null}
+            currentGuestFingerprint={!isAuthenticated ? guestFingerprint : null}
             maxVisible={10}
             t={t}
           />

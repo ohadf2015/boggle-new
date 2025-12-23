@@ -32,7 +32,11 @@ const WordChip = memo<WordChipProps>(({ wordObj, playerCount }) => {
   const label = displayWord;
 
   // Determine the reason to display - prefer aiReason for AI-rejected words
-  const displayReason = aiReason || invalidReason;
+  // Truncate long reasons to prevent tooltip overflow
+  const rawReason = aiReason || invalidReason;
+  const displayReason = rawReason && rawReason.length > 120
+    ? rawReason.substring(0, 120) + '...'
+    : rawReason;
 
   // Check if this word should have a touchable tooltip
   const hasInvalidReason = !isValid && !isDuplicate && !isPending && displayReason;
@@ -71,7 +75,7 @@ const WordChip = memo<WordChipProps>(({ wordObj, playerCount }) => {
     // - orange (4): bright color needs dark text
     // - purple (5-6): medium-light needs dark text
     // - pink (7-8): medium-light needs dark text
-    return 'var(--neo-black)';
+    return 'rgb(var(--neo-black))';
   };
 
   // Render the word chip content
@@ -195,7 +199,7 @@ const WordChip = memo<WordChipProps>(({ wordObj, playerCount }) => {
               side="top"
               sideOffset={4}
               align="center"
-                className="z-[200] bg-neo-red border-2 border-neo-black shadow-hard rounded-neo p-2 max-w-[250px] hidden sm:block"
+                className="z-[200] bg-neo-red border-2 border-neo-black shadow-hard rounded-neo p-2 max-w-[200px] break-words hidden sm:block"
             >
               {isAiVerified && (
                 <p className="text-[10px] font-bold text-neo-yellow mb-1 flex items-center gap-1">
@@ -230,7 +234,7 @@ const WordChip = memo<WordChipProps>(({ wordObj, playerCount }) => {
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.9 }}
               transition={{ duration: 0.15 }}
-              className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-[101] w-[min(280px,calc(100vw-32px))]"
+              className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-[101] w-[min(240px,calc(100vw-48px))]"
             >
               <div className="bg-neo-red border-3 border-neo-black shadow-hard-lg rounded-neo p-3 relative">
                 {/* Close button */}

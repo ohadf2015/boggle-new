@@ -155,6 +155,36 @@ const RoomChat: React.FC<RoomChatProps> = ({ username, isHost, gameCode, classNa
     };
   }, [socket, handleChatMessage]);
 
+  // Request chat history on mount (for late joiners and page refresh)
+  useEffect(() => {
+    if (!socket || !gameCode) return;
+
+    // Request chat history from server
+    socket.emit('requestChatHistory', { gameCode });
+
+    // Handle chat history response
+    const handleChatHistory = (data: { messages: ChatMessage[] }) => {
+      if (data.messages && data.messages.length > 0) {
+        // Only set if we don't already have messages (prevents duplicates on reconnect)
+        setMessages(prev => {
+          if (prev.length === 0) {
+            return data.messages.map(msg => ({
+              ...msg,
+              id: msg.id || `history-${msg.timestamp}-${Math.random().toString(36).substr(2, 9)}`
+            }));
+          }
+          return prev;
+        });
+      }
+    };
+
+    socket.on('chatHistory', handleChatHistory);
+
+    return () => {
+      socket.off('chatHistory', handleChatHistory);
+    };
+  }, [socket, gameCode]);
+
   // Auto-scroll to bottom when new messages arrive
   useEffect(() => {
     if (messages.length > 0) {

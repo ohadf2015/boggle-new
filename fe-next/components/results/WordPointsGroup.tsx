@@ -44,7 +44,7 @@ const PointsBadge = memo<{
   wordCount: number;
   t: (key: string) => string;
 }>(({ points, wordCount, t }) => (
-  <div className="text-xs font-black mb-1.5 flex items-center gap-2 text-neo-black dark:text-neo-cream uppercase">
+  <div className="text-xs font-black mb-1 flex items-center gap-1.5 text-neo-black dark:text-neo-cream uppercase">
     <span
       className="px-2 py-0.5 rounded-neo flex items-center justify-center font-black text-xs border-2 border-neo-black"
       style={{
@@ -122,11 +122,11 @@ const PointGroupRow = memo<{
   animate: boolean;
 }>(({ points, words, t, getPlayerCountForWord, mode, animate }) => (
   <div
-    className="rounded-neo p-2 border-l-4 border-neo-black bg-white/50 dark:bg-slate-700/50"
+    className="rounded-neo p-1.5 border-l-4 border-neo-black bg-white/50 dark:bg-slate-700/50"
     style={{ borderLeftColor: getPointColor(points) }}
   >
     <PointsBadge points={points} wordCount={words.length} t={t} />
-    <div className="flex flex-wrap gap-1.5">
+    <div className="flex flex-wrap gap-1">
       {words.map((wordObj, i) => (
         mode === 'chip' ? (
           <WordChip
@@ -192,11 +192,11 @@ export const WordPointsGroup = memo<WordPointsGroupProps>(({
 
   return (
     <div className={cn(
-      'bg-neo-cream dark:bg-slate-800 rounded-neo p-3 border-3 border-neo-black shadow-hard-sm',
+      'bg-neo-cream dark:bg-slate-800 rounded-neo p-2 border-3 border-neo-black shadow-hard-sm',
       className
     )}>
       {/* Header */}
-      <div className="text-sm font-black text-neo-black dark:text-neo-cream mb-3 flex items-center gap-2 uppercase">
+      <div className="text-sm font-black text-neo-black dark:text-neo-cream mb-2 flex items-center gap-2 uppercase">
         <span className="bg-neo-cyan text-neo-black px-2 py-0.5 rounded-neo border-2 border-neo-black">✓</span>
         {t('results.validWords') || 'Valid Words'} ({totalWordCount})
       </div>
@@ -244,14 +244,14 @@ export const SharedWordsSection = memo<SharedWordsSectionProps>(({
 
   return (
     <div className={cn(
-      'bg-neo-cream dark:bg-slate-800 rounded-neo p-3 border-3 border-neo-black shadow-hard-sm',
+      'bg-neo-cream dark:bg-slate-800 rounded-neo p-2 border-3 border-neo-black shadow-hard-sm',
       className
     )}>
-      <div className="text-sm font-black text-neo-black dark:text-neo-cream mb-2 flex items-center gap-2 uppercase">
+      <div className="text-sm font-black text-neo-black dark:text-neo-cream mb-1.5 flex items-center gap-1.5 uppercase">
         <span className="bg-neo-orange text-neo-black px-2 py-0.5 rounded-neo border-2 border-neo-black">👥</span>
         {t('results.shared') || 'Shared Words'} ({duplicateWords.length})
       </div>
-      <div className="flex flex-wrap gap-1.5">
+      <div className="flex flex-wrap gap-1">
         {duplicateWords.map((wordObj, i) => (
           <WordChip
             key={`duplicate-${i}`}
@@ -289,14 +289,14 @@ export const InvalidWordsSection = memo<InvalidWordsSectionProps>(({
 
   return (
     <div className={cn(
-      'bg-neo-cream dark:bg-slate-800 rounded-neo p-3 border-3 border-neo-black shadow-hard-sm',
+      'bg-neo-cream dark:bg-slate-800 rounded-neo p-2 border-3 border-neo-black shadow-hard-sm',
       className
     )}>
-      <div className="text-sm font-black text-neo-black/70 dark:text-neo-cream/70 mb-2 flex items-center gap-2 uppercase">
+      <div className="text-sm font-black text-neo-black/70 dark:text-white mb-1.5 flex items-center gap-1.5 uppercase">
         <span className="bg-neo-gray text-neo-cream px-2 py-0.5 rounded-neo border-2 border-neo-black">✗</span>
         {t('results.invalid') || 'Invalid Words'} ({invalidWords.length})
       </div>
-      <div className="flex flex-wrap gap-1.5">
+      <div className="flex flex-wrap gap-1">
         {invalidWords.map((wordObj, i) => (
           mode === 'chip' ? (
             <WordChip

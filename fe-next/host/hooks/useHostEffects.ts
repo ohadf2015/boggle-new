@@ -32,6 +32,7 @@ interface UseHostEffectsOptions {
   difficulty: DifficultyLevel;
   roomLanguage: Language;
   language: Language;
+  timerValue: number; // Timer duration in minutes
 
   // State setters
   setRemainingTime: React.Dispatch<React.SetStateAction<number | null>>;
@@ -44,10 +45,14 @@ interface UseHostEffectsOptions {
   fadeToTrack: (track: any, fadeOut?: number, fadeIn?: number) => void;
   stopMusic: (fadeOut: number) => void;
   playCountdownBeep: (time: number) => void;
-  TRACKS: { IN_GAME: any; ALMOST_OUT_OF_TIME: any };
+  TRACKS: { IN_GAME: any; ALMOST_OUT_OF_TIME: any; BOSSA_ARCADE: any; BOSSA: any };
+
+  // Earthquake state for music transitions
+  earthquakeState: 'idle' | 'warning' | 'shaking' | 'fire-round';
 
   // Refs
   hasTriggeredUrgentMusicRef: MutableRefObject<boolean>;
+  earthquakeMusicActiveRef: MutableRefObject<boolean>;
   intentionalExitRef: MutableRefObject<boolean>;
 
   // Initial data
@@ -97,22 +102,59 @@ export function useHostEffects(options: UseHostEffectsOptions): void {
     return () => clearInterval(intervalId);
   }, [gameStarted, setRemainingTime]);
 
-  // Urgent music trigger
+  // Urgent music trigger - plays after 33% of game time has elapsed
   useEffect(() => {
     if (
       gameStarted &&
       remainingTime !== null &&
-      remainingTime <= 20 &&
       remainingTime > 0 &&
       !hasTriggeredUrgentMusicRef.current
     ) {
-      hasTriggeredUrgentMusicRef.current = true;
-      fadeToTrack(TRACKS.ALMOST_OUT_OF_TIME, 500, 500);
+      // Calculate total time from timerValue (minutes to seconds)
+      // timerValue defaults to 3 minutes
+      const totalTimeSeconds = (options.timerValue || 3) * 60;
+      // Trigger when 33% of time has elapsed (67% remaining)
+      const triggerThreshold = totalTimeSeconds * 0.67;
+
+      if (remainingTime <= triggerThreshold) {
+        hasTriggeredUrgentMusicRef.current = true;
+        // Only play if earthquake music is not active (earthquake music takes priority)
+        if (!options.earthquakeMusicActiveRef.current) {
+          fadeToTrack(TRACKS.ALMOST_OUT_OF_TIME, 1000, 1000);
+        }
+      }
     }
-    if (remainingTime === 0) {
-      stopMusic(1500);
+    // When time runs out, music will transition to bossa for results validation (handled by waitingForResults effect)
+  }, [remainingTime, gameStarted, fadeToTrack, TRACKS, hasTriggeredUrgentMusicRef, options.timerValue, options.earthquakeMusicActiveRef]);
+
+  // Earthquake/Fire Round music - plays bossa-arcade during earthquake phases
+  useEffect(() => {
+    if (!gameStarted) return;
+
+    const earthquakeMusicActiveRef = options.earthquakeMusicActiveRef;
+    const earthquakeState = options.earthquakeState;
+
+    // When earthquake starts (warning, shaking, or fire-round), play bossa-arcade
+    if (earthquakeState !== 'idle' && !earthquakeMusicActiveRef.current) {
+      earthquakeMusicActiveRef.current = true;
+      fadeToTrack(TRACKS.BOSSA_ARCADE, 800, 800);
     }
-  }, [remainingTime, gameStarted, fadeToTrack, stopMusic, TRACKS, hasTriggeredUrgentMusicRef]);
+
+    // When earthquake ends, keep playing bossa-arcade (don't restore to previous track)
+    // This provides a consistent experience - earthquake music stays for remainder of game
+    if (earthquakeState === 'idle' && earthquakeMusicActiveRef.current) {
+      earthquakeMusicActiveRef.current = false;
+      // Keep bossa-arcade playing - no track restoration needed
+    }
+  }, [options.earthquakeState, gameStarted, remainingTime, fadeToTrack, TRACKS, options.earthquakeMusicActiveRef, options.timerValue]);
+
+  // Results validation music - plays bossa when entering results phase
+  useEffect(() => {
+    if (waitingForResults) {
+      // Transition to bossa for results validation and results page
+      fadeToTrack(TRACKS.BOSSA, 1500, 1500);
+    }
+  }, [waitingForResults, fadeToTrack, TRACKS]);
 
   // Countdown beep
   useEffect(() => {

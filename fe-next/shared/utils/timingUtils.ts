@@ -6,7 +6,7 @@
 // ==================== Constants ====================
 
 /** Minimum time to display waiting/calculation screen (ms) */
-export const MINIMUM_WAITING_TIME_MS = 1500;
+export const MINIMUM_WAITING_TIME_MS = 2500;
 
 // ==================== Functions ====================
 

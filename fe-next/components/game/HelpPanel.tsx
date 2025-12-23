@@ -45,7 +45,7 @@ export function HelpPanel({ isOpen, onClose }: HelpPanelProps) {
                 onClose();
               }
             }}
-            className="fixed inset-x-0 bottom-0 z-[101] bg-neo-cream border-t-4 border-neo-black rounded-t-[24px] shadow-hard-xl max-h-[75vh] overflow-y-auto"
+            className="fixed inset-x-0 bottom-0 z-[101] bg-neo-cream border-t-4 border-neo-black rounded-t-[24px] shadow-hard-xl max-h-[75vh] landscape:max-h-[85vh] overflow-y-auto overscroll-contain"
             style={{ paddingBottom: 'env(safe-area-inset-bottom, 16px)' }}
           >
             {/* Drag Handle */}

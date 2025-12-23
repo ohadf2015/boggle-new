@@ -1,9 +1,7 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FaRobot, FaPlus, FaTimes, FaChevronDown, FaChevronUp } from 'react-icons/fa';
-import { Button } from './ui/button';
+import { FaRobot, FaPlus, FaTimes } from 'react-icons/fa';
 import { Badge } from './ui/badge';
-import Avatar from './Avatar';
 import { cn } from '../lib/utils';
 import { useLanguage } from '../contexts/LanguageContext';
 import type { Socket } from 'socket.io-client';
@@ -74,7 +72,6 @@ const BotControls: React.FC<BotControlsProps> = ({
   maxPlayers = 50,
 }) => {
   const { t } = useLanguage();
-  const [isExpanded, setIsExpanded] = useState<boolean>(false);
   const [selectedDifficulty, setSelectedDifficulty] = useState<BotDifficulty>('medium');
   const [isAdding, setIsAdding] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
@@ -84,17 +81,16 @@ const BotControls: React.FC<BotControlsProps> = ({
   const playerCount = players.length;
   const canAddMore = playerCount < maxPlayers;
 
+  // Suppress unused variable warning
+  void gameCode;
+
   // Listen for socket events
   useEffect(() => {
     if (!socket) return;
 
-    const handleBotAdded = (data: { success?: boolean }): void => {
+    const handleBotAdded = (): void => {
       setIsAdding(false);
       setError(null);
-      if (data.success) {
-        // Auto-expand to show the new bot
-        setIsExpanded(true);
-      }
     };
 
     const handleBotRemoved = (data: { success?: boolean }): void => {
@@ -123,73 +119,48 @@ const BotControls: React.FC<BotControlsProps> = ({
     };
   }, [socket, t]);
 
-  const handleAddBot = useCallback(() => {
-    if (!socket || !canAddMore || isAdding || disabled) return;
-
-    setIsAdding(true);
-    setError(null);
-    socket.emit('addBot', { difficulty: selectedDifficulty });
-
-    // Reset adding state after timeout (in case socket event doesn't fire)
-    const timeout = setTimeout(() => {
-      setIsAdding(false);
-    }, 3000);
-
-    return () => clearTimeout(timeout);
-  }, [socket, selectedDifficulty, canAddMore, isAdding, disabled]);
-
   const handleRemoveBot = useCallback((botUsername: string): void => {
     if (!socket || disabled) return;
     socket.emit('removeBot', { botUsername });
   }, [socket, disabled]);
 
-  const toggleExpanded = useCallback(() => {
-    setIsExpanded(prev => !prev);
-  }, []);
-
-  // Quick add button for when collapsed
+  // Add bot with selected difficulty
   const handleQuickAdd = useCallback((e: React.MouseEvent<HTMLButtonElement>): void => {
     e.stopPropagation();
     if (!socket || !canAddMore || isAdding || disabled) return;
 
     setIsAdding(true);
     setError(null);
-    socket.emit('addBot', { difficulty: 'medium' });
+    socket.emit('addBot', { difficulty: selectedDifficulty });
 
     setTimeout(() => setIsAdding(false), 3000);
-  }, [socket, canAddMore, isAdding, disabled]);
+  }, [socket, selectedDifficulty, canAddMore, isAdding, disabled]);
 
   return (
-    <div className="space-y-3">
-      {/* Header with Toggle and Quick Add */}
+    <div className="space-y-2">
+      {/* Header - Compact */}
       <div className="flex items-center justify-between">
-        <button
-          type="button"
-          onClick={toggleExpanded}
-          className="flex items-center gap-2 py-2 text-neo-cream/80 hover:text-neo-cream transition-colors duration-100"
-        >
-          <FaRobot className="text-neo-cyan text-lg" />
-          <span className="text-sm font-bold uppercase">
+        <div className="flex items-center gap-2">
+          <FaRobot className="text-neo-cyan text-sm" />
+          <span className="text-xs font-bold uppercase text-neo-cream/80">
             {t('bots.title') || 'AI Bots'}
           </span>
           {bots.length > 0 && (
-            <Badge className="bg-neo-cyan text-neo-black text-xs px-2 py-0.5 font-bold">
+            <Badge className="bg-neo-cyan text-neo-black text-[10px] px-1.5 py-0 font-bold">
               {bots.length}
             </Badge>
           )}
-          {isExpanded ? <FaChevronUp className="ml-1" /> : <FaChevronDown className="ml-1" />}
-        </button>
+        </div>
 
-        {/* Quick Add Button - Always visible */}
-        {!isExpanded && canAddMore && (
+        {/* Quick Add Button */}
+        {canAddMore && (
           <motion.button
             type="button"
             onClick={handleQuickAdd}
             disabled={isAdding || disabled}
-            whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             className={cn(
-              "flex items-center gap-1 px-3 py-1.5 rounded-neo text-sm font-bold",
+              "flex items-center gap-1 px-2 py-1 rounded-neo text-xs font-bold",
               "bg-neo-cyan text-neo-black border-2 border-neo-black shadow-hard-sm",
               "hover:shadow-hard hover:translate-x-[-1px] hover:translate-y-[-1px]",
               "active:shadow-none active:translate-x-[1px] active:translate-y-[1px]",
@@ -197,7 +168,7 @@ const BotControls: React.FC<BotControlsProps> = ({
               (isAdding || disabled) && "opacity-50 cursor-not-allowed"
             )}
           >
-            <FaPlus size={10} />
+            <FaPlus size={8} />
             {isAdding ? '...' : (t('bots.quickAdd') || 'Add')}
           </motion.button>
         )}
@@ -210,186 +181,93 @@ const BotControls: React.FC<BotControlsProps> = ({
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
-            className="text-xs text-neo-red bg-neo-red/10 px-3 py-2 rounded-neo border border-neo-red/30"
+            className="text-[10px] text-neo-red bg-neo-red/10 px-2 py-1 rounded-neo border border-neo-red/30"
           >
             {error}
           </motion.div>
         )}
       </AnimatePresence>
 
-      {/* Expandable Content */}
-      <AnimatePresence>
-        {isExpanded && (
-          <motion.div
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: 'auto', opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.2 }}
-            className="overflow-hidden"
-          >
-            <div className="space-y-4 bg-neo-black/20 rounded-neo p-3 border border-neo-cream/10">
-              {/* Difficulty Selection */}
-              <div className="space-y-2">
-                <label className="text-xs font-bold uppercase text-neo-cream/80">
-                  {t('bots.selectDifficulty') || 'Choose Difficulty'}
-                </label>
-                <div className="grid grid-cols-3 gap-2">
-                  {BOT_DIFFICULTIES.map((diff) => {
-                    const isSelected = selectedDifficulty === diff.value;
-                    return (
-                      <motion.button
-                        key={diff.value}
-                        type="button"
-                        onClick={() => setSelectedDifficulty(diff.value)}
-                        whileTap={{ scale: 0.95 }}
-                        className={cn(
-                          "px-2 py-2 rounded-neo font-bold text-xs transition-all duration-100 border-2 border-neo-black",
-                          isSelected
-                            ? `${diff.color} shadow-none translate-x-[1px] translate-y-[1px]`
-                            : "bg-neo-cream text-neo-black shadow-hard-sm hover:shadow-hard hover:translate-x-[-1px] hover:translate-y-[-1px]"
-                        )}
-                      >
-                        {t(diff.labelKey) || diff.value}
-                      </motion.button>
-                    );
-                  })}
-                </div>
-                <p className="text-xs text-neo-cream/70 text-center">
-                  {t(BOT_DIFFICULTIES.find(d => d.value === selectedDifficulty)?.descKey || '') ||
-                   BOT_DIFFICULTIES.find(d => d.value === selectedDifficulty)?.defaultDesc}
-                </p>
-              </div>
-
-              {/* Add Bot Button */}
-              <Button
-                onClick={handleAddBot}
-                disabled={!canAddMore || isAdding || disabled}
-                className="w-full bg-neo-cyan text-neo-black hover:bg-neo-cyan/90 font-bold"
-              >
-                {isAdding ? (
-                  <span className="flex items-center gap-2">
-                    <motion.span
-                      animate={{ rotate: 360 }}
-                      transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-                    >
-                      <FaRobot />
-                    </motion.span>
-                    {t('bots.adding') || 'Adding...'}
-                  </span>
-                ) : (
-                  <span className="flex items-center gap-2">
-                    <FaPlus />
-                    {t('bots.addBot') || 'Add Bot'}
-                  </span>
-                )}
-              </Button>
-
-              {/* Current Bots List */}
-              {bots.length > 0 && (
-                <div className="space-y-2">
-                  <label className="text-xs font-bold uppercase text-neo-cream/80">
-                    {t('bots.currentBots') || 'Bots in Room'} ({bots.length})
-                  </label>
-                  <div className="space-y-2 max-h-40 overflow-y-auto pr-1">
-                    <AnimatePresence mode="popLayout">
-                      {bots.map((bot) => (
-                        <motion.div
-                          key={bot.username}
-                          layout
-                          initial={{ opacity: 0, scale: 0.8 }}
-                          animate={{ opacity: 1, scale: 1 }}
-                          exit={{ opacity: 0, scale: 0.8, x: 50 }}
-                          className="flex items-center justify-between bg-neo-black/30 rounded-neo px-3 py-2 border border-neo-cream/20"
-                        >
-                          <div className="flex items-center gap-2 min-w-0">
-                            <Avatar
-                              avatarEmoji={bot.avatar?.emoji}
-                              avatarColor={bot.avatar?.color}
-                              size="sm"
-                            />
-                            <div className="min-w-0 flex-1">
-                              <span className="text-sm font-bold text-neo-cream truncate block">
-                                {bot.username}
-                              </span>
-                            </div>
-                            <Badge className={cn(
-                              "text-xs px-1.5 py-0 shrink-0",
-                              bot.botDifficulty === 'easy' ? 'bg-neo-lime text-neo-black' :
-                              bot.botDifficulty === 'hard' ? 'bg-neo-red text-white' :
-                              'bg-neo-yellow text-neo-black'
-                            )}>
-                              {t(`bots.${bot.botDifficulty || 'medium'}`) || bot.botDifficulty || 'medium'}
-                            </Badge>
-                          </div>
-                          <motion.button
-                            type="button"
-                            onClick={() => handleRemoveBot(bot.username)}
-                            disabled={disabled}
-                            whileHover={{ scale: 1.1 }}
-                            whileTap={{ scale: 0.9 }}
-                            className="text-neo-red/70 hover:text-neo-red transition-colors p-1.5 ml-2 shrink-0"
-                            title={t('bots.remove') || 'Remove bot'}
-                          >
-                            <FaTimes size={12} />
-                          </motion.button>
-                        </motion.div>
-                      ))}
-                    </AnimatePresence>
-                  </div>
-                </div>
+      {/* Difficulty Selection - Inline compact */}
+      <div className="flex items-center gap-1.5 flex-wrap">
+        <span className="text-[10px] font-bold uppercase text-neo-cream/60">
+          {t('bots.selectDifficulty') || 'Difficulty'}:
+        </span>
+        {BOT_DIFFICULTIES.map((diff) => {
+          const isSelected = selectedDifficulty === diff.value;
+          return (
+            <motion.button
+              key={diff.value}
+              type="button"
+              onClick={() => setSelectedDifficulty(diff.value)}
+              whileTap={{ scale: 0.95 }}
+              className={cn(
+                "px-1.5 py-0.5 rounded text-[10px] font-bold transition-all duration-100 border border-neo-black",
+                isSelected
+                  ? `${diff.color} shadow-none`
+                  : "bg-neo-cream/80 text-neo-black hover:bg-neo-cream"
               )}
-
-              {/* Empty State / Help Text */}
-              {bots.length === 0 && (
-                <div className="text-center py-2">
-                  <p className="text-xs text-neo-cream/70">
-                    {t('bots.emptyState') || 'Add bots to practice or fill the room!'}
-                  </p>
-                </div>
-              )}
-
-              {/* Info Text */}
-              <p className="text-xs text-neo-cream/75 text-center border-t border-neo-cream/10 pt-3">
-                {t('bots.helpText') || 'Bots find and submit words automatically during the game.'}
-              </p>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* Collapsed State - Show bot avatars preview with emoji and name */}
-      {!isExpanded && bots.length > 0 && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          className="flex items-center gap-2 pl-6 flex-wrap"
-        >
-          {bots.slice(0, 5).map((bot, index) => (
-            <motion.div
-              key={bot.username}
-              initial={{ scale: 0 }}
-              animate={{ scale: 1 }}
-              transition={{ delay: index * 0.05 }}
-              className="flex items-center gap-1 bg-neo-black/30 rounded-full px-2 py-0.5 border border-neo-cream/20"
-              title={bot.username}
             >
-              <span
-                className="w-5 h-5 rounded-full flex items-center justify-center text-xs shrink-0"
-                style={{ backgroundColor: bot.avatar?.color || '#60a5fa' }}
-              >
-                {bot.avatar?.emoji || '🤖'}
-              </span>
-              <span className="text-xs text-neo-cream/80 font-medium truncate max-w-[80px]">
-                {bot.username}
-              </span>
-            </motion.div>
-          ))}
-          {bots.length > 5 && (
-            <span className="text-xs text-neo-cream/70 ml-1">
-              +{bots.length - 5}
-            </span>
-          )}
-        </motion.div>
+              {t(diff.labelKey) || diff.value}
+            </motion.button>
+          );
+        })}
+      </div>
+
+      {/* Current Bots List - Compact */}
+      {bots.length > 0 && (
+        <div className="space-y-1">
+          <div className="flex flex-wrap gap-1.5">
+            <AnimatePresence mode="popLayout">
+              {bots.map((bot) => (
+                <motion.div
+                  key={bot.username}
+                  layout
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.8 }}
+                  className="flex items-center gap-1 bg-neo-black/30 rounded-full px-2 py-0.5 border border-neo-cream/20"
+                >
+                  <span
+                    className="w-4 h-4 rounded-full flex items-center justify-center text-[10px] shrink-0"
+                    style={{ backgroundColor: bot.avatar?.color || '#60a5fa' }}
+                  >
+                    {bot.avatar?.emoji || '🤖'}
+                  </span>
+                  <span className="text-[10px] text-neo-cream/80 font-medium truncate max-w-[60px]">
+                    {bot.username}
+                  </span>
+                  <Badge className={cn(
+                    "text-[8px] px-1 py-0 shrink-0",
+                    bot.botDifficulty === 'easy' ? 'bg-neo-lime text-neo-black' :
+                    bot.botDifficulty === 'hard' ? 'bg-neo-red text-white' :
+                    'bg-neo-yellow text-neo-black'
+                  )}>
+                    {(t(`bots.${bot.botDifficulty || 'medium'}`) || bot.botDifficulty || 'M').charAt(0)}
+                  </Badge>
+                  <motion.button
+                    type="button"
+                    onClick={() => handleRemoveBot(bot.username)}
+                    disabled={disabled}
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.9 }}
+                    className="text-neo-red/60 hover:text-neo-red transition-colors shrink-0"
+                    title={t('bots.remove') || 'Remove bot'}
+                  >
+                    <FaTimes size={8} />
+                  </motion.button>
+                </motion.div>
+              ))}
+            </AnimatePresence>
+          </div>
+        </div>
+      )}
+
+      {/* Empty State - Minimal */}
+      {bots.length === 0 && (
+        <p className="text-[10px] text-neo-cream/50 text-center">
+          {t('bots.emptyState') || 'Add bots to practice or fill the room'}
+        </p>
       )}
     </div>
   );

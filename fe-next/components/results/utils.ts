@@ -76,5 +76,5 @@ export function getTextColor(points: number): string {
   // 1-point words have dark gray background (#2d2d44), need light text
   if (points === 1) return 'var(--neo-cream)';
   // Other point colors (cyan, orange, purple, pink) are light enough to need dark text
-  return 'var(--neo-black)';
+  return 'rgb(var(--neo-black))';
 }

@@ -5,7 +5,6 @@ import { Button } from '../../components/ui/button';
 import { Card } from '../../components/ui/card';
 import { Badge } from '../../components/ui/badge';
 import { Checkbox } from '../../components/ui/checkbox';
-import SlotMachineGrid from '../../components/SlotMachineGrid';
 import ShareButton from '../../components/ShareButton';
 import SlotMachineText from '../../components/SlotMachineText';
 import Avatar from '../../components/Avatar';
@@ -351,9 +350,9 @@ const HostPreGameView: React.FC<HostPreGameViewProps> = ({
                       {(Object.keys(DIFFICULTIES) as DifficultyLevel[]).map((key) => {
                         const isSelected = difficulty === key;
                         const difficultyColors: Record<string, string> = {
-                          easy: 'bg-neo-lime',
-                          normal: 'bg-neo-yellow',
-                          medium: 'bg-neo-orange',
+                          easy: 'bg-neo-lime text-neo-black',
+                          normal: 'bg-neo-yellow text-neo-black',
+                          medium: 'bg-neo-orange text-neo-black',
                           hard: 'bg-neo-red text-neo-white',
                           extreme: 'bg-neo-purple text-neo-white'
                         };
@@ -498,34 +497,14 @@ const HostPreGameView: React.FC<HostPreGameViewProps> = ({
         </Card>
       </div>
 
-      {/* Row 3: Letter Grid + Chat */}
-      <div className="flex flex-col lg:flex-row gap-3 sm:gap-4 md:gap-6">
-        {/* Letter Grid - LEFT */}
-        <Card className="flex-1 p-1 sm:p-3 flex flex-col items-center bg-slate-800/95 border-4 border-neo-black shadow-hard-lg">
-          <div className="w-full flex justify-center items-center transition-all duration-500 aspect-square max-w-full">
-            <div className="w-full h-full flex items-center justify-center">
-              <SlotMachineGrid
-                grid={shufflingGrid || tableData}
-                highlightedCells={highlightedCells}
-                language={roomLanguage || language}
-                className="w-full h-full"
-                animationDuration={600}
-                staggerDelay={40}
-                animationPattern="cascade"
-              />
-            </div>
-          </div>
-        </Card>
-
-        {/* Chat - RIGHT */}
-        <div className="lg:w-[350px] xl:w-[400px]">
-          <RoomChat
-            username="Host"
-            isHost={true}
-            gameCode={gameCode}
-            className="h-full min-h-[400px]"
-          />
-        </div>
+      {/* Row 3: Chat */}
+      <div className="w-full max-w-2xl mx-auto">
+        <RoomChat
+          username="Host"
+          isHost={true}
+          gameCode={gameCode}
+          className="h-full min-h-[400px]"
+        />
       </div>
     </div>
   );

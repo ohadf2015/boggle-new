@@ -118,16 +118,16 @@ const ParticipantRow = memo<{
             <Sparkles className="w-3 h-3 sm:w-4 sm:h-4 text-neo-yellow shrink-0" />
           )}
         </div>
-        <div className="text-xs sm:text-sm text-gray-600 dark:text-gray-300 flex items-center gap-2">
+        <div className="text-xs sm:text-sm text-gray-700 dark:text-gray-200 flex items-center gap-2">
           <span className="font-bold">{participant.score} pts</span>
-          <span className="text-gray-400">|</span>
+          <span className="text-gray-500 dark:text-gray-400">|</span>
           <span>{participant.word_count} words</span>
         </div>
       </div>
 
       {/* Time */}
       {!compact && (
-        <div className="hidden sm:flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400">
+        <div className="hidden sm:flex items-center gap-1 text-xs text-gray-600 dark:text-gray-300">
           <Clock className="w-3 h-3" />
           <span>{timeAgo}</span>
         </div>
@@ -164,15 +164,17 @@ const DailyLeaderboard: React.FC<DailyLeaderboardProps> = ({
       setLoading(true);
       setError(null);
 
-      const response = await fetch(
-        `/api/daily-challenge/leaderboard/${puzzleDate}/${language}?limit=50`
-      );
+      const url = `/api/daily-challenge/leaderboard/${puzzleDate}/${language}?limit=50`;
+      const response = await fetch(url);
 
       if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Leaderboard API error:', response.status, errorText);
         throw new Error('Failed to fetch leaderboard');
       }
 
       const data = await response.json();
+      console.log('Leaderboard data:', { url, date: puzzleDate, language, participants: data.data?.length, total: data.totalParticipants });
       setParticipants(data.data || []);
       setTotalCount(data.totalParticipants || 0);
 
@@ -225,15 +227,20 @@ const DailyLeaderboard: React.FC<DailyLeaderboardProps> = ({
           shadow-hard-sm
         `}
       >
-        <div className="flex items-center gap-2 mb-3">
-          <Users className="w-5 h-5 text-neo-purple" />
-          <h3 className="font-black text-sm sm:text-base uppercase tracking-wide text-neo-black dark:text-white">
+        <div className="flex items-center gap-2 mb-4">
+          <div className="p-1.5 sm:p-2 bg-neo-purple rounded-neo border-2 border-neo-black">
+            <Users className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
+          </div>
+          <h3 className="font-black text-sm sm:text-base uppercase tracking-wide text-slate-800">
             {t('daily.todaysPlayers')}
           </h3>
         </div>
-        <p className="text-center text-gray-500 dark:text-gray-400 py-6 text-sm">
-          {t('daily.beFirstToPlay')}
-        </p>
+        <div className="text-center py-6">
+          <div className="text-3xl mb-2">🏆</div>
+          <p className="text-slate-700 font-bold text-sm sm:text-base">
+            {t('daily.beFirstToPlay')}
+          </p>
+        </div>
       </motion.div>
     );
   }
@@ -258,7 +265,7 @@ const DailyLeaderboard: React.FC<DailyLeaderboardProps> = ({
             <h3 className="font-black text-sm sm:text-base uppercase tracking-wide text-neo-black dark:text-white">
               {t('daily.todaysPlayers')}
             </h3>
-            <p className="text-xs text-gray-500 dark:text-gray-400">
+            <p className="text-xs text-gray-700 dark:text-gray-300">
               {totalCount} {totalCount === 1 ? t('daily.playerSingular') : t('daily.playersPlural')}
             </p>
           </div>

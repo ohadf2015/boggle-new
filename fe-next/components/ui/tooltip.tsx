@@ -17,7 +17,7 @@ const TooltipPortal = TooltipPrimitive.Portal;
 const TooltipContent = React.forwardRef<
   React.ElementRef<typeof TooltipPrimitive.Content>,
   React.ComponentPropsWithoutRef<typeof TooltipPrimitive.Content>
->(({ className, sideOffset = 6, collisionPadding = 8, ...props }, ref) => (
+>(({ className, sideOffset = 6, collisionPadding = 16, ...props }, ref) => (
   <TooltipPortal>
     <TooltipPrimitive.Content
       ref={ref}

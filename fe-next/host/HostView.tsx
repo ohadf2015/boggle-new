@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState, memo } from 'react';
+import React, { useEffect, useState, memo, useRef } from 'react';
 import { FaSignOutAlt } from 'react-icons/fa';
 import { Button } from '../components/ui/button';
 import GoRipplesAnimation from '../components/GoRipplesAnimation';
@@ -79,6 +79,9 @@ const HostView: React.FC<HostViewProps> = memo(({
   const [fireRoundActive, setFireRoundActive] = useState(false);
   const [fireRoundRemaining, setFireRoundRemaining] = useState(0);
 
+  // Music ref for earthquake
+  const earthquakeMusicActiveRef = useRef<boolean>(false);
+
   // Socket event handling
   useHostSocketEvents({
     socket,
@@ -137,6 +140,7 @@ const HostView: React.FC<HostViewProps> = memo(({
     difficulty: state.settings.difficulty,
     roomLanguage: state.roomLanguage,
     language: language as Language,
+    timerValue: state.settings.timerValue,
     setRemainingTime: state.setRemainingTime,
     setGameStarted: state.setGameStarted,
     setShufflingGrid: state.setShufflingGrid,
@@ -146,7 +150,9 @@ const HostView: React.FC<HostViewProps> = memo(({
     stopMusic,
     playCountdownBeep,
     TRACKS,
+    earthquakeState,
     hasTriggeredUrgentMusicRef: state.refs.hasTriggeredUrgentMusicRef,
+    earthquakeMusicActiveRef,
     intentionalExitRef: state.refs.intentionalExitRef,
     initialPlayers,
   });

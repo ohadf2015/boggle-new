@@ -68,11 +68,11 @@ export async function POST(request: NextRequest): Promise<NextResponse<SolveGrid
     }, { status: 400 });
   }
 
-  // Validate grid size (4x4 to 6x6)
-  if (grid.length < 4 || grid.length > 6 || rowLength < 4 || rowLength > 6) {
+  // Validate grid size (4x4 to 11x11 - matches DIFFICULTIES in consts.ts)
+  if (grid.length < 4 || grid.length > 11 || rowLength < 4 || rowLength > 11) {
     return NextResponse.json({
       success: false,
-      error: 'Grid must be between 4x4 and 6x6',
+      error: 'Grid must be between 4x4 and 11x11',
     }, { status: 400 });
   }
 

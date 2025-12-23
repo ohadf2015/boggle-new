@@ -4,18 +4,21 @@ import { useEffect, useRef } from 'react';
 import { useMusic } from '@/contexts/MusicContext';
 
 export type GamePhase = 'lobby' | 'countdown' | 'playing' | 'results' | 'waiting';
+export type EarthquakeState = 'idle' | 'warning' | 'shaking' | 'fire-round';
 
 interface UseGameMusicOptions {
   /** Current game phase */
   phase: GamePhase;
   /** Remaining time in seconds (required when phase is 'playing') */
   remainingTime?: number | null;
+  /** Total game time in seconds (required for 33% elapsed calculation) */
+  totalTime?: number;
   /** Whether the game is paused (skips urgent music when paused) */
   isPaused?: boolean;
   /** Whether to enable music (defaults to true) */
   enabled?: boolean;
-  /** Threshold in seconds for urgent music (defaults to 20) */
-  urgentMusicThreshold?: number;
+  /** Earthquake state for special music during earthquake phases */
+  earthquakeState?: EarthquakeState;
 }
 
 /**
@@ -24,8 +27,9 @@ interface UseGameMusicOptions {
  * Handles music transitions for all game phases consistently:
  * - Lobby: Plays lobby music
  * - Countdown: Plays before-game music
- * - Playing: Plays in-game music, switches to urgent when time is low
- * - Results: Plays before-game music
+ * - Playing: Plays in-game music, switches to urgent after 33% of time elapsed
+ * - Playing + Earthquake: Plays bossa-arcade during earthquake phases
+ * - Results: Plays bossa music
  * - Waiting: No music change (used for waiting states)
  *
  * Used by both single player and multiplayer modes for consistency.
@@ -33,14 +37,17 @@ interface UseGameMusicOptions {
 export function useGameMusic({
   phase,
   remainingTime,
+  totalTime,
   isPaused = false,
   enabled = true,
-  urgentMusicThreshold = 20,
+  earthquakeState = 'idle',
 }: UseGameMusicOptions) {
-  const { fadeToTrack, playTrack, stopMusic, TRACKS } = useMusic();
+  const { fadeToTrack, playTrack, TRACKS } = useMusic();
 
   // Track if we've triggered urgent music to prevent re-triggering
   const hasTriggeredUrgentMusicRef = useRef(false);
+  // Track if earthquake music is active
+  const earthquakeMusicActiveRef = useRef(false);
   // Track the previous phase to detect transitions
   const previousPhaseRef = useRef<GamePhase | null>(null);
 
@@ -55,11 +62,13 @@ export function useGameMusic({
       case 'lobby':
         playTrack(TRACKS.LOBBY);
         hasTriggeredUrgentMusicRef.current = false;
+        earthquakeMusicActiveRef.current = false;
         break;
 
       case 'countdown':
         fadeToTrack(TRACKS.BEFORE_GAME, 500, 500);
         hasTriggeredUrgentMusicRef.current = false;
+        earthquakeMusicActiveRef.current = false;
         break;
 
       case 'playing':
@@ -67,12 +76,15 @@ export function useGameMusic({
         if (previousPhase !== 'playing') {
           fadeToTrack(TRACKS.IN_GAME, 800, 800);
           hasTriggeredUrgentMusicRef.current = false;
+          earthquakeMusicActiveRef.current = false;
         }
         break;
 
       case 'results':
-        fadeToTrack(TRACKS.BEFORE_GAME, 1200, 1200);
+        // Transition to bossa for results validation and results page
+        fadeToTrack(TRACKS.BOSSA, 1500, 1500);
         hasTriggeredUrgentMusicRef.current = false;
+        earthquakeMusicActiveRef.current = false;
         break;
 
       case 'waiting':
@@ -81,50 +93,73 @@ export function useGameMusic({
     }
   }, [phase, enabled, fadeToTrack, playTrack, TRACKS]);
 
-  // Handle urgent music when time is low
+  // Handle urgent music after 33% of game time has elapsed
   useEffect(() => {
     if (!enabled || phase !== 'playing' || isPaused) return;
     if (remainingTime === null || remainingTime === undefined) return;
 
-    // Trigger urgent music when below threshold
+    // Calculate threshold: 33% elapsed = 67% remaining
+    const effectiveTotalTime = totalTime || 180; // Default 3 minutes
+    const triggerThreshold = effectiveTotalTime * 0.67;
+
+    // Trigger urgent music when below threshold (only if earthquake music is not active)
     if (
-      remainingTime <= urgentMusicThreshold &&
+      remainingTime <= triggerThreshold &&
       remainingTime > 0 &&
       !hasTriggeredUrgentMusicRef.current
     ) {
       hasTriggeredUrgentMusicRef.current = true;
-      fadeToTrack(TRACKS.ALMOST_OUT_OF_TIME, 500, 500);
+      // Only play if earthquake music is not active (earthquake takes priority)
+      if (!earthquakeMusicActiveRef.current) {
+        fadeToTrack(TRACKS.ALMOST_OUT_OF_TIME, 1000, 1000);
+      }
     }
-
-    // Stop music when time runs out
-    if (remainingTime === 0) {
-      stopMusic(1500);
-    }
+    // When time runs out, music will transition to bossa in results phase
   }, [
     phase,
     remainingTime,
+    totalTime,
     isPaused,
     enabled,
-    urgentMusicThreshold,
     fadeToTrack,
-    stopMusic,
     TRACKS,
   ]);
 
-  // Reset urgent music flag when game becomes active again
+  // Handle earthquake/fire-round music - plays bossa-arcade during earthquake phases
+  useEffect(() => {
+    if (!enabled || phase !== 'playing' || isPaused) return;
+
+    // When earthquake starts (warning, shaking, or fire-round), play bossa-arcade
+    if (earthquakeState !== 'idle' && !earthquakeMusicActiveRef.current) {
+      earthquakeMusicActiveRef.current = true;
+      fadeToTrack(TRACKS.BOSSA_ARCADE, 800, 800);
+    }
+
+    // When earthquake ends, keep playing bossa-arcade (don't restore to previous track)
+    // This provides a consistent experience - earthquake music stays for remainder of game
+    if (earthquakeState === 'idle' && earthquakeMusicActiveRef.current) {
+      earthquakeMusicActiveRef.current = false;
+      // Keep bossa-arcade playing - no track restoration needed
+    }
+  }, [earthquakeState, phase, isPaused, enabled, remainingTime, totalTime, fadeToTrack, TRACKS]);
+
+  // Reset flags when game becomes active again (new game)
   useEffect(() => {
     if (phase === 'playing' && !isPaused) {
-      // Only reset if remainingTime is high enough (not during game)
-      if (remainingTime !== null && remainingTime !== undefined && remainingTime > urgentMusicThreshold) {
+      // Only reset if remainingTime is high enough (start of game)
+      const effectiveTotalTime = totalTime || 180;
+      const triggerThreshold = effectiveTotalTime * 0.67;
+      if (remainingTime !== null && remainingTime !== undefined && remainingTime > triggerThreshold) {
         hasTriggeredUrgentMusicRef.current = false;
       }
     }
-  }, [phase, isPaused, remainingTime, urgentMusicThreshold]);
+  }, [phase, isPaused, remainingTime, totalTime]);
 
   return {
     /** Manually reset the urgent music trigger (useful for game restarts) */
     resetUrgentMusic: () => {
       hasTriggeredUrgentMusicRef.current = false;
+      earthquakeMusicActiveRef.current = false;
     },
   };
 }

@@ -8,7 +8,6 @@ import { Badge } from '../ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '../ui/dialog';
 import { QRCodeSVG } from 'qrcode.react';
 import Avatar from '../Avatar';
-import SlotMachineGrid from '../SlotMachineGrid';
 import SlotMachineText from '../SlotMachineText';
 import RoomChat from '../RoomChat';
 import ShareButton from '../ShareButton';
@@ -116,30 +115,14 @@ const WaitingScreen: React.FC<WaitingScreenProps> = ({
           </Button>
         </div>
 
-        {/* Center: Grid Preview - maximized for full viewport */}
-        <div className="flex-1 flex items-center justify-center landscape-grid-container">
-          {shufflingGrid ? (
-            <SlotMachineGrid
-              grid={shufflingGrid}
-              highlightedCells={highlightedCells}
-              language={gameLanguage || 'en'}
-              className="max-h-[95vh] max-w-[95vh]"
-              animationDuration={600}
-              staggerDelay={40}
-              animationPattern="cascade"
-            />
-          ) : (
-            <div className="w-[95vh] max-w-full aspect-square grid grid-cols-4 gap-3 p-4">
-              {Array.from({ length: 16 }).map((_, i) => (
-                <motion.div
-                  key={i}
-                  className="aspect-square rounded-lg bg-slate-700/50"
-                  animate={{ opacity: [0.3, 0.6, 0.3] }}
-                  transition={{ duration: 1.5, repeat: Infinity, delay: i * 0.05 }}
-                />
-              ))}
-            </div>
-          )}
+        {/* Center: Chat - maximized for full viewport */}
+        <div className="flex-1 flex items-center justify-center max-w-2xl mx-auto">
+          <RoomChat
+            username={isHost ? "Host" : username}
+            isHost={isHost}
+            gameCode={gameCode}
+            className="h-full w-full min-h-[400px]"
+          />
         </div>
 
         {/* Right column: Players list + Game Settings (Host) */}
@@ -431,56 +414,14 @@ const WaitingScreen: React.FC<WaitingScreenProps> = ({
           </Card>
         </div>
 
-        {/* Row 3: Letter Grid + Chat */}
-        <div className="flex flex-col lg:flex-row gap-3 sm:gap-4 md:gap-6">
-          {/* Letter Grid - LEFT */}
-          <Card className="flex-1 p-1 sm:p-3 flex flex-col items-center bg-slate-800/95 border-4 border-neo-black shadow-hard-lg relative overflow-hidden texture-halftone-comic">
-            {/* Comic-style halftone dots */}
-            <div
-              className="absolute inset-0 pointer-events-none opacity-[0.02]"
-              style={{
-                backgroundImage: `radial-gradient(circle, rgba(255,255,255,0.3) 1px, transparent 1px)`,
-                backgroundSize: '12px 12px',
-              }}
-            />
-            <div className="w-full flex justify-center items-center transition-all duration-500 aspect-square max-w-full">
-              <div className="w-full h-full flex items-center justify-center">
-                {shufflingGrid ? (
-                  <SlotMachineGrid
-                    grid={shufflingGrid}
-                    highlightedCells={highlightedCells}
-                    language={gameLanguage || 'en'}
-                    className="w-full h-full"
-                    animationDuration={600}
-                    staggerDelay={40}
-                    animationPattern="cascade"
-                  />
-                ) : (
-                  // Loading skeleton
-                  <div className="w-full aspect-square grid grid-cols-4 gap-2 p-4">
-                    {Array.from({ length: 16 }).map((_, i) => (
-                      <motion.div
-                        key={i}
-                        className="aspect-square rounded-lg bg-slate-700/50"
-                        animate={{ opacity: [0.3, 0.6, 0.3] }}
-                        transition={{ duration: 1.5, repeat: Infinity, delay: i * 0.05 }}
-                      />
-                    ))}
-                  </div>
-                )}
-              </div>
-            </div>
-          </Card>
-
-          {/* Chat - RIGHT */}
-          <div className="lg:w-[350px] xl:w-[400px]">
-            <RoomChat
-              username={isHost ? "Host" : username}
-              isHost={isHost}
-              gameCode={gameCode}
-              className="h-full min-h-[400px]"
-            />
-          </div>
+        {/* Row 3: Chat */}
+        <div className="w-full max-w-2xl mx-auto">
+          <RoomChat
+            username={isHost ? "Host" : username}
+            isHost={isHost}
+            gameCode={gameCode}
+            className="h-full min-h-[400px]"
+          />
         </div>
       </div>
 

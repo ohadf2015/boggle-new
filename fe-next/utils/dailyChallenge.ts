@@ -300,15 +300,15 @@ export interface DailyChallengeResult {
 }
 
 /**
- * Color emoji for each word length
+ * Color emoji for each word length - representing word value/difficulty
  */
 const LENGTH_EMOJI: Record<number, string> = {
   2: '⬜',  // 2-letter (rare/bonus)
-  3: '🟨',  // Yellow
-  4: '🟩',  // Green
-  5: '🟦',  // Blue
-  6: '🟪',  // Purple
-  7: '🔶',  // Orange
+  3: '🟨',  // Yellow - common
+  4: '🟩',  // Green - good
+  5: '🟦',  // Blue - great
+  6: '🟪',  // Purple - excellent
+  7: '🔶',  // Orange - amazing
   8: '🔶',  // Orange (same for 8+)
 };
 
@@ -322,24 +322,34 @@ function getWordLengthEmoji(length: number): string {
 
 /**
  * Generate a shareable result string (Wordle-style)
+ * Shows word length distribution as a visual bar chart
  */
 export function generateShareableResult(result: DailyChallengeResult, siteUrl = 'lexiclash.live'): string {
-  // Build the word bar (emoji representation of words found)
-  const wordBar = Object.entries(result.wordsByLength)
-    .sort(([a], [b]) => Number(a) - Number(b))
-    .flatMap(([len, count]) => Array(count).fill(getWordLengthEmoji(Number(len))))
-    .join('');
+  // Build word length distribution display
+  // Group by length and show as horizontal bars
+  const sortedLengths = Object.entries(result.wordsByLength)
+    .sort(([a], [b]) => Number(a) - Number(b));
+
+  // Create visual bar for each word length
+  const wordBars = sortedLengths
+    .map(([len, count]) => {
+      const emoji = getWordLengthEmoji(Number(len));
+      const bar = emoji.repeat(Math.min(count, 8)); // Cap at 8 for visual clarity
+      const overflow = count > 8 ? `+${count - 8}` : '';
+      return `${len}⃣ ${bar}${overflow}`;
+    })
+    .join('\n');
 
   // Format streak if > 1
-  const streakText = result.streakDays > 1 ? ` | 🔥${result.streakDays}` : '';
+  const streakText = result.streakDays > 1 ? `🔥 ${result.streakDays} day streak!\n` : '';
 
   // Build the shareable text
-  return `LexiClash Daily #${result.puzzleNumber} 🎯
+  return `🎯 LexiClash Daily #${result.puzzleNumber}
 
-${wordBar}
+${wordBars}
 
-${result.score} pts | ${result.wordCount} words${streakText}
-
+📊 ${result.score} pts | ${result.wordCount} words
+${streakText}
 ${siteUrl}/daily`;
 }
 
@@ -544,6 +554,67 @@ function getYesterdayDate(): string {
 export function getStreakMilestone(streak: number): number | null {
   const milestones = [7, 14, 30, 50, 100, 365];
   return milestones.find(m => m === streak) || null;
+}
+
+// ==========================================
+// Guest Player Info (for daily leaderboard display)
+// ==========================================
+
+const GUEST_DAILY_PLAYER_KEY = 'lexiclash_guest_daily_player';
+
+export interface GuestDailyPlayer {
+  displayName: string;
+  avatarEmoji: string;
+  avatarColor: string;
+}
+
+/**
+ * Get or generate guest daily player info
+ * This is stored in localStorage so the same guest always appears with the same name/avatar
+ */
+export async function getGuestDailyPlayer(): Promise<GuestDailyPlayer> {
+  if (typeof window === 'undefined') {
+    return { displayName: 'Guest', avatarEmoji: '🎯', avatarColor: '#6366f1' };
+  }
+
+  // Check if we already have stored guest player info
+  const stored = localStorage.getItem(GUEST_DAILY_PLAYER_KEY);
+  if (stored) {
+    try {
+      return JSON.parse(stored);
+    } catch {
+      // Continue to generate new
+    }
+  }
+
+  // Generate new guest player info
+  try {
+    const response = await fetch('/api/random-name?language=en', {
+      method: 'GET',
+      headers: { Accept: 'application/json' },
+    });
+    if (response.ok) {
+      const data = await response.json();
+      const guestPlayer: GuestDailyPlayer = {
+        displayName: data.name,
+        avatarEmoji: data.avatar.emoji,
+        avatarColor: data.avatar.color,
+      };
+      localStorage.setItem(GUEST_DAILY_PLAYER_KEY, JSON.stringify(guestPlayer));
+      return guestPlayer;
+    }
+  } catch {
+    // Fall through to default
+  }
+
+  // Fallback
+  const fallback: GuestDailyPlayer = {
+    displayName: 'Player ' + Math.floor(Math.random() * 1000),
+    avatarEmoji: '🎯',
+    avatarColor: '#6366f1',
+  };
+  localStorage.setItem(GUEST_DAILY_PLAYER_KEY, JSON.stringify(fallback));
+  return fallback;
 }
 
 // ==========================================

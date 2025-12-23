@@ -656,7 +656,7 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, letterGrid, game
         </div>
 
         {/* Player Results Cards */}
-        <div className="w-full max-w-2xl mx-auto px-2 sm:px-4 space-y-4">
+        <div className="w-full max-w-2xl mx-auto px-2 sm:px-4 space-y-2">
           {sortedScores.map((player, index) => (
             <ResultsPlayerCard
               key={player.username}

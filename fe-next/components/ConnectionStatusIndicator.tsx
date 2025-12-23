@@ -47,6 +47,7 @@ const STATUS_CONFIG: Record<ConnectionStatus, {
 
 /**
  * Minimal connection dot (just the indicator, no tooltip)
+ * Only shows when there's a connection issue (not when connected)
  */
 export const ConnectionDot: React.FC<{ className?: string }> = ({ className }) => {
   const { isConnected, isReconnecting, connectionError } = useSocket();
@@ -59,6 +60,12 @@ export const ConnectionDot: React.FC<{ className?: string }> = ({ className }) =
   };
 
   const status = getStatus();
+
+  // Only show indicator when there's a problem - don't show green dot for normal operation
+  if (status === 'connected') {
+    return null;
+  }
+
   const config = STATUS_CONFIG[status];
 
   return (

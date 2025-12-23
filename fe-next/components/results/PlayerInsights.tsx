@@ -272,7 +272,7 @@ const PlayerInsights: React.FC<PlayerInsightsProps> = ({ insights }) => {
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.2 }}
-      className="mt-4 pt-4 border-t-3 border-neo-black/20"
+      className="mt-3 pt-3 border-t-3 border-neo-black/20"
     >
       {/* Player Story Card - The headline insight */}
       {playerStory && (
@@ -281,7 +281,7 @@ const PlayerInsights: React.FC<PlayerInsightsProps> = ({ insights }) => {
           animate={{ opacity: 1, scale: 1, rotate: 1 }}
           transition={{ delay: 0.1, type: 'spring', stiffness: 200 }}
           className={cn(
-            'mb-4 p-4 rounded-neo border-3 border-neo-black',
+            'mb-3 p-3 rounded-neo border-3 border-neo-black',
             'bg-gradient-to-br from-neo-purple to-neo-purple-light',
             'shadow-hard relative overflow-hidden texture-halftone-comic-dense'
           )}
@@ -316,12 +316,12 @@ const PlayerInsights: React.FC<PlayerInsightsProps> = ({ insights }) => {
         </motion.div>
       )}
 
-      <h4 className="text-sm font-black uppercase tracking-wide text-neo-black dark:text-neo-cream mb-3">
+      <h4 className="text-sm font-black uppercase tracking-wide text-foreground mb-2">
         {t('insights.yourStats') || 'Your Stats'}
       </h4>
 
       {/* 2x2 Grid of stat cards */}
-      <div className="grid grid-cols-2 gap-2">
+      <div className="grid grid-cols-2 gap-1.5">
         {insightCards.map((card, index) => {
           const Icon = card.icon;
           return (
@@ -331,7 +331,7 @@ const PlayerInsights: React.FC<PlayerInsightsProps> = ({ insights }) => {
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: 0.1 + index * 0.05 }}
               className={cn(
-                'p-3 rounded-neo border-2 border-neo-black',
+                'p-2 rounded-neo border-2 border-neo-black',
                 'bg-white shadow-hard-sm',
                 'hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-hard',
                 'transition-all duration-100'
@@ -367,7 +367,7 @@ const PlayerInsights: React.FC<PlayerInsightsProps> = ({ insights }) => {
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.4 }}
         className={cn(
-          'mt-2 p-3 rounded-neo border-2 border-neo-black',
+          'mt-1.5 p-2 rounded-neo border-2 border-neo-black',
           'bg-white shadow-hard-sm'
         )}
       >
@@ -419,7 +419,7 @@ const PlayerInsights: React.FC<PlayerInsightsProps> = ({ insights }) => {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.5 }}
-          className="mt-2 text-[10px] font-bold text-neo-black/80 dark:text-neo-cream/80 text-center"
+          className="mt-1.5 text-[10px] font-bold text-foreground/80 text-center"
         >
           {t('insights.accuracy') || 'Accuracy'}: {insights.accuracy}%
         </motion.div>

@@ -15,6 +15,8 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { HelpPanel, HelpButton } from '@/components/game/HelpPanel';
+import WordFormingArea, { type WordFeedback } from '@/components/game/WordFormingArea';
+import ComboDisplay from '@/components/game/ComboDisplay';
 import { Button } from '@/components/ui/button';
 import GridComponent from '@/components/GridComponent';
 import CircularTimer from '@/components/CircularTimer';
@@ -22,7 +24,6 @@ import { EarthquakeWarning, FireRoundIndicator } from '@/components/earthquake';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import { useGameMusic } from '@/hooks/useGameMusic';
-import { useMusic } from '@/contexts/MusicContext';
 import { useEarthquakeFireRound } from '@/hooks/useEarthquakeFireRound';
 import { generateRandomTable, applyHebrewFinalLetters } from '@/utils/utils';
 import { DIFFICULTIES } from '@/utils/consts';
@@ -75,7 +76,6 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
     stopFireCrackleLoop,
   } = useSoundEffects();
   const { announceWordResult, announceCombo } = useAnnouncer();
-  const { stopMusic } = useMusic();
   const [isLandscape, setIsLandscape] = useState(false);
   const [grid, setGrid] = useState<LetterGrid | null>(null);
   const [foundWords, setFoundWords] = useState<FoundWord[]>([]);
@@ -94,9 +94,18 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
   } | null>(null);
   // Track which words each bot has already used
   const botUsedWordsRef = useRef<Record<string, Set<string>>>({});
+  // Ref to access current availableWords in callbacks (avoids stale closure)
+  const availableWordsRef = useRef(availableWords);
   const [isHelpOpen, setIsHelpOpen] = useState(false);
   const [showQuitConfirm, setShowQuitConfirm] = useState(false);
   const [showLandscapeTutorial, setShowLandscapeTutorial] = useState(false);
+
+  // Word forming state (for external WordFormingArea)
+  const [formedWord, setFormedWord] = useState('');
+  const [letterCount, setLetterCount] = useState(0);
+
+  // Feedback state (for WordFormingArea)
+  const [currentFeedback, setCurrentFeedback] = useState<WordFeedback | null>(null);
 
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const comboTimeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -130,6 +139,7 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
   useEffect(() => { botWordsRef.current = botWords; }, [botWords]);
   useEffect(() => { gridRef.current = grid; }, [grid]);
   useEffect(() => { comboLevelRef.current = comboLevel; }, [comboLevel]);
+  useEffect(() => { availableWordsRef.current = availableWords; }, [availableWords]);
 
   // Track landscape orientation for ALL screen sizes (not just mobile)
   useEffect(() => {
@@ -149,21 +159,9 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
     };
   }, []);
 
-  // Use shared game music hook - handles in-game music, urgent music, and stop on game end
-  // Consistent with multiplayer: urgent music at 20 seconds, stops when timer hits 0
-  useGameMusic({
-    phase: 'playing',
-    remainingTime,
-    isPaused: isPaused || isGameOver || settings.mode === 'practice',
-    enabled: settings.mode !== 'practice', // No timed music in practice mode
-  });
-
-  // Stop music when component unmounts (e.g., when player quits)
-  useEffect(() => {
-    return () => {
-      stopMusic(500); // Fade out quickly on unmount
-    };
-  }, [stopMusic]);
+  // Note: Music transitions are handled by useGameMusic hook in SinglePlayerView
+  // which properly fades between tracks. We don't call stopMusic on unmount
+  // because that would interfere with the transition to results/lobby music.
 
   // Landscape tutorial - show only once per device
   useEffect(() => {
@@ -281,6 +279,17 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
     onTimerResume: handleEarthquakeTimerResume,
   });
 
+  // Use shared game music hook - handles in-game music, urgent music, earthquake music
+  // Consistent with multiplayer: urgent music after 33% elapsed, bossa-arcade during earthquake
+  useGameMusic({
+    phase: 'playing',
+    remainingTime,
+    totalTime: settings.timerSeconds,
+    isPaused: isPaused || isGameOver || settings.mode === 'practice',
+    enabled: settings.mode !== 'practice', // No timed music in practice mode
+    earthquakeState,
+  });
+
   // Generate grid on mount
   useEffect(() => {
     const difficultyConfig = DIFFICULTIES[settings.difficulty];
@@ -313,6 +322,14 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
   useEffect(() => {
     if (!grid || settings.mode !== 'solo-bots') return;
 
+    // Set timeout to ensure bots start even if API is slow/fails
+    const timeoutId = setTimeout(() => {
+      if (!availableWordsRef.current) {
+        console.warn('Grid solve API timed out, bots will use fallback words');
+        setAvailableWords({ easy: [], medium: [], hard: [] });
+      }
+    }, 5000); // 5 second timeout
+
     const fetchGridWords = async () => {
       try {
         const response = await fetch('/api/solve-grid', {
@@ -323,17 +340,32 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
             language: settings.language,
           }),
         });
+
+        // Check if response is OK before parsing JSON
+        if (!response.ok) {
+          console.warn(`Grid solve API returned ${response.status}`);
+          // Set empty categories so bots use fallback words
+          setAvailableWords({ easy: [], medium: [], hard: [] });
+          return;
+        }
+
         const result = await response.json();
         if (result.success && result.words) {
           setAvailableWords(result.words);
+        } else {
+          // API returned but no words - use fallback
+          setAvailableWords({ easy: [], medium: [], hard: [] });
         }
       } catch (error) {
         console.error('Failed to fetch grid words for bots:', error);
-        // Bots will fall back to simulated words if this fails
+        // Set empty categories so bots use fallback words
+        setAvailableWords({ easy: [], medium: [], hard: [] });
       }
     };
 
     fetchGridWords();
+
+    return () => clearTimeout(timeoutId);
   }, [grid, settings.language, settings.mode]);
 
   // Handle game over when isGameOver becomes true
@@ -367,9 +399,18 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
               minWordLength: 2, // Default minimum word length for single player
             }),
           });
-          const result = await response.json();
 
-          if (result.success && Array.isArray(result.results)) {
+          // Check response before parsing JSON to avoid parse errors on 500s
+          if (!response.ok) {
+            console.warn(`AI validation API returned ${response.status}`);
+            // Mark pending words as invalid when API fails
+            finalWords = currentWords.map(w =>
+              w.isValid === null ? { ...w, isValid: false } : w
+            );
+          } else {
+            const result = await response.json();
+
+            if (result.success && Array.isArray(result.results)) {
             // Create a map for quick lookup
             const validationMap = new Map<string, boolean>();
             for (const r of result.results) {
@@ -389,6 +430,7 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
             finalWords = currentWords.map(w =>
               w.isValid === null ? { ...w, isValid: false } : w
             );
+          }
           }
         } catch {
           // On error, mark pending words as invalid
@@ -461,13 +503,19 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
   }, [isGameOver, settings.bots, settings.language, onGameEnd]);
 
   // Timer effect - handles both manual pause and earthquake pause
+  // Note: remainingTime is NOT in dependency array to prevent interval recreation every tick
   useEffect(() => {
     if (settings.mode === 'practice') return;
-    if (isPaused || remainingTime <= 0 || isGameOver || isEarthquakePaused) return;
+    if (isPaused || isGameOver || isEarthquakePaused) return;
 
     timerRef.current = setInterval(() => {
       setRemainingTime(prev => {
-        if (prev <= 1) {
+        if (prev <= 0) {
+          // Already at 0, don't go negative
+          if (timerRef.current) clearInterval(timerRef.current);
+          return prev;
+        }
+        if (prev === 1) {
           if (timerRef.current) clearInterval(timerRef.current);
           // Trigger game over via state change, not direct call
           setIsGameOver(true);
@@ -478,13 +526,21 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
     }, 1000);
 
     return () => {
-      if (timerRef.current) clearInterval(timerRef.current);
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+        timerRef.current = null;
+      }
     };
-  }, [isPaused, settings.mode, isGameOver, remainingTime, isEarthquakePaused]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- remainingTime intentionally excluded to prevent interval recreation every tick
+  }, [isPaused, settings.mode, isGameOver, isEarthquakePaused]);
 
-  // Bot simulation effect
+  // Bot simulation effect - wait for availableWords before starting
+  // This ensures bots use actual words from the grid solver instead of placeholders
   useEffect(() => {
     if (settings.mode !== 'solo-bots' || isPaused || settings.bots.length === 0 || isGameOver) return;
+    // Wait for availableWords to be fetched before starting bot simulation
+    // This prevents bots from using fallback placeholder words
+    if (!availableWords) return;
 
     settings.bots.forEach(bot => {
       const interval = getBotInterval(bot.difficulty);
@@ -500,7 +556,7 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
       botIntervalsRef.current.forEach(clearInterval);
       botIntervalsRef.current = [];
     };
-  }, [settings.mode, settings.bots, isPaused, isGameOver]);
+  }, [settings.mode, settings.bots, isPaused, isGameOver, availableWords]);
 
   const getBotInterval = (difficulty: 'easy' | 'medium' | 'hard'): number => {
     const intervals = {
@@ -512,10 +568,13 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
   };
 
   const simulateBotFindWord = useCallback((bot: BotOpponent) => {
+    // Use ref to get current availableWords (avoids stale closure)
+    const currentAvailableWords = availableWordsRef.current;
+
     // Try to use real words from the grid solver
-    if (availableWords) {
+    if (currentAvailableWords) {
       // Get words for this bot's difficulty
-      const wordPool = availableWords[bot.difficulty] || [];
+      const wordPool = currentAvailableWords[bot.difficulty] || [];
       const usedWords = botUsedWordsRef.current[bot.id] || new Set();
 
       // Find an unused word
@@ -563,7 +622,7 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
       ...prev,
       [bot.id]: [...(prev[bot.id] || []), `word${length}`],
     }));
-  }, [availableWords]);
+  }, []);
 
   const calculateWordScore = (wordLength: number, currentComboLevel: number): number => {
     // Base score: word length - 1 (matches multiplayer scoring)
@@ -626,7 +685,14 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
       if (localValidation.errorParams?.min) {
         msg = msg.replace('${min}', String(localValidation.errorParams.min));
       }
-      wordErrorToast(msg, { duration: 1000 });
+      // Show notification in dedicated area
+      setCurrentFeedback({
+        id: `reject-${now}`,
+        type: 'rejected',
+        word: normalizedWord,
+        message: msg,
+        timestamp: now,
+      });
       announceWordResult(normalizedWord, false, undefined, msg);
       // Reset combo on invalid word submission (consistent with multiplayer behavior)
       if (comboTimeoutRef.current) clearTimeout(comboTimeoutRef.current);
@@ -641,7 +707,14 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
     const currentGrid = gridRef.current;
     if (!currentGrid || !isWordOnBoard(normalizedWord, currentGrid, settings.language)) {
       const notOnBoardMsg = t('playerView.wordNotOnBoard') || 'Word not on board';
-      wordErrorToast(notOnBoardMsg, { duration: 1500 });
+      // Show notification in dedicated area
+      setCurrentFeedback({
+        id: `reject-${now}`,
+        type: 'rejected',
+        word: normalizedWord,
+        message: notOnBoardMsg,
+        timestamp: now,
+      });
       announceWordResult(normalizedWord, false, undefined, notOnBoardMsg);
       // Reset combo on invalid word submission (consistent with multiplayer behavior)
       if (comboTimeoutRef.current) clearTimeout(comboTimeoutRef.current);
@@ -654,7 +727,14 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
     // MUST reset combo when duplicate is submitted (consistent with multiplayer behavior)
     if (foundWordsSetRef.current.has(normalizedWord)) {
       const alreadyFoundMsg = t('playerView.wordAlreadyFound') || 'Already found!';
-      wordErrorToast(alreadyFoundMsg, { duration: 1000 });
+      // Show notification in dedicated area
+      setCurrentFeedback({
+        id: `reject-${now}`,
+        type: 'rejected',
+        word: normalizedWord,
+        message: alreadyFoundMsg,
+        timestamp: now,
+      });
       announceWordResult(normalizedWord, false, undefined, alreadyFoundMsg);
       // Reset combo on duplicate submission
       if (comboTimeoutRef.current) clearTimeout(comboTimeoutRef.current);
@@ -681,14 +761,21 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
       isValid: null, // Pending - will update after dictionary check
     }]);
 
-    // Step 5: Check dictionary via API (same validation as multiplayer backend)
+    // Step 5: Check dictionary via backend API (same validation as multiplayer)
+    // Uses /api/dictionary/check which supports all languages (EN, HE, SV, ES, JA)
     // Combo and score only added AFTER validation (like multiplayer)
     fetch('/api/dictionary/check', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ word: normalizedWord, language: settings.language }),
     })
-      .then(res => res.json())
+      .then(res => {
+        if (!res.ok) {
+          // API error - treat as pending for AI validation at game end
+          return { isValid: false, source: 'pending' };
+        }
+        return res.json();
+      })
       .then(result => {
         if (result.isValid) {
           // Word is in dictionary/community - valid immediately (like multiplayer's handleValidatedWord)
@@ -729,11 +816,14 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
             playComboSound(currentCombo + 1);
           }
 
-          // Show accepted toast with full score (like multiplayer's wordAccepted event)
-          wordAcceptedToast(normalizedWord.toUpperCase(), {
+          // Show accepted feedback in WordFormingArea
+          setCurrentFeedback({
+            id: `accept-${now}`,
+            type: 'accepted',
+            word: normalizedWord.toUpperCase(),
             score: fullScore,
-            comboLevel: currentCombo > 0 ? currentCombo : undefined,
             fireRoundActive,
+            timestamp: now,
           });
           // Announce for screen readers
           announceWordResult(normalizedWord, true, fullScore);
@@ -746,8 +836,13 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
           setComboLevel(0);
           validWordCountRef.current = 0;
 
-          // Show pending toast (like multiplayer's wordNeedsValidation event)
-          wordNeedsValidationToast(normalizedWord.toUpperCase());
+          // Show pending notification in dedicated area
+          setCurrentFeedback({
+            id: `pending-${now}`,
+            type: 'pending',
+            word: normalizedWord.toUpperCase(),
+            timestamp: now,
+          });
         }
       })
       .catch(() => {
@@ -755,12 +850,23 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
         if (comboTimeoutRef.current) clearTimeout(comboTimeoutRef.current);
         setComboLevel(0);
         validWordCountRef.current = 0;
-        wordNeedsValidationToast(normalizedWord.toUpperCase());
+        setCurrentFeedback({
+          id: `pending-${Date.now()}`,
+          type: 'pending',
+          word: normalizedWord.toUpperCase(),
+          timestamp: Date.now(),
+        });
       });
   }, [settings.language, foundWords, t, playWordAcceptedSound, playComboSound, announceWordResult, announceCombo]);
 
   const handleFinishPractice = useCallback(() => {
     setIsGameOver(true);
+  }, []);
+
+  // Handle word forming changes from GridComponent
+  const handleWordChange = useCallback((word: string, count: number) => {
+    setFormedWord(word);
+    setLetterCount(count);
   }, []);
 
   if (!grid) {
@@ -827,28 +933,7 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
               {t('common.words') || 'Words'}
             </div>
           </div>
-          <AnimatePresence>
-            {comboLevel > 1 && (
-              <motion.div
-                initial={{ scale: 0, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                exit={{ scale: 0, opacity: 0 }}
-                className="bg-neo-cyan border-2 border-neo-black rounded-neo shadow-hard-sm px-2 py-1 text-center"
-              >
-                <motion.div
-                  key={comboLevel}
-                  initial={{ scale: 1.3 }}
-                  animate={{ scale: 1 }}
-                  className="text-sm font-black text-neo-black"
-                >
-                  x{comboLevel}
-                </motion.div>
-                <div className="text-xs font-bold uppercase text-neo-black/70">
-                  {t('common.combo') || 'Combo'}
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
+          <ComboDisplay comboLevel={comboLevel} compact />
         </div>
 
         {/* Top-right: Help button */}
@@ -899,13 +984,24 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
           </Button>
         </div>
 
-        {/* Center: Grid - maximized for landscape */}
-        <div className="flex items-center justify-center w-full h-full px-3 py-0.5 landscape-grid-container">
-          <div className="h-full flex items-center justify-center game-board-frame-landscape" style={{ aspectRatio: '1/1' }}>
+        {/* Center: Word Forming Area + Notification + Grid - maximized for landscape */}
+        <div className="flex flex-col items-center justify-center w-full h-full px-3 py-0.5 landscape-grid-container">
+          {/* Word Forming Area - Permanent space above grid */}
+          <WordFormingArea
+            word={formedWord}
+            letterCount={letterCount}
+            feedback={currentFeedback}
+            compact
+            className="mb-0.5"
+          />
+          <div className="flex-1 flex items-center justify-center game-board-frame-landscape" style={{ aspectRatio: '1/1' }}>
             <GridComponent
               grid={grid}
               interactive={!isPaused}
               onWordSubmit={handleWordSubmit}
+              onWordChange={handleWordChange}
+              hideWordPreview
+              hideComboIndicator={true}
               comboLevel={comboLevel}
               largeText
               fireRoundActive={fireRoundActive}
@@ -1008,7 +1104,7 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-2">
       {/* Earthquake Warning Overlay */}
       <EarthquakeWarning
         isVisible={earthquakeState === 'warning'}
@@ -1041,13 +1137,25 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
         )}
       </div>
 
-      {/* Timer with Score and Combo flanking it */}
-      <div className="flex items-center justify-center gap-4">
-        {/* Score - Neo-Brutalist card */}
+      {/* Timer row - Timer, Combo, Score all together */}
+      <div className="flex items-center justify-center gap-3 mb-1">
+        {/* Timer */}
+        {settings.mode !== 'practice' && (
+          <CircularTimer
+            remainingTime={remainingTime}
+            totalTime={settings.timerSeconds}
+            size="sm"
+          />
+        )}
+
+        {/* Combo next to timer */}
+        <ComboDisplay comboLevel={comboLevel} />
+
+        {/* Score */}
         <motion.div
           initial={{ scale: 0, rotate: -5 }}
           animate={{ scale: 1, rotate: -2 }}
-          className="relative bg-neo-yellow border-4 border-neo-black rounded-neo-lg shadow-hard px-4 py-2 min-w-[80px]"
+          className="relative bg-neo-yellow border-3 border-neo-black rounded-neo shadow-hard px-2 py-1 min-w-[60px]"
         >
           <div
             className="text-center"
@@ -1057,56 +1165,26 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
               key={score}
               initial={{ scale: 1.3 }}
               animate={{ scale: 1 }}
-              className="text-2xl font-black text-neo-black"
-              style={{ textShadow: '2px 2px 0px var(--neo-cream)' }}
+              className="text-lg font-black text-neo-black"
+              style={{ textShadow: '1px 1px 0px var(--neo-cream)' }}
             >
               {score}
             </motion.div>
-            <div className="text-xs font-bold uppercase tracking-wider text-neo-black/70">
+            <div className="text-[10px] font-bold uppercase tracking-wider text-neo-black/70">
               {t('common.score') || 'Score'}
             </div>
           </div>
         </motion.div>
+      </div>
 
-        {/* Timer */}
-        {settings.mode !== 'practice' && (
-          <CircularTimer
-            remainingTime={remainingTime}
-            totalTime={settings.timerSeconds}
-          />
-        )}
-
-        {/* Combo - Neo-Brutalist card (only shows when combo > 1) */}
-        <div className="min-w-[80px]">
-          <AnimatePresence>
-            {comboLevel > 1 && (
-              <motion.div
-                initial={{ scale: 0, rotate: 5, opacity: 0 }}
-                animate={{ scale: 1, rotate: 2, opacity: 1 }}
-                exit={{ scale: 0, rotate: 10, opacity: 0 }}
-                className="relative bg-neo-cyan border-4 border-neo-black rounded-neo-lg shadow-hard px-4 py-2"
-              >
-                <div
-                  className="text-center"
-                  style={{ transform: 'rotate(-2deg)' }}
-                >
-                  <motion.div
-                    key={comboLevel}
-                    initial={{ scale: 1.5 }}
-                    animate={{ scale: 1 }}
-                    className="text-2xl font-black text-neo-black"
-                    style={{ textShadow: '2px 2px 0px var(--neo-cream)' }}
-                  >
-                    x{comboLevel}
-                  </motion.div>
-                  <div className="text-xs font-bold uppercase tracking-wider text-neo-black/70">
-                    {t('common.combo') || 'Combo'}
-                  </div>
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </div>
+      {/* Word Forming Area with feedback - centered below timer */}
+      <div className="flex items-center justify-center mb-1">
+        <WordFormingArea
+          word={formedWord}
+          letterCount={letterCount}
+          feedback={currentFeedback}
+          compact
+        />
       </div>
 
       {/* Challenge Mode Progress Tracker */}
@@ -1114,7 +1192,7 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
         <motion.div
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
-          className="mx-4"
+          className="mx-4 mb-1"
         >
           {targetHighScore !== null ? (
             <div className={cn(
@@ -1162,7 +1240,7 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
                     </motion.span>
                   ) : score < targetHighScore ? (
                     <span className="font-bold text-neo-black/75 dark:text-neo-white/75">
-                      {targetHighScore - score} {t('challenge.toGo') || 'to go'}
+                      {targetHighScore - score} {t('challenge.toGo')}
                     </span>
                   ) : null}
                 </div>
@@ -1196,6 +1274,9 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
           grid={grid}
           interactive={!isPaused}
           onWordSubmit={handleWordSubmit}
+          onWordChange={handleWordChange}
+          hideWordPreview
+          hideComboIndicator={true}
           comboLevel={comboLevel}
           largeText
           fireRoundActive={fireRoundActive}

@@ -5,8 +5,8 @@ import { motion } from 'framer-motion';
 import { FaTimes } from 'react-icons/fa';
 import GridComponent from '@/components/GridComponent';
 import CircularTimer from '@/components/CircularTimer';
-import WordFormingArea from '@/components/game/WordFormingArea';
-import GameNotificationArea, { type GameNotification } from '@/components/game/GameNotificationArea';
+import WordFormingArea, { type WordFeedback } from '@/components/game/WordFormingArea';
+import ComboDisplay from '@/components/game/ComboDisplay';
 import { HelpPanel, HelpButton } from '@/components/game/HelpPanel';
 import { Button } from '@/components/ui/button';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -75,8 +75,8 @@ const DailyChallengeGame: React.FC<DailyChallengeGameProps> = ({
   const [formedWord, setFormedWord] = useState('');
   const [letterCount, setLetterCount] = useState(0);
 
-  // Notification state (for GameNotificationArea)
-  const [currentNotification, setCurrentNotification] = useState<GameNotification | null>(null);
+  // Feedback state (for WordFormingArea)
+  const [currentFeedback, setCurrentFeedback] = useState<WordFeedback | null>(null);
 
   // Help panel state
   const [isHelpOpen, setIsHelpOpen] = useState(false);
@@ -90,6 +90,7 @@ const DailyChallengeGame: React.FC<DailyChallengeGameProps> = ({
   const gameStartTimeRef = useRef<number>(Date.now());
   const lastWordTimeRef = useRef<number | null>(null);
   const maxComboRef = useRef(0);
+  const remainingTimeRef = useRef(duration); // Track remaining time to avoid stale closure
 
   // Latest values refs
   const scoreRef = useRef(score);
@@ -100,10 +101,11 @@ const DailyChallengeGame: React.FC<DailyChallengeGameProps> = ({
   useEffect(() => { foundWordsRef.current = foundWords; }, [foundWords]);
   useEffect(() => { comboLevelRef.current = comboLevel; }, [comboLevel]);
 
-  // Game music
+  // Game music - handles in-game music, urgent music after 33% elapsed
   useGameMusic({
     phase: 'playing',
     remainingTime,
+    totalTime: duration,
     isPaused: isGameOver,
     enabled: true,
   });
@@ -121,12 +123,14 @@ const DailyChallengeGame: React.FC<DailyChallengeGameProps> = ({
 
     timerRef.current = setInterval(() => {
       setRemainingTime(prev => {
-        if (prev <= 1) {
+        const newTime = prev - 1;
+        remainingTimeRef.current = newTime; // Update ref for handleGameEnd
+        if (newTime <= 0) {
           clearInterval(timerRef.current!);
           handleGameEnd();
           return 0;
         }
-        return prev - 1;
+        return newTime;
       });
     }, 1000);
 
@@ -215,13 +219,13 @@ const DailyChallengeGame: React.FC<DailyChallengeGameProps> = ({
       score: finalScore,
       wordCount: words.length,
       wordsByLength,
-      timeSeconds: duration - remainingTime,
+      timeSeconds: duration - remainingTimeRef.current, // Use ref to avoid stale closure
       words,
       longestWord,
     };
 
     onComplete(result);
-  }, [duration, remainingTime, onComplete, language]);
+  }, [duration, onComplete, language]);
 
   // Calculate word score
   const calculateWordScore = useCallback((word: string, combo: number): number => {
@@ -269,7 +273,7 @@ const DailyChallengeGame: React.FC<DailyChallengeGameProps> = ({
     // Check if already found
     if (foundWordsSetRef.current.has(lowerWord)) {
       const msg = t('game.wordAlreadyFound') || 'Already found!';
-      setCurrentNotification({
+      setCurrentFeedback({
         id: `reject-${now}`,
         type: 'rejected',
         word: normalizedWord,
@@ -287,7 +291,7 @@ const DailyChallengeGame: React.FC<DailyChallengeGameProps> = ({
     // Check minimum length
     if (normalizedWord.length < 2) {
       const msg = t('game.wordTooShort') || 'Too short!';
-      setCurrentNotification({
+      setCurrentFeedback({
         id: `reject-${now}`,
         type: 'rejected',
         word: normalizedWord,
@@ -300,7 +304,7 @@ const DailyChallengeGame: React.FC<DailyChallengeGameProps> = ({
     // Check if word is on board
     if (!isWordOnBoard(normalizedWord, grid, language)) {
       const msg = t('game.wordNotOnBoard') || 'Not on board!';
-      setCurrentNotification({
+      setCurrentFeedback({
         id: `reject-${now}`,
         type: 'rejected',
         word: normalizedWord,
@@ -322,7 +326,7 @@ const DailyChallengeGame: React.FC<DailyChallengeGameProps> = ({
     if (!validation.isValid) {
       const errorKey = validation.errorKey ?? 'Invalid word';
       const msg = t(errorKey) || errorKey;
-      setCurrentNotification({
+      setCurrentFeedback({
         id: `reject-${now}`,
         type: 'rejected',
         word: normalizedWord,
@@ -401,13 +405,12 @@ const DailyChallengeGame: React.FC<DailyChallengeGameProps> = ({
           playWordAcceptedSound?.();
         }
 
-        // Show accepted notification
-        setCurrentNotification({
+        // Show accepted feedback in WordFormingArea
+        setCurrentFeedback({
           id: `accept-${now}`,
           type: 'accepted',
           word: normalizedWord.toUpperCase(),
           score: fullScore,
-          comboLevel: newCombo > 1 ? newCombo : undefined,
           timestamp: now,
         });
       } else {
@@ -419,7 +422,7 @@ const DailyChallengeGame: React.FC<DailyChallengeGameProps> = ({
         lastWordTimeRef.current = null;
 
         // Show pending notification
-        setCurrentNotification({
+        setCurrentFeedback({
           id: `pending-${now}`,
           type: 'pending',
           word: normalizedWord.toUpperCase(),
@@ -432,7 +435,7 @@ const DailyChallengeGame: React.FC<DailyChallengeGameProps> = ({
       setComboLevel(0);
       comboLevelRef.current = 0;
       lastWordTimeRef.current = null;
-      setCurrentNotification({
+      setCurrentFeedback({
         id: `pending-${Date.now()}`,
         type: 'pending',
         word: normalizedWord.toUpperCase(),
@@ -449,13 +452,13 @@ const DailyChallengeGame: React.FC<DailyChallengeGameProps> = ({
         score: 0,
         wordCount: 0,
         wordsByLength: {},
-        timeSeconds: duration - remainingTime,
+        timeSeconds: duration - remainingTimeRef.current, // Use ref to avoid stale closure
         words: [],
         longestWord: '',
       };
       onComplete(result);
     }
-  }, [duration, remainingTime, onComplete, t]);
+  }, [duration, onComplete, t]);
 
   // Handle word forming changes from GridComponent
   const handleWordChange = useCallback((word: string, count: number) => {
@@ -473,9 +476,9 @@ const DailyChallengeGame: React.FC<DailyChallengeGameProps> = ({
         isLandscape && "flex-row"
       )}
     >
-      {/* Header with timer and score */}
+      {/* Timer row - Timer, Combo, Score all together */}
       <div className={cn(
-        "flex items-center justify-between mb-2 sm:mb-4",
+        "flex items-center justify-center gap-3 mb-1",
         isLandscape && "flex-col h-full mr-4 mb-0"
       )}>
         {/* Quit button */}
@@ -483,59 +486,44 @@ const DailyChallengeGame: React.FC<DailyChallengeGameProps> = ({
           variant="ghost"
           size="sm"
           onClick={handleQuitClick}
-          className="text-gray-600 hover:text-red-500"
+          className="text-gray-600 hover:text-red-500 p-1"
         >
-          <FaTimes className="w-5 h-5" />
+          <FaTimes className="w-4 h-4" />
         </Button>
 
         {/* Timer */}
-        <div className={cn("flex items-center gap-2", isLandscape && "my-4")}>
-          <CircularTimer
-            remainingTime={remainingTime}
-            totalTime={duration}
-            size={isLandscape ? 'sm' : 'md'}
-          />
-        </div>
+        <CircularTimer
+          remainingTime={remainingTime}
+          totalTime={duration}
+          size="sm"
+        />
 
-        {/* Score display */}
-        <div className={cn(
-          "text-right",
-          isLandscape && "mt-auto"
-        )}>
-          <div className="text-xs text-gray-600 uppercase font-bold">{t('common.score')}</div>
-          <div className="text-2xl sm:text-3xl font-black text-neo-yellow">
+        {/* Combo next to timer */}
+        <ComboDisplay comboLevel={comboLevel} />
+
+        {/* Score */}
+        <div className="bg-neo-yellow border-3 border-neo-black rounded-neo shadow-hard px-2 py-1 min-w-[60px]">
+          <div className="text-[10px] text-neo-black uppercase font-bold text-center">{t('common.score')}</div>
+          <div className="text-lg font-black text-neo-black text-center">
             {score}
           </div>
-          {comboLevel >= 2 && (
-            <div className="text-xs text-neo-orange font-bold animate-pulse">
-              🔥 x{comboLevel} {t('common.combo').toUpperCase()}
-            </div>
-          )}
         </div>
-      </div>
 
-      {/* Puzzle number badge */}
-      <div className="text-center mb-2">
-        <span className="inline-block px-3 py-1 bg-neo-yellow/20 text-neo-yellow text-xs font-bold rounded-full">
-          {t('daily.puzzleNumber').replace('{number}', String(puzzleNumber))}
+        {/* Puzzle number */}
+        <span className="hidden sm:inline-block px-2 py-0.5 bg-neo-yellow/20 text-neo-yellow text-[10px] font-bold rounded-full">
+          #{puzzleNumber}
         </span>
       </div>
 
-      {/* Word Forming Area - Permanent space above grid */}
-      <WordFormingArea
-        word={formedWord}
-        letterCount={letterCount}
-        compact={isLandscape}
-        className="mb-1"
-      />
-
-      {/* Notification Area - Shows word validation feedback and combo */}
-      <GameNotificationArea
-        notification={currentNotification}
-        comboLevel={comboLevel}
-        compact={isLandscape}
-        className="mb-2"
-      />
+      {/* Word Forming Area with feedback - centered below timer */}
+      <div className={cn("flex items-center justify-center mb-1", isLandscape && "hidden")}>
+        <WordFormingArea
+          word={formedWord}
+          letterCount={letterCount}
+          feedback={currentFeedback}
+          compact
+        />
+      </div>
 
       {/* Game Grid */}
       <div className={cn(
@@ -546,6 +534,9 @@ const DailyChallengeGame: React.FC<DailyChallengeGameProps> = ({
           grid={grid}
           interactive={true}
           onWordSubmit={handleWordSubmit}
+          onWordChange={handleWordChange}
+          hideWordPreview
+          hideComboIndicator={true}
           comboLevel={comboLevel}
         />
       </div>

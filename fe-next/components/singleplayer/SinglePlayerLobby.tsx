@@ -318,10 +318,10 @@ const SinglePlayerLobby: React.FC<SinglePlayerLobbyProps> = ({
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4 }}
-        className="max-w-xl mx-auto space-y-3 sm:space-y-4 px-2 xs:px-4 overflow-x-hidden min-h-screen flex flex-col"
+        className="max-w-xl mx-auto space-y-3 sm:space-y-4 px-2 xs:px-4 overflow-x-hidden"
       >
       {/* Title with back button */}
-      <div className="relative flex items-center justify-center mb-1 flex-shrink-0">
+      <div className="relative flex items-center justify-center mb-1">
         <Link
           href="/"
           className="absolute start-0 flex items-center gap-2 px-3 py-2 rounded-neo border-3 border-neo-black dark:border-slate-600 bg-neo-cream dark:bg-slate-700 shadow-hard hover:shadow-hard-lg hover:translate-x-[-2px] hover:translate-y-[-2px] active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-pressed transition-all text-neo-black dark:text-neo-white text-sm font-bold min-h-[44px] min-w-[44px]"
@@ -335,7 +335,7 @@ const SinglePlayerLobby: React.FC<SinglePlayerLobbyProps> = ({
       </div>
 
       {/* Mode Selection - Main UI */}
-      <div className="grid grid-cols-3 gap-2 sm:gap-3 flex-shrink-0">
+      <div className="grid grid-cols-3 gap-2 sm:gap-3">
         {(Object.keys(MODE_CONFIG) as SinglePlayerMode[]).map(modeKey => {
           const config = MODE_CONFIG[modeKey];
           const isSelected = mode === modeKey;
@@ -364,9 +364,9 @@ const SinglePlayerLobby: React.FC<SinglePlayerLobbyProps> = ({
       </div>
 
       {/* Quick Info Card */}
-      <Card className="border-3 border-neo-black dark:border-slate-600 shadow-hard flex-1 min-h-0 flex flex-col">
-        <CardContent className="p-3 sm:p-4 flex-1 min-h-0 flex flex-col overflow-y-auto">
-          <div className="flex items-center justify-between mb-2 sm:mb-3 flex-shrink-0">
+      <Card className="border-3 border-neo-black dark:border-slate-600 shadow-hard">
+        <CardContent className="p-3 sm:p-4">
+          <div className="flex items-center justify-between mb-2 sm:mb-3">
             <div>
               <h3 className="font-black text-lg uppercase">
                 {t(MODE_CONFIG[mode].labelKey) || mode}
@@ -390,7 +390,7 @@ const SinglePlayerLobby: React.FC<SinglePlayerLobbyProps> = ({
             <motion.div
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
-              className="mb-2 sm:mb-3 flex-shrink-0"
+              className="mb-2 sm:mb-3"
             >
               {currentHighScore ? (
                 <div className="p-3 sm:p-4 bg-gradient-to-br from-neo-yellow via-yellow-300 to-neo-orange rounded-neo-lg border-4 border-neo-black shadow-hard relative overflow-hidden texture-halftone-comic">
@@ -484,7 +484,7 @@ const SinglePlayerLobby: React.FC<SinglePlayerLobbyProps> = ({
 
           {/* Bot config for solo-bots mode */}
           {mode === 'solo-bots' && (
-            <div className="mb-2 sm:mb-3 p-2 sm:p-3 bg-slate-100 dark:bg-slate-700/50 rounded-neo border-2 border-neo-black/20 dark:border-slate-500/30 flex-shrink-0">
+            <div className="mb-2 sm:mb-3 p-2 sm:p-3 bg-slate-100 dark:bg-slate-700/50 rounded-neo border-2 border-neo-black/20 dark:border-slate-500/30">
               <div className="flex items-center justify-between mb-2">
                 <span className="text-sm font-bold flex items-center gap-2 text-neo-black dark:text-neo-white">
                   <FaRobot />
@@ -639,7 +639,7 @@ const SinglePlayerLobby: React.FC<SinglePlayerLobbyProps> = ({
       <Button
         size="lg"
         variant="success"
-        className="w-full text-lg py-4 sm:py-6 shadow-hard hover:shadow-hard-lg flex-shrink-0"
+        className="w-full text-lg py-4 sm:py-6 shadow-hard hover:shadow-hard-lg"
         onClick={handleStartGame}
       >
         <FaPlay className="mr-2" />

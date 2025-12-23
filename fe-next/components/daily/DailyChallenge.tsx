@@ -299,7 +299,7 @@ const DailyReadyScreen: React.FC<DailyReadyScreenProps> = ({
       className="flex-1 flex flex-col items-center justify-center p-4"
     >
       {/* Back button */}
-      <motion.div className="absolute top-20 left-4">
+      <motion.div className="absolute top-24 sm:top-28 left-4">
         <Button
           variant="ghost"
           size="sm"

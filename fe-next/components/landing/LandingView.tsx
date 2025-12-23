@@ -2,9 +2,10 @@
 
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { FaUser, FaUsers, FaRobot, FaBullseye, FaTrophy, FaDoorOpen, FaCrown, FaMedal, FaQuestionCircle } from 'react-icons/fa';
-import { Target, Flame, ChevronRight } from 'lucide-react';
+import { Target, Flame, ChevronRight, ChevronLeft } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useMusic } from '@/contexts/MusicContext';
 import { useMobileLandscape } from '@/hooks/useMobileLandscape';
@@ -27,6 +28,7 @@ import type { Language } from '@/types';
  */
 const LandingView: React.FC = () => {
   const { t, language } = useLanguage();
+  const router = useRouter();
   const { playTrack, TRACKS } = useMusic();
   const isLandscape = useMobileLandscape();
 
@@ -35,6 +37,18 @@ const LandingView: React.FC = () => {
   const [hasPlayedDaily, setHasPlayedDaily] = useState<boolean>(false);
   const [dailyStreak, setDailyStreak] = useState<number>(0);
   const [dailyCountdown, setDailyCountdown] = useState<string>('');
+
+  // Check for room parameter and redirect to multiplayer page
+  // This handles shared links (WhatsApp, barcode scan, copy link)
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const urlParams = new URLSearchParams(window.location.search);
+    const roomCode = urlParams.get('room');
+    if (roomCode) {
+      // Redirect to multiplayer page with all query params preserved (room, utm_source, etc.)
+      router.replace(`/${language}/multiplayer${window.location.search}`);
+    }
+  }, [language, router]);
 
   // Initialize daily challenge info
   useEffect(() => {
@@ -168,14 +182,18 @@ const LandingView: React.FC = () => {
                   </div>
                 </div>
 
-                <div className="flex items-center">
-                  <div className="hidden sm:block mr-3 text-right">
+                <div className="flex items-center gap-3">
+                  <div className="hidden sm:block text-right">
                     <div className="text-xs font-bold text-neo-black/75 uppercase">
                       {hasPlayedDaily ? t('results.viewResults') : t('daily.playNow')}
                     </div>
                   </div>
                   <div className="flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 bg-neo-black rounded-neo">
-                    <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
+                    {language === 'he' ? (
+                      <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
+                    ) : (
+                      <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
+                    )}
                   </div>
                 </div>
               </div>

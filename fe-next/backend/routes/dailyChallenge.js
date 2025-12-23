@@ -143,7 +143,10 @@ router.post('/submit', async (req, res) => {
       time_seconds: timeSeconds || 0,
       longest_word: longestWord || null,
       longest_word_length: longestWord ? longestWord.length : null,
-      completed_at: new Date().toISOString()
+      completed_at: new Date().toISOString(),
+      display_name: displayName || 'Anonymous',
+      avatar_emoji: avatarEmoji || '🎯',
+      avatar_color: avatarColor || '#6366f1'
     };
 
     if (playerId) {

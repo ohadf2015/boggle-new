@@ -525,6 +525,18 @@ export function useGridInteraction({
     return () => window.removeEventListener('pointerdown', handlePointerDown);
   }, []);
 
+  // Attach touchmove listener with { passive: false } to allow preventDefault
+  // React's synthetic events are passive by default which prevents preventDefault from working
+  useEffect(() => {
+    const element = gridRef.current;
+    if (!element) return;
+
+    element.addEventListener('touchmove', handleTouchMove, { passive: false });
+    return () => {
+      element.removeEventListener('touchmove', handleTouchMove);
+    };
+  }, [handleTouchMove]);
+
   // Undo last selected cell - can be called from button or keyboard
   const undoLastCell = useCallback(() => {
     if (selectedCells.length > 0) {

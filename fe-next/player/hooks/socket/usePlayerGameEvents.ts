@@ -42,6 +42,9 @@ interface UsePlayerGameEventsProps {
   // Exit ref
   intentionalExitRef: MutableRefObject<boolean>;
 
+  // Music ref for tracking total game time
+  totalGameTimeRef?: MutableRefObject<number>;
+
   // Callbacks
   onGameStart?: () => void;
 }
@@ -70,6 +73,7 @@ export function usePlayerGameEvents({
   comboTimeoutRef,
   comboShieldsUsedRef,
   intentionalExitRef,
+  totalGameTimeRef,
   onGameStart,
 }: UsePlayerGameEventsProps): UsePlayerGameEventsReturn {
   // Get all game state and setters from context (no more massive prop drilling!)
@@ -136,7 +140,10 @@ export function usePlayerGameEvents({
         gameSessionIdRef.current = (data as any).gameSessionId;
       }
       if (data.letterGrid) setLetterGrid(data.letterGrid);
-      if (data.timerSeconds) setRemainingTime(data.timerSeconds);
+      if (data.timerSeconds) {
+        setRemainingTime(data.timerSeconds);
+        if (totalGameTimeRef) totalGameTimeRef.current = data.timerSeconds;
+      }
       if (data.language) setGameLanguage(data.language);
       if (data.minWordLength) setMinWordLength(data.minWordLength);
 

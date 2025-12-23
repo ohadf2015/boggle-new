@@ -172,8 +172,9 @@ export default function MultiplayerPage(): React.JSX.Element {
   // The MusicContext will queue the request and play when user interacts
   useEffect(() => {
     if (showResults) {
-      // Results screen - fade to before_game music (players often start another game)
-      fadeToTrack(TRACKS.BEFORE_GAME, 1200, 1200);
+      // Results screen - bossa music is already playing from validation phase
+      // Don't change the music, let it continue
+      return;
     } else if (!isActive) {
       // Lobby - play lobby music
       playTrack(TRACKS.LOBBY);
@@ -305,10 +306,16 @@ export default function MultiplayerPage(): React.JSX.Element {
       if (!savedUsername.trim()) {
         // No saved username - generate a fun random name
         const { name, avatar } = getRandomDefaultNameWithAvatar(language);
+        logger.log('[AUTH] Generated random name for guest:', name, 'avatar:', avatar.emoji);
         setUsername(name);
         setRoomName(name);
         setGuestAvatar(avatar);
         hasSetRandomNameRef.current = true;
+      } else {
+        logger.log('[AUTH] Using saved username:', savedUsername);
+        // Also pre-populate room name for hosting
+        setRoomName(savedUsername);
+        setGuestAvatar(getAvatarForName(savedUsername));
       }
     }
   }, [user, profile?.display_name, loading, language]);
@@ -981,7 +988,7 @@ export default function MultiplayerPage(): React.JSX.Element {
 
     // Compute the correct username at join time to avoid stale state issues
     // When authenticated, always prefer the profile/OAuth display name over any generated guest name
-    const effectiveUsername = user
+    let effectiveUsername = user
       ? (profile?.display_name ||
          user?.user_metadata?.full_name ||
          user?.user_metadata?.name ||
@@ -989,10 +996,26 @@ export default function MultiplayerPage(): React.JSX.Element {
          username)
       : username;
 
+    // For guests without a username, generate a fun random name on the spot
+    // This handles cases where handleJoin is called before the auth effect runs
+    let generatedAvatar: { emoji: string; color: string } | null = null;
+    if (!effectiveUsername?.trim() && !user) {
+      const { name, avatar } = getRandomDefaultNameWithAvatar(language);
+      effectiveUsername = name;
+      generatedAvatar = avatar;
+      setGuestAvatar(avatar);
+      logger.log('[JOIN] Generated random name for guest:', name);
+    }
+
     // Also update state to keep it in sync for future use
     if (effectiveUsername !== username) {
       setUsername(effectiveUsername);
     }
+
+    // Determine avatar to use: profile > guest state > just-generated > derive from name
+    const effectiveAvatar = profile
+      ? { emoji: profile.avatar_emoji, color: profile.avatar_color }
+      : (generatedAvatar || guestAvatar || getAvatarForName(effectiveUsername));
 
     setError('');
     setIsJoining(true); // Show loading state
@@ -1040,7 +1063,11 @@ export default function MultiplayerPage(): React.JSX.Element {
 
     if (isHostMode) {
       // For hosts, the username is the effective username (authenticated name or room name)
-      const hostDisplayName = user ? effectiveUsername : roomName;
+      const hostDisplayName = user ? effectiveUsername : (roomName || effectiveUsername);
+      // For guest hosts without a room name, use the effective avatar
+      const hostAvatar = profile
+        ? { emoji: profile.avatar_emoji, color: profile.avatar_color }
+        : (generatedAvatar || guestAvatar || getAvatarForName(hostDisplayName));
       socket.emit('createGame', {
         gameCode: codeToUse,
         roomName: hostDisplayName,
@@ -1048,10 +1075,7 @@ export default function MultiplayerPage(): React.JSX.Element {
         language: roomLang || language,
         authUserId,
         guestTokenHash,
-        avatar: profile ? {
-          emoji: profile.avatar_emoji,
-          color: profile.avatar_color,
-        } : getAvatarForName(hostDisplayName),
+        avatar: hostAvatar,
         profilePictureUrl: profile?.profile_picture_url,
       });
     } else {
@@ -1060,14 +1084,11 @@ export default function MultiplayerPage(): React.JSX.Element {
         username: effectiveUsername,
         authUserId,
         guestTokenHash,
-        avatar: profile ? {
-          emoji: profile.avatar_emoji,
-          color: profile.avatar_color,
-        } : getAvatarForName(effectiveUsername),
+        avatar: effectiveAvatar,
         profilePictureUrl: profile?.profile_picture_url,
       });
     }
-  }, [socket, isConnected, gameCode, username, roomName, language, t, isSupabaseEnabled, user, profile, loading, authLoadingStartTime]);
+  }, [socket, isConnected, gameCode, username, roomName, language, t, isSupabaseEnabled, user, profile, loading, authLoadingStartTime, guestAvatar]);
 
   const refreshRooms = useCallback(() => {
     if (socket && isConnected) {

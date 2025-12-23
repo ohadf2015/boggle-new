@@ -7,7 +7,6 @@ import { Card } from '../../components/ui/card';
 import { Badge } from '../../components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '../../components/ui/dialog';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '../../components/ui/alert-dialog';
-import SlotMachineGrid from '../../components/SlotMachineGrid';
 import ShareButton from '../../components/ShareButton';
 import SlotMachineText from '../../components/SlotMachineText';
 import Avatar from '../../components/Avatar';
@@ -261,47 +260,14 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
         </Card>
       </div>
 
-      {/* Row 3: Letter Grid + Chat */}
-      <div className="flex flex-col lg:flex-row gap-3 sm:gap-4 md:gap-6">
-        {/* Letter Grid - LEFT */}
-        <Card className="flex-1 p-1 sm:p-3 flex flex-col items-center bg-slate-800/95 border-4 border-neo-black shadow-hard-lg">
-          <div className="w-full flex justify-center items-center transition-all duration-500 aspect-square max-w-full">
-            <div className="w-full h-full flex items-center justify-center">
-              {shufflingGrid ? (
-                <SlotMachineGrid
-                  grid={shufflingGrid}
-                  highlightedCells={highlightedCells}
-                  language={gameLanguage || 'en'}
-                  className="w-full h-full"
-                  animationDuration={600}
-                  staggerDelay={40}
-                  animationPattern="cascade"
-                />
-              ) : (
-                <div className="w-full aspect-square grid grid-cols-4 gap-2 p-4">
-                  {Array.from({ length: 16 }).map((_, i) => (
-                    <motion.div
-                      key={i}
-                      className="aspect-square rounded-neo bg-neo-cream/20 border-2 border-neo-black/30"
-                      animate={{ opacity: [0.3, 0.6, 0.3] }}
-                      transition={{ duration: 1.5, repeat: Infinity, delay: i * 0.05 }}
-                    />
-                  ))}
-                </div>
-              )}
-            </div>
-          </div>
-        </Card>
-
-        {/* Chat - RIGHT */}
-        <div className="lg:w-[350px] xl:w-[400px]">
-          <RoomChat
-            username={username}
-            isHost={false}
-            gameCode={gameCode}
-            className="h-full min-h-[400px]"
-          />
-        </div>
+      {/* Row 3: Chat */}
+      <div className="w-full max-w-2xl mx-auto">
+        <RoomChat
+          username={username}
+          isHost={false}
+          gameCode={gameCode}
+          className="h-full min-h-[400px]"
+        />
       </div>
 
       {/* QR Code Dialog */}

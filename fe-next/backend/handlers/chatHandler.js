@@ -70,13 +70,44 @@ function registerChatHandlers(io, socket) {
 
     // Filter profanity and sanitize HTML
     const cleanMessage = sanitizeHtml(cleanProfanity(message.trim().substring(0, 500)));
-
-    broadcastToRoom(io, getGameRoom(gameCode), 'chatMessage', {
+    const timestamp = Date.now();
+    const chatMessageData = {
       username: isHostUser ? 'Host' : sanitizeHtml(username),
       message: cleanMessage,
-      timestamp: Date.now(),
+      timestamp,
       isHost: isHostUser
-    });
+    };
+
+    // Store message in game chat history (persists across rounds)
+    if (!game.chatHistory) {
+      game.chatHistory = [];
+    }
+    game.chatHistory.push(chatMessageData);
+    // Keep only last 100 messages
+    if (game.chatHistory.length > 100) {
+      game.chatHistory = game.chatHistory.slice(-100);
+    }
+
+    broadcastToRoom(io, getGameRoom(gameCode), 'chatMessage', chatMessageData);
+  });
+
+  // Handle chat history request (for late joiners and page refresh)
+  socket.on('requestChatHistory', (data) => {
+    if (isSocketMigrating(socket)) return;
+
+    const gameCode = data?.gameCode || getGameBySocketId(socket.id);
+    if (!gameCode) {
+      socket.emit('chatHistory', { messages: [] });
+      return;
+    }
+
+    const game = getGame(gameCode);
+    if (!game || !game.chatHistory) {
+      socket.emit('chatHistory', { messages: [] });
+      return;
+    }
+
+    socket.emit('chatHistory', { messages: game.chatHistory });
   });
 }
 

@@ -4,7 +4,7 @@ import React, { createContext, useContext, useEffect, useState, useRef, useCallb
 import { Howl, Howler } from 'howler';
 import logger from '@/utils/logger';
 
-type TrackKey = 'lobby' | 'beforeGame' | 'inGame' | 'almostOutOfTime';
+type TrackKey = 'lobby' | 'beforeGame' | 'inGame' | 'almostOutOfTime' | 'bossaArcade' | 'bossa';
 
 interface MusicContextType {
   currentTrack: TrackKey | null;
@@ -23,6 +23,8 @@ interface MusicContextType {
     BEFORE_GAME: 'beforeGame';
     IN_GAME: 'inGame';
     ALMOST_OUT_OF_TIME: 'almostOutOfTime';
+    BOSSA_ARCADE: 'bossaArcade';
+    BOSSA: 'bossa';
   };
 }
 
@@ -44,6 +46,8 @@ const TRACKS: Record<TrackKey, string> = {
     beforeGame: '/music/before_game.mp3',
     inGame: '/music/in_game.mp3',
     almostOutOfTime: '/music/almost_out_of_time.mp3',
+    bossaArcade: '/music/bossa-arcade.mp3',
+    bossa: '/music/bossa.mp3',
 };
 
 const STORAGE_KEY = 'boggle_music_settings';
@@ -606,6 +610,8 @@ export function MusicProvider({ children }: MusicProviderProps) {
             BEFORE_GAME: 'beforeGame',
             IN_GAME: 'inGame',
             ALMOST_OUT_OF_TIME: 'almostOutOfTime',
+            BOSSA_ARCADE: 'bossaArcade',
+            BOSSA: 'bossa',
         },
     };
 

@@ -50,6 +50,9 @@ interface UsePlayerSocketEventsProps {
   // Exit ref
   intentionalExitRef: MutableRefObject<boolean>;
 
+  // Music ref for tracking total game time
+  totalGameTimeRef?: MutableRefObject<number>;
+
   // Callback when game starts
   onGameStart?: () => void;
 }
@@ -86,6 +89,9 @@ const usePlayerSocketEvents = ({
   // Exit ref
   intentionalExitRef,
 
+  // Music ref
+  totalGameTimeRef,
+
   // Callbacks
   onGameStart,
 }: UsePlayerSocketEventsProps): void => {
@@ -107,6 +113,7 @@ const usePlayerSocketEvents = ({
     comboTimeoutRef,
     comboShieldsUsedRef,
     intentionalExitRef,
+    totalGameTimeRef,
     onGameStart,
   });
 

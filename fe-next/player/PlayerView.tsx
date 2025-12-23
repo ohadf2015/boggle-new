@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useCallback, useRef, memo } from 'react';
+import React, { useState, useEffect, useCallback, useRef, memo, useMemo } from 'react';
 import GoRipplesAnimation from '../components/GoRipplesAnimation';
 import { useSocket } from '../utils/SocketContext';
 import { clearSessionPreservingUsername } from '../utils/session';
@@ -13,7 +13,6 @@ import { useHints } from '../hooks/useHints';
 import logger from '@/utils/logger';
 import type { LetterGrid, Language, Avatar, GridPosition, TournamentStanding } from '@/types';
 import type {
-  FoundWord,
   LiveLeaderboardEntry as LeaderboardEntry,
   ViewTournamentData as TournamentData,
   XpGainedData,
@@ -28,6 +27,7 @@ import PlayerInGameView from './components/PlayerInGameView';
 // Custom hooks
 import usePlayerSocketEvents from './hooks/usePlayerSocketEvents';
 import { resetComboState } from '@/shared/utils/comboUtils';
+import { useGameStateContext } from '@/contexts/GameStateContext';
 
 // ==========================================
 // Type Definitions
@@ -99,9 +99,11 @@ const PlayerView: React.FC<PlayerViewProps> = memo(({
   // Enable presence tracking
   usePresence({ enabled: !!gameCode });
 
+  // Use foundWords from GameStateContext (shared with usePlayerWordEvents)
+  const { foundWords, setFoundWords } = useGameStateContext();
+
   // Game state
   const [word, setWord] = useState<string>('');
-  const [foundWords, setFoundWords] = useState<FoundWord[]>([]);
   const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
   const [gameActive, setGameActive] = useState<boolean>(false);
   const [achievements, setAchievements] = useState<string[]>([]);
@@ -162,8 +164,10 @@ const PlayerView: React.FC<PlayerViewProps> = memo(({
   const [fireRoundActive, setFireRoundActive] = useState(false);
   const [fireRoundRemaining, setFireRoundRemaining] = useState(0);
 
-  // Music ref
+  // Music refs
   const hasTriggeredUrgentMusicRef = useRef<boolean>(false);
+  const totalGameTimeRef = useRef<number>(180); // Default 3 minutes, updated on game start
+  const earthquakeMusicActiveRef = useRef<boolean>(false); // Track if earthquake music is playing
 
   // Use custom hook for socket events (now uses GameStateContext - no more prop drilling!)
   usePlayerSocketEvents({
@@ -187,6 +191,7 @@ const PlayerView: React.FC<PlayerViewProps> = memo(({
     comboTimeoutRef,
     comboShieldsUsedRef,
     intentionalExitRef,
+    totalGameTimeRef,
     // Start music immediately when startGame event is received for better synchronization
     onGameStart: () => {
       fadeToTrack(TRACKS.IN_GAME, 800, 800);
@@ -203,21 +208,53 @@ const PlayerView: React.FC<PlayerViewProps> = memo(({
     }
   }, [gameActive]);
 
+  // Urgent music trigger - plays after 33% of game time has elapsed
   useEffect(() => {
-    if (gameActive && remainingTime !== null && remainingTime <= 20 && remainingTime > 0 && !hasTriggeredUrgentMusicRef.current) {
-      hasTriggeredUrgentMusicRef.current = true;
-      fadeToTrack(TRACKS.ALMOST_OUT_OF_TIME, 500, 500);
+    if (gameActive && remainingTime !== null && remainingTime > 0 && !hasTriggeredUrgentMusicRef.current) {
+      // Trigger when 33% of time has elapsed (67% remaining)
+      const triggerThreshold = totalGameTimeRef.current * 0.67;
+      if (remainingTime <= triggerThreshold) {
+        hasTriggeredUrgentMusicRef.current = true;
+        // Only play if earthquake music is not active (earthquake music takes priority)
+        if (!earthquakeMusicActiveRef.current) {
+          fadeToTrack(TRACKS.ALMOST_OUT_OF_TIME, 1000, 1000);
+        }
+      }
     }
-    if (remainingTime === 0) {
-      stopMusic(1500);
-    }
-  }, [remainingTime, gameActive, fadeToTrack, stopMusic, TRACKS]);
+    // When time runs out, music will transition to bossa for results validation (handled by waitingForResults effect)
+  }, [remainingTime, gameActive, fadeToTrack, TRACKS]);
 
   useEffect(() => {
     if (gameActive && remainingTime !== null && remainingTime <= 3 && remainingTime > 0) {
       playCountdownBeep(remainingTime);
     }
   }, [remainingTime, gameActive, playCountdownBeep]);
+
+  // Earthquake/Fire Round music - plays bossa-arcade during earthquake phases
+  useEffect(() => {
+    if (!gameActive) return;
+
+    // When earthquake starts (warning, shaking, or fire-round), play bossa-arcade
+    if (earthquakeState !== 'idle' && !earthquakeMusicActiveRef.current) {
+      earthquakeMusicActiveRef.current = true;
+      fadeToTrack(TRACKS.BOSSA_ARCADE, 800, 800);
+    }
+
+    // When earthquake ends, keep playing bossa-arcade (don't restore to previous track)
+    // This provides a consistent experience - earthquake music stays for remainder of game
+    if (earthquakeState === 'idle' && earthquakeMusicActiveRef.current) {
+      earthquakeMusicActiveRef.current = false;
+      // Keep bossa-arcade playing - no track restoration needed
+    }
+  }, [earthquakeState, gameActive, remainingTime, fadeToTrack, TRACKS]);
+
+  // Results validation music - plays bossa when entering results phase
+  useEffect(() => {
+    if (waitingForResults) {
+      // Transition to bossa for results validation and results page
+      fadeToTrack(TRACKS.BOSSA, 1500, 1500);
+    }
+  }, [waitingForResults, fadeToTrack, TRACKS]);
 
   // Client-side countdown timer
   useEffect(() => {
@@ -275,7 +312,7 @@ const PlayerView: React.FC<PlayerViewProps> = memo(({
         comboTimeoutRef.current = null;
       }
     };
-  }, []);
+  }, [setFoundWords]);
 
   // Update players from props
   useEffect(() => {
@@ -305,7 +342,10 @@ const PlayerView: React.FC<PlayerViewProps> = memo(({
     const startGame = () => {
       // Set game data and start animation
       if (pendingGameStart.letterGrid) setLetterGrid(pendingGameStart.letterGrid);
-      if (pendingGameStart.timerSeconds) setRemainingTime(pendingGameStart.timerSeconds);
+      if (pendingGameStart.timerSeconds) {
+        setRemainingTime(pendingGameStart.timerSeconds);
+        totalGameTimeRef.current = pendingGameStart.timerSeconds;
+      }
       if (pendingGameStart.minWordLength) setMinWordLength(pendingGameStart.minWordLength);
       setShowStartAnimation(true);
 
@@ -368,10 +408,30 @@ const PlayerView: React.FC<PlayerViewProps> = memo(({
     }, 200);
   }, [socket, gameCode, username]);
 
-  // Word submission handler
+  // Word submission handler - adds word with pending validation state
+  // Uses WordDetail type from GameStateContext
   const handleWordSubmit = useCallback((formedWord: string) => {
-    setFoundWords(prev => [...prev, { word: formedWord, isValid: null }]);
-  }, []);
+    setFoundWords(prev => [...prev, {
+      word: formedWord,
+      score: 0, // Will be updated when validated
+      validated: false, // Pending validation - will be updated by usePlayerWordEvents
+      isDuplicate: false,
+    }]);
+  }, [setFoundWords]);
+
+  // Map WordDetail (from context) to FoundWord (expected by components)
+  // This ensures type compatibility between context and view components
+  const mappedFoundWords = useMemo(() =>
+    foundWords.map(w => ({
+      word: w.word,
+      isValid: w.validated === true ? true : w.validated === false ? null : null,
+      score: w.score,
+      duplicate: w.isDuplicate,
+      comboBonus: w.comboBonus,
+      fireRoundBonus: w.fireRoundBonus,
+    })),
+    [foundWords]
+  );
 
   // Reset combo handler (for client-side duplicate detection)
   const handleResetCombo = useCallback(() => {
@@ -394,7 +454,7 @@ const PlayerView: React.FC<PlayerViewProps> = memo(({
           t={t}
           dir={dir}
           leaderboard={leaderboard}
-          foundWords={foundWords}
+          foundWords={mappedFoundWords}
           showExitConfirm={showExitConfirm}
           setShowExitConfirm={setShowExitConfirm}
           onExitRoom={handleExitRoom}
@@ -462,7 +522,7 @@ const PlayerView: React.FC<PlayerViewProps> = memo(({
         minWordLength={minWordLength}
         comboLevel={comboLevel}
         comboLevelRef={comboLevelRef}
-        foundWords={foundWords}
+        foundWords={mappedFoundWords}
         leaderboard={leaderboard}
         tournamentData={tournamentData}
         tournamentStandings={tournamentStandings}

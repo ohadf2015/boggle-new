@@ -3,7 +3,7 @@
 import React, { useState, useCallback, useEffect, useRef, FormEvent } from 'react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
-import { FaCrown, FaUser, FaDice, FaArrowLeft, FaCopy, FaCheck } from 'react-icons/fa';
+import { FaCrown, FaUser, FaArrowLeft } from 'react-icons/fa';
 import { QRCodeSVG } from 'qrcode.react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -85,29 +85,8 @@ const MultiplayerLobby: React.FC<MultiplayerLobbyProps> = ({
   const [roomLanguage, setRoomLanguage] = useState<Language>(language as Language);
   // Auto-expand room list on mobile when rooms are available
   const [mobileRoomsExpanded, setMobileRoomsExpanded] = useState(activeRooms.length > 0);
-  const [codeCopied, setCodeCopied] = useState(false);
   const hasAutoSwitchedToHostRef = useRef(false);
   const { notifyError } = useValidation(t);
-
-  // Copy room code to clipboard
-  const copyRoomCode = useCallback(async () => {
-    if (!gameCode) return;
-    try {
-      await navigator.clipboard.writeText(gameCode);
-      setCodeCopied(true);
-      setTimeout(() => setCodeCopied(false), 2000);
-    } catch (err) {
-      // Fallback for older browsers
-      const textArea = document.createElement('textarea');
-      textArea.value = gameCode;
-      document.body.appendChild(textArea);
-      textArea.select();
-      document.execCommand('copy');
-      document.body.removeChild(textArea);
-      setCodeCopied(true);
-      setTimeout(() => setCodeCopied(false), 2000);
-    }
-  }, [gameCode]);
 
   // Debounced validation
   const usernameValidation = useDebouncedValidation(username, { validate: validateUsername, delay: 300 });
@@ -149,11 +128,6 @@ const MultiplayerLobby: React.FC<MultiplayerLobbyProps> = ({
       setMode('join');
     }
   }, [prefilledRoom, gameCode]);
-
-  // Generate new room code
-  const generateRoomCode = useCallback(() => {
-    setGameCode(generateCode());
-  }, [setGameCode]);
 
   // Handle form submission
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
@@ -272,17 +246,12 @@ const MultiplayerLobby: React.FC<MultiplayerLobbyProps> = ({
                     <Label htmlFor="gameCode" className="text-sm font-bold uppercase text-neo-white mb-1 block">
                       {t('hostView.roomCode') || 'Room Code'}
                     </Label>
-                    <div className="flex gap-2">
-                      <Input
-                        id="gameCode"
-                        value={gameCode}
-                        onChange={(e) => { setGameCode(e.target.value.toUpperCase()); setGameCodeError(false); }}
-                        className="h-11 text-base font-mono flex-1"
-                      />
-                      <Button type="button" variant="secondary" size="sm" onClick={generateRoomCode} className="h-11 w-11 px-0">
-                        <FaDice />
-                      </Button>
-                    </div>
+                    <Input
+                      id="gameCode"
+                      value={gameCode}
+                      onChange={(e) => { setGameCode(e.target.value.toUpperCase()); setGameCodeError(false); }}
+                      className="h-11 text-base font-mono"
+                    />
                   </div>
 
                   {/* Language */}
@@ -370,7 +339,7 @@ const MultiplayerLobby: React.FC<MultiplayerLobbyProps> = ({
       <LandscapeIndicator />
 
       <div dir={dir} className="min-h-screen bg-gradient-to-b from-slate-50 via-slate-100 to-slate-200 dark:from-neo-navy dark:via-neo-navy-light dark:to-neo-navy flex flex-col">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 py-4 sm:py-6 flex-1 flex flex-col min-h-0">
+      <div className="w-[94%] max-w-7xl mx-auto py-4 sm:py-6 flex-1 flex flex-col min-h-0">
         {/* Title with back button */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
@@ -391,14 +360,14 @@ const MultiplayerLobby: React.FC<MultiplayerLobbyProps> = ({
 
         {/* On mobile: show room list first (top) when rooms exist, form first when empty */}
         <div className={cn(
-          "flex gap-3 sm:gap-4 lg:gap-6 lg:flex-row flex-1 min-h-0",
+          "flex gap-3 sm:gap-4 lg:gap-6 lg:flex-row",
           activeRooms.length > 0 ? "flex-col-reverse" : "flex-col"
         )}>
           {/* Main Form */}
           <motion.div
             initial={{ x: -30, opacity: 0 }}
             animate={{ x: 0, opacity: 1 }}
-            className="flex-1 max-w-md mx-auto lg:mx-0 w-full"
+            className="w-full lg:flex-1"
           >
             <Card>
               <CardHeader className="pb-4">
@@ -430,6 +399,7 @@ const MultiplayerLobby: React.FC<MultiplayerLobbyProps> = ({
                             setRoomNameError(false);
                           }}
                           placeholder={displayName || t('validation.enterRoomName') || 'Enter room name'}
+                          autoFocus
                           className={cn(
                             getValidationClasses(roomNameValidation.state),
                             roomNameError && 'border-neo-red'
@@ -445,41 +415,20 @@ const MultiplayerLobby: React.FC<MultiplayerLobbyProps> = ({
                         <Label htmlFor="gameCode" className="text-sm font-bold uppercase">
                           {t('hostView.roomCode') || 'Room Code'}
                         </Label>
-                        <div className="flex gap-2">
-                          <Input
-                            id="gameCode"
-                            value={gameCode}
-                            onChange={(e) => {
-                              setGameCode(e.target.value.toUpperCase());
-                              setGameCodeError(false);
-                            }}
-                            placeholder="ABC123"
-                            className={cn(
-                              'font-mono uppercase',
-                              getValidationClasses(gameCodeValidation.state),
-                              gameCodeError && 'border-neo-red'
-                            )}
-                          />
-                          <Button
-                            type="button"
-                            variant={codeCopied ? 'success' : 'outline'}
-                            size="icon"
-                            onClick={copyRoomCode}
-                            title={codeCopied ? (t('common.copied') || 'Copied!') : (t('common.copyCode') || 'Copy code')}
-                            aria-label={codeCopied ? 'Code copied' : 'Copy room code'}
-                          >
-                            {codeCopied ? <FaCheck /> : <FaCopy />}
-                          </Button>
-                          <Button
-                            type="button"
-                            variant="secondary"
-                            size="icon"
-                            onClick={generateRoomCode}
-                            title={t('joinView.generateNewCode') || 'Generate new code'}
-                          >
-                            <FaDice />
-                          </Button>
-                        </div>
+                        <Input
+                          id="gameCode"
+                          value={gameCode}
+                          onChange={(e) => {
+                            setGameCode(e.target.value.toUpperCase());
+                            setGameCodeError(false);
+                          }}
+                          placeholder="ABC123"
+                          className={cn(
+                            'font-mono uppercase',
+                            getValidationClasses(gameCodeValidation.state),
+                            gameCodeError && 'border-neo-red'
+                          )}
+                        />
                         {gameCodeError && gameCodeErrorKey && (
                           <p className="text-xs text-neo-red">{t(gameCodeErrorKey)}</p>
                         )}
@@ -520,6 +469,7 @@ const MultiplayerLobby: React.FC<MultiplayerLobbyProps> = ({
                             setUsernameError(false);
                           }}
                           placeholder={t('joinView.enterYourName') || 'Enter your name'}
+                          autoFocus
                           className={cn(
                             getValidationClasses(usernameValidation.state),
                             usernameError && 'border-neo-red'
@@ -577,7 +527,7 @@ const MultiplayerLobby: React.FC<MultiplayerLobbyProps> = ({
           <motion.div
             initial={{ x: 30, opacity: 0 }}
             animate={{ x: 0, opacity: 1 }}
-            className="flex-1 max-w-lg mx-auto lg:mx-0 w-full"
+            className="w-full lg:flex-1"
           >
             <RoomList
               activeRooms={activeRooms}

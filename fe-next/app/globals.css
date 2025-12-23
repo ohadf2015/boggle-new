@@ -408,9 +408,12 @@ body {
     border-radius: var(--radius-lg);
     /* No rotation - keep grid perfectly straight */
     padding: 10px;
-    /* Constrain to a perfect square */
-    width: min(100%, 80vh);
-    max-width: min(100%, 80vh);
+    /* Use viewport units directly - don't rely on parent percentage */
+    /* min with vw ensures it doesn't overflow horizontally on narrow screens */
+    width: min(80vh, calc(100vw - 32px));
+    height: min(80vh, calc(100vw - 32px));
+    max-width: min(80vh, calc(100vw - 32px));
+    max-height: min(80vh, calc(100vw - 32px));
     aspect-ratio: 1 / 1;
     /* Center within parent */
     margin: 0 auto;
@@ -419,8 +422,10 @@ body {
   /* On desktop screens, make the board a bit smaller */
   @media (min-width: 769px) {
     .game-board-frame {
-      width: min(100%, 65vh);
-      max-width: min(100%, 65vh);
+      width: min(65vh, calc(100vw - 400px));
+      height: min(65vh, calc(100vw - 400px));
+      max-width: min(65vh, calc(100vw - 400px));
+      max-height: min(65vh, calc(100vw - 400px));
     }
   }
 
@@ -428,14 +433,17 @@ body {
   @media (max-width: 768px) {
     .game-board-frame {
       padding: 4px;
-      /* On mobile, use full width but still square */
-      width: 100%;
-      max-width: 100%;
+      /* On mobile, maintain square aspect ratio by using the smaller of width or height */
+      /* This ensures the grid is always square regardless of screen orientation */
+      width: min(calc(100vw - 16px), 75vh, 75dvh);
+      max-width: min(calc(100vw - 16px), 75vh, 75dvh);
+      height: min(calc(100vw - 16px), 75vh, 75dvh);
+      max-height: min(calc(100vw - 16px), 75vh, 75dvh);
     }
   }
 
+  /* Note: Removed position: relative override that was breaking absolute-positioned grid children */
   .game-board-frame > * {
-    position: relative;
     z-index: 10;
   }
 
@@ -1828,19 +1836,21 @@ body {
 
   /* Game board frame adjustments for landscape - maximized for playability */
   .game-board-frame {
-    /* Maximized to 94vh for largest possible grid in landscape using dynamic vh */
-    width: min(100%, 94dvh);
-    max-width: min(100%, 94dvh);
-    height: 94dvh;
-    max-height: 94dvh;
+    /* Maximized to 94dvh for largest possible grid in landscape */
+    /* Use viewport units directly without percentage dependency */
+    width: min(94dvh, calc(100vw - 200px));
+    max-width: min(94dvh, calc(100vw - 200px));
+    height: min(94dvh, calc(100vw - 200px));
+    max-height: min(94dvh, calc(100vw - 200px));
     aspect-ratio: 1 / 1;
     padding: 4px;
   }
 
   /* Ensure grid cells have adequate minimum size in landscape - WCAG 2.1 AA compliant */
+  /* Allow cells to shrink on narrow screens to prevent overflow */
   .game-board-frame [role="gridcell"] {
-    min-width: 44px;
-    min-height: 44px;
+    min-width: min(44px, calc(100vw / 10));
+    min-height: min(44px, calc(100vw / 10));
   }
 
   /* Stack game UI vertically in landscape */
@@ -2014,9 +2024,10 @@ body {
 
   /* Game board frame maximized for full height when no header */
   .game-board-frame-full {
-    width: min(100%, 95vh);
-    max-width: min(100%, 95vh);
-    height: auto;
+    width: min(95vh, calc(100vw - 100px));
+    max-width: min(95vh, calc(100vw - 100px));
+    height: min(95vh, calc(100vw - 100px));
+    max-height: min(95vh, calc(100vw - 100px));
     aspect-ratio: 1 / 1;
     padding: 4px;
   }
@@ -2045,26 +2056,28 @@ body {
 
   .game-board-frame {
     /* Maximized to 96dvh for best playability on short screens */
-    width: min(100%, 96dvh);
-    max-width: min(100%, 96dvh);
-    height: 96dvh;
-    max-height: 96dvh;
+    /* Use viewport units without percentage dependency */
+    width: min(96dvh, calc(100vw - 150px));
+    max-width: min(96dvh, calc(100vw - 150px));
+    height: min(96dvh, calc(100vw - 150px));
+    max-height: min(96dvh, calc(100vw - 150px));
     padding: 2px;
   }
 
   /* Full-height mode - even larger on short screens */
   .game-board-frame-full {
-    width: min(100%, 98dvh);
-    max-width: min(100%, 98dvh);
-    height: 98dvh;
-    max-height: 98dvh;
+    width: min(98dvh, calc(100vw - 100px));
+    max-width: min(98dvh, calc(100vw - 100px));
+    height: min(98dvh, calc(100vw - 100px));
+    max-height: min(98dvh, calc(100vw - 100px));
     padding: 4px;
   }
 
-  /* Ensure grid cells are still readable on very short screens - but still meet touch target minimum */
+  /* Ensure grid cells are still readable on very short screens */
+  /* Use flexible minimum to prevent overflow on narrow landscape screens */
   .game-board-frame [role="gridcell"] {
-    min-width: 44px;
-    min-height: 44px;
+    min-width: min(44px, calc((100vw - 120px) / 8));
+    min-height: min(44px, calc((100vw - 120px) / 8));
     font-size: 0.875rem;
   }
 
@@ -2112,11 +2125,25 @@ body {
   }
 }
 
-/* Landscape tablets (larger screens in landscape) */
+/* Landscape tablets and desktop (larger screens in landscape) */
 @media (orientation: landscape) and (min-height: 601px) and (max-height: 900px) {
   .game-board-frame {
-    width: min(100%, 60vh);
-    max-width: min(100%, 60vh);
+    /* Larger grid for better playability on tablets/desktop landscape */
+    width: min(80vh, calc(100vw - 300px));
+    max-width: min(80vh, calc(100vw - 300px));
+    height: min(80vh, calc(100vw - 300px));
+    max-height: min(80vh, calc(100vw - 300px));
+  }
+}
+
+/* Large desktop landscape screens (height > 900px) */
+@media (orientation: landscape) and (min-height: 901px) {
+  .game-board-frame {
+    /* Comfortable size for large desktop screens */
+    width: min(70vh, calc(100vw - 400px));
+    max-width: min(70vh, calc(100vw - 400px));
+    height: min(70vh, calc(100vw - 400px));
+    max-height: min(70vh, calc(100vw - 400px));
   }
 }
 

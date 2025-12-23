@@ -1,9 +1,9 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import dynamic from 'next/dynamic';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FaTrophy, FaMedal, FaRedo, FaHome, FaRobot, FaChartBar, FaCrown, FaStar, FaAward, FaCog } from 'react-icons/fa';
+import { FaTrophy, FaMedal, FaRedo, FaHome, FaRobot, FaChartBar, FaCrown, FaStar, FaAward, FaArrowDown, FaCog } from 'react-icons/fa';
 import { Sparkles, TrendingUp, Target } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -52,9 +52,11 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
   const [showGrid, setShowGrid] = useState(false);
   const [expandedBot, setExpandedBot] = useState<string | null>(null);
   const [showSignupModal, setShowSignupModal] = useState(false);
+  const [showScrollButton, setShowScrollButton] = useState(true);
 
   // Refs to prevent duplicate stat updates
   const hasUpdatedStatsRef = useRef(false);
+  const actionButtonsRef = useRef<HTMLDivElement>(null);
 
   // Use extracted hook for data processing
   const {
@@ -126,6 +128,31 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
 
     return () => clearTimeout(timer);
   }, [isAuthenticated]);
+
+  // Scroll detection - hide button when near action buttons
+  useEffect(() => {
+    const handleScroll = () => {
+      if (!actionButtonsRef.current) return;
+
+      const rect = actionButtonsRef.current.getBoundingClientRect();
+      const windowHeight = window.innerHeight;
+
+      // Hide button when action buttons are visible (within viewport)
+      const isActionButtonsVisible = rect.top < windowHeight - 100;
+      setShowScrollButton(!isActionButtonsVisible);
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    // Initial check
+    handleScroll();
+
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  // Scroll to action buttons
+  const scrollToActions = useCallback(() => {
+    actionButtonsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }, []);
 
   // getRankIcon returns React elements - kept local as it's component-specific
   const getRankIcon = (rank: number) => {
@@ -588,7 +615,7 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
               {/* Invalid Words */}
               {invalidWords.length > 0 && (
                 <div className="bg-neo-cream dark:bg-slate-800 rounded-neo p-3 border-3 border-neo-black shadow-hard-sm">
-                  <div className="text-sm font-black text-neo-black/70 dark:text-neo-cream/70 mb-2 flex items-center gap-2 uppercase">
+                  <div className="text-sm font-black text-neo-black/70 dark:text-white mb-2 flex items-center gap-2 uppercase">
                     <span className="bg-neo-gray text-neo-cream px-2 py-0.5 rounded-neo border-2 border-neo-black">✗</span>
                     {t('results.invalid') || 'Invalid'} ({invalidWords.length})
                   </div>
@@ -663,7 +690,7 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
                 ))}
               </div>
               {/* Note that achievements are not saved */}
-              <p className="text-xs text-neo-black/70 dark:text-neo-cream/70 mt-3 italic">
+              <p className="text-xs text-neo-black/70 dark:text-white mt-3 italic">
                 {t('singlePlayer.achievementsNotSaved') || 'Achievements in single player mode are not saved to your profile.'}
               </p>
             </CardContent>
@@ -880,9 +907,9 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
         )}
       </AnimatePresence>
 
-      {/* Action buttons - Clear visual hierarchy */}
-      <div className="flex flex-col gap-3 pt-4">
-        {/* Primary CTA: Quick Rematch - most prominent, animated pulse */}
+      {/* Action buttons - Enhanced with Quick Rematch */}
+      <div ref={actionButtonsRef} className="flex flex-col gap-3 pt-4">
+        {/* Primary action: Quick Rematch - same settings, new game immediately */}
         {onQuickRematch && (
           <motion.div
             animate={{ scale: [1, 1.02, 1] }}
@@ -919,6 +946,24 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
           {t('common.backToLobby') || 'Back to Lobby'}
         </Button>
       </div>
+
+      {/* Floating scroll-to-bottom button */}
+      <AnimatePresence>
+        {showScrollButton && (
+          <motion.button
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 20 }}
+            transition={{ duration: 0.2 }}
+            onClick={scrollToActions}
+            className="fixed bottom-6 right-6 z-50 flex items-center gap-2 px-4 py-3 bg-neo-yellow hover:bg-neo-yellow/90 text-neo-black font-bold rounded-neo border-3 border-neo-black shadow-hard hover:shadow-hard-lg transition-all"
+            aria-label={t('common.newGame') || 'New Game'}
+          >
+            <FaArrowDown className="animate-bounce" />
+            <span className="hidden sm:inline">{t('common.newGame') || 'New Game'}</span>
+          </motion.button>
+        )}
+      </AnimatePresence>
 
       {/* Signup prompt for guests who have played multiple games */}
       <FirstWinSignupModal

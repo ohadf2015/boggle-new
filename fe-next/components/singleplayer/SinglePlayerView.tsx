@@ -8,6 +8,7 @@ import SinglePlayerResults from './SinglePlayerResults';
 import { getHighScore, recordGameResult } from './highScoreManager';
 import { useGameMusic, type GamePhase } from '@/hooks/useGameMusic';
 import { useMobileLandscape } from '@/hooks/useMobileLandscape';
+import { useLanguage } from '@/contexts/LanguageContext';
 import type { DifficultyLevel, Language, LetterGrid } from '@/shared/types/game';
 
 export type SinglePlayerMode = 'solo-bots' | 'practice' | 'challenge';
@@ -73,6 +74,7 @@ const DEFAULT_MEDIUM_BOT: BotOpponent = {
 };
 
 const SinglePlayerView: React.FC = () => {
+  const { language: uiLanguage } = useLanguage();
   const [phase, setPhase] = useState<SinglePlayerPhase>('lobby');
   const isMobileLandscape = useMobileLandscape();
   const [isAnyLandscape, setIsAnyLandscape] = useState(false);
@@ -95,14 +97,14 @@ const SinglePlayerView: React.FC = () => {
     };
   }, []);
 
-  const [gameState, setGameState] = useState<SinglePlayerGameState>({
+  const [gameState, setGameState] = useState<SinglePlayerGameState>(() => ({
     mode: 'solo-bots',
     difficulty: 'MEDIUM',
-    language: 'en',
+    language: (uiLanguage as Language) || 'en',
     grid: null,
     timerSeconds: 60, // 1 minute default
     bots: [DEFAULT_MEDIUM_BOT],
-  });
+  }));
   const [resultsData, setResultsData] = useState<SinglePlayerResultsData | null>(null);
 
   // Map SinglePlayerPhase to GamePhase for the music hook
