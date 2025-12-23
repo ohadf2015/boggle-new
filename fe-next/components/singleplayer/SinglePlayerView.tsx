@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import AutoHideHeader from '@/components/AutoHideHeader';
 import SinglePlayerLobby from './SinglePlayerLobby';
 import SinglePlayerGame from './SinglePlayerGame';
@@ -73,7 +73,27 @@ const DEFAULT_MEDIUM_BOT: BotOpponent = {
 
 const SinglePlayerView: React.FC = () => {
   const [phase, setPhase] = useState<SinglePlayerPhase>('lobby');
-  const isLandscape = useMobileLandscape();
+  const isMobileLandscape = useMobileLandscape();
+  const [isAnyLandscape, setIsAnyLandscape] = useState(false);
+
+  // Track landscape orientation for ALL screen sizes (not just mobile)
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    const checkLandscape = () => {
+      setIsAnyLandscape(window.innerWidth > window.innerHeight);
+    };
+
+    checkLandscape();
+    window.addEventListener('resize', checkLandscape);
+    window.addEventListener('orientationchange', checkLandscape);
+
+    return () => {
+      window.removeEventListener('resize', checkLandscape);
+      window.removeEventListener('orientationchange', checkLandscape);
+    };
+  }, []);
+
   const [gameState, setGameState] = useState<SinglePlayerGameState>({
     mode: 'solo-bots',
     difficulty: 'MEDIUM',
@@ -150,8 +170,8 @@ const SinglePlayerView: React.FC = () => {
     setPhase('lobby');
   };
 
-  // Hide header completely in landscape mode during gameplay (not just auto-hide)
-  const showHeader = !(phase === 'playing' && isLandscape);
+  // Hide header completely in ANY landscape mode during gameplay (desktop or mobile)
+  const showHeader = !(phase === 'playing' && isAnyLandscape);
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-50 via-slate-100 to-slate-200 dark:from-neo-navy dark:via-neo-navy-light dark:to-neo-navy">

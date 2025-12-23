@@ -36,7 +36,6 @@ import {
 } from '@/utils/singlePlayerAchievements';
 import type { SinglePlayerGameState, SinglePlayerResultsData, BotOpponent } from './SinglePlayerView';
 import type { LetterGrid } from '@/shared/types/game';
-import { useMobileLandscape } from '@/hooks/useMobileLandscape';
 
 interface SinglePlayerGameProps {
   settings: SinglePlayerGameState;
@@ -76,7 +75,7 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
   } = useSoundEffects();
   const { announceWordResult, announceCombo } = useAnnouncer();
   const { stopMusic } = useMusic();
-  const isLandscape = useMobileLandscape();
+  const [isLandscape, setIsLandscape] = useState(false);
   const [grid, setGrid] = useState<LetterGrid | null>(null);
   const [foundWords, setFoundWords] = useState<FoundWord[]>([]);
   const [score, setScore] = useState(0);
@@ -122,6 +121,24 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
   useEffect(() => { botWordsRef.current = botWords; }, [botWords]);
   useEffect(() => { gridRef.current = grid; }, [grid]);
   useEffect(() => { comboLevelRef.current = comboLevel; }, [comboLevel]);
+
+  // Track landscape orientation for ALL screen sizes (not just mobile)
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    const checkLandscape = () => {
+      setIsLandscape(window.innerWidth > window.innerHeight);
+    };
+
+    checkLandscape();
+    window.addEventListener('resize', checkLandscape);
+    window.addEventListener('orientationchange', checkLandscape);
+
+    return () => {
+      window.removeEventListener('resize', checkLandscape);
+      window.removeEventListener('orientationchange', checkLandscape);
+    };
+  }, []);
 
   // Use shared game music hook - handles in-game music, urgent music, and stop on game end
   // Consistent with multiplayer: urgent music at 20 seconds, stops when timer hits 0
