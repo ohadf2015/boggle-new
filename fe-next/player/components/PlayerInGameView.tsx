@@ -215,6 +215,7 @@ const PlayerInGameView = memo<PlayerInGameViewProps>(({
         gameCode={gameCode}
         isHost={false}
         isPlaying={true}
+        gameplayFocusMode={true}
         t={t}
         dir={dir}
         socket={socket}

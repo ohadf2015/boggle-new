@@ -134,6 +134,7 @@ const HostInGameView: React.FC<HostInGameViewProps> = ({
       gameCode={gameCode}
       isHost={true}
       isPlaying={hostPlaying}
+      gameplayFocusMode={hostPlaying}
       t={t}
       socket={socket}
 
