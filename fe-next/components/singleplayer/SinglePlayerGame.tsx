@@ -2,8 +2,18 @@
 
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FaArrowLeft, FaPause, FaPlay, FaCrown } from 'react-icons/fa';
+import { FaArrowLeft, FaPause, FaPlay, FaCrown, FaQuestion } from 'react-icons/fa';
 import { TrendingUp, Target, Zap } from 'lucide-react';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import { HelpPanel, HelpButton } from '@/components/game/HelpPanel';
 import { Button } from '@/components/ui/button';
 import GridComponent from '@/components/GridComponent';
@@ -77,6 +87,8 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
   const [botWords, setBotWords] = useState<Record<string, string[]>>({});
   const [isGameOver, setIsGameOver] = useState(false);
   const [isHelpOpen, setIsHelpOpen] = useState(false);
+  const [showQuitConfirm, setShowQuitConfirm] = useState(false);
+  const [showLandscapeTutorial, setShowLandscapeTutorial] = useState(false);
 
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const comboTimeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -126,6 +138,58 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
       stopMusic(500); // Fade out quickly on unmount
     };
   }, [stopMusic]);
+
+  // Landscape tutorial - show only once per device
+  useEffect(() => {
+    if (isLandscape && !isGameOver) {
+      const hasSeenTutorial = localStorage.getItem('landscape-tutorial-seen');
+      if (!hasSeenTutorial) {
+        setShowLandscapeTutorial(true);
+      }
+    }
+  }, [isLandscape, isGameOver]);
+
+  const dismissLandscapeTutorial = useCallback(() => {
+    setShowLandscapeTutorial(false);
+    localStorage.setItem('landscape-tutorial-seen', 'true');
+  }, []);
+
+  // Keyboard shortcuts for landscape mode
+  useEffect(() => {
+    if (!isLandscape || isGameOver) return;
+
+    const handleKeyPress = (e: KeyboardEvent) => {
+      // Don't trigger if user is typing in an input
+      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
+
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        if (score > 0) {
+          setShowQuitConfirm(true);
+        } else {
+          onQuit();
+        }
+      } else if (e.key === ' ' && settings.mode !== 'practice') {
+        e.preventDefault();
+        setIsPaused(prev => !prev);
+      } else if (e.key === '?' || e.key === 'h' || e.key === 'H') {
+        e.preventDefault();
+        setIsHelpOpen(prev => !prev);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyPress);
+    return () => window.removeEventListener('keydown', handleKeyPress);
+  }, [isLandscape, isGameOver, score, settings.mode, onQuit]);
+
+  // Handle quit with confirmation
+  const handleQuitRequest = useCallback(() => {
+    if (score > 0) {
+      setShowQuitConfirm(true);
+    } else {
+      onQuit();
+    }
+  }, [score, onQuit]);
 
   // Earthquake timer pause handlers
   const handleEarthquakeTimerPause = useCallback(() => {
@@ -479,7 +543,10 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
     }
 
     // Step 2: Check if word exists as a valid path on the board - same as multiplayer
-    if (!isWordOnBoard(normalizedWord, grid, settings.language)) {
+    // Use gridRef.current to ensure we always validate against the latest grid
+    // (important during fire round when grid is regenerated)
+    const currentGrid = gridRef.current;
+    if (!currentGrid || !isWordOnBoard(normalizedWord, currentGrid, settings.language)) {
       const notOnBoardMsg = t('playerView.wordNotOnBoard') || 'Word not on board';
       wordErrorToast(notOnBoardMsg, { duration: 1500 });
       announceWordResult(normalizedWord, false, undefined, notOnBoardMsg);
@@ -589,7 +656,7 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
         validWordCountRef.current = 0;
         wordNeedsValidationToast(normalizedWord.toUpperCase());
       });
-  }, [settings.language, grid, foundWords, t, playWordAcceptedSound, playComboSound, announceWordResult, announceCombo]);
+  }, [settings.language, foundWords, t, playWordAcceptedSound, playComboSound, announceWordResult, announceCombo]);
 
   const handleFinishPractice = useCallback(() => {
     setIsGameOver(true);
@@ -683,43 +750,52 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
           </AnimatePresence>
         </div>
 
-        {/* Top-left: Quit button */}
-        <div className="absolute top-2 left-2 z-30">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={onQuit}
-            className="w-11 h-11 p-0 bg-neo-red hover:brightness-110 border-2 border-neo-black rounded-neo flex items-center justify-center"
-          >
-            <FaArrowLeft className="text-sm text-neo-cream" />
-          </Button>
+        {/* Top-right: Help button */}
+        <div className="absolute top-2 right-2 z-30">
+          <HelpButton
+            onClick={() => setIsHelpOpen(true)}
+            className="w-11 h-11"
+            aria-label={t('common.help') || 'Help'}
+          />
         </div>
 
-        {/* Top-right: Pause/Help buttons */}
-        <div className="absolute top-2 right-2 z-30 flex gap-1">
+        {/* Bottom-left: Pause/Finish button (primary action - easy thumb reach) */}
+        <div className="absolute bottom-2 left-2 z-30">
           {settings.mode !== 'practice' ? (
             <Button
               variant="ghost"
               size="sm"
               onClick={() => setIsPaused(!isPaused)}
-              className="w-11 h-11 p-0 bg-neo-cream hover:brightness-110 border-2 border-neo-black rounded-neo flex items-center justify-center"
+              aria-label={isPaused ? (t('common.resume') || 'Resume') : (t('common.pause') || 'Pause')}
+              aria-pressed={isPaused}
+              className="w-12 h-12 p-0 bg-neo-cream hover:brightness-110 border-2 border-neo-black rounded-neo flex items-center justify-center shadow-hard-sm"
             >
-              {isPaused ? <FaPlay className="text-sm text-neo-black" /> : <FaPause className="text-sm text-neo-black" />}
+              {isPaused ? <FaPlay className="text-lg text-neo-black" /> : <FaPause className="text-lg text-neo-black" />}
             </Button>
           ) : (
             <Button
               variant="ghost"
               size="sm"
               onClick={handleFinishPractice}
-              className="px-3 h-11 min-h-[44px] bg-neo-lime hover:brightness-110 border-2 border-neo-black rounded-neo text-sm font-bold text-neo-black"
+              aria-label={t('singlePlayer.finish') || 'Finish'}
+              className="px-4 h-12 min-h-[48px] bg-neo-lime hover:brightness-110 border-2 border-neo-black rounded-neo text-sm font-bold text-neo-black shadow-hard-sm"
             >
               {t('singlePlayer.finish') || 'Finish'}
             </Button>
           )}
-          <HelpButton
-            onClick={() => setIsHelpOpen(true)}
-            className="w-11 h-11"
-          />
+        </div>
+
+        {/* Bottom-right: Quit button (secondary - requires confirmation if score > 0) */}
+        <div className="absolute bottom-2 right-2 z-30">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={handleQuitRequest}
+            aria-label={t('common.quit') || 'Quit game'}
+            className="w-12 h-12 p-0 bg-neo-red hover:brightness-110 border-2 border-neo-black rounded-neo flex items-center justify-center shadow-hard-sm"
+          >
+            <FaArrowLeft className="text-lg text-neo-cream" />
+          </Button>
         </div>
 
         {/* Center: Grid - maximized for landscape */}
@@ -742,6 +818,90 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
           isOpen={isHelpOpen}
           onClose={() => setIsHelpOpen(false)}
         />
+
+        {/* Quit Confirmation Dialog */}
+        <AlertDialog open={showQuitConfirm} onOpenChange={setShowQuitConfirm}>
+          <AlertDialogContent className="bg-neo-cream border-4 border-neo-black rounded-neo shadow-hard max-w-sm">
+            <AlertDialogHeader>
+              <AlertDialogTitle className="text-neo-black font-black text-xl">
+                {t('singlePlayer.quitConfirmTitle') || 'Quit Game?'}
+              </AlertDialogTitle>
+              <AlertDialogDescription className="text-neo-black/70 font-medium">
+                {t('singlePlayer.quitConfirmMessage') || 'You will lose your current progress. Are you sure you want to quit?'}
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter className="flex-row gap-2">
+              <AlertDialogCancel className="flex-1 bg-neo-cream border-2 border-neo-black rounded-neo font-bold text-neo-black hover:brightness-95">
+                {t('common.cancel') || 'Cancel'}
+              </AlertDialogCancel>
+              <AlertDialogAction
+                onClick={onQuit}
+                className="flex-1 bg-neo-red border-2 border-neo-black rounded-neo font-bold text-neo-cream hover:brightness-110"
+              >
+                {t('common.quit') || 'Quit'}
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+
+        {/* First-time Landscape Tutorial Overlay */}
+        <AnimatePresence>
+          {showLandscapeTutorial && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="absolute inset-0 bg-black/70 z-50 flex items-center justify-center"
+              onClick={dismissLandscapeTutorial}
+            >
+              <motion.div
+                initial={{ scale: 0.9, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0.9, opacity: 0 }}
+                className="bg-neo-cream border-4 border-neo-black rounded-neo shadow-hard p-6 max-w-md mx-4"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <h2 className="text-xl font-black text-neo-black mb-4">
+                  {t('landscape.tutorialTitle') || 'Landscape Controls'}
+                </h2>
+                <div className="space-y-3 text-neo-black/80 font-medium">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 bg-neo-cream border-2 border-neo-black rounded-neo flex items-center justify-center">
+                      <FaPause className="text-neo-black" />
+                    </div>
+                    <span>{t('landscape.tutorialPause') || 'Bottom-left: Pause/Resume game'}</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 bg-neo-red border-2 border-neo-black rounded-neo flex items-center justify-center">
+                      <FaArrowLeft className="text-neo-cream" />
+                    </div>
+                    <span>{t('landscape.tutorialQuit') || 'Bottom-right: Quit game'}</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 bg-neo-cyan border-2 border-neo-black rounded-neo flex items-center justify-center">
+                      <FaQuestion className="text-neo-black" />
+                    </div>
+                    <span>{t('landscape.tutorialHelp') || 'Top-right: Help & rules'}</span>
+                  </div>
+                </div>
+                <div className="mt-4 pt-4 border-t-2 border-neo-black/20 text-sm text-neo-black/60">
+                  <p>{t('landscape.tutorialKeyboard') || 'Keyboard: Space = Pause, Esc = Quit, ? = Help'}</p>
+                </div>
+                <Button
+                  onClick={dismissLandscapeTutorial}
+                  className="w-full mt-4 bg-neo-cyan border-2 border-neo-black rounded-neo font-bold text-neo-black hover:brightness-110 h-12"
+                >
+                  {t('common.gotIt') || 'Got it!'}
+                </Button>
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Screen reader status announcements */}
+        <div className="sr-only" role="status" aria-live="polite">
+          {isPaused && (t('singlePlayer.gamePaused') || 'Game paused')}
+        </div>
       </div>
     );
   }
