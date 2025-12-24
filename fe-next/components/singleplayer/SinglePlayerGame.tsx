@@ -155,13 +155,15 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
   const botWordsRef = useRef(botWords);
   const gridRef = useRef(grid);
 
-  // Keep refs in sync
-  useEffect(() => { scoreRef.current = score; }, [score]);
-  useEffect(() => { foundWordsRef.current = foundWords; }, [foundWords]);
-  useEffect(() => { botScoresRef.current = botScores; }, [botScores]);
-  useEffect(() => { botWordsRef.current = botWords; }, [botWords]);
-  useEffect(() => { gridRef.current = grid; }, [grid]);
-  useEffect(() => { availableWordsRef.current = availableWords; }, [availableWords]);
+  // Keep refs in sync (consolidated into single effect)
+  useEffect(() => {
+    scoreRef.current = score;
+    foundWordsRef.current = foundWords;
+    botScoresRef.current = botScores;
+    botWordsRef.current = botWords;
+    gridRef.current = grid;
+    availableWordsRef.current = availableWords;
+  }, [score, foundWords, botScores, botWords, grid, availableWords]);
 
   // Track landscape orientation for ALL screen sizes (not just mobile)
   useEffect(() => {
@@ -180,6 +182,45 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
       window.removeEventListener('orientationchange', checkLandscape);
     };
   }, []);
+
+  // Single player heartbeat for admin visibility
+  useEffect(() => {
+    // Generate a unique session ID for this game session
+    const sessionId = crypto.randomUUID();
+
+    const sendHeartbeat = async () => {
+      try {
+        await fetch('/api/single-player/heartbeat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            sessionId,
+            language: settings.language,
+            mode: settings.mode,
+          }),
+        });
+      } catch {
+        // Silently ignore heartbeat failures - not critical
+      }
+    };
+
+    // Send initial heartbeat
+    sendHeartbeat();
+
+    // Send heartbeat every 30 seconds
+    const interval = setInterval(sendHeartbeat, 30000);
+
+    // Cleanup: remove session on unmount
+    return () => {
+      clearInterval(interval);
+      // Best-effort cleanup - don't wait for response
+      fetch('/api/single-player/heartbeat', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ sessionId }),
+      }).catch(() => {});
+    };
+  }, [settings.language, settings.mode]);
 
   // Note: Music transitions are handled by useGameMusic hook in SinglePlayerView
   // which properly fades between tracks. We don't call stopMusic on unmount

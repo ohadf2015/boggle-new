@@ -68,7 +68,6 @@ export function useEarthquakeFireRound(
 
   // Reset refs when game session changes (new game started)
   useEffect(() => {
-    console.log(`[Earthquake] Game session changed to ${gameSessionId}, resetting state`);
     earthquakeTriggeredRef.current = false;
     triggerTimeRef.current = null;
     setEarthquakeState('idle');
@@ -87,7 +86,6 @@ export function useEarthquakeFireRound(
 
     // Don't trigger for very short games
     if (gameDurationSeconds < config.minGameDurationSeconds) {
-      console.log('[Earthquake] Game too short, earthquake disabled');
       return;
     }
 
@@ -104,7 +102,6 @@ export function useEarthquakeFireRound(
 
     // Ensure we have a valid window
     if (maxTriggerElapsed <= minTriggerElapsed) {
-      console.log('[Earthquake] Invalid trigger window, earthquake disabled');
       return;
     }
 
@@ -114,10 +111,6 @@ export function useEarthquakeFireRound(
     // Convert to "remaining time" for easier comparison
     const triggerTimeRemaining = gameDurationSeconds - randomElapsed;
     triggerTimeRef.current = Math.max(0, triggerTimeRemaining);
-
-    console.log(
-      `[Earthquake] Trigger calculated: ${triggerTimeRef.current.toFixed(1)}s remaining (${((randomElapsed / gameDurationSeconds) * 100).toFixed(1)}% elapsed)`
-    );
   }, [enabled, gameDurationSeconds, config]);
 
   // Generate new grid for fire round
@@ -130,19 +123,16 @@ export function useEarthquakeFireRound(
       [] // Empty array - let it generate random words to embed
     );
 
-    console.log('[Earthquake] Generated new grid for fire round');
     return { grid: newGrid, embeddedWords: [] };
   }, [difficulty, language]);
 
   // Trigger earthquake sequence
   const triggerEarthquake = useCallback(() => {
     if (earthquakeTriggeredRef.current) {
-      console.warn('[Earthquake] Already triggered, ignoring duplicate trigger');
       return;
     }
 
     earthquakeTriggeredRef.current = true;
-    console.log('[Earthquake] Triggering earthquake sequence');
 
     // For multiplayer hosts, emit socket event instead of executing locally
     if (mode === 'multiplayer' && isHost && socket) {
@@ -150,7 +140,6 @@ export function useEarthquakeFireRound(
         gameSessionId: String(gameSessionId ?? ''),
         triggerTime: currentTimeSeconds,
       };
-      console.log('[Earthquake] Host emitting triggerEarthquake event', payload);
       socket.emit('triggerEarthquake', payload);
       return; // Backend will broadcast events back to all players including host
     }
@@ -161,23 +150,17 @@ export function useEarthquakeFireRound(
 
   // Execute the full earthquake sequence (warning → shake → fire round)
   const executeEarthquakeSequence = useCallback(() => {
-    console.log('[Earthquake] Starting sequence: WARNING phase');
-
     // Phase 1: WARNING (2 seconds)
     setEarthquakeState('warning');
     onEarthquakeStart?.();
     onTimerPause?.(); // Pause game timer during warning
 
     warningTimeoutRef.current = setTimeout(() => {
-      console.log('[Earthquake] SHAKE phase');
-
       // Phase 2: SHAKING (1 second)
       setEarthquakeState('shaking');
       onEarthquakeShake?.();
 
       shakeTimeoutRef.current = setTimeout(() => {
-        console.log('[Earthquake] FIRE ROUND phase');
-
         // Phase 3: FIRE ROUND (15 seconds)
         const { grid, embeddedWords } = generateNewGrid();
         onGridRegenerate?.(grid, embeddedWords);
@@ -197,7 +180,6 @@ export function useEarthquakeFireRound(
           setFireRoundRemaining(remaining);
 
           if (remaining <= 0) {
-            console.log('[Earthquake] Fire round ended');
             if (fireRoundTimerRef.current) {
               clearInterval(fireRoundTimerRef.current);
             }
@@ -229,9 +211,6 @@ export function useEarthquakeFireRound(
 
     // Check if we've reached the trigger time
     if (currentTimeSeconds <= triggerTimeRef.current && currentTimeSeconds > 0) {
-      console.log(
-        `[Earthquake] Trigger condition met! Current: ${currentTimeSeconds}s, Trigger: ${triggerTimeRef.current}s`
-      );
       triggerEarthquake();
     }
   }, [enabled, currentTimeSeconds, triggerEarthquake]);
@@ -252,7 +231,6 @@ export function useEarthquakeFireRound(
 
   // Force earthquake (for testing/debugging)
   const forceEarthquake = useCallback(() => {
-    console.log('[Earthquake] Force trigger requested');
     earthquakeTriggeredRef.current = false; // Reset flag
     triggerEarthquake();
   }, [triggerEarthquake]);

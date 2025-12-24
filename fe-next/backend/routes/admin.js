@@ -15,6 +15,7 @@ const { z } = require('zod');
 const { getSupabase, isSupabaseConfigured } = require('../modules/supabaseServer');
 const { getAllGames } = require('../modules/gameStateManager');
 const { isInProgress } = require('../utils/gameStateMachine');
+const { getActiveSinglePlayerCount } = require('./singlePlayer');
 const logger = require('../utils/logger');
 
 // ==================== Request Validation Schemas ====================
@@ -587,12 +588,14 @@ router.get('/realtime', async (req, res) => {
     // Fixed: was checking for 'playing' which is not a valid state - use state machine helper
     const gamesInProgress = games.filter(g => isInProgress(g.gameState)).length;
     const socketConnections = io ? io.sockets.sockets.size : 0;
+    const singlePlayerCount = getActiveSinglePlayerCount();
 
     res.json({
       activeRooms,
       playersOnline,
       gamesInProgress,
       socketConnections,
+      singlePlayerCount,
       timestamp: Date.now(),
     });
   } catch (error) {

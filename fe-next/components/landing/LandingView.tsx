@@ -9,6 +9,7 @@ import { Target, Flame, ChevronRight, ChevronLeft } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useMusic } from '@/contexts/MusicContext';
 import { useMobileLandscape } from '@/hooks/useMobileLandscape';
+import { useLiveRoomStats } from '@/hooks/useLiveRoomStats';
 import ModeCard from './ModeCard';
 import Header from '@/components/Header';
 import SocialProof from '@/components/SocialProof';
@@ -31,6 +32,7 @@ const LandingView: React.FC = () => {
   const router = useRouter();
   const { playTrack, TRACKS } = useMusic();
   const isLandscape = useMobileLandscape();
+  const liveRoomStats = useLiveRoomStats();
 
   // Daily challenge state
   const [dailyPuzzleNumber, setDailyPuzzleNumber] = useState<number>(0);
@@ -249,6 +251,12 @@ const LandingView: React.FC = () => {
             href={`/${language}/multiplayer`}
             icon={<FaUsers />}
             variant="pink"
+            liveBadge={{
+              openRooms: liveRoomStats.openRooms,
+              totalPlayers: liveRoomStats.totalPlayers,
+              roomsLabel: t('landing.openRooms') || 'open rooms',
+              playersLabel: t('landing.playersLive') || 'playing now',
+            }}
           />
         </motion.div>
 

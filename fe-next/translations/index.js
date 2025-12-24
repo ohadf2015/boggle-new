@@ -1382,6 +1382,8 @@ const translations = {
         tournaments: 'Tournaments',
       },
       hint: 'New to the game? Start with Single Player to learn the ropes!',
+      openRooms: 'open rooms',
+      playersLive: 'playing now',
     },
     singlePlayer: {
       title: 'Single Player',
@@ -2925,6 +2927,8 @@ const translations = {
         tournaments: 'טורנירים',
       },
       hint: 'חדש במשחק? התחל עם שחקן יחיד כדי ללמוד את הכללים!',
+      openRooms: 'חדרים פתוחים',
+      playersLive: 'משחקים עכשיו',
     },
     singlePlayer: {
       title: 'שחקן יחיד',
@@ -4469,6 +4473,8 @@ const translations = {
         tournaments: 'Turneringar',
       },
       hint: 'Ny i spelet? Börja med enspelarläge för att lära dig!',
+      openRooms: 'öppna rum',
+      playersLive: 'spelar nu',
     },
     singlePlayer: {
       title: 'Enspelarläge',
@@ -6013,6 +6019,8 @@ const translations = {
         tournaments: 'トーナメント',
       },
       hint: '初めて？シングルプレイヤーで基本を学ぼう！',
+      openRooms: '部屋が開放中',
+      playersLive: 'プレイ中',
     },
     singlePlayer: {
       title: 'シングルプレイヤー',
@@ -7409,6 +7417,8 @@ const translations = {
         tournaments: 'Torneos',
       },
       hint: '¿Nuevo en el juego? ¡Empieza con Un Jugador para aprender!',
+      openRooms: 'salas abiertas',
+      playersLive: 'jugando ahora',
     },
     singlePlayer: {
       title: 'Un Jugador',

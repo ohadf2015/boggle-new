@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useCallback, useRef, memo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FaPlay, FaTimes, FaClock } from 'react-icons/fa';
 import { useLanguage } from '../../contexts/LanguageContext';
@@ -18,8 +18,9 @@ interface AutoRejoinTimerProps {
  * AutoRejoinTimer Component
  * Shows a countdown timer that auto-transitions player back to the room
  * after results. Player can dismiss or manually rejoin early.
+ * Memoized to prevent unnecessary re-renders when parent updates.
  */
-const AutoRejoinTimer: React.FC<AutoRejoinTimerProps> = ({
+const AutoRejoinTimer = memo<AutoRejoinTimerProps>(({
   duration = 30,
   onRejoin,
   onDismiss,
@@ -199,6 +200,8 @@ const AutoRejoinTimer: React.FC<AutoRejoinTimerProps> = ({
       </motion.div>
     </AnimatePresence>
   );
-};
+});
+
+AutoRejoinTimer.displayName = 'AutoRejoinTimer';
 
 export default AutoRejoinTimer;

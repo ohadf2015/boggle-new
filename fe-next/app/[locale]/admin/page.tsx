@@ -5,7 +5,7 @@ import { motion } from 'framer-motion';
 import {
   FaUsers, FaGamepad, FaClock, FaGlobe, FaChartLine,
   FaArrowLeft, FaSync, FaUserPlus, FaLanguage, FaLink,
-  FaTrophy, FaCalendarDay, FaCalendarWeek, FaServer
+  FaTrophy, FaCalendarDay, FaCalendarWeek, FaServer, FaUser
 } from 'react-icons/fa';
 import { useRouter } from 'next/navigation';
 import Header from '@/components/Header';
@@ -70,6 +70,7 @@ interface RealtimeStats {
   playersOnline: number;
   gamesInProgress: number;
   socketConnections: number;
+  singlePlayerCount: number;
   timestamp: number;
 }
 
@@ -353,10 +354,11 @@ export default function AdminDashboard() {
                 Live Stats
               </span>
             </div>
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+            <div className="grid grid-cols-2 sm:grid-cols-5 gap-4">
               <RealtimeStat icon={<FaServer />} label="Socket Connections" value={realtimeStats.socketConnections} isDarkMode={isDarkMode} />
               <RealtimeStat icon={<FaGamepad />} label="Active Rooms" value={realtimeStats.activeRooms} isDarkMode={isDarkMode} />
               <RealtimeStat icon={<FaUsers />} label="Players Online" value={realtimeStats.playersOnline} isDarkMode={isDarkMode} />
+              <RealtimeStat icon={<FaUser />} label="Single Players" value={realtimeStats.singlePlayerCount} isDarkMode={isDarkMode} />
               <RealtimeStat icon={<FaTrophy />} label="Games In Progress" value={realtimeStats.gamesInProgress} isDarkMode={isDarkMode} />
             </div>
           </motion.div>

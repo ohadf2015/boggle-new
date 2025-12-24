@@ -35,6 +35,8 @@ const analyticsRoutes = require('../backend/routes/analytics');
 const geolocationRoutes = require('../backend/routes/geolocation');
 const dictionaryRoutes = require('../backend/routes/dictionary');
 const solveGridRoutes = require('../backend/routes/solveGrid');
+const singlePlayerRoutes = require('../backend/routes/singlePlayer');
+const dailyChallengeRoutes = require('../backend/routes/dailyChallenge');
 
 // Configuration
 const dev = process.env.NODE_ENV !== 'production';
@@ -76,6 +78,8 @@ async function start() {
   app.use('/api/admin', adminRoutes);
   app.use('/api/dictionary', dictionaryRoutes);
   app.use('/api/solve-grid', solveGridRoutes);
+  app.use('/api/single-player', singlePlayerRoutes);
+  app.use('/api/daily-challenge', dailyChallengeRoutes);
 
   // Next.js request handler (catch-all)
   app.use(async (req, res) => {

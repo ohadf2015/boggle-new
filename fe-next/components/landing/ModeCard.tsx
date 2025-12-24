@@ -3,13 +3,20 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
-import { FaArrowRight, FaArrowLeft } from 'react-icons/fa';
+import { FaArrowRight, FaArrowLeft, FaUsers, FaDoorOpen } from 'react-icons/fa';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
 
 export interface FeatureItem {
   icon: React.ReactNode;
   label: string;
+}
+
+export interface LiveBadgeProps {
+  openRooms: number;
+  totalPlayers: number;
+  roomsLabel: string;
+  playersLabel: string;
 }
 
 interface ModeCardProps {
@@ -20,6 +27,7 @@ interface ModeCardProps {
   icon: React.ReactNode;
   variant: 'cyan' | 'pink';
   className?: string;
+  liveBadge?: LiveBadgeProps;
 }
 
 /**
@@ -34,6 +42,7 @@ const ModeCard: React.FC<ModeCardProps> = ({
   icon,
   variant,
   className,
+  liveBadge,
 }) => {
   const { dir } = useLanguage();
   const isRTL = dir === 'rtl';
@@ -132,6 +141,28 @@ const ModeCard: React.FC<ModeCardProps> = ({
         <p className="text-base sm:text-lg font-medium text-neo-black mb-5">
           {description}
         </p>
+
+        {/* Live Badge - shows open rooms and players when available */}
+        {liveBadge && (liveBadge.openRooms > 0 || liveBadge.totalPlayers > 0) && (
+          <div className="flex flex-wrap gap-2 mb-4">
+            {liveBadge.openRooms > 0 && (
+              <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-neo-lime/90 text-neo-black text-sm font-bold rounded-neo border-2 border-neo-black shadow-hard-sm">
+                <FaDoorOpen className="w-3.5 h-3.5" />
+                {liveBadge.openRooms} {liveBadge.roomsLabel}
+              </span>
+            )}
+            {liveBadge.totalPlayers > 0 && (
+              <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-neo-lime/90 text-neo-black text-sm font-bold rounded-neo border-2 border-neo-black shadow-hard-sm">
+                <span className="relative flex h-2 w-2">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-neo-black opacity-75" />
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-neo-black" />
+                </span>
+                <FaUsers className="w-3.5 h-3.5" />
+                {liveBadge.totalPlayers} {liveBadge.playersLabel}
+              </span>
+            )}
+          </div>
+        )}
 
         {/* Features as icon row with tooltips */}
         <div className="flex gap-2">

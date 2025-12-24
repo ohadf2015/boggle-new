@@ -84,11 +84,13 @@ export function useComboSystem(options: UseComboSystemOptions = {}): ComboSystem
   const validWordCountRef = useRef(0);
   const shieldsUsedRef = useRef(0);
 
-  // Keep refs in sync with state
-  useEffect(() => { comboLevelRef.current = comboLevel; }, [comboLevel]);
-  useEffect(() => { lastWordTimeRef.current = lastWordTime; }, [lastWordTime]);
-  useEffect(() => { validWordCountRef.current = validWordCount; }, [validWordCount]);
-  useEffect(() => { shieldsUsedRef.current = shieldsUsed; }, [shieldsUsed]);
+  // Keep refs in sync with state (consolidated into single effect)
+  useEffect(() => {
+    comboLevelRef.current = comboLevel;
+    lastWordTimeRef.current = lastWordTime;
+    validWordCountRef.current = validWordCount;
+    shieldsUsedRef.current = shieldsUsed;
+  }, [comboLevel, lastWordTime, validWordCount, shieldsUsed]);
 
   // Track max combo
   useEffect(() => {

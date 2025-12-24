@@ -82,7 +82,7 @@ function configureMiddleware(app, { corsOrigin, isDev }) {
 
   // JSON body parsing - only for Express-handled API routes
   // Next.js App Router API routes handle their own body parsing
-  const expressApiRoutes = ['/api/leaderboard', '/api/geolocation', '/api/analytics', '/api/admin', '/api/dictionary', '/api/solve-grid'];
+  const expressApiRoutes = ['/api/leaderboard', '/api/geolocation', '/api/analytics', '/api/admin', '/api/dictionary', '/api/solve-grid', '/api/single-player'];
   app.use((req, res, next) => {
     const isExpressRoute = expressApiRoutes.some(route => req.path.startsWith(route));
     if (isExpressRoute) {

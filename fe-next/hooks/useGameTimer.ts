@@ -12,6 +12,8 @@
  * - External pause (for earthquake/fire round)
  * - Callbacks for tick, warning, and completion
  * - Ref for accessing current time without stale closures
+ * - TIMESTAMP-BASED: Uses actual elapsed time, not interval callbacks
+ *   This prevents timer drift/pause during heavy touch interactions on mobile
  */
 
 import { useState, useRef, useEffect, useCallback } from 'react';
@@ -76,8 +78,27 @@ export function useGameTimer(options: UseGameTimerOptions): GameTimerReturn {
 
   // Refs
   const remainingTimeRef = useRef(initialTime);
-  const timerRef = useRef<NodeJS.Timeout | null>(null);
+  const animationFrameRef = useRef<number | null>(null);
   const warningTriggeredRef = useRef(false);
+  const timeUpCalledRef = useRef(false);
+
+  // Timestamp tracking for accurate elapsed time calculation
+  // This ensures timer accuracy even when JS event loop is blocked by touch events
+  const startTimestampRef = useRef<number | null>(null);
+  const accumulatedTimeRef = useRef(0); // Time accumulated before pauses
+  const lastDisplayedSecondRef = useRef(initialTime);
+
+  // Callback refs - store callbacks in refs to avoid re-triggering effect on every render
+  const onTimeUpRef = useRef(onTimeUp);
+  const onTickRef = useRef(onTick);
+  const onWarningRef = useRef(onWarning);
+
+  // Keep callback refs in sync (consolidated into single effect)
+  useEffect(() => {
+    onTimeUpRef.current = onTimeUp;
+    onTickRef.current = onTick;
+    onWarningRef.current = onWarning;
+  }, [onTimeUp, onTick, onWarning]);
 
   // Calculate effective pause state
   const effectivelyPaused = externalPause || isExternallyPaused || internalPaused;
@@ -88,24 +109,45 @@ export function useGameTimer(options: UseGameTimerOptions): GameTimerReturn {
     remainingTimeRef.current = remainingTime;
   }, [remainingTime]);
 
-  // Main timer effect
+  // Main timer effect using requestAnimationFrame for smooth updates
+  // Uses timestamp-based calculation to prevent drift during touch interactions
   useEffect(() => {
     // Don't run if paused or already at 0
-    if (effectivelyPaused || remainingTime <= 0) {
-      if (timerRef.current) {
-        clearInterval(timerRef.current);
-        timerRef.current = null;
+    // Use ref to avoid adding remainingTime to dependencies (would cause infinite loop)
+    if (effectivelyPaused || remainingTimeRef.current <= 0) {
+      // When pausing, accumulate the elapsed time
+      if (startTimestampRef.current !== null) {
+        const now = performance.now();
+        accumulatedTimeRef.current += (now - startTimestampRef.current) / 1000;
+        startTimestampRef.current = null;
+      }
+
+      if (animationFrameRef.current) {
+        cancelAnimationFrame(animationFrameRef.current);
+        animationFrameRef.current = null;
       }
       return;
     }
 
-    timerRef.current = setInterval(() => {
-      setRemainingTime(prev => {
-        const newTime = prev - 1;
+    // Start/resume timer - record start timestamp
+    startTimestampRef.current = performance.now();
+
+    const tick = () => {
+      if (startTimestampRef.current === null) return;
+
+      const now = performance.now();
+      const elapsedSinceStart = (now - startTimestampRef.current) / 1000;
+      const totalElapsed = accumulatedTimeRef.current + elapsedSinceStart;
+      const newTime = Math.max(0, Math.ceil(initialTime - totalElapsed));
+
+      // Only update state when the displayed second changes
+      if (newTime !== lastDisplayedSecondRef.current) {
+        lastDisplayedSecondRef.current = newTime;
         remainingTimeRef.current = newTime;
+        setRemainingTime(newTime);
 
         // Call tick callback
-        onTick?.(newTime);
+        onTickRef.current?.(newTime);
 
         // Check warning threshold
         if (
@@ -114,35 +156,39 @@ export function useGameTimer(options: UseGameTimerOptions): GameTimerReturn {
           !warningTriggeredRef.current
         ) {
           warningTriggeredRef.current = true;
-          onWarning?.();
+          onWarningRef.current?.();
         }
 
         // Check if time is up
-        if (newTime <= 0) {
-          if (timerRef.current) {
-            clearInterval(timerRef.current);
-            timerRef.current = null;
-          }
-          onTimeUp?.();
-          return 0;
+        if (newTime <= 0 && !timeUpCalledRef.current) {
+          timeUpCalledRef.current = true;
+          onTimeUpRef.current?.();
+          return; // Stop the animation loop
         }
+      }
 
-        return newTime;
-      });
-    }, 1000);
-
-    return () => {
-      if (timerRef.current) {
-        clearInterval(timerRef.current);
-        timerRef.current = null;
+      // Continue animation loop if time remaining
+      if (newTime > 0) {
+        animationFrameRef.current = requestAnimationFrame(tick);
       }
     };
-  }, [effectivelyPaused, onTimeUp, onTick, warningThreshold, onWarning]);
+
+    // Start the animation loop
+    animationFrameRef.current = requestAnimationFrame(tick);
+
+    return () => {
+      if (animationFrameRef.current) {
+        cancelAnimationFrame(animationFrameRef.current);
+        animationFrameRef.current = null;
+      }
+    };
+  }, [effectivelyPaused, initialTime, warningThreshold]);
 
   // Reset warning trigger when timer resets
   useEffect(() => {
     if (remainingTime === initialTime) {
       warningTriggeredRef.current = false;
+      timeUpCalledRef.current = false;
     }
   }, [remainingTime, initialTime]);
 
@@ -171,9 +217,15 @@ export function useGameTimer(options: UseGameTimerOptions): GameTimerReturn {
    * Reset timer to initial time
    */
   const reset = useCallback(() => {
+    // Reset all timestamp tracking
+    startTimestampRef.current = null;
+    accumulatedTimeRef.current = 0;
+    lastDisplayedSecondRef.current = initialTime;
+    warningTriggeredRef.current = false;
+    timeUpCalledRef.current = false;
+
     setRemainingTime(initialTime);
     remainingTimeRef.current = initialTime;
-    warningTriggeredRef.current = false;
     setInternalPaused(!autoStart);
   }, [initialTime, autoStart]);
 
@@ -182,15 +234,21 @@ export function useGameTimer(options: UseGameTimerOptions): GameTimerReturn {
    */
   const setTime = useCallback((time: number) => {
     const clampedTime = Math.max(0, time);
+
+    // Reset timestamp tracking to match the new time
+    startTimestampRef.current = null;
+    accumulatedTimeRef.current = initialTime - clampedTime;
+    lastDisplayedSecondRef.current = clampedTime;
+
     setRemainingTime(clampedTime);
     remainingTimeRef.current = clampedTime;
-  }, []);
+  }, [initialTime]);
 
   // Cleanup on unmount
   useEffect(() => {
     return () => {
-      if (timerRef.current) {
-        clearInterval(timerRef.current);
+      if (animationFrameRef.current) {
+        cancelAnimationFrame(animationFrameRef.current);
       }
     };
   }, []);

@@ -16,8 +16,14 @@ interface LandscapeIndicatorProps {
 /**
  * LandscapeIndicator - Neo-Brutalist banner prompting users to rotate their device
  * Only shows on mobile portrait screens, dismissible with "don't show again" option
+ *
+ * TEMPORARILY DISABLED: Landscape mode recommendation is disabled until the feature is more stable.
  */
 const LandscapeIndicator = memo<LandscapeIndicatorProps>(({ className = '' }) => {
+  // TEMPORARILY DISABLED: Don't recommend landscape mode until it's more stable
+  // TODO: Re-enable once landscape mode is fully tested and stable
+  return null;
+
   const { t } = useLanguage();
   const [isVisible, setIsVisible] = useState(false);
   const [isPortrait, setIsPortrait] = useState(false);

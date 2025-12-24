@@ -69,9 +69,17 @@ const DailyChallengeGame: React.FC<DailyChallengeGameProps> = ({
   // Refs for game end handler
   const gameOverCalledRef = useRef(false);
   const scoreRef = useRef(score);
+  const handleGameEndRef = useRef<(() => void) | null>(null);
 
   // Keep score ref in sync
   useEffect(() => { scoreRef.current = score; }, [score]);
+
+  // Stable callback for timer - prevents timer restart on every render
+  const stableOnTimeUp = useCallback(() => {
+    if (!gameOverCalledRef.current) {
+      handleGameEndRef.current?.();
+    }
+  }, []);
 
   // === SHARED HOOKS ===
 
@@ -86,14 +94,11 @@ const DailyChallengeGame: React.FC<DailyChallengeGameProps> = ({
   });
 
   // Game timer - handles countdown with callbacks
+  // Uses stableOnTimeUp to prevent timer restart on re-renders
   const timer = useGameTimer({
     initialTime: duration,
     isPaused: isGameOver,
-    onTimeUp: () => {
-      if (!gameOverCalledRef.current) {
-        handleGameEnd();
-      }
-    },
+    onTimeUp: stableOnTimeUp,
   });
 
   // Word submission - handles validation, dictionary checks, and feedback
@@ -221,6 +226,11 @@ const DailyChallengeGame: React.FC<DailyChallengeGameProps> = ({
     onComplete(gameResult);
   }, [duration, onComplete, language, wordSubmission.foundWords, timer.remainingTimeRef]);
 
+  // Keep handleGameEnd ref in sync for stable timer callback
+  useEffect(() => {
+    handleGameEndRef.current = handleGameEnd;
+  }, [handleGameEnd]);
+
   // Quit confirmation
   const handleQuitClick = useCallback(() => {
     if (window.confirm(t('daily.quitConfirm'))) {
@@ -259,43 +269,73 @@ const DailyChallengeGame: React.FC<DailyChallengeGameProps> = ({
         isLandscape && "flex-row"
       )}
     >
-      {/* Timer row - Timer, Combo, Score all together */}
+      {/* Top bar with quit button - matches multiplayer layout */}
       <div className={cn(
-        "flex items-center justify-center gap-3 mb-1",
-        isLandscape && "flex-col h-full mr-4 mb-0"
+        "flex items-center justify-between mb-2 px-2",
+        isLandscape && "hidden"
       )}>
-        {/* Quit button */}
         <Button
           variant="ghost"
           size="sm"
           onClick={handleQuitClick}
-          className="text-gray-600 hover:text-red-500 p-1"
+          className="text-gray-600 hover:text-red-500"
         >
-          <FaTimes className="w-4 h-4" />
+          <FaTimes className="w-4 h-4 mr-1" />
+          {t('common.quit') || 'Quit'}
         </Button>
-
-        {/* Timer */}
-        <CircularTimer
-          remainingTime={timer.remainingTime}
-          totalTime={duration}
-          size="sm"
-        />
-
-        {/* Combo next to timer */}
-        <ComboDisplay comboLevel={combo.comboLevel} />
-
-        {/* Score */}
-        <div className="bg-neo-yellow border-3 border-neo-black rounded-neo shadow-hard px-2 py-1 min-w-[60px]">
-          <div className="text-[10px] text-neo-black uppercase font-bold text-center">{t('common.score')}</div>
-          <div className="text-lg font-black text-neo-black text-center">
-            {score}
-          </div>
-        </div>
-
-        {/* Puzzle number */}
-        <span className="hidden sm:inline-block px-2 py-0.5 bg-neo-yellow/20 text-neo-yellow text-[10px] font-bold rounded-full">
+        {/* Puzzle number badge */}
+        <span className="px-2 py-0.5 bg-neo-yellow/20 text-neo-black dark:text-neo-yellow text-xs font-bold rounded-full">
           #{puzzleNumber}
         </span>
+      </div>
+
+      {/* Stats row - Combo | Timer | Score - matches multiplayer InGameScreen */}
+      <div className={cn(
+        "flex items-center justify-center gap-3 md:gap-4 mb-2",
+        isLandscape && "flex-col h-full mr-4 mb-0"
+      )} role="status" aria-label="Game status">
+        {/* Combo (left - placeholder for layout balance) */}
+        <div className="min-w-[70px] md:min-w-[90px] flex justify-end">
+          <ComboDisplay comboLevel={combo.comboLevel} compact />
+        </div>
+
+        {/* Timer (center - always visible and prominent) */}
+        <motion.div
+          initial={{ scale: 0, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          className="relative z-20"
+        >
+          <CircularTimer
+            remainingTime={timer.remainingTime}
+            totalTime={duration}
+            size="md"
+          />
+        </motion.div>
+
+        {/* Score (right position) - vibrant yellow/lime gradient like multiplayer */}
+        <motion.div
+          initial={{ scale: 0, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          className="relative border-3 border-neo-black rounded-neo shadow-hard-lg px-3 md:px-4 py-1.5 min-w-[70px] md:min-w-[90px]"
+          style={{
+            background: 'linear-gradient(135deg, #FFE135 0%, #BFFF00 100%)',
+          }}
+        >
+          <div className="text-center">
+            <motion.div
+              key={score}
+              initial={{ scale: 1.3 }}
+              animate={{ scale: 1 }}
+              className="text-xl md:text-2xl font-black text-neo-black leading-tight"
+              style={{ textShadow: '1px 1px 0px rgba(255,255,255,0.5)' }}
+            >
+              {score}
+            </motion.div>
+            <div className="text-[10px] md:text-xs font-bold uppercase tracking-wider text-neo-black/80">
+              {t('common.score') || 'Score'}
+            </div>
+          </div>
+        </motion.div>
       </div>
 
       {/* Word Forming Area with feedback - centered below timer */}

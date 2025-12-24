@@ -19,6 +19,13 @@ const SIZES = {
   md: { svgSize: 120, radius: 45, strokeWidth: 10, textSize: 'text-3xl', frameClasses: 'p-3 border-4', badgeClasses: '' },
 };
 
+// Format time as MM:SS - defined outside component to avoid recreation on each render
+const formatTime = (seconds: number): string => {
+  const mins = Math.floor(seconds / 60);
+  const secs = seconds % 60;
+  return `${mins}:${secs.toString().padStart(2, '0')}`;
+};
+
 /**
  * CircularTimer - Neo-Brutalist styled countdown timer
  * Memoized to prevent unnecessary re-renders when parent updates
@@ -36,14 +43,6 @@ const CircularTimer = memo<CircularTimerProps>(({ remainingTime, totalTime = 180
   const radius = config.radius;
   const circumference = 2 * Math.PI * radius;
   const strokeDashoffset = circumference - (progress / 100) * circumference;
-
-  // Format time as MM:SS
-  const formatTime = (seconds: number): string => {
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    const paddedSecs = secs < 10 ? `0${secs}` : secs;
-    return `${mins}:${paddedSecs}`;
-  };
 
   // Determine color based on remaining time (20 seconds to match music transition)
   const isLowTime = remainingTime <= 20;
