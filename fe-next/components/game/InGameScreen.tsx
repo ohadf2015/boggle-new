@@ -577,14 +577,14 @@ const InGameScreen = memo<InGameScreenProps>(({
 
           {/* Center: Word Forming Area + Notification + Grid */}
           <div className={`flex flex-col items-center justify-center w-full h-full ${isVeryShortLandscape ? 'px-4' : 'px-3'} py-0.5 landscape-grid-container`}>
-            {/* Word Forming Area with integrated feedback */}
+            {/* Word Forming Area with integrated feedback - flex-shrink-0 prevents squishing, z-50 keeps it visible */}
             {isPlaying && (
               <WordFormingArea
                 word={formedWord}
                 letterCount={letterCount}
                 feedback={currentFeedback}
                 compact
-                className="mb-0.5"
+                className="mb-1 flex-shrink-0 z-50"
               />
             )}
             <div className="flex-1 flex items-center justify-center game-board-frame-landscape" style={{ aspectRatio: '1/1' }}>
