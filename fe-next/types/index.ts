@@ -25,19 +25,6 @@ export type {
   // Note: LeaderboardEntry is now in shared/types/game.ts
 } from './user';
 
-// API types (frontend API calls)
-export type {
-  ApiResponse,
-  ApiError,
-  PaginatedResponse,
-  CreateGameResponse,
-  JoinGameResponse,
-  GetProfileResponse,
-  GetLeaderboardResponse,
-  GetActiveRoomsResponse,
-  ValidateWordResponse,
-} from './api';
-
 // Component prop types
 export type {
   JoinViewProps,

@@ -60,7 +60,7 @@ const ResultsPage = nextDynamic(() => import('@/components/views/ResultsPage'), 
   ssr: false,
 });
 
-const QuickJoinView = nextDynamic(() => import('@/components/join-view/QuickJoinView'), {
+const QuickJoinForm = nextDynamic(() => import('@/components/join/QuickJoinForm'), {
   loading: () => <ViewLoadingSkeleton />,
   ssr: false,
 });
@@ -1112,9 +1112,9 @@ export default function MultiplayerPage(): React.JSX.Element {
     setShowResults(true);
   }, []);
 
-  // QuickJoinView handlers
-  const handleQuickJoinSubmit = useCallback((e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+  // QuickJoinForm handlers
+  const handleQuickJoinSubmit = useCallback((e?: React.FormEvent<HTMLFormElement>) => {
+    e?.preventDefault();
     // Validate username
     if (!username || username.trim().length < 2) {
       setUsernameError(true);
@@ -1127,11 +1127,6 @@ export default function MultiplayerPage(): React.JSX.Element {
 
   const handleShowFullForm = useCallback(() => {
     setShowFullForm(true);
-  }, []);
-
-  const handleUsernameErrorClear = useCallback(() => {
-    setUsernameError(false);
-    setUsernameErrorKey(undefined);
   }, []);
 
   // Create context value
@@ -1161,23 +1156,22 @@ export default function MultiplayerPage(): React.JSX.Element {
     }
 
     if (!isActive) {
-      // Show QuickJoinView when there's a prefilled room code and user hasn't clicked to show full form
+      // Show QuickJoinForm when there's a prefilled room code and user hasn't clicked to show full form
       if (prefilledRoomCode && !showFullForm && !error) {
         return (
           <FeatureErrorBoundary featureName="Quick Join">
-            <QuickJoinView
+            <QuickJoinForm
               gameCode={prefilledRoomCode}
               username={username}
               setUsername={setUsername}
               error={error}
               isJoining={isJoining}
               isAuthenticated={isAuthenticated}
-              displayName={profile?.display_name ?? null}
+              displayName={profile?.display_name ?? ''}
               usernameError={usernameError}
               usernameErrorKey={usernameErrorKey}
-              onUsernameErrorClear={handleUsernameErrorClear}
-              onJoin={handleJoin}
-              onQuickJoinSubmit={handleQuickJoinSubmit}
+              setUsernameError={setUsernameError}
+              onJoin={handleQuickJoinSubmit}
               onShowFullForm={handleShowFullForm}
             />
           </FeatureErrorBoundary>
