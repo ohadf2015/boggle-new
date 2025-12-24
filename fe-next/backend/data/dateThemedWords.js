@@ -20,13 +20,13 @@ const dayOfWeekThemes = {
     { day: 6, nameKey: 'theme.saturdayAdventure', emoji: '🏔️', words: ['ADVENTURE', 'EXPLORE', 'TRAVEL', 'HIKE', 'CAMP', 'NATURE', 'OUTDOOR', 'TRAIL', 'JOURNEY', 'DISCOVER', 'EXPEDITION', 'WANDERLUST'] }
   ],
   he: [
-    { day: 0, nameKey: 'theme.sundayFunday', emoji: '🌞', words: ['ראשון', 'שמש', 'מנוחה', 'שלום', 'רגוע', 'נעים', 'שקט', 'רוגע', 'נחת', 'שלווה', 'מרגיע', 'נינוח'] },
-    { day: 1, nameKey: 'theme.mondayMotivation', emoji: '💪', words: ['שני', 'התחלה', 'כוח', 'אנרגיה', 'מוטיבציה', 'מטרה', 'הצלחה', 'שאיפה', 'נחישות', 'התמדה', 'מרץ', 'עוצמה'] },
-    { day: 2, nameKey: 'theme.tuesdayTrivia', emoji: '🧠', words: ['שלישי', 'מוח', 'חכם', 'פיקח', 'ידע', 'למידה', 'חשיבה', 'תבונה', 'שכל', 'הבנה', 'חוכמה', 'אינטלקט'] },
-    { day: 3, nameKey: 'theme.wednesdayWisdom', emoji: '📚', words: ['רביעי', 'ספר', 'קריאה', 'כתיבה', 'סיפור', 'מילים', 'שירה', 'חכמה', 'תורה', 'לימוד', 'השכלה', 'ספרות'] },
-    { day: 4, nameKey: 'theme.thursdayThrowback', emoji: '📷', words: ['חמישי', 'זיכרון', 'עבר', 'היסטוריה', 'מורשת', 'תמונה', 'אלבום', 'נוסטלגיה', 'ותיק', 'קלאסי', 'עתיק', 'מסורת'] },
-    { day: 5, nameKey: 'theme.funFriday', emoji: '🎉', words: ['שישי', 'שמחה', 'חגיגה', 'ריקוד', 'מוזיקה', 'שיר', 'מסיבה', 'כיף', 'צחוק', 'עליזות', 'התלהבות', 'אושר'] },
-    { day: 6, nameKey: 'theme.saturdayAdventure', emoji: '🏔️', words: ['שבת', 'טיול', 'הרפתקה', 'טבע', 'יער', 'הר', 'נחל', 'שביל', 'מסע', 'גילוי', 'חקירה', 'נדודים'] }
+    { day: 0, nameKey: 'theme.sundayFunday', emoji: '🌞', words: ['ראשונ', 'שמש', 'מנוחה', 'שלומ', 'רגוע', 'נעימ', 'שקט', 'רוגע', 'נחת', 'שלווה', 'מרגיע', 'נינוח'] },
+    { day: 1, nameKey: 'theme.mondayMotivation', emoji: '💪', words: ['שני', 'התחלה', 'כוח', 'אנרגיה', 'מוטיבציה', 'מטרה', 'הצלחה', 'שאיפה', 'נחישות', 'התמדה', 'מרצ', 'עוצמה'] },
+    { day: 2, nameKey: 'theme.tuesdayTrivia', emoji: '🧠', words: ['שלישי', 'מוח', 'חכמ', 'פיקח', 'ידע', 'למידה', 'חשיבה', 'תבונה', 'שכל', 'הבנה', 'חוכמה', 'אינטלקט'] },
+    { day: 3, nameKey: 'theme.wednesdayWisdom', emoji: '📚', words: ['רביעי', 'ספר', 'קריאה', 'כתיבה', 'סיפור', 'מילימ', 'שירה', 'חכמה', 'תורה', 'לימוד', 'השכלה', 'ספרות'] },
+    { day: 4, nameKey: 'theme.thursdayThrowback', emoji: '📷', words: ['חמישי', 'זיכרונ', 'עבר', 'היסטוריה', 'מורשת', 'תמונה', 'אלבומ', 'נוסטלגיה', 'ותיק', 'קלאסי', 'עתיק', 'מסורת'] },
+    { day: 5, nameKey: 'theme.funFriday', emoji: '🎉', words: ['שישי', 'שמחה', 'חגיגה', 'ריקוד', 'מוזיקה', 'שיר', 'מסיבה', 'כיפ', 'צחוק', 'עליזות', 'התלהבות', 'אושר'] },
+    { day: 6, nameKey: 'theme.saturdayAdventure', emoji: '🏔️', words: ['שבת', 'טיול', 'הרפתקה', 'טבע', 'יער', 'הר', 'נחל', 'שביל', 'מסע', 'גילוי', 'חקירה', 'נדודימ'] }
   ],
   sv: [
     { day: 0, nameKey: 'theme.sundayFunday', emoji: '🌞', words: ['SONDAG', 'VILA', 'LUGN', 'FRED', 'SKON', 'LAT', 'MJUK', 'VARM', 'HEMMA', 'FAMIL', 'AVSLAPPNAD', 'HARMONISK'] },
@@ -81,19 +81,19 @@ const holidayThemes = {
     // Rosh Hashanah (usually September/October)
     { startMonth: 8, startDay: 15, endMonth: 9, endDay: 15, nameKey: 'theme.roshHashana', emoji: '🍎', words: ['ראש', 'השנה', 'תפוח', 'דבש', 'שופר', 'תשובה', 'סליחה', 'ברכה', 'שנה', 'טובה', 'מתיקות', 'התחדשות'] },
     // Yom Kippur
-    { startMonth: 8, startDay: 20, endMonth: 9, endDay: 20, nameKey: 'theme.yomKippur', emoji: '🕊️', words: ['כיפור', 'צום', 'תפילה', 'סליחה', 'תשובה', 'כפרה', 'טהרה', 'קדושה', 'נשמה', 'רוחניות', 'התבוננות', 'מחילה'] },
+    { startMonth: 8, startDay: 20, endMonth: 9, endDay: 20, nameKey: 'theme.yomKippur', emoji: '🕊️', words: ['כיפור', 'צומ', 'תפילה', 'סליחה', 'תשובה', 'כפרה', 'טהרה', 'קדושה', 'נשמה', 'רוחניות', 'התבוננות', 'מחילה'] },
     // Sukkot
-    { startMonth: 8, startDay: 25, endMonth: 9, endDay: 25, nameKey: 'theme.sukkot', emoji: '🌿', words: ['סוכה', 'לולב', 'אתרוג', 'הדס', 'ערבה', 'חג', 'שמחה', 'אורחים', 'סכך', 'ארבעת', 'המינים', 'הושענא'] },
+    { startMonth: 8, startDay: 25, endMonth: 9, endDay: 25, nameKey: 'theme.sukkot', emoji: '🌿', words: ['סוכה', 'לולב', 'אתרוג', 'הדס', 'ערבה', 'חג', 'שמחה', 'אורחימ', 'סככ', 'ארבעת', 'המינימ', 'הושענא'] },
     // Hanukkah (usually December)
-    { startMonth: 10, startDay: 25, endMonth: 11, endDay: 31, nameKey: 'theme.hanukkah', emoji: '🕎', words: ['חנוכה', 'נר', 'חנוכיה', 'סביבון', 'סופגניה', 'לביבה', 'שמן', 'נס', 'אור', 'מכבים', 'הדלקה', 'מתנות'] },
+    { startMonth: 10, startDay: 25, endMonth: 11, endDay: 31, nameKey: 'theme.hanukkah', emoji: '🕎', words: ['חנוכה', 'נר', 'חנוכיה', 'סביבונ', 'סופגניה', 'לביבה', 'שמנ', 'נס', 'אור', 'מכבימ', 'הדלקה', 'מתנות'] },
     // Purim (usually March)
-    { startMonth: 1, startDay: 20, endMonth: 2, endDay: 20, nameKey: 'theme.purim', emoji: '🎭', words: ['פורים', 'תחפושת', 'המן', 'אסתר', 'מרדכי', 'מגילה', 'משלוח', 'מנות', 'רעשן', 'שמחה', 'משתה', 'עוגניות'] },
+    { startMonth: 1, startDay: 20, endMonth: 2, endDay: 20, nameKey: 'theme.purim', emoji: '🎭', words: ['פורימ', 'תחפושת', 'המנ', 'אסתר', 'מרדכי', 'מגילה', 'משלוח', 'מנות', 'רעשנ', 'שמחה', 'משתה', 'עוגניות'] },
     // Passover (usually April)
-    { startMonth: 2, startDay: 25, endMonth: 3, endDay: 30, nameKey: 'theme.passover', emoji: '🍷', words: ['פסח', 'מצה', 'סדר', 'הגדה', 'יציאת', 'מצרים', 'חירות', 'אפיקומן', 'כרפס', 'חרוסת', 'מרור', 'ארבע'] },
+    { startMonth: 2, startDay: 25, endMonth: 3, endDay: 30, nameKey: 'theme.passover', emoji: '🍷', words: ['פסח', 'מצה', 'סדר', 'הגדה', 'יציאת', 'מצרימ', 'חירות', 'אפיקומנ', 'כרפס', 'חרוסת', 'מרור', 'ארבע'] },
     // Shavuot (usually May/June)
-    { startMonth: 4, startDay: 20, endMonth: 5, endDay: 15, nameKey: 'theme.shavuot', emoji: '📜', words: ['שבועות', 'תורה', 'מתן', 'הר', 'סיני', 'חלב', 'גבינה', 'ביכורים', 'לימוד', 'עשרת', 'הדברות', 'מגילת'] },
+    { startMonth: 4, startDay: 20, endMonth: 5, endDay: 15, nameKey: 'theme.shavuot', emoji: '📜', words: ['שבועות', 'תורה', 'מתנ', 'הר', 'סיני', 'חלב', 'גבינה', 'ביכורימ', 'לימוד', 'עשרת', 'הדברות', 'מגילת'] },
     // Israeli Independence Day
-    { startMonth: 3, startDay: 20, endMonth: 4, endDay: 10, nameKey: 'theme.yomHaatzmaut', emoji: '🇮🇱', words: ['עצמאות', 'ישראל', 'דגל', 'חופש', 'מדינה', 'לאום', 'גאווה', 'חגיגה', 'מנגל', 'זיכרון', 'התקווה', 'ציונות'] }
+    { startMonth: 3, startDay: 20, endMonth: 4, endDay: 10, nameKey: 'theme.yomHaatzmaut', emoji: '🇮🇱', words: ['עצמאות', 'ישראל', 'דגל', 'חופש', 'מדינה', 'לאומ', 'גאווה', 'חגיגה', 'מנגל', 'זיכרונ', 'התקווה', 'ציונות'] }
   ],
   sv: [
     // New Year
