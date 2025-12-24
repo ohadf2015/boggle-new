@@ -19,6 +19,32 @@ import { useState, useRef, useCallback, useMemo } from 'react';
 import { validateWordLocally, isWordOnBoard } from '@/utils/clientWordValidator';
 import type { Language, LetterGrid } from '@/shared/types/game';
 
+// ==================== Scoring Utilities ====================
+
+/**
+ * Get combo bonus based on combo level and word length - matches backend scoring engine
+ */
+function getComboBonus(comboLevel: number, wordLength: number): number {
+  if (comboLevel <= 0) return 0;
+
+  // Word length factor - longer words get better combo bonuses
+  let wordLengthFactor: number;
+  if (wordLength <= 3) {
+    wordLengthFactor = 0.2;  // Very short words - minimal combo bonus
+  } else if (wordLength === 4) {
+    wordLengthFactor = 0.5;  // Short words - modest combo bonus
+  } else if (wordLength === 5) {
+    wordLengthFactor = 1.0;  // Medium words - full base bonus
+  } else if (wordLength === 6) {
+    wordLengthFactor = 1.5;  // Good words - 1.5x bonus
+  } else {
+    wordLengthFactor = 2.0;  // Long words (7+) - 2x bonus
+  }
+
+  const baseBonus = Math.min(comboLevel, 10);
+  return Math.floor(baseBonus * wordLengthFactor);
+}
+
 // ==================== Types ====================
 
 export interface WordFeedback {
@@ -133,13 +159,13 @@ export function useWordSubmission(options: UseWordSubmissionOptions): WordSubmis
   }, [foundWords]);
 
   /**
-   * Calculate word score based on length and combo
+   * Calculate word score based on length and combo - matches backend scoring engine
    */
   const calculateScore = useCallback((wordLength: number, currentCombo: number): number => {
     // Base score: word length - 1 (matches multiplayer scoring)
     const baseScore = Math.max(wordLength - 1, 1);
-    // Combo bonus scales with combo level
-    const comboBonus = currentCombo > 0 ? Math.floor(baseScore * (currentCombo * 0.1)) : 0;
+    // Combo bonus based on combo level and word length (matches backend formula)
+    const comboBonus = getComboBonus(currentCombo, wordLength);
     // Fire round multiplier (2x during fire round, 1x otherwise)
     const multiplier = fireRoundActive ? 2 : 1;
     return (baseScore + comboBonus) * multiplier;
@@ -311,10 +337,10 @@ export function useWordSubmission(options: UseWordSubmissionOptions): WordSubmis
       })
       .then(result => {
         if (result.isValid) {
-          // Word is valid - calculate full score with combo
+          // Word is valid - calculate full score with combo using backend-matching formula
           const fullScore = calculateScore(normalizedWord.length, currentCombo);
           const wordLenScore = Math.max(normalizedWord.length - 1, 1);
-          const comboBonus = currentCombo > 0 ? Math.floor(wordLenScore * (currentCombo * 0.1)) : 0;
+          const comboBonus = getComboBonus(currentCombo, normalizedWord.length);
           const fireRoundBonus = fireRoundActive ? (wordLenScore + comboBonus) : 0;
 
           setFoundWords(prev => prev.map(fw =>

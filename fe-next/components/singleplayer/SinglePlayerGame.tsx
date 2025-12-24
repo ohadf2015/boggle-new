@@ -699,11 +699,33 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
     }));
   }, []);
 
+  // Get combo bonus based on combo level and word length - matches backend scoring engine
+  const getComboBonus = (comboLevel: number, wordLength: number): number => {
+    if (comboLevel <= 0) return 0;
+
+    // Word length factor - longer words get better combo bonuses
+    let wordLengthFactor: number;
+    if (wordLength <= 3) {
+      wordLengthFactor = 0.2;  // Very short words - minimal combo bonus
+    } else if (wordLength === 4) {
+      wordLengthFactor = 0.5;  // Short words - modest combo bonus
+    } else if (wordLength === 5) {
+      wordLengthFactor = 1.0;  // Medium words - full base bonus
+    } else if (wordLength === 6) {
+      wordLengthFactor = 1.5;  // Good words - 1.5x bonus
+    } else {
+      wordLengthFactor = 2.0;  // Long words (7+) - 2x bonus
+    }
+
+    const baseBonus = Math.min(comboLevel, 10);
+    return Math.floor(baseBonus * wordLengthFactor);
+  };
+
   const calculateWordScore = (wordLength: number, currentComboLevel: number): number => {
     // Base score: word length - 1 (matches multiplayer scoring)
     const baseScore = Math.max(wordLength - 1, 1);
-    // Combo bonus scales with combo level (only applies after first word)
-    const comboBonus = currentComboLevel > 0 ? Math.floor(baseScore * (currentComboLevel * 0.1)) : 0;
+    // Combo bonus based on combo level and word length (matches backend formula)
+    const comboBonus = getComboBonus(currentComboLevel, wordLength);
     // Fire round multiplier (2x during fire round, 1x otherwise)
     const multiplier = getScoreMultiplier();
     return (baseScore + comboBonus) * multiplier;
@@ -847,13 +869,11 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
       .then(result => {
         if (result.isValid) {
           // Word is in dictionary/community - valid immediately (like multiplayer's handleValidatedWord)
-          // Calculate combo bonus and fire round bonus separately
+          // Calculate combo bonus and fire round bonus separately using backend-matching formula
           const wordLenScore = Math.max(normalizedWord.length - 1, 1);
-          const comboAmount = currentCombo > 0 ? Math.floor(wordLenScore * (currentCombo * 0.1)) : 0;
-          const scoreWithoutMultiplier = wordLenScore + comboAmount;
+          const comboBonus = getComboBonus(currentCombo, normalizedWord.length);
+          const scoreWithoutMultiplier = wordLenScore + comboBonus;
           const multiplier = getScoreMultiplier();
-          // comboBonus is the raw combo bonus (without multiplier)
-          const comboBonus = comboAmount;
           // fireRoundBonus is the extra points from doubling (when multiplier is 2x)
           const fireRoundBonus = multiplier > 1 ? scoreWithoutMultiplier : 0;
 
