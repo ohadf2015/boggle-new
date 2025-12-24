@@ -45,14 +45,18 @@ export const metadata: Metadata = {
             'max-video-preview': -1,
         },
     },
-    // Help Google find and display favicon
+    // Help Google find and display favicon - PNG icons first (Google preferred)
     icons: {
         icon: [
-            { url: 'https://www.lexiclash.live/favicon.svg', type: 'image/svg+xml' },
-            { url: 'https://www.lexiclash.live/favicon.ico', sizes: '48x48 32x32 16x16', type: 'image/x-icon' },
+            // PNG icons first - Google requires multiples of 48px
+            { url: 'https://www.lexiclash.live/icon-48.png', sizes: '48x48', type: 'image/png' },
+            { url: 'https://www.lexiclash.live/icon-96.png', sizes: '96x96', type: 'image/png' },
+            { url: 'https://www.lexiclash.live/icon-144.png', sizes: '144x144', type: 'image/png' },
             { url: 'https://www.lexiclash.live/icon-192.png', sizes: '192x192', type: 'image/png' },
+            // SVG for modern browsers (after PNG for Google compatibility)
+            { url: 'https://www.lexiclash.live/favicon.svg', type: 'image/svg+xml' },
         ],
-        shortcut: 'https://www.lexiclash.live/favicon.ico',
+        shortcut: 'https://www.lexiclash.live/icon-48.png',
         apple: 'https://www.lexiclash.live/apple-touch-icon.png',
     },
 };
