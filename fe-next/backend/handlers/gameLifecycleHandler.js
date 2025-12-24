@@ -208,7 +208,7 @@ function registerGameLifecycleHandlers(io, socket) {
       // Clear any lingering timers/state from previous game
       timerManager.clearGameTimer(gameCode);
       gameStartCoordinator.cleanupSequence(gameCode);
-      botManager.cleanupGameBots(gameCode);
+      botManager.stopAllBots(gameCode);
 
       // Force reset to 'waiting' state - try proper reset first, fallback to direct state change
       const resetSuccess = resetGameForNewRound(gameCode);
