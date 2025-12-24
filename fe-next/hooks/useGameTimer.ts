@@ -177,6 +177,13 @@ export function useGameTimer(options: UseGameTimerOptions): GameTimerReturn {
     animationFrameRef.current = requestAnimationFrame(tick);
 
     return () => {
+      // IMPORTANT: Accumulate elapsed time on cleanup to preserve progress
+      // This handles React StrictMode double-invocation and other effect re-runs
+      if (startTimestampRef.current !== null) {
+        const now = performance.now();
+        accumulatedTimeRef.current += (now - startTimestampRef.current) / 1000;
+        startTimestampRef.current = null;
+      }
       if (animationFrameRef.current) {
         cancelAnimationFrame(animationFrameRef.current);
         animationFrameRef.current = null;

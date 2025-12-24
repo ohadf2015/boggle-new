@@ -76,7 +76,15 @@ const WordFormingArea = React.memo<WordFormingAreaProps>(({
     }
   }, [word, letterCount]);
 
-  // Handle feedback display - persists until replaced or user starts forming new word
+  // Clear feedback when user starts forming a new word
+  const isFormingWord = word.length > 0;
+  useEffect(() => {
+    if (isFormingWord && visibleFeedback) {
+      setVisibleFeedback(null);
+    }
+  }, [isFormingWord]); // eslint-disable-line react-hooks/exhaustive-deps -- Only trigger on forming state change
+
+  // Handle feedback display - persists until new word is formed or timeout
   useEffect(() => {
     if (feedback) {
       setVisibleFeedback(feedback);
@@ -84,15 +92,18 @@ const WordFormingArea = React.memo<WordFormingAreaProps>(({
       if (feedbackTimeoutRef.current) {
         clearTimeout(feedbackTimeoutRef.current);
       }
+      // Auto-clear feedback after 5 seconds as fallback
+      feedbackTimeoutRef.current = setTimeout(() => {
+        setVisibleFeedback(null);
+      }, 5000);
     }
-  }, [feedback]);
 
-  // Clear feedback when user starts forming a new word
-  useEffect(() => {
-    if (word.length > 0 && visibleFeedback) {
-      setVisibleFeedback(null);
-    }
-  }, [word, visibleFeedback]); // Fixed: proper dependencies
+    return () => {
+      if (feedbackTimeoutRef.current) {
+        clearTimeout(feedbackTimeoutRef.current);
+      }
+    };
+  }, [feedback]);
 
   // Determine current state
   const isForming = word.length > 0;

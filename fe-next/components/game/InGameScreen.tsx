@@ -31,6 +31,7 @@ import type {
   TournamentData,
 } from '@/shared/types/view';
 import { useMobileLandscape } from '@/hooks/useMobileLandscape';
+import { useAutoScrollOnGameStart } from '@/hooks/useAutoScrollOnGameStart';
 
 // ==================== Types ====================
 
@@ -173,6 +174,16 @@ const InGameScreen = memo<InGameScreenProps>(({
 
   // Viewport height detection for very short landscape screens
   const [viewportHeight, setViewportHeight] = useState(0);
+
+  // Ref for auto-scroll target (timer/stats section in portrait mode)
+  const gameStatsRef = useRef<HTMLDivElement>(null);
+
+  // Auto-scroll to game area on game start in portrait mode
+  useAutoScrollOnGameStart(gameStatsRef, {
+    gameActive,
+    isLandscape,
+    showStartAnimation,
+  });
 
   // Track viewport height for responsive landscape adjustments
   useEffect(() => {
@@ -361,20 +372,24 @@ const InGameScreen = memo<InGameScreenProps>(({
 
     if (!validation.isValid) {
       let msg: string;
+      const isDuplicate = validation.errorKey === 'playerView.wordAlreadyFound';
+
       if (validation.errorKey === 'playerView.wordTooShortMin') {
         msg = t('playerView.wordTooShortMin')
           ? t('playerView.wordTooShortMin').replace('${min}', String(validation.errorParams?.min || minWordLength))
           : `Word too short! (min ${validation.errorParams?.min || minWordLength} letters)`;
       } else if (validation.errorKey === 'playerView.wordTooShort') {
         msg = t('playerView.wordTooShort') || 'Word too short';
+      } else if (isDuplicate) {
+        msg = t('playerView.alreadyFound') || 'Already found';
       } else {
         const errorKey = validation.errorKey ?? 'Invalid word';
         msg = t(errorKey) || errorKey;
       }
-      // Show feedback in WordFormingArea
+      // Show feedback in WordFormingArea - use 'duplicate' type for already found words
       setCurrentFeedback({
-        id: `reject-${Date.now()}`,
-        type: 'rejected',
+        id: isDuplicate ? `duplicate-${Date.now()}` : `reject-${Date.now()}`,
+        type: isDuplicate ? 'duplicate' : 'rejected',
         word: formedWord,
         message: msg,
         timestamp: Date.now(),
@@ -384,7 +399,7 @@ const InGameScreen = memo<InGameScreenProps>(({
       // Announce rejection for screen readers
       announceWordResult(formedWord, false, undefined, msg);
       // Reset combo if duplicate word
-      if (validation.errorKey === 'playerView.wordAlreadyFound' && onResetCombo) {
+      if (isDuplicate && onResetCombo) {
         onResetCombo();
       }
       return;
@@ -714,7 +729,7 @@ const InGameScreen = memo<InGameScreenProps>(({
       <div className="flex-1 flex flex-col min-w-0 min-h-0">
         {/* Stats row - Combo | Timer | Score - timer always centered and visible */}
         {remainingTime !== null && (
-          <div className="flex items-center justify-center gap-3 md:gap-4 mb-2" role="status" aria-label="Game status">
+          <div ref={gameStatsRef} className="flex items-center justify-center gap-3 md:gap-4 mb-2" role="status" aria-label="Game status">
             {/* Combo (left - shows when level >= 2, placeholder otherwise for layout balance) */}
             {isPlaying && (
               <div className="min-w-[70px] md:min-w-[90px] flex justify-end">

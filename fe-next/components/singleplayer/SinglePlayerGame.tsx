@@ -27,6 +27,7 @@ import { useGameMusic } from '@/hooks/useGameMusic';
 import { useEarthquakeFireRound } from '@/hooks/useEarthquakeFireRound';
 import { useComboSystem } from '@/hooks/useComboSystem';
 import { useGameTimer } from '@/hooks/useGameTimer';
+import { useAutoScrollOnGameStart } from '@/hooks/useAutoScrollOnGameStart';
 import { generateRandomTable, applyHebrewFinalLetters } from '@/utils/utils';
 import { DIFFICULTIES } from '@/utils/consts';
 import { cn } from '@/lib/utils';
@@ -133,6 +134,17 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
         setIsGameOver(true);
       }
     },
+  });
+
+  // Ref for auto-scroll target (timer/stats section in portrait mode)
+  const gameStatsRef = useRef<HTMLDivElement>(null);
+
+  // Auto-scroll to game area on game start in portrait mode
+  // Game is considered active when grid is loaded and not paused/game over
+  const gameActive = !!grid && !isPaused && !isGameOver && timer.remainingTime > 0;
+  useAutoScrollOnGameStart(gameStatsRef, {
+    gameActive,
+    isLandscape,
   });
 
   // Remaining refs (not replaced by hooks)
@@ -1144,7 +1156,7 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
       </div>
 
       {/* Stats row - Combo | Timer | Score - matches multiplayer layout */}
-      <div className="flex items-center justify-center gap-3 md:gap-4 mb-2" role="status" aria-label="Game status">
+      <div ref={gameStatsRef} className="flex items-center justify-center gap-3 md:gap-4 mb-2" role="status" aria-label="Game status">
         {/* Combo (left - shows when level >= 2, placeholder otherwise for layout balance) */}
         <div className="min-w-[70px] md:min-w-[90px] flex justify-end">
           <ComboDisplay comboLevel={combo.comboLevel} compact />
