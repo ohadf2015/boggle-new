@@ -441,7 +441,8 @@ function handleReconnection(io, socket, game, gameCode, username, authUserId, gu
       minWordLength: game.minWordLength || 2,
       messageId: 'reconnect-' + Date.now(),
       reconnect: true,
-      skipAck: true
+      skipAck: true,
+      boardTheme: game.boardTheme || null
     });
   }
 
@@ -463,7 +464,8 @@ function handleLateJoin(socket, game, gameCode, username) {
     minWordLength: game.minWordLength || 2,
     messageId: 'late-join-' + Date.now(),
     lateJoin: true,
-    skipAck: true
+    skipAck: true,
+    boardTheme: game.boardTheme || null
   });
 
   const leaderboard = getLeaderboard(gameCode);

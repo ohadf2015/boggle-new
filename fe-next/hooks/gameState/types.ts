@@ -9,7 +9,7 @@ import type {
   LeaderboardEntry,
   WordDetail,
 } from '@/shared/types/game';
-import type { XpGainedPayload, LevelUpPayload, AchievementPayload } from '@/shared/types/socket';
+import type { XpGainedPayload, LevelUpPayload, AchievementPayload, BoardTheme } from '@/shared/types/socket';
 
 // ==========================================
 // Domain Types
@@ -83,6 +83,9 @@ export interface GameStateValues {
   // XP/Level state
   xpGainedData: XpGainedPayload | null;
   levelUpData: LevelUpPayload | null;
+
+  // Board theme
+  boardTheme: BoardTheme | null;
 }
 
 // ==========================================
@@ -125,6 +128,8 @@ export type GameStateAction =
   // XP/Level actions
   | { type: 'SET_XP_GAINED_DATA'; payload: XpGainedPayload | null | ((prev: XpGainedPayload | null) => XpGainedPayload | null) }
   | { type: 'SET_LEVEL_UP_DATA'; payload: LevelUpPayload | null | ((prev: LevelUpPayload | null) => LevelUpPayload | null) }
+  // Board theme actions
+  | { type: 'SET_BOARD_THEME'; payload: BoardTheme | null | ((prev: BoardTheme | null) => BoardTheme | null) }
   // Reset actions
   | { type: 'RESET_FOR_NEW_ROUND' }
   | { type: 'RESET_ALL' };
@@ -174,6 +179,9 @@ export interface GameStateActions {
   // XP/Level actions
   setXpGainedData: React.Dispatch<React.SetStateAction<XpGainedPayload | null>>;
   setLevelUpData: React.Dispatch<React.SetStateAction<LevelUpPayload | null>>;
+
+  // Board theme actions
+  setBoardTheme: React.Dispatch<React.SetStateAction<BoardTheme | null>>;
 
   // Reset actions
   resetForNewRound: () => void;

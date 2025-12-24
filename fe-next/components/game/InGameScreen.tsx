@@ -17,6 +17,7 @@ import HintButton from '../HintButton';
 import { HelpPanel, HelpButton } from './HelpPanel';
 import WordFormingArea, { type WordFeedback } from './WordFormingArea';
 import ComboDisplay from './ComboDisplay';
+import ThemeIndicator from './ThemeIndicator';
 import { applyHebrewFinalLetters } from '../../utils/utils';
 import { wordErrorToast } from '../NeoToast';
 import { useSoundEffects } from '../../contexts/SoundEffectsContext';
@@ -30,6 +31,7 @@ import type {
   ExtendedLeaderboardPlayer as LeaderboardPlayer,
   TournamentData,
 } from '@/shared/types/view';
+import type { BoardTheme } from '@/shared/types/socket';
 import { useMobileLandscape } from '@/hooks/useMobileLandscape';
 import { useAutoScrollOnGameStart } from '@/hooks/useAutoScrollOnGameStart';
 
@@ -95,6 +97,9 @@ interface InGameScreenProps {
 
   // Achievement dock (rendered outside this component)
   children?: ReactNode;
+
+  // Board theme (date-themed words indicator)
+  boardTheme?: BoardTheme | null;
 }
 
 // ==================== Component ====================
@@ -150,6 +155,9 @@ const InGameScreen = memo<InGameScreenProps>(({
 
   // Achievement dock
   children,
+
+  // Board theme
+  boardTheme,
 }) => {
   const {
     playWordAcceptedSound,
@@ -619,6 +627,13 @@ const InGameScreen = memo<InGameScreenProps>(({
               />
             </div>
           </div>
+
+          {/* Theme Indicator - subtle, bottom center in landscape */}
+          {boardTheme && (
+            <div className="absolute bottom-1 left-1/2 -translate-x-1/2 z-20 opacity-60">
+              <ThemeIndicator theme={boardTheme} />
+            </div>
+          )}
         </div>
 
         {/* Achievement dock */}
@@ -839,6 +854,13 @@ const InGameScreen = memo<InGameScreenProps>(({
               earthquakeShaking={earthquakeState === 'shaking'}
             />
         </div>
+
+        {/* Theme Indicator - subtle, below grid */}
+        {boardTheme && (
+          <div className="flex justify-center mt-1 opacity-70">
+            <ThemeIndicator theme={boardTheme} />
+          </div>
+        )}
 
         {/* Mobile: Word count display (when playing) */}
         {isPlaying && (

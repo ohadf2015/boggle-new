@@ -5,6 +5,7 @@ import type { Socket } from 'socket.io-client';
 import InGameScreen from '../../components/game/InGameScreen';
 import type { Language, LetterGrid, Avatar as AvatarType, PresenceStatus } from '@/shared/types/game';
 import type { EarthquakeState } from '@/shared/types/earthquake';
+import type { BoardTheme } from '@/shared/types/socket';
 
 // ==================== Types ====================
 
@@ -53,6 +54,9 @@ interface HostInGameViewProps {
   earthquakeState?: EarthquakeState;
   fireRoundActive?: boolean;
   fireRoundRemaining?: number;
+
+  // Theme
+  boardTheme?: BoardTheme | null;
 }
 
 // ==================== Component ====================
@@ -94,6 +98,9 @@ const HostInGameView: React.FC<HostInGameViewProps> = ({
   earthquakeState = 'idle',
   fireRoundActive = false,
   fireRoundRemaining = 0,
+
+  // Theme
+  boardTheme,
 }): React.ReactElement => {
   // Build leaderboard from players data
   const leaderboard = useMemo(() => {
@@ -160,6 +167,9 @@ const HostInGameView: React.FC<HostInGameViewProps> = ({
       earthquakeState={earthquakeState}
       fireRoundActive={fireRoundActive}
       fireRoundRemaining={fireRoundRemaining}
+
+      // Theme
+      boardTheme={boardTheme}
     />
   );
 };

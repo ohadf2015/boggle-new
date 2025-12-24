@@ -119,7 +119,7 @@ export interface ServerToClientEvents {
   gridShuffling: (data: { gridState: unknown }) => void;
 
   // Word events
-  wordsForBoard: (data: { words: string[] }) => void;
+  wordsForBoard: (data: WordsForBoardPayload) => void;
   wordAccepted: (data: WordAcceptedPayload) => void;
   wordRejected: (data: { word: string; reason: string }) => void;
   wordTooShort: (data: { word: string; minLength: number }) => void;
@@ -209,6 +209,18 @@ export interface ServerToClientEvents {
 }
 
 // ==================== Payload Types ====================
+
+// Board theme information for date-themed word generation
+export interface BoardTheme {
+  nameKey: string;   // Translation key for theme name (e.g., 'theme.christmas')
+  emoji: string;     // Emoji to display with theme (e.g., '🎄')
+  isHoliday: boolean; // True for holidays, false for day-of-week themes
+}
+
+export interface WordsForBoardPayload {
+  words: string[];
+  theme?: BoardTheme; // Theme info for display, optional for backward compatibility
+}
 
 export interface CreateGamePayload {
   gameCode: string;

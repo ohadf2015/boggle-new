@@ -108,6 +108,7 @@ const HostView: React.FC<HostViewProps> = memo(({
     setTournamentCreating: state.setTournamentCreating,
     setShufflingGrid: state.setShufflingGrid,
     setWordsForBoard: state.setWordsForBoard,
+    setBoardTheme: state.setBoardTheme,
     setXpGainedData: state.setXpGainedData,
     setLevelUpData: state.setLevelUpData,
     setEarthquakeState: setEarthquakeState,
@@ -171,6 +172,7 @@ const HostView: React.FC<HostViewProps> = memo(({
     tournamentRounds: state.settings.tournamentRounds,
     roomLanguage: state.roomLanguage,
     wordsForBoard: state.wordsForBoard,
+    boardTheme: state.boardTheme,
     playersCount: state.players.playersReady.length,
     tournamentData: state.tournament.tournamentData,
     setTableData: state.setTableData,
@@ -389,6 +391,7 @@ const HostView: React.FC<HostViewProps> = memo(({
           earthquakeState={earthquakeState}
           fireRoundActive={fireRoundActive}
           fireRoundRemaining={fireRoundRemaining}
+          boardTheme={state.boardTheme}
         />
       )}
     </div>

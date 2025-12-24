@@ -6,7 +6,7 @@ import { useEffect, useCallback, MutableRefObject } from 'react';
 import { Socket } from 'socket.io-client';
 // Note: Word feedback toasts removed - WordFormingArea now handles visual feedback
 import { calculateComboChainWindow, calculateComboTimeout, resetComboState } from '@/shared/utils/comboUtils';
-import type { WordAcceptedPayload } from '@/shared/types/socket';
+import type { WordAcceptedPayload, BoardTheme } from '@/shared/types/socket';
 
 interface UseHostWordEventsProps {
   socket: Socket | null;
@@ -18,6 +18,7 @@ interface UseHostWordEventsProps {
   // State setters
   setHostFoundWords: React.Dispatch<React.SetStateAction<string[]>>;
   setWordsForBoard: React.Dispatch<React.SetStateAction<string[]>>;
+  setBoardTheme: React.Dispatch<React.SetStateAction<BoardTheme | null>>;
 
   // Combo refs and setters
   comboLevelRef: MutableRefObject<number>;
@@ -38,6 +39,7 @@ export function useHostWordEvents({
   fireRoundActive = false,
   setHostFoundWords,
   setWordsForBoard,
+  setBoardTheme,
   comboLevelRef,
   lastWordTimeRef,
   setComboLevel,
@@ -165,6 +167,10 @@ export function useHostWordEvents({
       if (data?.words) {
         setWordsForBoard(data.words);
       }
+      // Set the board theme if provided
+      if (data?.theme) {
+        setBoardTheme(data.theme);
+      }
     };
 
     // Register listeners
@@ -193,5 +199,6 @@ export function useHostWordEvents({
     resetCombo,
     setHostFoundWords,
     setWordsForBoard,
+    setBoardTheme,
   ]);
 }

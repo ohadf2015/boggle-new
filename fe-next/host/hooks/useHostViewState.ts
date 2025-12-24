@@ -13,6 +13,7 @@ import { generateRandomTable } from '@/utils/utils';
 import { DIFFICULTIES, DEFAULT_DIFFICULTY, DEFAULT_MIN_WORD_LENGTH } from '@/utils/consts';
 import type { Language, LetterGrid, DifficultyLevel, Avatar } from '@/types';
 import type { Player } from '@/hooks/useGameState';
+import type { BoardTheme } from '@/shared/types/socket';
 
 // ==========================================
 // Type Definitions
@@ -205,6 +206,8 @@ export interface UseHostViewStateReturn {
   roomLanguage: Language;
   wordsForBoard: string[];
   setWordsForBoard: React.Dispatch<React.SetStateAction<string[]>>;
+  boardTheme: BoardTheme | null;
+  setBoardTheme: React.Dispatch<React.SetStateAction<BoardTheme | null>>;
 
   // Actions
   resetForNewGame: () => void;
@@ -298,6 +301,7 @@ export function useHostViewState(options: UseHostViewStateOptions = {}): UseHost
   // Words for Board Embedding
   // ==========================================
   const [wordsForBoard, setWordsForBoard] = useState<string[]>([]);
+  const [boardTheme, setBoardTheme] = useState<BoardTheme | null>(null);
 
   // ==========================================
   // Refs
@@ -501,6 +505,8 @@ export function useHostViewState(options: UseHostViewStateOptions = {}): UseHost
     roomLanguage: resolvedRoomLanguage,
     wordsForBoard,
     setWordsForBoard,
+    boardTheme,
+    setBoardTheme,
 
     // Actions
     resetForNewGame,
@@ -520,6 +526,7 @@ export function useHostViewState(options: UseHostViewStateOptions = {}): UseHost
     refs,
     resolvedRoomLanguage,
     wordsForBoard,
+    boardTheme,
     addHostFoundWord,
     resetForNewGame,
     resetUrgentMusicRef,

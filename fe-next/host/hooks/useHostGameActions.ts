@@ -18,6 +18,7 @@ import { DIFFICULTIES } from '@/utils/consts';
 import logger from '@/utils/logger';
 import type { Language, LetterGrid, DifficultyLevel } from '@/types';
 import type { TournamentData } from './useHostViewState';
+import type { BoardTheme } from '@/shared/types/socket';
 
 interface UseHostGameActionsOptions {
   socket: Socket | null;
@@ -34,6 +35,7 @@ interface UseHostGameActionsOptions {
   tournamentRounds: number;
   roomLanguage: Language;
   wordsForBoard: string[];
+  boardTheme: BoardTheme | null;
 
   // State
   playersCount: number;
@@ -88,6 +90,7 @@ export function useHostGameActions(options: UseHostGameActionsOptions): UseHostG
     tournamentRounds,
     roomLanguage,
     wordsForBoard,
+    boardTheme,
     playersCount,
     tournamentData,
     setTableData,
@@ -167,6 +170,7 @@ export function useHostGameActions(options: UseHostGameActionsOptions): UseHostG
       hostPlaying: hostPlaying,
       minWordLength: minWordLength,
       difficulty: difficulty,
+      boardTheme: boardTheme,
     });
 
     neoSuccessToast(t('common.gameStarted'), {

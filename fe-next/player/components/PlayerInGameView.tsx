@@ -10,6 +10,7 @@ import HintButton from '../../components/HintButton';
 import TournamentStandings from '../../components/TournamentStandings';
 import InGameScreen from '../../components/game/InGameScreen';
 import type { LetterGrid, Language, Avatar as AvatarType, TournamentStanding } from '@/shared/types/game';
+import type { BoardTheme } from '@/shared/types/socket';
 
 // ==================== Hint Types ====================
 
@@ -100,6 +101,9 @@ interface PlayerInGameViewProps {
   earthquakeState?: 'idle' | 'warning' | 'shaking' | 'fire-round';
   fireRoundActive?: boolean;
   fireRoundRemaining?: number;
+
+  // Board theme
+  boardTheme?: BoardTheme | null;
 }
 
 // ==================== Component ====================
@@ -154,6 +158,9 @@ const PlayerInGameView = memo<PlayerInGameViewProps>(({
   earthquakeState,
   fireRoundActive,
   fireRoundRemaining,
+
+  // Board theme
+  boardTheme,
 }): React.ReactElement => {
 
   // Memoized handler for closing tournament standings
@@ -250,6 +257,9 @@ const PlayerInGameView = memo<PlayerInGameViewProps>(({
         earthquakeState={earthquakeState}
         fireRoundActive={fireRoundActive}
         fireRoundRemaining={fireRoundRemaining}
+
+        // Board theme
+        boardTheme={boardTheme}
       />
 
       {/* Tournament Standings Modal */}

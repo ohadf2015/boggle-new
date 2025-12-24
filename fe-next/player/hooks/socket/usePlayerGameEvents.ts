@@ -96,6 +96,7 @@ export function usePlayerGameEvents({
     setShowTournamentStandings,
     setXpGainedData,
     setLevelUpData,
+    setBoardTheme,
   } = useGameStateContext();
 
   // Track if was in active game (TODO: move to GameState context)
@@ -146,6 +147,7 @@ export function usePlayerGameEvents({
       }
       if (data.language) setGameLanguage(data.language);
       if (data.minWordLength) setMinWordLength(data.minWordLength);
+      if ((data as any).boardTheme) setBoardTheme((data as any).boardTheme);
 
       if ((data as any).lateJoin) {
         setGameActive(true);

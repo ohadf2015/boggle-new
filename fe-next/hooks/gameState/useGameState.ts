@@ -7,7 +7,7 @@
 
 import { useReducer, useCallback, useRef, useMemo } from 'react';
 import type { LetterGrid, LeaderboardEntry, Language, WordDetail } from '@/shared/types/game';
-import type { XpGainedPayload, LevelUpPayload, AchievementPayload } from '@/shared/types/socket';
+import type { XpGainedPayload, LevelUpPayload, AchievementPayload, BoardTheme } from '@/shared/types/socket';
 import { gameStateReducer, INITIAL_STATE } from './reducer';
 import type { Player, TournamentData, TournamentStanding, UseGameStateReturn } from './types';
 
@@ -181,6 +181,14 @@ export function useGameState(): UseGameStateReturn {
   }, []);
 
   // ==========================================
+  // Board Theme Actions
+  // ==========================================
+
+  const setBoardTheme = useCallback((value: React.SetStateAction<BoardTheme | null>) => {
+    dispatch({ type: 'SET_BOARD_THEME', payload: value });
+  }, []);
+
+  // ==========================================
   // Reset Actions
   // ==========================================
 
@@ -233,6 +241,7 @@ export function useGameState(): UseGameStateReturn {
     setShowTournamentStandings,
     setXpGainedData,
     setLevelUpData,
+    setBoardTheme,
     resetForNewRound,
     resetAll,
     refs: {
@@ -269,6 +278,7 @@ export function useGameState(): UseGameStateReturn {
     setShowTournamentStandings,
     setXpGainedData,
     setLevelUpData,
+    setBoardTheme,
     resetForNewRound,
     resetAll,
   ]);

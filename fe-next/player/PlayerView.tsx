@@ -99,8 +99,8 @@ const PlayerView: React.FC<PlayerViewProps> = memo(({
   // Enable presence tracking
   usePresence({ enabled: !!gameCode });
 
-  // Use foundWords from GameStateContext (shared with usePlayerWordEvents)
-  const { foundWords, setFoundWords } = useGameStateContext();
+  // Use foundWords and boardTheme from GameStateContext (shared with usePlayerWordEvents)
+  const { foundWords, setFoundWords, boardTheme } = useGameStateContext();
 
   // Game state
   const [word, setWord] = useState<string>('');
@@ -539,6 +539,7 @@ const PlayerView: React.FC<PlayerViewProps> = memo(({
         earthquakeState={earthquakeState}
         fireRoundActive={fireRoundActive}
         fireRoundRemaining={fireRoundRemaining}
+        boardTheme={boardTheme}
       />
     </>
   );

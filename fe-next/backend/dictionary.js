@@ -4,6 +4,7 @@ const path = require('path');
 const { promisify } = require('util');
 const appendFileAsync = promisify(fs.appendFile);
 const logger = require('./utils/logger');
+const { getThemedWords, getCurrentTheme } = require('./data/dateThemedWords');
 
 // Hebrew letter normalization - final letters
 const hebrewFinalLetters = {
@@ -453,6 +454,46 @@ class Dictionary {
     const shuffled = [...filteredWords].sort(() => Math.random() - 0.5);
     return shuffled.slice(0, Math.min(count, shuffled.length)).map(normalizer);
   }
+
+  /**
+   * Get random long words with 50% themed words based on current date
+   * Returns both words and theme information for display
+   * @param {string} language - Language code (en, he, sv, es, ja)
+   * @param {number} count - Total number of words to return
+   * @param {number} minLength - Minimum word length
+   * @param {number} maxLength - Maximum word length (now supports up to 12)
+   * @returns {{ words: string[], theme: { nameKey: string, emoji: string, isHoliday: boolean } }}
+   */
+  getRandomLongWordsWithTheme(language, count = 10, minLength = 3, maxLength = 12) {
+    // Get current theme and themed words (50% of total)
+    const themedCount = Math.ceil(count / 2);
+    const regularCount = count - themedCount;
+
+    const themedResult = getThemedWords(language, themedCount, minLength, maxLength);
+    let themedWords = themedResult.words;
+
+    // Normalize themed words based on language
+    let normalizer = (w) => w;
+    if (language === 'en' || language === 'sv' || language === 'es') {
+      normalizer = (w) => w.toUpperCase();
+    }
+    themedWords = themedWords.map(normalizer);
+
+    // Get regular dictionary words for the other 50%
+    const regularWords = this.getRandomLongWords(language, regularCount, minLength, maxLength);
+
+    // Combine and shuffle all words together
+    const allWords = [...themedWords, ...regularWords];
+    const shuffled = allWords.sort(() => Math.random() - 0.5);
+
+    // Remove any duplicates while preserving order
+    const uniqueWords = [...new Set(shuffled)];
+
+    return {
+      words: uniqueWords,
+      theme: themedResult.theme
+    };
+  }
 }
 
 // Create a singleton instance
@@ -554,5 +595,7 @@ module.exports = {
   isValidJapaneseWord: (word) => dictionary.isValidJapaneseWord(word),
   isValidSpanishWord: (word) => dictionary.isValidSpanishWord(word),
   getRandomKanjiCompounds: (count, minLength, maxLength) => dictionary.getRandomKanjiCompounds(count, minLength, maxLength),
-  getRandomLongWords: (language, count, minLength, maxLength) => dictionary.getRandomLongWords(language, count, minLength, maxLength)
+  getRandomLongWords: (language, count, minLength, maxLength) => dictionary.getRandomLongWords(language, count, minLength, maxLength),
+  getRandomLongWordsWithTheme: (language, count, minLength, maxLength) => dictionary.getRandomLongWordsWithTheme(language, count, minLength, maxLength),
+  getCurrentTheme: (language, date) => getCurrentTheme(language, date)
 };

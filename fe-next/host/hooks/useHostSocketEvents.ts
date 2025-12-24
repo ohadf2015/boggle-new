@@ -16,7 +16,7 @@ import {
   useHostPlayerEvents,
   useHostTournamentEvents,
 } from './socket';
-import type { XpGainedPayload, LevelUpPayload, AchievementPayload } from '@/shared/types/socket';
+import type { XpGainedPayload, LevelUpPayload, AchievementPayload, BoardTheme } from '@/shared/types/socket';
 import type { Player } from '@/hooks/useGameState';
 
 interface TournamentData {
@@ -53,6 +53,7 @@ interface UseHostSocketEventsProps {
   setTournamentCreating: React.Dispatch<React.SetStateAction<boolean>>;
   setShufflingGrid: React.Dispatch<React.SetStateAction<any>>;
   setWordsForBoard: React.Dispatch<React.SetStateAction<string[]>>;
+  setBoardTheme: React.Dispatch<React.SetStateAction<BoardTheme | null>>;
 
   // XP state setters
   setXpGainedData: React.Dispatch<React.SetStateAction<XpGainedPayload | null>>;
@@ -114,6 +115,7 @@ const useHostSocketEvents = ({
   setTournamentCreating,
   setShufflingGrid,
   setWordsForBoard,
+  setBoardTheme,
 
   // XP state setters
   setXpGainedData,
@@ -186,6 +188,7 @@ const useHostSocketEvents = ({
     playComboSound,
     setHostFoundWords,
     setWordsForBoard,
+    setBoardTheme,
     comboLevelRef,
     lastWordTimeRef,
     setComboLevel,

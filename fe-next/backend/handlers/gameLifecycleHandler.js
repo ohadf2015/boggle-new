@@ -39,7 +39,7 @@ const timerManager = require('../utils/timerManager');
 const redisClient = require('../redisClient');
 const { inc, ensureGame } = require('../utils/metrics');
 const { generateRandomAvatar } = require('../utils/gameUtils');
-const { getRandomLongWords } = require('../dictionary');
+const { getRandomLongWordsWithTheme } = require('../dictionary');
 const logger = require('../utils/logger');
 const { startGameTimer, endGame } = require('./shared');
 const { validatePayload, createGameSchema, startGameSchema } = require('../utils/socketValidation');
@@ -159,15 +159,21 @@ function registerGameLifecycleHandlers(io, socket) {
   });
 
   // Handle request for words to embed in board
+  // Returns themed words (50%) mixed with regular dictionary words (50%)
+  // Theme is based on current date (holidays, special events, or day-of-week)
   socket.on('getWordsForBoard', (data) => {
     const { language, boardSize } = data;
     const rows = boardSize?.rows || 5;
     const cols = boardSize?.cols || 5;
     const totalCells = rows * cols;
     const wordCount = Math.min(35, Math.max(5, Math.floor(totalCells / 3)));
-    const maxWordLen = Math.min(8, Math.max(rows, cols));
-    const words = getRandomLongWords(language || 'en', wordCount, 3, maxWordLen);
-    socket.emit('wordsForBoard', { words });
+    // Increased max word length from 8 to 12 to support longer themed words
+    const maxWordLen = Math.min(12, Math.max(rows, cols));
+    const result = getRandomLongWordsWithTheme(language || 'en', wordCount, 3, maxWordLen);
+    socket.emit('wordsForBoard', {
+      words: result.words,
+      theme: result.theme // { nameKey, emoji, isHoliday }
+    });
   });
 
   // Handle game start
@@ -177,7 +183,7 @@ function registerGameLifecycleHandlers(io, socket) {
       return;
     }
 
-    const { letterGrid, timerSeconds, language, minWordLength, difficulty } = data;
+    const { letterGrid, timerSeconds, language, minWordLength, difficulty, boardTheme } = data;
     const gameCode = getGameBySocketId(socket.id);
 
     if (!gameCode) {
@@ -232,7 +238,8 @@ function registerGameLifecycleHandlers(io, socket) {
       language: language || game.language,
       minWordLength: minWordLength || 2,
       difficulty: difficulty || 'MEDIUM',
-      gameStartedAt: Date.now()
+      gameStartedAt: Date.now(),
+      boardTheme: boardTheme || null // Store theme for late joiners
     });
 
     // Transition state using state machine
@@ -266,7 +273,8 @@ function registerGameLifecycleHandlers(io, socket) {
       language: language || game.language,
       minWordLength: minWordLength || 2,
       messageId,
-      gameSessionId: game.gameSessionId
+      gameSessionId: game.gameSessionId,
+      boardTheme: boardTheme || null
     });
 
     // Set acknowledgment timeout

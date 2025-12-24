@@ -21,7 +21,9 @@ import { Button } from '@/components/ui/button';
 import GridComponent from '@/components/GridComponent';
 import CircularTimer from '@/components/CircularTimer';
 import { EarthquakeWarning, FireRoundIndicator } from '@/components/earthquake';
+import ThemeIndicator from '@/components/game/ThemeIndicator';
 import { useLanguage } from '@/contexts/LanguageContext';
+import type { BoardTheme } from '@/shared/types/socket';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import { useGameMusic } from '@/hooks/useGameMusic';
 import { useEarthquakeFireRound } from '@/hooks/useEarthquakeFireRound';
@@ -87,6 +89,7 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
   const [botScores, setBotScores] = useState<Record<string, number>>({});
   const [botWords, setBotWords] = useState<Record<string, string[]>>({});
   const [isGameOver, setIsGameOver] = useState(false);
+  const [boardTheme, setBoardTheme] = useState<BoardTheme | null>(null);
   // Available words from grid solver for bots to use
   const [availableWords, setAvailableWords] = useState<{
     easy: string[];
@@ -360,15 +363,49 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
     earthquakeState,
   });
 
-  // Generate grid on mount
+  // Generate grid on mount - fetch themed words first (except for Japanese)
   useEffect(() => {
     const difficultyConfig = DIFFICULTIES[settings.difficulty];
-    const newGrid = generateRandomTable(
-      difficultyConfig.rows,
-      difficultyConfig.cols,
-      settings.language
-    );
-    setGrid(newGrid);
+    const rows = difficultyConfig.rows;
+    const cols = difficultyConfig.cols;
+    const totalCells = rows * cols;
+    const wordCount = Math.min(35, Math.max(5, Math.floor(totalCells / 3)));
+    const maxWordLen = Math.min(12, Math.max(rows, cols));
+
+    // Initialize grid generation
+    const initGrid = async () => {
+      let wordsToEmbed: string[] = [];
+
+      // Fetch themed words for non-Japanese languages
+      if (settings.language !== 'ja') {
+        try {
+          const response = await fetch('/api/themed-words', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              language: settings.language,
+              count: wordCount,
+              minLength: 3,
+              maxLength: maxWordLen,
+            }),
+          });
+          if (response.ok) {
+            const data = await response.json();
+            wordsToEmbed = data.words || [];
+            if (data.theme) {
+              setBoardTheme(data.theme);
+            }
+          }
+        } catch (error) {
+          console.warn('Failed to fetch themed words, using random grid:', error);
+        }
+      }
+
+      const newGrid = generateRandomTable(rows, cols, settings.language, wordsToEmbed);
+      setGrid(newGrid);
+    };
+
+    initGrid();
 
     // Initialize bot scores
     const initialBotScores: Record<string, number> = {};
@@ -1309,6 +1346,13 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
           earthquakeShaking={earthquakeState === 'shaking'}
         />
       </div>
+
+      {/* Theme Indicator - subtle, below grid */}
+      {boardTheme && (
+        <div className="flex justify-center mt-1 opacity-70">
+          <ThemeIndicator theme={boardTheme} />
+        </div>
+      )}
 
       {/* Found words - Enhanced display with validity status */}
       <div className="bg-neo-cream dark:bg-neo-navy-light rounded-neo-lg border-4 border-neo-black p-4 shadow-hard">

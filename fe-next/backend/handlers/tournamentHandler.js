@@ -185,7 +185,8 @@ function registerTournamentHandlers(io, socket) {
       timerSeconds,
       language: game.language,
       minWordLength: game.minWordLength || 2,
-      messageId
+      messageId,
+      boardTheme: game.boardTheme || null // Preserve theme from first round if any
     });
 
     // Set acknowledgment timeout

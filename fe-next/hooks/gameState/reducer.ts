@@ -35,6 +35,7 @@ export const INITIAL_STATE: GameStateValues = {
   showTournamentStandings: false,
   xpGainedData: null,
   levelUpData: null,
+  boardTheme: null,
 };
 
 // ==========================================
@@ -229,6 +230,15 @@ export function gameStateReducer(state: GameStateValues, action: GameStateAction
         ...state,
         levelUpData: typeof action.payload === 'function'
           ? action.payload(state.levelUpData)
+          : action.payload
+      };
+
+    // Board theme actions
+    case 'SET_BOARD_THEME':
+      return {
+        ...state,
+        boardTheme: typeof action.payload === 'function'
+          ? action.payload(state.boardTheme)
           : action.payload
       };
 
