@@ -58,6 +58,9 @@ export interface SinglePlayerResultsData {
   previousHighScore?: number | null; // For showing improvement
   isNewAllTimeBest?: boolean; // For extra celebration
   achievements?: SinglePlayerAchievement[]; // Achievements earned (not saved to profile)
+  botWordsForValidation?: string[]; // Bot words to show in validation modal
+  gameSessionId?: string; // Unique session ID for vote tracking
+  language?: Language; // Game language for vote recording
 }
 
 /**

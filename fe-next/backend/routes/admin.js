@@ -782,6 +782,94 @@ router.delete('/bot-blacklist/:id', async (req, res) => {
 });
 
 /**
+ * POST /api/admin/bot-words/approve
+ * Approve word permanently - remove from blacklist and add to approved words
+ */
+router.post('/bot-words/approve', async (req, res) => {
+  const supabase = getSupabase();
+  const { word, language } = req.body;
+
+  if (!word || !language) {
+    return res.status(400).json({ error: 'Missing word or language' });
+  }
+
+  const normalizedWord = word.toLowerCase().trim();
+
+  try {
+    // 1. Remove from blacklist
+    await supabase
+      .from('bot_word_blacklist')
+      .delete()
+      .eq('word', normalizedWord)
+      .eq('language', language);
+
+    // 2. Add 10 positive votes to push over threshold
+    const adminVotes = Array.from({ length: 10 }, (_, i) => ({
+      word: normalizedWord,
+      language,
+      user_id: req.adminUser.id,
+      game_code: `admin_approval_${Date.now()}_${i}`,
+      vote_type: 'like',
+      is_bot_word: true
+    }));
+
+    await supabase.from('word_votes').insert(adminVotes);
+
+    auditLog(req.adminUser, 'BOT_WORD_APPROVE', { word: normalizedWord, language });
+    res.json({ success: true });
+  } catch (error) {
+    logger.error('ADMIN_API', `Approve error: ${error.message}`);
+    res.status(500).json({ error: 'Failed to approve word' });
+  }
+});
+
+/**
+ * POST /api/admin/bot-words/disapprove
+ * Disapprove word permanently - add to blacklist and add negative votes
+ */
+router.post('/bot-words/disapprove', async (req, res) => {
+  const supabase = getSupabase();
+  const { word, language, reason } = req.body;
+
+  if (!word || !language) {
+    return res.status(400).json({ error: 'Missing word or language' });
+  }
+
+  const normalizedWord = word.toLowerCase().trim();
+
+  try {
+    // 1. Add to blacklist (manual, not auto)
+    await supabase
+      .from('bot_word_blacklist')
+      .upsert({
+        word: normalizedWord,
+        language,
+        reason: reason || 'Admin disapproval',
+        blacklisted_by: req.adminUser.id,
+        auto_blacklisted: false
+      }, { onConflict: 'word,language' });
+
+    // 2. Add 5 negative votes to mark as invalid
+    const adminVotes = Array.from({ length: 5 }, (_, i) => ({
+      word: normalizedWord,
+      language,
+      user_id: req.adminUser.id,
+      game_code: `admin_disapproval_${Date.now()}_${i}`,
+      vote_type: 'dislike',
+      is_bot_word: true
+    }));
+
+    await supabase.from('word_votes').insert(adminVotes);
+
+    auditLog(req.adminUser, 'BOT_WORD_DISAPPROVE', { word: normalizedWord, language, reason });
+    res.json({ success: true });
+  } catch (error) {
+    logger.error('ADMIN_API', `Disapprove error: ${error.message}`);
+    res.status(500).json({ error: 'Failed to disapprove word' });
+  }
+});
+
+/**
  * GET /api/admin/analytics/guest-players
  * Get guest player statistics
  */

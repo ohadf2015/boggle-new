@@ -5,7 +5,7 @@ import { motion } from 'framer-motion';
 import {
   FaUsers, FaGamepad, FaClock, FaGlobe, FaChartLine,
   FaArrowLeft, FaSync, FaUserPlus, FaLanguage, FaLink,
-  FaTrophy, FaCalendarDay, FaCalendarWeek, FaServer, FaUser
+  FaTrophy, FaCalendarDay, FaCalendarWeek, FaServer, FaUser, FaRobot
 } from 'react-icons/fa';
 import { useRouter } from 'next/navigation';
 import Header from '@/components/Header';
@@ -107,6 +107,15 @@ interface TopPlayer {
   created_at: string;
 }
 
+interface BotWord {
+  word: string;
+  language: string;
+  likes: number;
+  dislikes: number;
+  netScore: number;
+  isAutoBlacklisted: boolean;
+}
+
 export default function AdminDashboard() {
   const { theme } = useTheme();
   const { language } = useLanguage();
@@ -120,9 +129,11 @@ export default function AdminDashboard() {
   const [sources, setSources] = useState<SourceData | null>(null);
   const [dailyActivity, setDailyActivity] = useState<DailyActivity[]>([]);
   const [topPlayers, setTopPlayers] = useState<TopPlayer[]>([]);
+  const [botWords, setBotWords] = useState<BotWord[]>([]);
+  const [selectedLanguage, setSelectedLanguage] = useState<string>('all');
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
-  const [activeTab, setActiveTab] = useState<'overview' | 'players' | 'sources' | 'activity'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'players' | 'sources' | 'activity' | 'bot-words'>('overview');
 
   // Get auth token for API calls
   const getAuthToken = useCallback(async () => {
@@ -143,13 +154,14 @@ export default function AdminDashboard() {
 
     try {
       // Fetch all data in parallel
-      const [statsRes, realtimeRes, countriesRes, sourcesRes, dailyRes, playersRes] = await Promise.all([
+      const [statsRes, realtimeRes, countriesRes, sourcesRes, dailyRes, playersRes, botWordsRes] = await Promise.all([
         fetch('/api/admin/stats', { headers }),
         fetch('/api/admin/realtime', { headers }),
         fetch('/api/admin/players/countries', { headers }),
         fetch('/api/admin/players/sources', { headers }),
         fetch('/api/admin/activity/daily?days=30', { headers }),
         fetch('/api/admin/players/top?limit=20', { headers }),
+        fetch('/api/admin/bot-words', { headers }),
       ]);
 
       if (!statsRes.ok) {
@@ -157,13 +169,14 @@ export default function AdminDashboard() {
         throw new Error(error.error || 'Failed to fetch stats');
       }
 
-      const [statsData, realtimeData, countriesData, sourcesData, dailyData, playersData] = await Promise.all([
+      const [statsData, realtimeData, countriesData, sourcesData, dailyData, playersData, botWordsData] = await Promise.all([
         statsRes.json(),
         realtimeRes.json(),
         countriesRes.json(),
         sourcesRes.json(),
         dailyRes.json(),
         playersRes.json(),
+        botWordsRes.json(),
       ]);
 
       setStats(statsData);
@@ -172,6 +185,7 @@ export default function AdminDashboard() {
       setSources(sourcesData);
       setDailyActivity(dailyData.daily || []);
       setTopPlayers(playersData.players || []);
+      setBotWords(botWordsData.words || []);
     } catch (error) {
       console.error('Failed to fetch admin data:', error);
       toast.error(error instanceof Error ? error.message : 'Failed to load dashboard data');
@@ -216,6 +230,72 @@ export default function AdminDashboard() {
     await fetchAdminData();
     setRefreshing(false);
     toast.success('Dashboard refreshed');
+  };
+
+  // Handle bot word approval
+  const handleApprove = async (word: BotWord) => {
+    const token = await getAuthToken();
+    if (!token) {
+      toast.error('Authentication required');
+      return;
+    }
+
+    try {
+      const res = await fetch('/api/admin/bot-words/approve', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ word: word.word, language: word.language })
+      });
+
+      if (res.ok) {
+        toast.success(`Approved: ${word.word}`);
+        fetchAdminData(); // Refresh data
+      } else {
+        const error = await res.json();
+        toast.error(error.error || 'Failed to approve word');
+      }
+    } catch (error) {
+      console.error('Failed to approve word:', error);
+      toast.error('Failed to approve word');
+    }
+  };
+
+  // Handle bot word disapproval
+  const handleDisapprove = async (word: BotWord) => {
+    const token = await getAuthToken();
+    if (!token) {
+      toast.error('Authentication required');
+      return;
+    }
+
+    try {
+      const res = await fetch('/api/admin/bot-words/disapprove', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          word: word.word,
+          language: word.language,
+          reason: 'Admin review: invalid word'
+        })
+      });
+
+      if (res.ok) {
+        toast.success(`Disapproved: ${word.word}`);
+        fetchAdminData(); // Refresh data
+      } else {
+        const error = await res.json();
+        toast.error(error.error || 'Failed to disapprove word');
+      }
+    } catch (error) {
+      console.error('Failed to disapprove word:', error);
+      toast.error('Failed to disapprove word');
+    }
   };
 
   // Still loading profile - wait before showing access denied
@@ -366,7 +446,7 @@ export default function AdminDashboard() {
 
         {/* Tab Navigation */}
         <div className="flex gap-2 mb-6 overflow-x-auto pb-2">
-          {(['overview', 'players', 'sources', 'activity'] as const).map((tab) => (
+          {(['overview', 'players', 'sources', 'activity', 'bot-words'] as const).map((tab) => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
@@ -385,6 +465,7 @@ export default function AdminDashboard() {
               {tab === 'players' && 'Players'}
               {tab === 'sources' && 'Traffic Sources'}
               {tab === 'activity' && 'Activity'}
+              {tab === 'bot-words' && 'Bot Words'}
             </button>
           ))}
         </div>
@@ -752,6 +833,109 @@ export default function AdminDashboard() {
                 <div className="w-3 h-3 rounded bg-gradient-to-r from-cyan-500 to-blue-500" />
                 <span className={isDarkMode ? 'text-gray-600' : 'text-gray-600'}>Games played</span>
               </div>
+            </div>
+          </motion.div>
+        )}
+
+        {/* Bot Words Tab */}
+        {activeTab === 'bot-words' && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className={cn(
+              'rounded-xl p-6 border',
+              isDarkMode ? 'bg-slate-800/50 border-slate-700' : 'bg-white border-gray-200 shadow-md'
+            )}
+          >
+            <div className="flex items-center justify-between mb-4">
+              <h3 className={cn(
+                'text-lg font-bold flex items-center gap-2',
+                isDarkMode ? 'text-white' : 'text-gray-900'
+              )}>
+                <FaRobot className="text-purple-500" />
+                Bot Words Review
+              </h3>
+
+              {/* Language Filter */}
+              <select
+                value={selectedLanguage}
+                onChange={(e) => setSelectedLanguage(e.target.value)}
+                className={cn(
+                  'px-3 py-1 rounded-lg border',
+                  isDarkMode
+                    ? 'bg-slate-700 border-slate-600 text-white'
+                    : 'bg-white border-gray-300 text-gray-900'
+                )}
+              >
+                <option value="all">All Languages</option>
+                <option value="en">English</option>
+                <option value="he">Hebrew</option>
+                <option value="sv">Swedish</option>
+                <option value="ja">Japanese</option>
+              </select>
+            </div>
+
+            {/* Words Table */}
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead>
+                  <tr className={cn(
+                    'text-left border-b',
+                    isDarkMode ? 'border-slate-700' : 'border-gray-200'
+                  )}>
+                    <th className={cn('pb-2 px-2', isDarkMode ? 'text-gray-400' : 'text-gray-600')}>Word</th>
+                    <th className={cn('pb-2 px-2', isDarkMode ? 'text-gray-400' : 'text-gray-600')}>Language</th>
+                    <th className={cn('pb-2 px-2 text-right', isDarkMode ? 'text-gray-400' : 'text-gray-600')}>Likes</th>
+                    <th className={cn('pb-2 px-2 text-right', isDarkMode ? 'text-gray-400' : 'text-gray-600')}>Dislikes</th>
+                    <th className={cn('pb-2 px-2 text-right', isDarkMode ? 'text-gray-400' : 'text-gray-600')}>Net Score</th>
+                    <th className={cn('pb-2 px-2', isDarkMode ? 'text-gray-400' : 'text-gray-600')}>Status</th>
+                    <th className={cn('pb-2 px-2', isDarkMode ? 'text-gray-400' : 'text-gray-600')}>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {botWords
+                    .filter(w => selectedLanguage === 'all' || w.language === selectedLanguage)
+                    .map((word) => (
+                      <tr key={`${word.word}-${word.language}`} className={cn(
+                        'border-b',
+                        isDarkMode ? 'border-slate-700' : 'border-gray-200'
+                      )}>
+                        <td className={cn('py-3 px-2 font-mono', isDarkMode ? 'text-white' : 'text-gray-900')}>{word.word}</td>
+                        <td className={cn('py-3 px-2', isDarkMode ? 'text-gray-400' : 'text-gray-600')}>{LANGUAGE_NAMES[word.language] || word.language}</td>
+                        <td className="py-3 px-2 text-right text-green-400">{word.likes}</td>
+                        <td className="py-3 px-2 text-right text-red-400">{word.dislikes}</td>
+                        <td className={cn('py-3 px-2 text-right font-bold', word.netScore < 0 ? 'text-red-400' : 'text-gray-400')}>{word.netScore}</td>
+                        <td className="py-3 px-2">
+                          {word.isAutoBlacklisted ? (
+                            <span className="px-2 py-1 rounded text-xs bg-red-900/30 text-red-400">
+                              Auto-Blacklisted
+                            </span>
+                          ) : (
+                            <span className="px-2 py-1 rounded text-xs bg-yellow-900/30 text-yellow-400">
+                              Pending
+                            </span>
+                          )}
+                        </td>
+                        <td className="py-3 px-2">
+                          <div className="flex gap-2">
+                            <button
+                              onClick={() => handleApprove(word)}
+                              className="px-3 py-1 text-xs border border-green-600 text-green-400 rounded hover:bg-green-600/20 transition-colors"
+                            >
+                              Approve
+                            </button>
+                            <button
+                              onClick={() => handleDisapprove(word)}
+                              className="px-3 py-1 text-xs border border-red-600 text-red-400 rounded hover:bg-red-600/20 transition-colors"
+                            >
+                              Disapprove
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                </tbody>
+              </table>
             </div>
           </motion.div>
         )}

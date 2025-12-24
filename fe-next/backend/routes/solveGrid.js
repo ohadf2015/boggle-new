@@ -81,9 +81,12 @@ router.post('/', rateLimit, async (req, res) => {
       maxLength: 10,
     });
 
+    // Filter out blacklisted words
+    const filteredWords = await filterBlacklistedWords(words, language);
+
     return res.json({
       success: true,
-      words,
+      words: filteredWords,
     });
   } catch (error) {
     const msg = error instanceof Error ? error.message : 'Unknown error';
@@ -95,5 +98,41 @@ router.post('/', rateLimit, async (req, res) => {
     });
   }
 });
+
+/**
+ * Filter blacklisted words from bot word list
+ */
+async function filterBlacklistedWords(words, language) {
+  const { getSupabase } = require('../modules/supabaseServer');
+  const supabase = getSupabase();
+
+  if (!supabase) {
+    logger.debug('SOLVE-GRID', 'Supabase not configured, skipping blacklist filter');
+    return words;
+  }
+
+  try {
+    const { data: blacklist, error } = await supabase
+      .from('bot_word_blacklist')
+      .select('word')
+      .eq('language', language);
+
+    if (error) {
+      logger.error('SOLVE-GRID', `Blacklist query error: ${error.message}`);
+      return words; // Return unfiltered on error
+    }
+
+    const blacklistedSet = new Set((blacklist || []).map(b => b.word.toLowerCase()));
+
+    return {
+      easy: words.easy.filter(w => !blacklistedSet.has(w.toLowerCase())),
+      medium: words.medium.filter(w => !blacklistedSet.has(w.toLowerCase())),
+      hard: words.hard.filter(w => !blacklistedSet.has(w.toLowerCase()))
+    };
+  } catch (err) {
+    logger.error('SOLVE-GRID', `Blacklist filter error: ${err.message}`);
+    return words; // Graceful degradation
+  }
+}
 
 module.exports = router;

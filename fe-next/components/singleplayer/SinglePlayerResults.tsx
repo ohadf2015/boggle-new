@@ -10,6 +10,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import GridComponent from '@/components/GridComponent';
 import PlayerInsights from '@/components/results/PlayerInsights';
 import { AchievementBadge } from '@/components/AchievementBadge';
+import WordFeedbackModal from '@/components/voting/WordFeedbackModal';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { cn } from '@/lib/utils';
@@ -53,6 +54,8 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
   const [expandedBot, setExpandedBot] = useState<string | null>(null);
   const [showSignupModal, setShowSignupModal] = useState(false);
   const [showScrollButton, setShowScrollButton] = useState(true);
+  const [wordValidationQueue, setWordValidationQueue] = useState<string[]>([]);
+  const [showWordValidation, setShowWordValidation] = useState(false);
 
   // Refs to prevent duplicate stat updates
   const hasUpdatedStatsRef = useRef(false);
@@ -149,10 +152,43 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  // Show word validation modal after game results load
+  useEffect(() => {
+    if (results.botWordsForValidation && results.botWordsForValidation.length > 0) {
+      setTimeout(() => {
+        setWordValidationQueue(results.botWordsForValidation || []);
+        setShowWordValidation(true);
+      }, 1500); // 1.5s delay so results render first
+    }
+  }, [results.botWordsForValidation]);
+
   // Scroll to action buttons
   const scrollToActions = useCallback(() => {
     actionButtonsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
   }, []);
+
+  // Handle word validation votes
+  const handleWordVote = useCallback(async (voteType: 'like' | 'dislike', word?: string) => {
+    if (!word || !results.gameSessionId) return;
+
+    try {
+      const response = await fetch('/api/single-player/vote', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          word,
+          language: results.language || 'en',
+          voteType,
+          sessionId: results.gameSessionId
+        })
+      });
+
+      const result = await response.json();
+      console.log(`Vote recorded: ${voteType} for ${word}`, result);
+    } catch (error) {
+      console.error('Failed to record vote:', error);
+    }
+  }, [results.gameSessionId, results.language]);
 
   // getRankIcon returns React elements - kept local as it's component-specific
   const getRankIcon = (rank: number) => {
@@ -964,6 +1000,25 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
           </motion.button>
         )}
       </AnimatePresence>
+
+      {/* Word validation modal - shown after results for bot words */}
+      {showWordValidation && wordValidationQueue.length > 0 && (
+        <WordFeedbackModal
+          isOpen={showWordValidation}
+          word={wordValidationQueue[0] || ''}
+          submittedBy="Bot"
+          submitterAvatar={{ emoji: '🤖', color: '#6366f1' }}
+          wordQueue={wordValidationQueue.map(w => ({
+            word: w,
+            submittedBy: 'Bot',
+            submitterAvatar: { emoji: '🤖', color: '#6366f1' }
+          }))}
+          timeoutSeconds={15}
+          onVote={handleWordVote}
+          onSkip={() => setShowWordValidation(false)}
+          onTimeout={() => setShowWordValidation(false)}
+        />
+      )}
 
       {/* Signup prompt for guests who have played multiple games */}
       <FirstWinSignupModal
