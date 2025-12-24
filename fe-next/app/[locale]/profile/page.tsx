@@ -198,17 +198,19 @@ export default function ProfilePage(): React.ReactNode {
     }
   };
 
-  // Handle emoji avatar save
-  const handleSaveEmojiAvatar = async ({ emoji, color }: { emoji: string; color: string }): Promise<void> => {
+  // Handle avatar save (now using image avatars)
+  const handleSaveEmojiAvatar = async ({ avatarImage, emoji, color }: { avatarImage: string; emoji?: string; color?: string }): Promise<void> => {
     try {
       await updateProfile({
-        avatar_emoji: emoji,
-        avatar_color: color
+        avatar_image: avatarImage,
+        // Keep emoji/color for backward compatibility
+        avatar_emoji: emoji || '🎮',
+        avatar_color: color || '#4ECDC4'
       });
       await refreshProfile();
       toast.success(t('profile.saved') || 'Avatar updated!');
     } catch (err) {
-      console.error('Save emoji error:', err);
+      console.error('Save avatar error:', err);
       toast.error(t('profile.saveError') || 'Failed to save');
     }
   };
@@ -689,11 +691,12 @@ export default function ProfilePage(): React.ReactNode {
         </motion.div>
       </div>
 
-      {/* Emoji Avatar Picker Modal */}
+      {/* Avatar Picker Modal */}
       <EmojiAvatarPicker
         isOpen={showEmojiPicker}
         onClose={() => setShowEmojiPicker(false)}
         onSave={handleSaveEmojiAvatar}
+        currentAvatarImage={profile?.avatar_image}
         currentEmoji={profile?.avatar_emoji}
         currentColor={profile?.avatar_color}
       />

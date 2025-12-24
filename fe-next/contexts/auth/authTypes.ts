@@ -9,6 +9,7 @@ export interface ProfileData {
   id: string;
   username: string;
   display_name?: string;
+  avatar_image?: string; // New: Avatar image ID
   avatar_emoji?: string;
   avatar_color?: string;
   profile_picture_url?: string | null;

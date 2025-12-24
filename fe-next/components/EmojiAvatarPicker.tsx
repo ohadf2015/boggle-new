@@ -3,62 +3,66 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FaCheck, FaTimes } from 'react-icons/fa';
+import Image from 'next/image';
 import { useTheme } from '../utils/ThemeContext';
-
-// Same emojis and colors as backend socketHandlers.js
-const AVATAR_EMOJIS = [
-  '🐶', '🐱', '🐭', '🐹', '🐰', '🦊', '🐻', '🐼',
-  '🐨', '🐯', '🦁', '🐮', '🐷', '🐸', '🐵', '🐔',
-  '🐧', '🐦', '🐤', '🦆', '🦅', '🦉', '🦇', '🐺',
-  '🐗', '🐴', '🦄', '🐝', '🐛', '🦋', '🐌', '🐞'
-];
-
-// Avatar colors - synced with tailwind.config.js avatar color palette
-// Using CSS variables for theming consistency
-const AVATAR_COLORS = [
-  'var(--avatar-1, #FF6B6B)', 'var(--avatar-2, #4ECDC4)', 'var(--avatar-3, #45B7D1)',
-  'var(--avatar-4, #FFA07A)', 'var(--avatar-5, #98D8C8)', 'var(--avatar-6, #F7DC6F)',
-  'var(--avatar-7, #BB8FCE)', 'var(--avatar-8, #85C1E2)', 'var(--avatar-9, #F8B739)',
-  'var(--avatar-10, #52B788)', 'var(--avatar-11, #FF8FAB)', 'var(--avatar-12, #6BCF7F)',
-  'var(--avatar-13, #FFB347)', 'var(--avatar-14, #9D84B7)', 'var(--avatar-15, #FF6F61)'
-];
+import { AVATARS, getAvatarPath, mapEmojiToAvatar, type AvatarConfig } from '@/utils/avatarConfig';
 
 /**
  * Avatar selection result
  */
 interface AvatarSelection {
-  emoji: string;
-  color: string;
+  avatarImage: string; // Avatar image ID
+  emoji?: string; // Deprecated: kept for backward compatibility
+  color?: string; // Deprecated: kept for backward compatibility
 }
 
 /**
- * EmojiAvatarPicker Props
+ * EmojiAvatarPicker Props (renamed but kept for backward compatibility)
  */
 interface EmojiAvatarPickerProps {
   isOpen: boolean;
   onClose: () => void;
   onSave: (selection: AvatarSelection) => void;
-  currentEmoji?: string;
-  currentColor?: string;
+  currentEmoji?: string; // Deprecated: will be mapped to avatar image
+  currentColor?: string; // Deprecated: no longer used
+  currentAvatarImage?: string; // New: current avatar image ID
 }
 
 /**
- * EmojiAvatarPicker - Modal for selecting emoji and color for avatar
+ * AvatarPicker - Modal for selecting avatar image
+ * (Previously EmojiAvatarPicker - renamed but kept export name for compatibility)
  */
 const EmojiAvatarPicker: React.FC<EmojiAvatarPickerProps> = ({
   isOpen,
   onClose,
   onSave,
-  currentEmoji = '🐶',
-  currentColor = '#4ECDC4'
+  currentEmoji,
+  currentAvatarImage
 }) => {
   const { theme } = useTheme();
   const isDarkMode = theme === 'dark';
-  const [selectedEmoji, setSelectedEmoji] = useState(currentEmoji);
-  const [selectedColor, setSelectedColor] = useState(currentColor);
+
+  // Determine initial avatar selection
+  const getInitialAvatar = (): AvatarConfig => {
+    if (currentAvatarImage) {
+      const found = AVATARS.find(a => a.id === currentAvatarImage || a.filename === currentAvatarImage);
+      if (found) return found;
+    }
+    if (currentEmoji) {
+      return mapEmojiToAvatar(currentEmoji);
+    }
+    return AVATARS[0];
+  };
+
+  const [selectedAvatar, setSelectedAvatar] = useState<AvatarConfig>(getInitialAvatar());
 
   const handleSave = () => {
-    onSave({ emoji: selectedEmoji, color: selectedColor });
+    onSave({
+      avatarImage: selectedAvatar.id,
+      // Keep emoji/color for backward compatibility (though they'll be ignored)
+      emoji: '🎮',
+      color: '#4ECDC4'
+    });
     onClose();
   };
 
@@ -77,62 +81,51 @@ const EmojiAvatarPicker: React.FC<EmojiAvatarPickerProps> = ({
           initial={{ scale: 0.9, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           exit={{ scale: 0.9, opacity: 0 }}
-          className={`w-full max-w-sm rounded-2xl p-6 shadow-xl ${
+          className={`w-full max-w-md rounded-2xl p-6 shadow-xl ${
             isDarkMode ? 'bg-slate-800' : 'bg-white'
           }`}
           onClick={(e) => e.stopPropagation()}
         >
           {/* Preview */}
-          <div className="flex justify-center mb-6">
-            <div
-              className="w-24 h-24 rounded-full flex items-center justify-center text-5xl shadow-lg"
-              style={{ backgroundColor: selectedColor }}
-            >
-              {selectedEmoji}
+          <div className="flex flex-col items-center mb-6">
+            <div className="w-24 h-24 rounded-full overflow-hidden shadow-lg mb-3 relative">
+              <Image
+                src={getAvatarPath(selectedAvatar)}
+                alt={selectedAvatar.name}
+                fill
+                className="object-cover"
+              />
             </div>
+            <p className={`text-lg font-semibold ${isDarkMode ? 'text-gray-200' : 'text-gray-800'}`}>
+              {selectedAvatar.name}
+            </p>
           </div>
 
-          {/* Emoji Grid */}
-          <div className="mb-4">
-            <p className={`text-sm font-medium mb-2 ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
-              Choose Emoji
+          {/* Avatar Gallery Grid */}
+          <div className="mb-6">
+            <p className={`text-sm font-medium mb-3 ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+              Choose Your Avatar
             </p>
-            <div className="grid grid-cols-8 gap-1">
-              {AVATAR_EMOJIS.map((emoji) => (
+            <div className="grid grid-cols-4 gap-3 max-h-80 overflow-y-auto pr-2">
+              {AVATARS.map((avatar) => (
                 <button
-                  key={emoji}
-                  onClick={() => setSelectedEmoji(emoji)}
-                  className={`w-9 h-9 rounded-lg flex items-center justify-center text-xl transition-all ${
-                    selectedEmoji === emoji
-                      ? 'ring-2 ring-cyan-500 bg-cyan-500/20'
+                  key={avatar.id}
+                  onClick={() => setSelectedAvatar(avatar)}
+                  className={`relative aspect-square rounded-xl overflow-hidden transition-all ${
+                    selectedAvatar.id === avatar.id
+                      ? 'ring-3 ring-cyan-500 scale-105'
                       : isDarkMode
-                        ? 'hover:bg-slate-700'
-                        : 'hover:bg-gray-100'
+                        ? 'hover:ring-2 hover:ring-slate-600'
+                        : 'hover:ring-2 hover:ring-gray-300'
                   }`}
                 >
-                  {emoji}
+                  <Image
+                    src={getAvatarPath(avatar)}
+                    alt={avatar.name}
+                    fill
+                    className="object-cover"
+                  />
                 </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Color Palette */}
-          <div className="mb-6">
-            <p className={`text-sm font-medium mb-2 ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
-              Choose Color
-            </p>
-            <div className="flex flex-wrap gap-2 justify-center">
-              {AVATAR_COLORS.map((color) => (
-                <button
-                  key={color}
-                  onClick={() => setSelectedColor(color)}
-                  className={`w-8 h-8 rounded-full transition-all ${
-                    selectedColor === color
-                      ? 'ring-2 ring-offset-2 ring-cyan-500'
-                      : ''
-                  }`}
-                  style={{ backgroundColor: color }}
-                />
               ))}
             </div>
           </div>

@@ -20,6 +20,7 @@ const {
   getCacheStats,
   addWordToBlacklist,
 } = require('./botBehavior');
+const { getRandomAvatar } = require('./avatarConfig');
 const logger = require('../utils/logger');
 
 // ==========================================
@@ -47,11 +48,11 @@ function generateBotId(gameCode) {
 
 /**
  * Generate a bot name and avatar based on difficulty and language
- * Each bot name has a suited emoji that becomes its avatar
+ * Each bot gets a random avatar image
  * @param {string} difficulty - Bot difficulty level
  * @param {string[]} existingNames - Names already in use
  * @param {string} language - Game/board language (en, he, sv, ja)
- * @returns {{ name: string, avatar: { emoji: string, color: string } }}
+ * @returns {{ name: string, avatar: { avatarImage: string, emoji?: string, color?: string } }}
  */
 function generateBotName(difficulty, existingNames = [], language = 'en') {
   // Get language-specific names, fallback to English if language not found
@@ -74,9 +75,17 @@ function generateBotName(difficulty, existingNames = [], language = 'en') {
   // Add localized "Bot" suffix and maybe a number
   const suffix = Math.random() > 0.5 ? ` ${Math.floor(Math.random() * 99) + 1}` : '';
 
+  // Get random avatar image
+  const avatarImage = getRandomAvatar();
+
   return {
     name: `${entry.name} ${botSuffix}${suffix}`.trim(),
-    avatar: { emoji: entry.emoji, color: entry.color },
+    avatar: {
+      avatarImage: avatarImage.id,
+      // Keep emoji/color for backward compatibility
+      emoji: entry.emoji,
+      color: entry.color,
+    },
   };
 }
 
@@ -85,7 +94,7 @@ function generateBotName(difficulty, existingNames = [], language = 'en') {
  * For players who don't set their own name
  * @param {string[]} existingNames - Names already in use
  * @param {string} language - Language for names (en, he, sv, ja)
- * @returns {{ name: string, avatar: { emoji: string, color: string } }}
+ * @returns {{ name: string, avatar: { avatarImage: string, emoji?: string, color?: string } }}
  */
 function generateRandomPlayerName(existingNames = [], language = 'en') {
   const namePool = BOT_CONFIG.PLAYER_NAMES[language] || BOT_CONFIG.PLAYER_NAMES.en;
@@ -100,21 +109,38 @@ function generateRandomPlayerName(existingNames = [], language = 'en') {
     ? availableEntries[Math.floor(Math.random() * availableEntries.length)]
     : namePool[Math.floor(Math.random() * namePool.length)];
 
+  // Get random avatar image
+  const avatarImage = getRandomAvatar();
+
   return {
     name: entry.name,
-    avatar: { emoji: entry.emoji, color: entry.color },
+    avatar: {
+      avatarImage: avatarImage.id,
+      // Keep emoji/color for backward compatibility
+      emoji: entry.emoji,
+      color: entry.color,
+    },
   };
 }
 
 /**
  * Get a random generic avatar for OAuth users
  * These avatars are neutral and work with any name
- * @returns {{ emoji: string, color: string }}
+ * @returns {{ avatarImage: string, emoji?: string, color?: string }}
  */
 function getRandomGenericAvatar() {
   const avatars = BOT_CONFIG.GENERIC_AVATARS;
-  const avatar = avatars[Math.floor(Math.random() * avatars.length)];
-  return { emoji: avatar.emoji, color: avatar.color };
+  const legacyAvatar = avatars[Math.floor(Math.random() * avatars.length)];
+
+  // Get random avatar image
+  const avatarImage = getRandomAvatar();
+
+  return {
+    avatarImage: avatarImage.id,
+    // Keep emoji/color for backward compatibility
+    emoji: legacyAvatar.emoji,
+    color: legacyAvatar.color,
+  };
 }
 
 /**
