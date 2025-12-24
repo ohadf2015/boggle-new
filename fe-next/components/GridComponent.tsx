@@ -91,12 +91,15 @@ const GridComponent = memo<GridComponentProps>(({
     return selectedCells.map(c => c.letter).join('');
   }, [selectedCells]);
 
+  // Memoize selected cells length to prevent unnecessary effect runs
+  const selectedCellsLength = useMemo(() => selectedCells.length, [selectedCells]);
+
   // Notify parent of word changes (for external WordFormingArea)
   useEffect(() => {
     if (onWordChange) {
-      onWordChange(formedWord, selectedCells.length);
+      onWordChange(formedWord, selectedCellsLength);
     }
-  }, [formedWord, selectedCells.length, onWordChange]);
+  }, [formedWord, selectedCellsLength, onWordChange]);
 
   // Calculate adjacent cells for highlighting hints
   const adjacentHintCells = useMemo(() => {
@@ -275,8 +278,15 @@ const GridComponent = memo<GridComponentProps>(({
     setPerformanceMode(getPerformanceMode());
   }, []);
 
-  const isLargeGrid = (grid[0]?.length || 0) > 8;
-  const comboColors = getComboColors(comboLevel);
+  const isLargeGrid = useMemo(() => (grid[0]?.length || 0) > 8, [grid]);
+  const comboColors = useMemo(() => getComboColors(comboLevel), [comboLevel]);
+
+  // Memoize grid dimensions to prevent recalculations
+  const gridDimensions = useMemo(() => ({
+    cols: grid[0]?.length || 4,
+    rows: grid.length || 4,
+    gap: isLargeGrid ? "gap-1 sm:gap-1" : "gap-1.5 sm:gap-2",
+  }), [grid, isLargeGrid]);
 
   return (
     <div className="relative w-full h-full flex items-center justify-center">
@@ -334,18 +344,18 @@ const GridComponent = memo<GridComponentProps>(({
           dir="ltr"
           className={cn(
             "grid touch-none select-none absolute rounded-neo",
-            isLargeGrid ? "gap-1 sm:gap-1" : "gap-1.5 sm:gap-2",
+            gridDimensions.gap,
             "bg-neo-cream border-2 border-neo-black/20",
             earthquakeShaking && "earthquake-shake",
             className
           )}
           style={{
             inset: '0',
-            gridTemplateColumns: `repeat(${grid[0]?.length || 4}, minmax(0, 1fr))`,
-            gridTemplateRows: `repeat(${grid.length || 4}, minmax(0, 1fr))`,
+            gridTemplateColumns: `repeat(${gridDimensions.cols}, minmax(0, 1fr))`,
+            gridTemplateRows: `repeat(${gridDimensions.rows}, minmax(0, 1fr))`,
             backgroundImage: 'var(--halftone-pattern)',
             backgroundColor: 'var(--neo-cream)',
-            ['--cell-font-size' as string]: `calc((100cqw / ${grid[0]?.length || 4}) * ${largeText ? 0.70 : 0.50})`,
+            ['--cell-font-size' as string]: `calc((100cqw / ${gridDimensions.cols}) * ${largeText ? 0.70 : 0.50})`,
             containerType: 'size',
           }}
           role="grid"

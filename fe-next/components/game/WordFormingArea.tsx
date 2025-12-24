@@ -54,8 +54,9 @@ interface WordFormingAreaProps {
  * WordFormingArea - Display area for word being formed with integrated validation feedback
  * Shows the word being formed, then smoothly MORPHS to show accept/reject/duplicate feedback
  * The element stays visible and transforms - no hide/show cycle
+ * Memoized to prevent unnecessary re-renders
  */
-const WordFormingArea: React.FC<WordFormingAreaProps> = ({
+const WordFormingArea = React.memo<WordFormingAreaProps>(({
   word,
   letterCount,
   className,
@@ -91,7 +92,7 @@ const WordFormingArea: React.FC<WordFormingAreaProps> = ({
     if (word.length > 0 && visibleFeedback) {
       setVisibleFeedback(null);
     }
-  }, [word.length > 0]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [word, visibleFeedback]); // Fixed: proper dependencies
 
   // Determine current state
   const isForming = word.length > 0;
@@ -377,6 +378,8 @@ const WordFormingArea: React.FC<WordFormingAreaProps> = ({
       </AnimatePresence>
     </div>
   );
-};
+});
+
+WordFormingArea.displayName = 'WordFormingArea';
 
 export default WordFormingArea;

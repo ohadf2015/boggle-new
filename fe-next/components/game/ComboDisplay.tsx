@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useMemo } from 'react';
+import React, { useMemo, memo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { getComboColors } from '../grid/comboColors';
@@ -11,15 +11,15 @@ interface ComboDisplayProps {
   className?: string;
 }
 
-// Sparkle particle component
-const Sparkle: React.FC<{
+// Sparkle particle component - memoized to prevent unnecessary re-renders
+const Sparkle = memo<{
   index: number;
   angle: number;
   distance: number;
   color: string;
   size: number;
   delay: number;
-}> = ({ angle, distance, color, size, delay }) => (
+}>(({ angle, distance, color, size, delay }) => (
   <motion.div
     className="absolute pointer-events-none"
     style={{
@@ -48,13 +48,16 @@ const Sparkle: React.FC<{
       <path d="M12 0L14.59 9.41L24 12L14.59 14.59L12 24L9.41 14.59L0 12L9.41 9.41L12 0Z" />
     </svg>
   </motion.div>
-);
+));
+
+Sparkle.displayName = 'Sparkle';
 
 /**
  * ComboDisplay - Notification-style combo indicator
  * Shows current combo level with gradient pill shape and fire effects
+ * Memoized to prevent unnecessary re-renders
  */
-const ComboDisplay: React.FC<ComboDisplayProps> = ({
+const ComboDisplay = memo<ComboDisplayProps>(({
   comboLevel,
   compact = false,
   className,
@@ -236,6 +239,8 @@ const ComboDisplay: React.FC<ComboDisplayProps> = ({
       </AnimatePresence>
     </div>
   );
-};
+});
+
+ComboDisplay.displayName = 'ComboDisplay';
 
 export default ComboDisplay;

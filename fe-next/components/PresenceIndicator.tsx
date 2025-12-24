@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, memo, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 /**
@@ -46,8 +46,9 @@ interface PresenceIndicatorProps {
 
 /**
  * PresenceIndicator - Shows player's current activity status
+ * Memoized to prevent unnecessary re-renders in leaderboards
  */
-const PresenceIndicator: React.FC<PresenceIndicatorProps> = ({
+const PresenceIndicator = memo<PresenceIndicatorProps>(({
   status = 'active',
   isWindowFocused = true,
   size = 'md',
@@ -89,8 +90,8 @@ const PresenceIndicator: React.FC<PresenceIndicatorProps> = ({
     };
   }, [tooltipVisible]);
 
-  // Size configurations
-  const sizes: Record<PresenceSize, SizeConfig> = {
+  // Size configurations - memoized to prevent recreation
+  const sizes: Record<PresenceSize, SizeConfig> = useMemo(() => ({
     sm: {
       container: 'w-4 h-4',
       dot: 'w-2 h-2',
@@ -109,12 +110,12 @@ const PresenceIndicator: React.FC<PresenceIndicatorProps> = ({
       icon: 'text-sm',
       zzz: 'text-base',
     },
-  };
+  }), []);
 
   const sizeConfig = sizes[size] || sizes.md;
 
-  // Status configurations
-  const statusConfig: Record<PresenceStatus, StatusConfig> = {
+  // Status configurations - memoized to prevent recreation
+  const statusConfig: Record<PresenceStatus, StatusConfig> = useMemo(() => ({
     active: {
       color: 'bg-green-500',
       ringColor: 'ring-green-400/50',
@@ -133,12 +134,15 @@ const PresenceIndicator: React.FC<PresenceIndicatorProps> = ({
       tooltip: 'Away from keyboard',
       pulse: false,
     },
-  };
+  }), []);
 
   const config = statusConfig[status] || statusConfig.active;
 
-  // Determine effective status (window blur = at least idle)
-  const effectiveStatus: PresenceStatus = !isWindowFocused && status === 'active' ? 'idle' : status;
+  // Determine effective status (window blur = at least idle) - memoized
+  const effectiveStatus: PresenceStatus = useMemo(
+    () => !isWindowFocused && status === 'active' ? 'idle' : status,
+    [isWindowFocused, status]
+  );
   const effectiveConfig = statusConfig[effectiveStatus] || config;
 
   // Handle click/tap for mobile
@@ -271,6 +275,8 @@ const PresenceIndicator: React.FC<PresenceIndicatorProps> = ({
       </AnimatePresence>
     </div>
   );
-};
+});
+
+PresenceIndicator.displayName = 'PresenceIndicator';
 
 export default PresenceIndicator;

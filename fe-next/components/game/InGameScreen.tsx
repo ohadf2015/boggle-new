@@ -420,7 +420,20 @@ const InGameScreen = memo<InGameScreenProps>(({
 
     // Add to local found words
     onWordSubmit?.(formedWord);
-  }, [isPlaying, gameLanguage, minWordLength, normalizedFoundWords, letterGrid, gameActive, socket, effectiveComboLevelRef, onWordSubmit, onResetCombo, t, playWordAcceptedSound, fireRoundActive]);
+  }, [
+    isPlaying,
+    gameLanguage,
+    minWordLength,
+    normalizedFoundWords,
+    letterGrid,
+    gameActive,
+    socket,
+    onWordSubmit,
+    onResetCombo,
+    t,
+    playWordAcceptedSound,
+    announceWordResult,
+  ]); // Optimized: removed effectiveComboLevelRef and fireRoundActive from deps (using refs)
 
   // Memoize leaderboard items with centralized ranking utilities
   const memoizedLeaderboard = useMemo(() => leaderboard.map((player, index) => ({

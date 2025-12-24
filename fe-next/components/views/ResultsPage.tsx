@@ -38,7 +38,8 @@ interface LetterGridProps {
   onToggleHeatmap: () => void;
 }
 
-const LetterGrid: React.FC<LetterGridProps> = ({ letterGrid, heatMapData, showHeatmap, onToggleHeatmap }) => {
+// Memoize LetterGrid to prevent re-renders when parent updates
+const LetterGrid = React.memo<LetterGridProps>(({ letterGrid, heatMapData, showHeatmap, onToggleHeatmap }) => {
   const { t } = useLanguage();
   return (
     <div className="w-full">
@@ -88,7 +89,9 @@ const LetterGrid: React.FC<LetterGridProps> = ({ letterGrid, heatMapData, showHe
       </AnimatePresence>
     </div>
   );
-};
+});
+
+LetterGrid.displayName = 'LetterGrid';
 
 const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, letterGrid, gameCode, onReturnToRoom, username, socket, achievements, duplicateRuleDisabled, playerCount }) => {
   const { t } = useLanguage();
@@ -418,6 +421,7 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, letterGrid, game
   }, [socket, t]);
 
   // Handle word feedback vote (supports multi-word queue from self-healing system)
+  // Memoized to prevent recreation on every render
   const handleVote = useCallback((voteType: 'like' | 'dislike', votedWord?: string) => {
     if (!socket || !wordToVote) return;
 

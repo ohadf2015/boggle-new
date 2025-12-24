@@ -399,7 +399,7 @@ export function useGridInteraction({
     const handleMouseUp = () => handleTouchEnd();
     window.addEventListener('mouseup', handleMouseUp);
     return () => window.removeEventListener('mouseup', handleMouseUp);
-  }, [selectedCells]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [handleTouchEnd]); // Fixed: proper dependency
 
   // Keyboard navigation handler
   const handleKeyDown = useCallback((e: React.KeyboardEvent<HTMLDivElement>) => {

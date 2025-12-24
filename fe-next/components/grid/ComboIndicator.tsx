@@ -135,12 +135,13 @@ const ComboIndicator: React.FC<ComboIndicatorProps> = ({
     const isHighCombo = comboLevel >= 5;
     const isExtremeCombo = comboLevel >= 15;
     // Reduce sparkles at extreme levels to prevent performance issues
-    const count = isExtremeCombo ? 8 : isHighCombo ? 12 : 6;
+    // Also reduce if motion is disabled for accessibility and performance
+    const count = reduceMotion ? 0 : isExtremeCombo ? 6 : isHighCombo ? 10 : 5;
     return [...Array(count)].map((_, i) => ({
       angle: (i * (360 / count) + (Math.random() - 0.5) * 30) * (Math.PI / 180),
       distance: 50 + Math.random() * 30,
     }));
-  }, [comboLevel, animationKey]);
+  }, [comboLevel, animationKey, reduceMotion]);
 
   // Show combo indicator and auto-dismiss
   useEffect(() => {
@@ -190,11 +191,11 @@ const ComboIndicator: React.FC<ComboIndicatorProps> = ({
   const confettiColors = ['#FF3366', '#00FFFF', '#FFE135', '#BFFF00', '#FF6B35', '#FF1493'];
 
   // Scale effects with combo level, but cap aggressively at very high levels for performance
-  // Cap confetti at 16 for extreme combos to prevent performance issues
-  const confettiCount = isExtremeCombo 
-    ? 16 
-    : Math.min(8 + (visibleCombo - 5) * 3, 24); // 8 at level 5, up to 24
-  const extraGlowRings = Math.min(Math.floor((visibleCombo - 5) / 2), 3);
+  // Cap confetti at 12 for extreme combos to prevent performance issues
+  // Disable confetti entirely if motion is reduced
+  const confettiCount = reduceMotion ? 0 : isExtremeCombo
+    ? 12
+    : Math.min(6 + (visibleCombo - 5) * 2, 18); // 6 at level 5, up to 18
 
   return (
     <AnimatePresence mode="wait">

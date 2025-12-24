@@ -661,6 +661,7 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
   };
 
 
+  // Memoize word submission handler to prevent recreation on every render
   const handleWordSubmit = useCallback((word: string) => {
     const normalizedWord = word.toLowerCase().trim();
     const minWordLength = 2;
