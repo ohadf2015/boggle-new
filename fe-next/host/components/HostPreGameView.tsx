@@ -5,6 +5,7 @@ import { Button } from '../../components/ui/button';
 import { Card } from '../../components/ui/card';
 import { Badge } from '../../components/ui/badge';
 import { Checkbox } from '../../components/ui/checkbox';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../../components/ui/tooltip';
 import ShareButton from '../../components/ShareButton';
 import SlotMachineText from '../../components/SlotMachineText';
 import Avatar from '../../components/Avatar';
@@ -96,6 +97,7 @@ const GAME_PRESETS = {
     icon: '⚡',
     timer: 1,
     difficulty: 'MEDIUM' as DifficultyLevel,
+    minWordLength: 3,
     description: 'hostView.presetQuickDesc',
   },
   party: {
@@ -103,6 +105,7 @@ const GAME_PRESETS = {
     icon: '🎉',
     timer: 2,
     difficulty: 'MEDIUM' as DifficultyLevel,
+    minWordLength: 2,
     description: 'hostView.presetPartyDesc',
   },
   challenge: {
@@ -110,6 +113,7 @@ const GAME_PRESETS = {
     icon: '🏆',
     timer: 3,
     difficulty: 'HARD' as DifficultyLevel,
+    minWordLength: 3,
     description: 'hostView.presetChallengeDesc',
   },
 } as const;
@@ -204,9 +208,10 @@ const HostPreGameView: React.FC<HostPreGameViewProps> = ({
     const preset = GAME_PRESETS[presetKey];
     setTimerValue(preset.timer);
     setDifficulty(preset.difficulty);
+    setMinWordLength(preset.minWordLength);
     setTimerDirection(0);
     setSelectedPreset(presetKey);
-  }, [setTimerValue, setDifficulty, setTimerDirection]);
+  }, [setTimerValue, setDifficulty, setMinWordLength, setTimerDirection]);
 
   return (
     <div className="flex flex-col gap-2 sm:gap-3 md:gap-4 w-full max-w-6xl">
@@ -279,52 +284,63 @@ const HostPreGameView: React.FC<HostPreGameViewProps> = ({
               <label className="text-xs font-bold uppercase text-neo-cream/90">
                 {t('hostView.quickSetup') || 'Quick Setup'}
               </label>
-              <div className="flex flex-wrap gap-3">
-                {(Object.keys(GAME_PRESETS) as PresetKey[]).map((key) => {
-                  const preset = GAME_PRESETS[key];
-                  const isSelected = selectedPreset === key;
-                  const presetStyles: Record<PresetKey, { bg: string; selected: string }> = {
-                    quick: {
-                      bg: 'bg-neo-yellow',
-                      selected: 'bg-neo-yellow',
-                    },
-                    party: {
-                      bg: 'bg-neo-pink',
-                      selected: 'bg-neo-pink',
-                    },
-                    challenge: {
-                      bg: 'bg-neo-orange',
-                      selected: 'bg-neo-orange',
-                    },
-                  };
-                  const style = presetStyles[key];
-                  const difficultyName = t(DIFFICULTIES[preset.difficulty].nameKey);
-                  return (
-                    <motion.button
-                      key={key}
-                      onClick={() => handleApplyPreset(key)}
-                      whileTap={{ scale: 0.95 }}
-                      className={cn(
-                        "flex-1 min-w-[110px] px-4 py-4 rounded-neo font-bold transition-all duration-100 border-4 border-neo-black",
-                        style.bg,
-                        isSelected
-                          ? "shadow-none translate-x-[3px] translate-y-[3px]"
-                          : "shadow-hard-lg hover:shadow-hard-xl hover:translate-x-[-2px] hover:translate-y-[-2px] active:shadow-none active:translate-x-[3px] active:translate-y-[3px]"
-                      )}
-                    >
-                      <div className="flex flex-col items-center gap-1.5">
-                        <span className="text-3xl drop-shadow-sm">{preset.icon}</span>
-                        <span className="font-black text-base text-neo-black uppercase tracking-wide">
-                          {t(preset.nameKey) || key.charAt(0).toUpperCase() + key.slice(1)}
-                        </span>
-                        <span className="text-xs text-neo-black/70 font-bold">
-                          {preset.timer}min • {difficultyName}
-                        </span>
-                      </div>
-                    </motion.button>
-                  );
-                })}
-              </div>
+              <TooltipProvider delayDuration={300}>
+                <div className="flex flex-wrap gap-3">
+                  {(Object.keys(GAME_PRESETS) as PresetKey[]).map((key) => {
+                    const preset = GAME_PRESETS[key];
+                    const isSelected = selectedPreset === key;
+                    const presetStyles: Record<PresetKey, { bg: string; selected: string }> = {
+                      quick: {
+                        bg: 'bg-neo-yellow',
+                        selected: 'bg-neo-yellow ring-4 ring-neo-lime ring-offset-2 ring-offset-slate-800',
+                      },
+                      party: {
+                        bg: 'bg-neo-pink',
+                        selected: 'bg-neo-pink ring-4 ring-neo-purple ring-offset-2 ring-offset-slate-800',
+                      },
+                      challenge: {
+                        bg: 'bg-neo-orange',
+                        selected: 'bg-neo-orange ring-4 ring-neo-red ring-offset-2 ring-offset-slate-800',
+                      },
+                    };
+                    const style = presetStyles[key];
+                    const difficultyName = t(DIFFICULTIES[preset.difficulty].nameKey);
+                    return (
+                      <Tooltip key={key}>
+                        <TooltipTrigger asChild>
+                          <motion.button
+                            onClick={() => handleApplyPreset(key)}
+                            whileTap={{ scale: 0.95 }}
+                            className={cn(
+                              "flex-1 min-w-[110px] px-4 py-4 rounded-neo font-bold transition-all duration-100 border-4 border-neo-black",
+                              style.bg,
+                              isSelected
+                                ? `shadow-none translate-x-[3px] translate-y-[3px] ${style.selected}`
+                                : "shadow-hard-lg hover:shadow-hard-xl hover:translate-x-[-2px] hover:translate-y-[-2px] active:shadow-none active:translate-x-[3px] active:translate-y-[3px]"
+                            )}
+                          >
+                            <div className="flex flex-col items-center gap-1.5">
+                              <span className="text-3xl drop-shadow-sm">{preset.icon}</span>
+                              <span className="font-black text-base text-neo-black uppercase tracking-wide">
+                                {t(preset.nameKey) || key.charAt(0).toUpperCase() + key.slice(1)}
+                              </span>
+                              <span className="text-xs text-neo-black/70 font-bold">
+                                {preset.timer}min • {difficultyName}
+                              </span>
+                            </div>
+                          </motion.button>
+                        </TooltipTrigger>
+                        <TooltipContent side="bottom" className="text-center max-w-xs">
+                          <p className="font-bold">{t(preset.description)}</p>
+                          <p className="text-xs opacity-80 mt-1">
+                            {preset.minWordLength} {t('hostView.letterMinimum') || 'letter minimum'}
+                          </p>
+                        </TooltipContent>
+                      </Tooltip>
+                    );
+                  })}
+                </div>
+              </TooltipProvider>
             </div>
 
             {/* Divider */}
