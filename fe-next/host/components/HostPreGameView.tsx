@@ -318,7 +318,7 @@ const HostPreGameView: React.FC<HostPreGameViewProps> = ({
               <label className="text-xs font-bold uppercase text-neo-cream/90">
                 {t('hostView.quickSetup') || 'Quick Setup'}
               </label>
-              <div className="flex flex-wrap gap-3">
+              <div className="grid grid-cols-2 gap-2 sm:flex sm:flex-wrap sm:gap-3">
                 {(Object.keys(GAME_PRESETS) as PresetKey[]).map((key) => {
                   const preset = GAME_PRESETS[key];
                   const isSelected = selectedPreset === key;
@@ -353,19 +353,19 @@ const HostPreGameView: React.FC<HostPreGameViewProps> = ({
                       onTouchEnd={handlePresetMouseUp}
                       whileTap={{ scale: 0.95 }}
                       className={cn(
-                        "flex-1 min-w-[90px] px-3 py-3 rounded-neo font-bold transition-all duration-100 border-4 border-neo-black",
+                        "sm:flex-1 sm:min-w-[90px] px-2 py-2 sm:px-3 sm:py-3 rounded-neo font-bold transition-all duration-100 border-3 sm:border-4 border-neo-black",
                         style.bg,
                         isSelected
-                          ? `shadow-none translate-x-[3px] translate-y-[3px] ${style.selected}`
-                          : "shadow-hard-lg hover:shadow-hard-xl hover:translate-x-[-2px] hover:translate-y-[-2px] active:shadow-none active:translate-x-[3px] active:translate-y-[3px]"
+                          ? `shadow-none translate-x-[2px] translate-y-[2px] sm:translate-x-[3px] sm:translate-y-[3px] ${style.selected}`
+                          : "shadow-hard hover:shadow-hard-lg sm:shadow-hard-lg sm:hover:shadow-hard-xl hover:translate-x-[-1px] hover:translate-y-[-1px] sm:hover:translate-x-[-2px] sm:hover:translate-y-[-2px] active:shadow-none active:translate-x-[2px] active:translate-y-[2px] sm:active:translate-x-[3px] sm:active:translate-y-[3px]"
                       )}
                     >
-                      <div className="flex flex-col items-center gap-1.5">
-                        <span className="text-2xl sm:text-3xl drop-shadow-sm">{preset.icon}</span>
-                        <span className="font-black text-sm sm:text-base text-neo-black uppercase tracking-wide">
+                      <div className="flex flex-col items-center gap-1 sm:gap-1.5">
+                        <span className="text-xl sm:text-3xl drop-shadow-sm">{preset.icon}</span>
+                        <span className="font-black text-xs sm:text-base text-neo-black uppercase tracking-tight sm:tracking-wide leading-tight">
                           {t(preset.nameKey) || key.charAt(0).toUpperCase() + key.slice(1)}
                         </span>
-                        <span className="text-[10px] sm:text-xs text-neo-black/70 font-bold">
+                        <span className="text-[9px] sm:text-xs text-neo-black/70 font-bold leading-tight">
                           {preset.timer}min • {difficultyName}
                         </span>
                       </div>
