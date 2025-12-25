@@ -8,6 +8,7 @@ import { FaUser, FaUsers, FaRobot, FaBullseye, FaTrophy, FaDoorOpen, FaCrown, Fa
 import { Target, Flame, ChevronRight, ChevronLeft } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useMusic } from '@/contexts/MusicContext';
+import { useAuth } from '@/contexts/AuthContext';
 import { useMobileLandscape } from '@/hooks/useMobileLandscape';
 import { useLiveRoomStats } from '@/hooks/useLiveRoomStats';
 import ModeCard from './ModeCard';
