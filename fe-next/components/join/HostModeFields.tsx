@@ -92,8 +92,9 @@ const HostModeFields: React.FC<HostModeFieldsProps> = ({
       if (typeof window !== 'undefined') {
         localStorage.setItem('boggle_avatar_id', avatar.id);
       }
-      // Pre-fill host username with avatar name if username is empty or is a default avatar name
-      if (!hostUsername || hostUsername.trim() === '' || isAvatarDefaultName(hostUsername)) {
+      // Pre-fill host username with avatar name ONLY if username is empty
+      // Don't override if user has already entered a name (even if it matches an avatar name)
+      if (!hostUsername || hostUsername.trim() === '') {
         setHostUsername(avatar.name);
       }
     }

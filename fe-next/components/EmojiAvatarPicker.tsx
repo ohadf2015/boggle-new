@@ -130,6 +130,7 @@ const EmojiAvatarPicker: React.FC<EmojiAvatarPickerProps> = ({
           {/* Buttons */}
           <div className="flex gap-3">
             <button
+              type="button"
               onClick={onClose}
               className="flex-1 py-3 font-bold uppercase tracking-wide transition-all duration-100 flex items-center justify-center gap-2 bg-neo-cream text-neo-black border-3 border-neo-black shadow-hard-sm hover:shadow-hard hover:translate-x-[-2px] hover:translate-y-[-2px] active:shadow-none active:translate-x-[2px] active:translate-y-[2px]"
             >
@@ -137,6 +138,7 @@ const EmojiAvatarPicker: React.FC<EmojiAvatarPickerProps> = ({
               Cancel
             </button>
             <button
+              type="button"
               onClick={handleSave}
               className="flex-1 py-3 font-bold uppercase tracking-wide transition-all duration-100 flex items-center justify-center gap-2 bg-neo-cyan text-neo-black border-3 border-neo-black shadow-hard-sm hover:shadow-hard hover:translate-x-[-2px] hover:translate-y-[-2px] active:shadow-none active:translate-x-[2px] active:translate-y-[2px]"
             >
