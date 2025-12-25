@@ -276,8 +276,9 @@ const ResultsPlayerCard: React.FC<ResultsPlayerCardProps> = ({ player, index, al
               <Avatar
                 profilePictureUrl={avatar?.profilePictureUrl}
                 avatarEmoji={avatar?.emoji}
+                avatarImage={avatar?.avatarImage}
                 avatarColor={avatar?.color}
-                size="lg"
+                size="2xl"
                 className="flex-shrink-0"
               />
               <div className="flex flex-col gap-1 min-w-0 flex-1">

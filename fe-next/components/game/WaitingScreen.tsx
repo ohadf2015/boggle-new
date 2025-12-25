@@ -18,6 +18,7 @@ import type { Language, LetterGrid, GameUser, GridPosition } from '@/shared/type
 
 interface WaitingScreenProps {
   gameCode: string;
+  roomName?: string;
   gameLanguage: Language;
   playersReady?: GameUser[];
   username: string;
@@ -37,6 +38,7 @@ interface WaitingScreenProps {
  */
 const WaitingScreen: React.FC<WaitingScreenProps> = ({
   gameCode,
+  roomName,
   gameLanguage,
   playersReady = [] as GameUser[],
   username,
@@ -58,15 +60,18 @@ const WaitingScreen: React.FC<WaitingScreenProps> = ({
       <div className="relative flex h-screen w-full overflow-hidden bg-slate-900 p-3 gap-3 landscape-full-height">
         {/* Left column: Room info + Exit */}
         <div className="flex flex-col items-center gap-3 w-28 flex-shrink-0">
-          {/* Room Code */}
+          {/* Room Code & Name */}
           <div className="bg-neo-cyan border-3 border-neo-black rounded-neo p-3 text-center shadow-hard w-full">
+            {roomName && (
+              <div className="text-xs font-bold text-neo-black/90 mb-1 truncate" title={roomName}>{roomName}</div>
+            )}
             <div className="text-xs font-bold uppercase text-neo-black/70 mb-1">Room</div>
             <div className="text-2xl font-black text-neo-black">{gameCode}</div>
           </div>
 
           {/* Language Badge */}
           {gameLanguage && (
-            <Badge className="text-sm px-3 py-1.5 bg-neo-cream text-neo-black border-3 border-neo-black w-full text-center">
+            <Badge className="text-sm px-3 py-1.5 bg-neo-purple text-white border-3 border-neo-black w-full text-center" dir="auto">
               {gameLanguage === 'he' ? '🇮🇱' : gameLanguage === 'sv' ? '🇸🇪' : gameLanguage === 'ja' ? '🇯🇵' : '🇺🇸'}
             </Badge>
           )}
@@ -162,16 +167,23 @@ const WaitingScreen: React.FC<WaitingScreenProps> = ({
               return (
                 <Badge
                   key={playerUsername}
-                  className={`text-xs font-bold px-3 py-2 w-full truncate border-3 border-neo-black shadow-hard-sm ${
+                  className={`text-xs font-bold px-2 py-2 w-full truncate border-3 border-neo-black shadow-hard-sm ${
                     playerIsHost ? "bg-neo-yellow text-neo-black" : "bg-neo-cream text-neo-black"
                   }`}
                   style={avatar?.color && !playerIsHost ? { backgroundColor: avatar.color } : {}}
                 >
                   <div className="flex items-center gap-2 w-full truncate">
-                    {avatar?.emoji && <span className="text-sm">{avatar.emoji}</span>}
-                    {playerIsHost && <FaCrown className="text-[10px] flex-shrink-0" />}
-                    <span className="truncate">{playerUsername}</span>
-                    {isMe && <span className="text-[9px] opacity-70">(me)</span>}
+                    <Avatar
+                      profilePictureUrl={avatar?.profilePictureUrl ?? undefined}
+                      avatarEmoji={avatar?.emoji}
+                      avatarImage={avatar?.avatarImage}
+                      avatarColor={avatar?.color}
+                      size="xl"
+                      className="flex-shrink-0"
+                    />
+                    {playerIsHost && <FaCrown className="text-sm flex-shrink-0" />}
+                    <span className="truncate text-sm font-bold">{playerUsername}</span>
+                    {isMe && <span className="text-xs opacity-70">({t('playerView.me')})</span>}
                   </div>
                 </Badge>
               );
@@ -234,8 +246,15 @@ const WaitingScreen: React.FC<WaitingScreenProps> = ({
             }}
           />
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4 relative z-10">
-            {/* Room Code and Language */}
+            {/* Room Name, Code and Language */}
             <div className="flex flex-col items-center sm:items-start gap-2">
+              {roomName && (
+                <div className="text-center sm:text-left">
+                  <h2 className="text-2xl sm:text-3xl font-black text-neo-white mb-1">
+                    {roomName}
+                  </h2>
+                </div>
+              )}
               <div className="flex items-center gap-3">
                 <div className="text-center sm:text-left">
                   <p className="text-sm text-neo-cyan font-bold uppercase">{t('hostView.roomCode')}:</p>
@@ -244,7 +263,7 @@ const WaitingScreen: React.FC<WaitingScreenProps> = ({
                   </h2>
                 </div>
                 {gameLanguage && (
-                  <Badge className="text-base sm:text-lg px-3 py-1 bg-neo-cream text-neo-black border-3 border-neo-black shadow-hard-sm font-bold">
+                  <Badge className="text-base sm:text-lg px-3 py-1 bg-neo-purple text-white border-3 border-neo-black shadow-hard-sm font-bold" dir="auto">
                     {gameLanguage === 'he' ? '🇮🇱 עברית' : gameLanguage === 'sv' ? '🇸🇪 Svenska' : gameLanguage === 'ja' ? '🇯🇵 日本語' : '🇺🇸 English'}
                   </Badge>
                 )}
@@ -381,17 +400,19 @@ const WaitingScreen: React.FC<WaitingScreenProps> = ({
                     transition={{ delay: index * 0.05 }}
                   >
                     <Badge
-                      className={`font-black px-3 py-2 text-base w-full justify-between border-3 border-neo-black shadow-hard-sm ${
+                      className={`font-black px-3 py-3 text-base w-full justify-between border-3 border-neo-black shadow-hard-sm ${
                         playerIsHost ? "bg-neo-yellow text-neo-black" : "bg-neo-cream text-neo-black"
                       }`}
                       style={avatar?.color && !playerIsHost ? { backgroundColor: avatar.color } : {}}
                     >
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-3">
                         <Avatar
                           profilePictureUrl={avatar?.profilePictureUrl ?? undefined}
                           avatarEmoji={avatar?.emoji}
+                          avatarImage={avatar?.avatarImage}
                           avatarColor={avatar?.color}
-                          size="sm"
+                          size="2xl"
+                          className="flex-shrink-0"
                         />
                         {playerIsHost && <FaCrown className="text-neo-black" />}
                         <SlotMachineText text={playerUsername} />

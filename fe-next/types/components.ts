@@ -31,6 +31,10 @@ export interface JoinViewProps {
   roomName: string;
   /** Setter for room name */
   setRoomName: (name: string) => void;
+  /** Host username (player name for host) */
+  hostUsername: string;
+  /** Setter for host username */
+  setHostUsername: (name: string) => void;
   /** Whether auto-joining is in progress */
   isAutoJoining: boolean;
   /** Whether rooms are loading */

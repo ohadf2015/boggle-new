@@ -48,6 +48,7 @@ export interface Avatar {
   emoji: string;
   color: string;
   profilePictureUrl?: string | null;
+  avatarImage?: string; // Avatar image ID (e.g., 'broccoli-bob', 'pizza-pete')
 }
 
 export interface BaseUser {

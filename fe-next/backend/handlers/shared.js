@@ -42,31 +42,42 @@ function startGameTimer(io, gameCode, timerSeconds) {
   // Reset AI validation count for this game (hybrid cost-saving)
   resetGameAIValidationCount(gameCode);
 
-  let remainingTime = timerSeconds;
   const intervalMs = parseInt(process.env.TIME_UPDATE_INTERVAL_MS || '1000');
 
+  // TIMESTAMP-BASED TIMING: Use actual elapsed time to prevent drift
+  // This fixes the 7-10 second timer drift issue in multiplayer games
+  const startTimestamp = Date.now();
+  const endTimestamp = startTimestamp + (timerSeconds * 1000);
+
   // Store remaining time in game state for late joiners
-  updateGame(gameCode, { remainingTime });
+  updateGame(gameCode, { remainingTime: timerSeconds, gameStartTimestamp: startTimestamp });
 
   // Clear any existing timer
   timerManager.clearGameTimer(gameCode);
 
   // OPTIMIZATION: Track last broadcast time to reduce socket messages
-  let lastBroadcastTime = remainingTime;
+  let lastBroadcastTime = timerSeconds;
+  let lastBroadcastSecond = timerSeconds;
 
   // Create interval for time updates
   const timerId = setInterval(() => {
-    remainingTime -= intervalMs / 1000;
+    // Calculate remaining time based on actual elapsed time (prevents drift)
+    const now = Date.now();
+    const remainingMs = Math.max(0, endTimestamp - now);
+    const remainingTime = Math.ceil(remainingMs / 1000);
 
     // Update remaining time in game state for late joiners
     updateGame(gameCode, { remainingTime });
 
     // Smart broadcasting to reduce network overhead
-    const shouldBroadcast =
+    // Only broadcast when the displayed second changes
+    const secondChanged = remainingTime !== lastBroadcastSecond;
+    const shouldBroadcast = secondChanged && (
       remainingTime <= 10 ||
       remainingTime <= 0 ||
       (lastBroadcastTime - remainingTime >= 10) ||
-      remainingTime === 60 || remainingTime === 30;
+      remainingTime === 60 || remainingTime === 30
+    );
 
     if (shouldBroadcast) {
       broadcastToRoom(io, getGameRoom(gameCode), 'timeUpdate', {
@@ -75,6 +86,7 @@ function startGameTimer(io, gameCode, timerSeconds) {
       });
       lastBroadcastTime = remainingTime;
     }
+    lastBroadcastSecond = remainingTime;
 
     if (remainingTime <= 0) {
       timerManager.clearGameTimer(gameCode);

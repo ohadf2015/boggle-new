@@ -235,8 +235,9 @@ function registerWordHandlers(io, socket) {
         handlePendingWord(socket, game, gameCode, username, normalizedWord, comboLevel, fireRoundActive);
       }
 
-      // Update leaderboard
-      const lbThrottleMs = parseInt(process.env.LEADERBOARD_THROTTLE_MS || '500');
+      // Update leaderboard - reduced throttle for more responsive score updates
+      // Using 200ms as a balance between responsiveness and network efficiency
+      const lbThrottleMs = parseInt(process.env.LEADERBOARD_THROTTLE_MS || '200');
       getLeaderboardThrottled(gameCode, (leaderboard) => {
         broadcastToRoom(io, getGameRoom(gameCode), 'updateLeaderboard', { leaderboard });
       }, lbThrottleMs);
@@ -360,7 +361,7 @@ function registerWordHandlers(io, socket) {
 // Helper functions
 
 function handleValidatedWord(io, socket, game, gameCode, username, normalizedWord, comboLevel, isInDictionary, fireRoundActive = false) {
-  const safeComboLevel = Math.max(0, Math.min(10, parseInt(comboLevel) || 0));
+  const safeComboLevel = Math.max(0, Math.min(10, parseInt(comboLevel, 10) || 0));
   const fireRoundMultiplier = fireRoundActive ? 2 : 1;
   const baseScore = normalizedWord.length - 1;
   const wordScore = calculateWordScore(normalizedWord, safeComboLevel, fireRoundMultiplier);
@@ -430,7 +431,7 @@ function handleValidatedWord(io, socket, game, gameCode, username, normalizedWor
 }
 
 function handlePendingWord(socket, game, gameCode, username, normalizedWord, comboLevel, fireRoundActive = false) {
-  const safeComboLevel = Math.max(0, Math.min(10, parseInt(comboLevel) || 0));
+  const safeComboLevel = Math.max(0, Math.min(10, parseInt(comboLevel, 10) || 0));
   const fireRoundMultiplier = fireRoundActive ? 2 : 1;
   const baseScore = normalizedWord.length - 1;
   // Calculate potential score with fire round multiplier

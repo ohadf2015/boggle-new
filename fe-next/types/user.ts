@@ -9,6 +9,7 @@ export interface Session {
   username: string;
   isHost: boolean;
   roomName?: string;
+  hostUsername?: string; // Host's player name (only for hosts)
   language: string;
   timestamp: number;
 }

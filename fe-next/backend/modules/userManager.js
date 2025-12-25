@@ -331,6 +331,19 @@ function clearSocketMappings(socketId) {
 }
 
 /**
+ * Clear ALL socket mappings for intentional leave (user data preserved in game.users)
+ * This prevents stale socket IDs from causing issues when player rejoins
+ * @param {string} socketId - Socket ID to clear
+ * @param {string} gameCode - Game code
+ * @param {string} username - Username
+ */
+function clearSocketMappingsForLeave(socketId, gameCode, username) {
+  socketToGame.delete(socketId);
+  socketToUsername.delete(socketId);
+  usernameToSocket.delete(`${gameCode}:${username}`);
+}
+
+/**
  * Clean up user mappings for a game being deleted
  * @param {object} game - Game object
  * @param {string} gameCode - Game code
@@ -370,6 +383,7 @@ module.exports = {
   setAuthUserConnection,
   removeAuthUserConnection,
   clearSocketMappings,
+  clearSocketMappingsForLeave,
   cleanupUserMappings,
 
   // Expose maps for testing

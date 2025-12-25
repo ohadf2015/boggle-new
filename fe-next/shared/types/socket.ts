@@ -22,6 +22,11 @@ import type {
   WordBlockedByCooldownPayload
 } from './spam';
 
+import type {
+  GenerateScoreCardRequest,
+  GenerateScoreCardResponse
+} from './scorecard';
+
 // ==================== Client → Server Events ====================
 
 export interface ClientToServerEvents {
@@ -79,6 +84,9 @@ export interface ClientToServerEvents {
   'engagement:claimComebackBonus': (data: { playerId: string }) => void;
   'engagement:getStatus': (data: { playerId: string }) => void;
   'engagement:recordLogin': (data: { playerId: string }) => void;
+
+  // Score card events
+  'scorecard:generate': (data: GenerateScoreCardRequest) => void;
 
   // Spectator events
   upgradeToPlayer: (data: { gameCode: string }) => void;
@@ -202,6 +210,10 @@ export interface ServerToClientEvents {
   'engagement:mysteryReward': (data: { reward: MysteryReward }) => void;
   'engagement:status': (data: EngagementStatus) => void;
   'engagement:error': (data: { message: string }) => void;
+
+  // Score card events
+  'scorecard:data': (data: GenerateScoreCardResponse) => void;
+  'scorecard:error': (data: { message: string; code?: string }) => void;
 
   // Spectator events
   spectatorUpgraded: (data: SpectatorUpgradedPayload) => void;

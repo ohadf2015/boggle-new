@@ -7,7 +7,7 @@ import { getAvatarPath, mapEmojiToAvatar } from '@/utils/avatarConfig';
 /**
  * Avatar size type
  */
-type AvatarSize = 'sm' | 'md' | 'lg' | 'xl';
+type AvatarSize = 'sm' | 'md' | 'lg' | 'xl' | '2xl';
 
 /**
  * Size configuration
@@ -37,7 +37,8 @@ const SIZE_CONFIG: Record<AvatarSize, SizeConfig> = {
   sm: { container: 'w-6 h-6', text: 'text-sm', px: 24 },
   md: { container: 'w-8 h-8', text: 'text-base', px: 32 },
   lg: { container: 'w-12 h-12', text: 'text-2xl', px: 48 },
-  xl: { container: 'w-24 h-24', text: 'text-5xl', px: 96 }
+  xl: { container: 'w-20 h-20', text: 'text-5xl', px: 80 },
+  '2xl': { container: 'w-28 h-28', text: 'text-6xl', px: 112 }
 };
 
 /**

@@ -16,6 +16,7 @@ export const LanguageSchema = z.enum(['he', 'en', 'sv', 'ja', 'es', 'fr', 'de'])
 export const AvatarSchema = z.object({
   emoji: z.string().max(10),
   color: z.string().regex(/^#[0-9A-Fa-f]{6}$/),
+  avatarImage: z.string().max(100).regex(/^[a-z0-9_\-\/]+$/i).optional().nullable(),
   profilePictureUrl: z.string().url().nullable().optional(),
 });
 

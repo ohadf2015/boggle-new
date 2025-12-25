@@ -14,6 +14,7 @@ export const saveSession = (session: Omit<Session, 'timestamp'>): void => {
     username: session.username,
     isHost: session.isHost,
     roomName: session.roomName,
+    hostUsername: session.hostUsername,
     language: session.language,
     timestamp: Date.now(),
   };

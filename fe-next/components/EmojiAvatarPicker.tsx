@@ -4,7 +4,6 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FaCheck, FaTimes } from 'react-icons/fa';
 import Image from 'next/image';
-import { useTheme } from '../utils/ThemeContext';
 import { AVATARS, getAvatarPath, mapEmojiToAvatar, type AvatarConfig } from '@/utils/avatarConfig';
 
 /**
@@ -39,9 +38,6 @@ const EmojiAvatarPicker: React.FC<EmojiAvatarPickerProps> = ({
   currentEmoji,
   currentAvatarImage
 }) => {
-  const { theme } = useTheme();
-  const isDarkMode = theme === 'dark';
-
   // Determine initial avatar selection
   const getInitialAvatar = (): AvatarConfig => {
     if (currentAvatarImage) {
@@ -76,19 +72,20 @@ const EmojiAvatarPicker: React.FC<EmojiAvatarPickerProps> = ({
         exit={{ opacity: 0 }}
         className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
         onClick={onClose}
+        role="dialog"
+        aria-modal="true"
+        aria-label="Choose your avatar"
       >
         <motion.div
           initial={{ scale: 0.9, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           exit={{ scale: 0.9, opacity: 0 }}
-          className={`w-full max-w-md rounded-2xl p-6 shadow-xl ${
-            isDarkMode ? 'bg-slate-800' : 'bg-white'
-          }`}
+          className="w-full max-w-md p-6 bg-neo-cream border-4 border-neo-black shadow-hard"
           onClick={(e) => e.stopPropagation()}
         >
           {/* Preview */}
           <div className="flex flex-col items-center mb-6">
-            <div className="w-24 h-24 rounded-full overflow-hidden shadow-lg mb-3 relative">
+            <div className="w-24 h-24 rounded-full overflow-hidden border-4 border-neo-black shadow-hard mb-3 relative">
               <Image
                 src={getAvatarPath(selectedAvatar)}
                 alt={selectedAvatar.name}
@@ -96,14 +93,14 @@ const EmojiAvatarPicker: React.FC<EmojiAvatarPickerProps> = ({
                 className="object-cover"
               />
             </div>
-            <p className={`text-lg font-semibold ${isDarkMode ? 'text-gray-200' : 'text-gray-800'}`}>
+            <p className="text-lg font-black text-neo-black uppercase tracking-wide">
               {selectedAvatar.name}
             </p>
           </div>
 
           {/* Avatar Gallery Grid */}
           <div className="mb-6">
-            <p className={`text-sm font-medium mb-3 ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+            <p className="text-sm font-bold mb-3 text-neo-black uppercase tracking-wide">
               Choose Your Avatar
             </p>
             <div className="grid grid-cols-4 gap-3 max-h-80 overflow-y-auto pr-2">
@@ -111,12 +108,12 @@ const EmojiAvatarPicker: React.FC<EmojiAvatarPickerProps> = ({
                 <button
                   key={avatar.id}
                   onClick={() => setSelectedAvatar(avatar)}
-                  className={`relative aspect-square rounded-xl overflow-hidden transition-all ${
+                  aria-label={`Select ${avatar.name} avatar`}
+                  aria-pressed={selectedAvatar.id === avatar.id}
+                  className={`relative aspect-square overflow-hidden transition-all duration-100 border-3 border-neo-black ${
                     selectedAvatar.id === avatar.id
-                      ? 'ring-3 ring-cyan-500 scale-105'
-                      : isDarkMode
-                        ? 'hover:ring-2 hover:ring-slate-600'
-                        : 'hover:ring-2 hover:ring-gray-300'
+                      ? 'ring-4 ring-neo-cyan scale-105 shadow-hard'
+                      : 'hover:scale-105 hover:shadow-hard-sm'
                   }`}
                 >
                   <Image
@@ -134,18 +131,14 @@ const EmojiAvatarPicker: React.FC<EmojiAvatarPickerProps> = ({
           <div className="flex gap-3">
             <button
               onClick={onClose}
-              className={`flex-1 py-3 rounded-xl font-medium transition-colors flex items-center justify-center gap-2 ${
-                isDarkMode
-                  ? 'bg-slate-700 hover:bg-slate-600 text-gray-300'
-                  : 'bg-gray-100 hover:bg-gray-200 text-gray-700'
-              }`}
+              className="flex-1 py-3 font-bold uppercase tracking-wide transition-all duration-100 flex items-center justify-center gap-2 bg-neo-cream text-neo-black border-3 border-neo-black shadow-hard-sm hover:shadow-hard hover:translate-x-[-2px] hover:translate-y-[-2px] active:shadow-none active:translate-x-[2px] active:translate-y-[2px]"
             >
               <FaTimes size={14} />
               Cancel
             </button>
             <button
               onClick={handleSave}
-              className="flex-1 py-3 rounded-xl font-medium bg-gradient-to-r from-cyan-500 to-blue-600 text-white hover:from-cyan-600 hover:to-blue-700 transition-colors flex items-center justify-center gap-2"
+              className="flex-1 py-3 font-bold uppercase tracking-wide transition-all duration-100 flex items-center justify-center gap-2 bg-neo-cyan text-neo-black border-3 border-neo-black shadow-hard-sm hover:shadow-hard hover:translate-x-[-2px] hover:translate-y-[-2px] active:shadow-none active:translate-x-[2px] active:translate-y-[2px]"
             >
               <FaCheck size={14} />
               Save

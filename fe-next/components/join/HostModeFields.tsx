@@ -10,7 +10,7 @@ import { cn } from '@/lib/utils';
 import { validateUsername, validateGameCode, sanitizeInput } from '@/utils/validation';
 import { useDebouncedValidation, getValidationClasses } from '@/hooks/useDebouncedValidation';
 import AvatarSelectorButton from './AvatarSelectorButton';
-import type { AvatarConfig } from '@/utils/avatarConfig';
+import { AVATARS, type AvatarConfig } from '@/utils/avatarConfig';
 
 export interface HostModeFieldsProps {
   gameCode: string;
@@ -65,6 +65,11 @@ const HostModeFields: React.FC<HostModeFieldsProps> = ({
     }
   }, []);
 
+  // Check if a name is one of the avatar default names
+  const isAvatarDefaultName = (name: string): boolean => {
+    return AVATARS.some(a => a.name === name);
+  };
+
   // Handle avatar selection
   const handleAvatarSelect = (avatar: AvatarConfig) => {
     setSelectedAvatarId(avatar.id);
@@ -72,8 +77,8 @@ const HostModeFields: React.FC<HostModeFieldsProps> = ({
     if (typeof window !== 'undefined') {
       localStorage.setItem('boggle_avatar_id', avatar.id);
     }
-    // Pre-fill host username with avatar name if username is empty
-    if ((!hostUsername || hostUsername.trim() === '') && !isAuthenticated) {
+    // Pre-fill host username with avatar name if username is empty or is a default avatar name
+    if ((!hostUsername || hostUsername.trim() === '' || isAvatarDefaultName(hostUsername)) && !isAuthenticated) {
       setHostUsername(avatar.name);
     }
   };

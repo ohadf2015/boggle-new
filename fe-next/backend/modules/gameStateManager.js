@@ -356,6 +356,10 @@ function clearSocketMappings(socketId) {
   return userManager.clearSocketMappings(socketId);
 }
 
+function clearSocketMappingsForLeave(socketId, gameCode, username) {
+  userManager.clearSocketMappingsForLeave(socketId, gameCode, username);
+}
+
 // ==========================================
 // Score Management (delegated to scoreManager)
 // ==========================================
@@ -976,6 +980,7 @@ module.exports = {
   setAuthUserConnection,
   removeAuthUserConnection,
   clearSocketMappings,
+  clearSocketMappingsForLeave,
 
   // Tournament management
   getTournamentIdFromGame,

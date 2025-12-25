@@ -89,6 +89,33 @@ interface HostPreGameViewProps {
 
 // ==================== Component ====================
 
+// Game presets for quick setup
+const GAME_PRESETS = {
+  quick: {
+    nameKey: 'hostView.presetQuick',
+    icon: '⚡',
+    timer: 1,
+    difficulty: 'MEDIUM' as DifficultyLevel,
+    description: 'hostView.presetQuickDesc',
+  },
+  party: {
+    nameKey: 'hostView.presetParty',
+    icon: '🎉',
+    timer: 2,
+    difficulty: 'MEDIUM' as DifficultyLevel,
+    description: 'hostView.presetPartyDesc',
+  },
+  challenge: {
+    nameKey: 'hostView.presetChallenge',
+    icon: '🏆',
+    timer: 3,
+    difficulty: 'HARD' as DifficultyLevel,
+    description: 'hostView.presetChallengeDesc',
+  },
+} as const;
+
+type PresetKey = keyof typeof GAME_PRESETS;
+
 const HostPreGameView: React.FC<HostPreGameViewProps> = ({
   // Core props
   gameCode,
@@ -134,6 +161,7 @@ const HostPreGameView: React.FC<HostPreGameViewProps> = ({
 }): React.ReactElement => {
   const { socket } = useSocket();
   const [showAdvancedSettings, setShowAdvancedSettings] = useState<boolean>(false);
+  const [selectedPreset, setSelectedPreset] = useState<PresetKey | null>(null);
 
   // Memoized handlers
   const handleCopyLink = useCallback(() => {
@@ -170,6 +198,15 @@ const HostPreGameView: React.FC<HostPreGameViewProps> = ({
   const handleSetMinWordLength = useCallback((value: number) => {
     setMinWordLength(value);
   }, [setMinWordLength]);
+
+  // Apply preset configuration
+  const handleApplyPreset = useCallback((presetKey: PresetKey) => {
+    const preset = GAME_PRESETS[presetKey];
+    setTimerValue(preset.timer);
+    setDifficulty(preset.difficulty);
+    setTimerDirection(0);
+    setSelectedPreset(presetKey);
+  }, [setTimerValue, setDifficulty, setTimerDirection]);
 
   return (
     <div className="flex flex-col gap-2 sm:gap-3 md:gap-4 w-full max-w-6xl">
@@ -237,6 +274,62 @@ const HostPreGameView: React.FC<HostPreGameViewProps> = ({
             {t('hostView.gameSettings')}
           </h3>
           <div className="w-full space-y-2 sm:space-y-3">
+            {/* Game Presets - Quick Setup */}
+            <div className="space-y-2">
+              <label className="text-xs font-bold uppercase text-neo-cream/90">
+                {t('hostView.quickSetup') || 'Quick Setup'}
+              </label>
+              <div className="flex flex-wrap gap-3">
+                {(Object.keys(GAME_PRESETS) as PresetKey[]).map((key) => {
+                  const preset = GAME_PRESETS[key];
+                  const isSelected = selectedPreset === key;
+                  const presetStyles: Record<PresetKey, { bg: string; selected: string }> = {
+                    quick: {
+                      bg: 'bg-neo-yellow',
+                      selected: 'bg-neo-yellow',
+                    },
+                    party: {
+                      bg: 'bg-neo-pink',
+                      selected: 'bg-neo-pink',
+                    },
+                    challenge: {
+                      bg: 'bg-neo-orange',
+                      selected: 'bg-neo-orange',
+                    },
+                  };
+                  const style = presetStyles[key];
+                  const difficultyName = t(DIFFICULTIES[preset.difficulty].nameKey);
+                  return (
+                    <motion.button
+                      key={key}
+                      onClick={() => handleApplyPreset(key)}
+                      whileTap={{ scale: 0.95 }}
+                      className={cn(
+                        "flex-1 min-w-[110px] px-4 py-4 rounded-neo font-bold transition-all duration-100 border-4 border-neo-black",
+                        style.bg,
+                        isSelected
+                          ? "shadow-none translate-x-[3px] translate-y-[3px]"
+                          : "shadow-hard-lg hover:shadow-hard-xl hover:translate-x-[-2px] hover:translate-y-[-2px] active:shadow-none active:translate-x-[3px] active:translate-y-[3px]"
+                      )}
+                    >
+                      <div className="flex flex-col items-center gap-1.5">
+                        <span className="text-3xl drop-shadow-sm">{preset.icon}</span>
+                        <span className="font-black text-base text-neo-black uppercase tracking-wide">
+                          {t(preset.nameKey) || key.charAt(0).toUpperCase() + key.slice(1)}
+                        </span>
+                        <span className="text-xs text-neo-black/70 font-bold">
+                          {preset.timer}min • {difficultyName}
+                        </span>
+                      </div>
+                    </motion.button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Divider */}
+            <div className="border-t border-neo-cream/20 pt-2" />
+
             {/* Timer Input */}
             <div className="space-y-1.5">
               <label className="text-xs font-bold uppercase text-neo-cream/90 flex items-center gap-1.5">
@@ -460,14 +553,20 @@ const HostPreGameView: React.FC<HostPreGameViewProps> = ({
                         <Avatar
                           profilePictureUrl={avatar?.profilePictureUrl ?? undefined}
                           avatarEmoji={avatar?.emoji}
+                          avatarImage={avatar?.avatarImage}
                           avatarColor={avatar?.color}
-                          size="sm"
+                          size="lg"
                         />
                         <span className="font-medium text-neo-cream/90">
                           <SlotMachineText text={playerUsername} />
                         </span>
                         {isHostPlayer && <FaCrown className="text-neo-yellow/80 text-sm" />}
                         {isBot && <FaRobot className="text-neo-cyan/70 text-sm" />}
+                        {isMe && (
+                          <span className="text-xs text-neo-cream/70 font-medium">
+                            ({t('playerView.me')})
+                          </span>
+                        )}
                       </div>
                       <div className="flex items-center gap-2">
                         {playerWordCounts && playerWordCounts[playerUsername] !== undefined && (

@@ -13,6 +13,8 @@ import { useLiveRoomStats } from '@/hooks/useLiveRoomStats';
 import ModeCard from './ModeCard';
 import Header from '@/components/Header';
 import SocialProof from '@/components/SocialProof';
+import OnboardingModal from '@/components/OnboardingModal';
+import { hasCompletedOnboarding } from '@/utils/onboardingStorage';
 import {
   getPuzzleNumber,
   getDailyChallengeDate,
@@ -40,6 +42,9 @@ const LandingView: React.FC = () => {
   const [dailyStreak, setDailyStreak] = useState<number>(0);
   const [dailyCountdown, setDailyCountdown] = useState<string>('');
 
+  // Onboarding state
+  const [showOnboarding, setShowOnboarding] = useState(false);
+
   // Check for room parameter and redirect to multiplayer page
   // This handles shared links (WhatsApp, barcode scan, copy link)
   useEffect(() => {
@@ -51,6 +56,19 @@ const LandingView: React.FC = () => {
       router.replace(`/${language}/multiplayer${window.location.search}`);
     }
   }, [language, router]);
+
+  // Show onboarding modal for first-time visitors
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    // Only show if not completed and no room redirect in progress
+    const urlParams = new URLSearchParams(window.location.search);
+    const hasRoom = urlParams.get('room');
+
+    if (!hasRoom && !hasCompletedOnboarding()) {
+      setShowOnboarding(true);
+    }
+  }, []);
 
   // Initialize daily challenge info
   useEffect(() => {
@@ -129,6 +147,9 @@ const LandingView: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-50 via-slate-100 to-slate-200 dark:from-neo-navy dark:via-neo-navy-light dark:to-neo-navy">
+      {/* Onboarding Modal */}
+      <OnboardingModal isOpen={showOnboarding} onClose={() => setShowOnboarding(false)} />
+
       {/* Header */}
       <Header />
 

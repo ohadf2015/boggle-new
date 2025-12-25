@@ -20,6 +20,7 @@ const {
   processAchievementEngagement,
 } = require('./engagementHandler');
 const { registerEarthquakeHandlers, clearGameEarthquakeState } = require('./earthquakeHandler');
+const { registerScorecardHandlers } = require('./scorecardHandler');
 const {
   startGameTimer,
   endGame,
@@ -44,6 +45,7 @@ function registerAllHandlers(io, socket) {
   registerHintHandlers(io, socket);
   registerEngagementHandlers(io, socket);
   registerEarthquakeHandlers(io, socket);
+  registerScorecardHandlers(io, socket);
 }
 
 module.exports = {
@@ -62,6 +64,7 @@ module.exports = {
   registerHintHandlers,
   registerEngagementHandlers,
   registerEarthquakeHandlers,
+  registerScorecardHandlers,
 
   // Engagement utilities (for use in other handlers)
   processGameEndEngagement,

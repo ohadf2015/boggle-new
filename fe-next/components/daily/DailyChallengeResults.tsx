@@ -98,9 +98,22 @@ const DailyChallengeResults: React.FC<DailyChallengeResultsProps> = ({
             }),
           });
           if (!response.ok) {
-            console.error('Failed to submit daily result:', await response.text());
+            const errorText = await response.text();
+            console.error('Failed to submit daily result:', errorText);
+            console.error('Submission details:', {
+              puzzleDate: result.puzzleDate,
+              language: result.language,
+              isAuthenticated,
+              hasProfile: !!profile,
+              hasGuestFingerprint: !!guestFingerprint,
+            });
+            return; // Don't refresh leaderboard if submission failed
           }
-          // Refresh the leaderboard after submission
+
+          const responseData = await response.json();
+          console.log('Daily challenge submitted successfully:', responseData);
+
+          // Refresh the leaderboard after successful submission
           setLeaderboardKey(prev => prev + 1);
         } catch (err) {
           console.error('Failed to submit daily result:', err);

@@ -21,7 +21,8 @@ const {
   addSpectatorToGame,
   getGameSpectators,
   upgradeSpectatorToPlayer,
-  isSpectator
+  isSpectator,
+  clearSocketMappingsForLeave
 } = require('../modules/gameStateManager');
 
 const {
@@ -199,6 +200,10 @@ function registerPlayerJoinHandlers(io, socket) {
       if (game.users[username]) {
         game.users[username].disconnected = true;
         game.users[username].disconnectedAt = Date.now();
+
+        // Clear socket mappings to prevent stale socket ID issues on rejoin
+        // User data remains in game.users for score preservation
+        clearSocketMappingsForLeave(socket.id, gameCode, username);
 
         logger.info('SOCKET', `${username} left room ${gameCode} (game in progress - marked as disconnected, can rejoin)`);
 

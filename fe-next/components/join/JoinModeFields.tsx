@@ -10,7 +10,7 @@ import { cn } from '@/lib/utils';
 import { validateUsername, validateGameCode, sanitizeInput } from '@/utils/validation';
 import { useDebouncedValidation, getValidationClasses } from '@/hooks/useDebouncedValidation';
 import AvatarSelectorButton from './AvatarSelectorButton';
-import type { AvatarConfig } from '@/utils/avatarConfig';
+import { AVATARS, type AvatarConfig } from '@/utils/avatarConfig';
 
 export interface JoinModeFieldsProps {
   gameCode: string;
@@ -56,6 +56,11 @@ const JoinModeFields: React.FC<JoinModeFieldsProps> = ({
     }
   }, []);
 
+  // Check if a name is one of the avatar default names
+  const isAvatarDefaultName = (name: string): boolean => {
+    return AVATARS.some(a => a.name === name);
+  };
+
   // Handle avatar selection
   const handleAvatarSelect = (avatar: AvatarConfig) => {
     setSelectedAvatarId(avatar.id);
@@ -63,8 +68,8 @@ const JoinModeFields: React.FC<JoinModeFieldsProps> = ({
     if (typeof window !== 'undefined') {
       localStorage.setItem('boggle_avatar_id', avatar.id);
     }
-    // Pre-fill username with avatar name if username is empty
-    if (!username || username.trim() === '') {
+    // Pre-fill username with avatar name if username is empty or is a default avatar name
+    if (!username || username.trim() === '' || isAvatarDefaultName(username)) {
       setUsername(avatar.name);
     }
   };

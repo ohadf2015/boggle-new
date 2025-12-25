@@ -49,10 +49,17 @@ export const validateUsername = (username: string): ValidationResult => {
 /**
  * Validates room name input
  * @param roomName - The room name to validate
+ * @param optional - Whether the room name is optional (default: true)
  * @returns Validation result
  */
-export const validateRoomName = (roomName: string): ValidationResult => {
-  if (!roomName || !roomName.trim()) {
+export const validateRoomName = (roomName: string, optional: boolean = true): ValidationResult => {
+  // Allow empty room name if optional
+  if (optional && (!roomName || !roomName.trim())) {
+    return { isValid: true };
+  }
+
+  // If not optional, require a value
+  if (!optional && (!roomName || !roomName.trim())) {
     return { isValid: false, error: 'validation.roomNameRequired' };
   }
 

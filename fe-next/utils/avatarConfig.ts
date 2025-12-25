@@ -50,8 +50,13 @@ export function getRandomAvatar(): AvatarConfig {
  * Get avatar path for rendering
  */
 export function getAvatarPath(avatar: AvatarConfig | string): string {
-  const filename = typeof avatar === 'string' ? avatar : avatar.filename;
-  return `/avatars/${filename}`;
+  if (typeof avatar === 'string') {
+    // Could be an ID or a filename - check if it's an ID first
+    const avatarConfig = getAvatarById(avatar);
+    const filename = avatarConfig ? avatarConfig.filename : avatar;
+    return `/avatars/${filename}`;
+  }
+  return `/avatars/${avatar.filename}`;
 }
 
 /**

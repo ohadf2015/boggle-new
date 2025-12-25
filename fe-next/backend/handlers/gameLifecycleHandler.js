@@ -56,106 +56,119 @@ function registerGameLifecycleHandlers(io, socket) {
 
   // Handle game creation
   socket.on('createGame', async (data) => {
-    if (!checkRateLimit(socket.id)) {
-      inc('rateLimited');
-      socket.emit('rateLimited');
-      return;
-    }
-
-    // Validate payload
-    const validation = validatePayload(createGameSchema, data);
-    if (!validation.success) {
-      emitError(socket, `Invalid request: ${validation.error}`);
-      return;
-    }
-
-    const { gameCode, roomName, language, hostUsername, playerId, avatar, authUserId, guestTokenHash, isRanked, profilePictureUrl } = validation.data;
-
-    logger.info('SOCKET', `Create game request: ${gameCode} by ${hostUsername}${isRanked ? ' (RANKED)' : ''}`);
-
-    // Sanitize playerId
-    const sanitizedPlayerId = playerId && typeof playerId === 'string'
-      ? playerId.slice(0, 64).replace(/[^a-zA-Z0-9_-]/g, '')
-      : null;
-
-    // Check if game already exists
-    if (gameExists(gameCode)) {
-      emitError(socket, 'Game code already in use');
-      return;
-    }
-
-    // Handle multi-tab detection for authenticated users
-    if (authUserId) {
-      await handleExistingAuthConnection(io, socket, authUserId, gameCode);
-    }
-
-    // Create the game
-    const game = createGame(gameCode, {
-      hostSocketId: socket.id,
-      hostUsername: hostUsername || 'Host',
-      hostPlayerId: sanitizedPlayerId,
-      roomName: roomName || gameCode,
-      language: language || 'en',
-      isRanked: isRanked || false,
-      allowLateJoin: isRanked ? false : true
-    });
-
-    // Add host as first user
-    const hostAvatar = avatar || generateRandomAvatar();
-    addUserToGame(gameCode, hostUsername || 'Host', socket.id, {
-      avatar: { ...hostAvatar, profilePictureUrl: profilePictureUrl || null },
-      isHost: true,
-      playerId: sanitizedPlayerId,
-      authUserId: authUserId || null,
-      guestTokenHash: guestTokenHash || null
-    });
-
-    // Join socket to game room
-    joinRoom(socket, getGameRoom(gameCode));
-
-    // Confirm game creation
-    socket.emit('joined', {
-      success: true,
-      gameCode,
-      isHost: true,
-      username: hostUsername || 'Host',
-      roomName: roomName || gameCode,
-      language: language || 'en',
-      users: getGameUsers(gameCode)
-    });
-
-    ensureGame(gameCode);
-
-    // Broadcast updated room list
-    io.emit('activeRooms', { rooms: getActiveRooms() });
-
-    // Broadcast user list update
-    broadcastToRoom(io, getGameRoom(gameCode), 'updateUsers', {
-      users: getGameUsers(gameCode)
-    });
-
-    // Save to Redis
     try {
-      await redisClient.saveGameState(gameCode, game);
-    } catch (err) {
-      logger.error('REDIS', 'Failed to save game state', err);
-      safeEmit(socket, 'warning', {
-        type: 'persistence',
-        message: 'Game state could not be saved.'
+      if (!checkRateLimit(socket.id)) {
+        inc('rateLimited');
+        socket.emit('rateLimited');
+        return;
+      }
+
+      // Validate payload
+      const validation = validatePayload(createGameSchema, data);
+      if (!validation.success) {
+        logger.warn('SOCKET', `Create game validation failed: ${validation.error}`, { data });
+        emitError(socket, `Invalid request: ${validation.error}`);
+        return;
+      }
+
+      const { gameCode, roomName, language, hostUsername, playerId, avatar, authUserId, guestTokenHash, isRanked, profilePictureUrl } = validation.data;
+
+      logger.info('SOCKET', `Create game request: ${gameCode} by ${hostUsername}${isRanked ? ' (RANKED)' : ''}`, {
+        socketId: socket.id,
+        hasAvatar: !!avatar,
+        hasAuth: !!authUserId
       });
+
+      // playerId is already validated by schema (UUID v4 format) - use as is
+      const sanitizedPlayerId = playerId || null;
+
+      // Check if game already exists
+      if (gameExists(gameCode)) {
+        logger.warn('SOCKET', `Game code already exists: ${gameCode}`);
+        emitError(socket, 'Game code already in use');
+        return;
+      }
+
+      // Handle multi-tab detection for authenticated users
+      if (authUserId) {
+        await handleExistingAuthConnection(io, socket, authUserId, gameCode);
+      }
+
+      // Create the game
+      const game = createGame(gameCode, {
+        hostSocketId: socket.id,
+        hostUsername: hostUsername || 'Host',
+        hostPlayerId: sanitizedPlayerId,
+        roomName: roomName || gameCode,
+        language: language || 'en',
+        isRanked: isRanked || false,
+        allowLateJoin: isRanked ? false : true
+      });
+
+      // Add host as first user
+      const hostAvatar = avatar || generateRandomAvatar();
+      addUserToGame(gameCode, hostUsername || 'Host', socket.id, {
+        avatar: { ...hostAvatar, profilePictureUrl: profilePictureUrl || null },
+        isHost: true,
+        playerId: sanitizedPlayerId,
+        authUserId: authUserId || null,
+        guestTokenHash: guestTokenHash || null
+      });
+
+      // Join socket to game room
+      joinRoom(socket, getGameRoom(gameCode));
+
+      // Confirm game creation - CRITICAL: Always emit this before async operations
+      socket.emit('joined', {
+        success: true,
+        gameCode,
+        isHost: true,
+        username: hostUsername || 'Host',
+        roomName: roomName || gameCode,
+        language: language || 'en',
+        users: getGameUsers(gameCode)
+      });
+
+      logger.info('SOCKET', `Game ${gameCode} created successfully by ${hostUsername}`);
+
+      ensureGame(gameCode);
+
+      // Broadcast updated room list
+      io.emit('activeRooms', { rooms: getActiveRooms() });
+
+      // Broadcast user list update
+      broadcastToRoom(io, getGameRoom(gameCode), 'updateUsers', {
+        users: getGameUsers(gameCode)
+      });
+
+      // Save to Redis
+      try {
+        await redisClient.saveGameState(gameCode, game);
+      } catch (err) {
+        logger.error('REDIS', 'Failed to save game state', err);
+        safeEmit(socket, 'warning', {
+          type: 'persistence',
+          message: 'Game state could not be saved.'
+        });
+      }
+
+      // Fire-and-forget notification
+      notifyRoomCreated({
+        gameCode,
+        roomName: roomName || gameCode,
+        language: language || 'en',
+        hostUsername: hostUsername || 'Host',
+        isAuthenticated: !!authUserId,
+        isRanked: isRanked || false
+      }).catch(() => {}); // Swallow errors - never block game flow
+    } catch (error) {
+      logger.error('SOCKET', `Unhandled error in createGame handler: ${error.message}`, {
+        stack: error.stack,
+        socketId: socket.id,
+        data
+      });
+      emitError(socket, 'Failed to create game. Please try again.');
     }
-
-    logger.info('SOCKET', `Game ${gameCode} created by ${hostUsername}`);
-
-    // Fire-and-forget notification
-    notifyRoomCreated({
-      gameCode,
-      roomName: roomName || gameCode,
-      language: language || 'en',
-      hostUsername: hostUsername || 'Host',
-      isAuthenticated: !!authUserId,
-      isRanked: isRanked || false
-    }).catch(() => {}); // Swallow errors - never block game flow
   });
 
   // Handle request for words to embed in board
@@ -227,7 +240,7 @@ function registerGameLifecycleHandlers(io, socket) {
       logger.info('SOCKET', `Game ${gameCode} auto-reset successful, state now: ${game.gameState}`);
     }
 
-    const validTimer = Math.max(30, Math.min(600, parseInt(timerSeconds) || 180));
+    const validTimer = Math.max(30, Math.min(600, parseInt(timerSeconds, 10) || 180));
 
     // Update game settings first
     updateGame(gameCode, {

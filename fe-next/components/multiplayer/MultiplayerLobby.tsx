@@ -16,7 +16,6 @@ import { getJoinUrl } from '@/utils/share';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { validateUsername, validateRoomName, validateGameCode, sanitizeInput } from '@/utils/validation';
 import { useValidation } from '@/hooks/useValidation';
-import { useDebouncedValidation, getValidationClasses } from '@/hooks/useDebouncedValidation';
 import { generateRoomCode as generateCode } from '@/utils/utils';
 import type { Language, ActiveRoom } from '@/shared/types/game';
 import { useMobileLandscape } from '@/hooks/useMobileLandscape';
@@ -25,6 +24,8 @@ import {
   RoomList,
   LanguageSelector,
   ModeSelector,
+  HostModeFields,
+  JoinModeFields,
 } from '@/components/join';
 
 export type JoinMode = 'join' | 'host';
@@ -34,9 +35,11 @@ interface MultiplayerLobbyProps {
   gameCode: string;
   username: string;
   roomName: string;
+  hostUsername: string;
   setGameCode: (code: string) => void;
   setUsername: (name: string) => void;
   setRoomName: (name: string) => void;
+  setHostUsername: (name: string) => void;
   error: string;
   activeRooms: ActiveRoom[];
   refreshRooms: () => void;
@@ -58,9 +61,11 @@ const MultiplayerLobby: React.FC<MultiplayerLobbyProps> = ({
   gameCode,
   username,
   roomName,
+  hostUsername,
   setGameCode,
   setUsername,
   setRoomName,
+  setHostUsername,
   error,
   activeRooms,
   refreshRooms,
@@ -78,20 +83,17 @@ const MultiplayerLobby: React.FC<MultiplayerLobbyProps> = ({
   const [showQR, setShowQR] = useState(false);
   const [usernameError, setUsernameError] = useState(false);
   const [roomNameError, setRoomNameError] = useState(false);
+  const [hostUsernameError, setHostUsernameError] = useState(false);
   const [gameCodeError, setGameCodeError] = useState(false);
   const [usernameErrorKey, setUsernameErrorKey] = useState<string | undefined>();
   const [roomNameErrorKey, setRoomNameErrorKey] = useState<string | undefined>();
+  const [hostUsernameErrorKey, setHostUsernameErrorKey] = useState<string | undefined>();
   const [gameCodeErrorKey, setGameCodeErrorKey] = useState<string | undefined>();
   const [roomLanguage, setRoomLanguage] = useState<Language>(language as Language);
   // Auto-expand room list on mobile when rooms are available
   const [mobileRoomsExpanded, setMobileRoomsExpanded] = useState(activeRooms.length > 0);
   const hasAutoSwitchedToHostRef = useRef(false);
   const { notifyError } = useValidation(t);
-
-  // Debounced validation
-  const usernameValidation = useDebouncedValidation(username, { validate: validateUsername, delay: 300 });
-  const roomNameValidation = useDebouncedValidation(roomName, { validate: validateRoomName, delay: 300 });
-  const gameCodeValidation = useDebouncedValidation(gameCode, { validate: validateGameCode, delay: 300 });
 
   // Mode change handler
   const handleModeChange = useCallback((newMode: string) => {
@@ -102,6 +104,11 @@ const MultiplayerLobby: React.FC<MultiplayerLobbyProps> = ({
       }
     }
   }, [gameCode, setGameCode]);
+
+  // Generate room code handler for HostModeFields
+  const generateRoomCode = useCallback(() => {
+    setGameCode(generateCode());
+  }, [setGameCode]);
 
   // Auto-switch to host mode when no rooms exist (unless joining via prefilled room)
   useEffect(() => {
@@ -135,15 +142,34 @@ const MultiplayerLobby: React.FC<MultiplayerLobbyProps> = ({
 
     if (mode === 'host') {
       let effectiveRoomName = roomName;
-      if (isAuthenticated && displayName && (!roomName || !roomName.trim())) {
-        effectiveRoomName = displayName;
-        setRoomName(displayName);
+      let effectiveHostUsername = hostUsername;
+
+      if (isAuthenticated && displayName) {
+        // For authenticated users, use display name as player name
+        effectiveHostUsername = displayName;
+        // Use display name as room name fallback if no room name provided
+        if (!roomName || !roomName.trim()) {
+          effectiveRoomName = displayName;
+          setRoomName(displayName);
+        }
       }
 
       const rn = sanitizeInput(effectiveRoomName, 30);
       const { isValid: roomOk, error: roomErr } = validateRoomName(rn);
       const { isValid: codeOk, error: codeErr } = validateGameCode(gameCode);
-      if (!roomOk || !codeOk) {
+
+      // For guest hosts, validate hostUsername separately
+      let hostUsernameOk = true;
+      let hostUsernameErr: string | undefined;
+      if (!isAuthenticated) {
+        const hn = sanitizeInput(effectiveHostUsername, 20);
+        const validation = validateUsername(hn);
+        hostUsernameOk = validation.isValid;
+        hostUsernameErr = validation.error;
+        effectiveHostUsername = hn;
+      }
+
+      if (!roomOk || !codeOk || !hostUsernameOk) {
         if (!roomOk) {
           setRoomNameError(true);
           setRoomNameErrorKey(roomErr);
@@ -152,7 +178,11 @@ const MultiplayerLobby: React.FC<MultiplayerLobbyProps> = ({
           setGameCodeError(true);
           setGameCodeErrorKey(codeErr);
         }
-        notifyError(roomErr || codeErr);
+        if (!hostUsernameOk) {
+          setHostUsernameError(true);
+          setHostUsernameErrorKey(hostUsernameErr);
+        }
+        notifyError(roomErr || codeErr || hostUsernameErr);
         return;
       }
     } else {
@@ -226,72 +256,52 @@ const MultiplayerLobby: React.FC<MultiplayerLobbyProps> = ({
           <form onSubmit={handleSubmit} className="flex flex-col space-y-3 flex-1 min-h-0">
             <div className="flex-1 overflow-y-auto space-y-3">
               {mode === 'host' ? (
-                <>
-                  {/* Room Name */}
-                  <div>
-                    <Label htmlFor="roomName" className="text-sm font-bold uppercase text-neo-white mb-1 block">
-                      {t('joinView.roomNamePlaceholder') || 'Room Name'}
-                    </Label>
-                    <Input
-                      id="roomName"
-                      value={roomName}
-                      onChange={(e) => { setRoomName(e.target.value); setRoomNameError(false); }}
-                      placeholder={displayName || t('validation.enterRoomName') || 'Enter room name'}
-                      className={cn("h-11 text-base", roomNameError && 'border-neo-red')}
-                    />
-                  </div>
-
-                  {/* Game Code */}
-                  <div>
-                    <Label htmlFor="gameCode" className="text-sm font-bold uppercase text-neo-white mb-1 block">
-                      {t('hostView.roomCode') || 'Room Code'}
-                    </Label>
-                    <Input
-                      id="gameCode"
-                      value={gameCode}
-                      onChange={(e) => { setGameCode(e.target.value.toUpperCase()); setGameCodeError(false); }}
-                      className="h-11 text-base font-mono"
-                    />
-                  </div>
-
-                  {/* Language */}
+                <div className="space-y-3 text-sm">
+                  <HostModeFields
+                    gameCode={gameCode}
+                    setGameCode={setGameCode}
+                    gameCodeError={gameCodeError}
+                    setGameCodeError={setGameCodeError}
+                    gameCodeErrorKey={gameCodeErrorKey}
+                    roomName={roomName}
+                    setRoomName={setRoomName}
+                    roomNameError={roomNameError}
+                    setRoomNameError={setRoomNameError}
+                    roomNameErrorKey={roomNameErrorKey}
+                    hostUsername={hostUsername}
+                    setHostUsername={setHostUsername}
+                    hostUsernameError={hostUsernameError}
+                    setHostUsernameError={setHostUsernameError}
+                    hostUsernameErrorKey={hostUsernameErrorKey}
+                    generateRoomCode={generateRoomCode}
+                    isAuthenticated={isAuthenticated}
+                    displayName={displayName}
+                    isProfileLoading={isProfileLoading}
+                    t={t}
+                  />
                   <div>
                     <Label className="text-sm font-bold uppercase text-neo-white mb-1 block">
                       {t('joinView.language') || 'Language'}
                     </Label>
                     <LanguageSelector selectedLanguage={roomLanguage} onLanguageChange={setRoomLanguage} />
                   </div>
-                </>
+                </div>
               ) : (
-                <>
-                  {/* Join: Game Code */}
-                  <div>
-                    <Label htmlFor="gameCodeJoin" className="text-sm font-bold uppercase text-neo-white mb-1 block">
-                      {t('joinView.roomCode') || 'Room Code'}
-                    </Label>
-                    <Input
-                      id="gameCodeJoin"
-                      value={gameCode}
-                      onChange={(e) => { setGameCode(e.target.value.toUpperCase()); setGameCodeError(false); }}
-                      placeholder="XXXX"
-                      className={cn("h-11 text-base font-mono", gameCodeError && 'border-neo-red')}
-                    />
-                  </div>
-                </>
-              )}
-
-              {/* Username */}
-              {!isAuthenticated && (
-                <div>
-                  <Label htmlFor="username" className="text-sm font-bold uppercase text-neo-white mb-1 block">
-                    {t('joinView.nickname') || 'Nickname'}
-                  </Label>
-                  <Input
-                    id="username"
-                    value={username}
-                    onChange={(e) => { setUsername(e.target.value); setUsernameError(false); }}
-                    placeholder={t('joinView.nicknamePlaceholder') || 'Enter nickname'}
-                    className={cn("h-11 text-base", usernameError && 'border-neo-red')}
+                <div className="space-y-3 text-sm">
+                  <JoinModeFields
+                    gameCode={gameCode}
+                    setGameCode={setGameCode}
+                    gameCodeError={gameCodeError}
+                    setGameCodeError={setGameCodeError}
+                    gameCodeErrorKey={gameCodeErrorKey}
+                    username={username}
+                    setUsername={setUsername}
+                    usernameError={usernameError}
+                    setUsernameError={setUsernameError}
+                    usernameErrorKey={usernameErrorKey}
+                    isAuthenticated={isAuthenticated}
+                    displayName={displayName}
+                    t={t}
                   />
                 </div>
               )}
@@ -386,53 +396,28 @@ const MultiplayerLobby: React.FC<MultiplayerLobbyProps> = ({
                 <form onSubmit={handleSubmit} className="space-y-4">
                   {mode === 'host' ? (
                     <>
-                      {/* Room Name */}
-                      <div className="space-y-2">
-                        <Label htmlFor="roomName" className="text-sm font-bold uppercase">
-                          {t('joinView.roomNamePlaceholder') || 'Room Name'}
-                        </Label>
-                        <Input
-                          id="roomName"
-                          value={roomName}
-                          onChange={(e) => {
-                            setRoomName(e.target.value);
-                            setRoomNameError(false);
-                          }}
-                          placeholder={displayName || t('validation.enterRoomName') || 'Enter room name'}
-                          autoFocus
-                          className={cn(
-                            getValidationClasses(roomNameValidation.state),
-                            roomNameError && 'border-neo-red'
-                          )}
-                        />
-                        {roomNameError && roomNameErrorKey && (
-                          <p className="text-xs text-neo-red">{t(roomNameErrorKey)}</p>
-                        )}
-                      </div>
-
-                      {/* Game Code */}
-                      <div className="space-y-2">
-                        <Label htmlFor="gameCode" className="text-sm font-bold uppercase">
-                          {t('hostView.roomCode') || 'Room Code'}
-                        </Label>
-                        <Input
-                          id="gameCode"
-                          value={gameCode}
-                          onChange={(e) => {
-                            setGameCode(e.target.value.toUpperCase());
-                            setGameCodeError(false);
-                          }}
-                          placeholder="ABC123"
-                          className={cn(
-                            'font-mono uppercase',
-                            getValidationClasses(gameCodeValidation.state),
-                            gameCodeError && 'border-neo-red'
-                          )}
-                        />
-                        {gameCodeError && gameCodeErrorKey && (
-                          <p className="text-xs text-neo-red">{t(gameCodeErrorKey)}</p>
-                        )}
-                      </div>
+                      <HostModeFields
+                        gameCode={gameCode}
+                        setGameCode={setGameCode}
+                        gameCodeError={gameCodeError}
+                        setGameCodeError={setGameCodeError}
+                        gameCodeErrorKey={gameCodeErrorKey}
+                        roomName={roomName}
+                        setRoomName={setRoomName}
+                        roomNameError={roomNameError}
+                        setRoomNameError={setRoomNameError}
+                        roomNameErrorKey={roomNameErrorKey}
+                        hostUsername={hostUsername}
+                        setHostUsername={setHostUsername}
+                        hostUsernameError={hostUsernameError}
+                        setHostUsernameError={setHostUsernameError}
+                        hostUsernameErrorKey={hostUsernameErrorKey}
+                        generateRoomCode={generateRoomCode}
+                        isAuthenticated={isAuthenticated}
+                        displayName={displayName}
+                        isProfileLoading={isProfileLoading}
+                        t={t}
+                      />
 
                       {/* Language Selector */}
                       <LanguageSelector
@@ -456,53 +441,21 @@ const MultiplayerLobby: React.FC<MultiplayerLobbyProps> = ({
                     </>
                   ) : (
                     <>
-                      {/* Username */}
-                      <div className="space-y-2">
-                        <Label htmlFor="username" className="text-sm font-bold uppercase">
-                          {t('joinView.yourName') || 'Your Name'}
-                        </Label>
-                        <Input
-                          id="username"
-                          value={username}
-                          onChange={(e) => {
-                            setUsername(e.target.value);
-                            setUsernameError(false);
-                          }}
-                          placeholder={t('joinView.enterYourName') || 'Enter your name'}
-                          autoFocus
-                          className={cn(
-                            getValidationClasses(usernameValidation.state),
-                            usernameError && 'border-neo-red'
-                          )}
-                        />
-                        {usernameError && usernameErrorKey && (
-                          <p className="text-xs text-neo-red">{t(usernameErrorKey)}</p>
-                        )}
-                      </div>
-
-                      {/* Game Code */}
-                      <div className="space-y-2">
-                        <Label htmlFor="gameCodeJoin" className="text-sm font-bold uppercase">
-                          {t('hostView.roomCode') || 'Room Code'}
-                        </Label>
-                        <Input
-                          id="gameCodeJoin"
-                          value={gameCode}
-                          onChange={(e) => {
-                            setGameCode(e.target.value.toUpperCase());
-                            setGameCodeError(false);
-                          }}
-                          placeholder={t('validation.enterGameCode') || 'Enter game code'}
-                          className={cn(
-                            'font-mono uppercase',
-                            getValidationClasses(gameCodeValidation.state),
-                            gameCodeError && 'border-neo-red'
-                          )}
-                        />
-                        {gameCodeError && gameCodeErrorKey && (
-                          <p className="text-xs text-neo-red">{t(gameCodeErrorKey)}</p>
-                        )}
-                      </div>
+                      <JoinModeFields
+                        gameCode={gameCode}
+                        setGameCode={setGameCode}
+                        gameCodeError={gameCodeError}
+                        setGameCodeError={setGameCodeError}
+                        gameCodeErrorKey={gameCodeErrorKey}
+                        username={username}
+                        setUsername={setUsername}
+                        usernameError={usernameError}
+                        setUsernameError={setUsernameError}
+                        usernameErrorKey={usernameErrorKey}
+                        isAuthenticated={isAuthenticated}
+                        displayName={displayName}
+                        t={t}
+                      />
 
                       {/* Join Button */}
                       <Button

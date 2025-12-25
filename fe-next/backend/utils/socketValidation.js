@@ -29,10 +29,54 @@ try {
 
 const languageSchema = compiledSchemas?.languageSchema || z.enum(['he', 'en', 'sv', 'ja', 'es', 'fr', 'de']);
 
+// Allowed domains for profile picture URLs (prevent SSRF attacks)
+const ALLOWED_IMAGE_DOMAINS = [
+  'i.imgur.com',
+  'cdn.discordapp.com',
+  'lh3.googleusercontent.com',
+  'avatars.githubusercontent.com',
+  'cdn.cloudflare.com',
+  'res.cloudinary.com',
+  'storage.googleapis.com',
+  'firebasestorage.googleapis.com',
+];
+
 const avatarSchema = compiledSchemas?.avatarSchema || z.object({
-  emoji: z.string().max(10),
+  emoji: z.string()
+    .min(1)
+    .max(10)
+    // Prevent emoji bombs and zero-width joiners
+    .refine((val) => {
+      // Count actual characters (not just bytes)
+      const chars = Array.from(val);
+      // Max 4 actual characters (emoji with modifiers can be multiple code points)
+      if (chars.length > 4) return false;
+      // Check for excessive zero-width joiners
+      const zwjCount = (val.match(/\u200D/g) || []).length;
+      return zwjCount <= 3;
+    }, 'Invalid emoji format'),
   color: z.string().regex(/^#[0-9A-Fa-f]{6}$/),
-  profilePictureUrl: z.string().url().nullable().optional(),
+  avatarImage: z.string()
+    .max(100)
+    .regex(/^[a-z0-9_\-\/]+$/i, 'Avatar image must contain only alphanumeric characters, hyphens, underscores, and slashes')
+    .optional()
+    .nullable(),
+  profilePictureUrl: z.string()
+    .url()
+    .nullable()
+    .optional()
+    .refine((url) => {
+      if (!url) return true; // null/undefined is allowed
+      try {
+        const parsed = new URL(url);
+        // Only allow HTTPS (prevent data:, javascript:, file: schemes)
+        if (parsed.protocol !== 'https:') return false;
+        // Check against whitelist
+        return ALLOWED_IMAGE_DOMAINS.some(domain => parsed.hostname === domain || parsed.hostname.endsWith('.' + domain));
+      } catch {
+        return false;
+      }
+    }, 'Profile picture URL must be from an allowed domain (HTTPS only)'),
 }).optional();
 
 const gameCodeSchema = compiledSchemas?.gameCodeSchema || z.string()
@@ -44,8 +88,12 @@ const gameCodeSchema = compiledSchemas?.gameCodeSchema || z.string()
 const usernameSchema = compiledSchemas?.usernameSchema || z.string()
   .min(1, 'Username is required')
   .max(30, 'Username must be at most 30 characters')
-  .regex(/^[a-zA-Z0-9_\-\u0590-\u05FF\u3040-\u309F\u30A0-\u30FF\u4E00-\u9FFF\s]+$/)
-  .transform(s => s.trim());
+  // Allow spaces for multi-word names (e.g., "Sneaky Pickle", "מלפפון חמקמק")
+  // Matches frontend NAME_VALID_PATTERN for consistency
+  .regex(/^[a-zA-Z0-9\s_\-\u0590-\u05FF\u3040-\u309F\u30A0-\u30FF\u4E00-\u9FFF]+$/, 'Username can only contain letters, numbers, spaces, underscores, and hyphens')
+  .transform(s => s.trim())
+  // Additional safety: prevent control characters and zero-width characters
+  .refine((val) => !/[\u0000-\u001F\u007F-\u009F\u200B-\u200D\uFEFF]/.test(val), 'Username contains invalid characters');
 
 const wordSchema = compiledSchemas?.wordSchema || z.string()
   .min(1, 'Word is required')
@@ -62,28 +110,75 @@ const difficultySchema = compiledSchemas?.difficultySchema || z.enum(['EASY', 'M
 const botDifficultySchema = compiledSchemas?.botDifficultySchema || z.enum(['easy', 'medium', 'hard']);
 const presenceStatusSchema = compiledSchemas?.presenceStatusSchema || z.enum(['active', 'idle', 'afk']);
 
+// Room name schema - similar restrictions as username to prevent XSS
+// Allow spaces for multi-word room names (e.g., "Fun Room", "Disco Potato Room")
+const roomNameSchema = z.string()
+  .max(50, 'Room name must be at most 50 characters')
+  .regex(/^[a-zA-Z0-9\s_\-\u0590-\u05FF\u3040-\u309F\u30A0-\u30FF\u4E00-\u9FFF]+$/, 'Room name can only contain letters, numbers, spaces, underscores, and hyphens')
+  .transform(s => s.trim())
+  .refine((val) => !/[\u0000-\u001F\u007F-\u009F\u200B-\u200D\uFEFF]/.test(val), 'Room name contains invalid characters')
+  .optional();
+
+// Player ID schema - validate UUID v4 format
+const playerIdSchema = z.string()
+  .regex(/^[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$/i, 'Player ID must be a valid UUID v4')
+  .optional()
+  .nullable();
+
+// Guest token hash schema - validate SHA-256 hex format (64 characters)
+const guestTokenHashSchema = z.string()
+  .regex(/^[a-f0-9]{64}$/i, 'Guest token hash must be a valid SHA-256 hash')
+  .optional()
+  .nullable();
+
 // Event schemas - use compiled or inline
 const createGameSchema = compiledSchemas?.createGameSchema || z.object({
   gameCode: gameCodeSchema,
-  roomName: z.string().max(50).optional(),
+  roomName: roomNameSchema,
   language: languageSchema.optional().default('en'),
   hostUsername: usernameSchema.optional(),
-  playerId: z.string().max(64).optional().nullable(),
+  playerId: playerIdSchema,
   avatar: avatarSchema,
   authUserId: z.string().uuid().optional().nullable(),
-  guestTokenHash: z.string().max(128).optional().nullable(),
+  guestTokenHash: guestTokenHashSchema,
   isRanked: z.boolean().optional().default(false),
-  profilePictureUrl: z.string().url().optional().nullable(),
+  profilePictureUrl: z.string()
+    .url()
+    .optional()
+    .nullable()
+    .refine((url) => {
+      if (!url) return true;
+      try {
+        const parsed = new URL(url);
+        if (parsed.protocol !== 'https:') return false;
+        return ALLOWED_IMAGE_DOMAINS.some(domain => parsed.hostname === domain || parsed.hostname.endsWith('.' + domain));
+      } catch {
+        return false;
+      }
+    }, 'Profile picture URL must be from an allowed domain (HTTPS only)'),
 });
 
 const joinGameSchema = compiledSchemas?.joinGameSchema || z.object({
   gameCode: gameCodeSchema,
   username: usernameSchema,
-  playerId: z.string().max(64).optional().nullable(),
+  playerId: playerIdSchema,
   avatar: avatarSchema,
   authUserId: z.string().uuid().optional().nullable(),
-  guestTokenHash: z.string().max(128).optional().nullable(),
-  profilePictureUrl: z.string().url().optional().nullable(),
+  guestTokenHash: guestTokenHashSchema,
+  profilePictureUrl: z.string()
+    .url()
+    .optional()
+    .nullable()
+    .refine((url) => {
+      if (!url) return true;
+      try {
+        const parsed = new URL(url);
+        if (parsed.protocol !== 'https:') return false;
+        return ALLOWED_IMAGE_DOMAINS.some(domain => parsed.hostname === domain || parsed.hostname.endsWith('.' + domain));
+      } catch {
+        return false;
+      }
+    }, 'Profile picture URL must be from an allowed domain (HTTPS only)'),
 });
 
 const leaveRoomSchema = compiledSchemas?.leaveRoomSchema || z.object({
@@ -207,7 +302,7 @@ const reconnectSchema = compiledSchemas?.reconnectSchema || z.object({
   gameCode: gameCodeSchema,
   username: usernameSchema,
   authUserId: z.string().uuid().optional().nullable(),
-  guestTokenHash: z.string().max(128).optional().nullable(),
+  guestTokenHash: guestTokenHashSchema,
 });
 
 const updateGameSettingsSchema = compiledSchemas?.updateGameSettingsSchema || z.object({
@@ -222,6 +317,11 @@ const updateGameSettingsSchema = compiledSchemas?.updateGameSettingsSchema || z.
 
 const broadcastShufflingGridSchema = compiledSchemas?.broadcastShufflingGridSchema || z.object({
   gridState: z.unknown(),
+});
+
+const generateScoreCardSchema = compiledSchemas?.generateScoreCardSchema || z.object({
+  gameCode: gameCodeSchema.optional(),
+  username: usernameSchema.optional(),
 });
 
 // ==================== Schema Map ====================
@@ -251,6 +351,7 @@ const eventSchemas = compiledSchemas?.eventSchemas || {
   reconnect: reconnectSchema,
   updateGameSettings: updateGameSettingsSchema,
   broadcastShufflingGrid: broadcastShufflingGridSchema,
+  'scorecard:generate': generateScoreCardSchema,
 };
 
 // ==================== Validation Helpers ====================
@@ -393,6 +494,7 @@ module.exports = {
   reconnectSchema,
   updateGameSettingsSchema,
   broadcastShufflingGridSchema,
+  generateScoreCardSchema,
 
   // Base schemas
   languageSchema,
@@ -404,6 +506,12 @@ module.exports = {
   difficultySchema,
   botDifficultySchema,
   presenceStatusSchema,
+  roomNameSchema,
+  playerIdSchema,
+  guestTokenHashSchema,
+
+  // Constants
+  ALLOWED_IMAGE_DOMAINS,
 
   // Schema map
   eventSchemas,

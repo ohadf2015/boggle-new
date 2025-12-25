@@ -159,8 +159,9 @@ const MobileLeaderboard = memo<MobileLeaderboardProps>(({
               <Avatar
                 profilePictureUrl={player.avatar?.profilePictureUrl ?? undefined}
                 avatarEmoji={player.avatar?.emoji}
+                avatarImage={player.avatar?.avatarImage}
                 avatarColor={player.avatar?.color}
-                size="sm"
+                size="2xl"
               />
 
               {/* Player info */}

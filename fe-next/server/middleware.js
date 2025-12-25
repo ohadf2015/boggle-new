@@ -97,7 +97,7 @@ function configureMiddleware(app, { corsOrigin, isDev }) {
   // IP Geolocation
   app.use(geolocationMiddleware({
     skipPaths: ['/health', '/metrics', '/_next', '/favicon.ico'],
-    pathFilter: ['/', '/api/geolocation']
+    pathFilter: ['/', '/api/geolocation', '/api/analytics']
   }));
 }
 

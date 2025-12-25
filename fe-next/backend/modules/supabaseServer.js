@@ -154,9 +154,9 @@ async function updatePlayerStats(playerId, gameStats) {
     updates.casual_games = (profile.casual_games || 0) + 1;
   }
 
-  // Count wins for ALL games (both casual and ranked)
+  // Count wins - only for ranked games
   // Only count as win if placement === 1 AND more than 1 player (no solo wins)
-  if (gameStats.placement === 1 && (gameStats.totalPlayers || 0) > 1) {
+  if (gameStats.placement === 1 && (gameStats.totalPlayers || 0) > 1 && gameStats.isRanked) {
     updates.ranked_wins = (profile.ranked_wins || 0) + 1;
   }
 

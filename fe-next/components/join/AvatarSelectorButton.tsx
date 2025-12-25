@@ -4,24 +4,26 @@ import React, { useState } from 'react';
 import Avatar from '@/components/Avatar';
 import EmojiAvatarPicker from '@/components/EmojiAvatarPicker';
 import { getAvatarById, type AvatarConfig } from '@/utils/avatarConfig';
-import { Button } from '@/components/ui/button';
+import { FaPencilAlt } from 'react-icons/fa';
 
 export interface AvatarSelectorButtonProps {
   selectedAvatarId?: string;
   onAvatarSelect: (avatarConfig: AvatarConfig) => void;
   t: (key: string) => string;
   className?: string;
+  size?: 'sm' | 'md' | 'lg';
 }
 
 /**
- * Compact Avatar Selector Button - Shows current avatar inline
- * Used in both Join and Host mode fields
+ * Circular Avatar Selector Button
+ * Displays current avatar with edit indicator overlay
  */
 const AvatarSelectorButton: React.FC<AvatarSelectorButtonProps> = ({
   selectedAvatarId,
   onAvatarSelect,
   t,
-  className = ''
+  className = '',
+  size = 'md'
 }) => {
   const [isPickerOpen, setIsPickerOpen] = useState(false);
 
@@ -35,37 +37,64 @@ const AvatarSelectorButton: React.FC<AvatarSelectorButtonProps> = ({
     setIsPickerOpen(false);
   };
 
+  const sizeClasses = {
+    sm: 'w-10 h-10',
+    md: 'w-12 h-12',
+    lg: 'w-16 h-16'
+  };
+
+  const iconSizeClasses = {
+    sm: 'w-4 h-4 text-[8px]',
+    md: 'w-5 h-5 text-[10px]',
+    lg: 'w-6 h-6 text-xs'
+  };
+
   return (
     <>
-      <Button
+      <button
         type="button"
-        variant="outline"
         onClick={() => setIsPickerOpen(true)}
         aria-label={t('joinView.selectAvatar') || 'Select avatar'}
-        className={`h-10 px-3 bg-slate-100 dark:bg-slate-700/50 border-slate-200 dark:border-slate-600 hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors flex items-center gap-2 ${className}`}
+        className={`
+          relative group
+          ${sizeClasses[size]}
+          rounded-full
+          border-3 border-neo-black
+          shadow-hard-sm
+          transition-all duration-100
+          hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-hard
+          active:translate-x-[2px] active:translate-y-[2px] active:shadow-none
+          focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan focus-visible:ring-offset-2
+          overflow-hidden
+          ${className}
+        `}
       >
         {selectedAvatar ? (
-          <>
-            <Avatar
-              avatarImage={selectedAvatar.id}
-              size="sm"
-              className="flex-shrink-0"
-            />
-            <span className="font-medium text-sm text-slate-900 dark:text-white truncate max-w-[80px]">
-              {selectedAvatar.name}
-            </span>
-          </>
+          <Avatar
+            avatarImage={selectedAvatar.id}
+            size={size === 'lg' ? 'xl' : size === 'md' ? 'lg' : 'md'}
+            className="w-full h-full"
+          />
         ) : (
-          <>
-            <div className="w-6 h-6 rounded-full bg-slate-300 dark:bg-slate-600 flex items-center justify-center flex-shrink-0">
-              <span className="text-xs">?</span>
-            </div>
-            <span className="font-medium text-sm text-slate-600 dark:text-slate-400">
-              {t('joinView.selectAvatar') || 'Avatar'}
-            </span>
-          </>
+          <div className="w-full h-full bg-slate-200 dark:bg-slate-600 flex items-center justify-center">
+            <span className="text-xl">?</span>
+          </div>
         )}
-      </Button>
+
+        {/* Edit indicator overlay */}
+        <div className={`
+          absolute bottom-0 right-0
+          ${iconSizeClasses[size]}
+          bg-neo-yellow border-2 border-neo-black
+          rounded-full
+          flex items-center justify-center
+          shadow-hard-sm
+          group-hover:scale-110
+          transition-transform
+        `}>
+          <FaPencilAlt className="w-2 h-2" />
+        </div>
+      </button>
 
       <EmojiAvatarPicker
         isOpen={isPickerOpen}

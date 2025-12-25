@@ -915,8 +915,9 @@ const InGameScreen = memo<InGameScreenProps>(({
                   <Avatar
                     profilePictureUrl={player.avatar?.profilePictureUrl ?? undefined}
                     avatarEmoji={player.avatar?.emoji}
+                    avatarImage={player.avatar?.avatarImage}
                     avatarColor={player.avatar?.color}
-                    size="sm"
+                    size="xl"
                   />
                   {/* Player info */}
                   <div className="flex-1 min-w-0">

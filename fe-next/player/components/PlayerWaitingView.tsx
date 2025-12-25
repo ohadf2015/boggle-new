@@ -92,15 +92,15 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
                 </h2>
               </div>
               {gameLanguage && (
-                <Badge className="text-base sm:text-lg px-3 py-1 bg-neo-cream text-neo-black border-3 border-neo-black shadow-hard-sm font-bold">
+                <Badge className="text-base sm:text-lg px-3 py-1 bg-neo-purple text-white border-3 border-neo-black shadow-hard-sm font-bold" dir="auto">
                   {gameLanguage === 'he' ? '🇮🇱 עברית' : gameLanguage === 'sv' ? '🇸🇪 Svenska' : gameLanguage === 'ja' ? '🇯🇵 日本語' : '🇺🇸 English'}
                 </Badge>
               )}
             </div>
           </div>
 
-          {/* Share Buttons */}
-          <div className="flex flex-wrap gap-2 justify-center">
+          {/* Share Buttons + Exit */}
+          <div className="flex flex-wrap gap-2 justify-center items-center">
             <ShareButton
               variant="link"
               onClick={handleCopyLink}
@@ -122,6 +122,13 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
             >
               {t('hostView.qrCode')}
             </ShareButton>
+            <Button
+              onClick={onExitRoom}
+              className="bg-neo-red text-neo-white font-bold border-3 border-neo-black shadow-hard-sm hover:shadow-hard hover:translate-x-[-2px] hover:translate-y-[-2px] active:shadow-none active:translate-x-[2px] active:translate-y-[2px] transition-all duration-100 flex items-center gap-2"
+            >
+              <FaDoorOpen />
+              {t('playerView.exitRoom') || 'Exit Room'}
+            </Button>
           </div>
         </div>
       </Card>
@@ -225,8 +232,9 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
                         <Avatar
                           profilePictureUrl={avatar?.profilePictureUrl ?? undefined}
                           avatarEmoji={avatar?.emoji}
+                          avatarImage={avatar?.avatarImage}
                           avatarColor={avatar?.color}
-                          size="sm"
+                          size="lg"
                         />
                         <span className="font-medium text-neo-cream/90">
                           <SlotMachineText text={playerUsername} />

@@ -324,7 +324,7 @@ function getWordLengthEmoji(length: number): string {
  * Generate a shareable result string (Wordle-style)
  * Shows word length distribution as a visual bar chart
  */
-export function generateShareableResult(result: DailyChallengeResult, siteUrl = 'lexiclash.live'): string {
+export function generateShareableResult(result: DailyChallengeResult, siteUrl?: string): string {
   // Build word length distribution display
   // Group by length and show as horizontal bars
   const sortedLengths = Object.entries(result.wordsByLength)
@@ -343,6 +343,16 @@ export function generateShareableResult(result: DailyChallengeResult, siteUrl = 
   // Format streak if > 1
   const streakText = result.streakDays > 1 ? `🔥 ${result.streakDays} day streak!\n` : '';
 
+  // Build URL with current origin and language
+  let dailyUrl = 'lexiclash.live/daily';
+  if (typeof window !== 'undefined') {
+    const origin = window.location.origin;
+    const language = result.language;
+    dailyUrl = `${origin}/${language}/daily`;
+  } else if (siteUrl) {
+    dailyUrl = `${siteUrl}/${result.language}/daily`;
+  }
+
   // Build the shareable text
   return `🎯 LexiClash Daily #${result.puzzleNumber}
 
@@ -350,7 +360,7 @@ ${wordBars}
 
 📊 ${result.score} pts | ${result.wordCount} words
 ${streakText}
-${siteUrl}/daily`;
+${dailyUrl}`;
 }
 
 /**

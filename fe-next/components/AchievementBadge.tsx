@@ -25,6 +25,7 @@ interface AchievementBadgeProps {
   index?: number;
   count?: number;
   showTier?: boolean;
+  locked?: boolean; // If true, shows achievement as locked/not yet earned
 }
 
 /**
@@ -34,7 +35,7 @@ interface AchievementBadgeProps {
  * Memoized to prevent unnecessary re-renders in lists
  * Note: Achievements always use the user's UI language preference, not game language
  */
-export const AchievementBadge = memo<AchievementBadgeProps>(({ achievement, index = 0, count = 0, showTier = false }) => {
+export const AchievementBadge = memo<AchievementBadgeProps>(({ achievement, index = 0, count = 0, showTier = false, locked = false }) => {
   const [open, setOpen] = useState(false);
   const { t } = useLanguage();
   const isTouchDevice = useRef(false);
@@ -105,6 +106,7 @@ export const AchievementBadge = memo<AchievementBadgeProps>(({ achievement, inde
             whileHover={{ scale: 1.05, rotate: 2, y: -2 }}
             whileTap={{ scale: 0.95 }}
             className="inline-block relative"
+            aria-label={`${localizedAchievement.name}: ${localizedAchievement.description}${locked ? ' (Locked)' : ''}`}
           >
             <Badge
               variant="cyan"
@@ -115,17 +117,28 @@ export const AchievementBadge = memo<AchievementBadgeProps>(({ achievement, inde
                         active:translate-x-[1px] active:translate-y-[1px] active:shadow-none
                         transition-all duration-100 cursor-pointer touch-manipulation"
               style={{
-                backgroundColor: tierColors?.bg || 'var(--neo-cyan)',
-                borderColor: tierColors?.border || 'rgb(var(--neo-black))',
-                color: tierColors?.text || 'rgb(var(--neo-black))',
-                boxShadow: tierColors?.glow ? `0 0 8px ${tierColors.glow}` : undefined,
+                backgroundColor: locked ? '#808080' : (tierColors?.bg || 'var(--neo-cyan)'),
+                borderColor: locked ? '#404040' : (tierColors?.border || 'rgb(var(--neo-black))'),
+                color: locked ? '#e0e0e0' : (tierColors?.text || 'rgb(var(--neo-black))'),
+                boxShadow: locked ? 'none' : (tierColors?.glow ? `0 0 8px ${tierColors.glow}` : undefined),
+                opacity: locked ? 0.6 : 1,
+                filter: locked ? 'grayscale(100%)' : undefined,
               }}
             >
               <span className="mr-1">{localizedAchievement.icon}</span>
               {localizedAchievement.name}
             </Badge>
-            {/* Tier indicator badge */}
-            {showTier && tier && (
+            {/* Lock icon for locked achievements */}
+            {locked && (
+              <span
+                className="absolute -top-1 -right-1 text-xs w-5 h-5 flex items-center justify-center rounded-full border-2 border-gray-600 bg-gray-700 shadow-sm"
+                title={t('profile.locked') || 'Locked'}
+              >
+                🔒
+              </span>
+            )}
+            {/* Tier indicator badge (only for earned achievements) */}
+            {showTier && tier && !locked && (
               <span
                 className="absolute -top-1 -right-1 text-xs w-5 h-5 flex items-center justify-center rounded-full border-2 border-neo-black shadow-sm"
                 style={{ backgroundColor: tierColors?.bg }}
@@ -143,11 +156,20 @@ export const AchievementBadge = memo<AchievementBadgeProps>(({ achievement, inde
           onPointerDownOutside={() => setOpen(false)}
         >
           <div>
+            {/* Show lock indicator for locked achievements */}
+            {locked && (
+              <div className="flex items-center gap-1 mb-1">
+                <span className="text-sm">🔒</span>
+                <span className="text-[10px] uppercase font-bold text-neo-cyan tracking-wide">
+                  {t('profile.locked') || 'Locked'}
+                </span>
+              </div>
+            )}
             <p className="font-black uppercase text-neo-white tracking-wide">{localizedAchievement.name}</p>
             <p className="text-xs font-bold text-neo-cyan mt-1">{localizedAchievement.description}</p>
 
-            {/* Tier progress section */}
-            {showTier && count > 0 && (
+            {/* Tier progress section (only for earned achievements) */}
+            {showTier && count > 0 && !locked && (
               <div className="mt-2 pt-2 border-t border-neo-cyan/30">
                 <div className="flex items-center gap-2 text-xs">
                   <span className="text-neo-lime font-bold">
@@ -180,6 +202,13 @@ export const AchievementBadge = memo<AchievementBadgeProps>(({ achievement, inde
                   </p>
                 )}
               </div>
+            )}
+
+            {/* Hint for locked achievements */}
+            {locked && (
+              <p className="text-[10px] text-neo-white/60 mt-2 italic">
+                {t('profile.earnThisAchievement') || 'Play games to unlock this achievement!'}
+              </p>
             )}
           </div>
         </TooltipContent>

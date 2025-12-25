@@ -293,6 +293,7 @@ const translations = {
     validation: {
       usernameRequired: 'Username is required! Please fill in the field',
       roomNameRequired: 'Room name is required! Please fill in the field',
+      hostUsernameRequired: 'Your player name is required! Please fill in the field',
       enterNameToJoin: 'Enter a name to join',
       enterRoomName: 'Name to identify your room',
       enterGameCode: 'Enter the game code shared by the host',
@@ -326,6 +327,14 @@ const translations = {
       joinDesc: 'Enter code to join existing game',
       hostDesc: 'Start a new game as host',
       roomNamePlaceholder: 'Enter room name',
+      roomNameLabel: 'Room Name',
+      roomNameHelper: 'Name shown to other players in the lobby',
+      roomNameHelperOptional: 'Optional - A random name will be generated if left empty',
+      optional: 'optional',
+      roomNameExample: 'e.g., Friday Game Night',
+      hostPlayerName: 'Your Player Name',
+      hostPlayerNamePlaceholder: 'Enter your player name',
+      hostPlayerNameHelper: 'Your name displayed in the game',
       playerNamePlaceholder: 'Enter your name',
       yourName: 'Your Name',
       enterYourName: 'Enter your name',
@@ -389,6 +398,10 @@ const translations = {
         'Quirky Quokka', 'Jolly Jellyfish', 'Rowdy Raccoon', 'Fizzy Fox', 'Happy Hippo',
         'Kooky Koala',
       ],
+      chooseAvatar: 'Choose Your Avatar',
+      selectAvatar: 'Select an avatar',
+      tapToChange: 'Tap to change',
+      tapToSelect: 'Tap to choose',
     },
     hostView: {
       waitingForPlayers: 'Waiting for players...',
@@ -397,6 +410,13 @@ const translations = {
       roomCode: 'Room Code',
       playersJoined: 'Players Joined',
       gameSettings: 'Game Settings',
+      quickSetup: 'Quick Setup',
+      presetQuick: 'Quick',
+      presetQuickDesc: '2 min fast game',
+      presetParty: 'Party',
+      presetPartyDesc: '3 min fun for groups',
+      presetChallenge: 'Challenge',
+      presetChallengeDesc: '4 min competitive',
       difficulty: 'Difficulty',
       timer: 'Timer',
       roundDuration: 'Round Duration',
@@ -651,6 +671,40 @@ const translations = {
       time: 'Time',
       viewResults: 'View Results',
     },
+    scoreCard: {
+      title: 'Your Score Card',
+      rank: 'Rank',
+      score: 'Score',
+      wordsFound: 'Words Found',
+      accuracy: 'Accuracy',
+      longestWord: 'Longest Word',
+      maxCombo: 'Max Combo',
+      uniqueWords: 'Unique Words',
+      topWords: 'Top Words',
+      achievements: 'Achievements',
+      shareResults: 'Share Results',
+      downloadImage: 'Download Image',
+      errorGenerating: 'Failed to generate score card',
+      loading: 'Generating score card...',
+      stats: {
+        totalWords: 'Total Words',
+        validWords: 'Valid Words',
+        accuracy: 'Accuracy',
+        longestWord: 'Longest Word',
+        maxCombo: 'Max Combo',
+        comboBonus: 'Combo Bonus',
+        fireBonus: 'Fire Bonus',
+        uniqueWords: 'Unique Words',
+        avgWordLength: 'Avg Word Length',
+      },
+      rank: {
+        position: '#{rank} of {total}',
+        percentile: 'Top {percentile}%',
+        winner: 'Winner!',
+        pointsFromWinner: '{points} from winner',
+        pointsFromNext: '{points} from next',
+      },
+    },
     playerTitles: {
       champion: { name: 'Champion', icon: '👑', description: 'Winner of the game' },
       perfectionist: { name: 'The Perfectionist', icon: '✨', description: 'Highest accuracy - all valid words' },
@@ -782,6 +836,79 @@ const translations = {
         showTutorial: 'Show Me How',
         skipTutorial: 'I\'ll Figure It Out',
         dontShowAgain: 'Don\'t show this again',
+      },
+    },
+    onboarding: {
+      welcome: {
+        title: 'Welcome to LexiClash!',
+        subtitle: 'Learn the basics in 30 seconds',
+        demoInstruction: 'Swipe to form the word:',
+        demoWord: 'CAT',
+        demoSuccess: 'Perfect! You got it! 🎉',
+        demoHint: 'Swipe adjacent letters (including diagonals)',
+        clickNext: 'Click Next to continue',
+      },
+      combo: {
+        title: 'Combo Power! 🔥',
+        subtitle: 'Speed = Bigger Scores',
+        explanation: 'Find words quickly in a row to build combos. Each combo level multiplies your score!',
+        example1: 'Word 1: CAT → 3 points',
+        example2: 'Word 2 (quick!): DOG → 6 points (2x combo)',
+        example3: 'Word 3 (faster!): BIRD → 12 points (3x combo)',
+        tip: 'Keep the streak going for MASSIVE scores!',
+      },
+      specialRounds: {
+        title: 'Special Rounds',
+        subtitle: 'Chaos meets opportunity!',
+        earthquake: {
+          title: 'Earthquake! 🌋',
+          description: 'Letters shake and scramble! Find words fast before time runs out.',
+          tip: 'New board = new opportunities!',
+        },
+        fireRound: {
+          title: 'Fire Round! 💃',
+          description: 'Dance floor mode! All words count for 2x points. Letters glow like a party!',
+          tip: 'Go wild, every word is DOUBLE!',
+        },
+      },
+      avatar: {
+        title: 'Pick Your Character',
+        subtitle: 'Who will you be today?',
+        selected: 'You chose:',
+      },
+      name: {
+        title: 'What\'s Your Name?',
+        subtitle: 'Let everyone know who\'s crushing it!',
+        placeholder: 'Your awesome name...',
+        errorTooShort: 'At least 2 letters, champ!',
+        errorTooLong: 'Max 20 characters',
+        errorInvalid: 'Letters and spaces only',
+        characterCount: 'characters',
+        proTip: 'Pick a name that strikes fear into your opponents. Or makes them laugh. Both work!',
+      },
+      mode: {
+        title: 'Choose Your Adventure',
+        subtitle: 'How do you want to play?',
+        singlePlayer: {
+          title: 'Single Player',
+          description: 'Practice solo, challenge bots, beat high scores',
+        },
+        multiPlayer: {
+          title: 'Multiplayer',
+          description: 'Battle friends in real-time word wars',
+        },
+        dailyPlayer: {
+          title: 'Daily Challenge',
+          description: 'Same puzzle worldwide, share your results',
+        },
+        encouragement: 'Great choice! Click "Let\'s Play" to start your word adventure!',
+      },
+      navigation: {
+        skip: 'Skip',
+        back: 'Back',
+        next: 'Next',
+        letsPlay: 'Let\'s Play! 🚀',
+        title: 'Player Welcome',
       },
     },
     achievements: {
@@ -1288,7 +1415,76 @@ const translations = {
       chooseColor: 'Choose Color',
       backToGame: 'Back to Game',
       backToRoom: 'Back to Room',
-      backToLobby: 'Back to Lobby'
+      backToLobby: 'Back to Lobby',
+      locked: 'Locked',
+      earnThisAchievement: 'Play games to unlock this achievement!'
+    },
+    onboarding: {
+      welcome: {
+        title: 'Welcome to LexiClash!',
+        subtitle: 'Find words by connecting letters',
+        demoInstruction: 'Try it! Find the word:',
+        demoWord: 'CAT',
+        demoHint: 'Swipe or tap adjacent letters',
+        demoSuccess: 'Perfect! You got it!'
+      },
+      combo: {
+        title: 'Combo System',
+        subtitle: 'Find words quickly to build combos',
+        explanation: 'Each word you find increases your combo multiplier. The faster you find words, the higher your score!',
+        tip: 'Keep finding words to maintain your combo streak!',
+        example1: 'First word',
+        example2: '2x combo!',
+        example3: '3x combo!'
+      },
+      specialRounds: {
+        title: 'Special Rounds',
+        earthquake: {
+          title: 'Earthquake',
+          description: 'Letters shake and scramble - adapt fast!',
+          tip: 'Stay calm and look for new patterns'
+        },
+        fireRound: {
+          title: 'Fire Round',
+          description: 'All scores doubled - go wild!',
+          tip: 'This is your chance to rack up points'
+        }
+      },
+      avatar: {
+        title: 'Choose Your Avatar',
+        subtitle: 'Pick one that represents you',
+        selected: 'Selected'
+      },
+      name: {
+        title: 'What\'s Your Name?',
+        subtitle: 'Enter your display name',
+        placeholder: 'Enter your name',
+        errorInvalid: 'Only letters, numbers, and spaces allowed',
+        errorTooShort: 'Name must be at least 2 characters',
+        errorTooLong: 'Name can\'t be more than 20 characters'
+      },
+      mode: {
+        title: 'Choose Your Mode',
+        subtitle: 'How do you want to play?',
+        singlePlayer: {
+          title: 'Single Player',
+          description: 'Practice or challenge yourself with AI opponents'
+        },
+        multiPlayer: {
+          title: 'Multiplayer',
+          description: 'Compete with friends in real-time battles'
+        },
+        dailyPlayer: {
+          title: 'Daily Challenge',
+          description: 'Same puzzle for everyone worldwide each day'
+        }
+      },
+      navigation: {
+        skip: 'Skip',
+        back: 'Back',
+        next: 'Next',
+        letsPlay: 'Let\'s Play!'
+      }
     },
     leaderboard: {
       title: 'Leaderboard',
@@ -1882,6 +2078,7 @@ const translations = {
     },
     validation: {
       usernameRequired: 'שם משתמש נדרש! אנא מלא את השדה',
+      hostUsernameRequired: 'שם שחקן נדרש כדי להתחיל משחק',
       roomNameRequired: 'שם חדר נדרש! אנא מלא את השדה',
       enterNameToJoin: 'הזן שם כדי להצטרף',
       enterRoomName: 'שם לזיהוי החדר שלך',
@@ -1916,6 +2113,14 @@ const translations = {
       joinDesc: 'הכנס קוד להצטרפות למשחק קיים',
       hostDesc: 'התחל משחק חדש כמארח',
       roomNamePlaceholder: 'הכנס שם חדר',
+      roomNameLabel: 'שם החדר',
+      roomNameHelper: 'השם שיוצג לשחקנים אחרים בלובי',
+      roomNameHelperOptional: 'אופציונלי - שם אקראי ייווצר אם יישאר ריק',
+      optional: 'אופציונלי',
+      roomNameExample: 'לדוגמה, משחק יום שישי',
+      hostPlayerName: 'שם השחקן שלך',
+      hostPlayerNamePlaceholder: 'הכנס את שם השחקן שלך',
+      hostPlayerNameHelper: 'השם שלך שיוצג במשחק',
       playerNamePlaceholder: 'הכנס את שמך',
       yourName: 'השם שלך',
       enterYourName: 'הכנס את השם שלך',
@@ -1979,6 +2184,10 @@ const translations = {
         'דרקון מסוחרר', 'פלמינגו פאנקי', 'דוב קופצני', 'זברה זיפי', 'עצלן חצוף',
         'קואלה משונה', 'מדוזה עליזה', 'רקון רועש', 'שועל פיזי', 'היפו שמח',
       ],
+      chooseAvatar: 'בחר את האווטאר שלך',
+      selectAvatar: 'בחר אווטאר',
+      tapToChange: 'לחץ לשינוי',
+      tapToSelect: 'לחץ לבחירה',
     },
     hostView: {
       waitingForPlayers: 'ממתין לשחקנים...',
@@ -1987,6 +2196,13 @@ const translations = {
       roomCode: 'קוד חדר',
       playersJoined: 'שחקנים הצטרפו',
       gameSettings: 'הגדרות משחק',
+      quickSetup: 'הגדרה מהירה',
+      presetQuick: 'מהיר',
+      presetQuickDesc: 'משחק 2 דקות',
+      presetParty: 'מסיבה',
+      presetPartyDesc: '3 דקות לקבוצות',
+      presetChallenge: 'אתגר',
+      presetChallengeDesc: '4 דקות תחרותי',
       difficulty: 'רמת קושי',
       timer: 'טיימר',
       roundDuration: 'משך סיבוב',
@@ -2241,6 +2457,40 @@ const translations = {
       time: 'זמן',
       viewResults: 'צפה בתוצאות',
     },
+    scoreCard: {
+      title: 'כרטיס הניקוד שלך',
+      rank: 'דירוג',
+      score: 'ניקוד',
+      wordsFound: 'מילים שנמצאו',
+      accuracy: 'דיוק',
+      longestWord: 'המילה הארוכה ביותר',
+      maxCombo: 'קומבו מקסימלי',
+      uniqueWords: 'מילים ייחודיות',
+      topWords: 'המילים המובילות',
+      achievements: 'הישגים',
+      shareResults: 'שתף תוצאות',
+      downloadImage: 'הורד תמונה',
+      errorGenerating: 'נכשל ביצירת כרטיס ניקוד',
+      loading: 'יוצר כרטיס ניקוד...',
+      stats: {
+        totalWords: 'סה״כ מילים',
+        validWords: 'מילים תקפות',
+        accuracy: 'דיוק',
+        longestWord: 'המילה הארוכה ביותר',
+        maxCombo: 'קומבו מקסימלי',
+        comboBonus: 'בונוס קומבו',
+        fireBonus: 'בונוס אש',
+        uniqueWords: 'מילים ייחודיות',
+        avgWordLength: 'אורך מילה ממוצע',
+      },
+      rank: {
+        position: '#{rank} מתוך {total}',
+        percentile: '{percentile}% עליון',
+        winner: '!מנצח',
+        pointsFromWinner: '{points} מהמנצח',
+        pointsFromNext: '{points} מהבא',
+      },
+    },
     playerTitles: {
       champion: { name: 'אלוף', icon: '👑', description: 'מנצח המשחק' },
       perfectionist: { name: 'הפרפקציוניסט', icon: '✨', description: 'דיוק מושלם - כל המילים תקינות' },
@@ -2367,6 +2617,79 @@ const translations = {
         showTutorial: 'הראה לי איך',
         skipTutorial: 'אני אסתדר',
         dontShowAgain: 'אל תראה שוב',
+      },
+    },
+    onboarding: {
+      welcome: {
+        title: 'ברוכים הבאים ללקסיקלאש!',
+        subtitle: 'למדו את היסודות ב-30 שניות',
+        demoInstruction: 'החליקו ליצירת המילה:',
+        demoWord: 'CAT',
+        demoSuccess: 'מושלם! הבנתם! 🎉',
+        demoHint: 'החליקו על אותיות סמוכות (כולל באלכסון)',
+        clickNext: 'לחצו "הבא" להמשך',
+      },
+      combo: {
+        title: 'כוח הקומבו! 🔥',
+        subtitle: 'מהירות = ניקוד גבוה יותר',
+        explanation: 'מצאו מילים במהירות ברצף כדי לבנות קומבו. כל רמת קומבו מכפילה את הניקוד!',
+        example1: 'מילה 1: CAT → 3 נקודות',
+        example2: 'מילה 2 (מהר!): DOG → 6 נקודות (קומבו x2)',
+        example3: 'מילה 3 (מהר יותר!): BIRD → 12 נקודות (קומבו x3)',
+        tip: 'שמרו על הרצף לניקוד עצום!',
+      },
+      specialRounds: {
+        title: 'סבבים מיוחדים',
+        subtitle: 'כאוס פוגש הזדמנות!',
+        earthquake: {
+          title: 'רעידת אדמה! 🌋',
+          description: 'האותיות רועדות ומתערבבות! מצאו מילים מהר לפני שהזמן נגמר.',
+          tip: 'לוח חדש = הזדמנויות חדשות!',
+        },
+        fireRound: {
+          title: 'סבב אש! 💃',
+          description: 'מצב רחבת ריקודים! כל המילים שוות פי 2 נקודות. האותיות זוהרות כמו במסיבה!',
+          tip: 'השתוללו, כל מילה כפולה!',
+        },
+      },
+      avatar: {
+        title: 'בחרו את הדמות שלכם',
+        subtitle: 'מי תהיו היום?',
+        selected: 'בחרתם:',
+      },
+      name: {
+        title: 'מה השם שלכם?',
+        subtitle: 'תנו לכולם לדעת מי כובש פה!',
+        placeholder: 'השם המדהים שלכם...',
+        errorTooShort: 'לפחות 2 אותיות, אלוף!',
+        errorTooLong: 'מקסימום 20 תווים',
+        errorInvalid: 'רק אותיות ורווחים',
+        characterCount: 'תווים',
+        proTip: 'בחרו שם שיפחיד את היריבים. או יצחיק אותם. שניהם עובדים!',
+      },
+      mode: {
+        title: 'בחרו את ההרפתקה שלכם',
+        subtitle: 'איך תרצו לשחק?',
+        singlePlayer: {
+          title: 'שחקן יחיד',
+          description: 'תרגול סולו, אתגר נגד בוטים, ניצחון שיאים',
+        },
+        multiPlayer: {
+          title: 'רב משתתפים',
+          description: 'קרב מילים בזמן אמת נגד חברים',
+        },
+        dailyPlayer: {
+          title: 'אתגר יומי',
+          description: 'אותו פאזל בכל העולם, שתפו את התוצאות',
+        },
+        encouragement: 'בחירה מעולה! לחצו "בואו נשחק" להתחלת ההרפתקה!',
+      },
+      navigation: {
+        skip: 'דלג',
+        back: 'אחורה',
+        next: 'הבא',
+        letsPlay: 'בואו נשחק! 🚀',
+        title: 'ברוכים הבאים לשחקן',
       },
     },
     achievements: {
@@ -2872,7 +3195,76 @@ const translations = {
       chooseColor: 'בחר צבע',
       backToGame: 'חזרה למשחק',
       backToRoom: 'חזרה לחדר',
-      backToLobby: 'חזרה ללובי'
+      backToLobby: 'חזרה ללובי',
+      locked: 'נעול',
+      earnThisAchievement: 'שחק משחקים כדי לפתוח את ההישג הזה!'
+    },
+    onboarding: {
+      welcome: {
+        title: 'ברוכים הבאים ל-LexiClash!',
+        subtitle: 'מצא מילים על ידי חיבור אותיות',
+        demoInstruction: 'נסה! מצא את המילה:',
+        demoWord: 'CAT',
+        demoHint: 'החלק או הקש על אותיות סמוכות',
+        demoSuccess: 'מושלם! הצלחת!'
+      },
+      combo: {
+        title: 'מערכת קומבו',
+        subtitle: 'מצא מילים במהירות כדי לבנות קומבו',
+        explanation: 'כל מילה שאתה מוצא מגדילה את מכפיל הקומבו שלך. ככל שתמצא מילים מהר יותר, כך הניקוד שלך יהיה גבוה יותר!',
+        tip: 'המשך למצוא מילים כדי לשמור על רצף הקומבו שלך!',
+        example1: 'מילה ראשונה',
+        example2: 'קומבו x2!',
+        example3: 'קומבו x3!'
+      },
+      specialRounds: {
+        title: 'סבבים מיוחדים',
+        earthquake: {
+          title: 'רעידת אדמה',
+          description: 'האותיות רועדות ומתערבבות - הסתגל מהר!',
+          tip: 'שמור על קור רוח וחפש דפוסים חדשים'
+        },
+        fireRound: {
+          title: 'סבב אש',
+          description: 'כל הניקוד מוכפל - תשתולל!',
+          tip: 'זו ההזדמנות שלך לצבור נקודות'
+        }
+      },
+      avatar: {
+        title: 'בחר את האווטאר שלך',
+        subtitle: 'בחר אחד שמייצג אותך',
+        selected: 'נבחר'
+      },
+      name: {
+        title: 'מה שמך?',
+        subtitle: 'הכנס את שם התצוגה שלך',
+        placeholder: 'הכנס את שמך',
+        errorInvalid: 'רק אותיות, מספרים ורווחים מותרים',
+        errorTooShort: 'השם חייב להיות לפחות 2 תווים',
+        errorTooLong: 'השם לא יכול להיות יותר מ-20 תווים'
+      },
+      mode: {
+        title: 'בחר את המצב שלך',
+        subtitle: 'איך אתה רוצה לשחק?',
+        singlePlayer: {
+          title: 'שחקן יחיד',
+          description: 'תרגל או התמודד עם יריבי AI'
+        },
+        multiPlayer: {
+          title: 'מרובה משתתפים',
+          description: 'התחרה עם חברים בקרבות בזמן אמת'
+        },
+        dailyPlayer: {
+          title: 'אתגר יומי',
+          description: 'אותו פאזל לכולם ברחבי העולם מדי יום'
+        }
+      },
+      navigation: {
+        skip: 'דלג',
+        back: 'חזרה',
+        next: 'הבא',
+        letsPlay: 'בואו נשחק!'
+      }
     },
     leaderboard: {
       title: 'טבלת מובילים',
@@ -3466,6 +3858,7 @@ const translations = {
     },
     validation: {
       usernameRequired: 'Användarnamn krävs! Fyll i fältet',
+      hostUsernameRequired: 'Spelarnamn krävs för att starta ett spel',
       roomNameRequired: 'Rumsnamn krävs! Fyll i fältet',
       enterNameToJoin: 'Ange ett namn för att gå med',
       enterRoomName: 'Namn för att identifiera ditt rum',
@@ -3500,6 +3893,14 @@ const translations = {
       joinDesc: 'Ange kod för att gå med i befintligt spel',
       hostDesc: 'Starta ett nytt spel som värd',
       roomNamePlaceholder: 'Ange rumsnamn',
+      roomNameLabel: 'Rumsnamn',
+      roomNameHelper: 'Namn som visas för andra spelare i lobbyn',
+      roomNameHelperOptional: 'Valfritt - Ett slumpmässigt namn genereras om det lämnas tomt',
+      optional: 'valfritt',
+      roomNameExample: 't.ex. Fredagskväll Spel',
+      hostPlayerName: 'Ditt spelarnamn',
+      hostPlayerNamePlaceholder: 'Ange ditt spelarnamn',
+      hostPlayerNameHelper: 'Ditt namn som visas i spelet',
       playerNamePlaceholder: 'Ange ditt namn',
       yourName: 'Ditt namn',
       enterYourName: 'Ange ditt namn',
@@ -3561,6 +3962,10 @@ const translations = {
         'Yr Drake', 'Funky Flamingo', 'Studsig Björn', 'Snabb Zebra', 'Fräck Sengångare',
         'Knasig Koala', 'Glad Manet', 'Vild Tvättbjörn', 'Fräsig Räv', 'Glad Flodhäst',
       ],
+      chooseAvatar: 'Välj din avatar',
+      selectAvatar: 'Välj en avatar',
+      tapToChange: 'Tryck för att ändra',
+      tapToSelect: 'Tryck för att välja',
     },
     hostView: {
       waitingForPlayers: 'Väntar på spelare...',
@@ -3569,6 +3974,13 @@ const translations = {
       roomCode: 'Rumskod',
       playersJoined: 'Spelare anslutna',
       gameSettings: 'Spelinställningar',
+      quickSetup: 'Snabbval',
+      presetQuick: 'Snabb',
+      presetQuickDesc: '2 min snabbt spel',
+      presetParty: 'Fest',
+      presetPartyDesc: '3 min för grupper',
+      presetChallenge: 'Utmaning',
+      presetChallengeDesc: '4 min tävling',
       difficulty: 'Svårighetsgrad',
       timer: 'Timer',
       roundDuration: 'Rundans längd',
@@ -3823,6 +4235,40 @@ const translations = {
       time: 'Tid',
       viewResults: 'Visa resultat',
     },
+    scoreCard: {
+      title: 'Ditt Resultatkort',
+      rank: 'Ranking',
+      score: 'Poäng',
+      wordsFound: 'Ord Hittade',
+      accuracy: 'Noggrannhet',
+      longestWord: 'Längsta Ordet',
+      maxCombo: 'Max Kombo',
+      uniqueWords: 'Unika Ord',
+      topWords: 'Bästa Orden',
+      achievements: 'Prestationer',
+      shareResults: 'Dela Resultat',
+      downloadImage: 'Ladda Ner Bild',
+      errorGenerating: 'Kunde inte skapa resultatkort',
+      loading: 'Skapar resultatkort...',
+      stats: {
+        totalWords: 'Totalt Ord',
+        validWords: 'Giltiga Ord',
+        accuracy: 'Noggrannhet',
+        longestWord: 'Längsta Ordet',
+        maxCombo: 'Max Kombo',
+        comboBonus: 'Kombo Bonus',
+        fireBonus: 'Eld Bonus',
+        uniqueWords: 'Unika Ord',
+        avgWordLength: 'Genomsnittlig Ordlängd',
+      },
+      rank: {
+        position: '#{rank} av {total}',
+        percentile: 'Topp {percentile}%',
+        winner: 'Vinnare!',
+        pointsFromWinner: '{points} från vinnaren',
+        pointsFromNext: '{points} från nästa',
+      },
+    },
     playerTitles: {
       champion: { name: 'Mästare', icon: '👑', description: 'Spelets vinnare' },
       perfectionist: { name: 'Perfektionisten', icon: '✨', description: 'Högsta träffsäkerhet - alla ord giltiga' },
@@ -3954,6 +4400,79 @@ const translations = {
         showTutorial: 'Visa mig hur',
         skipTutorial: 'Jag klarar mig',
         dontShowAgain: 'Visa inte detta igen',
+      },
+    },
+    onboarding: {
+      welcome: {
+        title: 'Välkommen till LexiClash!',
+        subtitle: 'Lär dig grunderna på 30 sekunder',
+        demoInstruction: 'Svep för att bilda ordet:',
+        demoWord: 'CAT',
+        demoSuccess: 'Perfekt! Du förstod det! 🎉',
+        demoHint: 'Svep intilliggande bokstäver (inklusive diagonalt)',
+        clickNext: 'Klicka Nästa för att fortsätta',
+      },
+      combo: {
+        title: 'Combo Power! 🔥',
+        subtitle: 'Hastighet = Större Poäng',
+        explanation: 'Hitta ord snabbt i rad för att bygga combos. Varje combo-nivå multiplicerar din poäng!',
+        example1: 'Ord 1: CAT → 3 poäng',
+        example2: 'Ord 2 (snabbt!): DOG → 6 poäng (2x combo)',
+        example3: 'Ord 3 (snabbare!): BIRD → 12 poäng (3x combo)',
+        tip: 'Behåll streken för MASSIVA poäng!',
+      },
+      specialRounds: {
+        title: 'Specialrundor',
+        subtitle: 'Kaos möter möjlighet!',
+        earthquake: {
+          title: 'Jordbävning! 🌋',
+          description: 'Bokstäverna skakar och blandar sig! Hitta ord snabbt innan tiden tar slut.',
+          tip: 'Nytt bräde = nya möjligheter!',
+        },
+        fireRound: {
+          title: 'Eldrunda! 💃',
+          description: 'Dansgolvsläge! Alla ord räknas för 2x poäng. Bokstäverna lyser som en fest!',
+          tip: 'Gå loss, varje ord är DUBBELT!',
+        },
+      },
+      avatar: {
+        title: 'Välj Din Karaktär',
+        subtitle: 'Vem ska du vara idag?',
+        selected: 'Du valde:',
+      },
+      name: {
+        title: 'Vad heter du?',
+        subtitle: 'Låt alla veta vem som krossar det!',
+        placeholder: 'Ditt fantastiska namn...',
+        errorTooShort: 'Minst 2 bokstäver, champ!',
+        errorTooLong: 'Max 20 tecken',
+        errorInvalid: 'Endast bokstäver och mellanslag',
+        characterCount: 'tecken',
+        proTip: 'Välj ett namn som skrämmer dina motståndare. Eller får dem att skratta. Båda fungerar!',
+      },
+      mode: {
+        title: 'Välj Ditt Äventyr',
+        subtitle: 'Hur vill du spela?',
+        singlePlayer: {
+          title: 'Ensam Spelare',
+          description: 'Träna solo, utmana botar, slå högsta poäng',
+        },
+        multiPlayer: {
+          title: 'Flerspelar',
+          description: 'Slåss mot vänner i realtids ordkrig',
+        },
+        dailyPlayer: {
+          title: 'Daglig Utmaning',
+          description: 'Samma pussel världen över, dela dina resultat',
+        },
+        encouragement: 'Bra val! Klicka "Låt oss spela" för att börja ditt ordäventyr!',
+      },
+      navigation: {
+        skip: 'Hoppa över',
+        back: 'Tillbaka',
+        next: 'Nästa',
+        letsPlay: 'Låt oss spela! 🚀',
+        title: 'Spelarens Välkomstsida',
       },
     },
     achievements: {
@@ -4328,7 +4847,76 @@ const translations = {
       chooseColor: 'Välj färg',
       backToGame: 'Tillbaka till spelet',
       backToRoom: 'Tillbaka till rummet',
-      backToLobby: 'Tillbaka till lobbyn'
+      backToLobby: 'Tillbaka till lobbyn',
+      locked: 'Låst',
+      earnThisAchievement: 'Spela spel för att låsa upp denna prestation!'
+    },
+    onboarding: {
+      welcome: {
+        title: 'Välkommen till LexiClash!',
+        subtitle: 'Hitta ord genom att koppla samman bokstäver',
+        demoInstruction: 'Prova! Hitta ordet:',
+        demoWord: 'CAT',
+        demoHint: 'Svep eller tryck på angränsande bokstäver',
+        demoSuccess: 'Perfekt! Du klarade det!'
+      },
+      combo: {
+        title: 'Kombosystem',
+        subtitle: 'Hitta ord snabbt för att bygga kombon',
+        explanation: 'Varje ord du hittar ökar din kombomultiplikator. Ju snabbare du hittar ord, desto högre blir din poäng!',
+        tip: 'Fortsätt hitta ord för att behålla din kombosvit!',
+        example1: 'Första ordet',
+        example2: '2x kombo!',
+        example3: '3x kombo!'
+      },
+      specialRounds: {
+        title: 'Specialrundor',
+        earthquake: {
+          title: 'Jordbävning',
+          description: 'Bokstäverna skakar och blandas - anpassa dig snabbt!',
+          tip: 'Håll dig lugn och leta efter nya mönster'
+        },
+        fireRound: {
+          title: 'Eldrunda',
+          description: 'Alla poäng fördubblas - ge järnet!',
+          tip: 'Detta är din chans att samla poäng'
+        }
+      },
+      avatar: {
+        title: 'Välj din avatar',
+        subtitle: 'Välj en som representerar dig',
+        selected: 'Vald'
+      },
+      name: {
+        title: 'Vad heter du?',
+        subtitle: 'Ange ditt visningsnamn',
+        placeholder: 'Ange ditt namn',
+        errorInvalid: 'Endast bokstäver, siffror och mellanslag tillåtna',
+        errorTooShort: 'Namnet måste vara minst 2 tecken',
+        errorTooLong: 'Namnet kan inte vara längre än 20 tecken'
+      },
+      mode: {
+        title: 'Välj ditt läge',
+        subtitle: 'Hur vill du spela?',
+        singlePlayer: {
+          title: 'Ensam spelare',
+          description: 'Öva eller utmana dig själv med AI-motståndare'
+        },
+        multiPlayer: {
+          title: 'Flerspelarläge',
+          description: 'Tävla med vänner i realtidsstrider'
+        },
+        dailyPlayer: {
+          title: 'Daglig utmaning',
+          description: 'Samma pussel för alla världen över varje dag'
+        }
+      },
+      navigation: {
+        skip: 'Hoppa över',
+        back: 'Tillbaka',
+        next: 'Nästa',
+        letsPlay: 'Let\'s Play!'
+      }
     },
     leaderboard: {
       title: 'Topplista',
@@ -5051,6 +5639,7 @@ const translations = {
     },
     validation: {
       usernameRequired: 'ユーザー名が必要です！フィールドに入力してください',
+      hostUsernameRequired: 'ゲームを開始するにはプレイヤー名が必要です',
       roomNameRequired: 'ルーム名が必要です！フィールドに入力してください',
       enterNameToJoin: '参加するには名前を入力してください',
       enterRoomName: 'ルームを識別する名前',
@@ -5085,6 +5674,14 @@ const translations = {
       joinDesc: '既存のゲームに参加するコードを入力',
       hostDesc: 'ホストとして新しいゲームを開始',
       roomNamePlaceholder: 'ルーム名を入力',
+      roomNameLabel: 'ルーム名',
+      roomNameHelper: 'ロビーで他のプレイヤーに表示される名前',
+      roomNameHelperOptional: 'オプション - 空欄の場合はランダムな名前が生成されます',
+      optional: 'オプション',
+      roomNameExample: '例：金曜ゲームナイト',
+      hostPlayerName: 'あなたのプレイヤー名',
+      hostPlayerNamePlaceholder: 'プレイヤー名を入力',
+      hostPlayerNameHelper: 'ゲーム内で表示される名前',
       playerNamePlaceholder: '名前を入力',
       yourName: 'あなたの名前',
       enterYourName: '名前を入力してください',
@@ -5146,6 +5743,10 @@ const translations = {
         'くるくるドラゴン', 'ファンキーフラミンゴ', 'ぴょんぴょんクマ', 'びゅんびゅんシマウマ', 'おませなナマケモノ',
         'へんてこコアラ', 'ハッピークラゲ', 'やんちゃアライグマ', 'シュワシュワキツネ', 'ハッピーカバ',
       ],
+      chooseAvatar: 'アバターを選択',
+      selectAvatar: 'アバターを選択',
+      tapToChange: 'タップして変更',
+      tapToSelect: 'タップして選択',
     },
     hostView: {
       waitingForPlayers: 'プレイヤーを待っています...',
@@ -5154,6 +5755,13 @@ const translations = {
       roomCode: 'ルームコード',
       playersJoined: '参加プレイヤー',
       gameSettings: 'ゲーム設定',
+      quickSetup: 'クイック設定',
+      presetQuick: 'クイック',
+      presetQuickDesc: '2分の高速ゲーム',
+      presetParty: 'パーティー',
+      presetPartyDesc: '3分のグループ向け',
+      presetChallenge: 'チャレンジ',
+      presetChallengeDesc: '4分の競争モード',
       difficulty: '難易度',
       timer: 'タイマー',
       roundDuration: 'ラウンド時間',
@@ -5408,6 +6016,40 @@ const translations = {
       time: '時間',
       viewResults: '結果を見る',
     },
+    scoreCard: {
+      title: 'スコアカード',
+      rank: 'ランク',
+      score: 'スコア',
+      wordsFound: '見つけた単語',
+      accuracy: '正確度',
+      longestWord: '最長単語',
+      maxCombo: '最大コンボ',
+      uniqueWords: 'ユニーク単語',
+      topWords: 'トップ単語',
+      achievements: '実績',
+      shareResults: '結果を共有',
+      downloadImage: '画像をダウンロード',
+      errorGenerating: 'スコアカードの生成に失敗しました',
+      loading: 'スコアカードを生成中...',
+      stats: {
+        totalWords: '合計単語',
+        validWords: '有効な単語',
+        accuracy: '正確度',
+        longestWord: '最長単語',
+        maxCombo: '最大コンボ',
+        comboBonus: 'コンボボーナス',
+        fireBonus: 'ファイヤーボーナス',
+        uniqueWords: 'ユニーク単語',
+        avgWordLength: '平均単語長',
+      },
+      rank: {
+        position: '{total}人中{rank}位',
+        percentile: 'トップ{percentile}%',
+        winner: '勝者！',
+        pointsFromWinner: '勝者から{points}点',
+        pointsFromNext: '次から{points}点',
+      },
+    },
     playerTitles: {
       champion: { name: 'チャンピオン', icon: '👑', description: 'ゲームの勝者' },
       perfectionist: { name: '完璧主義者', icon: '✨', description: '最高の正確性 - 全ての単語が有効' },
@@ -5539,6 +6181,79 @@ const translations = {
         showTutorial: '遊び方を教えて',
         skipTutorial: '自分でやってみる',
         dontShowAgain: '再表示しない',
+      },
+    },
+    onboarding: {
+      welcome: {
+        title: 'LexiClashへようこそ!',
+        subtitle: '30秒で基本を学ぶ',
+        demoInstruction: 'スワイプして単語を作る:',
+        demoWord: 'CAT',
+        demoSuccess: '完璧！できました！🎉',
+        demoHint: '隣接する文字をスワイプ（斜めも含む）',
+        clickNext: '次へをクリックして続ける',
+      },
+      combo: {
+        title: 'コンボパワー！🔥',
+        subtitle: 'スピード = 高得点',
+        explanation: '素早く単語を見つけてコンボを作ろう。コンボレベルが上がるほど得点が倍増！',
+        example1: '単語1: CAT → 3ポイント',
+        example2: '単語2（素早く！）: DOG → 6ポイント（2xコンボ）',
+        example3: '単語3（さらに速く！）: BIRD → 12ポイント（3xコンボ）',
+        tip: '連続で大量得点を狙おう！',
+      },
+      specialRounds: {
+        title: 'スペシャルラウンド',
+        subtitle: 'カオスがチャンスに！',
+        earthquake: {
+          title: '地震！🌋',
+          description: '文字が揺れて混ざります！時間切れ前に単語を見つけよう。',
+          tip: '新しいボード = 新しいチャンス！',
+        },
+        fireRound: {
+          title: 'ファイアラウンド！💃',
+          description: 'ダンスフロアモード！すべての単語が2倍のポイント。文字がパーティーのように光る！',
+          tip: '好きなだけ、すべての単語が2倍！',
+        },
+      },
+      avatar: {
+        title: 'キャラクターを選ぶ',
+        subtitle: '今日はどれになる？',
+        selected: '選択:',
+      },
+      name: {
+        title: 'あなたの名前は？',
+        subtitle: 'みんなに知らせよう！',
+        placeholder: 'すごい名前...',
+        errorTooShort: '最低2文字必要です！',
+        errorTooLong: '最大20文字',
+        errorInvalid: '文字とスペースのみ',
+        characterCount: '文字',
+        proTip: '相手を怖がらせる名前を選ぼう。または笑わせる名前でも。どちらでも効果あり！',
+      },
+      mode: {
+        title: '冒険を選ぶ',
+        subtitle: 'どうプレイする？',
+        singlePlayer: {
+          title: 'シングルプレイヤー',
+          description: 'ソロで練習、ボットに挑戦、ハイスコアを目指す',
+        },
+        multiPlayer: {
+          title: 'マルチプレイヤー',
+          description: 'リアルタイムで友達とバトル',
+        },
+        dailyPlayer: {
+          title: 'デイリーチャレンジ',
+          description: '世界中で同じパズル、結果をシェア',
+        },
+        encouragement: '素晴らしい選択！「プレイしよう」をクリックして単語の冒険を始めよう！',
+      },
+      navigation: {
+        skip: 'スキップ',
+        back: '戻る',
+        next: '次へ',
+        letsPlay: 'プレイしよう！🚀',
+        title: 'プレイヤーようこそ',
       },
     },
     achievements: {
@@ -5913,7 +6628,76 @@ const translations = {
       chooseColor: '色を選択',
       backToGame: 'ゲームに戻る',
       backToRoom: 'ルームに戻る',
-      backToLobby: 'ロビーに戻る'
+      backToLobby: 'ロビーに戻る',
+      locked: 'ロック中',
+      earnThisAchievement: 'ゲームをプレイしてこの実績をアンロックしましょう！'
+    },
+    onboarding: {
+      welcome: {
+        title: 'LexiClashへようこそ！',
+        subtitle: '文字をつなげて単語を見つけよう',
+        demoInstruction: 'やってみよう！この単語を見つけて:',
+        demoWord: 'CAT',
+        demoHint: '隣接する文字をスワイプまたはタップ',
+        demoSuccess: '完璧！できました！'
+      },
+      combo: {
+        title: 'コンボシステム',
+        subtitle: '素早く単語を見つけてコンボを作ろう',
+        explanation: '見つけた単語ごとにコンボ倍率が上がります。速く見つけるほどスコアが高くなります！',
+        tip: '単語を見つけ続けてコンボを維持しよう！',
+        example1: '最初の単語',
+        example2: '2xコンボ！',
+        example3: '3xコンボ！'
+      },
+      specialRounds: {
+        title: 'スペシャルラウンド',
+        earthquake: {
+          title: '地震',
+          description: '文字が揺れてシャッフルされる - 素早く適応！',
+          tip: '落ち着いて新しいパターンを探そう'
+        },
+        fireRound: {
+          title: 'ファイアラウンド',
+          description: 'すべてのスコアが2倍 - 全力で！',
+          tip: 'ポイントを稼ぐチャンスです'
+        }
+      },
+      avatar: {
+        title: 'アバターを選択',
+        subtitle: 'あなたを表すものを選んで',
+        selected: '選択済み'
+      },
+      name: {
+        title: 'お名前は？',
+        subtitle: '表示名を入力してください',
+        placeholder: '名前を入力',
+        errorInvalid: '文字、数字、スペースのみ使用可能です',
+        errorTooShort: '名前は2文字以上必要です',
+        errorTooLong: '名前は20文字以内にしてください'
+      },
+      mode: {
+        title: 'モードを選択',
+        subtitle: 'どのようにプレイしますか？',
+        singlePlayer: {
+          title: 'シングルプレイヤー',
+          description: '練習するか、AIの対戦相手に挑戦'
+        },
+        multiPlayer: {
+          title: 'マルチプレイヤー',
+          description: '友達とリアルタイムバトルで競争'
+        },
+        dailyPlayer: {
+          title: 'デイリーチャレンジ',
+          description: '毎日世界中で同じパズルに挑戦'
+        }
+      },
+      navigation: {
+        skip: 'スキップ',
+        back: '戻る',
+        next: '次へ',
+        letsPlay: 'プレイしよう！'
+      }
     },
     leaderboard: {
       title: 'リーダーボード',
@@ -6636,6 +7420,7 @@ const translations = {
     },
     validation: {
       usernameRequired: '¡Se requiere nombre de usuario! Por favor completa el campo',
+      hostUsernameRequired: 'Se requiere nombre de jugador para iniciar un juego',
       roomNameRequired: '¡Se requiere nombre de sala! Por favor completa el campo',
       enterNameToJoin: 'Ingresa un nombre para unirte',
       enterRoomName: 'Nombre para identificar tu sala',
@@ -6670,6 +7455,14 @@ const translations = {
       joinDesc: 'Ingresa código para unirte a juego existente',
       hostDesc: 'Iniciar un nuevo juego como anfitrión',
       roomNamePlaceholder: 'Ingresa nombre de sala',
+      roomNameLabel: 'Nombre de la Sala',
+      roomNameHelper: 'Nombre mostrado a otros jugadores en el lobby',
+      roomNameHelperOptional: 'Opcional - Se generará un nombre aleatorio si se deja vacío',
+      optional: 'opcional',
+      roomNameExample: 'ej., Noche de Juegos del Viernes',
+      hostPlayerName: 'Tu Nombre de Jugador',
+      hostPlayerNamePlaceholder: 'Ingresa tu nombre de jugador',
+      hostPlayerNameHelper: 'Tu nombre mostrado en el juego',
       playerNamePlaceholder: 'Ingresa tu nombre',
       yourName: 'Tu Nombre',
       enterYourName: 'Ingresa tu nombre',
@@ -6728,6 +7521,10 @@ const translations = {
         'Salmón Tonto', 'Ganso Risueño', 'Morsa Loca', 'Pingüino Alegre', 'Llama Alocada',
         'Dragón Mareado', 'Flamenco Funky', 'Oso Saltarín', 'Cebra Veloz', 'Perezoso Sassy',
       ],
+      chooseAvatar: 'Elige tu Avatar',
+      selectAvatar: 'Selecciona un avatar',
+      tapToChange: 'Toca para cambiar',
+      tapToSelect: 'Toca para elegir',
     },
     hostView: {
       waitingForPlayers: 'Esperando jugadores...',
@@ -6736,6 +7533,13 @@ const translations = {
       roomCode: 'Código de Sala',
       playersJoined: 'Jugadores Unidos',
       gameSettings: 'Configuración del Juego',
+      quickSetup: 'Configuración Rápida',
+      presetQuick: 'Rápido',
+      presetQuickDesc: 'Juego de 2 min',
+      presetParty: 'Fiesta',
+      presetPartyDesc: '3 min para grupos',
+      presetChallenge: 'Desafío',
+      presetChallengeDesc: '4 min competitivo',
       difficulty: 'Dificultad',
       timer: 'Temporizador',
       roundDuration: 'Duración de la Ronda',
@@ -7458,6 +8262,40 @@ const translations = {
         },
       },
     },
+    scoreCard: {
+      title: 'Tu Tarjeta de Puntuación',
+      rank: 'Puesto',
+      score: 'Puntuación',
+      wordsFound: 'Palabras Encontradas',
+      accuracy: 'Precisión',
+      longestWord: 'Palabra Más Larga',
+      maxCombo: 'Combo Máximo',
+      uniqueWords: 'Palabras Únicas',
+      topWords: 'Mejores Palabras',
+      achievements: 'Logros',
+      shareResults: 'Compartir Resultados',
+      downloadImage: 'Descargar Imagen',
+      errorGenerating: 'Error al generar la tarjeta de puntuación',
+      loading: 'Generando tarjeta de puntuación...',
+      stats: {
+        totalWords: 'Palabras Totales',
+        validWords: 'Palabras Válidas',
+        accuracy: 'Precisión',
+        longestWord: 'Palabra Más Larga',
+        maxCombo: 'Combo Máximo',
+        comboBonus: 'Bonus de Combo',
+        fireBonus: 'Bonus de Fuego',
+        uniqueWords: 'Palabras Únicas',
+        avgWordLength: 'Long. Promedio de Palabra',
+      },
+      rank: {
+        position: '#{rank} de {total}',
+        percentile: 'Top {percentile}%',
+        winner: '¡Ganador!',
+        pointsFromWinner: '{points} del ganador',
+        pointsFromNext: '{points} del siguiente',
+      },
+    },
     profile: {
       title: 'Perfil',
       memberSince: 'Miembro desde',
@@ -7486,7 +8324,85 @@ const translations = {
       chooseColor: 'Elegir Color',
       backToGame: 'Volver al Juego',
       backToRoom: 'Volver a la Sala',
-      backToLobby: 'Volver al Lobby'
+      backToLobby: 'Volver al Lobby',
+      locked: 'Bloqueado',
+      earnThisAchievement: '¡Juega partidas para desbloquear este logro!'
+    },
+    onboarding: {
+      welcome: {
+        title: '¡Bienvenido a LexiClash!',
+        subtitle: 'Encuentra palabras conectando letras',
+        demoInstruction: '¡Inténtalo! Encuentra la palabra:',
+        demoWord: 'CAT',
+        demoHint: 'Desliza o toca letras adyacentes',
+        demoSuccess: '¡Perfecto! ¡Lo lograste!',
+        clickNext: 'Haz clic en Siguiente para continuar',
+      },
+      combo: {
+        title: 'Sistema de Combos',
+        subtitle: 'Encuentra palabras rápido para crear combos',
+        explanation: '¡Cada palabra que encuentras aumenta tu multiplicador de combo. Mientras más rápido encuentres palabras, mayor será tu puntuación!',
+        tip: '¡Sigue encontrando palabras para mantener tu racha de combos!',
+        example1: 'Primera palabra',
+        example2: '¡Combo x2!',
+        example3: '¡Combo x3!'
+      },
+      specialRounds: {
+        title: 'Rondas Especiales',
+        subtitle: '¡El caos se encuentra con la oportunidad!',
+        earthquake: {
+          title: 'Terremoto',
+          description: 'Las letras se agitan y se mezclan - ¡adáptate rápido!',
+          tip: 'Mantén la calma y busca nuevos patrones'
+        },
+        fireRound: {
+          title: 'Ronda de Fuego',
+          description: '¡Todas las puntuaciones se duplican - a por todas!',
+          tip: 'Esta es tu oportunidad para acumular puntos'
+        }
+      },
+      avatar: {
+        title: 'Elige tu Avatar',
+        subtitle: 'Selecciona uno que te represente',
+        selected: 'Seleccionado'
+      },
+      name: {
+        title: '¿Cuál es tu nombre?',
+        subtitle: 'Ingresa tu nombre de visualización',
+        placeholder: 'Ingresa tu nombre',
+        errorInvalid: 'Solo se permiten letras, números y espacios',
+        errorTooShort: 'El nombre debe tener al menos 2 caracteres',
+        errorTooLong: 'El nombre no puede tener más de 20 caracteres',
+        characterCount: 'caracteres',
+        proTip: 'Elige un nombre que asuste a tus oponentes. O que los haga reír. ¡Ambos funcionan!',
+      },
+      mode: {
+        title: 'Elige tu Modo',
+        subtitle: '¿Cómo quieres jugar?',
+        singlePlayer: {
+          title: 'Un Jugador',
+          description: 'Practica o desafíate con oponentes IA'
+        },
+        multiPlayer: {
+          title: 'Multijugador',
+          description: 'Compite con amigos en batallas en tiempo real'
+        },
+        dailyPlayer: {
+          title: 'Desafío Diario',
+          description: 'Mismo puzzle en todo el mundo, comparte tus resultados'
+        },
+        encouragement: '¡Excelente elección! Haz clic en "¡A Jugar!" para comenzar tu aventura de palabras!',
+      },
+      navigation: {
+        skip: 'Saltar',
+        back: 'Atrás',
+        next: 'Siguiente',
+        letsPlay: '¡A Jugar!',
+        title: 'Bienvenida del Jugador',
+      },
+    },
+    achievements: {
+      FIRST_BLOOD: { name: 'Primera Sangre', description: 'Primero en encontrar una palabra' },
     },
     leaderboard: {
       title: 'Clasificación',
@@ -7773,7 +8689,7 @@ const translations = {
       showMore: 'Mostrar más',
       showLess: 'Mostrar menos',
       more: 'más',
-    },
+    }
   }
 };
 

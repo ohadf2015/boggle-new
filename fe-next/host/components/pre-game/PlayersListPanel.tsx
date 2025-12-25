@@ -72,14 +72,20 @@ export const PlayersListPanel = memo<PlayersListPanelProps>(({
                     <Avatar
                       profilePictureUrl={avatar?.profilePictureUrl ?? undefined}
                       avatarEmoji={avatar?.emoji}
+                      avatarImage={avatar?.avatarImage}
                       avatarColor={avatar?.color}
-                      size="sm"
+                      size="lg"
                     />
                     <span className="font-medium text-neo-cream/90">
                       <SlotMachineText text={playerUsername} />
                     </span>
                     {isHostPlayer && <FaCrown className="text-neo-yellow/80 text-sm" />}
                     {isBot && <FaRobot className="text-neo-cyan/70 text-sm" />}
+                    {isMe && (
+                      <span className="text-xs text-neo-cream/70 font-medium">
+                        ({t('playerView.me')})
+                      </span>
+                    )}
                   </div>
                   <div className="flex items-center gap-2">
                     {playerWordCounts && playerWordCounts[playerUsername] !== undefined && (

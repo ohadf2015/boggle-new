@@ -24,7 +24,7 @@ export interface DifficultySettings {
 export const DIFFICULTIES: DifficultySettings = {
   EASY: { nameKey: 'difficulty.easy', rows: 5, cols: 5 },
   MEDIUM: { nameKey: 'difficulty.medium', rows: 7, cols: 7 },
-  HARD: { nameKey: 'difficulty.hard', rows: 11, cols: 11 },
+  HARD: { nameKey: 'difficulty.hard', rows: 9, cols: 9 },
 };
 
 export const DEFAULT_DIFFICULTY = 'MEDIUM' as const;
@@ -40,8 +40,8 @@ export type DifficultyLevel = keyof typeof DIFFICULTIES;
  */
 export const DIFFICULTY_TIMERS: Record<DifficultyLevel, number> = {
   EASY: 60,     // 1 minute - 5x5 board (25 cells)
-  MEDIUM: 90,   // 1.5 minutes - 7x7 board (49 cells)
-  HARD: 150,    // 2.5 minutes - 11x11 board (121 cells)
+  MEDIUM: 120,  // 2 minutes - 7x7 board (49 cells)
+  HARD: 180,    // 3 minutes - 9x9 board (81 cells)
 };
 
 export const DEFAULT_TIMER = 60; // 1 minute

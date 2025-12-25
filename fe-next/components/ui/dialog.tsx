@@ -77,9 +77,10 @@ const DialogContent = React.forwardRef<
       {/* Neo-Brutalist Close Button - adjusted for mobile and RTL */}
       <DialogPrimitive.Close
         className="
-          absolute top-2 sm:-top-3
-          right-2 sm:-right-3 rtl:right-auto rtl:left-2 rtl:sm:-left-3
-          w-8 h-8 sm:w-10 sm:h-10
+          absolute top-3 sm:-top-3
+          right-3 sm:-right-3
+          rtl:right-auto rtl:left-3 rtl:sm:-left-3
+          w-9 h-9 sm:w-10 sm:h-10
           flex items-center justify-center
           bg-neo-red text-neo-white
           border-2 sm:border-3 border-neo-black

@@ -14,7 +14,7 @@ function createGameData(hostUsername, options = {}) {
     hostSocketId: options.socketId || 'test-socket-id',
     hostUsername,
     hostPlayerId: options.playerId || null,
-    roomName: options.roomName || hostUsername + "'s Room",
+    roomName: options.roomName || hostUsername + " Room",
     language: options.language || 'en',
     isRanked: options.isRanked || false
   };

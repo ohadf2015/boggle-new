@@ -48,9 +48,9 @@ export const LanguageSelector: React.FC<LanguageSelectorProps> = ({
         {t('joinView.selectLanguage')}
       </Label>
       <Select value={selectedLanguage} onValueChange={(val) => onLanguageChange(val as Language)}>
-        <SelectTrigger className="h-10 bg-slate-100 dark:bg-slate-700/50 border-slate-200 dark:border-slate-600">
+        <SelectTrigger className="h-10 bg-slate-100 dark:bg-slate-700/50 border-slate-200 dark:border-slate-600 text-slate-900 dark:text-white">
           <SelectValue>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center justify-center gap-2">
               <span className="text-lg leading-none">{selectedOption?.flag}</span>
               <span className="font-semibold text-sm">{selectedOption ? t(selectedOption.labelKey) : ''}</span>
             </div>

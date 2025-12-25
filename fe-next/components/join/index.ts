@@ -11,6 +11,7 @@
  * - ModeSelector: Toggle between join/host modes
  * - JoinModeFields: Form fields for join mode (game code, username)
  * - HostModeFields: Form fields for host mode (room name, room code)
+ * - AvatarSelectorButton: Avatar selection button with modal picker
  */
 
 export { AutoJoiningState } from './AutoJoiningState';
@@ -20,5 +21,7 @@ export { LanguageSelector } from './LanguageSelector';
 export { ModeSelector } from './ModeSelector';
 export { default as JoinModeFields } from './JoinModeFields';
 export { default as HostModeFields } from './HostModeFields';
+export { default as AvatarSelectorButton } from './AvatarSelectorButton';
 export type { JoinModeFieldsProps } from './JoinModeFields';
 export type { HostModeFieldsProps } from './HostModeFields';
+export type { AvatarSelectorButtonProps } from './AvatarSelectorButton';

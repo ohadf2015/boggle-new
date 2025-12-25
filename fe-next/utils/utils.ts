@@ -36,6 +36,31 @@ export function generateRoomCode(): string {
 }
 
 /**
+ * Generate a random room name
+ * Used when host doesn't provide a room name
+ */
+export function generateRandomRoomName(): string {
+  const adjectives = [
+    'Swift', 'Epic', 'Mighty', 'Clever', 'Brave', 'Quick', 'Sharp', 'Bright',
+    'Lucky', 'Happy', 'Turbo', 'Super', 'Ultra', 'Mega', 'Grand', 'Noble',
+    'Wild', 'Bold', 'Pure', 'True', 'Royal', 'Prime', 'Elite', 'Wise',
+    'Swift', 'Cool', 'Rare', 'Ace', 'Pro', 'Star', 'Top', 'Best'
+  ];
+
+  const nouns = [
+    'Wizards', 'Knights', 'Dragons', 'Tigers', 'Eagles', 'Lions', 'Wolves', 'Bears',
+    'Hawks', 'Foxes', 'Panthers', 'Vipers', 'Ninjas', 'Samurai', 'Warriors', 'Champions',
+    'Legends', 'Heroes', 'Masters', 'Titans', 'Giants', 'Rangers', 'Hunters', 'Seekers',
+    'Scouts', 'Raiders', 'Pirates', 'Kings', 'Queens', 'Aces', 'Stars', 'Winners'
+  ];
+
+  const adjective = adjectives[Math.floor(Math.random() * adjectives.length)];
+  const noun = nouns[Math.floor(Math.random() * nouns.length)];
+
+  return `${adjective} ${noun}`;
+}
+
+/**
  * Generate a random avatar with emoji and color
  */
 export function generateRandomAvatar(): Avatar {

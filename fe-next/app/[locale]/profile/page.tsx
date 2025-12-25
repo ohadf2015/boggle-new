@@ -43,7 +43,9 @@ interface StatCardProps {
 }
 
 // Achievement icons mapping (matches backend achievementManager.js)
+// COMPLETE list of all achievements including elite, competitive/style, and lifetime achievements
 const ACHIEVEMENT_ICONS: Record<string, string> = {
+  // Basic achievements
   FIRST_BLOOD: '🎯',
   SPEED_DEMON: '⚡',
   WORD_MASTER: '📚',
@@ -56,6 +58,8 @@ const ACHIEVEMENT_ICONS: Record<string, string> = {
   DIVERSE_VOCABULARY: '🌈',
   DOUBLE_TROUBLE: '⚡⚡',
   TREASURE_HUNTER: '💎',
+
+  // Existing achievements
   TRIPLE_THREAT: '🎰',
   UNSTOPPABLE: '🚀',
   COMEBACK_KID: '🔄',
@@ -66,6 +70,33 @@ const ACHIEVEMENT_ICONS: Record<string, string> = {
   STREAK_MASTER: '🔥',
   ANAGRAM_ARTIST: '🔀',
   LETTER_POPPER: '🎈',
+
+  // New elite achievements
+  WORD_ARCHITECT: '🏛️',
+  SPEED_LEGEND: '🏎️',
+  COMBO_GOD: '👑',
+  VOCABULARY_TITAN: '🗿',
+  PRECISION_MASTER: '🎯',
+  LONG_WORD_CHAIN: '🔗',
+
+  // New competitive/style achievements
+  MINIMALIST: '🎯',
+  WORD_SNIPER: '🔫',
+  PHOTO_FINISH: '📸',
+  UNDERDOG: '🐕',
+  CLUTCH_PLAYER: '💪',
+
+  // Lifetime/career achievements (tracked across all games)
+  VETERAN: '🎖️',
+  CENTURION: '💯',
+  WORD_COLLECTOR: '📚',
+  WORD_HOARDER: '🗃️',
+  CHAMPION: '🏅',
+  LEGEND: '👑',
+  POINT_MASTER: '💰',
+  POINT_KING: '💎',
+  DEDICATION: '🔥',
+  LOYAL_PLAYER: '⭐',
 };
 
 // Helper to get achievement icon by key
@@ -602,46 +633,62 @@ export default function ProfilePage(): React.ReactNode {
           )}
         </motion.div>
 
-        {/* Achievement Counts with Tier Display */}
-        {profile?.achievement_counts && Object.keys(profile.achievement_counts).length > 0 && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3 }}
-            className={cn(
-              'rounded-2xl p-6',
-              isDarkMode ? 'bg-slate-800/50 border border-slate-700' : 'bg-white border border-gray-200 shadow-lg'
-            )}
-          >
-            <h2 className={cn(
-              'text-lg font-bold mb-4',
-              isDarkMode ? 'text-white' : 'text-gray-900'
-            )}>
-              {t('profile.achievements')}
-            </h2>
-            <div className="flex flex-wrap gap-3">
-              {Object.entries(profile.achievement_counts)
-                .sort((a, b) => b[1] - a[1]) // Sort by count descending
-                .map(([key, count], index) => {
-                  // Get achievement info from translations
-                  const achievementData: Achievement = {
-                    icon: getAchievementIcon(key),
-                    name: t(`achievements.${key}.name`) || key,
-                    description: t(`achievements.${key}.description`) || '',
-                  };
-                  return (
-                    <AchievementBadge
-                      key={key}
-                      achievement={achievementData}
-                      index={index}
-                      count={count}
-                      showTier={true}
-                    />
-                  );
-                })}
-            </div>
-          </motion.div>
-        )}
+        {/* Achievement Counts with Tier Display - showing ALL achievements (earned + locked) */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3 }}
+          className={cn(
+            'rounded-2xl p-6',
+            isDarkMode ? 'bg-slate-800/50 border border-slate-700' : 'bg-white border border-gray-200 shadow-lg'
+          )}
+        >
+          <h2 className={cn(
+            'text-lg font-bold mb-4',
+            isDarkMode ? 'text-white' : 'text-gray-900'
+          )}>
+            {t('profile.achievements')}
+          </h2>
+          <div className="flex flex-wrap gap-3">
+            {(() => {
+              const earnedCounts = profile?.achievement_counts || {};
+              const allAchievementKeys = Object.keys(ACHIEVEMENT_ICONS);
+
+              // Separate earned and locked achievements
+              const earnedAchievements = Object.entries(earnedCounts)
+                .sort((a, b) => b[1] - a[1]); // Sort by count descending
+
+              const lockedAchievements = allAchievementKeys
+                .filter(key => !earnedCounts[key])
+                .sort(); // Sort alphabetically
+
+              // Combine: earned first, then locked
+              const allAchievements = [
+                ...earnedAchievements.map(([key, count]) => ({ key, count, locked: false })),
+                ...lockedAchievements.map(key => ({ key, count: 0, locked: true }))
+              ];
+
+              return allAchievements.map(({ key, count, locked }, index) => {
+                // Get achievement info from translations
+                const achievementData: Achievement = {
+                  icon: getAchievementIcon(key),
+                  name: t(`achievements.${key}.name`) || key,
+                  description: t(`achievements.${key}.description`) || '',
+                };
+                return (
+                  <AchievementBadge
+                    key={key}
+                    achievement={achievementData}
+                    index={index}
+                    count={count}
+                    showTier={true}
+                    locked={locked}
+                  />
+                );
+              });
+            })()}
+          </div>
+        </motion.div>
 
         {/* Back Buttons - Neo-Brutalist styled */}
         <motion.div
