@@ -11,6 +11,8 @@ import { validateUsername, validateGameCode, sanitizeInput } from '@/utils/valid
 import { useDebouncedValidation, getValidationClasses } from '@/hooks/useDebouncedValidation';
 import AvatarSelectorButton from './AvatarSelectorButton';
 import { AVATARS, type AvatarConfig } from '@/utils/avatarConfig';
+import { useAuth } from '@/contexts/AuthContext';
+import Avatar from '@/components/Avatar';
 
 export interface HostModeFieldsProps {
   gameCode: string;
@@ -52,18 +54,26 @@ const HostModeFields: React.FC<HostModeFieldsProps> = ({
   isProfileLoading,
   t,
 }) => {
+  const { profile, updateProfile } = useAuth();
+
   // Avatar selection state
   const [selectedAvatarId, setSelectedAvatarId] = useState<string | undefined>(undefined);
 
-  // Load avatar from localStorage on mount
+  // Load avatar from profile (for auth users) or localStorage (for guests) on mount
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      const saved = localStorage.getItem('boggle_avatar_id');
-      if (saved) {
-        setSelectedAvatarId(saved);
+      if (isAuthenticated && profile?.avatar_image) {
+        // Authenticated users: load from profile
+        setSelectedAvatarId(profile.avatar_image);
+      } else {
+        // Guest users: load from localStorage
+        const saved = localStorage.getItem('boggle_avatar_id');
+        if (saved) {
+          setSelectedAvatarId(saved);
+        }
       }
     }
-  }, []);
+  }, [isAuthenticated, profile?.avatar_image]);
 
   // Check if a name is one of the avatar default names
   const isAvatarDefaultName = (name: string): boolean => {
@@ -71,15 +81,21 @@ const HostModeFields: React.FC<HostModeFieldsProps> = ({
   };
 
   // Handle avatar selection
-  const handleAvatarSelect = (avatar: AvatarConfig) => {
+  const handleAvatarSelect = async (avatar: AvatarConfig) => {
     setSelectedAvatarId(avatar.id);
-    // Save to localStorage
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('boggle_avatar_id', avatar.id);
-    }
-    // Pre-fill host username with avatar name if username is empty or is a default avatar name
-    if ((!hostUsername || hostUsername.trim() === '' || isAvatarDefaultName(hostUsername)) && !isAuthenticated) {
-      setHostUsername(avatar.name);
+
+    if (isAuthenticated && updateProfile) {
+      // Authenticated users: save to profile
+      await updateProfile({ avatar_image: avatar.id });
+    } else {
+      // Guest users: save to localStorage
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('boggle_avatar_id', avatar.id);
+      }
+      // Pre-fill host username with avatar name if username is empty or is a default avatar name
+      if (!hostUsername || hostUsername.trim() === '' || isAvatarDefaultName(hostUsername)) {
+        setHostUsername(avatar.name);
+      }
     }
   };
 
@@ -104,22 +120,69 @@ const HostModeFields: React.FC<HostModeFieldsProps> = ({
 
   return (
     <div className="space-y-3">
-      {/* Show "Hosting as" for authenticated users */}
-      {isAuthenticated && displayName && (
-        <div className="p-2 rounded-lg bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800">
-          <p className="text-xs text-slate-600 dark:text-gray-300">
-            {t('joinView.hostingAs') || 'Hosting as'}{' '}
-            <span className="font-semibold text-purple-600 dark:text-purple-400">{displayName}</span>
-          </p>
-        </div>
-      )}
-
       {/* Show loading indicator when profile is loading */}
       {isAuthenticated && !displayName && isProfileLoading && (
         <div className="p-2 rounded-lg bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800">
           <p className="text-xs text-amber-600 dark:text-amber-400">
             {t('joinView.loadingProfile') || 'Loading your profile...'}
           </p>
+        </div>
+      )}
+
+      {/* Show "Hosting as" for authenticated users with their profile avatar */}
+      {isAuthenticated && displayName && (
+        <div className="p-3 rounded-neo bg-neo-purple border-2 border-neo-magenta/50 shadow-hard-sm">
+          <div className="flex items-center gap-3">
+            {/* Show profile avatar or custom profile picture */}
+            <div className="relative">
+              {profile?.profile_picture_url ? (
+                <div className="w-12 h-12 rounded-full overflow-hidden border-3 border-neo-black shadow-hard-sm">
+                  <img
+                    src={profile.profile_picture_url}
+                    alt={displayName}
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+              ) : (
+                <Avatar
+                  avatarImage={selectedAvatarId}
+                  size="lg"
+                  className="border-3 border-neo-black shadow-hard-sm"
+                />
+              )}
+              {/* Small edit button overlay */}
+              <button
+                type="button"
+                onClick={() => {
+                  const btn = document.querySelector('[aria-label*="Select avatar"]') as HTMLButtonElement;
+                  btn?.click();
+                }}
+                className="absolute -bottom-1 -right-1 w-5 h-5 bg-neo-yellow border-2 border-neo-black rounded-full flex items-center justify-center text-xs hover:scale-110 transition-transform shadow-hard-sm"
+                aria-label={t('profile.chooseEmoji') || 'Change avatar'}
+              >
+                ✏️
+              </button>
+              {/* Hidden avatar selector button */}
+              <div className="hidden">
+                <AvatarSelectorButton
+                  selectedAvatarId={selectedAvatarId}
+                  onAvatarSelect={handleAvatarSelect}
+                  t={t}
+                />
+              </div>
+            </div>
+            <div className="flex-1">
+              <p className="text-xs text-neo-cream/70 font-bold uppercase tracking-wide">
+                {t('joinView.hostingAs') || 'Hosting as'}
+              </p>
+              <p className="text-sm text-neo-magenta font-black">
+                {displayName}
+              </p>
+              <p className="text-xs text-neo-cream/50 mt-0.5">
+                {t('profile.connectedAccount') || 'Connected with your account'}
+              </p>
+            </div>
+          </div>
         </div>
       )}
 
@@ -161,20 +224,6 @@ const HostModeFields: React.FC<HostModeFieldsProps> = ({
               {t(hostUsernameErrorMessage || 'validation.hostUsernameRequired')}
             </p>
           )}
-        </div>
-      )}
-
-      {/* Authenticated: Avatar selector only */}
-      {isAuthenticated && displayName && (
-        <div className="flex items-center gap-2">
-          <Label className="text-xs font-bold uppercase text-slate-600 dark:text-slate-400">
-            {t('joinView.chooseAvatar') || 'Avatar'}
-          </Label>
-          <AvatarSelectorButton
-            selectedAvatarId={selectedAvatarId}
-            onAvatarSelect={handleAvatarSelect}
-            t={t}
-          />
         </div>
       )}
 
