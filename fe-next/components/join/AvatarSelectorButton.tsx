@@ -41,6 +41,7 @@ const AvatarSelectorButton: React.FC<AvatarSelectorButtonProps> = ({
         type="button"
         variant="outline"
         onClick={() => setIsPickerOpen(true)}
+        aria-label={t('joinView.selectAvatar') || 'Select avatar'}
         className={`h-10 px-3 bg-slate-100 dark:bg-slate-700/50 border-slate-200 dark:border-slate-600 hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors flex items-center gap-2 ${className}`}
       >
         {selectedAvatar ? (
