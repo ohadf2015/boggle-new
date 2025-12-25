@@ -91,11 +91,20 @@ interface HostPreGameViewProps {
 
 // Game presets for quick setup
 const GAME_PRESETS = {
+  easy: {
+    nameKey: 'hostView.presetEasy',
+    icon: '🌱',
+    timer: 2,
+    difficulty: 'EASY' as DifficultyLevel,
+    minWordLength: 2,
+    description: 'hostView.presetEasyDesc',
+  },
   quick: {
     nameKey: 'hostView.presetQuick',
     icon: '⚡',
     timer: 1,
     difficulty: 'MEDIUM' as DifficultyLevel,
+    minWordLength: 3,
     description: 'hostView.presetQuickDesc',
   },
   party: {
@@ -103,6 +112,7 @@ const GAME_PRESETS = {
     icon: '🎉',
     timer: 2,
     difficulty: 'MEDIUM' as DifficultyLevel,
+    minWordLength: 2,
     description: 'hostView.presetPartyDesc',
   },
   challenge: {
@@ -110,6 +120,7 @@ const GAME_PRESETS = {
     icon: '🏆',
     timer: 3,
     difficulty: 'HARD' as DifficultyLevel,
+    minWordLength: 3,
     description: 'hostView.presetChallengeDesc',
   },
 } as const;
@@ -162,6 +173,8 @@ const HostPreGameView: React.FC<HostPreGameViewProps> = ({
   const { socket } = useSocket();
   const [showAdvancedSettings, setShowAdvancedSettings] = useState<boolean>(false);
   const [selectedPreset, setSelectedPreset] = useState<PresetKey | null>(null);
+  const [showPresetDescription, setShowPresetDescription] = useState<PresetKey | null>(null);
+  const [pressTimer, setPressTimer] = useState<ReturnType<typeof setTimeout> | null>(null);
 
   // Memoized handlers
   const handleCopyLink = useCallback(() => {
@@ -204,9 +217,35 @@ const HostPreGameView: React.FC<HostPreGameViewProps> = ({
     const preset = GAME_PRESETS[presetKey];
     setTimerValue(preset.timer);
     setDifficulty(preset.difficulty);
+    setMinWordLength(preset.minWordLength);
     setTimerDirection(0);
     setSelectedPreset(presetKey);
-  }, [setTimerValue, setDifficulty, setTimerDirection]);
+  }, [setTimerValue, setDifficulty, setMinWordLength, setTimerDirection]);
+
+  // Long-press handlers for preset description
+  const handlePresetMouseDown = useCallback((presetKey: PresetKey) => {
+    const timer = setTimeout(() => {
+      setShowPresetDescription(presetKey);
+    }, 1000); // 1 second
+    setPressTimer(timer);
+  }, []);
+
+  const handlePresetMouseUp = useCallback(() => {
+    if (pressTimer) {
+      clearTimeout(pressTimer);
+      setPressTimer(null);
+    }
+  }, [pressTimer]);
+
+  const handlePresetClick = useCallback((presetKey: PresetKey) => {
+    if (pressTimer) {
+      clearTimeout(pressTimer);
+      setPressTimer(null);
+    }
+    if (!showPresetDescription) {
+      handleApplyPreset(presetKey);
+    }
+  }, [pressTimer, showPresetDescription, handleApplyPreset]);
 
   return (
     <div className="flex flex-col gap-2 sm:gap-3 md:gap-4 w-full max-w-6xl">
@@ -279,22 +318,26 @@ const HostPreGameView: React.FC<HostPreGameViewProps> = ({
               <label className="text-xs font-bold uppercase text-neo-cream/90">
                 {t('hostView.quickSetup') || 'Quick Setup'}
               </label>
-              <div className="flex flex-wrap gap-3">
+              <div className="grid grid-cols-2 gap-2 sm:flex sm:flex-wrap sm:gap-3">
                 {(Object.keys(GAME_PRESETS) as PresetKey[]).map((key) => {
                   const preset = GAME_PRESETS[key];
                   const isSelected = selectedPreset === key;
                   const presetStyles: Record<PresetKey, { bg: string; selected: string }> = {
+                    easy: {
+                      bg: 'bg-neo-lime',
+                      selected: 'bg-neo-lime ring-4 ring-green-400 ring-offset-2 ring-offset-slate-800',
+                    },
                     quick: {
                       bg: 'bg-neo-yellow',
-                      selected: 'bg-neo-yellow',
+                      selected: 'bg-neo-yellow ring-4 ring-yellow-400 ring-offset-2 ring-offset-slate-800',
                     },
                     party: {
                       bg: 'bg-neo-pink',
-                      selected: 'bg-neo-pink',
+                      selected: 'bg-neo-pink ring-4 ring-pink-400 ring-offset-2 ring-offset-slate-800',
                     },
                     challenge: {
                       bg: 'bg-neo-orange',
-                      selected: 'bg-neo-orange',
+                      selected: 'bg-neo-orange ring-4 ring-red-500 ring-offset-2 ring-offset-slate-800',
                     },
                   };
                   const style = presetStyles[key];
@@ -302,77 +345,33 @@ const HostPreGameView: React.FC<HostPreGameViewProps> = ({
                   return (
                     <motion.button
                       key={key}
-                      onClick={() => handleApplyPreset(key)}
+                      onClick={() => handlePresetClick(key)}
+                      onMouseDown={() => handlePresetMouseDown(key)}
+                      onMouseUp={handlePresetMouseUp}
+                      onMouseLeave={handlePresetMouseUp}
+                      onTouchStart={() => handlePresetMouseDown(key)}
+                      onTouchEnd={handlePresetMouseUp}
                       whileTap={{ scale: 0.95 }}
                       className={cn(
-                        "flex-1 min-w-[110px] px-4 py-4 rounded-neo font-bold transition-all duration-100 border-4 border-neo-black",
+                        "sm:flex-1 sm:min-w-[90px] px-2 py-2 sm:px-3 sm:py-3 rounded-neo font-bold transition-all duration-100 border-3 sm:border-4 border-neo-black",
                         style.bg,
                         isSelected
-                          ? "shadow-none translate-x-[3px] translate-y-[3px]"
-                          : "shadow-hard-lg hover:shadow-hard-xl hover:translate-x-[-2px] hover:translate-y-[-2px] active:shadow-none active:translate-x-[3px] active:translate-y-[3px]"
+                          ? `shadow-none translate-x-[2px] translate-y-[2px] sm:translate-x-[3px] sm:translate-y-[3px] ${style.selected}`
+                          : "shadow-hard hover:shadow-hard-lg sm:shadow-hard-lg sm:hover:shadow-hard-xl hover:translate-x-[-1px] hover:translate-y-[-1px] sm:hover:translate-x-[-2px] sm:hover:translate-y-[-2px] active:shadow-none active:translate-x-[2px] active:translate-y-[2px] sm:active:translate-x-[3px] sm:active:translate-y-[3px]"
                       )}
                     >
-                      <div className="flex flex-col items-center gap-1.5">
-                        <span className="text-3xl drop-shadow-sm">{preset.icon}</span>
-                        <span className="font-black text-base text-neo-black uppercase tracking-wide">
+                      <div className="flex flex-col items-center gap-1 sm:gap-1.5">
+                        <span className="text-xl sm:text-3xl drop-shadow-sm">{preset.icon}</span>
+                        <span className="font-black text-xs sm:text-base text-neo-black uppercase tracking-tight sm:tracking-wide leading-tight">
                           {t(preset.nameKey) || key.charAt(0).toUpperCase() + key.slice(1)}
                         </span>
-                        <span className="text-xs text-neo-black/70 font-bold">
+                        <span className="text-[9px] sm:text-xs text-neo-black/70 font-bold leading-tight">
                           {preset.timer}min • {difficultyName}
                         </span>
                       </div>
                     </motion.button>
                   );
                 })}
-              </div>
-            </div>
-
-            {/* Divider */}
-            <div className="border-t border-neo-cream/20 pt-2" />
-
-            {/* Timer Input */}
-            <div className="space-y-1.5">
-              <label className="text-xs font-bold uppercase text-neo-cream/90 flex items-center gap-1.5">
-                <FaClock className="text-neo-cyan text-xs" />
-                {t('hostView.roundDuration')}
-              </label>
-              <div className="flex items-center gap-2">
-                {/* Minus Button */}
-                <button
-                  type="button"
-                  onClick={handleDecreaseTimer}
-                  disabled={timerValue <= 1}
-                  className="w-9 h-9 flex items-center justify-center rounded-neo bg-neo-cream text-neo-black border-2 border-neo-black shadow-hard-sm hover:shadow-hard hover:translate-x-[-1px] hover:translate-y-[-1px] active:shadow-none active:translate-x-[1px] active:translate-y-[1px] transition-all duration-100 disabled:opacity-50 disabled:cursor-not-allowed font-black"
-                >
-                  <FaMinus size={12} />
-                </button>
-
-                <div className="flex items-center gap-1.5">
-                  <div className="text-2xl font-black text-neo-yellow w-10 text-center overflow-hidden h-9 flex items-center justify-center">
-                    <AnimatePresence mode="popLayout">
-                      <motion.span
-                        key={timerValue}
-                        initial={{ y: timerDirection > 0 ? 16 : -16, opacity: 0 }}
-                        animate={{ y: 0, opacity: 1 }}
-                        exit={{ y: timerDirection > 0 ? -16 : 16, opacity: 0 }}
-                        transition={{ duration: 0.15, ease: 'easeOut' }}
-                      >
-                        {timerValue}
-                      </motion.span>
-                    </AnimatePresence>
-                  </div>
-                  <span className="text-sm text-neo-cream font-bold">{t('hostView.minutes')}</span>
-                </div>
-
-                {/* Plus Button */}
-                <button
-                  type="button"
-                  onClick={handleIncreaseTimer}
-                  disabled={timerValue >= 10}
-                  className="w-9 h-9 flex items-center justify-center rounded-neo bg-neo-cream text-neo-black border-2 border-neo-black shadow-hard-sm hover:shadow-hard hover:translate-x-[-1px] hover:translate-y-[-1px] active:shadow-none active:translate-x-[1px] active:translate-y-[1px] transition-all duration-100 disabled:opacity-50 disabled:cursor-not-allowed font-black"
-                >
-                  <FaPlus size={12} />
-                </button>
               </div>
             </div>
 
@@ -416,6 +415,52 @@ const HostPreGameView: React.FC<HostPreGameViewProps> = ({
                   transition={{ duration: 0.2 }}
                   className="overflow-hidden space-y-3"
                 >
+                  {/* Timer Input */}
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-bold uppercase text-neo-cream/90 flex items-center gap-1.5">
+                      <FaClock className="text-neo-cyan text-xs" />
+                      {t('hostView.roundDuration')}
+                    </label>
+                    <div className="flex items-center gap-2">
+                      {/* Minus Button */}
+                      <button
+                        type="button"
+                        onClick={handleDecreaseTimer}
+                        disabled={timerValue <= 1}
+                        className="w-9 h-9 flex items-center justify-center rounded-neo bg-neo-cream text-neo-black border-2 border-neo-black shadow-hard-sm hover:shadow-hard hover:translate-x-[-1px] hover:translate-y-[-1px] active:shadow-none active:translate-x-[1px] active:translate-y-[1px] transition-all duration-100 disabled:opacity-50 disabled:cursor-not-allowed font-black"
+                      >
+                        <FaMinus size={12} />
+                      </button>
+
+                      <div className="flex items-center gap-1.5">
+                        <div className="text-2xl font-black text-neo-yellow w-10 text-center overflow-hidden h-9 flex items-center justify-center">
+                          <AnimatePresence mode="popLayout">
+                            <motion.span
+                              key={timerValue}
+                              initial={{ y: timerDirection > 0 ? 16 : -16, opacity: 0 }}
+                              animate={{ y: 0, opacity: 1 }}
+                              exit={{ y: timerDirection > 0 ? -16 : 16, opacity: 0 }}
+                              transition={{ duration: 0.15, ease: 'easeOut' }}
+                            >
+                              {timerValue}
+                            </motion.span>
+                          </AnimatePresence>
+                        </div>
+                        <span className="text-sm text-neo-cream font-bold">{t('hostView.minutes')}</span>
+                      </div>
+
+                      {/* Plus Button */}
+                      <button
+                        type="button"
+                        onClick={handleIncreaseTimer}
+                        disabled={timerValue >= 10}
+                        className="w-9 h-9 flex items-center justify-center rounded-neo bg-neo-cream text-neo-black border-2 border-neo-black shadow-hard-sm hover:shadow-hard hover:translate-x-[-1px] hover:translate-y-[-1px] active:shadow-none active:translate-x-[1px] active:translate-y-[1px] transition-all duration-100 disabled:opacity-50 disabled:cursor-not-allowed font-black"
+                      >
+                        <FaPlus size={12} />
+                      </button>
+                    </div>
+                  </div>
+
                   {/* Host Play Option */}
                   <div className="flex items-center gap-3">
                     <Checkbox
@@ -605,6 +650,65 @@ const HostPreGameView: React.FC<HostPreGameViewProps> = ({
           className="h-full min-h-[280px]"
         />
       </div>
+
+      {/* Preset Description Bottom Drawer */}
+      <AnimatePresence>
+        {showPresetDescription && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm"
+            onClick={() => setShowPresetDescription(null)}
+          >
+            <motion.div
+              initial={{ y: '100%' }}
+              animate={{ y: 0 }}
+              exit={{ y: '100%' }}
+              transition={{ type: 'spring', damping: 30, stiffness: 300 }}
+              onClick={(e) => e.stopPropagation()}
+              className="absolute bottom-0 left-0 right-0 bg-slate-800 border-t-4 border-neo-black rounded-t-[24px] shadow-hard-xl"
+            >
+              {/* Drag handle */}
+              <div className="flex justify-center pt-3 pb-2">
+                <div className="w-12 h-1.5 bg-neo-cream/30 rounded-full" />
+              </div>
+
+              <div className="flex flex-col items-center gap-4 text-center p-6 pb-8">
+                <span className="text-6xl">{GAME_PRESETS[showPresetDescription].icon}</span>
+                <h2 className="text-2xl font-black uppercase text-neo-yellow">
+                  {t(GAME_PRESETS[showPresetDescription].nameKey)}
+                </h2>
+                <div className="space-y-3 text-neo-cream">
+                  <p className="text-lg font-bold">
+                    {t(GAME_PRESETS[showPresetDescription].description)}
+                  </p>
+                  <div className="flex items-center justify-center gap-4 text-sm bg-neo-black/20 rounded-neo px-4 py-3 border-2 border-neo-black/30">
+                    <span className="flex items-center gap-1.5">
+                      <FaClock className="text-neo-cyan" />
+                      <span className="font-bold">{GAME_PRESETS[showPresetDescription].timer} {t('hostView.minutes')}</span>
+                    </span>
+                    <span>•</span>
+                    <span className="font-bold">
+                      {t(DIFFICULTIES[GAME_PRESETS[showPresetDescription].difficulty].nameKey)}
+                    </span>
+                    <span>•</span>
+                    <span className="text-xs opacity-80">
+                      {GAME_PRESETS[showPresetDescription].minWordLength} {t('hostView.letterMinimum')}
+                    </span>
+                  </div>
+                </div>
+                <Button
+                  onClick={() => setShowPresetDescription(null)}
+                  className="w-full bg-neo-cyan text-neo-black font-black hover:bg-neo-cyan/90 shadow-hard border-3 border-neo-black"
+                >
+                  {t('common.gotIt') || t('common.close') || 'Got it!'}
+                </Button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };
