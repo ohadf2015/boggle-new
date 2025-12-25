@@ -33,6 +33,7 @@ const LandingView: React.FC = () => {
   const { t, language } = useLanguage();
   const router = useRouter();
   const { playTrack, TRACKS } = useMusic();
+  const { isAuthenticated } = useAuth();
   const isLandscape = useMobileLandscape();
   const liveRoomStats = useLiveRoomStats();
 
@@ -65,10 +66,11 @@ const LandingView: React.FC = () => {
     const urlParams = new URLSearchParams(window.location.search);
     const hasRoom = urlParams.get('room');
 
-    if (!hasRoom && !hasCompletedOnboarding()) {
+    // Skip onboarding if user is authenticated
+    if (!hasRoom && !isAuthenticated && !hasCompletedOnboarding()) {
       setShowOnboarding(true);
     }
-  }, []);
+  }, [isAuthenticated]);
 
   // Initialize daily challenge info
   useEffect(() => {
