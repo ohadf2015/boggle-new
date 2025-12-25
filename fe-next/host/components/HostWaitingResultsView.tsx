@@ -171,6 +171,7 @@ const HostWaitingResultsView: React.FC<HostWaitingResultsViewProps> = ({
                         </div>
                         <Avatar
                           profilePictureUrl={player.avatar?.profilePictureUrl ?? undefined}
+                          avatarImage={player.avatar?.avatarImage}
                           avatarEmoji={player.avatar?.emoji}
                           avatarColor={player.avatar?.color}
                           size="md"

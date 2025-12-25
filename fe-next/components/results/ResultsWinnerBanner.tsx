@@ -4,6 +4,7 @@ import { FaCrown, FaTrophy } from 'react-icons/fa';
 import { useLanguage } from '../../contexts/LanguageContext';
 import confetti from 'canvas-confetti';
 import { SiKofi } from 'react-icons/si';
+import Avatar from '../Avatar';
 import type { PlayerResult } from '@/types/components';
 
 // Confetti burst on mount
@@ -29,10 +30,16 @@ const fireConfetti = (): void => {
   fire(0.1, { spread: 120, startVelocity: 45 });
 };
 
-// Winner data - only needs username and score
+// Winner data - includes username, score, and optional avatar
 interface WinnerData {
   username: string;
   score: number;
+  avatar?: {
+    emoji?: string;
+    color?: string;
+    profilePictureUrl?: string | null;
+    avatarImage?: string;
+  };
 }
 
 interface ResultsWinnerBannerProps {
@@ -137,7 +144,7 @@ const ResultsWinnerBanner: React.FC<ResultsWinnerBannerProps> = ({ winner, isCur
             {t('results.winnerAnnouncement')}
           </motion.h2>
 
-          {/* Winner Name - Neo-Brutalist style */}
+          {/* Winner Name with Avatar - Neo-Brutalist style */}
           <motion.div
             initial={{ scale: 0.8, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
@@ -146,9 +153,26 @@ const ResultsWinnerBanner: React.FC<ResultsWinnerBannerProps> = ({ winner, isCur
           >
             <motion.div
               whileHover={{ scale: 1.02, rotate: 1 }}
-              className="cursor-pointer inline-block"
+              className="cursor-pointer inline-flex items-center justify-center gap-4"
               onClick={fireConfetti}
             >
+              {/* Winner Avatar */}
+              {winner.avatar && (
+                <motion.div
+                  initial={{ scale: 0, rotate: -180 }}
+                  animate={{ scale: 1, rotate: 0 }}
+                  transition={{ delay: 0.6, type: 'spring', stiffness: 200 }}
+                  className="border-4 border-neo-black rounded-full shadow-hard bg-neo-cream p-1"
+                >
+                  <Avatar
+                    profilePictureUrl={winner.avatar.profilePictureUrl ?? undefined}
+                    avatarImage={winner.avatar.avatarImage}
+                    avatarEmoji={winner.avatar.emoji}
+                    avatarColor={winner.avatar.color}
+                    size="xl"
+                  />
+                </motion.div>
+              )}
               <h1
                 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black text-neo-black uppercase"
                 style={{

@@ -334,51 +334,45 @@ export default function MultiplayerPage(): React.JSX.Element {
   useEffect(() => {
     if (typeof window === 'undefined') return;
 
-    // Use shared socket singleton (may already exist from SocketProvider or previous mount)
+    // Get or create shared socket instance
+    // IMPORTANT: Always go through full listener setup, even for existing sockets
+    // This fixes the bug where existing sockets from SocketProvider didn't have game event listeners
     const existingSocket = getSharedSocketIfExists();
-    if (existingSocket && existingSocket.connected) {
-      socketRef.current = existingSocket;
-      // Defer state updates to avoid calling setState directly within effect
+    const isReusingSocket = existingSocket && existingSocket.connected;
+
+    const socketUrl = getSocketURL();
+    logger.log('[SOCKET.IO] MultiplayerPage using shared socket:', socketUrl, isReusingSocket ? '(reusing existing)' : '(creating new)');
+
+    // Get socket - either existing or create new
+    const socketInstance = isReusingSocket ? existingSocket : getSharedSocket();
+    socketRef.current = socketInstance;
+
+    // For existing connected sockets, set state immediately and request active rooms
+    if (isReusingSocket) {
       Promise.resolve().then(() => {
-        setSocket(existingSocket);
+        setSocket(socketInstance);
         setIsConnected(true);
-        // Request active rooms since we're reusing an existing connection
-        existingSocket.emit('getActiveRooms');
+        socketInstance.emit('getActiveRooms');
       });
-
-      // Set up activeRooms listener for existing socket
-      const handleActiveRooms = (data: { rooms?: ActiveRoom[] }) => {
-        setActiveRooms(data.rooms || []);
-        setRoomsLoading(false);
-      };
-      existingSocket.on('activeRooms', handleActiveRooms);
-
-      // Fallback timeout for rooms loading - show UI faster on slow connections
-      const roomsLoadingTimeout = setTimeout(() => {
-        setRoomsLoading(false);
-      }, SOCKET_CONFIG.ROOMS_LOADING_TIMEOUT);
-
-      return () => {
-        clearTimeout(roomsLoadingTimeout);
-        existingSocket.off('activeRooms', handleActiveRooms);
-      };
     }
 
-    // Get or create shared socket instance
-    const socketUrl = getSocketURL();
-    logger.log('[SOCKET.IO] MultiplayerPage using shared socket:', socketUrl);
-
-    const newSocket = getSharedSocket();
-    socketRef.current = newSocket;
+    // Remove any existing listeners before adding new ones (prevents duplicates on re-mount)
+    const eventNames = [
+      'connect', 'disconnect', 'connect_error', 'reconnect', 'reconnect_failed',
+      'joined', 'updateUsers', 'activeRooms', 'joinedAsSpectator', 'spectatorList',
+      'spectatorUpgraded', 'debugGameStateResponse', 'error', 'startGame', 'resetGame',
+      'hostLeftRoomClosing', 'sessionMigrated', 'warning', 'rateLimited', 'hostTransferred', 'pong'
+    ];
+    eventNames.forEach(event => socketInstance.off(event));
 
     // Connection events
-    newSocket.on('connect', () => {
-      logger.log('[SOCKET.IO] Connected:', newSocket.id);
+    socketInstance.on('connect', () => {
+      logger.log('[SOCKET.IO] Connected:', socketInstance.id);
       setIsConnected(true);
-      setSocket(newSocket);
+      setSocket(socketInstance);
 
       // Request active rooms on connect
-      newSocket.emit('getActiveRooms');
+      socketInstance.emit('getActiveRooms');
 
       // Handle reconnection to game
       if (wasConnectedRef.current) {
@@ -415,12 +409,12 @@ export default function MultiplayerPage(): React.JSX.Element {
 
           buildAuthContext().then((authContext) => {
             // Check if socket is still connected after async operation
-            if (!newSocket.connected) {
+            if (!socketInstance.connected) {
               logger.warn('[SOCKET.IO] Socket disconnected during auth context build, skipping reconnection emit');
               return;
             }
             if (savedSession.isHost) {
-              newSocket.emit('createGame', {
+              socketInstance.emit('createGame', {
                 gameCode: savedSession.gameCode,
                 roomName: savedSession.roomName,
                 language: savedSession.language || language,
@@ -432,7 +426,7 @@ export default function MultiplayerPage(): React.JSX.Element {
                 } : getAvatarForName(savedSession.hostUsername || savedSession.username || ''),
               });
             } else {
-              newSocket.emit('join', {
+              socketInstance.emit('join', {
                 gameCode: savedSession.gameCode,
                 username: savedSession.username,
                 ...authContext,
@@ -448,23 +442,23 @@ export default function MultiplayerPage(): React.JSX.Element {
       wasConnectedRef.current = true;
     });
 
-    newSocket.on('disconnect', (reason) => {
+    socketInstance.on('disconnect', (reason) => {
       logger.log('[SOCKET.IO] Disconnected:', reason);
       setIsConnected(false);
       setIsJoining(false); // Clear joining state on disconnect to prevent stuck button
 
       if (reason === 'io server disconnect') {
-        newSocket.connect();
+        socketInstance.connect();
       }
     });
 
-    newSocket.on('connect_error', (error) => {
+    socketInstance.on('connect_error', (error) => {
       logger.error('[SOCKET.IO] Connection error:', error.message);
       setError(t('errors.unstableConnection') || 'Connection error');
       setIsJoining(false); // Clear joining state on connection error
     });
 
-    newSocket.on('reconnect', (attemptNumber) => {
+    socketInstance.on('reconnect', (attemptNumber) => {
       logger.log('[SOCKET.IO] Reconnected after', attemptNumber, 'attempts');
       setIsConnected(true);
       toast.success(t('common.reconnected') || 'Reconnected!', {
@@ -473,14 +467,14 @@ export default function MultiplayerPage(): React.JSX.Element {
       });
     });
 
-    newSocket.on('reconnect_failed', () => {
+    socketInstance.on('reconnect_failed', () => {
       logger.error('[SOCKET.IO] Reconnection failed');
       setError(t('errors.connectionLost') || 'Connection lost');
       setIsJoining(false); // Clear joining state on reconnection failure
     });
 
     // Game events
-    newSocket.on('joined', (data) => {
+    socketInstance.on('joined', (data) => {
       logger.log('[SOCKET.IO] ✅ Joined successfully:', data);
       setIsHost(data.isHost);
       setIsActive(true);
@@ -512,19 +506,19 @@ export default function MultiplayerPage(): React.JSX.Element {
       });
     });
 
-    newSocket.on('updateUsers', (data) => {
+    socketInstance.on('updateUsers', (data) => {
       if (data.users) {
         setPlayersInRoom(data.users);
       }
     });
 
-    newSocket.on('activeRooms', (data) => {
+    socketInstance.on('activeRooms', (data) => {
       setActiveRooms(data.rooms || []);
       setRoomsLoading(false);
     });
 
     // Spectator & Late Joiner events
-    newSocket.on('joinedAsSpectator', (data) => {
+    socketInstance.on('joinedAsSpectator', (data) => {
       logger.log('[SPECTATOR] Joined as spectator:', data);
       setIsSpectator(true);
       setGameCode(data.gameCode);
@@ -546,12 +540,12 @@ export default function MultiplayerPage(): React.JSX.Element {
       });
     });
 
-    newSocket.on('spectatorList', (data) => {
+    socketInstance.on('spectatorList', (data) => {
       logger.log('[SPECTATOR] Spectator list updated:', data.spectators?.length || 0);
       setSpectators(data.spectators || []);
     });
 
-    newSocket.on('spectatorUpgraded', (data) => {
+    socketInstance.on('spectatorUpgraded', (data) => {
       if (data.success && data.username === username) {
         logger.log('[SPECTATOR] Upgraded to player, late join:', data.lateJoin);
         setIsSpectator(false);
@@ -576,11 +570,11 @@ export default function MultiplayerPage(): React.JSX.Element {
     }, SOCKET_CONFIG.ROOMS_LOADING_TIMEOUT);
 
     // Debug handler to check server-side game state
-    newSocket.on('debugGameStateResponse', (data) => {
+    socketInstance.on('debugGameStateResponse', (data) => {
       logger.log('[DEBUG] Server game state:', data);
     });
 
-    newSocket.on('error', (data) => {
+    socketInstance.on('error', (data) => {
       setIsJoining(false); // Clear loading state on any error
 
       // Handle empty error objects (Socket.IO internal errors) - log as debug, not error
@@ -591,8 +585,8 @@ export default function MultiplayerPage(): React.JSX.Element {
 
       if (isEmptyError) {
         logger.debug('[SOCKET.IO] Received empty error object (internal Socket.IO event)', {
-          connected: newSocket.connected,
-          id: newSocket.id
+          connected: socketInstance.connected,
+          id: socketInstance.id
         });
         return; // Don't process empty errors further
       }
@@ -603,7 +597,7 @@ export default function MultiplayerPage(): React.JSX.Element {
       // If error is about game not in progress, query server for actual state
       if (data?.code === 'GAME_NOT_IN_PROGRESS' || data?.message?.includes('not in progress')) {
         logger.error('[SOCKET.IO] Game state mismatch - querying server for actual state');
-        newSocket.emit('debugGameState');
+        socketInstance.emit('debugGameState');
       }
 
       // Handle specific error cases
@@ -648,7 +642,7 @@ export default function MultiplayerPage(): React.JSX.Element {
     // Store game start data so PlayerView can consume it when it mounts or updates
     // This ensures the event is captured even if PlayerView is still loading (dynamic import)
     // Note: The actual "Game Started" toast is shown by PlayerView/HostView components
-    newSocket.on('startGame', (data) => {
+    socketInstance.on('startGame', (data) => {
       logger.log('[SOCKET.IO] startGame received:', data);
 
       // Always store pending game start data for PlayerView to consume
@@ -665,7 +659,7 @@ export default function MultiplayerPage(): React.JSX.Element {
 
     // Handle game reset - keep players in the room for new game
     // Note: Toast notification is handled by PlayerView/HostView to avoid duplicates
-    newSocket.on('resetGame', () => {
+    socketInstance.on('resetGame', () => {
       logger.log('[SOCKET.IO] Game reset - staying in room for new game');
       // Update ref SYNCHRONOUSLY before state change to prevent race condition
       // where startGame arrives before the ref useEffect updates
@@ -675,7 +669,7 @@ export default function MultiplayerPage(): React.JSX.Element {
       // Toast notification is handled by PlayerView/HostView to avoid duplicates
     });
 
-    newSocket.on('hostLeftRoomClosing', (data) => {
+    socketInstance.on('hostLeftRoomClosing', (data) => {
       toast.error(data.message || t('playerView.roomClosed'), {
         icon: '🚪',
         duration: 5000,
@@ -689,7 +683,7 @@ export default function MultiplayerPage(): React.JSX.Element {
     });
 
     // Handle session migration (another tab took over)
-    newSocket.on('sessionMigrated', (data) => {
+    socketInstance.on('sessionMigrated', (data) => {
       logger.log('[SOCKET.IO] Session migrated:', data);
       toast(data.message || 'Your session was moved to another tab', {
         icon: '🔄',
@@ -703,7 +697,7 @@ export default function MultiplayerPage(): React.JSX.Element {
     });
 
     // Handle joining as spectator (room is full)
-    newSocket.on('joinedAsSpectator', (data) => {
+    socketInstance.on('joinedAsSpectator', (data) => {
       logger.log('[SOCKET.IO] Joined as spectator:', data);
       setIsJoining(false); // Clear loading state
       setPrefilledRoomCode(''); // Clear prefilled room code
@@ -724,7 +718,7 @@ export default function MultiplayerPage(): React.JSX.Element {
     });
 
     // Handle server warnings (e.g., Redis failures)
-    newSocket.on('warning', (data) => {
+    socketInstance.on('warning', (data) => {
       logger.warn('[SOCKET.IO] Warning:', data);
       if (data.type === 'persistence') {
         toast.error(data.message || 'Game state could not be saved. Progress may be lost on server restart.', {
@@ -740,7 +734,7 @@ export default function MultiplayerPage(): React.JSX.Element {
     });
 
     // Handle rate limiting - user is sending too many requests
-    newSocket.on('rateLimited', () => {
+    socketInstance.on('rateLimited', () => {
       logger.warn('[SOCKET.IO] Rate limited by server');
       setIsJoining(false); // Clear loading state
       toast.error(t('errors.rateLimited') || 'Too many requests. Please wait a moment and try again.', {
@@ -749,7 +743,7 @@ export default function MultiplayerPage(): React.JSX.Element {
       });
     });
 
-    newSocket.on('hostTransferred', (data) => {
+    socketInstance.on('hostTransferred', (data) => {
       if (data.newHost === username) {
         setIsHost(true);
         saveSession({
@@ -765,42 +759,45 @@ export default function MultiplayerPage(): React.JSX.Element {
       }
     });
 
-    newSocket.on('pong', () => {
+    socketInstance.on('pong', () => {
       // Heartbeat response - connection is alive
     });
 
     // Defer state update to avoid calling setState directly within effect
     Promise.resolve().then(() => {
-      setSocket(newSocket);
+      setSocket(socketInstance);
     });
 
     return () => {
       logger.log('[SOCKET.IO] MultiplayerPage cleaning up');
       clearTimeout(roomsLoadingTimeout);
       // Remove this component's listeners but keep socket alive for other components
-      newSocket.off('connect');
-      newSocket.off('disconnect');
-      newSocket.off('connect_error');
-      newSocket.off('reconnect');
-      newSocket.off('reconnect_failed');
-      newSocket.off('joined');
-      newSocket.off('updateUsers');
-      newSocket.off('activeRooms');
-      newSocket.off('joinedAsSpectator');
-      newSocket.off('spectatorList');
-      newSocket.off('spectatorUpgraded');
-      newSocket.off('debugGameStateResponse');
-      newSocket.off('error');
-      newSocket.off('startGame');
-      newSocket.off('resetGame');
-      newSocket.off('hostLeftRoomClosing');
-      newSocket.off('sessionMigrated');
-      newSocket.off('warning');
-      newSocket.off('rateLimited');
-      newSocket.off('hostTransferred');
-      newSocket.off('pong');
-      // Release reference to shared socket (socket disconnects when all refs released)
-      releaseSharedSocket();
+      socketInstance.off('connect');
+      socketInstance.off('disconnect');
+      socketInstance.off('connect_error');
+      socketInstance.off('reconnect');
+      socketInstance.off('reconnect_failed');
+      socketInstance.off('joined');
+      socketInstance.off('updateUsers');
+      socketInstance.off('activeRooms');
+      socketInstance.off('joinedAsSpectator');
+      socketInstance.off('spectatorList');
+      socketInstance.off('spectatorUpgraded');
+      socketInstance.off('debugGameStateResponse');
+      socketInstance.off('error');
+      socketInstance.off('startGame');
+      socketInstance.off('resetGame');
+      socketInstance.off('hostLeftRoomClosing');
+      socketInstance.off('sessionMigrated');
+      socketInstance.off('warning');
+      socketInstance.off('rateLimited');
+      socketInstance.off('hostTransferred');
+      socketInstance.off('pong');
+      // Release reference to shared socket only if we created one (not reusing existing)
+      // When reusing, getSharedSocketIfExists() doesn't increment refcount
+      if (!isReusingSocket) {
+        releaseSharedSocket();
+      }
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps -- gameCode, username, roomName, roomLanguage are used in handlers but shouldn't trigger socket recreation
   }, [t, language]);

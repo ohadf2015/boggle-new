@@ -42,49 +42,48 @@ const SpecialRoundsStep: React.FC = () => {
   ];
 
   return (
-    <div className="flex flex-col items-center space-y-6">
+    <div className="flex flex-col items-center space-y-3 sm:space-y-5">
       {/* Header */}
       <motion.div
         initial={{ y: -20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
-        className="text-center space-y-2"
+        className="text-center space-y-1"
       >
-        <h2 className="text-2xl sm:text-3xl font-black text-neo-black uppercase">
+        <h2 className="text-xl sm:text-2xl font-black text-neo-black uppercase">
           {t('onboarding.specialRounds.title')}
         </h2>
-        <p className="text-sm sm:text-base text-neo-black/70">
+        <p className="text-xs sm:text-sm text-neo-black/70">
           {t('onboarding.specialRounds.subtitle')}
         </p>
       </motion.div>
 
-      {/* Two panels */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full max-w-2xl">
+      {/* Two panels - always 2 columns */}
+      <div className="grid grid-cols-2 gap-2 sm:gap-4 w-full max-w-2xl">
         {/* Earthquake panel */}
         <motion.div
           initial={{ x: -50, opacity: 0 }}
           animate={{ x: 0, opacity: 1 }}
           transition={{ delay: 0.2 }}
-          className="space-y-3"
         >
-          <div className="bg-neo-orange border-3 border-neo-black rounded-neo p-4 shadow-hard-md">
-            <div className="flex items-center gap-2 mb-2">
-              <span className="text-2xl">🌋</span>
-              <h3 className="font-black text-lg text-neo-black">
+          <div className="bg-neo-orange border-2 sm:border-3 border-neo-black rounded-neo p-2 sm:p-4 shadow-hard-sm sm:shadow-hard-md h-full">
+            <div className="flex items-center gap-1 sm:gap-2 mb-1 sm:mb-2">
+              <span className="text-lg sm:text-2xl">🌋</span>
+              <h3 className="font-black text-xs sm:text-lg text-neo-black leading-tight">
                 {t('onboarding.specialRounds.earthquake.title')}
               </h3>
             </div>
-            <p className="text-sm text-neo-black/80 mb-4">
+            <p className="text-[10px] sm:text-sm text-neo-black/80 mb-2 sm:mb-4 line-clamp-2 sm:line-clamp-none">
               {t('onboarding.specialRounds.earthquake.description')}
             </p>
 
             {/* Demo grid with earthquake effect */}
-            <div className="bg-neo-cream border-2 border-neo-black rounded-neo p-3 relative overflow-hidden">
-              <div className="grid grid-cols-2 gap-2">
+            <div className="bg-neo-cream border-2 border-neo-black rounded-neo p-1.5 sm:p-3 relative overflow-hidden">
+              <div className="grid grid-cols-2 gap-1 sm:gap-2">
                 {demoLetters.map((row, rowIndex) =>
                   row.map((letter, colIndex) => (
                     <motion.div
                       key={`${rowIndex}-${colIndex}`}
-                      className="aspect-square bg-neo-yellow border-2 border-neo-black rounded flex items-center justify-center font-black text-2xl"
+                      className="aspect-square bg-neo-yellow border-2 border-neo-black rounded flex items-center justify-center font-black text-base sm:text-2xl"
                       animate={
                         earthquakeActive
                           ? {
@@ -103,7 +102,7 @@ const SpecialRoundsStep: React.FC = () => {
               </div>
             </div>
 
-            <div className="mt-2 text-xs text-neo-black/70 text-center">
+            <div className="mt-1.5 sm:mt-2 text-[9px] sm:text-xs text-neo-black/70 text-center hidden sm:block">
               💡 {t('onboarding.specialRounds.earthquake.tip')}
             </div>
           </div>
@@ -114,29 +113,28 @@ const SpecialRoundsStep: React.FC = () => {
           initial={{ x: 50, opacity: 0 }}
           animate={{ x: 0, opacity: 1 }}
           transition={{ delay: 0.4 }}
-          className="space-y-3"
         >
-          <div className="bg-neo-pink border-3 border-neo-black rounded-neo p-4 shadow-hard-md">
-            <div className="flex items-center gap-2 mb-2">
-              <span className="text-2xl">💃</span>
-              <h3 className="font-black text-lg text-neo-black">
+          <div className="bg-neo-pink border-2 sm:border-3 border-neo-black rounded-neo p-2 sm:p-4 shadow-hard-sm sm:shadow-hard-md h-full">
+            <div className="flex items-center gap-1 sm:gap-2 mb-1 sm:mb-2">
+              <span className="text-lg sm:text-2xl">💃</span>
+              <h3 className="font-black text-xs sm:text-lg text-neo-black leading-tight">
                 {t('onboarding.specialRounds.fireRound.title')}
               </h3>
             </div>
-            <p className="text-sm text-neo-black/80 mb-4">
+            <p className="text-[10px] sm:text-sm text-neo-black/80 mb-2 sm:mb-4 line-clamp-2 sm:line-clamp-none">
               {t('onboarding.specialRounds.fireRound.description')}
             </p>
 
             {/* Demo grid with fire round effect */}
-            <div className="bg-neo-cream border-2 border-neo-black rounded-neo p-3 relative overflow-hidden">
-              <div className="grid grid-cols-2 gap-2">
+            <div className="bg-neo-cream border-2 border-neo-black rounded-neo p-1.5 sm:p-3 relative overflow-hidden">
+              <div className="grid grid-cols-2 gap-1 sm:gap-2">
                 {demoLetters.map((row, rowIndex) =>
                   row.map((letter, colIndex) => {
                     const colorIndex = (rowIndex + colIndex) % rainbowColors.length;
                     return (
                       <motion.div
                         key={`${rowIndex}-${colIndex}`}
-                        className="aspect-square border-2 border-neo-black rounded flex items-center justify-center font-black text-2xl"
+                        className="aspect-square border-2 border-neo-black rounded flex items-center justify-center font-black text-base sm:text-2xl"
                         style={{
                           backgroundColor: fireRoundActive
                             ? rainbowColors[colorIndex]
@@ -175,13 +173,13 @@ const SpecialRoundsStep: React.FC = () => {
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }}
                 transition={{ delay: 0.6 }}
-                className="absolute -top-2 -right-2 bg-neo-orange border-2 border-neo-black rounded-full px-3 py-1 font-black text-sm shadow-hard-sm"
+                className="absolute -top-1 -right-1 sm:-top-2 sm:-right-2 bg-neo-orange border-2 border-neo-black rounded-full px-1.5 sm:px-3 py-0.5 sm:py-1 font-black text-[10px] sm:text-sm shadow-hard-sm"
               >
                 2x
               </motion.div>
             </div>
 
-            <div className="mt-2 text-xs text-neo-black/70 text-center">
+            <div className="mt-1.5 sm:mt-2 text-[9px] sm:text-xs text-neo-black/70 text-center hidden sm:block">
               💡 {t('onboarding.specialRounds.fireRound.tip')}
             </div>
           </div>

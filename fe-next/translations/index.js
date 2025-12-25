@@ -480,6 +480,8 @@ const translations = {
       minWordLength2: '2 letters',
       minWordLength3: '3 letters',
       minWordLength4: '4 letters',
+      difficultyTooltipGrid: '{{rows}}×{{cols}} letter grid',
+      difficultyTooltipTimer: '{{minutes}} min recommended',
       allWordsAutoValidated: 'All words auto-validated!',
       wordsAutoValidated: 'words auto-validated',
       gameTypeSelector: 'Choose Game Mode',
@@ -518,6 +520,7 @@ const translations = {
       exitConfirmation: 'Exit room?',
       exitWarning: 'Are you sure you want to leave? You will lose your progress in the current game.',
       exit: 'Exit',
+      exitRoom: 'Exit Room',
       waitForGameStart: 'Wait for game start',
       players: 'Players',
       yourAchievements: 'Your Achievements',
@@ -1426,7 +1429,8 @@ const translations = {
         demoInstruction: 'Try it! Find the word:',
         demoWord: 'CAT',
         demoHint: 'Swipe or tap adjacent letters',
-        demoSuccess: 'Perfect! You got it!'
+        demoSuccess: 'Perfect! You got it!',
+        clickNext: 'Click Next to continue',
       },
       combo: {
         title: 'Combo System',
@@ -1439,6 +1443,7 @@ const translations = {
       },
       specialRounds: {
         title: 'Special Rounds',
+        subtitle: 'Chaos meets opportunity!',
         earthquake: {
           title: 'Earthquake',
           description: 'Letters shake and scramble - adapt fast!',
@@ -1461,7 +1466,9 @@ const translations = {
         placeholder: 'Enter your name',
         errorInvalid: 'Only letters, numbers, and spaces allowed',
         errorTooShort: 'Name must be at least 2 characters',
-        errorTooLong: 'Name can\'t be more than 20 characters'
+        errorTooLong: 'Name can\'t be more than 20 characters',
+        characterCount: 'characters',
+        proTip: 'Pick a name that strikes fear into your opponents. Or makes them laugh. Both work!',
       },
       mode: {
         title: 'Choose Your Mode',
@@ -1477,13 +1484,15 @@ const translations = {
         dailyPlayer: {
           title: 'Daily Challenge',
           description: 'Same puzzle for everyone worldwide each day'
-        }
+        },
+        encouragement: 'Great choice! Click "Let\'s Play" to start your word adventure!',
       },
       navigation: {
         skip: 'Skip',
         back: 'Back',
         next: 'Next',
-        letsPlay: 'Let\'s Play!'
+        letsPlay: 'Let\'s Play!',
+        title: 'Player Welcome',
       }
     },
     leaderboard: {
@@ -2266,6 +2275,8 @@ const translations = {
       minWordLength2: '2 אותיות',
       minWordLength3: '3 אותיות',
       minWordLength4: '4 אותיות',
+      difficultyTooltipGrid: 'לוח {{rows}}×{{cols}} אותיות',
+      difficultyTooltipTimer: '{{minutes}} דקות מומלץ',
       allWordsAutoValidated: 'כל המילים אומתו אוטומטית!',
       wordsAutoValidated: 'מילים אומתו אוטומטית',
       gameTypeSelector: 'בחר מצב משחק',
@@ -2304,6 +2315,7 @@ const translations = {
       exitConfirmation: 'לצאת מהחדר?',
       exitWarning: 'האם אתה בטוח שברצונך לעזוב? תאבד את ההתקדמות שלך במשחק הנוכחי.',
       exit: 'יציאה',
+      exitRoom: 'יציאה מהחדר',
       waitForGameStart: 'המתן לתחילת המשחק',
       players: 'שחקנים',
       yourAchievements: 'ההישגים שלך',
@@ -3206,7 +3218,8 @@ const translations = {
         demoInstruction: 'נסה! מצא את המילה:',
         demoWord: 'CAT',
         demoHint: 'החלק או הקש על אותיות סמוכות',
-        demoSuccess: 'מושלם! הצלחת!'
+        demoSuccess: 'מושלם! הצלחת!',
+        clickNext: 'לחץ הבא להמשך',
       },
       combo: {
         title: 'מערכת קומבו',
@@ -3219,6 +3232,7 @@ const translations = {
       },
       specialRounds: {
         title: 'סבבים מיוחדים',
+        subtitle: 'כאוס פוגש הזדמנות!',
         earthquake: {
           title: 'רעידת אדמה',
           description: 'האותיות רועדות ומתערבבות - הסתגל מהר!',
@@ -3241,7 +3255,9 @@ const translations = {
         placeholder: 'הכנס את שמך',
         errorInvalid: 'רק אותיות, מספרים ורווחים מותרים',
         errorTooShort: 'השם חייב להיות לפחות 2 תווים',
-        errorTooLong: 'השם לא יכול להיות יותר מ-20 תווים'
+        errorTooLong: 'השם לא יכול להיות יותר מ-20 תווים',
+        characterCount: 'תווים',
+        proTip: 'בחר שם שיפחיד את היריבים. או יצחיק אותם. שניהם עובדים!',
       },
       mode: {
         title: 'בחר את המצב שלך',
@@ -3257,13 +3273,15 @@ const translations = {
         dailyPlayer: {
           title: 'אתגר יומי',
           description: 'אותו פאזל לכולם ברחבי העולם מדי יום'
-        }
+        },
+        encouragement: 'בחירה מצוינת! לחץ "בואו נשחק" להתחיל את ההרפתקה!',
       },
       navigation: {
         skip: 'דלג',
         back: 'חזרה',
         next: 'הבא',
-        letsPlay: 'בואו נשחק!'
+        letsPlay: 'בואו נשחק!',
+        title: 'ברוכים הבאים',
       }
     },
     leaderboard: {
@@ -4044,6 +4062,8 @@ const translations = {
       minWordLength2: '2 bokstäver',
       minWordLength3: '3 bokstäver',
       minWordLength4: '4 bokstäver',
+      difficultyTooltipGrid: '{{rows}}×{{cols}} bokstavsrutnät',
+      difficultyTooltipTimer: '{{minutes}} min rekommenderas',
       allWordsAutoValidated: 'Alla ord automatiskt validerade!',
       wordsAutoValidated: 'ord automatiskt validerade',
       gameTypeSelector: 'Välj spelläge',
@@ -4082,6 +4102,7 @@ const translations = {
       exitConfirmation: 'Lämna rummet?',
       exitWarning: 'Är du säker på att du vill lämna? Du kommer att förlora ditt framsteg i det aktuella spelet.',
       exit: 'Avsluta',
+      exitRoom: 'Lämna rummet',
       waitForGameStart: 'Vänta på att spelet startar',
       players: 'Spelare',
       yourAchievements: 'Dina prestationer',
@@ -4858,7 +4879,8 @@ const translations = {
         demoInstruction: 'Prova! Hitta ordet:',
         demoWord: 'CAT',
         demoHint: 'Svep eller tryck på angränsande bokstäver',
-        demoSuccess: 'Perfekt! Du klarade det!'
+        demoSuccess: 'Perfekt! Du klarade det!',
+        clickNext: 'Klicka Nästa för att fortsätta',
       },
       combo: {
         title: 'Kombosystem',
@@ -4871,6 +4893,7 @@ const translations = {
       },
       specialRounds: {
         title: 'Specialrundor',
+        subtitle: 'Kaos möter möjlighet!',
         earthquake: {
           title: 'Jordbävning',
           description: 'Bokstäverna skakar och blandas - anpassa dig snabbt!',
@@ -4893,7 +4916,9 @@ const translations = {
         placeholder: 'Ange ditt namn',
         errorInvalid: 'Endast bokstäver, siffror och mellanslag tillåtna',
         errorTooShort: 'Namnet måste vara minst 2 tecken',
-        errorTooLong: 'Namnet kan inte vara längre än 20 tecken'
+        errorTooLong: 'Namnet kan inte vara längre än 20 tecken',
+        characterCount: 'tecken',
+        proTip: 'Välj ett namn som skrämmer dina motståndare. Eller får dem att skratta. Båda fungerar!',
       },
       mode: {
         title: 'Välj ditt läge',
@@ -4909,13 +4934,15 @@ const translations = {
         dailyPlayer: {
           title: 'Daglig utmaning',
           description: 'Samma pussel för alla världen över varje dag'
-        }
+        },
+        encouragement: 'Bra val! Klicka "Let\'s Play" för att starta ditt ordäventyr!',
       },
       navigation: {
         skip: 'Hoppa över',
         back: 'Tillbaka',
         next: 'Nästa',
-        letsPlay: 'Let\'s Play!'
+        letsPlay: 'Let\'s Play!',
+        title: 'Spelarvälkommen',
       }
     },
     leaderboard: {
@@ -5825,6 +5852,8 @@ const translations = {
       minWordLength2: '2文字',
       minWordLength3: '3文字',
       minWordLength4: '4文字',
+      difficultyTooltipGrid: '{{rows}}×{{cols}}のグリッド',
+      difficultyTooltipTimer: '{{minutes}}分推奨',
       allWordsAutoValidated: 'すべての単語が自動検証されました！',
       wordsAutoValidated: '単語が自動検証されました',
       gameTypeSelector: 'ゲームモードを選択',
@@ -5863,6 +5892,7 @@ const translations = {
       exitConfirmation: 'ルームを退出しますか？',
       exitWarning: '本当に退出しますか？現在のゲームの進行状況が失われます。',
       exit: '退出',
+      exitRoom: 'ルームを退出',
       waitForGameStart: 'ゲーム開始を待つ',
       players: 'プレイヤー',
       yourAchievements: 'あなたの実績',
@@ -6639,7 +6669,8 @@ const translations = {
         demoInstruction: 'やってみよう！この単語を見つけて:',
         demoWord: 'CAT',
         demoHint: '隣接する文字をスワイプまたはタップ',
-        demoSuccess: '完璧！できました！'
+        demoSuccess: '完璧！できました！',
+        clickNext: '次へをクリックして続ける',
       },
       combo: {
         title: 'コンボシステム',
@@ -6652,6 +6683,7 @@ const translations = {
       },
       specialRounds: {
         title: 'スペシャルラウンド',
+        subtitle: 'カオスがチャンスに！',
         earthquake: {
           title: '地震',
           description: '文字が揺れてシャッフルされる - 素早く適応！',
@@ -6674,7 +6706,9 @@ const translations = {
         placeholder: '名前を入力',
         errorInvalid: '文字、数字、スペースのみ使用可能です',
         errorTooShort: '名前は2文字以上必要です',
-        errorTooLong: '名前は20文字以内にしてください'
+        errorTooLong: '名前は20文字以内にしてください',
+        characterCount: '文字',
+        proTip: '相手を怖がらせる名前を選ぼう。または笑わせる名前でも。どちらでも効果あり！',
       },
       mode: {
         title: 'モードを選択',
@@ -6690,13 +6724,15 @@ const translations = {
         dailyPlayer: {
           title: 'デイリーチャレンジ',
           description: '毎日世界中で同じパズルに挑戦'
-        }
+        },
+        encouragement: '素晴らしい選択！「プレイしよう」をクリックして冒険を始めよう！',
       },
       navigation: {
         skip: 'スキップ',
         back: '戻る',
         next: '次へ',
-        letsPlay: 'プレイしよう！'
+        letsPlay: 'プレイしよう！',
+        title: 'プレイヤーようこそ',
       }
     },
     leaderboard: {
@@ -7603,6 +7639,8 @@ const translations = {
       minWordLength2: '2 letras',
       minWordLength3: '3 letras',
       minWordLength4: '4 letras',
+      difficultyTooltipGrid: 'Cuadrícula de {{rows}}×{{cols}} letras',
+      difficultyTooltipTimer: '{{minutes}} min recomendados',
       allWordsAutoValidated: '¡Todas las palabras auto-validadas!',
       wordsAutoValidated: 'palabras auto-validadas',
       gameTypeSelector: 'Elige Modo de Juego',
@@ -7641,6 +7679,7 @@ const translations = {
       exitConfirmation: '¿Salir de la sala?',
       exitWarning: '¿Seguro que quieres irte? Perderás tu progreso en el juego actual.',
       exit: 'Salir',
+      exitRoom: 'Salir de la sala',
       waitForGameStart: 'Espera que inicie el juego',
       players: 'Jugadores',
       yourAchievements: 'Tus Logros',
@@ -8402,7 +8441,178 @@ const translations = {
       },
     },
     achievements: {
-      FIRST_BLOOD: { name: 'Primera Sangre', description: 'Primero en encontrar una palabra' },
+      FIRST_BLOOD: {
+        name: 'Primera Sangre',
+        description: 'Primero en encontrar una palabra'
+      },
+      SPEED_DEMON: {
+        name: 'Demonio de la Velocidad',
+        description: 'Encontró 20 palabras en 90 segundos'
+      },
+      WORD_MASTER: {
+        name: 'Maestro de Palabras',
+        description: 'Encontró una palabra con 7+ letras'
+      },
+      COMBO_KING: {
+        name: 'Rey del Combo',
+        description: 'Alcanzó una racha de 10+ combos'
+      },
+      PERFECTIONIST: {
+        name: 'Perfeccionista',
+        description: '15+ palabras, todas válidas'
+      },
+      LEXICON: {
+        name: 'Léxico',
+        description: 'Encontró 35+ palabras'
+      },
+      WORDSMITH: {
+        name: 'Artesano de Palabras',
+        description: 'Encontró 25 palabras válidas'
+      },
+      QUICK_THINKER: {
+        name: 'Pensador Rápido',
+        description: 'Encontró una palabra en menos de 3 segundos'
+      },
+      LONG_HAULER: {
+        name: 'Corredor de Maratón',
+        description: 'Encontró una palabra en el último minuto'
+      },
+      DIVERSE_VOCABULARY: {
+        name: 'Vocabulario Diverso',
+        description: 'Encontró palabras de 5+ longitudes diferentes'
+      },
+      DOUBLE_TROUBLE: {
+        name: 'Dúo Ganador',
+        description: 'Encontró 2 palabras en 1.5 segundos'
+      },
+      TREASURE_HUNTER: {
+        name: 'Cazador de Tesoros',
+        description: 'Encontró una palabra rara (8+ letras)'
+      },
+      TRIPLE_THREAT: {
+        name: 'Triple Amenaza',
+        description: 'Encontró 3 palabras en 4 segundos'
+      },
+      UNSTOPPABLE: {
+        name: 'Imparable',
+        description: 'Encontró 45+ palabras'
+      },
+      COMEBACK_KID: {
+        name: 'El del Regreso',
+        description: 'Encontró una palabra en los últimos 3 segundos'
+      },
+      DICTIONARY_DIVER: {
+        name: 'Buceador del Diccionario',
+        description: 'Encontró 40+ palabras válidas'
+      },
+      LIGHTNING_ROUND: {
+        name: 'Ronda Relámpago',
+        description: 'Encontró 10 palabras en los primeros 30 segundos'
+      },
+      RARE_GEM: {
+        name: 'Gema Rara',
+        description: 'Encontró una palabra ultra-rara (9+ letras)'
+      },
+      EXPLORER: {
+        name: 'Explorador',
+        description: 'Encontró palabras de 6+ longitudes diferentes'
+      },
+      STREAK_MASTER: {
+        name: 'Maestro de Rachas',
+        description: 'Alcanzó una racha de 18+ combos'
+      },
+      ANAGRAM_ARTIST: {
+        name: 'Artista del Anagrama',
+        description: 'Encontró 2 palabras anagrama consecutivas'
+      },
+      LETTER_POPPER: {
+        name: 'Explotador de Globos',
+        description: 'Explotó 10+ letras en el menú principal'
+      },
+      WORD_ARCHITECT: {
+        name: 'Arquitecto de Palabras',
+        description: 'Encontró 3 palabras con 7+ letras'
+      },
+      SPEED_LEGEND: {
+        name: 'Leyenda de la Velocidad',
+        description: 'Encontró 25 palabras en 90 segundos'
+      },
+      COMBO_GOD: {
+        name: 'Dios del Combo',
+        description: 'Alcanzó una racha de 20+ combos'
+      },
+      VOCABULARY_TITAN: {
+        name: 'Titán del Vocabulario',
+        description: 'Encontró 50+ palabras válidas'
+      },
+      PRECISION_MASTER: {
+        name: 'Maestro de la Precisión',
+        description: '25+ palabras con 100% de precisión'
+      },
+      LONG_WORD_CHAIN: {
+        name: 'Cadena de Palabras Largas',
+        description: '4 palabras consecutivas de 6+ letras'
+      },
+      MINIMALIST: {
+        name: 'Minimalista',
+        description: 'Ganó solo con palabras de 4+ letras (15+ palabras)'
+      },
+      WORD_SNIPER: {
+        name: 'Francotirador de Palabras',
+        description: 'Encontró 5+ palabras únicas que nadie más encontró'
+      },
+      PHOTO_FINISH: {
+        name: 'Final de Foto',
+        description: 'Ganó por menos de 5 puntos'
+      },
+      UNDERDOG: {
+        name: 'Desvalido',
+        description: 'Remontó desde atrás para ganar'
+      },
+      CLUTCH_PLAYER: {
+        name: 'Jugador Decisivo',
+        description: 'Encontró 3+ palabras en los últimos 10 segundos'
+      },
+      VETERAN: {
+        name: 'Veterano',
+        description: 'Jugó 50 partidas en total'
+      },
+      CENTURION: {
+        name: 'Centurión',
+        description: 'Jugó 100 partidas en total'
+      },
+      WORD_COLLECTOR: {
+        name: 'Coleccionista de Palabras',
+        description: 'Encontró 1000 palabras válidas en total'
+      },
+      WORD_HOARDER: {
+        name: 'Acumulador de Palabras',
+        description: 'Encontró 5000 palabras válidas en total'
+      },
+      CHAMPION: {
+        name: 'Campeón',
+        description: 'Ganó 25 partidas en total'
+      },
+      LEGEND: {
+        name: 'Leyenda',
+        description: 'Ganó 100 partidas en total'
+      },
+      POINT_MASTER: {
+        name: 'Maestro de Puntos',
+        description: 'Acumuló 10,000 puntos en total'
+      },
+      POINT_KING: {
+        name: 'Rey de los Puntos',
+        description: 'Acumuló 50,000 puntos en total'
+      },
+      DEDICATION: {
+        name: 'Dedicación',
+        description: 'Jugó en 7 días diferentes'
+      },
+      LOYAL_PLAYER: {
+        name: 'Jugador Leal',
+        description: 'Jugó en 30 días diferentes'
+      }
     },
     leaderboard: {
       title: 'Clasificación',

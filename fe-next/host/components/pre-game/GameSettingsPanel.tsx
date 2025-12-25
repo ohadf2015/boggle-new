@@ -2,11 +2,12 @@
 
 import React, { memo, useCallback, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FaClock, FaCog, FaPlus, FaMinus, FaChevronDown, FaChevronUp } from 'react-icons/fa';
+import { FaClock, FaCog, FaPlus, FaMinus, FaChevronDown, FaChevronUp, FaCheck } from 'react-icons/fa';
 import type { Socket } from 'socket.io-client';
 import { Button } from '../../../components/ui/button';
 import { Card } from '../../../components/ui/card';
 import { Checkbox } from '../../../components/ui/checkbox';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../../../components/ui/tooltip';
 import GameTypeSelector from '../../../components/GameTypeSelector';
 import BotControls from '../../../components/BotControls';
 import { DIFFICULTIES, MIN_WORD_LENGTH_OPTIONS, getRecommendedTimer } from '../../../utils/consts';
@@ -223,38 +224,55 @@ export const GameSettingsPanel = memo<GameSettingsPanelProps>(({
                   <label className="text-xs font-bold uppercase text-neo-cream/80">
                     {t('hostView.difficulty')}
                   </label>
-                  <div className="flex flex-wrap gap-1.5" role="radiogroup" aria-label={t('hostView.difficulty')}>
-                    {(Object.keys(DIFFICULTIES) as DifficultyLevel[]).map((key) => {
-                      const isSelected = difficulty === key;
-                      const difficultyColors: Record<string, string> = {
-                        easy: 'bg-neo-lime',
-                        normal: 'bg-neo-yellow',
-                        medium: 'bg-neo-orange',
-                        hard: 'bg-neo-red text-neo-white',
-                        extreme: 'bg-neo-purple text-neo-white'
-                      };
-                      return (
-                        <motion.button
-                          key={key}
-                          role="radio"
-                          aria-checked={isSelected}
-                          onClick={() => handleSetDifficulty(key)}
-                          whileTap={{ scale: 0.95 }}
-                          className={cn(
-                            "px-2 py-1.5 rounded-neo font-bold transition-all duration-100 border-2 border-neo-black text-xs",
-                            isSelected
-                              ? `${difficultyColors[key] || 'bg-neo-cyan'} shadow-none translate-x-[1px] translate-y-[1px]`
-                              : "bg-neo-cream text-neo-black shadow-hard-sm hover:shadow-hard"
-                          )}
-                        >
-                          <span className="font-black">{t(DIFFICULTIES[key].nameKey)}</span>
-                          <span className="text-[10px] font-bold opacity-70 ms-1">
-                            {DIFFICULTIES[key].rows}x{DIFFICULTIES[key].cols}
-                          </span>
-                        </motion.button>
-                      );
-                    })}
-                  </div>
+                  <TooltipProvider delayDuration={300}>
+                    <div className="flex flex-wrap gap-1.5" role="radiogroup" aria-label={t('hostView.difficulty')}>
+                      {(Object.keys(DIFFICULTIES) as DifficultyLevel[]).map((key) => {
+                        const isSelected = difficulty === key;
+                        const difficultyConfig = DIFFICULTIES[key];
+                        const recommendedMinutes = Math.round(getRecommendedTimer(key) / 60);
+                        const difficultyColors: Record<string, string> = {
+                          EASY: 'bg-neo-lime',
+                          MEDIUM: 'bg-neo-orange',
+                          HARD: 'bg-neo-red text-neo-white',
+                        };
+                        return (
+                          <Tooltip key={key}>
+                            <TooltipTrigger asChild>
+                              <motion.button
+                                role="radio"
+                                aria-checked={isSelected}
+                                onClick={() => handleSetDifficulty(key)}
+                                whileTap={{ scale: 0.95 }}
+                                className={cn(
+                                  "relative px-2 py-1.5 rounded-neo font-bold transition-all duration-100 border-2 text-xs flex items-center gap-1",
+                                  isSelected
+                                    ? `${difficultyColors[key] || 'bg-neo-cyan'} border-neo-black ring-2 ring-neo-white ring-offset-1 ring-offset-neo-black shadow-none`
+                                    : "bg-neo-cream text-neo-black border-neo-black shadow-hard-sm hover:shadow-hard"
+                                )}
+                              >
+                                {isSelected && (
+                                  <FaCheck className="text-[10px]" aria-hidden="true" />
+                                )}
+                                <span className="font-black">{t(difficultyConfig.nameKey)}</span>
+                                <span className="text-[10px] font-bold opacity-70">
+                                  {difficultyConfig.rows}x{difficultyConfig.cols}
+                                </span>
+                              </motion.button>
+                            </TooltipTrigger>
+                            <TooltipContent side="bottom" className="text-center">
+                              <p className="font-black">{t(difficultyConfig.nameKey)}</p>
+                              <p className="text-xs opacity-80">
+                                {t('hostView.difficultyTooltipGrid', { rows: difficultyConfig.rows, cols: difficultyConfig.cols }) || `${difficultyConfig.rows}×${difficultyConfig.cols} grid`}
+                              </p>
+                              <p className="text-xs opacity-80">
+                                {t('hostView.difficultyTooltipTimer', { minutes: recommendedMinutes }) || `${recommendedMinutes} min recommended`}
+                              </p>
+                            </TooltipContent>
+                          </Tooltip>
+                        );
+                      })}
+                    </div>
+                  </TooltipProvider>
                 </div>
 
                 {/* Minimum Word Length - Compact inline */}

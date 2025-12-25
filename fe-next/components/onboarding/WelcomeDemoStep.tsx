@@ -36,18 +36,18 @@ const WelcomeDemoStep: React.FC<WelcomeDemoStepProps> = ({
   ];
 
   return (
-    <div className="flex flex-col items-center space-y-6">
+    <div className="flex flex-col items-center space-y-3 sm:space-y-5">
       {/* Welcome header */}
       <motion.div
         initial={{ y: -20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ delay: 0.1 }}
-        className="text-center space-y-2"
+        className="text-center space-y-1"
       >
-        <h2 className="text-2xl sm:text-3xl font-black text-neo-black uppercase">
+        <h2 className="text-xl sm:text-2xl font-black text-neo-black uppercase">
           {t('onboarding.welcome.title')}
         </h2>
-        <p className="text-sm sm:text-base text-neo-black/70">
+        <p className="text-xs sm:text-sm text-neo-black/70">
           {t('onboarding.welcome.subtitle')}
         </p>
       </motion.div>
@@ -58,18 +58,18 @@ const WelcomeDemoStep: React.FC<WelcomeDemoStepProps> = ({
           initial={{ scale: 0.9, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           transition={{ delay: 0.3 }}
-          className="bg-neo-yellow border-3 border-neo-black rounded-neo p-3 sm:p-4 shadow-hard-md max-w-sm text-center"
+          className="bg-neo-yellow border-3 border-neo-black rounded-neo p-2.5 sm:p-4 shadow-hard-md max-w-sm text-center"
         >
-          <div className="flex items-center justify-center gap-2 mb-2">
-            <FaHandPointUp className="text-2xl text-neo-black animate-bounce" />
-            <span className="font-bold text-neo-black text-sm sm:text-base">
+          <div className="flex items-center justify-center gap-2 mb-1">
+            <FaHandPointUp className="text-xl text-neo-black animate-bounce" />
+            <span className="font-bold text-neo-black text-xs sm:text-sm">
               {t('onboarding.welcome.demoInstruction')}
             </span>
           </div>
-          <div className="text-3xl sm:text-4xl font-black text-neo-black">
+          <div className="text-2xl sm:text-3xl font-black text-neo-black">
             {t('onboarding.welcome.demoWord')}
           </div>
-          <div className="text-xs sm:text-sm text-neo-black/60 mt-2">
+          <div className="text-[10px] sm:text-xs text-neo-black/60 mt-1">
             {t('onboarding.welcome.demoHint')}
           </div>
         </motion.div>
@@ -97,12 +97,12 @@ const WelcomeDemoStep: React.FC<WelcomeDemoStepProps> = ({
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-neo-lime border-3 border-neo-black rounded-neo p-4 shadow-hard-md text-center max-w-sm"
+          className="bg-neo-lime border-3 border-neo-black rounded-neo p-2.5 sm:p-4 shadow-hard-md text-center max-w-sm"
         >
-          <div className="text-xl sm:text-2xl font-black text-neo-black">
+          <div className="text-lg sm:text-xl font-black text-neo-black">
             {t('onboarding.welcome.demoSuccess')}
           </div>
-          <div className="text-sm text-neo-black/70 mt-2">
+          <div className="text-xs sm:text-sm text-neo-black/70 mt-1">
             {t('onboarding.welcome.clickNext')}
           </div>
         </motion.div>

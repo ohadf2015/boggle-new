@@ -204,7 +204,7 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({ isOpen, onClose }) =>
         </div>
 
         {/* Step content with animation */}
-        <DialogBody className="space-y-4 px-3 sm:px-6 min-h-[400px]">
+        <DialogBody className="space-y-3 px-3 sm:px-6">
           <AnimatePresence mode="wait">
             <motion.div
               key={currentStep}

@@ -174,7 +174,7 @@ const MiniGrid: React.FC<MiniGridProps> = ({
         ref={gridRef}
         className={cn(
           'grid gap-1 sm:gap-2 mx-auto',
-          size === 3 ? 'grid-cols-3 max-w-[280px]' : 'grid-cols-4 max-w-[320px]'
+          size === 3 ? 'grid-cols-3 max-w-[220px] sm:max-w-[280px]' : 'grid-cols-4 max-w-[280px] sm:max-w-[320px]'
         )}
         onMouseUp={handleMouseUp}
         onMouseLeave={handleMouseUp}
@@ -193,13 +193,13 @@ const MiniGrid: React.FC<MiniGridProps> = ({
                 data-row={rowIndex}
                 data-col={colIndex}
                 className={cn(
-                  'relative aspect-square rounded-neo border-3 border-neo-black',
-                  'flex items-center justify-center font-bold text-2xl sm:text-3xl',
+                  'relative aspect-square rounded-neo border-2 sm:border-3 border-neo-black',
+                  'flex items-center justify-center font-bold text-xl sm:text-2xl',
                   'cursor-pointer select-none touch-none transition-all',
-                  'min-h-[60px] min-w-[60px]',
+                  'min-h-[50px] min-w-[50px] sm:min-h-[60px] sm:min-w-[60px]',
                   isSelected
                     ? 'bg-neo-yellow shadow-hard-sm scale-95'
-                    : 'bg-neo-cream shadow-hard',
+                    : 'bg-neo-cream shadow-hard-sm sm:shadow-hard',
                   isHint && !isSelected && 'ring-2 ring-neo-pink animate-pulse'
                 )}
                 onTouchStart={(e) => handleTouchStart(e, rowIndex, colIndex)}
@@ -218,7 +218,7 @@ const MiniGrid: React.FC<MiniGridProps> = ({
                       initial={{ scale: 0 }}
                       animate={{ scale: 1 }}
                       exit={{ scale: 0 }}
-                      className="absolute -top-2 -right-2 w-6 h-6 bg-neo-pink border-2 border-neo-black rounded-full flex items-center justify-center text-xs font-black shadow-hard-sm"
+                      className="absolute -top-1.5 -right-1.5 sm:-top-2 sm:-right-2 w-5 h-5 sm:w-6 sm:h-6 bg-neo-pink border-2 border-neo-black rounded-full flex items-center justify-center text-[10px] sm:text-xs font-black shadow-hard-sm"
                     >
                       {selectedIndex + 1}
                     </motion.div>
@@ -232,14 +232,14 @@ const MiniGrid: React.FC<MiniGridProps> = ({
 
       {/* Word preview */}
       <motion.div
-        className="mt-4 text-center"
+        className="mt-3 sm:mt-4 text-center"
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
       >
-        <div className="text-lg sm:text-xl font-bold text-neo-black">
+        <div className="text-base sm:text-xl font-bold text-neo-black">
           {formedWord || '...'  }
         </div>
-        <div className="text-sm text-neo-black/60 mt-1">
+        <div className="text-xs sm:text-sm text-neo-black/60 mt-0.5">
           {selectedCells.length}/{demoWord.length} letters
         </div>
       </motion.div>
@@ -256,12 +256,12 @@ const MiniGrid: React.FC<MiniGridProps> = ({
             <motion.div
               initial={{ y: 20 }}
               animate={{ y: 0 }}
-              className="bg-neo-lime border-4 border-neo-black rounded-neo p-4 sm:p-6 shadow-hard-xl text-center"
+              className="bg-neo-lime border-3 sm:border-4 border-neo-black rounded-neo p-3 sm:p-5 shadow-hard-xl text-center"
             >
-              <div className="text-3xl sm:text-4xl font-black text-neo-black mb-2">
+              <div className="text-2xl sm:text-3xl font-black text-neo-black mb-1">
                 🎉 Perfect!
               </div>
-              <div className="text-lg sm:text-xl font-bold text-neo-black">
+              <div className="text-base sm:text-lg font-bold text-neo-black">
                 You got it!
               </div>
             </motion.div>

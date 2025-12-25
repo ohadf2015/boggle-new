@@ -1,14 +1,14 @@
 {
   "summary": {
-    "totalKeysInCode": 816,
+    "totalKeysInCode": 805,
     "keyCountByLanguage": {
-      "en": 1344,
-      "he": 1344,
-      "sv": 1344,
-      "ja": 1344,
-      "es": 1266
+      "en": 1362,
+      "he": 1362,
+      "sv": 1362,
+      "ja": 1362,
+      "es": 1362
     },
-    "missingFromEnglish": 7
+    "missingFromEnglish": 1
   },
   "missingFromEnglish": [
     {
@@ -51,192 +51,18 @@
           "line": 122
         }
       ]
-    },
-    {
-      "key": "onboarding.mode.encouragement",
-      "usages": [
-        {
-          "file": "components/onboarding/ModeSelectionStep.tsx",
-          "line": 128
-        },
-        {
-          "file": "components/onboarding/ModeSelectionStep.tsx",
-          "line": 128
-        }
-      ]
-    },
-    {
-      "key": "onboarding.name.characterCount",
-      "usages": [
-        {
-          "file": "components/onboarding/NameStep.tsx",
-          "line": 123
-        },
-        {
-          "file": "components/onboarding/NameStep.tsx",
-          "line": 123
-        }
-      ]
-    },
-    {
-      "key": "onboarding.name.proTip",
-      "usages": [
-        {
-          "file": "components/onboarding/NameStep.tsx",
-          "line": 145
-        },
-        {
-          "file": "components/onboarding/NameStep.tsx",
-          "line": 145
-        }
-      ]
-    },
-    {
-      "key": "onboarding.navigation.title",
-      "usages": [
-        {
-          "file": "components/OnboardingModal.tsx",
-          "line": 189
-        },
-        {
-          "file": "components/OnboardingModal.tsx",
-          "line": 189
-        },
-        {
-          "file": "components/OnboardingModal.tsx",
-          "line": 189
-        }
-      ]
-    },
-    {
-      "key": "onboarding.specialRounds.subtitle",
-      "usages": [
-        {
-          "file": "components/onboarding/SpecialRoundsStep.tsx",
-          "line": 56
-        },
-        {
-          "file": "components/onboarding/SpecialRoundsStep.tsx",
-          "line": 56
-        }
-      ]
-    },
-    {
-      "key": "onboarding.welcome.clickNext",
-      "usages": [
-        {
-          "file": "components/onboarding/WelcomeDemoStep.tsx",
-          "line": 106
-        },
-        {
-          "file": "components/onboarding/WelcomeDemoStep.tsx",
-          "line": 106
-        }
-      ]
     }
   ],
   "missingByLanguage": {
     "he": [],
     "sv": [],
     "ja": [],
-    "es": [
-      "achievements.SPEED_DEMON.name",
-      "achievements.SPEED_DEMON.description",
-      "achievements.WORD_MASTER.name",
-      "achievements.WORD_MASTER.description",
-      "achievements.COMBO_KING.name",
-      "achievements.COMBO_KING.description",
-      "achievements.PERFECTIONIST.name",
-      "achievements.PERFECTIONIST.description",
-      "achievements.LEXICON.name",
-      "achievements.LEXICON.description",
-      "achievements.WORDSMITH.name",
-      "achievements.WORDSMITH.description",
-      "achievements.QUICK_THINKER.name",
-      "achievements.QUICK_THINKER.description",
-      "achievements.LONG_HAULER.name",
-      "achievements.LONG_HAULER.description",
-      "achievements.DIVERSE_VOCABULARY.name",
-      "achievements.DIVERSE_VOCABULARY.description",
-      "achievements.DOUBLE_TROUBLE.name",
-      "achievements.DOUBLE_TROUBLE.description",
-      "achievements.TREASURE_HUNTER.name",
-      "achievements.TREASURE_HUNTER.description",
-      "achievements.TRIPLE_THREAT.name",
-      "achievements.TRIPLE_THREAT.description",
-      "achievements.UNSTOPPABLE.name",
-      "achievements.UNSTOPPABLE.description",
-      "achievements.COMEBACK_KID.name",
-      "achievements.COMEBACK_KID.description",
-      "achievements.DICTIONARY_DIVER.name",
-      "achievements.DICTIONARY_DIVER.description",
-      "achievements.LIGHTNING_ROUND.name",
-      "achievements.LIGHTNING_ROUND.description",
-      "achievements.RARE_GEM.name",
-      "achievements.RARE_GEM.description",
-      "achievements.EXPLORER.name",
-      "achievements.EXPLORER.description",
-      "achievements.STREAK_MASTER.name",
-      "achievements.STREAK_MASTER.description",
-      "achievements.ANAGRAM_ARTIST.name",
-      "achievements.ANAGRAM_ARTIST.description",
-      "achievements.LETTER_POPPER.name",
-      "achievements.LETTER_POPPER.description",
-      "achievements.WORD_ARCHITECT.name",
-      "achievements.WORD_ARCHITECT.description",
-      "achievements.SPEED_LEGEND.name",
-      "achievements.SPEED_LEGEND.description",
-      "achievements.COMBO_GOD.name",
-      "achievements.COMBO_GOD.description",
-      "achievements.VOCABULARY_TITAN.name",
-      "achievements.VOCABULARY_TITAN.description",
-      "achievements.PRECISION_MASTER.name",
-      "achievements.PRECISION_MASTER.description",
-      "achievements.LONG_WORD_CHAIN.name",
-      "achievements.LONG_WORD_CHAIN.description",
-      "achievements.MINIMALIST.name",
-      "achievements.MINIMALIST.description",
-      "achievements.WORD_SNIPER.name",
-      "achievements.WORD_SNIPER.description",
-      "achievements.PHOTO_FINISH.name",
-      "achievements.PHOTO_FINISH.description",
-      "achievements.UNDERDOG.name",
-      "achievements.UNDERDOG.description",
-      "achievements.CLUTCH_PLAYER.name",
-      "achievements.CLUTCH_PLAYER.description",
-      "achievements.VETERAN.name",
-      "achievements.VETERAN.description",
-      "achievements.CENTURION.name",
-      "achievements.CENTURION.description",
-      "achievements.WORD_COLLECTOR.name",
-      "achievements.WORD_COLLECTOR.description",
-      "achievements.WORD_HOARDER.name",
-      "achievements.WORD_HOARDER.description",
-      "achievements.CHAMPION.name",
-      "achievements.CHAMPION.description",
-      "achievements.LEGEND.name",
-      "achievements.LEGEND.description",
-      "achievements.POINT_MASTER.name",
-      "achievements.POINT_MASTER.description",
-      "achievements.POINT_KING.name",
-      "achievements.POINT_KING.description",
-      "achievements.DEDICATION.name",
-      "achievements.DEDICATION.description",
-      "achievements.LOYAL_PLAYER.name",
-      "achievements.LOYAL_PLAYER.description"
-    ]
+    "es": []
   },
   "keysNotInEnglish": {
     "he": [],
     "sv": [],
     "ja": [],
-    "es": [
-      "onboarding.welcome.clickNext",
-      "onboarding.specialRounds.subtitle",
-      "onboarding.name.characterCount",
-      "onboarding.name.proTip",
-      "onboarding.mode.encouragement",
-      "onboarding.navigation.title"
-    ]
+    "es": []
   }
 }
