@@ -135,43 +135,21 @@ const HostModeFields: React.FC<HostModeFieldsProps> = ({
         <div className="p-3 rounded-neo bg-neo-purple border-2 border-neo-magenta/50 shadow-hard-sm">
           <div className="flex items-center gap-3">
             {/* Show profile avatar or custom profile picture */}
-            <div className="relative">
-              {profile?.profile_picture_url ? (
-                <div className="w-12 h-12 rounded-full overflow-hidden border-3 border-neo-black shadow-hard-sm">
-                  <img
-                    src={profile.profile_picture_url}
-                    alt={displayName}
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-              ) : (
-                <Avatar
-                  avatarImage={selectedAvatarId}
-                  size="lg"
-                  className="border-3 border-neo-black shadow-hard-sm"
-                />
-              )}
-              {/* Small edit button overlay */}
-              <button
-                type="button"
-                onClick={() => {
-                  const btn = document.querySelector('[aria-label*="Select avatar"]') as HTMLButtonElement;
-                  btn?.click();
-                }}
-                className="absolute -bottom-1 -right-1 w-5 h-5 bg-neo-yellow border-2 border-neo-black rounded-full flex items-center justify-center text-xs hover:scale-110 transition-transform shadow-hard-sm"
-                aria-label={t('profile.chooseEmoji') || 'Change avatar'}
-              >
-                ✏️
-              </button>
-              {/* Hidden avatar selector button */}
-              <div className="hidden">
-                <AvatarSelectorButton
-                  selectedAvatarId={selectedAvatarId}
-                  onAvatarSelect={handleAvatarSelect}
-                  t={t}
+            {profile?.profile_picture_url ? (
+              <div className="w-12 h-12 rounded-full overflow-hidden border-3 border-neo-black shadow-hard-sm">
+                <img
+                  src={profile.profile_picture_url}
+                  alt={displayName}
+                  className="w-full h-full object-cover"
                 />
               </div>
-            </div>
+            ) : (
+              <Avatar
+                avatarImage={selectedAvatarId}
+                size="lg"
+                className="border-3 border-neo-black shadow-hard-sm"
+              />
+            )}
             <div className="flex-1">
               <p className="text-xs text-neo-cream/70 font-bold uppercase tracking-wide">
                 {t('joinView.hostingAs') || 'Hosting as'}
