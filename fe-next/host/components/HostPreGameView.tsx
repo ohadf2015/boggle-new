@@ -91,6 +91,14 @@ interface HostPreGameViewProps {
 
 // Game presets for quick setup
 const GAME_PRESETS = {
+  fast: {
+    nameKey: 'hostView.presetFast',
+    icon: '⚡',
+    timer: 1,
+    difficulty: 'MEDIUM' as DifficultyLevel,
+    minWordLength: 2,
+    description: 'hostView.presetFastDesc',
+  },
   easy: {
     nameKey: 'hostView.presetEasy',
     icon: '🌱',
@@ -98,14 +106,6 @@ const GAME_PRESETS = {
     difficulty: 'EASY' as DifficultyLevel,
     minWordLength: 2,
     description: 'hostView.presetEasyDesc',
-  },
-  quick: {
-    nameKey: 'hostView.presetQuick',
-    icon: '⚡',
-    timer: 1,
-    difficulty: 'MEDIUM' as DifficultyLevel,
-    minWordLength: 3,
-    description: 'hostView.presetQuickDesc',
   },
   party: {
     nameKey: 'hostView.presetParty',
@@ -175,6 +175,14 @@ const HostPreGameView: React.FC<HostPreGameViewProps> = ({
   const [selectedPreset, setSelectedPreset] = useState<PresetKey | null>(null);
   const [showPresetDescription, setShowPresetDescription] = useState<PresetKey | null>(null);
   const [pressTimer, setPressTimer] = useState<ReturnType<typeof setTimeout> | null>(null);
+
+  // Set default preset to 'fast' on mount
+  React.useEffect(() => {
+    if (selectedPreset === null) {
+      handleApplyPreset('fast');
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Memoized handlers
   const handleCopyLink = useCallback(() => {
@@ -323,13 +331,13 @@ const HostPreGameView: React.FC<HostPreGameViewProps> = ({
                   const preset = GAME_PRESETS[key];
                   const isSelected = selectedPreset === key;
                   const presetStyles: Record<PresetKey, { bg: string; selected: string }> = {
+                    fast: {
+                      bg: 'bg-neo-yellow',
+                      selected: 'bg-neo-yellow ring-4 ring-yellow-400 ring-offset-2 ring-offset-slate-800',
+                    },
                     easy: {
                       bg: 'bg-neo-lime',
                       selected: 'bg-neo-lime ring-4 ring-green-400 ring-offset-2 ring-offset-slate-800',
-                    },
-                    quick: {
-                      bg: 'bg-neo-yellow',
-                      selected: 'bg-neo-yellow ring-4 ring-yellow-400 ring-offset-2 ring-offset-slate-800',
                     },
                     party: {
                       bg: 'bg-neo-pink',

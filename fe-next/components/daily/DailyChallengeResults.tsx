@@ -62,15 +62,17 @@ const DailyChallengeResults: React.FC<DailyChallengeResultsProps> = ({
 
   // Submit result to backend when completing a new challenge
   useEffect(() => {
-    // Wait for guestFingerprint, and either profile (authenticated) or guestPlayer (guest)
-    const hasPlayerInfo = isAuthenticated ? !!profile : !!guestPlayer;
-    if (isNewCompletion && result && guestFingerprint && hasPlayerInfo) {
+    // For authenticated users, wait for profile. For guests, proceed without waiting for guestPlayer
+    // We can use fallback values if guestPlayer hasn't loaded yet
+    const canSubmit = isNewCompletion && result && guestFingerprint && (isAuthenticated ? !!profile : true);
+
+    if (canSubmit) {
       const submitResult = async () => {
         try {
-          // Get player display info
+          // Get player display info with fallbacks for guests
           const displayName = isAuthenticated && profile
             ? profile.display_name || profile.username
-            : guestPlayer?.displayName || 'Guest';
+            : guestPlayer?.displayName || 'Guest Player';
           const avatarEmoji = isAuthenticated && profile
             ? profile.avatar_emoji
             : guestPlayer?.avatarEmoji || '🎯';
@@ -106,6 +108,7 @@ const DailyChallengeResults: React.FC<DailyChallengeResultsProps> = ({
               isAuthenticated,
               hasProfile: !!profile,
               hasGuestFingerprint: !!guestFingerprint,
+              displayName,
             });
             return; // Don't refresh leaderboard if submission failed
           }

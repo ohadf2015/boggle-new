@@ -87,6 +87,10 @@ const JoinModeFields: React.FC<JoinModeFieldsProps> = ({
       // Don't override if user has already entered a name (even if it matches an avatar name)
       if (!username || username.trim() === '') {
         setUsername(avatar.name);
+        // Save the avatar name to localStorage to persist across page reloads
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('boggle_username', avatar.name);
+        }
       }
     }
   };
