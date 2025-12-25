@@ -32,20 +32,20 @@ export const ModeSelector: React.FC<ModeSelectorProps> = ({
       >
         <ToggleGroupItem
           value="join"
-          className="flex-1 py-3 h-auto data-[state=on]:bg-neo-cyan data-[state=on]:text-neo-black data-[state=on]:border-neo-black data-[state=on]:shadow-hard"
+          className="flex-1 py-2 h-auto data-[state=on]:bg-neo-cyan data-[state=on]:text-neo-black data-[state=on]:border-neo-black data-[state=on]:shadow-hard"
         >
-          <div className="flex items-center gap-2">
-            <FaDoorOpen className="text-lg" />
-            <span className="font-bold">{t('joinView.joinRoom') || 'Join Room'}</span>
+          <div className="flex items-center gap-1.5">
+            <FaDoorOpen className="text-base" />
+            <span className="font-bold text-sm">{t('joinView.joinRoom') || 'Join Room'}</span>
           </div>
         </ToggleGroupItem>
         <ToggleGroupItem
           value="host"
-          className="flex-1 py-3 h-auto data-[state=on]:bg-neo-pink data-[state=on]:text-neo-white data-[state=on]:border-neo-black data-[state=on]:shadow-hard"
+          className="flex-1 py-2 h-auto data-[state=on]:bg-neo-pink data-[state=on]:text-neo-white data-[state=on]:border-neo-black data-[state=on]:shadow-hard"
         >
-          <div className="flex items-center gap-2">
-            <FaCrown className="text-lg" />
-            <span className="font-bold">{t('joinView.createRoom') || 'Create Room'}</span>
+          <div className="flex items-center gap-1.5">
+            <FaCrown className="text-base" />
+            <span className="font-bold text-sm">{t('joinView.createRoom') || 'Create Room'}</span>
           </div>
         </ToggleGroupItem>
       </ToggleGroup>

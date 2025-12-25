@@ -4,10 +4,9 @@ import React, { useState, useEffect, useRef, useCallback, FormEvent } from 'reac
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
-import { FaCrown, FaUser, FaDice, FaSync, FaQrcode, FaQuestionCircle } from 'react-icons/fa';
+import { FaCrown, FaUser, FaSync, FaQrcode, FaQuestionCircle } from 'react-icons/fa';
 import { QRCodeSVG } from 'qrcode.react';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
@@ -19,7 +18,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import LogRocket from 'logrocket';
 import { validateUsername, validateRoomName, validateGameCode, sanitizeInput } from '@/utils/validation';
 import { useValidation } from '@/hooks/useValidation';
-import { generateRoomCode as generateCode } from '@/utils/utils';
+import { generateRoomCode as generateCode, generateRandomRoomName } from '@/utils/utils';
 import { setGuestName } from '@/utils/guestManager';
 import { trackGuestJoin } from '@/utils/growthTracking';
 import type { JoinViewProps, JoinMode } from '@/types/components';
@@ -57,6 +56,8 @@ const JoinView: React.FC<JoinViewProps> = ({
   prefilledRoom,
   roomName,
   setRoomName,
+  hostUsername,
+  setHostUsername,
   isAutoJoining,
   roomsLoading,
   isAuthenticated,
@@ -71,9 +72,11 @@ const JoinView: React.FC<JoinViewProps> = ({
   const [showNewPlayerWelcome, setShowNewPlayerWelcome] = useState<boolean>(false);
   const [usernameError, setUsernameError] = useState<boolean>(false);
   const [roomNameError, setRoomNameError] = useState<boolean>(false);
+  const [hostUsernameError, setHostUsernameError] = useState<boolean>(false);
   const [gameCodeError, setGameCodeError] = useState<boolean>(false);
   const [usernameErrorKey, setUsernameErrorKey] = useState<string | undefined>(undefined);
   const [roomNameErrorKey, setRoomNameErrorKey] = useState<string | undefined>(undefined);
+  const [hostUsernameErrorKey, setHostUsernameErrorKey] = useState<string | undefined>(undefined);
   const [gameCodeErrorKey, setGameCodeErrorKey] = useState<string | undefined>(undefined);
   const [showFullForm, setShowFullForm] = useState<boolean>(!prefilledRoom);
   // Map UI language to valid game language (game only supports en, he, sv, ja)
@@ -136,10 +139,6 @@ const JoinView: React.FC<JoinViewProps> = ({
     setGameCode(generateCode());
   }, [setGameCode]);
 
-  const handleJoinGuest = useCallback(() => {
-    handleJoin(false);
-  }, [handleJoin]);
-
   const handleShowFullForm = useCallback(() => {
     setShowFullForm(true);
   }, []);
@@ -157,15 +156,38 @@ const JoinView: React.FC<JoinViewProps> = ({
 
     if (mode === 'host') {
       let effectiveRoomName = roomName;
-      if (isAuthenticated && displayName && (!roomName || !roomName.trim())) {
-        effectiveRoomName = displayName;
-        setRoomName(displayName);
+      let effectiveHostUsername = hostUsername;
+
+      if (isAuthenticated && displayName) {
+        // For authenticated users, use display name as player name
+        effectiveHostUsername = displayName;
+        // Use display name as room name fallback if no room name provided
+        if (!roomName || !roomName.trim()) {
+          effectiveRoomName = displayName;
+          setRoomName(displayName);
+        }
+      } else if (!roomName || !roomName.trim()) {
+        // For guests without a room name, generate a random one
+        effectiveRoomName = generateRandomRoomName();
+        setRoomName(effectiveRoomName);
       }
 
       const rn = sanitizeInput(effectiveRoomName, 30);
-      const { isValid: roomOk, error: roomErr } = validateRoomName(rn);
+      const { isValid: roomOk, error: roomErr } = validateRoomName(rn, true); // true = optional
       const { isValid: codeOk, error: codeErr } = validateGameCode(gameCode);
-      if (!roomOk || !codeOk) {
+
+      // For guest hosts, validate hostUsername separately
+      let hostUsernameOk = true;
+      let hostUsernameErr: string | undefined;
+      if (!isAuthenticated) {
+        const hn = sanitizeInput(effectiveHostUsername, 20);
+        const validation = validateUsername(hn);
+        hostUsernameOk = validation.isValid;
+        hostUsernameErr = validation.error;
+        effectiveHostUsername = hn;
+      }
+
+      if (!roomOk || !codeOk || !hostUsernameOk) {
         if (!roomOk) {
           setRoomNameError(true);
           setRoomNameErrorKey(roomErr);
@@ -174,13 +196,20 @@ const JoinView: React.FC<JoinViewProps> = ({
           setGameCodeError(true);
           setGameCodeErrorKey(codeErr);
         }
-        notifyError(roomErr || codeErr);
+        if (!hostUsernameOk) {
+          setHostUsernameError(true);
+          setHostUsernameErrorKey(hostUsernameErr);
+        }
+        notifyError(roomErr || codeErr || hostUsernameErr);
         return;
       }
-      LogRocket.identify(rn.trim(), { name: rn.trim(), role: 'host', gameCode });
+
+      // Use hostUsername for player identification, roomName for room display
+      const playerName = effectiveHostUsername.trim();
+      LogRocket.identify(playerName, { name: playerName, role: 'host', gameCode, roomName: rn.trim() });
       if (!isAuthenticated) {
-        setGuestName(rn.trim());
-        trackGuestJoin(rn.trim(), gameCode, roomLanguage);
+        setGuestName(playerName);
+        trackGuestJoin(playerName, gameCode, roomLanguage);
       }
     } else {
       const un = sanitizeInput(username, 20);
@@ -289,53 +318,57 @@ const JoinView: React.FC<JoinViewProps> = ({
           )}
 
           {/* Form */}
-          <form onSubmit={handleSubmit} className="space-y-2 flex-1">
-            {mode === 'host' ? (
-              <>
-                <div>
-                  <Label className="text-xs font-bold uppercase text-neo-white">{t('joinView.roomNamePlaceholder') || 'Room Name'}</Label>
-                  <Input
-                    value={roomName}
-                    onChange={(e) => { setRoomName(e.target.value); setRoomNameError(false); }}
-                    placeholder={displayName || 'Enter room name'}
-                    className={cn("h-9 text-sm", roomNameError && 'border-neo-red')}
+          <form onSubmit={handleSubmit} className="space-y-2 flex-1 overflow-y-auto">
+            <div className="space-y-2">
+              {mode === 'host' ? (
+                <div className="space-y-2 text-sm">
+                  <HostModeFields
+                    gameCode={gameCode}
+                    setGameCode={setGameCode}
+                    gameCodeError={gameCodeError}
+                    setGameCodeError={setGameCodeError}
+                    gameCodeErrorKey={gameCodeErrorKey}
+                    roomName={roomName}
+                    setRoomName={setRoomName}
+                    roomNameError={roomNameError}
+                    setRoomNameError={setRoomNameError}
+                    roomNameErrorKey={roomNameErrorKey}
+                    hostUsername={hostUsername}
+                    setHostUsername={setHostUsername}
+                    hostUsernameError={hostUsernameError}
+                    setHostUsernameError={setHostUsernameError}
+                    hostUsernameErrorKey={hostUsernameErrorKey}
+                    generateRoomCode={generateRoomCode}
+                    isAuthenticated={isAuthenticated}
+                    displayName={displayName}
+                    isProfileLoading={isProfileLoading}
+                    t={t}
                   />
-                </div>
-                <div>
-                  <Label className="text-xs font-bold uppercase text-neo-white">{t('hostView.roomCode') || 'Room Code'}</Label>
-                  <div className="flex gap-1">
-                    <Input value={gameCode} onChange={(e) => setGameCode(e.target.value.toUpperCase())} className="h-9 text-sm font-mono flex-1" />
-                    <Button type="button" variant="secondary" size="sm" onClick={generateRoomCode} className="h-9 px-2"><FaDice /></Button>
+                  <div>
+                    <Label className="text-xs font-bold uppercase text-neo-white">{t('joinView.language') || 'Language'}</Label>
+                    <LanguageSelector selectedLanguage={roomLanguage} onLanguageChange={setRoomLanguage} />
                   </div>
                 </div>
-                <div>
-                  <Label className="text-xs font-bold uppercase text-neo-white">{t('joinView.language') || 'Language'}</Label>
-                  <LanguageSelector selectedLanguage={roomLanguage} onLanguageChange={setRoomLanguage} />
+              ) : (
+                <div className="space-y-2 text-sm">
+                  <JoinModeFields
+                    gameCode={gameCode}
+                    setGameCode={setGameCode}
+                    gameCodeError={gameCodeError}
+                    setGameCodeError={setGameCodeError}
+                    gameCodeErrorKey={gameCodeErrorKey}
+                    username={username}
+                    setUsername={setUsername}
+                    usernameError={usernameError}
+                    setUsernameError={setUsernameError}
+                    usernameErrorKey={usernameErrorKey}
+                    isAuthenticated={isAuthenticated}
+                    displayName={displayName}
+                    t={t}
+                  />
                 </div>
-              </>
-            ) : (
-              <div>
-                <Label className="text-xs font-bold uppercase text-neo-white">{t('joinView.roomCode') || 'Room Code'}</Label>
-                <Input
-                  value={gameCode}
-                  onChange={(e) => { setGameCode(e.target.value.toUpperCase()); setGameCodeError(false); }}
-                  placeholder="XXXX"
-                  className={cn("h-9 text-sm font-mono", gameCodeError && 'border-neo-red')}
-                />
-              </div>
-            )}
-
-            {!isAuthenticated && (
-              <div>
-                <Label className="text-xs font-bold uppercase text-neo-white">{t('joinView.nickname') || 'Nickname'}</Label>
-                <Input
-                  value={username}
-                  onChange={(e) => { setUsername(e.target.value); setUsernameError(false); }}
-                  placeholder={t('joinView.nicknamePlaceholder') || 'Enter nickname'}
-                  className={cn("h-9 text-sm", usernameError && 'border-neo-red')}
-                />
-              </div>
-            )}
+              )}
+            </div>
 
             <Button type="submit" disabled={isJoining} className="w-full h-11 min-h-[44px] font-bold uppercase bg-neo-yellow hover:bg-neo-yellow/90 text-neo-black border-2 border-neo-black">
               {mode === 'host' ? <FaCrown className="mr-2" /> : <FaUser className="mr-2" />}
@@ -380,7 +413,7 @@ const JoinView: React.FC<JoinViewProps> = ({
         >
           <Card className="backdrop-blur-md bg-white/90 dark:bg-slate-800/90 shadow-2xl border border-purple-500/30">
             <CardHeader className="text-center space-y-4" />
-            <CardContent className="space-y-3 sm:space-y-6">
+            <CardContent className="space-y-2 sm:space-y-4 p-4 sm:p-5">
               {/* Error Alert */}
               {error && (
                 <motion.div
@@ -419,7 +452,7 @@ const JoinView: React.FC<JoinViewProps> = ({
                 />
               )}
 
-              <form onSubmit={handleSubmit} className="space-y-3 sm:space-y-4">
+              <form onSubmit={handleSubmit} className="space-y-2 sm:space-y-3">
                 {mode === 'join' ? (
                   <JoinModeFields
                     gameCode={gameCode}
@@ -448,6 +481,11 @@ const JoinView: React.FC<JoinViewProps> = ({
                     roomNameError={roomNameError}
                     setRoomNameError={setRoomNameError}
                     roomNameErrorKey={roomNameErrorKey}
+                    hostUsername={hostUsername}
+                    setHostUsername={setHostUsername}
+                    hostUsernameError={hostUsernameError}
+                    setHostUsernameError={setHostUsernameError}
+                    hostUsernameErrorKey={hostUsernameErrorKey}
                     generateRoomCode={generateRoomCode}
                     isAuthenticated={isAuthenticated}
                     displayName={displayName}
@@ -468,7 +506,7 @@ const JoinView: React.FC<JoinViewProps> = ({
                         : (!gameCode || (isAuthenticated && !displayName)))
                     }
                     className={cn(
-                      "w-full h-12 text-lg",
+                      "w-full h-11 text-base font-bold",
                       mode === 'host' ? "bg-neo-pink text-neo-white" : "bg-neo-cyan text-neo-black"
                     )}
                   >

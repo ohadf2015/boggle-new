@@ -1,7 +1,6 @@
 'use client';
 
-import React from 'react';
-import { motion } from 'framer-motion';
+import React, { useState, useEffect } from 'react';
 import { FaPaste } from 'react-icons/fa';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -10,6 +9,8 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 import { cn } from '@/lib/utils';
 import { validateUsername, validateGameCode, sanitizeInput } from '@/utils/validation';
 import { useDebouncedValidation, getValidationClasses } from '@/hooks/useDebouncedValidation';
+import AvatarSelectorButton from './AvatarSelectorButton';
+import type { AvatarConfig } from '@/utils/avatarConfig';
 
 export interface JoinModeFieldsProps {
   gameCode: string;
@@ -42,6 +43,32 @@ const JoinModeFields: React.FC<JoinModeFieldsProps> = ({
   displayName,
   t,
 }) => {
+  // Avatar selection state
+  const [selectedAvatarId, setSelectedAvatarId] = useState<string | undefined>(undefined);
+
+  // Load avatar from localStorage on mount
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('boggle_avatar_id');
+      if (saved) {
+        setSelectedAvatarId(saved);
+      }
+    }
+  }, []);
+
+  // Handle avatar selection
+  const handleAvatarSelect = (avatar: AvatarConfig) => {
+    setSelectedAvatarId(avatar.id);
+    // Save to localStorage
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('boggle_avatar_id', avatar.id);
+    }
+    // Pre-fill username with avatar name if username is empty
+    if (!username || username.trim() === '') {
+      setUsername(avatar.name);
+    }
+  };
+
   // Real-time validation with debounce
   const gameCodeValidation = useDebouncedValidation(gameCode, {
     validate: validateGameCode,
@@ -52,7 +79,7 @@ const JoinModeFields: React.FC<JoinModeFieldsProps> = ({
   const usernameValidation = useDebouncedValidation(username, {
     validate: validateUsername,
     delay: 300,
-    minLength: 1,
+    minLength: 2,
   });
 
   // Combine real-time and submit-time errors
@@ -62,20 +89,13 @@ const JoinModeFields: React.FC<JoinModeFieldsProps> = ({
   const usernameErrorMessage = usernameErrorKey || usernameValidation.errorKey;
 
   return (
-    <>
-      <motion.div
-        initial={{ x: -50, opacity: 0 }}
-        animate={{ x: 0, opacity: 1 }}
-        transition={{ duration: 0.3 }}
-        className="space-y-2"
-      >
-        <Label htmlFor="gameCode" className="text-slate-700 dark:text-gray-300 flex items-center gap-2">
+    <div className="space-y-3">
+      {/* Room Code - inline with paste button */}
+      <div className="space-y-1.5">
+        <Label htmlFor="gameCode" className="text-xs font-bold uppercase text-slate-600 dark:text-slate-400">
           {t('hostView.roomCode')}
-          {gameCodeValidation.state === 'valid' && (
-            <span className="text-neo-lime text-xs">&#10003;</span>
-          )}
         </Label>
-        <div className="flex gap-2">
+        <div className="relative">
           <Input
             id="gameCode"
             value={gameCode}
@@ -89,9 +109,9 @@ const JoinModeFields: React.FC<JoinModeFieldsProps> = ({
             pattern="[A-Za-z0-9]*"
             inputMode="text"
             aria-invalid={showGameCodeError ? 'true' : undefined}
-            aria-describedby={showGameCodeError ? 'gameCode-error' : 'gameCode-hint'}
+            aria-describedby={showGameCodeError ? 'gameCode-error' : undefined}
             className={cn(
-              "flex-1 bg-slate-100 dark:bg-slate-700/50 border-slate-200 dark:border-slate-600 text-slate-900 dark:text-white placeholder:text-slate-500 dark:placeholder:text-gray-600 transition-colors",
+              "h-10 pr-12 bg-slate-100 dark:bg-slate-700/50 border-slate-200 dark:border-slate-600 text-slate-900 dark:text-white placeholder:text-slate-500 dark:placeholder:text-gray-600 transition-colors",
               getValidationClasses(
                 gameCodeError ? 'invalid' : gameCodeValidation.state,
                 showGameCodeError ? "border-red-500 bg-red-900/30 focus-visible:ring-red-500" : ""
@@ -117,10 +137,10 @@ const JoinModeFields: React.FC<JoinModeFieldsProps> = ({
                       // Clipboard API not available or permission denied
                     }
                   }}
-                  className="bg-neo-cream text-neo-black shrink-0"
+                  className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8 bg-neo-cream text-neo-black"
                   aria-label={t('joinView.pasteCode') || 'Paste room code'}
                 >
-                  <FaPaste />
+                  <FaPaste className="text-sm" />
                 </Button>
               </TooltipTrigger>
               <TooltipContent>{t('joinView.pasteCode') || 'Paste code'}</TooltipContent>
@@ -128,68 +148,70 @@ const JoinModeFields: React.FC<JoinModeFieldsProps> = ({
           </TooltipProvider>
         </div>
         {showGameCodeError && (
-          <p id="gameCode-error" className="text-sm text-red-400" role="alert">
+          <p id="gameCode-error" className="text-xs text-red-400" role="alert">
             {t(gameCodeErrorMessage || 'validation.gameCodeInvalid')}
           </p>
         )}
-        {!showGameCodeError && (
-          <p id="gameCode-hint" className="text-xs text-slate-500 dark:text-gray-300">
-            {t('validation.gameCodeHint') || '6-10 alphanumeric characters'}
-          </p>
-        )}
-      </motion.div>
-
-      {/* Username field for guest users */}
-      {!isAuthenticated && (
-        <motion.div
-          animate={usernameError ? { x: [-10, 10, -10, 10, 0] } : {}}
-          transition={{ duration: 0.4 }}
-          className="space-y-2"
-        >
-          <Label htmlFor="username-main" className="text-slate-700 dark:text-gray-300 flex items-center gap-2">
-            {t('joinView.playerNamePlaceholder')}
-            {usernameValidation.state === 'valid' && (
-              <span className="text-neo-lime text-xs">&#10003;</span>
-            )}
-          </Label>
-          <Input
-            id="username-main"
-            value={username}
-            onChange={(e) => {
-              setUsername(sanitizeInput(e.target.value, 20));
-              if (usernameError) setUsernameError(false);
-            }}
-            required
-            aria-invalid={showUsernameError ? 'true' : undefined}
-            aria-describedby={showUsernameError ? 'username-error' : undefined}
-            className={cn(
-              "bg-slate-100 dark:bg-slate-700/50 border-slate-200 dark:border-slate-600 text-slate-900 dark:text-white placeholder:text-slate-500 dark:placeholder:text-gray-600 transition-colors",
-              getValidationClasses(
-                usernameError ? 'invalid' : usernameValidation.state,
-                showUsernameError ? "border-red-500 bg-red-900/30 focus-visible:ring-red-500" : ""
-              )
-            )}
-            placeholder={t('joinView.playerNamePlaceholder')}
-            maxLength={20}
-          />
-          {showUsernameError && (
-            <p id="username-error" className="text-sm text-red-400" role="alert">
-              {t(usernameErrorMessage || 'validation.usernameRequired')}
-            </p>
-          )}
-        </motion.div>
-      )}
+      </div>
 
       {/* Show "Joining as" for authenticated users */}
       {isAuthenticated && displayName && (
-        <div className="p-3 rounded-neo bg-neo-navy border-3 border-neo-cyan/50 shadow-hard-sm">
-          <p className="text-sm text-neo-cream font-bold">
-            {t('joinView.joiningAs') || 'Joining as'}{' '}
-            <span className="text-neo-cyan">{displayName}</span>
-          </p>
+        <div className="p-2 rounded-neo bg-neo-navy border-2 border-neo-cyan/50 shadow-hard-sm">
+          <div className="flex items-center gap-2">
+            <AvatarSelectorButton
+              selectedAvatarId={selectedAvatarId}
+              onAvatarSelect={handleAvatarSelect}
+              t={t}
+            />
+            <p className="text-xs text-neo-cream font-bold">
+              {t('joinView.joiningAs') || 'Joining as'}{' '}
+              <span className="text-neo-cyan">{displayName}</span>
+            </p>
+          </div>
         </div>
       )}
-    </>
+
+      {/* Guest: Avatar + Username inline */}
+      {!isAuthenticated && (
+        <div className="space-y-1.5">
+          <Label htmlFor="username-main" className="text-xs font-bold uppercase text-slate-600 dark:text-slate-400">
+            {t('joinView.playerNamePlaceholder')}
+          </Label>
+          <div className="flex gap-2">
+            <AvatarSelectorButton
+              selectedAvatarId={selectedAvatarId}
+              onAvatarSelect={handleAvatarSelect}
+              t={t}
+            />
+            <Input
+              id="username-main"
+              value={username}
+              onChange={(e) => {
+                setUsername(sanitizeInput(e.target.value, 20));
+                if (usernameError) setUsernameError(false);
+              }}
+              required
+              aria-invalid={showUsernameError ? 'true' : undefined}
+              aria-describedby={showUsernameError ? 'username-error' : undefined}
+              className={cn(
+                "flex-1 h-10 bg-slate-100 dark:bg-slate-700/50 border-slate-200 dark:border-slate-600 text-slate-900 dark:text-white placeholder:text-slate-500 dark:placeholder:text-gray-600 transition-colors",
+                getValidationClasses(
+                  usernameError ? 'invalid' : usernameValidation.state,
+                  showUsernameError ? "border-red-500 bg-red-900/30 focus-visible:ring-red-500" : ""
+                )
+              )}
+              placeholder={t('joinView.playerNamePlaceholder')}
+              maxLength={20}
+            />
+          </div>
+          {showUsernameError && (
+            <p id="username-error" className="text-xs text-red-400" role="alert">
+              {t(usernameErrorMessage || 'validation.usernameRequired')}
+            </p>
+          )}
+        </div>
+      )}
+    </div>
   );
 };
 

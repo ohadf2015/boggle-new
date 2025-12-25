@@ -1,8 +1,14 @@
 'use client';
 
 import React from 'react';
-import { CardDescription } from '@/components/ui/card';
-import { cn } from '@/lib/utils';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { Label } from '@/components/ui/label';
 import { useLanguage } from '@/contexts/LanguageContext';
 import type { Language } from '@/shared/types/game';
 
@@ -26,7 +32,7 @@ const LANGUAGE_OPTIONS: LanguageOption[] = [
 ];
 
 /**
- * Language selection grid for host mode
+ * Compact language selection dropdown for host mode
  */
 export const LanguageSelector: React.FC<LanguageSelectorProps> = ({
   selectedLanguage,
@@ -34,29 +40,33 @@ export const LanguageSelector: React.FC<LanguageSelectorProps> = ({
 }) => {
   const { t } = useLanguage();
 
+  const selectedOption = LANGUAGE_OPTIONS.find(opt => opt.code === selectedLanguage);
+
   return (
-    <div className="space-y-2">
-      <CardDescription className="text-sm font-bold uppercase text-neo-black/70 dark:text-neo-white/70">
+    <div className="space-y-1.5">
+      <Label className="text-xs font-bold uppercase text-slate-600 dark:text-slate-400">
         {t('joinView.selectLanguage')}
-      </CardDescription>
-      <div className="flex flex-wrap gap-1.5 sm:gap-2">
-        {LANGUAGE_OPTIONS.map((option) => (
-          <button
-            key={option.code}
-            type="button"
-            onClick={() => onLanguageChange(option.code)}
-            className={cn(
-              "flex items-center gap-1.5 py-1.5 px-2.5 rounded-neo border-3 transition-all duration-100",
-              selectedLanguage === option.code
-                ? "bg-neo-cyan border-neo-cyan text-neo-black shadow-hard-sm"
-                : "bg-white dark:bg-slate-600 border-neo-black dark:border-slate-500 text-neo-black dark:text-neo-white shadow-hard-sm hover:shadow-hard hover:translate-x-[-1px] hover:translate-y-[-1px] hover:border-neo-cyan"
-            )}
-          >
-            <span className="text-base leading-none">{option.flag}</span>
-            <span className="font-bold text-[10px] uppercase leading-none">{t(option.labelKey)}</span>
-          </button>
-        ))}
-      </div>
+      </Label>
+      <Select value={selectedLanguage} onValueChange={(val) => onLanguageChange(val as Language)}>
+        <SelectTrigger className="h-10 bg-slate-100 dark:bg-slate-700/50 border-slate-200 dark:border-slate-600">
+          <SelectValue>
+            <div className="flex items-center gap-2">
+              <span className="text-lg leading-none">{selectedOption?.flag}</span>
+              <span className="font-semibold text-sm">{selectedOption ? t(selectedOption.labelKey) : ''}</span>
+            </div>
+          </SelectValue>
+        </SelectTrigger>
+        <SelectContent>
+          {LANGUAGE_OPTIONS.map((option) => (
+            <SelectItem key={option.code} value={option.code}>
+              <div className="flex items-center gap-2">
+                <span className="text-lg leading-none">{option.flag}</span>
+                <span className="font-medium">{t(option.labelKey)}</span>
+              </div>
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
     </div>
   );
 };
