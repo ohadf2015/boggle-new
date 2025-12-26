@@ -55,6 +55,11 @@ const MultiplayerLobby = nextDynamic(() => import('@/components/multiplayer/Mult
   ssr: false,
 });
 
+const MultiplayerFlow = nextDynamic(() => import('@/components/multiplayer/MultiplayerFlow'), {
+  loading: () => <ViewLoadingSkeleton />,
+  ssr: false,
+});
+
 const ResultsPage = nextDynamic(() => import('@/components/views/ResultsPage'), {
   loading: () => <ViewLoadingSkeleton />,
   ssr: false,
@@ -1243,26 +1248,20 @@ export default function MultiplayerPage(): React.JSX.Element {
       }
       return (
         <FeatureErrorBoundary featureName="Lobby">
-          <MultiplayerLobby
+          <MultiplayerFlow
             handleJoin={handleJoin}
-            gameCode={gameCode}
-            username={username}
-            roomName={roomName}
-            hostUsername={hostUsername}
+            refreshRooms={refreshRooms}
+            activeRooms={activeRooms}
+            roomsLoading={roomsLoading}
+            isJoining={isJoining}
+            isAuthenticated={isAuthenticated}
+            displayName={profile?.display_name ?? ''}
+            prefilledRoom={prefilledRoomCode}
+            defaultLanguage={language as Language}
             setGameCode={setGameCode}
             setUsername={setUsername}
             setRoomName={setRoomName}
             setHostUsername={setHostUsername}
-            error={error}
-            activeRooms={activeRooms}
-            refreshRooms={refreshRooms}
-            prefilledRoom={prefilledRoomCode}
-            isAutoJoining={shouldAutoJoin}
-            roomsLoading={roomsLoading}
-            isAuthenticated={isAuthenticated}
-            displayName={profile?.display_name ?? ''}
-            isProfileLoading={loading}
-            isJoining={isJoining}
           />
         </FeatureErrorBoundary>
       );
