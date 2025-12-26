@@ -11,7 +11,7 @@ import { useMobileLandscape } from '@/hooks/useMobileLandscape';
 import { useLanguage } from '@/contexts/LanguageContext';
 import type { DifficultyLevel, Language, LetterGrid } from '@/shared/types/game';
 
-export type SinglePlayerMode = 'solo-bots' | 'practice' | 'challenge';
+export type SinglePlayerMode = 'solo-bots' | 'practice' | 'challenge' | 'daily';
 export type SinglePlayerPhase = 'lobby' | 'playing' | 'results';
 
 export interface BotOpponent {

@@ -1,10 +1,11 @@
 'use client';
 
-import React, { useState, useCallback, useMemo } from 'react';
+import React, { useState, useCallback, useMemo, useEffect } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FaPlay, FaRobot, FaPlus, FaTimes, FaBook, FaTrophy, FaCog, FaChevronDown, FaArrowLeft, FaCrown, FaFire } from 'react-icons/fa';
-import { Target, Zap } from 'lucide-react';
+import { FaPlay, FaRobot, FaPlus, FaTimes, FaBook, FaTrophy, FaCog, FaChevronDown, FaArrowLeft, FaCrown, FaFire, FaCalendarDay } from 'react-icons/fa';
+import { Target, Zap, Flame, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -15,6 +16,14 @@ import { DIFFICULTIES } from '@/utils/consts';
 import { getHighScore, getProgressStats, getAllTimeBest } from './highScoreManager';
 import { useMobileLandscape } from '@/hooks/useMobileLandscape';
 import LandscapeIndicator from '@/components/LandscapeIndicator';
+import {
+  getPuzzleNumber,
+  getDailyChallengeDate,
+  hasPlayedToday,
+  getDailyStreak,
+  getSecondsUntilNextDaily,
+  formatCountdown,
+} from '@/utils/dailyChallenge';
 import type { DifficultyLevel, Language } from '@/shared/types/game';
 import type { SinglePlayerGameState, SinglePlayerMode, BotOpponent } from './SinglePlayerView';
 
@@ -52,6 +61,13 @@ const MODE_CONFIG = {
     labelKey: 'singlePlayer.challengeMode',
     descKey: 'singlePlayer.challengeModeDesc',
   },
+  'daily': {
+    Icon: FaCalendarDay,
+    color: 'from-neo-orange via-neo-yellow to-neo-pink',
+    selectedBorder: 'border-neo-orange',
+    labelKey: 'daily.badge',
+    descKey: 'daily.bannerSubtitle',
+  },
 };
 
 const BOT_DIFFICULTY_CONFIG: Record<BotDifficulty, { labelKey: string; color: string }> = {
@@ -69,7 +85,33 @@ const SinglePlayerLobby: React.FC<SinglePlayerLobbyProps> = ({
   onStartGame,
 }) => {
   const { t, language: currentLanguage } = useLanguage();
+  const router = useRouter();
   const isLandscape = useMobileLandscape();
+
+  // Daily challenge state
+  const [dailyPuzzleNumber, setDailyPuzzleNumber] = useState<number>(0);
+  const [hasPlayedDaily, setHasPlayedDaily] = useState<boolean>(false);
+  const [dailyStreak, setDailyStreak] = useState<number>(0);
+  const [dailyCountdown, setDailyCountdown] = useState<string>('');
+
+  // Initialize daily challenge info
+  useEffect(() => {
+    const date = getDailyChallengeDate();
+    setDailyPuzzleNumber(getPuzzleNumber(date));
+    setHasPlayedDaily(hasPlayedToday(currentLanguage as Language));
+    setDailyStreak(getDailyStreak().currentStreak);
+  }, [currentLanguage]);
+
+  // Update countdown timer
+  useEffect(() => {
+    const updateCountdown = () => {
+      const seconds = getSecondsUntilNextDaily();
+      setDailyCountdown(formatCountdown(seconds));
+    };
+    updateCountdown();
+    const interval = setInterval(updateCountdown, 1000);
+    return () => clearInterval(interval);
+  }, []);
 
   // Game settings state
   const [mode, setMode] = useState<SinglePlayerMode>(initialSettings.mode);
@@ -99,6 +141,12 @@ const SinglePlayerLobby: React.FC<SinglePlayerLobbyProps> = ({
   }, []);
 
   const handleStartGame = () => {
+    // Daily mode redirects to the dedicated daily challenge page
+    if (mode === 'daily') {
+      router.push(`/${currentLanguage}/daily`);
+      return;
+    }
+
     const timerSeconds = mode === 'practice' ? 0 : timerMinutes * 60;
     onStartGame({
       mode,
@@ -178,39 +226,73 @@ const SinglePlayerLobby: React.FC<SinglePlayerLobbyProps> = ({
               <div className="text-xs font-bold text-neo-black/70 uppercase">{t('challenge.recordToBeat') || 'Record to Beat'}</div>
             </div>
           )}
+
+          {/* Daily mode info */}
+          {mode === 'daily' && (
+            <div className="bg-gradient-to-r from-neo-orange via-neo-yellow to-neo-pink border-3 border-neo-black rounded-neo p-3 text-center shadow-hard">
+              <div className="flex items-center justify-center gap-2 mb-1">
+                <Target className="text-neo-black w-5 h-5" />
+                <span className="font-black text-neo-black">#{dailyPuzzleNumber}</span>
+                {dailyStreak > 0 && (
+                  <span className="flex items-center gap-1 text-sm">
+                    <Flame className="w-4 h-4 text-neo-orange" />
+                    {dailyStreak}
+                  </span>
+                )}
+              </div>
+              <div className="text-xs font-bold text-neo-black/70 uppercase">
+                {hasPlayedDaily ? t('daily.completed') || 'Completed!' : t('daily.playNow') || 'Play Now'}
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Right column: Settings + Start */}
         <div className="w-[60%] flex flex-col gap-3 overflow-hidden min-h-0">
           <div className="flex-1 overflow-y-auto space-y-3">
-            {/* Difficulty */}
-            <div>
-              <label className="text-sm font-bold uppercase text-neo-white mb-2 block">{t('singlePlayer.difficulty') || 'Difficulty'}</label>
-              <div className="flex gap-2">
-                {(['EASY', 'MEDIUM', 'HARD'] as DifficultyLevel[]).map(diff => (
-                  <button
-                    key={diff}
-                    onClick={() => setDifficulty(diff)}
-                    className={cn(
-                      'flex-1 py-3 rounded-neo border-3 border-neo-black text-sm font-bold uppercase shadow-hard hover:shadow-hard-lg transition-all',
-                      difficulty === diff
-                        ? diff === 'EASY' ? 'bg-neo-lime text-neo-black' : diff === 'MEDIUM' ? 'bg-neo-yellow text-neo-black' : 'bg-neo-red text-white'
-                        : 'bg-neo-cream text-neo-black'
-                    )}
-                  >
-                    {t(`difficulty.${diff.toLowerCase()}`) || diff}
-                  </button>
-                ))}
+            {/* Daily mode message */}
+            {mode === 'daily' && (
+              <div className="p-4 bg-gradient-to-br from-neo-orange/20 to-neo-pink/20 rounded-neo border-2 border-neo-orange/30 text-center">
+                <p className="text-neo-white font-bold">
+                  {hasPlayedDaily
+                    ? `${t('daily.nextPuzzleIn') || 'Next puzzle in'}: ${dailyCountdown}`
+                    : t('daily.oneAttempt') || 'One attempt per day - same puzzle for everyone!'}
+                </p>
               </div>
-            </div>
+            )}
 
-            {/* Grid size info */}
-            <div className="text-sm text-neo-white/70 text-center font-bold">
-              {difficultyConfig.rows}x{difficultyConfig.cols} grid
-            </div>
+            {/* Difficulty - Not for daily mode */}
+            {mode !== 'daily' && (
+              <div>
+                <label className="text-sm font-bold uppercase text-neo-white mb-2 block">{t('singlePlayer.difficulty') || 'Difficulty'}</label>
+                <div className="flex gap-2">
+                  {(['EASY', 'MEDIUM', 'HARD'] as DifficultyLevel[]).map(diff => (
+                    <button
+                      key={diff}
+                      onClick={() => setDifficulty(diff)}
+                      className={cn(
+                        'flex-1 py-3 rounded-neo border-3 border-neo-black text-sm font-bold uppercase shadow-hard hover:shadow-hard-lg transition-all',
+                        difficulty === diff
+                          ? diff === 'EASY' ? 'bg-neo-lime text-neo-black' : diff === 'MEDIUM' ? 'bg-neo-yellow text-neo-black' : 'bg-neo-red text-white'
+                          : 'bg-neo-cream text-neo-black'
+                      )}
+                    >
+                      {t(`difficulty.${diff.toLowerCase()}`) || diff}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
 
-            {/* Timer (not for practice mode) */}
-            {mode !== 'practice' && (
+            {/* Grid size info - Not for daily mode */}
+            {mode !== 'daily' && (
+              <div className="text-sm text-neo-white/70 text-center font-bold">
+                {difficultyConfig.rows}x{difficultyConfig.cols} grid
+              </div>
+            )}
+
+            {/* Timer (not for practice or daily mode) */}
+            {mode !== 'practice' && mode !== 'daily' && (
               <div>
                 <label className="text-sm font-bold uppercase text-neo-white mb-2 block">{t('singlePlayer.timer') || 'Timer'}</label>
                 <div className="flex gap-2">
@@ -230,11 +312,13 @@ const SinglePlayerLobby: React.FC<SinglePlayerLobbyProps> = ({
               </div>
             )}
 
-            {/* Language */}
-            <div>
-              <label className="text-sm font-bold uppercase text-neo-white mb-2 block">{t('joinView.language') || 'Language'}</label>
-              <LanguageSelector selectedLanguage={gameLanguage} onLanguageChange={setGameLanguage} />
-            </div>
+            {/* Language - Not for daily mode */}
+            {mode !== 'daily' && (
+              <div>
+                <label className="text-sm font-bold uppercase text-neo-white mb-2 block">{t('joinView.language') || 'Language'}</label>
+                <LanguageSelector selectedLanguage={gameLanguage} onLanguageChange={setGameLanguage} />
+              </div>
+            )}
 
             {/* Bots (for solo-bots mode) */}
             {mode === 'solo-bots' && (
@@ -334,29 +418,53 @@ const SinglePlayerLobby: React.FC<SinglePlayerLobbyProps> = ({
         </h1>
       </div>
 
-      {/* Mode Selection - Main UI */}
-      <div className="grid grid-cols-3 gap-2 sm:gap-3">
+      {/* Mode Selection - 2x2 Grid */}
+      <div className="grid grid-cols-2 gap-2 sm:gap-3">
         {(Object.keys(MODE_CONFIG) as SinglePlayerMode[]).map(modeKey => {
           const config = MODE_CONFIG[modeKey];
           const isSelected = mode === modeKey;
           const IconComponent = config.Icon;
+          const isDaily = modeKey === 'daily';
 
           return (
             <motion.button
               key={modeKey}
               onClick={() => setMode(modeKey)}
               className={cn(
-                'relative p-4 sm:p-6 rounded-neo-lg border-4 transition-all',
-                'flex flex-col items-center gap-2 text-center',
+                'relative p-3 sm:p-4 rounded-neo-lg border-4 transition-all',
+                'flex flex-col items-center gap-1.5 sm:gap-2 text-center',
                 isSelected
                   ? `bg-gradient-to-br ${config.color} ${config.selectedBorder} shadow-hard-pressed translate-x-[2px] translate-y-[2px] text-neo-black`
                   : 'bg-neo-cream dark:bg-slate-700 border-neo-black dark:border-slate-500 shadow-hard hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-hard-lg text-neo-black dark:text-neo-white'
               )}
               whileTap={{ scale: 0.98 }}
             >
-              <IconComponent className="w-8 h-8 sm:w-10 sm:h-10" />
+              {/* Daily mode badge indicators */}
+              {isDaily && (
+                <div className="absolute top-1 right-1 flex items-center gap-1">
+                  {dailyStreak > 0 && (
+                    <span className="flex items-center gap-0.5 text-[10px] font-bold bg-neo-black/20 dark:bg-white/20 px-1.5 py-0.5 rounded-full">
+                      <Flame className="w-3 h-3 text-neo-orange" />
+                      {dailyStreak}
+                    </span>
+                  )}
+                  {hasPlayedDaily && (
+                    <span className="flex items-center justify-center w-5 h-5 bg-neo-lime rounded-full border-2 border-neo-black">
+                      <Check className="w-3 h-3 text-neo-black" />
+                    </span>
+                  )}
+                </div>
+              )}
+              <IconComponent className="w-7 h-7 sm:w-9 sm:h-9" />
               <span className="text-xs sm:text-sm font-black uppercase leading-tight">
-                {t(config.labelKey) || modeKey}
+                {isDaily ? (
+                  <>
+                    {t(config.labelKey) || 'Daily'}
+                    <span className="block text-[10px] sm:text-xs font-bold opacity-75">#{dailyPuzzleNumber}</span>
+                  </>
+                ) : (
+                  t(config.labelKey) || modeKey
+                )}
               </span>
             </motion.button>
           );
@@ -375,15 +483,67 @@ const SinglePlayerLobby: React.FC<SinglePlayerLobbyProps> = ({
                 {t(MODE_CONFIG[mode].descKey)}
               </p>
             </div>
-            <div className="text-right">
-              <div className="text-xs uppercase text-neo-black/70 dark:text-neo-white/70">
-                {t('singlePlayer.selectDifficulty') || 'Grid'}
+            {mode !== 'daily' && (
+              <div className="text-right">
+                <div className="text-xs uppercase text-neo-black/70 dark:text-neo-white/70">
+                  {t('singlePlayer.selectDifficulty') || 'Grid'}
+                </div>
+                <div className="font-bold">
+                  {difficultyConfig.rows}x{difficultyConfig.cols}
+                </div>
               </div>
-              <div className="font-bold">
-                {difficultyConfig.rows}x{difficultyConfig.cols}
-              </div>
-            </div>
+            )}
           </div>
+
+          {/* Daily Challenge Info Panel */}
+          {mode === 'daily' && (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className="mb-2 sm:mb-3"
+            >
+              <div className="p-3 sm:p-4 bg-gradient-to-br from-neo-orange via-neo-yellow to-neo-pink rounded-neo-lg border-4 border-neo-black shadow-hard relative overflow-hidden">
+                {/* Background decoration */}
+                <div className="absolute -right-8 -top-8 w-32 h-32 bg-white/10 rounded-full blur-2xl" />
+                <div className="absolute -left-8 -bottom-8 w-24 h-24 bg-white/10 rounded-full blur-2xl" />
+
+                <div className="relative z-10">
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="flex items-center gap-2">
+                      <Target className="w-5 h-5 text-neo-black" />
+                      <span className="font-black uppercase text-sm text-neo-black">
+                        {t('daily.puzzleNumber')?.replace('{number}', String(dailyPuzzleNumber)) || `Puzzle #${dailyPuzzleNumber}`}
+                      </span>
+                    </div>
+                    {dailyStreak > 0 && (
+                      <Badge className="bg-neo-black text-neo-orange border-0 font-black flex items-center gap-1">
+                        <Flame className="w-3 h-3" />
+                        {dailyStreak} {t('daily.dayStreak') || 'day streak'}
+                      </Badge>
+                    )}
+                  </div>
+
+                  {hasPlayedDaily ? (
+                    <div className="text-center py-2">
+                      <div className="flex items-center justify-center gap-2 text-xl font-black text-neo-black mb-1">
+                        <Check className="w-6 h-6" />
+                        {t('daily.completed') || 'Completed!'}
+                      </div>
+                      <p className="text-sm text-neo-black/75">
+                        {t('daily.nextPuzzleIn') || 'Next puzzle in'}: <span className="font-bold">{dailyCountdown}</span>
+                      </p>
+                    </div>
+                  ) : (
+                    <div className="text-center py-1">
+                      <p className="text-sm text-neo-black/80">
+                        {t('daily.oneAttempt') || 'One attempt per day - same puzzle for everyone!'}
+                      </p>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </motion.div>
+          )}
 
           {/* Challenge Mode High Score Display */}
           {mode === 'challenge' && (
@@ -543,8 +703,8 @@ const SinglePlayerLobby: React.FC<SinglePlayerLobbyProps> = ({
             </div>
           )}
 
-          {/* Timer display for non-practice modes */}
-          {mode !== 'practice' && (
+          {/* Timer display for non-practice, non-daily modes */}
+          {mode !== 'practice' && mode !== 'daily' && (
             <div className="flex items-center justify-between text-sm mb-4">
               <span className="text-neo-black/75 dark:text-neo-white/75">
                 {t('singlePlayer.gameTime') || 'Time'}
@@ -568,27 +728,31 @@ const SinglePlayerLobby: React.FC<SinglePlayerLobbyProps> = ({
             </div>
           )}
 
-          {/* Language Selection - Always visible */}
-          <div className="mb-4">
-            <LanguageSelector
-              selectedLanguage={gameLanguage}
-              onLanguageChange={setGameLanguage}
-            />
-          </div>
+          {/* Language Selection - Not shown for daily mode (preset) */}
+          {mode !== 'daily' && (
+            <div className="mb-4">
+              <LanguageSelector
+                selectedLanguage={gameLanguage}
+                onLanguageChange={setGameLanguage}
+              />
+            </div>
+          )}
 
-          {/* Advanced Settings Toggle */}
-          <button
-            onClick={() => setShowAdvanced(!showAdvanced)}
-            className="w-full flex items-center justify-center gap-2 py-2 text-sm text-neo-black/75 dark:text-neo-white/75 hover:text-neo-black dark:hover:text-neo-white transition-colors"
-          >
-            <FaCog className={cn('transition-transform', showAdvanced && 'rotate-90')} />
-            {t('common.advancedSettings') || 'Advanced Settings'}
-            <FaChevronDown className={cn('transition-transform', showAdvanced && 'rotate-180')} />
-          </button>
+          {/* Advanced Settings Toggle - Not shown for daily mode */}
+          {mode !== 'daily' && (
+            <button
+              onClick={() => setShowAdvanced(!showAdvanced)}
+              className="w-full flex items-center justify-center gap-2 py-2 text-sm text-neo-black/75 dark:text-neo-white/75 hover:text-neo-black dark:hover:text-neo-white transition-colors"
+            >
+              <FaCog className={cn('transition-transform', showAdvanced && 'rotate-90')} />
+              {t('common.advancedSettings') || 'Advanced Settings'}
+              <FaChevronDown className={cn('transition-transform', showAdvanced && 'rotate-180')} />
+            </button>
+          )}
 
-          {/* Advanced Settings Panel */}
+          {/* Advanced Settings Panel - Not shown for daily mode */}
           <AnimatePresence>
-            {showAdvanced && (
+            {showAdvanced && mode !== 'daily' && (
               <motion.div
                 initial={{ height: 0, opacity: 0 }}
                 animate={{ height: 'auto', opacity: 1 }}
