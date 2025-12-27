@@ -5,7 +5,7 @@ aptPkgs = []
 [phases.install]
 dependsOn = ['setup']
 cmds = [
-    'cd fe-next && npm ci --prefer-offline --no-audit --no-fund --loglevel=error'
+    'cd fe-next && if [ -f package-lock.json ]; then npm ci --prefer-offline --no-audit --no-fund --loglevel=error; else npm install --no-audit --no-fund --loglevel=error; fi'
 ]
 cacheDirectories = ['fe-next/node_modules', 'fe-next/.next/cache', 'fe-next/.next/standalone']
 
