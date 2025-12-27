@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import GridComponent from '@/components/GridComponent';
 import PlayerInsights from '@/components/results/PlayerInsights';
+import { WordPointsGroup, InvalidWordsSection } from '@/components/results/WordPointsGroup';
 import { AchievementBadge } from '@/components/AchievementBadge';
 import WordFeedbackModal from '@/components/voting/WordFeedbackModal';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -18,6 +19,7 @@ import confetti from 'canvas-confetti';
 import { useMobileLandscape } from '@/hooks/useMobileLandscape';
 import { updateGuestStatsAfterGame, getGuestStats } from '@/utils/guestManager';
 import { getPointColor, getTextColor } from '@/components/results/utils';
+import type { WordObject } from '@/components/results/types';
 import { getRankBgColor } from '@/utils/rankingStyles';
 import type { SinglePlayerResultsData, SinglePlayerMode } from './SinglePlayerView';
 import { useResultsData } from './results';
@@ -588,89 +590,21 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
         <CardContent>
           {results.playerWordData?.length > 0 ? (
             <div className="space-y-3">
-              {/* Valid Words Grouped by Points */}
-              {sortedPointGroups.length > 0 && (
-                <div className="bg-neo-cream text-neo-black dark:bg-slate-800 dark:text-white rounded-neo p-3 border-3 border-neo-black shadow-hard-sm">
-                  <div className="text-sm font-black text-neo-black dark:text-neo-cream mb-3 flex items-center gap-2 uppercase">
-                    <span className="bg-neo-cyan text-neo-black px-2 py-0.5 rounded-neo border-2 border-neo-black">✓</span>
-                    {t('results.validWords') || 'Valid Words'} ({Object.values(wordsByPoints).flat().length})
-                  </div>
-                  <div className="space-y-2">
-                    {sortedPointGroups.map(points => {
-                      const wordsForPoints = wordsByPoints[points] ?? [];
-                      return (
-                        <div key={`points-${points}`} className="rounded-neo p-2 border-l-4 border-neo-black bg-white/50 text-neo-black dark:bg-slate-700/50 dark:text-white" style={{ borderLeftColor: getPointColor(points) }}>
-                          <div className="text-xs font-black mb-1.5 flex items-center gap-2 text-neo-black dark:text-neo-cream uppercase">
-                            <span
-                              className="px-2 py-0.5 rounded-neo flex items-center justify-center font-black text-xs border-2 border-neo-black"
-                              style={{
-                                backgroundColor: getPointColor(points),
-                                color: getTextColor(points)
-                              }}
-                            >
-                              {points} {t('results.points') || 'pts'}
-                            </span>
-                            <span>{wordsForPoints.length} {t('hostView.words') || 'words'}</span>
-                          </div>
-                          <div className="flex flex-wrap gap-1.5">
-                            {wordsForPoints.map((wordObj, i) => (
-                              <motion.span
-                                key={`${points}-${i}`}
-                                initial={{ opacity: 0, scale: 0.8 }}
-                                animate={{ opacity: 1, scale: 1 }}
-                                transition={{ delay: 0.02 * Math.min(i, 10) }}
-                                className="inline-flex items-center gap-1 px-2 py-1 text-sm font-black uppercase border-2 border-neo-black rounded-neo shadow-hard-sm"
-                                style={{
-                                  backgroundColor: getPointColor(wordObj.score),
-                                  color: getTextColor(wordObj.score)
-                                }}
-                              >
-                                {wordObj.word}
-                                {/* Show fire round bonus indicator (earthquake 2x) */}
-                                {(wordObj.fireRoundBonus ?? 0) > 0 && (
-                                  <span className="text-[10px] px-1 py-0.5 bg-neo-orange text-neo-black rounded border border-neo-black font-black" title="Fire Round 2x Bonus">
-                                    🔥+{wordObj.fireRoundBonus}
-                                  </span>
-                                )}
-                                {/* Show combo bonus indicator */}
-                                {(wordObj.comboBonus ?? 0) > 0 && (
-                                  <span className="text-[10px] px-1 py-0.5 bg-neo-yellow text-neo-black rounded border border-neo-black font-black">
-                                    +{wordObj.comboBonus}
-                                  </span>
-                                )}
-                              </motion.span>
-                            ))}
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
-              )}
+              {/* Valid Words Grouped by Points - using shared component */}
+              <WordPointsGroup
+                wordsByPoints={wordsByPoints}
+                sortedPointGroups={sortedPointGroups}
+                t={t}
+                mode="simple"
+                animate
+              />
 
-              {/* Invalid Words */}
-              {invalidWords.length > 0 && (
-                <div className="bg-neo-cream text-neo-black dark:bg-slate-800 dark:text-white rounded-neo p-3 border-3 border-neo-black shadow-hard-sm">
-                  <div className="text-sm font-black text-neo-black/70 dark:text-white mb-2 flex items-center gap-2 uppercase">
-                    <span className="bg-neo-gray text-neo-cream px-2 py-0.5 rounded-neo border-2 border-neo-black">✗</span>
-                    {t('results.invalid') || 'Invalid'} ({invalidWords.length})
-                  </div>
-                  <div className="flex flex-wrap gap-1.5">
-                    {invalidWords.map((wordObj, i) => (
-                      <span
-                        key={`invalid-${i}`}
-                        className="inline-flex items-center gap-1 px-2 py-1 text-sm font-black uppercase border-2 border-neo-black rounded-neo shadow-hard-sm opacity-70"
-                        style={{
-                          backgroundColor: 'var(--neo-red, #ef4444)',
-                          color: 'var(--neo-cream)'
-                        }}
-                      >
-                        {wordObj.word}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              )}
+              {/* Invalid Words - using shared component */}
+              <InvalidWordsSection
+                invalidWords={invalidWords}
+                t={t}
+                mode="simple"
+              />
             </div>
           ) : (
             <span className="text-sm text-neo-black/70 dark:text-neo-white/75 italic">

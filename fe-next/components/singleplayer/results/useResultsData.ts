@@ -1,9 +1,14 @@
 /**
  * useResultsData - Process and organize single player results data
+ *
+ * Uses shared utilities from results/utils.ts for word categorization
+ * to maintain consistency with multiplayer results display.
  */
 
 import { useMemo } from 'react';
 import { calculatePlayerInsights, WordData } from '@/utils/gameInsights';
+import { categorizeWords, calculateWordStats } from '@/components/results/utils';
+import type { WordObject } from '@/components/results/types';
 import type { SinglePlayerResultsData, PlayerWordData } from '../SinglePlayerView';
 
 export interface BotWordDetail {
@@ -16,11 +21,30 @@ export interface BotWordDetail {
 }
 
 export interface ProcessedResultsData {
-  wordsByPoints: Record<number, PlayerWordData[]>;
+  /** Words grouped by point value (uses shared WordObject type) */
+  wordsByPoints: Record<number, WordObject[]>;
+  /** Sorted point values for display (descending) */
   sortedPointGroups: number[];
-  invalidWords: PlayerWordData[];
+  /** Invalid words (uses shared WordObject type) */
+  invalidWords: WordObject[];
   totalComboBonus: number;
   totalFireRoundBonus: number;
+}
+
+/**
+ * Convert PlayerWordData to WordObject format for shared component compatibility
+ */
+function playerWordDataToWordObject(word: PlayerWordData): WordObject {
+  return {
+    word: word.word,
+    score: word.score,
+    validated: word.isValid,
+    isDuplicate: false, // Single player doesn't have duplicate words
+    comboBonus: word.comboBonus,
+    fireRoundBonus: word.fireRoundBonus,
+    timestamp: word.timestamp,
+    timeSinceStart: word.timeSinceStart,
+  };
 }
 
 export function useResultsData(results: SinglePlayerResultsData, t: (key: string) => string) {
@@ -34,6 +58,12 @@ export function useResultsData(results: SinglePlayerResultsData, t: (key: string
 
   const playerRank = allParticipants.findIndex(p => p.isPlayer) + 1;
   const isWinner = playerRank === 1;
+
+  // Convert PlayerWordData to WordObject format for shared utilities
+  const wordObjects = useMemo((): WordObject[] => {
+    if (!results.playerWordData?.length) return [];
+    return results.playerWordData.map(playerWordDataToWordObject);
+  }, [results.playerWordData]);
 
   // Calculate player insights from word data
   const playerInsights = useMemo(() => {
@@ -50,9 +80,9 @@ export function useResultsData(results: SinglePlayerResultsData, t: (key: string
     return calculatePlayerInsights(wordData, results.gameDuration, results.playerScore);
   }, [results.playerWordData, results.gameDuration, results.playerScore]);
 
-  // Group words by points for display
+  // Use shared utilities for word categorization
   const processedWords = useMemo((): ProcessedResultsData => {
-    if (!results.playerWordData?.length) {
+    if (!wordObjects.length) {
       return {
         wordsByPoints: {},
         sortedPointGroups: [],
@@ -62,35 +92,17 @@ export function useResultsData(results: SinglePlayerResultsData, t: (key: string
       };
     }
 
-    const validWords = results.playerWordData.filter(w => w.isValid);
-    const invalidWords = results.playerWordData.filter(w => !w.isValid);
+    const { validWords, invalidWords, wordsByPoints, sortedPointGroups } = categorizeWords(wordObjects);
+    const stats = calculateWordStats(wordObjects);
 
-    const totalComboBonus = validWords.reduce((sum, w) => sum + (w.comboBonus || 0), 0);
-    const totalFireRoundBonus = validWords.reduce((sum, w) => sum + (w.fireRoundBonus || 0), 0);
-
-    const wordsByPoints: Record<number, PlayerWordData[]> = {};
-    validWords.forEach(wordObj => {
-      const points = wordObj.score || 0;
-      if (!wordsByPoints[points]) {
-        wordsByPoints[points] = [];
-      }
-      wordsByPoints[points].push(wordObj);
-    });
-
-    // Sort words alphabetically within each point group
-    Object.keys(wordsByPoints).forEach(points => {
-      const wordList = wordsByPoints[Number(points)];
-      if (wordList) {
-        wordList.sort((a, b) => a.word.localeCompare(b.word));
-      }
-    });
-
-    const sortedPointGroups = Object.keys(wordsByPoints)
-      .map(Number)
-      .sort((a, b) => b - a);
-
-    return { wordsByPoints, sortedPointGroups, invalidWords, totalComboBonus, totalFireRoundBonus };
-  }, [results.playerWordData]);
+    return {
+      wordsByPoints,
+      sortedPointGroups,
+      invalidWords,
+      totalComboBonus: stats.totalComboBonus,
+      totalFireRoundBonus: stats.totalFireRoundBonus,
+    };
+  }, [wordObjects]);
 
   // Process bot words for display
   const botWordDetails = useMemo((): BotWordDetail[] => {
