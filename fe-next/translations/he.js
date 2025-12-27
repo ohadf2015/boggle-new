@@ -2039,7 +2039,9 @@ const he = {
     "reviewSettings": "סקירה והתחלה",
     "stepMode": "מצב",
     "stepDifficulty": "קושי",
-    "stepOf": "שלב {current} מתוך {total}"
+    "stepOf": "שלב {current} מתוך {total}",
+    "stepOptions": "אפשרויות",
+    "stepReview": "סקירה"
   }
 };
 

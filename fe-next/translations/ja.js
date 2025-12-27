@@ -2037,7 +2037,9 @@ const ja = {
     "reviewSettings": "確認してスタート",
     "stepMode": "モード",
     "stepDifficulty": "難易度",
-    "stepOf": "ステップ {current} / {total}"
+    "stepOf": "ステップ {current} / {total}",
+    "stepOptions": "オプション",
+    "stepReview": "確認"
   }
 };
 

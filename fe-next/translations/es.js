@@ -2034,7 +2034,9 @@ const es = {
     "reviewSettings": "Revisar e Iniciar",
     "stepMode": "Modo",
     "stepDifficulty": "Dificultad",
-    "stepOf": "Paso {current} de {total}"
+    "stepOf": "Paso {current} de {total}",
+    "stepOptions": "Opciones",
+    "stepReview": "Revisar"
   }
 };
 

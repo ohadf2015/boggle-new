@@ -2042,7 +2042,9 @@ const en = {
     "reviewSettings": "Review & Start",
     "stepMode": "Mode",
     "stepDifficulty": "Difficulty",
-    "stepOf": "Step {current} of {total}"
+    "stepOf": "Step {current} of {total}",
+    "stepOptions": "Options",
+    "stepReview": "Review"
   }
 };
 

@@ -7,9 +7,6 @@ const __dirname = path.dirname(__filename);
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Disable dev indicators in production (keeps them in local dev)
-  devIndicators: process.env.NODE_ENV === 'production' ? false : undefined,
-
   // Enable system TLS certs for Turbopack to fetch Google Fonts
   experimental: {
     turbopackUseSystemTlsCerts: true,

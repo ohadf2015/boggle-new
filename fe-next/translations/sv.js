@@ -2038,7 +2038,9 @@ const sv = {
     "reviewSettings": "Granska & Starta",
     "stepMode": "Läge",
     "stepDifficulty": "Svårighetsgrad",
-    "stepOf": "Steg {current} av {total}"
+    "stepOf": "Steg {current} av {total}",
+    "stepOptions": "Alternativ",
+    "stepReview": "Granska"
   }
 };
 
