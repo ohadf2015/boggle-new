@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FaRobot, FaPlus, FaTimes, FaMagic } from 'react-icons/fa';
+import { FaRobot, FaPlus, FaTimes, FaMagic, FaChevronDown } from 'react-icons/fa';
 import { Badge } from './ui/badge';
 import { Switch } from './ui/switch';
 import { cn } from '../lib/utils';
@@ -72,6 +72,7 @@ const BotControls: React.FC<BotControlsProps> = ({
   const [addingDifficulty, setAddingDifficulty] = useState<BotDifficulty | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [announcement, setAnnouncement] = useState<string>('');
+  const [isManualAddExpanded, setIsManualAddExpanded] = useState<boolean>(false);
 
   const bots = players.filter(p => p.isBot === true);
   const playerCount = players.length;
@@ -149,6 +150,10 @@ const BotControls: React.FC<BotControlsProps> = ({
     return BOT_DIFFICULTIES.find(d => d.value === difficulty) || BOT_DIFFICULTIES[1];
   };
 
+  const handleToggleManualAdd = useCallback(() => {
+    setIsManualAddExpanded(prev => !prev);
+  }, []);
+
   return (
     <div className="space-y-3">
       {/* Screen reader announcements */}
@@ -212,48 +217,98 @@ const BotControls: React.FC<BotControlsProps> = ({
         </div>
       </div>
 
-      {/* Manual Add Section */}
+      {/* Manual Add Section - Collapsible */}
       <div className="space-y-2">
-        <p className="text-xs text-neo-cream/60">
-          {t('bots.orAddManually') || 'Or add manually:'}
-        </p>
+        {/* Toggle Button */}
+        <button
+          type="button"
+          onClick={handleToggleManualAdd}
+          disabled={disabled}
+          aria-expanded={isManualAddExpanded}
+          aria-controls="manual-bot-section"
+          className={cn(
+            "w-full flex items-center justify-between px-3 py-2.5 rounded-neo",
+            "bg-neo-cyan/10 hover:bg-neo-cyan/20 text-neo-cream",
+            "border-2 border-neo-cyan/30 hover:border-neo-cyan/50",
+            "transition-all duration-100 shadow-hard-sm hover:shadow-hard",
+            "hover:translate-x-[-1px] hover:translate-y-[-1px]",
+            "active:shadow-none active:translate-x-[1px] active:translate-y-[1px]",
+            disabled && "opacity-50 cursor-not-allowed hover:shadow-hard-sm hover:translate-x-0 hover:translate-y-0"
+          )}
+        >
+          <div className="flex items-center gap-2">
+            <FaPlus className="text-neo-cyan" aria-hidden="true" />
+            <span className="text-sm font-bold">
+              {t('bots.addBotsManually') || 'Add Bots'}
+            </span>
+          </div>
+          <motion.span
+            animate={{ rotate: isManualAddExpanded ? 180 : 0 }}
+            transition={{ duration: 0.2 }}
+          >
+            <FaChevronDown className="text-neo-cyan" aria-hidden="true" />
+          </motion.span>
+        </button>
 
-        <div className="flex flex-wrap gap-2">
-          {BOT_DIFFICULTIES.map((diff) => {
-            const isAdding = addingDifficulty === diff.value;
-            const isDisabled = !canAddMore || isAdding || disabled || addingDifficulty !== null;
+        {/* Collapsible Content */}
+        <AnimatePresence initial={false}>
+          {isManualAddExpanded && (
+            <motion.div
+              id="manual-bot-section"
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: 'auto', opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              transition={{
+                height: { duration: 0.3, ease: [0.04, 0.62, 0.23, 0.98] },
+                opacity: { duration: 0.2, ease: 'easeInOut' }
+              }}
+              style={{ overflow: 'hidden' }}
+            >
+              <div className="space-y-2 pt-2">
+                <p className="text-xs text-neo-cream/60">
+                  {t('bots.selectDifficultyPrompt') || 'Select difficulty:'}
+                </p>
 
-            return (
-              <motion.button
-                key={diff.value}
-                type="button"
-                onClick={() => handleAddBot(diff.value)}
-                disabled={isDisabled}
-                whileTap={{ scale: 0.95 }}
-                aria-label={`Add ${diff.value} bot`}
-                className={cn(
-                  "flex items-center gap-1.5 px-3 py-2 rounded-neo text-sm font-bold",
-                  "border-2 border-neo-black transition-all duration-100",
-                  "min-h-[44px]",
-                  diff.color,
-                  !isDisabled && "shadow-hard-sm hover:shadow-hard hover:translate-x-[-1px] hover:translate-y-[-1px]",
-                  !isDisabled && "active:shadow-none active:translate-x-[1px] active:translate-y-[1px]",
-                  isDisabled && "opacity-50 cursor-not-allowed shadow-none"
+                <div className="flex flex-wrap gap-2">
+                  {BOT_DIFFICULTIES.map((diff) => {
+                    const isAdding = addingDifficulty === diff.value;
+                    const isDisabled = !canAddMore || isAdding || disabled || addingDifficulty !== null;
+
+                    return (
+                      <motion.button
+                        key={diff.value}
+                        type="button"
+                        onClick={() => handleAddBot(diff.value)}
+                        disabled={isDisabled}
+                        whileTap={{ scale: 0.95 }}
+                        aria-label={`Add ${diff.value} bot`}
+                        className={cn(
+                          "flex items-center gap-1.5 px-3 py-2 rounded-neo text-sm font-bold",
+                          "border-2 border-neo-black transition-all duration-100",
+                          "min-h-[44px]",
+                          diff.color,
+                          !isDisabled && "shadow-hard-sm hover:shadow-hard hover:translate-x-[-1px] hover:translate-y-[-1px]",
+                          !isDisabled && "active:shadow-none active:translate-x-[1px] active:translate-y-[1px]",
+                          isDisabled && "opacity-50 cursor-not-allowed shadow-none"
+                        )}
+                      >
+                        <FaPlus size={10} aria-hidden="true" />
+                        <span aria-hidden="true">{diff.icon}</span>
+                        <span>{isAdding ? '...' : (t(diff.labelKey) || diff.value)}</span>
+                      </motion.button>
+                    );
+                  })}
+                </div>
+
+                {!canAddMore && (
+                  <p className="text-xs text-neo-cream/50">
+                    {t('bots.roomFull') || 'Room is full'}
+                  </p>
                 )}
-              >
-                <FaPlus size={10} aria-hidden="true" />
-                <span aria-hidden="true">{diff.icon}</span>
-                <span>{isAdding ? '...' : (t(diff.labelKey) || diff.value)}</span>
-              </motion.button>
-            );
-          })}
-        </div>
-
-        {!canAddMore && (
-          <p className="text-xs text-neo-cream/50">
-            {t('bots.roomFull') || 'Room is full'}
-          </p>
-        )}
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
 
       {/* Current Bots List */}
