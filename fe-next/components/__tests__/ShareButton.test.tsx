@@ -43,9 +43,9 @@ describe('ShareButton', () => {
     it('applies whatsapp variant styles', () => {
       render(<ShareButton onClick={noop} variant="whatsapp">Share on WhatsApp</ShareButton>);
       const button = screen.getByRole('button');
-      // WhatsApp variant uses green colors
+      // WhatsApp variant uses green background with black text for better contrast
       expect(button.className).toContain('bg-[#25D366]');
-      expect(button.className).toContain('text-white');
+      expect(button.className).toContain('text-black');
     });
 
     it('applies secondary variant styles', () => {
