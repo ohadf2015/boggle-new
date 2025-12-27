@@ -242,9 +242,14 @@ export async function updatePlayerStats(
     updates.casual_games = (profile.casual_games || 0) + 1;
   }
 
-  // Count wins - only for ranked games
-  if (gameStats.placement === 1 && (gameStats.totalPlayers || 0) > 1 && gameStats.isRanked) {
-    updates.ranked_wins = (profile.ranked_wins || 0) + 1;
+  // Count wins - both casual and ranked
+  // Only count as win if placement === 1 AND more than 1 player (no solo wins)
+  if (gameStats.placement === 1 && (gameStats.totalPlayers || 0) > 1) {
+    if (gameStats.isRanked) {
+      updates.ranked_wins = (profile.ranked_wins || 0) + 1;
+    } else {
+      updates.casual_wins = (profile.casual_wins || 0) + 1;
+    }
   }
 
   // Update longest word if this game had a longer one
@@ -339,7 +344,7 @@ export async function updateLeaderboardEntry(playerId: string): Promise<{ data: 
   // Get updated profile stats
   const { data: profile, error: fetchError } = await client
     .from('profiles')
-    .select('username, display_name, avatar_emoji, avatar_color, total_score, total_games, ranked_wins, ranked_mmr')
+    .select('username, display_name, avatar_emoji, avatar_color, total_score, total_games, ranked_wins, casual_wins, ranked_mmr')
     .eq('id', playerId)
     .single();
 
@@ -356,7 +361,7 @@ export async function updateLeaderboardEntry(playerId: string): Promise<{ data: 
       avatar_color: profile.avatar_color,
       total_score: profile.total_score || 0,
       games_played: profile.total_games || 0,
-      games_won: profile.ranked_wins || 0,
+      games_won: (profile.casual_wins || 0) + (profile.ranked_wins || 0),
       ranked_mmr: profile.ranked_mmr || 1000,
       last_updated: new Date().toISOString()
     }, {

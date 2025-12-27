@@ -7,6 +7,7 @@ import { motion } from 'framer-motion';
 import { FaUser, FaUsers, FaRobot, FaBullseye, FaTrophy, FaDoorOpen, FaCrown, FaMedal, FaQuestionCircle } from 'react-icons/fa';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useMusic } from '@/contexts/MusicContext';
+import { useAuth } from '@/contexts/AuthContext';
 import { useMobileLandscape } from '@/hooks/useMobileLandscape';
 import { useLiveRoomStats } from '@/hooks/useLiveRoomStats';
 import ModeCard from './ModeCard';
@@ -22,6 +23,7 @@ const LandingView: React.FC = () => {
   const { t, language } = useLanguage();
   const router = useRouter();
   const { playTrack, TRACKS } = useMusic();
+  const { isAuthenticated } = useAuth();
   const isLandscape = useMobileLandscape();
   const liveRoomStats = useLiveRoomStats();
 
@@ -48,10 +50,11 @@ const LandingView: React.FC = () => {
     const urlParams = new URLSearchParams(window.location.search);
     const hasRoom = urlParams.get('room');
 
-    if (!hasRoom && !hasCompletedOnboarding()) {
+    // Skip onboarding if user is authenticated
+    if (!hasRoom && !isAuthenticated && !hasCompletedOnboarding()) {
       setShowOnboarding(true);
     }
-  }, []);
+  }, [isAuthenticated]);
 
   // Play lobby music on landing page (same as multiplayer lobby)
   // Note: We always call playTrack even if audio isn't unlocked yet

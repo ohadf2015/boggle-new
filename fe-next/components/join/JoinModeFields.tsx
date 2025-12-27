@@ -11,6 +11,8 @@ import { validateUsername, validateGameCode, sanitizeInput } from '@/utils/valid
 import { useDebouncedValidation, getValidationClasses } from '@/hooks/useDebouncedValidation';
 import AvatarSelectorButton from './AvatarSelectorButton';
 import { AVATARS, type AvatarConfig } from '@/utils/avatarConfig';
+import { useAuth } from '@/contexts/AuthContext';
+import Avatar from '@/components/Avatar';
 
 export interface JoinModeFieldsProps {
   gameCode: string;
@@ -43,18 +45,26 @@ const JoinModeFields: React.FC<JoinModeFieldsProps> = ({
   displayName,
   t,
 }) => {
+  const { profile, updateProfile } = useAuth();
+
   // Avatar selection state
   const [selectedAvatarId, setSelectedAvatarId] = useState<string | undefined>(undefined);
 
-  // Load avatar from localStorage on mount
+  // Load avatar from profile (for auth users) or localStorage (for guests) on mount
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      const saved = localStorage.getItem('boggle_avatar_id');
-      if (saved) {
-        setSelectedAvatarId(saved);
+      if (isAuthenticated && profile?.avatar_image) {
+        // Authenticated users: load from profile
+        setSelectedAvatarId(profile.avatar_image);
+      } else {
+        // Guest users: load from localStorage
+        const saved = localStorage.getItem('boggle_avatar_id');
+        if (saved) {
+          setSelectedAvatarId(saved);
+        }
       }
     }
-  }, []);
+  }, [isAuthenticated, profile?.avatar_image]);
 
   // Check if a name is one of the avatar default names
   const isAvatarDefaultName = (name: string): boolean => {
@@ -62,15 +72,26 @@ const JoinModeFields: React.FC<JoinModeFieldsProps> = ({
   };
 
   // Handle avatar selection
-  const handleAvatarSelect = (avatar: AvatarConfig) => {
+  const handleAvatarSelect = async (avatar: AvatarConfig) => {
     setSelectedAvatarId(avatar.id);
-    // Save to localStorage
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('boggle_avatar_id', avatar.id);
-    }
-    // Pre-fill username with avatar name if username is empty or is a default avatar name
-    if (!username || username.trim() === '' || isAvatarDefaultName(username)) {
-      setUsername(avatar.name);
+
+    if (isAuthenticated && updateProfile) {
+      // Authenticated users: save to profile
+      await updateProfile({ avatar_image: avatar.id });
+    } else {
+      // Guest users: save to localStorage
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('boggle_avatar_id', avatar.id);
+      }
+      // Pre-fill username with avatar name ONLY if username is empty
+      // Don't override if user has already entered a name (even if it matches an avatar name)
+      if (!username || username.trim() === '') {
+        setUsername(avatar.name);
+        // Save the avatar name to localStorage to persist across page reloads
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('boggle_username', avatar.name);
+        }
+      }
     }
   };
 
@@ -159,19 +180,37 @@ const JoinModeFields: React.FC<JoinModeFieldsProps> = ({
         )}
       </div>
 
-      {/* Show "Joining as" for authenticated users */}
+      {/* Show "Joining as" for authenticated users with their profile avatar */}
       {isAuthenticated && displayName && (
-        <div className="p-2 rounded-neo bg-neo-navy text-white border-2 border-neo-cyan/50 shadow-hard-sm">
-          <div className="flex items-center gap-2">
-            <AvatarSelectorButton
-              selectedAvatarId={selectedAvatarId}
-              onAvatarSelect={handleAvatarSelect}
-              t={t}
-            />
-            <p className="text-xs text-neo-cream font-bold">
-              {t('joinView.joiningAs') || 'Joining as'}{' '}
-              <span className="text-neo-cyan">{displayName}</span>
-            </p>
+        <div className="p-3 rounded-neo bg-neo-navy border-2 border-neo-cyan/50 shadow-hard-sm">
+          <div className="flex items-center gap-3">
+            {/* Show profile avatar or custom profile picture */}
+            {profile?.profile_picture_url ? (
+              <div className="w-12 h-12 rounded-full overflow-hidden border-3 border-neo-black shadow-hard-sm">
+                <img
+                  src={profile.profile_picture_url}
+                  alt={displayName}
+                  className="w-full h-full object-cover"
+                />
+              </div>
+            ) : (
+              <Avatar
+                avatarImage={selectedAvatarId}
+                size="lg"
+                className="border-3 border-neo-black shadow-hard-sm"
+              />
+            )}
+            <div className="flex-1">
+              <p className="text-xs text-neo-cream/70 font-bold uppercase tracking-wide">
+                {t('joinView.joiningAs') || 'Joining as'}
+              </p>
+              <p className="text-sm text-neo-cyan font-black">
+                {displayName}
+              </p>
+              <p className="text-xs text-neo-cream/50 mt-0.5">
+                {t('profile.connectedAccount') || 'Connected with your account'}
+              </p>
+            </div>
           </div>
         </div>
       )}
