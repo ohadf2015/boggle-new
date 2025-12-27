@@ -2,14 +2,15 @@
     "$schema": "https://railway.app/railway.schema.json",
     "build": {
         "builder": "NIXPACKS",
-        "buildCommand": "npm run build",
+        "installCommand": "cd fe-next && npm install --no-audit --no-fund",
+        "buildCommand": "cd fe-next && npm run build",
         "watchPatterns": [
             "fe-next/**"
         ],
         "nixpacksConfigPath": "nixpacks.toml"
     },
     "deploy": {
-        "startCommand": "npm start",
+        "startCommand": "cd fe-next && npm start",
         "restartPolicyType": "ON_FAILURE",
         "restartPolicyMaxRetries": 10,
         "healthcheckPath": "/health",
