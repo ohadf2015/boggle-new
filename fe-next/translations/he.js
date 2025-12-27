@@ -307,7 +307,8 @@ const he = {
     "more": "עוד...",
     "inviteTitle": "הצטרפו למשחק LexiClash שלי!",
     "copied": "הועתק!",
-    "shareVictory": "שתפו את הניצחון שלכם!"
+    "shareVictory": "שתפו את הניצחון שלכם!",
+    "scanToJoin": "סרקו להצטרפות"
   },
   "errors": {
     "unstableConnection": "חיבור האינטרנט לא יציב - ייתכנו בעיות במשחק",
@@ -748,15 +749,14 @@ const he = {
     "lookFor": "חפש מילה בת",
     "letterWord": "אותיות",
     "letters": "אותיות",
-    "startsWith": "מתחיל ב",
+    "startsWith": "מתחילה ב",
     "tapToDismiss": "הקש לסגירה",
     "with": "עם",
     "inMiddle": "באמצע",
     "vowels": "תנועות",
     "withDoubles": "עם אותיות כפולות",
     "longerWord": "מילה ארוכה יותר",
-    "shortWord": "מילה קצרה",
-    "noLongWordsLeft": "אין עוד מילים עם 5+ אותיות למצוא!"
+    "shortWord": "מילה קצרה"
   },
   "achievementPopup": {
     "unlocked": "הישג נפתח!",

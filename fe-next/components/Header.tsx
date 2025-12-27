@@ -344,12 +344,12 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                                                     className={cn(
                                                         "flex items-center gap-2 px-3 py-2.5 text-sm font-bold rounded-neo border-2 border-neo-black dark:border-slate-500 transition-all w-full",
                                                         language === option.code
-                                                            ? "bg-neo-cyan shadow-hard-sm"
-                                                            : "bg-white dark:bg-slate-700 hover:bg-neo-cyan/50 dark:hover:bg-slate-600"
+                                                            ? "bg-neo-cyan shadow-hard-sm text-neo-black"
+                                                            : "bg-white dark:bg-slate-700 hover:bg-neo-cyan/50 dark:hover:bg-slate-600 text-neo-black dark:text-white"
                                                     )}
                                                 >
                                                     <span className="text-lg">{option.flag}</span>
-                                                    <span className="text-neo-black dark:text-white">{option.name}</span>
+                                                    <span>{option.name}</span>
                                                 </button>
                                             ))}
                                         </div>

@@ -307,7 +307,8 @@ const es = {
     "more": "Más...",
     "inviteTitle": "¡Únete a mi juego de LexiClash!",
     "copied": "¡Copiado!",
-    "shareVictory": "¡Comparte tu victoria!"
+    "shareVictory": "¡Comparte tu victoria!",
+    "scanToJoin": "Escanea para unirte"
   },
   "errors": {
     "unstableConnection": "La conexión a internet es inestable - podrías experimentar problemas durante el juego",

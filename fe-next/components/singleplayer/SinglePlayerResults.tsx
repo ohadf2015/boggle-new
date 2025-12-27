@@ -7,13 +7,14 @@ import { FaTrophy, FaMedal, FaRedo, FaHome, FaRobot, FaChartBar, FaCrown, FaAwar
 import { Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import GridComponent from '@/components/GridComponent';
 import PlayerInsights from '@/components/results/PlayerInsights';
+import PlayerArchetypeBadge from '@/components/results/PlayerArchetypeBadge';
 import { WordPointsGroup, InvalidWordsSection } from '@/components/results/WordPointsGroup';
 import ResultsWinnerBanner from '@/components/results/ResultsWinnerBanner';
 import Top3Leaderboard, { type LeaderboardParticipant } from '@/components/results/Top3Leaderboard';
 import { AchievementBadge } from '@/components/AchievementBadge';
 import WordFeedbackModal from '@/components/voting/WordFeedbackModal';
+import MissedWords from '@/components/results/MissedWords';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { cn } from '@/lib/utils';
@@ -54,7 +55,6 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
   const { t } = useLanguage();
   const { isAuthenticated } = useAuth();
   const isLandscape = useMobileLandscape();
-  const [showGrid, setShowGrid] = useState(false);
   const [expandedBot, setExpandedBot] = useState<string | null>(null);
   const [showSignupModal, setShowSignupModal] = useState(false);
   const [showScrollButton, setShowScrollButton] = useState(true);
@@ -77,18 +77,22 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
     totalComboBonus,
     totalFireRoundBonus,
     botWordDetails,
+    playerArchetype,
+    missedWords,
   } = useResultsData(results, t);
 
-  // Celebration effect on mount
+  // Celebration effect on mount - top 3 in solo-bots mode, or winner/high score
+  const shouldShowConfetti = (mode === 'solo-bots' && playerRank >= 1 && playerRank <= 3) || isWinner || results.isNewHighScore;
+
   useEffect(() => {
-    if (isWinner || results.isNewHighScore) {
+    if (shouldShowConfetti) {
       confetti({
         particleCount: 100,
         spread: 70,
         origin: { y: 0.6 }
       });
     }
-  }, [isWinner, results.isNewHighScore]);
+  }, [shouldShowConfetti]);
 
   // Update guest stats for single player games (only for unauthenticated users)
   useEffect(() => {
@@ -249,23 +253,9 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
             </div>
           </div>
 
-          {/* Grid toggle + Grid */}
-          {results.grid && (
-            <div className="w-full max-w-[50vh]">
-              <button
-                onClick={() => setShowGrid(!showGrid)}
-                className={cn(
-                  'mb-2 mx-auto flex items-center gap-1 px-3 py-1 rounded-neo border-2 border-neo-black font-bold text-xs uppercase',
-                  showGrid ? 'bg-neo-cyan text-neo-black' : 'bg-neo-cream text-neo-black'
-                )}
-              >
-                <FaChartBar className="text-sm" />
-                <span>{showGrid ? 'Hide' : 'Show'} Grid</span>
-              </button>
-              {showGrid && (
-                <GridComponent grid={results.grid} interactive={false} className="w-full" />
-              )}
-            </div>
+          {/* Archetype Badge - compact for landscape */}
+          {mode === 'solo-bots' && playerArchetype && (
+            <PlayerArchetypeBadge archetype={playerArchetype} size="sm" />
           )}
 
           {/* Achievements - compact */}
@@ -331,6 +321,11 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
                 ))}
               </div>
             </div>
+          )}
+
+          {/* Missed Words - compact for landscape */}
+          {mode === 'solo-bots' && missedWords.length > 0 && (
+            <MissedWords missedWords={missedWords} maxDisplay={3} className="text-sm" />
           )}
 
           {/* Action buttons - landscape compact layout */}
@@ -401,7 +396,8 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
         }
         customMessage={
           mode === 'solo-bots' && isWinner ? (t('singlePlayer.victory') || 'Victory!') :
-          mode === 'solo-bots' && !isWinner ? (t('singlePlayer.gameOver') || 'Game Over') :
+          mode === 'solo-bots' && playerRank <= 3 ? undefined : // Let component show "2nd Place!" or "3rd Place!"
+          mode === 'solo-bots' ? (t('singlePlayer.gameOver') || 'Game Over') : // 4th+ place
           mode === 'practice' ? (t('singlePlayer.practiceComplete') || 'Practice Complete!') :
           undefined
         }
@@ -411,7 +407,7 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
             ? (t('challenge.shortOf') || '{diff} points short of your record').replace('{diff}', String(results.previousHighScore - results.playerScore))
             : undefined
         }
-        showConfetti={isWinner || results.isNewHighScore}
+        showConfetti={shouldShowConfetti}
       />
 
       {/* Score Display - Large and prominent with comic dots */}
@@ -438,7 +434,7 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
             {results.playerWords.length} {t('common.words') || 'words'}
           </div>
         </div>
-        {/* Fire round and Combo bonus displays */}
+        {/* Fire round, Combo bonus, and Archetype badge displays */}
         <div className="flex flex-wrap gap-2 justify-center mt-3">
           {totalFireRoundBonus > 0 && (
             <motion.div
@@ -462,6 +458,16 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
               <span className="text-sm font-black text-neo-black">
                 {t('results.comboBonus') || 'Combo Bonus'}: +{totalComboBonus}
               </span>
+            </motion.div>
+          )}
+          {/* Player Archetype Badge - only shown in solo-bots mode */}
+          {mode === 'solo-bots' && playerArchetype && (
+            <motion.div
+              initial={{ scale: 0, rotate: 5 }}
+              animate={{ scale: 1, rotate: 0 }}
+              transition={{ delay: 0.45, type: 'spring', stiffness: 300 }}
+            >
+              <PlayerArchetypeBadge archetype={playerArchetype} size="md" />
             </motion.div>
           )}
         </div>
@@ -515,6 +521,17 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
             <PlayerInsights insights={playerInsights} />
           </CardContent>
         </Card>
+      )}
+
+      {/* Missed Words Section - Only for solo-bots mode */}
+      {mode === 'solo-bots' && missedWords.length > 0 && (
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3, duration: 0.3 }}
+        >
+          <MissedWords missedWords={missedWords} maxDisplay={5} />
+        </motion.div>
       )}
 
       {/* Achievements Section - Single Player (not saved to profile) */}
@@ -693,39 +710,6 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
           </CardContent>
         </Card>
       )}
-
-      {/* Grid preview - Toggle button style */}
-      <motion.button
-        onClick={() => setShowGrid(!showGrid)}
-        className="w-full bg-neo-cream dark:bg-slate-800 border-4 border-neo-black dark:border-slate-600 rounded-neo-lg p-4 shadow-hard flex items-center justify-between font-bold uppercase tracking-wide hover:shadow-hard-lg hover:translate-x-[-2px] hover:translate-y-[-2px] transition-all text-neo-black dark:text-neo-white"
-      >
-        <span>{t('common.viewGrid') || 'View Grid'}</span>
-        <motion.span
-          animate={{ rotate: showGrid ? 180 : 0 }}
-          transition={{ duration: 0.2 }}
-        >
-          ▼
-        </motion.span>
-      </motion.button>
-
-      <AnimatePresence>
-        {showGrid && (
-          <motion.div
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: 'auto', opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.3 }}
-            className="overflow-hidden"
-          >
-            <div className="border-4 border-neo-black rounded-neo-lg bg-gradient-to-br from-slate-800/90 to-slate-900/90 p-6 flex justify-center shadow-hard-lg">
-              <GridComponent
-                grid={results.grid}
-                interactive={false}
-              />
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
 
       {/* Action buttons - Enhanced with Quick Rematch */}
       <div ref={actionButtonsRef} className="flex flex-col gap-3 pt-4">

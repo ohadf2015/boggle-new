@@ -1,17 +1,18 @@
 import React, { useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FaClock, FaUsers, FaQrcode, FaWhatsapp, FaLink, FaCog, FaPlus, FaMinus, FaCrown, FaChevronDown, FaChevronUp, FaTrophy, FaRobot, FaSignOutAlt, FaPlay } from 'react-icons/fa';
+import { FaClock, FaUsers, FaShareAlt, FaCog, FaPlus, FaMinus, FaCrown, FaChevronDown, FaChevronUp, FaTrophy, FaRobot, FaSignOutAlt } from 'react-icons/fa';
 import { Button } from '../../components/ui/button';
 import { Card } from '../../components/ui/card';
 import { Badge } from '../../components/ui/badge';
 import { Checkbox } from '../../components/ui/checkbox';
-import ShareButton from '../../components/ShareButton';
 import SlotMachineText from '../../components/SlotMachineText';
 import Avatar from '../../components/Avatar';
 import RoomChat from '../../components/RoomChat';
 import PresenceIndicator from '../../components/PresenceIndicator';
 import BotControls from '../../components/BotControls';
-import { copyJoinUrl, shareViaWhatsApp } from '../../utils/share';
+import UnifiedShareModal from '../../components/modals/UnifiedShareModal';
+import { useNativeShare } from '../../hooks/useNativeShare';
+import { getJoinUrl } from '../../utils/share';
 import { DIFFICULTIES, MIN_WORD_LENGTH_OPTIONS, getRecommendedTimer } from '../../utils/consts';
 import { cn } from '../../lib/utils';
 import { useSocket } from '../../utils/SocketContext';
@@ -78,7 +79,6 @@ interface HostPreGameViewProps {
 
   // Actions
   onStartGame: () => void;
-  onShowQR: () => void;
   onExitRoom: () => void;
   onCancelTournament: () => void;
 
@@ -162,7 +162,6 @@ const HostPreGameView: React.FC<HostPreGameViewProps> = ({
 
   // Actions
   onStartGame,
-  onShowQR,
   onExitRoom,
   onCancelTournament,
 
@@ -172,25 +171,27 @@ const HostPreGameView: React.FC<HostPreGameViewProps> = ({
   const { socket } = useSocket();
   const [showAdvancedSettings, setShowAdvancedSettings] = useState<boolean>(false);
   const [selectedPreset, setSelectedPreset] = useState<PresetKey | null>(null);
-  const [showPresetDescription, setShowPresetDescription] = useState<PresetKey | null>(null);
-  const [pressTimer, setPressTimer] = useState<ReturnType<typeof setTimeout> | null>(null);
+  const [isShareModalOpen, setIsShareModalOpen] = useState<boolean>(false);
+  const { canNativeShare, nativeShare } = useNativeShare();
 
-  // Set default preset to 'fast' on mount
-  React.useEffect(() => {
-    if (selectedPreset === null) {
-      handleApplyPreset('fast');
+  // Share handler - uses native share on mobile, modal on desktop
+  const handleShare = useCallback(async () => {
+    if (canNativeShare) {
+      const joinUrl = getJoinUrl(gameCode, 'native-share');
+      const shared = await nativeShare({
+        title: t('share.inviteTitle'),
+        text: t('share.inviteMessage'),
+        url: joinUrl,
+      });
+      // If native share was cancelled, show modal as fallback
+      if (!shared) {
+        setIsShareModalOpen(true);
+      }
+    } else {
+      // Desktop: show unified modal
+      setIsShareModalOpen(true);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  // Memoized handlers
-  const handleCopyLink = useCallback(() => {
-    copyJoinUrl(gameCode, t);
-  }, [gameCode, t]);
-
-  const handleShareWhatsApp = useCallback(() => {
-    shareViaWhatsApp(gameCode, '', t);
-  }, [gameCode, t]);
+  }, [canNativeShare, nativeShare, gameCode, t]);
 
   const handleDecreaseTimer = useCallback(() => {
     setTimerDirection(-1);
@@ -229,30 +230,24 @@ const HostPreGameView: React.FC<HostPreGameViewProps> = ({
     setSelectedPreset(presetKey);
   }, [setTimerValue, setDifficulty, setMinWordLength, setTimerDirection]);
 
-  // Long-press handlers for preset description
-  const handlePresetMouseDown = useCallback((presetKey: PresetKey) => {
-    const timer = setTimeout(() => {
-      setShowPresetDescription(presetKey);
-    }, 1000); // 1 second
-    setPressTimer(timer);
+  // Sticky start button visibility state
+  const [showStickyStart, setShowStickyStart] = useState<boolean>(false);
+  const startButtonRef = React.useRef<HTMLDivElement>(null);
+
+  // Intersection observer to show sticky button when original is out of view
+  React.useEffect(() => {
+    if (!startButtonRef.current) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setShowStickyStart(!entry.isIntersecting);
+      },
+      { threshold: 0.5 }
+    );
+
+    observer.observe(startButtonRef.current);
+    return () => observer.disconnect();
   }, []);
-
-  const handlePresetMouseUp = useCallback(() => {
-    if (pressTimer) {
-      clearTimeout(pressTimer);
-      setPressTimer(null);
-    }
-  }, [pressTimer]);
-
-  const handlePresetClick = useCallback((presetKey: PresetKey) => {
-    if (pressTimer) {
-      clearTimeout(pressTimer);
-      setPressTimer(null);
-    }
-    if (!showPresetDescription) {
-      handleApplyPreset(presetKey);
-    }
-  }, [pressTimer, showPresetDescription, handleApplyPreset]);
 
   return (
     <div className="flex flex-col gap-2 sm:gap-3 md:gap-4 w-full max-w-6xl pb-16 lg:pb-0">
@@ -291,36 +286,14 @@ const HostPreGameView: React.FC<HostPreGameViewProps> = ({
             )}
           </div>
 
-          {/* Share Buttons - compact row with tooltips on mobile */}
-          <div className="flex gap-1.5">
-            <ShareButton
-              variant="secondary"
-              onClick={handleCopyLink}
-              icon={<FaLink className="text-xs" />}
-              className="px-2 py-1 text-xs h-7"
-              tooltip={t('hostView.copyLink')}
-            >
-              <span className="hidden md:inline">{t('hostView.copyLink')}</span>
-            </ShareButton>
-            <ShareButton
-              variant="whatsapp"
-              onClick={handleShareWhatsApp}
-              icon={<FaWhatsapp className="text-xs" />}
-              className="px-2 py-1 text-xs h-7"
-              tooltip={t('hostView.shareWhatsapp')}
-            >
-              <span className="hidden md:inline">{t('hostView.shareWhatsapp')}</span>
-            </ShareButton>
-            <ShareButton
-              variant="secondary"
-              onClick={onShowQR}
-              icon={<FaQrcode className="text-xs" />}
-              className="px-2 py-1 text-xs h-7"
-              tooltip={t('hostView.qrCode')}
-            >
-              <span className="hidden md:inline">{t('hostView.qrCode')}</span>
-            </ShareButton>
-          </div>
+          {/* Single Share Button */}
+          <button
+            onClick={handleShare}
+            className="flex items-center gap-1.5 px-3 py-1.5 bg-neo-cyan text-neo-black font-bold text-sm rounded-neo border-2 border-neo-black shadow-hard-sm hover:shadow-hard hover:-translate-y-0.5 active:shadow-none active:translate-y-0 transition-all"
+          >
+            <FaShareAlt className="text-xs" />
+            <span>{t('share.buttonLabel')}</span>
+          </button>
         </div>
       </Card>
 
@@ -328,14 +301,17 @@ const HostPreGameView: React.FC<HostPreGameViewProps> = ({
       <div className="flex flex-col lg:flex-row lg:items-stretch gap-2 sm:gap-3 md:gap-4">
         {/* Game Settings - LEFT - Neo-Brutalist Dark */}
         <Card className="flex-1 p-2 sm:p-3 md:p-4 bg-slate-800/95 text-neo-white border-4 border-neo-black shadow-hard-lg">
-          <h3 className="text-xs font-bold text-neo-cream/80 mb-2 flex items-center gap-1.5">
-            <FaCog className="text-neo-cyan text-[10px]" />
+          <h3 className="text-sm font-black uppercase text-neo-cream mb-3 flex items-center gap-2">
+            <FaCog className="text-neo-cyan text-xs" />
             {t('hostView.gameSettings')}
           </h3>
           <div className="w-full space-y-2 sm:space-y-3">
-            {/* Game Presets */}
-            <div>
-              <div className="grid grid-cols-2 gap-2 sm:flex sm:flex-wrap sm:gap-2">
+            {/* Game Presets - Quick Setup */}
+            <div className="space-y-2">
+              <label className="text-xs font-bold uppercase text-neo-cream">
+                {t('hostView.quickSetup') || 'Quick Setup'}
+              </label>
+              <div className="flex flex-wrap gap-2">
                 {(Object.keys(GAME_PRESETS) as PresetKey[]).map((key) => {
                   const preset = GAME_PRESETS[key];
                   const isSelected = selectedPreset === key;
@@ -362,28 +338,23 @@ const HostPreGameView: React.FC<HostPreGameViewProps> = ({
                   return (
                     <motion.button
                       key={key}
-                      onClick={() => handlePresetClick(key)}
-                      onMouseDown={() => handlePresetMouseDown(key)}
-                      onMouseUp={handlePresetMouseUp}
-                      onMouseLeave={handlePresetMouseUp}
-                      onTouchStart={() => handlePresetMouseDown(key)}
-                      onTouchEnd={handlePresetMouseUp}
+                      onClick={() => handleApplyPreset(key)}
                       whileTap={{ scale: 0.95 }}
                       className={cn(
-                        "sm:flex-1 sm:min-w-[80px] px-2 py-2 sm:px-3 sm:py-2.5 rounded-neo font-bold transition-all duration-100 border-3 border-neo-black",
+                        "flex-1 min-w-[90px] px-2 py-2 rounded-neo font-bold transition-all duration-100 border-2 border-neo-black",
                         style.bg,
                         isSelected
-                          ? `shadow-none translate-x-[2px] translate-y-[2px] ${style.selected}`
+                          ? "shadow-none translate-x-[2px] translate-y-[2px]"
                           : "shadow-hard hover:shadow-hard-lg hover:translate-x-[-1px] hover:translate-y-[-1px] active:shadow-none active:translate-x-[2px] active:translate-y-[2px]"
                       )}
                     >
                       <div className="flex flex-col items-center gap-0.5">
-                        <span className="text-lg sm:text-2xl">{preset.icon}</span>
-                        <span className="font-black text-xs text-neo-black uppercase tracking-tight leading-tight">
+                        <span className="text-xl drop-shadow-sm">{preset.icon}</span>
+                        <span className="font-black text-sm text-neo-black uppercase tracking-wide">
                           {t(preset.nameKey) || key.charAt(0).toUpperCase() + key.slice(1)}
                         </span>
-                        <span className="text-[9px] text-neo-black/60 font-bold leading-tight">
-                          {preset.timer}min • {difficultyName}
+                        <span className="text-[10px] text-neo-black/90 font-bold">
+                          {preset.timer} {t('hostView.min')} • {difficultyName}
                         </span>
                       </div>
                     </motion.button>
@@ -392,8 +363,9 @@ const HostPreGameView: React.FC<HostPreGameViewProps> = ({
               </div>
             </div>
 
+
             {/* Bot Controls - Always visible */}
-            <div className="pt-1">
+            <div className="pt-2 border-t border-neo-cream/20">
               <BotControls
                 socket={socket}
                 gameCode={gameCode}
@@ -402,21 +374,23 @@ const HostPreGameView: React.FC<HostPreGameViewProps> = ({
               />
             </div>
 
-            {/* Advanced Settings Toggle */}
+            {/* Advanced Settings Toggle with Preview */}
             <button
               type="button"
               onClick={handleToggleAdvancedSettings}
-              className="w-full flex items-center justify-between py-1 text-neo-cream/60 hover:text-neo-cream transition-colors duration-100"
+              className="w-full flex items-center justify-between py-1.5 text-neo-cream/90 hover:text-neo-cream transition-colors duration-100"
             >
-              <span className="text-xs font-bold">
-                {t('hostView.advancedSettings')}
+              <div className="flex flex-col items-start gap-0.5">
+                <span className="text-xs font-bold uppercase">
+                  {t('hostView.advancedSettings')}
+                </span>
                 {!showAdvancedSettings && (
-                  <span className="text-[10px] text-neo-cream/50 ms-2 font-normal">
-                    {timerValue}min • {t(DIFFICULTIES[difficulty].nameKey)} • {hostPlaying ? t('hostView.hostPlaysShort') || '▶' : '⏸'}
+                  <span className="text-[10px] text-neo-cream/90">
+                    {timerValue}min • {t(DIFFICULTIES[difficulty].nameKey)} • {minWordLength}+ {t('hostView.letters') || 'letters'} • {hostPlaying ? t('hostView.hostPlaysShort') || 'Host plays' : t('hostView.hostSpectates') || 'Spectating'}
                   </span>
                 )}
-              </span>
-              {showAdvancedSettings ? <FaChevronUp size={10} /> : <FaChevronDown size={10} />}
+              </div>
+              {showAdvancedSettings ? <FaChevronUp size={12} /> : <FaChevronDown size={12} />}
             </button>
 
             {/* Collapsible Advanced Settings */}
@@ -431,23 +405,21 @@ const HostPreGameView: React.FC<HostPreGameViewProps> = ({
                 >
                   {/* Timer Input */}
                   <div className="space-y-1.5">
-                    <label className="text-xs font-bold uppercase text-neo-cream/90 flex items-center gap-1.5">
+                    <label className="text-xs font-bold uppercase text-neo-cream flex items-center gap-1.5">
                       <FaClock className="text-neo-cyan text-xs" />
                       {t('hostView.roundDuration')}
                     </label>
                     <div className="flex items-center gap-2">
-                      {/* Minus Button */}
                       <button
                         type="button"
                         onClick={handleDecreaseTimer}
                         disabled={timerValue <= 1}
-                        className="w-9 h-9 flex items-center justify-center rounded-neo bg-neo-cream text-neo-black border-2 border-neo-black shadow-hard-sm hover:shadow-hard hover:translate-x-[-1px] hover:translate-y-[-1px] active:shadow-none active:translate-x-[1px] active:translate-y-[1px] transition-all duration-100 disabled:opacity-50 disabled:cursor-not-allowed font-black"
+                        className="w-8 h-8 flex items-center justify-center rounded-neo bg-neo-cream text-neo-black border-2 border-neo-black shadow-hard-sm hover:shadow-hard hover:translate-x-[-1px] hover:translate-y-[-1px] active:shadow-none active:translate-x-[1px] active:translate-y-[1px] transition-all duration-100 disabled:opacity-50 disabled:cursor-not-allowed font-black"
                       >
                         <FaMinus size={12} />
                       </button>
-
                       <div className="flex items-center gap-1.5">
-                        <div className="text-2xl font-black text-neo-yellow w-10 text-center overflow-hidden h-9 flex items-center justify-center">
+                        <div className="text-2xl font-black text-neo-yellow w-8 text-center overflow-hidden h-8 flex items-center justify-center">
                           <AnimatePresence mode="popLayout">
                             <motion.span
                               key={timerValue}
@@ -462,13 +434,11 @@ const HostPreGameView: React.FC<HostPreGameViewProps> = ({
                         </div>
                         <span className="text-sm text-neo-cream font-bold">{t('hostView.minutes')}</span>
                       </div>
-
-                      {/* Plus Button */}
                       <button
                         type="button"
                         onClick={handleIncreaseTimer}
                         disabled={timerValue >= 10}
-                        className="w-9 h-9 flex items-center justify-center rounded-neo bg-neo-cream text-neo-black border-2 border-neo-black shadow-hard-sm hover:shadow-hard hover:translate-x-[-1px] hover:translate-y-[-1px] active:shadow-none active:translate-x-[1px] active:translate-y-[1px] transition-all duration-100 disabled:opacity-50 disabled:cursor-not-allowed font-black"
+                        className="w-8 h-8 flex items-center justify-center rounded-neo bg-neo-cream text-neo-black border-2 border-neo-black shadow-hard-sm hover:shadow-hard hover:translate-x-[-1px] hover:translate-y-[-1px] active:shadow-none active:translate-x-[1px] active:translate-y-[1px] transition-all duration-100 disabled:opacity-50 disabled:cursor-not-allowed font-black"
                       >
                         <FaPlus size={12} />
                       </button>
@@ -499,16 +469,18 @@ const HostPreGameView: React.FC<HostPreGameViewProps> = ({
 
                   {/* Difficulty Selection */}
                   <div className="space-y-1.5">
-                    <label className="text-xs font-bold uppercase text-neo-cream/90">
+                    <label className="text-xs font-bold uppercase text-neo-cream">
                       {t('hostView.difficulty')}
                     </label>
                     <div className="flex flex-wrap gap-1.5">
                       {(Object.keys(DIFFICULTIES) as DifficultyLevel[]).map((key) => {
                         const isSelected = difficulty === key;
                         const difficultyColors: Record<string, string> = {
-                          EASY: 'bg-neo-lime text-neo-black',
-                          MEDIUM: 'bg-neo-orange text-neo-black',
-                          HARD: 'bg-neo-red text-neo-white',
+                          easy: 'bg-neo-lime text-neo-black',
+                          normal: 'bg-neo-yellow text-neo-black',
+                          medium: 'bg-neo-orange text-neo-black',
+                          hard: 'bg-neo-red text-neo-white',
+                          extreme: 'bg-neo-purple text-neo-white'
                         };
                         return (
                           <motion.button
@@ -518,12 +490,12 @@ const HostPreGameView: React.FC<HostPreGameViewProps> = ({
                             className={cn(
                               "px-2 py-1.5 rounded-neo font-bold transition-all duration-100 border-2 border-neo-black text-xs",
                               isSelected
-                                ? `${difficultyColors[key] || 'bg-neo-cyan text-neo-black'} shadow-none translate-x-[1px] translate-y-[1px]`
+                                ? `${difficultyColors[key] || 'bg-neo-cyan'} shadow-none translate-x-[1px] translate-y-[1px]`
                                 : "bg-neo-cream text-neo-black shadow-hard-sm hover:shadow-hard"
                             )}
                           >
                             <span className="font-black">{t(DIFFICULTIES[key].nameKey)}</span>
-                            <span className="text-[10px] font-bold opacity-70 ms-1">
+                            <span className="text-[10px] font-bold opacity-90 ms-1">
                               {DIFFICULTIES[key].rows}x{DIFFICULTIES[key].cols}
                             </span>
                           </motion.button>
@@ -534,7 +506,7 @@ const HostPreGameView: React.FC<HostPreGameViewProps> = ({
 
                   {/* Minimum Word Length Selection */}
                   <div className="space-y-1.5">
-                    <label className="text-xs font-bold uppercase text-neo-cream/90">
+                    <label className="text-xs font-bold uppercase text-neo-cream">
                       {t('hostView.minWordLength') || 'Min Word Length'}
                     </label>
                     <div className="flex gap-1.5">
@@ -562,27 +534,14 @@ const HostPreGameView: React.FC<HostPreGameViewProps> = ({
               )}
             </AnimatePresence>
 
-            {/* Start Button - Made prominent with larger size and animation */}
-            <div className="pt-3 flex justify-center">
+            {/* Start Button (original position - tracked for sticky) */}
+            <div ref={startButtonRef} className="pt-1 flex justify-center">
               <Button
                 onClick={onStartGame}
                 disabled={!timerValue || playersReady.length === 0 || tournamentCreating}
-                className={cn(
-                  "w-full max-w-sm h-14 text-lg bg-neo-lime text-neo-black font-black border-4 border-neo-black shadow-hard-lg",
-                  "hover:shadow-hard-xl hover:-translate-y-1 transition-all duration-200",
-                  "disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none disabled:translate-y-0",
-                  // Pulsing animation when enabled and players are ready
-                  !tournamentCreating && playersReady.length > 0 && timerValue && "animate-pulse-subtle"
-                )}
-                aria-label={`${t('hostView.startGame')} - ${playersReady.length} ${playersReady.length === 1 ? 'player' : 'players'} ready`}
+                className="w-full max-w-xs h-10 text-sm bg-neo-lime text-neo-black font-black"
               >
-                <span className="flex items-center gap-2">
-                  <FaPlay className="text-neo-black" />
-                  {tournamentCreating
-                    ? t('hostView.creatingTournament') || 'Creating...'
-                    : `${t('hostView.startGame')} (${playersReady.length})`
-                  }
-                </span>
+                {tournamentCreating ? t('hostView.creatingTournament') || 'Creating...' : t('hostView.startGame')}
               </Button>
             </div>
           </div>
@@ -590,8 +549,8 @@ const HostPreGameView: React.FC<HostPreGameViewProps> = ({
 
         {/* Players List - RIGHT */}
         <Card className="lg:w-[320px] h-auto p-2 sm:p-3 md:p-4 flex flex-col bg-slate-800/95 text-neo-white border-4 border-neo-black shadow-hard-lg">
-          <h3 className="text-sm font-bold uppercase text-neo-cream/80 mb-2 flex items-center gap-2 flex-shrink-0">
-            <FaUsers className="text-neo-pink/80" />
+          <h3 className="text-sm font-bold uppercase text-neo-cream mb-2 flex items-center gap-2 flex-shrink-0">
+            <FaUsers className="text-neo-pink" />
             {t('hostView.playersJoined')} ({playersReady.length})
           </h3>
           <div className="flex flex-col gap-1 flex-1 overflow-y-auto">
@@ -615,14 +574,8 @@ const HostPreGameView: React.FC<HostPreGameViewProps> = ({
                   >
                     <div
                       className={cn(
-                        "flex items-center justify-between px-3 py-2 rounded-lg transition-all duration-200",
-                        "border-2 border-white/20",
-                        // Higher contrast backgrounds for better visibility
-                        isHostPlayer
-                          ? "bg-neo-yellow/15 border-neo-yellow/40 hover:bg-neo-yellow/20"
-                          : isBot
-                            ? "bg-neo-cyan/10 border-neo-cyan/30 hover:bg-neo-cyan/15"
-                            : "bg-white/10 hover:bg-white/15 hover:border-white/30"
+                        "flex items-center justify-between px-2.5 py-1.5 rounded-lg transition-colors",
+                        "bg-white/5 hover:bg-white/10"
                       )}
                     >
                       <div className="flex items-center gap-2.5">
@@ -633,20 +586,20 @@ const HostPreGameView: React.FC<HostPreGameViewProps> = ({
                           avatarColor={avatar?.color}
                           size="lg"
                         />
-                        <span className="font-medium text-neo-cream/90">
+                        <span className="font-medium text-neo-cream">
                           <SlotMachineText text={playerUsername} />
                         </span>
-                        {isHostPlayer && <FaCrown className="text-neo-yellow/80 text-sm" />}
-                        {isBot && <FaRobot className="text-neo-cyan/70 text-sm" />}
+                        {isHostPlayer && <FaCrown className="text-neo-yellow text-sm" />}
+                        {isBot && <FaRobot className="text-neo-cyan text-sm" />}
                         {isMe && (
-                          <span className="text-xs text-neo-cream/70 font-medium">
+                          <span className="text-xs text-neo-cream/90 font-medium">
                             ({t('playerView.me')})
                           </span>
                         )}
                       </div>
                       <div className="flex items-center gap-2">
                         {playerWordCounts && playerWordCounts[playerUsername] !== undefined && (
-                          <span className="text-neo-cream/70 text-sm font-medium">
+                          <span className="text-neo-cream/90 text-sm font-medium">
                             {playerWordCounts[playerUsername] || 0}
                           </span>
                         )}
@@ -665,7 +618,7 @@ const HostPreGameView: React.FC<HostPreGameViewProps> = ({
             </AnimatePresence>
           </div>
           {playersReady.length === 0 && (
-            <p className="text-sm text-center text-neo-cream/75 font-medium mt-2">
+            <p className="text-sm text-center text-neo-cream/90 font-medium mt-2">
               {t('hostView.waitingForPlayers')}
             </p>
           )}
@@ -682,61 +635,34 @@ const HostPreGameView: React.FC<HostPreGameViewProps> = ({
         />
       </div>
 
-      {/* Preset Description Bottom Drawer */}
-      <AnimatePresence>
-        {showPresetDescription && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm"
-            onClick={() => setShowPresetDescription(null)}
-          >
-            <motion.div
-              initial={{ y: '100%' }}
-              animate={{ y: 0 }}
-              exit={{ y: '100%' }}
-              transition={{ type: 'spring', damping: 30, stiffness: 300 }}
-              onClick={(e) => e.stopPropagation()}
-              className="absolute bottom-0 left-0 right-0 bg-slate-800 border-t-4 border-neo-black rounded-t-[24px] shadow-hard-xl"
-            >
-              {/* Drag handle */}
-              <div className="flex justify-center pt-3 pb-2">
-                <div className="w-12 h-1.5 bg-neo-cream/30 rounded-full" />
-              </div>
+      {/* Unified Share Modal */}
+      <UnifiedShareModal
+        isOpen={isShareModalOpen}
+        onClose={() => setIsShareModalOpen(false)}
+        gameCode={gameCode}
+        t={t}
+      />
 
-              <div className="flex flex-col items-center gap-4 text-center p-6 pb-8">
-                <span className="text-6xl">{GAME_PRESETS[showPresetDescription].icon}</span>
-                <h2 className="text-2xl font-black uppercase text-neo-yellow">
-                  {t(GAME_PRESETS[showPresetDescription].nameKey)}
-                </h2>
-                <div className="space-y-3 text-neo-cream">
-                  <p className="text-lg font-bold">
-                    {t(GAME_PRESETS[showPresetDescription].description)}
-                  </p>
-                  <div className="flex items-center justify-center gap-4 text-sm bg-neo-black/20 rounded-neo px-4 py-3 border-2 border-neo-black/30">
-                    <span className="flex items-center gap-1.5">
-                      <FaClock className="text-neo-cyan" />
-                      <span className="font-bold">{GAME_PRESETS[showPresetDescription].timer} {t('hostView.minutes')}</span>
-                    </span>
-                    <span>•</span>
-                    <span className="font-bold">
-                      {t(DIFFICULTIES[GAME_PRESETS[showPresetDescription].difficulty].nameKey)}
-                    </span>
-                    <span>•</span>
-                    <span className="text-xs opacity-80">
-                      {GAME_PRESETS[showPresetDescription].minWordLength} {t('hostView.letterMinimum')}
-                    </span>
-                  </div>
-                </div>
-                <Button
-                  onClick={() => setShowPresetDescription(null)}
-                  className="w-full bg-neo-cyan text-neo-black font-black hover:bg-neo-cyan/90 shadow-hard border-3 border-neo-black"
-                >
-                  {t('common.gotIt') || t('common.close') || 'Got it!'}
-                </Button>
-              </div>
-            </motion.div>
+      {/* Sticky Start Button - Mobile only, appears when original button is out of view */}
+      <AnimatePresence>
+        {showStickyStart && (
+          <motion.div
+            initial={{ y: 100, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: 100, opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            className="fixed bottom-0 left-0 right-0 p-3 bg-slate-900/95 backdrop-blur-sm border-t-2 border-neo-black z-50 lg:hidden"
+          >
+            <Button
+              onClick={onStartGame}
+              disabled={!timerValue || playersReady.length === 0 || tournamentCreating}
+              className="w-full h-12 text-base bg-neo-lime text-neo-black font-black shadow-hard border-2 border-neo-black"
+            >
+              {tournamentCreating ? t('hostView.creatingTournament') || 'Creating...' : t('hostView.startGame')}
+              {playersReady.length > 0 && (
+                <span className="ml-2 text-sm opacity-75">({playersReady.length} {t('hostView.players')})</span>
+              )}
+            </Button>
           </motion.div>
         )}
       </AnimatePresence>

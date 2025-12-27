@@ -9,8 +9,6 @@ Detects potential contrast issues:
 - Inherited background context issues
 - Missing dark mode text overrides (text-neo-black without dark:text-* when dark mode bg exists)
 - Low-opacity dark mode text (dark:text-neo-cream/50 etc. that's hard to read)
-- Conditional state-based contrast issues (ternary expressions where active/selected state has bg without text)
-- Template literal variable lookup issues (e.g., difficultyColors[key] with mismatched keys)
 
 Usage:
     python detect-contrast-issues.py [--path <directory>] [--fix] [--json]
@@ -547,125 +545,6 @@ def analyze_element_with_context(
     return issues
 
 
-def analyze_conditional_contrast(content: str, file_path: str) -> List[ContrastIssue]:
-    """
-    Detect contrast issues in conditional/ternary className expressions.
-    Catches patterns like:
-    - isSelected ? 'bg-neo-cyan' : 'bg-neo-cream text-neo-black'
-    - difficultyColors[key] || 'bg-neo-cyan'  (fallback without text color)
-    """
-    issues = []
-    lines = content.split('\n')
-
-    # Pattern for ternary expressions with className strings
-    # Matches: condition ? 'classes' : 'classes' or condition ? `classes` : `classes`
-    ternary_pattern = r'(\w+(?:\s*===?\s*\w+)?)\s*\?\s*[`\'"]([^`\'"]+)[`\'"]\s*:\s*[`\'"]([^`\'"]+)[`\'"]'
-
-    # Pattern for template literal with fallback: ${var} || 'fallback'
-    fallback_pattern = r'\$\{([^}]+)\s*\|\|\s*[\'"]([^\'"]+)[\'"]\}'
-
-    # Pattern for className with cn() containing ternary
-    cn_ternary_pattern = r'cn\([^)]*(\w+)\s*\?\s*[`\'"]([^`\'"]+)[`\'"]\s*:\s*[`\'"]([^`\'"]+)[`\'"]'
-
-    for line_num, line in enumerate(lines, 1):
-        # Check for ternary patterns
-        for match in re.finditer(ternary_pattern, line):
-            condition = match.group(1)
-            true_classes = match.group(2)
-            false_classes = match.group(3)
-
-            # Check if "true" branch (typically selected/active state) has bg without text
-            if _has_bg_without_text_in_classes(true_classes):
-                bg_color = _extract_bg_from_classes(true_classes)
-                if bg_color and (is_light_color(bg_color) or is_dark_color(bg_color)):
-                    # Determine what text color is needed
-                    suggested_text = 'text-neo-black' if is_light_color(bg_color) else 'text-neo-white'
-                    issues.append(ContrastIssue(
-                        file=file_path,
-                        line=line_num,
-                        column=match.start(),
-                        issue_type='state-based-missing-text-color',
-                        severity='error',
-                        context=line.strip(),
-                        bg_color=bg_color,
-                        text_color=None,
-                        suggestion=f"Add {suggested_text} to active/selected state: '{true_classes}' needs explicit text color",
-                        element_snippet=match.group(0)[:100],
-                        inherited_from_line=None,
-                        ancestor_depth=0
-                    ))
-
-        # Check for cn() with ternary
-        for match in re.finditer(cn_ternary_pattern, line):
-            condition = match.group(1)
-            true_classes = match.group(2)
-            false_classes = match.group(3)
-
-            if _has_bg_without_text_in_classes(true_classes):
-                bg_color = _extract_bg_from_classes(true_classes)
-                if bg_color and (is_light_color(bg_color) or is_dark_color(bg_color)):
-                    suggested_text = 'text-neo-black' if is_light_color(bg_color) else 'text-neo-white'
-                    issues.append(ContrastIssue(
-                        file=file_path,
-                        line=line_num,
-                        column=match.start(),
-                        issue_type='state-based-missing-text-color',
-                        severity='error',
-                        context=line.strip(),
-                        bg_color=bg_color,
-                        text_color=None,
-                        suggestion=f"Add {suggested_text} to active/selected state in cn(): needs explicit text color",
-                        element_snippet=match.group(0)[:100],
-                        inherited_from_line=None,
-                        ancestor_depth=0
-                    ))
-
-        # Check for fallback patterns that might miss text color
-        for match in re.finditer(fallback_pattern, line):
-            var_name = match.group(1)
-            fallback_classes = match.group(2)
-
-            if _has_bg_without_text_in_classes(fallback_classes):
-                bg_color = _extract_bg_from_classes(fallback_classes)
-                if bg_color and (is_light_color(bg_color) or is_dark_color(bg_color)):
-                    suggested_text = 'text-neo-black' if is_light_color(bg_color) else 'text-neo-white'
-                    issues.append(ContrastIssue(
-                        file=file_path,
-                        line=line_num,
-                        column=match.start(),
-                        issue_type='fallback-missing-text-color',
-                        severity='error',
-                        context=line.strip(),
-                        bg_color=bg_color,
-                        text_color=None,
-                        suggestion=f"Fallback '{fallback_classes}' needs explicit text color. Add {suggested_text} or ensure {var_name} always includes text color",
-                        element_snippet=match.group(0)[:100],
-                        inherited_from_line=None,
-                        ancestor_depth=0
-                    ))
-
-    return issues
-
-
-def _has_bg_without_text_in_classes(classes_str: str) -> bool:
-    """Check if a class string has a background color but no text color"""
-    classes = classes_str.split()
-    has_bg = any(c.startswith('bg-') for c in classes)
-    has_text = any(c.startswith('text-') and not c.startswith('text-[') and not c.startswith('text-xs') and not c.startswith('text-sm') and not c.startswith('text-base') and not c.startswith('text-lg') and not c.startswith('text-xl') and not c.startswith('text-2xl') and not c.startswith('text-3xl') for c in classes)
-    return has_bg and not has_text
-
-
-def _extract_bg_from_classes(classes_str: str) -> Optional[str]:
-    """Extract the background color from a class string"""
-    classes = classes_str.split()
-    for c in classes:
-        if c.startswith('bg-'):
-            color = extract_color_from_class(c)
-            if color:
-                return color
-    return None
-
-
 def scan_file(file_path: str, max_depth: int = 10) -> List[ContrastIssue]:
     """Scan a single file for contrast issues including inherited backgrounds"""
     issues = []
@@ -684,10 +563,6 @@ def scan_file(file_path: str, max_depth: int = 10) -> List[ContrastIssue]:
     for element, ancestors in elements_with_context:
         element_issues = analyze_element_with_context(element, ancestors, file_path, max_depth)
         issues.extend(element_issues)
-
-    # Analyze conditional/ternary contrast issues
-    conditional_issues = analyze_conditional_contrast(content, file_path)
-    issues.extend(conditional_issues)
 
     return issues
 
@@ -795,7 +670,6 @@ def main():
         inherited = sum(1 for i in issues if i.inherited_from_line is not None)
         dark_mode_issues = sum(1 for i in issues if i.issue_type == 'missing-dark-mode-override')
         low_opacity_issues = sum(1 for i in issues if i.issue_type == 'low-opacity-dark-mode-text')
-        state_based_issues = sum(1 for i in issues if i.issue_type in ('state-based-missing-text-color', 'fallback-missing-text-color'))
 
         print(f"\n{'='*60}")
         print(f"CONTRAST ISSUE REPORT")
@@ -808,8 +682,6 @@ def main():
             print(f"Missing dark mode overrides: {dark_mode_issues}")
         if low_opacity_issues > 0:
             print(f"Low-opacity dark mode text: {low_opacity_issues}")
-        if state_based_issues > 0:
-            print(f"State-based contrast issues (ternary/conditional): {state_based_issues}")
         print(f"{'='*60}")
 
         for file_path, file_issues in by_file.items():
@@ -823,8 +695,6 @@ def main():
         print("     - Includes inherited-* issues where background is from ancestor")
         print("     - Includes missing-dark-mode-override (dark text without dark:text-*)")
         print("     - Includes low-opacity-dark-mode-text (e.g., dark:text-neo-cream/50)")
-        print("     - Includes state-based-missing-text-color (ternary with bg but no text)")
-        print("     - Includes fallback-missing-text-color (|| fallback with bg but no text)")
         print("  2. \033[93mWARNING\033[0m - Missing explicit foreground color")
         print("  3. \033[94mINFO\033[0m - Potential issues to review")
         print(f"{'='*60}\n")

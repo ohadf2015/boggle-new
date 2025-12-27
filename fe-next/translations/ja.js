@@ -307,7 +307,8 @@ const ja = {
     "more": "その他...",
     "inviteTitle": "私のLexiClashゲームに参加！",
     "copied": "コピーしました！",
-    "shareVictory": "勝利をシェアしよう！"
+    "shareVictory": "勝利をシェアしよう！",
+    "scanToJoin": "スキャンして参加"
   },
   "errors": {
     "unstableConnection": "インターネット接続が不安定です - ゲーム中に問題が発生する可能性があります",
@@ -744,7 +745,7 @@ const ja = {
     "noHints": "ヒント残りなし",
     "noWordsLeft": "見つける単語がもうありません！",
     "noLongWordsLeft": "5文字以上の単語がもうありません！",
-    "lookFor": "探してください:",
+    "lookFor": "探してください：",
     "letterWord": "文字の単語",
     "letters": "文字",
     "startsWith": "で始まる",
@@ -752,10 +753,9 @@ const ja = {
     "with": "を含む",
     "inMiddle": "中央に",
     "vowels": "母音",
-    "withDoubles": "二重文字あり",
+    "withDoubles": "重複文字あり",
     "longerWord": "長い単語",
-    "shortWord": "短い単語",
-    "noLongWordsLeft": "5文字以上の単語はもうありません！"
+    "shortWord": "短い単語"
   },
   "achievementPopup": {
     "unlocked": "実績解除！",

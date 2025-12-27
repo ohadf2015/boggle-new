@@ -8,6 +8,7 @@
 import { useMemo } from 'react';
 import { calculatePlayerInsights, WordData } from '@/utils/gameInsights';
 import { categorizeWords, calculateWordStats } from '@/components/results/utils';
+import { calculateAllPlayerArchetypes, getMissedWords, type PlayerArchetype } from '@/utils/playerArchetypes';
 import type { WordObject } from '@/components/results/types';
 import type { SinglePlayerResultsData, PlayerWordData } from '../SinglePlayerView';
 
@@ -141,6 +142,79 @@ export function useResultsData(results: SinglePlayerResultsData, t: (key: string
     });
   }, [results.botScores]);
 
+  // Calculate player archetypes for solo-bots mode
+  // Requires at least 2 participants (player + bots)
+  const playerArchetypes = useMemo((): Map<string, PlayerArchetype> => {
+    if (results.botScores.length === 0) return new Map();
+
+    const playerUsername = t('common.you') || 'You';
+
+    // Convert player data to archetype calculation format
+    const playerData = {
+      username: playerUsername,
+      score: results.playerScore,
+      allWords: results.playerWordData?.map(w => ({
+        word: w.word,
+        validated: w.isValid,
+        score: w.score,
+        timeSinceStart: w.timeSinceStart,
+      })) || [],
+    };
+
+    // Convert bot data to archetype calculation format
+    const botData = results.botScores.map(bot => ({
+      username: bot.name,
+      score: bot.score,
+      allWords: bot.words
+        .filter(word => !word.match(/^word\d+$/)) // Filter out fallback format
+        .map(word => ({
+          word,
+          validated: true,
+          score: Math.max(word.length - 1, 1), // Estimate score from word length
+        })),
+    }));
+
+    const allPlayers = [playerData, ...botData];
+    return calculateAllPlayerArchetypes(allPlayers, results.gameDuration);
+  }, [results.botScores, results.playerScore, results.playerWordData, results.gameDuration, t]);
+
+  // Get player's archetype
+  const playerArchetype = useMemo((): PlayerArchetype | null => {
+    const playerUsername = t('common.you') || 'You';
+    return playerArchetypes.get(playerUsername) || null;
+  }, [playerArchetypes, t]);
+
+  // Calculate missed words for solo-bots mode
+  // Shows high-value words found by bots that the player didn't find
+  const missedWords = useMemo(() => {
+    if (results.botScores.length === 0) return [];
+
+    const playerUsername = t('common.you') || 'You';
+    const playerWords = results.playerWordData?.filter(w => w.isValid) || [];
+
+    // Build allPlayersWords map
+    const allPlayersWords: Record<string, Array<{ word: string; validated: boolean; score: number }>> = {
+      [playerUsername]: playerWords.map(w => ({
+        word: w.word,
+        validated: true,
+        score: w.score,
+      })),
+    };
+
+    // Add bot words
+    results.botScores.forEach(bot => {
+      allPlayersWords[bot.name] = bot.words
+        .filter(word => !word.match(/^word\d+$/)) // Filter out fallback format
+        .map(word => ({
+          word,
+          validated: true,
+          score: Math.max(word.length - 1, 1), // Estimate score from word length
+        }));
+    });
+
+    return getMissedWords(playerUsername, allPlayersWords, 10);
+  }, [results.botScores, results.playerWordData, t]);
+
   return {
     allParticipants,
     playerRank,
@@ -148,5 +222,8 @@ export function useResultsData(results: SinglePlayerResultsData, t: (key: string
     playerInsights,
     ...processedWords,
     botWordDetails,
+    playerArchetypes,
+    playerArchetype,
+    missedWords,
   };
 }

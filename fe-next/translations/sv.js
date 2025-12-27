@@ -307,7 +307,8 @@ const sv = {
     "more": "Mer...",
     "inviteTitle": "Gå med i mitt LexiClash-spel!",
     "copied": "Kopierat!",
-    "shareVictory": "Dela din seger!"
+    "shareVictory": "Dela din seger!",
+    "scanToJoin": "Skanna för att gå med"
   },
   "errors": {
     "unstableConnection": "Internetanslutningen är instabil - du kan uppleva problem under spelet",
@@ -754,8 +755,7 @@ const sv = {
     "vowels": "vokaler",
     "withDoubles": "med dubbla bokstäver",
     "longerWord": "Ett längre ord",
-    "shortWord": "Kort ord",
-    "noLongWordsLeft": "Inga fler 5+ bokstavsord att hitta!"
+    "shortWord": "Kort ord"
   },
   "achievementPopup": {
     "unlocked": "Prestation upplåst!",

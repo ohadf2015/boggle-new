@@ -1,10 +1,11 @@
 'use client';
 
-import React, { createContext, useContext, useEffect, useRef, useCallback, useState, useMemo, ReactNode } from 'react';
+import React, { createContext, useContext, useEffect, useRef, useCallback, useMemo, ReactNode } from 'react';
 import { Howl } from 'howler';
 import { useMusic } from './MusicContext';
 import logger from '@/utils/logger';
 import { hapticAchievement, hapticForComboLevel } from '@/utils/haptics';
+import { useLocalStorageObject } from '@/hooks/useLocalStorageState';
 
 interface SoundEffectOptions {
   volume?: number;
@@ -52,6 +53,7 @@ const SOUND_EFFECTS = {
 } as const;
 
 const SFX_STORAGE_KEY = 'boggle_sfx_settings';
+const DEFAULT_SFX_SETTINGS: SfxSettings = { volume: 0.7, muted: false };
 
 interface SoundEffectsProviderProps {
   children: ReactNode;
@@ -64,58 +66,25 @@ export function SoundEffectsProvider({ children }: SoundEffectsProviderProps) {
   const isTabVisibleRef = useRef(true);
   const fireCrackleLoopIdRef = useRef<number | null>(null); // Track fire crackle loop sound ID
 
-  // Separate volume state for sound effects
-  const [sfxVolume, setSfxVolumeState] = useState<number>(() => {
-    if (typeof window !== 'undefined') {
-      try {
-        const saved = localStorage.getItem(SFX_STORAGE_KEY);
-        if (saved) {
-          const { volume } = JSON.parse(saved) as SfxSettings;
-          return volume ?? 0.7;
-        }
-      } catch (e) {
-        logger.warn('Failed to load SFX settings:', e);
-      }
-    }
-    return 0.7;
-  });
+  // Use shared localStorage hook for SFX settings
+  const [sfxSettings, , updateSfxSetting] = useLocalStorageObject<SfxSettings>(
+    SFX_STORAGE_KEY,
+    DEFAULT_SFX_SETTINGS
+  );
 
-  const [sfxMuted, setSfxMuted] = useState<boolean>(() => {
-    if (typeof window !== 'undefined') {
-      try {
-        const saved = localStorage.getItem(SFX_STORAGE_KEY);
-        if (saved) {
-          const { muted } = JSON.parse(saved) as SfxSettings;
-          return muted ?? false;
-        }
-      } catch (e) {
-        logger.warn('Failed to load SFX settings:', e);
-      }
-    }
-    return false;
-  });
-
-  // Persist SFX settings to localStorage
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      try {
-        localStorage.setItem(SFX_STORAGE_KEY, JSON.stringify({ volume: sfxVolume, muted: sfxMuted }));
-      } catch (e) {
-        logger.warn('Failed to save SFX settings:', e);
-      }
-    }
-  }, [sfxVolume, sfxMuted]);
+  const sfxVolume = sfxSettings.volume;
+  const sfxMuted = sfxSettings.muted;
 
   // Set SFX volume
   const setSfxVolume = useCallback((newVolume: number) => {
     const clampedVolume = Math.max(0, Math.min(1, newVolume));
-    setSfxVolumeState(clampedVolume);
-  }, []);
+    updateSfxSetting('volume', clampedVolume);
+  }, [updateSfxSetting]);
 
   // Toggle SFX mute
   const toggleSfxMute = useCallback(() => {
-    setSfxMuted(prev => !prev);
-  }, []);
+    updateSfxSetting('muted', !sfxMuted);
+  }, [updateSfxSetting, sfxMuted]);
 
   // Track tab visibility to block sounds when tab is hidden
   useEffect(() => {

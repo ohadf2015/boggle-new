@@ -18,6 +18,7 @@ import { getSession as getSupabaseSession } from '@/lib/supabase';
 import logger from '@/utils/logger';
 import { getRandomDefaultNameWithAvatar, getAvatarForName } from '@/utils/defaultNames';
 import { useMobileLandscape } from '@/hooks/useMobileLandscape';
+import { mapEmojiToAvatar } from '@/utils/avatarConfig';
 import type { Language, ActiveRoom } from '@/shared/types/game';
 
 interface ResultsData {
