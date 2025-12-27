@@ -324,6 +324,27 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                                 </div>
 
                                 <div className="flex flex-col gap-4 p-4">
+                                    {/* Account Section - Now at the top */}
+                                    <div className="flex flex-col gap-2">
+                                        <span className="text-xs font-bold text-neo-black/60 uppercase tracking-wide">
+                                            {t('common.account') || 'Account'}
+                                        </span>
+                                        {/* Level Badge for authenticated users */}
+                                        {isAuthenticated && profile?.current_level && (
+                                            <div className="flex items-center gap-2 mb-1">
+                                                <LevelBadge
+                                                    level={profile.current_level}
+                                                    size="md"
+                                                    animate={false}
+                                                />
+                                            </div>
+                                        )}
+                                        <AuthButton inline onClose={() => setShowMobileMenu(false)} />
+                                    </div>
+
+                                    {/* Divider */}
+                                    <div className="h-0.5 bg-neo-black/20 rounded-full" />
+
                                     {/* Language Section */}
                                     <div className="flex flex-col gap-2">
                                         <span className="text-xs font-bold text-neo-black/60 uppercase tracking-wide">
@@ -360,14 +381,6 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                                         </span>
 
                                         <div className="flex items-center gap-3 flex-wrap">
-                                            {/* Level Badge */}
-                                            {isAuthenticated && profile?.current_level && (
-                                                <LevelBadge
-                                                    level={profile.current_level}
-                                                    size="md"
-                                                    animate={false}
-                                                />
-                                            )}
                                             {/* Admin Link */}
                                             {isAdmin && (
                                                 <Link
@@ -389,17 +402,6 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                                             )}
                                             <MusicControls />
                                         </div>
-                                    </div>
-
-                                    {/* Divider */}
-                                    <div className="h-0.5 bg-neo-black/20 rounded-full" />
-
-                                    {/* Auth Section */}
-                                    <div className="flex flex-col gap-2">
-                                        <span className="text-xs font-bold text-neo-black/60 uppercase tracking-wide">
-                                            {t('common.account') || 'Account'}
-                                        </span>
-                                        <AuthButton />
                                     </div>
                                 </div>
                             </motion.div>

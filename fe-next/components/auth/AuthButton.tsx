@@ -27,7 +27,14 @@ const languages: LanguageItem[] = [
   { code: 'ja', name: '日本語', flag: '🇯🇵' }
 ];
 
-const AuthButton = (): React.ReactElement | null => {
+interface AuthButtonProps {
+  /** When true, renders items inline without dropdown (for mobile menu) */
+  inline?: boolean;
+  /** Callback when an action closes the menu */
+  onClose?: () => void;
+}
+
+const AuthButton = ({ inline = false, onClose }: AuthButtonProps = {}): React.ReactElement | null => {
   const { theme, toggleTheme } = useTheme();
   const { t, language, setLanguage, dir } = useLanguage();
   const { isAuthenticated, profile, isSupabaseEnabled, loading } = useAuth();
@@ -64,6 +71,81 @@ const AuthButton = (): React.ReactElement | null => {
 
   // Authenticated user - show user menu
   if (isAuthenticated && profile) {
+    // Inline variant for mobile menu - renders items directly without dropdown
+    if (inline) {
+      return (
+        <div className="flex flex-col gap-2 w-full">
+          {/* Profile Header with Avatar - links to profile page */}
+          <button
+            onClick={() => {
+              router.push(`/${language}/profile`);
+              onClose?.();
+            }}
+            className={cn(
+              "flex items-center gap-3 px-3 py-2.5 text-sm font-bold rounded-neo border-2 border-neo-black transition-all w-full",
+              "bg-neo-cyan shadow-hard-sm hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-hard"
+            )}
+          >
+            <Avatar
+              profilePictureUrl={profile.profile_picture_url ?? undefined}
+              avatarEmoji={profile.avatar_emoji}
+              avatarColor={profile.avatar_color}
+              size="sm"
+            />
+            <span className="text-neo-black truncate">
+              {profile.display_name || profile.username}
+            </span>
+            <FaUser size={12} className="text-neo-black/50 ms-auto" />
+          </button>
+
+          {/* Leaderboard Link */}
+          <button
+            onClick={() => {
+              router.push(`/${language}/leaderboard`);
+              onClose?.();
+            }}
+            className={cn(
+              "flex items-center gap-3 px-3 py-2.5 text-sm font-bold rounded-neo border-2 border-neo-black transition-all w-full",
+              "bg-white hover:bg-neo-cyan/50"
+            )}
+          >
+            <FaTrophy size={14} className="text-neo-black" />
+            <span className="text-neo-black">{t('leaderboard.title') || 'Leaderboard'}</span>
+          </button>
+
+          {/* Theme Toggle */}
+          <button
+            onClick={toggleTheme}
+            className={cn(
+              "flex items-center gap-3 px-3 py-2.5 text-sm font-bold rounded-neo border-2 border-neo-black transition-all w-full",
+              "bg-white hover:bg-neo-cyan/50"
+            )}
+          >
+            {isDarkMode ? <FaSun size={14} className="text-yellow-500" /> : <FaMoon size={14} className="text-slate-600" />}
+            <span className="text-neo-black">{isDarkMode ? (t('common.lightMode') || 'Light Mode') : (t('common.darkMode') || 'Dark Mode')}</span>
+          </button>
+
+          {/* Sign Out */}
+          <button
+            onClick={handleSignOut}
+            disabled={isSigningOut}
+            className={cn(
+              "flex items-center gap-3 px-3 py-2.5 text-sm font-bold rounded-neo border-2 border-neo-black transition-all w-full",
+              "bg-red-100 hover:bg-red-200 text-red-600"
+            )}
+          >
+            {isSigningOut ? (
+              <div className="w-4 h-4 border-2 border-red-500 border-t-transparent rounded-full animate-spin" />
+            ) : (
+              <FaSignOutAlt size={14} />
+            )}
+            <span>{t('auth.signOut') || 'Sign Out'}</span>
+          </button>
+        </div>
+      );
+    }
+
+    // Default dropdown variant
     return (
       <div className="relative flex-shrink-0">
         <Button
@@ -263,6 +345,61 @@ const AuthButton = (): React.ReactElement | null => {
   }
 
   // Guest user - show prominent Sign In button + settings dropdown
+  // Inline variant for mobile menu
+  if (inline) {
+    return (
+      <>
+        <div className="flex flex-col gap-2 w-full">
+          {/* Sign In Button */}
+          <button
+            onClick={() => setShowAuthModal(true)}
+            className={cn(
+              "flex items-center gap-3 px-3 py-2.5 text-sm font-bold rounded-neo border-2 border-neo-black transition-all w-full",
+              "bg-neo-cyan shadow-hard-sm hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-hard"
+            )}
+          >
+            <FaUser size={14} className="text-neo-black" />
+            <span className="text-neo-black">{t('auth.signIn') || 'Sign In'}</span>
+          </button>
+
+          {/* Leaderboard Link */}
+          <button
+            onClick={() => {
+              router.push(`/${language}/leaderboard`);
+              onClose?.();
+            }}
+            className={cn(
+              "flex items-center gap-3 px-3 py-2.5 text-sm font-bold rounded-neo border-2 border-neo-black transition-all w-full",
+              "bg-white hover:bg-neo-cyan/50"
+            )}
+          >
+            <FaTrophy size={14} className="text-neo-black" />
+            <span className="text-neo-black">{t('leaderboard.title') || 'Leaderboard'}</span>
+          </button>
+
+          {/* Theme Toggle */}
+          <button
+            onClick={toggleTheme}
+            className={cn(
+              "flex items-center gap-3 px-3 py-2.5 text-sm font-bold rounded-neo border-2 border-neo-black transition-all w-full",
+              "bg-white hover:bg-neo-cyan/50"
+            )}
+          >
+            {isDarkMode ? <FaSun size={14} className="text-yellow-500" /> : <FaMoon size={14} className="text-slate-600" />}
+            <span className="text-neo-black">{isDarkMode ? (t('common.lightMode') || 'Light Mode') : (t('common.darkMode') || 'Dark Mode')}</span>
+          </button>
+        </div>
+
+        <AuthModal
+          isOpen={showAuthModal}
+          onClose={() => setShowAuthModal(false)}
+          showGuestStats={true}
+        />
+      </>
+    );
+  }
+
+  // Default dropdown variant
   return (
     <>
       <div className="flex items-center gap-2">
