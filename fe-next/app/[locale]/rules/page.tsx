@@ -1,10 +1,10 @@
 'use client';
 
-import React, { useRef } from 'react';
+import React from 'react';
 import Link from 'next/link';
 import dynamic from 'next/dynamic';
 import { motion } from 'framer-motion';
-import { FaGamepad, FaTrophy, FaLightbulb, FaClock, FaUsers, FaStar, FaArrowLeft, FaPlay, FaHandPointer, FaRobot, FaBook, FaChartLine } from 'react-icons/fa';
+import { FaGamepad, FaTrophy, FaLightbulb, FaUsers, FaArrowLeft, FaPlay, FaRobot, FaCheckCircle } from 'react-icons/fa';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import Header from '@/components/Header';
@@ -15,11 +15,6 @@ const InteractiveGridDemo = dynamic(() => import('@/components/how-to-play/Inter
 
 export default function RulesPage(): React.JSX.Element {
     const { language, dir, t } = useLanguage();
-    const tutorialRef = useRef<HTMLElement>(null);
-
-    const scrollToTutorial = () => {
-        tutorialRef.current?.scrollIntoView({ behavior: 'smooth' });
-    };
 
     const fadeInUp = {
         initial: { opacity: 0, y: 20 },
@@ -31,406 +26,209 @@ export default function RulesPage(): React.JSX.Element {
         <div dir={dir} className="min-h-screen bg-gradient-to-b from-slate-50 via-slate-100 to-slate-200 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
             <Header />
 
-            <main className="max-w-4xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
-                {/* Page Header */}
+            <main className="max-w-4xl mx-auto px-4 sm:px-6 py-6 sm:py-10">
+                {/* Page Header - Compact */}
                 <motion.div
-                    className="text-center mb-8 sm:mb-12"
+                    className="text-center mb-6"
                     initial={{ opacity: 0, y: -20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.6 }}
                 >
-                    <h1 className="text-3xl sm:text-4xl md:text-5xl font-black text-slate-900 dark:text-white mb-4">
+                    <h1 className="text-3xl sm:text-4xl font-black text-slate-900 dark:text-white mb-2">
                         {t('rules.pageTitle')}
                     </h1>
-                    <p className="text-lg sm:text-xl text-slate-600 dark:text-slate-200 max-w-2xl mx-auto">
-                        {t('rules.pageSubtitle')}
+                    <p className="text-base sm:text-lg text-slate-600 dark:text-slate-300">
+                        {t('howToPlay.description')}
                     </p>
                 </motion.div>
 
-                {/* Quick Start CTA */}
-                <motion.div
-                    className="flex flex-col sm:flex-row justify-center gap-4 mb-8"
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ delay: 0.2, duration: 0.4 }}
-                >
-                    <Link href={`/${language}`}>
-                        <Button
-                            size="lg"
-                            className="bg-neo-cyan text-neo-black hover:bg-neo-cyan/90 font-bold text-lg px-8 py-6 w-full sm:w-auto"
-                        >
-                            <FaPlay className={dir === 'rtl' ? 'ml-2' : 'mr-2'} />
-                            {t('rules.playNowFree')}
-                        </Button>
-                    </Link>
-                    <Button
-                        size="lg"
-                        variant="outline"
-                        onClick={scrollToTutorial}
-                        className="border-3 border-neo-black bg-neo-lime hover:bg-neo-lime/90 text-neo-black font-bold text-lg px-8 py-6 w-full sm:w-auto"
-                    >
-                        <FaHandPointer className={dir === 'rtl' ? 'ml-2' : 'mr-2'} />
-                        {t('footer.interactiveTutorial')}
-                    </Button>
-                </motion.div>
-
-                {/* Interactive Demo at Top */}
+                {/* HERO: Interactive Demo - First Thing Users See */}
                 <motion.section
-                    ref={tutorialRef}
                     id="interactive-tutorial"
-                    className="mb-10 scroll-mt-24"
+                    className="mb-8"
                     {...fadeInUp}
-                    transition={{ delay: 0.3 }}
+                    transition={{ delay: 0.2 }}
                 >
-                    <Card className="border-4 border-neo-black shadow-hard-lg bg-white text-neo-black dark:bg-slate-800 dark:text-white">
-                        <CardHeader className="bg-neo-yellow/20 text-neo-black dark:text-white border-b-4 border-neo-black">
-                            <CardTitle className="flex items-center gap-3 text-2xl sm:text-3xl font-black text-slate-900 dark:text-white">
-                                <FaHandPointer className="text-neo-pink" />
+                    <Card className="border-4 border-neo-black shadow-hard-lg bg-white dark:bg-slate-800 overflow-hidden">
+                        <CardHeader className="bg-gradient-to-r from-neo-cyan/30 to-neo-pink/30 border-b-4 border-neo-black py-4">
+                            <CardTitle className="flex items-center justify-center gap-3 text-xl sm:text-2xl font-black text-slate-900 dark:text-white">
+                                <FaGamepad className="text-neo-pink" />
                                 {t('footer.interactiveTutorial')}
                             </CardTitle>
                         </CardHeader>
-                        <CardContent className="p-6">
-                            <p className="text-lg text-slate-700 dark:text-slate-200 leading-relaxed mb-6">
-                                {t('howToPlay.description')}
-                            </p>
-                            <div className="bg-gradient-to-br from-neo-cyan/10 to-neo-pink/10 rounded-neo border-3 border-neo-black p-4 flex justify-center">
+                        <CardContent className="p-4 sm:p-6">
+                            <div className="bg-gradient-to-br from-neo-navy/5 to-neo-purple/5 rounded-xl p-4 flex justify-center">
                                 <InteractiveGridDemo t={t} dir={dir} />
                             </div>
                         </CardContent>
                     </Card>
                 </motion.section>
 
-                {/* How to Play Section */}
+                {/* Game Modes - Merged Section */}
                 <motion.section
-                    className="mb-10"
+                    className="mb-8"
+                    {...fadeInUp}
+                    transition={{ delay: 0.3 }}
+                >
+                    <Card className="border-4 border-neo-black shadow-hard-lg bg-white dark:bg-slate-800">
+                        <CardHeader className="bg-neo-lime/20 border-b-4 border-neo-black py-4">
+                            <CardTitle className="flex items-center gap-3 text-xl sm:text-2xl font-black text-slate-900 dark:text-white">
+                                <FaPlay className="text-neo-black dark:text-white" />
+                                {t('rules.gameModes') || 'Game Modes'}
+                            </CardTitle>
+                        </CardHeader>
+                        <CardContent className="p-4 sm:p-6">
+                            <div className="grid gap-4 sm:grid-cols-2">
+                                {/* Multiplayer Card */}
+                                <div className="p-4 rounded-xl bg-neo-cyan/10 border-3 border-neo-black">
+                                    <div className={`flex items-center gap-2 mb-3 ${dir === 'rtl' ? 'flex-row-reverse' : ''}`}>
+                                        <FaUsers className="text-neo-purple text-xl flex-shrink-0" />
+                                        <h3 className="font-bold text-lg text-slate-900 dark:text-white">{t('landing.multiPlayer')}</h3>
+                                    </div>
+                                    <ul className={`space-y-2 text-sm text-slate-600 dark:text-slate-300 ${dir === 'rtl' ? 'text-right' : ''}`}>
+                                        <li className={`flex items-start gap-2 ${dir === 'rtl' ? 'flex-row-reverse' : ''}`}>
+                                            <FaCheckCircle className="text-neo-lime mt-0.5 flex-shrink-0" />
+                                            <span>{t('rules.joinOrCreateDesc')}</span>
+                                        </li>
+                                        <li className={`flex items-start gap-2 ${dir === 'rtl' ? 'flex-row-reverse' : ''}`}>
+                                            <FaCheckCircle className="text-neo-lime mt-0.5 flex-shrink-0" />
+                                            <span>{t('rules.raceAgainstTimeDesc')}</span>
+                                        </li>
+                                        <li className={`flex items-start gap-2 ${dir === 'rtl' ? 'flex-row-reverse' : ''}`}>
+                                            <FaCheckCircle className="text-neo-lime mt-0.5 flex-shrink-0" />
+                                            <span>{t('rules.competeAndWinDesc')}</span>
+                                        </li>
+                                    </ul>
+                                    <div className="mt-4">
+                                        <Link href={`/${language}/multiplayer`}>
+                                            <Button
+                                                size="sm"
+                                                className="bg-neo-cyan text-neo-black hover:bg-neo-cyan/90 font-bold w-full"
+                                            >
+                                                <FaUsers className={dir === 'rtl' ? 'ml-2' : 'mr-2'} />
+                                                {t('landing.multiPlayer')}
+                                            </Button>
+                                        </Link>
+                                    </div>
+                                </div>
+
+                                {/* Single Player Card */}
+                                <div className="p-4 rounded-xl bg-neo-orange/10 border-3 border-neo-black">
+                                    <div className={`flex items-center gap-2 mb-3 ${dir === 'rtl' ? 'flex-row-reverse' : ''}`}>
+                                        <FaRobot className="text-neo-orange text-xl flex-shrink-0" />
+                                        <h3 className="font-bold text-lg text-slate-900 dark:text-white">{t('landing.singlePlayer')}</h3>
+                                    </div>
+                                    <ul className={`space-y-2 text-sm text-slate-600 dark:text-slate-300 ${dir === 'rtl' ? 'text-right' : ''}`}>
+                                        <li className={`flex items-start gap-2 ${dir === 'rtl' ? 'flex-row-reverse' : ''}`}>
+                                            <FaCheckCircle className="text-neo-lime mt-0.5 flex-shrink-0" />
+                                            <span>{t('rules.soloVsBotsDesc')}</span>
+                                        </li>
+                                        <li className={`flex items-start gap-2 ${dir === 'rtl' ? 'flex-row-reverse' : ''}`}>
+                                            <FaCheckCircle className="text-neo-lime mt-0.5 flex-shrink-0" />
+                                            <span>{t('rules.practiceModeDesc')}</span>
+                                        </li>
+                                        <li className={`flex items-start gap-2 ${dir === 'rtl' ? 'flex-row-reverse' : ''}`}>
+                                            <FaCheckCircle className="text-neo-lime mt-0.5 flex-shrink-0" />
+                                            <span>{t('rules.challengeModeDesc')}</span>
+                                        </li>
+                                    </ul>
+                                    <div className="mt-4">
+                                        <Link href={`/${language}/singleplayer`}>
+                                            <Button
+                                                size="sm"
+                                                className="bg-neo-orange text-neo-black hover:bg-neo-orange/90 font-bold w-full"
+                                            >
+                                                <FaRobot className={dir === 'rtl' ? 'ml-2' : 'mr-2'} />
+                                                {t('landing.singlePlayer')}
+                                            </Button>
+                                        </Link>
+                                    </div>
+                                </div>
+                            </div>
+                        </CardContent>
+                    </Card>
+                </motion.section>
+
+                {/* Compact Scoring System - 3 Rows */}
+                <motion.section
+                    className="mb-8"
                     {...fadeInUp}
                     transition={{ delay: 0.4 }}
                 >
-                    <Card className="border-4 border-neo-black shadow-hard-lg bg-white text-neo-black dark:bg-slate-800 dark:text-white">
-                        <CardHeader className="bg-neo-cyan/20 text-neo-black dark:text-white border-b-4 border-neo-black">
-                            <CardTitle className="flex items-center gap-3 text-2xl sm:text-3xl font-black text-slate-900 dark:text-white">
-                                <FaGamepad className="text-neo-black dark:text-white" />
-                                {t('howToPlay.title')}
-                            </CardTitle>
-                        </CardHeader>
-                        <CardContent className="p-6 space-y-6">
-                            <p className="text-lg text-slate-700 dark:text-slate-200 leading-relaxed">
-                                {t('rules.howToPlayIntro')}
-                            </p>
-
-                            <div className="grid gap-4 sm:grid-cols-2">
-                                <div className="p-4 rounded-neo bg-neo-lime/10 text-neo-black dark:text-white border-3 border-neo-black">
-                                    <div className="flex items-center gap-2 mb-2">
-                                        <FaUsers className="text-neo-purple text-xl" />
-                                        <h3 className="font-bold text-lg text-slate-900 dark:text-white">{t('rules.joinOrCreate')}</h3>
-                                    </div>
-                                    <p className="text-slate-600 dark:text-slate-300">
-                                        {t('rules.joinOrCreateDesc')}
-                                    </p>
-                                </div>
-
-                                <div className="p-4 rounded-neo bg-neo-pink/10 text-white border-3 border-neo-black">
-                                    <div className="flex items-center gap-2 mb-2">
-                                        <FaClock className="text-neo-pink text-xl" />
-                                        <h3 className="font-bold text-lg text-slate-900 dark:text-white">{t('rules.raceAgainstTime')}</h3>
-                                    </div>
-                                    <p className="text-slate-600 dark:text-slate-300">
-                                        {t('rules.raceAgainstTimeDesc')}
-                                    </p>
-                                </div>
-
-                                <div className="p-4 rounded-neo bg-neo-cyan/10 text-neo-black dark:text-white border-3 border-neo-black">
-                                    <div className="flex items-center gap-2 mb-2">
-                                        <span className="text-2xl">🔤</span>
-                                        <h3 className="font-bold text-lg text-slate-900 dark:text-white">{t('rules.swipeToForm')}</h3>
-                                    </div>
-                                    <p className="text-slate-600 dark:text-slate-300">
-                                        {t('rules.swipeToFormDesc')}
-                                    </p>
-                                </div>
-
-                                <div className="p-4 rounded-neo bg-neo-purple/10 text-white border-3 border-neo-black">
-                                    <div className="flex items-center gap-2 mb-2">
-                                        <FaTrophy className="text-neo-yellow text-xl" />
-                                        <h3 className="font-bold text-lg text-slate-900 dark:text-white">{t('rules.competeAndWin')}</h3>
-                                    </div>
-                                    <p className="text-slate-600 dark:text-slate-300">
-                                        {t('rules.competeAndWinDesc')}
-                                    </p>
-                                </div>
-                            </div>
-                        </CardContent>
-                    </Card>
-                </motion.section>
-
-                {/* Single Player Modes Section */}
-                <motion.section
-                    className="mb-10"
-                    {...fadeInUp}
-                    transition={{ delay: 0.45 }}
-                >
-                    <Card className="border-4 border-neo-black shadow-hard-lg bg-white text-neo-black dark:bg-slate-800 dark:text-white">
-                        <CardHeader className="bg-neo-orange/20 text-neo-black dark:text-white border-b-4 border-neo-black">
-                            <CardTitle className="flex items-center gap-3 text-2xl sm:text-3xl font-black text-slate-900 dark:text-white">
-                                <FaRobot className="text-neo-orange" />
-                                {t('rules.singlePlayerTitle')}
-                            </CardTitle>
-                        </CardHeader>
-                        <CardContent className="p-6 space-y-6">
-                            <p className="text-lg text-slate-700 dark:text-slate-200 leading-relaxed">
-                                {t('rules.singlePlayerIntro')}
-                            </p>
-
-                            <div className="grid gap-4 sm:grid-cols-3">
-                                <div className="p-4 rounded-neo bg-neo-cyan/10 text-neo-black dark:text-white border-3 border-neo-black">
-                                    <div className="flex items-center gap-2 mb-2">
-                                        <FaRobot className="text-neo-black dark:text-white text-xl" />
-                                        <h3 className="font-bold text-lg text-slate-900 dark:text-white">{t('rules.soloVsBots')}</h3>
-                                    </div>
-                                    <p className="text-slate-600 dark:text-slate-300 text-sm">
-                                        {t('rules.soloVsBotsDesc')}
-                                    </p>
-                                </div>
-
-                                <div className="p-4 rounded-neo bg-neo-lime/10 text-neo-black dark:text-white border-3 border-neo-black">
-                                    <div className="flex items-center gap-2 mb-2">
-                                        <FaBook className="text-neo-black dark:text-white text-xl" />
-                                        <h3 className="font-bold text-lg text-slate-900 dark:text-white">{t('rules.practiceMode')}</h3>
-                                    </div>
-                                    <p className="text-slate-600 dark:text-slate-300 text-sm">
-                                        {t('rules.practiceModeDesc')}
-                                    </p>
-                                </div>
-
-                                <div className="p-4 rounded-neo bg-neo-yellow/10 text-neo-black dark:text-white border-3 border-neo-black">
-                                    <div className="flex items-center gap-2 mb-2">
-                                        <FaChartLine className="text-neo-black dark:text-white text-xl" />
-                                        <h3 className="font-bold text-lg text-slate-900 dark:text-white">{t('rules.challengeMode')}</h3>
-                                    </div>
-                                    <p className="text-slate-600 dark:text-slate-300 text-sm">
-                                        {t('rules.challengeModeDesc')}
-                                    </p>
-                                </div>
-                            </div>
-
-                            <div className="flex justify-center">
-                                <Link href={`/${language}/singleplayer`}>
-                                    <Button
-                                        size="lg"
-                                        className="bg-neo-orange text-neo-black hover:bg-neo-orange/90 font-bold"
-                                    >
-                                        <FaPlay className={dir === 'rtl' ? 'ml-2' : 'mr-2'} />
-                                        {t('landing.singlePlayer')}
-                                    </Button>
-                                </Link>
-                            </div>
-                        </CardContent>
-                    </Card>
-                </motion.section>
-
-                {/* Scoring System Section */}
-                <motion.section
-                    className="mb-10"
-                    {...fadeInUp}
-                    transition={{ delay: 0.5 }}
-                >
-                    <Card className="border-4 border-neo-black shadow-hard-lg bg-white text-neo-black dark:bg-slate-800 dark:text-white">
-                        <CardHeader className="bg-neo-pink/20 text-white border-b-4 border-neo-black">
-                            <CardTitle className="flex items-center gap-3 text-2xl sm:text-3xl font-black text-slate-900 dark:text-white">
-                                <FaTrophy className="text-amber-500 dark:text-neo-yellow" />
+                    <Card className="border-4 border-neo-black shadow-hard-lg bg-white dark:bg-slate-800">
+                        <CardHeader className="bg-neo-pink/20 border-b-4 border-neo-black py-4">
+                            <CardTitle className="flex items-center gap-3 text-xl sm:text-2xl font-black text-slate-900 dark:text-white">
+                                <FaTrophy className="text-amber-500" />
                                 {t('howToPlay.scoringSystemTitle')}
                             </CardTitle>
                         </CardHeader>
-                        <CardContent className="p-6 space-y-6">
-                            <p className="text-lg text-slate-700 dark:text-slate-200 leading-relaxed">
-                                {t('rules.scoringIntro')}
-                            </p>
-
+                        <CardContent className="p-4 sm:p-6">
                             <div className="overflow-x-auto">
                                 <table className="w-full border-collapse">
                                     <thead>
                                         <tr className="bg-neo-navy text-white">
-                                            <th className="p-3 text-left border-2 border-neo-black font-bold">{t('rules.wordLength')}</th>
-                                            <th className="p-3 text-left border-2 border-neo-black font-bold">{t('rules.points')}</th>
-                                            <th className="p-3 text-left border-2 border-neo-black font-bold">{t('rules.example')}</th>
+                                            <th className={`p-3 border-2 border-neo-black font-bold ${dir === 'rtl' ? 'text-right' : 'text-left'}`}>{t('rules.wordLength')}</th>
+                                            <th className={`p-3 border-2 border-neo-black font-bold ${dir === 'rtl' ? 'text-right' : 'text-left'}`}>{t('rules.points')}</th>
+                                            <th className={`p-3 border-2 border-neo-black font-bold ${dir === 'rtl' ? 'text-right' : 'text-left'}`}>{t('rules.example')}</th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <tr className="bg-white text-neo-black dark:bg-slate-700 dark:text-white">
-                                            <td className="p-3 border-2 border-neo-black text-slate-900 dark:text-slate-100">3 {t('howToPlay.letters')}</td>
-                                            <td className="p-3 border-2 border-neo-black font-bold text-neo-cyan">1 {t('howToPlay.pts')}</td>
-                                            <td className="p-3 border-2 border-neo-black text-slate-600 dark:text-slate-200">CAT, DOG, RUN</td>
+                                        <tr className="bg-white dark:bg-slate-700">
+                                            <td className={`p-3 border-2 border-neo-black text-slate-900 dark:text-slate-100 ${dir === 'rtl' ? 'text-right' : ''}`}>3-4 {t('howToPlay.letters')}</td>
+                                            <td className={`p-3 border-2 border-neo-black font-bold text-neo-cyan ${dir === 'rtl' ? 'text-right' : ''}`}>1-2 {t('howToPlay.pts')}</td>
+                                            <td className={`p-3 border-2 border-neo-black text-slate-600 dark:text-slate-300 ${dir === 'rtl' ? 'text-right' : ''}`}>CAT, GAME, PLAY</td>
                                         </tr>
                                         <tr className="bg-slate-50 dark:bg-slate-600">
-                                            <td className="p-3 border-2 border-neo-black text-slate-900 dark:text-slate-100">4 {t('howToPlay.letters')}</td>
-                                            <td className="p-3 border-2 border-neo-black font-bold text-neo-cyan">1 {t('howToPlay.pts')}</td>
-                                            <td className="p-3 border-2 border-neo-black text-slate-600 dark:text-slate-200">GAME, PLAY, WORD</td>
+                                            <td className={`p-3 border-2 border-neo-black text-slate-900 dark:text-slate-100 ${dir === 'rtl' ? 'text-right' : ''}`}>5-6 {t('howToPlay.letters')}</td>
+                                            <td className={`p-3 border-2 border-neo-black font-bold text-neo-purple ${dir === 'rtl' ? 'text-right' : ''}`}>2-3 {t('howToPlay.pts')}</td>
+                                            <td className={`p-3 border-2 border-neo-black text-slate-600 dark:text-slate-300 ${dir === 'rtl' ? 'text-right' : ''}`}>BRAIN, PLAYER</td>
                                         </tr>
-                                        <tr className="bg-white text-neo-black dark:bg-slate-700 dark:text-white">
-                                            <td className="p-3 border-2 border-neo-black text-slate-900 dark:text-slate-100">5 {t('howToPlay.letters')}</td>
-                                            <td className="p-3 border-2 border-neo-black font-bold text-neo-lime">2 {t('howToPlay.pts')}</td>
-                                            <td className="p-3 border-2 border-neo-black text-slate-600 dark:text-slate-200">CLASH, SCORE, BRAIN</td>
-                                        </tr>
-                                        <tr className="bg-slate-50 dark:bg-slate-600">
-                                            <td className="p-3 border-2 border-neo-black text-slate-900 dark:text-slate-100">6 {t('howToPlay.letters')}</td>
-                                            <td className="p-3 border-2 border-neo-black font-bold text-neo-purple">3 {t('howToPlay.pts')}</td>
-                                            <td className="p-3 border-2 border-neo-black text-slate-600 dark:text-slate-200">PLAYER, WINNER, BATTLE</td>
-                                        </tr>
-                                        <tr className="bg-white text-neo-black dark:bg-slate-700 dark:text-white">
-                                            <td className="p-3 border-2 border-neo-black text-slate-900 dark:text-slate-100">7 {t('howToPlay.letters')}</td>
-                                            <td className="p-3 border-2 border-neo-black font-bold text-neo-pink">5 {t('howToPlay.pts')}</td>
-                                            <td className="p-3 border-2 border-neo-black text-slate-600 dark:text-slate-200">LETTERS, VICTORY, COMPETE</td>
-                                        </tr>
-                                        <tr className="bg-slate-50 dark:bg-slate-600">
-                                            <td className="p-3 border-2 border-neo-black text-slate-900 dark:text-slate-100">8+ {t('howToPlay.letters')}</td>
-                                            <td className="p-3 border-2 border-neo-black font-bold text-neo-yellow">11+ {t('howToPlay.pts')}</td>
-                                            <td className="p-3 border-2 border-neo-black text-slate-600 dark:text-slate-200">CHAMPION, STRATEGY</td>
+                                        <tr className="bg-white dark:bg-slate-700">
+                                            <td className={`p-3 border-2 border-neo-black text-slate-900 dark:text-slate-100 ${dir === 'rtl' ? 'text-right' : ''}`}>7+ {t('howToPlay.letters')}</td>
+                                            <td className={`p-3 border-2 border-neo-black font-bold text-neo-pink ${dir === 'rtl' ? 'text-right' : ''}`}>5+ {t('howToPlay.pts')}</td>
+                                            <td className={`p-3 border-2 border-neo-black text-slate-600 dark:text-slate-300 ${dir === 'rtl' ? 'text-right' : ''}`}>VICTORY, CHAMPION</td>
                                         </tr>
                                     </tbody>
                                 </table>
                             </div>
-
-                            <div className="p-4 rounded-neo bg-neo-yellow/20 text-neo-black dark:text-white border-3 border-neo-black">
-                                <p className="text-slate-700 dark:text-slate-200">
-                                    <strong>{t('rules.proTip')}:</strong> {t('rules.proTipText')}
-                                </p>
-                            </div>
+                            <p className={`text-sm text-slate-500 dark:text-slate-400 mt-3 ${dir === 'rtl' ? 'text-right' : ''}`}>
+                                <strong>{t('rules.proTip')}:</strong> {t('rules.proTipText')}
+                            </p>
                         </CardContent>
                     </Card>
                 </motion.section>
 
-                {/* Winning Strategies Section */}
+                {/* Quick Tips - 3 Inline Tips */}
                 <motion.section
-                    className="mb-10"
+                    className="mb-8"
                     {...fadeInUp}
-                    transition={{ delay: 0.55 }}
+                    transition={{ delay: 0.5 }}
                 >
-                    <Card className="border-4 border-neo-black shadow-hard-lg bg-white text-neo-black dark:bg-slate-800 dark:text-white">
-                        <CardHeader className="bg-neo-purple/20 text-white border-b-4 border-neo-black">
-                            <CardTitle className="flex items-center gap-3 text-2xl sm:text-3xl font-black text-slate-900 dark:text-white">
-                                <FaLightbulb className="text-amber-500 dark:text-neo-yellow" />
+                    <Card className="border-4 border-neo-black shadow-hard-lg bg-white dark:bg-slate-800">
+                        <CardHeader className="bg-neo-purple/20 border-b-4 border-neo-black py-4">
+                            <CardTitle className="flex items-center gap-3 text-xl sm:text-2xl font-black text-slate-900 dark:text-white">
+                                <FaLightbulb className="text-amber-500" />
                                 {t('howToPlay.tipsTitle')}
                             </CardTitle>
                         </CardHeader>
-                        <CardContent className="p-6 space-y-6">
-                            <p className="text-lg text-slate-700 dark:text-slate-200 leading-relaxed">
-                                {t('rules.strategiesIntro')}
-                            </p>
-
-                            <div className="space-y-4">
-                                <div className="flex gap-4 items-start p-4 rounded-neo bg-gradient-to-r from-neo-cyan/10 to-neo-purple/10 border-3 border-neo-black">
-                                    <div className="flex-shrink-0 w-10 h-10 rounded-full bg-neo-cyan flex items-center justify-center text-neo-black font-bold text-lg border-3 border-neo-black">
-                                        1
-                                    </div>
-                                    <div>
-                                        <h3 className="font-bold text-lg text-slate-900 dark:text-white mb-1">{t('rules.scanPrefixes')}</h3>
-                                        <p className="text-slate-600 dark:text-slate-300">
-                                            {t('rules.scanPrefixesDesc')}
-                                        </p>
-                                    </div>
-                                </div>
-
-                                <div className="flex gap-4 items-start p-4 rounded-neo bg-gradient-to-r from-neo-pink/10 to-neo-yellow/10 border-3 border-neo-black">
-                                    <div className="flex-shrink-0 w-10 h-10 rounded-full bg-neo-pink flex items-center justify-center text-white font-bold text-lg border-3 border-neo-black">
-                                        2
-                                    </div>
-                                    <div>
-                                        <h3 className="font-bold text-lg text-slate-900 dark:text-white mb-1">{t('rules.startFromVowels')}</h3>
-                                        <p className="text-slate-600 dark:text-slate-300">
-                                            {t('rules.startFromVowelsDesc')}
-                                        </p>
-                                    </div>
-                                </div>
-
-                                <div className="flex gap-4 items-start p-4 rounded-neo bg-gradient-to-r from-neo-lime/10 to-neo-cyan/10 border-3 border-neo-black">
-                                    <div className="flex-shrink-0 w-10 h-10 rounded-full bg-neo-lime flex items-center justify-center text-neo-black font-bold text-lg border-3 border-neo-black">
-                                        3
-                                    </div>
-                                    <div>
-                                        <h3 className="font-bold text-lg text-slate-900 dark:text-white mb-1">{t('rules.thinkWordFamilies')}</h3>
-                                        <p className="text-slate-600 dark:text-slate-300">
-                                            {t('rules.thinkWordFamiliesDesc')}
-                                        </p>
-                                    </div>
-                                </div>
-
-                                <div className="flex gap-4 items-start p-4 rounded-neo bg-gradient-to-r from-neo-purple/10 to-neo-pink/10 border-3 border-neo-black">
-                                    <div className="flex-shrink-0 w-10 h-10 rounded-full bg-neo-purple flex items-center justify-center text-white font-bold text-lg border-3 border-neo-black">
-                                        4
-                                    </div>
-                                    <div>
-                                        <h3 className="font-bold text-lg text-slate-900 dark:text-white mb-1">{t('rules.dontOverthink')}</h3>
-                                        <p className="text-slate-600 dark:text-slate-300">
-                                            {t('rules.dontOverthinkDesc')}
-                                        </p>
-                                    </div>
-                                </div>
-
-                                <div className="flex gap-4 items-start p-4 rounded-neo bg-gradient-to-r from-neo-yellow/10 to-neo-lime/10 border-3 border-neo-black">
-                                    <div className="flex-shrink-0 w-10 h-10 rounded-full bg-neo-yellow flex items-center justify-center text-neo-black font-bold text-lg border-3 border-neo-black">
-                                        5
-                                    </div>
-                                    <div>
-                                        <h3 className="font-bold text-lg text-slate-900 dark:text-white mb-1">{t('rules.practicePatterns')}</h3>
-                                        <p className="text-slate-600 dark:text-slate-300">
-                                            {t('rules.practicePatternsDesc')}
-                                        </p>
-                                    </div>
-                                </div>
-                            </div>
-                        </CardContent>
-                    </Card>
-                </motion.section>
-
-                {/* Additional Game Features */}
-                <motion.section
-                    className="mb-10"
-                    {...fadeInUp}
-                    transition={{ delay: 0.6 }}
-                >
-                    <Card className="border-4 border-neo-black shadow-hard-lg bg-white text-neo-black dark:bg-slate-800 dark:text-white">
-                        <CardHeader className="bg-neo-lime/20 text-neo-black dark:text-white border-b-4 border-neo-black">
-                            <CardTitle className="flex items-center gap-3 text-2xl sm:text-3xl font-black text-slate-900 dark:text-white">
-                                <FaStar className="text-neo-black dark:text-white" />
-                                {t('howToPlay.gameFeaturesTitle')}
-                            </CardTitle>
-                        </CardHeader>
-                        <CardContent className="p-6">
-                            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                                <div className="p-4 rounded-neo bg-white text-neo-black dark:bg-slate-700 dark:text-white border-3 border-neo-black shadow-hard">
-                                    <h3 className="font-bold text-lg text-slate-900 dark:text-white mb-2">{t('rules.multiLanguage')}</h3>
-                                    <p className="text-slate-600 dark:text-slate-300 text-sm">
-                                        {t('rules.multiLanguageDesc')}
+                        <CardContent className="p-4 sm:p-6">
+                            <div className="space-y-3">
+                                <div className={`flex items-start gap-3 p-3 rounded-lg bg-neo-cyan/10 ${dir === 'rtl' ? 'flex-row-reverse text-right' : ''}`}>
+                                    <span className="text-neo-cyan text-lg flex-shrink-0">1</span>
+                                    <p className="text-slate-700 dark:text-slate-300">
+                                        <strong className="text-slate-900 dark:text-white">{t('rules.scanPrefixes')}:</strong> {t('rules.scanPrefixesDesc')}
                                     </p>
                                 </div>
-                                <div className="p-4 rounded-neo bg-white text-neo-black dark:bg-slate-700 dark:text-white border-3 border-neo-black shadow-hard">
-                                    <h3 className="font-bold text-lg text-slate-900 dark:text-white mb-2">{t('rules.realTimeMultiplayer')}</h3>
-                                    <p className="text-slate-600 dark:text-slate-300 text-sm">
-                                        {t('rules.realTimeMultiplayerDesc')}
+                                <div className={`flex items-start gap-3 p-3 rounded-lg bg-neo-pink/10 ${dir === 'rtl' ? 'flex-row-reverse text-right' : ''}`}>
+                                    <span className="text-neo-pink text-lg flex-shrink-0">2</span>
+                                    <p className="text-slate-700 dark:text-slate-300">
+                                        <strong className="text-slate-900 dark:text-white">{t('rules.thinkWordFamilies')}:</strong> {t('rules.thinkWordFamiliesDesc')}
                                     </p>
                                 </div>
-                                <div className="p-4 rounded-neo bg-white text-neo-black dark:bg-slate-700 dark:text-white border-3 border-neo-black shadow-hard">
-                                    <h3 className="font-bold text-lg text-slate-900 dark:text-white mb-2">{t('rules.achievementsLevels')}</h3>
-                                    <p className="text-slate-600 dark:text-slate-300 text-sm">
-                                        {t('rules.achievementsLevelsDesc')}
-                                    </p>
-                                </div>
-                                <div className="p-4 rounded-neo bg-white text-neo-black dark:bg-slate-700 dark:text-white border-3 border-neo-black shadow-hard">
-                                    <h3 className="font-bold text-lg text-slate-900 dark:text-white mb-2">{t('rules.leaderboards')}</h3>
-                                    <p className="text-slate-600 dark:text-slate-300 text-sm">
-                                        {t('rules.leaderboardsDesc')}
-                                    </p>
-                                </div>
-                                <div className="p-4 rounded-neo bg-white text-neo-black dark:bg-slate-700 dark:text-white border-3 border-neo-black shadow-hard">
-                                    <h3 className="font-bold text-lg text-slate-900 dark:text-white mb-2">{t('rules.noDownload')}</h3>
-                                    <p className="text-slate-600 dark:text-slate-300 text-sm">
-                                        {t('rules.noDownloadDesc')}
-                                    </p>
-                                </div>
-                                <div className="p-4 rounded-neo bg-white text-neo-black dark:bg-slate-700 dark:text-white border-3 border-neo-black shadow-hard">
-                                    <h3 className="font-bold text-lg text-slate-900 dark:text-white mb-2">{t('rules.qrSharing')}</h3>
-                                    <p className="text-slate-600 dark:text-slate-300 text-sm">
-                                        {t('rules.qrSharingDesc')}
+                                <div className={`flex items-start gap-3 p-3 rounded-lg bg-neo-lime/10 ${dir === 'rtl' ? 'flex-row-reverse text-right' : ''}`}>
+                                    <span className="text-neo-lime text-lg flex-shrink-0">3</span>
+                                    <p className="text-slate-700 dark:text-slate-300">
+                                        <strong className="text-slate-900 dark:text-white">{t('rules.dontOverthink')}:</strong> {t('rules.dontOverthinkDesc')}
                                     </p>
                                 </div>
                             </div>
@@ -440,22 +238,22 @@ export default function RulesPage(): React.JSX.Element {
 
                 {/* Call to Action */}
                 <motion.div
-                    className="text-center py-8"
+                    className="text-center py-6"
                     initial={{ opacity: 0, scale: 0.9 }}
                     animate={{ opacity: 1, scale: 1 }}
-                    transition={{ delay: 0.7, duration: 0.4 }}
+                    transition={{ delay: 0.6, duration: 0.4 }}
                 >
-                    <h2 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white mb-4">
+                    <h2 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white mb-3">
                         {t('rules.readyToTest')}
                     </h2>
-                    <p className="text-lg text-slate-600 dark:text-slate-200 mb-6 max-w-xl mx-auto">
+                    <p className="text-base text-slate-600 dark:text-slate-300 mb-5 max-w-xl mx-auto">
                         {t('rules.readyToTestDesc')}
                     </p>
-                    <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                    <div className="flex flex-col sm:flex-row gap-3 justify-center">
                         <Link href={`/${language}`}>
                             <Button
                                 size="lg"
-                                className="bg-neo-cyan text-neo-black hover:bg-neo-cyan/90 font-bold text-lg px-8 py-6 w-full sm:w-auto"
+                                className="bg-neo-cyan text-neo-black hover:bg-neo-cyan/90 font-bold text-lg px-6 py-5 w-full sm:w-auto"
                             >
                                 <FaPlay className={dir === 'rtl' ? 'ml-2' : 'mr-2'} />
                                 {t('rules.startPlaying')}
@@ -465,7 +263,7 @@ export default function RulesPage(): React.JSX.Element {
                             <Button
                                 size="lg"
                                 variant="outline"
-                                className="border-3 border-neo-black font-bold text-lg px-8 py-6 w-full sm:w-auto"
+                                className="border-3 border-neo-black font-bold text-lg px-6 py-5 w-full sm:w-auto"
                             >
                                 <FaTrophy className={dir === 'rtl' ? 'ml-2' : 'mr-2'} />
                                 {t('leaderboard.viewLeaderboard')}
@@ -475,23 +273,23 @@ export default function RulesPage(): React.JSX.Element {
                 </motion.div>
 
                 {/* Back to Home Button */}
-                <div className="text-center pb-8">
+                <div className="text-center pb-6">
                     <Link href={`/${language}`}>
                         <motion.button
-                            whileHover={{ x: -4 }}
+                            whileHover={{ x: dir === 'rtl' ? 4 : -4 }}
                             whileTap={{ scale: 0.95 }}
                             className="
-                                inline-flex items-center gap-2 sm:gap-3
-                                px-5 sm:px-6 py-2.5 sm:py-3
+                                inline-flex items-center gap-2
+                                px-5 py-2.5
                                 bg-neo-cream text-neo-black
-                                font-bold text-base sm:text-lg
+                                font-bold text-base
                                 border-3 border-neo-black
-                                rounded-neo shadow-hard
+                                rounded-xl shadow-hard
                                 hover:bg-neo-yellow
                                 transition-colors duration-100
                             "
                         >
-                            <FaArrowLeft />
+                            <FaArrowLeft className={dir === 'rtl' ? 'rotate-180' : ''} />
                             {t('rules.backToHome')}
                         </motion.button>
                     </Link>

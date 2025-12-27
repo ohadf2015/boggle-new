@@ -125,7 +125,7 @@ export const InteractiveGridDemo: React.FC<InteractiveGridDemoProps> = ({ t, dir
             className="flex items-center gap-1.5"
           >
             <FaFire className={`text-lg ${comboCount >= 3 ? 'text-neo-orange animate-pulse drop-shadow-[0_0_8px_rgba(255,140,0,0.7)]' : 'text-gray-600'}`} />
-            <Badge className={`${comboCount >= 3 ? 'bg-neo-orange shadow-[0_0_12px_rgba(255,140,0,0.5)]' : 'bg-gray-300'} text-neo-black border-2 border-neo-black font-bold text-xs sm:text-sm px-2 py-0.5`}>
+            <Badge className={`${comboCount >= 3 ? 'bg-neo-orange shadow-[0_0_12px_rgba(255,140,0,0.5)]' : 'bg-gray-300'} text-neo-black border-2 border-neo-black font-bold text-xs sm:text-sm px-2 py-0.5 whitespace-nowrap`}>
               {comboCount}x Combo {comboCount >= 3 && `(${getComboMultiplier(comboCount)}×)`}
             </Badge>
           </motion.div>
@@ -187,7 +187,7 @@ export const InteractiveGridDemo: React.FC<InteractiveGridDemoProps> = ({ t, dir
 
         {/* Connection Lines SVG Overlay */}
         {selectedCells.length > 1 && (
-          <svg className="absolute inset-0 pointer-events-none z-20" style={{ margin: '12px' }}>
+          <svg className="absolute inset-0 pointer-events-none z-20 m-3 sm:m-4">
             <defs>
               <filter id="glow">
                 <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
@@ -276,7 +276,7 @@ export const InteractiveGridDemo: React.FC<InteractiveGridDemoProps> = ({ t, dir
             variant="outline"
             size="sm"
             onClick={() => setAutoPlay(false)}
-            className="bg-neo-cream hover:bg-neo-cream/80 text-xs sm:text-sm px-3 py-1.5 border-2 border-neo-black shadow-hard-sm hover:shadow-hard transition-all"
+            className="bg-neo-cream hover:bg-neo-cream/80 text-xs sm:text-sm px-3 py-2 border-2 border-neo-black shadow-hard-sm hover:shadow-hard transition-all"
           >
             <span className={`${dir === 'rtl' ? 'ml-1.5' : 'mr-1.5'}`}>⏸</span>
             {t('howToPlay.demo.pause') || 'Pause'}
@@ -286,7 +286,7 @@ export const InteractiveGridDemo: React.FC<InteractiveGridDemoProps> = ({ t, dir
             variant="outline"
             size="sm"
             onClick={() => setAutoPlay(true)}
-            className="bg-neo-lime hover:bg-neo-lime/80 text-xs sm:text-sm px-3 py-1.5 border-2 border-neo-black shadow-hard-sm hover:shadow-hard transition-all"
+            className="bg-neo-lime hover:bg-neo-lime/80 text-xs sm:text-sm px-3 py-2 border-2 border-neo-black shadow-hard-sm hover:shadow-hard transition-all"
           >
             <FaPlay className={`text-xs ${dir === 'rtl' ? 'ml-1.5' : 'mr-1.5'}`} />
             {t('howToPlay.demo.play') || 'Play'}
@@ -296,7 +296,7 @@ export const InteractiveGridDemo: React.FC<InteractiveGridDemoProps> = ({ t, dir
           variant="outline"
           size="sm"
           onClick={handleReplay}
-          className="bg-neo-cyan hover:bg-neo-cyan/80 text-xs sm:text-sm px-3 py-1.5 border-2 border-neo-black shadow-hard-sm hover:shadow-hard transition-all"
+          className="bg-neo-cyan hover:bg-neo-cyan/80 text-xs sm:text-sm px-3 py-2 border-2 border-neo-black shadow-hard-sm hover:shadow-hard transition-all"
         >
           <FaRedo className={`text-xs ${dir === 'rtl' ? 'ml-1.5' : 'mr-1.5'}`} />
           {t('howToPlay.demo.replay') || 'Replay'}
