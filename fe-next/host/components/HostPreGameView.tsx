@@ -294,7 +294,7 @@ const HostPreGameView: React.FC<HostPreGameViewProps> = ({
           {/* Share Buttons - compact row with tooltips on mobile */}
           <div className="flex gap-1.5">
             <ShareButton
-              variant="link"
+              variant="secondary"
               onClick={handleCopyLink}
               icon={<FaLink className="text-xs" />}
               className="px-2 py-1 text-xs h-7"
@@ -312,7 +312,7 @@ const HostPreGameView: React.FC<HostPreGameViewProps> = ({
               <span className="hidden md:inline">{t('hostView.shareWhatsapp')}</span>
             </ShareButton>
             <ShareButton
-              variant="qr"
+              variant="secondary"
               onClick={onShowQR}
               icon={<FaQrcode className="text-xs" />}
               className="px-2 py-1 text-xs h-7"

@@ -102,7 +102,7 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
           {/* Share Buttons + Exit */}
           <div className="flex flex-wrap gap-2 justify-center items-center">
             <ShareButton
-              variant="link"
+              variant="secondary"
               onClick={handleCopyLink}
               icon={<FaLink />}
             >
@@ -116,7 +116,7 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
               {t('hostView.shareWhatsapp')}
             </ShareButton>
             <ShareButton
-              variant="qr"
+              variant="secondary"
               onClick={handleShowQR}
               icon={<FaQrcode />}
             >

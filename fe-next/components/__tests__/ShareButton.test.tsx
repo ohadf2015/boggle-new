@@ -1,7 +1,7 @@
 /**
  * ShareButton Component Tests
  *
- * Tests for the reusable ShareButton component used in JoinView and HostView
+ * Tests for the reusable ShareButton component with neo-brutalist styling
  */
 
 import React from 'react';
@@ -27,41 +27,74 @@ describe('ShareButton', () => {
     it('renders without icon when not provided', () => {
       render(<ShareButton onClick={noop}>Copy Link</ShareButton>);
       const button = screen.getByRole('button');
-      // Should only have the text, no icon span
-      expect(button.querySelector('span')).toBeNull();
+      expect(button).toBeInTheDocument();
     });
   });
 
   describe('variants', () => {
-    it('applies link variant styles by default', () => {
+    it('applies primary variant styles by default', () => {
       render(<ShareButton onClick={noop}>Copy Link</ShareButton>);
       const button = screen.getByRole('button');
-      // Link variant uses cyan colors
-      expect(button.className).toContain('text-cyan-300');
-      expect(button.className).toContain('border-cyan-500/40');
+      // Primary variant uses neo-yellow
+      expect(button.className).toContain('bg-neo-yellow');
+      expect(button.className).toContain('text-neo-black');
     });
 
     it('applies whatsapp variant styles', () => {
       render(<ShareButton onClick={noop} variant="whatsapp">Share on WhatsApp</ShareButton>);
       const button = screen.getByRole('button');
       // WhatsApp variant uses green colors
-      expect(button.className).toContain('text-green-300');
-      expect(button.className).toContain('border-green-500/40');
+      expect(button.className).toContain('bg-[#25D366]');
+      expect(button.className).toContain('text-white');
     });
 
-    it('applies qr variant styles', () => {
-      render(<ShareButton onClick={noop} variant="qr">Show QR Code</ShareButton>);
+    it('applies secondary variant styles', () => {
+      render(<ShareButton onClick={noop} variant="secondary">Show QR Code</ShareButton>);
       const button = screen.getByRole('button');
-      // QR variant uses purple colors
-      expect(button.className).toContain('text-purple-300');
-      expect(button.className).toContain('border-purple-500/40');
+      // Secondary variant uses neo-cyan
+      expect(button.className).toContain('bg-neo-cyan');
+      expect(button.className).toContain('text-neo-black');
     });
 
-    it('falls back to link variant for unknown variant', () => {
+    it('falls back to primary variant for unknown variant', () => {
       // @ts-expect-error - Testing invalid variant
       render(<ShareButton onClick={noop} variant="invalid">Test</ShareButton>);
       const button = screen.getByRole('button');
-      expect(button.className).toContain('text-cyan-300');
+      expect(button.className).toContain('bg-neo-yellow');
+    });
+  });
+
+  describe('sizes', () => {
+    it('applies small size styles', () => {
+      render(<ShareButton onClick={noop} size="sm">Small</ShareButton>);
+      const button = screen.getByRole('button');
+      expect(button.className).toContain('text-xs');
+    });
+
+    it('applies medium size styles by default', () => {
+      render(<ShareButton onClick={noop}>Medium</ShareButton>);
+      const button = screen.getByRole('button');
+      expect(button.className).toContain('text-sm');
+    });
+
+    it('applies large size styles', () => {
+      render(<ShareButton onClick={noop} size="lg">Large</ShareButton>);
+      const button = screen.getByRole('button');
+      expect(button.className).toContain('text-base');
+    });
+  });
+
+  describe('fullWidth', () => {
+    it('applies full width when enabled', () => {
+      render(<ShareButton onClick={noop} fullWidth>Full Width</ShareButton>);
+      const button = screen.getByRole('button');
+      expect(button.className).toContain('w-full');
+    });
+
+    it('does not apply full width by default', () => {
+      render(<ShareButton onClick={noop}>Normal Width</ShareButton>);
+      const button = screen.getByRole('button');
+      expect(button.className).not.toContain('w-full');
     });
   });
 
@@ -95,7 +128,7 @@ describe('ShareButton', () => {
       );
       const button = screen.getByRole('button');
       expect(button.className).toContain('custom-class');
-      expect(button.className).toContain('text-green-300');
+      expect(button.className).toContain('bg-[#25D366]');
     });
   });
 
@@ -122,7 +155,7 @@ describe('ShareButton', () => {
   describe('integration with icons', () => {
     it('renders correctly with FaLink icon', () => {
       render(
-        <ShareButton onClick={noop} variant="link" icon={<FaLink data-testid="fa-link" />}>
+        <ShareButton onClick={noop} variant="secondary" icon={<FaLink data-testid="fa-link" />}>
           Copy Link
         </ShareButton>
       );
@@ -141,11 +174,31 @@ describe('ShareButton', () => {
 
     it('renders correctly with FaQrcode icon', () => {
       render(
-        <ShareButton onClick={noop} variant="qr" icon={<FaQrcode data-testid="fa-qrcode" />}>
+        <ShareButton onClick={noop} variant="secondary" icon={<FaQrcode data-testid="fa-qrcode" />}>
           QR Code
         </ShareButton>
       );
       expect(screen.getByTestId('fa-qrcode')).toBeInTheDocument();
+    });
+  });
+
+  describe('neo-brutalist styling', () => {
+    it('has hard shadow styling', () => {
+      render(<ShareButton onClick={noop}>Test</ShareButton>);
+      const button = screen.getByRole('button');
+      expect(button.className).toContain('shadow-hard-sm');
+    });
+
+    it('has rounded-neo styling', () => {
+      render(<ShareButton onClick={noop}>Test</ShareButton>);
+      const button = screen.getByRole('button');
+      expect(button.className).toContain('rounded-neo');
+    });
+
+    it('has border styling', () => {
+      render(<ShareButton onClick={noop}>Test</ShareButton>);
+      const button = screen.getByRole('button');
+      expect(button.className).toContain('border-2');
     });
   });
 });

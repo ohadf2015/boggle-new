@@ -1,17 +1,16 @@
 'use client';
 
 import React from 'react';
-import { Button } from './ui/button';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './ui/tooltip';
 import { cn } from '../lib/utils';
 
 /**
- * Share button variant types
+ * Share button variant types - now uses neo-brutalist styling
  */
-type ShareButtonVariant = 'link' | 'whatsapp' | 'qr';
+type ShareButtonVariant = 'primary' | 'whatsapp' | 'secondary';
 
 /**
- * Variant style configuration
+ * Variant style configuration - neo-brutalist with hard shadows
  */
 interface VariantStyle {
   base: string;
@@ -21,8 +20,8 @@ interface VariantStyle {
 /**
  * ShareButton Props
  *
- * Reusable Share Button Component
- * Used in JoinView (Create Game) and HostView (Game Code section)
+ * Reusable Share Button Component with Neo-Brutalist styling
+ * Used across the app for consistent share actions
  */
 interface ShareButtonProps {
   variant?: ShareButtonVariant;
@@ -31,48 +30,66 @@ interface ShareButtonProps {
   children: React.ReactNode;
   className?: string;
   tooltip?: string;
+  /** Full width button */
+  fullWidth?: boolean;
+  /** Size variant */
+  size?: 'sm' | 'md' | 'lg';
 }
 
 const ShareButton: React.FC<ShareButtonProps> = ({
-  variant = 'link',
+  variant = 'primary',
   onClick,
   icon,
   children,
   className,
-  tooltip
+  tooltip,
+  fullWidth = false,
+  size = 'md',
 }) => {
+  // Neo-brutalist styling - hard shadows, no glow effects
   const variantStyles: Record<ShareButtonVariant, VariantStyle> = {
-    link: {
-      base: 'text-cyan-300 border-cyan-500/40',
-      hover: 'hover:border-cyan-400 hover:bg-cyan-500/10 hover:shadow-[0_0_10px_rgba(6,182,212,0.3)] hover:text-white',
+    primary: {
+      base: 'bg-neo-yellow text-neo-black border-neo-black',
+      hover: 'hover:shadow-hard-md hover:-translate-y-0.5 active:shadow-hard-sm active:translate-y-0',
     },
     whatsapp: {
-      base: 'text-green-300 border-green-500/40',
-      hover: 'hover:border-green-400 hover:bg-green-500/10 hover:shadow-[0_0_10px_rgba(34,197,94,0.3)] hover:text-white',
+      base: 'bg-[#25D366] text-white border-neo-black',
+      hover: 'hover:shadow-hard-md hover:-translate-y-0.5 hover:bg-[#1ebe5d] active:shadow-hard-sm active:translate-y-0',
     },
-    qr: {
-      base: 'text-purple-300 border-purple-500/40',
-      hover: 'hover:border-purple-400 hover:bg-purple-500/10 hover:shadow-[0_0_10px_rgba(168,85,247,0.3)] hover:text-white',
+    secondary: {
+      base: 'bg-neo-cyan text-neo-black border-neo-black',
+      hover: 'hover:shadow-hard-md hover:-translate-y-0.5 active:shadow-hard-sm active:translate-y-0',
     },
   };
 
-  const selectedVariant = variantStyles[variant] || variantStyles.link;
+  const sizeStyles = {
+    sm: 'px-2.5 py-1.5 text-xs gap-1',
+    md: 'px-3 py-2 text-sm gap-1.5',
+    lg: 'px-4 py-3 text-base gap-2',
+  };
+
+  const selectedVariant = variantStyles[variant] || variantStyles.primary;
 
   const button = (
-    <Button
-      variant="outline"
-      size="sm"
+    <button
       onClick={onClick}
       className={cn(
-        'bg-slate-700/50 font-medium backdrop-blur-sm transition-all duration-300',
+        // Base styles - neo-brutalist
+        'inline-flex items-center justify-center font-bold rounded-neo',
+        'border-2 shadow-hard-sm transition-all duration-150',
+        // Size
+        sizeStyles[size],
+        // Width
+        fullWidth && 'w-full',
+        // Variant colors
         selectedVariant.base,
         selectedVariant.hover,
         className
       )}
     >
-      {icon && <span className="sm:mr-1.5">{icon}</span>}
-      {children}
-    </Button>
+      {icon && <span className="flex-shrink-0">{icon}</span>}
+      <span>{children}</span>
+    </button>
   );
 
   if (tooltip) {

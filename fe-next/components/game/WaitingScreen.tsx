@@ -273,7 +273,7 @@ const WaitingScreen: React.FC<WaitingScreenProps> = ({
             {/* Share Buttons */}
             <div className="flex flex-wrap gap-2 justify-center">
               <ShareButton
-                variant="link"
+                variant="secondary"
                 onClick={() => copyJoinUrl(gameCode, t)}
                 icon={<FaLink />}
               >
@@ -287,7 +287,7 @@ const WaitingScreen: React.FC<WaitingScreenProps> = ({
                 {t(isHost ? 'hostView.shareWhatsapp' : 'joinView.shareWhatsapp')}
               </ShareButton>
               <ShareButton
-                variant="qr"
+                variant="secondary"
                 onClick={() => setShowQR(true)}
                 icon={<FaQrcode />}
               >
