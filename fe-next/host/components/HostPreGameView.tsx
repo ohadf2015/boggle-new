@@ -328,17 +328,14 @@ const HostPreGameView: React.FC<HostPreGameViewProps> = ({
       <div className="flex flex-col lg:flex-row lg:items-stretch gap-2 sm:gap-3 md:gap-4">
         {/* Game Settings - LEFT - Neo-Brutalist Dark */}
         <Card className="flex-1 p-2 sm:p-3 md:p-4 bg-slate-800/95 text-neo-white border-4 border-neo-black shadow-hard-lg">
-          <h3 className="text-sm font-black uppercase text-neo-cream mb-3 flex items-center gap-2">
-            <FaCog className="text-neo-cyan text-xs" />
+          <h3 className="text-xs font-bold text-neo-cream/80 mb-2 flex items-center gap-1.5">
+            <FaCog className="text-neo-cyan text-[10px]" />
             {t('hostView.gameSettings')}
           </h3>
           <div className="w-full space-y-2 sm:space-y-3">
-            {/* Game Presets - Quick Setup */}
-            <div className="space-y-2">
-              <label className="text-xs font-bold uppercase text-neo-cream/90">
-                {t('hostView.quickSetup') || 'Quick Setup'}
-              </label>
-              <div className="grid grid-cols-2 gap-2 sm:flex sm:flex-wrap sm:gap-3">
+            {/* Game Presets */}
+            <div>
+              <div className="grid grid-cols-2 gap-2 sm:flex sm:flex-wrap sm:gap-2">
                 {(Object.keys(GAME_PRESETS) as PresetKey[]).map((key) => {
                   const preset = GAME_PRESETS[key];
                   const isSelected = selectedPreset === key;
@@ -373,19 +370,19 @@ const HostPreGameView: React.FC<HostPreGameViewProps> = ({
                       onTouchEnd={handlePresetMouseUp}
                       whileTap={{ scale: 0.95 }}
                       className={cn(
-                        "sm:flex-1 sm:min-w-[90px] px-2 py-2 sm:px-3 sm:py-3 rounded-neo font-bold transition-all duration-100 border-3 sm:border-4 border-neo-black",
+                        "sm:flex-1 sm:min-w-[80px] px-2 py-2 sm:px-3 sm:py-2.5 rounded-neo font-bold transition-all duration-100 border-3 border-neo-black",
                         style.bg,
                         isSelected
-                          ? `shadow-none translate-x-[2px] translate-y-[2px] sm:translate-x-[3px] sm:translate-y-[3px] ${style.selected}`
-                          : "shadow-hard hover:shadow-hard-lg sm:shadow-hard-lg sm:hover:shadow-hard-xl hover:translate-x-[-1px] hover:translate-y-[-1px] sm:hover:translate-x-[-2px] sm:hover:translate-y-[-2px] active:shadow-none active:translate-x-[2px] active:translate-y-[2px] sm:active:translate-x-[3px] sm:active:translate-y-[3px]"
+                          ? `shadow-none translate-x-[2px] translate-y-[2px] ${style.selected}`
+                          : "shadow-hard hover:shadow-hard-lg hover:translate-x-[-1px] hover:translate-y-[-1px] active:shadow-none active:translate-x-[2px] active:translate-y-[2px]"
                       )}
                     >
-                      <div className="flex flex-col items-center gap-1 sm:gap-1.5">
-                        <span className="text-xl sm:text-3xl drop-shadow-sm">{preset.icon}</span>
-                        <span className="font-black text-xs sm:text-base text-neo-black uppercase tracking-tight sm:tracking-wide leading-tight">
+                      <div className="flex flex-col items-center gap-0.5">
+                        <span className="text-lg sm:text-2xl">{preset.icon}</span>
+                        <span className="font-black text-xs text-neo-black uppercase tracking-tight leading-tight">
                           {t(preset.nameKey) || key.charAt(0).toUpperCase() + key.slice(1)}
                         </span>
-                        <span className="text-[9px] sm:text-xs text-neo-black/70 font-bold leading-tight">
+                        <span className="text-[9px] text-neo-black/60 font-bold leading-tight">
                           {preset.timer}min • {difficultyName}
                         </span>
                       </div>
@@ -396,7 +393,7 @@ const HostPreGameView: React.FC<HostPreGameViewProps> = ({
             </div>
 
             {/* Bot Controls - Always visible */}
-            <div className="pt-2 border-t border-neo-cream/20">
+            <div className="pt-1">
               <BotControls
                 socket={socket}
                 gameCode={gameCode}
@@ -409,19 +406,17 @@ const HostPreGameView: React.FC<HostPreGameViewProps> = ({
             <button
               type="button"
               onClick={handleToggleAdvancedSettings}
-              className="w-full flex items-center justify-between py-1.5 text-neo-cream/70 hover:text-neo-cream transition-colors duration-100"
+              className="w-full flex items-center justify-between py-1 text-neo-cream/60 hover:text-neo-cream transition-colors duration-100"
             >
-              <div className="flex flex-col items-start gap-0.5">
-                <span className="text-xs font-bold uppercase">
-                  {t('hostView.advancedSettings')}
-                </span>
+              <span className="text-xs font-bold">
+                {t('hostView.advancedSettings')}
                 {!showAdvancedSettings && (
-                  <span className="text-[10px] text-neo-cream/90">
-                    {timerValue}min • {t(DIFFICULTIES[difficulty].nameKey)} • {minWordLength}+ {t('hostView.letters') || 'letters'} • {hostPlaying ? t('hostView.hostPlaysShort') || 'Host plays' : t('hostView.hostSpectates') || 'Spectating'}
+                  <span className="text-[10px] text-neo-cream/50 ms-2 font-normal">
+                    {timerValue}min • {t(DIFFICULTIES[difficulty].nameKey)} • {hostPlaying ? t('hostView.hostPlaysShort') || '▶' : '⏸'}
                   </span>
                 )}
-              </div>
-              {showAdvancedSettings ? <FaChevronUp size={12} /> : <FaChevronDown size={12} />}
+              </span>
+              {showAdvancedSettings ? <FaChevronUp size={10} /> : <FaChevronDown size={10} />}
             </button>
 
             {/* Collapsible Advanced Settings */}

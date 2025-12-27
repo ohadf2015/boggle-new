@@ -118,6 +118,19 @@ interface GuestPlayerStat {
   last_seen: string;
 }
 
+interface CommunityWordEntry {
+  word: string;
+  language: string;
+  likes_count: number;
+  dislikes_count: number;
+  net_score: number;
+  is_potentially_valid: boolean;
+  first_submitter: string | null;
+  last_voted_at: string | null;
+  created_at: string;
+  status: 'validated' | 'pending_review' | 'rejected' | 'pending';
+}
+
 // ==================== Request Validation Schemas ====================
 
 const blacklistAddSchema = z.object({
@@ -1112,6 +1125,306 @@ router.get('/analytics/guest-players', async (req: AdminRequest, res: Response):
     const err = error as Error;
     logger.error('ADMIN_API', `Guest players error: ${err.message}`);
     res.status(500).json({ error: 'Failed to fetch guest player data' });
+  }
+});
+
+// ==================== Community Words Moderation ====================
+
+/**
+ * GET /api/admin/community-words
+ * Get all community words with filtering and pagination
+ *
+ * Query params:
+ * - language: Filter by language (en, he, sv, ja, es)
+ * - status: Filter by status (validated, pending_review, rejected, pending)
+ * - search: Search for specific word
+ * - sortBy: Sort field (net_score, likes_count, dislikes_count, created_at)
+ * - sortOrder: asc or desc
+ * - limit: Number of results (max 500)
+ * - offset: Pagination offset
+ */
+router.get('/community-words', async (req: AdminRequest, res: Response): Promise<void> => {
+  try {
+    const supabase = getSupabase();
+    const language = (req.query.language as string) || null;
+    const status = (req.query.status as string) || null;
+    const search = (req.query.search as string) || null;
+    const sortBy = (req.query.sortBy as string) || 'net_score';
+    const sortOrder = (req.query.sortOrder as string) === 'asc' ? true : false;
+    const limit = Math.min(parseInt(req.query.limit as string) || 100, 500);
+    const offset = parseInt(req.query.offset as string) || 0;
+
+    // Build query
+    let query = supabase
+      .from('word_scores')
+      .select('word, language, likes_count, dislikes_count, net_score, is_potentially_valid, first_submitter, last_voted_at, created_at', { count: 'exact' });
+
+    // Apply filters
+    if (language) {
+      query = query.eq('language', language);
+    }
+
+    if (search) {
+      query = query.ilike('word', `%${search}%`);
+    }
+
+    // Status filtering
+    if (status === 'validated') {
+      query = query.gte('net_score', 10);
+    } else if (status === 'pending_review') {
+      query = query.gte('net_score', 3).lt('net_score', 10);
+    } else if (status === 'rejected') {
+      query = query.lt('net_score', 0);
+    } else if (status === 'pending') {
+      query = query.gte('net_score', 0).lt('net_score', 3);
+    }
+
+    // Apply sorting
+    const validSortFields = ['net_score', 'likes_count', 'dislikes_count', 'created_at', 'last_voted_at'];
+    const sortField = validSortFields.includes(sortBy) ? sortBy : 'net_score';
+    query = query.order(sortField, { ascending: sortOrder });
+
+    // Apply pagination
+    query = query.range(offset, offset + limit - 1);
+
+    const { data, error, count } = await query;
+
+    if (error) {
+      throw error;
+    }
+
+    // Transform data to include computed status
+    interface WordScoreRow {
+      word: string;
+      language: string;
+      likes_count: number;
+      dislikes_count: number;
+      net_score: number;
+      is_potentially_valid: boolean;
+      first_submitter: string | null;
+      last_voted_at: string | null;
+      created_at: string;
+    }
+
+    const words: CommunityWordEntry[] = (data as WordScoreRow[] || []).map((row: WordScoreRow) => {
+      let wordStatus: CommunityWordEntry['status'] = 'pending';
+      if (row.net_score >= 10) {
+        wordStatus = 'validated';
+      } else if (row.net_score >= 3) {
+        wordStatus = 'pending_review';
+      } else if (row.net_score < 0) {
+        wordStatus = 'rejected';
+      }
+      return {
+        ...row,
+        status: wordStatus,
+      };
+    });
+
+    // Get summary stats
+    const { data: statsData } = await supabase
+      .from('word_scores')
+      .select('net_score')
+      .throwOnError();
+
+    interface NetScoreRow {
+      net_score: number;
+    }
+
+    const typedStatsData = statsData as NetScoreRow[] | null;
+    const stats = {
+      total: typedStatsData?.length || 0,
+      validated: typedStatsData?.filter((w: NetScoreRow) => w.net_score >= 10).length || 0,
+      pendingReview: typedStatsData?.filter((w: NetScoreRow) => w.net_score >= 3 && w.net_score < 10).length || 0,
+      rejected: typedStatsData?.filter((w: NetScoreRow) => w.net_score < 0).length || 0,
+      pending: typedStatsData?.filter((w: NetScoreRow) => w.net_score >= 0 && w.net_score < 3).length || 0,
+    };
+
+    res.json({
+      words,
+      total: count || 0,
+      stats,
+      pagination: {
+        limit,
+        offset,
+        hasMore: (count || 0) > offset + limit,
+      },
+    });
+  } catch (error) {
+    const err = error as Error;
+    logger.error('ADMIN_API', `Community words error: ${err.message}`);
+    res.status(500).json({ error: 'Failed to fetch community words' });
+  }
+});
+
+/**
+ * POST /api/admin/community-words/approve
+ * Approve a community word - adds positive votes to push over threshold
+ */
+router.post('/community-words/approve', async (req: AdminRequest, res: Response): Promise<void> => {
+  const supabase = getSupabase();
+  const { word, language, addToDictionary } = req.body;
+
+  if (!word || !language) {
+    res.status(400).json({ error: 'Missing word or language' });
+    return;
+  }
+
+  const normalizedWord = (word as string).toLowerCase().trim();
+
+  try {
+    // Get current score
+    const { data: currentScore } = await supabase
+      .from('word_scores')
+      .select('net_score')
+      .eq('word', normalizedWord)
+      .eq('language', language)
+      .single();
+
+    // Calculate votes needed to reach threshold
+    const currentNet = currentScore?.net_score || 0;
+    const votesNeeded = Math.max(10 - currentNet, 5); // At least 5 votes to show intent
+
+    // Add admin approval votes
+    const adminVotes = Array.from({ length: votesNeeded }, (_, i) => ({
+      word: normalizedWord,
+      language,
+      user_id: req.adminUser!.id,
+      game_code: `admin_community_approve_${Date.now()}_${i}`,
+      vote_type: 'like',
+      is_bot_word: false,
+    }));
+
+    const { error: voteError } = await supabase.from('word_votes').insert(adminVotes);
+    if (voteError) {
+      logger.warn('ADMIN_API', `Vote insert partial failure: ${voteError.message}`);
+    }
+
+    // Remove from blacklist if present
+    await supabase
+      .from('bot_word_blacklist')
+      .delete()
+      .eq('word', normalizedWord)
+      .eq('language', language);
+
+    // Optionally add to permanent dictionary file
+    if (addToDictionary) {
+      try {
+        // eslint-disable-next-line @typescript-eslint/no-require-imports
+        const dictionary = require('../../backend/dictionary');
+        await dictionary.addApprovedWord(normalizedWord, language);
+        auditLog(req.adminUser, 'COMMUNITY_WORD_ADD_TO_DICTIONARY', { word: normalizedWord, language });
+      } catch (dictError) {
+        logger.warn('ADMIN_API', `Dictionary add failed: ${(dictError as Error).message}`);
+      }
+    }
+
+    auditLog(req.adminUser, 'COMMUNITY_WORD_APPROVE', { word: normalizedWord, language, votesAdded: votesNeeded, addToDictionary });
+    res.json({ success: true, votesAdded: votesNeeded });
+  } catch (error) {
+    const err = error as Error;
+    logger.error('ADMIN_API', `Community word approve error: ${err.message}`);
+    res.status(500).json({ error: 'Failed to approve word' });
+  }
+});
+
+/**
+ * POST /api/admin/community-words/disapprove
+ * Disapprove a community word - adds negative votes and optionally blacklists
+ */
+router.post('/community-words/disapprove', async (req: AdminRequest, res: Response): Promise<void> => {
+  const supabase = getSupabase();
+  const { word, language, reason, addToBlacklist } = req.body;
+
+  if (!word || !language) {
+    res.status(400).json({ error: 'Missing word or language' });
+    return;
+  }
+
+  const normalizedWord = (word as string).toLowerCase().trim();
+
+  try {
+    // Add negative admin votes
+    const adminVotes = Array.from({ length: 10 }, (_, i) => ({
+      word: normalizedWord,
+      language,
+      user_id: req.adminUser!.id,
+      game_code: `admin_community_disapprove_${Date.now()}_${i}`,
+      vote_type: 'dislike',
+      is_bot_word: false,
+    }));
+
+    const { error: voteError } = await supabase.from('word_votes').insert(adminVotes);
+    if (voteError) {
+      logger.warn('ADMIN_API', `Vote insert partial failure: ${voteError.message}`);
+    }
+
+    // Optionally add to blacklist
+    if (addToBlacklist) {
+      await supabase
+        .from('bot_word_blacklist')
+        .upsert({
+          word: normalizedWord,
+          language,
+          reason: reason || 'Admin disapproval',
+          blacklisted_by: req.adminUser!.id,
+          auto_blacklisted: false,
+        }, { onConflict: 'word,language' });
+    }
+
+    auditLog(req.adminUser, 'COMMUNITY_WORD_DISAPPROVE', { word: normalizedWord, language, reason, addToBlacklist });
+    res.json({ success: true, votesAdded: 10 });
+  } catch (error) {
+    const err = error as Error;
+    logger.error('ADMIN_API', `Community word disapprove error: ${err.message}`);
+    res.status(500).json({ error: 'Failed to disapprove word' });
+  }
+});
+
+/**
+ * GET /api/admin/community-words/stats
+ * Get community words statistics by language
+ */
+router.get('/community-words/stats', async (req: AdminRequest, res: Response): Promise<void> => {
+  try {
+    const supabase = getSupabase();
+
+    const { data, error } = await supabase
+      .from('word_scores')
+      .select('language, net_score');
+
+    if (error) throw error;
+
+    // Aggregate by language
+    interface LanguageScoreRow {
+      language: string;
+      net_score: number;
+    }
+
+    const statsByLanguage: Record<string, { total: number; validated: number; pendingReview: number; rejected: number; pending: number }> = {};
+
+    (data as LanguageScoreRow[] || []).forEach((row: LanguageScoreRow) => {
+      if (!statsByLanguage[row.language]) {
+        statsByLanguage[row.language] = { total: 0, validated: 0, pendingReview: 0, rejected: 0, pending: 0 };
+      }
+      statsByLanguage[row.language].total++;
+
+      if (row.net_score >= 10) {
+        statsByLanguage[row.language].validated++;
+      } else if (row.net_score >= 3) {
+        statsByLanguage[row.language].pendingReview++;
+      } else if (row.net_score < 0) {
+        statsByLanguage[row.language].rejected++;
+      } else {
+        statsByLanguage[row.language].pending++;
+      }
+    });
+
+    res.json({ statsByLanguage });
+  } catch (error) {
+    const err = error as Error;
+    logger.error('ADMIN_API', `Community words stats error: ${err.message}`);
+    res.status(500).json({ error: 'Failed to fetch community words stats' });
   }
 });
 

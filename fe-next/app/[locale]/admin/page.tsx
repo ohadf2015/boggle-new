@@ -116,6 +116,27 @@ interface BotWord {
   isAutoBlacklisted: boolean;
 }
 
+interface CommunityWord {
+  word: string;
+  language: string;
+  likes_count: number;
+  dislikes_count: number;
+  net_score: number;
+  is_potentially_valid: boolean;
+  first_submitter: string | null;
+  last_voted_at: string | null;
+  created_at: string;
+  status: 'validated' | 'pending_review' | 'rejected' | 'pending';
+}
+
+interface CommunityWordsStats {
+  total: number;
+  validated: number;
+  pendingReview: number;
+  rejected: number;
+  pending: number;
+}
+
 export default function AdminDashboard() {
   const { theme } = useTheme();
   const { language } = useLanguage();
@@ -130,10 +151,17 @@ export default function AdminDashboard() {
   const [dailyActivity, setDailyActivity] = useState<DailyActivity[]>([]);
   const [topPlayers, setTopPlayers] = useState<TopPlayer[]>([]);
   const [botWords, setBotWords] = useState<BotWord[]>([]);
+  const [communityWords, setCommunityWords] = useState<CommunityWord[]>([]);
+  const [communityWordsStats, setCommunityWordsStats] = useState<CommunityWordsStats | null>(null);
+  const [communityWordsTotal, setCommunityWordsTotal] = useState(0);
+  const [communityWordSearch, setCommunityWordSearch] = useState('');
+  const [communityWordStatus, setCommunityWordStatus] = useState<string>('pending_review');
+  const [communityWordLanguage, setCommunityWordLanguage] = useState<string>('all');
+  const [communityWordLoading, setCommunityWordLoading] = useState(false);
   const [selectedLanguage, setSelectedLanguage] = useState<string>('all');
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
-  const [activeTab, setActiveTab] = useState<'overview' | 'players' | 'sources' | 'activity' | 'bot-words'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'players' | 'sources' | 'activity' | 'bot-words' | 'community-words'>('overview');
 
   // Get auth token for API calls
   const getAuthToken = useCallback(async () => {
@@ -298,6 +326,117 @@ export default function AdminDashboard() {
     }
   };
 
+  // Fetch community words with filters
+  const fetchCommunityWords = useCallback(async (search?: string, status?: string, lang?: string) => {
+    const token = await getAuthToken();
+    if (!token) return;
+
+    setCommunityWordLoading(true);
+    try {
+      const params = new URLSearchParams();
+      if (search) params.set('search', search);
+      if (status && status !== 'all') params.set('status', status);
+      if (lang && lang !== 'all') params.set('language', lang);
+      params.set('sortBy', 'net_score');
+      params.set('sortOrder', 'desc');
+      params.set('limit', '100');
+
+      const res = await fetch(`/api/admin/community-words?${params.toString()}`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        setCommunityWords(data.words || []);
+        setCommunityWordsStats(data.stats || null);
+        setCommunityWordsTotal(data.total || 0);
+      }
+    } catch (error) {
+      console.error('Failed to fetch community words:', error);
+    } finally {
+      setCommunityWordLoading(false);
+    }
+  }, [getAuthToken]);
+
+  // Handle community word approval
+  const handleCommunityApprove = async (word: CommunityWord, addToDictionary: boolean = false) => {
+    const token = await getAuthToken();
+    if (!token) {
+      toast.error('Authentication required');
+      return;
+    }
+
+    try {
+      const res = await fetch('/api/admin/community-words/approve', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          word: word.word,
+          language: word.language,
+          addToDictionary
+        })
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        toast.success(`Approved "${word.word}" (+${data.votesAdded} votes)`);
+        fetchCommunityWords(communityWordSearch, communityWordStatus, communityWordLanguage);
+      } else {
+        const error = await res.json();
+        toast.error(error.error || 'Failed to approve word');
+      }
+    } catch (error) {
+      console.error('Failed to approve word:', error);
+      toast.error('Failed to approve word');
+    }
+  };
+
+  // Handle community word disapproval
+  const handleCommunityDisapprove = async (word: CommunityWord, addToBlacklist: boolean = false) => {
+    const token = await getAuthToken();
+    if (!token) {
+      toast.error('Authentication required');
+      return;
+    }
+
+    try {
+      const res = await fetch('/api/admin/community-words/disapprove', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          word: word.word,
+          language: word.language,
+          reason: 'Admin review: invalid word',
+          addToBlacklist
+        })
+      });
+
+      if (res.ok) {
+        toast.success(`Disapproved "${word.word}"`);
+        fetchCommunityWords(communityWordSearch, communityWordStatus, communityWordLanguage);
+      } else {
+        const error = await res.json();
+        toast.error(error.error || 'Failed to disapprove word');
+      }
+    } catch (error) {
+      console.error('Failed to disapprove word:', error);
+      toast.error('Failed to disapprove word');
+    }
+  };
+
+  // Fetch community words when tab changes or filters update
+  useEffect(() => {
+    if (activeTab === 'community-words' && isAdmin) {
+      fetchCommunityWords(communityWordSearch, communityWordStatus, communityWordLanguage);
+    }
+  }, [activeTab, isAdmin, communityWordStatus, communityWordLanguage, fetchCommunityWords, communityWordSearch]);
+
   // Still loading profile - wait before showing access denied
   // This prevents showing "Access Required" while profile is still being fetched
   const isProfileLoading = !authLoading && user && !profile;
@@ -446,7 +585,7 @@ export default function AdminDashboard() {
 
         {/* Tab Navigation */}
         <div className="flex gap-2 mb-6 overflow-x-auto pb-2">
-          {(['overview', 'players', 'sources', 'activity', 'bot-words'] as const).map((tab) => (
+          {(['overview', 'players', 'sources', 'activity', 'community-words', 'bot-words'] as const).map((tab) => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
@@ -465,6 +604,7 @@ export default function AdminDashboard() {
               {tab === 'players' && 'Players'}
               {tab === 'sources' && 'Traffic Sources'}
               {tab === 'activity' && 'Activity'}
+              {tab === 'community-words' && 'Community Words'}
               {tab === 'bot-words' && 'Bot Words'}
             </button>
           ))}
@@ -833,6 +973,263 @@ export default function AdminDashboard() {
                 <div className="w-3 h-3 rounded bg-gradient-to-r from-cyan-500 to-blue-500" />
                 <span className={isDarkMode ? 'text-gray-600' : 'text-gray-600'}>Games played</span>
               </div>
+            </div>
+          </motion.div>
+        )}
+
+        {/* Community Words Tab */}
+        {activeTab === 'community-words' && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className={cn(
+              'rounded-xl p-6 border',
+              isDarkMode ? 'bg-slate-800/50 border-slate-700' : 'bg-white border-gray-200 shadow-md'
+            )}
+          >
+            {/* Header with Stats */}
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
+              <div>
+                <h3 className={cn(
+                  'text-lg font-bold flex items-center gap-2',
+                  isDarkMode ? 'text-white' : 'text-gray-900'
+                )}>
+                  <FaGlobe className="text-cyan-500" />
+                  Community Words Moderation
+                </h3>
+                {communityWordsStats && (
+                  <div className="flex flex-wrap gap-3 mt-2 text-sm">
+                    <span className={cn(
+                      'px-2 py-1 rounded',
+                      isDarkMode ? 'bg-green-900/30 text-green-400' : 'bg-green-100 text-green-700'
+                    )}>
+                      {communityWordsStats.validated} Validated
+                    </span>
+                    <span className={cn(
+                      'px-2 py-1 rounded',
+                      isDarkMode ? 'bg-yellow-900/30 text-yellow-400' : 'bg-yellow-100 text-yellow-700'
+                    )}>
+                      {communityWordsStats.pendingReview} Pending Review
+                    </span>
+                    <span className={cn(
+                      'px-2 py-1 rounded',
+                      isDarkMode ? 'bg-gray-800 text-gray-400' : 'bg-gray-100 text-gray-600'
+                    )}>
+                      {communityWordsStats.pending} New
+                    </span>
+                    <span className={cn(
+                      'px-2 py-1 rounded',
+                      isDarkMode ? 'bg-red-900/30 text-red-400' : 'bg-red-100 text-red-700'
+                    )}>
+                      {communityWordsStats.rejected} Rejected
+                    </span>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Filters */}
+            <div className="flex flex-wrap gap-3 mb-4">
+              {/* Search */}
+              <div className="flex-1 min-w-[200px]">
+                <input
+                  type="text"
+                  placeholder="Search words..."
+                  value={communityWordSearch}
+                  onChange={(e) => setCommunityWordSearch(e.target.value)}
+                  className={cn(
+                    'w-full px-3 py-2 rounded-lg border',
+                    isDarkMode
+                      ? 'bg-slate-700 border-slate-600 text-white placeholder-gray-400'
+                      : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
+                  )}
+                />
+              </div>
+
+              {/* Status Filter */}
+              <select
+                value={communityWordStatus}
+                onChange={(e) => setCommunityWordStatus(e.target.value)}
+                className={cn(
+                  'px-3 py-2 rounded-lg border',
+                  isDarkMode
+                    ? 'bg-slate-700 border-slate-600 text-white'
+                    : 'bg-white border-gray-300 text-gray-900'
+                )}
+              >
+                <option value="all">All Status</option>
+                <option value="pending_review">Pending Review (3-9)</option>
+                <option value="validated">Validated (10+)</option>
+                <option value="pending">New (0-2)</option>
+                <option value="rejected">Rejected (negative)</option>
+              </select>
+
+              {/* Language Filter */}
+              <select
+                value={communityWordLanguage}
+                onChange={(e) => setCommunityWordLanguage(e.target.value)}
+                className={cn(
+                  'px-3 py-2 rounded-lg border',
+                  isDarkMode
+                    ? 'bg-slate-700 border-slate-600 text-white'
+                    : 'bg-white border-gray-300 text-gray-900'
+                )}
+              >
+                <option value="all">All Languages</option>
+                <option value="en">English</option>
+                <option value="he">Hebrew</option>
+                <option value="sv">Swedish</option>
+                <option value="es">Spanish</option>
+                <option value="ja">Japanese</option>
+              </select>
+            </div>
+
+            {/* Results Count */}
+            <div className={cn(
+              'text-sm mb-4',
+              isDarkMode ? 'text-gray-400' : 'text-gray-600'
+            )}>
+              Showing {communityWords.length} of {communityWordsTotal} words
+            </div>
+
+            {/* Loading State */}
+            {communityWordLoading && (
+              <div className="flex justify-center py-8">
+                <div className="w-6 h-6 border-2 border-cyan-500 border-t-transparent rounded-full animate-spin" />
+              </div>
+            )}
+
+            {/* Words Table */}
+            {!communityWordLoading && (
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead>
+                    <tr className={cn(
+                      'text-left border-b',
+                      isDarkMode ? 'border-slate-700' : 'border-gray-200'
+                    )}>
+                      <th className={cn('pb-2 px-2', isDarkMode ? 'text-gray-400' : 'text-gray-600')}>Word</th>
+                      <th className={cn('pb-2 px-2', isDarkMode ? 'text-gray-400' : 'text-gray-600')}>Language</th>
+                      <th className={cn('pb-2 px-2 text-right', isDarkMode ? 'text-gray-400' : 'text-gray-600')}>Likes</th>
+                      <th className={cn('pb-2 px-2 text-right', isDarkMode ? 'text-gray-400' : 'text-gray-600')}>Dislikes</th>
+                      <th className={cn('pb-2 px-2 text-right', isDarkMode ? 'text-gray-400' : 'text-gray-600')}>Net Score</th>
+                      <th className={cn('pb-2 px-2', isDarkMode ? 'text-gray-400' : 'text-gray-600')}>Status</th>
+                      <th className={cn('pb-2 px-2', isDarkMode ? 'text-gray-400' : 'text-gray-600')}>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {communityWords.length === 0 ? (
+                      <tr>
+                        <td colSpan={7} className={cn(
+                          'py-8 text-center',
+                          isDarkMode ? 'text-gray-500' : 'text-gray-400'
+                        )}>
+                          No words found matching your filters
+                        </td>
+                      </tr>
+                    ) : (
+                      communityWords.map((word) => (
+                        <tr key={`${word.word}-${word.language}`} className={cn(
+                          'border-b',
+                          isDarkMode ? 'border-slate-700' : 'border-gray-200'
+                        )}>
+                          <td className={cn('py-3 px-2 font-mono font-medium', isDarkMode ? 'text-white' : 'text-gray-900')}>
+                            {word.word}
+                          </td>
+                          <td className={cn('py-3 px-2', isDarkMode ? 'text-gray-400' : 'text-gray-600')}>
+                            {LANGUAGE_NAMES[word.language] || word.language}
+                          </td>
+                          <td className="py-3 px-2 text-right text-green-400">{word.likes_count}</td>
+                          <td className="py-3 px-2 text-right text-red-400">{word.dislikes_count}</td>
+                          <td className={cn(
+                            'py-3 px-2 text-right font-bold',
+                            word.net_score >= 10 ? 'text-green-400' :
+                            word.net_score < 0 ? 'text-red-400' :
+                            word.net_score >= 3 ? 'text-yellow-400' : 'text-gray-400'
+                          )}>
+                            {word.net_score}
+                          </td>
+                          <td className="py-3 px-2">
+                            {word.status === 'validated' && (
+                              <span className="px-2 py-1 rounded text-xs bg-green-900/30 text-green-400">
+                                Validated
+                              </span>
+                            )}
+                            {word.status === 'pending_review' && (
+                              <span className="px-2 py-1 rounded text-xs bg-yellow-900/30 text-yellow-400">
+                                Review
+                              </span>
+                            )}
+                            {word.status === 'pending' && (
+                              <span className="px-2 py-1 rounded text-xs bg-gray-800 text-gray-400">
+                                New
+                              </span>
+                            )}
+                            {word.status === 'rejected' && (
+                              <span className="px-2 py-1 rounded text-xs bg-red-900/30 text-red-400">
+                                Rejected
+                              </span>
+                            )}
+                          </td>
+                          <td className="py-3 px-2">
+                            <div className="flex gap-2">
+                              <button
+                                onClick={() => handleCommunityApprove(word, false)}
+                                className="px-3 py-1 text-xs border border-green-600 text-green-400 rounded hover:bg-green-600/20 transition-colors"
+                                title="Approve (add votes to validate)"
+                              >
+                                Approve
+                              </button>
+                              <button
+                                onClick={() => handleCommunityApprove(word, true)}
+                                className="px-3 py-1 text-xs border border-blue-600 text-blue-400 rounded hover:bg-blue-600/20 transition-colors"
+                                title="Approve and add to permanent dictionary"
+                              >
+                                + Dict
+                              </button>
+                              <button
+                                onClick={() => handleCommunityDisapprove(word, false)}
+                                className="px-3 py-1 text-xs border border-red-600 text-red-400 rounded hover:bg-red-600/20 transition-colors"
+                                title="Disapprove (add negative votes)"
+                              >
+                                Reject
+                              </button>
+                              <button
+                                onClick={() => handleCommunityDisapprove(word, true)}
+                                className="px-3 py-1 text-xs border border-red-800 text-red-600 rounded hover:bg-red-800/20 transition-colors"
+                                title="Reject and blacklist"
+                              >
+                                Ban
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            )}
+
+            {/* Help Text */}
+            <div className={cn(
+              'mt-4 pt-4 border-t text-sm',
+              isDarkMode ? 'border-slate-700 text-gray-500' : 'border-gray-200 text-gray-500'
+            )}>
+              <p className="mb-2"><strong>Status Levels:</strong></p>
+              <ul className="list-disc list-inside space-y-1 ml-2">
+                <li><span className="text-green-400">Validated (10+)</span>: Word is automatically accepted in games</li>
+                <li><span className="text-yellow-400">Pending Review (3-9)</span>: Word needs more community votes or admin action</li>
+                <li><span className="text-gray-400">New (0-2)</span>: Recently submitted word</li>
+                <li><span className="text-red-400">Rejected (negative)</span>: Word has more dislikes than likes</li>
+              </ul>
+              <p className="mt-3"><strong>Actions:</strong></p>
+              <ul className="list-disc list-inside space-y-1 ml-2">
+                <li><span className="text-green-400">Approve</span>: Add votes to push word toward validation threshold</li>
+                <li><span className="text-blue-400">+ Dict</span>: Approve and add to permanent dictionary file</li>
+                <li><span className="text-red-400">Reject</span>: Add negative votes</li>
+                <li><span className="text-red-600">Ban</span>: Reject and add to blacklist (prevents future use)</li>
+              </ul>
             </div>
           </motion.div>
         )}

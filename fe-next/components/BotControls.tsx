@@ -163,12 +163,12 @@ const BotControls: React.FC<BotControlsProps> = ({
 
       {/* Header */}
       <div className="flex items-center gap-2">
-        <FaRobot className="text-neo-cyan" aria-hidden="true" />
-        <span className="text-sm font-bold uppercase text-neo-cream/90">
-          {t('bots.title') || 'AI Bots'}
+        <FaRobot className="text-neo-cyan text-sm" aria-hidden="true" />
+        <span className="text-sm font-bold text-neo-cream/90">
+          {t('bots.title') || 'Bots'}
         </span>
         {bots.length > 0 && (
-          <Badge className="bg-neo-cyan text-neo-black text-xs px-2 py-0.5 font-bold">
+          <Badge className="bg-neo-cyan text-neo-black text-[10px] px-1.5 py-0 font-bold">
             {bots.length}
           </Badge>
         )}
@@ -190,31 +190,23 @@ const BotControls: React.FC<BotControlsProps> = ({
         )}
       </AnimatePresence>
 
-      {/* Auto-fill Card - Promoted to top */}
-      <div className="bg-neo-purple/10 text-white border-2 border-neo-purple rounded-neo p-3 shadow-hard-sm">
-        <div className="flex items-center justify-between gap-3">
-          <div className="flex items-center gap-2 flex-1 min-w-0">
-            <FaMagic className="text-neo-purple shrink-0" aria-hidden="true" />
-            <div className="min-w-0">
-              <label
-                htmlFor="auto-fill-switch"
-                className="text-sm font-bold text-neo-cream block cursor-pointer"
-              >
-                {t('bots.autoFill') || 'Auto-fill Room'}
-              </label>
-              <p className="text-xs text-neo-cream/60 truncate">
-                {t('bots.autoFillDesc') || 'Fills empty slots with AI bots'}
-              </p>
-            </div>
-          </div>
-          <Switch
-            id="auto-fill-switch"
-            checked={autoFillEnabled}
-            onCheckedChange={toggleAutoFill}
-            disabled={disabled}
-            aria-describedby="auto-fill-desc"
-          />
+      {/* Auto-fill Toggle - Compact */}
+      <div className="flex items-center justify-between gap-2 bg-neo-purple/10 border border-neo-purple/30 rounded-neo px-3 py-2">
+        <div className="flex items-center gap-2">
+          <FaMagic className="text-neo-purple text-sm" aria-hidden="true" />
+          <label
+            htmlFor="auto-fill-switch"
+            className="text-sm font-bold text-neo-cream cursor-pointer"
+          >
+            {t('bots.autoFill') || 'Auto-fill'}
+          </label>
         </div>
+        <Switch
+          id="auto-fill-switch"
+          checked={autoFillEnabled}
+          onCheckedChange={toggleAutoFill}
+          disabled={disabled}
+        />
       </div>
 
       {/* Manual Add Section - Collapsible */}
@@ -264,11 +256,7 @@ const BotControls: React.FC<BotControlsProps> = ({
               }}
               style={{ overflow: 'hidden' }}
             >
-              <div className="space-y-2 pt-2">
-                <p className="text-xs text-neo-cream/60">
-                  {t('bots.selectDifficultyPrompt') || 'Select difficulty:'}
-                </p>
-
+              <div className="pt-2">
                 <div className="flex flex-wrap gap-2">
                   {BOT_DIFFICULTIES.map((diff) => {
                     const isAdding = addingDifficulty === diff.value;
@@ -299,12 +287,6 @@ const BotControls: React.FC<BotControlsProps> = ({
                     );
                   })}
                 </div>
-
-                {!canAddMore && (
-                  <p className="text-xs text-neo-cream/50">
-                    {t('bots.roomFull') || 'Room is full'}
-                  </p>
-                )}
               </div>
             </motion.div>
           )}
@@ -313,76 +295,62 @@ const BotControls: React.FC<BotControlsProps> = ({
 
       {/* Current Bots List */}
       {bots.length > 0 && (
-        <div className="space-y-2">
-          <p className="text-xs text-neo-cream/60">
-            {t('bots.currentBots') || 'Current bots:'}
-          </p>
-          <div className="flex flex-wrap gap-2">
-            <AnimatePresence mode="popLayout">
-              {bots.map((bot) => {
-                const config = getDifficultyConfig(bot.botDifficulty);
-                return (
-                  <motion.div
-                    key={bot.username}
-                    layout
-                    initial={{ opacity: 0, scale: 0.8 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0, scale: 0.8 }}
+        <div className="flex flex-wrap gap-2">
+          <AnimatePresence mode="popLayout">
+            {bots.map((bot) => {
+              const config = getDifficultyConfig(bot.botDifficulty);
+              return (
+                <motion.div
+                  key={bot.username}
+                  layout
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.8 }}
+                  className={cn(
+                    "flex items-center gap-2 rounded-neo px-2 py-1",
+                    "border-2 border-neo-black shadow-hard-sm",
+                    config.bgTint
+                  )}
+                >
+                  <span
+                    className="w-5 h-5 rounded-full flex items-center justify-center text-xs shrink-0 border border-neo-black/30"
+                    style={{ backgroundColor: bot.avatar?.color || '#60a5fa' }}
+                    aria-hidden="true"
+                  >
+                    {bot.avatar?.emoji ? bot.avatar.emoji : <FaRobot className="text-neo-cream text-[10px]" />}
+                  </span>
+                  <span className="text-xs text-neo-cream font-medium truncate max-w-[80px]">
+                    {bot.username}
+                  </span>
+                  <Badge
                     className={cn(
-                      "flex items-center gap-2 rounded-neo px-2.5 py-1.5",
-                      "border-2 border-neo-black shadow-hard-sm",
-                      config.bgTint
+                      "text-[10px] px-1.5 py-0 shrink-0 font-bold",
+                      config.color
+                    )}
+                    aria-label={`${bot.botDifficulty || 'medium'} difficulty`}
+                  >
+                    {config.icon}
+                  </Badge>
+                  <motion.button
+                    type="button"
+                    onClick={() => handleRemoveBot(bot.username)}
+                    disabled={disabled}
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.9 }}
+                    aria-label={`Remove ${bot.username}`}
+                    className={cn(
+                      "w-5 h-5 flex items-center justify-center rounded-full",
+                      "text-neo-red/70 hover:text-neo-red hover:bg-neo-red/20",
+                      "transition-colors shrink-0",
+                      disabled && "opacity-50 cursor-not-allowed"
                     )}
                   >
-                    <span
-                      className="w-5 h-5 rounded-full flex items-center justify-center text-xs shrink-0 border border-neo-black/30"
-                      style={{ backgroundColor: bot.avatar?.color || '#60a5fa' }}
-                      aria-hidden="true"
-                    >
-                      {bot.avatar?.emoji ? bot.avatar.emoji : <FaRobot className="text-neo-cream text-[10px]" />}
-                    </span>
-                    <span className="text-xs text-neo-cream font-medium truncate max-w-[80px]">
-                      {bot.username}
-                    </span>
-                    <Badge
-                      className={cn(
-                        "text-[10px] px-1.5 py-0 shrink-0 font-bold",
-                        config.color
-                      )}
-                      aria-label={`${bot.botDifficulty || 'medium'} difficulty`}
-                    >
-                      {config.icon}
-                    </Badge>
-                    <motion.button
-                      type="button"
-                      onClick={() => handleRemoveBot(bot.username)}
-                      disabled={disabled}
-                      whileHover={{ scale: 1.1 }}
-                      whileTap={{ scale: 0.9 }}
-                      aria-label={`Remove ${bot.username}`}
-                      className={cn(
-                        "w-5 h-5 flex items-center justify-center rounded-full",
-                        "text-neo-red/70 hover:text-neo-red hover:bg-neo-red/20",
-                        "transition-colors shrink-0",
-                        disabled && "opacity-50 cursor-not-allowed"
-                      )}
-                    >
-                      <FaTimes size={10} aria-hidden="true" />
-                    </motion.button>
-                  </motion.div>
-                );
-              })}
-            </AnimatePresence>
-          </div>
-        </div>
-      )}
-
-      {/* Empty State */}
-      {bots.length === 0 && !autoFillEnabled && (
-        <div className="text-center py-2">
-          <p className="text-sm text-neo-cream/50">
-            {t('bots.emptyState') || 'No bots yet - add some to practice!'}
-          </p>
+                    <FaTimes size={10} aria-hidden="true" />
+                  </motion.button>
+                </motion.div>
+              );
+            })}
+          </AnimatePresence>
         </div>
       )}
     </div>

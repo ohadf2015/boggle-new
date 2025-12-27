@@ -26,23 +26,29 @@ The word validation system has multiple layers:
    - Saves valid words to `community_words` table
 
 4. **Edge Route** (`app/api/validate-word/route.ts`)
-   - **LIMITATION**: Only supports English
-   - **LIMITATION**: Doesn't check community validation
-   - **LIMITATION**: No AI validation support
+   - ✅ **IMPROVED**: Now supports English and Spanish
+   - ✅ **IMPROVED**: Proper normalization for Spanish (accent removal)
+   - ⚠️ **LIMITATION**: Doesn't check community validation (use `/api/dictionary/check` for full validation)
+   - ⚠️ **LIMITATION**: No AI validation support (intentional for Edge runtime)
 
 ### Issues Identified
 
 #### 1. Edge Route Limitations
 **File**: `app/api/validate-word/route.ts`
 
-**Problems**:
-- Only supports English language
-- Doesn't check community-validated words
-- Doesn't check word scores
-- No AI validation (though this may be intentional for Edge runtime)
-- Inconsistent with backend validation logic
+**Status**: ✅ **PARTIALLY FIXED**
 
-**Impact**: Single-player mode has inferior word validation compared to multiplayer
+**Improvements Made**:
+- ✅ Added Spanish dictionary support
+- ✅ Added proper Spanish normalization (accent removal)
+- ✅ Improved code structure and comments
+
+**Remaining Limitations**:
+- Doesn't check community-validated words (use `/api/dictionary/check` for full validation)
+- Doesn't check word scores
+- No AI validation (intentional for Edge runtime limitations)
+
+**Recommendation**: For full validation including community validation, clients should use `/api/dictionary/check` which supports all languages and community validation.
 
 #### 2. Dictionary Source Quality
 **Current Sources**:
@@ -193,8 +199,8 @@ The word validation system has multiple layers:
 ## Implementation Plan
 
 ### Phase 1: Quick Wins (1-2 days)
-1. ✅ Fix Edge route to support all languages
-2. ✅ Add community validation check to Edge route
+1. ✅ Fix Edge route to support Spanish (English already supported)
+2. ⚠️ Add community validation check to Edge route (deferred - use `/api/dictionary/check` instead)
 3. ✅ Improve error messages and logging
 
 ### Phase 2: Dictionary Improvements (3-5 days)

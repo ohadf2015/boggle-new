@@ -1,14 +1,41 @@
 /**
  * API Route: /api/validate-word
  * Validates words for single-player mode
+ * Supports English and Spanish dictionaries
+ * For full validation (including community validation), use /api/dictionary/check
  */
 
 import { NextRequest } from 'next/server';
 import englishWords from 'an-array-of-english-words';
+import spanishWords from 'an-array-of-spanish-words';
 import { checkApiRateLimit, rateLimitResponse } from '@/lib/apiRateLimit';
 
-// Pre-build dictionary at module load (cached by Next.js)
+// Pre-build dictionaries at module load (cached by Next.js)
 const englishDictionary = new Set(englishWords.map((w: string) => w.toLowerCase()));
+const spanishDictionary = new Set(spanishWords.map((w: string) => w.toLowerCase()));
+
+// Spanish accent normalization - accented vowels to base vowels for dictionary lookup
+const spanishAccentMap: Record<string, string> = {
+  'á': 'a', 'é': 'e', 'í': 'i', 'ó': 'o', 'ú': 'u', 'ü': 'u'
+};
+
+function normalizeSpanishWord(word: string): string {
+  return word
+    .toLowerCase()
+    .split('')
+    .map(c => spanishAccentMap[c] || c)
+    .join('');
+}
+
+function normalizeWord(word: string, language: string): string {
+  switch (language) {
+    case 'es':
+      return normalizeSpanishWord(word);
+    case 'en':
+    default:
+      return word.toLowerCase();
+  }
+}
 
 // Rate limit config: 300 requests per minute per IP
 // Higher limit to accommodate multiple users on same network (family, office, cafe)
@@ -29,7 +56,7 @@ export async function POST(request: NextRequest) {
 
   try {
     const body = await request.json();
-    const { word, language = 'en', useAI = false } = body;
+    const { word, language = 'en' } = body;
 
     // Basic validation
     if (!word || typeof word !== 'string') {
@@ -40,7 +67,7 @@ export async function POST(request: NextRequest) {
       }, { status: 400 });
     }
 
-    const normalizedWord = word.toLowerCase().trim();
+    const normalizedWord = normalizeWord(word.trim(), language);
 
     if (normalizedWord.length < 2) {
       return Response.json({
@@ -50,19 +77,27 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    // Check dictionary
+    // Check dictionary based on language
+    let isInDictionary = false;
     if (language === 'en' && englishDictionary.has(normalizedWord)) {
+      isInDictionary = true;
+    } else if (language === 'es' && spanishDictionary.has(normalizedWord)) {
+      isInDictionary = true;
+    }
+
+    if (isInDictionary) {
       return Response.json({
         isValid: true,
         source: 'dictionary',
       });
     }
 
-    // Word not in dictionary - return pending (AI validation not available in Edge)
+    // Word not in dictionary - return pending
+    // Note: For community validation, use /api/dictionary/check instead
     return Response.json({
       isValid: false,
       reason: 'Word not in dictionary',
-      source: useAI ? 'dictionary' : 'pending',
+      source: 'pending',
     });
 
   } catch (error) {
