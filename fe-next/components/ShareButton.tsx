@@ -53,7 +53,7 @@ const ShareButton: React.FC<ShareButtonProps> = ({
       hover: 'hover:shadow-hard-md hover:-translate-y-0.5 active:shadow-hard-sm active:translate-y-0',
     },
     whatsapp: {
-      base: 'bg-[#25D366] text-white border-neo-black',
+      base: 'bg-[#25D366] text-black border-neo-black',
       hover: 'hover:shadow-hard-md hover:-translate-y-0.5 hover:bg-[#1ebe5d] active:shadow-hard-sm active:translate-y-0',
     },
     secondary: {

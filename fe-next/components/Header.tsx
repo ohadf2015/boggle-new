@@ -8,7 +8,6 @@ import { useAuth } from '../contexts/AuthContext';
 import { cn } from '../lib/utils';
 import AuthButton from './auth/AuthButton';
 import MusicControls from './MusicControls';
-import LevelBadge from './LevelBadge';
 import type { Language } from '../shared/types/game';
 
 /**
@@ -235,20 +234,15 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                             <FaChartBar className="text-base" aria-hidden="true" />
                         </Link>
                     )}
-                    {/* Show level badge for authenticated users */}
-                    {isAuthenticated && profile?.current_level && (
-                        <LevelBadge
-                            level={profile.current_level}
-                            size="md"
-                            animate={false}
-                        />
-                    )}
                     <MusicControls />
                     <AuthButton />
                 </div>
 
-                {/* Mobile: Hamburger Menu */}
-                <div className="sm:hidden" ref={mobileMenuRef}>
+                {/* Mobile: Volume Controls + Hamburger Menu */}
+                <div className="sm:hidden flex items-center gap-2" ref={mobileMenuRef}>
+                    {/* Sound controls - visible on mobile header */}
+                    <MusicControls />
+
                     <button
                         onClick={() => setShowMobileMenu(!showMobileMenu)}
                         className={cn(
@@ -294,7 +288,7 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                                 transition={{ type: 'spring', damping: 25, stiffness: 300 }}
                                 className={cn(
                                     "fixed top-0 bottom-0 w-[280px] max-w-[85vw] z-[200] sm:hidden",
-                                    "bg-neo-cream border-neo-black",
+                                    "bg-neo-cream dark:bg-slate-800 border-neo-black dark:border-slate-600",
                                     "shadow-hard-xl overflow-y-auto",
                                     language === 'he'
                                         ? "left-0 border-r-4 rounded-r-neo-lg"
@@ -302,8 +296,8 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                                 )}
                             >
                                 {/* Pane Header with close button */}
-                                <div className="flex items-center justify-between p-4 border-b-3 border-neo-black/20">
-                                    <span className="text-lg font-bold text-neo-black">
+                                <div className="flex items-center justify-between p-4 border-b-3 border-neo-black/20 dark:border-slate-600">
+                                    <span className="text-lg font-bold text-neo-black dark:text-white">
                                         {t('common.menu') || 'Menu'}
                                     </span>
                                     <button
@@ -311,8 +305,8 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                                         className={cn(
                                             "flex items-center justify-center",
                                             "w-10 h-10",
-                                            "bg-white text-neo-black",
-                                            "border-2 border-neo-black",
+                                            "bg-white dark:bg-slate-700 text-neo-black dark:text-white",
+                                            "border-2 border-neo-black dark:border-slate-500",
                                             "rounded-neo shadow-hard-sm",
                                             "active:translate-x-[1px] active:translate-y-[1px] active:shadow-none",
                                             "transition-all duration-100"
@@ -326,28 +320,18 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                                 <div className="flex flex-col gap-4 p-4">
                                     {/* Account Section - Now at the top */}
                                     <div className="flex flex-col gap-2">
-                                        <span className="text-xs font-bold text-neo-black/60 uppercase tracking-wide">
+                                        <span className="text-xs font-bold text-neo-black/60 dark:text-slate-400 uppercase tracking-wide">
                                             {t('common.account') || 'Account'}
                                         </span>
-                                        {/* Level Badge for authenticated users */}
-                                        {isAuthenticated && profile?.current_level && (
-                                            <div className="flex items-center gap-2 mb-1">
-                                                <LevelBadge
-                                                    level={profile.current_level}
-                                                    size="md"
-                                                    animate={false}
-                                                />
-                                            </div>
-                                        )}
                                         <AuthButton inline onClose={() => setShowMobileMenu(false)} />
                                     </div>
 
                                     {/* Divider */}
-                                    <div className="h-0.5 bg-neo-black/20 rounded-full" />
+                                    <div className="h-0.5 bg-neo-black/20 dark:bg-slate-600 rounded-full" />
 
                                     {/* Language Section */}
                                     <div className="flex flex-col gap-2">
-                                        <span className="text-xs font-bold text-neo-black/60 uppercase tracking-wide">
+                                        <span className="text-xs font-bold text-neo-black/60 dark:text-slate-400 uppercase tracking-wide">
                                             {t('common.language') || 'Language'}
                                         </span>
                                         <div className="flex flex-col gap-1.5">
@@ -358,31 +342,30 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                                                         setLanguage(option.code);
                                                     }}
                                                     className={cn(
-                                                        "flex items-center gap-2 px-3 py-2.5 text-sm font-bold rounded-neo border-2 border-neo-black transition-all w-full",
+                                                        "flex items-center gap-2 px-3 py-2.5 text-sm font-bold rounded-neo border-2 border-neo-black dark:border-slate-500 transition-all w-full",
                                                         language === option.code
                                                             ? "bg-neo-cyan shadow-hard-sm"
-                                                            : "bg-white hover:bg-neo-cyan/50"
+                                                            : "bg-white dark:bg-slate-700 hover:bg-neo-cyan/50 dark:hover:bg-slate-600"
                                                     )}
                                                 >
                                                     <span className="text-lg">{option.flag}</span>
-                                                    <span className="text-neo-black">{option.name}</span>
+                                                    <span className="text-neo-black dark:text-white">{option.name}</span>
                                                 </button>
                                             ))}
                                         </div>
                                     </div>
 
-                                    {/* Divider */}
-                                    <div className="h-0.5 bg-neo-black/20 rounded-full" />
+                                    {/* Admin Controls Section - only shown for admin users */}
+                                    {isAdmin && (
+                                        <>
+                                            {/* Divider */}
+                                            <div className="h-0.5 bg-neo-black/20 dark:bg-slate-600 rounded-full" />
 
-                                    {/* Controls Section */}
-                                    <div className="flex flex-col gap-3">
-                                        <span className="text-xs font-bold text-neo-black/60 uppercase tracking-wide">
-                                            {t('common.controls') || 'Controls'}
-                                        </span>
+                                            <div className="flex flex-col gap-3">
+                                                <span className="text-xs font-bold text-neo-black/60 dark:text-slate-400 uppercase tracking-wide">
+                                                    {t('common.admin') || 'Admin'}
+                                                </span>
 
-                                        <div className="flex items-center gap-3 flex-wrap">
-                                            {/* Admin Link */}
-                                            {isAdmin && (
                                                 <Link
                                                     href={`/${language}/admin`}
                                                     onClick={() => setShowMobileMenu(false)}
@@ -399,10 +382,9 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                                                 >
                                                     <FaChartBar className="text-base" aria-hidden="true" />
                                                 </Link>
-                                            )}
-                                            <MusicControls />
-                                        </div>
-                                    </div>
+                                            </div>
+                                        </>
+                                    )}
                                 </div>
                             </motion.div>
                         </>

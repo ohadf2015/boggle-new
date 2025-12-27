@@ -511,11 +511,9 @@ const HostPreGameView: React.FC<HostPreGameViewProps> = ({
                       {(Object.keys(DIFFICULTIES) as DifficultyLevel[]).map((key) => {
                         const isSelected = difficulty === key;
                         const difficultyColors: Record<string, string> = {
-                          easy: 'bg-neo-lime text-neo-black',
-                          normal: 'bg-neo-yellow text-neo-black',
-                          medium: 'bg-neo-orange text-neo-black',
-                          hard: 'bg-neo-red text-neo-white',
-                          extreme: 'bg-neo-purple text-neo-white'
+                          EASY: 'bg-neo-lime text-neo-black',
+                          MEDIUM: 'bg-neo-orange text-neo-black',
+                          HARD: 'bg-neo-red text-neo-white',
                         };
                         return (
                           <motion.button
@@ -525,7 +523,7 @@ const HostPreGameView: React.FC<HostPreGameViewProps> = ({
                             className={cn(
                               "px-2 py-1.5 rounded-neo font-bold transition-all duration-100 border-2 border-neo-black text-xs",
                               isSelected
-                                ? `${difficultyColors[key] || 'bg-neo-cyan'} shadow-none translate-x-[1px] translate-y-[1px]`
+                                ? `${difficultyColors[key] || 'bg-neo-cyan text-neo-black'} shadow-none translate-x-[1px] translate-y-[1px]`
                                 : "bg-neo-cream text-neo-black shadow-hard-sm hover:shadow-hard"
                             )}
                           >

@@ -121,6 +121,9 @@ function extractTFunctionCalls(filePath) {
     /\bt\(\s*['"]([^'"]+)['"]\s*\)\s*\|\|/g,
     // t('key').replace
     /\bt\(\s*['"]([^'"]+)['"]\s*\)\.replace/g,
+    // Object property patterns for translation keys stored in objects:
+    // nameKey: 'key', description: 'key', etc.
+    /\b(?:nameKey|description|label|title|message|text|placeholder|tooltip|header|buttonText|errorMessage|successMessage):\s*['"]([^'"]+)['"]/g,
   ];
 
   for (let lineNum = 0; lineNum < lines.length; lineNum++) {
@@ -139,6 +142,14 @@ function extractTFunctionCalls(filePath) {
 
         // Skip if it looks like a method call or URL
         if (key.includes('://') || key.startsWith('.') || key.endsWith('.')) continue;
+
+        // Skip if it looks like CSS classes, hex colors, or non-translation strings
+        if (key.includes(' ') || key.startsWith('#') || key.startsWith('/') || key.includes('(')) continue;
+
+        // For indirect patterns (from object properties), only accept keys that look like translation keys
+        // (must contain a dot, indicating namespace.key pattern)
+        const isIndirectPattern = pattern.source.includes('nameKey|description|label');
+        if (isIndirectPattern && !key.includes('.')) continue;
 
         calls.push({
           key,

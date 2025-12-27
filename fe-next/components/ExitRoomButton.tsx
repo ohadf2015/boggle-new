@@ -21,13 +21,14 @@ const ExitRoomButton: React.FC<ExitRoomButtonProps> = ({ onClick, label, classNa
     <Button
       type="button"
       onClick={onClick}
+      variant="destructive"
       size="sm"
-      className={`bg-neo-red text-neo-cream border-4 border-neo-black shadow-hard
+      className={`border-4 border-neo-black shadow-hard
         hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-hard-lg
         active:translate-x-[2px] active:translate-y-[2px] active:shadow-none
         font-black transition-all ${className}`}
     >
-      <FaDoorOpen className="mr-2" />
+      <FaDoorOpen className="me-2" />
       {label}
     </Button>
   );

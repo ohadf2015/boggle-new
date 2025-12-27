@@ -100,8 +100,15 @@ const PlayerView: React.FC<PlayerViewProps> = memo(({
   // Enable presence tracking
   usePresence({ enabled: !!gameCode });
 
-  // Use foundWords, boardTheme, and totalBoardWords from GameStateContext (shared with usePlayerWordEvents)
-  const { foundWords, setFoundWords, boardTheme, totalBoardWords } = useGameStateContext();
+  // Use game state from GameStateContext (shared with usePlayerWordEvents and usePlayerGameEvents)
+  const {
+    foundWords,
+    setFoundWords,
+    boardTheme,
+    totalBoardWords,
+    waitingForResults,
+    setWaitingForResults,
+  } = useGameStateContext();
 
   // Game state
   const [word, setWord] = useState<string>('');
@@ -110,7 +117,7 @@ const PlayerView: React.FC<PlayerViewProps> = memo(({
   const [achievements, setAchievements] = useState<string[]>([]);
   const [letterGrid, setLetterGrid] = useState<LetterGrid | null>(null);
   const [remainingTime, setRemainingTime] = useState<number | null>(null);
-  const [waitingForResults, setWaitingForResults] = useState<boolean>(false);
+  // waitingForResults is now from context (see useGameStateContext above)
   const [showStartAnimation, setShowStartAnimation] = useState<boolean>(false);
   const [minWordLength, setMinWordLength] = useState<number>(2);
 

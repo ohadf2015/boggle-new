@@ -10,6 +10,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import { signOut } from '../../lib/supabase';
 import AuthModal from './AuthModal';
 import Avatar from '../Avatar';
+import LevelBadge from '../LevelBadge';
 import { cn } from '../../lib/utils';
 import { useRouter } from 'next/navigation';
 import type { Language as LanguageType } from '@/shared/types';
@@ -75,7 +76,7 @@ const AuthButton = ({ inline = false, onClose }: AuthButtonProps = {}): React.Re
     if (inline) {
       return (
         <div className="flex flex-col gap-2 w-full">
-          {/* Profile Header with Avatar - links to profile page */}
+          {/* Profile Header with Avatar and Level - links to profile page */}
           <button
             onClick={() => {
               router.push(`/${language}/profile`);
@@ -92,10 +93,16 @@ const AuthButton = ({ inline = false, onClose }: AuthButtonProps = {}): React.Re
               avatarColor={profile.avatar_color}
               size="sm"
             />
-            <span className="text-neo-black truncate">
+            <span className="text-neo-black truncate flex-1">
               {profile.display_name || profile.username}
             </span>
-            <FaUser size={12} className="text-neo-black/50 ms-auto" />
+            {profile.current_level && (
+              <LevelBadge
+                level={profile.current_level}
+                size="sm"
+                animate={false}
+              />
+            )}
           </button>
 
           {/* Leaderboard Link */}
@@ -169,6 +176,13 @@ const AuthButton = ({ inline = false, onClose }: AuthButtonProps = {}): React.Re
           <span className="hidden sm:inline max-w-[80px] truncate font-medium">
             {profile.display_name || profile.username}
           </span>
+          {profile.current_level && (
+            <LevelBadge
+              level={profile.current_level}
+              size="sm"
+              animate={false}
+            />
+          )}
           <FaChevronDown size={10} className={showUserMenu ? 'rotate-180 transition-transform' : 'transition-transform'} />
         </Button>
 

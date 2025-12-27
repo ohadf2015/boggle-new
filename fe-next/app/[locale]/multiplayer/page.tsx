@@ -1208,6 +1208,8 @@ export default function MultiplayerPage(): React.JSX.Element {
             isJoining={isJoining}
             isAuthenticated={isAuthenticated}
             displayName={profile?.display_name ?? ''}
+            profileAvatarId={profile?.avatar_image}
+            profilePictureUrl={profile?.profile_picture_url}
             prefilledRoom={prefilledRoomCode}
             defaultLanguage={language as Language}
             setGameCode={setGameCode}

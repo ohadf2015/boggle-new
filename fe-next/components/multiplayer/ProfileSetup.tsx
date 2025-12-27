@@ -27,6 +27,7 @@ interface ProfileSetupProps {
   initialAvatarId?: string;
   isAuthenticated: boolean;
   displayName: string | null;
+  profilePictureUrl?: string | null;
   onComplete: (profile: ProfileData) => void;
   onBack: () => void;
 }
@@ -41,6 +42,7 @@ const ProfileSetup: React.FC<ProfileSetupProps> = ({
   initialAvatarId,
   isAuthenticated,
   displayName,
+  profilePictureUrl,
   onComplete,
   onBack,
 }) => {
@@ -81,8 +83,12 @@ const ProfileSetup: React.FC<ProfileSetupProps> = ({
   const showUsernameError = usernameError || usernameValidation.hasError;
   const usernameErrorMessage = usernameValidation.errorKey;
 
+  // Authenticated users with a profile picture or avatar don't need to select one
+  const hasAuthenticatedAvatar = isAuthenticated && (profilePictureUrl || initialAvatarId);
+
   // Check if form is valid
-  const isValid = username.trim().length >= 2 && selectedAvatarId;
+  // For authenticated users with existing avatar, they don't need to select one
+  const isValid = username.trim().length >= 2 && (selectedAvatarId || hasAuthenticatedAvatar);
 
   // Handle avatar selection
   const handleAvatarSelect = (avatar: AvatarConfig) => {
@@ -103,8 +109,11 @@ const ProfileSetup: React.FC<ProfileSetupProps> = ({
       return;
     }
 
-    // Save to localStorage
-    if (typeof window !== 'undefined') {
+    // For authenticated users, use their existing avatar if no new selection made
+    const effectiveAvatarId = selectedAvatarId || initialAvatarId || 'profile-picture';
+
+    // Save to localStorage (only for guests, authenticated users keep their profile settings)
+    if (typeof window !== 'undefined' && !isAuthenticated) {
       localStorage.setItem('boggle_username', username);
       if (selectedAvatarId) {
         localStorage.setItem('boggle_avatar_id', selectedAvatarId);
@@ -116,7 +125,7 @@ const ProfileSetup: React.FC<ProfileSetupProps> = ({
 
     onComplete({
       username,
-      avatarId: selectedAvatarId!,
+      avatarId: effectiveAvatarId,
       roomName,
     });
   };
@@ -225,54 +234,83 @@ const ProfileSetup: React.FC<ProfileSetupProps> = ({
                   )}
                 </div>
 
-                {/* Avatar Selection */}
-                <div className="space-y-3">
-                  <Label className="text-sm font-bold uppercase text-slate-600 dark:text-slate-400">
-                    {t('multiplayerFlow.profileSetup.avatarLabel') || 'Choose your avatar'}
-                  </Label>
-
-                  {/* Scrollable avatar grid */}
-                  <div className="max-h-32 overflow-y-auto rounded-lg border-2 border-slate-200 dark:border-slate-600 p-2 bg-white/50 dark:bg-slate-700/50">
-                    <div className="grid grid-cols-6 sm:grid-cols-8 gap-2">
-                      {quickAvatars.map((avatar) => {
-                        const isSelected = selectedAvatarId === avatar.id;
-                        const avatarConfig = getAvatarById(avatar.id);
-
-                      return (
-                        <button
-                          key={avatar.id}
-                          type="button"
-                          onClick={() => handleAvatarSelect(avatar)}
-                          className={cn(
-                            "w-14 h-14 rounded-full border-3 shadow-hard-sm transition-all overflow-hidden",
-                            isSelected
-                              ? "border-neo-cyan scale-110 shadow-hard"
-                              : "border-neo-black hover:scale-105"
-                          )}
-                          aria-label={`Select ${avatar.name} avatar`}
-                          aria-pressed={isSelected}
-                        >
-                          {avatarConfig && (
-                            <img
-                              src={getAvatarPath(avatarConfig)}
-                              alt={avatar.name}
-                              className="w-full h-full object-cover"
-                            />
-                          )}
-                        </button>
-                      );
-                    })}
-
-                    {/* More avatars button */}
-                    <AvatarSelectorButton
-                      selectedAvatarId={selectedAvatarId}
-                      onAvatarSelect={handleAvatarSelect}
-                      t={t}
-                      size="lg"
-                      className="!w-14 !h-14"
-                    />
+                {/* Avatar Selection - Skip for authenticated users with existing avatar */}
+                {hasAuthenticatedAvatar ? (
+                  <div className="space-y-3">
+                    <Label className="text-sm font-bold uppercase text-slate-600 dark:text-slate-400">
+                      {t('multiplayerFlow.profileSetup.avatarLabel') || 'Your avatar'}
+                    </Label>
+                    <div className="p-3 rounded-neo bg-purple-50 dark:bg-purple-900/30 border-2 border-purple-200 dark:border-purple-700 flex items-center gap-3">
+                      <div className="w-14 h-14 rounded-full border-3 border-neo-cyan shadow-hard overflow-hidden flex-shrink-0">
+                        {profilePictureUrl ? (
+                          <img
+                            src={profilePictureUrl}
+                            alt={displayName || 'Profile'}
+                            className="w-full h-full object-cover"
+                          />
+                        ) : initialAvatarId ? (
+                          <img
+                            src={getAvatarPath(getAvatarById(initialAvatarId) || AVATARS[0])}
+                            alt={displayName || 'Avatar'}
+                            className="w-full h-full object-cover"
+                          />
+                        ) : null}
+                      </div>
+                      <p className="text-sm text-slate-700 dark:text-slate-200">
+                        {t('multiplayerFlow.profileSetup.usingProfileAvatar') || 'Using your profile avatar'}
+                      </p>
+                    </div>
                   </div>
-                </div>
+                ) : (
+                  <div className="space-y-3">
+                    <Label className="text-sm font-bold uppercase text-slate-600 dark:text-slate-400">
+                      {t('multiplayerFlow.profileSetup.avatarLabel') || 'Choose your avatar'}
+                    </Label>
+
+                    {/* Scrollable avatar grid */}
+                    <div className="max-h-32 overflow-y-auto rounded-lg border-2 border-slate-200 dark:border-slate-600 p-2 bg-white/50 dark:bg-slate-700/50">
+                      <div className="grid grid-cols-6 sm:grid-cols-8 gap-2">
+                        {quickAvatars.map((avatar) => {
+                          const isSelected = selectedAvatarId === avatar.id;
+                          const avatarConfig = getAvatarById(avatar.id);
+
+                        return (
+                          <button
+                            key={avatar.id}
+                            type="button"
+                            onClick={() => handleAvatarSelect(avatar)}
+                            className={cn(
+                              "w-14 h-14 rounded-full border-3 shadow-hard-sm transition-all overflow-hidden",
+                              isSelected
+                                ? "border-neo-cyan scale-110 shadow-hard"
+                                : "border-neo-black hover:scale-105"
+                            )}
+                            aria-label={`Select ${avatar.name} avatar`}
+                            aria-pressed={isSelected}
+                          >
+                            {avatarConfig && (
+                              <img
+                                src={getAvatarPath(avatarConfig)}
+                                alt={avatar.name}
+                                className="w-full h-full object-cover"
+                              />
+                            )}
+                          </button>
+                        );
+                      })}
+
+                      {/* More avatars button */}
+                      <AvatarSelectorButton
+                        selectedAvatarId={selectedAvatarId}
+                        onAvatarSelect={handleAvatarSelect}
+                        t={t}
+                        size="lg"
+                        className="!w-14 !h-14"
+                      />
+                    </div>
+                    </div>
+                  </div>
+                )}
 
                 {/* Continue Button */}
                 <Button
@@ -285,7 +323,6 @@ const ProfileSetup: React.FC<ProfileSetupProps> = ({
                   <FaCheck className="mr-2" />
                   {t('multiplayerFlow.profileSetup.continueButton') || 'Continue'}
                 </Button>
-                </div>
               </CardContent>
             </Card>
           </motion.div>

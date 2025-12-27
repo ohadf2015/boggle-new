@@ -246,8 +246,8 @@ export const GameSettingsPanel = memo<GameSettingsPanelProps>(({
                         const difficultyConfig = DIFFICULTIES[key];
                         const recommendedMinutes = Math.round(getRecommendedTimer(key) / 60);
                         const difficultyColors: Record<string, string> = {
-                          EASY: 'bg-neo-lime',
-                          MEDIUM: 'bg-neo-orange',
+                          EASY: 'bg-neo-lime text-neo-black',
+                          MEDIUM: 'bg-neo-orange text-neo-black',
                           HARD: 'bg-neo-red text-neo-white',
                         };
                         return (
@@ -261,7 +261,7 @@ export const GameSettingsPanel = memo<GameSettingsPanelProps>(({
                                 className={cn(
                                   "relative px-2 py-1.5 rounded-neo font-bold transition-all duration-100 border-2 text-xs flex items-center gap-1",
                                   isSelected
-                                    ? `${difficultyColors[key] || 'bg-neo-cyan'} border-neo-black ring-2 ring-neo-white ring-offset-1 ring-offset-neo-black shadow-none`
+                                    ? `${difficultyColors[key] || 'bg-neo-cyan text-neo-black'} border-neo-black ring-2 ring-neo-white ring-offset-1 ring-offset-neo-black shadow-none`
                                     : "bg-neo-cream text-neo-black border-neo-black shadow-hard-sm hover:shadow-hard"
                                 )}
                               >
