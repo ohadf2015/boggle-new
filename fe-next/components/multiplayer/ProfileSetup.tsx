@@ -167,9 +167,9 @@ const ProfileSetup: React.FC<ProfileSetupProps> = ({
             className="w-full max-w-md"
           >
             <Card className="border-3 border-neo-black dark:border-slate-600 shadow-hard">
-              <CardContent className="p-6 sm:p-8 space-y-6">
+              <CardContent className="p-4 sm:p-6 space-y-4">
                 {/* Contextual message */}
-                <p className="text-center text-sm text-neo-black/70 dark:text-neo-cream/70">
+                <p className="text-center text-sm text-neo-black/80 dark:text-slate-300">
                   {mode === 'create'
                     ? (t('multiplayerFlow.profileSetup.forCreate') || 'Almost there! Set up your profile to create a room.')
                     : (t('multiplayerFlow.profileSetup.forJoin') || 'Almost there! Set up your profile to join a room.')
@@ -184,8 +184,8 @@ const ProfileSetup: React.FC<ProfileSetupProps> = ({
 
                   {isAuthenticated && displayName ? (
                     // Authenticated user - show display name as badge
-                    <div className="p-3 rounded-neo bg-purple-50 dark:bg-purple-900/20 border-2 border-purple-200 dark:border-purple-800">
-                      <p className="text-sm text-slate-600 dark:text-gray-300">
+                    <div className="p-3 rounded-neo bg-purple-50 dark:bg-purple-900/30 border-2 border-purple-200 dark:border-purple-700">
+                      <p className="text-sm text-slate-700 dark:text-slate-200">
                         {t('joinView.playingAs') || 'Playing as'}{' '}
                         <span className="font-bold text-purple-600 dark:text-purple-400">{displayName}</span>
                       </p>
@@ -213,7 +213,7 @@ const ProfileSetup: React.FC<ProfileSetupProps> = ({
                         placeholder={t('multiplayerFlow.profileSetup.usernamePlaceholder') || 'Enter your name'}
                         maxLength={20}
                       />
-                      <p id="username-hint" className="text-xs text-neo-black/50 dark:text-neo-cream/50">
+                      <p id="username-hint" className="text-xs text-slate-500 dark:text-slate-400">
                         {t('multiplayerFlow.profileSetup.usernameHint') || '2-20 characters, letters and numbers'}
                       </p>
                       {showUsernameError && (

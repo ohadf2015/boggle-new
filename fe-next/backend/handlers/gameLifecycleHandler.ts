@@ -352,7 +352,10 @@ function registerGameLifecycleHandlers(io: Server, socket: Socket): void {
           maxWords: 10000, // No practical limit - trie makes this fast
           trie
         });
-        const totalBoardWords = allWords.length;
+        // Only count 5+ letter words for "Words Remaining" display
+        // This prevents overwhelming numbers and focuses on meaningful words
+        const MIN_DISPLAY_WORD_LENGTH = 5;
+        const totalBoardWords = allWords.filter((word: string) => word.length >= MIN_DISPLAY_WORD_LENGTH).length;
 
         // Store in game state for late joiners
         const currentGame = getGame(gameCode);

@@ -140,7 +140,10 @@ const he = {
     "newGame": "משחק חדש",
     "join": "הצטרף",
     "showLess": "הצג פחות",
-    "or": "או"
+    "or": "או",
+    "closeMenu": "סגור תפריט",
+    "openMenu": "פתח תפריט",
+    "language": "שפה"
   },
   "theme": {
     "sundayFunday": "יום ראשון כיפי",
@@ -247,6 +250,7 @@ const he = {
     "remove": "הסר בוט",
     "removeError": "נכשל בהסרת הבוט",
     "currentBots": "בוטים בחדר",
+    "maxBots": "הגעת למספר הבוטים המרבי",
     "quickAdd": "הוסף",
     "add": "הוסף",
     "emptyState": "הוסיפו בוטים להתאמן או למלא את החדר",
@@ -834,7 +838,8 @@ const he = {
     "you": "(אתה)",
     "betterLuckNextTime": "יותר מזל בפעם הבאה!",
     "yourPlace": "מקום {rank}",
-    "tryAgainEncouragement": "המשיכו לשחק כדי להשתפר!"
+    "tryAgainEncouragement": "המשיכו לשחק כדי להשתפר!",
+    "of": "מתוך"
   },
   "archetypes": {
     "strategist": "האסטרטג",
@@ -1819,6 +1824,7 @@ const he = {
     "autoFillDesc": "ממלא את החדר ב-{count} יריבי AI",
     "addBotsPrompt": "הוסף יריבי AI להתחרות נגדם!",
     "addBotsHint": "השתמש במילוי אוטומטי או לחץ על הכפתורים למעלה",
+    "beatYourRecord": "שברת את השיא שלך!",
     "preset": {
       "recommended": "מומלץ",
       "tapToPlay": "הקש לשחק",
@@ -1849,7 +1855,31 @@ const he = {
       "personalBestDesc": "אתגר רגיל - עקוב אחר ההתקדמות",
       "ultra": "אתגר אולטימטיבי",
       "ultraDesc": "אתגר השיא הגבוה האולטימטיבי"
+    },
+    "wizard": {
+      "selectMode": "בחר מצב משחק",
+      "chooseDifficulty": "בחר רמת קושי",
+      "gridPreview": "תצוגת לוח",
+      "configureOptions": "אפשרויות משחק",
+      "reviewSettings": "סקירה והתחלה",
+      "stepOf": "שלב {current} מתוך {total}",
+      "showAll": "הצג הכל",
+      "useSteps": "השתמש בשלבים",
+      "editMode": "עריכת מצב",
+      "editSettings": "עריכת הגדרות",
+      "stepMode": "מצב",
+      "stepDifficulty": "קושי",
+      "stepOptions": "אפשרויות",
+      "stepReview": "סקירה"
     }
+  },
+  "practice": {
+    "tips": "טיפים לאימון",
+    "noTimer": "ללא הגבלת זמן - שחק בקצב שלך",
+    "exploreTip": "חקור ומצא כמה שיותר מילים"
+  },
+  "wizard": {
+    "stepOf": "שלב {current} מתוך {total}"
   },
   "landscape": {
     "tutorialTitle": "פקדי מסך רחב",

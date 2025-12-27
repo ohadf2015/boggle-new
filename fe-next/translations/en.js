@@ -141,7 +141,10 @@ const en = {
     "newGame": "New Game",
     "join": "Join",
     "showLess": "Show less",
-    "or": "or"
+    "or": "or",
+    "closeMenu": "Close menu",
+    "openMenu": "Open menu",
+    "language": "Language"
   },
   "theme": {
     "sundayFunday": "Sunday Funday",
@@ -248,6 +251,7 @@ const en = {
     "remove": "Remove bot",
     "removeError": "Failed to remove bot",
     "currentBots": "Current bots:",
+    "maxBots": "Maximum bots reached",
     "quickAdd": "Add",
     "add": "Add",
     "emptyState": "No bots yet - add some to practice!",
@@ -837,7 +841,8 @@ const en = {
     "you": "(You)",
     "betterLuckNextTime": "Better luck next time!",
     "yourPlace": "{rank}th Place",
-    "tryAgainEncouragement": "Keep playing to improve!"
+    "tryAgainEncouragement": "Keep playing to improve!",
+    "of": "of"
   },
   "archetypes": {
     "strategist": "The Strategist",
@@ -1822,6 +1827,7 @@ const en = {
     "autoFillDesc": "Fills room with {count} AI opponents",
     "addBotsPrompt": "Add AI opponents to compete against!",
     "addBotsHint": "Use auto-fill or click the buttons above",
+    "beatYourRecord": "You beat your record!",
     "preset": {
       "recommended": "Best",
       "tapToPlay": "Tap to play",
@@ -1852,7 +1858,31 @@ const en = {
       "personalBestDesc": "Standard challenge - track your progress",
       "ultra": "Ultra Challenge",
       "ultraDesc": "Ultimate high score challenge"
+    },
+    "wizard": {
+      "selectMode": "Select Game Mode",
+      "chooseDifficulty": "Choose Difficulty",
+      "gridPreview": "Grid Preview",
+      "configureOptions": "Game Options",
+      "reviewSettings": "Review & Start",
+      "stepOf": "Step {current} of {total}",
+      "showAll": "Show All",
+      "useSteps": "Use Steps",
+      "editMode": "Edit Mode",
+      "editSettings": "Edit Settings",
+      "stepMode": "Mode",
+      "stepDifficulty": "Difficulty",
+      "stepOptions": "Options",
+      "stepReview": "Review"
     }
+  },
+  "practice": {
+    "tips": "Practice Tips",
+    "noTimer": "No time limit - play at your own pace",
+    "exploreTip": "Explore and find as many words as possible"
+  },
+  "wizard": {
+    "stepOf": "Step {current} of {total}"
   },
   "landscape": {
     "tutorialTitle": "Landscape Controls",

@@ -91,6 +91,15 @@ module.exports = {
           cyan: "rgba(0, 255, 255, 0.5)",
           pink: "rgba(255, 20, 147, 0.5)",
         },
+        // Bot-specific colors (purple/indigo theme for AI opponents)
+        bot: {
+          purple: "#9333ea",        // Purple-600 - Primary bot color
+          "purple-light": "#a855f7", // Purple-500 - Light accent
+          "purple-dark": "#7e22ce",  // Purple-700 - Dark accent
+          indigo: "#6366f1",         // Indigo-500 - Secondary bot color
+          "indigo-dark": "#4f46e5",  // Indigo-600 - Dark secondary
+          border: "#581c87",         // Purple-900 - Border color
+        },
         // Avatar colors
         avatar: {
           1: "#FF6B6B",
@@ -164,6 +173,8 @@ module.exports = {
         'hard-yellow': '4px 4px 0px var(--neo-yellow)',
         'hard-pink': '4px 4px 0px var(--neo-pink)',
         'hard-cyan': '4px 4px 0px var(--neo-cyan)',
+        'hard-purple': '4px 4px 0px #581c87',
+        'hard-purple-lg': '6px 6px 0px #581c87',
         // Remove default shadows
         'none': 'none',
       },

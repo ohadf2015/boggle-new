@@ -52,19 +52,20 @@ interface StepItem {
 
 // Interactive Mini Grid Demo Component - Auto-plays words with combo demonstration
 const InteractiveGridDemo: React.FC<InteractiveGridDemoProps> = ({ t, dir }) => {
-  const demoGrid = [
+  // Memoize demo data to prevent recreation on every render
+  const demoGrid = useMemo(() => [
     ['C', 'A', 'T'],
     ['O', 'R', 'S'],
     ['W', 'D', 'E']
-  ];
+  ], []);
 
   // Demo sequence: words to show with combo building
-  const demoSequence: DemoWord[] = [
+  const demoSequence = useMemo<DemoWord[]>(() => [
     { word: 'CAT', path: [[0,0], [0,1], [0,2]], points: 2 },
     { word: 'RAT', path: [[1,1], [0,1], [0,2]], points: 2 },
     { word: 'ART', path: [[0,1], [1,1], [0,2]], points: 2 },
     { word: 'CARS', path: [[0,0], [0,1], [1,1], [1,2]], points: 3 },
-  ];
+  ], []);
 
   const [selectedCells, setSelectedCells] = useState<[number, number][]>([]);
   const [currentWordIndex, setCurrentWordIndex] = useState(0);
@@ -76,13 +77,13 @@ const InteractiveGridDemo: React.FC<InteractiveGridDemoProps> = ({ t, dir }) => 
 
   const currentDemo = demoSequence[currentWordIndex] ?? demoSequence[0] ?? { word: '', path: [], points: 0 };
 
-  // Calculate combo multiplier
-  const getComboMultiplier = (combo: number): number => {
+  // Calculate combo multiplier (memoized for stable reference)
+  const getComboMultiplier = useCallback((combo: number): number => {
     if (combo <= 2) return 1;
     if (combo <= 4) return 1.25;
     if (combo <= 6) return 1.5;
     return 1.75;
-  };
+  }, []);
 
   const animateWord = useCallback(() => {
     if (isAnimating) return;
@@ -122,7 +123,7 @@ const InteractiveGridDemo: React.FC<InteractiveGridDemoProps> = ({ t, dir }) => 
         }
       }, 1200);
     }, currentWord.path.length * 300 + 400);
-  }, [currentWordIndex, isAnimating, comboCount]);
+  }, [currentWordIndex, isAnimating, comboCount, getComboMultiplier, demoSequence]);
 
   // Auto-play animation
   useEffect(() => {

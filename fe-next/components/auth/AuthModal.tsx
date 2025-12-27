@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FaGoogle, FaDiscord, FaTimes } from 'react-icons/fa';
@@ -41,8 +41,57 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, showGuestStats =
   const isDarkMode = theme === 'dark';
   const [isLoading, setIsLoading] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const modalRef = useRef<HTMLDivElement>(null);
+  const previousActiveElement = useRef<HTMLElement | null>(null);
 
   const guestStats: GuestStats | null = showGuestStats ? getGuestStatsSummary() : null;
+
+  // Focus trap and keyboard handling
+  const handleKeyDown = useCallback((e: KeyboardEvent) => {
+    if (e.key === 'Escape') {
+      onClose();
+      return;
+    }
+
+    // Focus trap
+    if (e.key === 'Tab' && modalRef.current) {
+      const focusableElements = modalRef.current.querySelectorAll<HTMLElement>(
+        'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+      );
+      const firstElement = focusableElements[0];
+      const lastElement = focusableElements[focusableElements.length - 1];
+
+      if (e.shiftKey && document.activeElement === firstElement) {
+        e.preventDefault();
+        lastElement?.focus();
+      } else if (!e.shiftKey && document.activeElement === lastElement) {
+        e.preventDefault();
+        firstElement?.focus();
+      }
+    }
+  }, [onClose]);
+
+  // Manage focus on open/close
+  useEffect(() => {
+    if (isOpen) {
+      previousActiveElement.current = document.activeElement as HTMLElement;
+      document.addEventListener('keydown', handleKeyDown);
+      // Focus the first focusable element after a short delay for animation
+      setTimeout(() => {
+        const firstFocusable = modalRef.current?.querySelector<HTMLElement>(
+          'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+        );
+        firstFocusable?.focus();
+      }, 100);
+    }
+
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+      if (!isOpen && previousActiveElement.current) {
+        previousActiveElement.current.focus();
+      }
+    };
+  }, [isOpen, handleKeyDown]);
 
   const handleSignIn = async (provider: 'google' | 'discord') => {
     setIsLoading(provider);
@@ -93,6 +142,10 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, showGuestStats =
         onClick={onClose}
       >
         <motion.div
+          ref={modalRef}
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="auth-modal-title"
           initial={{ scale: 0.95, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           exit={{ scale: 0.95, opacity: 0 }}
@@ -105,10 +158,13 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, showGuestStats =
         >
           {/* Header */}
           <div className="flex items-center justify-between mb-6">
-            <h2 className={cn(
-              'text-xl font-bold',
-              isDarkMode ? 'text-white' : 'text-gray-900'
-            )}>
+            <h2
+              id="auth-modal-title"
+              className={cn(
+                'text-xl font-bold',
+                isDarkMode ? 'text-white' : 'text-gray-900'
+              )}
+            >
               {t('auth.signIn')}
             </h2>
             <Button
@@ -116,6 +172,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, showGuestStats =
               size="icon"
               onClick={onClose}
               className="rounded-full"
+              aria-label={t('common.close') || 'Close'}
               asChild={false}
             >
               <FaTimes size={18} />

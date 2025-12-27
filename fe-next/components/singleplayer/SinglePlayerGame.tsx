@@ -106,15 +106,20 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
   // Ref to access current availableWords in callbacks (avoids stale closure)
   const availableWordsRef = useRef(availableWords);
 
-  // Calculate total board words from availableWords
+  // Minimum word length for "Words Remaining" counter and hints
+  // Only count/hint words with 5+ letters to reduce overwhelming large numbers
+  const MIN_TRACKED_WORD_LENGTH = 5;
+
+  // Calculate total board words from availableWords (only 5+ letter words)
   const totalBoardWords = React.useMemo(() => {
     if (!availableWords) return null;
     // Combine all words from easy, medium, and hard categories
+    // Filter to only include words with 5+ letters
     const allWords = new Set([
       ...availableWords.easy,
       ...availableWords.medium,
       ...availableWords.hard,
-    ]);
+    ].filter(word => word.length >= MIN_TRACKED_WORD_LENGTH));
     return allWords.size;
   }, [availableWords]);
 
@@ -193,7 +198,12 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
   const botIntervalsRef = useRef<NodeJS.Timeout[]>([]);
   const foundWordsSetRef = useRef<Set<string>>(new Set());
   const gameOverCalledRef = useRef(false);
-  const gameStartTimeRef = useRef<number>(Date.now()); // Track when game started for pace analysis
+  const gameStartTimeRef = useRef<number>(0); // Track when game started for pace analysis
+
+  // Set game start time on mount
+  useEffect(() => {
+    gameStartTimeRef.current = Date.now();
+  }, []);
 
   // Abuse detection: track submission timestamps (like multiplayer's spamDetector)
   const submissionTimestampsRef = useRef<number[]>([]);
@@ -648,40 +658,32 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
 
   // Timer is now handled by useGameTimer hook (lines 126-136)
 
-  // Bot simulation effect - wait for availableWords before starting
-  // This ensures bots use actual words from the grid solver instead of placeholders
-  useEffect(() => {
-    if (settings.mode !== 'solo-bots' || isPaused || settings.bots.length === 0 || isGameOver) return;
-    // Wait for availableWords to be fetched before starting bot simulation
-    // This prevents bots from using fallback placeholder words
-    if (!availableWords) return;
+  // Bot interval helper - use refs for random intervals to avoid impure function in effect
+  const botIntervalsDataRef = useRef<Map<string, number>>(new Map());
+  const getBotInterval = useCallback((difficulty: 'easy' | 'medium' | 'hard', botId: string): number => {
+    // Check if we already have an interval for this bot
+    const cached = botIntervalsDataRef.current.get(botId);
+    if (cached) return cached;
 
-    settings.bots.forEach(bot => {
-      const interval = getBotInterval(bot.difficulty);
-      const botInterval = setInterval(() => {
-        if (!isPaused) {
-          simulateBotFindWord(bot);
-        }
-      }, interval);
-      botIntervalsRef.current.push(botInterval);
-    });
-
-    return () => {
-      botIntervalsRef.current.forEach(clearInterval);
-      botIntervalsRef.current = [];
+    const baseIntervals = {
+      easy: 6000,
+      medium: 3500,
+      hard: 2000,
     };
-  }, [settings.mode, settings.bots, isPaused, isGameOver, availableWords]);
-
-  const getBotInterval = (difficulty: 'easy' | 'medium' | 'hard'): number => {
-    const intervals = {
-      easy: 6000 + Math.random() * 4000,
-      medium: 3500 + Math.random() * 3000,
-      hard: 2000 + Math.random() * 2000,
+    const randomFactors = {
+      easy: 4000,
+      medium: 3000,
+      hard: 2000,
     };
-    return intervals[difficulty];
-  };
+    const interval = baseIntervals[difficulty] + Math.random() * randomFactors[difficulty];
+    botIntervalsDataRef.current.set(botId, interval);
+    return interval;
+  }, []);
 
   const simulateBotFindWord = useCallback((bot: BotOpponent) => {
+    // Simple scoring for bots: word length - 1 (no fire round multiplier, no combos)
+    const getBotWordScore = (wordLength: number): number => Math.max(wordLength - 1, 1);
+
     // Use ref to get current availableWords (avoids stale closure)
     const currentAvailableWords = availableWordsRef.current;
 
@@ -697,7 +699,7 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
       if (unusedWords.length > 0) {
         // Pick a random unused word
         const word = unusedWords[Math.floor(Math.random() * unusedWords.length)];
-        const wordScore = calculateWordScore(word.length, 0);
+        const wordScore = getBotWordScore(word.length);
 
         // Mark word as used by this bot
         usedWords.add(word);
@@ -724,8 +726,7 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
     };
     const lengths = wordLengths[bot.difficulty];
     const length = lengths[Math.floor(Math.random() * lengths.length)];
-    // Bots don't have combos, so pass 0
-    const wordScore = calculateWordScore(length, 0);
+    const wordScore = getBotWordScore(length);
 
     setBotScores(prev => ({
       ...prev,
@@ -738,8 +739,35 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
     }));
   }, []);
 
+  // Bot simulation effect - wait for availableWords before starting
+  // This ensures bots use actual words from the grid solver instead of placeholders
+  useEffect(() => {
+    if (settings.mode !== 'solo-bots' || isPaused || settings.bots.length === 0 || isGameOver) return;
+    // Wait for availableWords to be fetched before starting bot simulation
+    // This prevents bots from using fallback placeholder words
+    if (!availableWords) return;
+
+    // Clear cached intervals for fresh game
+    botIntervalsDataRef.current.clear();
+
+    settings.bots.forEach(bot => {
+      const interval = getBotInterval(bot.difficulty, bot.id);
+      const botInterval = setInterval(() => {
+        if (!isPaused) {
+          simulateBotFindWord(bot);
+        }
+      }, interval);
+      botIntervalsRef.current.push(botInterval);
+    });
+
+    return () => {
+      botIntervalsRef.current.forEach(clearInterval);
+      botIntervalsRef.current = [];
+    };
+  }, [settings.mode, settings.bots, isPaused, isGameOver, availableWords, getBotInterval, simulateBotFindWord]);
+
   // Get combo bonus based on combo level and word length - matches backend scoring engine
-  const getComboBonus = (comboLevel: number, wordLength: number): number => {
+  const getComboBonus = useCallback((comboLevel: number, wordLength: number): number => {
     if (comboLevel <= 0) return 0;
 
     // Word length factor - longer words get better combo bonuses
@@ -758,9 +786,9 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
 
     const baseBonus = Math.min(comboLevel, 10);
     return Math.floor(baseBonus * wordLengthFactor);
-  };
+  }, []);
 
-  const calculateWordScore = (wordLength: number, currentComboLevel: number): number => {
+  const calculateWordScore = useCallback((wordLength: number, currentComboLevel: number): number => {
     // Base score: word length - 1 (matches multiplayer scoring)
     const baseScore = Math.max(wordLength - 1, 1);
     // Combo bonus based on combo level and word length (matches backend formula)
@@ -768,7 +796,7 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
     // Fire round multiplier (2x during fire round, 1x otherwise)
     const multiplier = getScoreMultiplier();
     return (baseScore + comboBonus) * multiplier;
-  };
+  }, [getComboBonus, getScoreMultiplier]);
 
 
   // Memoize word submission handler to prevent recreation on every render
@@ -971,7 +999,7 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
           timestamp: Date.now(),
         });
       });
-  }, [settings.language, foundWords, t, playWordAcceptedSound, playComboSound, announceWordResult, announceCombo, combo, getScoreMultiplier, fireRoundActive]);
+  }, [settings.language, foundWords, t, playWordAcceptedSound, playComboSound, announceWordResult, announceCombo, combo, getScoreMultiplier, fireRoundActive, calculateWordScore]);
 
   const handleFinishPractice = useCallback(() => {
     setIsGameOver(true);
@@ -989,12 +1017,12 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
 
     setHintState(prev => ({ ...prev, isLoading: true, error: null }));
 
-    // Get all available words
+    // Get all available words and filter to only 5+ letter words
     const allWords = [
       ...availableWords.easy,
       ...availableWords.medium,
       ...availableWords.hard,
-    ];
+    ].filter(word => word.length >= MIN_TRACKED_WORD_LENGTH);
 
     // Filter out words player already found
     const foundWordsLower = foundWords
@@ -1009,7 +1037,7 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
       setHintState(prev => ({
         ...prev,
         isLoading: false,
-        error: t('hints.noWordsLeft') || 'No more words to find!',
+        error: t('hints.noLongWordsLeft') || 'No more 5+ letter words to find!',
       }));
       // Clear error after 3 seconds
       setTimeout(() => {
@@ -1081,11 +1109,12 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
     }));
   }, []);
 
-  // Check if hints are available (valid words found, not loading, hints remaining)
+  // Check if hints are available (5+ letter words found, not loading, hints remaining)
   const hintsAvailable = !hintState.isLoading &&
     hintState.hintsRemaining > 0 &&
     availableWords !== null &&
-    (availableWords.easy.length + availableWords.medium.length + availableWords.hard.length) > 0;
+    [...availableWords.easy, ...availableWords.medium, ...availableWords.hard]
+      .filter(word => word.length >= MIN_TRACKED_WORD_LENGTH).length > 0;
 
   if (!grid) {
     return (
@@ -1106,6 +1135,8 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
   // Landscape mode layout - maximized grid with minimal chrome
   if (isLandscape) {
     const validWordCount = foundWords.filter(fw => fw.isValid === true).length;
+    // Count only 5+ letter words for WordsRemaining (matches totalBoardWords filter)
+    const longWordCount = foundWords.filter(fw => fw.isValid === true && fw.word.length >= MIN_TRACKED_WORD_LENGTH).length;
 
     return (
       <div className="relative flex items-center justify-center w-full h-full min-h-screen overflow-hidden bg-slate-900 text-white">
@@ -1154,9 +1185,10 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
           {totalBoardWords !== null && totalBoardWords > 0 && (
             <WordsRemaining
               totalWords={totalBoardWords}
-              foundWordsCount={validWordCount}
+              foundWordsCount={longWordCount}
               t={t}
               compact
+              minLength={MIN_TRACKED_WORD_LENGTH}
             />
           )}
           <ComboDisplay comboLevel={combo.comboLevel} compact />
@@ -1541,12 +1573,13 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
         </div>
       )}
 
-      {/* Words Remaining Indicator (above found words) */}
+      {/* Words Remaining Indicator (above found words) - only 5+ letter words */}
       {totalBoardWords !== null && totalBoardWords > 0 && (
         <WordsRemaining
           totalWords={totalBoardWords}
-          foundWordsCount={foundWords.filter(fw => fw.isValid === true).length}
+          foundWordsCount={foundWords.filter(fw => fw.isValid === true && fw.word.length >= MIN_TRACKED_WORD_LENGTH).length}
           t={t}
+          minLength={MIN_TRACKED_WORD_LENGTH}
         />
       )}
 

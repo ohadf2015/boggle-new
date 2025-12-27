@@ -3,13 +3,15 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import dynamic from 'next/dynamic';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FaTrophy, FaMedal, FaRedo, FaHome, FaRobot, FaChartBar, FaCrown, FaStar, FaAward, FaArrowDown, FaCog } from 'react-icons/fa';
-import { Sparkles, TrendingUp, Target } from 'lucide-react';
+import { FaTrophy, FaMedal, FaRedo, FaHome, FaRobot, FaChartBar, FaCrown, FaAward, FaArrowDown, FaCog } from 'react-icons/fa';
+import { Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import GridComponent from '@/components/GridComponent';
 import PlayerInsights from '@/components/results/PlayerInsights';
 import { WordPointsGroup, InvalidWordsSection } from '@/components/results/WordPointsGroup';
+import ResultsWinnerBanner from '@/components/results/ResultsWinnerBanner';
+import Top3Leaderboard, { type LeaderboardParticipant } from '@/components/results/Top3Leaderboard';
 import { AchievementBadge } from '@/components/AchievementBadge';
 import WordFeedbackModal from '@/components/voting/WordFeedbackModal';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -383,148 +385,34 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
       transition={{ duration: 0.4 }}
       className="max-w-2xl mx-auto space-y-6"
     >
-      {/* Victory/Defeat banner - Enhanced */}
-      {mode === 'solo-bots' && (
-        <motion.div
-          initial={{ y: -20, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.2 }}
-          className={cn(
-            'text-center py-6 xs:py-8 rounded-neo-lg border-4 border-neo-black shadow-hard-xl relative overflow-hidden',
-            isWinner ? 'bg-gradient-to-br from-neo-yellow via-yellow-300 to-neo-orange' : 'bg-gradient-to-br from-neo-cream to-slate-100'
-          )}
-        >
-          {/* Halftone texture */}
-          <div
-            className="absolute inset-0 pointer-events-none opacity-10"
-            style={{
-              backgroundImage: `radial-gradient(circle, rgb(var(--neo-black)) 1px, transparent 1px)`,
-              backgroundSize: '8px 8px',
-            }}
-          />
-          <motion.div
-            animate={isWinner ? { rotate: [0, -10, 10, -10, 10, 0], scale: [1, 1.1, 1] } : {}}
-            transition={{ duration: 0.5, delay: 0.3 }}
-            className="relative z-10"
-          >
-            {isWinner ? (
-              <FaTrophy className="text-5xl xs:text-6xl mx-auto mb-3 text-neo-black drop-shadow-[2px_2px_0px_rgba(0,0,0,0.2)]" />
-            ) : (
-              <div className="text-5xl xs:text-6xl font-black text-neo-black/75 mb-3">#{playerRank}</div>
-            )}
-          </motion.div>
-          <h2 className="text-2xl xs:text-3xl font-black uppercase text-neo-black relative z-10" style={{ textShadow: isWinner ? '2px 2px 0px rgba(255,255,255,0.5)' : 'none' }}>
-            {isWinner
-              ? t('singlePlayer.victory') || 'Victory!'
-              : t('singlePlayer.gameOver') || 'Game Over'}
-          </h2>
-        </motion.div>
-      )}
-
-      {/* Practice mode completion - Enhanced */}
-      {mode === 'practice' && (
-        <motion.div
-          initial={{ y: -20, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.2 }}
-          className="text-center py-6 xs:py-8 bg-gradient-to-br from-neo-lime via-lime-300 to-green-400 rounded-neo-lg border-4 border-neo-black shadow-hard-xl"
-        >
-          <h2 className="text-2xl xs:text-3xl font-black uppercase text-neo-black">
-            {t('singlePlayer.practiceComplete') || 'Practice Complete!'}
-          </h2>
-        </motion.div>
-      )}
-
-      {/* Challenge mode - Enhanced with High Score Celebration */}
-      {mode === 'challenge' && (
-        <motion.div
-          initial={{ y: -20, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.2 }}
-          className={cn(
-            'text-center py-6 xs:py-8 rounded-neo-lg border-4 border-neo-black shadow-hard-xl relative overflow-hidden',
-            results.isNewHighScore
-              ? 'bg-gradient-to-br from-neo-yellow via-yellow-300 to-neo-orange'
-              : 'bg-gradient-to-br from-neo-cream to-slate-100 dark:from-slate-700 dark:to-slate-800'
-          )}
-        >
-          {/* Background decoration for high score */}
-          {results.isNewHighScore && (
-            <div className="absolute inset-0 pointer-events-none">
-              <div className="absolute top-4 left-4 text-6xl opacity-10">🏆</div>
-              <div className="absolute bottom-4 right-4 text-6xl opacity-10">⭐</div>
-              <div
-                className="absolute inset-0 opacity-5"
-                style={{
-                  backgroundImage: `radial-gradient(circle, rgb(var(--neo-black)) 1px, transparent 1px)`,
-                  backgroundSize: '12px 12px',
-                }}
-              />
-            </div>
-          )}
-
-          <div className="relative z-10">
-            {results.isNewHighScore ? (
-              <>
-                <motion.div
-                  animate={{
-                    rotate: [0, -10, 10, -10, 10, 0],
-                    scale: [1, 1.1, 1]
-                  }}
-                  transition={{ duration: 0.5, delay: 0.3 }}
-                  className="mb-3"
-                >
-                  <FaCrown className="text-5xl xs:text-6xl mx-auto text-neo-black drop-shadow-lg" />
-                </motion.div>
-                <h2 className="text-2xl xs:text-3xl font-black uppercase text-neo-black mb-2" style={{ textShadow: '2px 2px 0 rgba(255,255,255,0.3)' }}>
-                  {results.isNewAllTimeBest
-                    ? (t('challenge.allTimeRecord') || 'All-Time Record!')
-                    : (t('singlePlayer.newHighScore') || 'New High Score!')}
-                </h2>
-                {results.previousHighScore && results.previousHighScore > 0 && (
-                  <motion.div
-                    initial={{ scale: 0, y: 20 }}
-                    animate={{ scale: 1, y: 0 }}
-                    transition={{ delay: 0.5, type: 'spring' }}
-                    className="inline-flex items-center gap-2 bg-neo-black text-neo-yellow px-4 py-2 rounded-neo font-black"
-                  >
-                    <TrendingUp className="w-5 h-5" />
-                    <span>+{results.playerScore - results.previousHighScore}</span>
-                    <span className="text-sm font-bold opacity-80">
-                      {t('challenge.improvement') || 'improvement'}
-                    </span>
-                  </motion.div>
-                )}
-                {!results.previousHighScore && (
-                  <motion.div
-                    initial={{ scale: 0 }}
-                    animate={{ scale: 1 }}
-                    transition={{ delay: 0.5 }}
-                    className="inline-flex items-center gap-2 bg-neo-black text-neo-yellow px-4 py-2 rounded-neo font-black"
-                  >
-                    <FaStar className="w-4 h-4" />
-                    <span>{t('challenge.firstRecord') || 'First Record Set!'}</span>
-                  </motion.div>
-                )}
-              </>
-            ) : (
-              <>
-                <div className="flex items-center justify-center gap-3 mb-2">
-                  <Target className="w-8 h-8 xs:w-10 xs:h-10 text-neo-black/75 dark:text-neo-cream/75" />
-                </div>
-                <h2 className="text-2xl xs:text-3xl font-black uppercase text-neo-black dark:text-neo-white">
-                  {t('singlePlayer.challengeComplete') || 'Challenge Complete'}
-                </h2>
-                {results.previousHighScore && results.previousHighScore > results.playerScore && (
-                  <p className="mt-2 text-sm text-neo-black/80 dark:text-neo-cream/80">
-                    {(t('challenge.shortOf') || '{diff} points short of your record').replace('{diff}', String(results.previousHighScore - results.playerScore))}
-                  </p>
-                )}
-              </>
-            )}
-          </div>
-        </motion.div>
-      )}
+      {/* Unified Victory/Results Banner - using shared component */}
+      <ResultsWinnerBanner
+        winner={{
+          username: t('common.you') || 'You',
+          score: results.playerScore,
+        }}
+        isCurrentUserWinner={true}
+        rank={mode === 'solo-bots' ? playerRank : 1}
+        variant={
+          mode === 'practice' ? 'completion' :
+          mode === 'challenge' && results.isNewHighScore ? (results.isNewAllTimeBest ? 'newRecord' : 'highScore') :
+          mode === 'challenge' ? 'completion' :
+          'ranking'
+        }
+        customMessage={
+          mode === 'solo-bots' && isWinner ? (t('singlePlayer.victory') || 'Victory!') :
+          mode === 'solo-bots' && !isWinner ? (t('singlePlayer.gameOver') || 'Game Over') :
+          mode === 'practice' ? (t('singlePlayer.practiceComplete') || 'Practice Complete!') :
+          undefined
+        }
+        customAnnouncement={
+          mode === 'solo-bots' ? `#${playerRank} ${t('results.of') || 'of'} ${allParticipants.length}` :
+          mode === 'challenge' && results.previousHighScore && results.previousHighScore > results.playerScore
+            ? (t('challenge.shortOf') || '{diff} points short of your record').replace('{diff}', String(results.previousHighScore - results.playerScore))
+            : undefined
+        }
+        showConfetti={isWinner || results.isNewHighScore}
+      />
 
       {/* Score Display - Large and prominent with comic dots */}
       <motion.div
@@ -668,55 +556,17 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
         </motion.div>
       )}
 
-      {/* Leaderboard (solo-bots mode) - Enhanced */}
+      {/* Leaderboard (solo-bots mode) - using shared Top3Leaderboard component */}
       {mode === 'solo-bots' && results.botScores.length > 0 && (
-        <Card className="border-4 border-neo-black dark:border-slate-600 shadow-hard-lg">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <FaTrophy className="text-neo-yellow" />
-              {t('common.leaderboard') || 'Leaderboard'}
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-3">
-              {allParticipants.map((participant, index) => (
-                <motion.div
-                  key={participant.name}
-                  initial={{ x: -20, opacity: 0 }}
-                  animate={{ x: 0, opacity: 1 }}
-                  transition={{ delay: 0.1 * index }}
-                  className={cn(
-                    'flex items-center justify-between p-4 rounded-neo border-3 shadow-hard-sm',
-                    getRankBgColor(index + 1, participant.isPlayer)
-                  )}
-                >
-                  <div className="flex items-center gap-4">
-                    <div className="w-10 h-10 flex items-center justify-center rounded-full bg-white text-neo-black dark:bg-slate-700 dark:text-white border-2 border-neo-black dark:border-slate-500">
-                      {getRankIcon(index + 1)}
-                    </div>
-                    <div className="flex items-center gap-2">
-                      {!participant.isPlayer && <FaRobot className="text-neo-black/70 dark:text-white/75 text-lg" />}
-                      <span className={cn(
-                        'font-black text-lg text-neo-black dark:text-white',
-                        participant.isPlayer ? '' : 'text-neo-black/80 dark:text-white/80'
-                      )}>
-                        {participant.name}
-                      </span>
-                      {participant.isPlayer && (
-                        <span className="text-xs bg-neo-black text-white px-2 py-0.5 rounded-full font-bold uppercase">
-                          You
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                  <div className="text-2xl font-black text-neo-black dark:text-white">
-                    {participant.score}
-                  </div>
-                </motion.div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
+        <Top3Leaderboard
+          participants={allParticipants.map(p => ({
+            name: p.name,
+            score: p.score,
+            isCurrentPlayer: p.isPlayer,
+            isBot: !p.isPlayer,
+          })) as LeaderboardParticipant[]}
+          headerText={t('common.leaderboard') || 'Leaderboard'}
+        />
       )}
 
       {/* Bot Words Details (solo-bots mode) - Expandable sections for each bot */}

@@ -111,6 +111,9 @@ interface InGameScreenProps {
 
   // Board theme (date-themed words indicator)
   boardTheme?: BoardTheme | null;
+
+  // Total words on board (5+ letters only) for WordsRemaining display
+  totalBoardWords?: number | null;
 }
 
 // ==================== Component ====================
@@ -169,6 +172,9 @@ const InGameScreen = memo<InGameScreenProps>(({
 
   // Board theme
   boardTheme,
+
+  // Total board words
+  totalBoardWords,
 }) => {
   const {
     playWordAcceptedSound,
@@ -613,6 +619,17 @@ const InGameScreen = memo<InGameScreenProps>(({
 
                 {/* Enhanced Combo Display */}
                 <ComboDisplay comboLevel={comboLevel} />
+
+                {/* Words Remaining - 5+ letter words only */}
+                {totalBoardWords !== null && totalBoardWords !== undefined && totalBoardWords > 0 && (
+                  <WordsRemaining
+                    totalWords={totalBoardWords}
+                    foundWordsCount={normalizedFoundWords.filter(fw => fw.isValid !== false && fw.word.length >= 5).length}
+                    t={t}
+                    compact
+                    minLength={5}
+                  />
+                )}
               </motion.div>
             </div>
           )}
@@ -952,6 +969,18 @@ const InGameScreen = memo<InGameScreenProps>(({
         {boardTheme && (
           <div className="flex justify-center mt-1 opacity-70">
             <ThemeIndicator theme={boardTheme} />
+          </div>
+        )}
+
+        {/* Words Remaining - 5+ letter words only */}
+        {isPlaying && totalBoardWords !== null && totalBoardWords !== undefined && totalBoardWords > 0 && (
+          <div className="flex justify-center mt-2">
+            <WordsRemaining
+              totalWords={totalBoardWords}
+              foundWordsCount={normalizedFoundWords.filter(fw => fw.isValid !== false && fw.word.length >= 5).length}
+              t={t}
+              minLength={5}
+            />
           </div>
         )}
 

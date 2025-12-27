@@ -126,8 +126,9 @@ describe('useGameState', () => {
       });
 
       expect(result.current.players).toHaveLength(1);
-      expect(result.current.players[0].avatar.emoji).toBe('🎯');
-      expect(result.current.players[0].isHost).toBe(true);
+      const player = result.current.players[0];
+      expect(player?.avatar?.emoji).toBe('🎯');
+      expect(player?.isHost).toBe(true);
     });
 
     it('should update a player', () => {

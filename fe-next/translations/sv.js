@@ -139,7 +139,11 @@ const sv = {
     "retry": "Försök igen",
     "newGame": "Nytt spel",
     "join": "Gå med",
-    "showLess": "Visa mindre"
+    "showLess": "Visa mindre",
+    "or": "eller",
+    "closeMenu": "Stäng meny",
+    "openMenu": "Öppna meny",
+    "language": "Språk"
   },
   "theme": {
     "sundayFunday": "Kul Söndag",
@@ -246,6 +250,7 @@ const sv = {
     "remove": "Ta bort bot",
     "removeError": "Kunde inte ta bort bot",
     "currentBots": "Bottar i rummet",
+    "maxBots": "Maximalt antal bottar nått",
     "quickAdd": "Lägg till",
     "add": "Lägg till",
     "emptyState": "Lägg till bottar för att öva eller fylla rummet",
@@ -295,7 +300,8 @@ const sv = {
     "telegram": "Telegram",
     "more": "Mer...",
     "inviteTitle": "Gå med i mitt LexiClash-spel!",
-    "copied": "Kopierat!"
+    "copied": "Kopierat!",
+    "shareVictory": "Dela din seger!"
   },
   "errors": {
     "unstableConnection": "Internetanslutningen är instabil - du kan uppleva problem under spelet",
@@ -409,6 +415,7 @@ const sv = {
     "nickname": "Smeknamn",
     "nicknamePlaceholder": "Ange ditt smeknamn",
     "roomCode": "Rumskod",
+    "changeAvatar": "Byt avatar",
     "defaultPlayerNames": [
       "Smyg Gurka",
       "Disco Potatis",
@@ -606,7 +613,8 @@ const sv = {
     "hostPlaysShort": "Värd spelar",
     "hostSpectates": "Åskådar",
     "letters": "bokstäver",
-    "players": "spelare"
+    "players": "spelare",
+    "letterMinimum": "bokstäver minimum"
   },
   "playerView": {
     "waitingForHost": "Väntar på att värden ska starta...",
@@ -617,6 +625,9 @@ const sv = {
     "wordsFound": "Ord hittade",
     "wordsOnBoard": "Ord på brädet",
     "wordsRemaining": "ord kvar",
+    "longWordsLabel": "{{min}}+ bokstäver",
+    "longWordsOnBoard": "{{min}}+ bokstävers ord",
+    "longWordsRemaining": "{{min}}+ bokstavsord kvar",
     "remaining": "Kvar",
     "found": "hittade",
     "total": "totalt",
@@ -637,6 +648,9 @@ const sv = {
     "players": "Spelare",
     "yourAchievements": "Dina prestationer",
     "letterGrid": "Bokstavsbräde",
+    "longWordsLabel": "${min}+ bokstäver",
+    "longWordsOnBoard": "${min}+ bokstavsord",
+    "longWordsRemaining": "${min}+ bokstavsord kvar",
     "waitingForGame": "Väntar på spel...",
     "add": "Lägg till",
     "enterWord": "Ange ord...",
@@ -685,7 +699,10 @@ const sv = {
     "words": "Ord",
     "alreadyFound": "Redan hittad",
     "invalidWord": "Ogiltigt ord",
-    "pendingValidation": "Väntar på validering"
+    "pendingValidation": "Väntar på validering",
+    "longWordsLabel": "${min}+ bokstäver",
+    "longWordsOnBoard": "${min}+ bokstävers ord",
+    "longWordsRemaining": "${min}+ bokstävers ord kvar"
   },
   "lateJoiner": {
     "welcomeTitle": "Spelet pågår!",
@@ -717,6 +734,7 @@ const sv = {
     "loading": "Hämtar ledtråd...",
     "noHints": "Inga ledtrådar kvar",
     "noWordsLeft": "Inga fler ord att hitta!",
+    "noLongWordsLeft": "Inga fler 5+ bokstävers ord att hitta!",
     "lookFor": "Leta efter ett",
     "letterWord": "bokstävers ord",
     "letters": "bokstäver",
@@ -727,7 +745,8 @@ const sv = {
     "vowels": "vokaler",
     "withDoubles": "med dubbla bokstäver",
     "longerWord": "Ett längre ord",
-    "shortWord": "Kort ord"
+    "shortWord": "Kort ord",
+    "noLongWordsLeft": "Inga fler 5+ bokstavsord att hitta!"
   },
   "achievementPopup": {
     "unlocked": "Prestation upplåst!",
@@ -818,7 +837,8 @@ const sv = {
     "you": "(Du)",
     "betterLuckNextTime": "Bättre lycka nästa gång!",
     "yourPlace": "{rank}:e plats",
-    "tryAgainEncouragement": "Fortsätt spela för att förbättra dig!"
+    "tryAgainEncouragement": "Fortsätt spela för att förbättra dig!",
+    "of": "av"
   },
   "archetypes": {
     "strategist": "Strategen",
@@ -1508,7 +1528,8 @@ const sv = {
     "backToRoom": "Tillbaka till rummet",
     "backToLobby": "Tillbaka till lobbyn",
     "locked": "Låst",
-    "earnThisAchievement": "Spela spel för att låsa upp denna prestation!"
+    "earnThisAchievement": "Spela spel för att låsa upp denna prestation!",
+    "connectedAccount": "Ansluten med ditt konto"
   },
   "leaderboard": {
     "title": "Topplista",
@@ -1801,7 +1822,63 @@ const sv = {
     "aiOpponents": "AI-motståndare",
     "autoFillDesc": "Fyller rummet med {count} AI-motståndare",
     "addBotsPrompt": "Lägg till AI-motståndare att tävla mot!",
-    "addBotsHint": "Använd autofyll eller klicka på knapparna ovan"
+    "addBotsHint": "Använd autofyll eller klicka på knapparna ovan",
+    "beatYourRecord": "Du slog ditt rekord!",
+    "preset": {
+      "recommended": "Bäst",
+      "tapToPlay": "Tryck för att spela",
+      "customGame": "Anpassat Spel",
+      "hint": "Tryck på valfri förinställning för snabbstart, eller anpassa ditt spel",
+      "quickStart": "Snabbstart",
+      "quick": "Snabbspel",
+      "quickDesc": "Snabbt 1-minuts spel på litet bräde",
+      "standard": "Standard",
+      "standardDesc": "Klassisk Boggle-upplevelse",
+      "intense": "Intensivt",
+      "intenseDesc": "Stort bräde, mer tid, hårdare konkurrens",
+      "friendly": "Vänskapsmatch",
+      "friendlyDesc": "Avslappnat spel med lätta motståndare",
+      "competitive": "Tävling",
+      "competitiveDesc": "Balanserad utmaning mot skickliga bottar",
+      "battle": "Battle Royale",
+      "battleDesc": "Ultimat test mot expertbottar",
+      "explorer": "Bokstavsutforskare",
+      "explorerDesc": "Litet bräde, ta din tid",
+      "hunter": "Ordjägare",
+      "hunterDesc": "Hitta alla ord i din egen takt",
+      "mastery": "Ordförrådsträning",
+      "masteryDesc": "Stort bräde för omfattande övning",
+      "warmup": "Daglig uppvärmning",
+      "warmupDesc": "Snabb uppvärmning för att slå ditt rekord",
+      "personalBest": "Personbästa",
+      "personalBestDesc": "Standardutmaning - följ dina framsteg",
+      "ultra": "Ultra utmaning",
+      "ultraDesc": "Ultimat högpoängsutmaning"
+    },
+    "wizard": {
+      "selectMode": "Välj spelläge",
+      "chooseDifficulty": "Välj svårighetsgrad",
+      "gridPreview": "Förhandsgranskning av rutnät",
+      "configureOptions": "Spelalternativ",
+      "reviewSettings": "Granska & Starta",
+      "stepOf": "Steg {current} av {total}",
+      "showAll": "Visa alla",
+      "useSteps": "Använd steg",
+      "editMode": "Redigera läge",
+      "editSettings": "Redigera inställningar",
+      "stepMode": "Läge",
+      "stepDifficulty": "Svårighet",
+      "stepOptions": "Alternativ",
+      "stepReview": "Granska"
+    }
+  },
+  "practice": {
+    "tips": "Övningstips",
+    "noTimer": "Ingen tidsgräns - spela i din egen takt",
+    "exploreTip": "Utforska och hitta så många ord som möjligt"
+  },
+  "wizard": {
+    "stepOf": "Steg {current} av {total}"
   },
   "landscape": {
     "tutorialTitle": "Landskapskontroller",

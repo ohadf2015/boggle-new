@@ -21,7 +21,7 @@ import { FaPaperPlane, FaComments, FaBell } from 'react-icons/fa';
 import toast from 'react-hot-toast';
 import { useAnnouncer } from './GameAnnouncer';
 
-const MAX_CHAT_HEIGHT = 300; // Max height in pixels
+const MAX_CHAT_HEIGHT = 400; // Max height in pixels
 const ESTIMATED_MESSAGE_HEIGHT = 60; // Estimated height per message
 
 interface ChatMessage {
@@ -258,35 +258,35 @@ const RoomChat: React.FC<RoomChatProps> = ({ username, isHost, gameCode, classNa
           style={{ maxHeight: MAX_CHAT_HEIGHT }}
         >
           {messages.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-8 gap-4">
-              {/* NEO-BRUTALIST empty state */}
+            <div className="flex flex-col items-center justify-center py-4 gap-2">
+              {/* NEO-BRUTALIST empty state - compact version */}
               <motion.div
                 initial={{ scale: 0.8, rotate: -5 }}
                 animate={{ scale: 1, rotate: 0 }}
                 transition={{ type: "spring", stiffness: 300, damping: 20 }}
                 className="relative"
               >
-                {/* Decorative background shapes */}
-                <div className="absolute -top-2 -right-2 w-16 h-16 bg-neo-pink text-white border-3 border-neo-black rotate-12 -z-10" />
-                <div className="absolute -bottom-2 -left-2 w-12 h-12 bg-neo-cyan text-neo-black border-3 border-neo-black -rotate-6 -z-10" />
+                {/* Decorative background shapes - smaller */}
+                <div className="absolute -top-1 -right-1 w-10 h-10 bg-neo-pink text-white border-2 border-neo-black rotate-12 -z-10" />
+                <div className="absolute -bottom-1 -left-1 w-8 h-8 bg-neo-cyan text-neo-black border-2 border-neo-black -rotate-6 -z-10" />
 
-                {/* Main icon container */}
-                <div className="bg-neo-yellow text-neo-black border-3 border-neo-black shadow-hard p-4 rotate-[-2deg]">
-                  <FaComments className="text-4xl text-neo-black" />
+                {/* Main icon container - smaller */}
+                <div className="bg-neo-yellow text-neo-black border-2 border-neo-black shadow-hard-sm p-2 rotate-[-2deg]">
+                  <FaComments className="text-2xl text-neo-black" />
                 </div>
               </motion.div>
 
-              {/* Text with Neo-Brutalist styling */}
+              {/* Text with Neo-Brutalist styling - smaller */}
               <motion.div
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.2 }}
                 className="text-center"
               >
-                <div className="bg-neo-black text-neo-white px-4 py-2 font-black uppercase text-sm tracking-wider rotate-[1deg] shadow-hard-sm border-2 border-neo-black">
+                <div className="bg-neo-black text-neo-white px-3 py-1 font-black uppercase text-xs tracking-wider rotate-[1deg] shadow-hard-sm border-2 border-neo-black">
                   {t('chat.noMessages') || 'No messages yet'}
                 </div>
-                <p className="text-neo-black/75 font-bold text-xs mt-3 uppercase tracking-wide">
+                <p className="text-neo-black/75 font-bold text-[10px] mt-2 uppercase tracking-wide">
                   {t('chat.startChatting') || 'Start chatting!'}
                 </p>
               </motion.div>

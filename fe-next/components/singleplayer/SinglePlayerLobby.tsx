@@ -26,6 +26,7 @@ import {
 } from '@/utils/dailyChallenge';
 import type { DifficultyLevel, Language } from '@/shared/types/game';
 import type { SinglePlayerGameState, SinglePlayerMode, BotOpponent } from './SinglePlayerView';
+import { ConfigWizardNav, WizardNavigationButtons, type WizardStep } from './ConfigWizardNav';
 
 interface SinglePlayerLobbyProps {
   initialSettings: SinglePlayerGameState;
@@ -43,8 +44,8 @@ const BOT_NAMES = [
 const MODE_CONFIG = {
   'solo-bots': {
     Icon: FaRobot,
-    color: 'from-neo-cyan to-cyan-400',
-    selectedBorder: 'border-neo-cyan',
+    color: 'from-bot-purple via-bot-purple-dark to-bot-indigo',
+    selectedBorder: 'border-bot-purple',
     labelKey: 'singlePlayer.soloVsBots',
     descKey: 'singlePlayer.soloVsBotsDesc',
   },
@@ -124,6 +125,32 @@ const SinglePlayerLobby: React.FC<SinglePlayerLobbyProps> = ({
   const [timerMinutes, setTimerMinutes] = useState(Math.floor(initialSettings.timerSeconds / 60) || 2);
   const [showAdvanced, setShowAdvanced] = useState(false);
 
+  // Wizard step state for step-by-step configuration
+  const [wizardStep, setWizardStep] = useState<WizardStep>(1);
+  const [useWizard, setUseWizard] = useState(true);
+
+  // Wizard step validation
+  const canAdvanceFromStep = useCallback((step: WizardStep): boolean => {
+    switch (step) {
+      case 1: return mode !== null;
+      case 2: return difficulty !== null;
+      case 3: return mode !== 'solo-bots' || bots.length > 0;
+      case 4: return true;
+    }
+  }, [mode, difficulty, bots.length]);
+
+  const handleWizardNext = useCallback(() => {
+    if (wizardStep < 4 && canAdvanceFromStep(wizardStep)) {
+      setWizardStep((prev) => (prev + 1) as WizardStep);
+    }
+  }, [wizardStep, canAdvanceFromStep]);
+
+  const handleWizardBack = useCallback(() => {
+    if (wizardStep > 1) {
+      setWizardStep((prev) => (prev - 1) as WizardStep);
+    }
+  }, [wizardStep]);
+
   const addBot = useCallback(() => {
     if (bots.length >= 5) return;
     const availableNames = BOT_NAMES.filter(name => !bots.some(bot => bot.name === name));
@@ -177,7 +204,7 @@ const SinglePlayerLobby: React.FC<SinglePlayerLobbyProps> = ({
         {/* Landscape mode suggestion banner */}
         <LandscapeIndicator />
 
-        <div className="flex h-screen w-full overflow-hidden bg-slate-900 p-3 gap-4 landscape-full-height">
+        <div className="flex h-screen w-full overflow-hidden bg-slate-900 text-white p-3 gap-4 landscape-full-height">
         {/* Left column: Mode Selection */}
         <div className="w-[40%] flex flex-col gap-3 overflow-y-auto">
           {/* Header with back */}
@@ -331,13 +358,14 @@ const SinglePlayerLobby: React.FC<SinglePlayerLobbyProps> = ({
               </div>
             )}
 
-            {/* Bots (for solo-bots mode) */}
+            {/* Bots (for solo-bots mode) - Purple themed */}
             {mode === 'solo-bots' && (
-              <div>
+              <div className="p-3 bg-gradient-to-br from-bot-purple/20 via-bot-purple-dark/15 to-bot-indigo/20 rounded-neo-lg border-2 border-bot-purple/50 shadow-hard-purple">
                 <div className="flex items-center justify-between mb-2">
                   <label className="text-sm font-bold uppercase text-neo-white flex items-center gap-2">
-                    <FaRobot className="text-base" />
+                    <FaRobot className="text-bot-purple-light" />
                     {t('singlePlayer.opponents') || 'Opponents'}
+                    <Badge className="bg-bot-purple/30 text-bot-purple-light text-[10px] px-1.5 border border-bot-purple">AI</Badge>
                   </label>
                 </div>
                 <div className="flex gap-2 items-center mb-2">
@@ -358,7 +386,7 @@ const SinglePlayerLobby: React.FC<SinglePlayerLobbyProps> = ({
                   <button
                     onClick={addBot}
                     disabled={bots.length >= 5}
-                    className="px-3 py-2 text-sm bg-neo-lime hover:bg-neo-lime/80 disabled:opacity-50 disabled:cursor-not-allowed rounded-neo border-2 border-neo-black font-bold shadow-hard"
+                    className="px-3 py-2 text-sm bg-bot-purple hover:bg-bot-purple-dark disabled:opacity-50 disabled:cursor-not-allowed rounded-neo border-2 border-bot-border text-white font-bold shadow-hard-purple"
                   >
                     <FaPlus className="inline" />
                   </button>
@@ -366,23 +394,31 @@ const SinglePlayerLobby: React.FC<SinglePlayerLobbyProps> = ({
                 {bots.length > 0 ? (
                   <div className="flex flex-wrap gap-2">
                     {bots.map(bot => (
-                      <Badge
+                      <div
                         key={bot.id}
-                        className={cn('text-xs flex items-center gap-1 px-2 py-1', BOT_DIFFICULTY_CONFIG[bot.difficulty].color)}
+                        className="flex items-center gap-2 px-2.5 py-1.5 rounded-neo border-2 border-bot-purple bg-gradient-to-r from-bot-purple/20 to-bot-indigo/20 shadow-hard-sm"
                       >
-                        {bot.name}
-                        <button 
-                          onClick={() => removeBot(bot.id)} 
-                          className="ml-1 hover:text-neo-red min-w-[32px] min-h-[32px] flex items-center justify-center"
+                        <span className="w-5 h-5 rounded-full flex items-center justify-center bg-bot-purple border border-bot-purple-light/50">
+                          <FaRobot className="text-white text-[10px]" />
+                        </span>
+                        <span className="text-xs font-medium text-neo-white">
+                          {bot.name}
+                        </span>
+                        <Badge className={cn('text-[10px] px-1.5 py-0', BOT_DIFFICULTY_CONFIG[bot.difficulty].color)}>
+                          {bot.difficulty === 'easy' ? '🌱' : bot.difficulty === 'medium' ? '⚡' : '🔥'}
+                        </Badge>
+                        <button
+                          onClick={() => removeBot(bot.id)}
+                          className="w-5 h-5 flex items-center justify-center rounded-full text-neo-red/70 hover:text-neo-red hover:bg-neo-red/20 transition-colors"
                           aria-label={`Remove ${bot.name}`}
                         >
-                          <FaTimes className="text-[10px]" />
+                          <FaTimes className="w-2.5 h-2.5" />
                         </button>
-                      </Badge>
+                      </div>
                     ))}
                   </div>
                 ) : (
-                  <p className="text-xs text-neo-white/70 italic text-center">
+                  <p className="text-xs text-neo-white/70 italic text-center py-2">
                     {t('singlePlayer.noBots') || 'Tap + to add bot opponents'}
                   </p>
                 )}
@@ -439,7 +475,25 @@ const SinglePlayerLobby: React.FC<SinglePlayerLobbyProps> = ({
         </h1>
       </div>
 
-      {/* Mode Selection - 2x2 Grid */}
+      {/* Wizard Step Indicator */}
+      {useWizard && (
+        <ConfigWizardNav
+          currentStep={wizardStep}
+          onStepChange={setWizardStep}
+          canAdvance={canAdvanceFromStep(wizardStep)}
+          t={t}
+          className="mb-2"
+        />
+      )}
+
+      {/* Step 1: Mode Selection - 2x2 Grid */}
+      {(!useWizard || wizardStep === 1) && (
+        <>
+        <div className="text-center mb-2">
+          <h2 className="text-lg font-bold text-neo-black dark:text-neo-white">
+            {t('wizard.selectMode') || 'Select Game Mode'}
+          </h2>
+        </div>
       <div className="grid grid-cols-2 gap-2 sm:gap-3">
         {(Object.keys(MODE_CONFIG) as SinglePlayerMode[]).map(modeKey => {
           const config = MODE_CONFIG[modeKey];
@@ -470,7 +524,7 @@ const SinglePlayerLobby: React.FC<SinglePlayerLobbyProps> = ({
                     </span>
                   )}
                   {hasPlayedDaily && (
-                    <span className="flex items-center justify-center w-5 h-5 bg-neo-lime rounded-full border-2 border-neo-black">
+                    <span className="flex items-center justify-center w-5 h-5 bg-neo-lime text-neo-black rounded-full border-2 border-neo-black">
                       <Check className="w-3 h-3 text-neo-black" />
                     </span>
                   )}
@@ -491,7 +545,249 @@ const SinglePlayerLobby: React.FC<SinglePlayerLobbyProps> = ({
           );
         })}
       </div>
+        </>
+      )}
 
+      {/* Step 2: Difficulty Selection */}
+      {(!useWizard || wizardStep === 2) && mode !== 'daily' && (
+        <>
+        <div className="text-center mb-2">
+          <h2 className="text-lg font-bold text-neo-black dark:text-neo-white">
+            {t('wizard.chooseDifficulty') || 'Choose Difficulty'}
+          </h2>
+        </div>
+        <Card className="border-3 border-neo-black dark:border-slate-600 shadow-hard">
+          <CardContent className="p-3 sm:p-4">
+            <div className="space-y-3">
+              <div className="grid grid-cols-3 gap-2">
+                {(['EASY', 'MEDIUM', 'HARD'] as DifficultyLevel[]).map(level => {
+                  const config = DIFFICULTIES[level];
+                  const isSelected = difficulty === level;
+                  return (
+                    <button
+                      key={level}
+                      onClick={() => setDifficulty(level)}
+                      className={cn(
+                        'p-3 sm:p-4 rounded-neo-lg border-4 border-neo-black dark:border-slate-500 transition-all text-center',
+                        isSelected
+                          ? level === 'EASY' ? 'bg-neo-lime shadow-hard-pressed translate-x-[2px] translate-y-[2px] text-neo-black'
+                          : level === 'MEDIUM' ? 'bg-neo-yellow shadow-hard-pressed translate-x-[2px] translate-y-[2px] text-neo-black'
+                          : 'bg-neo-red shadow-hard-pressed translate-x-[2px] translate-y-[2px] text-white'
+                          : 'bg-white dark:bg-slate-600 shadow-hard hover:shadow-hard-lg text-neo-black dark:text-neo-white'
+                      )}
+                    >
+                      <div className="font-black uppercase text-sm sm:text-base">
+                        {t(`difficulty.${level.toLowerCase()}`) || level}
+                      </div>
+                      <div className="text-xs sm:text-sm opacity-75 font-bold">
+                        {config.rows}x{config.cols}
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+              <div className="text-center text-sm text-neo-black/70 dark:text-neo-white/70">
+                <span className="font-bold">{difficultyConfig.rows}x{difficultyConfig.cols}</span> {t('wizard.gridPreview') || 'grid'}
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+        </>
+      )}
+
+      {/* Step 3: Game Options */}
+      {(!useWizard || wizardStep === 3) && mode !== 'daily' && (
+        <>
+        <div className="text-center mb-2">
+          <h2 className="text-lg font-bold text-neo-black dark:text-neo-white">
+            {t('wizard.configureOptions') || 'Game Options'}
+          </h2>
+        </div>
+        <Card className="border-3 border-neo-black dark:border-slate-600 shadow-hard">
+          <CardContent className="p-3 sm:p-4 space-y-4">
+            {/* Timer for timed modes */}
+            {mode !== 'practice' && (
+              <div>
+                <label className="text-sm font-bold uppercase tracking-wide text-neo-black/70 dark:text-neo-white/70 mb-2 block">
+                  {t('singlePlayer.timer') || 'Game Duration'}
+                </label>
+                <div className="flex gap-2">
+                  {[1, 2, 3].map(min => (
+                    <button
+                      key={min}
+                      onClick={() => setTimerMinutes(min)}
+                      className={cn(
+                        'flex-1 py-3 rounded-neo border-3 border-neo-black text-sm font-bold shadow-hard hover:shadow-hard-lg transition-all text-neo-black',
+                        timerMinutes === min ? 'bg-neo-cyan' : 'bg-neo-cream dark:bg-slate-600 dark:text-neo-white'
+                      )}
+                    >
+                      {min} {t('common.minutes') || 'min'}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Language selector */}
+            <div>
+              <label className="text-sm font-bold uppercase tracking-wide text-neo-black/70 dark:text-neo-white/70 mb-2 block">
+                {t('joinView.language') || 'Language'}
+              </label>
+              <LanguageSelector selectedLanguage={gameLanguage} onLanguageChange={setGameLanguage} />
+            </div>
+
+            {/* Bot management for solo-bots mode */}
+            {mode === 'solo-bots' && (
+              <div className="p-3 sm:p-4 bg-gradient-to-br from-bot-purple/15 via-bot-purple-dark/10 to-bot-indigo/15 rounded-neo-lg border-3 border-bot-purple/50 shadow-hard-purple">
+                <div className="flex items-center justify-between mb-3">
+                  <span className="text-sm font-bold flex items-center gap-2 text-neo-black dark:text-neo-white">
+                    <FaRobot className="text-bot-purple" />
+                    <Badge className="bg-bot-purple/20 text-bot-purple border border-bot-purple text-[10px] px-1.5">AI</Badge>
+                    {t('singlePlayer.opponents') || 'Opponents'}
+                  </span>
+                </div>
+                <div className="flex gap-1 items-center mb-3">
+                  {(['easy', 'medium', 'hard'] as BotDifficulty[]).map(diff => (
+                    <button
+                      key={diff}
+                      onClick={() => setSelectedBotDifficulty(diff)}
+                      className={cn(
+                        'px-3 py-1.5 rounded text-xs font-bold uppercase border-2 border-neo-black/30 dark:border-slate-500 text-neo-black flex-1',
+                        selectedBotDifficulty === diff
+                          ? BOT_DIFFICULTY_CONFIG[diff].color
+                          : 'bg-white dark:bg-slate-600 dark:text-neo-white hover:bg-slate-100 dark:hover:bg-slate-500'
+                      )}
+                    >
+                      {t(BOT_DIFFICULTY_CONFIG[diff].labelKey) || diff}
+                    </button>
+                  ))}
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={addBot}
+                    disabled={bots.length >= 5}
+                    className="h-8 px-3 ml-2 border-2 border-neo-black dark:border-slate-500 bg-neo-lime hover:bg-neo-lime/80 text-neo-black"
+                  >
+                    <FaPlus className="w-4 h-4" />
+                  </Button>
+                </div>
+                {bots.length > 0 ? (
+                  <div className="flex flex-wrap gap-2">
+                    {bots.map(bot => (
+                      <div
+                        key={bot.id}
+                        className="flex items-center gap-2 px-2.5 py-1.5 rounded-neo border-2 border-bot-purple bg-gradient-to-r from-bot-purple/15 to-bot-indigo/15 shadow-hard-sm"
+                      >
+                        <span className="w-5 h-5 rounded-full flex items-center justify-center bg-bot-purple border border-bot-purple-light/50">
+                          <FaRobot className="text-white text-[10px]" />
+                        </span>
+                        <span className="text-xs font-medium text-neo-black dark:text-neo-white">
+                          {bot.name}
+                        </span>
+                        <Badge className={cn('text-[10px] px-1.5 py-0', BOT_DIFFICULTY_CONFIG[bot.difficulty].color)}>
+                          {bot.difficulty === 'easy' ? '🌱' : bot.difficulty === 'medium' ? '⚡' : '🔥'}
+                        </Badge>
+                        <button
+                          onClick={() => removeBot(bot.id)}
+                          className="w-5 h-5 flex items-center justify-center rounded-full hover:text-neo-red hover:bg-neo-red/20 transition-colors"
+                          aria-label={`Remove ${bot.name}`}
+                        >
+                          <FaTimes className="w-2.5 h-2.5" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-xs text-neo-black/70 dark:text-neo-white/70 italic text-center py-2">
+                    {t('singlePlayer.noBots') || 'Tap + to add bot opponents'}
+                  </p>
+                )}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+        </>
+      )}
+
+      {/* Step 4: Review & Start */}
+      {(!useWizard || wizardStep === 4) && (
+        <>
+        <div className="text-center mb-2">
+          <h2 className="text-lg font-bold text-neo-black dark:text-neo-white">
+            {t('wizard.reviewSettings') || 'Review & Start'}
+          </h2>
+        </div>
+        <Card className="border-3 border-neo-black dark:border-slate-600 shadow-hard">
+          <CardContent className="p-3 sm:p-4">
+            <div className="space-y-3">
+              {/* Mode summary */}
+              <div className="flex items-center justify-between p-2 bg-slate-100 dark:bg-slate-700 rounded-neo">
+                <span className="text-sm font-bold text-neo-black/70 dark:text-neo-white/70">{t('wizard.stepMode') || 'Mode'}</span>
+                <span className="font-bold text-neo-black dark:text-neo-white flex items-center gap-2">
+                  {React.createElement(MODE_CONFIG[mode].Icon, { className: 'w-4 h-4' })}
+                  {t(MODE_CONFIG[mode].labelKey) || mode}
+                </span>
+              </div>
+
+              {/* Difficulty summary */}
+              {mode !== 'daily' && (
+                <div className="flex items-center justify-between p-2 bg-slate-100 dark:bg-slate-700 rounded-neo">
+                  <span className="text-sm font-bold text-neo-black/70 dark:text-neo-white/70">{t('wizard.stepDifficulty') || 'Difficulty'}</span>
+                  <span className="font-bold text-neo-black dark:text-neo-white">
+                    {t(`difficulty.${difficulty.toLowerCase()}`) || difficulty} ({difficultyConfig.rows}x{difficultyConfig.cols})
+                  </span>
+                </div>
+              )}
+
+              {/* Timer summary */}
+              {mode !== 'practice' && mode !== 'daily' && (
+                <div className="flex items-center justify-between p-2 bg-slate-100 dark:bg-slate-700 rounded-neo">
+                  <span className="text-sm font-bold text-neo-black/70 dark:text-neo-white/70">{t('singlePlayer.timer') || 'Timer'}</span>
+                  <span className="font-bold text-neo-black dark:text-neo-white">{timerMinutes} {t('common.minutes') || 'min'}</span>
+                </div>
+              )}
+
+              {/* Language summary */}
+              {mode !== 'daily' && (
+                <div className="flex items-center justify-between p-2 bg-slate-100 dark:bg-slate-700 rounded-neo">
+                  <span className="text-sm font-bold text-neo-black/70 dark:text-neo-white/70">{t('joinView.language') || 'Language'}</span>
+                  <span className="font-bold text-neo-black dark:text-neo-white uppercase">{gameLanguage}</span>
+                </div>
+              )}
+
+              {/* Bots summary */}
+              {mode === 'solo-bots' && (
+                <div className="flex items-center justify-between p-2 bg-gradient-to-r from-bot-purple/10 to-bot-indigo/10 rounded-neo border border-bot-purple/30">
+                  <span className="text-sm font-bold text-neo-black/70 dark:text-neo-white/70 flex items-center gap-1">
+                    <FaRobot className="text-bot-purple" />
+                    {t('singlePlayer.opponents') || 'Opponents'}
+                  </span>
+                  <span className="font-bold text-neo-black dark:text-neo-white">
+                    {bots.length} {bots.length === 1 ? 'bot' : 'bots'}
+                  </span>
+                </div>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+        </>
+      )}
+
+      {/* Wizard Navigation Buttons */}
+      {useWizard && (
+        <WizardNavigationButtons
+          currentStep={wizardStep}
+          canAdvance={canAdvanceFromStep(wizardStep)}
+          onBack={handleWizardBack}
+          onNext={handleWizardNext}
+          onStart={handleStartGame}
+          t={t}
+        />
+      )}
+
+      {/* Non-wizard mode: Show all content */}
+      {!useWizard && (
+        <>
       {/* Quick Info Card */}
       <Card className="border-3 border-neo-black dark:border-slate-600 shadow-hard">
         <CardContent className="p-3 sm:p-4">
@@ -663,12 +959,13 @@ const SinglePlayerLobby: React.FC<SinglePlayerLobbyProps> = ({
             </motion.div>
           )}
 
-          {/* Bot config for solo-bots mode */}
+          {/* Bot config for solo-bots mode - Purple themed */}
           {mode === 'solo-bots' && (
-            <div className="mb-2 sm:mb-3 p-2 sm:p-3 bg-slate-100 dark:bg-slate-700/50 rounded-neo border-2 border-neo-black/20 dark:border-slate-500/30">
+            <div className="mb-2 sm:mb-3 p-3 sm:p-4 bg-gradient-to-br from-bot-purple/15 via-bot-purple-dark/10 to-bot-indigo/15 rounded-neo-lg border-3 border-bot-purple/50 shadow-hard-purple">
               <div className="flex items-center justify-between mb-2">
                 <span className="text-sm font-bold flex items-center gap-2 text-neo-black dark:text-neo-white">
-                  <FaRobot />
+                  <FaRobot className="text-bot-purple" />
+                  <Badge className="bg-bot-purple/20 text-bot-purple border border-bot-purple text-[10px] px-1.5">AI</Badge>
                   {t('singlePlayer.opponents') || 'Opponents'}
                 </span>
                 <div className="flex gap-1 items-center">
@@ -698,26 +995,33 @@ const SinglePlayerLobby: React.FC<SinglePlayerLobbyProps> = ({
                 </div>
               </div>
               {bots.length > 0 ? (
-                <div className="flex flex-wrap gap-1">
+                <div className="flex flex-wrap gap-2">
                   {bots.map(bot => (
-                    <Badge
+                    <div
                       key={bot.id}
-                      variant="secondary"
-                      className={cn('text-xs', BOT_DIFFICULTY_CONFIG[bot.difficulty].color)}
+                      className="flex items-center gap-2 px-2.5 py-1.5 rounded-neo border-2 border-bot-purple bg-gradient-to-r from-bot-purple/15 to-bot-indigo/15 shadow-hard-sm"
                     >
-                      {bot.name}
-                      <button 
-                        onClick={() => removeBot(bot.id)} 
-                        className="ml-1 hover:text-neo-red min-w-[32px] min-h-[32px] flex items-center justify-center"
+                      <span className="w-5 h-5 rounded-full flex items-center justify-center bg-bot-purple border border-bot-purple-light/50">
+                        <FaRobot className="text-white text-[10px]" />
+                      </span>
+                      <span className="text-xs font-medium text-neo-black dark:text-neo-white">
+                        {bot.name}
+                      </span>
+                      <Badge className={cn('text-[10px] px-1.5 py-0', BOT_DIFFICULTY_CONFIG[bot.difficulty].color)}>
+                        {bot.difficulty === 'easy' ? '🌱' : bot.difficulty === 'medium' ? '⚡' : '🔥'}
+                      </Badge>
+                      <button
+                        onClick={() => removeBot(bot.id)}
+                        className="w-5 h-5 flex items-center justify-center rounded-full hover:text-neo-red hover:bg-neo-red/20 transition-colors"
                         aria-label={`Remove ${bot.name}`}
                       >
-                        <FaTimes className="w-3.5 h-3.5" />
+                        <FaTimes className="w-2.5 h-2.5" />
                       </button>
-                    </Badge>
+                    </div>
                   ))}
                 </div>
               ) : (
-                <p className="text-xs text-neo-black/70 italic">
+                <p className="text-xs text-neo-black/70 dark:text-neo-white/70 italic text-center py-2">
                   {t('singlePlayer.noBots') || 'Tap + to add bot opponents'}
                 </p>
               )}
@@ -830,6 +1134,8 @@ const SinglePlayerLobby: React.FC<SinglePlayerLobbyProps> = ({
         <FaPlay className="mr-2" />
         {t('singlePlayer.startGame') || 'Start Game'}
       </Button>
+        </>
+      )}
     </motion.div>
     </>
   );

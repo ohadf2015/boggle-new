@@ -139,7 +139,11 @@ const ja = {
     "retry": "再試行",
     "newGame": "新しいゲーム",
     "join": "参加",
-    "showLess": "表示を減らす"
+    "showLess": "表示を減らす",
+    "or": "または",
+    "closeMenu": "メニューを閉じる",
+    "openMenu": "メニューを開く",
+    "language": "言語"
   },
   "theme": {
     "sundayFunday": "楽しい日曜日",
@@ -246,6 +250,7 @@ const ja = {
     "remove": "ボットを削除",
     "removeError": "ボットの削除に失敗しました",
     "currentBots": "ルーム内のボット",
+    "maxBots": "最大ボット数に達しました",
     "quickAdd": "追加",
     "add": "追加",
     "emptyState": "練習や部屋を埋めるためにボットを追加",
@@ -295,7 +300,8 @@ const ja = {
     "telegram": "Telegram",
     "more": "その他...",
     "inviteTitle": "私のLexiClashゲームに参加！",
-    "copied": "コピーしました！"
+    "copied": "コピーしました！",
+    "shareVictory": "勝利をシェアしよう！"
   },
   "errors": {
     "unstableConnection": "インターネット接続が不安定です - ゲーム中に問題が発生する可能性があります",
@@ -409,6 +415,7 @@ const ja = {
     "nickname": "ニックネーム",
     "nicknamePlaceholder": "ニックネームを入力",
     "roomCode": "ルームコード",
+    "changeAvatar": "アバターを変更",
     "defaultPlayerNames": [
       "こっそりピクルス",
       "ディスコポテト",
@@ -606,7 +613,8 @@ const ja = {
     "hostPlaysShort": "ホスト参加",
     "hostSpectates": "観戦中",
     "letters": "文字",
-    "players": "プレイヤー"
+    "players": "プレイヤー",
+    "letterMinimum": "文字以上"
   },
   "playerView": {
     "waitingForHost": "ホストが開始するのを待っています...",
@@ -617,6 +625,9 @@ const ja = {
     "wordsFound": "見つけた単語",
     "wordsOnBoard": "ボード上の単語",
     "wordsRemaining": "残り単語",
+    "longWordsLabel": "{{min}}文字以上",
+    "longWordsOnBoard": "{{min}}文字以上の単語",
+    "longWordsRemaining": "{{min}}文字以上の単語が残り",
     "remaining": "残り",
     "found": "発見",
     "total": "合計",
@@ -637,6 +648,9 @@ const ja = {
     "players": "プレイヤー",
     "yourAchievements": "あなたの実績",
     "letterGrid": "文字グリッド",
+    "longWordsLabel": "${min}文字以上",
+    "longWordsOnBoard": "${min}文字以上の単語",
+    "longWordsRemaining": "${min}文字以上の単語が残っています",
     "waitingForGame": "ゲームを待っています...",
     "add": "追加",
     "enterWord": "単語を入力...",
@@ -685,7 +699,10 @@ const ja = {
     "words": "単語",
     "alreadyFound": "既に発見済み",
     "invalidWord": "無効な単語",
-    "pendingValidation": "検証待ち"
+    "pendingValidation": "検証待ち",
+    "longWordsLabel": "${min}文字以上",
+    "longWordsOnBoard": "${min}文字以上の単語",
+    "longWordsRemaining": "${min}文字以上の単語が残り"
   },
   "lateJoiner": {
     "welcomeTitle": "ゲーム進行中！",
@@ -717,6 +734,7 @@ const ja = {
     "loading": "ヒント取得中...",
     "noHints": "ヒント残りなし",
     "noWordsLeft": "見つける単語がもうありません！",
+    "noLongWordsLeft": "5文字以上の単語がもうありません！",
     "lookFor": "探してください:",
     "letterWord": "文字の単語",
     "letters": "文字",
@@ -727,7 +745,8 @@ const ja = {
     "vowels": "母音",
     "withDoubles": "二重文字あり",
     "longerWord": "長い単語",
-    "shortWord": "短い単語"
+    "shortWord": "短い単語",
+    "noLongWordsLeft": "5文字以上の単語はもうありません！"
   },
   "achievementPopup": {
     "unlocked": "実績解除！",
@@ -817,7 +836,8 @@ const ja = {
     "you": "(あなた)",
     "betterLuckNextTime": "次はきっとうまくいく！",
     "yourPlace": "{rank}位",
-    "tryAgainEncouragement": "続けてプレイして上達しよう！"
+    "tryAgainEncouragement": "続けてプレイして上達しよう！",
+    "of": "/"
   },
   "archetypes": {
     "strategist": "戦略家",
@@ -1507,7 +1527,8 @@ const ja = {
     "backToRoom": "ルームに戻る",
     "backToLobby": "ロビーに戻る",
     "locked": "ロック中",
-    "earnThisAchievement": "ゲームをプレイしてこの実績をアンロックしましょう！"
+    "earnThisAchievement": "ゲームをプレイしてこの実績をアンロックしましょう！",
+    "connectedAccount": "アカウントに接続中"
   },
   "leaderboard": {
     "title": "リーダーボード",
@@ -1800,7 +1821,63 @@ const ja = {
     "aiOpponents": "AI対戦相手",
     "autoFillDesc": "{count}人のAI対戦相手を追加",
     "addBotsPrompt": "AI対戦相手を追加しよう！",
-    "addBotsHint": "自動追加を使うか、上のボタンをクリック"
+    "addBotsHint": "自動追加を使うか、上のボタンをクリック",
+    "beatYourRecord": "記録を更新しました！",
+    "preset": {
+      "recommended": "おすすめ",
+      "tapToPlay": "タップしてプレイ",
+      "customGame": "カスタムゲーム設定",
+      "hint": "プリセットをタップして即座にプレイ、またはゲームをカスタマイズ",
+      "quickStart": "クイックスタート",
+      "quick": "クイックプレイ",
+      "quickDesc": "小さなボードで1分間の高速ゲーム",
+      "standard": "スタンダード",
+      "standardDesc": "クラシックなボグル体験",
+      "intense": "インテンス",
+      "intenseDesc": "大きなボード、長い時間、激しい競争",
+      "friendly": "フレンドリーマッチ",
+      "friendlyDesc": "簡単な相手とリラックスしたゲーム",
+      "competitive": "コンペティティブ",
+      "competitiveDesc": "熟練ボットとのバランスの取れた挑戦",
+      "battle": "バトルロイヤル",
+      "battleDesc": "エキスパートボットとの究極のテスト",
+      "explorer": "レターエクスプローラー",
+      "explorerDesc": "小さなボードでじっくり",
+      "hunter": "ワードハンター",
+      "hunterDesc": "自分のペースで全ての単語を見つける",
+      "mastery": "語彙マスター",
+      "masteryDesc": "広範な練習用の大きなボード",
+      "warmup": "デイリーウォームアップ",
+      "warmupDesc": "記録を破る素早いウォームアップ",
+      "personalBest": "自己ベスト",
+      "personalBestDesc": "スタンダードチャレンジ - 進捗を追跡",
+      "ultra": "ウルトラチャレンジ",
+      "ultraDesc": "究極のハイスコアチャレンジ"
+    },
+    "wizard": {
+      "selectMode": "ゲームモードを選択",
+      "chooseDifficulty": "難易度を選択",
+      "gridPreview": "グリッドプレビュー",
+      "configureOptions": "ゲームオプション",
+      "reviewSettings": "確認して開始",
+      "stepOf": "ステップ {current} / {total}",
+      "showAll": "すべて表示",
+      "useSteps": "ステップを使用",
+      "editMode": "モード編集",
+      "editSettings": "設定を編集",
+      "stepMode": "モード",
+      "stepDifficulty": "難易度",
+      "stepOptions": "オプション",
+      "stepReview": "確認"
+    }
+  },
+  "practice": {
+    "tips": "練習のコツ",
+    "noTimer": "時間制限なし - 自分のペースでプレイ",
+    "exploreTip": "探索してできるだけ多くの単語を見つけよう"
+  },
+  "wizard": {
+    "stepOf": "ステップ {current} / {total}"
   },
   "landscape": {
     "tutorialTitle": "横画面コントロール",

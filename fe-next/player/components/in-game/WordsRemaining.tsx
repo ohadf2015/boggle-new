@@ -12,17 +12,21 @@ interface WordsRemainingProps {
   t: (key: string, params?: Record<string, string | number>) => string;
   /** Optional: compact mode for mobile/landscape */
   compact?: boolean;
+  /** Optional: minimum word length being tracked (for display purposes) */
+  minLength?: number;
 }
 
 /**
  * WordsRemaining - Displays the count of words remaining to be found on the board
  * Shows above the found words list to indicate progress
+ * When minLength is provided, displays "5+ letter words" label
  */
 export const WordsRemaining = memo<WordsRemainingProps>(({
   totalWords,
   foundWordsCount,
   t,
   compact = false,
+  minLength,
 }) => {
   // Don't render if we don't have total words yet
   if (totalWords === null || totalWords === 0) {
@@ -31,6 +35,12 @@ export const WordsRemaining = memo<WordsRemainingProps>(({
 
   const remaining = Math.max(0, totalWords - foundWordsCount);
   const progress = totalWords > 0 ? (foundWordsCount / totalWords) * 100 : 0;
+
+  // Generate label based on minLength
+  const getLengthLabel = () => {
+    if (!minLength) return '';
+    return t('playerView.longWordsLabel', { min: minLength }) || `${minLength}+ letters`;
+  };
 
   if (compact) {
     // Compact version for landscape/mobile
@@ -45,13 +55,21 @@ export const WordsRemaining = memo<WordsRemainingProps>(({
           {remaining}
         </motion.div>
         <div className="text-[10px] font-bold uppercase text-neo-cream/90">
-          {t('playerView.remaining') || 'Left'}
+          {minLength ? getLengthLabel() : (t('playerView.remaining') || 'Left')}
         </div>
       </div>
     );
   }
 
   // Full version for desktop sidebar
+  const headerTitle = minLength
+    ? (t('playerView.longWordsOnBoard', { min: minLength }) || `${minLength}+ Letter Words`)
+    : (t('playerView.wordsOnBoard') || 'Words on Board');
+
+  const remainingLabel = minLength
+    ? (t('playerView.longWordsRemaining', { min: minLength }) || `${minLength}+ letter words left`)
+    : (t('playerView.wordsRemaining') || 'words remaining');
+
   return (
     <div
       className="bg-neo-navy text-white border-4 border-neo-black rounded-neo-lg shadow-hard-lg overflow-hidden mb-2"
@@ -60,7 +78,7 @@ export const WordsRemaining = memo<WordsRemainingProps>(({
       {/* Header */}
       <div className="py-2 px-4 border-b-3 border-neo-black bg-neo-orange text-neo-black">
         <h4 className="text-neo-black text-sm uppercase tracking-widest font-black text-center">
-          {t('playerView.wordsOnBoard') || 'Words on Board'}
+          {headerTitle}
         </h4>
       </div>
 
@@ -77,7 +95,7 @@ export const WordsRemaining = memo<WordsRemainingProps>(({
             {remaining}
           </motion.div>
           <div className="text-xs font-bold uppercase tracking-wide text-neo-cream/90">
-            {t('playerView.wordsRemaining') || 'words remaining'}
+            {remainingLabel}
           </div>
         </div>
 

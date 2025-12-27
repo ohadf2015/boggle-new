@@ -2,15 +2,37 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import { FaCrown, FaMedal } from 'react-icons/fa';
+import { FaCrown, FaMedal, FaRobot } from 'react-icons/fa';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 import Avatar from '../Avatar';
 import type { Player } from './types';
 
+/**
+ * Generic participant type for leaderboard
+ * Works with both multiplayer Player and single player participants
+ */
+export interface LeaderboardParticipant {
+  name: string;
+  score: number;
+  isCurrentPlayer?: boolean;
+  isBot?: boolean;
+  avatar?: {
+    emoji?: string;
+    color?: string;
+    profilePictureUrl?: string | null;
+    avatarImage?: string;
+  };
+}
+
 interface Top3LeaderboardProps {
-  players: Player[];
+  /** Multiplayer players (preferred) */
+  players?: Player[];
+  /** Generic participants (for single player with bots) */
+  participants?: LeaderboardParticipant[];
   currentUsername?: string;
+  /** Custom header text */
+  headerText?: string;
 }
 
 const rankConfig = {
@@ -43,13 +65,39 @@ const rankConfig = {
 /**
  * Compact Top 3 Leaderboard
  * Horizontal layout optimized for mobile
- * Shows rank, avatar, name, and score for top 3 players
+ * Shows rank, avatar, name, and score for top 3 players/participants
+ *
+ * Supports both:
+ * - Multiplayer mode: Pass `players` prop
+ * - Single player mode: Pass `participants` prop (with bots)
  */
-const Top3Leaderboard: React.FC<Top3LeaderboardProps> = ({ players, currentUsername }) => {
+const Top3Leaderboard: React.FC<Top3LeaderboardProps> = ({
+  players,
+  participants,
+  currentUsername,
+  headerText,
+}) => {
   const { t } = useLanguage();
 
-  // Get top 3 players
-  const top3 = players.slice(0, 3);
+  // Normalize to unified participant format
+  const normalizedParticipants: LeaderboardParticipant[] = React.useMemo(() => {
+    if (participants) {
+      return participants;
+    }
+    if (players) {
+      return players.map(p => ({
+        name: p.username,
+        score: p.score,
+        isCurrentPlayer: p.username === currentUsername,
+        isBot: false,
+        avatar: p.avatar,
+      }));
+    }
+    return [];
+  }, [players, participants, currentUsername]);
+
+  // Get top 3 participants
+  const top3 = normalizedParticipants.slice(0, 3);
 
   if (top3.length === 0) return null;
 
@@ -63,21 +111,21 @@ const Top3Leaderboard: React.FC<Top3LeaderboardProps> = ({ players, currentUsern
       {/* Header */}
       <div className="flex items-center justify-center gap-2 mb-2">
         <span className="text-xs font-black uppercase tracking-wide text-slate-500 dark:text-slate-400">
-          {t('results.topPlayers') || 'Top Players'}
+          {headerText || t('results.topPlayers') || 'Top Players'}
         </span>
       </div>
 
       {/* Horizontal cards for top 3 */}
       <div className="flex gap-2">
-        {top3.map((player, index) => {
+        {top3.map((participant, index) => {
           const rank = index + 1;
           const config = rankConfig[rank as 1 | 2 | 3];
-          const isCurrentPlayer = player.username === currentUsername;
+          const isCurrentPlayer = participant.isCurrentPlayer ?? participant.name === currentUsername;
           const Icon = config.icon;
 
           return (
             <motion.div
-              key={player.username}
+              key={participant.name}
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: 0.1 + index * 0.1 }}
@@ -91,7 +139,7 @@ const Top3Leaderboard: React.FC<Top3LeaderboardProps> = ({ players, currentUsern
               <div className={cn('h-1.5', config.bg)} />
 
               <div className="p-2">
-                {/* Rank + Avatar */}
+                {/* Rank + Icon */}
                 <div className="flex items-center justify-center gap-1 mb-1">
                   <Icon className={cn('text-sm', config.iconColor)} />
                   <span className={cn('text-xs font-black', config.rankText)}>
@@ -99,26 +147,32 @@ const Top3Leaderboard: React.FC<Top3LeaderboardProps> = ({ players, currentUsern
                   </span>
                 </div>
 
-                {/* Avatar */}
+                {/* Avatar or Bot icon */}
                 <div className="flex justify-center mb-1">
-                  <Avatar
-                    profilePictureUrl={player.avatar?.profilePictureUrl}
-                    avatarEmoji={player.avatar?.emoji}
-                    avatarImage={player.avatar?.avatarImage}
-                    avatarColor={player.avatar?.color}
-                    size="md"
-                    className="border-2 border-neo-black"
-                  />
+                  {participant.isBot ? (
+                    <div className="w-10 h-10 rounded-full bg-slate-200 dark:bg-slate-700 border-2 border-neo-black flex items-center justify-center">
+                      <FaRobot className="text-slate-500 dark:text-slate-400 text-lg" />
+                    </div>
+                  ) : (
+                    <Avatar
+                      profilePictureUrl={participant.avatar?.profilePictureUrl ?? undefined}
+                      avatarEmoji={participant.avatar?.emoji}
+                      avatarImage={participant.avatar?.avatarImage}
+                      avatarColor={participant.avatar?.color}
+                      size="md"
+                      className="border-2 border-neo-black"
+                    />
+                  )}
                 </div>
 
-                {/* Username */}
+                {/* Name */}
                 <p className={cn(
                   'text-xs font-bold text-center truncate mb-1',
                   'text-neo-black dark:text-white'
                 )}>
-                  {player.username}
+                  {participant.name}
                   {isCurrentPlayer && (
-                    <span className="text-[10px] text-neo-cyan"> (me)</span>
+                    <span className="text-[10px] text-neo-cyan"> ({t('common.you') || 'me'})</span>
                   )}
                 </p>
 
@@ -128,7 +182,7 @@ const Top3Leaderboard: React.FC<Top3LeaderboardProps> = ({ players, currentUsern
                   config.bg
                 )}>
                   <span className={cn('text-sm font-black', config.text)}>
-                    {player.score}
+                    {participant.score}
                   </span>
                 </div>
               </div>

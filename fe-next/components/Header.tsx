@@ -1,6 +1,7 @@
-import { memo, useCallback, useMemo, useState } from 'react';
+import { memo, useCallback, useMemo, useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FaChartBar } from 'react-icons/fa';
+import { HiMenu, HiX } from 'react-icons/hi';
 import Link from 'next/link';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useAuth } from '../contexts/AuthContext';
@@ -34,6 +35,34 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
     const { t, language, setLanguage, currentFlag } = useLanguage();
     const { isAuthenticated, isAdmin, profile } = useAuth();
     const [showLangDropdown, setShowLangDropdown] = useState(false);
+    const [showMobileMenu, setShowMobileMenu] = useState(false);
+    const mobileMenuRef = useRef<HTMLDivElement>(null);
+
+    // Close mobile menu when clicking outside
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (mobileMenuRef.current && !mobileMenuRef.current.contains(event.target as Node)) {
+                setShowMobileMenu(false);
+            }
+        };
+        if (showMobileMenu) {
+            document.addEventListener('mousedown', handleClickOutside);
+        }
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, [showMobileMenu]);
+
+    // Close mobile menu on escape key
+    useEffect(() => {
+        const handleEscape = (event: KeyboardEvent) => {
+            if (event.key === 'Escape') {
+                setShowMobileMenu(false);
+            }
+        };
+        if (showMobileMenu) {
+            document.addEventListener('keydown', handleEscape);
+        }
+        return () => document.removeEventListener('keydown', handleEscape);
+    }, [showMobileMenu]);
 
     // Get font family based on language (memoized)
     const fontFamily = useMemo(() => {
@@ -124,8 +153,8 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                     </h1>
                 </motion.button>
 
-                {/* Controls: Language + Admin + Level + Music + Auth/Settings */}
-                <div className="flex items-center gap-0.5 xs:gap-1 sm:gap-1.5 md:gap-3 flex-shrink-0 min-w-0">
+                {/* Desktop Controls: visible on sm+ */}
+                <div className="hidden sm:flex items-center gap-3 md:gap-4 flex-shrink-0">
                     {/* Language Switcher */}
                     <div
                         className="relative"
@@ -136,9 +165,9 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                             onClick={() => setShowLangDropdown(!showLangDropdown)}
                             className={cn(
                                 "flex items-center justify-center gap-1",
-                                "min-w-[44px] min-h-[44px] w-11 h-11 xs:w-12 xs:h-12 sm:w-11 sm:h-11",
+                                "min-w-[44px] min-h-[44px] w-11 h-11",
                                 "bg-neo-cream text-neo-black",
-                                "border-2 sm:border-3 border-neo-black",
+                                "border-3 border-neo-black",
                                 "rounded-neo shadow-hard",
                                 "hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-hard-lg",
                                 "active:translate-x-[1px] active:translate-y-[1px] active:shadow-hard-sm",
@@ -148,7 +177,7 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                             aria-expanded={showLangDropdown}
                             aria-haspopup="listbox"
                         >
-                            <span className="text-lg sm:text-xl">{currentFlag}</span>
+                            <span className="text-xl">{currentFlag}</span>
                         </button>
 
                         <AnimatePresence>
@@ -192,9 +221,9 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                             href={`/${language}/admin`}
                             className="
                                 flex items-center justify-center
-                                min-w-[44px] min-h-[44px] w-11 h-11 xs:w-12 xs:h-12 sm:w-11 sm:h-11
+                                min-w-[44px] min-h-[44px] w-11 h-11
                                 bg-neo-purple text-white
-                                border-2 sm:border-3 border-neo-black
+                                border-3 border-neo-black
                                 rounded-neo
                                 shadow-hard
                                 hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-hard-lg
@@ -206,18 +235,119 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                             <FaChartBar className="text-base" aria-hidden="true" />
                         </Link>
                     )}
-                    {/* Show level badge for authenticated users - hidden on very small screens */}
+                    {/* Show level badge for authenticated users */}
                     {isAuthenticated && profile?.current_level && (
-                        <div className="hidden xs:block">
-                            <LevelBadge
-                                level={profile.current_level}
-                                size="md"
-                                animate={false}
-                            />
-                        </div>
+                        <LevelBadge
+                            level={profile.current_level}
+                            size="md"
+                            animate={false}
+                        />
                     )}
                     <MusicControls />
                     <AuthButton />
+                </div>
+
+                {/* Mobile: Hamburger Menu */}
+                <div className="sm:hidden relative" ref={mobileMenuRef}>
+                    <button
+                        onClick={() => setShowMobileMenu(!showMobileMenu)}
+                        className={cn(
+                            "flex items-center justify-center",
+                            "min-w-[44px] min-h-[44px] w-11 h-11",
+                            "bg-neo-cream text-neo-black",
+                            "border-3 border-neo-black",
+                            "rounded-neo shadow-hard",
+                            "hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-hard-lg",
+                            "active:translate-x-[1px] active:translate-y-[1px] active:shadow-hard-sm",
+                            "transition-all duration-100"
+                        )}
+                        aria-label={showMobileMenu ? (t('common.closeMenu') || 'Close menu') : (t('common.openMenu') || 'Open menu')}
+                        aria-expanded={showMobileMenu}
+                    >
+                        {showMobileMenu ? (
+                            <HiX className="text-xl" />
+                        ) : (
+                            <HiMenu className="text-xl" />
+                        )}
+                    </button>
+
+                    <AnimatePresence>
+                        {showMobileMenu && (
+                            <motion.div
+                                initial={{ opacity: 0, y: -10, scale: 0.95 }}
+                                animate={{ opacity: 1, y: 0, scale: 1 }}
+                                exit={{ opacity: 0, y: -10, scale: 0.95 }}
+                                transition={{ duration: 0.2 }}
+                                className="absolute top-full right-0 mt-2 z-[100] bg-neo-cream border-3 border-neo-black rounded-neo shadow-hard-lg p-3 min-w-[200px]"
+                            >
+                                <div className="flex flex-col gap-3">
+                                    {/* Language Section */}
+                                    <div className="flex flex-col gap-1">
+                                        <span className="text-xs font-bold text-neo-black/60 uppercase tracking-wide px-1">
+                                            {t('common.language') || 'Language'}
+                                        </span>
+                                        <div className="flex flex-wrap gap-1.5">
+                                            {LANGUAGE_OPTIONS.map((option) => (
+                                                <button
+                                                    key={option.code}
+                                                    onClick={() => {
+                                                        setLanguage(option.code);
+                                                    }}
+                                                    className={cn(
+                                                        "flex items-center gap-1.5 px-2.5 py-1.5 text-sm font-bold rounded-neo border-2 border-neo-black transition-all",
+                                                        language === option.code
+                                                            ? "bg-neo-cyan shadow-hard-sm"
+                                                            : "bg-white hover:bg-neo-cyan/50"
+                                                    )}
+                                                >
+                                                    <span>{option.flag}</span>
+                                                    <span className="text-neo-black">{option.name}</span>
+                                                </button>
+                                            ))}
+                                        </div>
+                                    </div>
+
+                                    {/* Divider */}
+                                    <div className="h-0.5 bg-neo-black/20 rounded-full" />
+
+                                    {/* Controls Row */}
+                                    <div className="flex items-center justify-between gap-2">
+                                        <div className="flex items-center gap-2">
+                                            {/* Level Badge */}
+                                            {isAuthenticated && profile?.current_level && (
+                                                <LevelBadge
+                                                    level={profile.current_level}
+                                                    size="md"
+                                                    animate={false}
+                                                />
+                                            )}
+                                            {/* Admin Link */}
+                                            {isAdmin && (
+                                                <Link
+                                                    href={`/${language}/admin`}
+                                                    onClick={() => setShowMobileMenu(false)}
+                                                    className="
+                                                        flex items-center justify-center
+                                                        min-w-[40px] min-h-[40px] w-10 h-10
+                                                        bg-neo-purple text-white
+                                                        border-2 border-neo-black
+                                                        rounded-neo shadow-hard-sm
+                                                        active:translate-x-[1px] active:translate-y-[1px] active:shadow-none
+                                                        transition-all duration-100
+                                                    "
+                                                    aria-label={t('common.adminDashboard') || 'Admin Dashboard'}
+                                                >
+                                                    <FaChartBar className="text-sm" aria-hidden="true" />
+                                                </Link>
+                                            )}
+                                            <MusicControls />
+                                        </div>
+                                        <AuthButton />
+                                    </div>
+                                </div>
+                            </motion.div>
+                        )}
+                    </AnimatePresence>
                 </div>
             </div>
         </motion.header>

@@ -189,6 +189,7 @@ export function useHostGameActions(options: UseHostGameActionsOptions): UseHostG
     wordsForBoard,
     hostPlaying,
     minWordLength,
+    boardTheme,
     tournamentRounds,
     setTableData,
     setRemainingTime,

@@ -262,6 +262,9 @@ const PlayerInGameView = memo<PlayerInGameViewProps>(({
 
         // Board theme
         boardTheme={boardTheme}
+
+        // Total board words for WordsRemaining display
+        totalBoardWords={totalBoardWords}
       />
 
       {/* Tournament Standings Modal */}

@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { FaDice } from 'react-icons/fa';
+import { FaDice, FaPencilAlt } from 'react-icons/fa';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
@@ -10,7 +10,8 @@ import { cn } from '@/lib/utils';
 import { validateUsername, validateGameCode, sanitizeInput } from '@/utils/validation';
 import { useDebouncedValidation, getValidationClasses } from '@/hooks/useDebouncedValidation';
 import AvatarSelectorButton from './AvatarSelectorButton';
-import { AVATARS, type AvatarConfig } from '@/utils/avatarConfig';
+import EmojiAvatarPicker from '@/components/EmojiAvatarPicker';
+import { AVATARS, getAvatarById, type AvatarConfig } from '@/utils/avatarConfig';
 import { useAuth } from '@/contexts/AuthContext';
 import Avatar from '@/components/Avatar';
 
@@ -58,13 +59,20 @@ const HostModeFields: React.FC<HostModeFieldsProps> = ({
 
   // Avatar selection state
   const [selectedAvatarId, setSelectedAvatarId] = useState<string | undefined>(undefined);
+  const [isAuthAvatarPickerOpen, setIsAuthAvatarPickerOpen] = useState(false);
 
   // Load avatar from profile (for auth users) or localStorage (for guests) on mount
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      if (isAuthenticated && profile?.avatar_image) {
-        // Authenticated users: load from profile
-        setSelectedAvatarId(profile.avatar_image);
+      if (isAuthenticated) {
+        // Authenticated users: only use profile avatar_image if explicitly set
+        // Don't fall back to localStorage game avatars - use profile picture or emoji/color fallback instead
+        if (profile?.avatar_image) {
+          setSelectedAvatarId(profile.avatar_image);
+        } else {
+          // Clear any guest avatar to prevent showing wrong avatar
+          setSelectedAvatarId(undefined);
+        }
       } else {
         // Guest users: load from localStorage
         const saved = localStorage.getItem('boggle_avatar_id');
@@ -104,6 +112,15 @@ const HostModeFields: React.FC<HostModeFieldsProps> = ({
     }
   };
 
+  // Handle avatar selection from picker for authenticated users
+  const handleAuthAvatarSave = ({ avatarImage }: { avatarImage: string; emoji?: string; color?: string }) => {
+    const avatar = getAvatarById(avatarImage);
+    if (avatar) {
+      handleAvatarSelect(avatar);
+    }
+    setIsAuthAvatarPickerOpen(false);
+  };
+
   // Real-time validation with debounce
   const hostUsernameValidation = useDebouncedValidation(hostUsername, {
     validate: validateUsername,
@@ -138,22 +155,41 @@ const HostModeFields: React.FC<HostModeFieldsProps> = ({
       {isAuthenticated && displayName && (
         <div className="p-3 rounded-neo bg-neo-purple border-2 border-neo-magenta/50 shadow-hard-sm">
           <div className="flex items-center gap-3">
-            {/* Show profile avatar or custom profile picture */}
-            {profile?.profile_picture_url ? (
-              <div className="w-12 h-12 rounded-full overflow-hidden border-3 border-neo-black shadow-hard-sm">
-                <img
-                  src={profile.profile_picture_url}
-                  alt={displayName}
-                  className="w-full h-full object-cover"
+            {/* Clickable avatar - allows authenticated users to change to a game avatar */}
+            <button
+              type="button"
+              onClick={() => setIsAuthAvatarPickerOpen(true)}
+              className="relative group flex-shrink-0"
+              aria-label={t('joinView.changeAvatar') || 'Change avatar'}
+            >
+              {/* Show selected game avatar if set, otherwise profile picture or emoji fallback */}
+              {selectedAvatarId ? (
+                <Avatar
+                  avatarImage={selectedAvatarId}
+                  size="lg"
+                  className="border-3 border-neo-black shadow-hard-sm group-hover:border-neo-magenta transition-colors"
                 />
+              ) : profile?.profile_picture_url ? (
+                <div className="w-12 h-12 rounded-full overflow-hidden border-3 border-neo-black shadow-hard-sm group-hover:border-neo-magenta transition-colors">
+                  <img
+                    src={profile.profile_picture_url}
+                    alt={displayName}
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+              ) : (
+                <Avatar
+                  avatarEmoji={profile?.avatar_emoji}
+                  avatarColor={profile?.avatar_color}
+                  size="lg"
+                  className="border-3 border-neo-black shadow-hard-sm group-hover:border-neo-magenta transition-colors"
+                />
+              )}
+              {/* Edit indicator */}
+              <div className="absolute -bottom-0.5 -right-0.5 w-5 h-5 bg-neo-yellow text-neo-black border-2 border-neo-black rounded-full flex items-center justify-center shadow-hard-sm group-hover:scale-110 transition-transform">
+                <FaPencilAlt className="w-2 h-2" />
               </div>
-            ) : (
-              <Avatar
-                avatarImage={selectedAvatarId}
-                size="lg"
-                className="border-3 border-neo-black shadow-hard-sm"
-              />
-            )}
+            </button>
             <div className="flex-1">
               <p className="text-xs text-neo-cream/70 font-bold uppercase tracking-wide">
                 {t('joinView.hostingAs') || 'Hosting as'}
@@ -168,6 +204,14 @@ const HostModeFields: React.FC<HostModeFieldsProps> = ({
           </div>
         </div>
       )}
+
+      {/* Avatar picker for authenticated users */}
+      <EmojiAvatarPicker
+        isOpen={isAuthAvatarPickerOpen}
+        onClose={() => setIsAuthAvatarPickerOpen(false)}
+        onSave={handleAuthAvatarSave}
+        currentAvatarImage={selectedAvatarId}
+      />
 
       {/* Guest: Avatar + Name inline */}
       {!isAuthenticated && !isProfileLoading && (

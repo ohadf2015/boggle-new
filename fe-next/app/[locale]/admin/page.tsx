@@ -323,7 +323,7 @@ export default function AdminDashboard() {
               'text-lg mb-6',
               isDarkMode ? 'text-gray-600' : 'text-gray-600'
             )}>
-              You don't have permission to access this page.
+              You don&apos;t have permission to access this page.
             </p>
             <Button
               onClick={() => router.push(`/${language}`)}

@@ -20,17 +20,18 @@ interface LandscapeIndicatorProps {
  * TEMPORARILY DISABLED: Landscape mode recommendation is disabled until the feature is more stable.
  */
 const LandscapeIndicator = memo<LandscapeIndicatorProps>(({ className = '' }) => {
-  // TEMPORARILY DISABLED: Don't recommend landscape mode until it's more stable
-  // TODO: Re-enable once landscape mode is fully tested and stable
-  return null;
-
+  // All hooks must be called unconditionally, even if component is disabled
   const { t } = useLanguage();
   const [isVisible, setIsVisible] = useState(false);
   const [isPortrait, setIsPortrait] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
 
+  // TEMPORARILY DISABLED: Feature flag to disable landscape mode recommendation
+  const FEATURE_ENABLED = false;
+
   // Check if we should show based on localStorage
   useEffect(() => {
+    if (!FEATURE_ENABLED) return;
     if (typeof window === 'undefined') return;
 
     const dismissed = localStorage.getItem(STORAGE_KEY);
@@ -72,6 +73,7 @@ const LandscapeIndicator = memo<LandscapeIndicatorProps>(({ className = '' }) =>
 
   // Update visibility based on mobile + portrait
   useEffect(() => {
+    if (!FEATURE_ENABLED) return;
     if (typeof window === 'undefined') return;
 
     const dismissed = localStorage.getItem(STORAGE_KEY);
@@ -91,6 +93,12 @@ const LandscapeIndicator = memo<LandscapeIndicatorProps>(({ className = '' }) =>
     localStorage.setItem(STORAGE_KEY, 'true');
     setIsVisible(false);
   }, []);
+
+  // TEMPORARILY DISABLED: Don't recommend landscape mode until it's more stable
+  // TODO: Re-enable once landscape mode is fully tested and stable
+  if (!FEATURE_ENABLED) {
+    return null;
+  }
 
   return (
     <AnimatePresence>
