@@ -119,6 +119,7 @@ const en = {
     "lobby": "Lobby",
     "viewGrid": "View Grid",
     "min": "min",
+    "minutes": "min",
     "advancedSettings": "Advanced Settings",
     "yourScore": "Your Score",
     "tapToDismiss": "Tap to dismiss",
@@ -144,7 +145,9 @@ const en = {
     "or": "or",
     "closeMenu": "Close menu",
     "openMenu": "Open menu",
-    "language": "Language"
+    "language": "Language",
+    "controls": "Controls",
+    "account": "Account"
   },
   "theme": {
     "sundayFunday": "Sunday Funday",
@@ -2030,6 +2033,16 @@ const en = {
       "text": "You can change directions while tracing a word! Go right, then down, then diagonal - all in one word."
     },
     "dismiss": "Got it!"
+  },
+  "wizard": {
+    "selectMode": "Select Game Mode",
+    "chooseDifficulty": "Choose Difficulty",
+    "gridPreview": "grid",
+    "configureOptions": "Game Options",
+    "reviewSettings": "Review & Start",
+    "stepMode": "Mode",
+    "stepDifficulty": "Difficulty",
+    "stepOf": "Step {current} of {total}"
   }
 };
 

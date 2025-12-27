@@ -22,23 +22,23 @@ const BOT_DIFFICULTIES: BotDifficultyOption[] = [
   {
     value: 'easy',
     labelKey: 'bots.easy',
-    color: 'bg-neo-lime text-neo-black border-neo-black',
-    bgTint: 'bg-neo-lime/20',
-    icon: '🌱',
+    color: 'bg-sky-400 text-neo-black border-neo-black',
+    bgTint: 'bg-sky-400/20',
+    icon: '🤖',
   },
   {
     value: 'medium',
     labelKey: 'bots.medium',
-    color: 'bg-amber-400 text-neo-black border-neo-black',
-    bgTint: 'bg-amber-400/20',
-    icon: '⚡',
+    color: 'bg-violet-400 text-neo-black border-neo-black',
+    bgTint: 'bg-violet-400/20',
+    icon: '⚙️',
   },
   {
     value: 'hard',
     labelKey: 'bots.hard',
-    color: 'bg-neo-red text-white border-neo-black',
-    bgTint: 'bg-neo-red/20',
-    icon: '🔥',
+    color: 'bg-fuchsia-500 text-white border-neo-black',
+    bgTint: 'bg-fuchsia-500/20',
+    icon: '💀',
   },
 ];
 

@@ -248,7 +248,7 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                 </div>
 
                 {/* Mobile: Hamburger Menu */}
-                <div className="sm:hidden relative" ref={mobileMenuRef}>
+                <div className="sm:hidden" ref={mobileMenuRef}>
                     <button
                         onClick={() => setShowMobileMenu(!showMobileMenu)}
                         className={cn(
@@ -270,23 +270,66 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                             <HiMenu className="text-xl" />
                         )}
                     </button>
+                </div>
 
-                    <AnimatePresence>
-                        {showMobileMenu && (
+                {/* Mobile Menu Slide-out Pane */}
+                <AnimatePresence>
+                    {showMobileMenu && (
+                        <>
+                            {/* Backdrop overlay */}
                             <motion.div
-                                initial={{ opacity: 0, y: -10, scale: 0.95 }}
-                                animate={{ opacity: 1, y: 0, scale: 1 }}
-                                exit={{ opacity: 0, y: -10, scale: 0.95 }}
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                exit={{ opacity: 0 }}
                                 transition={{ duration: 0.2 }}
-                                className="absolute top-full right-0 mt-2 z-[100] bg-neo-cream border-3 border-neo-black rounded-neo shadow-hard-lg p-3 min-w-[200px]"
+                                className="fixed inset-0 bg-neo-black/50 z-[150] sm:hidden"
+                                onClick={() => setShowMobileMenu(false)}
+                            />
+                            {/* Slide-out pane - slides from right in LTR, left in RTL */}
+                            <motion.div
+                                ref={mobileMenuRef}
+                                initial={{ x: language === 'he' ? '-100%' : '100%' }}
+                                animate={{ x: 0 }}
+                                exit={{ x: language === 'he' ? '-100%' : '100%' }}
+                                transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+                                className={cn(
+                                    "fixed top-0 bottom-0 w-[280px] max-w-[85vw] z-[200] sm:hidden",
+                                    "bg-neo-cream border-neo-black",
+                                    "shadow-hard-xl overflow-y-auto",
+                                    language === 'he'
+                                        ? "left-0 border-r-4 rounded-r-neo-lg"
+                                        : "right-0 border-l-4 rounded-l-neo-lg"
+                                )}
                             >
-                                <div className="flex flex-col gap-3">
+                                {/* Pane Header with close button */}
+                                <div className="flex items-center justify-between p-4 border-b-3 border-neo-black/20">
+                                    <span className="text-lg font-bold text-neo-black">
+                                        {t('common.menu') || 'Menu'}
+                                    </span>
+                                    <button
+                                        onClick={() => setShowMobileMenu(false)}
+                                        className={cn(
+                                            "flex items-center justify-center",
+                                            "w-10 h-10",
+                                            "bg-white text-neo-black",
+                                            "border-2 border-neo-black",
+                                            "rounded-neo shadow-hard-sm",
+                                            "active:translate-x-[1px] active:translate-y-[1px] active:shadow-none",
+                                            "transition-all duration-100"
+                                        )}
+                                        aria-label={t('common.closeMenu') || 'Close menu'}
+                                    >
+                                        <HiX className="text-xl" />
+                                    </button>
+                                </div>
+
+                                <div className="flex flex-col gap-4 p-4">
                                     {/* Language Section */}
-                                    <div className="flex flex-col gap-1">
-                                        <span className="text-xs font-bold text-neo-black/60 uppercase tracking-wide px-1">
+                                    <div className="flex flex-col gap-2">
+                                        <span className="text-xs font-bold text-neo-black/60 uppercase tracking-wide">
                                             {t('common.language') || 'Language'}
                                         </span>
-                                        <div className="flex flex-wrap gap-1.5">
+                                        <div className="flex flex-col gap-1.5">
                                             {LANGUAGE_OPTIONS.map((option) => (
                                                 <button
                                                     key={option.code}
@@ -294,13 +337,13 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                                                         setLanguage(option.code);
                                                     }}
                                                     className={cn(
-                                                        "flex items-center gap-1.5 px-2.5 py-1.5 text-sm font-bold rounded-neo border-2 border-neo-black transition-all",
+                                                        "flex items-center gap-2 px-3 py-2.5 text-sm font-bold rounded-neo border-2 border-neo-black transition-all w-full",
                                                         language === option.code
                                                             ? "bg-neo-cyan shadow-hard-sm"
                                                             : "bg-white hover:bg-neo-cyan/50"
                                                     )}
                                                 >
-                                                    <span>{option.flag}</span>
+                                                    <span className="text-lg">{option.flag}</span>
                                                     <span className="text-neo-black">{option.name}</span>
                                                 </button>
                                             ))}
@@ -310,9 +353,13 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                                     {/* Divider */}
                                     <div className="h-0.5 bg-neo-black/20 rounded-full" />
 
-                                    {/* Controls Row */}
-                                    <div className="flex items-center justify-between gap-2">
-                                        <div className="flex items-center gap-2">
+                                    {/* Controls Section */}
+                                    <div className="flex flex-col gap-3">
+                                        <span className="text-xs font-bold text-neo-black/60 uppercase tracking-wide">
+                                            {t('common.controls') || 'Controls'}
+                                        </span>
+
+                                        <div className="flex items-center gap-3 flex-wrap">
                                             {/* Level Badge */}
                                             {isAuthenticated && profile?.current_level && (
                                                 <LevelBadge
@@ -328,7 +375,7 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                                                     onClick={() => setShowMobileMenu(false)}
                                                     className="
                                                         flex items-center justify-center
-                                                        min-w-[40px] min-h-[40px] w-10 h-10
+                                                        min-w-[44px] min-h-[44px] w-11 h-11
                                                         bg-neo-purple text-white
                                                         border-2 border-neo-black
                                                         rounded-neo shadow-hard-sm
@@ -337,18 +384,28 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                                                     "
                                                     aria-label={t('common.adminDashboard') || 'Admin Dashboard'}
                                                 >
-                                                    <FaChartBar className="text-sm" aria-hidden="true" />
+                                                    <FaChartBar className="text-base" aria-hidden="true" />
                                                 </Link>
                                             )}
                                             <MusicControls />
                                         </div>
+                                    </div>
+
+                                    {/* Divider */}
+                                    <div className="h-0.5 bg-neo-black/20 rounded-full" />
+
+                                    {/* Auth Section */}
+                                    <div className="flex flex-col gap-2">
+                                        <span className="text-xs font-bold text-neo-black/60 uppercase tracking-wide">
+                                            {t('common.account') || 'Account'}
+                                        </span>
                                         <AuthButton />
                                     </div>
                                 </div>
                             </motion.div>
-                        )}
-                    </AnimatePresence>
-                </div>
+                        </>
+                    )}
+                </AnimatePresence>
             </div>
         </motion.header>
     );

@@ -117,6 +117,7 @@ const he = {
     "lobby": "לובי",
     "viewGrid": "הצג לוח",
     "min": "דק",
+    "minutes": "דק׳",
     "advancedSettings": "הגדרות מתקדמות",
     "yourScore": "הניקוד שלך",
     "tapToDismiss": "הקש לסגירה",
@@ -143,7 +144,9 @@ const he = {
     "or": "או",
     "closeMenu": "סגור תפריט",
     "openMenu": "פתח תפריט",
-    "language": "שפה"
+    "language": "שפה",
+    "controls": "פקדים",
+    "account": "חשבון"
   },
   "theme": {
     "sundayFunday": "יום ראשון כיפי",
@@ -2027,6 +2030,16 @@ const he = {
       "text": "אפשר לשנות כיוון בזמן שרושמים מילה! לכו ימינה, אז למטה, אז באלכסון - הכל במילה אחת."
     },
     "dismiss": "הבנתי!"
+  },
+  "wizard": {
+    "selectMode": "בחר מצב משחק",
+    "chooseDifficulty": "בחר רמת קושי",
+    "gridPreview": "לוח",
+    "configureOptions": "אפשרויות משחק",
+    "reviewSettings": "סקירה והתחלה",
+    "stepMode": "מצב",
+    "stepDifficulty": "קושי",
+    "stepOf": "שלב {current} מתוך {total}"
   }
 };
 

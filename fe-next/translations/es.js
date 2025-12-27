@@ -117,6 +117,7 @@ const es = {
     "lobby": "Sala de Espera",
     "viewGrid": "Ver Tablero",
     "min": "min",
+    "minutes": "min",
     "advancedSettings": "Configuración Avanzada",
     "yourScore": "Tu Puntuación",
     "tapToDismiss": "Toca para cerrar",
@@ -143,7 +144,9 @@ const es = {
     "or": "o",
     "closeMenu": "Cerrar menú",
     "openMenu": "Abrir menú",
-    "language": "Idioma"
+    "language": "Idioma",
+    "controls": "Controles",
+    "account": "Cuenta"
   },
   "theme": {
     "sundayFunday": "Domingo Divertido",
@@ -2022,6 +2025,16 @@ const es = {
       "text": "¡Puedes cambiar de dirección mientras trazas una palabra! Ve a la derecha, luego abajo, luego en diagonal - todo en una palabra."
     },
     "dismiss": "¡Entendido!"
+  },
+  "wizard": {
+    "selectMode": "Seleccionar Modo de Juego",
+    "chooseDifficulty": "Elegir Dificultad",
+    "gridPreview": "tablero",
+    "configureOptions": "Opciones de Juego",
+    "reviewSettings": "Revisar e Iniciar",
+    "stepMode": "Modo",
+    "stepDifficulty": "Dificultad",
+    "stepOf": "Paso {current} de {total}"
   }
 };
 

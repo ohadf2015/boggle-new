@@ -117,6 +117,7 @@ const sv = {
     "lobby": "Lobby",
     "viewGrid": "Visa rutnät",
     "min": "min",
+    "minutes": "min",
     "advancedSettings": "Avancerade inställningar",
     "yourScore": "Din poäng",
     "tapToDismiss": "Tryck för att stänga",
@@ -143,7 +144,9 @@ const sv = {
     "or": "eller",
     "closeMenu": "Stäng meny",
     "openMenu": "Öppna meny",
-    "language": "Språk"
+    "language": "Språk",
+    "controls": "Kontroller",
+    "account": "Konto"
   },
   "theme": {
     "sundayFunday": "Kul Söndag",
@@ -2026,6 +2029,16 @@ const sv = {
       "text": "Du kan byta riktning medan du drar ett ord! Gå höger, sedan ner, sedan diagonalt - allt i ett ord."
     },
     "dismiss": "Förstått!"
+  },
+  "wizard": {
+    "selectMode": "Välj spelläge",
+    "chooseDifficulty": "Välj svårighetsgrad",
+    "gridPreview": "rutnät",
+    "configureOptions": "Spelalternativ",
+    "reviewSettings": "Granska & Starta",
+    "stepMode": "Läge",
+    "stepDifficulty": "Svårighetsgrad",
+    "stepOf": "Steg {current} av {total}"
   }
 };
 

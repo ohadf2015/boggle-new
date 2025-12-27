@@ -117,6 +117,7 @@ const ja = {
     "lobby": "ロビー",
     "viewGrid": "グリッドを見る",
     "min": "分",
+    "minutes": "分",
     "advancedSettings": "詳細設定",
     "yourScore": "あなたのスコア",
     "tapToDismiss": "タップして閉じる",
@@ -143,7 +144,9 @@ const ja = {
     "or": "または",
     "closeMenu": "メニューを閉じる",
     "openMenu": "メニューを開く",
-    "language": "言語"
+    "language": "言語",
+    "controls": "コントロール",
+    "account": "アカウント"
   },
   "theme": {
     "sundayFunday": "楽しい日曜日",
@@ -2025,6 +2028,16 @@ const ja = {
       "text": "単語をなぞる途中で方向を変えられます！右、下、斜めと - すべて1つの単語で。"
     },
     "dismiss": "了解！"
+  },
+  "wizard": {
+    "selectMode": "ゲームモードを選択",
+    "chooseDifficulty": "難易度を選択",
+    "gridPreview": "グリッド",
+    "configureOptions": "ゲームオプション",
+    "reviewSettings": "確認してスタート",
+    "stepMode": "モード",
+    "stepDifficulty": "難易度",
+    "stepOf": "ステップ {current} / {total}"
   }
 };
 

@@ -260,17 +260,11 @@ const PresetSelector: React.FC<PresetSelectorProps> = ({
           <span>{t('singlePlayer.preset.quickStart') || 'Quick Start'}</span>
         </div>
 
-        {/* Preset cards - 2x2 grid */}
+        {/* Preset cards - 2x2 grid + daily */}
         <div className="grid grid-cols-2 gap-3">
           {mainPresets.map((preset, index) => renderPresetCard(preset, index))}
+          {dailyPreset && renderPresetCard(dailyPreset, mainPresets.length)}
         </div>
-
-        {/* Daily challenge - full width */}
-        {dailyPreset && (
-          <div className="mt-2">
-            {renderPresetCard(dailyPreset, mainPresets.length)}
-          </div>
-        )}
 
         {/* Challenge high score teaser */}
         {challengeInfo.highScore !== null && (

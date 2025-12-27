@@ -72,10 +72,10 @@ const MODE_CONFIG = {
   },
 };
 
-const BOT_DIFFICULTY_CONFIG: Record<BotDifficulty, { labelKey: string; color: string }> = {
-  easy: { labelKey: 'bots.easy', color: 'bg-neo-lime' },
-  medium: { labelKey: 'bots.medium', color: 'bg-neo-yellow' },
-  hard: { labelKey: 'bots.hard', color: 'bg-neo-red text-white' },
+const BOT_DIFFICULTY_CONFIG: Record<BotDifficulty, { labelKey: string; color: string; icon: string }> = {
+  easy: { labelKey: 'bots.easy', color: 'bg-sky-400', icon: '🤖' },
+  medium: { labelKey: 'bots.medium', color: 'bg-violet-400', icon: '⚙️' },
+  hard: { labelKey: 'bots.hard', color: 'bg-fuchsia-500 text-white', icon: '💀' },
 };
 
 /**
@@ -405,7 +405,7 @@ const SinglePlayerLobby: React.FC<SinglePlayerLobbyProps> = ({
                           {bot.name}
                         </span>
                         <Badge className={cn('text-[10px] px-1.5 py-0', BOT_DIFFICULTY_CONFIG[bot.difficulty].color)}>
-                          {bot.difficulty === 'easy' ? '🌱' : bot.difficulty === 'medium' ? '⚡' : '🔥'}
+                          {BOT_DIFFICULTY_CONFIG[bot.difficulty].icon}
                         </Badge>
                         <button
                           onClick={() => removeBot(bot.id)}
@@ -685,7 +685,7 @@ const SinglePlayerLobby: React.FC<SinglePlayerLobbyProps> = ({
                           {bot.name}
                         </span>
                         <Badge className={cn('text-[10px] px-1.5 py-0', BOT_DIFFICULTY_CONFIG[bot.difficulty].color)}>
-                          {bot.difficulty === 'easy' ? '🌱' : bot.difficulty === 'medium' ? '⚡' : '🔥'}
+                          {BOT_DIFFICULTY_CONFIG[bot.difficulty].icon}
                         </Badge>
                         <button
                           onClick={() => removeBot(bot.id)}
@@ -1008,7 +1008,7 @@ const SinglePlayerLobby: React.FC<SinglePlayerLobbyProps> = ({
                         {bot.name}
                       </span>
                       <Badge className={cn('text-[10px] px-1.5 py-0', BOT_DIFFICULTY_CONFIG[bot.difficulty].color)}>
-                        {bot.difficulty === 'easy' ? '🌱' : bot.difficulty === 'medium' ? '⚡' : '🔥'}
+                        {BOT_DIFFICULTY_CONFIG[bot.difficulty].icon}
                       </Badge>
                       <button
                         onClick={() => removeBot(bot.id)}
