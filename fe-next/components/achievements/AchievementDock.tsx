@@ -167,7 +167,7 @@ const AchievementDock = ({ achievements = [], className }: AchievementDockProps)
             )}
           >
             {/* Header - Neo-Brutalist stripe */}
-            <div className="bg-neo-purple border-b-4 border-neo-black px-4 py-3 flex items-center gap-2">
+            <div className="bg-neo-purple text-white border-b-4 border-neo-black px-4 py-3 flex items-center gap-2">
               <span className="text-xl">🏆</span>
               <h3 className="font-black uppercase text-neo-white tracking-wide">
                 {t('achievementDock.title') || 'YOUR ACHIEVEMENTS'}
@@ -198,7 +198,7 @@ const AchievementDock = ({ achievements = [], className }: AchievementDockProps)
                           'transition-all duration-100 cursor-pointer'
                         )}
                       >
-                        <div className="w-10 h-10 rounded-md bg-neo-cyan border-2 border-neo-black flex items-center justify-center shadow-hard-sm flex-shrink-0">
+                        <div className="w-10 h-10 rounded-md bg-neo-cyan text-neo-black border-2 border-neo-black flex items-center justify-center shadow-hard-sm flex-shrink-0">
                           <span className="text-lg">{achievement.icon}</span>
                         </div>
                         <div className="flex-1 min-w-0">

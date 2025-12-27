@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, memo, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { AchievementBadge } from '../AchievementBadge';
 import PlayerInsights from './PlayerInsights';
@@ -12,6 +12,7 @@ import Avatar from '../Avatar';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../ui/tooltip';
 import logger from '@/utils/logger';
 import XpBreakdownCard from './XpBreakdownCard';
+import PlayerArchetypeBadge from './PlayerArchetypeBadge';
 import { WordPointsGroup, SharedWordsSection, InvalidWordsSection } from './WordPointsGroup';
 import { getRankIconString, getRankBoxStyle, getCardStyle } from '../../utils/rankingStyles';
 import type { WordObject, GameAchievement, ResultsPlayerCardProps } from './types';
@@ -78,7 +79,7 @@ const filterGameAchievements = (
   });
 };
 
-const ResultsPlayerCard: React.FC<ResultsPlayerCardProps> = ({ player, index, allPlayerWords, currentUsername, isWinner, xpGainedData, levelUpData, duplicateRuleDisabled }) => {
+const ResultsPlayerCard: React.FC<ResultsPlayerCardProps> = memo(({ player, index, allPlayerWords, currentUsername, isWinner, xpGainedData, levelUpData, duplicateRuleDisabled, archetype }) => {
   const { t, dir } = useLanguage();
   // Arrow for level up indicator - use ← in RTL and → in LTR to show progression
   // In RTL languages, left arrow indicates "going up/forward"
@@ -87,12 +88,12 @@ const ResultsPlayerCard: React.FC<ResultsPlayerCardProps> = ({ player, index, al
   // Check if this is the current player
   const isCurrentPlayer = currentUsername && player.username === currentUsername;
 
-  // Auto-expand only the current player's words by default
-  const [isWordsExpanded, setIsWordsExpanded] = useState(isCurrentPlayer);
+  // Don't auto-expand - current player has ConsolidatedPlayerCard above
+  const [isWordsExpanded, setIsWordsExpanded] = useState(false);
 
-  const handleToggleExpand = () => {
-    setIsWordsExpanded(!isWordsExpanded);
-  };
+  const handleToggleExpand = useCallback(() => {
+    setIsWordsExpanded(prev => !prev);
+  }, []);
 
   // Extract avatar info if available
   const avatar = player.avatar || null;
@@ -215,8 +216,8 @@ const ResultsPlayerCard: React.FC<ResultsPlayerCardProps> = ({ player, index, al
 
   const showWinnerMessage = isCurrentPlayer && isWinner;
 
-  // Calculate how many players found each word
-  const getPlayerCountForWord = (word: string): number => {
+  // Calculate how many players found each word - memoized to prevent recalculation
+  const getPlayerCountForWord = useCallback((word: string): number => {
     if (!allPlayerWords || !word) return 1;
     let count = 0;
     Object.values(allPlayerWords).forEach(playerWordList => {
@@ -225,7 +226,7 @@ const ResultsPlayerCard: React.FC<ResultsPlayerCardProps> = ({ player, index, al
       }
     });
     return count;
-  };
+  }, [allPlayerWords]);
 
   // Use centralized ranking utilities
   const rankIcon = getRankIconString(index);
@@ -302,32 +303,38 @@ const ResultsPlayerCard: React.FC<ResultsPlayerCardProps> = ({ player, index, al
                     </motion.span>
                   )}
                 </div>
-                {/* Title badge - secondary row */}
-                {player.title && (
-                  <TooltipProvider delayDuration={0}>
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <motion.div
-                          initial={{ scale: 0, opacity: 0, x: -10 }}
-                          animate={{ scale: 1, opacity: 1, x: 0 }}
-                          transition={{ delay: 0.4, type: 'spring', stiffness: 300 }}
-                          className="flex items-center gap-1 cursor-help bg-neo-purple/10 px-1.5 py-0.5 rounded-neo border border-neo-black w-fit"
+                {/* Title badge and Archetype badge - secondary row */}
+                <div className="flex items-center gap-2 flex-wrap">
+                  {player.title && (
+                    <TooltipProvider delayDuration={0}>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <motion.div
+                            initial={{ scale: 0, opacity: 0, x: -10 }}
+                            animate={{ scale: 1, opacity: 1, x: 0 }}
+                            transition={{ delay: 0.4, type: 'spring', stiffness: 300 }}
+                            className="flex items-center gap-1 cursor-help bg-neo-purple/10 text-white px-1.5 py-0.5 rounded-neo border border-neo-black w-fit"
+                          >
+                            <span className="text-sm">{player.title.icon}</span>
+                            <span className="text-xs font-black text-neo-purple uppercase tracking-wide">
+                              {player.title.name}
+                            </span>
+                          </motion.div>
+                        </TooltipTrigger>
+                        <TooltipContent
+                          side="bottom"
+                          className="bg-neo-purple text-white border-2 border-neo-black shadow-hard rounded-neo p-2"
                         >
-                          <span className="text-sm">{player.title.icon}</span>
-                          <span className="text-xs font-black text-neo-purple uppercase tracking-wide">
-                            {player.title.name}
-                          </span>
-                        </motion.div>
-                      </TooltipTrigger>
-                      <TooltipContent
-                        side="bottom"
-                        className="bg-neo-purple border-2 border-neo-black shadow-hard rounded-neo p-2"
-                      >
-                        <p className="text-xs font-bold text-neo-cream">{player.title.description}</p>
-                      </TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
-                )}
+                          <p className="text-xs font-bold text-neo-cream">{player.title.description}</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                  )}
+                  {/* Show archetype only for other players - current player has it in ConsolidatedPlayerCard */}
+                  {archetype && !isCurrentPlayer && (
+                    <PlayerArchetypeBadge archetype={archetype} size="sm" showTooltip={true} />
+                  )}
+                </div>
               </div>
             </div>
 
@@ -337,56 +344,34 @@ const ResultsPlayerCard: React.FC<ResultsPlayerCardProps> = ({ player, index, al
             </div>
           </div>
 
-          {/* Stats row - condensed */}
-          <div className="flex items-center gap-2 flex-wrap">
-            {/* Combo bonus */}
-            {totalComboBonus > 0 && (
-              <motion.div
-                initial={{ scale: 0, rotate: -10 }}
-                animate={{ scale: 1, rotate: 3 }}
-                transition={{ delay: 0.2, type: 'spring', stiffness: 300 }}
-                className="bg-neo-orange border-2 border-neo-black rounded-neo px-2 py-0.5 shadow-hard-sm text-neo-black flex items-center gap-1"
-              >
-                <span className="text-xs font-black">⚡ {t('results.comboBonus')}: +{totalComboBonus}</span>
-              </motion.div>
-            )}
+          {/* Stats row - condensed (only show bonuses for other players - current player has them in ConsolidatedPlayerCard) */}
+          {!isCurrentPlayer && (totalComboBonus > 0 || totalFireRoundBonus > 0) && (
+            <div className="flex items-center gap-2 flex-wrap">
+              {/* Combo bonus */}
+              {totalComboBonus > 0 && (
+                <motion.div
+                  initial={{ scale: 0, rotate: -10 }}
+                  animate={{ scale: 1, rotate: 3 }}
+                  transition={{ delay: 0.2, type: 'spring', stiffness: 300 }}
+                  className="bg-neo-orange border-2 border-neo-black rounded-neo px-2 py-0.5 shadow-hard-sm text-neo-black flex items-center gap-1"
+                >
+                  <span className="text-xs font-black">⚡ +{totalComboBonus}</span>
+                </motion.div>
+              )}
 
-            {/* Fire Round Bonus */}
-            {totalFireRoundBonus > 0 && (
-              <motion.div
-                initial={{ scale: 0, rotate: -10 }}
-                animate={{ scale: 1, rotate: 3 }}
-                transition={{ delay: 0.25, type: 'spring', stiffness: 300 }}
-                className="bg-neo-red border-2 border-neo-black rounded-neo px-2 py-0.5 shadow-hard-sm text-neo-cream flex items-center gap-1"
-              >
-                <span className="text-xs font-black">🔥 {t('results.fireRoundBonus') || 'Fire Round'}: +{totalFireRoundBonus}</span>
-              </motion.div>
-            )}
-
-            {/* XP Earned - Only for current player with XP data */}
-            {isCurrentPlayer && xpGainedData && (
-              <motion.div
-                initial={{ scale: 0, opacity: 0, x: -20 }}
-                animate={{ scale: 1, opacity: 1, x: 0 }}
-                transition={{ delay: 0.3, type: 'spring', stiffness: 300 }}
-                className="bg-neo-purple border-2 border-neo-black rounded-neo px-2 py-0.5 shadow-hard-sm text-neo-cream flex items-center gap-1"
-              >
-                <span className="text-xs font-black">⭐ +{xpGainedData.xpEarned} XP</span>
-              </motion.div>
-            )}
-
-            {/* Level Up - Only for current player with level up data */}
-            {isCurrentPlayer && levelUpData && (
-              <motion.div
-                initial={{ scale: 0, opacity: 0, rotate: -10 }}
-                animate={{ scale: 1, opacity: 1, rotate: 2 }}
-                transition={{ delay: 0.4, type: 'spring', stiffness: 200, damping: 10 }}
-                className="bg-neo-yellow border-2 border-neo-black rounded-neo px-2 py-0.5 shadow-hard-sm text-neo-black flex items-center gap-1"
-              >
-                <span className="text-xs font-black">🎉 {t('results.levelUp') || 'Level Up!'} {levelUpData.oldLevel} {levelArrow} {levelUpData.newLevel}</span>
-              </motion.div>
-            )}
-          </div>
+              {/* Fire Round Bonus */}
+              {totalFireRoundBonus > 0 && (
+                <motion.div
+                  initial={{ scale: 0, rotate: -10 }}
+                  animate={{ scale: 1, rotate: 3 }}
+                  transition={{ delay: 0.25, type: 'spring', stiffness: 300 }}
+                  className="bg-neo-red border-2 border-neo-black rounded-neo px-2 py-0.5 shadow-hard-sm text-neo-cream flex items-center gap-1"
+                >
+                  <span className="text-xs font-black">🔥 +{totalFireRoundBonus}</span>
+                </motion.div>
+              )}
+            </div>
+          )}
         </div>
 
 
@@ -487,16 +472,10 @@ const ResultsPlayerCard: React.FC<ResultsPlayerCardProps> = ({ player, index, al
           </AnimatePresence>
         </div>
 
-        {/* Player Insights - Only for current player when words are expanded */}
-        {isCurrentPlayer && isWordsExpanded && playerInsights && (
-          <div className="relative z-10">
-            <PlayerInsights insights={playerInsights} />
-          </div>
-        )}
+        {/* Player Insights - Disabled for current player (shown in ConsolidatedPlayerCard above) */}
 
-        {/* Achievements Section - Neo-Brutalist */}
-        {/* Only show game-specific achievements, filtered to exclude lifetime/career achievements */}
-        {gameAchievements.length > 0 && (
+        {/* Achievements Section - Only for other players (current player has it in ConsolidatedPlayerCard) */}
+        {gameAchievements.length > 0 && !isCurrentPlayer && (
           <div className="mt-3 pt-3 sm:mt-4 sm:pt-4 border-t-4 border-neo-black relative z-10">
             <p className="text-sm font-black mb-2 text-neo-purple uppercase">
               {t('hostView.achievements')}:
@@ -509,19 +488,12 @@ const ResultsPlayerCard: React.FC<ResultsPlayerCardProps> = ({ player, index, al
           </div>
         )}
 
-        {/* XP Breakdown Card - Only for current authenticated player with XP data */}
-        {isCurrentPlayer && xpGainedData && (
-          <div className="relative z-10">
-            <XpBreakdownCard
-              xpGainedData={xpGainedData}
-              levelUpData={levelUpData}
-              isWinner={isWinner}
-            />
-          </div>
-        )}
+        {/* XP Breakdown - Disabled for current player (shown in ConsolidatedPlayerCard above) */}
       </div>
     </motion.div>
   );
-};
+});
+
+ResultsPlayerCard.displayName = 'ResultsPlayerCard';
 
 export default ResultsPlayerCard;

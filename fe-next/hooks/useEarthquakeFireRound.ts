@@ -126,29 +126,8 @@ export function useEarthquakeFireRound(
     return { grid: newGrid, embeddedWords: [] };
   }, [difficulty, language]);
 
-  // Trigger earthquake sequence
-  const triggerEarthquake = useCallback(() => {
-    if (earthquakeTriggeredRef.current) {
-      return;
-    }
-
-    earthquakeTriggeredRef.current = true;
-
-    // For multiplayer hosts, emit socket event instead of executing locally
-    if (mode === 'multiplayer' && isHost && socket) {
-      const payload: TriggerEarthquakePayload = {
-        gameSessionId: String(gameSessionId ?? ''),
-        triggerTime: currentTimeSeconds,
-      };
-      socket.emit('triggerEarthquake', payload);
-      return; // Backend will broadcast events back to all players including host
-    }
-
-    // Single-player or non-host: Execute earthquake sequence locally
-    executeEarthquakeSequence();
-  }, [mode, isHost, socket, gameSessionId, currentTimeSeconds]);
-
   // Execute the full earthquake sequence (warning → shake → fire round)
+  // Defined before triggerEarthquake since it's used by triggerEarthquake
   const executeEarthquakeSequence = useCallback(() => {
     // Phase 1: WARNING (2 seconds)
     setEarthquakeState('warning');
@@ -202,6 +181,28 @@ export function useEarthquakeFireRound(
     onTimerPause,
     onTimerResume,
   ]);
+
+  // Trigger earthquake sequence
+  const triggerEarthquake = useCallback(() => {
+    if (earthquakeTriggeredRef.current) {
+      return;
+    }
+
+    earthquakeTriggeredRef.current = true;
+
+    // For multiplayer hosts, emit socket event instead of executing locally
+    if (mode === 'multiplayer' && isHost && socket) {
+      const payload: TriggerEarthquakePayload = {
+        gameSessionId: String(gameSessionId ?? ''),
+        triggerTime: currentTimeSeconds,
+      };
+      socket.emit('triggerEarthquake', payload);
+      return; // Backend will broadcast events back to all players including host
+    }
+
+    // Single-player or non-host: Execute earthquake sequence locally
+    executeEarthquakeSequence();
+  }, [mode, isHost, socket, gameSessionId, currentTimeSeconds, executeEarthquakeSequence]);
 
   // Monitor time remaining and trigger earthquake at the right moment
   useEffect(() => {

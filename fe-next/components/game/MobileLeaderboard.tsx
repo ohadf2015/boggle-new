@@ -82,11 +82,11 @@ const MobileLeaderboard = memo<MobileLeaderboardProps>(({
           <div className="flex items-center justify-between gap-2 border-b-2 border-neo-black/20 pb-1 mb-1">
             <div className="flex items-center gap-1">
               <FaTrophy className="text-neo-yellow text-sm" style={{ filter: 'drop-shadow(1px 1px 0px rgb(var(--neo-black)))' }} />
-              <span className="text-[10px] font-black uppercase text-neo-black/70">
+              <span className="text-[10px] font-black uppercase text-neo-black/90">
                 {t('playerView.rankings') || 'Rankings'}
               </span>
             </div>
-            <FaChevronUp className="text-neo-black/70 text-xs" />
+            <FaChevronUp className="text-neo-black/90 text-xs" />
           </div>
 
           {/* Top 3 Mini-List */}
@@ -114,7 +114,7 @@ const MobileLeaderboard = memo<MobileLeaderboardProps>(({
           {/* Player's rank if not in top 3 */}
           {playerData.rank && playerData.rank > 3 && (
             <>
-              <div className="text-center text-neo-black/75 text-[10px]">⋯</div>
+              <div className="text-center text-neo-black/90 text-[10px]">⋯</div>
               <div className="flex items-center gap-1.5 px-1.5 py-0.5 rounded-neo text-xs bg-neo-cyan ring-2 ring-neo-black">
                 <span className="font-black w-5 text-center text-[10px]">
                   #{playerData.rank}
@@ -175,7 +175,7 @@ const MobileLeaderboard = memo<MobileLeaderboardProps>(({
                     </span>
                   )}
                 </div>
-                <div className="text-xs font-bold text-neo-black/70">
+                <div className="text-xs font-bold text-neo-black/90">
                   {player.wordCount || 0} {t('hostView.words') || 'words'}
                 </div>
               </div>
@@ -185,7 +185,7 @@ const MobileLeaderboard = memo<MobileLeaderboardProps>(({
                 <div className="text-lg font-black text-neo-black leading-none">
                   {player.score}
                 </div>
-                <div className="text-[9px] font-bold text-neo-black/75 uppercase">pts</div>
+                <div className="text-[9px] font-bold text-neo-black uppercase">pts</div>
               </div>
             </motion.div>
           ))}

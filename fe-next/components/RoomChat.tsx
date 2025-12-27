@@ -267,11 +267,11 @@ const RoomChat: React.FC<RoomChatProps> = ({ username, isHost, gameCode, classNa
                 className="relative"
               >
                 {/* Decorative background shapes */}
-                <div className="absolute -top-2 -right-2 w-16 h-16 bg-neo-pink border-3 border-neo-black rotate-12 -z-10" />
-                <div className="absolute -bottom-2 -left-2 w-12 h-12 bg-neo-cyan border-3 border-neo-black -rotate-6 -z-10" />
+                <div className="absolute -top-2 -right-2 w-16 h-16 bg-neo-pink text-white border-3 border-neo-black rotate-12 -z-10" />
+                <div className="absolute -bottom-2 -left-2 w-12 h-12 bg-neo-cyan text-neo-black border-3 border-neo-black -rotate-6 -z-10" />
 
                 {/* Main icon container */}
-                <div className="bg-neo-yellow border-3 border-neo-black shadow-hard p-4 rotate-[-2deg]">
+                <div className="bg-neo-yellow text-neo-black border-3 border-neo-black shadow-hard p-4 rotate-[-2deg]">
                   <FaComments className="text-4xl text-neo-black" />
                 </div>
               </motion.div>

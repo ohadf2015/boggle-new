@@ -295,8 +295,8 @@ const DailyChallengeResults: React.FC<DailyChallengeResultsProps> = ({
           transition={{ delay: 0.4 }}
           className="grid grid-cols-3 gap-3"
         >
-          <div className="bg-white dark:bg-neo-navy-light rounded-neo border-3 border-neo-black dark:border-white/20 p-3 shadow-hard-sm">
-            <BookOpen className="w-5 h-5 mx-auto mb-1 text-neo-cyan" />
+          <div className="bg-white text-neo-black dark:bg-neo-navy-light dark:text-white rounded-neo border-3 border-neo-black dark:border-white/20 p-3 shadow-hard-sm">
+            <BookOpen className="w-5 h-5 mx-auto mb-1 text-cyan-600 dark:text-neo-cyan" />
             <div className="text-xl font-black text-neo-black dark:text-white">
               {result.wordCount}
             </div>
@@ -305,7 +305,7 @@ const DailyChallengeResults: React.FC<DailyChallengeResultsProps> = ({
             </div>
           </div>
 
-          <div className="bg-white dark:bg-neo-navy-light rounded-neo border-3 border-neo-black dark:border-white/20 p-3 shadow-hard-sm">
+          <div className="bg-white text-neo-black dark:bg-neo-navy-light dark:text-white rounded-neo border-3 border-neo-black dark:border-white/20 p-3 shadow-hard-sm">
             <Flame className="w-5 h-5 mx-auto mb-1 text-neo-orange" />
             <div className="text-xl font-black text-neo-black dark:text-white">
               {streak?.currentStreak ?? 0}
@@ -315,7 +315,7 @@ const DailyChallengeResults: React.FC<DailyChallengeResultsProps> = ({
             </div>
           </div>
 
-          <div className="bg-white dark:bg-neo-navy-light rounded-neo border-3 border-neo-black dark:border-white/20 p-3 shadow-hard-sm">
+          <div className="bg-white text-neo-black dark:bg-neo-navy-light dark:text-white rounded-neo border-3 border-neo-black dark:border-white/20 p-3 shadow-hard-sm">
             <Clock className="w-5 h-5 mx-auto mb-1 text-neo-purple" />
             <div className="text-xl font-black text-neo-black dark:text-white">
               {Math.floor(result.timeSeconds / 60)}<span className="text-sm font-bold text-gray-500">m</span> {(result.timeSeconds % 60).toString().padStart(2, '0')}<span className="text-sm font-bold text-gray-500">s</span>

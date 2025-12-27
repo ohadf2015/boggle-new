@@ -2,14 +2,14 @@
 module.exports = {
   darkMode: ["class"],
   content: [
-    './app/**/*.{js,jsx,ts,tsx}',
-    './components/**/*.{js,jsx,ts,tsx}',
-    './contexts/**/*.{js,jsx,ts,tsx}',
-    './utils/**/*.{js,jsx,ts,tsx}',
-    './host/**/*.{js,jsx,ts,tsx}',
-    './player/**/*.{js,jsx,ts,tsx}',
-    './lib/**/*.{js,jsx,ts,tsx}',
-    './*.{js,jsx,ts,tsx}',
+    './app/**/*.{js,jsx,ts,tsx,mdx}',
+    './components/**/*.{js,jsx,ts,tsx,mdx}',
+    './contexts/**/*.{js,jsx,ts,tsx,mdx}',
+    './utils/**/*.{js,jsx,ts,tsx,mdx}',
+    './host/**/*.{js,jsx,ts,tsx,mdx}',
+    './player/**/*.{js,jsx,ts,tsx,mdx}',
+    './lib/**/*.{js,jsx,ts,tsx,mdx}',
+    './*.{js,jsx,ts,tsx,mdx}',
   ],
   prefix: "",
   theme: {
@@ -247,6 +247,21 @@ module.exports = {
         'neo': ['var(--font-fredoka)', 'var(--font-rubik)', 'Fredoka', 'Rubik', 'sans-serif'],
         'neo-display': ['var(--font-fredoka)', 'Fredoka', 'sans-serif'],
         'neo-body': ['var(--font-rubik)', 'Rubik', 'sans-serif'],
+        sans: ['var(--font-rubik)', 'Rubik', 'sans-serif'],
+      },
+      // Additional spacing for better component composition
+      spacing: {
+        '18': '4.5rem',
+        '88': '22rem',
+        '128': '32rem',
+      },
+      // Z-index scale for better layering
+      zIndex: {
+        '60': '60',
+        '70': '70',
+        '80': '80',
+        '90': '90',
+        '100': '100',
       },
     },
   },

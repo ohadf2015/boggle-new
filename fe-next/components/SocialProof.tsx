@@ -111,8 +111,8 @@ const SocialProof: React.FC<SocialProofProps> = ({
         )}
       >
         <span className="relative flex h-2 w-2">
-          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-neo-lime opacity-75" />
-          <span className="relative inline-flex rounded-full h-2 w-2 bg-neo-lime" />
+          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-neo-lime text-neo-black opacity-75" />
+          <span className="relative inline-flex rounded-full h-2 w-2 bg-neo-lime text-neo-black" />
         </span>
         <FaUsers className="w-3 h-3" />
         <span>{displayStats.playersOnline} {t('social.online') || 'online'}</span>
@@ -125,8 +125,8 @@ const SocialProof: React.FC<SocialProofProps> = ({
       <div className={cn("flex items-center gap-4 text-sm", className)}>
         <div className="flex items-center gap-1.5 text-neo-lime">
           <span className="relative flex h-2 w-2">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-neo-lime opacity-75" />
-            <span className="relative inline-flex rounded-full h-2 w-2 bg-neo-lime" />
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-neo-lime text-neo-black opacity-75" />
+            <span className="relative inline-flex rounded-full h-2 w-2 bg-neo-lime text-neo-black" />
           </span>
           <FaUsers className="w-3.5 h-3.5" />
           <span className="font-bold">{displayStats.playersOnline}</span>
@@ -134,7 +134,7 @@ const SocialProof: React.FC<SocialProofProps> = ({
         <div className="flex items-center gap-1.5 text-neo-orange">
           <FaGamepad className="w-3.5 h-3.5" />
           <span className="font-bold">{displayStats.gamesActive}</span>
-          <span className="text-neo-white/75">{t('social.games') || 'games'}</span>
+          <span className="text-neo-white/90">{t('social.games') || 'games'}</span>
         </div>
       </div>
     );
@@ -166,14 +166,14 @@ const SocialProof: React.FC<SocialProofProps> = ({
           className="flex items-center gap-2"
         >
           <span className="relative flex h-3 w-3">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-neo-lime opacity-75" />
-            <span className="relative inline-flex rounded-full h-3 w-3 bg-neo-lime border border-neo-black" />
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-neo-lime text-neo-black opacity-75" />
+            <span className="relative inline-flex rounded-full h-3 w-3 bg-neo-lime text-neo-black border border-neo-black" />
           </span>
           <FaUsers className="text-neo-yellow w-4 h-4" />
           <span className="font-black text-neo-white">
             {displayStats.playersOnline}
           </span>
-          <span className="text-neo-white/80 font-bold text-sm hidden sm:inline">
+          <span className="text-neo-white/90 font-bold text-sm hidden sm:inline">
             {t('social.playersOnline') || 'players online'}
           </span>
         </motion.div>
@@ -192,7 +192,7 @@ const SocialProof: React.FC<SocialProofProps> = ({
           <span className="font-black text-neo-white">
             {displayStats.gamesActive}
           </span>
-          <span className="text-neo-white/80 font-bold text-sm hidden sm:inline">
+          <span className="text-neo-white/90 font-bold text-sm hidden sm:inline">
             {t('social.gamesNow') || 'games happening now'}
           </span>
         </motion.div>
@@ -209,13 +209,13 @@ const SocialProof: React.FC<SocialProofProps> = ({
                 className="hidden md:flex items-center gap-2"
               >
                 <FaTrophy className="text-neo-yellow w-4 h-4" />
-                <span className="text-neo-white/80 font-bold text-sm">
+                <span className="text-neo-white/90 font-bold text-sm">
                   {t('social.newRecord') || 'New record:'}
                 </span>
                 <span className="font-black text-neo-yellow">
                   {displayStats.recentHighScore.score}
                 </span>
-                <span className="text-neo-white/75 text-sm">
+                <span className="text-neo-white/90 text-sm">
                   by @{displayStats.recentHighScore.username}
                 </span>
               </motion.div>

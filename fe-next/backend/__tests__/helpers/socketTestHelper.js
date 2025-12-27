@@ -367,18 +367,31 @@ function createTestEnvironment() {
     },
 
     /**
+     * Generate a random UUID v4 for testing
+     * @returns {string}
+     */
+    generateUUID() {
+      return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+        const r = Math.random() * 16 | 0;
+        const v = c === 'x' ? r : (r & 0x3 | 0x8);
+        return v.toString(16);
+      });
+    },
+
+    /**
      * Helper to generate test game data
      * @param {Object} overrides - Override default values
      * @returns {Object}
      */
     createGameData(overrides = {}) {
+      // Generate 8-char alphanumeric code (satisfies 6-10 char requirement)
       const code = `TS${Math.random().toString(36).substring(2, 8).toUpperCase()}`;
       return {
         gameCode: code,
         roomName: `Test Room ${code}`,
         language: 'en',
         hostUsername: 'TestHost',
-        playerId: `player_${Date.now()}`,
+        playerId: this.generateUUID(), // UUID v4 format required by schema
         avatar: { emoji: '🎮', color: '#FF6B6B' },
         ...overrides,
       };
@@ -394,7 +407,7 @@ function createTestEnvironment() {
       return {
         gameCode,
         username: `Player${Math.floor(Math.random() * 1000)}`,
-        playerId: `player_${Date.now()}`,
+        playerId: this.generateUUID(), // UUID v4 format required by schema
         avatar: { emoji: '🎯', color: '#4ECDC4' },
         ...overrides,
       };

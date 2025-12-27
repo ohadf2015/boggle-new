@@ -52,17 +52,17 @@ export const QuickJoinForm: React.FC<QuickJoinFormProps> = ({
   };
 
   return (
-    <div className="min-h-screen bg-neo-black pt-4 flex flex-col items-center justify-center p-2 sm:p-4 md:p-6">
+    <div className="min-h-screen bg-neo-black text-white pt-4 flex flex-col items-center justify-center p-2 sm:p-4 md:p-6">
       <motion.div
         initial={{ scale: 0, rotate: -3 }}
         animate={{ scale: 1, rotate: 1 }}
         transition={{ type: 'spring', stiffness: 260, damping: 20 }}
         className="w-full max-w-md"
       >
-        <Card className="bg-neo-navy border-4 border-neo-cream rounded-neo shadow-hard">
+        <Card className="bg-neo-navy text-white border-4 border-neo-cream rounded-neo shadow-hard">
           <CardHeader className="text-center space-y-4">
             <div className="flex justify-center">
-              <div className="p-4 bg-neo-cyan rounded-neo border-3 border-neo-black shadow-hard-sm rotate-3">
+              <div className="p-4 bg-neo-cyan text-neo-black rounded-neo border-3 border-neo-black shadow-hard-sm rotate-3">
                 <FaGamepad size={48} className="text-neo-black" />
               </div>
             </div>
@@ -84,7 +84,7 @@ export const QuickJoinForm: React.FC<QuickJoinFormProps> = ({
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.3 }}
               >
-                <div className="p-4 bg-neo-pink/20 border-3 border-neo-pink rounded-neo">
+                <div className="p-4 bg-neo-pink/20 text-white border-3 border-neo-pink rounded-neo">
                   <p className="text-neo-pink font-bold uppercase text-sm">{error}</p>
                 </div>
               </motion.div>
@@ -123,7 +123,7 @@ export const QuickJoinForm: React.FC<QuickJoinFormProps> = ({
                     required
                     autoFocus
                     className={cn(
-                      "h-14 text-lg bg-neo-cream text-neo-black font-bold border-3 border-neo-black rounded-neo shadow-hard-sm placeholder:text-neo-black/70 focus:border-neo-cyan focus:ring-0",
+                      "h-14 text-lg bg-neo-cream text-neo-black font-bold border-3 border-neo-black rounded-neo shadow-hard-sm placeholder:text-neo-black/50 focus:border-neo-cyan focus:ring-0",
                       usernameError && "border-neo-pink bg-neo-pink/20 text-neo-pink"
                     )}
                     placeholder={t('joinView.playerNamePlaceholder')}
@@ -176,11 +176,11 @@ const AuthenticatedQuickJoin: React.FC<AuthenticatedQuickJoinProps> = ({
         id="auth-display-name"
         value={username || displayName}
         onChange={(e) => setUsername(sanitizeInput(e.target.value, 20))}
-        className="w-full h-16 sm:h-14 text-xl sm:text-lg text-center font-black text-neo-cyan uppercase tracking-tight bg-neo-navy border-3 border-neo-cyan/50 rounded-neo shadow-hard-sm placeholder:text-neo-cyan/70 focus:border-neo-cyan focus:ring-0"
+        className="w-full h-16 sm:h-14 text-xl sm:text-lg text-center font-black text-neo-cyan uppercase tracking-tight bg-neo-navy border-3 border-neo-cyan/50 rounded-neo shadow-hard-sm placeholder:text-neo-cyan/50 focus:border-neo-cyan focus:ring-0"
         placeholder={displayName}
         maxLength={20}
       />
-      <p className="text-neo-cream/70 text-xs font-bold uppercase text-center">
+      <p className="text-neo-cream/90 text-xs font-bold uppercase text-center">
         {t('joinView.tapToChangeDisplayName') || 'Tap to change display name'}
       </p>
     </div>

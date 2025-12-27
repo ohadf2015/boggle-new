@@ -1,0 +1,1952 @@
+// Español translations
+const es = {
+  "flag": "🇪🇸",
+  "name": "Español",
+  "direction": "ltr",
+  "logo": {
+    "lexi": "Lexi",
+    "clash": "Clash"
+  },
+  "seo": {
+    "title": "LexiClash - Juego de Palabras Multijugador Rápido | Compite en Tiempo Real",
+    "description": "¡Compite contra amigos en emocionantes batallas de palabras en tiempo real! LexiClash es un juego de palabras multijugador rápido donde cada segundo cuenta. Encuentra palabras, supera a tus oponentes y sube en la clasificación. Perfecto para fiestas, noches de juegos y competiciones amistosas. ¡Juega gratis en 5 idiomas - sin descargas!",
+    "keywords": "juego de palabras multijugador, juego de palabras en tiempo real, batalla de palabras online, juego de palabras para fiestas, juego de palabras competitivo, boggle online, juego de vocabulario, juego de aprendizaje de idiomas, juego online gratis",
+    "ogTitle": "LexiClash - Juego de Palabras Multijugador Rápido | Compite en Tiempo Real",
+    "ogDescription": "¡Compite contra amigos en emocionantes batallas de palabras en tiempo real! Encuentra palabras rápido, supera a tus oponentes, sube en la clasificación. ¡Juega gratis en 5 idiomas!",
+    "twitterTitle": "LexiClash - Juego de Palabras Multijugador Rápido",
+    "twitterDescription": "¡Compite en batallas de palabras en tiempo real! Encuentra palabras, supera oponentes y sube en la clasificación.",
+    "locale": "es_ES",
+    "language": "Spanish",
+    "leaderboard": {
+      "title": "Clasificación Global - Mejores Jugadores | LexiClash",
+      "description": "Ve a los jugadores mejor clasificados en la tabla de LexiClash. Compite con entusiastas de juegos de palabras de todo el mundo.",
+      "ogTitle": "Clasificación Global - Mejores Jugadores de Palabras",
+      "ogDescription": "¡Mira dónde te clasificas entre los mejores jugadores de palabras!"
+    },
+    "profile": {
+      "title": "Tu Perfil y Estadísticas | LexiClash",
+      "description": "Ve tu perfil de LexiClash, estadísticas de juego, logros y progreso.",
+      "ogTitle": "Perfil del Jugador y Estadísticas - LexiClash",
+      "ogDescription": "Rastrea tus logros y estadísticas de juegos de palabras."
+    },
+    "terms": {
+      "title": "Términos de Servicio | LexiClash",
+      "description": "Lee los Términos de Servicio de LexiClash.",
+      "ogTitle": "Términos de Servicio - LexiClash",
+      "ogDescription": "Términos de Servicio de LexiClash."
+    },
+    "privacy": {
+      "title": "Política de Privacidad | LexiClash",
+      "description": "Política de Privacidad de LexiClash - Aprende cómo protegemos tus datos.",
+      "ogTitle": "Política de Privacidad - LexiClash",
+      "ogDescription": "Aprende cómo LexiClash protege tu privacidad."
+    },
+    "legal": {
+      "title": "Información Legal | LexiClash",
+      "description": "Información legal de LexiClash - Términos de Servicio y Política de Privacidad.",
+      "ogTitle": "Información Legal - LexiClash",
+      "ogDescription": "Accede a los Términos de Servicio y Política de Privacidad de LexiClash."
+    },
+    "singleplayer": {
+      "title": "Modo Un Jugador - Practica y Desafía | LexiClash",
+      "description": "¡Juega LexiClash solo! Practica la búsqueda de palabras, desafía bots de IA y mejora tu vocabulario. Múltiples niveles de dificultad. Sigue tu progreso y supera tus mejores puntuaciones.",
+      "ogTitle": "Modo Un Jugador - Practica y Desafía",
+      "ogDescription": "Practica la búsqueda de palabras solo, desafía bots de IA y supera tus mejores puntuaciones."
+    },
+    "daily": {
+      "title": "Desafío Diario de Palabras - Mismo Puzzle Mundial | LexiClash",
+      "description": "¡Juega el Desafío Diario de LexiClash! Mismo puzzle para todos en el mundo cada día. Comparte tus resultados como Wordle. Compite globalmente.",
+      "ogTitle": "Desafío Diario - Mismo Puzzle Mundial",
+      "ogDescription": "Desafío de palabras diario - mismo tablero para todos. ¡Comparte tus resultados y compite globalmente!"
+    },
+    "multiplayer": {
+      "title": "Batalla de Palabras Multijugador - Competencia en Tiempo Real | LexiClash",
+      "description": "¡Únete a batallas de palabras en tiempo real con amigos! Crea o únete a salas multijugador, compite en vivo contra oponentes y sube en la clasificación.",
+      "ogTitle": "Batalla de Palabras Multijugador - Compite en Vivo",
+      "ogDescription": "Juego de palabras multijugador en tiempo real - crea salas, invita amigos y compite en batallas de palabras en vivo."
+    }
+  },
+  "common": {
+    "loading": "Cargando...",
+    "error": "Error",
+    "back": "Atrás",
+    "next": "Siguiente",
+    "confirm": "Confirmar",
+    "cancel": "Cancelar",
+    "dismiss": "Descartar",
+    "selectUILanguage": "Idioma de Interfaz",
+    "close": "Cerrar",
+    "changeLanguage": "Cambiar idioma",
+    "adminDashboard": "Panel de administración",
+    "understood": "¡Entendido, a jugar!",
+    "refresh": "Actualizar",
+    "reconnecting": "Reconectando al juego...",
+    "reconnected": "¡Reconectado!",
+    "connectionLost": "Conexión perdida",
+    "notConnected": "No conectado al servidor",
+    "connected": "Conectado",
+    "connecting": "Conectando...",
+    "connectedToServer": "Conectado al servidor de juego",
+    "connectingToServer": "Conectando al servidor de juego...",
+    "duplicateWarning": "Las palabras encontradas por varios jugadores no cuentan",
+    "gameStarted": "¡Juego Iniciado!",
+    "joinedGame": "¡Te uniste al juego!",
+    "newGameReady": "¡Nuevo juego comenzando!",
+    "lightMode": "Modo Claro",
+    "darkMode": "Modo Oscuro",
+    "hurry": "¡DATE PRISA!",
+    "goToHome": "Ir al Inicio",
+    "comboBonus": "¡combo!",
+    "pending": "Pendiente",
+    "xpGained": "XP",
+    "score": "Puntuación",
+    "points": "puntos",
+    "combo": "Combo",
+    "quit": "Salir",
+    "foundWords": "Palabras Encontradas",
+    "words": "palabras",
+    "wordsFound": "Palabras Encontradas",
+    "leaderboard": "Clasificación",
+    "you": "Tú",
+    "playAgain": "Jugar de Nuevo",
+    "quickRematch": "Revancha Rápida",
+    "changeSettings": "Cambiar Configuración",
+    "settingsAndPlay": "Configurar y Jugar",
+    "backToLobby": "Volver a la Sala",
+    "settings": "Configuración",
+    "lobby": "Sala de Espera",
+    "viewGrid": "Ver Tablero",
+    "min": "min",
+    "advancedSettings": "Configuración Avanzada",
+    "yourScore": "Tu Puntuación",
+    "tapToDismiss": "Toca para cerrar",
+    "copied": "¡Copiado!",
+    "copyCode": "Copiar código",
+    "rotateLandscape": "¡Gira para mejor experiencia!",
+    "dontShowAgain": "No mostrar de nuevo",
+    "landscapeMode": "Modo Horizontal",
+    "rank": "Puesto",
+    "menu": "Menú",
+    "showControls": "Toca para mostrar controles",
+    "loadingProfile": "Cargando perfil...",
+    "rematch": "Revancha",
+    "roomFull": "La sala está llena. Te has unido como espectador.",
+    "selectLanguage": "Seleccionar idioma",
+    "gotIt": "Entendido",
+    "help": "Ayuda",
+    "pause": "Pausar",
+    "resume": "Reanudar",
+    "retry": "Reintentar",
+    "newGame": "Nuevo Juego",
+    "join": "Unirse",
+    "showLess": "Mostrar menos"
+  },
+  "theme": {
+    "sundayFunday": "Domingo Divertido",
+    "mondayMotivation": "Motivación del Lunes",
+    "tuesdayTrivia": "Trivia del Martes",
+    "wednesdayWisdom": "Sabiduría del Miércoles",
+    "thursdayThrowback": "Nostalgia del Jueves",
+    "funFriday": "Viernes de Fiesta",
+    "saturdayAdventure": "Aventura del Sábado",
+    "newYear": "Año Nuevo",
+    "valentines": "San Valentín",
+    "stPatricks": "San Patricio",
+    "easter": "Pascua",
+    "independence": "Día de la Independencia",
+    "halloween": "Halloween",
+    "thanksgiving": "Acción de Gracias",
+    "christmas": "Navidad",
+    "hanukkah": "Janucá",
+    "roshHashana": "Rosh Hashaná",
+    "yomKippur": "Yom Kipur",
+    "sukkot": "Sucot",
+    "purim": "Purim",
+    "passover": "Pésaj",
+    "shavuot": "Shavuot",
+    "yomHaatzmaut": "Día de la Independencia de Israel",
+    "midsummer": "Solsticio de Verano",
+    "lucia": "Día de Santa Lucía",
+    "threeKings": "Día de los Reyes Magos",
+    "dayOfDead": "Día de los Muertos",
+    "setsubun": "Setsubun",
+    "hinamatsuri": "Día de las Niñas",
+    "sakura": "Temporada de Cerezos",
+    "goldenWeek": "Semana Dorada",
+    "tanabata": "Tanabata",
+    "obon": "Obon",
+    "autumnLeaves": "Hojas de Otoño"
+  },
+  "game": {
+    "swipeToForm": "Desliza letras",
+    "wordAlreadyFound": "¡Ya encontrada!",
+    "wordNotOnBoard": "¡No está en el tablero!",
+    "wordTooShort": "¡Muy corta!",
+    "boardTheme": "Tema del tablero"
+  },
+  "help": {
+    "title": "Ayuda Rápida",
+    "howToPlay": "Cómo Jugar",
+    "swipeLetters": "Desliza sobre letras adyacentes para formar palabras",
+    "diagonalWorks": "¡Las conexiones diagonales también funcionan!",
+    "liftToSubmit": "Levanta el dedo para enviar la palabra",
+    "minThreeLetters": "Las palabras deben tener al menos 3 letras",
+    "scoring": "Puntuación",
+    "letters": "letras",
+    "point": "punto",
+    "points": "puntos",
+    "combos": "Combos",
+    "comboExplanation": "¡Encuentra palabras rápidamente en fila para construir combos! Cada nivel de combo añade puntos bonus a tus palabras.",
+    "keyboardShortcuts": "Atajos de Teclado",
+    "arrowKeys": "Teclas de Flecha",
+    "navigate": "Navegar",
+    "spaceKey": "Espacio",
+    "selectLetter": "Seleccionar letra",
+    "enterKey": "Enter",
+    "submitWord": "Enviar palabra",
+    "backspaceKey": "Retroceso",
+    "undoLetter": "Deshacer letra",
+    "escKey": "Escape",
+    "clearSelection": "Limpiar selección",
+    "swipeDownToClose": "Desliza hacia abajo para cerrar",
+    "accessibility": "Accesibilidad",
+    "disableFireRoundLights": "Desactivar luces de ronda de fuego",
+    "disableFireRoundLightsDescription": "Apaga las luces parpadeantes en las celdas de la cuadrícula durante la ronda de fuego"
+  },
+  "combo": {
+    "shieldUsed": "🛡️ ¡Escudo de Combo Usado!",
+    "shieldEarned": "🛡️ ¡Escudo Ganado!",
+    "explanationTitle": "Explicación de combos",
+    "explanationText": "Los combos aumentan cuando encuentras múltiples palabras seguidas sin pausas. ¡Cuanto mayor sea tu combo, más XP ganarás!"
+  },
+  "earthquake": {
+    "warning": "¡Terremoto!",
+    "brace": "¡Prepárate!",
+    "fireRound": "Ronda de Fuego",
+    "multiplier": "Multiplicador ×2"
+  },
+  "spam": {
+    "warning": "¡Más despacio! Demasiadas palabras inválidas",
+    "penalty": "Puntos deducidos: -${points}",
+    "cooldown": "Bloqueado por ${seconds}s - ¡más despacio!",
+    "cooldownEnd": "Puedes enviar palabras de nuevo",
+    "blockedWord": "Espera ${seconds}s antes de enviar"
+  },
+  "bots": {
+    "title": "Bots de IA",
+    "easy": "Fácil",
+    "medium": "Medio",
+    "hard": "Difícil",
+    "easyDesc": "Palabras de 3-5 letras, ritmo lento",
+    "mediumDesc": "Mezcla equilibrada de palabras",
+    "hardDesc": "Palabras largas, ritmo rápido",
+    "selectDifficulty": "Nivel",
+    "addBot": "Añadir Bot",
+    "adding": "Añadiendo...",
+    "remove": "Eliminar bot",
+    "removeError": "Error al eliminar bot",
+    "currentBots": "Bots en la Sala",
+    "quickAdd": "Añadir",
+    "add": "Añadir",
+    "emptyState": "Añade bots para practicar o llenar la sala",
+    "helpText": "Los bots encuentran y envían palabras automáticamente durante el juego.",
+    "autoFill": "Auto-llenar con bots",
+    "autoFillDesc": "Añadir bots automáticamente para llenar espacios vacíos",
+    "orAddManually": "O añadir manualmente:",
+    "roomFull": "La sala está llena",
+    "autoStart": "Auto-iniciar después de 30s",
+    "autoStartDesc": "Iniciar el juego automáticamente después de 30 segundos",
+    "startingIn": "Comenzando en...",
+    "cancel": "Cancelar",
+    "waitingForPlayers": "Esperando al menos 2 jugadores...",
+    "maxReached": "Máximo de bots alcanzado"
+  },
+  "music": {
+    "volume": "Volumen",
+    "musicVolume": "Música",
+    "sfxVolume": "Sonidos",
+    "mute": "Silenciar",
+    "unmute": "Activar sonido",
+    "clickToEnable": "Haz clic en cualquier lugar para activar la música",
+    "controls": "Controles de Música",
+    "musicVolumeSlider": "Control de volumen de música",
+    "sfxVolumeSlider": "Control de volumen de efectos de sonido"
+  },
+  "share": {
+    "linkCopied": "¡Enlace copiado! 📋",
+    "copyError": "Error al copiar enlace",
+    "inviteMessage": "¡Únete a jugar LexiClash conmigo!",
+    "room": "Sala",
+    "code": "Código",
+    "joinViaLink": "Únete a través de este enlace",
+    "copyLinkButton": "Copiar Enlace",
+    "whatsappButton": "Compartir en WhatsApp",
+    "qrCodeButton": "Mostrar Código QR",
+    "qrCodeTitle": "Escanea para Unirte",
+    "shareTitle": "Invitar Jugadores",
+    "codeCopied": "¡Código copiado! 🎯",
+    "codeCopyError": "Error al copiar código",
+    "buttonLabel": "Compartir Juego",
+    "modalTitle": "Invitar Jugadores",
+    "scanQR": "Escanea con el teléfono para unirte",
+    "orShareVia": "O comparte vía:",
+    "copyLink": "Copiar Enlace",
+    "whatsapp": "WhatsApp",
+    "telegram": "Telegram",
+    "more": "Más...",
+    "inviteTitle": "¡Únete a mi juego de LexiClash!",
+    "copied": "¡Copiado!"
+  },
+  "errors": {
+    "unstableConnection": "La conexión a internet es inestable - podrías experimentar problemas durante el juego",
+    "slowConnection": "La conexión a internet es lenta",
+    "sessionExpired": "Sesión anterior expirada. Por favor únete a una nueva sala.",
+    "gameCodeNotExist": "El código de juego no existe. Por favor verifica e intenta de nuevo.",
+    "usernameTaken": "El nombre de usuario ya está en uso en este juego. Por favor elige otro.",
+    "gameCodeExists": "El código de juego ya existe. Por favor elige un código diferente.",
+    "somethingWentWrong": "¡Ups! Algo salió mal",
+    "unexpectedError": "El juego encontró un error inesperado. Por favor intenta actualizar la página.",
+    "errorDetails": "Detalles del Error",
+    "refreshPage": "Actualizar Página",
+    "connectionTimeout": "Tiempo de conexión agotado",
+    "rateLimited": "Demasiadas solicitudes. Por favor, reduce la velocidad.",
+    "connectionLost": "Conexión perdida",
+    "notConnected": "No conectado al servidor"
+  },
+  "validation": {
+    "usernameRequired": "¡Se requiere nombre de usuario! Por favor completa el campo",
+    "hostUsernameRequired": "Se requiere nombre de jugador para iniciar un juego",
+    "roomNameRequired": "¡Se requiere nombre de sala! Por favor completa el campo",
+    "enterNameToJoin": "Ingresa un nombre para unirte",
+    "enterRoomName": "Nombre para identificar tu sala",
+    "enterGameCode": "Ingresa el código de juego compartido por el anfitrión",
+    "codeHelper": "Código que los jugadores compartirán para unirse",
+    "fourDigitCode": "Código de 4 dígitos",
+    "enterFourDigitCode": "Ingresa un código de 4 dígitos",
+    "usernameTooShort": "El nombre de usuario debe tener al menos 2 caracteres",
+    "usernameTooLong": "El nombre de usuario no puede exceder 20 caracteres",
+    "usernameInvalidChars": "El nombre de usuario contiene caracteres inválidos",
+    "roomNameTooShort": "El nombre de sala debe tener al menos 2 caracteres",
+    "roomNameTooLong": "El nombre de sala no puede exceder 30 caracteres",
+    "roomNameInvalidChars": "El nombre de sala contiene caracteres inválidos",
+    "gameCodeRequired": "Se requiere código de juego",
+    "gameCodeInvalid": "El código de juego debe tener 6-10 caracteres alfanuméricos",
+    "wordRequired": "Se requiere palabra",
+    "wordTooLong": "La palabra es demasiado larga",
+    "wordInvalidChars": "La palabra contiene caracteres inválidos",
+    "gameCodeHint": "Ingresa el código de juego compartido por el anfitrión"
+  },
+  "difficulty": {
+    "easy": "Fácil",
+    "medium": "Medio",
+    "hard": "Difícil",
+    "expert": "Experto",
+    "master": "Maestro"
+  },
+  "joinView": {
+    "title": "LexiClash",
+    "createRoom": "Crear Sala",
+    "joinRoom": "Unirse a Sala",
+    "joinDesc": "Ingresa código para unirte a juego existente",
+    "hostDesc": "Iniciar un nuevo juego como anfitrión",
+    "roomNamePlaceholder": "Ingresa nombre de sala",
+    "roomNameLabel": "Nombre de la Sala",
+    "roomNameHelper": "Nombre mostrado a otros jugadores en el lobby",
+    "roomNameHelperOptional": "Opcional - Se generará un nombre aleatorio si se deja vacío",
+    "optional": "opcional",
+    "roomNameExample": "ej., Noche de Juegos del Viernes",
+    "hostPlayerName": "Tu Nombre de Jugador",
+    "hostPlayerNamePlaceholder": "Ingresa tu nombre de jugador",
+    "hostPlayerNameHelper": "Tu nombre mostrado en el juego",
+    "playerNamePlaceholder": "Ingresa tu nombre",
+    "yourName": "Tu Nombre",
+    "enterYourName": "Ingresa tu nombre",
+    "pleaseEnterYourName": "Por favor ingresa tu nombre",
+    "playerAndRoomName": "Este será tu nombre de jugador y nombre de sala",
+    "selectLanguage": "Idioma del Juego",
+    "language": "Idioma del Juego",
+    "activeRooms": "Salas Disponibles",
+    "noRooms": "No hay salas disponibles. ¡Crea una!",
+    "roomsList": "Salas Disponibles",
+    "players": "jugadores",
+    "host": "Sala",
+    "joiningRoom": "Te estás uniendo a la sala",
+    "roomLabel": "Sala",
+    "wantToHostOrJoinOther": "¿Quieres ser anfitrión o unirte a otra sala?",
+    "clearAndRestart": "Limpiar y empezar de nuevo",
+    "english": "Inglés",
+    "hebrew": "Hebreo",
+    "swedish": "Sueco",
+    "japanese": "Japonés",
+    "spanish": "Español",
+    "generateNewCode": "Generar nuevo código",
+    "createGameInstructions": "¡Crea un juego y comparte el código con amigos!",
+    "createNewRoom": "¡Crea una nueva sala para comenzar!",
+    "howToPlay": "¿Cómo jugar?",
+    "howToPlayTitle": "Cómo Jugar LexiClash",
+    "qrCodeTitle": "Código QR para Unirse",
+    "scanToJoin": "Escanea el código para unirte al juego o usa el código",
+    "copyLink": "Copiar Enlace",
+    "shareWhatsapp": "WhatsApp",
+    "shareEmail": "Email",
+    "inviteTitle": "Unirse a Sala",
+    "enterNameToPlay": "Ingresa tu nombre para jugar",
+    "playButton": "Jugar",
+    "joiningRoomNumber": "Sala",
+    "room": "Sala",
+    "welcomeBack": "Bienvenido de nuevo",
+    "connectingToRoom": "Conectando a la sala...",
+    "enterRoom": "Entrar a la Sala",
+    "joinGame": "Unirse al Juego",
+    "pasteCode": "Pegar código",
+    "joiningAs": "Uniéndose como",
+    "hostingAs": "Siendo anfitrión como",
+    "tapToChangeDisplayName": "Toca para cambiar el nombre",
+    "joining": "Uniéndose...",
+    "creating": "Creando...",
+    "playersOnline": "en línea",
+    "loadingProfile": "Cargando perfil...",
+    "nickname": "Apodo",
+    "nicknamePlaceholder": "Ingresa tu apodo",
+    "roomCode": "Código de sala",
+    "defaultPlayerNames": [
+      "Pepinillo Astuto",
+      "Papa Disco",
+      "Banana Cósmica",
+      "Waffle Esponjoso",
+      "Taco Crujiente",
+      "Mochi Suave",
+      "Pretzel Retorcido",
+      "Galleta Gruesa",
+      "Donut Pegajoso",
+      "Aguacate Picante",
+      "Fideo Masticable",
+      "Falafel Crujiente",
+      "Calabacín Loco",
+      "Salmón Tonto",
+      "Ganso Risueño",
+      "Morsa Loca",
+      "Pingüino Alegre",
+      "Llama Alocada",
+      "Dragón Mareado",
+      "Flamenco Funky",
+      "Oso Saltarín",
+      "Cebra Veloz",
+      "Perezoso Sassy"
+    ],
+    "chooseAvatar": "Elige tu Avatar",
+    "selectAvatar": "Selecciona un avatar",
+    "tapToChange": "Toca para cambiar",
+    "tapToSelect": "Toca para elegir",
+    "playingAs": "Jugando como",
+    "changeProfile": "Cambiar perfil o unirse a otra sala"
+  },
+  "multiplayerFlow": {
+    "selector": {
+      "createCard": {
+        "title": "Crear Sala",
+        "description": "Organiza un juego nuevo e invita amigos",
+        "button": "Iniciar Configuración"
+      },
+      "joinCard": {
+        "title": "Unirse a Sala",
+        "description": "Entra a un juego existente con un código",
+        "button": "Explorar Salas"
+      },
+      "activeRoomsPreview": "Salas Activas",
+      "playersOnline": "en línea",
+      "noRooms": "No hay salas activas - ¡sé el primero en crear una!"
+    },
+    "editProfile": "Editar Perfil",
+    "profileSetup": {
+      "title": "Configuración de Jugador",
+      "editTitle": "Editar Perfil",
+      "progress": "Paso 1 de 2",
+      "editingProgress": "Editando tu perfil",
+      "forCreate": "¡Casi listo! Configura tu perfil para crear una sala.",
+      "forJoin": "¡Casi listo! Configura tu perfil para unirte a una sala.",
+      "forEdit": "Actualiza los detalles de tu perfil a continuación.",
+      "usernameLabel": "¿Cómo te llamamos?",
+      "usernamePlaceholder": "Ingresa tu nombre",
+      "usernameHint": "2-20 caracteres, letras y números",
+      "avatarLabel": "Elige tu avatar",
+      "continueButton": "Continuar",
+      "saveButton": "Guardar Cambios"
+    },
+    "createForm": {
+      "title": "Crear Sala",
+      "progress": "Paso 2 de 2",
+      "profileLabel": "Tu Perfil",
+      "roomNameLabel": "Nombre de la Sala",
+      "roomNamePlaceholder": "Ingresa nombre de sala (opcional)",
+      "roomNameHint": "Este nombre se muestra a otros jugadores en el lobby",
+      "languageHint": "Los jugadores encontrarán palabras en este idioma",
+      "createButton": "Crear Sala",
+      "creating": "Creando..."
+    },
+    "joinForm": {
+      "title": "Unirse a Sala",
+      "progress": "Paso 2 de 2",
+      "profileLabel": "Tu Perfil",
+      "codeLabel": "Ingresa Código de Sala",
+      "codePlaceholder": "ABC123",
+      "codeHint": "Pídele a tu amigo el código de su sala",
+      "roomsLabel": "O elige una sala activa",
+      "refreshButton": "Actualizar",
+      "noRooms": "No hay salas activas. ¡Pídele a un amigo su código!",
+      "joinButton": "Unirse a Sala",
+      "joining": "Uniéndose..."
+    }
+  },
+  "hostView": {
+    "waitingForPlayers": "Esperando jugadores...",
+    "startGame": "Iniciar Juego",
+    "stopGame": "Detener Juego",
+    "roomCode": "Código de Sala",
+    "playersJoined": "Jugadores Unidos",
+    "gameSettings": "Configuración del Juego",
+    "quickSetup": "Configuración Rápida",
+    "presetEasy": "Fácil",
+    "presetEasyDesc": "Tablero 5x5, 2 min",
+    "presetQuick": "Rápido",
+    "presetQuickDesc": "Tablero 7x7, 1 min",
+    "presetParty": "Fiesta",
+    "presetPartyDesc": "Tablero 7x7, 2 min",
+    "presetChallenge": "Desafío",
+    "presetChallengeDesc": "Tablero 9x9, 3 min",
+    "min": "min",
+    "difficulty": "Dificultad",
+    "timer": "Temporizador",
+    "roundDuration": "Duración de la Ronda",
+    "minutes": "minutos",
+    "playerJoinedLate": "¡se unió tarde!",
+    "playerFoundWord": "encontró",
+    "validateWords": "Revisar y validar palabras",
+    "validationComplete": "¡Validación completa!",
+    "gameStopped": "Juego Detenido",
+    "confirmExit": "¿Seguro que quieres salir? La sala permanecerá abierta y otro jugador será el anfitrión.",
+    "exitWarning": "Esta acción cerrará la sala para todos los jugadores. ¿Seguro que quieres salir?",
+    "exitRoom": "Salir de la Sala",
+    "startNewGame": "Iniciar Nuevo Juego",
+    "validation": "Validación de Palabras",
+    "validateIntro": "¿Son estas palabras válidas? Marca las válidas.",
+    "totalWords": "Total de palabras a validar",
+    "submitValidation": "Enviar Validación",
+    "finalScores": "Puntuaciones Finales",
+    "words": "Palabras",
+    "achievements": "Logros",
+    "close": "Cerrar",
+    "copyLink": "Copiar Enlace",
+    "shareWhatsapp": "Compartir WhatsApp",
+    "qrCode": "Código QR",
+    "scanQr": "Escanea el código QR para unirte o usa el código",
+    "autoValidated": "Auto-validado",
+    "clickToShow": "Clic para mostrar",
+    "clickToHide": "Clic para ocultar",
+    "hostPlays": "Quiero jugar",
+    "spectatorMode": "Modo espectador - mira el tablero",
+    "advancedSettings": "Configuración Avanzada",
+    "autoValidatedCount": "palabras auto-validadas",
+    "roomClosedInactivity": "Sala cerrada por inactividad",
+    "gameOverCheckScores": "¡Juego Terminado! Revisa las puntuaciones finales",
+    "validatingWords": "Validando palabras...",
+    "youAreNowHost": "¡Ahora eres el anfitrión!",
+    "newHostAssigned": "ahora es el anfitrión",
+    "hostLeft": "El anfitrión abandonó la sala",
+    "liveResults": "Resultados en Vivo",
+    "spectatingInfo": "Estás como espectador - las palabras están ocultas hasta que termine el juego",
+    "autoSubmittingValidation": "Enviando validación automáticamente por inactividad",
+    "tournamentMode": "Modo Torneo",
+    "rounds": "Rondas",
+    "tournamentRound": "Ronda",
+    "tournamentStandings": "Clasificación del Torneo",
+    "tournamentComplete": "¡Torneo Completo!",
+    "tournamentWinner": "Ganador del Torneo",
+    "totalScore": "Puntuación Total",
+    "nextRound": "Siguiente Ronda",
+    "tournamentProgress": "Progreso del Torneo",
+    "tournamentCreated": "¡Torneo creado!",
+    "tournamentCancelled": "Torneo cancelado",
+    "gameComplete": "¡Juego completo!",
+    "wonTournament": "ganó el torneo",
+    "tournamentCreateFailed": "Error al crear torneo. Por favor intenta de nuevo.",
+    "autoValidationCompleted": "Auto-validación completada",
+    "cancelTournament": "Cancelar Torneo",
+    "confirmCancelTournament": "¿Cancelar Torneo?",
+    "cancelTournamentWarning": "¿Seguro que quieres cancelar el torneo? Todo el progreso se perderá.",
+    "minWordLength": "Longitud Mínima de Palabra",
+    "minWordLength2": "2 letras",
+    "minWordLength3": "3 letras",
+    "minWordLength4": "4 letras",
+    "difficultyTooltipGrid": "Cuadrícula de {{rows}}×{{cols}} letras",
+    "difficultyTooltipTimer": "{{minutes}} min recomendados",
+    "allWordsAutoValidated": "¡Todas las palabras auto-validadas!",
+    "wordsAutoValidated": "palabras auto-validadas",
+    "gameTypeSelector": "Elige Modo de Juego",
+    "regularGame": "Juego Regular",
+    "regularGameDesc": "Ronda rápida para juego casual",
+    "tournament": "Torneo",
+    "tournamentDesc": "Competición de múltiples rondas para campeones",
+    "comingSoon": "Próximamente",
+    "numberOfRounds": "Número de Rondas",
+    "betweenRoundsStandings": "Clasificación Actual",
+    "nextRoundIn": "Siguiente ronda comienza en",
+    "startNow": "Comenzar Ahora",
+    "creatingTournament": "Creando torneo...",
+    "increaseRounds": "Aumentar número de rondas",
+    "decreaseRounds": "Disminuir número de rondas",
+    "resetFailed": "Error al reiniciar el juego",
+    "decreaseTimer": "Disminuir temporizador",
+    "increaseTimer": "Aumentar temporizador",
+    "moreSettings": "Más Configuraciones",
+    "playersReadyForNextGame": "jugadores listos para el próximo juego",
+    "hostPlaysShort": "Anfitrión juega",
+    "hostSpectates": "Espectador",
+    "letters": "letras",
+    "players": "jugadores"
+  },
+  "playerView": {
+    "waitingForHost": "Esperando que el anfitrión inicie...",
+    "submitWord": "Enviar",
+    "clear": "Limpiar",
+    "timeRemaining": "Tiempo Restante",
+    "score": "Puntuación",
+    "wordsFound": "Palabras Encontradas",
+    "wordsOnBoard": "Palabras en el Tablero",
+    "wordsRemaining": "palabras restantes",
+    "remaining": "Quedan",
+    "found": "encontradas",
+    "total": "total",
+    "gameOver": "¡Juego Terminado! 🏁",
+    "wordAlreadyFound": "¡Palabra ya encontrada! ❌",
+    "foundByOther": "Encontrada por ${player}",
+    "wordNotOnBoard": "¡Palabra no está en el tablero! 🚫",
+    "wordRejected": "¡No es una palabra válida! ❌",
+    "newWord": "¡Nueva palabra!",
+    "scoresReady": "¡Puntuaciones listas! ✅",
+    "roomClosed": "Sala cerrada",
+    "onlyLanguageWords": "¡Solo palabras en el idioma seleccionado! 🚫",
+    "exitConfirmation": "¿Salir de la sala?",
+    "exitWarning": "¿Seguro que quieres irte? Perderás tu progreso en el juego actual.",
+    "exit": "Salir",
+    "exitRoom": "Salir de la sala",
+    "waitForGameStart": "Espera que inicie el juego",
+    "players": "Jugadores",
+    "yourAchievements": "Tus Logros",
+    "letterGrid": "Tablero de Letras",
+    "waitingForGame": "Esperando juego...",
+    "add": "Añadir",
+    "enterWord": "Ingresa palabra...",
+    "waitingForResults": "Esperando resultados...",
+    "calculatingScores": "Calculando Puntuaciones...",
+    "aiValidating": "La IA está verificando tus palabras...",
+    "leaderboard": "Clasificación",
+    "noPlayersYet": "Aún no hay jugadores",
+    "wordSubmitted": "Enviado",
+    "wordTooShort": "¡Palabra muy corta! (mín 2 letras)",
+    "wordTooShortMin": "¡Palabra muy corta! (mín ${min} letras)",
+    "errorOccurred": "Ocurrió un error",
+    "tooFast": "¡Más despacio! Enviando muy rápido",
+    "wordCount": "palabras",
+    "longestWord": "Más Larga",
+    "hostValidating": "El anfitrión está validando palabras...",
+    "clickToSelect": "Haz clic en las letras para seleccionar palabras",
+    "me": "Yo",
+    "noWordsYet": "Aún no hay palabras encontradas",
+    "shuffle": "Mezclar",
+    "swipeToFormWords": "Desliza en el tablero para formar palabras",
+    "inviteFriends": "Invitar Amigos",
+    "waitingForHostToStart": "Esperando que el anfitrión inicie el juego...",
+    "notInDictionary": "No está en el diccionario",
+    "hostDisconnected": "Anfitrión desconectado. Esperando reconexión...",
+    "isNowHost": "ahora es el anfitrión",
+    "disconnected": "desconectado. Esperando reconexión...",
+    "reconnected": "reconectado",
+    "leftRoom": "abandonó la sala",
+    "weakConnection": "tiene conexión débil",
+    "connectionRecovered": "conexión recuperada",
+    "sessionMovedToAnotherTab": "Sesión movida a otra pestaña",
+    "sessionMovedToAnotherRoom": "Sesión movida a otra sala",
+    "validatingWord": "Verificando:",
+    "validation": {
+      "scanning": "Escaneando palabras...",
+      "checking": "Verificando diccionario...",
+      "verifying": "IA verificando...",
+      "scoring": "Calculando puntuaciones...",
+      "finalizing": "Finalizando resultados..."
+    },
+    "rankings": "Clasificaciones",
+    "showLeaderboard": "Mostrar tabla de líderes",
+    "slowDown": "¡Más despacio! Las palabras se están procesando.",
+    "submittingTooFast": "Estás enviando palabras demasiado rápido",
+    "words": "Palabras",
+    "alreadyFound": "Ya encontrada",
+    "invalidWord": "Palabra inválida",
+    "pendingValidation": "Validación pendiente"
+  },
+  "hints": {
+    "hint": "Pista",
+    "getHint": "Obtener Pista",
+    "loading": "Obteniendo pista...",
+    "noHints": "No quedan pistas",
+    "noWordsLeft": "¡No hay más palabras por encontrar!",
+    "lookFor": "Busca una palabra de",
+    "letterWord": "letras",
+    "letters": "letras",
+    "startsWith": "comienza con",
+    "tapToDismiss": "Toca para cerrar",
+    "with": "con",
+    "inMiddle": "en el medio",
+    "vowels": "vocales",
+    "withDoubles": "con letras dobles",
+    "longerWord": "Una palabra más larga",
+    "shortWord": "Palabra corta"
+  },
+  "achievementPopup": {
+    "unlocked": "¡Logro Desbloqueado!",
+    "tapToDismiss": "Toca para cerrar"
+  },
+  "achievementDock": {
+    "title": "Tus Logros"
+  },
+  "lateJoiner": {
+    "welcomeTitle": "¡Juego en Progreso!",
+    "welcomeMessage": "Te uniste a mitad del juego. Esto es lo que necesitas saber:",
+    "timeRemaining": "Tiempo restante",
+    "currentLeaders": "Líderes actuales",
+    "quickTip1": "Desliza sobre letras adyacentes para formar palabras",
+    "quickTip2": "Levanta el dedo para enviar",
+    "quickTip3": "¡Palabras más largas = más puntos!",
+    "gotIt": "¡Entendido, a jugar!",
+    "badge": "Llegada Tardía",
+    "joinedMidGame": "se unió a mitad del juego"
+  },
+  "spectator": {
+    "watching": "Viendo como espectador",
+    "roomFull": "Sala llena ({{current}}/{{max}} jugadores)",
+    "joinWhenAvailable": "Únete cuando haya espacio",
+    "joinGame": "Unirse al Juego",
+    "slotAvailable": "{{count}} espacio disponible",
+    "slotsAvailable": "{{count}} espacios disponibles",
+    "upgraded": "¡Ya puedes jugar!",
+    "youAreSpectating": "Estás viendo este juego",
+    "watchingGame": "Viendo el juego...",
+    "waitForSlot": "Esperando espacio de jugador..."
+  },
+  "chat": {
+    "title": "Chat de Sala",
+    "placeholder": "Escribe un mensaje...",
+    "noMessages": "Aún no hay mensajes",
+    "startChatting": "¡Comienza a chatear!",
+    "send": "Enviar mensaje",
+    "newMessages": "Nuevos mensajes de chat"
+  },
+  "results": {
+    "topPlayers": "Mejores Jugadores",
+    "otherPlayers": "Otros Jugadores",
+    "yourPerformance": "Tu Rendimiento",
+    "viewDetails": "Ver Detalles del Rendimiento",
+    "viewAllWords": "Ver Todas las Palabras",
+    "viewXpBreakdown": "Ver Desglose de XP",
+    "gameOver": "Juego Terminado",
+    "winner": "Ganador",
+    "winnerAnnouncement": "Ganador",
+    "youWon": "¡Ganaste!",
+    "secondPlace": "¡2do Lugar!",
+    "thirdPlace": "¡3er Lugar!",
+    "silverMedalist": "Medallista de Plata",
+    "bronzeMedalist": "Medallista de Bronce",
+    "points": "puntos",
+    "pointWords": "Palabras de ${points} Puntos",
+    "invalid": "Inválido",
+    "exitRoom": "Salir de la Sala",
+    "exitWarning": "¿Seguro que quieres irte? Puedes quedarte y esperar un nuevo juego.",
+    "playAgain": "Jugar de Nuevo",
+    "finalScores": "Puntuaciones Finales",
+    "returnToRoom": "Volver a la Sala Activa",
+    "cancelAutoReturn": "Cancelar Auto Retorno",
+    "valid": "válido",
+    "validWords": "Palabras Válidas",
+    "playAgainQuestion": "🎮 ¿Listo para Otra Ronda?",
+    "playAgainDescription": "Quédate en la sala y espera que el anfitrión inicie un nuevo juego",
+    "stayInRoom": "Sí, Quedarme",
+    "leaveRoom": "No, Irme",
+    "shared": "Compartido",
+    "comboBonus": "Bonus de Combo",
+    "basePoints": "Base",
+    "totalScore": "Total",
+    "noPoints": "Sin Puntos",
+    "otherPlayers": "Otros Jugadores",
+    "needsVerification": "Necesita Verificación",
+    "autoVerified": "Auto-Verificado",
+    "aiVerified": "Verificado por IA",
+    "aiRejected": "Rechazado por IA",
+    "tapToClose": "Toca en cualquier lugar para cerrar",
+    "startNewGame": "Iniciar Nuevo Juego",
+    "levelUp": "¡Subiste de Nivel!",
+    "pendingValidation": "Pendiente de validación comunitaria",
+    "potentialScore": "+${score} pts si se aprueba",
+    "wordValidated": "¡Palabra validada! ¡Ganaste ${score} puntos!",
+    "autoRejoinIn": "Auto-unión en",
+    "rejoinNow": "Unirse Ahora",
+    "largeRoomMode": "Modo Sala Grande",
+    "duplicateRuleDisabled": "¡Con 8+ jugadores, las palabras duplicadas sí cuentan!",
+    "longest": "Más Larga",
+    "accuracy": "Precisión",
+    "rankings": "Clasificaciones",
+    "yourWords": "Tus palabras",
+    "fireRoundBonus": "Ronda de Fuego",
+    "time": "Tiempo",
+    "viewResults": "Ver Resultados",
+    "place": "Lugar",
+    "words": "Palabras",
+    "bestWord": "Mejor",
+    "pointsFromFirst": "¡Solo {points} puntos del 1er lugar!",
+    "missedWords": "Palabras que Perdiste",
+    "missedWordsHint": "Palabras valiosas encontradas por otros",
+    "missedWordsMotivation": "¡Apréndelas para la próxima!",
+    "showMoreWords": "Mostrar {count} Más",
+    "players": "jugadores",
+    "everyoneReady": "¡Todos listos!",
+    "waitingForPlayers": "Esperando jugadores",
+    "ready": "¡Listo!",
+    "waiting": "Esperando...",
+    "allPlayersReady": "¡Todos los jugadores están listos! El anfitrión puede comenzar la siguiente ronda.",
+    "you": "(Tú)",
+    "betterLuckNextTime": "¡Mejor suerte la próxima vez!",
+    "yourPlace": "{rank}º lugar",
+    "tryAgainEncouragement": "¡Sigue jugando para mejorar!"
+  },
+  "archetypes": {
+    "strategist": "El Estratega",
+    "strategistDesc": "Movimientos calculados, máximo impacto",
+    "speedster": "El Veloz",
+    "speedsterDesc": "Reflejos relámpago",
+    "scholar": "El Erudito",
+    "scholarDesc": "Maestro del vocabulario complejo",
+    "explorer": "El Explorador",
+    "explorerDesc": "Encuentra lo que otros pierden",
+    "perfectionist": "El Perfeccionista",
+    "perfectionistDesc": "Cada palabra cuenta",
+    "maverick": "El Inconformista",
+    "maverickDesc": "Audaz y poco convencional",
+    "workhorse": "El Incansable",
+    "workhorseDesc": "Imparable y persistente",
+    "closer": "El Rematador",
+    "closerDesc": "Prospera bajo presión",
+    "trailblazer": "El Pionero",
+    "trailblazerDesc": "Va por las grandes victorias"
+  },
+  "playerTitles": {
+    "champion": {
+      "name": "Campeón",
+      "icon": "👑",
+      "description": "Ganador del juego"
+    },
+    "perfectionist": {
+      "name": "El Perfeccionista",
+      "icon": "✨",
+      "description": "Mayor precisión - todas las palabras válidas"
+    },
+    "speedster": {
+      "name": "Demonio de la Velocidad",
+      "icon": "⚡",
+      "description": "Palabras más rápidas por minuto"
+    },
+    "wordsmith": {
+      "name": "Artesano de Palabras",
+      "icon": "📝",
+      "description": "Encontró más palabras"
+    },
+    "scholar": {
+      "name": "Erudito",
+      "icon": "🎓",
+      "description": "Encontró la palabra más larga"
+    },
+    "explorer": {
+      "name": "Explorador",
+      "icon": "🧭",
+      "description": "Más diversidad en longitudes de palabras"
+    },
+    "sniper": {
+      "name": "Francotirador",
+      "icon": "🎯",
+      "description": "Mejor precisión (menos palabras inválidas)"
+    },
+    "comboMaster": {
+      "name": "Maestro del Combo",
+      "icon": "🔥",
+      "description": "Mayor bonus de combo ganado"
+    },
+    "earlyBird": {
+      "name": "Madrugador",
+      "icon": "🐦",
+      "description": "Más palabras en el primer minuto"
+    },
+    "clutchPlayer": {
+      "name": "Jugador Clutch",
+      "icon": "⏰",
+      "description": "Más palabras en los últimos 30 segundos"
+    },
+    "bigWordHunter": {
+      "name": "Cazador de Palabras Grandes",
+      "icon": "🦁",
+      "description": "Más palabras de 6+ letras"
+    },
+    "consistentPlayer": {
+      "name": "Eddie Constante",
+      "icon": "📊",
+      "description": "Envíos de palabras más consistentes"
+    }
+  },
+  "scorePage": {
+    "title": "🏆 Resultados del Juego",
+    "leaderboard": "Clasificación",
+    "points": "Puntos",
+    "congratulations": "Felicitaciones"
+  },
+  "howToPlay": {
+    "title": "¿Cómo Jugar LexiClash?",
+    "description": "LexiClash es un juego de palabras rápido donde compites contra el tiempo para encontrar tantas palabras como sea posible en un tablero de letras. ¡Cuanto más larga la palabra, más puntos ganas!",
+    "descriptionNote": "Las palabras deben tener al menos 2 letras. ¡Se permiten nombres, lugares y acrónimos conocidos!",
+    "createOrJoinTitle": "Crear o Unirse a un Juego",
+    "createOrJoinDesc": "El anfitrión crea una sala y comparte el código. Los jugadores se unen usando el código.",
+    "hostStartsTitle": "El Anfitrión Inicia el Juego",
+    "hostStartsDesc": "¡Una vez que todos estén listos, el anfitrión inicia el temporizador y aparecen las letras!",
+    "findWordsTitle": "Encuentra Palabras en el Tablero",
+    "findWordsDesc": "Conecta letras adyacentes en CUALQUIER dirección (horizontal, vertical, diagonal, e incluso hacia atrás) para formar palabras. Cada letra solo puede usarse una vez por palabra.",
+    "findWordsNote": "¡Nota: No puedes reusar la misma letra en una sola palabra!",
+    "earnPointsTitle": "Gana Puntos y Logros",
+    "earnPointsDesc": "¡Cuanto más larga la palabra, más puntos obtienes! Además, desbloquea logros especiales por hazañas impresionantes.",
+    "earnPointsNote": "¡Los logros especiales pueden darte un buen aumento de puntos!",
+    "scoringSystemTitle": "Sistema de Puntuación",
+    "scoringTable": {
+      "letters2": "2 letras: 1 punto",
+      "letters3": "3 letras: 2 puntos",
+      "letters4": "4 letras: 3 puntos",
+      "letters5": "5 letras: 4 puntos",
+      "letters6": "6 letras: 5 puntos",
+      "letters7": "7 letras: 6 puntos",
+      "letters8plus": "8+ letras: 7+ puntos",
+      "formula": "Fórmula simple: (longitud de palabra - 1) puntos"
+    },
+    "achievementsTitle": "Logros Especiales",
+    "achievements": {
+      "speedDemon": "⚡ Demonio de la Velocidad - Primer jugador en encontrar 5 palabras",
+      "wordWizard": "🎩 Mago de Palabras - Encuentra 20+ palabras",
+      "vocabularyKing": "👑 Rey del Vocabulario - Encuentra 30+ palabras",
+      "longWordMaster": "📏 Maestro de Palabras Largas - Encuentra una palabra de 7+ letras",
+      "perfectionist": "💎 Perfeccionista - 100% de tus palabras son válidas",
+      "earlyBird": "🐦 Madrugador - Encuentra 3 palabras en el primer minuto",
+      "examples": "Ejemplos de Logros"
+    },
+    "tipsTitle": "Consejos para Ganar",
+    "gameFeaturesTitle": "Características del Juego",
+    "tips": {
+      "tip1": "Comienza con palabras cortas y expándelas (ej: \"sal\" → \"sala\")",
+      "tip2": "Busca combinaciones comunes de letras (ej: \"ción\", \"mente\", \"ando\")",
+      "tip3": "Escanea sistemáticamente - no saltes al azar",
+      "tip4": "¡La velocidad importa! Encuentra palabras rápido para construir combos",
+      "tip5": "Recuerda - solo las palabras válidas en el idioma seleccionado cuentan"
+    },
+    "readyToPlay": "¿Listo? ¡Vamos a jugar!",
+    "funForFamily": "Un juego entretenido y divertido para toda la familia - ¡completamente gratis!",
+    "letters": "letras",
+    "pts": "pts",
+    "steps": {
+      "basics": {
+        "title": "Básicos del Juego",
+        "description": "LexiClash es un juego de palabras multijugador rápido. ¡Compite contra amigos para encontrar palabras en un tablero de letras!"
+      },
+      "grid": {
+        "title": "Encontrar Palabras",
+        "description": "¡Desliza o haz clic en letras adyacentes para formar palabras. Las letras se conectan en las 8 direcciones!"
+      },
+      "scoring": {
+        "title": "Sistema de Puntuación",
+        "description": "¡Las palabras más largas ganan más puntos! Cada letra más allá de la primera añade un punto a tu puntuación."
+      },
+      "combo": {
+        "title": "Sistema de Combo",
+        "description": "¡Envía palabras rápidamente para construir multiplicadores de combo! Cuanto más rápido encuentres palabras, mayor será tu bonus."
+      },
+      "xp": {
+        "title": "XP y Niveles",
+        "description": "¡Gana XP de cada juego para subir de nivel y desbloquear nuevos títulos. Los bonuses de victoria y logros aumentan tu XP!"
+      },
+      "achievements": {
+        "title": "Logros",
+        "description": "¡Desbloquea logros por hazañas especiales! Cada logro puede ganarse múltiples veces para mejorar su nivel."
+      }
+    },
+    "demo": {
+      "watchAnimation": "Mira cómo se forman palabras en el tablero",
+      "autoPlay": "Auto",
+      "pause": "Pausar",
+      "replay": "Repetir",
+      "tryIt": "¡Intenta arrastrar letras tú mismo!",
+      "gridExample": "Ejemplo de trazar una palabra en el tablero",
+      "traceExample": "Traza letras para formar palabras",
+      "play": "Reproducir demo"
+    },
+    "combo": {
+      "currentCombo": "Combo Actual",
+      "multiplier": "multiplicador",
+      "noBonus": "Sin bonus",
+      "tryIt": "Simular Combo",
+      "building": "Construyendo combo...",
+      "tip": "¡Envía palabras dentro de 5 segundos entre cada una para mantener tu combo!"
+    },
+    "xp": {
+      "howToEarn": "Cómo Ganar XP",
+      "base": "Completar un juego",
+      "score": "Ganar puntos",
+      "win": "Ganar el juego",
+      "achievement": "Desbloquear logros",
+      "unlockTitles": "Desbloquea Títulos al Subir de Nivel"
+    },
+    "newPlayer": {
+      "welcomeTitle": "¡Bienvenido a LexiClash!",
+      "welcomeMessage": "Parece que es tu primera vez aquí. ¿Te gustaría un tour rápido de cómo jugar?",
+      "showTutorial": "Muéstrame Cómo",
+      "skipTutorial": "Lo Descubriré Solo",
+      "dontShowAgain": "No mostrar esto de nuevo"
+    }
+  },
+  "achievements": {
+    "FIRST_BLOOD": {
+      "name": "Primera Sangre",
+      "description": "Primero en encontrar una palabra"
+    },
+    "SPEED_DEMON": {
+      "name": "Demonio de la Velocidad",
+      "description": "Encontró 20 palabras en 90 segundos"
+    },
+    "WORD_MASTER": {
+      "name": "Maestro de Palabras",
+      "description": "Encontró una palabra con 7+ letras"
+    },
+    "COMBO_KING": {
+      "name": "Rey del Combo",
+      "description": "Alcanzó una racha de 10+ combos"
+    },
+    "PERFECTIONIST": {
+      "name": "Perfeccionista",
+      "description": "15+ palabras, todas válidas"
+    },
+    "LEXICON": {
+      "name": "Léxico",
+      "description": "Encontró 35+ palabras"
+    },
+    "WORDSMITH": {
+      "name": "Artesano de Palabras",
+      "description": "Encontró 25 palabras válidas"
+    },
+    "QUICK_THINKER": {
+      "name": "Pensador Rápido",
+      "description": "Encontró una palabra en menos de 3 segundos"
+    },
+    "LONG_HAULER": {
+      "name": "Corredor de Maratón",
+      "description": "Encontró una palabra en el último minuto"
+    },
+    "DIVERSE_VOCABULARY": {
+      "name": "Vocabulario Diverso",
+      "description": "Encontró palabras de 5+ longitudes diferentes"
+    },
+    "DOUBLE_TROUBLE": {
+      "name": "Dúo Ganador",
+      "description": "Encontró 2 palabras en 1.5 segundos"
+    },
+    "TREASURE_HUNTER": {
+      "name": "Cazador de Tesoros",
+      "description": "Encontró una palabra rara (8+ letras)"
+    },
+    "TRIPLE_THREAT": {
+      "name": "Triple Amenaza",
+      "description": "Encontró 3 palabras en 4 segundos"
+    },
+    "UNSTOPPABLE": {
+      "name": "Imparable",
+      "description": "Encontró 45+ palabras"
+    },
+    "COMEBACK_KID": {
+      "name": "El del Regreso",
+      "description": "Encontró una palabra en los últimos 3 segundos"
+    },
+    "DICTIONARY_DIVER": {
+      "name": "Buceador del Diccionario",
+      "description": "Encontró 40+ palabras válidas"
+    },
+    "LIGHTNING_ROUND": {
+      "name": "Ronda Relámpago",
+      "description": "Encontró 10 palabras en los primeros 30 segundos"
+    },
+    "RARE_GEM": {
+      "name": "Gema Rara",
+      "description": "Encontró una palabra ultra-rara (9+ letras)"
+    },
+    "EXPLORER": {
+      "name": "Explorador",
+      "description": "Encontró palabras de 6+ longitudes diferentes"
+    },
+    "STREAK_MASTER": {
+      "name": "Maestro de Rachas",
+      "description": "Alcanzó una racha de 18+ combos"
+    },
+    "ANAGRAM_ARTIST": {
+      "name": "Artista del Anagrama",
+      "description": "Encontró 2 palabras anagrama consecutivas"
+    },
+    "LETTER_POPPER": {
+      "name": "Explotador de Globos",
+      "description": "Explotó 10+ letras en el menú principal"
+    },
+    "WORD_ARCHITECT": {
+      "name": "Arquitecto de Palabras",
+      "description": "Encontró 3 palabras con 7+ letras"
+    },
+    "SPEED_LEGEND": {
+      "name": "Leyenda de la Velocidad",
+      "description": "Encontró 25 palabras en 90 segundos"
+    },
+    "COMBO_GOD": {
+      "name": "Dios del Combo",
+      "description": "Alcanzó una racha de 20+ combos"
+    },
+    "VOCABULARY_TITAN": {
+      "name": "Titán del Vocabulario",
+      "description": "Encontró 50+ palabras válidas"
+    },
+    "PRECISION_MASTER": {
+      "name": "Maestro de la Precisión",
+      "description": "25+ palabras con 100% de precisión"
+    },
+    "LONG_WORD_CHAIN": {
+      "name": "Cadena de Palabras Largas",
+      "description": "4 palabras consecutivas de 6+ letras"
+    },
+    "MINIMALIST": {
+      "name": "Minimalista",
+      "description": "Ganó solo con palabras de 4+ letras (15+ palabras)"
+    },
+    "WORD_SNIPER": {
+      "name": "Francotirador de Palabras",
+      "description": "Encontró 5+ palabras únicas que nadie más encontró"
+    },
+    "PHOTO_FINISH": {
+      "name": "Final de Foto",
+      "description": "Ganó por menos de 5 puntos"
+    },
+    "UNDERDOG": {
+      "name": "Desvalido",
+      "description": "Remontó desde atrás para ganar"
+    },
+    "CLUTCH_PLAYER": {
+      "name": "Jugador Decisivo",
+      "description": "Encontró 3+ palabras en los últimos 10 segundos"
+    },
+    "VETERAN": {
+      "name": "Veterano",
+      "description": "Jugó 50 partidas en total"
+    },
+    "CENTURION": {
+      "name": "Centurión",
+      "description": "Jugó 100 partidas en total"
+    },
+    "WORD_COLLECTOR": {
+      "name": "Coleccionista de Palabras",
+      "description": "Encontró 1000 palabras válidas en total"
+    },
+    "WORD_HOARDER": {
+      "name": "Acumulador de Palabras",
+      "description": "Encontró 5000 palabras válidas en total"
+    },
+    "CHAMPION": {
+      "name": "Campeón",
+      "description": "Ganó 25 partidas en total"
+    },
+    "LEGEND": {
+      "name": "Leyenda",
+      "description": "Ganó 100 partidas en total"
+    },
+    "POINT_MASTER": {
+      "name": "Maestro de Puntos",
+      "description": "Acumuló 10,000 puntos en total"
+    },
+    "POINT_KING": {
+      "name": "Rey de los Puntos",
+      "description": "Acumuló 50,000 puntos en total"
+    },
+    "DEDICATION": {
+      "name": "Dedicación",
+      "description": "Jugó en 7 días diferentes"
+    },
+    "LOYAL_PLAYER": {
+      "name": "Jugador Leal",
+      "description": "Jugó en 30 días diferentes"
+    }
+  },
+  "achievementTiers": {
+    "bronze": "Bronce",
+    "silver": "Plata",
+    "gold": "Oro",
+    "platinum": "Platino",
+    "earned": "Ganado",
+    "maxTier": "¡Nivel Máximo Alcanzado!"
+  },
+  "insights": {
+    "yourPerformance": "Tu Rendimiento",
+    "yourStats": "Tus Estadísticas",
+    "longestWord": "Palabra Más Larga",
+    "wordsPerMinute": "Palabras/Min",
+    "avgWordLength": "Long. Promedio",
+    "favoriteLength": "Longitud Favorita",
+    "speedPattern": "Patrón de Velocidad",
+    "letters": "letras",
+    "early": "Inicio",
+    "mid": "Medio",
+    "late": "Final",
+    "fastStart": "Inicio Rápido",
+    "strongFinish": "Final Fuerte",
+    "momentum": "Construyendo Momentum",
+    "steady": "Ritmo Constante",
+    "fadeOut": "Explosión Inicial",
+    "midGamePeak": "Pico a Mitad de Juego",
+    "burstMode": "Modo Explosivo",
+    "slowStarter": "Inicio Lento",
+    "secondWind": "Segundo Aire",
+    "accuracy": "Precisión",
+    "story": {
+      "precisionSpeed": "Precisión a Velocidad",
+      "precisionSpeedDesc": "Juego de palabras de élite. Rápido Y preciso.",
+      "bigGameHunter": "Cazador Mayor",
+      "bigGameHunterDesc": "Ir por las palabras grandes vale la pena.",
+      "speedDemon": "Demonio de la Velocidad",
+      "speedDemonDesc": "¡Tus dedos están en llamas!",
+      "sharpshooter": "Tirador de Élite",
+      "sharpshooterDesc": "Calidad sobre cantidad. Cada tiro cuenta.",
+      "wordStorm": "Tormenta de Palabras",
+      "wordStormDesc": "¡Disparar y rezar tiene sus méritos!",
+      "clutchFinisher": "Finalizador Clutch",
+      "clutchFinisherDesc": "Guardaste lo mejor para el final. La presión hace diamantes.",
+      "firstBlood": "Primera Sangre",
+      "firstBloodDesc": "Saliste con todo. La agresión temprana marca el tono.",
+      "slowBurn": "Combustión Lenta",
+      "slowBurnDesc": "Empezaste lento, terminaste fuerte. La tortuga sabía lo que hacía.",
+      "earlyBurst": "Explosión Inicial",
+      "earlyBurstDesc": "Saliste con todo. ¿Quizás guardar algo de fuego para después?",
+      "midGamePeak": "Rendimiento Máximo",
+      "midGamePeakDesc": "Encontraste tu ritmo a mitad de juego. Calentamiento completo.",
+      "burstMode": "Modo Explosivo",
+      "burstModeDesc": "Una fase explosiva de pura dominación. ¡Calidad sobre consistencia!",
+      "slowStarter": "Inicio Lento",
+      "slowStarterDesc": "Tardaste un minuto en encontrar tu ritmo. Una vez que lo hiciste, imparable.",
+      "secondWind": "Segundo Aire",
+      "secondWindDesc": "¿Una caída a mitad de juego? No hay problema. Regresaste más fuerte.",
+      "wordsmith": "Artesano de Palabras",
+      "wordsmithDesc": "No te conformas con palabras pequeñas.",
+      "solidPerformance": "Rendimiento Sólido",
+      "solidPerformanceDesc": "Una actuación respetable. ¡Sigue así!",
+      "gettingStarted": "Calentando",
+      "gettingStartedDesc": "Todo campeón empezó en algún lugar. ¡La siguiente ronda es tuya!"
+    }
+  },
+  "noWords": {
+    "noWordsThisRound": "Sin palabras esta ronda",
+    "keepGoing": "¡Sigue adelante!",
+    "nextRoundIsYours": "¡La siguiente ronda es tuya!",
+    "funFact": "Dato curioso: ¡El jugador promedio pierde el 70% de las palabras posibles!",
+    "otherPlayer": {
+      "headline": "Ronda Difícil",
+      "message": "Las letras no fueron amables esta vez."
+    },
+    "encourage": {
+      "rookie": {
+        "headline": "¿Nervios de Principiante?",
+        "message": "Hasta los mejores cazadores de palabras empiezan en algún lugar. ¡El tablero estaba difícil!",
+        "tip": "Consejo: Empieza con palabras de 3 letras y construye desde ahí."
+      },
+      "unlucky": {
+        "headline": "¡Letras Difíciles!",
+        "message": "A veces los dados simplemente no caen a tu favor. ¡Le pasa a todos!",
+        "tip": "Consejo: Busca patrones comunes como -CIÓN, -MENTE, -ANDO."
+      },
+      "thinking": {
+        "headline": "Silencio Estratégico",
+        "message": "Mentalidad de calidad sobre cantidad... ¡quizás demasiada calidad esta vez!",
+        "tip": "Consejo: Envía palabras mientras las encuentras - ¡no hay penalización por intentar!"
+      },
+      "warmup": {
+        "headline": "Ronda de Calentamiento",
+        "message": "Considera esto una práctica. ¡Tu cerebro apenas está empezando!",
+        "tip": "Consejo: Escanea el tablero rápidamente, luego enfócate en las esquinas de alto valor."
+      },
+      "comeback": {
+        "headline": "Remontada en Camino...",
+        "message": "Los mejores jugadores tienen rondas malas. ¡El siguiente juego es TU juego!",
+        "tip": "Consejo: Intenta decir las letras en voz alta para activar asociaciones de palabras."
+      }
+    }
+  },
+  "xp": {
+    "title": "Nivel del Jugador",
+    "level": "Nivel",
+    "maxLevel": "Nivel Máximo",
+    "xpProgress": "Progreso de XP",
+    "totalXpEarned": "XP Total Ganado",
+    "xpToNextLevel": "XP para siguiente nivel",
+    "xpGained": "XP Ganado",
+    "levelUp": "¡Subiste de Nivel!",
+    "youReached": "Alcanzaste",
+    "titleUnlocked": "Título Desbloqueado",
+    "baseXp": "XP Base",
+    "scoreBonus": "Bonus de Puntuación",
+    "winBonus": "Bonus de Victoria",
+    "achievementBonus": "Bonus de Logro",
+    "titles": {
+      "wordSeeker": "Buscador de Palabras",
+      "letterHunter": "Cazador de Letras",
+      "vocabularian": "Vocabulariano",
+      "wordsmith": "Artesano de Palabras",
+      "lexiconAdept": "Adepto del Léxico",
+      "grammarGuardian": "Guardián de la Gramática",
+      "syntaxSage": "Sabio de la Sintaxis",
+      "eloquentElite": "Élite Elocuente",
+      "linguisticLegend": "Leyenda Lingüística",
+      "lexiClashChampion": "Campeón de LexiClash"
+    }
+  },
+  "auth": {
+    "signIn": "Iniciar Sesión",
+    "signOut": "Cerrar Sesión",
+    "signInWith": "Continuar con ${provider}",
+    "continueAsGuest": "Continuar como Invitado",
+    "saveProgress": "Guarda Tu Progreso",
+    "guestStatsTitle": "Tus estadísticas como invitado:",
+    "claimStats": "Reclamar Tus Estadísticas",
+    "statsClaimedSuccess": "¡Estadísticas reclamadas exitosamente!",
+    "termsAgreement": "Al continuar, aceptas nuestros Términos de Servicio",
+    "termsPrefix": "Al continuar, aceptas nuestros",
+    "termsLink": "Términos de Servicio",
+    "andText": "y",
+    "privacyLink": "Política de Privacidad",
+    "upgradePrompt": "¡Inicia sesión para guardar tu progreso y competir en la clasificación!",
+    "firstWin": {
+      "title": "¡Felicitaciones por Tu Primera Victoria!",
+      "subtitle": "¡Tienes habilidades! Crea una cuenta para mantener tu racha ganadora.",
+      "benefitsTitle": "Regístrate para desbloquear:",
+      "benefits": {
+        "trackProgress": "Rastrea tus estadísticas, victorias y logros",
+        "leaderboard": "Compite en la clasificación global",
+        "playWithFriends": "Desafía a amigos y construye tu reputación"
+      },
+      "statsTeaser": "¡Has jugado ${games} juego(s) y anotado ${score} puntos!",
+      "maybeLater": "Quizás después"
+    },
+    "multiGames": {
+      "title": "¡Estás mejorando!",
+      "subtitle": "¡Regístrate para guardar tu progreso y seguir tus logros!",
+      "features": {
+        "leaderboard": "Compite en la clasificación global",
+        "playWithFriends": "Desafía a amigos y construye tu reputación"
+      },
+      "statsTeaser": "¡Has jugado ${games} juego(s) y anotado ${score} puntos!",
+      "maybeLater": "Quizás después"
+    }
+  },
+  "legal": {
+    "termsOfService": "Términos de Servicio",
+    "privacyPolicy": "Política de Privacidad",
+    "backToGame": "Volver al Juego",
+    "lastUpdated": "Última actualización",
+    "copyright": "© 2025 LexiClash Ltd. Todos los derechos reservados.",
+    "allRightsReserved": "Todos los derechos reservados.",
+    "index": {
+      "title": "Información Legal",
+      "intro": "Revisa nuestros documentos legales para entender tus derechos.",
+      "termsDescription": "Lee nuestros Términos de Servicio.",
+      "privacyDescription": "Aprende cómo recopilamos y protegemos tu información personal."
+    },
+    "terms": {
+      "title": "Términos de Servicio",
+      "intro": "Estos Términos de Servicio rigen su uso de LexiClash.",
+      "acceptance": {
+        "title": "Aceptación de Términos",
+        "content": "Al acceder y usar LexiClash, usted acepta estar sujeto a estos Términos de Servicio."
+      },
+      "service": {
+        "title": "Descripción del Servicio",
+        "content": "LexiClash es un juego de palabras multijugador en tiempo real."
+      },
+      "accounts": {
+        "title": "Cuentas de Usuario",
+        "content": "Puede ser necesario crear una cuenta para acceder a ciertas funciones."
+      },
+      "conduct": {
+        "title": "Conducta del Usuario",
+        "content": "Usted acepta no usar el servicio para fines ilegales."
+      },
+      "contentLicense": {
+        "title": "Licencia de Contenido",
+        "content": "Usted conserva la propiedad de cualquier contenido que envíe."
+      },
+      "intellectualProperty": {
+        "title": "Propiedad Intelectual",
+        "content": "El juego y todo su contenido son propiedad de sus respectivos dueños."
+      },
+      "disclaimers": {
+        "title": "Descargos de Responsabilidad",
+        "content": "El servicio se proporciona \"tal cual\" sin garantías de ningún tipo."
+      },
+      "liability": {
+        "title": "Limitación de Responsabilidad",
+        "content": "No seremos responsables por daños indirectos, incidentales o consecuentes."
+      },
+      "indemnification": {
+        "title": "Indemnización",
+        "content": "Usted acepta indemnizarnos contra reclamos derivados de su uso del servicio."
+      },
+      "termination": {
+        "title": "Terminación",
+        "content": "Podemos terminar o suspender su acceso inmediatamente sin previo aviso."
+      },
+      "governingLaw": {
+        "title": "Ley Aplicable",
+        "content": "Estos términos se rigen por las leyes aplicables."
+      },
+      "disputes": {
+        "title": "Resolución de Disputas",
+        "content": "Cualquier disputa se resolverá mediante arbitraje vinculante."
+      },
+      "modifications": {
+        "title": "Modificaciones",
+        "content": "Nos reservamos el derecho de modificar estos términos en cualquier momento."
+      },
+      "severability": {
+        "title": "Divisibilidad",
+        "content": "Si alguna disposición es inválida, las demás permanecerán en pleno vigor."
+      }
+    },
+    "privacy": {
+      "title": "Política de Privacidad",
+      "intro": "Su privacidad es importante para nosotros.",
+      "infoCollected": {
+        "title": "Información que Recopilamos",
+        "content": "Recopilamos varios tipos de información.",
+        "profile": "Información de perfil (nombre de usuario, avatar)",
+        "gameState": "Datos del estado del juego (puntuaciones, progreso)",
+        "stats": "Estadísticas de juego y logros",
+        "oauth": "Información de autenticación OAuth (Google, Discord)",
+        "analytics": "Datos de análisis y uso"
+      },
+      "howWeUse": {
+        "title": "Cómo Usamos Su Información",
+        "content": "Usamos su información para proporcionar y mejorar nuestro servicio."
+      },
+      "thirdParties": {
+        "title": "Servicios de Terceros",
+        "content": "Usamos los siguientes servicios de terceros:",
+        "supabase": "Supabase (autenticación y base de datos)",
+        "google": "Google OAuth (autenticación)",
+        "discord": "Discord OAuth (autenticación)",
+        "logrocket": "LogRocket (análisis y registro de errores)",
+        "noSale": "No vendemos su información personal a terceros."
+      },
+      "cookies": {
+        "title": "Cookies y Almacenamiento Local",
+        "content": "Usamos cookies y almacenamiento local del navegador para mantener su sesión."
+      },
+      "security": {
+        "title": "Seguridad de Datos",
+        "content": "Implementamos medidas de seguridad estándar de la industria."
+      },
+      "dataRetention": {
+        "title": "Retención de Datos",
+        "content": "Retenemos sus datos mientras su cuenta esté activa."
+      },
+      "yourRights": {
+        "title": "Sus Derechos",
+        "content": "Usted tiene derecho a acceder, corregir o eliminar su información personal."
+      },
+      "international": {
+        "title": "Transferencias Internacionales",
+        "content": "Su información puede ser transferida y almacenada en servidores ubicados fuera de su país."
+      },
+      "changes": {
+        "title": "Cambios a Esta Política",
+        "content": "Podemos actualizar esta política de privacidad ocasionalmente."
+      },
+      "governingLaw": {
+        "title": "Ley Aplicable",
+        "content": "Esta política se rige por las leyes aplicables."
+      }
+    }
+  },
+  "scoreCard": {
+    "title": "Tu Tarjeta de Puntuación",
+    "rank": {
+      "position": "#{rank} de {total}",
+      "percentile": "Top {percentile}%",
+      "winner": "¡Ganador!",
+      "pointsFromWinner": "{points} del ganador",
+      "pointsFromNext": "{points} del siguiente"
+    },
+    "score": "Puntuación",
+    "wordsFound": "Palabras Encontradas",
+    "accuracy": "Precisión",
+    "longestWord": "Palabra Más Larga",
+    "maxCombo": "Combo Máximo",
+    "uniqueWords": "Palabras Únicas",
+    "topWords": "Mejores Palabras",
+    "achievements": "Logros",
+    "shareResults": "Compartir Resultados",
+    "downloadImage": "Descargar Imagen",
+    "errorGenerating": "Error al generar la tarjeta de puntuación",
+    "loading": "Generando tarjeta de puntuación...",
+    "stats": {
+      "totalWords": "Palabras Totales",
+      "validWords": "Palabras Válidas",
+      "accuracy": "Precisión",
+      "longestWord": "Palabra Más Larga",
+      "maxCombo": "Combo Máximo",
+      "comboBonus": "Bonus de Combo",
+      "fireBonus": "Bonus de Fuego",
+      "uniqueWords": "Palabras Únicas",
+      "avgWordLength": "Long. Promedio de Palabra"
+    }
+  },
+  "profile": {
+    "title": "Perfil",
+    "memberSince": "Miembro desde",
+    "totalGames": "Juegos",
+    "wins": "Victorias",
+    "wordsFound": "Palabras Encontradas",
+    "totalScore": "Puntuación Total",
+    "timePlayed": "Tiempo Jugado",
+    "achievements": "Logros",
+    "editProfile": "Editar Perfil",
+    "changeAvatar": "Cambiar Avatar",
+    "username": "Nombre de Usuario",
+    "saveChanges": "Guardar Cambios",
+    "uploadPhoto": "Subir Foto",
+    "removePhoto": "Eliminar Foto",
+    "imageTooLarge": "La imagen debe ser menor a 2MB",
+    "invalidImageType": "Por favor sube una imagen JPG, PNG, WebP o GIF",
+    "uploadSuccess": "¡Foto de perfil actualizada!",
+    "uploadError": "Error al subir imagen",
+    "photoRemoved": "Foto de perfil eliminada",
+    "removeError": "Error al eliminar foto",
+    "saved": "¡Perfil guardado!",
+    "saveError": "Error al guardar",
+    "editName": "Editar Nombre",
+    "chooseEmoji": "Cambiar Emoji",
+    "chooseColor": "Elegir Color",
+    "backToGame": "Volver al Juego",
+    "backToRoom": "Volver a la Sala",
+    "backToLobby": "Volver al Lobby",
+    "locked": "Bloqueado",
+    "earnThisAchievement": "¡Juega partidas para desbloquear este logro!"
+  },
+  "onboarding": {
+    "welcome": {
+      "title": "¡Bienvenido a LexiClash!",
+      "subtitle": "Encuentra palabras conectando letras",
+      "demoInstruction": "¡Inténtalo! Encuentra la palabra:",
+      "demoWord": "CAT",
+      "demoHint": "Desliza o toca letras adyacentes",
+      "demoSuccess": "¡Perfecto! ¡Lo lograste!",
+      "clickNext": "Haz clic en Siguiente para continuar"
+    },
+    "combo": {
+      "title": "Sistema de Combos",
+      "subtitle": "Encuentra palabras rápido para crear combos",
+      "explanation": "¡Cada palabra que encuentras aumenta tu multiplicador de combo. Mientras más rápido encuentres palabras, mayor será tu puntuación!",
+      "tip": "¡Sigue encontrando palabras para mantener tu racha de combos!",
+      "example1": "Primera palabra",
+      "example2": "¡Combo x2!",
+      "example3": "¡Combo x3!"
+    },
+    "specialRounds": {
+      "title": "Rondas Especiales",
+      "subtitle": "¡El caos se encuentra con la oportunidad!",
+      "earthquake": {
+        "title": "Terremoto",
+        "description": "Las letras se agitan y se mezclan - ¡adáptate rápido!",
+        "tip": "Mantén la calma y busca nuevos patrones"
+      },
+      "fireRound": {
+        "title": "Ronda de Fuego",
+        "description": "¡Todas las puntuaciones se duplican - a por todas!",
+        "tip": "Esta es tu oportunidad para acumular puntos"
+      }
+    },
+    "avatar": {
+      "title": "Elige tu Avatar",
+      "subtitle": "Selecciona uno que te represente",
+      "selected": "Seleccionado"
+    },
+    "name": {
+      "title": "¿Cuál es tu nombre?",
+      "subtitle": "Ingresa tu nombre de visualización",
+      "placeholder": "Ingresa tu nombre",
+      "errorInvalid": "Solo se permiten letras, números y espacios",
+      "errorTooShort": "El nombre debe tener al menos 2 caracteres",
+      "errorTooLong": "El nombre no puede tener más de 20 caracteres",
+      "characterCount": "caracteres",
+      "proTip": "Elige un nombre que asuste a tus oponentes. O que los haga reír. ¡Ambos funcionan!"
+    },
+    "profile": {
+      "title": "Configura tu Perfil",
+      "subtitle": "Elige un avatar e ingresa tu nombre"
+    },
+    "quickTips": {
+      "title": "Consejos Rápidos",
+      "subtitle": "¡Aprenderás más mientras juegas!",
+      "tip1Title": "Desliza para conectar",
+      "tip1Text": "Arrastra a través de letras adyacentes para formar palabras",
+      "tip2Title": "Más largo = Mejor",
+      "tip2Text": "Más letras significa más puntos",
+      "tip3Title": "Presta atención",
+      "tip3Text": "¡Las rondas especiales aparecen con puntos de bonificación!"
+    },
+    "mode": {
+      "title": "Elige tu Modo",
+      "subtitle": "¿Cómo quieres jugar?",
+      "singlePlayer": {
+        "title": "Un Jugador",
+        "description": "Practica o desafíate con oponentes IA"
+      },
+      "multiPlayer": {
+        "title": "Multijugador",
+        "description": "Compite con amigos en batallas en tiempo real"
+      },
+      "dailyPlayer": {
+        "title": "Desafío Diario",
+        "description": "Mismo puzzle en todo el mundo, comparte tus resultados"
+      },
+      "encouragement": "¡Excelente elección! Haz clic en \"¡A Jugar!\" para comenzar tu aventura de palabras!"
+    },
+    "navigation": {
+      "skip": "Saltar",
+      "back": "Atrás",
+      "next": "Siguiente",
+      "letsPlay": "¡A Jugar!",
+      "title": "Bienvenida del Jugador"
+    }
+  },
+  "leaderboard": {
+    "title": "Clasificación",
+    "allTime": "Histórico",
+    "rank": "Puesto",
+    "player": "Jugador",
+    "score": "Puntuación",
+    "games": "Juegos",
+    "winRate": "Tasa de Victoria",
+    "yourRank": "Tu Puesto",
+    "topPercent": "Top ${percent}%",
+    "noRankYet": "¡Juega partidas para clasificarte!",
+    "viewLeaderboard": "Ver Clasificación"
+  },
+  "ranked": {
+    "title": "Modo Clasificatorio",
+    "locked": "Bloqueado",
+    "unlocked": "Desbloqueado",
+    "unlockProgress": "${current}/${required} juegos para desbloquear",
+    "playMoreToUnlock": "¡Juega ${count} partidas casuales más para desbloquear!",
+    "benefits": "Beneficios",
+    "benefitFairPlay": "Configuración fija para juego justo",
+    "benefitLeaderboard": "Clasificación global",
+    "benefitAchievements": "Logros exclusivos",
+    "playCasualInstead": "Jugar Casual",
+    "queueing": "Buscando partida...",
+    "playersInQueue": "${count} jugadores en cola",
+    "matchFound": "¡Partida encontrada!",
+    "requiresAuth": "Inicia sesión para acceder al Modo Clasificatorio"
+  },
+  "growth": {
+    "shareYourResult": "Comparte Tu Resultado",
+    "shareVictory": "🎉 ¡Comparte Tu Victoria!",
+    "shareResult": "Comparte Tu Juego",
+    "bragToFriends": "¡Deja que tus amigos sepan que ganaste!",
+    "inviteFriendsToPlay": "Invita amigos a desafiarte",
+    "viralPrompt": "¡Desafía a tus amigos a superar tu puntuación!",
+    "share": "Compartir",
+    "dayStreak": "racha de días",
+    "winsAway": "victorias más",
+    "nextTier": "Siguiente nivel",
+    "newBest": "¡Nuevo Mejor!",
+    "newPersonalBest": "¡Nuevo Récord Personal!",
+    "streakUnlocked": "¡Racha Desbloqueada!",
+    "streakAtRisk": "¡Tu racha está en riesgo! Juega hoy para mantenerla.",
+    "keepStreakAlive": "¡Mantén tu racha viva!",
+    "streakStarting": "Comenzando",
+    "streakHot": "Caliente",
+    "streakOnFire": "En Llamas",
+    "streakEpic": "Épico",
+    "streakLegendary": "Legendario",
+    "referFriend": "Referir a un Amigo",
+    "referralReward": "¡Obtén recompensas por invitar amigos!",
+    "yourReferralLink": "Tu Enlace de Referido",
+    "referralsCount": "Amigos Referidos",
+    "dailyChallenge": "Desafío Diario",
+    "dailyChallengeDesc": "¡Nuevo desafío cada día!",
+    "todaysChallenge": "Desafío de Hoy",
+    "challengeCompleted": "¡Desafío Completado!",
+    "nextChallengeIn": "Siguiente desafío en",
+    "welcomeBack": "¡Bienvenido de Nuevo!",
+    "missedYou": "¡Te extrañamos! ¿Listo para otra ronda?",
+    "playNow": "Jugar Ahora",
+    "firstWin": "¡Primera Victoria!",
+    "tenWins": "¡10 Victorias!",
+    "hundredWins": "¡100 Victorias!",
+    "milestoneUnlocked": "¡Hito Desbloqueado!"
+  },
+  "wordFeedback": {
+    "title": "Jurado de Palabras",
+    "dictionaryTitle": "Construye Nuestro Diccionario",
+    "question": "¿Es esta una palabra real?",
+    "submittedBy": "Enviado por",
+    "thumbsUp": "¡Legítima!",
+    "thumbsDown": "Nope",
+    "skipHint": "Presiona ESC para saltar",
+    "thankYou": "¡Gracias por ayudar!",
+    "witty1": "{player} dice que \"{word}\" es totalmente una palabra...",
+    "witty2": "¿Palabra real o genialidad creativa? ¡Tú decides!",
+    "witty3": "{player} encontró \"{word}\" en su diccionario mental",
+    "witty4": "La RAE llamó, quieren saber sobre \"{word}\"",
+    "witty5": "Suena legítimo... ¿o no?",
+    "witty6": "¿Es \"{word}\" un golpe de genialidad o locura?",
+    "witty7": "¡{player} jura que esto es una palabra real!",
+    "witty8": "El comité del diccionario espera tu veredicto sobre \"{word}\"",
+    "nowValid": "¡ahora es una palabra válida!",
+    "dictionary1": "¡Ayúdanos a construir un mejor diccionario!",
+    "dictionary2": "¡Tu voto hace palabras oficiales!",
+    "dictionary3": "¡Cada voto mejora el juego!",
+    "dictionary4": "¡Sé el juez de palabras!",
+    "dictionary5": "¡Construyamos el diccionario juntos!",
+    "notAWord": "No es una palabra",
+    "realWord": "¡Palabra real!",
+    "nextWord": "Siguiente palabra...",
+    "almostApproved": "¡Casi aprobada!",
+    "votesNeeded": "{count} votos más para aprobar",
+    "validForScoring": "¡Cuenta como válida! Ayuda a añadirla al diccionario.",
+    "moreForDictionary": "más para el diccionario"
+  },
+  "footer": {
+    "howToPlay": "Cómo Jugar",
+    "leaderboard": "Clasificación",
+    "interactiveTutorial": "Tutorial Interactivo"
+  },
+  "support": {
+    "kofiWinner": "¿Te Sientes Generoso, Campeón?",
+    "kofiFooter": "Invítanos un Café",
+    "kofiTooltip": "Apoya el desarrollo de LexiClash"
+  },
+  "landing": {
+    "chooseMode": "Elige Tu Modo",
+    "subtitle": "¡Juega solo para practicar y superar tus récords, o compite con amigos en multijugador en tiempo real!",
+    "subtitleSimple": "Practica solo o desafía a amigos",
+    "singlePlayer": "Un Jugador",
+    "singlePlayerDesc": "¡Practica a tu ritmo o desafíate a ti mismo!",
+    "multiplayer": "Multijugador",
+    "multiplayerDesc": "¡Compite con amigos en tiempo real!",
+    "feature": {
+      "soloVsBots": "Solo vs Bots",
+      "practiceMode": "Modo Práctica",
+      "challenges": "Desafíos y Récords",
+      "joinRooms": "Unirse a Salas",
+      "hostGames": "Crear Juegos",
+      "tournaments": "Torneos"
+    },
+    "hint": "¿Nuevo en el juego? ¡Empieza con Un Jugador para aprender!",
+    "openRooms": "salas abiertas",
+    "playersLive": "jugando ahora"
+  },
+  "singlePlayer": {
+    "title": "Un Jugador",
+    "selectMode": "Selecciona Modo",
+    "soloVsBots": "Solo vs Bots",
+    "soloVsBotsDesc": "Compite contra oponentes de IA",
+    "practiceMode": "Práctica",
+    "practiceModeDesc": "Sin temporizador, descubre palabras a tu ritmo",
+    "challengeMode": "Desafío",
+    "challengeModeDesc": "Supera tus récords",
+    "selectDifficulty": "Tamaño del Tablero",
+    "gameTime": "Tiempo de Juego",
+    "opponents": "Oponentes Bot",
+    "noBots": "No hay bots añadidos. ¡Añade algunos oponentes para competir!",
+    "startGame": "Iniciar Juego",
+    "finish": "Terminar",
+    "noWordsYet": "Aún no hay palabras. ¡Empieza a deslizar!",
+    "victory": "¡Victoria!",
+    "gameOver": "Juego Terminado",
+    "practiceComplete": "¡Práctica Completa!",
+    "newHighScore": "¡Nuevo Récord!",
+    "challengeComplete": "Desafío Completo",
+    "noWordsFound": "No se encontraron palabras",
+    "achievementsNotSaved": "Los logros en modo un jugador no se guardan en tu perfil.",
+    "botDetails": "Detalles del bot",
+    "difficulty": "Dificultad",
+    "timer": "Temporizador",
+    "totalScore": "Puntuación total",
+    "wordsByLength": "Palabras por longitud",
+    "quitConfirmTitle": "¿Salir del juego?",
+    "quitConfirmMessage": "Perderás tu progreso actual. ¿Seguro que quieres salir?",
+    "gamePaused": "Juego pausado",
+    "botWords": "Palabras encontradas",
+    "aiOpponents": "Oponentes IA",
+    "autoFillDesc": "Llena la sala con {count} oponentes IA",
+    "addBotsPrompt": "¡Añade oponentes IA para competir!",
+    "addBotsHint": "Usa auto-llenar o haz clic en los botones de arriba"
+  },
+  "landscape": {
+    "tutorialTitle": "Controles en horizontal",
+    "tutorialPause": "Abajo izquierda: Pausar/Reanudar juego",
+    "tutorialQuit": "Abajo derecha: Salir del juego",
+    "tutorialHelp": "Arriba derecha: Ayuda y reglas",
+    "tutorialKeyboard": "Teclado: Espacio = Pausar, Esc = Salir, ? = Ayuda"
+  },
+  "challenge": {
+    "yourRecord": "Tu Récord",
+    "beatIt": "¿Puedes superarlo?",
+    "noRecord": "Sin Récord Aún",
+    "setFirst": "¡Establece tu primer récord y empieza a competir contigo mismo!",
+    "recordsSet": "récords establecidos",
+    "gamesPlayed": "juegos jugados",
+    "allTimeBest": "Mejor histórico",
+    "longest": "más larga",
+    "newRecord": "¡Nuevo Récord!",
+    "tied": "¡Empate!",
+    "recordToBeat": "Récord",
+    "toGo": "pts para superar récord",
+    "settingFirst": "¡Estableciendo tu primer récord!",
+    "allTimeRecord": "¡Récord Histórico!",
+    "improvement": "mejora",
+    "firstRecord": "¡Primer Récord Establecido!",
+    "shortOf": "{diff} puntos por debajo de tu récord",
+    "settingRecord": "¡Estableciendo tu primer récord!",
+    "aheadOfRecord": "¡+{diff} por delante del récord!",
+    "behindRecord": "{diff} para superar tu récord",
+    "tiedWithRecord": "¡Empatado con tu récord!"
+  },
+  "rules": {
+    "pageTitle": "LexiClash: Batalla de Palabras en Tiempo Real",
+    "pageSubtitle": "Domina el arte de la caza de palabras en este juego multijugador de estrategia rápida",
+    "playNowFree": "¡Juega Ahora - Es Gratis!",
+    "readyToTest": "¿Listo para Probar Tus Habilidades con Palabras?",
+    "readyToTestDesc": "Únete a miles de jugadores en la experiencia definitiva de batalla de palabras.",
+    "startPlaying": "Empezar a Jugar Ahora",
+    "backToHome": "Volver al Inicio",
+    "howToPlayIntro": "LexiClash es un juego de palabras multijugador en tiempo real donde los jugadores compiten para encontrar tantas palabras como sea posible de un tablero de letras.",
+    "joinOrCreate": "Únete o Crea una Sala",
+    "joinOrCreateDesc": "Crea tu propia sala de juego o únete a una existente usando un código de sala.",
+    "raceAgainstTime": "Carrera Contra el Tiempo",
+    "raceAgainstTimeDesc": "Cuando el juego comienza, tienes tiempo limitado (típicamente 90 segundos) para encontrar tantas palabras válidas como sea posible.",
+    "swipeToForm": "Desliza para Formar Palabras",
+    "swipeToFormDesc": "Conecta letras adyacentes deslizando o haciendo clic para formar palabras. Las letras deben estar conectadas horizontal, vertical o diagonalmente.",
+    "competeAndWin": "Compite y Gana",
+    "competeAndWinDesc": "¡El jugador con la puntuación más alta cuando se acabe el tiempo gana!",
+    "scoringIntro": "En LexiClash, las palabras más largas te dan más puntos.",
+    "wordLength": "Longitud de Palabra",
+    "points": "Puntos",
+    "example": "Ejemplo",
+    "proTip": "Consejo Pro",
+    "proTipText": "Enfócate en encontrar palabras de 5-7 letras para la mejor relación puntos-tiempo.",
+    "strategiesIntro": "Convertirse en un campeón de LexiClash requiere más que buen vocabulario.",
+    "scanPrefixes": "Busca Prefijos y Sufijos",
+    "scanPrefixesDesc": "Busca partes comunes de palabras como \"DES-\", \"RE-\", \"-CIÓN\", \"-MENTE\".",
+    "startFromVowels": "Empieza desde las Vocales",
+    "startFromVowelsDesc": "La mayoría de las palabras en español contienen vocales. Localiza A, E, I, O, U en el tablero.",
+    "thinkWordFamilies": "Piensa en Familias de Palabras",
+    "thinkWordFamiliesDesc": "Cuando encuentres una palabra como \"JUGAR\", busca variaciones: \"JUEGO\", \"JUGADOR\", \"JUGANDO\".",
+    "dontOverthink": "No Pienses Demasiado las Palabras Cortas",
+    "dontOverthinkDesc": "Envía palabras obvias de 3-4 letras rápidamente sin dudar.",
+    "practicePatterns": "Practica el Reconocimiento de Patrones",
+    "practicePatternsDesc": "Cuanto más juegues, más rápido reconocerás patrones comunes de letras.",
+    "multiLanguage": "Soporte Multi-Idioma",
+    "multiLanguageDesc": "Juega en inglés, hebreo, sueco, japonés o español. ¡Perfecto para aprender idiomas!",
+    "realTimeMultiplayer": "Multijugador en Tiempo Real",
+    "realTimeMultiplayerDesc": "Compite contra amigos o jugadores de todo el mundo en batallas de palabras en tiempo real.",
+    "achievementsLevels": "Logros y Niveles",
+    "achievementsLevelsDesc": "Gana XP, desbloquea logros y sube de rango mientras mejoras.",
+    "leaderboards": "Clasificaciones",
+    "leaderboardsDesc": "Rastrea tu progreso y ve cómo te clasificas contra otros jugadores globalmente.",
+    "noDownload": "Sin Descargas",
+    "noDownloadDesc": "Juega instantáneamente en tu navegador en cualquier dispositivo.",
+    "qrSharing": "Compartir con QR",
+    "qrSharingDesc": "Genera códigos QR para invitar amigos instantáneamente a tu sala de juego.",
+    "singlePlayerTitle": "Modos de Un Jugador",
+    "singlePlayerIntro": "¡Practica solo o desafíate contra oponentes de IA!",
+    "soloVsBots": "Solo vs Bots",
+    "soloVsBotsDesc": "Compite contra oponentes de IA de diferentes niveles de dificultad.",
+    "practiceMode": "Modo Práctica",
+    "practiceModeDesc": "Tómate tu tiempo sin temporizador. Perfecto para aprender nuevas palabras.",
+    "challengeMode": "Modo Desafío",
+    "challengeModeDesc": "Supera tus récords personales y rastrea tu mejora con el tiempo."
+  },
+  "social": {
+    "playersOnline": "jugadores en línea",
+    "gamesNow": "partidas en curso",
+    "games": "juegos",
+    "newRecord": "¡Nuevo récord!",
+    "online": "en línea"
+  },
+  "daily": {
+    "title": "Desafío Diario",
+    "badge": "DESAFÍO DIARIO",
+    "puzzleNumber": "Diario #{number}",
+    "timeLimit": "Límite de Tiempo",
+    "attempt": "Intento",
+    "playButton": "Jugar el Puzzle de Hoy",
+    "nextPuzzleIn": "Próximo puzzle en:",
+    "samePuzzle": "Mismo puzzle para todos en el mundo. ¡Comparte tus resultados para desafiar a amigos!",
+    "alreadyPlayed": "Ya Jugaste Hoy",
+    "yourScore": "Tu Puntuación",
+    "completed": "¡Completado!",
+    "quitConfirm": "¿Seguro que quieres salir? Perderás tu progreso y no podrás jugar el puzzle de hoy de nuevo.",
+    "wordsFound": "{count} palabras encontradas",
+    "streak": "Racha",
+    "streakDays": "¡Racha de {count} días!",
+    "shareScore": "Comparte tu Puntuación",
+    "copyToClipboard": "Copiar al portapapeles",
+    "copiedToClipboard": "¡Copiado al portapapeles!",
+    "home": "Inicio",
+    "close": "Cerrar",
+    "bannerTitle": "Diario #{number}",
+    "bannerSubtitle": "Mismo puzzle para todos. ¡Comparte tu puntuación!",
+    "oneAttempt": "¡Un intento por día - mismo puzzle para todos!",
+    "dayStreak": "días de racha",
+    "playNow": "JUGAR AHORA",
+    "loading": "Cargando Desafío Diario...",
+    "todaysPlayers": "Jugadores de hoy",
+    "beFirstToPlay": "¡Sé el primero en jugar el desafío de hoy!",
+    "playerSingular": "jugador",
+    "playersPlural": "jugadores",
+    "yourRank": "Tu posición",
+    "showMore": "Mostrar más",
+    "showLess": "Mostrar menos",
+    "more": "más"
+  },
+  "guidance": {
+    "combo": {
+      "title": "¡Bono de Combo!",
+      "text": "¡Encuentra palabras rápido para construir combos y multiplicar tu puntuación! ¡Mantén el impulso!"
+    },
+    "earthquake": {
+      "title": "¡Terremoto en camino!",
+      "text": "Las letras se mezclarán pronto - ¡encuentra palabras rápido antes de que se muevan! ¡Empieza la Ronda de Fuego!"
+    },
+    "fireRound": {
+      "title": "Ronda de Fuego - ¡2X Puntos!",
+      "text": "Todos los puntos se DUPLICAN durante los próximos 15 segundos - ¡encuentra todas las palabras que puedas!"
+    },
+    "directionPattern": {
+      "title": "¡Cambia de Dirección!",
+      "text": "¡Puedes cambiar de dirección mientras trazas una palabra! Ve a la derecha, luego abajo, luego en diagonal - todo en una palabra."
+    },
+    "dismiss": "¡Entendido!"
+  }
+};
+
+module.exports = { es };

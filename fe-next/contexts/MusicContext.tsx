@@ -1,6 +1,6 @@
 'use client';
 
-import React, { createContext, useContext, useEffect, useState, useRef, useCallback, ReactNode } from 'react';
+import React, { createContext, useContext, useEffect, useState, useRef, useCallback, useMemo, ReactNode } from 'react';
 import { Howl, Howler } from 'howler';
 import logger from '@/utils/logger';
 
@@ -588,7 +588,18 @@ export function MusicProvider({ children }: MusicProviderProps) {
         }
     }, [isMuted, volume]);
 
-    const value: MusicContextType = {
+    // Memoize TRACKS object to prevent recreation on every render
+    const TRACKS_CONST = useMemo(() => ({
+        LOBBY: 'lobby' as const,
+        BEFORE_GAME: 'beforeGame' as const,
+        IN_GAME: 'inGame' as const,
+        ALMOST_OUT_OF_TIME: 'almostOutOfTime' as const,
+        BOSSA_ARCADE: 'bossaArcade' as const,
+        BOSSA: 'bossa' as const,
+    }), []);
+
+    // Memoize context value to prevent unnecessary re-renders of all consumers
+    const value = useMemo<MusicContextType>(() => ({
         // State
         currentTrack,
         volume,
@@ -605,15 +616,21 @@ export function MusicProvider({ children }: MusicProviderProps) {
         unlockAudio,
 
         // Track keys for convenience
-        TRACKS: {
-            LOBBY: 'lobby',
-            BEFORE_GAME: 'beforeGame',
-            IN_GAME: 'inGame',
-            ALMOST_OUT_OF_TIME: 'almostOutOfTime',
-            BOSSA_ARCADE: 'bossaArcade',
-            BOSSA: 'bossa',
-        },
-    };
+        TRACKS: TRACKS_CONST,
+    }), [
+        currentTrack,
+        volume,
+        isMuted,
+        isPlaying,
+        audioUnlocked,
+        playTrack,
+        stopMusic,
+        fadeToTrack,
+        setVolume,
+        toggleMute,
+        unlockAudio,
+        TRACKS_CONST,
+    ]);
 
     return (
         <MusicContext.Provider value={value}>

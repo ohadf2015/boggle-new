@@ -1,5 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { generateRandomPlayerName } from '@/backend/modules/botManager';
+import { BOT_CONFIG } from '@/backend/modules/botConfig';
+import { getRandomAvatar } from '@/backend/modules/avatarConfig';
+
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
 
 /**
  * GET /api/random-name
@@ -15,10 +19,29 @@ export async function GET(request: NextRequest) {
     ? existingNamesParam.split(',').map(n => n.trim()).filter(Boolean)
     : [];
 
-  const { name, avatar } = generateRandomPlayerName(existingNames, language);
+  // Get name pool for the language
+  const namePool = BOT_CONFIG.PLAYER_NAMES[language] || BOT_CONFIG.PLAYER_NAMES.en;
+
+  // Filter out names already in use
+  const availableEntries = namePool.filter((entry: { name: string }) =>
+    !existingNames.includes(entry.name)
+  );
+
+  // Pick a random entry (or fallback to any if all used)
+  const entry = availableEntries.length > 0
+    ? availableEntries[Math.floor(Math.random() * availableEntries.length)]
+    : namePool[Math.floor(Math.random() * namePool.length)];
+
+  // Get random avatar image
+  const avatarImage = getRandomAvatar();
 
   return NextResponse.json({
-    name,
-    avatar,
+    name: entry.name,
+    avatar: {
+      avatarImage: avatarImage.id,
+      // Keep emoji/color for backward compatibility
+      emoji: entry.emoji,
+      color: entry.color,
+    },
   });
 }

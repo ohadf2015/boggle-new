@@ -97,6 +97,7 @@ export function usePlayerGameEvents({
     setXpGainedData,
     setLevelUpData,
     setBoardTheme,
+    setTotalBoardWords,
   } = useGameStateContext();
 
   // Track if was in active game (TODO: move to GameState context)
@@ -355,6 +356,12 @@ export function usePlayerGameEvents({
       setFireRoundRemaining(0);
     };
 
+    // Handle total board words broadcast
+    const handleTotalBoardWords = (data: { count: number }) => {
+      logger.log('[PLAYER] Received totalBoardWords:', data.count);
+      setTotalBoardWords(data.count);
+    };
+
     // Register listeners
     socket.on('startGame', handleStartGame);
     socket.on('endGame', handleEndGame);
@@ -367,6 +374,7 @@ export function usePlayerGameEvents({
     socket.on('earthquakeShake', handleEarthquakeShake);
     socket.on('fireRoundStart', handleFireRoundStart);
     socket.on('fireRoundEnd', handleFireRoundEnd);
+    socket.on('totalBoardWords', handleTotalBoardWords);
 
     return () => {
       socket.off('startGame', handleStartGame);
@@ -380,6 +388,7 @@ export function usePlayerGameEvents({
       socket.off('earthquakeShake', handleEarthquakeShake);
       socket.off('fireRoundStart', handleFireRoundStart);
       socket.off('fireRoundEnd', handleFireRoundEnd);
+      socket.off('totalBoardWords', handleTotalBoardWords);
     };
     // Setters from context are stable (wrapped in useCallback), no need in deps
   }, [
@@ -405,6 +414,7 @@ export function usePlayerGameEvents({
     setWordToVote,
     setXpGainedData,
     setLevelUpData,
+    setTotalBoardWords,
     comboLevelRef,
     lastWordTimeRef,
     setComboLevel,

@@ -47,7 +47,7 @@ export const XpExplainer: React.FC<XpExplainerProps> = ({ t }) => {
   return (
     <div className="space-y-4">
       {/* XP Sources */}
-      <div className="bg-neo-cream rounded-neo border-3 border-neo-black p-4 shadow-hard-sm">
+      <div className="bg-neo-cream text-neo-black rounded-neo border-3 border-neo-black p-4 shadow-hard-sm">
         <h4 className="font-bold text-neo-black mb-3 flex items-center gap-2">
           <FaLevelUpAlt className="text-neo-pink" />
           {t('howToPlay.xp.howToEarn')}

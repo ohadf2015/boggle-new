@@ -65,7 +65,7 @@ const QuickJoinView: React.FC<QuickJoinViewProps> = React.memo(({
   // Landscape mode - horizontal layout
   if (isLandscape) {
     return (
-      <div className="flex h-screen w-full items-center justify-center bg-slate-900 p-4">
+      <div className="flex h-screen w-full items-center justify-center bg-slate-900 text-white p-4">
         <div className="flex gap-4 items-center w-full max-w-2xl">
           {/* Room info */}
           <div className="flex flex-col items-center gap-2">
@@ -78,7 +78,7 @@ const QuickJoinView: React.FC<QuickJoinViewProps> = React.memo(({
           {/* Form */}
           <div className="flex-1">
             {error && (
-              <div className="mb-2 p-2 bg-neo-pink/20 border-2 border-neo-pink rounded-neo">
+              <div className="mb-2 p-2 bg-neo-pink/20 text-white border-2 border-neo-pink rounded-neo">
                 <p className="text-neo-pink font-bold text-xs">{error}</p>
               </div>
             )}
@@ -129,17 +129,17 @@ const QuickJoinView: React.FC<QuickJoinViewProps> = React.memo(({
   }
 
   return (
-    <div className="min-h-screen bg-neo-black pt-4 flex flex-col items-center justify-center p-2 sm:p-4 md:p-6 relative">
+    <div className="min-h-screen bg-neo-black text-white pt-4 flex flex-col items-center justify-center p-2 sm:p-4 md:p-6 relative">
       <motion.div
         initial={{ scale: 0, rotate: -3 }}
         animate={{ scale: 1, rotate: 1 }}
         transition={{ type: 'spring', stiffness: 260, damping: 20 }}
         className="w-full max-w-md relative z-10"
       >
-        <Card className="bg-neo-navy border-4 border-neo-cream rounded-neo shadow-hard">
+        <Card className="bg-neo-navy text-white border-4 border-neo-cream rounded-neo shadow-hard">
           <CardHeader className="text-center space-y-4">
             <div className="flex justify-center">
-              <div className="p-4 bg-neo-cyan rounded-neo border-3 border-neo-black shadow-hard-sm rotate-3">
+              <div className="p-4 bg-neo-cyan text-neo-black rounded-neo border-3 border-neo-black shadow-hard-sm rotate-3">
                 <FaGamepad size={48} className="text-neo-black" />
               </div>
             </div>
@@ -160,7 +160,7 @@ const QuickJoinView: React.FC<QuickJoinViewProps> = React.memo(({
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.3 }}
               >
-                <div className="p-4 bg-neo-pink/20 border-3 border-neo-pink rounded-neo">
+                <div className="p-4 bg-neo-pink/20 text-white border-3 border-neo-pink rounded-neo">
                   <p className="text-neo-pink font-bold uppercase text-sm">{error}</p>
                 </div>
               </motion.div>

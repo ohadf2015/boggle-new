@@ -71,7 +71,7 @@ function SkeletonCard({ className }: { className?: string }) {
   return (
     <div
       className={cn(
-        "flex items-center space-x-4 p-4 border-3 border-neo-black rounded-neo-lg bg-neo-navy-light",
+        "flex items-center space-x-4 p-4 border-3 border-neo-black rounded-neo-lg bg-neo-navy-light text-white",
         className
       )}
       aria-busy="true"

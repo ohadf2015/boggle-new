@@ -155,7 +155,7 @@ const MultiplayerLobby: React.FC<MultiplayerLobbyProps> = ({
       }
 
       const rn = sanitizeInput(effectiveRoomName, 30);
-      const { isValid: roomOk, error: roomErr } = validateRoomName(rn);
+      const { isValid: roomOk, error: roomErr } = validateRoomName(rn, true); // true = optional
       const { isValid: codeOk, error: codeErr } = validateGameCode(gameCode);
 
       // For guest hosts, validate hostUsername separately
@@ -226,7 +226,7 @@ const MultiplayerLobby: React.FC<MultiplayerLobbyProps> = ({
         {/* Landscape mode suggestion banner */}
         <LandscapeIndicator />
 
-        <div dir={dir} className="flex h-screen w-full overflow-hidden bg-slate-900 p-3 gap-4 landscape-full-height">
+        <div dir={dir} className="flex h-screen w-full overflow-hidden bg-slate-900 text-white p-3 gap-4 landscape-full-height">
         {/* Left column: Form */}
         <div className="w-[45%] flex flex-col gap-3 overflow-y-auto">
           {/* Header with back + title */}
@@ -324,7 +324,7 @@ const MultiplayerLobby: React.FC<MultiplayerLobbyProps> = ({
           <h2 className="text-base font-black uppercase text-neo-white text-center">
             {t('joinView.activeRooms') || 'Active Rooms'}
           </h2>
-          <div className="flex-1 overflow-y-auto bg-slate-800 rounded-neo border-3 border-neo-black p-3 shadow-hard">
+          <div className="flex-1 overflow-y-auto bg-slate-800 text-white rounded-neo border-3 border-neo-black p-3 shadow-hard">
             <RoomList
               activeRooms={activeRooms}
               onRoomSelect={handleRoomSelect}
@@ -349,12 +349,12 @@ const MultiplayerLobby: React.FC<MultiplayerLobbyProps> = ({
       <LandscapeIndicator />
 
       <div dir={dir} className="min-h-screen bg-gradient-to-b from-slate-50 via-slate-100 to-slate-200 dark:from-neo-navy dark:via-neo-navy-light dark:to-neo-navy flex flex-col">
-      <div className="w-[94%] max-w-7xl mx-auto py-4 sm:py-6 flex-1 flex flex-col min-h-0">
+      <div className="w-[94%] max-w-7xl mx-auto py-3 sm:py-4 flex-1 flex flex-col min-h-0">
         {/* Title with back button */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="relative flex items-center justify-center mb-3 sm:mb-4 flex-shrink-0"
+          className="relative flex items-center justify-center mb-2 sm:mb-3 flex-shrink-0"
         >
           <Link
             href="/"
@@ -504,7 +504,7 @@ const MultiplayerLobby: React.FC<MultiplayerLobbyProps> = ({
             <DialogTitle>{t('share.qrCodeTitle') || 'Scan to Join'}</DialogTitle>
           </DialogHeader>
           <div className="flex flex-col items-center gap-4 py-4">
-            <div className="bg-white p-4 rounded-neo border-3 border-neo-black">
+            <div className="bg-white text-neo-black p-4 rounded-neo border-3 border-neo-black">
               <QRCodeSVG
                 value={getJoinUrl(gameCode)}
                 size={200}

@@ -48,7 +48,7 @@ export function ThemeIndicator({ theme, className = '' }: ThemeIndicatorProps) {
       </span>
 
       {/* Separator */}
-      <span className="w-px h-4 bg-neo-black/20" />
+      <span className="w-px h-4 bg-neo-black/20 text-white" />
 
       {/* Theme Emoji */}
       <motion.span

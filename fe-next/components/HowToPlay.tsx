@@ -181,7 +181,7 @@ const InteractiveGridDemo: React.FC<InteractiveGridDemoProps> = ({ t, dir }) => 
 
       {/* Demo Grid */}
       <div className="relative overflow-hidden p-2">
-        <div className="grid grid-cols-3 gap-1 sm:gap-1.5 p-2 sm:p-3 bg-neo-black/10 rounded-neo border-2 sm:border-3 border-neo-black">
+        <div className="grid grid-cols-3 gap-1 sm:gap-1.5 p-2 sm:p-3 bg-neo-black/10 text-white rounded-neo border-2 sm:border-3 border-neo-black">
           {demoGrid.map((row, rowIndex) => (
             row.map((letter, colIndex) => {
               const isSelected = isCellSelected(rowIndex, colIndex);
@@ -388,7 +388,7 @@ const HowToPlay: React.FC<HowToPlayProps> = ({ onClose }) => {
                   transition={{ delay: index * 0.1 }}
                   className="flex gap-2 sm:gap-3 items-start"
                 >
-                  <div className="flex-shrink-0 w-8 h-8 sm:w-10 sm:h-10 bg-neo-yellow rounded-neo border-2 border-neo-black flex items-center justify-center shadow-hard-sm">
+                  <div className="flex-shrink-0 w-8 h-8 sm:w-10 sm:h-10 bg-neo-yellow text-neo-black rounded-neo border-2 border-neo-black flex items-center justify-center shadow-hard-sm">
                     <item.icon className="text-neo-black text-sm sm:text-base" />
                   </div>
                   <div className="min-w-0">
@@ -417,7 +417,7 @@ const HowToPlay: React.FC<HowToPlayProps> = ({ onClose }) => {
               <InteractiveGridDemo t={t} dir={dir} />
             </motion.div>
 
-            <div className="bg-neo-yellow/30 rounded-neo border-2 border-neo-black p-2 sm:p-3">
+            <div className="bg-neo-yellow/30 text-neo-black rounded-neo border-2 border-neo-black p-2 sm:p-3">
               <p className="text-xs sm:text-sm font-medium text-neo-black flex items-center gap-2">
                 <FaLightbulb className="text-neo-orange flex-shrink-0" />
                 {t('howToPlay.findWordsNote')}
@@ -444,7 +444,7 @@ const HowToPlay: React.FC<HowToPlayProps> = ({ onClose }) => {
                   { letters: '5', points: 4 },
                   { letters: '7+', points: '6+' },
                 ].map((item, index) => (
-                  <div key={index} className="bg-neo-yellow rounded-neo border-2 border-neo-black px-3 py-1 sm:px-4 sm:py-2">
+                  <div key={index} className="bg-neo-yellow text-neo-black rounded-neo border-2 border-neo-black px-3 py-1 sm:px-4 sm:py-2">
                     <span className="font-bold text-neo-black text-sm sm:text-base">
                       {item.letters} {t('howToPlay.letters')} = {item.points} {t('howToPlay.pts')}
                     </span>
@@ -454,7 +454,7 @@ const HowToPlay: React.FC<HowToPlayProps> = ({ onClose }) => {
             </div>
 
             {/* Bonus features mention */}
-            <div className="bg-neo-lime/30 rounded-neo border-2 border-neo-black p-2 sm:p-3">
+            <div className="bg-neo-lime/30 text-neo-black rounded-neo border-2 border-neo-black p-2 sm:p-3">
               <p className="text-xs sm:text-sm font-medium text-neo-black flex items-center gap-2">
                 <FaFire className="text-neo-orange flex-shrink-0" />
                 {t('howToPlay.steps.combo.description') || 'Find words quickly for combo bonuses!'}

@@ -1,0 +1,1954 @@
+// 日本語 translations
+const ja = {
+  "flag": "🇯🇵",
+  "name": "日本語",
+  "direction": "ltr",
+  "logo": {
+    "lexi": "Lexi",
+    "clash": "Clash"
+  },
+  "seo": {
+    "title": "LexiClash - スリル満点のマルチプレイヤーワードゲーム | リアルタイム対戦",
+    "description": "友達とスリリングなリアルタイムワードバトルで競い合おう！LexiClashは一秒一秒が勝負の速いマルチプレイヤーワードゲーム。単語を見つけ、相手を出し抜き、リーダーボードを駆け上がれ。パーティー、ゲームナイト、友達との対戦に最適。楽しみながら語彙力も鍛えられる！4言語対応で無料プレイ - ダウンロード不要！",
+    "keywords": "マルチプレイヤーワードゲーム, リアルタイムワードゲーム, オンラインワードバトル, パーティーゲーム, 対戦ワードゲーム, 速いワードゲーム, ワードパズルマルチプレイヤー, Alias, Kahoot, ファミリーゲームナイト, チームビルディング, 単語対戦, ライブワードゲーム, ワードレース, 語彙ゲーム, 無料オンラインゲーム",
+    "ogTitle": "LexiClash - スリル満点のマルチプレイヤーワードゲーム | リアルタイム対戦",
+    "ogDescription": "友達とスリリングなリアルタイムワードバトルで競い合おう！素早く単語を見つけ、相手を出し抜き、ランキング上位を目指せ。パーティーやゲームナイトに最適。4言語対応で無料プレイ！",
+    "twitterTitle": "LexiClash - スリル満点のマルチプレイヤーワードゲーム | リアルタイム対戦",
+    "twitterDescription": "友達とスリリングなリアルタイムワードバトルで競い合おう！素早く単語を見つけ、相手を出し抜き、ランキング上位を目指せ。パーティーやゲームナイトに最適。4言語対応で無料プレイ！",
+    "locale": "ja_JP",
+    "language": "Japanese",
+    "leaderboard": {
+      "title": "グローバルリーダーボード - トッププレイヤー | LexiClash",
+      "description": "LexiClashグローバルリーダーボードで上位ランクのプレイヤーを見る。世界中のワードゲーム愛好家と競い合い、進捗を追跡しましょう。",
+      "ogTitle": "グローバルリーダーボード - トップワードゲームプレイヤー",
+      "ogDescription": "最高のワードゲームプレイヤーの中で自分のランクを確認しよう。LexiClashに参加してトップを目指そう！"
+    },
+    "profile": {
+      "title": "あなたのプロフィールと統計 | LexiClash",
+      "description": "LexiClashプロフィール、ゲーム統計、実績、進捗を表示。この競争的なワードゲームで勝利数、合計スコア、見つけた単語、プレイ時間を追跡しましょう。",
+      "ogTitle": "プレイヤープロフィールとゲーム統計 - LexiClash",
+      "ogDescription": "ワードゲームの実績、統計を追跡し、リーダーボードランキングを登りましょう。"
+    },
+    "terms": {
+      "title": "利用規約 | LexiClash",
+      "description": "LexiClash利用規約を読む。このマルチプレイヤーワードゲームプラットフォームのユーザー権利、利用規定、アカウント管理、ゲームポリシーについて学びましょう。",
+      "ogTitle": "利用規約 - LexiClash",
+      "ogDescription": "LexiClash利用規約 - ユーザー権利と利用規定ポリシー。"
+    },
+    "privacy": {
+      "title": "プライバシーポリシー | LexiClash",
+      "description": "LexiClashプライバシーポリシー - データの収集、使用、保護方法を学びましょう。私たちはあなたのプライバシーを優先し、業界標準のセキュリティ対策を使用しています。",
+      "ogTitle": "プライバシーポリシー - LexiClash",
+      "ogDescription": "LexiClashがあなたのプライバシーをどのように保護し、データを安全に処理するかを学びましょう。"
+    },
+    "legal": {
+      "title": "法的情報 | LexiClash",
+      "description": "LexiClash法的情報 - 利用規約とプライバシーポリシーにアクセス。あなたの権利と私たちがどのようにデータを保護するかを学びましょう。",
+      "ogTitle": "法的情報 - LexiClash",
+      "ogDescription": "LexiClash利用規約とプライバシーポリシーにアクセス。"
+    },
+    "singleplayer": {
+      "title": "シングルプレイヤーワードゲーム - 練習＆チャレンジ | LexiClash",
+      "description": "LexiClashをソロでプレイ！単語探しを練習し、AIボットに挑戦し、語彙力を向上させよう。簡単から難しいまで複数の難易度レベル。進捗を追跡しハイスコアを更新しよう。",
+      "ogTitle": "シングルプレイヤーモード - 練習＆チャレンジ",
+      "ogDescription": "ソロで単語探しを練習し、AIボットに挑戦し、LexiClashシングルプレイヤーモードでハイスコアを更新しよう。"
+    },
+    "daily": {
+      "title": "デイリーワードチャレンジ - 世界共通パズル | LexiClash",
+      "description": "LexiClashデイリーチャレンジをプレイ！毎日同じパズルが世界中で出題。Wordleのように絵文字で結果をシェア。グローバルで競い合い、連続記録を追跡しよう。",
+      "ogTitle": "デイリーチャレンジ - 世界共通パズル",
+      "ogDescription": "毎日のワードパズルチャレンジ - 世界中で同じボード。結果をシェアしてグローバルで競争！"
+    },
+    "multiplayer": {
+      "title": "マルチプレイヤーワードバトル - リアルタイム対戦 | LexiClash",
+      "description": "友達とリアルタイムワードバトルに参加！マルチプレイヤールームをホストまたは参加し、対戦相手とライブで競い合い、リーダーボードを登りましょう。パーティーやゲームナイトに最適。",
+      "ogTitle": "マルチプレイヤーワードバトル - ライブ対戦",
+      "ogDescription": "リアルタイムマルチプレイヤーワードゲーム - ルームをホスト、友達を招待、ライブワードバトルで競争！"
+    }
+  },
+  "common": {
+    "loading": "読み込み中...",
+    "error": "エラー",
+    "back": "戻る",
+    "next": "次へ",
+    "confirm": "確認",
+    "cancel": "キャンセル",
+    "dismiss": "閉じる",
+    "selectUILanguage": "インターフェース言語",
+    "close": "閉じる",
+    "changeLanguage": "言語を変更",
+    "adminDashboard": "管理ダッシュボード",
+    "understood": "わかりました、プレイしましょう！",
+    "refresh": "更新",
+    "reconnecting": "ゲームに再接続中...",
+    "reconnected": "再接続しました！",
+    "connectionLost": "接続が切れました",
+    "notConnected": "サーバーに接続されていません",
+    "connected": "接続済み",
+    "connecting": "接続中...",
+    "connectedToServer": "ゲームサーバーに接続中",
+    "connectingToServer": "ゲームサーバーに接続中...",
+    "duplicateWarning": "複数のプレイヤーが見つけた単語はカウントされません",
+    "gameStarted": "ゲーム開始！",
+    "joinedGame": "ゲームに参加しました！",
+    "newGameReady": "新しいゲームを開始します！",
+    "lightMode": "ライトモード",
+    "darkMode": "ダークモード",
+    "hurry": "急いで!",
+    "goToHome": "ホームへ戻る",
+    "comboBonus": "コンボ！",
+    "pending": "保留中",
+    "xpGained": "XP",
+    "score": "スコア",
+    "points": "ポイント",
+    "combo": "コンボ",
+    "quit": "終了",
+    "foundWords": "発見した単語",
+    "words": "単語",
+    "wordsFound": "発見した単語",
+    "leaderboard": "ランキング",
+    "you": "あなた",
+    "playAgain": "もう一度",
+    "quickRematch": "クイックリマッチ",
+    "changeSettings": "設定を変更",
+    "settingsAndPlay": "設定して再プレイ",
+    "backToLobby": "ロビーに戻る",
+    "settings": "設定",
+    "lobby": "ロビー",
+    "viewGrid": "グリッドを見る",
+    "min": "分",
+    "advancedSettings": "詳細設定",
+    "yourScore": "あなたのスコア",
+    "tapToDismiss": "タップして閉じる",
+    "copied": "コピーしました！",
+    "copyCode": "コードをコピー",
+    "rotateLandscape": "横向きでより良いプレイを！",
+    "dontShowAgain": "今後表示しない",
+    "landscapeMode": "横向きモード",
+    "rank": "ランク",
+    "menu": "メニュー",
+    "showControls": "タップしてコントロールを表示",
+    "loadingProfile": "プロフィールを読み込み中...",
+    "rematch": "再戦",
+    "roomFull": "ルームが満員です。観戦者として参加しました。",
+    "selectLanguage": "言語を選択",
+    "gotIt": "了解",
+    "help": "ヘルプ",
+    "pause": "一時停止",
+    "resume": "再開",
+    "retry": "再試行",
+    "newGame": "新しいゲーム",
+    "join": "参加",
+    "showLess": "表示を減らす"
+  },
+  "theme": {
+    "sundayFunday": "楽しい日曜日",
+    "mondayMotivation": "月曜のモチベーション",
+    "tuesdayTrivia": "火曜のトリビア",
+    "wednesdayWisdom": "水曜の知恵",
+    "thursdayThrowback": "木曜の懐かし",
+    "funFriday": "楽しい金曜日",
+    "saturdayAdventure": "土曜の冒険",
+    "newYear": "新年",
+    "valentines": "バレンタインデー",
+    "stPatricks": "聖パトリックの日",
+    "easter": "イースター",
+    "independence": "独立記念日",
+    "halloween": "ハロウィン",
+    "thanksgiving": "感謝祭",
+    "christmas": "クリスマス",
+    "hanukkah": "ハヌカ",
+    "roshHashana": "ロシュ・ハシャナ",
+    "yomKippur": "ヨム・キプール",
+    "sukkot": "スコット",
+    "purim": "プリム",
+    "passover": "過越祭",
+    "shavuot": "シャブオット",
+    "yomHaatzmaut": "イスラエル独立記念日",
+    "midsummer": "夏至祭",
+    "lucia": "ルシア祭",
+    "threeKings": "三賢者の日",
+    "dayOfDead": "死者の日",
+    "setsubun": "節分",
+    "hinamatsuri": "ひな祭り",
+    "sakura": "桜の季節",
+    "goldenWeek": "ゴールデンウィーク",
+    "tanabata": "七夕",
+    "obon": "お盆",
+    "autumnLeaves": "紅葉"
+  },
+  "game": {
+    "swipeToForm": "文字をスワイプ",
+    "wordAlreadyFound": "既に発見済み！",
+    "wordNotOnBoard": "ボードにありません！",
+    "wordTooShort": "短すぎます！",
+    "boardTheme": "ボードテーマ"
+  },
+  "help": {
+    "title": "クイックヘルプ",
+    "howToPlay": "遊び方",
+    "swipeLetters": "隣接する文字をスワイプして単語を作成",
+    "diagonalWorks": "斜めの接続も有効です！",
+    "liftToSubmit": "指を離して単語を送信",
+    "minThreeLetters": "単語は3文字以上必要です",
+    "scoring": "スコアリング",
+    "letters": "文字",
+    "point": "ポイント",
+    "points": "ポイント",
+    "combos": "コンボ",
+    "comboExplanation": "連続で素早く単語を見つけてコンボを築こう！各コンボレベルで単語にボーナスポイントが追加されます。",
+    "keyboardShortcuts": "キーボードショートカット",
+    "arrowKeys": "矢印キー",
+    "navigate": "ナビゲート",
+    "spaceKey": "スペース",
+    "selectLetter": "文字を選択",
+    "enterKey": "Enter",
+    "submitWord": "単語を送信",
+    "backspaceKey": "Backspace",
+    "undoLetter": "文字を元に戻す",
+    "escKey": "Escape",
+    "clearSelection": "選択をクリア",
+    "swipeDownToClose": "下にスワイプして閉じる",
+    "accessibility": "アクセシビリティ",
+    "disableFireRoundLights": "ファイアラウンドのライトを無効化",
+    "disableFireRoundLightsDescription": "ファイアラウンド中のグリッドセルの点滅ライトをオフにする"
+  },
+  "combo": {
+    "shieldUsed": "🛡️ コンボシールド使用！",
+    "shieldEarned": "🛡️ シールド獲得！",
+    "explanationTitle": "🔥 コンボパワー！",
+    "explanationText": "素早く単語を見つけてコンボを築こう！コンボが高いほどスコア倍率アップ。連続を維持しよう！"
+  },
+  "earthquake": {
+    "warning": "地震！",
+    "brace": "準備して！",
+    "fireRound": "ファイアラウンド",
+    "multiplier": "2倍マルチプライヤー"
+  },
+  "spam": {
+    "warning": "スローダウン！無効な単語が多すぎます",
+    "penalty": "ポイント減少: -${points}",
+    "cooldown": "${seconds}秒間ブロック - ゆっくり！",
+    "cooldownEnd": "単語を送信できます",
+    "blockedWord": "送信まで${seconds}秒お待ちください"
+  },
+  "bots": {
+    "title": "AIボット",
+    "easy": "簡単",
+    "medium": "普通",
+    "hard": "難しい",
+    "easyDesc": "3-5文字、ゆっくりペース",
+    "mediumDesc": "バランスの取れた単語",
+    "hardDesc": "長い単語、速いペース",
+    "selectDifficulty": "レベル",
+    "addBot": "ボットを追加",
+    "adding": "追加中...",
+    "remove": "ボットを削除",
+    "removeError": "ボットの削除に失敗しました",
+    "currentBots": "ルーム内のボット",
+    "quickAdd": "追加",
+    "add": "追加",
+    "emptyState": "練習や部屋を埋めるためにボットを追加",
+    "helpText": "ボットはゲーム中に自動的に単語を見つけて提出します。",
+    "autoFill": "ボットで自動補充",
+    "autoFillDesc": "空いている席にボットを自動追加",
+    "orAddManually": "または手動で追加:",
+    "roomFull": "部屋は満員です",
+    "autoStart": "30秒後に自動開始",
+    "autoStartDesc": "30秒後にゲームを自動開始",
+    "startingIn": "開始まで...",
+    "cancel": "キャンセル",
+    "waitingForPlayers": "2人以上のプレイヤーを待っています...",
+    "maxReached": "ボットの最大数に達しました"
+  },
+  "music": {
+    "volume": "音量",
+    "musicVolume": "音楽",
+    "sfxVolume": "効果音",
+    "mute": "ミュート",
+    "unmute": "ミュート解除",
+    "clickToEnable": "クリックして音楽を有効にする",
+    "controls": "音楽コントロール",
+    "musicVolumeSlider": "音楽ボリュームスライダー",
+    "sfxVolumeSlider": "効果音ボリュームスライダー"
+  },
+  "share": {
+    "linkCopied": "リンクをコピーしました！📋",
+    "copyError": "リンクのコピーエラー",
+    "inviteMessage": "私と一緒にLexiClashをプレイしましょう！",
+    "room": "ルーム",
+    "code": "コード",
+    "joinViaLink": "このリンクから参加",
+    "copyLinkButton": "リンクをコピー",
+    "whatsappButton": "WhatsAppで共有",
+    "qrCodeButton": "QRコードを表示",
+    "qrCodeTitle": "スキャンして参加",
+    "shareTitle": "プレイヤーを招待",
+    "codeCopied": "コードをコピーしました！🎯",
+    "codeCopyError": "コードのコピーエラー",
+    "buttonLabel": "ゲームをシェア",
+    "modalTitle": "プレイヤーを招待",
+    "scanQR": "スマホでスキャンして参加",
+    "orShareVia": "または共有:",
+    "copyLink": "リンクをコピー",
+    "whatsapp": "WhatsApp",
+    "telegram": "Telegram",
+    "more": "その他...",
+    "inviteTitle": "私のLexiClashゲームに参加！",
+    "copied": "コピーしました！"
+  },
+  "errors": {
+    "unstableConnection": "インターネット接続が不安定です - ゲーム中に問題が発生する可能性があります",
+    "slowConnection": "インターネット接続が遅い",
+    "sessionExpired": "前回のセッションの有効期限が切れました。新しいルームに参加してください。",
+    "gameCodeNotExist": "ゲームコードが存在しません。確認して再試行してください。",
+    "usernameTaken": "ユーザー名はこのゲームですでに使用されています。別の名前を選択してください。",
+    "gameCodeExists": "ゲームコードはすでに存在します。別のコードを選択してください。",
+    "somethingWentWrong": "おっと！問題が発生しました",
+    "unexpectedError": "ゲームで予期しないエラーが発生しました。ページを更新してみてください。",
+    "errorDetails": "エラーの詳細",
+    "refreshPage": "ページを更新",
+    "connectionTimeout": "接続タイムアウト",
+    "rateLimited": "リクエストが多すぎます。速度を落としてください。",
+    "connectionLost": "接続が失われました",
+    "notConnected": "サーバーに接続されていません"
+  },
+  "validation": {
+    "usernameRequired": "ユーザー名が必要です！フィールドに入力してください",
+    "hostUsernameRequired": "ゲームを開始するにはプレイヤー名が必要です",
+    "roomNameRequired": "ルーム名が必要です！フィールドに入力してください",
+    "enterNameToJoin": "参加するには名前を入力してください",
+    "enterRoomName": "ルームを識別する名前",
+    "enterGameCode": "ホストが共有したゲームコードを入力してください",
+    "codeHelper": "プレイヤーが参加するために共有するコード",
+    "fourDigitCode": "4桁のコード",
+    "enterFourDigitCode": "4桁のコードを入力してください",
+    "usernameTooShort": "ユーザー名は2文字以上である必要があります",
+    "usernameTooLong": "ユーザー名は20文字を超えることはできません",
+    "usernameInvalidChars": "ユーザー名に無効な文字が含まれています",
+    "roomNameTooShort": "ルーム名は2文字以上である必要があります",
+    "roomNameTooLong": "ルーム名は30文字を超えることはできません",
+    "roomNameInvalidChars": "ルーム名に無効な文字が含まれています",
+    "gameCodeRequired": "ゲームコードが必要です",
+    "gameCodeInvalid": "ゲームコードは6〜10文字の英数字である必要があります",
+    "wordRequired": "単語が必要です",
+    "wordTooLong": "単語が長すぎます",
+    "wordInvalidChars": "単語に無効な文字が含まれています",
+    "gameCodeHint": "ホストが共有したゲームコードを入力してください"
+  },
+  "difficulty": {
+    "easy": "簡単",
+    "medium": "普通",
+    "hard": "難しい",
+    "expert": "エキスパート",
+    "master": "マスター"
+  },
+  "joinView": {
+    "title": "LexiClash",
+    "createRoom": "ルーム作成",
+    "joinRoom": "ルーム参加",
+    "joinDesc": "既存のゲームに参加するコードを入力",
+    "hostDesc": "ホストとして新しいゲームを開始",
+    "roomNamePlaceholder": "ルーム名を入力",
+    "roomNameLabel": "ルーム名",
+    "roomNameHelper": "ロビーで他のプレイヤーに表示される名前",
+    "roomNameHelperOptional": "オプション - 空欄の場合はランダムな名前が生成されます",
+    "optional": "オプション",
+    "roomNameExample": "例：金曜ゲームナイト",
+    "hostPlayerName": "あなたのプレイヤー名",
+    "hostPlayerNamePlaceholder": "プレイヤー名を入力",
+    "hostPlayerNameHelper": "ゲーム内で表示される名前",
+    "playerNamePlaceholder": "名前を入力",
+    "yourName": "あなたの名前",
+    "enterYourName": "名前を入力してください",
+    "pleaseEnterYourName": "名前を入力してください",
+    "playerAndRoomName": "これがあなたのプレイヤー名とルーム名になります",
+    "selectLanguage": "ゲーム言語",
+    "language": "ゲーム言語",
+    "activeRooms": "利用可能なルーム",
+    "noRooms": "利用可能なルームがありません。作成してください！",
+    "roomsList": "利用可能なルーム",
+    "players": "プレイヤー",
+    "host": "ルーム",
+    "joiningRoom": "ルームに参加しています",
+    "roomLabel": "ルーム",
+    "wantToHostOrJoinOther": "ホストするか、別のルームに参加しますか？",
+    "clearAndRestart": "クリアして最初からやり直す",
+    "english": "English",
+    "hebrew": "Hebrew",
+    "swedish": "Svenska",
+    "japanese": "日本語",
+    "spanish": "Español",
+    "generateNewCode": "新しいコードを生成",
+    "createGameInstructions": "ゲームを作成して友達とコードを共有しましょう！",
+    "createNewRoom": "新しいルームを作成して始めましょう！",
+    "howToPlay": "遊び方",
+    "howToPlayTitle": "LexiClashの遊び方",
+    "qrCodeTitle": "参加用QRコード",
+    "scanToJoin": "コードをスキャンしてゲームに参加するか、コードを使用してください",
+    "copyLink": "リンクをコピー",
+    "shareWhatsapp": "WhatsApp",
+    "shareEmail": "メール",
+    "inviteTitle": "ルームに参加",
+    "enterNameToPlay": "プレイするには名前を入力してください",
+    "playButton": "プレイ",
+    "joiningRoomNumber": "ルーム",
+    "room": "ルーム",
+    "welcomeBack": "おかえりなさい",
+    "connectingToRoom": "ルームに接続中...",
+    "enterRoom": "ルームに入る",
+    "joinGame": "ゲームに参加",
+    "pasteCode": "コードを貼り付け",
+    "joiningAs": "参加中",
+    "hostingAs": "ホスト名",
+    "tapToChangeDisplayName": "タップして表示名を変更",
+    "joining": "参加中...",
+    "creating": "作成中...",
+    "playersOnline": "オンライン",
+    "loadingProfile": "プロフィールを読み込み中...",
+    "nickname": "ニックネーム",
+    "nicknamePlaceholder": "ニックネームを入力",
+    "roomCode": "ルームコード",
+    "defaultPlayerNames": [
+      "こっそりピクルス",
+      "ディスコポテト",
+      "コズミックバナナ",
+      "ふわふわワッフル",
+      "カリカリタコス",
+      "もちもちモチ",
+      "ねじねじプレッツェル",
+      "ザクザククッキー",
+      "とろとろドーナツ",
+      "ピリピリアボカド",
+      "もちもちヌードル",
+      "おバカサーモン",
+      "くすくすガチョウ",
+      "おかしなセイウチ",
+      "ペッピーペンギン",
+      "ルーピーラマ",
+      "くるくるドラゴン",
+      "ファンキーフラミンゴ",
+      "ぴょんぴょんクマ",
+      "びゅんびゅんシマウマ",
+      "おませなナマケモノ",
+      "へんてこコアラ",
+      "ハッピークラゲ",
+      "やんちゃアライグマ",
+      "シュワシュワキツネ",
+      "ハッピーカバ"
+    ],
+    "chooseAvatar": "アバターを選択",
+    "selectAvatar": "アバターを選択",
+    "tapToChange": "タップして変更",
+    "tapToSelect": "タップして選択",
+    "playingAs": "プレイヤー名",
+    "changeProfile": "プロフィールを変更または別のルームに参加"
+  },
+  "multiplayerFlow": {
+    "selector": {
+      "createCard": {
+        "title": "ルーム作成",
+        "description": "新しいゲームをホストして友達を招待",
+        "button": "セットアップ開始"
+      },
+      "joinCard": {
+        "title": "ルーム参加",
+        "description": "コードで既存のゲームに参加",
+        "button": "ルームを探す"
+      },
+      "activeRoomsPreview": "アクティブなルーム",
+      "playersOnline": "オンライン",
+      "noRooms": "アクティブなルームがありません - 最初に作成しましょう！"
+    },
+    "editProfile": "プロフィール編集",
+    "profileSetup": {
+      "title": "プレイヤー設定",
+      "editTitle": "プロフィール編集",
+      "progress": "ステップ1/2",
+      "editingProgress": "プロフィールを編集中",
+      "forCreate": "もう少し！ルームを作成するにはプロフィールを設定してください。",
+      "forJoin": "もう少し！ルームに参加するにはプロフィールを設定してください。",
+      "forEdit": "以下でプロフィールの詳細を更新してください。",
+      "usernameLabel": "あなたの名前は？",
+      "usernamePlaceholder": "名前を入力",
+      "usernameHint": "2-20文字、英数字",
+      "avatarLabel": "アバターを選択",
+      "continueButton": "続ける",
+      "saveButton": "変更を保存"
+    },
+    "createForm": {
+      "title": "ルーム作成",
+      "progress": "ステップ2/2",
+      "profileLabel": "あなたのプロフィール",
+      "roomNameLabel": "ルーム名",
+      "roomNamePlaceholder": "ルーム名を入力（任意）",
+      "roomNameHint": "この名前はロビーで他のプレイヤーに表示されます",
+      "languageHint": "プレイヤーはこの言語で単語を探します",
+      "createButton": "ルーム作成",
+      "creating": "作成中..."
+    },
+    "joinForm": {
+      "title": "ルーム参加",
+      "progress": "ステップ2/2",
+      "profileLabel": "あなたのプロフィール",
+      "codeLabel": "ルームコードを入力",
+      "codePlaceholder": "ABC123",
+      "codeHint": "友達にルームコードを聞いてください",
+      "roomsLabel": "または、アクティブなルームを選択",
+      "refreshButton": "更新",
+      "noRooms": "アクティブなルームがありません。友達にコードを聞いてください！",
+      "joinButton": "ルーム参加",
+      "joining": "参加中..."
+    }
+  },
+  "hostView": {
+    "waitingForPlayers": "プレイヤーを待っています...",
+    "startGame": "ゲーム開始",
+    "stopGame": "ゲーム停止",
+    "roomCode": "ルームコード",
+    "playersJoined": "参加プレイヤー",
+    "gameSettings": "ゲーム設定",
+    "quickSetup": "クイック設定",
+    "presetEasy": "イージー",
+    "presetEasyDesc": "5x5盤面、2分",
+    "presetQuick": "クイック",
+    "presetQuickDesc": "7x7盤面、1分",
+    "presetParty": "パーティー",
+    "presetPartyDesc": "7x7盤面、2分",
+    "presetChallenge": "チャレンジ",
+    "presetChallengeDesc": "9x9盤面、3分",
+    "min": "分",
+    "difficulty": "難易度",
+    "timer": "タイマー",
+    "roundDuration": "ラウンド時間",
+    "minutes": "分",
+    "playerJoinedLate": "途中参加しました！",
+    "playerFoundWord": "が見つけました",
+    "validateWords": "単語を確認して検証する",
+    "validationComplete": "検証完了！",
+    "gameStopped": "ゲーム停止",
+    "confirmExit": "本当に終了しますか？ルームは開いたままで、別のプレイヤーがホストになります。",
+    "exitWarning": "このアクションは全プレイヤーのためにルームを閉じます。本当に退出しますか？",
+    "exitRoom": "ルームを退出",
+    "startNewGame": "新しいゲームを開始",
+    "validation": "単語の検証",
+    "validateIntro": "有効な単語を確認してください。チェックされていない単語は削除されます。",
+    "totalWords": "検証する単語の合計",
+    "submitValidation": "検証を送信",
+    "finalScores": "最終スコア",
+    "words": "単語",
+    "achievements": "実績",
+    "close": "閉じる",
+    "copyLink": "リンクをコピー",
+    "shareWhatsapp": "WhatsAppで共有",
+    "qrCode": "QRコード",
+    "scanQr": "QRコードをスキャンして参加するか、コードを使用してください",
+    "autoValidated": "自動検証済み",
+    "clickToShow": "クリックして表示",
+    "clickToHide": "クリックして非表示",
+    "hostPlays": "プレイしたい",
+    "spectatorMode": "観戦モード - ボードを見る",
+    "advancedSettings": "詳細設定",
+    "autoValidatedCount": "単語が自動検証されました",
+    "roomClosedInactivity": "非アクティブのためルームが閉じられました",
+    "gameOverCheckScores": "ゲームオーバー！最終スコアを確認してください",
+    "validatingWords": "単語を検証しています...",
+    "youAreNowHost": "あなたが新しいホストになりました！",
+    "newHostAssigned": "が新しいホストになりました",
+    "hostLeft": "ホストがルームを退出しました",
+    "liveResults": "ライブ結果",
+    "spectatingInfo": "観戦中 - 単語はゲーム終了まで非表示です",
+    "autoSubmittingValidation": "非アクティブのため自動的に検証を送信しています",
+    "tournamentMode": "トーナメントモード",
+    "rounds": "ラウンド",
+    "tournamentRound": "ラウンド",
+    "tournamentStandings": "トーナメント順位",
+    "tournamentComplete": "トーナメント完了！",
+    "tournamentWinner": "トーナメント優勝者",
+    "totalScore": "合計スコア",
+    "nextRound": "次のラウンド",
+    "tournamentProgress": "トーナメント進行状況",
+    "tournamentCreated": "トーナメントが作成されました！",
+    "tournamentCancelled": "トーナメントがキャンセルされました",
+    "gameComplete": "ゲーム完了！",
+    "wonTournament": "がトーナメントに優勝しました",
+    "tournamentCreateFailed": "トーナメントの作成に失敗しました。もう一度お試しください。",
+    "autoValidationCompleted": "自動検証が完了しました",
+    "cancelTournament": "トーナメントをキャンセル",
+    "confirmCancelTournament": "トーナメントをキャンセルしますか？",
+    "cancelTournamentWarning": "トーナメントをキャンセルしてもよろしいですか？すべての進行状況が失われ、元に戻すことはできません。",
+    "minWordLength": "最小文字数",
+    "minWordLength2": "2文字",
+    "minWordLength3": "3文字",
+    "minWordLength4": "4文字",
+    "difficultyTooltipGrid": "{{rows}}×{{cols}}のグリッド",
+    "difficultyTooltipTimer": "{{minutes}}分推奨",
+    "allWordsAutoValidated": "すべての単語が自動検証されました！",
+    "wordsAutoValidated": "単語が自動検証されました",
+    "gameTypeSelector": "ゲームモードを選択",
+    "regularGame": "通常ゲーム",
+    "regularGameDesc": "カジュアルプレイ用のクイックシングルラウンド",
+    "tournament": "トーナメント",
+    "tournamentDesc": "チャンピオン向けのマルチラウンド競技",
+    "comingSoon": "近日公開",
+    "numberOfRounds": "ラウンド数",
+    "betweenRoundsStandings": "現在の順位",
+    "nextRoundIn": "次のラウンド開始まで",
+    "startNow": "今すぐ開始",
+    "creatingTournament": "トーナメント作成中...",
+    "increaseRounds": "ラウンド数を増やす",
+    "decreaseRounds": "ラウンド数を減らす",
+    "resetFailed": "ゲームのリセットに失敗しました",
+    "decreaseTimer": "タイマーを減らす",
+    "increaseTimer": "タイマーを増やす",
+    "moreSettings": "その他の設定",
+    "playersReadyForNextGame": "次のゲームの準備ができたプレイヤー",
+    "hostPlaysShort": "ホスト参加",
+    "hostSpectates": "観戦中",
+    "letters": "文字",
+    "players": "プレイヤー"
+  },
+  "playerView": {
+    "waitingForHost": "ホストが開始するのを待っています...",
+    "submitWord": "送信",
+    "clear": "クリア",
+    "timeRemaining": "残り時間",
+    "score": "スコア",
+    "wordsFound": "見つけた単語",
+    "wordsOnBoard": "ボード上の単語",
+    "wordsRemaining": "残り単語",
+    "remaining": "残り",
+    "found": "発見",
+    "total": "合計",
+    "gameOver": "ゲームオーバー！ 🏁",
+    "wordAlreadyFound": "すでに見つけた単語です！ ❌",
+    "foundByOther": "${player}が見つけました",
+    "wordNotOnBoard": "ボードに単語がありません！ 🚫",
+    "wordRejected": "有効な単語ではありません！ ❌",
+    "newWord": "新しい単語！",
+    "scoresReady": "スコア準備完了！ ✅",
+    "roomClosed": "ルームが閉じられました",
+    "onlyLanguageWords": "選択した言語の単語のみ！ 🚫",
+    "exitConfirmation": "ルームを退出しますか？",
+    "exitWarning": "本当に退出しますか？現在のゲームの進行状況が失われます。",
+    "exit": "退出",
+    "exitRoom": "ルームを退出",
+    "waitForGameStart": "ゲーム開始を待つ",
+    "players": "プレイヤー",
+    "yourAchievements": "あなたの実績",
+    "letterGrid": "文字グリッド",
+    "waitingForGame": "ゲームを待っています...",
+    "add": "追加",
+    "enterWord": "単語を入力...",
+    "waitingForResults": "結果を待っています...",
+    "calculatingScores": "スコアを計算中...",
+    "aiValidating": "AIが確認中...",
+    "leaderboard": "リーダーボード",
+    "noPlayersYet": "まだプレイヤーがいません",
+    "wordSubmitted": "送信済み",
+    "wordTooShort": "単語が短すぎます！（最低2文字）",
+    "wordTooShortMin": "単語が短すぎます！（最低${min}文字）",
+    "errorOccurred": "エラーが発生しました",
+    "tooFast": "ゆっくり！送信が速すぎます",
+    "wordCount": "単語",
+    "longestWord": "最長",
+    "hostValidating": "ホストが単語を検証しています...",
+    "clickToSelect": "文字をクリックして単語を選択",
+    "me": "自分",
+    "noWordsYet": "まだ単語が見つかりません",
+    "shuffle": "シャッフル",
+    "swipeToFormWords": "ボードをスワイプして単語を作ります",
+    "inviteFriends": "友達を招待",
+    "waitingForHostToStart": "ホストがゲームを開始するのを待っています...",
+    "notInDictionary": "辞書にありません",
+    "hostDisconnected": "ホストが切断されました。再接続を待っています...",
+    "isNowHost": "が新しいホストになりました",
+    "disconnected": "が切断されました。再接続を待っています...",
+    "reconnected": "再接続しました",
+    "leftRoom": "がルームを退出しました",
+    "weakConnection": "の接続が不安定です",
+    "connectionRecovered": "の接続が回復しました",
+    "sessionMovedToAnotherTab": "セッションが別のタブに移動しました",
+    "sessionMovedToAnotherRoom": "セッションが別のルームに移動しました",
+    "validatingWord": "確認中:",
+    "validation": {
+      "scanning": "単語をスキャン中...",
+      "checking": "辞書を確認中...",
+      "verifying": "AIが検証中...",
+      "scoring": "スコアを計算中...",
+      "finalizing": "結果を確定中..."
+    },
+    "rankings": "ランキング",
+    "showLeaderboard": "リーダーボードを表示",
+    "slowDown": "速度を落としてください！単語を処理中です。",
+    "submittingTooFast": "単語を送信するのが速すぎます",
+    "words": "単語",
+    "alreadyFound": "既に発見済み",
+    "invalidWord": "無効な単語",
+    "pendingValidation": "検証待ち"
+  },
+  "lateJoiner": {
+    "welcomeTitle": "ゲーム進行中！",
+    "welcomeMessage": "ゲームの途中で参加しました。知っておくべきこと:",
+    "timeRemaining": "残り時間",
+    "currentLeaders": "現在のリーダー",
+    "quickTip1": "隣接する文字をスワイプして単語を作成",
+    "quickTip2": "指を離して送信",
+    "quickTip3": "長い単語 = より多くのポイント！",
+    "gotIt": "わかりました、プレイしましょう！",
+    "badge": "途中参加",
+    "joinedMidGame": "ゲーム途中で参加しました"
+  },
+  "spectator": {
+    "watching": "観戦中",
+    "roomFull": "ルーム満員 ({{current}}/{{max}} プレイヤー)",
+    "joinWhenAvailable": "空きが出たら参加",
+    "joinGame": "ゲームに参加",
+    "slotAvailable": "{{count}} 枠利用可能",
+    "slotsAvailable": "{{count}} 枠利用可能",
+    "upgraded": "プレイできます！",
+    "youAreSpectating": "このゲームを観戦しています",
+    "watchingGame": "ゲーム観戦中...",
+    "waitForSlot": "プレイヤー枠待機中..."
+  },
+  "hints": {
+    "hint": "ヒント",
+    "getHint": "ヒントを得る",
+    "loading": "ヒント取得中...",
+    "noHints": "ヒント残りなし",
+    "noWordsLeft": "見つける単語がもうありません！",
+    "lookFor": "探してください:",
+    "letterWord": "文字の単語",
+    "letters": "文字",
+    "startsWith": "で始まる",
+    "tapToDismiss": "タップして閉じる",
+    "with": "を含む",
+    "inMiddle": "中央に",
+    "vowels": "母音",
+    "withDoubles": "二重文字あり",
+    "longerWord": "長い単語",
+    "shortWord": "短い単語"
+  },
+  "achievementPopup": {
+    "unlocked": "実績解除！",
+    "tapToDismiss": "タップして閉じる"
+  },
+  "achievementDock": {
+    "title": "あなたの実績"
+  },
+  "chat": {
+    "title": "ルームチャット",
+    "placeholder": "メッセージを入力...",
+    "noMessages": "まだメッセージがありません",
+    "startChatting": "チャットを始めましょう！",
+    "send": "メッセージを送信",
+    "newMessages": "新しいチャットメッセージ"
+  },
+  "results": {
+    "topPlayers": "トッププレイヤー",
+    "yourPerformance": "あなたの成績",
+    "viewDetails": "詳細を表示",
+    "viewAllWords": "すべての単語を表示",
+    "viewXpBreakdown": "XP内訳を表示",
+    "gameOver": "ゲームオーバー",
+    "winner": "勝者",
+    "winnerAnnouncement": "勝者",
+    "youWon": "あなたの勝ち！",
+    "secondPlace": "2位！",
+    "thirdPlace": "3位！",
+    "silverMedalist": "銀メダル",
+    "bronzeMedalist": "銅メダル",
+    "points": "ポイント",
+    "pointWords": "${points}ポイントの単語",
+    "invalid": "無効",
+    "exitRoom": "ルームを退出",
+    "exitWarning": "本当に退出しますか？留まって新しいゲームの開始を待つことができます。",
+    "playAgain": "もう一度プレイ",
+    "finalScores": "最終スコア",
+    "returnToRoom": "アクティブルームに戻る",
+    "cancelAutoReturn": "自動復帰をキャンセル",
+    "valid": "有効",
+    "validWords": "有効な単語",
+    "playAgainQuestion": "🎮 もう一度プレイしますか？",
+    "playAgainDescription": "ルームに留まり、ホストが新しいゲームを開始するのを待ちます",
+    "stayInRoom": "はい、ルームに留まる",
+    "leaveRoom": "いいえ、ルームを退出",
+    "shared": "共有",
+    "comboBonus": "コンボボーナス",
+    "basePoints": "ベース",
+    "totalScore": "合計",
+    "noPoints": "ポイントなし",
+    "otherPlayers": "他のプレイヤー",
+    "needsVerification": "検証が必要",
+    "autoVerified": "自動検証済み",
+    "aiVerified": "AIで検証済み",
+    "aiRejected": "AIにより却下",
+    "tapToClose": "どこかをタップして閉じる",
+    "startNewGame": "新しいゲームを開始",
+    "levelUp": "レベルアップ!",
+    "pendingValidation": "コミュニティ検証待ち",
+    "potentialScore": "承認されれば+${score}ポイント",
+    "wordValidated": "単語が承認されました！${score}ポイント獲得！",
+    "autoRejoinIn": "自動再参加まで",
+    "rejoinNow": "今すぐ再参加",
+    "largeRoomMode": "大規模ルームモード",
+    "duplicateRuleDisabled": "8人以上のプレイヤーでは、重複単語もカウントされます！",
+    "longest": "最長",
+    "accuracy": "正確性",
+    "rankings": "ランキング",
+    "yourWords": "あなたの単語",
+    "fireRoundBonus": "ファイアラウンド",
+    "time": "時間",
+    "viewResults": "結果を見る",
+    "place": "位",
+    "words": "単語",
+    "bestWord": "ベスト",
+    "pointsFromFirst": "あと{points}点で1位！",
+    "missedWords": "見逃した単語",
+    "missedWordsHint": "他のプレイヤーが見つけた高得点単語",
+    "missedWordsMotivation": "次回のために覚えておこう！",
+    "showMoreWords": "さらに{count}個を表示",
+    "players": "人",
+    "everyoneReady": "全員準備完了！",
+    "waitingForPlayers": "プレイヤーを待っています",
+    "ready": "準備完了！",
+    "waiting": "待機中...",
+    "allPlayersReady": "全員準備完了！ホストは次のラウンドを開始できます。",
+    "you": "(あなた)",
+    "betterLuckNextTime": "次はきっとうまくいく！",
+    "yourPlace": "{rank}位",
+    "tryAgainEncouragement": "続けてプレイして上達しよう！"
+  },
+  "archetypes": {
+    "strategist": "戦略家",
+    "strategistDesc": "計算された動き、最大のインパクト",
+    "speedster": "スピードスター",
+    "speedsterDesc": "稲妻のような反射神経",
+    "scholar": "学者",
+    "scholarDesc": "難しい語彙のマスター",
+    "explorer": "探検家",
+    "explorerDesc": "他の人が見逃すものを見つける",
+    "perfectionist": "完璧主義者",
+    "perfectionistDesc": "一語一語を大切に",
+    "maverick": "マーベリック",
+    "maverickDesc": "大胆で型破り",
+    "workhorse": "働き者",
+    "workhorseDesc": "粘り強く休まない",
+    "closer": "クローザー",
+    "closerDesc": "プレッシャーに強い",
+    "trailblazer": "先駆者",
+    "trailblazerDesc": "大きな勝利を狙う"
+  },
+  "scoreCard": {
+    "title": "スコアカード",
+    "rank": {
+      "position": "{total}人中{rank}位",
+      "percentile": "トップ{percentile}%",
+      "winner": "勝者！",
+      "pointsFromWinner": "勝者から{points}点",
+      "pointsFromNext": "次から{points}点"
+    },
+    "score": "スコア",
+    "wordsFound": "見つけた単語",
+    "accuracy": "正確度",
+    "longestWord": "最長単語",
+    "maxCombo": "最大コンボ",
+    "uniqueWords": "ユニーク単語",
+    "topWords": "トップ単語",
+    "achievements": "実績",
+    "shareResults": "結果を共有",
+    "downloadImage": "画像をダウンロード",
+    "errorGenerating": "スコアカードの生成に失敗しました",
+    "loading": "スコアカードを生成中...",
+    "stats": {
+      "totalWords": "合計単語",
+      "validWords": "有効な単語",
+      "accuracy": "正確度",
+      "longestWord": "最長単語",
+      "maxCombo": "最大コンボ",
+      "comboBonus": "コンボボーナス",
+      "fireBonus": "ファイヤーボーナス",
+      "uniqueWords": "ユニーク単語",
+      "avgWordLength": "平均単語長"
+    }
+  },
+  "playerTitles": {
+    "champion": {
+      "name": "チャンピオン",
+      "icon": "👑",
+      "description": "ゲームの勝者"
+    },
+    "perfectionist": {
+      "name": "完璧主義者",
+      "icon": "✨",
+      "description": "最高の正確性 - 全ての単語が有効"
+    },
+    "speedster": {
+      "name": "スピードスター",
+      "icon": "⚡",
+      "description": "1分あたり最多の単語"
+    },
+    "wordsmith": {
+      "name": "言葉の達人",
+      "icon": "📝",
+      "description": "最も多くの単語を発見"
+    },
+    "scholar": {
+      "name": "学者",
+      "icon": "🎓",
+      "description": "最も長い単語を発見"
+    },
+    "explorer": {
+      "name": "探検家",
+      "icon": "🧭",
+      "description": "最も多様な単語の長さ"
+    },
+    "sniper": {
+      "name": "スナイパー",
+      "icon": "🎯",
+      "description": "最高の精度（無効な単語が最少）"
+    },
+    "comboMaster": {
+      "name": "コンボマスター",
+      "icon": "🔥",
+      "description": "最高のコンボボーナス獲得"
+    },
+    "earlyBird": {
+      "name": "早起き鳥",
+      "icon": "🐦",
+      "description": "最初の1分で最多の単語"
+    },
+    "clutchPlayer": {
+      "name": "クラッチプレイヤー",
+      "icon": "⏰",
+      "description": "最後の30秒で最多の単語"
+    },
+    "bigWordHunter": {
+      "name": "大物ハンター",
+      "icon": "🦁",
+      "description": "6文字以上の単語が最多"
+    },
+    "consistentPlayer": {
+      "name": "安定プレイヤー",
+      "icon": "📊",
+      "description": "最も安定した単語提出"
+    }
+  },
+  "scorePage": {
+    "title": "🏆 ゲーム結果",
+    "leaderboard": "リーダーボード",
+    "points": "ポイント",
+    "congratulations": "おめでとうございます"
+  },
+  "howToPlay": {
+    "title": "LexiClashの遊び方",
+    "description": "LexiClashは、文字のグリッド上でできるだけ多くの単語を見つけるために時間と競う、速いペースのワードゲームです。単語が長いほど、獲得できるポイントが多くなります！",
+    "descriptionNote": "単語は少なくとも2文字である必要があります。名前、場所、有名な頭字語も使用できます！",
+    "createOrJoinTitle": "ゲームを作成または参加",
+    "createOrJoinDesc": "ホストがルームを作成してコードを共有します。プレイヤーはコードを使用して参加します。",
+    "hostStartsTitle": "ホストがゲームを開始",
+    "hostStartsDesc": "全員の準備ができたら、ホストがタイマーを開始し、文字が表示されます！",
+    "findWordsTitle": "ボード上で単語を見つける",
+    "findWordsDesc": "隣接する文字をあらゆる方向（水平、垂直、斜め、さらには逆方向）に接続して単語を形成します。各文字は単語ごとに1回しか使用できません。",
+    "findWordsNote": "注意：単一の単語で同じ文字を再利用することはできません！",
+    "earnPointsTitle": "ポイントと実績を獲得",
+    "earnPointsDesc": "単語が長いほど、獲得できるポイントが多くなります！さらに、印象的な成果のために特別な実績をアンロックします。",
+    "earnPointsNote": "特別な実績は、素敵なポイントブーストを与えることができます！",
+    "scoringSystemTitle": "スコアリングシステム 🎯",
+    "scoringTable": {
+      "letters2": "2文字：1ポイント",
+      "letters3": "3文字：2ポイント",
+      "letters4": "4文字：3ポイント",
+      "letters5": "5文字：4ポイント",
+      "letters6": "6文字：5ポイント",
+      "letters7": "7文字：6ポイント",
+      "letters8plus": "8文字以上：7ポイント以上",
+      "formula": "シンプルな計算式：(単語の長さ - 1) ポイント"
+    },
+    "achievementsTitle": "特別な実績 🏆",
+    "achievements": {
+      "speedDemon": "⚡ スピードデーモン - 5つの単語を見つけた最初のプレイヤー",
+      "wordWizard": "🎩 ワードウィザード - 20以上の単語を見つける",
+      "vocabularyKing": "👑 ボキャブラリーキング - 30以上の単語を見つける",
+      "longWordMaster": "📏 ロングワードマスター - 7文字以上の単語を見つける",
+      "perfectionist": "💎 完璧主義者 - あなたの単語の100％が有効",
+      "earlyBird": "🐦 早起き鳥 - 最初の1分で3つの単語を見つける",
+      "examples": "実績の例"
+    },
+    "tipsTitle": "勝つためのヒント 💡",
+    "gameFeaturesTitle": "ゲーム機能",
+    "tips": {
+      "tip1": "短い単語から始めて展開します（例：「猫」→「猫たち」）",
+      "tip2": "一般的な文字の組み合わせを探します",
+      "tip3": "体系的にスキャン - ランダムに飛び回らない",
+      "tip4": "スピードが重要です！実績をアンロックするために素早く単語を見つけましょう",
+      "tip5": "覚えておいてください - 選択した言語の有効な単語のみがカウントされます"
+    },
+    "readyToPlay": "準備はいいですか？プレイを始めましょう！ 🎮",
+    "funForFamily": "家族全員のための魅力的で楽しいゲーム - 完全無料！",
+    "letters": "文字",
+    "pts": "ポイント",
+    "steps": {
+      "basics": {
+        "title": "ゲームの基本",
+        "description": "LexiClashは、高速マルチプレイヤーワードゲームです。友達と競争して、文字のグリッド上で単語を見つけましょう！"
+      },
+      "grid": {
+        "title": "単語の見つけ方",
+        "description": "スワイプまたはクリックで隣接する文字を繋げて単語を作ります。文字は8つの方向すべて（水平、垂直、斜め）で繋がります！"
+      },
+      "scoring": {
+        "title": "スコアリングシステム",
+        "description": "長い単語ほど多くのポイントを獲得できます！最初の文字以降、各文字がスコアに1ポイント追加されます。"
+      },
+      "combo": {
+        "title": "コンボシステム",
+        "description": "素早く単語を送信してコンボ倍率を構築しましょう！単語を見つけるのが速いほど、ボーナスが大きくなります。"
+      },
+      "xp": {
+        "title": "XP & レベル",
+        "description": "ゲームごとにXPを獲得してレベルアップし、新しい称号をアンロックしましょう。勝利ボーナスと実績がXPを増やします！"
+      },
+      "achievements": {
+        "title": "実績",
+        "description": "特別な功績で実績をアンロック！各実績は複数回獲得してティアをアップグレードできます。"
+      }
+    },
+    "demo": {
+      "watchAnimation": "グリッド上で単語がどのように形成されるかをご覧ください",
+      "autoPlay": "自動",
+      "pause": "一時停止",
+      "replay": "リプレイ",
+      "tryIt": "自分で文字をドラッグしてみてください！",
+      "gridExample": "グリッド上で単語をトレースする例",
+      "traceExample": "文字をトレースして単語を形成 - T→O→N→D",
+      "play": "デモを再生"
+    },
+    "combo": {
+      "currentCombo": "現在のコンボ",
+      "multiplier": "倍率",
+      "noBonus": "ボーナスなし",
+      "tryIt": "コンボをシミュレート",
+      "building": "コンボを構築中...",
+      "tip": "コンボを維持するために、5秒以内に単語を送信してください！"
+    },
+    "xp": {
+      "howToEarn": "XPの獲得方法",
+      "base": "ゲームを完了",
+      "score": "ポイントを獲得",
+      "win": "ゲームに勝利",
+      "achievement": "実績をアンロック",
+      "unlockTitles": "レベルアップで称号をアンロック"
+    },
+    "newPlayer": {
+      "welcomeTitle": "LexiClashへようこそ！",
+      "welcomeMessage": "初めてのようですね。遊び方のクイックツアーを見ますか？",
+      "showTutorial": "遊び方を教えて",
+      "skipTutorial": "自分でやってみる",
+      "dontShowAgain": "再表示しない"
+    }
+  },
+  "onboarding": {
+    "welcome": {
+      "title": "LexiClashへようこそ！",
+      "subtitle": "文字をつなげて単語を見つけよう",
+      "demoInstruction": "やってみよう！この単語を見つけて:",
+      "demoWord": "CAT",
+      "demoHint": "隣接する文字をスワイプまたはタップ",
+      "demoSuccess": "完璧！できました！",
+      "clickNext": "次へをクリックして続ける"
+    },
+    "combo": {
+      "title": "コンボシステム",
+      "subtitle": "素早く単語を見つけてコンボを作ろう",
+      "explanation": "見つけた単語ごとにコンボ倍率が上がります。速く見つけるほどスコアが高くなります！",
+      "tip": "単語を見つけ続けてコンボを維持しよう！",
+      "example1": "最初の単語",
+      "example2": "2xコンボ！",
+      "example3": "3xコンボ！"
+    },
+    "specialRounds": {
+      "title": "スペシャルラウンド",
+      "subtitle": "カオスがチャンスに！",
+      "earthquake": {
+        "title": "地震",
+        "description": "文字が揺れてシャッフルされる - 素早く適応！",
+        "tip": "落ち着いて新しいパターンを探そう"
+      },
+      "fireRound": {
+        "title": "ファイアラウンド",
+        "description": "すべてのスコアが2倍 - 全力で！",
+        "tip": "ポイントを稼ぐチャンスです"
+      }
+    },
+    "avatar": {
+      "title": "アバターを選択",
+      "subtitle": "あなたを表すものを選んで",
+      "selected": "選択済み"
+    },
+    "name": {
+      "title": "お名前は？",
+      "subtitle": "表示名を入力してください",
+      "placeholder": "名前を入力",
+      "errorInvalid": "文字、数字、スペースのみ使用可能です",
+      "errorTooShort": "名前は2文字以上必要です",
+      "errorTooLong": "名前は20文字以内にしてください",
+      "characterCount": "文字",
+      "proTip": "相手を怖がらせる名前を選ぼう。または笑わせる名前でも。どちらでも効果あり！"
+    },
+    "profile": {
+      "title": "プロフィール設定",
+      "subtitle": "アバターを選んで名前を入力"
+    },
+    "quickTips": {
+      "title": "クイックヒント",
+      "subtitle": "プレイしながら学べます！",
+      "tip1Title": "スワイプで接続",
+      "tip1Text": "隣接する文字をドラッグして単語を作る",
+      "tip2Title": "長いほど良い",
+      "tip2Text": "文字が多いほどポイントが高い",
+      "tip3Title": "注目",
+      "tip3Text": "スペシャルラウンドでボーナスポイント！"
+    },
+    "mode": {
+      "title": "モードを選択",
+      "subtitle": "どのようにプレイしますか？",
+      "singlePlayer": {
+        "title": "シングルプレイヤー",
+        "description": "練習するか、AIの対戦相手に挑戦"
+      },
+      "multiPlayer": {
+        "title": "マルチプレイヤー",
+        "description": "友達とリアルタイムバトルで競争"
+      },
+      "dailyPlayer": {
+        "title": "デイリーチャレンジ",
+        "description": "毎日世界中で同じパズルに挑戦"
+      },
+      "encouragement": "素晴らしい選択！「プレイしよう」をクリックして冒険を始めよう！"
+    },
+    "navigation": {
+      "skip": "スキップ",
+      "back": "戻る",
+      "next": "次へ",
+      "letsPlay": "プレイしよう！",
+      "title": "プレイヤーようこそ"
+    }
+  },
+  "achievements": {
+    "FIRST_BLOOD": {
+      "name": "ファーストブラッド",
+      "description": "最初に単語を見つける"
+    },
+    "SPEED_DEMON": {
+      "name": "スピードデーモン",
+      "description": "90秒で20の単語を見つけた"
+    },
+    "WORD_MASTER": {
+      "name": "ワードマスター",
+      "description": "7文字以上の単語を見つけた"
+    },
+    "COMBO_KING": {
+      "name": "コンボキング",
+      "description": "10以上のコンボストリークに到達"
+    },
+    "PERFECTIONIST": {
+      "name": "完璧主義者",
+      "description": "15以上の単語、すべて有効"
+    },
+    "LEXICON": {
+      "name": "レキシコン",
+      "description": "35以上の単語を見つけた"
+    },
+    "WORDSMITH": {
+      "name": "ワードスミス",
+      "description": "25の有効な単語を見つけた"
+    },
+    "QUICK_THINKER": {
+      "name": "クイックシンカー",
+      "description": "3秒以内に単語を見つけた"
+    },
+    "LONG_HAULER": {
+      "name": "マラソンランナー",
+      "description": "最後の1分で単語を見つけた"
+    },
+    "DIVERSE_VOCABULARY": {
+      "name": "多様なボキャブラリー",
+      "description": "5種類以上の長さの単語を見つけた"
+    },
+    "DOUBLE_TROUBLE": {
+      "name": "ウィニングデュオ",
+      "description": "1.5秒以内に2つの単語を見つけた"
+    },
+    "TREASURE_HUNTER": {
+      "name": "トレジャーハンター",
+      "description": "珍しい単語を見つけた（8文字以上）"
+    },
+    "TRIPLE_THREAT": {
+      "name": "トリプルスレット",
+      "description": "4秒以内に3つの単語を見つけた"
+    },
+    "UNSTOPPABLE": {
+      "name": "アンストッパブル",
+      "description": "45以上の単語を見つけた"
+    },
+    "COMEBACK_KID": {
+      "name": "カムバックキッド",
+      "description": "最後の3秒で単語を見つけた"
+    },
+    "DICTIONARY_DIVER": {
+      "name": "ディクショナリーダイバー",
+      "description": "40以上の有効な単語を見つけた"
+    },
+    "LIGHTNING_ROUND": {
+      "name": "ライトニングラウンド",
+      "description": "最初の30秒で10の単語を見つけた"
+    },
+    "RARE_GEM": {
+      "name": "レアジェム",
+      "description": "超珍しい単語を見つけた（9文字以上）"
+    },
+    "EXPLORER": {
+      "name": "エクスプローラー",
+      "description": "6種類以上の長さの単語を見つけた"
+    },
+    "STREAK_MASTER": {
+      "name": "ストリークマスター",
+      "description": "18以上のコンボストリークに到達"
+    },
+    "ANAGRAM_ARTIST": {
+      "name": "アナグラムアーティスト",
+      "description": "連続でアナグラム単語を見つけた"
+    },
+    "LETTER_POPPER": {
+      "name": "バルーンポッパー",
+      "description": "メインメニューで10以上の文字をポップした"
+    },
+    "WORD_ARCHITECT": {
+      "name": "ワードアーキテクト",
+      "description": "7文字以上の単語を3つ見つけた"
+    },
+    "SPEED_LEGEND": {
+      "name": "スピードレジェンド",
+      "description": "90秒で25の単語を見つけた"
+    },
+    "COMBO_GOD": {
+      "name": "コンボゴッド",
+      "description": "20以上のコンボストリークに到達"
+    },
+    "VOCABULARY_TITAN": {
+      "name": "ボキャブラリータイタン",
+      "description": "50以上の有効な単語を見つけた"
+    },
+    "PRECISION_MASTER": {
+      "name": "プレシジョンマスター",
+      "description": "25以上の単語で100%の精度"
+    },
+    "LONG_WORD_CHAIN": {
+      "name": "ロングワードチェーン",
+      "description": "6文字以上の単語を4つ連続で"
+    },
+    "MINIMALIST": {
+      "name": "ミニマリスト",
+      "description": "4文字以上の単語のみで勝利（15単語以上）"
+    },
+    "WORD_SNIPER": {
+      "name": "ワードスナイパー",
+      "description": "他の誰も見つけなかったユニークな単語を5つ以上発見"
+    },
+    "PHOTO_FINISH": {
+      "name": "フォトフィニッシュ",
+      "description": "5ポイント未満の差で勝利"
+    },
+    "UNDERDOG": {
+      "name": "アンダードッグ",
+      "description": "後れを取っていたが逆転勝利"
+    },
+    "CLUTCH_PLAYER": {
+      "name": "クラッチプレイヤー",
+      "description": "最後の10秒で3つ以上の単語を発見"
+    },
+    "VETERAN": {
+      "name": "ベテラン",
+      "description": "合計50ゲームをプレイ"
+    },
+    "CENTURION": {
+      "name": "センチュリオン",
+      "description": "合計100ゲームをプレイ"
+    },
+    "WORD_COLLECTOR": {
+      "name": "言葉コレクター",
+      "description": "合計1000の有効な単語を発見"
+    },
+    "WORD_HOARDER": {
+      "name": "言葉ハンター",
+      "description": "合計5000の有効な単語を発見"
+    },
+    "CHAMPION": {
+      "name": "チャンピオン",
+      "description": "合計25ゲームに勝利"
+    },
+    "LEGEND": {
+      "name": "レジェンド",
+      "description": "合計100ゲームに勝利"
+    },
+    "POINT_MASTER": {
+      "name": "ポイントマスター",
+      "description": "合計10,000ポイントを獲得"
+    },
+    "POINT_KING": {
+      "name": "ポイントキング",
+      "description": "合計50,000ポイントを獲得"
+    },
+    "DEDICATION": {
+      "name": "献身",
+      "description": "7日間にわたってプレイ"
+    },
+    "LOYAL_PLAYER": {
+      "name": "忠実なプレイヤー",
+      "description": "30日間にわたってプレイ"
+    }
+  },
+  "achievementTiers": {
+    "bronze": "ブロンズ",
+    "silver": "シルバー",
+    "gold": "ゴールド",
+    "platinum": "プラチナ",
+    "earned": "獲得",
+    "maxTier": "最高ランク達成!"
+  },
+  "insights": {
+    "yourPerformance": "あなたのパフォーマンス",
+    "yourStats": "あなたの統計",
+    "longestWord": "最長の単語",
+    "wordsPerMinute": "単語/分",
+    "avgWordLength": "平均長さ",
+    "favoriteLength": "お気に入りの長さ",
+    "speedPattern": "スピードパターン",
+    "letters": "文字",
+    "early": "序盤",
+    "mid": "中盤",
+    "late": "終盤",
+    "fastStart": "高速スタート",
+    "strongFinish": "強力なフィニッシュ",
+    "momentum": "勢いを構築",
+    "steady": "安定したペース",
+    "fadeOut": "序盤バースト",
+    "midGamePeak": "中盤ピーク",
+    "burstMode": "バーストモード",
+    "slowStarter": "スロースターター",
+    "secondWind": "セカンドウィンド",
+    "accuracy": "正確性",
+    "story": {
+      "precisionSpeed": "スピードと精度",
+      "precisionSpeedDesc": "エリートレベルのワードプレイ。速くて正確。",
+      "bigGameHunter": "ビッグワードハンター",
+      "bigGameHunterDesc": "長い単語を狙うのは正解。",
+      "speedDemon": "スピードデーモン",
+      "speedDemonDesc": "指が燃えている！",
+      "sharpshooter": "シャープシューター",
+      "sharpshooterDesc": "質は量に勝る。一発必中。",
+      "wordStorm": "ワードストーム",
+      "wordStormDesc": "数で勝負も悪くない！",
+      "clutchFinisher": "クラッチフィニッシャー",
+      "clutchFinisherDesc": "最後に本領発揮。プレッシャーがダイヤモンドを作る。",
+      "firstBlood": "ファーストブラッド",
+      "firstBloodDesc": "序盤から全力。攻撃的なスタートが流れを決める。",
+      "slowBurn": "スロースタート",
+      "slowBurnDesc": "ゆっくり始まり、強く終わる。亀の勝利。",
+      "earlyBurst": "序盤バースト",
+      "earlyBurstDesc": "ロケットのようなスタート。終盤に力を残しては？",
+      "midGamePeak": "ピークパフォーマー",
+      "midGamePeakDesc": "中盤にリズムを掴んだ。ウォームアップ完了、クールダウン待ち。",
+      "burstMode": "バーストモード",
+      "burstModeDesc": "一つの爆発的なフェーズで圧倒。質が安定性に勝る！",
+      "slowStarter": "スロースターター",
+      "slowStarterDesc": "リズムを見つけるのに時間がかかった。見つけたら止まらない。",
+      "secondWind": "セカンドウィンド",
+      "secondWindDesc": "中盤の落ち込み？問題なし。強く復活した。",
+      "wordsmith": "ワードスミス",
+      "wordsmithDesc": "短い単語では満足しない。",
+      "solidPerformance": "安定したパフォーマンス",
+      "solidPerformanceDesc": "立派な結果。この調子で！",
+      "gettingStarted": "ウォームアップ中",
+      "gettingStartedDesc": "チャンピオンも最初は初心者。次のラウンドはあなたの番！"
+    }
+  },
+  "noWords": {
+    "noWordsThisRound": "今ラウンドは単語なし",
+    "keepGoing": "頑張って！",
+    "nextRoundIsYours": "次のラウンドはあなたの番！",
+    "funFact": "豆知識：平均的なプレイヤーは可能な単語の70%を見逃します！",
+    "otherPlayer": {
+      "headline": "厳しいラウンド",
+      "message": "今回は文字が味方しなかった。"
+    },
+    "encourage": {
+      "rookie": {
+        "headline": "初めての緊張？",
+        "message": "最高のワードハンターも最初はここから。ボードが難しかった！",
+        "tip": "ヒント：3文字の単語から始めて、そこから広げましょう。"
+      },
+      "unlucky": {
+        "headline": "難しい文字！",
+        "message": "サイコロが味方しないこともある。誰にでもあること！",
+        "tip": "ヒント：-ING、-ED、-ERなどの一般的なパターンを探そう。"
+      },
+      "thinking": {
+        "headline": "戦略的沈黙",
+        "message": "質より量の考え方...今回は質にこだわりすぎたかも！",
+        "tip": "ヒント：見つけたらすぐに送信 - 試すことにペナルティなし！"
+      },
+      "warmup": {
+        "headline": "ウォームアップラウンド",
+        "message": "練習だと思って。脳がまだ始まったばかり！",
+        "tip": "ヒント：ボードを素早くスキャンし、高得点のコーナーに集中。"
+      },
+      "comeback": {
+        "headline": "カムバック準備中...",
+        "message": "最高のプレイヤーにもオフラウンドがある。次のゲームはあなたの番！",
+        "tip": "ヒント：文字を声に出して言うと、単語の連想が生まれます。"
+      }
+    }
+  },
+  "xp": {
+    "title": "プレイヤーレベル",
+    "level": "レベル",
+    "maxLevel": "最大レベル",
+    "xpProgress": "XP進捗",
+    "totalXpEarned": "獲得した合計XP",
+    "xpToNextLevel": "次のレベルまでのXP",
+    "xpGained": "獲得XP",
+    "levelUp": "レベルアップ!",
+    "youReached": "到達しました",
+    "titleUnlocked": "称号解除",
+    "baseXp": "基本XP",
+    "scoreBonus": "スコアボーナス",
+    "winBonus": "勝利ボーナス",
+    "achievementBonus": "実績ボーナス",
+    "titles": {
+      "wordSeeker": "ワードシーカー",
+      "letterHunter": "レターハンター",
+      "vocabularian": "ボキャブラリアン",
+      "wordsmith": "ワードスミス",
+      "lexiconAdept": "レキシコンアデプト",
+      "grammarGuardian": "グラマーガーディアン",
+      "syntaxSage": "シンタックスセージ",
+      "eloquentElite": "エロクエントエリート",
+      "linguisticLegend": "リングイスティックレジェンド",
+      "lexiClashChampion": "レキシクラッシュチャンピオン"
+    }
+  },
+  "auth": {
+    "signIn": "ログイン",
+    "signOut": "ログアウト",
+    "signInWith": "${provider}で続ける",
+    "continueAsGuest": "ゲストとして続ける",
+    "saveProgress": "進捗を保存",
+    "guestStatsTitle": "ゲストとしての統計:",
+    "claimStats": "統計を取得",
+    "statsClaimedSuccess": "統計が保存されました!",
+    "termsAgreement": "続けることで利用規約に同意します",
+    "termsPrefix": "続けることで",
+    "termsLink": "利用規約",
+    "andText": "と",
+    "privacyLink": "プライバシーポリシー",
+    "upgradePrompt": "ログインして進捗を保存し、リーダーボードで競いましょう!",
+    "firstWin": {
+      "title": "初勝利おめでとうございます!",
+      "subtitle": "才能がありますね!アカウントを作成して連勝を続けましょう。",
+      "benefitsTitle": "登録して以下をアンロック:",
+      "benefits": {
+        "trackProgress": "統計、勝利、実績を追跡",
+        "leaderboard": "グローバルリーダーボードで競争",
+        "playWithFriends": "友達に挑戦して評判を築く"
+      },
+      "statsTeaser": "${games}ゲームをプレイして${score}ポイントを獲得しました!",
+      "maybeLater": "また今度"
+    },
+    "multiGames": {
+      "title": "上達しています！",
+      "subtitle": "登録して進捗を保存し、実績を追跡しましょう！",
+      "features": {
+        "leaderboard": "グローバルランキングで競争",
+        "playWithFriends": "友達に挑戦して評判を築く"
+      },
+      "statsTeaser": "${games}ゲームをプレイして${score}ポイントを獲得しました！",
+      "maybeLater": "また今度"
+    }
+  },
+  "profile": {
+    "title": "プロフィール",
+    "memberSince": "登録日",
+    "totalGames": "ゲーム数",
+    "wins": "勝利",
+    "wordsFound": "見つけた単語",
+    "totalScore": "合計スコア",
+    "timePlayed": "プレイ時間",
+    "achievements": "実績",
+    "editProfile": "プロフィール編集",
+    "changeAvatar": "アバター変更",
+    "username": "ユーザー名",
+    "saveChanges": "変更を保存",
+    "uploadPhoto": "写真をアップロード",
+    "removePhoto": "写真を削除",
+    "imageTooLarge": "画像は2MB以下にしてください",
+    "invalidImageType": "JPG、PNG、WebP、またはGIF画像をアップロードしてください",
+    "uploadSuccess": "プロフィール写真を更新しました!",
+    "uploadError": "画像のアップロードに失敗しました",
+    "photoRemoved": "プロフィール写真を削除しました",
+    "removeError": "写真の削除に失敗しました",
+    "saved": "プロフィールを保存しました!",
+    "saveError": "保存に失敗しました",
+    "editName": "名前を編集",
+    "chooseEmoji": "絵文字を選択",
+    "chooseColor": "色を選択",
+    "backToGame": "ゲームに戻る",
+    "backToRoom": "ルームに戻る",
+    "backToLobby": "ロビーに戻る",
+    "locked": "ロック中",
+    "earnThisAchievement": "ゲームをプレイしてこの実績をアンロックしましょう！"
+  },
+  "leaderboard": {
+    "title": "リーダーボード",
+    "allTime": "全期間",
+    "rank": "ランク",
+    "player": "プレイヤー",
+    "score": "スコア",
+    "games": "ゲーム",
+    "winRate": "勝率",
+    "yourRank": "あなたのランク",
+    "topPercent": "トップ${percent}%",
+    "noRankYet": "ゲームをプレイしてランク入り!",
+    "viewLeaderboard": "リーダーボードを見る"
+  },
+  "ranked": {
+    "title": "ランクマッチ",
+    "locked": "ロック中",
+    "unlocked": "解除済み",
+    "unlockProgress": "${current}/${required}ゲームで解除",
+    "playMoreToUnlock": "あと${count}ゲームで解除!",
+    "benefits": "特典",
+    "benefitFairPlay": "公平なプレイのための固定設定",
+    "benefitLeaderboard": "グローバルランクリーダーボード",
+    "benefitAchievements": "限定実績",
+    "playCasualInstead": "カジュアルをプレイ",
+    "queueing": "マッチ検索中...",
+    "playersInQueue": "${count}人がキューに",
+    "matchFound": "マッチ発見!",
+    "requiresAuth": "ランクマッチにはログインが必要です"
+  },
+  "legal": {
+    "termsOfService": "利用規約",
+    "privacyPolicy": "プライバシーポリシー",
+    "backToGame": "ゲームに戻る",
+    "lastUpdated": "最終更新日",
+    "copyright": "© 2025 LexiClash Ltd. All rights reserved.",
+    "allRightsReserved": "All rights reserved.",
+    "index": {
+      "title": "法的情報",
+      "intro": "LexiClashをご利用いただく際の権利と、私たちがどのようにお客様のデータを保護するかを理解するため、法的文書をご確認ください。",
+      "termsDescription": "LexiClashのご利用に関するルールとガイドラインを理解するため、利用規約をお読みください。",
+      "privacyDescription": "私たちがどのようにお客様の個人情報を収集、使用、保護するかをご確認ください。"
+    },
+    "terms": {
+      "title": "利用規約",
+      "intro": "LexiClashへようこそ。この利用規約は、lexiclash.liveでのマルチプレイヤーワードゲームプラットフォームの使用を規定します。",
+      "acceptance": {
+        "title": "1. 規約への同意",
+        "content": "LexiClashにアクセスまたは使用することにより、本利用規約に拘束されることに同意したものとみなされます。これらの条件に同意されない場合は、当サービスをご利用にならないでください。"
+      },
+      "service": {
+        "title": "2. サービスの説明",
+        "content": "LexiClashは、プレイヤーがリアルタイムで文字グリッド上の単語を見つけて競い合う無料のマルチプレイヤーワードゲームです。このサービスには、ユーザーアカウント、リーダーボード、実績、マルチプレイヤーゲームプレイ機能が含まれます。"
+      },
+      "accounts": {
+        "title": "3. ユーザーアカウント",
+        "content": "LexiClashはゲストとして使用するか、GoogleまたはDiscord認証を使用してアカウントを作成できます。アカウント情報のセキュリティを維持する責任はお客様にあります。パスワードは保存されません。認証はOAuthプロバイダーを通じて安全に処理されます。"
+      },
+      "conduct": {
+        "title": "4. ユーザーの行動",
+        "content": "LexiClashを公正かつ敬意を持って使用することに同意するものとします。禁止される活動には、攻撃的または差別的な表示名の使用、チートまたはバグの悪用、自動ボットまたはスクリプトの使用、他のプレイヤーへの嫌がらせ、サービスの妨害またはリーダーボードランキングの操作の試みが含まれます。"
+      },
+      "contentLicense": {
+        "title": "5. ユーザーコンテンツライセンス",
+        "content": "LexiClashを使用することにより、リーダーボード、ゲーム内ディスプレイ、およびサービス内でユーザー名、アバター、ゲーム統計を表示するための世界規模のロイヤリティフリーの非独占的ライセンスを当社に付与します。このライセンスにより、ゲームを運営し、他のユーザーにプレイヤー情報を表示することができます。"
+      },
+      "intellectualProperty": {
+        "title": "6. 知的財産権",
+        "content": "LexiClash（名前、ロゴ、ゲームメカニクス、コード、すべてのコンテンツを含む）は、LexiClash Ltdが所有しています。すべての権利が留保されています。当社の明示的な書面による許可なく、コピー、変更、配布、または派生作品を作成することはできません。"
+      },
+      "disclaimers": {
+        "title": "7. 免責事項",
+        "content": "LexiClashは、明示または黙示を問わず、いかなる種類の保証もなく「現状のまま」および「利用可能な状態で」提供されます。サービスが中断なく、エラーなく、または安全であることを保証するものではありません。ゲームの進行状況や統計を含むデータの損失について責任を負いません。"
+      },
+      "liability": {
+        "title": "8. 責任の制限",
+        "content": "法律で許可される最大限の範囲で、LexiClash Ltdは、利益、データ、またはのれんの損失を含むがこれに限定されない、サービスの使用から生じる間接的、偶発的、特別、結果的、または懲罰的損害について責任を負いません。"
+      },
+      "indemnification": {
+        "title": "9. 補償",
+        "content": "これらの条件への違反、サービスの使用、または他の当事者の権利侵害から生じるすべての請求、損害、損失、または費用からLexiClash Ltdを免責し、防御し、無害に保つことに同意するものとします。"
+      },
+      "termination": {
+        "title": "10. 終了",
+        "content": "当社は、理由の有無にかかわらず、通知の有無にかかわらず、いつでもLexiClashへのアクセスを一時停止または終了することができます。終了時には、サービスを使用する権利は直ちに終了し、アカウントデータは削除される場合があります。"
+      },
+      "modifications": {
+        "title": "11. 規約の変更",
+        "content": "当社は、いつでも本利用規約を変更する権利を留保します。変更は、ウェブサイトへの掲載時に有効となります。変更後もLexiClashを継続して使用することで、新しい条件に同意したものとみなされます。"
+      },
+      "governingLaw": {
+        "title": "12. 準拠法",
+        "content": "本利用規約は、抵触法の規定に関係なく、イスラエル国の法律に準拠し、それに従って解釈されるものとします。"
+      },
+      "disputes": {
+        "title": "13. 紛争解決",
+        "content": "これらの条件またはLexiClashの使用から生じる紛争は、まず非公式に解決を試みるものとします。それが失敗した場合、紛争はイスラエルの裁判所でのみ解決され、そのような裁判所の対人管轄権に同意するものとします。"
+      },
+      "severability": {
+        "title": "14. 分離可能性",
+        "content": "本利用規約のいずれかの条項が執行不能または無効であると判断された場合、その条項は必要最小限の範囲で制限または削除され、残りの条項は完全な効力を維持するものとします。"
+      }
+    },
+    "privacy": {
+      "title": "プライバシーポリシー",
+      "intro": "このプライバシーポリシーは、lexiclash.liveでマルチプレイヤーワードゲームを使用する際に、LexiClash Ltdがお客様の個人情報をどのように収集、使用、保護するかを説明します。",
+      "infoCollected": {
+        "title": "1. 収集する情報",
+        "content": "以下の種類の情報を収集します：",
+        "oauth": "Google/Discord OAuthによるアカウントデータ：名前、メールアドレス、プロフィール写真",
+        "profile": "プレイヤープロフィール情報：表示名、アバター絵文字/色、アップロードしたカスタムプロフィール写真",
+        "stats": "ゲーム統計：スコア、勝利数、見つけた単語、プレイしたゲーム、プレイ時間、実績、リーダーボードランキング",
+        "gameState": "一時的なゲーム状態：ルーム情報、現在のゲームデータ（Redisに一時的に保存され、自動削除）",
+        "analytics": "LogRocketによる分析データ：サービス改善のためのセッション録画、エラーログ、使用パターン"
+      },
+      "howWeUse": {
+        "title": "2. 情報の使用方法",
+        "content": "以下の目的で情報を使用します：認証とアカウント機能の提供、他のプレイヤーへのプロフィールと統計の表示、リーダーボードとランキングの維持、分析によるサービスの改善、重要なサービス関連の通知の送信、公正なプレイの確保と利用規約の施行。"
+      },
+      "thirdParties": {
+        "title": "3. サードパーティサービス",
+        "content": "LexiClashを運営するために以下のサードパーティサービスを使用しています：",
+        "supabase": "Supabase - 認証、データベースストレージ、プロフィール写真ストレージ",
+        "logrocket": "LogRocket - 分析、セッション録画、エラー追跡",
+        "google": "Google - OAuth認証",
+        "discord": "Discord - OAuth認証",
+        "noSale": "お客様の個人情報を第三者に販売することはありません。"
+      },
+      "cookies": {
+        "title": "4. Cookieとローカルストレージ",
+        "content": "以下の目的でエッセンシャルCookieとローカルストレージを使用します：認証トークン（Supabase）、ユーザー名と設定（localStorage）、テーマ設定（ダーク/ライトモード）、言語設定。また、分析目的でLogRocket Cookieを使用します。広告やトラッキングCookieは使用しません。"
+      },
+      "dataRetention": {
+        "title": "5. データ保持",
+        "content": "アカウントとプロフィールデータは、削除をリクエストするまで保持されます。ゲーム統計は、リーダーボードの整合性を維持するために保持されます。一時的なゲーム状態（Redis）は1時間以内に自動的に削除されます。分析データは、LogRocketのポリシーに従って保持されます。"
+      },
+      "security": {
+        "title": "6. データセキュリティ",
+        "content": "業界標準のセキュリティ対策を実施しています：暗号化された接続（HTTPS）、安全なOAuth認証、Supabaseによる暗号化されたデータベースストレージ、リアルタイムゲームプレイのための安全なWebSocket接続。"
+      },
+      "yourRights": {
+        "title": "7. お客様の権利",
+        "content": "お客様には以下の権利があります：プロフィールページからの個人データへのアクセス、いつでもプロフィール情報を更新、アカウントと関連データの削除、データの使用方法に関する情報のリクエスト。"
+      },
+      "international": {
+        "title": "8. 海外ユーザー",
+        "content": "お客様のデータは、異なるデータ保護法を持つ可能性のある国を含む、居住国以外の国に転送および保存される場合があります。LexiClashを使用することにより、そのような転送に同意するものとします。"
+      },
+      "changes": {
+        "title": "9. 本ポリシーの変更",
+        "content": "当社は、随時このプライバシーポリシーを更新することがあります。変更は、更新された日付とともにこのページに掲載されます。変更後もLexiClashを継続して使用することで、更新されたポリシーに同意したものとみなされます。"
+      },
+      "governingLaw": {
+        "title": "10. 準拠法",
+        "content": "このプライバシーポリシーは、イスラエル国の法律に準拠します。すべての紛争は、イスラエルの裁判所で解決されるものとします。"
+      }
+    }
+  },
+  "growth": {
+    "shareYourResult": "結果を共有",
+    "shareVictory": "🎉 勝利を共有！",
+    "shareResult": "ゲームを共有",
+    "bragToFriends": "友達にあなたの勝利を知らせよう！",
+    "inviteFriendsToPlay": "友達を招待して挑戦しよう",
+    "viralPrompt": "友達にあなたのスコアを超えられるか挑戦しよう！",
+    "share": "共有",
+    "dayStreak": "日連続",
+    "winsAway": "勝利まで",
+    "nextTier": "次のティア",
+    "newBest": "新記録！",
+    "newPersonalBest": "新しい自己ベスト！",
+    "streakUnlocked": "連勝解除！",
+    "streakAtRisk": "連勝が危険！今日プレイして維持しよう。",
+    "keepStreakAlive": "連勝を続けよう！",
+    "streakStarting": "スタート",
+    "streakHot": "ホット",
+    "streakOnFire": "燃えている",
+    "streakEpic": "エピック",
+    "streakLegendary": "レジェンド",
+    "referFriend": "友達を紹介",
+    "referralReward": "友達を招待して報酬をもらおう！",
+    "yourReferralLink": "紹介リンク",
+    "referralsCount": "紹介した友達",
+    "dailyChallenge": "デイリーチャレンジ",
+    "dailyChallengeDesc": "毎日新しいチャレンジ！",
+    "todaysChallenge": "今日のチャレンジ",
+    "challengeCompleted": "チャレンジ達成！",
+    "nextChallengeIn": "次のチャレンジまで",
+    "welcomeBack": "おかえりなさい！",
+    "missedYou": "お待ちしていました！もう一回プレイしませんか？",
+    "playNow": "今すぐプレイ",
+    "firstWin": "初勝利！",
+    "tenWins": "10勝利！",
+    "hundredWins": "100勝利！",
+    "milestoneUnlocked": "マイルストーン達成！"
+  },
+  "wordFeedback": {
+    "title": "言葉の審査",
+    "dictionaryTitle": "辞書を作ろう",
+    "question": "これは本当の言葉ですか？",
+    "submittedBy": "提出者",
+    "thumbsUp": "正解！",
+    "thumbsDown": "不正解",
+    "skipHint": "ESCでスキップ",
+    "thankYou": "ご協力ありがとう！",
+    "witty1": "{player}は「{word}」が本当の言葉だと主張しています...",
+    "witty2": "本当の言葉？それとも創造性？あなたが決めて！",
+    "witty3": "{player}は「{word}」を脳の辞書で見つけました",
+    "witty4": "辞書編集者が電話してきました、「{word}」について知りたいそうです",
+    "witty5": "正しそうに聞こえる...本当に？",
+    "witty6": "「{word}」は天才のひらめき？それとも狂気？",
+    "witty7": "{player}はこれが本物の言葉だと誓っています！",
+    "witty8": "辞書委員会があなたの判定を待っています「{word}」",
+    "nowValid": "は有効な単語になりました！",
+    "dictionary1": "より良い辞書を作るお手伝いを！",
+    "dictionary2": "あなたの投票で言葉が公式に！",
+    "dictionary3": "投票するたびにゲームが改善！",
+    "dictionary4": "言葉の審判になろう！",
+    "dictionary5": "一緒に辞書を作ろう！",
+    "notAWord": "言葉じゃない",
+    "realWord": "本物の言葉！",
+    "nextWord": "次の言葉...",
+    "almostApproved": "もう少しで承認！",
+    "votesNeeded": "あと{count}票で承認",
+    "validForScoring": "有効とカウント！辞書に追加するお手伝いを。",
+    "moreForDictionary": "あと辞書に追加まで"
+  },
+  "footer": {
+    "howToPlay": "遊び方",
+    "leaderboard": "ランキング",
+    "interactiveTutorial": "インタラクティブチュートリアル"
+  },
+  "support": {
+    "kofiWinner": "勝者の余裕で応援してね！",
+    "kofiFooter": "コーヒーをおごる",
+    "kofiTooltip": "LexiClashの開発を応援"
+  },
+  "landing": {
+    "chooseMode": "モードを選択",
+    "subtitle": "ソロでハイスコアを目指して練習するか、リアルタイムで友達と対戦！",
+    "subtitleSimple": "ソロで練習か友達と対戦",
+    "singlePlayer": "シングルプレイヤー",
+    "singlePlayerDesc": "自分のペースで練習、またはチャレンジ！",
+    "multiplayer": "マルチプレイヤー",
+    "multiplayerDesc": "リアルタイムで友達と対戦！",
+    "feature": {
+      "soloVsBots": "ボット対戦",
+      "practiceMode": "練習モード",
+      "challenges": "チャレンジ＆ハイスコア",
+      "joinRooms": "部屋に参加",
+      "hostGames": "ゲームを主催",
+      "tournaments": "トーナメント"
+    },
+    "hint": "初めて？シングルプレイヤーで基本を学ぼう！",
+    "openRooms": "部屋が開放中",
+    "playersLive": "プレイ中"
+  },
+  "singlePlayer": {
+    "title": "シングルプレイヤー",
+    "selectMode": "モード選択",
+    "soloVsBots": "ボット対戦",
+    "soloVsBotsDesc": "AI相手に対戦",
+    "practiceMode": "練習",
+    "practiceModeDesc": "タイマーなし、自分のペースで単語を発見",
+    "challengeMode": "チャレンジ",
+    "challengeModeDesc": "ハイスコアを更新",
+    "selectDifficulty": "グリッドサイズ",
+    "gameTime": "ゲーム時間",
+    "opponents": "ボット対戦相手",
+    "noBots": "ボットが追加されていません。対戦相手を追加！",
+    "startGame": "ゲーム開始",
+    "finish": "終了",
+    "noWordsYet": "まだ単語が見つかっていません。スワイプ開始！",
+    "victory": "勝利！",
+    "gameOver": "ゲームオーバー",
+    "practiceComplete": "練習完了！",
+    "newHighScore": "新記録！",
+    "challengeComplete": "チャレンジ完了",
+    "noWordsFound": "単語が見つかりません",
+    "achievementsNotSaved": "シングルプレイヤーモードの実績はプロフィールに保存されません。",
+    "botDetails": "ボット詳細",
+    "difficulty": "難易度",
+    "timer": "タイマー",
+    "totalScore": "合計スコア",
+    "wordsByLength": "長さ別の単語",
+    "quitConfirmTitle": "ゲームを終了しますか？",
+    "quitConfirmMessage": "現在の進捗が失われます。本当に終了しますか？",
+    "gamePaused": "ゲーム一時停止中",
+    "botWords": "発見した単語",
+    "aiOpponents": "AI対戦相手",
+    "autoFillDesc": "{count}人のAI対戦相手を追加",
+    "addBotsPrompt": "AI対戦相手を追加しよう！",
+    "addBotsHint": "自動追加を使うか、上のボタンをクリック"
+  },
+  "landscape": {
+    "tutorialTitle": "横画面コントロール",
+    "tutorialPause": "左下：一時停止/再開",
+    "tutorialQuit": "右下：ゲームを終了",
+    "tutorialHelp": "右上：ヘルプとルール",
+    "tutorialKeyboard": "キーボード：スペース=一時停止、Esc=終了、?=ヘルプ"
+  },
+  "challenge": {
+    "yourRecord": "あなたの記録",
+    "beatIt": "破れるかな？",
+    "noRecord": "まだ記録なし",
+    "setFirst": "最初の記録を作って、自分と競争しよう！",
+    "recordsSet": "記録達成",
+    "gamesPlayed": "ゲームプレイ",
+    "allTimeBest": "歴代最高",
+    "longest": "最長",
+    "newRecord": "新記録！",
+    "tied": "タイ！",
+    "recordToBeat": "記録",
+    "toGo": "pts 記録更新まで",
+    "settingFirst": "最初の記録を設定中！",
+    "allTimeRecord": "歴代最高記録！",
+    "improvement": "改善",
+    "firstRecord": "初記録達成！",
+    "shortOf": "記録まであと{diff}点",
+    "settingRecord": "初めての記録を設定中！",
+    "aheadOfRecord": "記録より+{diff}リード！",
+    "behindRecord": "記録を破るまであと{diff}",
+    "tiedWithRecord": "記録と同点！"
+  },
+  "rules": {
+    "pageTitle": "LexiClash: リアルタイム単語バトル",
+    "pageSubtitle": "このスピーディーなマルチプレイヤー戦略ゲームで単語ハンティングの技を極めよう",
+    "playNowFree": "今すぐプレイ - 無料！",
+    "readyToTest": "単語力を試す準備はできましたか？",
+    "readyToTestDesc": "究極の単語バトル体験に何千人ものプレイヤーと一緒に参加しましょう。ルームを作成し、友達を招待して、誰が最高のボキャブラリーを持っているか確かめよう！",
+    "startPlaying": "今すぐプレイを開始",
+    "backToHome": "ホームに戻る",
+    "howToPlayIntro": "LexiClashは、プレイヤーが文字のグリッドからできるだけ多くの単語を見つけるために競うリアルタイムマルチプレイヤー単語ゲームです。世界中の友達と遊べるモダンなひねりを加えた、競争的でデジタル版の古典的な単語探しゲームと考えてください。",
+    "joinOrCreate": "ルームに参加または作成",
+    "joinOrCreateDesc": "自分のゲームルームを作成するか、ルームコードを使って既存のルームに参加します。コードを友達と共有して即座に招待できます。",
+    "raceAgainstTime": "時間との戦い",
+    "raceAgainstTimeDesc": "ゲームが始まると、文字グリッドからできるだけ多くの有効な単語を見つけるために制限時間（通常90秒）があります。",
+    "swipeToForm": "スワイプして単語を作る",
+    "swipeToFormDesc": "隣接する文字をスワイプまたはクリックして接続し、単語を作ります。文字は水平、垂直、または斜めに接続されている必要があります。",
+    "competeAndWin": "競争して勝つ",
+    "competeAndWinDesc": "時間切れになった時に最高得点のプレイヤーが勝ちます！複数ラウンドをプレイして究極の単語チャンピオンを決めましょう。",
+    "scoringIntro": "LexiClashでは、長い単語ほど多くのポイントを獲得できます。スコアリングシステムは、多くの短い単語を提出するのではなく、より長く複雑な単語を探す戦略的なプレイヤーに報酬を与えます。",
+    "wordLength": "単語の長さ",
+    "points": "ポイント",
+    "example": "例",
+    "proTip": "プロのヒント",
+    "proTipText": "最高のポイント対時間比率のために5-7文字の単語を見つけることに集中しましょう。8文字以上の単語は大量のポイントを与えますが、珍しく見つけるのに時間がかかります！",
+    "strategiesIntro": "LexiClashのチャンピオンになるには、良いボキャブラリー以上のものが必要です。ここでは、トッププレイヤーが対戦相手を支配し、リーダーボードを登るために使用する実証済みの戦略を紹介します。",
+    "scanPrefixes": "接頭辞と接尾辞をスキャン",
+    "scanPrefixesDesc": "「不-」、「再-」、「-的」、「-化」などの一般的な単語パーツを探しましょう。これらはグリッドに隠れている長い単語を素早く特定するのに役立ちます。",
+    "startFromVowels": "母音から始める",
+    "startFromVowelsDesc": "ほとんどの単語には母音が含まれています。グリッド上のア、イ、ウ、エ、オを見つけてから、その周りに単語を構築して、より速く単語を発見しましょう。",
+    "thinkWordFamilies": "単語ファミリーで考える",
+    "thinkWordFamiliesDesc": "「遊ぶ」のような単語を見つけたら、すぐにバリエーションをチェック：「遊び」、「遊んで」、「遊んだ」。このテクニックはスコアを素早く増やすことができます。",
+    "dontOverthink": "短い単語を考えすぎない",
+    "dontOverthinkDesc": "明らかな3-4文字の単語をためらわずに素早く提出しましょう。それらはすぐに積み重なり、より長く高得点の単語を探している間、堅実な基盤を与えてくれます。",
+    "practicePatterns": "パターン認識を練習",
+    "practicePatternsDesc": "プレイすればするほど、一般的な文字パターンを素早く認識できるようになります。定期的な練習は脳がほぼ瞬時に単語を見つけるように訓練し、大きなアドバンテージを与えます。",
+    "multiLanguage": "多言語サポート",
+    "multiLanguageDesc": "英語、ヘブライ語、スウェーデン語、または日本語でプレイ。語学学習者に最適！",
+    "realTimeMultiplayer": "リアルタイムマルチプレイヤー",
+    "realTimeMultiplayerDesc": "友達や世界中のプレイヤーとリアルタイムで単語バトル。",
+    "achievementsLevels": "実績とレベル",
+    "achievementsLevelsDesc": "XPを獲得し、実績をアンロックし、上達するにつれてランクを上げましょう。",
+    "leaderboards": "リーダーボード",
+    "leaderboardsDesc": "進捗状況を追跡し、世界中の他のプレイヤーとのランキングを確認。",
+    "noDownload": "ダウンロード不要",
+    "noDownloadDesc": "デスクトップ、タブレット、モバイルなど、どのデバイスでもブラウザで即座にプレイ。",
+    "qrSharing": "QRコード共有",
+    "qrSharingDesc": "QRコードを生成して、友達を即座にゲームルームに招待。",
+    "singlePlayerTitle": "シングルプレイヤーモード",
+    "singlePlayerIntro": "一人で練習したり、AI対戦相手に挑戦したりしましょう！",
+    "soloVsBots": "ソロ vs ボット",
+    "soloVsBotsDesc": "様々な難易度レベルのAI対戦相手と競争。本物のプレイヤーに挑戦する前の戦略練習に最適。",
+    "practiceMode": "練習モード",
+    "practiceModeDesc": "タイマーなしでゆっくり。新しい単語を学んだり、プレッシャーなしでグリッドを探索するのに最適。",
+    "challengeMode": "チャレンジモード",
+    "challengeModeDesc": "自分の最高記録を破り、時間とともに上達を追跡。自分自身と競争！"
+  },
+  "social": {
+    "playersOnline": "オンラインプレイヤー",
+    "gamesNow": "進行中のゲーム",
+    "games": "ゲーム",
+    "newRecord": "新記録！",
+    "online": "オンライン"
+  },
+  "daily": {
+    "title": "デイリーチャレンジ",
+    "badge": "デイリーチャレンジ",
+    "puzzleNumber": "デイリー #{number}",
+    "timeLimit": "制限時間",
+    "attempt": "挑戦",
+    "playButton": "今日のパズルをプレイ",
+    "nextPuzzleIn": "次のパズルまで:",
+    "samePuzzle": "世界中で同じパズル。結果をシェアして友達に挑戦！",
+    "alreadyPlayed": "今日はプレイ済み",
+    "yourScore": "あなたのスコア",
+    "completed": "完了！",
+    "quitConfirm": "本当に終了しますか？進捗が失われ、今日のパズルは再プレイできません。",
+    "wordsFound": "{count}語発見",
+    "streak": "ストリーク",
+    "streakDays": "{count}日連続！",
+    "shareScore": "スコアをシェア",
+    "copyToClipboard": "クリップボードにコピー",
+    "copiedToClipboard": "コピーしました！",
+    "home": "ホーム",
+    "close": "閉じる",
+    "bannerTitle": "デイリー #{number}",
+    "bannerSubtitle": "世界共通のパズル。スコアをシェア！",
+    "oneAttempt": "1日1回のチャンス - 全員同じパズル！",
+    "dayStreak": "日連続",
+    "playNow": "今すぐプレイ",
+    "loading": "デイリーチャレンジを読み込み中...",
+    "todaysPlayers": "今日のプレイヤー",
+    "beFirstToPlay": "今日のチャレンジに最初に挑戦しよう！",
+    "playerSingular": "プレイヤー",
+    "playersPlural": "プレイヤー",
+    "yourRank": "あなたの順位",
+    "showMore": "もっと見る",
+    "showLess": "閉じる",
+    "more": "人"
+  },
+  "guidance": {
+    "combo": {
+      "title": "コンボボーナス！",
+      "text": "素早く単語を見つけてコンボを構築し、スコアを倍増させよう！勢いを維持して！"
+    },
+    "earthquake": {
+      "title": "地震が来る！",
+      "text": "まもなく文字がシャッフルされます - 動く前に素早く単語を見つけよう！ファイアラウンドが始まります！"
+    },
+    "fireRound": {
+      "title": "ファイアラウンド - 2倍ポイント！",
+      "text": "次の15秒間、すべてのポイントが2倍になります - できるだけ多くの単語を見つけよう！"
+    },
+    "directionPattern": {
+      "title": "方向を変えよう！",
+      "text": "単語をなぞる途中で方向を変えられます！右、下、斜めと - すべて1つの単語で。"
+    },
+    "dismiss": "了解！"
+  }
+};
+
+module.exports = { ja };

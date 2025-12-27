@@ -57,7 +57,7 @@ const WaitingScreen: React.FC<WaitingScreenProps> = ({
   // Landscape mode layout - optimized 3-column: room info | grid | players
   if (isLandscape) {
     return (
-      <div className="relative flex h-screen w-full overflow-hidden bg-slate-900 p-3 gap-3 landscape-full-height">
+      <div className="relative flex h-screen w-full overflow-hidden bg-slate-900 text-white p-3 gap-3 landscape-full-height">
         {/* Left column: Room info + Exit */}
         <div className="flex flex-col items-center gap-3 w-28 flex-shrink-0">
           {/* Room Code & Name */}
@@ -198,7 +198,7 @@ const WaitingScreen: React.FC<WaitingScreenProps> = ({
 
         {/* QR Code Dialog - same as portrait */}
         <Dialog open={showQR} onOpenChange={setShowQR}>
-          <DialogContent className="sm:max-w-md bg-white dark:bg-slate-800 border-cyan-500/30">
+          <DialogContent className="sm:max-w-md bg-white text-neo-black dark:bg-slate-800 dark:text-white border-cyan-500/30">
             <DialogHeader>
               <DialogTitle className="text-center text-cyan-600 dark:text-cyan-300 flex items-center justify-center gap-2">
                 <FaQrcode />
@@ -206,7 +206,7 @@ const WaitingScreen: React.FC<WaitingScreenProps> = ({
               </DialogTitle>
             </DialogHeader>
             <div className="flex flex-col items-center gap-4 py-4">
-              <div className="p-6 bg-white rounded-lg shadow-md">
+              <div className="p-6 bg-white text-neo-black rounded-lg shadow-md">
                 <QRCodeSVG value={getJoinUrl(gameCode)} size={200} level="H" includeMargin />
               </div>
               <h4 className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-400">
@@ -306,7 +306,7 @@ const WaitingScreen: React.FC<WaitingScreenProps> = ({
             gameSettings
           ) : (
             // Player: Waiting Message - NEO-BRUTALIST
-            <div className="flex-1 p-4 sm:p-6 md:p-8 bg-slate-800/95 border-4 border-neo-black shadow-hard flex flex-col items-center justify-center rotate-[-0.5deg]">
+            <div className="flex-1 p-4 sm:p-6 md:p-8 bg-slate-800/95 text-white border-4 border-neo-black shadow-hard flex flex-col items-center justify-center rotate-[-0.5deg]">
               <motion.div
                 initial={{ scale: 0.9, rotate: -3 }}
                 animate={{ scale: 1, rotate: 0 }}
@@ -314,9 +314,9 @@ const WaitingScreen: React.FC<WaitingScreenProps> = ({
                 className="relative"
               >
                 {/* Decorative background shapes */}
-                <div className="absolute -top-4 -right-6 w-20 h-20 bg-neo-pink border-4 border-neo-black rotate-12 -z-10" />
-                <div className="absolute -bottom-4 -left-6 w-16 h-16 bg-neo-cyan border-4 border-neo-black -rotate-6 -z-10" />
-                <div className="absolute top-1/2 -right-10 w-10 h-10 bg-neo-yellow border-3 border-neo-black rotate-45 -z-10" />
+                <div className="absolute -top-4 -right-6 w-20 h-20 bg-neo-pink text-white border-4 border-neo-black rotate-12 -z-10" />
+                <div className="absolute -bottom-4 -left-6 w-16 h-16 bg-neo-cyan text-neo-black border-4 border-neo-black -rotate-6 -z-10" />
+                <div className="absolute top-1/2 -right-10 w-10 h-10 bg-neo-yellow text-neo-black border-3 border-neo-black rotate-45 -z-10" />
 
                 {/* Neo-Brutalist Hourglass */}
                 <motion.div
@@ -326,7 +326,7 @@ const WaitingScreen: React.FC<WaitingScreenProps> = ({
                 >
                   <div className="relative w-16 h-20 flex flex-col items-center">
                     <div className="w-0 h-0 border-l-[28px] border-r-[28px] border-t-[32px] border-l-transparent border-r-transparent border-t-neo-black" />
-                    <div className="w-2 h-1 bg-neo-black -my-[2px] z-10" />
+                    <div className="w-2 h-1 bg-neo-black text-white -my-[2px] z-10" />
                     <div className="w-0 h-0 border-l-[28px] border-r-[28px] border-b-[32px] border-l-transparent border-r-transparent border-b-neo-black" />
                     <motion.div
                       animate={{ y: [0, 24, 0], opacity: [1, 1, 0] }}
@@ -414,7 +414,7 @@ const WaitingScreen: React.FC<WaitingScreenProps> = ({
                           size="2xl"
                           className="flex-shrink-0"
                         />
-                        {playerIsHost && <FaCrown className="text-neo-black" />}
+                        {playerIsHost && <FaCrown className="text-neo-yellow" />}
                         <SlotMachineText text={playerUsername} />
                         {isMe && (
                           <span className="text-xs bg-neo-black/20 px-2 py-0.5 rounded-neo font-bold">
@@ -448,7 +448,7 @@ const WaitingScreen: React.FC<WaitingScreenProps> = ({
 
       {/* QR Code Dialog */}
       <Dialog open={showQR} onOpenChange={setShowQR}>
-        <DialogContent className="sm:max-w-md bg-white dark:bg-slate-800 border-cyan-500/30">
+        <DialogContent className="sm:max-w-md bg-white text-neo-black dark:bg-slate-800 dark:text-white border-cyan-500/30">
           <DialogHeader>
             <DialogTitle className="text-center text-cyan-600 dark:text-cyan-300 flex items-center justify-center gap-2">
               <FaQrcode />
@@ -456,7 +456,7 @@ const WaitingScreen: React.FC<WaitingScreenProps> = ({
             </DialogTitle>
           </DialogHeader>
           <div className="flex flex-col items-center gap-4 py-4">
-            <div className="p-6 bg-white rounded-lg shadow-md">
+            <div className="p-6 bg-white text-neo-black rounded-lg shadow-md">
               <QRCodeSVG value={getJoinUrl(gameCode)} size={250} level="H" includeMargin />
             </div>
             <h4 className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-400">

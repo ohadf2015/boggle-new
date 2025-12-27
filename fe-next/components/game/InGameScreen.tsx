@@ -1,6 +1,6 @@
 'use client';
 
-import React, { ReactNode, useRef, useEffect, useCallback, useMemo, memo, useState } from 'react';
+import React, { ReactNode, useRef, useEffect, useCallback, useMemo, memo, useState, useTransition, useDeferredValue } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FaTrophy, FaCrown } from 'react-icons/fa';
 import type { Socket } from 'socket.io-client';
@@ -34,6 +34,17 @@ import type {
 import type { BoardTheme } from '@/shared/types/socket';
 import { useMobileLandscape } from '@/hooks/useMobileLandscape';
 import { useAutoScrollOnGameStart } from '@/hooks/useAutoScrollOnGameStart';
+import { WordsRemaining } from '@/player/components/in-game/WordsRemaining';
+import { getPerformanceConfig } from '../grid/performanceUtils';
+import ContextualTooltip from './ContextualTooltip';
+import DirectionGuidanceTooltip from './DirectionGuidanceTooltip';
+import {
+  useContextualGuidance,
+  useComboGuidanceTrigger,
+  useEarthquakeGuidanceTrigger,
+  useFireRoundGuidanceTrigger,
+} from '@/hooks/useContextualGuidance';
+import { useDirectionPatternGuidance } from '@/hooks/useDirectionPatternGuidance';
 
 // ==================== Types ====================
 
@@ -173,6 +184,18 @@ const InGameScreen = memo<InGameScreenProps>(({
   // Help panel state for discoverability
   const [showHelpPanel, setShowHelpPanel] = useState(false);
 
+  // Mobile tab state for words/leaderboard toggle
+  const [mobileActiveTab, setMobileActiveTab] = useState<'words' | 'leaderboard'>('words');
+
+  // Use transition for non-urgent UI updates (leaderboard, word list)
+  const [isPending, startTransition] = useTransition();
+
+  // Defer expensive leaderboard calculations for smoother UI
+  const deferredLeaderboard = useDeferredValue(leaderboard);
+
+  // Defer found words updates for better performance during rapid word submissions
+  const deferredFoundWords = useDeferredValue(foundWords);
+
   // Word forming state (for external WordFormingArea)
   const [formedWord, setFormedWord] = useState('');
   const [letterCount, setLetterCount] = useState(0);
@@ -192,6 +215,17 @@ const InGameScreen = memo<InGameScreenProps>(({
     isLandscape,
     showStartAnimation,
   });
+
+  // Contextual guidance for first-time players
+  const guidance = useContextualGuidance();
+
+  // Auto-trigger guidance based on game events
+  useComboGuidanceTrigger(comboLevel, guidance.triggerComboGuidance);
+  useEarthquakeGuidanceTrigger(earthquakeState, guidance.triggerEarthquakeGuidance);
+  useFireRoundGuidanceTrigger(fireRoundActive, guidance.triggerFireRoundGuidance);
+
+  // Direction pattern guidance - shows when player only uses straight-line directions
+  const directionGuidance = useDirectionPatternGuidance();
 
   // Track viewport height for responsive landscape adjustments
   useEffect(() => {
@@ -352,12 +386,12 @@ const InGameScreen = memo<InGameScreenProps>(({
   }, [comboLevel]);
   const effectiveComboLevelRef = comboLevelRef || internalComboLevelRef;
 
-  // Normalize found words to FoundWord format
+  // Normalize found words to FoundWord format (using deferred value for smoother updates)
   const normalizedFoundWords: FoundWord[] = useMemo(() => {
-    return foundWords.map(w =>
+    return deferredFoundWords.map(w =>
       typeof w === 'string' ? { word: w, isValid: true } : w
     );
-  }, [foundWords]);
+  }, [deferredFoundWords]);
 
   // Calculate player's score and rank from leaderboard
   const playerData = useMemo(() => {
@@ -458,13 +492,13 @@ const InGameScreen = memo<InGameScreenProps>(({
     announceWordResult,
   ]); // Optimized: removed effectiveComboLevelRef and fireRoundActive from deps (using refs)
 
-  // Memoize leaderboard items with centralized ranking utilities
-  const memoizedLeaderboard = useMemo(() => leaderboard.map((player, index) => ({
+  // Memoize leaderboard items with centralized ranking utilities (using deferred value)
+  const memoizedLeaderboard = useMemo(() => deferredLeaderboard.map((player, index) => ({
     ...player,
     rankStyle: getRankStyle(index),
     isMe: player.username === username,
     rankDisplay: getRankIconString(index)
-  })), [leaderboard, username]);
+  })), [deferredLeaderboard, username]);
 
   // Handle word forming changes from GridComponent
   const handleWordChange = useCallback((word: string, count: number) => {
@@ -491,12 +525,38 @@ const InGameScreen = memo<InGameScreenProps>(({
           remainingSeconds={fireRoundRemaining}
         />
 
+        {/* Contextual Guidance Tooltips - First-time player education */}
+        <ContextualTooltip
+          type="combo"
+          isVisible={guidance.showComboTip}
+          onDismiss={guidance.dismissComboTip}
+          t={t}
+        />
+        <ContextualTooltip
+          type="earthquake"
+          isVisible={guidance.showEarthquakeTip}
+          onDismiss={guidance.dismissEarthquakeTip}
+          t={t}
+        />
+        <ContextualTooltip
+          type="fireRound"
+          isVisible={guidance.showFireRoundTip}
+          onDismiss={guidance.dismissFireRoundTip}
+          t={t}
+        />
+        <DirectionGuidanceTooltip
+          isVisible={directionGuidance.showDirectionGuidance}
+          onDismiss={directionGuidance.dismissDirectionGuidance}
+          t={t}
+          dir={dir}
+        />
+
         {/* Full-screen landscape container with grid centered - uses full viewport */}
-        <div className="relative flex items-center justify-center w-full h-screen overflow-hidden bg-slate-900 landscape-full-height">
+        <div className="relative flex items-center justify-center w-full h-screen overflow-hidden bg-slate-900 text-white landscape-full-height">
 
           {/* Left Side Stats - Consolidated Panel (Timer + Stats) - ENLARGED FOR LANDSCAPE */}
           <div className="absolute left-2 top-1/2 -translate-y-1/2 z-40 landscape-side-panel">
-            <div className="bg-neo-cream/95 border-4 border-neo-black rounded-neo shadow-hard-lg p-3 flex flex-col items-center gap-3">
+            <div className="bg-neo-cream/95 text-neo-black border-4 border-neo-black rounded-neo shadow-hard-lg p-3 flex flex-col items-center gap-3">
               {/* Timer - Larger for better visibility */}
               {remainingTime !== null && (
                 <CircularTimer
@@ -617,6 +677,7 @@ const InGameScreen = memo<InGameScreenProps>(({
                 interactive={isPlaying && !showStartAnimation}
                 animateOnMount={!hasAnimatedRef.current}
                 onWordSubmit={handleGridWordSubmit}
+                onPathSubmit={directionGuidance.trackWordPath}
                 onWordChange={handleWordChange}
                 comboLevel={comboLevel}
                 hideComboIndicator={true}
@@ -654,7 +715,33 @@ const InGameScreen = memo<InGameScreenProps>(({
         remainingSeconds={fireRoundRemaining}
       />
 
-      <div className="flex flex-col lg:flex-row gap-1 md:gap-2 flex-grow w-full overflow-hidden transition-all duration-500 ease-in-out">
+      {/* Contextual Guidance Tooltips - First-time player education */}
+      <ContextualTooltip
+        type="combo"
+        isVisible={guidance.showComboTip}
+        onDismiss={guidance.dismissComboTip}
+        t={t}
+      />
+      <ContextualTooltip
+        type="earthquake"
+        isVisible={guidance.showEarthquakeTip}
+        onDismiss={guidance.dismissEarthquakeTip}
+        t={t}
+      />
+      <ContextualTooltip
+        type="fireRound"
+        isVisible={guidance.showFireRoundTip}
+        onDismiss={guidance.dismissFireRoundTip}
+        t={t}
+      />
+      <DirectionGuidanceTooltip
+        isVisible={directionGuidance.showDirectionGuidance}
+        onDismiss={directionGuidance.dismissDirectionGuidance}
+        t={t}
+        dir={dir}
+      />
+
+      <div className="flex flex-col lg:flex-row gap-2 md:gap-4 lg:gap-6 flex-grow w-full max-w-[1920px] mx-auto overflow-hidden transition-all duration-500 ease-in-out">
 
       {/* Top Bar - Only on mobile, integrated into parent on desktop */}
       <div className="lg:hidden w-full flex items-center justify-between mb-1 px-2">
@@ -692,13 +779,13 @@ const InGameScreen = memo<InGameScreenProps>(({
 
       {/* Left Column: Found Words (Desktop only, only when playing, hidden in focus mode) */}
       {isPlaying && !gameplayFocusMode && (
-        <div className="hidden lg:flex lg:flex-col lg:w-64 xl:w-80 gap-2 min-h-0">
+        <div className="hidden lg:flex lg:flex-col lg:w-80 xl:w-96 2xl:w-[28rem] gap-2 min-h-0">
           <div
-            className="bg-neo-cream border-4 border-neo-black rounded-neo-lg shadow-hard-lg flex flex-col min-h-0 max-h-[65vh] lg:max-h-[70vh] overflow-hidden"
+            className="bg-neo-cream text-neo-black border-4 border-neo-black rounded-neo-lg shadow-hard-lg flex flex-col min-h-0 max-h-[65vh] lg:max-h-[70vh] overflow-hidden"
             style={{ transform: 'rotate(1deg)' }}
           >
             {/* Header */}
-            <div className="py-3 px-4 border-b-4 border-neo-black bg-neo-cyan">
+            <div className="py-3 px-4 border-b-4 border-neo-black bg-neo-cyan text-neo-black">
               <h3 className="text-neo-black text-base uppercase tracking-widest font-black">
                 {t('playerView.wordsFound')}
               </h3>
@@ -758,7 +845,12 @@ const InGameScreen = memo<InGameScreenProps>(({
               animate={{ scale: 1, opacity: 1 }}
               className="relative z-20"
             >
-              <CircularTimer remainingTime={remainingTime} totalTime={timerValue * 60} size="md" />
+              <div className="hidden lg:block">
+                <CircularTimer remainingTime={remainingTime} totalTime={timerValue * 60} size="lg" />
+              </div>
+              <div className="lg:hidden">
+                <CircularTimer remainingTime={remainingTime} totalTime={timerValue * 60} size="md" />
+              </div>
             </motion.div>
 
             {/* Score (right position) - vibrant yellow/lime gradient */}
@@ -776,12 +868,12 @@ const InGameScreen = memo<InGameScreenProps>(({
                     key={playerData.score}
                     initial={{ scale: 1.3 }}
                     animate={{ scale: 1 }}
-                    className="text-xl md:text-2xl font-black text-neo-black leading-tight"
+                    className="text-xl md:text-2xl lg:text-3xl font-black text-neo-black leading-tight"
                     style={{ textShadow: '1px 1px 0px rgba(255,255,255,0.5)' }}
                   >
                     {playerData.score}
                   </motion.div>
-                  <div className="text-[10px] md:text-xs font-bold uppercase tracking-wider text-neo-black/80">
+                  <div className="text-[10px] md:text-xs lg:text-sm font-bold uppercase tracking-wider text-neo-black/80">
                     {t('common.score') || 'Score'}
                   </div>
                 </div>
@@ -829,7 +921,7 @@ const InGameScreen = memo<InGameScreenProps>(({
                       </div>
                     </div>
                   </div>
-                  <Badge className="bg-white/20 text-white border-white/30 text-[10px] md:text-xs">
+                  <Badge className="bg-white/20 text-neo-black border-white/30 text-[10px] md:text-xs">
                     {t('hostView.tournamentProgress')}
                   </Badge>
                 </div>
@@ -846,6 +938,7 @@ const InGameScreen = memo<InGameScreenProps>(({
               interactive={isPlaying && !showStartAnimation}
               animateOnMount={!hasAnimatedRef.current}
               onWordSubmit={handleGridWordSubmit}
+              onPathSubmit={directionGuidance.trackWordPath}
               onWordChange={handleWordChange}
               comboLevel={comboLevel}
               hideComboIndicator={true}
@@ -862,16 +955,63 @@ const InGameScreen = memo<InGameScreenProps>(({
           </div>
         )}
 
-        {/* Mobile: Word count display (when playing) */}
-        {isPlaying && (
-          <div className="lg:hidden">
-            <Card className="bg-white/90 dark:bg-slate-800/90 backdrop-blur-md border border-teal-500/30 shadow-[0_0_15px_rgba(20,184,166,0.1)]">
-              <CardContent className="p-3">
-                <div className="text-center text-lg text-teal-600 dark:text-teal-300 font-bold">
-                  {normalizedFoundWords.length} {t('playerView.wordsFound') || 'words found'}
+        {/* Mobile: Tabbed Words/Leaderboard view (when playing) - reduces scroll */}
+        {isPlaying && !gameplayFocusMode && (
+          <div className="lg:hidden mt-2">
+            {/* Tab buttons */}
+            <div className="flex gap-1 mb-2">
+              <button
+                onClick={() => setMobileActiveTab('words')}
+                className={`flex-1 py-2 px-3 font-black text-sm uppercase border-3 border-neo-black rounded-neo transition-all ${
+                  mobileActiveTab === 'words'
+                    ? 'bg-neo-cyan text-neo-black shadow-none translate-x-[1px] translate-y-[1px]'
+                    : 'bg-neo-cream text-neo-black shadow-hard-sm hover:shadow-hard'
+                }`}
+              >
+                {t('hostView.words') || 'Words'} ({normalizedFoundWords.length})
+              </button>
+              <button
+                onClick={() => setMobileActiveTab('leaderboard')}
+                className={`flex-1 py-2 px-3 font-black text-sm uppercase border-3 border-neo-black rounded-neo transition-all ${
+                  mobileActiveTab === 'leaderboard'
+                    ? 'bg-neo-purple text-neo-cream shadow-none translate-x-[1px] translate-y-[1px]'
+                    : 'bg-neo-cream text-neo-black shadow-hard-sm hover:shadow-hard'
+                }`}
+              >
+                <FaTrophy className="inline mr-1 text-neo-yellow" />
+                {t('playerView.rankings') || 'Rankings'}
+              </button>
+            </div>
+
+            {/* Tab content - compact height with scroll */}
+            <div className="bg-neo-cream text-neo-black border-3 border-neo-black rounded-neo shadow-hard max-h-[180px] overflow-y-auto">
+              {mobileActiveTab === 'words' ? (
+                <div className="p-2 space-y-1">
+                  {normalizedFoundWords.length === 0 ? (
+                    <p className="text-center text-neo-black/70 py-4 text-sm font-bold">
+                      {t('playerView.noWordsYet') || 'No words found yet'}
+                    </p>
+                  ) : (
+                    <div className="flex flex-wrap gap-1">
+                      {normalizedFoundWords.slice().reverse().map((wordObj, index) => (
+                        <span
+                          key={`${wordObj.word}-${index}`}
+                          className={`inline-block px-2 py-1 text-xs font-bold uppercase rounded-neo border-2 border-neo-black ${
+                            wordObj.isValid === false
+                              ? 'bg-neo-red text-neo-cream line-through opacity-70'
+                              : index === 0
+                                ? 'bg-neo-yellow text-neo-black'
+                                : 'bg-white text-neo-black'
+                          }`}
+                        >
+                          {applyHebrewFinalLetters(wordObj.word)}
+                        </span>
+                      ))}
+                    </div>
+                  )}
                 </div>
-              </CardContent>
-            </Card>
+              ) : null}
+            </div>
           </div>
         )}
 
@@ -881,13 +1021,13 @@ const InGameScreen = memo<InGameScreenProps>(({
 
       {/* Right Column: Live Leaderboard (hidden in focus mode) */}
       {!gameplayFocusMode && (
-      <div className="lg:w-64 xl:w-80 flex flex-col gap-2">
+      <div className="lg:w-80 xl:w-96 2xl:w-[28rem] flex flex-col gap-2">
         <div
-          className="bg-neo-cream border-4 border-neo-black rounded-neo-lg shadow-hard-lg flex flex-col overflow-hidden max-h-[45vh] lg:max-h-none lg:flex-grow"
+          className="bg-neo-cream text-neo-black border-4 border-neo-black rounded-neo-lg shadow-hard-lg flex flex-col overflow-hidden max-h-[45vh] lg:max-h-none lg:flex-grow"
           style={{ transform: 'rotate(-1deg)' }}
         >
           {/* Header */}
-          <div className="py-3 px-4 border-b-4 border-neo-black bg-neo-purple">
+          <div className="py-3 px-4 border-b-4 border-neo-black bg-neo-purple text-white">
             <h3 className="flex items-center gap-2 text-neo-cream text-base uppercase tracking-widest font-black">
               <FaTrophy className="text-neo-yellow" style={{ filter: 'drop-shadow(2px 2px 0px rgb(var(--neo-black)))' }} />
               {t('playerView.leaderboard')}

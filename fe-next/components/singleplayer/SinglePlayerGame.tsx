@@ -1,8 +1,8 @@
 'use client';
 
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
 import { FaArrowLeft, FaPause, FaPlay, FaCrown, FaQuestion } from 'react-icons/fa';
+import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
 import { TrendingUp, Target, Zap } from 'lucide-react';
 import {
   AlertDialog,
@@ -22,6 +22,8 @@ import GridComponent from '@/components/GridComponent';
 import CircularTimer from '@/components/CircularTimer';
 import { EarthquakeWarning, FireRoundIndicator } from '@/components/earthquake';
 import ThemeIndicator from '@/components/game/ThemeIndicator';
+import { WordsRemaining } from '@/player/components/in-game/WordsRemaining';
+import HintButton from '@/components/HintButton';
 import { useLanguage } from '@/contexts/LanguageContext';
 import type { BoardTheme } from '@/shared/types/socket';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
@@ -30,6 +32,7 @@ import { useEarthquakeFireRound } from '@/hooks/useEarthquakeFireRound';
 import { useComboSystem } from '@/hooks/useComboSystem';
 import { useGameTimer } from '@/hooks/useGameTimer';
 import { useAutoScrollOnGameStart } from '@/hooks/useAutoScrollOnGameStart';
+import { useMobileLandscape } from '@/hooks/useMobileLandscape';
 import { generateRandomTable, applyHebrewFinalLetters } from '@/utils/utils';
 import { DIFFICULTIES } from '@/utils/consts';
 import { cn } from '@/lib/utils';
@@ -81,7 +84,9 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
     stopFireCrackleLoop,
   } = useSoundEffects();
   const { announceWordResult, announceCombo } = useAnnouncer();
-  const [isLandscape, setIsLandscape] = useState(false);
+  // Use shared hook for consistent landscape detection across multiplayer and single player
+  // Only triggers on mobile devices (height <= 600px) to prevent desktop from using landscape layout
+  const isLandscape = useMobileLandscape();
   const [grid, setGrid] = useState<LetterGrid | null>(null);
   const [foundWords, setFoundWords] = useState<FoundWord[]>([]);
   const [score, setScore] = useState(0);
@@ -100,6 +105,19 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
   const botUsedWordsRef = useRef<Record<string, Set<string>>>({});
   // Ref to access current availableWords in callbacks (avoids stale closure)
   const availableWordsRef = useRef(availableWords);
+
+  // Calculate total board words from availableWords
+  const totalBoardWords = React.useMemo(() => {
+    if (!availableWords) return null;
+    // Combine all words from easy, medium, and hard categories
+    const allWords = new Set([
+      ...availableWords.easy,
+      ...availableWords.medium,
+      ...availableWords.hard,
+    ]);
+    return allWords.size;
+  }, [availableWords]);
+
   const [isHelpOpen, setIsHelpOpen] = useState(false);
   const [showQuitConfirm, setShowQuitConfirm] = useState(false);
   const [showLandscapeTutorial, setShowLandscapeTutorial] = useState(false);
@@ -113,6 +131,27 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
 
   // Earthquake pause state
   const [isEarthquakePaused, setIsEarthquakePaused] = useState(false);
+
+  // Hint system state (local, not socket-based)
+  const MAX_HINTS = 3;
+  const [hintState, setHintState] = useState<{
+    hint: string | null;
+    hintType: 'firstLetter' | 'length' | null;
+    wordLength?: number;
+    firstLetter?: string;
+    hintsRemaining: number;
+    isLoading: boolean;
+    error: string | null;
+  }>({
+    hint: null,
+    hintType: null,
+    hintsRemaining: MAX_HINTS,
+    isLoading: false,
+    error: null,
+  });
+
+  // Track grid version for earthquake recalculation
+  const gridVersionRef = useRef(0);
 
   // === SHARED HOOKS ===
 
@@ -180,23 +219,6 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
     availableWordsRef.current = availableWords;
   }, [score, foundWords, botScores, botWords, grid, availableWords]);
 
-  // Track landscape orientation for ALL screen sizes (not just mobile)
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
-
-    const checkLandscape = () => {
-      setIsLandscape(window.innerWidth > window.innerHeight);
-    };
-
-    checkLandscape();
-    window.addEventListener('resize', checkLandscape);
-    window.addEventListener('orientationchange', checkLandscape);
-
-    return () => {
-      window.removeEventListener('resize', checkLandscape);
-      window.removeEventListener('orientationchange', checkLandscape);
-    };
-  }, []);
 
   // Single player heartbeat for admin visibility
   useEffect(() => {
@@ -425,14 +447,31 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
     botUsedWordsRef.current = initialBotUsedWords;
   }, [settings.difficulty, settings.language, settings.bots]);
 
-  // Fetch valid words from grid for bot simulation
+  // Fetch valid words from grid for bots, hints, and WordsRemaining
+  // Runs for ALL modes to support WordsRemaining and hints, not just solo-bots
   useEffect(() => {
-    if (!grid || settings.mode !== 'solo-bots') return;
+    if (!grid) return;
 
-    // Set timeout to ensure bots start even if API is slow/fails
+    // Increment grid version to track earthquake regenerations
+    gridVersionRef.current += 1;
+    const currentVersion = gridVersionRef.current;
+
+    // Reset hint state when grid changes (earthquake regeneration)
+    if (currentVersion > 1) {
+      setHintState(prev => ({
+        ...prev,
+        hint: null,
+        hintType: null,
+        wordLength: undefined,
+        firstLetter: undefined,
+        // Keep hintsRemaining - don't reset on earthquake, only on new game
+      }));
+    }
+
+    // Set timeout to ensure we get words even if API is slow/fails
     const timeoutId = setTimeout(() => {
       if (!availableWordsRef.current) {
-        console.warn('Grid solve API timed out, bots will use fallback words');
+        console.warn('Grid solve API timed out');
         setAvailableWords({ easy: [], medium: [], hard: [] });
       }
     }, 5000); // 5 second timeout
@@ -448,10 +487,12 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
           }),
         });
 
+        // Check if grid changed while fetching (ignore stale response)
+        if (currentVersion !== gridVersionRef.current) return;
+
         // Check if response is OK before parsing JSON
         if (!response.ok) {
           console.warn(`Grid solve API returned ${response.status}`);
-          // Set empty categories so bots use fallback words
           setAvailableWords({ easy: [], medium: [], hard: [] });
           return;
         }
@@ -460,12 +501,10 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
         if (result.success && result.words) {
           setAvailableWords(result.words);
         } else {
-          // API returned but no words - use fallback
           setAvailableWords({ easy: [], medium: [], hard: [] });
         }
       } catch (error) {
-        console.error('Failed to fetch grid words for bots:', error);
-        // Set empty categories so bots use fallback words
+        console.error('Failed to fetch grid words:', error);
         setAvailableWords({ easy: [], medium: [], hard: [] });
       }
     };
@@ -473,7 +512,7 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
     fetchGridWords();
 
     return () => clearTimeout(timeoutId);
-  }, [grid, settings.language, settings.mode]);
+  }, [grid, settings.language]);
 
   // Handle game over when isGameOver becomes true
   useEffect(() => {
@@ -944,6 +983,110 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
     setLetterCount(count);
   }, []);
 
+  // Request a hint - pick random unfound word from available words
+  const handleRequestHint = useCallback(() => {
+    if (hintState.isLoading || hintState.hintsRemaining <= 0 || !availableWords) return;
+
+    setHintState(prev => ({ ...prev, isLoading: true, error: null }));
+
+    // Get all available words
+    const allWords = [
+      ...availableWords.easy,
+      ...availableWords.medium,
+      ...availableWords.hard,
+    ];
+
+    // Filter out words player already found
+    const foundWordsLower = foundWords
+      .filter(fw => fw.isValid === true)
+      .map(fw => fw.word.toLowerCase());
+
+    const unfoundWords = allWords.filter(
+      word => !foundWordsLower.includes(word.toLowerCase())
+    );
+
+    if (unfoundWords.length === 0) {
+      setHintState(prev => ({
+        ...prev,
+        isLoading: false,
+        error: t('hints.noWordsLeft') || 'No more words to find!',
+      }));
+      // Clear error after 3 seconds
+      setTimeout(() => {
+        setHintState(prev => ({ ...prev, error: null }));
+      }, 3000);
+      return;
+    }
+
+    // Pick a random unfound word (prefer longer words = more points)
+    const sortedWords = [...unfoundWords].sort((a, b) => b.length - a.length);
+    const topCandidates = sortedWords.slice(0, Math.min(10, sortedWords.length));
+    const targetWord = topCandidates[Math.floor(Math.random() * topCandidates.length)];
+    const firstLetter = targetWord[0].toUpperCase();
+    const secondLetter = targetWord.length >= 2 ? targetWord[1].toUpperCase() : '';
+    const lastLetter = targetWord[targetWord.length - 1].toUpperCase();
+    const middleLetter = targetWord[Math.floor(targetWord.length / 2)].toUpperCase();
+    const wordLength = targetWord.length;
+
+    // Count vowels for pattern hint
+    const vowels = 'AEIOU';
+    const vowelCount = [...targetWord.toUpperCase()].filter(c => vowels.includes(c)).length;
+    const hasDoubleLetters = /(.)\1/.test(targetWord);
+
+    // Generate more varied and helpful hints
+    const hints = [
+      // Pattern hints
+      `${wordLength} ${t('hints.letters') || 'letters'}: "${firstLetter}" → "${secondLetter}" → ... → "${lastLetter}"`,
+      `${t('hints.lookFor') || 'Look for a'} ${wordLength}-${t('hints.letterWord') || 'letter word'} ${t('hints.with') || 'with'} "${middleLetter}" ${t('hints.inMiddle') || 'in the middle'}`,
+      // Vowel pattern hint
+      `${wordLength} ${t('hints.letters') || 'letters'}, ${vowelCount} ${t('hints.vowels') || 'vowels'} - ${t('hints.startsWith') || 'starts with'} "${firstLetter}"`,
+      // Double letter hint (if applicable)
+      ...(hasDoubleLetters ? [`${wordLength} ${t('hints.letters') || 'letters'} ${t('hints.withDoubles') || 'with double letters'}, ${t('hints.startsWith') || 'starts with'} "${firstLetter}"`] : []),
+      // Length-based hints
+      ...(wordLength >= 6 ? [`${t('hints.longerWord') || 'A longer word'}: ${wordLength} ${t('hints.letters') || 'letters'} "${firstLetter}...${lastLetter}"`] : []),
+      ...(wordLength <= 4 ? [`${t('hints.shortWord') || 'Short word'}: "${firstLetter}${secondLetter}..." (${wordLength} ${t('hints.letters') || 'letters'})`] : []),
+    ];
+    const hint = hints[Math.floor(Math.random() * hints.length)];
+
+    setHintState(prev => ({
+      ...prev,
+      hint,
+      hintType: 'firstLetter',
+      firstLetter,
+      wordLength,
+      hintsRemaining: prev.hintsRemaining - 1,
+      isLoading: false,
+    }));
+
+    // Auto-clear hint after 8 seconds
+    setTimeout(() => {
+      setHintState(prev => ({
+        ...prev,
+        hint: null,
+        hintType: null,
+        wordLength: undefined,
+        firstLetter: undefined,
+      }));
+    }, 8000);
+  }, [hintState.isLoading, hintState.hintsRemaining, availableWords, foundWords, t]);
+
+  // Clear the current hint
+  const handleClearHint = useCallback(() => {
+    setHintState(prev => ({
+      ...prev,
+      hint: null,
+      hintType: null,
+      wordLength: undefined,
+      firstLetter: undefined,
+    }));
+  }, []);
+
+  // Check if hints are available (valid words found, not loading, hints remaining)
+  const hintsAvailable = !hintState.isLoading &&
+    hintState.hintsRemaining > 0 &&
+    availableWords !== null &&
+    (availableWords.easy.length + availableWords.medium.length + availableWords.hard.length) > 0;
+
   if (!grid) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
@@ -965,7 +1108,7 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
     const validWordCount = foundWords.filter(fw => fw.isValid === true).length;
 
     return (
-      <div className="relative flex items-center justify-center w-full h-full min-h-screen overflow-hidden bg-slate-900">
+      <div className="relative flex items-center justify-center w-full h-full min-h-screen overflow-hidden bg-slate-900 text-white">
         {/* Earthquake Warning Overlay */}
         <EarthquakeWarning
           isVisible={earthquakeState === 'warning'}
@@ -986,21 +1129,21 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
             />
           )}
           <div className="bg-neo-yellow border-2 border-neo-black rounded-neo shadow-hard-sm px-2 py-1 text-center">
-            <motion.div
+            <AdaptiveMotion.div
               key={score}
               initial={{ scale: 1.2 }}
               animate={{ scale: 1 }}
               className="text-sm font-black text-neo-black"
             >
               {score}
-            </motion.div>
+            </AdaptiveMotion.div>
             <div className="text-xs font-bold uppercase text-neo-black/70">
               {t('common.score') || 'Score'}
             </div>
           </div>
         </div>
 
-        {/* Right side: Words count + Combo */}
+        {/* Right side: Words count + Words Remaining + Combo */}
         <div className="absolute right-2 top-1/2 -translate-y-1/2 flex flex-col items-center gap-2 z-20">
           <div className="bg-neo-cream border-2 border-neo-black rounded-neo shadow-hard-sm px-2 py-1 text-center">
             <div className="text-sm font-black text-neo-black">{validWordCount}</div>
@@ -1008,7 +1151,31 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
               {t('common.words') || 'Words'}
             </div>
           </div>
+          {totalBoardWords !== null && totalBoardWords > 0 && (
+            <WordsRemaining
+              totalWords={totalBoardWords}
+              foundWordsCount={validWordCount}
+              t={t}
+              compact
+            />
+          )}
           <ComboDisplay comboLevel={combo.comboLevel} compact />
+          {/* Hint Button - Single Player Mode */}
+          <HintButton
+            hint={hintState.hint}
+            hintType={hintState.hintType}
+            hintsRemaining={hintState.hintsRemaining}
+            wordLength={hintState.wordLength}
+            firstLetter={hintState.firstLetter}
+            isLoading={hintState.isLoading}
+            error={hintState.error}
+            isAvailable={hintsAvailable}
+            isSinglePlayer={true}
+            gameActive={!isPaused && !isGameOver && timer.remainingTime > 0}
+            onRequestHint={handleRequestHint}
+            onClearHint={handleClearHint}
+            t={t}
+          />
         </div>
 
         {/* Bottom-right: Help button (offset to avoid quit button) */}
@@ -1093,7 +1260,7 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
 
         {/* Quit Confirmation Dialog */}
         <AlertDialog open={showQuitConfirm} onOpenChange={setShowQuitConfirm}>
-          <AlertDialogContent className="bg-neo-cream border-4 border-neo-black rounded-neo shadow-hard max-w-sm">
+          <AlertDialogContent className="bg-neo-cream text-neo-black border-4 border-neo-black rounded-neo shadow-hard max-w-sm">
             <AlertDialogHeader>
               <AlertDialogTitle className="text-neo-black font-black text-xl">
                 {t('singlePlayer.quitConfirmTitle') || 'Quit Game?'}
@@ -1117,16 +1284,16 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
         </AlertDialog>
 
         {/* First-time Landscape Tutorial Overlay */}
-        <AnimatePresence>
+        <AdaptiveAnimatePresence>
           {showLandscapeTutorial && (
-            <motion.div
+            <AdaptiveMotion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               className="absolute inset-0 bg-black/70 z-50 flex items-center justify-center"
               onClick={dismissLandscapeTutorial}
             >
-              <motion.div
+              <AdaptiveMotion.div
                 initial={{ scale: 0.9, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
                 exit={{ scale: 0.9, opacity: 0 }}
@@ -1138,7 +1305,7 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
                 </h2>
                 <div className="space-y-3 text-neo-black/80 font-medium">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-neo-cream border-2 border-neo-black rounded-neo flex items-center justify-center">
+                    <div className="w-10 h-10 bg-neo-cream text-neo-black border-2 border-neo-black rounded-neo flex items-center justify-center">
                       <FaPause className="text-neo-black" />
                     </div>
                     <span>{t('landscape.tutorialPause') || 'Bottom-left: Pause/Resume game'}</span>
@@ -1150,7 +1317,7 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
                     <span>{t('landscape.tutorialQuit') || 'Bottom-right: Quit game'}</span>
                   </div>
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-neo-cyan border-2 border-neo-black rounded-neo flex items-center justify-center">
+                    <div className="w-10 h-10 bg-neo-cyan text-neo-black border-2 border-neo-black rounded-neo flex items-center justify-center">
                       <FaQuestion className="text-neo-black" />
                     </div>
                     <span>{t('landscape.tutorialHelp') || 'Top-right: Help & rules'}</span>
@@ -1165,10 +1332,10 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
                 >
                   {t('common.gotIt') || 'Got it!'}
                 </Button>
-              </motion.div>
-            </motion.div>
+              </AdaptiveMotion.div>
+            </AdaptiveMotion.div>
           )}
-        </AnimatePresence>
+        </AdaptiveAnimatePresence>
 
         {/* Screen reader status announcements */}
         <div className="sr-only" role="status" aria-live="polite">
@@ -1221,7 +1388,7 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
 
         {/* Timer (center - always visible and prominent) */}
         {settings.mode !== 'practice' && (
-          <motion.div
+          <AdaptiveMotion.div
             initial={{ scale: 0, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             className="relative z-20"
@@ -1231,11 +1398,11 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
               totalTime={settings.timerSeconds}
               size="md"
             />
-          </motion.div>
+          </AdaptiveMotion.div>
         )}
 
         {/* Score (right position) - vibrant yellow/lime gradient like multiplayer */}
-        <motion.div
+        <AdaptiveMotion.div
           initial={{ scale: 0, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           className="relative border-3 border-neo-black rounded-neo shadow-hard-lg px-3 md:px-4 py-1.5 min-w-[70px] md:min-w-[90px]"
@@ -1244,7 +1411,7 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
           }}
         >
           <div className="text-center">
-            <motion.div
+            <AdaptiveMotion.div
               key={score}
               initial={{ scale: 1.3 }}
               animate={{ scale: 1 }}
@@ -1252,12 +1419,12 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
               style={{ textShadow: '1px 1px 0px rgba(255,255,255,0.5)' }}
             >
               {score}
-            </motion.div>
+            </AdaptiveMotion.div>
             <div className="text-[10px] md:text-xs font-bold uppercase tracking-wider text-neo-black/80">
               {t('common.score') || 'Score'}
             </div>
           </div>
-        </motion.div>
+        </AdaptiveMotion.div>
       </div>
 
       {/* Word Forming Area with feedback - centered below timer */}
@@ -1272,7 +1439,7 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
 
       {/* Challenge Mode Progress Tracker */}
       {settings.mode === 'challenge' && (
-        <motion.div
+        <AdaptiveMotion.div
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
           className="mx-4 mb-1"
@@ -1313,14 +1480,14 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
                 </div>
                 <div className="flex items-center gap-2">
                   {score > targetHighScore ? (
-                    <motion.span
+                    <AdaptiveMotion.span
                       key={score}
                       initial={{ scale: 1.3 }}
                       animate={{ scale: 1 }}
                       className="font-black text-neo-black"
                     >
                       +{score - targetHighScore}
-                    </motion.span>
+                    </AdaptiveMotion.span>
                   ) : score < targetHighScore ? (
                     <span className="font-bold text-neo-black/75 dark:text-neo-white/75">
                       {targetHighScore - score} {t('challenge.toGo')}
@@ -1330,8 +1497,8 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
               </div>
               {/* Progress bar */}
               {score <= targetHighScore && (
-                <div className="mt-2 h-2 bg-neo-black/10 dark:bg-white/10 rounded-full overflow-hidden">
-                  <motion.div
+                <div className="mt-2 h-2 bg-neo-black/10 text-white dark:bg-white/10 rounded-full overflow-hidden">
+                  <AdaptiveMotion.div
                     className="h-full bg-gradient-to-r from-neo-cyan to-neo-lime rounded-full"
                     initial={{ width: 0 }}
                     animate={{ width: `${Math.min((score / targetHighScore) * 100, 100)}%` }}
@@ -1341,14 +1508,14 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
               )}
             </div>
           ) : (
-            <div className="flex items-center justify-center gap-2 px-4 py-2 bg-neo-cyan/20 dark:bg-neo-cyan/10 rounded-neo border-2 border-dashed border-neo-cyan">
+            <div className="flex items-center justify-center gap-2 px-4 py-2 bg-neo-cyan/20 text-neo-black dark:bg-neo-cyan/10 dark:text-white rounded-neo border-2 border-dashed border-neo-cyan">
               <Zap className="w-4 h-4 text-neo-cyan" />
               <span className="font-bold text-sm text-neo-black/70 dark:text-neo-white/70">
                 {t('challenge.settingFirst') || 'Setting your first record!'}
               </span>
             </div>
           )}
-        </motion.div>
+        </AdaptiveMotion.div>
       )}
 
       {/* Game grid */}
@@ -1374,8 +1541,36 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
         </div>
       )}
 
+      {/* Words Remaining Indicator (above found words) */}
+      {totalBoardWords !== null && totalBoardWords > 0 && (
+        <WordsRemaining
+          totalWords={totalBoardWords}
+          foundWordsCount={foundWords.filter(fw => fw.isValid === true).length}
+          t={t}
+        />
+      )}
+
+      {/* Hint Button - Single Player Mode (portrait) */}
+      <div className="flex justify-center px-4 -mt-1">
+        <HintButton
+          hint={hintState.hint}
+          hintType={hintState.hintType}
+          hintsRemaining={hintState.hintsRemaining}
+          wordLength={hintState.wordLength}
+          firstLetter={hintState.firstLetter}
+          isLoading={hintState.isLoading}
+          error={hintState.error}
+          isAvailable={hintsAvailable}
+          isSinglePlayer={true}
+          gameActive={!isPaused && !isGameOver && timer.remainingTime > 0}
+          onRequestHint={handleRequestHint}
+          onClearHint={handleClearHint}
+          t={t}
+        />
+      </div>
+
       {/* Found words - Enhanced display with validity status */}
-      <div className="bg-neo-cream dark:bg-neo-navy-light rounded-neo-lg border-4 border-neo-black p-4 shadow-hard">
+      <div className="bg-neo-cream text-neo-black dark:bg-neo-navy-light dark:text-white rounded-neo-lg border-4 border-neo-black p-4 shadow-hard">
         <h3 className="text-sm font-bold uppercase tracking-wide text-neo-black/70 dark:text-neo-white/70 mb-3 flex items-center justify-between">
           <span>{t('common.foundWords') || 'Found Words'}</span>
           <span className="bg-neo-cyan text-neo-black px-2 py-0.5 rounded-full text-xs">
@@ -1383,13 +1578,13 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
           </span>
         </h3>
         <div className="flex flex-wrap gap-2 max-h-36 overflow-y-auto">
-          <AnimatePresence>
+          <AdaptiveAnimatePresence>
             {foundWords.filter(fw => fw.isValid !== false).map((fw, index) => {
               const isPending = fw.isValid === null;
               const isLatest = index === foundWords.filter(f => f.isValid !== false).length - 1;
 
               return (
-                <motion.span
+                <AdaptiveMotion.span
                   key={`${fw.word}-${fw.timestamp}`}
                   initial={{ opacity: 0, scale: 0.8, x: -20 }}
                   animate={{ opacity: 1, scale: 1, x: 0 }}
@@ -1416,10 +1611,10 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
                   {isPending && (
                     <span className="ml-1 text-xs">...</span>
                   )}
-                </motion.span>
+                </AdaptiveMotion.span>
               );
             })}
-          </AnimatePresence>
+          </AdaptiveAnimatePresence>
           {foundWords.filter(fw => fw.isValid !== false).length === 0 && (
             <span className="text-sm text-neo-black/70 dark:text-neo-white/75 italic">
               {t('singlePlayer.noWordsYet') || 'No words found yet. Start swiping!'}
@@ -1430,7 +1625,7 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
 
       {/* Bot scores (only in solo-bots mode) */}
       {settings.mode === 'solo-bots' && settings.bots.length > 0 && (
-        <div className="bg-neo-cream dark:bg-neo-navy-light rounded-neo border-3 border-neo-black p-4">
+        <div className="bg-neo-cream text-neo-black dark:bg-neo-navy-light dark:text-white rounded-neo border-3 border-neo-black p-4">
           <h3 className="text-sm font-bold uppercase tracking-wide text-neo-black/70 dark:text-neo-white/70 mb-2">
             {t('singlePlayer.opponents') || 'Opponents'}
           </h3>

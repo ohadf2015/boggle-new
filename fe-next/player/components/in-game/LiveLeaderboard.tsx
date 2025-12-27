@@ -46,10 +46,10 @@ export const LiveLeaderboard = memo<LiveLeaderboardProps>(({
 
   return (
     <div
-      className="bg-neo-cream border-4 border-neo-black rounded-neo-lg shadow-hard-lg flex flex-col overflow-hidden"
+      className="bg-neo-cream text-neo-black border-4 border-neo-black rounded-neo-lg shadow-hard-lg flex flex-col overflow-hidden"
       style={{ transform: compact ? 'none' : 'rotate(-1deg)' }}
     >
-      <div className="py-3 px-4 border-b-4 border-neo-black bg-neo-purple">
+      <div className="py-3 px-4 border-b-4 border-neo-black bg-neo-purple text-white">
         <h3 className="flex items-center gap-2 text-neo-cream text-base uppercase tracking-widest font-black">
           <FaTrophy className="text-neo-yellow" style={{ filter: 'drop-shadow(2px 2px 0px rgb(var(--neo-black)))' }} />
           {t('playerView.leaderboard')}
@@ -90,7 +90,7 @@ export const LiveLeaderboard = memo<LiveLeaderboardProps>(({
             </motion.div>
           ))}
           {leaderboard.length === 0 && (
-            <p className="text-center text-neo-black/75 py-6 text-sm font-bold">
+            <p className="text-center text-neo-black/90 py-6 text-sm font-bold">
               {t('playerView.noPlayersYet') || 'No players yet'}
             </p>
           )}

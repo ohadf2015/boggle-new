@@ -143,7 +143,7 @@ const AchievementPopup = ({ achievement, onComplete }: AchievementPopupProps): R
         onClick={onComplete}
       >
         {/* Compact toast container - Neo-Brutalist */}
-        <div className="relative overflow-hidden rounded-lg bg-neo-purple border-3 border-neo-black shadow-hard-lg cursor-pointer hover:scale-[1.02] transition-transform">
+        <div className="relative overflow-hidden rounded-lg bg-neo-purple text-white border-3 border-neo-black shadow-hard-lg cursor-pointer hover:scale-[1.02] transition-transform">
           {/* Content */}
           <div className="p-3">
             <div className="flex items-center gap-3">
@@ -153,7 +153,7 @@ const AchievementPopup = ({ achievement, onComplete }: AchievementPopupProps): R
                 animate={{ scale: 1, rotate: 0 }}
                 transition={{ delay: 0.1, type: 'spring', stiffness: 400, damping: 15 }}
               >
-                <div className="w-10 h-10 bg-neo-cyan border-2 border-neo-black shadow-hard rounded-md flex items-center justify-center flex-shrink-0">
+                <div className="w-10 h-10 bg-neo-cyan text-neo-black border-2 border-neo-black shadow-hard rounded-md flex items-center justify-center flex-shrink-0">
                   <span className="text-xl">
                     {localizedAchievement.icon}
                   </span>

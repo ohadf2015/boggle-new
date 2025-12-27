@@ -82,8 +82,8 @@ export default function RulesPage(): React.JSX.Element {
                     {...fadeInUp}
                     transition={{ delay: 0.3 }}
                 >
-                    <Card className="border-4 border-neo-black shadow-hard-lg bg-white dark:bg-slate-800">
-                        <CardHeader className="bg-neo-yellow/20 border-b-4 border-neo-black">
+                    <Card className="border-4 border-neo-black shadow-hard-lg bg-white text-neo-black dark:bg-slate-800 dark:text-white">
+                        <CardHeader className="bg-neo-yellow/20 text-neo-black dark:text-white border-b-4 border-neo-black">
                             <CardTitle className="flex items-center gap-3 text-2xl sm:text-3xl font-black text-slate-900 dark:text-white">
                                 <FaHandPointer className="text-neo-pink" />
                                 {t('footer.interactiveTutorial')}
@@ -106,10 +106,10 @@ export default function RulesPage(): React.JSX.Element {
                     {...fadeInUp}
                     transition={{ delay: 0.4 }}
                 >
-                    <Card className="border-4 border-neo-black shadow-hard-lg bg-white dark:bg-slate-800">
-                        <CardHeader className="bg-neo-cyan/20 border-b-4 border-neo-black">
+                    <Card className="border-4 border-neo-black shadow-hard-lg bg-white text-neo-black dark:bg-slate-800 dark:text-white">
+                        <CardHeader className="bg-neo-cyan/20 text-neo-black dark:text-white border-b-4 border-neo-black">
                             <CardTitle className="flex items-center gap-3 text-2xl sm:text-3xl font-black text-slate-900 dark:text-white">
-                                <FaGamepad className="text-neo-cyan" />
+                                <FaGamepad className="text-neo-black dark:text-white" />
                                 {t('howToPlay.title')}
                             </CardTitle>
                         </CardHeader>
@@ -119,7 +119,7 @@ export default function RulesPage(): React.JSX.Element {
                             </p>
 
                             <div className="grid gap-4 sm:grid-cols-2">
-                                <div className="p-4 rounded-neo bg-neo-lime/10 border-3 border-neo-black">
+                                <div className="p-4 rounded-neo bg-neo-lime/10 text-neo-black dark:text-white border-3 border-neo-black">
                                     <div className="flex items-center gap-2 mb-2">
                                         <FaUsers className="text-neo-purple text-xl" />
                                         <h3 className="font-bold text-lg text-slate-900 dark:text-white">{t('rules.joinOrCreate')}</h3>
@@ -129,7 +129,7 @@ export default function RulesPage(): React.JSX.Element {
                                     </p>
                                 </div>
 
-                                <div className="p-4 rounded-neo bg-neo-pink/10 border-3 border-neo-black">
+                                <div className="p-4 rounded-neo bg-neo-pink/10 text-white border-3 border-neo-black">
                                     <div className="flex items-center gap-2 mb-2">
                                         <FaClock className="text-neo-pink text-xl" />
                                         <h3 className="font-bold text-lg text-slate-900 dark:text-white">{t('rules.raceAgainstTime')}</h3>
@@ -139,7 +139,7 @@ export default function RulesPage(): React.JSX.Element {
                                     </p>
                                 </div>
 
-                                <div className="p-4 rounded-neo bg-neo-cyan/10 border-3 border-neo-black">
+                                <div className="p-4 rounded-neo bg-neo-cyan/10 text-neo-black dark:text-white border-3 border-neo-black">
                                     <div className="flex items-center gap-2 mb-2">
                                         <span className="text-2xl">🔤</span>
                                         <h3 className="font-bold text-lg text-slate-900 dark:text-white">{t('rules.swipeToForm')}</h3>
@@ -149,7 +149,7 @@ export default function RulesPage(): React.JSX.Element {
                                     </p>
                                 </div>
 
-                                <div className="p-4 rounded-neo bg-neo-purple/10 border-3 border-neo-black">
+                                <div className="p-4 rounded-neo bg-neo-purple/10 text-white border-3 border-neo-black">
                                     <div className="flex items-center gap-2 mb-2">
                                         <FaTrophy className="text-neo-yellow text-xl" />
                                         <h3 className="font-bold text-lg text-slate-900 dark:text-white">{t('rules.competeAndWin')}</h3>
@@ -169,8 +169,8 @@ export default function RulesPage(): React.JSX.Element {
                     {...fadeInUp}
                     transition={{ delay: 0.45 }}
                 >
-                    <Card className="border-4 border-neo-black shadow-hard-lg bg-white dark:bg-slate-800">
-                        <CardHeader className="bg-neo-orange/20 border-b-4 border-neo-black">
+                    <Card className="border-4 border-neo-black shadow-hard-lg bg-white text-neo-black dark:bg-slate-800 dark:text-white">
+                        <CardHeader className="bg-neo-orange/20 text-neo-black dark:text-white border-b-4 border-neo-black">
                             <CardTitle className="flex items-center gap-3 text-2xl sm:text-3xl font-black text-slate-900 dark:text-white">
                                 <FaRobot className="text-neo-orange" />
                                 {t('rules.singlePlayerTitle')}
@@ -182,9 +182,9 @@ export default function RulesPage(): React.JSX.Element {
                             </p>
 
                             <div className="grid gap-4 sm:grid-cols-3">
-                                <div className="p-4 rounded-neo bg-neo-cyan/10 border-3 border-neo-black">
+                                <div className="p-4 rounded-neo bg-neo-cyan/10 text-neo-black dark:text-white border-3 border-neo-black">
                                     <div className="flex items-center gap-2 mb-2">
-                                        <FaRobot className="text-neo-cyan text-xl" />
+                                        <FaRobot className="text-neo-black dark:text-white text-xl" />
                                         <h3 className="font-bold text-lg text-slate-900 dark:text-white">{t('rules.soloVsBots')}</h3>
                                     </div>
                                     <p className="text-slate-600 dark:text-slate-300 text-sm">
@@ -192,9 +192,9 @@ export default function RulesPage(): React.JSX.Element {
                                     </p>
                                 </div>
 
-                                <div className="p-4 rounded-neo bg-neo-lime/10 border-3 border-neo-black">
+                                <div className="p-4 rounded-neo bg-neo-lime/10 text-neo-black dark:text-white border-3 border-neo-black">
                                     <div className="flex items-center gap-2 mb-2">
-                                        <FaBook className="text-neo-lime text-xl" />
+                                        <FaBook className="text-neo-black dark:text-white text-xl" />
                                         <h3 className="font-bold text-lg text-slate-900 dark:text-white">{t('rules.practiceMode')}</h3>
                                     </div>
                                     <p className="text-slate-600 dark:text-slate-300 text-sm">
@@ -202,9 +202,9 @@ export default function RulesPage(): React.JSX.Element {
                                     </p>
                                 </div>
 
-                                <div className="p-4 rounded-neo bg-neo-yellow/10 border-3 border-neo-black">
+                                <div className="p-4 rounded-neo bg-neo-yellow/10 text-neo-black dark:text-white border-3 border-neo-black">
                                     <div className="flex items-center gap-2 mb-2">
-                                        <FaChartLine className="text-neo-yellow text-xl" />
+                                        <FaChartLine className="text-neo-black dark:text-white text-xl" />
                                         <h3 className="font-bold text-lg text-slate-900 dark:text-white">{t('rules.challengeMode')}</h3>
                                     </div>
                                     <p className="text-slate-600 dark:text-slate-300 text-sm">
@@ -234,10 +234,10 @@ export default function RulesPage(): React.JSX.Element {
                     {...fadeInUp}
                     transition={{ delay: 0.5 }}
                 >
-                    <Card className="border-4 border-neo-black shadow-hard-lg bg-white dark:bg-slate-800">
-                        <CardHeader className="bg-neo-pink/20 border-b-4 border-neo-black">
+                    <Card className="border-4 border-neo-black shadow-hard-lg bg-white text-neo-black dark:bg-slate-800 dark:text-white">
+                        <CardHeader className="bg-neo-pink/20 text-white border-b-4 border-neo-black">
                             <CardTitle className="flex items-center gap-3 text-2xl sm:text-3xl font-black text-slate-900 dark:text-white">
-                                <FaTrophy className="text-neo-yellow" />
+                                <FaTrophy className="text-amber-500 dark:text-neo-yellow" />
                                 {t('howToPlay.scoringSystemTitle')}
                             </CardTitle>
                         </CardHeader>
@@ -256,7 +256,7 @@ export default function RulesPage(): React.JSX.Element {
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <tr className="bg-white dark:bg-slate-700">
+                                        <tr className="bg-white text-neo-black dark:bg-slate-700 dark:text-white">
                                             <td className="p-3 border-2 border-neo-black text-slate-900 dark:text-slate-100">3 {t('howToPlay.letters')}</td>
                                             <td className="p-3 border-2 border-neo-black font-bold text-neo-cyan">1 {t('howToPlay.pts')}</td>
                                             <td className="p-3 border-2 border-neo-black text-slate-600 dark:text-slate-200">CAT, DOG, RUN</td>
@@ -266,7 +266,7 @@ export default function RulesPage(): React.JSX.Element {
                                             <td className="p-3 border-2 border-neo-black font-bold text-neo-cyan">1 {t('howToPlay.pts')}</td>
                                             <td className="p-3 border-2 border-neo-black text-slate-600 dark:text-slate-200">GAME, PLAY, WORD</td>
                                         </tr>
-                                        <tr className="bg-white dark:bg-slate-700">
+                                        <tr className="bg-white text-neo-black dark:bg-slate-700 dark:text-white">
                                             <td className="p-3 border-2 border-neo-black text-slate-900 dark:text-slate-100">5 {t('howToPlay.letters')}</td>
                                             <td className="p-3 border-2 border-neo-black font-bold text-neo-lime">2 {t('howToPlay.pts')}</td>
                                             <td className="p-3 border-2 border-neo-black text-slate-600 dark:text-slate-200">CLASH, SCORE, BRAIN</td>
@@ -276,7 +276,7 @@ export default function RulesPage(): React.JSX.Element {
                                             <td className="p-3 border-2 border-neo-black font-bold text-neo-purple">3 {t('howToPlay.pts')}</td>
                                             <td className="p-3 border-2 border-neo-black text-slate-600 dark:text-slate-200">PLAYER, WINNER, BATTLE</td>
                                         </tr>
-                                        <tr className="bg-white dark:bg-slate-700">
+                                        <tr className="bg-white text-neo-black dark:bg-slate-700 dark:text-white">
                                             <td className="p-3 border-2 border-neo-black text-slate-900 dark:text-slate-100">7 {t('howToPlay.letters')}</td>
                                             <td className="p-3 border-2 border-neo-black font-bold text-neo-pink">5 {t('howToPlay.pts')}</td>
                                             <td className="p-3 border-2 border-neo-black text-slate-600 dark:text-slate-200">LETTERS, VICTORY, COMPETE</td>
@@ -290,7 +290,7 @@ export default function RulesPage(): React.JSX.Element {
                                 </table>
                             </div>
 
-                            <div className="p-4 rounded-neo bg-neo-yellow/20 border-3 border-neo-black">
+                            <div className="p-4 rounded-neo bg-neo-yellow/20 text-neo-black dark:text-white border-3 border-neo-black">
                                 <p className="text-slate-700 dark:text-slate-200">
                                     <strong>{t('rules.proTip')}:</strong> {t('rules.proTipText')}
                                 </p>
@@ -305,10 +305,10 @@ export default function RulesPage(): React.JSX.Element {
                     {...fadeInUp}
                     transition={{ delay: 0.55 }}
                 >
-                    <Card className="border-4 border-neo-black shadow-hard-lg bg-white dark:bg-slate-800">
-                        <CardHeader className="bg-neo-purple/20 border-b-4 border-neo-black">
+                    <Card className="border-4 border-neo-black shadow-hard-lg bg-white text-neo-black dark:bg-slate-800 dark:text-white">
+                        <CardHeader className="bg-neo-purple/20 text-white border-b-4 border-neo-black">
                             <CardTitle className="flex items-center gap-3 text-2xl sm:text-3xl font-black text-slate-900 dark:text-white">
-                                <FaLightbulb className="text-neo-yellow" />
+                                <FaLightbulb className="text-amber-500 dark:text-neo-yellow" />
                                 {t('howToPlay.tipsTitle')}
                             </CardTitle>
                         </CardHeader>
@@ -388,46 +388,46 @@ export default function RulesPage(): React.JSX.Element {
                     {...fadeInUp}
                     transition={{ delay: 0.6 }}
                 >
-                    <Card className="border-4 border-neo-black shadow-hard-lg bg-white dark:bg-slate-800">
-                        <CardHeader className="bg-neo-lime/20 border-b-4 border-neo-black">
+                    <Card className="border-4 border-neo-black shadow-hard-lg bg-white text-neo-black dark:bg-slate-800 dark:text-white">
+                        <CardHeader className="bg-neo-lime/20 text-neo-black dark:text-white border-b-4 border-neo-black">
                             <CardTitle className="flex items-center gap-3 text-2xl sm:text-3xl font-black text-slate-900 dark:text-white">
-                                <FaStar className="text-neo-yellow" />
+                                <FaStar className="text-neo-black dark:text-white" />
                                 {t('howToPlay.gameFeaturesTitle')}
                             </CardTitle>
                         </CardHeader>
                         <CardContent className="p-6">
                             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                                <div className="p-4 rounded-neo bg-white dark:bg-slate-700 border-3 border-neo-black shadow-hard">
+                                <div className="p-4 rounded-neo bg-white text-neo-black dark:bg-slate-700 dark:text-white border-3 border-neo-black shadow-hard">
                                     <h3 className="font-bold text-lg text-slate-900 dark:text-white mb-2">{t('rules.multiLanguage')}</h3>
                                     <p className="text-slate-600 dark:text-slate-300 text-sm">
                                         {t('rules.multiLanguageDesc')}
                                     </p>
                                 </div>
-                                <div className="p-4 rounded-neo bg-white dark:bg-slate-700 border-3 border-neo-black shadow-hard">
+                                <div className="p-4 rounded-neo bg-white text-neo-black dark:bg-slate-700 dark:text-white border-3 border-neo-black shadow-hard">
                                     <h3 className="font-bold text-lg text-slate-900 dark:text-white mb-2">{t('rules.realTimeMultiplayer')}</h3>
                                     <p className="text-slate-600 dark:text-slate-300 text-sm">
                                         {t('rules.realTimeMultiplayerDesc')}
                                     </p>
                                 </div>
-                                <div className="p-4 rounded-neo bg-white dark:bg-slate-700 border-3 border-neo-black shadow-hard">
+                                <div className="p-4 rounded-neo bg-white text-neo-black dark:bg-slate-700 dark:text-white border-3 border-neo-black shadow-hard">
                                     <h3 className="font-bold text-lg text-slate-900 dark:text-white mb-2">{t('rules.achievementsLevels')}</h3>
                                     <p className="text-slate-600 dark:text-slate-300 text-sm">
                                         {t('rules.achievementsLevelsDesc')}
                                     </p>
                                 </div>
-                                <div className="p-4 rounded-neo bg-white dark:bg-slate-700 border-3 border-neo-black shadow-hard">
+                                <div className="p-4 rounded-neo bg-white text-neo-black dark:bg-slate-700 dark:text-white border-3 border-neo-black shadow-hard">
                                     <h3 className="font-bold text-lg text-slate-900 dark:text-white mb-2">{t('rules.leaderboards')}</h3>
                                     <p className="text-slate-600 dark:text-slate-300 text-sm">
                                         {t('rules.leaderboardsDesc')}
                                     </p>
                                 </div>
-                                <div className="p-4 rounded-neo bg-white dark:bg-slate-700 border-3 border-neo-black shadow-hard">
+                                <div className="p-4 rounded-neo bg-white text-neo-black dark:bg-slate-700 dark:text-white border-3 border-neo-black shadow-hard">
                                     <h3 className="font-bold text-lg text-slate-900 dark:text-white mb-2">{t('rules.noDownload')}</h3>
                                     <p className="text-slate-600 dark:text-slate-300 text-sm">
                                         {t('rules.noDownloadDesc')}
                                     </p>
                                 </div>
-                                <div className="p-4 rounded-neo bg-white dark:bg-slate-700 border-3 border-neo-black shadow-hard">
+                                <div className="p-4 rounded-neo bg-white text-neo-black dark:bg-slate-700 dark:text-white border-3 border-neo-black shadow-hard">
                                     <h3 className="font-bold text-lg text-slate-900 dark:text-white mb-2">{t('rules.qrSharing')}</h3>
                                     <p className="text-slate-600 dark:text-slate-300 text-sm">
                                         {t('rules.qrSharingDesc')}

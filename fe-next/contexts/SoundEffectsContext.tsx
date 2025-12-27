@@ -1,6 +1,6 @@
 'use client';
 
-import React, { createContext, useContext, useEffect, useRef, useCallback, useState, ReactNode } from 'react';
+import React, { createContext, useContext, useEffect, useRef, useCallback, useState, useMemo, ReactNode } from 'react';
 import { Howl } from 'howler';
 import { useMusic } from './MusicContext';
 import logger from '@/utils/logger';
@@ -309,7 +309,8 @@ export function SoundEffectsProvider({ children }: SoundEffectsProviderProps) {
     }, 500);
   }, []);
 
-  const value: SoundEffectsContextType = {
+  // Memoize context value to prevent unnecessary re-renders of all consumers
+  const value = useMemo<SoundEffectsContextType>(() => ({
     // Volume state
     sfxVolume,
     sfxMuted,
@@ -328,7 +329,23 @@ export function SoundEffectsProvider({ children }: SoundEffectsProviderProps) {
     playFireRoundStart,
     startFireCrackleLoop,
     stopFireCrackleLoop,
-  };
+  }), [
+    sfxVolume,
+    sfxMuted,
+    setSfxVolume,
+    toggleSfxMute,
+    playSound,
+    playComboSound,
+    playAchievementSound,
+    playWordAcceptedSound,
+    playCountdownBeep,
+    playMessageSound,
+    playEarthquakeRumble,
+    playEarthquakeShake,
+    playFireRoundStart,
+    startFireCrackleLoop,
+    stopFireCrackleLoop,
+  ]);
 
   return (
     <SoundEffectsContext.Provider value={value}>

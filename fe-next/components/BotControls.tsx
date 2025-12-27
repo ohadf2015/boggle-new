@@ -1,9 +1,11 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FaRobot, FaPlus, FaTimes } from 'react-icons/fa';
+import { FaRobot, FaPlus, FaTimes, FaMagic } from 'react-icons/fa';
 import { Badge } from './ui/badge';
+import { Switch } from './ui/switch';
 import { cn } from '../lib/utils';
 import { useLanguage } from '../contexts/LanguageContext';
+import { useAutoFillBots } from '../hooks/useAutoFillBots';
 import type { Socket } from 'socket.io-client';
 
 type BotDifficulty = 'easy' | 'medium' | 'hard';
@@ -12,35 +14,34 @@ interface BotDifficultyOption {
   value: BotDifficulty;
   labelKey: string;
   color: string;
-  descKey: string;
-  defaultDesc: string;
+  bgTint: string;
+  icon: string;
 }
 
 const BOT_DIFFICULTIES: BotDifficultyOption[] = [
   {
     value: 'easy',
     labelKey: 'bots.easy',
-    color: 'bg-neo-lime text-neo-black',
-    descKey: 'bots.easyDesc',
-    defaultDesc: '3-5 letter words, slower pace'
+    color: 'bg-neo-lime text-neo-black border-neo-black',
+    bgTint: 'bg-neo-lime/20',
+    icon: '🌱',
   },
   {
     value: 'medium',
     labelKey: 'bots.medium',
-    color: 'bg-amber-400 text-neo-black',
-    descKey: 'bots.mediumDesc',
-    defaultDesc: 'Balanced mix of words'
+    color: 'bg-amber-400 text-neo-black border-neo-black',
+    bgTint: 'bg-amber-400/20',
+    icon: '⚡',
   },
   {
     value: 'hard',
     labelKey: 'bots.hard',
-    color: 'bg-neo-red text-white',
-    descKey: 'bots.hardDesc',
-    defaultDesc: 'Long words, fast pace'
+    color: 'bg-neo-red text-white border-neo-black',
+    bgTint: 'bg-neo-red/20',
+    icon: '🔥',
   },
 ];
 
-// Flexible player type for bot controls - only needs these properties
 interface BotControlsPlayer {
   username: string;
   isBot?: boolean;
@@ -60,47 +61,57 @@ interface BotControlsProps {
   maxPlayers?: number;
 }
 
-/**
- * Bot Controls Component
- * Allows host to add/remove AI bots to the game
- */
 const BotControls: React.FC<BotControlsProps> = ({
   socket,
   gameCode,
   players = [] as BotControlsPlayer[],
   disabled = false,
-  maxPlayers = 50,
+  maxPlayers = 8,
 }) => {
   const { t } = useLanguage();
-  const [selectedDifficulty, setSelectedDifficulty] = useState<BotDifficulty>('medium');
-  const [isAdding, setIsAdding] = useState<boolean>(false);
+  const [addingDifficulty, setAddingDifficulty] = useState<BotDifficulty | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [announcement, setAnnouncement] = useState<string>('');
 
-  // Get current bots from players list
   const bots = players.filter(p => p.isBot === true);
   const playerCount = players.length;
   const canAddMore = playerCount < maxPlayers;
 
-  // Suppress unused variable warning
+  const {
+    autoFillEnabled,
+    toggleAutoFill,
+  } = useAutoFillBots({
+    socket,
+    enabled: !disabled,
+    maxPlayers,
+    currentPlayerCount: playerCount,
+  });
+
   void gameCode;
 
-  // Listen for socket events
   useEffect(() => {
     if (!socket) return;
 
-    const handleBotAdded = (): void => {
-      setIsAdding(false);
+    const handleBotAdded = (data: { username?: string; difficulty?: string }): void => {
+      setAddingDifficulty(null);
       setError(null);
+      if (data?.username) {
+        setAnnouncement(`${data.username} bot added`);
+        setTimeout(() => setAnnouncement(''), 2000);
+      }
     };
 
-    const handleBotRemoved = (data: { success?: boolean }): void => {
+    const handleBotRemoved = (data: { success?: boolean; username?: string }): void => {
       if (!data.success) {
         setError(t('bots.removeError') || 'Failed to remove bot');
+      } else if (data.username) {
+        setAnnouncement(`${data.username} removed`);
+        setTimeout(() => setAnnouncement(''), 2000);
       }
     };
 
     const handleError = (message: string | { message: string }): void => {
-      setIsAdding(false);
+      setAddingDifficulty(null);
       const errorMsg = typeof message === 'string' ? message : message.message;
       if (errorMsg && errorMsg.toLowerCase().includes('bot')) {
         setError(errorMsg);
@@ -124,28 +135,35 @@ const BotControls: React.FC<BotControlsProps> = ({
     socket.emit('removeBot', { botUsername });
   }, [socket, disabled]);
 
-  // Add bot with selected difficulty
-  const handleQuickAdd = useCallback((e: React.MouseEvent<HTMLButtonElement>): void => {
-    e.stopPropagation();
-    if (!socket || !canAddMore || isAdding || disabled) return;
+  const handleAddBot = useCallback((difficulty: BotDifficulty): void => {
+    if (!socket || !canAddMore || addingDifficulty || disabled) return;
 
-    setIsAdding(true);
+    setAddingDifficulty(difficulty);
     setError(null);
-    socket.emit('addBot', { difficulty: selectedDifficulty });
+    socket.emit('addBot', { difficulty });
 
-    setTimeout(() => setIsAdding(false), 3000);
-  }, [socket, selectedDifficulty, canAddMore, isAdding, disabled]);
+    setTimeout(() => setAddingDifficulty(null), 3000);
+  }, [socket, canAddMore, addingDifficulty, disabled]);
+
+  const getDifficultyConfig = (difficulty: BotDifficulty | undefined): BotDifficultyOption => {
+    return BOT_DIFFICULTIES.find(d => d.value === difficulty) || BOT_DIFFICULTIES[1];
+  };
 
   return (
-    <div className="space-y-2">
-      {/* Header - Compact */}
+    <div className="space-y-3">
+      {/* Screen reader announcements */}
+      <div role="status" aria-live="polite" className="sr-only">
+        {announcement}
+      </div>
+
+      {/* Header */}
       <div className="flex items-center gap-2">
-        <FaRobot className="text-neo-cyan text-sm" />
-        <span className="text-xs font-bold uppercase text-neo-cream/80">
+        <FaRobot className="text-neo-cyan" aria-hidden="true" />
+        <span className="text-sm font-bold uppercase text-neo-cream/90">
           {t('bots.title') || 'AI Bots'}
         </span>
         {bots.length > 0 && (
-          <Badge className="bg-neo-cyan text-neo-black text-[10px] px-1.5 py-0 font-bold">
+          <Badge className="bg-neo-cyan text-neo-black text-xs px-2 py-0.5 font-bold">
             {bots.length}
           </Badge>
         )}
@@ -155,117 +173,162 @@ const BotControls: React.FC<BotControlsProps> = ({
       <AnimatePresence>
         {error && (
           <motion.div
+            role="alert"
+            aria-live="assertive"
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
-            className="text-[10px] text-neo-red bg-neo-red/10 px-2 py-1 rounded-neo border border-neo-red/30"
+            className="text-xs text-neo-red bg-neo-red/10 px-3 py-2 rounded-neo border-2 border-neo-red/30"
           >
             {error}
           </motion.div>
         )}
       </AnimatePresence>
 
-      {/* Difficulty Selection + Add Button - Same row */}
-      <div className="flex items-center gap-2 flex-wrap">
-        <span className="text-[10px] font-bold uppercase text-neo-cream/70">
-          {t('bots.selectDifficulty') || 'Level'}:
-        </span>
-        {BOT_DIFFICULTIES.map((diff) => {
-          const isSelected = selectedDifficulty === diff.value;
-          return (
-            <motion.button
-              key={diff.value}
-              type="button"
-              onClick={() => setSelectedDifficulty(diff.value)}
-              whileTap={{ scale: 0.95 }}
-              className={cn(
-                "px-2 py-1 rounded-neo text-[11px] font-bold transition-all duration-100 border-2 border-neo-black",
-                isSelected
-                  ? `${diff.color} shadow-none translate-x-[1px] translate-y-[1px]`
-                  : "bg-neo-cream text-neo-black shadow-hard-sm hover:shadow-hard"
-              )}
-            >
-              {t(diff.labelKey) || diff.value}
-            </motion.button>
-          );
-        })}
+      {/* Auto-fill Card - Promoted to top */}
+      <div className="bg-neo-purple/10 text-white border-2 border-neo-purple rounded-neo p-3 shadow-hard-sm">
+        <div className="flex items-center justify-between gap-3">
+          <div className="flex items-center gap-2 flex-1 min-w-0">
+            <FaMagic className="text-neo-purple shrink-0" aria-hidden="true" />
+            <div className="min-w-0">
+              <label
+                htmlFor="auto-fill-switch"
+                className="text-sm font-bold text-neo-cream block cursor-pointer"
+              >
+                {t('bots.autoFill') || 'Auto-fill Room'}
+              </label>
+              <p className="text-xs text-neo-cream/60 truncate">
+                {t('bots.autoFillDesc') || 'Fills empty slots with AI bots'}
+              </p>
+            </div>
+          </div>
+          <Switch
+            id="auto-fill-switch"
+            checked={autoFillEnabled}
+            onCheckedChange={toggleAutoFill}
+            disabled={disabled}
+            aria-describedby="auto-fill-desc"
+          />
+        </div>
+      </div>
 
-        {/* Add Button - Right next to difficulty */}
-        {canAddMore && (
-          <motion.button
-            type="button"
-            onClick={handleQuickAdd}
-            disabled={isAdding || disabled}
-            whileTap={{ scale: 0.95 }}
-            className={cn(
-              "flex items-center gap-1 px-2 py-1 rounded-neo text-[11px] font-bold",
-              "bg-neo-cyan text-neo-black border-2 border-neo-black shadow-hard-sm",
-              "hover:shadow-hard hover:translate-x-[-1px] hover:translate-y-[-1px]",
-              "active:shadow-none active:translate-x-[1px] active:translate-y-[1px]",
-              "transition-all duration-100",
-              (isAdding || disabled) && "opacity-50 cursor-not-allowed"
-            )}
-          >
-            <FaPlus size={8} />
-            {isAdding ? '...' : (t('bots.add') || '+')}
-          </motion.button>
+      {/* Manual Add Section */}
+      <div className="space-y-2">
+        <p className="text-xs text-neo-cream/60">
+          {t('bots.orAddManually') || 'Or add manually:'}
+        </p>
+
+        <div className="flex flex-wrap gap-2">
+          {BOT_DIFFICULTIES.map((diff) => {
+            const isAdding = addingDifficulty === diff.value;
+            const isDisabled = !canAddMore || isAdding || disabled || addingDifficulty !== null;
+
+            return (
+              <motion.button
+                key={diff.value}
+                type="button"
+                onClick={() => handleAddBot(diff.value)}
+                disabled={isDisabled}
+                whileTap={{ scale: 0.95 }}
+                aria-label={`Add ${diff.value} bot`}
+                className={cn(
+                  "flex items-center gap-1.5 px-3 py-2 rounded-neo text-sm font-bold",
+                  "border-2 border-neo-black transition-all duration-100",
+                  "min-h-[44px]",
+                  diff.color,
+                  !isDisabled && "shadow-hard-sm hover:shadow-hard hover:translate-x-[-1px] hover:translate-y-[-1px]",
+                  !isDisabled && "active:shadow-none active:translate-x-[1px] active:translate-y-[1px]",
+                  isDisabled && "opacity-50 cursor-not-allowed shadow-none"
+                )}
+              >
+                <FaPlus size={10} aria-hidden="true" />
+                <span aria-hidden="true">{diff.icon}</span>
+                <span>{isAdding ? '...' : (t(diff.labelKey) || diff.value)}</span>
+              </motion.button>
+            );
+          })}
+        </div>
+
+        {!canAddMore && (
+          <p className="text-xs text-neo-cream/50">
+            {t('bots.roomFull') || 'Room is full'}
+          </p>
         )}
       </div>
 
-      {/* Current Bots List - Compact */}
+      {/* Current Bots List */}
       {bots.length > 0 && (
-        <div className="space-y-1">
-          <div className="flex flex-wrap gap-1.5">
+        <div className="space-y-2">
+          <p className="text-xs text-neo-cream/60">
+            {t('bots.currentBots') || 'Current bots:'}
+          </p>
+          <div className="flex flex-wrap gap-2">
             <AnimatePresence mode="popLayout">
-              {bots.map((bot) => (
-                <motion.div
-                  key={bot.username}
-                  layout
-                  initial={{ opacity: 0, scale: 0.8 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.8 }}
-                  className="flex items-center gap-1 bg-neo-black/30 rounded-full px-2 py-0.5 border border-neo-cream/20"
-                >
-                  <span
-                    className="w-4 h-4 rounded-full flex items-center justify-center text-[10px] shrink-0"
-                    style={{ backgroundColor: bot.avatar?.color || '#60a5fa' }}
+              {bots.map((bot) => {
+                const config = getDifficultyConfig(bot.botDifficulty);
+                return (
+                  <motion.div
+                    key={bot.username}
+                    layout
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.8 }}
+                    className={cn(
+                      "flex items-center gap-2 rounded-neo px-2.5 py-1.5",
+                      "border-2 border-neo-black shadow-hard-sm",
+                      config.bgTint
+                    )}
                   >
-                    {bot.avatar?.emoji || '🤖'}
-                  </span>
-                  <span className="text-[10px] text-neo-cream/80 font-medium truncate max-w-[60px]">
-                    {bot.username}
-                  </span>
-                  <Badge className={cn(
-                    "text-[8px] px-1 py-0 shrink-0",
-                    bot.botDifficulty === 'easy' ? 'bg-neo-lime text-neo-black' :
-                    bot.botDifficulty === 'hard' ? 'bg-neo-red text-white' :
-                    'bg-amber-400 text-neo-black'
-                  )}>
-                    {(t(`bots.${bot.botDifficulty || 'medium'}`) || bot.botDifficulty || 'M').charAt(0)}
-                  </Badge>
-                  <motion.button
-                    type="button"
-                    onClick={() => handleRemoveBot(bot.username)}
-                    disabled={disabled}
-                    whileHover={{ scale: 1.1 }}
-                    whileTap={{ scale: 0.9 }}
-                    className="text-neo-red/60 hover:text-neo-red transition-colors shrink-0"
-                    title={t('bots.remove') || 'Remove bot'}
-                  >
-                    <FaTimes size={8} />
-                  </motion.button>
-                </motion.div>
-              ))}
+                    <span
+                      className="w-5 h-5 rounded-full flex items-center justify-center text-xs shrink-0 border border-neo-black/30"
+                      style={{ backgroundColor: bot.avatar?.color || '#60a5fa' }}
+                      aria-hidden="true"
+                    >
+                      {bot.avatar?.emoji ? bot.avatar.emoji : <FaRobot className="text-neo-cream text-[10px]" />}
+                    </span>
+                    <span className="text-xs text-neo-cream font-medium truncate max-w-[80px]">
+                      {bot.username}
+                    </span>
+                    <Badge
+                      className={cn(
+                        "text-[10px] px-1.5 py-0 shrink-0 font-bold",
+                        config.color
+                      )}
+                      aria-label={`${bot.botDifficulty || 'medium'} difficulty`}
+                    >
+                      {config.icon}
+                    </Badge>
+                    <motion.button
+                      type="button"
+                      onClick={() => handleRemoveBot(bot.username)}
+                      disabled={disabled}
+                      whileHover={{ scale: 1.1 }}
+                      whileTap={{ scale: 0.9 }}
+                      aria-label={`Remove ${bot.username}`}
+                      className={cn(
+                        "w-5 h-5 flex items-center justify-center rounded-full",
+                        "text-neo-red/70 hover:text-neo-red hover:bg-neo-red/20",
+                        "transition-colors shrink-0",
+                        disabled && "opacity-50 cursor-not-allowed"
+                      )}
+                    >
+                      <FaTimes size={10} aria-hidden="true" />
+                    </motion.button>
+                  </motion.div>
+                );
+              })}
             </AnimatePresence>
           </div>
         </div>
       )}
 
-      {/* Empty State - Minimal */}
-      {bots.length === 0 && (
-        <p className="text-[10px] text-neo-cream/50 text-center">
-          {t('bots.emptyState') || 'Add bots to practice or fill the room'}
-        </p>
+      {/* Empty State */}
+      {bots.length === 0 && !autoFillEnabled && (
+        <div className="text-center py-2">
+          <p className="text-sm text-neo-cream/50">
+            {t('bots.emptyState') || 'No bots yet - add some to practice!'}
+          </p>
+        </div>
       )}
     </div>
   );

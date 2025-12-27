@@ -1,7 +1,7 @@
 "use client";
 
-import * as Sentry from "@sentry/nextjs";
 import { useEffect } from "react";
+import { captureError } from "@/utils/sentry";
 import { translations } from "../translations";
 
 export default function GlobalError({
@@ -12,7 +12,12 @@ export default function GlobalError({
   reset: () => void;
 }) {
   useEffect(() => {
-    Sentry.captureException(error);
+    captureError(error, {
+      errorBoundary: {
+        type: "global-error",
+        digest: error.digest,
+      },
+    });
   }, [error]);
 
   // Use English as fallback for global errors

@@ -20,8 +20,8 @@ const SelectTrigger = React.forwardRef<
     ref={ref}
     className={cn(
       "flex h-10 w-full items-center justify-between",
-      "bg-neo-cream text-neo-black",
-      "border-3 border-neo-black rounded-neo",
+      "bg-neo-cream text-neo-black dark:bg-slate-700 dark:text-white",
+      "border-3 border-neo-black dark:border-slate-500 rounded-neo",
       "px-3 py-2 text-sm font-medium",
       "shadow-hard-sm",
       "transition-all duration-100",
@@ -86,8 +86,8 @@ const SelectContent = React.forwardRef<
       ref={ref}
       className={cn(
         "relative z-50 max-h-96 min-w-[8rem] overflow-hidden",
-        "bg-neo-cream text-neo-black",
-        "border-3 border-neo-black rounded-neo",
+        "bg-neo-cream text-neo-black dark:bg-slate-700 dark:text-white",
+        "border-3 border-neo-black dark:border-slate-500 rounded-neo",
         "shadow-hard",
         "data-[state=open]:animate-in data-[state=closed]:animate-out",
         "data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",

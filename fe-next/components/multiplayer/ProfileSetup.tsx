@@ -149,9 +149,9 @@ const ProfileSetup: React.FC<ProfileSetupProps> = ({
             </h1>
             {/* Progress indicator */}
             <div className="flex items-center justify-center gap-2 mt-2">
-              <div className="w-3 h-3 rounded-full bg-neo-cyan border-2 border-neo-black" />
-              <div className="w-3 h-3 rounded-full bg-neo-cream/30 border-2 border-neo-black/30" />
-              <span className="text-xs text-neo-black/50 dark:text-neo-cream/50 ms-2">
+              <div className="w-3 h-3 rounded-full bg-neo-cyan text-neo-black border-2 border-neo-black" />
+              <div className="w-3 h-3 rounded-full bg-neo-cream/30 text-neo-black border-2 border-neo-black/30" />
+              <span className="text-xs text-neo-black/60 dark:text-slate-400 ms-2">
                 {t('multiplayerFlow.profileSetup.progress') || 'Step 1 of 2'}
               </span>
             </div>
@@ -231,11 +231,12 @@ const ProfileSetup: React.FC<ProfileSetupProps> = ({
                     {t('multiplayerFlow.profileSetup.avatarLabel') || 'Choose your avatar'}
                   </Label>
 
-                  <div className="flex items-center gap-3 flex-wrap">
-                    {/* Quick avatar buttons */}
-                    {quickAvatars.map((avatar) => {
-                      const isSelected = selectedAvatarId === avatar.id;
-                      const avatarConfig = getAvatarById(avatar.id);
+                  {/* Scrollable avatar grid */}
+                  <div className="max-h-32 overflow-y-auto rounded-lg border-2 border-slate-200 dark:border-slate-600 p-2 bg-white/50 dark:bg-slate-700/50">
+                    <div className="grid grid-cols-6 sm:grid-cols-8 gap-2">
+                      {quickAvatars.map((avatar) => {
+                        const isSelected = selectedAvatarId === avatar.id;
+                        const avatarConfig = getAvatarById(avatar.id);
 
                       return (
                         <button
@@ -284,6 +285,7 @@ const ProfileSetup: React.FC<ProfileSetupProps> = ({
                   <FaCheck className="mr-2" />
                   {t('multiplayerFlow.profileSetup.continueButton') || 'Continue'}
                 </Button>
+                </div>
               </CardContent>
             </Card>
           </motion.div>

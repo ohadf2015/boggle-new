@@ -152,7 +152,7 @@ export const AchievementBadge = memo<AchievementBadgeProps>(({ achievement, inde
         <TooltipContent
           side="top"
           sideOffset={8}
-          className="z-50 bg-neo-purple border-3 border-neo-black shadow-hard rounded-md p-3 max-w-xs"
+          className="z-50 bg-neo-purple text-white border-3 border-neo-black shadow-hard rounded-md p-3 max-w-xs"
           onPointerDownOutside={() => setOpen(false)}
         >
           <div>
@@ -187,9 +187,9 @@ export const AchievementBadge = memo<AchievementBadgeProps>(({ achievement, inde
                       <span>{tierProgress.currentCount}/{tierProgress.nextThreshold}</span>
                       <span>{TIER_ICONS[tierProgress.nextTier]} {getTierName(tierProgress.nextTier)}</span>
                     </div>
-                    <div className="h-1.5 bg-neo-black/50 rounded-full overflow-hidden">
+                    <div className="h-1.5 bg-neo-black/50 text-white rounded-full overflow-hidden">
                       <div
-                        className="h-full bg-neo-lime transition-all duration-300"
+                        className="h-full bg-neo-lime text-neo-black transition-all duration-300"
                         style={{ width: `${tierProgress.progress}%` }}
                       />
                     </div>

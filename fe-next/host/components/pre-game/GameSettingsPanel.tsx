@@ -2,14 +2,16 @@
 
 import React, { memo, useCallback, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FaClock, FaCog, FaPlus, FaMinus, FaChevronDown, FaChevronUp, FaCheck } from 'react-icons/fa';
+import { FaClock, FaCog, FaPlus, FaMinus, FaChevronDown, FaChevronUp, FaCheck, FaPlay, FaStop } from 'react-icons/fa';
 import type { Socket } from 'socket.io-client';
 import { Button } from '../../../components/ui/button';
 import { Card } from '../../../components/ui/card';
 import { Checkbox } from '../../../components/ui/checkbox';
+import { Switch } from '../../../components/ui/switch';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../../../components/ui/tooltip';
 import GameTypeSelector from '../../../components/GameTypeSelector';
 import BotControls from '../../../components/BotControls';
+import { useAutoFillBots } from '../../../hooks/useAutoFillBots';
 import { DIFFICULTIES, MIN_WORD_LENGTH_OPTIONS, getRecommendedTimer } from '../../../utils/consts';
 import { cn } from '../../../lib/utils';
 import type { DifficultyLevel, Avatar as AvatarType, PresenceStatus } from '@/shared/types/game';
@@ -102,6 +104,19 @@ export const GameSettingsPanel = memo<GameSettingsPanelProps>(({
   t,
 }) => {
   const [showAdvancedSettings, setShowAdvancedSettings] = useState(false);
+
+  // Auto-start functionality
+  const {
+    autoStartEnabled,
+    countdown,
+    toggleAutoStart,
+    cancelAutoStart,
+    isReadyToAutoStart,
+  } = useAutoFillBots({
+    socket,
+    enabled: true,
+    currentPlayerCount: players.length,
+  });
 
   const handleDecreaseTimer = useCallback(() => {
     setTimerDirection(-1);
@@ -218,7 +233,7 @@ export const GameSettingsPanel = memo<GameSettingsPanelProps>(({
               transition={{ duration: 0.2 }}
               className="overflow-hidden"
             >
-              <div className="space-y-3 bg-neo-black/20 rounded-neo p-3 border border-neo-cream/10">
+              <div className="space-y-3 bg-neo-black/20 text-white rounded-neo p-3 border border-neo-cream/10">
                 {/* Difficulty Selection - Compact */}
                 <div className="space-y-1.5">
                   <label className="text-xs font-bold uppercase text-neo-cream/80">
@@ -314,6 +329,79 @@ export const GameSettingsPanel = memo<GameSettingsPanelProps>(({
                   <label htmlFor="hostPlays" className="text-xs font-bold text-neo-cream cursor-pointer">
                     {t('hostView.hostPlays')}
                   </label>
+                </div>
+
+                {/* Auto-start toggle */}
+                <div className="pt-2 border-t border-neo-cream/10">
+                  <div className="flex items-center justify-between gap-2">
+                    <div className="flex items-center gap-1.5">
+                      <FaPlay className="text-neo-lime text-xs" />
+                      <span className="text-xs font-bold text-neo-cream/80">
+                        {t('bots.autoStart') || 'Auto-start after 30s'}
+                      </span>
+                    </div>
+                    <Switch
+                      checked={autoStartEnabled}
+                      onCheckedChange={toggleAutoStart}
+                      disabled={!isReadyToAutoStart}
+                      className="data-[state=checked]:bg-neo-lime"
+                    />
+                  </div>
+
+                  {/* Countdown display */}
+                  <AnimatePresence>
+                    {countdown !== null && countdown > 0 && (
+                      <motion.div
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: 'auto' }}
+                        exit={{ opacity: 0, height: 0 }}
+                        className="flex items-center justify-between bg-neo-lime/20 rounded-neo px-2 py-1.5 border border-neo-lime/30 mt-2"
+                      >
+                        <div className="flex items-center gap-2">
+                          <div className="relative">
+                            <div className="w-8 h-8 rounded-full bg-neo-lime text-neo-black border-2 border-neo-black flex items-center justify-center">
+                              <span className="font-black text-neo-black text-sm">{countdown}</span>
+                            </div>
+                            {/* Circular progress indicator */}
+                            <svg
+                              className="absolute inset-0 w-8 h-8 -rotate-90"
+                              viewBox="0 0 32 32"
+                            >
+                              <circle
+                                cx="16"
+                                cy="16"
+                                r="14"
+                                fill="none"
+                                stroke="currentColor"
+                                strokeWidth="2"
+                                strokeDasharray={`${(countdown / 30) * 88} 88`}
+                                className="text-neo-lime"
+                              />
+                            </svg>
+                          </div>
+                          <span className="text-[10px] font-bold text-neo-cream">
+                            {t('bots.startingIn') || 'Starting in...'}
+                          </span>
+                        </div>
+                        <motion.button
+                          type="button"
+                          onClick={cancelAutoStart}
+                          whileTap={{ scale: 0.95 }}
+                          className="flex items-center gap-1 px-2 py-1 rounded-neo text-[10px] font-bold bg-neo-red text-white border-2 border-neo-black shadow-hard-sm hover:shadow-hard transition-all"
+                        >
+                          <FaStop size={8} />
+                          {t('bots.cancel') || 'Cancel'}
+                        </motion.button>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+
+                  {/* Info text when not ready for auto-start */}
+                  {autoStartEnabled && !isReadyToAutoStart && (
+                    <p className="text-[10px] text-neo-cream/50 text-center mt-1">
+                      {t('bots.waitingForPlayers') || 'Waiting for at least 2 players...'}
+                    </p>
+                  )}
                 </div>
 
                 {/* Cancel Tournament Button */}

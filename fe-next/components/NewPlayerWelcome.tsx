@@ -69,7 +69,7 @@ const NewPlayerWelcome: React.FC<NewPlayerWelcomeProps> = ({
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-md" dir={dir}>
-        <DialogHeader className="bg-neo-cyan p-3 sm:p-4">
+        <DialogHeader className="bg-neo-cyan text-neo-black p-3 sm:p-4">
           <DialogTitle className="flex items-center justify-center gap-2 sm:gap-3 text-base sm:text-xl">
             <motion.div
               animate={{ rotate: [0, -10, 10, -10, 0] }}

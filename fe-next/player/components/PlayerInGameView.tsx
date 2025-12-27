@@ -76,6 +76,7 @@ interface PlayerInGameViewProps {
   // Player data
   foundWords: FoundWord[];
   leaderboard: LeaderboardEntry[];
+  totalBoardWords?: number | null;
 
   // Tournament
   tournamentData: TournamentData | null;
@@ -134,6 +135,7 @@ const PlayerInGameView = memo<PlayerInGameViewProps>(({
   // Player data
   foundWords,
   leaderboard,
+  totalBoardWords,
 
   // Tournament
   tournamentData,
@@ -179,7 +181,7 @@ const PlayerInGameView = memo<PlayerInGameViewProps>(({
           {Array.from({ length: 16 }).map((_, i) => (
             <div
               key={i}
-              className="aspect-square rounded-xl bg-slate-700/50 animate-pulse"
+              className="aspect-square rounded-xl bg-slate-700/50 text-white animate-pulse"
               style={{ animationDelay: `${i * 50}ms` }}
             />
           ))}
@@ -264,7 +266,7 @@ const PlayerInGameView = memo<PlayerInGameViewProps>(({
 
       {/* Tournament Standings Modal */}
       <Dialog open={showTournamentStandings} onOpenChange={setShowTournamentStandings}>
-        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto bg-white dark:bg-slate-800 border-purple-500/30">
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto bg-white text-neo-black dark:bg-slate-800 dark:text-white border-purple-500/30">
           <DialogHeader>
             <DialogTitle className="text-center text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-pink-600 dark:from-purple-400 dark:to-pink-400">
               {tournamentData?.status === 'completed' ? t('hostView.tournamentComplete') : t('hostView.tournamentStandings')}
@@ -291,7 +293,7 @@ const PlayerInGameView = memo<PlayerInGameViewProps>(({
 
       {/* Exit Confirmation Dialog */}
       <AlertDialog open={showExitConfirm} onOpenChange={setShowExitConfirm}>
-        <AlertDialogContent className="bg-white dark:bg-slate-800 border-red-500/30">
+        <AlertDialogContent className="bg-white text-neo-black dark:bg-slate-800 dark:text-white border-red-500/30">
           <AlertDialogHeader>
             <AlertDialogTitle className="text-slate-900 dark:text-white">
               {t('playerView.exitConfirmation')}

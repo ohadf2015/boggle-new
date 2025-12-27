@@ -65,7 +65,7 @@ const SpecialRoundsStep: React.FC = () => {
           animate={{ x: 0, opacity: 1 }}
           transition={{ delay: 0.2 }}
         >
-          <div className="bg-neo-orange border-2 sm:border-3 border-neo-black rounded-neo p-2 sm:p-4 shadow-hard-sm sm:shadow-hard-md h-full">
+          <div className="bg-neo-orange text-neo-black border-2 sm:border-3 border-neo-black rounded-neo p-2 sm:p-4 shadow-hard-sm sm:shadow-hard-md h-full">
             <div className="flex items-center gap-1 sm:gap-2 mb-1 sm:mb-2">
               <span className="text-lg sm:text-2xl">🌋</span>
               <h3 className="font-black text-xs sm:text-lg text-neo-black leading-tight">
@@ -77,7 +77,7 @@ const SpecialRoundsStep: React.FC = () => {
             </p>
 
             {/* Demo grid with earthquake effect */}
-            <div className="bg-neo-cream border-2 border-neo-black rounded-neo p-1.5 sm:p-3 relative overflow-hidden">
+            <div className="bg-neo-cream text-neo-black border-2 border-neo-black rounded-neo p-1.5 sm:p-3 relative overflow-hidden">
               <div className="grid grid-cols-2 gap-1 sm:gap-2">
                 {demoLetters.map((row, rowIndex) =>
                   row.map((letter, colIndex) => (
@@ -114,7 +114,7 @@ const SpecialRoundsStep: React.FC = () => {
           animate={{ x: 0, opacity: 1 }}
           transition={{ delay: 0.4 }}
         >
-          <div className="bg-neo-pink border-2 sm:border-3 border-neo-black rounded-neo p-2 sm:p-4 shadow-hard-sm sm:shadow-hard-md h-full">
+          <div className="bg-neo-pink text-white border-2 sm:border-3 border-neo-black rounded-neo p-2 sm:p-4 shadow-hard-sm sm:shadow-hard-md h-full">
             <div className="flex items-center gap-1 sm:gap-2 mb-1 sm:mb-2">
               <span className="text-lg sm:text-2xl">💃</span>
               <h3 className="font-black text-xs sm:text-lg text-neo-black leading-tight">
@@ -126,7 +126,7 @@ const SpecialRoundsStep: React.FC = () => {
             </p>
 
             {/* Demo grid with fire round effect */}
-            <div className="bg-neo-cream border-2 border-neo-black rounded-neo p-1.5 sm:p-3 relative overflow-hidden">
+            <div className="bg-neo-cream text-neo-black border-2 border-neo-black rounded-neo p-1.5 sm:p-3 relative overflow-hidden">
               <div className="grid grid-cols-2 gap-1 sm:gap-2">
                 {demoLetters.map((row, rowIndex) =>
                   row.map((letter, colIndex) => {

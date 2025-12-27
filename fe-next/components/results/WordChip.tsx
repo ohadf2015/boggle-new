@@ -102,7 +102,7 @@ const WordChip = memo<WordChipProps>(({ wordObj, playerCount }) => {
       {label}
       {/* Show info icon for invalid words with reason - indicates it's tappable */}
       {hasInvalidReason && (
-        <span className="text-xs w-8 h-8 min-w-[44px] min-h-[44px] flex items-center justify-center bg-neo-cream/20 rounded border border-neo-cream/30 font-black">
+        <span className="text-xs w-8 h-8 min-w-[44px] min-h-[44px] flex items-center justify-center bg-neo-cream/20 text-neo-black rounded border border-neo-cream/30 font-black">
           ℹ️
         </span>
       )}
@@ -123,7 +123,7 @@ const WordChip = memo<WordChipProps>(({ wordObj, playerCount }) => {
             </TooltipTrigger>
             <TooltipContent
               side="top"
-              className="bg-neo-orange border-2 border-neo-black shadow-hard rounded-neo p-2"
+              className="bg-neo-orange text-neo-black border-2 border-neo-black shadow-hard rounded-neo p-2"
             >
               <p className="text-xs font-bold text-neo-black">
                 {t('results.fireRoundBonus') || 'Fire Round Bonus!'}
@@ -146,7 +146,7 @@ const WordChip = memo<WordChipProps>(({ wordObj, playerCount }) => {
             </TooltipTrigger>
             <TooltipContent
               side="top"
-              className="bg-neo-purple border-2 border-neo-black shadow-hard rounded-neo p-2"
+              className="bg-neo-purple text-white border-2 border-neo-black shadow-hard rounded-neo p-2"
             >
               <p className="text-xs font-bold text-neo-cream">
                 {t('results.pendingValidation') || 'Pending community validation'}
@@ -171,7 +171,7 @@ const WordChip = memo<WordChipProps>(({ wordObj, playerCount }) => {
             </TooltipTrigger>
             <TooltipContent
               side="top"
-              className="bg-neo-purple border-2 border-neo-black shadow-hard rounded-neo p-2 max-w-[250px]"
+              className="bg-neo-purple text-white border-2 border-neo-black shadow-hard rounded-neo p-2 max-w-[250px]"
             >
               <p className="text-xs font-bold text-neo-cream">{t('results.aiVerified') || 'Verified by AI'}</p>
               {aiReason && (

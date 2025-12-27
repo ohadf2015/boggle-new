@@ -15,11 +15,6 @@ export interface SelectedCell extends GridPosition {
   letter: string;
 }
 
-export interface HeatMapData {
-  cellUsageCounts: Record<string, number>;
-  maxCount: number;
-}
-
 export interface ComboColors {
   bg: string;
   border: string;

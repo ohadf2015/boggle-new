@@ -1,6 +1,6 @@
 'use client';
 
-import React, { createContext, useState, useContext, useEffect, ReactNode, useRef } from 'react';
+import React, { createContext, useState, useContext, useEffect, ReactNode, useRef, useCallback, useMemo } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { translations } from '../translations';
 import { locales, defaultLocale } from '../lib/i18n';
@@ -147,8 +147,8 @@ export const LanguageProvider = ({ children, initialLanguage }: LanguageProvider
         }
     }, [language]);
 
-    const setLanguage = (newLang: Language) => {
-        if (newLang !== language) {
+    const setLanguage = useCallback((newLang: Language) => {
+        if (newLang !== languageRef.current) {
             setLanguageState(newLang);
 
             // Also update cookie immediately for server-side consistency
@@ -171,9 +171,10 @@ export const LanguageProvider = ({ children, initialLanguage }: LanguageProvider
                 router.push(`/${newLang}${pathname}`);
             }
         }
-    };
+    }, [pathname, router]);
 
-    const t = (path: string, params: Record<string, string | number> = {}): string => {
+    // Memoize t function to prevent unnecessary re-renders of consumers
+    const t = useCallback((path: string, params: Record<string, string | number> = {}): string => {
         const keys = path.split('.');
         // Use type assertion since Language type may include values not in translations
         let current: unknown = (translations as Record<string, unknown>)[language] || translations['he']; // Fallback to Hebrew if language is invalid
@@ -205,15 +206,16 @@ export const LanguageProvider = ({ children, initialLanguage }: LanguageProvider
         }
 
         return typeof current === 'string' ? current : path;
-    };
+    }, [language]);
 
-    const value: LanguageContextValue = {
+    // Memoize context value to prevent unnecessary re-renders of all consumers
+    const value = useMemo<LanguageContextValue>(() => ({
         language,
         setLanguage,
         t,
         dir: ((translations as Record<string, { direction?: 'rtl' | 'ltr' }>)[language])?.direction || 'rtl',
         currentFlag: ((translations as Record<string, { flag?: string }>)[language])?.flag || '🇮🇱'
-    };
+    }), [language, setLanguage, t]);
 
     return (
         <LanguageContext.Provider value={value}>

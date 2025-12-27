@@ -66,6 +66,14 @@ export async function GET(request: NextRequest) {
   // Preserve query parameters (like ?room=1234 for invite links)
   const requestUrl = new URL(request.url);
   const searchParams = requestUrl.search;
+  const roomCode = requestUrl.searchParams.get('room');
+
+  // If there's a room code in the URL, redirect directly to multiplayer page
+  // This provides a faster, more direct path to the quick join screen
+  if (roomCode) {
+    const targetUrl = new URL(`/${locale}/multiplayer${searchParams}`, origin);
+    return NextResponse.redirect(targetUrl);
+  }
 
   const targetUrl = new URL(`/${locale}${searchParams}`, origin);
 

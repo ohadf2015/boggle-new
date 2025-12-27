@@ -1,0 +1,490 @@
+/**
+ * Engagement Handler
+ * Handles engagement-related socket events:
+ * - Daily challenges
+ * - Streaks and login bonuses
+ * - Calendar rewards
+ * - Come-back campaigns
+ * - Mystery rewards
+ */
+
+import type { Server, Socket } from 'socket.io';
+import type {
+  DailyChallenge,
+  ChallengeProgress,
+  CompletedChallenge,
+  MysteryReward,
+  NearMiss,
+  OneMoreGamePrompt
+} from '@/shared/types';
+
+const {
+  generateDailyChallenges,
+  updateChallengeProgress,
+  claimChallengeReward,
+  getTodaysChallenges,
+  getChallengeStats,
+} = require('../modules/dailyChallengesManager');
+
+const {
+  recordLogin,
+  getStreakXpMultiplier,
+  getCalendarStatus,
+  claimCalendarReward,
+  checkComebackBonus,
+  claimComebackBonus,
+  calculateNearMisses,
+  getOneMoreGamePrompt,
+  rollMysteryReward,
+  logMysteryReward,
+  getEngagementStatus,
+} = require('../modules/engagementManager');
+
+const { safeEmit } = require('../utils/socketHelpers');
+const { checkRateLimit } = require('../utils/rateLimiter');
+const logger = require('../utils/logger');
+
+// Types for payloads
+interface PlayerIdPayload {
+  playerId: string;
+}
+
+interface ClaimChallengePayload {
+  playerId: string;
+  challengeId: string;
+}
+
+interface GameStats {
+  score: number;
+  wordCount: number;
+  longestWord: string;
+  isWinner: boolean;
+  placement: number;
+  playerCount: number;
+  achievements: string[];
+}
+
+interface ChallengeUpdateResult {
+  completed: CompletedChallenge[];
+  updated: ChallengeProgress[];
+}
+
+interface ChallengeRewardResult {
+  success: boolean;
+  reward?: {
+    totalXp: number;
+  };
+  error?: string;
+}
+
+interface LoginResultType {
+  streak: number;
+}
+
+interface ComebackStatusType {
+  eligible: boolean;
+}
+
+interface ComebackClaimResultType {
+  success: boolean;
+  bonus?: {
+    xpMultiplier: number;
+  };
+}
+
+interface CalendarStatusType {
+  currentDay: number;
+  claimedDays: number[];
+  todayClaimable: boolean;
+  rewards: unknown[];
+}
+
+interface CalendarRewardResultType {
+  success: boolean;
+  reward?: {
+    day: number;
+  };
+}
+
+interface EngagementStatusType {
+  streak: number;
+  streakMultiplier: number;
+  calendarDay: number;
+  comebackEligible: boolean;
+}
+
+interface ChallengeStatsType {
+  completed: number;
+  total: number;
+}
+
+/**
+ * Register engagement socket event handlers
+ * @param io - Socket.IO server instance
+ * @param socket - Socket.IO socket instance
+ */
+function registerEngagementHandlers(io: Server, socket: Socket): void {
+
+  // ==================== Daily Challenges ====================
+
+  /**
+   * Get today's daily challenges for the player
+   */
+  socket.on('engagement:getDailyChallenges', async (data: PlayerIdPayload) => {
+    if (!checkRateLimit(socket.id)) {
+      socket.emit('rateLimited');
+      return;
+    }
+
+    const { playerId } = data || {};
+    if (!playerId) {
+      safeEmit(socket, 'engagement:error', { message: 'Player ID required' });
+      return;
+    }
+
+    try {
+      const challenges: DailyChallenge[] = await getTodaysChallenges(playerId);
+      safeEmit(socket, 'engagement:dailyChallenges', { challenges });
+      logger.debug('ENGAGEMENT', `Sent daily challenges to ${playerId}`);
+    } catch (error: unknown) {
+      const err = error as Error;
+      logger.error('ENGAGEMENT', `Error getting challenges: ${err.message}`);
+      safeEmit(socket, 'engagement:error', { message: 'Failed to get challenges' });
+    }
+  });
+
+  /**
+   * Claim reward for a completed challenge
+   */
+  socket.on('engagement:claimChallengeReward', async (data: ClaimChallengePayload) => {
+    if (!checkRateLimit(socket.id)) {
+      socket.emit('rateLimited');
+      return;
+    }
+
+    const { playerId, challengeId } = data || {};
+    if (!playerId || !challengeId) {
+      safeEmit(socket, 'engagement:error', { message: 'Player ID and Challenge ID required' });
+      return;
+    }
+
+    try {
+      const result: ChallengeRewardResult = await claimChallengeReward(playerId, challengeId);
+      safeEmit(socket, 'engagement:rewardClaimed', result);
+
+      if (result.success && result.reward) {
+        logger.info('ENGAGEMENT', `Challenge reward claimed: ${result.reward.totalXp} XP for ${playerId}`);
+      }
+    } catch (error: unknown) {
+      const err = error as Error;
+      logger.error('ENGAGEMENT', `Error claiming challenge reward: ${err.message}`);
+      safeEmit(socket, 'engagement:error', { message: 'Failed to claim reward' });
+    }
+  });
+
+  // ==================== Streak System ====================
+
+  /**
+   * Record player login and return streak status
+   */
+  socket.on('engagement:recordLogin', async (data: PlayerIdPayload) => {
+    if (!checkRateLimit(socket.id)) {
+      socket.emit('rateLimited');
+      return;
+    }
+
+    const { playerId } = data || {};
+    if (!playerId) {
+      safeEmit(socket, 'engagement:error', { message: 'Player ID required' });
+      return;
+    }
+
+    try {
+      const loginResult: LoginResultType = await recordLogin(playerId);
+      safeEmit(socket, 'engagement:loginResult', loginResult);
+
+      // Check for comeback bonus
+      const comebackStatus: ComebackStatusType = await checkComebackBonus(playerId);
+      if (comebackStatus.eligible) {
+        safeEmit(socket, 'engagement:comebackAvailable', comebackStatus);
+      }
+
+      logger.info('ENGAGEMENT', `Login recorded for ${playerId}, streak: ${loginResult.streak}`);
+    } catch (error: unknown) {
+      const err = error as Error;
+      logger.error('ENGAGEMENT', `Error recording login: ${err.message}`);
+      safeEmit(socket, 'engagement:error', { message: 'Failed to record login' });
+    }
+  });
+
+  // ==================== Calendar Rewards ====================
+
+  /**
+   * Get calendar status for the player
+   */
+  socket.on('engagement:getCalendarStatus', async (data: PlayerIdPayload) => {
+    if (!checkRateLimit(socket.id)) {
+      socket.emit('rateLimited');
+      return;
+    }
+
+    const { playerId } = data || {};
+    if (!playerId) {
+      safeEmit(socket, 'engagement:error', { message: 'Player ID required' });
+      return;
+    }
+
+    try {
+      const status: CalendarStatusType = await getCalendarStatus(playerId);
+      safeEmit(socket, 'engagement:calendarStatus', status);
+    } catch (error: unknown) {
+      const err = error as Error;
+      logger.error('ENGAGEMENT', `Error getting calendar status: ${err.message}`);
+      safeEmit(socket, 'engagement:error', { message: 'Failed to get calendar status' });
+    }
+  });
+
+  /**
+   * Claim today's calendar reward
+   */
+  socket.on('engagement:claimCalendarReward', async (data: PlayerIdPayload) => {
+    if (!checkRateLimit(socket.id)) {
+      socket.emit('rateLimited');
+      return;
+    }
+
+    const { playerId } = data || {};
+    if (!playerId) {
+      safeEmit(socket, 'engagement:error', { message: 'Player ID required' });
+      return;
+    }
+
+    try {
+      const result: CalendarRewardResultType = await claimCalendarReward(playerId);
+      safeEmit(socket, 'engagement:calendarRewardClaimed', result);
+
+      if (result.success && result.reward) {
+        logger.info('ENGAGEMENT', `Calendar reward claimed for day ${result.reward.day} by ${playerId}`);
+      }
+    } catch (error: unknown) {
+      const err = error as Error;
+      logger.error('ENGAGEMENT', `Error claiming calendar reward: ${err.message}`);
+      safeEmit(socket, 'engagement:error', { message: 'Failed to claim calendar reward' });
+    }
+  });
+
+  // ==================== Come-back Campaigns ====================
+
+  /**
+   * Get comeback bonus status
+   */
+  socket.on('engagement:getComebackStatus', async (data: PlayerIdPayload) => {
+    if (!checkRateLimit(socket.id)) {
+      socket.emit('rateLimited');
+      return;
+    }
+
+    const { playerId } = data || {};
+    if (!playerId) {
+      safeEmit(socket, 'engagement:error', { message: 'Player ID required' });
+      return;
+    }
+
+    try {
+      const status: ComebackStatusType = await checkComebackBonus(playerId);
+      safeEmit(socket, 'engagement:comebackStatus', status);
+    } catch (error: unknown) {
+      const err = error as Error;
+      logger.error('ENGAGEMENT', `Error getting comeback status: ${err.message}`);
+      safeEmit(socket, 'engagement:error', { message: 'Failed to get comeback status' });
+    }
+  });
+
+  /**
+   * Claim comeback bonus
+   */
+  socket.on('engagement:claimComebackBonus', async (data: PlayerIdPayload) => {
+    if (!checkRateLimit(socket.id)) {
+      socket.emit('rateLimited');
+      return;
+    }
+
+    const { playerId } = data || {};
+    if (!playerId) {
+      safeEmit(socket, 'engagement:error', { message: 'Player ID required' });
+      return;
+    }
+
+    try {
+      const result: ComebackClaimResultType = await claimComebackBonus(playerId);
+      safeEmit(socket, 'engagement:comebackClaimed', result);
+
+      if (result.success && result.bonus) {
+        logger.info('ENGAGEMENT', `Comeback bonus claimed by ${playerId}: ${result.bonus.xpMultiplier}x XP`);
+      }
+    } catch (error: unknown) {
+      const err = error as Error;
+      logger.error('ENGAGEMENT', `Error claiming comeback bonus: ${err.message}`);
+      safeEmit(socket, 'engagement:error', { message: 'Failed to claim comeback bonus' });
+    }
+  });
+
+  // ==================== Full Engagement Status ====================
+
+  /**
+   * Get complete engagement status for player
+   */
+  socket.on('engagement:getStatus', async (data: PlayerIdPayload) => {
+    if (!checkRateLimit(socket.id)) {
+      socket.emit('rateLimited');
+      return;
+    }
+
+    const { playerId } = data || {};
+    if (!playerId) {
+      safeEmit(socket, 'engagement:error', { message: 'Player ID required' });
+      return;
+    }
+
+    try {
+      const status: EngagementStatusType = await getEngagementStatus(playerId);
+      const challenges: DailyChallenge[] = await getTodaysChallenges(playerId);
+      const stats: ChallengeStatsType = await getChallengeStats(playerId);
+
+      safeEmit(socket, 'engagement:status', {
+        ...status,
+        dailyChallenges: challenges,
+        challengeStats: stats,
+      });
+    } catch (error: unknown) {
+      const err = error as Error;
+      logger.error('ENGAGEMENT', `Error getting engagement status: ${err.message}`);
+      safeEmit(socket, 'engagement:error', { message: 'Failed to get engagement status' });
+    }
+  });
+}
+
+/**
+ * Process game end engagement events
+ * Called by gameLifecycleHandler when a game ends
+ * @param socket - Player socket
+ * @param playerId - Player UUID
+ * @param gameStats - Game statistics
+ * @param gameCode - Game code
+ */
+async function processGameEndEngagement(socket: Socket, playerId: string, gameStats: GameStats, gameCode: string): Promise<void> {
+  if (!playerId) return;
+
+  try {
+    // Update daily challenge progress
+    const challengeUpdate: ChallengeUpdateResult = await updateChallengeProgress(playerId, gameStats);
+
+    if (challengeUpdate.completed.length > 0) {
+      safeEmit(socket, 'engagement:challengeCompleted', {
+        completed: challengeUpdate.completed,
+      });
+    }
+
+    if (challengeUpdate.updated.length > 0) {
+      safeEmit(socket, 'engagement:challengeProgress', {
+        progress: challengeUpdate.updated,
+      });
+    }
+
+    // Calculate and send near-miss notifications
+    const nearMisses: NearMiss[] = calculateNearMisses(gameStats, gameStats.achievements || []);
+    if (nearMisses.length > 0) {
+      safeEmit(socket, 'engagement:nearMisses', { nearMisses });
+    }
+
+    // Get one-more-game prompt
+    const prompt: OneMoreGamePrompt | null = getOneMoreGamePrompt(gameStats);
+    if (prompt) {
+      safeEmit(socket, 'engagement:oneMoreGame', { prompt });
+    }
+
+    // Roll for mystery rewards
+    const mysteryReward: MysteryReward | null = rollMysteryReward('game_completion');
+    if (mysteryReward) {
+      await logMysteryReward(playerId, gameCode, mysteryReward);
+      safeEmit(socket, 'engagement:mysteryReward', { reward: mysteryReward });
+      logger.info('ENGAGEMENT', `Mystery reward: ${mysteryReward.display} for ${playerId}`);
+    }
+
+    // Check for win reward
+    if (gameStats.isWinner) {
+      const winReward: MysteryReward | null = rollMysteryReward('win');
+      if (winReward) {
+        await logMysteryReward(playerId, gameCode, winReward);
+        safeEmit(socket, 'engagement:mysteryReward', { reward: winReward });
+      }
+    }
+
+    logger.debug('ENGAGEMENT', `Processed game end engagement for ${playerId}`);
+  } catch (error: unknown) {
+    const err = error as Error;
+    logger.error('ENGAGEMENT', `Error processing game end engagement: ${err.message}`);
+  }
+}
+
+/**
+ * Process long word found engagement
+ * Called when a player finds a long word (8+ letters)
+ * @param socket - Player socket
+ * @param playerId - Player UUID
+ * @param word - The word found
+ * @param gameCode - Game code
+ */
+async function processLongWordEngagement(socket: Socket, playerId: string, word: string, gameCode: string): Promise<void> {
+  if (!playerId || word.length < 8) return;
+
+  try {
+    const reward: MysteryReward | null = rollMysteryReward('long_word');
+    if (reward) {
+      await logMysteryReward(playerId, gameCode, reward);
+      safeEmit(socket, 'engagement:mysteryReward', { reward });
+      logger.debug('ENGAGEMENT', `Long word reward: ${reward.display} for ${word}`);
+    }
+  } catch (error: unknown) {
+    const err = error as Error;
+    logger.error('ENGAGEMENT', `Error processing long word engagement: ${err.message}`);
+  }
+}
+
+/**
+ * Process achievement earned engagement
+ * Called when a player earns an achievement
+ * @param socket - Player socket
+ * @param playerId - Player UUID
+ * @param achievementId - Achievement ID
+ * @param gameCode - Game code
+ */
+async function processAchievementEngagement(socket: Socket, playerId: string, achievementId: string, gameCode: string): Promise<void> {
+  if (!playerId) return;
+
+  try {
+    const reward: MysteryReward | null = rollMysteryReward('achievement');
+    if (reward) {
+      await logMysteryReward(playerId, gameCode, reward);
+      safeEmit(socket, 'engagement:mysteryReward', { reward });
+      logger.debug('ENGAGEMENT', `Achievement reward: ${reward.display} for ${achievementId}`);
+    }
+  } catch (error: unknown) {
+    const err = error as Error;
+    logger.error('ENGAGEMENT', `Error processing achievement engagement: ${err.message}`);
+  }
+}
+
+module.exports = {
+  registerEngagementHandlers,
+  processGameEndEngagement,
+  processLongWordEngagement,
+  processAchievementEngagement,
+};
+
+export {
+  registerEngagementHandlers,
+  processGameEndEngagement,
+  processLongWordEngagement,
+  processAchievementEngagement,
+};

@@ -35,7 +35,7 @@ export const QRCodeDialog: React.FC<QRCodeDialogProps> = ({
 
   return (
   <Dialog open={open} onOpenChange={onOpenChange}>
-    <DialogContent className="sm:max-w-md bg-white dark:bg-slate-800 border-cyan-500/30">
+    <DialogContent className="sm:max-w-md bg-white text-neo-black dark:bg-slate-800 dark:text-white border-cyan-500/30">
       <DialogHeader>
         <DialogTitle className="text-center text-cyan-600 dark:text-cyan-300 flex items-center justify-center gap-2">
           <FaQrcode />
@@ -144,7 +144,7 @@ export const ValidationModal: React.FC<ValidationModalProps> = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl max-h-[85vh] flex flex-col bg-slate-900 border-cyan-500/40">
+      <DialogContent className="max-w-2xl max-h-[85vh] flex flex-col bg-slate-900 text-white border-cyan-500/40">
         <DialogHeader className="flex-shrink-0 pb-2">
           <DialogTitle className="text-center text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-400">
             {t('hostView.validation')}
@@ -229,6 +229,11 @@ interface TournamentData {
   standings?: TournamentStanding[];
 }
 
+interface PlayersReadyData {
+  readyCount: number;
+  totalPlayers: number;
+}
+
 interface FinalScoresModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -239,6 +244,7 @@ interface FinalScoresModalProps {
   onStartNewGame: () => void;
   onNextRound: () => void;
   socket: Socket | null;
+  playersReady?: PlayersReadyData | null;
 }
 
 export const FinalScoresModal: React.FC<FinalScoresModalProps> = ({
@@ -251,6 +257,7 @@ export const FinalScoresModal: React.FC<FinalScoresModalProps> = ({
   onStartNewGame,
   onNextRound,
   socket,
+  playersReady,
 }): React.ReactElement => {
   const handleClose = useCallback(() => {
     onOpenChange(false);
@@ -339,6 +346,17 @@ export const FinalScoresModal: React.FC<FinalScoresModalProps> = ({
           </div>
         )}
       </div>
+
+      {/* Players Ready Indicator */}
+      {playersReady && playersReady.totalPlayers > 0 && (
+        <div className="flex items-center justify-center gap-2 py-3 px-4 bg-gradient-to-r from-emerald-500/10 to-teal-500/10 dark:from-emerald-500/20 dark:to-teal-500/20 rounded-lg border border-emerald-500/30">
+          <span className="text-2xl">✅</span>
+          <span className="font-bold text-emerald-700 dark:text-emerald-300">
+            {playersReady.readyCount}/{playersReady.totalPlayers} {t('hostView.playersReadyForNextGame') || 'players ready for next game'}
+          </span>
+        </div>
+      )}
+
       <DialogFooter className="flex-col sm:flex-row gap-2">
         {tournamentData && !tournamentData.isComplete && (
           <Button
@@ -381,7 +399,7 @@ export const ExitConfirmDialog: React.FC<ExitConfirmDialogProps> = ({
   t
 }): React.ReactElement => (
   <AlertDialog open={open} onOpenChange={onOpenChange}>
-    <AlertDialogContent className="bg-white dark:bg-slate-800 border-red-500/30">
+    <AlertDialogContent className="bg-white text-neo-black dark:bg-slate-800 dark:text-white border-red-500/30">
       <AlertDialogHeader>
         <AlertDialogTitle className="text-slate-900 dark:text-white">
           {t('hostView.confirmExit')}
@@ -421,7 +439,7 @@ export const CancelTournamentDialog: React.FC<CancelTournamentDialogProps> = ({
   t
 }): React.ReactElement => (
   <AlertDialog open={open} onOpenChange={onOpenChange}>
-    <AlertDialogContent className="bg-white dark:bg-slate-800 border-red-500/30">
+    <AlertDialogContent className="bg-white text-neo-black dark:bg-slate-800 dark:text-white border-red-500/30">
       <AlertDialogHeader>
         <AlertDialogTitle className="text-slate-900 dark:text-white">
           {t('hostView.confirmCancelTournament') || 'Cancel Tournament?'}

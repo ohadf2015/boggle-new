@@ -17,13 +17,17 @@ import {
 } from '../utils/onboardingStorage';
 import { AVATARS } from '../utils/avatarConfig';
 
-// Step components (will be created)
+// Step components - Streamlined 3-step onboarding
 import WelcomeDemoStep from './onboarding/WelcomeDemoStep';
-import ComboStep from './onboarding/ComboStep';
-import SpecialRoundsStep from './onboarding/SpecialRoundsStep';
-import AvatarStep from './onboarding/AvatarStep';
-import NameStep from './onboarding/NameStep';
-import ModeSelectionStep from './onboarding/ModeSelectionStep';
+import ProfileSetupStep from './onboarding/ProfileSetupStep';
+import QuickTipsStep from './onboarding/QuickTipsStep';
+
+// Legacy components (kept for reference, no longer used in main flow)
+// import ComboStep from './onboarding/ComboStep';
+// import SpecialRoundsStep from './onboarding/SpecialRoundsStep';
+// import AvatarStep from './onboarding/AvatarStep';
+// import NameStep from './onboarding/NameStep';
+// import ModeSelectionStep from './onboarding/ModeSelectionStep';
 
 interface OnboardingModalProps {
   isOpen: boolean;
@@ -36,7 +40,7 @@ interface FormData {
   selectedMode: 'single' | 'multi' | 'daily' | null;
 }
 
-const TOTAL_STEPS = 6;
+const TOTAL_STEPS = 3;
 
 /**
  * OnboardingModal - Interactive multi-step onboarding for new players
@@ -98,8 +102,8 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({ isOpen, onClose }) =>
       return;
     }
 
-    if (currentStep === 4 && !formData.displayName.trim()) {
-      // Name is required
+    if (currentStep === 1 && !formData.displayName.trim()) {
+      // Name is required in profile step
       return;
     }
 
@@ -141,6 +145,7 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({ isOpen, onClose }) =>
   const renderStep = () => {
     switch (currentStep) {
       case 0:
+        // Step 1: Interactive demo - learn the basics
         return (
           <WelcomeDemoStep
             onDemoComplete={() => setDemoCompleted(true)}
@@ -148,30 +153,23 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({ isOpen, onClose }) =>
           />
         );
       case 1:
-        return <ComboStep />;
-      case 2:
-        return <SpecialRoundsStep />;
-      case 3:
+        // Step 2: Profile setup - avatar + name combined
         return (
-          <AvatarStep
+          <ProfileSetupStep
             selectedAvatarId={formData.avatarId}
+            displayName={formData.displayName}
             onAvatarSelect={(avatarId) =>
               setFormData((prev) => ({ ...prev, avatarId }))
             }
-          />
-        );
-      case 4:
-        return (
-          <NameStep
-            name={formData.displayName}
             onNameChange={(name) =>
               setFormData((prev) => ({ ...prev, displayName: name }))
             }
           />
         );
-      case 5:
+      case 2:
+        // Step 3: Quick tips + mode selection
         return (
-          <ModeSelectionStep
+          <QuickTipsStep
             selectedMode={formData.selectedMode}
             onModeSelect={(mode) =>
               setFormData((prev) => ({ ...prev, selectedMode: mode }))
@@ -185,8 +183,8 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({ isOpen, onClose }) =>
 
   const canAdvance = () => {
     if (currentStep === 0 && !demoCompleted) return false;
-    if (currentStep === 4 && !formData.displayName.trim()) return false;
-    if (currentStep === 5 && !formData.selectedMode) return false;
+    if (currentStep === 1 && !formData.displayName.trim()) return false;
+    if (currentStep === 2 && !formData.selectedMode) return false;
     return true;
   };
 

@@ -4,9 +4,11 @@
  * to prevent blocking the main event loop
  */
 
-const { parentPort, workerData } = require('worker_threads');
+const { parentPort } = require('worker_threads');
 
-// Normalize Hebrew letters - convert final forms to regular forms
+/**
+ * Normalize Hebrew letters - convert final forms to regular forms
+ */
 function normalizeHebrewLetter(letter) {
   const finalToRegular = {
     'ץ': 'צ',
@@ -18,12 +20,16 @@ function normalizeHebrewLetter(letter) {
   return finalToRegular[letter] || letter;
 }
 
-// Normalize an entire Hebrew word
+/**
+ * Normalize an entire Hebrew word
+ */
 function normalizeHebrewWord(word) {
   return word.split('').map(normalizeHebrewLetter).join('');
 }
 
-// Helper function to search for word using DFS with all 8 adjacent directions
+/**
+ * Helper function to search for word using DFS with all 8 adjacent directions
+ */
 function searchWord(board, word, row, col, index, visited) {
   if (index === word.length) return true;
 
@@ -55,7 +61,9 @@ function searchWord(board, word, row, col, index, visited) {
   return false;
 }
 
-// Helper function to search for word and return the path
+/**
+ * Helper function to search for word and return the path
+ */
 function searchWordPath(board, word, row, col, index, visited, path) {
   if (index === word.length) return [...path];
 
@@ -89,7 +97,9 @@ function searchWordPath(board, word, row, col, index, visited, path) {
   return null;
 }
 
-// Build positions map for the board
+/**
+ * Build positions map for the board
+ */
 function makePositionsMap(board) {
   const positions = new Map();
   if (!board || board.length === 0) return positions;
@@ -103,7 +113,9 @@ function makePositionsMap(board) {
   return positions;
 }
 
-// Check if a word exists on the board
+/**
+ * Check if a word exists on the board
+ */
 function isWordOnBoard(word, board, positionsMap) {
   if (!word || !board || board.length === 0) return false;
 
@@ -120,7 +132,9 @@ function isWordOnBoard(word, board, positionsMap) {
   return false;
 }
 
-// Get the path of cells used to form a word on the board
+/**
+ * Get the path of cells used to form a word on the board
+ */
 function getWordPath(word, board, positionsMap) {
   if (!word || !board || board.length === 0) return null;
 
@@ -143,7 +157,7 @@ if (parentPort) {
 
     try {
       let result;
-      const positionsMap = positions ? new Map(positions) : makePositionsMap(board);
+      const positionsMap = positions ? new Map(positions) : (board ? makePositionsMap(board) : undefined);
 
       switch (action) {
         case 'isWordOnBoard':
@@ -161,12 +175,13 @@ if (parentPort) {
 
       parentPort.postMessage({ id, success: true, result });
     } catch (error) {
-      parentPort.postMessage({ id, success: false, error: error.message });
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      parentPort.postMessage({ id, success: false, error: errorMessage });
     }
   });
 }
 
-// Export for testing
+// CommonJS exports for testing
 module.exports = {
   isWordOnBoard,
   getWordPath,

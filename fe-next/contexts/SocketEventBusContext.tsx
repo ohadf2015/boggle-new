@@ -20,7 +20,7 @@
 
 'use client';
 
-import React, { createContext, useContext, useEffect, useRef, ReactNode, useCallback } from 'react';
+import React, { createContext, useContext, useEffect, useRef, ReactNode, useCallback, useMemo } from 'react';
 
 // ==========================================
 // Event Emitter Implementation
@@ -153,11 +153,12 @@ export function SocketEventBusProvider({ children }: SocketEventBusProviderProps
     return eventBusRef.current!.on(eventName, handler);
   }, []);
 
-  const value: SocketEventBusContextValue = {
-    eventBus: eventBusRef.current,
+  // Memoize context value to prevent unnecessary re-renders of all consumers
+  const value = useMemo<SocketEventBusContextValue>(() => ({
+    eventBus: eventBusRef.current!,
     emit,
     on,
-  };
+  }), [emit, on]);
 
   return (
     <SocketEventBusContext.Provider value={value}>

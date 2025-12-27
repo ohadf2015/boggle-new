@@ -24,6 +24,10 @@ import {
   fetchRandomPlayerName,
   fetchRandomGenericAvatar,
   isRefreshTokenError,
+  isNetworkError,
+  isRecoverableError,
+  getAuthErrorMessage,
+  type SupabaseAuthError,
 } from './auth';
 
 // Re-export types for consumers
@@ -190,11 +194,11 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       }
 
       // Get initial session with timeout to prevent slow connections from blocking UI
+      // With middleware handling session refresh, this is mainly for initial state
       try {
-        // Wrap getSession with a 2 second timeout for fast failure on slow connections
         const sessionPromise = supabase.auth.getSession();
-        const timeoutPromise = new Promise<{ data: { session: null }; error: { message: string } }>((_, reject) =>
-          setTimeout(() => reject(new Error('Session fetch timeout')), 2000)
+        const timeoutPromise = new Promise<{ data: { session: null }; error: SupabaseAuthError }>((_, reject) =>
+          setTimeout(() => reject({ code: 'TIMEOUT', message: 'Session fetch timeout' }), 2000)
         );
 
         const { data: { session }, error } = await Promise.race([sessionPromise, timeoutPromise]);
@@ -203,9 +207,15 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         if (error) {
           if (isRefreshTokenError(error)) {
             await clearAuthState('Invalid or expired refresh token');
+          } else if (isRecoverableError(error)) {
+            // Network errors - don't sign out, just log and continue
+            logger.warn('Recoverable auth error:', getAuthErrorMessage(error));
           } else {
-            logger.warn('Session error, signing out:', error.message);
-            await supabase.auth.signOut();
+            logger.warn('Session error:', getAuthErrorMessage(error));
+            // Only sign out on non-recoverable errors
+            if (!isNetworkError(error)) {
+              await supabase.auth.signOut();
+            }
           }
         } else if (session?.user) {
           setUser(session.user);
@@ -216,13 +226,15 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         }
       } catch (err) {
         if (!isMounted) return;
-        const error = err as { code?: string; message?: string };
-        if (error.message === 'Session fetch timeout') {
+        const error = err as SupabaseAuthError;
+        if (error.message === 'Session fetch timeout' || error.code === 'TIMEOUT') {
           logger.warn('Auth session fetch timed out - continuing without blocking');
         } else if (isRefreshTokenError(error)) {
           await clearAuthState('Invalid or expired refresh token');
+        } else if (isRecoverableError(error)) {
+          logger.warn('Recoverable auth error during init:', getAuthErrorMessage(error));
         } else {
-          logger.warn('Failed to get session:', error.message);
+          logger.warn('Failed to get session:', getAuthErrorMessage(error));
         }
       }
 
@@ -289,9 +301,14 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     };
 
     // Listen for auth errors from API calls
-    const handleAuthError = (event: CustomEvent<{ code?: string; message?: string }>) => {
-      if (isRefreshTokenError(event.detail)) {
-        clearAuthState('Auth error: ' + event.detail.message);
+    const handleAuthError = (event: CustomEvent<SupabaseAuthError>) => {
+      const error = event.detail;
+      if (isRefreshTokenError(error)) {
+        clearAuthState('Auth error: ' + getAuthErrorMessage(error));
+      } else if (isRecoverableError(error)) {
+        logger.warn('Recoverable auth error:', getAuthErrorMessage(error));
+      } else {
+        logger.error('Auth error:', getAuthErrorMessage(error));
       }
     };
     window.addEventListener('supabase-auth-error', handleAuthError as EventListener);

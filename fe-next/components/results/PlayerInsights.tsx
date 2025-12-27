@@ -309,7 +309,7 @@ const PlayerInsights: React.FC<PlayerInsightsProps> = ({ insights }) => {
               </h3>
               <Sparkles className="w-4 h-4 text-neo-yellow ml-auto" />
             </div>
-            <p className="text-sm font-bold text-neo-cream/90 leading-relaxed">
+            <p className="text-sm font-bold text-neo-cream leading-relaxed">
               {playerStory.story}
             </p>
           </div>
@@ -392,19 +392,19 @@ const PlayerInsights: React.FC<PlayerInsightsProps> = ({ insights }) => {
           {/* Speed breakdown */}
           <div className="flex gap-1 text-[10px] font-bold text-gray-800">
             <span
-              className="px-1.5 py-0.5 rounded border border-gray-400 bg-neo-lime/50"
+              className="px-1.5 py-0.5 rounded border border-gray-400 bg-neo-lime/50 text-neo-black"
               title={t('insights.early') || 'Early'}
             >
               {t('insights.early') || 'E'}: {insights.earlyGameWords}
             </span>
             <span
-              className="px-1.5 py-0.5 rounded border border-gray-400 bg-neo-cyan/50"
+              className="px-1.5 py-0.5 rounded border border-gray-400 bg-neo-cyan/50 text-neo-black"
               title={t('insights.mid') || 'Mid'}
             >
               {t('insights.mid') || 'M'}: {insights.midGameWords}
             </span>
             <span
-              className="px-1.5 py-0.5 rounded border border-gray-400 bg-neo-orange/50"
+              className="px-1.5 py-0.5 rounded border border-gray-400 bg-neo-orange/50 text-neo-black"
               title={t('insights.late') || 'Late'}
             >
               {t('insights.late') || 'L'}: {insights.lateGameWords}
@@ -419,7 +419,7 @@ const PlayerInsights: React.FC<PlayerInsightsProps> = ({ insights }) => {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.5 }}
-          className="mt-1.5 text-[10px] font-bold text-foreground/80 text-center"
+          className="mt-1.5 text-[10px] font-bold text-foreground/90 text-center"
         >
           {t('insights.accuracy') || 'Accuracy'}: {insights.accuracy}%
         </motion.div>

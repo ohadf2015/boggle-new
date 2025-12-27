@@ -27,7 +27,7 @@ export const MobileWordStats = memo<MobileWordStatsProps>(({
   onOpenChat,
 }) => {
   return (
-    <div className="lg:hidden bg-neo-cream border-4 border-neo-black rounded-neo shadow-hard flex items-center justify-between px-3 py-2">
+    <div className="lg:hidden bg-neo-cream text-neo-black border-4 border-neo-black rounded-neo shadow-hard flex items-center justify-between px-3 py-2">
       {/* Word count - tap to open words drawer */}
       <button
         onClick={onOpenWords}
@@ -42,7 +42,7 @@ export const MobileWordStats = memo<MobileWordStatsProps>(({
       {/* Rank - tap to open leaderboard drawer */}
       <button
         onClick={onOpenLeaderboard}
-        className="flex items-center gap-2 px-3 py-1.5 bg-neo-purple rounded-neo border-2 border-neo-black shadow-hard-sm hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-hard transition-all"
+        className="flex items-center gap-2 px-3 py-1.5 bg-neo-purple text-white rounded-neo border-2 border-neo-black shadow-hard-sm hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-hard transition-all"
       >
         <FaTrophy className="text-neo-yellow" />
         <span className="font-black text-neo-cream">
@@ -53,7 +53,7 @@ export const MobileWordStats = memo<MobileWordStatsProps>(({
       {/* Chat button */}
       <button
         onClick={onOpenChat}
-        className="flex items-center gap-2 px-3 py-1.5 bg-neo-gray rounded-neo border-2 border-neo-black shadow-hard-sm hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-hard transition-all"
+        className="flex items-center gap-2 px-3 py-1.5 bg-neo-gray text-white rounded-neo border-2 border-neo-black shadow-hard-sm hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-hard transition-all"
       >
         <FaComments className="text-neo-cyan" />
       </button>

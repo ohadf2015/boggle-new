@@ -413,8 +413,8 @@ const DailyReadyScreen: React.FC<DailyReadyScreenProps> = ({
           transition={{ delay: 0.4 }}
           className="grid grid-cols-2 gap-3"
         >
-          <div className="bg-white dark:bg-neo-navy-light rounded-neo border-3 border-neo-black dark:border-white/20 p-4 shadow-hard-sm">
-            <Timer className="w-6 h-6 mx-auto mb-2 text-neo-cyan" />
+          <div className="bg-white text-neo-black dark:bg-neo-navy-light dark:text-white rounded-neo border-3 border-neo-black dark:border-white/20 p-4 shadow-hard-sm">
+            <Timer className="w-6 h-6 mx-auto mb-2 text-cyan-600 dark:text-neo-cyan" />
             <div className="text-2xl font-black text-neo-black dark:text-white">
               {Math.floor(DAILY_CHALLENGE_DURATION / 60)}:{(DAILY_CHALLENGE_DURATION % 60).toString().padStart(2, '0')}
             </div>
@@ -423,8 +423,8 @@ const DailyReadyScreen: React.FC<DailyReadyScreenProps> = ({
             </div>
           </div>
 
-          <div className="bg-white dark:bg-neo-navy-light rounded-neo border-3 border-neo-black dark:border-white/20 p-4 shadow-hard-sm">
-            <Trophy className="w-6 h-6 mx-auto mb-2 text-neo-yellow" />
+          <div className="bg-white text-neo-black dark:bg-neo-navy-light dark:text-white rounded-neo border-3 border-neo-black dark:border-white/20 p-4 shadow-hard-sm">
+            <Trophy className="w-6 h-6 mx-auto mb-2 text-amber-500 dark:text-neo-yellow" />
             <div className="text-2xl font-black text-neo-black dark:text-white">
               1
             </div>

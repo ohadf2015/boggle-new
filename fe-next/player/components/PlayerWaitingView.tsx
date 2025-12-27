@@ -154,10 +154,10 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
               transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
               className="bg-neo-yellow border-4 border-neo-black shadow-hard p-4 rotate-[2deg]"
             >
-              <div className="relative w-16 h-20 flex flex-col items-center">
-                <div className="w-0 h-0 border-l-[28px] border-r-[28px] border-t-[32px] border-l-transparent border-r-transparent border-t-neo-black" />
-                <div className="w-2 h-1 bg-neo-black -my-[2px] z-10" />
-                <div className="w-0 h-0 border-l-[28px] border-r-[28px] border-b-[32px] border-l-transparent border-r-transparent border-b-neo-black" />
+              <div className="relative w-12 h-16 flex flex-col items-center">
+                <div className="w-0 h-0 border-l-[20px] border-r-[20px] border-t-[24px] border-l-transparent border-r-transparent border-t-neo-black" />
+                <div className="w-1.5 h-0.5 bg-neo-black -my-[1px] z-10" />
+                <div className="w-0 h-0 border-l-[20px] border-r-[20px] border-b-[24px] border-l-transparent border-r-transparent border-b-neo-black" />
                 <motion.div
                   animate={{ y: [0, 24, 0], opacity: [1, 1, 0] }}
                   transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
@@ -280,7 +280,7 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
 
       {/* QR Code Dialog */}
       <Dialog open={showQR} onOpenChange={setShowQR}>
-        <DialogContent className="sm:max-w-md bg-neo-cream border-4 border-neo-black shadow-hard">
+        <DialogContent className="sm:max-w-md bg-neo-cream text-neo-black border-4 border-neo-black shadow-hard">
           <DialogHeader>
             <DialogTitle className="text-center text-neo-black flex items-center justify-center gap-2 font-black">
               <FaQrcode />
@@ -288,7 +288,7 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
             </DialogTitle>
           </DialogHeader>
           <div className="flex flex-col items-center gap-4 py-4">
-            <div className="p-6 bg-white rounded-neo shadow-hard border-3 border-neo-black">
+            <div className="p-6 bg-white text-neo-black rounded-neo shadow-hard border-3 border-neo-black">
               <QRCodeSVG value={getJoinUrl(gameCode)} size={250} level="H" includeMargin />
             </div>
             <h4 className="text-3xl font-black text-neo-black">{gameCode}</h4>
@@ -312,7 +312,7 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
 
       {/* Exit Confirmation Dialog */}
       <AlertDialog open={showExitConfirm} onOpenChange={setShowExitConfirm}>
-        <AlertDialogContent className="bg-neo-cream border-4 border-neo-black shadow-hard">
+        <AlertDialogContent className="bg-neo-cream text-neo-black border-4 border-neo-black shadow-hard">
           <AlertDialogHeader>
             <AlertDialogTitle className="text-neo-black font-black">
               {t('playerView.exitConfirmation')}

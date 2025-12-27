@@ -137,9 +137,9 @@ const JoinRoomForm: React.FC<JoinRoomFormProps> = ({
             </h1>
             {/* Progress indicator */}
             <div className="flex items-center justify-center gap-2 mt-2">
-              <div className="w-3 h-3 rounded-full bg-neo-cyan border-2 border-neo-black" />
-              <div className="w-3 h-3 rounded-full bg-neo-cyan border-2 border-neo-black" />
-              <span className="text-xs text-neo-black/50 dark:text-neo-cream/50 ms-2">
+              <div className="w-3 h-3 rounded-full bg-neo-cyan text-neo-black border-2 border-neo-black" />
+              <div className="w-3 h-3 rounded-full bg-neo-cyan text-neo-black border-2 border-neo-black" />
+              <span className="text-xs text-neo-black/60 dark:text-slate-400 ms-2">
                 {t('multiplayerFlow.joinForm.progress') || 'Step 2 of 2'}
               </span>
             </div>
@@ -162,7 +162,7 @@ const JoinRoomForm: React.FC<JoinRoomFormProps> = ({
                     <Label className="text-sm font-bold uppercase text-slate-600 dark:text-slate-400">
                       {t('multiplayerFlow.joinForm.profileLabel') || 'Your Profile'}
                     </Label>
-                    <div className="flex items-center gap-3 p-3 rounded-neo bg-neo-cyan/10 dark:bg-neo-cyan/5 border-2 border-neo-cyan/30">
+                    <div className="flex items-center gap-3 p-3 rounded-neo bg-neo-cyan/10 dark:bg-neo-cyan/5 text-neo-black dark:text-white border-2 border-neo-cyan/30">
                       <Avatar
                         avatarImage={profile.avatarId}
                         size="lg"
@@ -221,7 +221,7 @@ const JoinRoomForm: React.FC<JoinRoomFormProps> = ({
                         </Tooltip>
                       </TooltipProvider>
                     </div>
-                    <p id="game-code-hint" className="text-xs text-neo-black/50 dark:text-neo-cream/50">
+                    <p id="game-code-hint" className="text-xs text-neo-black/60 dark:text-slate-400">
                       {t('multiplayerFlow.joinForm.codeHint') || 'Ask your friend for their room code'}
                     </p>
                     {showGameCodeError && (
@@ -279,7 +279,7 @@ const JoinRoomForm: React.FC<JoinRoomFormProps> = ({
                           ))}
                         </div>
                       ) : (
-                        <div className="p-4 text-center text-sm text-neo-black/50 dark:text-neo-cream/50">
+                        <div className="p-4 text-center text-sm text-neo-black/60 dark:text-slate-400">
                           {t('multiplayerFlow.joinForm.noRooms') || 'No active rooms. Ask a friend for their room code!'}
                         </div>
                       )}

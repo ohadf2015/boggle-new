@@ -224,7 +224,7 @@ const WordFeedbackModal = memo<WordFeedbackModalProps>(({
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="absolute inset-0 bg-neo-black/60"
+          className="absolute inset-0 bg-neo-black/60 text-white"
           onClick={onSkip}
         />
 
@@ -250,7 +250,7 @@ const WordFeedbackModal = memo<WordFeedbackModalProps>(({
         >
           {/* Header - Dictionary Building Focus */}
           <div className="
-            bg-neo-purple
+            bg-neo-purple text-white
             border-b-4 border-neo-black
             px-4 py-3
             flex items-center justify-between
@@ -339,7 +339,7 @@ const WordFeedbackModal = memo<WordFeedbackModalProps>(({
               {/* Vote Progress Bar - Shows how close word is to being approved */}
               {wordVoteInfo && (
                 <div className="mt-4 space-y-1">
-                  <div className="h-2 bg-neo-black/20 rounded-full overflow-hidden">
+                  <div className="h-2 bg-neo-black/20 text-white rounded-full overflow-hidden">
                     <motion.div
                       className={`h-full ${isValidForScoring ? 'bg-neo-cyan' : 'bg-neo-lime'}`}
                       initial={{ width: 0 }}

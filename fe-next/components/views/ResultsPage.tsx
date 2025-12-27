@@ -1,9 +1,9 @@
 'use client';
 
-import React, { useMemo, useEffect, useState, useCallback, useRef } from 'react';
+import React, { useMemo, useEffect, useState, useCallback, useRef, useDeferredValue, useTransition } from 'react';
 import dynamic from 'next/dynamic';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FaTrophy, FaStar, FaFire, FaChartBar, FaDoorOpen } from 'react-icons/fa';
+import { FaTrophy, FaStar, FaDoorOpen } from 'react-icons/fa';
 import ExitRoomButton from '@/components/ExitRoomButton';
 import confetti from 'canvas-confetti';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -15,85 +15,28 @@ import { useWinStreak } from '@/hooks/useWinStreak';
 import { trackGameCompletion, trackStreakMilestone } from '@/utils/growthTracking';
 import logger from '@/utils/logger';
 import { levelUpToast } from '@/components/NeoToast';
-import { getWordPath } from '@/utils/wordPath';
-import type { ResultsPageProps, HeatMapData, WordToVote, XpGainedData, LevelUpData } from '@/types/components';
-import type { LetterGrid as LetterGridType } from '@/shared/types/game';
+import { calculateAllPlayerArchetypes, getMissedWords, type PlayerArchetype } from '@/utils/playerArchetypes';
+import type { ResultsPageProps, WordToVote, XpGainedData, LevelUpData } from '@/types/components';
 import { useMobileLandscape } from '@/hooks/useMobileLandscape';
-import GridComponent from '@/components/GridComponent';
 
 // Dynamic imports for heavy components (loaded after initial render)
 const ResultsPlayerCard = dynamic(() => import('@/components/results/ResultsPlayerCard'), { ssr: false });
 const ResultsWinnerBanner = dynamic(() => import('@/components/results/ResultsWinnerBanner'), { ssr: false });
+const ConsolidatedPlayerCard = dynamic(() => import('@/components/results/ConsolidatedPlayerCard'), { ssr: false });
+const Top3Leaderboard = dynamic(() => import('@/components/results/Top3Leaderboard'), { ssr: false });
 const AuthModal = dynamic(() => import('@/components/auth/AuthModal'), { ssr: false });
 const FirstWinSignupModal = dynamic(() => import('@/components/auth/FirstWinSignupModal'), { ssr: false });
 const ShareWinPrompt = dynamic(() => import('@/components/results/ShareWinPrompt'), { ssr: false });
 const WinStreakDisplay = dynamic(() => import('@/components/results/WinStreakDisplay'), { ssr: false });
 const WordFeedbackModal = dynamic(() => import('@/components/voting/WordFeedbackModal'), { ssr: false });
+const MissedWords = dynamic(() => import('@/components/results/MissedWords'), { ssr: false });
+const PlayersReadyIndicator = dynamic(() => import('@/components/results/PlayersReadyIndicator'), { ssr: false });
 const AutoRejoinTimer = dynamic(() => import('@/components/results/AutoRejoinTimer'), { ssr: false });
+import CollapsibleSection from '@/components/ui/CollapsibleSection';
+import { Users } from 'lucide-react';
 
-interface LetterGridProps {
-  letterGrid: LetterGridType | null;
-  heatMapData: HeatMapData | null;
-  showHeatmap: boolean;
-  onToggleHeatmap: () => void;
-}
 
-// Memoize LetterGrid to prevent re-renders when parent updates
-const LetterGrid = React.memo<LetterGridProps>(({ letterGrid, heatMapData, showHeatmap, onToggleHeatmap }) => {
-  const { t } = useLanguage();
-  return (
-    <div className="w-full">
-      {/* Heatmap Toggle Button - Always visible */}
-      {heatMapData && heatMapData.maxCount > 0 && (
-        <motion.button
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.3, duration: 0.3 }}
-          onClick={onToggleHeatmap}
-          className={`mb-3 mx-auto flex items-center gap-2 px-4 py-2 rounded-neo border-3 border-neo-black font-bold text-sm uppercase transition-all shadow-hard-sm hover:shadow-hard hover:translate-x-[-1px] hover:translate-y-[-1px] active:translate-x-[1px] active:translate-y-[1px] active:shadow-hard-pressed ${
-            showHeatmap
-              ? 'bg-neo-orange text-neo-black'
-              : 'bg-neo-cream text-neo-black'
-          }`}
-        >
-          <FaFire className={`text-lg ${showHeatmap ? 'text-neo-red' : 'text-neo-black/75'}`} />
-          <span>{showHeatmap ? (t('results.hideHeatmap') || 'Hide Heatmap') : (t('results.showHeatmap') || 'Show Heatmap')}</span>
-          <FaChartBar className={`text-lg ${showHeatmap ? 'text-neo-black' : 'text-neo-black/75'}`} />
-        </motion.button>
-      )}
-
-      {/* Grid - Only shown when heatmap is enabled */}
-      <AnimatePresence>
-        {showHeatmap && (
-          <motion.div
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: 'auto', opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.3, ease: 'easeInOut' }}
-            className="overflow-hidden"
-          >
-            <div className="w-full max-w-full mx-auto p-2 sm:p-3 rounded-xl bg-gradient-to-br from-slate-800/40 to-slate-900/40 dark:from-slate-800/40 dark:to-slate-900/40 border-2 border-cyan-500/50 shadow-[0_4px_24px_rgba(6,182,212,0.3)] relative overflow-hidden">
-              {/* Glass glare effect */}
-              <div className="absolute inset-0 bg-gradient-to-br from-white/20 via-transparent to-transparent pointer-events-none" />
-              {letterGrid && (
-              <GridComponent
-                grid={letterGrid}
-                interactive={false}
-                className="w-full relative z-10"
-                heatMapData={heatMapData}
-              />
-            )}
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </div>
-  );
-});
-
-LetterGrid.displayName = 'LetterGrid';
-
-const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, letterGrid, gameCode, onReturnToRoom, username, socket, achievements, duplicateRuleDisabled, playerCount }) => {
+const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onReturnToRoom, username, socket, achievements, duplicateRuleDisabled, playerCount }) => {
   const { t } = useLanguage();
   const { isAuthenticated } = useAuth();
   const isLandscape = useMobileLandscape();
@@ -101,7 +44,6 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, letterGrid, game
   const [showAuthModal, setShowAuthModal] = useState<boolean>(false);
   const [showFirstWinModal, setShowFirstWinModal] = useState<boolean>(false);
   const [hasShownUpgradePrompt, setHasShownUpgradePrompt] = useState<boolean>(false);
-  const [showHeatmap, setShowHeatmap] = useState<boolean>(false);
 
   // Use refs for values that don't need to trigger re-renders
   const hasUpdatedStatsRef = useRef<boolean>(false);
@@ -121,6 +63,13 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, letterGrid, game
   // Auto-rejoin timer state
   const [autoRejoinDismissed, setAutoRejoinDismissed] = useState<boolean>(false);
 
+  // Track which players are ready for next game (received from socket)
+  const [readyUsernames, setReadyUsernames] = useState<string[]>([]);
+
+  // State for sticky action bar visibility (must be declared before any conditional returns)
+  const [showStickyActions, setShowStickyActions] = useState<boolean>(true);
+  const playAgainSectionRef = useRef<HTMLDivElement>(null);
+
   // Win streak tracking
   const { currentStreak, bestStreak, recordWin } = useWinStreak();
 
@@ -131,6 +80,26 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, letterGrid, game
 
   const winner = sortedScores[0];
   const isCurrentUserWinner = winner?.username === username;
+
+  // Calculate current player's rank (1-based: 1st, 2nd, 3rd, etc.)
+  const currentPlayerRank = useMemo(() => {
+    if (!username || sortedScores.length === 0) return -1;
+    const index = sortedScores.findIndex(p => p.username === username);
+    return index >= 0 ? index + 1 : -1;
+  }, [sortedScores, username]);
+
+  // Always show the current player in the celebration banner
+  // This ensures personalized feedback regardless of rank
+  const bannerPlayer = useMemo(() => {
+    if (currentPlayerRank >= 1) {
+      return sortedScores[currentPlayerRank - 1];
+    }
+    return winner;
+  }, [currentPlayerRank, sortedScores, winner]);
+
+  // Use actual player rank for styling (1st=gold, 2nd=silver, 3rd=bronze, 4+=purple encouraging)
+  const bannerRank = currentPlayerRank >= 1 ? currentPlayerRank : 1;
+  const isCurrentUserInBanner = bannerPlayer?.username === username;
 
   // Get current player data for share prompt
   const currentPlayerData = useMemo(() => {
@@ -255,6 +224,9 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, letterGrid, game
     window.location.reload();
   };
 
+  // Defer expensive word mapping calculation
+  const deferredFinalScoresForWords = useDeferredValue(finalScores);
+  
   // Create a map of all player words for duplicate detection
   // Using 'any' here as the exact WordObject type varies between components
   const allPlayerWords = useMemo(() => {
@@ -271,8 +243,8 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, letterGrid, game
       invalidReason?: string;
       aiReason?: string;
     }>> = {};
-    if (finalScores) {
-      finalScores.forEach(player => {
+    if (deferredFinalScoresForWords) {
+      deferredFinalScoresForWords.forEach(player => {
         // Map allWords with required fields, defaulting isDuplicate to false
         wordMap[player.username] = (player.allWords || []).map(w => ({
           word: w.word,
@@ -293,49 +265,34 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, letterGrid, game
       });
     }
     return wordMap;
-  }, [finalScores]);
+  }, [deferredFinalScoresForWords]);
 
-  // Calculate heat map data from all valid words found
-  const heatMapData = useMemo(() => {
-    if (!finalScores || !letterGrid) return null;
+  // Use transition for non-urgent UI updates
+  const [isPending, startTransition] = useTransition();
 
-    const cellUsageCounts: Record<string, number> = {};
-    let maxCount = 0;
+  // Defer expensive archetype calculations - can be delayed without affecting UX
+  const deferredFinalScores = useDeferredValue(finalScores);
 
-    // Collect all unique valid words from all players
-    const processedWords = new Set();
-    finalScores.forEach(player => {
-      const words = player.allWords || [];
-      words.forEach(wordObj => {
-        // Only count validated words that scored points (not duplicates)
-        if (wordObj.validated && wordObj.score > 0 && !processedWords.has(wordObj.word)) {
-          processedWords.add(wordObj.word);
-          const path = getWordPath(wordObj.word, letterGrid);
-          if (path) {
-            path.forEach(({ row, col }) => {
-              const key = `${row},${col}`;
-              cellUsageCounts[key] = (cellUsageCounts[key] || 0) + 1;
-              maxCount = Math.max(maxCount, cellUsageCounts[key]);
-            });
-          }
-        }
-      });
-    });
+  // Calculate player archetypes for all players (deferred for better performance)
+  const playerArchetypes = useMemo(() => {
+    if (!deferredFinalScores || deferredFinalScores.length === 0) return new Map<string, PlayerArchetype>();
+    return calculateAllPlayerArchetypes(deferredFinalScores, 180); // Default 3 min game
+  }, [deferredFinalScores]);
 
-    return { cellUsageCounts, maxCount };
-  }, [finalScores, letterGrid]);
+  // Get current player's archetype
+  const currentPlayerArchetype = useMemo(() => {
+    if (!username) return null;
+    return playerArchetypes.get(username) || null;
+  }, [playerArchetypes, username]);
 
-  // Celebration effect when results load
-  useEffect(() => {
-    if (winner) {
-      // Single celebratory confetti burst
-      confetti({
-        particleCount: 100,
-        spread: 70,
-        origin: { y: 0.6 }
-      });
-    }
-  }, [winner]);
+  // Calculate missed words for current player (high-value words others found)
+  const missedWords = useMemo(() => {
+    if (!username || !allPlayerWords) return [];
+    return getMissedWords(username, allPlayerWords, 10);
+  }, [username, allPlayerWords]);
+
+
+  // Note: Confetti is now handled by ResultsWinnerBanner with rank-specific colors
 
 
   // Socket event listeners for word feedback (crowd-sourced word validation) and XP
@@ -420,6 +377,39 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, letterGrid, game
     };
   }, [socket, t]);
 
+  // Socket listener for players ready for next game updates
+  useEffect(() => {
+    if (!socket) return;
+
+    const handlePlayersReadyUpdate = (data: {
+      readyCount: number;
+      totalPlayers: number;
+      username?: string;
+      readyUsernames?: string[];
+    }) => {
+      logger.log('[RESULTS] Players ready update:', data);
+      // If we receive the full list of ready usernames, use it
+      if (data.readyUsernames) {
+        setReadyUsernames(data.readyUsernames);
+      } else if (data.username) {
+        // Otherwise, add the new ready username to the list
+        setReadyUsernames(prev => {
+          if (prev.includes(data.username!)) return prev;
+          return [...prev, data.username!];
+        });
+      }
+    };
+
+    socket.on('playersReadyUpdate', handlePlayersReadyUpdate);
+
+    // Request initial ready state
+    socket.emit('getPlayersReadyCount');
+
+    return () => {
+      socket.off('playersReadyUpdate', handlePlayersReadyUpdate);
+    };
+  }, [socket]);
+
   // Handle word feedback vote (supports multi-word queue from self-healing system)
   // Memoized to prevent recreation on every render
   const handleVote = useCallback((voteType: 'like' | 'dislike', votedWord?: string) => {
@@ -450,11 +440,26 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, letterGrid, game
     setWordQueue([]); // Clear the queue
   }, []);
 
+  // Hide sticky bar when play again section is visible (portrait mode only)
+  useEffect(() => {
+    if (!playAgainSectionRef.current) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setShowStickyActions(!entry.isIntersecting);
+      },
+      { threshold: 0.3 }
+    );
+
+    observer.observe(playAgainSectionRef.current);
+    return () => observer.disconnect();
+  }, []);
+
   // Landscape mode layout - 2-column: winner/grid left, player cards right
   if (isLandscape) {
     return (
-      <div className="flex h-screen w-full overflow-hidden bg-slate-900 p-2 gap-2">
-        {/* Left column: Winner + Grid */}
+      <div className="flex h-screen w-full overflow-hidden bg-slate-900 text-white p-2 gap-2">
+        {/* Left column: Winner Banner */}
         <div className="w-1/2 flex flex-col items-center justify-start gap-2 overflow-y-auto">
           {/* Exit button - compact */}
           <div className="w-full flex justify-end">
@@ -468,26 +473,18 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, letterGrid, game
             </div>
           )}
 
-          {/* Grid with heatmap toggle */}
-          {letterGrid && heatMapData && heatMapData.maxCount > 0 && (
-            <div className="w-full max-w-[60vh]">
-              <button
-                onClick={() => setShowHeatmap(prev => !prev)}
-                className={`mb-2 mx-auto flex items-center gap-1 px-3 py-1 rounded-neo border-2 border-neo-black font-bold text-xs uppercase ${
-                  showHeatmap ? 'bg-neo-orange text-neo-black' : 'bg-neo-cream text-neo-black'
-                }`}
-              >
-                <FaFire className={`text-sm ${showHeatmap ? 'text-neo-red' : 'text-neo-black/75'}`} />
-                <span>{showHeatmap ? 'Hide' : 'Show'} Heatmap</span>
-              </button>
-              {showHeatmap && (
-                <GridComponent
-                  grid={letterGrid}
-                  interactive={false}
-                  className="w-full"
-                  heatMapData={heatMapData}
-                />
-              )}
+          {/* Players Ready Indicator - Compact for landscape */}
+          {gameCode && sortedScores.length > 1 && (
+            <div className="w-full max-w-xs mt-4">
+              <PlayersReadyIndicator
+                players={sortedScores.map(p => ({
+                  username: p.username,
+                  avatar: p.avatar,
+                  isBot: p.isBot
+                }))}
+                readyUsernames={readyUsernames}
+                currentUsername={username}
+              />
             </div>
           )}
         </div>
@@ -513,6 +510,7 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, letterGrid, game
                 xpGainedData={player.username === username ? xpGainedData : null}
                 levelUpData={player.username === username ? levelUpData : null}
                 duplicateRuleDisabled={duplicateRuleDisabled}
+                archetype={playerArchetypes.get(player.username) || null}
               />
             ))}
           </div>
@@ -540,7 +538,7 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, letterGrid, game
 
         {/* Exit Confirmation Dialog */}
         <AlertDialog open={showExitConfirm} onOpenChange={setShowExitConfirm}>
-          <AlertDialogContent className="bg-white dark:bg-slate-800 border-red-500/30">
+          <AlertDialogContent className="bg-white text-neo-black dark:bg-slate-800 dark:text-white border-red-500/30">
             <AlertDialogHeader>
               <AlertDialogTitle>{t('playerView.exitConfirmation')}</AlertDialogTitle>
               <AlertDialogDescription>{t('results.exitWarning')}</AlertDialogDescription>
@@ -572,7 +570,7 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, letterGrid, game
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-50 via-slate-100 to-slate-200 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 flex flex-col overflow-auto transition-colors duration-300 px-1 py-3 sm:px-4 sm:py-4 md:p-8 relative">
+    <div className="min-h-screen bg-gradient-to-b from-slate-50 via-slate-100 to-slate-200 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 flex flex-col overflow-auto transition-colors duration-300 px-1 py-2 sm:px-4 sm:py-3 md:p-6 relative pb-16 lg:pb-6">
       {/* Neo-brutalist halftone dot pattern overlay */}
       <div
         className="fixed inset-0 pointer-events-none opacity-10 dark:opacity-[0.08]"
@@ -582,7 +580,7 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, letterGrid, game
         }}
       />
       {/* Top Bar with Exit Button */}
-      <div className="w-full max-w-4xl mx-auto flex justify-end mb-4">
+      <div className="w-full max-w-4xl mx-auto flex items-center justify-end mb-2">
         <ExitRoomButton onClick={handleExitRoom} label={t('results.exitRoom')} />
       </div>
 
@@ -590,49 +588,43 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, letterGrid, game
       <div className="flex-1 w-full">
         {/* Header Section - Centered */}
         <div className="max-w-4xl mx-auto">
-          {/* Winner Banner */}
-          {winner && <ResultsWinnerBanner winner={winner} isCurrentUserWinner={winner.username === username} />}
+          {/* Celebration Banner (shows current player if in top 3) */}
+          {bannerPlayer && <ResultsWinnerBanner winner={bannerPlayer} isCurrentUserWinner={isCurrentUserInBanner} rank={bannerRank} />}
 
-          {/* Letter Grid */}
-          {letterGrid && (
+          {/* Consolidated Player Card - Your Performance (always shows current player) */}
+          {currentPlayerData && currentPlayerRank > 0 && (
+            <ConsolidatedPlayerCard
+              player={currentPlayerData}
+              rank={currentPlayerRank}
+              totalPlayers={sortedScores.length}
+              winnerScore={winner?.score || 0}
+              allPlayerWords={allPlayerWords}
+              xpGainedData={xpGainedData}
+              levelUpData={levelUpData}
+              archetype={currentPlayerArchetype}
+              duplicateRuleDisabled={duplicateRuleDisabled}
+            />
+          )}
+
+          {/* Missed Words - Educational feedback on high-value words you missed (placed near your card) */}
+          {missedWords.length > 0 && (
             <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.1, duration: 0.3 }}
-              className="mb-6 px-0 sm:px-4"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2, duration: 0.3 }}
+              className="mt-2"
             >
-              <LetterGrid
-                letterGrid={letterGrid}
-                heatMapData={heatMapData}
-                showHeatmap={showHeatmap}
-                onToggleHeatmap={() => setShowHeatmap(prev => !prev)}
-              />
+              <MissedWords missedWords={missedWords} maxDisplay={5} />
             </motion.div>
           )}
 
-          {/* Final Scores Title */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.2, duration: 0.3 }}
-            className="flex items-center justify-center gap-3 mb-6"
-          >
-            <motion.div
-              animate={{ rotate: [0, -10, 10, 0], scale: [1, 1.1, 1] }}
-              transition={{ duration: 2, repeat: Infinity, repeatDelay: 2 }}
-            >
-              <FaTrophy className="text-2xl text-yellow-500 dark:text-yellow-400 drop-shadow-[0_0_10px_rgba(234,179,8,0.5)]" />
-            </motion.div>
-            <h2 className="text-2xl sm:text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 via-orange-400 to-yellow-500 dark:from-yellow-300 dark:via-orange-300 dark:to-yellow-400">
-              {t('results.finalScores')}
-            </h2>
-            <motion.div
-              animate={{ rotate: [0, 10, -10, 0], scale: [1, 1.1, 1] }}
-              transition={{ duration: 2, repeat: Infinity, repeatDelay: 2, delay: 0.5 }}
-            >
-              <FaTrophy className="text-2xl text-yellow-500 dark:text-yellow-400 drop-shadow-[0_0_10px_rgba(234,179,8,0.5)]" />
-            </motion.div>
-          </motion.div>
+          {/* Compact Top 3 Leaderboard */}
+          {sortedScores.length > 1 && (
+            <Top3Leaderboard
+              players={sortedScores}
+              currentUsername={username}
+            />
+          )}
 
           {/* Large Room Notice - Duplicate rule disabled */}
           {duplicateRuleDisabled && (
@@ -640,7 +632,7 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, letterGrid, game
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.3, duration: 0.3 }}
-              className="mb-4 mx-auto max-w-md"
+              className="mb-2 mx-auto max-w-md"
             >
               <div className="bg-neo-cyan border-3 border-neo-black rounded-neo p-3 shadow-hard text-center">
                 <div className="flex items-center justify-center gap-2">
@@ -659,25 +651,45 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, letterGrid, game
 
         </div>
 
-        {/* Player Results Cards */}
-        <div className="w-full max-w-2xl mx-auto px-2 sm:px-4 space-y-2">
-          {sortedScores.map((player, index) => (
-            <ResultsPlayerCard
-              key={player.username}
-              player={player}
-              index={index}
-              allPlayerWords={allPlayerWords}
-              currentUsername={username}
-              isWinner={index === 0}
-              xpGainedData={player.username === username ? xpGainedData : null}
-              levelUpData={player.username === username ? levelUpData : null}
-              duplicateRuleDisabled={duplicateRuleDisabled}
-            />
-          ))}
-        </div>
+        {/* Other Players Results - Collapsible Section */}
+        {sortedScores.filter(p => p.username !== username).length > 0 && (
+          <div className="w-full max-w-2xl mx-auto px-2 sm:px-4 mt-2">
+            <CollapsibleSection
+              title={t('results.otherPlayers') || 'Other Players'}
+              icon={<Users className="w-4 h-4" />}
+              badge={sortedScores.filter(p => p.username !== username).length}
+              defaultExpanded={false}
+              variant="tertiary"
+              className="shadow-hard"
+            >
+              <div className="space-y-2">
+                {sortedScores
+                  .filter(player => player.username !== username)
+                  .map((player, filteredIndex) => {
+                    // Find original index for proper ranking display
+                    const originalIndex = sortedScores.findIndex(p => p.username === player.username);
+                    return (
+                      <ResultsPlayerCard
+                        key={player.username}
+                        player={player}
+                        index={originalIndex}
+                        allPlayerWords={allPlayerWords}
+                        currentUsername={username}
+                        isWinner={originalIndex === 0}
+                        xpGainedData={null}
+                        levelUpData={null}
+                        duplicateRuleDisabled={duplicateRuleDisabled}
+                        archetype={playerArchetypes.get(player.username) || null}
+                      />
+                    );
+                  })}
+              </div>
+            </CollapsibleSection>
+          </div>
+        )}
 
         {/* Growth Features Section - Appears smoothly on scroll */}
-        <div className="w-full max-w-2xl mx-auto px-2 sm:px-4 mt-6 space-y-3">
+        <div className="w-full max-w-2xl mx-auto px-2 sm:px-4 mt-3 space-y-2">
           {/* Win Streak Display - Only show when NOT showing victory card (ShareWinPrompt already has streak badge) */}
           {isCurrentUserWinner && currentStreak > 0 && !(currentPlayerData && gameCode) && (
             <motion.div
@@ -720,16 +732,37 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, letterGrid, game
           )}
         </div>
 
+        {/* Players Ready Indicator - Shows who's ready for next round */}
+        {gameCode && sortedScores.length > 1 && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-30px" }}
+            transition={{ duration: 0.4, ease: "easeOut" }}
+            className="mt-4 max-w-2xl mx-auto px-2 sm:px-4"
+          >
+            <PlayersReadyIndicator
+              players={sortedScores.map(p => ({
+                username: p.username,
+                avatar: p.avatar,
+                isBot: p.isBot
+              }))}
+              readyUsernames={readyUsernames}
+              currentUsername={username}
+            />
+          </motion.div>
+        )}
+
         {/* Play Again Section - Neo-Brutalist */}
         {gameCode && onReturnToRoom && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.5 + sortedScores.length * 0.1, duration: 0.3 }}
-            className="mt-8 max-w-4xl mx-auto"
+            className="mt-4 max-w-4xl mx-auto"
             style={{ transform: 'rotate(1deg)' }}
           >
-            <div className="p-5 sm:p-6 bg-neo-cyan border-4 border-neo-black rounded-neo-lg shadow-hard-xl relative overflow-hidden texture-halftone-comic">
+            <div className="p-5 sm:p-6 bg-neo-cyan text-neo-black border-4 border-neo-black rounded-neo-lg shadow-hard-xl relative overflow-hidden texture-halftone-comic">
               {/* Comic-style halftone texture pattern */}
               <div
                 className="absolute inset-0 pointer-events-none opacity-[0.05]"
@@ -784,7 +817,7 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, letterGrid, game
 
       {/* Exit Confirmation Dialog */}
       <AlertDialog open={showExitConfirm} onOpenChange={setShowExitConfirm}>
-        <AlertDialogContent className="bg-white dark:bg-slate-800 border-red-500/30">
+        <AlertDialogContent className="bg-white text-neo-black dark:bg-slate-800 dark:text-white border-red-500/30">
           <AlertDialogHeader>
             <AlertDialogTitle className="text-slate-900 dark:text-white">
               {t('playerView.exitConfirmation')}

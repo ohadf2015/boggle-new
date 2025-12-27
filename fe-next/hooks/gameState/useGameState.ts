@@ -189,6 +189,14 @@ export function useGameState(): UseGameStateReturn {
   }, []);
 
   // ==========================================
+  // Total Board Words Actions
+  // ==========================================
+
+  const setTotalBoardWords = useCallback((value: React.SetStateAction<number | null>) => {
+    dispatch({ type: 'SET_TOTAL_BOARD_WORDS', payload: value });
+  }, []);
+
+  // ==========================================
   // Reset Actions
   // ==========================================
 
@@ -242,6 +250,7 @@ export function useGameState(): UseGameStateReturn {
     setXpGainedData,
     setLevelUpData,
     setBoardTheme,
+    setTotalBoardWords,
     resetForNewRound,
     resetAll,
     refs: {
@@ -279,6 +288,7 @@ export function useGameState(): UseGameStateReturn {
     setXpGainedData,
     setLevelUpData,
     setBoardTheme,
+    setTotalBoardWords,
     resetForNewRound,
     resetAll,
   ]);

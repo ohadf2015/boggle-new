@@ -110,7 +110,7 @@ const ParticipantRow = memo<{
             {participant.display_name || 'Player'}
           </span>
           {isCurrentUser && (
-            <span className="text-[10px] sm:text-xs bg-neo-cyan text-white px-1.5 py-0.5 rounded font-bold shrink-0">
+            <span className="text-[10px] sm:text-xs bg-neo-cyan text-neo-black px-1.5 py-0.5 rounded font-bold shrink-0">
               YOU
             </span>
           )}
@@ -228,7 +228,7 @@ const DailyLeaderboard: React.FC<DailyLeaderboardProps> = ({
         `}
       >
         <div className="flex items-center gap-2 mb-4">
-          <div className="p-1.5 sm:p-2 bg-neo-purple rounded-neo border-2 border-neo-black">
+          <div className="p-1.5 sm:p-2 bg-neo-purple text-white rounded-neo border-2 border-neo-black">
             <Users className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
           </div>
           <h3 className="font-black text-sm sm:text-base uppercase tracking-wide text-slate-800">
@@ -258,7 +258,7 @@ const DailyLeaderboard: React.FC<DailyLeaderboardProps> = ({
       {/* Header */}
       <div className="flex items-center justify-between mb-3 sm:mb-4">
         <div className="flex items-center gap-2">
-          <div className="p-1.5 sm:p-2 bg-neo-purple rounded-neo border-2 border-neo-black">
+          <div className="p-1.5 sm:p-2 bg-neo-purple text-white rounded-neo border-2 border-neo-black">
             <Trophy className="w-4 h-4 sm:w-5 sm:h-5 text-neo-yellow" />
           </div>
           <div>

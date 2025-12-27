@@ -147,7 +147,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, showGuestStats =
                   </div>
                   <div className={cn(
                     'text-xs',
-                    isDarkMode ? 'text-gray-600' : 'text-gray-600'
+                    isDarkMode ? 'text-gray-400' : 'text-gray-600'
                   )}>
                     {t('profile.totalGames')}
                   </div>
@@ -164,7 +164,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, showGuestStats =
                   </div>
                   <div className={cn(
                     'text-xs',
-                    isDarkMode ? 'text-gray-600' : 'text-gray-600'
+                    isDarkMode ? 'text-gray-400' : 'text-gray-600'
                   )}>
                     {t('profile.totalScore')}
                   </div>
@@ -211,7 +211,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, showGuestStats =
               onClick={onClose}
               className={cn(
                 'text-sm hover:underline',
-                isDarkMode ? 'text-gray-600 hover:text-gray-300' : 'text-gray-600 hover:text-gray-700'
+                isDarkMode ? 'text-gray-400 hover:text-gray-200' : 'text-gray-600 hover:text-gray-700'
               )}
             >
               {t('auth.continueAsGuest')}
@@ -221,7 +221,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, showGuestStats =
           {/* Terms */}
           <p className={cn(
             'mt-4 text-xs text-center',
-            isDarkMode ? 'text-gray-600' : 'text-gray-600'
+            isDarkMode ? 'text-gray-400' : 'text-gray-600'
           )}>
             {t('auth.termsPrefix')}{' '}
             <Link

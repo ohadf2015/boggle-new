@@ -5,6 +5,21 @@ import type { Session } from '@/types';
 const SESSION_COOKIE_NAME = 'boggle_session';
 const SESSION_EXPIRY_HOURS = 2; // Session expires after 2 hours
 
+// Storage helper for incognito mode support
+function saveToStorage(key: string, value: string): void {
+  if (typeof window === 'undefined') return;
+  try {
+    localStorage.setItem(key, value);
+    sessionStorage.setItem(key, value);
+  } catch {
+    try {
+      sessionStorage.setItem(key, value);
+    } catch {
+      // Storage blocked
+    }
+  }
+}
+
 /**
  * Save the current game session to a cookie
  */
@@ -60,7 +75,7 @@ export const clearSession = (): void => {
 };
 
 /**
- * Clear the session but preserve the username in localStorage for next join
+ * Clear the session but preserve the username in storage for next join
  * This ensures smooth fallback to lobby with the username pre-filled
  * @param username - Optional username to preserve (will read from session if not provided)
  */
@@ -69,9 +84,9 @@ export const clearSessionPreservingUsername = (username?: string): void => {
     // Get the username from session if not provided
     const usernameToSave = username || getSession()?.username;
 
-    // Save username to localStorage before clearing session
-    if (usernameToSave && typeof window !== 'undefined') {
-      localStorage.setItem('boggle_username', usernameToSave);
+    // Save username to both storages before clearing session
+    if (usernameToSave) {
+      saveToStorage('boggle_username', usernameToSave);
     }
   } catch (error) {
     logger.error('Error preserving username:', error);

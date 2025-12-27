@@ -10,6 +10,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { checkApiRateLimit, rateLimitResponse } from '@/lib/apiRateLimit';
 
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
+
 interface ValidationResult {
   word: string;
   isValid: boolean;

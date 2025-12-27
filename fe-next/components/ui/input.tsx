@@ -16,11 +16,11 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
           "flex h-11 w-full px-4 py-2 text-sm font-medium",
           // Neo-Brutalist: thick border, hard shadow
           "rounded-neo border-3 border-neo-black dark:border-slate-500",
-          "bg-neo-cream dark:bg-slate-700 text-neo-black dark:text-neo-white",
+          "bg-neo-cream dark:bg-slate-700 text-slate-900 dark:text-white",
           // Inset shadow for depth
           "shadow-[inset_2px_2px_0px_rgba(0,0,0,0.1)]",
           // Placeholder styling
-          "placeholder:text-neo-black/70 dark:placeholder:text-neo-white/75 placeholder:font-normal",
+          "placeholder:text-slate-500 dark:placeholder:text-slate-400 placeholder:font-normal",
           // Focus state with cyan ring
           "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy",
           // Focus: slight "press" effect

@@ -36,6 +36,7 @@ export const INITIAL_STATE: GameStateValues = {
   xpGainedData: null,
   levelUpData: null,
   boardTheme: null,
+  totalBoardWords: null,
 };
 
 // ==========================================
@@ -239,6 +240,15 @@ export function gameStateReducer(state: GameStateValues, action: GameStateAction
         ...state,
         boardTheme: typeof action.payload === 'function'
           ? action.payload(state.boardTheme)
+          : action.payload
+      };
+
+    // Total board words actions
+    case 'SET_TOTAL_BOARD_WORDS':
+      return {
+        ...state,
+        totalBoardWords: typeof action.payload === 'function'
+          ? action.payload(state.totalBoardWords)
           : action.payload
       };
 

@@ -87,7 +87,7 @@ const MusicControls: React.FC = memo(() => {
         {/* Playing indicator - Neo-Brutalist style */}
         {isPlaying && !isMuted && audioUnlocked && (
           <motion.div
-            className="absolute -top-1 -right-1 w-3 h-3 rounded-full bg-neo-lime border-2 border-neo-black"
+            className="absolute -top-1 -right-1 w-3 h-3 rounded-full bg-neo-lime text-neo-black border-2 border-neo-black"
             animate={{ scale: [1, 1.2, 1] }}
             transition={{ repeat: Infinity, duration: 1.5 }}
           />
@@ -121,7 +121,7 @@ const MusicControls: React.FC = memo(() => {
                     {t('music.musicVolume')}: {Math.round(volume * 100)}%
                   </span>
                 </div>
-                <div className="relative h-4 bg-neo-navy/20 border-2 border-neo-black rounded-neo overflow-hidden">
+                <div className="relative h-4 bg-neo-navy/20 text-white border-2 border-neo-black rounded-neo overflow-hidden">
                   <div
                     className="absolute inset-y-0 left-0 bg-neo-pink"
                     style={{ width: `${(isMuted ? 0 : volume) * 100}%` }}
@@ -152,7 +152,7 @@ const MusicControls: React.FC = memo(() => {
                     {t('music.sfxVolume')}: {Math.round(sfxVolume * 100)}%
                   </span>
                 </div>
-                <div className="relative h-4 bg-neo-navy/20 border-2 border-neo-black rounded-neo overflow-hidden">
+                <div className="relative h-4 bg-neo-navy/20 text-white border-2 border-neo-black rounded-neo overflow-hidden">
                   <div
                     className="absolute inset-y-0 left-0 bg-neo-lime"
                     style={{ width: `${(sfxMuted ? 0 : sfxVolume) * 100}%` }}

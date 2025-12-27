@@ -81,7 +81,7 @@ const HintButton = memo<HintButtonProps>(({
             className="absolute top-full left-0 mt-2 z-50 w-64 md:w-80"
           >
             <div
-              className="bg-neo-cream border-4 border-neo-black rounded-neo-lg p-4 shadow-hard-lg"
+              className="bg-neo-cream text-neo-black border-4 border-neo-black rounded-neo-lg p-4 shadow-hard-lg"
               onClick={onClearHint}
             >
               {/* Header */}

@@ -1,18 +1,26 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
-import { FaCrown, FaTrophy } from 'react-icons/fa';
+import { FaCrown, FaTrophy, FaMedal, FaHandPeace } from 'react-icons/fa';
 import { useLanguage } from '../../contexts/LanguageContext';
 import confetti from 'canvas-confetti';
-import { SiKofi } from 'react-icons/si';
 import Avatar from '../Avatar';
 import type { PlayerResult } from '@/types/components';
 
-// Confetti burst on mount
-const fireConfetti = (): void => {
+// Confetti colors for each rank
+const RANK_CONFETTI_COLORS: Record<number, string[]> = {
+  1: ['#ffd700', '#ffed4a', '#f59e0b', '#fbbf24'], // Gold
+  2: ['#c0c0c0', '#94a3b8', '#e2e8f0', '#cbd5e1'], // Silver
+  3: ['#cd7f32', '#ea580c', '#f97316', '#fb923c'], // Bronze/Orange
+};
+
+// Confetti burst on mount with rank-specific colors
+const fireConfetti = (rank: number = 1): void => {
   const count = 100;
+  const colors = RANK_CONFETTI_COLORS[rank] || RANK_CONFETTI_COLORS[1];
   const defaults = {
     origin: { y: 0.7 },
     zIndex: 1000,
+    colors,
   };
 
   function fire(particleRatio: number, opts: confetti.Options): void {
@@ -45,21 +53,105 @@ interface WinnerData {
 interface ResultsWinnerBannerProps {
   winner: WinnerData | PlayerResult | null;
   isCurrentUserWinner: boolean;
+  rank?: number; // 1 = 1st place (default), 2 = 2nd place, 3 = 3rd place
 }
 
-const ResultsWinnerBanner: React.FC<ResultsWinnerBannerProps> = ({ winner, isCurrentUserWinner }) => {
+// Styling configuration for each rank
+const RANK_STYLES: Record<number, {
+  bgClass: string;
+  iconBgClass: string;
+  iconTextClass: string;
+  messageBgClass: string;
+  messageTextClass: string;
+  nameShadowColor: string;
+  trophyShadowColor: string;
+}> = {
+  1: {
+    bgClass: 'bg-neo-yellow',
+    iconBgClass: 'bg-neo-cream',
+    iconTextClass: 'text-neo-yellow',
+    messageBgClass: 'bg-neo-pink',
+    messageTextClass: 'text-neo-cream',
+    nameShadowColor: 'var(--neo-cyan)',
+    trophyShadowColor: 'var(--neo-orange)',
+  },
+  2: {
+    bgClass: 'bg-gradient-to-br from-slate-300 via-slate-200 to-slate-300',
+    iconBgClass: 'bg-slate-100',
+    iconTextClass: 'text-slate-400',
+    messageBgClass: 'bg-slate-600',
+    messageTextClass: 'text-white',
+    nameShadowColor: 'var(--neo-cyan)',
+    trophyShadowColor: '#94a3b8',
+  },
+  3: {
+    bgClass: 'bg-gradient-to-br from-neo-orange via-orange-400 to-neo-orange',
+    iconBgClass: 'bg-orange-100',
+    iconTextClass: 'text-neo-orange',
+    messageBgClass: 'bg-amber-700',
+    messageTextClass: 'text-white',
+    nameShadowColor: 'var(--neo-cyan)',
+    trophyShadowColor: '#ea580c',
+  },
+  // 4+ place: Purple encouraging banner for non-winners
+  4: {
+    bgClass: 'bg-gradient-to-br from-neo-purple via-purple-500 to-neo-purple',
+    iconBgClass: 'bg-purple-100',
+    iconTextClass: 'text-neo-purple',
+    messageBgClass: 'bg-purple-700',
+    messageTextClass: 'text-white',
+    nameShadowColor: 'var(--neo-cyan)',
+    trophyShadowColor: '#a855f7',
+  },
+};
+
+const ResultsWinnerBanner: React.FC<ResultsWinnerBannerProps> = ({ winner, isCurrentUserWinner, rank = 1 }) => {
   const { t } = useLanguage();
 
-  // Fire confetti on mount
+  // Normalize rank for styling (4+ all use the same style)
+  const styleRank = rank <= 3 ? rank : 4;
+
+  // Memoize the confetti function for this rank (only for top 3)
+  const handleConfetti = useCallback(() => {
+    if (rank <= 3) {
+      fireConfetti(rank);
+    }
+  }, [rank]);
+
+  // Fire confetti on mount (only for top 3)
   useEffect(() => {
-    if (winner) {
-      const timer = setTimeout(fireConfetti, 400);
+    if (winner && rank <= 3) {
+      const timer = setTimeout(() => fireConfetti(rank), 400);
       return () => clearTimeout(timer);
     }
     return undefined;
-  }, [winner]);
+  }, [winner, rank]);
+
+  // Get styles for this rank (4+ use the same purple style)
+  const styles = RANK_STYLES[styleRank] || RANK_STYLES[4];
+
+  // Get the appropriate message for this rank
+  const getRankMessage = () => {
+    if (rank === 1) return t('results.youWon');
+    if (rank === 2) return t('results.secondPlace') || '2nd Place!';
+    if (rank === 3) return t('results.thirdPlace') || '3rd Place!';
+    // 4th place and below - encouraging message
+    return t('results.betterLuckNextTime') || 'Better luck next time!';
+  };
+
+  // Get the appropriate announcement text
+  const getAnnouncementText = () => {
+    if (rank === 1) return t('results.winnerAnnouncement');
+    if (rank === 2) return t('results.silverMedalist') || 'Silver Medalist';
+    if (rank === 3) return t('results.bronzeMedalist') || 'Bronze Medalist';
+    // 4th+ place - show their position
+    return t('results.yourPlace', { rank }) || `${rank}th Place`;
+  };
 
   if (!winner) return null;
+
+  // Select the appropriate icon for this rank
+  const RankIcon = rank === 1 ? FaCrown : rank <= 3 ? FaMedal : FaHandPeace;
 
   return (
     <motion.div
@@ -70,7 +162,7 @@ const ResultsWinnerBanner: React.FC<ResultsWinnerBannerProps> = ({ winner, isCur
     >
       {/* Neo-Brutalist Main Container */}
       <div
-        className="relative bg-neo-yellow border-4 border-neo-black rounded-neo-lg shadow-hard-xl overflow-hidden texture-halftone-comic-dense"
+        className={`relative ${styles.bgClass} border-4 border-neo-black rounded-neo-lg shadow-hard-xl overflow-hidden texture-halftone-comic-dense`}
         style={{ transform: 'rotate(-1deg)' }}
       >
         {/* Comic-style halftone texture pattern - subtle for winner banner */}
@@ -82,209 +174,98 @@ const ResultsWinnerBanner: React.FC<ResultsWinnerBannerProps> = ({ winner, isCur
           }}
         />
 
-        {/* Content */}
-        <div className="relative z-10 p-6 sm:p-8 md:p-12 text-center">
-          {/* Animated Crown - Neo-Brutalist */}
-          <motion.div
-            initial={{ y: -20, opacity: 0, rotate: -15 }}
-            animate={{ y: 0, opacity: 1, rotate: 0 }}
-            transition={{ delay: 0.3, type: 'spring', stiffness: 150 }}
-            className="inline-block mb-4"
-          >
+        {/* Content - Compact layout */}
+        <div className="relative z-10 p-3 sm:p-4 md:p-5 text-center">
+          {/* Compact horizontal layout: Icon + Content */}
+          <div className="flex items-center justify-center gap-3 sm:gap-4">
+            {/* Animated Icon - Smaller */}
             <motion.div
-              animate={{
-                y: [0, -6, 0],
-                rotate: [0, -3, 3, 0],
-              }}
-              transition={{
-                duration: 2,
-                repeat: Infinity,
-                repeatDelay: 1,
-                ease: 'easeInOut',
-              }}
+              initial={{ scale: 0, rotate: -15 }}
+              animate={{ scale: 1, rotate: 0 }}
+              transition={{ delay: 0.3, type: 'spring', stiffness: 150 }}
               whileHover={{ scale: 1.1 }}
-              className="cursor-pointer"
-              onClick={fireConfetti}
+              className="cursor-pointer flex-shrink-0"
+              onClick={handleConfetti}
             >
-              <div className="bg-neo-cream border-4 border-neo-black rounded-neo p-3 shadow-hard inline-block">
-                <FaCrown
-                  className="text-5xl sm:text-6xl md:text-7xl text-neo-yellow"
+              <div className={`${styles.iconBgClass} border-3 border-neo-black rounded-neo p-2 shadow-hard inline-block`}>
+                <RankIcon
+                  className={`text-2xl sm:text-3xl md:text-4xl ${styles.iconTextClass}`}
                   style={{
-                    filter: 'drop-shadow(3px 3px 0px rgb(var(--neo-black)))',
+                    filter: 'drop-shadow(2px 2px 0px rgb(var(--neo-black)))',
                   }}
                 />
               </div>
             </motion.div>
-          </motion.div>
 
-          {/* You Won! Message for current user */}
-          {isCurrentUserWinner && (
+            {/* Center content: Avatar + Name + Message */}
             <motion.div
-              initial={{ scale: 0, opacity: 0, rotate: -5 }}
-              animate={{ scale: 1, opacity: 1, rotate: 3 }}
-              transition={{ delay: 0.4, type: 'spring', stiffness: 200 }}
-              className="mb-4"
+              initial={{ opacity: 0, x: -10 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.4 }}
+              className="flex items-center gap-2 sm:gap-3 cursor-pointer"
+              onClick={handleConfetti}
             >
-              <span
-                className="inline-block bg-neo-pink text-neo-cream text-2xl sm:text-3xl md:text-4xl font-black uppercase px-4 py-2 border-4 border-neo-black rounded-neo shadow-hard"
-                style={{ textShadow: '2px 2px 0px rgb(var(--neo-black))' }}
-              >
-                {t('results.youWon')}
-              </span>
-            </motion.div>
-          )}
-
-          {/* Winner Announcement Text */}
-          <motion.h2
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.45 }}
-            className="text-lg sm:text-xl md:text-2xl font-black text-neo-black uppercase tracking-wide mb-3"
-          >
-            {t('results.winnerAnnouncement')}
-          </motion.h2>
-
-          {/* Winner Name with Avatar - Neo-Brutalist style */}
-          <motion.div
-            initial={{ scale: 0.8, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            transition={{ delay: 0.5, type: 'spring', stiffness: 120 }}
-            className="mb-6"
-          >
-            <motion.div
-              whileHover={{ scale: 1.02, rotate: 1 }}
-              className="cursor-pointer inline-flex items-center justify-center gap-4"
-              onClick={fireConfetti}
-            >
-              {/* Winner Avatar */}
+              {/* Winner Avatar - Smaller */}
               {winner.avatar && (
                 <motion.div
-                  initial={{ scale: 0, rotate: -180 }}
-                  animate={{ scale: 1, rotate: 0 }}
-                  transition={{ delay: 0.6, type: 'spring', stiffness: 200 }}
-                  className="border-4 border-neo-black rounded-full shadow-hard bg-neo-cream p-1"
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  transition={{ delay: 0.5, type: 'spring', stiffness: 200 }}
+                  className="border-3 border-neo-black rounded-full shadow-hard-sm bg-neo-cream p-0.5 flex-shrink-0"
                 >
                   <Avatar
                     profilePictureUrl={winner.avatar.profilePictureUrl ?? undefined}
                     avatarImage={winner.avatar.avatarImage}
                     avatarEmoji={winner.avatar.emoji}
                     avatarColor={winner.avatar.color}
-                    size="xl"
+                    size="lg"
                   />
                 </motion.div>
               )}
-              <h1
-                className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black text-neo-black uppercase"
-                style={{
-                  textShadow: '4px 4px 0px var(--neo-cyan)',
-                  letterSpacing: '0.02em',
-                }}
-              >
-                {winner.username}!
-              </h1>
+              <div className="text-left">
+                {/* Rank Message - Always shown for current player's banner */}
+                <motion.span
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  transition={{ delay: 0.45, type: 'spring', stiffness: 200 }}
+                  className={`inline-block ${styles.messageBgClass} ${styles.messageTextClass} text-xs sm:text-sm font-black uppercase px-2 py-0.5 border-2 border-neo-black rounded-neo shadow-hard-sm mb-1`}
+                >
+                  {getRankMessage()}
+                </motion.span>
+                {/* Username - Smaller */}
+                <h1
+                  className="text-xl sm:text-2xl md:text-3xl font-black text-neo-black uppercase leading-tight"
+                  style={{
+                    textShadow: `2px 2px 0px ${styles.nameShadowColor}`,
+                  }}
+                >
+                  {winner.username}
+                </h1>
+                {/* Announcement Text - Smaller */}
+                <p className="text-xs sm:text-sm font-bold text-neo-black/80 uppercase">
+                  {getAnnouncementText()}
+                </p>
+              </div>
             </motion.div>
-          </motion.div>
 
-          {/* Score Display - Neo-Brutalist badge */}
-          <motion.div
-            initial={{ y: 15, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ delay: 0.6 }}
-            className="flex items-center justify-center gap-4"
-          >
+            {/* Score Badge - Compact */}
             <motion.div
-              animate={{ rotate: [0, -8, 8, 0] }}
-              transition={{ duration: 1.5, repeat: Infinity, repeatDelay: 2 }}
-              whileHover={{ scale: 1.2 }}
-              className="cursor-pointer"
-              onClick={fireConfetti}
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              transition={{ delay: 0.5, type: 'spring', stiffness: 150 }}
+              className="flex items-center gap-2 flex-shrink-0"
             >
               <FaTrophy
-                className="text-3xl sm:text-4xl text-neo-black"
-                style={{ filter: 'drop-shadow(2px 2px 0px var(--neo-orange))' }}
+                className="text-xl sm:text-2xl text-neo-black hidden sm:block"
+                style={{ filter: `drop-shadow(1px 1px 0px ${styles.trophyShadowColor})` }}
               />
+              <div className="bg-neo-cream text-neo-black border-3 border-neo-black rounded-neo px-3 py-1.5 sm:px-4 sm:py-2 shadow-hard">
+                <p className="text-lg sm:text-xl md:text-2xl font-black text-neo-black">
+                  {winner.score} <span className="text-xs sm:text-sm">{t('results.points')}</span>
+                </p>
+              </div>
             </motion.div>
-            <div
-              className="bg-neo-cream border-4 border-neo-black rounded-neo px-6 py-3 shadow-hard"
-            >
-              <p
-                className="text-2xl sm:text-3xl md:text-4xl font-black text-neo-black"
-              >
-                {winner.score} {t('results.points')}
-              </p>
-            </div>
-          </motion.div>
-
-          {/* Ko-fi Support Button - Shows after victory celebration */}
-          {isCurrentUserWinner && (
-            <motion.div
-              initial={{ opacity: 0, y: 20, scale: 0.9 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              transition={{ delay: 1.2, type: 'spring', stiffness: 120 }}
-              className="mt-6 flex justify-center"
-            >
-              <motion.a
-                href="https://ko-fi.com/lexiclash"
-                target="_blank"
-                rel="noopener noreferrer"
-                whileHover={{
-                  scale: 1.05,
-                  rotate: [0, -2, 2, 0],
-                  transition: { rotate: { duration: 0.3 } }
-                }}
-                whileTap={{ scale: 0.95 }}
-                onClick={() => {
-                  // Fire celebration confetti when clicking support
-                  confetti({
-                    particleCount: 50,
-                    spread: 60,
-                    origin: { y: 0.8 },
-                    colors: ['#FF5E5B', '#FFED66', '#00CECB'],
-                  });
-                }}
-                className="
-                  group
-                  inline-flex items-center gap-2
-                  px-5 py-3
-                  bg-gradient-to-r from-[#FF5E5B] to-[#FF1493]
-                  text-neo-cream
-                  font-black
-                  text-sm sm:text-base
-                  uppercase
-                  tracking-wide
-                  border-4 border-neo-black
-                  rounded-neo
-                  shadow-hard
-                  hover:shadow-hard-lg
-                  transition-shadow
-                  cursor-pointer
-                "
-                style={{ textShadow: '1px 1px 0px rgb(var(--neo-black))' }}
-              >
-                <motion.span
-                  animate={{
-                    rotate: [0, -10, 10, 0],
-                    scale: [1, 1.1, 1]
-                  }}
-                  transition={{
-                    duration: 2,
-                    repeat: Infinity,
-                    repeatDelay: 3
-                  }}
-                >
-                  <SiKofi className="text-xl" />
-                </motion.span>
-                <span>{t('support.kofiWinner')}</span>
-                <motion.span
-                  className="text-lg"
-                  animate={{ scale: [1, 1.2, 1] }}
-                  transition={{ duration: 0.5, repeat: Infinity, repeatDelay: 2 }}
-                >
-                  ☕
-                </motion.span>
-              </motion.a>
-            </motion.div>
-          )}
+          </div>
         </div>
       </div>
     </motion.div>

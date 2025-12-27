@@ -9,6 +9,40 @@ const GUEST_SESSION_KEY = 'boggle_guest_session_id';
 const GUEST_STATS_KEY = 'boggle_guest_stats';
 const GUEST_NAME_KEY = 'boggle_guest_name';
 
+// Storage helpers for incognito mode support
+function getFromStorage(key: string): string | null {
+  if (typeof window === 'undefined') return null;
+  try {
+    return localStorage.getItem(key) || sessionStorage.getItem(key);
+  } catch {
+    return null;
+  }
+}
+
+function saveToStorage(key: string, value: string): void {
+  if (typeof window === 'undefined') return;
+  try {
+    localStorage.setItem(key, value);
+    sessionStorage.setItem(key, value);
+  } catch {
+    try {
+      sessionStorage.setItem(key, value);
+    } catch {
+      // Storage blocked
+    }
+  }
+}
+
+function removeFromStorage(key: string): void {
+  if (typeof window === 'undefined') return;
+  try {
+    localStorage.removeItem(key);
+    sessionStorage.removeItem(key);
+  } catch {
+    // Ignore
+  }
+}
+
 export interface GuestStats {
   games: number;
   wins: number;
@@ -56,10 +90,10 @@ export async function hashToken(token: string): Promise<string | null> {
 export function getGuestSessionId(): string | null {
   if (typeof window === 'undefined') return null;
 
-  let sessionId = localStorage.getItem(GUEST_SESSION_KEY);
+  let sessionId = getFromStorage(GUEST_SESSION_KEY);
   if (!sessionId) {
     sessionId = crypto.randomUUID();
-    localStorage.setItem(GUEST_SESSION_KEY, sessionId);
+    saveToStorage(GUEST_SESSION_KEY, sessionId);
   }
   return sessionId;
 }
@@ -69,7 +103,7 @@ export function getGuestSessionId(): string | null {
  */
 export function hasGuestSession(): boolean {
   if (typeof window === 'undefined') return false;
-  return !!localStorage.getItem(GUEST_SESSION_KEY);
+  return !!getFromStorage(GUEST_SESSION_KEY);
 }
 
 /**
@@ -88,13 +122,13 @@ function getDefaultGuestStats(): GuestStats {
 }
 
 /**
- * Get current guest stats from localStorage
+ * Get current guest stats from storage
  */
 export function getGuestStats(): GuestStats {
   if (typeof window === 'undefined') return getDefaultGuestStats();
 
   try {
-    const statsStr = localStorage.getItem(GUEST_STATS_KEY);
+    const statsStr = getFromStorage(GUEST_STATS_KEY);
     if (!statsStr) {
       return getDefaultGuestStats();
     }
@@ -106,13 +140,13 @@ export function getGuestStats(): GuestStats {
 }
 
 /**
- * Save guest stats to localStorage
+ * Save guest stats to storage (both localStorage and sessionStorage)
  */
 export function saveGuestStats(stats: GuestStats): void {
   if (typeof window === 'undefined') return;
 
   try {
-    localStorage.setItem(GUEST_STATS_KEY, JSON.stringify(stats));
+    saveToStorage(GUEST_STATS_KEY, JSON.stringify(stats));
   } catch (error) {
     logger.error('Error saving guest stats:', error);
   }
@@ -160,9 +194,9 @@ export function updateGuestStatsAfterGame(gameResult: GameResult): GuestStats {
 export function clearGuestData(): void {
   if (typeof window === 'undefined') return;
 
-  localStorage.removeItem(GUEST_SESSION_KEY);
-  localStorage.removeItem(GUEST_STATS_KEY);
-  localStorage.removeItem(GUEST_NAME_KEY);
+  removeFromStorage(GUEST_SESSION_KEY);
+  removeFromStorage(GUEST_STATS_KEY);
+  removeFromStorage(GUEST_NAME_KEY);
 }
 
 /**
@@ -228,7 +262,7 @@ export function setGuestName(name: string): void {
   if (typeof window === 'undefined') return;
 
   try {
-    localStorage.setItem(GUEST_NAME_KEY, name);
+    saveToStorage(GUEST_NAME_KEY, name);
     // Also update in stats
     const stats = getGuestStats();
     stats.guestName = name;
@@ -246,7 +280,7 @@ export function getGuestName(): string | null {
 
   try {
     // First check dedicated key
-    const name = localStorage.getItem(GUEST_NAME_KEY);
+    const name = getFromStorage(GUEST_NAME_KEY);
     if (name) return name;
     // Fall back to stats
     const stats = getGuestStats();

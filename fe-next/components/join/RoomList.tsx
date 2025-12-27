@@ -147,7 +147,7 @@ export const RoomList: React.FC<RoomListProps> = ({
                         </div>
                         <div className={cn(
                           "text-xs font-bold",
-                          selectedGameCode === room.gameCode ? "text-neo-black/75" : "text-neo-cream/75"
+                          selectedGameCode === room.gameCode ? "text-neo-black/90" : "text-neo-cream/90"
                         )}>
                           {t('joinView.host')}: {room.gameCode}
                         </div>
@@ -182,16 +182,16 @@ const LoadingSkeleton: React.FC = () => (
         <div className="flex items-center justify-between gap-3">
           <div className="flex items-center gap-2">
             {/* Flag skeleton */}
-            <div className="w-8 h-8 rounded-neo bg-neo-cream/10" />
+            <div className="w-8 h-8 rounded-neo bg-neo-cream/10 text-neo-black" />
             <div>
               {/* Room name skeleton */}
-              <div className="h-5 w-28 rounded-neo bg-neo-cream/15 mb-1" />
+              <div className="h-5 w-28 rounded-neo bg-neo-cream/15 text-neo-black mb-1" />
               {/* Host code skeleton */}
-              <div className="h-3 w-20 rounded-neo bg-neo-cream/10" />
+              <div className="h-3 w-20 rounded-neo bg-neo-cream/10 text-neo-black" />
             </div>
           </div>
           {/* Player count badge skeleton */}
-          <div className="h-6 w-20 rounded-md bg-neo-cream/15" />
+          <div className="h-6 w-20 rounded-md bg-neo-cream/15 text-neo-black" />
         </div>
       </div>
     ))}
@@ -210,7 +210,7 @@ const EmptyRoomsState: React.FC<EmptyRoomsStateProps> = ({
   onSwitchToHostMode,
   t,
 }) => (
-  <div className="text-center py-6 text-neo-cream/75 space-y-4">
+  <div className="text-center py-6 text-neo-cream/90 space-y-4">
     {isJoinMode && (
       <motion.div whileHover={{ x: -2, y: -2 }} whileTap={{ x: 2, y: 2 }}>
         <Button
@@ -223,7 +223,7 @@ const EmptyRoomsState: React.FC<EmptyRoomsStateProps> = ({
       </motion.div>
     )}
     <div className="flex justify-center">
-      <FaGamepad size={48} className="text-neo-cream/75" />
+      <FaGamepad size={48} className="text-neo-cream/90" />
     </div>
     <div>
       <p className="text-base font-bold uppercase">{t('joinView.noRooms')}</p>

@@ -102,7 +102,7 @@ const LandscapeIndicator = memo<LandscapeIndicatorProps>(({ className = '' }) =>
           transition={{ type: 'spring', damping: 20, stiffness: 300 }}
           className={`fixed top-0 left-0 right-0 z-50 safe-area-top ${className}`}
         >
-          <div className="mx-2 mt-2 bg-neo-orange border-4 border-neo-black rounded-neo shadow-hard-lg">
+          <div className="mx-2 mt-2 bg-neo-orange text-neo-black border-4 border-neo-black rounded-neo shadow-hard-lg">
             <div className="flex items-center gap-3 p-3">
               {/* Rotating phone icon */}
               <motion.div

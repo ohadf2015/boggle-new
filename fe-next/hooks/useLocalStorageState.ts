@@ -1,0 +1,83 @@
+'use client';
+
+import { useState, useEffect, useCallback } from 'react';
+
+/**
+ * Hook for storing and retrieving an object from localStorage
+ * Returns [value, setValue, updateField] where updateField allows updating individual properties
+ */
+export function useLocalStorageObject<T extends object>(
+  key: string,
+  defaultValue: T
+): [T, (value: T) => void, <K extends keyof T>(field: K, value: T[K]) => void] {
+  // Initialize state from localStorage or default
+  const [value, setValue] = useState<T>(() => {
+    if (typeof window === 'undefined') {
+      return defaultValue;
+    }
+    try {
+      const stored = localStorage.getItem(key);
+      if (stored) {
+        return { ...defaultValue, ...JSON.parse(stored) };
+      }
+    } catch (e) {
+      console.warn(`Failed to load ${key} from localStorage:`, e);
+    }
+    return defaultValue;
+  });
+
+  // Sync to localStorage when value changes
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    try {
+      localStorage.setItem(key, JSON.stringify(value));
+    } catch (e) {
+      console.warn(`Failed to save ${key} to localStorage:`, e);
+    }
+  }, [key, value]);
+
+  // Update a single field in the object
+  const updateField = useCallback(<K extends keyof T>(field: K, fieldValue: T[K]) => {
+    setValue((prev) => ({
+      ...prev,
+      [field]: fieldValue,
+    }));
+  }, []);
+
+  return [value, setValue, updateField];
+}
+
+/**
+ * Simple hook for storing a single value in localStorage
+ */
+export function useLocalStorageState<T>(
+  key: string,
+  defaultValue: T
+): [T, (value: T | ((prev: T) => T)) => void] {
+  const [value, setValue] = useState<T>(() => {
+    if (typeof window === 'undefined') {
+      return defaultValue;
+    }
+    try {
+      const stored = localStorage.getItem(key);
+      if (stored) {
+        return JSON.parse(stored);
+      }
+    } catch (e) {
+      console.warn(`Failed to load ${key} from localStorage:`, e);
+    }
+    return defaultValue;
+  });
+
+  // Sync to localStorage when value changes
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    try {
+      localStorage.setItem(key, JSON.stringify(value));
+    } catch (e) {
+      console.warn(`Failed to save ${key} to localStorage:`, e);
+    }
+  }, [key, value]);
+
+  return [value, setValue];
+}

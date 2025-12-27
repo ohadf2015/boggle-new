@@ -5,6 +5,7 @@ import { useRouter, useSearchParams, useParams } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import logger from '@/utils/logger';
 import { defaultLocale } from '@/lib/i18n';
+import { isRecoverableError, isRefreshTokenError, getAuthErrorMessage, type SupabaseAuthError } from '@/contexts/auth';
 
 // Loading UI component
 function LoadingUI(): React.ReactNode {
@@ -252,15 +253,11 @@ function AuthCallbackContent(): React.ReactNode {
           releaseLock();
 
           if (error) {
-            // Check if error is because code was already used (by another tab) or timeout
+            const authError = error as SupabaseAuthError;
+            // Check if error is recoverable (code already used, timeout, etc.)
             // In this case, wait and poll for session as other tab should have it
-            const isRecoverableError = error.message?.includes('code') ||
-                                        error.message?.includes('expired') ||
-                                        error.message?.includes('invalid') ||
-                                        error.message?.includes('timed out');
-
-            if (isRecoverableError) {
-              logger.warn('Auth callback: Code exchange failed (possibly used by another tab or timed out), waiting for session');
+            if (isRecoverableError(authError) || isRefreshTokenError(authError)) {
+              logger.warn('Auth callback: Code exchange failed (possibly used by another tab or recoverable error), waiting for session:', getAuthErrorMessage(authError));
 
               // Poll for session with retries - another tab may have succeeded
               const gotSession = await waitForSessionFromOtherTab(next, 5000);
@@ -274,7 +271,7 @@ function AuthCallbackContent(): React.ReactNode {
                 return;
               }
             }
-            logger.error('Auth callback: Code exchange error:', error);
+            logger.error('Auth callback: Code exchange error:', getAuthErrorMessage(authError));
             safeRedirect(`/${locale}?auth_error=true`);
             return;
           }
@@ -313,7 +310,8 @@ function AuthCallbackContent(): React.ReactNode {
           });
 
           if (sessionError) {
-            logger.error('Auth callback: Error setting session from hash tokens:', sessionError);
+            const authError = sessionError as SupabaseAuthError;
+            logger.error('Auth callback: Error setting session from hash tokens:', getAuthErrorMessage(authError));
             safeRedirect(`/${locale}?auth_error=true`);
             return;
           }

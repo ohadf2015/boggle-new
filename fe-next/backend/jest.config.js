@@ -22,8 +22,12 @@ module.exports = {
     '^@/(.*)$': '<rootDir>/../$1'
   },
 
-  // No transform needed for JS tests
-  transform: {},
+  // Transform TypeScript files using ts-jest
+  transform: {
+    '^.+\\.tsx?$': ['ts-jest', {
+      useESM: false,
+    }],
+  },
 
   // Ignore patterns for transform
   transformIgnorePatterns: [

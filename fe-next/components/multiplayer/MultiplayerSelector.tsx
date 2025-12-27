@@ -49,7 +49,7 @@ const MultiplayerSelector: React.FC<MultiplayerSelectorProps> = ({
     <>
       <LandscapeIndicator />
 
-      <div dir={dir} className="min-h-screen h-screen bg-gradient-to-b from-slate-50 via-slate-100 to-slate-200 dark:from-neo-navy dark:via-neo-navy-light dark:to-neo-navy flex flex-col overflow-hidden">
+      <div dir={dir} className="min-h-screen h-screen bg-gradient-to-b from-neo-navy via-neo-navy-light to-neo-navy flex flex-col overflow-hidden">
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
@@ -63,7 +63,7 @@ const MultiplayerSelector: React.FC<MultiplayerSelectorProps> = ({
             <FaArrowLeft className="w-4 h-4 rtl:rotate-180" />
             <span className="hidden sm:inline">{t('common.back') || 'Back'}</span>
           </Link>
-          <h1 className="text-2xl sm:text-3xl md:text-4xl font-black uppercase text-center text-neo-black dark:text-neo-white">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-black uppercase text-center text-neo-white">
             {t('landing.multiplayer') || 'Multiplayer'}
           </h1>
         </motion.div>
@@ -80,7 +80,7 @@ const MultiplayerSelector: React.FC<MultiplayerSelectorProps> = ({
               className="flex-1"
             >
               <Card
-                className="h-full cursor-pointer group border-3 border-neo-black dark:border-slate-600 shadow-hard hover:shadow-hard-lg hover:translate-x-[-3px] hover:translate-y-[-3px] active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-sm transition-all bg-gradient-to-br from-neo-lime/20 to-neo-lime/5 dark:from-neo-lime/10 dark:to-neo-lime/5"
+                className="h-full cursor-pointer group border-3 border-slate-600 shadow-hard hover:shadow-hard-lg hover:translate-x-[-3px] hover:translate-y-[-3px] active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-sm transition-all bg-gradient-to-br from-neo-lime/10 to-neo-lime/5"
                 onClick={onSelectCreate}
                 role="button"
                 tabIndex={0}
@@ -88,13 +88,13 @@ const MultiplayerSelector: React.FC<MultiplayerSelectorProps> = ({
                 aria-label={t('multiplayerFlow.selector.createCard.title') || 'Create Room'}
               >
                 <CardContent className="flex flex-col items-center justify-center text-center p-6 sm:p-8 h-full min-h-[180px] sm:min-h-[220px]">
-                  <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-neo-lime border-3 border-neo-black flex items-center justify-center mb-4 shadow-hard group-hover:scale-110 transition-transform">
+                  <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-neo-lime text-neo-black border-3 border-neo-black flex items-center justify-center mb-4 shadow-hard group-hover:scale-110 transition-transform">
                     <FaCrown className="w-8 h-8 sm:w-10 sm:h-10 text-neo-black" />
                   </div>
-                  <h2 className="text-xl sm:text-2xl font-black uppercase text-neo-black dark:text-neo-white mb-2">
+                  <h2 className="text-xl sm:text-2xl font-black uppercase text-neo-white mb-2">
                     {t('multiplayerFlow.selector.createCard.title') || 'Create Room'}
                   </h2>
-                  <p className="text-sm sm:text-base text-neo-black/70 dark:text-neo-cream/70 mb-4">
+                  <p className="text-sm sm:text-base text-neo-cream mb-4">
                     {t('multiplayerFlow.selector.createCard.description') || 'Host a new game and invite friends'}
                   </p>
                   <Button
@@ -117,7 +117,7 @@ const MultiplayerSelector: React.FC<MultiplayerSelectorProps> = ({
               className="flex-1"
             >
               <Card
-                className="h-full cursor-pointer group border-3 border-neo-black dark:border-slate-600 shadow-hard hover:shadow-hard-lg hover:translate-x-[-3px] hover:translate-y-[-3px] active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-sm transition-all bg-gradient-to-br from-neo-cyan/20 to-neo-cyan/5 dark:from-neo-cyan/10 dark:to-neo-cyan/5"
+                className="h-full cursor-pointer group border-3 border-slate-600 shadow-hard hover:shadow-hard-lg hover:translate-x-[-3px] hover:translate-y-[-3px] active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-sm transition-all bg-gradient-to-br from-neo-cyan/10 to-neo-cyan/5"
                 onClick={onSelectJoin}
                 role="button"
                 tabIndex={0}
@@ -125,13 +125,13 @@ const MultiplayerSelector: React.FC<MultiplayerSelectorProps> = ({
                 aria-label={t('multiplayerFlow.selector.joinCard.title') || 'Join Room'}
               >
                 <CardContent className="flex flex-col items-center justify-center text-center p-6 sm:p-8 h-full min-h-[180px] sm:min-h-[220px]">
-                  <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-neo-cyan border-3 border-neo-black flex items-center justify-center mb-4 shadow-hard group-hover:scale-110 transition-transform">
+                  <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-neo-cyan text-neo-black border-3 border-neo-black flex items-center justify-center mb-4 shadow-hard group-hover:scale-110 transition-transform">
                     <FaSignInAlt className="w-8 h-8 sm:w-10 sm:h-10 text-neo-black" />
                   </div>
-                  <h2 className="text-xl sm:text-2xl font-black uppercase text-neo-black dark:text-neo-white mb-2">
+                  <h2 className="text-xl sm:text-2xl font-black uppercase text-neo-white mb-2">
                     {t('multiplayerFlow.selector.joinCard.title') || 'Join Room'}
                   </h2>
-                  <p className="text-sm sm:text-base text-neo-black/70 dark:text-neo-cream/70 mb-4">
+                  <p className="text-sm sm:text-base text-neo-cream mb-4">
                     {t('multiplayerFlow.selector.joinCard.description') || 'Enter an existing game with a code'}
                   </p>
                   <Button
@@ -155,7 +155,7 @@ const MultiplayerSelector: React.FC<MultiplayerSelectorProps> = ({
             className="w-full max-w-4xl mx-auto flex-shrink-0"
           >
             <div className="flex items-center justify-between mb-2">
-              <h3 className="text-sm sm:text-base font-bold uppercase text-neo-black/70 dark:text-neo-cream/70 flex items-center gap-2">
+              <h3 className="text-sm sm:text-base font-bold uppercase text-neo-cream/70 flex items-center gap-2">
                 <FaUsers className="w-4 h-4" />
                 {t('multiplayerFlow.selector.activeRoomsPreview') || 'Active Rooms'}
                 {totalPlayers > 0 && (
@@ -174,14 +174,14 @@ const MultiplayerSelector: React.FC<MultiplayerSelectorProps> = ({
                   <button
                     key={room.gameCode}
                     onClick={() => onQuickJoin(room.gameCode)}
-                    className="flex items-center gap-2 p-3 rounded-neo border-2 border-neo-black/30 dark:border-slate-600 bg-neo-cream/50 dark:bg-slate-700/50 hover:bg-neo-cyan/20 hover:border-neo-cyan transition-all text-left group"
+                    className="flex items-center gap-2 p-3 rounded-neo border-2 border-slate-600 bg-slate-700/50 hover:bg-neo-cyan/20 hover:border-neo-cyan transition-all text-left group"
                   >
                     <span className="text-lg">{LANGUAGE_FLAGS[room.language] || '🎮'}</span>
                     <div className="flex-1 min-w-0">
-                      <p className="font-bold text-sm text-neo-black dark:text-neo-white truncate">
+                      <p className="font-bold text-sm text-neo-white truncate">
                         {room.roomName || room.gameCode}
                       </p>
-                      <p className="text-xs text-neo-black/60 dark:text-neo-cream/60">
+                      <p className="text-xs text-neo-cream/60">
                         {room.playerCount || 0} {t('joinView.players') || 'players'}
                       </p>
                     </div>
@@ -192,7 +192,7 @@ const MultiplayerSelector: React.FC<MultiplayerSelectorProps> = ({
                 ))}
               </div>
             ) : (
-              <div className="text-center py-3 text-sm text-neo-black/50 dark:text-neo-cream/50">
+              <div className="text-center py-3 text-sm text-neo-cream/80">
                 {t('multiplayerFlow.selector.noRooms') || 'No active rooms - be the first to create one!'}
               </div>
             )}

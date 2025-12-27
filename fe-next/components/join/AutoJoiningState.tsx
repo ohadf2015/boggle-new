@@ -23,17 +23,17 @@ export const AutoJoiningState: React.FC<AutoJoiningStateProps> = ({
   const { t } = useLanguage();
 
   return (
-    <div className="min-h-screen bg-neo-black pt-4 flex flex-col items-center justify-center p-2 sm:p-4 md:p-6">
+    <div className="min-h-screen bg-neo-black text-white pt-4 flex flex-col items-center justify-center p-2 sm:p-4 md:p-6">
       <motion.div
         initial={{ scale: 0, rotate: -3 }}
         animate={{ scale: 1, rotate: 1 }}
         transition={{ type: 'spring', stiffness: 260, damping: 20 }}
         className="w-full max-w-md"
       >
-        <Card className="bg-neo-navy border-4 border-neo-cream rounded-neo shadow-hard">
+        <Card className="bg-neo-navy text-white border-4 border-neo-cream rounded-neo shadow-hard">
           <CardHeader className="text-center space-y-4">
             <div className="flex justify-center">
-              <div className="p-4 bg-neo-cyan rounded-neo border-3 border-neo-black shadow-hard-sm">
+              <div className="p-4 bg-neo-cyan text-neo-black rounded-neo border-3 border-neo-black shadow-hard-sm">
                 <FaGamepad size={48} className="text-neo-black" />
               </div>
             </div>
@@ -57,7 +57,7 @@ export const AutoJoiningState: React.FC<AutoJoiningStateProps> = ({
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.3 }}
               >
-                <div className="p-4 bg-neo-pink/20 border-3 border-neo-pink rounded-neo">
+                <div className="p-4 bg-neo-pink/20 text-white border-3 border-neo-pink rounded-neo">
                   <p className="text-neo-pink font-bold uppercase text-sm">{error}</p>
                 </div>
               </motion.div>

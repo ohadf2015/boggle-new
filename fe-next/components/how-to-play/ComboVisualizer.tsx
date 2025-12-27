@@ -29,7 +29,7 @@ export const ComboVisualizer: React.FC<ComboVisualizerProps> = ({ t }) => {
     { level: '0', multiplier: '1.0x', color: 'bg-gray-400', bonus: t('howToPlay.combo.noBonus') },
     { level: '1-2', multiplier: '+1-2', color: 'bg-neo-cyan', bonus: '+1-2' },
     { level: '3-4', multiplier: '+3-4', color: 'bg-neo-lime', bonus: '+3-4' },
-    { level: '5-6', multiplier: '+5-6', color: 'bg-neo-yellow', bonus: '+5-6' },
+    { level: '5-6', multiplier: '+5-6', color: 'bg-neo-yellow text-neo-black', bonus: '+5-6' },
     { level: '7-8', multiplier: '+7-8', color: 'bg-neo-orange', bonus: '+7-8' },
     { level: '9+', multiplier: '+10', color: 'bg-neo-pink', bonus: '+10 max' },
   ];
@@ -68,7 +68,7 @@ export const ComboVisualizer: React.FC<ComboVisualizerProps> = ({ t }) => {
   return (
     <div className="space-y-4">
       {/* Combo Meter */}
-      <div className="relative bg-neo-cream rounded-neo border-3 border-neo-black p-4 shadow-hard-sm">
+      <div className="relative bg-neo-cream text-neo-black rounded-neo border-3 border-neo-black p-4 shadow-hard-sm">
         <div className="flex items-center justify-between mb-3">
           <span className="font-bold text-neo-black flex items-center gap-2">
             <FaFire className={comboLevel > 2 ? 'text-neo-orange animate-pulse' : 'text-gray-600'} />
@@ -84,7 +84,7 @@ export const ComboVisualizer: React.FC<ComboVisualizerProps> = ({ t }) => {
           </motion.span>
         </div>
 
-        <div className="h-4 bg-neo-black/10 rounded-neo-pill border-2 border-neo-black overflow-hidden">
+        <div className="h-4 bg-neo-black/10 text-white rounded-neo-pill border-2 border-neo-black overflow-hidden">
           <motion.div
             className={`h-full ${getCurrentTierData().color}`}
             initial={{ width: 0 }}

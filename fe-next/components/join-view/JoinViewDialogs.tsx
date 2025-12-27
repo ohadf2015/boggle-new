@@ -45,7 +45,7 @@ const JoinViewDialogs: React.FC<JoinViewDialogsProps> = React.memo(({
 
       {/* QR Code Dialog */}
       <Dialog open={showQR} onOpenChange={onSetShowQR}>
-        <DialogContent className="sm:max-w-md bg-white dark:bg-slate-800 border-cyan-500/30">
+        <DialogContent className="sm:max-w-md bg-white text-neo-black dark:bg-slate-800 dark:text-white border-cyan-500/30">
           <DialogHeader>
             <DialogTitle className="text-center text-cyan-300 flex items-center justify-center gap-2">
               <FaQrcode />

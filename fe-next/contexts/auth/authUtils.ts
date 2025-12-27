@@ -82,10 +82,20 @@ export async function fetchRandomGenericAvatar(): Promise<{
 }
 
 /**
+ * Supabase auth error types
+ */
+export interface SupabaseAuthError {
+  code?: string;
+  message?: string;
+  status?: number;
+  name?: string;
+}
+
+/**
  * Check if error is a refresh token error
  */
 export function isRefreshTokenError(
-  error: { code?: string; message?: string } | null
+  error: SupabaseAuthError | null | undefined
 ): boolean {
   if (!error) return false;
   const errorCode = error.code?.toLowerCase() || '';
@@ -95,6 +105,62 @@ export function isRefreshTokenError(
     errorMessage.includes('refresh token not found') ||
     errorMessage.includes('invalid refresh token') ||
     errorCode === 'bad_jwt' ||
-    errorMessage.includes('jwt expired')
+    errorMessage.includes('jwt expired') ||
+    errorCode === 'token_expired' ||
+    errorMessage.includes('token expired')
   );
+}
+
+/**
+ * Check if error is a network/connection error
+ */
+export function isNetworkError(
+  error: SupabaseAuthError | null | undefined
+): boolean {
+  if (!error) return false;
+  const errorMessage = error.message?.toLowerCase() || '';
+  return (
+    errorMessage.includes('network') ||
+    errorMessage.includes('fetch') ||
+    errorMessage.includes('connection') ||
+    errorMessage.includes('timeout') ||
+    errorMessage.includes('failed to fetch')
+  );
+}
+
+/**
+ * Check if error is recoverable (can retry)
+ */
+export function isRecoverableError(
+  error: SupabaseAuthError | null | undefined
+): boolean {
+  if (!error) return false;
+  return isNetworkError(error) || error.status === 429 || error.status === 503;
+}
+
+/**
+ * Get user-friendly error message
+ */
+export function getAuthErrorMessage(
+  error: SupabaseAuthError | null | undefined
+): string {
+  if (!error) return 'An unknown error occurred';
+  
+  if (isRefreshTokenError(error)) {
+    return 'Your session has expired. Please sign in again.';
+  }
+  
+  if (isNetworkError(error)) {
+    return 'Connection error. Please check your internet connection and try again.';
+  }
+  
+  if (error.status === 429) {
+    return 'Too many requests. Please wait a moment and try again.';
+  }
+  
+  if (error.status === 503) {
+    return 'Service temporarily unavailable. Please try again later.';
+  }
+  
+  return error.message || 'An authentication error occurred';
 }

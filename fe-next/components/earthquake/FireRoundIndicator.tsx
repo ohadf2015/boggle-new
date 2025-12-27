@@ -106,7 +106,7 @@ export const FireRoundIndicator: React.FC<FireRoundIndicatorProps> = ({
               </div>
 
               {/* Countdown */}
-              <div className="ml-2 bg-neo-black/20 rounded-neo px-2 py-1 border-2 border-neo-black/40">
+              <div className="ml-2 bg-neo-black/20 text-white rounded-neo px-2 py-1 border-2 border-neo-black/40">
                 <motion.span
                   key={remainingSeconds}
                   className="text-xl font-black text-neo-cream tabular-nums"

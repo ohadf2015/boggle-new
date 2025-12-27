@@ -63,7 +63,7 @@ const TournamentStandings: React.FC<TournamentStandingsProps> = ({
   };
 
   return (
-    <Card className="bg-white/90 dark:bg-slate-800/90 backdrop-blur-md p-4 sm:p-6 rounded-lg shadow-xl border-2 border-amber-500/50">
+    <Card className="bg-white/90 text-neo-black dark:bg-slate-800/90 dark:text-white backdrop-blur-md p-4 sm:p-6 rounded-lg shadow-xl border-2 border-amber-500/50">
       <div className="space-y-4">
         {/* Header */}
         <div className="text-center space-y-2">

@@ -7,6 +7,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { checkApiRateLimit, rateLimitResponse } from '@/lib/apiRateLimit';
 
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
+
 interface SolveGridRequest {
   grid: string[][];
   language: string;

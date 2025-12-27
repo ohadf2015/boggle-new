@@ -49,7 +49,7 @@ const GameTypeSelector = memo<GameTypeSelectorProps>(({
   return (
     <div className="space-y-2">
       {/* Title */}
-      <label className="text-xs font-bold uppercase text-neo-cream/80">
+      <label className="text-xs font-bold uppercase text-neo-cream">
         {t('hostView.gameTypeSelector') || 'Game Mode'}
       </label>
 
@@ -83,7 +83,7 @@ const GameTypeSelector = memo<GameTypeSelectorProps>(({
           onClick={() => handleSelectGameType('tournament', isTournamentLocked)}
           className={cn(
             "flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded-neo border-3 border-neo-black transition-all duration-100 font-bold text-sm",
-            "bg-neo-gray/60 text-neo-cream/70 opacity-60 cursor-not-allowed"
+            "bg-neo-gray/60 text-neo-cream/90 opacity-70 cursor-not-allowed"
           )}
         >
           <FaTrophy className="text-sm" aria-hidden="true" />
@@ -101,7 +101,7 @@ const GameTypeSelector = memo<GameTypeSelectorProps>(({
           className="p-2 rounded-neo bg-neo-navy border-2 border-neo-cream/30"
         >
           <div className="flex items-center justify-center gap-3">
-            <label className="text-xs font-bold uppercase text-neo-cream/80">
+            <label className="text-xs font-bold uppercase text-neo-cream">
               {t('hostView.numberOfRounds') || 'Rounds'}
             </label>
             <motion.button
@@ -112,7 +112,7 @@ const GameTypeSelector = memo<GameTypeSelectorProps>(({
               className={cn(
                 "w-7 h-7 rounded-neo border-2 flex items-center justify-center transition-all font-black text-xs",
                 tournamentRounds <= 2
-                  ? "bg-neo-gray/50 text-neo-cream/75 border-neo-cream/30 cursor-not-allowed"
+                  ? "bg-neo-gray/50 text-neo-cream/90 border-neo-cream/30 cursor-not-allowed"
                   : "bg-neo-cream text-neo-black border-neo-black shadow-hard-sm hover:shadow-hard"
               )}
             >
@@ -131,7 +131,7 @@ const GameTypeSelector = memo<GameTypeSelectorProps>(({
               className={cn(
                 "w-7 h-7 rounded-neo border-2 flex items-center justify-center transition-all font-black text-xs",
                 tournamentRounds >= 5
-                  ? "bg-neo-gray/50 text-neo-cream/75 border-neo-cream/30 cursor-not-allowed"
+                  ? "bg-neo-gray/50 text-neo-cream/90 border-neo-cream/30 cursor-not-allowed"
                   : "bg-neo-cream text-neo-black border-neo-black shadow-hard-sm hover:shadow-hard"
               )}
             >

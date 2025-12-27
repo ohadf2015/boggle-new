@@ -1,0 +1,128 @@
+'use client';
+
+import React, { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { ChevronDown, ChevronUp } from 'lucide-react';
+import { cn } from '@/lib/utils';
+
+interface CollapsibleSectionProps {
+  title: string;
+  icon?: React.ReactNode;
+  children: React.ReactNode;
+  defaultExpanded?: boolean;
+  onToggle?: (isExpanded: boolean) => void;
+  badge?: string | number;
+  variant?: 'primary' | 'secondary' | 'tertiary';
+  className?: string;
+  headerClassName?: string;
+  contentClassName?: string;
+}
+
+const variantStyles = {
+  primary: {
+    header: 'bg-slate-800 text-white border-neo-cyan',
+    content: 'bg-slate-800/50',
+    badge: 'bg-neo-cyan text-neo-black',
+  },
+  secondary: {
+    header: 'bg-neo-cream text-neo-black border-neo-black',
+    content: 'bg-white dark:bg-slate-800',
+    badge: 'bg-neo-purple text-neo-cream',
+  },
+  tertiary: {
+    header: 'bg-slate-100 dark:bg-slate-700 text-neo-black dark:text-neo-cream border-neo-black/30',
+    content: 'bg-slate-50 dark:bg-slate-800',
+    badge: 'bg-slate-500 text-white',
+  },
+};
+
+/**
+ * Reusable Collapsible Section Component
+ * Neo-Brutalist style with smooth animations
+ * Supports ARIA attributes for accessibility
+ */
+const CollapsibleSection: React.FC<CollapsibleSectionProps> = ({
+  title,
+  icon,
+  children,
+  defaultExpanded = false,
+  onToggle,
+  badge,
+  variant = 'secondary',
+  className,
+  headerClassName,
+  contentClassName,
+}) => {
+  const [isExpanded, setIsExpanded] = useState(defaultExpanded);
+  const styles = variantStyles[variant];
+
+  const handleToggle = () => {
+    const newState = !isExpanded;
+    setIsExpanded(newState);
+    onToggle?.(newState);
+  };
+
+  const contentId = `collapsible-content-${title.replace(/\s+/g, '-').toLowerCase()}`;
+
+  return (
+    <div className={cn('rounded-neo border-2 border-neo-black overflow-hidden', className)}>
+      {/* Header Button */}
+      <button
+        onClick={handleToggle}
+        aria-expanded={isExpanded}
+        aria-controls={contentId}
+        className={cn(
+          'w-full flex items-center justify-between gap-2 p-2.5 sm:p-3',
+          'font-bold text-sm uppercase tracking-wide',
+          'border-b-2 transition-all duration-150',
+          'hover:brightness-95 focus:outline-none focus:ring-2 focus:ring-neo-cyan focus:ring-offset-1',
+          'min-h-[44px]', // WCAG touch target
+          styles.header,
+          isExpanded ? 'border-neo-black' : 'border-transparent',
+          headerClassName
+        )}
+      >
+        <div className="flex items-center gap-2">
+          {icon && <span className="flex-shrink-0">{icon}</span>}
+          <span>{title}</span>
+          {badge !== undefined && (
+            <span className={cn(
+              'px-1.5 py-0.5 text-xs font-black rounded-neo border border-neo-black',
+              styles.badge
+            )}>
+              {badge}
+            </span>
+          )}
+        </div>
+        <motion.div
+          animate={{ rotate: isExpanded ? 180 : 0 }}
+          transition={{ duration: 0.2 }}
+        >
+          <ChevronDown className="w-5 h-5 flex-shrink-0" />
+        </motion.div>
+      </button>
+
+      {/* Collapsible Content */}
+      <AnimatePresence initial={false}>
+        {isExpanded && (
+          <motion.div
+            id={contentId}
+            role="region"
+            aria-labelledby={`${contentId}-header`}
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.25, ease: 'easeInOut' }}
+            className="overflow-hidden"
+          >
+            <div className={cn('p-3', styles.content, contentClassName)}>
+              {children}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+};
+
+export default CollapsibleSection;

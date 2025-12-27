@@ -1,8 +1,63 @@
 /**
  * LandingView Component Tests
- * 
+ *
  * Tests for the main landing page component
  */
+
+// Mock Sentry before any imports
+jest.mock('@sentry/nextjs', () => ({
+  init: jest.fn(),
+  setUser: jest.fn(),
+  setContext: jest.fn(),
+  captureException: jest.fn(),
+  captureMessage: jest.fn(),
+  withScope: jest.fn((callback) => callback({ setLevel: jest.fn() })),
+  Severity: { Error: 'error', Warning: 'warning', Info: 'info' },
+}));
+
+// Mock utils/sentry
+jest.mock('@/utils/sentry', () => ({
+  setSentryUserContext: jest.fn(),
+  captureException: jest.fn(),
+  captureMessage: jest.fn(),
+}));
+
+// Mock AuthContext
+jest.mock('@/contexts/AuthContext', () => ({
+  useAuth: () => ({
+    user: null,
+    profile: null,
+    isLoading: false,
+    signIn: jest.fn(),
+    signOut: jest.fn(),
+    signUp: jest.fn(),
+  }),
+  AuthProvider: ({ children }: { children: React.ReactNode }) => <>{children}</>,
+}));
+
+// Mock OnboardingModal to avoid auth dependencies
+jest.mock('@/components/OnboardingModal', () => ({
+  __esModule: true,
+  default: () => null,
+}));
+
+// Mock SocketContext
+jest.mock('@/utils/SocketContext', () => ({
+  useSocket: () => ({
+    socket: null,
+    isConnected: false,
+    connectionError: null,
+  }),
+  SocketProvider: ({ children }: { children: React.ReactNode }) => <>{children}</>,
+}));
+
+// Mock useLiveRoomStats hook
+jest.mock('@/hooks/useLiveRoomStats', () => ({
+  useLiveRoomStats: () => ({
+    stats: null,
+    isLoading: false,
+  }),
+}));
 
 jest.mock('@/contexts/MusicContext', () => ({
   useMusic: jest.fn(() => ({

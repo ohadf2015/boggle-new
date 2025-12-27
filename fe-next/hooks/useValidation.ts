@@ -32,7 +32,7 @@ export const useValidation = (t: (key: string) => string): UseValidationReturn =
 
   const validateRoom = useCallback((roomName: string): RoomValidationResult => {
     const cleaned = sanitizeInput(roomName, 30);
-    const res = validateRoomName(cleaned);
+    const res = validateRoomName(cleaned, true); // true = optional (room names get defaults if empty)
     return { cleaned, ...res };
   }, []);
 

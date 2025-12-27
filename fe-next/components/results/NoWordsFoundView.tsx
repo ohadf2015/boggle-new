@@ -183,7 +183,7 @@ const NoWordsFoundView: React.FC<NoWordsFoundViewProps> = ({ isCurrentPlayer, pl
               className="bg-neo-cream border-2 border-neo-black rounded-neo p-3 shadow-hard-sm"
             >
               <div className="flex items-start gap-2">
-                <div className="w-6 h-6 rounded-md bg-neo-purple border-2 border-neo-black flex items-center justify-center flex-shrink-0">
+                <div className="w-6 h-6 rounded-md bg-neo-purple text-white border-2 border-neo-black flex items-center justify-center flex-shrink-0">
                   <Brain className="w-3.5 h-3.5 text-neo-cream" />
                 </div>
                 <p className="text-xs font-bold text-neo-black leading-relaxed">

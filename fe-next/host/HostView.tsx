@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useEffect, useState, memo, useRef } from 'react';
-import { FaSignOutAlt } from 'react-icons/fa';
 import { Button } from '../components/ui/button';
 import GoRipplesAnimation from '../components/GoRipplesAnimation';
 import '../style/animation.scss';
@@ -34,6 +33,7 @@ import {
   useHostEffects,
   type Player,
 } from './hooks';
+import { useNavigationGuard } from '../hooks/useNavigationGuard';
 
 // ==========================================
 // Props
@@ -78,6 +78,9 @@ const HostView: React.FC<HostViewProps> = memo(({
   const [earthquakeState, setEarthquakeState] = useState<'idle' | 'warning' | 'shaking' | 'fire-round'>('idle');
   const [fireRoundActive, setFireRoundActive] = useState(false);
   const [fireRoundRemaining, setFireRoundRemaining] = useState(0);
+
+  // Players ready for next game state
+  const [playersReadyData, setPlayersReadyData] = useState<{ readyCount: number; totalPlayers: number } | null>(null);
 
   // Music ref for earthquake
   const earthquakeMusicActiveRef = useRef<boolean>(false);
@@ -209,8 +212,44 @@ const HostView: React.FC<HostViewProps> = memo(({
     });
   }, [socket, state.settings.difficulty, state.roomLanguage]);
 
+  // Listen for players ready updates
+  useEffect(() => {
+    if (!socket) return;
+
+    const handlePlayersReadyUpdate = (data: { readyCount: number; totalPlayers: number }) => {
+      setPlayersReadyData(data);
+    };
+
+    // Reset ready count when game resets or starts
+    const handleResetGame = () => {
+      setPlayersReadyData(null);
+    };
+
+    socket.on('playersReadyUpdate', handlePlayersReadyUpdate);
+    socket.on('resetGame', handleResetGame);
+    socket.on('startGame', handleResetGame);
+
+    return () => {
+      socket.off('playersReadyUpdate', handlePlayersReadyUpdate);
+      socket.off('resetGame', handleResetGame);
+      socket.off('startGame', handleResetGame);
+    };
+  }, [socket]);
+
   // Destructure for cleaner JSX
   const { runtime, settings, players, tournament, animation, ui, hostPlaying: hostPlayingState, combo } = state;
+
+  // Navigation guard - prevent accidental navigation during active game
+  // Only enable when the host is actively playing (not spectating)
+  useNavigationGuard({
+    enabled: runtime.gameStarted && settings.hostPlaying,
+    message: t('playerView.exitWarning'),
+    onNavigationAttempt: () => {
+      // Show the exit confirmation dialog
+      state.setShowExitConfirm(true);
+      return false; // Block navigation, let modal handle it
+    },
+  });
 
   // Earthquake/Fire Round feature for multiplayer (only for triggering, state managed via socket events)
   useEarthquakeFireRound({
@@ -276,6 +315,7 @@ const HostView: React.FC<HostViewProps> = memo(({
         onStartNewGame={actions.handleStartNewGame}
         onNextRound={actions.handleNextRound}
         socket={socket}
+        playersReady={playersReadyData}
       />
 
       <QRCodeDialog
@@ -299,19 +339,6 @@ const HostView: React.FC<HostViewProps> = memo(({
         t={t}
       />
 
-      {/* Top Bar with Exit Button */}
-      {!runtime.waitingForResults && (
-        <div className="w-full max-w-6xl flex justify-end mb-4">
-          <Button
-            onClick={actions.handleExitRoom}
-            size="sm"
-            className="shadow-lg hover:scale-105 transition-transform bg-red-500 hover:bg-red-600 border border-red-400/30 hover:shadow-[0_0_15px_rgba(239,68,68,0.5)]"
-          >
-            <FaSignOutAlt className="mr-2" />
-            {t('hostView.exitRoom')}
-          </Button>
-        </div>
-      )}
 
       {/* Waiting for Results View */}
       {runtime.waitingForResults && (
@@ -359,7 +386,7 @@ const HostView: React.FC<HostViewProps> = memo(({
           highlightedCells={animation.highlightedCells}
           tableData={runtime.tableData}
           onStartGame={actions.startGame}
-          onShowQR={actions.handleShowQR}
+          onShowQR={() => state.setShowQR(true)}
           onExitRoom={actions.handleExitRoom}
           onCancelTournament={actions.handleCancelTournamentDialog}
           tournamentCreating={tournament.tournamentCreating}

@@ -44,7 +44,6 @@ export type {
   JoinMode,
   ResultsPageProps,
   PlayerResult,
-  HeatMapData,
   WordToVote,
   XpGainedData,
   LevelUpData,

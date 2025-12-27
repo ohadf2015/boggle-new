@@ -41,11 +41,13 @@ const TestWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => (
 
 describe('Bug Fixes', () => {
   describe('Results Page Text Contrast', () => {
-    it('returns dark text color for all valid point values', () => {
-      // All point colors should have dark text for WCAG AA contrast
-      const pointValues = [1, 2, 3, 4, 5, 6, 7, 8];
+    it('returns correct text color for contrast with backgrounds', () => {
+      // 1-point words have dark gray background, need light text
+      expect(getTextColor(1)).toBe('var(--neo-cream)');
 
-      pointValues.forEach((points) => {
+      // Other point colors (2-8) are light enough to need dark text for WCAG AA contrast
+      const lightBackgroundPoints = [2, 3, 4, 5, 6, 7, 8];
+      lightBackgroundPoints.forEach((points) => {
         const textColor = getTextColor(points);
         expect(textColor).toBe('rgb(var(--neo-black))');
       });

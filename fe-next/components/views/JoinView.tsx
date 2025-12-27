@@ -304,7 +304,7 @@ const JoinView: React.FC<JoinViewProps> = ({
   // Landscape mode layout - 2-column: form left, room list right
   if (isLandscape) {
     return (
-      <div dir={dir} className="flex h-screen w-full overflow-hidden bg-slate-900 p-2 gap-2">
+      <div dir={dir} className="flex h-screen w-full overflow-hidden bg-slate-900 text-white p-2 gap-2">
         {/* Left column: Form */}
         <div className="w-1/2 flex flex-col gap-2 overflow-y-auto">
           {/* Mode Selector */}
@@ -380,7 +380,7 @@ const JoinView: React.FC<JoinViewProps> = ({
         {/* Right column: Room List */}
         <div className="w-1/2 flex flex-col gap-2 overflow-hidden">
           <h2 className="text-xs font-black uppercase text-neo-white text-center">{t('joinView.activeRooms') || 'Active Rooms'}</h2>
-          <div className="flex-1 overflow-y-auto bg-slate-800 rounded-neo border-2 border-neo-black p-2">
+          <div className="flex-1 overflow-y-auto bg-slate-800 text-white rounded-neo border-2 border-neo-black p-2">
             <RoomList
               activeRooms={activeRooms}
               onRoomSelect={handleRoomSelect}
@@ -411,7 +411,7 @@ const JoinView: React.FC<JoinViewProps> = ({
           transition={{ duration: 0.5 }}
           className="flex-1 max-w-md mx-auto w-full"
         >
-          <Card className="backdrop-blur-md bg-white/90 dark:bg-slate-800/90 shadow-2xl border border-purple-500/30">
+          <Card className="backdrop-blur-md bg-white/90 text-neo-black dark:bg-slate-800/90 dark:text-white shadow-2xl border border-purple-500/30">
             <CardHeader className="text-center space-y-4" />
             <CardContent className="space-y-2 sm:space-y-4 p-4 sm:p-5">
               {/* Error Alert */}
@@ -586,7 +586,7 @@ const JoinView: React.FC<JoinViewProps> = ({
 
       {/* QR Code Dialog */}
       <Dialog open={showQR} onOpenChange={setShowQR}>
-        <DialogContent className="sm:max-w-md bg-white dark:bg-slate-800 border-cyan-500/30">
+        <DialogContent className="sm:max-w-md bg-white text-neo-black dark:bg-slate-800 dark:text-white border-cyan-500/30">
           <DialogHeader>
             <DialogTitle className="text-center text-cyan-300 flex items-center justify-center gap-2">
               <FaQrcode />
@@ -594,7 +594,7 @@ const JoinView: React.FC<JoinViewProps> = ({
             </DialogTitle>
           </DialogHeader>
           <div className="flex flex-col items-center gap-4 py-4">
-            <div className="p-6 bg-white rounded-lg shadow-md">
+            <div className="p-6 bg-white text-neo-black rounded-lg shadow-md">
               <QRCodeSVG value={getJoinUrl(gameCode)} size={250} level="H" includeMargin />
             </div>
             <h4 className="text-3xl font-bold text-cyan-400">{gameCode}</h4>

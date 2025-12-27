@@ -65,10 +65,7 @@ const ResultsPage = nextDynamic(() => import('@/components/views/ResultsPage'), 
   ssr: false,
 });
 
-const QuickJoinView = nextDynamic(() => import('@/components/join-view/QuickJoinView'), {
-  loading: () => <ViewLoadingSkeleton />,
-  ssr: false,
-});
+// QuickJoinView removed - invitation flow now uses MultiplayerFlow with InvitationQuickJoin
 
 // Loading skeleton component
 function ViewLoadingSkeleton() {
@@ -79,7 +76,7 @@ function ViewLoadingSkeleton() {
           <div className="absolute inset-0 border-4 border-cyan-500/30 rounded-full" />
           <div className="absolute inset-0 border-4 border-transparent border-t-cyan-500 rounded-full animate-spin" />
         </div>
-        <p className="text-gray-600 text-sm">Loading game...</p>
+        <p className="text-gray-400 text-sm">Loading game...</p>
       </div>
     </div>
   );
@@ -151,16 +148,6 @@ export default function MultiplayerPage(): React.JSX.Element {
   // Track if we should auto-join (prefilled room + existing username)
   const [shouldAutoJoin, setShouldAutoJoin] = useState(false);
   const [prefilledRoomCode, setPrefilledRoomCode] = useState('');
-  // State for QuickJoinView
-  const [usernameError, setUsernameError] = useState(false);
-  const [usernameErrorKey, setUsernameErrorKey] = useState<string | undefined>();
-  const [roomNameError, setRoomNameError] = useState(false);
-  const [roomNameErrorKey, setRoomNameErrorKey] = useState<string | undefined>();
-  const [hostUsernameError, setHostUsernameError] = useState(false);
-  const [hostUsernameErrorKey, setHostUsernameErrorKey] = useState<string | undefined>();
-  const [gameCodeError, setGameCodeError] = useState(false);
-  const [gameCodeErrorKey, setGameCodeErrorKey] = useState<string | undefined>();
-  const [showFullForm, setShowFullForm] = useState(false); // Track if user wants to see full form instead of quick join
 
   // Music transitions based on game state
   // Note: We always call playTrack/fadeToTrack even if audio isn't unlocked yet
@@ -584,20 +571,26 @@ export default function MultiplayerPage(): React.JSX.Element {
 
       // Handle empty error objects (Socket.IO internal errors) - log as debug, not error
       // Also handle Error instances that may appear as {} when logged
-      const isEmptyError = !data ||
-        (typeof data === 'object' && Object.keys(data).length === 0) ||
-        (data instanceof Error && !data.message);
+      // Note: Error objects from different realms may fail instanceof check, so also check for Error-like objects
+      const isErrorLike = data && typeof data === 'object' && ('stack' in data || 'message' in data);
 
-      if (isEmptyError) {
-        logger.debug('[SOCKET.IO] Received empty error object (internal Socket.IO event)', {
-          connected: socketInstance.connected,
-          id: socketInstance.id
-        });
+      // Extract message, handling various error formats
+      const errorMessage = data?.message || (typeof data === 'string' ? data : null);
+      const errorCode = data?.code;
+
+      // Check if we have any meaningful content to log/process
+      const hasNoMeaningfulContent = !data ||
+        (typeof data === 'object' && Object.keys(data).length === 0) ||
+        (isErrorLike && !errorMessage);
+
+      if (hasNoMeaningfulContent) {
+        // Only log in debug mode - these are internal Socket.IO events
+        logger.debug('[SOCKET.IO] Received empty error object (internal Socket.IO event)');
         return; // Don't process empty errors further
       }
 
-      // Log meaningful errors
-      logger.error('[SOCKET.IO] ❌ Error received:', data);
+      // Log meaningful errors with the extracted message
+      logger.error('[SOCKET.IO] ❌ Error received:', errorMessage || errorCode || 'Unknown error');
 
       // If error is about game not in progress, query server for actual state
       if (data?.code === 'GAME_NOT_IN_PROGRESS' || data?.message?.includes('not in progress')) {
@@ -1175,27 +1168,7 @@ export default function MultiplayerPage(): React.JSX.Element {
     setShowResults(true);
   }, []);
 
-  // QuickJoinView handlers
-  const handleQuickJoinSubmit = useCallback((e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    // Validate username
-    if (!username || username.trim().length < 2) {
-      setUsernameError(true);
-      setUsernameErrorKey('validation.usernameTooShort');
-      return;
-    }
-    // Join the prefilled room
-    handleJoin(false, null, prefilledRoomCode);
-  }, [username, prefilledRoomCode, handleJoin]);
-
-  const handleShowFullForm = useCallback(() => {
-    setShowFullForm(true);
-  }, []);
-
-  const handleUsernameErrorClear = useCallback(() => {
-    setUsernameError(false);
-    setUsernameErrorKey(undefined);
-  }, []);
+  // QuickJoinView handlers removed - invitation flow now handled by MultiplayerFlow
 
   // Create context value
   const socketContextValue = {
@@ -1211,7 +1184,6 @@ export default function MultiplayerPage(): React.JSX.Element {
         <FeatureErrorBoundary featureName="Results">
           <ResultsPage
             finalScores={resultsData?.scores ?? null}
-            letterGrid={resultsData?.letterGrid ?? null}
             gameCode={gameCode}
             onReturnToRoom={handleReturnToRoom}
             username={username}
@@ -1224,28 +1196,8 @@ export default function MultiplayerPage(): React.JSX.Element {
     }
 
     if (!isActive) {
-      // Show QuickJoinView when there's a prefilled room code and user hasn't clicked to show full form
-      if (prefilledRoomCode && !showFullForm && !error) {
-        return (
-          <FeatureErrorBoundary featureName="Quick Join">
-            <QuickJoinView
-              gameCode={prefilledRoomCode}
-              username={username}
-              setUsername={setUsername}
-              error={error}
-              isJoining={isJoining}
-              isAuthenticated={isAuthenticated}
-              displayName={profile?.display_name ?? null}
-              usernameError={usernameError}
-              usernameErrorKey={usernameErrorKey}
-              onUsernameErrorClear={handleUsernameErrorClear}
-              onJoin={handleJoin}
-              onQuickJoinSubmit={handleQuickJoinSubmit}
-              onShowFullForm={handleShowFullForm}
-            />
-          </FeatureErrorBoundary>
-        );
-      }
+      // MultiplayerFlow handles both normal flow and invitation links
+      // When prefilledRoomCode is set, it shows InvitationQuickJoin or ProfileSetup accordingly
       return (
         <FeatureErrorBoundary featureName="Lobby">
           <MultiplayerFlow

@@ -118,7 +118,7 @@ const PlayerWaitingResultsView: React.FC<PlayerWaitingResultsViewProps> = ({
   const currentWord = words[currentWordIndex];
 
   return (
-    <div className="min-h-screen w-full bg-neo-cream dark:bg-slate-900 p-3 sm:p-4 md:p-8 flex flex-col transition-colors duration-300">
+    <div className="min-h-screen w-full bg-neo-cream text-neo-black dark:bg-slate-900 dark:text-white p-3 sm:p-4 md:p-8 flex flex-col transition-colors duration-300">
 
       {/* Exit Button */}
       <div className="w-full flex justify-end mb-4 relative z-50">
@@ -137,10 +137,10 @@ const PlayerWaitingResultsView: React.FC<PlayerWaitingResultsViewProps> = ({
               transition={{ duration: 0.3 }}
               className="text-center"
             >
-              <div className="bg-neo-yellow border-4 border-neo-black shadow-hard-lg p-4 sm:p-6 lg:p-8">
+              <div className="bg-neo-yellow text-neo-black border-4 border-neo-black shadow-hard-lg p-4 sm:p-6 lg:p-8">
                 {/* Brain/Processing Animation - Static container, opacity-only animation to prevent CLS */}
                 <div className="mb-4 lg:mb-6 h-[60px] lg:h-[80px] flex items-center justify-center">
-                  <div className="inline-block bg-neo-pink border-4 border-neo-black shadow-hard p-3 lg:p-4">
+                  <div className="inline-block bg-neo-pink text-white border-4 border-neo-black shadow-hard p-3 lg:p-4">
                     <AnimatePresence mode="wait">
                       <motion.div
                         key={stage}
@@ -173,7 +173,7 @@ const PlayerWaitingResultsView: React.FC<PlayerWaitingResultsViewProps> = ({
                 </div>
 
                 {/* Progress bar - Visual feedback */}
-                <div className="relative h-3 lg:h-4 bg-neo-cream border-3 border-neo-black overflow-hidden mb-3 lg:mb-4">
+                <div className="relative h-3 lg:h-4 bg-neo-cream text-neo-black border-3 border-neo-black overflow-hidden mb-3 lg:mb-4">
                   <motion.div
                     className="absolute inset-y-0 left-0 bg-neo-cyan"
                     initial={{ width: '0%' }}
@@ -239,8 +239,8 @@ const PlayerWaitingResultsView: React.FC<PlayerWaitingResultsViewProps> = ({
                 animate={{ opacity: 1 }}
                 transition={{ duration: 0.3, delay: 0.1 }}
               >
-                <div className="bg-neo-cream border-4 border-neo-black shadow-hard-lg overflow-hidden">
-                  <div className="py-2 lg:py-3 px-3 lg:px-4 border-b-4 border-neo-black bg-neo-purple">
+                <div className="bg-neo-cream text-neo-black border-4 border-neo-black shadow-hard-lg overflow-hidden">
+                  <div className="py-2 lg:py-3 px-3 lg:px-4 border-b-4 border-neo-black bg-neo-purple text-white">
                     <h3 className="flex items-center gap-2 text-neo-white text-lg lg:text-xl uppercase tracking-wider font-black">
                       <FaTrophy className="text-neo-yellow" style={{ filter: 'drop-shadow(2px 2px 0px rgb(var(--neo-black)))' }} />
                       {t('playerView.leaderboard')}
@@ -320,7 +320,7 @@ const PlayerWaitingResultsView: React.FC<PlayerWaitingResultsViewProps> = ({
 
       {/* Exit Confirmation Dialog */}
       <AlertDialog open={showExitConfirm} onOpenChange={setShowExitConfirm}>
-        <AlertDialogContent className="bg-white dark:bg-slate-800 border-red-500/30">
+        <AlertDialogContent className="bg-white text-neo-black dark:bg-slate-800 dark:text-white border-red-500/30">
           <AlertDialogHeader>
             <AlertDialogTitle className="text-slate-900 dark:text-white">
               {t('playerView.exitConfirmation') || 'Exit Room?'}

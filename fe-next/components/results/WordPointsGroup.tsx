@@ -122,7 +122,7 @@ const PointGroupRow = memo<{
   animate: boolean;
 }>(({ points, words, t, getPlayerCountForWord, mode, animate }) => (
   <div
-    className="rounded-neo p-1.5 border-l-4 border-neo-black bg-white/50 dark:bg-slate-700/50"
+    className="rounded-neo p-1.5 border-l-4 border-neo-black bg-white/50 text-neo-black dark:bg-slate-700/50"
     style={{ borderLeftColor: getPointColor(points) }}
   >
     <PointsBadge points={points} wordCount={words.length} t={t} />

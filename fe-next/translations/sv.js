@@ -1,0 +1,1955 @@
+// Svenska translations
+const sv = {
+  "flag": "🇸🇪",
+  "name": "Svenska",
+  "direction": "ltr",
+  "logo": {
+    "lexi": "Lexi",
+    "clash": "Clash"
+  },
+  "seo": {
+    "title": "LexiClash - Snabbt Multiplayer Ordspel | Tävla i Realtid",
+    "description": "Tävla mot vänner i spännande ordstrider i realtid! LexiClash är ett snabbt multiplayer-ordspel där varje sekund räknas. Hitta ord, överträffa motståndarna och klättra på topplistan. Perfekt för fester, spelkvällar och vänskaplig tävling. Också bra för att bygga ordförråd medan du har kul! Spela gratis på 4 språk - ingen nedladdning krävs.",
+    "keywords": "multiplayer ordspel, realtids ordspel, online ordstrid, festspel, tävlings ordspel, snabbt ordspel, ordpussel multiplayer, alias spel, kahoot alternativ, familjespelkväll, festspel, teambuilding, ordtävling, live ordspel, ordrace, ordförrådsspel, gratis onlinespel",
+    "ogTitle": "LexiClash - Snabbt Multiplayer Ordspel | Tävla i Realtid",
+    "ogDescription": "Tävla mot vänner i spännande ordstrider i realtid! Hitta ord snabbt, överträffa motståndarna, klättra på topplistan. Perfekt för fester och spelkvällar. Spela gratis på 4 språk!",
+    "twitterTitle": "LexiClash - Snabbt Multiplayer Ordspel | Tävla i Realtid",
+    "twitterDescription": "Tävla mot vänner i spännande ordstrider i realtid! Hitta ord snabbt, överträffa motståndarna, klättra på topplistan. Perfekt för fester och spelkvällar. Spela gratis på 4 språk!",
+    "locale": "sv_SE",
+    "language": "Swedish",
+    "leaderboard": {
+      "title": "Global topplista - Toppspelare | LexiClash",
+      "description": "Visa de högst rankade spelarna på LexiClash globala topplista. Tävla med ordspelsentusiaster över hela världen och följ dina framsteg.",
+      "ogTitle": "Global topplista - Topp ordspelspelare",
+      "ogDescription": "Se var du rankas bland de bästa ordspelsspelarna. Gå med i LexiClash och tävla om toppplatsen!"
+    },
+    "profile": {
+      "title": "Din profil och statistik | LexiClash",
+      "description": "Visa din LexiClash-profil, spelstatistik, prestationer och framsteg. Följ dina vinster, totala poäng, hittade ord och speltid i detta tävlingsinriktade ordspel.",
+      "ogTitle": "Spelarprofil och spelstatistik - LexiClash",
+      "ogDescription": "Följ dina ordspelsprestationer, statistik och klättra i topplistans rankningar."
+    },
+    "terms": {
+      "title": "Användarvillkor | LexiClash",
+      "description": "Läs LexiClash användarvillkor. Lär dig om användarrättigheter, acceptabel användning, kontohantering och våra spelregler för denna multiplayer-ordspelsplattform.",
+      "ogTitle": "Användarvillkor - LexiClash",
+      "ogDescription": "LexiClash användarvillkor - Användarrättigheter och policyer för acceptabel användning."
+    },
+    "privacy": {
+      "title": "Integritetspolicy | LexiClash",
+      "description": "LexiClash integritetspolicy - Lär dig hur vi samlar in, använder och skyddar dina data. Vi prioriterar din integritet och använder branschstandardiserade säkerhetsåtgärder.",
+      "ogTitle": "Integritetspolicy - LexiClash",
+      "ogDescription": "Lär dig hur LexiClash skyddar din integritet och hanterar dina data säkert."
+    },
+    "legal": {
+      "title": "Juridisk information | LexiClash",
+      "description": "LexiClash juridisk information - Få tillgång till våra användarvillkor och integritetspolicy. Lär dig om dina rättigheter och hur vi skyddar dina data.",
+      "ogTitle": "Juridisk information - LexiClash",
+      "ogDescription": "Få tillgång till LexiClash användarvillkor och integritetspolicy."
+    },
+    "singleplayer": {
+      "title": "Enspelarläge - Öva & Utmana | LexiClash",
+      "description": "Spela LexiClash solo! Öva ordhittning, utmana AI-bottar och förbättra ditt ordförråd. Flera svårighetsgrader från lätt till svår. Följ dina framsteg och slå dina highscores.",
+      "ogTitle": "Enspelarläge - Öva & Utmana",
+      "ogDescription": "Öva ordhittning solo, utmana AI-bottar och slå dina highscores i LexiClash enspelarläge."
+    },
+    "daily": {
+      "title": "Daglig Ordutmaning - Samma Pussel Världen Över | LexiClash",
+      "description": "Spela LexiClash dagliga utmaning! Samma pussel för alla världen över varje dag. Dela dina emoji-resultat som Wordle. Tävla globalt och följ dina dagliga serier.",
+      "ogTitle": "Daglig Utmaning - Samma Pussel Världen Över",
+      "ogDescription": "Dagligt ordpussel - samma bräda för alla världen över. Dela dina resultat och tävla globalt!"
+    },
+    "multiplayer": {
+      "title": "Multiplayer Ordstrid - Realtidstävling | LexiClash",
+      "description": "Gå med i ordstrider i realtid med vänner! Var värd för eller gå med i multiplayer-rum, tävla live mot motståndare och klättra på topplistan. Perfekt för fester och spelkvällar.",
+      "ogTitle": "Multiplayer Ordstrid - Tävla Live",
+      "ogDescription": "Realtids multiplayer ordspel - var värd för rum, bjud in vänner och tävla i live ordstrider!"
+    }
+  },
+  "common": {
+    "loading": "Laddar...",
+    "error": "Fel",
+    "back": "Tillbaka",
+    "next": "Nästa",
+    "confirm": "Bekräfta",
+    "cancel": "Avbryt",
+    "dismiss": "Avfärda",
+    "selectUILanguage": "Gränssnittsspråk",
+    "close": "Stäng",
+    "changeLanguage": "Byt Språk",
+    "adminDashboard": "Administratörspanel",
+    "understood": "Förstått, låt oss spela!",
+    "refresh": "Uppdatera",
+    "reconnecting": "Återansluter till spelet...",
+    "reconnected": "Återansluten!",
+    "connectionLost": "Anslutningen förlorad",
+    "notConnected": "Inte ansluten till servern",
+    "connected": "Ansluten",
+    "connecting": "Ansluter...",
+    "connectedToServer": "Ansluten till spelservern",
+    "connectingToServer": "Ansluter till spelservern...",
+    "duplicateWarning": "Ord som hittas av flera spelare räknas inte",
+    "gameStarted": "Spelet startat!",
+    "joinedGame": "Gick med i spelet!",
+    "newGameReady": "Startar nytt spel!",
+    "lightMode": "Ljust läge",
+    "darkMode": "Mörkt läge",
+    "hurry": "SKYNDA!",
+    "goToHome": "Gå till startsidan",
+    "comboBonus": "kombo!",
+    "pending": "Väntar",
+    "xpGained": "XP",
+    "score": "Poäng",
+    "points": "poäng",
+    "combo": "Kombo",
+    "quit": "Avsluta",
+    "foundWords": "Hittade ord",
+    "words": "ord",
+    "wordsFound": "Hittade ord",
+    "leaderboard": "Topplista",
+    "you": "Du",
+    "playAgain": "Spela igen",
+    "quickRematch": "Snabb Omstart",
+    "changeSettings": "Ändra Inställningar",
+    "settingsAndPlay": "Inställningar & Spela Igen",
+    "backToLobby": "Tillbaka till Lobby",
+    "settings": "Inställningar",
+    "lobby": "Lobby",
+    "viewGrid": "Visa rutnät",
+    "min": "min",
+    "advancedSettings": "Avancerade inställningar",
+    "yourScore": "Din poäng",
+    "tapToDismiss": "Tryck för att stänga",
+    "copied": "Kopierad!",
+    "copyCode": "Kopiera kod",
+    "rotateLandscape": "Rotera för bättre spelupplevelse!",
+    "dontShowAgain": "Visa inte igen",
+    "landscapeMode": "Liggande läge",
+    "rank": "Rank",
+    "menu": "Meny",
+    "showControls": "Tryck för att visa kontroller",
+    "loadingProfile": "Laddar profil...",
+    "rematch": "Returmatch",
+    "roomFull": "Rummet är fullt. Du gick med som åskådare.",
+    "selectLanguage": "Välj språk",
+    "gotIt": "Förstått",
+    "help": "Hjälp",
+    "pause": "Pausa",
+    "resume": "Fortsätt",
+    "retry": "Försök igen",
+    "newGame": "Nytt spel",
+    "join": "Gå med",
+    "showLess": "Visa mindre"
+  },
+  "theme": {
+    "sundayFunday": "Kul Söndag",
+    "mondayMotivation": "Måndagsmotivation",
+    "tuesdayTrivia": "Tisdagstrivia",
+    "wednesdayWisdom": "Onsdagsvisdom",
+    "thursdayThrowback": "Torsdags Nostalgi",
+    "funFriday": "Kul Fredag",
+    "saturdayAdventure": "Lördagsäventyr",
+    "newYear": "Nyår",
+    "valentines": "Alla hjärtans dag",
+    "stPatricks": "Sankt Patricks dag",
+    "easter": "Påsk",
+    "independence": "Självständighetsdagen",
+    "halloween": "Halloween",
+    "thanksgiving": "Tacksägelsedag",
+    "christmas": "Jul",
+    "hanukkah": "Chanukka",
+    "roshHashana": "Rosh Hashanah",
+    "yomKippur": "Yom Kippur",
+    "sukkot": "Sukkot",
+    "purim": "Purim",
+    "passover": "Pesach",
+    "shavuot": "Shavuot",
+    "yomHaatzmaut": "Israels nationaldag",
+    "midsummer": "Midsommar",
+    "lucia": "Lucia",
+    "threeKings": "Trettondagen",
+    "dayOfDead": "De dödas dag",
+    "setsubun": "Setsubun",
+    "hinamatsuri": "Flickornas dag",
+    "sakura": "Körsbärsblomning",
+    "goldenWeek": "Gyllene veckan",
+    "tanabata": "Tanabata",
+    "obon": "Obon",
+    "autumnLeaves": "Höstlöv"
+  },
+  "game": {
+    "swipeToForm": "Svep bokstäver",
+    "wordAlreadyFound": "Redan hittad!",
+    "wordNotOnBoard": "Finns inte på brädet!",
+    "wordTooShort": "För kort!",
+    "boardTheme": "Brädtema"
+  },
+  "help": {
+    "title": "Snabbhjälp",
+    "howToPlay": "Hur man spelar",
+    "swipeLetters": "Svep över angränsande bokstäver för att bilda ord",
+    "diagonalWorks": "Diagonala kopplingar fungerar också!",
+    "liftToSubmit": "Lyft fingret för att skicka ordet",
+    "minThreeLetters": "Ord måste vara minst 3 bokstäver",
+    "scoring": "Poängsättning",
+    "letters": "bokstäver",
+    "point": "poäng",
+    "points": "poäng",
+    "combos": "Kombos",
+    "comboExplanation": "Hitta ord snabbt i rad för att bygga kombos! Varje kombonivå ger bonuspoäng till dina ord.",
+    "keyboardShortcuts": "Tangentbordsgenvägar",
+    "arrowKeys": "Piltangenter",
+    "navigate": "Navigera",
+    "spaceKey": "Mellanslag",
+    "selectLetter": "Välj bokstav",
+    "enterKey": "Enter",
+    "submitWord": "Skicka ord",
+    "backspaceKey": "Backsteg",
+    "undoLetter": "Ångra bokstav",
+    "escKey": "Escape",
+    "clearSelection": "Rensa urval",
+    "swipeDownToClose": "Svep nedåt för att stänga",
+    "accessibility": "Tillgänglighet",
+    "disableFireRoundLights": "Inaktivera eldrundebelysning",
+    "disableFireRoundLightsDescription": "Stäng av blinkande ljus på rutorna under eldrunda"
+  },
+  "combo": {
+    "shieldUsed": "🛡️ Kombosköld använd!",
+    "shieldEarned": "🛡️ Sköld upplåst!",
+    "explanationTitle": "🔥 Kombokraft!",
+    "explanationText": "Hitta ord snabbt för att bygga kombon! Högre kombo = större poängmultiplikator. Håll igång serien!"
+  },
+  "earthquake": {
+    "warning": "Jordbävning!",
+    "brace": "Spänn dig!",
+    "fireRound": "Eldrunda",
+    "multiplier": "2× Multiplikator"
+  },
+  "spam": {
+    "warning": "Sakta ner! För många ogiltiga ord",
+    "penalty": "Poäng avdragna: -${points}",
+    "cooldown": "Blockerad i ${seconds}s - sakta ner!",
+    "cooldownEnd": "Du kan skicka ord igen",
+    "blockedWord": "Vänta ${seconds}s innan du skickar"
+  },
+  "bots": {
+    "title": "AI-bottar",
+    "easy": "Lätt",
+    "medium": "Mellan",
+    "hard": "Svår",
+    "easyDesc": "3-5 bokstavsord, långsamt tempo",
+    "mediumDesc": "Balanserad blandning av ord",
+    "hardDesc": "Långa ord, snabbt tempo",
+    "selectDifficulty": "Nivå",
+    "addBot": "Lägg till bot",
+    "adding": "Lägger till...",
+    "remove": "Ta bort bot",
+    "removeError": "Kunde inte ta bort bot",
+    "currentBots": "Bottar i rummet",
+    "quickAdd": "Lägg till",
+    "add": "Lägg till",
+    "emptyState": "Lägg till bottar för att öva eller fylla rummet",
+    "helpText": "Bottar hittar och skickar in ord automatiskt under spelet.",
+    "autoFill": "Fyll automatiskt med bottar",
+    "autoFillDesc": "Lägg automatiskt till bottar för att fylla tomma platser",
+    "orAddManually": "Eller lägg till manuellt:",
+    "roomFull": "Rummet är fullt",
+    "autoStart": "Auto-start efter 30s",
+    "autoStartDesc": "Starta spelet automatiskt efter 30 sekunder",
+    "startingIn": "Startar om...",
+    "cancel": "Avbryt",
+    "waitingForPlayers": "Väntar på minst 2 spelare...",
+    "maxReached": "Maximalt antal bottar nått"
+  },
+  "music": {
+    "volume": "Volym",
+    "musicVolume": "Musik",
+    "sfxVolume": "Ljud",
+    "mute": "Tyst",
+    "unmute": "Ljud på",
+    "clickToEnable": "Klicka för att aktivera musik",
+    "controls": "Musikkontroller",
+    "musicVolumeSlider": "Musikvolymreglage",
+    "sfxVolumeSlider": "Ljudeffektvolymreglage"
+  },
+  "share": {
+    "linkCopied": "Länk kopierad! 📋",
+    "copyError": "Fel vid kopiering av länk",
+    "inviteMessage": "Gå med mig för att spela LexiClash!",
+    "room": "Rum",
+    "code": "Kod",
+    "joinViaLink": "Gå med via denna länk",
+    "copyLinkButton": "Kopiera länk",
+    "whatsappButton": "Dela på WhatsApp",
+    "qrCodeButton": "Visa QR-kod",
+    "qrCodeTitle": "Skanna för att gå med",
+    "shareTitle": "Bjud in spelare",
+    "codeCopied": "Kod kopierad! 🎯",
+    "codeCopyError": "Fel vid kopiering av kod",
+    "buttonLabel": "Dela spel",
+    "modalTitle": "Bjud in spelare",
+    "scanQR": "Skanna med telefon för att gå med",
+    "orShareVia": "Eller dela via:",
+    "copyLink": "Kopiera länk",
+    "whatsapp": "WhatsApp",
+    "telegram": "Telegram",
+    "more": "Mer...",
+    "inviteTitle": "Gå med i mitt LexiClash-spel!",
+    "copied": "Kopierat!"
+  },
+  "errors": {
+    "unstableConnection": "Internetanslutningen är instabil - du kan uppleva problem under spelet",
+    "slowConnection": "Långsam internetanslutning",
+    "sessionExpired": "Föregående session har gått ut. Vänligen gå med i ett nytt rum.",
+    "gameCodeNotExist": "Spelkoden finns inte. Vänligen kontrollera och försök igen.",
+    "usernameTaken": "Användarnamnet är redan upptaget i det här spelet. Välj ett annat.",
+    "gameCodeExists": "Spelkoden finns redan. Välj en annan kod.",
+    "somethingWentWrong": "Hoppsan! Något gick fel",
+    "unexpectedError": "Spelet stötte på ett oväntat fel. Försök uppdatera sidan.",
+    "errorDetails": "Feldetaljer",
+    "refreshPage": "Uppdatera sidan",
+    "connectionTimeout": "Anslutningen gick ut",
+    "rateLimited": "För många förfrågningar. Vänligen sakta ner.",
+    "connectionLost": "Anslutningen förlorad",
+    "notConnected": "Inte ansluten till servern"
+  },
+  "validation": {
+    "usernameRequired": "Användarnamn krävs! Fyll i fältet",
+    "hostUsernameRequired": "Spelarnamn krävs för att starta ett spel",
+    "roomNameRequired": "Rumsnamn krävs! Fyll i fältet",
+    "enterNameToJoin": "Ange ett namn för att gå med",
+    "enterRoomName": "Namn för att identifiera ditt rum",
+    "enterGameCode": "Ange spelkoden som delats av värden",
+    "codeHelper": "Kod som spelare delar för att gå med",
+    "fourDigitCode": "4-siffrig kod",
+    "enterFourDigitCode": "Ange en 4-siffrig kod",
+    "usernameTooShort": "Användarnamn måste vara minst 2 tecken",
+    "usernameTooLong": "Användarnamn får inte överstiga 20 tecken",
+    "usernameInvalidChars": "Användarnamn innehåller ogiltiga tecken",
+    "roomNameTooShort": "Rumsnamn måste vara minst 2 tecken",
+    "roomNameTooLong": "Rumsnamn får inte överstiga 30 tecken",
+    "roomNameInvalidChars": "Rumsnamn innehåller ogiltiga tecken",
+    "gameCodeRequired": "Spelkod krävs",
+    "gameCodeInvalid": "Spelkod måste vara 6-10 alfanumeriska tecken",
+    "wordRequired": "Ord krävs",
+    "wordTooLong": "Ordet är för långt",
+    "wordInvalidChars": "Ordet innehåller ogiltiga tecken",
+    "gameCodeHint": "Ange spelkoden som delades av värden"
+  },
+  "difficulty": {
+    "easy": "Lätt",
+    "medium": "Medel",
+    "hard": "Svår",
+    "expert": "Expert",
+    "master": "Mästare"
+  },
+  "joinView": {
+    "title": "LexiClash",
+    "createRoom": "Skapa rum",
+    "joinRoom": "Gå med i rum",
+    "joinDesc": "Ange kod för att gå med i befintligt spel",
+    "hostDesc": "Starta ett nytt spel som värd",
+    "roomNamePlaceholder": "Ange rumsnamn",
+    "roomNameLabel": "Rumsnamn",
+    "roomNameHelper": "Namn som visas för andra spelare i lobbyn",
+    "roomNameHelperOptional": "Valfritt - Ett slumpmässigt namn genereras om det lämnas tomt",
+    "optional": "valfritt",
+    "roomNameExample": "t.ex. Fredagskväll Spel",
+    "hostPlayerName": "Ditt spelarnamn",
+    "hostPlayerNamePlaceholder": "Ange ditt spelarnamn",
+    "hostPlayerNameHelper": "Ditt namn som visas i spelet",
+    "playerNamePlaceholder": "Ange ditt namn",
+    "yourName": "Ditt namn",
+    "enterYourName": "Ange ditt namn",
+    "pleaseEnterYourName": "Vänligen ange ditt namn",
+    "playerAndRoomName": "Detta blir ditt spelarnamn och rumsnamn",
+    "selectLanguage": "Spelspråk",
+    "language": "Spelspråk",
+    "activeRooms": "Tillgängliga rum",
+    "noRooms": "Inga tillgängliga rum. Skapa ett!",
+    "roomsList": "Tillgängliga rum",
+    "players": "spelare",
+    "host": "Rum",
+    "joiningRoom": "Du går med i rummet",
+    "roomLabel": "Rum",
+    "wantToHostOrJoinOther": "Vill du vara värd eller gå med i ett annat rum?",
+    "clearAndRestart": "Rensa och börja om",
+    "english": "English",
+    "hebrew": "Hebrew",
+    "swedish": "Svenska",
+    "japanese": "日本語",
+    "spanish": "Español",
+    "generateNewCode": "Generera ny kod",
+    "createGameInstructions": "Skapa ett spel och dela koden med vänner!",
+    "createNewRoom": "Skapa ett nytt rum för att komma igång!",
+    "howToPlay": "Hur spelar man?",
+    "howToPlayTitle": "Hur man spelar LexiClash",
+    "qrCodeTitle": "QR-kod för att gå med",
+    "scanToJoin": "Skanna koden för att gå med i spelet eller använd kod",
+    "copyLink": "Kopiera länk",
+    "shareWhatsapp": "WhatsApp",
+    "shareEmail": "E-post",
+    "inviteTitle": "Gå med i rum",
+    "enterNameToPlay": "Ange ditt namn för att spela",
+    "playButton": "Spela",
+    "joiningRoomNumber": "Rum",
+    "room": "Rum",
+    "welcomeBack": "Välkommen tillbaka",
+    "connectingToRoom": "Ansluter till rummet...",
+    "enterRoom": "Gå in i rummet",
+    "joinGame": "Gå med i spelet",
+    "pasteCode": "Klistra in Kod",
+    "joiningAs": "Går med som",
+    "hostingAs": "Värd som",
+    "tapToChangeDisplayName": "Tryck för att ändra visningsnamn",
+    "joining": "Går med...",
+    "creating": "Skapar...",
+    "playersOnline": "online",
+    "loadingProfile": "Laddar profil...",
+    "nickname": "Smeknamn",
+    "nicknamePlaceholder": "Ange ditt smeknamn",
+    "roomCode": "Rumskod",
+    "defaultPlayerNames": [
+      "Smyg Gurka",
+      "Disco Potatis",
+      "Kosmisk Banan",
+      "Fluffig Våffla",
+      "Krispig Taco",
+      "Mjuk Mochi",
+      "Vriden Kringla",
+      "Chunky Kaka",
+      "Kladdig Munk",
+      "Pigg Avokado",
+      "Seg Nudel",
+      "Fånig Lax",
+      "Fnissig Gås",
+      "Galen Valross",
+      "Pigg Pingvin",
+      "Loopy Lama",
+      "Yr Drake",
+      "Funky Flamingo",
+      "Studsig Björn",
+      "Snabb Zebra",
+      "Fräck Sengångare",
+      "Knasig Koala",
+      "Glad Manet",
+      "Vild Tvättbjörn",
+      "Fräsig Räv",
+      "Glad Flodhäst"
+    ],
+    "chooseAvatar": "Välj din avatar",
+    "selectAvatar": "Välj en avatar",
+    "tapToChange": "Tryck för att ändra",
+    "tapToSelect": "Tryck för att välja",
+    "playingAs": "Spelar som",
+    "changeProfile": "Ändra profil eller gå med i ett annat rum"
+  },
+  "multiplayerFlow": {
+    "selector": {
+      "createCard": {
+        "title": "Skapa Rum",
+        "description": "Var värd för ett nytt spel och bjud in vänner",
+        "button": "Starta Inställning"
+      },
+      "joinCard": {
+        "title": "Gå Med i Rum",
+        "description": "Gå med i ett befintligt spel med en kod",
+        "button": "Bläddra i Rum"
+      },
+      "activeRoomsPreview": "Aktiva Rum",
+      "playersOnline": "online",
+      "noRooms": "Inga aktiva rum - var den första att skapa ett!"
+    },
+    "editProfile": "Redigera Profil",
+    "profileSetup": {
+      "title": "Spelarinställning",
+      "editTitle": "Redigera Profil",
+      "progress": "Steg 1 av 2",
+      "editingProgress": "Redigerar din profil",
+      "forCreate": "Nästan där! Ställ in din profil för att skapa ett rum.",
+      "forJoin": "Nästan där! Ställ in din profil för att gå med i ett rum.",
+      "forEdit": "Uppdatera dina profiluppgifter nedan.",
+      "usernameLabel": "Vad ska vi kalla dig?",
+      "usernamePlaceholder": "Ange ditt namn",
+      "usernameHint": "2-20 tecken, bokstäver och siffror",
+      "avatarLabel": "Välj din avatar",
+      "continueButton": "Fortsätt",
+      "saveButton": "Spara Ändringar"
+    },
+    "createForm": {
+      "title": "Skapa Rum",
+      "progress": "Steg 2 av 2",
+      "profileLabel": "Din Profil",
+      "roomNameLabel": "Rumsnamn",
+      "roomNamePlaceholder": "Ange rumsnamn (valfritt)",
+      "roomNameHint": "Detta namn visas för andra spelare i lobbyn",
+      "languageHint": "Spelare hittar ord på detta språk",
+      "createButton": "Skapa Rum",
+      "creating": "Skapar..."
+    },
+    "joinForm": {
+      "title": "Gå Med i Rum",
+      "progress": "Steg 2 av 2",
+      "profileLabel": "Din Profil",
+      "codeLabel": "Ange Rumskod",
+      "codePlaceholder": "ABC123",
+      "codeHint": "Be din vän om deras rumskod",
+      "roomsLabel": "Eller välj ett aktivt rum",
+      "refreshButton": "Uppdatera",
+      "noRooms": "Inga aktiva rum. Be en vän om deras rumskod!",
+      "joinButton": "Gå Med i Rum",
+      "joining": "Går med..."
+    }
+  },
+  "hostView": {
+    "waitingForPlayers": "Väntar på spelare...",
+    "startGame": "Starta spel",
+    "stopGame": "Stoppa spel",
+    "roomCode": "Rumskod",
+    "playersJoined": "Spelare anslutna",
+    "gameSettings": "Spelinställningar",
+    "quickSetup": "Snabbval",
+    "presetEasy": "Lätt",
+    "presetEasyDesc": "5x5 bräde, 2 min",
+    "presetQuick": "Snabb",
+    "presetQuickDesc": "7x7 bräde, 1 min",
+    "presetParty": "Fest",
+    "presetPartyDesc": "7x7 bräde, 2 min",
+    "presetChallenge": "Utmaning",
+    "presetChallengeDesc": "9x9 bräde, 3 min",
+    "min": "min",
+    "difficulty": "Svårighetsgrad",
+    "timer": "Timer",
+    "roundDuration": "Rundans längd",
+    "minutes": "minuter",
+    "playerJoinedLate": "gick med sent!",
+    "playerFoundWord": "hittade",
+    "validateWords": "Granska och validera ord",
+    "validationComplete": "Validering klar!",
+    "gameStopped": "Spelet stoppat",
+    "confirmExit": "Är du säker på att du vill avsluta? Rummet förblir öppet och en annan spelare blir värd.",
+    "exitWarning": "Denna åtgärd stänger rummet för alla spelare. Är du säker på att du vill avsluta?",
+    "exitRoom": "Lämna rum",
+    "startNewGame": "Starta nytt spel",
+    "validation": "Ordvalidering",
+    "validateIntro": "Markera giltiga ord. Omarkerade ord tas bort.",
+    "totalWords": "Totalt antal ord att validera",
+    "submitValidation": "Skicka validering",
+    "finalScores": "Slutresultat",
+    "words": "Ord",
+    "achievements": "Prestationer",
+    "close": "Stäng",
+    "copyLink": "Kopiera länk",
+    "shareWhatsapp": "Dela WhatsApp",
+    "qrCode": "QR-kod",
+    "scanQr": "Skanna QR-kod för att gå med eller använd kod",
+    "autoValidated": "Automatiskt validerat",
+    "clickToShow": "Klicka för att visa",
+    "clickToHide": "Klicka för att dölja",
+    "hostPlays": "Jag vill spela",
+    "spectatorMode": "Åskådarläge - titta på brädet",
+    "advancedSettings": "Avancerade inställningar",
+    "autoValidatedCount": "ord automatiskt validerade",
+    "roomClosedInactivity": "Rummet stängt på grund av inaktivitet",
+    "gameOverCheckScores": "Spelet slut! Kolla slutresultaten",
+    "validatingWords": "Validerar ord...",
+    "youAreNowHost": "Du är nu värden!",
+    "newHostAssigned": "är nu värden",
+    "hostLeft": "Värden lämnade rummet",
+    "liveResults": "Liveresultat",
+    "spectatingInfo": "Du tittar på - ord är dolda tills spelet slutar",
+    "autoSubmittingValidation": "Skickar automatisk validering på grund av inaktivitet",
+    "tournamentMode": "Turneringsläge",
+    "rounds": "Omgångar",
+    "tournamentRound": "Omgång",
+    "tournamentStandings": "Turneringsställning",
+    "tournamentComplete": "Turnering slutförd!",
+    "tournamentWinner": "Turneringsvinnare",
+    "totalScore": "Totalpoäng",
+    "nextRound": "Nästa omgång",
+    "tournamentProgress": "Turneringsframsteg",
+    "tournamentCreated": "Turnering skapad!",
+    "tournamentCancelled": "Turnering avbruten",
+    "gameComplete": "Spelet avslutat!",
+    "wonTournament": "vann turneringen",
+    "tournamentCreateFailed": "Misslyckades med att skapa turnering. Försök igen.",
+    "autoValidationCompleted": "Automatisk validering slutförd",
+    "cancelTournament": "Avbryt turnering",
+    "confirmCancelTournament": "Avbryt turnering?",
+    "cancelTournamentWarning": "Är du säker på att du vill avbryta turneringen? Alla framsteg går förlorade och detta kan inte ångras.",
+    "minWordLength": "Minsta ordlängd",
+    "minWordLength2": "2 bokstäver",
+    "minWordLength3": "3 bokstäver",
+    "minWordLength4": "4 bokstäver",
+    "difficultyTooltipGrid": "{{rows}}×{{cols}} bokstavsrutnät",
+    "difficultyTooltipTimer": "{{minutes}} min rekommenderas",
+    "allWordsAutoValidated": "Alla ord automatiskt validerade!",
+    "wordsAutoValidated": "ord automatiskt validerade",
+    "gameTypeSelector": "Välj spelläge",
+    "regularGame": "Vanligt spel",
+    "regularGameDesc": "Snabb enkelomgång för avslappnat spel",
+    "tournament": "Turnering",
+    "tournamentDesc": "Flerrundskonkurrens för mästare",
+    "comingSoon": "Kommer snart",
+    "numberOfRounds": "Antal omgångar",
+    "betweenRoundsStandings": "Aktuell ställning",
+    "nextRoundIn": "Nästa omgång börjar om",
+    "startNow": "Starta nu",
+    "creatingTournament": "Skapar turnering...",
+    "increaseRounds": "Öka antal omgångar",
+    "decreaseRounds": "Minska antal omgångar",
+    "resetFailed": "Misslyckades att återställa spelet",
+    "decreaseTimer": "Minska timer",
+    "increaseTimer": "Öka timer",
+    "moreSettings": "Fler inställningar",
+    "playersReadyForNextGame": "spelare redo för nästa spel",
+    "hostPlaysShort": "Värd spelar",
+    "hostSpectates": "Åskådar",
+    "letters": "bokstäver",
+    "players": "spelare"
+  },
+  "playerView": {
+    "waitingForHost": "Väntar på att värden ska starta...",
+    "submitWord": "Skicka",
+    "clear": "Rensa",
+    "timeRemaining": "Tid kvar",
+    "score": "Poäng",
+    "wordsFound": "Ord hittade",
+    "wordsOnBoard": "Ord på brädet",
+    "wordsRemaining": "ord kvar",
+    "remaining": "Kvar",
+    "found": "hittade",
+    "total": "totalt",
+    "gameOver": "Spelet slut! 🏁",
+    "wordAlreadyFound": "Ordet redan hittat! ❌",
+    "foundByOther": "Hittades av ${player}",
+    "wordNotOnBoard": "Ordet finns inte på brädet! 🚫",
+    "wordRejected": "Inte ett giltigt ord! ❌",
+    "newWord": "Nytt ord!",
+    "scoresReady": "Resultat klara! ✅",
+    "roomClosed": "Rummet stängt",
+    "onlyLanguageWords": "Endast ord på valt språk! 🚫",
+    "exitConfirmation": "Lämna rummet?",
+    "exitWarning": "Är du säker på att du vill lämna? Du kommer att förlora ditt framsteg i det aktuella spelet.",
+    "exit": "Avsluta",
+    "exitRoom": "Lämna rummet",
+    "waitForGameStart": "Vänta på att spelet startar",
+    "players": "Spelare",
+    "yourAchievements": "Dina prestationer",
+    "letterGrid": "Bokstavsbräde",
+    "waitingForGame": "Väntar på spel...",
+    "add": "Lägg till",
+    "enterWord": "Ange ord...",
+    "waitingForResults": "Väntar på resultat...",
+    "calculatingScores": "Beräknar poäng...",
+    "aiValidating": "AI kontrollerar...",
+    "leaderboard": "Topplista",
+    "noPlayersYet": "Inga spelare ännu",
+    "wordSubmitted": "Skickat",
+    "wordTooShort": "Ordet för kort! (min 2 bokstäver)",
+    "wordTooShortMin": "Ordet för kort! (min ${min} bokstäver)",
+    "errorOccurred": "Ett fel inträffade",
+    "tooFast": "Sakta ner! Skickar för snabbt",
+    "wordCount": "ord",
+    "longestWord": "Längsta",
+    "hostValidating": "Värden validerar ord...",
+    "clickToSelect": "Klicka på bokstäver för att välja ord",
+    "me": "Jag",
+    "noWordsYet": "Inga ord hittade ännu",
+    "shuffle": "Blanda",
+    "swipeToFormWords": "Svep på brädet för att bilda ord",
+    "inviteFriends": "Bjud in vänner",
+    "waitingForHostToStart": "Väntar på att värden ska starta spelet...",
+    "notInDictionary": "Finns inte i ordlistan",
+    "hostDisconnected": "Värden kopplades bort. Väntar på återanslutning...",
+    "isNowHost": "är nu värd",
+    "disconnected": "kopplades bort. Väntar på återanslutning...",
+    "reconnected": "återansluten",
+    "leftRoom": "lämnade rummet",
+    "weakConnection": "har svag anslutning",
+    "connectionRecovered": "anslutningen återställd",
+    "sessionMovedToAnotherTab": "Sessionen flyttades till en annan flik",
+    "sessionMovedToAnotherRoom": "Sessionen flyttades till ett annat rum",
+    "validatingWord": "Kontrollerar:",
+    "validation": {
+      "scanning": "Skannar ord...",
+      "checking": "Kollar ordbok...",
+      "verifying": "AI verifierar...",
+      "scoring": "Beräknar poäng...",
+      "finalizing": "Slutför resultat..."
+    },
+    "rankings": "Rankningar",
+    "showLeaderboard": "Visa topplistan",
+    "slowDown": "Sakta ner! Ord bearbetas.",
+    "submittingTooFast": "Du skickar ord för snabbt",
+    "words": "Ord",
+    "alreadyFound": "Redan hittad",
+    "invalidWord": "Ogiltigt ord",
+    "pendingValidation": "Väntar på validering"
+  },
+  "lateJoiner": {
+    "welcomeTitle": "Spelet pågår!",
+    "welcomeMessage": "Du gick med mitt i spelet. Här är vad du behöver veta:",
+    "timeRemaining": "Tid kvar",
+    "currentLeaders": "Nuvarande ledare",
+    "quickTip1": "Svep intilliggande bokstäver för att bilda ord",
+    "quickTip2": "Lyft fingret för att skicka in",
+    "quickTip3": "Längre ord = fler poäng!",
+    "gotIt": "Jag fattar, låt oss spela!",
+    "badge": "Sen anslutning",
+    "joinedMidGame": "gick med mitt i spelet"
+  },
+  "spectator": {
+    "watching": "Tittar som åskådare",
+    "roomFull": "Rummet är fullt ({{current}}/{{max}} spelare)",
+    "joinWhenAvailable": "Gå med när en plats öppnas",
+    "joinGame": "Gå med i spelet",
+    "slotAvailable": "{{count}} plats tillgänglig",
+    "slotsAvailable": "{{count}} platser tillgängliga",
+    "upgraded": "Du kan nu spela!",
+    "youAreSpectating": "Du tittar på detta spel",
+    "watchingGame": "Tittar på spelet...",
+    "waitForSlot": "Väntar på spelarplats..."
+  },
+  "hints": {
+    "hint": "Ledtråd",
+    "getHint": "Få ledtråd",
+    "loading": "Hämtar ledtråd...",
+    "noHints": "Inga ledtrådar kvar",
+    "noWordsLeft": "Inga fler ord att hitta!",
+    "lookFor": "Leta efter ett",
+    "letterWord": "bokstävers ord",
+    "letters": "bokstäver",
+    "startsWith": "börjar med",
+    "tapToDismiss": "Tryck för att stänga",
+    "with": "med",
+    "inMiddle": "i mitten",
+    "vowels": "vokaler",
+    "withDoubles": "med dubbla bokstäver",
+    "longerWord": "Ett längre ord",
+    "shortWord": "Kort ord"
+  },
+  "achievementPopup": {
+    "unlocked": "Prestation upplåst!",
+    "tapToDismiss": "Tryck för att stänga"
+  },
+  "achievementDock": {
+    "title": "Dina prestationer"
+  },
+  "chat": {
+    "title": "Rumschatt",
+    "placeholder": "Skriv ett meddelande...",
+    "noMessages": "Inga meddelanden ännu",
+    "startChatting": "Börja chatta!",
+    "send": "Skicka meddelande",
+    "newMessages": "Nya chattmeddelanden"
+  },
+  "results": {
+    "topPlayers": "Toppspelare",
+    "otherPlayers": "Andra spelare",
+    "yourPerformance": "Din prestation",
+    "viewDetails": "Visa prestationsdetaljer",
+    "viewAllWords": "Visa alla ord",
+    "viewXpBreakdown": "Visa XP-uppdelning",
+    "gameOver": "Spelet slut",
+    "winner": "Vinnare",
+    "winnerAnnouncement": "Vinnare",
+    "youWon": "Du vann!",
+    "secondPlace": "2:a plats!",
+    "thirdPlace": "3:e plats!",
+    "silverMedalist": "Silvermedaljör",
+    "bronzeMedalist": "Bronsmedaljör",
+    "points": "poäng",
+    "pointWords": "${points} Poäng Ord",
+    "invalid": "Ogiltiga",
+    "exitRoom": "Lämna rum",
+    "exitWarning": "Är du säker på att du vill lämna? Du kan stanna kvar och vänta på att ett nytt spel startar.",
+    "playAgain": "Spela igen",
+    "finalScores": "Slutresultat",
+    "returnToRoom": "Återvänd till aktivt rum",
+    "cancelAutoReturn": "Avbryt automatisk retur",
+    "valid": "giltiga",
+    "validWords": "Giltiga Ord",
+    "playAgainQuestion": "🎮 Redo för en ny runda?",
+    "playAgainDescription": "Stanna kvar i rummet och vänta på att värden startar ett nytt spel",
+    "stayInRoom": "Ja, stanna i rummet",
+    "leaveRoom": "Nej, lämna rummet",
+    "shared": "Delad",
+    "comboBonus": "Kombobonus",
+    "basePoints": "Bas",
+    "totalScore": "Totalt",
+    "noPoints": "Inga poäng",
+    "otherPlayers": "Andra spelare",
+    "needsVerification": "Behöver Verifiering",
+    "autoVerified": "Automatiskt Verifierad",
+    "aiVerified": "Verifierad av AI",
+    "aiRejected": "Avvisad av AI",
+    "tapToClose": "Tryck var som helst för att stänga",
+    "startNewGame": "Starta nytt spel",
+    "levelUp": "Nivå upp!",
+    "pendingValidation": "Väntar på gemenskapens validering",
+    "potentialScore": "+${score} poäng om godkänt",
+    "wordValidated": "Ordet validerat! Du fick ${score} poäng!",
+    "autoRejoinIn": "Automatiskt återansluter om",
+    "rejoinNow": "Återanslut nu",
+    "largeRoomMode": "Stort rumsläge",
+    "duplicateRuleDisabled": "Med 8+ spelare räknas dubblettord fortfarande!",
+    "longest": "Längsta",
+    "accuracy": "Precision",
+    "rankings": "Rankningar",
+    "yourWords": "Dina ord",
+    "fireRoundBonus": "Eldrunda",
+    "time": "Tid",
+    "viewResults": "Visa resultat",
+    "place": "Plats",
+    "words": "Ord",
+    "bestWord": "Bästa",
+    "pointsFromFirst": "Bara {points} poäng från 1:a plats!",
+    "missedWords": "Ord du missade",
+    "missedWordsHint": "Höga poäng ord som andra hittade",
+    "missedWordsMotivation": "Lär dig dessa till nästa gång!",
+    "showMoreWords": "Visa {count} till",
+    "players": "spelare",
+    "everyoneReady": "Alla redo!",
+    "waitingForPlayers": "Väntar på spelare",
+    "ready": "Redo!",
+    "waiting": "Väntar...",
+    "allPlayersReady": "Alla spelare är redo! Värden kan starta nästa runda.",
+    "you": "(Du)",
+    "betterLuckNextTime": "Bättre lycka nästa gång!",
+    "yourPlace": "{rank}:e plats",
+    "tryAgainEncouragement": "Fortsätt spela för att förbättra dig!"
+  },
+  "archetypes": {
+    "strategist": "Strategen",
+    "strategistDesc": "Beräknade drag, maximal effekt",
+    "speedster": "Snabbis",
+    "speedsterDesc": "Blixtsnabba reflexer",
+    "scholar": "Akademikern",
+    "scholarDesc": "Mästare på svår vokabulär",
+    "explorer": "Upptäckaren",
+    "explorerDesc": "Hittar det andra missar",
+    "perfectionist": "Perfektionisten",
+    "perfectionistDesc": "Varje ord räknas",
+    "maverick": "Rebellen",
+    "maverickDesc": "Djärv och okonventionell",
+    "workhorse": "Arbetshästen",
+    "workhorseDesc": "Outtröttlig och ihärdig",
+    "closer": "Avslutaren",
+    "closerDesc": "Trivs under press",
+    "trailblazer": "Banbrytaren",
+    "trailblazerDesc": "Satsar på stora vinster"
+  },
+  "scoreCard": {
+    "title": "Ditt Resultatkort",
+    "rank": {
+      "position": "#{rank} av {total}",
+      "percentile": "Topp {percentile}%",
+      "winner": "Vinnare!",
+      "pointsFromWinner": "{points} från vinnaren",
+      "pointsFromNext": "{points} från nästa"
+    },
+    "score": "Poäng",
+    "wordsFound": "Ord Hittade",
+    "accuracy": "Noggrannhet",
+    "longestWord": "Längsta Ordet",
+    "maxCombo": "Max Kombo",
+    "uniqueWords": "Unika Ord",
+    "topWords": "Bästa Orden",
+    "achievements": "Prestationer",
+    "shareResults": "Dela Resultat",
+    "downloadImage": "Ladda Ner Bild",
+    "errorGenerating": "Kunde inte skapa resultatkort",
+    "loading": "Skapar resultatkort...",
+    "stats": {
+      "totalWords": "Totalt Ord",
+      "validWords": "Giltiga Ord",
+      "accuracy": "Noggrannhet",
+      "longestWord": "Längsta Ordet",
+      "maxCombo": "Max Kombo",
+      "comboBonus": "Kombo Bonus",
+      "fireBonus": "Eld Bonus",
+      "uniqueWords": "Unika Ord",
+      "avgWordLength": "Genomsnittlig Ordlängd"
+    }
+  },
+  "playerTitles": {
+    "champion": {
+      "name": "Mästare",
+      "icon": "👑",
+      "description": "Spelets vinnare"
+    },
+    "perfectionist": {
+      "name": "Perfektionisten",
+      "icon": "✨",
+      "description": "Högsta träffsäkerhet - alla ord giltiga"
+    },
+    "speedster": {
+      "name": "Blixtsnabb",
+      "icon": "⚡",
+      "description": "Flest ord per minut"
+    },
+    "wordsmith": {
+      "name": "Ordsmeden",
+      "icon": "📝",
+      "description": "Hittade flest ord"
+    },
+    "scholar": {
+      "name": "Den Lärde",
+      "icon": "🎓",
+      "description": "Hittade det längsta ordet"
+    },
+    "explorer": {
+      "name": "Utforskaren",
+      "icon": "🧭",
+      "description": "Mest varierade ordlängder"
+    },
+    "sniper": {
+      "name": "Prickskytten",
+      "icon": "🎯",
+      "description": "Bästa träffsäkerhet (minst ogiltiga ord)"
+    },
+    "comboMaster": {
+      "name": "Kombomästare",
+      "icon": "🔥",
+      "description": "Högsta intjänad kombobonus"
+    },
+    "earlyBird": {
+      "name": "Morgonfågeln",
+      "icon": "🐦",
+      "description": "Flest ord under första minuten"
+    },
+    "clutchPlayer": {
+      "name": "Avgörande Spelaren",
+      "icon": "⏰",
+      "description": "Flest ord under sista 30 sekunderna"
+    },
+    "bigWordHunter": {
+      "name": "Storordsjägare",
+      "icon": "🦁",
+      "description": "Flest ord med 6+ bokstäver"
+    },
+    "consistentPlayer": {
+      "name": "Den Stadige",
+      "icon": "📊",
+      "description": "Mest konsekvent ordinlämning"
+    }
+  },
+  "scorePage": {
+    "title": "🏆 Spelresultat",
+    "leaderboard": "Topplista",
+    "points": "Poäng",
+    "congratulations": "Grattis"
+  },
+  "howToPlay": {
+    "title": "Hur spelar man LexiClash?",
+    "description": "LexiClash är ett snabbt ordspel där du tävlar mot klockan för att hitta så många ord som möjligt på ett bokstavsrutnät. Ju längre ord, desto fler poäng!",
+    "descriptionNote": "Ord måste vara minst 2 bokstäver långa. Namn, platser och kända akronymer är tillåtna!",
+    "createOrJoinTitle": "Skapa eller gå med i ett spel",
+    "createOrJoinDesc": "Värden skapar ett rum och delar koden. Spelare går med med koden.",
+    "hostStartsTitle": "Värden startar spelet",
+    "hostStartsDesc": "När alla är redo startar värden timern och bokstäverna visas!",
+    "findWordsTitle": "Hitta ord på brädet",
+    "findWordsDesc": "Koppla ihop angränsande bokstäver i ALLA riktningar (horisontellt, vertikalt, diagonalt, och till och med baklänges) för att bilda ord. Varje bokstav kan bara användas en gång per ord.",
+    "findWordsNote": "Obs: Du kan inte återanvända samma bokstav i ett enda ord!",
+    "earnPointsTitle": "Tjäna poäng och prestationer",
+    "earnPointsDesc": "Ju längre ord, desto fler poäng! Plus, lås upp speciella prestationer för imponerande bedrifter.",
+    "earnPointsNote": "Speciella prestationer kan ge dig en fin poängboost!",
+    "scoringSystemTitle": "Poängsystem 🎯",
+    "scoringTable": {
+      "letters2": "2 bokstäver: 1 poäng",
+      "letters3": "3 bokstäver: 2 poäng",
+      "letters4": "4 bokstäver: 3 poäng",
+      "letters5": "5 bokstäver: 4 poäng",
+      "letters6": "6 bokstäver: 5 poäng",
+      "letters7": "7 bokstäver: 6 poäng",
+      "letters8plus": "8+ bokstäver: 7+ poäng",
+      "formula": "Enkel formel: (ordlängd - 1) poäng"
+    },
+    "achievementsTitle": "Speciella prestationer 🏆",
+    "achievements": {
+      "speedDemon": "⚡ Hastighetsdemon - Första spelaren att hitta 5 ord",
+      "wordWizard": "🎩 Ordtrollkarl - Hitta 20+ ord",
+      "vocabularyKing": "👑 Ordförrådskung - Hitta 30+ ord",
+      "longWordMaster": "📏 Långordsmästare - Hitta ett ord med 7+ bokstäver",
+      "perfectionist": "💎 Perfektionist - 100% av dina ord är giltiga",
+      "earlyBird": "🐦 Morgonpiggen - Hitta 3 ord på första minuten",
+      "examples": "Exempel på prestationer"
+    },
+    "tipsTitle": "Tips för att vinna 💡",
+    "gameFeaturesTitle": "Spelfunktioner",
+    "tips": {
+      "tip1": "Börja med korta ord och utöka dem (t.ex. \"katt\" → \"katter\")",
+      "tip2": "Leta efter vanliga bokstavskombinationer",
+      "tip3": "Skanna systematiskt - hoppa inte runt slumpmässigt",
+      "tip4": "Hastighet är viktigt! Hitta ord snabbt för att låsa upp prestationer",
+      "tip5": "Kom ihåg - endast giltiga ord på det valda språket räknas"
+    },
+    "readyToPlay": "Redo? Låt oss börja spela! 🎮",
+    "funForFamily": "Ett engagerande och roligt spel för hela familjen - helt gratis!",
+    "letters": "bokstäver",
+    "pts": "poäng",
+    "steps": {
+      "basics": {
+        "title": "Spelgrunder",
+        "description": "LexiClash är ett snabbt multiplayer-ordspel. Tävla mot vänner om att hitta ord på ett bokstavsrutnät!"
+      },
+      "grid": {
+        "title": "Hitta ord",
+        "description": "Svep eller klicka på angränsande bokstäver för att bilda ord. Bokstäver kopplas ihop i alla 8 riktningar - horisontellt, vertikalt och diagonalt!"
+      },
+      "scoring": {
+        "title": "Poängsystem",
+        "description": "Längre ord ger fler poäng! Varje bokstav utöver den första ger en poäng till din totala poäng."
+      },
+      "combo": {
+        "title": "Kombosystem",
+        "description": "Skicka ord snabbt för att bygga kombomultiplikatorer! Ju snabbare du hittar ord, desto större bonus."
+      },
+      "xp": {
+        "title": "XP & Nivåer",
+        "description": "Tjäna XP från varje spel för att stiga i nivå och låsa upp nya titlar. Vinstbonusar och prestationer ökar din XP!"
+      },
+      "achievements": {
+        "title": "Prestationer",
+        "description": "Lås upp prestationer för speciella bedrifter! Varje prestation kan tjänas flera gånger för att uppgradera dess nivå."
+      }
+    },
+    "demo": {
+      "watchAnimation": "Se hur ord bildas på rutnätet",
+      "autoPlay": "Auto",
+      "pause": "Pausa",
+      "replay": "Spela om",
+      "tryIt": "Prova att dra bokstäver själv!",
+      "gridExample": "Exempel på att spåra ett ord på rutnätet",
+      "traceExample": "Spåra bokstäver för att bilda ord - T→O→N→D",
+      "play": "Spela demo"
+    },
+    "combo": {
+      "currentCombo": "Nuvarande Kombo",
+      "multiplier": "multiplikator",
+      "noBonus": "Ingen bonus",
+      "tryIt": "Simulera Kombo",
+      "building": "Bygger kombo...",
+      "tip": "Skicka ord inom 5 sekunder från varandra för att behålla din kombo!"
+    },
+    "xp": {
+      "howToEarn": "Hur man tjänar XP",
+      "base": "Slutför ett spel",
+      "score": "Få poäng",
+      "win": "Vinn spelet",
+      "achievement": "Lås upp prestationer",
+      "unlockTitles": "Lås upp titlar när du stiger i nivå"
+    },
+    "newPlayer": {
+      "welcomeTitle": "Välkommen till LexiClash!",
+      "welcomeMessage": "Det verkar som att det här är din första gång här. Vill du ha en snabb genomgång av hur man spelar?",
+      "showTutorial": "Visa mig hur",
+      "skipTutorial": "Jag klarar mig",
+      "dontShowAgain": "Visa inte detta igen"
+    }
+  },
+  "onboarding": {
+    "welcome": {
+      "title": "Välkommen till LexiClash!",
+      "subtitle": "Hitta ord genom att koppla samman bokstäver",
+      "demoInstruction": "Prova! Hitta ordet:",
+      "demoWord": "CAT",
+      "demoHint": "Svep eller tryck på angränsande bokstäver",
+      "demoSuccess": "Perfekt! Du klarade det!",
+      "clickNext": "Klicka Nästa för att fortsätta"
+    },
+    "combo": {
+      "title": "Kombosystem",
+      "subtitle": "Hitta ord snabbt för att bygga kombon",
+      "explanation": "Varje ord du hittar ökar din kombomultiplikator. Ju snabbare du hittar ord, desto högre blir din poäng!",
+      "tip": "Fortsätt hitta ord för att behålla din kombosvit!",
+      "example1": "Första ordet",
+      "example2": "2x kombo!",
+      "example3": "3x kombo!"
+    },
+    "specialRounds": {
+      "title": "Specialrundor",
+      "subtitle": "Kaos möter möjlighet!",
+      "earthquake": {
+        "title": "Jordbävning",
+        "description": "Bokstäverna skakar och blandas - anpassa dig snabbt!",
+        "tip": "Håll dig lugn och leta efter nya mönster"
+      },
+      "fireRound": {
+        "title": "Eldrunda",
+        "description": "Alla poäng fördubblas - ge järnet!",
+        "tip": "Detta är din chans att samla poäng"
+      }
+    },
+    "avatar": {
+      "title": "Välj din avatar",
+      "subtitle": "Välj en som representerar dig",
+      "selected": "Vald"
+    },
+    "name": {
+      "title": "Vad heter du?",
+      "subtitle": "Ange ditt visningsnamn",
+      "placeholder": "Ange ditt namn",
+      "errorInvalid": "Endast bokstäver, siffror och mellanslag tillåtna",
+      "errorTooShort": "Namnet måste vara minst 2 tecken",
+      "errorTooLong": "Namnet kan inte vara längre än 20 tecken",
+      "characterCount": "tecken",
+      "proTip": "Välj ett namn som skrämmer dina motståndare. Eller får dem att skratta. Båda fungerar!"
+    },
+    "profile": {
+      "title": "Konfigurera din profil",
+      "subtitle": "Välj en avatar och ange ditt namn"
+    },
+    "quickTips": {
+      "title": "Snabba Tips",
+      "subtitle": "Du lär dig mer medan du spelar!",
+      "tip1Title": "Svep för att ansluta",
+      "tip1Text": "Dra genom intilliggande bokstäver för att bilda ord",
+      "tip2Title": "Längre = Bättre",
+      "tip2Text": "Fler bokstäver betyder fler poäng",
+      "tip3Title": "Var uppmärksam",
+      "tip3Text": "Specialrundor dyker upp med bonuspoäng!"
+    },
+    "mode": {
+      "title": "Välj ditt läge",
+      "subtitle": "Hur vill du spela?",
+      "singlePlayer": {
+        "title": "Ensam spelare",
+        "description": "Öva eller utmana dig själv med AI-motståndare"
+      },
+      "multiPlayer": {
+        "title": "Flerspelarläge",
+        "description": "Tävla med vänner i realtidsstrider"
+      },
+      "dailyPlayer": {
+        "title": "Daglig utmaning",
+        "description": "Samma pussel för alla världen över varje dag"
+      },
+      "encouragement": "Bra val! Klicka \"Let's Play\" för att starta ditt ordäventyr!"
+    },
+    "navigation": {
+      "skip": "Hoppa över",
+      "back": "Tillbaka",
+      "next": "Nästa",
+      "letsPlay": "Let's Play!",
+      "title": "Spelarvälkommen"
+    }
+  },
+  "achievements": {
+    "FIRST_BLOOD": {
+      "name": "Första Blodet",
+      "description": "Först att hitta ett ord"
+    },
+    "SPEED_DEMON": {
+      "name": "Hastighetsdemon",
+      "description": "Hittade 20 ord på 90 sekunder"
+    },
+    "WORD_MASTER": {
+      "name": "Ordmästare",
+      "description": "Hittade ett ord med 7+ bokstäver"
+    },
+    "COMBO_KING": {
+      "name": "Kombokung",
+      "description": "Nådde 10+ komboserie"
+    },
+    "PERFECTIONIST": {
+      "name": "Perfektionist",
+      "description": "15+ ord, alla giltiga"
+    },
+    "LEXICON": {
+      "name": "Lexikon",
+      "description": "Hittade 35+ ord"
+    },
+    "WORDSMITH": {
+      "name": "Ordsmed",
+      "description": "Hittade 25 giltiga ord"
+    },
+    "QUICK_THINKER": {
+      "name": "Snabbtänkare",
+      "description": "Hittade ett ord inom 3 sekunder"
+    },
+    "LONG_HAULER": {
+      "name": "Maratonlöpare",
+      "description": "Hittade ett ord i sista minuten"
+    },
+    "DIVERSE_VOCABULARY": {
+      "name": "Varierat Ordförråd",
+      "description": "Hittade ord av 5+ olika längder"
+    },
+    "DOUBLE_TROUBLE": {
+      "name": "Vinnande Duo",
+      "description": "Hittade 2 ord inom 1,5 sekunder"
+    },
+    "TREASURE_HUNTER": {
+      "name": "Skattjägare",
+      "description": "Hittade ett sällsynt ord (8+ bokstäver)"
+    },
+    "TRIPLE_THREAT": {
+      "name": "Trippelhot",
+      "description": "Hittade 3 ord inom 4 sekunder"
+    },
+    "UNSTOPPABLE": {
+      "name": "Ostoppbar",
+      "description": "Hittade 45+ ord"
+    },
+    "COMEBACK_KID": {
+      "name": "Comeback-kungen",
+      "description": "Hittade ett ord under de sista 3 sekunderna"
+    },
+    "DICTIONARY_DIVER": {
+      "name": "Ordboksdykare",
+      "description": "Hittade 40+ giltiga ord"
+    },
+    "LIGHTNING_ROUND": {
+      "name": "Blixtomgång",
+      "description": "Hittade 10 ord i första 30 sekunderna"
+    },
+    "RARE_GEM": {
+      "name": "Sällsynt Juvel",
+      "description": "Hittade ett ultrasällsynt ord (9+ bokstäver)"
+    },
+    "EXPLORER": {
+      "name": "Utforskare",
+      "description": "Hittade ord av 6+ olika längder"
+    },
+    "STREAK_MASTER": {
+      "name": "Seriemästare",
+      "description": "Nådde 18+ komboserie"
+    },
+    "ANAGRAM_ARTIST": {
+      "name": "Anagramkonstnär",
+      "description": "Hittade 2 konsekutiva anagramord"
+    },
+    "LETTER_POPPER": {
+      "name": "Ballongsprängare",
+      "description": "Sprängde 10+ bokstäver i huvudmenyn"
+    },
+    "WORD_ARCHITECT": {
+      "name": "Ordarkitekt",
+      "description": "Hittade 3 ord med 7+ bokstäver"
+    },
+    "SPEED_LEGEND": {
+      "name": "Hastighetslegend",
+      "description": "Hittade 25 ord på 90 sekunder"
+    },
+    "COMBO_GOD": {
+      "name": "Kombogud",
+      "description": "Nådde 20+ komboserie"
+    },
+    "VOCABULARY_TITAN": {
+      "name": "Ordförrådstitanen",
+      "description": "Hittade 50+ giltiga ord"
+    },
+    "PRECISION_MASTER": {
+      "name": "Precisionsmästare",
+      "description": "25+ ord med 100% träffsäkerhet"
+    },
+    "LONG_WORD_CHAIN": {
+      "name": "Lång Ordkedja",
+      "description": "4 konsekutiva ord med 6+ bokstäver"
+    },
+    "MINIMALIST": {
+      "name": "Minimalist",
+      "description": "Vann med endast 4+ bokstavsord (15+ ord)"
+    },
+    "WORD_SNIPER": {
+      "name": "Ordprickskytt",
+      "description": "Hittade 5+ unika ord som ingen annan hittade"
+    },
+    "PHOTO_FINISH": {
+      "name": "Fotofinish",
+      "description": "Vann med mindre än 5 poängs marginal"
+    },
+    "UNDERDOG": {
+      "name": "Underdog",
+      "description": "Kom från underläge för att vinna"
+    },
+    "CLUTCH_PLAYER": {
+      "name": "Clutch-spelare",
+      "description": "Hittade 3+ ord under sista 10 sekunderna"
+    },
+    "VETERAN": {
+      "name": "Veteran",
+      "description": "Spelade 50 spel totalt"
+    },
+    "CENTURION": {
+      "name": "Centurion",
+      "description": "Spelade 100 spel totalt"
+    },
+    "WORD_COLLECTOR": {
+      "name": "Ordsamlare",
+      "description": "Hittade 1000 giltiga ord totalt"
+    },
+    "WORD_HOARDER": {
+      "name": "Ordhoarder",
+      "description": "Hittade 5000 giltiga ord totalt"
+    },
+    "CHAMPION": {
+      "name": "Mästare",
+      "description": "Vann 25 spel totalt"
+    },
+    "LEGEND": {
+      "name": "Legend",
+      "description": "Vann 100 spel totalt"
+    },
+    "POINT_MASTER": {
+      "name": "Poängmästare",
+      "description": "Samlade 10 000 poäng totalt"
+    },
+    "POINT_KING": {
+      "name": "Poängkung",
+      "description": "Samlade 50 000 poäng totalt"
+    },
+    "DEDICATION": {
+      "name": "Hängivenhet",
+      "description": "Spelade på 7 olika dagar"
+    },
+    "LOYAL_PLAYER": {
+      "name": "Lojal spelare",
+      "description": "Spelade på 30 olika dagar"
+    }
+  },
+  "achievementTiers": {
+    "bronze": "Brons",
+    "silver": "Silver",
+    "gold": "Guld",
+    "platinum": "Platina",
+    "earned": "Uppnått",
+    "maxTier": "Max nivå nådd!"
+  },
+  "insights": {
+    "yourPerformance": "Din Prestation",
+    "yourStats": "Din Statistik",
+    "longestWord": "Längsta Ordet",
+    "wordsPerMinute": "Ord/Min",
+    "avgWordLength": "Snittlängd",
+    "favoriteLength": "Favoritlängd",
+    "speedPattern": "Hastighetsmönster",
+    "letters": "bokstäver",
+    "early": "Tidigt",
+    "mid": "Mitt",
+    "late": "Sent",
+    "fastStart": "Snabb Start",
+    "strongFinish": "Stark Finish",
+    "momentum": "Bygger Momentum",
+    "steady": "Jämn Takt",
+    "fadeOut": "Tidig Burst",
+    "midGamePeak": "Topp Mitt i Spelet",
+    "burstMode": "Burst-läge",
+    "slowStarter": "Långsam Start",
+    "secondWind": "Andra Andetaget",
+    "accuracy": "Precision",
+    "story": {
+      "precisionSpeed": "Precision i Fart",
+      "precisionSpeedDesc": "Ordspel på elitnivå. Snabb OCH träffsäker.",
+      "bigGameHunter": "Storviltsjakare",
+      "bigGameHunterDesc": "Att jaga långa ord lönar sig.",
+      "speedDemon": "Hastighetsdemon",
+      "speedDemonDesc": "Dina fingrar brinner!",
+      "sharpshooter": "Prickskytt",
+      "sharpshooterDesc": "Kvalitet över kvantitet. Varje skott räknas.",
+      "wordStorm": "Ordstorm",
+      "wordStormDesc": "Ibland vinner mängden!",
+      "clutchFinisher": "Avgörande Avslutare",
+      "clutchFinisherDesc": "Du sparade det bästa till sist. Tryck skapar diamanter.",
+      "firstBlood": "Första Blod",
+      "firstBloodDesc": "Du kom ut svingandes. Tidig aggression sätter tonen.",
+      "slowBurn": "Långsam Brand",
+      "slowBurnDesc": "Startade sakta, slutade starkt. Sköldpaddan visste.",
+      "earlyBurst": "Tidig Burst",
+      "earlyBurstDesc": "Du kom ut som en raket. Kanske spara lite krut till slutet?",
+      "midGamePeak": "Topprestation",
+      "midGamePeakDesc": "Du hittade rytmen i mitten. Uppvärmning klar, nedkylning väntar.",
+      "burstMode": "Burst-läge",
+      "burstModeDesc": "En explosiv fas av ren dominans. Kvalitet över konsekvens!",
+      "slowStarter": "Långsam Start",
+      "slowStarterDesc": "Tog lite tid att hitta rytmen. När du väl gjorde det, ingen hejd.",
+      "secondWind": "Andra Andetaget",
+      "secondWindDesc": "En svacka mitt i? Inget problem. Du studsade tillbaka starkare.",
+      "wordsmith": "Ordsmed",
+      "wordsmithDesc": "Du nöjer dig inte med korta ord.",
+      "solidPerformance": "Solid Prestation",
+      "solidPerformanceDesc": "Ett respektabelt resultat. Fortsätt så!",
+      "gettingStarted": "Värmer Upp",
+      "gettingStartedDesc": "Varje mästare började någonstans. Nästa runda är din!"
+    }
+  },
+  "noWords": {
+    "noWordsThisRound": "Inga ord denna runda",
+    "keepGoing": "Fortsätt!",
+    "nextRoundIsYours": "Nästa runda är din!",
+    "funFact": "Kul fakta: Genomsnittsspelaren missar 70% av möjliga ord!",
+    "otherPlayer": {
+      "headline": "Tuff Runda",
+      "message": "Bokstäverna var inte snälla denna gång."
+    },
+    "encourage": {
+      "rookie": {
+        "headline": "Första Gången Nervös?",
+        "message": "Även de bästa ordjägarna börjar någonstans. Brädet var knepigt!",
+        "tip": "Tips: Börja med 3-bokstavsord och bygg därifrån."
+      },
+      "unlucky": {
+        "headline": "Tuffa Bokstäver!",
+        "message": "Ibland rullar inte tärningarna din väg. Det händer alla!",
+        "tip": "Tips: Leta efter vanliga mönster som -ING, -AR, -ER."
+      },
+      "thinking": {
+        "headline": "Strategisk Tystnad",
+        "message": "Kvalitet över kvantitet-mentalitet... kanske för mycket kvalitet denna gång!",
+        "tip": "Tips: Skicka ord när du hittar dem - inget straff för att försöka!"
+      },
+      "warmup": {
+        "headline": "Uppvärmningsrunda",
+        "message": "Se detta som övning. Din hjärna håller bara på att börja!",
+        "tip": "Tips: Skanna brädet snabbt, fokusera sedan på hövärdeshörn."
+      },
+      "comeback": {
+        "headline": "Comeback Laddar...",
+        "message": "De största spelarna har dåliga rundor. Nästa spel är DITT spel!",
+        "tip": "Tips: Prova att säga bokstäver högt för att utlösa ordassociationer."
+      }
+    }
+  },
+  "xp": {
+    "title": "Spelarnivå",
+    "level": "Nivå",
+    "maxLevel": "Max Nivå",
+    "xpProgress": "XP-framsteg",
+    "totalXpEarned": "Total XP intjänad",
+    "xpToNextLevel": "XP till nästa nivå",
+    "xpGained": "XP intjänad",
+    "levelUp": "Nivå upp!",
+    "youReached": "Du nådde",
+    "titleUnlocked": "Titel upplåst",
+    "baseXp": "Bas-XP",
+    "scoreBonus": "Poängbonus",
+    "winBonus": "Vinstbonus",
+    "achievementBonus": "Prestationsbonus",
+    "titles": {
+      "wordSeeker": "Ordsökare",
+      "letterHunter": "Bokstavsjägare",
+      "vocabularian": "Ordförrådsexpert",
+      "wordsmith": "Ordsmed",
+      "lexiconAdept": "Lexikonadept",
+      "grammarGuardian": "Grammatikväktare",
+      "syntaxSage": "Syntaxvis",
+      "eloquentElite": "Vältalande Elit",
+      "linguisticLegend": "Lingvistisk Legend",
+      "lexiClashChampion": "LexiClash-mästare"
+    }
+  },
+  "auth": {
+    "signIn": "Logga in",
+    "signOut": "Logga ut",
+    "signInWith": "Fortsätt med ${provider}",
+    "continueAsGuest": "Fortsätt som gäst",
+    "saveProgress": "Spara din framsteg",
+    "guestStatsTitle": "Din statistik som gäst:",
+    "claimStats": "Hämta din statistik",
+    "statsClaimedSuccess": "Statistik sparad!",
+    "termsAgreement": "Genom att fortsätta godkänner du våra användarvillkor",
+    "termsPrefix": "Genom att fortsätta godkänner du våra",
+    "termsLink": "Användarvillkor",
+    "andText": "och",
+    "privacyLink": "Integritetspolicy",
+    "upgradePrompt": "Logga in för att spara din framsteg och tävla på topplistan!",
+    "firstWin": {
+      "title": "Grattis till din första vinst!",
+      "subtitle": "Du har talang! Skapa ett konto för att fortsätta din vinstsvit.",
+      "benefitsTitle": "Registrera dig för att låsa upp:",
+      "benefits": {
+        "trackProgress": "Följ din statistik, vinster och prestationer",
+        "leaderboard": "Tävla på den globala topplistan",
+        "playWithFriends": "Utmana vänner och bygg ditt rykte"
+      },
+      "statsTeaser": "Du har spelat ${games} spel och fått ${score} poäng!",
+      "maybeLater": "Kanske senare"
+    },
+    "multiGames": {
+      "title": "Du blir bättre!",
+      "subtitle": "Registrera dig för att spara din framsteg och följa dina prestationer!",
+      "features": {
+        "leaderboard": "Tävla på den globala topplistan",
+        "playWithFriends": "Utmana vänner och bygg ditt rykte"
+      },
+      "statsTeaser": "Du har spelat ${games} spel och fått ${score} poäng!",
+      "maybeLater": "Kanske senare"
+    }
+  },
+  "profile": {
+    "title": "Profil",
+    "memberSince": "Medlem sedan",
+    "totalGames": "Spel",
+    "wins": "Vinster",
+    "wordsFound": "Ord hittade",
+    "totalScore": "Total poäng",
+    "timePlayed": "Spelad tid",
+    "achievements": "Prestationer",
+    "editProfile": "Redigera profil",
+    "changeAvatar": "Ändra avatar",
+    "username": "Användarnamn",
+    "saveChanges": "Spara ändringar",
+    "uploadPhoto": "Ladda upp foto",
+    "removePhoto": "Ta bort foto",
+    "imageTooLarge": "Bilden måste vara mindre än 2MB",
+    "invalidImageType": "Ladda upp en JPG, PNG, WebP eller GIF-bild",
+    "uploadSuccess": "Profilbild uppdaterad!",
+    "uploadError": "Kunde inte ladda upp bild",
+    "photoRemoved": "Profilbild borttagen",
+    "removeError": "Kunde inte ta bort bild",
+    "saved": "Profil sparad!",
+    "saveError": "Kunde inte spara",
+    "editName": "Redigera namn",
+    "chooseEmoji": "Välj emoji",
+    "chooseColor": "Välj färg",
+    "backToGame": "Tillbaka till spelet",
+    "backToRoom": "Tillbaka till rummet",
+    "backToLobby": "Tillbaka till lobbyn",
+    "locked": "Låst",
+    "earnThisAchievement": "Spela spel för att låsa upp denna prestation!"
+  },
+  "leaderboard": {
+    "title": "Topplista",
+    "allTime": "Alla tider",
+    "rank": "Rank",
+    "player": "Spelare",
+    "score": "Poäng",
+    "games": "Spel",
+    "winRate": "Vinstprocent",
+    "yourRank": "Din rank",
+    "topPercent": "Topp ${percent}%",
+    "noRankYet": "Spela för att bli rankad!",
+    "viewLeaderboard": "Visa topplista"
+  },
+  "ranked": {
+    "title": "Rankat läge",
+    "locked": "Låst",
+    "unlocked": "Upplåst",
+    "unlockProgress": "${current}/${required} spel för att låsa upp",
+    "playMoreToUnlock": "Spela ${count} fler casual spel för att låsa upp!",
+    "benefits": "Fördelar",
+    "benefitFairPlay": "Fasta spelinställningar för rättvist spel",
+    "benefitLeaderboard": "Global rankad topplista",
+    "benefitAchievements": "Exklusiva prestationer",
+    "playCasualInstead": "Spela casual istället",
+    "queueing": "Söker match...",
+    "playersInQueue": "${count} spelare i kö",
+    "matchFound": "Match hittad!",
+    "requiresAuth": "Logga in för att få tillgång till rankat läge"
+  },
+  "legal": {
+    "termsOfService": "Användarvillkor",
+    "privacyPolicy": "Integritetspolicy",
+    "backToGame": "Tillbaka till spelet",
+    "lastUpdated": "Senast uppdaterad",
+    "copyright": "© 2025 LexiClash Ltd. Alla rättigheter förbehållna.",
+    "allRightsReserved": "Alla rättigheter förbehållna.",
+    "index": {
+      "title": "Juridisk information",
+      "intro": "Granska våra juridiska dokument för att förstå dina rättigheter och hur vi skyddar dina data när du använder LexiClash.",
+      "termsDescription": "Läs våra användarvillkor för att förstå reglerna och riktlinjerna för att använda LexiClash.",
+      "privacyDescription": "Lär dig hur vi samlar in, använder och skyddar din personliga information."
+    },
+    "terms": {
+      "title": "Användarvillkor",
+      "intro": "Välkommen till LexiClash. Dessa användarvillkor reglerar din användning av vår multiplayer-ordspelsplattform på lexiclash.live.",
+      "acceptance": {
+        "title": "1. Godkännande av villkor",
+        "content": "Genom att använda LexiClash godkänner du dessa användarvillkor. Om du inte godkänner dessa villkor, vänligen använd inte vår tjänst."
+      },
+      "service": {
+        "title": "2. Beskrivning av tjänsten",
+        "content": "LexiClash är ett gratis multiplayer-ordspel där spelare tävlar om att hitta ord på ett bokstavsrutnät i realtid. Tjänsten inkluderar användarkonton, topplistor, prestationer och multiplayer-funktioner."
+      },
+      "accounts": {
+        "title": "3. Användarkonton",
+        "content": "Du kan använda LexiClash som gäst eller skapa ett konto med Google eller Discord-autentisering. Du ansvarar för att hålla dina kontouppgifter säkra. Vi lagrar inte dina lösenord - autentisering hanteras säkert via OAuth-leverantörer."
+      },
+      "conduct": {
+        "title": "4. Användaruppförande",
+        "content": "Du samtycker till att använda LexiClash rättvist och respektfullt. Förbjudna aktiviteter inkluderar: användning av stötande eller diskriminerande visningsnamn, fusk eller utnyttjande av buggar, användning av automatiserade bottar eller skript, trakassering av andra spelare, och alla försök att störa tjänsten eller manipulera topplistor."
+      },
+      "contentLicense": {
+        "title": "5. Licens för användarinnehåll",
+        "content": "Genom att använda LexiClash ger du oss en världsomspännande, royaltyfri, icke-exklusiv licens att visa ditt användarnamn, avatar och spelstatistik på topplistor, i spelet och inom tjänsten. Denna licens tillåter oss att driva spelet och visa spelarinformation för andra användare."
+      },
+      "intellectualProperty": {
+        "title": "6. Immateriella rättigheter",
+        "content": "LexiClash, inklusive dess namn, logotyp, spelmekanik, kod och allt innehåll, ägs av LexiClash Ltd. Alla rättigheter förbehållna. Du får inte kopiera, modifiera, distribuera eller skapa härledda verk utan vårt uttryckliga skriftliga tillstånd."
+      },
+      "disclaimers": {
+        "title": "7. Friskrivningar",
+        "content": "LexiClash tillhandahålls \"i befintligt skick\" och \"som tillgängligt\" utan garantier av något slag, varken uttryckliga eller underförstådda. Vi garanterar inte att tjänsten kommer att vara oavbruten, felfri eller säker. Vi ansvarar inte för förlust av data, inklusive spelframsteg eller statistik."
+      },
+      "liability": {
+        "title": "8. Ansvarsbegränsning",
+        "content": "I den utsträckning lagen tillåter ska LexiClash Ltd inte hållas ansvarig för indirekta, tillfälliga, speciella, följd- eller straffskador som uppstår från din användning av tjänsten, inklusive men inte begränsat till förlust av vinst, data eller goodwill."
+      },
+      "indemnification": {
+        "title": "9. Skadeersättning",
+        "content": "Du samtycker till att hålla LexiClash Ltd skadeslöst från alla anspråk, skador, förluster eller kostnader som uppstår från din överträdelse av dessa villkor, din användning av tjänsten eller din kränkning av någon annan parts rättigheter."
+      },
+      "termination": {
+        "title": "10. Uppsägning",
+        "content": "Vi kan suspendera eller avsluta din åtkomst till LexiClash när som helst, med eller utan orsak, och med eller utan förvarning. Vid uppsägning upphör din rätt att använda tjänsten omedelbart och dina kontodata kan raderas."
+      },
+      "modifications": {
+        "title": "11. Ändringar av villkor",
+        "content": "Vi förbehåller oss rätten att ändra dessa användarvillkor när som helst. Ändringar träder i kraft vid publicering på webbplatsen. Din fortsatta användning av LexiClash efter ändringar utgör godkännande av de nya villkoren."
+      },
+      "governingLaw": {
+        "title": "12. Tillämplig lag",
+        "content": "Dessa användarvillkor ska styras av och tolkas i enlighet med lagarna i staten Israel, utan hänsyn till dess lagvalsregler."
+      },
+      "disputes": {
+        "title": "13. Tvistlösning",
+        "content": "Alla tvister som uppstår från dessa villkor eller din användning av LexiClash ska först försöka lösas informellt. Om detta misslyckas ska tvister lösas exklusivt i domstolar i Israel, och du samtycker till sådan domstols personliga jurisdiktion."
+      },
+      "severability": {
+        "title": "14. Avskiljbarhet",
+        "content": "Om någon bestämmelse i dessa användarvillkor befinns vara icke verkställbar eller ogiltig, ska den bestämmelsen begränsas eller elimineras i minsta nödvändiga utsträckning, och de återstående bestämmelserna ska fortsätta gälla fullt ut."
+      }
+    },
+    "privacy": {
+      "title": "Integritetspolicy",
+      "intro": "Denna integritetspolicy förklarar hur LexiClash Ltd samlar in, använder och skyddar din personliga information när du använder vårt multiplayer-ordspel på lexiclash.live.",
+      "infoCollected": {
+        "title": "1. Information vi samlar in",
+        "content": "Vi samlar in följande typer av information:",
+        "oauth": "Kontodata via Google/Discord OAuth: namn, e-postadress och profilbild",
+        "profile": "Spelarprofilinformation: visningsnamn, avatar-emoji/färg och anpassade profilbilder du laddar upp",
+        "stats": "Spelstatistik: poäng, vinster, hittade ord, spelade spel, speltid, prestationer och topplisteplaceringar",
+        "gameState": "Tillfälligt speltillstånd: rumsinformation, aktuell speldata (lagras tillfälligt i Redis med automatisk radering)",
+        "analytics": "Analysdata via LogRocket: sessionsinspelningar, felloggar och användningsmönster för att hjälpa oss förbättra tjänsten"
+      },
+      "howWeUse": {
+        "title": "2. Hur vi använder din information",
+        "content": "Vi använder din information för att: tillhandahålla autentisering och kontofunktioner, visa din profil och statistik för andra spelare, upprätthålla topplistor och rankingar, förbättra vår tjänst genom analys, skicka viktig tjänsterelaterad kommunikation, och säkerställa rättvist spel och upprätthålla våra användarvillkor."
+      },
+      "thirdParties": {
+        "title": "3. Tredjepartstjänster",
+        "content": "Vi använder följande tredjepartstjänster för att driva LexiClash:",
+        "supabase": "Supabase - För autentisering, databaslagring och lagring av profilbilder",
+        "logrocket": "LogRocket - För analys, sessionsinspelning och felspårning",
+        "google": "Google - För OAuth-autentisering",
+        "discord": "Discord - För OAuth-autentisering",
+        "noSale": "Vi säljer inte din personliga information till tredje part."
+      },
+      "cookies": {
+        "title": "4. Cookies och lokal lagring",
+        "content": "Vi använder essentiella cookies och lokal lagring för: autentiseringstoken (Supabase), användarnamn och preferenser (localStorage), temainställningar (mörkt/ljust läge) och språkpreferenser. Vi använder också LogRocket-cookies för analysändamål. Vi använder inte reklam- eller spårningscookies."
+      },
+      "dataRetention": {
+        "title": "5. Datalagring",
+        "content": "Konto- och profildata behålls tills du begär radering. Spelstatistik behålls för att upprätthålla topplistans integritet. Tillfälligt speltillstånd (Redis) raderas automatiskt inom 1 timme. Analysdata behålls enligt LogRockets policyer."
+      },
+      "security": {
+        "title": "6. Datasäkerhet",
+        "content": "Vi implementerar branschstandardsäkerhetsåtgärder inklusive: krypterade anslutningar (HTTPS), säker OAuth-autentisering, krypterad databaslagring via Supabase, och säkra WebSocket-anslutningar för realtidsspel."
+      },
+      "yourRights": {
+        "title": "7. Dina rättigheter",
+        "content": "Du har rätt att: få tillgång till dina personuppgifter via din profilsida, uppdatera din profilinformation när som helst, radera ditt konto och tillhörande data, och begära information om hur dina data används."
+      },
+      "international": {
+        "title": "8. Internationella användare",
+        "content": "Dina data kan överföras till och lagras i länder utanför ditt hemland, inklusive länder som kan ha andra dataskyddslagar. Genom att använda LexiClash samtycker du till sådana överföringar."
+      },
+      "changes": {
+        "title": "9. Ändringar i denna policy",
+        "content": "Vi kan uppdatera denna integritetspolicy från tid till annan. Ändringar kommer att publiceras på denna sida med ett uppdaterat datum. Din fortsatta användning av LexiClash efter ändringar utgör godkännande av den uppdaterade policyn."
+      },
+      "governingLaw": {
+        "title": "10. Tillämplig lag",
+        "content": "Denna integritetspolicy styrs av lagarna i staten Israel. Alla tvister ska lösas i domstolar i Israel."
+      }
+    }
+  },
+  "growth": {
+    "shareYourResult": "Dela ditt resultat",
+    "shareVictory": "🎉 Dela din seger!",
+    "shareResult": "Dela ditt spel",
+    "bragToFriends": "Låt dina vänner veta att du vann!",
+    "inviteFriendsToPlay": "Bjud in vänner att utmana dig",
+    "viralPrompt": "Utmana dina vänner att slå ditt resultat!",
+    "share": "Dela",
+    "dayStreak": "dagars svit",
+    "winsAway": "vinster kvar",
+    "nextTier": "Nästa nivå",
+    "newBest": "Nytt rekord!",
+    "newPersonalBest": "Nytt personligt rekord!",
+    "streakUnlocked": "Svit upplåst!",
+    "streakAtRisk": "Din svit är i fara! Spela idag för att behålla den.",
+    "keepStreakAlive": "Håll din svit vid liv!",
+    "streakStarting": "Start",
+    "streakHot": "Het",
+    "streakOnFire": "I brand",
+    "streakEpic": "Episk",
+    "streakLegendary": "Legendarisk",
+    "referFriend": "Rekommendera en vän",
+    "referralReward": "Få belöningar för att bjuda in vänner!",
+    "yourReferralLink": "Din rekommendationslänk",
+    "referralsCount": "Rekommenderade vänner",
+    "dailyChallenge": "Daglig utmaning",
+    "dailyChallengeDesc": "Ny utmaning varje dag!",
+    "todaysChallenge": "Dagens utmaning",
+    "challengeCompleted": "Utmaning slutförd!",
+    "nextChallengeIn": "Nästa utmaning om",
+    "welcomeBack": "Välkommen tillbaka!",
+    "missedYou": "Vi saknade dig! Redo för en ny runda?",
+    "playNow": "Spela nu",
+    "firstWin": "Första vinst!",
+    "tenWins": "10 vinster!",
+    "hundredWins": "100 vinster!",
+    "milestoneUnlocked": "Milstolpe upplåst!"
+  },
+  "wordFeedback": {
+    "title": "Ordjury",
+    "dictionaryTitle": "Bygg vår ordbok",
+    "question": "Är detta ett riktigt ord?",
+    "submittedBy": "Skickad av",
+    "thumbsUp": "Giltig!",
+    "thumbsDown": "Nej",
+    "skipHint": "Tryck ESC för att hoppa över",
+    "thankYou": "Tack för hjälpen!",
+    "witty1": "{player} påstår att \"{word}\" är ett riktigt ord...",
+    "witty2": "Riktigt ord eller kreativt geni? Du bestämmer!",
+    "witty3": "{player} hittade \"{word}\" i sin hjärnordbok",
+    "witty4": "Svenska Akademien ringde, de vill veta om \"{word}\"",
+    "witty5": "Låter legit... eller?",
+    "witty6": "Är \"{word}\" ett genidrag eller galenskap?",
+    "witty7": "{player} svär att detta är ett riktigt ord!",
+    "witty8": "Ordbokskommittén väntar på din dom över \"{word}\"",
+    "nowValid": "är nu ett giltigt ord!",
+    "dictionary1": "Hjälp oss bygga en bättre ordbok!",
+    "dictionary2": "Din röst gör ord officiella!",
+    "dictionary3": "Varje röst förbättrar spelet!",
+    "dictionary4": "Var orddomaren!",
+    "dictionary5": "Forma vår ordbok tillsammans!",
+    "notAWord": "Inte ett ord",
+    "realWord": "Riktigt ord!",
+    "nextWord": "Nästa ord...",
+    "almostApproved": "Nästan godkänt!",
+    "votesNeeded": "{count} röster till för att godkänna",
+    "validForScoring": "Räknas som giltigt! Hjälp till att lägga till i ordboken.",
+    "moreForDictionary": "mer till ordbok"
+  },
+  "footer": {
+    "howToPlay": "Hur man spelar",
+    "leaderboard": "Topplista",
+    "interactiveTutorial": "Interaktiv handledning"
+  },
+  "support": {
+    "kofiWinner": "Känn dig generös, mästare?",
+    "kofiFooter": "Köp oss en kaffe",
+    "kofiTooltip": "Stöd LexiClash-utveckling"
+  },
+  "landing": {
+    "chooseMode": "Välj spelläge",
+    "subtitle": "Spela ensam för att öva och slå dina rekord, eller tävla med vänner i realtid!",
+    "subtitleSimple": "Öva ensam eller utmana vänner",
+    "singlePlayer": "Enspelarläge",
+    "singlePlayerDesc": "Öva i din egen takt eller utmana dig själv!",
+    "multiplayer": "Flerspelarläge",
+    "multiplayerDesc": "Tävla med vänner i realtid!",
+    "feature": {
+      "soloVsBots": "Solo mot bottar",
+      "practiceMode": "Övningsläge",
+      "challenges": "Utmaningar & Rekord",
+      "joinRooms": "Gå med i rum",
+      "hostGames": "Skapa spel",
+      "tournaments": "Turneringar"
+    },
+    "hint": "Ny i spelet? Börja med enspelarläge för att lära dig!",
+    "openRooms": "öppna rum",
+    "playersLive": "spelar nu"
+  },
+  "singlePlayer": {
+    "title": "Enspelarläge",
+    "selectMode": "Välj läge",
+    "soloVsBots": "Solo mot bottar",
+    "soloVsBotsDesc": "Tävla mot AI-motståndare",
+    "practiceMode": "Övning",
+    "practiceModeDesc": "Ingen timer, upptäck ord i din takt",
+    "challengeMode": "Utmaning",
+    "challengeModeDesc": "Slå dina rekord",
+    "selectDifficulty": "Rutstorlek",
+    "gameTime": "Speltid",
+    "opponents": "Bottmotståndare",
+    "noBots": "Inga bottar tillagda. Lägg till motståndare att tävla mot!",
+    "startGame": "Starta spel",
+    "finish": "Avsluta",
+    "noWordsYet": "Inga ord hittade än. Börja svep!",
+    "victory": "Seger!",
+    "gameOver": "Spelet slut",
+    "practiceComplete": "Övning slutförd!",
+    "newHighScore": "Nytt rekord!",
+    "challengeComplete": "Utmaning slutförd",
+    "noWordsFound": "Inga ord hittade",
+    "achievementsNotSaved": "Prestationer i enspelarläge sparas inte till din profil.",
+    "botDetails": "Bot-detaljer",
+    "difficulty": "Svårighetsgrad",
+    "timer": "Timer",
+    "totalScore": "Totalpoäng",
+    "wordsByLength": "Ord efter längd",
+    "quitConfirmTitle": "Avsluta spelet?",
+    "quitConfirmMessage": "Du kommer förlora dina framsteg. Är du säker på att du vill avsluta?",
+    "gamePaused": "Spelet pausat",
+    "botWords": "Hittade ord",
+    "aiOpponents": "AI-motståndare",
+    "autoFillDesc": "Fyller rummet med {count} AI-motståndare",
+    "addBotsPrompt": "Lägg till AI-motståndare att tävla mot!",
+    "addBotsHint": "Använd autofyll eller klicka på knapparna ovan"
+  },
+  "landscape": {
+    "tutorialTitle": "Landskapskontroller",
+    "tutorialPause": "Nere till vänster: Pausa/Återuppta spel",
+    "tutorialQuit": "Nere till höger: Avsluta spel",
+    "tutorialHelp": "Uppe till höger: Hjälp & regler",
+    "tutorialKeyboard": "Tangentbord: Mellanslag = Pausa, Esc = Avsluta, ? = Hjälp"
+  },
+  "challenge": {
+    "yourRecord": "Ditt rekord",
+    "beatIt": "Kan du slå det?",
+    "noRecord": "Inget rekord än",
+    "setFirst": "Sätt ditt första rekord och börja tävla mot dig själv!",
+    "recordsSet": "rekord satta",
+    "gamesPlayed": "spel spelade",
+    "allTimeBest": "Bästa någonsin",
+    "longest": "längsta",
+    "newRecord": "Nytt rekord!",
+    "tied": "Oavgjort!",
+    "recordToBeat": "Rekord",
+    "toGo": "poäng kvar till rekord",
+    "settingFirst": "Sätter ditt första rekord!",
+    "allTimeRecord": "Bästa någonsin!",
+    "improvement": "förbättring",
+    "firstRecord": "Första rekord satt!",
+    "shortOf": "{diff} poäng från ditt rekord",
+    "settingRecord": "Sätter ditt första rekord!",
+    "aheadOfRecord": "+{diff} före rekordet!",
+    "behindRecord": "{diff} för att slå ditt rekord",
+    "tiedWithRecord": "Lika med ditt rekord!"
+  },
+  "rules": {
+    "pageTitle": "LexiClash: Ordstrid i Realtid",
+    "pageSubtitle": "Bemästra konsten att hitta ord i detta snabba multiplayer-strategispel",
+    "playNowFree": "Spela nu - Det är gratis!",
+    "readyToTest": "Redo att testa dina ordkunskaper?",
+    "readyToTestDesc": "Gå med tusentals spelare i den ultimata ordstridsupplevelsen. Skapa ett rum, bjud in dina vänner och se vem som har det bästa ordförrådet!",
+    "startPlaying": "Börja spela nu",
+    "backToHome": "Tillbaka till startsidan",
+    "howToPlayIntro": "LexiClash är ett multiplayer-ordspel i realtid där spelare tävlar om att hitta så många ord som möjligt från ett rutnät av bokstäver. Tänk på det som en tävlingsinriktad, digital version av klassiska ordletningsspel, men med en modern twist som låter dig spela med vänner var som helst i världen.",
+    "joinOrCreate": "Gå med eller skapa ett rum",
+    "joinOrCreateDesc": "Skapa ditt eget spelrum eller gå med i ett befintligt med en rumskod. Dela koden med vänner för att bjuda in dem direkt.",
+    "raceAgainstTime": "Tävla mot klockan",
+    "raceAgainstTimeDesc": "När spelet startar har du begränsad tid (vanligtvis 90 sekunder) att hitta så många giltiga ord som möjligt från bokstavsrutnätet.",
+    "swipeToForm": "Svep för att bilda ord",
+    "swipeToFormDesc": "Koppla ihop intilliggande bokstäver genom att svepa eller klicka för att bilda ord. Bokstäver måste vara sammankopplade horisontellt, vertikalt eller diagonalt.",
+    "competeAndWin": "Tävla & Vinn",
+    "competeAndWinDesc": "Spelaren med högst poäng när tiden är slut vinner! Spela flera omgångar för att avgöra den ultimata ordmästaren.",
+    "scoringIntro": "I LexiClash ger längre ord fler poäng. Poängsystemet belönar strategiska spelare som letar efter längre, mer komplexa ord istället för att bara skicka in många korta ord.",
+    "wordLength": "Ordlängd",
+    "points": "Poäng",
+    "example": "Exempel",
+    "proTip": "Proffstips",
+    "proTipText": "Fokusera på att hitta ord med 5-7 bokstäver för bästa poäng-till-tid-förhållandet. Medan ord med 8+ bokstäver ger massiva poäng är de sällsynta och tidskrävande att hitta!",
+    "strategiesIntro": "Att bli en LexiClash-mästare kräver mer än bara ett bra ordförråd. Här är beprövade strategier som används av toppspelare för att dominera sina motståndare och klättra på topplistan.",
+    "scanPrefixes": "Skanna efter prefix och suffix",
+    "scanPrefixesDesc": "Leta efter vanliga orddelar som \"för-\", \"om-\", \"-ing\", \"-ade\" och \"-tion\". Dessa kan hjälpa dig att snabbt identifiera längre ord som gömmer sig i rutnätet.",
+    "startFromVowels": "Börja från vokaler",
+    "startFromVowelsDesc": "De flesta ord innehåller vokaler. Börja med att lokalisera A, E, I, O, U, Y, Ä, Ö på rutnätet och bygg ord runt dem för snabbare ordupptäckt.",
+    "thinkWordFamilies": "Tänk i ordfamiljer",
+    "thinkWordFamiliesDesc": "När du hittar ett ord som \"SPELA\", kontrollera omedelbart variationer: \"SPELAR\", \"SPELAD\", \"SPELANDE\", \"SPELARE\". Denna teknik kan snabbt multiplicera din poäng.",
+    "dontOverthink": "Övertänk inte korta ord",
+    "dontOverthinkDesc": "Skicka in uppenbara ord med 3-4 bokstäver snabbt utan att tveka. De läggs ihop snabbt och ger dig en solid grund medan du letar efter längre, högre poänggivande ord.",
+    "practicePatterns": "Öva mönsterigenkänning",
+    "practicePatternsDesc": "Ju mer du spelar, desto snabbare kommer du att känna igen vanliga bokstavsmönster. Regelbunden övning tränar din hjärna att upptäcka ord nästan omedelbart, vilket ger dig en betydande fördel.",
+    "multiLanguage": "Flerspråksstöd",
+    "multiLanguageDesc": "Spela på engelska, hebreiska, svenska eller japanska. Perfekt för språkinlärare!",
+    "realTimeMultiplayer": "Multiplayer i realtid",
+    "realTimeMultiplayerDesc": "Tävla mot vänner eller spelare världen över i ordstrider i realtid.",
+    "achievementsLevels": "Prestationer & Nivåer",
+    "achievementsLevelsDesc": "Tjäna XP, lås upp prestationer och klättra i rankerna när du förbättras.",
+    "leaderboards": "Topplistor",
+    "leaderboardsDesc": "Följ din utveckling och se hur du rankar mot andra spelare globalt.",
+    "noDownload": "Ingen nedladdning krävs",
+    "noDownloadDesc": "Spela direkt i din webbläsare på vilken enhet som helst - dator, surfplatta eller mobil.",
+    "qrSharing": "QR-koddelning",
+    "qrSharingDesc": "Generera QR-koder för att omedelbart bjuda in vänner till ditt spelrum.",
+    "singlePlayerTitle": "Enspelarlägen",
+    "singlePlayerIntro": "Öva på egen hand eller utmana dig själv mot AI-motståndare!",
+    "soloVsBots": "Solo mot bottar",
+    "soloVsBotsDesc": "Tävla mot AI-motståndare på olika svårighetsgrader. Perfekt för att öva strategier innan du utmanar riktiga spelare.",
+    "practiceMode": "Övningsläge",
+    "practiceModeDesc": "Ta din tid utan timer. Perfekt för att lära dig nya ord och utforska rutnätet utan press.",
+    "challengeMode": "Utmaningsläge",
+    "challengeModeDesc": "Slå dina personliga rekord och följ din förbättring över tid. Tävla mot dig själv!"
+  },
+  "social": {
+    "playersOnline": "spelare online",
+    "gamesNow": "spel pågår nu",
+    "games": "spel",
+    "newRecord": "Nytt rekord!",
+    "online": "online"
+  },
+  "daily": {
+    "title": "Daglig utmaning",
+    "badge": "DAGLIG UTMANING",
+    "puzzleNumber": "Daglig #{number}",
+    "timeLimit": "Tidsgräns",
+    "attempt": "Försök",
+    "playButton": "Spela dagens pussel",
+    "nextPuzzleIn": "Nästa pussel om:",
+    "samePuzzle": "Samma pussel för alla världen över. Dela dina resultat för att utmana vänner!",
+    "alreadyPlayed": "Redan spelat idag",
+    "yourScore": "Din poäng",
+    "completed": "Klart!",
+    "quitConfirm": "Är du säker på att du vill avsluta? Dina framsteg går förlorade och du kommer inte kunna spela dagens pussel igen.",
+    "wordsFound": "{count} ord hittade",
+    "streak": "Streak",
+    "streakDays": "{count} dagars streak!",
+    "shareScore": "Dela din poäng",
+    "copyToClipboard": "Kopiera till urklipp",
+    "copiedToClipboard": "Kopierad till urklipp!",
+    "home": "Hem",
+    "close": "Stäng",
+    "bannerTitle": "Daglig #{number}",
+    "bannerSubtitle": "Samma pussel för alla. Dela din poäng!",
+    "oneAttempt": "Ett försök per dag - samma pussel för alla!",
+    "dayStreak": "dagars streak",
+    "playNow": "SPELA NU",
+    "loading": "Laddar daglig utmaning...",
+    "todaysPlayers": "Dagens spelare",
+    "beFirstToPlay": "Bli först att spela dagens utmaning!",
+    "playerSingular": "spelare",
+    "playersPlural": "spelare",
+    "yourRank": "Din placering",
+    "showMore": "Visa mer",
+    "showLess": "Visa mindre",
+    "more": "mer"
+  },
+  "guidance": {
+    "combo": {
+      "title": "Kombobonus!",
+      "text": "Hitta ord snabbt för att bygga kombinationer och multiplicera din poäng! Håll farten uppe!"
+    },
+    "earthquake": {
+      "title": "Jordbävning på väg!",
+      "text": "Bokstäverna blandas snart - hitta ord snabbt innan de flyttas! Eldrundan börjar härnäst!"
+    },
+    "fireRound": {
+      "title": "Eldrunda - Dubbla poäng!",
+      "text": "Alla poäng DUBBLERAS de nästa 15 sekunderna - hitta så många ord du kan!"
+    },
+    "directionPattern": {
+      "title": "Byt Riktning!",
+      "text": "Du kan byta riktning medan du drar ett ord! Gå höger, sedan ner, sedan diagonalt - allt i ett ord."
+    },
+    "dismiss": "Förstått!"
+  }
+};
+
+module.exports = { sv };

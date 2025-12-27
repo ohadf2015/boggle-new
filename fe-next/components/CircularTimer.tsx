@@ -9,14 +9,15 @@ import { useReducedMotion } from '../utils/accessibility';
 interface CircularTimerProps {
   remainingTime: number;
   totalTime?: number;
-  /** Size variant: 'sm' for compact landscape mode, 'md' (default) for normal */
-  size?: 'sm' | 'md';
+  /** Size variant: 'sm' for compact landscape mode, 'md' (default) for normal, 'lg' for desktop */
+  size?: 'sm' | 'md' | 'lg';
 }
 
 // Size configurations
 const SIZES = {
   sm: { svgSize: 100, radius: 38, strokeWidth: 8, textSize: 'text-2xl', frameClasses: 'p-2 border-3', badgeClasses: 'hidden' },
   md: { svgSize: 120, radius: 45, strokeWidth: 10, textSize: 'text-3xl', frameClasses: 'p-3 border-4', badgeClasses: '' },
+  lg: { svgSize: 140, radius: 52, strokeWidth: 12, textSize: 'text-4xl', frameClasses: 'p-4 border-4', badgeClasses: '' },
 };
 
 // Format time as MM:SS - defined outside component to avoid recreation on each render
@@ -60,10 +61,10 @@ const CircularTimer = memo<CircularTimerProps>(({ remainingTime, totalTime = 180
       <div
         className={`
           relative
-          bg-neo-cream
+          bg-neo-cream text-neo-black
           border-neo-black
           rounded-neo-lg
-          ${size === 'sm' ? 'shadow-hard-sm' : 'shadow-hard-lg'}
+          ${size === 'sm' ? 'shadow-hard-sm' : size === 'lg' ? 'shadow-hard-xl' : 'shadow-hard-lg'}
           ${config.frameClasses}
         `}
         style={{ transform: size === 'sm' ? 'rotate(-1deg)' : 'rotate(-2deg)' }}

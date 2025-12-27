@@ -146,7 +146,7 @@ const HostModeFields: React.FC<HostModeFieldsProps> = ({
               aria-invalid={showHostUsernameError ? 'true' : undefined}
               aria-describedby={showHostUsernameError ? 'hostUsername-error' : undefined}
               className={cn(
-                "flex-1 h-10 bg-slate-100 dark:bg-slate-700/50 border-slate-200 dark:border-slate-600 text-slate-900 dark:text-white placeholder:text-slate-500 dark:placeholder:text-gray-600 transition-colors",
+                "flex-1 h-10 bg-slate-100 dark:bg-slate-700/50 border-slate-200 dark:border-slate-600 text-slate-900 dark:text-white placeholder:text-slate-500 dark:placeholder:text-slate-400 transition-colors",
                 getValidationClasses(
                   hostUsernameError ? 'invalid' : hostUsernameValidation.state,
                   showHostUsernameError ? "border-red-500 bg-red-900/30 focus-visible:ring-red-500" : ""
@@ -199,7 +199,7 @@ const HostModeFields: React.FC<HostModeFieldsProps> = ({
             aria-invalid={showGameCodeError ? 'true' : undefined}
             aria-describedby={showGameCodeError ? 'host-gameCode-error' : undefined}
             className={cn(
-              "h-10 pr-12 bg-slate-100 dark:bg-slate-700/50 border-slate-200 dark:border-slate-600 text-slate-900 dark:text-white placeholder:text-slate-500 dark:placeholder:text-gray-600 transition-colors",
+              "h-10 pr-12 bg-slate-100 dark:bg-slate-700/50 border-slate-200 dark:border-slate-600 text-slate-900 dark:text-white placeholder:text-slate-500 dark:placeholder:text-slate-400 transition-colors",
               getValidationClasses(
                 gameCodeError ? 'invalid' : gameCodeValidation.state,
                 showGameCodeError ? "border-red-500 bg-red-900/30 focus-visible:ring-red-500" : ""

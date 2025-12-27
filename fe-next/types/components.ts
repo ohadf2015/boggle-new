@@ -4,7 +4,7 @@
  */
 
 import type { Socket } from 'socket.io-client';
-import type { Language, LetterGrid, ActiveRoom, Avatar, WordDetail } from '@/shared/types/game';
+import type { Language, ActiveRoom, Avatar, WordDetail } from '@/shared/types/game';
 
 // ==================== JoinView Types ====================
 
@@ -82,12 +82,10 @@ export interface PlayerResult {
 export interface ResultsPageProps {
   /** Final scores for all players */
   finalScores: PlayerResult[] | null;
-  /** Letter grid from the game */
-  letterGrid: LetterGrid | null;
-  /** Game code */
-  gameCode: string;
-  /** Handler to return to the room/lobby */
-  onReturnToRoom: () => void;
+  /** Game code (optional for single player) */
+  gameCode?: string;
+  /** Handler to return to the room/lobby (optional for single player) */
+  onReturnToRoom?: () => void;
   /** Current user's username */
   username: string;
   /** Socket.IO connection */
@@ -98,11 +96,6 @@ export interface ResultsPageProps {
   duplicateRuleDisabled?: boolean;
   /** Number of players in the game */
   playerCount?: number;
-}
-
-export interface HeatMapData {
-  cellUsageCounts: Record<string, number>;
-  maxCount: number;
 }
 
 export interface VoteInfo {

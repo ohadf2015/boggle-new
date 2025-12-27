@@ -28,6 +28,7 @@ import PlayerInGameView from './components/PlayerInGameView';
 import usePlayerSocketEvents from './hooks/usePlayerSocketEvents';
 import { resetComboState } from '@/shared/utils/comboUtils';
 import { useGameStateContext } from '@/contexts/GameStateContext';
+import { useNavigationGuard } from '@/hooks/useNavigationGuard';
 
 // ==========================================
 // Type Definitions
@@ -99,8 +100,8 @@ const PlayerView: React.FC<PlayerViewProps> = memo(({
   // Enable presence tracking
   usePresence({ enabled: !!gameCode });
 
-  // Use foundWords and boardTheme from GameStateContext (shared with usePlayerWordEvents)
-  const { foundWords, setFoundWords, boardTheme } = useGameStateContext();
+  // Use foundWords, boardTheme, and totalBoardWords from GameStateContext (shared with usePlayerWordEvents)
+  const { foundWords, setFoundWords, boardTheme, totalBoardWords } = useGameStateContext();
 
   // Game state
   const [word, setWord] = useState<string>('');
@@ -136,6 +137,17 @@ const PlayerView: React.FC<PlayerViewProps> = memo(({
   // Track active game session
   const [wasInActiveGame, setWasInActiveGame] = useState<boolean>(false);
 
+  // Navigation guard - prevent accidental navigation during active game
+  useNavigationGuard({
+    enabled: gameActive,
+    message: t('playerView.exitWarning'),
+    onNavigationAttempt: () => {
+      // Show the exit confirmation dialog
+      setShowExitConfirm(true);
+      return false; // Block navigation, let modal handle it
+    },
+  });
+
   // Combo system
   const [comboLevel, setComboLevel] = useState<number>(0);
   const [lastWordTime, setLastWordTime] = useState<number | null>(null);
@@ -169,6 +181,12 @@ const PlayerView: React.FC<PlayerViewProps> = memo(({
   const totalGameTimeRef = useRef<number>(180); // Default 3 minutes, updated on game start
   const earthquakeMusicActiveRef = useRef<boolean>(false); // Track if earthquake music is playing
 
+  // Memoized game start handler to prevent unnecessary effect re-runs
+  const handleGameStart = useCallback(() => {
+    fadeToTrack(TRACKS.IN_GAME, 800, 800);
+    hasTriggeredUrgentMusicRef.current = false;
+  }, [fadeToTrack, TRACKS.IN_GAME]);
+
   // Use custom hook for socket events (now uses GameStateContext - no more prop drilling!)
   usePlayerSocketEvents({
     socket,
@@ -193,10 +211,7 @@ const PlayerView: React.FC<PlayerViewProps> = memo(({
     intentionalExitRef,
     totalGameTimeRef,
     // Start music immediately when startGame event is received for better synchronization
-    onGameStart: () => {
-      fadeToTrack(TRACKS.IN_GAME, 800, 800);
-      hasTriggeredUrgentMusicRef.current = false;
-    },
+    onGameStart: handleGameStart,
   });
 
   // Reset urgent music ref when game becomes active (for urgent music trigger)
@@ -524,6 +539,7 @@ const PlayerView: React.FC<PlayerViewProps> = memo(({
         comboLevelRef={comboLevelRef}
         foundWords={mappedFoundWords}
         leaderboard={leaderboard}
+        totalBoardWords={totalBoardWords}
         tournamentData={tournamentData}
         tournamentStandings={tournamentStandings}
         showTournamentStandings={showTournamentStandings}

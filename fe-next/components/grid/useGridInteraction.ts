@@ -13,6 +13,8 @@ interface UseGridInteractionProps {
   interactive: boolean;
   comboLevel: number;
   onWordSubmit?: (word: string) => void;
+  /** Callback when word is submitted with its path - used for direction pattern detection */
+  onPathSubmit?: (cells: SelectedCell[]) => void;
   externalSelectedCells?: SelectedCell[];
   gridRef: React.RefObject<HTMLDivElement | null>;
   fireRoundActive?: boolean;
@@ -42,6 +44,7 @@ export function useGridInteraction({
   interactive,
   comboLevel,
   onWordSubmit,
+  onPathSubmit,
   externalSelectedCells,
   gridRef,
   fireRoundActive = false,
@@ -192,6 +195,9 @@ export function useGridInteraction({
           if (onWordSubmit) {
             onWordSubmit(formedWord);
           }
+          if (onPathSubmit) {
+            onPathSubmit([...selectedCells]);
+          }
           startSequentialFadeOut(true);
           isTouchingRef.current = false;
         }
@@ -203,7 +209,7 @@ export function useGridInteraction({
         clearTimeout(autoSubmitTimeoutRef.current);
       }
     };
-  }, [selectedCells, comboLevel, interactive, onWordSubmit, startSequentialFadeOut]);
+  }, [selectedCells, comboLevel, interactive, onWordSubmit, onPathSubmit, startSequentialFadeOut]);
 
   const handleTouchStart = (
     rowIndex: number,
@@ -318,6 +324,9 @@ export function useGridInteraction({
       const formedWord = selectedCells.map(c => c.letter).join('');
       if (onWordSubmit) {
         onWordSubmit(formedWord);
+      }
+      if (onPathSubmit) {
+        onPathSubmit([...selectedCells]);
       }
 
       // Haptic feedback based on word length and combo
@@ -450,6 +459,9 @@ export function useGridInteraction({
           if (onWordSubmit) {
             onWordSubmit(formedWord);
           }
+          if (onPathSubmit) {
+            onPathSubmit([...selectedCells]);
+          }
           // Haptic feedback
           if (window.navigator?.vibrate) {
             window.navigator.vibrate(fireRoundActive ? 50 : 15);
@@ -514,7 +526,7 @@ export function useGridInteraction({
       // Haptic feedback for navigation
       if (window.navigator?.vibrate) window.navigator.vibrate(10);
     }
-  }, [interactive, grid, focusedCell, selectedCells, comboLevel, onWordSubmit, startSequentialFadeOut, setSelectedCells, isAdjacentCell, fireRoundActive]);
+  }, [interactive, grid, focusedCell, selectedCells, comboLevel, onWordSubmit, onPathSubmit, startSequentialFadeOut, setSelectedCells, isAdjacentCell, fireRoundActive]);
 
   // Reset keyboard mode on touch/mouse interaction
   useEffect(() => {

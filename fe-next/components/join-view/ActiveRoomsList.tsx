@@ -159,17 +159,17 @@ const LoadingSkeleton: React.FC = React.memo(() => (
     {[1, 2].map((i) => (
       <div
         key={i}
-        className="w-full p-3 rounded-neo bg-neo-navy/50 border-3 border-neo-cream/20 animate-pulse"
+        className="w-full p-3 rounded-neo bg-neo-navy/50 text-white border-3 border-neo-cream/20 animate-pulse"
       >
         <div className="flex items-center justify-between gap-3">
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-neo-cream/20 rounded-neo" />
+            <div className="w-8 h-8 bg-neo-cream/20 text-neo-black rounded-neo" />
             <div>
-              <div className="h-5 w-24 bg-neo-cream/20 rounded-neo mb-1" />
-              <div className="h-3 w-16 bg-neo-cream/10 rounded-neo" />
+              <div className="h-5 w-24 bg-neo-cream/20 text-neo-black rounded-neo mb-1" />
+              <div className="h-3 w-16 bg-neo-cream/10 text-neo-black rounded-neo" />
             </div>
           </div>
-          <div className="h-5 w-16 bg-neo-cream/20 rounded-neo" />
+          <div className="h-5 w-16 bg-neo-cream/20 text-neo-black rounded-neo" />
         </div>
       </div>
     ))}

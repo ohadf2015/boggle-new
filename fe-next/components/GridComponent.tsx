@@ -6,26 +6,26 @@ import type { LetterGrid, GridPosition } from '@/types';
 // Import extracted utilities
 import {
   getComboColors,
-  getHeatMapStyle,
   useGridInteraction,
   getPerformanceMode,
   ComboIndicator,
   ComboExplanationTooltip,
   type SelectedCell,
-  type HeatMapData,
   type PerformanceMode,
 } from './grid';
+import { useDisableFireRoundLights } from '@/contexts/AccessibilityContext';
 
 interface GridComponentProps {
   grid: LetterGrid;
   interactive?: boolean;
   onWordSubmit?: (word: string) => void;
+  /** Callback when word is submitted with its path - used for direction pattern detection */
+  onPathSubmit?: (cells: SelectedCell[]) => void;
   selectedCells?: SelectedCell[];
   className?: string;
   largeText?: boolean;
   comboLevel?: number;
   animateOnMount?: boolean;
-  heatMapData?: HeatMapData | null;
   fireRoundActive?: boolean;
   earthquakeShaking?: boolean;
   /** Callback when formed word changes - use for external word display */
@@ -42,7 +42,6 @@ interface GridComponentProps {
  *
  * REFACTORED: Core logic extracted to components/grid/:
  * - comboColors.ts - Combo level color schemes
- * - heatMap.ts - Heat map overlay calculations
  * - useGridInteraction.ts - Touch/mouse interaction logic
  * - performanceUtils.ts - Device capability detection
  */
@@ -50,12 +49,12 @@ const GridComponent = memo<GridComponentProps>(({
   grid,
   interactive = false,
   onWordSubmit,
+  onPathSubmit,
   selectedCells: externalSelectedCells,
   className,
   largeText = false,
   comboLevel = 0,
   animateOnMount = false,
-  heatMapData = null,
   fireRoundActive = false,
   earthquakeShaking = false,
   onWordChange,
@@ -65,6 +64,9 @@ const GridComponent = memo<GridComponentProps>(({
   const [reduceMotion, setReduceMotion] = useState(false);
   const [performanceMode, setPerformanceMode] = useState<PerformanceMode>('full');
   const gridRef = useRef<HTMLDivElement>(null);
+
+  // Accessibility setting to disable fire round lights
+  const disableFireRoundLights = useDisableFireRoundLights();
 
   // Use extracted interaction hook
   const {
@@ -81,6 +83,7 @@ const GridComponent = memo<GridComponentProps>(({
     interactive,
     comboLevel,
     onWordSubmit,
+    onPathSubmit,
     externalSelectedCells,
     gridRef,
     fireRoundActive,
@@ -168,8 +171,9 @@ const GridComponent = memo<GridComponentProps>(({
   ];
 
   // Randomize glowing cells when fire round is active (optimized for performance)
+  // Skip if user has disabled fire round lights in accessibility settings
   useEffect(() => {
-    if (!fireRoundActive) {
+    if (!fireRoundActive || disableFireRoundLights) {
       setGlowingCells(new Set());
       setCellColorIndices(new Map());
       return;
@@ -250,7 +254,7 @@ const GridComponent = memo<GridComponentProps>(({
         cancelAnimationFrame(animationFrameId);
       }
     };
-  }, [fireRoundActive, grid]);
+  }, [fireRoundActive, disableFireRoundLights, grid]);
 
   // Auto-focus on grid when game becomes interactive
   useEffect(() => {
@@ -313,7 +317,7 @@ const GridComponent = memo<GridComponentProps>(({
               className="fixed top-24 left-1/2 -translate-x-1/2 z-[90] pointer-events-none"
               aria-hidden="true"
             >
-              <div className="bg-neo-cyan border-3 border-neo-black rounded-neo px-4 py-2 shadow-hard flex items-center gap-2 whitespace-nowrap">
+              <div className="bg-neo-cyan text-neo-black border-3 border-neo-black rounded-neo px-4 py-2 shadow-hard flex items-center gap-2 whitespace-nowrap">
                 <span className="font-black text-xl sm:text-2xl text-neo-black uppercase tracking-wide">
                   {formedWord}
                 </span>
@@ -373,7 +377,6 @@ const GridComponent = memo<GridComponentProps>(({
               const isFirstSelected = firstSelected !== undefined && firstSelected.row === i && firstSelected.col === j;
               const isFading = fadingCells.some(c => c.row === i && c.col === j);
               const isFocused = focusedCell?.row === i && focusedCell?.col === j;
-              const heatStyle = getHeatMapStyle(i, j, heatMapData);
               const isAdjacentHint = adjacentHintCells.has(cellKey);
               const isGlowing = glowingCells.has(cellKey);
               const glowColorIndex = cellColorIndices.get(cellKey) ?? 0;
@@ -623,16 +626,6 @@ const GridComponent = memo<GridComponentProps>(({
                     </>
                   )}
 
-                  {/* Heat map glow overlay - solid fill without negative insets to avoid clipping artifacts */}
-                  {heatStyle && (
-                    <div
-                      className="absolute inset-0 pointer-events-none rounded-[6px]"
-                      style={{
-                        background: `radial-gradient(ellipse at center, rgba(${heatStyle.r}, ${heatStyle.g}, ${heatStyle.b}, ${0.6 + heatStyle.t * 0.3}) 0%, rgba(${heatStyle.r}, ${heatStyle.g}, ${heatStyle.b}, ${0.3 + heatStyle.t * 0.2}) 50%, rgba(${heatStyle.r}, ${heatStyle.g}, ${heatStyle.b}, ${0.1 + heatStyle.t * 0.1}) 100%)`,
-                        zIndex: 1
-                      }}
-                    />
-                  )}
                   {cell}
                 </motion.div>
               );

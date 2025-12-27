@@ -3,6 +3,7 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import toast from 'react-hot-toast';
+import { FaRobot } from 'react-icons/fa';
 import { applyHebrewFinalLetters } from '@/utils/utils';
 
 /**
@@ -233,9 +234,9 @@ export const wordAIValidatingToast = (word: string, options: WordAIValidatingOpt
             <motion.span
               animate={{ rotate: 360 }}
               transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
-              className="text-2xl"
+              className="text-2xl flex items-center justify-center"
             >
-              🤖
+              <FaRobot className="text-neo-cream" />
             </motion.span>
             <div className="flex flex-col">
               <span className="font-black uppercase tracking-wide text-neo-cream">

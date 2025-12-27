@@ -173,6 +173,8 @@ describe('useGameState', () => {
       const word = {
         word: 'TEST',
         score: 3,
+        validated: true,
+        isDuplicate: false,
         autoValidated: true,
       };
 
@@ -189,6 +191,8 @@ describe('useGameState', () => {
       const word = {
         word: 'TEST',
         score: 3,
+        validated: true,
+        isDuplicate: false,
         autoValidated: true,
       };
 
@@ -202,20 +206,22 @@ describe('useGameState', () => {
 
     it('should add an achievement', () => {
       const { result } = renderHook(() => useGameState());
+      const achievement = { key: 'FIRST_BLOOD', icon: '🩸' };
 
       act(() => {
-        result.current.addAchievement('FIRST_BLOOD');
+        result.current.addAchievement(achievement);
       });
 
-      expect(result.current.achievements).toContain('FIRST_BLOOD');
+      expect(result.current.achievements).toContainEqual(achievement);
     });
 
     it('should not add duplicate achievements', () => {
       const { result } = renderHook(() => useGameState());
+      const achievement = { key: 'FIRST_BLOOD', icon: '🩸' };
 
       act(() => {
-        result.current.addAchievement('FIRST_BLOOD');
-        result.current.addAchievement('FIRST_BLOOD');
+        result.current.addAchievement(achievement);
+        result.current.addAchievement(achievement);
       });
 
       expect(result.current.achievements).toHaveLength(1);
@@ -282,8 +288,9 @@ describe('useGameState', () => {
           result.current.addFoundWord({
             word: `WORD${i}`,
             score: 3,
-            autoValidated: true,
             validated: true,
+            isDuplicate: false,
+            autoValidated: true,
           });
         }
       });
@@ -310,8 +317,8 @@ describe('useGameState', () => {
       act(() => {
         result.current.setGameActive(true);
         result.current.setLetterGrid([['A', 'B']]);
-        result.current.addFoundWord({ word: 'TEST', score: 3, autoValidated: true });
-        result.current.addAchievement('FIRST_BLOOD');
+        result.current.addFoundWord({ word: 'TEST', score: 3, validated: true, isDuplicate: false, autoValidated: true });
+        result.current.addAchievement({ key: 'FIRST_BLOOD', icon: '🩸' });
       });
 
       // Reset for new round

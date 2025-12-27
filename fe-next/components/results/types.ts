@@ -1,4 +1,5 @@
 import type { Avatar as AvatarType } from '@/types';
+import type { PlayerArchetype } from '@/utils/playerArchetypes';
 
 export interface WordObject {
   word: string;
@@ -67,6 +68,7 @@ export interface ResultsPlayerCardProps {
   xpGainedData?: XpGainedData | null;
   levelUpData?: LevelUpData | null;
   duplicateRuleDisabled?: boolean;
+  archetype?: PlayerArchetype | null;
 }
 
 export interface WordChipProps {

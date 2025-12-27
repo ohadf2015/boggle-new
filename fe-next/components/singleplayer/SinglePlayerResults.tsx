@@ -127,7 +127,7 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
     const timer = setTimeout(() => {
       setShowSignupModal(true);
       sessionStorage.setItem(SIGNUP_PROMPT_SHOWN_KEY, 'true');
-    }, 2000);
+    }, 3500);
 
     return () => clearTimeout(timer);
   }, [isAuthenticated]);
@@ -205,7 +205,7 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
     const validWordCount = results.playerWordData?.filter(w => w.isValid).length || 0;
 
     return (
-      <div className="flex h-screen w-full overflow-hidden bg-slate-900 p-2 gap-2">
+      <div className="flex h-screen w-full overflow-hidden bg-slate-900 text-white p-2 gap-2">
         {/* Left column: Victory banner + Score + Grid */}
         <div className="w-1/2 flex flex-col items-center gap-2 overflow-y-auto">
           {/* Victory/Defeat indicator - compact */}
@@ -277,7 +277,7 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
         {/* Right column: Words + Bot scores + Actions */}
         <div className="w-1/2 flex flex-col gap-2 overflow-y-auto">
           {/* Words by points - compact */}
-          <div className="bg-neo-cream dark:bg-slate-800 border-2 border-neo-black rounded-neo p-2 flex-1 overflow-y-auto">
+          <div className="bg-neo-cream text-neo-black dark:bg-slate-800 dark:text-white border-2 border-neo-black rounded-neo p-2 flex-1 overflow-y-auto">
             <h3 className="text-xs font-black uppercase text-neo-black/80 dark:text-neo-cream mb-2">
               {t('results.yourWords') || 'Your Words'}
             </h3>
@@ -304,7 +304,7 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
 
           {/* Bot rankings - compact (for solo-bots mode) */}
           {mode === 'solo-bots' && allParticipants.length > 1 && (
-            <div className="bg-neo-cream dark:bg-slate-800 border-2 border-neo-black rounded-neo p-2">
+            <div className="bg-neo-cream text-neo-black dark:bg-slate-800 dark:text-white border-2 border-neo-black rounded-neo p-2">
               <h3 className="text-xs font-black uppercase text-neo-black/80 dark:text-neo-cream mb-1">
                 {t('results.rankings') || 'Rankings'}
               </h3>
@@ -388,7 +388,7 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.2 }}
           className={cn(
-            'text-center py-8 rounded-neo-lg border-4 border-neo-black shadow-hard-xl relative overflow-hidden',
+            'text-center py-6 xs:py-8 rounded-neo-lg border-4 border-neo-black shadow-hard-xl relative overflow-hidden',
             isWinner ? 'bg-gradient-to-br from-neo-yellow via-yellow-300 to-neo-orange' : 'bg-gradient-to-br from-neo-cream to-slate-100'
           )}
         >
@@ -406,12 +406,12 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
             className="relative z-10"
           >
             {isWinner ? (
-              <FaTrophy className="text-6xl mx-auto mb-3 text-neo-black drop-shadow-[2px_2px_0px_rgba(0,0,0,0.2)]" />
+              <FaTrophy className="text-5xl xs:text-6xl mx-auto mb-3 text-neo-black drop-shadow-[2px_2px_0px_rgba(0,0,0,0.2)]" />
             ) : (
-              <div className="text-6xl font-black text-neo-black/75 mb-3">#{playerRank}</div>
+              <div className="text-5xl xs:text-6xl font-black text-neo-black/75 mb-3">#{playerRank}</div>
             )}
           </motion.div>
-          <h2 className="text-3xl font-black uppercase text-neo-black relative z-10" style={{ textShadow: isWinner ? '2px 2px 0px rgba(255,255,255,0.5)' : 'none' }}>
+          <h2 className="text-2xl xs:text-3xl font-black uppercase text-neo-black relative z-10" style={{ textShadow: isWinner ? '2px 2px 0px rgba(255,255,255,0.5)' : 'none' }}>
             {isWinner
               ? t('singlePlayer.victory') || 'Victory!'
               : t('singlePlayer.gameOver') || 'Game Over'}
@@ -425,9 +425,9 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
           initial={{ y: -20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.2 }}
-          className="text-center py-8 bg-gradient-to-br from-neo-lime via-lime-300 to-green-400 rounded-neo-lg border-4 border-neo-black shadow-hard-xl"
+          className="text-center py-6 xs:py-8 bg-gradient-to-br from-neo-lime via-lime-300 to-green-400 rounded-neo-lg border-4 border-neo-black shadow-hard-xl"
         >
-          <h2 className="text-3xl font-black uppercase text-neo-black">
+          <h2 className="text-2xl xs:text-3xl font-black uppercase text-neo-black">
             {t('singlePlayer.practiceComplete') || 'Practice Complete!'}
           </h2>
         </motion.div>
@@ -440,7 +440,7 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.2 }}
           className={cn(
-            'text-center py-8 rounded-neo-lg border-4 border-neo-black shadow-hard-xl relative overflow-hidden',
+            'text-center py-6 xs:py-8 rounded-neo-lg border-4 border-neo-black shadow-hard-xl relative overflow-hidden',
             results.isNewHighScore
               ? 'bg-gradient-to-br from-neo-yellow via-yellow-300 to-neo-orange'
               : 'bg-gradient-to-br from-neo-cream to-slate-100 dark:from-slate-700 dark:to-slate-800'
@@ -472,9 +472,9 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
                   transition={{ duration: 0.5, delay: 0.3 }}
                   className="mb-3"
                 >
-                  <FaCrown className="text-6xl mx-auto text-neo-black drop-shadow-lg" />
+                  <FaCrown className="text-5xl xs:text-6xl mx-auto text-neo-black drop-shadow-lg" />
                 </motion.div>
-                <h2 className="text-3xl font-black uppercase text-neo-black mb-2" style={{ textShadow: '2px 2px 0 rgba(255,255,255,0.3)' }}>
+                <h2 className="text-2xl xs:text-3xl font-black uppercase text-neo-black mb-2" style={{ textShadow: '2px 2px 0 rgba(255,255,255,0.3)' }}>
                   {results.isNewAllTimeBest
                     ? (t('challenge.allTimeRecord') || 'All-Time Record!')
                     : (t('singlePlayer.newHighScore') || 'New High Score!')}
@@ -508,9 +508,9 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
             ) : (
               <>
                 <div className="flex items-center justify-center gap-3 mb-2">
-                  <Target className="w-10 h-10 text-neo-black/75 dark:text-neo-cream/75" />
+                  <Target className="w-8 h-8 xs:w-10 xs:h-10 text-neo-black/75 dark:text-neo-cream/75" />
                 </div>
-                <h2 className="text-3xl font-black uppercase text-neo-black dark:text-neo-white">
+                <h2 className="text-2xl xs:text-3xl font-black uppercase text-neo-black dark:text-neo-white">
                   {t('singlePlayer.challengeComplete') || 'Challenge Complete'}
                 </h2>
                 {results.previousHighScore && results.previousHighScore > results.playerScore && (
@@ -531,7 +531,7 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
         transition={{ type: 'spring', delay: 0.3 }}
         className="text-center py-6"
       >
-        <div className="inline-block bg-gradient-to-br from-neo-cyan to-cyan-400 rounded-neo-lg border-4 border-neo-black shadow-hard-lg px-10 py-6 relative overflow-hidden texture-halftone-comic">
+        <div className="inline-block bg-gradient-to-br from-neo-cyan to-cyan-400 rounded-neo-lg border-4 border-neo-black shadow-hard-lg px-6 py-4 xs:px-10 xs:py-6 relative overflow-hidden texture-halftone-comic">
           {/* Comic-style halftone overlay */}
           <div
             className="absolute inset-0 pointer-events-none"
@@ -590,7 +590,7 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
             <div className="space-y-3">
               {/* Valid Words Grouped by Points */}
               {sortedPointGroups.length > 0 && (
-                <div className="bg-neo-cream dark:bg-slate-800 rounded-neo p-3 border-3 border-neo-black shadow-hard-sm">
+                <div className="bg-neo-cream text-neo-black dark:bg-slate-800 dark:text-white rounded-neo p-3 border-3 border-neo-black shadow-hard-sm">
                   <div className="text-sm font-black text-neo-black dark:text-neo-cream mb-3 flex items-center gap-2 uppercase">
                     <span className="bg-neo-cyan text-neo-black px-2 py-0.5 rounded-neo border-2 border-neo-black">✓</span>
                     {t('results.validWords') || 'Valid Words'} ({Object.values(wordsByPoints).flat().length})
@@ -599,7 +599,7 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
                     {sortedPointGroups.map(points => {
                       const wordsForPoints = wordsByPoints[points] ?? [];
                       return (
-                        <div key={`points-${points}`} className="rounded-neo p-2 border-l-4 border-neo-black bg-white/50 dark:bg-slate-700/50" style={{ borderLeftColor: getPointColor(points) }}>
+                        <div key={`points-${points}`} className="rounded-neo p-2 border-l-4 border-neo-black bg-white/50 text-neo-black dark:bg-slate-700/50 dark:text-white" style={{ borderLeftColor: getPointColor(points) }}>
                           <div className="text-xs font-black mb-1.5 flex items-center gap-2 text-neo-black dark:text-neo-cream uppercase">
                             <span
                               className="px-2 py-0.5 rounded-neo flex items-center justify-center font-black text-xs border-2 border-neo-black"
@@ -650,7 +650,7 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
 
               {/* Invalid Words */}
               {invalidWords.length > 0 && (
-                <div className="bg-neo-cream dark:bg-slate-800 rounded-neo p-3 border-3 border-neo-black shadow-hard-sm">
+                <div className="bg-neo-cream text-neo-black dark:bg-slate-800 dark:text-white rounded-neo p-3 border-3 border-neo-black shadow-hard-sm">
                   <div className="text-sm font-black text-neo-black/70 dark:text-white mb-2 flex items-center gap-2 uppercase">
                     <span className="bg-neo-gray text-neo-cream px-2 py-0.5 rounded-neo border-2 border-neo-black">✗</span>
                     {t('results.invalid') || 'Invalid'} ({invalidWords.length})
@@ -757,7 +757,7 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
                   )}
                 >
                   <div className="flex items-center gap-4">
-                    <div className="w-10 h-10 flex items-center justify-center rounded-full bg-white dark:bg-slate-700 border-2 border-neo-black dark:border-slate-500">
+                    <div className="w-10 h-10 flex items-center justify-center rounded-full bg-white text-neo-black dark:bg-slate-700 dark:text-white border-2 border-neo-black dark:border-slate-500">
                       {getRankIcon(index + 1)}
                     </div>
                     <div className="flex items-center gap-2">
@@ -837,7 +837,7 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
                       transition={{ duration: 0.2 }}
                       className="overflow-hidden"
                     >
-                      <div className="p-3 bg-white dark:bg-slate-800 border-t-2 border-neo-black/20 dark:border-slate-600">
+                      <div className="p-3 bg-white text-neo-black dark:bg-slate-800 dark:text-white border-t-2 border-neo-black/20 dark:border-slate-600">
                         {/* Show actual bot words if available */}
                         {bot.words && bot.words.length > 0 && (
                           <div className="mb-3">

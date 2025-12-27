@@ -1,5 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
+
 // Re-export types for client use
 export interface BoardTheme {
   nameKey: string;
@@ -12,10 +15,12 @@ export interface ThemedWordsResponse {
   theme: BoardTheme;
 }
 
+import type { Language } from '@/shared/types';
+
 // Import the themed words logic from backend
 // Note: We need to use dynamic import since this is backend code
 async function getThemedWordsWithTheme(
-  language: string,
+  language: Language,
   count: number,
   minLength: number,
   maxLength: number
@@ -31,15 +36,15 @@ export async function POST(request: NextRequest) {
     const { language = 'en', count = 10, minLength = 3, maxLength = 12 } = body;
 
     // Validate inputs
-    const validLanguages = ['en', 'he', 'sv', 'es', 'ja'];
-    if (!validLanguages.includes(language)) {
+    const validLanguages: Language[] = ['en', 'he', 'sv', 'es', 'ja'];
+    if (!validLanguages.includes(language as Language)) {
       return NextResponse.json(
         { error: 'Invalid language' },
         { status: 400 }
       );
     }
 
-    const result = await getThemedWordsWithTheme(language, count, minLength, maxLength);
+    const result = await getThemedWordsWithTheme(language as Language, count, minLength, maxLength);
 
     return NextResponse.json(result);
   } catch (error) {
@@ -60,8 +65,8 @@ export async function GET(request: NextRequest) {
   const maxLength = parseInt(searchParams.get('maxLength') || '12');
 
   // Validate inputs
-  const validLanguages = ['en', 'he', 'sv', 'es', 'ja'];
-  if (!validLanguages.includes(language)) {
+  const validLanguages: Language[] = ['en', 'he', 'sv', 'es', 'ja'];
+  if (!validLanguages.includes(language as Language)) {
     return NextResponse.json(
       { error: 'Invalid language' },
       { status: 400 }
@@ -69,7 +74,7 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    const result = await getThemedWordsWithTheme(language, count, minLength, maxLength);
+    const result = await getThemedWordsWithTheme(language as Language, count, minLength, maxLength);
     return NextResponse.json(result);
   } catch (error) {
     console.error('Error getting themed words:', error);

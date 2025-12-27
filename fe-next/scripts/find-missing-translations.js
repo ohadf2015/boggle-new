@@ -17,7 +17,7 @@ const path = require('path');
 const PROJECT_ROOT = path.resolve(__dirname, '..');
 const TRANSLATIONS_FILE = path.join(PROJECT_ROOT, 'translations/index.js');
 const EXTENSIONS_TO_SCAN = ['.ts', '.tsx', '.js', '.jsx'];
-const DIRS_TO_EXCLUDE = ['node_modules', '.next', 'dist', 'build', '.git', 'playwright-report'];
+const DIRS_TO_EXCLUDE = ['node_modules', '.next', 'dist', 'build', '.git', 'playwright-report', 'scripts'];
 
 // ============================================
 // PART 1: Extract translation keys from translation file

@@ -66,7 +66,7 @@ const NameStep: React.FC<NameStepProps> = ({ name, onNameChange }) => {
           )}
         >
           <div className="flex items-center gap-2 sm:gap-3 mb-3">
-            <div className="w-10 h-10 sm:w-12 sm:h-12 bg-neo-yellow border-2 border-neo-black rounded-full flex items-center justify-center shadow-hard-sm shrink-0">
+            <div className="w-10 h-10 sm:w-12 sm:h-12 bg-neo-yellow text-neo-black border-2 border-neo-black rounded-full flex items-center justify-center shadow-hard-sm shrink-0">
               <FaUser className="text-neo-black text-lg sm:text-xl" />
             </div>
             <div className="flex-1">

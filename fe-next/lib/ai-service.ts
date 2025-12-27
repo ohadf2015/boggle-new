@@ -946,16 +946,28 @@ Respond with ONLY valid JSON (no markdown):
     const firstLetter = targetWord[0].toUpperCase();
     const wordLength = targetWord.length;
 
-    // Optimized prompt - concise to reduce tokens
-    const prompt = `Give a short hint for the ${languageName} word "${targetWord}" in a word game.
+    // Enhanced prompt for more helpful, specific hints
+    const hintGuidance = hintLevel === 1
+      ? 'Give a vague category or general context (e.g., "Something in nature")'
+      : hintLevel === 2
+      ? 'Give a brief definition or what it means/does (e.g., "A tool for cutting")'
+      : 'Give a specific definition or usage example (e.g., "What a chef does to vegetables")';
 
-Hint level: ${hintLevel === 1 ? 'vague' : hintLevel === 2 ? 'moderate' : 'specific'}
+    const prompt = `Create a helpful hint for the ${languageName} word "${targetWord}" in a word game.
+
+${hintGuidance}
+
+HINT STYLE (pick one that fits best):
+- Definition: What the word means (e.g., "A place where books are kept")
+- Category: What type of thing it is (e.g., "A type of fruit")
+- Action: What it does/is used for (e.g., "What you do when tired")
+- Context: Where/when you'd see it (e.g., "Found in a kitchen")
 
 Rules:
-- Max 15 words
+- Max 12 words, be concise and helpful
 - In ${languageName}
-- Don't use the word itself
-- Don't use rhymes
+- Never include the word itself or obvious rhymes
+- Make it useful for guessing, not just describing letters
 
 Respond JSON only: {"hint":"your hint","difficulty":"${hintLevel === 1 ? 'easy' : hintLevel === 2 ? 'medium' : 'hard'}"}`;
 

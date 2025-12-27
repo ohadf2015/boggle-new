@@ -22,7 +22,7 @@ jest.mock('@/utils/utils', () => ({
 }));
 
 import React from 'react';
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import { LanguageProvider } from '@/contexts/LanguageContext';
 
 jest.mock('@/contexts/MusicContext', () => ({
@@ -95,6 +95,42 @@ jest.mock('@/utils/accessibility', () => ({
   useReducedMotion: () => false,
 }));
 
+jest.mock('@/contexts/AccessibilityContext', () => ({
+  useAccessibility: () => ({
+    isScreenReaderEnabled: false,
+    announceToScreenReader: jest.fn(),
+    highContrast: false,
+    largeText: false,
+  }),
+  useDisableFireRoundLights: () => false,
+}));
+
+jest.mock('@/hooks/useAutoScrollOnGameStart', () => ({
+  useAutoScrollOnGameStart: jest.fn(),
+}));
+
+jest.mock('@/hooks/useComboSystem', () => ({
+  useComboSystem: () => ({
+    comboLevel: 0,
+    comboMultiplier: 1,
+    maxCombo: 0,
+    addWord: jest.fn(),
+    reset: jest.fn(),
+    getComboBonus: () => 0,
+  }),
+}));
+
+jest.mock('@/hooks/useGameTimer', () => ({
+  useGameTimer: () => ({
+    remainingTime: 180,
+    formattedTime: '3:00',
+    isRunning: true,
+    pause: jest.fn(),
+    resume: jest.fn(),
+    reset: jest.fn(),
+  }),
+}));
+
 global.fetch = jest.fn();
 
 const TestWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => (
@@ -111,7 +147,7 @@ describe('SinglePlayerGame - Word Submission', () => {
     });
   });
 
-  it('renders the game grid correctly', () => {
+  it('renders the game grid correctly', async () => {
     const mockSettings = {
       timerSeconds: 180,
       language: 'en' as const,
@@ -136,8 +172,10 @@ describe('SinglePlayerGame - Word Submission', () => {
       { wrapper: TestWrapper }
     );
 
-    // Verify the grid is rendered
-    expect(screen.getByRole('grid')).toBeInTheDocument();
+    // Wait for the grid to load (async initialization)
+    await waitFor(() => {
+      expect(screen.getByRole('grid')).toBeInTheDocument();
+    });
 
     // Verify the timer is shown
     expect(screen.getByText('3:00')).toBeInTheDocument();

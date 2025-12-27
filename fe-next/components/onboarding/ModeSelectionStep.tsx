@@ -88,7 +88,7 @@ const ModeSelectionStep: React.FC<ModeSelectionStepProps> = ({
               whileTap={{ scale: 0.95 }}
             >
               {/* Icon */}
-              <div className="w-10 h-10 sm:w-14 sm:h-14 bg-white border-2 sm:border-3 border-neo-black rounded-full flex items-center justify-center shadow-hard-sm mb-1.5 sm:mb-3">
+              <div className="w-10 h-10 sm:w-14 sm:h-14 bg-white text-neo-black border-2 sm:border-3 border-neo-black rounded-full flex items-center justify-center shadow-hard-sm mb-1.5 sm:mb-3">
                 <Icon className="text-xl sm:text-2xl text-neo-black" />
               </div>
 

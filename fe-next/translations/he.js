@@ -1,0 +1,1956 @@
+// עברית translations
+const he = {
+  "flag": "🇮🇱",
+  "name": "עברית",
+  "direction": "rtl",
+  "logo": {
+    "lexi": "לקסי",
+    "clash": "קלאש"
+  },
+  "seo": {
+    "title": "לקסיקלאש - משחק מילים מהיר ומרתק | התחרו בזמן אמת",
+    "description": "התחרו נגד חברים בקרבות מילים מרגשים בזמן אמת! לקסיקלאש הוא משחק מילים מהיר שבו כל שנייה חשובה. מצאו מילים, נצחו את היריבים וטפסו בטבלת המובילים. מושלם למסיבות, ערבי משחקים ותחרויות ידידותיות. גם מעולה להעשרת אוצר מילים תוך כדי הנאה! שחקו בחינם ב-4 שפות - ללא התקנה.",
+    "keywords": "משחק מילים מרובה משתתפים, משחק מילים בזמן אמת, קרב מילים אונליין, משחק מילים למסיבות, משחק מילים תחרותי, משחק מילים מהיר, אליאס, קהוט, משחק כמו אליאס, ערב משפחתי, משחק מסיבה, משחק קבוצתי, תחרות מילים, משחק מילים חי, מירוץ מילים, משחק אוצר מילים, משחק חינם, משחק לילדים, משחק משפחתי, פעילות לחנוכה, פעילות ביתית, משחק בעברית",
+    "ogTitle": "לקסיקלאש - משחק מילים מהיר ומרתק | התחרו בזמן אמת",
+    "ogDescription": "התחרו נגד חברים בקרבות מילים מרגשים בזמן אמת! מצאו מילים במהירות, נצחו את היריבים וטפסו בדירוג. מושלם למסיבות וערבי משחקים. שחקו בחינם ב-4 שפות!",
+    "twitterTitle": "לקסיקלאש - משחק מילים מהיר ומרתק | התחרו בזמן אמת",
+    "twitterDescription": "התחרו נגד חברים בקרבות מילים מרגשים בזמן אמת! מצאו מילים במהירות, נצחו את היריבים וטפסו בדירוג. מושלם למסיבות וערבי משחקים. שחקו בחינם ב-4 שפות!",
+    "locale": "he_IL",
+    "language": "Hebrew",
+    "leaderboard": {
+      "title": "טבלת מובילים עולמית - השחקנים המובילים | לקסיקלאש",
+      "description": "צפו בשחקנים המדורגים הגבוה ביותר בטבלת המובילים העולמית של לקסיקלאש. התחרו עם חובבי משחקי מילים ברחבי העולם ועקבו אחר ההתקדמות שלכם.",
+      "ogTitle": "טבלת מובילים עולמית - שחקני משחקי מילים מובילים",
+      "ogDescription": "ראו איפה אתם מדורגים בין שחקני משחקי המילים הטובים ביותר. הצטרפו ללקסיקלאש והתחרו על המקום הראשון!"
+    },
+    "profile": {
+      "title": "הפרופיל והסטטיסטיקות שלך | לקסיקלאש",
+      "description": "צפו בפרופיל לקסיקלאש שלכם, סטטיסטיקות משחק, הישגים והתקדמות. עקבו אחר הניצחונות, הניקוד הכולל, המילים שמצאתם והזמן ששיחקתם במשחק מילים תחרותי זה.",
+      "ogTitle": "פרופיל שחקן וסטטיסטיקות משחק - לקסיקלאש",
+      "ogDescription": "עקבו אחר הישגי משחקי המילים, הסטטיסטיקות וטפסו בדירוג טבלת המובילים."
+    },
+    "terms": {
+      "title": "תנאי שימוש | לקסיקלאש",
+      "description": "קראו את תנאי השימוש של לקסיקלאש. למדו על זכויות משתמשים, שימוש מקובל, ניהול חשבון ומדיניות המשחק שלנו לפלטפורמת משחקי מילים מרובי משתתפים.",
+      "ogTitle": "תנאי שימוש - לקסיקלאש",
+      "ogDescription": "תנאי השימוש של לקסיקלאש - זכויות משתמשים ומדיניות שימוש מקובל."
+    },
+    "privacy": {
+      "title": "מדיניות פרטיות | לקסיקלאש",
+      "description": "מדיניות הפרטיות של לקסיקלאש - למדו כיצד אנו אוספים, משתמשים ומגנים על הנתונים שלכם. אנו שמים בראש סדר העדיפויות את הפרטיות שלכם ומשתמשים באמצעי אבטחה בתקן התעשייה.",
+      "ogTitle": "מדיניות פרטיות - לקסיקלאש",
+      "ogDescription": "למדו כיצד לקסיקלאש מגן על הפרטיות שלכם ומטפל בנתונים שלכם בצורה מאובטחת."
+    },
+    "legal": {
+      "title": "מידע משפטי | לקסיקלאש",
+      "description": "מידע משפטי של לקסיקלאש - גשו לתנאי השימוש ומדיניות הפרטיות שלנו. למדו על הזכויות שלכם וכיצד אנו מגנים על הנתונים שלכם.",
+      "ogTitle": "מידע משפטי - לקסיקלאש",
+      "ogDescription": "גשו לתנאי השימוש ומדיניות הפרטיות של לקסיקלאש."
+    },
+    "singleplayer": {
+      "title": "משחק מילים יחיד - תרגול ואתגר | לקסיקלאש",
+      "description": "שחקו לקסיקלאש לבד! תרגלו מציאת מילים, התמודדו עם בוטים ושפרו את אוצר המילים. רמות קושי מרובות מקל עד קשה. עקבו אחר ההתקדמות ונצחו את השיאים שלכם.",
+      "ogTitle": "מצב שחקן יחיד - תרגול ואתגר",
+      "ogDescription": "תרגלו מציאת מילים לבד, התמודדו עם בוטים ונצחו את השיאים שלכם במצב שחקן יחיד של לקסיקלאש."
+    },
+    "daily": {
+      "title": "אתגר מילים יומי - אותו פאזל בכל העולם | לקסיקלאש",
+      "description": "שחקו את האתגר היומי של לקסיקלאש! אותו פאזל לכולם בכל העולם כל יום. שתפו את התוצאות שלכם כמו וורדל. התחרו גלובלית ועקבו אחר הרצף היומי שלכם.",
+      "ogTitle": "אתגר יומי - אותו פאזל בכל העולם",
+      "ogDescription": "אתגר מילים יומי - אותו לוח לכולם בכל העולם. שתפו את התוצאות והתחרו גלובלית!"
+    },
+    "multiplayer": {
+      "title": "קרב מילים מרובה משתתפים - תחרות בזמן אמת | לקסיקלאש",
+      "description": "הצטרפו לקרבות מילים בזמן אמת עם חברים! ארחו או הצטרפו לחדרים מרובי משתתפים, התחרו חי נגד יריבים וטפסו בטבלת המובילים. מושלם למסיבות וערבי משחקים.",
+      "ogTitle": "קרב מילים מרובה משתתפים - התחרו בזמן אמת",
+      "ogDescription": "משחק מילים מרובה משתתפים בזמן אמת - ארחו חדרים, הזמינו חברים והתחרו בקרבות מילים חיים!"
+    }
+  },
+  "common": {
+    "loading": "טוען...",
+    "error": "שגיאה",
+    "back": "חזור",
+    "next": "הבא",
+    "confirm": "אישור",
+    "cancel": "ביטול",
+    "dismiss": "בטל",
+    "selectUILanguage": "שפת ממשק",
+    "close": "סגור",
+    "changeLanguage": "שנה שפה",
+    "adminDashboard": "לוח בקרה",
+    "understood": "הבנתי, בוא נשחק!",
+    "refresh": "רענן",
+    "reconnecting": "מתחבר מחדש למשחק...",
+    "reconnected": "התחבר מחדש!",
+    "connectionLost": "החיבור אבד",
+    "notConnected": "לא מחובר לשרת",
+    "connected": "מחובר",
+    "connecting": "מתחבר...",
+    "connectedToServer": "מחובר לשרת המשחק",
+    "connectingToServer": "מתחבר לשרת המשחק...",
+    "duplicateWarning": "מילים שנמצאו על ידי מספר שחקנים לא נספרות",
+    "gameStarted": "המשחק התחיל!",
+    "joinedGame": "הצטרפת למשחק!",
+    "newGameReady": "מתחיל משחק חדש!",
+    "lightMode": "מצב בהיר",
+    "darkMode": "מצב כהה",
+    "hurry": "מהרו!",
+    "goToHome": "חזרה לדף הבית",
+    "comboBonus": "קומבו!",
+    "pending": "ממתין",
+    "xpGained": "XP",
+    "score": "ניקוד",
+    "points": "נקודות",
+    "combo": "קומבו",
+    "quit": "יציאה",
+    "foundWords": "מילים שנמצאו",
+    "words": "מילים",
+    "wordsFound": "מילים שנמצאו",
+    "leaderboard": "טבלת מובילים",
+    "you": "אתה",
+    "playAgain": "שחק שוב",
+    "quickRematch": "משחק מהיר נוסף",
+    "changeSettings": "שנה הגדרות",
+    "settingsAndPlay": "הגדרות ושחק שוב",
+    "backToLobby": "חזרה ללובי",
+    "settings": "הגדרות",
+    "lobby": "לובי",
+    "viewGrid": "הצג לוח",
+    "min": "דק",
+    "advancedSettings": "הגדרות מתקדמות",
+    "yourScore": "הניקוד שלך",
+    "tapToDismiss": "הקש לסגירה",
+    "copied": "הועתק!",
+    "copyCode": "העתק קוד",
+    "rotateLandscape": "סובב לחוויה טובה יותר!",
+    "dontShowAgain": "אל תציג שוב",
+    "landscapeMode": "מצב אופקי",
+    "rank": "דירוג",
+    "menu": "תפריט",
+    "showControls": "הקש להצגת פקדים",
+    "loadingProfile": "טוען פרופיל...",
+    "rematch": "משחק חוזר",
+    "roomFull": "החדר מלא. הצטרפת כצופה.",
+    "selectLanguage": "בחר שפה",
+    "gotIt": "הבנתי",
+    "help": "עזרה",
+    "pause": "השהה",
+    "resume": "המשך",
+    "retry": "נסה שוב",
+    "newGame": "משחק חדש",
+    "join": "הצטרף",
+    "showLess": "הצג פחות"
+  },
+  "theme": {
+    "sundayFunday": "יום ראשון כיפי",
+    "mondayMotivation": "מוטיבציה של שני",
+    "tuesdayTrivia": "טריוויה של שלישי",
+    "wednesdayWisdom": "חכמת רביעי",
+    "thursdayThrowback": "נוסטלגיה של חמישי",
+    "funFriday": "שישי שמח",
+    "saturdayAdventure": "הרפתקת שבת",
+    "newYear": "שנה חדשה",
+    "valentines": "יום האהבה",
+    "stPatricks": "יום סנט פטריק",
+    "easter": "חג הפסחא",
+    "independence": "יום העצמאות",
+    "halloween": "ליל כל הקדושים",
+    "thanksgiving": "יום ההודיה",
+    "christmas": "חג המולד",
+    "hanukkah": "חנוכה",
+    "roshHashana": "ראש השנה",
+    "yomKippur": "יום כיפור",
+    "sukkot": "סוכות",
+    "purim": "פורים",
+    "passover": "פסח",
+    "shavuot": "שבועות",
+    "yomHaatzmaut": "יום העצמאות",
+    "midsummer": "אמצע הקיץ",
+    "lucia": "יום לוסיה",
+    "threeKings": "שלושת המלכים",
+    "dayOfDead": "יום המתים",
+    "setsubun": "סצובון",
+    "hinamatsuri": "יום הבנות",
+    "sakura": "עונת פריחת הדובדבן",
+    "goldenWeek": "שבוע הזהב",
+    "tanabata": "טנאבאטה",
+    "obon": "אובון",
+    "autumnLeaves": "עלי הסתיו"
+  },
+  "game": {
+    "swipeToForm": "החלק ליצירת מילה",
+    "wordAlreadyFound": "כבר נמצאה!",
+    "wordNotOnBoard": "לא בלוח!",
+    "wordTooShort": "קצרה מדי!",
+    "boardTheme": "נושא הלוח"
+  },
+  "help": {
+    "title": "עזרה מהירה",
+    "howToPlay": "איך לשחק",
+    "swipeLetters": "החלק על אותיות סמוכות ליצירת מילים",
+    "diagonalWorks": "חיבורים באלכסון עובדים גם!",
+    "liftToSubmit": "הרם את האצבע לשליחת המילה",
+    "minThreeLetters": "מילים חייבות להיות לפחות 3 אותיות",
+    "scoring": "ניקוד",
+    "letters": "אותיות",
+    "point": "נקודה",
+    "points": "נקודות",
+    "combos": "קומבו",
+    "comboExplanation": "מצא מילים מהר ברצף כדי לבנות קומבו! כל רמת קומבו מוסיפה נקודות בונוס למילים שלך.",
+    "keyboardShortcuts": "קיצורי מקלדת",
+    "arrowKeys": "מקשי חצים",
+    "navigate": "ניווט",
+    "spaceKey": "רווח",
+    "selectLetter": "בחר אות",
+    "enterKey": "Enter",
+    "submitWord": "שלח מילה",
+    "backspaceKey": "Backspace",
+    "undoLetter": "בטל אות",
+    "escKey": "Escape",
+    "clearSelection": "נקה בחירה",
+    "swipeDownToClose": "החלק למטה לסגירה",
+    "accessibility": "נגישות",
+    "disableFireRoundLights": "כבה את אורות סיבוב האש",
+    "disableFireRoundLightsDescription": "כבה את האורות המהבהבים על תאי הרשת בזמן סיבוב אש"
+  },
+  "combo": {
+    "shieldUsed": "🛡️ מגן קומבו נוצל!",
+    "shieldEarned": "🛡️ מגן נפתח!",
+    "explanationTitle": "🔥 כוח הקומבו!",
+    "explanationText": "מצאו מילים מהר כדי לבנות קומבו! קומבו גבוה = מכפיל ניקוד גדול. שמרו על הרצף!"
+  },
+  "earthquake": {
+    "warning": "רעידת אדמה!",
+    "brace": "התכוננו!",
+    "fireRound": "סיבוב אש",
+    "multiplier": "מכפיל ×2"
+  },
+  "spam": {
+    "warning": "לאט! יותר מדי מילים לא תקינות",
+    "penalty": "נקודות הופחתו: -${points}",
+    "cooldown": "חסום ל-${seconds} שניות - האט!",
+    "cooldownEnd": "אפשר לשלוח מילים שוב",
+    "blockedWord": "המתן ${seconds} שניות לפני שליחה"
+  },
+  "bots": {
+    "title": "בוטים",
+    "easy": "קל",
+    "medium": "בינוני",
+    "hard": "קשה",
+    "easyDesc": "מילים של 3-5 אותיות, קצב איטי",
+    "mediumDesc": "מיקס מאוזן של מילים",
+    "hardDesc": "מילים ארוכות, קצב מהיר",
+    "selectDifficulty": "רמה",
+    "addBot": "הוסף בוט",
+    "adding": "מוסיף...",
+    "remove": "הסר בוט",
+    "removeError": "נכשל בהסרת הבוט",
+    "currentBots": "בוטים בחדר",
+    "quickAdd": "הוסף",
+    "add": "הוסף",
+    "emptyState": "הוסיפו בוטים להתאמן או למלא את החדר",
+    "helpText": "בוטים מוצאים ושולחים מילים אוטומטית במשחק.",
+    "autoFill": "מילוי אוטומטי עם בוטים",
+    "autoFillDesc": "הוסף בוטים אוטומטית למילוי מקומות פנויים",
+    "orAddManually": "או הוסף ידנית:",
+    "roomFull": "החדר מלא",
+    "autoStart": "התחלה אוטומטית אחרי 30 שניות",
+    "autoStartDesc": "התחל משחק אוטומטית אחרי 30 שניות",
+    "startingIn": "מתחיל בעוד...",
+    "cancel": "ביטול",
+    "waitingForPlayers": "ממתין לפחות 2 שחקנים...",
+    "maxReached": "הגעת למספר המקסימלי של בוטים"
+  },
+  "music": {
+    "volume": "עוצמה",
+    "musicVolume": "מוזיקה",
+    "sfxVolume": "צלילים",
+    "mute": "השתק",
+    "unmute": "בטל השתקה",
+    "clickToEnable": "לחצו כדי להפעיל מוזיקה",
+    "controls": "בקרות מוזיקה",
+    "musicVolumeSlider": "החלקת עוצמת מוזיקה",
+    "sfxVolumeSlider": "החלקת עוצמת אפקטים"
+  },
+  "share": {
+    "linkCopied": "הקישור הועתק ללוח! 📋",
+    "copyError": "שגיאה בהעתקת הקישור",
+    "inviteMessage": "בואו לשחק LexiClash איתי!",
+    "room": "חדר",
+    "code": "קוד",
+    "joinViaLink": "הצטרפו דרך הקישור",
+    "copyLinkButton": "העתק קישור",
+    "whatsappButton": "שתף בוואטסאפ",
+    "qrCodeButton": "הצג ברקוד",
+    "qrCodeTitle": "סרוק כדי להצטרף",
+    "shareTitle": "הזמן שחקנים",
+    "codeCopied": "הקוד הועתק ללוח! 🎯",
+    "codeCopyError": "שגיאה בהעתקת הקוד",
+    "buttonLabel": "שתף משחק",
+    "modalTitle": "הזמן שחקנים",
+    "scanQR": "סרקו עם הטלפון להצטרפות",
+    "orShareVia": "או שתפו דרך:",
+    "copyLink": "העתק קישור",
+    "whatsapp": "וואטסאפ",
+    "telegram": "טלגרם",
+    "more": "עוד...",
+    "inviteTitle": "הצטרפו למשחק LexiClash שלי!",
+    "copied": "הועתק!"
+  },
+  "errors": {
+    "unstableConnection": "חיבור האינטרנט לא יציב - ייתכנו בעיות במשחק",
+    "slowConnection": "חיבור האינטרנט איטי",
+    "sessionExpired": "הסשן הקודם פג תוקף. אנא הצטרף לחדר חדש.",
+    "gameCodeNotExist": "קוד המשחק לא קיים. אנא בדוק ונסה שוב.",
+    "usernameTaken": "שם המשתמש כבר תפוס במשחק הזה. אנא בחר שם אחר.",
+    "gameCodeExists": "קוד המשחק כבר קיים. אנא בחר קוד אחר.",
+    "somethingWentWrong": "אופס! משהו השתבש",
+    "unexpectedError": "המשחק נתקל בשגיאה בלתי צפויה. אנא נסה לרענן את הדף.",
+    "errorDetails": "פרטי שגיאה",
+    "refreshPage": "רענן דף",
+    "connectionTimeout": "תם זמן החיבור",
+    "rateLimited": "יותר מדי בקשות. אנא האט.",
+    "connectionLost": "החיבור אבד",
+    "notConnected": "לא מחובר לשרת"
+  },
+  "validation": {
+    "usernameRequired": "שם משתמש נדרש! אנא מלא את השדה",
+    "hostUsernameRequired": "שם שחקן נדרש כדי להתחיל משחק",
+    "roomNameRequired": "שם חדר נדרש! אנא מלא את השדה",
+    "enterNameToJoin": "הזן שם כדי להצטרף",
+    "enterRoomName": "שם לזיהוי החדר שלך",
+    "enterGameCode": "הזן את קוד המשחק ששותף על ידי המארח",
+    "codeHelper": "קוד שישתפו השחקנים כדי להצטרף",
+    "fourDigitCode": "קוד בן 4 ספרות",
+    "enterFourDigitCode": "הזן קוד בן 4 ספרות",
+    "usernameTooShort": "שם המשתמש חייב להיות לפחות 2 תווים",
+    "usernameTooLong": "שם המשתמש לא יכול לעבור 20 תווים",
+    "usernameInvalidChars": "שם המשתמש מכיל תווים לא חוקיים",
+    "roomNameTooShort": "שם החדר חייב להיות לפחות 2 תווים",
+    "roomNameTooLong": "שם החדר לא יכול לעבור 30 תווים",
+    "roomNameInvalidChars": "שם החדר מכיל תווים לא חוקיים",
+    "gameCodeRequired": "נדרש קוד משחק",
+    "gameCodeInvalid": "קוד המשחק חייב להכיל 6-10 תווים אלפאנומריים",
+    "wordRequired": "נדרשת מילה",
+    "wordTooLong": "המילה ארוכה מדי",
+    "wordInvalidChars": "המילה מכילה תווים לא חוקיים",
+    "gameCodeHint": "הכנס את קוד המשחק ששותף על ידי המארח"
+  },
+  "difficulty": {
+    "easy": "קל",
+    "medium": "בינוני",
+    "hard": "קשה",
+    "expert": "מומחה",
+    "master": "אמן"
+  },
+  "joinView": {
+    "title": "לקסיקלאש",
+    "createRoom": "צור חדר",
+    "joinRoom": "הצטרף לחדר",
+    "joinDesc": "הכנס קוד להצטרפות למשחק קיים",
+    "hostDesc": "התחל משחק חדש כמארח",
+    "roomNamePlaceholder": "הכנס שם חדר",
+    "roomNameLabel": "שם החדר",
+    "roomNameHelper": "השם שיוצג לשחקנים אחרים בלובי",
+    "roomNameHelperOptional": "אופציונלי - שם אקראי ייווצר אם יישאר ריק",
+    "optional": "אופציונלי",
+    "roomNameExample": "לדוגמה, משחק יום שישי",
+    "hostPlayerName": "שם השחקן שלך",
+    "hostPlayerNamePlaceholder": "הכנס את שם השחקן שלך",
+    "hostPlayerNameHelper": "השם שלך שיוצג במשחק",
+    "playerNamePlaceholder": "הכנס את שמך",
+    "yourName": "השם שלך",
+    "enterYourName": "הכנס את השם שלך",
+    "pleaseEnterYourName": "אנא הכנס את השם שלך",
+    "playerAndRoomName": "זה יהיה שם השחקן ושם החדר שלך",
+    "selectLanguage": "שפת המשחק",
+    "language": "שפת המשחק",
+    "activeRooms": "חדרים זמינים",
+    "noRooms": "אין חדרים זמינים. צור אחד!",
+    "roomsList": "חדרים זמינים",
+    "players": "שחקנים",
+    "host": "חדר",
+    "joiningRoom": "אתה מצטרף לחדר",
+    "roomLabel": "חדר",
+    "wantToHostOrJoinOther": "רוצה לארח או להצטרף לחדר אחר?",
+    "clearAndRestart": "נקה והתחל מחדש",
+    "english": "English",
+    "hebrew": "עברית",
+    "swedish": "Svenska",
+    "japanese": "日本語",
+    "spanish": "Español",
+    "generateNewCode": "צור קוד חדש",
+    "createGameInstructions": "צור משחק ושתף את הקוד עם חברים!",
+    "createNewRoom": "צור חדר חדש כדי להתחיל!",
+    "howToPlay": "איך משחקים?",
+    "howToPlayTitle": "איך משחקים בלקסיקלאש",
+    "qrCodeTitle": "קוד QR להצטרפות",
+    "scanToJoin": "סרוק את הקוד כדי להצטרף למשחק או השתמש בקוד",
+    "copyLink": "העתק קישור",
+    "shareWhatsapp": "וואטסאפ",
+    "shareEmail": "אימייל",
+    "inviteTitle": "הצטרף לחדר",
+    "enterNameToPlay": "הכנס את שמך כדי לשחק",
+    "playButton": "שחק",
+    "joiningRoomNumber": "חדר",
+    "room": "חדר",
+    "welcomeBack": "ברוך שובך",
+    "connectingToRoom": "מתחבר לחדר...",
+    "enterRoom": "כניסה לחדר",
+    "joinGame": "הצטרף למשחק",
+    "pasteCode": "הדבק קוד",
+    "joiningAs": "מצטרף בתור",
+    "hostingAs": "מארח בשם",
+    "tapToChangeDisplayName": "לחץ לשינוי שם התצוגה",
+    "joining": "מצטרף...",
+    "creating": "יוצר...",
+    "playersOnline": "מחוברים",
+    "loadingProfile": "טוען פרופיל...",
+    "nickname": "כינוי",
+    "nicknamePlaceholder": "הכנס את הכינוי שלך",
+    "roomCode": "קוד חדר",
+    "defaultPlayerNames": [
+      "מלפפון חמקמק",
+      "תפוח אדמה דיסקו",
+      "בננה קוסמית",
+      "וופל פלאפי",
+      "טאקו קריספי",
+      "מוצ׳י סקוושי",
+      "בייגלה מפותל",
+      "עוגייה צ׳אנקית",
+      "דונאט דביק",
+      "אבוקדו זסטי",
+      "נודל לעיס",
+      "פלאפל קריספי",
+      "סלמון סילי",
+      "אווז צחקני",
+      "כלב ים משוגע",
+      "פינגווין פפי",
+      "למה לופי",
+      "דרקון מסוחרר",
+      "פלמינגו פאנקי",
+      "דוב קופצני",
+      "זברה זיפי",
+      "עצלן חצוף",
+      "קואלה משונה",
+      "מדוזה עליזה",
+      "רקון רועש",
+      "שועל פיזי",
+      "היפו שמח"
+    ],
+    "chooseAvatar": "בחר את האווטאר שלך",
+    "selectAvatar": "בחר אווטאר",
+    "tapToChange": "לחץ לשינוי",
+    "tapToSelect": "לחץ לבחירה",
+    "playingAs": "משחק בתור",
+    "changeProfile": "שנה פרופיל או הצטרף לחדר אחר"
+  },
+  "multiplayerFlow": {
+    "selector": {
+      "createCard": {
+        "title": "צור חדר",
+        "description": "ארח משחק חדש והזמן חברים",
+        "button": "התחל הגדרה"
+      },
+      "joinCard": {
+        "title": "הצטרף לחדר",
+        "description": "הכנס למשחק קיים עם קוד",
+        "button": "חפש חדרים"
+      },
+      "activeRoomsPreview": "חדרים פעילים",
+      "playersOnline": "מחוברים",
+      "noRooms": "אין חדרים פעילים - היה הראשון ליצור!"
+    },
+    "editProfile": "ערוך פרופיל",
+    "profileSetup": {
+      "title": "הגדרת שחקן",
+      "editTitle": "עריכת פרופיל",
+      "progress": "שלב 1 מתוך 2",
+      "editingProgress": "עורך את הפרופיל שלך",
+      "forCreate": "כמעט שם! הגדר את הפרופיל שלך ליצירת חדר.",
+      "forJoin": "כמעט שם! הגדר את הפרופיל שלך להצטרפות לחדר.",
+      "forEdit": "עדכן את פרטי הפרופיל שלך למטה.",
+      "usernameLabel": "איך לקרוא לך?",
+      "usernamePlaceholder": "הכנס את שמך",
+      "usernameHint": "2-20 תווים, אותיות ומספרים",
+      "avatarLabel": "בחר אווטאר",
+      "continueButton": "המשך",
+      "saveButton": "שמור שינויים"
+    },
+    "createForm": {
+      "title": "צור חדר",
+      "progress": "שלב 2 מתוך 2",
+      "profileLabel": "הפרופיל שלך",
+      "roomNameLabel": "שם החדר",
+      "roomNamePlaceholder": "הכנס שם חדר (אופציונלי)",
+      "roomNameHint": "שם זה יוצג לשחקנים אחרים בלובי",
+      "languageHint": "שחקנים ימצאו מילים בשפה זו",
+      "createButton": "צור חדר",
+      "creating": "יוצר..."
+    },
+    "joinForm": {
+      "title": "הצטרף לחדר",
+      "progress": "שלב 2 מתוך 2",
+      "profileLabel": "הפרופיל שלך",
+      "codeLabel": "הכנס קוד חדר",
+      "codePlaceholder": "ABC123",
+      "codeHint": "בקש מחבר את קוד החדר שלו",
+      "roomsLabel": "או בחר חדר פעיל",
+      "refreshButton": "רענן",
+      "noRooms": "אין חדרים פעילים. בקש מחבר את הקוד שלו!",
+      "joinButton": "הצטרף לחדר",
+      "joining": "מצטרף..."
+    }
+  },
+  "hostView": {
+    "waitingForPlayers": "ממתין לשחקנים...",
+    "startGame": "התחל משחק",
+    "stopGame": "עצור משחק",
+    "roomCode": "קוד חדר",
+    "playersJoined": "שחקנים הצטרפו",
+    "gameSettings": "הגדרות משחק",
+    "quickSetup": "הגדרה מהירה",
+    "presetEasy": "קל",
+    "presetEasyDesc": "לוח 5x5, 2 דקות",
+    "presetQuick": "מהיר",
+    "presetQuickDesc": "לוח 7x7, דקה",
+    "presetParty": "מסיבה",
+    "presetPartyDesc": "לוח 7x7, 2 דקות",
+    "presetChallenge": "אתגר",
+    "presetChallengeDesc": "לוח 9x9, 3 דקות",
+    "min": "דק׳",
+    "difficulty": "רמת קושי",
+    "timer": "טיימר",
+    "roundDuration": "משך סיבוב",
+    "minutes": "דקות",
+    "playerJoinedLate": "הצטרף למשחק באמצע!",
+    "playerFoundWord": "מצא",
+    "validateWords": "סקור ואשר את כל המילים",
+    "validationComplete": "האימות הושלם!",
+    "gameStopped": "המשחק נעצר",
+    "confirmExit": "האם אתה בטוח שברצונך לצאת? החדר יישאר פתוח ושחקן אחר יהפוך למארח.",
+    "exitWarning": "פעולה זו תסגור את החדר עבור כל השחקנים. האם אתה בטוח שברצונך לצאת?",
+    "exitRoom": "יציאה מהחדר",
+    "startNewGame": "התחל משחק חדש",
+    "validation": "אימות מילים",
+    "validateIntro": "האם אלו מילים תקינות? סמן את התקינות.",
+    "totalWords": "סה\"כ מילים לאימות",
+    "submitValidation": "שלח אימות",
+    "finalScores": "תוצאות סופיות",
+    "words": "מילים",
+    "achievements": "הישגים",
+    "close": "סגור",
+    "copyLink": "העתק קישור",
+    "shareWhatsapp": "שתף בוואטסאפ",
+    "qrCode": "ברקוד",
+    "scanQr": "סרוק את הקוד כדי להצטרף למשחק או השתמש בקוד",
+    "autoValidated": "אומתה אוטומטית",
+    "clickToShow": "לחץ להצגה",
+    "clickToHide": "לחץ להסתרה",
+    "hostPlays": "אני רוצה לשחק",
+    "spectatorMode": "מצב צפייה - צפה בלוח",
+    "advancedSettings": "הגדרות מתקדמות",
+    "autoValidatedCount": "מילים אומתו אוטומטית",
+    "roomClosedInactivity": "החדר נסגר עקב חוסר פעילות",
+    "gameOverCheckScores": "המשחק נגמר! בדוק את התוצאות הסופיות",
+    "validatingWords": "מאמת מילים...",
+    "youAreNowHost": "אתה המארח החדש!",
+    "newHostAssigned": "הוא המארח החדש",
+    "hostLeft": "המארח עזב את החדר",
+    "liveResults": "תוצאות בזמן אמת",
+    "spectatingInfo": "אתה צופה - המילים מוסתרות עד סוף המשחק",
+    "autoSubmittingValidation": "שולח אימות אוטומטית בגלל חוסר פעילות",
+    "tournamentMode": "מצב טורניר",
+    "rounds": "סבבים",
+    "tournamentRound": "סבב",
+    "tournamentStandings": "דירוג הטורניר",
+    "tournamentComplete": "הטורניר הסתיים!",
+    "tournamentWinner": "מנצח הטורניר",
+    "totalScore": "ציון כולל",
+    "nextRound": "הסבב הבא",
+    "tournamentProgress": "התקדמות בטורניר",
+    "tournamentCreated": "הטורניר נוצר!",
+    "tournamentCancelled": "הטורניר בוטל",
+    "gameComplete": "המשחק הסתיים!",
+    "wonTournament": "ניצח בטורניר",
+    "tournamentCreateFailed": "יצירת הטורניר נכשלה. אנא נסה שוב.",
+    "autoValidationCompleted": "האימות האוטומטי הושלם",
+    "cancelTournament": "בטל טורניר",
+    "confirmCancelTournament": "לבטל את הטורניר?",
+    "cancelTournamentWarning": "האם אתה בטוח שברצונך לבטל את הטורניר? כל ההתקדמות תאבד ולא ניתן לבטל פעולה זו.",
+    "minWordLength": "אורך מילה מינימלי",
+    "minWordLength2": "2 אותיות",
+    "minWordLength3": "3 אותיות",
+    "minWordLength4": "4 אותיות",
+    "difficultyTooltipGrid": "לוח {{rows}}×{{cols}} אותיות",
+    "difficultyTooltipTimer": "{{minutes}} דקות מומלץ",
+    "allWordsAutoValidated": "כל המילים אומתו אוטומטית!",
+    "wordsAutoValidated": "מילים אומתו אוטומטית",
+    "gameTypeSelector": "בחר מצב משחק",
+    "regularGame": "משחק רגיל",
+    "regularGameDesc": "סיבוב בודד למשחק מזדמן",
+    "tournament": "טורניר",
+    "tournamentDesc": "תחרות מרובת סיבובים לאלופים",
+    "comingSoon": "בקרוב",
+    "numberOfRounds": "מספר סיבובים",
+    "betweenRoundsStandings": "דירוג נוכחי",
+    "nextRoundIn": "הסיבוב הבא מתחיל בעוד",
+    "startNow": "התחל עכשיו",
+    "creatingTournament": "יוצר טורניר...",
+    "increaseRounds": "הגדל מספר סיבובים",
+    "decreaseRounds": "הקטן מספר סיבובים",
+    "resetFailed": "איפוס המשחק נכשל",
+    "decreaseTimer": "הקטן טיימר",
+    "increaseTimer": "הגדל טיימר",
+    "moreSettings": "הגדרות נוספות",
+    "playersReadyForNextGame": "שחקנים מוכנים למשחק הבא",
+    "hostPlaysShort": "המארח משחק",
+    "hostSpectates": "צופה",
+    "letters": "אותיות",
+    "players": "שחקנים"
+  },
+  "playerView": {
+    "waitingForHost": "ממתין למארח שיתחיל...",
+    "submitWord": "שלח",
+    "clear": "נקה",
+    "timeRemaining": "זמן נותר",
+    "score": "ניקוד",
+    "wordsFound": "מילים שנמצאו",
+    "wordsOnBoard": "מילים על הלוח",
+    "wordsRemaining": "מילים נותרו",
+    "remaining": "נותר",
+    "found": "נמצאו",
+    "total": "סה\"כ",
+    "gameOver": "המשחק נגמר! 🏁",
+    "wordAlreadyFound": "כבר מצאת את המילה! ❌",
+    "foundByOther": "נמצא על ידי ${player}",
+    "wordNotOnBoard": "המילה לא על הלוח! 🚫",
+    "wordRejected": "מילה לא תקינה! ❌",
+    "newWord": "מילה חדשה!",
+    "scoresReady": "הציונים מוכנים! ✅",
+    "roomClosed": "החדר נסגר",
+    "onlyLanguageWords": "רק מילים בשפה הנבחרת! 🚫",
+    "exitConfirmation": "לצאת מהחדר?",
+    "exitWarning": "האם אתה בטוח שברצונך לעזוב? תאבד את ההתקדמות שלך במשחק הנוכחי.",
+    "exit": "יציאה",
+    "exitRoom": "יציאה מהחדר",
+    "waitForGameStart": "המתן לתחילת המשחק",
+    "players": "שחקנים",
+    "yourAchievements": "ההישגים שלך",
+    "letterGrid": "לוח האותיות",
+    "waitingForGame": "ממתין למשחק...",
+    "add": "הוסף",
+    "enterWord": "הזן מילה...",
+    "waitingForResults": "ממתין לתוצאות...",
+    "calculatingScores": "מחשב תוצאות...",
+    "aiValidating": "AI בודק...",
+    "leaderboard": "טבלת המובילים",
+    "noPlayersYet": "אין שחקנים עדיין",
+    "wordSubmitted": "נשלח",
+    "wordTooShort": "מילה קצרה מדי! (מינימום 2 אותיות)",
+    "wordTooShortMin": "מילה קצרה מדי! (מינימום ${min} אותיות)",
+    "errorOccurred": "אירעה שגיאה",
+    "tooFast": "לאט! שולח מהר מדי",
+    "wordCount": "מילים",
+    "longestWord": "הארוכה ביותר",
+    "hostValidating": "המארח מאמת מילים...",
+    "clickToSelect": "לחץ על אותיות כדי לבחור מילים",
+    "me": "אני",
+    "noWordsYet": "לא נמצאו מילים עדיין",
+    "shuffle": "ערבב",
+    "swipeToFormWords": "החליקו על הלוח כדי ליצור מילים",
+    "inviteFriends": "הזמן חברים",
+    "waitingForHostToStart": "ממתינים למארח שיתחיל את המשחק...",
+    "notInDictionary": "לא נמצא במילון",
+    "hostDisconnected": "המארח התנתק. ממתין לחיבור מחדש...",
+    "isNowHost": "הוא עכשיו המארח",
+    "disconnected": "התנתק. ממתין לחיבור מחדש...",
+    "reconnected": "התחבר מחדש",
+    "leftRoom": "עזב את החדר",
+    "weakConnection": "חיבור חלש",
+    "connectionRecovered": "החיבור התאושש",
+    "sessionMovedToAnotherTab": "החיבור עבר ללשונית אחרת",
+    "sessionMovedToAnotherRoom": "החיבור עבר לחדר אחר",
+    "validatingWord": "בודק:",
+    "validation": {
+      "scanning": "סורק מילים...",
+      "checking": "בודק במילון...",
+      "verifying": "AI מאמת...",
+      "scoring": "מחשב ניקוד...",
+      "finalizing": "מסיים תוצאות..."
+    },
+    "rankings": "דירוגים",
+    "showLeaderboard": "הצג לוח מובילים",
+    "slowDown": "האט! המילים מעובדות.",
+    "submittingTooFast": "אתה שולח מילים מהר מדי",
+    "words": "מילים",
+    "alreadyFound": "כבר נמצא",
+    "invalidWord": "מילה לא חוקית",
+    "pendingValidation": "ממתין לאימות"
+  },
+  "lateJoiner": {
+    "welcomeTitle": "!המשחק כבר התחיל",
+    "welcomeMessage": ":הצטרפת באמצע המשחק. הנה מה שאתה צריך לדעת",
+    "timeRemaining": "זמן נותר",
+    "currentLeaders": "מובילים נוכחיים",
+    "quickTip1": "החלק אותיות סמוכות ליצירת מילים",
+    "quickTip2": "הרם את האצבע כדי לשלוח",
+    "quickTip3": "!מילים ארוכות = יותר נקודות",
+    "gotIt": "!הבנתי, בואו נשחק",
+    "badge": "הצטרף באיחור",
+    "joinedMidGame": "הצטרף באמצע המשחק"
+  },
+  "spectator": {
+    "watching": "צופה כצופה",
+    "roomFull": "החדר מלא ({{current}}/{{max}} שחקנים)",
+    "joinWhenAvailable": "הצטרף כשיש מקום",
+    "joinGame": "הצטרף למשחק",
+    "slotAvailable": "מקום {{count}} פנוי",
+    "slotsAvailable": "מקומות {{count}} פנויים",
+    "upgraded": "!עכשיו אתה יכול לשחק",
+    "youAreSpectating": "אתה צופה במשחק הזה",
+    "watchingGame": "...צופה במשחק",
+    "waitForSlot": "...ממתין למקום שחקן"
+  },
+  "hints": {
+    "hint": "רמז",
+    "getHint": "קבל רמז",
+    "loading": "מקבל רמז...",
+    "noHints": "אין רמזים נותרים",
+    "noWordsLeft": "!אין עוד מילים למצוא",
+    "lookFor": "חפש מילה בת",
+    "letterWord": "אותיות",
+    "letters": "אותיות",
+    "startsWith": "מתחיל ב",
+    "tapToDismiss": "הקש לסגירה",
+    "with": "עם",
+    "inMiddle": "באמצע",
+    "vowels": "תנועות",
+    "withDoubles": "עם אותיות כפולות",
+    "longerWord": "מילה ארוכה יותר",
+    "shortWord": "מילה קצרה"
+  },
+  "achievementPopup": {
+    "unlocked": "הישג נפתח!",
+    "tapToDismiss": "הקש לסגירה"
+  },
+  "achievementDock": {
+    "title": "ההישגים שלך"
+  },
+  "chat": {
+    "title": "צ'אט החדר",
+    "placeholder": "הקלד הודעה...",
+    "noMessages": "אין הודעות עדיין",
+    "startChatting": "התחילו לשוחח!",
+    "send": "שלח הודעה",
+    "newMessages": "הודעות צ'אט חדשות"
+  },
+  "results": {
+    "topPlayers": "השחקנים המובילים",
+    "otherPlayers": "שחקנים אחרים",
+    "yourPerformance": "הביצועים שלך",
+    "viewDetails": "הצג פרטי ביצועים",
+    "viewAllWords": "הצג את כל המילים",
+    "viewXpBreakdown": "הצג פירוט נק׳ ניסיון",
+    "gameOver": "המשחק נגמר",
+    "winner": "מנצח",
+    "winnerAnnouncement": "המנצח",
+    "youWon": "ניצחת!",
+    "secondPlace": "מקום שני!",
+    "thirdPlace": "מקום שלישי!",
+    "silverMedalist": "מדליית כסף",
+    "bronzeMedalist": "מדליית ארד",
+    "points": "נקודות",
+    "pointWords": "מילים ב-${points} נקודות",
+    "invalid": "לא תקינות",
+    "exitRoom": "יציאה מהחדר",
+    "exitWarning": "האם אתה בטוח שברצונך לעזוב? אתה יכול להישאר ולחכות להתחלת משחק חדש.",
+    "playAgain": "שחק שוב",
+    "finalScores": "תוצאות סופיות",
+    "returnToRoom": "חזור לחדר הפעיל",
+    "cancelAutoReturn": "בטל מעבר אוטומטי",
+    "valid": "תקינות",
+    "validWords": "מילים תקינות",
+    "playAgainQuestion": "🎮 מוכנים לסיבוב נוסף?",
+    "playAgainDescription": "הישארו בחדר והמתינו למארח שיתחיל משחק חדש",
+    "stayInRoom": "כן, הישאר בחדר",
+    "leaveRoom": "לא, צא מהחדר",
+    "shared": "משותף",
+    "comboBonus": "בונוס קומבו",
+    "basePoints": "בסיס",
+    "totalScore": "סה\"כ",
+    "noPoints": "אין נקודות",
+    "otherPlayers": "שחקנים אחרים",
+    "needsVerification": "דורש אימות",
+    "autoVerified": "אומת אוטומטית",
+    "aiVerified": "אומת על ידי AI",
+    "aiRejected": "נדחה על ידי AI",
+    "tapToClose": "לחץ בכל מקום לסגירה",
+    "startNewGame": "התחל משחק חדש",
+    "levelUp": "עליית רמה!",
+    "pendingValidation": "ממתין לאימות קהילתי",
+    "potentialScore": "+${score} נק' אם יאושר",
+    "wordValidated": "המילה אושרה! קיבלת ${score} נקודות!",
+    "autoRejoinIn": "חזרה אוטומטית בעוד",
+    "rejoinNow": "חזור עכשיו",
+    "largeRoomMode": "מצב חדר גדול",
+    "duplicateRuleDisabled": "עם 8+ שחקנים, מילים כפולות עדיין נספרות!",
+    "longest": "הארוכה ביותר",
+    "accuracy": "דיוק",
+    "rankings": "דירוגים",
+    "yourWords": "המילים שלך",
+    "fireRoundBonus": "סיבוב אש",
+    "time": "זמן",
+    "viewResults": "צפה בתוצאות",
+    "place": "מקום",
+    "words": "מילים",
+    "bestWord": "הטובה ביותר",
+    "pointsFromFirst": "רק {points} נקודות מהמקום הראשון!",
+    "missedWords": "מילים שפספסת",
+    "missedWordsHint": "מילים בעלות ערך גבוה שאחרים מצאו",
+    "missedWordsMotivation": "למד אותן לפעם הבאה!",
+    "showMoreWords": "הצג עוד {count}",
+    "players": "שחקנים",
+    "everyoneReady": "כולם מוכנים!",
+    "waitingForPlayers": "ממתין לשחקנים",
+    "ready": "מוכן!",
+    "waiting": "ממתין...",
+    "allPlayersReady": "כל השחקנים מוכנים! המארח יכול להתחיל סיבוב חדש.",
+    "you": "(אתה)",
+    "betterLuckNextTime": "יותר מזל בפעם הבאה!",
+    "yourPlace": "מקום {rank}",
+    "tryAgainEncouragement": "המשיכו לשחק כדי להשתפר!"
+  },
+  "archetypes": {
+    "strategist": "האסטרטג",
+    "strategistDesc": "מהלכים מחושבים, השפעה מקסימלית",
+    "speedster": "המהיר",
+    "speedsterDesc": "רפלקסים ברק",
+    "scholar": "המלומד",
+    "scholarDesc": "שולט באוצר מילים מורכב",
+    "explorer": "החוקר",
+    "explorerDesc": "מוצא מה שאחרים מפספסים",
+    "perfectionist": "הפרפקציוניסט",
+    "perfectionistDesc": "כל מילה חשובה",
+    "maverick": "החריג",
+    "maverickDesc": "נועז ולא שגרתי",
+    "workhorse": "הסוס הפרא",
+    "workhorseDesc": "בלתי נלאה ומתמיד",
+    "closer": "הסוגר",
+    "closerDesc": "משגשג תחת לחץ",
+    "trailblazer": "הפורץ דרך",
+    "trailblazerDesc": "הולך על הניצחונות הגדולים"
+  },
+  "scoreCard": {
+    "title": "כרטיס הניקוד שלך",
+    "rank": {
+      "position": "#{rank} מתוך {total}",
+      "percentile": "{percentile}% עליון",
+      "winner": "!מנצח",
+      "pointsFromWinner": "{points} מהמנצח",
+      "pointsFromNext": "{points} מהבא"
+    },
+    "score": "ניקוד",
+    "wordsFound": "מילים שנמצאו",
+    "accuracy": "דיוק",
+    "longestWord": "המילה הארוכה ביותר",
+    "maxCombo": "קומבו מקסימלי",
+    "uniqueWords": "מילים ייחודיות",
+    "topWords": "המילים המובילות",
+    "achievements": "הישגים",
+    "shareResults": "שתף תוצאות",
+    "downloadImage": "הורד תמונה",
+    "errorGenerating": "נכשל ביצירת כרטיס ניקוד",
+    "loading": "יוצר כרטיס ניקוד...",
+    "stats": {
+      "totalWords": "סה״כ מילים",
+      "validWords": "מילים תקפות",
+      "accuracy": "דיוק",
+      "longestWord": "המילה הארוכה ביותר",
+      "maxCombo": "קומבו מקסימלי",
+      "comboBonus": "בונוס קומבו",
+      "fireBonus": "בונוס אש",
+      "uniqueWords": "מילים ייחודיות",
+      "avgWordLength": "אורך מילה ממוצע"
+    }
+  },
+  "playerTitles": {
+    "champion": {
+      "name": "אלוף",
+      "icon": "👑",
+      "description": "מנצח המשחק"
+    },
+    "perfectionist": {
+      "name": "הפרפקציוניסט",
+      "icon": "✨",
+      "description": "דיוק מושלם - כל המילים תקינות"
+    },
+    "speedster": {
+      "name": "שד המהירות",
+      "icon": "⚡",
+      "description": "הכי הרבה מילים לדקה"
+    },
+    "wordsmith": {
+      "name": "מילונאי",
+      "icon": "📝",
+      "description": "מצא הכי הרבה מילים"
+    },
+    "scholar": {
+      "name": "המלומד",
+      "icon": "🎓",
+      "description": "מצא את המילה הארוכה ביותר"
+    },
+    "explorer": {
+      "name": "החוקר",
+      "icon": "🧭",
+      "description": "מגוון אורכי מילים הכי גדול"
+    },
+    "sniper": {
+      "name": "הצלף",
+      "icon": "🎯",
+      "description": "דיוק הכי גבוה (הכי פחות טעויות)"
+    },
+    "comboMaster": {
+      "name": "אמן הקומבו",
+      "icon": "🔥",
+      "description": "בונוס קומבו הכי גבוה"
+    },
+    "earlyBird": {
+      "name": "ציפור מוקדמת",
+      "icon": "🐦",
+      "description": "הכי הרבה מילים בדקה הראשונה"
+    },
+    "clutchPlayer": {
+      "name": "שחקן הרגע",
+      "icon": "⏰",
+      "description": "הכי הרבה מילים ב-30 השניות האחרונות"
+    },
+    "bigWordHunter": {
+      "name": "צייד מילים גדולות",
+      "icon": "🦁",
+      "description": "הכי הרבה מילים של 6+ אותיות"
+    },
+    "consistentPlayer": {
+      "name": "עקבי ויציב",
+      "icon": "📊",
+      "description": "הכי עקבי בשליחת מילים"
+    }
+  },
+  "scorePage": {
+    "title": "🏆 תוצאות המשחק",
+    "leaderboard": "טבלת המובילים",
+    "points": "נקודות",
+    "congratulations": "מזל טוב"
+  },
+  "howToPlay": {
+    "title": "איך משחקים בלקסיקלאש?",
+    "description": "לקסיקלאש הוא משחק מילים מהיר בו אתם מתחרים בזמן כדי למצוא כמה שיותר מילים על לוח אותיות. ככל שהמילה ארוכה יותר, כך תקבלו יותר נקודות!",
+    "descriptionNote": "מילים חייבות להיות לפחות בנות 2 אותיות. שמות, מקומות וראשי תיבות מוכרים מותרים!",
+    "createOrJoinTitle": "צרו או הצטרפו למשחק",
+    "createOrJoinDesc": "המארח יוצר חדר ומשתף את הקוד. השחקנים מצטרפים באמצעות הקוד.",
+    "hostStartsTitle": "המארח מתחיל את המשחק",
+    "hostStartsDesc": "כשכולם מוכנים, המארח מפעיל את הטיימר והאותיות מופיעות!",
+    "findWordsTitle": "מצאו מילים על הלוח",
+    "findWordsDesc": "חברו אותיות סמוכות בכל כיוון (אופקית, אנכית, באלכסון, ואפילו אחורה) כדי ליצור מילים. כל אות יכולה לשמש רק פעם אחת בכל מילה.",
+    "findWordsNote": "שימו לב: אי אפשר להשתמש באותה אות פעמיים באותה מילה!",
+    "earnPointsTitle": "צברו נקודות והשיגו הישגים",
+    "earnPointsDesc": "ככל שהמילה ארוכה יותר, כך תקבלו יותר נקודות! בנוסף, פתחו הישגים מיוחדים על הישגים מרשימים.",
+    "earnPointsNote": "הישגים מיוחדים יכולים לתת לכם בונוס נקודות נחמד!",
+    "scoringSystemTitle": "מערכת ניקוד",
+    "scoringTable": {
+      "letters2": "2 אותיות: 1 נקודה",
+      "letters3": "3 אותיות: 2 נקודות",
+      "letters4": "4 אותיות: 3 נקודות",
+      "letters5": "5 אותיות: 4 נקודות",
+      "letters6": "6 אותיות: 5 נקודות",
+      "letters7": "7 אותיות: 6 נקודות",
+      "letters8plus": "8+ אותיות: 7+ נקודות",
+      "formula": "נוסחה פשוטה: (אורך המילה - 1) נקודות"
+    },
+    "achievementsTitle": "הישגים מיוחדים",
+    "achievements": {
+      "speedDemon": "⚡ שד המהירות - שחקן ראשון שמצא 5 מילים",
+      "wordWizard": "🎩 קוסם המילים - מצא 20+ מילים",
+      "vocabularyKing": "👑 מלך האוצר מילים - מצא 30+ מילים",
+      "longWordMaster": "📏 אמן המילים הארוכות - מצא מילה באורך 7+ אותיות",
+      "perfectionist": "💎 פרפקציוניסט - 100% מהמילים שלך תקינות",
+      "earlyBird": "🐦 ציפור מוקדמת - מצא 3 מילים בדקה הראשונה",
+      "examples": "דוגמאות להישגים"
+    },
+    "tipsTitle": "טיפים למשחק מנצח",
+    "gameFeaturesTitle": "תכונות המשחק",
+    "tips": {
+      "tip1": "התחילו במילים קצרות והרחיבו אותן (לדוגמה: \"חתול\" ← \"חתולים\")",
+      "tip2": "חפשו צירופי אותיות נפוצים",
+      "tip3": "סרקו באופן שיטתי - אל תקפצו בצורה אקראית",
+      "tip4": "מהירות חשובה! מצאו מילים במהירות כדי לבנות קומבו",
+      "tip5": "זכרו - רק מילים תקינות בשפה הנבחרת נספרות"
+    },
+    "readyToPlay": "מוכנים? בואו נתחיל לשחק!",
+    "funForFamily": "משחק חוויתי ומהנה לכל המשפחה - חינמי לחלוטין!",
+    "letters": "אותיות",
+    "pts": "נק׳",
+    "steps": {
+      "basics": {
+        "title": "יסודות המשחק",
+        "description": "לקסיקלאש הוא משחק מילים מרובה משתתפים מהיר. התחרו מול חברים במציאת מילים על לוח אותיות!"
+      },
+      "grid": {
+        "title": "איך מוצאים מילים",
+        "description": "החליקו או לחצו על אותיות סמוכות ליצירת מילים. אותיות מתחברות בכל 8 הכיוונים - אופקית, אנכית ובאלכסון!"
+      },
+      "scoring": {
+        "title": "מערכת ניקוד",
+        "description": "מילים ארוכות יותר מרוויחות יותר נקודות! כל אות מעבר לראשונה מוסיפה נקודה לתוצאה."
+      },
+      "combo": {
+        "title": "מערכת קומבו",
+        "description": "שלחו מילים במהירות כדי לבנות מכפילי קומבו! ככל שתמצאו מילים מהר יותר, כך הבונוס יגדל."
+      },
+      "xp": {
+        "title": "XP ורמות",
+        "description": "צברו XP מכל משחק כדי לעלות רמה ולפתוח תארים חדשים. בונוסים על ניצחון והישגים מעלים את ה-XP שלכם!"
+      },
+      "achievements": {
+        "title": "הישגים",
+        "description": "פתחו הישגים על מעשים מיוחדים! כל הישג ניתן להשגה מספר פעמים כדי לשדרג את הדרגה שלו."
+      }
+    },
+    "demo": {
+      "watchAnimation": "צפו כיצד מילים נוצרות על הלוח",
+      "autoPlay": "אוטו",
+      "pause": "השהה",
+      "replay": "שחזר",
+      "tryIt": "נסו לגרור אותיות בעצמכם!",
+      "gridExample": "דוגמה לציור מילה על הלוח",
+      "traceExample": "עקבו אחר אותיות כדי ליצור מילים - T→O→N→D",
+      "play": "נגן הדגמה"
+    },
+    "combo": {
+      "currentCombo": "קומבו נוכחי",
+      "multiplier": "מכפיל",
+      "noBonus": "ללא בונוס",
+      "tryIt": "סמלץ קומבו",
+      "building": "בונה קומבו...",
+      "tip": "שלחו מילים תוך 5 שניות אחת מהשנייה כדי לשמור על הקומבו!"
+    },
+    "xp": {
+      "howToEarn": "איך צוברים XP",
+      "base": "סיום משחק",
+      "score": "צבירת נקודות",
+      "win": "ניצחון במשחק",
+      "achievement": "פתיחת הישגים",
+      "unlockTitles": "פתחו תארים ככל שתעלו רמה"
+    },
+    "newPlayer": {
+      "welcomeTitle": "ברוכים הבאים ללקסיקלאש!",
+      "welcomeMessage": "נראה שזו הפעם הראשונה שלכם כאן. רוצים סיור מהיר איך לשחק?",
+      "showTutorial": "הראה לי איך",
+      "skipTutorial": "אני אסתדר",
+      "dontShowAgain": "אל תראה שוב"
+    }
+  },
+  "onboarding": {
+    "welcome": {
+      "title": "ברוכים הבאים ל-LexiClash!",
+      "subtitle": "מצא מילים על ידי חיבור אותיות",
+      "demoInstruction": "נסה! מצא את המילה:",
+      "demoWord": "CAT",
+      "demoHint": "החלק או הקש על אותיות סמוכות",
+      "demoSuccess": "מושלם! הצלחת!",
+      "clickNext": "לחץ הבא להמשך"
+    },
+    "combo": {
+      "title": "מערכת קומבו",
+      "subtitle": "מצא מילים במהירות כדי לבנות קומבו",
+      "explanation": "כל מילה שאתה מוצא מגדילה את מכפיל הקומבו שלך. ככל שתמצא מילים מהר יותר, כך הניקוד שלך יהיה גבוה יותר!",
+      "tip": "המשך למצוא מילים כדי לשמור על רצף הקומבו שלך!",
+      "example1": "מילה ראשונה",
+      "example2": "קומבו x2!",
+      "example3": "קומבו x3!"
+    },
+    "specialRounds": {
+      "title": "סבבים מיוחדים",
+      "subtitle": "כאוס פוגש הזדמנות!",
+      "earthquake": {
+        "title": "רעידת אדמה",
+        "description": "האותיות רועדות ומתערבבות - הסתגל מהר!",
+        "tip": "שמור על קור רוח וחפש דפוסים חדשים"
+      },
+      "fireRound": {
+        "title": "סבב אש",
+        "description": "כל הניקוד מוכפל - תשתולל!",
+        "tip": "זו ההזדמנות שלך לצבור נקודות"
+      }
+    },
+    "avatar": {
+      "title": "בחר את האווטאר שלך",
+      "subtitle": "בחר אחד שמייצג אותך",
+      "selected": "נבחר"
+    },
+    "name": {
+      "title": "מה שמך?",
+      "subtitle": "הכנס את שם התצוגה שלך",
+      "placeholder": "הכנס את שמך",
+      "errorInvalid": "רק אותיות, מספרים ורווחים מותרים",
+      "errorTooShort": "השם חייב להיות לפחות 2 תווים",
+      "errorTooLong": "השם לא יכול להיות יותר מ-20 תווים",
+      "characterCount": "תווים",
+      "proTip": "בחר שם שיפחיד את היריבים. או יצחיק אותם. שניהם עובדים!"
+    },
+    "profile": {
+      "title": "הגדר את הפרופיל שלך",
+      "subtitle": "בחר אווטאר והכנס את שמך"
+    },
+    "quickTips": {
+      "title": "טיפים מהירים",
+      "subtitle": "תלמד עוד בזמן שתשחק!",
+      "tip1Title": "החלק לחיבור",
+      "tip1Text": "גרור דרך אותיות סמוכות ליצירת מילים",
+      "tip2Title": "יותר ארוך = יותר טוב",
+      "tip2Text": "יותר אותיות אומר יותר נקודות",
+      "tip3Title": "שים לב",
+      "tip3Text": "סבבים מיוחדים מופיעים עם נקודות בונוס!"
+    },
+    "mode": {
+      "title": "בחר את המצב שלך",
+      "subtitle": "איך אתה רוצה לשחק?",
+      "singlePlayer": {
+        "title": "שחקן יחיד",
+        "description": "תרגל או התמודד עם יריבי AI"
+      },
+      "multiPlayer": {
+        "title": "מרובה משתתפים",
+        "description": "התחרה עם חברים בקרבות בזמן אמת"
+      },
+      "dailyPlayer": {
+        "title": "אתגר יומי",
+        "description": "אותו פאזל לכולם ברחבי העולם מדי יום"
+      },
+      "encouragement": "בחירה מצוינת! לחץ \"בואו נשחק\" להתחיל את ההרפתקה!"
+    },
+    "navigation": {
+      "skip": "דלג",
+      "back": "חזרה",
+      "next": "הבא",
+      "letsPlay": "בואו נשחק!",
+      "title": "ברוכים הבאים"
+    }
+  },
+  "achievements": {
+    "FIRST_BLOOD": {
+      "name": "דם ראשון",
+      "description": "ראשון למצוא מילה"
+    },
+    "SPEED_DEMON": {
+      "name": "שד המהירות",
+      "description": "מצא 20 מילים ב-90 שניות"
+    },
+    "WORD_MASTER": {
+      "name": "אדון המילים",
+      "description": "מצא מילה בת 7+ אותיות"
+    },
+    "COMBO_KING": {
+      "name": "מלך הקומבו",
+      "description": "הגיע לרצף של 10+ קומבו"
+    },
+    "PERFECTIONIST": {
+      "name": "פרפקציוניסט",
+      "description": "15+ מילים, כולן תקינות"
+    },
+    "LEXICON": {
+      "name": "לקסיקון",
+      "description": "מצא 35+ מילים"
+    },
+    "WORDSMITH": {
+      "name": "צורף מילים",
+      "description": "מצא 25 מילים תקינות"
+    },
+    "QUICK_THINKER": {
+      "name": "חושב מהיר",
+      "description": "מצא מילה בתוך 3 שניות"
+    },
+    "LONG_HAULER": {
+      "name": "מרתונאי",
+      "description": "מצא מילה בדקה האחרונה"
+    },
+    "DIVERSE_VOCABULARY": {
+      "name": "אוצר מילים מגוון",
+      "description": "מצא מילים ב-5+ אורכים שונים"
+    },
+    "DOUBLE_TROUBLE": {
+      "name": "צמד מנצח",
+      "description": "מצא 2 מילים בתוך 1.5 שניות"
+    },
+    "TREASURE_HUNTER": {
+      "name": "צייד אוצרות",
+      "description": "מצא מילה נדירה (8+ אותיות)"
+    },
+    "TRIPLE_THREAT": {
+      "name": "שלישייה מנצחת",
+      "description": "מצא 3 מילים בתוך 4 שניות"
+    },
+    "UNSTOPPABLE": {
+      "name": "בלתי ניתן לעצירה",
+      "description": "מצא 45+ מילים"
+    },
+    "COMEBACK_KID": {
+      "name": "חזרה מהשטח",
+      "description": "מצא מילה ב-3 השניות האחרונות"
+    },
+    "DICTIONARY_DIVER": {
+      "name": "צוללן המילון",
+      "description": "מצא 40+ מילים תקינות"
+    },
+    "LIGHTNING_ROUND": {
+      "name": "סיבוב ברקים",
+      "description": "מצא 10 מילים ב-30 השניות הראשונות"
+    },
+    "RARE_GEM": {
+      "name": "יהלום נדיר",
+      "description": "מצא מילה נדירה במיוחד (9+ אותיות)"
+    },
+    "EXPLORER": {
+      "name": "חוקר",
+      "description": "מצא מילים ב-6+ אורכים שונים"
+    },
+    "STREAK_MASTER": {
+      "name": "אלוף הרצף",
+      "description": "הגיע לרצף של 18+ קומבו"
+    },
+    "ANAGRAM_ARTIST": {
+      "name": "אמן האנגרמות",
+      "description": "מצא 2 מילים עוקבות מאותן אותיות"
+    },
+    "LETTER_POPPER": {
+      "name": "מפוצץ בלונים",
+      "description": "פוצץ 10+ אותיות בתפריט הראשי"
+    },
+    "WORD_ARCHITECT": {
+      "name": "אדריכל מילים",
+      "description": "מצא 3 מילים בנות 7+ אותיות"
+    },
+    "SPEED_LEGEND": {
+      "name": "אגדת מהירות",
+      "description": "מצא 25 מילים ב-90 שניות"
+    },
+    "COMBO_GOD": {
+      "name": "אל הקומבו",
+      "description": "הגיע לרצף של 20+ קומבו"
+    },
+    "VOCABULARY_TITAN": {
+      "name": "טיטאן המילים",
+      "description": "מצא 50+ מילים תקינות"
+    },
+    "PRECISION_MASTER": {
+      "name": "אלוף הדיוק",
+      "description": "25+ מילים עם 100% דיוק"
+    },
+    "LONG_WORD_CHAIN": {
+      "name": "שרשרת מילים ארוכות",
+      "description": "4 מילים רצופות בנות 6+ אותיות"
+    },
+    "MINIMALIST": {
+      "name": "מינימליסט",
+      "description": "ניצחון עם מילים של 4+ אותיות בלבד (15+ מילים)"
+    },
+    "WORD_SNIPER": {
+      "name": "צלף מילים",
+      "description": "מצא 5+ מילים ייחודיות שאף אחד אחר לא מצא"
+    },
+    "PHOTO_FINISH": {
+      "name": "פוטו פיניש",
+      "description": "ניצחון בפחות מ-5 נקודות הפרש"
+    },
+    "UNDERDOG": {
+      "name": "אאוטסיידר",
+      "description": "ניצחון לאחר פיגור באמצע המשחק"
+    },
+    "CLUTCH_PLAYER": {
+      "name": "שחקן קלאץ'",
+      "description": "מצא 3+ מילים ב-10 השניות האחרונות"
+    },
+    "VETERAN": {
+      "name": "ותיק",
+      "description": "שיחק 50 משחקים"
+    },
+    "CENTURION": {
+      "name": "סנטוריון",
+      "description": "שיחק 100 משחקים"
+    },
+    "WORD_COLLECTOR": {
+      "name": "אספן מילים",
+      "description": "מצא 1000 מילים תקינות סה\"כ"
+    },
+    "WORD_HOARDER": {
+      "name": "אוגר מילים",
+      "description": "מצא 5000 מילים תקינות סה\"כ"
+    },
+    "CHAMPION": {
+      "name": "אלוף",
+      "description": "ניצח 25 משחקים"
+    },
+    "LEGEND": {
+      "name": "אגדה",
+      "description": "ניצח 100 משחקים"
+    },
+    "POINT_MASTER": {
+      "name": "אדון הנקודות",
+      "description": "צבר 10,000 נקודות סה\"כ"
+    },
+    "POINT_KING": {
+      "name": "מלך הנקודות",
+      "description": "צבר 50,000 נקודות סה\"כ"
+    },
+    "DEDICATION": {
+      "name": "מסירות",
+      "description": "שיחק ב-7 ימים שונים"
+    },
+    "LOYAL_PLAYER": {
+      "name": "שחקן נאמן",
+      "description": "שיחק ב-30 ימים שונים"
+    }
+  },
+  "achievementTiers": {
+    "bronze": "ארד",
+    "silver": "כסף",
+    "gold": "זהב",
+    "platinum": "פלטינום",
+    "earned": "הושג",
+    "maxTier": "דרגה מקסימלית!"
+  },
+  "insights": {
+    "yourPerformance": "הביצועים שלך",
+    "yourStats": "הסטטיסטיקות שלך",
+    "longestWord": "המילה הארוכה ביותר",
+    "wordsPerMinute": "מילים/דקה",
+    "avgWordLength": "אורך ממוצע",
+    "favoriteLength": "אורך מועדף",
+    "speedPattern": "תבנית מהירות",
+    "letters": "אותיות",
+    "early": "התחלה",
+    "mid": "אמצע",
+    "late": "סוף",
+    "fastStart": "התחלה מהירה",
+    "strongFinish": "סיום חזק",
+    "momentum": "מומנטום עולה",
+    "steady": "קצב יציב",
+    "fadeOut": "פרץ מוקדם",
+    "midGamePeak": "שיא באמצע",
+    "burstMode": "מצב פרץ",
+    "slowStarter": "התחלה איטית",
+    "secondWind": "רוח שנייה",
+    "accuracy": "דיוק",
+    "story": {
+      "precisionSpeed": "דיוק במהירות",
+      "precisionSpeedDesc": "משחק מילים ברמה גבוהה. מהיר ומדויק.",
+      "bigGameHunter": "צייד מילים גדולות",
+      "bigGameHunterDesc": "ציד המילים הארוכות משתלם.",
+      "speedDemon": "שד מהירות",
+      "speedDemonDesc": "האצבעות שלך בוערות!",
+      "sharpshooter": "צלף מדויק",
+      "sharpshooterDesc": "איכות על כמות. כל יריה נספרת.",
+      "wordStorm": "סערת מילים",
+      "wordStormDesc": "לפעמים כמות זה היתרון שלך!",
+      "clutchFinisher": "מסיים קלאץ׳",
+      "clutchFinisherDesc": "שמרת את הטוב לסוף. לחץ יוצר יהלומים.",
+      "firstBlood": "דם ראשון",
+      "firstBloodDesc": "יצאת לדרך בכוח. אגרסיביות מוקדמת קובעת את הטון.",
+      "slowBurn": "שריפה איטית",
+      "slowBurnDesc": "התחלת לאט, סיימת חזק. הצב ידע מה הוא עושה.",
+      "earlyBurst": "פרץ מוקדם",
+      "earlyBurstDesc": "יצאת כמו טיל. אולי לשמור קצת כוח לסוף?",
+      "midGamePeak": "שיא באמצע",
+      "midGamePeakDesc": "מצאת את הקצב שלך באמצע. חימום הושלם, קירור בדרך.",
+      "burstMode": "מצב פרץ",
+      "burstModeDesc": "פרץ אחד של שליטה מוחלטת. איכות מעל עקביות!",
+      "slowStarter": "התחלה איטית",
+      "slowStarterDesc": "לקח זמן למצוא את הקצב. אחרי שמצאת - אין עצירה.",
+      "secondWind": "רוח שנייה",
+      "secondWindDesc": "שקיעה באמצע? לא בעיה. חזרת חזק יותר.",
+      "wordsmith": "אומן מילים",
+      "wordsmithDesc": "אתה לא מסתפק במילים קצרות.",
+      "solidPerformance": "ביצוע מוצק",
+      "solidPerformanceDesc": "הופעה מכובדת. המשך כך!",
+      "gettingStarted": "מתחממים",
+      "gettingStartedDesc": "כל אלוף התחיל איפשהו. הסיבוב הבא שלך!"
+    }
+  },
+  "noWords": {
+    "noWordsThisRound": "ללא מילים בסיבוב זה",
+    "keepGoing": "להמשיך!",
+    "nextRoundIsYours": "הסיבוב הבא שלך!",
+    "funFact": "עובדה מעניינת: השחקן הממוצע מפספס 70% מהמילים האפשריות!",
+    "otherPlayer": {
+      "headline": "סיבוב קשה",
+      "message": "האותיות לא היו נדיבות הפעם."
+    },
+    "encourage": {
+      "rookie": {
+        "headline": "פעם ראשונה?",
+        "message": "גם הציידים הטובים ביותר מתחילים איפשהו. הלוח היה מסובך!",
+        "tip": "טיפ: התחל עם מילים של 3 אותיות ותבנה משם."
+      },
+      "unlucky": {
+        "headline": "אותיות קשות!",
+        "message": "לפעמים הקוביות פשוט לא מתגלגלות לטובתך. קורה לכולם!",
+        "tip": "טיפ: חפש דפוסים נפוצים כמו -ות, -ים, -ה."
+      },
+      "thinking": {
+        "headline": "שתיקה אסטרטגית",
+        "message": "גישת איכות על כמות... אולי יותר מדי איכות הפעם!",
+        "tip": "טיפ: שלח מילים ברגע שאתה מוצא אותן - אין עונש על ניסיון!"
+      },
+      "warmup": {
+        "headline": "סיבוב חימום",
+        "message": "תחשוב על זה כתרגול. המוח שלך רק מתחיל!",
+        "tip": "טיפ: סרוק את הלוח במהירות, ואז התמקד בפינות עתירות ערך."
+      },
+      "comeback": {
+        "headline": "חזרה בעיבוד...",
+        "message": "לשחקנים הגדולים ביותר יש סיבובים קשים. המשחק הבא שלך!",
+        "tip": "טיפ: נסה לומר אותיות בקול כדי לעורר אסוציאציות."
+      }
+    }
+  },
+  "xp": {
+    "title": "רמת שחקן",
+    "level": "רמה",
+    "maxLevel": "רמה מקסימלית",
+    "xpProgress": "התקדמות XP",
+    "totalXpEarned": "סה\"כ XP שנצבר",
+    "xpToNextLevel": "XP לרמה הבאה",
+    "xpGained": "XP שנצבר",
+    "levelUp": "עליית רמה!",
+    "youReached": "הגעת ל",
+    "titleUnlocked": "תואר נפתח",
+    "baseXp": "XP בסיסי",
+    "scoreBonus": "בונוס ניקוד",
+    "winBonus": "בונוס ניצחון",
+    "achievementBonus": "בונוס הישג",
+    "titles": {
+      "wordSeeker": "מחפש מילים",
+      "letterHunter": "צייד אותיות",
+      "vocabularian": "אוצר מילים",
+      "wordsmith": "נפח מילים",
+      "lexiconAdept": "מומחה לקסיקון",
+      "grammarGuardian": "שומר הדקדוק",
+      "syntaxSage": "חכם התחביר",
+      "eloquentElite": "עילית רהוטה",
+      "linguisticLegend": "אגדת הלשון",
+      "lexiClashChampion": "אלוף לקסיקלאש"
+    }
+  },
+  "auth": {
+    "signIn": "התחברות",
+    "signOut": "התנתקות",
+    "signInWith": "המשך עם ${provider}",
+    "continueAsGuest": "המשך כאורח",
+    "saveProgress": "שמור את ההתקדמות שלך",
+    "guestStatsTitle": "הסטטיסטיקה שלך כאורח:",
+    "claimStats": "קבל את הנקודות שלך",
+    "statsClaimedSuccess": "הנקודות נשמרו בהצלחה!",
+    "termsAgreement": "בהמשך, אתה מסכים לתנאי השימוש שלנו",
+    "termsPrefix": "בהמשך, את/ה מסכים/ה ל",
+    "termsLink": "תנאי השימוש",
+    "andText": "ול",
+    "privacyLink": "מדיניות הפרטיות",
+    "upgradePrompt": "התחבר כדי לשמור את ההתקדמות שלך ולהתחרות בטבלת המובילים!",
+    "firstWin": {
+      "title": "מזל טוב על הניצחון הראשון!",
+      "subtitle": "יש לך כישרון! צור חשבון כדי להמשיך את רצף הניצחונות.",
+      "benefitsTitle": "הירשם כדי לקבל:",
+      "benefits": {
+        "trackProgress": "מעקב אחר הסטטיסטיקות, הניצחונות וההישגים שלך",
+        "leaderboard": "להתחרות בטבלת המובילים",
+        "playWithFriends": "לאתגר חברים ולבנות את המוניטין שלך"
+      },
+      "statsTeaser": "שיחקת ${games} משחק(ים) וצברת ${score} נקודות!",
+      "maybeLater": "אולי אחר כך"
+    },
+    "multiGames": {
+      "title": "אתה משתפר!",
+      "subtitle": "הירשם כדי לשמור את ההתקדמות שלך ולעקוב אחר ההישגים!",
+      "features": {
+        "leaderboard": "התחרות בטבלת המובילים העולמית",
+        "playWithFriends": "אתגר חברים ובנה את המוניטין שלך"
+      },
+      "statsTeaser": "שיחקת ${games} משחק(ים) וצברת ${score} נקודות!",
+      "maybeLater": "אולי אחר כך"
+    }
+  },
+  "legal": {
+    "termsOfService": "תנאי שימוש",
+    "privacyPolicy": "מדיניות פרטיות",
+    "backToGame": "חזרה למשחק",
+    "lastUpdated": "עודכן לאחרונה",
+    "copyright": "© 2025 LexiClash Ltd. כל הזכויות שמורות.",
+    "allRightsReserved": "כל הזכויות שמורות.",
+    "index": {
+      "title": "מידע משפטי",
+      "intro": "עיינו במסמכים המשפטיים שלנו כדי להבין את הזכויות שלכם וכיצד אנו מגנים על הנתונים שלכם בעת השימוש בלקסיקלאש.",
+      "termsDescription": "קראו את תנאי השימוש שלנו כדי להבין את הכללים וההנחיות לשימוש בלקסיקלאש.",
+      "privacyDescription": "למדו כיצד אנו אוספים, משתמשים ומגנים על המידע האישי שלכם."
+    },
+    "terms": {
+      "title": "תנאי שימוש",
+      "intro": "ברוכים הבאים ל-LexiClash. תנאי שימוש אלה מסדירים את השימוש שלך בפלטפורמת משחק המילים המרובה משתתפים שלנו בכתובת lexiclash.live.",
+      "acceptance": {
+        "title": "1. קבלת התנאים",
+        "content": "על ידי גישה או שימוש ב-LexiClash, את/ה מסכים/ה להיות כפוף/ה לתנאי שימוש אלה. אם אינך מסכים/ה לתנאים אלה, אנא אל תשתמש/י בשירות שלנו."
+      },
+      "service": {
+        "title": "2. תיאור השירות",
+        "content": "LexiClash הוא משחק מילים מרובה משתתפים חינמי שבו שחקנים מתחרים למצוא מילים על לוח אותיות בזמן אמת. השירות כולל חשבונות משתמש, טבלאות מובילים, הישגים ותכונות משחק מרובות משתתפים."
+      },
+      "accounts": {
+        "title": "3. חשבונות משתמש",
+        "content": "ניתן להשתמש ב-LexiClash כאורח או ליצור חשבון באמצעות אימות Google או Discord. את/ה אחראי/ת לשמירה על אבטחת פרטי החשבון שלך. איננו מאחסנים את הסיסמאות שלך - האימות מתבצע בצורה מאובטחת דרך ספקי OAuth."
+      },
+      "conduct": {
+        "title": "4. התנהגות משתמשים",
+        "content": "את/ה מסכים/ה להשתמש ב-LexiClash בצורה הוגנת ומכבדת. פעילויות אסורות כוללות: שימוש בשמות תצוגה פוגעניים או מפלים, רמאות או ניצול באגים, שימוש בבוטים אוטומטיים או סקריפטים, הטרדת שחקנים אחרים, וכל ניסיון לשבש את השירות או לתמרן את דירוגי טבלת המובילים."
+      },
+      "contentLicense": {
+        "title": "5. רישיון תוכן משתמש",
+        "content": "על ידי שימוש ב-LexiClash, את/ה מעניק/ה לנו רישיון עולמי, ללא תמלוגים ולא בלעדי להציג את שם המשתמש, האווטאר והסטטיסטיקות שלך בטבלאות המובילים, בתצוגות במשחק ובתוך השירות. רישיון זה מאפשר לנו להפעיל את המשחק ולהציג מידע שחקנים למשתמשים אחרים."
+      },
+      "intellectualProperty": {
+        "title": "6. קניין רוחני",
+        "content": "LexiClash, כולל שמו, הלוגו, מכניקת המשחק, הקוד וכל התוכן, הם בבעלות LexiClash Ltd. כל הזכויות שמורות. אסור לך להעתיק, לשנות, להפיץ או ליצור יצירות נגזרות ללא אישור כתוב מפורש מאיתנו."
+      },
+      "disclaimers": {
+        "title": "7. הצהרות אחריות",
+        "content": "LexiClash מסופק \"כמות שהוא\" ו\"כפי שזמין\" ללא אחריות מכל סוג, בין אם מפורשת או משתמעת. איננו מבטיחים שהשירות יהיה רציף, נקי משגיאות או מאובטח. איננו אחראים לאובדן נתונים, כולל התקדמות או סטטיסטיקות משחק."
+      },
+      "liability": {
+        "title": "8. הגבלת אחריות",
+        "content": "במידה המרבית המותרת על פי חוק, LexiClash Ltd לא תהיה אחראית לכל נזק עקיף, מקרי, מיוחד, תוצאתי או עונשי הנובע משימושך בשירות, כולל אך לא מוגבל לאובדן רווחים, נתונים או מוניטין."
+      },
+      "indemnification": {
+        "title": "9. שיפוי",
+        "content": "את/ה מסכים/ה לשפות, להגן ולהחזיק את LexiClash Ltd חסינה מפני כל תביעות, נזקים, הפסדים או הוצאות הנובעים מהפרת תנאים אלה על ידך, משימושך בשירות, או מהפרת זכויות של צד אחר."
+      },
+      "termination": {
+        "title": "10. סיום",
+        "content": "אנו עשויים להשעות או לסיים את הגישה שלך ל-LexiClash בכל עת, עם או בלי סיבה, ועם או בלי הודעה מוקדמת. עם הסיום, הזכות שלך להשתמש בשירות מסתיימת מיידית, ונתוני החשבון שלך עשויים להימחק."
+      },
+      "modifications": {
+        "title": "11. שינויים בתנאים",
+        "content": "אנו שומרים לעצמנו את הזכות לשנות תנאי שימוש אלה בכל עת. שינויים ייכנסו לתוקף עם הפרסום באתר. המשך השימוש שלך ב-LexiClash לאחר שינויים מהווה הסכמה לתנאים החדשים."
+      },
+      "governingLaw": {
+        "title": "12. דין חל",
+        "content": "תנאי שימוש אלה יפורשו וייושמו בהתאם לחוקי מדינת ישראל, מבלי להתחשב בכללי ברירת הדין שלה."
+      },
+      "disputes": {
+        "title": "13. יישוב סכסוכים",
+        "content": "כל סכסוך הנובע מתנאים אלה או משימושך ב-LexiClash ייושב תחילה באופן לא פורמלי. אם לא יצליח, הסכסוכים ייושבו באופן בלעדי בבתי המשפט בישראל, ואת/ה מסכים/ה לסמכות השיפוט האישית של בתי משפט אלה."
+      },
+      "severability": {
+        "title": "14. הפרדה",
+        "content": "אם הוראה כלשהי מתנאי שימוש אלה תימצא בלתי ניתנת לאכיפה או בלתי חוקית, הוראה זו תוגבל או תבוטל במידה המינימלית הנדרשת, וההוראות הנותרות ימשיכו לחול במלואן."
+      }
+    },
+    "privacy": {
+      "title": "מדיניות פרטיות",
+      "intro": "מדיניות פרטיות זו מסבירה כיצד LexiClash Ltd אוספת, משתמשת ומגנה על המידע האישי שלך כאשר את/ה משתמש/ת במשחק המילים המרובה משתתפים שלנו בכתובת lexiclash.live.",
+      "infoCollected": {
+        "title": "1. מידע שאנו אוספים",
+        "content": "אנו אוספים את סוגי המידע הבאים:",
+        "oauth": "נתוני חשבון דרך Google/Discord OAuth: שם, כתובת אימייל ותמונת פרופיל",
+        "profile": "מידע פרופיל שחקן: שם תצוגה, אימוג'י/צבע אווטאר ותמונות פרופיל מותאמות אישית שאת/ה מעלה",
+        "stats": "סטטיסטיקות משחק: ניקוד, ניצחונות, מילים שנמצאו, משחקים ששוחקו, זמן משחק, הישגים ודירוגי טבלת מובילים",
+        "gameState": "מצב משחק זמני: מידע על חדר, נתוני משחק נוכחיים (מאוחסנים באופן זמני ב-Redis עם מחיקה אוטומטית)",
+        "analytics": "נתוני אנליטיקה דרך LogRocket: הקלטות פעילות, יומני שגיאות ודפוסי שימוש כדי לעזור לנו לשפר את השירות"
+      },
+      "howWeUse": {
+        "title": "2. כיצד אנו משתמשים במידע שלך",
+        "content": "אנו משתמשים במידע שלך כדי: לספק אימות ותכונות חשבון, להציג את הפרופיל והסטטיסטיקות שלך לשחקנים אחרים, לתחזק טבלאות מובילים ודירוגים, לשפר את השירות שלנו באמצעות אנליטיקה, לשלוח תקשורת חשובה הקשורה לשירות, ולהבטיח משחק הוגן ולאכוף את תנאי השימוש שלנו."
+      },
+      "thirdParties": {
+        "title": "3. שירותי צד שלישי",
+        "content": "אנו משתמשים בשירותי צד שלישי הבאים כדי להפעיל את LexiClash:",
+        "supabase": "Supabase - לאימות, אחסון מסד נתונים ואחסון תמונות פרופיל",
+        "logrocket": "LogRocket - לאנליטיקה, הקלטת פעילות ומעקב אחר שגיאות",
+        "google": "Google - לאימות OAuth",
+        "discord": "Discord - לאימות OAuth",
+        "noSale": "איננו מוכרים את המידע האישי שלך לצדדים שלישיים."
+      },
+      "cookies": {
+        "title": "4. עוגיות ואחסון מקומי",
+        "content": "אנו משתמשים בעוגיות חיוניות ואחסון מקומי עבור: אסימוני אימות (Supabase), שם משתמש והעדפות (localStorage), הגדרות ערכת נושא (מצב כהה/בהיר) והעדפות שפה. אנו גם משתמשים בעוגיות LogRocket למטרות אנליטיקה. איננו משתמשים בעוגיות פרסום או מעקב."
+      },
+      "dataRetention": {
+        "title": "5. שמירת נתונים",
+        "content": "נתוני חשבון ופרופיל נשמרים עד שתבקש/י מחיקה. סטטיסטיקות משחק נשמרות לשמירה על שלמות טבלת המובילים. מצב משחק זמני (Redis) נמחק אוטומטית תוך שעה אחת. נתוני אנליטיקה נשמרים בהתאם למדיניות LogRocket."
+      },
+      "security": {
+        "title": "6. אבטחת נתונים",
+        "content": "אנו מיישמים אמצעי אבטחה סטנדרטיים בתעשייה כולל: חיבורים מוצפנים (HTTPS), אימות OAuth מאובטח, אחסון מסד נתונים מוצפן דרך Supabase, וחיבורי WebSocket מאובטחים למשחק בזמן אמת."
+      },
+      "yourRights": {
+        "title": "7. הזכויות שלך",
+        "content": "יש לך את הזכות: לגשת לנתונים האישיים שלך דרך דף הפרופיל שלך, לעדכן את מידע הפרופיל שלך בכל עת, למחוק את החשבון והנתונים המשויכים אליו, ולבקש מידע על אופן השימוש בנתונים שלך."
+      },
+      "international": {
+        "title": "8. משתמשים בינלאומיים",
+        "content": "הנתונים שלך עשויים להיות מועברים ומאוחסנים במדינות מחוץ למדינת מגוריך, כולל מדינות שעשויות להיות להן חוקי הגנת נתונים שונים. על ידי שימוש ב-LexiClash, את/ה מסכים/ה להעברות כאלה."
+      },
+      "changes": {
+        "title": "9. שינויים במדיניות זו",
+        "content": "אנו עשויים לעדכן מדיניות פרטיות זו מעת לעת. שינויים יפורסמו בדף זה עם תאריך מעודכן. המשך השימוש שלך ב-LexiClash לאחר שינויים מהווה הסכמה למדיניות המעודכנת."
+      },
+      "governingLaw": {
+        "title": "10. דין חל",
+        "content": "מדיניות פרטיות זו כפופה לחוקי מדינת ישראל. כל סכסוך ייושב בבתי המשפט בישראל."
+      }
+    }
+  },
+  "profile": {
+    "title": "פרופיל",
+    "memberSince": "חבר מאז",
+    "totalGames": "משחקים",
+    "wins": "ניצחונות",
+    "wordsFound": "מילים שנמצאו",
+    "totalScore": "ניקוד כולל",
+    "timePlayed": "זמן משחק",
+    "achievements": "הישגים",
+    "editProfile": "ערוך פרופיל",
+    "changeAvatar": "שנה אווטאר",
+    "username": "שם משתמש",
+    "saveChanges": "שמור שינויים",
+    "uploadPhoto": "העלה תמונה",
+    "removePhoto": "הסר תמונה",
+    "imageTooLarge": "התמונה חייבת להיות פחות מ-2MB",
+    "invalidImageType": "אנא העלה תמונת JPG, PNG, WebP או GIF",
+    "uploadSuccess": "תמונת הפרופיל עודכנה!",
+    "uploadError": "העלאת התמונה נכשלה",
+    "photoRemoved": "תמונת הפרופיל הוסרה",
+    "removeError": "הסרת התמונה נכשלה",
+    "saved": "הפרופיל נשמר!",
+    "saveError": "השמירה נכשלה",
+    "editName": "ערוך שם",
+    "chooseEmoji": "בחר אימוג'י",
+    "chooseColor": "בחר צבע",
+    "backToGame": "חזרה למשחק",
+    "backToRoom": "חזרה לחדר",
+    "backToLobby": "חזרה ללובי",
+    "locked": "נעול",
+    "earnThisAchievement": "שחק משחקים כדי לפתוח את ההישג הזה!"
+  },
+  "leaderboard": {
+    "title": "טבלת מובילים",
+    "allTime": "כל הזמנים",
+    "rank": "דירוג",
+    "player": "שחקן",
+    "score": "ניקוד",
+    "games": "משחקים",
+    "winRate": "אחוז ניצחונות",
+    "yourRank": "הדירוג שלך",
+    "topPercent": "${percent}% העליונים",
+    "noRankYet": "שחק משחקים כדי להיכנס לדירוג!",
+    "viewLeaderboard": "צפייה בטבלת מובילים"
+  },
+  "ranked": {
+    "title": "מצב מדורג",
+    "locked": "נעול",
+    "unlocked": "פתוח",
+    "unlockProgress": "${current}/${required} משחקים לפתיחה",
+    "playMoreToUnlock": "שחק עוד ${count} משחקים רגילים כדי לפתוח!",
+    "benefits": "יתרונות",
+    "benefitFairPlay": "הגדרות קבועות למשחק הוגן",
+    "benefitLeaderboard": "טבלת מובילים גלובלית",
+    "benefitAchievements": "הישגים בלעדיים",
+    "playCasualInstead": "שחק רגיל במקום",
+    "queueing": "מחפש משחק...",
+    "playersInQueue": "${count} שחקנים בתור",
+    "matchFound": "נמצא משחק!",
+    "requiresAuth": "התחבר כדי לגשת למצב מדורג"
+  },
+  "growth": {
+    "shareYourResult": "שתף את התוצאה",
+    "shareVictory": "🎉 שתף את הניצחון!",
+    "shareResult": "שתף את המשחק",
+    "bragToFriends": "ספר לחברים שלך שניצחת!",
+    "inviteFriendsToPlay": "הזמן חברים לאתגר אותך",
+    "viralPrompt": "אתגר את החברים שלך לנצח את הניקוד שלך!",
+    "share": "שתף",
+    "dayStreak": "ימי רצף",
+    "winsAway": "ניצחונות עד",
+    "nextTier": "הרמה הבאה",
+    "newBest": "שיא חדש!",
+    "newPersonalBest": "שיא אישי חדש!",
+    "streakUnlocked": "רצף נפתח!",
+    "streakAtRisk": "הרצף שלך בסכנה! שחק היום כדי לשמור עליו.",
+    "keepStreakAlive": "שמור על הרצף!",
+    "streakStarting": "מתחיל",
+    "streakHot": "חם",
+    "streakOnFire": "בוער",
+    "streakEpic": "אפי",
+    "streakLegendary": "אגדי",
+    "referFriend": "הזמן חבר",
+    "referralReward": "קבל פרסים על הזמנת חברים!",
+    "yourReferralLink": "הקישור שלך להזמנה",
+    "referralsCount": "חברים שהוזמנו",
+    "dailyChallenge": "אתגר יומי",
+    "dailyChallengeDesc": "אתגר חדש כל יום!",
+    "todaysChallenge": "האתגר של היום",
+    "challengeCompleted": "האתגר הושלם!",
+    "nextChallengeIn": "האתגר הבא בעוד",
+    "welcomeBack": "ברוך הבא חזרה!",
+    "missedYou": "התגעגענו! מוכן לעוד סיבוב?",
+    "playNow": "שחק עכשיו",
+    "firstWin": "ניצחון ראשון!",
+    "tenWins": "10 ניצחונות!",
+    "hundredWins": "100 ניצחונות!",
+    "milestoneUnlocked": "אבן דרך נפתחה!"
+  },
+  "wordFeedback": {
+    "title": "בית דין למילים",
+    "dictionaryTitle": "בנה את המילון שלנו",
+    "question": "האם זו מילה אמיתית?",
+    "submittedBy": "נשלח על ידי",
+    "thumbsUp": "לגיטימי!",
+    "thumbsDown": "לא",
+    "skipHint": "לחץ ESC לדילוג",
+    "thankYou": "תודה על העזרה!",
+    "witty1": "{player} טוען ש\"{word}\" היא מילה לגמרי...",
+    "witty2": "מילה אמיתית או יצירתיות? אתה מחליט!",
+    "witty3": "{player} מצא את \"{word}\" במילון שלו",
+    "witty4": "האקדמיה ללשון התקשרה, רוצים לדעת על \"{word}\"",
+    "witty5": "נשמע לגיטימי... או לא?",
+    "witty6": "האם \"{word}\" הברקה גאונית או שגעון?",
+    "witty7": "{player} נשבע שזו מילה אמיתית!",
+    "witty8": "ועדת המילון מחכה להחלטתך על \"{word}\"",
+    "nowValid": "היא עכשיו מילה חוקית!",
+    "dictionary1": "עזור לנו לבנות מילון טוב יותר!",
+    "dictionary2": "ההצבעה שלך הופכת מילים לרשמיות!",
+    "dictionary3": "כל הצבעה משפרת את המשחק!",
+    "dictionary4": "היה שופט המילים!",
+    "dictionary5": "בנה את המילון שלנו ביחד!",
+    "notAWord": "לא מילה",
+    "realWord": "מילה אמיתית!",
+    "nextWord": "מילה הבאה...",
+    "almostApproved": "כמעט מאושר!",
+    "votesNeeded": "עוד {count} הצבעות לאישור",
+    "validForScoring": "נחשב כמילה! עזור להוסיף למילון.",
+    "moreForDictionary": "עוד להוספה למילון"
+  },
+  "footer": {
+    "howToPlay": "איך משחקים",
+    "leaderboard": "טבלת מובילים",
+    "interactiveTutorial": "מדריך אינטראקטיבי"
+  },
+  "support": {
+    "kofiWinner": "מרגיש נדיב, אלוף?",
+    "kofiFooter": "קנה לנו קפה",
+    "kofiTooltip": "תמוך בפיתוח לקסיקלאש"
+  },
+  "landing": {
+    "chooseMode": "בחר מצב משחק",
+    "subtitle": "שחק לבד כדי להתאמן ולשבור שיאים, או התחרה עם חברים במשחק רב-משתתפים!",
+    "subtitleSimple": "התאמן לבד או אתגר חברים",
+    "singlePlayer": "שחקן יחיד",
+    "singlePlayerDesc": "התאמן בקצב שלך או אתגר את עצמך!",
+    "multiplayer": "רב משתתפים",
+    "multiplayerDesc": "התחרה עם חברים בזמן אמת!",
+    "feature": {
+      "soloVsBots": "נגד בוטים",
+      "practiceMode": "מצב אימון",
+      "challenges": "אתגרים ושיאים",
+      "joinRooms": "הצטרף לחדרים",
+      "hostGames": "ארח משחקים",
+      "tournaments": "טורנירים"
+    },
+    "hint": "חדש במשחק? התחל עם שחקן יחיד כדי ללמוד את הכללים!",
+    "openRooms": "חדרים פתוחים",
+    "playersLive": "משחקים עכשיו"
+  },
+  "singlePlayer": {
+    "title": "שחקן יחיד",
+    "selectMode": "בחר מצב",
+    "soloVsBots": "נגד בוטים",
+    "soloVsBotsDesc": "התחרה נגד יריבים ממוחשבים",
+    "practiceMode": "אימון",
+    "practiceModeDesc": "ללא טיימר, גלה מילים בקצב שלך",
+    "challengeMode": "אתגר",
+    "challengeModeDesc": "שבור את השיאים שלך",
+    "selectDifficulty": "גודל הלוח",
+    "gameTime": "זמן משחק",
+    "opponents": "יריבים",
+    "noBots": "לא נוספו בוטים. הוסף יריבים להתחרות נגדם!",
+    "startGame": "התחל משחק",
+    "finish": "סיום",
+    "noWordsYet": "עדיין לא נמצאו מילים. התחל להחליק!",
+    "victory": "ניצחון!",
+    "gameOver": "המשחק נגמר",
+    "practiceComplete": "האימון הושלם!",
+    "newHighScore": "שיא חדש!",
+    "challengeComplete": "האתגר הושלם",
+    "noWordsFound": "לא נמצאו מילים",
+    "achievementsNotSaved": "הישגים במצב שחקן יחיד לא נשמרים בפרופיל שלך.",
+    "botDetails": "פרטי בוט",
+    "difficulty": "קושי",
+    "timer": "טיימר",
+    "totalScore": "ניקוד כולל",
+    "wordsByLength": "מילים לפי אורך",
+    "quitConfirmTitle": "לצאת מהמשחק?",
+    "quitConfirmMessage": "תאבד את ההתקדמות הנוכחית. בטוח שאתה רוצה לצאת?",
+    "gamePaused": "המשחק מושהה",
+    "botWords": "מילים שנמצאו",
+    "aiOpponents": "יריבי AI",
+    "autoFillDesc": "ממלא את החדר ב-{count} יריבי AI",
+    "addBotsPrompt": "הוסף יריבי AI להתחרות נגדם!",
+    "addBotsHint": "השתמש במילוי אוטומטי או לחץ על הכפתורים למעלה"
+  },
+  "landscape": {
+    "tutorialTitle": "פקדי מסך רחב",
+    "tutorialPause": "שמאל למטה: השהה/המשך משחק",
+    "tutorialQuit": "ימין למטה: צא מהמשחק",
+    "tutorialHelp": "ימין למעלה: עזרה וחוקים",
+    "tutorialKeyboard": "מקלדת: רווח = השהה, Esc = צא, ? = עזרה"
+  },
+  "challenge": {
+    "yourRecord": "השיא שלך",
+    "beatIt": "תוכל לשבור אותו?",
+    "noRecord": "עדיין אין שיא",
+    "setFirst": "קבע את השיא הראשון שלך והתחל להתחרות נגד עצמך!",
+    "recordsSet": "שיאים נקבעו",
+    "gamesPlayed": "משחקים שוחקו",
+    "allTimeBest": "השיא של כל הזמנים",
+    "longest": "הארוכה ביותר",
+    "newRecord": "שיא חדש!",
+    "tied": "שוויון!",
+    "recordToBeat": "שיא",
+    "toGo": "נק׳ לשבירת השיא",
+    "settingFirst": "קובע את השיא הראשון שלך!",
+    "allTimeRecord": "שיא כל הזמנים!",
+    "improvement": "שיפור",
+    "firstRecord": "נקבע שיא ראשון!",
+    "shortOf": "{diff} נקודות מהשיא שלך",
+    "settingRecord": "קובע את השיא הראשון שלך!",
+    "aheadOfRecord": "+{diff} מעל השיא!",
+    "behindRecord": "{diff} להכות את השיא שלך",
+    "tiedWithRecord": "שוויון עם השיא שלך!"
+  },
+  "rules": {
+    "pageTitle": "לקסיקלאש: קרב מילים בזמן אמת",
+    "pageSubtitle": "שלטו באומנות ציד המילים במשחק האסטרטגיה המרובה משתתפים המהיר הזה",
+    "playNowFree": "שחקו עכשיו - בחינם!",
+    "readyToTest": "מוכנים לבחון את כישורי המילים שלכם?",
+    "readyToTestDesc": "הצטרפו לאלפי שחקנים בחוויית קרב המילים האולטימטיבית. צרו חדר, הזמינו חברים וגלו מי בעל אוצר המילים הטוב ביותר!",
+    "startPlaying": "התחילו לשחק עכשיו",
+    "backToHome": "חזרה לדף הבית",
+    "howToPlayIntro": "לקסיקלאש הוא משחק מילים מרובה משתתפים בזמן אמת שבו שחקנים מתחרים למצוא כמה שיותר מילים מלוח אותיות. חשבו על זה כגרסה תחרותית ודיגיטלית של משחקי מציאת מילים קלאסיים, אבל עם טוויסט מודרני שמאפשר לכם לשחק עם חברים מכל מקום בעולם.",
+    "joinOrCreate": "הצטרפו או צרו חדר",
+    "joinOrCreateDesc": "צרו חדר משחק משלכם או הצטרפו לחדר קיים באמצעות קוד. שתפו את הקוד עם חברים כדי להזמין אותם מיד.",
+    "raceAgainstTime": "מירוץ נגד הזמן",
+    "raceAgainstTimeDesc": "כשהמשחק מתחיל, יש לכם זמן מוגבל (בדרך כלל 90 שניות) למצוא כמה שיותר מילים תקינות מלוח האותיות.",
+    "swipeToForm": "החליקו ליצירת מילים",
+    "swipeToFormDesc": "חברו אותיות סמוכות על ידי החלקה או לחיצה ליצירת מילים. אותיות חייבות להיות מחוברות אופקית, אנכית או באלכסון.",
+    "competeAndWin": "התחרו ונצחו",
+    "competeAndWinDesc": "השחקן עם הניקוד הגבוה ביותר כשהזמן נגמר מנצח! שחקו מספר סיבובים כדי לקבוע את אלוף המילים האולטימטיבי.",
+    "scoringIntro": "בלקסיקלאש, מילים ארוכות יותר מזכות ביותר נקודות. מערכת הניקוד מתגמלת שחקנים אסטרטגיים שמחפשים מילים ארוכות ומורכבות יותר במקום פשוט לשלוח הרבה מילים קצרות.",
+    "wordLength": "אורך מילה",
+    "points": "נקודות",
+    "example": "דוגמה",
+    "proTip": "טיפ מקצועי",
+    "proTipText": "התמקדו במציאת מילים של 5-7 אותיות ליחס הנקודות-לזמן הטוב ביותר. בעוד מילים של 8+ אותיות נותנות נקודות מסיביות, הן נדירות וגוזלות זמן למציאה!",
+    "strategiesIntro": "להפוך לאלוף לקסיקלאש דורש יותר מאוצר מילים טוב. הנה אסטרטגיות מוכחות שמשמשות שחקנים מובילים לשלוט ביריבים ולטפס בטבלת המובילים.",
+    "scanPrefixes": "סרקו תחיליות וסיומות",
+    "scanPrefixesDesc": "חפשו חלקי מילים נפוצים כמו \"מת-\", \"הת-\", \"-ים\", \"-ות\". אלה יכולים לעזור לכם לזהות במהירות מילים ארוכות המסתתרות בלוח.",
+    "startFromVowels": "התחילו מתנועות",
+    "startFromVowelsDesc": "רוב המילים בעברית מכילות תנועות. התחילו באיתור א, ה, י, ו על הלוח ובנו מילים סביבן לגילוי מילים מהיר יותר.",
+    "thinkWordFamilies": "חשבו במשפחות מילים",
+    "thinkWordFamiliesDesc": "כשמוצאים מילה כמו \"שחק\", בדקו מיד וריאציות: \"שחקן\", \"שחקנים\", \"משחק\", \"משחקים\". טכניקה זו יכולה להכפיל במהירות את הניקוד שלכם.",
+    "dontOverthink": "אל תחשבו יותר מדי על מילים קצרות",
+    "dontOverthinkDesc": "שלחו מילים ברורות של 3-4 אותיות במהירות ללא היסוס. הן מצטברות מהר ונותנות לכם בסיס מוצק בזמן שאתם מחפשים מילים ארוכות יותר.",
+    "practicePatterns": "תרגלו זיהוי דפוסים",
+    "practicePatternsDesc": "ככל שתשחקו יותר, תזהו דפוסי אותיות נפוצים מהר יותר. תרגול קבוע מאמן את המוח לזהות מילים כמעט מיידית, ונותן לכם יתרון משמעותי.",
+    "multiLanguage": "תמיכה רב-לשונית",
+    "multiLanguageDesc": "שחקו באנגלית, עברית, שוודית או יפנית. מושלם ללומדי שפות!",
+    "realTimeMultiplayer": "מרובה משתתפים בזמן אמת",
+    "realTimeMultiplayerDesc": "התחרו נגד חברים או שחקנים מכל העולם בקרבות מילים בזמן אמת.",
+    "achievementsLevels": "הישגים ורמות",
+    "achievementsLevelsDesc": "צברו XP, פתחו הישגים וטפסו בדרגות ככל שתשתפרו.",
+    "leaderboards": "טבלאות מובילים",
+    "leaderboardsDesc": "עקבו אחר ההתקדמות שלכם וראו איך אתם מדורגים מול שחקנים אחרים בעולם.",
+    "noDownload": "ללא צורך בהורדה",
+    "noDownloadDesc": "שחקו מיד בדפדפן שלכם בכל מכשיר - מחשב, טאבלט או נייד.",
+    "qrSharing": "שיתוף קוד QR",
+    "qrSharingDesc": "צרו קודי QR כדי להזמין חברים לחדר המשחק שלכם באופן מיידי.",
+    "singlePlayerTitle": "מצבי שחקן יחיד",
+    "singlePlayerIntro": "התאמנו לבד או אתגרו את עצמכם נגד יריבי בינה מלאכותית!",
+    "soloVsBots": "סולו נגד בוטים",
+    "soloVsBotsDesc": "התחרו נגד יריבי בינה מלאכותית ברמות קושי שונות. מושלם לתרגול אסטרטגיות לפני אתגור שחקנים אמיתיים.",
+    "practiceMode": "מצב תרגול",
+    "practiceModeDesc": "קחו את הזמן שלכם ללא טיימר. מושלם ללמידת מילים חדשות וחקירת הלוח ללא לחץ.",
+    "challengeMode": "מצב אתגר",
+    "challengeModeDesc": "שברו את השיאים האישיים שלכם ועקבו אחר ההתקדמות לאורך זמן. התחרו נגד עצמכם!"
+  },
+  "social": {
+    "playersOnline": "שחקנים מחוברים",
+    "gamesNow": "משחקים מתקיימים עכשיו",
+    "games": "משחקים",
+    "newRecord": "שיא חדש!",
+    "online": "מחוברים"
+  },
+  "daily": {
+    "title": "אתגר יומי",
+    "badge": "אתגר יומי",
+    "puzzleNumber": "יומי #{number}",
+    "timeLimit": "מגבלת זמן",
+    "attempt": "ניסיון",
+    "playButton": "שחקו את החידה של היום",
+    "nextPuzzleIn": "החידה הבאה בעוד:",
+    "samePuzzle": "אותה חידה לכולם בעולם. שתפו את התוצאות שלכם לאתגר חברים!",
+    "alreadyPlayed": "כבר שיחקתם היום",
+    "yourScore": "הניקוד שלכם",
+    "completed": "הושלם!",
+    "quitConfirm": "בטוחים שאתם רוצים לצאת? ההתקדמות תאבד ולא תוכלו לשחק שוב את החידה של היום.",
+    "wordsFound": "נמצאו {count} מילים",
+    "streak": "רצף",
+    "streakDays": "רצף של {count} ימים!",
+    "shareScore": "שתפו את הניקוד",
+    "copyToClipboard": "העתק ללוח",
+    "copiedToClipboard": "הועתק ללוח!",
+    "home": "בית",
+    "close": "סגור",
+    "bannerTitle": "יומי #{number}",
+    "bannerSubtitle": "אותה חידה לכולם. שתפו את הניקוד!",
+    "oneAttempt": "ניסיון אחד ביום - אותה חידה לכולם!",
+    "dayStreak": "ימים ברצף",
+    "playNow": "שחקו עכשיו",
+    "loading": "טוען אתגר יומי...",
+    "todaysPlayers": "השחקנים של היום",
+    "beFirstToPlay": "היו הראשונים לשחק באתגר של היום!",
+    "playerSingular": "שחקן",
+    "playersPlural": "שחקנים",
+    "yourRank": "הדירוג שלך",
+    "showMore": "הצג עוד",
+    "showLess": "הצג פחות",
+    "more": "עוד"
+  },
+  "guidance": {
+    "combo": {
+      "title": "בונוס קומבו!",
+      "text": "מצאו מילים מהר לבנות קומבו ולהכפיל ניקוד! שמרו על התנופה!"
+    },
+    "earthquake": {
+      "title": "רעידת אדמה מתקרבת!",
+      "text": "האותיות יתערבבו בקרוב - מצאו מילים מהר לפני שהן זזות! סיבוב אש מתחיל!"
+    },
+    "fireRound": {
+      "title": "סיבוב אש - נקודות כפולות!",
+      "text": "כל הנקודות מוכפלות ל-15 שניות הבאות - מצאו כמה שיותר מילים!"
+    },
+    "directionPattern": {
+      "title": "שנו כיוונים!",
+      "text": "אפשר לשנות כיוון בזמן שרושמים מילה! לכו ימינה, אז למטה, אז באלכסון - הכל במילה אחת."
+    },
+    "dismiss": "הבנתי!"
+  }
+};
+
+module.exports = { he };

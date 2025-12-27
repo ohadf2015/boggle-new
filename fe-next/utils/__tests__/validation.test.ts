@@ -109,11 +109,16 @@ describe('validateRoomName', () => {
   });
 
   describe('invalid room names', () => {
-    it('rejects empty room name', () => {
-      expect(validateRoomName('')).toEqual({
+    it('rejects empty room name when required', () => {
+      // Pass false to make room name required (default is optional)
+      expect(validateRoomName('', false)).toEqual({
         isValid: false,
         error: 'validation.roomNameRequired',
       });
+    });
+
+    it('accepts empty room name when optional (default)', () => {
+      expect(validateRoomName('')).toEqual({ isValid: true });
     });
 
     it('rejects too short room name', () => {

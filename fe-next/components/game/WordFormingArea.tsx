@@ -31,13 +31,17 @@ function applyHebrewFinalLetter(word: string): string {
 
 export interface WordFeedback {
   id: string;
-  type: 'accepted' | 'rejected' | 'pending' | 'duplicate';
+  type: 'accepted' | 'rejected' | 'pending' | 'duplicate' | 'foundByOther';
   word: string;
   score?: number;
   message?: string;
   fireRoundActive?: boolean;
   fireRoundBonus?: number;
   timestamp: number;
+  /** Name of the player who found this word first (for foundByOther type) */
+  foundBy?: string;
+  /** Avatar of the first finder */
+  foundByAvatar?: { emoji?: string; color?: string; avatarImage?: string } | null;
 }
 
 interface WordFormingAreaProps {
@@ -133,6 +137,7 @@ const WordFormingArea = React.memo<WordFormingAreaProps>(({
         case 'accepted': return 'bg-neo-lime';
         case 'rejected': return 'bg-neo-red';
         case 'duplicate': return 'bg-neo-orange';
+        case 'foundByOther': return 'bg-neo-orange';
         case 'pending': return 'bg-neo-yellow';
         default: return 'bg-neo-cyan';
       }
@@ -194,15 +199,15 @@ const WordFormingArea = React.memo<WordFormingAreaProps>(({
             animate={{
               opacity: 1,
               scale: 1,
-              x: showFeedback && (visibleFeedback?.type === 'rejected' || visibleFeedback?.type === 'duplicate')
-                ? [-4, 4, -4, 4, 0] : 0,
+              x: showFeedback && (visibleFeedback?.type === 'rejected' || visibleFeedback?.type === 'duplicate' || visibleFeedback?.type === 'foundByOther')
+                ? [0, -10, 10, 0] : 0,
             }}
             exit={{ opacity: 0, scale: 0.9 }}
             transition={{
               layout: { type: 'spring', stiffness: 500, damping: 30 },
               opacity: { duration: 0.15 },
               scale: { type: 'spring', stiffness: 400, damping: 25 },
-              x: { duration: 0.4 }
+              x: { duration: 0.5, ease: 'easeInOut' }
             }}
             className={cn(
               'relative border-3 border-neo-black rounded-neo shadow-hard flex items-center gap-2 whitespace-nowrap overflow-visible',
@@ -218,7 +223,7 @@ const WordFormingArea = React.memo<WordFormingAreaProps>(({
                   initial={{ scale: 0, rotate: visibleFeedback?.type === 'accepted' ? -180 : 0 }}
                   animate={{
                     scale: 1,
-                    rotate: (visibleFeedback?.type === 'rejected' || visibleFeedback?.type === 'duplicate')
+                    rotate: (visibleFeedback?.type === 'rejected' || visibleFeedback?.type === 'duplicate' || visibleFeedback?.type === 'foundByOther')
                       ? [0, -15, 15, -15, 0] : 0
                   }}
                   exit={{ scale: 0 }}
@@ -236,6 +241,10 @@ const WordFormingArea = React.memo<WordFormingAreaProps>(({
                   {visibleFeedback?.type === 'accepted' && '✓'}
                   {visibleFeedback?.type === 'rejected' && '✗'}
                   {visibleFeedback?.type === 'duplicate' && '⟳'}
+                  {visibleFeedback?.type === 'foundByOther' && (
+                    // Show the first finder's avatar emoji or a default icon
+                    visibleFeedback?.foundByAvatar?.emoji || '👤'
+                  )}
                   {visibleFeedback?.type === 'pending' && (
                     <motion.span
                       animate={{ rotate: 360 }}
@@ -261,7 +270,9 @@ const WordFormingArea = React.memo<WordFormingAreaProps>(({
                 ? (visibleFeedback.message || 'Invalid')
                 : showFeedback && visibleFeedback?.type === 'duplicate'
                   ? (visibleFeedback.message || 'Already found')
-                  : displayWord}
+                  : showFeedback && visibleFeedback?.type === 'foundByOther'
+                    ? (visibleFeedback.message || `Found by ${visibleFeedback.foundBy || 'another player'}`)
+                    : displayWord}
             </motion.span>
 
             {/* Letter count - only when forming */}
@@ -360,8 +371,8 @@ const WordFormingArea = React.memo<WordFormingAreaProps>(({
               />
             )}
 
-            {/* Orange pulse - for duplicate */}
-            {showFeedback && visibleFeedback?.type === 'duplicate' && (
+            {/* Orange pulse - for duplicate and foundByOther */}
+            {showFeedback && (visibleFeedback?.type === 'duplicate' || visibleFeedback?.type === 'foundByOther') && (
               <motion.div
                 className="absolute inset-0 rounded-neo pointer-events-none bg-orange-500/40"
                 initial={{ opacity: 0 }}

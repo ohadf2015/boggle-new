@@ -53,7 +53,7 @@ export const EarthquakeWarning: React.FC<EarthquakeWarningProps> = ({ isVisible 
         >
           {/* Semi-transparent backdrop - pointer-events-none to allow word selection */}
           <motion.div
-            className="absolute inset-0 bg-neo-black/40 backdrop-blur-sm pointer-events-none"
+            className="absolute inset-0 bg-neo-black/40 text-white backdrop-blur-sm pointer-events-none"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -81,7 +81,7 @@ export const EarthquakeWarning: React.FC<EarthquakeWarningProps> = ({ isVisible 
             }}
           >
             <div
-              className="relative bg-neo-yellow border-4 border-neo-black rounded-neo-lg shadow-hard-xl px-8 py-6"
+              className="relative bg-neo-yellow text-neo-black border-4 border-neo-black rounded-neo-lg shadow-hard-xl px-8 py-6"
               style={{
                 animation: 'warning-pulse 0.8s ease-in-out infinite',
                 transform: 'rotate(-2deg)',

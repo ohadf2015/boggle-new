@@ -71,6 +71,15 @@ export interface GameUser extends BaseUser {
   botDifficulty?: string;
 }
 
+export interface Spectator {
+  socketId: string;
+  username?: string;
+  avatar: Avatar | null;
+  authUserId: string | null;
+  guestTokenHash: string | null;
+  joinedAt: number;
+}
+
 // ==================== Word Types ====================
 
 export interface WordSubmission {
@@ -101,6 +110,19 @@ export interface WordDetail {
   inDictionary?: boolean;
   validationSource?: 'dictionary' | 'community' | 'ai' | 'cached' | 'none';
   isUnique?: boolean;
+  /** First player to find this word (for first-to-find scoring) */
+  foundBy?: string;
+  /** Avatar of the first finder */
+  foundByAvatar?: Avatar;
+  /** Whether this player was the first to find this word */
+  isFirstFinder?: boolean;
+}
+
+/** Entry tracking who found a word first */
+export interface FirstFinderEntry {
+  username: string;
+  avatar?: Partial<Avatar> | null;
+  timestamp: number;
 }
 
 export interface AiApprovedWord {
@@ -132,17 +154,18 @@ export interface LeaderboardEntry {
 
 export interface Game {
   gameCode: string;
-  hostSocketId: string;
-  hostUsername: string;
+  hostSocketId: string | null;
+  hostUsername: string | null;
   hostPlayerId?: string | null;
   roomName: string;
   language: Language;
   users: Record<string, GameUser>;
+  spectators?: Record<string, Spectator>;
   playerScores: Record<string, number>;
   playerWords: Record<string, string[]>;
   playerWordDetails: Record<string, WordDetail[]>;
   playerAchievements: Record<string, string[]>;
-  playerCombos: Record<string, number>;
+  playerCombos?: Record<string, number>;
   gameState: GameState;
   letterGrid: LetterGrid | null;
   letterPositions?: Map<string, GridPosition[]>;
@@ -165,6 +188,8 @@ export interface Game {
   aiApprovedWords?: AiApprovedWord[];
   peerValidationWord?: AiApprovedWord | null;
   peerValidationVotes?: Record<string, 'valid' | 'invalid'>;
+  /** Maps word to the first player who found it (for first-to-find scoring) */
+  firstFinderMap?: Record<string, FirstFinderEntry>;
 }
 
 export interface ActiveRoom {

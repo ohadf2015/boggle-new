@@ -77,7 +77,7 @@ const ComboExplanationTooltip: React.FC<ComboExplanationTooltipProps> = ({
         >
           <div
             className="
-              bg-neo-cream border-3 border-neo-black rounded-neo-lg shadow-hard-lg
+              bg-neo-cream text-neo-black border-3 border-neo-black rounded-neo-lg shadow-hard-lg
               px-4 py-3 max-w-[320px] relative
             "
             onClick={handleDismiss}

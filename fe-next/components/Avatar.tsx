@@ -2,6 +2,7 @@
 
 import { useState, useEffect, memo } from 'react';
 import Image from 'next/image';
+import { FaRobot } from 'react-icons/fa';
 import { getAvatarPath, mapEmojiToAvatar } from '@/utils/avatarConfig';
 
 /**
@@ -116,6 +117,8 @@ const Avatar = memo<AvatarProps>(({
   }
 
   // 3. Fallback to emoji if all else fails (backward compatibility)
+  // Special case: show FaRobot icon for robot emoji to maintain flat icon consistency
+  const isRobotEmoji = avatarEmoji === '🤖';
   const fallbackEmoji = avatarEmoji || '🐶';
   const fallbackColor = avatarColor || '#4ECDC4';
 
@@ -124,7 +127,7 @@ const Avatar = memo<AvatarProps>(({
       className={`rounded-full flex items-center justify-center flex-shrink-0 ${config.container} ${config.text} ${className}`}
       style={{ backgroundColor: fallbackColor }}
     >
-      {fallbackEmoji}
+      {isRobotEmoji ? <FaRobot className="text-neo-cream" style={{ fontSize: '0.7em' }} /> : fallbackEmoji}
     </div>
   );
 });

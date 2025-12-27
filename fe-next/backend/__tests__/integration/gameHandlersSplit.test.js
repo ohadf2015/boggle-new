@@ -27,7 +27,7 @@ describe('Game Lifecycle Handler', () => {
     test('creates game with valid data and emits joined event', async () => {
       const socket = env.createSocket();
       const gameData = env.createGameData({
-        gameCode: '1234',
+        gameCode: 'TEST01', // Must be 6+ chars (schema requirement)
         hostUsername: 'TestHost',
         language: 'en',
       });
@@ -39,7 +39,7 @@ describe('Game Lifecycle Handler', () => {
       const joinedEvent = socket.getEmittedEventsByName('joined')[0];
       expect(joinedEvent.data).toMatchObject({
         success: true,
-        gameCode: '1234',
+        gameCode: 'TEST01',
         isHost: true,
         username: 'TestHost',
         language: 'en',
@@ -154,7 +154,8 @@ describe('Game Lifecycle Handler', () => {
 
       await socket.receiveEvent('endGame', {});
 
-      expect(socket.getEmittedEvents()).toContainEvent('gameEnded');
+      // Handler broadcasts 'endGame' event (not 'gameEnded')
+      expect(socket.getEmittedEvents()).toContainEvent('endGame');
     });
 
     test('non-host cannot end game', async () => {
@@ -436,9 +437,9 @@ describe('Room Management Handler', () => {
       const socket1 = env.createSocket();
       const socket2 = env.createSocket();
 
-      // Create two games
-      await socket1.receiveEvent('createGame', env.createGameData({ gameCode: 'ROOM1' }));
-      await socket2.receiveEvent('createGame', env.createGameData({ gameCode: 'ROOM2' }));
+      // Create two games (game codes must be 6+ chars)
+      await socket1.receiveEvent('createGame', env.createGameData({ gameCode: 'ROOM01' }));
+      await socket2.receiveEvent('createGame', env.createGameData({ gameCode: 'ROOM02' }));
 
       const querySocket = env.createSocket();
       await querySocket.receiveEvent('getActiveRooms', {});
@@ -520,15 +521,16 @@ describe('Handler Integration', () => {
     const hostSocket = env.createSocket();
     const player1Socket = env.createSocket();
     const player2Socket = env.createSocket();
-    const gameData = env.createGameData({ gameCode: 'FULL' });
+    // Game code must be 6+ chars (schema requirement)
+    const gameData = env.createGameData({ gameCode: 'FULLGM' });
 
     // 1. Host creates game
     await hostSocket.receiveEvent('createGame', gameData);
     expect(hostSocket.wasEventEmitted('joined')).toBe(true);
 
     // 2. Players join
-    await player1Socket.receiveEvent('join', env.createJoinData('FULL', { username: 'Player1' }));
-    await player2Socket.receiveEvent('join', env.createJoinData('FULL', { username: 'Player2' }));
+    await player1Socket.receiveEvent('join', env.createJoinData('FULLGM', { username: 'Player1' }));
+    await player2Socket.receiveEvent('join', env.createJoinData('FULLGM', { username: 'Player2' }));
 
     expect(player1Socket.wasEventEmitted('joined')).toBe(true);
     expect(player2Socket.wasEventEmitted('joined')).toBe(true);
@@ -550,13 +552,13 @@ describe('Handler Integration', () => {
 
     // 4. Player leaves
     player2Socket.clearTracking();
-    await player2Socket.receiveEvent('leaveRoom', { gameCode: 'FULL', username: 'Player2' });
+    await player2Socket.receiveEvent('leaveRoom', { gameCode: 'FULLGM', username: 'Player2' });
     expect(player2Socket.wasEventEmitted('leftRoom')).toBe(true);
 
     // 5. Host ends game
     hostSocket.clearTracking();
     await hostSocket.receiveEvent('endGame', {});
-    expect(hostSocket.wasEventEmitted('gameEnded')).toBe(true);
+    expect(hostSocket.wasEventEmitted('endGame')).toBe(true);
 
     // 6. Host resets for new round
     hostSocket.clearTracking();

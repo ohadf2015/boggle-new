@@ -8,7 +8,7 @@ cmds = [
     'cd fe-next',
     'npm ci --prefer-offline --no-audit --no-fund --loglevel=error'
 ]
-cacheDirectories = ['fe-next/node_modules', 'fe-next/.next/cache']
+cacheDirectories = ['fe-next/node_modules', 'fe-next/.next/cache', 'fe-next/.next/standalone']
 
 [phases.build]
 dependsOn = ['install']

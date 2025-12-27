@@ -86,6 +86,9 @@ export interface GameStateValues {
 
   // Board theme
   boardTheme: BoardTheme | null;
+
+  // Total words available on board
+  totalBoardWords: number | null;
 }
 
 // ==========================================
@@ -130,6 +133,8 @@ export type GameStateAction =
   | { type: 'SET_LEVEL_UP_DATA'; payload: LevelUpPayload | null | ((prev: LevelUpPayload | null) => LevelUpPayload | null) }
   // Board theme actions
   | { type: 'SET_BOARD_THEME'; payload: BoardTheme | null | ((prev: BoardTheme | null) => BoardTheme | null) }
+  // Total board words actions
+  | { type: 'SET_TOTAL_BOARD_WORDS'; payload: number | null | ((prev: number | null) => number | null) }
   // Reset actions
   | { type: 'RESET_FOR_NEW_ROUND' }
   | { type: 'RESET_ALL' };
@@ -182,6 +187,9 @@ export interface GameStateActions {
 
   // Board theme actions
   setBoardTheme: React.Dispatch<React.SetStateAction<BoardTheme | null>>;
+
+  // Total board words actions
+  setTotalBoardWords: React.Dispatch<React.SetStateAction<number | null>>;
 
   // Reset actions
   resetForNewRound: () => void;

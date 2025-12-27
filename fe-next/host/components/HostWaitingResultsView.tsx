@@ -71,7 +71,7 @@ const HostWaitingResultsView: React.FC<HostWaitingResultsViewProps> = ({
   }, [playersReady, playerScores, playerWordCounts]);
 
   return (
-    <div className="min-h-screen w-full bg-neo-cream dark:bg-slate-900 p-3 sm:p-4 md:p-8 flex flex-col transition-colors duration-300">
+    <div className="min-h-screen w-full bg-neo-cream text-neo-black dark:bg-slate-900 dark:text-white p-3 sm:p-4 md:p-8 flex flex-col transition-colors duration-300">
 
       {/* Exit Button */}
       <div className="w-full flex justify-end mb-4 relative z-50">
@@ -90,7 +90,7 @@ const HostWaitingResultsView: React.FC<HostWaitingResultsViewProps> = ({
             transition={{ duration: 0.3 }}
             className="text-center"
           >
-            <div className="bg-neo-yellow border-4 border-neo-black shadow-hard-lg p-6 sm:p-8 md:p-10">
+            <div className="bg-neo-yellow text-neo-black border-4 border-neo-black shadow-hard-lg p-6 sm:p-8 md:p-10">
               {/* Hourglass Animation */}
               <div className="mb-6">
                 <motion.div
@@ -100,7 +100,7 @@ const HostWaitingResultsView: React.FC<HostWaitingResultsViewProps> = ({
                 >
                   <div className="relative w-12 h-16 flex flex-col items-center">
                     <div className="w-0 h-0 border-l-[20px] border-r-[20px] border-t-[24px] border-l-transparent border-r-transparent border-t-neo-black" />
-                    <div className="w-2 h-1 bg-neo-black -my-[2px] z-10" />
+                    <div className="w-2 h-1 bg-neo-black text-white -my-[2px] z-10" />
                     <div className="w-0 h-0 border-l-[20px] border-r-[20px] border-b-[24px] border-l-transparent border-r-transparent border-b-neo-black" />
                     <motion.div
                       animate={{ y: [0, 20, 0], opacity: [1, 1, 0] }}
@@ -139,8 +139,8 @@ const HostWaitingResultsView: React.FC<HostWaitingResultsViewProps> = ({
               animate={{ opacity: 1 }}
               transition={{ duration: 0.3, delay: 0.1 }}
             >
-              <div className="bg-neo-cream border-4 border-neo-black shadow-hard-lg overflow-hidden">
-                <div className="py-3 px-4 border-b-4 border-neo-black bg-neo-purple">
+              <div className="bg-neo-cream text-neo-black border-4 border-neo-black shadow-hard-lg overflow-hidden">
+                <div className="py-3 px-4 border-b-4 border-neo-black bg-neo-purple text-white">
                   <h3 className="flex items-center gap-2 text-neo-white text-xl uppercase tracking-wider font-black">
                     <FaTrophy className="text-neo-yellow" style={{ filter: 'drop-shadow(2px 2px 0px rgb(var(--neo-black)))' }} />
                     {t('playerView.leaderboard') || 'Leaderboard'}
@@ -218,7 +218,7 @@ const HostWaitingResultsView: React.FC<HostWaitingResultsViewProps> = ({
 
       {/* Exit Confirmation Dialog */}
       <AlertDialog open={showExitConfirm} onOpenChange={setShowExitConfirm}>
-        <AlertDialogContent className="bg-white dark:bg-slate-800 border-red-500/30">
+        <AlertDialogContent className="bg-white text-neo-black dark:bg-slate-800 dark:text-white border-red-500/30">
           <AlertDialogHeader>
             <AlertDialogTitle className="text-slate-900 dark:text-white">
               {t('playerView.exitConfirmation') || 'Exit Room?'}
