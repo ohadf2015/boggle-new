@@ -361,21 +361,24 @@ const DailyChallengeResults: React.FC<DailyChallengeResultsProps> = ({
           <div className="grid grid-cols-3 gap-2">
             <Button
               onClick={handleWhatsApp}
-              className="py-3 bg-[#25D366] text-white border-3 border-neo-black rounded-neo shadow-hard-sm hover:-translate-y-0.5 transition-all"
+              aria-label="Share on WhatsApp"
+              className="py-3 min-h-[44px] bg-[#25D366] text-black border-3 border-neo-black rounded-neo shadow-hard-sm hover:-translate-y-0.5 transition-all focus:ring-2 focus:ring-neo-yellow focus:ring-offset-2"
             >
               <FaWhatsapp className="w-5 h-5" />
             </Button>
 
             <Button
               onClick={handleTwitter}
-              className="py-3 bg-black text-white border-3 border-gray-700 rounded-neo shadow-hard-sm hover:-translate-y-0.5 transition-all"
+              aria-label="Share on X (Twitter)"
+              className="py-3 min-h-[44px] bg-black text-white border-3 border-gray-700 rounded-neo shadow-hard-sm hover:-translate-y-0.5 transition-all focus:ring-2 focus:ring-neo-cyan focus:ring-offset-2"
             >
               <FaXTwitter className="w-5 h-5" />
             </Button>
 
             <Button
               onClick={handleCopy}
-              className="py-3 bg-gray-600 text-white border-3 border-neo-black rounded-neo shadow-hard-sm hover:-translate-y-0.5 transition-all"
+              aria-label={copied ? t('common.copied') : t('daily.copyToClipboard')}
+              className="py-3 min-h-[44px] bg-gray-600 text-white border-3 border-neo-black rounded-neo shadow-hard-sm hover:-translate-y-0.5 transition-all focus:ring-2 focus:ring-neo-cyan focus:ring-offset-2"
             >
               {copied ? (
                 <FaCheck className="w-5 h-5 text-neo-lime" />
@@ -477,7 +480,7 @@ const DailyChallengeResults: React.FC<DailyChallengeResultsProps> = ({
               <div className="space-y-3">
                 <Button
                   onClick={handleWhatsApp}
-                  className="w-full py-3 bg-[#25D366] text-white border-3 border-neo-black rounded-neo"
+                  className="w-full py-3 bg-[#25D366] text-black border-3 border-neo-black rounded-neo"
                 >
                   <FaWhatsapp className="mr-2 w-5 h-5" />
                   WhatsApp

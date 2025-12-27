@@ -88,12 +88,13 @@ export const RoomCodeSection = memo<RoomCodeSectionProps>(({
             )}
           </div>
 
-          {/* Single Share Button */}
+          {/* Single Share Button - More Prominent */}
           <button
             onClick={handleShare}
-            className="flex items-center gap-1.5 px-3 py-1.5 bg-neo-cyan text-neo-black font-bold text-sm rounded-neo border-2 border-neo-black shadow-hard-sm hover:shadow-hard hover:-translate-y-0.5 active:shadow-none active:translate-y-0 transition-all"
+            aria-label={t('share.buttonLabel')}
+            className="flex items-center gap-2 px-4 py-2 min-h-[44px] bg-neo-yellow text-neo-black font-bold text-base rounded-neo border-3 border-neo-black shadow-hard-md hover:shadow-hard-lg hover:-translate-y-0.5 active:shadow-hard-sm active:translate-y-0 transition-all focus:outline-none focus:ring-2 focus:ring-neo-cyan focus:ring-offset-2"
           >
-            <FaShareAlt className="text-xs" />
+            <FaShareAlt className="text-sm" />
             <span>{t('share.buttonLabel')}</span>
           </button>
         </div>

@@ -1,13 +1,14 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FaTrophy, FaFire, FaTimes, FaShareAlt } from 'react-icons/fa';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { useTheme } from '../../utils/ThemeContext';
 import { cn } from '../../lib/utils';
 import UnifiedShareModal from '../modals/UnifiedShareModal';
-import type { GameResultForShare } from '../../utils/share';
+import { useNativeShare } from '../../hooks/useNativeShare';
+import { generatePersonalizedShareMessage, getJoinUrl, type GameResultForShare } from '../../utils/share';
 
 interface Achievement {
   id?: string;
@@ -155,6 +156,53 @@ const ShareWinPrompt: React.FC<ShareWinPromptProps> = ({
     streakDays,
   }), [score, wordCount, isWinner, achievements, streakDays]);
 
+  // Native share support
+  const { canNativeShare, nativeShare } = useNativeShare();
+
+  // Generate share URL and message
+  const joinUrl = getJoinUrl(gameCode, 'share-win');
+  const shareMessage = useMemo(() => {
+    return generatePersonalizedShareMessage(gameCode, gameResult, language, 'victory-prompt');
+  }, [gameCode, gameResult, language]);
+
+  // Smart share handler: try native share first, then modal
+  const handleShare = useCallback(async () => {
+    if (canNativeShare) {
+      const success = await nativeShare({
+        title: language === 'he' ? 'ניצחתי ב-LexiClash!' : 'I won at LexiClash!',
+        text: shareMessage,
+        url: joinUrl,
+      });
+      // If native share succeeded, we're done. If cancelled/failed, show modal
+      if (!success) {
+        setIsShareModalOpen(true);
+      }
+    } else {
+      // Desktop: show modal directly
+      setIsShareModalOpen(true);
+    }
+  }, [canNativeShare, nativeShare, shareMessage, joinUrl, language]);
+
+  // Streak encouragement - motivate users close to milestones
+  const streakEncouragement = useMemo(() => {
+    if (streakDays === 6) {
+      return language === 'he' ? '🔥 יום אחד לשבוע שלם!' : '🔥 One day from a full week!';
+    }
+    if (streakDays === 13) {
+      return language === 'he' ? '🔥 מחר שבועיים!' : '🔥 Almost two weeks!';
+    }
+    if (streakDays === 29) {
+      return language === 'he' ? '🔥 יום אחד לחודש!' : '🔥 One day from a full month!';
+    }
+    if (streakDays >= 7 && streakDays % 7 === 0) {
+      const weeks = Math.floor(streakDays / 7);
+      return language === 'he'
+        ? `🎯 ${weeks} שבועות ברצף!`
+        : `🎯 ${weeks} week${weeks > 1 ? 's' : ''} streak!`;
+    }
+    return null;
+  }, [streakDays, language]);
+
   // Don't show for non-winners with low scores
   if (!isWinner && score < 30) return null;
 
@@ -178,13 +226,15 @@ const ShareWinPrompt: React.FC<ShareWinPromptProps> = ({
           <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            onClick={() => setIsShareModalOpen(true)}
+            onClick={handleShare}
             className={cn(
               'flex items-center gap-1.5 px-4 py-2 font-bold text-sm rounded-neo',
               'border-2 border-neo-black shadow-hard-sm',
               'hover:shadow-hard-md hover:-translate-y-0.5 transition-all',
-              'bg-neo-yellow text-neo-black'
+              'bg-neo-yellow text-neo-black',
+              'focus:outline-none focus:ring-2 focus:ring-neo-cyan focus:ring-offset-2'
             )}
+            aria-label={language === 'he' ? 'שתף' : 'Share'}
           >
             <FaShareAlt size={14} />
             <span>{language === 'he' ? 'שתף' : 'Share'}</span>
@@ -317,18 +367,35 @@ const ShareWinPrompt: React.FC<ShareWinPromptProps> = ({
           )}
         </div>
 
-        {/* Single Share CTA */}
+        {/* Streak Encouragement - motivate sharing near milestones */}
+        {streakEncouragement && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className={cn(
+              'text-center py-2 px-4 rounded-neo border-2',
+              'bg-orange-500/20 border-orange-500/40 text-orange-400',
+              'font-bold text-sm animate-pulse'
+            )}
+          >
+            {streakEncouragement}
+          </motion.div>
+        )}
+
+        {/* Single Share CTA - tries native share first on mobile */}
         <motion.button
           whileHover={{ scale: 1.02, y: -2 }}
           whileTap={{ scale: 0.98 }}
-          onClick={() => setIsShareModalOpen(true)}
+          onClick={handleShare}
+          aria-label={language === 'he' ? 'שתף את הניצחון' : 'Share Your Victory'}
           className={cn(
             'w-full flex items-center justify-center gap-2 px-4 py-4',
-            'font-black text-base uppercase tracking-wide rounded-neo',
-            'border-3 border-neo-black shadow-hard-md',
-            'hover:shadow-hard-lg active:shadow-hard-sm',
+            'font-black text-lg uppercase tracking-wide rounded-neo',
+            'border-4 border-neo-black shadow-hard-lg',
+            'hover:shadow-hard-xl active:shadow-hard-sm',
             'transition-all duration-150',
-            'bg-neo-yellow text-neo-black'
+            'bg-neo-yellow text-neo-black',
+            'focus:outline-none focus:ring-4 focus:ring-neo-cyan focus:ring-offset-2'
           )}
         >
           <FaShareAlt size={18} />

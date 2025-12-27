@@ -1,9 +1,9 @@
 'use client';
 
-import React, { useCallback, useMemo } from 'react';
+import React, { useCallback, useMemo, useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { QRCodeSVG } from 'qrcode.react';
-import { FaCopy, FaWhatsapp, FaTrophy, FaFire } from 'react-icons/fa';
+import { FaCopy, FaWhatsapp, FaTrophy, FaFire, FaCheck, FaSpinner } from 'react-icons/fa';
 import { Dialog, DialogContent, DialogTitle } from '../ui/dialog';
 import { cn } from '@/lib/utils';
 import { getJoinUrl, copyJoinUrl, shareViaWhatsApp, generatePersonalizedShareMessage, type GameResultForShare } from '@/utils/share';
@@ -52,6 +52,26 @@ const UnifiedShareModal: React.FC<UnifiedShareModalProps> = ({
   const { canNativeShare, nativeShare } = useNativeShare();
   const isPostGame = context === 'post-game';
   const joinUrl = getJoinUrl(gameCode, isPostGame ? 'share-win' : 'modal-share');
+  const [copied, setCopied] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+
+  // Keyboard shortcut: Cmd/Ctrl+C to copy link when modal is open
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'c' && !window.getSelection()?.toString()) {
+        e.preventDefault();
+        copyJoinUrl(gameCode, t, isPostGame ? 'share-win-copy' : 'copy').then(() => {
+          setCopied(true);
+          setTimeout(() => setCopied(false), 2000);
+        });
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, gameCode, t, isPostGame]);
 
   // Generate share message for post-game context
   const shareMessage = useMemo(() => {
@@ -62,7 +82,15 @@ const UnifiedShareModal: React.FC<UnifiedShareModalProps> = ({
   }, [isPostGame, gameResult, gameCode, language, joinUrl, t]);
 
   const handleCopyLink = useCallback(async () => {
+    setIsLoading(true);
     await copyJoinUrl(gameCode, t, isPostGame ? 'share-win-copy' : 'copy');
+    setIsLoading(false);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+    // Haptic feedback on mobile
+    if (navigator.vibrate) {
+      navigator.vibrate(50);
+    }
   }, [gameCode, t, isPostGame]);
 
   const handleWhatsApp = useCallback(() => {
@@ -156,27 +184,28 @@ const UnifiedShareModal: React.FC<UnifiedShareModalProps> = ({
             </motion.div>
           )}
 
-          {/* QR Code - Prominent (hidden on mobile for post-game) */}
+          {/* QR Code - Hidden on mobile, visible on desktop */}
           <motion.div
             initial={{ scale: 0.9, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={{ delay: 0.1 }}
-            className={cn(
-              'flex flex-col items-center',
-              isPostGame && 'hidden sm:flex' // Hide QR on mobile for post-game
-            )}
+            className="hidden sm:flex flex-col items-center"
           >
-            <div className="bg-white text-neo-black p-4 rounded-neo border-3 border-neo-black shadow-hard-md">
+            <p className="text-xs font-bold text-white/70 uppercase tracking-wide mb-2">
+              {t('share.scanToJoin') || 'Scan to join'}
+            </p>
+            <div
+              className="bg-white text-neo-black p-5 rounded-neo border-3 border-neo-black shadow-hard-md"
+              role="img"
+              aria-label={`QR code to join game ${gameCode}`}
+            >
               <QRCodeSVG
                 value={joinUrl}
-                size={isPostGame ? 140 : 180}
+                size={160}
                 level="H"
                 includeMargin={false}
               />
             </div>
-            <p className="text-xs text-white/70 mt-2 text-center">
-              {t('share.scanQR')}
-            </p>
           </motion.div>
 
           {/* Room Code Display */}
@@ -193,10 +222,14 @@ const UnifiedShareModal: React.FC<UnifiedShareModalProps> = ({
             </div>
             <button
               onClick={handleCopyLink}
-              className="bg-neo-cyan text-neo-black border-2 border-neo-black rounded-neo p-2 shadow-hard-sm hover:shadow-hard-md hover:-translate-y-0.5 transition-all"
-              title={t('share.copyLink')}
+              className={cn(
+                'border-2 border-neo-black rounded-neo p-3 min-w-[44px] min-h-[44px] flex items-center justify-center shadow-hard-sm hover:shadow-hard-md hover:-translate-y-0.5 transition-all focus:outline-none focus:ring-2 focus:ring-neo-yellow focus:ring-offset-2',
+                copied ? 'bg-neo-lime' : 'bg-neo-cyan'
+              )}
+              aria-label={copied ? t('share.linkCopied') : t('share.copyLink')}
+              title={copied ? t('share.linkCopied') : t('share.copyLink')}
             >
-              <FaCopy className="text-neo-black" />
+              {copied ? <FaCheck className="text-neo-black" /> : <FaCopy className="text-neo-black" />}
             </button>
           </motion.div>
 
@@ -213,17 +246,27 @@ const UnifiedShareModal: React.FC<UnifiedShareModalProps> = ({
               animate={{ scale: 1, opacity: 1 }}
               transition={{ delay: 0.35 }}
               onClick={handleCopyLink}
+              disabled={isLoading}
+              aria-label={copied ? t('share.linkCopied') : t('share.copyLink')}
               className={cn(
                 'w-full flex items-center justify-center gap-2 p-4 rounded-neo',
-                'border-3 border-neo-black shadow-hard-md',
-                'hover:shadow-hard-lg hover:-translate-y-1 active:shadow-hard-sm active:translate-y-0',
+                'border-4 border-neo-black shadow-hard-lg',
+                'hover:shadow-hard-xl hover:-translate-y-1 active:shadow-hard-sm active:translate-y-0',
                 'transition-all duration-150',
-                'font-black text-base uppercase tracking-wide',
-                'bg-neo-yellow text-neo-black'
+                'font-black text-lg uppercase tracking-wide',
+                copied ? 'bg-neo-lime text-neo-black' : 'bg-neo-yellow text-neo-black',
+                'focus:outline-none focus:ring-4 focus:ring-neo-cyan focus:ring-offset-2',
+                'disabled:opacity-70 disabled:cursor-not-allowed'
               )}
             >
-              <FaCopy className="text-lg" />
-              <span>{t('share.copyLink')}</span>
+              {isLoading ? (
+                <FaSpinner className="text-lg animate-spin" />
+              ) : copied ? (
+                <FaCheck className="text-lg" />
+              ) : (
+                <FaCopy className="text-lg" />
+              )}
+              <span>{copied ? t('share.linkCopied') : t('share.copyLink')}</span>
             </motion.button>
 
             {/* Secondary: WhatsApp - Full Width */}
@@ -232,13 +275,15 @@ const UnifiedShareModal: React.FC<UnifiedShareModalProps> = ({
               animate={{ scale: 1, opacity: 1 }}
               transition={{ delay: 0.4 }}
               onClick={handleWhatsApp}
+              aria-label={t('share.whatsapp')}
               className={cn(
                 'w-full flex items-center justify-center gap-2 p-3 rounded-neo',
                 'border-2 border-neo-black shadow-hard-sm',
                 'hover:shadow-hard-md hover:-translate-y-0.5 active:shadow-none active:translate-y-0',
                 'transition-all duration-150',
                 'font-bold text-sm uppercase tracking-wide',
-                'bg-[#25D366] text-white'
+                'bg-[#25D366] text-black',
+                'focus:outline-none focus:ring-2 focus:ring-neo-yellow focus:ring-offset-2'
               )}
             >
               <FaWhatsapp className="text-lg" />
@@ -252,12 +297,14 @@ const UnifiedShareModal: React.FC<UnifiedShareModalProps> = ({
                 animate={{ scale: 1, opacity: 1 }}
                 transition={{ delay: 0.45 }}
                 onClick={handleNativeShare}
+                aria-label={t('share.more') || 'More Options'}
                 className={cn(
                   'w-full sm:hidden flex items-center justify-center gap-2 p-3 rounded-neo',
                   'border-2 border-white/30 shadow-hard-sm',
                   'hover:shadow-hard-md hover:-translate-y-0.5 transition-all',
                   'font-bold text-sm uppercase tracking-wide',
-                  'bg-white/10 text-white hover:bg-white/20'
+                  'bg-white/10 text-white hover:bg-white/20',
+                  'focus:outline-none focus:ring-2 focus:ring-neo-cyan focus:ring-offset-2'
                 )}
               >
                 <span>{t('share.more') || 'More Options...'}</span>
