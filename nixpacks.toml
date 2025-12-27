@@ -5,14 +5,16 @@ aptPkgs = []
 [phases.install]
 dependsOn = ['setup']
 cmds = [
-    'cd fe-next && npm install --no-audit --no-fund --loglevel=error'
+    'cd fe-next',
+    'npm install --prefer-offline --no-audit --no-fund --loglevel=error'
 ]
 cacheDirectories = ['fe-next/node_modules', 'fe-next/.next/cache', 'fe-next/.next/standalone']
 
 [phases.build]
 dependsOn = ['install']
 cmds = [
-    'cd fe-next && NODE_ENV=production npm run build --loglevel=error'
+    'cd fe-next',
+    'NODE_ENV=production npm run build --loglevel=error'
 ]
 
 [start]
