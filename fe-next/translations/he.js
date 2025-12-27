@@ -139,7 +139,8 @@ const he = {
     "retry": "נסה שוב",
     "newGame": "משחק חדש",
     "join": "הצטרף",
-    "showLess": "הצג פחות"
+    "showLess": "הצג פחות",
+    "or": "או"
   },
   "theme": {
     "sundayFunday": "יום ראשון כיפי",
@@ -295,7 +296,8 @@ const he = {
     "telegram": "טלגרם",
     "more": "עוד...",
     "inviteTitle": "הצטרפו למשחק LexiClash שלי!",
-    "copied": "הועתק!"
+    "copied": "הועתק!",
+    "shareVictory": "שתפו את הניצחון שלכם!"
   },
   "errors": {
     "unstableConnection": "חיבור האינטרנט לא יציב - ייתכנו בעיות במשחק",
@@ -409,6 +411,7 @@ const he = {
     "nickname": "כינוי",
     "nicknamePlaceholder": "הכנס את הכינוי שלך",
     "roomCode": "קוד חדר",
+    "changeAvatar": "שנה אווטאר",
     "defaultPlayerNames": [
       "מלפפון חמקמק",
       "תפוח אדמה דיסקו",
@@ -607,7 +610,8 @@ const he = {
     "hostPlaysShort": "המארח משחק",
     "hostSpectates": "צופה",
     "letters": "אותיות",
-    "players": "שחקנים"
+    "players": "שחקנים",
+    "letterMinimum": "אותיות מינימום"
   },
   "playerView": {
     "waitingForHost": "ממתין למארח שיתחיל...",
@@ -618,6 +622,9 @@ const he = {
     "wordsFound": "מילים שנמצאו",
     "wordsOnBoard": "מילים על הלוח",
     "wordsRemaining": "מילים נותרו",
+    "longWordsLabel": "{{min}}+ אותיות",
+    "longWordsOnBoard": "מילים עם {{min}}+ אותיות",
+    "longWordsRemaining": "מילים עם {{min}}+ אותיות נותרו",
     "remaining": "נותר",
     "found": "נמצאו",
     "total": "סה\"כ",
@@ -638,6 +645,9 @@ const he = {
     "players": "שחקנים",
     "yourAchievements": "ההישגים שלך",
     "letterGrid": "לוח האותיות",
+    "longWordsLabel": "${min}+ אותיות",
+    "longWordsOnBoard": "מילים עם ${min}+ אותיות",
+    "longWordsRemaining": "מילים עם ${min}+ אותיות נותרו",
     "waitingForGame": "ממתין למשחק...",
     "add": "הוסף",
     "enterWord": "הזן מילה...",
@@ -686,7 +696,10 @@ const he = {
     "words": "מילים",
     "alreadyFound": "כבר נמצא",
     "invalidWord": "מילה לא חוקית",
-    "pendingValidation": "ממתין לאימות"
+    "pendingValidation": "ממתין לאימות",
+    "longWordsLabel": "${min}+ אותיות",
+    "longWordsOnBoard": "מילים עם ${min}+ אותיות",
+    "longWordsRemaining": "מילים של ${min}+ אותיות נותרו"
   },
   "lateJoiner": {
     "welcomeTitle": "!המשחק כבר התחיל",
@@ -718,6 +731,7 @@ const he = {
     "loading": "מקבל רמז...",
     "noHints": "אין רמזים נותרים",
     "noWordsLeft": "!אין עוד מילים למצוא",
+    "noLongWordsLeft": "!אין עוד מילים של 5+ אותיות למצוא",
     "lookFor": "חפש מילה בת",
     "letterWord": "אותיות",
     "letters": "אותיות",
@@ -728,7 +742,8 @@ const he = {
     "vowels": "תנועות",
     "withDoubles": "עם אותיות כפולות",
     "longerWord": "מילה ארוכה יותר",
-    "shortWord": "מילה קצרה"
+    "shortWord": "מילה קצרה",
+    "noLongWordsLeft": "אין עוד מילים עם 5+ אותיות למצוא!"
   },
   "achievementPopup": {
     "unlocked": "הישג נפתח!",
@@ -1637,7 +1652,8 @@ const he = {
     "backToRoom": "חזרה לחדר",
     "backToLobby": "חזרה ללובי",
     "locked": "נעול",
-    "earnThisAchievement": "שחק משחקים כדי לפתוח את ההישג הזה!"
+    "earnThisAchievement": "שחק משחקים כדי לפתוח את ההישג הזה!",
+    "connectedAccount": "מחובר עם החשבון שלך"
   },
   "leaderboard": {
     "title": "טבלת מובילים",
@@ -1802,7 +1818,38 @@ const he = {
     "aiOpponents": "יריבי AI",
     "autoFillDesc": "ממלא את החדר ב-{count} יריבי AI",
     "addBotsPrompt": "הוסף יריבי AI להתחרות נגדם!",
-    "addBotsHint": "השתמש במילוי אוטומטי או לחץ על הכפתורים למעלה"
+    "addBotsHint": "השתמש במילוי אוטומטי או לחץ על הכפתורים למעלה",
+    "preset": {
+      "recommended": "מומלץ",
+      "tapToPlay": "הקש לשחק",
+      "customGame": "משחק מותאם אישית",
+      "hint": "הקש על כל הגדרה מוכנה לשחק מיידית, או התאם את המשחק",
+      "quickStart": "התחלה מהירה",
+      "quick": "משחק מהיר",
+      "quickDesc": "משחק דקה על לוח קטן",
+      "standard": "רגיל",
+      "standardDesc": "חוויית בוגל קלאסית",
+      "intense": "אינטנסיבי",
+      "intenseDesc": "לוח גדול, יותר זמן, תחרות קשה יותר",
+      "friendly": "משחק ידידותי",
+      "friendlyDesc": "משחק רגוע עם יריבים קלים",
+      "competitive": "תחרותי",
+      "competitiveDesc": "אתגר מאוזן נגד בוטים מיומנים",
+      "battle": "קרב מלוכות",
+      "battleDesc": "מבחן אולטימטיבי נגד בוטים מומחים",
+      "explorer": "חוקר אותיות",
+      "explorerDesc": "לוח קטן, קח את הזמן שלך",
+      "hunter": "צייד מילים",
+      "hunterDesc": "מצא את כל המילים בקצב שלך",
+      "mastery": "שליטה באוצר מילים",
+      "masteryDesc": "לוח גדול לתרגול מקיף",
+      "warmup": "חימום יומי",
+      "warmupDesc": "חימום מהיר לשבירת השיא שלך",
+      "personalBest": "שיא אישי",
+      "personalBestDesc": "אתגר רגיל - עקוב אחר ההתקדמות",
+      "ultra": "אתגר אולטימטיבי",
+      "ultraDesc": "אתגר השיא הגבוה האולטימטיבי"
+    }
   },
   "landscape": {
     "tutorialTitle": "פקדי מסך רחב",

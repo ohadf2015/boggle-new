@@ -30,6 +30,7 @@ import type { SinglePlayerGameState, SinglePlayerMode, BotOpponent } from './Sin
 interface SinglePlayerLobbyProps {
   initialSettings: SinglePlayerGameState;
   onStartGame: (settings: Partial<SinglePlayerGameState>) => void;
+  onBack?: () => void; // Back to preset selection
 }
 
 type BotDifficulty = 'easy' | 'medium' | 'hard';
@@ -83,6 +84,7 @@ const BOT_DIFFICULTY_CONFIG: Record<BotDifficulty, { labelKey: string; color: st
 const SinglePlayerLobby: React.FC<SinglePlayerLobbyProps> = ({
   initialSettings,
   onStartGame,
+  onBack,
 }) => {
   const { t, language: currentLanguage } = useLanguage();
   const router = useRouter();
@@ -180,14 +182,23 @@ const SinglePlayerLobby: React.FC<SinglePlayerLobbyProps> = ({
         <div className="w-[40%] flex flex-col gap-3 overflow-y-auto">
           {/* Header with back */}
           <div className="flex items-center gap-3">
-            <Link
-              href="/"
-              className="w-12 h-12 min-w-[48px] min-h-[48px] flex items-center justify-center rounded-neo border-3 border-neo-black bg-neo-cream shadow-hard hover:shadow-hard-lg transition-all"
-            >
-              <FaArrowLeft className="text-sm text-neo-black" />
-            </Link>
+            {onBack ? (
+              <button
+                onClick={onBack}
+                className="w-12 h-12 min-w-[48px] min-h-[48px] flex items-center justify-center rounded-neo border-3 border-neo-black bg-neo-cream shadow-hard hover:shadow-hard-lg transition-all"
+              >
+                <FaArrowLeft className="text-sm text-neo-black rtl:rotate-180" />
+              </button>
+            ) : (
+              <Link
+                href="/"
+                className="w-12 h-12 min-w-[48px] min-h-[48px] flex items-center justify-center rounded-neo border-3 border-neo-black bg-neo-cream shadow-hard hover:shadow-hard-lg transition-all"
+              >
+                <FaArrowLeft className="text-sm text-neo-black rtl:rotate-180" />
+              </Link>
+            )}
             <h1 className="text-xl font-black uppercase text-neo-white flex-1">
-              {t('landing.singlePlayer') || 'Single Player'}
+              {t('singlePlayer.preset.customGame') || 'Custom Game'}
             </h1>
           </div>
 
@@ -406,15 +417,25 @@ const SinglePlayerLobby: React.FC<SinglePlayerLobbyProps> = ({
       >
       {/* Title with back button */}
       <div className="relative flex items-center justify-center mb-1">
-        <Link
-          href="/"
-          className="absolute start-0 flex items-center gap-2 px-3 py-2 rounded-neo border-3 border-neo-black dark:border-slate-600 bg-neo-cream dark:bg-slate-700 shadow-hard hover:shadow-hard-lg hover:translate-x-[-2px] hover:translate-y-[-2px] active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-pressed transition-all text-neo-black dark:text-neo-white text-sm font-bold min-h-[44px] min-w-[44px]"
-        >
-          <FaArrowLeft className="w-5 h-5 rtl:rotate-180" />
-          <span className="hidden sm:inline">{t('common.back') || 'Back'}</span>
-        </Link>
+        {onBack ? (
+          <button
+            onClick={onBack}
+            className="absolute start-0 flex items-center gap-2 px-3 py-2 rounded-neo border-3 border-neo-black dark:border-slate-600 bg-neo-cream dark:bg-slate-700 shadow-hard hover:shadow-hard-lg hover:translate-x-[-2px] hover:translate-y-[-2px] active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-pressed transition-all text-neo-black dark:text-neo-white text-sm font-bold min-h-[44px] min-w-[44px]"
+          >
+            <FaArrowLeft className="w-5 h-5 rtl:rotate-180" />
+            <span className="hidden sm:inline">{t('common.back') || 'Back'}</span>
+          </button>
+        ) : (
+          <Link
+            href="/"
+            className="absolute start-0 flex items-center gap-2 px-3 py-2 rounded-neo border-3 border-neo-black dark:border-slate-600 bg-neo-cream dark:bg-slate-700 shadow-hard hover:shadow-hard-lg hover:translate-x-[-2px] hover:translate-y-[-2px] active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-pressed transition-all text-neo-black dark:text-neo-white text-sm font-bold min-h-[44px] min-w-[44px]"
+          >
+            <FaArrowLeft className="w-5 h-5 rtl:rotate-180" />
+            <span className="hidden sm:inline">{t('common.back') || 'Back'}</span>
+          </Link>
+        )}
         <h1 className="text-2xl sm:text-3xl font-black uppercase text-center text-neo-black dark:text-neo-white">
-          {t('landing.singlePlayer') || 'Single Player'}
+          {t('singlePlayer.preset.customGame') || 'Custom Game'}
         </h1>
       </div>
 

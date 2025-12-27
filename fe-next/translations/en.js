@@ -74,6 +74,7 @@ const en = {
     "next": "Next",
     "confirm": "Confirm",
     "cancel": "Cancel",
+    "or": "or",
     "dismiss": "Dismiss",
     "selectUILanguage": "Interface Language",
     "close": "Close",
@@ -139,7 +140,8 @@ const en = {
     "resume": "Resume",
     "newGame": "New Game",
     "join": "Join",
-    "showLess": "Show less"
+    "showLess": "Show less",
+    "or": "or"
   },
   "theme": {
     "sundayFunday": "Sunday Funday",
@@ -295,7 +297,8 @@ const en = {
     "telegram": "Telegram",
     "more": "More...",
     "inviteTitle": "Join my LexiClash game!",
-    "copied": "Copied!"
+    "copied": "Copied!",
+    "shareVictory": "Share Your Victory!"
   },
   "errors": {
     "unstableConnection": "Internet connection is unstable - you may experience issues during the game",
@@ -409,6 +412,7 @@ const en = {
     "nickname": "Nickname",
     "nicknamePlaceholder": "Enter your nickname",
     "roomCode": "Room Code",
+    "changeAvatar": "Change avatar",
     "defaultPlayerNames": [
       "Sneaky Pickle",
       "Disco Potato",
@@ -609,7 +613,8 @@ const en = {
     "hostPlaysShort": "Host plays",
     "hostSpectates": "Spectating",
     "letters": "letters",
-    "players": "players"
+    "players": "players",
+    "letterMinimum": "letter minimum"
   },
   "playerView": {
     "waitingForHost": "Waiting for host to start...",
@@ -620,6 +625,9 @@ const en = {
     "wordsFound": "Words Found",
     "wordsOnBoard": "Words on Board",
     "wordsRemaining": "words remaining",
+    "longWordsLabel": "{{min}}+ letters",
+    "longWordsOnBoard": "{{min}}+ Letter Words",
+    "longWordsRemaining": "{{min}}+ letter words left",
     "remaining": "Left",
     "found": "found",
     "total": "total",
@@ -641,6 +649,9 @@ const en = {
     "players": "Players",
     "yourAchievements": "Your Achievements",
     "letterGrid": "Letter Grid",
+    "longWordsLabel": "${min}+ letters",
+    "longWordsOnBoard": "${min}+ Letter Words",
+    "longWordsRemaining": "${min}+ letter words left",
     "waitingForGame": "Waiting for game...",
     "add": "Add",
     "enterWord": "Enter word...",
@@ -689,7 +700,10 @@ const en = {
     "words": "Words",
     "alreadyFound": "Already found",
     "invalidWord": "Invalid word",
-    "pendingValidation": "Pending validation"
+    "pendingValidation": "Pending validation",
+    "longWordsLabel": "${min}+ letters",
+    "longWordsOnBoard": "${min}+ Letter Words",
+    "longWordsRemaining": "${min}+ letter words left"
   },
   "lateJoiner": {
     "welcomeTitle": "Game in Progress!",
@@ -721,6 +735,7 @@ const en = {
     "loading": "Getting hint...",
     "noHints": "No hints left",
     "noWordsLeft": "No more words to find!",
+    "noLongWordsLeft": "No more 5+ letter words to find!",
     "lookFor": "Look for a",
     "letterWord": "letter word",
     "letters": "letters",
@@ -1640,7 +1655,8 @@ const en = {
     "backToRoom": "Back to Room",
     "backToLobby": "Back to Lobby",
     "locked": "Locked",
-    "earnThisAchievement": "Play games to unlock this achievement!"
+    "earnThisAchievement": "Play games to unlock this achievement!",
+    "connectedAccount": "Connected with your account"
   },
   "leaderboard": {
     "title": "Leaderboard",
@@ -1805,7 +1821,38 @@ const en = {
     "aiOpponents": "AI Opponents",
     "autoFillDesc": "Fills room with {count} AI opponents",
     "addBotsPrompt": "Add AI opponents to compete against!",
-    "addBotsHint": "Use auto-fill or click the buttons above"
+    "addBotsHint": "Use auto-fill or click the buttons above",
+    "preset": {
+      "recommended": "Best",
+      "tapToPlay": "Tap to play",
+      "customGame": "Custom Game Setup",
+      "hint": "Tap any preset for instant play, or customize your game",
+      "quickStart": "Quick Start",
+      "quick": "Quick Play",
+      "quickDesc": "Fast 1-minute game on small board",
+      "standard": "Standard",
+      "standardDesc": "Classic Boggle experience",
+      "intense": "Intense",
+      "intenseDesc": "Large board, more time, harder competition",
+      "friendly": "Friendly Match",
+      "friendlyDesc": "Relaxed game with easy opponents",
+      "competitive": "Competitive",
+      "competitiveDesc": "Balanced challenge against skilled bots",
+      "battle": "Battle Royale",
+      "battleDesc": "Ultimate test against expert bots",
+      "explorer": "Letter Explorer",
+      "explorerDesc": "Small board, take your time",
+      "hunter": "Word Hunter",
+      "hunterDesc": "Find all words at your own pace",
+      "mastery": "Vocabulary Mastery",
+      "masteryDesc": "Large board for extensive practice",
+      "warmup": "Daily Warmup",
+      "warmupDesc": "Quick warm-up to beat your record",
+      "personalBest": "Personal Best",
+      "personalBestDesc": "Standard challenge - track your progress",
+      "ultra": "Ultra Challenge",
+      "ultraDesc": "Ultimate high score challenge"
+    }
   },
   "landscape": {
     "tutorialTitle": "Landscape Controls",

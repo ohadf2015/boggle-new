@@ -1,18 +1,29 @@
 'use client';
 
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo, useEffect, useCallback } from 'react';
+import { useRouter } from 'next/navigation';
 import AutoHideHeader from '@/components/AutoHideHeader';
+import PresetSelector from './PresetSelector';
 import SinglePlayerLobby from './SinglePlayerLobby';
 import SinglePlayerGame from './SinglePlayerGame';
 import SinglePlayerResults from './SinglePlayerResults';
-import { getHighScore, recordGameResult } from './highScoreManager';
+import { getHighScore, recordGameResult, getAllTimeBest } from './highScoreManager';
 import { useGameMusic, type GamePhase } from '@/hooks/useGameMusic';
 import { useMobileLandscape } from '@/hooks/useMobileLandscape';
 import { useLanguage } from '@/contexts/LanguageContext';
+import {
+  getPuzzleNumber,
+  getDailyChallengeDate,
+  hasPlayedToday,
+  getDailyStreak,
+  getSecondsUntilNextDaily,
+  formatCountdown,
+} from '@/utils/dailyChallenge';
+import type { PresetConfig } from './presetConfig';
 import type { DifficultyLevel, Language, LetterGrid } from '@/shared/types/game';
 
 export type SinglePlayerMode = 'solo-bots' | 'practice' | 'challenge' | 'daily';
-export type SinglePlayerPhase = 'lobby' | 'playing' | 'results';
+export type SinglePlayerPhase = 'preset-selection' | 'lobby' | 'playing' | 'results';
 
 export interface BotOpponent {
   id: string;
@@ -76,11 +87,42 @@ const DEFAULT_MEDIUM_BOT: BotOpponent = {
   wordsFound: [],
 };
 
+const BOT_NAMES = [
+  'WordBot', 'LexiBot', 'AlphaBot', 'BrainBot', 'SpeedBot',
+  'CleverBot', 'QuickBot', 'SmartBot', 'ProBot', 'MasterBot'
+];
+
 const SinglePlayerView: React.FC = () => {
   const { language: uiLanguage } = useLanguage();
-  const [phase, setPhase] = useState<SinglePlayerPhase>('lobby');
+  const router = useRouter();
+  const [phase, setPhase] = useState<SinglePlayerPhase>('preset-selection');
   const isMobileLandscape = useMobileLandscape();
   const [isAnyLandscape, setIsAnyLandscape] = useState(false);
+
+  // Daily challenge state
+  const [dailyPuzzleNumber, setDailyPuzzleNumber] = useState<number>(0);
+  const [hasPlayedDaily, setHasPlayedDaily] = useState<boolean>(false);
+  const [dailyStreak, setDailyStreak] = useState<number>(0);
+  const [dailyCountdown, setDailyCountdown] = useState<string>('');
+
+  // Initialize daily challenge info
+  useEffect(() => {
+    const date = getDailyChallengeDate();
+    setDailyPuzzleNumber(getPuzzleNumber(date));
+    setHasPlayedDaily(hasPlayedToday(uiLanguage as Language));
+    setDailyStreak(getDailyStreak().currentStreak);
+  }, [uiLanguage]);
+
+  // Update countdown timer
+  useEffect(() => {
+    const updateCountdown = () => {
+      const seconds = getSecondsUntilNextDaily();
+      setDailyCountdown(formatCountdown(seconds));
+    };
+    updateCountdown();
+    const interval = setInterval(updateCountdown, 1000);
+    return () => clearInterval(interval);
+  }, []);
 
   // Track landscape orientation for ALL screen sizes (not just mobile)
   useEffect(() => {
@@ -105,14 +147,17 @@ const SinglePlayerView: React.FC = () => {
     difficulty: 'MEDIUM',
     language: (uiLanguage as Language) || 'en',
     grid: null,
-    timerSeconds: 60, // 1 minute default
+    timerSeconds: 120, // 2 minutes default (standard preset)
     bots: [DEFAULT_MEDIUM_BOT],
   }));
   const [resultsData, setResultsData] = useState<SinglePlayerResultsData | null>(null);
 
+  // Get challenge high score info
+  const challengeHighScore = useMemo(() => getAllTimeBest(), []);
+
   // Map SinglePlayerPhase to GamePhase for the music hook
   // 'playing' phase music is handled by SinglePlayerGame component
-  const musicPhase: GamePhase = phase === 'playing' ? 'waiting' : phase;
+  const musicPhase: GamePhase = phase === 'playing' ? 'waiting' : (phase === 'preset-selection' ? 'lobby' : phase);
 
   // Use shared music hook for lobby and results phases
   // Playing phase is handled by SinglePlayerGame for timer-based transitions
@@ -126,6 +171,64 @@ const SinglePlayerView: React.FC = () => {
     if (gameState.mode !== 'challenge') return null;
     return getHighScore(gameState.difficulty, gameState.timerSeconds);
   }, [gameState.mode, gameState.difficulty, gameState.timerSeconds]);
+
+  // Generate bots for a preset
+  const generateBots = useCallback((count: number, difficulty: 'easy' | 'medium' | 'hard'): BotOpponent[] => {
+    const bots: BotOpponent[] = [];
+    const availableNames = [...BOT_NAMES];
+
+    for (let i = 0; i < count && availableNames.length > 0; i++) {
+      const randomIndex = Math.floor(Math.random() * availableNames.length);
+      const botName = availableNames.splice(randomIndex, 1)[0];
+      bots.push({
+        id: `bot-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+        name: botName,
+        difficulty,
+        score: 0,
+        wordsFound: [],
+      });
+    }
+    return bots;
+  }, []);
+
+  // Handle preset selection - quick start with preset settings
+  const handleSelectPreset = useCallback((preset: PresetConfig) => {
+    // Daily mode redirects to the dedicated daily challenge page
+    if (preset.id === 'daily' || preset.modes.includes('daily')) {
+      router.push(`/${uiLanguage}/daily`);
+      return;
+    }
+
+    // Determine mode based on preset
+    let mode: SinglePlayerMode = 'solo-bots';
+    if (preset.settings.bots === 0 && preset.settings.timerSeconds === 0) {
+      mode = 'practice';
+    } else if (preset.settings.bots === 0 && preset.settings.timerSeconds > 0) {
+      mode = 'challenge';
+    }
+
+    // Generate bots if needed
+    const bots = preset.settings.bots > 0
+      ? generateBots(preset.settings.bots, preset.settings.botDifficulty)
+      : [];
+
+    // Set game state and start immediately
+    setGameState(prev => ({
+      ...prev,
+      mode,
+      difficulty: preset.settings.difficulty,
+      timerSeconds: preset.settings.timerSeconds,
+      bots,
+      language: uiLanguage as Language,
+      grid: null,
+    }));
+    setPhase('playing');
+  }, [uiLanguage, router, generateBots]);
+
+  // Handle custom game - go to detailed lobby
+  const handleCustomGame = useCallback(() => {
+    setPhase('lobby');
+  }, []);
 
   const handleStartGame = (settings: Partial<SinglePlayerGameState>) => {
     setGameState(prev => ({ ...prev, ...settings }));
@@ -159,7 +262,7 @@ const SinglePlayerView: React.FC = () => {
 
   const handlePlayAgain = () => {
     setResultsData(null);
-    setPhase('lobby');
+    setPhase('preset-selection');
   };
 
   // Quick rematch - immediately start a new game with same settings
@@ -173,21 +276,46 @@ const SinglePlayerView: React.FC = () => {
 
   const handleBackToLobby = () => {
     setResultsData(null);
-    setPhase('lobby');
+    setPhase('preset-selection');
+  };
+
+  // Back from custom lobby to preset selection
+  const handleBackToPresets = () => {
+    setPhase('preset-selection');
   };
 
   // Hide header completely in ANY landscape mode during gameplay (desktop or mobile)
-  const showHeader = !(phase === 'playing' && isAnyLandscape);
+  const showHeader = !(phase === 'playing' && isAnyLandscape) && phase !== 'preset-selection';
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-50 via-slate-100 to-slate-200 dark:from-neo-navy dark:via-neo-navy-light dark:to-neo-navy">
       {showHeader && <AutoHideHeader />}
 
       <main className="max-w-6xl mx-auto px-2 xs:px-4 sm:px-6 py-8 landscape-content overflow-x-hidden">
+        {phase === 'preset-selection' && (
+          <PresetSelector
+            onSelectPreset={handleSelectPreset}
+            onCustomGame={handleCustomGame}
+            dailyInfo={{
+              puzzleNumber: dailyPuzzleNumber,
+              hasPlayedToday: hasPlayedDaily,
+              streak: dailyStreak,
+              countdown: dailyCountdown,
+            }}
+            challengeInfo={{
+              highScore: challengeHighScore?.score || null,
+              wordCount: challengeHighScore?.wordCount,
+              longestWord: challengeHighScore?.longestWord,
+            }}
+            currentLanguage={uiLanguage as Language}
+          />
+        )}
+
         {phase === 'lobby' && (
           <SinglePlayerLobby
             initialSettings={gameState}
             onStartGame={handleStartGame}
+            onBack={handleBackToPresets}
           />
         )}
 
