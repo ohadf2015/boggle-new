@@ -233,6 +233,11 @@ module.exports = {
           "25%": { transform: "translateX(-4px) rotate(-1deg)" },
           "75%": { transform: "translateX(4px) rotate(1deg)" },
         },
+        // Subtle pulse for CTA buttons
+        "pulse-subtle": {
+          "0%, 100%": { transform: "scale(1)", boxShadow: "6px 6px 0px rgb(var(--neo-black))" },
+          "50%": { transform: "scale(1.02)", boxShadow: "8px 8px 0px rgb(var(--neo-black))" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
@@ -245,6 +250,7 @@ module.exports = {
         "neo-pop": "neo-pop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards",
         "neo-slide-in": "neo-slide-in 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards",
         "neo-shake": "neo-shake 0.4s ease-in-out",
+        "pulse-subtle": "pulse-subtle 2s ease-in-out infinite",
       },
       // Custom rotation values for tilts
       rotate: {

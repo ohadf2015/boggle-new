@@ -1,6 +1,6 @@
 import React, { useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FaClock, FaUsers, FaQrcode, FaWhatsapp, FaLink, FaCog, FaPlus, FaMinus, FaCrown, FaChevronDown, FaChevronUp, FaTrophy, FaRobot, FaSignOutAlt } from 'react-icons/fa';
+import { FaClock, FaUsers, FaQrcode, FaWhatsapp, FaLink, FaCog, FaPlus, FaMinus, FaCrown, FaChevronDown, FaChevronUp, FaTrophy, FaRobot, FaSignOutAlt, FaPlay } from 'react-icons/fa';
 import { Button } from '../../components/ui/button';
 import { Card } from '../../components/ui/card';
 import { Badge } from '../../components/ui/badge';
@@ -562,14 +562,27 @@ const HostPreGameView: React.FC<HostPreGameViewProps> = ({
               )}
             </AnimatePresence>
 
-            {/* Start Button */}
-            <div className="pt-1 flex justify-center">
+            {/* Start Button - Made prominent with larger size and animation */}
+            <div className="pt-3 flex justify-center">
               <Button
                 onClick={onStartGame}
                 disabled={!timerValue || playersReady.length === 0 || tournamentCreating}
-                className="w-full max-w-xs h-10 text-sm bg-neo-lime text-neo-black font-black"
+                className={cn(
+                  "w-full max-w-sm h-14 text-lg bg-neo-lime text-neo-black font-black border-4 border-neo-black shadow-hard-lg",
+                  "hover:shadow-hard-xl hover:-translate-y-1 transition-all duration-200",
+                  "disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none disabled:translate-y-0",
+                  // Pulsing animation when enabled and players are ready
+                  !tournamentCreating && playersReady.length > 0 && timerValue && "animate-pulse-subtle"
+                )}
+                aria-label={`${t('hostView.startGame')} - ${playersReady.length} ${playersReady.length === 1 ? 'player' : 'players'} ready`}
               >
-                {tournamentCreating ? t('hostView.creatingTournament') || 'Creating...' : t('hostView.startGame')}
+                <span className="flex items-center gap-2">
+                  <FaPlay className="text-neo-black" />
+                  {tournamentCreating
+                    ? t('hostView.creatingTournament') || 'Creating...'
+                    : `${t('hostView.startGame')} (${playersReady.length})`
+                  }
+                </span>
               </Button>
             </div>
           </div>
@@ -602,8 +615,14 @@ const HostPreGameView: React.FC<HostPreGameViewProps> = ({
                   >
                     <div
                       className={cn(
-                        "flex items-center justify-between px-2.5 py-1.5 rounded-lg transition-colors",
-                        "bg-white/5 hover:bg-white/10"
+                        "flex items-center justify-between px-3 py-2 rounded-lg transition-all duration-200",
+                        "border-2 border-white/20",
+                        // Higher contrast backgrounds for better visibility
+                        isHostPlayer
+                          ? "bg-neo-yellow/15 border-neo-yellow/40 hover:bg-neo-yellow/20"
+                          : isBot
+                            ? "bg-neo-cyan/10 border-neo-cyan/30 hover:bg-neo-cyan/15"
+                            : "bg-white/10 hover:bg-white/15 hover:border-white/30"
                       )}
                     >
                       <div className="flex items-center gap-2.5">

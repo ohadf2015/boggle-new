@@ -62,10 +62,11 @@ const ShareButton: React.FC<ShareButtonProps> = ({
     },
   };
 
+  // WCAG 2.1 AA: Minimum touch target 44x44px
   const sizeStyles = {
-    sm: 'px-2.5 py-1.5 text-xs gap-1',
-    md: 'px-3 py-2 text-sm gap-1.5',
-    lg: 'px-4 py-3 text-base gap-2',
+    sm: 'px-3 py-2 text-xs gap-1 min-h-[44px]',
+    md: 'px-4 py-2.5 text-sm gap-1.5 min-h-[48px]',
+    lg: 'px-5 py-3 text-base gap-2 min-h-[52px]',
   };
 
   const selectedVariant = variantStyles[variant] || variantStyles.primary;
