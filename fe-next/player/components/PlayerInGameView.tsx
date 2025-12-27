@@ -243,6 +243,7 @@ const PlayerInGameView = memo<PlayerInGameViewProps>(({
         // Player data
         foundWords={foundWords}
         leaderboard={leaderboard}
+        totalBoardWords={totalBoardWords}
 
         // Callbacks
         onExitRoom={onExitRoom}
@@ -262,9 +263,6 @@ const PlayerInGameView = memo<PlayerInGameViewProps>(({
 
         // Board theme
         boardTheme={boardTheme}
-
-        // Total board words for WordsRemaining display
-        totalBoardWords={totalBoardWords}
       />
 
       {/* Tournament Standings Modal */}

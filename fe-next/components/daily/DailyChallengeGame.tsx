@@ -376,12 +376,12 @@ const DailyChallengeGame: React.FC<DailyChallengeGameProps> = ({
         </span>
       </div>
 
-      {/* Help Button - Fixed position */}
+      {/* Help Button - Fixed at corner, not covering the board */}
       <HelpButton
         onClick={() => setIsHelpOpen(true)}
         className={isLandscape
-          ? "fixed top-4 right-4 z-30"
-          : "fixed bottom-24 right-4 z-40 safe-area-bottom"
+          ? "fixed top-2 right-2 z-30 w-9 h-9 opacity-70 hover:opacity-100"
+          : "fixed bottom-0 right-0 z-40 mb-[max(env(safe-area-inset-bottom),8px)] mr-2 w-10 h-10 opacity-70 hover:opacity-100"
         }
       />
 

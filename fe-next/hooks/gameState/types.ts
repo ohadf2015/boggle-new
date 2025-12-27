@@ -57,6 +57,7 @@ export interface GameStateValues {
   remainingTime: number | null;
   gameLanguage: Language | null;
   minWordLength: number;
+  totalBoardWords: number | null; // Total possible words on the board
 
   // Player state
   players: Player[];
@@ -86,9 +87,6 @@ export interface GameStateValues {
 
   // Board theme
   boardTheme: BoardTheme | null;
-
-  // Total words available on board
-  totalBoardWords: number | null;
 }
 
 // ==========================================
@@ -103,6 +101,7 @@ export type GameStateAction =
   | { type: 'UPDATE_REMAINING_TIME'; payload: (prev: number | null) => number | null }
   | { type: 'SET_GAME_LANGUAGE'; payload: Language | null | ((prev: Language | null) => Language | null) }
   | { type: 'SET_MIN_WORD_LENGTH'; payload: number | ((prev: number) => number) }
+  | { type: 'SET_TOTAL_BOARD_WORDS'; payload: number | null | ((prev: number | null) => number | null) }
   // Player actions
   | { type: 'SET_PLAYERS'; payload: Player[] | ((prev: Player[]) => Player[]) }
   | { type: 'UPDATE_PLAYER'; payload: { username: string; updates: Partial<Player> } }
@@ -133,8 +132,6 @@ export type GameStateAction =
   | { type: 'SET_LEVEL_UP_DATA'; payload: LevelUpPayload | null | ((prev: LevelUpPayload | null) => LevelUpPayload | null) }
   // Board theme actions
   | { type: 'SET_BOARD_THEME'; payload: BoardTheme | null | ((prev: BoardTheme | null) => BoardTheme | null) }
-  // Total board words actions
-  | { type: 'SET_TOTAL_BOARD_WORDS'; payload: number | null | ((prev: number | null) => number | null) }
   // Reset actions
   | { type: 'RESET_FOR_NEW_ROUND' }
   | { type: 'RESET_ALL' };
@@ -150,6 +147,7 @@ export interface GameStateActions {
   setRemainingTime: React.Dispatch<React.SetStateAction<number | null>>;
   setGameLanguage: React.Dispatch<React.SetStateAction<Language | null>>;
   setMinWordLength: React.Dispatch<React.SetStateAction<number>>;
+  setTotalBoardWords: React.Dispatch<React.SetStateAction<number | null>>;
 
   // Player actions
   setPlayers: React.Dispatch<React.SetStateAction<Player[]>>;
@@ -187,9 +185,6 @@ export interface GameStateActions {
 
   // Board theme actions
   setBoardTheme: React.Dispatch<React.SetStateAction<BoardTheme | null>>;
-
-  // Total board words actions
-  setTotalBoardWords: React.Dispatch<React.SetStateAction<number | null>>;
 
   // Reset actions
   resetForNewRound: () => void;

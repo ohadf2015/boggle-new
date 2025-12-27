@@ -86,6 +86,7 @@ interface InGameScreenProps {
   // Player data
   foundWords?: FoundWord[] | string[];
   leaderboard?: LeaderboardPlayer[];
+  totalBoardWords?: number | null;
 
   // Callbacks
   onExitRoom?: () => void;
@@ -111,9 +112,6 @@ interface InGameScreenProps {
 
   // Board theme (date-themed words indicator)
   boardTheme?: BoardTheme | null;
-
-  // Total words on board (5+ letters only) for WordsRemaining display
-  totalBoardWords?: number | null;
 }
 
 // ==================== Component ====================
@@ -147,6 +145,7 @@ const InGameScreen = memo<InGameScreenProps>(({
   // Player data
   foundWords = [],
   leaderboard = [],
+  totalBoardWords = null,
 
   // Callbacks
   onExitRoom,
@@ -172,9 +171,6 @@ const InGameScreen = memo<InGameScreenProps>(({
 
   // Board theme
   boardTheme,
-
-  // Total board words
-  totalBoardWords,
 }) => {
   const {
     playWordAcceptedSound,
@@ -594,6 +590,16 @@ const InGameScreen = memo<InGameScreenProps>(({
                       {normalizedFoundWords.length}
                     </div>
                   </div>
+
+                  {/* Words Remaining - Compact for landscape */}
+                  {totalBoardWords !== null && totalBoardWords > 0 && (
+                    <WordsRemaining
+                      totalWords={totalBoardWords}
+                      foundWordsCount={normalizedFoundWords.filter(w => w.isValid !== false).length}
+                      t={t}
+                      compact
+                    />
+                  )}
                 </div>
               )}
             </div>
@@ -635,11 +641,11 @@ const InGameScreen = memo<InGameScreenProps>(({
           )}
 
 
-          {/* Bottom-right: Help button (offset to avoid hint button) */}
-          <div className="absolute bottom-2 right-16 z-30">
+          {/* Bottom-right corner: Help button (outside game board area) */}
+          <div className="absolute bottom-0 right-0 z-30 pb-[max(env(safe-area-inset-bottom),4px)] pr-1">
             <HelpButton
               onClick={() => setShowHelpPanel(true)}
-              className="w-11 h-11"
+              className="w-9 h-9 opacity-70 hover:opacity-100"
             />
           </div>
 
@@ -786,9 +792,9 @@ const InGameScreen = memo<InGameScreenProps>(({
         )}
       </div>
 
-      {/* Help Button - Fixed at bottom right on mobile */}
-      <div className="lg:hidden fixed bottom-4 right-4 z-50">
-        <HelpButton onClick={() => setShowHelpPanel(true)} />
+      {/* Help Button - Fixed at bottom right corner on mobile, outside the game board */}
+      <div className="lg:hidden fixed bottom-0 right-0 z-50 pb-[max(env(safe-area-inset-bottom),8px)] pr-2">
+        <HelpButton onClick={() => setShowHelpPanel(true)} className="w-10 h-10 opacity-70 hover:opacity-100" />
       </div>
 
       {/* Help Panel - Accessible from anywhere */}

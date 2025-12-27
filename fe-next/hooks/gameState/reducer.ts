@@ -21,6 +21,7 @@ export const INITIAL_STATE: GameStateValues = {
   remainingTime: null,
   gameLanguage: null,
   minWordLength: 2,
+  totalBoardWords: null,
   players: [],
   leaderboard: [],
   foundWords: [],
@@ -36,7 +37,6 @@ export const INITIAL_STATE: GameStateValues = {
   xpGainedData: null,
   levelUpData: null,
   boardTheme: null,
-  totalBoardWords: null,
 };
 
 // ==========================================
@@ -81,6 +81,13 @@ export function gameStateReducer(state: GameStateValues, action: GameStateAction
         ...state,
         minWordLength: typeof action.payload === 'function'
           ? action.payload(state.minWordLength)
+          : action.payload
+      };
+    case 'SET_TOTAL_BOARD_WORDS':
+      return {
+        ...state,
+        totalBoardWords: typeof action.payload === 'function'
+          ? action.payload(state.totalBoardWords)
           : action.payload
       };
 
@@ -243,15 +250,6 @@ export function gameStateReducer(state: GameStateValues, action: GameStateAction
           : action.payload
       };
 
-    // Total board words actions
-    case 'SET_TOTAL_BOARD_WORDS':
-      return {
-        ...state,
-        totalBoardWords: typeof action.payload === 'function'
-          ? action.payload(state.totalBoardWords)
-          : action.payload
-      };
-
     // Reset actions
     case 'RESET_FOR_NEW_ROUND':
       return {
@@ -259,6 +257,7 @@ export function gameStateReducer(state: GameStateValues, action: GameStateAction
         gameActive: false,
         letterGrid: null,
         remainingTime: null,
+        totalBoardWords: null,
         foundWords: [],
         achievements: [],
         waitingForResults: false,

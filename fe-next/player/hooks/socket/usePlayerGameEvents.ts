@@ -295,6 +295,7 @@ export function usePlayerGameEvents({
       setShowTournamentStandings(false);
       setXpGainedData(null);
       setLevelUpData(null);
+      setTotalBoardWords(null);
 
       neoSuccessToast(data.message || t('common.newGameReady'), { icon: '🔄', duration: 3000 });
     };
@@ -356,7 +357,7 @@ export function usePlayerGameEvents({
       setFireRoundRemaining(0);
     };
 
-    // Handle total board words broadcast
+    // Handle total board words count (for "words remaining" display)
     const handleTotalBoardWords = (data: { count: number }) => {
       logger.log('[PLAYER] Received totalBoardWords:', data.count);
       setTotalBoardWords(data.count);
