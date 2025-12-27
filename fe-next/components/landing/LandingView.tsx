@@ -67,24 +67,10 @@ const LandingView: React.FC = () => {
   if (isLandscape) {
     return (
       <main
-        className="flex h-screen w-full items-center justify-center bg-slate-900 p-3 gap-4 overflow-x-hidden landscape-full-height"
+        className="flex h-screen w-full items-center justify-center bg-slate-900 p-3 gap-3 overflow-x-hidden landscape-full-height"
         role="main"
         aria-label="Game mode selection"
       >
-        {/* Single Player */}
-        <Link
-          href={`/${language}/singleplayer`}
-          className="flex-1 flex flex-col items-center justify-center gap-3 p-6 bg-gradient-to-br from-neo-cyan to-cyan-400 border-4 border-neo-black rounded-neo shadow-hard hover:shadow-hard-lg hover:translate-x-[-2px] hover:translate-y-[-2px] active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-sm transition-all h-full max-h-[90vh] min-h-[300px]"
-          aria-label={`${t('landing.singlePlayer') || 'Single Player'} - ${t('landing.singlePlayerDesc') || 'Practice at your own pace'}`}
-        >
-          <FaUser className="text-5xl text-neo-black" aria-hidden="true" />
-          <span className="text-xl font-black uppercase text-neo-black text-center">{t('landing.singlePlayer') || 'Single Player'}</span>
-          <div className="flex flex-col gap-2 text-sm" aria-hidden="true">
-            <span className="bg-neo-black/20 px-3 py-1.5 rounded-neo font-bold text-center"><FaRobot className="inline mr-1" />Bots</span>
-            <span className="bg-neo-black/20 px-3 py-1.5 rounded-neo font-bold text-center"><FaTrophy className="inline mr-1" />Challenges</span>
-          </div>
-        </Link>
-
         {/* Multiplayer */}
         <Link
           href={`/${language}/multiplayer`}
@@ -96,6 +82,20 @@ const LandingView: React.FC = () => {
           <div className="flex flex-col gap-2 text-sm" aria-hidden="true">
             <span className="bg-neo-black/20 px-3 py-1.5 rounded-neo font-bold text-center"><FaDoorOpen className="inline mr-1" />Rooms</span>
             <span className="bg-neo-black/20 px-3 py-1.5 rounded-neo font-bold text-center"><FaCrown className="inline mr-1" />Host</span>
+          </div>
+        </Link>
+
+        {/* Single Player */}
+        <Link
+          href={`/${language}/singleplayer`}
+          className="flex-1 flex flex-col items-center justify-center gap-3 p-6 bg-gradient-to-br from-neo-cyan to-cyan-400 border-4 border-neo-black rounded-neo shadow-hard hover:shadow-hard-lg hover:translate-x-[-2px] hover:translate-y-[-2px] active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-sm transition-all h-full max-h-[90vh] min-h-[300px]"
+          aria-label={`${t('landing.singlePlayer') || 'Single Player'} - ${t('landing.singlePlayerDesc') || 'Practice at your own pace'}`}
+        >
+          <FaUser className="text-5xl text-neo-black" aria-hidden="true" />
+          <span className="text-xl font-black uppercase text-neo-black text-center">{t('landing.singlePlayer') || 'Single Player'}</span>
+          <div className="flex flex-col gap-2 text-sm" aria-hidden="true">
+            <span className="bg-neo-black/20 px-3 py-1.5 rounded-neo font-bold text-center"><FaRobot className="inline mr-1" />Bots</span>
+            <span className="bg-neo-black/20 px-3 py-1.5 rounded-neo font-bold text-center"><FaTrophy className="inline mr-1" />Challenges</span>
           </div>
         </Link>
 
@@ -121,13 +121,13 @@ const LandingView: React.FC = () => {
       <Header />
 
       {/* Main content */}
-      <main className="max-w-6xl mx-auto px-2 xs:px-4 sm:px-6 py-6 sm:py-10 overflow-x-hidden">
+      <main className="max-w-6xl mx-auto px-2 xs:px-4 sm:px-6 py-4 sm:py-6 overflow-x-hidden">
         {/* Hero section */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4 }}
-          className="text-center mb-6 sm:mb-8"
+          className="text-center mb-4 sm:mb-5"
         >
           <h1 className="text-2xl sm:text-3xl md:text-4xl font-black uppercase tracking-tight text-neo-black dark:text-neo-white mb-2">
             {t('landing.chooseMode') || 'Choose Your Mode'}
@@ -142,22 +142,8 @@ const LandingView: React.FC = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4, delay: 0.1 }}
-          className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8 max-w-4xl mx-auto"
+          className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5 max-w-4xl mx-auto"
         >
-          {/* Single Player Card */}
-          <ModeCard
-            title={t('landing.singlePlayer') || 'Single Player'}
-            description={t('landing.singlePlayerDesc') || 'Practice at your own pace or challenge yourself!'}
-            features={[
-              { icon: <FaRobot />, label: t('landing.feature.soloVsBots') || 'Solo vs Bots' },
-              { icon: <FaBullseye />, label: t('landing.feature.practiceMode') || 'Practice Mode' },
-              { icon: <FaTrophy />, label: t('landing.feature.challenges') || 'Challenges & High Scores' },
-            ]}
-            href={`/${language}/singleplayer`}
-            icon={<FaUser />}
-            variant="cyan"
-          />
-
           {/* Multiplayer Card */}
           <ModeCard
             title={t('landing.multiplayer') || 'Multiplayer'}
@@ -177,6 +163,20 @@ const LandingView: React.FC = () => {
               playersLabel: t('landing.playersLive') || 'playing now',
             }}
           />
+
+          {/* Single Player Card */}
+          <ModeCard
+            title={t('landing.singlePlayer') || 'Single Player'}
+            description={t('landing.singlePlayerDesc') || 'Practice at your own pace or challenge yourself!'}
+            features={[
+              { icon: <FaRobot />, label: t('landing.feature.soloVsBots') || 'Solo vs Bots' },
+              { icon: <FaBullseye />, label: t('landing.feature.practiceMode') || 'Practice Mode' },
+              { icon: <FaTrophy />, label: t('landing.feature.challenges') || 'Challenges & High Scores' },
+            ]}
+            href={`/${language}/singleplayer`}
+            icon={<FaUser />}
+            variant="cyan"
+          />
         </motion.div>
 
         {/* How to Play Button */}
@@ -184,7 +184,7 @@ const LandingView: React.FC = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4, delay: 0.2 }}
-          className="flex justify-center mt-6 sm:mt-8"
+          className="flex justify-center mt-4 sm:mt-5"
         >
           <Link
             href={`/${language}/rules`}

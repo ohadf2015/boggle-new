@@ -139,7 +139,11 @@ const es = {
     "retry": "Reintentar",
     "newGame": "Nuevo Juego",
     "join": "Unirse",
-    "showLess": "Mostrar menos"
+    "showLess": "Mostrar menos",
+    "or": "o",
+    "closeMenu": "Cerrar menú",
+    "openMenu": "Abrir menú",
+    "language": "Idioma"
   },
   "theme": {
     "sundayFunday": "Domingo Divertido",
@@ -246,6 +250,7 @@ const es = {
     "remove": "Eliminar bot",
     "removeError": "Error al eliminar bot",
     "currentBots": "Bots en la Sala",
+    "maxBots": "Máximo de bots alcanzado",
     "quickAdd": "Añadir",
     "add": "Añadir",
     "emptyState": "Añade bots para practicar o llenar la sala",
@@ -295,7 +300,8 @@ const es = {
     "telegram": "Telegram",
     "more": "Más...",
     "inviteTitle": "¡Únete a mi juego de LexiClash!",
-    "copied": "¡Copiado!"
+    "copied": "¡Copiado!",
+    "shareVictory": "¡Comparte tu victoria!"
   },
   "errors": {
     "unstableConnection": "La conexión a internet es inestable - podrías experimentar problemas durante el juego",
@@ -409,6 +415,7 @@ const es = {
     "nickname": "Apodo",
     "nicknamePlaceholder": "Ingresa tu apodo",
     "roomCode": "Código de sala",
+    "changeAvatar": "Cambiar avatar",
     "defaultPlayerNames": [
       "Pepinillo Astuto",
       "Papa Disco",
@@ -603,7 +610,8 @@ const es = {
     "hostPlaysShort": "Anfitrión juega",
     "hostSpectates": "Espectador",
     "letters": "letras",
-    "players": "jugadores"
+    "players": "jugadores",
+    "letterMinimum": "letras mínimo"
   },
   "playerView": {
     "waitingForHost": "Esperando que el anfitrión inicie...",
@@ -614,6 +622,9 @@ const es = {
     "wordsFound": "Palabras Encontradas",
     "wordsOnBoard": "Palabras en el Tablero",
     "wordsRemaining": "palabras restantes",
+    "longWordsLabel": "{{min}}+ letras",
+    "longWordsOnBoard": "Palabras de {{min}}+ Letras",
+    "longWordsRemaining": "palabras de {{min}}+ letras restantes",
     "remaining": "Quedan",
     "found": "encontradas",
     "total": "total",
@@ -634,6 +645,9 @@ const es = {
     "players": "Jugadores",
     "yourAchievements": "Tus Logros",
     "letterGrid": "Tablero de Letras",
+    "longWordsLabel": "${min}+ letras",
+    "longWordsOnBoard": "Palabras de ${min}+ letras",
+    "longWordsRemaining": "palabras de ${min}+ letras restantes",
     "waitingForGame": "Esperando juego...",
     "add": "Añadir",
     "enterWord": "Ingresa palabra...",
@@ -682,7 +696,10 @@ const es = {
     "words": "Palabras",
     "alreadyFound": "Ya encontrada",
     "invalidWord": "Palabra inválida",
-    "pendingValidation": "Validación pendiente"
+    "pendingValidation": "Validación pendiente",
+    "longWordsLabel": "${min}+ letras",
+    "longWordsOnBoard": "Palabras de ${min}+ letras",
+    "longWordsRemaining": "${min}+ letras restantes"
   },
   "hints": {
     "hint": "Pista",
@@ -700,7 +717,8 @@ const es = {
     "vowels": "vocales",
     "withDoubles": "con letras dobles",
     "longerWord": "Una palabra más larga",
-    "shortWord": "Palabra corta"
+    "shortWord": "Palabra corta",
+    "noLongWordsLeft": "¡No hay más palabras de 5+ letras por encontrar!"
   },
   "achievementPopup": {
     "unlocked": "¡Logro Desbloqueado!",
@@ -815,7 +833,8 @@ const es = {
     "you": "(Tú)",
     "betterLuckNextTime": "¡Mejor suerte la próxima vez!",
     "yourPlace": "{rank}º lugar",
-    "tryAgainEncouragement": "¡Sigue jugando para mejorar!"
+    "tryAgainEncouragement": "¡Sigue jugando para mejorar!",
+    "of": "de"
   },
   "archetypes": {
     "strategist": "El Estratega",
@@ -1546,7 +1565,8 @@ const es = {
     "backToRoom": "Volver a la Sala",
     "backToLobby": "Volver al Lobby",
     "locked": "Bloqueado",
-    "earnThisAchievement": "¡Juega partidas para desbloquear este logro!"
+    "earnThisAchievement": "¡Juega partidas para desbloquear este logro!",
+    "connectedAccount": "Conectado con tu cuenta"
   },
   "onboarding": {
     "welcome": {
@@ -1798,7 +1818,63 @@ const es = {
     "aiOpponents": "Oponentes IA",
     "autoFillDesc": "Llena la sala con {count} oponentes IA",
     "addBotsPrompt": "¡Añade oponentes IA para competir!",
-    "addBotsHint": "Usa auto-llenar o haz clic en los botones de arriba"
+    "addBotsHint": "Usa auto-llenar o haz clic en los botones de arriba",
+    "beatYourRecord": "¡Superaste tu récord!",
+    "preset": {
+      "recommended": "Mejor",
+      "tapToPlay": "Toca para jugar",
+      "customGame": "Configuración Personalizada",
+      "hint": "Toca cualquier preset para juego instantáneo, o personaliza tu juego",
+      "quickStart": "Inicio Rápido",
+      "quick": "Juego Rápido",
+      "quickDesc": "Juego rápido de 1 minuto en tablero pequeño",
+      "standard": "Estándar",
+      "standardDesc": "Experiencia clásica de Boggle",
+      "intense": "Intenso",
+      "intenseDesc": "Tablero grande, más tiempo, competencia difícil",
+      "friendly": "Partida Amistosa",
+      "friendlyDesc": "Juego relajado con oponentes fáciles",
+      "competitive": "Competitivo",
+      "competitiveDesc": "Desafío equilibrado contra bots hábiles",
+      "battle": "Battle Royale",
+      "battleDesc": "Prueba definitiva contra bots expertos",
+      "explorer": "Explorador de Letras",
+      "explorerDesc": "Tablero pequeño, tómate tu tiempo",
+      "hunter": "Cazador de Palabras",
+      "hunterDesc": "Encuentra todas las palabras a tu ritmo",
+      "mastery": "Dominio del Vocabulario",
+      "masteryDesc": "Tablero grande para práctica extensiva",
+      "warmup": "Calentamiento Diario",
+      "warmupDesc": "Calentamiento rápido para batir tu récord",
+      "personalBest": "Mejor Personal",
+      "personalBestDesc": "Desafío estándar - sigue tu progreso",
+      "ultra": "Desafío Ultra",
+      "ultraDesc": "Desafío definitivo de puntuación"
+    },
+    "wizard": {
+      "selectMode": "Seleccionar modo de juego",
+      "chooseDifficulty": "Elegir dificultad",
+      "gridPreview": "Vista previa del tablero",
+      "configureOptions": "Opciones del juego",
+      "reviewSettings": "Revisar e iniciar",
+      "stepOf": "Paso {current} de {total}",
+      "showAll": "Mostrar todo",
+      "useSteps": "Usar pasos",
+      "editMode": "Editar modo",
+      "editSettings": "Editar configuración",
+      "stepMode": "Modo",
+      "stepDifficulty": "Dificultad",
+      "stepOptions": "Opciones",
+      "stepReview": "Revisar"
+    }
+  },
+  "practice": {
+    "tips": "Consejos de práctica",
+    "noTimer": "Sin límite de tiempo - juega a tu ritmo",
+    "exploreTip": "Explora y encuentra tantas palabras como puedas"
+  },
+  "wizard": {
+    "stepOf": "Paso {current} de {total}"
   },
   "landscape": {
     "tutorialTitle": "Controles en horizontal",

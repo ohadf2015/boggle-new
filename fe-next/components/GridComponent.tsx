@@ -134,26 +134,27 @@ const GridComponent = memo<GridComponentProps>(({
   const shakeOffsetsRef = useRef<Map<string, { x: number; y: number; rotate: number; scale: number }>>(new Map());
   const prevEarthquakeShakingRef = useRef(false);
 
-  // Generate offsets synchronously during render when earthquake starts
-  // This ensures offsets are available immediately on the first render
-  if (earthquakeShaking && !prevEarthquakeShakingRef.current) {
-    // Earthquake just started - generate fresh random offsets
-    const newOffsets = new Map<string, { x: number; y: number; rotate: number; scale: number }>();
-    const rows = grid.length;
-    const cols = grid[0]?.length || 0;
-    for (let i = 0; i < rows; i++) {
-      for (let j = 0; j < cols; j++) {
-        newOffsets.set(`${i}-${j}`, {
-          x: (Math.random() - 0.5) * 200,
-          y: (Math.random() - 0.5) * 200,
-          rotate: (Math.random() - 0.5) * 360,
-          scale: 0.6 + Math.random() * 0.6,
-        });
+  // Generate offsets when earthquake starts
+  useEffect(() => {
+    if (earthquakeShaking && !prevEarthquakeShakingRef.current) {
+      // Earthquake just started - generate fresh random offsets
+      const newOffsets = new Map<string, { x: number; y: number; rotate: number; scale: number }>();
+      const rows = grid.length;
+      const cols = grid[0]?.length || 0;
+      for (let i = 0; i < rows; i++) {
+        for (let j = 0; j < cols; j++) {
+          newOffsets.set(`${i}-${j}`, {
+            x: (Math.random() - 0.5) * 200,
+            y: (Math.random() - 0.5) * 200,
+            rotate: (Math.random() - 0.5) * 360,
+            scale: 0.6 + Math.random() * 0.6,
+          });
+        }
       }
+      shakeOffsetsRef.current = newOffsets;
     }
-    shakeOffsetsRef.current = newOffsets;
-  }
-  prevEarthquakeShakingRef.current = earthquakeShaking;
+    prevEarthquakeShakingRef.current = earthquakeShaking;
+  }, [earthquakeShaking, grid]);
 
   // Fire Round: Random glowing cells with rainbow cycling
   const [glowingCells, setGlowingCells] = useState<Set<string>>(new Set());

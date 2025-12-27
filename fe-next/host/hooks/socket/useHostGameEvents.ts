@@ -127,10 +127,11 @@ export function useHostGameEvents({
     );
   }, [setComboLevel, setLastWordTime, comboLevelRef, lastWordTimeRef, comboTimeoutRef]);
 
-  // Memoized room closed handler
-  const handleRoomClosedDueToInactivity = useMemo(() => {
-    if (!socket) return () => {};
-    return createRoomClosedDueToInactivityHandler(socket, username, t, intentionalExitRef);
+  // Room closed handler callback
+  const handleRoomClosedDueToInactivity = useCallback((data: { message?: string }) => {
+    if (!socket) return;
+    const handler = createRoomClosedDueToInactivityHandler(socket, username, t, intentionalExitRef);
+    handler(data);
   }, [socket, username, t, intentionalExitRef]);
 
   useEffect(() => {

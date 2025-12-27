@@ -154,8 +154,8 @@ const ModeCard: React.FC<ModeCardProps> = ({
             {liveBadge.totalPlayers > 0 && (
               <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-neo-lime/90 text-neo-black text-sm font-bold rounded-neo border-2 border-neo-black shadow-hard-sm">
                 <span className="relative flex h-2 w-2">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-neo-black opacity-75" />
-                  <span className="relative inline-flex rounded-full h-2 w-2 bg-neo-black" />
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-neo-black text-neo-white opacity-75" />
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-neo-black text-neo-white" />
                 </span>
                 <FaUsers className="w-3.5 h-3.5" />
                 {liveBadge.totalPlayers} {liveBadge.playersLabel}

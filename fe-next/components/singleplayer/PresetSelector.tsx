@@ -102,7 +102,7 @@ const PresetSelector: React.FC<PresetSelectorProps> = ({
               </span>
             )}
             {dailyInfo.hasPlayedToday && (
-              <span className="flex items-center justify-center w-5 h-5 bg-neo-lime rounded-full border-2 border-neo-black">
+              <span className="flex items-center justify-center w-5 h-5 bg-neo-lime text-neo-black rounded-full border-2 border-neo-black">
                 <Check className="w-3 h-3 text-neo-black" />
               </span>
             )}
@@ -159,7 +159,7 @@ const PresetSelector: React.FC<PresetSelectorProps> = ({
     return (
       <>
         <LandscapeIndicator />
-        <div dir={dir} className="flex h-screen w-full overflow-hidden bg-slate-900 p-3 gap-4 landscape-full-height">
+        <div dir={dir} className="flex h-screen w-full overflow-hidden bg-slate-900 text-white p-3 gap-4 landscape-full-height">
           {/* Left column: Header + Presets */}
           <div className="w-[45%] flex flex-col gap-3 overflow-y-auto">
             {/* Header */}
@@ -298,7 +298,7 @@ const PresetSelector: React.FC<PresetSelectorProps> = ({
         {/* Divider */}
         <div className="flex items-center gap-3 my-2">
           <div className="flex-1 h-[2px] bg-neo-black/10 dark:bg-neo-white/10 rounded" />
-          <span className="text-xs font-bold uppercase text-neo-black/50 dark:text-neo-white/50">
+          <span className="text-xs font-bold uppercase text-neo-black/50 dark:text-slate-400">
             {t('common.or') || 'or'}
           </span>
           <div className="flex-1 h-[2px] bg-neo-black/10 dark:bg-neo-white/10 rounded" />
@@ -322,7 +322,7 @@ const PresetSelector: React.FC<PresetSelectorProps> = ({
         </motion.div>
 
         {/* Hint text */}
-        <p className="text-center text-xs text-neo-black/50 dark:text-neo-cream/50 pb-4">
+        <p className="text-center text-xs text-neo-black/50 dark:text-slate-400 pb-4">
           {t('singlePlayer.preset.hint') || 'Tap any preset for instant play, or customize your game'}
         </p>
       </motion.div>

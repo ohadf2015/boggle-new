@@ -11,17 +11,12 @@ import PlayerInsights from './PlayerInsights';
 import { AchievementBadge } from '../AchievementBadge';
 import XpBreakdownCard from './XpBreakdownCard';
 import { WordPointsGroup, SharedWordsSection, InvalidWordsSection } from './WordPointsGroup';
+import { filterGameAchievements } from './utils';
+import { useWordCategories } from './useWordCategories';
 import { calculatePlayerInsights } from '@/utils/gameInsights';
 import { applyHebrewFinalLetters } from '@/utils/utils';
-import type { Player, WordObject, XpGainedData, LevelUpData, GameAchievement } from './types';
+import type { Player, WordObject, XpGainedData, LevelUpData } from './types';
 import type { PlayerArchetype } from '@/utils/playerArchetypes';
-
-// Lifetime achievement keys to filter out
-const LIFETIME_ACHIEVEMENT_KEYS = new Set([
-  'VETERAN', 'CENTURION', 'WORD_COLLECTOR', 'WORD_HOARDER',
-  'CHAMPION', 'LEGEND', 'POINT_MASTER', 'POINT_KING',
-  'DEDICATION', 'LOYAL_PLAYER',
-]);
 
 interface ConsolidatedPlayerCardProps {
   player: Player;
@@ -89,70 +84,26 @@ const ConsolidatedPlayerCard: React.FC<ConsolidatedPlayerCardProps> = memo(({
     return count;
   }, [allPlayerWords]);
 
-  // Memoized word calculations
-  const { validWords, duplicateWords, invalidWords, wordsByPoints, sortedPointGroups, totalComboBonus, totalFireRoundBonus, summaryStats } = useMemo(() => {
-    if (!player.allWords || player.allWords.length === 0) {
-      return {
-        validWords: [] as WordObject[],
-        duplicateWords: [] as WordObject[],
-        invalidWords: [] as WordObject[],
-        wordsByPoints: {} as Record<number, WordObject[]>,
-        sortedPointGroups: [] as number[],
-        totalComboBonus: 0,
-        totalFireRoundBonus: 0,
-        summaryStats: null,
-      };
-    }
+  // Use shared hook for word categorization
+  const {
+    validWords,
+    duplicateWords,
+    invalidWords,
+    wordsByPoints,
+    sortedPointGroups,
+    totalComboBonus,
+    totalFireRoundBonus,
+    longestWord,
+    accuracy,
+    bestWord,
+  } = useWordCategories(player.allWords);
 
-    const dups = player.allWords.filter(w => w && w.isDuplicate);
-    const invalid = player.allWords.filter(w => w && !w.isDuplicate && !w.validated);
-    const valid = player.allWords.filter(w => w && !w.isDuplicate && w.validated);
-
-    const comboBonus = valid.reduce((sum, w) => sum + (w.comboBonus || 0), 0);
-    const fireBonus = valid.reduce((sum, w) => sum + (w.fireRoundBonus || 0), 0);
-
-    // Group by points
-    const byPoints: Record<number, WordObject[]> = {};
-    valid.forEach(wordObj => {
-      const points = wordObj.score || 0;
-      if (!byPoints[points]) byPoints[points] = [];
-      byPoints[points].push(wordObj);
-    });
-
-    // Sort within groups
-    Object.keys(byPoints).forEach(points => {
-      byPoints[Number(points)]?.sort((a, b) => a.word.localeCompare(b.word));
-    });
-
-    const sortedGroups = Object.keys(byPoints).map(Number).sort((a, b) => b - a);
-
-    // Summary stats
-    const longestWord = valid.reduce((max, w) => w.word.length > max.length ? w.word : max, '');
-    const accuracy = player.allWords.length > 0
-      ? Math.round((valid.length / player.allWords.length) * 100)
-      : 0;
-
-    return {
-      validWords: valid,
-      duplicateWords: dups,
-      invalidWords: invalid,
-      wordsByPoints: byPoints,
-      sortedPointGroups: sortedGroups,
-      totalComboBonus: comboBonus,
-      totalFireRoundBonus: fireBonus,
-      summaryStats: {
-        validCount: valid.length,
-        longestWord: longestWord ? applyHebrewFinalLetters(longestWord) : '-',
-        accuracy,
-      },
-    };
-  }, [player.allWords]);
-
-  // Best word
-  const bestWord = useMemo(() => {
-    if (!validWords.length) return null;
-    return validWords.reduce((best, w) => (w.score || 0) > (best?.score || 0) ? w : best, validWords[0]);
-  }, [validWords]);
+  // Summary stats for display (with Hebrew final letters applied)
+  const summaryStats = useMemo(() => ({
+    validCount: validWords.length,
+    longestWord: longestWord ? applyHebrewFinalLetters(longestWord) : '-',
+    accuracy,
+  }), [validWords.length, longestWord, accuracy]);
 
   // Player insights
   const playerInsights = useMemo(() => {
@@ -165,14 +116,11 @@ const ConsolidatedPlayerCard: React.FC<ConsolidatedPlayerCardProps> = memo(({
     return calculatePlayerInsights(player.allWords, gameDuration, player.score);
   }, [player.allWords, player.score]);
 
-  // Filter achievements
+  // Filter achievements using shared utility
   const gameAchievements = useMemo(() => {
     if (!player.achievements) return [];
-    return player.achievements.filter(ach => {
-      const key = ach.key || ach.name || '';
-      return !LIFETIME_ACHIEVEMENT_KEYS.has(key);
-    });
-  }, [player.achievements]);
+    return filterGameAchievements(player.achievements, validWords);
+  }, [player.achievements, validWords]);
 
   return (
     <motion.div

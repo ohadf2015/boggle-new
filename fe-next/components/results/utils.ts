@@ -78,3 +78,121 @@ export function getTextColor(points: number): string {
   // Other point colors (cyan, orange, purple, pink) are light enough to need dark text
   return 'rgb(var(--neo-black))';
 }
+
+/**
+ * Word summary statistics calculated from a word list
+ */
+export interface WordStats {
+  validCount: number;
+  invalidCount: number;
+  duplicateCount: number;
+  longestWord: string;
+  avgWordLength: number;
+  accuracy: number;
+  totalComboBonus: number;
+  totalFireRoundBonus: number;
+}
+
+/**
+ * Categorized word lists
+ */
+export interface CategorizedWords {
+  validWords: WordObject[];
+  invalidWords: WordObject[];
+  duplicateWords: WordObject[];
+  wordsByPoints: Record<number, WordObject[]>;
+  sortedPointGroups: number[];
+}
+
+/**
+ * Categorize words into valid, invalid, and duplicate groups
+ * Also groups valid words by point value for display
+ */
+export function categorizeWords(allWords: WordObject[] | undefined): CategorizedWords {
+  if (!allWords || allWords.length === 0) {
+    return {
+      validWords: [],
+      invalidWords: [],
+      duplicateWords: [],
+      wordsByPoints: {},
+      sortedPointGroups: [],
+    };
+  }
+
+  const duplicateWords = allWords.filter(w => w && w.isDuplicate);
+  const invalidWords = allWords.filter(w => w && !w.isDuplicate && !w.validated);
+  const validWords = allWords.filter(w => w && !w.isDuplicate && w.validated);
+
+  // Group valid words by points
+  const wordsByPoints: Record<number, WordObject[]> = {};
+  validWords.forEach(wordObj => {
+    const points = wordObj.score || 0;
+    if (!wordsByPoints[points]) wordsByPoints[points] = [];
+    wordsByPoints[points].push(wordObj);
+  });
+
+  // Sort words alphabetically within each point group
+  Object.keys(wordsByPoints).forEach(points => {
+    wordsByPoints[Number(points)]?.sort((a, b) => a.word.localeCompare(b.word));
+  });
+
+  // Sort point groups descending
+  const sortedPointGroups = Object.keys(wordsByPoints)
+    .map(Number)
+    .sort((a, b) => b - a);
+
+  return {
+    validWords,
+    invalidWords,
+    duplicateWords,
+    wordsByPoints,
+    sortedPointGroups,
+  };
+}
+
+/**
+ * Calculate summary statistics from a word list
+ */
+export function calculateWordStats(allWords: WordObject[] | undefined): WordStats {
+  if (!allWords || allWords.length === 0) {
+    return {
+      validCount: 0,
+      invalidCount: 0,
+      duplicateCount: 0,
+      longestWord: '',
+      avgWordLength: 0,
+      accuracy: 0,
+      totalComboBonus: 0,
+      totalFireRoundBonus: 0,
+    };
+  }
+
+  const { validWords, invalidWords, duplicateWords } = categorizeWords(allWords);
+
+  const totalComboBonus = validWords.reduce((sum, w) => sum + (w.comboBonus || 0), 0);
+  const totalFireRoundBonus = validWords.reduce((sum, w) => sum + (w.fireRoundBonus || 0), 0);
+
+  const longestWord = validWords.reduce((max, w) =>
+    w.word.length > max.length ? w.word : max, ''
+  );
+
+  const totalLength = validWords.reduce((sum, w) => sum + w.word.length, 0);
+  const avgWordLength = validWords.length > 0
+    ? Math.round((totalLength / validWords.length) * 10) / 10
+    : 0;
+
+  const accuracy = allWords.length > 0
+    ? Math.round((validWords.length / allWords.length) * 100)
+    : 0;
+
+  return {
+    validCount: validWords.length,
+    invalidCount: invalidWords.length,
+    duplicateCount: duplicateWords.length,
+    longestWord,
+    avgWordLength,
+    accuracy,
+    totalComboBonus,
+    totalFireRoundBonus,
+  };
+}

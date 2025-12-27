@@ -128,19 +128,20 @@ const ComboIndicator: React.FC<ComboIndicatorProps> = ({
   const controls = useAnimation();
   const [visibleCombo, setVisibleCombo] = useState<number | null>(null);
   const [animationKey, setAnimationKey] = useState(0);
+  const [sparkleData, setSparkleData] = useState<{ angle: number; distance: number }[]>([]);
 
-  // Memoize random values for sparkles to prevent recalculation
-  // Reduce sparkle count at very high levels to maintain performance
-  const sparkleData = useMemo(() => {
+  // Generate random sparkle data when animationKey changes
+  useEffect(() => {
     const isHighCombo = comboLevel >= 5;
     const isExtremeCombo = comboLevel >= 15;
     // Reduce sparkles at extreme levels to prevent performance issues
     // Also reduce if motion is disabled for accessibility and performance
     const count = reduceMotion ? 0 : isExtremeCombo ? 6 : isHighCombo ? 10 : 5;
-    return [...Array(count)].map((_, i) => ({
+    const data = [...Array(count)].map((_, i) => ({
       angle: (i * (360 / count) + (Math.random() - 0.5) * 30) * (Math.PI / 180),
       distance: 50 + Math.random() * 30,
     }));
+    setSparkleData(data);
   }, [comboLevel, animationKey, reduceMotion]);
 
   // Show combo indicator and auto-dismiss

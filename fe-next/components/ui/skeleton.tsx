@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import { cn } from "../../lib/utils";
 
 /**
@@ -130,17 +131,23 @@ function WordListSkeleton({
   items?: number;
   className?: string;
 }) {
+  // Pre-computed widths to avoid Math.random() during render
+  const widths = useMemo(() =>
+    Array.from({ length: items }).map((_, i) => 60 + ((i * 17) % 40)),
+    [items]
+  );
+
   return (
     <div
       className={cn("flex flex-wrap gap-2", className)}
       aria-busy="true"
       aria-label="Loading words"
     >
-      {Array.from({ length: items }).map((_, i) => (
+      {widths.map((width, i) => (
         <Skeleton
           key={i}
           className="h-8 rounded-neo"
-          style={{ width: `${60 + Math.random() * 40}px` }}
+          style={{ width: `${width}px` }}
         />
       ))}
     </div>

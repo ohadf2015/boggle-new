@@ -54,6 +54,11 @@ interface ResultsWinnerBannerProps {
   winner: WinnerData | PlayerResult | null;
   isCurrentUserWinner: boolean;
   rank?: number; // 1 = 1st place (default), 2 = 2nd place, 3 = 3rd place
+  // Single player mode support
+  variant?: 'ranking' | 'highScore' | 'newRecord' | 'completion';
+  customMessage?: string; // Override the rank message
+  customAnnouncement?: string; // Override the announcement text
+  showConfetti?: boolean; // Control confetti independently (default: true for top 3)
 }
 
 // Styling configuration for each rank
@@ -105,46 +110,74 @@ const RANK_STYLES: Record<number, {
   },
 };
 
-const ResultsWinnerBanner: React.FC<ResultsWinnerBannerProps> = ({ winner, isCurrentUserWinner, rank = 1 }) => {
+const ResultsWinnerBanner: React.FC<ResultsWinnerBannerProps> = ({
+  winner,
+  isCurrentUserWinner,
+  rank = 1,
+  variant = 'ranking',
+  customMessage,
+  customAnnouncement,
+  showConfetti: showConfettiProp,
+}) => {
   const { t } = useLanguage();
 
-  // Normalize rank for styling (4+ all use the same style)
-  const styleRank = rank <= 3 ? rank : 4;
+  // Determine if confetti should fire
+  const shouldShowConfetti = showConfettiProp ?? (variant === 'ranking' ? rank <= 3 : variant !== 'completion');
 
-  // Memoize the confetti function for this rank (only for top 3)
+  // Normalize rank for styling (4+ all use the same style)
+  // For non-ranking variants, use rank 1 style for victories/records
+  const styleRank = variant === 'ranking'
+    ? (rank <= 3 ? rank : 4)
+    : (variant === 'completion' ? 4 : 1);
+
+  // Memoize the confetti function for this rank
   const handleConfetti = useCallback(() => {
-    if (rank <= 3) {
+    if (shouldShowConfetti) {
       fireConfetti(rank);
     }
-  }, [rank]);
+  }, [rank, shouldShowConfetti]);
 
-  // Fire confetti on mount (only for top 3)
+  // Fire confetti on mount
   useEffect(() => {
-    if (winner && rank <= 3) {
+    if (winner && shouldShowConfetti) {
       const timer = setTimeout(() => fireConfetti(rank), 400);
       return () => clearTimeout(timer);
     }
     return undefined;
-  }, [winner, rank]);
+  }, [winner, rank, shouldShowConfetti]);
 
   // Get styles for this rank (4+ use the same purple style)
   const styles = RANK_STYLES[styleRank] || RANK_STYLES[4];
 
-  // Get the appropriate message for this rank
+  // Get the appropriate message for this rank/variant
   const getRankMessage = () => {
+    if (customMessage) return customMessage;
+
+    // Handle single player variants
+    if (variant === 'highScore') return t('singlePlayer.newHighScore') || 'New High Score!';
+    if (variant === 'newRecord') return t('challenge.allTimeRecord') || 'All-Time Record!';
+    if (variant === 'completion') return t('singlePlayer.gameOver') || 'Game Over';
+
+    // Multiplayer ranking
     if (rank === 1) return t('results.youWon');
     if (rank === 2) return t('results.secondPlace') || '2nd Place!';
     if (rank === 3) return t('results.thirdPlace') || '3rd Place!';
-    // 4th place and below - encouraging message
     return t('results.betterLuckNextTime') || 'Better luck next time!';
   };
 
   // Get the appropriate announcement text
   const getAnnouncementText = () => {
+    if (customAnnouncement) return customAnnouncement;
+
+    // Handle single player variants
+    if (variant === 'highScore') return t('singlePlayer.beatYourRecord') || 'You beat your record!';
+    if (variant === 'newRecord') return t('challenge.firstRecord') || 'First Record Set!';
+    if (variant === 'completion') return t('singlePlayer.practiceComplete') || 'Practice Complete';
+
+    // Multiplayer ranking
     if (rank === 1) return t('results.winnerAnnouncement');
     if (rank === 2) return t('results.silverMedalist') || 'Silver Medalist';
     if (rank === 3) return t('results.bronzeMedalist') || 'Bronze Medalist';
-    // 4th+ place - show their position
     return t('results.yourPlace', { rank }) || `${rank}th Place`;
   };
 
