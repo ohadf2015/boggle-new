@@ -6,8 +6,8 @@ import { FaArrowLeft, FaGlobe, FaChevronDown } from 'react-icons/fa';
 import { Trophy, Timer, Flame, Target } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import AutoHideHeader from '@/components/AutoHideHeader';
-import DailyChallengeGame from './DailyChallengeGame';
-import DailyChallengeResults from './DailyChallengeResults';
+import DailyWordHuntSurvival from './DailyWordHuntSurvival';
+import DailyWordHuntResults from './DailyWordHuntResults';
 import DailyLeaderboard from './DailyLeaderboard';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useMobileLandscape } from '@/hooks/useMobileLandscape';
@@ -17,29 +17,17 @@ import {
   getPuzzleNumber,
   getSecondsUntilNextDaily,
   formatCountdown,
-  hasPlayedToday,
-  getTodaysResult,
-  saveDailyResult,
-  getDailyStreak,
-  updateDailyStreak,
-  getStreakMilestone,
-  DAILY_CHALLENGE_DURATION,
-  type DailyChallengeResult,
-  type StoredDailyResult,
-  type DailyStreak,
+  hasPlayedWordHuntToday,
+  getTodaysWordHuntResult,
+  saveWordHuntResult,
+  selectDailyTargetWord,
+  type WordHuntResult,
+  type StoredWordHuntResult,
 } from '@/utils/dailyChallenge';
 import type { LetterGrid, Language } from '@/types';
+import type { WordHuntGameResult } from './DailyWordHuntSurvival';
 
 export type DailyChallengePhase = 'loading' | 'ready' | 'playing' | 'completed' | 'already-played';
-
-interface DailyChallengeGameResult {
-  score: number;
-  wordCount: number;
-  wordsByLength: Record<number, number>;
-  timeSeconds: number;
-  words: string[];
-  longestWord: string;
-}
 
 /**
  * DailyChallenge - Main container for the daily puzzle
@@ -68,15 +56,14 @@ const DailyChallenge: React.FC = () => {
   const [puzzleDate, setPuzzleDate] = useState<string>('');
   const [puzzleNumber, setPuzzleNumber] = useState<number>(0);
   const [grid, setGrid] = useState<LetterGrid | null>(null);
+  const [targetWord, setTargetWord] = useState<string>('');
   const [countdown, setCountdown] = useState<string>('');
 
   // Results
-  const [storedResult, setStoredResult] = useState<StoredDailyResult | null>(null);
-  const [gameResult, setGameResult] = useState<DailyChallengeGameResult | null>(null);
-  const [streak, setStreak] = useState<DailyStreak | null>(null);
-  const [streakMilestone, setStreakMilestone] = useState<number | null>(null);
+  const [storedResult, setStoredResult] = useState<StoredWordHuntResult | null>(null);
+  const [gameResult, setGameResult] = useState<WordHuntGameResult | null>(null);
 
-  // Initialize daily challenge
+  // Initialize Word Hunt daily challenge
   useEffect(() => {
     const date = getDailyChallengeDate();
     const number = getPuzzleNumber(date);
@@ -85,19 +72,21 @@ const DailyChallenge: React.FC = () => {
     setPuzzleNumber(number);
 
     // Check if already played today
-    if (hasPlayedToday(language as Language)) {
-      const result = getTodaysResult(language as Language);
+    if (hasPlayedWordHuntToday(language as Language)) {
+      const result = getTodaysWordHuntResult(language as Language);
       setStoredResult(result);
       setPhase('already-played');
     } else {
       // Generate the grid for today
       const dailyGrid = generateDailyGrid(date, language as Language);
       setGrid(dailyGrid);
+
+      // Select target word for today
+      const target = selectDailyTargetWord(dailyGrid, date, language as Language);
+      setTargetWord(target.word);
+
       setPhase('ready');
     }
-
-    // Get current streak
-    setStreak(getDailyStreak());
   }, [language]);
 
   // Update countdown timer
@@ -118,49 +107,35 @@ const DailyChallenge: React.FC = () => {
     setPhase('playing');
   }, []);
 
-  // Handle game completion
-  const handleGameComplete = useCallback((result: DailyChallengeGameResult) => {
-    // Calculate words by length
-    const wordsByLength: Record<number, number> = {};
-    result.words.forEach(word => {
-      const len = word.length;
-      wordsByLength[len] = (wordsByLength[len] || 0) + 1;
-    });
-
-    // Create the result object
-    const dailyResult: DailyChallengeResult = {
+  // Handle Word Hunt game completion
+  const handleGameComplete = useCallback((result: WordHuntGameResult) => {
+    // Create the Word Hunt result object
+    const wordHuntResult: WordHuntResult = {
       puzzleNumber,
       puzzleDate,
-      score: result.score,
-      wordCount: result.wordCount,
-      wordsByLength,
-      timeSeconds: result.timeSeconds,
-      streakDays: streak?.currentStreak ?? 0,
       language: language as Language,
+      solved: result.solved,
+      attemptsUsed: result.attemptsUsed,
+      targetWord: result.targetWord,
+      attempts: result.attempts,
+      streakDays: 0, // TODO: Implement streak tracking for Word Hunt
+      completedAt: new Date().toISOString(),
     };
 
     // Save result to localStorage
-    saveDailyResult(dailyResult);
-
-    // Update streak
-    const updatedStreak = updateDailyStreak();
-    setStreak(updatedStreak);
-
-    // Check for streak milestone
-    const milestone = getStreakMilestone(updatedStreak.currentStreak);
-    setStreakMilestone(milestone);
+    saveWordHuntResult(wordHuntResult);
 
     // Store result for display
     setGameResult(result);
     setStoredResult({
       date: puzzleDate,
       puzzleNumber,
-      result: dailyResult,
+      result: wordHuntResult,
       completedAt: new Date().toISOString(),
     });
 
     setPhase('completed');
-  }, [puzzleNumber, puzzleDate, streak, language]);
+  }, [puzzleNumber, puzzleDate, language]);
 
   // Handle going back
   const handleBack = useCallback(() => {
@@ -198,7 +173,6 @@ const DailyChallenge: React.FC = () => {
           <DailyReadyScreen
             puzzleNumber={puzzleNumber}
             puzzleDate={puzzleDate}
-            streak={streak}
             countdown={countdown}
             language={language as Language}
             currentFlag={getCurrentFlag(language as Language)}
@@ -209,28 +183,26 @@ const DailyChallenge: React.FC = () => {
           />
         )}
 
-        {phase === 'playing' && grid && (
-          <DailyChallengeGame
+        {phase === 'playing' && grid && targetWord && (
+          <DailyWordHuntSurvival
             grid={grid}
             puzzleNumber={puzzleNumber}
             language={language as Language}
-            duration={DAILY_CHALLENGE_DURATION}
+            targetWord={targetWord}
             onComplete={handleGameComplete}
             onQuit={handleBack}
           />
         )}
 
         {(phase === 'completed' || phase === 'already-played') && storedResult && (
-          <DailyChallengeResults
+          <DailyWordHuntResults
             result={storedResult.result}
-            streak={streak}
-            streakMilestone={streakMilestone}
-            words={gameResult?.words ?? []}
-            longestWord={gameResult?.longestWord ?? ''}
+            puzzleNumber={puzzleNumber}
+            puzzleDate={puzzleDate}
+            language={language as Language}
             countdown={countdown}
             isNewCompletion={phase === 'completed'}
             onBack={handleBack}
-            t={t}
           />
         )}
       </AnimatePresence>
@@ -254,7 +226,6 @@ const LANGUAGE_OPTIONS: { code: Language; flag: string; name: string }[] = [
 interface DailyReadyScreenProps {
   puzzleNumber: number;
   puzzleDate: string;
-  streak: DailyStreak | null;
   countdown: string;
   language: Language;
   currentFlag: string;
@@ -267,7 +238,6 @@ interface DailyReadyScreenProps {
 const DailyReadyScreen: React.FC<DailyReadyScreenProps> = ({
   puzzleNumber,
   puzzleDate,
-  streak,
   countdown,
   language,
   currentFlag,
@@ -391,46 +361,22 @@ const DailyReadyScreen: React.FC<DailyReadyScreenProps> = ({
           </p>
         </motion.div>
 
-        {/* Streak Display */}
-        {streak && streak.currentStreak > 0 && (
-          <motion.div
-            initial={{ scale: 0.9, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            transition={{ delay: 0.3 }}
-            className="flex items-center justify-center gap-2 text-neo-orange"
-          >
-            <Flame className="w-6 h-6 animate-pulse" />
-            <span className="text-xl font-bold">
-              {t('daily.streakDays').replace('{count}', String(streak.currentStreak))}
-            </span>
-          </motion.div>
-        )}
-
-        {/* Info Cards */}
+        {/* Info Cards - Word Hunt specific */}
         <motion.div
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.4 }}
-          className="grid grid-cols-2 gap-3"
+          transition={{ delay: 0.3 }}
+          className="bg-white text-neo-black dark:bg-neo-navy-light dark:text-white rounded-neo border-3 border-neo-black dark:border-white/20 p-4 shadow-hard-sm max-w-xs mx-auto"
         >
-          <div className="bg-white text-neo-black dark:bg-neo-navy-light dark:text-white rounded-neo border-3 border-neo-black dark:border-white/20 p-4 shadow-hard-sm">
-            <Timer className="w-6 h-6 mx-auto mb-2 text-cyan-600 dark:text-neo-cyan" />
-            <div className="text-2xl font-black text-neo-black dark:text-white">
-              {Math.floor(DAILY_CHALLENGE_DURATION / 60)}:{(DAILY_CHALLENGE_DURATION % 60).toString().padStart(2, '0')}
-            </div>
-            <div className="text-xs text-gray-600 dark:text-gray-300 uppercase">
-              {t('daily.timeLimit')}
-            </div>
+          <Target className="w-8 h-8 mx-auto mb-2 text-green-600 dark:text-green-400" />
+          <div className="text-3xl font-black text-neo-black dark:text-white">
+            10
           </div>
-
-          <div className="bg-white text-neo-black dark:bg-neo-navy-light dark:text-white rounded-neo border-3 border-neo-black dark:border-white/20 p-4 shadow-hard-sm">
-            <Trophy className="w-6 h-6 mx-auto mb-2 text-amber-500 dark:text-neo-yellow" />
-            <div className="text-2xl font-black text-neo-black dark:text-white">
-              1
-            </div>
-            <div className="text-xs text-gray-600 dark:text-gray-300 uppercase">
-              {t('daily.attempt')}
-            </div>
+          <div className="text-sm text-gray-600 dark:text-gray-300 uppercase font-bold">
+            {t('wordHunt.title')} - Max Attempts
+          </div>
+          <div className="text-xs text-gray-500 dark:text-gray-400 mt-2">
+            Hunt for the hidden word using color-coded feedback!
           </div>
         </motion.div>
 

@@ -7,6 +7,7 @@
 
 import { hebrewLetters, swedishLetters, spanishLetters, japaneseLetters, kanjiCompounds, DIFFICULTIES, DEFAULT_DIFFICULTY } from './consts';
 import type { Language, LetterGrid } from '@/types';
+import type { LetterFeedback } from './wordHuntFeedback';
 
 // ==========================================
 // Constants
@@ -285,9 +286,53 @@ function tryEmbedCompoundSeeded(
 }
 
 // ==========================================
+// Word Hunt Results (New Daily Challenge Format)
+// ==========================================
+
+/**
+ * Result for Word Hunt daily challenge
+ * Replaces the old scoring-based DailyChallengeResult
+ */
+export interface WordHuntResult {
+  puzzleNumber: number;
+  puzzleDate: string;
+  language: Language;
+
+  // Game outcome
+  solved: boolean;                // Did player find the target word?
+  attemptsUsed: number;          // 1-10 attempts
+  targetWord: string;            // The word they were hunting for
+
+  // Attempt history
+  attempts: Array<{
+    word: string;
+    feedback: LetterFeedback[];
+    timestamp: number;
+  }>;
+
+  // Survival mode fields (optional for backward compatibility)
+  wordsDiscovered?: Array<{
+    word: string;
+    timestamp: number;
+    lifeGained: number;
+    tokensGained: number;
+  }>;
+  lifeRemaining?: number;
+  clueTokensEarned?: number;
+  clueTokensSpent?: number;
+  hintsUnlocked?: number;
+  efficiencyScore?: number;
+
+  // Metadata
+  streakDays: number;
+  completedAt: string;
+}
+
+// ==========================================
 // Shareable Results Generation
 // ==========================================
 
+// Legacy interface for backward compatibility
 export interface DailyChallengeResult {
   puzzleNumber: number;
   puzzleDate: string;
@@ -364,7 +409,70 @@ ${dailyUrl}`;
 }
 
 /**
- * Generate share text for different platforms
+ * Generate Word Hunt share text (Wordle-style emoji grid)
+ * Shows attempt feedback patterns without spoiling the target word
+ */
+export function generateWordHuntShareableResult(result: WordHuntResult, siteUrl?: string): string {
+  // Import feedback emoji function
+  const { feedbackToEmoji } = require('./wordHuntFeedback');
+
+  // Build emoji grid - one row per attempt
+  const emojiGrid = result.attempts
+    .map(attempt => feedbackToEmoji(attempt.feedback))
+    .join('\n');
+
+  // Format result line
+  const resultLine = result.solved
+    ? `${result.attemptsUsed}/10 ✨`
+    : `X/10 ❌`;
+
+  // Format streak if > 1
+  const streakText = result.streakDays > 1 ? `🔥 ${result.streakDays} day streak!\n` : '';
+
+  // Build URL
+  let dailyUrl = 'lexiclash.live/daily';
+  if (typeof window !== 'undefined') {
+    const origin = window.location.origin;
+    dailyUrl = `${origin}/${result.language}/daily`;
+  } else if (siteUrl) {
+    dailyUrl = `${siteUrl}/${result.language}/daily`;
+  }
+
+  // Build the shareable text
+  return `🎯 LexiClash Word Hunt #${result.puzzleNumber}
+${emojiGrid}
+${resultLine}
+
+${streakText}${dailyUrl}`;
+}
+
+/**
+ * Generate share text for different platforms (Word Hunt)
+ */
+export function getWordHuntShareTextForPlatform(
+  result: WordHuntResult,
+  platform: 'whatsapp' | 'twitter' | 'telegram' | 'copy',
+  siteUrl = 'lexiclash.live'
+): string {
+  const baseText = generateWordHuntShareableResult(result, siteUrl);
+
+  // Platform-specific tweaks
+  switch (platform) {
+    case 'twitter':
+      // Twitter has character limits, keep it concise
+      return baseText;
+    case 'whatsapp':
+    case 'telegram':
+      // Add challenge message for messaging apps
+      return `${baseText}\n\nCan you solve today's Word Hunt?`;
+    case 'copy':
+    default:
+      return baseText;
+  }
+}
+
+/**
+ * Generate share text for different platforms (LEGACY - old daily challenge format)
  */
 export function getShareTextForPlatform(
   result: DailyChallengeResult,
@@ -393,11 +501,21 @@ export function getShareTextForPlatform(
 // ==========================================
 
 const DAILY_STORAGE_KEY = 'lexiclash_daily';
+const WORD_HUNT_STORAGE_KEY = 'lexiclash_word_hunt'; // New key for Word Hunt
 
+// Legacy stored result interface
 export interface StoredDailyResult {
   date: string;
   puzzleNumber: number;
   result: DailyChallengeResult;
+  completedAt: string;
+}
+
+// New Word Hunt stored result interface
+export interface StoredWordHuntResult {
+  date: string;
+  puzzleNumber: number;
+  result: WordHuntResult;
   completedAt: string;
 }
 
@@ -458,6 +576,86 @@ export function getAllDailyResults(language: Language): StoredDailyResult[] {
 
   const results: StoredDailyResult[] = [];
   const prefix = `${DAILY_STORAGE_KEY}_${language}_`;
+
+  for (let i = 0; i < localStorage.length; i++) {
+    const key = localStorage.key(i);
+    if (key && key.startsWith(prefix)) {
+      const stored = localStorage.getItem(key);
+      if (stored) {
+        try {
+          results.push(JSON.parse(stored));
+        } catch {
+          // Skip invalid entries
+        }
+      }
+    }
+  }
+
+  // Sort by date descending
+  return results.sort((a, b) => b.date.localeCompare(a.date));
+}
+
+// ==========================================
+// Word Hunt Local Storage (New)
+// ==========================================
+
+/**
+ * Check if user has already played today's Word Hunt
+ */
+export function hasPlayedWordHuntToday(language: Language): boolean {
+  if (typeof window === 'undefined') return false;
+
+  const today = getDailyChallengeDate();
+  const key = `${WORD_HUNT_STORAGE_KEY}_${language}_${today}`;
+  return localStorage.getItem(key) !== null;
+}
+
+/**
+ * Get the stored Word Hunt result for today (if exists)
+ */
+export function getTodaysWordHuntResult(language: Language): StoredWordHuntResult | null {
+  if (typeof window === 'undefined') return null;
+
+  const today = getDailyChallengeDate();
+  const key = `${WORD_HUNT_STORAGE_KEY}_${language}_${today}`;
+  const stored = localStorage.getItem(key);
+
+  if (!stored) return null;
+
+  try {
+    return JSON.parse(stored);
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Save the result of today's Word Hunt
+ */
+export function saveWordHuntResult(result: WordHuntResult): void {
+  if (typeof window === 'undefined') return;
+
+  const today = getDailyChallengeDate();
+  const key = `${WORD_HUNT_STORAGE_KEY}_${result.language}_${today}`;
+
+  const storedResult: StoredWordHuntResult = {
+    date: today,
+    puzzleNumber: result.puzzleNumber,
+    result,
+    completedAt: new Date().toISOString(),
+  };
+
+  localStorage.setItem(key, JSON.stringify(storedResult));
+}
+
+/**
+ * Get all stored Word Hunt results (for history)
+ */
+export function getAllWordHuntResults(language: Language): StoredWordHuntResult[] {
+  if (typeof window === 'undefined') return [];
+
+  const results: StoredWordHuntResult[] = [];
+  const prefix = `${WORD_HUNT_STORAGE_KEY}_${language}_`;
 
   for (let i = 0; i < localStorage.length; i++) {
     const key = localStorage.key(i);
@@ -671,4 +869,187 @@ async function getCanvasFingerprint(): Promise<string> {
   } catch {
     return '';
   }
+}
+
+// ==========================================
+// Word Hunt Target Word Selection
+// ==========================================
+
+/**
+ * Curated lists of quality target words for Word Hunt mode
+ * Organized by language and difficulty
+ */
+const TARGET_WORD_LISTS: Record<Language, string[]> = {
+  en: [
+    // 5-letter words (easier)
+    'HOUSE', 'PLANT', 'WATER', 'EARTH', 'SOUND', 'PLACE', 'WORLD', 'GREAT',
+    'SMALL', 'LARGE', 'YOUNG', 'ROUND', 'CLEAR', 'LIGHT', 'DARK', 'FRESH',
+    'CLEAN', 'QUICK', 'QUIET', 'HAPPY', 'READY', 'STRONG', 'SMART', 'BRAVE',
+    // 6-letter words (medium)
+    'CASTLE', 'GARDEN', 'FOREST', 'ISLAND', 'MARKET', 'BRIDGE', 'CORNER',
+    'WINDOW', 'SIMPLE', 'MODERN', 'GOLDEN', 'SILVER', 'PURPLE', 'YELLOW',
+    'ORANGE', 'SPRING', 'SUMMER', 'WINTER', 'AUTUMN', 'MONDAY', 'FRIDAY',
+    // 7-letter words (harder)
+    'KITCHEN', 'MORNING', 'EVENING', 'PERFECT', 'NATURAL', 'SPECIAL',
+    'AMAZING', 'REGULAR', 'GENERAL', 'CENTRAL', 'EASTERN', 'WESTERN',
+    // 8-letter words (challenging)
+    'MOUNTAIN', 'STANDARD', 'TREASURE', 'QUESTION', 'BUILDING', 'FUNCTION'
+  ],
+  he: [
+    // Hebrew 5-letter words
+    'בית', 'מים', 'עולם', 'אדם', 'דבר',
+    'לב', 'יד', 'עין', 'פה', 'ראש',
+    // Hebrew 6-letter words
+    'משפחה', 'חברה', 'עבודה', 'תרבות',
+    // Hebrew 7-letter words
+    'חינוך', 'בריאות', 'תקשורת'
+  ],
+  sv: [
+    // Swedish 5-letter words
+    'VATTEN', 'VÄRLD', 'PLATS', 'LJUD', 'KRAFT',
+    'BÄSTA', 'FÖRSTA', 'SISTA', 'RUNDA', 'KLAR',
+    // Swedish 6-letter words
+    'SLOTT', 'TRÄDGÅRD', 'MARKNAD', 'FÖNSTER',
+    // Swedish 7-letter words
+    'MORGON', 'KVÄLL', 'PERFEKT'
+  ],
+  ja: [
+    // Japanese 5-character compound words
+    '日本語', '図書館', '電車', '新聞', '会社',
+    '学校', '先生', '学生', '家族', '友達',
+    // Japanese 6-character words
+    '音楽', '映画', '料理', '旅行', '天気'
+  ],
+  es: [
+    // Spanish 5-letter words
+    'CASA', 'AGUA', 'MUNDO', 'LUGAR', 'TIEMPO',
+    'GENTE', 'NOCHE', 'PLANTA', 'TIERRA', 'CIELO',
+    // Spanish 6-letter words
+    'CASTILLO', 'JARDÍN', 'MERCADO', 'PUENTE',
+    'VENTANA', 'SIMPLE', 'MODERNO', 'DORADO',
+    // Spanish 7-letter words
+    'COCINA', 'MAÑANA', 'PERFECTO', 'NATURAL'
+  ]
+};
+
+/**
+ * Interface for daily target word result
+ */
+export interface DailyTargetWord {
+  word: string;
+  puzzleDate: string;
+  language: Language;
+  puzzleNumber: number;
+}
+
+/**
+ * Deterministically select a target word for the daily Word Hunt challenge
+ *
+ * Algorithm:
+ * 1. Use same seeded PRNG as grid generation
+ * 2. Shuffle curated word list using seeded random
+ * 3. Try each word in order to see if it exists on the board
+ * 4. Return the first word that can be formed on the board
+ * 5. If none work, fall back to simplest words
+ *
+ * CRITICAL: Must be 100% deterministic - same date+language = same target word
+ *
+ * @param grid - The daily challenge grid
+ * @param dateString - Date string (YYYY-MM-DD)
+ * @param language - Game language
+ * @returns Target word for this puzzle
+ */
+export function selectDailyTargetWord(
+  grid: LetterGrid,
+  dateString: string,
+  language: Language
+): DailyTargetWord {
+  // Use same seed as grid generation for consistency
+  const seedString = `${SEED_SALT}-${dateString}-${language}-target`;
+  const seed = hashString(seedString);
+  const random = mulberry32(seed);
+
+  // Get word list for this language
+  const wordList = TARGET_WORD_LISTS[language] || TARGET_WORD_LISTS['en'];
+
+  // Shuffle word list using seeded random (Fisher-Yates)
+  const shuffled = [...wordList];
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(random() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  }
+
+  // Import word validation function dynamically to avoid circular deps
+  // For now, we'll use a simpler heuristic: check if all letters exist
+  // The actual game will validate using isWordOnBoard
+
+  // Try each word in shuffled order
+  for (const word of shuffled) {
+    if (canWordExistOnGrid(word, grid, language)) {
+      return {
+        word,
+        puzzleDate: dateString,
+        language,
+        puzzleNumber: getPuzzleNumber(dateString)
+      };
+    }
+  }
+
+  // Fallback: return first word (should never happen with good word lists)
+  return {
+    word: shuffled[0],
+    puzzleDate: dateString,
+    language,
+    puzzleNumber: getPuzzleNumber(dateString)
+  };
+}
+
+/**
+ * Quick heuristic to check if a word could exist on the grid
+ * Checks if all required letters are available (not a full path check)
+ *
+ * @param word - Word to check
+ * @param grid - Letter grid
+ * @param language - Language for normalization
+ * @returns true if word might exist on grid
+ */
+function canWordExistOnGrid(word: string, grid: LetterGrid, language: Language): boolean {
+  // Flatten grid and count available letters
+  const gridLetters = grid.flat();
+  const letterCounts = new Map<string, number>();
+
+  for (const letter of gridLetters) {
+    const normalized = letter.toUpperCase();
+    letterCounts.set(normalized, (letterCounts.get(normalized) || 0) + 1);
+  }
+
+  // Check if all letters in word are available
+  const wordUpper = word.toUpperCase();
+  const wordLetterCounts = new Map<string, number>();
+
+  for (const letter of wordUpper) {
+    wordLetterCounts.set(letter, (wordLetterCounts.get(letter) || 0) + 1);
+  }
+
+  for (const [letter, count] of wordLetterCounts.entries()) {
+    const available = letterCounts.get(letter) || 0;
+    if (available < count) {
+      return false; // Not enough of this letter
+    }
+  }
+
+  return true; // All letters are available
+}
+
+/**
+ * Get the daily target word for today
+ * Convenience wrapper for selectDailyTargetWord
+ *
+ * @param grid - The daily grid
+ * @param language - Game language
+ * @returns Today's target word
+ */
+export function getTodaysTargetWord(grid: LetterGrid, language: Language): DailyTargetWord {
+  const date = getDailyChallengeDate();
+  return selectDailyTargetWord(grid, date, language);
 }

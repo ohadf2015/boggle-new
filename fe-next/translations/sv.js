@@ -114,6 +114,10 @@ const sv = {
     "changeSettings": "Ändra Inställningar",
     "settingsAndPlay": "Inställningar & Spela Igen",
     "backToLobby": "Tillbaka till Lobby",
+    "attempts": "Försök",
+    "games": "spel",
+    "share": "Dela",
+    "xp": "XP",
     "settings": "Inställningar",
     "lobby": "Lobby",
     "viewGrid": "Visa rutnät",
@@ -230,6 +234,7 @@ const sv = {
   "earthquake": {
     "warning": "Jordbävning!",
     "brace": "Spänn dig!",
+    "photosensitivity": "Blinkande ljus framåt! Inaktivera i inställningar om känslig",
     "fireRound": "Eldrunda",
     "multiplier": "2× Multiplikator"
   },
@@ -1171,7 +1176,8 @@ const sv = {
       "next": "Nästa",
       "letsPlay": "Let's Play!",
       "title": "Spelarvälkommen"
-    }
+    },
+    "skipHint": "Tryck ESC eller klicka Hoppa över för att hoppa direkt till spelet 🎮"
   },
   "achievements": {
     "FIRST_BLOOD": {
@@ -1546,7 +1552,17 @@ const sv = {
     "backToLobby": "Tillbaka till lobbyn",
     "locked": "Låst",
     "earnThisAchievement": "Spela spel för att låsa upp denna prestation!",
-    "connectedAccount": "Ansluten med ditt konto"
+    "connectedAccount": "Ansluten med ditt konto",
+    "referralReward": "Bjud in vänner",
+    "referralDescription": "Tjäna belöningar när vänner går med!",
+    "referralsCount": "Vänner",
+    "xp": "XP tjänat",
+    "activeReferrals": "Aktiva",
+    "yourReferralCode": "Din remiss-kod",
+    "shareWith": "Dela din länk",
+    "referralRewards": "Remiss-belöningar",
+    "yourReferrals": "Dina remisser",
+    "noReferralsYet": "Inga remisser än. Börja dela!"
   },
   "leaderboard": {
     "title": "Topplista",
@@ -1808,6 +1824,16 @@ const sv = {
   "singlePlayer": {
     "title": "Enspelarläge",
     "selectMode": "Välj läge",
+    "chooseMode": "Välj ditt läge",
+    "mode": {
+      "soloBots": "Solo mot Botar",
+      "soloBotsDesc": "Tävla mot AI-motståndare",
+      "practice": "Träning",
+      "practiceDesc": "Ingen timer, inget tryck",
+      "challenge": "Utmaning",
+      "challengeDesc": "Slå dina högsta poäng",
+      "noTimer": "Ingen timer"
+    },
     "soloVsBots": "Solo mot bottar",
     "soloVsBotsDesc": "Tävla mot AI-motståndare",
     "practiceMode": "Övning",
@@ -1906,6 +1932,7 @@ const sv = {
     "tutorialKeyboard": "Tangentbord: Mellanslag = Pausa, Esc = Avsluta, ? = Hjälp"
   },
   "challenge": {
+    "record": "Rekord",
     "yourRecord": "Ditt rekord",
     "beatIt": "Kan du slå det?",
     "noRecord": "Inget rekord än",
@@ -2026,6 +2053,71 @@ const sv = {
     "showMore": "Visa mer",
     "showLess": "Visa mindre",
     "more": "mer"
+  },
+  "wordHunt": {
+    "title": "Ordjakt",
+    "attemptsRemaining": "Försök {current} av {max}",
+    "wrongLength": "Ordet måste vara {expected} bokstäver (du skrev {got})",
+    "alreadyGuessed": "Du har redan gissat det ordet!",
+    "victory": "🎉 Du hittade det!",
+    "defeat": "Spelet är slut! Ordet var: {word}",
+    "keepGoing": "Fortsätt jaga! Använd feedbacken för att vägleda nästa gissning",
+    "formWord": "Bilda ett ord från brädet...",
+    "letterKnowledge": "Bokstavskunskap",
+    "targetLength": "Målordet längd: {length} bokstäver",
+    "greenMeaning": "🟩 = Bokstav på rätt plats",
+    "yellowMeaning": "🟨 = Bokstaven finns men fel plats",
+    "grayMeaning": "⬜ = Bokstaven finns inte i ordet",
+    "howToPlay": "Jaga det dolda {length}-bokstavs ordet med hjälp av feedback! Du har {max} försök att hitta det.",
+    "shareResult": "Dela resultat",
+    "playAgainTomorrow": "Kom tillbaka imorgon för ett nytt pussel!",
+    "stats": {
+      "title": "Statistik",
+      "totalPlayers": "Totalt antal spelare",
+      "solveRate": "Lösningsgrad",
+      "avgAttempts": "Genomsnittliga försök",
+      "distribution": "Fördelning av försök",
+      "yourPercentile": "Du gjorde det bättre än {percentile}% av spelarna!",
+      "youSolved": "Du löste det!",
+      "youFailed": "Du löste det inte den här gången",
+      "attemptsUsed": "Försök använda: {count}"
+    },
+    "survival": {
+      "lifePoints": "Liv",
+      "lifeRemaining": "{points} Liv",
+      "lifeDraining": "Livet rinner ut...",
+      "clueTokens": "Ledtrådspoletter",
+      "tokensAvailable": "{count} poletter",
+      "wordsDiscovered": "Ord hittade",
+      "wordsCount": "{count} ord hittade",
+      "hints": "Ledtrådar",
+      "aiHint": "AI Ledtråd",
+      "hintLevel": "Ledtråd {level}/5",
+      "hintUnlocked": "Ledtråd upplåst!",
+      "hintCost": "Kostnad: {cost} ord",
+      "needMoreWords": "Hitta {count} fler ord för att låsa upp",
+      "shop": "Ledtrådsbutik",
+      "shopTitle": "Spendera ledtrådspoletter",
+      "revealLetter": "Avslöja bokstav",
+      "revealLetterDesc": "Avslöja en slumpmässig bokstav i målordet",
+      "eliminateLetters": "Eliminera felaktiga bokstäver",
+      "eliminateLettersDesc": "Ta bort 3 bokstäver som INTE finns i ordet",
+      "exampleSentence": "Exempelmening",
+      "exampleSentenceDesc": "Se ordet använt i en mening (ordet är tomt)",
+      "revealCategory": "Avslöja kategori",
+      "revealCategoryDesc": "Visa ordkategorin (t.ex. \"Djur > Däggdjur\")",
+      "purchase": "Köp ({cost} poletter)",
+      "purchased": "Köpt",
+      "notEnoughTokens": "Inte tillräckligt med poletter",
+      "efficiency": "Effektivitet",
+      "efficiencyScore": "Effektivitetspoäng: {score}",
+      "wordDiscovery": "+{life} Liv, +{tokens} Poletter",
+      "gameOver": "Slut på liv!",
+      "youWon": "Du överlevde och hittade ordet!",
+      "category": "Kategori: {category}",
+      "targetWordGuess": "Målordsgissning",
+      "gridWordDiscovery": "Rutnätsupptäckt"
+    }
   },
   "guidance": {
     "combo": {

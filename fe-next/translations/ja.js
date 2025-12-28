@@ -114,6 +114,10 @@ const ja = {
     "changeSettings": "設定を変更",
     "settingsAndPlay": "設定して再プレイ",
     "backToLobby": "ロビーに戻る",
+    "attempts": "試行回数",
+    "games": "ゲーム",
+    "share": "共有",
+    "xp": "XP",
     "settings": "設定",
     "lobby": "ロビー",
     "viewGrid": "グリッドを見る",
@@ -230,6 +234,7 @@ const ja = {
   "earthquake": {
     "warning": "地震！",
     "brace": "準備して！",
+    "photosensitivity": "点滅するライトが前方に！敏感な場合は設定で無効にしてください",
     "fireRound": "ファイアラウンド",
     "multiplier": "2倍マルチプライヤー"
   },
@@ -1170,7 +1175,8 @@ const ja = {
       "next": "次へ",
       "letsPlay": "プレイしよう！",
       "title": "プレイヤーようこそ"
-    }
+    },
+    "skipHint": "ESCキーを押すか、スキップをクリックしてゲームに直接ジャンプ 🎮"
   },
   "achievements": {
     "FIRST_BLOOD": {
@@ -1545,7 +1551,17 @@ const ja = {
     "backToLobby": "ロビーに戻る",
     "locked": "ロック中",
     "earnThisAchievement": "ゲームをプレイしてこの実績をアンロックしましょう！",
-    "connectedAccount": "アカウントに接続中"
+    "connectedAccount": "アカウントに接続中",
+    "referralReward": "友達を招待",
+    "referralDescription": "友達が参加すると報酬を獲得！",
+    "referralsCount": "友達",
+    "xp": "獲得XP",
+    "activeReferrals": "アクティブ",
+    "yourReferralCode": "あなたの紹介コード",
+    "shareWith": "リンクを共有",
+    "referralRewards": "紹介報酬",
+    "yourReferrals": "あなたの紹介",
+    "noReferralsYet": "まだ紹介はありません。シェアを始めましょう！"
   },
   "leaderboard": {
     "title": "リーダーボード",
@@ -1807,6 +1823,16 @@ const ja = {
   "singlePlayer": {
     "title": "シングルプレイヤー",
     "selectMode": "モード選択",
+    "chooseMode": "モードを選択",
+    "mode": {
+      "soloBots": "ボット対戦",
+      "soloBotsDesc": "AIと競争",
+      "practice": "練習",
+      "practiceDesc": "タイマーなし、プレッシャーなし",
+      "challenge": "チャレンジ",
+      "challengeDesc": "ハイスコアを更新",
+      "noTimer": "タイマーなし"
+    },
     "soloVsBots": "ボット対戦",
     "soloVsBotsDesc": "AI相手に対戦",
     "practiceMode": "練習",
@@ -1905,6 +1931,7 @@ const ja = {
     "tutorialKeyboard": "キーボード：スペース=一時停止、Esc=終了、?=ヘルプ"
   },
   "challenge": {
+    "record": "記録",
     "yourRecord": "あなたの記録",
     "beatIt": "破れるかな？",
     "noRecord": "まだ記録なし",
@@ -2025,6 +2052,71 @@ const ja = {
     "showMore": "もっと見る",
     "showLess": "閉じる",
     "more": "人"
+  },
+  "wordHunt": {
+    "title": "ワードハント",
+    "attemptsRemaining": "試行 {current}/{max}",
+    "wrongLength": "単語は{expected}文字である必要があります（{got}文字入力されました）",
+    "alreadyGuessed": "その単語は既に推測されています！",
+    "victory": "🎉 見つけました！",
+    "defeat": "ゲーム終了！正解は：{word}",
+    "keepGoing": "探し続けてください！フィードバックを使って次の推測を導きましょう",
+    "formWord": "グリッドから単語を作成...",
+    "letterKnowledge": "文字の知識",
+    "targetLength": "目標単語の長さ：{length}文字",
+    "greenMeaning": "🟩 = 正しい位置の文字",
+    "yellowMeaning": "🟨 = 文字は存在するが位置が違う",
+    "grayMeaning": "⬜ = 単語に含まれていない文字",
+    "howToPlay": "フィードバックのヒントを使って隠された{length}文字の単語を探そう！{max}回の試行があります。",
+    "shareResult": "結果をシェア",
+    "playAgainTomorrow": "明日また新しいパズルに挑戦してください！",
+    "stats": {
+      "title": "統計",
+      "totalPlayers": "総プレイヤー数",
+      "solveRate": "解決率",
+      "avgAttempts": "平均試行回数",
+      "distribution": "試行回数の分布",
+      "yourPercentile": "プレイヤーの{percentile}%より良い成績です！",
+      "youSolved": "解決しました！",
+      "youFailed": "今回は解決できませんでした",
+      "attemptsUsed": "使用した試行回数：{count}"
+    },
+    "survival": {
+      "lifePoints": "ライフ",
+      "lifeRemaining": "{points} ライフ",
+      "lifeDraining": "ライフが減っています...",
+      "clueTokens": "ヒントトークン",
+      "tokensAvailable": "{count} トークン",
+      "wordsDiscovered": "発見した単語",
+      "wordsCount": "{count} 単語発見",
+      "hints": "ヒント",
+      "aiHint": "AIヒント",
+      "hintLevel": "ヒント {level}/5",
+      "hintUnlocked": "ヒントがアンロックされました！",
+      "hintCost": "コスト：{cost} 単語",
+      "needMoreWords": "アンロックするにはあと{count}単語必要",
+      "shop": "ヒントショップ",
+      "shopTitle": "ヒントトークンを使う",
+      "revealLetter": "文字を表示",
+      "revealLetterDesc": "目標単語のランダムな文字を表示",
+      "eliminateLetters": "間違った文字を削除",
+      "eliminateLettersDesc": "単語に含まれていない3文字を削除",
+      "exampleSentence": "例文",
+      "exampleSentenceDesc": "単語が使われている文を表示（単語は空白）",
+      "revealCategory": "カテゴリを表示",
+      "revealCategoryDesc": "単語のカテゴリを表示（例：「動物 > 哺乳類」）",
+      "purchase": "購入（{cost} トークン）",
+      "purchased": "購入済み",
+      "notEnoughTokens": "トークンが不足しています",
+      "efficiency": "効率",
+      "efficiencyScore": "効率スコア：{score}",
+      "wordDiscovery": "+{life} ライフ、+{tokens} トークン",
+      "gameOver": "ライフがなくなりました！",
+      "youWon": "生き残って単語を見つけました！",
+      "category": "カテゴリ：{category}",
+      "targetWordGuess": "目標単語の推測",
+      "gridWordDiscovery": "グリッド単語の発見"
+    }
   },
   "guidance": {
     "combo": {

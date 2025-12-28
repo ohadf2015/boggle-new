@@ -114,6 +114,10 @@ const he = {
     "changeSettings": "שנה הגדרות",
     "settingsAndPlay": "הגדרות ושחק שוב",
     "backToLobby": "חזרה ללובי",
+    "attempts": "ניסיונות",
+    "games": "משחקים",
+    "share": "שתף",
+    "xp": "XP",
     "settings": "הגדרות",
     "lobby": "לובי",
     "viewGrid": "הצג לוח",
@@ -230,6 +234,7 @@ const he = {
   "earthquake": {
     "warning": "רעידת אדמה!",
     "brace": "התכוננו!",
+    "photosensitivity": "אורות מהבהבים לפניך! השבת בהגדרות אם רגיש",
     "fireRound": "סיבוב אש",
     "multiplier": "מכפיל ×2"
   },
@@ -1172,7 +1177,8 @@ const he = {
       "next": "הבא",
       "letsPlay": "בואו נשחק!",
       "title": "ברוכים הבאים"
-    }
+    },
+    "skipHint": "לחץ ESC או לחץ דלג כדי לקפוץ ישר למשחק 🎮"
   },
   "achievements": {
     "FIRST_BLOOD": {
@@ -1675,7 +1681,17 @@ const he = {
     "backToLobby": "חזרה ללובי",
     "locked": "נעול",
     "earnThisAchievement": "שחק משחקים כדי לפתוח את ההישג הזה!",
-    "connectedAccount": "מחובר עם החשבון שלך"
+    "connectedAccount": "מחובר עם החשבון שלך",
+    "referralReward": "הזמן חברים",
+    "referralDescription": "הרווח פרסים כשחברים מצטרפים!",
+    "referralsCount": "חברים",
+    "xp": "XP שהרווחת",
+    "activeReferrals": "פעילים",
+    "yourReferralCode": "קוד ההפניה שלך",
+    "shareWith": "שתף את הקישור שלך",
+    "referralRewards": "פרסי הפניות",
+    "yourReferrals": "ההפניות שלך",
+    "noReferralsYet": "אין הפניות עדיין. התחל לשתף!"
   },
   "leaderboard": {
     "title": "טבלת מובילים",
@@ -1809,6 +1825,16 @@ const he = {
   "singlePlayer": {
     "title": "שחקן יחיד",
     "selectMode": "בחר מצב",
+    "chooseMode": "בחר את המצב שלך",
+    "mode": {
+      "soloBots": "נגד בוטים",
+      "soloBotsDesc": "התחרה נגד יריבי AI",
+      "practice": "אימון",
+      "practiceDesc": "ללא טיימר, ללא לחץ",
+      "challenge": "אתגר",
+      "challengeDesc": "שבור את השיאים שלך",
+      "noTimer": "ללא טיימר"
+    },
     "soloVsBots": "נגד בוטים",
     "soloVsBotsDesc": "התחרה נגד יריבים ממוחשבים",
     "practiceMode": "אימון",
@@ -1907,6 +1933,7 @@ const he = {
     "tutorialKeyboard": "מקלדת: רווח = השהה, Esc = צא, ? = עזרה"
   },
   "challenge": {
+    "record": "שיא",
     "yourRecord": "השיא שלך",
     "beatIt": "תוכל לשבור אותו?",
     "noRecord": "עדיין אין שיא",
@@ -2027,6 +2054,71 @@ const he = {
     "showMore": "הצג עוד",
     "showLess": "הצג פחות",
     "more": "עוד"
+  },
+  "wordHunt": {
+    "title": "ציד מילים",
+    "attemptsRemaining": "ניסיון {current} מתוך {max}",
+    "wrongLength": "המילה חייבת להיות בת {expected} אותיות (הזנת {got})",
+    "alreadyGuessed": "כבר ניחשת את המילה הזאת!",
+    "victory": "🎉 מצאת את המילה!",
+    "defeat": "המשחק הסתיים! המילה הייתה: {word}",
+    "keepGoing": "המשיכו לחפש! השתמשו במשוב כדי לכוון את הניחוש הבא",
+    "formWord": "צרו מילה מהלוח...",
+    "letterKnowledge": "אותיות שנמצאו",
+    "targetLength": "אורך המילה המטרה: {length} אותיות",
+    "greenMeaning": "🟩 = אות במיקום הנכון",
+    "yellowMeaning": "🟨 = האות קיימת אך במיקום שגוי",
+    "grayMeaning": "⬜ = האות לא נמצאת במילה",
+    "howToPlay": "חפשו את המילה המוסתרת בת {length} אותיות באמצעות רמזים! יש לכם {max} ניסיונות למצוא אותה.",
+    "shareResult": "שתפו תוצאה",
+    "playAgainTomorrow": "חזרו מחר לפאזל חדש!",
+    "stats": {
+      "title": "סטטיסטיקה",
+      "totalPlayers": "סך כל השחקנים",
+      "solveRate": "אחוז פתרון",
+      "avgAttempts": "ממוצע ניסיונות",
+      "distribution": "התפלגות ניסיונות",
+      "yourPercentile": "עשיתם טוב יותר מ-{percentile}% מהשחקנים!",
+      "youSolved": "פתרתם את החידה!",
+      "youFailed": "לא הצלחתם לפתור הפעם",
+      "attemptsUsed": "ניסיונות שהושקעו: {count}"
+    },
+    "survival": {
+      "lifePoints": "חיים",
+      "lifeRemaining": "{points} חיים",
+      "lifeDraining": "החיים מתרוקנים...",
+      "clueTokens": "אסימוני רמז",
+      "tokensAvailable": "{count} אסימונים",
+      "wordsDiscovered": "מילים שנמצאו",
+      "wordsCount": "{count} מילים נמצאו",
+      "hints": "רמזים",
+      "aiHint": "רמז AI",
+      "hintLevel": "רמז {level}/5",
+      "hintUnlocked": "רמז נפתח!",
+      "hintCost": "עלות: {cost} מילים",
+      "needMoreWords": "מצאו עוד {count} מילים לפתיחה",
+      "shop": "חנות רמזים",
+      "shopTitle": "השתמשו באסימוני רמז",
+      "revealLetter": "חשוף אות",
+      "revealLetterDesc": "חשוף אות אקראית במילת היעד",
+      "eliminateLetters": "הסר אותיות שגויות",
+      "eliminateLettersDesc": "הסר 3 אותיות שאינן במילה",
+      "exampleSentence": "משפט לדוגמה",
+      "exampleSentenceDesc": "ראה את המילה בשימוש במשפט (המילה ריקה)",
+      "revealCategory": "חשוף קטגוריה",
+      "revealCategoryDesc": "הצג את קטגוריית המילה (לדוגמה, \"חיות > יונקים\")",
+      "purchase": "קנה ({cost} אסימונים)",
+      "purchased": "נרכש",
+      "notEnoughTokens": "אין מספיק אסימונים",
+      "efficiency": "יעילות",
+      "efficiencyScore": "ציון יעילות: {score}",
+      "wordDiscovery": "+{life} חיים, +{tokens} אסימונים",
+      "gameOver": "נגמרו החיים!",
+      "youWon": "שרדתם ומצאתם את המילה!",
+      "category": "קטגוריה: {category}",
+      "targetWordGuess": "ניחוש מילת יעד",
+      "gridWordDiscovery": "גילוי מילת לוח"
+    }
   },
   "guidance": {
     "combo": {

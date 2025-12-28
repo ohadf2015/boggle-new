@@ -2,8 +2,11 @@
 
 import React, { useState, useEffect, useCallback, memo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Users, Trophy, Clock, ChevronDown, ChevronUp, Sparkles } from 'lucide-react';
+import { Users, Trophy, Clock, ChevronDown, ChevronUp, Sparkles, Share2 } from 'lucide-react';
+import { FaCheck, FaCopy } from 'react-icons/fa';
+import { Button } from '@/components/ui/button';
 import { getRankDisplay, getRankBgColor } from '@/utils/rankingStyles';
+import { getPuzzleNumber } from '@/utils/dailyChallenge';
 import type { Language } from '@/types';
 
 // Simple relative time formatter
@@ -157,6 +160,7 @@ const DailyLeaderboard: React.FC<DailyLeaderboardProps> = ({
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [expanded, setExpanded] = useState(false);
+  const [copied, setCopied] = useState(false);
 
   // Fetch leaderboard data
   const fetchLeaderboard = useCallback(async () => {
@@ -207,6 +211,51 @@ const DailyLeaderboard: React.FC<DailyLeaderboardProps> = ({
 
   // Find current user's position
   const currentUserIndex = participants.findIndex(isCurrentUser);
+  const currentUserData = currentUserIndex >= 0 ? participants[currentUserIndex] : null;
+
+  // Generate shareable link with OG image
+  const handleShareRank = useCallback(async () => {
+    if (!currentUserData) return;
+
+    const puzzleNumber = getPuzzleNumber(puzzleDate);
+    const origin = typeof window !== 'undefined' ? window.location.origin : '';
+
+    // Generate OG image URL
+    const ogParams = new URLSearchParams({
+      rank: currentUserData.rank_position.toString(),
+      displayName: currentUserData.display_name,
+      avatarEmoji: currentUserData.avatar_emoji,
+      score: currentUserData.score.toString(),
+      wordCount: currentUserData.word_count.toString(),
+      puzzleNumber: puzzleNumber.toString(),
+    });
+
+    const shareUrl = `${origin}/${language}/daily?share=${encodeURIComponent(ogParams.toString())}`;
+    const shareText = `🎯 I ranked #${currentUserData.rank_position} on LexiClash Daily #${puzzleNumber}! ${currentUserData.score} pts | ${currentUserData.word_count} words\n\n`;
+
+    // Try native share first
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: `LexiClash Daily #${puzzleNumber}`,
+          text: shareText,
+          url: shareUrl,
+        });
+        return;
+      } catch (err) {
+        // User cancelled or error - fall through to copy
+      }
+    }
+
+    // Fallback to clipboard
+    try {
+      await navigator.clipboard.writeText(shareText + shareUrl);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch (err) {
+      console.error('Failed to copy:', err);
+    }
+  }, [currentUserData, puzzleDate, language]);
 
   // Determine which participants to show
   const visibleParticipants = expanded
@@ -271,17 +320,35 @@ const DailyLeaderboard: React.FC<DailyLeaderboardProps> = ({
           </div>
         </div>
 
-        {/* Current user's rank badge (if not in visible list) */}
-        {currentUserIndex >= maxVisible && !expanded && (
-          <motion.div
-            initial={{ scale: 0 }}
-            animate={{ scale: 1 }}
-            className="flex items-center gap-1.5 px-2 py-1 bg-neo-cyan/20 border-2 border-neo-cyan rounded-neo"
-          >
-            <span className="text-xs font-bold text-neo-cyan">
-              {t('daily.yourRank')}: #{currentUserIndex + 1}
-            </span>
-          </motion.div>
+        {/* Current user's rank badge and share button */}
+        {currentUserData && (
+          <div className="flex items-center gap-2">
+            {currentUserIndex >= maxVisible && !expanded && (
+              <motion.div
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                className="flex items-center gap-1.5 px-2 py-1 bg-neo-cyan/20 border-2 border-neo-cyan rounded-neo"
+              >
+                <span className="text-xs font-bold text-neo-cyan">
+                  {t('daily.yourRank')}: #{currentUserIndex + 1}
+                </span>
+              </motion.div>
+            )}
+
+            {/* Share Rank Button */}
+            <Button
+              onClick={handleShareRank}
+              size="sm"
+              className="px-2 py-1 h-8 bg-neo-purple hover:bg-neo-purple/90 text-white border-2 border-neo-black rounded-neo shadow-hard-sm hover:-translate-y-0.5 transition-all"
+              aria-label="Share your rank"
+            >
+              {copied ? (
+                <FaCheck className="w-3 h-3" />
+              ) : (
+                <Share2 className="w-3 h-3" />
+              )}
+            </Button>
+          </div>
         )}
       </div>
 

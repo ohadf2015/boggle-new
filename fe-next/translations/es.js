@@ -114,6 +114,10 @@ const es = {
     "changeSettings": "Cambiar Configuración",
     "settingsAndPlay": "Configurar y Jugar",
     "backToLobby": "Volver a la Sala",
+    "attempts": "Intentos",
+    "games": "juegos",
+    "share": "Compartir",
+    "xp": "XP",
     "settings": "Configuración",
     "lobby": "Sala de Espera",
     "viewGrid": "Ver Tablero",
@@ -230,6 +234,7 @@ const es = {
   "earthquake": {
     "warning": "¡Terremoto!",
     "brace": "¡Prepárate!",
+    "photosensitivity": "¡Luces parpadeantes adelante! Desactivar en Configuración si es sensible",
     "fireRound": "Ronda de Fuego",
     "multiplier": "Multiplicador ×2"
   },
@@ -1584,7 +1589,17 @@ const es = {
     "backToLobby": "Volver al Lobby",
     "locked": "Bloqueado",
     "earnThisAchievement": "¡Juega partidas para desbloquear este logro!",
-    "connectedAccount": "Conectado con tu cuenta"
+    "connectedAccount": "Conectado con tu cuenta",
+    "referralReward": "Invitar amigos",
+    "referralDescription": "¡Gana recompensas cuando se unan amigos!",
+    "referralsCount": "Amigos",
+    "xp": "XP ganado",
+    "activeReferrals": "Activos",
+    "yourReferralCode": "Tu código de referencia",
+    "shareWith": "Comparte tu enlace",
+    "referralRewards": "Recompensas de referencia",
+    "yourReferrals": "Tus referencias",
+    "noReferralsYet": "No hay referencias aún. ¡Empieza a compartir!"
   },
   "onboarding": {
     "welcome": {
@@ -1671,7 +1686,8 @@ const es = {
       "next": "Siguiente",
       "letsPlay": "¡A Jugar!",
       "title": "Bienvenida del Jugador"
-    }
+    },
+    "skipHint": "Presiona ESC o haz clic en Saltar para ir directamente al juego 🎮"
   },
   "leaderboard": {
     "title": "Clasificación",
@@ -1805,6 +1821,16 @@ const es = {
   "singlePlayer": {
     "title": "Un Jugador",
     "selectMode": "Selecciona Modo",
+    "chooseMode": "Elige tu modo",
+    "mode": {
+      "soloBots": "Solo vs Bots",
+      "soloBotsDesc": "Compite contra oponentes IA",
+      "practice": "Práctica",
+      "practiceDesc": "Sin temporizador, sin presión",
+      "challenge": "Desafío",
+      "challengeDesc": "Supera tus mejores puntajes",
+      "noTimer": "Sin temporizador"
+    },
     "soloVsBots": "Solo vs Bots",
     "soloVsBotsDesc": "Compite contra oponentes de IA",
     "practiceMode": "Práctica",
@@ -1903,6 +1929,7 @@ const es = {
     "tutorialKeyboard": "Teclado: Espacio = Pausar, Esc = Salir, ? = Ayuda"
   },
   "challenge": {
+    "record": "Récord",
     "yourRecord": "Tu Récord",
     "beatIt": "¿Puedes superarlo?",
     "noRecord": "Sin Récord Aún",
@@ -2023,6 +2050,71 @@ const es = {
     "showMore": "Mostrar más",
     "showLess": "Mostrar menos",
     "more": "más"
+  },
+  "wordHunt": {
+    "title": "Caza de Palabras",
+    "attemptsRemaining": "Intento {current} de {max}",
+    "wrongLength": "La palabra debe tener {expected} letras (ingresaste {got})",
+    "alreadyGuessed": "¡Ya adivinaste esa palabra!",
+    "victory": "🎉 ¡La encontraste!",
+    "defeat": "Fin del juego! La palabra era: {word}",
+    "keepGoing": "¡Sigue buscando! Usa la retroalimentación para guiar tu próxima suposición",
+    "formWord": "Forma una palabra del tablero...",
+    "letterKnowledge": "Conocimiento de letras",
+    "targetLength": "Longitud de la palabra objetivo: {length} letras",
+    "greenMeaning": "🟩 = Letra en posición correcta",
+    "yellowMeaning": "🟨 = La letra existe pero en posición incorrecta",
+    "grayMeaning": "⬜ = La letra no está en la palabra",
+    "howToPlay": "¡Caza la palabra oculta de {length} letras usando pistas de retroalimentación! Tienes {max} intentos para encontrarla.",
+    "shareResult": "Compartir Resultado",
+    "playAgainTomorrow": "¡Vuelve mañana para un nuevo puzzle!",
+    "stats": {
+      "title": "Estadísticas",
+      "totalPlayers": "Total de Jugadores",
+      "solveRate": "Tasa de Resolución",
+      "avgAttempts": "Intentos Promedio",
+      "distribution": "Distribución de Intentos",
+      "yourPercentile": "¡Lo hiciste mejor que el {percentile}% de los jugadores!",
+      "youSolved": "¡Lo resolviste!",
+      "youFailed": "No lo resolviste esta vez",
+      "attemptsUsed": "Intentos usados: {count}"
+    },
+    "survival": {
+      "lifePoints": "Vida",
+      "lifeRemaining": "{points} Vida",
+      "lifeDraining": "La vida se agota...",
+      "clueTokens": "Fichas de Pista",
+      "tokensAvailable": "{count} fichas",
+      "wordsDiscovered": "Palabras Descubiertas",
+      "wordsCount": "{count} palabras encontradas",
+      "hints": "Pistas",
+      "aiHint": "Pista IA",
+      "hintLevel": "Pista {level}/5",
+      "hintUnlocked": "¡Pista desbloqueada!",
+      "hintCost": "Costo: {cost} palabras",
+      "needMoreWords": "Encuentra {count} palabras más para desbloquear",
+      "shop": "Tienda de Pistas",
+      "shopTitle": "Gastar Fichas de Pista",
+      "revealLetter": "Revelar Letra",
+      "revealLetterDesc": "Revelar una letra aleatoria de la palabra objetivo",
+      "eliminateLetters": "Eliminar Letras Incorrectas",
+      "eliminateLettersDesc": "Eliminar 3 letras que NO están en la palabra",
+      "exampleSentence": "Oración de Ejemplo",
+      "exampleSentenceDesc": "Ver la palabra usada en una oración (la palabra está en blanco)",
+      "revealCategory": "Revelar Categoría",
+      "revealCategoryDesc": "Mostrar la categoría de la palabra (ej. \"Animales > Mamíferos\")",
+      "purchase": "Comprar ({cost} fichas)",
+      "purchased": "Comprado",
+      "notEnoughTokens": "No hay suficientes fichas",
+      "efficiency": "Eficiencia",
+      "efficiencyScore": "Puntuación de Eficiencia: {score}",
+      "wordDiscovery": "+{life} Vida, +{tokens} Fichas",
+      "gameOver": "¡Se acabó la vida!",
+      "youWon": "¡Sobreviviste y encontraste la palabra!",
+      "category": "Categoría: {category}",
+      "targetWordGuess": "Adivinar palabra objetivo",
+      "gridWordDiscovery": "Descubrimiento de palabra del tablero"
+    }
   },
   "guidance": {
     "combo": {
