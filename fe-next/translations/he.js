@@ -2176,7 +2176,26 @@ const he = {
       "avgEfficiency": "יעילות ממוצעת",
       "bestEfficiency": "יעילות מקסימלית",
       "yourEfficiency": "היעילות שלך: {score} נקודות",
-      "efficiencyPercentile": "טוב יותר מ-{percentile}% מהשחקנים!"
+      "efficiencyPercentile": "טוב יותר מ-{percentile}% מהשחקנים!",
+      "rarestFind": "המילה הנדירה ביותר",
+      "legendary": "אגדי",
+      "rare": "נדיר",
+      "uncommon": "לא שכיח",
+      "common": "נפוץ",
+      "challengeTitle": "אתגר מחבר!",
+      "theyScored": "הם השיגו",
+      "attempts": "ניסיונות",
+      "beatTheirScore": "האם תוכלו לנצח אותם?"
+    },
+    "streak": {
+      "milestoneTitle": "אבן דרך!",
+      "weekStreak": "רצף של שבוע!",
+      "twoWeekStreak": "שבועיים חזקים!",
+      "monthStreak": "אלוף חודשי!",
+      "fiftyDayStreak": "רצף אגדי!",
+      "centuryStreak": "אלוף המאה!",
+      "yearStreak": "לוחם שנה!",
+      "keepGoing": "המשיכו את הרצף!"
     },
     "leaderboard": {
       "solved": "נפתר",

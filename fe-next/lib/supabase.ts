@@ -1,6 +1,7 @@
 import { createBrowserClient } from '@supabase/ssr';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import logger from '@/utils/logger';
+import type { ProfileData, RankedProgress } from '@/contexts/auth/authTypes';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
@@ -83,32 +84,37 @@ export async function getUser() {
 }
 
 // Profile helpers
-export async function getProfile(userId: string) {
+type ProfileResult = { data: ProfileData | null; error: { message: string } | null };
+
+export async function getProfile(userId: string): Promise<ProfileResult> {
   if (!supabase) return { data: null, error: { message: 'Supabase not configured' } };
-  return supabase
+  const result = await supabase
     .from('profiles')
-    .select('id, username, display_name, avatar_emoji, avatar_color, profile_picture_url, profile_picture_provider, total_games, total_score, total_words, casual_games, casual_wins, ranked_games, ranked_wins, ranked_mmr, peak_mmr, longest_word, longest_word_length, total_xp, current_level, player_title, is_admin, total_hints_used, free_hints_available, created_at, updated_at')
+    .select('id, username, display_name, avatar_emoji, avatar_color, profile_picture_url, profile_picture_provider, total_games, total_score, total_words, casual_games, casual_wins, ranked_games, ranked_wins, ranked_mmr, peak_mmr, longest_word, longest_word_length, total_xp, current_level, player_title, is_admin, total_hints_used, free_hints_available, country_code, created_at, updated_at')
     .eq('id', userId)
     .single();
+  return { data: result.data as ProfileData | null, error: result.error ? { message: result.error.message } : null };
 }
 
-export async function updateProfile(userId: string, updates: Record<string, any>) {
+export async function updateProfile(userId: string, updates: Partial<ProfileData>): Promise<ProfileResult> {
   if (!supabase) return { data: null, error: { message: 'Supabase not configured' } };
-  return supabase
+  const result = await supabase
     .from('profiles')
     .update(updates)
     .eq('id', userId)
     .select()
     .single();
+  return { data: result.data as ProfileData | null, error: result.error ? { message: result.error.message } : null };
 }
 
-export async function createProfile(profile: Record<string, any>) {
+export async function createProfile(profile: Partial<ProfileData>): Promise<ProfileResult> {
   if (!supabase) return { data: null, error: { message: 'Supabase not configured' } };
-  return supabase
+  const result = await supabase
     .from('profiles')
     .insert(profile)
     .select()
     .single();
+  return { data: result.data as ProfileData | null, error: result.error ? { message: result.error.message } : null };
 }
 
 
@@ -166,13 +172,28 @@ export async function claimGuestToken(tokenHash: string, userId: string) {
 }
 
 // Ranked progress helpers
-export async function getRankedProgress(userId: string) {
+type RankedProgressResult = { data: RankedProgress | null; error: { message: string } | null };
+
+export async function getRankedProgress(userId: string): Promise<RankedProgressResult> {
   if (!supabase) return { data: null, error: { message: 'Supabase not configured' } };
-  return supabase
+  const result = await supabase
     .from('ranked_progress')
     .select('id, player_id, casual_games_played, unlocked_at')
     .eq('player_id', userId)
     .maybeSingle();
+
+  // Map player_id to user_id to match RankedProgress interface
+  if (result.data) {
+    return {
+      data: {
+        user_id: result.data.player_id,
+        casual_games_played: result.data.casual_games_played,
+        unlocked_at: result.data.unlocked_at,
+      },
+      error: null,
+    };
+  }
+  return { data: null, error: result.error ? { message: result.error.message } : null };
 }
 
 export async function isSupabaseConfigured(): Promise<boolean> {

@@ -323,6 +323,7 @@ async function fetchPreSelectedWord(
     }
 
     const supabase = getSupabase();
+    if (!supabase) return null;
     const { data, error } = await supabase
       .from('daily_target_words')
       .select('target_word, override_word')

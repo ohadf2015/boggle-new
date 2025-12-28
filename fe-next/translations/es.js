@@ -2172,7 +2172,26 @@ const es = {
       "avgEfficiency": "Eficiencia Prom.",
       "bestEfficiency": "Mejor Eficiencia",
       "yourEfficiency": "Tu Eficiencia: {score} puntos",
-      "efficiencyPercentile": "¡Mejor que el {percentile}% de los jugadores!"
+      "efficiencyPercentile": "¡Mejor que el {percentile}% de los jugadores!",
+      "rarestFind": "Hallazgo más raro",
+      "legendary": "LEGENDARIO",
+      "rare": "RARO",
+      "uncommon": "POCO COMÚN",
+      "common": "COMÚN",
+      "challengeTitle": "¡Desafío de un amigo!",
+      "theyScored": "Puntuaron",
+      "attempts": "intentos",
+      "beatTheirScore": "¿Puedes superar su puntuación?"
+    },
+    "streak": {
+      "milestoneTitle": "¡Hito de racha!",
+      "weekStreak": "¡1 SEMANA DE RACHA!",
+      "twoWeekStreak": "¡2 SEMANAS FUERTES!",
+      "monthStreak": "¡MAESTRO MENSUAL!",
+      "fiftyDayStreak": "¡RACHA LEGENDARIA!",
+      "centuryStreak": "¡CAMPEÓN DEL SIGLO!",
+      "yearStreak": "¡GUERRERO DEL AÑO!",
+      "keepGoing": "¡Mantén la racha!"
     },
     "leaderboard": {
       "solved": "Resuelto",

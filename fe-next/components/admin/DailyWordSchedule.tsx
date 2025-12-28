@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Calendar, Sparkles, Edit2, Save, X, RefreshCw, AlertCircle, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+import { createClient } from '@/utils/supabase/client';
 import type { Language } from '@/types';
 
 interface ScheduledWord {
@@ -42,7 +42,7 @@ export const DailyWordSchedule: React.FC = () => {
   const [triggerLoading, setTriggerLoading] = useState(false);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
-  const supabase = createClientComponentClient();
+  const supabase = createClient();
 
   // Fetch scheduled words for the next 7 days
   const fetchScheduledWords = useCallback(async () => {

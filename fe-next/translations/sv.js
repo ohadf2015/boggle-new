@@ -2175,7 +2175,26 @@ const sv = {
       "avgEfficiency": "Genomsnittlig effektivitet",
       "bestEfficiency": "Bästa effektivitet",
       "yourEfficiency": "Din effektivitet: {score} poäng",
-      "efficiencyPercentile": "Bättre än {percentile}% av spelarna!"
+      "efficiencyPercentile": "Bättre än {percentile}% av spelarna!",
+      "rarestFind": "Sällsyntaste fyndet",
+      "legendary": "LEGENDARISK",
+      "rare": "SÄLLSYNT",
+      "uncommon": "OVANLIG",
+      "common": "VANLIG",
+      "challengeTitle": "Utmaning från en vän!",
+      "theyScored": "De fick",
+      "attempts": "försök",
+      "beatTheirScore": "Kan du slå deras poäng?"
+    },
+    "streak": {
+      "milestoneTitle": "Seriemilstolpe!",
+      "weekStreak": "1 VECKA I RAD!",
+      "twoWeekStreak": "2 VECKOR STARK!",
+      "monthStreak": "MÅNADSMÄSTARE!",
+      "fiftyDayStreak": "LEGENDARISK SERIE!",
+      "centuryStreak": "ÅRHUNDRADETS MÄSTARE!",
+      "yearStreak": "ÅRETS KRIGARE!",
+      "keepGoing": "Håll serien igång!"
     },
     "leaderboard": {
       "solved": "Löst",

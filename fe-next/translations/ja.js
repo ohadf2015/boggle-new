@@ -2174,7 +2174,26 @@ const ja = {
       "avgEfficiency": "平均効率",
       "bestEfficiency": "最高効率",
       "yourEfficiency": "あなたの効率：{score}ポイント",
-      "efficiencyPercentile": "プレイヤーの{percentile}%より上位！"
+      "efficiencyPercentile": "プレイヤーの{percentile}%より上位！",
+      "rarestFind": "最もレアな発見",
+      "legendary": "伝説級",
+      "rare": "レア",
+      "uncommon": "珍しい",
+      "common": "一般的",
+      "challengeTitle": "友達からの挑戦！",
+      "theyScored": "相手のスコア",
+      "attempts": "試行",
+      "beatTheirScore": "相手のスコアを超えられますか？"
+    },
+    "streak": {
+      "milestoneTitle": "連続記録達成！",
+      "weekStreak": "1週間連続！",
+      "twoWeekStreak": "2週間連続！",
+      "monthStreak": "月間マスター！",
+      "fiftyDayStreak": "伝説の連続記録！",
+      "centuryStreak": "100日連続達成！",
+      "yearStreak": "1年間連続！",
+      "keepGoing": "連続記録を続けよう！"
     },
     "leaderboard": {
       "solved": "成功",
