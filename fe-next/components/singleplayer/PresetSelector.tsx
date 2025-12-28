@@ -1,9 +1,9 @@
 'use client';
 
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import Link from 'next/link';
-import { motion } from 'framer-motion';
-import { FaArrowLeft, FaCog, FaPlay, FaCrown, FaFire } from 'react-icons/fa';
+import { motion, AnimatePresence } from 'framer-motion';
+import { FaArrowLeft, FaCog, FaPlay, FaCrown, FaFire, FaRobot, FaBook, FaTrophy, FaCalendar } from 'react-icons/fa';
 import { Target, Flame, Check } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -11,10 +11,11 @@ import { Button } from '@/components/ui/button';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 import { DIFFICULTIES } from '@/utils/consts';
-import { PRESETS, type PresetConfig } from './presetConfig';
+import { PRESETS, type PresetConfig, getPresetsForMode } from './presetConfig';
 import { useMobileLandscape } from '@/hooks/useMobileLandscape';
 import LandscapeIndicator from '@/components/LandscapeIndicator';
 import type { Language } from '@/shared/types/game';
+import type { SinglePlayerMode } from './SinglePlayerView';
 
 interface DailyInfo {
   puzzleNumber: number;
@@ -37,6 +38,37 @@ interface PresetSelectorProps {
   currentLanguage: Language;
 }
 
+// Mode configuration for the mode selector
+const MODE_CONFIG: Record<Exclude<SinglePlayerMode, 'daily'>, {
+  id: SinglePlayerMode;
+  nameKey: string;
+  descKey: string;
+  Icon: any;
+  color: string;
+}> = {
+  'solo-bots': {
+    id: 'solo-bots',
+    nameKey: 'singlePlayer.mode.soloBots',
+    descKey: 'singlePlayer.mode.soloBotsDesc',
+    Icon: FaRobot,
+    color: 'from-purple-400 to-indigo-500',
+  },
+  'practice': {
+    id: 'practice',
+    nameKey: 'singlePlayer.mode.practice',
+    descKey: 'singlePlayer.mode.practiceDesc',
+    Icon: FaBook,
+    color: 'from-neo-lime to-lime-400',
+  },
+  'challenge': {
+    id: 'challenge',
+    nameKey: 'singlePlayer.mode.challenge',
+    descKey: 'singlePlayer.mode.challengeDesc',
+    Icon: FaTrophy,
+    color: 'from-neo-yellow to-yellow-400',
+  },
+};
+
 /**
  * PresetSelector - Quick start screen with preset cards
  * Primary screen for single player - allows 1-tap game start
@@ -51,10 +83,13 @@ const PresetSelector: React.FC<PresetSelectorProps> = ({
   const { t, dir } = useLanguage();
   const isLandscape = useMobileLandscape();
 
-  // Filter presets for display (exclude daily - it's shown separately)
-  const mainPresets = useMemo(() =>
-    PRESETS.filter(p => !p.modes.includes('daily')),
-    []
+  // State for selected mode
+  const [selectedMode, setSelectedMode] = useState<Exclude<SinglePlayerMode, 'daily'>>('solo-bots');
+
+  // Get presets for the selected mode
+  const modePresets = useMemo(() =>
+    getPresetsForMode(selectedMode),
+    [selectedMode]
   );
 
   const dailyPreset = useMemo(() =>
@@ -62,10 +97,68 @@ const PresetSelector: React.FC<PresetSelectorProps> = ({
     []
   );
 
+  const renderModeCard = (mode: Exclude<SinglePlayerMode, 'daily'>, index: number) => {
+    const config = MODE_CONFIG[mode];
+    const IconComponent = config.Icon;
+    const isSelected = selectedMode === mode;
+
+    return (
+      <motion.button
+        key={mode}
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ delay: index * 0.05 }}
+        onClick={() => setSelectedMode(mode)}
+        className={cn(
+          'group relative p-3 sm:p-4 rounded-neo border-4 transition-all',
+          'flex flex-col items-center text-center',
+          isSelected
+            ? 'shadow-hard-pressed translate-x-[2px] translate-y-[2px] border-neo-black'
+            : 'shadow-hard hover:shadow-hard-lg hover:translate-x-[-2px] hover:translate-y-[-2px] border-neo-black/50',
+          isSelected
+            ? `bg-gradient-to-br ${config.color}`
+            : 'bg-neo-cream dark:bg-slate-800'
+        )}
+        aria-label={t(config.nameKey) || mode}
+        aria-pressed={isSelected}
+      >
+        {/* Icon */}
+        <div className={cn(
+          'w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center mb-1',
+          'transition-all',
+          isSelected ? 'text-neo-black' : 'text-neo-black dark:text-neo-white'
+        )}>
+          <IconComponent className="w-5 h-5 sm:w-6 sm:h-6" />
+        </div>
+
+        {/* Name */}
+        <h3 className={cn(
+          'text-xs sm:text-sm font-black uppercase leading-tight',
+          isSelected ? 'text-neo-black' : 'text-neo-black dark:text-neo-white'
+        )}>
+          {t(config.nameKey) || mode}
+        </h3>
+
+        {/* Description */}
+        <p className={cn(
+          'text-[9px] sm:text-[10px] font-bold mt-0.5 line-clamp-2',
+          isSelected ? 'text-neo-black/80' : 'text-neo-black/60 dark:text-neo-white/60'
+        )}>
+          {t(config.descKey) || ''}
+        </p>
+      </motion.button>
+    );
+  };
+
   const renderPresetCard = (preset: PresetConfig, index: number) => {
     const IconComponent = preset.Icon;
     const difficultyConfig = DIFFICULTIES[preset.settings.difficulty];
     const isDaily = preset.id === 'daily';
+
+    // Difficulty-based colors for borders
+    const difficultyColor = preset.settings.difficulty === 'EASY' ? 'border-neo-lime'
+      : preset.settings.difficulty === 'MEDIUM' ? 'border-neo-yellow'
+      : 'border-neo-red';
 
     return (
       <motion.button
@@ -81,11 +174,11 @@ const PresetSelector: React.FC<PresetSelectorProps> = ({
           'active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-pressed',
           isDaily
             ? 'bg-gradient-to-br from-neo-orange via-neo-yellow to-neo-pink border-neo-black'
-            : `bg-gradient-to-br ${preset.color} border-neo-black`
+            : `bg-neo-cream dark:bg-slate-800 ${difficultyColor}`
         )}
         aria-label={`${t(preset.nameKey) || preset.id}: ${t(preset.descKey) || ''}`}
       >
-        {/* Badge for recommended or daily status */}
+        {/* Badge for recommended */}
         {preset.badge === 'recommended' && (
           <span className="absolute -top-2 -right-2 px-2 py-0.5 text-[10px] font-black uppercase bg-neo-black text-neo-yellow rounded-full border-2 border-neo-yellow">
             {t('singlePlayer.preset.recommended') || 'Best'}
@@ -109,36 +202,56 @@ const PresetSelector: React.FC<PresetSelectorProps> = ({
           </div>
         )}
 
-        {/* Icon */}
-        <div className={cn(
-          'w-12 h-12 sm:w-14 sm:h-14 rounded-full flex items-center justify-center mb-2',
-          'border-3 border-neo-black shadow-hard group-hover:scale-110 transition-transform',
-          preset.bgColor
-        )}>
-          <IconComponent className="w-6 h-6 sm:w-7 sm:h-7 text-neo-black" />
-        </div>
-
-        {/* Name */}
-        <h3 className="text-sm sm:text-base font-black uppercase text-neo-black leading-tight">
-          {isDaily ? (
-            <>
-              {t('daily.badge') || 'Daily'}
-              <span className="block text-xs font-bold opacity-80">#{dailyInfo.puzzleNumber}</span>
-            </>
-          ) : (
-            t(preset.nameKey) || preset.id
-          )}
-        </h3>
-
-        {/* Settings preview */}
+        {/* Grid Size (PROMINENT) */}
         {!isDaily && (
-          <p className="text-[10px] sm:text-xs font-bold text-neo-black/70 mt-1">
-            {difficultyConfig.rows}x{difficultyConfig.cols} • {preset.settings.timerSeconds / 60}m
-            {preset.settings.bots > 0 && ` • ${preset.settings.bots} ${t('bots.title') || 'bots'}`}
-          </p>
+          <div className="text-3xl sm:text-4xl font-black text-neo-black dark:text-neo-white mb-1">
+            {difficultyConfig.rows}×{difficultyConfig.cols}
+          </div>
         )}
 
-        {/* Daily countdown or challenge high score */}
+        {/* Daily Icon */}
+        {isDaily && (
+          <div className="w-12 h-12 sm:w-14 sm:h-14 flex items-center justify-center mb-2">
+            <IconComponent className="w-8 h-8 sm:w-10 sm:h-10 text-neo-black" />
+          </div>
+        )}
+
+        {/* Difficulty Name */}
+        {!isDaily && (
+          <h3 className="text-base sm:text-lg font-bold uppercase text-neo-black dark:text-neo-white leading-tight">
+            {t(difficultyConfig.nameKey) || preset.settings.difficulty}
+          </h3>
+        )}
+
+        {/* Daily Name */}
+        {isDaily && (
+          <h3 className="text-sm sm:text-base font-black uppercase text-neo-black leading-tight">
+            {t('daily.badge') || 'Daily'}
+            <span className="block text-xs font-bold opacity-80">#{dailyInfo.puzzleNumber}</span>
+          </h3>
+        )}
+
+        {/* Mode-specific details */}
+        {!isDaily && (
+          <div className="text-xs sm:text-sm font-bold text-neo-black/70 dark:text-neo-white/70 mt-1 space-y-0.5">
+            {preset.settings.timerSeconds > 0 && (
+              <div>{preset.settings.timerSeconds / 60}m</div>
+            )}
+            {preset.settings.timerSeconds === 0 && (
+              <div>{t('singlePlayer.mode.noTimer') || 'No timer'}</div>
+            )}
+            {preset.settings.bots > 0 && (
+              <div>{preset.settings.bots} {t('bots.title') || 'bots'}</div>
+            )}
+            {selectedMode === 'challenge' && challengeInfo.highScore !== null && (
+              <div className="text-neo-yellow dark:text-neo-yellow font-black">
+                {t('challenge.record') || 'Record'}: {challengeInfo.highScore}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Daily countdown */}
         {isDaily && dailyInfo.hasPlayedToday && (
           <p className="text-[10px] font-bold text-neo-black/70 mt-1">
             {t('daily.nextPuzzleIn') || 'Next'}: {dailyInfo.countdown}
@@ -146,7 +259,7 @@ const PresetSelector: React.FC<PresetSelectorProps> = ({
         )}
 
         {/* Play indicator */}
-        <div className="mt-2 flex items-center gap-1 text-[10px] font-bold text-neo-black/60 group-hover:text-neo-black transition-colors">
+        <div className="mt-2 flex items-center gap-1 text-[10px] font-bold text-neo-black/60 dark:text-neo-white/60 group-hover:text-neo-black dark:group-hover:text-neo-white transition-colors">
           <FaPlay className="w-2 h-2" />
           <span>{t('singlePlayer.preset.tapToPlay') || 'Tap to play'}</span>
         </div>
@@ -160,8 +273,8 @@ const PresetSelector: React.FC<PresetSelectorProps> = ({
       <>
         <LandscapeIndicator />
         <div dir={dir} className="flex h-screen w-full overflow-hidden bg-slate-900 text-white p-3 gap-4 landscape-full-height">
-          {/* Left column: Header + Presets */}
-          <div className="w-[45%] flex flex-col gap-3 overflow-y-auto">
+          {/* Left column: Header + Modes */}
+          <div className="w-[30%] flex flex-col gap-3 overflow-y-auto">
             {/* Header */}
             <div className="flex items-center gap-3">
               <Link
@@ -175,17 +288,69 @@ const PresetSelector: React.FC<PresetSelectorProps> = ({
               </h1>
             </div>
 
-            {/* Presets grid */}
-            <div className="grid grid-cols-2 gap-3">
-              {mainPresets.map((preset, index) => renderPresetCard(preset, index))}
-              {dailyPreset && renderPresetCard(dailyPreset, mainPresets.length)}
+            {/* Mode Selector */}
+            <div className="space-y-2">
+              <h3 className="text-xs font-bold uppercase text-neo-white/70">
+                {t('singlePlayer.chooseMode') || 'Choose Mode'}
+              </h3>
+              <div className="space-y-2">
+                {(['solo-bots', 'practice', 'challenge'] as const).map((mode, index) => (
+                  renderModeCard(mode, index)
+                ))}
+              </div>
             </div>
+
+            {/* Daily Challenge */}
+            {dailyPreset && (
+              <button
+                onClick={() => onSelectPreset(dailyPreset)}
+                className={cn(
+                  'p-3 rounded-neo border-4 transition-all',
+                  'flex items-center gap-3',
+                  'shadow-hard hover:shadow-hard-lg hover:translate-x-[-2px] hover:translate-y-[-2px]',
+                  'active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-pressed',
+                  'bg-gradient-to-r from-neo-orange via-neo-yellow to-neo-pink border-neo-black'
+                )}
+              >
+                <FaCalendar className="w-6 h-6 text-neo-black" />
+                <div className="flex-1 text-left">
+                  <h4 className="text-sm font-black uppercase text-neo-black">
+                    {t('daily.badge') || 'Daily'}
+                  </h4>
+                  <p className="text-xs font-bold text-neo-black/80">
+                    #{dailyInfo.puzzleNumber}
+                  </p>
+                </div>
+                {dailyInfo.hasPlayedToday && (
+                  <Check className="w-5 h-5 text-neo-black" />
+                )}
+              </button>
+            )}
           </div>
 
-          {/* Right column: Info + Custom */}
-          <div className="w-[55%] flex flex-col gap-3 overflow-y-auto">
+          {/* Right column: Quick Start Presets */}
+          <div className="w-[70%] flex flex-col gap-3 overflow-y-auto">
+            {/* Section Header */}
+            <h3 className="text-sm font-bold uppercase text-neo-white/70">
+              {t('singlePlayer.quickStart') || 'Quick Start'} - {t(MODE_CONFIG[selectedMode].nameKey)}
+            </h3>
+
+            {/* Presets grid */}
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={selectedMode}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                transition={{ duration: 0.3 }}
+                className="grid grid-cols-3 gap-3"
+              >
+                {modePresets.map((preset, index) => renderPresetCard(preset, index))}
+              </motion.div>
+            </AnimatePresence>
+
             {/* Challenge high score preview */}
-            {challengeInfo.highScore !== null && (
+            {selectedMode === 'challenge' && challengeInfo.highScore !== null && (
               <Card className="border-3 border-neo-yellow shadow-hard bg-gradient-to-br from-neo-yellow/20 to-neo-orange/10">
                 <CardContent className="p-4 flex items-center gap-4">
                   <div className="flex items-center gap-2">
@@ -218,11 +383,6 @@ const PresetSelector: React.FC<PresetSelectorProps> = ({
                 {t('singlePlayer.preset.customGame') || 'Custom Game Setup'}
               </Button>
             </motion.div>
-
-            {/* Hint */}
-            <p className="text-center text-xs text-neo-cream/60">
-              {t('singlePlayer.preset.hint') || 'Tap any preset for instant play, or customize your game'}
-            </p>
           </div>
         </div>
       </>
@@ -254,16 +414,95 @@ const PresetSelector: React.FC<PresetSelectorProps> = ({
           </h1>
         </div>
 
-        {/* Quick Start label */}
-        <div className="flex items-center gap-2 text-sm font-bold uppercase text-neo-black/70 dark:text-neo-white/70">
-          <FaPlay className="w-3 h-3" />
-          <span>{t('singlePlayer.preset.quickStart') || 'Quick Start'}</span>
+        {/* Mode Selector Section */}
+        <div className="space-y-3">
+          <div className="flex items-center gap-2 text-sm font-bold uppercase text-neo-black/70 dark:text-neo-white/70">
+            <Target className="w-3 h-3" />
+            <span>{t('singlePlayer.chooseMode') || 'Choose Your Mode'}</span>
+          </div>
+
+          {/* Mode Cards - 3 modes */}
+          <div className="grid grid-cols-3 gap-2">
+            {(['solo-bots', 'practice', 'challenge'] as const).map((mode, index) =>
+              renderModeCard(mode, index)
+            )}
+          </div>
+
+          {/* Daily Challenge Card (Full Width) */}
+          {dailyPreset && (
+            <motion.button
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2 }}
+              onClick={() => onSelectPreset(dailyPreset)}
+              className={cn(
+                'group relative p-4 rounded-neo-lg border-4 transition-all w-full',
+                'flex items-center gap-4',
+                'shadow-hard hover:shadow-hard-lg hover:translate-x-[-3px] hover:translate-y-[-3px]',
+                'active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-pressed',
+                'bg-gradient-to-r from-neo-orange via-neo-yellow to-neo-pink border-neo-black'
+              )}
+              aria-label={`${t('daily.badge') || 'Daily'}: #${dailyInfo.puzzleNumber}`}
+            >
+              {/* Daily Icon */}
+              <div className="flex items-center justify-center">
+                <FaCalendar className="w-8 h-8 sm:w-10 sm:h-10 text-neo-black" />
+              </div>
+
+              {/* Daily Info */}
+              <div className="flex-1 text-left">
+                <h3 className="text-base sm:text-lg font-black uppercase text-neo-black leading-tight">
+                  {t('daily.badge') || 'Daily Challenge'}
+                </h3>
+                <p className="text-xs sm:text-sm font-bold text-neo-black/80">
+                  #{dailyInfo.puzzleNumber}
+                  {dailyInfo.streak > 0 && (
+                    <span className="ml-2 inline-flex items-center gap-1">
+                      <Flame className="w-3 h-3 text-neo-orange" />
+                      {dailyInfo.streak} {t('daily.streak') || 'streak'}
+                    </span>
+                  )}
+                </p>
+              </div>
+
+              {/* Status Badge */}
+              <div>
+                {dailyInfo.hasPlayedToday ? (
+                  <span className="flex items-center justify-center w-10 h-10 bg-neo-lime text-neo-black rounded-full border-3 border-neo-black">
+                    <Check className="w-5 h-5" />
+                  </span>
+                ) : (
+                  <span className="flex items-center justify-center w-10 h-10 bg-neo-black/20 rounded-full border-3 border-neo-black">
+                    <FaPlay className="w-4 h-4 text-neo-black" />
+                  </span>
+                )}
+              </div>
+            </motion.button>
+          )}
         </div>
 
-        {/* Preset cards - 2x2 grid + daily */}
-        <div className="grid grid-cols-2 gap-3">
-          {mainPresets.map((preset, index) => renderPresetCard(preset, index))}
-          {dailyPreset && renderPresetCard(dailyPreset, mainPresets.length)}
+        {/* Quick Start Presets */}
+        <div className="space-y-3">
+          <div className="flex items-center gap-2 text-sm font-bold uppercase text-neo-black/70 dark:text-neo-white/70">
+            <FaPlay className="w-3 h-3" />
+            <span>
+              {t('singlePlayer.quickStart') || 'Quick Start'} - {t(MODE_CONFIG[selectedMode].nameKey)}
+            </span>
+          </div>
+
+          {/* Preset cards - dynamic based on selected mode */}
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={selectedMode}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.3 }}
+              className="grid grid-cols-2 gap-3"
+            >
+              {modePresets.map((preset, index) => renderPresetCard(preset, index))}
+            </motion.div>
+          </AnimatePresence>
         </div>
 
         {/* Challenge high score teaser */}

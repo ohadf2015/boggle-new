@@ -1813,6 +1813,7 @@ const en = {
   "singlePlayer": {
     "title": "Single Player",
     "selectMode": "Select Mode",
+    "chooseMode": "Choose Your Mode",
     "soloVsBots": "Solo vs Bots",
     "soloVsBotsDesc": "Compete against AI opponents",
     "practiceMode": "Practice",
@@ -1820,6 +1821,15 @@ const en = {
     "challengeMode": "Challenge",
     "challengeModeDesc": "Beat your high scores",
     "selectDifficulty": "Grid Size",
+    "mode": {
+      "soloBots": "Solo vs Bots",
+      "soloBotsDesc": "Race against AI",
+      "practice": "Practice",
+      "practiceDesc": "No timer, no pressure",
+      "challenge": "Challenge",
+      "challengeDesc": "Beat your high scores",
+      "noTimer": "No timer"
+    },
     "gameTime": "Game Time",
     "opponents": "Bot Opponents",
     "noBots": "No bots added. Add some opponents to compete against!",
@@ -1911,6 +1921,7 @@ const en = {
     "tutorialKeyboard": "Keyboard: Space = Pause, Esc = Quit, ? = Help"
   },
   "challenge": {
+    "record": "Record",
     "yourRecord": "Your Record",
     "beatIt": "Can you beat it?",
     "noRecord": "No Record Yet",
