@@ -896,12 +896,13 @@ const TARGET_WORD_LISTS: Record<Language, string[]> = {
     'MOUNTAIN', 'STANDARD', 'TREASURE', 'QUESTION', 'BUILDING', 'FUNCTION'
   ],
   he: [
-    // Hebrew 5-letter words
+    // Hebrew 3+ letter words
     'בית', 'מים', 'עולם', 'אדם', 'דבר',
-    'לב', 'יד', 'עין', 'פה', 'ראש',
-    // Hebrew 6-letter words
+    'עין', 'ראש', 'ילד', 'ספר', 'שלום',
+    'חבר', 'דלת', 'חלון', 'שולחן', 'כיסא',
+    // Hebrew 5-6 letter words
     'משפחה', 'חברה', 'עבודה', 'תרבות',
-    // Hebrew 7-letter words
+    // Hebrew 7+ letter words
     'חינוך', 'בריאות', 'תקשורת'
   ],
   sv: [
