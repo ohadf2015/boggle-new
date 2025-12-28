@@ -9,6 +9,7 @@ import AutoHideHeader from '@/components/AutoHideHeader';
 import DailyWordHuntSurvival from './DailyWordHuntSurvival';
 import DailyWordHuntResults from './DailyWordHuntResults';
 import DailyLeaderboard from './DailyLeaderboard';
+import { DailyChallengeTutorial } from './DailyChallengeTutorial';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useMobileLandscape } from '@/hooks/useMobileLandscape';
 import {
@@ -52,6 +53,10 @@ const DailyChallenge: React.FC = () => {
   // Phase management
   const [phase, setPhase] = useState<DailyChallengePhase>('loading');
 
+  // Tutorial state
+  const [showTutorial, setShowTutorial] = useState(false);
+  const [tutorialCompleted, setTutorialCompleted] = useState(false);
+
   // Daily challenge state
   const [puzzleDate, setPuzzleDate] = useState<string>('');
   const [puzzleNumber, setPuzzleNumber] = useState<number>(0);
@@ -71,6 +76,11 @@ const DailyChallenge: React.FC = () => {
     setPuzzleDate(date);
     setPuzzleNumber(number);
 
+    // Check if tutorial has been completed
+    const tutorialKey = `lexiclash_wordHunt_tutorial_completed_${language}`;
+    const hasCompletedTutorial = typeof window !== 'undefined' && localStorage.getItem(tutorialKey) === 'true';
+    setTutorialCompleted(hasCompletedTutorial);
+
     // Check if already played today
     if (hasPlayedWordHuntToday(language as Language)) {
       const result = getTodaysWordHuntResult(language as Language);
@@ -85,7 +95,13 @@ const DailyChallenge: React.FC = () => {
       const target = selectDailyTargetWord(dailyGrid, date, language as Language);
       setTargetWord(target.word);
 
-      setPhase('ready');
+      // Show tutorial if not completed, otherwise go to ready screen
+      if (!hasCompletedTutorial) {
+        setShowTutorial(true);
+        setPhase('ready');
+      } else {
+        setPhase('ready');
+      }
     }
   }, [language]);
 
@@ -137,6 +153,26 @@ const DailyChallenge: React.FC = () => {
     setPhase('completed');
   }, [puzzleNumber, puzzleDate, language]);
 
+  // Handle tutorial completion
+  const handleTutorialComplete = useCallback(() => {
+    const tutorialKey = `lexiclash_wordHunt_tutorial_completed_${language}`;
+    if (typeof window !== 'undefined') {
+      localStorage.setItem(tutorialKey, 'true');
+    }
+    setTutorialCompleted(true);
+    setShowTutorial(false);
+  }, [language]);
+
+  // Handle tutorial skip
+  const handleTutorialSkip = useCallback(() => {
+    setShowTutorial(false);
+  }, []);
+
+  // Handle showing tutorial manually
+  const handleShowTutorial = useCallback(() => {
+    setShowTutorial(true);
+  }, []);
+
   // Handle going back
   const handleBack = useCallback(() => {
     window.location.href = `/${language}`;
@@ -179,6 +215,7 @@ const DailyChallenge: React.FC = () => {
             onLanguageChange={(lang) => setLanguage(lang)}
             onStart={handleStartGame}
             onBack={handleBack}
+            onShowTutorial={handleShowTutorial}
             t={t}
           />
         )}
@@ -206,6 +243,14 @@ const DailyChallenge: React.FC = () => {
           />
         )}
       </AnimatePresence>
+
+      {/* Tutorial Modal */}
+      {showTutorial && (
+        <DailyChallengeTutorial
+          onComplete={handleTutorialComplete}
+          onSkip={handleTutorialSkip}
+        />
+      )}
     </div>
   );
 };
@@ -232,6 +277,7 @@ interface DailyReadyScreenProps {
   onLanguageChange: (lang: Language) => void;
   onStart: () => void;
   onBack: () => void;
+  onShowTutorial: () => void;
   t: (key: string) => string;
 }
 
@@ -244,6 +290,7 @@ const DailyReadyScreen: React.FC<DailyReadyScreenProps> = ({
   onLanguageChange,
   onStart,
   onBack,
+  onShowTutorial,
   t,
 }) => {
   const [showLangDropdown, setShowLangDropdown] = useState(false);

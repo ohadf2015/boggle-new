@@ -2128,6 +2128,45 @@ const sv = {
       "gridWordDiscovery": "Rutnätsupptäckt"
     }
   },
+  "tutorial": {
+    "wordHunt": {
+      "welcome": {
+        "title": "Daglig ordjakt",
+        "description": "Hitta det dolda ordet! Du har 10 försök.",
+        "next": "Nästa"
+      },
+      "colorFeedback": {
+        "title": "Lär dig färgerna",
+        "tryGuessing": "Efter varje gissning visar färgerna hur nära du är:",
+        "green": "Grön = Rätt position",
+        "yellow": "Gul = I ordet, fel plats",
+        "gray": "Grå = Inte i ordet",
+        "next": "Nästa"
+      },
+      "lifeSystem": {
+        "title": "Liv & ordupptäckt",
+        "description": "Hitta ord på brädet för att få liv & ledtrådspoletter!",
+        "swipeToGain": "Svep ord för att få",
+        "tryIt": "Jag förstår!"
+      },
+      "minLength": {
+        "title": "⚠️ VIKTIG REGEL",
+        "description": "Ord måste vara minst 3 BOKSTÄVER långa",
+        "example1": "3 bokstäver ✓",
+        "example2": "2 bokstäver - för kort!",
+        "gotIt": "Jag förstår!"
+      },
+      "complete": {
+        "title": "Du är redo!",
+        "remember": "Kom ihåg:",
+        "rule1": "10 försök att hitta målordet",
+        "rule2": "Hitta andra ord för liv",
+        "rule3": "Minimum 3 bokstäver",
+        "rule4": "Samma pussel världen över",
+        "start": "Starta daglig utmaning"
+      }
+    }
+  },
   "guidance": {
     "combo": {
       "title": "Kombobonus!",

@@ -2127,6 +2127,45 @@ const ja = {
       "gridWordDiscovery": "グリッド単語の発見"
     }
   },
+  "tutorial": {
+    "wordHunt": {
+      "welcome": {
+        "title": "デイリーワードハント",
+        "description": "隠された単語を見つけよう！10回の試行があります。",
+        "next": "次へ"
+      },
+      "colorFeedback": {
+        "title": "色を学ぶ",
+        "tryGuessing": "各推測の後、色であなたの近さを示します：",
+        "green": "緑 = 正しい位置",
+        "yellow": "黄 = 単語にあるが位置が違う",
+        "gray": "灰 = 単語にない",
+        "next": "次へ"
+      },
+      "lifeSystem": {
+        "title": "ライフと単語発見",
+        "description": "ボード上の単語を見つけてライフとヒントトークンを獲得！",
+        "swipeToGain": "単語をスワイプして獲得",
+        "tryIt": "わかりました！"
+      },
+      "minLength": {
+        "title": "⚠️ 重要なルール",
+        "description": "単語は最低3文字必要です",
+        "example1": "3文字 ✓",
+        "example2": "2文字 - 短すぎます！",
+        "gotIt": "わかりました！"
+      },
+      "complete": {
+        "title": "準備完了！",
+        "remember": "覚えておいて：",
+        "rule1": "目標を見つけるための10回の試行",
+        "rule2": "ライフのために他の単語を見つける",
+        "rule3": "最低3文字",
+        "rule4": "世界中で同じパズル",
+        "start": "デイリーチャレンジを開始"
+      }
+    }
+  },
   "guidance": {
     "combo": {
       "title": "コンボボーナス！",

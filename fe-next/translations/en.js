@@ -2133,6 +2133,45 @@ const en = {
       "gridWordDiscovery": "Grid word discovery"
     }
   },
+  "tutorial": {
+    "wordHunt": {
+      "welcome": {
+        "title": "Daily Word Hunt",
+        "description": "Find the hidden word! You have 10 attempts.",
+        "next": "Next"
+      },
+      "colorFeedback": {
+        "title": "Learn the Colors",
+        "tryGuessing": "After each guess, colors show how close you are:",
+        "green": "Green = Correct position",
+        "yellow": "Yellow = In word, wrong spot",
+        "gray": "Gray = Not in word",
+        "next": "Next"
+      },
+      "lifeSystem": {
+        "title": "Life & Word Discovery",
+        "description": "Find words on the board to gain life & clue tokens!",
+        "swipeToGain": "Swipe words to gain",
+        "tryIt": "Got it!"
+      },
+      "minLength": {
+        "title": "⚠️ IMPORTANT RULE",
+        "description": "Words must be at least 3 LETTERS long",
+        "example1": "3 letters ✓",
+        "example2": "2 letters - too short!",
+        "gotIt": "Got it!"
+      },
+      "complete": {
+        "title": "You're ready!",
+        "remember": "Remember:",
+        "rule1": "10 attempts to find target",
+        "rule2": "Find other words for life",
+        "rule3": "3+ letters minimum",
+        "rule4": "Same puzzle worldwide",
+        "start": "Start Daily Challenge"
+      }
+    }
+  },
   "guidance": {
     "combo": {
       "title": "Combo Bonus!",
