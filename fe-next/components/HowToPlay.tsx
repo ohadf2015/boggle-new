@@ -3,15 +3,15 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-  FaGamepad, FaUsers, FaTrophy, FaClock, FaStar, FaFire,
-  FaChevronRight, FaChevronLeft, FaRedo, FaLightbulb,
-  FaCheck, FaHandPointer
-} from 'react-icons/fa';
+  Gamepad2, Users, Trophy, Clock, Star, Flame,
+  ChevronRight, ChevronLeft, RotateCw, Lightbulb,
+  Check, Pointer
+} from 'lucide-react';
 import { Badge } from './ui/badge';
 import { Button } from './ui/button';
 import { Progress } from './ui/progress';
 import { useLanguage } from '../contexts/LanguageContext';
-import type { IconType } from 'react-icons';
+import type { LucideIcon } from 'lucide-react';
 
 /**
  * Demo word sequence item
@@ -36,7 +36,7 @@ interface InteractiveGridDemoProps {
  */
 interface Step {
   id: string;
-  icon: IconType;
+  icon: LucideIcon;
   title: string;
   color: string;
 }
@@ -45,7 +45,7 @@ interface Step {
  * Step item for basics section
  */
 interface StepItem {
-  icon: IconType;
+  icon: LucideIcon;
   title: string;
   desc: string;
 }
@@ -161,7 +161,7 @@ const InteractiveGridDemo: React.FC<InteractiveGridDemoProps> = ({ t, dir }) => 
             animate={{ scale: 1, opacity: 1 }}
             className="flex items-center gap-1"
           >
-            <FaFire className={`${comboCount >= 3 ? 'text-neo-orange animate-pulse' : 'text-gray-600'}`} />
+            <Flame className={`${comboCount >= 3 ? 'text-neo-orange animate-pulse' : 'text-gray-600'}`} />
             <Badge className={`${comboCount >= 3 ? 'bg-neo-orange' : 'bg-gray-300'} text-neo-black border-2 border-neo-black font-bold text-xs`}>
               {comboCount}x Combo {comboCount >= 3 && `(${getComboMultiplier(comboCount)}×)`}
             </Badge>
@@ -294,7 +294,7 @@ const InteractiveGridDemo: React.FC<InteractiveGridDemoProps> = ({ t, dir }) => 
                 animate={{ scale: 1, rotate: 0 }}
                 className="flex items-center gap-1"
               >
-                <FaCheck className="text-neo-lime text-lg" />
+                <Check className="text-neo-lime text-lg" />
                 <Badge className="bg-neo-lime text-neo-black border-2 border-neo-black font-bold text-xs">
                   +{Math.floor(currentDemo.points * getComboMultiplier(comboCount))}
                 </Badge>
@@ -315,7 +315,7 @@ const InteractiveGridDemo: React.FC<InteractiveGridDemoProps> = ({ t, dir }) => 
           onClick={handleReplay}
           className="bg-neo-cream text-[10px] sm:text-xs px-2 py-1"
         >
-          <FaRedo className="mr-1 text-[10px]" />
+          <RotateCw className="mr-1 text-[10px]" />
           {t('howToPlay.demo.replay') || 'Replay'}
         </Button>
       </div>
@@ -342,19 +342,19 @@ const HowToPlay: React.FC<HowToPlayProps> = ({ onClose }) => {
   const steps: Step[] = useMemo(() => [
     {
       id: 'basics',
-      icon: FaGamepad,
+      icon: Gamepad2,
       title: t('howToPlay.steps.basics.title'),
       color: 'bg-neo-cyan'
     },
     {
       id: 'grid',
-      icon: FaHandPointer,
+      icon: Pointer,
       title: t('howToPlay.steps.grid.title'),
       color: 'bg-neo-yellow'
     },
     {
       id: 'scoring',
-      icon: FaStar,
+      icon: Star,
       title: t('howToPlay.steps.scoring.title'),
       color: 'bg-neo-lime'
     },
@@ -378,9 +378,9 @@ const HowToPlay: React.FC<HowToPlayProps> = ({ onClose }) => {
 
             <div className="space-y-2 sm:space-y-3">
               {([
-                { icon: FaUsers, title: t('howToPlay.createOrJoinTitle'), desc: t('howToPlay.createOrJoinDesc') },
-                { icon: FaClock, title: t('howToPlay.hostStartsTitle'), desc: t('howToPlay.hostStartsDesc') },
-                { icon: FaTrophy, title: t('howToPlay.earnPointsTitle'), desc: t('howToPlay.earnPointsDesc') },
+                { icon: Users, title: t('howToPlay.createOrJoinTitle'), desc: t('howToPlay.createOrJoinDesc') },
+                { icon: Clock, title: t('howToPlay.hostStartsTitle'), desc: t('howToPlay.hostStartsDesc') },
+                { icon: Trophy, title: t('howToPlay.earnPointsTitle'), desc: t('howToPlay.earnPointsDesc') },
               ] as StepItem[]).map((item, index) => (
                 <motion.div
                   key={index}
@@ -420,7 +420,7 @@ const HowToPlay: React.FC<HowToPlayProps> = ({ onClose }) => {
 
             <div className="bg-neo-yellow/30 text-neo-black rounded-neo border-2 border-neo-black p-2 sm:p-3">
               <p className="text-xs sm:text-sm font-medium text-neo-black flex items-center gap-2">
-                <FaLightbulb className="text-neo-orange flex-shrink-0" />
+                <Lightbulb className="text-neo-orange flex-shrink-0" />
                 {t('howToPlay.findWordsNote')}
               </p>
             </div>
@@ -457,7 +457,7 @@ const HowToPlay: React.FC<HowToPlayProps> = ({ onClose }) => {
             {/* Bonus features mention */}
             <div className="bg-neo-lime/30 text-neo-black rounded-neo border-2 border-neo-black p-2 sm:p-3">
               <p className="text-xs sm:text-sm font-medium text-neo-black flex items-center gap-2">
-                <FaFire className="text-neo-orange flex-shrink-0" />
+                <Flame className="text-neo-orange flex-shrink-0" />
                 {t('howToPlay.steps.combo.description') || 'Find words quickly for combo bonuses!'}
               </p>
             </div>
@@ -495,7 +495,7 @@ const HowToPlay: React.FC<HowToPlayProps> = ({ onClose }) => {
               `}
             >
               {index < currentStep ? (
-                <FaCheck className="text-neo-black text-xs sm:text-sm" />
+                <Check className="text-neo-black text-xs sm:text-sm" />
               ) : (
                 <step.icon className="text-neo-black text-xs sm:text-sm" />
               )}
@@ -540,7 +540,7 @@ const HowToPlay: React.FC<HowToPlayProps> = ({ onClose }) => {
           disabled={currentStep === 0}
           className="bg-neo-cream text-sm sm:text-base px-2 sm:px-4"
         >
-          <FaChevronLeft className={`${isRTL ? 'ml-1 sm:ml-2 rotate-180' : 'mr-1 sm:mr-2'}`} />
+          <ChevronLeft className={`${isRTL ? 'ml-1 sm:ml-2 rotate-180' : 'mr-1 sm:mr-2'}`} />
           <span className="hidden xs:inline">{t('common.back')}</span>
         </Button>
 
@@ -556,7 +556,7 @@ const HowToPlay: React.FC<HowToPlayProps> = ({ onClose }) => {
           >
             <span className="hidden xs:inline">{t('common.understood')}</span>
             <span className="xs:hidden">OK</span>
-            <FaCheck className={`${isRTL ? 'mr-1 sm:mr-2' : 'ml-1 sm:ml-2'}`} />
+            <Check className={`${isRTL ? 'mr-1 sm:mr-2' : 'ml-1 sm:ml-2'}`} />
           </Button>
         ) : (
           <Button
@@ -566,7 +566,7 @@ const HowToPlay: React.FC<HowToPlayProps> = ({ onClose }) => {
           >
             <span className="hidden xs:inline">{t('common.next') || 'Next'}</span>
             <span className="xs:hidden">{t('common.next') || 'Next'}</span>
-            <FaChevronRight className={`${isRTL ? 'mr-1 sm:mr-2 rotate-180' : 'ml-1 sm:ml-2'}`} />
+            <ChevronRight className={`${isRTL ? 'mr-1 sm:mr-2 rotate-180' : 'ml-1 sm:ml-2'}`} />
           </Button>
         )}
       </div>
@@ -580,13 +580,13 @@ const HowToPlay: React.FC<HowToPlayProps> = ({ onClose }) => {
           className="mt-4 bg-neo-pink/20 rounded-neo border-2 border-neo-black p-3"
         >
           <h4 className="font-bold text-neo-black mb-2 flex items-center gap-2 text-sm">
-            <FaLightbulb className="text-neo-yellow" />
+            <Lightbulb className="text-neo-yellow" />
             {t('howToPlay.tipsTitle')}
           </h4>
           <ul className="space-y-1 text-xs text-neo-black">
             {[1, 2, 4].map((num) => (
               <li key={num} className="flex items-start gap-2">
-                <FaCheck className="text-neo-lime mt-0.5 flex-shrink-0 text-xs" />
+                <Check className="text-neo-lime mt-0.5 flex-shrink-0 text-xs" />
                 <span>{t(`howToPlay.tips.tip${num}`)}</span>
               </li>
             ))}

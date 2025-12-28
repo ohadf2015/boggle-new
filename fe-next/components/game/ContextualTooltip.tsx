@@ -2,7 +2,7 @@
 
 import React, { useEffect, memo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FaTimes } from 'react-icons/fa';
+import { X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 export type GuidanceType = 'combo' | 'earthquake' | 'fireRound';
@@ -154,7 +154,7 @@ const ContextualTooltip = memo<ContextualTooltipProps>(
                     )}
                     aria-label={t('guidance.dismiss')}
                   >
-                    <FaTimes className="w-3 h-3" />
+                    <X className="w-3 h-3" />
                   </button>
                 </div>
 

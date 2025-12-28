@@ -2,8 +2,7 @@
 
 import React, { useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
-import { FaPlus, FaTrash, FaCopy, FaDownload, FaCheck } from 'react-icons/fa';
-import { Search, AlertTriangle } from 'lucide-react';
+import { Search, AlertTriangle, Plus, Trash2, Copy, Download, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
@@ -158,7 +157,7 @@ export const DailyWordManager: React.FC = () => {
     <div className="min-h-screen bg-gradient-to-b from-slate-50 to-slate-100 dark:from-neo-navy dark:to-neo-navy-light p-4">
       <div className="max-w-6xl mx-auto">
         {/* Header */}
-        <div className="bg-white dark:bg-neo-navy-light rounded-neo border-4 border-neo-black p-6 mb-4">
+        <div className="bg-white dark:bg-neo-navy-light rounded-neo border-4 border-neo-black p-6 mb-4 text-neo-black dark:text-neo-cream">
           <h1 className="text-3xl font-black mb-2">Daily Word Manager</h1>
           <p className="text-gray-600 dark:text-gray-400">
             Manage target words for the daily Word Hunt challenge
@@ -166,7 +165,7 @@ export const DailyWordManager: React.FC = () => {
         </div>
 
         {/* Language Selector */}
-        <div className="bg-white dark:bg-neo-navy-light rounded-neo border-4 border-neo-black p-4 mb-4">
+        <div className="bg-white dark:bg-neo-navy-light rounded-neo border-4 border-neo-black p-4 mb-4 text-neo-black dark:text-neo-cream">
           <div className="flex flex-wrap gap-2">
             {LANGUAGES.map(lang => (
               <button
@@ -187,7 +186,7 @@ export const DailyWordManager: React.FC = () => {
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
           {/* Stats Panel */}
-          <div className="bg-white dark:bg-neo-navy-light rounded-neo border-4 border-neo-black p-4">
+          <div className="bg-white dark:bg-neo-navy-light rounded-neo border-4 border-neo-black p-4 text-neo-black dark:text-neo-cream">
             <h2 className="font-black text-xl mb-4">Statistics</h2>
 
             <div className="space-y-3">
@@ -236,7 +235,7 @@ export const DailyWordManager: React.FC = () => {
                 onClick={handleExportCode}
                 className="w-full bg-green-500 hover:bg-green-600 text-white"
               >
-                {copied ? <FaCheck className="mr-2" /> : <FaCopy className="mr-2" />}
+                {copied ? <Check className="mr-2 h-4 w-4" /> : <Copy className="mr-2 h-4 w-4" />}
                 {copied ? 'Copied!' : 'Copy TypeScript Code'}
               </Button>
               <Button
@@ -244,7 +243,7 @@ export const DailyWordManager: React.FC = () => {
                 variant="outline"
                 className="w-full"
               >
-                <FaDownload className="mr-2" />
+                <Download className="mr-2 h-4 w-4" />
                 Download JSON
               </Button>
             </div>
@@ -253,7 +252,7 @@ export const DailyWordManager: React.FC = () => {
           {/* Word List */}
           <div className="lg:col-span-2 space-y-4">
             {/* Add Word */}
-            <div className="bg-white dark:bg-neo-navy-light rounded-neo border-4 border-neo-black p-4">
+            <div className="bg-white dark:bg-neo-navy-light rounded-neo border-4 border-neo-black p-4 text-neo-black dark:text-neo-cream">
               <h2 className="font-black text-xl mb-4">Add New Word</h2>
               <div className="flex gap-2">
                 <input
@@ -265,14 +264,14 @@ export const DailyWordManager: React.FC = () => {
                   className="flex-1 px-4 py-2 border-2 border-neo-black rounded-neo font-mono text-lg"
                 />
                 <Button onClick={handleAddWord} className="bg-neo-purple text-white">
-                  <FaPlus className="mr-2" />
+                  <Plus className="mr-2 h-4 w-4" />
                   Add
                 </Button>
               </div>
             </div>
 
             {/* Search */}
-            <div className="bg-white dark:bg-neo-navy-light rounded-neo border-4 border-neo-black p-4">
+            <div className="bg-white dark:bg-neo-navy-light rounded-neo border-4 border-neo-black p-4 text-neo-black dark:text-neo-cream">
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                 <input
@@ -286,7 +285,7 @@ export const DailyWordManager: React.FC = () => {
             </div>
 
             {/* Words Grid */}
-            <div className="bg-white dark:bg-neo-navy-light rounded-neo border-4 border-neo-black p-4">
+            <div className="bg-white dark:bg-neo-navy-light rounded-neo border-4 border-neo-black p-4 text-neo-black dark:text-neo-cream">
               <h2 className="font-black text-xl mb-4">
                 Words ({filteredWords.length})
               </h2>
@@ -305,7 +304,7 @@ export const DailyWordManager: React.FC = () => {
                       onClick={() => handleRemoveWord(word)}
                       className="opacity-0 group-hover:opacity-100 transition-opacity text-red-500 hover:text-red-700"
                     >
-                      <FaTrash className="w-3 h-3" />
+                      <Trash2 className="w-3 h-3" />
                     </button>
                   </motion.div>
                 ))}

@@ -2,7 +2,7 @@
 
 import React, { useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FaCheck, FaTimes, FaExclamationTriangle, FaSync } from 'react-icons/fa';
+import { Check, X, AlertTriangle, RefreshCw } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 export type FeedbackType =
@@ -32,35 +32,35 @@ const FEEDBACK_STYLES: Record<FeedbackType, {
     bg: 'bg-green-500',
     text: 'text-white',
     border: 'border-green-700',
-    icon: <FaCheck className="w-5 h-5" />,
+    icon: <Check className="w-5 h-5" />,
     animation: 'animate-neo-pop',
   },
   'invalid-word': {
     bg: 'bg-red-500',
     text: 'text-white',
     border: 'border-red-700',
-    icon: <FaTimes className="w-5 h-5" />,
+    icon: <X className="w-5 h-5" />,
     animation: 'animate-neo-shake',
   },
   'not-on-board': {
     bg: 'bg-orange-500',
     text: 'text-white',
     border: 'border-orange-700',
-    icon: <FaExclamationTriangle className="w-5 h-5" />,
+    icon: <AlertTriangle className="w-5 h-5" />,
     animation: 'animate-neo-wiggle',
   },
   'too-short': {
     bg: 'bg-orange-500',
     text: 'text-white',
     border: 'border-orange-700',
-    icon: <FaExclamationTriangle className="w-5 h-5" />,
+    icon: <AlertTriangle className="w-5 h-5" />,
     animation: 'animate-bounce',
   },
   'duplicate': {
     bg: 'bg-yellow-500',
     text: 'text-black',
     border: 'border-yellow-700',
-    icon: <FaSync className="w-5 h-5" />,
+    icon: <RefreshCw className="w-5 h-5" />,
     animation: 'animate-pulse',
   },
   'target-attempt': {

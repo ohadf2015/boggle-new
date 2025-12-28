@@ -1,7 +1,6 @@
 import { memo, useCallback, useMemo, useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FaChartBar } from 'react-icons/fa';
-import { HiMenu, HiX } from 'react-icons/hi';
+import { BarChart3, Menu, X } from 'lucide-react';
 import Link from 'next/link';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useAuth } from '../contexts/AuthContext';
@@ -231,7 +230,7 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                             "
                             aria-label={t('common.adminDashboard') || 'Admin Dashboard'}
                         >
-                            <FaChartBar className="text-base" aria-hidden="true" />
+                            <BarChart3 className="text-base" size={16} aria-hidden="true" />
                         </Link>
                     )}
                     <MusicControls />
@@ -259,9 +258,9 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                         aria-expanded={showMobileMenu}
                     >
                         {showMobileMenu ? (
-                            <HiX className="text-xl" />
+                            <X className="text-xl" size={20} />
                         ) : (
-                            <HiMenu className="text-xl" />
+                            <Menu className="text-xl" size={20} />
                         )}
                     </button>
                 </div>
@@ -313,7 +312,7 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                                         )}
                                         aria-label={t('common.closeMenu') || 'Close menu'}
                                     >
-                                        <HiX className="text-xl" />
+                                        <X className="text-xl" size={20} />
                                     </button>
                                 </div>
 
@@ -380,7 +379,7 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                                                     "
                                                     aria-label={t('common.adminDashboard') || 'Admin Dashboard'}
                                                 >
-                                                    <FaChartBar className="text-base" aria-hidden="true" />
+                                                    <BarChart3 className="text-base" size={16} aria-hidden="true" />
                                                 </Link>
                                             </div>
                                         </>

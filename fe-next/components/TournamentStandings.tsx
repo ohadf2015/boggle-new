@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { FaTrophy, FaMedal, FaStar } from 'react-icons/fa';
+import { Trophy, Medal, Star } from 'lucide-react';
 import { Card } from './ui/card';
 import { Badge } from './ui/badge';
 import { useLanguage } from '../contexts/LanguageContext';
@@ -39,11 +39,11 @@ const TournamentStandings: React.FC<TournamentStandingsProps> = ({
   const getMedalIcon = (placement: number): React.ReactElement | null => {
     switch (placement) {
       case 1:
-        return <FaTrophy className="text-yellow-500 text-2xl" />;
+        return <Trophy className="text-yellow-500 text-2xl" />;
       case 2:
-        return <FaMedal className="text-gray-600 text-xl" />;
+        return <Medal className="text-gray-600 text-xl" />;
       case 3:
-        return <FaMedal className="text-amber-600 text-xl" />;
+        return <Medal className="text-amber-600 text-xl" />;
       default:
         return null;
     }
@@ -68,7 +68,7 @@ const TournamentStandings: React.FC<TournamentStandingsProps> = ({
         {/* Header */}
         <div className="text-center space-y-2">
           <div className="flex items-center justify-center gap-2">
-            <FaTrophy className="text-amber-500 text-2xl" />
+            <Trophy className="text-amber-500 text-2xl" />
             <h2 className="text-2xl font-bold text-amber-700 dark:text-amber-300">
               {isComplete ? t('hostView.tournamentComplete') : t('hostView.tournamentStandings')}
             </h2>
@@ -186,7 +186,7 @@ const TournamentStandings: React.FC<TournamentStandingsProps> = ({
             transition={{ type: 'spring', duration: 0.5 }}
             className="text-center p-4 bg-neo-yellow rounded-lg shadow-xl border-3 border-neo-black"
           >
-            <FaStar className="text-neo-black text-3xl mx-auto mb-2 animate-pulse" />
+            <Star className="text-neo-black text-3xl mx-auto mb-2 animate-pulse" />
             <p className="text-sm font-medium text-neo-black">
               {t('hostView.tournamentWinner')}
             </p>

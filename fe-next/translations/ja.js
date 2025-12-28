@@ -862,6 +862,33 @@ const ja = {
     "tryAgainEncouragement": "続けてプレイして上達しよう！",
     "of": "/"
   },
+  "chart": {
+    "yourProgress": "あなたの進捗",
+    "needMoreGames": "もっとプレイしよう！",
+    "needMoreGamesDesc": "2ゲーム以上プレイすると進捗グラフが表示されます",
+    "bestScore": "最高",
+    "average": "平均",
+    "games": "ゲーム",
+    "trendUp": "上達中！",
+    "trendDown": "頑張れ！",
+    "trendStable": "安定",
+    "milestones": {
+      "wordWizard": "言葉の魔法使い",
+      "onFire": "燃えてる！",
+      "nice": "いいね！",
+      "warmingUp": "ウォームアップ中"
+    },
+    "funMessages": {
+      "crushing": "絶好調だね！🔥",
+      "domination": "言葉の達人への道！📈",
+      "steadyImprovement": "着実に上達中！👆",
+      "roughDay": "調子悪い日もあるよね！💪",
+      "comeback": "カムバックの準備中！🎯",
+      "tinyDip": "少し下がっただけ、大丈夫！🌊",
+      "holdingSteady": "プロのように安定！⚖️",
+      "playMore": "もっとプレイして傾向を見よう！"
+    }
+  },
   "archetypes": {
     "strategist": "戦略家",
     "strategistDesc": "計算された動き、最大のインパクト",
@@ -2043,6 +2070,7 @@ const ja = {
     "bannerSubtitle": "世界共通のパズル。スコアをシェア！",
     "oneAttempt": "1日1回のチャンス - 全員同じパズル！",
     "dayStreak": "日連続",
+    "daysStreak": "日連続",
     "playNow": "今すぐプレイ",
     "loading": "デイリーチャレンジを読み込み中...",
     "todaysPlayers": "今日のプレイヤー",
@@ -2052,7 +2080,9 @@ const ja = {
     "yourRank": "あなたの順位",
     "showMore": "もっと見る",
     "showLess": "閉じる",
-    "more": "人"
+    "more": "人",
+    "maxAttempts": "最大試行回数",
+    "huntDescription": "色分けされたフィードバックで隠された単語を探そう！"
   },
   "wordHunt": {
     "title": "ワードハント",
@@ -2105,6 +2135,9 @@ const ja = {
       "hintUnlocked": "ヒントがアンロックされました！",
       "hintCost": "コスト：{cost} 単語",
       "needMoreWords": "アンロックするにはあと{count}単語必要",
+      "oneMoreWord": "あと1単語！",
+      "nextHint": "次のヒント",
+      "allHintsUnlocked": "全ヒントアンロック済み！",
       "shop": "ヒントショップ",
       "shopTitle": "ヒントトークンを使う",
       "revealLetter": "文字を表示",
@@ -2125,7 +2158,33 @@ const ja = {
       "youWon": "生き残って単語を見つけました！",
       "category": "カテゴリ：{category}",
       "targetWordGuess": "目標単語の推測",
-      "gridWordDiscovery": "グリッド単語の発見"
+      "gridWordDiscovery": "グリッド単語の発見",
+      "cannotRevealMore": "これ以上文字を表示できません",
+      "wordsLabel": "単語",
+      "attemptsLabel": "試行"
+    },
+    "results": {
+      "targetWord": "目標単語",
+      "tokensEarned": "獲得トークン",
+      "rankOutOf": "{total}人中{rank}位",
+      "rankingsFor": "{language}パズルのランキング",
+      "survivalMetrics": "サバイバルモード統計",
+      "avgLifeLeft": "平均残りライフ",
+      "avgWordsFound": "平均発見単語数",
+      "avgEfficiency": "平均効率",
+      "bestEfficiency": "最高効率",
+      "yourEfficiency": "あなたの効率：{score}ポイント",
+      "efficiencyPercentile": "プレイヤーの{percentile}%より上位！"
+    },
+    "leaderboard": {
+      "solved": "成功",
+      "failed": "失敗",
+      "attempts": "試行",
+      "pts": "pts",
+      "words": "単語",
+      "justNow": "たった今",
+      "minutesAgo": "{count}分前",
+      "hoursAgo": "{count}時間前"
     }
   },
   "tutorial": {

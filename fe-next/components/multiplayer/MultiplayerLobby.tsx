@@ -3,7 +3,7 @@
 import React, { useState, useCallback, useEffect, useRef, FormEvent } from 'react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
-import { FaCrown, FaUser, FaArrowLeft } from 'react-icons/fa';
+import { Crown, User, ArrowLeft } from 'lucide-react';
 import { QRCodeSVG } from 'qrcode.react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -235,7 +235,7 @@ const MultiplayerLobby: React.FC<MultiplayerLobbyProps> = ({
               href="/"
               className="w-12 h-12 min-w-[48px] min-h-[48px] flex items-center justify-center rounded-neo border-3 border-neo-black bg-neo-cream shadow-hard hover:shadow-hard-lg transition-all"
             >
-              <FaArrowLeft className="text-sm text-neo-black rtl:rotate-180" />
+              <ArrowLeft className="text-sm text-neo-black rtl:rotate-180" />
             </Link>
             <h1 className="text-xl font-black uppercase text-neo-white flex-1">
               {t('landing.multiplayer') || 'Multiplayer'}
@@ -313,7 +313,7 @@ const MultiplayerLobby: React.FC<MultiplayerLobbyProps> = ({
               disabled={isJoining}
               className="w-full h-12 font-black uppercase text-base bg-neo-yellow hover:bg-neo-yellow/90 text-neo-black border-3 border-neo-black shadow-hard hover:shadow-hard-lg transition-all flex-shrink-0"
             >
-              {mode === 'host' ? <FaCrown className="mr-2 w-5 h-5" /> : <FaUser className="mr-2 w-5 h-5" />}
+              {mode === 'host' ? <Crown className="mr-2 w-5 h-5" /> : <User className="mr-2 w-5 h-5" />}
               {isJoining ? (t('common.loading') || 'Loading...') : mode === 'host' ? (t('joinView.createRoom') || 'Create Room') : (t('joinView.joinRoom') || 'Join Room')}
             </Button>
           </form>
@@ -360,7 +360,7 @@ const MultiplayerLobby: React.FC<MultiplayerLobbyProps> = ({
             href="/"
             className="absolute start-0 flex items-center gap-2 px-3 py-2 rounded-neo border-3 border-neo-black dark:border-slate-600 bg-neo-cream dark:bg-slate-700 shadow-hard hover:shadow-hard-lg hover:translate-x-[-2px] hover:translate-y-[-2px] transition-all text-neo-black dark:text-neo-white text-sm font-bold"
           >
-            <FaArrowLeft className="w-5 h-5 rtl:rotate-180" />
+            <ArrowLeft className="w-5 h-5 rtl:rotate-180" />
             <span className="hidden sm:inline">{t('common.back') || 'Back'}</span>
           </Link>
           <h1 className="text-2xl sm:text-3xl md:text-4xl font-black uppercase text-center text-neo-black dark:text-neo-white">
@@ -433,7 +433,7 @@ const MultiplayerLobby: React.FC<MultiplayerLobbyProps> = ({
                         size="lg"
                         disabled={isJoining}
                       >
-                        <FaCrown className="mr-2" />
+                        <Crown className="mr-2" />
                         {isJoining
                           ? t('joinView.creating') || 'Creating...'
                           : t('joinView.createRoom') || 'Create Room'}
@@ -464,7 +464,7 @@ const MultiplayerLobby: React.FC<MultiplayerLobbyProps> = ({
                         size="lg"
                         disabled={isJoining || isAutoJoining || !gameCode}
                       >
-                        <FaUser className="mr-2" />
+                        <User className="mr-2" />
                         {isJoining || isAutoJoining
                           ? t('joinView.joining') || 'Joining...'
                           : t('joinView.joinGame') || 'Join Game'}

@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import Avatar from '@/components/Avatar';
 import EmojiAvatarPicker from '@/components/EmojiAvatarPicker';
 import { getAvatarById, type AvatarConfig } from '@/utils/avatarConfig';
-import { FaPencilAlt } from 'react-icons/fa';
+import { Pencil } from 'lucide-react';
 
 export interface AvatarSelectorButtonProps {
   selectedAvatarId?: string;
@@ -92,7 +92,7 @@ const AvatarSelectorButton: React.FC<AvatarSelectorButtonProps> = ({
           group-hover:scale-110
           transition-transform
         `}>
-          <FaPencilAlt className="w-2 h-2" />
+          <Pencil className="w-2 h-2" />
         </div>
       </button>
 

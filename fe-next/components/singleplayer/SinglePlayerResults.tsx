@@ -3,8 +3,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import dynamic from 'next/dynamic';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FaTrophy, FaMedal, FaRedo, FaHome, FaRobot, FaChartBar, FaCrown, FaAward, FaArrowDown, FaCog } from 'react-icons/fa';
-import { Sparkles } from 'lucide-react';
+import { Trophy, Medal, RotateCw, Home, Bot, BarChart3, Crown, Award, ArrowDown, Settings, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import PlayerInsights from '@/components/results/PlayerInsights';
@@ -24,8 +23,12 @@ import { updateGuestStatsAfterGame, getGuestStats } from '@/utils/guestManager';
 import { getPointColor, getTextColor } from '@/components/results/utils';
 import type { WordObject } from '@/components/results/types';
 import { getRankBgColor } from '@/utils/rankingStyles';
+import { addGameToHistory } from '@/utils/gameHistoryManager';
 import type { SinglePlayerResultsData, SinglePlayerMode } from './SinglePlayerView';
 import { useResultsData } from './results';
+
+// Dynamic import for PerformanceChart (heavy component)
+const PerformanceChart = dynamic(() => import('@/components/results/PerformanceChart'), { ssr: false });
 
 // Dynamic import for signup modal
 const FirstWinSignupModal = dynamic(() => import('@/components/auth/FirstWinSignupModal'), { ssr: false });
@@ -63,6 +66,7 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
 
   // Refs to prevent duplicate stat updates
   const hasUpdatedStatsRef = useRef(false);
+  const hasAddedToHistoryRef = useRef(false);
   const actionButtonsRef = useRef<HTMLDivElement>(null);
 
   // Use extracted hook for data processing
@@ -116,6 +120,29 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
 
     hasUpdatedStatsRef.current = true;
   }, [isAuthenticated, results, isWinner]);
+
+  // Add game to history for the performance chart (runs for all users)
+  useEffect(() => {
+    if (hasAddedToHistoryRef.current) return;
+
+    const validWords = results.playerWordData?.filter(w => w.isValid) || [];
+    const totalAttempts = results.playerWordData?.length || 0;
+    const accuracy = totalAttempts > 0 ? Math.round((validWords.length / totalAttempts) * 100) : 0;
+    const longestWordLength = validWords.reduce((max, w) => Math.max(max, w.word.length), 0);
+
+    addGameToHistory({
+      score: results.playerScore,
+      wordCount: validWords.length,
+      accuracy,
+      rank: playerRank,
+      totalPlayers: allParticipants.length,
+      mode: 'single',
+      isWinner: isWinner,
+      longestWordLength,
+    });
+
+    hasAddedToHistoryRef.current = true;
+  }, [results, playerRank, allParticipants.length, isWinner]);
 
   // Show signup prompt for guests who have played 2+ games
   useEffect(() => {
@@ -200,9 +227,9 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
 
   // getRankIcon returns React elements - kept local as it's component-specific
   const getRankIcon = (rank: number) => {
-    if (rank === 1) return <FaTrophy className="text-neo-yellow text-xl" />;
-    if (rank === 2) return <FaMedal className="text-slate-500 dark:text-slate-300 text-xl" />;
-    if (rank === 3) return <FaMedal className="text-amber-600 text-xl" />;
+    if (rank === 1) return <Trophy className="text-neo-yellow text-xl" />;
+    if (rank === 2) return <Medal className="text-slate-500 dark:text-slate-300 text-xl" />;
+    if (rank === 3) return <Medal className="text-amber-600 text-xl" />;
     return <span className="text-neo-black/70 dark:text-white/70 font-bold">#{rank}</span>;
   };
 
@@ -225,9 +252,9 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
           )}>
             <div className="flex items-center justify-center gap-2">
               {isWinner ? (
-                <FaTrophy className="text-xl text-neo-black" />
+                <Trophy className="text-xl text-neo-black" />
               ) : results.isNewHighScore ? (
-                <FaCrown className="text-xl text-neo-black" />
+                <Crown className="text-xl text-neo-black" />
               ) : (
                 <span className="font-black text-neo-black">#{playerRank}</span>
               )}
@@ -336,7 +363,7 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
                 className="w-full py-2 bg-neo-yellow hover:bg-neo-yellow/90 text-neo-black font-bold text-xs border-2 border-neo-black"
                 onClick={onQuickRematch}
               >
-                <FaRedo className="me-1 text-xs" />
+                <RotateCw className="me-1 text-xs" />
                 {t('common.rematch') || 'Rematch'}
               </Button>
             )}
@@ -347,7 +374,7 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
                 className="flex-1 py-2 font-bold text-xs border-2 border-neo-black"
                 onClick={onPlayAgain}
               >
-                <FaCog className="me-1 text-xs" />
+                <Settings className="me-1 text-xs" />
                 {t('common.settings') || 'Settings'}
               </Button>
               <Button
@@ -356,7 +383,7 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
                 className="flex-1 py-2 font-bold text-xs border-2 border-neo-black"
                 onClick={onBackToLobby}
               >
-                <FaHome className="me-1 text-xs" />
+                <Home className="me-1 text-xs" />
                 {t('common.lobby') || 'Lobby'}
               </Button>
             </div>
@@ -477,7 +504,7 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
       <Card className="border-4 border-neo-black dark:border-slate-600 shadow-hard-lg">
         <CardHeader className="pb-2">
           <CardTitle className="text-sm uppercase tracking-wide text-neo-black/70 dark:text-neo-white/70 flex items-center gap-2">
-            <FaChartBar className="text-neo-cyan" />
+            <BarChart3 className="text-neo-cyan" />
             {t('common.wordsFound') || 'Words Found'} ({results.playerWords.length})
           </CardTitle>
         </CardHeader>
@@ -523,6 +550,15 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
         </Card>
       )}
 
+      {/* Performance Chart - Shows improvement over recent games */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.35, duration: 0.3 }}
+      >
+        <PerformanceChart currentScore={results.playerScore} gamesLimit={10} />
+      </motion.div>
+
       {/* Missed Words Section - Only for solo-bots mode */}
       {mode === 'solo-bots' && missedWords.length > 0 && (
         <motion.div
@@ -544,7 +580,7 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
           <Card className="border-4 border-neo-black dark:border-slate-600 shadow-hard-lg">
             <CardHeader className="pb-2">
               <CardTitle className="text-sm uppercase tracking-wide text-neo-black/70 dark:text-neo-white/70 flex items-center gap-2">
-                <FaAward className="w-4 h-4 text-neo-purple" />
+                <Award className="w-4 h-4 text-neo-purple" />
                 {t('hostView.achievements') || 'Achievements'}
                 <span className="text-xs bg-neo-purple/20 text-neo-purple px-2 py-0.5 rounded-neo border border-neo-purple/30 font-bold">
                   {results.achievements.length}
@@ -591,7 +627,7 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
         <Card className="border-4 border-neo-black dark:border-slate-600 shadow-hard-lg">
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-sm uppercase tracking-wide text-neo-black/70 dark:text-neo-white/70">
-              <FaRobot className="text-neo-purple" />
+              <Bot className="text-neo-purple" />
               {t('singlePlayer.botDetails') || 'Bot Performance Details'}
             </CardTitle>
           </CardHeader>
@@ -610,7 +646,7 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
                   className="w-full flex items-center justify-between p-3 bg-neo-cream dark:bg-slate-700 hover:bg-neo-cream/80 dark:hover:bg-slate-600 transition-colors"
                 >
                   <div className="flex items-center gap-3">
-                    <FaRobot className="text-neo-black/70 dark:text-white/70" />
+                    <Bot className="text-neo-black/70 dark:text-white/70" />
                     <span className="font-black text-neo-black dark:text-white">{bot.name}</span>
                     <span className="text-xs bg-neo-black/10 dark:bg-white/10 px-2 py-0.5 rounded-full font-bold">
                       {bot.totalWords} {t('hostView.words') || 'words'}
@@ -724,7 +760,7 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
               className="w-full py-5 text-xl shadow-hard-lg hover:shadow-hard-xl border-4 bg-neo-yellow hover:bg-neo-yellow/90 text-neo-black font-black uppercase tracking-wider"
               onClick={onQuickRematch}
             >
-              <FaRedo className="me-2 text-2xl" />
+              <RotateCw className="me-2 text-2xl" />
               {t('common.quickRematch') || 'Quick Rematch'}
             </Button>
           </motion.div>
@@ -736,7 +772,7 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
           className="w-full py-3 shadow-hard hover:shadow-hard-lg border-3"
           onClick={onPlayAgain}
         >
-          <FaCog className="me-2" />
+          <Settings className="me-2" />
           {t('common.settingsAndPlay') || 'Settings & Play Again'}
         </Button>
         {/* Tertiary: Back to Lobby - least prominent exit action */}
@@ -746,7 +782,7 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
           className="w-full py-3 shadow-hard hover:shadow-hard-lg border-3"
           onClick={onBackToLobby}
         >
-          <FaHome className="me-2" />
+          <Home className="me-2" />
           {t('common.backToLobby') || 'Back to Lobby'}
         </Button>
       </div>
@@ -763,7 +799,7 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
             className="fixed bottom-6 right-6 z-50 flex items-center gap-2 px-4 py-3 bg-neo-yellow hover:bg-neo-yellow/90 text-neo-black font-bold rounded-neo border-3 border-neo-black shadow-hard hover:shadow-hard-lg transition-all"
             aria-label={t('common.newGame') || 'New Game'}
           >
-            <FaArrowDown className="animate-bounce" />
+            <ArrowDown className="animate-bounce" />
             <span className="hidden sm:inline">{t('common.newGame') || 'New Game'}</span>
           </motion.button>
         )}

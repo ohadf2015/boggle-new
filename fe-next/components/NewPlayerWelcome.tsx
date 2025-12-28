@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
-import { FaGamepad, FaPlay, FaTimes, FaStar, FaFire, FaTrophy } from 'react-icons/fa';
+import { Gamepad2, Play, X, Star, Flame, Trophy } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogBody, DialogFooter } from './ui/dialog';
 import { Button } from './ui/button';
 import { useLanguage } from '../contexts/LanguageContext';
@@ -61,9 +61,9 @@ const NewPlayerWelcome: React.FC<NewPlayerWelcomeProps> = ({
   };
 
   const features: FeatureItem[] = [
-    { icon: FaStar, label: t('howToPlay.steps.scoring.title'), color: 'bg-neo-yellow' },
-    { icon: FaFire, label: t('howToPlay.steps.combo.title'), color: 'bg-neo-orange' },
-    { icon: FaTrophy, label: t('howToPlay.steps.achievements.title'), color: 'bg-neo-pink' },
+    { icon: Star, label: t('howToPlay.steps.scoring.title'), color: 'bg-neo-yellow' },
+    { icon: Flame, label: t('howToPlay.steps.combo.title'), color: 'bg-neo-orange' },
+    { icon: Trophy, label: t('howToPlay.steps.achievements.title'), color: 'bg-neo-pink' },
   ];
 
   return (
@@ -75,7 +75,7 @@ const NewPlayerWelcome: React.FC<NewPlayerWelcomeProps> = ({
               animate={{ rotate: [0, -10, 10, -10, 0] }}
               transition={{ duration: 0.5, delay: 0.3 }}
             >
-              <FaGamepad className="text-2xl sm:text-3xl" />
+              <Gamepad2 className="text-2xl sm:text-3xl" />
             </motion.div>
             {t('howToPlay.newPlayer.welcomeTitle')}
           </DialogTitle>
@@ -160,7 +160,7 @@ const NewPlayerWelcome: React.FC<NewPlayerWelcomeProps> = ({
             onClick={handleSkip}
             className="bg-neo-cream flex-1 text-sm sm:text-base"
           >
-            <FaTimes className={`${dir === 'rtl' ? 'ml-2' : 'mr-2'}`} />
+            <X className={`${dir === 'rtl' ? 'ml-2' : 'mr-2'}`} />
             {t('howToPlay.newPlayer.skipTutorial')}
           </Button>
           <Link href={rulesPageUrl} onClick={handleShowTutorial} className="flex-1">
@@ -168,7 +168,7 @@ const NewPlayerWelcome: React.FC<NewPlayerWelcomeProps> = ({
               variant="outline"
               className="bg-neo-lime w-full text-sm sm:text-base"
             >
-              <FaPlay className={`${dir === 'rtl' ? 'ml-2' : 'mr-2'}`} />
+              <Play className={`${dir === 'rtl' ? 'ml-2' : 'mr-2'}`} />
               {t('howToPlay.newPlayer.showTutorial')}
             </Button>
           </Link>

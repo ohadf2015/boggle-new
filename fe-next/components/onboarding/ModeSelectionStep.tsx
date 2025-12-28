@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import { FaUser, FaUsers, FaCalendarDay } from 'react-icons/fa';
+import { User, Users, CalendarDays } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 
@@ -24,21 +24,21 @@ const ModeSelectionStep: React.FC<ModeSelectionStepProps> = ({
   const modes = [
     {
       id: 'single' as const,
-      icon: FaUser,
+      icon: User,
       color: 'bg-neo-yellow',
       hoverColor: 'hover:bg-neo-yellow/90',
       delay: 0.2,
     },
     {
       id: 'multi' as const,
-      icon: FaUsers,
+      icon: Users,
       color: 'bg-neo-orange',
       hoverColor: 'hover:bg-neo-orange/90',
       delay: 0.4,
     },
     {
       id: 'daily' as const,
-      icon: FaCalendarDay,
+      icon: CalendarDays,
       color: 'bg-neo-pink',
       hoverColor: 'hover:bg-neo-pink/90',
       delay: 0.6,

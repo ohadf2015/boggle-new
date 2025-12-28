@@ -534,44 +534,38 @@ const GridComponent = memo<GridComponentProps>(({
                         />
                       )}
 
-                      {/* Sparkle burst - first letter gets extra flair */}
-                      {isFirstSelected && !reduceMotion && performanceMode !== 'minimal' && (
+                      {/* Sparkle burst - first letter gets extra flair (reduced particle count for performance) */}
+                      {isFirstSelected && !reduceMotion && performanceMode === 'full' && (
                         <>
-                          {[...Array(performanceMode === 'full' ? 10 : 6)].map((_, idx) => {
-                            const particleCount = performanceMode === 'full' ? 10 : 6;
-                            const angle = (idx * (360 / particleCount) + (idx % 2) * 15) * (Math.PI / 180);
-                            const distance = 28 + (idx % 3) * 8;
+                          {[...Array(4)].map((_, idx) => {
+                            const angle = (idx * 90) * (Math.PI / 180);
+                            const distance = 24;
                             const colors = comboColors.isRainbow
-                              ? ['#FF3366', '#FFE135', '#00FFFF', '#FF1493', '#BFFF00']
+                              ? ['#FF3366', '#00FFFF', '#FFE135', '#FF1493']
                               : ['#FFD700', '#FF6B35', '#FF3366', '#FFA500'];
                             return (
                               <motion.div
                                 key={`first-burst-${idx}`}
-                                className="absolute pointer-events-none"
+                                className="absolute pointer-events-none rounded-full"
                                 style={{
-                                  width: 6 + (idx % 2) * 2,
-                                  height: 6 + (idx % 2) * 2,
-                                  background: colors[idx % colors.length],
-                                  borderRadius: idx % 2 === 0 ? '50%' : '2px',
+                                  width: 6,
+                                  height: 6,
+                                  background: colors[idx],
                                   left: '50%',
                                   top: '50%',
-                                  marginLeft: -3 - (idx % 2),
-                                  marginTop: -3 - (idx % 2),
-                                  boxShadow: `0 0 6px ${colors[idx % colors.length]}`,
-                                  transform: `rotate(${idx * 45}deg)`,
+                                  marginLeft: -3,
+                                  marginTop: -3,
                                 }}
                                 initial={{ scale: 0, opacity: 1, x: 0, y: 0 }}
                                 animate={{
-                                  scale: [0, 1.5, 1, 0],
-                                  opacity: [0, 1, 0.8, 0],
+                                  scale: [0, 1.2, 0],
+                                  opacity: [0, 1, 0],
                                   x: Math.cos(angle) * distance,
                                   y: Math.sin(angle) * distance,
-                                  rotate: [0, 180, 360],
                                 }}
                                 transition={{
-                                  duration: 0.5,
-                                  ease: [0.25, 0.46, 0.45, 0.94],
-                                  delay: idx * 0.025
+                                  duration: 0.35,
+                                  ease: 'easeOut',
                                 }}
                               />
                             );
@@ -579,45 +573,40 @@ const GridComponent = memo<GridComponentProps>(({
                         </>
                       )}
 
-                      {/* Center burst particles - scale with combo */}
-                      {!reduceMotion && performanceMode !== 'minimal' && (
+                      {/* Center burst particles - simplified for performance */}
+                      {!reduceMotion && performanceMode === 'full' && comboLevel >= 2 && (
                         <>
-                          {[...Array(performanceMode === 'full' ? 8 : 5)].map((_, idx) => {
-                            const count = performanceMode === 'full' ? 8 : 5;
-                            const angle = (idx * (360 / count) + 22.5) * (Math.PI / 180);
-                            const distance = 12 + Math.min(comboLevel * 2.5, 20);
+                          {[...Array(4)].map((_, idx) => {
+                            const angle = (idx * 90 + 45) * (Math.PI / 180);
+                            const distance = 16;
                             const particleColor = comboColors.isRainbow
-                              ? ['#FF1493', '#00FFFF', '#FFE135'][idx % 3]
+                              ? '#FF1493'
                               : comboLevel >= 5
                               ? '#FF3366'
-                              : comboLevel >= 3
-                              ? '#FF6B35'
-                              : '#FFA500';
+                              : '#FF6B35';
                             return (
                               <motion.div
                                 key={`burst-${idx}`}
                                 className="absolute rounded-full pointer-events-none"
                                 style={{
-                                  width: 5,
-                                  height: 5,
+                                  width: 4,
+                                  height: 4,
                                   background: particleColor,
                                   left: '50%',
                                   top: '50%',
-                                  marginLeft: -2.5,
-                                  marginTop: -2.5,
-                                  boxShadow: `0 0 4px ${particleColor}`,
+                                  marginLeft: -2,
+                                  marginTop: -2,
                                 }}
                                 initial={{ scale: 0, opacity: 1, x: 0, y: 0 }}
                                 animate={{
-                                  scale: [0, 1.2, 0.8, 0],
-                                  opacity: [0, 1, 0.7, 0],
+                                  scale: [0, 1, 0],
+                                  opacity: [0, 1, 0],
                                   x: Math.cos(angle) * distance,
                                   y: Math.sin(angle) * distance
                                 }}
                                 transition={{
-                                  duration: 0.4,
-                                  ease: [0.25, 0.46, 0.45, 0.94],
-                                  delay: idx * 0.02
+                                  duration: 0.3,
+                                  ease: 'easeOut',
                                 }}
                               />
                             );

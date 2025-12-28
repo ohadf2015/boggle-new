@@ -7,6 +7,8 @@ import express, { Request, Response, Router } from 'express';
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const { getSupabase, isSupabaseConfigured } = require('../modules/supabaseServer');
 import logger from '../utils/logger';
+import { generateDailyPuzzle, generateDailyPuzzleAsync, getPuzzleNumber } from '../../utils/dailyChallenge';
+import type { Language } from '../../types';
 
 const router: Router = express.Router();
 
@@ -120,6 +122,58 @@ interface StatsResponse {
 
 const VALID_LANGUAGES = ['en', 'he', 'sv', 'ja', 'es'] as const;
 type ValidLanguage = typeof VALID_LANGUAGES[number];
+
+/**
+ * GET /api/daily-challenge/puzzle/:date/:language
+ * Get the daily puzzle for a specific date and language
+ * This endpoint returns the AI-selected word if available, otherwise deterministic
+ */
+router.get('/puzzle/:date/:language', async (req: Request<LeaderboardParams>, res: Response): Promise<void> => {
+  try {
+    const { date, language } = req.params;
+
+    // Validate date format
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) {
+      res.status(400).json({ error: 'Invalid date format. Use YYYY-MM-DD' });
+      return;
+    }
+
+    // Validate language
+    if (!VALID_LANGUAGES.includes(language as ValidLanguage)) {
+      res.status(400).json({ error: 'Invalid language code' });
+      return;
+    }
+
+    // Generate puzzle with async version (checks DB for AI-selected word)
+    const puzzle = await generateDailyPuzzleAsync(date, language as Language);
+
+    res.json({
+      grid: puzzle.grid,
+      targetWord: puzzle.targetWord,
+      puzzleDate: puzzle.puzzleDate,
+      puzzleNumber: puzzle.puzzleNumber,
+      language: puzzle.language
+    });
+  } catch (error) {
+    const err = error as Error;
+    logger.error('API', `Daily puzzle error: ${err.message}`);
+
+    // Fall back to sync version on error
+    try {
+      const { date, language } = req.params;
+      const puzzle = generateDailyPuzzle(date, language as Language);
+      res.json({
+        grid: puzzle.grid,
+        targetWord: puzzle.targetWord,
+        puzzleDate: puzzle.puzzleDate,
+        puzzleNumber: puzzle.puzzleNumber,
+        language: puzzle.language
+      });
+    } catch (fallbackError) {
+      res.status(500).json({ error: 'Failed to generate puzzle' });
+    }
+  }
+});
 
 /**
  * GET /api/daily-challenge/leaderboard/:date/:language
@@ -470,6 +524,42 @@ router.post('/word-hunt/submit', async (req: WordHuntSubmitRequest, res: Respons
     if (!playerId && !guestFingerprint) {
       res.status(400).json({ error: 'Either playerId or guestFingerprint is required' });
       return;
+    }
+
+    // Server-side validation: Verify target word matches expected puzzle
+    try {
+      // Use async version to check database for AI-selected word first
+      const expectedPuzzle = await generateDailyPuzzleAsync(puzzleDate, language as Language);
+      const expectedTargetWord = expectedPuzzle.targetWord.toUpperCase();
+      const submittedTargetWord = targetWord.toUpperCase();
+
+      if (expectedTargetWord !== submittedTargetWord) {
+        logger.warn('API', `Word Hunt validation failed: expected ${expectedTargetWord}, got ${submittedTargetWord} for ${puzzleDate}/${language}`);
+        res.status(400).json({ error: 'Invalid target word for this puzzle' });
+        return;
+      }
+
+      // Verify puzzle number matches
+      const expectedPuzzleNumber = getPuzzleNumber(puzzleDate);
+      if (expectedPuzzleNumber !== puzzleNumber) {
+        logger.warn('API', `Word Hunt validation failed: expected puzzle #${expectedPuzzleNumber}, got #${puzzleNumber}`);
+        res.status(400).json({ error: 'Invalid puzzle number' });
+        return;
+      }
+
+      // If solved, verify the last attempt matches the target word
+      if (solved && attemptWords && attemptWords.length > 0) {
+        const lastAttempt = attemptWords[attemptWords.length - 1];
+        if (lastAttempt.word.toUpperCase() !== expectedTargetWord) {
+          logger.warn('API', `Word Hunt validation failed: solved=true but last attempt "${lastAttempt.word}" doesn't match target "${expectedTargetWord}"`);
+          res.status(400).json({ error: 'Invalid solve claim' });
+          return;
+        }
+      }
+    } catch (validationError) {
+      logger.error('API', `Word Hunt validation error: ${(validationError as Error).message}`);
+      // Continue without blocking - validation errors shouldn't prevent submission
+      // Just log for monitoring
     }
 
     const supabase = getSupabase();

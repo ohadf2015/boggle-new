@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
-import { FaUser, FaUsers, FaRobot, FaBullseye, FaTrophy, FaDoorOpen, FaCrown, FaMedal, FaQuestionCircle } from 'react-icons/fa';
+import { User, Users, Bot, Target, Trophy, DoorOpen, Crown, Medal, CircleHelp } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useMusic } from '@/contexts/MusicContext';
 import { useAuth } from '@/contexts/AuthContext';
@@ -77,11 +77,11 @@ const LandingView: React.FC = () => {
           className="flex-1 flex flex-col items-center justify-center gap-3 p-6 bg-gradient-to-br from-neo-pink to-pink-400 border-4 border-neo-black rounded-neo shadow-hard hover:shadow-hard-lg hover:translate-x-[-2px] hover:translate-y-[-2px] active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-sm transition-all h-full max-h-[90vh] min-h-[300px]"
           aria-label={`${t('landing.multiplayer') || 'Multiplayer'} - ${t('landing.multiplayerDesc') || 'Compete with friends'}`}
         >
-          <FaUsers className="text-5xl text-neo-black" aria-hidden="true" />
+          <Users className="w-12 h-12 text-neo-black" aria-hidden="true" />
           <span className="text-xl font-black uppercase text-neo-black text-center">{t('landing.multiplayer') || 'Multiplayer'}</span>
           <div className="flex flex-col gap-2 text-sm" aria-hidden="true">
-            <span className="bg-neo-black/20 px-3 py-1.5 rounded-neo font-bold text-center"><FaDoorOpen className="inline mr-1" />Rooms</span>
-            <span className="bg-neo-black/20 px-3 py-1.5 rounded-neo font-bold text-center"><FaCrown className="inline mr-1" />Host</span>
+            <span className="bg-neo-black/20 px-3 py-1.5 rounded-neo font-bold text-center"><DoorOpen className="inline w-4 h-4 mr-1" />Rooms</span>
+            <span className="bg-neo-black/20 px-3 py-1.5 rounded-neo font-bold text-center"><Crown className="inline w-4 h-4 mr-1" />Host</span>
           </div>
         </Link>
 
@@ -91,11 +91,11 @@ const LandingView: React.FC = () => {
           className="flex-1 flex flex-col items-center justify-center gap-3 p-6 bg-gradient-to-br from-neo-cyan to-cyan-400 border-4 border-neo-black rounded-neo shadow-hard hover:shadow-hard-lg hover:translate-x-[-2px] hover:translate-y-[-2px] active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-sm transition-all h-full max-h-[90vh] min-h-[300px]"
           aria-label={`${t('landing.singlePlayer') || 'Single Player'} - ${t('landing.singlePlayerDesc') || 'Practice at your own pace'}`}
         >
-          <FaUser className="text-5xl text-neo-black" aria-hidden="true" />
+          <User className="w-12 h-12 text-neo-black" aria-hidden="true" />
           <span className="text-xl font-black uppercase text-neo-black text-center">{t('landing.singlePlayer') || 'Single Player'}</span>
           <div className="flex flex-col gap-2 text-sm" aria-hidden="true">
-            <span className="bg-neo-black/20 px-3 py-1.5 rounded-neo font-bold text-center"><FaRobot className="inline mr-1" />Bots</span>
-            <span className="bg-neo-black/20 px-3 py-1.5 rounded-neo font-bold text-center"><FaTrophy className="inline mr-1" />Challenges</span>
+            <span className="bg-neo-black/20 px-3 py-1.5 rounded-neo font-bold text-center"><Bot className="inline w-4 h-4 mr-1" />Bots</span>
+            <span className="bg-neo-black/20 px-3 py-1.5 rounded-neo font-bold text-center"><Trophy className="inline w-4 h-4 mr-1" />Challenges</span>
           </div>
         </Link>
 
@@ -105,7 +105,7 @@ const LandingView: React.FC = () => {
           className="absolute bottom-4 right-4 flex items-center gap-2 px-4 py-3 bg-neo-yellow text-neo-black font-bold text-lg border-3 border-neo-black rounded-neo min-h-[48px] shadow-hard hover:shadow-hard-lg hover:translate-x-[-1px] hover:translate-y-[-1px] active:translate-x-[1px] active:translate-y-[1px] active:shadow-hard-sm transition-all z-10"
           aria-label={t('joinView.howToPlay') || 'How to Play'}
         >
-          <FaQuestionCircle className="w-5 h-5 sm:w-6 sm:h-6" aria-hidden="true" />
+          <CircleHelp className="w-5 h-5 sm:w-6 sm:h-6" aria-hidden="true" />
           <span className="hidden sm:inline">{t('joinView.howToPlay') || 'How to Play'}</span>
         </Link>
       </main>
@@ -142,19 +142,19 @@ const LandingView: React.FC = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4, delay: 0.1 }}
-          className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5 max-w-4xl mx-auto"
+          className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4 max-w-3xl mx-auto"
         >
           {/* Multiplayer Card */}
           <ModeCard
             title={t('landing.multiplayer') || 'Multiplayer'}
             description={t('landing.multiplayerDesc') || 'Compete with friends in real-time!'}
             features={[
-              { icon: <FaDoorOpen />, label: t('landing.feature.joinRooms') || 'Join Rooms' },
-              { icon: <FaCrown />, label: t('landing.feature.hostGames') || 'Host Games' },
-              { icon: <FaMedal />, label: t('landing.feature.tournaments') || 'Tournaments' },
+              { icon: <DoorOpen className="w-4 h-4" />, label: t('landing.feature.joinRooms') || 'Join Rooms' },
+              { icon: <Crown className="w-4 h-4" />, label: t('landing.feature.hostGames') || 'Host Games' },
+              { icon: <Medal className="w-4 h-4" />, label: t('landing.feature.tournaments') || 'Tournaments' },
             ]}
             href={`/${language}/multiplayer`}
-            icon={<FaUsers />}
+            icon={<Users className="w-6 h-6" />}
             variant="pink"
             liveBadge={{
               openRooms: liveRoomStats.openRooms,
@@ -169,12 +169,12 @@ const LandingView: React.FC = () => {
             title={t('landing.singlePlayer') || 'Single Player'}
             description={t('landing.singlePlayerDesc') || 'Practice at your own pace or challenge yourself!'}
             features={[
-              { icon: <FaRobot />, label: t('landing.feature.soloVsBots') || 'Solo vs Bots' },
-              { icon: <FaBullseye />, label: t('landing.feature.practiceMode') || 'Practice Mode' },
-              { icon: <FaTrophy />, label: t('landing.feature.challenges') || 'Challenges & High Scores' },
+              { icon: <Bot className="w-4 h-4" />, label: t('landing.feature.soloVsBots') || 'Solo vs Bots' },
+              { icon: <Target className="w-4 h-4" />, label: t('landing.feature.practiceMode') || 'Practice Mode' },
+              { icon: <Trophy className="w-4 h-4" />, label: t('landing.feature.challenges') || 'Challenges & High Scores' },
             ]}
             href={`/${language}/singleplayer`}
-            icon={<FaUser />}
+            icon={<User className="w-6 h-6" />}
             variant="cyan"
           />
         </motion.div>
@@ -200,7 +200,7 @@ const LandingView: React.FC = () => {
               transition-all duration-100
             "
           >
-            <FaQuestionCircle className="w-5 h-5 sm:w-6 sm:h-6" />
+            <CircleHelp className="w-5 h-5 sm:w-6 sm:h-6" />
             {t('joinView.howToPlay') || 'How to Play?'}
           </Link>
         </motion.div>

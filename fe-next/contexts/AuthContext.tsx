@@ -16,6 +16,7 @@ import { getUtmDataForProfile } from '../utils/utmCapture';
 import logger from '@/utils/logger';
 import { setSentryUser, clearSentryUser } from '@/utils/sentry';
 import type { User } from '@supabase/supabase-js';
+import { linkSessionToUser } from '@/utils/sessionTracking';
 
 // Import types and utils from auth module
 import type { ProfileData, RankedProgress, AuthContextValue } from './auth';
@@ -250,6 +251,10 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
           // Handle cross-tab auth state sync
           if (event === 'SIGNED_IN' && session?.user) {
             setUser(session.user);
+            // Link guest session to user account
+            linkSessionToUser(session.user.id).catch((err) => {
+              logger.warn('Failed to link guest session to user:', err);
+            });
             // Only set loading if we don't already have profile data
             // This prevents loading state getting stuck on tab visibility change
             setLoading(currentLoading => {
@@ -282,6 +287,10 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
             // Handle initial session from other tabs - ensure loading is set
             if (session?.user) {
               setUser(session.user);
+              // Link guest session to user account
+              linkSessionToUser(session.user.id).catch((err) => {
+                logger.warn('Failed to link guest session to user:', err);
+              });
               try {
                 await fetchUserData(session.user.id, session.user.user_metadata);
               } finally {

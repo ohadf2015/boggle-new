@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import { FaFire } from 'react-icons/fa';
+import { Flame } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 
 /**
@@ -45,11 +45,11 @@ const ComboStep: React.FC = () => {
         className="text-center space-y-1"
       >
         <div className="flex items-center justify-center gap-2">
-          <FaFire className="text-2xl text-neo-orange" />
+          <Flame className="text-2xl text-neo-orange" />
           <h2 className="text-xl sm:text-2xl font-black text-neo-black uppercase">
             {t('onboarding.combo.title')}
           </h2>
-          <FaFire className="text-2xl text-neo-orange" />
+          <Flame className="text-2xl text-neo-orange" />
         </div>
         <p className="text-xs sm:text-sm text-neo-black/70">
           {t('onboarding.combo.subtitle')}
@@ -92,7 +92,7 @@ const ComboStep: React.FC = () => {
                   {example.score}
                 </div>
                 <div className="flex items-center gap-1 justify-end">
-                  <FaFire className="text-neo-black/70 text-sm" />
+                  <Flame className="text-neo-black/70 text-sm" />
                   <span className="text-xs font-bold text-neo-black">
                     {example.combo}x
                   </span>

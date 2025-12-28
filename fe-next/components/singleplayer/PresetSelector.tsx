@@ -3,8 +3,7 @@
 import React, { useMemo, useState } from 'react';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FaArrowLeft, FaCog, FaPlay, FaCrown, FaFire, FaRobot, FaBook, FaTrophy, FaCalendar } from 'react-icons/fa';
-import { Target, Flame, Check } from 'lucide-react';
+import { ArrowLeft, Settings, Play, Crown, Flame, Bot, Book, Trophy, Calendar, Target, Check } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -50,21 +49,21 @@ const MODE_CONFIG: Record<Exclude<SinglePlayerMode, 'daily'>, {
     id: 'solo-bots',
     nameKey: 'singlePlayer.mode.soloBots',
     descKey: 'singlePlayer.mode.soloBotsDesc',
-    Icon: FaRobot,
+    Icon: Bot,
     color: 'from-purple-400 to-indigo-500',
   },
   'practice': {
     id: 'practice',
     nameKey: 'singlePlayer.mode.practice',
     descKey: 'singlePlayer.mode.practiceDesc',
-    Icon: FaBook,
+    Icon: Book,
     color: 'from-neo-lime to-lime-400',
   },
   'challenge': {
     id: 'challenge',
     nameKey: 'singlePlayer.mode.challenge',
     descKey: 'singlePlayer.mode.challengeDesc',
-    Icon: FaTrophy,
+    Icon: Trophy,
     color: 'from-neo-yellow to-yellow-400',
   },
 };
@@ -261,7 +260,7 @@ const PresetSelector: React.FC<PresetSelectorProps> = ({
 
         {/* Play indicator */}
         <div className="mt-1 flex items-center gap-0.5 text-[8px] sm:text-[9px] font-bold text-neo-black/60 dark:text-neo-white/60 group-hover:text-neo-black dark:group-hover:text-neo-white transition-colors">
-          <FaPlay className="w-2 h-2" />
+          <Play className="w-2 h-2" />
           <span>{t('singlePlayer.preset.tapToPlay') || 'Play'}</span>
         </div>
       </motion.button>
@@ -282,7 +281,7 @@ const PresetSelector: React.FC<PresetSelectorProps> = ({
                 href="/"
                 className="w-12 h-12 min-w-[48px] min-h-[48px] flex items-center justify-center rounded-neo border-3 border-neo-black bg-neo-cream shadow-hard hover:shadow-hard-lg transition-all"
               >
-                <FaArrowLeft className="text-sm text-neo-black rtl:rotate-180" />
+                <ArrowLeft className="text-sm text-neo-black rtl:rotate-180" />
               </Link>
               <h1 className="text-xl font-black uppercase text-neo-white flex-1">
                 {t('landing.singlePlayer') || 'Single Player'}
@@ -313,7 +312,7 @@ const PresetSelector: React.FC<PresetSelectorProps> = ({
                   'bg-gradient-to-r from-neo-orange via-neo-yellow to-neo-pink border-neo-black'
                 )}
               >
-                <FaCalendar className="w-6 h-6 text-neo-black" />
+                <Calendar className="w-6 h-6 text-neo-black" />
                 <div className="flex-1 text-left">
                   <h4 className="text-sm font-black uppercase text-neo-black">
                     {t('daily.badge') || 'Daily'}
@@ -360,7 +359,7 @@ const PresetSelector: React.FC<PresetSelectorProps> = ({
               <Card className="border-3 border-neo-yellow shadow-hard bg-gradient-to-br from-neo-yellow/20 to-neo-orange/10">
                 <CardContent className="p-4 flex items-center gap-4">
                   <div className="flex items-center gap-2">
-                    <FaCrown className="text-neo-yellow text-xl" />
+                    <Crown className="text-neo-yellow text-xl" />
                     <span className="font-black text-neo-white text-sm uppercase">
                       {t('challenge.yourRecord') || 'Your Record'}
                     </span>
@@ -385,7 +384,7 @@ const PresetSelector: React.FC<PresetSelectorProps> = ({
                 onClick={onCustomGame}
                 className="w-full h-14 border-3 border-slate-600 bg-slate-800 hover:bg-slate-700 text-neo-white font-bold uppercase gap-2"
               >
-                <FaCog className="w-4 h-4" />
+                <Settings className="w-4 h-4" />
                 {t('singlePlayer.preset.customGame') || 'Custom Game Setup'}
               </Button>
             </motion.div>
@@ -412,7 +411,7 @@ const PresetSelector: React.FC<PresetSelectorProps> = ({
             href="/"
             className="absolute start-0 flex items-center gap-2 px-3 py-2 rounded-neo border-3 border-neo-black dark:border-slate-600 bg-neo-cream dark:bg-slate-700 shadow-hard hover:shadow-hard-lg transition-all text-neo-black dark:text-neo-white text-sm font-bold min-h-[44px] min-w-[44px]"
           >
-            <FaArrowLeft className="w-5 h-5 rtl:rotate-180" />
+            <ArrowLeft className="w-5 h-5 rtl:rotate-180" />
             <span className="hidden sm:inline">{t('common.back') || 'Back'}</span>
           </Link>
           <h1 className="text-2xl sm:text-3xl font-black uppercase text-center text-neo-black dark:text-neo-white">
@@ -452,7 +451,7 @@ const PresetSelector: React.FC<PresetSelectorProps> = ({
             >
               {/* Daily Icon */}
               <div className="flex items-center justify-center">
-                <FaCalendar className="w-8 h-8 sm:w-10 sm:h-10 text-neo-black" />
+                <Calendar className="w-8 h-8 sm:w-10 sm:h-10 text-neo-black" />
               </div>
 
               {/* Daily Info */}
@@ -479,7 +478,7 @@ const PresetSelector: React.FC<PresetSelectorProps> = ({
                   </span>
                 ) : (
                   <span className="flex items-center justify-center w-10 h-10 bg-neo-black/20 rounded-full border-3 border-neo-black">
-                    <FaPlay className="w-4 h-4 text-neo-black" />
+                    <Play className="w-4 h-4 text-neo-black" />
                   </span>
                 )}
               </div>
@@ -490,7 +489,7 @@ const PresetSelector: React.FC<PresetSelectorProps> = ({
         {/* Quick Start Presets */}
         <div className="space-y-3">
           <div className="flex items-center gap-2 text-sm font-bold uppercase text-neo-black/70 dark:text-neo-white/70">
-            <FaPlay className="w-3 h-3" />
+            <Play className="w-3 h-3" />
             <span>
               {t('singlePlayer.preset.quickStart') || 'Quick Start'} - {t(MODE_CONFIG[selectedMode].nameKey)}
             </span>
@@ -526,7 +525,7 @@ const PresetSelector: React.FC<PresetSelectorProps> = ({
             <Card className="border-3 border-neo-yellow dark:border-neo-yellow/60 shadow-hard bg-gradient-to-r from-neo-yellow/10 to-neo-orange/10">
               <CardContent className="p-3 flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <FaCrown className="text-neo-yellow text-lg" />
+                  <Crown className="text-neo-yellow text-lg" />
                   <span className="font-bold text-sm text-neo-black dark:text-neo-white">
                     {t('challenge.yourRecord') || 'Your Record'}
                   </span>
@@ -560,7 +559,7 @@ const PresetSelector: React.FC<PresetSelectorProps> = ({
             onClick={onCustomGame}
             className="w-full h-12 border-3 border-neo-black/30 dark:border-slate-600 bg-neo-cream dark:bg-slate-700 hover:bg-neo-cream/80 dark:hover:bg-slate-600 text-neo-black dark:text-neo-white font-bold uppercase gap-2"
           >
-            <FaCog className="w-4 h-4" />
+            <Settings className="w-4 h-4" />
             {t('singlePlayer.preset.customGame') || 'Custom Game Setup'}
           </Button>
         </motion.div>

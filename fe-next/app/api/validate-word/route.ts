@@ -45,7 +45,9 @@ const RATE_LIMIT_CONFIG = {
   blockDurationMs: 300000, // 5 min block if abused
 };
 
-export const runtime = 'edge';
+// Using Node.js runtime for dictionary caching efficiency
+// Edge runtime would reload 11MB+ dictionary on every cold start
+export const runtime = 'nodejs';
 
 export async function POST(request: NextRequest) {
   // Check rate limit

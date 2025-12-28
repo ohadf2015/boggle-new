@@ -1,12 +1,48 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
-import { FaCrown, FaMedal, FaRobot } from 'react-icons/fa';
+import { Crown, Medal, Bot } from 'lucide-react';
+import confetti from 'canvas-confetti';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 import Avatar from '../Avatar';
 import type { Player } from './types';
+
+// Confetti colors for each rank (matching ResultsWinnerBanner)
+const RANK_CONFETTI_COLORS: Record<number, string[]> = {
+  1: ['#ffd700', '#ffed4a', '#f59e0b', '#fbbf24'], // Gold
+  2: ['#c0c0c0', '#94a3b8', '#e2e8f0', '#cbd5e1'], // Silver
+  3: ['#cd7f32', '#ea580c', '#f97316', '#fb923c'], // Bronze/Orange
+};
+
+// Fire confetti burst for a specific rank
+const fireConfettiForRank = (rank: number, intensity: number = 1): void => {
+  const count = Math.floor(80 * intensity);
+  const colors = RANK_CONFETTI_COLORS[rank] || RANK_CONFETTI_COLORS[1];
+
+  // Different origin positions for each rank (left, center, right)
+  const originX = rank === 1 ? 0.5 : rank === 2 ? 0.25 : 0.75;
+
+  const defaults = {
+    origin: { x: originX, y: 0.6 },
+    zIndex: 1000,
+    colors,
+  };
+
+  function fire(particleRatio: number, opts: confetti.Options): void {
+    confetti({
+      ...defaults,
+      ...opts,
+      particleCount: Math.floor(count * particleRatio),
+    });
+  }
+
+  fire(0.25, { spread: 26, startVelocity: 45 });
+  fire(0.2, { spread: 50 });
+  fire(0.35, { spread: 80, decay: 0.91, scalar: 0.8 });
+  fire(0.2, { spread: 100, startVelocity: 25, decay: 0.92, scalar: 1.1 });
+};
 
 /**
  * Generic participant type for leaderboard
@@ -33,6 +69,8 @@ interface Top3LeaderboardProps {
   currentUsername?: string;
   /** Custom header text */
   headerText?: string;
+  /** Show confetti celebration for top 3 (default: true) */
+  showConfetti?: boolean;
 }
 
 const rankConfig = {
@@ -41,7 +79,7 @@ const rankConfig = {
     border: 'border-neo-yellow',
     text: 'text-neo-black',
     rankText: 'text-neo-yellow dark:text-neo-yellow',
-    icon: FaCrown,
+    icon: Crown,
     iconColor: 'text-neo-yellow',
   },
   2: {
@@ -49,7 +87,7 @@ const rankConfig = {
     border: 'border-slate-300',
     text: 'text-slate-800',
     rankText: 'text-slate-500 dark:text-slate-300',
-    icon: FaMedal,
+    icon: Medal,
     iconColor: 'text-slate-400',
   },
   3: {
@@ -57,7 +95,7 @@ const rankConfig = {
     border: 'border-neo-orange',
     text: 'text-neo-black',
     rankText: 'text-neo-orange dark:text-neo-orange',
-    icon: FaMedal,
+    icon: Medal,
     iconColor: 'text-neo-orange',
   },
 };
@@ -76,6 +114,7 @@ const Top3Leaderboard: React.FC<Top3LeaderboardProps> = ({
   participants,
   currentUsername,
   headerText,
+  showConfetti = true,
 }) => {
   const { t } = useLanguage();
 
@@ -98,6 +137,38 @@ const Top3Leaderboard: React.FC<Top3LeaderboardProps> = ({
 
   // Get top 3 participants
   const top3 = normalizedParticipants.slice(0, 3);
+
+  // Fire staggered confetti bursts for top 3 on mount
+  // This creates a celebratory cascade effect from position to position
+  useEffect(() => {
+    if (!showConfetti || top3.length === 0) return;
+
+    // Staggered confetti: 1st place first, then 2nd, then 3rd
+    const timers: ReturnType<typeof setTimeout>[] = [];
+
+    top3.forEach((_, index) => {
+      const rank = index + 1;
+      // Stagger timing: 1st at 600ms, 2nd at 900ms, 3rd at 1200ms
+      // This timing is after ResultsWinnerBanner confetti (which fires at 400ms)
+      const delay = 600 + index * 300;
+      // Intensity decreases by rank: 1st = full, 2nd = 80%, 3rd = 60%
+      const intensity = 1 - index * 0.2;
+
+      const timer = setTimeout(() => {
+        fireConfettiForRank(rank, intensity);
+      }, delay);
+      timers.push(timer);
+    });
+
+    return () => {
+      timers.forEach(timer => clearTimeout(timer));
+    };
+  }, [showConfetti, top3.length]);
+
+  // Handler for clicking on a player card to fire confetti again (interactive celebration)
+  const handleCardClick = useCallback((rank: number) => {
+    fireConfettiForRank(rank, 0.7);
+  }, []);
 
   if (top3.length === 0) return null;
 
@@ -129,8 +200,11 @@ const Top3Leaderboard: React.FC<Top3LeaderboardProps> = ({
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: 0.1 + index * 0.1 }}
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              onClick={() => handleCardClick(rank)}
               className={cn(
-                'flex-1 relative rounded-neo border-2 border-neo-black shadow-hard-sm overflow-hidden',
+                'flex-1 relative rounded-neo border-2 border-neo-black shadow-hard-sm overflow-hidden cursor-pointer',
                 'bg-white dark:bg-slate-800',
                 isCurrentPlayer && 'ring-2 ring-neo-cyan'
               )}
@@ -151,7 +225,7 @@ const Top3Leaderboard: React.FC<Top3LeaderboardProps> = ({
                 <div className="flex justify-center mb-1">
                   {participant.isBot ? (
                     <div className="w-10 h-10 rounded-full bg-slate-200 dark:bg-slate-700 border-2 border-neo-black flex items-center justify-center">
-                      <FaRobot className="text-slate-500 dark:text-slate-400 text-lg" />
+                      <Bot className="text-slate-500 dark:text-slate-400 text-lg" />
                     </div>
                   ) : (
                     <Avatar

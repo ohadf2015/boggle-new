@@ -3,7 +3,7 @@
 import { Component, ReactNode, ErrorInfo } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { FaExclamationTriangle, FaRedo, FaHome } from 'react-icons/fa';
+import { AlertTriangle, RefreshCw, Home } from 'lucide-react';
 import logger from '@/utils/logger';
 
 /**
@@ -89,7 +89,7 @@ const DefaultErrorFallback: React.FC<ErrorFallbackProps> = ({ error, onReset }) 
   <Card className="m-4 border-red-500/50 bg-red-50 dark:bg-red-900/20">
     <CardHeader>
       <CardTitle className="flex items-center gap-2 text-red-600 dark:text-red-400">
-        <FaExclamationTriangle />
+        <AlertTriangle className="w-5 h-5" />
         Something went wrong
       </CardTitle>
     </CardHeader>
@@ -100,7 +100,7 @@ const DefaultErrorFallback: React.FC<ErrorFallbackProps> = ({ error, onReset }) 
         </pre>
       )}
       <Button onClick={onReset} variant="outline" className="gap-2">
-        <FaRedo />
+        <RefreshCw className="w-4 h-4" />
         Try again
       </Button>
     </CardContent>
@@ -144,7 +144,7 @@ export class FeatureErrorBoundary extends Component<FeatureErrorBoundaryProps, E
         <Card className="m-4 border-amber-500/50 bg-amber-50 dark:bg-amber-900/20">
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-amber-600 dark:text-amber-400">
-              {icon || <FaExclamationTriangle />}
+              {icon || <AlertTriangle className="w-5 h-5" />}
               {featureName} Error
             </CardTitle>
           </CardHeader>
@@ -164,13 +164,13 @@ export class FeatureErrorBoundary extends Component<FeatureErrorBoundaryProps, E
             <div className="flex gap-2">
               {showRetry && (
                 <Button onClick={this.handleReset} variant="outline" className="gap-2">
-                  <FaRedo />
+                  <RefreshCw className="w-4 h-4" />
                   Try again
                 </Button>
               )}
               {showHomeButton && (
                 <Button onClick={this.handleGoHome} variant="outline" className="gap-2">
-                  <FaHome />
+                  <Home className="w-4 h-4" />
                   Go Home
                 </Button>
               )}

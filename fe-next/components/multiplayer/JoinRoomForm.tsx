@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { FaArrowLeft, FaSignInAlt, FaPaste, FaSync } from 'react-icons/fa';
+import { ArrowLeft, LogIn, ClipboardPaste, RefreshCw } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
@@ -127,7 +127,7 @@ const JoinRoomForm: React.FC<JoinRoomFormProps> = ({
             disabled={isSubmitting}
             className="absolute start-4 flex items-center gap-2 px-3 py-2 rounded-neo border-3 border-neo-black dark:border-slate-600 bg-neo-cream dark:bg-slate-700 shadow-hard hover:shadow-hard-lg hover:translate-x-[-2px] hover:translate-y-[-2px] transition-all text-neo-black dark:text-neo-white text-sm font-bold disabled:opacity-50"
           >
-            <FaArrowLeft className="w-4 h-4 rtl:rotate-180" />
+            <ArrowLeft className="w-4 h-4 rtl:rotate-180" />
             <span className="hidden sm:inline">{t('common.back') || 'Back'}</span>
           </button>
 
@@ -214,7 +214,7 @@ const JoinRoomForm: React.FC<JoinRoomFormProps> = ({
                               className="absolute right-2 top-1/2 -translate-y-1/2 h-10 w-10 bg-neo-cream text-neo-black hover:bg-neo-yellow"
                               aria-label={t('joinView.pasteCode') || 'Paste room code'}
                             >
-                              <FaPaste className="w-4 h-4" />
+                              <ClipboardPaste className="w-4 h-4" />
                             </Button>
                           </TooltipTrigger>
                           <TooltipContent>{t('joinView.pasteCode') || 'Paste code'}</TooltipContent>
@@ -244,7 +244,7 @@ const JoinRoomForm: React.FC<JoinRoomFormProps> = ({
                         className="p-1.5 rounded-full hover:bg-neo-cyan/20 transition-colors"
                         aria-label={t('multiplayerFlow.joinForm.refreshButton') || 'Refresh'}
                       >
-                        <FaSync className={cn("w-3 h-3 text-neo-cyan", roomsLoading && "animate-spin")} />
+                        <RefreshCw className={cn("w-3 h-3 text-neo-cyan", roomsLoading && "animate-spin")} />
                       </button>
                     </div>
 
@@ -293,7 +293,7 @@ const JoinRoomForm: React.FC<JoinRoomFormProps> = ({
                     size="lg"
                     className="w-full h-14 text-lg font-black uppercase bg-neo-cyan hover:bg-neo-cyan/90 text-neo-black"
                   >
-                    <FaSignInAlt className="mr-2 w-5 h-5" />
+                    <LogIn className="mr-2 w-5 h-5" />
                     {isSubmitting
                       ? (t('multiplayerFlow.joinForm.joining') || 'Joining...')
                       : (t('multiplayerFlow.joinForm.joinButton') || 'Join Room')

@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FaTimes, FaFire } from 'react-icons/fa';
+import { X, Flame } from 'lucide-react';
 import { useLanguage } from '../../contexts/LanguageContext';
 
 const STORAGE_KEY = 'lexiclash_combo_explanation_seen';
@@ -96,13 +96,13 @@ const ComboExplanationTooltip: React.FC<ComboExplanationTooltipProps> = ({
               "
               aria-label={t('common.close') || 'Close'}
             >
-              <FaTimes className="text-xs" />
+              <X className="text-xs" />
             </button>
 
             {/* Content */}
             <div className="flex items-start gap-3">
               <div className="flex-shrink-0 w-10 h-10 bg-gradient-to-br from-orange-500 to-red-500 rounded-neo border-2 border-neo-black flex items-center justify-center shadow-hard-sm">
-                <FaFire className="text-white text-lg" />
+                <Flame className="text-white text-lg" />
               </div>
               <div className="flex-1 min-w-0">
                 <h4 className="font-black text-neo-black text-sm uppercase tracking-wide mb-1">

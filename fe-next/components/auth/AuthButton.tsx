@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FaUser, FaSignOutAlt, FaTrophy, FaChevronDown, FaSun, FaMoon, FaCog } from 'react-icons/fa';
+import { User, LogOut, Trophy, ChevronDown, Sun, Moon, Settings } from 'lucide-react';
 import { Button } from '../ui/button';
 import { useTheme } from '../../utils/ThemeContext';
 import { useLanguage } from '../../contexts/LanguageContext';
@@ -116,7 +116,7 @@ const AuthButton = ({ inline = false, onClose }: AuthButtonProps = {}): React.Re
               "bg-white hover:bg-neo-cyan/50"
             )}
           >
-            <FaTrophy size={14} className="text-neo-black" />
+            <Trophy size={14} className="text-neo-black" />
             <span className="text-neo-black">{t('leaderboard.title') || 'Leaderboard'}</span>
           </button>
 
@@ -128,7 +128,7 @@ const AuthButton = ({ inline = false, onClose }: AuthButtonProps = {}): React.Re
               "bg-white hover:bg-neo-cyan/50"
             )}
           >
-            {isDarkMode ? <FaSun size={14} className="text-yellow-500" /> : <FaMoon size={14} className="text-slate-600" />}
+            {isDarkMode ? <Sun size={14} className="text-yellow-500" /> : <Moon size={14} className="text-slate-600" />}
             <span className="text-neo-black">{isDarkMode ? (t('common.lightMode') || 'Light Mode') : (t('common.darkMode') || 'Dark Mode')}</span>
           </button>
 
@@ -144,7 +144,7 @@ const AuthButton = ({ inline = false, onClose }: AuthButtonProps = {}): React.Re
             {isSigningOut ? (
               <div className="w-4 h-4 border-2 border-red-500 border-t-transparent rounded-full animate-spin" />
             ) : (
-              <FaSignOutAlt size={14} />
+              <LogOut size={14} />
             )}
             <span>{t('auth.signOut') || 'Sign Out'}</span>
           </button>
@@ -183,7 +183,7 @@ const AuthButton = ({ inline = false, onClose }: AuthButtonProps = {}): React.Re
               animate={false}
             />
           )}
-          <FaChevronDown size={10} className={showUserMenu ? 'rotate-180 transition-transform' : 'transition-transform'} />
+          <ChevronDown size={10} className={showUserMenu ? 'rotate-180 transition-transform' : 'transition-transform'} />
         </Button>
 
         {/* User Dropdown */}
@@ -217,7 +217,7 @@ const AuthButton = ({ inline = false, onClose }: AuthButtonProps = {}): React.Re
                     : 'text-gray-700 hover:bg-gray-50 hover:text-gray-700'
                 )}
               >
-                <FaUser size={14} />
+                <User size={14} />
                 <span>{t('profile.title') || 'Profile'}</span>
               </Button>
 
@@ -235,7 +235,7 @@ const AuthButton = ({ inline = false, onClose }: AuthButtonProps = {}): React.Re
                     : 'text-gray-700 hover:bg-gray-50 hover:text-gray-700'
                 )}
               >
-                <FaTrophy size={14} />
+                <Trophy size={14} />
                 <span>{t('leaderboard.title') || 'Leaderboard'}</span>
               </Button>
 
@@ -264,7 +264,7 @@ const AuthButton = ({ inline = false, onClose }: AuthButtonProps = {}): React.Re
                     <span className="text-lg">{currentLang.flag}</span>
                     <span>{currentLang.name}</span>
                   </div>
-                  <FaChevronDown
+                  <ChevronDown
                     size={10}
                     className={cn('transition-transform duration-200', isLanguageExpanded && 'rotate-180')}
                   />
@@ -322,7 +322,7 @@ const AuthButton = ({ inline = false, onClose }: AuthButtonProps = {}): React.Re
                     : 'text-gray-700 hover:bg-gray-50 hover:text-gray-700'
                 )}
               >
-                {isDarkMode ? <FaSun size={14} className="text-yellow-400" /> : <FaMoon size={14} className="text-slate-600" />}
+                {isDarkMode ? <Sun size={14} className="text-yellow-400" /> : <Moon size={14} className="text-slate-600" />}
                 <span>{isDarkMode ? (t('common.lightMode') || 'Light Mode') : (t('common.darkMode') || 'Dark Mode')}</span>
               </Button>
 
@@ -347,7 +347,7 @@ const AuthButton = ({ inline = false, onClose }: AuthButtonProps = {}): React.Re
                 {isSigningOut ? (
                   <div className="w-4 h-4 border-2 border-red-500 border-t-transparent rounded-full animate-spin" />
                 ) : (
-                  <FaSignOutAlt size={14} />
+                  <LogOut size={14} />
                 )}
                 <span>{t('auth.signOut') || 'Sign Out'}</span>
               </Button>
@@ -372,7 +372,7 @@ const AuthButton = ({ inline = false, onClose }: AuthButtonProps = {}): React.Re
               "bg-neo-cyan shadow-hard-sm hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-hard"
             )}
           >
-            <FaUser size={14} className="text-neo-black" />
+            <User size={14} className="text-neo-black" />
             <span className="text-neo-black">{t('auth.signIn') || 'Sign In'}</span>
           </button>
 
@@ -387,7 +387,7 @@ const AuthButton = ({ inline = false, onClose }: AuthButtonProps = {}): React.Re
               "bg-white hover:bg-neo-cyan/50"
             )}
           >
-            <FaTrophy size={14} className="text-neo-black" />
+            <Trophy size={14} className="text-neo-black" />
             <span className="text-neo-black">{t('leaderboard.title') || 'Leaderboard'}</span>
           </button>
 
@@ -399,7 +399,7 @@ const AuthButton = ({ inline = false, onClose }: AuthButtonProps = {}): React.Re
               "bg-white hover:bg-neo-cyan/50"
             )}
           >
-            {isDarkMode ? <FaSun size={14} className="text-yellow-500" /> : <FaMoon size={14} className="text-slate-600" />}
+            {isDarkMode ? <Sun size={14} className="text-yellow-500" /> : <Moon size={14} className="text-slate-600" />}
             <span className="text-neo-black">{isDarkMode ? (t('common.lightMode') || 'Light Mode') : (t('common.darkMode') || 'Dark Mode')}</span>
           </button>
         </div>
@@ -428,7 +428,7 @@ const AuthButton = ({ inline = false, onClose }: AuthButtonProps = {}): React.Re
               : 'bg-neo-cyan text-neo-black hover:bg-cyan-400 hover:shadow-[0_0_15px_rgba(6,182,212,0.4)] border-2 border-neo-black'
           )}
         >
-          <FaUser size={14} />
+          <User size={14} />
           <span className="hidden sm:inline">{t('auth.signIn') || 'Sign In'}</span>
         </Button>
 
@@ -446,8 +446,8 @@ const AuthButton = ({ inline = false, onClose }: AuthButtonProps = {}): React.Re
                 : 'bg-white text-cyan-600 hover:bg-gray-50 hover:shadow-[0_0_15px_rgba(6,182,212,0.2)] border-gray-200'
             )}
           >
-            <FaCog size={16} />
-            <FaChevronDown size={10} className={showUserMenu ? 'rotate-180 transition-transform' : 'transition-transform'} />
+            <Settings size={16} />
+            <ChevronDown size={10} className={showUserMenu ? 'rotate-180 transition-transform' : 'transition-transform'} />
           </Button>
 
         {/* Guest Dropdown */}
@@ -486,7 +486,7 @@ const AuthButton = ({ inline = false, onClose }: AuthButtonProps = {}): React.Re
                     <span className="text-lg">{currentLang.flag}</span>
                     <span>{currentLang.name}</span>
                   </div>
-                  <FaChevronDown
+                  <ChevronDown
                     size={10}
                     className={cn('transition-transform duration-200', isLanguageExpanded && 'rotate-180')}
                   />
@@ -544,7 +544,7 @@ const AuthButton = ({ inline = false, onClose }: AuthButtonProps = {}): React.Re
                     : 'text-gray-700 hover:bg-gray-50 hover:text-gray-700'
                 )}
               >
-                {isDarkMode ? <FaSun size={14} className="text-yellow-400" /> : <FaMoon size={14} className="text-slate-600" />}
+                {isDarkMode ? <Sun size={14} className="text-yellow-400" /> : <Moon size={14} className="text-slate-600" />}
                 <span>{isDarkMode ? (t('common.lightMode') || 'Light Mode') : (t('common.darkMode') || 'Dark Mode')}</span>
               </Button>
 
@@ -568,7 +568,7 @@ const AuthButton = ({ inline = false, onClose }: AuthButtonProps = {}): React.Re
                     : 'text-gray-700 hover:bg-gray-50 hover:text-gray-700'
                 )}
               >
-                <FaTrophy size={14} />
+                <Trophy size={14} />
                 <span>{t('leaderboard.title') || 'Leaderboard'}</span>
               </Button>
             </motion.div>

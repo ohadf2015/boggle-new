@@ -868,6 +868,33 @@ const en = {
     "tryAgainEncouragement": "Keep playing to improve!",
     "of": "of"
   },
+  "chart": {
+    "yourProgress": "Your Progress",
+    "needMoreGames": "Play More Games!",
+    "needMoreGamesDesc": "Your improvement chart will appear after 2+ games",
+    "bestScore": "Best",
+    "average": "Avg",
+    "games": "Games",
+    "trendUp": "Improving!",
+    "trendDown": "Keep trying!",
+    "trendStable": "Consistent",
+    "milestones": {
+      "wordWizard": "Word Wizard",
+      "onFire": "On Fire!",
+      "nice": "Nice!",
+      "warmingUp": "Warming Up"
+    },
+    "funMessages": {
+      "crushing": "You're absolutely crushing it! 🔥",
+      "domination": "On your way to word domination! 📈",
+      "steadyImprovement": "Steady improvement, nice! 👆",
+      "roughDay": "Rough day? We all have them! 💪",
+      "comeback": "Warming up for a comeback! 🎯",
+      "tinyDip": "A tiny dip, no worries! 🌊",
+      "holdingSteady": "Holding steady like a pro! ⚖️",
+      "playMore": "Play more to see your trend!"
+    }
+  },
   "archetypes": {
     "strategist": "The Strategist",
     "strategistDesc": "Calculated moves, maximum impact",
@@ -2049,6 +2076,7 @@ const en = {
     "bannerSubtitle": "Same puzzle for everyone. Share your score!",
     "oneAttempt": "One attempt per day - same puzzle for everyone!",
     "dayStreak": "day streak",
+    "daysStreak": "days streak",
     "playNow": "PLAY NOW",
     "loading": "Loading Daily Challenge...",
     "todaysPlayers": "Today's Players",
@@ -2058,7 +2086,9 @@ const en = {
     "yourRank": "Your rank",
     "showMore": "Show more",
     "showLess": "Show less",
-    "more": "more"
+    "more": "more",
+    "maxAttempts": "Max Attempts",
+    "huntDescription": "Hunt for the hidden word using color-coded feedback!"
   },
   "wordHunt": {
     "title": "Word Hunt",
@@ -2111,6 +2141,9 @@ const en = {
       "hintUnlocked": "Hint unlocked!",
       "hintCost": "Cost: {cost} words",
       "needMoreWords": "Find {count} more words to unlock",
+      "oneMoreWord": "1 more word!",
+      "nextHint": "Next Hint",
+      "allHintsUnlocked": "All hints unlocked!",
       "shop": "Clue Shop",
       "shopTitle": "Spend Clue Tokens",
       "revealLetter": "Reveal Letter",
@@ -2132,7 +2165,51 @@ const en = {
       "category": "Category: {category}",
       "targetWordGuess": "Target word guess",
       "gridWordDiscovery": "Grid word discovery",
-      "cannotRevealMore": "Cannot reveal more letters"
+      "cannotRevealMore": "Cannot reveal more letters",
+      "wordsLabel": "Words",
+      "attemptsLabel": "Attempts"
+    },
+    "results": {
+      "targetWord": "Target Word",
+      "tokensEarned": "tokens earned",
+      "rankOutOf": "#{rank} out of {total} players",
+      "rankingsFor": "Rankings for {language} puzzle",
+      "survivalMetrics": "Survival Mode Metrics",
+      "avgLifeLeft": "Avg Life Left",
+      "avgWordsFound": "Avg Words Found",
+      "avgEfficiency": "Avg Efficiency",
+      "bestEfficiency": "Best Efficiency",
+      "yourEfficiency": "Your Efficiency: {score} points",
+      "efficiencyPercentile": "Better than {percentile}% of players!",
+      "rarestFind": "Rarest Find",
+      "legendary": "LEGENDARY",
+      "rare": "RARE",
+      "uncommon": "UNCOMMON",
+      "common": "COMMON",
+      "challengeTitle": "Challenge from a friend!",
+      "theyScored": "They scored",
+      "attempts": "attempts",
+      "beatTheirScore": "Can you beat their score?"
+    },
+    "streak": {
+      "milestoneTitle": "Streak Milestone!",
+      "weekStreak": "1 WEEK STREAK!",
+      "twoWeekStreak": "2 WEEKS STRONG!",
+      "monthStreak": "MONTHLY MASTER!",
+      "fiftyDayStreak": "LEGENDARY STREAK!",
+      "centuryStreak": "CENTURY CHAMPION!",
+      "yearStreak": "YEAR-LONG WARRIOR!",
+      "keepGoing": "Keep the streak going!"
+    },
+    "leaderboard": {
+      "solved": "Solved",
+      "failed": "Failed",
+      "attempts": "attempts",
+      "pts": "pts",
+      "words": "words",
+      "justNow": "just now",
+      "minutesAgo": "{count}m ago",
+      "hoursAgo": "{count}h ago"
     }
   },
   "tutorial": {

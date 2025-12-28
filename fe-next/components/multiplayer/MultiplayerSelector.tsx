@@ -3,7 +3,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
-import { FaCrown, FaSignInAlt, FaArrowLeft, FaUsers } from 'react-icons/fa';
+import { Crown, LogIn, ArrowLeft, Users } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -60,7 +60,7 @@ const MultiplayerSelector: React.FC<MultiplayerSelectorProps> = ({
             href="/"
             className="absolute start-4 flex items-center gap-2 px-3 py-2 rounded-neo border-3 border-neo-black dark:border-slate-600 bg-neo-cream dark:bg-slate-700 shadow-hard hover:shadow-hard-lg hover:translate-x-[-2px] hover:translate-y-[-2px] transition-all text-neo-black dark:text-neo-white text-sm font-bold"
           >
-            <FaArrowLeft className="w-4 h-4 rtl:rotate-180" />
+            <ArrowLeft className="w-4 h-4 rtl:rotate-180" />
             <span className="hidden sm:inline">{t('common.back') || 'Back'}</span>
           </Link>
           <h1 className="text-2xl sm:text-3xl md:text-4xl font-black uppercase text-center text-neo-white">
@@ -89,7 +89,7 @@ const MultiplayerSelector: React.FC<MultiplayerSelectorProps> = ({
               >
                 <CardContent className="flex flex-col items-center justify-center text-center p-6 sm:p-8 h-full min-h-[180px] sm:min-h-[220px]">
                   <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-neo-lime text-neo-black border-3 border-neo-black flex items-center justify-center mb-4 shadow-hard group-hover:scale-110 transition-transform">
-                    <FaCrown className="w-8 h-8 sm:w-10 sm:h-10 text-neo-black" />
+                    <Crown className="w-8 h-8 sm:w-10 sm:h-10 text-neo-black" />
                   </div>
                   <h2 className="text-xl sm:text-2xl font-black uppercase text-neo-white mb-2">
                     {t('multiplayerFlow.selector.createCard.title') || 'Create Room'}
@@ -126,7 +126,7 @@ const MultiplayerSelector: React.FC<MultiplayerSelectorProps> = ({
               >
                 <CardContent className="flex flex-col items-center justify-center text-center p-6 sm:p-8 h-full min-h-[180px] sm:min-h-[220px]">
                   <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-neo-cyan text-neo-black border-3 border-neo-black flex items-center justify-center mb-4 shadow-hard group-hover:scale-110 transition-transform">
-                    <FaSignInAlt className="w-8 h-8 sm:w-10 sm:h-10 text-neo-black" />
+                    <LogIn className="w-8 h-8 sm:w-10 sm:h-10 text-neo-black" />
                   </div>
                   <h2 className="text-xl sm:text-2xl font-black uppercase text-neo-white mb-2">
                     {t('multiplayerFlow.selector.joinCard.title') || 'Join Room'}
@@ -156,7 +156,7 @@ const MultiplayerSelector: React.FC<MultiplayerSelectorProps> = ({
           >
             <div className="flex items-center justify-between mb-2">
               <h3 className="text-sm sm:text-base font-bold uppercase text-neo-cream/70 flex items-center gap-2">
-                <FaUsers className="w-4 h-4" />
+                <Users className="w-4 h-4" />
                 {t('multiplayerFlow.selector.activeRoomsPreview') || 'Active Rooms'}
                 {totalPlayers > 0 && (
                   <span className="text-neo-cyan">({totalPlayers} {t('multiplayerFlow.selector.playersOnline') || 'online'})</span>

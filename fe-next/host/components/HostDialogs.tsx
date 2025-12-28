@@ -1,6 +1,6 @@
 import React, { useCallback, useMemo } from 'react';
 import { motion } from 'framer-motion';
-import { FaQrcode, FaTrophy } from 'react-icons/fa';
+import { QrCode, Trophy } from 'lucide-react';
 import { QRCodeSVG } from 'qrcode.react';
 import { Button } from '../../components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '../../components/ui/dialog';
@@ -38,7 +38,7 @@ export const QRCodeDialog: React.FC<QRCodeDialogProps> = ({
     <DialogContent className="sm:max-w-md bg-white text-neo-black dark:bg-slate-800 dark:text-white border-cyan-500/30">
       <DialogHeader>
         <DialogTitle className="text-center text-cyan-600 dark:text-cyan-300 flex items-center justify-center gap-2">
-          <FaQrcode />
+          <QrCode />
           {t('hostView.qrCode')}
         </DialogTitle>
       </DialogHeader>
@@ -268,9 +268,9 @@ export const FinalScoresModal: React.FC<FinalScoresModalProps> = ({
     <DialogContent className="max-w-5xl max-h-[90vh] overflow-auto bg-gradient-to-b from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800">
       <DialogHeader>
         <DialogTitle className="text-center text-3xl sm:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 to-orange-500 flex items-center justify-center gap-3">
-          <FaTrophy className="text-yellow-500" />
+          <Trophy className="text-yellow-500" />
           {tournamentData ? t('hostView.tournamentRound') + ' ' + tournamentData.currentRound : t('hostView.finalScores')}
-          <FaTrophy className="text-yellow-500" />
+          <Trophy className="text-yellow-500" />
         </DialogTitle>
       </DialogHeader>
 

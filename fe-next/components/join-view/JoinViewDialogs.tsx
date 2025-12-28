@@ -2,7 +2,7 @@
 
 import React from 'react';
 import dynamic from 'next/dynamic';
-import { FaQrcode } from 'react-icons/fa';
+import { QrCode } from 'lucide-react';
 import { QRCodeSVG } from 'qrcode.react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '../ui/dialog';
 import { Button } from '../ui/button';
@@ -48,7 +48,7 @@ const JoinViewDialogs: React.FC<JoinViewDialogsProps> = React.memo(({
         <DialogContent className="sm:max-w-md bg-white text-neo-black dark:bg-slate-800 dark:text-white border-cyan-500/30">
           <DialogHeader>
             <DialogTitle className="text-center text-cyan-300 flex items-center justify-center gap-2">
-              <FaQrcode />
+              <QrCode />
               {t('joinView.qrCodeTitle')}
             </DialogTitle>
           </DialogHeader>

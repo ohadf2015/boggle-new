@@ -2,7 +2,7 @@
 
 import React, { useRef, FormEvent } from 'react';
 import { motion } from 'framer-motion';
-import { FaGamepad, FaSync } from 'react-icons/fa';
+import { Gamepad2, RefreshCw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -63,7 +63,7 @@ export const QuickJoinForm: React.FC<QuickJoinFormProps> = ({
           <CardHeader className="text-center space-y-4">
             <div className="flex justify-center">
               <div className="p-4 bg-neo-cyan text-neo-black rounded-neo border-3 border-neo-black shadow-hard-sm rotate-3">
-                <FaGamepad size={48} className="text-neo-black" />
+                <Gamepad2 size={48} className="text-neo-black" />
               </div>
             </div>
             <CardTitle className="text-2xl sm:text-3xl font-black uppercase text-neo-cream tracking-tight">
@@ -213,13 +213,13 @@ const JoinButton: React.FC<JoinButtonProps> = ({ isJoining, disabled, onClick, t
             transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
             className="mr-3 inline-block"
           >
-            <FaSync size={24} />
+            <RefreshCw size={24} />
           </motion.span>
           {t('joinView.joining')}
         </>
       ) : (
         <>
-          <FaGamepad className="mr-3" size={24} />
+          <Gamepad2 className="mr-3" size={24} />
           {t('joinView.joinGame')}
         </>
       )}

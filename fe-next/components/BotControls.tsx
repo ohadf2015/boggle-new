@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FaRobot, FaPlus, FaTimes, FaMagic, FaChevronDown } from 'react-icons/fa';
+import { Bot, Plus, X, Wand2, ChevronDown } from 'lucide-react';
 import { Badge } from './ui/badge';
 import { Switch } from './ui/switch';
 import { cn } from '../lib/utils';
@@ -176,7 +176,7 @@ const BotControls: React.FC<BotControlsProps> = ({
         aria-expanded={!isCollapsed}
       >
         <div className="flex items-center gap-2">
-          <FaRobot className="text-neo-cyan" aria-hidden="true" />
+          <Bot className="text-neo-cyan" aria-hidden="true" />
           <span>{t('bots.title') || 'AI Bots'}</span>
           {bots.length > 0 && (
             <Badge className="bg-neo-cyan text-neo-black text-xs px-2 py-0.5 font-bold">
@@ -185,7 +185,7 @@ const BotControls: React.FC<BotControlsProps> = ({
           )}
         </div>
         <motion.div animate={{ rotate: isCollapsed ? 0 : 180 }} transition={{ duration: 0.2 }}>
-          <FaChevronDown className="text-neo-cream/70" />
+          <ChevronDown className="text-neo-cream/70" />
         </motion.div>
       </button>
 
@@ -219,7 +219,7 @@ const BotControls: React.FC<BotControlsProps> = ({
       <div className="bg-neo-purple/10 text-white border-2 border-neo-purple rounded-neo p-3 shadow-hard-sm">
         <div className="flex items-center justify-between gap-3">
           <div className="flex items-center gap-2 flex-1 min-w-0">
-            <FaMagic className="text-neo-purple shrink-0" aria-hidden="true" />
+            <Wand2 className="text-neo-purple shrink-0" aria-hidden="true" />
             <div className="min-w-0">
               <label
                 htmlFor="auto-fill-switch"
@@ -271,7 +271,7 @@ const BotControls: React.FC<BotControlsProps> = ({
                   isDisabled && "opacity-50 cursor-not-allowed shadow-none"
                 )}
               >
-                <FaPlus size={10} aria-hidden="true" />
+                <Plus size={10} aria-hidden="true" />
                 <span aria-hidden="true">{diff.icon}</span>
                 <span>{isAdding ? '...' : (t(diff.labelKey) || diff.value)}</span>
               </motion.button>
@@ -314,7 +314,7 @@ const BotControls: React.FC<BotControlsProps> = ({
                       style={{ backgroundColor: bot.avatar?.color || '#60a5fa' }}
                       aria-hidden="true"
                     >
-                      {bot.avatar?.emoji ? bot.avatar.emoji : <FaRobot className="text-neo-cream text-[10px]" />}
+                      {bot.avatar?.emoji ? bot.avatar.emoji : <Bot className="text-neo-cream text-[10px]" />}
                     </span>
                     <span className="text-xs text-neo-cream font-medium truncate max-w-[80px]">
                       {bot.username}
@@ -342,7 +342,7 @@ const BotControls: React.FC<BotControlsProps> = ({
                         disabled && "opacity-50 cursor-not-allowed"
                       )}
                     >
-                      <FaTimes size={10} aria-hidden="true" />
+                      <X size={10} aria-hidden="true" />
                     </motion.button>
                   </motion.div>
                 );

@@ -2,7 +2,7 @@
 
 import React, { useCallback, useState } from 'react';
 import { motion } from 'framer-motion';
-import { FaSync, FaCrown, FaGamepad } from 'react-icons/fa';
+import { RefreshCw, Crown, Gamepad2 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 import { Button } from '../ui/button';
 import { Badge } from '../ui/badge';
@@ -110,7 +110,7 @@ const ActiveRoomsList: React.FC<ActiveRoomsListProps> = React.memo(({
                     size="icon"
                     onClick={handleRefreshClick}
                   >
-                    <FaSync />
+                    <RefreshCw />
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent>{t('common.refresh')}</TooltipContent>
@@ -191,13 +191,13 @@ const EmptyState: React.FC<EmptyStateProps> = React.memo(({ isJoinMode, onSwitch
           onClick={onSwitchToHostMode}
           className="bg-neo-pink text-neo-white"
         >
-          <span className="mr-2"><FaCrown /></span>
+          <span className="mr-2"><Crown /></span>
           {t('joinView.createRoom')}
         </Button>
       </motion.div>
     )}
     <div className="flex justify-center">
-      <FaGamepad size={48} className="text-neo-cream/75" />
+      <Gamepad2 size={48} className="text-neo-cream/75" />
     </div>
     <div>
       <p className="text-base font-bold uppercase text-black">{t('joinView.noRooms')}</p>

@@ -81,7 +81,7 @@ router.post('/generate-word-hints', async (req: Request, res: Response): Promise
     hints.push({
       level: 2,
       hint: [targetWord[0].toUpperCase(), ...Array(wordLength - 1).fill('_')].join(' '),
-      unlockCost: 0,
+      unlockCost: 2,
     });
 
     if (wordLength >= 4) {
@@ -234,7 +234,7 @@ function generateFallbackHints(targetWord: string): HintGenerationResponse {
     {
       level: 2,
       hint: generateBlanksDisplay(targetWord, [0]), // "B _ _ _"
-      unlockCost: 0,
+      unlockCost: 2,
     },
   ];
 

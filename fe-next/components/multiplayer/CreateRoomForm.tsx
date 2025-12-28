@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { FaArrowLeft, FaCrown } from 'react-icons/fa';
+import { ArrowLeft, Crown } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
@@ -97,7 +97,7 @@ const CreateRoomForm: React.FC<CreateRoomFormProps> = ({
             disabled={isSubmitting}
             className="absolute start-4 flex items-center gap-2 px-3 py-2 rounded-neo border-3 border-neo-black dark:border-slate-600 bg-neo-cream dark:bg-slate-700 shadow-hard hover:shadow-hard-lg hover:translate-x-[-2px] hover:translate-y-[-2px] transition-all text-neo-black dark:text-neo-white text-sm font-bold disabled:opacity-50"
           >
-            <FaArrowLeft className="w-4 h-4 rtl:rotate-180" />
+            <ArrowLeft className="w-4 h-4 rtl:rotate-180" />
             <span className="hidden sm:inline">{t('common.back') || 'Back'}</span>
           </button>
 
@@ -198,7 +198,7 @@ const CreateRoomForm: React.FC<CreateRoomFormProps> = ({
                     size="lg"
                     className="w-full h-16 text-xl font-black uppercase"
                   >
-                    <FaCrown className="mr-3 w-6 h-6" />
+                    <Crown className="mr-3 w-6 h-6" />
                     {isSubmitting
                       ? (t('multiplayerFlow.createForm.creating') || 'Creating...')
                       : (t('multiplayerFlow.createForm.createButton') || 'Create Room')

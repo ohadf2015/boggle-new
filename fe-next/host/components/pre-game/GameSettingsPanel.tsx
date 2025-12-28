@@ -2,7 +2,7 @@
 
 import React, { memo, useCallback, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FaClock, FaCog, FaPlus, FaMinus, FaChevronDown, FaChevronUp, FaCheck, FaPlay, FaStop } from 'react-icons/fa';
+import { Clock, Settings, Plus, Minus, ChevronDown, ChevronUp, Check, Play, Square } from 'lucide-react';
 import type { Socket } from 'socket.io-client';
 import { Button } from '../../../components/ui/button';
 import { Card } from '../../../components/ui/card';
@@ -145,7 +145,7 @@ export const GameSettingsPanel = memo<GameSettingsPanelProps>(({
   return (
     <Card className="flex-1 p-3 sm:p-4 bg-slate-800/95 text-neo-white border-4 border-neo-black shadow-hard-lg">
       <h3 className="text-sm font-black uppercase text-neo-cream mb-3 flex items-center gap-2">
-        <FaCog className="text-neo-cyan text-xs" />
+        <Settings className="text-neo-cyan text-xs" />
         {t('hostView.gameSettings')}
       </h3>
       <div className="w-full space-y-3">
@@ -160,7 +160,7 @@ export const GameSettingsPanel = memo<GameSettingsPanelProps>(({
         {/* Timer Input - Compact */}
         <div className="space-y-1.5">
           <label className="text-xs font-bold uppercase text-neo-cream/80 flex items-center gap-1.5">
-            <FaClock className="text-neo-cyan text-xs" />
+            <Clock className="text-neo-cyan text-xs" />
             {t('hostView.roundDuration')}
           </label>
           <div className="flex items-center gap-2">
@@ -171,7 +171,7 @@ export const GameSettingsPanel = memo<GameSettingsPanelProps>(({
               aria-label={t('hostView.decreaseTimer') || 'Decrease timer'}
               className="w-8 h-8 flex items-center justify-center rounded-neo bg-neo-cream text-neo-black border-2 border-neo-black shadow-hard-sm hover:shadow-hard hover:translate-x-[-1px] hover:translate-y-[-1px] active:shadow-none active:translate-x-[1px] active:translate-y-[1px] transition-all duration-100 disabled:opacity-50 disabled:cursor-not-allowed font-black"
             >
-              <FaMinus size={12} aria-hidden="true" />
+              <Minus size={12} aria-hidden="true" />
             </button>
 
             <div className="flex items-center gap-1.5">
@@ -198,7 +198,7 @@ export const GameSettingsPanel = memo<GameSettingsPanelProps>(({
               aria-label={t('hostView.increaseTimer') || 'Increase timer'}
               className="w-8 h-8 flex items-center justify-center rounded-neo bg-neo-cream text-neo-black border-2 border-neo-black shadow-hard-sm hover:shadow-hard hover:translate-x-[-1px] hover:translate-y-[-1px] active:shadow-none active:translate-x-[1px] active:translate-y-[1px] transition-all duration-100 disabled:opacity-50 disabled:cursor-not-allowed font-black"
             >
-              <FaPlus size={12} aria-hidden="true" />
+              <Plus size={12} aria-hidden="true" />
             </button>
           </div>
         </div>
@@ -219,7 +219,7 @@ export const GameSettingsPanel = memo<GameSettingsPanelProps>(({
               </span>
             )}
           </span>
-          {showAdvancedSettings ? <FaChevronUp size={12} /> : <FaChevronDown size={12} />}
+          {showAdvancedSettings ? <ChevronUp size={12} /> : <ChevronDown size={12} />}
         </button>
 
         {/* Collapsible More Settings - Bots + Advanced combined */}
@@ -266,7 +266,7 @@ export const GameSettingsPanel = memo<GameSettingsPanelProps>(({
                                 )}
                               >
                                 {isSelected && (
-                                  <FaCheck className="text-[10px]" aria-hidden="true" />
+                                  <Check className="text-[10px]" aria-hidden="true" />
                                 )}
                                 <span className="font-black">{t(difficultyConfig.nameKey)}</span>
                                 <span className="text-[10px] font-bold opacity-70">
@@ -335,7 +335,7 @@ export const GameSettingsPanel = memo<GameSettingsPanelProps>(({
                 <div className="pt-2 border-t border-neo-cream/10">
                   <div className="flex items-center justify-between gap-2">
                     <div className="flex items-center gap-1.5">
-                      <FaPlay className="text-neo-lime text-xs" />
+                      <Play className="text-neo-lime text-xs" />
                       <span className="text-xs font-bold text-neo-cream/80">
                         {t('bots.autoStart') || 'Auto-start after 30s'}
                       </span>
@@ -389,7 +389,7 @@ export const GameSettingsPanel = memo<GameSettingsPanelProps>(({
                           whileTap={{ scale: 0.95 }}
                           className="flex items-center gap-1 px-2 py-1 rounded-neo text-[10px] font-bold bg-neo-red text-white border-2 border-neo-black shadow-hard-sm hover:shadow-hard transition-all"
                         >
-                          <FaStop size={8} />
+                          <Square size={8} />
                           {t('bots.cancel') || 'Cancel'}
                         </motion.button>
                       </motion.div>

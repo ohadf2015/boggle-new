@@ -87,7 +87,7 @@ export async function getProfile(userId: string) {
   if (!supabase) return { data: null, error: { message: 'Supabase not configured' } };
   return supabase
     .from('profiles')
-    .select('*')
+    .select('id, username, display_name, avatar_emoji, avatar_color, profile_picture_url, profile_picture_provider, total_games, total_score, total_words, casual_games, casual_wins, ranked_games, ranked_wins, ranked_mmr, peak_mmr, longest_word, longest_word_length, total_xp, current_level, player_title, is_admin, total_hints_used, free_hints_available, created_at, updated_at')
     .eq('id', userId)
     .single();
 }
@@ -117,7 +117,7 @@ export async function getLeaderboard(limit = 100, offset = 0) {
   if (!supabase) return { data: [], error: { message: 'Supabase not configured' } };
   return supabase
     .from('leaderboard')
-    .select('*')
+    .select('id, player_id, username, display_name, avatar_emoji, avatar_color, total_score, games_played, games_won, ranked_mmr, rank_position, total_xp, current_level')
     .order('total_score', { ascending: false })
     .range(offset, offset + limit - 1);
 }
@@ -137,7 +137,7 @@ export async function getGuestToken(tokenHash: string) {
   if (!supabase) return { data: null, error: { message: 'Supabase not configured' } };
   return supabase
     .from('guest_tokens')
-    .select('*')
+    .select('id, token_hash, stats, claimed_by, created_at, updated_at')
     .eq('token_hash', tokenHash)
     .is('claimed_by', null)
     .single();
@@ -170,7 +170,7 @@ export async function getRankedProgress(userId: string) {
   if (!supabase) return { data: null, error: { message: 'Supabase not configured' } };
   return supabase
     .from('ranked_progress')
-    .select('*')
+    .select('id, player_id, casual_games_played, unlocked_at')
     .eq('player_id', userId)
     .maybeSingle();
 }

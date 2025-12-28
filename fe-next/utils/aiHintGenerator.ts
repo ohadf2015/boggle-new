@@ -84,7 +84,7 @@ function generateFallbackHints(
     {
       level: 2,
       hint: generateBlanksDisplay(targetWord, [0]), // "B _ _ _"
-      unlockCost: 0, // Free - shown after 2 words found
+      unlockCost: 2, // Unlock after finding 2 words
     },
   ];
 

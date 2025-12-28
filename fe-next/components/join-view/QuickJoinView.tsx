@@ -3,7 +3,7 @@
 import React, { useCallback, useRef, FormEvent } from 'react';
 import dynamic from 'next/dynamic';
 import { motion } from 'framer-motion';
-import { FaGamepad, FaSync } from 'react-icons/fa';
+import { Gamepad2, RefreshCw } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
@@ -69,7 +69,7 @@ const QuickJoinView: React.FC<QuickJoinViewProps> = React.memo(({
         <div className="flex gap-4 items-center w-full max-w-2xl">
           {/* Room info */}
           <div className="flex flex-col items-center gap-2">
-            <FaGamepad className="text-3xl text-neo-cyan" />
+            <Gamepad2 className="text-3xl text-neo-cyan" />
             <div className="bg-neo-pink text-neo-white font-black uppercase rounded-neo border-2 border-neo-black px-4 py-2">
               {t('joinView.room')} {gameCode}
             </div>
@@ -94,7 +94,7 @@ const QuickJoinView: React.FC<QuickJoinViewProps> = React.memo(({
                   />
                 </div>
                 <Button onClick={handleJoinGuest} disabled={isJoining} className="h-11 min-h-[44px] px-6 bg-neo-lime text-neo-black font-bold border-2 border-neo-black">
-                  <FaGamepad className="mr-2" />
+                  <Gamepad2 className="mr-2" />
                   {isJoining ? t('joinView.joining') : t('joinView.joinGame')}
                 </Button>
               </div>
@@ -113,7 +113,7 @@ const QuickJoinView: React.FC<QuickJoinViewProps> = React.memo(({
                   />
                 </div>
                 <Button type="submit" disabled={!username || isJoining} className="h-11 min-h-[44px] px-6 bg-neo-lime text-neo-black font-bold border-2 border-neo-black">
-                  <FaGamepad className="mr-2" />
+                  <Gamepad2 className="mr-2" />
                   {isJoining ? t('joinView.joining') : t('joinView.joinGame')}
                 </Button>
               </form>
@@ -140,7 +140,7 @@ const QuickJoinView: React.FC<QuickJoinViewProps> = React.memo(({
           <CardHeader className="text-center space-y-4">
             <div className="flex justify-center">
               <div className="p-4 bg-neo-cyan text-neo-black rounded-neo border-3 border-neo-black shadow-hard-sm rotate-3">
-                <FaGamepad size={48} className="text-neo-black" />
+                <Gamepad2 size={48} className="text-neo-black" />
               </div>
             </div>
             <CardTitle className="text-2xl sm:text-3xl font-black uppercase text-neo-cream tracking-tight">
@@ -249,13 +249,13 @@ const AuthenticatedQuickJoin: React.FC<AuthenticatedQuickJoinProps> = React.memo
               transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
               className="mr-3 inline-block"
             >
-              <FaSync size={24} />
+              <RefreshCw size={24} />
             </motion.span>
             {t('joinView.joining')}
           </>
         ) : (
           <>
-            <FaGamepad className="mr-3" size={24} />
+            <Gamepad2 className="mr-3" size={24} />
             {t('joinView.joinGame')}
           </>
         )}
@@ -341,13 +341,13 @@ const GuestQuickJoin: React.FC<GuestQuickJoinProps> = React.memo(({
               transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
               className="mr-3 inline-block"
             >
-              <FaSync size={24} />
+              <RefreshCw size={24} />
             </motion.span>
             {t('joinView.joining')}
           </>
         ) : (
           <>
-            <FaGamepad className="mr-3" size={24} />
+            <Gamepad2 className="mr-3" size={24} />
             {t('joinView.joinGame')}
           </>
         )}

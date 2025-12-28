@@ -17,7 +17,7 @@ import { useVirtualizer } from '@tanstack/react-virtual';
 import { useSocket } from '../utils/SocketContext';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useSoundEffects } from '../contexts/SoundEffectsContext';
-import { FaPaperPlane, FaComments, FaBell } from 'react-icons/fa';
+import { Send, MessageSquare, Bell } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useAnnouncer } from './GameAnnouncer';
 
@@ -117,7 +117,7 @@ const RoomChat: React.FC<RoomChatProps> = ({ username, isHost, gameCode, classNa
             toast.dismiss();
           }}
         >
-          <FaBell style={{ color: '#FF6B9D', flexShrink: 0, fontSize: '18px' }} />
+          <Bell style={{ color: '#FF6B9D', flexShrink: 0, fontSize: '18px' }} />
           <div style={{ minWidth: 0 }}>
             <div style={{ fontWeight: 900, color: '#000000', textTransform: 'uppercase', fontSize: '14px' }}>{data.username}</div>
             <div style={{ fontSize: '14px', fontWeight: 700, color: 'rgba(0,0,0,0.8)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{data.message.substring(0, 50)}{data.message.length > 50 ? '...' : ''}</div>
@@ -235,7 +235,7 @@ const RoomChat: React.FC<RoomChatProps> = ({ username, isHost, gameCode, classNa
       {/* NEO-BRUTALIST Header */}
       <div className="py-3 px-4 border-b-3 border-neo-black flex-shrink-0">
         <h3 className="text-neo-black text-base font-black uppercase flex items-center gap-2">
-          <FaComments className="text-neo-pink" />
+          <MessageSquare className="text-neo-pink" />
           {t('chat.title') || 'Room Chat'}
           {unreadCount > 0 && (
             <motion.div
@@ -272,7 +272,7 @@ const RoomChat: React.FC<RoomChatProps> = ({ username, isHost, gameCode, classNa
 
                 {/* Main icon container - smaller */}
                 <div className="bg-neo-yellow text-neo-black border-2 border-neo-black shadow-hard-sm p-2 rotate-[-2deg]">
-                  <FaComments className="text-2xl text-neo-black" />
+                  <MessageSquare className="text-2xl text-neo-black" />
                 </div>
               </motion.div>
 
@@ -372,7 +372,7 @@ const RoomChat: React.FC<RoomChatProps> = ({ username, isHost, gameCode, classNa
             className="flex-shrink-0"
             aria-label={t('chat.send') || 'Send message'}
           >
-            <FaPaperPlane aria-hidden="true" />
+            <Send aria-hidden="true" />
           </Button>
         </div>
       </CardContent>

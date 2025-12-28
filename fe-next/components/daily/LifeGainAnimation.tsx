@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FaHeart } from 'react-icons/fa';
+import { Heart } from 'lucide-react';
 
 export interface LifeGainAnimationProps {
   amount: number | null;
@@ -27,7 +27,7 @@ export const LifeGainAnimation: React.FC<LifeGainAnimationProps> = ({
         >
           <div className="flex items-center gap-2 text-2xl font-black text-green-500 drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">
             <span>+{amount}</span>
-            <FaHeart className="text-red-500" />
+            <Heart className="w-6 h-6 text-red-500 fill-red-500" />
           </div>
         </motion.div>
       )}

@@ -863,6 +863,33 @@ const sv = {
     "tryAgainEncouragement": "Fortsätt spela för att förbättra dig!",
     "of": "av"
   },
+  "chart": {
+    "yourProgress": "Din Utveckling",
+    "needMoreGames": "Spela fler spel!",
+    "needMoreGamesDesc": "Ditt utvecklingsdiagram visas efter 2+ spel",
+    "bestScore": "Bäst",
+    "average": "Snitt",
+    "games": "Spel",
+    "trendUp": "Förbättras!",
+    "trendDown": "Fortsätt försöka!",
+    "trendStable": "Stabil",
+    "milestones": {
+      "wordWizard": "Ordtrollkarl",
+      "onFire": "På gång!",
+      "nice": "Snyggt!",
+      "warmingUp": "Värmer upp"
+    },
+    "funMessages": {
+      "crushing": "Du krossar det! 🔥",
+      "domination": "På väg mot orddominans! 📈",
+      "steadyImprovement": "Stadig förbättring, snyggt! 👆",
+      "roughDay": "Tuff dag? Vi har alla sådana! 💪",
+      "comeback": "Värmer upp för comeback! 🎯",
+      "tinyDip": "Liten dipp, inga problem! 🌊",
+      "holdingSteady": "Håller stabil som ett proffs! ⚖️",
+      "playMore": "Spela mer för att se din trend!"
+    }
+  },
   "archetypes": {
     "strategist": "Strategen",
     "strategistDesc": "Beräknade drag, maximal effekt",
@@ -2044,6 +2071,7 @@ const sv = {
     "bannerSubtitle": "Samma pussel för alla. Dela din poäng!",
     "oneAttempt": "Ett försök per dag - samma pussel för alla!",
     "dayStreak": "dagars streak",
+    "daysStreak": "dagars streak",
     "playNow": "SPELA NU",
     "loading": "Laddar daglig utmaning...",
     "todaysPlayers": "Dagens spelare",
@@ -2053,7 +2081,9 @@ const sv = {
     "yourRank": "Din placering",
     "showMore": "Visa mer",
     "showLess": "Visa mindre",
-    "more": "mer"
+    "more": "mer",
+    "maxAttempts": "Max Försök",
+    "huntDescription": "Jaga det dolda ordet med färgkodad feedback!"
   },
   "wordHunt": {
     "title": "Ordjakt",
@@ -2106,6 +2136,9 @@ const sv = {
       "hintUnlocked": "Ledtråd upplåst!",
       "hintCost": "Kostnad: {cost} ord",
       "needMoreWords": "Hitta {count} fler ord för att låsa upp",
+      "oneMoreWord": "1 ord kvar!",
+      "nextHint": "Nästa ledtråd",
+      "allHintsUnlocked": "Alla ledtrådar upplåsta!",
       "shop": "Ledtrådsbutik",
       "shopTitle": "Spendera ledtrådspoletter",
       "revealLetter": "Avslöja bokstav",
@@ -2126,7 +2159,33 @@ const sv = {
       "youWon": "Du överlevde och hittade ordet!",
       "category": "Kategori: {category}",
       "targetWordGuess": "Målordsgissning",
-      "gridWordDiscovery": "Rutnätsupptäckt"
+      "gridWordDiscovery": "Rutnätsupptäckt",
+      "cannotRevealMore": "Kan inte avslöja fler bokstäver",
+      "wordsLabel": "Ord",
+      "attemptsLabel": "Försök"
+    },
+    "results": {
+      "targetWord": "Målordet",
+      "tokensEarned": "poletter tjänade",
+      "rankOutOf": "#{rank} av {total} spelare",
+      "rankingsFor": "Rankning för {language} pussel",
+      "survivalMetrics": "Överlevnadsstatistik",
+      "avgLifeLeft": "Genomsnittligt liv",
+      "avgWordsFound": "Genomsnittliga ord",
+      "avgEfficiency": "Genomsnittlig effektivitet",
+      "bestEfficiency": "Bästa effektivitet",
+      "yourEfficiency": "Din effektivitet: {score} poäng",
+      "efficiencyPercentile": "Bättre än {percentile}% av spelarna!"
+    },
+    "leaderboard": {
+      "solved": "Löst",
+      "failed": "Misslyckades",
+      "attempts": "försök",
+      "pts": "poäng",
+      "words": "ord",
+      "justNow": "just nu",
+      "minutesAgo": "{count}m sedan",
+      "hoursAgo": "{count}h sedan"
     }
   },
   "tutorial": {

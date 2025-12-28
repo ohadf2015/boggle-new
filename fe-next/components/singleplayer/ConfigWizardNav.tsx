@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import { FaArrowLeft, FaArrowRight, FaPlay, FaCheck } from 'react-icons/fa';
+import { ArrowLeft, ArrowRight, Play, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 
@@ -79,7 +79,7 @@ export const ConfigWizardNav: React.FC<ConfigWizardNavProps> = ({
                 whileTap={step.number < currentStep ? { scale: 0.95 } : undefined}
               >
                 {isCompleted ? (
-                  <FaCheck className="w-3 h-3" />
+                  <Check className="w-3 h-3" />
                 ) : (
                   step.number
                 )}
@@ -156,7 +156,7 @@ export const WizardNavigationButtons: React.FC<WizardNavigationButtonsProps> = (
           onClick={onBack}
           className="flex-1 sm:flex-initial min-h-[48px] gap-2"
         >
-          <FaArrowLeft className="rtl:rotate-180" />
+          <ArrowLeft className="rtl:rotate-180" />
           <span className="hidden sm:inline">{t('common.back') || 'Back'}</span>
         </Button>
       )}
@@ -178,7 +178,7 @@ export const WizardNavigationButtons: React.FC<WizardNavigationButtonsProps> = (
           )}
         >
           <span>{t('common.next') || 'Next'}</span>
-          <FaArrowRight className="rtl:rotate-180" />
+          <ArrowRight className="rtl:rotate-180" />
         </Button>
       ) : (
         <Button
@@ -187,7 +187,7 @@ export const WizardNavigationButtons: React.FC<WizardNavigationButtonsProps> = (
           onClick={onStart}
           className="flex-1 min-h-[56px] gap-2 font-black text-lg shadow-hard hover:shadow-hard-lg"
         >
-          <FaPlay />
+          <Play />
           <span>{t('singlePlayer.startGame') || 'Start Game'}</span>
         </Button>
       )}

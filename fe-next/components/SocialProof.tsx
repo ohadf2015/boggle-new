@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FaUsers, FaFire, FaGamepad, FaTrophy } from 'react-icons/fa';
+import { Users, Flame, Gamepad2, Trophy } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useSocket } from '@/utils/SocketContext';
 import { cn } from '@/lib/utils';
@@ -114,7 +114,7 @@ const SocialProof: React.FC<SocialProofProps> = ({
           <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-neo-lime text-neo-black opacity-75" />
           <span className="relative inline-flex rounded-full h-2 w-2 bg-neo-lime text-neo-black" />
         </span>
-        <FaUsers className="w-3 h-3" />
+        <Users className="w-3 h-3" />
         <span>{displayStats.playersOnline} {t('social.online') || 'online'}</span>
       </motion.div>
     );
@@ -128,11 +128,11 @@ const SocialProof: React.FC<SocialProofProps> = ({
             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-neo-lime text-neo-black opacity-75" />
             <span className="relative inline-flex rounded-full h-2 w-2 bg-neo-lime text-neo-black" />
           </span>
-          <FaUsers className="w-3.5 h-3.5" />
+          <Users className="w-3.5 h-3.5" />
           <span className="font-bold">{displayStats.playersOnline}</span>
         </div>
         <div className="flex items-center gap-1.5 text-neo-orange">
-          <FaGamepad className="w-3.5 h-3.5" />
+          <Gamepad2 className="w-3.5 h-3.5" />
           <span className="font-bold">{displayStats.gamesActive}</span>
           <span className="text-neo-white/90">{t('social.games') || 'games'}</span>
         </div>
@@ -169,7 +169,7 @@ const SocialProof: React.FC<SocialProofProps> = ({
             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-neo-lime text-neo-black opacity-75" />
             <span className="relative inline-flex rounded-full h-3 w-3 bg-neo-lime text-neo-black border border-neo-black" />
           </span>
-          <FaUsers className="text-neo-yellow w-4 h-4" />
+          <Users className="text-neo-yellow w-4 h-4" />
           <span className="font-black text-neo-white">
             {displayStats.playersOnline}
           </span>
@@ -188,7 +188,7 @@ const SocialProof: React.FC<SocialProofProps> = ({
           transition={{ delay: 0.2, type: 'spring' }}
           className="flex items-center gap-2"
         >
-          <FaFire className="text-neo-orange w-4 h-4 animate-pulse" />
+          <Flame className="text-neo-orange w-4 h-4 animate-pulse" />
           <span className="font-black text-neo-white">
             {displayStats.gamesActive}
           </span>
@@ -208,7 +208,7 @@ const SocialProof: React.FC<SocialProofProps> = ({
                 exit={{ opacity: 0, x: -20 }}
                 className="hidden md:flex items-center gap-2"
               >
-                <FaTrophy className="text-neo-yellow w-4 h-4" />
+                <Trophy className="text-neo-yellow w-4 h-4" />
                 <span className="text-neo-white/90 font-bold text-sm">
                   {t('social.newRecord') || 'New record:'}
                 </span>

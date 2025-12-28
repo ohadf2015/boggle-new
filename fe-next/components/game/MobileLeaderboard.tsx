@@ -2,7 +2,7 @@
 
 import React, { useState, memo, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FaTrophy, FaCrown, FaChevronUp, FaChevronDown } from 'react-icons/fa';
+import { Trophy, Crown, ChevronUp } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { getRankIconString, getRankStyle } from '@/utils/rankingStyles';
 import Avatar from '../Avatar';
@@ -81,12 +81,12 @@ const MobileLeaderboard = memo<MobileLeaderboardProps>(({
           {/* Header */}
           <div className="flex items-center justify-between gap-2 border-b-2 border-neo-black/20 pb-1 mb-1">
             <div className="flex items-center gap-1">
-              <FaTrophy className="text-neo-yellow text-sm" style={{ filter: 'drop-shadow(1px 1px 0px rgb(var(--neo-black)))' }} />
+              <Trophy className="w-4 h-4 text-neo-yellow" style={{ filter: 'drop-shadow(1px 1px 0px rgb(var(--neo-black)))' }} />
               <span className="text-[10px] font-black uppercase text-neo-black/90">
                 {t('playerView.rankings') || 'Rankings'}
               </span>
             </div>
-            <FaChevronUp className="text-neo-black/90 text-xs" />
+            <ChevronUp className="w-3 h-3 text-neo-black/90" />
           </div>
 
           {/* Top 3 Mini-List */}
@@ -167,7 +167,7 @@ const MobileLeaderboard = memo<MobileLeaderboardProps>(({
               {/* Player info */}
               <div className="flex-1 min-w-0">
                 <div className={cn('font-black truncate text-sm flex items-center gap-1', dir === 'rtl' && 'flex-row-reverse')}>
-                  {player.isHost && <FaCrown className="text-neo-yellow flex-shrink-0" style={{ filter: 'drop-shadow(1px 1px 0px rgb(var(--neo-black)))' }} />}
+                  {player.isHost && <Crown className="w-4 h-4 text-neo-yellow flex-shrink-0" style={{ filter: 'drop-shadow(1px 1px 0px rgb(var(--neo-black)))' }} />}
                   <span className="truncate">{player.username}</span>
                   {player.username === currentUsername && (
                     <span className="text-[10px] bg-neo-black text-neo-cream px-1.5 py-0.5 rounded-neo font-bold flex-shrink-0">

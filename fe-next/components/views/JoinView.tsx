@@ -4,7 +4,7 @@ import React, { useState, useEffect, useRef, useCallback, FormEvent } from 'reac
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
-import { FaCrown, FaUser, FaSync, FaQrcode, FaQuestionCircle } from 'react-icons/fa';
+import { Crown, User, RefreshCw, QrCode, HelpCircle } from 'lucide-react';
 import { QRCodeSVG } from 'qrcode.react';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
@@ -371,7 +371,7 @@ const JoinView: React.FC<JoinViewProps> = ({
             </div>
 
             <Button type="submit" disabled={isJoining} className="w-full h-11 min-h-[44px] font-bold uppercase bg-neo-yellow hover:bg-neo-yellow/90 text-neo-black border-2 border-neo-black">
-              {mode === 'host' ? <FaCrown className="mr-2" /> : <FaUser className="mr-2" />}
+              {mode === 'host' ? <Crown className="mr-2 w-4 h-4" /> : <User className="mr-2 w-4 h-4" />}
               {isJoining ? (t('common.loading') || 'Loading...') : mode === 'host' ? (t('joinView.createRoom') || 'Create') : (t('joinView.joinRoom') || 'Join')}
             </Button>
           </form>
@@ -517,18 +517,18 @@ const JoinView: React.FC<JoinViewProps> = ({
                           transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
                           className="mr-2 inline-block"
                         >
-                          <FaSync />
+                          <RefreshCw className="w-4 h-4" />
                         </motion.span>
                         {mode === 'host' ? t('joinView.creating') : t('joinView.joining')}
                       </>
                     ) : mode === 'host' ? (
                       <>
-                        <span className="mr-2"><FaCrown /></span>
+                        <span className="mr-2"><Crown className="w-4 h-4" /></span>
                         {t('joinView.createRoom')}
                       </>
                     ) : (
                       <>
-                        <span className="mr-2"><FaUser /></span>
+                        <span className="mr-2"><User className="w-4 h-4" /></span>
                         {t('joinView.joinRoom')}
                       </>
                     )}
@@ -568,7 +568,7 @@ const JoinView: React.FC<JoinViewProps> = ({
                   size="lg"
                   className="rounded-full w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-r from-teal-500 to-cyan-500 hover:from-teal-400 hover:to-cyan-400 shadow-2xl hover:shadow-[0_0_25px_rgba(20,184,166,0.6)] p-0"
                 >
-                  <FaQuestionCircle className="text-xl sm:text-2xl" />
+                  <HelpCircle className="w-5 h-5 sm:w-6 sm:h-6" />
                 </Button>
               </Link>
             </TooltipTrigger>
@@ -589,7 +589,7 @@ const JoinView: React.FC<JoinViewProps> = ({
         <DialogContent className="sm:max-w-md bg-white text-neo-black dark:bg-slate-800 dark:text-white border-cyan-500/30">
           <DialogHeader>
             <DialogTitle className="text-center text-cyan-300 flex items-center justify-center gap-2">
-              <FaQrcode />
+              <QrCode className="w-4 h-4" />
               {t('joinView.qrCodeTitle')}
             </DialogTitle>
           </DialogHeader>

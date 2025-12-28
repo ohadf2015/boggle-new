@@ -2,8 +2,7 @@
 
 import React, { useState, useCallback, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FaTimes, FaHeart, FaCoins, FaLightbulb } from 'react-icons/fa';
-import { Trophy, Zap, ShoppingBag } from 'lucide-react';
+import { Trophy, Zap, ShoppingBag, X, Heart, Coins, Lightbulb } from 'lucide-react';
 import GridComponent from '@/components/GridComponent';
 import { HelpPanel, HelpButton } from '@/components/game/HelpPanel';
 import { Button } from '@/components/ui/button';
@@ -30,6 +29,8 @@ import {
 import { isWordOnBoard } from '@/utils/clientWordValidator';
 import { WordFeedbackToast, type FeedbackType } from './WordFeedbackToast';
 import { LifeGainAnimation } from './LifeGainAnimation';
+import { useAuth } from '@/contexts/AuthContext';
+import { logGameStart, logGameEnd, formatWordsForLogging } from '@/utils/gameLogger';
 
 const MAX_ATTEMPTS = 10;
 const INITIAL_LIFE = 100;
@@ -84,6 +85,7 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
   const { t } = useLanguage();
   const { playWordAcceptedSound } = useSoundEffects();
   const isLandscape = useMobileLandscape();
+  const { user } = useAuth();
 
   // Survival state
   const [lifePoints, setLifePoints] = useState(INITIAL_LIFE);
@@ -114,6 +116,7 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
   const [eliminatedLetters, setEliminatedLetters] = useState<Set<string>>(new Set());
   const [showCategory, setShowCategory] = useState(false);
   const [showExample, setShowExample] = useState(false);
+  const [hintUnlockAnimation, setHintUnlockAnimation] = useState(false);
 
   // UI state
   const [formedWord, setFormedWord] = useState('');
@@ -125,6 +128,10 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
   // Refs for life drain
   const lifeIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const gameOverRef = useRef(false);
+
+  // Session tracking
+  const [gameSessionId, setGameSessionId] = useState<string | null>(null);
+  const gameStartTimeRef = useRef<number>(Date.now());
 
   // Load AI hints on mount
   useEffect(() => {
@@ -141,6 +148,23 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
     }
     loadHints();
   }, [targetWord, language]);
+
+  // Log game session start
+  useEffect(() => {
+    async function initGameSession() {
+      const sessionId = await logGameStart({
+        mode: 'daily_challenge',
+        language,
+        userId: user?.id || null,
+        dailyPuzzleNumber: puzzleNumber,
+        targetWord,
+      });
+      if (sessionId) {
+        setGameSessionId(sessionId);
+      }
+    }
+    initGameSession();
+  }, []); // Only run once on mount
 
   // Start life drain
   useEffect(() => {
@@ -172,9 +196,17 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
   useEffect(() => {
     const nextHint = getNextHint(availableHints, discoveredWords.length);
     if (nextHint && (!currentHint || nextHint.level > currentHint.level)) {
+      // Trigger unlock animation when upgrading hint level (not on initial load)
+      if (currentHint && nextHint.level > currentHint.level) {
+        setHintUnlockAnimation(true);
+        // Play sound effect for hint unlock
+        playWordAcceptedSound?.();
+        // Reset animation after delay
+        setTimeout(() => setHintUnlockAnimation(false), 1500);
+      }
       setCurrentHint(nextHint);
     }
-  }, [discoveredWords.length, availableHints, currentHint]);
+  }, [discoveredWords.length, availableHints, currentHint, playWordAcceptedSound]);
 
   // Show toast feedback
   const showToast = useCallback((type: FeedbackType, message: string) => {
@@ -294,7 +326,7 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
   }, [discoveredWords, grid, language, playWordAcceptedSound, showToast, t]);
 
   // Handle game over
-  const handleGameOver = useCallback((won: boolean, finalAttempts?: TargetAttempt[]) => {
+  const handleGameOver = useCallback(async (won: boolean, finalAttempts?: TargetAttempt[]) => {
     if (gameOverRef.current) return;
     gameOverRef.current = true;
     setIsGameOver(true);
@@ -326,8 +358,35 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
       ),
     };
 
+    // Log game session end
+    if (gameSessionId) {
+      const durationSeconds = Math.floor((Date.now() - gameStartTimeRef.current) / 1000);
+      const wordsFoundFormatted = formatWordsForLogging(
+        discoveredWords.map(w => w.word),
+        discoveredWords.map(w => ({
+          word: w.word,
+          points: w.lifeGained + (w.tokensGained * 10), // Approximate points
+          timestamp: w.timestamp,
+        }))
+      );
+
+      await logGameEnd(gameSessionId, {
+        score: result.efficiencyScore,
+        wordsFound: wordsFoundFormatted,
+        durationSeconds,
+        completed: true,
+        targetFound: won,
+        attemptsUsed: attemptsToUse.length,
+        lifeRemaining: lifePoints,
+        lifeGained: discoveredWords.reduce((sum, w) => sum + w.lifeGained, 0),
+        tokensEarned: clueTokens + tokensSpent,
+        tokensSpent: tokensSpent,
+        cluesUsed: tokensSpent > 0 ? Math.ceil(tokensSpent / 5) : 0, // Estimate clues used
+      });
+    }
+
     onComplete(result);
-  }, [attempts, discoveredWords, lifePoints, clueTokens, tokensSpent, currentHint, targetWord, onComplete]);
+  }, [attempts, discoveredWords, lifePoints, clueTokens, tokensSpent, currentHint, targetWord, onComplete, gameSessionId, gameStartTimeRef]);
 
   // Handle clue shop purchases
   const handlePurchase = useCallback((item: ClueShopItem) => {
@@ -413,7 +472,7 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
           onClick={onQuit}
           className="text-gray-600 hover:text-red-500"
         >
-          <FaTimes className="w-4 h-4 mr-1" />
+          <X className="w-4 h-4 mr-1" />
           {t('common.quit') || 'Quit'}
         </Button>
         <span className="px-2 py-0.5 bg-neo-purple/20 text-neo-black dark:text-neo-purple text-xs font-bold rounded-full">
@@ -424,26 +483,79 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
       {/* Life bar + Clue tokens */}
       <div className="flex items-center gap-3 mb-2">
         {/* Life bar */}
-        <div className="flex-1 bg-gray-200 dark:bg-gray-700 rounded-full h-6 overflow-hidden border-2 border-neo-black relative">
+        <motion.div
+          className={cn(
+            "flex-1 bg-gray-200 dark:bg-gray-700 rounded-full h-6 overflow-hidden border-2 relative",
+            lifePoints <= 20 ? "border-red-500" : "border-neo-black"
+          )}
+          animate={
+            lifePoints <= 20 && !isGameOver
+              ? {
+                  scale: [1, 1.02, 1],
+                  borderColor: ['#ef4444', '#dc2626', '#ef4444']
+                }
+              : {}
+          }
+          transition={{ duration: 0.5, repeat: lifePoints <= 20 ? Infinity : 0 }}
+        >
           <motion.div
-            className={cn("h-full flex items-center justify-center text-xs font-bold text-white transition-all", getLifeColor())}
-            style={{ width: `${lifePoints}%` }}
-            animate={{ width: `${lifePoints}%` }}
+            className={cn(
+              "h-full flex items-center justify-center text-xs font-bold text-white transition-all",
+              getLifeColor(),
+              lifePoints <= 20 && "animate-pulse"
+            )}
+            animate={{
+              width: `${lifePoints}%`,
+            }}
+            transition={{ duration: 0.3 }}
           >
-            <FaHeart className="w-3 h-3 mr-1" />
+            <motion.div
+              animate={lifePoints <= 20 && !isGameOver ? { scale: [1, 1.2, 1] } : {}}
+              transition={{ duration: 0.5, repeat: lifePoints <= 20 ? Infinity : 0 }}
+            >
+              <Heart className="w-3 h-3 mr-1 fill-current" />
+            </motion.div>
             {lifePoints}/100
           </motion.div>
+
+          {/* Life drain particles effect when low on life */}
+          {lifePoints <= 33 && lifePoints > 0 && !isGameOver && (
+            <motion.div
+              className="absolute inset-0 pointer-events-none overflow-hidden"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+            >
+              {[...Array(3)].map((_, i) => (
+                <motion.div
+                  key={i}
+                  className="absolute w-1 h-1 bg-red-500 rounded-full"
+                  initial={{ x: `${lifePoints}%`, y: '50%', opacity: 1 }}
+                  animate={{
+                    x: [`${lifePoints}%`, `${lifePoints + 20}%`],
+                    y: ['50%', `${30 + i * 20}%`],
+                    opacity: [1, 0],
+                  }}
+                  transition={{
+                    duration: 1,
+                    repeat: Infinity,
+                    delay: i * 0.3,
+                    ease: 'easeOut'
+                  }}
+                />
+              ))}
+            </motion.div>
+          )}
 
           {/* Life gain animation */}
           <LifeGainAnimation
             amount={lifeGainAmount}
             onComplete={() => setLifeGainAmount(null)}
           />
-        </div>
+        </motion.div>
 
         {/* Clue tokens */}
         <div className="flex items-center gap-1 px-3 py-1 bg-yellow-100 dark:bg-yellow-900/30 border-2 border-neo-black rounded-neo">
-          <FaCoins className="w-4 h-4 text-yellow-600" />
+          <Coins className="w-4 h-4 text-yellow-600" />
           <span className="font-bold text-sm">{clueTokens}</span>
         </div>
 
@@ -469,16 +581,60 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
       {currentHint && (
         <motion.div
           initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="bg-blue-50 dark:bg-blue-900/20 border-2 border-blue-500 rounded-neo p-3 mb-2"
+          animate={{
+            opacity: 1,
+            y: 0,
+            scale: hintUnlockAnimation ? [1, 1.05, 1] : 1,
+            borderColor: hintUnlockAnimation ? ['#3b82f6', '#fbbf24', '#3b82f6'] : '#3b82f6'
+          }}
+          transition={{ duration: hintUnlockAnimation ? 0.5 : 0.3 }}
+          className={cn(
+            "border-2 rounded-neo p-3 mb-2 relative overflow-hidden",
+            hintUnlockAnimation
+              ? "bg-gradient-to-r from-yellow-50 to-blue-50 dark:from-yellow-900/30 dark:to-blue-900/30 border-yellow-500"
+              : "bg-blue-50 dark:bg-blue-900/20 border-blue-500"
+          )}
         >
+          {/* Unlock animation sparkles */}
+          {hintUnlockAnimation && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: [0, 1, 0] }}
+              transition={{ duration: 1 }}
+              className="absolute inset-0 flex items-center justify-center pointer-events-none"
+            >
+              <span className="text-4xl">✨</span>
+            </motion.div>
+          )}
+
           <div className="flex items-start gap-2">
-            <FaLightbulb className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+            <motion.div
+              animate={hintUnlockAnimation ? { rotate: [0, -15, 15, 0], scale: [1, 1.3, 1] } : {}}
+              transition={{ duration: 0.5 }}
+            >
+              <Lightbulb className={cn(
+                "w-5 h-5 flex-shrink-0 mt-0.5",
+                hintUnlockAnimation ? "text-yellow-500" : "text-blue-600"
+              )} />
+            </motion.div>
             <div className="flex-1">
-              <div className="text-xs text-blue-600 dark:text-blue-400 font-bold mb-1">
-                {t('wordHunt.survival.hintLevel')?.replace('{level}', String(currentHint.level)) || `Hint ${currentHint.level}/5`}
+              <div className={cn(
+                "text-xs font-bold mb-1",
+                hintUnlockAnimation ? "text-yellow-600 dark:text-yellow-400" : "text-blue-600 dark:text-blue-400"
+              )}>
+                {hintUnlockAnimation
+                  ? (t('wordHunt.survival.hintUnlocked') || '🎉 New Hint Unlocked!')
+                  : (t('wordHunt.survival.hintLevel')?.replace('{level}', String(currentHint.level)) || `Hint ${currentHint.level}/5`)
+                }
               </div>
-              <div className="text-2xl font-mono font-bold tracking-widest text-center">{currentHint.hint}</div>
+              <motion.div
+                key={currentHint.hint}
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className="text-2xl font-mono font-bold tracking-widest text-center"
+              >
+                {currentHint.hint}
+              </motion.div>
             </div>
           </div>
         </motion.div>
@@ -487,15 +643,51 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
       {/* Next hint progress */}
       {(() => {
         const nextHint = availableHints.find(h => h.unlockCost > discoveredWords.length);
-        if (nextHint) {
+        if (nextHint && currentHint) {
           const wordsNeeded = nextHint.unlockCost - discoveredWords.length;
+          const progress = discoveredWords.length - (currentHint.unlockCost || 0);
+          const total = nextHint.unlockCost - (currentHint.unlockCost || 0);
+          const progressPercent = total > 0 ? Math.min(100, (progress / total) * 100) : 0;
+
           return (
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              className="text-center text-xs text-gray-600 dark:text-gray-400 mb-2"
+              className="mb-2 px-2"
             >
-              💡 {t('wordHunt.survival.needMoreWords')?.replace('{count}', String(wordsNeeded)) || `Find ${wordsNeeded} more words to unlock next hint`}
+              <div className="flex items-center gap-2 text-xs text-gray-600 dark:text-gray-400 mb-1">
+                <span className="font-bold">{t('wordHunt.survival.nextHint') || 'Next Hint'}</span>
+                <span className="text-neo-purple font-bold">Lvl {nextHint.level}</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="flex-1 bg-gray-200 dark:bg-gray-700 rounded-full h-2 overflow-hidden">
+                  <motion.div
+                    className="h-full bg-gradient-to-r from-blue-500 to-purple-500"
+                    initial={{ width: 0 }}
+                    animate={{ width: `${progressPercent}%` }}
+                    transition={{ duration: 0.3 }}
+                  />
+                </div>
+                <span className="text-xs font-bold text-gray-600 dark:text-gray-400 min-w-[60px] text-right">
+                  {discoveredWords.length}/{nextHint.unlockCost} 📖
+                </span>
+              </div>
+              <div className="text-center text-xs text-gray-500 dark:text-gray-500 mt-1">
+                {wordsNeeded === 1
+                  ? (t('wordHunt.survival.oneMoreWord') || '1 more word!')
+                  : (t('wordHunt.survival.needMoreWords')?.replace('{count}', String(wordsNeeded)) || `${wordsNeeded} more words`)}
+              </div>
+            </motion.div>
+          );
+        } else if (currentHint?.level === 5) {
+          // All hints unlocked
+          return (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="text-center text-xs text-green-600 dark:text-green-400 mb-2 font-bold"
+            >
+              ✅ {t('wordHunt.survival.allHintsUnlocked') || 'All hints unlocked!'}
             </motion.div>
           );
         }
@@ -521,8 +713,8 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
 
       {/* Stats */}
       <div className="flex justify-center gap-4 text-xs text-gray-600 dark:text-gray-400 mb-2">
-        <span>Words: {discoveredWords.length}</span>
-        <span>Attempts: {attempts.length}/{MAX_ATTEMPTS}</span>
+        <span>{t('wordHunt.survival.wordsLabel')}: {discoveredWords.length}</span>
+        <span>{t('wordHunt.survival.attemptsLabel')}: {attempts.length}/{MAX_ATTEMPTS}</span>
       </div>
 
       {/* Feedback */}
@@ -608,7 +800,7 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
                           <div className="text-xs text-gray-600">{itemDescs[item.id] || item.description}</div>
                         </div>
                         <div className="flex items-center gap-1 ml-2">
-                          <FaCoins className="w-4 h-4 text-yellow-600" />
+                          <Coins className="w-4 h-4 text-yellow-600" />
                           <span className="font-bold">{item.cost}</span>
                         </div>
                       </div>

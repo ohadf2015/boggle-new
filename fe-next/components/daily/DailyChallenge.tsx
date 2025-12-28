@@ -2,8 +2,7 @@
 
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FaArrowLeft, FaGlobe, FaChevronDown } from 'react-icons/fa';
-import { Trophy, Timer, Flame, Target, Check } from 'lucide-react';
+import { ArrowLeft, Globe, ChevronDown, Trophy, Timer, Flame, Target, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import AutoHideHeader from '@/components/AutoHideHeader';
 import DailyWordHuntSurvival from './DailyWordHuntSurvival';
@@ -13,7 +12,7 @@ import { DailyChallengeTutorial } from './DailyChallengeTutorial';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useMobileLandscape } from '@/hooks/useMobileLandscape';
 import {
-  generateDailyGrid,
+  generateDailyPuzzle,
   getDailyChallengeDate,
   getPuzzleNumber,
   getSecondsUntilNextDaily,
@@ -21,10 +20,12 @@ import {
   hasPlayedWordHuntToday,
   getTodaysWordHuntResult,
   saveWordHuntResult,
-  selectDailyTargetWord,
+  getDailyStreak,
+  parseChallengeParam,
   type WordHuntResult,
   type StoredWordHuntResult,
 } from '@/utils/dailyChallenge';
+import { useSearchParams } from 'next/navigation';
 import type { LetterGrid, Language } from '@/types';
 import type { SurvivalGameResult } from './DailyWordHuntSurvival';
 
@@ -34,8 +35,18 @@ export type DailyChallengePhase = 'loading' | 'ready' | 'playing' | 'completed' 
  * DailyChallenge - Main container for the daily puzzle
  * Same puzzle for everyone worldwide each day
  */
+// Challenge data from URL parameter
+interface ChallengeData {
+  puzzleNumber: number;
+  attemptsUsed: number;
+  solved: boolean;
+  efficiencyScore: number;
+  wordsDiscovered: number;
+}
+
 const DailyChallenge: React.FC = () => {
   const { t, language, setLanguage } = useLanguage();
+  const searchParams = useSearchParams();
 
   // Get current language flag
   const getCurrentFlag = (lang: Language) => {
@@ -49,6 +60,9 @@ const DailyChallenge: React.FC = () => {
     return flags[lang] || '🌐';
   };
   const isLandscape = useMobileLandscape();
+
+  // Challenge state (from URL parameter)
+  const [challengeData, setChallengeData] = useState<ChallengeData | null>(null);
 
   // Phase management
   const [phase, setPhase] = useState<DailyChallengePhase>('loading');
@@ -68,32 +82,58 @@ const DailyChallenge: React.FC = () => {
   const [storedResult, setStoredResult] = useState<StoredWordHuntResult | null>(null);
   const [gameResult, setGameResult] = useState<SurvivalGameResult | null>(null);
 
+  // Parse challenge parameter from URL
+  useEffect(() => {
+    const challengeParam = searchParams.get('challenge');
+    if (challengeParam) {
+      const parsed = parseChallengeParam(challengeParam);
+      if (parsed) {
+        setChallengeData(parsed);
+      }
+    }
+  }, [searchParams]);
+
   // Initialize Word Hunt daily challenge
   useEffect(() => {
-    const date = getDailyChallengeDate();
-    const number = getPuzzleNumber(date);
+    const initializePuzzle = async () => {
+      const date = getDailyChallengeDate();
+      const number = getPuzzleNumber(date);
 
-    setPuzzleDate(date);
-    setPuzzleNumber(number);
+      setPuzzleDate(date);
+      setPuzzleNumber(number);
 
-    // Check if tutorial has been completed
-    const tutorialKey = `lexiclash_wordHunt_tutorial_completed_${language}`;
-    const hasCompletedTutorial = typeof window !== 'undefined' && localStorage.getItem(tutorialKey) === 'true';
-    setTutorialCompleted(hasCompletedTutorial);
+      // Check if tutorial has been completed
+      const tutorialKey = `lexiclash_wordHunt_tutorial_completed_${language}`;
+      const hasCompletedTutorial = typeof window !== 'undefined' && localStorage.getItem(tutorialKey) === 'true';
+      setTutorialCompleted(hasCompletedTutorial);
 
-    // Check if already played today
-    if (hasPlayedWordHuntToday(language as Language)) {
-      const result = getTodaysWordHuntResult(language as Language);
-      setStoredResult(result);
-      setPhase('already-played');
-    } else {
-      // Generate the grid for today
-      const dailyGrid = generateDailyGrid(date, language as Language);
-      setGrid(dailyGrid);
+      // Check if already played today
+      if (hasPlayedWordHuntToday(language as Language)) {
+        const result = getTodaysWordHuntResult(language as Language);
+        setStoredResult(result);
+        setPhase('already-played');
+        return;
+      }
 
-      // Select target word for today
-      const target = selectDailyTargetWord(dailyGrid, date, language as Language);
-      setTargetWord(target.word);
+      // Try to fetch puzzle from API (includes AI-selected word if available)
+      try {
+        const response = await fetch(`/api/daily-challenge/puzzle/${date}/${language}`);
+        if (response.ok) {
+          const puzzleData = await response.json();
+          setGrid(puzzleData.grid);
+          setTargetWord(puzzleData.targetWord);
+        } else {
+          // Fall back to local generation
+          const puzzle = generateDailyPuzzle(date, language as Language);
+          setGrid(puzzle.grid);
+          setTargetWord(puzzle.targetWord);
+        }
+      } catch {
+        // Fall back to local generation on network error
+        const puzzle = generateDailyPuzzle(date, language as Language);
+        setGrid(puzzle.grid);
+        setTargetWord(puzzle.targetWord);
+      }
 
       // Show tutorial if not completed, otherwise go to ready screen
       if (!hasCompletedTutorial) {
@@ -102,7 +142,9 @@ const DailyChallenge: React.FC = () => {
       } else {
         setPhase('ready');
       }
-    }
+    };
+
+    initializePuzzle();
   }, [language]);
 
   // Update countdown timer
@@ -125,7 +167,7 @@ const DailyChallenge: React.FC = () => {
 
   // Handle Word Hunt game completion
   const handleGameComplete = useCallback((result: SurvivalGameResult) => {
-    // Create the Word Hunt result object
+    // Create the Word Hunt result object (streak will be updated by saveWordHuntResult)
     const wordHuntResult: WordHuntResult = {
       puzzleNumber,
       puzzleDate,
@@ -134,12 +176,22 @@ const DailyChallenge: React.FC = () => {
       attemptsUsed: result.attemptsUsed,
       targetWord: result.targetWord,
       attempts: result.attempts,
-      streakDays: 0, // TODO: Implement streak tracking for Word Hunt
+      // Include survival mode fields
+      wordsDiscovered: result.wordsDiscovered,
+      lifeRemaining: result.lifeRemaining,
+      clueTokensEarned: result.clueTokensEarned,
+      clueTokensSpent: result.clueTokensSpent,
+      hintsUnlocked: result.hintsUnlocked,
+      efficiencyScore: result.efficiencyScore,
+      streakDays: 0, // Placeholder - will be updated after save
       completedAt: new Date().toISOString(),
     };
 
-    // Save result to localStorage
-    saveWordHuntResult(wordHuntResult);
+    // Save result to localStorage and update streak
+    const updatedStreak = saveWordHuntResult(wordHuntResult);
+
+    // Update the result with the actual streak
+    wordHuntResult.streakDays = updatedStreak.currentStreak;
 
     // Store result for display
     setGameResult(result);
@@ -212,6 +264,7 @@ const DailyChallenge: React.FC = () => {
             countdown={countdown}
             language={language as Language}
             currentFlag={getCurrentFlag(language as Language)}
+            challengeData={challengeData}
             onLanguageChange={(lang) => setLanguage(lang)}
             onStart={handleStartGame}
             onBack={handleBack}
@@ -274,6 +327,7 @@ interface DailyReadyScreenProps {
   countdown: string;
   language: Language;
   currentFlag: string;
+  challengeData: ChallengeData | null;
   onLanguageChange: (lang: Language) => void;
   onStart: () => void;
   onBack: () => void;
@@ -287,6 +341,7 @@ const DailyReadyScreen: React.FC<DailyReadyScreenProps> = ({
   countdown,
   language,
   currentFlag,
+  challengeData,
   onLanguageChange,
   onStart,
   onBack,
@@ -294,6 +349,9 @@ const DailyReadyScreen: React.FC<DailyReadyScreenProps> = ({
   t,
 }) => {
   const [showLangDropdown, setShowLangDropdown] = useState(false);
+
+  // Check if this is a valid challenge (same puzzle number)
+  const isValidChallenge = challengeData && challengeData.puzzleNumber === puzzleNumber;
 
   // Calculate how many languages have been completed today
   const completedLanguagesCount = useMemo(() => {
@@ -328,7 +386,7 @@ const DailyReadyScreen: React.FC<DailyReadyScreenProps> = ({
           onClick={onBack}
           className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white"
         >
-          <FaArrowLeft className="mr-2" />
+          <ArrowLeft className="mr-2" />
           {t('daily.home')}
         </Button>
       </motion.div>
@@ -349,8 +407,8 @@ const DailyReadyScreen: React.FC<DailyReadyScreenProps> = ({
             className="relative flex items-center gap-2 bg-neo-cream border-3 border-neo-black rounded-neo shadow-hard-sm hover:shadow-hard transition-all"
           >
             <span className="text-lg">{currentFlag}</span>
-            <FaGlobe className="w-4 h-4 text-neo-black" />
-            <FaChevronDown className={`w-3 h-3 text-neo-black transition-transform ${showLangDropdown ? 'rotate-180' : ''}`} />
+            <Globe className="w-4 h-4 text-neo-black" />
+            <ChevronDown className={`w-3 h-3 text-neo-black transition-transform ${showLangDropdown ? 'rotate-180' : ''}`} />
             {completedLanguagesCount > 0 && (
               <span className="absolute -top-2 -right-2 w-5 h-5 bg-neo-lime text-neo-black rounded-full border-2 border-neo-black flex items-center justify-center text-xs font-black">
                 {completedLanguagesCount}
@@ -397,6 +455,38 @@ const DailyReadyScreen: React.FC<DailyReadyScreenProps> = ({
 
       {/* Main content */}
       <div className="max-w-md w-full text-center space-y-6">
+        {/* Challenge Banner (when arriving via challenge link) */}
+        {isValidChallenge && (
+          <motion.div
+            initial={{ scale: 0.8, opacity: 0, y: -20 }}
+            animate={{ scale: 1, opacity: 1, y: 0 }}
+            transition={{ delay: 0.05, type: 'spring' }}
+            className="w-full max-w-sm bg-gradient-to-r from-purple-500 to-indigo-600 rounded-neo border-3 border-neo-black shadow-hard p-4 mb-2"
+          >
+            <div className="flex items-center justify-center gap-2 mb-2">
+              <span className="text-2xl">🎯</span>
+              <span className="font-black text-white text-lg">{t('wordHunt.results.challengeTitle')}</span>
+            </div>
+            <div className="flex items-center justify-center gap-4">
+              <div className="text-center">
+                <div className="text-3xl font-black text-white">
+                  {challengeData.solved ? challengeData.attemptsUsed : 'X'}/10
+                </div>
+                <div className="text-xs text-white/80">{t('wordHunt.results.attempts')}</div>
+              </div>
+              {challengeData.wordsDiscovered > 0 && (
+                <div className="text-center">
+                  <div className="text-2xl font-black text-white">{challengeData.wordsDiscovered}</div>
+                  <div className="text-xs text-white/80">{t('wordHunt.survival.wordsLabel')}</div>
+                </div>
+              )}
+            </div>
+            <div className="text-center mt-2 text-white/90 text-sm font-bold">
+              {t('wordHunt.results.beatTheirScore')}
+            </div>
+          </motion.div>
+        )}
+
         {/* Daily Challenge Badge */}
         <motion.div
           initial={{ scale: 0.8, opacity: 0 }}
@@ -436,10 +526,10 @@ const DailyReadyScreen: React.FC<DailyReadyScreenProps> = ({
             10
           </div>
           <div className="text-sm text-gray-600 dark:text-gray-300 uppercase font-bold">
-            {t('wordHunt.title')} - Max Attempts
+            {t('wordHunt.title')} - {t('daily.maxAttempts')}
           </div>
           <div className="text-xs text-gray-500 dark:text-gray-400 mt-2">
-            Hunt for the hidden word using color-coded feedback!
+            {t('daily.huntDescription')}
           </div>
         </motion.div>
 

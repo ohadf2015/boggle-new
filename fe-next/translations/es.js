@@ -860,6 +860,33 @@ const es = {
     "tryAgainEncouragement": "¡Sigue jugando para mejorar!",
     "of": "de"
   },
+  "chart": {
+    "yourProgress": "Tu Progreso",
+    "needMoreGames": "¡Juega más partidas!",
+    "needMoreGamesDesc": "Tu gráfico de mejora aparecerá después de 2+ juegos",
+    "bestScore": "Mejor",
+    "average": "Prom",
+    "games": "Juegos",
+    "trendUp": "¡Mejorando!",
+    "trendDown": "¡Sigue intentando!",
+    "trendStable": "Constante",
+    "milestones": {
+      "wordWizard": "Mago de Palabras",
+      "onFire": "¡En llamas!",
+      "nice": "¡Bien!",
+      "warmingUp": "Calentando"
+    },
+    "funMessages": {
+      "crushing": "¡Lo estás aplastando! 🔥",
+      "domination": "¡En camino a la dominación verbal! 📈",
+      "steadyImprovement": "Mejora constante, ¡bien! 👆",
+      "roughDay": "¿Día difícil? ¡Todos los tenemos! 💪",
+      "comeback": "¡Preparándote para un regreso! 🎯",
+      "tinyDip": "Una pequeña bajada, ¡no pasa nada! 🌊",
+      "holdingSteady": "¡Manteniéndote estable como un pro! ⚖️",
+      "playMore": "¡Juega más para ver tu tendencia!"
+    }
+  },
   "archetypes": {
     "strategist": "El Estratega",
     "strategistDesc": "Movimientos calculados, máximo impacto",
@@ -2041,6 +2068,7 @@ const es = {
     "bannerSubtitle": "Mismo puzzle para todos. ¡Comparte tu puntuación!",
     "oneAttempt": "¡Un intento por día - mismo puzzle para todos!",
     "dayStreak": "días de racha",
+    "daysStreak": "días de racha",
     "playNow": "JUGAR AHORA",
     "loading": "Cargando Desafío Diario...",
     "todaysPlayers": "Jugadores de hoy",
@@ -2050,7 +2078,9 @@ const es = {
     "yourRank": "Tu posición",
     "showMore": "Mostrar más",
     "showLess": "Mostrar menos",
-    "more": "más"
+    "more": "más",
+    "maxAttempts": "Intentos Máximos",
+    "huntDescription": "¡Caza la palabra oculta usando retroalimentación de colores!"
   },
   "wordHunt": {
     "title": "Caza de Palabras",
@@ -2103,6 +2133,9 @@ const es = {
       "hintUnlocked": "¡Pista desbloqueada!",
       "hintCost": "Costo: {cost} palabras",
       "needMoreWords": "Encuentra {count} palabras más para desbloquear",
+      "oneMoreWord": "¡1 palabra más!",
+      "nextHint": "Siguiente pista",
+      "allHintsUnlocked": "¡Todas las pistas desbloqueadas!",
       "shop": "Tienda de Pistas",
       "shopTitle": "Gastar Fichas de Pista",
       "revealLetter": "Revelar Letra",
@@ -2123,7 +2156,33 @@ const es = {
       "youWon": "¡Sobreviviste y encontraste la palabra!",
       "category": "Categoría: {category}",
       "targetWordGuess": "Adivinar palabra objetivo",
-      "gridWordDiscovery": "Descubrimiento de palabra del tablero"
+      "gridWordDiscovery": "Descubrimiento de palabra del tablero",
+      "cannotRevealMore": "No se pueden revelar más letras",
+      "wordsLabel": "Palabras",
+      "attemptsLabel": "Intentos"
+    },
+    "results": {
+      "targetWord": "Palabra Objetivo",
+      "tokensEarned": "fichas ganadas",
+      "rankOutOf": "#{rank} de {total} jugadores",
+      "rankingsFor": "Clasificación para puzzle en {language}",
+      "survivalMetrics": "Métricas del Modo Supervivencia",
+      "avgLifeLeft": "Vida Promedio",
+      "avgWordsFound": "Palabras Encontradas Prom.",
+      "avgEfficiency": "Eficiencia Prom.",
+      "bestEfficiency": "Mejor Eficiencia",
+      "yourEfficiency": "Tu Eficiencia: {score} puntos",
+      "efficiencyPercentile": "¡Mejor que el {percentile}% de los jugadores!"
+    },
+    "leaderboard": {
+      "solved": "Resuelto",
+      "failed": "Fallido",
+      "attempts": "intentos",
+      "pts": "pts",
+      "words": "palabras",
+      "justNow": "ahora mismo",
+      "minutesAgo": "hace {count}m",
+      "hoursAgo": "hace {count}h"
     }
   },
   "tutorial": {

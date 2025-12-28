@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { FaUsers, FaCrown, FaLink, FaWhatsapp, FaQrcode, FaTimes } from 'react-icons/fa';
+import { Users, Crown, Link, MessageCircle, QrCode, X } from 'lucide-react';
 import { Button } from '../ui/button';
 import ExitRoomButton from '../ExitRoomButton';
 import { Card } from '../ui/card';
@@ -85,7 +85,7 @@ const WaitingScreen: React.FC<WaitingScreenProps> = ({
               className="w-full h-12 min-h-[48px] p-0 bg-neo-yellow/90 hover:bg-neo-yellow border-3 border-neo-black rounded-neo flex items-center justify-center shadow-hard"
               title={t('hostView.copyLink')}
             >
-              <FaLink className="text-base text-neo-black" />
+              <Link className="w-4 h-4 text-neo-black" />
             </Button>
             <Button
               variant="ghost"
@@ -94,7 +94,7 @@ const WaitingScreen: React.FC<WaitingScreenProps> = ({
               className="w-full h-12 min-h-[48px] p-0 bg-neo-green/90 hover:bg-neo-green border-3 border-neo-black rounded-neo flex items-center justify-center shadow-hard"
               title={t('hostView.shareWhatsapp')}
             >
-              <FaWhatsapp className="text-base text-neo-black" />
+              <MessageCircle className="w-4 h-4 text-neo-black" />
             </Button>
           </div>
 
@@ -106,7 +106,7 @@ const WaitingScreen: React.FC<WaitingScreenProps> = ({
             className="w-full h-12 min-h-[48px] p-0 bg-neo-purple/90 hover:bg-neo-purple border-3 border-neo-black rounded-neo flex items-center justify-center shadow-hard"
             title={t('hostView.qrCode')}
           >
-            <FaQrcode className="text-base text-neo-cream" />
+            <QrCode className="w-4 h-4 text-neo-cream" />
           </Button>
 
           {/* Exit Button */}
@@ -116,7 +116,7 @@ const WaitingScreen: React.FC<WaitingScreenProps> = ({
             onClick={onExitRoom}
             className="w-full h-12 min-h-[48px] p-0 bg-neo-red/90 hover:bg-neo-red border-3 border-neo-black rounded-neo mt-auto flex items-center justify-center shadow-hard"
           >
-            <FaTimes className="text-base text-neo-black" />
+            <X className="w-4 h-4 text-neo-black" />
           </Button>
         </div>
 
@@ -154,7 +154,7 @@ const WaitingScreen: React.FC<WaitingScreenProps> = ({
 
           {/* Players Header */}
           <div className="text-sm font-black uppercase text-neo-cream text-center flex items-center justify-center gap-2">
-            <FaUsers className="text-neo-pink text-base" />
+            <Users className="w-4 h-4 text-neo-pink" />
             <span>{playersReady.length}</span>
           </div>
           <div className="flex-1 overflow-y-auto space-y-2">
@@ -181,7 +181,7 @@ const WaitingScreen: React.FC<WaitingScreenProps> = ({
                       size="xl"
                       className="flex-shrink-0"
                     />
-                    {playerIsHost && <FaCrown className="text-sm flex-shrink-0" />}
+                    {playerIsHost && <Crown className="w-4 h-4 flex-shrink-0" />}
                     <span className="truncate text-sm font-bold">{playerUsername}</span>
                     {isMe && <span className="text-xs opacity-70">({t('playerView.me')})</span>}
                   </div>
@@ -201,7 +201,7 @@ const WaitingScreen: React.FC<WaitingScreenProps> = ({
           <DialogContent className="sm:max-w-md bg-white text-neo-black dark:bg-slate-800 dark:text-white border-cyan-500/30">
             <DialogHeader>
               <DialogTitle className="text-center text-cyan-600 dark:text-cyan-300 flex items-center justify-center gap-2">
-                <FaQrcode />
+                <QrCode className="w-4 h-4" />
                 {t(isHost ? 'hostView.qrCode' : 'joinView.qrCodeTitle')}
               </DialogTitle>
             </DialogHeader>
@@ -275,21 +275,21 @@ const WaitingScreen: React.FC<WaitingScreenProps> = ({
               <ShareButton
                 variant="secondary"
                 onClick={() => copyJoinUrl(gameCode, t)}
-                icon={<FaLink />}
+                icon={<Link className="w-4 h-4" />}
               >
                 {t(isHost ? 'hostView.copyLink' : 'joinView.copyLink')}
               </ShareButton>
               <ShareButton
                 variant="whatsapp"
                 onClick={() => shareViaWhatsApp(gameCode, '', t)}
-                icon={<FaWhatsapp />}
+                icon={<MessageCircle className="w-4 h-4" />}
               >
                 {t(isHost ? 'hostView.shareWhatsapp' : 'joinView.shareWhatsapp')}
               </ShareButton>
               <ShareButton
                 variant="secondary"
                 onClick={() => setShowQR(true)}
-                icon={<FaQrcode />}
+                icon={<QrCode className="w-4 h-4" />}
               >
                 {t('hostView.qrCode')}
               </ShareButton>
@@ -381,7 +381,7 @@ const WaitingScreen: React.FC<WaitingScreenProps> = ({
               }}
             />
             <h3 className="text-lg font-black uppercase text-neo-cream mb-4 flex items-center gap-2 flex-shrink-0 relative z-10">
-              <FaUsers className="text-neo-pink" />
+              <Users className="w-4 h-4 text-neo-pink" />
               {t(isHost ? 'hostView.playersJoined' : 'playerView.players')} ({playersReady.length})
             </h3>
             <div className="flex flex-col gap-3 flex-1 overflow-y-auto relative z-10">
@@ -414,7 +414,7 @@ const WaitingScreen: React.FC<WaitingScreenProps> = ({
                           size="2xl"
                           className="flex-shrink-0"
                         />
-                        {playerIsHost && <FaCrown className="text-neo-yellow" />}
+                        {playerIsHost && <Crown className="w-4 h-4 text-neo-yellow" />}
                         <SlotMachineText text={playerUsername} />
                         {isMe && (
                           <span className="text-xs bg-neo-black/20 px-2 py-0.5 rounded-neo font-bold">
@@ -451,7 +451,7 @@ const WaitingScreen: React.FC<WaitingScreenProps> = ({
         <DialogContent className="sm:max-w-md bg-white text-neo-black dark:bg-slate-800 dark:text-white border-cyan-500/30">
           <DialogHeader>
             <DialogTitle className="text-center text-cyan-600 dark:text-cyan-300 flex items-center justify-center gap-2">
-              <FaQrcode />
+              <QrCode className="w-4 h-4" />
               {t(isHost ? 'hostView.qrCode' : 'joinView.qrCodeTitle')}
             </DialogTitle>
           </DialogHeader>

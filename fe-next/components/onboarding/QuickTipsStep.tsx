@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import { FaUser, FaUsers, FaCalendarDay, FaHandPointer, FaStar, FaBolt } from 'react-icons/fa';
+import { User, Users, CalendarDays, Pointer, Star, Zap } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 
@@ -23,19 +23,19 @@ const QuickTipsStep: React.FC<QuickTipsStepProps> = ({
 
   const tips = [
     {
-      icon: FaHandPointer,
+      icon: Pointer,
       color: 'bg-neo-cyan',
       titleKey: 'onboarding.quickTips.tip1Title',
       textKey: 'onboarding.quickTips.tip1Text',
     },
     {
-      icon: FaStar,
+      icon: Star,
       color: 'bg-neo-yellow',
       titleKey: 'onboarding.quickTips.tip2Title',
       textKey: 'onboarding.quickTips.tip2Text',
     },
     {
-      icon: FaBolt,
+      icon: Zap,
       color: 'bg-neo-pink',
       titleKey: 'onboarding.quickTips.tip3Title',
       textKey: 'onboarding.quickTips.tip3Text',
@@ -45,17 +45,17 @@ const QuickTipsStep: React.FC<QuickTipsStepProps> = ({
   const modes = [
     {
       id: 'single' as const,
-      icon: FaUser,
+      icon: User,
       color: 'bg-neo-yellow',
     },
     {
       id: 'multi' as const,
-      icon: FaUsers,
+      icon: Users,
       color: 'bg-neo-orange',
     },
     {
       id: 'daily' as const,
-      icon: FaCalendarDay,
+      icon: CalendarDays,
       color: 'bg-neo-pink',
     },
   ];

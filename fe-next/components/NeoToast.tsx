@@ -3,7 +3,7 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import toast from 'react-hot-toast';
-import { FaRobot } from 'react-icons/fa';
+import { Bot } from 'lucide-react';
 import { applyHebrewFinalLetters } from '@/utils/utils';
 
 /**
@@ -236,7 +236,7 @@ export const wordAIValidatingToast = (word: string, options: WordAIValidatingOpt
               transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
               className="text-2xl flex items-center justify-center"
             >
-              <FaRobot className="text-neo-cream" />
+              <Bot className="text-neo-cream" />
             </motion.span>
             <div className="flex flex-col">
               <span className="font-black uppercase tracking-wide text-neo-cream">

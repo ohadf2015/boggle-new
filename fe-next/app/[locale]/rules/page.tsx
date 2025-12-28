@@ -5,7 +5,7 @@ import Link from 'next/link';
 import Script from 'next/script';
 import dynamic from 'next/dynamic';
 import { motion } from 'framer-motion';
-import { FaGamepad, FaTrophy, FaLightbulb, FaUsers, FaArrowLeft, FaPlay, FaRobot, FaCheckCircle } from 'react-icons/fa';
+import { Gamepad2, Trophy, Lightbulb, Users, ArrowLeft, Play, Bot, CheckCircle } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import Header from '@/components/Header';
@@ -122,7 +122,7 @@ export default function RulesPage(): React.JSX.Element {
                     <Card className="border-4 border-neo-black shadow-hard-lg bg-white dark:bg-slate-800 overflow-hidden">
                         <CardHeader className="bg-gradient-to-r from-neo-cyan/30 to-neo-pink/30 border-b-4 border-neo-black py-4">
                             <CardTitle className="flex items-center justify-center gap-3 text-xl sm:text-2xl font-black text-slate-900 dark:text-white">
-                                <FaGamepad className="text-neo-pink" />
+                                <Gamepad2 className="text-neo-pink" />
                                 {t('footer.interactiveTutorial')}
                             </CardTitle>
                         </CardHeader>
@@ -143,7 +143,7 @@ export default function RulesPage(): React.JSX.Element {
                     <Card className="border-4 border-neo-black shadow-hard-lg bg-white dark:bg-slate-800">
                         <CardHeader className="bg-neo-lime/20 border-b-4 border-neo-black py-4">
                             <CardTitle className="flex items-center gap-3 text-xl sm:text-2xl font-black text-slate-900 dark:text-white">
-                                <FaPlay className="text-neo-black dark:text-white" />
+                                <Play className="text-neo-black dark:text-white" />
                                 {t('rules.gameModes') || 'Game Modes'}
                             </CardTitle>
                         </CardHeader>
@@ -152,20 +152,20 @@ export default function RulesPage(): React.JSX.Element {
                                 {/* Multiplayer Card */}
                                 <div className="p-4 rounded-xl bg-neo-cyan/10 border-3 border-neo-black">
                                     <div className={`flex items-center gap-2 mb-3 ${dir === 'rtl' ? 'flex-row-reverse' : ''}`}>
-                                        <FaUsers className="text-neo-purple text-xl flex-shrink-0" />
+                                        <Users className="text-neo-purple text-xl flex-shrink-0" />
                                         <h3 className="font-bold text-lg text-slate-900 dark:text-white">{t('landing.multiPlayer')}</h3>
                                     </div>
                                     <ul className={`space-y-2 text-sm text-slate-600 dark:text-slate-300 ${dir === 'rtl' ? 'text-right' : ''}`}>
                                         <li className={`flex items-start gap-2 ${dir === 'rtl' ? 'flex-row-reverse' : ''}`}>
-                                            <FaCheckCircle className="text-neo-lime mt-0.5 flex-shrink-0" />
+                                            <CheckCircle className="text-neo-lime mt-0.5 flex-shrink-0" />
                                             <span>{t('rules.joinOrCreateDesc')}</span>
                                         </li>
                                         <li className={`flex items-start gap-2 ${dir === 'rtl' ? 'flex-row-reverse' : ''}`}>
-                                            <FaCheckCircle className="text-neo-lime mt-0.5 flex-shrink-0" />
+                                            <CheckCircle className="text-neo-lime mt-0.5 flex-shrink-0" />
                                             <span>{t('rules.raceAgainstTimeDesc')}</span>
                                         </li>
                                         <li className={`flex items-start gap-2 ${dir === 'rtl' ? 'flex-row-reverse' : ''}`}>
-                                            <FaCheckCircle className="text-neo-lime mt-0.5 flex-shrink-0" />
+                                            <CheckCircle className="text-neo-lime mt-0.5 flex-shrink-0" />
                                             <span>{t('rules.competeAndWinDesc')}</span>
                                         </li>
                                     </ul>
@@ -175,7 +175,7 @@ export default function RulesPage(): React.JSX.Element {
                                                 size="sm"
                                                 className="bg-neo-cyan text-neo-black hover:bg-neo-cyan/90 font-bold w-full"
                                             >
-                                                <FaUsers className={dir === 'rtl' ? 'ml-2' : 'mr-2'} />
+                                                <Users className={dir === 'rtl' ? 'ml-2' : 'mr-2'} />
                                                 {t('landing.multiPlayer')}
                                             </Button>
                                         </Link>
@@ -185,20 +185,20 @@ export default function RulesPage(): React.JSX.Element {
                                 {/* Single Player Card */}
                                 <div className="p-4 rounded-xl bg-neo-orange/10 border-3 border-neo-black">
                                     <div className={`flex items-center gap-2 mb-3 ${dir === 'rtl' ? 'flex-row-reverse' : ''}`}>
-                                        <FaRobot className="text-neo-orange text-xl flex-shrink-0" />
+                                        <Bot className="text-neo-orange text-xl flex-shrink-0" />
                                         <h3 className="font-bold text-lg text-slate-900 dark:text-white">{t('landing.singlePlayer')}</h3>
                                     </div>
                                     <ul className={`space-y-2 text-sm text-slate-600 dark:text-slate-300 ${dir === 'rtl' ? 'text-right' : ''}`}>
                                         <li className={`flex items-start gap-2 ${dir === 'rtl' ? 'flex-row-reverse' : ''}`}>
-                                            <FaCheckCircle className="text-neo-lime mt-0.5 flex-shrink-0" />
+                                            <CheckCircle className="text-neo-lime mt-0.5 flex-shrink-0" />
                                             <span>{t('rules.soloVsBotsDesc')}</span>
                                         </li>
                                         <li className={`flex items-start gap-2 ${dir === 'rtl' ? 'flex-row-reverse' : ''}`}>
-                                            <FaCheckCircle className="text-neo-lime mt-0.5 flex-shrink-0" />
+                                            <CheckCircle className="text-neo-lime mt-0.5 flex-shrink-0" />
                                             <span>{t('rules.practiceModeDesc')}</span>
                                         </li>
                                         <li className={`flex items-start gap-2 ${dir === 'rtl' ? 'flex-row-reverse' : ''}`}>
-                                            <FaCheckCircle className="text-neo-lime mt-0.5 flex-shrink-0" />
+                                            <CheckCircle className="text-neo-lime mt-0.5 flex-shrink-0" />
                                             <span>{t('rules.challengeModeDesc')}</span>
                                         </li>
                                     </ul>
@@ -208,7 +208,7 @@ export default function RulesPage(): React.JSX.Element {
                                                 size="sm"
                                                 className="bg-neo-orange text-neo-black hover:bg-neo-orange/90 font-bold w-full"
                                             >
-                                                <FaRobot className={dir === 'rtl' ? 'ml-2' : 'mr-2'} />
+                                                <Bot className={dir === 'rtl' ? 'ml-2' : 'mr-2'} />
                                                 {t('landing.singlePlayer')}
                                             </Button>
                                         </Link>
@@ -228,7 +228,7 @@ export default function RulesPage(): React.JSX.Element {
                     <Card className="border-4 border-neo-black shadow-hard-lg bg-white dark:bg-slate-800">
                         <CardHeader className="bg-neo-pink/20 border-b-4 border-neo-black py-4">
                             <CardTitle className="flex items-center gap-3 text-xl sm:text-2xl font-black text-slate-900 dark:text-white">
-                                <FaTrophy className="text-amber-500" />
+                                <Trophy className="text-amber-500" />
                                 {t('howToPlay.scoringSystemTitle')}
                             </CardTitle>
                         </CardHeader>
@@ -277,7 +277,7 @@ export default function RulesPage(): React.JSX.Element {
                     <Card className="border-4 border-neo-black shadow-hard-lg bg-white dark:bg-slate-800">
                         <CardHeader className="bg-neo-purple/20 border-b-4 border-neo-black py-4">
                             <CardTitle className="flex items-center gap-3 text-xl sm:text-2xl font-black text-slate-900 dark:text-white">
-                                <FaLightbulb className="text-amber-500" />
+                                <Lightbulb className="text-amber-500" />
                                 {t('howToPlay.tipsTitle')}
                             </CardTitle>
                         </CardHeader>
@@ -325,7 +325,7 @@ export default function RulesPage(): React.JSX.Element {
                                 size="lg"
                                 className="bg-neo-cyan text-neo-black hover:bg-neo-cyan/90 font-bold text-lg px-6 py-5 w-full sm:w-auto"
                             >
-                                <FaPlay className={dir === 'rtl' ? 'ml-2' : 'mr-2'} />
+                                <Play className={dir === 'rtl' ? 'ml-2' : 'mr-2'} />
                                 {t('rules.startPlaying')}
                             </Button>
                         </Link>
@@ -335,7 +335,7 @@ export default function RulesPage(): React.JSX.Element {
                                 variant="outline"
                                 className="border-3 border-neo-black font-bold text-lg px-6 py-5 w-full sm:w-auto"
                             >
-                                <FaTrophy className={dir === 'rtl' ? 'ml-2' : 'mr-2'} />
+                                <Trophy className={dir === 'rtl' ? 'ml-2' : 'mr-2'} />
                                 {t('leaderboard.viewLeaderboard')}
                             </Button>
                         </Link>
@@ -359,7 +359,7 @@ export default function RulesPage(): React.JSX.Element {
                                 transition-colors duration-100
                             "
                         >
-                            <FaArrowLeft className={dir === 'rtl' ? 'rotate-180' : ''} />
+                            <ArrowLeft className={dir === 'rtl' ? 'rotate-180' : ''} />
                             {t('rules.backToHome')}
                         </motion.button>
                     </Link>

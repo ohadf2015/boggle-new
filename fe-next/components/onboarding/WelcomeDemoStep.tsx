@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import { FaHandPointUp } from 'react-icons/fa';
+import { Pointer } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import MiniGrid from './MiniGrid';
 
@@ -61,7 +61,7 @@ const WelcomeDemoStep: React.FC<WelcomeDemoStepProps> = ({
           className="bg-neo-yellow border-3 border-neo-black rounded-neo p-2.5 sm:p-4 shadow-hard-md max-w-sm text-center"
         >
           <div className="flex items-center justify-center gap-2 mb-1">
-            <FaHandPointUp className="text-xl text-neo-black animate-bounce" />
+            <Pointer className="text-xl text-neo-black animate-bounce" />
             <span className="font-bold text-neo-black text-xs sm:text-sm">
               {t('onboarding.welcome.demoInstruction')}
             </span>

@@ -286,6 +286,581 @@ function tryEmbedCompoundSeeded(
 }
 
 // ==========================================
+// Word-First Grid Generation (Core Fix)
+// ==========================================
+
+/**
+ * Result of word-first grid generation
+ * Contains both the grid AND the guaranteed target word
+ */
+export interface DailyPuzzle {
+  grid: LetterGrid;
+  targetWord: string;
+  puzzleDate: string;
+  language: Language;
+  puzzleNumber: number;
+}
+
+/**
+ * Fetch pre-selected target word from the database
+ * Returns null if not found (will fall back to deterministic selection)
+ */
+async function fetchPreSelectedWord(
+  dateString: string,
+  language: Language
+): Promise<string | null> {
+  // Only run on server side
+  if (typeof window !== 'undefined') {
+    return null;
+  }
+
+  try {
+    // Dynamic import to avoid client-side issues
+    const { getSupabase, isSupabaseConfigured } = await import('@/backend/modules/supabaseServer');
+
+    if (!isSupabaseConfigured()) {
+      return null;
+    }
+
+    const supabase = getSupabase();
+    const { data, error } = await supabase
+      .from('daily_target_words')
+      .select('target_word, override_word')
+      .eq('puzzle_date', dateString)
+      .eq('language', language)
+      .single();
+
+    if (error || !data) {
+      return null;
+    }
+
+    // Use override_word if set, otherwise use target_word
+    return data.override_word || data.target_word;
+  } catch {
+    // Silently fail and fall back to deterministic
+    return null;
+  }
+}
+
+/**
+ * Generate a daily puzzle with GUARANTEED playable target word
+ *
+ * ALGORITHM (Word-First):
+ * 1. Check database for pre-selected word (AI-generated or admin override)
+ * 2. If not found, select target word deterministically from date
+ * 3. Generate a grid that embeds the word along a valid path
+ * 4. Fill remaining cells with seeded random letters
+ *
+ * This eliminates the possibility of an unsolvable puzzle.
+ *
+ * @param dateString - Date string (YYYY-MM-DD)
+ * @param language - Game language
+ * @param preSelectedWord - Optional pre-selected word (skips DB lookup)
+ * @returns Puzzle with guaranteed playable word
+ */
+export function generateDailyPuzzle(
+  dateString: string,
+  language: Language,
+  preSelectedWord?: string
+): DailyPuzzle {
+  // Create seed from date + language + salt
+  const seedString = `${SEED_SALT}-${dateString}-${language}-v2`;
+  const seed = hashString(seedString);
+  const random = mulberry32(seed);
+
+  // Get grid dimensions
+  const rows = DIFFICULTIES[DEFAULT_DIFFICULTY].rows;
+  const cols = DIFFICULTIES[DEFAULT_DIFFICULTY].cols;
+
+  // Get letters for the language
+  let letters: string[];
+  if (language === 'en') {
+    letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
+  } else if (language === 'sv') {
+    letters = swedishLetters;
+  } else if (language === 'es') {
+    letters = spanishLetters;
+  } else if (language === 'ja') {
+    // Japanese uses different word embedding strategy
+    return generateJapaneseDailyPuzzle(dateString, language, random, rows, cols, preSelectedWord);
+  } else {
+    letters = hebrewLetters;
+  }
+
+  // STEP 1: Select target word - use pre-selected if provided, otherwise deterministic
+  let targetWord: string;
+
+  if (preSelectedWord) {
+    targetWord = preSelectedWord.toUpperCase();
+  } else {
+    // Deterministic fallback
+    const wordList = TARGET_WORD_LISTS[language] || TARGET_WORD_LISTS['en'];
+    const fourLetterWords = wordList.filter(word => word.length === 4);
+
+    // Shuffle word list using seeded random (Fisher-Yates)
+    const shuffled = [...fourLetterWords];
+    for (let i = shuffled.length - 1; i > 0; i--) {
+      const j = Math.floor(random() * (i + 1));
+      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    }
+
+    // Pick the first word (deterministic)
+    targetWord = shuffled[0];
+  }
+
+  // STEP 2: Get bonus words for survival mode playability
+  const bonusWordList = BONUS_WORD_LISTS[language] || BONUS_WORD_LISTS['en'];
+  const shuffledBonus = [...bonusWordList];
+  for (let i = shuffledBonus.length - 1; i > 0; i--) {
+    const j = Math.floor(random() * (i + 1));
+    [shuffledBonus[i], shuffledBonus[j]] = [shuffledBonus[j], shuffledBonus[i]];
+  }
+  // Select 6-10 bonus words to attempt embedding
+  const bonusWordsToEmbed = shuffledBonus.slice(0, 10);
+
+  // STEP 3: Create grid with target word AND bonus words embedded
+  const grid = embedMultipleWordsInGrid(targetWord, bonusWordsToEmbed, letters, rows, cols, random, language);
+
+  return {
+    grid,
+    targetWord,
+    puzzleDate: dateString,
+    language,
+    puzzleNumber: getPuzzleNumber(dateString)
+  };
+}
+
+/**
+ * Generate a daily puzzle with async database lookup for pre-selected word
+ * Use this on the server-side to get AI-selected words when available
+ *
+ * @param dateString - Date string (YYYY-MM-DD)
+ * @param language - Game language
+ * @returns Puzzle with AI-selected or deterministic word
+ */
+export async function generateDailyPuzzleAsync(
+  dateString: string,
+  language: Language
+): Promise<DailyPuzzle> {
+  // Try to fetch pre-selected word from database
+  const preSelectedWord = await fetchPreSelectedWord(dateString, language);
+
+  // Generate puzzle with pre-selected word (or fall back to deterministic)
+  return generateDailyPuzzle(dateString, language, preSelectedWord || undefined);
+}
+
+/**
+ * Embed a word into a grid along a valid adjacent path
+ * Then fill remaining cells with random letters
+ */
+function embedWordInGrid(
+  word: string,
+  letters: string[],
+  rows: number,
+  cols: number,
+  random: () => number,
+  language: Language
+): LetterGrid {
+  const grid: (string | null)[][] = Array(rows).fill(null).map(() => Array(cols).fill(null));
+  const wordUpper = word.toUpperCase();
+
+  // 8 directions for adjacent cells (including diagonals)
+  const directions = [
+    { dr: -1, dc: -1 }, { dr: -1, dc: 0 }, { dr: -1, dc: 1 },
+    { dr: 0, dc: -1 },                      { dr: 0, dc: 1 },
+    { dr: 1, dc: -1 },  { dr: 1, dc: 0 },  { dr: 1, dc: 1 },
+  ];
+
+  // Try to place the word starting from random positions
+  let placed = false;
+  const maxAttempts = 100;
+
+  for (let attempt = 0; attempt < maxAttempts && !placed; attempt++) {
+    // Pick random starting position
+    const startRow = Math.floor(random() * rows);
+    const startCol = Math.floor(random() * cols);
+
+    // Try to find a valid path for the word using DFS
+    const path = findWordPath(wordUpper, startRow, startCol, rows, cols, random, directions);
+
+    if (path && path.length === wordUpper.length) {
+      // Place the word along the path
+      for (let i = 0; i < path.length; i++) {
+        grid[path[i].row][path[i].col] = wordUpper[i];
+      }
+      placed = true;
+    }
+  }
+
+  // If somehow couldn't place (very unlikely), use linear placement as fallback
+  if (!placed) {
+    console.warn(`[Daily Puzzle] Using linear fallback for word: ${word}`);
+    // Place word in first row
+    for (let i = 0; i < wordUpper.length && i < cols; i++) {
+      grid[0][i] = wordUpper[i];
+    }
+  }
+
+  // STEP 3: Fill remaining cells with random letters
+  for (let i = 0; i < rows; i++) {
+    for (let j = 0; j < cols; j++) {
+      if (grid[i][j] === null) {
+        const randomIndex = Math.floor(random() * letters.length);
+        grid[i][j] = letters[randomIndex];
+      }
+    }
+  }
+
+  return grid as LetterGrid;
+}
+
+/**
+ * Embed multiple words into a grid for survival mode playability
+ * First embeds the target word (required), then tries to embed bonus words
+ * Finally fills remaining cells with random letters
+ *
+ * @param targetWord - The main target word (must be embedded)
+ * @param bonusWords - Additional words to try embedding for survival mode
+ * @param letters - Available letters for this language
+ * @param rows - Grid rows
+ * @param cols - Grid columns
+ * @param random - Seeded random function
+ * @param language - Language code
+ * @returns Grid with embedded words
+ */
+function embedMultipleWordsInGrid(
+  targetWord: string,
+  bonusWords: string[],
+  letters: string[],
+  rows: number,
+  cols: number,
+  random: () => number,
+  language: Language
+): LetterGrid {
+  const grid: (string | null)[][] = Array(rows).fill(null).map(() => Array(cols).fill(null));
+  const usedCells = new Set<string>();
+
+  // 8 directions for adjacent cells (including diagonals)
+  const directions = [
+    { dr: -1, dc: -1 }, { dr: -1, dc: 0 }, { dr: -1, dc: 1 },
+    { dr: 0, dc: -1 },                      { dr: 0, dc: 1 },
+    { dr: 1, dc: -1 },  { dr: 1, dc: 0 },  { dr: 1, dc: 1 },
+  ];
+
+  // STEP 1: Embed the target word (REQUIRED)
+  const targetUpper = targetWord.toUpperCase();
+  let targetPlaced = false;
+  const maxAttempts = 100;
+
+  for (let attempt = 0; attempt < maxAttempts && !targetPlaced; attempt++) {
+    const startRow = Math.floor(random() * rows);
+    const startCol = Math.floor(random() * cols);
+    const path = findWordPathInPartialGrid(targetUpper, startRow, startCol, rows, cols, random, directions, grid, usedCells);
+
+    if (path && path.length === targetUpper.length) {
+      for (let i = 0; i < path.length; i++) {
+        grid[path[i].row][path[i].col] = targetUpper[i];
+        usedCells.add(`${path[i].row},${path[i].col}`);
+      }
+      targetPlaced = true;
+    }
+  }
+
+  // Fallback if target word couldn't be placed (very unlikely)
+  if (!targetPlaced) {
+    console.warn(`[Daily Puzzle] Using linear fallback for target word: ${targetWord}`);
+    for (let i = 0; i < targetUpper.length && i < cols; i++) {
+      grid[0][i] = targetUpper[i];
+      usedCells.add(`0,${i}`);
+    }
+  }
+
+  // STEP 2: Try to embed bonus words for survival mode playability
+  let embeddedCount = 0;
+  const maxBonusWords = 6; // Embed up to 6 bonus words
+
+  for (const bonusWord of bonusWords) {
+    if (embeddedCount >= maxBonusWords) break;
+
+    const wordUpper = bonusWord.toUpperCase();
+    let wordPlaced = false;
+
+    // Try a few random positions
+    for (let attempt = 0; attempt < 30 && !wordPlaced; attempt++) {
+      const startRow = Math.floor(random() * rows);
+      const startCol = Math.floor(random() * cols);
+
+      const path = findWordPathInPartialGrid(wordUpper, startRow, startCol, rows, cols, random, directions, grid, usedCells);
+
+      if (path && path.length === wordUpper.length) {
+        // Place the word
+        for (let i = 0; i < path.length; i++) {
+          grid[path[i].row][path[i].col] = wordUpper[i];
+          usedCells.add(`${path[i].row},${path[i].col}`);
+        }
+        wordPlaced = true;
+        embeddedCount++;
+      }
+    }
+  }
+
+  // STEP 3: Fill remaining cells with random letters
+  for (let i = 0; i < rows; i++) {
+    for (let j = 0; j < cols; j++) {
+      if (grid[i][j] === null) {
+        const randomIndex = Math.floor(random() * letters.length);
+        grid[i][j] = letters[randomIndex];
+      }
+    }
+  }
+
+  return grid as LetterGrid;
+}
+
+/**
+ * Find a valid adjacent path for a word in a partially filled grid
+ * Allows placing letters in empty cells or reusing cells with matching letters
+ */
+function findWordPathInPartialGrid(
+  word: string,
+  startRow: number,
+  startCol: number,
+  rows: number,
+  cols: number,
+  random: () => number,
+  directions: Array<{ dr: number; dc: number }>,
+  grid: (string | null)[][],
+  usedCells: Set<string>
+): Array<{ row: number; col: number }> | null {
+  const path: Array<{ row: number; col: number }> = [];
+  const visited = new Set<string>();
+
+  function dfs(row: number, col: number, charIndex: number): boolean {
+    if (charIndex === word.length) {
+      return true;
+    }
+
+    if (row < 0 || row >= rows || col < 0 || col >= cols) {
+      return false;
+    }
+
+    const key = `${row},${col}`;
+    if (visited.has(key)) {
+      return false;
+    }
+
+    // Check if this cell is valid:
+    // - Empty (null) - we can place our letter
+    // - Has matching letter - we can share this cell
+    const cellValue = grid[row][col];
+    const neededChar = word[charIndex];
+    if (cellValue !== null && cellValue !== neededChar) {
+      return false; // Cell has a different letter
+    }
+
+    visited.add(key);
+    path.push({ row, col });
+
+    if (charIndex === word.length - 1) {
+      return true;
+    }
+
+    const shuffledDirs = [...directions].sort(() => random() - 0.5);
+    for (const dir of shuffledDirs) {
+      if (dfs(row + dir.dr, col + dir.dc, charIndex + 1)) {
+        return true;
+      }
+    }
+
+    visited.delete(key);
+    path.pop();
+    return false;
+  }
+
+  if (dfs(startRow, startCol, 0)) {
+    return path;
+  }
+  return null;
+}
+
+/**
+ * Find a valid adjacent path for a word starting from given position
+ * Uses randomized DFS to create varied path shapes
+ */
+function findWordPath(
+  word: string,
+  startRow: number,
+  startCol: number,
+  rows: number,
+  cols: number,
+  random: () => number,
+  directions: Array<{ dr: number; dc: number }>
+): Array<{ row: number; col: number }> | null {
+  const path: Array<{ row: number; col: number }> = [];
+  const visited = new Set<string>();
+
+  function dfs(row: number, col: number, charIndex: number): boolean {
+    if (charIndex === word.length) {
+      return true; // Successfully placed all characters
+    }
+
+    // Check bounds
+    if (row < 0 || row >= rows || col < 0 || col >= cols) {
+      return false;
+    }
+
+    const key = `${row},${col}`;
+    if (visited.has(key)) {
+      return false; // Already used this cell
+    }
+
+    // Mark as visited and add to path
+    visited.add(key);
+    path.push({ row, col });
+
+    if (charIndex === word.length - 1) {
+      return true; // Last character placed
+    }
+
+    // Shuffle directions for variety
+    const shuffledDirs = [...directions].sort(() => random() - 0.5);
+
+    // Try each direction
+    for (const dir of shuffledDirs) {
+      const newRow = row + dir.dr;
+      const newCol = col + dir.dc;
+      if (dfs(newRow, newCol, charIndex + 1)) {
+        return true;
+      }
+    }
+
+    // Backtrack
+    visited.delete(key);
+    path.pop();
+    return false;
+  }
+
+  if (dfs(startRow, startCol, 0)) {
+    return path;
+  }
+  return null;
+}
+
+/**
+ * Generate Japanese daily puzzle with embedded compound
+ */
+function generateJapaneseDailyPuzzle(
+  dateString: string,
+  language: Language,
+  random: () => number,
+  rows: number,
+  cols: number,
+  preSelectedWord?: string
+): DailyPuzzle {
+  // Use pre-selected word if provided
+  let targetWord: string;
+
+  if (preSelectedWord) {
+    targetWord = preSelectedWord;
+  } else {
+    // For Japanese, use 2-character compounds as target
+    const japaneseTargets = TARGET_WORD_LISTS['ja'] || [];
+    const twoCharWords = japaneseTargets.filter(w => w.length === 2);
+
+    // Shuffle and pick first
+    const shuffled = [...twoCharWords];
+    for (let i = shuffled.length - 1; i > 0; i--) {
+      const j = Math.floor(random() * (i + 1));
+      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    }
+
+    targetWord = shuffled[0] || '日本';
+  }
+
+  // Get bonus words for survival mode playability
+  const japaneseBonusWords = BONUS_WORD_LISTS['ja'] || [];
+  const shuffledBonus = [...japaneseBonusWords];
+  for (let i = shuffledBonus.length - 1; i > 0; i--) {
+    const j = Math.floor(random() * (i + 1));
+    [shuffledBonus[i], shuffledBonus[j]] = [shuffledBonus[j], shuffledBonus[i]];
+  }
+  const bonusWordsToEmbed = shuffledBonus.slice(0, 8);
+
+  // Generate grid with Japanese characters
+  const grid: (string | null)[][] = Array(rows).fill(null).map(() => Array(cols).fill(null));
+  const usedCells = new Set<string>();
+
+  // 8 directions for adjacent cells
+  const directions = [
+    { dr: -1, dc: -1 }, { dr: -1, dc: 0 }, { dr: -1, dc: 1 },
+    { dr: 0, dc: -1 },                      { dr: 0, dc: 1 },
+    { dr: 1, dc: -1 },  { dr: 1, dc: 0 },  { dr: 1, dc: 1 },
+  ];
+
+  // Place target word (2 chars) adjacently
+  const startRow = Math.floor(random() * rows);
+  const startCol = Math.floor(random() * (cols - 1)); // Ensure room for 2 chars
+  grid[startRow][startCol] = targetWord[0];
+  grid[startRow][startCol + 1] = targetWord[1];
+  usedCells.add(`${startRow},${startCol}`);
+  usedCells.add(`${startRow},${startCol + 1}`);
+
+  // Embed bonus words for survival mode
+  let embeddedCount = 0;
+  const maxBonusWords = 6;
+
+  for (const bonusWord of bonusWordsToEmbed) {
+    if (embeddedCount >= maxBonusWords) break;
+
+    const wordChars = bonusWord.split('');
+    let wordPlaced = false;
+
+    for (let attempt = 0; attempt < 30 && !wordPlaced; attempt++) {
+      const bStartRow = Math.floor(random() * rows);
+      const bStartCol = Math.floor(random() * cols);
+
+      const path = findWordPathInPartialGrid(bonusWord, bStartRow, bStartCol, rows, cols, random, directions, grid, usedCells);
+
+      if (path && path.length === wordChars.length) {
+        for (let i = 0; i < path.length; i++) {
+          grid[path[i].row][path[i].col] = wordChars[i];
+          usedCells.add(`${path[i].row},${path[i].col}`);
+        }
+        wordPlaced = true;
+        embeddedCount++;
+      }
+    }
+  }
+
+  // Fill rest with random Japanese characters
+  for (let i = 0; i < rows; i++) {
+    for (let j = 0; j < cols; j++) {
+      if (grid[i][j] === null) {
+        const randomIndex = Math.floor(random() * japaneseLetters.length);
+        grid[i][j] = japaneseLetters[randomIndex];
+      }
+    }
+  }
+
+  return {
+    grid: grid as LetterGrid,
+    targetWord,
+    puzzleDate: dateString,
+    language,
+    puzzleNumber: getPuzzleNumber(dateString)
+  };
+}
+
+/**
+ * Get today's daily puzzle
+ * Convenience wrapper for generateDailyPuzzle
+ */
+export function getTodaysDailyPuzzle(language: Language): DailyPuzzle {
+  const date = getDailyChallengeDate();
+  return generateDailyPuzzle(date, language);
+}
+
+// ==========================================
 // Word Hunt Results (New Daily Challenge Format)
 // ==========================================
 
@@ -411,6 +986,7 @@ ${dailyUrl}`;
 /**
  * Generate Word Hunt share text (Wordle-style emoji grid)
  * Shows attempt feedback patterns without spoiling the target word
+ * Includes "Beat My Score" challenge link for viral sharing
  */
 export function generateWordHuntShareableResult(result: WordHuntResult, siteUrl?: string): string {
   // Import feedback emoji function
@@ -429,21 +1005,54 @@ export function generateWordHuntShareableResult(result: WordHuntResult, siteUrl?
   // Format streak if > 1
   const streakText = result.streakDays > 1 ? `🔥 ${result.streakDays} day streak!\n` : '';
 
-  // Build URL
-  let dailyUrl = 'lexiclash.live/daily';
-  if (typeof window !== 'undefined') {
-    const origin = window.location.origin;
-    dailyUrl = `${origin}/${result.language}/daily`;
-  } else if (siteUrl) {
-    dailyUrl = `${siteUrl}/${result.language}/daily`;
+  // Build survival mode stats line (if available)
+  let survivalStats = '';
+  if (result.wordsDiscovered && result.wordsDiscovered.length > 0) {
+    const statsItems: string[] = [];
+    if (result.lifeRemaining !== undefined && result.lifeRemaining > 0) {
+      statsItems.push(`❤️${result.lifeRemaining}`);
+    }
+    if (result.wordsDiscovered.length > 0) {
+      statsItems.push(`📖${result.wordsDiscovered.length}`);
+    }
+    if (result.efficiencyScore !== undefined && result.efficiencyScore > 0) {
+      statsItems.push(`⚡${result.efficiencyScore}`);
+    }
+    const netTokens = (result.clueTokensEarned || 0) - (result.clueTokensSpent || 0);
+    if (netTokens > 0) {
+      statsItems.push(`🪙${netTokens}`);
+    }
+    if (statsItems.length > 0) {
+      survivalStats = statsItems.join(' ') + '\n';
+    }
+  }
+
+  // Find and highlight rarest word (if words were discovered)
+  let rarestWordText = '';
+  if (result.wordsDiscovered && result.wordsDiscovered.length > 0) {
+    const rarestWord = findRarestWord(result.wordsDiscovered, result.language);
+    if (rarestWord && rarestWord.rarity >= 4) {
+      rarestWordText = `${rarestWord.emoji} Rarest find: ${rarestWord.word.toUpperCase()}\n`;
+    }
+  }
+
+  // Build challenge URL for "Beat My Score"
+  const challengeUrl = generateChallengeUrl(result);
+
+  // Build challenge CTA based on result
+  let challengeCta = '';
+  if (result.solved) {
+    challengeCta = `\n🔥 Beat ${result.attemptsUsed} attempts?\n${challengeUrl}`;
+  } else {
+    challengeCta = `\n🎯 Can you solve it?\n${challengeUrl}`;
   }
 
   // Build the shareable text
   return `🎯 LexiClash Word Hunt #${result.puzzleNumber}
+
 ${emojiGrid}
 ${resultLine}
-
-${streakText}${dailyUrl}`;
+${survivalStats}${rarestWordText}${streakText}${challengeCta}`;
 }
 
 /**
@@ -631,9 +1240,12 @@ export function getTodaysWordHuntResult(language: Language): StoredWordHuntResul
 
 /**
  * Save the result of today's Word Hunt
+ * Also updates the daily streak for Word Hunt completions
  */
-export function saveWordHuntResult(result: WordHuntResult): void {
-  if (typeof window === 'undefined') return;
+export function saveWordHuntResult(result: WordHuntResult): DailyStreak {
+  if (typeof window === 'undefined') {
+    return { currentStreak: 0, longestStreak: 0, lastPlayedDate: null, totalDailiesCompleted: 0 };
+  }
 
   const today = getDailyChallengeDate();
   const key = `${WORD_HUNT_STORAGE_KEY}_${result.language}_${today}`;
@@ -646,6 +1258,9 @@ export function saveWordHuntResult(result: WordHuntResult): void {
   };
 
   localStorage.setItem(key, JSON.stringify(storedResult));
+
+  // Update the daily streak when completing Word Hunt
+  return updateDailyStreak();
 }
 
 /**
@@ -764,6 +1379,149 @@ export function getStreakMilestone(streak: number): number | null {
   return milestones.find(m => m === streak) || null;
 }
 
+/**
+ * Get a celebratory message for streak milestones
+ */
+export function getStreakMilestoneMessage(streak: number): { emoji: string; title: string; subtitle: string } | null {
+  const milestoneMessages: Record<number, { emoji: string; title: string; subtitle: string }> = {
+    7: { emoji: '🔥', title: '1 WEEK STREAK!', subtitle: 'A full week of word hunting!' },
+    14: { emoji: '🌟', title: '2 WEEKS STRONG!', subtitle: 'Two weeks of dedication!' },
+    30: { emoji: '👑', title: 'MONTHLY MASTER!', subtitle: '30 days of excellence!' },
+    50: { emoji: '💎', title: 'LEGENDARY STREAK!', subtitle: '50 days unstoppable!' },
+    100: { emoji: '🏆', title: 'CENTURY CHAMPION!', subtitle: '100 days - you are a legend!' },
+    365: { emoji: '🌍', title: 'YEAR-LONG WARRIOR!', subtitle: '365 days of pure dedication!' },
+  };
+  return milestoneMessages[streak] || null;
+}
+
+// ==========================================
+// Challenge Link Utilities
+// ==========================================
+
+/**
+ * Generate a challenge URL for "Beat My Score" sharing
+ * Encodes the player's result to create a challenge link
+ */
+export function generateChallengeUrl(result: WordHuntResult): string {
+  const baseUrl = typeof window !== 'undefined' ? window.location.origin : 'https://lexiclash.live';
+
+  // Create challenge data
+  const challengeData = {
+    p: result.puzzleNumber,           // puzzle number
+    a: result.attemptsUsed,           // attempts used
+    s: result.solved ? 1 : 0,         // solved (1/0)
+    e: result.efficiencyScore || 0,   // efficiency score
+    w: result.wordsDiscovered?.length || 0, // words discovered
+  };
+
+  // Encode as base64
+  const encoded = btoa(JSON.stringify(challengeData));
+
+  return `${baseUrl}/${result.language}/daily?challenge=${encoded}`;
+}
+
+/**
+ * Parse a challenge URL parameter
+ */
+export function parseChallengeParam(encoded: string): {
+  puzzleNumber: number;
+  attemptsUsed: number;
+  solved: boolean;
+  efficiencyScore: number;
+  wordsDiscovered: number;
+} | null {
+  try {
+    const decoded = JSON.parse(atob(encoded));
+    return {
+      puzzleNumber: decoded.p,
+      attemptsUsed: decoded.a,
+      solved: decoded.s === 1,
+      efficiencyScore: decoded.e || 0,
+      wordsDiscovered: decoded.w || 0,
+    };
+  } catch {
+    return null;
+  }
+}
+
+// ==========================================
+// Word Rarity Utilities
+// ==========================================
+
+/**
+ * Common word frequency tiers (lower = more common)
+ * Words found less frequently are considered rarer
+ */
+const WORD_FREQUENCY_TIERS: Record<Language, Record<string, number>> = {
+  en: {
+    // Tier 1: Very common (frequency 1)
+    'THE': 1, 'AND': 1, 'FOR': 1, 'ARE': 1, 'BUT': 1, 'NOT': 1, 'YOU': 1, 'ALL': 1,
+    'CAN': 1, 'HER': 1, 'WAS': 1, 'ONE': 1, 'OUR': 1, 'OUT': 1, 'DAY': 1, 'HAD': 1,
+    // Tier 2: Common (frequency 2)
+    'CAT': 2, 'DOG': 2, 'RUN': 2, 'SUN': 2, 'FUN': 2, 'BIG': 2, 'TOP': 2, 'MAN': 2,
+    'RED': 2, 'BOX': 2, 'CUP': 2, 'PEN': 2, 'CAR': 2, 'BUS': 2, 'MAP': 2, 'KEY': 2,
+    // Tier 3: Less common (frequency 3)
+    'MOON': 3, 'STAR': 3, 'BIRD': 3, 'FISH': 3, 'TREE': 3, 'BOOK': 3, 'DOOR': 3, 'HAND': 3,
+    'FOOT': 3, 'HEAD': 3, 'ROCK': 3, 'SAND': 3, 'BOAT': 3, 'GAME': 3, 'WOLF': 3, 'BEAR': 3,
+    // Tier 4: Uncommon (frequency 4) - these are considered rare
+    'HAWK': 4, 'FROG': 4, 'DEER': 4, 'DUCK': 4, 'JADE': 4, 'RUBY': 4, 'SILK': 4, 'WOOL': 4,
+    'CAVE': 4, 'PEAK': 4, 'POND': 4, 'REEF': 4, 'MYTH': 4, 'BARD': 4, 'MAGE': 4, 'SAGE': 4,
+    // Tier 5: Rare (frequency 5) - these are very rare
+    'LYNX': 5, 'FLUX': 5, 'APEX': 5, 'VOID': 5, 'ECHO': 5, 'QUIZ': 5, 'MAZE': 5, 'GRID': 5,
+    'SWAN': 5, 'CROW': 5, 'MOTH': 5, 'WASP': 5, 'CRAB': 5, 'SEAL': 5, 'TOAD': 5, 'BREW': 5,
+  },
+  he: {},
+  sv: {},
+  ja: {},
+  es: {},
+  fr: {},
+  de: {},
+};
+
+/**
+ * Get the rarity score of a word (1-5, higher = rarer)
+ * Returns 3 (average) for unknown words
+ */
+export function getWordRarity(word: string, language: Language): number {
+  const wordUpper = word.toUpperCase();
+  const tiers = WORD_FREQUENCY_TIERS[language] || {};
+  return tiers[wordUpper] || 3; // Default to average rarity
+}
+
+/**
+ * Get rarity label and emoji based on rarity score
+ */
+export function getRarityLabel(rarity: number): { label: string; emoji: string; color: string } {
+  if (rarity >= 5) return { label: 'LEGENDARY', emoji: '💎', color: 'text-purple-500' };
+  if (rarity >= 4) return { label: 'RARE', emoji: '🌟', color: 'text-yellow-500' };
+  if (rarity >= 3) return { label: 'UNCOMMON', emoji: '✨', color: 'text-blue-500' };
+  return { label: 'COMMON', emoji: '📖', color: 'text-gray-500' };
+}
+
+/**
+ * Find the rarest word from a list of discovered words
+ */
+export function findRarestWord(
+  words: Array<{ word: string }>,
+  language: Language
+): { word: string; rarity: number; label: string; emoji: string } | null {
+  if (!words || words.length === 0) return null;
+
+  let rarestWord = words[0].word;
+  let highestRarity = getWordRarity(words[0].word, language);
+
+  for (const { word } of words) {
+    const rarity = getWordRarity(word, language);
+    if (rarity > highestRarity) {
+      highestRarity = rarity;
+      rarestWord = word;
+    }
+  }
+
+  const { label, emoji } = getRarityLabel(highestRarity);
+  return { word: rarestWord, rarity: highestRarity, label, emoji };
+}
+
 // ==========================================
 // Guest Player Info (for daily leaderboard display)
 // ==========================================
@@ -874,6 +1632,59 @@ async function getCanvasFingerprint(): Promise<string> {
 // ==========================================
 // Word Hunt Target Word Selection
 // ==========================================
+
+/**
+ * Bonus words to embed in the grid for survival mode playability
+ * These are short words (3 letters) that can be discovered for life/tokens
+ * Curated for each language to ensure validity
+ */
+const BONUS_WORD_LISTS: Record<Language, string[]> = {
+  en: [
+    // Common 3-letter English words for easy discovery
+    'THE', 'AND', 'FOR', 'ARE', 'BUT', 'NOT', 'YOU', 'ALL', 'CAN', 'HER',
+    'WAS', 'ONE', 'OUR', 'OUT', 'DAY', 'HAD', 'HOT', 'HAS', 'HIM', 'HIS',
+    'HOW', 'ITS', 'LET', 'MAY', 'OLD', 'SEE', 'NOW', 'WAY', 'WHO', 'OWN',
+    'SAY', 'SHE', 'TWO', 'USE', 'CAT', 'DOG', 'RUN', 'SUN', 'FUN', 'BIG',
+    'TOP', 'MAN', 'TEN', 'RED', 'BOX', 'CUP', 'JAR', 'PEN', 'CAR', 'BUS',
+    'SKY', 'SEA', 'MAP', 'KEY', 'NET', 'BAG', 'HAT', 'BED', 'LEG', 'ARM',
+  ],
+  he: [
+    // Common 2-3 letter Hebrew words
+    'גם', 'את', 'על', 'עם', 'אם', 'כל', 'אל', 'לא', 'זה', 'מה',
+    'טוב', 'רע', 'יד', 'עד', 'כן', 'או', 'בא', 'גן', 'דג', 'חם',
+    'קר', 'שם', 'פה', 'כי', 'רק', 'עוד', 'איך', 'למה', 'כמה', 'אחד',
+  ],
+  sv: [
+    // Common 2-3 letter Swedish words
+    'JAG', 'DU', 'HAN', 'HON', 'DET', 'OCH', 'ATT', 'ÄR', 'VAR', 'SOM',
+    'MEN', 'PÅ', 'EN', 'ETT', 'NU', 'UT', 'ÅR', 'FÖR', 'OM', 'NI',
+    'AV', 'KAN', 'SKA', 'HAR', 'VEM', 'HUR', 'MIG', 'DIG', 'SIG', 'UPP',
+  ],
+  ja: [
+    // Common 2-character Japanese words/kanji compounds
+    '私', '人', '日', '年', '時', '前', '今', '何', '事', '人',
+    '月', '火', '水', '木', '金', '土', '大', '中', '小', '新',
+    '上', '下', '左', '右', '外', '内', '口', '目', '手', '足',
+  ],
+  es: [
+    // Common 2-3 letter Spanish words
+    'SOL', 'MAR', 'PAN', 'SAL', 'LUZ', 'VOZ', 'PAZ', 'REY', 'LEY', 'TÚ',
+    'YO', 'EL', 'UN', 'DE', 'LA', 'EN', 'ES', 'NO', 'QUE', 'CON',
+    'POR', 'SER', 'SIN', 'MAS', 'TAN', 'VER', 'DAR', 'DOS', 'MIS', 'SUS',
+  ],
+  fr: [
+    // Common 2-3 letter French words
+    'LE', 'LA', 'DE', 'UN', 'UNE', 'ET', 'EN', 'DU', 'AU', 'OU',
+    'IL', 'JE', 'TU', 'ON', 'CE', 'ME', 'TE', 'SE', 'LUI', 'EUX',
+    'MOI', 'TOI', 'SOI', 'VIE', 'BON', 'OUI', 'NON', 'PAS', 'TON', 'SON',
+  ],
+  de: [
+    // Common 2-3 letter German words
+    'DER', 'DIE', 'DAS', 'UND', 'ICH', 'DU', 'ER', 'SIE', 'WIR', 'IHR',
+    'EIN', 'IST', 'AUF', 'MIT', 'FÜR', 'VON', 'BEI', 'ZU', 'AN', 'UM',
+    'OB', 'SO', 'WIE', 'WAS', 'WER', 'NUR', 'ORT', 'TAG', 'JA', 'ALT',
+  ],
+};
 
 /**
  * Curated lists of quality target words for Word Hunt mode

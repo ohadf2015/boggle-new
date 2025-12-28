@@ -2,7 +2,7 @@
 
 import React, { memo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FaUsers, FaCrown, FaRobot } from 'react-icons/fa';
+import { Users, Crown, Bot } from 'lucide-react';
 import { Card } from '../../../components/ui/card';
 import Avatar from '../../../components/Avatar';
 import SlotMachineText from '../../../components/SlotMachineText';
@@ -40,7 +40,7 @@ export const PlayersListPanel = memo<PlayersListPanelProps>(({
   return (
     <Card className="lg:w-[350px] h-auto p-3 sm:p-4 md:p-6 flex flex-col bg-slate-800/95 text-neo-white border-4 border-neo-black shadow-hard-lg">
       <h3 className="text-base font-bold uppercase text-neo-cream/80 mb-3 flex items-center gap-2 flex-shrink-0">
-        <FaUsers className="text-neo-pink/80" />
+        <Users className="text-neo-pink/80" />
         {t('hostView.playersJoined')} ({players.length})
       </h3>
       <div className="flex flex-col gap-1.5 flex-1 overflow-y-auto">
@@ -79,8 +79,8 @@ export const PlayersListPanel = memo<PlayersListPanelProps>(({
                     <span className="font-medium text-neo-cream/90">
                       <SlotMachineText text={playerUsername} />
                     </span>
-                    {isHostPlayer && <FaCrown className="text-neo-yellow/80 text-sm" />}
-                    {isBot && <FaRobot className="text-neo-cyan/70 text-sm" />}
+                    {isHostPlayer && <Crown className="text-neo-yellow/80 text-sm" />}
+                    {isBot && <Bot className="text-neo-cyan/70 text-sm" />}
                     {isMe && (
                       <span className="text-xs text-neo-cream/70 font-medium">
                         ({t('playerView.me')})

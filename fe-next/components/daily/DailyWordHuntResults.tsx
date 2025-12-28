@@ -2,9 +2,14 @@
 
 import React, { useState, useCallback, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FaArrowLeft, FaWhatsapp, FaCopy, FaCheck } from 'react-icons/fa';
-import { FaXTwitter } from 'react-icons/fa6';
-import { Share2, Trophy, Target, X, TrendingUp } from 'lucide-react';
+import { Share2, Trophy, Target, X, TrendingUp, ArrowLeft, MessageCircle, Copy, Check, Send } from 'lucide-react';
+
+// X/Twitter icon (no lucide equivalent)
+const XTwitterIcon = ({ className }: { className?: string }) => (
+  <svg className={className} viewBox="0 0 24 24" fill="currentColor" width="1em" height="1em">
+    <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+  </svg>
+);
 import { Button } from '@/components/ui/button';
 import confetti from 'canvas-confetti';
 import { cn } from '@/lib/utils';
@@ -12,9 +17,13 @@ import {
   generateWordHuntShareableResult,
   getGuestFingerprint,
   getGuestDailyPlayer,
+  getStreakMilestone,
+  getStreakMilestoneMessage,
+  findRarestWord,
   type WordHuntResult,
   type GuestDailyPlayer,
 } from '@/utils/dailyChallenge';
+import StreakMilestoneCelebration from './StreakMilestoneCelebration';
 import { feedbackToEmoji, type LetterFeedback } from '@/utils/wordHuntFeedback';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -69,7 +78,15 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
   const [guestFingerprint, setGuestFingerprint] = useState<string | null>(null);
   const [guestPlayer, setGuestPlayer] = useState<GuestDailyPlayer | null>(null);
   const [stats, setStats] = useState<WordHuntStats | null>(null);
+  const [showMilestoneCelebration, setShowMilestoneCelebration] = useState(false);
   const { profile, isAuthenticated } = useAuth();
+
+  // Check for streak milestone
+  const streakMilestone = getStreakMilestone(result.streakDays);
+  const milestoneMessage = streakMilestone ? getStreakMilestoneMessage(result.streakDays) : null;
+
+  // Find rarest word discovered
+  const rarestWord = result.wordsDiscovered ? findRarestWord(result.wordsDiscovered, language) : null;
 
   // Get guest fingerprint and player info on mount
   useEffect(() => {
@@ -220,14 +237,26 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
     }
   }, [isNewCompletion, result.solved, result.attemptsUsed]);
 
-  // Generate shareable text
+  // Show streak milestone celebration for new completions
+  useEffect(() => {
+    if (isNewCompletion && milestoneMessage) {
+      // Delay slightly to let the main confetti start first
+      const timer = setTimeout(() => {
+        setShowMilestoneCelebration(true);
+      }, 1500);
+      return () => clearTimeout(timer);
+    }
+    return undefined;
+  }, [isNewCompletion, milestoneMessage]);
+
+  // Generate shareable text (use streak from result, which is now properly tracked)
   const shareText = generateWordHuntShareableResult({
     ...result,
     puzzleNumber,
     puzzleDate,
     language,
-    streakDays: 0, // TODO: Add streak tracking
-    completedAt: new Date().toISOString(),
+    streakDays: result.streakDays || 0,
+    completedAt: result.completedAt || new Date().toISOString(),
   });
 
   // Handle copy to clipboard
@@ -252,6 +281,12 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
     const url = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}`;
     window.open(url, '_blank');
   }, [shareText]);
+
+  // Handle share to Telegram
+  const handleTelegram = useCallback(() => {
+    const url = `https://t.me/share/url?url=${encodeURIComponent(`https://lexiclash.live/${language}/daily`)}&text=${encodeURIComponent(shareText + '\n\nCan you solve it?')}`;
+    window.open(url, '_blank');
+  }, [shareText, language]);
 
   // Handle native share
   const handleNativeShare = useCallback(async () => {
@@ -284,7 +319,7 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
           onClick={onBack}
           className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white"
         >
-          <FaArrowLeft className="mr-2" />
+          <ArrowLeft className="w-4 h-4 mr-2" />
           {t('daily.home')}
         </Button>
       </motion.div>
@@ -337,7 +372,7 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
           {result.solved && (
             <div className="mt-3 space-y-2">
               <div className="text-sm text-gray-600 dark:text-gray-400">
-                Target Word:
+                {t('wordHunt.results.targetWord')}:
               </div>
               <div className="text-2xl font-black text-neo-yellow tracking-wider">
                 {result.targetWord.toUpperCase()}
@@ -351,7 +386,7 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
               <span className="text-2xl">🪙</span>
               <div className="text-sm">
                 <span className="font-black text-xl">{result.clueTokensEarned - result.clueTokensSpent}</span>
-                <span className="text-gray-600 dark:text-gray-400 ml-1">tokens earned</span>
+                <span className="text-gray-600 dark:text-gray-400 ml-1">{t('wordHunt.results.tokensEarned')}</span>
               </div>
             </div>
           )}
@@ -361,6 +396,42 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
             <div className="mt-2 text-sm text-gray-600 dark:text-gray-400">
               {t('wordHunt.defeat').replace('{word}', result.targetWord.toUpperCase())}
             </div>
+          )}
+
+          {/* Streak display */}
+          {result.streakDays > 0 && (
+            <motion.div
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              transition={{ type: 'spring', delay: 0.25 }}
+              className="mt-3 inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-orange-400 to-red-500 rounded-neo border-3 border-neo-black shadow-hard"
+            >
+              <span className="text-2xl">🔥</span>
+              <span className="font-black text-white">
+                {result.streakDays} {result.streakDays === 1 ? t('daily.dayStreak') : t('daily.daysStreak')}
+              </span>
+              {milestoneMessage && (
+                <span className="text-lg ml-1">{milestoneMessage.emoji}</span>
+              )}
+            </motion.div>
+          )}
+
+          {/* Rarest word highlight */}
+          {rarestWord && rarestWord.rarity >= 4 && (
+            <motion.div
+              initial={{ scale: 0, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ type: 'spring', delay: 0.3 }}
+              className="mt-3 inline-flex flex-col items-center gap-1 px-4 py-3 bg-gradient-to-r from-purple-500 to-indigo-600 rounded-neo border-3 border-neo-black shadow-hard"
+            >
+              <div className="flex items-center gap-2">
+                <span className="text-xl">{rarestWord.emoji}</span>
+                <span className="font-black text-white text-sm uppercase">{rarestWord.label} FIND</span>
+              </div>
+              <span className="font-black text-white text-xl tracking-wider">
+                {rarestWord.word.toUpperCase()}
+              </span>
+            </motion.div>
           )}
         </motion.div>
 
@@ -378,7 +449,7 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
                 <div className="flex items-center gap-2">
                   <Trophy className="w-5 h-5 text-neo-black" />
                   <span className="font-black text-neo-black text-sm">
-                    #{stats.yourStats.rank} out of {stats.totalPlayers} players
+                    {t('wordHunt.results.rankOutOf').replace('{rank}', String(stats.yourStats.rank)).replace('{total}', String(stats.totalPlayers))}
                   </span>
                 </div>
               </motion.div>
@@ -403,7 +474,7 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
 
             {/* Language note */}
             <div className="text-xs text-gray-500 dark:text-gray-400">
-              Rankings for {language.toUpperCase()} puzzle
+              {t('wordHunt.results.rankingsFor').replace('{language}', language.toUpperCase())}
             </div>
           </div>
         )}
@@ -450,43 +521,61 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
             initial={{ y: 20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ delay: 0.5 }}
-            className="bg-white dark:bg-neo-navy-light rounded-neo border-3 border-neo-black p-4 space-y-3"
+            className="bg-white dark:bg-neo-navy-light rounded-neo border-3 border-neo-black p-4 space-y-4"
           >
-            <h3 className="text-sm font-bold text-gray-600 dark:text-gray-300 uppercase">
-              {t('wordHunt.stats.title')}
+            <h3 className="text-sm font-bold text-gray-600 dark:text-gray-300 uppercase flex items-center gap-2">
+              📊 {t('wordHunt.stats.title')}
             </h3>
 
             <div className="grid grid-cols-3 gap-3 text-center">
-              <div>
-                <div className="text-2xl font-black text-neo-black dark:text-white">
+              <motion.div
+                initial={{ scale: 0.8, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={{ delay: 0.6 }}
+                className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-2 border-2 border-blue-200 dark:border-blue-800"
+              >
+                <div className="text-lg mb-1">👥</div>
+                <div className="text-2xl font-black text-blue-600 dark:text-blue-400">
                   {stats.totalPlayers}
                 </div>
                 <div className="text-xs text-gray-600 dark:text-gray-400">
                   {t('wordHunt.stats.totalPlayers')}
                 </div>
-              </div>
-              <div>
-                <div className="text-2xl font-black text-green-600">
+              </motion.div>
+              <motion.div
+                initial={{ scale: 0.8, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={{ delay: 0.7 }}
+                className="bg-green-50 dark:bg-green-900/20 rounded-lg p-2 border-2 border-green-200 dark:border-green-800"
+              >
+                <div className="text-lg mb-1">✅</div>
+                <div className="text-2xl font-black text-green-600 dark:text-green-400">
                   {stats.solveRate}%
                 </div>
                 <div className="text-xs text-gray-600 dark:text-gray-400">
                   {t('wordHunt.stats.solveRate')}
                 </div>
-              </div>
-              <div>
-                <div className="text-2xl font-black text-neo-purple">
+              </motion.div>
+              <motion.div
+                initial={{ scale: 0.8, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={{ delay: 0.8 }}
+                className="bg-purple-50 dark:bg-purple-900/20 rounded-lg p-2 border-2 border-purple-200 dark:border-purple-800"
+              >
+                <div className="text-lg mb-1">🎯</div>
+                <div className="text-2xl font-black text-purple-600 dark:text-purple-400">
                   {stats.avgAttemptsSolved?.toFixed(1) ?? 'N/A'}
                 </div>
                 <div className="text-xs text-gray-600 dark:text-gray-400">
                   {t('wordHunt.stats.avgAttempts')}
                 </div>
-              </div>
+              </motion.div>
             </div>
 
             {/* Attempt distribution histogram */}
             <div className="space-y-1">
-              <div className="text-xs font-bold text-gray-600 dark:text-gray-300 uppercase">
-                {t('wordHunt.stats.distribution')}
+              <div className="text-xs font-bold text-gray-600 dark:text-gray-300 uppercase mb-2">
+                📈 {t('wordHunt.stats.distribution')}
               </div>
               {[...Array(10)].map((_, i) => {
                 const attemptNum = i + 1;
@@ -496,22 +585,38 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
                 const isYourAttempt = result.solved && result.attemptsUsed === attemptNum;
 
                 return (
-                  <div key={attemptNum} className="flex items-center gap-2">
-                    <span className="text-xs font-bold w-6 text-gray-600 dark:text-gray-400">
+                  <motion.div
+                    key={attemptNum}
+                    initial={{ x: -20, opacity: 0 }}
+                    animate={{ x: 0, opacity: 1 }}
+                    transition={{ delay: 0.5 + i * 0.05 }}
+                    className="flex items-center gap-2"
+                  >
+                    <span className={cn(
+                      "text-xs font-bold w-6",
+                      isYourAttempt ? "text-neo-yellow" : "text-gray-600 dark:text-gray-400"
+                    )}>
                       {attemptNum}
                     </span>
-                    <div className="flex-1 h-5 bg-gray-200 dark:bg-gray-700 rounded-sm overflow-hidden">
-                      <div
+                    <div className="flex-1 h-6 bg-gray-200 dark:bg-gray-700 rounded-sm overflow-hidden">
+                      <motion.div
+                        initial={{ width: 0 }}
+                        animate={{ width: `${percentage}%` }}
+                        transition={{ duration: 0.5, delay: 0.5 + i * 0.05 }}
                         className={cn(
-                          "h-full flex items-center justify-end px-1 text-xs font-bold text-white transition-all",
-                          isYourAttempt ? "bg-neo-yellow" : "bg-green-500"
+                          "h-full flex items-center justify-end px-2 text-xs font-bold text-white",
+                          isYourAttempt
+                            ? "bg-gradient-to-r from-neo-yellow to-neo-orange"
+                            : "bg-gradient-to-r from-green-500 to-emerald-500"
                         )}
-                        style={{ width: `${percentage}%` }}
                       >
                         {count > 0 && <span>{count}</span>}
-                      </div>
+                      </motion.div>
                     </div>
-                  </div>
+                    {isYourAttempt && (
+                      <span className="text-xs font-bold text-neo-yellow">← YOU</span>
+                    )}
+                  </motion.div>
                 );
               })}
             </div>
@@ -520,7 +625,7 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
             {(stats.avgLifeRemaining != null || stats.avgEfficiencyScore != null || stats.avgWordsDiscovered != null) && (
               <div className="mt-4 pt-4 border-t-2 border-gray-200 dark:border-gray-700 space-y-2">
                 <div className="text-xs font-bold text-gray-600 dark:text-gray-300 uppercase">
-                  Survival Mode Metrics
+                  {t('wordHunt.results.survivalMetrics')}
                 </div>
                 <div className="grid grid-cols-2 gap-3 text-center">
                   {stats.avgLifeRemaining != null && (
@@ -529,7 +634,7 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
                         {stats.avgLifeRemaining.toFixed(0)}
                       </div>
                       <div className="text-xs text-gray-600 dark:text-gray-400">
-                        Avg Life Left
+                        {t('wordHunt.results.avgLifeLeft')}
                       </div>
                     </div>
                   )}
@@ -539,7 +644,7 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
                         {stats.avgWordsDiscovered.toFixed(1)}
                       </div>
                       <div className="text-xs text-gray-600 dark:text-gray-400">
-                        Avg Words Found
+                        {t('wordHunt.results.avgWordsFound')}
                       </div>
                     </div>
                   )}
@@ -549,7 +654,7 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
                         {stats.avgEfficiencyScore.toFixed(0)}
                       </div>
                       <div className="text-xs text-gray-600 dark:text-gray-400">
-                        Avg Efficiency
+                        {t('wordHunt.results.avgEfficiency')}
                       </div>
                     </div>
                   )}
@@ -559,7 +664,7 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
                         {stats.maxEfficiencyScore}
                       </div>
                       <div className="text-xs text-gray-600 dark:text-gray-400">
-                        Best Efficiency
+                        {t('wordHunt.results.bestEfficiency')}
                       </div>
                     </div>
                   )}
@@ -569,10 +674,10 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
                 {stats.yourStats?.efficiencyScore !== undefined && stats.yourStats?.efficiencyPercentile !== undefined && (
                   <div className="mt-2 p-2 bg-purple-50 dark:bg-purple-900/20 rounded-lg border-2 border-purple-200 dark:border-purple-700">
                     <div className="text-xs font-bold text-purple-700 dark:text-purple-300">
-                      Your Efficiency: {stats.yourStats.efficiencyScore} points
+                      {t('wordHunt.results.yourEfficiency').replace('{score}', String(stats.yourStats.efficiencyScore))}
                     </div>
                     <div className="text-xs text-purple-600 dark:text-purple-400">
-                      Better than {stats.yourStats.efficiencyPercentile}% of players! 🎯
+                      {t('wordHunt.results.efficiencyPercentile').replace('{percentile}', String(stats.yourStats.efficiencyPercentile))} 🎯
                     </div>
                   </div>
                 )}
@@ -608,13 +713,13 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
             {t('wordHunt.shareResult')}
           </Button>
 
-          <div className="grid grid-cols-3 gap-2">
+          <div className="grid grid-cols-4 gap-2">
             <Button
               onClick={handleWhatsApp}
               aria-label="Share on WhatsApp"
               className="py-3 min-h-[44px] bg-[#25D366] text-black border-3 border-neo-black rounded-neo shadow-hard-sm hover:-translate-y-0.5 transition-all"
             >
-              <FaWhatsapp className="w-5 h-5" />
+              <MessageCircle className="w-5 h-5" />
             </Button>
 
             <Button
@@ -622,7 +727,15 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
               aria-label="Share on X (Twitter)"
               className="py-3 min-h-[44px] bg-black text-white border-3 border-gray-700 rounded-neo shadow-hard-sm hover:-translate-y-0.5 transition-all"
             >
-              <FaXTwitter className="w-5 h-5" />
+              <XTwitterIcon className="w-5 h-5" />
+            </Button>
+
+            <Button
+              onClick={handleTelegram}
+              aria-label="Share on Telegram"
+              className="py-3 min-h-[44px] bg-[#0088cc] text-white border-3 border-neo-black rounded-neo shadow-hard-sm hover:-translate-y-0.5 transition-all"
+            >
+              <Send className="w-5 h-5" />
             </Button>
 
             <Button
@@ -631,9 +744,9 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
               className="py-3 min-h-[44px] bg-gray-600 text-white border-3 border-neo-black rounded-neo shadow-hard-sm hover:-translate-y-0.5 transition-all"
             >
               {copied ? (
-                <FaCheck className="w-5 h-5 text-neo-lime" />
+                <Check className="w-5 h-5 text-neo-lime" />
               ) : (
-                <FaCopy className="w-5 h-5" />
+                <Copy className="w-5 h-5" />
               )}
             </Button>
           </div>
@@ -689,7 +802,7 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
                   onClick={handleWhatsApp}
                   className="w-full py-3 bg-[#25D366] text-black border-3 border-neo-black rounded-neo"
                 >
-                  <FaWhatsapp className="mr-2 w-5 h-5" />
+                  <MessageCircle className="mr-2 w-5 h-5" />
                   WhatsApp
                 </Button>
 
@@ -697,8 +810,16 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
                   onClick={handleTwitter}
                   className="w-full py-3 bg-black text-white border-3 border-gray-700 rounded-neo"
                 >
-                  <FaXTwitter className="mr-2 w-5 h-5" />
+                  <XTwitterIcon className="mr-2 w-5 h-5" />
                   X / Twitter
+                </Button>
+
+                <Button
+                  onClick={handleTelegram}
+                  className="w-full py-3 bg-[#0088cc] text-white border-3 border-neo-black rounded-neo"
+                >
+                  <Send className="mr-2 w-5 h-5" />
+                  Telegram
                 </Button>
 
                 <Button
@@ -707,12 +828,12 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
                 >
                   {copied ? (
                     <>
-                      <FaCheck className="mr-2 w-5 h-5 text-neo-lime" />
+                      <Check className="mr-2 w-5 h-5 text-neo-lime" />
                       {t('common.copied')}
                     </>
                   ) : (
                     <>
-                      <FaCopy className="mr-2 w-5 h-5" />
+                      <Copy className="mr-2 w-5 h-5" />
                       {t('daily.copyToClipboard')}
                     </>
                   )}
@@ -730,6 +851,18 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Streak Milestone Celebration Modal */}
+      {milestoneMessage && (
+        <StreakMilestoneCelebration
+          isOpen={showMilestoneCelebration}
+          onClose={() => setShowMilestoneCelebration(false)}
+          streak={result.streakDays}
+          emoji={milestoneMessage.emoji}
+          title={milestoneMessage.title}
+          subtitle={milestoneMessage.subtitle}
+        />
+      )}
     </motion.div>
   );
 };

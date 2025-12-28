@@ -864,6 +864,33 @@ const he = {
     "tryAgainEncouragement": "המשיכו לשחק כדי להשתפר!",
     "of": "מתוך"
   },
+  "chart": {
+    "yourProgress": "ההתקדמות שלך",
+    "needMoreGames": "שחקו עוד משחקים!",
+    "needMoreGamesDesc": "גרף ההתקדמות יופיע אחרי 2+ משחקים",
+    "bestScore": "הכי טוב",
+    "average": "ממוצע",
+    "games": "משחקים",
+    "trendUp": "משתפרים!",
+    "trendDown": "להמשיך לנסות!",
+    "trendStable": "עקביים",
+    "milestones": {
+      "wordWizard": "קוסם מילים",
+      "onFire": "בוערים!",
+      "nice": "יפה!",
+      "warmingUp": "מתחממים"
+    },
+    "funMessages": {
+      "crushing": "אתם פשוט מוחצים! 🔥",
+      "domination": "בדרך לשליטה מילולית! 📈",
+      "steadyImprovement": "שיפור יציב, יפה! 👆",
+      "roughDay": "יום קשה? לכולנו יש כאלה! 💪",
+      "comeback": "מתחממים לקאמבק! 🎯",
+      "tinyDip": "ירידה קטנה, הכל בסדר! 🌊",
+      "holdingSteady": "שומרים על יציבות כמו מקצוענים! ⚖️",
+      "playMore": "שחקו עוד כדי לראות את המגמה!"
+    }
+  },
   "archetypes": {
     "strategist": "האסטרטג",
     "strategistDesc": "מהלכים מחושבים, השפעה מקסימלית",
@@ -2045,6 +2072,7 @@ const he = {
     "bannerSubtitle": "אותה חידה לכולם. שתפו את הניקוד!",
     "oneAttempt": "ניסיון אחד ביום - אותה חידה לכולם!",
     "dayStreak": "ימים ברצף",
+    "daysStreak": "ימים ברצף",
     "playNow": "שחקו עכשיו",
     "loading": "טוען אתגר יומי...",
     "todaysPlayers": "השחקנים של היום",
@@ -2054,7 +2082,9 @@ const he = {
     "yourRank": "הדירוג שלך",
     "showMore": "הצג עוד",
     "showLess": "הצג פחות",
-    "more": "עוד"
+    "more": "עוד",
+    "maxAttempts": "ניסיונות מקסימליים",
+    "huntDescription": "חפשו את המילה המוסתרת בעזרת משוב צבעוני!"
   },
   "wordHunt": {
     "title": "ציד מילים",
@@ -2107,6 +2137,9 @@ const he = {
       "hintUnlocked": "רמז נפתח!",
       "hintCost": "עלות: {cost} מילים",
       "needMoreWords": "מצאו עוד {count} מילים לפתיחה",
+      "oneMoreWord": "עוד מילה אחת!",
+      "nextHint": "הרמז הבא",
+      "allHintsUnlocked": "כל הרמזים נפתחו!",
       "shop": "חנות רמזים",
       "shopTitle": "השתמשו באסימוני רמז",
       "revealLetter": "חשוף אות",
@@ -2128,7 +2161,32 @@ const he = {
       "category": "קטגוריה: {category}",
       "targetWordGuess": "ניחוש מילת יעד",
       "gridWordDiscovery": "גילוי מילת לוח",
-      "cannotRevealMore": "לא ניתן לחשוף עוד אותיות"
+      "cannotRevealMore": "לא ניתן לחשוף עוד אותיות",
+      "wordsLabel": "מילים",
+      "attemptsLabel": "ניסיונות"
+    },
+    "results": {
+      "targetWord": "מילת היעד",
+      "tokensEarned": "אסימונים שנצברו",
+      "rankOutOf": "מקום #{rank} מתוך {total} שחקנים",
+      "rankingsFor": "דירוג לפאזל ב{language}",
+      "survivalMetrics": "מדדי מצב הישרדות",
+      "avgLifeLeft": "חיים ממוצעים",
+      "avgWordsFound": "מילים ממוצעות",
+      "avgEfficiency": "יעילות ממוצעת",
+      "bestEfficiency": "יעילות מקסימלית",
+      "yourEfficiency": "היעילות שלך: {score} נקודות",
+      "efficiencyPercentile": "טוב יותר מ-{percentile}% מהשחקנים!"
+    },
+    "leaderboard": {
+      "solved": "נפתר",
+      "failed": "נכשל",
+      "attempts": "ניסיונות",
+      "pts": "נק'",
+      "words": "מילים",
+      "justNow": "עכשיו",
+      "minutesAgo": "לפני {count} דק'",
+      "hoursAgo": "לפני {count} שע'"
     }
   },
   "tutorial": {

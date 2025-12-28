@@ -1,7 +1,7 @@
 'use client';
 
 import React, { memo, useState, useCallback } from 'react';
-import { FaShareAlt, FaTrophy } from 'react-icons/fa';
+import { Share2, Trophy } from 'lucide-react';
 import { Card } from '../../../components/ui/card';
 import { Badge } from '../../../components/ui/badge';
 import UnifiedShareModal from '../../../components/modals/UnifiedShareModal';
@@ -82,7 +82,7 @@ export const RoomCodeSection = memo<RoomCodeSectionProps>(({
             </Badge>
             {tournamentData && (
               <Badge className="text-xs px-2 py-0 bg-gradient-to-r from-amber-500 to-yellow-600 text-white border-0">
-                <FaTrophy className="mr-1 text-[10px]" />
+                <Trophy className="mr-1 text-[10px]" />
                 R{tournamentData.currentRound}/{tournamentData.totalRounds}
               </Badge>
             )}
@@ -94,7 +94,7 @@ export const RoomCodeSection = memo<RoomCodeSectionProps>(({
             aria-label={t('share.buttonLabel')}
             className="flex items-center gap-2 px-4 py-2 min-h-[44px] bg-neo-yellow text-neo-black font-bold text-base rounded-neo border-3 border-neo-black shadow-hard-md hover:shadow-hard-lg hover:-translate-y-0.5 active:shadow-hard-sm active:translate-y-0 transition-all focus:outline-none focus:ring-2 focus:ring-neo-cyan focus:ring-offset-2"
           >
-            <FaShareAlt className="text-sm" />
+            <Share2 className="text-sm" />
             <span>{t('share.buttonLabel')}</span>
           </button>
         </div>

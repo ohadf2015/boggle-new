@@ -2,15 +2,14 @@
 
 import React, { useState, useEffect, useCallback, memo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Users, Trophy, Clock, ChevronDown, ChevronUp, Sparkles, Share2 } from 'lucide-react';
-import { FaCheck, FaCopy } from 'react-icons/fa';
+import { Users, Trophy, Clock, ChevronDown, ChevronUp, Sparkles, Share2, Check, Copy } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { getRankDisplay, getRankBgColor } from '@/utils/rankingStyles';
 import { getPuzzleNumber } from '@/utils/dailyChallenge';
 import type { Language } from '@/types';
 
-// Simple relative time formatter
-function formatDistanceToNow(dateString: string): string {
+// Simple relative time formatter with translation support
+function formatDistanceToNow(dateString: string, t: (key: string) => string): string {
   const date = new Date(dateString);
   const now = new Date();
   const diffMs = now.getTime() - date.getTime();
@@ -18,9 +17,9 @@ function formatDistanceToNow(dateString: string): string {
   const diffMins = Math.floor(diffSecs / 60);
   const diffHours = Math.floor(diffMins / 60);
 
-  if (diffSecs < 60) return 'just now';
-  if (diffMins < 60) return `${diffMins}m ago`;
-  if (diffHours < 24) return `${diffHours}h ago`;
+  if (diffSecs < 60) return t('wordHunt.leaderboard.justNow');
+  if (diffMins < 60) return t('wordHunt.leaderboard.minutesAgo').replace('{count}', String(diffMins));
+  if (diffHours < 24) return t('wordHunt.leaderboard.hoursAgo').replace('{count}', String(diffHours));
   return date.toLocaleDateString();
 }
 
@@ -67,12 +66,13 @@ const ParticipantRow = memo<{
   isCurrentUser: boolean;
   compact: boolean;
   gameType: 'puzzle' | 'wordHunt';
-}>(({ participant, index, isCurrentUser, compact, gameType }) => {
+  t: (key: string) => string;
+}>(({ participant, index, isCurrentUser, compact, gameType, t }) => {
   const rank = participant.rank_position;
   const isTopThree = rank <= 3;
 
   // Format time since completion
-  const timeAgo = formatDistanceToNow(participant.completed_at);
+  const timeAgo = formatDistanceToNow(participant.completed_at, t);
 
   return (
     <motion.div
@@ -131,16 +131,16 @@ const ParticipantRow = memo<{
           {gameType === 'wordHunt' ? (
             <>
               <span className={`font-bold ${participant.solved ? 'text-green-600 dark:text-green-400' : 'text-gray-500'}`}>
-                {participant.solved ? '✓ Solved' : '✗ Failed'}
+                {participant.solved ? `✓ ${t('wordHunt.leaderboard.solved')}` : `✗ ${t('wordHunt.leaderboard.failed')}`}
               </span>
               <span className="text-gray-500 dark:text-gray-400">|</span>
-              <span>{participant.attempts_used}/10 attempts</span>
+              <span>{participant.attempts_used}/10 {t('wordHunt.leaderboard.attempts')}</span>
             </>
           ) : (
             <>
-              <span className="font-bold">{participant.score} pts</span>
+              <span className="font-bold">{participant.score} {t('wordHunt.leaderboard.pts')}</span>
               <span className="text-gray-500 dark:text-gray-400">|</span>
-              <span>{participant.word_count} words</span>
+              <span>{participant.word_count} {t('wordHunt.leaderboard.words')}</span>
             </>
           )}
         </div>
@@ -366,7 +366,7 @@ const DailyLeaderboard: React.FC<DailyLeaderboardProps> = ({
               aria-label="Share your rank"
             >
               {copied ? (
-                <FaCheck className="w-3 h-3" />
+                <Check className="w-3 h-3" />
               ) : (
                 <Share2 className="w-3 h-3" />
               )}
@@ -407,6 +407,7 @@ const DailyLeaderboard: React.FC<DailyLeaderboardProps> = ({
                 isCurrentUser={isCurrentUser(participant)}
                 compact={compact}
                 gameType={gameType}
+                t={t}
               />
             ))}
           </AnimatePresence>

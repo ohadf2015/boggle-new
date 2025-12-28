@@ -4,8 +4,7 @@ import React, { useState, useCallback, useMemo, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FaPlay, FaRobot, FaPlus, FaTimes, FaBook, FaTrophy, FaCog, FaChevronDown, FaArrowLeft, FaCrown, FaFire, FaCalendarDay } from 'react-icons/fa';
-import { Target, Zap, Flame, Check } from 'lucide-react';
+import { Play, Bot, Plus, X, Book, Trophy, Settings, ChevronDown, ArrowLeft, Crown, Flame, CalendarDays, Target, Zap, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -43,28 +42,28 @@ const BOT_NAMES = [
 
 const MODE_CONFIG = {
   'solo-bots': {
-    Icon: FaRobot,
+    Icon: Bot,
     color: 'from-bot-purple via-bot-purple-dark to-bot-indigo',
     selectedBorder: 'border-bot-purple',
     labelKey: 'singlePlayer.soloVsBots',
     descKey: 'singlePlayer.soloVsBotsDesc',
   },
   'practice': {
-    Icon: FaBook,
+    Icon: Book,
     color: 'from-neo-lime to-lime-400',
     selectedBorder: 'border-neo-lime',
     labelKey: 'singlePlayer.practiceMode',
     descKey: 'singlePlayer.practiceModeDesc',
   },
   'challenge': {
-    Icon: FaTrophy,
+    Icon: Trophy,
     color: 'from-neo-yellow to-yellow-400',
     selectedBorder: 'border-neo-yellow',
     labelKey: 'singlePlayer.challengeMode',
     descKey: 'singlePlayer.challengeModeDesc',
   },
   'daily': {
-    Icon: FaCalendarDay,
+    Icon: CalendarDays,
     color: 'from-neo-orange via-neo-yellow to-neo-pink',
     selectedBorder: 'border-neo-orange',
     labelKey: 'daily.badge',
@@ -214,14 +213,14 @@ const SinglePlayerLobby: React.FC<SinglePlayerLobbyProps> = ({
                 onClick={onBack}
                 className="w-12 h-12 min-w-[48px] min-h-[48px] flex items-center justify-center rounded-neo border-3 border-neo-black bg-neo-cream shadow-hard hover:shadow-hard-lg transition-all"
               >
-                <FaArrowLeft className="text-sm text-neo-black rtl:rotate-180" />
+                <ArrowLeft className="text-sm text-neo-black rtl:rotate-180" />
               </button>
             ) : (
               <Link
                 href="/"
                 className="w-12 h-12 min-w-[48px] min-h-[48px] flex items-center justify-center rounded-neo border-3 border-neo-black bg-neo-cream shadow-hard hover:shadow-hard-lg transition-all"
               >
-                <FaArrowLeft className="text-sm text-neo-black rtl:rotate-180" />
+                <ArrowLeft className="text-sm text-neo-black rtl:rotate-180" />
               </Link>
             )}
             <h1 className="text-xl font-black uppercase text-neo-white flex-1">
@@ -258,7 +257,7 @@ const SinglePlayerLobby: React.FC<SinglePlayerLobbyProps> = ({
           {mode === 'challenge' && currentHighScore !== null && (
             <div className="bg-neo-yellow border-3 border-neo-black rounded-neo p-3 text-center shadow-hard">
               <div className="flex items-center justify-center gap-2 mb-1">
-                <FaCrown className="text-neo-black text-lg" />
+                <Crown className="text-neo-black text-lg" />
                 <span className="font-black text-neo-black text-xl">{currentHighScore.score}</span>
               </div>
               <div className="text-xs font-bold text-neo-black/70 uppercase">{t('challenge.recordToBeat') || 'Record to Beat'}</div>
@@ -363,7 +362,7 @@ const SinglePlayerLobby: React.FC<SinglePlayerLobbyProps> = ({
               <div className="p-3 bg-gradient-to-br from-bot-purple/20 via-bot-purple-dark/15 to-bot-indigo/20 rounded-neo-lg border-2 border-bot-purple/50 shadow-hard-purple">
                 <div className="flex items-center justify-between mb-2">
                   <label className="text-sm font-bold uppercase text-neo-white flex items-center gap-2">
-                    <FaRobot className="text-bot-purple-light" />
+                    <Bot className="text-bot-purple-light" />
                     {t('singlePlayer.opponents') || 'Opponents'}
                     <Badge className="bg-bot-purple/30 text-bot-purple-light text-[10px] px-1.5 border border-bot-purple">AI</Badge>
                   </label>
@@ -388,7 +387,7 @@ const SinglePlayerLobby: React.FC<SinglePlayerLobbyProps> = ({
                     disabled={bots.length >= 5}
                     className="px-3 py-2 text-sm bg-bot-purple hover:bg-bot-purple-dark disabled:opacity-50 disabled:cursor-not-allowed rounded-neo border-2 border-bot-border text-white font-bold shadow-hard-purple"
                   >
-                    <FaPlus className="inline" />
+                    <Plus className="inline" />
                   </button>
                 </div>
                 {bots.length > 0 ? (
@@ -399,7 +398,7 @@ const SinglePlayerLobby: React.FC<SinglePlayerLobbyProps> = ({
                         className="flex items-center gap-2 px-2.5 py-1.5 rounded-neo border-2 border-bot-purple bg-gradient-to-r from-bot-purple/20 to-bot-indigo/20 shadow-hard-sm"
                       >
                         <span className="w-5 h-5 rounded-full flex items-center justify-center bg-bot-purple border border-bot-purple-light/50">
-                          <FaRobot className="text-white text-[10px]" />
+                          <Bot className="text-white text-[10px]" />
                         </span>
                         <span className="text-xs font-medium text-neo-white">
                           {bot.name}
@@ -412,7 +411,7 @@ const SinglePlayerLobby: React.FC<SinglePlayerLobbyProps> = ({
                           className="w-5 h-5 flex items-center justify-center rounded-full text-neo-red/70 hover:text-neo-red hover:bg-neo-red/20 transition-colors"
                           aria-label={`Remove ${bot.name}`}
                         >
-                          <FaTimes className="w-2.5 h-2.5" />
+                          <X className="w-2.5 h-2.5" />
                         </button>
                       </div>
                     ))}
@@ -431,7 +430,7 @@ const SinglePlayerLobby: React.FC<SinglePlayerLobbyProps> = ({
             onClick={handleStartGame}
             className="w-full h-14 font-black uppercase text-lg bg-neo-yellow hover:bg-neo-yellow/90 text-neo-black border-4 border-neo-black shadow-hard hover:shadow-hard-lg transition-all flex-shrink-0"
           >
-            <FaPlay className="mr-2 w-6 h-6" />
+            <Play className="mr-2 w-6 h-6" />
             {t('singlePlayer.startGame') || 'Start Game'}
           </Button>
         </div>
@@ -458,7 +457,7 @@ const SinglePlayerLobby: React.FC<SinglePlayerLobbyProps> = ({
             onClick={onBack}
             className="absolute start-0 flex items-center gap-2 px-3 py-2 rounded-neo border-3 border-neo-black dark:border-slate-600 bg-neo-cream dark:bg-slate-700 shadow-hard hover:shadow-hard-lg hover:translate-x-[-2px] hover:translate-y-[-2px] active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-pressed transition-all text-neo-black dark:text-neo-white text-sm font-bold min-h-[44px] min-w-[44px]"
           >
-            <FaArrowLeft className="w-5 h-5 rtl:rotate-180" />
+            <ArrowLeft className="w-5 h-5 rtl:rotate-180" />
             <span className="hidden sm:inline">{t('common.back') || 'Back'}</span>
           </button>
         ) : (
@@ -466,7 +465,7 @@ const SinglePlayerLobby: React.FC<SinglePlayerLobbyProps> = ({
             href="/"
             className="absolute start-0 flex items-center gap-2 px-3 py-2 rounded-neo border-3 border-neo-black dark:border-slate-600 bg-neo-cream dark:bg-slate-700 shadow-hard hover:shadow-hard-lg hover:translate-x-[-2px] hover:translate-y-[-2px] active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-pressed transition-all text-neo-black dark:text-neo-white text-sm font-bold min-h-[44px] min-w-[44px]"
           >
-            <FaArrowLeft className="w-5 h-5 rtl:rotate-180" />
+            <ArrowLeft className="w-5 h-5 rtl:rotate-180" />
             <span className="hidden sm:inline">{t('common.back') || 'Back'}</span>
           </Link>
         )}
@@ -641,7 +640,7 @@ const SinglePlayerLobby: React.FC<SinglePlayerLobbyProps> = ({
               <div className="p-3 sm:p-4 bg-gradient-to-br from-bot-purple/15 via-bot-purple-dark/10 to-bot-indigo/15 rounded-neo-lg border-3 border-bot-purple/50 shadow-hard-purple">
                 <div className="flex items-center justify-between mb-3">
                   <span className="text-sm font-bold flex items-center gap-2 text-neo-black dark:text-neo-white">
-                    <FaRobot className="text-bot-purple" />
+                    <Bot className="text-bot-purple" />
                     <Badge className="bg-bot-purple/20 text-bot-purple border border-bot-purple text-[10px] px-1.5">AI</Badge>
                     {t('singlePlayer.opponents') || 'Opponents'}
                   </span>
@@ -668,7 +667,7 @@ const SinglePlayerLobby: React.FC<SinglePlayerLobbyProps> = ({
                     disabled={bots.length >= 5}
                     className="h-8 px-3 ml-2 border-2 border-neo-black dark:border-slate-500 bg-neo-lime hover:bg-neo-lime/80 text-neo-black"
                   >
-                    <FaPlus className="w-4 h-4" />
+                    <Plus className="w-4 h-4" />
                   </Button>
                 </div>
                 {bots.length > 0 ? (
@@ -679,7 +678,7 @@ const SinglePlayerLobby: React.FC<SinglePlayerLobbyProps> = ({
                         className="flex items-center gap-2 px-2.5 py-1.5 rounded-neo border-2 border-bot-purple bg-gradient-to-r from-bot-purple/15 to-bot-indigo/15 shadow-hard-sm"
                       >
                         <span className="w-5 h-5 rounded-full flex items-center justify-center bg-bot-purple border border-bot-purple-light/50">
-                          <FaRobot className="text-white text-[10px]" />
+                          <Bot className="text-white text-[10px]" />
                         </span>
                         <span className="text-xs font-medium text-neo-black dark:text-neo-white">
                           {bot.name}
@@ -692,7 +691,7 @@ const SinglePlayerLobby: React.FC<SinglePlayerLobbyProps> = ({
                           className="w-5 h-5 flex items-center justify-center rounded-full hover:text-neo-red hover:bg-neo-red/20 transition-colors"
                           aria-label={`Remove ${bot.name}`}
                         >
-                          <FaTimes className="w-2.5 h-2.5" />
+                          <X className="w-2.5 h-2.5" />
                         </button>
                       </div>
                     ))}
@@ -759,7 +758,7 @@ const SinglePlayerLobby: React.FC<SinglePlayerLobbyProps> = ({
               {mode === 'solo-bots' && (
                 <div className="flex items-center justify-between p-2 bg-gradient-to-r from-bot-purple/10 to-bot-indigo/10 rounded-neo border border-bot-purple/30">
                   <span className="text-sm font-bold text-neo-black/70 dark:text-neo-white/70 flex items-center gap-1">
-                    <FaRobot className="text-bot-purple" />
+                    <Bot className="text-bot-purple" />
                     {t('singlePlayer.opponents') || 'Opponents'}
                   </span>
                   <span className="font-bold text-neo-black dark:text-neo-white">
@@ -881,12 +880,12 @@ const SinglePlayerLobby: React.FC<SinglePlayerLobbyProps> = ({
                   />
                   {/* Trophy background decoration */}
                   <div className="absolute -right-4 -top-4 opacity-10">
-                    <FaTrophy className="w-24 h-24 text-neo-black" />
+                    <Trophy className="w-24 h-24 text-neo-black" />
                   </div>
                   <div className="relative z-10">
                     <div className="flex items-center justify-between mb-2">
                       <div className="flex items-center gap-2">
-                        <FaCrown className="text-neo-black text-xl" />
+                        <Crown className="text-neo-black text-xl" />
                         <span className="font-black uppercase text-sm text-neo-black">
                           {t('challenge.yourRecord') || 'Your Record'}
                         </span>
@@ -939,7 +938,7 @@ const SinglePlayerLobby: React.FC<SinglePlayerLobbyProps> = ({
               {progressStats.totalGames > 0 && (
                 <div className="mt-3 flex items-center justify-center gap-4 text-xs text-neo-black/75 dark:text-neo-white/75">
                   <span className="flex items-center gap-1">
-                    <FaFire className="text-neo-orange" />
+                    <Flame className="text-neo-orange" />
                     {progressStats.highScoreBeats} {t('challenge.recordsSet') || 'records set'}
                   </span>
                   <span>•</span>
@@ -951,7 +950,7 @@ const SinglePlayerLobby: React.FC<SinglePlayerLobbyProps> = ({
               {allTimeBest && currentHighScore && allTimeBest.score > currentHighScore.score && (
                 <div className="mt-2 text-center text-xs text-neo-black/70 dark:text-neo-white/70">
                   <span className="flex items-center justify-center gap-1">
-                    <FaCrown className="text-neo-yellow text-sm" />
+                    <Crown className="text-neo-yellow text-sm" />
                     {t('challenge.allTimeBest') || 'All-time best'}: <span className="font-black">{allTimeBest.score}</span>
                   </span>
                 </div>
@@ -964,7 +963,7 @@ const SinglePlayerLobby: React.FC<SinglePlayerLobbyProps> = ({
             <div className="mb-2 sm:mb-3 p-3 sm:p-4 bg-gradient-to-br from-bot-purple/15 via-bot-purple-dark/10 to-bot-indigo/15 rounded-neo-lg border-3 border-bot-purple/50 shadow-hard-purple">
               <div className="flex items-center justify-between mb-2">
                 <span className="text-sm font-bold flex items-center gap-2 text-neo-black dark:text-neo-white">
-                  <FaRobot className="text-bot-purple" />
+                  <Bot className="text-bot-purple" />
                   <Badge className="bg-bot-purple/20 text-bot-purple border border-bot-purple text-[10px] px-1.5">AI</Badge>
                   {t('singlePlayer.opponents') || 'Opponents'}
                 </span>
@@ -990,7 +989,7 @@ const SinglePlayerLobby: React.FC<SinglePlayerLobbyProps> = ({
                     disabled={bots.length >= 5}
                     className="h-6 px-2 ml-1 border-2 border-neo-black dark:border-slate-500 bg-neo-lime hover:bg-neo-lime/80 text-neo-black"
                   >
-                    <FaPlus className="w-4 h-4" />
+                    <Plus className="w-4 h-4" />
                   </Button>
                 </div>
               </div>
@@ -1002,7 +1001,7 @@ const SinglePlayerLobby: React.FC<SinglePlayerLobbyProps> = ({
                       className="flex items-center gap-2 px-2.5 py-1.5 rounded-neo border-2 border-bot-purple bg-gradient-to-r from-bot-purple/15 to-bot-indigo/15 shadow-hard-sm"
                     >
                       <span className="w-5 h-5 rounded-full flex items-center justify-center bg-bot-purple border border-bot-purple-light/50">
-                        <FaRobot className="text-white text-[10px]" />
+                        <Bot className="text-white text-[10px]" />
                       </span>
                       <span className="text-xs font-medium text-neo-black dark:text-neo-white">
                         {bot.name}
@@ -1015,7 +1014,7 @@ const SinglePlayerLobby: React.FC<SinglePlayerLobbyProps> = ({
                         className="w-5 h-5 flex items-center justify-center rounded-full hover:text-neo-red hover:bg-neo-red/20 transition-colors"
                         aria-label={`Remove ${bot.name}`}
                       >
-                        <FaTimes className="w-2.5 h-2.5" />
+                        <X className="w-2.5 h-2.5" />
                       </button>
                     </div>
                   ))}
@@ -1069,9 +1068,9 @@ const SinglePlayerLobby: React.FC<SinglePlayerLobbyProps> = ({
               onClick={() => setShowAdvanced(!showAdvanced)}
               className="w-full flex items-center justify-center gap-2 py-2 text-sm text-neo-black/75 dark:text-neo-white/75 hover:text-neo-black dark:hover:text-neo-white transition-colors"
             >
-              <FaCog className={cn('transition-transform', showAdvanced && 'rotate-90')} />
+              <Settings className={cn('transition-transform', showAdvanced && 'rotate-90')} />
               {t('common.advancedSettings') || 'Advanced Settings'}
-              <FaChevronDown className={cn('transition-transform', showAdvanced && 'rotate-180')} />
+              <ChevronDown className={cn('transition-transform', showAdvanced && 'rotate-180')} />
             </button>
           )}
 
@@ -1131,7 +1130,7 @@ const SinglePlayerLobby: React.FC<SinglePlayerLobbyProps> = ({
         className="w-full text-lg py-4 sm:py-6 shadow-hard hover:shadow-hard-lg"
         onClick={handleStartGame}
       >
-        <FaPlay className="mr-2" />
+        <Play className="mr-2" />
         {t('singlePlayer.startGame') || 'Start Game'}
       </Button>
         </>

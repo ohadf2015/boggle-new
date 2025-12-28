@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import { FaChevronRight } from 'react-icons/fa';
+import { ChevronRight } from 'lucide-react';
 
 interface AchievementTier {
   name: string;
@@ -59,7 +59,7 @@ export const AchievementTiers: React.FC<AchievementTiersProps> = ({ t }) => {
               <span className="text-xs text-neo-black/75">×{tier.count}</span>
             </motion.div>
             {index < tiers.length - 1 && (
-              <FaChevronRight className="text-neo-black/70 flex-shrink-0" />
+              <ChevronRight className="text-neo-black/70 flex-shrink-0" />
             )}
           </React.Fragment>
         ))}

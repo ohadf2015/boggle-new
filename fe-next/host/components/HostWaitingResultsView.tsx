@@ -1,6 +1,6 @@
 import React, { useMemo, useRef } from 'react';
 import { motion } from 'framer-motion';
-import { FaTrophy } from 'react-icons/fa';
+import { Trophy } from 'lucide-react';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '../../components/ui/alert-dialog';
 import RoomChat from '../../components/RoomChat';
 import Avatar from '../../components/Avatar';
@@ -142,7 +142,7 @@ const HostWaitingResultsView: React.FC<HostWaitingResultsViewProps> = ({
               <div className="bg-neo-cream text-neo-black border-4 border-neo-black shadow-hard-lg overflow-hidden">
                 <div className="py-3 px-4 border-b-4 border-neo-black bg-neo-purple text-white">
                   <h3 className="flex items-center gap-2 text-neo-white text-xl uppercase tracking-wider font-black">
-                    <FaTrophy className="text-neo-yellow" style={{ filter: 'drop-shadow(2px 2px 0px rgb(var(--neo-black)))' }} />
+                    <Trophy className="text-neo-yellow" style={{ filter: 'drop-shadow(2px 2px 0px rgb(var(--neo-black)))' }} />
                     {t('playerView.leaderboard') || 'Leaderboard'}
                   </h3>
                 </div>

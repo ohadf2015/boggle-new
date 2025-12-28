@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { motion } from 'framer-motion';
-import { FaTimes } from 'react-icons/fa';
+import { X } from 'lucide-react';
 import GridComponent from '@/components/GridComponent';
 import CircularTimer from '@/components/CircularTimer';
 import WordFormingArea from '@/components/game/WordFormingArea';
@@ -300,7 +300,7 @@ const DailyChallengeGame: React.FC<DailyChallengeGameProps> = ({
           onClick={handleQuitClick}
           className="text-gray-600 hover:text-red-500"
         >
-          <FaTimes className="w-4 h-4 mr-1" />
+          <X className="w-4 h-4 mr-1" />
           {t('common.quit') || 'Quit'}
         </Button>
         {/* Puzzle number badge */}

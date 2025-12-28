@@ -1,9 +1,8 @@
 'use client';
 
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { FaArrowLeft, FaPause, FaPlay, FaCrown, FaQuestion } from 'react-icons/fa';
 import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
-import { TrendingUp, Target, Zap } from 'lucide-react';
+import { ArrowLeft, Pause, Play, Crown, HelpCircle, TrendingUp, Target, Zap } from 'lucide-react';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -1262,7 +1261,7 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
               aria-pressed={isPaused}
               className="w-12 h-12 p-0 bg-neo-cream hover:brightness-110 border-2 border-neo-black rounded-neo flex items-center justify-center shadow-hard-sm"
             >
-              {isPaused ? <FaPlay className="text-lg text-neo-black" /> : <FaPause className="text-lg text-neo-black" />}
+              {isPaused ? <Play className="text-lg text-neo-black" /> : <Pause className="text-lg text-neo-black" />}
             </Button>
           ) : (
             <Button
@@ -1286,7 +1285,7 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
             aria-label={t('common.quit') || 'Quit game'}
             className="w-12 h-12 p-0 bg-neo-red hover:brightness-110 border-2 border-neo-black rounded-neo flex items-center justify-center shadow-hard-sm"
           >
-            <FaArrowLeft className="text-lg text-neo-cream" />
+            <ArrowLeft className="text-lg text-neo-cream" />
           </Button>
         </div>
 
@@ -1370,19 +1369,19 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
                 <div className="space-y-3 text-neo-black/80 font-medium">
                   <div className="flex items-center gap-3">
                     <div className="w-10 h-10 bg-neo-cream text-neo-black border-2 border-neo-black rounded-neo flex items-center justify-center">
-                      <FaPause className="text-neo-black" />
+                      <Pause className="text-neo-black" />
                     </div>
                     <span>{t('landscape.tutorialPause') || 'Bottom-left: Pause/Resume game'}</span>
                   </div>
                   <div className="flex items-center gap-3">
                     <div className="w-10 h-10 bg-neo-red border-2 border-neo-black rounded-neo flex items-center justify-center">
-                      <FaArrowLeft className="text-neo-cream" />
+                      <ArrowLeft className="text-neo-cream" />
                     </div>
                     <span>{t('landscape.tutorialQuit') || 'Bottom-right: Quit game'}</span>
                   </div>
                   <div className="flex items-center gap-3">
                     <div className="w-10 h-10 bg-neo-cyan text-neo-black border-2 border-neo-black rounded-neo flex items-center justify-center">
-                      <FaQuestion className="text-neo-black" />
+                      <HelpCircle className="text-neo-black" />
                     </div>
                     <span>{t('landscape.tutorialHelp') || 'Top-right: Help & rules'}</span>
                   </div>
@@ -1436,7 +1435,7 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
       {/* Header with controls */}
       <div className="flex items-center justify-between px-4">
         <Button variant="ghost" size="sm" onClick={onQuit}>
-          <FaArrowLeft className="mr-2" />
+          <ArrowLeft className="mr-2" />
           {t('common.quit') || 'Quit'}
         </Button>
         {settings.mode !== 'practice' ? (
@@ -1445,7 +1444,7 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
             size="sm"
             onClick={() => setIsPaused(!isPaused)}
           >
-            {isPaused ? <FaPlay /> : <FaPause />}
+            {isPaused ? <Play /> : <Pause />}
           </Button>
         ) : (
           <Button variant="accent" onClick={handleFinishPractice}>
@@ -1546,7 +1545,7 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
                     </>
                   ) : (
                     <>
-                      <FaCrown className="w-4 h-4 text-neo-yellow" />
+                      <Crown className="w-4 h-4 text-neo-yellow" />
                       <span className="font-bold text-sm text-neo-black/70 dark:text-neo-white/70">
                         {t('challenge.recordToBeat') || 'Record'}: <span className="font-black text-neo-black dark:text-neo-white">{targetHighScore}</span>
                       </span>

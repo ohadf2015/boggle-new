@@ -2,9 +2,14 @@
 
 import React, { useState, useCallback, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FaArrowLeft, FaWhatsapp, FaCopy, FaCheck } from 'react-icons/fa';
-import { FaXTwitter } from 'react-icons/fa6';
-import { Share2, Trophy, Flame, Target, Clock, BookOpen } from 'lucide-react';
+import { Share2, Trophy, Flame, Target, Clock, BookOpen, ArrowLeft, MessageCircle, Copy, Check } from 'lucide-react';
+
+// X/Twitter icon (no lucide equivalent)
+const XTwitterIcon = ({ className }: { className?: string }) => (
+  <svg className={className} viewBox="0 0 24 24" fill="currentColor" width="1em" height="1em">
+    <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+  </svg>
+);
 import { Button } from '@/components/ui/button';
 import confetti from 'canvas-confetti';
 import {
@@ -226,7 +231,7 @@ const DailyChallengeResults: React.FC<DailyChallengeResultsProps> = ({
           onClick={onBack}
           className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white"
         >
-          <FaArrowLeft className="mr-2" />
+          <ArrowLeft className="w-4 h-4 mr-2" />
           {t('daily.home')}
         </Button>
       </motion.div>
@@ -364,7 +369,7 @@ const DailyChallengeResults: React.FC<DailyChallengeResultsProps> = ({
               aria-label="Share on WhatsApp"
               className="py-3 min-h-[44px] bg-[#25D366] text-black border-3 border-neo-black rounded-neo shadow-hard-sm hover:-translate-y-0.5 transition-all focus:ring-2 focus:ring-neo-yellow focus:ring-offset-2"
             >
-              <FaWhatsapp className="w-5 h-5" />
+              <MessageCircle className="w-5 h-5" />
             </Button>
 
             <Button
@@ -372,7 +377,7 @@ const DailyChallengeResults: React.FC<DailyChallengeResultsProps> = ({
               aria-label="Share on X (Twitter)"
               className="py-3 min-h-[44px] bg-black text-white border-3 border-gray-700 rounded-neo shadow-hard-sm hover:-translate-y-0.5 transition-all focus:ring-2 focus:ring-neo-cyan focus:ring-offset-2"
             >
-              <FaXTwitter className="w-5 h-5" />
+              <XTwitterIcon className="w-5 h-5" />
             </Button>
 
             <Button
@@ -381,9 +386,9 @@ const DailyChallengeResults: React.FC<DailyChallengeResultsProps> = ({
               className="py-3 min-h-[44px] bg-gray-600 text-white border-3 border-neo-black rounded-neo shadow-hard-sm hover:-translate-y-0.5 transition-all focus:ring-2 focus:ring-neo-cyan focus:ring-offset-2"
             >
               {copied ? (
-                <FaCheck className="w-5 h-5 text-neo-lime" />
+                <Check className="w-5 h-5 text-neo-lime" />
               ) : (
-                <FaCopy className="w-5 h-5" />
+                <Copy className="w-5 h-5" />
               )}
             </Button>
           </div>
@@ -482,7 +487,7 @@ const DailyChallengeResults: React.FC<DailyChallengeResultsProps> = ({
                   onClick={handleWhatsApp}
                   className="w-full py-3 bg-[#25D366] text-black border-3 border-neo-black rounded-neo"
                 >
-                  <FaWhatsapp className="mr-2 w-5 h-5" />
+                  <MessageCircle className="mr-2 w-5 h-5" />
                   WhatsApp
                 </Button>
 
@@ -490,7 +495,7 @@ const DailyChallengeResults: React.FC<DailyChallengeResultsProps> = ({
                   onClick={handleTwitter}
                   className="w-full py-3 bg-black text-white border-3 border-gray-700 rounded-neo"
                 >
-                  <FaXTwitter className="mr-2 w-5 h-5" />
+                  <XTwitterIcon className="mr-2 w-5 h-5" />
                   X / Twitter
                 </Button>
 
@@ -500,12 +505,12 @@ const DailyChallengeResults: React.FC<DailyChallengeResultsProps> = ({
                 >
                   {copied ? (
                     <>
-                      <FaCheck className="mr-2 w-5 h-5 text-neo-lime" />
+                      <Check className="mr-2 w-5 h-5 text-neo-lime" />
                       {t('common.copied')}
                     </>
                   ) : (
                     <>
-                      <FaCopy className="mr-2 w-5 h-5" />
+                      <Copy className="mr-2 w-5 h-5" />
                       {t('daily.copyToClipboard')}
                     </>
                   )}

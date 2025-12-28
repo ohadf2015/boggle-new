@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { FaArrowLeft, FaCheck } from 'react-icons/fa';
+import { ArrowLeft, Check } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
@@ -148,7 +148,7 @@ const ProfileSetup: React.FC<ProfileSetupProps> = ({
             onClick={onBack}
             className="absolute start-4 flex items-center gap-2 px-3 py-2 rounded-neo border-3 border-neo-black dark:border-slate-600 bg-neo-cream dark:bg-slate-700 shadow-hard hover:shadow-hard-lg hover:translate-x-[-2px] hover:translate-y-[-2px] transition-all text-neo-black dark:text-neo-white text-sm font-bold"
           >
-            <FaArrowLeft className="w-4 h-4 rtl:rotate-180" />
+            <ArrowLeft className="w-4 h-4 rtl:rotate-180" />
             <span className="hidden sm:inline">{t('common.back') || 'Back'}</span>
           </button>
 
@@ -320,7 +320,7 @@ const ProfileSetup: React.FC<ProfileSetupProps> = ({
                   size="lg"
                   className="w-full h-14 text-lg font-black uppercase"
                 >
-                  <FaCheck className="mr-2" />
+                  <Check className="mr-2" />
                   {t('multiplayerFlow.profileSetup.continueButton') || 'Continue'}
                 </Button>
               </CardContent>

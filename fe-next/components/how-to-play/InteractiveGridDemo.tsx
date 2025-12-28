@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
-import { FaFire, FaRedo, FaPlay, FaCheck } from 'react-icons/fa';
+import { Flame, RotateCw, Play, Check } from 'lucide-react';
 import { Badge } from '../ui/badge';
 import { Button } from '../ui/button';
 
@@ -124,7 +124,7 @@ export const InteractiveGridDemo: React.FC<InteractiveGridDemoProps> = ({ t, dir
             animate={{ scale: 1, opacity: 1, y: 0 }}
             className="flex items-center gap-1.5"
           >
-            <FaFire className={`text-lg ${comboCount >= 3 ? 'text-neo-orange animate-pulse drop-shadow-[0_0_8px_rgba(255,140,0,0.7)]' : 'text-gray-600'}`} />
+            <Flame className={`text-lg ${comboCount >= 3 ? 'text-neo-orange animate-pulse drop-shadow-[0_0_8px_rgba(255,140,0,0.7)]' : 'text-gray-600'}`} />
             <Badge className={`${comboCount >= 3 ? 'bg-neo-orange shadow-[0_0_12px_rgba(255,140,0,0.5)]' : 'bg-gray-300'} text-neo-black border-2 border-neo-black font-bold text-xs sm:text-sm px-2 py-0.5 whitespace-nowrap`}>
               {comboCount}x Combo {comboCount >= 3 && `(${getComboMultiplier(comboCount)}×)`}
             </Badge>
@@ -263,7 +263,7 @@ export const InteractiveGridDemo: React.FC<InteractiveGridDemoProps> = ({ t, dir
             transition={{ type: "spring", stiffness: 400 }}
             className="flex items-center gap-1.5 bg-neo-lime/20 px-3 py-1.5 rounded-lg border-2 border-neo-lime"
           >
-            <FaCheck className="text-lg text-neo-lime" />
+            <Check className="text-lg text-neo-lime" />
             <span className="font-bold text-sm sm:text-base text-neo-lime">+{currentDemo.points}</span>
           </motion.div>
         )}
@@ -288,7 +288,7 @@ export const InteractiveGridDemo: React.FC<InteractiveGridDemoProps> = ({ t, dir
             onClick={() => setAutoPlay(true)}
             className="bg-neo-lime hover:bg-neo-lime/80 text-xs sm:text-sm px-3 py-2 border-2 border-neo-black shadow-hard-sm hover:shadow-hard transition-all"
           >
-            <FaPlay className={`text-xs ${dir === 'rtl' ? 'ml-1.5' : 'mr-1.5'}`} />
+            <Play className={`text-xs ${dir === 'rtl' ? 'ml-1.5' : 'mr-1.5'}`} />
             {t('howToPlay.demo.play') || 'Play'}
           </Button>
         )}
@@ -298,7 +298,7 @@ export const InteractiveGridDemo: React.FC<InteractiveGridDemoProps> = ({ t, dir
           onClick={handleReplay}
           className="bg-neo-cyan hover:bg-neo-cyan/80 text-xs sm:text-sm px-3 py-2 border-2 border-neo-black shadow-hard-sm hover:shadow-hard transition-all"
         >
-          <FaRedo className={`text-xs ${dir === 'rtl' ? 'ml-1.5' : 'mr-1.5'}`} />
+          <RotateCw className={`text-xs ${dir === 'rtl' ? 'ml-1.5' : 'mr-1.5'}`} />
           {t('howToPlay.demo.replay') || 'Replay'}
         </Button>
       </div>

@@ -2,7 +2,7 @@
 
 import React, { memo, useMemo } from 'react';
 import { motion } from 'framer-motion';
-import { FaTrophy } from 'react-icons/fa';
+import { Trophy } from 'lucide-react';
 import { getRankStyle, getRankIconString } from '@/utils/rankingStyles';
 import Avatar from '../../../components/Avatar';
 import type { Avatar as AvatarType } from '@/shared/types/game';
@@ -51,7 +51,7 @@ export const LiveLeaderboard = memo<LiveLeaderboardProps>(({
     >
       <div className="py-3 px-4 border-b-4 border-neo-black bg-neo-purple text-white">
         <h3 className="flex items-center gap-2 text-neo-cream text-base uppercase tracking-widest font-black">
-          <FaTrophy className="text-neo-yellow" style={{ filter: 'drop-shadow(2px 2px 0px rgb(var(--neo-black)))' }} />
+          <Trophy className="text-neo-yellow" style={{ filter: 'drop-shadow(2px 2px 0px rgb(var(--neo-black)))' }} />
           {t('playerView.leaderboard')}
         </h3>
       </div>

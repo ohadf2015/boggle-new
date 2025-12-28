@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { FaClock, FaTrophy, FaRocket } from 'react-icons/fa';
+import { Clock, Trophy, Rocket } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogBody, DialogFooter } from './ui/dialog';
 import { Button } from './ui/button';
 import { useLanguage } from '../contexts/LanguageContext';
@@ -31,9 +31,9 @@ const LateJoinerWelcome: React.FC<LateJoinerWelcomeProps> = ({
   };
 
   const tips = [
-    { icon: FaRocket, text: t('lateJoiner.quickTip1'), color: 'bg-neo-yellow' },
-    { icon: FaClock, text: t('lateJoiner.quickTip2'), color: 'bg-neo-pink' },
-    { icon: FaTrophy, text: t('lateJoiner.quickTip3'), color: 'bg-neo-lime' },
+    { icon: Rocket, text: t('lateJoiner.quickTip1'), color: 'bg-neo-yellow' },
+    { icon: Clock, text: t('lateJoiner.quickTip2'), color: 'bg-neo-pink' },
+    { icon: Trophy, text: t('lateJoiner.quickTip3'), color: 'bg-neo-lime' },
   ];
 
   return (
@@ -45,7 +45,7 @@ const LateJoinerWelcome: React.FC<LateJoinerWelcomeProps> = ({
               animate={{ scale: [1, 1.2, 1] }}
               transition={{ duration: 0.5, repeat: 2 }}
             >
-              <FaRocket className="text-2xl sm:text-3xl" />
+              <Rocket className="text-2xl sm:text-3xl" />
             </motion.div>
             {t('lateJoiner.welcomeTitle')}
           </DialogTitle>
@@ -72,7 +72,7 @@ const LateJoinerWelcome: React.FC<LateJoinerWelcomeProps> = ({
               className="bg-neo-yellow rounded-neo border-2 border-neo-black p-2 sm:p-3 shadow-hard-sm"
             >
               <div className="flex items-center gap-2 mb-1">
-                <FaClock className="text-neo-black" />
+                <Clock className="text-neo-black" />
                 <span className="text-xs sm:text-sm font-bold text-neo-black">
                   {t('lateJoiner.timeRemaining')}
                 </span>
@@ -90,7 +90,7 @@ const LateJoinerWelcome: React.FC<LateJoinerWelcomeProps> = ({
               className="bg-neo-pink rounded-neo border-2 border-neo-black p-2 sm:p-3 shadow-hard-sm"
             >
               <div className="flex items-center gap-2 mb-1">
-                <FaTrophy className="text-neo-black" />
+                <Trophy className="text-neo-black" />
                 <span className="text-xs sm:text-sm font-bold text-neo-black">
                   {t('lateJoiner.currentLeaders')}
                 </span>
@@ -133,7 +133,7 @@ const LateJoinerWelcome: React.FC<LateJoinerWelcomeProps> = ({
             className="bg-neo-lime w-full text-sm sm:text-base"
             variant="outline"
           >
-            <FaRocket className={`${dir === 'rtl' ? 'ml-2' : 'mr-2'}`} />
+            <Rocket className={`${dir === 'rtl' ? 'ml-2' : 'mr-2'}`} />
             {t('lateJoiner.gotIt')}
           </Button>
         </DialogFooter>

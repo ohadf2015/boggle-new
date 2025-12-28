@@ -1,7 +1,7 @@
 'use client';
 
 import React, { memo } from 'react';
-import { FaListUl, FaTrophy, FaComments } from 'react-icons/fa';
+import { List, Trophy, MessageSquare } from 'lucide-react';
 
 interface MobileWordStatsProps {
   wordCount: number;
@@ -33,7 +33,7 @@ export const MobileWordStats = memo<MobileWordStatsProps>(({
         onClick={onOpenWords}
         className="flex items-center gap-2 px-3 py-1.5 bg-neo-cyan rounded-neo border-2 border-neo-black shadow-hard-sm hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-hard transition-all"
       >
-        <FaListUl className="text-neo-black" />
+        <List className="text-neo-black" />
         <span className="font-black text-neo-black">
           {wordCount} {t('playerView.words') || 'words'}
         </span>
@@ -44,7 +44,7 @@ export const MobileWordStats = memo<MobileWordStatsProps>(({
         onClick={onOpenLeaderboard}
         className="flex items-center gap-2 px-3 py-1.5 bg-neo-purple text-white rounded-neo border-2 border-neo-black shadow-hard-sm hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-hard transition-all"
       >
-        <FaTrophy className="text-neo-yellow" />
+        <Trophy className="text-neo-yellow" />
         <span className="font-black text-neo-cream">
           #{rank}/{totalPlayers}
         </span>
@@ -55,7 +55,7 @@ export const MobileWordStats = memo<MobileWordStatsProps>(({
         onClick={onOpenChat}
         className="flex items-center gap-2 px-3 py-1.5 bg-neo-gray text-white rounded-neo border-2 border-neo-black shadow-hard-sm hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-hard transition-all"
       >
-        <FaComments className="text-neo-cyan" />
+        <MessageSquare className="text-neo-cyan" />
       </button>
     </div>
   );

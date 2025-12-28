@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { FaDoorOpen } from 'react-icons/fa';
+import { DoorOpen } from 'lucide-react';
 import { Button } from './ui/button';
 
 /**
@@ -28,7 +28,7 @@ const ExitRoomButton: React.FC<ExitRoomButtonProps> = ({ onClick, label, classNa
         active:translate-x-[2px] active:translate-y-[2px] active:shadow-none
         font-black transition-all ${className}`}
     >
-      <FaDoorOpen className="me-2" />
+      <DoorOpen className="me-2" />
       {label}
     </Button>
   );

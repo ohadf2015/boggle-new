@@ -2,13 +2,12 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import { FaGamepad, FaStar, FaTrophy, FaMedal, FaLevelUpAlt } from 'react-icons/fa';
+import { Gamepad2, Star, Trophy, Medal, TrendingUp, type LucideIcon } from 'lucide-react';
 import { Badge } from '../ui/badge';
-import type { IconType } from 'react-icons';
 
 interface XpBreakdownItem {
   key: string;
-  icon: IconType;
+  icon: LucideIcon;
   value: number;
   color: string;
 }
@@ -29,10 +28,10 @@ interface XpExplainerProps {
  */
 export const XpExplainer: React.FC<XpExplainerProps> = ({ t }) => {
   const xpBreakdown: XpBreakdownItem[] = [
-    { key: 'base', icon: FaGamepad, value: 50, color: 'bg-neo-cyan' },
-    { key: 'score', icon: FaStar, value: 25, color: 'bg-neo-yellow' },
-    { key: 'win', icon: FaTrophy, value: 100, color: 'bg-neo-lime' },
-    { key: 'achievement', icon: FaMedal, value: 30, color: 'bg-neo-pink' },
+    { key: 'base', icon: Gamepad2, value: 50, color: 'bg-neo-cyan' },
+    { key: 'score', icon: Star, value: 25, color: 'bg-neo-yellow' },
+    { key: 'win', icon: Trophy, value: 100, color: 'bg-neo-lime' },
+    { key: 'achievement', icon: Medal, value: 30, color: 'bg-neo-pink' },
   ];
 
   const titles: LevelTitle[] = [
@@ -49,7 +48,7 @@ export const XpExplainer: React.FC<XpExplainerProps> = ({ t }) => {
       {/* XP Sources */}
       <div className="bg-neo-cream text-neo-black rounded-neo border-3 border-neo-black p-4 shadow-hard-sm">
         <h4 className="font-bold text-neo-black mb-3 flex items-center gap-2">
-          <FaLevelUpAlt className="text-neo-pink" />
+          <TrendingUp className="text-neo-pink" />
           {t('howToPlay.xp.howToEarn')}
         </h4>
 

@@ -1,6 +1,6 @@
 import { useCallback, memo } from 'react';
 import { motion } from 'framer-motion';
-import { FaGamepad, FaTrophy, FaMinus, FaPlus, FaLock } from 'react-icons/fa';
+import { Gamepad2, Trophy, Minus, Plus, Lock } from 'lucide-react';
 import { cn } from '../lib/utils';
 import { useLanguage } from '../contexts/LanguageContext';
 
@@ -70,7 +70,7 @@ const GameTypeSelector = memo<GameTypeSelectorProps>(({
               : "bg-neo-cream text-neo-black shadow-hard-sm hover:shadow-hard"
           )}
         >
-          <FaGamepad className="text-sm" aria-hidden="true" />
+          <Gamepad2 className="text-sm" aria-hidden="true" />
           {t('hostView.regularGame') || 'Regular'}
         </motion.button>
 
@@ -86,9 +86,9 @@ const GameTypeSelector = memo<GameTypeSelectorProps>(({
             "bg-neo-gray/60 text-neo-cream/90 opacity-70 cursor-not-allowed"
           )}
         >
-          <FaTrophy className="text-sm" aria-hidden="true" />
+          <Trophy className="text-sm" aria-hidden="true" />
           {t('hostView.tournament') || 'Tournament'}
-          <FaLock className="text-xs" aria-hidden="true" />
+          <Lock className="text-xs" aria-hidden="true" />
         </motion.button>
       </div>
 
@@ -116,7 +116,7 @@ const GameTypeSelector = memo<GameTypeSelectorProps>(({
                   : "bg-neo-cream text-neo-black border-neo-black shadow-hard-sm hover:shadow-hard"
               )}
             >
-              <FaMinus size={10} aria-hidden="true" />
+              <Minus size={10} aria-hidden="true" />
             </motion.button>
 
             <span className="text-xl font-black text-neo-yellow w-6 text-center">
@@ -135,7 +135,7 @@ const GameTypeSelector = memo<GameTypeSelectorProps>(({
                   : "bg-neo-cream text-neo-black border-neo-black shadow-hard-sm hover:shadow-hard"
               )}
             >
-              <FaPlus size={10} aria-hidden="true" />
+              <Plus size={10} aria-hidden="true" />
             </motion.button>
           </div>
         </motion.div>

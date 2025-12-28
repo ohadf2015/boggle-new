@@ -1,6 +1,6 @@
 import React, { useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
-import { FaCrown, FaTrophy, FaMedal, FaHandPeace } from 'react-icons/fa';
+import { Crown, Trophy, Medal, Hand } from 'lucide-react';
 import { useLanguage } from '../../contexts/LanguageContext';
 import confetti from 'canvas-confetti';
 import Avatar from '../Avatar';
@@ -184,7 +184,7 @@ const ResultsWinnerBanner: React.FC<ResultsWinnerBannerProps> = ({
   if (!winner) return null;
 
   // Select the appropriate icon for this rank
-  const RankIcon = rank === 1 ? FaCrown : rank <= 3 ? FaMedal : FaHandPeace;
+  const RankIcon = rank === 1 ? Crown : rank <= 3 ? Medal : Hand;
 
   return (
     <motion.div
@@ -288,7 +288,7 @@ const ResultsWinnerBanner: React.FC<ResultsWinnerBannerProps> = ({
               transition={{ delay: 0.5, type: 'spring', stiffness: 150 }}
               className="flex items-center gap-2 flex-shrink-0"
             >
-              <FaTrophy
+              <Trophy
                 className="text-xl sm:text-2xl text-neo-black hidden sm:block"
                 style={{ filter: `drop-shadow(1px 1px 0px ${styles.trophyShadowColor})` }}
               />

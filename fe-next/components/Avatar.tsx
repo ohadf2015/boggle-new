@@ -2,7 +2,7 @@
 
 import { useState, useEffect, memo } from 'react';
 import Image from 'next/image';
-import { FaRobot } from 'react-icons/fa';
+import { Bot } from 'lucide-react';
 import { getAvatarPath, mapEmojiToAvatar } from '@/utils/avatarConfig';
 
 /**
@@ -127,7 +127,7 @@ const Avatar = memo<AvatarProps>(({
       className={`rounded-full flex items-center justify-center flex-shrink-0 ${config.container} ${config.text} ${className}`}
       style={{ backgroundColor: fallbackColor }}
     >
-      {isRobotEmoji ? <FaRobot className="text-neo-cream" style={{ fontSize: '0.7em' }} /> : fallbackEmoji}
+      {isRobotEmoji ? <Bot className="text-neo-cream" style={{ fontSize: '0.7em' }} /> : fallbackEmoji}
     </div>
   );
 });

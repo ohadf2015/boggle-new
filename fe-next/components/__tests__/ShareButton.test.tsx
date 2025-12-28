@@ -7,7 +7,7 @@
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import ShareButton from '../ShareButton';
-import { FaLink, FaWhatsapp, FaQrcode } from 'react-icons/fa';
+import { Link as LinkIcon, MessageCircle, QrCode } from 'lucide-react';
 
 // Default noop handler for tests that don't test click behavior
 const noop = () => {};
@@ -20,7 +20,7 @@ describe('ShareButton', () => {
     });
 
     it('renders with an icon when provided', () => {
-      render(<ShareButton onClick={noop} icon={<FaLink data-testid="link-icon" />}>Copy Link</ShareButton>);
+      render(<ShareButton onClick={noop} icon={<LinkIcon data-testid="link-icon" />}>Copy Link</ShareButton>);
       expect(screen.getByTestId('link-icon')).toBeInTheDocument();
     });
 
@@ -155,7 +155,7 @@ describe('ShareButton', () => {
   describe('integration with icons', () => {
     it('renders correctly with FaLink icon', () => {
       render(
-        <ShareButton onClick={noop} variant="secondary" icon={<FaLink data-testid="fa-link" />}>
+        <ShareButton onClick={noop} variant="secondary" icon={<LinkIcon data-testid="fa-link" />}>
           Copy Link
         </ShareButton>
       );
@@ -165,7 +165,7 @@ describe('ShareButton', () => {
 
     it('renders correctly with FaWhatsapp icon', () => {
       render(
-        <ShareButton onClick={noop} variant="whatsapp" icon={<FaWhatsapp data-testid="fa-whatsapp" />}>
+        <ShareButton onClick={noop} variant="whatsapp" icon={<MessageCircle data-testid="fa-whatsapp" />}>
           WhatsApp
         </ShareButton>
       );
@@ -174,7 +174,7 @@ describe('ShareButton', () => {
 
     it('renders correctly with FaQrcode icon', () => {
       render(
-        <ShareButton onClick={noop} variant="secondary" icon={<FaQrcode data-testid="fa-qrcode" />}>
+        <ShareButton onClick={noop} variant="secondary" icon={<QrCode data-testid="fa-qrcode" />}>
           QR Code
         </ShareButton>
       );

@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useCallback, memo, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FaThumbsUp, FaThumbsDown, FaTimes, FaBook, FaCheckCircle } from 'react-icons/fa';
+import { ThumbsUp, ThumbsDown, X, Book, CheckCircle } from 'lucide-react';
 import Avatar from '../Avatar';
 import { useLanguage } from '../../contexts/LanguageContext';
 
@@ -256,7 +256,7 @@ const WordFeedbackModal = memo<WordFeedbackModalProps>(({
             flex items-center justify-between
           ">
             <h2 className="text-xl font-black uppercase tracking-tight text-neo-cream flex items-center gap-2">
-              <FaBook className="text-neo-yellow" />
+              <Book className="w-5 h-5 text-neo-yellow" />
               {t('wordFeedback.dictionaryTitle') || 'Build Our Dictionary'}
             </h2>
             <div className="flex items-center gap-2">
@@ -274,7 +274,7 @@ const WordFeedbackModal = memo<WordFeedbackModalProps>(({
                 "
                 aria-label="Close"
               >
-                <FaTimes size={20} />
+                <X className="w-5 h-5" />
               </button>
             </div>
           </div>
@@ -350,7 +350,7 @@ const WordFeedbackModal = memo<WordFeedbackModalProps>(({
                   <p className="text-xs font-semibold text-neo-black/70">
                     {isValidForScoring ? (
                       <>
-                        <FaCheckCircle className="inline mr-1 text-neo-cyan" />
+                        <CheckCircle className="inline w-4 h-4 mr-1 text-neo-cyan" />
                         {t('wordFeedback.validForScoring') || 'Counts as valid! Help add it to dictionary.'}
                         {votesNeeded > 0 && (
                           <span className="text-neo-black/70 ml-1">
@@ -360,12 +360,12 @@ const WordFeedbackModal = memo<WordFeedbackModalProps>(({
                       </>
                     ) : votesNeeded > 0 ? (
                       <>
-                        <FaCheckCircle className="inline mr-1 text-neo-lime" />
+                        <CheckCircle className="inline w-4 h-4 mr-1 text-neo-lime" />
                         {t('wordFeedback.votesNeeded', { count: String(votesNeeded) }) || `${votesNeeded} more votes to approve`}
                       </>
                     ) : (
                       <>
-                        <FaCheckCircle className="inline mr-1 text-neo-lime" />
+                        <CheckCircle className="inline w-4 h-4 mr-1 text-neo-lime" />
                         {t('wordFeedback.almostApproved') || 'Almost approved!'}
                       </>
                     )}
@@ -399,7 +399,7 @@ const WordFeedbackModal = memo<WordFeedbackModalProps>(({
                     transition-all duration-150
                   "
                 >
-                  <FaThumbsDown size={24} />
+                  <ThumbsDown className="w-6 h-6" />
                   <span>{t('wordFeedback.notAWord') || 'Not a word'}</span>
                 </button>
 
@@ -420,7 +420,7 @@ const WordFeedbackModal = memo<WordFeedbackModalProps>(({
                     transition-all duration-150
                   "
                 >
-                  <FaThumbsUp size={24} />
+                  <ThumbsUp className="w-6 h-6" />
                   <span>{t('wordFeedback.realWord') || 'Real word!'}</span>
                 </button>
               </motion.div>
@@ -431,7 +431,7 @@ const WordFeedbackModal = memo<WordFeedbackModalProps>(({
                 className="text-center py-4"
               >
                 <span className="text-2xl font-black text-neo-purple flex items-center justify-center gap-2">
-                  <FaCheckCircle className="text-neo-lime" />
+                  <CheckCircle className="w-6 h-6 text-neo-lime" />
                   {hasMoreWords
                     ? (t('wordFeedback.nextWord') || 'Next word...')
                     : (t('wordFeedback.thankYou') || 'Thanks for helping!')

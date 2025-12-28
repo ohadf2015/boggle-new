@@ -3,10 +3,11 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import {
-  FaUsers, FaGamepad, FaClock, FaGlobe, FaChartLine,
-  FaArrowLeft, FaSync, FaUserPlus, FaLanguage, FaLink,
-  FaTrophy, FaCalendarDay, FaCalendarWeek, FaServer, FaUser, FaRobot
-} from 'react-icons/fa';
+  Users, Gamepad2, Clock, Globe, TrendingUp,
+  ArrowLeft, RefreshCw, UserPlus, Languages, Link,
+  Trophy, CalendarDays, CalendarRange, Server, User, Bot,
+  Book, Settings
+} from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import Header from '@/components/Header';
 import { Button } from '@/components/ui/button';
@@ -16,6 +17,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/lib/supabase';
 import { cn } from '@/lib/utils';
 import toast from 'react-hot-toast';
+import { DailyWordSchedule } from '@/components/admin/DailyWordSchedule';
 
 // Country code to flag emoji and name mapping
 const COUNTRY_INFO: Record<string, { flag: string; name: string }> = {
@@ -473,7 +475,7 @@ export default function AdminDashboard() {
                   : 'bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-400 hover:to-blue-400'
               )}
             >
-              <FaArrowLeft className="mr-2" />
+              <ArrowLeft className="mr-2" />
               Back to Game
             </Button>
           </div>
@@ -534,7 +536,7 @@ export default function AdminDashboard() {
                 isDarkMode ? 'border-slate-600 text-gray-300' : ''
               )}
             >
-              <FaSync className={cn('mr-2', refreshing && 'animate-spin')} />
+              <RefreshCw className={cn('mr-2', refreshing && 'animate-spin')} />
               Refresh
             </Button>
             <Button
@@ -546,7 +548,7 @@ export default function AdminDashboard() {
                 isDarkMode ? 'border-slate-600 text-gray-300' : ''
               )}
             >
-              <FaArrowLeft className="mr-2" />
+              <ArrowLeft className="mr-2" />
               Back
             </Button>
           </div>
@@ -574,11 +576,11 @@ export default function AdminDashboard() {
               </span>
             </div>
             <div className="grid grid-cols-2 sm:grid-cols-5 gap-4">
-              <RealtimeStat icon={<FaServer />} label="Socket Connections" value={realtimeStats.socketConnections} isDarkMode={isDarkMode} />
-              <RealtimeStat icon={<FaGamepad />} label="Active Rooms" value={realtimeStats.activeRooms} isDarkMode={isDarkMode} />
-              <RealtimeStat icon={<FaUsers />} label="Players Online" value={realtimeStats.playersOnline} isDarkMode={isDarkMode} />
-              <RealtimeStat icon={<FaUser />} label="Single Players" value={realtimeStats.singlePlayerCount} isDarkMode={isDarkMode} />
-              <RealtimeStat icon={<FaTrophy />} label="Games In Progress" value={realtimeStats.gamesInProgress} isDarkMode={isDarkMode} />
+              <RealtimeStat icon={<Server />} label="Socket Connections" value={realtimeStats.socketConnections} isDarkMode={isDarkMode} />
+              <RealtimeStat icon={<Gamepad2 />} label="Active Rooms" value={realtimeStats.activeRooms} isDarkMode={isDarkMode} />
+              <RealtimeStat icon={<Users />} label="Players Online" value={realtimeStats.playersOnline} isDarkMode={isDarkMode} />
+              <RealtimeStat icon={<User />} label="Single Players" value={realtimeStats.singlePlayerCount} isDarkMode={isDarkMode} />
+              <RealtimeStat icon={<Trophy />} label="Games In Progress" value={realtimeStats.gamesInProgress} isDarkMode={isDarkMode} />
             </div>
           </motion.div>
         )}
@@ -616,28 +618,28 @@ export default function AdminDashboard() {
             {/* Main Stats Grid */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
               <StatCard
-                icon={<FaUsers />}
+                icon={<Users />}
                 label="Total Players"
                 value={stats.overview.totalPlayers.toLocaleString()}
                 isDarkMode={isDarkMode}
                 color="cyan"
               />
               <StatCard
-                icon={<FaGamepad />}
+                icon={<Gamepad2 />}
                 label="Total Games"
                 value={stats.overview.totalGames.toLocaleString()}
                 isDarkMode={isDarkMode}
                 color="purple"
               />
               <StatCard
-                icon={<FaClock />}
+                icon={<Clock />}
                 label="Total Play Time"
                 value={`${stats.overview.totalGameTimeHours}h`}
                 isDarkMode={isDarkMode}
                 color="orange"
               />
               <StatCard
-                icon={<FaChartLine />}
+                icon={<TrendingUp />}
                 label="Words Found"
                 value={stats.overview.totalWords.toLocaleString()}
                 isDarkMode={isDarkMode}
@@ -648,37 +650,37 @@ export default function AdminDashboard() {
             {/* Activity Stats */}
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
               <SmallStatCard
-                icon={<FaCalendarDay />}
+                icon={<CalendarDays />}
                 label="Games Today"
                 value={stats.activity.gamesToday}
                 isDarkMode={isDarkMode}
               />
               <SmallStatCard
-                icon={<FaUsers />}
+                icon={<Users />}
                 label="Players Today"
                 value={stats.activity.uniquePlayersToday}
                 isDarkMode={isDarkMode}
               />
               <SmallStatCard
-                icon={<FaCalendarWeek />}
+                icon={<CalendarRange />}
                 label="Players This Week"
                 value={stats.activity.uniquePlayersWeek}
                 isDarkMode={isDarkMode}
               />
               <SmallStatCard
-                icon={<FaUsers />}
+                icon={<Users />}
                 label="Players This Month"
                 value={stats.activity.uniquePlayersMonth}
                 isDarkMode={isDarkMode}
               />
               <SmallStatCard
-                icon={<FaUserPlus />}
+                icon={<UserPlus />}
                 label="Signups Today"
                 value={stats.activity.signupsToday}
                 isDarkMode={isDarkMode}
               />
               <SmallStatCard
-                icon={<FaUserPlus />}
+                icon={<UserPlus />}
                 label="Signups This Week"
                 value={stats.activity.signupsWeek}
                 isDarkMode={isDarkMode}
@@ -701,7 +703,7 @@ export default function AdminDashboard() {
                   'text-lg font-bold mb-4 flex items-center gap-2',
                   isDarkMode ? 'text-white' : 'text-gray-900'
                 )}>
-                  <FaLanguage className="text-cyan-500" />
+                  <Languages className="text-cyan-500" />
                   Games by Language
                 </h3>
                 <div className="space-y-3">
@@ -749,7 +751,7 @@ export default function AdminDashboard() {
                   'text-lg font-bold mb-4 flex items-center gap-2',
                   isDarkMode ? 'text-white' : 'text-gray-900'
                 )}>
-                  <FaGlobe className="text-green-500" />
+                  <Globe className="text-green-500" />
                   Players by Country
                 </h3>
                 {countries.length > 0 ? (
@@ -792,6 +794,82 @@ export default function AdminDashboard() {
                 )}
               </motion.div>
             </div>
+
+            {/* Admin Tools Section */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3 }}
+            >
+              <h3 className={cn(
+                'text-lg font-bold mb-4 flex items-center gap-2',
+                isDarkMode ? 'text-white' : 'text-gray-900'
+              )}>
+                <Settings className="text-cyan-500" />
+                Admin Tools
+              </h3>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                {/* Daily Word Manager */}
+                <motion.button
+                  onClick={() => router.push(`/${language}/admin/words`)}
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  className={cn(
+                    'rounded-xl p-6 border text-left transition-all',
+                    isDarkMode
+                      ? 'bg-gradient-to-br from-purple-900/40 to-pink-900/40 border-purple-500/30 hover:border-purple-400'
+                      : 'bg-gradient-to-br from-purple-50 to-pink-50 border-purple-200 hover:border-purple-300 shadow-md'
+                  )}
+                >
+                  <div className={cn('text-3xl mb-3', isDarkMode ? 'text-purple-400' : 'text-purple-600')}>
+                    <Book />
+                  </div>
+                  <h4 className={cn(
+                    'text-lg font-bold mb-2',
+                    isDarkMode ? 'text-white' : 'text-gray-900'
+                  )}>
+                    Daily Word Manager
+                  </h4>
+                  <p className={cn(
+                    'text-sm',
+                    isDarkMode ? 'text-gray-400' : 'text-gray-600'
+                  )}>
+                    Manage target words for daily Word Hunt challenges across all languages
+                  </p>
+                </motion.button>
+
+                {/* Placeholder for future tools */}
+                <div className={cn(
+                  'rounded-xl p-6 border opacity-50',
+                  isDarkMode ? 'bg-slate-800/50 border-slate-700' : 'bg-white border-gray-200'
+                )}>
+                  <div className={cn('text-3xl mb-3', isDarkMode ? 'text-gray-600' : 'text-gray-400')}>
+                    <Settings />
+                  </div>
+                  <h4 className={cn(
+                    'text-lg font-bold mb-2',
+                    isDarkMode ? 'text-gray-500' : 'text-gray-500'
+                  )}>
+                    More tools coming soon
+                  </h4>
+                  <p className={cn(
+                    'text-sm',
+                    isDarkMode ? 'text-gray-600' : 'text-gray-500'
+                  )}>
+                    Additional admin features will be added here
+                  </p>
+                </div>
+              </div>
+            </motion.div>
+
+            {/* Daily Word Schedule - AI-Selected Words */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.4 }}
+            >
+              <DailyWordSchedule />
+            </motion.div>
           </div>
         )}
 
@@ -809,7 +887,7 @@ export default function AdminDashboard() {
               'text-lg font-bold mb-4 flex items-center gap-2',
               isDarkMode ? 'text-white' : 'text-gray-900'
             )}>
-              <FaTrophy className="text-yellow-500" />
+              <Trophy className="text-yellow-500" />
               Top Players
             </h3>
             <div className="overflow-x-auto">
@@ -878,28 +956,28 @@ export default function AdminDashboard() {
             {/* UTM Sources */}
             <SourceCard
               title="UTM Sources"
-              icon={<FaLink />}
+              icon={<Link />}
               data={sources.sources}
               isDarkMode={isDarkMode}
             />
             {/* UTM Mediums */}
             <SourceCard
               title="UTM Mediums"
-              icon={<FaLink />}
+              icon={<Link />}
               data={sources.mediums}
               isDarkMode={isDarkMode}
             />
             {/* Campaigns */}
             <SourceCard
               title="Campaigns"
-              icon={<FaChartLine />}
+              icon={<TrendingUp />}
               data={sources.campaigns}
               isDarkMode={isDarkMode}
             />
             {/* Referrers */}
             <SourceCard
               title="Referrer Domains"
-              icon={<FaGlobe />}
+              icon={<Globe />}
               data={sources.referrers}
               isDarkMode={isDarkMode}
             />
@@ -920,7 +998,7 @@ export default function AdminDashboard() {
               'text-lg font-bold mb-4 flex items-center gap-2',
               isDarkMode ? 'text-white' : 'text-gray-900'
             )}>
-              <FaChartLine className="text-blue-500" />
+              <TrendingUp className="text-blue-500" />
               Daily Activity (Last 30 Days)
             </h3>
 
@@ -994,7 +1072,7 @@ export default function AdminDashboard() {
                   'text-lg font-bold flex items-center gap-2',
                   isDarkMode ? 'text-white' : 'text-gray-900'
                 )}>
-                  <FaGlobe className="text-cyan-500" />
+                  <Globe className="text-cyan-500" />
                   Community Words Moderation
                 </h3>
                 {communityWordsStats && (
@@ -1249,7 +1327,7 @@ export default function AdminDashboard() {
                 'text-lg font-bold flex items-center gap-2',
                 isDarkMode ? 'text-white' : 'text-gray-900'
               )}>
-                <FaRobot className="text-purple-500" />
+                <Bot className="text-purple-500" />
                 Bot Words Review
               </h3>
 

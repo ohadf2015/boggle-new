@@ -2,7 +2,7 @@
 
 import React, { useState, useMemo, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FaTrophy, FaFire, FaTimes, FaShareAlt } from 'react-icons/fa';
+import { Trophy, Flame, X, Share2 } from 'lucide-react';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { useTheme } from '../../utils/ThemeContext';
 import { cn } from '../../lib/utils';
@@ -236,7 +236,7 @@ const ShareWinPrompt: React.FC<ShareWinPromptProps> = ({
             )}
             aria-label={language === 'he' ? 'שתף' : 'Share'}
           >
-            <FaShareAlt size={14} />
+            <Share2 size={14} />
             <span>{language === 'he' ? 'שתף' : 'Share'}</span>
           </motion.button>
         </motion.div>
@@ -285,7 +285,7 @@ const ShareWinPrompt: React.FC<ShareWinPromptProps> = ({
               isDarkMode ? 'hover:bg-white/10 text-gray-300' : 'hover:bg-black/5 text-gray-600'
             )}
           >
-            <FaTimes size={14} />
+            <X size={14} />
           </button>
         )}
 
@@ -295,7 +295,7 @@ const ShareWinPrompt: React.FC<ShareWinPromptProps> = ({
             animate={{ rotate: [0, -10, 10, 0], scale: [1, 1.2, 1] }}
             transition={{ duration: 1.5, repeat: Infinity, repeatDelay: 2 }}
           >
-            <FaTrophy className="text-3xl text-yellow-400 drop-shadow-lg" />
+            <Trophy className="text-3xl text-yellow-400 drop-shadow-lg" />
           </motion.div>
           <div>
             <h3 className={cn(
@@ -327,7 +327,7 @@ const ShareWinPrompt: React.FC<ShareWinPromptProps> = ({
                 : 'bg-yellow-500/20 text-yellow-400 border border-yellow-500/30'
             )}
           >
-            <FaFire className={streakDays >= 7 ? 'text-orange-500' : 'text-yellow-500'} />
+            <Flame className={streakDays >= 7 ? 'text-orange-500' : 'text-yellow-500'} />
             {streakDays} {t('growth.dayStreak') || 'day streak'}!
           </motion.div>
         )}
@@ -398,7 +398,7 @@ const ShareWinPrompt: React.FC<ShareWinPromptProps> = ({
             'focus:outline-none focus:ring-4 focus:ring-neo-cyan focus:ring-offset-2'
           )}
         >
-          <FaShareAlt size={18} />
+          <Share2 size={18} />
           <span>{language === 'he' ? 'שתף את הניצחון!' : 'Share Your Victory!'}</span>
         </motion.button>
 

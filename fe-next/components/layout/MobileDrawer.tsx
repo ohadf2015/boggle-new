@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FaTimes } from 'react-icons/fa';
+import { X } from 'lucide-react';
 import { cn } from '../../lib/utils';
 import { Button } from '../ui/button';
 
@@ -72,7 +72,7 @@ export function MobileDrawer({
                   onClick={onClose}
                   className="h-8 w-8 border-2"
                 >
-                  <FaTimes />
+                  <X />
                 </Button>
               </div>
             )}

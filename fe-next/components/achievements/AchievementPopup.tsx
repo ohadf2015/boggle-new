@@ -3,7 +3,7 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import confetti from 'canvas-confetti';
-import { FaShare } from 'react-icons/fa';
+import { Share } from 'lucide-react';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { useSoundEffects } from '../../contexts/SoundEffectsContext';
 import { getAchievementShareUrl, shareWithOgImage } from '../../utils/ogShare';
@@ -193,7 +193,7 @@ const AchievementPopup = ({ achievement, onComplete }: AchievementPopupProps): R
                   className="relative w-6 h-6 bg-neo-cyan border-2 border-neo-black rounded flex items-center justify-center text-xs font-black hover:bg-neo-lime transition-colors"
                   title={language === 'he' ? 'שתף' : 'Share'}
                 >
-                  <FaShare size={10} />
+                  <Share size={10} />
                   {showShareHint && (
                     <span className="absolute -bottom-6 left-1/2 -translate-x-1/2 text-[10px] whitespace-nowrap bg-neo-black text-neo-white px-1.5 py-0.5 rounded">
                       {language === 'he' ? 'הועתק!' : 'Copied!'}

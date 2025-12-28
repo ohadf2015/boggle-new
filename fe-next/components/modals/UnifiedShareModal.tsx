@@ -3,7 +3,7 @@
 import React, { useCallback, useMemo, useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { QRCodeSVG } from 'qrcode.react';
-import { FaCopy, FaWhatsapp, FaTrophy, FaFire, FaCheck, FaSpinner } from 'react-icons/fa';
+import { Copy, MessageCircle, Trophy, Flame, Check, Loader2 } from 'lucide-react';
 import { Dialog, DialogContent, DialogTitle } from '../ui/dialog';
 import { cn } from '@/lib/utils';
 import { getJoinUrl, copyJoinUrl, shareViaWhatsApp, generatePersonalizedShareMessage, type GameResultForShare } from '@/utils/share';
@@ -126,7 +126,7 @@ const UnifiedShareModal: React.FC<UnifiedShareModalProps> = ({
           'border-b-4 border-neo-black p-4 flex items-center justify-center gap-2',
           headerColor
         )}>
-          {isPostGame && <FaTrophy className="text-xl text-neo-black" />}
+          {isPostGame && <Trophy className="w-5 h-5 text-neo-black" />}
           <DialogTitle className={cn('text-lg font-black uppercase', headerTextColor)}>
             {isPostGame ? t('share.shareVictory') || 'Share Your Victory!' : t('share.modalTitle')}
           </DialogTitle>
@@ -172,7 +172,7 @@ const UnifiedShareModal: React.FC<UnifiedShareModalProps> = ({
                     <div className="w-0.5 h-10 rounded-full bg-white/20" />
                     <div className="text-center px-3">
                       <div className="text-2xl font-black text-orange-400 flex items-center gap-1">
-                        <FaFire /> {gameResult.streakDays}
+                        <Flame className="w-5 h-5" /> {gameResult.streakDays}
                       </div>
                       <div className="text-xs font-bold uppercase tracking-wide text-gray-300">
                         {language === 'he' ? 'רצף' : 'streak'}
@@ -229,7 +229,7 @@ const UnifiedShareModal: React.FC<UnifiedShareModalProps> = ({
               aria-label={copied ? t('share.linkCopied') : t('share.copyLink')}
               title={copied ? t('share.linkCopied') : t('share.copyLink')}
             >
-              {copied ? <FaCheck className="text-neo-black" /> : <FaCopy className="text-neo-black" />}
+              {copied ? <Check className="w-4 h-4 text-neo-black" /> : <Copy className="w-4 h-4 text-neo-black" />}
             </button>
           </motion.div>
 
@@ -260,11 +260,11 @@ const UnifiedShareModal: React.FC<UnifiedShareModalProps> = ({
               )}
             >
               {isLoading ? (
-                <FaSpinner className="text-lg animate-spin" />
+                <Loader2 className="w-5 h-5 animate-spin" />
               ) : copied ? (
-                <FaCheck className="text-lg" />
+                <Check className="w-5 h-5" />
               ) : (
-                <FaCopy className="text-lg" />
+                <Copy className="w-5 h-5" />
               )}
               <span>{copied ? t('share.linkCopied') : t('share.copyLink')}</span>
             </motion.button>
@@ -286,7 +286,7 @@ const UnifiedShareModal: React.FC<UnifiedShareModalProps> = ({
                 'focus:outline-none focus:ring-2 focus:ring-neo-yellow focus:ring-offset-2'
               )}
             >
-              <FaWhatsapp className="text-lg" />
+              <MessageCircle className="w-5 h-5" />
               <span>{t('share.whatsapp')}</span>
             </motion.button>
 

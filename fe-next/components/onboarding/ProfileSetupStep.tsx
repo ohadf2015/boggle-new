@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
-import { FaCheck, FaTimes } from 'react-icons/fa';
+import { Check, X } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { AVATARS, getAvatarPath } from '@/utils/avatarConfig';
 import { cn } from '@/lib/utils';
@@ -121,9 +121,9 @@ const ProfileSetupStep: React.FC<ProfileSetupStepProps> = ({
                   )}
                 >
                   {isNameValid ? (
-                    <FaCheck className="text-neo-black text-sm" />
+                    <Check className="text-neo-black text-sm" />
                   ) : (
-                    <FaTimes className="text-neo-white text-sm" />
+                    <X className="text-neo-white text-sm" />
                   )}
                 </motion.div>
               )}

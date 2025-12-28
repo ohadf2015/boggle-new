@@ -2,7 +2,7 @@
 
 import React, { useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FaCheck, FaHourglass, FaRobot } from 'react-icons/fa';
+import { Check, Hourglass, Bot } from 'lucide-react';
 import Avatar from '@/components/Avatar';
 import { useLanguage } from '@/contexts/LanguageContext';
 import type { Avatar as AvatarType } from '@/types';
@@ -86,7 +86,7 @@ const PlayersReadyIndicator: React.FC<PlayersReadyIndicatorProps> = ({
                 {allReady ? (
                   <span className="text-lg">🎉</span>
                 ) : (
-                  <FaHourglass className="text-neo-yellow text-sm" />
+                  <Hourglass className="text-neo-yellow text-sm" />
                 )}
               </motion.div>
               <h3 className="font-black text-sm uppercase tracking-wide text-white">
@@ -150,7 +150,7 @@ const PlayersReadyIndicator: React.FC<PlayersReadyIndicatorProps> = ({
                       `}
                     >
                       {isReady ? (
-                        <FaCheck className="text-white text-xs" />
+                        <Check className="text-white text-xs" />
                       ) : (
                         <motion.div
                           animate={{ opacity: [0.4, 1, 0.4] }}
@@ -198,7 +198,7 @@ const PlayersReadyIndicator: React.FC<PlayersReadyIndicatorProps> = ({
                         ${isReady ? 'text-white' : 'text-slate-400'}
                         ${isCurrentUser ? 'text-neo-yellow' : ''}
                       `}>
-                        {isBot && <FaRobot className="text-neo-cyan text-xs shrink-0" />}
+                        {isBot && <Bot className="text-neo-cyan text-xs shrink-0" />}
                         {player.username}
                         {isCurrentUser && ` ${t('results.you')}`}
                       </span>

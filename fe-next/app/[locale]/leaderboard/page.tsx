@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import { FaTrophy, FaMedal, FaArrowLeft, FaSync } from 'react-icons/fa';
+import { Trophy, Medal, ArrowLeft, RefreshCw } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import Header from '@/components/Header';
 import AutoHideHeader from '@/components/AutoHideHeader';
@@ -65,7 +65,7 @@ export default function LeaderboardPage(): React.ReactNode {
         <AutoHideHeader />
         <div className="max-w-4xl mx-auto px-4 py-8">
           <div className="text-center py-12">
-            <FaTrophy className="mx-auto text-6xl text-gray-600 mb-4" />
+            <Trophy className="mx-auto text-6xl text-gray-600 mb-4" />
             <h2 className={cn(
               'text-2xl font-bold mb-2',
               isDarkMode ? 'text-white' : 'text-gray-900'
@@ -82,7 +82,7 @@ export default function LeaderboardPage(): React.ReactNode {
               onClick={() => router.push(`/${language}`)}
               className="mt-6"
             >
-              <FaArrowLeft className="mr-2" />
+              <ArrowLeft className="mr-2" />
               Back to Game
             </Button>
           </div>
@@ -112,7 +112,7 @@ export default function LeaderboardPage(): React.ReactNode {
             'text-3xl sm:text-4xl font-bold flex items-center justify-center gap-3',
             isDarkMode ? 'text-white' : 'text-gray-900'
           )}>
-            <FaTrophy className="text-yellow-500" />
+            <Trophy className="text-yellow-500" />
             {t('leaderboard.title')}
           </h1>
           <div className="flex items-center justify-center gap-3 mt-2">
@@ -144,7 +144,7 @@ export default function LeaderboardPage(): React.ReactNode {
               )}
               title="Refresh"
             >
-              <FaSync className={cn(
+              <RefreshCw className={cn(
                 'w-3 h-3',
                 loading && 'animate-spin',
                 isDarkMode ? 'text-gray-600' : 'text-gray-600'
@@ -248,7 +248,7 @@ export default function LeaderboardPage(): React.ReactNode {
             {/* Table Body */}
             {leaderboard.length === 0 ? (
               <div className="text-center py-12">
-                <FaMedal className={cn(
+                <Medal className={cn(
                   'mx-auto text-4xl mb-4',
                   isDarkMode ? 'text-gray-600' : 'text-gray-300'
                 )} />
@@ -332,7 +332,7 @@ export default function LeaderboardPage(): React.ReactNode {
                 : 'border-gray-300 text-gray-700 hover:bg-gray-100'
             )}
           >
-            <FaArrowLeft className="mr-2" />
+            <ArrowLeft className="mr-2" />
             Back to Game
           </Button>
         </div>

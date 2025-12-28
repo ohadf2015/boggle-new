@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { FaFire, FaBolt } from 'react-icons/fa';
+import { Flame, Zap } from 'lucide-react';
 import { Badge } from '../ui/badge';
 import { Button } from '../ui/button';
 
@@ -71,7 +71,7 @@ export const ComboVisualizer: React.FC<ComboVisualizerProps> = ({ t }) => {
       <div className="relative bg-neo-cream text-neo-black rounded-neo border-3 border-neo-black p-4 shadow-hard-sm">
         <div className="flex items-center justify-between mb-3">
           <span className="font-bold text-neo-black flex items-center gap-2">
-            <FaFire className={comboLevel > 2 ? 'text-neo-orange animate-pulse' : 'text-gray-600'} />
+            <Flame className={comboLevel > 2 ? 'text-neo-orange animate-pulse' : 'text-gray-600'} />
             {t('howToPlay.combo.currentCombo')}
           </span>
           <motion.span
@@ -130,7 +130,7 @@ export const ComboVisualizer: React.FC<ComboVisualizerProps> = ({ t }) => {
         disabled={isAnimating}
         className="w-full bg-neo-yellow hover:bg-neo-orange"
       >
-        <FaBolt className="mr-2" />
+        <Zap className="mr-2 h-4 w-4" />
         {isAnimating ? t('howToPlay.combo.building') : t('howToPlay.combo.tryIt')}
       </Button>
 

@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { FaDice, FaPencilAlt } from 'react-icons/fa';
+import { Dices, Pencil } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
@@ -187,7 +187,7 @@ const HostModeFields: React.FC<HostModeFieldsProps> = ({
               )}
               {/* Edit indicator */}
               <div className="absolute -bottom-0.5 -right-0.5 w-5 h-5 bg-neo-yellow text-neo-black border-2 border-neo-black rounded-full flex items-center justify-center shadow-hard-sm group-hover:scale-110 transition-transform">
-                <FaPencilAlt className="w-2 h-2" />
+                <Pencil className="w-2 h-2" />
               </div>
             </button>
             <div className="flex-1">
@@ -292,7 +292,7 @@ const HostModeFields: React.FC<HostModeFieldsProps> = ({
                   aria-label={t('joinView.generateNewCode') || 'Generate new room code'}
                   className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-400 hover:to-pink-400"
                 >
-                  <FaDice className="text-sm" />
+                  <Dices className="text-sm" />
                 </Button>
               </TooltipTrigger>
               <TooltipContent>{t('joinView.generateNewCode')}</TooltipContent>

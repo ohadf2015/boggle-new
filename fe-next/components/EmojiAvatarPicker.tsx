@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FaCheck, FaTimes } from 'react-icons/fa';
+import { Check, X } from 'lucide-react';
 import Image from 'next/image';
 import { AVATARS, getAvatarPath, mapEmojiToAvatar, type AvatarConfig } from '@/utils/avatarConfig';
 
@@ -138,7 +138,7 @@ const EmojiAvatarPicker: React.FC<EmojiAvatarPickerProps> = ({
               onClick={onClose}
               className="flex-1 py-3 font-bold uppercase tracking-wide transition-all duration-100 flex items-center justify-center gap-2 bg-neo-cream text-neo-black border-3 border-neo-black shadow-hard-sm hover:shadow-hard hover:translate-x-[-2px] hover:translate-y-[-2px] active:shadow-none active:translate-x-[2px] active:translate-y-[2px]"
             >
-              <FaTimes size={14} />
+              <X size={14} />
               Cancel
             </button>
             <button
@@ -146,7 +146,7 @@ const EmojiAvatarPicker: React.FC<EmojiAvatarPickerProps> = ({
               onClick={handleSave}
               className="flex-1 py-3 font-bold uppercase tracking-wide transition-all duration-100 flex items-center justify-center gap-2 bg-neo-cyan text-neo-black border-3 border-neo-black shadow-hard-sm hover:shadow-hard hover:translate-x-[-2px] hover:translate-y-[-2px] active:shadow-none active:translate-x-[2px] active:translate-y-[2px]"
             >
-              <FaCheck size={14} />
+              <Check size={14} />
               Save
             </button>
           </div>

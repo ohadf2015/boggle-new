@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FaTrophy, FaCrown, FaRobot } from 'react-icons/fa';
+import { Trophy, Crown, Bot } from 'lucide-react';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '../../components/ui/alert-dialog';
 import RoomChat from '../../components/RoomChat';
 import Avatar from '../../components/Avatar';
@@ -242,7 +242,7 @@ const PlayerWaitingResultsView: React.FC<PlayerWaitingResultsViewProps> = ({
                 <div className="bg-neo-cream text-neo-black border-4 border-neo-black shadow-hard-lg overflow-hidden">
                   <div className="py-2 lg:py-3 px-3 lg:px-4 border-b-4 border-neo-black bg-neo-purple text-white">
                     <h3 className="flex items-center gap-2 text-neo-white text-lg lg:text-xl uppercase tracking-wider font-black">
-                      <FaTrophy className="text-neo-yellow" style={{ filter: 'drop-shadow(2px 2px 0px rgb(var(--neo-black)))' }} />
+                      <Trophy className="text-neo-yellow" style={{ filter: 'drop-shadow(2px 2px 0px rgb(var(--neo-black)))' }} />
                       {t('playerView.leaderboard')}
                     </h3>
                   </div>
@@ -279,8 +279,8 @@ const PlayerWaitingResultsView: React.FC<PlayerWaitingResultsViewProps> = ({
                           <div className="flex-1 min-w-0">
                             <div className={`font-black flex items-center gap-1 lg:gap-2 ${dir === 'rtl' ? 'flex-row-reverse' : ''}`}>
                               <span className="truncate"><SlotMachineText text={player.username} /></span>
-                              {player.isHost && <FaCrown className="text-neo-yellow text-xs lg:text-sm flex-shrink-0" style={{ filter: 'drop-shadow(1px 1px 0px rgb(var(--neo-black)))' }} />}
-                              {player.isBot && <FaRobot className="text-neo-cyan text-xs lg:text-sm flex-shrink-0" />}
+                              {player.isHost && <Crown className="text-neo-yellow text-xs lg:text-sm flex-shrink-0" style={{ filter: 'drop-shadow(1px 1px 0px rgb(var(--neo-black)))' }} />}
+                              {player.isBot && <Bot className="text-neo-cyan text-xs lg:text-sm flex-shrink-0" />}
                               {isMe && (
                                 <span className="text-[10px] lg:text-xs bg-neo-black text-neo-white px-1.5 lg:px-2 py-0.5 rounded-neo font-bold border-2 border-neo-black flex-shrink-0">
                                   ({t('playerView.me')})

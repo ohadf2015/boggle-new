@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import { FaArrowLeft } from 'react-icons/fa';
+import { ArrowLeft } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import Header from '@/components/Header';
 import { Button } from '@/components/ui/button';
@@ -90,7 +90,7 @@ export default function LegalPageLayout({
                 : 'border-gray-300 text-gray-700 hover:bg-gray-100'
             )}
           >
-            <FaArrowLeft className="mr-2" />
+            <ArrowLeft className="mr-2" />
             {t('legal.backToGame')}
           </Button>
         </div>

@@ -1,6 +1,6 @@
 import React, { useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FaClock, FaUsers, FaShareAlt, FaCog, FaPlus, FaMinus, FaCrown, FaChevronDown, FaChevronUp, FaTrophy, FaRobot, FaSignOutAlt } from 'react-icons/fa';
+import { Clock, Users, Share2, Settings, Plus, Minus, Crown, ChevronDown, ChevronUp, Trophy, Bot, LogOut } from 'lucide-react';
 import { Button } from '../../components/ui/button';
 import { Card } from '../../components/ui/card';
 import { Badge } from '../../components/ui/badge';
@@ -262,7 +262,7 @@ const HostPreGameView: React.FC<HostPreGameViewProps> = ({
               className="flex items-center gap-1 px-2 py-1 bg-neo-red/90 text-white font-bold text-xs rounded-neo border-2 border-neo-black shadow-hard-sm hover:shadow-hard hover:bg-neo-red active:shadow-none transition-all"
               title={t('hostView.exitRoom')}
             >
-              <FaSignOutAlt className="text-xs" />
+              <LogOut className="text-xs" />
               <span className="hidden sm:inline">{t('hostView.exitRoom')}</span>
             </button>
 
@@ -280,7 +280,7 @@ const HostPreGameView: React.FC<HostPreGameViewProps> = ({
             </span>
             {tournamentData && (
               <Badge className="text-xs px-2 py-0 bg-gradient-to-r from-amber-500 to-yellow-600 text-white border-0">
-                <FaTrophy className="mr-1 text-[10px]" />
+                <Trophy className="mr-1 text-[10px]" />
                 R{tournamentData.currentRound}/{tournamentData.totalRounds}
               </Badge>
             )}
@@ -291,7 +291,7 @@ const HostPreGameView: React.FC<HostPreGameViewProps> = ({
             onClick={handleShare}
             className="flex items-center gap-1.5 px-3 py-1.5 bg-neo-cyan text-neo-black font-bold text-sm rounded-neo border-2 border-neo-black shadow-hard-sm hover:shadow-hard hover:-translate-y-0.5 active:shadow-none active:translate-y-0 transition-all"
           >
-            <FaShareAlt className="text-xs" />
+            <Share2 className="text-xs" />
             <span>{t('share.buttonLabel')}</span>
           </button>
         </div>
@@ -302,7 +302,7 @@ const HostPreGameView: React.FC<HostPreGameViewProps> = ({
         {/* Game Settings - LEFT - Neo-Brutalist Dark */}
         <Card className="flex-1 p-2 sm:p-3 md:p-4 bg-slate-800/95 text-neo-white border-4 border-neo-black shadow-hard-lg">
           <h3 className="text-sm font-black uppercase text-neo-cream mb-3 flex items-center gap-2">
-            <FaCog className="text-neo-cyan text-xs" />
+            <Settings className="text-neo-cyan text-xs" />
             {t('hostView.gameSettings')}
           </h3>
           <div className="w-full space-y-2 sm:space-y-3">
@@ -390,7 +390,7 @@ const HostPreGameView: React.FC<HostPreGameViewProps> = ({
                   </span>
                 )}
               </div>
-              {showAdvancedSettings ? <FaChevronUp size={12} /> : <FaChevronDown size={12} />}
+              {showAdvancedSettings ? <ChevronUp size={12} /> : <ChevronDown size={12} />}
             </button>
 
             {/* Collapsible Advanced Settings */}
@@ -406,7 +406,7 @@ const HostPreGameView: React.FC<HostPreGameViewProps> = ({
                   {/* Timer Input */}
                   <div className="space-y-1.5">
                     <label className="text-xs font-bold uppercase text-neo-cream flex items-center gap-1.5">
-                      <FaClock className="text-neo-cyan text-xs" />
+                      <Clock className="text-neo-cyan text-xs" />
                       {t('hostView.roundDuration')}
                     </label>
                     <div className="flex items-center gap-2">
@@ -416,7 +416,7 @@ const HostPreGameView: React.FC<HostPreGameViewProps> = ({
                         disabled={timerValue <= 1}
                         className="w-8 h-8 flex items-center justify-center rounded-neo bg-neo-cream text-neo-black border-2 border-neo-black shadow-hard-sm hover:shadow-hard hover:translate-x-[-1px] hover:translate-y-[-1px] active:shadow-none active:translate-x-[1px] active:translate-y-[1px] transition-all duration-100 disabled:opacity-50 disabled:cursor-not-allowed font-black"
                       >
-                        <FaMinus size={12} />
+                        <Minus size={12} />
                       </button>
                       <div className="flex items-center gap-1.5">
                         <div className="text-2xl font-black text-neo-yellow w-8 text-center overflow-hidden h-8 flex items-center justify-center">
@@ -440,7 +440,7 @@ const HostPreGameView: React.FC<HostPreGameViewProps> = ({
                         disabled={timerValue >= 10}
                         className="w-8 h-8 flex items-center justify-center rounded-neo bg-neo-cream text-neo-black border-2 border-neo-black shadow-hard-sm hover:shadow-hard hover:translate-x-[-1px] hover:translate-y-[-1px] active:shadow-none active:translate-x-[1px] active:translate-y-[1px] transition-all duration-100 disabled:opacity-50 disabled:cursor-not-allowed font-black"
                       >
-                        <FaPlus size={12} />
+                        <Plus size={12} />
                       </button>
                     </div>
                   </div>
@@ -550,7 +550,7 @@ const HostPreGameView: React.FC<HostPreGameViewProps> = ({
         {/* Players List - RIGHT */}
         <Card className="lg:w-[320px] h-auto p-2 sm:p-3 md:p-4 flex flex-col bg-slate-800/95 text-neo-white border-4 border-neo-black shadow-hard-lg">
           <h3 className="text-sm font-bold uppercase text-neo-cream mb-2 flex items-center gap-2 flex-shrink-0">
-            <FaUsers className="text-neo-pink" />
+            <Users className="text-neo-pink" />
             {t('hostView.playersJoined')} ({playersReady.length})
           </h3>
           <div className="flex flex-col gap-1 flex-1 overflow-y-auto">
@@ -589,8 +589,8 @@ const HostPreGameView: React.FC<HostPreGameViewProps> = ({
                         <span className="font-medium text-neo-cream">
                           <SlotMachineText text={playerUsername} />
                         </span>
-                        {isHostPlayer && <FaCrown className="text-neo-yellow text-sm" />}
-                        {isBot && <FaRobot className="text-neo-cyan text-sm" />}
+                        {isHostPlayer && <Crown className="text-neo-yellow text-sm" />}
+                        {isBot && <Bot className="text-neo-cyan text-sm" />}
                         {isMe && (
                           <span className="text-xs text-neo-cream/90 font-medium">
                             ({t('playerView.me')})

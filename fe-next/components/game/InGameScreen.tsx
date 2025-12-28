@@ -2,7 +2,7 @@
 
 import React, { ReactNode, useRef, useEffect, useCallback, useMemo, memo, useState, useTransition, useDeferredValue } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FaTrophy, FaCrown } from 'react-icons/fa';
+import { Trophy, Crown } from 'lucide-react';
 import type { Socket } from 'socket.io-client';
 import { Badge } from '../ui/badge';
 import { Card, CardContent } from '../ui/card';
@@ -934,7 +934,7 @@ const InGameScreen = memo<InGameScreenProps>(({
               <CardContent className="py-1 px-3">
                 <div className="flex items-center justify-between gap-2">
                   <div className="flex items-center gap-2">
-                    <FaTrophy className="text-yellow-300 text-lg drop-shadow-[0_0_8px_rgba(251,191,36,0.6)]" />
+                    <Trophy className="w-5 h-5 text-yellow-300 drop-shadow-[0_0_8px_rgba(251,191,36,0.6)]" />
                     <div>
                       <div className="text-white font-bold text-xs md:text-sm">
                         {tournamentData.name || t('hostView.tournament')}
@@ -1013,7 +1013,7 @@ const InGameScreen = memo<InGameScreenProps>(({
                     : 'bg-neo-cream text-neo-black shadow-hard-sm hover:shadow-hard'
                 }`}
               >
-                <FaTrophy className="inline mr-1 text-neo-yellow" />
+                <Trophy className="inline mr-1 w-4 h-4 text-neo-yellow" />
                 {t('playerView.rankings') || 'Rankings'}
               </button>
             </div>
@@ -1064,7 +1064,7 @@ const InGameScreen = memo<InGameScreenProps>(({
           {/* Header */}
           <div className="py-3 px-4 border-b-4 border-neo-black bg-neo-purple text-white">
             <h3 className="flex items-center gap-2 text-neo-cream text-base uppercase tracking-widest font-black">
-              <FaTrophy className="text-neo-yellow" style={{ filter: 'drop-shadow(2px 2px 0px rgb(var(--neo-black)))' }} />
+              <Trophy className="w-4 h-4 text-neo-yellow" style={{ filter: 'drop-shadow(2px 2px 0px rgb(var(--neo-black)))' }} />
               {t('playerView.leaderboard')}
             </h3>
           </div>
@@ -1097,7 +1097,7 @@ const InGameScreen = memo<InGameScreenProps>(({
                   {/* Player info */}
                   <div className="flex-1 min-w-0">
                     <div className={`font-black truncate text-sm flex items-center gap-1 text-neo-black ${dir === 'rtl' ? 'flex-row-reverse' : ''}`}>
-                      {player.isHost && <FaCrown className="text-neo-yellow flex-shrink-0" style={{ filter: 'drop-shadow(1px 1px 0px rgb(var(--neo-black)))' }} />}
+                      {player.isHost && <Crown className="w-4 h-4 text-neo-yellow flex-shrink-0" style={{ filter: 'drop-shadow(1px 1px 0px rgb(var(--neo-black)))' }} />}
                       <span className="truncate">{player.username}</span>
                       {player.isMe && (
                         <span className="text-xs bg-neo-black text-neo-cream px-1.5 py-0.5 rounded-neo font-bold flex-shrink-0">

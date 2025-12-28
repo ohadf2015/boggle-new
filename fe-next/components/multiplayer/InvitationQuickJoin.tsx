@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import { FaGamepad, FaArrowLeft, FaSync } from 'react-icons/fa';
+import { Gamepad2, ArrowLeft, RefreshCw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -51,7 +51,7 @@ const InvitationQuickJoin: React.FC<InvitationQuickJoinProps> = ({
             disabled={isJoining}
             className="absolute start-4 flex items-center gap-2 px-3 py-2 rounded-neo border-3 border-neo-black dark:border-slate-600 bg-neo-cream dark:bg-slate-700 shadow-hard hover:shadow-hard-lg hover:translate-x-[-2px] hover:translate-y-[-2px] transition-all text-neo-black dark:text-neo-white text-sm font-bold disabled:opacity-50"
           >
-            <FaArrowLeft className="w-4 h-4 rtl:rotate-180" />
+            <ArrowLeft className="w-4 h-4 rtl:rotate-180" />
             <span className="hidden sm:inline">{t('common.back') || 'Back'}</span>
           </button>
 
@@ -121,12 +121,12 @@ const InvitationQuickJoin: React.FC<InvitationQuickJoinProps> = ({
                   >
                     {isJoining ? (
                       <>
-                        <FaSync className="mr-3 w-6 h-6 animate-spin" />
+                        <RefreshCw className="mr-3 w-6 h-6 animate-spin" />
                         {t('joinView.joining') || 'Joining...'}
                       </>
                     ) : (
                       <>
-                        <FaGamepad className="mr-3 w-6 h-6" />
+                        <Gamepad2 className="mr-3 w-6 h-6" />
                         {t('joinView.joinGame') || 'Join Game'}
                       </>
                     )}

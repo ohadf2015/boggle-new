@@ -2,8 +2,7 @@
 
 import React, { useState, useEffect, memo, useCallback, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FaVolumeUp, FaVolumeMute, FaVolumeDown, FaMusic } from 'react-icons/fa';
-import { HiSpeakerWave } from 'react-icons/hi2';
+import { Volume2, VolumeX, Volume1, Music } from 'lucide-react';
 import { useMusic } from '../contexts/MusicContext';
 import { useSoundEffects } from '../contexts/SoundEffectsContext';
 import { useLanguage } from '../contexts/LanguageContext';
@@ -28,14 +27,14 @@ const MusicControls: React.FC = memo(() => {
   // Memoized volume icon
   const volumeIcon = useMemo(() => {
     // Return consistent icon during SSR to prevent hydration mismatch
-    if (!hasMounted) return <FaVolumeUp size={18} aria-hidden="true" />;
+    if (!hasMounted) return <Volume2 size={18} aria-hidden="true" />;
 
     // Show muted if both are muted
-    if ((isMuted || volume === 0) && (sfxMuted || sfxVolume === 0)) return <FaVolumeMute size={18} aria-hidden="true" />;
+    if ((isMuted || volume === 0) && (sfxMuted || sfxVolume === 0)) return <VolumeX size={18} aria-hidden="true" />;
     // Show low volume if average is low
     const avgVolume = ((isMuted ? 0 : volume) + (sfxMuted ? 0 : sfxVolume)) / 2;
-    if (avgVolume < 0.5) return <FaVolumeDown size={18} aria-hidden="true" />;
-    return <FaVolumeUp size={18} aria-hidden="true" />;
+    if (avgVolume < 0.5) return <Volume1 size={18} aria-hidden="true" />;
+    return <Volume2 size={18} aria-hidden="true" />;
   }, [hasMounted, isMuted, volume, sfxMuted, sfxVolume]);
 
   const handleMusicVolumeChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
@@ -116,7 +115,7 @@ const MusicControls: React.FC = memo(() => {
               {/* Music Volume */}
               <div className="flex flex-col gap-1">
                 <div className="flex items-center gap-2">
-                  <FaMusic size={12} className="text-neo-pink" aria-hidden="true" />
+                  <Music size={12} className="text-neo-pink" aria-hidden="true" />
                   <span className="text-xs font-black uppercase tracking-wide text-neo-black/70">
                     {t('music.musicVolume')}: {Math.round(volume * 100)}%
                   </span>
@@ -147,7 +146,7 @@ const MusicControls: React.FC = memo(() => {
               {/* Sound Effects Volume */}
               <div className="flex flex-col gap-1">
                 <div className="flex items-center gap-2">
-                  <HiSpeakerWave size={14} className="text-neo-lime" aria-hidden="true" />
+                  <Volume2 size={14} className="text-neo-lime" aria-hidden="true" />
                   <span className="text-xs font-black uppercase tracking-wide text-neo-black/70">
                     {t('music.sfxVolume')}: {Math.round(sfxVolume * 100)}%
                   </span>

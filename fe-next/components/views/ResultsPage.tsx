@@ -3,7 +3,7 @@
 import React, { useMemo, useEffect, useState, useCallback, useRef, useDeferredValue, useTransition } from 'react';
 import dynamic from 'next/dynamic';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FaTrophy, FaStar, FaDoorOpen, FaCheck, FaArrowRight } from 'react-icons/fa';
+import { Trophy, Star, DoorOpen, Check, ArrowRight } from 'lucide-react';
 import ExitRoomButton from '@/components/ExitRoomButton';
 import confetti from 'canvas-confetti';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -31,9 +31,11 @@ const WinStreakDisplay = dynamic(() => import('@/components/results/WinStreakDis
 const WordFeedbackModal = dynamic(() => import('@/components/voting/WordFeedbackModal'), { ssr: false });
 const MissedWords = dynamic(() => import('@/components/results/MissedWords'), { ssr: false });
 const PlayersReadyIndicator = dynamic(() => import('@/components/results/PlayersReadyIndicator'), { ssr: false });
+const PerformanceChart = dynamic(() => import('@/components/results/PerformanceChart'), { ssr: false });
 // AutoRejoinTimer removed - players now actively confirm readiness
 import CollapsibleSection from '@/components/ui/CollapsibleSection';
 import { Users } from 'lucide-react';
+import { addGameToHistory } from '@/utils/gameHistoryManager';
 
 
 const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onReturnToRoom, username, socket, achievements, duplicateRuleDisabled, playerCount }) => {
@@ -48,6 +50,7 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
   // Use refs for values that don't need to trigger re-renders
   const hasUpdatedStatsRef = useRef<boolean>(false);
   const hasTrackedGameRef = useRef<boolean>(false);
+  const hasAddedToHistoryRef = useRef<boolean>(false);
   // previousStreak needs to be state since it's used in render
   const [previousStreak, setPreviousStreak] = useState<number>(0);
 
@@ -160,6 +163,29 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
 
     hasTrackedGameRef.current = true;
   }, [currentPlayerData, isCurrentUserWinner, currentStreak, recordWin]);
+
+  // Add game to history for the performance chart (runs for all users)
+  useEffect(() => {
+    if (hasAddedToHistoryRef.current || !currentPlayerData) return;
+
+    const validWords = currentPlayerData.allWords?.filter(w => w.validated && w.score > 0) || [];
+    const totalAttempts = currentPlayerData.allWords?.length || 0;
+    const accuracy = totalAttempts > 0 ? Math.round((validWords.length / totalAttempts) * 100) : 0;
+    const longestWordLength = validWords.reduce((max, w) => Math.max(max, w.word.length), 0);
+
+    addGameToHistory({
+      score: currentPlayerData.score || 0,
+      wordCount: validWords.length,
+      accuracy,
+      rank: currentPlayerRank,
+      totalPlayers: sortedScores.length,
+      mode: 'multiplayer',
+      isWinner: isCurrentUserWinner,
+      longestWordLength,
+    });
+
+    hasAddedToHistoryRef.current = true;
+  }, [currentPlayerData, currentPlayerRank, sortedScores.length, isCurrentUserWinner]);
 
   // Show celebratory signup prompt for guests - triggered on scroll near bottom
   // This ensures it doesn't interfere with the word feedback modal
@@ -509,7 +535,7 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
         <div className="w-1/2 flex flex-col gap-2 overflow-y-auto">
           {/* Final Scores Title - compact */}
           <div className="flex items-center justify-center gap-2">
-            <FaTrophy className="text-lg text-yellow-500" />
+            <Trophy className="w-5 h-5 text-yellow-500" />
             <h2 className="text-lg font-black text-yellow-400">{t('results.finalScores')}</h2>
           </div>
 
@@ -540,14 +566,14 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
                     onClick={onReturnToRoom}
                     className="flex-1 bg-emerald-500 text-white font-bold text-sm py-2 px-3 uppercase border-2 border-neo-black rounded-neo shadow-hard-sm flex items-center justify-center gap-1"
                   >
-                    <FaCheck className="text-xs" />
+                    <Check className="w-3 h-3" />
                     {t('results.ready')}
                   </button>
                   <button
                     onClick={handleExitRoom}
                     className="flex-1 bg-neo-red text-neo-cream font-bold text-sm py-2 px-3 uppercase border-2 border-neo-black rounded-neo shadow-hard-sm flex items-center justify-center gap-1"
                   >
-                    <FaDoorOpen className="text-xs" />
+                    <DoorOpen className="w-3 h-3" />
                     {t('results.leaveRoom')}
                   </button>
                 </>
@@ -557,14 +583,14 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
                     onClick={handleMarkReady}
                     className="flex-1 bg-neo-yellow text-neo-black font-bold text-sm py-2 px-3 uppercase border-2 border-neo-black rounded-neo shadow-hard-sm flex items-center justify-center gap-1"
                   >
-                    <FaStar className="text-xs" />
+                    <Star className="w-3 h-3" />
                     {t('results.imReady')}
                   </button>
                   <button
                     onClick={handleExitRoom}
                     className="flex-1 bg-neo-red text-neo-cream font-bold text-sm py-2 px-3 uppercase border-2 border-neo-black rounded-neo shadow-hard-sm flex items-center justify-center gap-1"
                   >
-                    <FaDoorOpen className="text-xs" />
+                    <DoorOpen className="w-3 h-3" />
                     {t('results.leaveRoom')}
                   </button>
                 </>
@@ -643,12 +669,22 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
             />
           )}
 
+          {/* Performance Chart - Shows improvement over recent games */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.25, duration: 0.3 }}
+            className="mt-2"
+          >
+            <PerformanceChart currentScore={currentPlayerData?.score} gamesLimit={10} />
+          </motion.div>
+
           {/* Missed Words - Educational feedback on high-value words you missed (placed near your card) */}
           {missedWords.length > 0 && (
             <motion.div
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2, duration: 0.3 }}
+              transition={{ delay: 0.3, duration: 0.3 }}
               className="mt-2"
             >
               <MissedWords missedWords={missedWords} maxDisplay={5} />
@@ -823,7 +859,7 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
                         transition={{ duration: 1, repeat: Infinity }}
                         className="w-12 h-12 bg-white rounded-full flex items-center justify-center border-4 border-neo-black shadow-hard"
                       >
-                        <FaCheck className="text-emerald-500 text-2xl" />
+                        <Check className="w-6 h-6 text-emerald-500" />
                       </motion.div>
                       <h3
                         className="text-xl sm:text-2xl font-black text-white uppercase"
@@ -844,7 +880,7 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
                           onClick={onReturnToRoom}
                           className="w-full sm:w-auto bg-white text-neo-black font-black text-base px-6 py-2.5 uppercase border-3 border-neo-black rounded-neo shadow-hard hover:shadow-hard-lg transition-all flex items-center justify-center gap-2"
                         >
-                          <FaArrowRight />
+                          <ArrowRight className="w-4 h-4" />
                           {t('results.goToLobby')}
                         </button>
                       </motion.div>
@@ -856,7 +892,7 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
                           onClick={handleExitRoom}
                           className="w-full sm:w-auto bg-neo-red text-neo-cream font-black text-base px-6 py-2.5 uppercase border-3 border-neo-black rounded-neo shadow-hard hover:shadow-hard-lg transition-all flex items-center justify-center gap-2"
                         >
-                          <FaDoorOpen />
+                          <DoorOpen className="w-4 h-4" />
                           {t('results.leaveRoom')}
                         </button>
                       </motion.div>
@@ -885,7 +921,7 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
                           onClick={handleMarkReady}
                           className="w-full sm:w-auto bg-neo-yellow text-neo-black font-black text-lg px-8 py-3 uppercase border-4 border-neo-black rounded-neo shadow-hard hover:shadow-hard-lg transition-all flex items-center justify-center gap-2"
                         >
-                          <FaStar />
+                          <Star className="w-4 h-4" />
                           {t('results.imReady')}
                         </button>
                       </motion.div>
@@ -897,7 +933,7 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
                           onClick={handleExitRoom}
                           className="w-full sm:w-auto bg-neo-red text-neo-cream font-black text-lg px-8 py-3 uppercase border-4 border-neo-black rounded-neo shadow-hard hover:shadow-hard-lg transition-all flex items-center justify-center gap-2"
                         >
-                          <FaDoorOpen />
+                          <DoorOpen className="w-4 h-4" />
                           {t('results.leaveRoom')}
                         </button>
                       </motion.div>

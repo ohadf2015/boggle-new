@@ -2,8 +2,7 @@
 
 import React, { useState, useEffect, useCallback, memo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { MdScreenRotation } from 'react-icons/md';
-import { FaTimes } from 'react-icons/fa';
+import { RotateCcw, X } from 'lucide-react';
 import { useLanguage } from '../contexts/LanguageContext';
 
 const STORAGE_KEY = 'boggle_landscape_dismissed';
@@ -123,7 +122,7 @@ const LandscapeIndicator = memo<LandscapeIndicatorProps>(({ className = '' }) =>
                 }}
                 className="flex-shrink-0 w-10 h-10 bg-neo-cream border-3 border-neo-black rounded-neo flex items-center justify-center shadow-hard-sm"
               >
-                <MdScreenRotation className="text-xl text-neo-black" />
+                <RotateCcw className="text-xl text-neo-black" size={20} />
               </motion.div>
 
               {/* Message */}
@@ -145,7 +144,7 @@ const LandscapeIndicator = memo<LandscapeIndicatorProps>(({ className = '' }) =>
                 aria-label={t('common.dismiss') || 'Dismiss'}
                 className="flex-shrink-0 w-11 h-11 min-w-[44px] min-h-[44px] bg-neo-cream border-2 border-neo-black rounded-neo flex items-center justify-center shadow-hard-sm hover:shadow-hard hover:translate-x-[-1px] hover:translate-y-[-1px] active:shadow-none active:translate-x-[1px] active:translate-y-[1px] transition-all duration-100"
               >
-                <FaTimes className="text-sm text-neo-black" />
+                <X className="text-sm text-neo-black" size={14} />
               </button>
             </div>
           </div>

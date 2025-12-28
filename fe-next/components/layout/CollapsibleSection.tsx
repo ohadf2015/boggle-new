@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FaChevronDown } from 'react-icons/fa';
+import { ChevronDown } from 'lucide-react';
 import { cn } from '../../lib/utils';
 
 interface CollapsibleSectionProps {
@@ -49,7 +49,7 @@ export function CollapsibleSection({
           animate={{ rotate: isOpen ? 180 : 0 }}
           transition={{ duration: 0.2 }}
         >
-          <FaChevronDown className="text-neo-cyan" />
+          <ChevronDown className="text-neo-cyan" />
         </motion.span>
       </button>
 

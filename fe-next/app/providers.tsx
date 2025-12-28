@@ -17,6 +17,7 @@ import ErrorBoundary from './components/ErrorBoundary';
 import { initUtmCapture } from '@/utils/utmCapture';
 import { composeProviders } from '@/utils/composeProviders';
 import { linkLogRocketSession } from '@/utils/sentry';
+import { initSessionTracking } from '@/utils/sessionTracking';
 
 import type { Language } from '@/shared/types/game';
 
@@ -74,6 +75,11 @@ const GameProviders = composeProviders([
 export function Providers({ children, lang }: ProvidersProps) {
     // Note: UTM capture now happens at module load (above) for earlier execution
     // The useEffect below is kept as a safety fallback in case module-level execution fails
+
+    // Initialize session tracking for analytics
+    useEffect(() => {
+        initSessionTracking();
+    }, []);
 
     // Defer LogRocket initialization for slow connections
     // Load after 3 seconds or on first user interaction, whichever comes first

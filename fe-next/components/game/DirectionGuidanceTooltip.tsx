@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useCallback, memo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FaTimes, FaRoute } from 'react-icons/fa';
+import { X, Route } from 'lucide-react';
 
 const STORAGE_KEY = 'lexiclash_direction_guidance_seen';
 const AUTO_DISMISS_MS = 8000; // 8 seconds - longer for interactive demo
@@ -153,13 +153,13 @@ const DirectionGuidanceTooltip = memo<DirectionGuidanceTooltipProps>(
                 "
                 aria-label={t('common.close') || 'Close'}
               >
-                <FaTimes className="text-xs" />
+                <X className="w-3 h-3" />
               </button>
 
               {/* Header */}
               <div className="flex items-center gap-2 mb-3">
                 <div className="w-8 h-8 bg-gradient-to-br from-neo-purple to-neo-pink rounded-neo border-2 border-neo-black flex items-center justify-center shadow-hard-sm">
-                  <FaRoute className="text-white text-sm" />
+                  <Route className="w-4 h-4 text-white" />
                 </div>
                 <h4 className="font-black text-neo-black text-sm uppercase tracking-wide">
                   {t('guidance.directionPattern.title') || 'Change Directions!'}

@@ -2,8 +2,7 @@
 
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FaArrowRight, FaCheck, FaHeart, FaCoins } from 'react-icons/fa';
-import { X } from 'lucide-react';
+import { X, ArrowRight, Check, Heart, Coins } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
@@ -113,7 +112,7 @@ const Step1Welcome: React.FC<{ onNext: () => void }> = ({ onNext }) => {
         {t('tutorial.wordHunt.welcome.description') || 'Find the hidden word! You have 10 attempts.'}
       </p>
       <Button onClick={onNext} className="w-full bg-neo-purple text-white">
-        {t('tutorial.wordHunt.welcome.next') || 'Next'} <FaArrowRight className="ml-2" />
+        {t('tutorial.wordHunt.welcome.next') || 'Next'} <ArrowRight className="w-4 h-4 ml-2" />
       </Button>
     </div>
   );
@@ -139,7 +138,7 @@ const Step2WordDiscovery: React.FC<{ onNext: () => void; onPrev: () => void }> =
           <div className="text-xs text-gray-600 dark:text-gray-400 mb-1">Life Bar</div>
           <div className="bg-gray-200 dark:bg-gray-700 rounded-full h-6 overflow-hidden border-2 border-neo-black">
             <div className="h-full bg-green-500 flex items-center justify-center text-xs font-bold text-white" style={{ width: '85%' }}>
-              <FaHeart className="w-3 h-3 mr-1" />
+              <Heart className="w-3 h-3 mr-1 fill-current" />
               85/100
             </div>
           </div>
@@ -149,7 +148,7 @@ const Step2WordDiscovery: React.FC<{ onNext: () => void; onPrev: () => void }> =
         <div className="mb-3">
           <div className="text-xs text-gray-600 dark:text-gray-400 mb-1">Clue Tokens</div>
           <div className="flex items-center gap-1 px-3 py-1 bg-yellow-100 dark:bg-yellow-900/30 border-2 border-neo-black rounded-neo inline-flex">
-            <FaCoins className="w-4 h-4 text-yellow-600" />
+            <Coins className="w-4 h-4 text-yellow-600" />
             <span className="font-bold text-sm">12</span>
           </div>
         </div>
@@ -167,7 +166,7 @@ const Step2WordDiscovery: React.FC<{ onNext: () => void; onPrev: () => void }> =
           ← {t('common.back') || 'Back'}
         </Button>
         <Button onClick={onNext} className="flex-1 bg-neo-purple text-white">
-          {t('tutorial.wordHunt.lifeSystem.tryIt') || 'Got it!'} <FaArrowRight className="ml-2" />
+          {t('tutorial.wordHunt.lifeSystem.tryIt') || 'Got it!'} <ArrowRight className="w-4 h-4 ml-2" />
         </Button>
       </div>
     </div>
@@ -203,7 +202,7 @@ const Step3MinimumLength: React.FC<{ onNext: () => void; onPrev: () => void }> =
       <div className="bg-gray-100 dark:bg-gray-800 rounded-neo border-2 border-neo-black p-4 mb-6 space-y-3">
         <div className="flex items-center gap-3">
           <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center">
-            <FaCheck className="text-white" />
+            <Check className="w-4 h-4 text-white" />
           </div>
           <div>
             <div className="font-bold">CAT</div>
@@ -231,7 +230,7 @@ const Step3MinimumLength: React.FC<{ onNext: () => void; onPrev: () => void }> =
           ← {t('common.back') || 'Back'}
         </Button>
         <Button onClick={onNext} className="flex-1 bg-neo-purple text-white">
-          {t('tutorial.wordHunt.minLength.gotIt') || 'Got it!'} <FaArrowRight className="ml-2" />
+          {t('tutorial.wordHunt.minLength.gotIt') || 'Got it!'} <ArrowRight className="w-4 h-4 ml-2" />
         </Button>
       </div>
     </div>

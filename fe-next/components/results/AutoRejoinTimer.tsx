@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback, useRef, memo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FaPlay, FaTimes, FaClock } from 'react-icons/fa';
+import { Play, X, Clock } from 'lucide-react';
 import { useLanguage } from '../../contexts/LanguageContext';
 
 interface AutoRejoinTimerProps {
@@ -126,7 +126,7 @@ const AutoRejoinTimer = memo<AutoRejoinTimerProps>(({
           />
           {/* Row 1: Text label with countdown */}
           <div className="flex items-center gap-2 relative z-10">
-            <FaClock className="text-neo-black text-sm sm:text-base" />
+            <Clock className="text-neo-black text-sm sm:text-base" />
             <span className="font-bold text-neo-black text-sm sm:text-base whitespace-nowrap">
               {t('results.autoRejoinIn') || 'Auto-rejoin in'}
             </span>
@@ -180,7 +180,7 @@ const AutoRejoinTimer = memo<AutoRejoinTimerProps>(({
                 onClick={handleRejoinNow}
                 className="flex items-center gap-1 px-2.5 sm:px-3 py-1 sm:py-1.5 bg-neo-yellow border-3 border-neo-black rounded-neo shadow-hard-sm font-bold text-neo-black text-xs sm:text-sm uppercase hover:shadow-hard transition-all"
               >
-                <FaPlay className="text-xs" />
+                <Play className="text-xs" />
                 <span>{t('results.rejoinNow') || 'Rejoin Now'}</span>
               </motion.button>
 
@@ -191,7 +191,7 @@ const AutoRejoinTimer = memo<AutoRejoinTimerProps>(({
                 onClick={handleDismiss}
                 className="flex items-center gap-1 px-2.5 sm:px-3 py-1 sm:py-1.5 bg-neo-cream border-3 border-neo-black rounded-neo shadow-hard-sm font-bold text-neo-black text-xs sm:text-sm uppercase hover:shadow-hard transition-all"
               >
-                <FaTimes className="text-xs" />
+                <X className="text-xs" />
                 <span>{t('common.dismiss') || 'Dismiss'}</span>
               </motion.button>
             </div>

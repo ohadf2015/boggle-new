@@ -1,9 +1,15 @@
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { withSentryConfig } from '@sentry/nextjs';
+import bundleAnalyzer from '@next/bundle-analyzer';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+
+// Bundle analyzer - run with ANALYZE=true
+const withBundleAnalyzer = bundleAnalyzer({
+  enabled: process.env.ANALYZE === 'true',
+});
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
@@ -149,11 +155,14 @@ const nextConfig = {
 
 // Sentry configuration - only needs NEXT_PUBLIC_SENTRY_DSN to work
 // Source map upload options are optional (for better stack traces in Sentry dashboard)
-export default withSentryConfig(nextConfig, {
-  org: process.env.SENTRY_ORG,
-  project: process.env.SENTRY_PROJECT,
-  authToken: process.env.SENTRY_AUTH_TOKEN,
-  silent: true,
-  hideSourceMaps: true,
-  disableLogger: true,
-});
+// Wrap with bundle analyzer (only active when ANALYZE=true)
+export default withBundleAnalyzer(
+  withSentryConfig(nextConfig, {
+    org: process.env.SENTRY_ORG,
+    project: process.env.SENTRY_PROJECT,
+    authToken: process.env.SENTRY_AUTH_TOKEN,
+    silent: true,
+    hideSourceMaps: true,
+    disableLogger: true,
+  })
+);

@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FaFire, FaBolt, FaCrown, FaGem, FaStar } from 'react-icons/fa';
+import { Flame, Zap, Crown, Gem, Star } from 'lucide-react';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { useTheme } from '../../utils/ThemeContext';
 import { cn } from '../../lib/utils';
@@ -17,11 +17,11 @@ interface WinStreakDisplayProps {
 }
 
 const STREAK_TIERS = [
-  { min: 1, emoji: '✨', icon: FaStar, color: 'yellow', name: 'Starting' },
-  { min: 3, emoji: '⚡', icon: FaBolt, color: 'blue', name: 'Hot' },
-  { min: 7, emoji: '🔥', icon: FaFire, color: 'orange', name: 'On Fire' },
-  { min: 14, emoji: '💎', icon: FaGem, color: 'purple', name: 'Epic' },
-  { min: 30, emoji: '👑', icon: FaCrown, color: 'gold', name: 'Legendary' },
+  { min: 1, emoji: '✨', icon: Star, color: 'yellow', name: 'Starting' },
+  { min: 3, emoji: '⚡', icon: Zap, color: 'blue', name: 'Hot' },
+  { min: 7, emoji: '🔥', icon: Flame, color: 'orange', name: 'On Fire' },
+  { min: 14, emoji: '💎', icon: Gem, color: 'purple', name: 'Epic' },
+  { min: 30, emoji: '👑', icon: Crown, color: 'gold', name: 'Legendary' },
 ];
 
 const getStreakTier = (streak: number) => {
@@ -85,7 +85,7 @@ const WinStreakDisplay: React.FC<WinStreakDisplayProps> = ({
 
   if (currentStreak === 0) return null;
 
-  const Icon = tier?.icon || FaStar;
+  const Icon = tier?.icon || Star;
 
   // Compact inline badge version
   if (compact) {

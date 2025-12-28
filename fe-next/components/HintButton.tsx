@@ -5,7 +5,7 @@
 
 import React, { memo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FaLightbulb, FaStar } from 'react-icons/fa';
+import { Lightbulb, Star } from 'lucide-react';
 import { Button } from './ui/button';
 
 interface HintButtonProps {
@@ -60,7 +60,7 @@ const HintButton = memo<HintButtonProps>(({
           border-3 rounded-neo font-bold text-sm transition-all shadow-hard-sm
         `}
       >
-        <FaLightbulb className={isLoading ? 'animate-spin' : ''} />
+        <Lightbulb className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} />
         <div className="flex flex-col items-start">
           <span className="text-xs opacity-80">
             {isLoading
@@ -71,7 +71,7 @@ const HintButton = memo<HintButtonProps>(({
           <div className="flex items-center gap-1">
             {/* Visual star tokens */}
             {[...Array(3)].map((_, i) => (
-              <FaStar
+              <Star
                 key={i}
                 className={`w-3 h-3 ${
                   i < hintsRemaining
@@ -99,7 +99,7 @@ const HintButton = memo<HintButtonProps>(({
             >
               {/* Header */}
               <div className="flex items-center gap-2 mb-2">
-                <FaLightbulb className="text-neo-yellow text-lg" style={{ filter: 'drop-shadow(1px 1px 0px rgb(var(--neo-black)))' }} />
+                <Lightbulb className="w-5 h-5 text-neo-yellow" style={{ filter: 'drop-shadow(1px 1px 0px rgb(var(--neo-black)))' }} />
                 <span className="font-black text-neo-black uppercase text-sm">
                   {t('hints.hint') || 'Hint'}
                 </span>

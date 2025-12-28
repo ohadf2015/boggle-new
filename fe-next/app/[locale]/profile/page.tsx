@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { FaUser, FaArrowLeft, FaEdit, FaGamepad, FaTrophy, FaStar, FaCamera, FaTimes, FaCheck, FaClock, FaPlay } from 'react-icons/fa';
+import { User, ArrowLeft, Edit, Gamepad2, Trophy, Star, Camera, X, Check, Clock, Play } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import Header from '@/components/Header';
 import AutoHideHeader from '@/components/AutoHideHeader';
@@ -262,7 +262,7 @@ export default function ProfilePage(): React.ReactNode {
         <AutoHideHeader />
         <div className="max-w-4xl mx-auto px-4 py-8">
           <div className="text-center py-12">
-            <FaUser className="mx-auto text-6xl text-gray-600 mb-4" />
+            <User className="mx-auto text-6xl text-gray-600 mb-4" />
             <h2 className={cn(
               'text-2xl font-bold mb-2',
               isDarkMode ? 'text-white' : 'text-gray-900'
@@ -297,7 +297,7 @@ export default function ProfilePage(): React.ReactNode {
                     : 'border-gray-300 text-gray-700 hover:bg-gray-100'
                 )}
               >
-                <FaArrowLeft className="mr-2" />
+                <ArrowLeft className="mr-2" />
                 Back to Game
               </Button>
             </div>
@@ -372,7 +372,7 @@ export default function ProfilePage(): React.ReactNode {
                 {isUploading ? (
                   <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
                 ) : (
-                  <FaCamera size={14} />
+                  <Camera size={14} />
                 )}
                 <input
                   type="file"
@@ -393,7 +393,7 @@ export default function ProfilePage(): React.ReactNode {
                   )}
                   title={t('profile.removePhoto') || 'Remove Photo'}
                 >
-                  <FaTimes size={10} />
+                  <X size={10} />
                 </button>
               )}
 
@@ -407,7 +407,7 @@ export default function ProfilePage(): React.ReactNode {
                   )}
                   title={t('profile.chooseEmoji') || 'Change Emoji'}
                 >
-                  <FaEdit size={10} />
+                  <Edit size={10} />
                 </button>
               )}
             </div>
@@ -432,7 +432,7 @@ export default function ProfilePage(): React.ReactNode {
                     disabled={isSaving}
                     className="bg-green-600 hover:bg-green-500"
                   >
-                    {isSaving ? <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" /> : <FaCheck />}
+                    {isSaving ? <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" /> : <Check />}
                   </Button>
                   <Button
                     size="sm"
@@ -440,7 +440,7 @@ export default function ProfilePage(): React.ReactNode {
                     onClick={() => setIsEditingName(false)}
                     className={isDarkMode ? 'border-slate-600' : ''}
                   >
-                    <FaTimes />
+                    <X />
                   </Button>
                 </div>
               ) : (
@@ -457,7 +457,7 @@ export default function ProfilePage(): React.ReactNode {
                     )}
                     title={t('profile.editName') || 'Edit Name'}
                   >
-                    <FaEdit size={14} />
+                    <Edit size={14} />
                   </button>
                 </h1>
               )}
@@ -527,19 +527,19 @@ export default function ProfilePage(): React.ReactNode {
           className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 mb-6"
         >
           <StatCard
-            icon={<FaGamepad />}
+            icon={<Gamepad2 />}
             label={t('profile.totalGames')}
             value={profile?.total_games || 0}
             isDarkMode={isDarkMode}
           />
           <StatCard
-            icon={<FaTrophy />}
+            icon={<Trophy />}
             label={t('profile.wins')}
             value={profile?.ranked_wins || 0}
             isDarkMode={isDarkMode}
           />
           <StatCard
-            icon={<FaStar />}
+            icon={<Star />}
             label={t('profile.totalScore')}
             value={(profile?.total_score || 0).toLocaleString()}
             isDarkMode={isDarkMode}
@@ -552,7 +552,7 @@ export default function ProfilePage(): React.ReactNode {
             isDarkMode={isDarkMode}
           />
           <StatCard
-            icon={<FaClock />}
+            icon={<Clock />}
             label={t('profile.timePlayed')}
             value={formatTimePlayed(profile?.total_time_played)}
             isDarkMode={isDarkMode}
@@ -573,7 +573,7 @@ export default function ProfilePage(): React.ReactNode {
             'text-lg font-bold mb-4 flex items-center gap-2',
             isDarkMode ? 'text-white' : 'text-gray-900'
           )}>
-            <FaTrophy className="text-yellow-500" />
+            <Trophy className="text-yellow-500" />
             {t('ranked.title')}
           </h2>
 
@@ -708,7 +708,7 @@ export default function ProfilePage(): React.ReactNode {
                 'bg-neo-lime text-neo-black hover:bg-neo-lime/90'
               )}
             >
-              <FaPlay className="mr-2" />
+              <Play className="mr-2" />
               {t('profile.backToRoom') || 'Back to Room'} {activeGameSession.gameCode}
             </Button>
           )}
@@ -730,7 +730,7 @@ export default function ProfilePage(): React.ReactNode {
                   : 'bg-neo-purple text-neo-white hover:bg-neo-purple/90'
             )}
           >
-            <FaArrowLeft className="mr-2" />
+            <ArrowLeft className="mr-2" />
             {activeGameSession
               ? (t('profile.backToLobby') || 'Back to Lobby')
               : (t('profile.backToGame') || 'Back to Game')}

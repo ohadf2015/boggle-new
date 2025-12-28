@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FaTimes, FaArrowLeft, FaArrowRight } from 'react-icons/fa';
+import { X, ArrowLeft, ArrowRight } from 'lucide-react';
 import { Dialog, DialogContent, DialogTitle, DialogBody, DialogFooter } from './ui/dialog';
 import { Button } from './ui/button';
 import { useLanguage } from '../contexts/LanguageContext';
@@ -242,7 +242,7 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({ isOpen, onClose }) =>
               onClick={handleSkip}
               className="bg-neo-yellow hover:bg-neo-yellow/90 text-neo-black font-bold text-sm sm:text-base border-3 border-neo-black shadow-hard-sm"
             >
-              <FaTimes className={dir === 'rtl' ? 'ml-2' : 'mr-2'} />
+              <X className={dir === 'rtl' ? 'ml-2' : 'mr-2'} />
               {t('onboarding.navigation.skip')}
             </Button>
           )}
@@ -255,9 +255,9 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({ isOpen, onClose }) =>
               className="bg-neo-cream text-sm sm:text-base"
             >
               {dir === 'rtl' ? (
-                <FaArrowRight className="ml-2" />
+                <ArrowRight className="ml-2" />
               ) : (
-                <FaArrowLeft className="mr-2" />
+                <ArrowLeft className="mr-2" />
               )}
               {t('onboarding.navigation.back')}
             </Button>
@@ -274,9 +274,9 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({ isOpen, onClose }) =>
           >
             {isLastStep ? t('onboarding.navigation.letsPlay') : t('onboarding.navigation.next')}
             {!isLastStep && (dir === 'rtl' ? (
-              <FaArrowLeft className="mr-2" />
+              <ArrowLeft className="mr-2" />
             ) : (
-              <FaArrowRight className="ml-2" />
+              <ArrowRight className="ml-2" />
             ))}
           </Button>
         </DialogFooter>

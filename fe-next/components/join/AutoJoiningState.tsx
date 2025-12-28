@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import { FaGamepad } from 'react-icons/fa';
+import { Gamepad2 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useLanguage } from '@/contexts/LanguageContext';
 
@@ -34,7 +34,7 @@ export const AutoJoiningState: React.FC<AutoJoiningStateProps> = ({
           <CardHeader className="text-center space-y-4">
             <div className="flex justify-center">
               <div className="p-4 bg-neo-cyan text-neo-black rounded-neo border-3 border-neo-black shadow-hard-sm">
-                <FaGamepad size={48} className="text-neo-black" />
+                <Gamepad2 size={48} className="text-neo-black" />
               </div>
             </div>
             <CardTitle className="text-2xl sm:text-3xl font-black uppercase text-neo-cream tracking-tight">
