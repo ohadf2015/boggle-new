@@ -805,6 +805,114 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
           )}
         </div>
 
+        {/* PROMINENT Ready Action Section - Shows first for immediate visibility */}
+        {gameCode && onReturnToRoom && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 0.2, duration: 0.4, type: 'spring' }}
+            className="mt-4 max-w-2xl mx-auto px-2 sm:px-4"
+          >
+            {isCurrentPlayerReady ? (
+              /* Ready State - Confirmed */
+              <div className="bg-emerald-500 text-white border-4 border-neo-black rounded-neo-lg shadow-hard-xl p-6 sm:p-8 relative overflow-hidden">
+                {/* Success pattern */}
+                <div className="absolute inset-0 pointer-events-none opacity-10" style={{
+                  backgroundImage: 'repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(255,255,255,0.1) 10px, rgba(255,255,255,0.1) 20px)',
+                }} />
+                <div className="text-center space-y-4 relative z-10">
+                  <motion.div
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    transition={{ type: 'spring', stiffness: 300, damping: 20 }}
+                    className="flex items-center justify-center gap-4"
+                  >
+                    <motion.div
+                      animate={{ scale: [1, 1.15, 1] }}
+                      transition={{ duration: 1.5, repeat: Infinity }}
+                      className="w-16 h-16 bg-white rounded-full flex items-center justify-center border-4 border-neo-black shadow-hard"
+                    >
+                      <Check className="w-8 h-8 text-emerald-600" />
+                    </motion.div>
+                  </motion.div>
+                  <h3 className="text-2xl sm:text-3xl font-black uppercase" style={{ textShadow: '2px 2px 0px rgba(0,0,0,0.3)' }}>
+                    {t('results.youAreReady')}
+                  </h3>
+                  <p className="text-white/90 text-base font-bold">
+                    {t('results.waitingForHostToStart') || 'Waiting for host to start the next round...'}
+                  </p>
+                  <div className="flex flex-col sm:flex-row gap-3 justify-center mt-4">
+                    <motion.button
+                      whileHover={{ x: -2, y: -2 }}
+                      whileTap={{ x: 2, y: 2 }}
+                      onClick={onReturnToRoom}
+                      className="bg-white text-neo-black font-black text-base px-6 py-3 uppercase border-3 border-neo-black rounded-neo shadow-hard hover:shadow-hard-lg transition-all flex items-center justify-center gap-2"
+                    >
+                      <ArrowRight className="w-5 h-5" />
+                      {t('results.goToLobby')}
+                    </motion.button>
+                    <motion.button
+                      whileHover={{ x: -2, y: -2 }}
+                      whileTap={{ x: 2, y: 2 }}
+                      onClick={handleExitRoom}
+                      className="bg-neo-red text-neo-cream font-black text-base px-6 py-3 uppercase border-3 border-neo-black rounded-neo shadow-hard hover:shadow-hard-lg transition-all flex items-center justify-center gap-2"
+                    >
+                      <DoorOpen className="w-5 h-5" />
+                      {t('results.leaveRoom')}
+                    </motion.button>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              /* Not Ready State - PROMINENT CTA */
+              <div className="bg-neo-yellow text-neo-black border-4 border-neo-black rounded-neo-lg shadow-hard-xl p-6 sm:p-8 relative overflow-hidden">
+                {/* Attention-grabbing pattern */}
+                <div className="absolute inset-0 pointer-events-none opacity-[0.08]" style={{
+                  backgroundImage: 'radial-gradient(circle, rgb(var(--neo-black)) 1px, transparent 1px)',
+                  backgroundSize: '16px 16px',
+                }} />
+                <div className="text-center space-y-5 relative z-10">
+                  <motion.div
+                    animate={{ rotate: [0, -3, 3, 0] }}
+                    transition={{ duration: 0.5, repeat: Infinity, repeatDelay: 2 }}
+                  >
+                    <h3 className="text-2xl sm:text-3xl font-black uppercase" style={{ textShadow: '3px 3px 0px var(--neo-pink)' }}>
+                      {t('results.playAgainQuestion')}
+                    </h3>
+                  </motion.div>
+                  <p className="text-neo-black/80 text-base font-bold max-w-md mx-auto">
+                    {t('results.markReadyDescription') || 'Click below to let the host know you\'re ready for the next round'}
+                  </p>
+
+                  {/* HUGE I'm Ready Button */}
+                  <motion.button
+                    onClick={handleMarkReady}
+                    animate={{ scale: [1, 1.03, 1] }}
+                    transition={{ duration: 1.5, repeat: Infinity }}
+                    whileHover={{ scale: 1.05, x: -3, y: -3 }}
+                    whileTap={{ scale: 0.98, x: 3, y: 3 }}
+                    className="w-full sm:w-auto bg-neo-lime text-neo-black font-black text-xl sm:text-2xl px-12 py-5 uppercase border-4 border-neo-black rounded-neo shadow-hard-lg hover:shadow-hard-xl transition-all flex items-center justify-center gap-3 mx-auto"
+                  >
+                    <Star className="w-7 h-7" />
+                    {t('results.imReady')}
+                    <Star className="w-7 h-7" />
+                  </motion.button>
+
+                  <motion.button
+                    whileHover={{ x: -2, y: -2 }}
+                    whileTap={{ x: 2, y: 2 }}
+                    onClick={handleExitRoom}
+                    className="bg-neo-red text-neo-cream font-bold text-sm px-6 py-2.5 uppercase border-3 border-neo-black rounded-neo shadow-hard hover:shadow-hard-lg transition-all flex items-center justify-center gap-2 mx-auto mt-2"
+                  >
+                    <DoorOpen className="w-4 h-4" />
+                    {t('results.leaveRoom')}
+                  </motion.button>
+                </div>
+              </div>
+            )}
+          </motion.div>
+        )}
+
         {/* Players Ready Indicator - Shows who's ready for next round */}
         {gameCode && sortedScores.length > 1 && (
           <motion.div
@@ -823,125 +931,6 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
               readyUsernames={readyUsernames}
               currentUsername={username}
             />
-          </motion.div>
-        )}
-
-        {/* Play Again Section - Neo-Brutalist */}
-        {gameCode && onReturnToRoom && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.5 + sortedScores.length * 0.1, duration: 0.3 }}
-            className="mt-4 max-w-4xl mx-auto"
-            style={{ transform: 'rotate(1deg)' }}
-          >
-            <div className={`p-5 sm:p-6 ${isCurrentPlayerReady ? 'bg-emerald-500' : 'bg-neo-cyan'} text-neo-black border-4 border-neo-black rounded-neo-lg shadow-hard-xl relative overflow-hidden texture-halftone-comic transition-colors duration-300`}>
-              {/* Comic-style halftone texture pattern */}
-              <div
-                className="absolute inset-0 pointer-events-none opacity-[0.05]"
-                style={{
-                  backgroundImage: `radial-gradient(circle, rgb(var(--neo-black)) 1px, transparent 1px)`,
-                  backgroundSize: '12px 12px',
-                }}
-              />
-              <div className="text-center space-y-4 relative z-10">
-                {isCurrentPlayerReady ? (
-                  <>
-                    {/* Ready State */}
-                    <motion.div
-                      initial={{ scale: 0 }}
-                      animate={{ scale: 1 }}
-                      transition={{ type: 'spring', stiffness: 300, damping: 20 }}
-                      className="flex items-center justify-center gap-3"
-                    >
-                      <motion.div
-                        animate={{ scale: [1, 1.2, 1] }}
-                        transition={{ duration: 1, repeat: Infinity }}
-                        className="w-12 h-12 bg-white rounded-full flex items-center justify-center border-4 border-neo-black shadow-hard"
-                      >
-                        <Check className="w-6 h-6 text-emerald-500" />
-                      </motion.div>
-                      <h3
-                        className="text-xl sm:text-2xl font-black text-white uppercase"
-                        style={{ textShadow: '2px 2px 0px rgba(0,0,0,0.3)' }}
-                      >
-                        {t('results.youAreReady')}
-                      </h3>
-                    </motion.div>
-                    <p className="text-white/90 text-sm font-bold">
-                      {t('results.waitingForOthersToReady')}
-                    </p>
-                    <div className="flex flex-col sm:flex-row gap-3 justify-center mt-4">
-                      <motion.div
-                        whileHover={{ x: -2, y: -2 }}
-                        whileTap={{ x: 2, y: 2 }}
-                      >
-                        <button
-                          onClick={onReturnToRoom}
-                          className="w-full sm:w-auto bg-white text-neo-black font-black text-base px-6 py-2.5 uppercase border-3 border-neo-black rounded-neo shadow-hard hover:shadow-hard-lg transition-all flex items-center justify-center gap-2"
-                        >
-                          <ArrowRight className="w-4 h-4" />
-                          {t('results.goToLobby')}
-                        </button>
-                      </motion.div>
-                      <motion.div
-                        whileHover={{ x: -2, y: -2 }}
-                        whileTap={{ x: 2, y: 2 }}
-                      >
-                        <button
-                          onClick={handleExitRoom}
-                          className="w-full sm:w-auto bg-neo-red text-neo-cream font-black text-base px-6 py-2.5 uppercase border-3 border-neo-black rounded-neo shadow-hard hover:shadow-hard-lg transition-all flex items-center justify-center gap-2"
-                        >
-                          <DoorOpen className="w-4 h-4" />
-                          {t('results.leaveRoom')}
-                        </button>
-                      </motion.div>
-                    </div>
-                  </>
-                ) : (
-                  <>
-                    {/* Not Ready State */}
-                    <motion.h3
-                      className="text-xl sm:text-2xl font-black text-neo-black uppercase"
-                      style={{ textShadow: '2px 2px 0px var(--neo-yellow)' }}
-                      animate={{ scale: [1, 1.02, 1] }}
-                      transition={{ duration: 2, repeat: Infinity }}
-                    >
-                      {t('results.playAgainQuestion')}
-                    </motion.h3>
-                    <p className="text-neo-black text-sm font-bold">
-                      {t('results.markReadyDescription')}
-                    </p>
-                    <div className="flex flex-col sm:flex-row gap-3 justify-center mt-4">
-                      <motion.div
-                        whileHover={{ x: -2, y: -2 }}
-                        whileTap={{ x: 2, y: 2 }}
-                      >
-                        <button
-                          onClick={handleMarkReady}
-                          className="w-full sm:w-auto bg-neo-yellow text-neo-black font-black text-lg px-8 py-3 uppercase border-4 border-neo-black rounded-neo shadow-hard hover:shadow-hard-lg transition-all flex items-center justify-center gap-2"
-                        >
-                          <Star className="w-4 h-4" />
-                          {t('results.imReady')}
-                        </button>
-                      </motion.div>
-                      <motion.div
-                        whileHover={{ x: -2, y: -2 }}
-                        whileTap={{ x: 2, y: 2 }}
-                      >
-                        <button
-                          onClick={handleExitRoom}
-                          className="w-full sm:w-auto bg-neo-red text-neo-cream font-black text-lg px-8 py-3 uppercase border-4 border-neo-black rounded-neo shadow-hard hover:shadow-hard-lg transition-all flex items-center justify-center gap-2"
-                        >
-                          <DoorOpen className="w-4 h-4" />
-                          {t('results.leaveRoom')}
-                        </button>
-                      </motion.div>
-                    </div>
-                  </>
-                )}
-              </div>
-            </div>
           </motion.div>
         )}
       </div>

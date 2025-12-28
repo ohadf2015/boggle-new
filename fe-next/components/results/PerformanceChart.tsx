@@ -149,35 +149,48 @@ const CustomTooltip = ({
   if (!active || !payload || !payload[0]) return null;
 
   const data = payload[0].payload;
-  const date = new Date(data.timestamp);
-  const timeAgo = getTimeAgo(data.timestamp);
+  const timeAgo = getTimeAgo(data.timestamp, t);
 
   return (
-    <div className="bg-neo-cream border-3 border-neo-black rounded-neo p-2 shadow-hard text-neo-black">
-      <div className="font-black text-lg">{data.score} pts</div>
-      <div className="text-xs font-bold space-y-0.5">
-        <div>📝 {data.wordCount} {t('results.words') || 'words'}</div>
-        <div>🎯 {data.accuracy}% {t('results.accuracy') || 'accuracy'}</div>
-        {data.isWinner && <div className="text-neo-lime">🏆 Winner!</div>}
-        <div className="text-neo-black/60 mt-1">{timeAgo}</div>
+    <div className="bg-neo-cream border-3 border-neo-black rounded-neo p-3 shadow-hard text-neo-black min-w-[140px]">
+      <div className="font-black text-xl mb-1.5">{data.score} <span className="text-base">{t('scorePage.pts') || 'pts'}</span></div>
+      <div className="text-xs font-bold space-y-1">
+        <div className="flex items-center gap-1.5">
+          <span>📝</span>
+          <span>{data.wordCount} {t('results.words') || 'words'}</span>
+        </div>
+        <div className="flex items-center gap-1.5">
+          <span>🎯</span>
+          <span>{data.accuracy}% {t('results.accuracy') || 'accuracy'}</span>
+        </div>
+        {data.isWinner && (
+          <div className="flex items-center gap-1.5 text-neo-lime font-black">
+            <span>🏆</span>
+            <span>{t('results.winner') || 'Winner!'}</span>
+          </div>
+        )}
+        <div className="text-neo-black/50 mt-1.5 pt-1.5 border-t border-neo-black/10 text-[10px]">{timeAgo}</div>
       </div>
     </div>
   );
 };
 
 // Helper to get time ago string
-function getTimeAgo(timestamp: number): string {
+function getTimeAgo(
+  timestamp: number,
+  t: (key: string, params?: Record<string, string | number>) => string
+): string {
   const now = Date.now();
   const diff = now - timestamp;
   const minutes = Math.floor(diff / 60000);
   const hours = Math.floor(diff / 3600000);
   const days = Math.floor(diff / 86400000);
 
-  if (minutes < 1) return 'Just now';
-  if (minutes < 60) return `${minutes}m ago`;
-  if (hours < 24) return `${hours}h ago`;
-  if (days === 1) return 'Yesterday';
-  return `${days}d ago`;
+  if (minutes < 1) return t('chart.timeAgo.justNow') || 'Just now';
+  if (minutes < 60) return t('chart.timeAgo.minutesAgo', { count: minutes }) || `${minutes}m ago`;
+  if (hours < 24) return t('chart.timeAgo.hoursAgo', { count: hours }) || `${hours}h ago`;
+  if (days === 1) return t('chart.timeAgo.yesterday') || 'Yesterday';
+  return t('chart.timeAgo.daysAgo', { count: days }) || `${days}d ago`;
 }
 
 // Trend icon component

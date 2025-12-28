@@ -32,8 +32,8 @@ interface PlayerWaitingViewProps {
   username: string;
   t: (path: string, params?: Record<string, string | number>) => string;
   playersReady: (string | PlayerReadyInfo)[];
-  shufflingGrid: LetterGrid | null;
-  highlightedCells: GridPosition[];
+  shufflingGrid?: LetterGrid | null;
+  highlightedCells?: GridPosition[];
   showQR: boolean;
   setShowQR: (show: boolean) => void;
   showExitConfirm: boolean;
@@ -50,8 +50,6 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
   username,
   t,
   playersReady,
-  shufflingGrid,
-  highlightedCells,
   showQR,
   setShowQR,
   showExitConfirm,
@@ -60,77 +58,24 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
   onConfirmExit,
 }): React.ReactElement => {
   // Memoized handlers
-  const handleCopyLink = useCallback(() => {
-    copyJoinUrl(gameCode, t);
-  }, [gameCode, t]);
-
-  const handleShareWhatsApp = useCallback(() => {
-    shareViaWhatsApp(gameCode, '', t);
-  }, [gameCode, t]);
-
-  const handleShowQR = useCallback(() => {
-    setShowQR(true);
-  }, [setShowQR]);
-
   const handleCloseQR = useCallback(() => {
     setShowQR(false);
   }, [setShowQR]);
 
   return (
     <div className="flex flex-col gap-3 sm:gap-4 md:gap-6 w-full max-w-6xl">
-      {/* Row 1: Room Code + Language + Share */}
-      <Card className="bg-slate-800/95 text-neo-white p-3 sm:p-4 md:p-6 border-4 border-neo-black shadow-hard-lg">
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-          {/* Room Code and Language in same row */}
-          <div className="flex flex-col items-center sm:items-start gap-2">
-            <div className="flex items-center gap-3">
-              <div className="text-center sm:text-left">
-                <p className="text-sm text-neo-cyan font-bold uppercase">{t('hostView.roomCode')}:</p>
-                <h2 className="text-3xl sm:text-4xl font-black tracking-wide text-neo-yellow">
-                  {gameCode}
-                </h2>
-              </div>
-              {gameLanguage && (
-                <Badge className="text-base sm:text-lg px-3 py-1 bg-neo-purple text-white border-3 border-neo-black shadow-hard-sm font-bold" dir="auto">
-                  {gameLanguage === 'he' ? '🇮🇱 עברית' : gameLanguage === 'sv' ? '🇸🇪 Svenska' : gameLanguage === 'ja' ? '🇯🇵 日本語' : '🇺🇸 English'}
-                </Badge>
-              )}
-            </div>
-          </div>
-
-          {/* Share Buttons + Exit */}
-          <div className="flex flex-wrap gap-2 justify-center items-center">
-            <ShareButton
-              variant="secondary"
-              onClick={handleCopyLink}
-              icon={<Link />}
-            >
-              {t('hostView.copyLink')}
-            </ShareButton>
-            <ShareButton
-              variant="whatsapp"
-              onClick={handleShareWhatsApp}
-              icon={<WhatsAppIcon />}
-            >
-              {t('hostView.shareWhatsapp')}
-            </ShareButton>
-            <ShareButton
-              variant="secondary"
-              onClick={handleShowQR}
-              icon={<QrCode />}
-            >
-              {t('hostView.qrCode')}
-            </ShareButton>
-            <Button
-              onClick={onExitRoom}
-              className="bg-neo-red text-neo-white font-bold border-3 border-neo-black shadow-hard-sm hover:shadow-hard hover:translate-x-[-2px] hover:translate-y-[-2px] active:shadow-none active:translate-x-[2px] active:translate-y-[2px] transition-all duration-100 flex items-center gap-2"
-            >
-              <DoorOpen />
-              {t('playerView.exitRoom') || 'Exit Room'}
-            </Button>
-          </div>
-        </div>
-      </Card>
+      {/* Row 1: Room Code + Language + Share + Exit */}
+      {gameLanguage && (
+        <GameRoomHeader
+          gameCode={gameCode}
+          roomLanguage={gameLanguage}
+          username={username}
+          t={t}
+          onExitRoom={onExitRoom}
+          isHost={false}
+          showRoomName={false}
+        />
+      )}
 
       {/* Row 2: Waiting Message + Players List (side by side on desktop) */}
       <div className="flex flex-col lg:flex-row lg:items-stretch gap-3 sm:gap-4 md:gap-6">

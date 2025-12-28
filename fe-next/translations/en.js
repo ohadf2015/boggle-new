@@ -559,6 +559,11 @@ const en = {
     "exitWarning": "This action will close the room for all players. Are you sure you want to exit?",
     "exitRoom": "Exit Room",
     "startNewGame": "Start New Game",
+    "startNextRound": "Start Next Round",
+    "playersReady": "Players Ready",
+    "waitingForPlayersToReady": "Waiting for players to confirm they're ready...",
+    "allPlayersReady": "All players are ready! Start the next round.",
+    "players": "players",
     "validation": "Word Validation",
     "validateIntro": "Are these valid words? Mark the valid ones.",
     "totalWords": "Total words to validate",
@@ -862,7 +867,12 @@ const en = {
     "imReady": "I'm Ready!",
     "youAreReady": "You're Ready!",
     "waitingForOthersToReady": "Waiting for others to mark ready...",
-    "markReadyDescription": "Tap the button to mark yourself ready for the next game",
+    "waitingForHostToStart": "Waiting for host to start the next round...",
+    "markReadyDescription": "Click below to let the host know you're ready for the next round",
+    "allReadyHostCanStart": "🎉 All players ready! You can start the next round.",
+    "allPlayersReadyWaitingHost": "✓ All players ready — waiting for host to start",
+    "hostWillStartWhenReady": "The host will start the next round when everyone is ready",
+    "performanceHistory": "Performance History",
     "goToLobby": "Go to Lobby",
     "you": "(You)",
     "betterLuckNextTime": "Better luck next time!",
@@ -896,6 +906,13 @@ const en = {
       "tinyDip": "A tiny dip, no worries! 🌊",
       "holdingSteady": "Holding steady like a pro! ⚖️",
       "playMore": "Play more to see your trend!"
+    },
+    "timeAgo": {
+      "justNow": "Just now",
+      "minutesAgo": "{count}m ago",
+      "hoursAgo": "{count}h ago",
+      "yesterday": "Yesterday",
+      "daysAgo": "{count}d ago"
     }
   },
   "archetypes": {
@@ -1017,6 +1034,7 @@ const en = {
     "title": "🏆 Game Results",
     "leaderboard": "Leaderboard",
     "points": "Points",
+    "pts": "pts",
     "congratulations": "Congratulations"
   },
   "howToPlay": {
@@ -2201,7 +2219,9 @@ const en = {
       "challengeTitle": "Challenge from a friend!",
       "theyScored": "They scored",
       "attempts": "attempts",
-      "beatTheirScore": "Can you beat their score?"
+      "beatTheirScore": "Can you beat their score?",
+      "tryAnotherLanguage": "Try Another Language",
+      "playDifferentLanguage": "Play today's puzzle in a different language"
     },
     "streak": {
       "milestoneTitle": "Streak Milestone!",

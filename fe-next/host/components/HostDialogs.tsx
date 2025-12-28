@@ -347,34 +347,52 @@ export const FinalScoresModal: React.FC<FinalScoresModalProps> = ({
         )}
       </div>
 
-      {/* Players Ready Indicator */}
+      {/* Players Ready Indicator - PROMINENT */}
       {playersReady && playersReady.totalPlayers > 0 && (
-        <div className="flex items-center justify-center gap-2 py-3 px-4 bg-gradient-to-r from-emerald-500/10 to-teal-500/10 dark:from-emerald-500/20 dark:to-teal-500/20 rounded-lg border border-emerald-500/30">
-          <span className="text-2xl">✅</span>
-          <span className="font-bold text-emerald-700 dark:text-emerald-300">
-            {playersReady.readyCount}/{playersReady.totalPlayers} {t('hostView.playersReadyForNextGame') || 'players ready for next game'}
-          </span>
+        <div className={cn(
+          "py-4 px-5 rounded-neo border-3 border-neo-black shadow-hard text-center",
+          playersReady.readyCount === playersReady.totalPlayers
+            ? "bg-neo-lime"
+            : "bg-neo-yellow"
+        )}>
+          <div className="flex items-center justify-center gap-3 mb-2">
+            <span className="text-3xl">{playersReady.readyCount === playersReady.totalPlayers ? '🎉' : '⏳'}</span>
+            <span className="font-black text-neo-black text-xl uppercase">
+              {playersReady.readyCount}/{playersReady.totalPlayers} {t('hostView.playersReady') || 'Players Ready'}
+            </span>
+          </div>
+          {playersReady.readyCount < playersReady.totalPlayers && (
+            <p className="text-neo-black/70 text-sm font-bold">
+              {t('hostView.waitingForPlayersToReady') || 'Waiting for players to confirm they\'re ready...'}
+            </p>
+          )}
+          {playersReady.readyCount === playersReady.totalPlayers && (
+            <p className="text-neo-black font-bold">
+              {t('hostView.allPlayersReady') || 'All players are ready! Start the next round.'}
+            </p>
+          )}
         </div>
       )}
 
-      <DialogFooter className="flex-col sm:flex-row gap-2">
+      <DialogFooter className="flex-col gap-3 pt-4">
+        {/* HOST START GAME BUTTON - PROMINENT */}
         {tournamentData && !tournamentData.isComplete && (
           <Button
             onClick={onNextRound}
-            className="w-full bg-gradient-to-r from-amber-500 to-yellow-600 hover:from-amber-400 hover:to-yellow-500"
+            className="w-full h-14 text-lg font-black uppercase bg-neo-lime text-neo-black border-3 border-neo-black shadow-hard hover:shadow-hard-lg hover:translate-x-[-2px] hover:translate-y-[-2px] active:shadow-none active:translate-x-[2px] active:translate-y-[2px] transition-all"
           >
-            🏁 {t('hostView.nextRound')}
+            🏁 {t('hostView.startNextRound') || 'Start Next Round'}
           </Button>
         )}
         {(!tournamentData || tournamentData.isComplete) && (
           <Button
             onClick={onStartNewGame}
-            className="w-full bg-gradient-to-r from-cyan-500 to-purple-600 hover:from-cyan-400 hover:to-purple-500"
+            className="w-full h-14 text-lg font-black uppercase bg-neo-lime text-neo-black border-3 border-neo-black shadow-hard hover:shadow-hard-lg hover:translate-x-[-2px] hover:translate-y-[-2px] active:shadow-none active:translate-x-[2px] active:translate-y-[2px] transition-all"
           >
-            🎮 {t('hostView.startNewGame')}
+            🎮 {t('hostView.startNewGame') || 'Start New Game'}
           </Button>
         )}
-        <Button onClick={handleClose} variant="outline" className="w-full">
+        <Button onClick={handleClose} variant="outline" className="w-full border-2 border-neo-black">
           {t('hostView.close')}
         </Button>
       </DialogFooter>

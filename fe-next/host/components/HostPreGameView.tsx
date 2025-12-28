@@ -476,14 +476,21 @@ const HostPreGameView: React.FC<HostPreGameViewProps> = ({
               )}
             </AnimatePresence>
 
-            {/* Start Button (original position - tracked for sticky) */}
-            <div ref={startButtonRef} className="pt-1 flex justify-center">
+            {/* Start Game Button - PROMINENT HOST-ONLY ACTION */}
+            <div ref={startButtonRef} className="pt-3 flex justify-center">
               <Button
                 onClick={onStartGame}
                 disabled={!timerValue || playersReady.length === 0 || tournamentCreating}
-                className="w-full max-w-xs h-10 text-sm bg-neo-lime text-neo-black font-black"
+                className="w-full max-w-md h-14 text-lg bg-neo-lime text-neo-black font-black uppercase border-3 border-neo-black shadow-hard hover:shadow-hard-lg hover:translate-x-[-2px] hover:translate-y-[-2px] active:shadow-none active:translate-x-[2px] active:translate-y-[2px] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {tournamentCreating ? t('hostView.creatingTournament') || 'Creating...' : t('hostView.startGame')}
+                {tournamentCreating ? (t('hostView.creatingTournament') || 'Creating...') : (
+                  <>
+                    🎮 {t('hostView.startGame') || 'Start Game'}
+                    {playersReady.length > 0 && (
+                      <span className="ml-2 text-sm opacity-80">({playersReady.length} {t('hostView.players') || 'players'})</span>
+                    )}
+                  </>
+                )}
               </Button>
             </div>
           </div>

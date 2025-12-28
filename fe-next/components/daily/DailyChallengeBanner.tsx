@@ -87,15 +87,15 @@ const DailyChallengeBanner: React.FC<DailyChallengeBannerProps> = ({
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4 }}
         className={cn(
-          "group relative w-full rounded-neo-lg border-4 border-neo-black shadow-hard transition-all cursor-pointer overflow-hidden",
-          "hover:shadow-hard-lg hover:translate-x-[-3px] hover:translate-y-[-3px]",
-          "active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-pressed",
+          "group relative w-full rounded-neo-lg border-3 border-neo-black shadow-hard transition-all cursor-pointer overflow-hidden",
+          "hover:shadow-hard-lg hover:translate-x-[-2px] hover:translate-y-[-2px]",
+          "active:translate-x-[1px] active:translate-y-[1px] active:shadow-hard-pressed",
           "bg-gradient-to-r from-neo-orange via-neo-yellow to-neo-pink",
-          compact ? "p-3" : "p-4",
+          compact ? "p-2" : "p-2.5 sm:p-3",
           className
         )}
-        whileHover={{ scale: 1.01 }}
-        whileTap={{ scale: 0.99 }}
+        whileHover={{ scale: 1.005 }}
+        whileTap={{ scale: 0.995 }}
       >
         {/* Animated background shimmer */}
         {!hasPlayed && (
@@ -111,44 +111,44 @@ const DailyChallengeBanner: React.FC<DailyChallengeBannerProps> = ({
           />
         )}
 
-        <div className="relative flex items-center gap-3 sm:gap-4">
+        <div className="relative flex items-center gap-2 sm:gap-3">
           {/* Icon */}
           <div className={cn(
-            "flex items-center justify-center rounded-full border-3 border-neo-black",
+            "flex items-center justify-center rounded-full border-2 border-neo-black",
             "bg-neo-black/10",
-            compact ? "w-10 h-10" : "w-12 h-12 sm:w-14 sm:h-14"
+            compact ? "w-8 h-8" : "w-9 h-9 sm:w-10 sm:h-10"
           )}>
             <Target className={cn(
               "text-neo-black",
-              compact ? "w-5 h-5" : "w-6 h-6 sm:w-7 sm:h-7"
+              compact ? "w-4 h-4" : "w-4 h-4 sm:w-5 sm:h-5"
             )} />
           </div>
 
           {/* Content */}
           <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-2 flex-wrap">
+            <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap">
               <h3 className={cn(
                 "font-black uppercase text-neo-black leading-tight",
-                compact ? "text-sm" : "text-base sm:text-lg"
+                compact ? "text-xs" : "text-sm sm:text-base"
               )}>
                 {t('daily.badge') || 'Daily Challenge'}
               </h3>
               <span className={cn(
                 "font-black text-neo-black/80",
-                compact ? "text-sm" : "text-base sm:text-lg"
+                compact ? "text-xs" : "text-sm sm:text-base"
               )}>
                 #{puzzleNumber}
               </span>
               {streak > 0 && (
-                <span className="flex items-center gap-0.5 px-2 py-0.5 bg-neo-black/20 rounded-full">
-                  <Flame className="w-3 h-3 sm:w-4 sm:h-4 text-neo-orange" />
-                  <span className="text-xs sm:text-sm font-bold text-neo-black">
+                <span className="flex items-center gap-0.5 px-1.5 py-0.5 bg-neo-black/20 rounded-full">
+                  <Flame className="w-3 h-3 text-neo-orange" />
+                  <span className="text-xs font-bold text-neo-black">
                     {streak}
                   </span>
                 </span>
               )}
             </div>
-            <div className="flex items-center gap-2 text-xs sm:text-sm text-neo-black/80 font-medium mt-0.5">
+            <div className="flex items-center gap-1.5 text-xs text-neo-black/80 font-medium">
               <Clock className="w-3 h-3" />
               <span>
                 {hasPlayed
@@ -165,37 +165,37 @@ const DailyChallengeBanner: React.FC<DailyChallengeBannerProps> = ({
               <motion.div
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }}
-                className="flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 bg-neo-lime rounded-full border-3 border-neo-black"
+                className="flex items-center justify-center w-8 h-8 sm:w-9 sm:h-9 bg-neo-lime rounded-full border-2 border-neo-black"
               >
-                <Check className="w-5 h-5 sm:w-6 sm:h-6 text-neo-black" strokeWidth={3} />
+                <Check className="w-4 h-4 sm:w-5 sm:h-5 text-neo-black" strokeWidth={3} />
               </motion.div>
             ) : (
               <motion.div
-                className="flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 bg-neo-black rounded-full"
-                animate={{ x: [0, 3, 0] }}
+                className="flex items-center justify-center w-8 h-8 sm:w-9 sm:h-9 bg-neo-black rounded-full"
+                animate={{ x: [0, 2, 0] }}
                 transition={{ duration: 1, repeat: Infinity, repeatDelay: 2 }}
               >
-                <Play className="w-5 h-5 sm:w-6 sm:h-6 text-neo-yellow" fill="currentColor" />
+                <Play className="w-4 h-4 sm:w-5 sm:h-5 text-neo-yellow" fill="currentColor" />
               </motion.div>
             )}
           </div>
 
           {/* Arrow indicator */}
           <ChevronRight className={cn(
-            "w-5 h-5 text-neo-black/60 transition-transform",
+            "w-4 h-4 text-neo-black/60 transition-transform",
             "group-hover:translate-x-1 group-hover:text-neo-black"
           )} />
         </div>
 
-        {/* "PLAY NOW" text for not played state */}
+        {/* "PLAY NOW" text for not played state - hidden on small screens to save space */}
         {!hasPlayed && !compact && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.3 }}
-            className="absolute top-2 right-12 sm:right-16"
+            className="absolute top-1.5 right-10 sm:right-12 hidden sm:block"
           >
-            <span className="text-[10px] sm:text-xs font-black uppercase text-neo-black/70 bg-neo-black/10 px-2 py-0.5 rounded-full">
+            <span className="text-[10px] font-black uppercase text-neo-black/70 bg-neo-black/10 px-1.5 py-0.5 rounded-full">
               {t('daily.playNow') || 'Play Now'}
             </span>
           </motion.div>

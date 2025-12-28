@@ -555,6 +555,10 @@ const ja = {
     "exitWarning": "このアクションは全プレイヤーのためにルームを閉じます。本当に退出しますか？",
     "exitRoom": "ルームを退出",
     "startNewGame": "新しいゲームを開始",
+    "startNextRound": "次のラウンドを開始",
+    "playersReady": "準備完了のプレイヤー",
+    "waitingForPlayersToReady": "プレイヤーの準備完了を待っています...",
+    "allPlayersReady": "全員準備完了！次のラウンドを開始しましょう。",
     "validation": "単語の検証",
     "validateIntro": "有効な単語を確認してください。チェックされていない単語は削除されます。",
     "totalWords": "検証する単語の合計",
@@ -856,7 +860,12 @@ const ja = {
     "imReady": "準備OK！",
     "youAreReady": "準備完了！",
     "waitingForOthersToReady": "他のプレイヤーの準備を待っています...",
+    "waitingForHostToStart": "ホストが次のラウンドを開始するのを待っています...",
     "markReadyDescription": "ボタンをタップして次のゲームの準備完了を伝えましょう",
+    "allReadyHostCanStart": "🎉 全員準備完了！次のラウンドを開始できます。",
+    "allPlayersReadyWaitingHost": "✓ 全員準備完了 — ホストの開始を待っています",
+    "hostWillStartWhenReady": "全員が準備完了したらホストが次のラウンドを開始します",
+    "performanceHistory": "パフォーマンス履歴",
     "goToLobby": "ロビーへ",
     "you": "(あなた)",
     "betterLuckNextTime": "次はきっとうまくいく！",
@@ -890,6 +899,13 @@ const ja = {
       "tinyDip": "少し下がっただけ、大丈夫！🌊",
       "holdingSteady": "プロのように安定！⚖️",
       "playMore": "もっとプレイして傾向を見よう！"
+    },
+    "timeAgo": {
+      "justNow": "たった今",
+      "minutesAgo": "{count}分前",
+      "hoursAgo": "{count}時間前",
+      "yesterday": "昨日",
+      "daysAgo": "{count}日前"
     }
   },
   "archetypes": {
@@ -1011,6 +1027,7 @@ const ja = {
     "title": "🏆 ゲーム結果",
     "leaderboard": "リーダーボード",
     "points": "ポイント",
+    "pts": "pts",
     "congratulations": "おめでとうございます"
   },
   "howToPlay": {
@@ -2195,7 +2212,9 @@ const ja = {
       "challengeTitle": "友達からの挑戦！",
       "theyScored": "相手のスコア",
       "attempts": "試行",
-      "beatTheirScore": "相手のスコアを超えられますか？"
+      "beatTheirScore": "相手のスコアを超えられますか？",
+      "tryAnotherLanguage": "他の言語で挑戦",
+      "playDifferentLanguage": "今日のパズルを別の言語でプレイ"
     },
     "streak": {
       "milestoneTitle": "連続記録達成！",

@@ -556,6 +556,10 @@ const he = {
     "exitWarning": "פעולה זו תסגור את החדר עבור כל השחקנים. האם אתה בטוח שברצונך לצאת?",
     "exitRoom": "יציאה מהחדר",
     "startNewGame": "התחל משחק חדש",
+    "startNextRound": "התחל סיבוב הבא",
+    "playersReady": "שחקנים מוכנים",
+    "waitingForPlayersToReady": "ממתין לשחקנים לאשר שהם מוכנים...",
+    "allPlayersReady": "כל השחקנים מוכנים! התחל את הסיבוב הבא.",
     "validation": "אימות מילים",
     "validateIntro": "האם אלו מילים תקינות? סמן את התקינות.",
     "totalWords": "סה\"כ מילים לאימות",
@@ -858,7 +862,12 @@ const he = {
     "imReady": "אני מוכן!",
     "youAreReady": "אתה מוכן!",
     "waitingForOthersToReady": "ממתין לאחרים לסמן מוכן...",
+    "waitingForHostToStart": "ממתין למארח להתחיל את הסיבוב הבא...",
     "markReadyDescription": "לחץ על הכפתור כדי לסמן שאתה מוכן למשחק הבא",
+    "allReadyHostCanStart": "🎉 כל השחקנים מוכנים! אתה יכול להתחיל את הסיבוב הבא.",
+    "allPlayersReadyWaitingHost": "✓ כל השחקנים מוכנים — ממתין למארח להתחיל",
+    "hostWillStartWhenReady": "המארח יתחיל את הסיבוב הבא כשכולם יהיו מוכנים",
+    "performanceHistory": "היסטוריית ביצועים",
     "goToLobby": "לחדר המתנה",
     "you": "(אתה)",
     "betterLuckNextTime": "יותר מזל בפעם הבאה!",
@@ -892,6 +901,13 @@ const he = {
       "tinyDip": "ירידה קטנה, הכל בסדר! 🌊",
       "holdingSteady": "שומרים על יציבות כמו מקצוענים! ⚖️",
       "playMore": "שחקו עוד כדי לראות את המגמה!"
+    },
+    "timeAgo": {
+      "justNow": "עכשיו",
+      "minutesAgo": "לפני {count} דק׳",
+      "hoursAgo": "לפני {count} שע׳",
+      "yesterday": "אתמול",
+      "daysAgo": "לפני {count} ימים"
     }
   },
   "archetypes": {
@@ -1013,6 +1029,7 @@ const he = {
     "title": "🏆 תוצאות המשחק",
     "leaderboard": "טבלת המובילים",
     "points": "נקודות",
+    "pts": "נק׳",
     "congratulations": "מזל טוב"
   },
   "howToPlay": {
@@ -2197,7 +2214,9 @@ const he = {
       "challengeTitle": "אתגר מחבר!",
       "theyScored": "הם השיגו",
       "attempts": "ניסיונות",
-      "beatTheirScore": "האם תוכלו לנצח אותם?"
+      "beatTheirScore": "האם תוכלו לנצח אותם?",
+      "tryAnotherLanguage": "נסו שפה אחרת",
+      "playDifferentLanguage": "שחקו את הפאזל היומי בשפה אחרת"
     },
     "streak": {
       "milestoneTitle": "אבן דרך!",

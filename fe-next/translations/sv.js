@@ -555,6 +555,10 @@ const sv = {
     "exitWarning": "Denna åtgärd stänger rummet för alla spelare. Är du säker på att du vill avsluta?",
     "exitRoom": "Lämna rum",
     "startNewGame": "Starta nytt spel",
+    "startNextRound": "Starta nästa runda",
+    "playersReady": "Spelare redo",
+    "waitingForPlayersToReady": "Väntar på att spelare ska bekräfta att de är redo...",
+    "allPlayersReady": "Alla spelare är redo! Starta nästa runda.",
     "validation": "Ordvalidering",
     "validateIntro": "Markera giltiga ord. Omarkerade ord tas bort.",
     "totalWords": "Totalt antal ord att validera",
@@ -857,7 +861,12 @@ const sv = {
     "imReady": "Jag är redo!",
     "youAreReady": "Du är redo!",
     "waitingForOthersToReady": "Väntar på att andra ska markera sig redo...",
+    "waitingForHostToStart": "Väntar på att värden ska starta nästa runda...",
     "markReadyDescription": "Tryck på knappen för att markera dig redo för nästa spel",
+    "allReadyHostCanStart": "🎉 Alla spelare redo! Du kan starta nästa runda.",
+    "allPlayersReadyWaitingHost": "✓ Alla spelare redo — väntar på att värden startar",
+    "hostWillStartWhenReady": "Värden startar nästa runda när alla är redo",
+    "performanceHistory": "Prestationshistorik",
     "goToLobby": "Gå till lobby",
     "you": "(Du)",
     "betterLuckNextTime": "Bättre lycka nästa gång!",
@@ -891,6 +900,13 @@ const sv = {
       "tinyDip": "Liten dipp, inga problem! 🌊",
       "holdingSteady": "Håller stabil som ett proffs! ⚖️",
       "playMore": "Spela mer för att se din trend!"
+    },
+    "timeAgo": {
+      "justNow": "Just nu",
+      "minutesAgo": "{count}m sedan",
+      "hoursAgo": "{count}h sedan",
+      "yesterday": "Igår",
+      "daysAgo": "{count}d sedan"
     }
   },
   "archetypes": {
@@ -1012,6 +1028,7 @@ const sv = {
     "title": "🏆 Spelresultat",
     "leaderboard": "Topplista",
     "points": "Poäng",
+    "pts": "poäng",
     "congratulations": "Grattis"
   },
   "howToPlay": {
@@ -2196,7 +2213,9 @@ const sv = {
       "challengeTitle": "Utmaning från en vän!",
       "theyScored": "De fick",
       "attempts": "försök",
-      "beatTheirScore": "Kan du slå deras poäng?"
+      "beatTheirScore": "Kan du slå deras poäng?",
+      "tryAnotherLanguage": "Prova ett annat språk",
+      "playDifferentLanguage": "Spela dagens pussel på ett annat språk"
     },
     "streak": {
       "milestoneTitle": "Seriemilstolpe!",

@@ -76,9 +76,9 @@ const ModeCard: React.FC<ModeCardProps> = ({
       <motion.div
         className={cn(
           // Neo-Brutalist card base
-          'rounded-neo-lg border-4 border-neo-black',
+          'rounded-neo-lg border-3 border-neo-black',
           'shadow-hard-lg',
-          'p-4 sm:p-5',
+          'p-3 sm:p-4',
           'cursor-pointer',
           'relative overflow-hidden',
           // Colors
@@ -88,31 +88,31 @@ const ModeCard: React.FC<ModeCardProps> = ({
           'transition-all duration-200 ease-out',
           // Hover effect - move up and left/right based on direction, grow shadow
           isRTL
-            ? 'hover:translate-x-[4px] hover:translate-y-[-4px] hover:shadow-[-8px_8px_0px_black]'
-            : 'hover:translate-x-[-4px] hover:translate-y-[-4px] hover:shadow-[8px_8px_0px_black]',
+            ? 'hover:translate-x-[3px] hover:translate-y-[-3px] hover:shadow-[-6px_6px_0px_black]'
+            : 'hover:translate-x-[-3px] hover:translate-y-[-3px] hover:shadow-[6px_6px_0px_black]',
           // Active effect - press down
           isRTL
-            ? 'active:translate-x-[-2px] active:translate-y-[2px]'
-            : 'active:translate-x-[2px] active:translate-y-[2px]',
+            ? 'active:translate-x-[-1px] active:translate-y-[1px]'
+            : 'active:translate-x-[1px] active:translate-y-[1px]',
           'active:shadow-hard-pressed',
           className
         )}
-        whileHover={{ scale: 1.01 }}
-        whileTap={{ scale: 0.98 }}
+        whileHover={{ scale: 1.005 }}
+        whileTap={{ scale: 0.99 }}
       >
         {/* Header with icon and arrow */}
-        <div className="flex items-start justify-between mb-3">
+        <div className="flex items-start justify-between mb-2">
           {/* Icon */}
           <div
             className={cn(
-              'w-10 h-10 sm:w-12 sm:h-12',
-              'rounded-neo border-3 border-neo-black',
+              'w-9 h-9 sm:w-10 sm:h-10',
+              'rounded-neo border-2 border-neo-black',
               'shadow-hard-sm',
               'flex items-center justify-center',
               styles.iconBg
             )}
           >
-            <span className={cn('text-xl sm:text-2xl', styles.iconText)}>
+            <span className={cn('text-lg sm:text-xl', styles.iconText)}>
               {icon}
             </span>
           </div>
@@ -120,7 +120,7 @@ const ModeCard: React.FC<ModeCardProps> = ({
           {/* Arrow indicator */}
           <div
             className={cn(
-              'w-8 h-8 sm:w-10 sm:h-10',
+              'w-7 h-7 sm:w-8 sm:h-8',
               'rounded-full border-2 border-neo-black',
               'flex items-center justify-center',
               'transition-transform duration-200 ease-out',
@@ -128,23 +128,23 @@ const ModeCard: React.FC<ModeCardProps> = ({
               styles.arrow
             )}
           >
-            <ArrowIcon className="text-base sm:text-lg" />
+            <ArrowIcon className="text-sm sm:text-base" />
           </div>
         </div>
 
         {/* Title */}
-        <h2 className="text-xl sm:text-2xl font-black uppercase tracking-tight text-neo-black mb-1">
+        <h2 className="text-lg sm:text-xl font-black uppercase tracking-tight text-neo-black mb-0.5">
           {title}
         </h2>
 
         {/* Description */}
-        <p className="text-sm sm:text-base font-medium text-neo-black mb-3">
+        <p className="text-xs sm:text-sm font-medium text-neo-black mb-2">
           {description}
         </p>
 
         {/* Live Badge - shows open rooms and players when available */}
         {liveBadge && (liveBadge.openRooms > 0 || liveBadge.totalPlayers > 0) && (
-          <div className="flex flex-wrap gap-1.5 mb-3">
+          <div className="flex flex-wrap gap-1 mb-2">
             {liveBadge.openRooms > 0 && (
               <span className="inline-flex items-center gap-1 px-2 py-1 bg-neo-lime/90 text-neo-black text-xs font-bold rounded-neo border-2 border-neo-black shadow-hard-sm">
                 <LayoutGrid className="w-3 h-3" />
@@ -165,7 +165,7 @@ const ModeCard: React.FC<ModeCardProps> = ({
         )}
 
         {/* Features as icon row with tooltips */}
-        <div className="flex gap-1.5">
+        <div className="flex gap-1">
           {features.map((feature, index) => (
             <div
               key={index}
@@ -173,10 +173,10 @@ const ModeCard: React.FC<ModeCardProps> = ({
             >
               <div
                 className={cn(
-                  'w-7 h-7 sm:w-8 sm:h-8',
+                  'w-6 h-6 sm:w-7 sm:h-7',
                   'rounded-neo border-2 border-neo-black/30',
                   'flex items-center justify-center',
-                  'text-sm sm:text-base',
+                  'text-xs sm:text-sm',
                   styles.badgeBg,
                   styles.badgeText
                 )}
@@ -184,7 +184,7 @@ const ModeCard: React.FC<ModeCardProps> = ({
                 {feature.icon}
               </div>
               {/* Tooltip */}
-              <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1.5 px-2 py-0.5 text-xs font-medium text-neo-white bg-neo-black rounded whitespace-nowrap opacity-0 group-hover/tooltip:opacity-100 transition-opacity pointer-events-none z-10">
+              <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1 px-1.5 py-0.5 text-[10px] font-medium text-neo-white bg-neo-black rounded whitespace-nowrap opacity-0 group-hover/tooltip:opacity-100 transition-opacity pointer-events-none z-10">
                 {feature.label}
               </span>
             </div>

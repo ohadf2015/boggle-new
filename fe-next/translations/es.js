@@ -552,6 +552,10 @@ const es = {
     "exitWarning": "Esta acción cerrará la sala para todos los jugadores. ¿Seguro que quieres salir?",
     "exitRoom": "Salir de la Sala",
     "startNewGame": "Iniciar Nuevo Juego",
+    "startNextRound": "Iniciar Siguiente Ronda",
+    "playersReady": "Jugadores Listos",
+    "waitingForPlayersToReady": "Esperando a que los jugadores confirmen que están listos...",
+    "allPlayersReady": "¡Todos los jugadores están listos! Inicia la siguiente ronda.",
     "validation": "Validación de Palabras",
     "validateIntro": "¿Son estas palabras válidas? Marca las válidas.",
     "totalWords": "Total de palabras a validar",
@@ -854,7 +858,12 @@ const es = {
     "imReady": "¡Estoy listo!",
     "youAreReady": "¡Estás listo!",
     "waitingForOthersToReady": "Esperando a que otros se marquen como listos...",
+    "waitingForHostToStart": "Esperando a que el anfitrión inicie la siguiente ronda...",
     "markReadyDescription": "Toca el botón para indicar que estás listo para el próximo juego",
+    "allReadyHostCanStart": "🎉 ¡Todos los jugadores listos! Puedes iniciar la siguiente ronda.",
+    "allPlayersReadyWaitingHost": "✓ Todos los jugadores listos — esperando al anfitrión",
+    "hostWillStartWhenReady": "El anfitrión iniciará la siguiente ronda cuando todos estén listos",
+    "performanceHistory": "Historial de Rendimiento",
     "goToLobby": "Ir al lobby",
     "you": "(Tú)",
     "betterLuckNextTime": "¡Mejor suerte la próxima vez!",
@@ -888,6 +897,13 @@ const es = {
       "tinyDip": "Una pequeña bajada, ¡no pasa nada! 🌊",
       "holdingSteady": "¡Manteniéndote estable como un pro! ⚖️",
       "playMore": "¡Juega más para ver tu tendencia!"
+    },
+    "timeAgo": {
+      "justNow": "Ahora mismo",
+      "minutesAgo": "hace {count}m",
+      "hoursAgo": "hace {count}h",
+      "yesterday": "Ayer",
+      "daysAgo": "hace {count}d"
     }
   },
   "archetypes": {
@@ -976,6 +992,7 @@ const es = {
     "title": "🏆 Resultados del Juego",
     "leaderboard": "Clasificación",
     "points": "Puntos",
+    "pts": "pts",
     "congratulations": "Felicitaciones"
   },
   "howToPlay": {
@@ -2193,7 +2210,9 @@ const es = {
       "challengeTitle": "¡Desafío de un amigo!",
       "theyScored": "Puntuaron",
       "attempts": "intentos",
-      "beatTheirScore": "¿Puedes superar su puntuación?"
+      "beatTheirScore": "¿Puedes superar su puntuación?",
+      "tryAnotherLanguage": "Prueba otro idioma",
+      "playDifferentLanguage": "Juega el rompecabezas de hoy en otro idioma"
     },
     "streak": {
       "milestoneTitle": "¡Hito de racha!",

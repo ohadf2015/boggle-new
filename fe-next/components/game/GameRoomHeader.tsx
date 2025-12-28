@@ -95,7 +95,7 @@ const GameRoomHeader: React.FC<GameRoomHeaderProps> = ({
             {/* Exit Button */}
             <button
               onClick={onExitRoom}
-              className="flex items-center gap-1 px-2 py-1 bg-neo-red/90 text-white font-bold text-xs rounded-neo border-2 border-neo-black shadow-hard-sm hover:shadow-hard hover:bg-neo-red active:shadow-none transition-all"
+              className="flex items-center gap-1 px-2 py-1 bg-neo-red text-white font-bold text-xs rounded-neo border-2 border-red-700 shadow-hard-sm hover:shadow-hard hover:bg-red-600 active:shadow-none transition-all"
               title={isHost ? t('hostView.exitRoom') : t('playerView.exitRoom')}
             >
               <LogOut className="text-xs" />

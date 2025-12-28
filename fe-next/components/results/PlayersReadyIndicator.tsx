@@ -17,6 +17,7 @@ interface PlayersReadyIndicatorProps {
   players: PlayerInfo[];
   readyUsernames: string[];
   currentUsername?: string;
+  isHost?: boolean;
 }
 
 /**
@@ -27,6 +28,7 @@ const PlayersReadyIndicator: React.FC<PlayersReadyIndicatorProps> = ({
   players,
   readyUsernames,
   currentUsername,
+  isHost = false,
 }) => {
   const { t } = useLanguage();
   const readySet = useMemo(() => new Set(readyUsernames), [readyUsernames]);
@@ -218,7 +220,7 @@ const PlayersReadyIndicator: React.FC<PlayersReadyIndicatorProps> = ({
           </div>
         </div>
 
-        {/* All ready celebration message */}
+        {/* All ready celebration message OR waiting for host message */}
         <AnimatePresence>
           {allReady && (
             <motion.div
@@ -234,12 +236,23 @@ const PlayersReadyIndicator: React.FC<PlayersReadyIndicatorProps> = ({
                   transition={{ duration: 1.5, repeat: Infinity }}
                   className="text-center text-sm font-bold text-emerald-300"
                 >
-                  {t('results.allPlayersReady')}
+                  {isHost
+                    ? (t('results.allReadyHostCanStart') || '🎉 All players ready! You can start the next round.')
+                    : (t('results.allPlayersReadyWaitingHost') || '✓ All players ready — waiting for host to start')}
                 </motion.p>
               </div>
             </motion.div>
           )}
         </AnimatePresence>
+
+        {/* Waiting for more players message (for non-hosts) */}
+        {!allReady && !isHost && (
+          <div className="px-4 py-2 border-t-2 border-slate-700/50">
+            <p className="text-center text-xs text-slate-400 font-medium">
+              {t('results.hostWillStartWhenReady') || 'The host will start the next round when everyone is ready'}
+            </p>
+          </div>
+        )}
       </div>
 
       {/* CSS for glow effect */}
