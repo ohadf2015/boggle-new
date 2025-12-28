@@ -9,6 +9,7 @@ import WordFormingArea from '@/components/game/WordFormingArea';
 import ComboDisplay from '@/components/game/ComboDisplay';
 import { HelpPanel, HelpButton } from '@/components/game/HelpPanel';
 import { Button } from '@/components/ui/button';
+import { AchievementProgressTracker } from '@/components/achievements/AchievementProgressTracker';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import { useGameMusic } from '@/hooks/useGameMusic';
@@ -65,6 +66,7 @@ const DailyChallengeGame: React.FC<DailyChallengeGameProps> = ({
 
   // Help panel state
   const [isHelpOpen, setIsHelpOpen] = useState(false);
+  const [hasShownFirstGameHelp, setHasShownFirstGameHelp] = useState(false);
 
   // Refs for game end handler
   const gameOverCalledRef = useRef(false);
@@ -146,6 +148,24 @@ const DailyChallengeGame: React.FC<DailyChallengeGameProps> = ({
       stopMusic(500);
     };
   }, [stopMusic]);
+
+  // Auto-show help panel on first game - helps new players learn the mechanics
+  useEffect(() => {
+    if (isGameOver || hasShownFirstGameHelp) return undefined;
+
+    const hasSeenHelp = localStorage.getItem('first-game-help-seen');
+    if (!hasSeenHelp) {
+      // Delay opening help panel by 1.5 seconds to let game UI settle
+      const timer = setTimeout(() => {
+        setIsHelpOpen(true);
+        setHasShownFirstGameHelp(true);
+        localStorage.setItem('first-game-help-seen', 'true');
+      }, 1500);
+
+      return () => clearTimeout(timer);
+    }
+    return undefined;
+  }, [isGameOver, hasShownFirstGameHelp]);
 
   // Game end handler - validates pending words with AI before completing
   const handleGameEnd = useCallback(async () => {
@@ -337,6 +357,17 @@ const DailyChallengeGame: React.FC<DailyChallengeGameProps> = ({
           </div>
         </motion.div>
       </div>
+
+      {/* Achievement Progress Tracker - shows near-completion achievements */}
+      <AchievementProgressTracker
+        validWordCount={wordSubmission.validWordCount}
+        comboLevel={combo.comboLevel}
+        maxCombo={combo.maxCombo}
+        wordLengths={wordSubmission.foundWords.filter(w => w.isValid === true).map(w => w.word.length)}
+        timeSinceStart={duration - timer.remainingTime}
+        gameDuration={duration}
+        earnedAchievements={[]}
+      />
 
       {/* Word Forming Area with feedback - centered below timer */}
       <div className={cn("flex items-center justify-center mb-1", isLandscape && "hidden")}>

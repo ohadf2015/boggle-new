@@ -24,6 +24,7 @@ import { EarthquakeWarning, FireRoundIndicator } from '@/components/earthquake';
 import ThemeIndicator from '@/components/game/ThemeIndicator';
 import { WordsRemaining } from '@/player/components/in-game/WordsRemaining';
 import HintButton from '@/components/HintButton';
+import { AchievementProgressTracker } from '@/components/achievements/AchievementProgressTracker';
 import { useLanguage } from '@/contexts/LanguageContext';
 import type { BoardTheme } from '@/shared/types/socket';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
@@ -126,6 +127,7 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
   const [isHelpOpen, setIsHelpOpen] = useState(false);
   const [showQuitConfirm, setShowQuitConfirm] = useState(false);
   const [showLandscapeTutorial, setShowLandscapeTutorial] = useState(false);
+  const [hasShownFirstGameHelp, setHasShownFirstGameHelp] = useState(false);
 
   // Word forming state (for external WordFormingArea)
   const [formedWord, setFormedWord] = useState('');
@@ -282,6 +284,24 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
       }
     }
   }, [isLandscape, isGameOver]);
+
+  // Auto-show help panel on first game - helps new players learn the mechanics
+  useEffect(() => {
+    if (!grid || isGameOver || hasShownFirstGameHelp) return undefined;
+
+    const hasSeenHelp = localStorage.getItem('first-game-help-seen');
+    if (!hasSeenHelp) {
+      // Delay opening help panel by 1.5 seconds to let game UI settle
+      const timer = setTimeout(() => {
+        setIsHelpOpen(true);
+        setHasShownFirstGameHelp(true);
+        localStorage.setItem('first-game-help-seen', 'true');
+      }, 1500);
+
+      return () => clearTimeout(timer);
+    }
+    return undefined;
+  }, [grid, isGameOver, hasShownFirstGameHelp]);
 
   const dismissLandscapeTutorial = useCallback(() => {
     setShowLandscapeTutorial(false);
@@ -1150,6 +1170,18 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
           isActive={fireRoundActive}
           remainingSeconds={fireRoundRemaining}
         />
+
+        {/* Achievement Progress Tracker - shows near-completion achievements */}
+        <AchievementProgressTracker
+          validWordCount={validWordCount}
+          comboLevel={combo.comboLevel}
+          maxCombo={combo.maxCombo}
+          wordLengths={foundWords.filter(fw => fw.isValid === true).map(fw => fw.word.length)}
+          timeSinceStart={(Date.now() - gameStartTimeRef.current) / 1000}
+          gameDuration={settings.timerSeconds}
+          earnedAchievements={[]}
+        />
+
         {/* Left side: Timer + Score */}
         <div className="absolute left-2 top-1/2 -translate-y-1/2 flex flex-col items-center gap-2 z-20">
           {settings.mode !== 'practice' && (
@@ -1388,6 +1420,17 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
       <FireRoundIndicator
         isActive={fireRoundActive}
         remainingSeconds={fireRoundRemaining}
+      />
+
+      {/* Achievement Progress Tracker - shows near-completion achievements */}
+      <AchievementProgressTracker
+        validWordCount={foundWords.filter(fw => fw.isValid === true).length}
+        comboLevel={combo.comboLevel}
+        maxCombo={combo.maxCombo}
+        wordLengths={foundWords.filter(fw => fw.isValid === true).map(fw => fw.word.length)}
+        timeSinceStart={(Date.now() - gameStartTimeRef.current) / 1000}
+        gameDuration={settings.timerSeconds}
+        earnedAchievements={[]}
       />
 
       {/* Header with controls */}

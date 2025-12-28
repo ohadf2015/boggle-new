@@ -5,6 +5,7 @@ import { Providers } from '../providers';
 import Footer from '@/components/Footer';
 import GoogleAnalytics from '@/components/GoogleAnalytics';
 import ServiceWorkerRegistration from '@/components/ServiceWorkerRegistration';
+import { fredoka, rubik } from '../fonts';
 
 // Force dynamic rendering - prevent static generation
 export const dynamic = 'force-dynamic';
@@ -394,18 +395,13 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
     ];
 
     return (
-        <html lang={validLocale} dir={dir}>
+        <html lang={validLocale} dir={dir} className={`${fredoka.variable} ${rubik.variable}`}>
             <head>
                 <meta charSet="utf-8" />
                 {/* Preconnect hints for faster resource loading on slow connections */}
-                <link rel="preconnect" href="https://fonts.googleapis.com" />
-                <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+                {/* Note: Google Fonts preconnects removed - now using next/font for zero CLS */}
                 <link rel="preconnect" href="https://hdtmpkicuxvtmvrmtybx.supabase.co" />
-                <link rel="dns-prefetch" href="https://fonts.googleapis.com" />
-                <link rel="dns-prefetch" href="https://fonts.gstatic.com" />
                 <link rel="dns-prefetch" href="https://hdtmpkicuxvtmvrmtybx.supabase.co" />
-                {/* Load Google Fonts at runtime */}
-                <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Rubik:wght@400;500;600;700&display=swap" rel="stylesheet" />
                 {/* Favicon and icons with absolute URLs for better Google crawlability */}
                 {/* PNG icons FIRST - Google requires multiples of 48px and prefers PNG over SVG/ICO */}
                 <link rel="icon" type="image/png" sizes="48x48" href="https://www.lexiclash.live/icon-48.png" />

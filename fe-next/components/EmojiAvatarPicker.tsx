@@ -90,7 +90,9 @@ const EmojiAvatarPicker: React.FC<EmojiAvatarPickerProps> = ({
                 src={getAvatarPath(selectedAvatar)}
                 alt={selectedAvatar.name}
                 fill
+                sizes="96px"
                 className="object-cover"
+                priority
               />
             </div>
             <p className="text-lg font-black text-neo-black uppercase tracking-wide">
@@ -120,7 +122,9 @@ const EmojiAvatarPicker: React.FC<EmojiAvatarPickerProps> = ({
                     src={getAvatarPath(avatar)}
                     alt={avatar.name}
                     fill
+                    sizes="(max-width: 640px) 64px, 80px"
                     className="object-cover"
+                    loading="lazy"
                   />
                 </button>
               ))}

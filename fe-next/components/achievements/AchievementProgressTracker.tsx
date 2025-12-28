@@ -1,0 +1,208 @@
+'use client';
+
+import React, { useMemo } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { useLanguage } from '@/contexts/LanguageContext';
+import { cn } from '@/lib/utils';
+
+interface AchievementProgress {
+  key: string;
+  icon: string;
+  name: string;
+  current: number;
+  target: number;
+  percentage: number;
+}
+
+interface AchievementProgressTrackerProps {
+  validWordCount: number;
+  comboLevel: number;
+  maxCombo: number;
+  wordLengths: number[];
+  timeSinceStart: number;
+  gameDuration: number;
+  earnedAchievements: string[];
+  className?: string;
+}
+
+/**
+ * AchievementProgressTracker - Shows near-completion achievements during gameplay
+ *
+ * Displays a small panel showing 2-3 achievements the player is close to unlocking.
+ * Only shows achievements that are 50%+ complete to avoid clutter.
+ */
+export const AchievementProgressTracker: React.FC<AchievementProgressTrackerProps> = ({
+  validWordCount,
+  comboLevel,
+  maxCombo,
+  wordLengths,
+  timeSinceStart,
+  gameDuration,
+  earnedAchievements,
+  className,
+}) => {
+  const { t } = useLanguage();
+
+  // Calculate achievement progress for all trackable achievements
+  const achievementProgress = useMemo<AchievementProgress[]>(() => {
+    const progress: AchievementProgress[] = [];
+
+    // Word count achievements
+    if (!earnedAchievements.includes('WORDSMITH') && validWordCount >= 25) {
+      progress.push({
+        key: 'WORDSMITH',
+        icon: '🎓',
+        name: t('achievements.WORDSMITH.name') || 'Wordsmith',
+        current: validWordCount,
+        target: 50,
+        percentage: (validWordCount / 50) * 100,
+      });
+    }
+
+    if (!earnedAchievements.includes('LEXICON') && validWordCount >= 35) {
+      progress.push({
+        key: 'LEXICON',
+        icon: '🏆',
+        name: t('achievements.LEXICON.name') || 'Lexicon',
+        current: validWordCount,
+        target: 65,
+        percentage: (validWordCount / 65) * 100,
+      });
+    }
+
+    if (!earnedAchievements.includes('VOCABULARY_TITAN') && validWordCount >= 30) {
+      progress.push({
+        key: 'VOCABULARY_TITAN',
+        icon: '🗿',
+        name: t('achievements.VOCABULARY_TITAN.name') || 'Vocabulary Titan',
+        current: validWordCount,
+        target: 60,
+        percentage: (validWordCount / 60) * 100,
+      });
+    }
+
+    // Combo achievements
+    const currentCombo = Math.max(comboLevel, maxCombo);
+    if (!earnedAchievements.includes('COMBO_KING') && currentCombo >= 10) {
+      progress.push({
+        key: 'COMBO_KING',
+        icon: '🔥',
+        name: t('achievements.COMBO_KING.name') || 'Combo King',
+        current: currentCombo,
+        target: 25,
+        percentage: (currentCombo / 25) * 100,
+      });
+    }
+
+    if (!earnedAchievements.includes('COMBO_GOD') && currentCombo >= 13) {
+      progress.push({
+        key: 'COMBO_GOD',
+        icon: '👑',
+        name: t('achievements.COMBO_GOD.name') || 'Combo God',
+        current: currentCombo,
+        target: 25,
+        percentage: (currentCombo / 25) * 100,
+      });
+    }
+
+    // Speed Demon (time-scaled)
+    const halfGameTime = gameDuration * 0.5;
+    const speedDemonThreshold = Math.ceil(40 * (gameDuration / 180));
+    if (!earnedAchievements.includes('SPEED_DEMON') &&
+        timeSinceStart <= halfGameTime &&
+        validWordCount >= speedDemonThreshold * 0.5) {
+      progress.push({
+        key: 'SPEED_DEMON',
+        icon: '⚡',
+        name: t('achievements.SPEED_DEMON.name') || 'Speed Demon',
+        current: validWordCount,
+        target: speedDemonThreshold,
+        percentage: (validWordCount / speedDemonThreshold) * 100,
+      });
+    }
+
+    // Word Master (7+ letter word)
+    const hasSevenPlusLetter = wordLengths.some(len => len >= 7);
+    if (!earnedAchievements.includes('WORD_MASTER') && !hasSevenPlusLetter && validWordCount >= 20) {
+      progress.push({
+        key: 'WORD_MASTER',
+        icon: '📚',
+        name: t('achievements.WORD_MASTER.name') || 'Word Master',
+        current: Math.max(...wordLengths, 0),
+        target: 7,
+        percentage: (Math.max(...wordLengths, 0) / 7) * 100,
+      });
+    }
+
+    // Treasure Hunter (8+ letter word)
+    const hasEightPlusLetter = wordLengths.some(len => len >= 8);
+    if (!earnedAchievements.includes('TREASURE_HUNTER') && !hasEightPlusLetter && hasSevenPlusLetter) {
+      progress.push({
+        key: 'TREASURE_HUNTER',
+        icon: '💎',
+        name: t('achievements.TREASURE_HUNTER.name') || 'Treasure Hunter',
+        current: Math.max(...wordLengths, 0),
+        target: 8,
+        percentage: (Math.max(...wordLengths, 0) / 8) * 100,
+      });
+    }
+
+    // Sort by completion percentage (highest first) and filter to show only 50%+
+    return progress
+      .filter(p => p.percentage >= 50 && p.percentage < 100)
+      .sort((a, b) => b.percentage - a.percentage)
+      .slice(0, 3); // Show max 3 achievements
+  }, [validWordCount, comboLevel, maxCombo, wordLengths, timeSinceStart, gameDuration, earnedAchievements, t]);
+
+  // Don't render if no near-completion achievements
+  if (achievementProgress.length === 0) {
+    return null;
+  }
+
+  return (
+    <div className={cn("fixed bottom-20 right-4 z-40 space-y-2", className)}>
+      <AnimatePresence>
+        {achievementProgress.map((progress) => (
+          <motion.div
+            key={progress.key}
+            initial={{ opacity: 0, x: 50, scale: 0.8 }}
+            animate={{ opacity: 1, x: 0, scale: 1 }}
+            exit={{ opacity: 0, x: 50, scale: 0.8 }}
+            transition={{ type: 'spring', stiffness: 400, damping: 25 }}
+            className="bg-neo-navy/90 backdrop-blur-sm border-2 border-neo-cyan rounded-neo px-3 py-2 shadow-hard-sm max-w-[200px]"
+          >
+            {/* Header */}
+            <div className="flex items-center gap-2 mb-1">
+              <span className="text-lg">{progress.icon}</span>
+              <span className="text-xs font-bold text-neo-cyan truncate">
+                {progress.name}
+              </span>
+            </div>
+
+            {/* Progress Bar */}
+            <div className="w-full bg-neo-black/40 rounded-full h-2 overflow-hidden border border-neo-black/60">
+              <motion.div
+                className="h-full bg-gradient-to-r from-neo-cyan to-neo-pink"
+                initial={{ width: 0 }}
+                animate={{ width: `${Math.min(progress.percentage, 100)}%` }}
+                transition={{ duration: 0.5, ease: 'easeOut' }}
+              />
+            </div>
+
+            {/* Progress Text */}
+            <div className="flex justify-between items-center mt-1">
+              <span className="text-xs font-bold text-neo-cream">
+                {progress.current}/{progress.target}
+              </span>
+              <span className="text-xs font-bold text-neo-yellow">
+                {Math.round(progress.percentage)}%
+              </span>
+            </div>
+          </motion.div>
+        ))}
+      </AnimatePresence>
+    </div>
+  );
+};
+
+export default AchievementProgressTracker;
