@@ -332,7 +332,7 @@ const PresetSelector: React.FC<PresetSelectorProps> = ({
           <div className="w-[70%] flex flex-col gap-3 overflow-y-auto">
             {/* Section Header */}
             <h3 className="text-sm font-bold uppercase text-neo-white/70">
-              {t('singlePlayer.quickStart') || 'Quick Start'} - {t(MODE_CONFIG[selectedMode].nameKey)}
+              {t('singlePlayer.preset.quickStart') || 'Quick Start'} - {t(MODE_CONFIG[selectedMode].nameKey)}
             </h3>
 
             {/* Presets grid */}
@@ -486,7 +486,7 @@ const PresetSelector: React.FC<PresetSelectorProps> = ({
           <div className="flex items-center gap-2 text-sm font-bold uppercase text-neo-black/70 dark:text-neo-white/70">
             <FaPlay className="w-3 h-3" />
             <span>
-              {t('singlePlayer.quickStart') || 'Quick Start'} - {t(MODE_CONFIG[selectedMode].nameKey)}
+              {t('singlePlayer.preset.quickStart') || 'Quick Start'} - {t(MODE_CONFIG[selectedMode].nameKey)}
             </span>
           </div>
 
