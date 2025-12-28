@@ -107,11 +107,30 @@ export function calculateGameXp(gameStats: GameStats): XpResult {
 
 /**
  * Calculate XP required to reach a specific level
- * Formula: XP = 100 * level^1.5
+ * Formula: XP = 100 * level^exponent (segmented by tier)
+ *
+ * Segmented curve to improve mid-game retention:
+ * - Levels 1-25: Exponent 1.4 (faster early progression)
+ * - Levels 26-50: Exponent 1.45 (gentler mid-game)
+ * - Levels 51-75: Exponent 1.5 (current baseline)
+ * - Levels 76+: Exponent 1.55 (prestige tier challenge)
  */
 export function getXpForLevel(level: number): number {
   if (level <= 1) return 0;
-  return Math.round(XP_CONFIG.LEVEL_BASE * Math.pow(level, XP_CONFIG.LEVEL_EXPONENT));
+
+  // Determine exponent based on level tier
+  let exponent: number;
+  if (level <= 25) {
+    exponent = 1.4;  // Faster early progression
+  } else if (level <= 50) {
+    exponent = 1.45; // Gentler mid-game (was 1.5)
+  } else if (level <= 75) {
+    exponent = 1.5;  // Current baseline
+  } else {
+    exponent = 1.55; // Prestige tier
+  }
+
+  return Math.round(XP_CONFIG.LEVEL_BASE * Math.pow(level, exponent));
 }
 
 /**

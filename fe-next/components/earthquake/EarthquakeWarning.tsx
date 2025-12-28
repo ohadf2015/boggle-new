@@ -111,6 +111,10 @@ export const EarthquakeWarning: React.FC<EarthquakeWarningProps> = ({ isVisible 
                 <p className="text-lg font-bold text-neo-black/80">
                   {t('earthquake.brace') || 'Brace yourself!'}
                 </p>
+                {/* Photosensitivity Warning */}
+                <p className="text-xs font-bold text-neo-red mt-2 bg-neo-cream/80 rounded px-2 py-1 inline-block border-2 border-neo-black">
+                  ⚠️ {t('earthquake.photosensitivity') || 'Flashing lights ahead! Disable in Settings if sensitive'}
+                </p>
               </div>
 
               {/* Decorative stripes */}

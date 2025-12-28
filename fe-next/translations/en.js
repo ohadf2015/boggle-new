@@ -231,6 +231,7 @@ const en = {
   "earthquake": {
     "warning": "Earthquake!",
     "brace": "Brace yourself!",
+    "photosensitivity": "Flashing lights ahead! Disable in Settings if sensitive",
     "fireRound": "Fire Round",
     "multiplier": "2× Multiplier"
   },
@@ -1176,7 +1177,8 @@ const en = {
       "next": "Next",
       "letsPlay": "Let's Play!",
       "title": "Player Welcome"
-    }
+    },
+    "skipHint": "Press ESC or click Skip to jump straight to the game 🎮"
   },
   "achievements": {
     "FIRST_BLOOD": {

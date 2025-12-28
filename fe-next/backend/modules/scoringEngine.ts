@@ -157,6 +157,31 @@ export function calculateGameScores(
       // When duplicate rule is disabled (large rooms with >7 players), treat all words as unique
       const isUnique = duplicateRuleDisabled || (wordCountMap[word] || 0) === 1;
 
+      // Calculate word rarity based on how many players found it
+      // Rarity scoring rewards finding words that others missed
+      let rarityMultiplier = 1.0;
+      let wordRarity: 'common' | 'uncommon' | 'rare' | 'legendary' = 'common';
+
+      if (playerCount > 1 && !duplicateRuleDisabled) {
+        const playersWhoFoundThis = wordCountMap[word] || 1;
+        const percentageWhoFound = (playersWhoFoundThis / playerCount) * 100;
+
+        if (percentageWhoFound <= 5) {
+          // Only 1 player in 20 found this - legendary!
+          rarityMultiplier = 2.0;
+          wordRarity = 'legendary';
+        } else if (percentageWhoFound <= 15) {
+          // Less than 15% of players found this - rare
+          rarityMultiplier = 1.5;
+          wordRarity = 'rare';
+        } else if (percentageWhoFound <= 30) {
+          // 15-30% of players found this - uncommon
+          rarityMultiplier = 1.25;
+          wordRarity = 'uncommon';
+        }
+        // else: common word (50%+ found it), no bonus
+      }
+
       // Get pre-calculated score from word details if available
       const existingDetails = (playerWordDetails[username] || []).find(d => d.word === word);
       let score = 0;
@@ -167,6 +192,9 @@ export function calculateGameScores(
         } else {
           score = calculateWordScore(word, 0);
         }
+
+        // Apply rarity multiplier to base score
+        score = Math.round(score * rarityMultiplier);
         totalScore += score;
       }
 
@@ -185,8 +213,11 @@ export function calculateGameScores(
         timeSinceStart: (existingDetails as WordDetailResult | undefined)?.timeSinceStart || null,
         // Include fire round data for results display
         fireRoundMultiplier: existingDetails?.fireRoundMultiplier || 1,
-        fireRoundBonus: existingDetails?.fireRoundBonus || 0
-      };
+        fireRoundBonus: existingDetails?.fireRoundBonus || 0,
+        // Include rarity scoring data
+        rarityMultiplier,
+        wordRarity
+      } as WordDetailResult & { rarityMultiplier: number; wordRarity: string };
 
       // Only add aiReason if present (for invalid AI-verified words or valid ones with explanation)
       if (aiReason) {

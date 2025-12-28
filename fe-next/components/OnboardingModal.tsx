@@ -74,6 +74,20 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({ isOpen, onClose }) =>
     }
   }, [isOpen, audioUnlocked, fadeToTrack, TRACKS]);
 
+  // Add ESC key support for easy dismissal
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        handleSkip();
+      }
+    };
+
+    window.addEventListener('keydown', handleEscape);
+    return () => window.removeEventListener('keydown', handleEscape);
+  }, [isOpen]);
+
   const handleSkip = () => {
     markOnboardingSkipped();
     onClose();
@@ -196,8 +210,11 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({ isOpen, onClose }) =>
         {/* Visually hidden title for accessibility */}
         <DialogTitle className="sr-only">{t('onboarding.navigation.title') || 'Player Onboarding'}</DialogTitle>
 
-        {/* Progress indicator */}
+        {/* Helper text for easy dismissal */}
         <div className="px-3 sm:px-6 pt-3 sm:pt-4">
+          <p className="text-xs sm:text-sm text-neo-black/70 text-center mb-2">
+            {t('onboarding.skipHint') || 'Press ESC or click Skip to jump straight to the game 🎮'}
+          </p>
           <OnboardingProgress currentStep={currentStep} totalSteps={TOTAL_STEPS} />
         </div>
 
@@ -218,12 +235,12 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({ isOpen, onClose }) =>
 
         {/* Navigation buttons */}
         <DialogFooter className="flex-col sm:flex-row gap-2 px-3 sm:px-6 pb-3 sm:pb-6">
-          {/* Skip button (not on last step) */}
+          {/* Skip button - NOW ALWAYS VISIBLE (even on first step for easy dismissal) */}
           {!isLastStep && (
             <Button
               variant="outline"
               onClick={handleSkip}
-              className="bg-neo-cream text-sm sm:text-base"
+              className="bg-neo-yellow hover:bg-neo-yellow/90 text-neo-black font-bold text-sm sm:text-base border-3 border-neo-black shadow-hard-sm"
             >
               <FaTimes className={dir === 'rtl' ? 'ml-2' : 'mr-2'} />
               {t('onboarding.navigation.skip')}
