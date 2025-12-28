@@ -881,65 +881,95 @@ async function getCanvasFingerprint(): Promise<string> {
  */
 const TARGET_WORD_LISTS: Record<Language, string[]> = {
   en: [
+    // 3-4 letter words (easy)
+    'CAT', 'DOG', 'TREE', 'BIRD', 'FISH', 'MOON', 'STAR', 'RAIN', 'WIND', 'SNOW',
+    'BOOK', 'DOOR', 'HAND', 'FOOT', 'HEAD', 'FACE', 'ROCK', 'SAND', 'BOAT', 'GAME',
     // 5-letter words (easier)
     'HOUSE', 'PLANT', 'WATER', 'EARTH', 'SOUND', 'PLACE', 'WORLD', 'GREAT',
     'SMALL', 'LARGE', 'YOUNG', 'ROUND', 'CLEAR', 'LIGHT', 'DARK', 'FRESH',
     'CLEAN', 'QUICK', 'QUIET', 'HAPPY', 'READY', 'STRONG', 'SMART', 'BRAVE',
+    'STONE', 'RIVER', 'OCEAN', 'CLOUD', 'STORM', 'FIELD', 'GRASS', 'BEACH',
     // 6-letter words (medium)
     'CASTLE', 'GARDEN', 'FOREST', 'ISLAND', 'MARKET', 'BRIDGE', 'CORNER',
     'WINDOW', 'SIMPLE', 'MODERN', 'GOLDEN', 'SILVER', 'PURPLE', 'YELLOW',
     'ORANGE', 'SPRING', 'SUMMER', 'WINTER', 'AUTUMN', 'MONDAY', 'FRIDAY',
+    'DRAGON', 'PLANET', 'NATURE', 'FLOWER', 'BUTTER', 'COFFEE', 'SUNSET',
     // 7-letter words (harder)
     'KITCHEN', 'MORNING', 'EVENING', 'PERFECT', 'NATURAL', 'SPECIAL',
     'AMAZING', 'REGULAR', 'GENERAL', 'CENTRAL', 'EASTERN', 'WESTERN',
+    'RAINBOW', 'THUNDER', 'CRYSTAL', 'DIAMOND', 'VANILLA', 'BLANKET',
     // 8-letter words (challenging)
-    'MOUNTAIN', 'STANDARD', 'TREASURE', 'QUESTION', 'BUILDING', 'FUNCTION'
+    'MOUNTAIN', 'STANDARD', 'TREASURE', 'QUESTION', 'BUILDING', 'FUNCTION',
+    'PEACEFUL', 'POWERFUL', 'BEAUTIFUL', 'WONDERFUL', 'FANTASTIC', 'ELEPHANT'
   ],
   he: [
-    // Hebrew 3+ letter words
+    // Hebrew 3-4 letter words
     'בית', 'מים', 'עולם', 'אדם', 'דבר',
     'עין', 'ראש', 'ילד', 'ספר', 'שלום',
     'חבר', 'דלת', 'חלון', 'שולחן', 'כיסא',
+    'שמש', 'ירח', 'כוכב', 'עץ', 'פרח',
+    'סוס', 'כלב', 'חתול', 'ציפור', 'דג',
     // Hebrew 5-6 letter words
     'משפחה', 'חברה', 'עבודה', 'תרבות',
+    'אהבה', 'שמחה', 'תקווה', 'חופש',
     // Hebrew 7+ letter words
-    'חינוך', 'בריאות', 'תקשורת'
+    'חינוך', 'בריאות', 'תקשורת', 'מדינה', 'ממשלה'
   ],
   sv: [
+    // Swedish 3-4 letter words
+    'HUS', 'DAG', 'ÖGA', 'ÖRA', 'ARM', 'BEN', 'BOK', 'BIL', 'SOL', 'VÄG',
     // Swedish 5-letter words
     'VATTEN', 'VÄRLD', 'PLATS', 'LJUD', 'KRAFT',
     'BÄSTA', 'FÖRSTA', 'SISTA', 'RUNDA', 'KLAR',
+    'STEN', 'HUND', 'KATT', 'FÅGEL', 'BLOM',
     // Swedish 6-letter words
     'SLOTT', 'TRÄDGÅRD', 'MARKNAD', 'FÖNSTER',
+    'NATUR', 'HIMMEL', 'VINTER', 'SOMMAR',
     // Swedish 7-letter words
-    'MORGON', 'KVÄLL', 'PERFEKT'
+    'MORGON', 'KVÄLL', 'PERFEKT', 'FANTASTISK'
   ],
   ja: [
-    // Japanese 5-character compound words
-    '日本語', '図書館', '電車', '新聞', '会社',
-    '学校', '先生', '学生', '家族', '友達',
-    // Japanese 6-character words
-    '音楽', '映画', '料理', '旅行', '天気'
+    // Japanese 2-3 character words
+    '日本', '東京', '学校', '先生', '学生',
+    '友達', '家族', '会社', '仕事', '時間',
+    '天気', '音楽', '映画', '料理', '旅行',
+    '電車', '新聞', '本', '犬', '猫',
+    '花', '木', '山', '川', '海',
+    // Japanese 3-4 character compound words
+    '日本語', '図書館', '大学', '病院', '空港',
+    '公園', '駅', '銀行', '郵便局', '美術館'
   ],
   es: [
+    // Spanish 3-4 letter words
+    'SOL', 'MAR', 'PAN', 'SAL', 'LUZ', 'VOZ', 'PAZ', 'REY', 'LEY', 'RÍO',
+    'CASA', 'AGUA', 'VIDA', 'AMOR', 'MESA', 'LIBRO', 'PERRO', 'GATO',
     // Spanish 5-letter words
-    'CASA', 'AGUA', 'MUNDO', 'LUGAR', 'TIEMPO',
-    'GENTE', 'NOCHE', 'PLANTA', 'TIERRA', 'CIELO',
+    'MUNDO', 'LUGAR', 'TIEMPO', 'GENTE', 'NOCHE',
+    'PLANTA', 'TIERRA', 'CIELO', 'FIESTA', 'AMIGO',
     // Spanish 6-letter words
     'CASTILLO', 'JARDÍN', 'MERCADO', 'PUENTE',
     'VENTANA', 'SIMPLE', 'MODERNO', 'DORADO',
     // Spanish 7-letter words
-    'COCINA', 'MAÑANA', 'PERFECTO', 'NATURAL'
+    'COCINA', 'MAÑANA', 'PERFECTO', 'NATURAL', 'FANTÁSTICO'
   ],
   fr: [
+    // French 3-4 letter words
+    'CHAT', 'PAIN', 'LUNE', 'ÉTOILE', 'ARBRE', 'FLEUR', 'JOUR', 'NUIT',
     // French 5-letter words
     'MAISON', 'MONDE', 'TEMPS', 'VILLE', 'GRAND',
-    'PETIT', 'BELLE', 'FORCE', 'PLACE', 'CHOSE'
+    'PETIT', 'BELLE', 'FORCE', 'PLACE', 'CHOSE',
+    'LIVRE', 'CHIEN', 'AMOUR', 'JOLIE', 'RÊVE',
+    // French 6-letter words
+    'JARDIN', 'SOLEIL', 'NATURE', 'MONTAGNE', 'RIVIÈRE'
   ],
   de: [
+    // German 3-4 letter words
+    'HAUS', 'BAUM', 'BUCH', 'HUND', 'KATZE', 'SONNE', 'MOND', 'STERN',
     // German 5-letter words
-    'HAUS', 'WELT', 'ZEIT', 'STADT', 'GROSS',
-    'KLEIN', 'KRAFT', 'PLATZ', 'SACHE', 'WASSER'
+    'WELT', 'ZEIT', 'STADT', 'GROSS', 'KLEIN',
+    'KRAFT', 'PLATZ', 'SACHE', 'WASSER', 'LIEBE',
+    // German 6-letter words
+    'GARTEN', 'FENSTER', 'NATUR', 'HIMMEL', 'SOMMER'
   ]
 };
 

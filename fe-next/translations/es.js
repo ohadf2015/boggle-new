@@ -2068,6 +2068,15 @@ const es = {
     "howToPlay": "¡Caza la palabra oculta de {length} letras usando pistas de retroalimentación! Tienes {max} intentos para encontrarla.",
     "shareResult": "Compartir Resultado",
     "playAgainTomorrow": "¡Vuelve mañana para un nuevo puzzle!",
+    "feedback": {
+      "tooShort": "📏 Mínimo 3 letras",
+      "duplicate": "🔁 ¡Ya encontrada!",
+      "notOnBoard": "⚠️ No se puede formar en el tablero",
+      "invalidWord": "❌ No es una palabra válida",
+      "validWord": "✓ ¡Palabra encontrada!",
+      "targetAttempt": "🎯 ¡Sigue intentando!",
+      "targetFound": "🎉 ¡LA ENCONTRASTE!"
+    },
     "stats": {
       "title": "Estadísticas",
       "totalPlayers": "Total de Jugadores",
@@ -2114,6 +2123,45 @@ const es = {
       "category": "Categoría: {category}",
       "targetWordGuess": "Adivinar palabra objetivo",
       "gridWordDiscovery": "Descubrimiento de palabra del tablero"
+    }
+  },
+  "tutorial": {
+    "wordHunt": {
+      "welcome": {
+        "title": "Caza de Palabras Diaria",
+        "description": "¡Encuentra la palabra oculta! Tienes 10 intentos.",
+        "next": "Siguiente"
+      },
+      "colorFeedback": {
+        "title": "Aprende los Colores",
+        "tryGuessing": "Después de cada intento, los colores muestran qué tan cerca estás:",
+        "green": "Verde = Posición correcta",
+        "yellow": "Amarillo = En la palabra, lugar equivocado",
+        "gray": "Gris = No está en la palabra",
+        "next": "Siguiente"
+      },
+      "lifeSystem": {
+        "title": "Vida y Descubrimiento de Palabras",
+        "description": "¡Encuentra palabras en el tablero para ganar vida y fichas de pista!",
+        "swipeToGain": "Desliza palabras para ganar",
+        "tryIt": "¡Entendido!"
+      },
+      "minLength": {
+        "title": "⚠️ REGLA IMPORTANTE",
+        "description": "Las palabras deben tener al menos 3 LETRAS",
+        "example1": "3 letras ✓",
+        "example2": "2 letras - ¡muy corto!",
+        "gotIt": "¡Entendido!"
+      },
+      "complete": {
+        "title": "¡Estás listo!",
+        "remember": "Recuerda:",
+        "rule1": "10 intentos para encontrar el objetivo",
+        "rule2": "Encuentra otras palabras para vida",
+        "rule3": "Mínimo 3 letras",
+        "rule4": "Mismo puzzle en todo el mundo",
+        "start": "Comenzar Desafío Diario"
+      }
     }
   },
   "guidance": {
