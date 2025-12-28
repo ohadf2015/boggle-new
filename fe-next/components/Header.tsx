@@ -7,6 +7,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { cn } from '../lib/utils';
 import AuthButton from './auth/AuthButton';
 import MusicControls from './MusicControls';
+import DailyQuickLink from './daily/DailyQuickLink';
 import type { Language } from '../shared/types/game';
 
 /**
@@ -153,6 +154,9 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
 
                 {/* Desktop Controls: visible on sm+ */}
                 <div className="hidden sm:flex items-center gap-3 md:gap-4 flex-shrink-0">
+                    {/* Daily Challenge Quick Link */}
+                    <DailyQuickLink />
+
                     {/* Language Switcher */}
                     <div
                         className="relative"
@@ -317,7 +321,18 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                                 </div>
 
                                 <div className="flex flex-col gap-4 p-4">
-                                    {/* Account Section - Now at the top */}
+                                    {/* Daily Challenge - TOP PRIORITY */}
+                                    <div className="flex flex-col gap-2">
+                                        <span className="text-xs font-bold text-neo-black/60 dark:text-slate-400 uppercase tracking-wide">
+                                            {t('daily.badge') || 'Daily Challenge'}
+                                        </span>
+                                        <DailyQuickLink inline onClick={() => setShowMobileMenu(false)} />
+                                    </div>
+
+                                    {/* Divider */}
+                                    <div className="h-0.5 bg-neo-black/20 dark:bg-slate-600 rounded-full" />
+
+                                    {/* Account Section */}
                                     <div className="flex flex-col gap-2">
                                         <span className="text-xs font-bold text-neo-black/60 dark:text-slate-400 uppercase tracking-wide">
                                             {t('common.account') || 'Account'}

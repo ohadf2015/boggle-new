@@ -425,6 +425,85 @@ const PresetSelector: React.FC<PresetSelectorProps> = ({
           </h1>
         </div>
 
+        {/* Daily Challenge Card - FEATURED at TOP */}
+        {dailyPreset && (
+          <motion.button
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.05 }}
+            onClick={() => onSelectPreset(dailyPreset)}
+            className={cn(
+              'group relative p-4 rounded-neo-lg border-4 transition-all w-full',
+              'flex items-center gap-4',
+              'shadow-hard hover:shadow-hard-lg hover:translate-x-[-3px] hover:translate-y-[-3px]',
+              'active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-pressed',
+              'bg-gradient-to-r from-neo-orange via-neo-yellow to-neo-pink border-neo-black',
+              // Animated border glow when not played
+              !dailyInfo.hasPlayedToday && 'ring-2 ring-neo-orange/50 ring-offset-2 ring-offset-slate-50 dark:ring-offset-neo-navy'
+            )}
+            aria-label={`${t('daily.badge') || 'Daily'}: #${dailyInfo.puzzleNumber}`}
+          >
+            {/* Daily Icon */}
+            <div className="flex items-center justify-center">
+              <motion.div
+                animate={!dailyInfo.hasPlayedToday ? { scale: [1, 1.1, 1] } : {}}
+                transition={{ duration: 1.5, repeat: Infinity, repeatDelay: 2 }}
+              >
+                <Calendar className="w-10 h-10 sm:w-12 sm:h-12 text-neo-black" />
+              </motion.div>
+            </div>
+
+            {/* Daily Info */}
+            <div className="flex-1 text-left">
+              <div className="flex items-center gap-2 flex-wrap">
+                <h3 className="text-lg sm:text-xl font-black uppercase text-neo-black leading-tight">
+                  {t('daily.badge') || 'Daily Challenge'}
+                </h3>
+                {!dailyInfo.hasPlayedToday && (
+                  <span className="text-[10px] font-black uppercase px-2 py-0.5 bg-neo-black/20 rounded-full text-neo-black">
+                    {t('daily.playNow') || 'Play Now'}
+                  </span>
+                )}
+              </div>
+              <p className="text-sm sm:text-base font-bold text-neo-black/80 mt-0.5">
+                #{dailyInfo.puzzleNumber}
+                {dailyInfo.streak > 0 && (
+                  <span className="ml-2 inline-flex items-center gap-1 px-2 py-0.5 bg-neo-black/15 rounded-full">
+                    <Flame className="w-3 h-3 text-neo-orange" />
+                    {dailyInfo.streak} {t('daily.streak') || 'streak'}
+                  </span>
+                )}
+                {dailyInfo.hasPlayedToday && !dailyInfo.countdown && (
+                  <span className="ml-2 text-xs">
+                    {t('daily.nextPuzzleIn') || 'Next'}: {dailyInfo.countdown}
+                  </span>
+                )}
+              </p>
+            </div>
+
+            {/* Status Badge */}
+            <div>
+              {dailyInfo.hasPlayedToday ? (
+                <motion.span
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  className="flex items-center justify-center w-12 h-12 bg-neo-lime text-neo-black rounded-full border-3 border-neo-black"
+                >
+                  <Check className="w-6 h-6" strokeWidth={3} />
+                </motion.span>
+              ) : (
+                <motion.span
+                  className="flex items-center justify-center w-12 h-12 bg-neo-black rounded-full"
+                  animate={{ x: [0, 3, 0] }}
+                  transition={{ duration: 1, repeat: Infinity, repeatDelay: 2 }}
+                >
+                  <Play className="w-5 h-5 text-neo-yellow" fill="currentColor" />
+                </motion.span>
+              )}
+            </div>
+          </motion.button>
+        )}
+
         {/* Mode Selector Section */}
         <div className="space-y-3">
           <div className="flex items-center gap-2 text-sm font-bold uppercase text-neo-black/70 dark:text-neo-white/70">
@@ -438,58 +517,6 @@ const PresetSelector: React.FC<PresetSelectorProps> = ({
               renderModeCard(mode, index)
             )}
           </div>
-
-          {/* Daily Challenge Card (Full Width) */}
-          {dailyPreset && (
-            <motion.button
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2 }}
-              onClick={() => onSelectPreset(dailyPreset)}
-              className={cn(
-                'group relative p-4 rounded-neo-lg border-4 transition-all w-full',
-                'flex items-center gap-4',
-                'shadow-hard hover:shadow-hard-lg hover:translate-x-[-3px] hover:translate-y-[-3px]',
-                'active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-pressed',
-                'bg-gradient-to-r from-neo-orange via-neo-yellow to-neo-pink border-neo-black'
-              )}
-              aria-label={`${t('daily.badge') || 'Daily'}: #${dailyInfo.puzzleNumber}`}
-            >
-              {/* Daily Icon */}
-              <div className="flex items-center justify-center">
-                <Calendar className="w-8 h-8 sm:w-10 sm:h-10 text-neo-black" />
-              </div>
-
-              {/* Daily Info */}
-              <div className="flex-1 text-left">
-                <h3 className="text-base sm:text-lg font-black uppercase text-neo-black leading-tight">
-                  {t('daily.badge') || 'Daily Challenge'}
-                </h3>
-                <p className="text-xs sm:text-sm font-bold text-neo-black/80">
-                  #{dailyInfo.puzzleNumber}
-                  {dailyInfo.streak > 0 && (
-                    <span className="ml-2 inline-flex items-center gap-1">
-                      <Flame className="w-3 h-3 text-neo-orange" />
-                      {dailyInfo.streak} {t('daily.streak') || 'streak'}
-                    </span>
-                  )}
-                </p>
-              </div>
-
-              {/* Status Badge */}
-              <div>
-                {dailyInfo.hasPlayedToday ? (
-                  <span className="flex items-center justify-center w-10 h-10 bg-neo-lime text-neo-black rounded-full border-3 border-neo-black">
-                    <Check className="w-5 h-5" />
-                  </span>
-                ) : (
-                  <span className="flex items-center justify-center w-10 h-10 bg-neo-black/20 rounded-full border-3 border-neo-black">
-                    <Play className="w-4 h-4 text-neo-black" />
-                  </span>
-                )}
-              </div>
-            </motion.button>
-          )}
         </div>
 
         {/* Quick Start Presets */}

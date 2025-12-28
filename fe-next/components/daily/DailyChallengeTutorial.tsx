@@ -188,7 +188,7 @@ const Step3MinimumLength: React.FC<{ onNext: () => void; onPrev: () => void }> =
           animate={{ scale: [1, 1.2, 1] }}
           transition={{ duration: 0.6, repeat: Infinity, repeatDelay: 1 }}
         >
-          3
+          4
         </motion.div>
       </div>
 
@@ -196,7 +196,7 @@ const Step3MinimumLength: React.FC<{ onNext: () => void; onPrev: () => void }> =
         {t('tutorial.wordHunt.minLength.title') || '⚠️ IMPORTANT RULE'}
       </h2>
       <p className="text-lg mb-6 text-center font-bold">
-        {t('tutorial.wordHunt.minLength.description') || 'Words must be at least 3 LETTERS long'}
+        {t('tutorial.wordHunt.minLength.description') || 'Words must be at least 4 LETTERS long'}
       </p>
 
       <div className="bg-gray-100 dark:bg-gray-800 rounded-neo border-2 border-neo-black p-4 mb-6 space-y-3">
@@ -205,9 +205,9 @@ const Step3MinimumLength: React.FC<{ onNext: () => void; onPrev: () => void }> =
             <Check className="w-4 h-4 text-white" />
           </div>
           <div>
-            <div className="font-bold">CAT</div>
+            <div className="font-bold">BIRD</div>
             <div className="text-xs text-gray-600 dark:text-gray-400">
-              {t('tutorial.wordHunt.minLength.example1') || '3 letters ✓'}
+              {t('tutorial.wordHunt.minLength.example1') || '4 letters ✓'}
             </div>
           </div>
         </div>
@@ -217,9 +217,9 @@ const Step3MinimumLength: React.FC<{ onNext: () => void; onPrev: () => void }> =
             <X className="w-5 h-5 text-white" />
           </div>
           <div>
-            <div className="font-bold line-through">AT</div>
+            <div className="font-bold line-through">CAT</div>
             <div className="text-xs text-gray-600 dark:text-gray-400">
-              {t('tutorial.wordHunt.minLength.example2') || '2 letters - too short!'}
+              {t('tutorial.wordHunt.minLength.example2') || '3 letters - too short!'}
             </div>
           </div>
         </div>
@@ -264,7 +264,7 @@ const Step4Summary: React.FC<{ onNext: () => void; onPrev: () => void }> = ({
           </li>
           <li className="flex items-start gap-2">
             <span className="text-neo-purple font-bold">•</span>
-            <span>{t('tutorial.wordHunt.complete.rule3') || '3+ letters minimum'}</span>
+            <span>{t('tutorial.wordHunt.complete.rule3') || '4+ letters minimum'}</span>
           </li>
           <li className="flex items-start gap-2">
             <span className="text-neo-purple font-bold">•</span>

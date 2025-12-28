@@ -13,6 +13,7 @@ import { useLiveRoomStats } from '@/hooks/useLiveRoomStats';
 import ModeCard from './ModeCard';
 import Header from '@/components/Header';
 import OnboardingModal from '@/components/OnboardingModal';
+import DailyChallengeBanner from '@/components/daily/DailyChallengeBanner';
 import { hasCompletedOnboarding } from '@/utils/onboardingStorage';
 
 /**
@@ -67,37 +68,45 @@ const LandingView: React.FC = () => {
   if (isLandscape) {
     return (
       <main
-        className="flex h-screen w-full items-center justify-center bg-slate-900 p-3 gap-3 overflow-x-hidden landscape-full-height"
+        className="flex flex-col h-screen w-full bg-slate-900 p-3 gap-2 overflow-x-hidden landscape-full-height"
         role="main"
         aria-label="Game mode selection"
       >
-        {/* Multiplayer */}
-        <Link
-          href={`/${language}/multiplayer`}
-          className="flex-1 flex flex-col items-center justify-center gap-3 p-6 bg-gradient-to-br from-neo-pink to-pink-400 border-4 border-neo-black rounded-neo shadow-hard hover:shadow-hard-lg hover:translate-x-[-2px] hover:translate-y-[-2px] active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-sm transition-all h-full max-h-[90vh] min-h-[300px]"
-          aria-label={`${t('landing.multiplayer') || 'Multiplayer'} - ${t('landing.multiplayerDesc') || 'Compete with friends'}`}
-        >
-          <Users className="w-12 h-12 text-neo-black" aria-hidden="true" />
-          <span className="text-xl font-black uppercase text-neo-black text-center">{t('landing.multiplayer') || 'Multiplayer'}</span>
-          <div className="flex flex-col gap-2 text-sm" aria-hidden="true">
-            <span className="bg-neo-black/20 px-3 py-1.5 rounded-neo font-bold text-center"><LayoutGrid className="inline w-4 h-4 mr-1" />Rooms</span>
-            <span className="bg-neo-black/20 px-3 py-1.5 rounded-neo font-bold text-center"><Crown className="inline w-4 h-4 mr-1" />Host</span>
-          </div>
-        </Link>
+        {/* Daily Challenge Banner - Top of landscape view */}
+        <div className="w-full max-w-4xl mx-auto">
+          <DailyChallengeBanner compact />
+        </div>
 
-        {/* Single Player */}
-        <Link
-          href={`/${language}/singleplayer`}
-          className="flex-1 flex flex-col items-center justify-center gap-3 p-6 bg-gradient-to-br from-neo-cyan to-cyan-400 border-4 border-neo-black rounded-neo shadow-hard hover:shadow-hard-lg hover:translate-x-[-2px] hover:translate-y-[-2px] active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-sm transition-all h-full max-h-[90vh] min-h-[300px]"
-          aria-label={`${t('landing.singlePlayer') || 'Single Player'} - ${t('landing.singlePlayerDesc') || 'Practice at your own pace'}`}
-        >
-          <User className="w-12 h-12 text-neo-black" aria-hidden="true" />
-          <span className="text-xl font-black uppercase text-neo-black text-center">{t('landing.singlePlayer') || 'Single Player'}</span>
-          <div className="flex flex-col gap-2 text-sm" aria-hidden="true">
-            <span className="bg-neo-black/20 px-3 py-1.5 rounded-neo font-bold text-center"><Bot className="inline w-4 h-4 mr-1" />Bots</span>
-            <span className="bg-neo-black/20 px-3 py-1.5 rounded-neo font-bold text-center"><Trophy className="inline w-4 h-4 mr-1" />Challenges</span>
-          </div>
-        </Link>
+        {/* Mode cards row */}
+        <div className="flex-1 flex items-center justify-center gap-3 min-h-0">
+          {/* Multiplayer */}
+          <Link
+            href={`/${language}/multiplayer`}
+            className="flex-1 flex flex-col items-center justify-center gap-3 p-6 bg-gradient-to-br from-neo-pink to-pink-400 border-4 border-neo-black rounded-neo shadow-hard hover:shadow-hard-lg hover:translate-x-[-2px] hover:translate-y-[-2px] active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-sm transition-all h-full max-h-[80vh] min-h-[200px]"
+            aria-label={`${t('landing.multiplayer') || 'Multiplayer'} - ${t('landing.multiplayerDesc') || 'Compete with friends'}`}
+          >
+            <Users className="w-12 h-12 text-neo-black" aria-hidden="true" />
+            <span className="text-xl font-black uppercase text-neo-black text-center">{t('landing.multiplayer') || 'Multiplayer'}</span>
+            <div className="flex flex-col gap-2 text-sm" aria-hidden="true">
+              <span className="bg-neo-black/20 px-3 py-1.5 rounded-neo font-bold text-center"><LayoutGrid className="inline w-4 h-4 mr-1" />Rooms</span>
+              <span className="bg-neo-black/20 px-3 py-1.5 rounded-neo font-bold text-center"><Crown className="inline w-4 h-4 mr-1" />Host</span>
+            </div>
+          </Link>
+
+          {/* Single Player */}
+          <Link
+            href={`/${language}/singleplayer`}
+            className="flex-1 flex flex-col items-center justify-center gap-3 p-6 bg-gradient-to-br from-neo-cyan to-cyan-400 border-4 border-neo-black rounded-neo shadow-hard hover:shadow-hard-lg hover:translate-x-[-2px] hover:translate-y-[-2px] active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-sm transition-all h-full max-h-[80vh] min-h-[200px]"
+            aria-label={`${t('landing.singlePlayer') || 'Single Player'} - ${t('landing.singlePlayerDesc') || 'Practice at your own pace'}`}
+          >
+            <User className="w-12 h-12 text-neo-black" aria-hidden="true" />
+            <span className="text-xl font-black uppercase text-neo-black text-center">{t('landing.singlePlayer') || 'Single Player'}</span>
+            <div className="flex flex-col gap-2 text-sm" aria-hidden="true">
+              <span className="bg-neo-black/20 px-3 py-1.5 rounded-neo font-bold text-center"><Bot className="inline w-4 h-4 mr-1" />Bots</span>
+              <span className="bg-neo-black/20 px-3 py-1.5 rounded-neo font-bold text-center"><Trophy className="inline w-4 h-4 mr-1" />Challenges</span>
+            </div>
+          </Link>
+        </div>
 
         {/* How to Play - compact, always visible */}
         <Link
@@ -137,11 +146,21 @@ const LandingView: React.FC = () => {
           </p>
         </motion.div>
 
+        {/* Daily Challenge Banner - Prominent placement above mode cards */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4, delay: 0.08 }}
+          className="max-w-3xl mx-auto mb-3 sm:mb-4"
+        >
+          <DailyChallengeBanner />
+        </motion.div>
+
         {/* Mode cards grid */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4, delay: 0.1 }}
+          transition={{ duration: 0.4, delay: 0.15 }}
           className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4 max-w-3xl mx-auto"
         >
           {/* Multiplayer Card */}

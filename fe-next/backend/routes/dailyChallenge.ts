@@ -526,6 +526,9 @@ router.post('/word-hunt/submit', async (req: WordHuntSubmitRequest, res: Respons
       return;
     }
 
+    // Debug logging for Word Hunt submission
+    logger.info('API', `[WordHunt Submit] Received: playerId=${playerId || 'null'}, guestFingerprint=${guestFingerprint ? guestFingerprint.substring(0, 8) + '...' : 'null'}, displayName=${displayName}, solved=${solved}, attempts=${attemptsUsed}`);
+
     // Server-side validation: Verify target word matches expected puzzle
     try {
       // Use async version to check database for AI-selected word first
@@ -635,6 +638,7 @@ router.post('/word-hunt/submit', async (req: WordHuntSubmitRequest, res: Respons
     if (error) {
       // Check for unique constraint violation
       if (error.code === '23505') {
+        logger.info('API', `[WordHunt Submit] Already submitted for ${puzzleDate}/${language}`);
         res.json({ success: true, alreadySubmitted: true });
         return;
       }
@@ -642,6 +646,9 @@ router.post('/word-hunt/submit', async (req: WordHuntSubmitRequest, res: Respons
       res.status(500).json({ error: 'Failed to submit result' });
       return;
     }
+
+    // Debug: Log successful insertion
+    logger.info('API', `[WordHunt Submit] SUCCESS: id=${data.id}, playerType=${playerId ? 'authenticated' : 'guest'}, displayName=${displayName}, solved=${solved}`);
 
     res.json({
       success: true,
@@ -707,6 +714,11 @@ router.get('/word-hunt/leaderboard/:date/:language', async (req: Request<Leaderb
     if (countError) {
       logger.warn('API', `Word Hunt leaderboard count error: ${countError.message}`);
     }
+
+    // Debug: Log leaderboard fetch results
+    const guestCount = (data || []).filter((p: Record<string, unknown>) => p.guest_fingerprint && !p.player_id).length;
+    const authCount = (data || []).filter((p: Record<string, unknown>) => p.player_id).length;
+    logger.info('API', `[WordHunt Leaderboard] ${date}/${language}: total=${count}, guests=${guestCount}, authenticated=${authCount}`);
 
     res.json({
       data: data || [],

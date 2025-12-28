@@ -20,6 +20,7 @@ import { cn } from '@/lib/utils';
 import confetti from 'canvas-confetti';
 import { useMobileLandscape } from '@/hooks/useMobileLandscape';
 import { updateGuestStatsAfterGame, getGuestStats } from '@/utils/guestManager';
+import { logGameStart, logGameEnd, formatWordsForLogging } from '@/utils/gameLogger';
 import { getPointColor, getTextColor } from '@/components/results/utils';
 import type { WordObject } from '@/components/results/types';
 import { getRankBgColor } from '@/utils/rankingStyles';
@@ -68,6 +69,7 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
   // Refs to prevent duplicate stat updates
   const hasUpdatedStatsRef = useRef(false);
   const hasAddedToHistoryRef = useRef(false);
+  const hasLoggedGameSessionRef = useRef(false);
   const actionButtonsRef = useRef<HTMLDivElement>(null);
 
   // Use extracted hook for data processing
@@ -130,6 +132,44 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
 
     hasUpdatedStatsRef.current = true;
   }, [isAuthenticated, results, isWinner, totalComboBonus, totalFireRoundBonus, playerArchetype]);
+
+  // Log game session to database for admin analytics (runs for all users)
+  useEffect(() => {
+    if (hasLoggedGameSessionRef.current) return;
+
+    async function logSession() {
+      try {
+        const validWords = results.playerWordData?.filter(w => w.isValid) || [];
+        const wordDetails = validWords.map(w => ({
+          word: w.word,
+          points: w.score || 0,
+          timestamp: Date.now()
+        }));
+
+        // Start and immediately complete the session (single player game is already done)
+        const sessionId = await logGameStart({
+          mode: 'singleplayer',
+          language: language as string,
+          userId: null, // Will be set by the API if authenticated
+        });
+
+        if (sessionId) {
+          await logGameEnd(sessionId, {
+            score: results.playerScore,
+            wordsFound: formatWordsForLogging(validWords.map(w => w.word), wordDetails),
+            durationSeconds: results.gameDuration || 0,
+            completed: true,
+            finalRank: playerRank,
+          });
+        }
+      } catch (error) {
+        console.error('Failed to log single player game session:', error);
+      }
+    }
+
+    logSession();
+    hasLoggedGameSessionRef.current = true;
+  }, [results, language, playerRank]);
 
   // Add game to history for the performance chart (runs for all users)
   useEffect(() => {

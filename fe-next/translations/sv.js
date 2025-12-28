@@ -2104,9 +2104,12 @@ const sv = {
     "grayMeaning": "⬜ = Bokstaven finns inte i ordet",
     "howToPlay": "Jaga det dolda {length}-bokstavs ordet med hjälp av feedback! Du har {max} försök att hitta det.",
     "shareResult": "Dela resultat",
+    "shareAttempt": "Dela försök",
     "playAgainTomorrow": "Kom tillbaka imorgon för ett nytt pussel!",
+    "tryAnotherLanguage": "Prova ett annat språk",
+    "playDifferentLanguage": "Utmana dig själv på ett annat språk!",
     "feedback": {
-      "tooShort": "📏 Minst 3 bokstäver",
+      "tooShort": "📏 Minst 4 bokstäver",
       "duplicate": "🔁 Redan hittat!",
       "notOnBoard": "⚠️ Kan inte bilda detta på brädet",
       "invalidWord": "❌ Inte ett giltigt ord",
@@ -2165,7 +2168,10 @@ const sv = {
       "gridWordDiscovery": "Rutnätsupptäckt",
       "cannotRevealMore": "Kan inte avslöja fler bokstäver",
       "wordsLabel": "Ord",
-      "attemptsLabel": "Försök"
+      "attemptsLabel": "Försök",
+      "triesLeft": "försök kvar",
+      "findOnBoard": "Hitta detta ord på brädet!",
+      "traceLetters": "Följ bokstäverna på rutnätet för att stava det"
     },
     "results": {
       "targetWord": "Målordet",
@@ -2236,9 +2242,9 @@ const sv = {
       },
       "minLength": {
         "title": "⚠️ VIKTIG REGEL",
-        "description": "Ord måste vara minst 3 BOKSTÄVER långa",
-        "example1": "3 bokstäver ✓",
-        "example2": "2 bokstäver - för kort!",
+        "description": "Ord måste vara minst 4 BOKSTÄVER långa",
+        "example1": "4 bokstäver ✓",
+        "example2": "3 bokstäver - för kort!",
         "gotIt": "Jag förstår!"
       },
       "complete": {
@@ -2246,7 +2252,7 @@ const sv = {
         "remember": "Kom ihåg:",
         "rule1": "10 försök att hitta målordet",
         "rule2": "Hitta andra ord för liv",
-        "rule3": "Minimum 3 bokstäver",
+        "rule3": "Minimum 4 bokstäver",
         "rule4": "Samma pussel världen över",
         "start": "Starta daglig utmaning"
       }

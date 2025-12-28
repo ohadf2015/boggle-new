@@ -8,6 +8,7 @@ import { HelpPanel, HelpButton } from '@/components/game/HelpPanel';
 import { Button } from '@/components/ui/button';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
+import { useMusic } from '@/contexts/MusicContext';
 import { cn } from '@/lib/utils';
 import { useMobileLandscape } from '@/hooks/useMobileLandscape';
 import type { LetterGrid, Language } from '@/types';
@@ -84,6 +85,7 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
 }) => {
   const { t } = useLanguage();
   const { playWordAcceptedSound } = useSoundEffects();
+  const { fadeToTrack, stopMusic, TRACKS } = useMusic();
   const isLandscape = useMobileLandscape();
   const { user } = useAuth();
 
@@ -165,6 +167,17 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
     }
     initGameSession();
   }, []); // Only run once on mount
+
+  // Start fire round music on mount
+  useEffect(() => {
+    // Fade to fire round music (bossa arcade) with quick fade
+    fadeToTrack(TRACKS.BOSSA_ARCADE, 500, 800);
+
+    // Cleanup: stop music when component unmounts
+    return () => {
+      // Music transition will be handled by parent component
+    };
+  }, [fadeToTrack, TRACKS]);
 
   // Start life drain
   useEffect(() => {
@@ -298,9 +311,9 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
 
   // Handle grid word discovery
   const handleWordDiscovery = useCallback((word: string) => {
-    // Check minimum length (3+ letters)
-    if (word.length < 3) {
-      showToast('too-short', t('wordHunt.feedback.tooShort') || '📏 Minimum 3 letters');
+    // Check minimum length (4+ letters for daily challenge)
+    if (word.length < 4) {
+      showToast('too-short', t('wordHunt.feedback.tooShort') || '📏 Minimum 4 letters');
       return;
     }
 
@@ -347,6 +360,9 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
     gameOverRef.current = true;
     setIsGameOver(true);
     setHasWon(won);
+
+    // Transition to calmer music for results
+    fadeToTrack(TRACKS.BOSSA, 1000, 1500);
 
     if (lifeIntervalRef.current) {
       clearInterval(lifeIntervalRef.current);
@@ -402,7 +418,7 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
     }
 
     onComplete(result);
-  }, [attempts, discoveredWords, lifePoints, clueTokens, tokensSpent, currentHint, targetWord, onComplete, gameSessionId, gameStartTimeRef]);
+  }, [attempts, discoveredWords, lifePoints, clueTokens, tokensSpent, currentHint, targetWord, onComplete, gameSessionId, gameStartTimeRef, fadeToTrack, TRACKS]);
 
   // Handle clue shop purchases
   const handlePurchase = useCallback((item: ClueShopItem) => {
@@ -575,18 +591,15 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
           <span className="font-bold text-sm">{clueTokens}</span>
         </div>
 
-        {/* Shop button - more prominent with animation when tokens available */}
+        {/* Shop button - subtle indicator when tokens available */}
         <Button
           size="sm"
           onClick={() => setShowShop(!showShop)}
-          className={cn(
-            "bg-neo-purple text-white relative",
-            clueTokens > 0 && "animate-pulse"
-          )}
+          className="bg-neo-purple text-white relative hover:bg-neo-purple/80"
         >
           <ShoppingBag className="w-4 h-4" />
           {clueTokens > 0 && (
-            <span className="absolute -top-1 -right-1 w-4 h-4 bg-neo-yellow text-neo-black text-xs font-bold rounded-full flex items-center justify-center">
+            <span className="absolute -top-1 -right-1 w-4 h-4 bg-neo-yellow text-neo-black text-xs font-bold rounded-full flex items-center justify-center border border-neo-black">
               !
             </span>
           )}
@@ -722,15 +735,74 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
         </div>
       )}
 
-      {/* Target word display */}
-      <div className="flex justify-center gap-1 mb-2">
-        {renderTargetWord()}
+      {/* Target word display with instruction */}
+      <div className="text-center mb-2">
+        <div className="text-xs font-bold text-neo-purple dark:text-neo-purple mb-1">
+          🔍 {t('wordHunt.survival.findOnBoard') || 'Find this word on the board!'}
+        </div>
+        <div className="flex justify-center gap-1">
+          {renderTargetWord()}
+        </div>
+        <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+          {t('wordHunt.survival.traceLetters') || 'Trace the letters on the grid to spell it'}
+        </div>
       </div>
 
-      {/* Stats */}
-      <div className="flex justify-center gap-4 text-xs text-gray-600 dark:text-gray-400 mb-2">
+      {/* Prominent Attempts Counter */}
+      <motion.div
+        className={cn(
+          "flex items-center justify-center gap-3 px-4 py-2 rounded-neo border-3 mb-2 mx-auto",
+          MAX_ATTEMPTS - attempts.length <= 2
+            ? "bg-red-100 dark:bg-red-900/30 border-red-500"
+            : MAX_ATTEMPTS - attempts.length <= 4
+              ? "bg-yellow-100 dark:bg-yellow-900/30 border-yellow-500"
+              : "bg-green-100 dark:bg-green-900/30 border-green-500"
+        )}
+        animate={MAX_ATTEMPTS - attempts.length <= 2 && !isGameOver ? {
+          scale: [1, 1.02, 1],
+        } : {}}
+        transition={{ duration: 0.5, repeat: MAX_ATTEMPTS - attempts.length <= 2 ? Infinity : 0 }}
+      >
+        {/* Attempts dots indicator */}
+        <div className="flex items-center gap-1">
+          {[...Array(MAX_ATTEMPTS)].map((_, i) => (
+            <motion.div
+              key={i}
+              className={cn(
+                "w-2.5 h-2.5 rounded-full border border-neo-black/50",
+                i < attempts.length
+                  ? "bg-gray-400 dark:bg-gray-600" // Used attempt
+                  : MAX_ATTEMPTS - attempts.length <= 2
+                    ? "bg-red-500" // Critical - remaining
+                    : MAX_ATTEMPTS - attempts.length <= 4
+                      ? "bg-yellow-500" // Warning - remaining
+                      : "bg-green-500" // Safe - remaining
+              )}
+              initial={false}
+              animate={i === attempts.length - 1 && attempts.length > 0 ? {
+                scale: [1, 0.5, 1]
+              } : {}}
+              transition={{ duration: 0.3 }}
+            />
+          ))}
+        </div>
+
+        {/* Text indicator */}
+        <div className={cn(
+          "text-sm font-black",
+          MAX_ATTEMPTS - attempts.length <= 2
+            ? "text-red-600 dark:text-red-400"
+            : MAX_ATTEMPTS - attempts.length <= 4
+              ? "text-yellow-600 dark:text-yellow-400"
+              : "text-green-600 dark:text-green-400"
+        )}>
+          {MAX_ATTEMPTS - attempts.length} {t('wordHunt.survival.triesLeft') || 'tries left'}
+        </div>
+      </motion.div>
+
+      {/* Stats - words discovered */}
+      <div className="flex justify-center text-xs text-gray-600 dark:text-gray-400 mb-2">
         <span>{t('wordHunt.survival.wordsLabel')}: {discoveredWords.length}</span>
-        <span>{t('wordHunt.survival.attemptsLabel')}: {attempts.length}/{MAX_ATTEMPTS}</span>
       </div>
 
       {/* Feedback */}

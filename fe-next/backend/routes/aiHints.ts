@@ -60,14 +60,30 @@ router.post('/generate-word-hints', async (req: Request, res: Response): Promise
     const langName = languageNames[language] || 'English';
 
     // Generate hints as progressive blanks with revealed letters
-    // Ensure non-adjacent reveals for better challenge
-    // For word "BIRD" (4 letters):
+    // Reveal vowels from the END first, never reveal more than 50% of letters
+    // For word "BIRD" (4 letters, max reveal = 2):
     // Level 1: "_ _ _ _" (no letters)
-    // Level 2: "B _ _ _" (first letter only)
-    // Level 3: "B _ R _" (first and third - not adjacent)
-    // Level 4: "B _ R D" (first, third, last - spaced out)
-    // Level 5: "B _ R D" (all but second letter hidden)
+    // Level 2: "_ I _ _" (last vowel only)
+    // Level 3: "_ I _ _" (1 letter - 25% of max)
+    // Level 4: "_ I _ D" (2 letters - 50% of word)
+    // Level 5: "_ I _ D" (still max 50%)
     const wordLength = targetWord.length;
+    const vowelPositions = findVowelPositions(targetWord, language);
+
+    // Maximum letters we can ever reveal is 50% of the word (rounded down)
+    const maxReveal = Math.floor(wordLength / 2);
+
+    // Sort vowel positions from end to start (reverse order)
+    const vowelsFromEnd = [...vowelPositions].sort((a, b) => b - a);
+
+    // Get consonant positions from end to start
+    const consonantPositions = [...Array(wordLength).keys()]
+      .filter(i => !vowelPositions.includes(i))
+      .sort((a, b) => b - a);
+
+    // Build reveal order: vowels from end, then consonants from end
+    const revealOrder = [...vowelsFromEnd, ...consonantPositions];
+
     const hints = [];
 
     // Level 1: All blanks
@@ -77,18 +93,29 @@ router.post('/generate-word-hints', async (req: Request, res: Response): Promise
       unlockCost: 0,
     });
 
-    // Level 2: First letter revealed
+    // Level 2: Last vowel revealed (or last letter if no vowels) - max 1 letter
+    const lastVowelPos = vowelsFromEnd.length > 0 ? [vowelsFromEnd[0]] : [wordLength - 1];
+    const level2Chars = [];
+    for (let i = 0; i < wordLength; i++) {
+      if (lastVowelPos.includes(i)) {
+        level2Chars.push(targetWord[i].toUpperCase());
+      } else {
+        level2Chars.push('_');
+      }
+    }
     hints.push({
       level: 2,
-      hint: [targetWord[0].toUpperCase(), ...Array(wordLength - 1).fill('_')].join(' '),
-      unlockCost: 2,
+      hint: level2Chars.join(' '),
+      unlockCost: 4,
     });
 
     if (wordLength >= 4) {
-      // Level 3: First and third letters (positions 0, 2) - not adjacent
+      // Level 3: Reveal up to ceil(maxReveal * 0.5) letters
+      const level3Count = Math.min(Math.ceil(maxReveal * 0.5), revealOrder.length);
+      const level3Positions = revealOrder.slice(0, level3Count);
       const level3Chars = [];
       for (let i = 0; i < wordLength; i++) {
-        if (i === 0 || i === 2) {
+        if (level3Positions.includes(i)) {
           level3Chars.push(targetWord[i].toUpperCase());
         } else {
           level3Chars.push('_');
@@ -97,13 +124,15 @@ router.post('/generate-word-hints', async (req: Request, res: Response): Promise
       hints.push({
         level: 3,
         hint: level3Chars.join(' '),
-        unlockCost: 4,
+        unlockCost: 8,
       });
 
-      // Level 4: First, third, and last (positions 0, 2, last) - spaced out
+      // Level 4: Reveal up to ceil(maxReveal * 0.75) letters
+      const level4Count = Math.min(Math.ceil(maxReveal * 0.75), revealOrder.length);
+      const level4Positions = revealOrder.slice(0, level4Count);
       const level4Chars = [];
       for (let i = 0; i < wordLength; i++) {
-        if (i === 0 || i === 2 || i === wordLength - 1) {
+        if (level4Positions.includes(i)) {
           level4Chars.push(targetWord[i].toUpperCase());
         } else {
           level4Chars.push('_');
@@ -112,13 +141,14 @@ router.post('/generate-word-hints', async (req: Request, res: Response): Promise
       hints.push({
         level: 4,
         hint: level4Chars.join(' '),
-        unlockCost: 6,
+        unlockCost: 12,
       });
 
-      // Level 5: All but second letter (position 1 hidden)
+      // Level 5: Reveal exactly maxReveal letters (50% of word)
+      const level5Positions = revealOrder.slice(0, maxReveal);
       const level5Chars = [];
       for (let i = 0; i < wordLength; i++) {
-        if (i !== 1) {
+        if (level5Positions.includes(i)) {
           level5Chars.push(targetWord[i].toUpperCase());
         } else {
           level5Chars.push('_');
@@ -127,16 +157,10 @@ router.post('/generate-word-hints', async (req: Request, res: Response): Promise
       hints.push({
         level: 5,
         hint: level5Chars.join(' '),
-        unlockCost: 8,
-      });
-    } else if (wordLength === 3) {
-      // For 3-letter words: first and last (not adjacent)
-      hints.push({
-        level: 3,
-        hint: [targetWord[0].toUpperCase(), '_', targetWord[2].toUpperCase()].join(' '),
-        unlockCost: 4,
+        unlockCost: 16,
       });
     }
+    // Note: 3-letter words are no longer valid targets in daily challenge (minimum is 4 letters)
 
     // For category and example, we still use AI
     const message = await anthropic.messages.create({
@@ -217,54 +241,101 @@ function generateBlanksDisplay(word: string, revealPositions: number[]): string 
 }
 
 /**
- * Fallback hint generation when AI is unavailable
- * Generates progressive hints that reveal letters in blanks format
- * Ensures non-adjacent letter reveals for better challenge
+ * Get vowels for a specific language
  */
-function generateFallbackHints(targetWord: string): HintGenerationResponse {
-  const wordLength = targetWord.length;
+function getVowelsForLanguage(language: string): Set<string> {
+  const vowelSets: Record<string, string[]> = {
+    en: ['A', 'E', 'I', 'O', 'U'],
+    he: ['א', 'ע', 'י', 'ו'], // Hebrew vowel letters (matres lectionis)
+    sv: ['A', 'E', 'I', 'O', 'U', 'Y', 'Å', 'Ä', 'Ö'],
+    ja: ['あ', 'い', 'う', 'え', 'お', 'ア', 'イ', 'ウ', 'エ', 'オ'], // Hiragana/Katakana vowels
+    es: ['A', 'E', 'I', 'O', 'U', 'Á', 'É', 'Í', 'Ó', 'Ú'],
+    fr: ['A', 'E', 'I', 'O', 'U', 'Y', 'À', 'Â', 'É', 'È', 'Ê', 'Ë', 'Î', 'Ï', 'Ô', 'Ù', 'Û', 'Ü', 'Ÿ'],
+    de: ['A', 'E', 'I', 'O', 'U', 'Ä', 'Ö', 'Ü'],
+  };
+  return new Set(vowelSets[language] || vowelSets['en']);
+}
 
-  // Progressive reveal positions with non-adjacent spacing
+/**
+ * Find positions of vowels in a word
+ */
+function findVowelPositions(word: string, language: string): number[] {
+  const vowels = getVowelsForLanguage(language);
+  const positions: number[] = [];
+  for (let i = 0; i < word.length; i++) {
+    if (vowels.has(word[i].toUpperCase())) {
+      positions.push(i);
+    }
+  }
+  return positions;
+}
+
+/**
+ * Fallback hint generation when AI is unavailable
+ * Reveals vowels from the END first, never reveals more than 50% of letters
+ */
+function generateFallbackHints(targetWord: string, language = 'en'): HintGenerationResponse {
+  const wordLength = targetWord.length;
+  const vowelPositions = findVowelPositions(targetWord, language);
+
+  // Maximum letters we can ever reveal is 50% of the word (rounded down)
+  const maxReveal = Math.floor(wordLength / 2);
+
+  // Sort vowel positions from end to start (reverse order)
+  const vowelsFromEnd = [...vowelPositions].sort((a, b) => b - a);
+
+  // Get consonant positions from end to start
+  const consonantPositions = [...Array(wordLength).keys()]
+    .filter(i => !vowelPositions.includes(i))
+    .sort((a, b) => b - a);
+
+  // Build reveal order: vowels from end, then consonants from end
+  const revealOrder = [...vowelsFromEnd, ...consonantPositions];
+
   const hints: HintLevel[] = [
     {
       level: 1,
       hint: generateBlanksDisplay(targetWord, []), // "_ _ _ _"
       unlockCost: 0,
     },
-    {
-      level: 2,
-      hint: generateBlanksDisplay(targetWord, [0]), // "B _ _ _"
-      unlockCost: 2,
-    },
   ];
 
-  // Add progressive hints - ensure non-adjacent reveals
+  // Level 2: Reveal last vowel (or last letter if no vowels) - max 1 letter
+  const lastVowelPos = vowelsFromEnd.length > 0 ? [vowelsFromEnd[0]] : [wordLength - 1];
+  hints.push({
+    level: 2,
+    hint: generateBlanksDisplay(targetWord, lastVowelPos.slice(0, 1)),
+    unlockCost: 4,
+  });
+
   if (wordLength >= 4) {
-    // Level 3: First and third letters (positions 0, 2) - not adjacent
+    // Level 3: Reveal up to ceil(maxReveal * 0.5) letters
+    const level3Count = Math.min(Math.ceil(maxReveal * 0.5), revealOrder.length);
+    const level3Positions = revealOrder.slice(0, level3Count);
     hints.push({
       level: 3,
-      hint: generateBlanksDisplay(targetWord, [0, 2]), // "B _ R _"
-      unlockCost: 4,
-    });
-
-    // Level 4: First, third, and last - spaced out
-    hints.push({
-      level: 4,
-      hint: generateBlanksDisplay(targetWord, [0, 2, wordLength - 1]), // "B _ R D"
-      unlockCost: 6,
-    });
-
-    // Level 5: All but second letter (position 1 hidden)
-    const allButSecond: number[] = [];
-    for (let i = 0; i < wordLength; i++) {
-      if (i !== 1) allButSecond.push(i);
-    }
-    hints.push({
-      level: 5,
-      hint: generateBlanksDisplay(targetWord, allButSecond), // "B _ R D"
+      hint: generateBlanksDisplay(targetWord, level3Positions.sort((a, b) => a - b)),
       unlockCost: 8,
     });
+
+    // Level 4: Reveal up to ceil(maxReveal * 0.75) letters
+    const level4Count = Math.min(Math.ceil(maxReveal * 0.75), revealOrder.length);
+    const level4Positions = revealOrder.slice(0, level4Count);
+    hints.push({
+      level: 4,
+      hint: generateBlanksDisplay(targetWord, level4Positions.sort((a, b) => a - b)),
+      unlockCost: 12,
+    });
+
+    // Level 5: Reveal exactly maxReveal letters (50% of word)
+    const level5Positions = revealOrder.slice(0, maxReveal);
+    hints.push({
+      level: 5,
+      hint: generateBlanksDisplay(targetWord, level5Positions.sort((a, b) => a - b)),
+      unlockCost: 16,
+    });
   }
+  // Note: 3-letter words are no longer valid targets in daily challenge (minimum is 4 letters)
 
   return {
     hints,

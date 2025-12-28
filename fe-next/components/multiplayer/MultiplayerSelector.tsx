@@ -70,88 +70,11 @@ const MultiplayerSelector: React.FC<MultiplayerSelectorProps> = ({
 
         {/* Main Content - Decision Cards */}
         <div className="flex-1 flex flex-col justify-center px-4 sm:px-6 pb-4 min-h-0 gap-4 lg:gap-6">
-          {/* Cards Container */}
-          <div className="flex flex-col lg:flex-row gap-4 lg:gap-6 w-full max-w-4xl mx-auto flex-shrink-0">
-            {/* Create Room Card */}
-            <motion.div
-              initial={{ x: -30, opacity: 0 }}
-              animate={{ x: 0, opacity: 1 }}
-              transition={{ delay: 0.1 }}
-              className="flex-1"
-            >
-              <Card
-                className="h-full cursor-pointer group border-3 border-slate-600 shadow-hard hover:shadow-hard-lg hover:translate-x-[-3px] hover:translate-y-[-3px] active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-sm transition-all bg-gradient-to-br from-neo-lime/10 to-neo-lime/5"
-                onClick={onSelectCreate}
-                role="button"
-                tabIndex={0}
-                onKeyDown={(e) => e.key === 'Enter' && onSelectCreate()}
-                aria-label={t('multiplayerFlow.selector.createCard.title') || 'Create Room'}
-              >
-                <CardContent className="flex flex-col items-center justify-center text-center p-6 sm:p-8 h-full min-h-[180px] sm:min-h-[220px]">
-                  <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-neo-lime text-neo-black border-3 border-neo-black flex items-center justify-center mb-4 shadow-hard group-hover:scale-110 transition-transform">
-                    <Crown className="w-8 h-8 sm:w-10 sm:h-10 text-neo-black" />
-                  </div>
-                  <h2 className="text-xl sm:text-2xl font-black uppercase text-neo-white mb-2">
-                    {t('multiplayerFlow.selector.createCard.title') || 'Create Room'}
-                  </h2>
-                  <p className="text-sm sm:text-base text-neo-cream mb-4">
-                    {t('multiplayerFlow.selector.createCard.description') || 'Host a new game and invite friends'}
-                  </p>
-                  <Button
-                    variant="success"
-                    size="lg"
-                    className="w-full max-w-[200px] font-bold uppercase"
-                    tabIndex={-1}
-                  >
-                    {t('multiplayerFlow.selector.createCard.button') || 'Start Setup'}
-                  </Button>
-                </CardContent>
-              </Card>
-            </motion.div>
-
-            {/* Join Room Card */}
-            <motion.div
-              initial={{ x: 30, opacity: 0 }}
-              animate={{ x: 0, opacity: 1 }}
-              transition={{ delay: 0.2 }}
-              className="flex-1"
-            >
-              <Card
-                className="h-full cursor-pointer group border-3 border-slate-600 shadow-hard hover:shadow-hard-lg hover:translate-x-[-3px] hover:translate-y-[-3px] active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-sm transition-all bg-gradient-to-br from-neo-cyan/10 to-neo-cyan/5"
-                onClick={onSelectJoin}
-                role="button"
-                tabIndex={0}
-                onKeyDown={(e) => e.key === 'Enter' && onSelectJoin()}
-                aria-label={t('multiplayerFlow.selector.joinCard.title') || 'Join Room'}
-              >
-                <CardContent className="flex flex-col items-center justify-center text-center p-6 sm:p-8 h-full min-h-[180px] sm:min-h-[220px]">
-                  <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-neo-cyan text-neo-black border-3 border-neo-black flex items-center justify-center mb-4 shadow-hard group-hover:scale-110 transition-transform">
-                    <LogIn className="w-8 h-8 sm:w-10 sm:h-10 text-neo-black" />
-                  </div>
-                  <h2 className="text-xl sm:text-2xl font-black uppercase text-neo-white mb-2">
-                    {t('multiplayerFlow.selector.joinCard.title') || 'Join Room'}
-                  </h2>
-                  <p className="text-sm sm:text-base text-neo-cream mb-4">
-                    {t('multiplayerFlow.selector.joinCard.description') || 'Enter an existing game with a code'}
-                  </p>
-                  <Button
-                    variant="default"
-                    size="lg"
-                    className="w-full max-w-[200px] font-bold uppercase bg-neo-cyan hover:bg-neo-cyan/90 text-neo-black"
-                    tabIndex={-1}
-                  >
-                    {t('multiplayerFlow.selector.joinCard.button') || 'Browse Rooms'}
-                  </Button>
-                </CardContent>
-              </Card>
-            </motion.div>
-          </div>
-
-          {/* Active Rooms Preview */}
+          {/* Active Rooms Preview - Positioned at top for visibility */}
           <motion.div
-            initial={{ y: 20, opacity: 0 }}
+            initial={{ y: -20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
-            transition={{ delay: 0.3 }}
+            transition={{ delay: 0.1 }}
             className="w-full max-w-4xl mx-auto flex-shrink-0"
           >
             <div className="flex items-center justify-between mb-2">
@@ -197,6 +120,83 @@ const MultiplayerSelector: React.FC<MultiplayerSelectorProps> = ({
               </div>
             )}
           </motion.div>
+
+          {/* Cards Container */}
+          <div className="flex flex-col lg:flex-row gap-4 lg:gap-6 w-full max-w-4xl mx-auto flex-shrink-0">
+            {/* Create Room Card */}
+            <motion.div
+              initial={{ x: -30, opacity: 0 }}
+              animate={{ x: 0, opacity: 1 }}
+              transition={{ delay: 0.2 }}
+              className="flex-1"
+            >
+              <Card
+                className="h-full cursor-pointer group border-3 border-slate-600 shadow-hard hover:shadow-hard-lg hover:translate-x-[-3px] hover:translate-y-[-3px] active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-sm transition-all bg-gradient-to-br from-neo-lime/10 to-neo-lime/5"
+                onClick={onSelectCreate}
+                role="button"
+                tabIndex={0}
+                onKeyDown={(e) => e.key === 'Enter' && onSelectCreate()}
+                aria-label={t('multiplayerFlow.selector.createCard.title') || 'Create Room'}
+              >
+                <CardContent className="flex flex-col items-center justify-center text-center p-6 sm:p-8 h-full min-h-[180px] sm:min-h-[220px]">
+                  <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-neo-lime text-neo-black border-3 border-neo-black flex items-center justify-center mb-4 shadow-hard group-hover:scale-110 transition-transform">
+                    <Crown className="w-8 h-8 sm:w-10 sm:h-10 text-neo-black" />
+                  </div>
+                  <h2 className="text-xl sm:text-2xl font-black uppercase text-neo-white mb-2">
+                    {t('multiplayerFlow.selector.createCard.title') || 'Create Room'}
+                  </h2>
+                  <p className="text-sm sm:text-base text-neo-cream mb-4">
+                    {t('multiplayerFlow.selector.createCard.description') || 'Host a new game and invite friends'}
+                  </p>
+                  <Button
+                    variant="success"
+                    size="lg"
+                    className="w-full max-w-[200px] font-bold uppercase"
+                    tabIndex={-1}
+                  >
+                    {t('multiplayerFlow.selector.createCard.button') || 'Start Setup'}
+                  </Button>
+                </CardContent>
+              </Card>
+            </motion.div>
+
+            {/* Join Room Card */}
+            <motion.div
+              initial={{ x: 30, opacity: 0 }}
+              animate={{ x: 0, opacity: 1 }}
+              transition={{ delay: 0.3 }}
+              className="flex-1"
+            >
+              <Card
+                className="h-full cursor-pointer group border-3 border-slate-600 shadow-hard hover:shadow-hard-lg hover:translate-x-[-3px] hover:translate-y-[-3px] active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-sm transition-all bg-gradient-to-br from-neo-cyan/10 to-neo-cyan/5"
+                onClick={onSelectJoin}
+                role="button"
+                tabIndex={0}
+                onKeyDown={(e) => e.key === 'Enter' && onSelectJoin()}
+                aria-label={t('multiplayerFlow.selector.joinCard.title') || 'Join Room'}
+              >
+                <CardContent className="flex flex-col items-center justify-center text-center p-6 sm:p-8 h-full min-h-[180px] sm:min-h-[220px]">
+                  <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-neo-cyan text-neo-black border-3 border-neo-black flex items-center justify-center mb-4 shadow-hard group-hover:scale-110 transition-transform">
+                    <LogIn className="w-8 h-8 sm:w-10 sm:h-10 text-neo-black" />
+                  </div>
+                  <h2 className="text-xl sm:text-2xl font-black uppercase text-neo-white mb-2">
+                    {t('multiplayerFlow.selector.joinCard.title') || 'Join Room'}
+                  </h2>
+                  <p className="text-sm sm:text-base text-neo-cream mb-4">
+                    {t('multiplayerFlow.selector.joinCard.description') || 'Enter an existing game with a code'}
+                  </p>
+                  <Button
+                    variant="default"
+                    size="lg"
+                    className="w-full max-w-[200px] font-bold uppercase bg-neo-cyan hover:bg-neo-cyan/90 text-neo-black"
+                    tabIndex={-1}
+                  >
+                    {t('multiplayerFlow.selector.joinCard.button') || 'Browse Rooms'}
+                  </Button>
+                </CardContent>
+              </Card>
+            </motion.div>
+          </div>
         </div>
       </div>
     </>

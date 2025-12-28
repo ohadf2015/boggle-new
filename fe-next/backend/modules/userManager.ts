@@ -49,6 +49,7 @@ export interface AddUserOptions {
   playerId?: string | null;
   authUserId?: string | null;
   guestTokenHash?: string | null;
+  guestSessionId?: string | null;
 }
 
 export interface GameUserInfo {
@@ -87,7 +88,7 @@ export function addUserToGame(
 ): boolean {
   if (!game) return false;
 
-  const { avatar = null, isHost = false, playerId = null, authUserId = null, guestTokenHash = null } = options;
+  const { avatar = null, isHost = false, playerId = null, authUserId = null, guestTokenHash = null, guestSessionId = null } = options;
 
   // Store user data with auth context and presence tracking
   game.users[username] = {
@@ -97,6 +98,7 @@ export function addUserToGame(
     playerId,
     authUserId,        // Supabase user ID for authenticated users
     guestTokenHash,    // Hashed guest token for guest users
+    guestSessionId,    // Session ID for guest game logging
     username,
     // Presence tracking
     lastActivity: Date.now(),

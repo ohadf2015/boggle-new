@@ -66,6 +66,7 @@ export interface GameUser {
   isHost: boolean;
   authUserId: string | null;
   guestTokenHash: string | null;
+  guestSessionId?: string | null;
   isBot?: boolean;
   disconnected?: boolean;
   presence?: {
@@ -436,6 +437,7 @@ interface AddUserOptions {
   isHost?: boolean;
   authUserId?: string | null;
   guestTokenHash?: string | null;
+  guestSessionId?: string | null;
   isBot?: boolean;
 }
 

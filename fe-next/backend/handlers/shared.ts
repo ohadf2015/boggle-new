@@ -472,11 +472,12 @@ async function calculateAndBroadcastFinalScores(io: Server, gameCode: string): P
 async function recordGameResultsToSupabase(io: Server, gameCode: string, scoresArray: PlayerResult[], game: Game): Promise<void> {
   try {
     // Build userAuthMap from game.users
-    const userAuthMap: Record<string, { authUserId: string | null; guestTokenHash: string | null; socketId: string | null }> = {};
-    for (const [username, userData] of Object.entries(game.users || {}) as [string, { authUserId?: string; guestTokenHash?: string; socketId?: string }][]) {
+    const userAuthMap: Record<string, { authUserId: string | null; guestTokenHash: string | null; guestSessionId: string | null; socketId: string | null }> = {};
+    for (const [username, userData] of Object.entries(game.users || {}) as [string, { authUserId?: string; guestTokenHash?: string; guestSessionId?: string; socketId?: string }][]) {
       userAuthMap[username] = {
         authUserId: userData.authUserId || null,
         guestTokenHash: userData.guestTokenHash || null,
+        guestSessionId: userData.guestSessionId || null,
         socketId: userData.socketId || null
       };
     }

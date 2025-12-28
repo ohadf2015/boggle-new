@@ -20,6 +20,7 @@ import {
   getStreakMilestone,
   getStreakMilestoneMessage,
   findRarestWord,
+  hasPlayedWordHuntToday,
   type WordHuntResult,
   type GuestDailyPlayer,
 } from '@/utils/dailyChallenge';
@@ -59,6 +60,66 @@ interface DailyWordHuntResultsProps {
   isNewCompletion: boolean;
   onBack: () => void;
 }
+
+// Language options for the "Try Another Language" section
+const LANGUAGE_OPTIONS: { code: Language; flag: string; name: string }[] = [
+  { code: 'en', flag: '🇺🇸', name: 'English' },
+  { code: 'he', flag: '🇮🇱', name: 'עברית' },
+  { code: 'sv', flag: '🇸🇪', name: 'Svenska' },
+  { code: 'ja', flag: '🇯🇵', name: '日本語' },
+  { code: 'es', flag: '🇪🇸', name: 'Español' },
+];
+
+/**
+ * TryAnotherLanguage - Shows available languages the player can still try today
+ */
+const TryAnotherLanguage: React.FC<{ currentLanguage: Language }> = ({ currentLanguage }) => {
+  const { t, setLanguage } = useLanguage();
+
+  // Get languages that haven't been played today
+  const availableLanguages = LANGUAGE_OPTIONS.filter(
+    (option) => option.code !== currentLanguage && !hasPlayedWordHuntToday(option.code)
+  );
+
+  // If no other languages available, don't show this section
+  if (availableLanguages.length === 0) {
+    return null;
+  }
+
+  const handleLanguageClick = (langCode: Language) => {
+    setLanguage(langCode);
+    // Force reload to start fresh with new language
+    window.location.href = `/${langCode}/daily`;
+  };
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: 0.9 }}
+      className="mt-6 pt-4 border-t border-gray-200 dark:border-gray-700"
+    >
+      <h3 className="text-sm font-bold text-gray-600 dark:text-gray-300 uppercase mb-3 flex items-center gap-2">
+        🌍 {t('wordHunt.results.tryAnotherLanguage')}
+      </h3>
+      <div className="flex flex-wrap justify-center gap-2">
+        {availableLanguages.map((option) => (
+          <Button
+            key={option.code}
+            onClick={() => handleLanguageClick(option.code)}
+            className="px-4 py-2 bg-gradient-to-r from-neo-cyan to-neo-blue text-white border-3 border-neo-black rounded-neo shadow-hard-sm hover:-translate-y-0.5 hover:shadow-hard transition-all flex items-center gap-2"
+          >
+            <span className="text-lg">{option.flag}</span>
+            <span className="font-bold text-sm">{option.name}</span>
+          </Button>
+        ))}
+      </div>
+      <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
+        {t('wordHunt.results.playDifferentLanguage')}
+      </p>
+    </motion.div>
+  );
+};
 
 /**
  * DailyWordHuntResults - Results screen for Word Hunt with Wordle-style sharing
@@ -136,6 +197,18 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
             })),
           };
 
+          // Debug logging for submission
+          console.log('[WordHunt Submit] Preparing submission:', {
+            isAuthenticated,
+            hasProfile: !!profile,
+            playerId: bodyData.playerId,
+            guestFingerprint: bodyData.guestFingerprint,
+            displayName: bodyData.displayName,
+            avatarEmoji: bodyData.avatarEmoji,
+            solved: bodyData.solved,
+            attemptsUsed: bodyData.attemptsUsed,
+          });
+
           // Add survival mode fields if present
           if (result.wordsDiscovered) bodyData.wordsDiscovered = result.wordsDiscovered;
           if (result.lifeRemaining !== undefined) bodyData.lifeRemaining = result.lifeRemaining;
@@ -157,7 +230,12 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
           }
 
           const responseData = await response.json();
-          console.log('Word Hunt submitted successfully:', responseData);
+          console.log('[WordHunt Submit] Response:', {
+            success: responseData.success,
+            alreadySubmitted: responseData.alreadySubmitted,
+            dataId: responseData.data?.id,
+            playerType: bodyData.playerId ? 'authenticated' : 'guest',
+          });
 
           // Fetch stats
           fetchStats();
@@ -494,11 +572,138 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
           </div>
         )}
 
-        {/* Attempt history with feedback */}
+        {/* Share Section - Moved above statistics */}
         <motion.div
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.4 }}
+          className="space-y-4"
+        >
+          {/* Shareable result preview - Enhanced UI */}
+          <div className={cn(
+            "relative rounded-neo border-3 overflow-hidden",
+            result.solved
+              ? "bg-gradient-to-br from-gray-900 via-emerald-950 to-gray-900 border-emerald-600"
+              : "bg-gradient-to-br from-gray-900 via-slate-800 to-gray-900 border-gray-600"
+          )}>
+            {/* Decorative corner accents */}
+            <div className={cn(
+              "absolute top-0 left-0 w-8 h-8 border-l-2 border-t-2 rounded-tl",
+              result.solved ? "border-emerald-400/50" : "border-gray-500/50"
+            )} />
+            <div className={cn(
+              "absolute top-0 right-0 w-8 h-8 border-r-2 border-t-2 rounded-tr",
+              result.solved ? "border-emerald-400/50" : "border-gray-500/50"
+            )} />
+            <div className={cn(
+              "absolute bottom-0 left-0 w-8 h-8 border-l-2 border-b-2 rounded-bl",
+              result.solved ? "border-emerald-400/50" : "border-gray-500/50"
+            )} />
+            <div className={cn(
+              "absolute bottom-0 right-0 w-8 h-8 border-r-2 border-b-2 rounded-br",
+              result.solved ? "border-emerald-400/50" : "border-gray-500/50"
+            )} />
+
+            {/* Header bar */}
+            <div className={cn(
+              "px-4 py-2 flex items-center justify-between border-b",
+              result.solved
+                ? "bg-emerald-900/50 border-emerald-700/50"
+                : "bg-gray-800/50 border-gray-700/50"
+            )}>
+              <div className="flex items-center gap-2">
+                <Share2 className={cn(
+                  "w-4 h-4",
+                  result.solved ? "text-emerald-400" : "text-gray-400"
+                )} />
+                <span className={cn(
+                  "text-xs font-bold uppercase tracking-wider",
+                  result.solved ? "text-emerald-400" : "text-gray-400"
+                )}>
+                  {t('wordHunt.shareResult')}
+                </span>
+              </div>
+              <span className="text-lg">{result.solved ? '✨' : '💪'}</span>
+            </div>
+
+            {/* Share text content */}
+            <div className="p-4">
+              <pre className="text-white text-sm font-mono whitespace-pre-wrap leading-relaxed break-words overflow-hidden max-w-full">
+                {shareText}
+              </pre>
+            </div>
+          </div>
+
+          {/* Share buttons */}
+          <div className="space-y-3">
+            <Button
+              onClick={handleNativeShare}
+              className={cn(
+                "w-full py-4 text-lg font-black uppercase border-4 border-neo-black rounded-neo shadow-hard hover:shadow-hard-lg hover:-translate-y-1 transition-all",
+                result.solved
+                  ? "bg-gradient-to-r from-green-400 to-emerald-500 text-white"
+                  : "bg-gradient-to-r from-neo-cyan to-neo-blue text-white"
+              )}
+            >
+              <Share2 className="mr-2 w-5 h-5" />
+              {result.solved ? t('wordHunt.shareResult') : t('wordHunt.shareAttempt')}
+            </Button>
+
+            <div className="grid grid-cols-4 gap-2">
+              <Button
+                onClick={handleWhatsApp}
+                aria-label="Share on WhatsApp"
+                className="py-3 min-h-[44px] bg-[#25D366] text-black border-3 border-neo-black rounded-neo shadow-hard-sm hover:-translate-y-0.5 transition-all"
+              >
+                <MessageCircle className="w-5 h-5" />
+              </Button>
+
+              <Button
+                onClick={handleTwitter}
+                aria-label="Share on X (Twitter)"
+                className="py-3 min-h-[44px] bg-black text-white border-3 border-gray-700 rounded-neo shadow-hard-sm hover:-translate-y-0.5 transition-all"
+              >
+                <XTwitterIcon className="w-5 h-5" />
+              </Button>
+
+              <Button
+                onClick={handleTelegram}
+                aria-label="Share on Telegram"
+                className="py-3 min-h-[44px] bg-[#0088cc] text-white border-3 border-neo-black rounded-neo shadow-hard-sm hover:-translate-y-0.5 transition-all"
+              >
+                <Send className="w-5 h-5" />
+              </Button>
+
+              <Button
+                onClick={handleCopy}
+                aria-label={copied ? t('common.copied') : t('daily.copyToClipboard')}
+                className="py-3 min-h-[44px] bg-gray-600 text-white border-3 border-neo-black rounded-neo shadow-hard-sm hover:-translate-y-0.5 transition-all"
+              >
+                {copied ? (
+                  <Check className="w-5 h-5 text-neo-lime" />
+                ) : (
+                  <Copy className="w-5 h-5" />
+                )}
+              </Button>
+            </div>
+
+            {copied && (
+              <motion.p
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="text-sm text-neo-lime font-bold"
+              >
+                {t('daily.copiedToClipboard')}
+              </motion.p>
+            )}
+          </div>
+        </motion.div>
+
+        {/* Attempt history with feedback */}
+        <motion.div
+          initial={{ y: 20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 0.5 }}
           className="space-y-2"
         >
           <h3 className="text-sm font-bold text-gray-600 dark:text-gray-300 uppercase">
@@ -701,82 +906,6 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
           </motion.div>
         )}
 
-        {/* Shareable result preview */}
-        <motion.div
-          initial={{ y: 20, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.6 }}
-          className="bg-gray-900 dark:bg-black rounded-neo border-3 border-gray-700 p-4 text-left"
-        >
-          <pre className="text-white text-sm font-mono whitespace-pre-wrap leading-relaxed">
-            {shareText}
-          </pre>
-        </motion.div>
-
-        {/* Share buttons */}
-        <motion.div
-          initial={{ y: 20, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.7 }}
-          className="space-y-3"
-        >
-          <Button
-            onClick={handleNativeShare}
-            className="w-full py-4 text-lg font-black uppercase bg-gradient-to-r from-green-400 to-emerald-500 text-white border-4 border-neo-black rounded-neo shadow-hard hover:shadow-hard-lg hover:-translate-y-1 transition-all"
-          >
-            <Share2 className="mr-2 w-5 h-5" />
-            {t('wordHunt.shareResult')}
-          </Button>
-
-          <div className="grid grid-cols-4 gap-2">
-            <Button
-              onClick={handleWhatsApp}
-              aria-label="Share on WhatsApp"
-              className="py-3 min-h-[44px] bg-[#25D366] text-black border-3 border-neo-black rounded-neo shadow-hard-sm hover:-translate-y-0.5 transition-all"
-            >
-              <MessageCircle className="w-5 h-5" />
-            </Button>
-
-            <Button
-              onClick={handleTwitter}
-              aria-label="Share on X (Twitter)"
-              className="py-3 min-h-[44px] bg-black text-white border-3 border-gray-700 rounded-neo shadow-hard-sm hover:-translate-y-0.5 transition-all"
-            >
-              <XTwitterIcon className="w-5 h-5" />
-            </Button>
-
-            <Button
-              onClick={handleTelegram}
-              aria-label="Share on Telegram"
-              className="py-3 min-h-[44px] bg-[#0088cc] text-white border-3 border-neo-black rounded-neo shadow-hard-sm hover:-translate-y-0.5 transition-all"
-            >
-              <Send className="w-5 h-5" />
-            </Button>
-
-            <Button
-              onClick={handleCopy}
-              aria-label={copied ? t('common.copied') : t('daily.copyToClipboard')}
-              className="py-3 min-h-[44px] bg-gray-600 text-white border-3 border-neo-black rounded-neo shadow-hard-sm hover:-translate-y-0.5 transition-all"
-            >
-              {copied ? (
-                <Check className="w-5 h-5 text-neo-lime" />
-              ) : (
-                <Copy className="w-5 h-5" />
-              )}
-            </Button>
-          </div>
-
-          {copied && (
-            <motion.p
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="text-sm text-neo-lime font-bold"
-            >
-              {t('daily.copiedToClipboard')}
-            </motion.p>
-          )}
-        </motion.div>
-
         {/* Next puzzle countdown */}
         <motion.div
           initial={{ opacity: 0 }}
@@ -791,6 +920,9 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
             {t('wordHunt.playAgainTomorrow')}
           </p>
         </motion.div>
+
+        {/* Try Another Language Section */}
+        <TryAnotherLanguage currentLanguage={language} />
       </div>
 
       {/* Share panel for browsers without native share */}

@@ -2101,9 +2101,12 @@ const es = {
     "grayMeaning": "⬜ = La letra no está en la palabra",
     "howToPlay": "¡Caza la palabra oculta de {length} letras usando pistas de retroalimentación! Tienes {max} intentos para encontrarla.",
     "shareResult": "Compartir Resultado",
+    "shareAttempt": "Compartir Intento",
     "playAgainTomorrow": "¡Vuelve mañana para un nuevo puzzle!",
+    "tryAnotherLanguage": "Prueba Otro Idioma",
+    "playDifferentLanguage": "¡Desafíate en un idioma diferente!",
     "feedback": {
-      "tooShort": "📏 Mínimo 3 letras",
+      "tooShort": "📏 Mínimo 4 letras",
       "duplicate": "🔁 ¡Ya encontrada!",
       "notOnBoard": "⚠️ No se puede formar en el tablero",
       "invalidWord": "❌ No es una palabra válida",
@@ -2162,7 +2165,10 @@ const es = {
       "gridWordDiscovery": "Descubrimiento de palabra del tablero",
       "cannotRevealMore": "No se pueden revelar más letras",
       "wordsLabel": "Palabras",
-      "attemptsLabel": "Intentos"
+      "attemptsLabel": "Intentos",
+      "triesLeft": "intentos restantes",
+      "findOnBoard": "¡Encuentra esta palabra en el tablero!",
+      "traceLetters": "Traza las letras en la cuadrícula para deletrearla"
     },
     "results": {
       "targetWord": "Palabra Objetivo",
@@ -2233,9 +2239,9 @@ const es = {
       },
       "minLength": {
         "title": "⚠️ REGLA IMPORTANTE",
-        "description": "Las palabras deben tener al menos 3 LETRAS",
-        "example1": "3 letras ✓",
-        "example2": "2 letras - ¡muy corto!",
+        "description": "Las palabras deben tener al menos 4 LETRAS",
+        "example1": "4 letras ✓",
+        "example2": "3 letras - ¡muy corto!",
         "gotIt": "¡Entendido!"
       },
       "complete": {
@@ -2243,7 +2249,7 @@ const es = {
         "remember": "Recuerda:",
         "rule1": "10 intentos para encontrar el objetivo",
         "rule2": "Encuentra otras palabras para vida",
-        "rule3": "Mínimo 3 letras",
+        "rule3": "Mínimo 4 letras",
         "rule4": "Mismo puzzle en todo el mundo",
         "start": "Comenzar Desafío Diario"
       }

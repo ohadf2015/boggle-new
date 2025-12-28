@@ -1,18 +1,15 @@
 import React, { useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Clock, Users, Share2, Settings, Plus, Minus, Crown, ChevronDown, ChevronUp, Trophy, Bot, LogOut } from 'lucide-react';
+import { Clock, Users, Settings, Plus, Minus, Crown, ChevronDown, ChevronUp, Bot } from 'lucide-react';
 import { Button } from '../../components/ui/button';
 import { Card } from '../../components/ui/card';
-import { Badge } from '../../components/ui/badge';
 import { Checkbox } from '../../components/ui/checkbox';
 import SlotMachineText from '../../components/SlotMachineText';
 import Avatar from '../../components/Avatar';
 import RoomChat from '../../components/RoomChat';
 import PresenceIndicator from '../../components/PresenceIndicator';
 import BotControls from '../../components/BotControls';
-import UnifiedShareModal from '../../components/modals/UnifiedShareModal';
-import { useNativeShare } from '../../hooks/useNativeShare';
-import { getJoinUrl } from '../../utils/share';
+import GameRoomHeader from '../../components/game/GameRoomHeader';
 import { DIFFICULTIES, MIN_WORD_LENGTH_OPTIONS, getRecommendedTimer } from '../../utils/consts';
 import { cn } from '../../lib/utils';
 import { useSocket } from '../../utils/SocketContext';
@@ -171,27 +168,6 @@ const HostPreGameView: React.FC<HostPreGameViewProps> = ({
   const { socket } = useSocket();
   const [showAdvancedSettings, setShowAdvancedSettings] = useState<boolean>(false);
   const [selectedPreset, setSelectedPreset] = useState<PresetKey | null>(null);
-  const [isShareModalOpen, setIsShareModalOpen] = useState<boolean>(false);
-  const { canNativeShare, nativeShare } = useNativeShare();
-
-  // Share handler - uses native share on mobile, modal on desktop
-  const handleShare = useCallback(async () => {
-    if (canNativeShare) {
-      const joinUrl = getJoinUrl(gameCode, 'native-share');
-      const shared = await nativeShare({
-        title: t('share.inviteTitle'),
-        text: t('share.inviteMessage'),
-        url: joinUrl,
-      });
-      // If native share was cancelled, show modal as fallback
-      if (!shared) {
-        setIsShareModalOpen(true);
-      }
-    } else {
-      // Desktop: show unified modal
-      setIsShareModalOpen(true);
-    }
-  }, [canNativeShare, nativeShare, gameCode, t]);
 
   const handleDecreaseTimer = useCallback(() => {
     setTimerDirection(-1);
@@ -252,50 +228,16 @@ const HostPreGameView: React.FC<HostPreGameViewProps> = ({
   return (
     <div className="flex flex-col gap-2 sm:gap-3 md:gap-4 w-full max-w-6xl pb-16 lg:pb-0">
       {/* Row 1: Room Code + Language + Share + Exit */}
-      <Card className="bg-slate-800/95 text-neo-white px-2 py-1.5 sm:px-3 sm:py-2 border-2 border-neo-black shadow-hard">
-        <div className="flex items-center justify-between gap-2">
-          {/* Exit Button + Room Code and Language */}
-          <div className="flex items-center gap-2">
-            {/* Exit Button */}
-            <button
-              onClick={onExitRoom}
-              className="flex items-center gap-1 px-2 py-1 bg-neo-red/90 text-white font-bold text-xs rounded-neo border-2 border-neo-black shadow-hard-sm hover:shadow-hard hover:bg-neo-red active:shadow-none transition-all"
-              title={t('hostView.exitRoom')}
-            >
-              <LogOut className="text-xs" />
-              <span className="hidden sm:inline">{t('hostView.exitRoom')}</span>
-            </button>
-
-            <div className="flex items-center gap-1.5">
-              <span className="text-lg sm:text-xl font-black tracking-wide text-neo-yellow">
-                {gameCode}
-              </span>
-            </div>
-            <Badge className="text-xs px-1.5 py-0 bg-neo-cream text-neo-black border border-neo-black font-semibold">
-              {roomLanguage === 'he' ? '🇮🇱 עברית' : roomLanguage === 'sv' ? '🇸🇪 Svenska' : roomLanguage === 'ja' ? '🇯🇵 日本語' : '🇺🇸 English'}
-            </Badge>
-            {/* Room Name */}
-            <span className="text-xs text-neo-cream/70 font-medium hidden md:inline truncate max-w-[150px]">
-              {username}&apos;s Room
-            </span>
-            {tournamentData && (
-              <Badge className="text-xs px-2 py-0 bg-gradient-to-r from-amber-500 to-yellow-600 text-white border-0">
-                <Trophy className="mr-1 text-[10px]" />
-                R{tournamentData.currentRound}/{tournamentData.totalRounds}
-              </Badge>
-            )}
-          </div>
-
-          {/* Single Share Button */}
-          <button
-            onClick={handleShare}
-            className="flex items-center gap-1.5 px-3 py-1.5 bg-neo-cyan text-neo-black font-bold text-sm rounded-neo border-2 border-neo-black shadow-hard-sm hover:shadow-hard hover:-translate-y-0.5 active:shadow-none active:translate-y-0 transition-all"
-          >
-            <Share2 className="text-xs" />
-            <span>{t('share.buttonLabel')}</span>
-          </button>
-        </div>
-      </Card>
+      <GameRoomHeader
+        gameCode={gameCode}
+        roomLanguage={roomLanguage}
+        username={username}
+        t={t}
+        onExitRoom={onExitRoom}
+        isHost={true}
+        tournamentData={tournamentData}
+        showRoomName={true}
+      />
 
       {/* Row 2: Game Settings + Players List (side by side on desktop) */}
       <div className="flex flex-col lg:flex-row lg:items-stretch gap-2 sm:gap-3 md:gap-4">
@@ -634,14 +576,6 @@ const HostPreGameView: React.FC<HostPreGameViewProps> = ({
           className="h-full min-h-[240px] max-h-[280px]"
         />
       </div>
-
-      {/* Unified Share Modal */}
-      <UnifiedShareModal
-        isOpen={isShareModalOpen}
-        onClose={() => setIsShareModalOpen(false)}
-        gameCode={gameCode}
-        t={t}
-      />
 
       {/* Sticky Start Button - Mobile only, appears when original button is out of view */}
       <AnimatePresence>

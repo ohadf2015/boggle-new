@@ -61,6 +61,7 @@ interface JoinGamePayload {
   avatar?: Avatar;
   authUserId?: string;
   guestTokenHash?: string;
+  guestSessionId?: string;
   profilePictureUrl?: string;
 }
 
@@ -113,7 +114,7 @@ function registerPlayerJoinHandlers(io: Server, socket: Socket): void {
       return;
     }
 
-    let { gameCode, username, playerId, avatar, authUserId, guestTokenHash, profilePictureUrl } = validation.data as JoinGamePayload;
+    let { gameCode, username, playerId, avatar, authUserId, guestTokenHash, guestSessionId, profilePictureUrl } = validation.data as JoinGamePayload;
 
     logger.info('SOCKET', `Join request: ${username} to game ${gameCode}`);
 
@@ -158,7 +159,8 @@ function registerPlayerJoinHandlers(io: Server, socket: Socket): void {
       addSpectatorToGame(gameCode, username, socket.id, {
         avatar: { ...userAvatar, profilePictureUrl: profilePictureUrl || null },
         authUserId: authUserId || null,
-        guestTokenHash: guestTokenHash || null
+        guestTokenHash: guestTokenHash || null,
+        guestSessionId: guestSessionId || null
       });
 
       joinRoom(socket, getGameRoom(gameCode));
@@ -193,7 +195,8 @@ function registerPlayerJoinHandlers(io: Server, socket: Socket): void {
       isHost: false,
       playerId,
       authUserId: authUserId || null,
-      guestTokenHash: guestTokenHash || null
+      guestTokenHash: guestTokenHash || null,
+      guestSessionId: guestSessionId || null
     });
 
     joinRoom(socket, getGameRoom(gameCode));

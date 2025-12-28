@@ -203,55 +203,6 @@ const ProfileSetup: React.FC<ProfileSetupProps> = ({
                   }
                 </p>
 
-                {/* Name Input */}
-                <div className="space-y-2">
-                  <Label htmlFor="profile-username" className="text-sm font-bold uppercase text-slate-600 dark:text-slate-400">
-                    {t('multiplayerFlow.profileSetup.usernameLabel') || 'What should we call you?'}
-                  </Label>
-
-                  {isAuthenticated && displayName ? (
-                    // Authenticated user - show display name as badge
-                    <div className="p-3 rounded-neo bg-purple-50 dark:bg-purple-900/30 border-2 border-purple-200 dark:border-purple-700">
-                      <p className="text-sm text-slate-700 dark:text-slate-200">
-                        {t('joinView.playingAs') || 'Playing as'}{' '}
-                        <span className="font-bold text-purple-600 dark:text-purple-400">{displayName}</span>
-                      </p>
-                    </div>
-                  ) : (
-                    // Guest user - editable input
-                    <>
-                      <Input
-                        id="profile-username"
-                        value={username}
-                        onChange={(e) => {
-                          setUsername(sanitizeInput(e.target.value, 20));
-                          if (usernameError) setUsernameError(false);
-                        }}
-                        required
-                        aria-invalid={showUsernameError ? 'true' : undefined}
-                        aria-describedby={showUsernameError ? 'username-error' : 'username-hint'}
-                        className={cn(
-                          "h-14 text-lg bg-slate-100 dark:bg-slate-700/50 border-slate-200 dark:border-slate-600 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-gray-500",
-                          getValidationClasses(
-                            usernameError ? 'invalid' : usernameValidation.state,
-                            showUsernameError ? "border-red-500 bg-red-900/30 focus-visible:ring-red-500" : ""
-                          )
-                        )}
-                        placeholder={t('multiplayerFlow.profileSetup.usernamePlaceholder') || 'Enter your name'}
-                        maxLength={20}
-                      />
-                      <p id="username-hint" className="text-xs text-slate-500 dark:text-slate-400">
-                        {t('multiplayerFlow.profileSetup.usernameHint') || '2-20 characters, letters and numbers'}
-                      </p>
-                      {showUsernameError && (
-                        <p id="username-error" className="text-xs text-red-400" role="alert">
-                          {t(usernameErrorMessage || 'validation.usernameRequired')}
-                        </p>
-                      )}
-                    </>
-                  )}
-                </div>
-
                 {/* Avatar Selection - Authenticated users can change their avatar too */}
                 {hasAuthenticatedAvatar ? (
                   <div className="space-y-3">
@@ -368,6 +319,55 @@ const ProfileSetup: React.FC<ProfileSetupProps> = ({
                     </div>
                   </div>
                 )}
+
+                {/* Name Input */}
+                <div className="space-y-2">
+                  <Label htmlFor="profile-username" className="text-sm font-bold uppercase text-slate-600 dark:text-slate-400">
+                    {t('multiplayerFlow.profileSetup.usernameLabel') || 'What should we call you?'}
+                  </Label>
+
+                  {isAuthenticated && displayName ? (
+                    // Authenticated user - show display name as badge
+                    <div className="p-3 rounded-neo bg-purple-50 dark:bg-purple-900/30 border-2 border-purple-200 dark:border-purple-700">
+                      <p className="text-sm text-slate-700 dark:text-slate-200">
+                        {t('joinView.playingAs') || 'Playing as'}{' '}
+                        <span className="font-bold text-purple-600 dark:text-purple-400">{displayName}</span>
+                      </p>
+                    </div>
+                  ) : (
+                    // Guest user - editable input
+                    <>
+                      <Input
+                        id="profile-username"
+                        value={username}
+                        onChange={(e) => {
+                          setUsername(sanitizeInput(e.target.value, 20));
+                          if (usernameError) setUsernameError(false);
+                        }}
+                        required
+                        aria-invalid={showUsernameError ? 'true' : undefined}
+                        aria-describedby={showUsernameError ? 'username-error' : 'username-hint'}
+                        className={cn(
+                          "h-14 text-lg bg-slate-100 dark:bg-slate-700/50 border-slate-200 dark:border-slate-600 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-gray-500",
+                          getValidationClasses(
+                            usernameError ? 'invalid' : usernameValidation.state,
+                            showUsernameError ? "border-red-500 bg-red-900/30 focus-visible:ring-red-500" : ""
+                          )
+                        )}
+                        placeholder={t('multiplayerFlow.profileSetup.usernamePlaceholder') || 'Enter your name'}
+                        maxLength={20}
+                      />
+                      <p id="username-hint" className="text-xs text-slate-500 dark:text-slate-400">
+                        {t('multiplayerFlow.profileSetup.usernameHint') || '2-20 characters, letters and numbers'}
+                      </p>
+                      {showUsernameError && (
+                        <p id="username-error" className="text-xs text-red-400" role="alert">
+                          {t(usernameErrorMessage || 'validation.usernameRequired')}
+                        </p>
+                      )}
+                    </>
+                  )}
+                </div>
 
                 {/* Continue Button */}
                 <Button

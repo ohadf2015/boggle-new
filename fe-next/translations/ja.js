@@ -2103,9 +2103,12 @@ const ja = {
     "grayMeaning": "⬜ = 単語に含まれていない文字",
     "howToPlay": "フィードバックのヒントを使って隠された{length}文字の単語を探そう！{max}回の試行があります。",
     "shareResult": "結果をシェア",
+    "shareAttempt": "挑戦をシェア",
     "playAgainTomorrow": "明日また新しいパズルに挑戦してください！",
+    "tryAnotherLanguage": "別の言語に挑戦",
+    "playDifferentLanguage": "違う言語でチャレンジしよう！",
     "feedback": {
-      "tooShort": "📏 最低3文字必要",
+      "tooShort": "📏 最低4文字必要",
       "duplicate": "🔁 既に見つかりました！",
       "notOnBoard": "⚠️ ボード上でこれを作成できません",
       "invalidWord": "❌ 有効な単語ではありません",
@@ -2164,7 +2167,10 @@ const ja = {
       "gridWordDiscovery": "グリッド単語の発見",
       "cannotRevealMore": "これ以上文字を表示できません",
       "wordsLabel": "単語",
-      "attemptsLabel": "試行"
+      "attemptsLabel": "試行",
+      "triesLeft": "回残り",
+      "findOnBoard": "この単語をボード上で見つけてください！",
+      "traceLetters": "グリッド上の文字をなぞってスペルを作ろう"
     },
     "results": {
       "targetWord": "目標単語",
@@ -2235,9 +2241,9 @@ const ja = {
       },
       "minLength": {
         "title": "⚠️ 重要なルール",
-        "description": "単語は最低3文字必要です",
-        "example1": "3文字 ✓",
-        "example2": "2文字 - 短すぎます！",
+        "description": "単語は最低4文字必要です",
+        "example1": "4文字 ✓",
+        "example2": "3文字 - 短すぎます！",
         "gotIt": "わかりました！"
       },
       "complete": {
@@ -2245,7 +2251,7 @@ const ja = {
         "remember": "覚えておいて：",
         "rule1": "目標を見つけるための10回の試行",
         "rule2": "ライフのために他の単語を見つける",
-        "rule3": "最低3文字",
+        "rule3": "最低4文字",
         "rule4": "世界中で同じパズル",
         "start": "デイリーチャレンジを開始"
       }

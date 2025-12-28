@@ -13,7 +13,6 @@ import OnboardingProgress from './onboarding/OnboardingProgress';
 import {
   markOnboardingComplete,
   markOnboardingSkipped,
-  type OnboardingData,
 } from '../utils/onboardingStorage';
 import { AVATARS } from '../utils/avatarConfig';
 
@@ -21,13 +20,6 @@ import { AVATARS } from '../utils/avatarConfig';
 import WelcomeDemoStep from './onboarding/WelcomeDemoStep';
 import ProfileSetupStep from './onboarding/ProfileSetupStep';
 import QuickTipsStep from './onboarding/QuickTipsStep';
-
-// Legacy components (kept for reference, no longer used in main flow)
-// import ComboStep from './onboarding/ComboStep';
-// import SpecialRoundsStep from './onboarding/SpecialRoundsStep';
-// import AvatarStep from './onboarding/AvatarStep';
-// import NameStep from './onboarding/NameStep';
-// import ModeSelectionStep from './onboarding/ModeSelectionStep';
 
 interface OnboardingModalProps {
   isOpen: boolean;

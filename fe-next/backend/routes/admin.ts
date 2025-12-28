@@ -76,6 +76,11 @@ interface StatsResponse {
     signupsWeek: number;
   };
   languages: Record<string, number>;
+  guests?: {
+    totalGuestGames: number;
+    guestGamesToday: number;
+    uniqueGuestSessions: number;
+  };
 }
 
 interface CountryData {
@@ -127,7 +132,7 @@ interface CommunityWordEntry {
   is_potentially_valid: boolean;
   first_submitter: string | null;
   last_voted_at: string | null;
-  created_at: string;
+  first_voted_at: string | null;
   status: 'validated' | 'pending_review' | 'rejected' | 'pending';
 }
 
@@ -375,6 +380,44 @@ router.get('/stats', async (_req: AdminRequest, res: Response): Promise<void> =>
       languageCounts[lang] = (languageCounts[lang] || 0) + 1;
     });
 
+    // Get guest game stats from game_sessions table
+    let guestStats: StatsResponse['guests'] = undefined;
+    try {
+      // Total guest games (sessions with guest_session_id but no user_id)
+      const { count: totalGuestGames } = await supabase
+        .from('game_sessions')
+        .select('*', { count: 'exact', head: true })
+        .is('user_id', null)
+        .not('guest_session_id', 'is', null);
+
+      // Guest games today
+      const { count: guestGamesToday } = await supabase
+        .from('game_sessions')
+        .select('*', { count: 'exact', head: true })
+        .is('user_id', null)
+        .not('guest_session_id', 'is', null)
+        .gte('started_at', todayStart);
+
+      // Unique guest sessions
+      const { data: guestSessionsData } = await supabase
+        .from('game_sessions')
+        .select('guest_session_id')
+        .is('user_id', null)
+        .not('guest_session_id', 'is', null);
+      const uniqueGuestSessions = new Set(
+        guestSessionsData?.map((s: { guest_session_id: string }) => s.guest_session_id)
+      ).size;
+
+      guestStats = {
+        totalGuestGames: totalGuestGames || 0,
+        guestGamesToday: guestGamesToday || 0,
+        uniqueGuestSessions,
+      };
+    } catch (guestError) {
+      // game_sessions table might not exist yet, just skip guest stats
+      logger.debug('ADMIN_API', 'Guest stats unavailable: game_sessions table may not exist');
+    }
+
     const response: StatsResponse = {
       overview: {
         totalPlayers: totalPlayers || 0,
@@ -391,6 +434,7 @@ router.get('/stats', async (_req: AdminRequest, res: Response): Promise<void> =>
         signupsWeek: signupsWeek || 0,
       },
       languages: languageCounts,
+      guests: guestStats,
     };
 
     res.json(response);
@@ -1030,8 +1074,7 @@ router.post('/bot-words/disapprove', async (req: AdminRequest, res: Response): P
         word: normalizedWord,
         language,
         reason: reason || 'Admin disapproval',
-        blacklisted_by: req.adminUser!.id,
-        auto_blacklisted: false
+        blacklisted_by: req.adminUser!.id
       }, { onConflict: 'word,language' });
 
     // 2. Add 5 negative votes to mark as invalid
@@ -1128,6 +1171,116 @@ router.get('/analytics/guest-players', async (req: AdminRequest, res: Response):
   }
 });
 
+/**
+ * GET /api/admin/analytics/guest-games
+ * Get guest game sessions from the game_sessions table
+ * This shows actual games played by guests (logged via gameSessionLogger)
+ */
+router.get('/analytics/guest-games', async (req: AdminRequest, res: Response): Promise<void> => {
+  try {
+    const supabase = getSupabase();
+    const limit = Math.min(parseInt(req.query.limit as string) || 100, 500);
+    const days = Math.min(parseInt(req.query.days as string) || 30, 90);
+
+    const startDate = new Date();
+    startDate.setDate(startDate.getDate() - days);
+
+    // Get guest game sessions (sessions with guest_session_id but no user_id)
+    const { data: guestSessions, error: sessionsError } = await supabase
+      .from('game_sessions')
+      .select(`
+        id,
+        guest_session_id,
+        mode,
+        language,
+        score,
+        words_found,
+        duration_seconds,
+        completed,
+        room_code,
+        player_count,
+        final_rank,
+        started_at,
+        completed_at
+      `)
+      .is('user_id', null)
+      .not('guest_session_id', 'is', null)
+      .gte('started_at', startDate.toISOString())
+      .order('started_at', { ascending: false })
+      .limit(limit);
+
+    if (sessionsError) {
+      // Handle case where table doesn't exist yet
+      if (sessionsError.message?.includes('does not exist') || sessionsError.code === '42P01') {
+        res.json({
+          sessions: [],
+          stats: { totalGames: 0, totalScore: 0, avgScore: 0, byMode: {}, byLanguage: {} },
+          message: 'Game sessions table not yet created.'
+        });
+        return;
+      }
+      throw sessionsError;
+    }
+
+    interface GuestSession {
+      id: string;
+      guest_session_id: string;
+      mode: string;
+      language: string;
+      score: number;
+      words_found: unknown[] | null;
+      duration_seconds: number;
+      completed: boolean;
+      room_code: string | null;
+      player_count: number | null;
+      final_rank: number | null;
+      started_at: string;
+      completed_at: string | null;
+    }
+
+    // Calculate stats
+    const sessions = (guestSessions || []) as GuestSession[];
+    const totalGames = sessions.length;
+    const totalScore = sessions.reduce((sum, s) => sum + (s.score || 0), 0);
+    const avgScore = totalGames > 0 ? Math.round(totalScore / totalGames) : 0;
+
+    const byMode: Record<string, number> = {};
+    const byLanguage: Record<string, number> = {};
+    const uniqueGuests = new Set<string>();
+
+    sessions.forEach((s) => {
+      byMode[s.mode] = (byMode[s.mode] || 0) + 1;
+      byLanguage[s.language] = (byLanguage[s.language] || 0) + 1;
+      if (s.guest_session_id) {
+        uniqueGuests.add(s.guest_session_id);
+      }
+    });
+
+    res.json({
+      sessions: sessions.map(s => ({
+        ...s,
+        wordsCount: Array.isArray(s.words_found) ? s.words_found.length : 0,
+      })),
+      stats: {
+        totalGames,
+        totalScore,
+        avgScore,
+        uniqueGuests: uniqueGuests.size,
+        byMode: Object.entries(byMode)
+          .sort((a, b) => b[1] - a[1])
+          .map(([mode, count]) => ({ mode, count })),
+        byLanguage: Object.entries(byLanguage)
+          .sort((a, b) => b[1] - a[1])
+          .map(([language, count]) => ({ language, count })),
+      },
+    });
+  } catch (error) {
+    const err = error as Error;
+    logger.error('ADMIN_API', `Guest games error: ${err.message}`);
+    res.status(500).json({ error: 'Failed to fetch guest game data' });
+  }
+});
+
 // ==================== Community Words Moderation ====================
 
 /**
@@ -1157,7 +1310,7 @@ router.get('/community-words', async (req: AdminRequest, res: Response): Promise
     // Build query
     let query = supabase
       .from('word_scores')
-      .select('word, language, likes_count, dislikes_count, net_score, is_potentially_valid, first_submitter, last_voted_at, created_at', { count: 'exact' });
+      .select('word, language, likes_count, dislikes_count, net_score, is_potentially_valid, first_submitter, last_voted_at, first_voted_at', { count: 'exact' });
 
     // Apply filters
     if (language) {
@@ -1203,7 +1356,7 @@ router.get('/community-words', async (req: AdminRequest, res: Response): Promise
       is_potentially_valid: boolean;
       first_submitter: string | null;
       last_voted_at: string | null;
-      created_at: string;
+      first_voted_at: string | null;
     }
 
     const words: CommunityWordEntry[] = (data as WordScoreRow[] || []).map((row: WordScoreRow) => {

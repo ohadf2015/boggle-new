@@ -349,6 +349,7 @@ const DailyReadyScreen: React.FC<DailyReadyScreenProps> = ({
   t,
 }) => {
   const [showLangDropdown, setShowLangDropdown] = useState(false);
+  const [showLeaderboard, setShowLeaderboard] = useState(false);
 
   // Check if this is a valid challenge (same puzzle number)
   const isValidChallenge = challengeData && challengeData.puzzleNumber === puzzleNumber;
@@ -378,8 +379,9 @@ const DailyReadyScreen: React.FC<DailyReadyScreenProps> = ({
       exit={{ opacity: 0, y: -20 }}
       className="flex-1 flex flex-col items-center justify-center p-4"
     >
-      {/* Back button */}
-      <motion.div className="absolute top-24 sm:top-28 left-4">
+      {/* Top bar with back and language */}
+      <div className="absolute top-20 sm:top-24 left-4 right-4 flex items-center justify-between">
+        {/* Back button */}
         <Button
           variant="ghost"
           size="sm"
@@ -389,22 +391,15 @@ const DailyReadyScreen: React.FC<DailyReadyScreenProps> = ({
           <ArrowLeft className="mr-2" />
           {t('daily.home')}
         </Button>
-      </motion.div>
 
-      {/* Language Selector */}
-      <motion.div
-        className="absolute top-20 right-4"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.2 }}
-      >
+        {/* Language Selector */}
         <div className="relative">
           <Button
             variant="outline"
             size="sm"
             onClick={() => setShowLangDropdown(!showLangDropdown)}
             onBlur={() => setTimeout(() => setShowLangDropdown(false), 200)}
-            className="relative flex items-center gap-2 bg-neo-cream border-3 border-neo-black rounded-neo shadow-hard-sm hover:shadow-hard transition-all"
+            className="relative flex items-center gap-2 bg-neo-cream border-3 border-neo-black rounded-neo shadow-hard-sm hover:shadow-hard transition-all min-w-[44px] min-h-[44px]"
           >
             <span className="text-lg">{currentFlag}</span>
             <Globe className="w-4 h-4 text-neo-black" />
@@ -451,17 +446,17 @@ const DailyReadyScreen: React.FC<DailyReadyScreenProps> = ({
             )}
           </AnimatePresence>
         </div>
-      </motion.div>
+      </div>
 
-      {/* Main content */}
-      <div className="max-w-md w-full text-center space-y-6">
+      {/* Main content - SIMPLIFIED */}
+      <div className="max-w-md w-full text-center space-y-5">
         {/* Challenge Banner (when arriving via challenge link) */}
         {isValidChallenge && (
           <motion.div
             initial={{ scale: 0.8, opacity: 0, y: -20 }}
             animate={{ scale: 1, opacity: 1, y: 0 }}
             transition={{ delay: 0.05, type: 'spring' }}
-            className="w-full max-w-sm bg-gradient-to-r from-purple-500 to-indigo-600 rounded-neo border-3 border-neo-black shadow-hard p-4 mb-2"
+            className="w-full max-w-sm mx-auto bg-gradient-to-r from-purple-500 to-indigo-600 rounded-neo border-3 border-neo-black shadow-hard p-4"
           >
             <div className="flex items-center justify-center gap-2 mb-2">
               <span className="text-2xl">🎯</span>
@@ -487,101 +482,117 @@ const DailyReadyScreen: React.FC<DailyReadyScreenProps> = ({
           </motion.div>
         )}
 
-        {/* Daily Challenge Badge */}
-        <motion.div
-          initial={{ scale: 0.8, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          transition={{ delay: 0.1, type: 'spring' }}
-          className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-neo-yellow to-neo-orange rounded-neo border-3 border-neo-black shadow-hard"
-        >
-          <Target className="w-5 h-5 text-neo-black" />
-          <span className="font-black text-neo-black uppercase tracking-wide">
-            {t('daily.badge')}
-          </span>
-        </motion.div>
-
-        {/* Puzzle Number */}
+        {/* Hero Section - Puzzle Number (LARGE) */}
         <motion.div
           initial={{ scale: 0.9, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
-          transition={{ delay: 0.2 }}
+          transition={{ delay: 0.1 }}
+          className="space-y-2"
         >
-          <h1 className="text-6xl md:text-7xl font-black text-neo-black dark:text-white">
+          {/* Daily Badge */}
+          <motion.div
+            initial={{ scale: 0.8, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ delay: 0.05, type: 'spring' }}
+            className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-neo-yellow to-neo-orange rounded-neo border-3 border-neo-black shadow-hard"
+          >
+            <Target className="w-5 h-5 text-neo-black" />
+            <span className="font-black text-neo-black uppercase tracking-wide">
+              {t('daily.badge')}
+            </span>
+          </motion.div>
+
+          <h1 className="text-7xl md:text-8xl font-black text-neo-black dark:text-white">
             #{puzzleNumber}
           </h1>
-          <p className="text-lg text-gray-600 dark:text-gray-300 mt-2">
+          <p className="text-lg text-gray-600 dark:text-gray-300">
             {formattedDate}
           </p>
         </motion.div>
 
-        {/* Info Cards - Word Hunt specific */}
+        {/* Simplified Game Info */}
         <motion.div
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.3 }}
-          className="bg-white text-neo-black dark:bg-neo-navy-light dark:text-white rounded-neo border-3 border-neo-black dark:border-white/20 p-4 shadow-hard-sm max-w-xs mx-auto"
+          transition={{ delay: 0.2 }}
+          className="flex items-center justify-center gap-4 text-sm"
         >
-          <Target className="w-8 h-8 mx-auto mb-2 text-green-600 dark:text-green-400" />
-          <div className="text-3xl font-black text-neo-black dark:text-white">
-            10
+          <div className="flex items-center gap-2 px-3 py-2 bg-neo-cream dark:bg-slate-700 rounded-neo border-2 border-neo-black dark:border-slate-500">
+            <Target className="w-4 h-4 text-green-600 dark:text-green-400" />
+            <span className="font-bold text-neo-black dark:text-white">10 {t('daily.maxAttempts') || 'attempts'}</span>
           </div>
-          <div className="text-sm text-gray-600 dark:text-gray-300 uppercase font-bold">
-            {t('wordHunt.title')} - {t('daily.maxAttempts')}
-          </div>
-          <div className="text-xs text-gray-500 dark:text-gray-400 mt-2">
-            {t('daily.huntDescription')}
+          <div className="flex items-center gap-2 px-3 py-2 bg-neo-cream dark:bg-slate-700 rounded-neo border-2 border-neo-black dark:border-slate-500">
+            <Timer className="w-4 h-4 text-neo-orange" />
+            <span className="font-bold text-neo-black dark:text-white">{countdown}</span>
           </div>
         </motion.div>
 
-        {/* Important Note */}
-        <motion.p
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.5 }}
-          className="text-sm text-gray-600 dark:text-gray-300"
-        >
-          {t('daily.samePuzzle')}
-        </motion.p>
-
-        {/* Start Button */}
+        {/* START BUTTON - PROMINENT */}
         <motion.div
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.6, type: 'spring' }}
+          transition={{ delay: 0.3, type: 'spring' }}
         >
           <Button
             onClick={onStart}
-            className="w-full py-6 text-xl font-black uppercase bg-gradient-to-r from-neo-lime to-neo-cyan text-neo-black border-4 border-neo-black rounded-neo shadow-hard hover:shadow-hard-lg hover:-translate-y-1 transition-all"
+            className="w-full py-7 text-2xl font-black uppercase bg-gradient-to-r from-neo-lime to-neo-cyan text-neo-black border-4 border-neo-black rounded-neo shadow-hard hover:shadow-hard-lg hover:-translate-y-1 active:translate-y-0 active:shadow-hard-sm transition-all"
           >
             {t('daily.playButton')}
           </Button>
         </motion.div>
 
-        {/* Next puzzle countdown */}
+        {/* Secondary Actions - Collapsed */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ delay: 0.7 }}
-          className="text-xs text-gray-600 dark:text-gray-300"
+          transition={{ delay: 0.4 }}
+          className="flex items-center justify-center gap-4 pt-2"
         >
-          {t('daily.nextPuzzleIn')} {countdown}
+          <button
+            onClick={onShowTutorial}
+            className="text-sm font-bold text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors flex items-center gap-1"
+          >
+            <span>?</span> {t('joinView.howToPlay') || 'How to Play'}
+          </button>
+          <span className="text-gray-300 dark:text-gray-600">|</span>
+          <button
+            onClick={() => setShowLeaderboard(!showLeaderboard)}
+            className="text-sm font-bold text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors flex items-center gap-1"
+          >
+            <Trophy className="w-3 h-3" /> {t('daily.todaysPlayers') || 'Leaderboard'}
+          </button>
         </motion.div>
 
-        {/* Today's Players Leaderboard */}
-        <motion.div
-          initial={{ y: 20, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.8 }}
-          className="mt-6"
+        {/* Collapsible Leaderboard */}
+        <AnimatePresence>
+          {showLeaderboard && (
+            <motion.div
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: 'auto', opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              transition={{ duration: 0.2 }}
+              className="overflow-hidden"
+            >
+              <DailyLeaderboard
+                puzzleDate={puzzleDate}
+                language={language}
+                maxVisible={3}
+                compact
+                t={t}
+              />
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Note */}
+        <motion.p
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.5 }}
+          className="text-xs text-gray-500 dark:text-gray-400"
         >
-          <DailyLeaderboard
-            puzzleDate={puzzleDate}
-            language={language}
-            maxVisible={5}
-            compact
-            t={t}
-          />
-        </motion.div>
+          {t('daily.samePuzzle')}
+        </motion.p>
       </div>
     </motion.div>
   );

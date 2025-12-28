@@ -2105,9 +2105,12 @@ const he = {
     "grayMeaning": "⬜ = האות לא נמצאת במילה",
     "howToPlay": "חפשו את המילה המוסתרת בת {length} אותיות באמצעות רמזים! יש לכם {max} ניסיונות למצוא אותה.",
     "shareResult": "שתפו תוצאה",
+    "shareAttempt": "שתפו ניסיון",
     "playAgainTomorrow": "חזרו מחר לפאזל חדש!",
+    "tryAnotherLanguage": "נסו שפה אחרת",
+    "playDifferentLanguage": "אתגרו את עצמכם בשפה אחרת!",
     "feedback": {
-      "tooShort": "📏 לפחות 3 אותיות",
+      "tooShort": "📏 לפחות 4 אותיות",
       "duplicate": "🔁 כבר נמצאה!",
       "notOnBoard": "⚠️ לא ניתן לבנות את זה על הלוח",
       "invalidWord": "❌ מילה לא תקינה",
@@ -2166,7 +2169,10 @@ const he = {
       "gridWordDiscovery": "גילוי מילת לוח",
       "cannotRevealMore": "לא ניתן לחשוף עוד אותיות",
       "wordsLabel": "מילים",
-      "attemptsLabel": "ניסיונות"
+      "attemptsLabel": "ניסיונות",
+      "triesLeft": "ניסיונות נותרו",
+      "findOnBoard": "מצאו את המילה הזו על הלוח!",
+      "traceLetters": "עקבו אחרי האותיות על הלוח כדי לאיית אותה"
     },
     "results": {
       "targetWord": "מילת היעד",
@@ -2237,9 +2243,9 @@ const he = {
       },
       "minLength": {
         "title": "⚠️ כלל חשוב",
-        "description": "מילים חייבות להיות באורך של לפחות 3 אותיות",
-        "example1": "3 אותיות ✓",
-        "example2": "2 אותיות - קצר מדי!",
+        "description": "מילים חייבות להיות באורך של לפחות 4 אותיות",
+        "example1": "4 אותיות ✓",
+        "example2": "3 אותיות - קצר מדי!",
         "gotIt": "הבנתי!"
       },
       "complete": {
@@ -2247,7 +2253,7 @@ const he = {
         "remember": "זכרו:",
         "rule1": "10 ניסיונות למצוא את המילה",
         "rule2": "מצאו מילים אחרות לחיים",
-        "rule3": "מינימום 3 אותיות",
+        "rule3": "מינימום 4 אותיות",
         "rule4": "אותו חידה בכל העולם",
         "start": "התחילו את האתגר היומי"
       }

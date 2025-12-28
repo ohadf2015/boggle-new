@@ -1028,17 +1028,13 @@ export function generateWordHuntShareableResult(result: WordHuntResult, siteUrl?
     }
   }
 
-  // Find and highlight rarest word (if words were discovered)
-  let rarestWordText = '';
-  if (result.wordsDiscovered && result.wordsDiscovered.length > 0) {
-    const rarestWord = findRarestWord(result.wordsDiscovered, result.language);
-    if (rarestWord && rarestWord.rarity >= 4) {
-      rarestWordText = `${rarestWord.emoji} Rarest find: ${rarestWord.word.toUpperCase()}\n`;
-    }
-  }
+  // NOTE: We intentionally do NOT include the rarest word in share text
+  // as it could spoil the puzzle by revealing valid words on the board
 
-  // Build challenge URL for "Beat My Score"
-  const challengeUrl = generateChallengeUrl(result);
+  // Build simple challenge URL - just links to the daily page
+  // We avoid encoding personal game data in URLs for privacy
+  const baseUrl = typeof window !== 'undefined' ? window.location.origin : 'https://lexiclash.live';
+  const challengeUrl = `${baseUrl}/${result.language}/daily`;
 
   // Build challenge CTA based on result
   let challengeCta = '';
@@ -1053,7 +1049,7 @@ export function generateWordHuntShareableResult(result: WordHuntResult, siteUrl?
 
 ${emojiGrid}
 ${resultLine}
-${survivalStats}${rarestWordText}${streakText}${challengeCta}`;
+${survivalStats}${streakText}${challengeCta}`;
 }
 
 /**
@@ -1400,29 +1396,23 @@ export function getStreakMilestoneMessage(streak: number): { emoji: string; titl
 // ==========================================
 
 /**
- * Generate a challenge URL for "Beat My Score" sharing
- * Encodes the player's result to create a challenge link
+ * Generate a simple challenge URL for sharing
+ *
+ * PRIVACY NOTE: We intentionally keep the URL simple (no encoded player data)
+ * to avoid exposing any game-specific information that could:
+ * 1. Spoil the puzzle for others
+ * 2. Leak player statistics unnecessarily
+ *
+ * The URL just links to the daily challenge page for the correct language.
  */
 export function generateChallengeUrl(result: WordHuntResult): string {
   const baseUrl = typeof window !== 'undefined' ? window.location.origin : 'https://lexiclash.live';
-
-  // Create challenge data
-  const challengeData = {
-    p: result.puzzleNumber,           // puzzle number
-    a: result.attemptsUsed,           // attempts used
-    s: result.solved ? 1 : 0,         // solved (1/0)
-    e: result.efficiencyScore || 0,   // efficiency score
-    w: result.wordsDiscovered?.length || 0, // words discovered
-  };
-
-  // Encode as base64
-  const encoded = btoa(JSON.stringify(challengeData));
-
-  return `${baseUrl}/${result.language}/daily?challenge=${encoded}`;
+  return `${baseUrl}/${result.language}/daily`;
 }
 
 /**
- * Parse a challenge URL parameter
+ * Parse a legacy challenge URL parameter (for backwards compatibility)
+ * New URLs don't include challenge data, but we keep this for old links.
  */
 export function parseChallengeParam(encoded: string): {
   puzzleNumber: number;
@@ -1636,54 +1626,53 @@ async function getCanvasFingerprint(): Promise<string> {
 
 /**
  * Bonus words to embed in the grid for survival mode playability
- * These are short words (3 letters) that can be discovered for life/tokens
+ * These are 4+ letter words that can be discovered for life/tokens
  * Curated for each language to ensure validity
  */
 const BONUS_WORD_LISTS: Record<Language, string[]> = {
   en: [
-    // Common 3-letter English words for easy discovery
-    'THE', 'AND', 'FOR', 'ARE', 'BUT', 'NOT', 'YOU', 'ALL', 'CAN', 'HER',
-    'WAS', 'ONE', 'OUR', 'OUT', 'DAY', 'HAD', 'HOT', 'HAS', 'HIM', 'HIS',
-    'HOW', 'ITS', 'LET', 'MAY', 'OLD', 'SEE', 'NOW', 'WAY', 'WHO', 'OWN',
-    'SAY', 'SHE', 'TWO', 'USE', 'CAT', 'DOG', 'RUN', 'SUN', 'FUN', 'BIG',
-    'TOP', 'MAN', 'TEN', 'RED', 'BOX', 'CUP', 'JAR', 'PEN', 'CAR', 'BUS',
-    'SKY', 'SEA', 'MAP', 'KEY', 'NET', 'BAG', 'HAT', 'BED', 'LEG', 'ARM',
+    // Common 4-letter English words for discovery
+    'TREE', 'BIRD', 'FISH', 'STAR', 'MOON', 'RAIN', 'WIND', 'SNOW',
+    'BOOK', 'DOOR', 'HAND', 'FOOT', 'HEAD', 'FACE', 'ROCK', 'SAND',
+    'BOAT', 'GAME', 'WOLF', 'BEAR', 'FROG', 'DEER', 'DUCK', 'HAWK',
+    'CAKE', 'MILK', 'SOUP', 'RICE', 'BEAN', 'CORN', 'PLUM', 'PEAR',
+    'GOLD', 'IRON', 'JADE', 'RUBY', 'SILK', 'WOOL', 'CLAY', 'COAL',
+    'HILL', 'LAKE', 'WAVE', 'CAVE', 'PATH', 'PEAK', 'POND', 'REEF',
   ],
   he: [
-    // Common 2-3 letter Hebrew words
-    'גם', 'את', 'על', 'עם', 'אם', 'כל', 'אל', 'לא', 'זה', 'מה',
-    'טוב', 'רע', 'יד', 'עד', 'כן', 'או', 'בא', 'גן', 'דג', 'חם',
-    'קר', 'שם', 'פה', 'כי', 'רק', 'עוד', 'איך', 'למה', 'כמה', 'אחד',
+    // Common 4+ letter Hebrew words
+    'בית', 'מים', 'עולם', 'אדם', 'דבר', 'עין', 'ראש', 'ילד',
+    'ספר', 'חבר', 'דלת', 'חלון', 'שמש', 'ירח', 'כוכב', 'פרח',
+    'סוס', 'כלב', 'ציפור', 'דגים', 'ארנב', 'נמר', 'זאב', 'דוב',
   ],
   sv: [
-    // Common 2-3 letter Swedish words
-    'JAG', 'DU', 'HAN', 'HON', 'DET', 'OCH', 'ATT', 'ÄR', 'VAR', 'SOM',
-    'MEN', 'PÅ', 'EN', 'ETT', 'NU', 'UT', 'ÅR', 'FÖR', 'OM', 'NI',
-    'AV', 'KAN', 'SKA', 'HAR', 'VEM', 'HUR', 'MIG', 'DIG', 'SIG', 'UPP',
+    // Common 4+ letter Swedish words
+    'HUND', 'KATT', 'FÅGEL', 'TRÄD', 'STEN', 'BERG', 'SJÖN', 'REGN',
+    'SNÖN', 'VIND', 'SOLEN', 'MÅNE', 'NATT', 'LJUS', 'MÖRK', 'VÄGG',
+    'GOLV', 'DÖRR', 'BORD', 'STOL', 'SÄNG', 'LAMP', 'GLAS', 'SKÅL',
   ],
   ja: [
-    // Common 2-character Japanese words/kanji compounds
-    '私', '人', '日', '年', '時', '前', '今', '何', '事', '人',
-    '月', '火', '水', '木', '金', '土', '大', '中', '小', '新',
-    '上', '下', '左', '右', '外', '内', '口', '目', '手', '足',
+    // Common 2-character Japanese words/kanji compounds (Japanese uses different char lengths)
+    '日本', '東京', '学校', '先生', '学生', '友達', '家族', '会社',
+    '仕事', '時間', '天気', '音楽', '映画', '料理', '旅行', '電車',
   ],
   es: [
-    // Common 2-3 letter Spanish words
-    'SOL', 'MAR', 'PAN', 'SAL', 'LUZ', 'VOZ', 'PAZ', 'REY', 'LEY', 'TÚ',
-    'YO', 'EL', 'UN', 'DE', 'LA', 'EN', 'ES', 'NO', 'QUE', 'CON',
-    'POR', 'SER', 'SIN', 'MAS', 'TAN', 'VER', 'DAR', 'DOS', 'MIS', 'SUS',
+    // Common 4+ letter Spanish words
+    'CASA', 'AGUA', 'VIDA', 'AMOR', 'MESA', 'LIBRO', 'PERRO', 'GATO',
+    'LUNA', 'CIELO', 'NOCHE', 'TIERRA', 'PLAYA', 'CAMPO', 'MONTE', 'LAGO',
+    'FLOR', 'ROSA', 'ARBOL', 'HOJA', 'VINO', 'CAFE', 'LECHE', 'CARNE',
   ],
   fr: [
-    // Common 2-3 letter French words
-    'LE', 'LA', 'DE', 'UN', 'UNE', 'ET', 'EN', 'DU', 'AU', 'OU',
-    'IL', 'JE', 'TU', 'ON', 'CE', 'ME', 'TE', 'SE', 'LUI', 'EUX',
-    'MOI', 'TOI', 'SOI', 'VIE', 'BON', 'OUI', 'NON', 'PAS', 'TON', 'SON',
+    // Common 4+ letter French words
+    'MAISON', 'LIVRE', 'CHIEN', 'CHAT', 'LUNE', 'SOLEIL', 'NUIT', 'JOUR',
+    'FLEUR', 'ARBRE', 'TERRE', 'CIEL', 'PLAGE', 'VILLE', 'PAYS', 'MONDE',
+    'PAIN', 'LAIT', 'CAFE', 'VINO', 'ROSE', 'BLEU', 'NOIR', 'BLANC',
   ],
   de: [
-    // Common 2-3 letter German words
-    'DER', 'DIE', 'DAS', 'UND', 'ICH', 'DU', 'ER', 'SIE', 'WIR', 'IHR',
-    'EIN', 'IST', 'AUF', 'MIT', 'FÜR', 'VON', 'BEI', 'ZU', 'AN', 'UM',
-    'OB', 'SO', 'WIE', 'WAS', 'WER', 'NUR', 'ORT', 'TAG', 'JA', 'ALT',
+    // Common 4+ letter German words
+    'HAUS', 'BAUM', 'BUCH', 'HUND', 'KATZE', 'SONNE', 'MOND', 'STERN',
+    'BERG', 'WALD', 'FLUSS', 'MEER', 'STADT', 'LAND', 'WELT', 'ZEIT',
+    'BROT', 'WEIN', 'MILCH', 'ROSE', 'BLAU', 'GRÜN', 'ROTE', 'GOLD',
   ],
 };
 

@@ -2109,9 +2109,12 @@ const en = {
     "grayMeaning": "⬜ = Letter not in word",
     "howToPlay": "Hunt for the hidden {length}-letter word using feedback clues! You have {max} attempts to find it.",
     "shareResult": "Share Result",
+    "shareAttempt": "Share Attempt",
     "playAgainTomorrow": "Come back tomorrow for a new puzzle!",
+    "tryAnotherLanguage": "Try Another Language",
+    "playDifferentLanguage": "Challenge yourself in a different language!",
     "feedback": {
-      "tooShort": "📏 Minimum 3 letters",
+      "tooShort": "📏 Minimum 4 letters",
       "duplicate": "🔁 Already found!",
       "notOnBoard": "⚠️ Can't form this on the board",
       "invalidWord": "❌ Not a valid word",
@@ -2170,7 +2173,10 @@ const en = {
       "gridWordDiscovery": "Grid word discovery",
       "cannotRevealMore": "Cannot reveal more letters",
       "wordsLabel": "Words",
-      "attemptsLabel": "Attempts"
+      "attemptsLabel": "Attempts",
+      "triesLeft": "tries left",
+      "findOnBoard": "Find this word on the board!",
+      "traceLetters": "Trace the letters on the grid to spell it"
     },
     "results": {
       "targetWord": "Target Word",
@@ -2241,9 +2247,9 @@ const en = {
       },
       "minLength": {
         "title": "⚠️ IMPORTANT RULE",
-        "description": "Words must be at least 3 LETTERS long",
-        "example1": "3 letters ✓",
-        "example2": "2 letters - too short!",
+        "description": "Words must be at least 4 LETTERS long",
+        "example1": "4 letters ✓",
+        "example2": "3 letters - too short!",
         "gotIt": "Got it!"
       },
       "complete": {
@@ -2251,7 +2257,7 @@ const en = {
         "remember": "Remember:",
         "rule1": "10 attempts to find target",
         "rule2": "Find other words for life",
-        "rule3": "3+ letters minimum",
+        "rule3": "4+ letters minimum",
         "rule4": "Same puzzle worldwide",
         "start": "Start Daily Challenge"
       }

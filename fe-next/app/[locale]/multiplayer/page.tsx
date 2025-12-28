@@ -839,20 +839,20 @@ export default function MultiplayerPage(): React.JSX.Element {
 
   // Helper to get auth context for socket events
   const getAuthContext = useCallback(async () => {
-    if (!isSupabaseEnabled) return { authUserId: null, guestTokenHash: null };
+    if (!isSupabaseEnabled) return { authUserId: null, guestTokenHash: null, guestSessionId: null };
 
     // Use user.id directly - don't require profile for stats recording
     if (user?.id) {
-      return { authUserId: user.id, guestTokenHash: null };
+      return { authUserId: user.id, guestTokenHash: null, guestSessionId: null };
     }
 
     const guestSessionId = getGuestSessionId();
     if (guestSessionId) {
       const hash = await hashToken(guestSessionId);
-      return { authUserId: null, guestTokenHash: hash };
+      return { authUserId: null, guestTokenHash: hash, guestSessionId };
     }
 
-    return { authUserId: null, guestTokenHash: null };
+    return { authUserId: null, guestTokenHash: null, guestSessionId: null };
   }, [isSupabaseEnabled, user]);
 
   // Auto-join effect
@@ -1055,6 +1055,7 @@ export default function MultiplayerPage(): React.JSX.Element {
     // Build auth context for game result tracking
     let authUserId = null;
     let guestTokenHash = null;
+    let guestSessionId: string | null = null;
 
     if (isSupabaseEnabled) {
       // For stats recording, we only need the user.id from Supabase auth
@@ -1065,11 +1066,11 @@ export default function MultiplayerPage(): React.JSX.Element {
         logger.log('[AUTH] Joining as authenticated user:', { authUserId, username: effectiveUsername, hasProfile: !!profile });
       } else {
         // Guest user - get or create guest session
-        const guestSessionId = getGuestSessionId();
+        guestSessionId = getGuestSessionId();
         if (guestSessionId) {
           guestTokenHash = await hashToken(guestSessionId);
         }
-        logger.log('[AUTH] Joining as guest:', { hasUser: !!user, guestTokenHash: !!guestTokenHash });
+        logger.log('[AUTH] Joining as guest:', { hasUser: !!user, guestTokenHash: !!guestTokenHash, guestSessionId: !!guestSessionId });
       }
     }
 
@@ -1096,6 +1097,7 @@ export default function MultiplayerPage(): React.JSX.Element {
         language: roomLang || language,
         authUserId,
         guestTokenHash,
+        guestSessionId,
         avatar: hostAvatar,
         profilePictureUrl: profile?.profile_picture_url,
       };
@@ -1122,6 +1124,7 @@ export default function MultiplayerPage(): React.JSX.Element {
         username: effectiveUsername,
         authUserId,
         guestTokenHash,
+        guestSessionId,
         avatar: effectiveAvatar,
         profilePictureUrl: profile?.profile_picture_url,
       };

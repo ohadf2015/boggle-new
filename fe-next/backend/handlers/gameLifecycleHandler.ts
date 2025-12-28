@@ -63,6 +63,7 @@ interface CreateGamePayload {
   avatar?: Avatar;
   authUserId?: string;
   guestTokenHash?: string;
+  guestSessionId?: string;
   isRanked?: boolean;
   profilePictureUrl?: string;
 }
@@ -120,7 +121,7 @@ function registerGameLifecycleHandlers(io: Server, socket: Socket): void {
         return;
       }
 
-      const { gameCode, roomName, language, hostUsername, playerId, avatar, authUserId, guestTokenHash, isRanked, profilePictureUrl } = validation.data as CreateGamePayload;
+      const { gameCode, roomName, language, hostUsername, playerId, avatar, authUserId, guestTokenHash, guestSessionId, isRanked, profilePictureUrl } = validation.data as CreateGamePayload;
 
       logger.info('SOCKET', `Create game request: ${gameCode} by ${hostUsername}${isRanked ? ' (RANKED)' : ''}`, {
         socketId: socket.id,
@@ -161,7 +162,8 @@ function registerGameLifecycleHandlers(io: Server, socket: Socket): void {
         isHost: true,
         playerId: sanitizedPlayerId,
         authUserId: authUserId || null,
-        guestTokenHash: guestTokenHash || null
+        guestTokenHash: guestTokenHash || null,
+        guestSessionId: guestSessionId || null
       });
 
       // Join socket to game room

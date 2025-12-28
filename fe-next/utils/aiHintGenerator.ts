@@ -62,67 +62,111 @@ function generateBlanksDisplay(word: string, revealPositions: number[]): string 
 }
 
 /**
+ * Get vowels for a specific language
+ */
+function getVowelsForLanguage(language: Language): Set<string> {
+  const vowelSets: Record<Language, string[]> = {
+    en: ['A', 'E', 'I', 'O', 'U'],
+    he: ['א', 'ע', 'י', 'ו'], // Hebrew vowel letters (matres lectionis)
+    sv: ['A', 'E', 'I', 'O', 'U', 'Y', 'Å', 'Ä', 'Ö'],
+    ja: ['あ', 'い', 'う', 'え', 'お', 'ア', 'イ', 'ウ', 'エ', 'オ'], // Hiragana/Katakana vowels
+    es: ['A', 'E', 'I', 'O', 'U', 'Á', 'É', 'Í', 'Ó', 'Ú'],
+    fr: ['A', 'E', 'I', 'O', 'U', 'Y', 'À', 'Â', 'É', 'È', 'Ê', 'Ë', 'Î', 'Ï', 'Ô', 'Ù', 'Û', 'Ü', 'Ÿ'],
+    de: ['A', 'E', 'I', 'O', 'U', 'Ä', 'Ö', 'Ü'],
+  };
+  return new Set(vowelSets[language] || vowelSets['en']);
+}
+
+/**
+ * Find positions of vowels in a word
+ */
+function findVowelPositions(word: string, language: Language): number[] {
+  const vowels = getVowelsForLanguage(language);
+  const positions: number[] = [];
+  for (let i = 0; i < word.length; i++) {
+    if (vowels.has(word[i].toUpperCase())) {
+      positions.push(i);
+    }
+  }
+  return positions;
+}
+
+/**
  * Fallback hint generation (non-AI, basic hints)
- * Generates progressive hints that reveal letters in blanks format
- * Ensures revealed letters are NOT adjacent (at least 1 space between)
+ * Generates progressive hints that reveal vowels starting from the END of the word
+ * Always keeps at least 50% of letters hidden (never reveal more than half)
  */
 function generateFallbackHints(
   targetWord: string,
   language: Language
 ): HintGenerationResult {
   const wordLength = targetWord.length;
+  const vowelPositions = findVowelPositions(targetWord, language);
 
-  // Progressive reveal positions with spacing between revealed letters
-  // For 4-letter word "BIRD": [] -> [0] -> [0,2] -> [0,2,3] (never adjacent until final)
-  // For 5-letter word "HOUSE": [] -> [0] -> [0,2] -> [0,2,4] -> [0,1,2,4]
+  // Maximum letters we can ever reveal is 50% of the word (rounded down)
+  const maxReveal = Math.floor(wordLength / 2);
+
+  // Sort vowel positions from end to start (reverse order)
+  const vowelsFromEnd = [...vowelPositions].sort((a, b) => b - a);
+
+  // Get consonant positions from end to start
+  const consonantPositions = [...Array(wordLength).keys()]
+    .filter(i => !vowelPositions.includes(i))
+    .sort((a, b) => b - a);
+
+  // Progressive reveal: vowels first (from end), then consonants (from end)
+  // Never reveal more than 50% of the word
+  // Level 1: All blanks
+  // Level 2: Last vowel only (1 letter max)
+  // Level 3-5: Progressively reveal up to maxReveal letters
+
   const hints: HintLevel[] = [
     {
       level: 1,
       hint: generateBlanksDisplay(targetWord, []), // "_ _ _ _"
       unlockCost: 0, // Free - shown immediately
     },
-    {
-      level: 2,
-      hint: generateBlanksDisplay(targetWord, [0]), // "B _ _ _"
-      unlockCost: 2, // Unlock after finding 2 words
-    },
   ];
 
-  // Add progressive hints - ensure non-adjacent reveals for earlier hints
+  // Level 2: Reveal last vowel (or last letter if no vowels) - max 1 letter
+  const lastVowelPos = vowelsFromEnd.length > 0 ? [vowelsFromEnd[0]] : [wordLength - 1];
+  hints.push({
+    level: 2,
+    hint: generateBlanksDisplay(targetWord, lastVowelPos.slice(0, 1)),
+    unlockCost: 4,
+  });
+
   if (wordLength >= 4) {
-    // Level 3: First and third letters (positions 0, 2) - not adjacent
+    // Build reveal order: vowels from end, then consonants from end
+    const revealOrder = [...vowelsFromEnd, ...consonantPositions];
+
+    // Level 3: Reveal up to ceil(maxReveal * 0.5) letters
+    const level3Count = Math.min(Math.ceil(maxReveal * 0.5), revealOrder.length);
+    const level3Positions = revealOrder.slice(0, level3Count);
     hints.push({
       level: 3,
-      hint: generateBlanksDisplay(targetWord, [0, 2]), // "B _ R _"
-      unlockCost: 4,
-    });
-
-    // Level 4: First, third, and last (positions 0, 2, last) - spaced out
-    hints.push({
-      level: 4,
-      hint: generateBlanksDisplay(targetWord, [0, 2, wordLength - 1]), // "B _ R D"
-      unlockCost: 6,
-    });
-
-    // Level 5: All but one letter - keep position 1 hidden (second letter)
-    // This maintains some mystery while being very helpful
-    const allButSecond: number[] = [];
-    for (let i = 0; i < wordLength; i++) {
-      if (i !== 1) allButSecond.push(i);
-    }
-    hints.push({
-      level: 5,
-      hint: generateBlanksDisplay(targetWord, allButSecond), // "B _ R D"
+      hint: generateBlanksDisplay(targetWord, level3Positions.sort((a, b) => a - b)),
       unlockCost: 8,
     });
-  } else if (wordLength === 3) {
-    // For 3-letter words - first and last (not adjacent)
+
+    // Level 4: Reveal up to ceil(maxReveal * 0.75) letters
+    const level4Count = Math.min(Math.ceil(maxReveal * 0.75), revealOrder.length);
+    const level4Positions = revealOrder.slice(0, level4Count);
     hints.push({
-      level: 3,
-      hint: generateBlanksDisplay(targetWord, [0, 2]), // "C _ T"
-      unlockCost: 4,
+      level: 4,
+      hint: generateBlanksDisplay(targetWord, level4Positions.sort((a, b) => a - b)),
+      unlockCost: 12,
+    });
+
+    // Level 5: Reveal exactly maxReveal letters (50% of word)
+    const level5Positions = revealOrder.slice(0, maxReveal);
+    hints.push({
+      level: 5,
+      hint: generateBlanksDisplay(targetWord, level5Positions.sort((a, b) => a - b)),
+      unlockCost: 16,
     });
   }
+  // Note: 3-letter words are no longer valid targets in daily challenge (minimum is 4 letters)
 
   return {
     hints,
@@ -147,9 +191,10 @@ export function getNextHint(
 
 /**
  * Calculate life points reward based on word length
+ * Minimum word length for daily challenge is 4 letters
  */
 export function calculateLifeReward(wordLength: number): number {
-  if (wordLength === 3) return 5;
+  if (wordLength < 4) return 0; // Words less than 4 letters not valid in daily challenge
   if (wordLength === 4) return 10;
   if (wordLength === 5) return 15;
   if (wordLength === 6) return 20;
@@ -158,9 +203,10 @@ export function calculateLifeReward(wordLength: number): number {
 
 /**
  * Calculate clue tokens reward based on word length
+ * Minimum word length for daily challenge is 4 letters
  */
 export function calculateTokenReward(wordLength: number): number {
-  if (wordLength === 3) return 0;
+  if (wordLength < 4) return 0; // Words less than 4 letters not valid in daily challenge
   if (wordLength === 4) return 1;
   if (wordLength === 5) return 2;
   if (wordLength === 6) return 3;
