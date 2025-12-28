@@ -6,7 +6,7 @@
     "dev": "tsx server.ts",
     "build": "npm run build:schemas && next build",
     "build:schemas": "tsc --project backend/tsconfig.schemas.json",
-    "start": "tsx server.ts",
+    "start": "NODE_ENV=production tsx server.ts",
     "lint": "eslint",
     "test": "npm run test:backend && npm run test:frontend",
     "test:backend": "jest --config=backend/jest.config.js",
