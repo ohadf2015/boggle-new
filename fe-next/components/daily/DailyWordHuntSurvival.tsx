@@ -235,13 +235,13 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
     // Check if correct
     const won = isTargetWordFound(feedback);
     if (won) {
-      handleGameOver(true); // Victory
+      handleGameOver(true, newAttempts); // Victory - pass the updated attempts array
       return;
     }
 
     // Check if out of attempts
     if (newAttempts.length >= MAX_ATTEMPTS) {
-      handleGameOver(false); // Failed
+      handleGameOver(false, newAttempts); // Failed - pass the updated attempts array
       return;
     }
 
@@ -294,7 +294,7 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
   }, [discoveredWords, grid, language, playWordAcceptedSound, showToast, t]);
 
   // Handle game over
-  const handleGameOver = useCallback((won: boolean) => {
+  const handleGameOver = useCallback((won: boolean, finalAttempts?: TargetAttempt[]) => {
     if (gameOverRef.current) return;
     gameOverRef.current = true;
     setIsGameOver(true);
@@ -304,11 +304,14 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
       clearInterval(lifeIntervalRef.current);
     }
 
+    // Use provided finalAttempts or fall back to state (for life drain game over)
+    const attemptsToUse = finalAttempts || attempts;
+
     const result: SurvivalGameResult = {
       solved: won,
-      attemptsUsed: attempts.length,
+      attemptsUsed: attemptsToUse.length,
       targetWord,
-      attempts,
+      attempts: attemptsToUse,
       wordsDiscovered: discoveredWords,
       lifeRemaining: lifePoints,
       clueTokensEarned: clueTokens + tokensSpent,
@@ -317,7 +320,7 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
       efficiencyScore: calculateEfficiencyScore(
         lifePoints,
         clueTokens,
-        attempts.length,
+        attemptsToUse.length,
         discoveredWords.length,
         won
       ),
@@ -339,11 +342,15 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
 
     switch (item.id) {
       case 'reveal_letter': {
-        // Reveal a random unrevealed letter
+        // Reveal a random unrevealed letter, but never reveal ALL letters (keep at least 1 hidden)
         const unrevealed = [...Array(targetWord.length).keys()].filter(i => !revealedLetters.has(i));
-        if (unrevealed.length > 0) {
+        // Only reveal if we have at least 2 unrevealed letters (to keep 1 always hidden)
+        if (unrevealed.length > 1) {
           const randomIdx = unrevealed[Math.floor(Math.random() * unrevealed.length)];
           setRevealedLetters(prev => new Set([...prev, randomIdx]));
+        } else {
+          // Cannot reveal more - show feedback
+          setCurrentFeedback('Cannot reveal more! At least one letter must remain hidden.');
         }
         break;
       }
@@ -438,12 +445,21 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
           <span className="font-bold text-sm">{clueTokens}</span>
         </div>
 
+        {/* Shop button - more prominent with animation when tokens available */}
         <Button
           size="sm"
           onClick={() => setShowShop(!showShop)}
-          className="bg-neo-purple text-white"
+          className={cn(
+            "bg-neo-purple text-white relative",
+            clueTokens > 0 && "animate-pulse"
+          )}
         >
           <ShoppingBag className="w-4 h-4" />
+          {clueTokens > 0 && (
+            <span className="absolute -top-1 -right-1 w-4 h-4 bg-neo-yellow text-neo-black text-xs font-bold rounded-full flex items-center justify-center">
+              !
+            </span>
+          )}
         </Button>
       </div>
 
@@ -458,13 +474,31 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
             <FaLightbulb className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
             <div className="flex-1">
               <div className="text-xs text-blue-600 dark:text-blue-400 font-bold mb-1">
-                Hint {currentHint.level}/5
+                Hint {currentHint.level}/5 {currentHint.unlockCost === 0 ? '(Free)' : `(Unlocked at ${currentHint.unlockCost} words)`}
               </div>
               <div className="text-sm">{currentHint.hint}</div>
             </div>
           </div>
         </motion.div>
       )}
+
+      {/* Next hint progress */}
+      {(() => {
+        const nextHint = availableHints.find(h => h.unlockCost > discoveredWords.length);
+        if (nextHint) {
+          const wordsNeeded = nextHint.unlockCost - discoveredWords.length;
+          return (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="text-center text-xs text-gray-600 dark:text-gray-400 mb-2"
+            >
+              💡 Next hint unlocks in {wordsNeeded} {wordsNeeded === 1 ? 'word' : 'words'}
+            </motion.div>
+          );
+        }
+        return null;
+      })()}
 
       {/* Category and example (if unlocked) */}
       {showCategory && (

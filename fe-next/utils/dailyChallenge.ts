@@ -1010,11 +1010,12 @@ export function selectDailyTargetWord(
   const seed = hashString(seedString);
   const random = mulberry32(seed);
 
-  // Get word list for this language
+  // Get word list for this language and filter to only 4-letter words
   const wordList = TARGET_WORD_LISTS[language] || TARGET_WORD_LISTS['en'];
+  const fourLetterWords = wordList.filter(word => word.length === 4);
 
   // Shuffle word list using seeded random (Fisher-Yates)
-  const shuffled = [...wordList];
+  const shuffled = [...fourLetterWords];
   for (let i = shuffled.length - 1; i > 0; i--) {
     const j = Math.floor(random() * (i + 1));
     [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];

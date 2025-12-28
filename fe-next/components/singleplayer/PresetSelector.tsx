@@ -168,8 +168,9 @@ const PresetSelector: React.FC<PresetSelectorProps> = ({
         transition={{ delay: index * 0.05 + 0.1 }}
         onClick={() => onSelectPreset(preset)}
         className={cn(
-          'group relative p-4 sm:p-5 rounded-neo-lg border-4 transition-all',
-          'flex flex-col items-center text-center',
+          'group relative p-3 rounded-neo-lg border-4 transition-all',
+          'flex flex-col items-center text-center flex-shrink-0',
+          'w-[140px] min-w-[140px]',
           'shadow-hard hover:shadow-hard-lg hover:translate-x-[-3px] hover:translate-y-[-3px]',
           'active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-pressed',
           isDaily
@@ -204,36 +205,36 @@ const PresetSelector: React.FC<PresetSelectorProps> = ({
 
         {/* Grid Size (PROMINENT) */}
         {!isDaily && (
-          <div className="text-3xl sm:text-4xl font-black text-neo-black dark:text-neo-white mb-1">
+          <div className="text-2xl sm:text-3xl font-black text-neo-black dark:text-neo-white mb-1">
             {difficultyConfig.rows}×{difficultyConfig.cols}
           </div>
         )}
 
         {/* Daily Icon */}
         {isDaily && (
-          <div className="w-12 h-12 sm:w-14 sm:h-14 flex items-center justify-center mb-2">
-            <IconComponent className="w-8 h-8 sm:w-10 sm:h-10 text-neo-black" />
+          <div className="w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center mb-1">
+            <IconComponent className="w-6 h-6 sm:w-8 sm:h-8 text-neo-black" />
           </div>
         )}
 
         {/* Difficulty Name */}
         {!isDaily && (
-          <h3 className="text-base sm:text-lg font-bold uppercase text-neo-black dark:text-neo-white leading-tight">
+          <h3 className="text-sm sm:text-base font-bold uppercase text-neo-black dark:text-neo-white leading-tight">
             {t(difficultyConfig.nameKey) || preset.settings.difficulty}
           </h3>
         )}
 
         {/* Daily Name */}
         {isDaily && (
-          <h3 className="text-sm sm:text-base font-black uppercase text-neo-black leading-tight">
+          <h3 className="text-xs sm:text-sm font-black uppercase text-neo-black leading-tight">
             {t('daily.badge') || 'Daily'}
-            <span className="block text-xs font-bold opacity-80">#{dailyInfo.puzzleNumber}</span>
+            <span className="block text-[10px] font-bold opacity-80">#{dailyInfo.puzzleNumber}</span>
           </h3>
         )}
 
         {/* Mode-specific details */}
         {!isDaily && (
-          <div className="text-xs sm:text-sm font-bold text-neo-black/70 dark:text-neo-white/70 mt-1 space-y-0.5">
+          <div className="text-[10px] sm:text-xs font-bold text-neo-black/70 dark:text-neo-white/70 mt-1 space-y-0.5">
             {preset.settings.timerSeconds > 0 && (
               <div>{preset.settings.timerSeconds / 60}m</div>
             )}
@@ -259,7 +260,7 @@ const PresetSelector: React.FC<PresetSelectorProps> = ({
         )}
 
         {/* Play indicator */}
-        <div className="mt-2 flex items-center gap-1 text-[10px] font-bold text-neo-black/60 dark:text-neo-white/60 group-hover:text-neo-black dark:group-hover:text-neo-white transition-colors">
+        <div className="mt-1.5 flex items-center gap-1 text-[10px] font-bold text-neo-black/60 dark:text-neo-white/60 group-hover:text-neo-black dark:group-hover:text-neo-white transition-colors">
           <FaPlay className="w-2 h-2" />
           <span>{t('singlePlayer.preset.tapToPlay') || 'Tap to play'}</span>
         </div>
@@ -335,7 +336,7 @@ const PresetSelector: React.FC<PresetSelectorProps> = ({
               {t('singlePlayer.preset.quickStart') || 'Quick Start'} - {t(MODE_CONFIG[selectedMode].nameKey)}
             </h3>
 
-            {/* Presets grid */}
+            {/* Presets horizontal scroll */}
             <AnimatePresence mode="wait">
               <motion.div
                 key={selectedMode}
@@ -343,9 +344,14 @@ const PresetSelector: React.FC<PresetSelectorProps> = ({
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -10 }}
                 transition={{ duration: 0.3 }}
-                className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 gap-3"
+                className="flex gap-2 overflow-x-auto scrollable-area snap-x snap-mandatory pb-2"
+                style={{ scrollbarWidth: 'thin' }}
               >
-                {modePresets.map((preset, index) => renderPresetCard(preset, index))}
+                {modePresets.map((preset, index) => (
+                  <div key={preset.id} className="snap-start">
+                    {renderPresetCard(preset, index)}
+                  </div>
+                ))}
               </motion.div>
             </AnimatePresence>
 
@@ -490,7 +496,7 @@ const PresetSelector: React.FC<PresetSelectorProps> = ({
             </span>
           </div>
 
-          {/* Preset cards - dynamic based on selected mode */}
+          {/* Preset cards - horizontal scrollable row */}
           <AnimatePresence mode="wait">
             <motion.div
               key={selectedMode}
@@ -498,9 +504,14 @@ const PresetSelector: React.FC<PresetSelectorProps> = ({
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
               transition={{ duration: 0.3 }}
-              className="grid grid-cols-2 sm:grid-cols-3 gap-3"
+              className="flex gap-2 overflow-x-auto scrollable-area snap-x snap-mandatory pb-2 -mx-2 px-2"
+              style={{ scrollbarWidth: 'thin' }}
             >
-              {modePresets.map((preset, index) => renderPresetCard(preset, index))}
+              {modePresets.map((preset, index) => (
+                <div key={preset.id} className="snap-start">
+                  {renderPresetCard(preset, index)}
+                </div>
+              ))}
             </motion.div>
           </AnimatePresence>
         </div>

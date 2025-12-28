@@ -35,6 +35,7 @@ interface WordHuntStats {
     solved: boolean;
     attemptsUsed: number;
     percentile: number;
+    rank?: number; // Player's rank position (1 = best)
     efficiencyScore?: number;
     efficiencyPercentile?: number;
   };
@@ -331,6 +332,31 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
           <div className="text-gray-600 dark:text-gray-300">
             {t('wordHunt.stats.attemptsUsed').replace('{count}', String(result.attemptsUsed))}
           </div>
+
+          {/* Show target word for successful players */}
+          {result.solved && (
+            <div className="mt-3 space-y-2">
+              <div className="text-sm text-gray-600 dark:text-gray-400">
+                Target Word:
+              </div>
+              <div className="text-2xl font-black text-neo-yellow tracking-wider">
+                {result.targetWord.toUpperCase()}
+              </div>
+            </div>
+          )}
+
+          {/* Show coins earned (net tokens) for successful players */}
+          {result.solved && result.clueTokensEarned !== undefined && result.clueTokensSpent !== undefined && (
+            <div className="mt-2 flex items-center justify-center gap-2 px-4 py-2 bg-yellow-100 dark:bg-yellow-900/30 rounded-neo border-2 border-neo-black">
+              <span className="text-2xl">🪙</span>
+              <div className="text-sm">
+                <span className="font-black text-xl">{result.clueTokensEarned - result.clueTokensSpent}</span>
+                <span className="text-gray-600 dark:text-gray-400 ml-1">tokens earned</span>
+              </div>
+            </div>
+          )}
+
+          {/* Show defeat message with target word */}
           {!result.solved && (
             <div className="mt-2 text-sm text-gray-600 dark:text-gray-400">
               {t('wordHunt.defeat').replace('{word}', result.targetWord.toUpperCase())}
@@ -338,21 +364,48 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
           )}
         </motion.div>
 
-        {/* Percentile badge */}
-        {stats?.yourStats && stats.yourStats.solved && stats.yourStats.percentile !== undefined && (
-          <motion.div
-            initial={{ scale: 0, rotate: -10 }}
-            animate={{ scale: 1, rotate: 0 }}
-            transition={{ type: 'spring', delay: 0.3 }}
-            className="inline-block px-6 py-3 bg-gradient-to-r from-neo-purple to-neo-blue rounded-neo border-3 border-neo-black shadow-hard"
-          >
-            <div className="flex items-center gap-2">
-              <TrendingUp className="w-5 h-5 text-white" />
-              <span className="font-bold text-white text-sm">
-                {t('wordHunt.stats.yourPercentile').replace('{percentile}', String(stats.yourStats.percentile))}
-              </span>
+        {/* Ranking badges */}
+        {stats?.yourStats && stats.yourStats.solved && (
+          <div className="space-y-3">
+            {/* Rank position */}
+            {stats.yourStats.rank !== undefined && (
+              <motion.div
+                initial={{ scale: 0, rotate: -10 }}
+                animate={{ scale: 1, rotate: 0 }}
+                transition={{ type: 'spring', delay: 0.3 }}
+                className="inline-block px-6 py-3 bg-gradient-to-r from-neo-orange to-neo-yellow rounded-neo border-3 border-neo-black shadow-hard"
+              >
+                <div className="flex items-center gap-2">
+                  <Trophy className="w-5 h-5 text-neo-black" />
+                  <span className="font-black text-neo-black text-sm">
+                    #{stats.yourStats.rank} out of {stats.totalPlayers} players
+                  </span>
+                </div>
+              </motion.div>
+            )}
+
+            {/* Percentile badge */}
+            {stats.yourStats.percentile !== undefined && (
+              <motion.div
+                initial={{ scale: 0, rotate: -10 }}
+                animate={{ scale: 1, rotate: 0 }}
+                transition={{ type: 'spring', delay: 0.35 }}
+                className="inline-block px-6 py-3 bg-gradient-to-r from-neo-purple to-neo-blue rounded-neo border-3 border-neo-black shadow-hard"
+              >
+                <div className="flex items-center gap-2">
+                  <TrendingUp className="w-5 h-5 text-white" />
+                  <span className="font-bold text-white text-sm">
+                    {t('wordHunt.stats.yourPercentile').replace('{percentile}', String(stats.yourStats.percentile))}
+                  </span>
+                </div>
+              </motion.div>
+            )}
+
+            {/* Language note */}
+            <div className="text-xs text-gray-500 dark:text-gray-400">
+              Rankings for {language.toUpperCase()} puzzle
             </div>
-          </motion.div>
+          </div>
         )}
 
         {/* Attempt history with feedback */}

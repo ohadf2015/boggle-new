@@ -8,7 +8,7 @@ import type { Language } from '@/types';
 export interface HintLevel {
   level: number;
   hint: string;
-  unlockCost: number; // How many words needed to unlock
+  unlockCost: number; // How many words needed to unlock (auto-unlock system)
 }
 
 export interface HintGenerationResult {
@@ -53,35 +53,49 @@ function generateFallbackHints(
   language: Language
 ): HintGenerationResult {
   const wordLength = targetWord.length;
+  const maxRevealCount = wordLength - 1; // Never reveal all letters (N-1 max)
+
+  // For 4-letter words, we can reveal max 3 letters
+  // Hint progression: general -> specific, but never reveal position 4 (last unrevealed)
+  const hints: HintLevel[] = [
+    {
+      level: 1,
+      hint: `The target is a ${wordLength}-letter word`,
+      unlockCost: 0, // Free - shown immediately
+    },
+    {
+      level: 2,
+      hint: `It starts with "${targetWord[0]}"`,
+      unlockCost: 0, // Free - shown after 2 words found
+    },
+  ];
+
+  // Add progressive hints that reveal letters but never all
+  if (wordLength >= 4) {
+    hints.push({
+      level: 3,
+      hint: `The second letter is "${targetWord[1]}"`,
+      unlockCost: 4, // Auto-unlock after 4 words found
+    });
+
+    hints.push({
+      level: 4,
+      hint: `It ends with "${targetWord[targetWord.length - 1]}"`,
+      unlockCost: 6, // Auto-unlock after 6 words found
+    });
+
+    // Final hint reveals N-2 letters (for 4-letter word: show 2 letters with blanks)
+    const revealedPart = targetWord.substring(0, maxRevealCount - 1);
+    const blanks = '_'.repeat(wordLength - revealedPart.length);
+    hints.push({
+      level: 5,
+      hint: `Almost there! ${revealedPart}${blanks}`,
+      unlockCost: 8, // Auto-unlock after 8 words found
+    });
+  }
 
   return {
-    hints: [
-      {
-        level: 1,
-        hint: `The target is a ${wordLength}-letter word`,
-        unlockCost: 0,
-      },
-      {
-        level: 2,
-        hint: `It starts with "${targetWord[0]}"`,
-        unlockCost: 1,
-      },
-      {
-        level: 3,
-        hint: `It ends with "${targetWord[targetWord.length - 1]}"`,
-        unlockCost: 2,
-      },
-      {
-        level: 4,
-        hint: `The second letter is "${targetWord[1]}"`,
-        unlockCost: 3,
-      },
-      {
-        level: 5,
-        hint: `Almost there! The word is ${targetWord.substring(0, 2)}****`,
-        unlockCost: 5,
-      },
-    ],
+    hints,
     category: 'Unknown',
     exampleSentence: `The ${targetWord} was beautiful.`,
   };
@@ -159,7 +173,7 @@ export const CLUE_SHOP_ITEMS: ClueShopItem[] = [
   {
     id: 'reveal_letter',
     name: 'Reveal Letter',
-    description: 'Reveal a random letter in the target word',
+    description: 'Reveal a random letter in the target word (keeps 1 letter hidden)',
     cost: 1,
     icon: '💡',
   },
