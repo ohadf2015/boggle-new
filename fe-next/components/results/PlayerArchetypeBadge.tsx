@@ -28,48 +28,96 @@ const PlayerArchetypeBadge: React.FC<PlayerArchetypeBadgeProps> = ({
   className,
 }) => {
   const { t } = useLanguage();
-  const [isHovered, setIsHovered] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
   const [imageError, setImageError] = useState(false);
   const badgeRef = useRef<HTMLDivElement>(null);
-  const [tooltipPosition, setTooltipPosition] = useState<{ top: number; left: number } | null>(null);
+  const [tooltipPosition, setTooltipPosition] = useState<{ top: number; left: number; showAbove?: boolean } | null>(null);
   const [isMounted, setIsMounted] = useState(false);
+  const isTouchDevice = useRef(false);
 
   useEffect(() => {
     setIsMounted(true);
   }, []);
 
+  // Close tooltip when clicking outside
   useEffect(() => {
-    if (isHovered && badgeRef.current) {
+    const handleClickOutside = (e: MouseEvent | TouchEvent) => {
+      if (badgeRef.current && !badgeRef.current.contains(e.target as Node)) {
+        setIsOpen(false);
+      }
+    };
+    if (isOpen && isTouchDevice.current) {
+      document.addEventListener('mousedown', handleClickOutside);
+      document.addEventListener('touchstart', handleClickOutside);
+    }
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('touchstart', handleClickOutside);
+    };
+  }, [isOpen]);
+
+  useEffect(() => {
+    if (isOpen && badgeRef.current) {
       const rect = badgeRef.current.getBoundingClientRect();
-      // For position: fixed, use viewport-relative coordinates (no scroll offset needed)
+      const viewportHeight = window.innerHeight;
+      const tooltipEstimatedHeight = 80;
+
+      // Check if tooltip would go below viewport
+      const spaceBelow = viewportHeight - rect.bottom;
+      const showAbove = spaceBelow < tooltipEstimatedHeight + 20;
+
       setTooltipPosition({
-        top: rect.bottom + 8,
+        top: showAbove ? rect.top - 8 : rect.bottom + 8,
         left: rect.left + rect.width / 2,
+        showAbove,
       });
-    } else if (!isHovered) {
-      // Reset position when not hovered to ensure recalculation on next hover
+    } else if (!isOpen) {
       setTooltipPosition(null);
     }
-  }, [isHovered]);
+  }, [isOpen]);
 
+  // Touch/click handlers for mobile support
+  const handleTouchStart = () => {
+    isTouchDevice.current = true;
+  };
+
+  const handleClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsOpen(!isOpen);
+  };
+
+  const handleMouseEnter = () => {
+    if (!isTouchDevice.current) {
+      setIsOpen(true);
+    }
+  };
+
+  const handleMouseLeave = () => {
+    if (!isTouchDevice.current) {
+      setIsOpen(false);
+    }
+  };
+
+  // Size classes - 1.5x larger for better visibility
   const sizeClasses = {
     sm: {
-      container: 'px-2 py-1 gap-2',
-      icon: 'w-8 h-8',
-      text: 'text-xs',
-      emoji: 'text-lg',
-    },
-    md: {
-      container: 'px-3 py-1.5 gap-2.5',
-      icon: 'w-12 h-12',
+      container: 'px-2.5 py-1.5 gap-2',
+      icon: 'w-12 h-12',     // Was w-8 h-8 (32px), now 48px
       text: 'text-sm',
       emoji: 'text-2xl',
     },
+    md: {
+      container: 'px-3.5 py-2 gap-3',
+      icon: 'w-16 h-16',     // Was w-12 h-12 (48px), now 64px
+      text: 'text-base',
+      emoji: 'text-3xl',
+    },
     lg: {
-      container: 'px-4 py-2 gap-3',
-      icon: 'w-16 h-16',
-      text: 'text-base font-black',
-      emoji: 'text-4xl',
+      container: 'px-5 py-2.5 gap-4',
+      icon: 'w-20 h-20',     // Was w-16 h-16 (64px), now 80px
+      text: 'text-lg font-black',
+      emoji: 'text-5xl',
     },
   };
 
@@ -115,8 +163,10 @@ const PlayerArchetypeBadge: React.FC<PlayerArchetypeBadgeProps> = ({
         sizes.container,
         className
       )}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
+      onClick={handleClick}
+      onTouchStart={handleTouchStart}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
       initial={animate ? { scale: 0, rotate: -10 } : false}
       animate={{ scale: 1, rotate: 0 }}
       whileHover={{ scale: 1.05, rotate: 2 }}
@@ -129,8 +179,8 @@ const PlayerArchetypeBadge: React.FC<PlayerArchetypeBadgeProps> = ({
           <Image
             src={archetype.icon}
             alt={archetype.name}
-            width={64}
-            height={64}
+            width={80}
+            height={80}
             className="w-full h-full object-contain"
             onError={() => setImageError(true)}
           />
@@ -152,25 +202,30 @@ const PlayerArchetypeBadge: React.FC<PlayerArchetypeBadgeProps> = ({
 
   const tooltipContent = (
     <AnimatePresence>
-      {isHovered && isMounted && tooltipPosition && (
+      {isOpen && isMounted && tooltipPosition && (
         <motion.div
-          initial={{ opacity: 0, y: 5, scale: 0.95 }}
+          initial={{ opacity: 0, y: tooltipPosition.showAbove ? -5 : 5, scale: 0.95 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
-          exit={{ opacity: 0, y: 5, scale: 0.95 }}
+          exit={{ opacity: 0, y: tooltipPosition.showAbove ? -5 : 5, scale: 0.95 }}
           transition={{ duration: 0.15 }}
           className={cn(
             'fixed z-[9999] -translate-x-1/2',
             'px-3 py-2 rounded-neo border-2 border-neo-black',
             'bg-neo-cream shadow-hard',
-            'whitespace-nowrap pointer-events-none'
+            'whitespace-nowrap',
+            tooltipPosition.showAbove && '-translate-y-full'
           )}
           style={{
             top: tooltipPosition.top,
             left: tooltipPosition.left,
           }}
         >
-          {/* Arrow */}
-          <div className="absolute -top-2 left-1/2 -translate-x-1/2 w-3 h-3 rotate-45 bg-neo-cream text-neo-black border-l-2 border-t-2 border-neo-black" />
+          {/* Arrow - points down when showing above, up when showing below */}
+          {tooltipPosition.showAbove ? (
+            <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-3 h-3 rotate-45 bg-neo-cream border-r-2 border-b-2 border-neo-black" />
+          ) : (
+            <div className="absolute -top-2 left-1/2 -translate-x-1/2 w-3 h-3 rotate-45 bg-neo-cream border-l-2 border-t-2 border-neo-black" />
+          )}
 
           <p className="text-sm font-bold text-neo-black relative z-10">
             {t(`archetypes.${archetype.id}Desc`) || archetype.description}

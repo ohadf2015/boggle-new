@@ -250,6 +250,7 @@ const MultiplayerFlow: React.FC<MultiplayerFlowProps> = ({
           gameCode={prefilledRoom || ''}
           username={savedUsername || ''}
           avatarId={savedAvatarId || ''}
+          profilePictureUrl={profilePictureUrl}
           isJoining={isJoining}
           onJoin={handleInvitationJoin}
           onChangeProfile={handleChangeProfileFromInvitation}

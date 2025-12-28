@@ -1159,10 +1159,14 @@ export default function MultiplayerPage(): React.JSX.Element {
   }, [socket, gameCode]);
 
   const handleReturnToRoom = useCallback(() => {
+    // Emit ready confirmation to server before hiding results
+    if (socket && gameCode) {
+      socket.emit('confirmReadyForNextGame');
+    }
     setShowResults(false);
     setResultsData(null);
     setPendingGameStart(null);
-  }, []);
+  }, [socket, gameCode]);
 
   const handleShowResults = useCallback((data: unknown) => {
     setResultsData(data as ResultsData);

@@ -53,6 +53,7 @@ const ConsolidatedPlayerCard: React.FC<ConsolidatedPlayerCardProps> = memo(({
   const [showDetails, setShowDetails] = useState(false);
   const [showWords, setShowWords] = useState(false);
   const [showXp, setShowXp] = useState(false);
+  const [showAchievements, setShowAchievements] = useState(false);
 
   const isWinner = rank === 1;
   const pointsFromWinner = winnerScore - player.score;
@@ -404,18 +405,40 @@ const ConsolidatedPlayerCard: React.FC<ConsolidatedPlayerCardProps> = memo(({
             </>
           )}
 
-          {/* Achievements - Always visible if present */}
+          {/* Collapsible: Achievements */}
           {gameAchievements.length > 0 && (
-            <div className="pt-3 border-t border-white/10">
-              <p className="text-xs font-black mb-2 text-neo-purple uppercase">
-                {t('hostView.achievements')}:
-              </p>
-              <div className="flex flex-wrap gap-2">
-                {gameAchievements.map((ach, i) => (
-                  <AchievementBadge key={i} achievement={ach} index={i} />
-                ))}
-              </div>
-            </div>
+            <>
+              <button
+                onClick={() => setShowAchievements(!showAchievements)}
+                aria-expanded={showAchievements}
+                className="w-full flex items-center justify-between p-2 rounded-neo text-sm font-bold text-white uppercase border-2 border-neo-yellow/50 bg-neo-yellow/10 hover:bg-neo-yellow/20 transition-colors"
+              >
+                <span className="flex items-center gap-2">
+                  <Award className="w-4 h-4" />
+                  {t('hostView.achievements') || 'Achievements'} ({gameAchievements.length})
+                </span>
+                <motion.div animate={{ rotate: showAchievements ? 180 : 0 }} transition={{ duration: 0.2 }}>
+                  <ChevronDown className="w-5 h-5" />
+                </motion.div>
+              </button>
+              <AnimatePresence>
+                {showAchievements && (
+                  <motion.div
+                    initial={{ height: 0, opacity: 0 }}
+                    animate={{ height: 'auto', opacity: 1 }}
+                    exit={{ height: 0, opacity: 0 }}
+                    transition={{ duration: 0.25 }}
+                    className="overflow-hidden mt-2"
+                  >
+                    <div className="flex flex-wrap gap-2">
+                      {gameAchievements.map((ach, i) => (
+                        <AchievementBadge key={i} achievement={ach} index={i} />
+                      ))}
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </>
           )}
         </div>
       </div>

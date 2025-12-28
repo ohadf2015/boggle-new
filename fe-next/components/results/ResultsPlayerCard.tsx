@@ -7,7 +7,7 @@ import { useLanguage } from '../../contexts/LanguageContext';
 import { cn } from '../../lib/utils';
 import { applyHebrewFinalLetters } from '../../utils/utils';
 import { calculatePlayerInsights } from '../../utils/gameInsights';
-import { ChevronDown, ChevronUp } from 'lucide-react';
+import { ChevronDown, ChevronUp, Award } from 'lucide-react';
 import Avatar from '../Avatar';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../ui/tooltip';
 import logger from '@/utils/logger';
@@ -15,69 +15,8 @@ import XpBreakdownCard from './XpBreakdownCard';
 import PlayerArchetypeBadge from './PlayerArchetypeBadge';
 import { WordPointsGroup, SharedWordsSection, InvalidWordsSection } from './WordPointsGroup';
 import { getRankIconString, getRankBoxStyle, getCardStyle } from '../../utils/rankingStyles';
-import type { WordObject, GameAchievement, ResultsPlayerCardProps } from './types';
-
-// Lifetime/career achievement keys that should NOT be shown in game results
-// These are cumulative achievements that don't apply to a single round
-const LIFETIME_ACHIEVEMENT_KEYS = new Set([
-  'VETERAN',        // 50 games played
-  'CENTURION',      // 100 games played
-  'WORD_COLLECTOR', // 1000 total words
-  'WORD_HOARDER',   // 5000 total words
-  'CHAMPION',       // 25 wins
-  'LEGEND',         // 100 wins
-  'POINT_MASTER',   // 10000 total points
-  'POINT_KING',     // 50000 total points
-  'DEDICATION',     // 7 unique days
-  'LOYAL_PLAYER',   // 30 unique days
-]);
-
-// Achievement thresholds for validation (base thresholds, may scale with game duration)
-// These are set to 50% of the actual thresholds to account for time scaling
-const ACHIEVEMENT_WORD_THRESHOLDS: Record<string, number> = {
-  'WORDSMITH': 25,          // Actual: ~50 words (scaled)
-  'LEXICON': 32,            // Actual: ~65 words (scaled)
-  'UNSTOPPABLE': 37,        // Actual: ~75 words (scaled)
-  'VOCABULARY_TITAN': 42,   // Actual: ~85 words (scaled)
-  'DICTIONARY_DIVER': 32,   // Actual: ~65 words (scaled)
-};
-
-/**
- * Filter achievements to only show game-specific achievements
- * Excludes lifetime/career achievements and achievements that don't match player's round stats
- */
-const filterGameAchievements = (
-  achievements: GameAchievement[],
-  allWords?: WordObject[]
-): GameAchievement[] => {
-  if (!achievements || !Array.isArray(achievements)) return [];
-
-  const validWordCount = allWords
-    ? allWords.filter(w => w && !w.isDuplicate && w.validated).length
-    : 0;
-
-  return achievements.filter(ach => {
-    const key = ach.key || ach.name || '';
-
-    // Filter out lifetime achievements - these should not appear in round results
-    if (LIFETIME_ACHIEVEMENT_KEYS.has(key)) {
-      logger.debug(`[RESULTS] Filtering out lifetime achievement: ${key}`);
-      return false;
-    }
-
-    // Validate word-count-based achievements against actual round stats
-    // Use a generous threshold (50% of base) to account for time scaling
-    const threshold = ACHIEVEMENT_WORD_THRESHOLDS[key];
-    if (threshold && validWordCount < threshold * 0.5) {
-      // Achievement requires more words than player actually found
-      // This suggests stale data from a previous game
-      logger.warn(`[RESULTS] Filtering out invalid achievement: ${key} (${validWordCount} words < ${threshold * 0.5} threshold)`);
-      return false;
-    }
-
-    return true;
-  });
-};
+import { filterGameAchievements } from './utils';
+import type { WordObject, ResultsPlayerCardProps } from './types';
 
 const ResultsPlayerCard: React.FC<ResultsPlayerCardProps> = memo(({ player, index, allPlayerWords, currentUsername, isWinner, xpGainedData, levelUpData, duplicateRuleDisabled, archetype }) => {
   const { t, dir } = useLanguage();
@@ -90,6 +29,7 @@ const ResultsPlayerCard: React.FC<ResultsPlayerCardProps> = memo(({ player, inde
 
   // Don't auto-expand - current player has ConsolidatedPlayerCard above
   const [isWordsExpanded, setIsWordsExpanded] = useState(false);
+  const [showAchievements, setShowAchievements] = useState(false);
 
   const handleToggleExpand = useCallback(() => {
     setIsWordsExpanded(prev => !prev);
@@ -474,17 +414,41 @@ const ResultsPlayerCard: React.FC<ResultsPlayerCardProps> = memo(({ player, inde
 
         {/* Player Insights - Disabled for current player (shown in ConsolidatedPlayerCard above) */}
 
-        {/* Achievements Section - Only for other players (current player has it in ConsolidatedPlayerCard) */}
+        {/* Collapsible Achievements Section - Only for other players (current player has it in ConsolidatedPlayerCard) */}
         {gameAchievements.length > 0 && !isCurrentPlayer && (
-          <div className="mt-3 pt-3 sm:mt-4 sm:pt-4 border-t-4 border-neo-black relative z-10">
-            <p className="text-sm font-black mb-2 text-neo-purple uppercase">
-              {t('hostView.achievements')}:
-            </p>
-            <div className="flex flex-wrap gap-2">
-              {gameAchievements.map((ach, i) => (
-                <AchievementBadge key={i} achievement={ach} index={i} />
-              ))}
-            </div>
+          <div className="mt-2 relative z-10">
+            <button
+              onClick={() => setShowAchievements(!showAchievements)}
+              aria-expanded={showAchievements}
+              className="w-full flex items-center justify-between p-2 rounded-neo text-sm font-black text-neo-black dark:text-neo-cream uppercase border-2 border-neo-black bg-neo-yellow/20 dark:bg-neo-yellow/10 shadow-hard-sm hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-hard transition-all"
+            >
+              <span className="flex items-center gap-2">
+                <Award className="w-4 h-4 text-neo-purple" />
+                {t('hostView.achievements') || 'Achievements'} ({gameAchievements.length})
+              </span>
+              {showAchievements ? (
+                <ChevronUp className="w-5 h-5" />
+              ) : (
+                <ChevronDown className="w-5 h-5" />
+              )}
+            </button>
+            <AnimatePresence>
+              {showAchievements && (
+                <motion.div
+                  initial={{ height: 0, opacity: 0 }}
+                  animate={{ height: 'auto', opacity: 1 }}
+                  exit={{ height: 0, opacity: 0 }}
+                  transition={{ duration: 0.25 }}
+                  className="overflow-hidden"
+                >
+                  <div className="flex flex-wrap gap-2 pt-2">
+                    {gameAchievements.map((ach, i) => (
+                      <AchievementBadge key={i} achievement={ach} index={i} />
+                    ))}
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
         )}
 

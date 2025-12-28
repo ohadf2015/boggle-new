@@ -13,6 +13,7 @@ interface InvitationQuickJoinProps {
   gameCode: string;
   username: string;
   avatarId: string;
+  profilePictureUrl?: string | null;
   isJoining: boolean;
   onJoin: () => void;
   onChangeProfile: () => void;
@@ -27,6 +28,7 @@ const InvitationQuickJoin: React.FC<InvitationQuickJoinProps> = ({
   gameCode,
   username,
   avatarId,
+  profilePictureUrl,
   isJoining,
   onJoin,
   onChangeProfile,
@@ -94,6 +96,7 @@ const InvitationQuickJoin: React.FC<InvitationQuickJoinProps> = ({
                   </p>
                   <div className="flex items-center justify-center gap-4 p-4 rounded-neo bg-neo-cyan/10 dark:bg-neo-cyan/5 border-2 border-neo-cyan/30">
                     <Avatar
+                      profilePictureUrl={profilePictureUrl ?? undefined}
                       avatarImage={avatarId}
                       size="xl"
                       className="border-3 border-neo-black"

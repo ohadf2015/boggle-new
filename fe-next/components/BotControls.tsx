@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FaRobot, FaPlus, FaTimes, FaMagic } from 'react-icons/fa';
+import { FaRobot, FaPlus, FaTimes, FaMagic, FaChevronDown } from 'react-icons/fa';
 import { Badge } from './ui/badge';
 import { Switch } from './ui/switch';
 import { cn } from '../lib/utils';
@@ -59,6 +59,7 @@ interface BotControlsProps {
   players?: BotControlsPlayer[];
   disabled?: boolean;
   maxPlayers?: number;
+  defaultCollapsed?: boolean;
 }
 
 const BotControls: React.FC<BotControlsProps> = ({
@@ -67,11 +68,13 @@ const BotControls: React.FC<BotControlsProps> = ({
   players = [] as BotControlsPlayer[],
   disabled = false,
   maxPlayers = 8,
+  defaultCollapsed = true,
 }) => {
   const { t } = useLanguage();
   const [addingDifficulty, setAddingDifficulty] = useState<BotDifficulty | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [announcement, setAnnouncement] = useState<string>('');
+  const [isCollapsed, setIsCollapsed] = useState(defaultCollapsed);
 
   const bots = players.filter(p => p.isBot === true);
   const playerCount = players.length;
@@ -138,12 +141,21 @@ const BotControls: React.FC<BotControlsProps> = ({
   const handleAddBot = useCallback((difficulty: BotDifficulty): void => {
     if (!socket || !canAddMore || addingDifficulty || disabled) return;
 
+    // Auto-expand when adding bots
+    setIsCollapsed(false);
     setAddingDifficulty(difficulty);
     setError(null);
     socket.emit('addBot', { difficulty });
 
     setTimeout(() => setAddingDifficulty(null), 3000);
   }, [socket, canAddMore, addingDifficulty, disabled]);
+
+  // Auto-expand when auto-fill is enabled
+  useEffect(() => {
+    if (autoFillEnabled) {
+      setIsCollapsed(false);
+    }
+  }, [autoFillEnabled]);
 
   const getDifficultyConfig = (difficulty: BotDifficulty | undefined): BotDifficultyOption => {
     return BOT_DIFFICULTIES.find(d => d.value === difficulty) || BOT_DIFFICULTIES[1];
@@ -156,19 +168,37 @@ const BotControls: React.FC<BotControlsProps> = ({
         {announcement}
       </div>
 
-      {/* Header */}
-      <div className="flex items-center gap-2">
-        <FaRobot className="text-neo-cyan" aria-hidden="true" />
-        <span className="text-sm font-bold uppercase text-neo-cream/90">
-          {t('bots.title') || 'AI Bots'}
-        </span>
-        {bots.length > 0 && (
-          <Badge className="bg-neo-cyan text-neo-black text-xs px-2 py-0.5 font-bold">
-            {bots.length}
-          </Badge>
-        )}
-      </div>
+      {/* Collapsible Header */}
+      <button
+        type="button"
+        onClick={() => setIsCollapsed(!isCollapsed)}
+        className="w-full flex items-center justify-between p-2 rounded-neo text-sm font-bold text-neo-cream uppercase border-2 border-neo-cream/30 bg-transparent hover:bg-white/5 transition-all"
+        aria-expanded={!isCollapsed}
+      >
+        <div className="flex items-center gap-2">
+          <FaRobot className="text-neo-cyan" aria-hidden="true" />
+          <span>{t('bots.title') || 'AI Bots'}</span>
+          {bots.length > 0 && (
+            <Badge className="bg-neo-cyan text-neo-black text-xs px-2 py-0.5 font-bold">
+              {bots.length}
+            </Badge>
+          )}
+        </div>
+        <motion.div animate={{ rotate: isCollapsed ? 0 : 180 }} transition={{ duration: 0.2 }}>
+          <FaChevronDown className="text-neo-cream/70" />
+        </motion.div>
+      </button>
 
+      {/* Collapsible Content */}
+      <AnimatePresence>
+        {!isCollapsed && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            className="overflow-hidden space-y-3"
+          >
       {/* Error Message */}
       <AnimatePresence>
         {error && (
@@ -330,6 +360,9 @@ const BotControls: React.FC<BotControlsProps> = ({
           </p>
         </div>
       )}
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };

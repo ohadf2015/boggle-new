@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Lightbulb, ChevronDown, ChevronUp, Users } from 'lucide-react';
+import { ChevronDown, ChevronUp, Users } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 import { applyHebrewFinalLetters } from '@/utils/utils';
@@ -20,8 +20,8 @@ interface MissedWordsProps {
 }
 
 /**
- * Neo-Brutalist Missed Words Section
- * Shows high-value words that others found but you missed
+ * Neo-Brutalist "Found by Opponents" Section
+ * Shows high-value words that opponents discovered first
  * Educational and motivating - helps players learn new words
  */
 const MissedWords: React.FC<MissedWordsProps> = ({
@@ -60,14 +60,14 @@ const MissedWords: React.FC<MissedWordsProps> = ({
         {/* Header */}
         <div className="flex items-center gap-2 px-4 py-3 bg-neo-orange text-neo-black border-b-3 border-neo-black">
           <div className="w-8 h-8 rounded-neo bg-neo-cream text-neo-black border-2 border-neo-black flex items-center justify-center shadow-hard-sm">
-            <Lightbulb className="w-5 h-5 text-neo-orange" />
+            <Users className="w-5 h-5 text-neo-orange" />
           </div>
           <div>
             <h3 className="font-black text-neo-black uppercase text-sm">
-              {t('results.missedWords') || 'Words You Missed'}
+              {t('results.foundByOpponents') || 'Found by Opponents'}
             </h3>
             <p className="text-xs font-bold text-neo-black/70">
-              {t('results.missedWordsHint') || 'High-value words found by others'}
+              {t('results.foundByOpponentsHint') || 'Words opponents discovered first'}
             </p>
           </div>
         </div>
@@ -153,7 +153,7 @@ const MissedWords: React.FC<MissedWordsProps> = ({
         {/* Motivational footer */}
         <div className="px-4 py-2 bg-neo-cream/50 text-neo-black dark:bg-slate-800/50 dark:text-white border-t-2 border-neo-black/10">
           <p className="text-xs text-center font-bold text-muted-foreground">
-            {t('results.missedWordsMotivation') || "Learn these for next time!"}
+            {t('results.foundByOpponentsMotivation') || "Learn these for next time!"}
           </p>
         </div>
       </div>

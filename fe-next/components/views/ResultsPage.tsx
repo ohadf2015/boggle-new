@@ -3,7 +3,7 @@
 import React, { useMemo, useEffect, useState, useCallback, useRef, useDeferredValue, useTransition } from 'react';
 import dynamic from 'next/dynamic';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FaTrophy, FaStar, FaDoorOpen } from 'react-icons/fa';
+import { FaTrophy, FaStar, FaDoorOpen, FaCheck, FaArrowRight } from 'react-icons/fa';
 import ExitRoomButton from '@/components/ExitRoomButton';
 import confetti from 'canvas-confetti';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -31,7 +31,7 @@ const WinStreakDisplay = dynamic(() => import('@/components/results/WinStreakDis
 const WordFeedbackModal = dynamic(() => import('@/components/voting/WordFeedbackModal'), { ssr: false });
 const MissedWords = dynamic(() => import('@/components/results/MissedWords'), { ssr: false });
 const PlayersReadyIndicator = dynamic(() => import('@/components/results/PlayersReadyIndicator'), { ssr: false });
-const AutoRejoinTimer = dynamic(() => import('@/components/results/AutoRejoinTimer'), { ssr: false });
+// AutoRejoinTimer removed - players now actively confirm readiness
 import CollapsibleSection from '@/components/ui/CollapsibleSection';
 import { Users } from 'lucide-react';
 
@@ -60,11 +60,11 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
   const [xpGainedData, setXpGainedData] = useState<XpGainedData | null>(null);
   const [levelUpData, setLevelUpData] = useState<LevelUpData | null>(null);
 
-  // Auto-rejoin timer state
-  const [autoRejoinDismissed, setAutoRejoinDismissed] = useState<boolean>(false);
-
   // Track which players are ready for next game (received from socket)
   const [readyUsernames, setReadyUsernames] = useState<string[]>([]);
+
+  // Track if current player has confirmed they're ready
+  const [isCurrentPlayerReady, setIsCurrentPlayerReady] = useState<boolean>(false);
 
   // State for sticky action bar visibility (must be declared before any conditional returns)
   const [showStickyActions, setShowStickyActions] = useState<boolean>(true);
@@ -391,12 +391,20 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
       // If we receive the full list of ready usernames, use it
       if (data.readyUsernames) {
         setReadyUsernames(data.readyUsernames);
+        // Check if current player is in the ready list
+        if (username && data.readyUsernames.includes(username)) {
+          setIsCurrentPlayerReady(true);
+        }
       } else if (data.username) {
         // Otherwise, add the new ready username to the list
         setReadyUsernames(prev => {
           if (prev.includes(data.username!)) return prev;
           return [...prev, data.username!];
         });
+        // Check if current player just became ready
+        if (data.username === username) {
+          setIsCurrentPlayerReady(true);
+        }
       }
     };
 
@@ -408,7 +416,7 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
     return () => {
       socket.off('playersReadyUpdate', handlePlayersReadyUpdate);
     };
-  }, [socket]);
+  }, [socket, username]);
 
   // Handle word feedback vote (supports multi-word queue from self-healing system)
   // Memoized to prevent recreation on every render
@@ -439,6 +447,14 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
     setWordToVote(null);
     setWordQueue([]); // Clear the queue
   }, []);
+
+  // Handle marking the player as ready for the next game
+  const handleMarkReady = useCallback(() => {
+    if (!socket || isCurrentPlayerReady) return;
+    logger.log('[RESULTS] Marking player as ready for next game');
+    socket.emit('confirmReadyForNextGame');
+    setIsCurrentPlayerReady(true);
+  }, [socket, isCurrentPlayerReady]);
 
   // Hide sticky bar when play again section is visible (portrait mode only)
   useEffect(() => {
@@ -518,20 +534,41 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
           {/* Action Buttons */}
           {gameCode && onReturnToRoom && (
             <div className="flex gap-2 mt-2">
-              <button
-                onClick={onReturnToRoom}
-                className="flex-1 bg-neo-yellow text-neo-black font-bold text-sm py-2 px-3 uppercase border-2 border-neo-black rounded-neo shadow-hard-sm flex items-center justify-center gap-1"
-              >
-                <FaStar className="text-xs" />
-                {t('results.stayInRoom')}
-              </button>
-              <button
-                onClick={handleExitRoom}
-                className="flex-1 bg-neo-red text-neo-cream font-bold text-sm py-2 px-3 uppercase border-2 border-neo-black rounded-neo shadow-hard-sm flex items-center justify-center gap-1"
-              >
-                <FaDoorOpen className="text-xs" />
-                {t('results.leaveRoom')}
-              </button>
+              {isCurrentPlayerReady ? (
+                <>
+                  <button
+                    onClick={onReturnToRoom}
+                    className="flex-1 bg-emerald-500 text-white font-bold text-sm py-2 px-3 uppercase border-2 border-neo-black rounded-neo shadow-hard-sm flex items-center justify-center gap-1"
+                  >
+                    <FaCheck className="text-xs" />
+                    {t('results.ready')}
+                  </button>
+                  <button
+                    onClick={handleExitRoom}
+                    className="flex-1 bg-neo-red text-neo-cream font-bold text-sm py-2 px-3 uppercase border-2 border-neo-black rounded-neo shadow-hard-sm flex items-center justify-center gap-1"
+                  >
+                    <FaDoorOpen className="text-xs" />
+                    {t('results.leaveRoom')}
+                  </button>
+                </>
+              ) : (
+                <>
+                  <button
+                    onClick={handleMarkReady}
+                    className="flex-1 bg-neo-yellow text-neo-black font-bold text-sm py-2 px-3 uppercase border-2 border-neo-black rounded-neo shadow-hard-sm flex items-center justify-center gap-1"
+                  >
+                    <FaStar className="text-xs" />
+                    {t('results.imReady')}
+                  </button>
+                  <button
+                    onClick={handleExitRoom}
+                    className="flex-1 bg-neo-red text-neo-cream font-bold text-sm py-2 px-3 uppercase border-2 border-neo-black rounded-neo shadow-hard-sm flex items-center justify-center gap-1"
+                  >
+                    <FaDoorOpen className="text-xs" />
+                    {t('results.leaveRoom')}
+                  </button>
+                </>
+              )}
             </div>
           )}
         </div>
@@ -762,7 +799,7 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
             className="mt-4 max-w-4xl mx-auto"
             style={{ transform: 'rotate(1deg)' }}
           >
-            <div className="p-5 sm:p-6 bg-neo-cyan text-neo-black border-4 border-neo-black rounded-neo-lg shadow-hard-xl relative overflow-hidden texture-halftone-comic">
+            <div className={`p-5 sm:p-6 ${isCurrentPlayerReady ? 'bg-emerald-500' : 'bg-neo-cyan'} text-neo-black border-4 border-neo-black rounded-neo-lg shadow-hard-xl relative overflow-hidden texture-halftone-comic transition-colors duration-300`}>
               {/* Comic-style halftone texture pattern */}
               <div
                 className="absolute inset-0 pointer-events-none opacity-[0.05]"
@@ -772,43 +809,101 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
                 }}
               />
               <div className="text-center space-y-4 relative z-10">
-                <motion.h3
-                  className="text-xl sm:text-2xl font-black text-neo-black uppercase"
-                  style={{ textShadow: '2px 2px 0px var(--neo-yellow)' }}
-                  animate={{ scale: [1, 1.02, 1] }}
-                  transition={{ duration: 2, repeat: Infinity }}
-                >
-                  {t('results.playAgainQuestion')}
-                </motion.h3>
-                <p className="text-neo-black text-sm font-bold">
-                  {t('results.playAgainDescription')}
-                </p>
-                <div className="flex flex-col sm:flex-row gap-3 justify-center mt-4">
-                  <motion.div
-                    whileHover={{ x: -2, y: -2 }}
-                    whileTap={{ x: 2, y: 2 }}
-                  >
-                    <button
-                      onClick={onReturnToRoom}
-                      className="w-full sm:w-auto bg-neo-yellow text-neo-black font-black text-lg px-8 py-3 uppercase border-4 border-neo-black rounded-neo shadow-hard hover:shadow-hard-lg transition-all flex items-center justify-center gap-2"
+                {isCurrentPlayerReady ? (
+                  <>
+                    {/* Ready State */}
+                    <motion.div
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 1 }}
+                      transition={{ type: 'spring', stiffness: 300, damping: 20 }}
+                      className="flex items-center justify-center gap-3"
                     >
-                      <FaStar />
-                      {t('results.stayInRoom')}
-                    </button>
-                  </motion.div>
-                  <motion.div
-                    whileHover={{ x: -2, y: -2 }}
-                    whileTap={{ x: 2, y: 2 }}
-                  >
-                    <button
-                      onClick={handleExitRoom}
-                      className="w-full sm:w-auto bg-neo-red text-neo-cream font-black text-lg px-8 py-3 uppercase border-4 border-neo-black rounded-neo shadow-hard hover:shadow-hard-lg transition-all flex items-center justify-center gap-2"
+                      <motion.div
+                        animate={{ scale: [1, 1.2, 1] }}
+                        transition={{ duration: 1, repeat: Infinity }}
+                        className="w-12 h-12 bg-white rounded-full flex items-center justify-center border-4 border-neo-black shadow-hard"
+                      >
+                        <FaCheck className="text-emerald-500 text-2xl" />
+                      </motion.div>
+                      <h3
+                        className="text-xl sm:text-2xl font-black text-white uppercase"
+                        style={{ textShadow: '2px 2px 0px rgba(0,0,0,0.3)' }}
+                      >
+                        {t('results.youAreReady')}
+                      </h3>
+                    </motion.div>
+                    <p className="text-white/90 text-sm font-bold">
+                      {t('results.waitingForOthersToReady')}
+                    </p>
+                    <div className="flex flex-col sm:flex-row gap-3 justify-center mt-4">
+                      <motion.div
+                        whileHover={{ x: -2, y: -2 }}
+                        whileTap={{ x: 2, y: 2 }}
+                      >
+                        <button
+                          onClick={onReturnToRoom}
+                          className="w-full sm:w-auto bg-white text-neo-black font-black text-base px-6 py-2.5 uppercase border-3 border-neo-black rounded-neo shadow-hard hover:shadow-hard-lg transition-all flex items-center justify-center gap-2"
+                        >
+                          <FaArrowRight />
+                          {t('results.goToLobby')}
+                        </button>
+                      </motion.div>
+                      <motion.div
+                        whileHover={{ x: -2, y: -2 }}
+                        whileTap={{ x: 2, y: 2 }}
+                      >
+                        <button
+                          onClick={handleExitRoom}
+                          className="w-full sm:w-auto bg-neo-red text-neo-cream font-black text-base px-6 py-2.5 uppercase border-3 border-neo-black rounded-neo shadow-hard hover:shadow-hard-lg transition-all flex items-center justify-center gap-2"
+                        >
+                          <FaDoorOpen />
+                          {t('results.leaveRoom')}
+                        </button>
+                      </motion.div>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    {/* Not Ready State */}
+                    <motion.h3
+                      className="text-xl sm:text-2xl font-black text-neo-black uppercase"
+                      style={{ textShadow: '2px 2px 0px var(--neo-yellow)' }}
+                      animate={{ scale: [1, 1.02, 1] }}
+                      transition={{ duration: 2, repeat: Infinity }}
                     >
-                      <FaDoorOpen />
-                      {t('results.leaveRoom')}
-                    </button>
-                  </motion.div>
-                </div>
+                      {t('results.playAgainQuestion')}
+                    </motion.h3>
+                    <p className="text-neo-black text-sm font-bold">
+                      {t('results.markReadyDescription')}
+                    </p>
+                    <div className="flex flex-col sm:flex-row gap-3 justify-center mt-4">
+                      <motion.div
+                        whileHover={{ x: -2, y: -2 }}
+                        whileTap={{ x: 2, y: 2 }}
+                      >
+                        <button
+                          onClick={handleMarkReady}
+                          className="w-full sm:w-auto bg-neo-yellow text-neo-black font-black text-lg px-8 py-3 uppercase border-4 border-neo-black rounded-neo shadow-hard hover:shadow-hard-lg transition-all flex items-center justify-center gap-2"
+                        >
+                          <FaStar />
+                          {t('results.imReady')}
+                        </button>
+                      </motion.div>
+                      <motion.div
+                        whileHover={{ x: -2, y: -2 }}
+                        whileTap={{ x: 2, y: 2 }}
+                      >
+                        <button
+                          onClick={handleExitRoom}
+                          className="w-full sm:w-auto bg-neo-red text-neo-cream font-black text-lg px-8 py-3 uppercase border-4 border-neo-black rounded-neo shadow-hard hover:shadow-hard-lg transition-all flex items-center justify-center gap-2"
+                        >
+                          <FaDoorOpen />
+                          {t('results.leaveRoom')}
+                        </button>
+                      </motion.div>
+                    </div>
+                  </>
+                )}
               </div>
             </div>
           </motion.div>
@@ -870,15 +965,6 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
         onTimeout={handleFeedbackSkip}
       />
 
-      {/* Auto-Rejoin Timer - shows countdown to auto-return to room */}
-      {gameCode && onReturnToRoom && !autoRejoinDismissed && (
-        <AutoRejoinTimer
-          duration={30}
-          onRejoin={onReturnToRoom}
-          onDismiss={() => setAutoRejoinDismissed(true)}
-          visible={!showWordFeedback}
-        />
-      )}
     </div>
   );
 };

@@ -135,33 +135,29 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
 
       {/* Row 2: Waiting Message + Players List (side by side on desktop) */}
       <div className="flex flex-col lg:flex-row lg:items-stretch gap-3 sm:gap-4 md:gap-6">
-        {/* Waiting Message Card - Neo-Brutalist (matches host settings card styling) */}
-        <Card className="flex-1 p-3 sm:p-4 md:p-5 bg-slate-800/95 text-neo-white border-4 border-neo-black shadow-hard-lg flex flex-col items-center justify-center min-h-[300px]">
+        {/* Waiting Message Card - Neo-Brutalist (compact version) */}
+        <Card className="flex-1 p-2 sm:p-3 md:p-4 bg-slate-800/95 text-neo-white border-4 border-neo-black shadow-hard-lg flex flex-col items-center justify-center min-h-[180px]">
           <motion.div
             initial={{ scale: 0.9, rotate: -3 }}
             animate={{ scale: 1, rotate: 0 }}
             transition={{ type: "spring", stiffness: 300, damping: 20 }}
             className="relative"
+            aria-hidden="true"
           >
-            {/* Decorative background shapes */}
-            <div className="absolute -top-4 -right-6 w-20 h-20 bg-neo-pink border-4 border-neo-black rotate-12 -z-10" />
-            <div className="absolute -bottom-4 -left-6 w-16 h-16 bg-neo-cyan border-4 border-neo-black -rotate-6 -z-10" />
-            <div className="absolute top-1/2 -right-10 w-10 h-10 bg-neo-yellow border-3 border-neo-black rotate-45 -z-10" />
-
-            {/* Neo-Brutalist Hourglass */}
+            {/* Neo-Brutalist Hourglass - Compact */}
             <motion.div
               animate={{ rotate: [0, 10, -10, 0] }}
               transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-              className="bg-neo-yellow border-4 border-neo-black shadow-hard p-4 rotate-[2deg]"
+              className="bg-neo-yellow border-3 border-neo-black shadow-hard p-3 rotate-[2deg]"
             >
-              <div className="relative w-12 h-16 flex flex-col items-center">
-                <div className="w-0 h-0 border-l-[20px] border-r-[20px] border-t-[24px] border-l-transparent border-r-transparent border-t-neo-black" />
-                <div className="w-1.5 h-0.5 bg-neo-black -my-[1px] z-10" />
-                <div className="w-0 h-0 border-l-[20px] border-r-[20px] border-b-[24px] border-l-transparent border-r-transparent border-b-neo-black" />
+              <div className="relative w-8 h-12 flex flex-col items-center">
+                <div className="w-0 h-0 border-l-[14px] border-r-[14px] border-t-[18px] border-l-transparent border-r-transparent border-t-neo-black" />
+                <div className="w-1 h-0.5 bg-neo-black -my-[1px] z-10" />
+                <div className="w-0 h-0 border-l-[14px] border-r-[14px] border-b-[18px] border-l-transparent border-r-transparent border-b-neo-black" />
                 <motion.div
-                  animate={{ y: [0, 24, 0], opacity: [1, 1, 0] }}
+                  animate={{ y: [0, 18, 0], opacity: [1, 1, 0] }}
                   transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
-                  className="absolute top-[32px] w-1 h-3 bg-neo-pink"
+                  className="absolute top-[24px] w-0.5 h-2 bg-neo-pink"
                 />
               </div>
             </motion.div>
@@ -171,27 +167,29 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3 }}
-            className="mt-6 text-center"
+            className="mt-3 text-center"
+            role="status"
+            aria-live="polite"
           >
-            <div className="bg-neo-black text-neo-white px-6 py-3 font-black uppercase text-xl md:text-2xl tracking-wider rotate-[1deg] shadow-hard border-4 border-neo-black">
+            <div className="bg-neo-black text-neo-white px-4 py-2 font-black uppercase text-base md:text-lg tracking-wider rotate-[1deg] shadow-hard border-3 border-neo-black">
               {t('playerView.waitForGameStart')}
             </div>
             <motion.p
               animate={{ opacity: [0.6, 1, 0.6] }}
               transition={{ duration: 2, repeat: Infinity }}
-              className="text-neo-cream/75 font-bold text-sm mt-4 uppercase tracking-wide"
+              className="text-neo-cream/80 font-bold text-xs mt-2 uppercase tracking-wide"
             >
               {t('playerView.waitingForHostToStart') || 'Waiting for host to start the game...'}
             </motion.p>
           </motion.div>
 
-          <div className="flex gap-3 mt-6">
+          <div className="flex gap-2 mt-3" aria-hidden="true">
             {[0, 1, 2].map((i) => (
               <motion.div
                 key={i}
-                animate={{ scale: [1, 1.3, 1], rotate: [0, 180, 360] }}
+                animate={{ scale: [1, 1.2, 1] }}
                 transition={{ duration: 1.5, repeat: Infinity, delay: i * 0.2 }}
-                className="w-4 h-4 bg-neo-pink border-2 border-neo-black"
+                className="w-3 h-3 bg-neo-pink border-2 border-neo-black"
               />
             ))}
           </div>

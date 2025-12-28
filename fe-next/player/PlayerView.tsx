@@ -101,6 +101,9 @@ const PlayerView: React.FC<PlayerViewProps> = memo(({
   usePresence({ enabled: !!gameCode });
 
   // Use game state from GameStateContext (shared with usePlayerWordEvents and usePlayerGameEvents)
+  // CRITICAL: letterGrid and shufflingGrid MUST come from context, not local state
+  // The socket handlers in usePlayerGameEvents update the CONTEXT's grid,
+  // so we must read from context to see earthquake grid updates
   const {
     foundWords,
     setFoundWords,
@@ -108,6 +111,10 @@ const PlayerView: React.FC<PlayerViewProps> = memo(({
     totalBoardWords,
     waitingForResults,
     setWaitingForResults,
+    letterGrid,
+    setLetterGrid,
+    shufflingGrid,
+    setShufflingGrid,
   } = useGameStateContext();
 
   // Game state
@@ -115,7 +122,7 @@ const PlayerView: React.FC<PlayerViewProps> = memo(({
   const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
   const [gameActive, setGameActive] = useState<boolean>(false);
   const [achievements, setAchievements] = useState<string[]>([]);
-  const [letterGrid, setLetterGrid] = useState<LetterGrid | null>(null);
+  // letterGrid now comes from GameStateContext (see above)
   const [remainingTime, setRemainingTime] = useState<number | null>(null);
   // waitingForResults is now from context (see useGameStateContext above)
   const [showStartAnimation, setShowStartAnimation] = useState<boolean>(false);
@@ -133,7 +140,7 @@ const PlayerView: React.FC<PlayerViewProps> = memo(({
     playerCount: humanPlayerCount,
     gameActive,
   });
-  const [shufflingGrid, setShufflingGrid] = useState<LetterGrid | null>(null);
+  // shufflingGrid now comes from GameStateContext (see above)
   const [highlightedCells, setHighlightedCells] = useState<GridPosition[]>([]);
   const [gameLanguage, setGameLanguage] = useState<Language | null>(null);
 
