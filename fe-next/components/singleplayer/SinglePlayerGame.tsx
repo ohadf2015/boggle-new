@@ -570,7 +570,7 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
             body: JSON.stringify({
               words: pendingWords.map(pw => pw.word),
               language: settings.language,
-              minWordLength: 2, // Default minimum word length for single player
+              minWordLength: 3, // Minimum word length for single player
             }),
           });
 
@@ -822,7 +822,7 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
   // Memoize word submission handler to prevent recreation on every render
   const handleWordSubmit = useCallback((word: string) => {
     const normalizedWord = word.toLowerCase().trim();
-    const minWordLength = 2;
+    const minWordLength = 3;
     const now = Date.now();
 
     // Abuse detection: check if on cooldown

@@ -746,6 +746,7 @@ const ja = {
   "hints": {
     "hint": "ヒント",
     "getHint": "ヒントを得る",
+    "freeHints": "無料ヒント",
     "loading": "ヒント取得中...",
     "noHints": "ヒント残りなし",
     "noWordsLeft": "見つける単語がもうありません！",

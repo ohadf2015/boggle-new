@@ -751,6 +751,7 @@ const en = {
   "hints": {
     "hint": "Hint",
     "getHint": "Get Hint",
+    "freeHints": "Free Hints",
     "loading": "Getting hint...",
     "noHints": "No hints left",
     "noWordsLeft": "No more words to find!",

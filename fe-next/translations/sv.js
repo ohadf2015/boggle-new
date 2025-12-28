@@ -746,6 +746,7 @@ const sv = {
   "hints": {
     "hint": "Ledtråd",
     "getHint": "Få ledtråd",
+    "freeHints": "Gratis Ledtrådar",
     "loading": "Hämtar ledtråd...",
     "noHints": "Inga ledtrådar kvar",
     "noWordsLeft": "Inga fler ord att hitta!",

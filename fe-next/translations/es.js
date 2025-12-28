@@ -719,6 +719,7 @@ const es = {
   "hints": {
     "hint": "Pista",
     "getHint": "Obtener Pista",
+    "freeHints": "Pistas Gratis",
     "loading": "Obteniendo pista...",
     "noHints": "No quedan pistas",
     "noWordsLeft": "¡No hay más palabras por encontrar!",

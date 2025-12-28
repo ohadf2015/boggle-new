@@ -903,12 +903,12 @@ const TARGET_WORD_LISTS: Record<Language, string[]> = {
     'PEACEFUL', 'POWERFUL', 'BEAUTIFUL', 'WONDERFUL', 'FANTASTIC', 'ELEPHANT'
   ],
   he: [
-    // Hebrew 3-4 letter words
+    // Hebrew 3-4 letter words (minimum 3 letters)
     'בית', 'מים', 'עולם', 'אדם', 'דבר',
     'עין', 'ראש', 'ילד', 'ספר', 'שלום',
     'חבר', 'דלת', 'חלון', 'שולחן', 'כיסא',
     'שמש', 'ירח', 'כוכב', 'עץ', 'פרח',
-    'סוס', 'כלב', 'חתול', 'ציפור', 'דג',
+    'סוס', 'כלב', 'חתול', 'ציפור',
     // Hebrew 5-6 letter words
     'משפחה', 'חברה', 'עבודה', 'תרבות',
     'אהבה', 'שמחה', 'תקווה', 'חופש',

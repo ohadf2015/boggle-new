@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FaArrowLeft, FaGlobe, FaChevronDown } from 'react-icons/fa';
-import { Trophy, Timer, Flame, Target } from 'lucide-react';
+import { Trophy, Timer, Flame, Target, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import AutoHideHeader from '@/components/AutoHideHeader';
 import DailyWordHuntSurvival from './DailyWordHuntSurvival';
@@ -295,6 +295,11 @@ const DailyReadyScreen: React.FC<DailyReadyScreenProps> = ({
 }) => {
   const [showLangDropdown, setShowLangDropdown] = useState(false);
 
+  // Calculate how many languages have been completed today
+  const completedLanguagesCount = useMemo(() => {
+    return LANGUAGE_OPTIONS.filter(option => hasPlayedWordHuntToday(option.code)).length;
+  }, []);
+
   const formattedDate = useMemo(() => {
     try {
       return new Date(puzzleDate + 'T00:00:00Z').toLocaleDateString(undefined, {
@@ -341,11 +346,16 @@ const DailyReadyScreen: React.FC<DailyReadyScreenProps> = ({
             size="sm"
             onClick={() => setShowLangDropdown(!showLangDropdown)}
             onBlur={() => setTimeout(() => setShowLangDropdown(false), 200)}
-            className="flex items-center gap-2 bg-neo-cream border-3 border-neo-black rounded-neo shadow-hard-sm hover:shadow-hard transition-all"
+            className="relative flex items-center gap-2 bg-neo-cream border-3 border-neo-black rounded-neo shadow-hard-sm hover:shadow-hard transition-all"
           >
             <span className="text-lg">{currentFlag}</span>
             <FaGlobe className="w-4 h-4 text-neo-black" />
             <FaChevronDown className={`w-3 h-3 text-neo-black transition-transform ${showLangDropdown ? 'rotate-180' : ''}`} />
+            {completedLanguagesCount > 0 && (
+              <span className="absolute -top-2 -right-2 w-5 h-5 bg-neo-lime text-neo-black rounded-full border-2 border-neo-black flex items-center justify-center text-xs font-black">
+                {completedLanguagesCount}
+              </span>
+            )}
           </Button>
 
           <AnimatePresence>
@@ -358,21 +368,27 @@ const DailyReadyScreen: React.FC<DailyReadyScreenProps> = ({
                 className="absolute top-full right-0 mt-2 z-[100] bg-neo-cream border-3 border-neo-black rounded-neo shadow-hard-lg overflow-hidden min-w-[140px]"
                 onMouseDown={(e) => e.preventDefault()}
               >
-                {LANGUAGE_OPTIONS.map((option) => (
-                  <button
-                    key={option.code}
-                    onClick={() => {
-                      onLanguageChange(option.code);
-                      setShowLangDropdown(false);
-                    }}
-                    className={`w-full flex items-center gap-2 px-3 py-2 text-left hover:bg-neo-cyan/30 transition-colors ${
-                      language === option.code ? 'bg-neo-cyan/50 font-bold' : ''
-                    }`}
-                  >
-                    <span className="text-lg">{option.flag}</span>
-                    <span className="text-sm text-neo-black">{option.name}</span>
-                  </button>
-                ))}
+                {LANGUAGE_OPTIONS.map((option) => {
+                  const hasPlayed = hasPlayedWordHuntToday(option.code);
+                  return (
+                    <button
+                      key={option.code}
+                      onClick={() => {
+                        onLanguageChange(option.code);
+                        setShowLangDropdown(false);
+                      }}
+                      className={`w-full flex items-center gap-2 px-3 py-2 text-left hover:bg-neo-cyan/30 transition-colors ${
+                        language === option.code ? 'bg-neo-cyan/50 font-bold' : ''
+                      }`}
+                    >
+                      <span className="text-lg">{option.flag}</span>
+                      <span className="text-sm text-neo-black">{option.name}</span>
+                      {hasPlayed && (
+                        <Check className="w-4 h-4 ml-auto text-neo-lime" strokeWidth={3} />
+                      )}
+                    </button>
+                  );
+                })}
               </motion.div>
             )}
           </AnimatePresence>

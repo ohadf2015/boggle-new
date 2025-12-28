@@ -343,7 +343,7 @@ const PresetSelector: React.FC<PresetSelectorProps> = ({
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -10 }}
                 transition={{ duration: 0.3 }}
-                className="grid grid-cols-3 gap-3"
+                className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 gap-3"
               >
                 {modePresets.map((preset, index) => renderPresetCard(preset, index))}
               </motion.div>
@@ -498,7 +498,7 @@ const PresetSelector: React.FC<PresetSelectorProps> = ({
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
               transition={{ duration: 0.3 }}
-              className="grid grid-cols-2 gap-3"
+              className="grid grid-cols-2 sm:grid-cols-3 gap-3"
             >
               {modePresets.map((preset, index) => renderPresetCard(preset, index))}
             </motion.div>

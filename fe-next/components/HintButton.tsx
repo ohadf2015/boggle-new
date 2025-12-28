@@ -5,7 +5,7 @@
 
 import React, { memo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FaLightbulb } from 'react-icons/fa';
+import { FaLightbulb, FaStar } from 'react-icons/fa';
 import { Button } from './ui/button';
 
 interface HintButtonProps {
@@ -57,18 +57,31 @@ const HintButton = memo<HintButtonProps>(({
           ${hintsRemaining > 0
             ? 'bg-neo-yellow border-neo-black text-neo-black hover:bg-neo-orange hover:shadow-hard-sm'
             : 'bg-gray-300 border-gray-400 text-gray-600 cursor-not-allowed'}
-          border-2 rounded-neo font-bold text-sm transition-all
+          border-3 rounded-neo font-bold text-sm transition-all shadow-hard-sm
         `}
       >
         <FaLightbulb className={isLoading ? 'animate-spin' : ''} />
-        <span>
-          {isLoading
-            ? (t('hints.loading') || 'Getting hint...')
-            : hintsRemaining > 0
-              ? `${t('hints.getHint') || 'Hint'} (${hintsRemaining})`
-              : (t('hints.noHints') || 'No hints left')
-          }
-        </span>
+        <div className="flex flex-col items-start">
+          <span className="text-xs opacity-80">
+            {isLoading
+              ? (t('hints.loading') || 'Getting hint...')
+              : (t('hints.freeHints') || 'Free Hints')
+            }
+          </span>
+          <div className="flex items-center gap-1">
+            {/* Visual star tokens */}
+            {[...Array(3)].map((_, i) => (
+              <FaStar
+                key={i}
+                className={`w-3 h-3 ${
+                  i < hintsRemaining
+                    ? 'text-neo-orange'
+                    : 'text-gray-400 opacity-40'
+                }`}
+              />
+            ))}
+          </div>
+        </div>
       </Button>
 
       {/* Hint Display Popup */}

@@ -747,6 +747,7 @@ const he = {
   "hints": {
     "hint": "רמז",
     "getHint": "קבל רמז",
+    "freeHints": "רמזים חינמיים",
     "loading": "מקבל רמז...",
     "noHints": "אין רמזים נותרים",
     "noWordsLeft": "!אין עוד מילים למצוא",
