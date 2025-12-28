@@ -872,7 +872,9 @@ const sv = {
     "betterLuckNextTime": "Bättre lycka nästa gång!",
     "yourPlace": "{rank}:e plats",
     "tryAgainEncouragement": "Fortsätt spela för att förbättra dig!",
-    "of": "av"
+    "of": "av",
+    "readyForNextRound": "Redo för nästa runda?",
+    "hostStartDescription": "Starta ett nytt spel när alla är redo!"
   },
   "chart": {
     "yourProgress": "Din Utveckling",
@@ -1909,6 +1911,7 @@ const sv = {
     "wordsByLength": "Ord efter längd",
     "quitConfirmTitle": "Avsluta spelet?",
     "quitConfirmMessage": "Du kommer förlora dina framsteg. Är du säker på att du vill avsluta?",
+    "imSure": "Jag är säker",
     "gamePaused": "Spelet pausat",
     "botWords": "Hittade ord",
     "aiOpponents": "AI-motståndare",
@@ -1945,7 +1948,8 @@ const sv = {
       "personalBest": "Personbästa",
       "personalBestDesc": "Standardutmaning - följ dina framsteg",
       "ultra": "Ultra utmaning",
-      "ultraDesc": "Ultimat högpoängsutmaning"
+      "ultraDesc": "Ultimat högpoängsutmaning",
+      "letters": "bokstäver"
     },
     "wizard": {
       "selectMode": "Välj spelläge",
@@ -2079,6 +2083,8 @@ const sv = {
     "yourScore": "Din poäng",
     "completed": "Klart!",
     "quitConfirm": "Är du säker på att du vill avsluta? Dina framsteg går förlorade och du kommer inte kunna spela dagens pussel igen.",
+    "quitConfirmTitle": "Avsluta utmaning?",
+    "imSure": "Jag är säker",
     "wordsFound": "{count} ord hittade",
     "streak": "Streak",
     "streakDays": "{count} dagars streak!",
@@ -2126,7 +2132,7 @@ const sv = {
     "tryAnotherLanguage": "Prova ett annat språk",
     "playDifferentLanguage": "Utmana dig själv på ett annat språk!",
     "feedback": {
-      "tooShort": "📏 Minst 4 bokstäver",
+      "tooShort": "📏 Minst 3 bokstäver",
       "duplicate": "🔁 Redan hittat!",
       "notOnBoard": "⚠️ Kan inte bilda detta på brädet",
       "invalidWord": "❌ Inte ett giltigt ord",
@@ -2261,9 +2267,9 @@ const sv = {
       },
       "minLength": {
         "title": "⚠️ VIKTIG REGEL",
-        "description": "Ord måste vara minst 4 BOKSTÄVER långa",
-        "example1": "4 bokstäver ✓",
-        "example2": "3 bokstäver - för kort!",
+        "description": "Ord måste vara minst 3 BOKSTÄVER långa",
+        "example1": "3 bokstäver ✓",
+        "example2": "2 bokstäver - för kort!",
         "gotIt": "Jag förstår!"
       },
       "complete": {
@@ -2271,7 +2277,7 @@ const sv = {
         "remember": "Kom ihåg:",
         "rule1": "10 försök att hitta målordet",
         "rule2": "Hitta andra ord för liv",
-        "rule3": "Minimum 4 bokstäver",
+        "rule3": "Minimum 3 bokstäver",
         "rule4": "Samma pussel världen över",
         "start": "Starta daglig utmaning"
       }
@@ -2307,6 +2313,22 @@ const sv = {
     "stepOf": "Steg {current} av {total}",
     "stepOptions": "Alternativ",
     "stepReview": "Granska"
+  },
+  "home": {
+    "singlePlayer": "Enspelare",
+    "multiplayer": "Flerspelare"
+  },
+  "reveal": {
+    "revealWord": "Avslöja",
+    "finding": "Söker...",
+    "noWordsLeft": "Inga 5+ bokstavsord kvar att avslöja",
+    "notEnoughCoins": "Behöver {cost} mynt (har {balance})",
+    "gameNotActive": "Spelet är inte aktivt",
+    "coins": "Mynt",
+    "base": "Bas",
+    "efficiency": "Effektivitet",
+    "streak": "Svit",
+    "usedForReveals": "Använd mynt för att avslöja ord i enspelarspel!"
   }
 };
 

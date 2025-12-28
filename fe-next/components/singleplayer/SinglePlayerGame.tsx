@@ -23,7 +23,9 @@ import { EarthquakeWarning, FireRoundIndicator } from '@/components/earthquake';
 import ThemeIndicator from '@/components/game/ThemeIndicator';
 import { WordsRemaining } from '@/player/components/in-game/WordsRemaining';
 import HintButton from '@/components/HintButton';
+import RevealButton from '@/components/singleplayer/RevealButton';
 import { AchievementProgressTracker } from '@/components/achievements/AchievementProgressTracker';
+import { selectRandomRevealWord, getRevealableWordCount } from '@/utils/wordPathFinder';
 import { useLanguage } from '@/contexts/LanguageContext';
 import type { BoardTheme } from '@/shared/types/socket';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
@@ -33,7 +35,7 @@ import { useComboSystem } from '@/hooks/useComboSystem';
 import { useGameTimer } from '@/hooks/useGameTimer';
 import { useAutoScrollOnGameStart } from '@/hooks/useAutoScrollOnGameStart';
 import { useMobileLandscape } from '@/hooks/useMobileLandscape';
-import { generateRandomTable, applyHebrewFinalLetters } from '@/utils/utils';
+import { generateRandomTable } from '@/utils/utils';
 import { DIFFICULTIES } from '@/utils/consts';
 import { cn } from '@/lib/utils';
 import { validateWordLocally, isWordOnBoard } from '@/utils/clientWordValidator';
@@ -154,6 +156,17 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
     hintsRemaining: MAX_HINTS,
     isLoading: false,
     error: null,
+  });
+
+  // Reveal word system state
+  const [revealState, setRevealState] = useState<{
+    revealsUsed: number;
+    isLoading: boolean;
+    highlightedPath: Array<{ row: number; col: number }>;
+  }>({
+    revealsUsed: 0,
+    isLoading: false,
+    highlightedPath: [],
   });
 
   // Track grid version for earthquake recalculation
@@ -1161,6 +1174,68 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
     [...availableWords.easy, ...availableWords.medium, ...availableWords.hard]
       .filter(word => word.length >= MIN_TRACKED_WORD_LENGTH).length > 0;
 
+  // Calculate revealable word count
+  const revealableWordCount = React.useMemo(() => {
+    if (!availableWords || !grid) return 0;
+    const foundWordsList = foundWords.filter(fw => fw.isValid === true).map(fw => fw.word);
+    return getRevealableWordCount(availableWords, foundWordsList, settings.language);
+  }, [availableWords, foundWords, grid, settings.language]);
+
+  // Handle reveal word - find a random 5+ letter word and highlight its path
+  const handleReveal = useCallback(async () => {
+    if (revealState.isLoading || !availableWords || !grid) return null;
+
+    setRevealState(prev => ({ ...prev, isLoading: true }));
+
+    const foundWordsList = foundWords.filter(fw => fw.isValid === true).map(fw => fw.word);
+    const result = selectRandomRevealWord(availableWords, foundWordsList, grid, settings.language);
+
+    if (!result) {
+      setRevealState(prev => ({ ...prev, isLoading: false }));
+      return null;
+    }
+
+    const { word, path } = result;
+
+    // Calculate score for the revealed word
+    const baseScore = Math.max(word.length - 1, 1);
+    const multiplier = getScoreMultiplier();
+    const finalScore = Math.floor(baseScore * multiplier);
+
+    // Add the revealed word to found words
+    const newWord: FoundWord = {
+      word,
+      score: finalScore,
+      timestamp: Date.now(),
+      timeSinceStart: (Date.now() - gameStartTimeRef.current) / 1000,
+      isValid: true,
+      comboBonus: 0,
+      fireRoundBonus: fireRoundActive ? Math.floor(baseScore) : 0,
+    };
+
+    setFoundWords(prev => [...prev, newWord]);
+    foundWordsSetRef.current.add(word.toLowerCase());
+    setScore(prev => prev + finalScore);
+
+    // Highlight the path on the grid
+    setRevealState(prev => ({
+      ...prev,
+      revealsUsed: prev.revealsUsed + 1,
+      isLoading: false,
+      highlightedPath: path.map(p => ({ row: p.row, col: p.col })),
+    }));
+
+    // Play word accepted sound
+    playWordAcceptedSound();
+
+    // Clear highlight after 2 seconds
+    setTimeout(() => {
+      setRevealState(prev => ({ ...prev, highlightedPath: [] }));
+    }, 2000);
+
+    return result;
+  }, [revealState.isLoading, availableWords, grid, foundWords, settings.language, getScoreMultiplier, fireRoundActive, playWordAcceptedSound]);
+
   if (!grid) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
@@ -1266,6 +1341,15 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
             onClearHint={handleClearHint}
             t={t}
           />
+          {/* Reveal Button - Single Player Mode */}
+          <RevealButton
+            revealsUsed={revealState.revealsUsed}
+            revealableWordsCount={revealableWordCount}
+            isLoading={revealState.isLoading}
+            gameActive={!isPaused && !isGameOver && timer.remainingTime > 0}
+            onReveal={handleReveal}
+            t={t}
+          />
         </div>
 
         {/* Top-right: Help button (moved to avoid covering game board) */}
@@ -1338,6 +1422,7 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
               largeText
               fireRoundActive={fireRoundActive}
               earthquakeShaking={earthquakeState === 'shaking'}
+              highlightedPath={revealState.highlightedPath}
             />
           </div>
         </div>
@@ -1462,7 +1547,7 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
 
       {/* Header with controls */}
       <div className="flex items-center justify-between px-4">
-        <Button variant="ghost" size="sm" onClick={onQuit}>
+        <Button variant="ghost" size="sm" onClick={handleQuitRequest}>
           <ArrowLeft className="mr-2" />
           {t('common.quit') || 'Quit'}
         </Button>
@@ -1633,6 +1718,7 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
           largeText
           fireRoundActive={fireRoundActive}
           earthquakeShaking={earthquakeState === 'shaking'}
+          highlightedPath={revealState.highlightedPath}
         />
       </div>
 
@@ -1653,8 +1739,8 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
         />
       )}
 
-      {/* Hint Button - Single Player Mode (portrait) */}
-      <div className="flex justify-center px-4 -mt-1">
+      {/* Hint & Reveal Buttons - Single Player Mode (portrait) */}
+      <div className="flex justify-center gap-3 px-4 -mt-1">
         <HintButton
           hint={hintState.hint}
           hintType={hintState.hintType}
@@ -1670,61 +1756,16 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
           onClearHint={handleClearHint}
           t={t}
         />
+        <RevealButton
+          revealsUsed={revealState.revealsUsed}
+          revealableWordsCount={revealableWordCount}
+          isLoading={revealState.isLoading}
+          gameActive={!isPaused && !isGameOver && timer.remainingTime > 0}
+          onReveal={handleReveal}
+          t={t}
+        />
       </div>
 
-      {/* Found words - Enhanced display with validity status */}
-      <div className="bg-neo-cream text-neo-black dark:bg-neo-navy-light dark:text-white rounded-neo-lg border-4 border-neo-black p-4 shadow-hard">
-        <h3 className="text-sm font-bold uppercase tracking-wide text-neo-black/70 dark:text-neo-white/70 mb-3 flex items-center justify-between">
-          <span>{t('common.foundWords') || 'Found Words'}</span>
-          <span className="bg-neo-cyan text-neo-black px-2 py-0.5 rounded-full text-xs">
-            {foundWords.filter(fw => fw.isValid === true).length}
-          </span>
-        </h3>
-        <div className="flex flex-wrap gap-2 max-h-36 overflow-y-auto">
-          <AdaptiveAnimatePresence>
-            {foundWords.filter(fw => fw.isValid !== false).map((fw, index) => {
-              const isPending = fw.isValid === null;
-              const isLatest = index === foundWords.filter(f => f.isValid !== false).length - 1;
-
-              return (
-                <AdaptiveMotion.span
-                  key={`${fw.word}-${fw.timestamp}`}
-                  initial={{ opacity: 0, scale: 0.8, x: -20 }}
-                  animate={{ opacity: 1, scale: 1, x: 0 }}
-                  exit={{ opacity: 0, scale: 0.8, x: 20 }}
-                  className={cn(
-                    'px-3 py-1.5 rounded-neo border-2 text-sm font-bold shadow-hard-sm transition-all',
-                    isPending
-                      ? 'bg-gray-200 text-gray-600 border-gray-400 animate-pulse'
-                      : isLatest
-                        ? 'bg-neo-yellow text-neo-black border-neo-black'
-                        : fw.word.length >= 6
-                          ? 'bg-neo-yellow text-neo-black border-neo-black'
-                          : fw.word.length >= 5
-                            ? 'bg-neo-lime text-neo-black border-neo-black'
-                            : fw.word.length >= 4
-                              ? 'bg-neo-cyan/70 text-neo-black border-neo-black'
-                              : 'bg-white text-neo-black border-neo-black'
-                  )}
-                >
-                  {applyHebrewFinalLetters(fw.word).toUpperCase()}
-                  {!isPending && fw.score > 0 && (
-                    <span className="ml-1 text-xs opacity-70">+{fw.score}</span>
-                  )}
-                  {isPending && (
-                    <span className="ml-1 text-xs">...</span>
-                  )}
-                </AdaptiveMotion.span>
-              );
-            })}
-          </AdaptiveAnimatePresence>
-          {foundWords.filter(fw => fw.isValid !== false).length === 0 && (
-            <span className="text-sm text-neo-black/70 dark:text-neo-white/75 italic">
-              {t('singlePlayer.noWordsYet') || 'No words found yet. Start swiping!'}
-            </span>
-          )}
-        </div>
-      </div>
 
       {/* Bot scores (only in solo-bots mode) */}
       {settings.mode === 'solo-bots' && settings.bots.length > 0 && (
@@ -1760,6 +1801,31 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
         isOpen={isHelpOpen}
         onClose={() => setIsHelpOpen(false)}
       />
+
+      {/* Quit Confirmation Dialog */}
+      <AlertDialog open={showQuitConfirm} onOpenChange={setShowQuitConfirm}>
+        <AlertDialogContent className="bg-neo-cream text-neo-black border-4 border-neo-black rounded-neo shadow-hard max-w-sm">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="text-neo-black font-black text-xl">
+              {t('singlePlayer.quitConfirmTitle') || 'Quit Game?'}
+            </AlertDialogTitle>
+            <AlertDialogDescription className="text-neo-black/70 font-medium">
+              {t('singlePlayer.quitConfirmMessage') || 'You will lose your current progress. Are you sure you want to quit?'}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter className="flex-row gap-2">
+            <AlertDialogCancel className="flex-1 bg-neo-cream border-2 border-neo-black rounded-neo font-bold text-neo-black hover:brightness-95">
+              {t('common.cancel') || 'Cancel'}
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={onQuit}
+              className="flex-1 bg-neo-red border-2 border-neo-black rounded-neo font-bold text-neo-cream hover:brightness-110"
+            >
+              {t('singlePlayer.imSure') || "I'm Sure"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };

@@ -50,13 +50,21 @@ const ProfileSetup: React.FC<ProfileSetupProps> = ({
 }) => {
   const { t, dir } = useLanguage();
   const [username, setUsername] = useState(initialUsername);
-  const [selectedAvatarId, setSelectedAvatarId] = useState<string | undefined>(initialAvatarId);
+  // For authenticated users with a profile avatar, default to using their profile (PROFILE_AVATAR_ID)
+  // They can change to a game avatar if they want, and can always go back to profile
+  const [selectedAvatarId, setSelectedAvatarId] = useState<string | undefined>(() => {
+    // If authenticated user has a profile picture or avatar, default to profile avatar
+    if (isAuthenticated && (profilePictureUrl || initialAvatarId)) {
+      return PROFILE_AVATAR_ID;
+    }
+    return initialAvatarId;
+  });
   const [usernameError, setUsernameError] = useState(false);
   const [isAvatarPickerOpen, setIsAvatarPickerOpen] = useState(false);
 
-  // Load from localStorage on mount
+  // Load from localStorage on mount (only for guests)
   useEffect(() => {
-    if (typeof window !== 'undefined') {
+    if (typeof window !== 'undefined' && !isAuthenticated) {
       const savedUsername = localStorage.getItem('boggle_username');
       const savedAvatarId = localStorage.getItem('boggle_avatar_id');
 
@@ -263,9 +271,12 @@ const ProfileSetup: React.FC<ProfileSetupProps> = ({
                       currentAvatarImage={selectedAvatarId}
                       profileAvatar={{
                         profilePictureUrl: profilePictureUrl,
-                        avatarEmoji: undefined, // ProfileSetup doesn't have emoji info, but it has profilePictureUrl
+                        // Use initialAvatarId to show the profile's avatar_image in the picker
+                        avatarEmoji: undefined,
                         avatarColor: undefined,
                         displayName: displayName || undefined,
+                        // Pass the profile's avatar_image so it can be displayed as the "profile" option
+                        avatarImage: initialAvatarId,
                       }}
                     />
                   </div>

@@ -109,11 +109,48 @@ export default async function LeaderboardLayout({ children, params }: Leaderboar
     },
   };
 
+  // ItemList schema - indicates this is a ranked list of items (players)
+  // This can help with rich snippets showing leaderboard rankings
+  const itemListSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    '@id': `https://www.lexiclash.live${localePath}/leaderboard#itemlist`,
+    name: 'LexiClash Global Leaderboard',
+    description: 'Top-ranked players in LexiClash multiplayer word game. Rankings based on total score, wins, and achievements.',
+    itemListOrder: 'https://schema.org/ItemListOrderDescending',
+    numberOfItems: 100,
+    itemListElement: [
+      // Placeholder items to indicate structure - actual data is dynamic
+      {
+        '@type': 'ListItem',
+        position: 1,
+        name: 'Top Player',
+        description: 'Highest ranked player in LexiClash',
+      },
+    ],
+  };
+
+  // CollectionPage schema - indicates this is a collection/gallery of items
+  const collectionPageSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'CollectionPage',
+    '@id': `https://www.lexiclash.live${localePath}/leaderboard#collectionpage`,
+    name: 'LexiClash Global Leaderboard',
+    description: 'View the top-ranked word game players worldwide. Track your progress and compete for the top spot.',
+    url: `https://www.lexiclash.live${localePath}/leaderboard`,
+    mainEntity: {
+      '@id': `https://www.lexiclash.live${localePath}/leaderboard#itemlist`,
+    },
+    isPartOf: {
+      '@id': 'https://www.lexiclash.live/#website',
+    },
+  };
+
   return (
     <>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify([breadcrumbSchema, webPageSchema]) }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify([breadcrumbSchema, webPageSchema, itemListSchema, collectionPageSchema]) }}
       />
       {children}
     </>

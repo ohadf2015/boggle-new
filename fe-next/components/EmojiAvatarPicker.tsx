@@ -26,6 +26,7 @@ interface ProfileAvatarInfo {
   avatarEmoji?: string;
   avatarColor?: string;
   displayName?: string;
+  avatarImage?: string; // Profile's avatar_image ID
 }
 
 /**
@@ -53,8 +54,8 @@ const EmojiAvatarPicker: React.FC<EmojiAvatarPickerProps> = ({
   currentAvatarImage,
   profileAvatar
 }) => {
-  // Check if profile avatar is available (user has profile picture or emoji)
-  const hasProfileAvatar = profileAvatar && (profileAvatar.profilePictureUrl || profileAvatar.avatarEmoji);
+  // Check if profile avatar is available (user has profile picture, avatar image, or emoji)
+  const hasProfileAvatar = profileAvatar && (profileAvatar.profilePictureUrl || profileAvatar.avatarImage || profileAvatar.avatarEmoji);
 
   // Check if currently using profile avatar
   const isUsingProfileAvatar = currentAvatarImage === PROFILE_AVATAR_ID ||
@@ -151,6 +152,16 @@ const EmojiAvatarPicker: React.FC<EmojiAvatarPickerProps> = ({
                     className="object-cover"
                     priority
                   />
+                ) : profileAvatar?.avatarImage ? (
+                  // Show profile's avatar_image in preview
+                  <Image
+                    src={getAvatarPath(AVATARS.find(a => a.id === profileAvatar.avatarImage) || AVATARS[0])}
+                    alt={profileAvatar.displayName || 'Profile Avatar'}
+                    fill
+                    sizes="96px"
+                    className="object-cover"
+                    priority
+                  />
                 ) : (
                   <div
                     className="w-full h-full flex items-center justify-center text-4xl"
@@ -201,6 +212,16 @@ const EmojiAvatarPicker: React.FC<EmojiAvatarPickerProps> = ({
                     <Image
                       src={profileAvatar.profilePictureUrl}
                       alt={profileAvatar.displayName || 'Profile'}
+                      fill
+                      sizes="(max-width: 640px) 64px, 80px"
+                      className="object-cover"
+                      loading="lazy"
+                    />
+                  ) : profileAvatar?.avatarImage ? (
+                    // Show profile's avatar_image if no profile picture URL
+                    <Image
+                      src={getAvatarPath(AVATARS.find(a => a.id === profileAvatar.avatarImage) || AVATARS[0])}
+                      alt={profileAvatar.displayName || 'Profile Avatar'}
                       fill
                       sizes="(max-width: 640px) 64px, 80px"
                       className="object-cover"

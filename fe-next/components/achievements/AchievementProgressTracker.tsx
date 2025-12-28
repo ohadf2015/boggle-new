@@ -183,7 +183,7 @@ export const AchievementProgressTracker: React.FC<AchievementProgressTrackerProp
             animate={{ opacity: 1, x: 0, scale: 1 }}
             exit={{ opacity: 0, x: 50, scale: 0.8 }}
             transition={{ type: 'spring', stiffness: 400, damping: 25 }}
-            className="bg-neo-navy/90 backdrop-blur-sm border-2 border-neo-cyan rounded-neo px-3 py-2 shadow-hard-sm max-w-[200px]"
+            className="bg-neo-navy border-2 border-neo-cyan rounded-neo px-3 py-2 shadow-hard-sm max-w-[200px]"
           >
             {/* Header */}
             <div className="flex items-center gap-2 mb-1">

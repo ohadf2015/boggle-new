@@ -108,11 +108,52 @@ export default async function DailyLayout({ children, params }: DailyLayoutProps
     },
   };
 
+  // Event schema for Daily Challenge - recurring daily event (like Wordle)
+  // This helps search engines understand the time-sensitive nature of the content
+  const today = new Date();
+  const tomorrow = new Date(today);
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  tomorrow.setHours(0, 0, 0, 0);
+
+  const eventSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'Event',
+    '@id': `https://www.lexiclash.live${localePath}/daily#event`,
+    name: 'LexiClash Daily Word Challenge',
+    description: 'Daily word puzzle challenge - same board for everyone worldwide. New puzzle every day at midnight UTC. Share your emoji results like Wordle!',
+    startDate: today.toISOString().split('T')[0],
+    endDate: tomorrow.toISOString().split('T')[0],
+    eventStatus: 'https://schema.org/EventScheduled',
+    eventAttendanceMode: 'https://schema.org/OnlineEventAttendanceMode',
+    location: {
+      '@type': 'VirtualLocation',
+      url: `https://www.lexiclash.live${localePath}/daily`,
+    },
+    organizer: {
+      '@id': 'https://www.lexiclash.live/#organization',
+    },
+    offers: {
+      '@type': 'Offer',
+      price: '0',
+      priceCurrency: 'USD',
+      availability: 'https://schema.org/InStock',
+      url: `https://www.lexiclash.live${localePath}/daily`,
+      validFrom: today.toISOString().split('T')[0],
+    },
+    performer: {
+      '@type': 'Organization',
+      name: 'LexiClash',
+    },
+    image: 'https://www.lexiclash.live/og-image-en.jpg',
+    isAccessibleForFree: true,
+    inLanguage: ['en', 'he', 'sv', 'ja'],
+  };
+
   return (
     <>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify([breadcrumbSchema, webPageSchema]) }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify([breadcrumbSchema, webPageSchema, eventSchema]) }}
       />
       {children}
     </>

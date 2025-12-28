@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { ThumbsUp, ThumbsDown, X, Book, CheckCircle } from 'lucide-react';
 import Avatar from '../Avatar';
 import { useLanguage } from '../../contexts/LanguageContext';
+import { applyHebrewFinalLetters } from '../../utils/utils';
 
 /**
  * Avatar data interface
@@ -58,16 +59,20 @@ interface WordFeedbackModalProps {
  * Witty sentences about the word being validated
  * Makes voting fun with humorous commentary
  */
-const getWittySentences = (t: (key: string, params?: Record<string, string>) => string, word: string, player: string) => [
-  t('wordFeedback.witty1', { player, word }) || `${player} claims "${word}" is totally a word...`,
-  t('wordFeedback.witty2', { player, word }) || 'Real word or creative genius? You decide!',
-  t('wordFeedback.witty3', { player, word }) || `${player} found "${word}" in their brain dictionary`,
-  t('wordFeedback.witty4', { player, word }) || `Webster called, they want to know about "${word}"`,
-  t('wordFeedback.witty5', { player, word }) || 'Sounds legit... or does it?',
-  t('wordFeedback.witty6', { player, word }) || `Is "${word}" a stroke of genius or madness?`,
-  t('wordFeedback.witty7', { player, word }) || `${player} swears this is a real word!`,
-  t('wordFeedback.witty8', { player, word }) || `The dictionary committee awaits your verdict on "${word}"`,
-];
+const getWittySentences = (t: (key: string, params?: Record<string, string>) => string, word: string, player: string) => {
+  // Apply Hebrew final letter normalization for display
+  const displayWord = applyHebrewFinalLetters(word);
+  return [
+    t('wordFeedback.witty1', { player, word: displayWord }) || `${player} claims "${displayWord}" is totally a word...`,
+    t('wordFeedback.witty2', { player, word: displayWord }) || 'Real word or creative genius? You decide!',
+    t('wordFeedback.witty3', { player, word: displayWord }) || `${player} found "${displayWord}" in their brain dictionary`,
+    t('wordFeedback.witty4', { player, word: displayWord }) || `Webster called, they want to know about "${displayWord}"`,
+    t('wordFeedback.witty5', { player, word: displayWord }) || 'Sounds legit... or does it?',
+    t('wordFeedback.witty6', { player, word: displayWord }) || `Is "${displayWord}" a stroke of genius or madness?`,
+    t('wordFeedback.witty7', { player, word: displayWord }) || `${player} swears this is a real word!`,
+    t('wordFeedback.witty8', { player, word: displayWord }) || `The dictionary committee awaits your verdict on "${displayWord}"`,
+  ];
+};
 
 /**
  * WordFeedbackModal - Neo-Brutalist styled modal for crowd-sourced word validation
@@ -333,7 +338,7 @@ const WordFeedbackModal = memo<WordFeedbackModalProps>(({
               style={{ transform: 'rotate(1deg)' }}
             >
               <p className="text-4xl font-black uppercase tracking-wide text-neo-black">
-                {currentWord.word}
+                {applyHebrewFinalLetters(currentWord.word)}
               </p>
 
               {/* Vote Progress Bar - Shows how close word is to being approved */}

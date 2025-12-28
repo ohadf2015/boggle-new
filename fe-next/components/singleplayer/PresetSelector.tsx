@@ -240,6 +240,16 @@ const PresetSelector: React.FC<PresetSelectorProps> = ({
         {/* Mode-specific details */}
         {!isDaily && (
           <div className="text-[9px] sm:text-[10px] font-bold text-neo-black/70 dark:text-neo-white/70 mt-0.5 space-y-0">
+            {/* Minimum word length - prominent indicator */}
+            <div className={cn(
+              'inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full text-[8px] sm:text-[9px] font-black',
+              preset.settings.minWordLength === 2
+                ? 'bg-neo-lime/30 text-neo-black dark:text-neo-lime'
+                : 'bg-neo-cyan/30 text-neo-black dark:text-neo-cyan'
+            )}>
+              <span>{preset.settings.minWordLength || 3}+</span>
+              <span>{t('singlePlayer.preset.letters') || 'letters'}</span>
+            </div>
             {preset.settings.timerSeconds > 0 && (
               <div>{preset.settings.timerSeconds / 60}m</div>
             )}

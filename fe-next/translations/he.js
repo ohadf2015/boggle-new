@@ -873,7 +873,9 @@ const he = {
     "betterLuckNextTime": "יותר מזל בפעם הבאה!",
     "yourPlace": "מקום {rank}",
     "tryAgainEncouragement": "המשיכו לשחק כדי להשתפר!",
-    "of": "מתוך"
+    "of": "מתוך",
+    "readyForNextRound": "מוכנים לסיבוב הבא?",
+    "hostStartDescription": "התחילו משחק חדש כשכולם מוכנים!"
   },
   "chart": {
     "yourProgress": "ההתקדמות שלך",
@@ -1910,6 +1912,7 @@ const he = {
     "wordsByLength": "מילים לפי אורך",
     "quitConfirmTitle": "לצאת מהמשחק?",
     "quitConfirmMessage": "תאבד את ההתקדמות הנוכחית. בטוח שאתה רוצה לצאת?",
+    "imSure": "אני בטוח/ה",
     "gamePaused": "המשחק מושהה",
     "botWords": "מילים שנמצאו",
     "aiOpponents": "יריבי AI",
@@ -1946,7 +1949,8 @@ const he = {
       "personalBest": "שיא אישי",
       "personalBestDesc": "אתגר רגיל - עקוב אחר ההתקדמות",
       "ultra": "אתגר אולטימטיבי",
-      "ultraDesc": "אתגר השיא הגבוה האולטימטיבי"
+      "ultraDesc": "אתגר השיא הגבוה האולטימטיבי",
+      "letters": "אותיות"
     },
     "wizard": {
       "selectMode": "בחר מצב משחק",
@@ -2080,6 +2084,8 @@ const he = {
     "yourScore": "הניקוד שלכם",
     "completed": "הושלם!",
     "quitConfirm": "בטוחים שאתם רוצים לצאת? ההתקדמות תאבד ולא תוכלו לשחק שוב את החידה של היום.",
+    "quitConfirmTitle": "לצאת מהאתגר?",
+    "imSure": "אני בטוח/ה",
     "wordsFound": "נמצאו {count} מילים",
     "streak": "רצף",
     "streakDays": "רצף של {count} ימים!",
@@ -2127,7 +2133,7 @@ const he = {
     "tryAnotherLanguage": "נסו שפה אחרת",
     "playDifferentLanguage": "אתגרו את עצמכם בשפה אחרת!",
     "feedback": {
-      "tooShort": "📏 לפחות 4 אותיות",
+      "tooShort": "📏 לפחות 3 אותיות",
       "duplicate": "🔁 כבר נמצאה!",
       "notOnBoard": "⚠️ לא ניתן לבנות את זה על הלוח",
       "invalidWord": "❌ מילה לא תקינה",
@@ -2262,9 +2268,9 @@ const he = {
       },
       "minLength": {
         "title": "⚠️ כלל חשוב",
-        "description": "מילים חייבות להיות באורך של לפחות 4 אותיות",
-        "example1": "4 אותיות ✓",
-        "example2": "3 אותיות - קצר מדי!",
+        "description": "מילים חייבות להיות באורך של לפחות 3 אותיות",
+        "example1": "3 אותיות ✓",
+        "example2": "2 אותיות - קצר מדי!",
         "gotIt": "הבנתי!"
       },
       "complete": {
@@ -2272,7 +2278,7 @@ const he = {
         "remember": "זכרו:",
         "rule1": "10 ניסיונות למצוא את המילה",
         "rule2": "מצאו מילים אחרות לחיים",
-        "rule3": "מינימום 4 אותיות",
+        "rule3": "מינימום 3 אותיות",
         "rule4": "אותו חידה בכל העולם",
         "start": "התחילו את האתגר היומי"
       }
@@ -2308,6 +2314,22 @@ const he = {
     "stepOf": "שלב {current} מתוך {total}",
     "stepOptions": "אפשרויות",
     "stepReview": "סקירה"
+  },
+  "home": {
+    "singlePlayer": "שחקן יחיד",
+    "multiplayer": "מרובה משתתפים"
+  },
+  "reveal": {
+    "revealWord": "חשוף",
+    "finding": "מחפש...",
+    "noWordsLeft": "לא נשארו מילים של 5+ אותיות לחשוף",
+    "notEnoughCoins": "צריך {cost} מטבעות (יש לך {balance})",
+    "gameNotActive": "המשחק לא פעיל",
+    "coins": "מטבעות",
+    "base": "בסיס",
+    "efficiency": "יעילות",
+    "streak": "רצף",
+    "usedForReveals": "השתמשו במטבעות כדי לחשוף מילים במשחקי יחיד!"
   }
 };
 

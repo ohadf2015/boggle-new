@@ -1,65 +1,113 @@
 export default function robots() {
   const baseUrl = 'https://www.lexiclash.live';
 
+  // Common allowed paths for all bots
+  const commonAllowPaths = [
+    '/',
+    // Favicon and icons - critical for search engine crawling
+    '/favicon.ico',
+    '/favicon.svg',
+    '/icon-*.png',
+    '/apple-touch-icon.png',
+    // Social/OG images - essential for rich snippets
+    '/og-image.jpg',
+    '/og-image-*.jpg',
+    '/lexiclash.jpg',
+    '/logo*.png',
+    '/logos/',
+    // Other public assets
+    '/winner-celebration/',
+    '/manifest.json',
+  ];
+
+  // Paths to block from crawling
+  const disallowPaths = [
+    '/api/',           // API endpoints
+    '/_next/static/',  // Next.js static assets
+    '/_next/image/',   // Next.js image optimization
+    '/admin/',         // Admin pages (if any)
+    '/*?room=*',       // Dynamic room URLs (avoid duplicate content)
+  ];
+
   return {
     rules: [
+      // Default rules for all bots
       {
         userAgent: '*',
-        allow: [
-          '/',
-          // Favicon and icons - critical for Google crawling
-          '/favicon.ico',
-          '/icon-*.png',
-          '/apple-touch-icon.png',
-          // Social/OG images
-          '/og-image.jpg',
-          '/og-image-*.jpg',
-          '/lexiclash.jpg',
-          '/logo*.png',
-          '/logos/',
-          // Other assets
-          '/winner-celebration/',
-          '/manifest.json',
-        ],
-        disallow: ['/api/', '/_next/static/', '/_next/image/'],
+        allow: commonAllowPaths,
+        disallow: disallowPaths,
       },
+      // Google Search bot - primary search engine
       {
         userAgent: 'Googlebot',
-        allow: [
-          '/',
-          '/favicon.ico',
-          '/icon-*.png',
-          '/apple-touch-icon.png',
-          '/og-image.jpg',
-          '/og-image-*.jpg',
-        ],
+        allow: commonAllowPaths,
+        disallow: disallowPaths,
       },
+      // Google Image bot - for image search
       {
         userAgent: 'Googlebot-Image',
         allow: [
-          '/',
-          '/favicon.ico',
-          '/icon-*.png',
-          '/apple-touch-icon.png',
-          '/og-image.jpg',
-          '/og-image-*.jpg',
-          '/lexiclash.jpg',
-          '/logo*.png',
-          '/logos/',
+          ...commonAllowPaths,
           '/winner-celebration/',
         ],
       },
+      // Bing Search bot
       {
         userAgent: 'Bingbot',
-        allow: [
-          '/',
-          '/favicon.ico',
-          '/icon-*.png',
-          '/og-image.jpg',
-          '/og-image-*.jpg',
-        ],
+        allow: commonAllowPaths,
+        disallow: disallowPaths,
+      },
+      // DuckDuckGo bot
+      {
+        userAgent: 'DuckDuckBot',
+        allow: commonAllowPaths,
+        disallow: disallowPaths,
+      },
+      // Yandex (Russian search engine)
+      {
+        userAgent: 'Yandex',
+        allow: commonAllowPaths,
+        disallow: disallowPaths,
+      },
+      // Baidu (Chinese search engine)
+      {
+        userAgent: 'Baiduspider',
+        allow: commonAllowPaths,
+        disallow: disallowPaths,
+      },
+      // Social media bots for link previews
+      {
+        userAgent: 'facebookexternalhit',
+        allow: commonAllowPaths,
+      },
+      {
+        userAgent: 'Twitterbot',
+        allow: commonAllowPaths,
+      },
+      {
+        userAgent: 'LinkedInBot',
+        allow: commonAllowPaths,
+      },
+      {
+        userAgent: 'WhatsApp',
+        allow: commonAllowPaths,
+      },
+      {
+        userAgent: 'Slackbot',
+        allow: commonAllowPaths,
+      },
+      {
+        userAgent: 'Discordbot',
+        allow: commonAllowPaths,
+      },
+      // Telegram bot for link previews
+      {
+        userAgent: 'TelegramBot',
+        allow: commonAllowPaths,
       },
     ],
     sitemap: `${baseUrl}/sitemap.xml`,
+    // Additional directives
+    host: baseUrl,
   };
 }

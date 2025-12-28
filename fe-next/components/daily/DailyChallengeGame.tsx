@@ -9,6 +9,16 @@ import WordFormingArea from '@/components/game/WordFormingArea';
 import ComboDisplay from '@/components/game/ComboDisplay';
 import { HelpPanel, HelpButton } from '@/components/game/HelpPanel';
 import { Button } from '@/components/ui/button';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import { AchievementProgressTracker } from '@/components/achievements/AchievementProgressTracker';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
@@ -67,6 +77,9 @@ const DailyChallengeGame: React.FC<DailyChallengeGameProps> = ({
   // Help panel state
   const [isHelpOpen, setIsHelpOpen] = useState(false);
   const [hasShownFirstGameHelp, setHasShownFirstGameHelp] = useState(false);
+
+  // Exit confirmation dialog state
+  const [showQuitConfirm, setShowQuitConfirm] = useState(false);
 
   // Refs for game end handler
   const gameOverCalledRef = useRef(false);
@@ -251,21 +264,24 @@ const DailyChallengeGame: React.FC<DailyChallengeGameProps> = ({
     handleGameEndRef.current = handleGameEnd;
   }, [handleGameEnd]);
 
-  // Quit confirmation
+  // Open quit confirmation dialog
   const handleQuitClick = useCallback(() => {
-    if (window.confirm(t('daily.quitConfirm'))) {
-      // Mark as played with score 0 so they can't retry
-      const result: DailyChallengeGameResult = {
-        score: 0,
-        wordCount: 0,
-        wordsByLength: {},
-        timeSeconds: duration - timer.remainingTimeRef.current,
-        words: [],
-        longestWord: '',
-      };
-      onComplete(result);
-    }
-  }, [duration, onComplete, t, timer.remainingTimeRef]);
+    setShowQuitConfirm(true);
+  }, []);
+
+  // Confirm quit - mark as played with score 0
+  const handleConfirmQuit = useCallback(() => {
+    setShowQuitConfirm(false);
+    const result: DailyChallengeGameResult = {
+      score: 0,
+      wordCount: 0,
+      wordsByLength: {},
+      timeSeconds: duration - timer.remainingTimeRef.current,
+      words: [],
+      longestWord: '',
+    };
+    onComplete(result);
+  }, [duration, onComplete, timer.remainingTimeRef]);
 
   // Handle word forming changes from GridComponent
   const handleWordChange = useCallback((word: string, count: number) => {
@@ -419,6 +435,31 @@ const DailyChallengeGame: React.FC<DailyChallengeGameProps> = ({
 
       {/* Help Panel */}
       <HelpPanel isOpen={isHelpOpen} onClose={() => setIsHelpOpen(false)} />
+
+      {/* Quit Confirmation Dialog */}
+      <AlertDialog open={showQuitConfirm} onOpenChange={setShowQuitConfirm}>
+        <AlertDialogContent className="bg-neo-cream text-neo-black border-4 border-neo-black rounded-neo shadow-hard max-w-sm">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="text-neo-black font-black text-xl">
+              {t('daily.quitConfirmTitle') || 'Quit Challenge?'}
+            </AlertDialogTitle>
+            <AlertDialogDescription className="text-neo-black/70 font-medium">
+              {t('daily.quitConfirm') || 'If you quit, this will count as your attempt for today. You won\'t be able to try again until tomorrow.'}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter className="flex-row gap-2">
+            <AlertDialogCancel className="flex-1 bg-neo-cream border-2 border-neo-black rounded-neo font-bold text-neo-black hover:brightness-95">
+              {t('common.cancel') || 'Cancel'}
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleConfirmQuit}
+              className="flex-1 bg-neo-red border-2 border-neo-black rounded-neo font-bold text-neo-cream hover:brightness-110"
+            >
+              {t('daily.imSure') || "I'm Sure"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </motion.div>
   );
 };

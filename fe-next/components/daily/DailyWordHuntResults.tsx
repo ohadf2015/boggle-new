@@ -2,7 +2,7 @@
 
 import React, { useState, useCallback, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Share2, Trophy, Target, X, TrendingUp, ArrowLeft, MessageCircle, Copy, Check, Send } from 'lucide-react';
+import { Share2, Trophy, Target, X, TrendingUp, ArrowLeft, MessageCircle, Copy, Check, Send, Coins } from 'lucide-react';
 
 // X/Twitter icon (no lucide equivalent)
 const XTwitterIcon = ({ className }: { className?: string }) => (
@@ -28,6 +28,7 @@ import StreakMilestoneCelebration from './StreakMilestoneCelebration';
 import { feedbackToEmoji, type LetterFeedback } from '@/utils/wordHuntFeedback';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { awardDailyCoins } from '@/utils/coinManager';
 import type { Language } from '@/types';
 
 interface WordHuntStats {
@@ -140,6 +141,10 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
   const [guestPlayer, setGuestPlayer] = useState<GuestDailyPlayer | null>(null);
   const [stats, setStats] = useState<WordHuntStats | null>(null);
   const [showMilestoneCelebration, setShowMilestoneCelebration] = useState(false);
+  const [coinReward, setCoinReward] = useState<{
+    awarded: number;
+    breakdown: { base: number; efficiency: number; streak: number };
+  } | null>(null);
   const { profile, isAuthenticated } = useAuth();
 
   // Check for streak milestone
@@ -327,6 +332,22 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
     return undefined;
   }, [isNewCompletion, milestoneMessage]);
 
+  // Award coins for completing the daily challenge
+  useEffect(() => {
+    if (isNewCompletion) {
+      const reward = awardDailyCoins(
+        puzzleDate,
+        language,
+        result.solved,
+        result.efficiencyScore || 0,
+        result.streakDays || 0
+      );
+      if (reward) {
+        setCoinReward(reward);
+      }
+    }
+  }, [isNewCompletion, puzzleDate, language, result.solved, result.efficiencyScore, result.streakDays]);
+
   // Generate shareable text (use streak from result, which is now properly tracked)
   const shareText = generateWordHuntShareableResult({
     ...result,
@@ -466,6 +487,36 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
                     <span className="text-gray-600 dark:text-gray-400 ml-1">{t('wordHunt.results.tokensEarned')}</span>
                   </div>
                 </div>
+              )}
+
+              {/* Coin reward for word reveals */}
+              {coinReward && (
+                <motion.div
+                  initial={{ scale: 0.8, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  transition={{ delay: 0.5, type: 'spring' }}
+                  className="mt-3 px-4 py-3 bg-gradient-to-r from-neo-yellow to-amber-400 rounded-neo border-3 border-neo-black shadow-hard"
+                >
+                  <div className="flex items-center justify-center gap-2 mb-1">
+                    <Coins className="w-5 h-5 text-neo-black" />
+                    <span className="font-black text-xl text-neo-black">+{coinReward.awarded}</span>
+                    <span className="text-sm font-bold text-neo-black/70">{t('reveal.coins') || 'Coins'}</span>
+                  </div>
+                  <div className="flex items-center justify-center gap-3 text-xs text-neo-black/70 font-medium">
+                    {coinReward.breakdown.base > 0 && (
+                      <span>{t('reveal.base') || 'Base'}: +{coinReward.breakdown.base}</span>
+                    )}
+                    {coinReward.breakdown.efficiency > 0 && (
+                      <span>{t('reveal.efficiency') || 'Efficiency'}: +{coinReward.breakdown.efficiency}</span>
+                    )}
+                    {coinReward.breakdown.streak > 0 && (
+                      <span>🔥 {t('reveal.streak') || 'Streak'}: +{coinReward.breakdown.streak}</span>
+                    )}
+                  </div>
+                  <p className="text-xs text-neo-black/60 mt-1">
+                    {t('reveal.usedForReveals') || 'Use coins to reveal words in single player games!'}
+                  </p>
+                </motion.div>
               )}
             </>
           ) : (

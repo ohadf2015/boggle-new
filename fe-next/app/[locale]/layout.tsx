@@ -190,15 +190,41 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
                 'Fast-paced competitive word battles',
                 'Multiple language support (Hebrew, English, Swedish, Japanese)',
                 'Live leaderboard and rankings',
-                'Achievement system',
-                'Room-based multiplayer',
-                'QR code sharing',
+                'Achievement system with 35+ badges',
+                'Room-based multiplayer with QR code sharing',
                 'Cross-platform compatibility',
-                'No download required',
-                'Vocabulary building bonus'
+                'No download required - browser-based',
+                'Daily Challenge mode like Wordle',
+                'Single player vs AI bots',
+                'Vocabulary building for language learners',
+                'Perfect for parties and game nights',
+                'Team building activities',
+                'Educational word games for classrooms',
             ],
-            genre: ['Word Game', 'Puzzle', 'Multiplayer', 'Party Game', 'Competitive Game', 'Brain Training'],
-            playMode: ['MultiPlayer', 'CoOp'],
+            genre: [
+                'Word Game',
+                'Puzzle',
+                'Multiplayer',
+                'Party Game',
+                'Competitive Game',
+                'Brain Training',
+                'Educational',
+                'Casual',
+                'Family Friendly',
+            ],
+            playMode: ['MultiPlayer', 'SinglePlayer', 'CoOp'],
+            numberOfPlayers: {
+                '@type': 'QuantitativeValue',
+                minValue: 1,
+                maxValue: 20,
+            },
+            gamePlatform: [
+                'Web Browser',
+                'Desktop',
+                'Mobile',
+                'iOS',
+                'Android',
+            ],
             author: {
                 '@type': 'Organization',
                 name: 'LexiClash',
@@ -206,7 +232,7 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
             },
             keywords: 'multiplayer word game, real-time word battle, competitive word game, party game, word puzzle',
         },
-        // Organization schema
+        // Organization schema with social proof
         {
             '@context': 'https://schema.org',
             '@type': 'Organization',
@@ -216,8 +242,20 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
             logo: {
                 '@type': 'ImageObject',
                 url: 'https://www.lexiclash.live/og-image-en.jpg',
+                width: 1200,
+                height: 630,
             },
-            sameAs: [],
+            // Social media and platform presence for SEO authority
+            sameAs: [
+                'https://www.lexiclash.live',
+            ],
+            contactPoint: {
+                '@type': 'ContactPoint',
+                contactType: 'customer support',
+                availableLanguage: ['English', 'Hebrew', 'Swedish', 'Japanese'],
+            },
+            foundingDate: '2024',
+            slogan: 'Real-Time Multiplayer Word Battles',
         },
         // Website schema
         {

@@ -15,6 +15,12 @@ import {
 } from './grid';
 import { useDisableFireRoundLights } from '@/contexts/AccessibilityContext';
 
+/** Cell position for highlighted paths */
+export interface HighlightedCell {
+  row: number;
+  col: number;
+}
+
 interface GridComponentProps {
   grid: LetterGrid;
   interactive?: boolean;
@@ -34,6 +40,8 @@ interface GridComponentProps {
   hideWordPreview?: boolean;
   /** Hide the internal combo indicator (when using external positioning) */
   hideComboIndicator?: boolean;
+  /** External highlighted path for revealed words */
+  highlightedPath?: HighlightedCell[];
 }
 
 /**
@@ -60,6 +68,7 @@ const GridComponent = memo<GridComponentProps>(({
   onWordChange,
   hideWordPreview = false,
   hideComboIndicator = false,
+  highlightedPath = [],
 }) => {
   const [reduceMotion, setReduceMotion] = useState(false);
   const [performanceMode, setPerformanceMode] = useState<PerformanceMode>('full');
@@ -128,6 +137,15 @@ const GridComponent = memo<GridComponentProps>(({
     }
     return hints;
   }, [selectedCells, grid]);
+
+  // Create set of highlighted cells for revealed word path
+  const highlightedCellsSet = useMemo(() => {
+    const set = new Set<string>();
+    for (const cell of highlightedPath) {
+      set.add(`${cell.row}-${cell.col}`);
+    }
+    return set;
+  }, [highlightedPath]);
 
   // Stable shake offsets for earthquake animation
   // Use ref to track previous state and store offsets persistently
@@ -382,6 +400,7 @@ const GridComponent = memo<GridComponentProps>(({
               const isGlowing = glowingCells.has(cellKey);
               const glowColorIndex = cellColorIndices.get(cellKey) ?? 0;
               const glowColor = RAINBOW_COLORS[glowColorIndex];
+              const isHighlighted = highlightedCellsSet.has(cellKey);
 
               // Use stable shake offsets from ref
               const shakeOffset = earthquakeShaking
@@ -440,11 +459,15 @@ const GridComponent = memo<GridComponentProps>(({
                       ? comboColors.isRainbow
                         ? `${comboColors.textColor || 'text-neo-black'} ${comboColors.border} z-10 ${comboColors.shadow}`
                         : `${comboColors.bg} ${comboColors.textColor || 'text-neo-black'} border-3 ${comboColors.border} z-10 ${comboColors.shadow}`
-                      : "bg-neo-white text-neo-black border-3 border-neo-black shadow-hard-sm hover:shadow-hard hover:translate-x-[-1px] hover:translate-y-[-1px] active:translate-x-[1px] active:translate-y-[1px] active:shadow-hard-pressed",
+                      : isHighlighted
+                        ? "bg-neo-purple text-white border-3 border-neo-purple z-10"
+                        : "bg-neo-white text-neo-black border-3 border-neo-black shadow-hard-sm hover:shadow-hard hover:translate-x-[-1px] hover:translate-y-[-1px] active:translate-x-[1px] active:translate-y-[1px] active:shadow-hard-pressed",
                     // Adjacent cell hint - subtle glow indicating valid next selection
-                    isAdjacentHint && !isSelected && "ring-2 ring-neo-yellow/70 ring-offset-1 ring-offset-neo-cream",
+                    isAdjacentHint && !isSelected && !isHighlighted && "ring-2 ring-neo-yellow/70 ring-offset-1 ring-offset-neo-cream",
                     // Keyboard focus indicator
                     isFocused && !isSelected && "ring-4 ring-neo-cyan ring-offset-2 ring-offset-neo-cream z-20",
+                    // Highlighted path for revealed words - pulsing glow effect
+                    isHighlighted && !isSelected && "animate-pulse",
                     // Transition controls (no longer using fire-glow CSS class)
                     "transition-all",
                     comboLevel > 0 ? "duration-300" : "duration-100"
@@ -452,8 +475,12 @@ const GridComponent = memo<GridComponentProps>(({
                   style={{
                     borderRadius: '6px',
                     fontSize: 'var(--cell-font-size)',
+                    // Revealed word highlight - purple glow effect
+                    ...(isHighlighted && !isSelected && {
+                      boxShadow: '0 0 12px rgba(139, 92, 246, 0.8), 0 0 24px rgba(139, 92, 246, 0.4), 4px 4px 0 #000',
+                    }),
                     // Rainbow dance floor effect during fire round (no solid fill)
-                    ...(isGlowing && fireRoundActive && !isSelected && {
+                    ...(isGlowing && fireRoundActive && !isSelected && !isHighlighted && {
                       background: glowColor,
                       boxShadow: `0 0 8px ${glowColor}60, 0 0 16px ${glowColor}30, 4px 4px 0 #000`,
                       animation: 'rainbow-pulse 1.5s ease-in-out infinite',

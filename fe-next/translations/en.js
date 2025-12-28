@@ -878,7 +878,9 @@ const en = {
     "betterLuckNextTime": "Better luck next time!",
     "yourPlace": "{rank}th Place",
     "tryAgainEncouragement": "Keep playing to improve!",
-    "of": "of"
+    "of": "of",
+    "readyForNextRound": "Ready for Next Round?",
+    "hostStartDescription": "Start a new game when everyone is ready!"
   },
   "chart": {
     "yourProgress": "Your Progress",
@@ -1915,6 +1917,7 @@ const en = {
     "wordsByLength": "Words by Length",
     "quitConfirmTitle": "Quit Game?",
     "quitConfirmMessage": "You will lose your current progress. Are you sure you want to quit?",
+    "imSure": "I'm Sure",
     "gamePaused": "Game paused",
     "botWords": "Words Found",
     "aiOpponents": "AI Opponents",
@@ -1951,7 +1954,8 @@ const en = {
       "personalBest": "Personal Best",
       "personalBestDesc": "Standard challenge - track your progress",
       "ultra": "Ultra Challenge",
-      "ultraDesc": "Ultimate high score challenge"
+      "ultraDesc": "Ultimate high score challenge",
+      "letters": "letters"
     },
     "wizard": {
       "selectMode": "Select Game Mode",
@@ -2085,6 +2089,8 @@ const en = {
     "yourScore": "Your Score",
     "completed": "Completed!",
     "quitConfirm": "Are you sure you want to quit? Your progress will be lost and you won't be able to play today's puzzle again.",
+    "quitConfirmTitle": "Quit Challenge?",
+    "imSure": "I'm Sure",
     "wordsFound": "{count} words found",
     "streak": "Streak",
     "streakDays": "{count} Day Streak!",
@@ -2132,7 +2138,7 @@ const en = {
     "tryAnotherLanguage": "Try Another Language",
     "playDifferentLanguage": "Challenge yourself in a different language!",
     "feedback": {
-      "tooShort": "📏 Minimum 4 letters",
+      "tooShort": "📏 Minimum 3 letters",
       "duplicate": "🔁 Already found!",
       "notOnBoard": "⚠️ Can't form this on the board",
       "invalidWord": "❌ Not a valid word",
@@ -2267,9 +2273,9 @@ const en = {
       },
       "minLength": {
         "title": "⚠️ IMPORTANT RULE",
-        "description": "Words must be at least 4 LETTERS long",
-        "example1": "4 letters ✓",
-        "example2": "3 letters - too short!",
+        "description": "Words must be at least 3 LETTERS long",
+        "example1": "3 letters ✓",
+        "example2": "2 letters - too short!",
         "gotIt": "Got it!"
       },
       "complete": {
@@ -2277,7 +2283,7 @@ const en = {
         "remember": "Remember:",
         "rule1": "10 attempts to find target",
         "rule2": "Find other words for life",
-        "rule3": "4+ letters minimum",
+        "rule3": "3+ letters minimum",
         "rule4": "Same puzzle worldwide",
         "start": "Start Daily Challenge"
       }
@@ -2313,6 +2319,22 @@ const en = {
     "stepOf": "Step {current} of {total}",
     "stepOptions": "Options",
     "stepReview": "Review"
+  },
+  "home": {
+    "singlePlayer": "Single Player",
+    "multiplayer": "Multiplayer"
+  },
+  "reveal": {
+    "revealWord": "Reveal",
+    "finding": "Finding...",
+    "noWordsLeft": "No 5+ letter words left to reveal",
+    "notEnoughCoins": "Need {cost} coins (have {balance})",
+    "gameNotActive": "Game not active",
+    "coins": "Coins",
+    "base": "Base",
+    "efficiency": "Efficiency",
+    "streak": "Streak",
+    "usedForReveals": "Use coins to reveal words in single player games!"
   }
 };
 

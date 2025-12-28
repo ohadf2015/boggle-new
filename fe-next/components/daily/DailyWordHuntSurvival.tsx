@@ -6,6 +6,16 @@ import { Trophy, Zap, ShoppingBag, X, Heart, Coins, Lightbulb } from 'lucide-rea
 import GridComponent from '@/components/GridComponent';
 import { HelpPanel, HelpButton } from '@/components/game/HelpPanel';
 import { Button } from '@/components/ui/button';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import { useMusic } from '@/contexts/MusicContext';
@@ -126,6 +136,7 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
   const [isHelpOpen, setIsHelpOpen] = useState(false);
   const [showShop, setShowShop] = useState(false);
   const [tokensSpent, setTokensSpent] = useState(0);
+  const [showQuitConfirm, setShowQuitConfirm] = useState(false);
 
   // Refs for life drain
   const lifeIntervalRef = useRef<NodeJS.Timeout | null>(null);
@@ -519,7 +530,7 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
         <Button
           variant="ghost"
           size="sm"
-          onClick={onQuit}
+          onClick={() => setShowQuitConfirm(true)}
           className="text-gray-600 hover:text-red-500"
         >
           <X className="w-4 h-4 mr-1" />
@@ -745,10 +756,12 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
         </div>
       )}
 
-      {/* Target word display - responsive with wrapping for long words */}
-      <div className="flex justify-center flex-wrap gap-1.5 sm:gap-2 mb-3 px-2">
-        {renderTargetWord()}
-      </div>
+      {/* Target word display - only show when at least one letter is revealed */}
+      {revealedLetters.size > 0 && (
+        <div className="flex justify-center flex-wrap gap-1.5 sm:gap-2 mb-3 px-2">
+          {renderTargetWord()}
+        </div>
+      )}
 
       {/* Prominent Attempts Counter */}
       <motion.div
@@ -921,6 +934,34 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
         message={feedbackMessage}
         onClose={closeToast}
       />
+
+      {/* Quit Confirmation Dialog */}
+      <AlertDialog open={showQuitConfirm} onOpenChange={setShowQuitConfirm}>
+        <AlertDialogContent className="bg-neo-cream text-neo-black border-4 border-neo-black rounded-neo shadow-hard max-w-sm">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="text-neo-black font-black text-xl">
+              {t('daily.quitConfirmTitle') || 'Quit Challenge?'}
+            </AlertDialogTitle>
+            <AlertDialogDescription className="text-neo-black/70 font-medium">
+              {t('daily.quitConfirm') || 'If you quit, this will count as your attempt for today. You won\'t be able to try again until tomorrow.'}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter className="flex-row gap-2">
+            <AlertDialogCancel className="flex-1 bg-neo-cream border-2 border-neo-black rounded-neo font-bold text-neo-black hover:brightness-95">
+              {t('common.cancel') || 'Cancel'}
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => {
+                setShowQuitConfirm(false);
+                onQuit();
+              }}
+              className="flex-1 bg-neo-red border-2 border-neo-black rounded-neo font-bold text-neo-cream hover:brightness-110"
+            >
+              {t('daily.imSure') || "I'm Sure"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </motion.div>
   );
 };

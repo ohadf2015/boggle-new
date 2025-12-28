@@ -869,7 +869,9 @@ const es = {
     "betterLuckNextTime": "¡Mejor suerte la próxima vez!",
     "yourPlace": "{rank}º lugar",
     "tryAgainEncouragement": "¡Sigue jugando para mejorar!",
-    "of": "de"
+    "of": "de",
+    "readyForNextRound": "¿Listos para la siguiente ronda?",
+    "hostStartDescription": "¡Inicia una nueva partida cuando todos estén listos!"
   },
   "chart": {
     "yourProgress": "Tu Progreso",
@@ -1906,6 +1908,7 @@ const es = {
     "wordsByLength": "Palabras por longitud",
     "quitConfirmTitle": "¿Salir del juego?",
     "quitConfirmMessage": "Perderás tu progreso actual. ¿Seguro que quieres salir?",
+    "imSure": "Estoy seguro",
     "gamePaused": "Juego pausado",
     "botWords": "Palabras encontradas",
     "aiOpponents": "Oponentes IA",
@@ -1942,7 +1945,8 @@ const es = {
       "personalBest": "Mejor Personal",
       "personalBestDesc": "Desafío estándar - sigue tu progreso",
       "ultra": "Desafío Ultra",
-      "ultraDesc": "Desafío definitivo de puntuación"
+      "ultraDesc": "Desafío definitivo de puntuación",
+      "letters": "letras"
     },
     "wizard": {
       "selectMode": "Seleccionar modo de juego",
@@ -2076,6 +2080,8 @@ const es = {
     "yourScore": "Tu Puntuación",
     "completed": "¡Completado!",
     "quitConfirm": "¿Seguro que quieres salir? Perderás tu progreso y no podrás jugar el puzzle de hoy de nuevo.",
+    "quitConfirmTitle": "¿Salir del desafío?",
+    "imSure": "Estoy seguro",
     "wordsFound": "{count} palabras encontradas",
     "streak": "Racha",
     "streakDays": "¡Racha de {count} días!",
@@ -2123,7 +2129,7 @@ const es = {
     "tryAnotherLanguage": "Prueba Otro Idioma",
     "playDifferentLanguage": "¡Desafíate en un idioma diferente!",
     "feedback": {
-      "tooShort": "📏 Mínimo 4 letras",
+      "tooShort": "📏 Mínimo 3 letras",
       "duplicate": "🔁 ¡Ya encontrada!",
       "notOnBoard": "⚠️ No se puede formar en el tablero",
       "invalidWord": "❌ No es una palabra válida",
@@ -2258,9 +2264,9 @@ const es = {
       },
       "minLength": {
         "title": "⚠️ REGLA IMPORTANTE",
-        "description": "Las palabras deben tener al menos 4 LETRAS",
-        "example1": "4 letras ✓",
-        "example2": "3 letras - ¡muy corto!",
+        "description": "Las palabras deben tener al menos 3 LETRAS",
+        "example1": "3 letras ✓",
+        "example2": "2 letras - ¡muy corto!",
         "gotIt": "¡Entendido!"
       },
       "complete": {
@@ -2268,7 +2274,7 @@ const es = {
         "remember": "Recuerda:",
         "rule1": "10 intentos para encontrar el objetivo",
         "rule2": "Encuentra otras palabras para vida",
-        "rule3": "Mínimo 4 letras",
+        "rule3": "Mínimo 3 letras",
         "rule4": "Mismo puzzle en todo el mundo",
         "start": "Comenzar Desafío Diario"
       }
@@ -2304,6 +2310,22 @@ const es = {
     "stepOf": "Paso {current} de {total}",
     "stepOptions": "Opciones",
     "stepReview": "Revisar"
+  },
+  "home": {
+    "singlePlayer": "Un Jugador",
+    "multiplayer": "Multijugador"
+  },
+  "reveal": {
+    "revealWord": "Revelar",
+    "finding": "Buscando...",
+    "noWordsLeft": "No quedan palabras de 5+ letras para revelar",
+    "notEnoughCoins": "Necesitas {cost} monedas (tienes {balance})",
+    "gameNotActive": "El juego no está activo",
+    "coins": "Monedas",
+    "base": "Base",
+    "efficiency": "Eficiencia",
+    "streak": "Racha",
+    "usedForReveals": "¡Usa monedas para revelar palabras en juegos de un jugador!"
   }
 };
 

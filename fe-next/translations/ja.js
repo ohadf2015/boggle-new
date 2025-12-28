@@ -871,7 +871,9 @@ const ja = {
     "betterLuckNextTime": "次はきっとうまくいく！",
     "yourPlace": "{rank}位",
     "tryAgainEncouragement": "続けてプレイして上達しよう！",
-    "of": "/"
+    "of": "/",
+    "readyForNextRound": "次のラウンドの準備はいい？",
+    "hostStartDescription": "全員の準備ができたら新しいゲームを始めよう！"
   },
   "chart": {
     "yourProgress": "あなたの進捗",
@@ -1908,6 +1910,7 @@ const ja = {
     "wordsByLength": "長さ別の単語",
     "quitConfirmTitle": "ゲームを終了しますか？",
     "quitConfirmMessage": "現在の進捗が失われます。本当に終了しますか？",
+    "imSure": "終了する",
     "gamePaused": "ゲーム一時停止中",
     "botWords": "発見した単語",
     "aiOpponents": "AI対戦相手",
@@ -1944,7 +1947,8 @@ const ja = {
       "personalBest": "自己ベスト",
       "personalBestDesc": "スタンダードチャレンジ - 進捗を追跡",
       "ultra": "ウルトラチャレンジ",
-      "ultraDesc": "究極のハイスコアチャレンジ"
+      "ultraDesc": "究極のハイスコアチャレンジ",
+      "letters": "文字"
     },
     "wizard": {
       "selectMode": "ゲームモードを選択",
@@ -2078,6 +2082,8 @@ const ja = {
     "yourScore": "あなたのスコア",
     "completed": "完了！",
     "quitConfirm": "本当に終了しますか？進捗が失われ、今日のパズルは再プレイできません。",
+    "quitConfirmTitle": "チャレンジを終了しますか？",
+    "imSure": "終了する",
     "wordsFound": "{count}語発見",
     "streak": "ストリーク",
     "streakDays": "{count}日連続！",
@@ -2125,7 +2131,7 @@ const ja = {
     "tryAnotherLanguage": "別の言語に挑戦",
     "playDifferentLanguage": "違う言語でチャレンジしよう！",
     "feedback": {
-      "tooShort": "📏 最低4文字必要",
+      "tooShort": "📏 最低3文字必要",
       "duplicate": "🔁 既に見つかりました！",
       "notOnBoard": "⚠️ ボード上でこれを作成できません",
       "invalidWord": "❌ 有効な単語ではありません",
@@ -2260,9 +2266,9 @@ const ja = {
       },
       "minLength": {
         "title": "⚠️ 重要なルール",
-        "description": "単語は最低4文字必要です",
-        "example1": "4文字 ✓",
-        "example2": "3文字 - 短すぎます！",
+        "description": "単語は最低3文字必要です",
+        "example1": "3文字 ✓",
+        "example2": "2文字 - 短すぎます！",
         "gotIt": "わかりました！"
       },
       "complete": {
@@ -2270,7 +2276,7 @@ const ja = {
         "remember": "覚えておいて：",
         "rule1": "目標を見つけるための10回の試行",
         "rule2": "ライフのために他の単語を見つける",
-        "rule3": "最低4文字",
+        "rule3": "最低3文字",
         "rule4": "世界中で同じパズル",
         "start": "デイリーチャレンジを開始"
       }
@@ -2306,6 +2312,22 @@ const ja = {
     "stepOf": "ステップ {current} / {total}",
     "stepOptions": "オプション",
     "stepReview": "確認"
+  },
+  "home": {
+    "singlePlayer": "シングルプレイヤー",
+    "multiplayer": "マルチプレイヤー"
+  },
+  "reveal": {
+    "revealWord": "表示",
+    "finding": "検索中...",
+    "noWordsLeft": "表示する5文字以上の単語がありません",
+    "notEnoughCoins": "{cost}コインが必要です（現在{balance}）",
+    "gameNotActive": "ゲームがアクティブではありません",
+    "coins": "コイン",
+    "base": "基本",
+    "efficiency": "効率",
+    "streak": "連続",
+    "usedForReveals": "コインを使ってシングルプレイヤーゲームで単語を表示しましょう！"
   }
 };
 
