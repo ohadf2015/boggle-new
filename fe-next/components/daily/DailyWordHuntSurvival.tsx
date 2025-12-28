@@ -79,7 +79,7 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
   onQuit,
 }) => {
   const { t } = useLanguage();
-  const { playWordAcceptedSound, playWrongAnswerSound } = useSoundEffects();
+  const { playWordAcceptedSound } = useSoundEffects();
   const isLandscape = useMobileLandscape();
 
   // Survival state
@@ -194,7 +194,6 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
     // Check if already attempted
     if (attempts.some(a => a.word === word)) {
       setCurrentFeedback(t('wordHunt.alreadyGuessed'));
-      playWrongAnswerSound?.();
       return;
     }
 
@@ -224,7 +223,7 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
     }
 
     setCurrentFeedback(t('wordHunt.keepGoing'));
-  }, [attempts, playWordAcceptedSound, playWrongAnswerSound, t]);
+  }, [attempts, playWordAcceptedSound, t]);
 
   // Handle grid word discovery
   const handleWordDiscovery = useCallback((word: string) => {

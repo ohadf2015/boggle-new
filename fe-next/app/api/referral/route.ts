@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs';
-import { cookies } from 'next/headers';
+import { createClient } from '@/utils/supabase/server';
 
 /**
  * GET /api/referral
@@ -8,7 +7,7 @@ import { cookies } from 'next/headers';
  */
 export async function GET(request: NextRequest) {
   try {
-    const supabase = createRouteHandlerClient({ cookies });
+    const supabase = await createClient();
 
     // Get authenticated user
     const {
@@ -53,7 +52,13 @@ export async function GET(request: NextRequest) {
 
     // Get referred user details for display
     const referredIds = referrals?.map(r => r.referred_id) || [];
-    let referredUsers = [];
+    let referredUsers: Array<{
+      id: string;
+      username: string | null;
+      display_name: string | null;
+      avatar_emoji: string | null;
+      avatar_color: string | null;
+    }> = [];
 
     if (referredIds.length > 0) {
       const { data: users, error: usersError } = await supabase
@@ -108,7 +113,7 @@ export async function GET(request: NextRequest) {
  */
 export async function POST(request: NextRequest) {
   try {
-    const supabase = createRouteHandlerClient({ cookies });
+    const supabase = await createClient();
 
     // Get authenticated user
     const {

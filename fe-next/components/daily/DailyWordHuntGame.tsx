@@ -57,7 +57,7 @@ const DailyWordHuntGame: React.FC<DailyWordHuntGameProps> = ({
   onQuit,
 }) => {
   const { t } = useLanguage();
-  const { playWordAcceptedSound, playWrongAnswerSound } = useSoundEffects();
+  const { playWordAcceptedSound } = useSoundEffects();
   const isLandscape = useMobileLandscape();
 
   // Game state
@@ -102,14 +102,12 @@ const DailyWordHuntGame: React.FC<DailyWordHuntGameProps> = ({
       setCurrentFeedback(t('wordHunt.wrongLength')
         .replace('{expected}', String(normalizedTarget.length))
         .replace('{got}', String(normalizedWord.length)));
-      playWrongAnswerSound?.();
       return;
     }
 
     // Check if word already submitted
     if (attempts.some(a => a.word.toUpperCase() === normalizedWord)) {
       setCurrentFeedback(t('wordHunt.alreadyGuessed'));
-      playWrongAnswerSound?.();
       return;
     }
 
@@ -160,7 +158,7 @@ const DailyWordHuntGame: React.FC<DailyWordHuntGameProps> = ({
 
     // Game continues
     setCurrentFeedback(t('wordHunt.keepGoing'));
-  }, [isGameOver, targetWord, attempts, t, playWordAcceptedSound, playWrongAnswerSound, onComplete]);
+  }, [isGameOver, targetWord, attempts, t, playWordAcceptedSound, onComplete]);
 
   // Quit confirmation
   const handleQuitClick = useCallback(() => {

@@ -18,6 +18,7 @@ import {
 import { feedbackToEmoji, type LetterFeedback } from '@/utils/wordHuntFeedback';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
+import type { Language } from '@/types';
 
 interface WordHuntStats {
   totalPlayers: number;
@@ -43,7 +44,7 @@ interface DailyWordHuntResultsProps {
   result: WordHuntResult;
   puzzleNumber: number;
   puzzleDate: string;
-  language: string;
+  language: Language;
   countdown: string;
   isNewCompletion: boolean;
   onBack: () => void;
@@ -463,13 +464,13 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
             </div>
 
             {/* Survival mode stats - show when available */}
-            {(stats.avgLifeRemaining !== null || stats.avgEfficiencyScore !== null || stats.avgWordsDiscovered !== null) && (
+            {(stats.avgLifeRemaining != null || stats.avgEfficiencyScore != null || stats.avgWordsDiscovered != null) && (
               <div className="mt-4 pt-4 border-t-2 border-gray-200 dark:border-gray-700 space-y-2">
                 <div className="text-xs font-bold text-gray-600 dark:text-gray-300 uppercase">
                   Survival Mode Metrics
                 </div>
                 <div className="grid grid-cols-2 gap-3 text-center">
-                  {stats.avgLifeRemaining !== null && (
+                  {stats.avgLifeRemaining != null && (
                     <div>
                       <div className="text-xl font-black text-red-500">
                         {stats.avgLifeRemaining.toFixed(0)}
@@ -479,7 +480,7 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
                       </div>
                     </div>
                   )}
-                  {stats.avgWordsDiscovered !== null && (
+                  {stats.avgWordsDiscovered != null && (
                     <div>
                       <div className="text-xl font-black text-blue-500">
                         {stats.avgWordsDiscovered.toFixed(1)}
@@ -489,7 +490,7 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
                       </div>
                     </div>
                   )}
-                  {stats.avgEfficiencyScore !== null && (
+                  {stats.avgEfficiencyScore != null && (
                     <div>
                       <div className="text-xl font-black text-purple-500">
                         {stats.avgEfficiencyScore.toFixed(0)}
@@ -499,7 +500,7 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
                       </div>
                     </div>
                   )}
-                  {stats.maxEfficiencyScore !== null && (
+                  {stats.maxEfficiencyScore != null && (
                     <div>
                       <div className="text-xl font-black text-yellow-500">
                         {stats.maxEfficiencyScore}

@@ -23,7 +23,6 @@ const DailyChallenge = dynamicImport(() => import('@/components/daily/DailyChall
       </div>
     </div>
   ),
-  ssr: false,
 });
 
 // Force dynamic rendering

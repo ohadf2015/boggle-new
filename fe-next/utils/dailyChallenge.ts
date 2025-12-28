@@ -929,6 +929,16 @@ const TARGET_WORD_LISTS: Record<Language, string[]> = {
     'VENTANA', 'SIMPLE', 'MODERNO', 'DORADO',
     // Spanish 7-letter words
     'COCINA', 'MAÑANA', 'PERFECTO', 'NATURAL'
+  ],
+  fr: [
+    // French 5-letter words
+    'MAISON', 'MONDE', 'TEMPS', 'VILLE', 'GRAND',
+    'PETIT', 'BELLE', 'FORCE', 'PLACE', 'CHOSE'
+  ],
+  de: [
+    // German 5-letter words
+    'HAUS', 'WELT', 'ZEIT', 'STADT', 'GROSS',
+    'KLEIN', 'KRAFT', 'PLATZ', 'SACHE', 'WASSER'
   ]
 };
 

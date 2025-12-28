@@ -25,7 +25,7 @@ import {
   type StoredWordHuntResult,
 } from '@/utils/dailyChallenge';
 import type { LetterGrid, Language } from '@/types';
-import type { WordHuntGameResult } from './DailyWordHuntSurvival';
+import type { SurvivalGameResult } from './DailyWordHuntSurvival';
 
 export type DailyChallengePhase = 'loading' | 'ready' | 'playing' | 'completed' | 'already-played';
 
@@ -61,7 +61,7 @@ const DailyChallenge: React.FC = () => {
 
   // Results
   const [storedResult, setStoredResult] = useState<StoredWordHuntResult | null>(null);
-  const [gameResult, setGameResult] = useState<WordHuntGameResult | null>(null);
+  const [gameResult, setGameResult] = useState<SurvivalGameResult | null>(null);
 
   // Initialize Word Hunt daily challenge
   useEffect(() => {
@@ -108,7 +108,7 @@ const DailyChallenge: React.FC = () => {
   }, []);
 
   // Handle Word Hunt game completion
-  const handleGameComplete = useCallback((result: WordHuntGameResult) => {
+  const handleGameComplete = useCallback((result: SurvivalGameResult) => {
     // Create the Word Hunt result object
     const wordHuntResult: WordHuntResult = {
       puzzleNumber,
