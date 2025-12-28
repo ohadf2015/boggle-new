@@ -235,14 +235,30 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
     const normalizedWord = word.toUpperCase();
     const normalizedTarget = targetWord.toUpperCase();
 
-    // Check if attempting target word
-    if (normalizedWord.length === normalizedTarget.length) {
+    // Check if attempting target word (exact match only)
+    if (normalizedWord === normalizedTarget) {
       handleTargetAttempt(normalizedWord, normalizedTarget);
+    } else if (normalizedWord.length === normalizedTarget.length) {
+      // Same length as target - could be a target guess attempt
+      // First check if it's already been attempted
+      if (attempts.some(a => a.word === normalizedWord)) {
+        showToast('duplicate', t('wordHunt.alreadyGuessed') || '🔁 Already guessed!');
+        return;
+      }
+      // Check if it's a valid word on the board - if so, treat as word discovery AND target attempt
+      if (isWordOnBoard(normalizedWord, grid, language)) {
+        // It's a valid word, give discovery rewards AND record as target attempt
+        handleWordDiscovery(normalizedWord);
+        handleTargetAttempt(normalizedWord, normalizedTarget);
+      } else {
+        // Not a valid word, just record as failed target attempt
+        handleTargetAttempt(normalizedWord, normalizedTarget);
+      }
     } else {
-      // It's a grid word discovery
+      // Different length - it's only a grid word discovery
       handleWordDiscovery(normalizedWord);
     }
-  }, [isGameOver, targetWord, discoveredWords, attempts]);
+  }, [isGameOver, targetWord, discoveredWords, attempts, grid, language, showToast, t]);
 
   // Handle target word attempt
   const handleTargetAttempt = useCallback((word: string, target: string) => {

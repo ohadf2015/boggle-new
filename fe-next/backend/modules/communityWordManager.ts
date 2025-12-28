@@ -1,13 +1,13 @@
 /**
  * Community Word Manager
  * Handles crowd-sourced word voting and dynamic dictionary expansion
- * Words with net_score >= 10 become "prominently valid" and auto-validate during gameplay
+ * Words with net_score >= 6 become "prominently valid" and auto-validate during gameplay
  * Words with positive ratio (> 0) count as valid for scoring but still show validation modal
  *
  * VALIDATION SCORING:
  * - AI validation = 4 points
  * - Player vote = 1 point (like = +1, dislike = -1)
- * - Words need 10+ net score to be added prominently to dictionary
+ * - Words need 6+ net score to be added prominently to dictionary (matches database is_potentially_valid)
  * - Words with positive ratio (> 0) count as valid for scoring
  *
  * SELF-HEALING FEATURES:
@@ -152,21 +152,22 @@ export interface SelfHealingConfig {
   SKIP_AI_IF_COMMUNITY_NEGATIVE: boolean;
 }
 
-type LanguageCode = 'en' | 'he' | 'sv' | 'ja';
+type LanguageCode = 'en' | 'he' | 'sv' | 'ja' | 'es';
 
 // Validation scoring constants
 export const AI_VOTE_POINTS = 4;          // AI validation counts as 4 points
-export const PROMINENT_THRESHOLD = 10;    // Words need 10+ net score for prominent dictionary addition
+export const PROMINENT_THRESHOLD = 6;     // Words need 6+ net score for prominent dictionary addition (matches database is_potentially_valid)
 export const VALID_THRESHOLD = 0;         // Words with positive ratio (> 0) count as valid for scoring
 
 // In-memory cache of community-validated words per language
-// These are words with net_score >= PROMINENT_THRESHOLD (10) that are prominently valid
+// These are words with net_score >= PROMINENT_THRESHOLD (6) that are prominently valid
 // Words with positive ratio (> 0) also count as valid for scoring
 const communityValidWords: Record<LanguageCode, Set<string>> = {
   en: new Set(),
   he: new Set(),
   sv: new Set(),
-  ja: new Set()
+  ja: new Set(),
+  es: new Set()
 };
 
 // In-memory cache of words pending validation with their vote counts
@@ -175,7 +176,8 @@ const wordsPendingVotes: Record<LanguageCode, Map<string, PendingWordData>> = {
   en: new Map(),
   he: new Map(),
   sv: new Map(),
-  ja: new Map()
+  ja: new Map(),
+  es: new Map()
 };
 
 // Configuration for self-healing system
@@ -183,7 +185,7 @@ export const SELF_HEALING_CONFIG: SelfHealingConfig = {
   // Number of words to show each player for voting
   WORDS_PER_PLAYER: 3,
   // Prioritize words within this range of the threshold (close to being validated)
-  THRESHOLD_PROXIMITY: 3, // Words with net_score between 3 and 8 get priority
+  THRESHOLD_PROXIMITY: 3, // Words with net_score between 3 and 6 get priority
   // Minimum votes before a word is considered for validation
   MIN_VOTES_FOR_REVIEW: 4,
   // If AI and community disagree by this margin, flag for review
@@ -233,7 +235,7 @@ export async function loadCommunityWords(): Promise<void> {
     }
 
     // Populate in-memory sets
-    const counts: Record<LanguageCode, number> = { en: 0, he: 0, sv: 0, ja: 0 };
+    const counts: Record<LanguageCode, number> = { en: 0, he: 0, sv: 0, ja: 0, es: 0 };
     for (const row of data || []) {
       const lang = (row.language || 'en') as LanguageCode;
       if (communityValidWords[lang]) {
@@ -252,7 +254,7 @@ export async function loadCommunityWords(): Promise<void> {
       .gt('likes_count', 0); // Has at least some engagement
 
     if (!pendingError && pendingData) {
-      const pendingCounts: Record<LanguageCode, number> = { en: 0, he: 0, sv: 0, ja: 0 };
+      const pendingCounts: Record<LanguageCode, number> = { en: 0, he: 0, sv: 0, ja: 0, es: 0 };
       for (const row of pendingData) {
         const lang = (row.language || 'en') as LanguageCode;
         if (wordsPendingVotes[lang]) {

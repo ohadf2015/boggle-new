@@ -3,7 +3,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
-import { ArrowRight, ArrowLeft, Users, DoorOpen } from 'lucide-react';
+import { ArrowRight, ArrowLeft, Users, LayoutGrid } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
 
@@ -147,7 +147,7 @@ const ModeCard: React.FC<ModeCardProps> = ({
           <div className="flex flex-wrap gap-1.5 mb-3">
             {liveBadge.openRooms > 0 && (
               <span className="inline-flex items-center gap-1 px-2 py-1 bg-neo-lime/90 text-neo-black text-xs font-bold rounded-neo border-2 border-neo-black shadow-hard-sm">
-                <DoorOpen className="w-3 h-3" />
+                <LayoutGrid className="w-3 h-3" />
                 {liveBadge.openRooms} {liveBadge.roomsLabel}
               </span>
             )}

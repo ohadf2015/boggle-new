@@ -40,6 +40,7 @@ export interface SinglePlayerGameState {
   grid: LetterGrid | null;
   timerSeconds: number;
   bots: BotOpponent[];
+  minWordLength: number; // Minimum word length (2 for EASY, 3 for others)
 }
 
 export interface PlayerWordData {
@@ -149,6 +150,7 @@ const SinglePlayerView: React.FC = () => {
     grid: null,
     timerSeconds: 120, // 2 minutes default (standard preset)
     bots: [DEFAULT_MEDIUM_BOT],
+    minWordLength: 3, // Default to 3 letters minimum
   }));
   const [resultsData, setResultsData] = useState<SinglePlayerResultsData | null>(null);
 
@@ -221,6 +223,7 @@ const SinglePlayerView: React.FC = () => {
       bots,
       language: uiLanguage as Language,
       grid: null,
+      minWordLength: preset.settings.minWordLength ?? 3, // Use preset's minWordLength or default to 3
     }));
     setPhase('playing');
   }, [uiLanguage, router, generateBots]);
@@ -242,12 +245,30 @@ const SinglePlayerView: React.FC = () => {
         (longest, word) => word.length > longest.length ? word : longest,
         ''
       );
+
+      // Calculate additional stats for high score tracking
+      const validWords = results.playerWordData?.filter(w => w.isValid) || [];
+      const totalAttempts = results.playerWordData?.length || 0;
+      const accuracy = totalAttempts > 0 ? Math.round((validWords.length / totalAttempts) * 100) : 0;
+      const avgWordLength = validWords.length > 0
+        ? validWords.reduce((sum, w) => sum + w.word.length, 0) / validWords.length
+        : 0;
+      const totalComboBonus = validWords.reduce((sum, w) => sum + (w.comboBonus || 0), 0);
+      const totalFireRoundBonus = validWords.reduce((sum, w) => sum + (w.fireRoundBonus || 0), 0);
+
       const highScoreResult = recordGameResult(
         results.playerScore,
         results.playerWords.length,
         longestWord,
         gameState.difficulty,
-        gameState.timerSeconds
+        gameState.timerSeconds,
+        {
+          accuracy,
+          comboBonus: totalComboBonus,
+          fireRoundBonus: totalFireRoundBonus,
+          averageWordLength: avgWordLength,
+          achievementCount: results.achievements?.length || 0,
+        }
       );
 
       // Update results with high score info

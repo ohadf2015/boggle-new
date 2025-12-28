@@ -10,7 +10,7 @@ import { cn } from '@/lib/utils';
 import { validateUsername, validateGameCode, sanitizeInput } from '@/utils/validation';
 import { useDebouncedValidation, getValidationClasses } from '@/hooks/useDebouncedValidation';
 import AvatarSelectorButton from './AvatarSelectorButton';
-import EmojiAvatarPicker from '@/components/EmojiAvatarPicker';
+import EmojiAvatarPicker, { PROFILE_AVATAR_ID } from '@/components/EmojiAvatarPicker';
 import { AVATARS, getAvatarById, type AvatarConfig } from '@/utils/avatarConfig';
 import { useAuth } from '@/contexts/AuthContext';
 import Avatar from '@/components/Avatar';
@@ -105,9 +105,15 @@ const JoinModeFields: React.FC<JoinModeFieldsProps> = ({
 
   // Handle avatar selection from picker for authenticated users
   const handleAuthAvatarSave = ({ avatarImage }: { avatarImage: string; emoji?: string; color?: string }) => {
-    const avatar = getAvatarById(avatarImage);
-    if (avatar) {
-      handleAvatarSelect(avatar);
+    if (avatarImage === PROFILE_AVATAR_ID) {
+      // User selected their profile avatar - clear the game avatar
+      setSelectedAvatarId(PROFILE_AVATAR_ID);
+      // No need to update profile - PROFILE_AVATAR_ID means use profile picture/emoji
+    } else {
+      const avatar = getAvatarById(avatarImage);
+      if (avatar) {
+        handleAvatarSelect(avatar);
+      }
     }
     setIsAuthAvatarPickerOpen(false);
   };
@@ -208,8 +214,8 @@ const JoinModeFields: React.FC<JoinModeFieldsProps> = ({
               className="relative group flex-shrink-0"
               aria-label={t('joinView.changeAvatar') || 'Change avatar'}
             >
-              {/* Show selected game avatar if set, otherwise profile picture or emoji fallback */}
-              {selectedAvatarId ? (
+              {/* Show selected game avatar if set (not PROFILE_AVATAR_ID), otherwise profile picture or emoji fallback */}
+              {selectedAvatarId && selectedAvatarId !== PROFILE_AVATAR_ID ? (
                 <Avatar
                   avatarImage={selectedAvatarId}
                   size="lg"
@@ -257,6 +263,12 @@ const JoinModeFields: React.FC<JoinModeFieldsProps> = ({
         onClose={() => setIsAuthAvatarPickerOpen(false)}
         onSave={handleAuthAvatarSave}
         currentAvatarImage={selectedAvatarId}
+        profileAvatar={isAuthenticated ? {
+          profilePictureUrl: profile?.profile_picture_url,
+          avatarEmoji: profile?.avatar_emoji,
+          avatarColor: profile?.avatar_color,
+          displayName: displayName,
+        } : undefined}
       />
 
       {/* Guest: Avatar + Username inline */}

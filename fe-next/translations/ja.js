@@ -493,6 +493,8 @@ const ja = {
       "usernameHint": "2-20文字、英数字",
       "avatarLabel": "アバターを選択",
       "usingProfileAvatar": "プロフィールアバターを使用中",
+      "usingGameAvatar": "ゲームアバターを使用中",
+      "tapToChange": "タップして変更",
       "continueButton": "続ける",
       "saveButton": "変更を保存"
     },
@@ -865,6 +867,7 @@ const ja = {
   "chart": {
     "yourProgress": "あなたの進捗",
     "needMoreGames": "もっとプレイしよう！",
+    "oneMoreGame": "あと1ゲーム！",
     "needMoreGamesDesc": "2ゲーム以上プレイすると進捗グラフが表示されます",
     "bestScore": "最高",
     "average": "平均",
@@ -2166,6 +2169,9 @@ const ja = {
     "results": {
       "targetWord": "目標単語",
       "tokensEarned": "獲得トークン",
+      "betterLuckNextTime": "次回は頑張って！",
+      "nextChallengeIn": "次のチャレンジまで",
+      "tryAgainTomorrow": "明日また新しいパズルに挑戦しよう！",
       "rankOutOf": "{total}人中{rank}位",
       "rankingsFor": "{language}パズルのランキング",
       "survivalMetrics": "サバイバルモード統計",

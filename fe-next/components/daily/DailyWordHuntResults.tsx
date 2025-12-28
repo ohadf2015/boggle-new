@@ -358,43 +358,58 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
           <div className="text-sm text-gray-600 dark:text-gray-300 uppercase font-bold">
             🎯 {t('daily.puzzleNumber').replace('{number}', String(puzzleNumber))}
           </div>
-          <div className={cn(
-            "text-6xl md:text-7xl font-black mt-2",
-            result.solved ? "text-green-500" : "text-gray-400"
-          )}>
-            {result.solved ? result.attemptsUsed : 'X'}/10
-          </div>
-          <div className="text-gray-600 dark:text-gray-300">
-            {t('wordHunt.stats.attemptsUsed').replace('{count}', String(result.attemptsUsed))}
-          </div>
 
-          {/* Show target word for successful players */}
-          {result.solved && (
-            <div className="mt-3 space-y-2">
-              <div className="text-sm text-gray-600 dark:text-gray-400">
-                {t('wordHunt.results.targetWord')}:
+          {/* Success: Show attempts used */}
+          {result.solved ? (
+            <>
+              <div className="text-6xl md:text-7xl font-black mt-2 text-green-500">
+                {result.attemptsUsed}/10
               </div>
-              <div className="text-2xl font-black text-neo-yellow tracking-wider">
-                {result.targetWord.toUpperCase()}
+              <div className="text-gray-600 dark:text-gray-300">
+                {t('wordHunt.stats.attemptsUsed').replace('{count}', String(result.attemptsUsed))}
               </div>
-            </div>
-          )}
 
-          {/* Show coins earned (net tokens) for successful players */}
-          {result.solved && result.clueTokensEarned !== undefined && result.clueTokensSpent !== undefined && (
-            <div className="mt-2 flex items-center justify-center gap-2 px-4 py-2 bg-yellow-100 dark:bg-yellow-900/30 rounded-neo border-2 border-neo-black">
-              <span className="text-2xl">🪙</span>
-              <div className="text-sm">
-                <span className="font-black text-xl">{result.clueTokensEarned - result.clueTokensSpent}</span>
-                <span className="text-gray-600 dark:text-gray-400 ml-1">{t('wordHunt.results.tokensEarned')}</span>
+              {/* Show target word for successful players */}
+              <div className="mt-3 space-y-2">
+                <div className="text-sm text-gray-600 dark:text-gray-400">
+                  {t('wordHunt.results.targetWord')}:
+                </div>
+                <div className="text-2xl font-black text-neo-yellow tracking-wider">
+                  {result.targetWord.toUpperCase()}
+                </div>
               </div>
-            </div>
-          )}
 
-          {/* Show defeat message with target word */}
-          {!result.solved && (
-            <div className="mt-2 text-sm text-gray-600 dark:text-gray-400">
-              {t('wordHunt.defeat').replace('{word}', result.targetWord.toUpperCase())}
+              {/* Show coins earned (net tokens) for successful players */}
+              {result.clueTokensEarned !== undefined && result.clueTokensSpent !== undefined && (
+                <div className="mt-2 flex items-center justify-center gap-2 px-4 py-2 bg-yellow-100 dark:bg-yellow-900/30 rounded-neo border-2 border-neo-black">
+                  <span className="text-2xl">🪙</span>
+                  <div className="text-sm">
+                    <span className="font-black text-xl">{result.clueTokensEarned - result.clueTokensSpent}</span>
+                    <span className="text-gray-600 dark:text-gray-400 ml-1">{t('wordHunt.results.tokensEarned')}</span>
+                  </div>
+                </div>
+              )}
+            </>
+          ) : (
+            /* Failed: Show encouraging message and countdown */
+            <div className="mt-4 space-y-4">
+              <div className="text-lg text-gray-600 dark:text-gray-300">
+                {t('wordHunt.results.betterLuckNextTime')}
+              </div>
+
+              {/* Next challenge countdown - prominent for failed players */}
+              <div className="inline-block px-6 py-4 bg-gradient-to-r from-neo-cyan to-neo-blue rounded-neo border-3 border-neo-black shadow-hard">
+                <div className="text-sm text-white/80 uppercase font-bold mb-1">
+                  {t('wordHunt.results.nextChallengeIn')}
+                </div>
+                <div className="text-3xl font-black text-white">
+                  {countdown}
+                </div>
+              </div>
+
+              <div className="text-sm text-gray-500 dark:text-gray-400">
+                {t('wordHunt.results.tryAgainTomorrow')}
+              </div>
             </div>
           )}
 

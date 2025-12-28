@@ -497,6 +497,8 @@ const en = {
       "usernameHint": "2-20 characters, letters and numbers",
       "avatarLabel": "Choose your avatar",
       "usingProfileAvatar": "Using your profile avatar",
+      "usingGameAvatar": "Using game avatar",
+      "tapToChange": "Tap to change",
       "continueButton": "Continue",
       "saveButton": "Save Changes"
     },
@@ -871,6 +873,7 @@ const en = {
   "chart": {
     "yourProgress": "Your Progress",
     "needMoreGames": "Play More Games!",
+    "oneMoreGame": "1 More Game!",
     "needMoreGamesDesc": "Your improvement chart will appear after 2+ games",
     "bestScore": "Best",
     "average": "Avg",
@@ -2172,6 +2175,9 @@ const en = {
     "results": {
       "targetWord": "Target Word",
       "tokensEarned": "tokens earned",
+      "betterLuckNextTime": "Better luck next time!",
+      "nextChallengeIn": "Next challenge in",
+      "tryAgainTomorrow": "Come back tomorrow for a new puzzle!",
       "rankOutOf": "#{rank} out of {total} players",
       "rankingsFor": "Rankings for {language} puzzle",
       "survivalMetrics": "Survival Mode Metrics",

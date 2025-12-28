@@ -5,6 +5,9 @@ import Image from 'next/image';
 import { Bot } from 'lucide-react';
 import { getAvatarPath, mapEmojiToAvatar } from '@/utils/avatarConfig';
 
+// Special constant for "use profile avatar" selection - indicates profile picture/emoji should be used
+const PROFILE_AVATAR_ID = '__profile_avatar__';
+
 /**
  * Avatar size type
  */
@@ -86,10 +89,11 @@ const Avatar = memo<AvatarProps>(({
   }
 
   // 2. Show avatar image if provided (either directly or via emoji migration)
+  // Skip if avatarImage is PROFILE_AVATAR_ID - that means use profile picture/emoji fallback
   let avatarPath: string | undefined;
 
-  if (avatarImage) {
-    // Direct avatar image provided
+  if (avatarImage && avatarImage !== PROFILE_AVATAR_ID) {
+    // Direct avatar image provided (not the special profile marker)
     avatarPath = avatarImage.includes('/') ? avatarImage : getAvatarPath(avatarImage);
   } else if (avatarEmoji) {
     // Legacy emoji avatar - map to image avatar

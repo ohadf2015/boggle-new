@@ -6,7 +6,7 @@ import {
   Users, Gamepad2, Clock, Globe, TrendingUp,
   ArrowLeft, RefreshCw, UserPlus, Languages, Link,
   Trophy, CalendarDays, CalendarRange, Server, User, Bot,
-  Book, Settings
+  Book, Settings, History, ChevronLeft, ChevronRight
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import Header from '@/components/Header';
@@ -139,6 +139,35 @@ interface CommunityWordsStats {
   pending: number;
 }
 
+interface GameLog {
+  id: string;
+  player_id: string;
+  game_code: string;
+  score: number;
+  word_count: number;
+  longest_word: string | null;
+  placement: number | null;
+  is_ranked: boolean;
+  language: string;
+  time_played: number;
+  created_at: string;
+  profiles: {
+    username: string;
+    display_name: string | null;
+    avatar_emoji: string | null;
+    avatar_color: string | null;
+  } | null;
+}
+
+interface GameLogsPagination {
+  page: number;
+  pageSize: number;
+  totalCount: number;
+  totalPages: number;
+  hasNextPage: boolean;
+  hasPrevPage: boolean;
+}
+
 export default function AdminDashboard() {
   const { theme } = useTheme();
   const { language } = useLanguage();
@@ -163,7 +192,17 @@ export default function AdminDashboard() {
   const [selectedLanguage, setSelectedLanguage] = useState<string>('all');
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
-  const [activeTab, setActiveTab] = useState<'overview' | 'players' | 'sources' | 'activity' | 'bot-words' | 'community-words'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'players' | 'sources' | 'activity' | 'bot-words' | 'community-words' | 'game-logs'>('overview');
+
+  // Game Logs state
+  const [gameLogs, setGameLogs] = useState<GameLog[]>([]);
+  const [gameLogsPagination, setGameLogsPagination] = useState<GameLogsPagination | null>(null);
+  const [gameLogsLoading, setGameLogsLoading] = useState(false);
+  const [gameLogsPage, setGameLogsPage] = useState(1);
+  const [gameLogsLanguage, setGameLogsLanguage] = useState<string>('all');
+  const [gameLogsRanked, setGameLogsRanked] = useState<string>('all');
+  const [gameLogsStartDate, setGameLogsStartDate] = useState<string>('');
+  const [gameLogsEndDate, setGameLogsEndDate] = useState<string>('');
 
   // Get auth token for API calls
   const getAuthToken = useCallback(async () => {
@@ -360,6 +399,42 @@ export default function AdminDashboard() {
     }
   }, [getAuthToken]);
 
+  // Fetch game logs with pagination and filters
+  const fetchGameLogs = useCallback(async (page: number = 1) => {
+    const token = await getAuthToken();
+    if (!token) return;
+
+    setGameLogsLoading(true);
+    try {
+      const params = new URLSearchParams();
+      params.set('page', page.toString());
+      params.set('pageSize', '20');
+      if (gameLogsLanguage !== 'all') params.set('language', gameLogsLanguage);
+      if (gameLogsRanked !== 'all') params.set('isRanked', gameLogsRanked);
+      if (gameLogsStartDate) params.set('startDate', gameLogsStartDate);
+      if (gameLogsEndDate) params.set('endDate', gameLogsEndDate);
+
+      const res = await fetch(`/api/admin/game-logs?${params.toString()}`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        setGameLogs(data.games || []);
+        setGameLogsPagination(data.pagination || null);
+        setGameLogsPage(page);
+      } else {
+        const error = await res.json();
+        toast.error(error.error || 'Failed to fetch game logs');
+      }
+    } catch (error) {
+      console.error('Failed to fetch game logs:', error);
+      toast.error('Failed to fetch game logs');
+    } finally {
+      setGameLogsLoading(false);
+    }
+  }, [getAuthToken, gameLogsLanguage, gameLogsRanked, gameLogsStartDate, gameLogsEndDate]);
+
   // Handle community word approval
   const handleCommunityApprove = async (word: CommunityWord, addToDictionary: boolean = false) => {
     const token = await getAuthToken();
@@ -439,6 +514,13 @@ export default function AdminDashboard() {
     }
   }, [activeTab, isAdmin, communityWordStatus, communityWordLanguage, fetchCommunityWords, communityWordSearch]);
 
+  // Fetch game logs when tab changes or filters update
+  useEffect(() => {
+    if (activeTab === 'game-logs' && isAdmin) {
+      fetchGameLogs(1); // Reset to page 1 when filters change
+    }
+  }, [activeTab, isAdmin, gameLogsLanguage, gameLogsRanked, gameLogsStartDate, gameLogsEndDate, fetchGameLogs]);
+
   // Still loading profile - wait before showing access denied
   // This prevents showing "Access Required" while profile is still being fetched
   const isProfileLoading = !authLoading && user && !profile;
@@ -462,7 +544,7 @@ export default function AdminDashboard() {
             </h2>
             <p className={cn(
               'text-lg mb-6',
-              isDarkMode ? 'text-gray-600' : 'text-gray-600'
+              isDarkMode ? 'text-gray-400' : 'text-gray-600'
             )}>
               You don&apos;t have permission to access this page.
             </p>
@@ -508,59 +590,64 @@ export default function AdminDashboard() {
     )}>
       <Header />
 
-      <div className="max-w-7xl mx-auto px-4 py-6">
-        {/* Header */}
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
-          <div>
+      <div className="max-w-7xl mx-auto px-3 sm:px-4 py-4 sm:py-6">
+        {/* Header - Responsive with back button */}
+        <div className="flex items-center justify-between gap-2 sm:gap-4 mb-4 sm:mb-6">
+          {/* Back Button - Always visible */}
+          <Button
+            onClick={() => router.push(`/${language}`)}
+            variant="outline"
+            size="sm"
+            className={cn(
+              'rounded-lg flex-shrink-0 min-w-[44px] min-h-[44px]',
+              isDarkMode ? 'border-slate-600 text-gray-300 hover:bg-slate-700' : 'hover:bg-gray-100'
+            )}
+            aria-label="Back to home"
+          >
+            <ArrowLeft className="h-5 w-5" />
+            <span className="hidden sm:inline ml-2">Back</span>
+          </Button>
+
+          {/* Title - Centered on mobile */}
+          <div className="flex-1 min-w-0 text-center sm:text-left">
             <h1 className={cn(
-              'text-2xl sm:text-3xl font-bold',
+              'text-lg sm:text-2xl md:text-3xl font-bold truncate',
               isDarkMode ? 'text-white' : 'text-gray-900'
             )}>
               Admin Dashboard
             </h1>
             <p className={cn(
-              'text-sm',
-              isDarkMode ? 'text-gray-600' : 'text-gray-600'
+              'text-xs sm:text-sm truncate',
+              isDarkMode ? 'text-gray-400' : 'text-gray-600'
             )}>
-              Welcome, {profile?.display_name || profile?.username}
+              <span className="hidden xs:inline">Welcome, </span>{profile?.display_name || profile?.username}
             </p>
           </div>
-          <div className="flex gap-2">
-            <Button
-              onClick={handleRefresh}
-              disabled={refreshing}
-              variant="outline"
-              size="sm"
-              className={cn(
-                'rounded-lg',
-                isDarkMode ? 'border-slate-600 text-gray-300' : ''
-              )}
-            >
-              <RefreshCw className={cn('mr-2', refreshing && 'animate-spin')} />
-              Refresh
-            </Button>
-            <Button
-              onClick={() => router.push(`/${language}`)}
-              variant="outline"
-              size="sm"
-              className={cn(
-                'rounded-lg',
-                isDarkMode ? 'border-slate-600 text-gray-300' : ''
-              )}
-            >
-              <ArrowLeft className="mr-2" />
-              Back
-            </Button>
-          </div>
+
+          {/* Refresh Button */}
+          <Button
+            onClick={handleRefresh}
+            disabled={refreshing}
+            variant="outline"
+            size="sm"
+            className={cn(
+              'rounded-lg flex-shrink-0 min-w-[44px] min-h-[44px]',
+              isDarkMode ? 'border-slate-600 text-gray-300 hover:bg-slate-700' : 'hover:bg-gray-100'
+            )}
+            aria-label="Refresh dashboard"
+          >
+            <RefreshCw className={cn('h-5 w-5', refreshing && 'animate-spin')} />
+            <span className="hidden sm:inline ml-2">Refresh</span>
+          </Button>
         </div>
 
-        {/* Realtime Stats Bar */}
+        {/* Realtime Stats Bar - Responsive grid */}
         {realtimeStats && (
           <motion.div
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             className={cn(
-              'rounded-xl p-4 mb-6 border',
+              'rounded-xl p-3 sm:p-4 mb-4 sm:mb-6 border',
               isDarkMode
                 ? 'bg-gradient-to-r from-green-900/30 to-emerald-900/30 border-green-500/30'
                 : 'bg-gradient-to-r from-green-50 to-emerald-50 border-green-200'
@@ -569,47 +656,55 @@ export default function AdminDashboard() {
             <div className="flex items-center gap-2 mb-2">
               <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
               <span className={cn(
-                'text-sm font-medium',
+                'text-xs sm:text-sm font-medium',
                 isDarkMode ? 'text-green-400' : 'text-green-700'
               )}>
                 Live Stats
               </span>
             </div>
-            <div className="grid grid-cols-2 sm:grid-cols-5 gap-4">
-              <RealtimeStat icon={<Server />} label="Socket Connections" value={realtimeStats.socketConnections} isDarkMode={isDarkMode} />
-              <RealtimeStat icon={<Gamepad2 />} label="Active Rooms" value={realtimeStats.activeRooms} isDarkMode={isDarkMode} />
-              <RealtimeStat icon={<Users />} label="Players Online" value={realtimeStats.playersOnline} isDarkMode={isDarkMode} />
-              <RealtimeStat icon={<User />} label="Single Players" value={realtimeStats.singlePlayerCount} isDarkMode={isDarkMode} />
-              <RealtimeStat icon={<Trophy />} label="Games In Progress" value={realtimeStats.gamesInProgress} isDarkMode={isDarkMode} />
+            <div className="grid grid-cols-3 sm:grid-cols-5 gap-2 sm:gap-4">
+              <RealtimeStat icon={<Server size={16} />} label="Sockets" value={realtimeStats.socketConnections} isDarkMode={isDarkMode} />
+              <RealtimeStat icon={<Gamepad2 size={16} />} label="Rooms" value={realtimeStats.activeRooms} isDarkMode={isDarkMode} />
+              <RealtimeStat icon={<Users size={16} />} label="Online" value={realtimeStats.playersOnline} isDarkMode={isDarkMode} />
+              <RealtimeStat icon={<User size={16} />} label="Solo" value={realtimeStats.singlePlayerCount} isDarkMode={isDarkMode} />
+              <RealtimeStat icon={<Trophy size={16} />} label="Games" value={realtimeStats.gamesInProgress} isDarkMode={isDarkMode} />
             </div>
           </motion.div>
         )}
 
-        {/* Tab Navigation */}
-        <div className="flex gap-2 mb-6 overflow-x-auto pb-2">
-          {(['overview', 'players', 'sources', 'activity', 'community-words', 'bot-words'] as const).map((tab) => (
-            <button
-              key={tab}
-              onClick={() => setActiveTab(tab)}
-              className={cn(
-                'px-4 py-2 rounded-lg font-medium text-sm whitespace-nowrap transition-colors',
-                activeTab === tab
-                  ? isDarkMode
-                    ? 'bg-cyan-600 text-white'
-                    : 'bg-cyan-500 text-white'
-                  : isDarkMode
-                    ? 'bg-slate-800 text-gray-600 hover:bg-slate-700'
-                    : 'bg-white text-gray-600 hover:bg-gray-100 border border-gray-200'
-              )}
-            >
-              {tab === 'overview' && 'Overview'}
-              {tab === 'players' && 'Players'}
-              {tab === 'sources' && 'Traffic Sources'}
-              {tab === 'activity' && 'Activity'}
-              {tab === 'community-words' && 'Community Words'}
-              {tab === 'bot-words' && 'Bot Words'}
-            </button>
-          ))}
+        {/* Tab Navigation - Scrollable on mobile */}
+        <div className="relative mb-4 sm:mb-6">
+          <div className="flex gap-1.5 sm:gap-2 overflow-x-auto pb-2 scrollbar-hide -mx-3 px-3 sm:mx-0 sm:px-0">
+            {(['overview', 'players', 'sources', 'activity', 'game-logs', 'community-words', 'bot-words'] as const).map((tab) => (
+              <button
+                key={tab}
+                onClick={() => setActiveTab(tab)}
+                className={cn(
+                  'px-3 sm:px-4 py-2 rounded-lg font-medium text-xs sm:text-sm whitespace-nowrap transition-colors flex-shrink-0 min-h-[40px]',
+                  activeTab === tab
+                    ? isDarkMode
+                      ? 'bg-cyan-600 text-white shadow-md'
+                      : 'bg-cyan-500 text-white shadow-md'
+                    : isDarkMode
+                      ? 'bg-slate-700 text-gray-300 hover:bg-slate-600 hover:text-white border border-slate-600'
+                      : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-300'
+                )}
+              >
+                {tab === 'overview' && 'Overview'}
+                {tab === 'players' && 'Players'}
+                {tab === 'sources' && 'Traffic'}
+                {tab === 'activity' && 'Activity'}
+                {tab === 'game-logs' && 'Game Logs'}
+                {tab === 'community-words' && 'Community'}
+                {tab === 'bot-words' && 'Bot Words'}
+              </button>
+            ))}
+          </div>
+          {/* Fade indicators for scroll */}
+          <div className={cn(
+            'absolute right-0 top-0 bottom-2 w-8 bg-gradient-to-l pointer-events-none sm:hidden',
+            isDarkMode ? 'from-slate-900/80 to-transparent' : 'from-blue-50/80 to-transparent'
+          )} />
         </div>
 
         {/* Overview Tab */}
@@ -718,7 +813,7 @@ export default function AdminDashboard() {
                             <span className={isDarkMode ? 'text-gray-300' : 'text-gray-700'}>
                               {LANGUAGE_NAMES[lang] || lang}
                             </span>
-                            <span className={isDarkMode ? 'text-gray-600' : 'text-gray-600'}>
+                            <span className={isDarkMode ? 'text-gray-400' : 'text-gray-500'}>
                               {count.toLocaleString()} ({percentage}%)
                             </span>
                           </div>
@@ -776,7 +871,7 @@ export default function AdminDashboard() {
                           </div>
                           <span className={cn(
                             'font-medium',
-                            isDarkMode ? 'text-gray-600' : 'text-gray-600'
+                            isDarkMode ? 'text-gray-400' : 'text-gray-500'
                           )}>
                             {item.count} ({percentage}%)
                           </span>
@@ -787,7 +882,7 @@ export default function AdminDashboard() {
                 ) : (
                   <p className={cn(
                     'text-center py-4',
-                    isDarkMode ? 'text-gray-600' : 'text-gray-600'
+                    isDarkMode ? 'text-gray-400' : 'text-gray-500'
                   )}>
                     No country data available yet
                   </p>
@@ -897,12 +992,12 @@ export default function AdminDashboard() {
                     'text-left border-b',
                     isDarkMode ? 'border-slate-700' : 'border-gray-200'
                   )}>
-                    <th className={cn('pb-2 pr-4', isDarkMode ? 'text-gray-600' : 'text-gray-600')}>#</th>
-                    <th className={cn('pb-2 pr-4', isDarkMode ? 'text-gray-600' : 'text-gray-600')}>Player</th>
-                    <th className={cn('pb-2 pr-4 text-right', isDarkMode ? 'text-gray-600' : 'text-gray-600')}>Score</th>
-                    <th className={cn('pb-2 pr-4 text-right hidden sm:table-cell', isDarkMode ? 'text-gray-600' : 'text-gray-600')}>Games</th>
-                    <th className={cn('pb-2 pr-4 text-right hidden md:table-cell', isDarkMode ? 'text-gray-600' : 'text-gray-600')}>Words</th>
-                    <th className={cn('pb-2 text-right hidden lg:table-cell', isDarkMode ? 'text-gray-600' : 'text-gray-600')}>Time</th>
+                    <th className={cn('pb-2 pr-4', isDarkMode ? 'text-gray-400' : 'text-gray-500')}>#</th>
+                    <th className={cn('pb-2 pr-4', isDarkMode ? 'text-gray-400' : 'text-gray-500')}>Player</th>
+                    <th className={cn('pb-2 pr-4 text-right', isDarkMode ? 'text-gray-400' : 'text-gray-500')}>Score</th>
+                    <th className={cn('pb-2 pr-4 text-right hidden sm:table-cell', isDarkMode ? 'text-gray-400' : 'text-gray-500')}>Games</th>
+                    <th className={cn('pb-2 pr-4 text-right hidden md:table-cell', isDarkMode ? 'text-gray-400' : 'text-gray-500')}>Words</th>
+                    <th className={cn('pb-2 text-right hidden lg:table-cell', isDarkMode ? 'text-gray-400' : 'text-gray-500')}>Time</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -914,7 +1009,7 @@ export default function AdminDashboard() {
                         isDarkMode ? 'border-slate-700' : 'border-gray-100'
                       )}
                     >
-                      <td className={cn('py-3 pr-4', isDarkMode ? 'text-gray-600' : 'text-gray-600')}>
+                      <td className={cn('py-3 pr-4', isDarkMode ? 'text-gray-400' : 'text-gray-500')}>
                         {index + 1}
                       </td>
                       <td className="py-3 pr-4">
@@ -933,13 +1028,13 @@ export default function AdminDashboard() {
                       <td className={cn('py-3 pr-4 text-right font-medium', isDarkMode ? 'text-cyan-400' : 'text-cyan-600')}>
                         {player.total_score.toLocaleString()}
                       </td>
-                      <td className={cn('py-3 pr-4 text-right hidden sm:table-cell', isDarkMode ? 'text-gray-600' : 'text-gray-600')}>
+                      <td className={cn('py-3 pr-4 text-right hidden sm:table-cell', isDarkMode ? 'text-gray-400' : 'text-gray-500')}>
                         {player.total_games}
                       </td>
-                      <td className={cn('py-3 pr-4 text-right hidden md:table-cell', isDarkMode ? 'text-gray-600' : 'text-gray-600')}>
+                      <td className={cn('py-3 pr-4 text-right hidden md:table-cell', isDarkMode ? 'text-gray-400' : 'text-gray-500')}>
                         {player.total_words?.toLocaleString() || 0}
                       </td>
-                      <td className={cn('py-3 text-right hidden lg:table-cell', isDarkMode ? 'text-gray-600' : 'text-gray-600')}>
+                      <td className={cn('py-3 text-right hidden lg:table-cell', isDarkMode ? 'text-gray-400' : 'text-gray-500')}>
                         {formatTime(player.total_time_played || 0)}
                       </td>
                     </tr>
@@ -1012,7 +1107,7 @@ export default function AdminDashboard() {
                   <div key={day.date} className="flex items-center gap-4">
                     <div className={cn(
                       'w-24 text-sm',
-                      isDarkMode ? 'text-gray-600' : 'text-gray-600'
+                      isDarkMode ? 'text-gray-400' : 'text-gray-500'
                     )}>
                       {new Date(day.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
                     </div>
@@ -1033,7 +1128,7 @@ export default function AdminDashboard() {
                     </div>
                     <div className={cn(
                       'w-20 text-sm text-right',
-                      isDarkMode ? 'text-gray-600' : 'text-gray-600'
+                      isDarkMode ? 'text-gray-400' : 'text-gray-500'
                     )}>
                       {day.uniquePlayers} players
                     </div>
@@ -1049,9 +1144,335 @@ export default function AdminDashboard() {
             )}>
               <div className="flex items-center gap-2">
                 <div className="w-3 h-3 rounded bg-gradient-to-r from-cyan-500 to-blue-500" />
-                <span className={isDarkMode ? 'text-gray-600' : 'text-gray-600'}>Games played</span>
+                <span className={isDarkMode ? 'text-gray-400' : 'text-gray-500'}>Games played</span>
               </div>
             </div>
+          </motion.div>
+        )}
+
+        {/* Game Logs Tab */}
+        {activeTab === 'game-logs' && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className={cn(
+              'rounded-xl p-6 border',
+              isDarkMode ? 'bg-slate-800/50 border-slate-700' : 'bg-white border-gray-200 shadow-md'
+            )}
+          >
+            {/* Header */}
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
+              <div>
+                <h3 className={cn(
+                  'text-lg font-bold flex items-center gap-2',
+                  isDarkMode ? 'text-white' : 'text-gray-900'
+                )}>
+                  <History className="text-cyan-500" />
+                  Game Logs
+                </h3>
+                {gameLogsPagination && (
+                  <p className={cn(
+                    'text-sm mt-1',
+                    isDarkMode ? 'text-gray-400' : 'text-gray-600'
+                  )}>
+                    Showing {gameLogs.length} of {gameLogsPagination.totalCount} games
+                  </p>
+                )}
+              </div>
+            </div>
+
+            {/* Filters */}
+            <div className="flex flex-wrap gap-3 mb-4">
+              {/* Language Filter */}
+              <select
+                value={gameLogsLanguage}
+                onChange={(e) => setGameLogsLanguage(e.target.value)}
+                className={cn(
+                  'px-3 py-2 rounded-lg border text-sm',
+                  isDarkMode
+                    ? 'bg-slate-700 border-slate-600 text-white'
+                    : 'bg-white border-gray-300 text-gray-900'
+                )}
+              >
+                <option value="all">All Languages</option>
+                <option value="en">English</option>
+                <option value="he">Hebrew</option>
+                <option value="sv">Swedish</option>
+                <option value="es">Spanish</option>
+                <option value="ja">Japanese</option>
+              </select>
+
+              {/* Game Mode Filter */}
+              <select
+                value={gameLogsRanked}
+                onChange={(e) => setGameLogsRanked(e.target.value)}
+                className={cn(
+                  'px-3 py-2 rounded-lg border text-sm',
+                  isDarkMode
+                    ? 'bg-slate-700 border-slate-600 text-white'
+                    : 'bg-white border-gray-300 text-gray-900'
+                )}
+              >
+                <option value="all">All Modes</option>
+                <option value="false">Casual</option>
+                <option value="true">Ranked</option>
+              </select>
+
+              {/* Date Range */}
+              <input
+                type="date"
+                value={gameLogsStartDate}
+                onChange={(e) => setGameLogsStartDate(e.target.value)}
+                placeholder="Start Date"
+                className={cn(
+                  'px-3 py-2 rounded-lg border text-sm',
+                  isDarkMode
+                    ? 'bg-slate-700 border-slate-600 text-white'
+                    : 'bg-white border-gray-300 text-gray-900'
+                )}
+              />
+              <input
+                type="date"
+                value={gameLogsEndDate}
+                onChange={(e) => setGameLogsEndDate(e.target.value)}
+                placeholder="End Date"
+                className={cn(
+                  'px-3 py-2 rounded-lg border text-sm',
+                  isDarkMode
+                    ? 'bg-slate-700 border-slate-600 text-white'
+                    : 'bg-white border-gray-300 text-gray-900'
+                )}
+              />
+
+              {/* Clear Filters */}
+              {(gameLogsLanguage !== 'all' || gameLogsRanked !== 'all' || gameLogsStartDate || gameLogsEndDate) && (
+                <button
+                  onClick={() => {
+                    setGameLogsLanguage('all');
+                    setGameLogsRanked('all');
+                    setGameLogsStartDate('');
+                    setGameLogsEndDate('');
+                  }}
+                  className={cn(
+                    'px-3 py-2 rounded-lg border text-sm',
+                    isDarkMode
+                      ? 'border-slate-600 text-gray-400 hover:bg-slate-700'
+                      : 'border-gray-300 text-gray-600 hover:bg-gray-100'
+                  )}
+                >
+                  Clear Filters
+                </button>
+              )}
+            </div>
+
+            {/* Loading State */}
+            {gameLogsLoading && (
+              <div className="flex justify-center py-8">
+                <div className="w-6 h-6 border-2 border-cyan-500 border-t-transparent rounded-full animate-spin" />
+              </div>
+            )}
+
+            {/* Game Logs Table */}
+            {!gameLogsLoading && (
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead>
+                    <tr className={cn(
+                      'text-left border-b',
+                      isDarkMode ? 'border-slate-700' : 'border-gray-200'
+                    )}>
+                      <th className={cn('pb-2 px-2', isDarkMode ? 'text-gray-400' : 'text-gray-600')}>Player</th>
+                      <th className={cn('pb-2 px-2', isDarkMode ? 'text-gray-400' : 'text-gray-600')}>Game Code</th>
+                      <th className={cn('pb-2 px-2 text-right', isDarkMode ? 'text-gray-400' : 'text-gray-600')}>Score</th>
+                      <th className={cn('pb-2 px-2 text-right hidden sm:table-cell', isDarkMode ? 'text-gray-400' : 'text-gray-600')}>Words</th>
+                      <th className={cn('pb-2 px-2 hidden md:table-cell', isDarkMode ? 'text-gray-400' : 'text-gray-600')}>Longest</th>
+                      <th className={cn('pb-2 px-2 text-center hidden sm:table-cell', isDarkMode ? 'text-gray-400' : 'text-gray-600')}>Place</th>
+                      <th className={cn('pb-2 px-2 hidden lg:table-cell', isDarkMode ? 'text-gray-400' : 'text-gray-600')}>Lang</th>
+                      <th className={cn('pb-2 px-2 hidden lg:table-cell', isDarkMode ? 'text-gray-400' : 'text-gray-600')}>Mode</th>
+                      <th className={cn('pb-2 px-2 text-right hidden md:table-cell', isDarkMode ? 'text-gray-400' : 'text-gray-600')}>Time</th>
+                      <th className={cn('pb-2 px-2', isDarkMode ? 'text-gray-400' : 'text-gray-600')}>Date</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {gameLogs.length === 0 ? (
+                      <tr>
+                        <td colSpan={10} className={cn(
+                          'py-8 text-center',
+                          isDarkMode ? 'text-gray-500' : 'text-gray-400'
+                        )}>
+                          No games found matching your filters
+                        </td>
+                      </tr>
+                    ) : (
+                      gameLogs.map((game) => (
+                        <tr key={game.id} className={cn(
+                          'border-b',
+                          isDarkMode ? 'border-slate-700' : 'border-gray-200'
+                        )}>
+                          <td className="py-3 px-2">
+                            <div className="flex items-center gap-2">
+                              <div
+                                className="w-7 h-7 rounded-full flex items-center justify-center text-xs flex-shrink-0"
+                                style={{ backgroundColor: game.profiles?.avatar_color || '#6366f1' }}
+                              >
+                                {game.profiles?.avatar_emoji || '😀'}
+                              </div>
+                              <span className={cn(
+                                'truncate max-w-[100px] sm:max-w-[150px]',
+                                isDarkMode ? 'text-white' : 'text-gray-900'
+                              )}>
+                                {game.profiles?.display_name || game.profiles?.username || 'Unknown'}
+                              </span>
+                            </div>
+                          </td>
+                          <td className={cn('py-3 px-2 font-mono text-xs', isDarkMode ? 'text-gray-400' : 'text-gray-600')}>
+                            {game.game_code || '-'}
+                          </td>
+                          <td className={cn('py-3 px-2 text-right font-medium', isDarkMode ? 'text-cyan-400' : 'text-cyan-600')}>
+                            {game.score.toLocaleString()}
+                          </td>
+                          <td className={cn('py-3 px-2 text-right hidden sm:table-cell', isDarkMode ? 'text-gray-400' : 'text-gray-600')}>
+                            {game.word_count}
+                          </td>
+                          <td className={cn('py-3 px-2 font-mono text-xs hidden md:table-cell', isDarkMode ? 'text-gray-400' : 'text-gray-600')}>
+                            {game.longest_word || '-'}
+                          </td>
+                          <td className="py-3 px-2 text-center hidden sm:table-cell">
+                            {game.placement ? (
+                              <span className={cn(
+                                'px-2 py-0.5 rounded text-xs font-medium',
+                                game.placement === 1
+                                  ? 'bg-yellow-900/30 text-yellow-400'
+                                  : game.placement === 2
+                                    ? 'bg-gray-600/30 text-gray-300'
+                                    : game.placement === 3
+                                      ? 'bg-orange-900/30 text-orange-400'
+                                      : isDarkMode ? 'bg-slate-700 text-gray-400' : 'bg-gray-100 text-gray-600'
+                              )}>
+                                #{game.placement}
+                              </span>
+                            ) : (
+                              <span className={isDarkMode ? 'text-gray-600' : 'text-gray-400'}>-</span>
+                            )}
+                          </td>
+                          <td className={cn('py-3 px-2 hidden lg:table-cell', isDarkMode ? 'text-gray-400' : 'text-gray-600')}>
+                            {LANGUAGE_NAMES[game.language] || game.language}
+                          </td>
+                          <td className="py-3 px-2 hidden lg:table-cell">
+                            <span className={cn(
+                              'px-2 py-0.5 rounded text-xs',
+                              game.is_ranked
+                                ? 'bg-purple-900/30 text-purple-400'
+                                : isDarkMode ? 'bg-slate-700 text-gray-400' : 'bg-gray-100 text-gray-600'
+                            )}>
+                              {game.is_ranked ? 'Ranked' : 'Casual'}
+                            </span>
+                          </td>
+                          <td className={cn('py-3 px-2 text-right hidden md:table-cell', isDarkMode ? 'text-gray-400' : 'text-gray-600')}>
+                            {formatTime(game.time_played || 0)}
+                          </td>
+                          <td className={cn('py-3 px-2 text-xs', isDarkMode ? 'text-gray-500' : 'text-gray-500')}>
+                            {new Date(game.created_at).toLocaleDateString('en-US', {
+                              month: 'short',
+                              day: 'numeric',
+                              hour: '2-digit',
+                              minute: '2-digit'
+                            })}
+                          </td>
+                        </tr>
+                      ))
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            )}
+
+            {/* Pagination */}
+            {gameLogsPagination && gameLogsPagination.totalPages > 1 && (
+              <div className={cn(
+                'mt-4 pt-4 border-t flex items-center justify-between',
+                isDarkMode ? 'border-slate-700' : 'border-gray-200'
+              )}>
+                <div className={cn(
+                  'text-sm',
+                  isDarkMode ? 'text-gray-400' : 'text-gray-600'
+                )}>
+                  Page {gameLogsPagination.page} of {gameLogsPagination.totalPages}
+                </div>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => fetchGameLogs(gameLogsPage - 1)}
+                    disabled={!gameLogsPagination.hasPrevPage || gameLogsLoading}
+                    className={cn(
+                      'px-3 py-1.5 rounded-lg border text-sm flex items-center gap-1 transition-colors',
+                      gameLogsPagination.hasPrevPage && !gameLogsLoading
+                        ? isDarkMode
+                          ? 'border-slate-600 text-gray-300 hover:bg-slate-700'
+                          : 'border-gray-300 text-gray-700 hover:bg-gray-100'
+                        : isDarkMode
+                          ? 'border-slate-700 text-gray-600 cursor-not-allowed'
+                          : 'border-gray-200 text-gray-400 cursor-not-allowed'
+                    )}
+                  >
+                    <ChevronLeft size={16} />
+                    Prev
+                  </button>
+
+                  {/* Page Numbers */}
+                  <div className="hidden sm:flex gap-1">
+                    {Array.from({ length: Math.min(5, gameLogsPagination.totalPages) }, (_, i) => {
+                      let pageNum: number;
+                      if (gameLogsPagination.totalPages <= 5) {
+                        pageNum = i + 1;
+                      } else if (gameLogsPage <= 3) {
+                        pageNum = i + 1;
+                      } else if (gameLogsPage >= gameLogsPagination.totalPages - 2) {
+                        pageNum = gameLogsPagination.totalPages - 4 + i;
+                      } else {
+                        pageNum = gameLogsPage - 2 + i;
+                      }
+                      return (
+                        <button
+                          key={pageNum}
+                          onClick={() => fetchGameLogs(pageNum)}
+                          disabled={gameLogsLoading}
+                          className={cn(
+                            'w-8 h-8 rounded-lg text-sm font-medium transition-colors',
+                            pageNum === gameLogsPage
+                              ? isDarkMode
+                                ? 'bg-cyan-600 text-white'
+                                : 'bg-cyan-500 text-white'
+                              : isDarkMode
+                                ? 'text-gray-400 hover:bg-slate-700'
+                                : 'text-gray-600 hover:bg-gray-100'
+                          )}
+                        >
+                          {pageNum}
+                        </button>
+                      );
+                    })}
+                  </div>
+
+                  <button
+                    onClick={() => fetchGameLogs(gameLogsPage + 1)}
+                    disabled={!gameLogsPagination.hasNextPage || gameLogsLoading}
+                    className={cn(
+                      'px-3 py-1.5 rounded-lg border text-sm flex items-center gap-1 transition-colors',
+                      gameLogsPagination.hasNextPage && !gameLogsLoading
+                        ? isDarkMode
+                          ? 'border-slate-600 text-gray-300 hover:bg-slate-700'
+                          : 'border-gray-300 text-gray-700 hover:bg-gray-100'
+                        : isDarkMode
+                          ? 'border-slate-700 text-gray-600 cursor-not-allowed'
+                          : 'border-gray-200 text-gray-400 cursor-not-allowed'
+                    )}
+                  >
+                    Next
+                    <ChevronRight size={16} />
+                  </button>
+                </div>
+              </div>
+            )}
           </motion.div>
         )}
 
@@ -1253,28 +1674,28 @@ export default function AdminDashboard() {
                             <div className="flex gap-2">
                               <button
                                 onClick={() => handleCommunityApprove(word, false)}
-                                className="px-3 py-1 text-xs border border-green-600 text-green-400 rounded hover:bg-green-600/20 transition-colors"
+                                className="px-3 py-1.5 text-xs font-medium bg-green-600 text-white rounded hover:bg-green-500 transition-colors"
                                 title="Approve (add votes to validate)"
                               >
                                 Approve
                               </button>
                               <button
                                 onClick={() => handleCommunityApprove(word, true)}
-                                className="px-3 py-1 text-xs border border-blue-600 text-blue-400 rounded hover:bg-blue-600/20 transition-colors"
+                                className="px-3 py-1.5 text-xs font-medium bg-blue-600 text-white rounded hover:bg-blue-500 transition-colors"
                                 title="Approve and add to permanent dictionary"
                               >
                                 + Dict
                               </button>
                               <button
                                 onClick={() => handleCommunityDisapprove(word, false)}
-                                className="px-3 py-1 text-xs border border-red-600 text-red-400 rounded hover:bg-red-600/20 transition-colors"
+                                className="px-3 py-1.5 text-xs font-medium bg-red-600 text-white rounded hover:bg-red-500 transition-colors"
                                 title="Disapprove (add negative votes)"
                               >
                                 Reject
                               </button>
                               <button
                                 onClick={() => handleCommunityDisapprove(word, true)}
-                                className="px-3 py-1 text-xs border border-red-800 text-red-600 rounded hover:bg-red-800/20 transition-colors"
+                                className="px-3 py-1.5 text-xs font-medium bg-red-800 text-white rounded hover:bg-red-700 transition-colors"
                                 title="Reject and blacklist"
                               >
                                 Ban
@@ -1395,13 +1816,13 @@ export default function AdminDashboard() {
                           <div className="flex gap-2">
                             <button
                               onClick={() => handleApprove(word)}
-                              className="px-3 py-1 text-xs border border-green-600 text-green-400 rounded hover:bg-green-600/20 transition-colors"
+                              className="px-3 py-1.5 text-xs font-medium bg-green-600 text-white rounded hover:bg-green-500 transition-colors"
                             >
                               Approve
                             </button>
                             <button
                               onClick={() => handleDisapprove(word)}
-                              className="px-3 py-1 text-xs border border-red-600 text-red-400 rounded hover:bg-red-600/20 transition-colors"
+                              className="px-3 py-1.5 text-xs font-medium bg-red-600 text-white rounded hover:bg-red-500 transition-colors"
                             >
                               Disapprove
                             </button>
@@ -1469,7 +1890,7 @@ function StatCard({ icon, label, value, isDarkMode, color }: {
       </p>
       <p className={cn(
         'text-xs sm:text-sm',
-        isDarkMode ? 'text-gray-600' : 'text-gray-600'
+        isDarkMode ? 'text-gray-400' : 'text-gray-500'
       )}>
         {label}
       </p>
@@ -1488,7 +1909,7 @@ function SmallStatCard({ icon, label, value, isDarkMode }: {
       'rounded-xl p-4 border',
       isDarkMode ? 'bg-slate-800/50 border-slate-700' : 'bg-white border-gray-200 shadow-sm'
     )}>
-      <div className={cn('text-lg mb-1', isDarkMode ? 'text-gray-600' : 'text-gray-600')}>
+      <div className={cn('text-lg mb-1', isDarkMode ? 'text-cyan-400' : 'text-cyan-600')}>
         {icon}
       </div>
       <p className={cn(
@@ -1499,7 +1920,7 @@ function SmallStatCard({ icon, label, value, isDarkMode }: {
       </p>
       <p className={cn(
         'text-xs',
-        isDarkMode ? 'text-gray-600' : 'text-gray-600'
+        isDarkMode ? 'text-gray-400' : 'text-gray-500'
       )}>
         {label}
       </p>
@@ -1514,19 +1935,19 @@ function RealtimeStat({ icon, label, value, isDarkMode }: {
   isDarkMode: boolean;
 }) {
   return (
-    <div className="text-center">
-      <div className={cn('text-sm mb-1', isDarkMode ? 'text-green-400' : 'text-green-600')}>
+    <div className="text-center px-1">
+      <div className={cn('mb-0.5 sm:mb-1 flex justify-center', isDarkMode ? 'text-green-400' : 'text-green-600')}>
         {icon}
       </div>
       <p className={cn(
-        'text-xl font-bold',
+        'text-base sm:text-xl font-bold leading-tight',
         isDarkMode ? 'text-white' : 'text-gray-900'
       )}>
         {value}
       </p>
       <p className={cn(
-        'text-xs',
-        isDarkMode ? 'text-gray-600' : 'text-gray-600'
+        'text-[10px] sm:text-xs leading-tight',
+        isDarkMode ? 'text-gray-400' : 'text-gray-600'
       )}>
         {label}
       </p>
@@ -1577,7 +1998,7 @@ function SourceCard({ title, icon, data, isDarkMode }: {
                 </span>
                 <span className={cn(
                   'font-medium whitespace-nowrap',
-                  isDarkMode ? 'text-gray-600' : 'text-gray-600'
+                  isDarkMode ? 'text-gray-400' : 'text-gray-500'
                 )}>
                   {item.count} ({percentage}%)
                 </span>
@@ -1588,7 +2009,7 @@ function SourceCard({ title, icon, data, isDarkMode }: {
       ) : (
         <p className={cn(
           'text-center py-4',
-          isDarkMode ? 'text-gray-600' : 'text-gray-600'
+          isDarkMode ? 'text-gray-400' : 'text-gray-500'
         )}>
           No data available yet
         </p>

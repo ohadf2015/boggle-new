@@ -26,7 +26,6 @@ const nextConfig = {
   },
 
   // Production optimizations
-  swcMinify: true,
   reactStrictMode: true,
   poweredByHeader: false,
 
@@ -163,6 +162,10 @@ export default withBundleAnalyzer(
     authToken: process.env.SENTRY_AUTH_TOKEN,
     silent: true,
     hideSourceMaps: true,
-    disableLogger: true,
+    webpack: {
+      treeshake: {
+        removeDebugLogging: true,
+      },
+    },
   })
 );

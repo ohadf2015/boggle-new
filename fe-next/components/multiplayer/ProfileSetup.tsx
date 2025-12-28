@@ -11,8 +11,10 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { validateUsername, sanitizeInput } from '@/utils/validation';
 import { useDebouncedValidation, getValidationClasses } from '@/hooks/useDebouncedValidation';
 import AvatarSelectorButton from '@/components/join/AvatarSelectorButton';
+import EmojiAvatarPicker, { PROFILE_AVATAR_ID } from '@/components/EmojiAvatarPicker';
 import { AVATARS, getAvatarById, getAvatarPath, type AvatarConfig } from '@/utils/avatarConfig';
 import LandscapeIndicator from '@/components/LandscapeIndicator';
+import { Pencil } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 export interface ProfileData {
@@ -50,6 +52,7 @@ const ProfileSetup: React.FC<ProfileSetupProps> = ({
   const [username, setUsername] = useState(initialUsername);
   const [selectedAvatarId, setSelectedAvatarId] = useState<string | undefined>(initialAvatarId);
   const [usernameError, setUsernameError] = useState(false);
+  const [isAvatarPickerOpen, setIsAvatarPickerOpen] = useState(false);
 
   // Load from localStorage on mount
   useEffect(() => {
@@ -102,6 +105,20 @@ const ProfileSetup: React.FC<ProfileSetupProps> = ({
     }
   };
 
+  // Handle avatar selection from picker (for authenticated users)
+  const handleAvatarPickerSave = ({ avatarImage }: { avatarImage: string; emoji?: string; color?: string }) => {
+    if (avatarImage === PROFILE_AVATAR_ID) {
+      // User selected their profile avatar - clear the game avatar to use profile
+      setSelectedAvatarId(PROFILE_AVATAR_ID);
+    } else {
+      const avatar = getAvatarById(avatarImage);
+      if (avatar) {
+        setSelectedAvatarId(avatar.id);
+      }
+    }
+    setIsAvatarPickerOpen(false);
+  };
+
   // Handle continue
   const handleContinue = () => {
     if (!isValid) {
@@ -110,7 +127,8 @@ const ProfileSetup: React.FC<ProfileSetupProps> = ({
     }
 
     // For authenticated users, use their existing avatar if no new selection made
-    const effectiveAvatarId = selectedAvatarId || initialAvatarId || 'profile-picture';
+    // PROFILE_AVATAR_ID means "use profile picture/emoji" instead of a game avatar
+    const effectiveAvatarId = selectedAvatarId || initialAvatarId || PROFILE_AVATAR_ID;
 
     // Save to localStorage (only for guests, authenticated users keep their profile settings)
     if (typeof window !== 'undefined' && !isAuthenticated) {
@@ -158,8 +176,8 @@ const ProfileSetup: React.FC<ProfileSetupProps> = ({
             </h1>
             {/* Progress indicator */}
             <div className="flex items-center justify-center gap-2 mt-2">
-              <div className="w-3 h-3 rounded-full bg-neo-cyan text-neo-black border-2 border-neo-black" />
-              <div className="w-3 h-3 rounded-full bg-neo-cream/30 text-neo-black border-2 border-neo-black/30" />
+              <div className="w-3 h-3 rounded-full bg-neo-cyan border-2 border-neo-black dark:border-slate-300" />
+              <div className="w-3 h-3 rounded-full bg-neo-cream/30 dark:bg-slate-600/50 border-2 border-neo-black/30 dark:border-slate-500" />
               <span className="text-xs text-neo-black/60 dark:text-slate-400 ms-2">
                 {t('multiplayerFlow.profileSetup.progress') || 'Step 1 of 2'}
               </span>
@@ -168,7 +186,7 @@ const ProfileSetup: React.FC<ProfileSetupProps> = ({
         </motion.div>
 
         {/* Main Content */}
-        <div className="flex-1 flex items-center justify-center px-4 sm:px-6 pb-6 min-h-0">
+        <div className="flex-1 flex items-start justify-center px-4 sm:px-6 pt-4 pb-6 min-h-0 overflow-y-auto">
           <motion.div
             initial={{ y: 20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
@@ -234,32 +252,71 @@ const ProfileSetup: React.FC<ProfileSetupProps> = ({
                   )}
                 </div>
 
-                {/* Avatar Selection - Skip for authenticated users with existing avatar */}
+                {/* Avatar Selection - Authenticated users can change their avatar too */}
                 {hasAuthenticatedAvatar ? (
                   <div className="space-y-3">
                     <Label className="text-sm font-bold uppercase text-slate-600 dark:text-slate-400">
                       {t('multiplayerFlow.profileSetup.avatarLabel') || 'Your avatar'}
                     </Label>
-                    <div className="p-3 rounded-neo bg-purple-50 dark:bg-purple-900/30 border-2 border-purple-200 dark:border-purple-700 flex items-center gap-3">
-                      <div className="w-14 h-14 rounded-full border-3 border-neo-cyan shadow-hard overflow-hidden flex-shrink-0">
-                        {profilePictureUrl ? (
-                          <img
-                            src={profilePictureUrl}
-                            alt={displayName || 'Profile'}
-                            className="w-full h-full object-cover"
-                          />
-                        ) : initialAvatarId ? (
-                          <img
-                            src={getAvatarPath(getAvatarById(initialAvatarId) || AVATARS[0])}
-                            alt={displayName || 'Avatar'}
-                            className="w-full h-full object-cover"
-                          />
-                        ) : null}
+                    <button
+                      type="button"
+                      onClick={() => setIsAvatarPickerOpen(true)}
+                      className="w-full p-3 rounded-neo bg-purple-50 dark:bg-purple-900/30 border-2 border-purple-200 dark:border-purple-700 hover:border-purple-400 dark:hover:border-purple-500 flex items-center gap-3 transition-colors group"
+                    >
+                      <div className="relative flex-shrink-0">
+                        <div className="w-14 h-14 rounded-full border-3 border-neo-cyan shadow-hard overflow-hidden group-hover:border-purple-400 transition-colors">
+                          {/* Show selected game avatar if set (not PROFILE_AVATAR_ID), otherwise profile picture or initial avatar */}
+                          {selectedAvatarId && selectedAvatarId !== PROFILE_AVATAR_ID ? (
+                            <img
+                              src={getAvatarPath(getAvatarById(selectedAvatarId) || AVATARS[0])}
+                              alt={displayName || 'Avatar'}
+                              className="w-full h-full object-cover"
+                            />
+                          ) : profilePictureUrl ? (
+                            <img
+                              src={profilePictureUrl}
+                              alt={displayName || 'Profile'}
+                              className="w-full h-full object-cover"
+                            />
+                          ) : initialAvatarId ? (
+                            <img
+                              src={getAvatarPath(getAvatarById(initialAvatarId) || AVATARS[0])}
+                              alt={displayName || 'Avatar'}
+                              className="w-full h-full object-cover"
+                            />
+                          ) : null}
+                        </div>
+                        {/* Edit indicator */}
+                        <div className="absolute -bottom-0.5 -right-0.5 w-5 h-5 bg-neo-yellow text-neo-black border-2 border-neo-black rounded-full flex items-center justify-center shadow-hard-sm group-hover:scale-110 transition-transform">
+                          <Pencil className="w-2 h-2" />
+                        </div>
                       </div>
-                      <p className="text-sm text-slate-700 dark:text-slate-200">
-                        {t('multiplayerFlow.profileSetup.usingProfileAvatar') || 'Using your profile avatar'}
-                      </p>
-                    </div>
+                      <div className="flex-1 text-left">
+                        <p className="text-sm text-slate-700 dark:text-slate-200">
+                          {selectedAvatarId && selectedAvatarId !== PROFILE_AVATAR_ID
+                            ? (t('multiplayerFlow.profileSetup.usingGameAvatar') || 'Using game avatar')
+                            : (t('multiplayerFlow.profileSetup.usingProfileAvatar') || 'Using your profile avatar')
+                          }
+                        </p>
+                        <p className="text-xs text-slate-500 dark:text-slate-400">
+                          {t('multiplayerFlow.profileSetup.tapToChange') || 'Tap to change'}
+                        </p>
+                      </div>
+                    </button>
+
+                    {/* Avatar picker modal */}
+                    <EmojiAvatarPicker
+                      isOpen={isAvatarPickerOpen}
+                      onClose={() => setIsAvatarPickerOpen(false)}
+                      onSave={handleAvatarPickerSave}
+                      currentAvatarImage={selectedAvatarId}
+                      profileAvatar={{
+                        profilePictureUrl: profilePictureUrl,
+                        avatarEmoji: undefined, // ProfileSetup doesn't have emoji info, but it has profilePictureUrl
+                        avatarColor: undefined,
+                        displayName: displayName || undefined,
+                      }}
+                    />
                   </div>
                 ) : (
                   <div className="space-y-3">

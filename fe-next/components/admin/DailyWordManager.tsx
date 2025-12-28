@@ -154,155 +154,153 @@ export const DailyWordManager: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-50 to-slate-100 dark:from-neo-navy dark:to-neo-navy-light p-4">
+    <div className="w-full">
       <div className="max-w-6xl mx-auto">
-        {/* Header */}
-        <div className="bg-white dark:bg-neo-navy-light rounded-neo border-4 border-neo-black p-6 mb-4 text-neo-black dark:text-neo-cream">
-          <h1 className="text-3xl font-black mb-2">Daily Word Manager</h1>
-          <p className="text-gray-600 dark:text-gray-400">
-            Manage target words for the daily Word Hunt challenge
-          </p>
-        </div>
-
-        {/* Language Selector */}
-        <div className="bg-white dark:bg-neo-navy-light rounded-neo border-4 border-neo-black p-4 mb-4 text-neo-black dark:text-neo-cream">
-          <div className="flex flex-wrap gap-2">
+        {/* Language Selector - Scrollable on mobile */}
+        <div className="bg-white dark:bg-slate-800/50 rounded-xl border border-gray-200 dark:border-slate-700 p-3 sm:p-4 mb-4 text-gray-900 dark:text-white">
+          <div className="flex gap-1.5 sm:gap-2 overflow-x-auto pb-1 scrollbar-hide -mx-1 px-1">
             {LANGUAGES.map(lang => (
               <button
                 key={lang.code}
                 onClick={() => setSelectedLang(lang.code)}
                 className={cn(
-                  'px-4 py-2 rounded-neo border-2 border-neo-black font-bold transition-all',
+                  'px-2.5 sm:px-4 py-2 rounded-lg border-2 font-bold transition-all flex-shrink-0 text-xs sm:text-sm min-h-[40px]',
                   selectedLang === lang.code
-                    ? 'bg-neo-purple text-white shadow-hard'
-                    : 'bg-white dark:bg-gray-700 hover:shadow-hard'
+                    ? 'bg-purple-600 text-white border-purple-700 shadow-md'
+                    : 'bg-white dark:bg-slate-700 border-gray-300 dark:border-slate-600 hover:border-purple-400 text-gray-800 dark:text-gray-200'
                 )}
               >
-                {lang.flag} {lang.name} ({wordLists[lang.code].length})
+                <span className="mr-1">{lang.flag}</span>
+                <span className="hidden xs:inline">{lang.name}</span>
+                <span className="xs:hidden">{lang.code.toUpperCase()}</span>
+                <span className="ml-1 opacity-70">({wordLists[lang.code].length})</span>
               </button>
             ))}
           </div>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-          {/* Stats Panel */}
-          <div className="bg-white dark:bg-neo-navy-light rounded-neo border-4 border-neo-black p-4 text-neo-black dark:text-neo-cream">
-            <h2 className="font-black text-xl mb-4">Statistics</h2>
+          {/* Stats Panel - Collapsible on mobile */}
+          <div className="bg-white dark:bg-slate-800/50 rounded-xl border border-gray-200 dark:border-slate-700 p-4 text-gray-900 dark:text-gray-100">
+            <h2 className="font-bold text-lg sm:text-xl mb-3">Statistics</h2>
 
-            <div className="space-y-3">
-              <div className="flex justify-between">
-                <span className="text-gray-600 dark:text-gray-400">Total Words:</span>
-                <span className="font-bold">{stats.total}</span>
+            <div className="grid grid-cols-3 gap-2 sm:block sm:space-y-3">
+              <div className="text-center sm:text-left sm:flex sm:justify-between p-2 bg-gray-50 dark:bg-slate-700/50 rounded-lg sm:bg-transparent sm:p-0">
+                <span className="block sm:inline text-xs sm:text-sm text-gray-500 dark:text-gray-400">Total</span>
+                <span className="block sm:inline font-bold text-lg sm:text-base">{stats.total}</span>
               </div>
-              <div className="flex justify-between">
-                <span className="text-gray-600 dark:text-gray-400">Shortest:</span>
-                <span className="font-bold">{stats.shortest} letters</span>
+              <div className="text-center sm:text-left sm:flex sm:justify-between p-2 bg-gray-50 dark:bg-slate-700/50 rounded-lg sm:bg-transparent sm:p-0">
+                <span className="block sm:inline text-xs sm:text-sm text-gray-500 dark:text-gray-400">Shortest</span>
+                <span className="block sm:inline font-bold text-lg sm:text-base">{stats.shortest}L</span>
               </div>
-              <div className="flex justify-between">
-                <span className="text-gray-600 dark:text-gray-400">Longest:</span>
-                <span className="font-bold">{stats.longest} letters</span>
+              <div className="text-center sm:text-left sm:flex sm:justify-between p-2 bg-gray-50 dark:bg-slate-700/50 rounded-lg sm:bg-transparent sm:p-0">
+                <span className="block sm:inline text-xs sm:text-sm text-gray-500 dark:text-gray-400">Longest</span>
+                <span className="block sm:inline font-bold text-lg sm:text-base">{stats.longest}L</span>
               </div>
             </div>
 
-            <div className="mt-4 pt-4 border-t-2 border-gray-200 dark:border-gray-700">
-              <h3 className="font-bold mb-2">By Length:</h3>
-              <div className="space-y-1 text-sm">
+            <div className="mt-4 pt-4 border-t border-gray-200 dark:border-slate-600">
+              <h3 className="font-bold mb-2 text-sm">By Length:</h3>
+              <div className="grid grid-cols-2 sm:grid-cols-1 gap-1 text-sm">
                 {Object.entries(stats.byLength)
                   .sort(([a], [b]) => Number(a) - Number(b))
                   .map(([len, count]) => (
-                    <div key={len} className="flex justify-between">
-                      <span>{len} letters:</span>
-                      <span className="font-mono">{count}</span>
+                    <div key={len} className="flex justify-between px-2 py-1 bg-gray-50 dark:bg-slate-700/50 rounded">
+                      <span className="text-gray-600 dark:text-gray-400">{len}L:</span>
+                      <span className="font-mono font-bold">{count}</span>
                     </div>
                   ))}
               </div>
             </div>
 
             {stats.shortest < 3 && (
-              <div className="mt-4 p-3 bg-red-100 dark:bg-red-900/30 border-2 border-red-500 rounded">
+              <div className="mt-4 p-2 sm:p-3 bg-red-100 dark:bg-red-900/30 border border-red-500 rounded-lg">
                 <div className="flex items-start gap-2">
-                  <AlertTriangle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
-                  <div className="text-sm text-red-600 dark:text-red-400">
-                    <strong>Warning:</strong> Some words are shorter than 3 letters!
+                  <AlertTriangle className="w-4 h-4 sm:w-5 sm:h-5 text-red-600 flex-shrink-0 mt-0.5" />
+                  <div className="text-xs sm:text-sm text-red-600 dark:text-red-400">
+                    <strong>Warning:</strong> Some words &lt;3 letters!
                   </div>
                 </div>
               </div>
             )}
 
             {/* Export Actions */}
-            <div className="mt-6 space-y-2">
+            <div className="mt-4 sm:mt-6 flex sm:flex-col gap-2">
               <Button
                 onClick={handleExportCode}
-                className="w-full bg-green-500 hover:bg-green-600 text-white"
+                size="sm"
+                className="flex-1 sm:w-full bg-green-500 hover:bg-green-600 text-white text-xs sm:text-sm"
               >
-                {copied ? <Check className="mr-2 h-4 w-4" /> : <Copy className="mr-2 h-4 w-4" />}
-                {copied ? 'Copied!' : 'Copy TypeScript Code'}
+                {copied ? <Check className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4" /> : <Copy className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4" />}
+                {copied ? 'Copied!' : 'Copy TS'}
               </Button>
               <Button
                 onClick={handleDownloadJSON}
                 variant="outline"
-                className="w-full"
+                size="sm"
+                className="flex-1 sm:w-full text-xs sm:text-sm"
               >
-                <Download className="mr-2 h-4 w-4" />
-                Download JSON
+                <Download className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4" />
+                JSON
               </Button>
             </div>
           </div>
 
           {/* Word List */}
-          <div className="lg:col-span-2 space-y-4">
-            {/* Add Word */}
-            <div className="bg-white dark:bg-neo-navy-light rounded-neo border-4 border-neo-black p-4 text-neo-black dark:text-neo-cream">
-              <h2 className="font-black text-xl mb-4">Add New Word</h2>
-              <div className="flex gap-2">
-                <input
-                  type="text"
-                  value={newWord}
-                  onChange={(e) => setNewWord(e.target.value)}
-                  onKeyPress={(e) => e.key === 'Enter' && handleAddWord()}
-                  placeholder="Enter word (3+ letters)"
-                  className="flex-1 px-4 py-2 border-2 border-neo-black rounded-neo font-mono text-lg"
-                />
-                <Button onClick={handleAddWord} className="bg-neo-purple text-white">
-                  <Plus className="mr-2 h-4 w-4" />
-                  Add
-                </Button>
-              </div>
-            </div>
+          <div className="lg:col-span-2 space-y-3 sm:space-y-4">
+            {/* Add Word + Search Row */}
+            <div className="bg-white dark:bg-slate-800/50 rounded-xl border border-gray-200 dark:border-slate-700 p-3 sm:p-4 text-gray-900 dark:text-gray-100">
+              <div className="flex flex-col sm:flex-row gap-2">
+                {/* Add Word Input */}
+                <div className="flex gap-2 flex-1">
+                  <input
+                    type="text"
+                    value={newWord}
+                    onChange={(e) => setNewWord(e.target.value)}
+                    onKeyPress={(e) => e.key === 'Enter' && handleAddWord()}
+                    placeholder="Add word (3+ letters)"
+                    className="flex-1 px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg font-mono text-sm sm:text-base bg-white dark:bg-slate-700 min-w-0"
+                  />
+                  <Button onClick={handleAddWord} size="sm" className="bg-purple-600 hover:bg-purple-700 text-white flex-shrink-0 min-h-[40px] min-w-[44px]">
+                    <Plus className="h-4 w-4 sm:mr-1" />
+                    <span className="hidden sm:inline">Add</span>
+                  </Button>
+                </div>
 
-            {/* Search */}
-            <div className="bg-white dark:bg-neo-navy-light rounded-neo border-4 border-neo-black p-4 text-neo-black dark:text-neo-cream">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                <input
-                  type="text"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="Search words..."
-                  className="w-full pl-10 pr-4 py-2 border-2 border-neo-black rounded-neo"
-                />
+                {/* Search Input */}
+                <div className="relative flex-1 sm:max-w-[200px]">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                  <input
+                    type="text"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    placeholder="Search..."
+                    className="w-full pl-9 pr-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg text-sm bg-white dark:bg-slate-700"
+                  />
+                </div>
               </div>
             </div>
 
             {/* Words Grid */}
-            <div className="bg-white dark:bg-neo-navy-light rounded-neo border-4 border-neo-black p-4 text-neo-black dark:text-neo-cream">
-              <h2 className="font-black text-xl mb-4">
-                Words ({filteredWords.length})
+            <div className="bg-white dark:bg-slate-800/50 rounded-xl border border-gray-200 dark:border-slate-700 p-3 sm:p-4 text-gray-900 dark:text-gray-100">
+              <h2 className="font-bold text-sm sm:text-base mb-3">
+                Words <span className="text-gray-500">({filteredWords.length})</span>
               </h2>
 
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2 max-h-[600px] overflow-y-auto">
+              <div className="grid grid-cols-2 xs:grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-1.5 sm:gap-2 max-h-[50vh] sm:max-h-[600px] overflow-y-auto">
                 {filteredWords.map((word, idx) => (
                   <motion.div
                     key={word}
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: idx * 0.01 }}
-                    className="flex items-center justify-between p-2 bg-gray-100 dark:bg-gray-800 rounded border border-gray-300 dark:border-gray-600 group"
+                    transition={{ delay: Math.min(idx * 0.005, 0.2) }}
+                    className="flex items-center justify-between p-1.5 sm:p-2 bg-gray-50 dark:bg-slate-700/50 rounded-lg border border-gray-200 dark:border-slate-600 group hover:border-red-300 dark:hover:border-red-500 transition-colors"
                   >
-                    <span className="font-mono text-sm">{word}</span>
+                    <span className="font-mono text-xs sm:text-sm truncate flex-1">{word}</span>
                     <button
                       onClick={() => handleRemoveWord(word)}
-                      className="opacity-0 group-hover:opacity-100 transition-opacity text-red-500 hover:text-red-700"
+                      className="opacity-0 group-hover:opacity-100 transition-opacity text-red-500 hover:text-red-700 ml-1 flex-shrink-0 p-1"
+                      aria-label={`Remove ${word}`}
                     >
                       <Trash2 className="w-3 h-3" />
                     </button>
@@ -311,7 +309,7 @@ export const DailyWordManager: React.FC = () => {
               </div>
 
               {filteredWords.length === 0 && (
-                <div className="text-center py-12 text-gray-500">
+                <div className="text-center py-8 sm:py-12 text-gray-500 dark:text-gray-400">
                   No words found
                 </div>
               )}

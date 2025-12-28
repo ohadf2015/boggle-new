@@ -2,17 +2,30 @@
 
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Check, X } from 'lucide-react';
+import { Check, X, User } from 'lucide-react';
 import Image from 'next/image';
 import { AVATARS, getAvatarPath, mapEmojiToAvatar, type AvatarConfig } from '@/utils/avatarConfig';
+
+// Special constant for "use profile avatar" selection
+export const PROFILE_AVATAR_ID = '__profile_avatar__';
 
 /**
  * Avatar selection result
  */
 interface AvatarSelection {
-  avatarImage: string; // Avatar image ID
+  avatarImage: string; // Avatar image ID or PROFILE_AVATAR_ID
   emoji?: string; // Deprecated: kept for backward compatibility
   color?: string; // Deprecated: kept for backward compatibility
+}
+
+/**
+ * Profile avatar info for authenticated users
+ */
+interface ProfileAvatarInfo {
+  profilePictureUrl?: string | null;
+  avatarEmoji?: string;
+  avatarColor?: string;
+  displayName?: string;
 }
 
 /**
@@ -25,6 +38,7 @@ interface EmojiAvatarPickerProps {
   currentEmoji?: string; // Deprecated: will be mapped to avatar image
   currentColor?: string; // Deprecated: no longer used
   currentAvatarImage?: string; // New: current avatar image ID
+  profileAvatar?: ProfileAvatarInfo; // Profile avatar for authenticated users
 }
 
 /**
@@ -36,30 +50,71 @@ const EmojiAvatarPicker: React.FC<EmojiAvatarPickerProps> = ({
   onClose,
   onSave,
   currentEmoji,
-  currentAvatarImage
+  currentAvatarImage,
+  profileAvatar
 }) => {
+  // Check if profile avatar is available (user has profile picture or emoji)
+  const hasProfileAvatar = profileAvatar && (profileAvatar.profilePictureUrl || profileAvatar.avatarEmoji);
+
+  // Check if currently using profile avatar
+  const isUsingProfileAvatar = currentAvatarImage === PROFILE_AVATAR_ID ||
+    (!currentAvatarImage && !!hasProfileAvatar);
+
   // Determine initial avatar selection
-  const getInitialAvatar = (): AvatarConfig => {
-    if (currentAvatarImage) {
+  const getInitialAvatar = (): AvatarConfig | null => {
+    // If using profile avatar, return null to indicate profile selection
+    if (isUsingProfileAvatar) {
+      return null;
+    }
+    if (currentAvatarImage && currentAvatarImage !== PROFILE_AVATAR_ID) {
       const found = AVATARS.find(a => a.id === currentAvatarImage || a.filename === currentAvatarImage);
       if (found) return found;
     }
     if (currentEmoji) {
       return mapEmojiToAvatar(currentEmoji);
     }
-    return AVATARS[0];
+    // Default to first avatar if no profile avatar available
+    return hasProfileAvatar ? null : AVATARS[0];
   };
 
-  const [selectedAvatar, setSelectedAvatar] = useState<AvatarConfig>(getInitialAvatar());
+  const [selectedAvatar, setSelectedAvatar] = useState<AvatarConfig | null>(getInitialAvatar());
+  const [useProfileAvatar, setUseProfileAvatar] = useState<boolean>(isUsingProfileAvatar);
+
+  // Handle selecting a regular avatar
+  const handleSelectAvatar = (avatar: AvatarConfig) => {
+    setSelectedAvatar(avatar);
+    setUseProfileAvatar(false);
+  };
+
+  // Handle selecting profile avatar
+  const handleSelectProfileAvatar = () => {
+    setSelectedAvatar(null);
+    setUseProfileAvatar(true);
+  };
 
   const handleSave = () => {
-    onSave({
-      avatarImage: selectedAvatar.id,
-      // Keep emoji/color for backward compatibility (though they'll be ignored)
-      emoji: '🎮',
-      color: '#4ECDC4'
-    });
+    if (useProfileAvatar) {
+      onSave({
+        avatarImage: PROFILE_AVATAR_ID,
+        emoji: profileAvatar?.avatarEmoji || '🎮',
+        color: profileAvatar?.avatarColor || '#4ECDC4'
+      });
+    } else if (selectedAvatar) {
+      onSave({
+        avatarImage: selectedAvatar.id,
+        emoji: '🎮',
+        color: '#4ECDC4'
+      });
+    }
     onClose();
+  };
+
+  // Get display name for preview
+  const getPreviewName = (): string => {
+    if (useProfileAvatar && profileAvatar?.displayName) {
+      return profileAvatar.displayName;
+    }
+    return selectedAvatar?.name || 'Your Avatar';
   };
 
   if (!isOpen) return null;
@@ -86,17 +141,41 @@ const EmojiAvatarPicker: React.FC<EmojiAvatarPickerProps> = ({
           {/* Preview */}
           <div className="flex flex-col items-center mb-6">
             <div className="w-24 h-24 rounded-full overflow-hidden border-4 border-neo-black shadow-hard mb-3 relative">
-              <Image
-                src={getAvatarPath(selectedAvatar)}
-                alt={selectedAvatar.name}
-                fill
-                sizes="96px"
-                className="object-cover"
-                priority
-              />
+              {useProfileAvatar ? (
+                profileAvatar?.profilePictureUrl ? (
+                  <Image
+                    src={profileAvatar.profilePictureUrl}
+                    alt={profileAvatar.displayName || 'Profile'}
+                    fill
+                    sizes="96px"
+                    className="object-cover"
+                    priority
+                  />
+                ) : (
+                  <div
+                    className="w-full h-full flex items-center justify-center text-4xl"
+                    style={{ backgroundColor: profileAvatar?.avatarColor || '#4ECDC4' }}
+                  >
+                    {profileAvatar?.avatarEmoji || '🎮'}
+                  </div>
+                )
+              ) : selectedAvatar ? (
+                <Image
+                  src={getAvatarPath(selectedAvatar)}
+                  alt={selectedAvatar.name}
+                  fill
+                  sizes="96px"
+                  className="object-cover"
+                  priority
+                />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center bg-slate-200">
+                  <User className="w-12 h-12 text-slate-400" />
+                </div>
+              )}
             </div>
             <p className="text-lg font-black text-neo-black uppercase tracking-wide">
-              {selectedAvatar.name}
+              {getPreviewName()}
             </p>
           </div>
 
@@ -106,14 +185,51 @@ const EmojiAvatarPicker: React.FC<EmojiAvatarPickerProps> = ({
               Choose Your Avatar
             </p>
             <div className="grid grid-cols-4 gap-3 max-h-80 overflow-y-auto pr-2">
+              {/* Profile Avatar Option (if available) */}
+              {hasProfileAvatar && (
+                <button
+                  onClick={handleSelectProfileAvatar}
+                  aria-label="Use your profile avatar"
+                  aria-pressed={useProfileAvatar}
+                  className={`relative aspect-square overflow-hidden transition-all duration-100 border-3 ${
+                    useProfileAvatar
+                      ? 'ring-4 ring-neo-cyan scale-105 shadow-hard border-neo-cyan'
+                      : 'hover:scale-105 hover:shadow-hard-sm border-neo-black'
+                  }`}
+                >
+                  {profileAvatar?.profilePictureUrl ? (
+                    <Image
+                      src={profileAvatar.profilePictureUrl}
+                      alt={profileAvatar.displayName || 'Profile'}
+                      fill
+                      sizes="(max-width: 640px) 64px, 80px"
+                      className="object-cover"
+                      loading="lazy"
+                    />
+                  ) : (
+                    <div
+                      className="w-full h-full flex items-center justify-center text-2xl"
+                      style={{ backgroundColor: profileAvatar?.avatarColor || '#4ECDC4' }}
+                    >
+                      {profileAvatar?.avatarEmoji || '🎮'}
+                    </div>
+                  )}
+                  {/* "Your Profile" label */}
+                  <div className="absolute bottom-0 left-0 right-0 bg-neo-black/80 text-white text-[8px] font-bold text-center py-0.5">
+                    PROFILE
+                  </div>
+                </button>
+              )}
+
+              {/* Regular Avatars */}
               {AVATARS.map((avatar) => (
                 <button
                   key={avatar.id}
-                  onClick={() => setSelectedAvatar(avatar)}
+                  onClick={() => handleSelectAvatar(avatar)}
                   aria-label={`Select ${avatar.name} avatar`}
-                  aria-pressed={selectedAvatar.id === avatar.id}
+                  aria-pressed={!useProfileAvatar && selectedAvatar?.id === avatar.id}
                   className={`relative aspect-square overflow-hidden transition-all duration-100 border-3 border-neo-black ${
-                    selectedAvatar.id === avatar.id
+                    !useProfileAvatar && selectedAvatar?.id === avatar.id
                       ? 'ring-4 ring-neo-cyan scale-105 shadow-hard'
                       : 'hover:scale-105 hover:shadow-hard-sm'
                   }`}

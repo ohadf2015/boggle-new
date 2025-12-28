@@ -13,6 +13,7 @@ export interface PresetSettings {
   timerSeconds: number;
   bots: number;
   botDifficulty: 'easy' | 'medium' | 'hard';
+  minWordLength?: number; // Minimum word length (defaults to 3, EASY presets use 2)
 }
 
 export interface PresetConfig {
@@ -46,6 +47,7 @@ export const PRESETS: PresetConfig[] = [
       timerSeconds: 60,
       bots: 1,
       botDifficulty: 'easy',
+      minWordLength: 2, // EASY preset accepts 2-letter words
     },
     modes: ['solo-bots', 'practice', 'challenge'],
   },
@@ -118,6 +120,7 @@ export const MODE_PRESETS: Record<Exclude<SinglePlayerMode, 'daily'>, PresetConf
         timerSeconds: 90,
         bots: 2,
         botDifficulty: 'easy',
+        minWordLength: 2, // EASY preset accepts 2-letter words
       },
       modes: ['solo-bots'],
     },
@@ -166,6 +169,7 @@ export const MODE_PRESETS: Record<Exclude<SinglePlayerMode, 'daily'>, PresetConf
         timerSeconds: 0, // No timer for practice
         bots: 0,
         botDifficulty: 'easy',
+        minWordLength: 2, // EASY preset accepts 2-letter words
       },
       modes: ['practice'],
       isDefault: true,
@@ -214,6 +218,7 @@ export const MODE_PRESETS: Record<Exclude<SinglePlayerMode, 'daily'>, PresetConf
         timerSeconds: 60,
         bots: 0,
         botDifficulty: 'easy',
+        minWordLength: 2, // EASY preset accepts 2-letter words
       },
       modes: ['challenge'],
     },

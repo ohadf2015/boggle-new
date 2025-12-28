@@ -20,6 +20,15 @@ export interface GameHistoryEntry {
   mode: 'single' | 'multiplayer' | 'daily';
   isWinner?: boolean;
   longestWordLength?: number;
+  // Additional fields for comprehensive tracking
+  difficulty?: string;
+  duration?: number; // game duration in seconds
+  comboBonus?: number;
+  fireRoundBonus?: number;
+  archetype?: string;
+  averageWordLength?: number;
+  maxCombo?: number;
+  achievementCount?: number;
 }
 
 export interface GameHistoryData {

@@ -6,7 +6,7 @@ const VALID_LOCALES = ['en', 'he', 'sv', 'ja'] as const;
 const DEFAULT_LOCALE = 'en';
 
 /**
- * Next.js Middleware
+ * Next.js Proxy (formerly Middleware)
  * Handles:
  * - Supabase auth session refresh
  * - Locale detection and redirection
@@ -14,13 +14,13 @@ const DEFAULT_LOCALE = 'en';
  * - Request logging (dev only)
  * - Performance optimizations
  */
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const { pathname, search } = request.nextUrl;
   const pathnameHasLocale = VALID_LOCALES.some(
     (locale) => pathname.startsWith(`/${locale}/`) || pathname === `/${locale}`
   );
 
-  // Skip middleware for static files, API routes, and Next.js internals
+  // Skip proxy for static files, API routes, and Next.js internals
   if (
     pathname.startsWith('/_next') ||
     pathname.startsWith('/api') ||
@@ -68,7 +68,7 @@ export async function middleware(request: NextRequest) {
       // Session refresh happens automatically via cookie handling above
       // This ensures tokens are refreshed on every request
     } catch (error) {
-      // Silently handle auth errors in middleware - let client handle them
+      // Silently handle auth errors in proxy - let client handle them
     }
   }
 

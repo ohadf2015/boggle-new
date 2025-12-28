@@ -24,6 +24,7 @@ import { getPointColor, getTextColor } from '@/components/results/utils';
 import type { WordObject } from '@/components/results/types';
 import { getRankBgColor } from '@/utils/rankingStyles';
 import { addGameToHistory } from '@/utils/gameHistoryManager';
+import { applyHebrewFinalLetters } from '@/utils/utils';
 import type { SinglePlayerResultsData, SinglePlayerMode } from './SinglePlayerView';
 import { useResultsData } from './results';
 
@@ -55,7 +56,7 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
   onQuickRematch,
   onBackToLobby,
 }) => {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const { isAuthenticated } = useAuth();
   const isLandscape = useMobileLandscape();
   const [expandedBot, setExpandedBot] = useState<string | null>(null);
@@ -109,17 +110,26 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
       undefined
     );
 
-    // Update guest stats
+    // Calculate average word length
+    const avgWordLength = validWords.length > 0
+      ? validWords.reduce((sum, w) => sum + w.word.length, 0) / validWords.length
+      : 0;
+
+    // Update guest stats with all tracked data
     updateGuestStatsAfterGame({
       score: results.playerScore,
       wordCount: validWords.length,
       longestWord,
       isWinner: isWinner,
-      achievements: results.achievements?.map(a => a.key) || []
+      achievements: results.achievements?.map(a => a.key) || [],
+      comboBonus: totalComboBonus,
+      fireRoundBonus: totalFireRoundBonus,
+      archetype: playerArchetype?.id,
+      averageWordLength: avgWordLength,
     });
 
     hasUpdatedStatsRef.current = true;
-  }, [isAuthenticated, results, isWinner]);
+  }, [isAuthenticated, results, isWinner, totalComboBonus, totalFireRoundBonus, playerArchetype]);
 
   // Add game to history for the performance chart (runs for all users)
   useEffect(() => {
@@ -129,6 +139,9 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
     const totalAttempts = results.playerWordData?.length || 0;
     const accuracy = totalAttempts > 0 ? Math.round((validWords.length / totalAttempts) * 100) : 0;
     const longestWordLength = validWords.reduce((max, w) => Math.max(max, w.word.length), 0);
+    const avgWordLength = validWords.length > 0
+      ? validWords.reduce((sum, w) => sum + w.word.length, 0) / validWords.length
+      : 0;
 
     addGameToHistory({
       score: results.playerScore,
@@ -139,10 +152,17 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
       mode: 'single',
       isWinner: isWinner,
       longestWordLength,
+      // Additional comprehensive tracking data
+      duration: results.gameDuration,
+      comboBonus: totalComboBonus,
+      fireRoundBonus: totalFireRoundBonus,
+      archetype: playerArchetype?.id,
+      averageWordLength: avgWordLength,
+      achievementCount: results.achievements?.length || 0,
     });
 
     hasAddedToHistoryRef.current = true;
-  }, [results, playerRank, allParticipants.length, isWinner]);
+  }, [results, playerRank, allParticipants.length, isWinner, totalComboBonus, totalFireRoundBonus, playerArchetype]);
 
   // Show signup prompt for guests who have played 2+ games
   useEffect(() => {
@@ -684,6 +704,9 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
                             <div className="flex flex-wrap gap-1.5">
                               {bot.words.map((word, i) => {
                                 const points = Math.max(word.length - 1, 1);
+                                // Use game language (results.language) for proper word display, fallback to UI language
+                                const gameLanguage = results.language || language;
+                                const displayWord = gameLanguage === 'he' ? applyHebrewFinalLetters(word) : word;
                                 return (
                                   <span
                                     key={`${word}-${i}`}
@@ -693,7 +716,7 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
                                       color: getTextColor(points)
                                     }}
                                   >
-                                    {word}
+                                    {displayWord}
                                     <span className="text-[10px] opacity-70">+{points}</span>
                                   </span>
                                 );

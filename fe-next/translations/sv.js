@@ -493,6 +493,8 @@ const sv = {
       "usernameHint": "2-20 tecken, bokstäver och siffror",
       "avatarLabel": "Välj din avatar",
       "usingProfileAvatar": "Använder din profilavatar",
+      "usingGameAvatar": "Använder spelavatar",
+      "tapToChange": "Tryck för att ändra",
       "continueButton": "Fortsätt",
       "saveButton": "Spara Ändringar"
     },
@@ -866,6 +868,7 @@ const sv = {
   "chart": {
     "yourProgress": "Din Utveckling",
     "needMoreGames": "Spela fler spel!",
+    "oneMoreGame": "1 spel till!",
     "needMoreGamesDesc": "Ditt utvecklingsdiagram visas efter 2+ spel",
     "bestScore": "Bäst",
     "average": "Snitt",
@@ -2167,6 +2170,9 @@ const sv = {
     "results": {
       "targetWord": "Målordet",
       "tokensEarned": "poletter tjänade",
+      "betterLuckNextTime": "Bättre lycka nästa gång!",
+      "nextChallengeIn": "Nästa utmaning om",
+      "tryAgainTomorrow": "Kom tillbaka imorgon för ett nytt pussel!",
       "rankOutOf": "#{rank} av {total} spelare",
       "rankingsFor": "Rankning för {language} pussel",
       "survivalMetrics": "Överlevnadsstatistik",

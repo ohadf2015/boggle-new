@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
-import { User, Users, Bot, Target, Trophy, DoorOpen, Crown, Medal, CircleHelp } from 'lucide-react';
+import { User, Users, Bot, Target, Trophy, LayoutGrid, Crown, Medal, CircleHelp } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useMusic } from '@/contexts/MusicContext';
 import { useAuth } from '@/contexts/AuthContext';
@@ -80,7 +80,7 @@ const LandingView: React.FC = () => {
           <Users className="w-12 h-12 text-neo-black" aria-hidden="true" />
           <span className="text-xl font-black uppercase text-neo-black text-center">{t('landing.multiplayer') || 'Multiplayer'}</span>
           <div className="flex flex-col gap-2 text-sm" aria-hidden="true">
-            <span className="bg-neo-black/20 px-3 py-1.5 rounded-neo font-bold text-center"><DoorOpen className="inline w-4 h-4 mr-1" />Rooms</span>
+            <span className="bg-neo-black/20 px-3 py-1.5 rounded-neo font-bold text-center"><LayoutGrid className="inline w-4 h-4 mr-1" />Rooms</span>
             <span className="bg-neo-black/20 px-3 py-1.5 rounded-neo font-bold text-center"><Crown className="inline w-4 h-4 mr-1" />Host</span>
           </div>
         </Link>
@@ -149,7 +149,7 @@ const LandingView: React.FC = () => {
             title={t('landing.multiplayer') || 'Multiplayer'}
             description={t('landing.multiplayerDesc') || 'Compete with friends in real-time!'}
             features={[
-              { icon: <DoorOpen className="w-4 h-4" />, label: t('landing.feature.joinRooms') || 'Join Rooms' },
+              { icon: <LayoutGrid className="w-4 h-4" />, label: t('landing.feature.joinRooms') || 'Join Rooms' },
               { icon: <Crown className="w-4 h-4" />, label: t('landing.feature.hostGames') || 'Host Games' },
               { icon: <Medal className="w-4 h-4" />, label: t('landing.feature.tournaments') || 'Tournaments' },
             ]}

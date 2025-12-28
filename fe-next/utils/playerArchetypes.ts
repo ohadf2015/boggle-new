@@ -379,17 +379,24 @@ export function calculateAllPlayerArchetypes(
 ): Map<string, PlayerArchetype> {
   const archetypeMap = new Map<string, PlayerArchetype>();
 
-  // Need at least 2 players for archetypes to be meaningful
-  if (players.length < 2) return archetypeMap;
+  // Filter to only include players with at least 3 valid words
+  // Players who didn't actively participate shouldn't get an archetype
+  const eligiblePlayers = players.filter(p => {
+    const validWords = (p.allWords || []).filter(w => w.validated !== false);
+    return validWords.length >= 3;
+  });
 
-  // Build word map for unique word detection
+  // Need at least 2 eligible players for archetypes to be meaningful
+  if (eligiblePlayers.length < 2) return archetypeMap;
+
+  // Build word map for unique word detection (include all players for comparison)
   const allPlayersWords: Record<string, Array<{ word: string; validated?: boolean; score?: number }>> = {};
   players.forEach(p => {
     allPlayersWords[p.username] = p.allWords || [];
   });
 
-  // Calculate stats for all players
-  const allStats = players.map(p => calculatePlayerStats(p, allPlayersWords, gameDuration));
+  // Calculate stats only for eligible players (those with 3+ valid words)
+  const allStats = eligiblePlayers.map(p => calculatePlayerStats(p, allPlayersWords, gameDuration));
 
   // Track which players have already been assigned an archetype
   const assignedPlayers = new Set<string>();

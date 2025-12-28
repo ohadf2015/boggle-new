@@ -53,6 +53,12 @@ export interface GuestStats {
   createdAt: number;
   // Guest player name for tracking
   guestName?: string | null;
+  // Additional stats for UI display
+  totalComboBonus?: number;
+  totalFireRoundBonus?: number;
+  archetypeCounts?: Record<string, number>; // Track archetype frequency
+  averageWordLength?: number;
+  bestCombo?: number;
 }
 
 export interface GameResult {
@@ -61,6 +67,12 @@ export interface GameResult {
   isWinner?: boolean;
   longestWord?: string;
   achievements?: string[];
+  // Additional stats for comprehensive tracking
+  comboBonus?: number;
+  fireRoundBonus?: number;
+  archetype?: string;
+  averageWordLength?: number;
+  maxCombo?: number;
 }
 
 export interface GuestStatsSummary {
@@ -181,6 +193,40 @@ export function updateGuestStatsAfterGame(gameResult: GameResult): GuestStats {
     stats.achievementCounts = stats.achievementCounts || {};
     for (const achievement of gameResult.achievements) {
       stats.achievementCounts[achievement] = (stats.achievementCounts[achievement] || 0) + 1;
+    }
+  }
+
+  // Track combo and fire round bonuses
+  if (gameResult.comboBonus) {
+    stats.totalComboBonus = (stats.totalComboBonus || 0) + gameResult.comboBonus;
+  }
+  if (gameResult.fireRoundBonus) {
+    stats.totalFireRoundBonus = (stats.totalFireRoundBonus || 0) + gameResult.fireRoundBonus;
+  }
+
+  // Track archetype frequency
+  if (gameResult.archetype) {
+    stats.archetypeCounts = stats.archetypeCounts || {};
+    stats.archetypeCounts[gameResult.archetype] = (stats.archetypeCounts[gameResult.archetype] || 0) + 1;
+  }
+
+  // Track best combo
+  if (gameResult.maxCombo && gameResult.maxCombo > (stats.bestCombo || 0)) {
+    stats.bestCombo = gameResult.maxCombo;
+  }
+
+  // Update average word length (running average)
+  if (gameResult.averageWordLength && gameResult.wordCount && gameResult.wordCount > 0) {
+    const totalWordsNow = stats.words || gameResult.wordCount;
+    const previousTotal = totalWordsNow - gameResult.wordCount;
+    if (previousTotal > 0 && stats.averageWordLength) {
+      // Weighted average
+      stats.averageWordLength = (
+        (stats.averageWordLength * previousTotal) +
+        (gameResult.averageWordLength * gameResult.wordCount)
+      ) / totalWordsNow;
+    } else {
+      stats.averageWordLength = gameResult.averageWordLength;
     }
   }
 

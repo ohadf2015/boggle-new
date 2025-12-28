@@ -107,8 +107,8 @@ const CreateRoomForm: React.FC<CreateRoomFormProps> = ({
             </h1>
             {/* Progress indicator */}
             <div className="flex items-center justify-center gap-2 mt-2">
-              <div className="w-3 h-3 rounded-full bg-neo-cyan text-neo-black border-2 border-neo-black" />
-              <div className="w-3 h-3 rounded-full bg-neo-cyan text-neo-black border-2 border-neo-black" />
+              <div className="w-3 h-3 rounded-full bg-neo-cyan border-2 border-neo-black dark:border-slate-300" />
+              <div className="w-3 h-3 rounded-full bg-neo-cyan border-2 border-neo-black dark:border-slate-300" />
               <span className="text-xs text-neo-black/60 dark:text-slate-400 ms-2">
                 {t('multiplayerFlow.createForm.progress') || 'Step 2 of 2'}
               </span>
@@ -117,7 +117,7 @@ const CreateRoomForm: React.FC<CreateRoomFormProps> = ({
         </motion.div>
 
         {/* Main Content */}
-        <div className="flex-1 flex items-center justify-center px-4 sm:px-6 pb-6 min-h-0">
+        <div className="flex-1 flex items-start justify-center px-4 sm:px-6 pt-4 pb-6 min-h-0 overflow-y-auto">
           <motion.div
             initial={{ y: 20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}

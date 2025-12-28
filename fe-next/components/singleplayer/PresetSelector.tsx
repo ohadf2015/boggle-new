@@ -11,6 +11,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 import { DIFFICULTIES } from '@/utils/consts';
 import { PRESETS, type PresetConfig, getPresetsForMode } from './presetConfig';
+import { getHighScoreForPreset } from './highScoreManager';
 import { useMobileLandscape } from '@/hooks/useMobileLandscape';
 import LandscapeIndicator from '@/components/LandscapeIndicator';
 import type { Language } from '@/shared/types/game';
@@ -154,6 +155,11 @@ const PresetSelector: React.FC<PresetSelectorProps> = ({
     const difficultyConfig = DIFFICULTIES[preset.settings.difficulty];
     const isDaily = preset.id === 'daily';
 
+    // Get high score specific to this preset (for challenge mode)
+    const presetHighScore = selectedMode === 'challenge'
+      ? getHighScoreForPreset(preset.id, preset.settings.difficulty, preset.settings.timerSeconds)
+      : null;
+
     // Difficulty-based colors for borders
     const difficultyColor = preset.settings.difficulty === 'EASY' ? 'border-neo-lime'
       : preset.settings.difficulty === 'MEDIUM' ? 'border-neo-yellow'
@@ -243,9 +249,9 @@ const PresetSelector: React.FC<PresetSelectorProps> = ({
             {preset.settings.bots > 0 && (
               <div>{preset.settings.bots} {t('bots.title') || 'bots'}</div>
             )}
-            {selectedMode === 'challenge' && challengeInfo.highScore !== null && (
+            {selectedMode === 'challenge' && presetHighScore !== null && (
               <div className="text-neo-yellow dark:text-neo-yellow font-black">
-                {t('challenge.record') || 'Record'}: {challengeInfo.highScore}
+                {t('challenge.record') || 'Record'}: {presetHighScore.score}
               </div>
             )}
           </div>

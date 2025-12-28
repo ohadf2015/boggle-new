@@ -240,24 +240,126 @@ const PerformanceChart: React.FC<PerformanceChartProps> = ({
     return null;
   }
 
-  // Not enough data
+  // Not enough data - show engaging empty state with chart preview
   if (chartData.length < 2) {
+    const gamesPlayed = chartData.length;
+    const gamesNeeded = 2 - gamesPlayed;
+
     return (
       <motion.div
-        initial={{ opacity: 0, y: 10 }}
+        initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4, ease: 'easeOut' }}
         className={cn(
-          'bg-neo-cream border-4 border-neo-black rounded-neo-lg p-4 shadow-hard text-center',
+          'bg-gradient-to-br from-slate-800 via-slate-900 to-slate-800',
+          'border-4 border-neo-black rounded-neo-lg shadow-hard-lg overflow-hidden',
           className
         )}
+        style={{ transform: 'rotate(-0.5deg)' }}
       >
-        <div className="text-4xl mb-2">📊</div>
-        <h3 className="font-black text-neo-black uppercase text-sm">
-          {t('chart.needMoreGames') || 'Play More Games!'}
-        </h3>
-        <p className="text-neo-black/70 text-xs mt-1">
-          {t('chart.needMoreGamesDesc') || 'Your improvement chart will appear after 2+ games'}
-        </p>
+        {/* Halftone texture overlay - matching the main chart */}
+        <div
+          className="absolute inset-0 pointer-events-none opacity-[0.04]"
+          style={{
+            backgroundImage: `radial-gradient(circle, white 1px, transparent 1px)`,
+            backgroundSize: '8px 8px',
+          }}
+        />
+
+        <div className="relative z-10 p-4">
+          {/* Header - matching the chart header style */}
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-2">
+              <Target className="w-5 h-5 text-neo-cyan" />
+              <h3 className="text-sm font-black uppercase tracking-wide text-white">
+                {t('chart.yourProgress') || 'Your Progress'}
+              </h3>
+            </div>
+            {/* Progress badge */}
+            <div className="flex items-center gap-1.5 bg-neo-yellow/20 rounded-neo px-2 py-1 border border-neo-yellow/40">
+              <span className="text-xs font-black text-neo-yellow">
+                {gamesPlayed}/2
+              </span>
+            </div>
+          </div>
+
+          {/* Preview chart area with blurred placeholder */}
+          <div className="relative h-32 mb-4 overflow-hidden rounded-neo">
+            {/* Fake chart lines - blurred preview */}
+            <div className="absolute inset-0 flex items-end justify-around px-4 pb-4 opacity-30 blur-[2px]">
+              <div className="w-2 bg-gradient-to-t from-neo-pink to-neo-cyan rounded-t h-[40%]" />
+              <div className="w-2 bg-gradient-to-t from-neo-pink to-neo-cyan rounded-t h-[55%]" />
+              <div className="w-2 bg-gradient-to-t from-neo-pink to-neo-cyan rounded-t h-[45%]" />
+              <div className="w-2 bg-gradient-to-t from-neo-pink to-neo-cyan rounded-t h-[70%]" />
+              <div className="w-2 bg-gradient-to-t from-neo-pink to-neo-cyan rounded-t h-[60%]" />
+              <div className="w-2 bg-gradient-to-t from-neo-pink to-neo-lime rounded-t h-[85%]" />
+            </div>
+
+            {/* Overlay with message */}
+            <div className="absolute inset-0 flex flex-col items-center justify-center bg-slate-900/60 backdrop-blur-[1px]">
+              <motion.div
+                initial={{ scale: 0.8, rotate: -5 }}
+                animate={{ scale: 1, rotate: 0 }}
+                transition={{ delay: 0.2, type: 'spring', stiffness: 200 }}
+                className="text-4xl mb-2"
+              >
+                📊
+              </motion.div>
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.3 }}
+                className="text-center"
+              >
+                <h4 className="font-black text-white uppercase text-sm mb-1">
+                  {gamesNeeded === 1
+                    ? (t('chart.oneMoreGame') || '1 More Game!')
+                    : (t('chart.needMoreGames') || 'Play More Games!')}
+                </h4>
+                <p className="text-white/60 text-xs px-4">
+                  {t('chart.needMoreGamesDesc') || 'Your improvement chart will appear after 2+ games'}
+                </p>
+              </motion.div>
+            </div>
+          </div>
+
+          {/* Motivational stats placeholders */}
+          <div className="grid grid-cols-3 gap-2">
+            <div className="bg-white/5 rounded-neo border border-white/10 p-2 text-center">
+              <div className="flex justify-center mb-1">
+                <div className="w-5 h-5 rounded bg-neo-lime/30 border border-neo-lime/50 flex items-center justify-center">
+                  <Flame className="w-3 h-3 text-neo-lime/70" />
+                </div>
+              </div>
+              <div className="text-lg font-black text-white/30">--</div>
+              <div className="text-[9px] font-bold uppercase text-white/40">
+                {t('chart.bestScore') || 'Best'}
+              </div>
+            </div>
+            <div className="bg-white/5 rounded-neo border border-white/10 p-2 text-center">
+              <div className="flex justify-center mb-1">
+                <div className="w-5 h-5 rounded bg-neo-cyan/30 border border-neo-cyan/50 flex items-center justify-center">
+                  <Target className="w-3 h-3 text-neo-cyan/70" />
+                </div>
+              </div>
+              <div className="text-lg font-black text-white/30">--</div>
+              <div className="text-[9px] font-bold uppercase text-white/40">
+                {t('chart.average') || 'Avg'}
+              </div>
+            </div>
+            <div className="bg-white/5 rounded-neo border border-white/10 p-2 text-center">
+              <div className="flex justify-center mb-1">
+                <div className="w-5 h-5 rounded bg-neo-yellow/30 border border-neo-yellow/50 flex items-center justify-center">
+                  <Trophy className="w-3 h-3 text-neo-yellow/70" />
+                </div>
+              </div>
+              <div className="text-lg font-black text-white/30">{gamesPlayed}</div>
+              <div className="text-[9px] font-bold uppercase text-white/40">
+                {t('chart.games') || 'Games'}
+              </div>
+            </div>
+          </div>
+        </div>
       </motion.div>
     );
   }
@@ -410,8 +512,8 @@ const PerformanceChart: React.FC<PerformanceChartProps> = ({
           <div className="grid grid-cols-3 gap-2 mt-3">
             <div className="bg-white/10 rounded-neo border border-white/20 p-2 text-center">
               <div className="flex justify-center mb-1">
-                <div className="w-5 h-5 rounded bg-neo-lime border border-neo-black flex items-center justify-center">
-                  <Flame className="w-3 h-3 text-neo-black" />
+                <div className="w-5 h-5 rounded bg-neo-lime border border-neo-black flex items-center justify-center text-neo-black">
+                  <Flame className="w-3 h-3" />
                 </div>
               </div>
               <div className="text-lg font-black text-white">{trend.bestScore}</div>
@@ -421,8 +523,8 @@ const PerformanceChart: React.FC<PerformanceChartProps> = ({
             </div>
             <div className="bg-white/10 rounded-neo border border-white/20 p-2 text-center">
               <div className="flex justify-center mb-1">
-                <div className="w-5 h-5 rounded bg-neo-cyan border border-neo-black flex items-center justify-center">
-                  <Target className="w-3 h-3 text-neo-black" />
+                <div className="w-5 h-5 rounded bg-neo-cyan border border-neo-black flex items-center justify-center text-neo-black">
+                  <Target className="w-3 h-3" />
                 </div>
               </div>
               <div className="text-lg font-black text-white">{trend.averageScore}</div>
@@ -432,8 +534,8 @@ const PerformanceChart: React.FC<PerformanceChartProps> = ({
             </div>
             <div className="bg-white/10 rounded-neo border border-white/20 p-2 text-center">
               <div className="flex justify-center mb-1">
-                <div className="w-5 h-5 rounded bg-neo-yellow border border-neo-black flex items-center justify-center">
-                  <Trophy className="w-3 h-3 text-neo-black" />
+                <div className="w-5 h-5 rounded bg-neo-yellow border border-neo-black flex items-center justify-center text-neo-black">
+                  <Trophy className="w-3 h-3" />
                 </div>
               </div>
               <div className="text-lg font-black text-white">{trend.totalGames}</div>

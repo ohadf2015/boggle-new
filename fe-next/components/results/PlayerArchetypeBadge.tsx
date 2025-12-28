@@ -60,15 +60,26 @@ const PlayerArchetypeBadge: React.FC<PlayerArchetypeBadgeProps> = ({
     if (isOpen && badgeRef.current) {
       const rect = badgeRef.current.getBoundingClientRect();
       const viewportHeight = window.innerHeight;
+      const viewportWidth = window.innerWidth;
       const tooltipEstimatedHeight = 80;
+      const tooltipEstimatedWidth = 200; // Estimated tooltip width
 
       // Check if tooltip would go below viewport
       const spaceBelow = viewportHeight - rect.bottom;
       const showAbove = spaceBelow < tooltipEstimatedHeight + 20;
 
+      // Calculate horizontal position - center on badge by default
+      let leftPos = rect.left + rect.width / 2;
+
+      // Ensure tooltip doesn't overflow horizontally
+      // Leave 16px padding from viewport edges
+      const minLeft = tooltipEstimatedWidth / 2 + 16;
+      const maxLeft = viewportWidth - tooltipEstimatedWidth / 2 - 16;
+      leftPos = Math.max(minLeft, Math.min(maxLeft, leftPos));
+
       setTooltipPosition({
         top: showAbove ? rect.top - 8 : rect.bottom + 8,
-        left: rect.left + rect.width / 2,
+        left: leftPos,
         showAbove,
       });
     } else if (!isOpen) {

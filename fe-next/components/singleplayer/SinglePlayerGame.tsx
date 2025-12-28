@@ -644,6 +644,21 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
         combo.maxCombo
       );
 
+      // Generate a unique session ID for this game (used for vote tracking)
+      const gameSessionId = crypto.randomUUID();
+
+      // Collect bot words for validation modal
+      // Get all unique bot words that are actual words (not fallback format like "word5")
+      const allBotWords = settings.bots.flatMap(bot => {
+        const words = botWordsRef.current[bot.id] || [];
+        return words.filter(word => !word.match(/^word\d+$/)); // Filter out fallback format
+      });
+      // Dedupe and limit to reasonable number for validation
+      const uniqueBotWords = [...new Set(allBotWords)];
+      // Randomly select up to 5 words for validation to avoid overwhelming the user
+      const shuffledBotWords = uniqueBotWords.sort(() => Math.random() - 0.5);
+      const botWordsForValidation = shuffledBotWords.slice(0, 5);
+
       const results: SinglePlayerResultsData = {
         playerScore: finalScore,
         playerWords: validWords.map(w => w.word),
@@ -667,6 +682,10 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
         allPossibleWords: [],
         isNewHighScore: false,
         achievements: finalAchievements,
+        // Include bot words for validation and session ID for vote tracking
+        botWordsForValidation,
+        gameSessionId,
+        language: settings.language,
       };
 
       onGameEnd(results);
@@ -821,7 +840,8 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
   // Memoize word submission handler to prevent recreation on every render
   const handleWordSubmit = useCallback((word: string) => {
     const normalizedWord = word.toLowerCase().trim();
-    const minWordLength = 3;
+    // Use minWordLength from settings (EASY presets use 2, others use 3)
+    const minWordLength = settings.minWordLength ?? 3;
     const now = Date.now();
 
     // Abuse detection: check if on cooldown
@@ -929,13 +949,17 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
 
     // Step 4: Add word with pending state and BASE score (no combo yet)
     // Score will be updated if validated (like multiplayer's async socket)
-    setFoundWords(prev => [...prev, {
+    const newWord = {
       word: normalizedWord,
       score: baseScore, // Start with base score, updated if validated with combo
       timestamp: now,
       timeSinceStart,
-      isValid: null, // Pending - will update after dictionary check
-    }]);
+      isValid: null as boolean | null, // Pending - will update after dictionary check
+    };
+    // Update ref immediately to avoid race condition when game ends right after word submission
+    // (useEffect sync may not have run yet when game-over effect reads the ref)
+    foundWordsRef.current = [...foundWordsRef.current, newWord];
+    setFoundWords(foundWordsRef.current);
 
     // Step 5: Check dictionary via backend API (same validation as multiplayer)
     // Uses /api/dictionary/check which supports all languages (EN, HE, SV, ES, JA)
@@ -963,11 +987,13 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
           // fireRoundBonus is the extra points from doubling (when multiplier is 2x)
           const fireRoundBonus = multiplier > 1 ? scoreWithoutMultiplier : 0;
 
-          setFoundWords(prev => prev.map(fw =>
+          // Update ref immediately to avoid race condition when game ends right after validation
+          foundWordsRef.current = foundWordsRef.current.map(fw =>
             fw.word === normalizedWord && fw.timestamp === now
               ? { ...fw, isValid: true, score: fullScore, comboBonus, fireRoundBonus }
               : fw
-          ));
+          );
+          setFoundWords(foundWordsRef.current);
 
           // Add full score with combo (exactly like multiplayer)
           setScore(prev => prev + fullScore);

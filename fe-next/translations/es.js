@@ -490,6 +490,8 @@ const es = {
       "usernameHint": "2-20 caracteres, letras y números",
       "avatarLabel": "Elige tu avatar",
       "usingProfileAvatar": "Usando tu avatar de perfil",
+      "usingGameAvatar": "Usando avatar del juego",
+      "tapToChange": "Toca para cambiar",
       "continueButton": "Continuar",
       "saveButton": "Guardar Cambios"
     },
@@ -863,6 +865,7 @@ const es = {
   "chart": {
     "yourProgress": "Tu Progreso",
     "needMoreGames": "¡Juega más partidas!",
+    "oneMoreGame": "¡1 partida más!",
     "needMoreGamesDesc": "Tu gráfico de mejora aparecerá después de 2+ juegos",
     "bestScore": "Mejor",
     "average": "Prom",
@@ -2164,6 +2167,9 @@ const es = {
     "results": {
       "targetWord": "Palabra Objetivo",
       "tokensEarned": "fichas ganadas",
+      "betterLuckNextTime": "¡Mejor suerte la próxima vez!",
+      "nextChallengeIn": "Próximo desafío en",
+      "tryAgainTomorrow": "¡Vuelve mañana para un nuevo puzzle!",
       "rankOutOf": "#{rank} de {total} jugadores",
       "rankingsFor": "Clasificación para puzzle en {language}",
       "survivalMetrics": "Métricas del Modo Supervivencia",

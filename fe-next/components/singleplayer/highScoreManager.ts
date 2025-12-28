@@ -13,6 +13,12 @@ export interface HighScoreEntry {
   wordCount: number;
   longestWord: string;
   achievedAt: number; // timestamp
+  // Additional stats for comprehensive tracking
+  accuracy?: number;
+  comboBonus?: number;
+  fireRoundBonus?: number;
+  averageWordLength?: number;
+  achievementCount?: number;
 }
 
 export interface ChallengeHighScores {
@@ -112,6 +118,20 @@ export function isNewAllTimeBest(score: number): boolean {
   return !best || score > best.score;
 }
 
+export interface RecordGameOptions {
+  score: number;
+  wordCount: number;
+  longestWord: string;
+  difficulty: DifficultyLevel;
+  durationSeconds: number;
+  // Additional optional stats
+  accuracy?: number;
+  comboBonus?: number;
+  fireRoundBonus?: number;
+  averageWordLength?: number;
+  achievementCount?: number;
+}
+
 /**
  * Record a game result and update high scores if applicable
  * Returns true if a new high score was achieved
@@ -121,7 +141,8 @@ export function recordGameResult(
   wordCount: number,
   longestWord: string,
   difficulty: DifficultyLevel,
-  durationSeconds: number
+  durationSeconds: number,
+  options?: Partial<Omit<RecordGameOptions, 'score' | 'wordCount' | 'longestWord' | 'difficulty' | 'durationSeconds'>>
 ): { isNewHighScore: boolean; isNewAllTimeBest: boolean; previousBest: number | null } {
   const scores = getHighScores();
   const key = getScoreKey(difficulty, durationSeconds);
@@ -135,6 +156,12 @@ export function recordGameResult(
     wordCount,
     longestWord,
     achievedAt: Date.now(),
+    // Include additional stats if provided
+    accuracy: options?.accuracy,
+    comboBonus: options?.comboBonus,
+    fireRoundBonus: options?.fireRoundBonus,
+    averageWordLength: options?.averageWordLength,
+    achievementCount: options?.achievementCount,
   };
 
   // Check for new configuration-specific high score
@@ -173,6 +200,16 @@ export function getProgressStats(): {
     highScoreBeats: scores.totalHighScoreBeats,
     uniqueConfigurations: Object.keys(scores.scores).length,
   };
+}
+
+/**
+ * Get high score for a specific preset
+ * Uses the preset's difficulty and timer settings
+ */
+export function getHighScoreForPreset(presetId: string, difficulty: DifficultyLevel, durationSeconds: number): HighScoreEntry | null {
+  // For presets with no timer (practice mode), we don't track high scores
+  if (durationSeconds === 0) return null;
+  return getHighScore(difficulty, durationSeconds);
 }
 
 /**

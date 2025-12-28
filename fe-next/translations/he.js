@@ -494,6 +494,8 @@ const he = {
       "usernameHint": "2-20 תווים, אותיות ומספרים",
       "avatarLabel": "בחר אווטאר",
       "usingProfileAvatar": "משתמש באווטאר הפרופיל שלך",
+      "usingGameAvatar": "משתמש באווטאר משחק",
+      "tapToChange": "הקש לשינוי",
       "continueButton": "המשך",
       "saveButton": "שמור שינויים"
     },
@@ -867,6 +869,7 @@ const he = {
   "chart": {
     "yourProgress": "ההתקדמות שלך",
     "needMoreGames": "שחקו עוד משחקים!",
+    "oneMoreGame": "עוד משחק אחד!",
     "needMoreGamesDesc": "גרף ההתקדמות יופיע אחרי 2+ משחקים",
     "bestScore": "הכי טוב",
     "average": "ממוצע",
@@ -2168,6 +2171,9 @@ const he = {
     "results": {
       "targetWord": "מילת היעד",
       "tokensEarned": "אסימונים שנצברו",
+      "betterLuckNextTime": "בהצלחה בפעם הבאה!",
+      "nextChallengeIn": "האתגר הבא בעוד",
+      "tryAgainTomorrow": "חזרו מחר לפאזל חדש!",
       "rankOutOf": "מקום #{rank} מתוך {total} שחקנים",
       "rankingsFor": "דירוג לפאזל ב{language}",
       "survivalMetrics": "מדדי מצב הישרדות",

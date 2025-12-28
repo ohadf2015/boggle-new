@@ -85,7 +85,7 @@ const WaitingScreen: React.FC<WaitingScreenProps> = ({
               className="w-full h-12 min-h-[48px] p-0 bg-neo-yellow/90 hover:bg-neo-yellow border-3 border-neo-black rounded-neo flex items-center justify-center shadow-hard"
               title={t('hostView.copyLink')}
             >
-              <Link className="w-4 h-4 text-neo-black" />
+              <Link className="w-4 h-4" />
             </Button>
             <Button
               variant="ghost"
