@@ -2070,6 +2070,15 @@ const ja = {
     "howToPlay": "フィードバックのヒントを使って隠された{length}文字の単語を探そう！{max}回の試行があります。",
     "shareResult": "結果をシェア",
     "playAgainTomorrow": "明日また新しいパズルに挑戦してください！",
+    "feedback": {
+      "tooShort": "📏 最低3文字必要",
+      "duplicate": "🔁 既に見つかりました！",
+      "notOnBoard": "⚠️ ボード上でこれを作成できません",
+      "invalidWord": "❌ 有効な単語ではありません",
+      "validWord": "✓ 単語が見つかりました！",
+      "targetAttempt": "🎯 頑張って！",
+      "targetFound": "🎉 見つけました！"
+    },
     "stats": {
       "title": "統計",
       "totalPlayers": "総プレイヤー数",

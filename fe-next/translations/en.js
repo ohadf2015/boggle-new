@@ -2076,6 +2076,15 @@ const en = {
     "howToPlay": "Hunt for the hidden {length}-letter word using feedback clues! You have {max} attempts to find it.",
     "shareResult": "Share Result",
     "playAgainTomorrow": "Come back tomorrow for a new puzzle!",
+    "feedback": {
+      "tooShort": "📏 Minimum 3 letters",
+      "duplicate": "🔁 Already found!",
+      "notOnBoard": "⚠️ Can't form this on the board",
+      "invalidWord": "❌ Not a valid word",
+      "validWord": "✓ Word found!",
+      "targetAttempt": "🎯 Keep going!",
+      "targetFound": "🎉 YOU FOUND IT!"
+    },
     "stats": {
       "title": "Statistics",
       "totalPlayers": "Total Players",

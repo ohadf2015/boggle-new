@@ -27,6 +27,9 @@ import {
   type HintLevel,
   type ClueShopItem,
 } from '@/utils/aiHintGenerator';
+import { isWordOnBoard } from '@/utils/clientWordValidator';
+import { WordFeedbackToast, type FeedbackType } from './WordFeedbackToast';
+import { LifeGainAnimation } from './LifeGainAnimation';
 
 const MAX_ATTEMPTS = 10;
 const INITIAL_LIFE = 100;
@@ -94,6 +97,13 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
   // Target word attempts
   const [attempts, setAttempts] = useState<TargetAttempt[]>([]);
   const [currentFeedback, setCurrentFeedback] = useState<string>('');
+
+  // Toast feedback system
+  const [feedbackType, setFeedbackType] = useState<FeedbackType | null>(null);
+  const [feedbackMessage, setFeedbackMessage] = useState<string>('');
+
+  // Life gain animation
+  const [lifeGainAmount, setLifeGainAmount] = useState<number | null>(null);
 
   // Hint system
   const [availableHints, setAvailableHints] = useState<HintLevel[]>([]);
@@ -166,12 +176,25 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
     }
   }, [discoveredWords.length, availableHints, currentHint]);
 
+  // Show toast feedback
+  const showToast = useCallback((type: FeedbackType, message: string) => {
+    setFeedbackType(type);
+    setFeedbackMessage(message);
+  }, []);
+
+  // Close toast
+  const closeToast = useCallback(() => {
+    setFeedbackType(null);
+    setFeedbackMessage('');
+  }, []);
+
   // Handle word change from grid
   const handleWordChange = useCallback((word: string, count: number) => {
     setFormedWord(word);
     setLetterCount(count);
     setCurrentFeedback('');
-  }, []);
+    closeToast();
+  }, [closeToast]);
 
   // Handle word submission (could be target attempt OR grid word discovery)
   const handleWordSubmit = useCallback((word: string) => {
@@ -227,9 +250,21 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
 
   // Handle grid word discovery
   const handleWordDiscovery = useCallback((word: string) => {
+    // Check minimum length (3+ letters)
+    if (word.length < 3) {
+      showToast('too-short', t('wordHunt.feedback.tooShort') || '📏 Minimum 3 letters');
+      return;
+    }
+
     // Check if already discovered
     if (discoveredWords.some(w => w.word === word)) {
-      setCurrentFeedback('Already discovered this word!');
+      showToast('duplicate', t('wordHunt.feedback.duplicate') || '🔁 Already found!');
+      return;
+    }
+
+    // Check if word is actually on the board
+    if (!isWordOnBoard(word, grid, language)) {
+      showToast('not-on-board', t('wordHunt.feedback.notOnBoard') || '⚠️ Can\'t form this on the board');
       return;
     }
 
@@ -250,8 +285,13 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
     setClueTokens(prev => prev + tokensGained);
     playWordAcceptedSound?.();
 
+    // Trigger life gain animation
+    setLifeGainAmount(lifeGained);
+
+    // Show success feedback
+    showToast('valid-word', `+${lifeGained} ❤️ ${tokensGained > 0 ? `+${tokensGained} 🪙` : ''}`);
     setCurrentFeedback(`+${lifeGained} ❤️ ${tokensGained > 0 ? `+${tokensGained} 🪙` : ''}`);
-  }, [discoveredWords, playWordAcceptedSound]);
+  }, [discoveredWords, grid, language, playWordAcceptedSound, showToast, t]);
 
   // Handle game over
   const handleGameOver = useCallback((won: boolean) => {
@@ -375,7 +415,7 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
       {/* Life bar + Clue tokens */}
       <div className="flex items-center gap-3 mb-2">
         {/* Life bar */}
-        <div className="flex-1 bg-gray-200 dark:bg-gray-700 rounded-full h-6 overflow-hidden border-2 border-neo-black">
+        <div className="flex-1 bg-gray-200 dark:bg-gray-700 rounded-full h-6 overflow-hidden border-2 border-neo-black relative">
           <motion.div
             className={cn("h-full flex items-center justify-center text-xs font-bold text-white transition-all", getLifeColor())}
             style={{ width: `${lifePoints}%` }}
@@ -384,6 +424,12 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
             <FaHeart className="w-3 h-3 mr-1" />
             {lifePoints}/100
           </motion.div>
+
+          {/* Life gain animation */}
+          <LifeGainAnimation
+            amount={lifeGainAmount}
+            onComplete={() => setLifeGainAmount(null)}
+          />
         </div>
 
         {/* Clue tokens */}
@@ -534,6 +580,13 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
 
       {/* Help Panel */}
       <HelpPanel isOpen={isHelpOpen} onClose={() => setIsHelpOpen(false)} />
+
+      {/* Word Feedback Toast */}
+      <WordFeedbackToast
+        type={feedbackType}
+        message={feedbackMessage}
+        onClose={closeToast}
+      />
     </motion.div>
   );
 };

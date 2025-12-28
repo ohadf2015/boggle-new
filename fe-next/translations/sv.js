@@ -2071,6 +2071,15 @@ const sv = {
     "howToPlay": "Jaga det dolda {length}-bokstavs ordet med hjälp av feedback! Du har {max} försök att hitta det.",
     "shareResult": "Dela resultat",
     "playAgainTomorrow": "Kom tillbaka imorgon för ett nytt pussel!",
+    "feedback": {
+      "tooShort": "📏 Minst 3 bokstäver",
+      "duplicate": "🔁 Redan hittat!",
+      "notOnBoard": "⚠️ Kan inte bilda detta på brädet",
+      "invalidWord": "❌ Inte ett giltigt ord",
+      "validWord": "✓ Ord hittades!",
+      "targetAttempt": "🎯 Fortsätt!",
+      "targetFound": "🎉 DU HITTADE DET!"
+    },
     "stats": {
       "title": "Statistik",
       "totalPlayers": "Totalt antal spelare",

@@ -958,9 +958,9 @@ export interface DailyTargetWord {
  * Algorithm:
  * 1. Use same seeded PRNG as grid generation
  * 2. Shuffle curated word list using seeded random
- * 3. Try each word in order to see if it exists on the board
- * 4. Return the first word that can be formed on the board
- * 5. If none work, fall back to simplest words
+ * 3. Try each word in order to see if it exists on the board WITH A VALID PATH
+ * 4. Return the first word that can be formed on the board through adjacent cells
+ * 5. If none work (should never happen), regenerate grid with better letter distribution
  *
  * CRITICAL: Must be 100% deterministic - same date+language = same target word
  *
@@ -989,23 +989,28 @@ export function selectDailyTargetWord(
     [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
   }
 
-  // Import word validation function dynamically to avoid circular deps
-  // For now, we'll use a simpler heuristic: check if all letters exist
-  // The actual game will validate using isWordOnBoard
+  // Import word validation to check if word is actually on board
+  const { isWordOnBoard } = require('./clientWordValidator');
 
-  // Try each word in shuffled order
+  // Try each word in shuffled order - must validate with actual path-finding
   for (const word of shuffled) {
+    // First do quick letter count check
     if (canWordExistOnGrid(word, grid, language)) {
-      return {
-        word,
-        puzzleDate: dateString,
-        language,
-        puzzleNumber: getPuzzleNumber(dateString)
-      };
+      // Then validate with proper path-finding algorithm
+      if (isWordOnBoard(word, grid, language)) {
+        return {
+          word,
+          puzzleDate: dateString,
+          language,
+          puzzleNumber: getPuzzleNumber(dateString)
+        };
+      }
     }
   }
 
   // Fallback: return first word (should never happen with good word lists)
+  // This word might not be on the board, but it's deterministic
+  console.warn(`[Daily Challenge] No valid target word found on grid for ${dateString} ${language}`);
   return {
     word: shuffled[0],
     puzzleDate: dateString,

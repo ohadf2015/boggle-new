@@ -2072,6 +2072,15 @@ const he = {
     "howToPlay": "חפשו את המילה המוסתרת בת {length} אותיות באמצעות רמזים! יש לכם {max} ניסיונות למצוא אותה.",
     "shareResult": "שתפו תוצאה",
     "playAgainTomorrow": "חזרו מחר לפאזל חדש!",
+    "feedback": {
+      "tooShort": "📏 לפחות 3 אותיות",
+      "duplicate": "🔁 כבר נמצאה!",
+      "notOnBoard": "⚠️ לא ניתן לבנות את זה על הלוח",
+      "invalidWord": "❌ מילה לא תקינה",
+      "validWord": "✓ מילה נמצאה!",
+      "targetAttempt": "🎯 המשיכו!",
+      "targetFound": "🎉 מצאתם את המילה!"
+    },
     "stats": {
       "title": "סטטיסטיקה",
       "totalPlayers": "סך כל השחקנים",
