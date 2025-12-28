@@ -2131,7 +2131,8 @@ const en = {
       "youWon": "You survived and found the word!",
       "category": "Category: {category}",
       "targetWordGuess": "Target word guess",
-      "gridWordDiscovery": "Grid word discovery"
+      "gridWordDiscovery": "Grid word discovery",
+      "cannotRevealMore": "Cannot reveal more letters"
     }
   },
   "tutorial": {

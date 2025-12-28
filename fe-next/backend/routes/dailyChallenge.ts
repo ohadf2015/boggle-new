@@ -565,6 +565,73 @@ router.post('/word-hunt/submit', async (req: WordHuntSubmitRequest, res: Respons
 });
 
 /**
+ * GET /api/daily-challenge/word-hunt/leaderboard/:date/:language
+ * Get Word Hunt leaderboard for a specific date and language
+ */
+router.get('/word-hunt/leaderboard/:date/:language', async (req: Request<LeaderboardParams, unknown, unknown, LeaderboardQuery>, res: Response): Promise<void> => {
+  try {
+    if (!isSupabaseConfigured()) {
+      res.status(503).json({ error: 'Leaderboard service not available' });
+      return;
+    }
+
+    const { date, language } = req.params;
+    const limit = Math.min(parseInt(req.query.limit || '50') || 50, 100);
+
+    // Validate date format
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) {
+      res.status(400).json({ error: 'Invalid date format. Use YYYY-MM-DD' });
+      return;
+    }
+
+    // Validate language
+    if (!VALID_LANGUAGES.includes(language as ValidLanguage)) {
+      res.status(400).json({ error: 'Invalid language code' });
+      return;
+    }
+
+    const supabase = getSupabase();
+
+    // Fetch leaderboard from the Word Hunt leaderboard view
+    const { data, error } = await supabase
+      .from('daily_word_hunt_leaderboard')
+      .select('*')
+      .eq('puzzle_date', date)
+      .eq('language', language)
+      .order('rank_position', { ascending: true })
+      .limit(limit);
+
+    if (error) {
+      logger.error('API', `Word Hunt leaderboard error: ${error.message}`);
+      res.status(500).json({ error: 'Failed to fetch leaderboard' });
+      return;
+    }
+
+    // Get total participant count
+    const { count, error: countError } = await supabase
+      .from('daily_word_hunt_attempts')
+      .select('*', { count: 'exact', head: true })
+      .eq('puzzle_date', date)
+      .eq('language', language);
+
+    if (countError) {
+      logger.warn('API', `Word Hunt leaderboard count error: ${countError.message}`);
+    }
+
+    res.json({
+      data: data || [],
+      totalParticipants: count || data?.length || 0,
+      date,
+      language
+    });
+  } catch (error) {
+    const err = error as Error;
+    logger.error('API', `Word Hunt leaderboard error: ${err.message}`);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+/**
  * GET /api/daily-challenge/word-hunt/stats/:date/:language
  * Get Word Hunt aggregate statistics (Wordle-style)
  */

@@ -2127,7 +2127,8 @@ const he = {
       "youWon": "שרדתם ומצאתם את המילה!",
       "category": "קטגוריה: {category}",
       "targetWordGuess": "ניחוש מילת יעד",
-      "gridWordDiscovery": "גילוי מילת לוח"
+      "gridWordDiscovery": "גילוי מילת לוח",
+      "cannotRevealMore": "לא ניתן לחשוף עוד אותיות"
     }
   },
   "tutorial": {

@@ -332,7 +332,7 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
   // Handle clue shop purchases
   const handlePurchase = useCallback((item: ClueShopItem) => {
     if (clueTokens < item.cost) {
-      setCurrentFeedback('Not enough tokens!');
+      setCurrentFeedback(t('wordHunt.survival.notEnoughTokens') || 'Not enough tokens!');
       return;
     }
 
@@ -349,8 +349,10 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
           const randomIdx = unrevealed[Math.floor(Math.random() * unrevealed.length)];
           setRevealedLetters(prev => new Set([...prev, randomIdx]));
         } else {
-          // Cannot reveal more - show feedback
-          setCurrentFeedback('Cannot reveal more! At least one letter must remain hidden.');
+          // Cannot reveal more - refund and show feedback
+          setClueTokens(prev => prev + item.cost);
+          setTokensSpent(prev => prev - item.cost);
+          setCurrentFeedback(t('wordHunt.survival.cannotRevealMore') || 'Cannot reveal more letters');
         }
         break;
       }
@@ -474,9 +476,9 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
             <FaLightbulb className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
             <div className="flex-1">
               <div className="text-xs text-blue-600 dark:text-blue-400 font-bold mb-1">
-                Hint {currentHint.level}/5 {currentHint.unlockCost === 0 ? '(Free)' : `(Unlocked at ${currentHint.unlockCost} words)`}
+                {t('wordHunt.survival.hintLevel')?.replace('{level}', String(currentHint.level)) || `Hint ${currentHint.level}/5`}
               </div>
-              <div className="text-sm">{currentHint.hint}</div>
+              <div className="text-2xl font-mono font-bold tracking-widest text-center">{currentHint.hint}</div>
             </div>
           </div>
         </motion.div>
@@ -493,7 +495,7 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
               animate={{ opacity: 1 }}
               className="text-center text-xs text-gray-600 dark:text-gray-400 mb-2"
             >
-              💡 Next hint unlocks in {wordsNeeded} {wordsNeeded === 1 ? 'word' : 'words'}
+              💡 {t('wordHunt.survival.needMoreWords')?.replace('{count}', String(wordsNeeded)) || `Find ${wordsNeeded} more words to unlock next hint`}
             </motion.div>
           );
         }
@@ -503,12 +505,12 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
       {/* Category and example (if unlocked) */}
       {showCategory && (
         <div className="text-xs bg-purple-50 dark:bg-purple-900/20 border border-purple-300 rounded p-2 mb-2">
-          <span className="font-bold">Category:</span> {category}
+          <span className="font-bold">{t('wordHunt.survival.category')?.replace('{category}', category) || `Category: ${category}`}</span>
         </div>
       )}
       {showExample && (
         <div className="text-xs bg-green-50 dark:bg-green-900/20 border border-green-300 rounded p-2 mb-2">
-          <span className="font-bold">Example:</span> {exampleSentence.replace(targetWord, '____')}
+          <span className="font-bold">{t('wordHunt.survival.exampleSentence') || 'Example:'}</span> {exampleSentence.replace(new RegExp(targetWord, 'gi'), '____')}
         </div>
       )}
 
@@ -568,38 +570,54 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
               className="bg-white dark:bg-neo-navy rounded-neo border-4 border-neo-black p-6 max-w-md w-full"
               onClick={e => e.stopPropagation()}
             >
-              <h3 className="text-xl font-black mb-4">Clue Shop</h3>
+              <h3 className="text-xl font-black mb-4">{t('wordHunt.survival.shop') || 'Clue Shop'}</h3>
               <div className="space-y-2">
-                {CLUE_SHOP_ITEMS.map(item => (
-                  <button
-                    key={item.id}
-                    onClick={() => handlePurchase(item)}
-                    disabled={clueTokens < item.cost}
-                    className={cn(
-                      "w-full p-3 rounded-neo border-2 border-neo-black text-left transition-all",
-                      clueTokens >= item.cost
-                        ? "bg-neo-yellow hover:shadow-hard cursor-pointer"
-                        : "bg-gray-200 opacity-50 cursor-not-allowed"
-                    )}
-                  >
-                    <div className="flex items-start justify-between">
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2 mb-1">
-                          <span className="text-2xl">{item.icon}</span>
-                          <span className="font-bold">{item.name}</span>
+                {CLUE_SHOP_ITEMS.map(item => {
+                  // Get translated names and descriptions for shop items
+                  const itemNames: Record<string, string> = {
+                    'reveal_letter': t('wordHunt.survival.revealLetter') || 'Reveal Letter',
+                    'eliminate_letters': t('wordHunt.survival.eliminateLetters') || 'Eliminate Wrong Letters',
+                    'example_sentence': t('wordHunt.survival.exampleSentence') || 'Example Sentence',
+                    'reveal_category': t('wordHunt.survival.revealCategory') || 'Reveal Category',
+                  };
+                  const itemDescs: Record<string, string> = {
+                    'reveal_letter': t('wordHunt.survival.revealLetterDesc') || 'Reveal a random letter in the target word',
+                    'eliminate_letters': t('wordHunt.survival.eliminateLettersDesc') || 'Remove 3 letters that are NOT in the word',
+                    'example_sentence': t('wordHunt.survival.exampleSentenceDesc') || 'See the word used in a sentence',
+                    'reveal_category': t('wordHunt.survival.revealCategoryDesc') || 'Show the word category',
+                  };
+
+                  return (
+                    <button
+                      key={item.id}
+                      onClick={() => handlePurchase(item)}
+                      disabled={clueTokens < item.cost}
+                      className={cn(
+                        "w-full p-3 rounded-neo border-2 border-neo-black text-left transition-all",
+                        clueTokens >= item.cost
+                          ? "bg-neo-yellow hover:shadow-hard cursor-pointer"
+                          : "bg-gray-200 opacity-50 cursor-not-allowed"
+                      )}
+                    >
+                      <div className="flex items-start justify-between">
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 mb-1">
+                            <span className="text-2xl">{item.icon}</span>
+                            <span className="font-bold">{itemNames[item.id] || item.name}</span>
+                          </div>
+                          <div className="text-xs text-gray-600">{itemDescs[item.id] || item.description}</div>
                         </div>
-                        <div className="text-xs text-gray-600">{item.description}</div>
+                        <div className="flex items-center gap-1 ml-2">
+                          <FaCoins className="w-4 h-4 text-yellow-600" />
+                          <span className="font-bold">{item.cost}</span>
+                        </div>
                       </div>
-                      <div className="flex items-center gap-1 ml-2">
-                        <FaCoins className="w-4 h-4 text-yellow-600" />
-                        <span className="font-bold">{item.cost}</span>
-                      </div>
-                    </div>
-                  </button>
-                ))}
+                    </button>
+                  );
+                })}
               </div>
               <Button onClick={() => setShowShop(false)} className="w-full mt-4">
-                Close
+                {t('common.close') || 'Close'}
               </Button>
             </motion.div>
           </motion.div>

@@ -881,39 +881,41 @@ async function getCanvasFingerprint(): Promise<string> {
  */
 const TARGET_WORD_LISTS: Record<Language, string[]> = {
   en: [
-    // 3-4 letter words (easy)
-    'CAT', 'DOG', 'TREE', 'BIRD', 'FISH', 'MOON', 'STAR', 'RAIN', 'WIND', 'SNOW',
-    'BOOK', 'DOOR', 'HAND', 'FOOT', 'HEAD', 'FACE', 'ROCK', 'SAND', 'BOAT', 'GAME',
-    // 5-letter words (easier)
-    'HOUSE', 'PLANT', 'WATER', 'EARTH', 'SOUND', 'PLACE', 'WORLD', 'GREAT',
-    'SMALL', 'LARGE', 'YOUNG', 'ROUND', 'CLEAR', 'LIGHT', 'DARK', 'FRESH',
-    'CLEAN', 'QUICK', 'QUIET', 'HAPPY', 'READY', 'STRONG', 'SMART', 'BRAVE',
-    'STONE', 'RIVER', 'OCEAN', 'CLOUD', 'STORM', 'FIELD', 'GRASS', 'BEACH',
-    // 6-letter words (medium)
-    'CASTLE', 'GARDEN', 'FOREST', 'ISLAND', 'MARKET', 'BRIDGE', 'CORNER',
-    'WINDOW', 'SIMPLE', 'MODERN', 'GOLDEN', 'SILVER', 'PURPLE', 'YELLOW',
-    'ORANGE', 'SPRING', 'SUMMER', 'WINTER', 'AUTUMN', 'MONDAY', 'FRIDAY',
-    'DRAGON', 'PLANET', 'NATURE', 'FLOWER', 'BUTTER', 'COFFEE', 'SUNSET',
-    // 7-letter words (harder)
-    'KITCHEN', 'MORNING', 'EVENING', 'PERFECT', 'NATURAL', 'SPECIAL',
-    'AMAZING', 'REGULAR', 'GENERAL', 'CENTRAL', 'EASTERN', 'WESTERN',
-    'RAINBOW', 'THUNDER', 'CRYSTAL', 'DIAMOND', 'VANILLA', 'BLANKET',
-    // 8-letter words (challenging)
-    'MOUNTAIN', 'STANDARD', 'TREASURE', 'QUESTION', 'BUILDING', 'FUNCTION',
-    'PEACEFUL', 'POWERFUL', 'BEAUTIFUL', 'WONDERFUL', 'FANTASTIC', 'ELEPHANT'
+    // 4-letter words - varied and interesting (main target pool)
+    'BIRD', 'FISH', 'MOON', 'STAR', 'RAIN', 'WIND', 'SNOW', 'TREE',
+    'BOOK', 'DOOR', 'HAND', 'FOOT', 'HEAD', 'FACE', 'ROCK', 'SAND',
+    'BOAT', 'GAME', 'WOLF', 'BEAR', 'FROG', 'DEER', 'DUCK', 'HAWK',
+    'CAKE', 'MILK', 'SOUP', 'RICE', 'BEAN', 'CORN', 'PLUM', 'PEAR',
+    'GOLD', 'IRON', 'JADE', 'RUBY', 'SILK', 'WOOL', 'CLAY', 'COAL',
+    'HILL', 'LAKE', 'WAVE', 'CAVE', 'PATH', 'PEAK', 'POND', 'REEF',
+    'SONG', 'DRUM', 'HORN', 'BELL', 'POEM', 'TALE', 'MYTH', 'PLAY',
+    'KING', 'DUKE', 'HERO', 'SAGE', 'MONK', 'CHEF', 'MAGE', 'BARD',
+    'SHIP', 'CART', 'BIKE', 'SLED', 'RAFT', 'KITE', 'DOME', 'ARCH',
+    'ROSE', 'FERN', 'VINE', 'LEAF', 'STEM', 'ROOT', 'PALM', 'PINE',
+    'DAWN', 'DUSK', 'NOON', 'GLOW', 'BEAM', 'BLUR', 'MIST', 'HAZE',
+    'HOPE', 'WISH', 'CALM', 'ZEAL', 'GRIT', 'SOUL', 'MIND', 'WILL',
+    'NEST', 'HIVE', 'LAIR', 'FORT', 'TENT', 'BARN', 'MILL', 'PIER',
+    'WAND', 'COIN', 'MASK', 'RING', 'CAPE', 'HELM', 'CLAW', 'FANG',
+    'FIRE', 'TIDE', 'GUST', 'BOLT', 'SURF', 'FOAM', 'SAND', 'DUST',
+    // Additional unique 4-letter words
+    'MAZE', 'GRID', 'CODE', 'QUIZ', 'ECHO', 'VOID', 'FLUX', 'APEX',
+    'LYNX', 'SWAN', 'CROW', 'MOTH', 'WASP', 'CRAB', 'SEAL', 'TOAD',
+    'BREW', 'STEW', 'BAKE', 'ROAM', 'SOAR', 'DIVE', 'LEAP', 'SPIN',
   ],
   he: [
-    // Hebrew 3-4 letter words (minimum 3 letters)
+    // Hebrew 4-letter words (for daily challenge - replaced obvious ones)
     'בית', 'מים', 'עולם', 'אדם', 'דבר',
-    'עין', 'ראש', 'ילד', 'ספר', 'שלום',
-    'חבר', 'דלת', 'חלון', 'שולחן', 'כיסא',
-    'שמש', 'ירח', 'כוכב', 'עץ', 'פרח',
-    'סוס', 'כלב', 'חתול', 'ציפור',
-    // Hebrew 5-6 letter words
-    'משפחה', 'חברה', 'עבודה', 'תרבות',
-    'אהבה', 'שמחה', 'תקווה', 'חופש',
-    // Hebrew 7+ letter words
-    'חינוך', 'בריאות', 'תקשורת', 'מדינה', 'ממשלה'
+    'עין', 'ראש', 'ילד', 'ספר', 'חבר',
+    'דלת', 'חלון', 'שמש', 'ירח', 'כוכב',
+    'פרח', 'סוס', 'כלב', 'ציפור', 'דגים',
+    'ארנב', 'נמר', 'זאב', 'דוב', 'אריה',
+    'עוגה', 'לחם', 'חלב', 'מים', 'מרק',
+    'זהב', 'כסף', 'נחושת', 'ברזל', 'עץ',
+    'הר', 'נהר', 'ים', 'אגם', 'גבעה',
+    'שיר', 'ספר', 'מכתב', 'סיפור', 'חלום',
+    'מלך', 'גיבור', 'חכם', 'אמן', 'רופא',
+    'אש', 'מים', 'רוח', 'אדמה', 'שמים',
+    'אור', 'צל', 'לילה', 'יום', 'בוקר',
   ],
   sv: [
     // Swedish 3-4 letter words

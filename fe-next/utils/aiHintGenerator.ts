@@ -46,51 +46,81 @@ export async function generateProgressiveHints(
 }
 
 /**
+ * Generate blanks display for a word with some letters revealed
+ * E.g., revealPositions = [0, 2] for "WORD" -> "W _ R _"
+ */
+function generateBlanksDisplay(word: string, revealPositions: number[]): string {
+  const chars: string[] = [];
+  for (let i = 0; i < word.length; i++) {
+    if (revealPositions.includes(i)) {
+      chars.push(word[i].toUpperCase());
+    } else {
+      chars.push('_');
+    }
+  }
+  return chars.join(' ');
+}
+
+/**
  * Fallback hint generation (non-AI, basic hints)
+ * Generates progressive hints that reveal letters in blanks format
+ * Ensures revealed letters are NOT adjacent (at least 1 space between)
  */
 function generateFallbackHints(
   targetWord: string,
   language: Language
 ): HintGenerationResult {
   const wordLength = targetWord.length;
-  const maxRevealCount = wordLength - 1; // Never reveal all letters (N-1 max)
 
-  // For 4-letter words, we can reveal max 3 letters
-  // Hint progression: general -> specific, but never reveal position 4 (last unrevealed)
+  // Progressive reveal positions with spacing between revealed letters
+  // For 4-letter word "BIRD": [] -> [0] -> [0,2] -> [0,2,3] (never adjacent until final)
+  // For 5-letter word "HOUSE": [] -> [0] -> [0,2] -> [0,2,4] -> [0,1,2,4]
   const hints: HintLevel[] = [
     {
       level: 1,
-      hint: `The target is a ${wordLength}-letter word`,
+      hint: generateBlanksDisplay(targetWord, []), // "_ _ _ _"
       unlockCost: 0, // Free - shown immediately
     },
     {
       level: 2,
-      hint: `It starts with "${targetWord[0]}"`,
+      hint: generateBlanksDisplay(targetWord, [0]), // "B _ _ _"
       unlockCost: 0, // Free - shown after 2 words found
     },
   ];
 
-  // Add progressive hints that reveal letters but never all
+  // Add progressive hints - ensure non-adjacent reveals for earlier hints
   if (wordLength >= 4) {
+    // Level 3: First and third letters (positions 0, 2) - not adjacent
     hints.push({
       level: 3,
-      hint: `The second letter is "${targetWord[1]}"`,
-      unlockCost: 4, // Auto-unlock after 4 words found
+      hint: generateBlanksDisplay(targetWord, [0, 2]), // "B _ R _"
+      unlockCost: 4,
     });
 
+    // Level 4: First, third, and last (positions 0, 2, last) - spaced out
     hints.push({
       level: 4,
-      hint: `It ends with "${targetWord[targetWord.length - 1]}"`,
-      unlockCost: 6, // Auto-unlock after 6 words found
+      hint: generateBlanksDisplay(targetWord, [0, 2, wordLength - 1]), // "B _ R D"
+      unlockCost: 6,
     });
 
-    // Final hint reveals N-2 letters (for 4-letter word: show 2 letters with blanks)
-    const revealedPart = targetWord.substring(0, maxRevealCount - 1);
-    const blanks = '_'.repeat(wordLength - revealedPart.length);
+    // Level 5: All but one letter - keep position 1 hidden (second letter)
+    // This maintains some mystery while being very helpful
+    const allButSecond: number[] = [];
+    for (let i = 0; i < wordLength; i++) {
+      if (i !== 1) allButSecond.push(i);
+    }
     hints.push({
       level: 5,
-      hint: `Almost there! ${revealedPart}${blanks}`,
-      unlockCost: 8, // Auto-unlock after 8 words found
+      hint: generateBlanksDisplay(targetWord, allButSecond), // "B _ R D"
+      unlockCost: 8,
+    });
+  } else if (wordLength === 3) {
+    // For 3-letter words - first and last (not adjacent)
+    hints.push({
+      level: 3,
+      hint: generateBlanksDisplay(targetWord, [0, 2]), // "C _ T"
+      unlockCost: 4,
     });
   }
 

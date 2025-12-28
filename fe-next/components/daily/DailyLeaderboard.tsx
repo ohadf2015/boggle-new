@@ -39,6 +39,10 @@ export interface DailyParticipant {
   time_seconds: number;
   completed_at: string;
   rank_position: number;
+  // Word Hunt specific fields
+  solved?: boolean;
+  attempts_used?: number;
+  efficiency_score?: number;
 }
 
 interface DailyLeaderboardProps {
@@ -50,6 +54,7 @@ interface DailyLeaderboardProps {
   compact?: boolean;
   maxVisible?: number;
   t: (key: string) => string;
+  gameType?: 'puzzle' | 'wordHunt';
 }
 
 // ==========================================
@@ -61,7 +66,8 @@ const ParticipantRow = memo<{
   index: number;
   isCurrentUser: boolean;
   compact: boolean;
-}>(({ participant, index, isCurrentUser, compact }) => {
+  gameType: 'puzzle' | 'wordHunt';
+}>(({ participant, index, isCurrentUser, compact, gameType }) => {
   const rank = participant.rank_position;
   const isTopThree = rank <= 3;
 
@@ -122,9 +128,21 @@ const ParticipantRow = memo<{
           )}
         </div>
         <div className="text-xs sm:text-sm text-gray-700 dark:text-gray-200 flex items-center gap-2">
-          <span className="font-bold">{participant.score} pts</span>
-          <span className="text-gray-500 dark:text-gray-400">|</span>
-          <span>{participant.word_count} words</span>
+          {gameType === 'wordHunt' ? (
+            <>
+              <span className={`font-bold ${participant.solved ? 'text-green-600 dark:text-green-400' : 'text-gray-500'}`}>
+                {participant.solved ? '✓ Solved' : '✗ Failed'}
+              </span>
+              <span className="text-gray-500 dark:text-gray-400">|</span>
+              <span>{participant.attempts_used}/10 attempts</span>
+            </>
+          ) : (
+            <>
+              <span className="font-bold">{participant.score} pts</span>
+              <span className="text-gray-500 dark:text-gray-400">|</span>
+              <span>{participant.word_count} words</span>
+            </>
+          )}
         </div>
       </div>
 
@@ -154,6 +172,7 @@ const DailyLeaderboard: React.FC<DailyLeaderboardProps> = ({
   compact = false,
   maxVisible = 10,
   t,
+  gameType = 'wordHunt',
 }) => {
   const [participants, setParticipants] = useState<DailyParticipant[]>([]);
   const [totalCount, setTotalCount] = useState(0);
@@ -168,7 +187,11 @@ const DailyLeaderboard: React.FC<DailyLeaderboardProps> = ({
       setLoading(true);
       setError(null);
 
-      const url = `/api/daily-challenge/leaderboard/${puzzleDate}/${language}?limit=50`;
+      // Use the correct API endpoint based on game type
+      const basePath = gameType === 'wordHunt'
+        ? `/api/daily-challenge/word-hunt/leaderboard`
+        : `/api/daily-challenge/leaderboard`;
+      const url = `${basePath}/${puzzleDate}/${language}?limit=50`;
       const response = await fetch(url);
 
       if (!response.ok) {
@@ -178,7 +201,7 @@ const DailyLeaderboard: React.FC<DailyLeaderboardProps> = ({
       }
 
       const data = await response.json();
-      console.log('Leaderboard data:', { url, date: puzzleDate, language, participants: data.data?.length, total: data.totalParticipants });
+      console.log('Leaderboard data:', { url, date: puzzleDate, language, gameType, participants: data.data?.length, total: data.totalParticipants });
       setParticipants(data.data || []);
       setTotalCount(data.totalParticipants || 0);
 
@@ -191,7 +214,7 @@ const DailyLeaderboard: React.FC<DailyLeaderboardProps> = ({
     } finally {
       setLoading(false);
     }
-  }, [puzzleDate, language, onParticipantCountChange]);
+  }, [puzzleDate, language, onParticipantCountChange, gameType]);
 
   // Initial fetch and polling
   useEffect(() => {
@@ -383,6 +406,7 @@ const DailyLeaderboard: React.FC<DailyLeaderboardProps> = ({
                 index={index}
                 isCurrentUser={isCurrentUser(participant)}
                 compact={compact}
+                gameType={gameType}
               />
             ))}
           </AnimatePresence>

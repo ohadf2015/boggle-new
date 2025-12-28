@@ -168,9 +168,9 @@ const PresetSelector: React.FC<PresetSelectorProps> = ({
         transition={{ delay: index * 0.05 + 0.1 }}
         onClick={() => onSelectPreset(preset)}
         className={cn(
-          'group relative p-3 rounded-neo-lg border-4 transition-all',
+          'group relative p-2 sm:p-3 rounded-neo-lg border-3 sm:border-4 transition-all',
           'flex flex-col items-center text-center flex-shrink-0',
-          'w-[140px] min-w-[140px]',
+          'w-[100px] min-w-[100px] sm:w-[120px] sm:min-w-[120px]',
           'shadow-hard hover:shadow-hard-lg hover:translate-x-[-3px] hover:translate-y-[-3px]',
           'active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-pressed',
           isDaily
@@ -181,7 +181,7 @@ const PresetSelector: React.FC<PresetSelectorProps> = ({
       >
         {/* Badge for recommended */}
         {preset.badge === 'recommended' && (
-          <span className="absolute -top-2 -right-2 px-2 py-0.5 text-[10px] font-black uppercase bg-neo-black text-neo-yellow rounded-full border-2 border-neo-yellow">
+          <span className="absolute -top-1.5 -right-1.5 px-1.5 py-0.5 text-[8px] sm:text-[9px] font-black uppercase bg-neo-black text-neo-yellow rounded-full border-2 border-neo-yellow">
             {t('singlePlayer.preset.recommended') || 'Best'}
           </span>
         )}
@@ -205,36 +205,36 @@ const PresetSelector: React.FC<PresetSelectorProps> = ({
 
         {/* Grid Size (PROMINENT) */}
         {!isDaily && (
-          <div className="text-2xl sm:text-3xl font-black text-neo-black dark:text-neo-white mb-1">
+          <div className="text-xl sm:text-2xl font-black text-neo-black dark:text-neo-white mb-0.5">
             {difficultyConfig.rows}×{difficultyConfig.cols}
           </div>
         )}
 
         {/* Daily Icon */}
         {isDaily && (
-          <div className="w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center mb-1">
-            <IconComponent className="w-6 h-6 sm:w-8 sm:h-8 text-neo-black" />
+          <div className="w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center mb-0.5">
+            <IconComponent className="w-5 h-5 sm:w-6 sm:h-6 text-neo-black" />
           </div>
         )}
 
         {/* Difficulty Name */}
         {!isDaily && (
-          <h3 className="text-sm sm:text-base font-bold uppercase text-neo-black dark:text-neo-white leading-tight">
+          <h3 className="text-xs sm:text-sm font-bold uppercase text-neo-black dark:text-neo-white leading-tight">
             {t(difficultyConfig.nameKey) || preset.settings.difficulty}
           </h3>
         )}
 
         {/* Daily Name */}
         {isDaily && (
-          <h3 className="text-xs sm:text-sm font-black uppercase text-neo-black leading-tight">
+          <h3 className="text-[10px] sm:text-xs font-black uppercase text-neo-black leading-tight">
             {t('daily.badge') || 'Daily'}
-            <span className="block text-[10px] font-bold opacity-80">#{dailyInfo.puzzleNumber}</span>
+            <span className="block text-[8px] sm:text-[9px] font-bold opacity-80">#{dailyInfo.puzzleNumber}</span>
           </h3>
         )}
 
         {/* Mode-specific details */}
         {!isDaily && (
-          <div className="text-[10px] sm:text-xs font-bold text-neo-black/70 dark:text-neo-white/70 mt-1 space-y-0.5">
+          <div className="text-[9px] sm:text-[10px] font-bold text-neo-black/70 dark:text-neo-white/70 mt-0.5 space-y-0">
             {preset.settings.timerSeconds > 0 && (
               <div>{preset.settings.timerSeconds / 60}m</div>
             )}
@@ -254,15 +254,15 @@ const PresetSelector: React.FC<PresetSelectorProps> = ({
 
         {/* Daily countdown */}
         {isDaily && dailyInfo.hasPlayedToday && (
-          <p className="text-[10px] font-bold text-neo-black/70 mt-1">
+          <p className="text-[8px] sm:text-[9px] font-bold text-neo-black/70 mt-0.5">
             {t('daily.nextPuzzleIn') || 'Next'}: {dailyInfo.countdown}
           </p>
         )}
 
         {/* Play indicator */}
-        <div className="mt-1.5 flex items-center gap-1 text-[10px] font-bold text-neo-black/60 dark:text-neo-white/60 group-hover:text-neo-black dark:group-hover:text-neo-white transition-colors">
+        <div className="mt-1 flex items-center gap-0.5 text-[8px] sm:text-[9px] font-bold text-neo-black/60 dark:text-neo-white/60 group-hover:text-neo-black dark:group-hover:text-neo-white transition-colors">
           <FaPlay className="w-2 h-2" />
-          <span>{t('singlePlayer.preset.tapToPlay') || 'Tap to play'}</span>
+          <span>{t('singlePlayer.preset.tapToPlay') || 'Play'}</span>
         </div>
       </motion.button>
     );

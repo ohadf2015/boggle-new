@@ -59,42 +59,97 @@ router.post('/generate-word-hints', async (req: Request, res: Response): Promise
 
     const langName = languageNames[language] || 'English';
 
-    // Generate hints using Claude
+    // Generate hints as progressive blanks with revealed letters
+    // Ensure non-adjacent reveals for better challenge
+    // For word "BIRD" (4 letters):
+    // Level 1: "_ _ _ _" (no letters)
+    // Level 2: "B _ _ _" (first letter only)
+    // Level 3: "B _ R _" (first and third - not adjacent)
+    // Level 4: "B _ R D" (first, third, last - spaced out)
+    // Level 5: "B _ R D" (all but second letter hidden)
+    const wordLength = targetWord.length;
+    const hints = [];
+
+    // Level 1: All blanks
+    hints.push({
+      level: 1,
+      hint: Array(wordLength).fill('_').join(' '),
+      unlockCost: 0,
+    });
+
+    // Level 2: First letter revealed
+    hints.push({
+      level: 2,
+      hint: [targetWord[0].toUpperCase(), ...Array(wordLength - 1).fill('_')].join(' '),
+      unlockCost: 0,
+    });
+
+    if (wordLength >= 4) {
+      // Level 3: First and third letters (positions 0, 2) - not adjacent
+      const level3Chars = [];
+      for (let i = 0; i < wordLength; i++) {
+        if (i === 0 || i === 2) {
+          level3Chars.push(targetWord[i].toUpperCase());
+        } else {
+          level3Chars.push('_');
+        }
+      }
+      hints.push({
+        level: 3,
+        hint: level3Chars.join(' '),
+        unlockCost: 4,
+      });
+
+      // Level 4: First, third, and last (positions 0, 2, last) - spaced out
+      const level4Chars = [];
+      for (let i = 0; i < wordLength; i++) {
+        if (i === 0 || i === 2 || i === wordLength - 1) {
+          level4Chars.push(targetWord[i].toUpperCase());
+        } else {
+          level4Chars.push('_');
+        }
+      }
+      hints.push({
+        level: 4,
+        hint: level4Chars.join(' '),
+        unlockCost: 6,
+      });
+
+      // Level 5: All but second letter (position 1 hidden)
+      const level5Chars = [];
+      for (let i = 0; i < wordLength; i++) {
+        if (i !== 1) {
+          level5Chars.push(targetWord[i].toUpperCase());
+        } else {
+          level5Chars.push('_');
+        }
+      }
+      hints.push({
+        level: 5,
+        hint: level5Chars.join(' '),
+        unlockCost: 8,
+      });
+    } else if (wordLength === 3) {
+      // For 3-letter words: first and last (not adjacent)
+      hints.push({
+        level: 3,
+        hint: [targetWord[0].toUpperCase(), '_', targetWord[2].toUpperCase()].join(' '),
+        unlockCost: 4,
+      });
+    }
+
+    // For category and example, we still use AI
     const message = await anthropic.messages.create({
       model: 'claude-3-5-sonnet-20241022',
-      max_tokens: 1024,
+      max_tokens: 256,
       messages: [
         {
           role: 'user',
-          content: `You are helping create progressive hints for a word guessing game. The target word is "${targetWord}" in ${langName}.
+          content: `For the word "${targetWord}" in ${langName}, provide:
+1. A category path (e.g., "Living Things > Animals > Mammals > Pets")
+2. A natural example sentence using the word
 
-Generate 5 progressive hints that start VERY vague and get increasingly specific. Each hint should help players deduce the word without giving it away directly.
-
-Hint progression:
-1. Very vague (general category or domain)
-2. Slightly more specific (characteristics or context)
-3. More concrete (usage or associations)
-4. Very specific (narrow the possibilities)
-5. Almost obvious (but still doesn't say the word)
-
-Also provide:
-- A category path (e.g., "Living Things > Animals > Mammals > Pets")
-- An example sentence using the word (keep it natural and helpful)
-
-Return your response in this exact JSON format:
-{
-  "hints": [
-    {"level": 1, "hint": "hint text", "unlockCost": 0},
-    {"level": 2, "hint": "hint text", "unlockCost": 1},
-    {"level": 3, "hint": "hint text", "unlockCost": 2},
-    {"level": 4, "hint": "hint text", "unlockCost": 3},
-    {"level": 5, "hint": "hint text", "unlockCost": 5}
-  ],
-  "category": "category path",
-  "exampleSentence": "example sentence with the word"
-}
-
-Important: Return ONLY the JSON, no other text.`,
+Return ONLY JSON: {"category": "...", "exampleSentence": "..."}`,
         },
       ],
     });
@@ -104,23 +159,34 @@ Important: Return ONLY the JSON, no other text.`,
       throw new Error('Unexpected response type from Claude');
     }
 
-    // Parse Claude's response
+    // Parse Claude's response for category and example
     const responseText = content.text.trim();
-    let hintData: HintGenerationResponse;
+    let category = 'Unknown';
+    let exampleSentence = `The ${targetWord} was beautiful.`;
 
     try {
       // Try to extract JSON if Claude wrapped it in markdown
       const jsonMatch = responseText.match(/\{[\s\S]*\}/);
       if (jsonMatch) {
-        hintData = JSON.parse(jsonMatch[0]);
+        const parsed = JSON.parse(jsonMatch[0]);
+        category = parsed.category || category;
+        exampleSentence = parsed.exampleSentence || exampleSentence;
       } else {
-        hintData = JSON.parse(responseText);
+        const parsed = JSON.parse(responseText);
+        category = parsed.category || category;
+        exampleSentence = parsed.exampleSentence || exampleSentence;
       }
     } catch (parseError) {
-      logger.error('API', `Failed to parse Claude response: ${parseError}`);
-      // Return fallback hints
-      hintData = generateFallbackHints(targetWord);
+      logger.error('API', `Failed to parse Claude category response: ${parseError}`);
+      // Use defaults already set
     }
+
+    // Return hints (generated above) with AI-generated category and example
+    const hintData: HintGenerationResponse = {
+      hints,
+      category,
+      exampleSentence,
+    };
 
     res.json(hintData);
   } catch (error) {
@@ -135,43 +201,75 @@ Important: Return ONLY the JSON, no other text.`,
 });
 
 /**
+ * Generate blanks display for a word with some letters revealed
+ * E.g., revealPositions = [0, 2] for "WORD" -> "W _ R _"
+ */
+function generateBlanksDisplay(word: string, revealPositions: number[]): string {
+  const chars: string[] = [];
+  for (let i = 0; i < word.length; i++) {
+    if (revealPositions.includes(i)) {
+      chars.push(word[i].toUpperCase());
+    } else {
+      chars.push('_');
+    }
+  }
+  return chars.join(' ');
+}
+
+/**
  * Fallback hint generation when AI is unavailable
+ * Generates progressive hints that reveal letters in blanks format
+ * Ensures non-adjacent letter reveals for better challenge
  */
 function generateFallbackHints(targetWord: string): HintGenerationResponse {
   const wordLength = targetWord.length;
-  const firstLetter = targetWord[0];
-  const lastLetter = targetWord[targetWord.length - 1];
+
+  // Progressive reveal positions with non-adjacent spacing
+  const hints: HintLevel[] = [
+    {
+      level: 1,
+      hint: generateBlanksDisplay(targetWord, []), // "_ _ _ _"
+      unlockCost: 0,
+    },
+    {
+      level: 2,
+      hint: generateBlanksDisplay(targetWord, [0]), // "B _ _ _"
+      unlockCost: 0,
+    },
+  ];
+
+  // Add progressive hints - ensure non-adjacent reveals
+  if (wordLength >= 4) {
+    // Level 3: First and third letters (positions 0, 2) - not adjacent
+    hints.push({
+      level: 3,
+      hint: generateBlanksDisplay(targetWord, [0, 2]), // "B _ R _"
+      unlockCost: 4,
+    });
+
+    // Level 4: First, third, and last - spaced out
+    hints.push({
+      level: 4,
+      hint: generateBlanksDisplay(targetWord, [0, 2, wordLength - 1]), // "B _ R D"
+      unlockCost: 6,
+    });
+
+    // Level 5: All but second letter (position 1 hidden)
+    const allButSecond: number[] = [];
+    for (let i = 0; i < wordLength; i++) {
+      if (i !== 1) allButSecond.push(i);
+    }
+    hints.push({
+      level: 5,
+      hint: generateBlanksDisplay(targetWord, allButSecond), // "B _ R D"
+      unlockCost: 8,
+    });
+  }
 
   return {
-    hints: [
-      {
-        level: 1,
-        hint: `This is a common ${wordLength}-letter word`,
-        unlockCost: 0,
-      },
-      {
-        level: 2,
-        hint: `It starts with the letter "${firstLetter}"`,
-        unlockCost: 1,
-      },
-      {
-        level: 3,
-        hint: `The last letter is "${lastLetter}"`,
-        unlockCost: 2,
-      },
-      {
-        level: 4,
-        hint: `The first two letters are "${targetWord.substring(0, 2)}"`,
-        unlockCost: 3,
-      },
-      {
-        level: 5,
-        hint: `Almost there! It begins with "${targetWord.substring(0, Math.ceil(wordLength / 2))}"`,
-        unlockCost: 5,
-      },
-    ],
-    category: 'Common Words',
-    exampleSentence: `I saw the ${targetWord} yesterday.`,
+    hints,
+    category: 'Unknown',
+    exampleSentence: `The ${targetWord} was beautiful.`,
   };
 }
 

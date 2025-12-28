@@ -13,7 +13,7 @@ export interface DailyChallengeTutorialProps {
   onSkip: () => void;
 }
 
-const TOTAL_STEPS = 5;
+const TOTAL_STEPS = 4;
 
 export const DailyChallengeTutorial: React.FC<DailyChallengeTutorialProps> = ({
   onComplete,
@@ -41,13 +41,11 @@ export const DailyChallengeTutorial: React.FC<DailyChallengeTutorialProps> = ({
       case 1:
         return <Step1Welcome onNext={nextStep} />;
       case 2:
-        return <Step2ColorFeedback onNext={nextStep} onPrev={prevStep} />;
+        return <Step2WordDiscovery onNext={nextStep} onPrev={prevStep} />;
       case 3:
-        return <Step3WordDiscovery onNext={nextStep} onPrev={prevStep} />;
+        return <Step3MinimumLength onNext={nextStep} onPrev={prevStep} />;
       case 4:
-        return <Step4MinimumLength onNext={nextStep} onPrev={prevStep} />;
-      case 5:
-        return <Step5Summary onNext={onComplete} onPrev={prevStep} />;
+        return <Step4Summary onNext={onComplete} onPrev={prevStep} />;
       default:
         return null;
     }
@@ -121,76 +119,8 @@ const Step1Welcome: React.FC<{ onNext: () => void }> = ({ onNext }) => {
   );
 };
 
-// Step 2: Color Feedback Demo
-const Step2ColorFeedback: React.FC<{ onNext: () => void; onPrev: () => void }> = ({
-  onNext,
-  onPrev,
-}) => {
-  const { t } = useLanguage();
-
-  return (
-    <div>
-      <h2 className="text-2xl font-black mb-4">{t('tutorial.wordHunt.colorFeedback.title') || 'Learn the Colors'}</h2>
-      <p className="mb-4 text-gray-700 dark:text-gray-300">
-        {t('tutorial.wordHunt.colorFeedback.tryGuessing') || 'After each guess, colors show how close you are:'}
-      </p>
-
-      {/* Example: HOUSE vs HOMES */}
-      <div className="bg-gray-100 dark:bg-gray-800 rounded-neo border-2 border-neo-black p-4 mb-4">
-        <div className="text-center mb-2 text-sm text-gray-600 dark:text-gray-400">
-          Target: H O U S E
-        </div>
-        <div className="text-center mb-1 text-sm font-bold">Your guess: H O M E S</div>
-        <div className="flex justify-center gap-1 mb-4">
-          {[
-            { letter: 'H', color: 'bg-green-500' },
-            { letter: 'O', color: 'bg-green-500' },
-            { letter: 'M', color: 'bg-gray-400' },
-            { letter: 'E', color: 'bg-yellow-500' },
-            { letter: 'S', color: 'bg-yellow-500' },
-          ].map((item, i) => (
-            <div
-              key={i}
-              className={cn(
-                'w-10 h-10 flex items-center justify-center rounded border-2 border-neo-black text-white font-bold',
-                item.color
-              )}
-            >
-              {item.letter}
-            </div>
-          ))}
-        </div>
-
-        <div className="space-y-2 text-sm">
-          <div className="flex items-center gap-2">
-            <div className="w-4 h-4 bg-green-500 rounded border border-neo-black"></div>
-            <span>{t('tutorial.wordHunt.colorFeedback.green') || 'Green = Correct position'}</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="w-4 h-4 bg-yellow-500 rounded border border-neo-black"></div>
-            <span>{t('tutorial.wordHunt.colorFeedback.yellow') || 'Yellow = In word, wrong spot'}</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="w-4 h-4 bg-gray-400 rounded border border-neo-black"></div>
-            <span>{t('tutorial.wordHunt.colorFeedback.gray') || 'Gray = Not in word'}</span>
-          </div>
-        </div>
-      </div>
-
-      <div className="flex gap-2">
-        <Button onClick={onPrev} variant="outline" className="flex-1">
-          ← {t('common.back') || 'Back'}
-        </Button>
-        <Button onClick={onNext} className="flex-1 bg-neo-purple text-white">
-          {t('tutorial.wordHunt.colorFeedback.next') || 'Next'} <FaArrowRight className="ml-2" />
-        </Button>
-      </div>
-    </div>
-  );
-};
-
-// Step 3: Word Discovery & Life System
-const Step3WordDiscovery: React.FC<{ onNext: () => void; onPrev: () => void }> = ({
+// Step 2: Word Discovery & Life System
+const Step2WordDiscovery: React.FC<{ onNext: () => void; onPrev: () => void }> = ({
   onNext,
   onPrev,
 }) => {
@@ -244,8 +174,8 @@ const Step3WordDiscovery: React.FC<{ onNext: () => void; onPrev: () => void }> =
   );
 };
 
-// Step 4: Minimum Length Rule
-const Step4MinimumLength: React.FC<{ onNext: () => void; onPrev: () => void }> = ({
+// Step 3: Minimum Length Rule
+const Step3MinimumLength: React.FC<{ onNext: () => void; onPrev: () => void }> = ({
   onNext,
   onPrev,
 }) => {
@@ -308,8 +238,8 @@ const Step4MinimumLength: React.FC<{ onNext: () => void; onPrev: () => void }> =
   );
 };
 
-// Step 5: Summary & Start
-const Step5Summary: React.FC<{ onNext: () => void; onPrev: () => void }> = ({
+// Step 4: Summary & Start
+const Step4Summary: React.FC<{ onNext: () => void; onPrev: () => void }> = ({
   onNext,
   onPrev,
 }) => {
