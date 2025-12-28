@@ -1198,6 +1198,8 @@ export default function MultiplayerPage(): React.JSX.Element {
             socket={socket}
             duplicateRuleDisabled={resultsData?.duplicateRuleDisabled}
             playerCount={resultsData?.playerCount}
+            isHost={isHost}
+            roomLanguage={roomLanguage ?? undefined}
           />
         </FeatureErrorBoundary>
       );
@@ -1246,6 +1248,7 @@ export default function MultiplayerPage(): React.JSX.Element {
           initialPlayers={playersInRoom}
           pendingGameStart={pendingGameStart}
           onGameStartConsumed={() => setPendingGameStart(null)}
+          roomLanguage={roomLanguage}
         />
       </FeatureErrorBoundary>
     );

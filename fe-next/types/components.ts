@@ -96,6 +96,10 @@ export interface ResultsPageProps {
   duplicateRuleDisabled?: boolean;
   /** Number of players in the game */
   playerCount?: number;
+  /** Whether the current user is the host */
+  isHost?: boolean;
+  /** Room language for starting new games */
+  roomLanguage?: Language;
 }
 
 export interface VoteInfo {

@@ -107,7 +107,7 @@ const DailyChallengeGame: React.FC<DailyChallengeGameProps> = ({
   const wordSubmission = useWordSubmission({
     grid,
     language,
-    minWordLength: 2,
+    minWordLength: 3,
     enableSpamDetection: false, // Daily challenge doesn't need spam detection
     fireRoundActive: false,
     comboLevel: combo.comboLevel,
@@ -186,7 +186,7 @@ const DailyChallengeGame: React.FC<DailyChallengeGameProps> = ({
           body: JSON.stringify({
             words: pendingWords.map(pw => pw.word),
             language,
-            minWordLength: 2,
+            minWordLength: 3,
           }),
         });
         const result = await response.json();
@@ -358,7 +358,7 @@ const DailyChallengeGame: React.FC<DailyChallengeGameProps> = ({
         </motion.div>
       </div>
 
-      {/* Achievement Progress Tracker - shows near-completion achievements */}
+      {/* Achievement Progress Tracker - shows near-completion achievements, auto-dismisses 2s after game ends */}
       <AchievementProgressTracker
         validWordCount={wordSubmission.validWordCount}
         comboLevel={combo.comboLevel}
@@ -367,6 +367,7 @@ const DailyChallengeGame: React.FC<DailyChallengeGameProps> = ({
         timeSinceStart={duration - timer.remainingTime}
         gameDuration={duration}
         earnedAchievements={[]}
+        isGameOver={isGameOver}
       />
 
       {/* Word Forming Area with feedback - centered below timer */}

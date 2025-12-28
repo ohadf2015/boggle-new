@@ -1030,17 +1030,45 @@ router.post('/bot-words/approve', async (req: AdminRequest, res: Response): Prom
       .eq('word', normalizedWord)
       .eq('language', language);
 
-    // 2. Add 10 positive votes to push over threshold
-    const adminVotes = Array.from({ length: 10 }, (_, i) => ({
+    // 2. Get current score
+    const { data: currentScore } = await supabase
+      .from('word_scores')
+      .select('likes_count, dislikes_count, net_score')
+      .eq('word', normalizedWord)
+      .eq('language', language)
+      .single();
+
+    const currentLikes = currentScore?.likes_count || 0;
+    const currentDislikes = currentScore?.dislikes_count || 0;
+    const currentNet = currentScore?.net_score || 0;
+    const votesNeeded = Math.max(10 - currentNet, 10); // At least 10 votes
+
+    // 3. Update word_scores directly (instead of inserting multiple votes which would violate unique constraint)
+    const { error: scoreError } = await supabase
+      .from('word_scores')
+      .upsert({
+        word: normalizedWord,
+        language,
+        likes_count: currentLikes + votesNeeded,
+        dislikes_count: currentDislikes,
+        last_voted_at: new Date().toISOString(),
+      }, { onConflict: 'word,language' });
+
+    if (scoreError) {
+      logger.error('ADMIN_API', `Score update failed: ${scoreError.message}`);
+      res.status(500).json({ error: 'Failed to update word score' });
+      return;
+    }
+
+    // 4. Record a single admin vote for audit trail (upsert to handle duplicate)
+    await supabase.from('word_votes').upsert({
       word: normalizedWord,
       language,
       user_id: req.adminUser!.id,
-      game_code: `admin_approval_${Date.now()}_${i}`,
+      game_code: `admin_approval_${Date.now()}`,
       vote_type: 'like',
       is_bot_word: true
-    }));
-
-    await supabase.from('word_votes').insert(adminVotes);
+    }, { onConflict: 'user_id,word,language', ignoreDuplicates: true });
 
     auditLog(req.adminUser, 'BOT_WORD_APPROVE', { word: normalizedWord, language });
     res.json({ success: true });
@@ -1077,17 +1105,44 @@ router.post('/bot-words/disapprove', async (req: AdminRequest, res: Response): P
         blacklisted_by: req.adminUser!.id
       }, { onConflict: 'word,language' });
 
-    // 2. Add 5 negative votes to mark as invalid
-    const adminVotes = Array.from({ length: 5 }, (_, i) => ({
+    // 2. Get current score
+    const { data: currentScore } = await supabase
+      .from('word_scores')
+      .select('likes_count, dislikes_count')
+      .eq('word', normalizedWord)
+      .eq('language', language)
+      .single();
+
+    const currentLikes = currentScore?.likes_count || 0;
+    const currentDislikes = currentScore?.dislikes_count || 0;
+    const votesToAdd = 5; // Add 5 negative votes to mark as invalid
+
+    // 3. Update word_scores directly (instead of inserting multiple votes which would violate unique constraint)
+    const { error: scoreError } = await supabase
+      .from('word_scores')
+      .upsert({
+        word: normalizedWord,
+        language,
+        likes_count: currentLikes,
+        dislikes_count: currentDislikes + votesToAdd,
+        last_voted_at: new Date().toISOString(),
+      }, { onConflict: 'word,language' });
+
+    if (scoreError) {
+      logger.error('ADMIN_API', `Score update failed: ${scoreError.message}`);
+      res.status(500).json({ error: 'Failed to update word score' });
+      return;
+    }
+
+    // 4. Record a single admin vote for audit trail (upsert to handle duplicate)
+    await supabase.from('word_votes').upsert({
       word: normalizedWord,
       language,
       user_id: req.adminUser!.id,
-      game_code: `admin_disapproval_${Date.now()}_${i}`,
+      game_code: `admin_disapproval_${Date.now()}`,
       vote_type: 'dislike',
       is_bot_word: true
-    }));
-
-    await supabase.from('word_votes').insert(adminVotes);
+    }, { onConflict: 'user_id,word,language', ignoreDuplicates: true });
 
     auditLog(req.adminUser, 'BOT_WORD_DISAPPROVE', { word: normalizedWord, language, reason });
     res.json({ success: true });
@@ -1426,32 +1481,49 @@ router.post('/community-words/approve', async (req: AdminRequest, res: Response)
   const normalizedWord = (word as string).toLowerCase().trim();
 
   try {
-    // Get current score
+    // Get current score with full counts
     const { data: currentScore } = await supabase
       .from('word_scores')
-      .select('net_score')
+      .select('likes_count, dislikes_count, net_score')
       .eq('word', normalizedWord)
       .eq('language', language)
       .single();
 
-    // Calculate votes needed to reach threshold
+    // Calculate votes needed to reach threshold of 10
     const currentNet = currentScore?.net_score || 0;
     const votesNeeded = Math.max(10 - currentNet, 5); // At least 5 votes to show intent
 
-    // Add admin approval votes
-    const adminVotes = Array.from({ length: votesNeeded }, (_, i) => ({
+    // Calculate new likes_count by adding votesNeeded to existing
+    const currentLikes = currentScore?.likes_count || 0;
+    const currentDislikes = currentScore?.dislikes_count || 0;
+    const newLikesCount = currentLikes + votesNeeded;
+
+    // Update word_scores directly (instead of inserting multiple votes which would violate unique constraint)
+    const { error: scoreError } = await supabase
+      .from('word_scores')
+      .upsert({
+        word: normalizedWord,
+        language,
+        likes_count: newLikesCount,
+        dislikes_count: currentDislikes,
+        last_voted_at: new Date().toISOString(),
+      }, { onConflict: 'word,language' });
+
+    if (scoreError) {
+      logger.error('ADMIN_API', `Score update failed: ${scoreError.message}`);
+      res.status(500).json({ error: 'Failed to update word score' });
+      return;
+    }
+
+    // Also record a single admin vote for audit trail (upsert to handle duplicate)
+    await supabase.from('word_votes').upsert({
       word: normalizedWord,
       language,
       user_id: req.adminUser!.id,
-      game_code: `admin_community_approve_${Date.now()}_${i}`,
+      game_code: `admin_community_approve_${Date.now()}`,
       vote_type: 'like',
       is_bot_word: false,
-    }));
-
-    const { error: voteError } = await supabase.from('word_votes').insert(adminVotes);
-    if (voteError) {
-      logger.warn('ADMIN_API', `Vote insert partial failure: ${voteError.message}`);
-    }
+    }, { onConflict: 'user_id,word,language', ignoreDuplicates: true });
 
     // Remove from blacklist if present
     await supabase
@@ -1497,20 +1569,44 @@ router.post('/community-words/disapprove', async (req: AdminRequest, res: Respon
   const normalizedWord = (word as string).toLowerCase().trim();
 
   try {
-    // Add negative admin votes
-    const adminVotes = Array.from({ length: 10 }, (_, i) => ({
+    // Get current score with full counts
+    const { data: currentScore } = await supabase
+      .from('word_scores')
+      .select('likes_count, dislikes_count')
+      .eq('word', normalizedWord)
+      .eq('language', language)
+      .single();
+
+    const currentLikes = currentScore?.likes_count || 0;
+    const currentDislikes = currentScore?.dislikes_count || 0;
+    const votesToAdd = 10; // Add 10 negative votes to reject
+
+    // Update word_scores directly (instead of inserting multiple votes which would violate unique constraint)
+    const { error: scoreError } = await supabase
+      .from('word_scores')
+      .upsert({
+        word: normalizedWord,
+        language,
+        likes_count: currentLikes,
+        dislikes_count: currentDislikes + votesToAdd,
+        last_voted_at: new Date().toISOString(),
+      }, { onConflict: 'word,language' });
+
+    if (scoreError) {
+      logger.error('ADMIN_API', `Score update failed: ${scoreError.message}`);
+      res.status(500).json({ error: 'Failed to update word score' });
+      return;
+    }
+
+    // Also record a single admin vote for audit trail (upsert to handle duplicate)
+    await supabase.from('word_votes').upsert({
       word: normalizedWord,
       language,
       user_id: req.adminUser!.id,
-      game_code: `admin_community_disapprove_${Date.now()}_${i}`,
+      game_code: `admin_community_disapprove_${Date.now()}`,
       vote_type: 'dislike',
       is_bot_word: false,
-    }));
-
-    const { error: voteError } = await supabase.from('word_votes').insert(adminVotes);
-    if (voteError) {
-      logger.warn('ADMIN_API', `Vote insert partial failure: ${voteError.message}`);
-    }
+    }, { onConflict: 'user_id,word,language', ignoreDuplicates: true });
 
     // Optionally add to blacklist
     if (addToBlacklist) {

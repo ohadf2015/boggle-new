@@ -311,9 +311,9 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
 
   // Handle grid word discovery
   const handleWordDiscovery = useCallback((word: string) => {
-    // Check minimum length (4+ letters for daily challenge)
-    if (word.length < 4) {
-      showToast('too-short', t('wordHunt.feedback.tooShort') || '📏 Minimum 4 letters');
+    // Check minimum length (3+ letters for daily challenge word discovery)
+    if (word.length < 3) {
+      showToast('too-short', t('wordHunt.feedback.tooShort') || '📏 Minimum 3 letters');
       return;
     }
 
@@ -467,15 +467,33 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
     playWordAcceptedSound?.();
   }, [clueTokens, targetWord, revealedLetters, eliminatedLetters, playWordAcceptedSound]);
 
-  // Render target word with revealed letters
+  // Render target word with revealed letters - responsive sizing
   const renderTargetWord = () => {
+    // Dynamically size based on word length to fit screen
+    const wordLength = targetWord.length;
+    // Larger boxes for short words, smaller for long words
+    const sizeClass = wordLength <= 4
+      ? "w-12 h-12 sm:w-14 sm:h-14 text-xl sm:text-2xl"
+      : wordLength <= 6
+        ? "w-10 h-10 sm:w-12 sm:h-12 text-lg sm:text-xl"
+        : wordLength <= 8
+          ? "w-8 h-8 sm:w-10 sm:h-10 text-base sm:text-lg"
+          : "w-7 h-7 sm:w-9 sm:h-9 text-sm sm:text-base";
+
     return targetWord.split('').map((letter, idx) => (
-      <div
+      <motion.div
         key={idx}
-        className="w-10 h-10 flex items-center justify-center border-2 border-neo-black rounded bg-white dark:bg-gray-800 font-bold text-lg"
+        initial={{ scale: 0, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        transition={{ delay: idx * 0.05, type: "spring", stiffness: 300 }}
+        className={cn(
+          "flex items-center justify-center border-2 border-neo-black rounded-lg bg-white dark:bg-gray-800 font-bold shadow-sm",
+          sizeClass,
+          revealedLetters.has(idx) && "bg-neo-yellow/30 border-neo-yellow"
+        )}
       >
         {revealedLetters.has(idx) ? letter.toUpperCase() : '_'}
-      </div>
+      </motion.div>
     ));
   };
 
@@ -606,7 +624,7 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
         </Button>
       </div>
 
-      {/* Current hint */}
+      {/* Current hint - compact on mobile */}
       {currentHint && (
         <motion.div
           initial={{ opacity: 0, y: -10 }}
@@ -618,7 +636,7 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
           }}
           transition={{ duration: hintUnlockAnimation ? 0.5 : 0.3 }}
           className={cn(
-            "border-2 rounded-neo p-3 mb-2 relative overflow-hidden",
+            "border-2 rounded-neo p-2 sm:p-3 mb-1.5 relative overflow-hidden mx-1",
             hintUnlockAnimation
               ? "bg-gradient-to-r from-yellow-50 to-blue-50 dark:from-yellow-900/30 dark:to-blue-900/30 border-yellow-500"
               : "bg-blue-50 dark:bg-blue-900/20 border-blue-500"
@@ -632,35 +650,35 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
               transition={{ duration: 1 }}
               className="absolute inset-0 flex items-center justify-center pointer-events-none"
             >
-              <span className="text-4xl">✨</span>
+              <span className="text-3xl sm:text-4xl">✨</span>
             </motion.div>
           )}
 
-          <div className="flex items-start gap-2">
+          <div className="flex items-center gap-2">
             <motion.div
               animate={hintUnlockAnimation ? { rotate: [0, -15, 15, 0], scale: [1, 1.3, 1] } : {}}
               transition={{ duration: 0.5 }}
             >
               <Lightbulb className={cn(
-                "w-5 h-5 flex-shrink-0 mt-0.5",
+                "w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0",
                 hintUnlockAnimation ? "text-yellow-500" : "text-blue-600"
               )} />
             </motion.div>
-            <div className="flex-1">
+            <div className="flex-1 flex items-center gap-2 sm:gap-3">
               <div className={cn(
-                "text-xs font-bold mb-1",
+                "text-[10px] sm:text-xs font-bold whitespace-nowrap",
                 hintUnlockAnimation ? "text-yellow-600 dark:text-yellow-400" : "text-blue-600 dark:text-blue-400"
               )}>
                 {hintUnlockAnimation
-                  ? (t('wordHunt.survival.hintUnlocked') || '🎉 New Hint Unlocked!')
-                  : (t('wordHunt.survival.hintLevel')?.replace('{level}', String(currentHint.level)) || `Hint ${currentHint.level}/5`)
+                  ? (t('wordHunt.survival.hintUnlocked') || '🎉 New!')
+                  : (t('wordHunt.survival.hintLevel')?.replace('{level}', String(currentHint.level)) || `Lvl ${currentHint.level}`)
                 }
               </div>
               <motion.div
                 key={currentHint.hint}
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
-                className="text-2xl font-mono font-bold tracking-widest text-center"
+                className="text-lg sm:text-2xl font-mono font-bold tracking-widest flex-1 text-center"
               >
                 {currentHint.hint}
               </motion.div>
@@ -669,7 +687,7 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
         </motion.div>
       )}
 
-      {/* Next hint progress */}
+      {/* Next hint progress - compact inline design */}
       {(() => {
         const nextHint = availableHints.find(h => h.unlockCost > discoveredWords.length);
         if (nextHint && currentHint) {
@@ -682,30 +700,22 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              className="mb-2 px-2"
+              className="mb-1.5 px-2 flex items-center gap-2"
             >
-              <div className="flex items-center gap-2 text-xs text-gray-600 dark:text-gray-400 mb-1">
-                <span className="font-bold">{t('wordHunt.survival.nextHint') || 'Next Hint'}</span>
-                <span className="text-neo-purple font-bold">Lvl {nextHint.level}</span>
+              <span className="text-[10px] sm:text-xs text-gray-500 whitespace-nowrap">
+                {t('wordHunt.survival.nextHint') || 'Next'} Lvl {nextHint.level}:
+              </span>
+              <div className="flex-1 bg-gray-200 dark:bg-gray-700 rounded-full h-1.5 overflow-hidden">
+                <motion.div
+                  className="h-full bg-gradient-to-r from-blue-500 to-purple-500"
+                  initial={{ width: 0 }}
+                  animate={{ width: `${progressPercent}%` }}
+                  transition={{ duration: 0.3 }}
+                />
               </div>
-              <div className="flex items-center gap-2">
-                <div className="flex-1 bg-gray-200 dark:bg-gray-700 rounded-full h-2 overflow-hidden">
-                  <motion.div
-                    className="h-full bg-gradient-to-r from-blue-500 to-purple-500"
-                    initial={{ width: 0 }}
-                    animate={{ width: `${progressPercent}%` }}
-                    transition={{ duration: 0.3 }}
-                  />
-                </div>
-                <span className="text-xs font-bold text-gray-600 dark:text-gray-400 min-w-[60px] text-right">
-                  {discoveredWords.length}/{nextHint.unlockCost} 📖
-                </span>
-              </div>
-              <div className="text-center text-xs text-gray-500 dark:text-gray-500 mt-1">
-                {wordsNeeded === 1
-                  ? (t('wordHunt.survival.oneMoreWord') || '1 more word!')
-                  : (t('wordHunt.survival.needMoreWords')?.replace('{count}', String(wordsNeeded)) || `${wordsNeeded} more words`)}
-              </div>
+              <span className="text-[10px] sm:text-xs font-bold text-gray-500 whitespace-nowrap">
+                {wordsNeeded} more
+              </span>
             </motion.div>
           );
         } else if (currentHint?.level === 5) {
@@ -714,7 +724,7 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              className="text-center text-xs text-green-600 dark:text-green-400 mb-2 font-bold"
+              className="text-center text-[10px] sm:text-xs text-green-600 dark:text-green-400 mb-1.5 font-bold"
             >
               ✅ {t('wordHunt.survival.allHintsUnlocked') || 'All hints unlocked!'}
             </motion.div>
@@ -735,23 +745,15 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
         </div>
       )}
 
-      {/* Target word display with instruction */}
-      <div className="text-center mb-2">
-        <div className="text-xs font-bold text-neo-purple dark:text-neo-purple mb-1">
-          🔍 {t('wordHunt.survival.findOnBoard') || 'Find this word on the board!'}
-        </div>
-        <div className="flex justify-center gap-1">
-          {renderTargetWord()}
-        </div>
-        <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-          {t('wordHunt.survival.traceLetters') || 'Trace the letters on the grid to spell it'}
-        </div>
+      {/* Target word display - responsive with wrapping for long words */}
+      <div className="flex justify-center flex-wrap gap-1.5 sm:gap-2 mb-3 px-2">
+        {renderTargetWord()}
       </div>
 
       {/* Prominent Attempts Counter */}
       <motion.div
         className={cn(
-          "flex items-center justify-center gap-3 px-4 py-2 rounded-neo border-3 mb-2 mx-auto",
+          "flex items-center justify-between gap-2 sm:gap-3 px-3 sm:px-4 py-1.5 sm:py-2 rounded-neo border-2 sm:border-3 mb-1.5 mx-2",
           MAX_ATTEMPTS - attempts.length <= 2
             ? "bg-red-100 dark:bg-red-900/30 border-red-500"
             : MAX_ATTEMPTS - attempts.length <= 4
@@ -764,12 +766,12 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
         transition={{ duration: 0.5, repeat: MAX_ATTEMPTS - attempts.length <= 2 ? Infinity : 0 }}
       >
         {/* Attempts dots indicator */}
-        <div className="flex items-center gap-1">
+        <div className="flex items-center gap-0.5 sm:gap-1">
           {[...Array(MAX_ATTEMPTS)].map((_, i) => (
             <motion.div
               key={i}
               className={cn(
-                "w-2.5 h-2.5 rounded-full border border-neo-black/50",
+                "w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full border border-neo-black/50",
                 i < attempts.length
                   ? "bg-gray-400 dark:bg-gray-600" // Used attempt
                   : MAX_ATTEMPTS - attempts.length <= 2
@@ -789,21 +791,21 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
 
         {/* Text indicator */}
         <div className={cn(
-          "text-sm font-black",
+          "text-xs sm:text-sm font-black",
           MAX_ATTEMPTS - attempts.length <= 2
             ? "text-red-600 dark:text-red-400"
             : MAX_ATTEMPTS - attempts.length <= 4
               ? "text-yellow-600 dark:text-yellow-400"
               : "text-green-600 dark:text-green-400"
         )}>
-          {MAX_ATTEMPTS - attempts.length} {t('wordHunt.survival.triesLeft') || 'tries left'}
+          {MAX_ATTEMPTS - attempts.length} {t('wordHunt.survival.triesLeft') || 'left'}
+        </div>
+
+        {/* Words discovered - integrated */}
+        <div className="text-[10px] sm:text-xs text-gray-600 dark:text-gray-400">
+          📖 {discoveredWords.length}
         </div>
       </motion.div>
-
-      {/* Stats - words discovered */}
-      <div className="flex justify-center text-xs text-gray-600 dark:text-gray-400 mb-2">
-        <span>{t('wordHunt.survival.wordsLabel')}: {discoveredWords.length}</span>
-      </div>
 
       {/* Feedback */}
       <AnimatePresence mode="wait">

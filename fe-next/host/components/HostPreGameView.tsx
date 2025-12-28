@@ -1,6 +1,6 @@
 import React, { useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Clock, Users, Settings, Plus, Minus, Crown, ChevronDown, ChevronUp, Bot } from 'lucide-react';
+import { Clock, Users, Settings, Plus, Minus, Crown, ChevronDown, ChevronUp, Bot, Check } from 'lucide-react';
 import { Button } from '../../components/ui/button';
 import { Card } from '../../components/ui/card';
 import { Checkbox } from '../../components/ui/checkbox';
@@ -167,7 +167,20 @@ const HostPreGameView: React.FC<HostPreGameViewProps> = ({
 }): React.ReactElement => {
   const { socket } = useSocket();
   const [showAdvancedSettings, setShowAdvancedSettings] = useState<boolean>(false);
-  const [selectedPreset, setSelectedPreset] = useState<PresetKey | null>(null);
+  // Default to 'party' preset (Standard: 2min, MEDIUM difficulty) for balanced gameplay
+  const [selectedPreset, setSelectedPreset] = useState<PresetKey>('party');
+  const [hasInitialized, setHasInitialized] = useState<boolean>(false);
+
+  // Apply default preset on mount
+  React.useEffect(() => {
+    if (!hasInitialized) {
+      const defaultPreset = GAME_PRESETS['party'];
+      setTimerValue(defaultPreset.timer);
+      setDifficulty(defaultPreset.difficulty);
+      setMinWordLength(defaultPreset.minWordLength);
+      setHasInitialized(true);
+    }
+  }, [hasInitialized, setTimerValue, setDifficulty, setMinWordLength]);
 
   const handleDecreaseTimer = useCallback(() => {
     setTimerDirection(-1);
@@ -257,22 +270,26 @@ const HostPreGameView: React.FC<HostPreGameViewProps> = ({
                 {(Object.keys(GAME_PRESETS) as PresetKey[]).map((key) => {
                   const preset = GAME_PRESETS[key];
                   const isSelected = selectedPreset === key;
-                  const presetStyles: Record<PresetKey, { bg: string; selected: string }> = {
+                  const presetStyles: Record<PresetKey, { bg: string; ring: string; glow: string }> = {
                     fast: {
                       bg: 'bg-neo-yellow',
-                      selected: 'bg-neo-yellow ring-4 ring-yellow-400 ring-offset-2 ring-offset-slate-800',
+                      ring: 'ring-neo-yellow',
+                      glow: 'shadow-[0_0_20px_rgba(255,237,0,0.6)]',
                     },
                     easy: {
                       bg: 'bg-neo-lime',
-                      selected: 'bg-neo-lime ring-4 ring-green-400 ring-offset-2 ring-offset-slate-800',
+                      ring: 'ring-neo-lime',
+                      glow: 'shadow-[0_0_20px_rgba(0,255,127,0.6)]',
                     },
                     party: {
                       bg: 'bg-neo-pink',
-                      selected: 'bg-neo-pink ring-4 ring-pink-400 ring-offset-2 ring-offset-slate-800',
+                      ring: 'ring-neo-pink',
+                      glow: 'shadow-[0_0_20px_rgba(255,20,147,0.6)]',
                     },
                     challenge: {
                       bg: 'bg-neo-orange',
-                      selected: 'bg-neo-orange ring-4 ring-red-500 ring-offset-2 ring-offset-slate-800',
+                      ring: 'ring-neo-orange',
+                      glow: 'shadow-[0_0_20px_rgba(255,140,0,0.6)]',
                     },
                   };
                   const style = presetStyles[key];
@@ -283,13 +300,23 @@ const HostPreGameView: React.FC<HostPreGameViewProps> = ({
                       onClick={() => handleApplyPreset(key)}
                       whileTap={{ scale: 0.95 }}
                       className={cn(
-                        "flex-1 min-w-[90px] px-2 py-2 rounded-neo font-bold transition-all duration-100 border-2 border-neo-black",
+                        "relative flex-1 min-w-[90px] px-2 py-2 rounded-neo font-bold transition-all duration-150 border-3 border-neo-black",
                         style.bg,
                         isSelected
-                          ? "shadow-none translate-x-[2px] translate-y-[2px]"
-                          : "shadow-hard hover:shadow-hard-lg hover:translate-x-[-1px] hover:translate-y-[-1px] active:shadow-none active:translate-x-[2px] active:translate-y-[2px]"
+                          ? `ring-4 ${style.ring} ring-offset-2 ring-offset-slate-800 ${style.glow} scale-105 z-10`
+                          : "shadow-hard hover:shadow-hard-lg hover:translate-x-[-1px] hover:translate-y-[-1px] active:shadow-none active:translate-x-[2px] active:translate-y-[2px] opacity-80 hover:opacity-100"
                       )}
                     >
+                      {/* Active indicator checkmark */}
+                      {isSelected && (
+                        <motion.div
+                          initial={{ scale: 0 }}
+                          animate={{ scale: 1 }}
+                          className="absolute -top-2 -right-2 w-6 h-6 bg-neo-black rounded-full flex items-center justify-center border-2 border-neo-white z-20"
+                        >
+                          <Check className="w-3.5 h-3.5 text-neo-white" strokeWidth={3} />
+                        </motion.div>
+                      )}
                       <div className="flex flex-col items-center gap-0.5">
                         <span className="text-xl drop-shadow-sm">{preset.icon}</span>
                         <span className="font-black text-sm text-neo-black uppercase tracking-wide">

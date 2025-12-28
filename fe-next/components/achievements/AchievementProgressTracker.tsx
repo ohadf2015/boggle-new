@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useMemo } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
@@ -22,6 +22,7 @@ interface AchievementProgressTrackerProps {
   timeSinceStart: number;
   gameDuration: number;
   earnedAchievements: string[];
+  isGameOver?: boolean; // When true, auto-dismiss after 2 seconds
   className?: string;
 }
 
@@ -39,9 +40,22 @@ export const AchievementProgressTracker: React.FC<AchievementProgressTrackerProp
   timeSinceStart,
   gameDuration,
   earnedAchievements,
+  isGameOver = false,
   className,
 }) => {
   const { t } = useLanguage();
+  const [isDismissed, setIsDismissed] = useState(false);
+
+  // Auto-dismiss after 2 seconds when game ends
+  useEffect(() => {
+    if (isGameOver && !isDismissed) {
+      const timer = setTimeout(() => {
+        setIsDismissed(true);
+      }, 2000);
+      return () => clearTimeout(timer);
+    }
+    return undefined;
+  }, [isGameOver, isDismissed]);
 
   // Calculate achievement progress for all trackable achievements
   const achievementProgress = useMemo<AchievementProgress[]>(() => {
@@ -154,8 +168,8 @@ export const AchievementProgressTracker: React.FC<AchievementProgressTrackerProp
       .slice(0, 3); // Show max 3 achievements
   }, [validWordCount, comboLevel, maxCombo, wordLengths, timeSinceStart, gameDuration, earnedAchievements, t]);
 
-  // Don't render if no near-completion achievements
-  if (achievementProgress.length === 0) {
+  // Don't render if no near-completion achievements or dismissed
+  if (achievementProgress.length === 0 || isDismissed) {
     return null;
   }
 

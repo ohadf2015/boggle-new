@@ -3,7 +3,7 @@
 import React, { useMemo, useEffect, useState, useCallback, useRef, useDeferredValue, useTransition } from 'react';
 import dynamic from 'next/dynamic';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Trophy, Star, DoorOpen, Check, ArrowRight } from 'lucide-react';
+import { Trophy, Star, DoorOpen, Check, ArrowRight, Play } from 'lucide-react';
 import ExitRoomButton from '@/components/ExitRoomButton';
 import confetti from 'canvas-confetti';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -36,9 +36,12 @@ const PerformanceChart = dynamic(() => import('@/components/results/PerformanceC
 import CollapsibleSection from '@/components/ui/CollapsibleSection';
 import { Users } from 'lucide-react';
 import { addGameToHistory } from '@/utils/gameHistoryManager';
+import RoomChat from '@/components/RoomChat';
+import { generateRandomTable } from '@/utils/utils';
+import { DIFFICULTIES } from '@/utils/consts';
 
 
-const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onReturnToRoom, username, socket, achievements, duplicateRuleDisabled, playerCount }) => {
+const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onReturnToRoom, username, socket, achievements, duplicateRuleDisabled, playerCount, isHost = false, roomLanguage = 'en' }) => {
   const { t } = useLanguage();
   const { isAuthenticated } = useAuth();
   const isLandscape = useMobileLandscape();
@@ -482,6 +485,34 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
     setIsCurrentPlayerReady(true);
   }, [socket, isCurrentPlayerReady]);
 
+  // Handle host starting a new game directly from results page
+  const handleStartGame = useCallback(() => {
+    if (!socket || !isHost) return;
+    logger.log('[RESULTS] Host starting new game from results page');
+
+    // Generate a new board with default settings
+    const difficultyConfig = DIFFICULTIES.MEDIUM;
+    const newTable = generateRandomTable(
+      difficultyConfig.rows,
+      difficultyConfig.cols,
+      roomLanguage,
+      []
+    );
+
+    // Default timer: 3 minutes
+    const timerSeconds = 180;
+
+    socket.emit('startGame', {
+      letterGrid: newTable,
+      timerSeconds: timerSeconds,
+      language: roomLanguage,
+      hostPlaying: true,
+      minWordLength: 3,
+      difficulty: 'MEDIUM',
+      boardTheme: null,
+    });
+  }, [socket, isHost, roomLanguage]);
+
   // Hide sticky bar when play again section is visible (portrait mode only)
   useEffect(() => {
     if (!playAgainSectionRef.current) return;
@@ -529,6 +560,7 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
               />
             </div>
           )}
+
         </div>
 
         {/* Right column: Player cards + Actions */}
@@ -560,7 +592,26 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
           {/* Action Buttons */}
           {gameCode && onReturnToRoom && (
             <div className="flex gap-2 mt-2">
-              {isCurrentPlayerReady ? (
+              {isHost ? (
+                /* HOST: Start Game button */
+                <>
+                  <button
+                    onClick={handleStartGame}
+                    className="flex-1 bg-emerald-500 text-white font-bold text-sm py-2 px-3 uppercase border-2 border-neo-black rounded-neo shadow-hard-sm flex items-center justify-center gap-1"
+                  >
+                    <Play className="w-3 h-3" />
+                    {t('hostView.startGame') || 'Start Game'}
+                  </button>
+                  <button
+                    onClick={handleExitRoom}
+                    className="flex-1 bg-neo-red text-neo-cream font-bold text-sm py-2 px-3 uppercase border-2 border-neo-black rounded-neo shadow-hard-sm flex items-center justify-center gap-1"
+                  >
+                    <DoorOpen className="w-3 h-3" />
+                    {t('results.leaveRoom')}
+                  </button>
+                </>
+              ) : isCurrentPlayerReady ? (
+                /* PLAYER: Ready state */
                 <>
                   <button
                     onClick={onReturnToRoom}
@@ -578,6 +629,7 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
                   </button>
                 </>
               ) : (
+                /* PLAYER: Not ready state */
                 <>
                   <button
                     onClick={handleMarkReady}
@@ -595,6 +647,18 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
                   </button>
                 </>
               )}
+            </div>
+          )}
+
+          {/* Room Chat - At the bottom of right column */}
+          {gameCode && sortedScores.length > 1 && (
+            <div className="mt-2">
+              <RoomChat
+                username={username}
+                isHost={isHost}
+                gameCode={gameCode}
+                className="max-h-[150px]"
+              />
             </div>
           )}
         </div>
@@ -805,7 +869,7 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
           )}
         </div>
 
-        {/* PROMINENT Ready Action Section - Shows first for immediate visibility */}
+        {/* PROMINENT Action Section - Host sees Start Game, Players see I'm Ready */}
         {gameCode && onReturnToRoom && (
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
@@ -813,8 +877,54 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
             transition={{ delay: 0.2, duration: 0.4, type: 'spring' }}
             className="mt-4 max-w-2xl mx-auto px-2 sm:px-4"
           >
-            {isCurrentPlayerReady ? (
-              /* Ready State - Confirmed */
+            {isHost ? (
+              /* HOST VIEW - Start Game Button */
+              <div className="bg-neo-lime text-neo-black border-4 border-neo-black rounded-neo-lg shadow-hard-xl p-6 sm:p-8 relative overflow-hidden">
+                {/* Attention-grabbing pattern */}
+                <div className="absolute inset-0 pointer-events-none opacity-[0.08]" style={{
+                  backgroundImage: 'radial-gradient(circle, rgb(var(--neo-black)) 1px, transparent 1px)',
+                  backgroundSize: '16px 16px',
+                }} />
+                <div className="text-center space-y-5 relative z-10">
+                  <motion.div
+                    animate={{ rotate: [0, -3, 3, 0] }}
+                    transition={{ duration: 0.5, repeat: Infinity, repeatDelay: 2 }}
+                  >
+                    <h3 className="text-2xl sm:text-3xl font-black uppercase" style={{ textShadow: '3px 3px 0px var(--neo-cyan)' }}>
+                      {t('results.readyForNextRound') || 'Ready for Next Round?'}
+                    </h3>
+                  </motion.div>
+                  <p className="text-neo-black/80 text-base font-bold max-w-md mx-auto">
+                    {t('results.hostStartDescription') || 'Start a new game when everyone is ready!'}
+                  </p>
+
+                  {/* HUGE Start Game Button for Host */}
+                  <motion.button
+                    onClick={handleStartGame}
+                    animate={{ scale: [1, 1.03, 1] }}
+                    transition={{ duration: 1.5, repeat: Infinity }}
+                    whileHover={{ scale: 1.05, x: -3, y: -3 }}
+                    whileTap={{ scale: 0.98, x: 3, y: 3 }}
+                    className="w-full sm:w-auto bg-emerald-500 text-white font-black text-xl sm:text-2xl px-12 py-5 uppercase border-4 border-neo-black rounded-neo shadow-hard-lg hover:shadow-hard-xl transition-all flex items-center justify-center gap-3 mx-auto"
+                  >
+                    <Play className="w-7 h-7" />
+                    {t('hostView.startGame') || 'Start Game'}
+                    <Play className="w-7 h-7" />
+                  </motion.button>
+
+                  <motion.button
+                    whileHover={{ x: -2, y: -2 }}
+                    whileTap={{ x: 2, y: 2 }}
+                    onClick={handleExitRoom}
+                    className="bg-neo-red text-neo-cream font-bold text-sm px-6 py-2.5 uppercase border-3 border-neo-black rounded-neo shadow-hard hover:shadow-hard-lg transition-all flex items-center justify-center gap-2 mx-auto mt-2"
+                  >
+                    <DoorOpen className="w-4 h-4" />
+                    {t('results.leaveRoom')}
+                  </motion.button>
+                </div>
+              </div>
+            ) : isCurrentPlayerReady ? (
+              /* PLAYER Ready State - Confirmed */
               <div className="bg-emerald-500 text-white border-4 border-neo-black rounded-neo-lg shadow-hard-xl p-6 sm:p-8 relative overflow-hidden">
                 {/* Success pattern */}
                 <div className="absolute inset-0 pointer-events-none opacity-10" style={{
@@ -864,7 +974,7 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
                 </div>
               </div>
             ) : (
-              /* Not Ready State - PROMINENT CTA */
+              /* PLAYER Not Ready State - PROMINENT CTA */
               <div className="bg-neo-yellow text-neo-black border-4 border-neo-black rounded-neo-lg shadow-hard-xl p-6 sm:p-8 relative overflow-hidden">
                 {/* Attention-grabbing pattern */}
                 <div className="absolute inset-0 pointer-events-none opacity-[0.08]" style={{
@@ -933,7 +1043,26 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
             />
           </motion.div>
         )}
+
       </div>
+
+      {/* Room Chat - At the bottom of the page for communication */}
+      {gameCode && sortedScores.length > 1 && (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-30px" }}
+          transition={{ duration: 0.4, delay: 0.1, ease: "easeOut" }}
+          className="mt-6 max-w-2xl mx-auto px-2 sm:px-4 pb-4"
+        >
+          <RoomChat
+            username={username}
+            isHost={isHost}
+            gameCode={gameCode}
+            className="max-h-[300px]"
+          />
+        </motion.div>
+      )}
 
       {/* Exit Confirmation Dialog */}
       <AlertDialog open={showExitConfirm} onOpenChange={setShowExitConfirm}>

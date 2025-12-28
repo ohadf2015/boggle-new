@@ -136,6 +136,23 @@ const CustomDot = (props: {
   );
 };
 
+// Helper to get game mode label and icon
+function getGameModeInfo(
+  mode: 'single' | 'multiplayer' | 'daily',
+  t: (key: string, params?: Record<string, string | number>) => string
+): { label: string; icon: string } {
+  switch (mode) {
+    case 'single':
+      return { label: t('home.singlePlayer') || 'Single Player', icon: '🎮' };
+    case 'multiplayer':
+      return { label: t('home.multiplayer') || 'Multiplayer', icon: '👥' };
+    case 'daily':
+      return { label: t('daily.title') || 'Daily Challenge', icon: '📅' };
+    default:
+      return { label: mode, icon: '🎲' };
+  }
+}
+
 // Custom tooltip
 const CustomTooltip = ({
   active,
@@ -150,11 +167,16 @@ const CustomTooltip = ({
 
   const data = payload[0].payload;
   const timeAgo = getTimeAgo(data.timestamp, t);
+  const modeInfo = getGameModeInfo(data.mode, t);
 
   return (
     <div className="bg-neo-cream border-3 border-neo-black rounded-neo p-3 shadow-hard text-neo-black min-w-[140px]">
       <div className="font-black text-xl mb-1.5">{data.score} <span className="text-base">{t('scorePage.pts') || 'pts'}</span></div>
       <div className="text-xs font-bold space-y-1">
+        <div className="flex items-center gap-1.5">
+          <span>{modeInfo.icon}</span>
+          <span>{modeInfo.label}</span>
+        </div>
         <div className="flex items-center gap-1.5">
           <span>📝</span>
           <span>{data.wordCount} {t('results.words') || 'words'}</span>

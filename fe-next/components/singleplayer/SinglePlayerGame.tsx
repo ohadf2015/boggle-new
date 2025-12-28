@@ -1196,7 +1196,7 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
           remainingSeconds={fireRoundRemaining}
         />
 
-        {/* Achievement Progress Tracker - shows near-completion achievements */}
+        {/* Achievement Progress Tracker - shows near-completion achievements, auto-dismisses 2s after game ends */}
         <AchievementProgressTracker
           validWordCount={validWordCount}
           comboLevel={combo.comboLevel}
@@ -1205,6 +1205,7 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
           timeSinceStart={(Date.now() - gameStartTimeRef.current) / 1000}
           gameDuration={settings.timerSeconds}
           earnedAchievements={[]}
+          isGameOver={isGameOver}
         />
 
         {/* Left side: Timer + Score */}
@@ -1447,7 +1448,7 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
         remainingSeconds={fireRoundRemaining}
       />
 
-      {/* Achievement Progress Tracker - shows near-completion achievements */}
+      {/* Achievement Progress Tracker - shows near-completion achievements, auto-dismisses 2s after game ends */}
       <AchievementProgressTracker
         validWordCount={foundWords.filter(fw => fw.isValid === true).length}
         comboLevel={combo.comboLevel}
@@ -1456,6 +1457,7 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
         timeSinceStart={(Date.now() - gameStartTimeRef.current) / 1000}
         gameDuration={settings.timerSeconds}
         earnedAchievements={[]}
+        isGameOver={isGameOver}
       />
 
       {/* Header with controls */}
