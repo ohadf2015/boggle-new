@@ -635,65 +635,90 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
         </Button>
       </div>
 
-      {/* Current hint - compact on mobile */}
+      {/* Target word black boxes - always visible */}
       {currentHint && (
         <motion.div
           initial={{ opacity: 0, y: -10 }}
-          animate={{
-            opacity: 1,
-            y: 0,
-            scale: hintUnlockAnimation ? [1, 1.05, 1] : 1,
-            borderColor: hintUnlockAnimation ? ['#3b82f6', '#fbbf24', '#3b82f6'] : '#3b82f6'
-          }}
-          transition={{ duration: hintUnlockAnimation ? 0.5 : 0.3 }}
-          className={cn(
-            "border-2 rounded-neo p-2 sm:p-3 mb-1.5 relative overflow-hidden mx-1",
-            hintUnlockAnimation
-              ? "bg-gradient-to-r from-yellow-50 to-blue-50 dark:from-yellow-900/30 dark:to-blue-900/30 border-yellow-500"
-              : "bg-blue-50 dark:bg-blue-900/20 border-blue-500"
-          )}
+          animate={{ opacity: 1, y: 0 }}
+          className="mb-1.5 mx-1"
         >
-          {/* Unlock animation sparkles */}
-          {hintUnlockAnimation && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: [0, 1, 0] }}
-              transition={{ duration: 1 }}
-              className="absolute inset-0 flex items-center justify-center pointer-events-none"
-            >
-              <span className="text-3xl sm:text-4xl">✨</span>
-            </motion.div>
-          )}
+          {/* Black boxes for target word */}
+          <div className="flex justify-center flex-wrap gap-1.5 sm:gap-2 px-2">
+            {(() => {
+              // Parse hint to understand revealed letters
+              const hintChars = currentHint.hint.split(' ').filter(c => c !== '');
+              const wordLength = hintChars.length;
+              // Dynamically size based on word length
+              const sizeClass = wordLength <= 4
+                ? "w-10 h-10 sm:w-12 sm:h-12 text-lg sm:text-xl"
+                : wordLength <= 6
+                  ? "w-8 h-8 sm:w-10 sm:h-10 text-base sm:text-lg"
+                  : wordLength <= 8
+                    ? "w-7 h-7 sm:w-9 sm:h-9 text-sm sm:text-base"
+                    : "w-6 h-6 sm:w-8 sm:h-8 text-xs sm:text-sm";
 
-          <div className="flex items-center gap-2">
+              return hintChars.map((char, idx) => {
+                // Check if revealed by hint OR by shop purchase
+                const isHintRevealed = char !== '_';
+                const isShopRevealed = revealedLetters.has(idx);
+                const isRevealed = isHintRevealed || isShopRevealed;
+                const displayChar = isShopRevealed ? targetWord[idx]?.toUpperCase() : (isHintRevealed ? char : '?');
+
+                return (
+                  <motion.div
+                    key={idx}
+                    initial={{ scale: 0, opacity: 0 }}
+                    animate={{
+                      scale: 1,
+                      opacity: 1,
+                      ...(hintUnlockAnimation && isRevealed ? { scale: [1, 1.2, 1] } : {})
+                    }}
+                    transition={{ delay: idx * 0.03, type: "spring", stiffness: 300 }}
+                    className={cn(
+                      "flex items-center justify-center border-3 rounded-lg font-black shadow-hard",
+                      sizeClass,
+                      isRevealed
+                        ? "bg-neo-yellow border-neo-black text-neo-black"
+                        : "bg-neo-black border-neo-black text-white"
+                    )}
+                  >
+                    {displayChar}
+                  </motion.div>
+                );
+              });
+            })()}
+          </div>
+
+          {/* Hint level indicator below boxes */}
+          <div className="flex items-center justify-center gap-2 mt-2">
             <motion.div
               animate={hintUnlockAnimation ? { rotate: [0, -15, 15, 0], scale: [1, 1.3, 1] } : {}}
               transition={{ duration: 0.5 }}
             >
               <Lightbulb className={cn(
-                "w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0",
-                hintUnlockAnimation ? "text-yellow-500" : "text-blue-600"
+                "w-3 h-3 sm:w-4 sm:h-4",
+                hintUnlockAnimation ? "text-yellow-500" : "text-gray-500"
               )} />
             </motion.div>
-            <div className="flex-1 flex items-center gap-2 sm:gap-3">
-              <div className={cn(
-                "text-[10px] sm:text-xs font-bold whitespace-nowrap",
-                hintUnlockAnimation ? "text-yellow-600 dark:text-yellow-400" : "text-blue-600 dark:text-blue-400"
-              )}>
-                {hintUnlockAnimation
-                  ? (t('wordHunt.survival.hintUnlocked') || '🎉 New!')
-                  : (t('wordHunt.survival.hintLevel')?.replace('{level}', String(currentHint.level)) || `Lvl ${currentHint.level}`)
-                }
-              </div>
-              <motion.div
-                key={currentHint.hint}
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                className="text-lg sm:text-2xl font-mono font-bold tracking-widest flex-1 text-center"
+            <span className={cn(
+              "text-[10px] sm:text-xs font-bold",
+              hintUnlockAnimation ? "text-yellow-600 dark:text-yellow-400" : "text-gray-500"
+            )}>
+              {hintUnlockAnimation
+                ? (t('wordHunt.survival.hintUnlocked') || '🎉 New hint!')
+                : (t('wordHunt.survival.hintLevel')?.replace('{level}', String(currentHint.level)) || `Hint Lvl ${currentHint.level}`)
+              }
+            </span>
+            {/* Unlock animation sparkles */}
+            {hintUnlockAnimation && (
+              <motion.span
+                initial={{ opacity: 0, scale: 0 }}
+                animate={{ opacity: [0, 1, 0], scale: [0.5, 1.2, 0.5] }}
+                transition={{ duration: 1 }}
               >
-                {currentHint.hint}
-              </motion.div>
-            </div>
+                ✨
+              </motion.span>
+            )}
           </div>
         </motion.div>
       )}
@@ -756,12 +781,6 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
         </div>
       )}
 
-      {/* Target word display - only show when at least one letter is revealed */}
-      {revealedLetters.size > 0 && (
-        <div className="flex justify-center flex-wrap gap-1.5 sm:gap-2 mb-3 px-2">
-          {renderTargetWord()}
-        </div>
-      )}
 
       {/* Prominent Attempts Counter */}
       <motion.div

@@ -82,7 +82,7 @@ export default function LeaderboardPage(): React.ReactNode {
               onClick={() => router.push(`/${language}`)}
               className="mt-6"
             >
-              <ArrowLeft className="mr-2" />
+              <ArrowLeft className="me-2 rtl:rotate-180" />
               Back to Game
             </Button>
           </div>
@@ -265,11 +265,8 @@ export default function LeaderboardPage(): React.ReactNode {
                   const isCurrentUser = user?.id === entry.player_id;
 
                   return (
-                    <motion.div
+                    <div
                       key={entry.player_id}
-                      initial={{ opacity: 0, x: -20 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ delay: index * 0.03 }}
                       className={cn(
                         'grid grid-cols-12 gap-4 px-4 py-3 items-center transition-colors',
                         isCurrentUser
@@ -312,7 +309,7 @@ export default function LeaderboardPage(): React.ReactNode {
                       )}>
                         {entry.games_played || 0}
                       </div>
-                    </motion.div>
+                    </div>
                   );
                 })}
               </div>
@@ -332,7 +329,7 @@ export default function LeaderboardPage(): React.ReactNode {
                 : 'border-gray-300 text-gray-700 hover:bg-gray-100'
             )}
           >
-            <ArrowLeft className="mr-2" />
+            <ArrowLeft className="me-2 rtl:rotate-180" />
             Back to Game
           </Button>
         </div>

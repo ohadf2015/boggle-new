@@ -701,7 +701,10 @@ export const DailyWordSchedule: React.FC = () => {
           {/* Primary action: Set Today's Word */}
           <Button
             onClick={openSetTodayModal}
-            className="bg-red-500 hover:bg-red-600 text-white font-bold shadow-hard animate-pulse hover:animate-none"
+            className={cn(
+              "bg-red-500 hover:bg-red-600 text-white font-bold shadow-hard",
+              !getTodayWord() && "animate-pulse hover:animate-none"
+            )}
           >
             <Calendar className="w-4 h-4 mr-2" />
             Set Today's Word

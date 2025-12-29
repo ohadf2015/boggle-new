@@ -388,7 +388,7 @@ const DailyReadyScreen: React.FC<DailyReadyScreenProps> = ({
           onClick={onBack}
           className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white"
         >
-          <ArrowLeft className="mr-2" />
+          <ArrowLeft className="me-2 rtl:rotate-180" />
           {t('daily.home')}
         </Button>
 

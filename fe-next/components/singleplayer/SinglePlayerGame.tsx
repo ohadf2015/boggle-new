@@ -1548,7 +1548,7 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
       {/* Header with controls */}
       <div className="flex items-center justify-between px-4">
         <Button variant="ghost" size="sm" onClick={handleQuitRequest}>
-          <ArrowLeft className="mr-2" />
+          <ArrowLeft className="me-2 rtl:rotate-180" />
           {t('common.quit') || 'Quit'}
         </Button>
         {settings.mode !== 'practice' ? (

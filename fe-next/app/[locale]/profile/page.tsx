@@ -297,7 +297,7 @@ export default function ProfilePage(): React.ReactNode {
                     : 'border-gray-300 text-gray-700 hover:bg-gray-100'
                 )}
               >
-                <ArrowLeft className="mr-2" />
+                <ArrowLeft className="me-2 rtl:rotate-180" />
                 Back to Game
               </Button>
             </div>
@@ -708,7 +708,7 @@ export default function ProfilePage(): React.ReactNode {
                 'bg-neo-lime text-neo-black hover:bg-neo-lime/90'
               )}
             >
-              <Play className="mr-2" />
+              <Play className="me-2" />
               {t('profile.backToRoom') || 'Back to Room'} {activeGameSession.gameCode}
             </Button>
           )}
@@ -730,7 +730,7 @@ export default function ProfilePage(): React.ReactNode {
                   : 'bg-neo-purple text-neo-white hover:bg-neo-purple/90'
             )}
           >
-            <ArrowLeft className="mr-2" />
+            <ArrowLeft className="me-2 rtl:rotate-180" />
             {activeGameSession
               ? (t('profile.backToLobby') || 'Back to Lobby')
               : (t('profile.backToGame') || 'Back to Game')}

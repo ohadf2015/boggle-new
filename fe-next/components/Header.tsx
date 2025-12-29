@@ -8,6 +8,7 @@ import { cn } from '../lib/utils';
 import AuthButton from './auth/AuthButton';
 import MusicControls from './MusicControls';
 import DailyQuickLink from './daily/DailyQuickLink';
+import Avatar from './Avatar';
 import type { Language } from '../shared/types/game';
 
 /**
@@ -189,7 +190,7 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                                     animate={{ opacity: 1, y: 0, scale: 1 }}
                                     exit={{ opacity: 0, y: -5, scale: 0.95 }}
                                     transition={{ duration: 0.15 }}
-                                    className="absolute top-full right-0 mt-2 z-[100] bg-neo-cream border-3 border-neo-black rounded-neo shadow-hard-lg overflow-hidden min-w-[120px]"
+                                    className="absolute top-full end-0 mt-2 z-[100] bg-neo-cream border-3 border-neo-black rounded-neo shadow-hard-lg overflow-hidden min-w-[120px]"
                                     role="listbox"
                                     aria-label={t('common.selectLanguage') || 'Select language'}
                                 >
@@ -241,8 +242,34 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                     <AuthButton />
                 </div>
 
-                {/* Mobile: Volume Controls + Hamburger Menu */}
+                {/* Mobile: Avatar + Volume Controls + Hamburger Menu */}
                 <div className="sm:hidden flex items-center gap-2" ref={mobileMenuRef}>
+                    {/* Profile Avatar - visible on mobile header when authenticated */}
+                    {isAuthenticated && profile && (
+                        <Link
+                            href={`/${language}/profile`}
+                            className={cn(
+                                "flex items-center justify-center",
+                                "min-w-[44px] min-h-[44px] w-11 h-11",
+                                "bg-neo-cream",
+                                "border-3 border-neo-black",
+                                "rounded-full shadow-hard",
+                                "hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-hard-lg",
+                                "active:translate-x-[1px] active:translate-y-[1px] active:shadow-hard-sm",
+                                "transition-all duration-100",
+                                "overflow-hidden"
+                            )}
+                            aria-label={t('profile.title') || 'Profile'}
+                        >
+                            <Avatar
+                                profilePictureUrl={profile.profile_picture_url ?? undefined}
+                                avatarEmoji={profile.avatar_emoji}
+                                avatarColor={profile.avatar_color}
+                                size="md"
+                            />
+                        </Link>
+                    )}
+
                     {/* Sound controls - visible on mobile header */}
                     <MusicControls />
 

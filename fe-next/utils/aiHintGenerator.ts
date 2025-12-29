@@ -191,10 +191,11 @@ export function getNextHint(
 
 /**
  * Calculate life points reward based on word length
- * Minimum word length for daily challenge is 4 letters
+ * 3-letter words give a small life reward, 4+ letters give more
  */
 export function calculateLifeReward(wordLength: number): number {
-  if (wordLength < 4) return 0; // Words less than 4 letters not valid in daily challenge
+  if (wordLength < 3) return 0; // Words less than 3 letters not valid
+  if (wordLength === 3) return 5; // 3-letter words give life (not coins)
   if (wordLength === 4) return 10;
   if (wordLength === 5) return 15;
   if (wordLength === 6) return 20;
@@ -203,10 +204,10 @@ export function calculateLifeReward(wordLength: number): number {
 
 /**
  * Calculate clue tokens reward based on word length
- * Minimum word length for daily challenge is 4 letters
+ * Only 4+ letter words give tokens (3-letter words give life instead)
  */
 export function calculateTokenReward(wordLength: number): number {
-  if (wordLength < 4) return 0; // Words less than 4 letters not valid in daily challenge
+  if (wordLength < 4) return 0; // 3-letter words don't give tokens, they give life instead
   if (wordLength === 4) return 1;
   if (wordLength === 5) return 2;
   if (wordLength === 6) return 3;

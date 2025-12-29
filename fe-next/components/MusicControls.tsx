@@ -117,7 +117,7 @@ const MusicControls: React.FC = memo(() => {
             exit={{ opacity: 0, y: -10, scale: 0.95 }}
             transition={{ duration: 0.15, ease: [0.68, -0.55, 0.265, 1.55] }}
             className="
-              absolute top-full right-0 mt-3 p-3
+              absolute top-full end-0 mt-3 p-3
               min-w-[150px]
               bg-neo-cream text-neo-black
               border-3 border-neo-black

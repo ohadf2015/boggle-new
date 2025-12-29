@@ -279,14 +279,14 @@ const DailyChallengeResults: React.FC<DailyChallengeResultsProps> = ({
       className="flex-1 flex flex-col items-center justify-start p-4 overflow-y-auto"
     >
       {/* Back button */}
-      <motion.div className="absolute top-24 sm:top-28 left-4">
+      <motion.div className="absolute top-24 sm:top-28 start-4">
         <Button
           variant="ghost"
           size="sm"
           onClick={onBack}
           className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white"
         >
-          <ArrowLeft className="w-4 h-4 mr-2" />
+          <ArrowLeft className="w-4 h-4 me-2 rtl:rotate-180" />
           {t('daily.home')}
         </Button>
       </motion.div>

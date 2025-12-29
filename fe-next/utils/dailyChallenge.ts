@@ -17,6 +17,28 @@ import type { LetterFeedback } from './wordHuntFeedback';
 // Puzzle #1 = 2024-01-01
 const DAILY_CHALLENGE_EPOCH = new Date('2024-01-01T00:00:00Z');
 
+// Hebrew final letters mapping to regular forms
+// Final letters should not appear on the grid - only regular forms
+const HEBREW_FINAL_TO_REGULAR: Record<string, string> = {
+  'ך': 'כ', // final kaf → kaf
+  'ם': 'מ', // final mem → mem
+  'ן': 'נ', // final nun → nun
+  'ף': 'פ', // final pe → pe
+  'ץ': 'צ', // final tsade → tsade
+};
+
+/**
+ * Normalize Hebrew final letters to regular forms for grid display
+ * Final letters (ך, ם, ן, ף, ץ) are replaced with their regular forms
+ */
+function normalizeHebrewFinalLetters(text: string): string {
+  let normalized = text;
+  for (const [final, regular] of Object.entries(HEBREW_FINAL_TO_REGULAR)) {
+    normalized = normalized.replace(new RegExp(final, 'g'), regular);
+  }
+  return normalized;
+}
+
 // Salt for seeding (prevents reverse-engineering grids)
 const SEED_SALT = 'lexiclash-daily-v1';
 
@@ -417,14 +439,22 @@ export function generateDailyPuzzle(
     [shuffledBonus[i], shuffledBonus[j]] = [shuffledBonus[j], shuffledBonus[i]];
   }
   // Select 6-10 bonus words to attempt embedding
-  const bonusWordsToEmbed = shuffledBonus.slice(0, 10);
+  let bonusWordsToEmbed = shuffledBonus.slice(0, 10);
+
+  // STEP 2.5: Normalize Hebrew final letters for grid display
+  // Final letters (ך, ם, ן, ף, ץ) should not appear on the grid
+  let normalizedTargetWord = targetWord;
+  if (language === 'he') {
+    normalizedTargetWord = normalizeHebrewFinalLetters(targetWord);
+    bonusWordsToEmbed = bonusWordsToEmbed.map(word => normalizeHebrewFinalLetters(word));
+  }
 
   // STEP 3: Create grid with target word AND bonus words embedded
-  const grid = embedMultipleWordsInGrid(targetWord, bonusWordsToEmbed, letters, rows, cols, random, language);
+  const grid = embedMultipleWordsInGrid(normalizedTargetWord, bonusWordsToEmbed, letters, rows, cols, random, language);
 
   return {
     grid,
-    targetWord,
+    targetWord: normalizedTargetWord, // Use normalized word so hints match grid
     puzzleDate: dateString,
     language,
     puzzleNumber: getPuzzleNumber(dateString)
@@ -1829,12 +1859,15 @@ export function selectDailyTargetWord(
 
   // Try each word in shuffled order - must validate with actual path-finding
   for (const word of shuffled) {
+    // Normalize Hebrew final letters before checking
+    const normalizedWord = language === 'he' ? normalizeHebrewFinalLetters(word) : word;
+
     // First do quick letter count check
-    if (canWordExistOnGrid(word, grid, language)) {
+    if (canWordExistOnGrid(normalizedWord, grid, language)) {
       // Then validate with proper path-finding algorithm
-      if (isWordOnBoard(word, grid, language)) {
+      if (isWordOnBoard(normalizedWord, grid, language)) {
         return {
-          word,
+          word: normalizedWord, // Return normalized word
           puzzleDate: dateString,
           language,
           puzzleNumber: getPuzzleNumber(dateString)
@@ -1846,8 +1879,9 @@ export function selectDailyTargetWord(
   // Fallback: return first word (should never happen with good word lists)
   // This word might not be on the board, but it's deterministic
   console.warn(`[Daily Challenge] No valid target word found on grid for ${dateString} ${language}`);
+  const fallbackWord = language === 'he' ? normalizeHebrewFinalLetters(shuffled[0]) : shuffled[0];
   return {
-    word: shuffled[0],
+    word: fallbackWord,
     puzzleDate: dateString,
     language,
     puzzleNumber: getPuzzleNumber(dateString)

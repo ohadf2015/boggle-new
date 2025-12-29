@@ -557,7 +557,7 @@ export default function AdminDashboard() {
                   : 'bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-400 hover:to-blue-400'
               )}
             >
-              <ArrowLeft className="mr-2" />
+              <ArrowLeft className="me-2 rtl:rotate-180" />
               Back to Game
             </Button>
           </div>
