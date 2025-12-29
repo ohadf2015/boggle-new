@@ -64,7 +64,7 @@ export async function getOrCreateGuestSession(
     // Try to get existing session
     const { data: existingSession, error: fetchError } = await client
       .from('guest_sessions')
-      .select('*')
+      .select('id, session_id, first_visit_at, last_visit_at, device_type, browser, language, utm_source, utm_medium, utm_campaign, referrer, country, user_id, linked_at, created_at')
       .eq('session_id', sessionData.sessionId)
       .single();
 
@@ -196,7 +196,7 @@ export async function getGuestSession(sessionId: string): Promise<any | null> {
   try {
     const { data, error } = await client
       .from('guest_sessions')
-      .select('*')
+      .select('id, session_id, first_visit_at, last_visit_at, device_type, browser, language, utm_source, utm_medium, utm_campaign, referrer, country, user_id, linked_at, created_at')
       .eq('session_id', sessionId)
       .single();
 
@@ -222,7 +222,7 @@ export async function getUserGuestSessions(userId: string): Promise<any[]> {
   try {
     const { data, error } = await client
       .from('guest_sessions')
-      .select('*')
+      .select('id, session_id, first_visit_at, last_visit_at, device_type, browser, language, utm_source, utm_medium, utm_campaign, referrer, country, user_id, linked_at, created_at')
       .eq('user_id', userId)
       .order('first_visit_at', { ascending: false });
 
@@ -296,10 +296,10 @@ export async function getGuestSessionAnalytics(): Promise<{
   if (!client) return defaultAnalytics;
 
   try {
-    // Get all sessions
+    // Get all sessions - only fields needed for analytics
     const { data: sessions, error } = await client
       .from('guest_sessions')
-      .select('*');
+      .select('user_id, utm_source, country, device_type');
 
     if (error || !sessions) {
       logger.error('GUEST_TRACKER', `Failed to get sessions for analytics: ${error?.message}`);

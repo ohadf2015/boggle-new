@@ -12,7 +12,7 @@ export const dynamic = 'force-dynamic';
 export const dynamicParams = true;
 export const runtime = 'nodejs';
 
-type Locale = 'en' | 'he' | 'sv' | 'ja';
+type Locale = 'en' | 'he' | 'sv' | 'ja' | 'es';
 
 interface LocaleLayoutProps {
     children: ReactNode;
@@ -31,6 +31,8 @@ function getLocalePath(locale: string): string {
             return '/ja';
         case 'he':
             return '/he';
+        case 'es':
+            return '/es';
         default:
             return '/en'; // Default to English for SEO
     }
@@ -45,6 +47,8 @@ function getLanguageCode(locale: string): string {
             return 'sv';
         case 'ja':
             return 'ja';
+        case 'es':
+            return 'es';
         case 'he':
         default:
             return 'he';
@@ -119,6 +123,7 @@ export async function generateMetadata({ params }: LocaleLayoutProps): Promise<M
                 en: 'https://www.lexiclash.live/en',
                 sv: 'https://www.lexiclash.live/sv',
                 ja: 'https://www.lexiclash.live/ja',
+                es: 'https://www.lexiclash.live/es',
             },
         },
         other: {
@@ -178,17 +183,18 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
                 height: 630,
             },
             screenshot: 'https://www.lexiclash.live/og-image-en.jpg',
-            inLanguage: [languageCode, 'he', 'en', 'sv', 'ja'],
+            inLanguage: [languageCode, 'he', 'en', 'sv', 'ja', 'es'],
             availableLanguage: [
                 { '@type': 'Language', name: 'English', alternateName: 'en' },
                 { '@type': 'Language', name: 'Hebrew', alternateName: 'he' },
                 { '@type': 'Language', name: 'Swedish', alternateName: 'sv' },
                 { '@type': 'Language', name: 'Japanese', alternateName: 'ja' },
+                { '@type': 'Language', name: 'Spanish', alternateName: 'es' },
             ],
             featureList: [
                 'Real-time multiplayer gameplay',
                 'Fast-paced competitive word battles',
-                'Multiple language support (Hebrew, English, Swedish, Japanese)',
+                'Multiple language support (Hebrew, English, Swedish, Japanese, Spanish)',
                 'Live leaderboard and rankings',
                 'Achievement system with 35+ badges',
                 'Room-based multiplayer with QR code sharing',
@@ -252,7 +258,7 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
             contactPoint: {
                 '@type': 'ContactPoint',
                 contactType: 'customer support',
-                availableLanguage: ['English', 'Hebrew', 'Swedish', 'Japanese'],
+                availableLanguage: ['English', 'Hebrew', 'Swedish', 'Japanese', 'Spanish'],
             },
             foundingDate: '2024',
             slogan: 'Real-Time Multiplayer Word Battles',
@@ -268,7 +274,7 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
             publisher: {
                 '@id': 'https://www.lexiclash.live/#organization',
             },
-            inLanguage: [languageCode, 'he', 'en', 'sv', 'ja'],
+            inLanguage: [languageCode, 'he', 'en', 'sv', 'ja', 'es'],
         },
         // WebPage schema - marks the main page as the primary entry point
         {
@@ -312,7 +318,7 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
                     name: 'What is a free online game like Boggle I can play with friends?',
                     acceptedAnswer: {
                         '@type': 'Answer',
-                        text: 'LexiClash is a free online word game similar to Boggle that you can play with friends in real-time. It features competitive multiplayer gameplay, live leaderboards, and supports multiple languages including English, Hebrew, Swedish, and Japanese. No account required - just create a room and share the link!',
+                        text: 'LexiClash is a free online word game similar to Boggle that you can play with friends in real-time. It features competitive multiplayer gameplay, live leaderboards, and supports multiple languages including English, Hebrew, Swedish, Japanese, and Spanish. No account required - just create a room and share the link!',
                     },
                 },
                 {
@@ -336,7 +342,7 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
                     name: 'Is there a free alternative to Kahoot for word games?',
                     acceptedAnswer: {
                         '@type': 'Answer',
-                        text: 'Yes! LexiClash is a free multiplayer word game similar to Kahoot\'s competitive style. Players join rooms and compete in real-time word battles. It\'s great for classrooms, parties, and casual play. No subscription needed - completely free with support for Hebrew, English, Swedish, and Japanese.',
+                        text: 'Yes! LexiClash is a free multiplayer word game similar to Kahoot\'s competitive style. Players join rooms and compete in real-time word battles. It\'s great for classrooms, parties, and casual play. No subscription needed - completely free with support for Hebrew, English, Swedish, Japanese, and Spanish.',
                     },
                 },
                 {
@@ -385,7 +391,7 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
                     name: 'What languages does LexiClash support?',
                     acceptedAnswer: {
                         '@type': 'Answer',
-                        text: 'LexiClash supports 4 languages: English, Hebrew, Swedish, and Japanese. Each language has its own dictionary for word validation. You can switch languages from the game settings. The interface is also available in all supported languages.',
+                        text: 'LexiClash supports 5 languages: English, Hebrew, Swedish, Japanese, and Spanish. Each language has its own dictionary for word validation. You can switch languages from the game settings. The interface is also available in all supported languages.',
                     },
                 },
                 {
@@ -471,7 +477,7 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
                     href="#main-content"
                     className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-[9999] focus:px-4 focus:py-3 focus:min-h-[44px] focus:min-w-[44px] focus:bg-neo-yellow focus:text-neo-black focus:font-bold focus:border-3 focus:border-neo-black focus:rounded-neo focus:shadow-hard focus:outline-none focus:flex focus:items-center focus:justify-center"
                 >
-                    {validLocale === 'he' ? 'דלג לתוכן הראשי' : validLocale === 'sv' ? 'Hoppa till huvudinnehåll' : validLocale === 'ja' ? 'メインコンテンツへスキップ' : 'Skip to main content'}
+                    {validLocale === 'he' ? 'דלג לתוכן הראשי' : validLocale === 'sv' ? 'Hoppa till huvudinnehåll' : validLocale === 'ja' ? 'メインコンテンツへスキップ' : validLocale === 'es' ? 'Saltar al contenido principal' : 'Skip to main content'}
                 </a>
                 <GoogleAnalytics />
                 <ServiceWorkerRegistration />

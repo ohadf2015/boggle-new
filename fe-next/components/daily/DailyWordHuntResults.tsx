@@ -2,12 +2,19 @@
 
 import React, { useState, useCallback, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Share2, Trophy, Target, X, TrendingUp, ArrowLeft, MessageCircle, Copy, Check, Send, Coins } from 'lucide-react';
+import { Share2, Trophy, Target, X, TrendingUp, ArrowLeft, Copy, Check, Send, Coins } from 'lucide-react';
 
 // X/Twitter icon (no lucide equivalent)
 const XTwitterIcon = ({ className }: { className?: string }) => (
   <svg className={className} viewBox="0 0 24 24" fill="currentColor" width="1em" height="1em">
     <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+  </svg>
+);
+
+// WhatsApp icon (official brand icon)
+const WhatsAppIcon = ({ className }: { className?: string }) => (
+  <svg className={className} viewBox="0 0 24 24" fill="currentColor" width="1em" height="1em">
+    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
   </svg>
 );
 import { Button } from '@/components/ui/button';
@@ -28,7 +35,7 @@ import StreakMilestoneCelebration from './StreakMilestoneCelebration';
 import { feedbackToEmoji, type LetterFeedback } from '@/utils/wordHuntFeedback';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { awardDailyCoins } from '@/utils/coinManager';
+import { awardDailyCoins, spendCoins, canAfford, getCoins, COIN_COSTS } from '@/utils/coinManager';
 import type { Language } from '@/types';
 
 interface WordHuntStats {
@@ -145,6 +152,8 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
     awarded: number;
     breakdown: { base: number; efficiency: number; streak: number };
   } | null>(null);
+  const [targetWordRevealed, setTargetWordRevealed] = useState(false);
+  const [currentCoins, setCurrentCoins] = useState(() => getCoins());
   const { profile, isAuthenticated } = useAuth();
 
   // Check for streak milestone
@@ -371,7 +380,7 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
 
   // Handle share to WhatsApp
   const handleWhatsApp = useCallback(() => {
-    const url = `https://wa.me/?text=${encodeURIComponent(shareText + '\n\nCan you solve it?')}`;
+    const url = `https://wa.me/?text=${encodeURIComponent(shareText)}`;
     window.open(url, '_blank');
   }, [shareText]);
 
@@ -383,7 +392,7 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
 
   // Handle share to Telegram
   const handleTelegram = useCallback(() => {
-    const url = `https://t.me/share/url?url=${encodeURIComponent(`https://lexiclash.live/${language}/daily`)}&text=${encodeURIComponent(shareText + '\n\nCan you solve it?')}`;
+    const url = `https://t.me/share/url?url=${encodeURIComponent(`https://lexiclash.live/${language}/daily`)}&text=${encodeURIComponent(shareText)}`;
     window.open(url, '_blank');
   }, [shareText, language]);
 
@@ -392,7 +401,7 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
     if (navigator.share) {
       try {
         await navigator.share({
-          text: shareText + '\n\nCan you solve it?',
+          text: shareText,
         });
       } catch (err) {
         console.error('Share failed:', err);
@@ -401,6 +410,24 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
       setShowSharePanel(true);
     }
   }, [shareText]);
+
+  // Handle reveal target word (costs coins)
+  const handleRevealTargetWord = useCallback(() => {
+    const cost = COIN_COSTS.REVEAL_TARGET_WORD;
+    if (!canAfford(cost)) {
+      return; // Not enough coins
+    }
+
+    const spent = spendCoins(cost, 'Reveal Target Word', {
+      puzzleDate,
+      language,
+    });
+
+    if (spent) {
+      setTargetWordRevealed(true);
+      setCurrentCoins(getCoins());
+    }
+  }, [puzzleDate, language]);
 
   return (
     <motion.div
@@ -539,6 +566,55 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
               <div className="text-sm text-gray-500 dark:text-gray-400">
                 {t('wordHunt.results.tryAgainTomorrow')}
               </div>
+
+              {/* Reveal Target Word Option */}
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.6 }}
+                className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700"
+              >
+                {targetWordRevealed ? (
+                  // Show the revealed target word
+                  <div className="space-y-2">
+                    <div className="text-sm text-gray-600 dark:text-gray-400">
+                      {t('wordHunt.results.theTargetWordWas') || 'The target word was:'}
+                    </div>
+                    <div className="text-3xl font-black text-neo-yellow tracking-wider">
+                      {result.targetWord.toUpperCase()}
+                    </div>
+                  </div>
+                ) : (
+                  // Show the reveal button
+                  <div className="space-y-2">
+                    <Button
+                      onClick={handleRevealTargetWord}
+                      disabled={!canAfford(COIN_COSTS.REVEAL_TARGET_WORD)}
+                      className={cn(
+                        "px-6 py-3 font-bold border-3 border-neo-black rounded-neo shadow-hard transition-all",
+                        canAfford(COIN_COSTS.REVEAL_TARGET_WORD)
+                          ? "bg-neo-purple hover:bg-neo-pink text-white hover:-translate-y-0.5"
+                          : "bg-gray-300 text-gray-600 cursor-not-allowed"
+                      )}
+                    >
+                      <Coins className="w-4 h-4 mr-2" />
+                      {t('wordHunt.results.revealTargetWord') || 'Reveal Target Word'}
+                      <span className="ml-2 px-2 py-0.5 bg-neo-yellow text-neo-black text-xs rounded-full font-black">
+                        {COIN_COSTS.REVEAL_TARGET_WORD}
+                      </span>
+                    </Button>
+                    <div className="text-xs text-gray-500 dark:text-gray-400">
+                      {t('wordHunt.results.yourCoins') || 'Your coins:'}{' '}
+                      <span className="font-bold text-neo-yellow">{currentCoins}</span>
+                      {!canAfford(COIN_COSTS.REVEAL_TARGET_WORD) && (
+                        <span className="text-red-500 ml-2">
+                          ({t('wordHunt.results.notEnoughCoins') || 'not enough coins'})
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                )}
+              </motion.div>
             </div>
           )}
 
@@ -704,9 +780,9 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
               <Button
                 onClick={handleWhatsApp}
                 aria-label="Share on WhatsApp"
-                className="py-3 min-h-[44px] bg-[#25D366] text-black border-3 border-neo-black rounded-neo shadow-hard-sm hover:-translate-y-0.5 transition-all"
+                className="py-3 min-h-[44px] bg-[#25D366] text-white border-3 border-neo-black rounded-neo shadow-hard-sm hover:-translate-y-0.5 transition-all"
               >
-                <MessageCircle className="w-5 h-5" />
+                <WhatsAppIcon className="w-5 h-5" />
               </Button>
 
               <Button
@@ -998,9 +1074,9 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
               <div className="space-y-3">
                 <Button
                   onClick={handleWhatsApp}
-                  className="w-full py-3 bg-[#25D366] text-black border-3 border-neo-black rounded-neo"
+                  className="w-full py-3 bg-[#25D366] text-white border-3 border-neo-black rounded-neo"
                 >
-                  <MessageCircle className="mr-2 w-5 h-5" />
+                  <WhatsAppIcon className="mr-2 w-5 h-5" />
                   WhatsApp
                 </Button>
 

@@ -1033,26 +1033,46 @@ export function generateWordHuntShareableResult(result: WordHuntResult, siteUrl?
     ? `${result.attemptsUsed}/10 ✨`
     : `X/10 ❌`;
 
+  // Language-specific streak translations
+  const streakTexts: Record<string, string> = {
+    en: '{count} day streak!',
+    he: 'רצף של {count} ימים!',
+    sv: '{count} dagars streak!',
+    es: '¡{count} días de racha!',
+    ja: '{count}日連続！',
+  };
+  const streakTemplate = streakTexts[result.language] || streakTexts.en;
+
   // Format streak if > 1
-  const streakText = result.streakDays > 1 ? `🔥 ${result.streakDays} day streak!\n` : '';
+  const streakText = result.streakDays > 1 ? `🔥 ${streakTemplate.replace('{count}', String(result.streakDays))}\n` : '';
 
   // Build survival mode stats line (if available)
   let survivalStats = '';
   if (result.wordsDiscovered && result.wordsDiscovered.length > 0) {
     const statsItems: string[] = [];
-    if (result.lifeRemaining !== undefined && result.lifeRemaining > 0) {
-      statsItems.push(`❤️${result.lifeRemaining}`);
+
+    // Calculate total life earned from all discovered words
+    const totalLifeEarned = result.wordsDiscovered.reduce((sum, w) => sum + w.lifeGained, 0);
+    if (totalLifeEarned > 0) {
+      statsItems.push(`❤️+${totalLifeEarned}`);
     }
+
+    // Calculate total tokens earned from all discovered words
+    const totalTokensEarned = result.wordsDiscovered.reduce((sum, w) => sum + w.tokensGained, 0);
+    if (totalTokensEarned > 0) {
+      statsItems.push(`🪙+${totalTokensEarned}`);
+    }
+
+    // Show words discovered count
     if (result.wordsDiscovered.length > 0) {
       statsItems.push(`📖${result.wordsDiscovered.length}`);
     }
+
+    // Show efficiency score
     if (result.efficiencyScore !== undefined && result.efficiencyScore > 0) {
       statsItems.push(`⚡${result.efficiencyScore}`);
     }
-    const netTokens = (result.clueTokensEarned || 0) - (result.clueTokensSpent || 0);
-    if (netTokens > 0) {
-      statsItems.push(`🪙${netTokens}`);
-    }
+
     if (statsItems.length > 0) {
       survivalStats = statsItems.join(' ') + '\n';
     }
@@ -1066,12 +1086,22 @@ export function generateWordHuntShareableResult(result: WordHuntResult, siteUrl?
   const baseUrl = typeof window !== 'undefined' ? window.location.origin : 'https://lexiclash.live';
   const challengeUrl = `${baseUrl}/${result.language}/daily`;
 
+  // Language-specific CTA translations
+  const shareCTAs: Record<string, { canYouSolve: string; beatAttempts: string; dayStreak: string }> = {
+    en: { canYouSolve: 'Can you solve it?', beatAttempts: 'Beat {count} attempts?', dayStreak: '{count} day streak!' },
+    he: { canYouSolve: 'תצליחו לפתור?', beatAttempts: 'תנצחו {count} ניסיונות?', dayStreak: 'רצף של {count} ימים!' },
+    sv: { canYouSolve: 'Kan du lösa det?', beatAttempts: 'Slå {count} försök?', dayStreak: '{count} dagars streak!' },
+    es: { canYouSolve: '¿Puedes resolverlo?', beatAttempts: '¿Superar {count} intentos?', dayStreak: '¡{count} días de racha!' },
+    ja: { canYouSolve: '解けますか？', beatAttempts: '{count}回で勝てる？', dayStreak: '{count}日連続！' },
+  };
+  const cta = shareCTAs[result.language] || shareCTAs.en;
+
   // Build challenge CTA based on result
   let challengeCta = '';
   if (result.solved) {
-    challengeCta = `\n🔥 Beat ${result.attemptsUsed} attempts?\n${challengeUrl}`;
+    challengeCta = `\n🔥 ${cta.beatAttempts.replace('{count}', String(result.attemptsUsed))}\n${challengeUrl}`;
   } else {
-    challengeCta = `\n🎯 Can you solve it?\n${challengeUrl}`;
+    challengeCta = `\n🎯 ${cta.canYouSolve}\n${challengeUrl}`;
   }
 
   // Build the shareable text

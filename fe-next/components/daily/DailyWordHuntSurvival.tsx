@@ -2,20 +2,11 @@
 
 import React, { useState, useCallback, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Trophy, Zap, ShoppingBag, X, Heart, Coins, Lightbulb } from 'lucide-react';
+import { Trophy, Zap, Store, X, Heart, Coins, Lightbulb } from 'lucide-react';
 import GridComponent from '@/components/GridComponent';
 import { HelpPanel, HelpButton } from '@/components/game/HelpPanel';
 import { Button } from '@/components/ui/button';
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
+import { ConfirmationDialog } from '@/components/ui/ConfirmationDialog';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import { useMusic } from '@/contexts/MusicContext';
@@ -46,6 +37,7 @@ import { logGameStart, logGameEnd, formatWordsForLogging } from '@/utils/gameLog
 const MAX_ATTEMPTS = 10;
 const INITIAL_LIFE = 100;
 const LIFE_DRAIN_RATE = 2; // points per second
+const INVALID_WORD_PENALTY = 5; // life points lost for invalid submissions
 
 interface DailyWordHuntSurvivalProps {
   grid: LetterGrid;
@@ -111,6 +103,11 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
   // Target word attempts
   const [attempts, setAttempts] = useState<TargetAttempt[]>([]);
   const [currentFeedback, setCurrentFeedback] = useState<string>('');
+
+  // Latest attempt feedback display (for animated hint box overlay)
+  const [latestAttemptFeedback, setLatestAttemptFeedback] = useState<LetterFeedback[] | null>(null);
+  const [showFeedbackOverlay, setShowFeedbackOverlay] = useState(false);
+  const feedbackTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // Toast feedback system
   const [feedbackType, setFeedbackType] = useState<FeedbackType | null>(null);
@@ -216,6 +213,15 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
     };
   }, [isGameOver]);
 
+  // Cleanup feedback timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (feedbackTimeoutRef.current) {
+        clearTimeout(feedbackTimeoutRef.current);
+      }
+    };
+  }, []);
+
   // Update hints when words discovered
   useEffect(() => {
     const nextHint = getNextHint(availableHints, discoveredWords.length);
@@ -275,7 +281,9 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
         handleWordDiscovery(normalizedWord);
         handleTargetAttempt(normalizedWord, normalizedTarget);
       } else {
-        // Not a valid word, just record as failed target attempt
+        // Not a valid word path on board - penalize and record as target attempt
+        setLifePoints(prev => Math.max(0, prev - INVALID_WORD_PENALTY));
+        showToast('not-on-board', t('wordHunt.feedback.notFormablePenalty') || `⚠️ Not on board -${INVALID_WORD_PENALTY} ❤️`);
         handleTargetAttempt(normalizedWord, normalizedTarget);
       }
     } else {
@@ -304,15 +312,38 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
     setAttempts(newAttempts);
     playWordAcceptedSound?.();
 
+    // Show letter feedback overlay on hint boxes
+    if (feedbackTimeoutRef.current) {
+      clearTimeout(feedbackTimeoutRef.current);
+    }
+    setLatestAttemptFeedback(feedback);
+    setShowFeedbackOverlay(true);
+
+    // Hide feedback overlay after 3 seconds (return to hint display)
+    feedbackTimeoutRef.current = setTimeout(() => {
+      setShowFeedbackOverlay(false);
+    }, 3000);
+
     // Check if correct
     const won = isTargetWordFound(feedback);
     if (won) {
+      // Keep feedback visible on victory
+      if (feedbackTimeoutRef.current) {
+        clearTimeout(feedbackTimeoutRef.current);
+      }
       handleGameOver(true, newAttempts); // Victory - pass the updated attempts array
       return;
     }
 
+    // Wrong guess - penalize with life loss
+    setLifePoints(prev => Math.max(0, prev - INVALID_WORD_PENALTY));
+
     // Check if out of attempts
     if (newAttempts.length >= MAX_ATTEMPTS) {
+      // Keep feedback visible on game over
+      if (feedbackTimeoutRef.current) {
+        clearTimeout(feedbackTimeoutRef.current);
+      }
       handleGameOver(false, newAttempts); // Failed - pass the updated attempts array
       return;
     }
@@ -322,9 +353,9 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
 
   // Handle grid word discovery
   const handleWordDiscovery = useCallback((word: string) => {
-    // Check minimum length (3+ letters for daily challenge word discovery)
-    if (word.length < 3) {
-      showToast('too-short', t('wordHunt.feedback.tooShort') || '📏 Minimum 3 letters');
+    // Check minimum length (2+ letters - Japanese uses 2-character kanji compounds)
+    if (word.length < 2) {
+      showToast('too-short', t('wordHunt.feedback.tooShort') || '📏 Minimum 2 letters');
       return;
     }
 
@@ -336,7 +367,9 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
 
     // Check if word is actually on the board
     if (!isWordOnBoard(word, grid, language)) {
-      showToast('not-on-board', t('wordHunt.feedback.notOnBoard') || '⚠️ Can\'t form this on the board');
+      // Penalize for invalid word submission
+      setLifePoints(prev => Math.max(0, prev - INVALID_WORD_PENALTY));
+      showToast('not-on-board', t('wordHunt.feedback.notOnBoardPenalty') || `⚠️ Not on board -${INVALID_WORD_PENALTY} ❤️`);
       return;
     }
 
@@ -626,7 +659,7 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
           onClick={() => setShowShop(!showShop)}
           className="bg-neo-purple text-white relative hover:bg-neo-purple/80"
         >
-          <ShoppingBag className="w-4 h-4" />
+          <Store className="w-4 h-4" />
           {clueTokens > 0 && (
             <span className="absolute -top-1 -right-1 w-4 h-4 bg-neo-yellow text-neo-black text-xs font-bold rounded-full flex items-center justify-center border border-neo-black">
               !
@@ -642,84 +675,170 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
           animate={{ opacity: 1, y: 0 }}
           className="mb-1.5 mx-1"
         >
-          {/* Black boxes for target word */}
+          {/* Black boxes for target word OR Letter Feedback Overlay */}
           <div className="flex justify-center flex-wrap gap-1.5 sm:gap-2 px-2">
-            {(() => {
-              // Parse hint to understand revealed letters
-              const hintChars = currentHint.hint.split(' ').filter(c => c !== '');
-              const wordLength = hintChars.length;
-              // Dynamically size based on word length
-              const sizeClass = wordLength <= 4
-                ? "w-10 h-10 sm:w-12 sm:h-12 text-lg sm:text-xl"
-                : wordLength <= 6
-                  ? "w-8 h-8 sm:w-10 sm:h-10 text-base sm:text-lg"
-                  : wordLength <= 8
-                    ? "w-7 h-7 sm:w-9 sm:h-9 text-sm sm:text-base"
-                    : "w-6 h-6 sm:w-8 sm:h-8 text-xs sm:text-sm";
+            <AnimatePresence mode="wait">
+              {showFeedbackOverlay && latestAttemptFeedback ? (
+                // Show colored letter feedback when overlay is active
+                <motion.div
+                  key="feedback-overlay"
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.9 }}
+                  transition={{ duration: 0.3 }}
+                  className="flex justify-center flex-wrap gap-1.5 sm:gap-2"
+                >
+                  {latestAttemptFeedback.map((letterFb, idx) => {
+                    const wordLength = latestAttemptFeedback.length;
+                    const sizeClass = wordLength <= 4
+                      ? "w-10 h-10 sm:w-12 sm:h-12 text-lg sm:text-xl"
+                      : wordLength <= 6
+                        ? "w-8 h-8 sm:w-10 sm:h-10 text-base sm:text-lg"
+                        : wordLength <= 8
+                          ? "w-7 h-7 sm:w-9 sm:h-9 text-sm sm:text-base"
+                          : "w-6 h-6 sm:w-8 sm:h-8 text-xs sm:text-sm";
 
-              return hintChars.map((char, idx) => {
-                // Check if revealed by hint OR by shop purchase
-                const isHintRevealed = char !== '_';
-                const isShopRevealed = revealedLetters.has(idx);
-                const isRevealed = isHintRevealed || isShopRevealed;
-                const displayChar = isShopRevealed ? targetWord[idx]?.toUpperCase() : (isHintRevealed ? char : '?');
+                    return (
+                      <motion.div
+                        key={idx}
+                        initial={{ rotateX: 90, opacity: 0 }}
+                        animate={{ rotateX: 0, opacity: 1 }}
+                        transition={{
+                          delay: idx * 0.1,
+                          type: "spring",
+                          stiffness: 300,
+                          damping: 20
+                        }}
+                        className={cn(
+                          "flex items-center justify-center border-3 rounded-lg font-black shadow-hard text-white",
+                          sizeClass,
+                          letterFb.feedback === 'green' && "bg-green-500 border-green-700",
+                          letterFb.feedback === 'yellow' && "bg-yellow-500 border-yellow-600 text-neo-black",
+                          letterFb.feedback === 'gray' && "bg-gray-400 border-gray-500"
+                        )}
+                      >
+                        {letterFb.letter}
+                      </motion.div>
+                    );
+                  })}
+                </motion.div>
+              ) : (
+                // Show hint boxes when no feedback overlay
+                <motion.div
+                  key="hint-boxes"
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.9 }}
+                  transition={{ duration: 0.3 }}
+                  className="flex justify-center flex-wrap gap-1.5 sm:gap-2"
+                >
+                  {(() => {
+                    // Parse hint to understand revealed letters
+                    const hintChars = currentHint.hint.split(' ').filter(c => c !== '');
+                    const wordLength = hintChars.length;
+                    // Dynamically size based on word length
+                    const sizeClass = wordLength <= 4
+                      ? "w-10 h-10 sm:w-12 sm:h-12 text-lg sm:text-xl"
+                      : wordLength <= 6
+                        ? "w-8 h-8 sm:w-10 sm:h-10 text-base sm:text-lg"
+                        : wordLength <= 8
+                          ? "w-7 h-7 sm:w-9 sm:h-9 text-sm sm:text-base"
+                          : "w-6 h-6 sm:w-8 sm:h-8 text-xs sm:text-sm";
 
-                return (
-                  <motion.div
-                    key={idx}
-                    initial={{ scale: 0, opacity: 0 }}
-                    animate={{
-                      scale: 1,
-                      opacity: 1,
-                      ...(hintUnlockAnimation && isRevealed ? { scale: [1, 1.2, 1] } : {})
-                    }}
-                    transition={{ delay: idx * 0.03, type: "spring", stiffness: 300 }}
-                    className={cn(
-                      "flex items-center justify-center border-3 rounded-lg font-black shadow-hard",
-                      sizeClass,
-                      isRevealed
-                        ? "bg-neo-yellow border-neo-black text-neo-black"
-                        : "bg-neo-black border-neo-black text-white"
-                    )}
-                  >
-                    {displayChar}
-                  </motion.div>
-                );
-              });
-            })()}
+                    return hintChars.map((char, idx) => {
+                      // Check if revealed by hint OR by shop purchase
+                      const isHintRevealed = char !== '_';
+                      const isShopRevealed = revealedLetters.has(idx);
+                      const isRevealed = isHintRevealed || isShopRevealed;
+                      const displayChar = isShopRevealed ? targetWord[idx]?.toUpperCase() : (isHintRevealed ? char : '?');
+
+                      return (
+                        <motion.div
+                          key={idx}
+                          initial={{ scale: 0, opacity: 0 }}
+                          animate={{
+                            scale: 1,
+                            opacity: 1,
+                            ...(hintUnlockAnimation && isRevealed ? { scale: [1, 1.2, 1] } : {})
+                          }}
+                          transition={{ delay: idx * 0.03, type: "spring", stiffness: 300 }}
+                          className={cn(
+                            "flex items-center justify-center border-3 rounded-lg font-black shadow-hard",
+                            sizeClass,
+                            isRevealed
+                              ? "bg-neo-yellow border-neo-black text-neo-black"
+                              : "bg-neo-black border-neo-black text-white"
+                          )}
+                        >
+                          {displayChar}
+                        </motion.div>
+                      );
+                    });
+                  })()}
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
 
-          {/* Hint level indicator below boxes */}
-          <div className="flex items-center justify-center gap-2 mt-2">
-            <motion.div
-              animate={hintUnlockAnimation ? { rotate: [0, -15, 15, 0], scale: [1, 1.3, 1] } : {}}
-              transition={{ duration: 0.5 }}
-            >
-              <Lightbulb className={cn(
-                "w-3 h-3 sm:w-4 sm:h-4",
-                hintUnlockAnimation ? "text-yellow-500" : "text-gray-500"
-              )} />
-            </motion.div>
-            <span className={cn(
-              "text-[10px] sm:text-xs font-bold",
-              hintUnlockAnimation ? "text-yellow-600 dark:text-yellow-400" : "text-gray-500"
-            )}>
-              {hintUnlockAnimation
-                ? (t('wordHunt.survival.hintUnlocked') || '🎉 New hint!')
-                : (t('wordHunt.survival.hintLevel')?.replace('{level}', String(currentHint.level)) || `Hint Lvl ${currentHint.level}`)
-              }
-            </span>
-            {/* Unlock animation sparkles */}
-            {hintUnlockAnimation && (
-              <motion.span
-                initial={{ opacity: 0, scale: 0 }}
-                animate={{ opacity: [0, 1, 0], scale: [0.5, 1.2, 0.5] }}
-                transition={{ duration: 1 }}
+          {/* Feedback legend when showing overlay */}
+          <AnimatePresence>
+            {showFeedbackOverlay && latestAttemptFeedback && (
+              <motion.div
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                transition={{ duration: 0.2, delay: 0.3 }}
+                className="flex items-center justify-center gap-3 mt-2 text-[10px] sm:text-xs"
               >
-                ✨
-              </motion.span>
+                <span className="flex items-center gap-1">
+                  <span className="w-3 h-3 sm:w-4 sm:h-4 bg-green-500 rounded border border-green-700"></span>
+                  <span className="text-gray-600 dark:text-gray-400">{t('wordHunt.feedback.correct') || 'Correct'}</span>
+                </span>
+                <span className="flex items-center gap-1">
+                  <span className="w-3 h-3 sm:w-4 sm:h-4 bg-yellow-500 rounded border border-yellow-600"></span>
+                  <span className="text-gray-600 dark:text-gray-400">{t('wordHunt.feedback.wrongPlace') || 'Wrong place'}</span>
+                </span>
+                <span className="flex items-center gap-1">
+                  <span className="w-3 h-3 sm:w-4 sm:h-4 bg-gray-400 rounded border border-gray-500"></span>
+                  <span className="text-gray-600 dark:text-gray-400">{t('wordHunt.feedback.notInWord') || 'Not in word'}</span>
+                </span>
+              </motion.div>
             )}
-          </div>
+          </AnimatePresence>
+
+          {/* Hint level indicator below boxes - hide when showing feedback */}
+          {!showFeedbackOverlay && (
+            <div className="flex items-center justify-center gap-2 mt-2">
+              <motion.div
+                animate={hintUnlockAnimation ? { rotate: [0, -15, 15, 0], scale: [1, 1.3, 1] } : {}}
+                transition={{ duration: 0.5 }}
+              >
+                <Lightbulb className={cn(
+                  "w-3 h-3 sm:w-4 sm:h-4",
+                  hintUnlockAnimation ? "text-yellow-500" : "text-gray-500"
+                )} />
+              </motion.div>
+              <span className={cn(
+                "text-[10px] sm:text-xs font-bold",
+                hintUnlockAnimation ? "text-yellow-600 dark:text-yellow-400" : "text-gray-500"
+              )}>
+                {hintUnlockAnimation
+                  ? (t('wordHunt.survival.hintUnlocked') || '🎉 New hint!')
+                  : (t('wordHunt.survival.hintLevel')?.replace('{level}', String(currentHint.level)) || `Hint Lvl ${currentHint.level}`)
+                }
+              </span>
+              {/* Unlock animation sparkles */}
+              {hintUnlockAnimation && (
+                <motion.span
+                  initial={{ opacity: 0, scale: 0 }}
+                  animate={{ opacity: [0, 1, 0], scale: [0.5, 1.2, 0.5] }}
+                  transition={{ duration: 1 }}
+                >
+                  ✨
+                </motion.span>
+              )}
+            </div>
+          )}
         </motion.div>
       )}
 
@@ -955,32 +1074,19 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
       />
 
       {/* Quit Confirmation Dialog */}
-      <AlertDialog open={showQuitConfirm} onOpenChange={setShowQuitConfirm}>
-        <AlertDialogContent className="bg-neo-cream text-neo-black border-4 border-neo-black rounded-neo shadow-hard max-w-sm">
-          <AlertDialogHeader>
-            <AlertDialogTitle className="text-neo-black font-black text-xl">
-              {t('daily.quitConfirmTitle') || 'Quit Challenge?'}
-            </AlertDialogTitle>
-            <AlertDialogDescription className="text-neo-black/70 font-medium">
-              {t('daily.quitConfirm') || 'If you quit, this will count as your attempt for today. You won\'t be able to try again until tomorrow.'}
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter className="flex-row gap-2">
-            <AlertDialogCancel className="flex-1 bg-neo-cream border-2 border-neo-black rounded-neo font-bold text-neo-black hover:brightness-95">
-              {t('common.cancel') || 'Cancel'}
-            </AlertDialogCancel>
-            <AlertDialogAction
-              onClick={() => {
-                setShowQuitConfirm(false);
-                onQuit();
-              }}
-              className="flex-1 bg-neo-red border-2 border-neo-black rounded-neo font-bold text-neo-cream hover:brightness-110"
-            >
-              {t('daily.imSure') || "I'm Sure"}
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      <ConfirmationDialog
+        open={showQuitConfirm}
+        onOpenChange={setShowQuitConfirm}
+        title={t('daily.quitConfirmTitle') || 'Quit Challenge?'}
+        description={t('daily.quitConfirm') || 'If you quit, this will count as your attempt for today. You won\'t be able to try again until tomorrow.'}
+        confirmText={t('daily.imSure') || "I'm Sure"}
+        cancelText={t('common.cancel') || 'Cancel'}
+        onConfirm={() => {
+          setShowQuitConfirm(false);
+          onQuit();
+        }}
+        variant="danger"
+      />
     </motion.div>
   );
 };

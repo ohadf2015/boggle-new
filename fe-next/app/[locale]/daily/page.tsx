@@ -3,7 +3,7 @@ import dynamicImport from 'next/dynamic';
 import type { Metadata } from 'next';
 import { translations } from '@/translations';
 
-type Locale = 'en' | 'he' | 'sv' | 'ja';
+type Locale = 'en' | 'he' | 'sv' | 'ja' | 'es';
 
 interface PageParams {
   params: Promise<{ locale: string }>;

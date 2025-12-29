@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import dynamic from 'next/dynamic';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Trophy, Medal, RotateCw, Home, Bot, BarChart3, Crown, Award, Settings, Sparkles, Hash, Target, ChevronDown, TrendingUp } from 'lucide-react';
+import { Trophy, Medal, RotateCw, Home, Bot, BarChart3, Crown, Award, Settings, Sparkles, Hash, Target, ChevronDown, TrendingUp, Coins } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import CollapsibleSection from '@/components/ui/CollapsibleSection';
 import PlayerInsights from '@/components/results/PlayerInsights';
@@ -28,6 +28,7 @@ import { addGameToHistory } from '@/utils/gameHistoryManager';
 import { applyHebrewFinalLetters } from '@/utils/utils';
 import type { SinglePlayerResultsData, SinglePlayerMode } from './SinglePlayerView';
 import { useResultsData } from './results';
+import { awardGameCoins } from '@/utils/coinManager';
 
 // Dynamic import for PerformanceChart (heavy component)
 const PerformanceChart = dynamic(() => import('@/components/results/PerformanceChart'), { ssr: false });
@@ -74,7 +75,14 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
   const hasUpdatedStatsRef = useRef(false);
   const hasAddedToHistoryRef = useRef(false);
   const hasLoggedGameSessionRef = useRef(false);
+  const hasAwardedCoinsRef = useRef(false);
   const actionButtonsRef = useRef<HTMLDivElement>(null);
+
+  // Coin reward state
+  const [coinReward, setCoinReward] = useState<{
+    awarded: number;
+    breakdown: { base: number; scoreBonus: number; placement: number };
+  } | null>(null);
 
   // Use extracted hook for data processing
   const {
@@ -208,6 +216,28 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
     hasAddedToHistoryRef.current = true;
   }, [results, playerRank, allParticipants.length, isWinner, totalComboBonus, totalFireRoundBonus, playerArchetype]);
 
+  // Award coins for single player game completion
+  useEffect(() => {
+    if (hasAwardedCoinsRef.current) return;
+
+    // Generate a unique session ID for this game if not already present
+    const sessionId = results.gameSessionId || `sp_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
+
+    const reward = awardGameCoins(
+      sessionId,
+      'singleplayer',
+      results.playerScore,
+      playerRank,
+      allParticipants.length
+    );
+
+    if (reward) {
+      setCoinReward(reward);
+    }
+
+    hasAwardedCoinsRef.current = true;
+  }, [results.playerScore, results.gameSessionId, playerRank, allParticipants.length]);
+
   // Show signup prompt for guests who have played 2+ games
   useEffect(() => {
     // Skip if authenticated or modal already shown this session
@@ -332,6 +362,17 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
               {results.achievements.slice(0, 3).map((achievement, i) => (
                 <AchievementBadge key={i} achievement={achievement} index={i} />
               ))}
+            </div>
+          )}
+
+          {/* Coins earned - compact for landscape */}
+          {coinReward && (
+            <div className="bg-neo-yellow border-2 border-neo-black rounded-neo px-3 py-1 text-center">
+              <div className="flex items-center justify-center gap-1">
+                <Coins className="w-3 h-3 text-neo-black" />
+                <span className="font-black text-neo-black">+{coinReward.awarded}</span>
+              </div>
+              <div className="text-[8px] font-bold uppercase text-neo-black/70">{t('reveal.coins') || 'Coins'}</div>
             </div>
           )}
         </div>
@@ -626,6 +667,36 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
                   </span>
                 )}
               </div>
+            )}
+
+            {/* Coins Earned */}
+            {coinReward && (
+              <motion.div
+                initial={{ scale: 0.8, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={{ delay: 0.3, type: 'spring' }}
+                className="mb-3 px-4 py-3 bg-gradient-to-r from-neo-yellow to-amber-400 rounded-neo border-3 border-neo-black shadow-hard"
+              >
+                <div className="flex items-center justify-center gap-2 mb-1">
+                  <Coins className="w-5 h-5 text-neo-black" />
+                  <span className="font-black text-xl text-neo-black">+{coinReward.awarded}</span>
+                  <span className="text-sm font-bold text-neo-black/70">{t('reveal.coins') || 'Coins'}</span>
+                </div>
+                <div className="flex items-center justify-center gap-3 text-xs text-neo-black/70 font-medium">
+                  {coinReward.breakdown.base > 0 && (
+                    <span>{t('reveal.base') || 'Base'}: +{coinReward.breakdown.base}</span>
+                  )}
+                  {coinReward.breakdown.scoreBonus > 0 && (
+                    <span>{t('coins.score') || 'Score'}: +{coinReward.breakdown.scoreBonus}</span>
+                  )}
+                  {coinReward.breakdown.placement > 0 && (
+                    <span>🏆 {t('coins.placement') || 'Placement'}: +{coinReward.breakdown.placement}</span>
+                  )}
+                </div>
+                <p className="text-xs text-neo-black/60 mt-1 text-center">
+                  {t('reveal.usedForReveals') || 'Use coins to reveal words in single player games!'}
+                </p>
+              </motion.div>
             )}
 
             {/* Collapsible: Performance Details */}

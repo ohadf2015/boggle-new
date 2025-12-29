@@ -1,6 +1,7 @@
-import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
+import React, { useState, useEffect, useRef, useMemo, useCallback, memo } from 'react';
 import './SlotMachine.css';
 import type { Language } from '@/shared/types';
+import { useDevicePerformance } from '../hooks/useDevicePerformance';
 
 // Character sets for different languages
 const CHAR_SETS: Record<Language, string> = {
@@ -25,7 +26,13 @@ interface SlotMachineCellProps {
   size?: CellSize;
 }
 
-const SlotMachineCell: React.FC<SlotMachineCellProps> = ({
+/**
+ * SlotMachineCell - Individual cell with slot machine animation
+ *
+ * PERFORMANCE: On low-end devices, skips spinning animation entirely
+ * and shows final letter immediately with a simple CSS fade transition.
+ */
+const SlotMachineCell: React.FC<SlotMachineCellProps> = memo(({
   letter,
   delay = 0,
   duration = 800,
@@ -34,13 +41,16 @@ const SlotMachineCell: React.FC<SlotMachineCellProps> = ({
   size = 'normal'
 }) => {
   const [displayLetter, setDisplayLetter] = useState<string>(letter);
-  const [isAnimating, setIsAnimating] = useState<boolean>(false);
   const [animationPhase, setAnimationPhase] = useState<AnimationPhase>('idle');
   const previousLetterRef = useRef<string>(letter);
   const animationTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const spinIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const isMountedRef = useRef<boolean>(true);
   const isInitialMountRef = useRef<boolean>(true);
+
+  // PERFORMANCE: Get device capability for adaptive animation
+  const { isLowEnd, enableComplexAnimations, prefersReducedMotion } = useDevicePerformance();
+  const shouldAnimate = enableComplexAnimations && !prefersReducedMotion && !isLowEnd;
 
   // Get character set for current language
   const charSet = useMemo(() => {
@@ -87,16 +97,30 @@ const SlotMachineCell: React.FC<SlotMachineCellProps> = ({
         clearInterval(spinIntervalRef.current);
       }
 
+      // PERFORMANCE: On low-end devices, skip spinning and show letter with simple delay
+      if (!shouldAnimate) {
+        animationTimeoutRef.current = setTimeout(() => {
+          if (!isMountedRef.current) return;
+          setAnimationPhase('landing');
+          setDisplayLetter(letter);
+          // Quick reset
+          setTimeout(() => {
+            if (isMountedRef.current) setAnimationPhase('idle');
+          }, 150);
+        }, delay);
+        return;
+      }
+
       // Start animation after delay
       animationTimeoutRef.current = setTimeout(() => {
         if (!isMountedRef.current) return;
 
-        setIsAnimating(true);
         setAnimationPhase('spinning');
 
-        // Spin through random letters - optimized for performance
+        // Spin through random letters - reduced iterations for better performance
         let spinCount = 0;
-        const spinInterval = 100; // ms between letter changes (increased from 60 for better performance)
+        // PERFORMANCE: Increased interval from 100ms to 150ms = 33% fewer updates
+        const spinInterval = 150;
         const totalSpins = Math.floor(duration / spinInterval);
 
         spinIntervalRef.current = setInterval(() => {
@@ -124,9 +148,8 @@ const SlotMachineCell: React.FC<SlotMachineCellProps> = ({
               // Reset animation state after landing animation completes
               setTimeout(() => {
                 if (!isMountedRef.current) return;
-                setIsAnimating(false);
                 setAnimationPhase('idle');
-              }, 250);
+              }, 200);
             }, 50);
           }
         }, spinInterval);
@@ -141,7 +164,7 @@ const SlotMachineCell: React.FC<SlotMachineCellProps> = ({
         clearInterval(spinIntervalRef.current);
       }
     };
-  }, [letter, delay, duration, getRandomLetter]);
+  }, [letter, delay, duration, getRandomLetter, shouldAnimate]);
 
   // Get CSS classes based on animation phase
   const getLetterClasses = (): string => {
@@ -180,6 +203,8 @@ const SlotMachineCell: React.FC<SlotMachineCellProps> = ({
       </span>
     </div>
   );
-};
+});
+
+SlotMachineCell.displayName = 'SlotMachineCell';
 
 export default SlotMachineCell;

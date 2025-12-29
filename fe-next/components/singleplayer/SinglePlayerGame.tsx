@@ -3,16 +3,7 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
 import { ArrowLeft, Pause, Play, Crown, HelpCircle, TrendingUp, Target, Zap } from 'lucide-react';
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
+import { ConfirmationDialog } from '@/components/ui/ConfirmationDialog';
 import { HelpPanel, HelpButton } from '@/components/game/HelpPanel';
 import WordFormingArea, { type WordFeedback } from '@/components/game/WordFormingArea';
 import ComboDisplay from '@/components/game/ComboDisplay';
@@ -45,6 +36,7 @@ import {
   calculateFinalAchievements,
   type WordData as AchievementWordData,
 } from '@/utils/singlePlayerAchievements';
+import { finalizeWordValidation } from '@/utils/wordValidationAPI';
 import type { SinglePlayerGameState, SinglePlayerResultsData, BotOpponent } from './SinglePlayerView';
 import type { LetterGrid } from '@/shared/types/game';
 
@@ -569,62 +561,9 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
     // Uses batch API endpoint for efficiency - single request for all pending words
     const finalizeAndEndGame = async () => {
       const currentWords = foundWordsRef.current;
-      const pendingWords = currentWords.filter(w => w.isValid === null);
 
-      let finalWords = currentWords;
-
-      // Batch validate pending words with AI (single API call like multiplayer)
-      if (pendingWords.length > 0) {
-        try {
-          const response = await fetch('/api/validate-words-ai', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              words: pendingWords.map(pw => pw.word),
-              language: settings.language,
-              minWordLength: 3, // Minimum word length for single player
-            }),
-          });
-
-          // Check response before parsing JSON to avoid parse errors on 500s
-          if (!response.ok) {
-            console.warn(`AI validation API returned ${response.status}`);
-            // Mark pending words as invalid when API fails
-            finalWords = currentWords.map(w =>
-              w.isValid === null ? { ...w, isValid: false } : w
-            );
-          } else {
-            const result = await response.json();
-
-            if (result.success && Array.isArray(result.results)) {
-            // Create a map for quick lookup
-            const validationMap = new Map<string, boolean>();
-            for (const r of result.results) {
-              validationMap.set(r.word, r.isValid);
-            }
-
-            // Update words with AI validation results
-            finalWords = currentWords.map(w => {
-              if (w.isValid === null) {
-                const isValid = validationMap.get(w.word) ?? false;
-                return { ...w, isValid };
-              }
-              return w;
-            });
-          } else {
-            // On error, mark pending words as invalid
-            finalWords = currentWords.map(w =>
-              w.isValid === null ? { ...w, isValid: false } : w
-            );
-          }
-          }
-        } catch {
-          // On error, mark pending words as invalid
-          finalWords = currentWords.map(w =>
-            w.isValid === null ? { ...w, isValid: false } : w
-          );
-        }
-      }
+      // Use shared utility for batch word validation
+      const finalWords = await finalizeWordValidation(currentWords, settings.language, 3);
 
       // Calculate final score from validated words only
       const validWords = finalWords.filter(w => w.isValid === true);
@@ -1434,29 +1373,16 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
         />
 
         {/* Quit Confirmation Dialog */}
-        <AlertDialog open={showQuitConfirm} onOpenChange={setShowQuitConfirm}>
-          <AlertDialogContent className="bg-neo-cream text-neo-black border-4 border-neo-black rounded-neo shadow-hard max-w-sm">
-            <AlertDialogHeader>
-              <AlertDialogTitle className="text-neo-black font-black text-xl">
-                {t('singlePlayer.quitConfirmTitle') || 'Quit Game?'}
-              </AlertDialogTitle>
-              <AlertDialogDescription className="text-neo-black/70 font-medium">
-                {t('singlePlayer.quitConfirmMessage') || 'You will lose your current progress. Are you sure you want to quit?'}
-              </AlertDialogDescription>
-            </AlertDialogHeader>
-            <AlertDialogFooter className="flex-row gap-2">
-              <AlertDialogCancel className="flex-1 bg-neo-cream border-2 border-neo-black rounded-neo font-bold text-neo-black hover:brightness-95">
-                {t('common.cancel') || 'Cancel'}
-              </AlertDialogCancel>
-              <AlertDialogAction
-                onClick={onQuit}
-                className="flex-1 bg-neo-red border-2 border-neo-black rounded-neo font-bold text-neo-cream hover:brightness-110"
-              >
-                {t('common.quit') || 'Quit'}
-              </AlertDialogAction>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialog>
+        <ConfirmationDialog
+          open={showQuitConfirm}
+          onOpenChange={setShowQuitConfirm}
+          title={t('singlePlayer.quitConfirmTitle') || 'Quit Game?'}
+          description={t('singlePlayer.quitConfirmMessage') || 'You will lose your current progress. Are you sure you want to quit?'}
+          confirmText={t('common.quit') || 'Quit'}
+          cancelText={t('common.cancel') || 'Cancel'}
+          onConfirm={onQuit}
+          variant="danger"
+        />
 
         {/* First-time Landscape Tutorial Overlay */}
         <AdaptiveAnimatePresence>
@@ -1803,29 +1729,16 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
       />
 
       {/* Quit Confirmation Dialog */}
-      <AlertDialog open={showQuitConfirm} onOpenChange={setShowQuitConfirm}>
-        <AlertDialogContent className="bg-neo-cream text-neo-black border-4 border-neo-black rounded-neo shadow-hard max-w-sm">
-          <AlertDialogHeader>
-            <AlertDialogTitle className="text-neo-black font-black text-xl">
-              {t('singlePlayer.quitConfirmTitle') || 'Quit Game?'}
-            </AlertDialogTitle>
-            <AlertDialogDescription className="text-neo-black/70 font-medium">
-              {t('singlePlayer.quitConfirmMessage') || 'You will lose your current progress. Are you sure you want to quit?'}
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter className="flex-row gap-2">
-            <AlertDialogCancel className="flex-1 bg-neo-cream border-2 border-neo-black rounded-neo font-bold text-neo-black hover:brightness-95">
-              {t('common.cancel') || 'Cancel'}
-            </AlertDialogCancel>
-            <AlertDialogAction
-              onClick={onQuit}
-              className="flex-1 bg-neo-red border-2 border-neo-black rounded-neo font-bold text-neo-cream hover:brightness-110"
-            >
-              {t('singlePlayer.imSure') || "I'm Sure"}
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      <ConfirmationDialog
+        open={showQuitConfirm}
+        onOpenChange={setShowQuitConfirm}
+        title={t('singlePlayer.quitConfirmTitle') || 'Quit Game?'}
+        description={t('singlePlayer.quitConfirmMessage') || 'You will lose your current progress. Are you sure you want to quit?'}
+        confirmText={t('singlePlayer.imSure') || "I'm Sure"}
+        cancelText={t('common.cancel') || 'Cancel'}
+        onConfirm={onQuit}
+        variant="danger"
+      />
     </div>
   );
 };

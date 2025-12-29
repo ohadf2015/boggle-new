@@ -13,7 +13,7 @@ export interface PresetSettings {
   timerSeconds: number;
   bots: number;
   botDifficulty: 'easy' | 'medium' | 'hard';
-  minWordLength?: number; // Minimum word length (defaults to 3, EASY presets use 2)
+  minWordLength?: number; // Minimum word length (defaults to 2 for all presets)
 }
 
 export interface PresetConfig {
@@ -64,6 +64,7 @@ export const PRESETS: PresetConfig[] = [
       timerSeconds: 120,
       bots: 2,
       botDifficulty: 'medium',
+      minWordLength: 2, // Accept 2-letter words (especially for Japanese)
     },
     modes: ['solo-bots', 'practice', 'challenge'],
     badge: 'recommended',
@@ -82,6 +83,7 @@ export const PRESETS: PresetConfig[] = [
       timerSeconds: 180,
       bots: 3,
       botDifficulty: 'hard',
+      minWordLength: 2, // Accept 2-letter words (especially for Japanese)
     },
     modes: ['solo-bots', 'practice', 'challenge'],
   },
@@ -98,6 +100,7 @@ export const PRESETS: PresetConfig[] = [
       timerSeconds: 120,
       bots: 0,
       botDifficulty: 'medium',
+      minWordLength: 2, // Always accept 2-letter words (especially important for Japanese)
     },
     modes: ['daily'],
   },
@@ -136,6 +139,7 @@ export const MODE_PRESETS: Record<Exclude<SinglePlayerMode, 'daily'>, PresetConf
         timerSeconds: 120,
         bots: 3,
         botDifficulty: 'medium',
+        minWordLength: 2, // Accept 2-letter words (especially for Japanese)
       },
       modes: ['solo-bots'],
       isDefault: true,
@@ -152,6 +156,7 @@ export const MODE_PRESETS: Record<Exclude<SinglePlayerMode, 'daily'>, PresetConf
         timerSeconds: 180,
         bots: 4,
         botDifficulty: 'hard',
+        minWordLength: 2, // Accept 2-letter words (especially for Japanese)
       },
       modes: ['solo-bots'],
     },
@@ -186,6 +191,7 @@ export const MODE_PRESETS: Record<Exclude<SinglePlayerMode, 'daily'>, PresetConf
         timerSeconds: 0,
         bots: 0,
         botDifficulty: 'medium',
+        minWordLength: 2, // Accept 2-letter words (especially for Japanese)
       },
       modes: ['practice'],
     },
@@ -201,6 +207,7 @@ export const MODE_PRESETS: Record<Exclude<SinglePlayerMode, 'daily'>, PresetConf
         timerSeconds: 0,
         bots: 0,
         botDifficulty: 'hard',
+        minWordLength: 2, // Accept 2-letter words (especially for Japanese)
       },
       modes: ['practice'],
     },
@@ -234,6 +241,7 @@ export const MODE_PRESETS: Record<Exclude<SinglePlayerMode, 'daily'>, PresetConf
         timerSeconds: 120,
         bots: 0,
         botDifficulty: 'medium',
+        minWordLength: 2, // Accept 2-letter words (especially for Japanese)
       },
       modes: ['challenge'],
       isDefault: true,
@@ -250,6 +258,7 @@ export const MODE_PRESETS: Record<Exclude<SinglePlayerMode, 'daily'>, PresetConf
         timerSeconds: 180,
         bots: 0,
         botDifficulty: 'hard',
+        minWordLength: 2, // Accept 2-letter words (especially for Japanese)
       },
       modes: ['challenge'],
     },

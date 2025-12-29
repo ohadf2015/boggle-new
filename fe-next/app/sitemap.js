@@ -1,6 +1,6 @@
 export default function sitemap() {
   const baseUrl = 'https://www.lexiclash.live';
-  const locales = ['he', 'en', 'sv', 'ja'];
+  const locales = ['he', 'en', 'sv', 'ja', 'es'];
   const now = new Date();
 
   // Use explicit locale paths for all languages for SEO consistency
@@ -10,6 +10,7 @@ export default function sitemap() {
     en: `${baseUrl}/en`,
     sv: `${baseUrl}/sv`,
     ja: `${baseUrl}/ja`,
+    es: `${baseUrl}/es`,
   };
 
   // Common images for sitemap (helps Google discover and index images)
@@ -71,6 +72,17 @@ export default function sitemap() {
     images: [...commonImages, `${baseUrl}/og-image-en.jpg`],
   });
 
+  routes.push({
+    url: `${baseUrl}/es`,
+    lastModified: now,
+    changeFrequency: 'weekly',
+    priority: 0.9,
+    alternates: {
+      languages: languageAlternates,
+    },
+    images: [...commonImages, `${baseUrl}/og-image-en.jpg`],
+  });
+
   // Rules pages for all locales (Game mechanics, How to Play)
   locales.forEach((locale) => {
     // Always use explicit locale path
@@ -87,6 +99,7 @@ export default function sitemap() {
           en: `${baseUrl}/en/rules`,
           sv: `${baseUrl}/sv/rules`,
           ja: `${baseUrl}/ja/rules`,
+          es: `${baseUrl}/es/rules`,
         },
       },
     });
@@ -108,6 +121,7 @@ export default function sitemap() {
           en: `${baseUrl}/en/leaderboard`,
           sv: `${baseUrl}/sv/leaderboard`,
           ja: `${baseUrl}/ja/leaderboard`,
+          es: `${baseUrl}/es/leaderboard`,
         },
       },
     });
@@ -129,6 +143,7 @@ export default function sitemap() {
           en: `${baseUrl}/en/profile`,
           sv: `${baseUrl}/sv/profile`,
           ja: `${baseUrl}/ja/profile`,
+          es: `${baseUrl}/es/profile`,
         },
       },
     });
@@ -150,6 +165,7 @@ export default function sitemap() {
           en: `${baseUrl}/en/singleplayer`,
           sv: `${baseUrl}/sv/singleplayer`,
           ja: `${baseUrl}/ja/singleplayer`,
+          es: `${baseUrl}/es/singleplayer`,
         },
       },
     });
@@ -170,6 +186,7 @@ export default function sitemap() {
           en: `${baseUrl}/en/daily`,
           sv: `${baseUrl}/sv/daily`,
           ja: `${baseUrl}/ja/daily`,
+          es: `${baseUrl}/es/daily`,
         },
       },
     });
@@ -190,6 +207,7 @@ export default function sitemap() {
           en: `${baseUrl}/en/multiplayer`,
           sv: `${baseUrl}/sv/multiplayer`,
           ja: `${baseUrl}/ja/multiplayer`,
+          es: `${baseUrl}/es/multiplayer`,
         },
       },
     });
@@ -213,6 +231,7 @@ export default function sitemap() {
           en: `${baseUrl}/en/legal`,
           sv: `${baseUrl}/sv/legal`,
           ja: `${baseUrl}/ja/legal`,
+          es: `${baseUrl}/es/legal`,
         },
       },
     });
@@ -230,6 +249,7 @@ export default function sitemap() {
           en: `${baseUrl}/en/legal/terms`,
           sv: `${baseUrl}/sv/legal/terms`,
           ja: `${baseUrl}/ja/legal/terms`,
+          es: `${baseUrl}/es/legal/terms`,
         },
       },
     });
@@ -247,6 +267,7 @@ export default function sitemap() {
           en: `${baseUrl}/en/legal/privacy`,
           sv: `${baseUrl}/sv/legal/privacy`,
           ja: `${baseUrl}/ja/legal/privacy`,
+          es: `${baseUrl}/es/legal/privacy`,
         },
       },
     });

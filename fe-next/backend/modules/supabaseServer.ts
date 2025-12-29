@@ -195,10 +195,10 @@ export async function updatePlayerStats(
   const client = getSupabase();
   if (!client) return { data: null, error: { message: 'Supabase not configured' } };
 
-  // First, get current profile
+  // First, get current profile (only fields needed for stats update)
   let { data: profile, error: fetchError } = await client
     .from('profiles')
-    .select('*')
+    .select('id, username, avatar_emoji, avatar_color, total_games, total_score, total_words, casual_games, ranked_games, ranked_wins, casual_wins, ranked_mmr, peak_mmr, longest_word, longest_word_length, total_time_played, total_xp, current_level, player_title, last_game_at, achievement_counts')
     .eq('id', playerId)
     .single();
 
@@ -429,7 +429,7 @@ export async function getOrCreateGuestToken(tokenHash: string): Promise<{ data: 
   // Try to get existing token
   const { data: existing } = await client
     .from('guest_tokens')
-    .select('*')
+    .select('id, token_hash, stats, claimed_by, created_at, updated_at')
     .eq('token_hash', tokenHash)
     .is('claimed_by', null)
     .single();

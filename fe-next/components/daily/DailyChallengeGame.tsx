@@ -9,16 +9,7 @@ import WordFormingArea from '@/components/game/WordFormingArea';
 import ComboDisplay from '@/components/game/ComboDisplay';
 import { HelpPanel, HelpButton } from '@/components/game/HelpPanel';
 import { Button } from '@/components/ui/button';
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
+import { ConfirmationDialog } from '@/components/ui/ConfirmationDialog';
 import { AchievementProgressTracker } from '@/components/achievements/AchievementProgressTracker';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
@@ -29,6 +20,7 @@ import { useGameTimer } from '@/hooks/useGameTimer';
 import { useWordSubmission } from '@/hooks/useWordSubmission';
 import { cn } from '@/lib/utils';
 import { useMobileLandscape } from '@/hooks/useMobileLandscape';
+import { finalizeWordValidation } from '@/utils/wordValidationAPI';
 import type { LetterGrid, Language } from '@/types';
 
 interface DailyChallengeGameProps {
@@ -187,49 +179,9 @@ const DailyChallengeGame: React.FC<DailyChallengeGameProps> = ({
     setIsGameOver(true);
 
     const currentWords = wordSubmission.foundWords;
-    const pendingWords = currentWords.filter(w => w.isValid === null);
-    let finalWords = currentWords;
 
-    // Batch validate pending words with AI
-    if (pendingWords.length > 0) {
-      try {
-        const response = await fetch('/api/validate-words-ai', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            words: pendingWords.map(pw => pw.word),
-            language,
-            minWordLength: 3,
-          }),
-        });
-        const result = await response.json();
-
-        if (result.success && Array.isArray(result.results)) {
-          const validationMap = new Map<string, boolean>();
-          for (const r of result.results) {
-            validationMap.set(r.word, r.isValid);
-          }
-
-          finalWords = currentWords.map(w => {
-            if (w.isValid === null) {
-              const isValid = validationMap.get(w.word) ?? false;
-              return { ...w, isValid };
-            }
-            return w;
-          });
-        } else {
-          // On error, mark pending words as invalid
-          finalWords = currentWords.map(w =>
-            w.isValid === null ? { ...w, isValid: false } : w
-          );
-        }
-      } catch {
-        // On error, mark pending words as invalid
-        finalWords = currentWords.map(w =>
-          w.isValid === null ? { ...w, isValid: false } : w
-        );
-      }
-    }
+    // Use shared utility for batch word validation
+    const finalWords = await finalizeWordValidation(currentWords, language, 3);
 
     // Calculate final score from validated words only
     const validWords = finalWords.filter(w => w.isValid === true);
@@ -437,29 +389,16 @@ const DailyChallengeGame: React.FC<DailyChallengeGameProps> = ({
       <HelpPanel isOpen={isHelpOpen} onClose={() => setIsHelpOpen(false)} />
 
       {/* Quit Confirmation Dialog */}
-      <AlertDialog open={showQuitConfirm} onOpenChange={setShowQuitConfirm}>
-        <AlertDialogContent className="bg-neo-cream text-neo-black border-4 border-neo-black rounded-neo shadow-hard max-w-sm">
-          <AlertDialogHeader>
-            <AlertDialogTitle className="text-neo-black font-black text-xl">
-              {t('daily.quitConfirmTitle') || 'Quit Challenge?'}
-            </AlertDialogTitle>
-            <AlertDialogDescription className="text-neo-black/70 font-medium">
-              {t('daily.quitConfirm') || 'If you quit, this will count as your attempt for today. You won\'t be able to try again until tomorrow.'}
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter className="flex-row gap-2">
-            <AlertDialogCancel className="flex-1 bg-neo-cream border-2 border-neo-black rounded-neo font-bold text-neo-black hover:brightness-95">
-              {t('common.cancel') || 'Cancel'}
-            </AlertDialogCancel>
-            <AlertDialogAction
-              onClick={handleConfirmQuit}
-              className="flex-1 bg-neo-red border-2 border-neo-black rounded-neo font-bold text-neo-cream hover:brightness-110"
-            >
-              {t('daily.imSure') || "I'm Sure"}
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      <ConfirmationDialog
+        open={showQuitConfirm}
+        onOpenChange={setShowQuitConfirm}
+        title={t('daily.quitConfirmTitle') || 'Quit Challenge?'}
+        description={t('daily.quitConfirm') || 'If you quit, this will count as your attempt for today. You won\'t be able to try again until tomorrow.'}
+        confirmText={t('daily.imSure') || "I'm Sure"}
+        cancelText={t('common.cancel') || 'Cancel'}
+        onConfirm={handleConfirmQuit}
+        variant="danger"
+      />
     </motion.div>
   );
 };

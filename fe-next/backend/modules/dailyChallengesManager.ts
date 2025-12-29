@@ -174,7 +174,7 @@ export async function generateDailyChallenges(playerId: string): Promise<DailyCh
   // Check if challenges already exist for today
   const { data: existing } = await supabase
     .from('daily_challenges')
-    .select('*')
+    .select('id, player_id, challenge_date, challenge_type, challenge_tier, title, description, target_value, current_value, xp_reward, bonus_reward, completed, completed_at, claimed, claimed_at, created_at')
     .eq('player_id', playerId)
     .eq('challenge_date', today);
 
@@ -237,7 +237,7 @@ export async function updateChallengeProgress(playerId: string, gameStats: GameS
   // Get today's challenges
   const { data: challenges } = await supabase
     .from('daily_challenges')
-    .select('*')
+    .select('id, player_id, challenge_date, challenge_type, challenge_tier, title, description, target_value, current_value, xp_reward, bonus_reward, completed, completed_at, claimed, claimed_at, created_at')
     .eq('player_id', playerId)
     .eq('challenge_date', today)
     .eq('completed', false);
@@ -346,7 +346,7 @@ export async function claimChallengeReward(playerId: string, challengeId: string
   // Get the challenge
   const { data: challenge, error: fetchError } = await supabase
     .from('daily_challenges')
-    .select('*')
+    .select('id, player_id, challenge_type, challenge_tier, xp_reward, bonus_reward, completed, claimed')
     .eq('id', challengeId)
     .eq('player_id', playerId)
     .single();
@@ -417,7 +417,7 @@ export async function getTodaysChallenges(playerId: string): Promise<DailyChalle
 
   const { data } = await supabase
     .from('daily_challenges')
-    .select('*')
+    .select('id, player_id, challenge_date, challenge_type, challenge_tier, title, description, target_value, current_value, xp_reward, bonus_reward, completed, completed_at, claimed, claimed_at, created_at')
     .eq('player_id', playerId)
     .eq('challenge_date', today)
     .order('challenge_tier', { ascending: true });

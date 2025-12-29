@@ -1304,12 +1304,26 @@ const sv = {
         "example2": "2 bokstäver - för kort!",
         "gotIt": "Jag förstår!"
       },
+      "letterFeedback": {
+        "title": "Bokstavsfeedback",
+        "description": "När du gissar målordet visar varje bokstav hur nära du är:",
+        "green": "Grön",
+        "greenDesc": "Rätt bokstav på rätt plats",
+        "yellow": "Gul",
+        "yellowDesc": "Bokstaven finns men på fel plats",
+        "gray": "Grå",
+        "grayDesc": "Bokstaven finns inte i målordet",
+        "example": "Exempel: Målet är \"BEACH\"",
+        "exampleDesc": "\"E\" är korrekt, \"A\" finns i ordet men fel plats",
+        "gotIt": "Jag förstår!"
+      },
       "complete": {
         "title": "Du är redo!",
         "remember": "Kom ihåg:",
         "rule1": "10 försök att hitta målordet",
         "rule2": "Hitta andra ord för liv",
         "rule3": "Minimum 3 bokstäver",
+        "ruleColors": "🟩 = rätt, 🟨 = fel plats, ⬜ = inte i ordet",
         "rule4": "Samma pussel världen över",
         "start": "Starta daglig utmaning"
       }
@@ -2223,10 +2237,15 @@ const sv = {
       "tooShort": "📏 Minst 3 bokstäver",
       "duplicate": "🔁 Redan hittat!",
       "notOnBoard": "⚠️ Kan inte bilda detta på brädet",
+      "notOnBoardPenalty": "⚠️ Inte på brädet -5 ❤️",
+      "notFormablePenalty": "⚠️ Inte på brädet -5 ❤️",
       "invalidWord": "❌ Inte ett giltigt ord",
       "validWord": "✓ Ord hittades!",
       "targetAttempt": "🎯 Fortsätt!",
-      "targetFound": "🎉 DU HITTADE DET!"
+      "targetFound": "🎉 DU HITTADE DET!",
+      "correct": "Korrekt",
+      "wrongPlace": "Fel plats",
+      "notInWord": "Inte i ordet"
     },
     "stats": {
       "title": "Statistik",
@@ -2309,7 +2328,16 @@ const sv = {
       "attempts": "försök",
       "beatTheirScore": "Kan du slå deras poäng?",
       "tryAnotherLanguage": "Prova ett annat språk",
-      "playDifferentLanguage": "Spela dagens pussel på ett annat språk"
+      "playDifferentLanguage": "Spela dagens pussel på ett annat språk",
+      "theTargetWordWas": "Målordet var:",
+      "revealTargetWord": "Avslöja målord",
+      "yourCoins": "Dina mynt:",
+      "notEnoughCoins": "inte tillräckligt med mynt"
+    },
+    "shareCTA": {
+      "canYouSolve": "Kan du lösa det?",
+      "beatAttempts": "Slå {count} försök?",
+      "dayStreak": "{count} dagars streak!"
     },
     "streak": {
       "milestoneTitle": "Seriemilstolpe!",
@@ -2381,6 +2409,13 @@ const sv = {
     "efficiency": "Effektivitet",
     "streak": "Svit",
     "usedForReveals": "Använd mynt för att avslöja ord i enspelarspel!"
+  },
+  "coins": {
+    "score": "Poäng",
+    "placement": "Placering",
+    "earned": "Mynt intjänade",
+    "winBonus": "Vinnarbonus",
+    "topThreeBonus": "Topp 3 bonus"
   }
 };
 

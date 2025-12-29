@@ -20,7 +20,17 @@ export const COIN_EARNING = {
 
 // Coin cost constants
 export const COIN_COSTS = {
-  REVEAL_5_PLUS: 15,        // Cost to reveal a 5+ letter word
+  REVEAL_5_PLUS: 60,        // Cost to reveal a 5+ letter word (balances with daily earnings)
+  REVEAL_TARGET_WORD: 250,  // Cost to reveal the target word in daily challenge when failed
+} as const;
+
+// Coin earning constants for other game modes
+export const COIN_EARNING_OTHER = {
+  SCORE_DIVISOR: 10,        // Coins = score / this value
+  WIN_BONUS: 25,            // Bonus for 1st place
+  TOP_3_BONUS: 10,          // Bonus for 2nd-3rd place
+  MULTIPLAYER_BASE: 15,     // Base coins for multiplayer participation
+  SINGLEPLAYER_BASE: 10,    // Base coins for single player completion
 } as const;
 
 // Free reveals per game
@@ -255,4 +265,81 @@ export function getCoinHistory(): CoinTransaction[] {
     logger.error('Error reading coin history:', error);
     return [];
   }
+}
+
+/**
+ * Calculate coins earned from a game (single player or multiplayer)
+ */
+export function calculateGameReward(
+  score: number,
+  mode: 'singleplayer' | 'multiplayer',
+  rank?: number,
+  totalPlayers?: number
+): { total: number; breakdown: { base: number; scoreBonus: number; placement: number } } {
+  // Base coins for completing the game
+  const base = mode === 'multiplayer'
+    ? COIN_EARNING_OTHER.MULTIPLAYER_BASE
+    : COIN_EARNING_OTHER.SINGLEPLAYER_BASE;
+
+  // Score-based bonus
+  const scoreBonus = Math.floor(score / COIN_EARNING_OTHER.SCORE_DIVISOR);
+
+  // Placement bonus (only for competitive modes with rankings)
+  let placement = 0;
+  if (rank !== undefined && totalPlayers !== undefined && totalPlayers > 1) {
+    if (rank === 1) {
+      placement = COIN_EARNING_OTHER.WIN_BONUS;
+    } else if (rank <= 3) {
+      placement = COIN_EARNING_OTHER.TOP_3_BONUS;
+    }
+  }
+
+  return {
+    total: base + scoreBonus + placement,
+    breakdown: { base, scoreBonus, placement }
+  };
+}
+
+/**
+ * Award coins for game completion (single player or multiplayer)
+ * Returns null if already awarded for this session, or the reward if successful
+ */
+export function awardGameCoins(
+  sessionId: string,
+  mode: 'singleplayer' | 'multiplayer',
+  score: number,
+  rank?: number,
+  totalPlayers?: number
+): { awarded: number; breakdown: { base: number; scoreBonus: number; placement: number } } | null {
+  if (typeof window === 'undefined') return null;
+
+  // Check if already awarded for this session
+  const awardKey = `lexiclash_game_coin_award_${sessionId}`;
+  if (localStorage.getItem(awardKey)) {
+    return null; // Already awarded
+  }
+
+  const reward = calculateGameReward(score, mode, rank, totalPlayers);
+
+  // Don't award if reward is 0
+  if (reward.total <= 0) {
+    return null;
+  }
+
+  // Add coins with appropriate reason
+  const reason = mode === 'multiplayer' ? 'Multiplayer Game' : 'Single Player Game';
+  addCoins(reward.total, reason, {
+    sessionId,
+    score,
+    rank: rank ?? 0,
+    totalPlayers: totalPlayers ?? 1,
+  });
+
+  // Mark as awarded
+  localStorage.setItem(awardKey, new Date().toISOString());
+
+  return {
+    awarded: reward.total,
+    breakdown: reward.breakdown,
+  };
 }

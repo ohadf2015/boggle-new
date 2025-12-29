@@ -1814,12 +1814,26 @@ const es = {
         "example2": "2 letras - ¡muy corto!",
         "gotIt": "¡Entendido!"
       },
+      "letterFeedback": {
+        "title": "Retroalimentación de Letras",
+        "description": "Cuando adivinas la palabra objetivo, cada letra muestra qué tan cerca estás:",
+        "green": "Verde",
+        "greenDesc": "Letra correcta en la posición correcta",
+        "yellow": "Amarillo",
+        "yellowDesc": "La letra existe pero en posición incorrecta",
+        "gray": "Gris",
+        "grayDesc": "La letra no está en la palabra objetivo",
+        "example": "Ejemplo: El objetivo es \"BEACH\"",
+        "exampleDesc": "\"E\" es correcta, \"A\" está en la palabra pero en lugar incorrecto",
+        "gotIt": "¡Entendido!"
+      },
       "complete": {
         "title": "¡Estás listo!",
         "remember": "Recuerda:",
         "rule1": "10 intentos para encontrar el objetivo",
         "rule2": "Encuentra otras palabras para vida",
         "rule3": "Mínimo 3 letras",
+        "ruleColors": "🟩 = correcto, 🟨 = lugar incorrecto, ⬜ = no en palabra",
         "rule4": "Mismo puzzle en todo el mundo",
         "start": "Comenzar Desafío Diario"
       }
@@ -2220,10 +2234,15 @@ const es = {
       "tooShort": "📏 Mínimo 3 letras",
       "duplicate": "🔁 ¡Ya encontrada!",
       "notOnBoard": "⚠️ No se puede formar en el tablero",
+      "notOnBoardPenalty": "⚠️ No en el tablero -5 ❤️",
+      "notFormablePenalty": "⚠️ No en el tablero -5 ❤️",
       "invalidWord": "❌ No es una palabra válida",
       "validWord": "✓ ¡Palabra encontrada!",
       "targetAttempt": "🎯 ¡Sigue intentando!",
-      "targetFound": "🎉 ¡LA ENCONTRASTE!"
+      "targetFound": "🎉 ¡LA ENCONTRASTE!",
+      "correct": "Correcto",
+      "wrongPlace": "Lugar incorrecto",
+      "notInWord": "No en palabra"
     },
     "stats": {
       "title": "Estadísticas",
@@ -2306,7 +2325,16 @@ const es = {
       "attempts": "intentos",
       "beatTheirScore": "¿Puedes superar su puntuación?",
       "tryAnotherLanguage": "Prueba otro idioma",
-      "playDifferentLanguage": "Juega el rompecabezas de hoy en otro idioma"
+      "playDifferentLanguage": "Juega el rompecabezas de hoy en otro idioma",
+      "theTargetWordWas": "La palabra objetivo era:",
+      "revealTargetWord": "Revelar palabra objetivo",
+      "yourCoins": "Tus monedas:",
+      "notEnoughCoins": "no tienes suficientes monedas"
+    },
+    "shareCTA": {
+      "canYouSolve": "¿Puedes resolverlo?",
+      "beatAttempts": "¿Superar {count} intentos?",
+      "dayStreak": "¡{count} días de racha!"
     },
     "streak": {
       "milestoneTitle": "¡Hito de racha!",
@@ -2378,6 +2406,13 @@ const es = {
     "efficiency": "Eficiencia",
     "streak": "Racha",
     "usedForReveals": "¡Usa monedas para revelar palabras en juegos de un jugador!"
+  },
+  "coins": {
+    "score": "Puntuación",
+    "placement": "Posición",
+    "earned": "Monedas ganadas",
+    "winBonus": "Bono por victoria",
+    "topThreeBonus": "Bono por top 3"
   }
 };
 

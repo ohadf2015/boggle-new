@@ -1,5 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, memo } from 'react';
 import { motion } from 'framer-motion';
+import { useDevicePerformance } from '../hooks/useDevicePerformance';
 
 interface Particle {
     id: number;
@@ -12,13 +13,28 @@ interface Particle {
     height: number;
 }
 
-const Particles: React.FC = () => {
+/**
+ * Particles - Decorative background particles
+ *
+ * PERFORMANCE: Disabled on low-end devices and when reduced motion is preferred.
+ * Uses device performance hook to adapt particle count.
+ */
+const Particles: React.FC = memo(() => {
     const [particles, setParticles] = useState<Particle[]>([]);
+    const { enableComplexAnimations, maxParticles, prefersReducedMotion } = useDevicePerformance();
 
     useEffect(() => {
+        // Skip particles entirely on low-end devices or reduced motion preference
+        if (!enableComplexAnimations || prefersReducedMotion || maxParticles === 0) {
+            setParticles([]);
+            return;
+        }
+
         // Defer state update to avoid synchronous setState
         Promise.resolve().then(() => {
-            const newParticles: Particle[] = [...Array(20)].map((_, i) => ({
+            // Use adaptive particle count based on device capability
+            const particleCount = Math.min(maxParticles, 20);
+            const newParticles: Particle[] = [...Array(particleCount)].map((_, i) => ({
                 id: i,
                 initialX: Math.random() * window.innerWidth,
                 initialY: Math.random() * window.innerHeight,
@@ -30,7 +46,7 @@ const Particles: React.FC = () => {
             }));
             setParticles(newParticles);
         });
-    }, []);
+    }, [enableComplexAnimations, maxParticles, prefersReducedMotion]);
 
     if (particles.length === 0) return null;
 
@@ -61,6 +77,8 @@ const Particles: React.FC = () => {
             ))}
         </>
     );
-};
+});
+
+Particles.displayName = 'Particles';
 
 export default Particles;

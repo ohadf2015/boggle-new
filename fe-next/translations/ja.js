@@ -1303,12 +1303,26 @@ const ja = {
         "example2": "2文字 - 短すぎます！",
         "gotIt": "わかりました！"
       },
+      "letterFeedback": {
+        "title": "文字フィードバック",
+        "description": "目標の単語を推測すると、各文字がどれだけ近いかを示します：",
+        "green": "緑",
+        "greenDesc": "正しい位置の正しい文字",
+        "yellow": "黄色",
+        "yellowDesc": "文字は存在しますが位置が違います",
+        "gray": "灰色",
+        "grayDesc": "文字は目標の単語にありません",
+        "example": "例：目標は「BEACH」",
+        "exampleDesc": "「E」は正解、「A」は単語内にあるが位置が違う",
+        "gotIt": "わかりました！"
+      },
       "complete": {
         "title": "準備完了！",
         "remember": "覚えておいて：",
         "rule1": "目標を見つけるための10回の試行",
         "rule2": "ライフのために他の単語を見つける",
         "rule3": "最低3文字",
+        "ruleColors": "🟩 = 正解、🟨 = 位置違い、⬜ = 単語にない",
         "rule4": "世界中で同じパズル",
         "start": "デイリーチャレンジを開始"
       }
@@ -2222,10 +2236,15 @@ const ja = {
       "tooShort": "📏 最低3文字必要",
       "duplicate": "🔁 既に見つかりました！",
       "notOnBoard": "⚠️ ボード上でこれを作成できません",
+      "notOnBoardPenalty": "⚠️ ボードにない -5 ❤️",
+      "notFormablePenalty": "⚠️ ボードにない -5 ❤️",
       "invalidWord": "❌ 有効な単語ではありません",
       "validWord": "✓ 単語が見つかりました！",
       "targetAttempt": "🎯 頑張って！",
-      "targetFound": "🎉 見つけました！"
+      "targetFound": "🎉 見つけました！",
+      "correct": "正解",
+      "wrongPlace": "位置違い",
+      "notInWord": "単語にない"
     },
     "stats": {
       "title": "統計",
@@ -2308,7 +2327,16 @@ const ja = {
       "attempts": "試行",
       "beatTheirScore": "相手のスコアを超えられますか？",
       "tryAnotherLanguage": "他の言語で挑戦",
-      "playDifferentLanguage": "今日のパズルを別の言語でプレイ"
+      "playDifferentLanguage": "今日のパズルを別の言語でプレイ",
+      "theTargetWordWas": "正解の単語は:",
+      "revealTargetWord": "正解を表示",
+      "yourCoins": "あなたのコイン:",
+      "notEnoughCoins": "コインが足りません"
+    },
+    "shareCTA": {
+      "canYouSolve": "解けますか？",
+      "beatAttempts": "{count}回で勝てる？",
+      "dayStreak": "{count}日連続！"
     },
     "streak": {
       "milestoneTitle": "連続記録達成！",
@@ -2380,6 +2408,13 @@ const ja = {
     "efficiency": "効率",
     "streak": "連続",
     "usedForReveals": "コインを使ってシングルプレイヤーゲームで単語を表示しましょう！"
+  },
+  "coins": {
+    "score": "スコア",
+    "placement": "順位",
+    "earned": "獲得コイン",
+    "winBonus": "勝利ボーナス",
+    "topThreeBonus": "トップ3ボーナス"
   }
 };
 

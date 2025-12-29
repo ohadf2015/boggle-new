@@ -1310,12 +1310,26 @@ const en = {
         "example2": "2 letters - too short!",
         "gotIt": "Got it!"
       },
+      "letterFeedback": {
+        "title": "Letter Feedback",
+        "description": "When you guess the target word, each letter shows you how close you are:",
+        "green": "Green",
+        "greenDesc": "Correct letter in the correct position",
+        "yellow": "Yellow",
+        "yellowDesc": "Letter exists but in wrong position",
+        "gray": "Gray",
+        "grayDesc": "Letter is not in the target word",
+        "example": "Example: Target is \"BEACH\"",
+        "exampleDesc": "\"E\" is correct, \"A\" is in the word but wrong spot",
+        "gotIt": "Got it!"
+      },
       "complete": {
         "title": "You're ready!",
         "remember": "Remember:",
         "rule1": "10 attempts to find target",
         "rule2": "Find other words for life",
         "rule3": "3+ letters minimum",
+        "ruleColors": "🟩 = right, 🟨 = wrong place, ⬜ = not in word",
         "rule4": "Same puzzle worldwide",
         "start": "Start Daily Challenge"
       }
@@ -2229,10 +2243,15 @@ const en = {
       "tooShort": "📏 Minimum 3 letters",
       "duplicate": "🔁 Already found!",
       "notOnBoard": "⚠️ Can't form this on the board",
+      "notOnBoardPenalty": "⚠️ Not on board -5 ❤️",
+      "notFormablePenalty": "⚠️ Not on board -5 ❤️",
       "invalidWord": "❌ Not a valid word",
       "validWord": "✓ Word found!",
       "targetAttempt": "🎯 Keep going!",
-      "targetFound": "🎉 YOU FOUND IT!"
+      "targetFound": "🎉 YOU FOUND IT!",
+      "correct": "Correct",
+      "wrongPlace": "Wrong place",
+      "notInWord": "Not in word"
     },
     "stats": {
       "title": "Statistics",
@@ -2315,7 +2334,16 @@ const en = {
       "attempts": "attempts",
       "beatTheirScore": "Can you beat their score?",
       "tryAnotherLanguage": "Try Another Language",
-      "playDifferentLanguage": "Play today's puzzle in a different language"
+      "playDifferentLanguage": "Play today's puzzle in a different language",
+      "theTargetWordWas": "The target word was:",
+      "revealTargetWord": "Reveal Target Word",
+      "yourCoins": "Your coins:",
+      "notEnoughCoins": "not enough coins"
+    },
+    "shareCTA": {
+      "canYouSolve": "Can you solve it?",
+      "beatAttempts": "Beat {count} attempts?",
+      "dayStreak": "{count} day streak!"
     },
     "streak": {
       "milestoneTitle": "Streak Milestone!",
@@ -2387,6 +2415,13 @@ const en = {
     "efficiency": "Efficiency",
     "streak": "Streak",
     "usedForReveals": "Use coins to reveal words in single player games!"
+  },
+  "coins": {
+    "score": "Score",
+    "placement": "Placement",
+    "earned": "Coins Earned",
+    "winBonus": "Win Bonus",
+    "topThreeBonus": "Top 3 Bonus"
   }
 };
 

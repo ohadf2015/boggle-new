@@ -8,7 +8,7 @@ import ExitRoomButton from '@/components/ExitRoomButton';
 import confetti from 'canvas-confetti';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
+import { ConfirmationDialog } from '@/components/ui/ConfirmationDialog';
 import { clearSessionPreservingUsername } from '@/utils/session';
 import { shouldShowUpgradePrompt, getGuestStatsSummary, updateGuestStatsAfterGame, isFirstWin } from '@/utils/guestManager';
 import { useWinStreak } from '@/hooks/useWinStreak';
@@ -696,20 +696,16 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
         </div>
 
         {/* Exit Confirmation Dialog */}
-        <AlertDialog open={showExitConfirm} onOpenChange={setShowExitConfirm}>
-          <AlertDialogContent className="bg-white text-neo-black dark:bg-slate-800 dark:text-white border-red-500/30">
-            <AlertDialogHeader>
-              <AlertDialogTitle>{t('playerView.exitConfirmation')}</AlertDialogTitle>
-              <AlertDialogDescription>{t('results.exitWarning')}</AlertDialogDescription>
-            </AlertDialogHeader>
-            <AlertDialogFooter>
-              <AlertDialogCancel>{t('common.cancel')}</AlertDialogCancel>
-              <AlertDialogAction onClick={confirmExitRoom} className="bg-red-500 hover:bg-red-600">
-                {t('common.confirm')}
-              </AlertDialogAction>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialog>
+        <ConfirmationDialog
+          open={showExitConfirm}
+          onOpenChange={setShowExitConfirm}
+          title={t('playerView.exitConfirmation')}
+          description={t('results.exitWarning')}
+          confirmText={t('common.confirm')}
+          cancelText={t('common.cancel')}
+          onConfirm={confirmExitRoom}
+          variant="default"
+        />
 
         {/* Word Feedback Modal */}
         <WordFeedbackModal
@@ -1102,29 +1098,16 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
       )}
 
       {/* Exit Confirmation Dialog */}
-      <AlertDialog open={showExitConfirm} onOpenChange={setShowExitConfirm}>
-        <AlertDialogContent className="bg-white text-neo-black dark:bg-slate-800 dark:text-white border-red-500/30">
-          <AlertDialogHeader>
-            <AlertDialogTitle className="text-slate-900 dark:text-white">
-              {t('playerView.exitConfirmation')}
-            </AlertDialogTitle>
-            <AlertDialogDescription className="text-slate-600 dark:text-gray-300">
-              {t('results.exitWarning')}
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel className="bg-slate-100 dark:bg-slate-700 text-slate-900 dark:text-white border-slate-300 dark:border-slate-600">
-              {t('common.cancel')}
-            </AlertDialogCancel>
-            <AlertDialogAction
-              onClick={confirmExitRoom}
-              className="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white"
-            >
-              {t('common.confirm')}
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      <ConfirmationDialog
+        open={showExitConfirm}
+        onOpenChange={setShowExitConfirm}
+        title={t('playerView.exitConfirmation')}
+        description={t('results.exitWarning')}
+        confirmText={t('common.confirm')}
+        cancelText={t('common.cancel')}
+        onConfirm={confirmExitRoom}
+        variant="default"
+      />
 
       {/* Sign Up Prompt for Guests (non-winners) */}
       <AuthModal

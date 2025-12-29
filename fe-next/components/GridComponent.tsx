@@ -14,6 +14,7 @@ import {
   type PerformanceMode,
 } from './grid';
 import { useDisableFireRoundLights } from '@/contexts/AccessibilityContext';
+import { useDevicePerformance } from '../hooks/useDevicePerformance';
 
 /** Cell position for highlighted paths */
 export interface HighlightedCell {
@@ -76,6 +77,11 @@ const GridComponent = memo<GridComponentProps>(({
 
   // Accessibility setting to disable fire round lights
   const disableFireRoundLights = useDisableFireRoundLights();
+
+  // PERFORMANCE: Device capability detection for adaptive rendering
+  const { isLowEnd, enableComplexAnimations, prefersReducedMotion } = useDevicePerformance();
+  // Disable fire round lights on low-end devices or when reduced motion is preferred
+  const shouldDisableFireRoundLights = disableFireRoundLights || isLowEnd || !enableComplexAnimations || prefersReducedMotion;
 
   // Use extracted interaction hook
   const {
@@ -190,9 +196,9 @@ const GridComponent = memo<GridComponentProps>(({
   ];
 
   // Randomize glowing cells when fire round is active (optimized for performance)
-  // Skip if user has disabled fire round lights in accessibility settings
+  // PERFORMANCE: Skip on low-end devices, reduced motion, or user accessibility setting
   useEffect(() => {
-    if (!fireRoundActive || disableFireRoundLights) {
+    if (!fireRoundActive || shouldDisableFireRoundLights) {
       setGlowingCells(new Set());
       setCellColorIndices(new Map());
       return;
@@ -273,7 +279,7 @@ const GridComponent = memo<GridComponentProps>(({
         cancelAnimationFrame(animationFrameId);
       }
     };
-  }, [fireRoundActive, disableFireRoundLights, grid]);
+  }, [fireRoundActive, shouldDisableFireRoundLights, grid]);
 
   // Auto-focus on grid when game becomes interactive
   useEffect(() => {

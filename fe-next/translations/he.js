@@ -1305,12 +1305,26 @@ const he = {
         "example2": "2 אותיות - קצר מדי!",
         "gotIt": "הבנתי!"
       },
+      "letterFeedback": {
+        "title": "משוב אותיות",
+        "description": "כשאתם מנחשים את מילת היעד, כל אות מראה כמה קרובים אתם:",
+        "green": "ירוק",
+        "greenDesc": "אות נכונה במיקום הנכון",
+        "yellow": "צהוב",
+        "yellowDesc": "האות קיימת אבל במיקום לא נכון",
+        "gray": "אפור",
+        "grayDesc": "האות לא נמצאת במילת היעד",
+        "example": "דוגמה: היעד הוא \"BEACH\"",
+        "exampleDesc": "\"E\" נכון, \"A\" במילה אבל במקום לא נכון",
+        "gotIt": "הבנתי!"
+      },
       "complete": {
         "title": "אתם מוכנים!",
         "remember": "זכרו:",
         "rule1": "10 ניסיונות למצוא את המילה",
         "rule2": "מצאו מילים אחרות לחיים",
         "rule3": "מינימום 3 אותיות",
+        "ruleColors": "🟩 = נכון, 🟨 = מקום לא נכון, ⬜ = לא במילה",
         "rule4": "אותו חידה בכל העולם",
         "start": "התחילו את האתגר היומי"
       }
@@ -2224,10 +2238,15 @@ const he = {
       "tooShort": "📏 לפחות 3 אותיות",
       "duplicate": "🔁 כבר נמצאה!",
       "notOnBoard": "⚠️ לא ניתן לבנות את זה על הלוח",
+      "notOnBoardPenalty": "⚠️ לא על הלוח -5 ❤️",
+      "notFormablePenalty": "⚠️ לא על הלוח -5 ❤️",
       "invalidWord": "❌ מילה לא תקינה",
       "validWord": "✓ מילה נמצאה!",
       "targetAttempt": "🎯 המשיכו!",
-      "targetFound": "🎉 מצאתם את המילה!"
+      "targetFound": "🎉 מצאתם את המילה!",
+      "correct": "נכון",
+      "wrongPlace": "מקום לא נכון",
+      "notInWord": "לא במילה"
     },
     "stats": {
       "title": "סטטיסטיקה",
@@ -2310,7 +2329,16 @@ const he = {
       "attempts": "ניסיונות",
       "beatTheirScore": "האם תוכלו לנצח אותם?",
       "tryAnotherLanguage": "נסו שפה אחרת",
-      "playDifferentLanguage": "שחקו את הפאזל היומי בשפה אחרת"
+      "playDifferentLanguage": "שחקו את הפאזל היומי בשפה אחרת",
+      "theTargetWordWas": "מילת היעד הייתה:",
+      "revealTargetWord": "חשוף מילת יעד",
+      "yourCoins": "המטבעות שלך:",
+      "notEnoughCoins": "אין מספיק מטבעות"
+    },
+    "shareCTA": {
+      "canYouSolve": "תצליחו לפתור?",
+      "beatAttempts": "תנצחו {count} ניסיונות?",
+      "dayStreak": "רצף של {count} ימים!"
     },
     "streak": {
       "milestoneTitle": "אבן דרך!",
@@ -2382,6 +2410,13 @@ const he = {
     "efficiency": "יעילות",
     "streak": "רצף",
     "usedForReveals": "השתמשו במטבעות כדי לחשוף מילים במשחקי יחיד!"
+  },
+  "coins": {
+    "score": "ניקוד",
+    "placement": "מיקום",
+    "earned": "מטבעות שנצברו",
+    "winBonus": "בונוס ניצחון",
+    "topThreeBonus": "בונוס טופ 3"
   }
 };
 

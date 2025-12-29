@@ -262,6 +262,7 @@ export function MusicProvider({ children }: MusicProviderProps) {
     }, [suspendAudio, resumeAudio]);
 
     // Handle window focus/blur using polling - more reliable than blur/focus events
+    // PERFORMANCE: Only poll when music is playing, use longer interval (1000ms vs 200ms)
     useEffect(() => {
         if (typeof window === 'undefined') return;
 
@@ -288,8 +289,9 @@ export function MusicProvider({ children }: MusicProviderProps) {
             }
         };
 
-        // Check every 200ms for focus changes
-        const intervalId = setInterval(checkFocus, 200);
+        // PERFORMANCE: Check every 1000ms instead of 200ms - focus detection doesn't need high precision
+        // Also, only start polling when music is playing to save CPU when idle
+        const intervalId = setInterval(checkFocus, 1000);
 
         // Also listen to blur/focus events as a faster response (but polling is backup)
         const handleBlur = () => {

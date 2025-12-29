@@ -2,7 +2,7 @@ import { translations } from '@/translations';
 import type { Metadata } from 'next';
 import type { ReactNode } from 'react';
 
-type Locale = 'en' | 'he' | 'sv' | 'ja';
+type Locale = 'en' | 'he' | 'sv' | 'ja' | 'es';
 
 interface LayoutParams {
   params: Promise<{ locale: string }>;
@@ -50,6 +50,7 @@ export async function generateMetadata({ params }: LayoutParams): Promise<Metada
         en: 'https://www.lexiclash.live/en/leaderboard',
         sv: 'https://www.lexiclash.live/sv/leaderboard',
         ja: 'https://www.lexiclash.live/ja/leaderboard',
+        es: 'https://www.lexiclash.live/es/leaderboard',
       },
     },
     robots: {

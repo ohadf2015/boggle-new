@@ -2,7 +2,7 @@ import { translations } from '@/translations';
 import type { Metadata } from 'next';
 import type { ReactNode } from 'react';
 
-type Locale = 'en' | 'he' | 'sv' | 'ja';
+type Locale = 'en' | 'he' | 'sv' | 'ja' | 'es';
 
 interface LayoutParams {
   params: Promise<{ locale: string }>;
@@ -52,6 +52,7 @@ export async function generateMetadata({ params }: LayoutParams): Promise<Metada
         en: 'https://www.lexiclash.live/en/daily',
         sv: 'https://www.lexiclash.live/sv/daily',
         ja: 'https://www.lexiclash.live/ja/daily',
+        es: 'https://www.lexiclash.live/es/daily',
       },
     },
     robots: {
@@ -146,7 +147,7 @@ export default async function DailyLayout({ children, params }: DailyLayoutProps
     },
     image: 'https://www.lexiclash.live/og-image-en.jpg',
     isAccessibleForFree: true,
-    inLanguage: ['en', 'he', 'sv', 'ja'],
+    inLanguage: ['en', 'he', 'sv', 'ja', 'es'],
   };
 
   return (
