@@ -38,7 +38,6 @@ import DailyChallengeSignupModal from '@/components/auth/DailyChallengeSignupMod
 import StreakMilestoneCelebration from './StreakMilestoneCelebration';
 import ConfettiRetrigger from '@/components/results/ConfettiRetrigger';
 import DailyLeaderboard from './DailyLeaderboard';
-import { feedbackToEmoji, type LetterFeedback } from '@/utils/wordHuntFeedback';
 import { useAuth } from '@/contexts/AuthContext';
 import { fetchGeolocation } from '@/contexts/auth/authUtils';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -514,9 +513,6 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
     ? profile.avatar_emoji || '🎯'
     : guestPlayer?.avatarEmoji || '🎯';
 
-  // Generate emoji grid from attempts for OG image (raw string, URLSearchParams handles encoding)
-  const emojiGridRaw = result.attempts.map(attempt => feedbackToEmoji(attempt.feedback)).join('|');
-
   // Build share URL with OG parameters for rich previews on WhatsApp/social
   // The wh value must be URL-encoded so & becomes %26 (otherwise they're parsed as separate params)
   const shareUrl = useMemo(() => {
@@ -524,17 +520,15 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
     const whParams = new URLSearchParams({
       solved: String(result.solved),
       attempts: String(result.attemptsUsed),
-      streak: String(result.streakDays || 0),
       puzzleNumber: String(puzzleNumber),
       displayName,
       avatarEmoji,
-      emojiGrid: emojiGridRaw,
     });
     // encodeURIComponent ensures the entire whParams string is the wh value
     // Without this: ?wh=solved=true&attempts=2 (attempts is a separate param!)
     // With this:    ?wh=solved%3Dtrue%26attempts%3D2 (all inside wh)
     return `${origin}/${language}/daily?wh=${encodeURIComponent(whParams.toString())}`;
-  }, [result.solved, result.attemptsUsed, result.streakDays, puzzleNumber, displayName, avatarEmoji, emojiGridRaw, language]);
+  }, [result.solved, result.attemptsUsed, puzzleNumber, displayName, avatarEmoji, language]);
 
   // Generate shareable text (use streak from result, which is now properly tracked)
   const shareText = generateWordHuntShareableResult({
