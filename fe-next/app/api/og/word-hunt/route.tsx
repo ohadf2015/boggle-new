@@ -5,158 +5,39 @@ export const runtime = 'edge';
 
 /**
  * Dynamic OG Image for Word Hunt Daily Challenge
- *
- * Generates a compelling, shareable image for Word Hunt results.
- * Uses neo-brutalist design with playful teasing messages.
- *
- * Query params:
- * - solved: 'true' or 'false'
- * - attempts: Number of attempts used (1-10)
- * - streak: Current streak days
- * - puzzleNumber: Daily puzzle number
- * - displayName: Player's display name
- * - avatarEmoji: Player's avatar emoji
- * - emojiGrid: Encoded emoji grid (optional)
- * - locale: Language code (en, he, sv, ja, es)
+ * Dark neo-brutalist style
  */
 
-// Neo-brutalist color palette (matching app style)
-const COLORS = {
-  yellow: '#FFE135',
-  orange: '#FF6B35',
-  pink: '#FF1493',
-  cyan: '#00D9FF',
-  lime: '#BFFF00',
-  red: '#FF3366',
-  green: '#10B981',
-  purple: '#6366F1',
-  navy: '#1a1a2e',
-  cream: '#FFFEF0',
-  black: '#000000',
-  white: '#FFFFFF',
+const CHALLENGE: Record<string, string> = {
+  en: 'Beat my score?',
+  he: 'תנצח אותי?',
+  sv: 'Slå mitt resultat?',
+  ja: '挑戦する？',
+  es: '¿Puedes superarlo?',
 };
 
-// Localized playful teasing messages based on performance
-const MESSAGES: Record<string, {
-  perfect: string;
-  great: string;
-  good: string;
-  close: string;
-  barely: string;
-  failed: string;
-  challenge: string;
-}> = {
-  en: {
-    perfect: 'Word Wizard!',
-    great: 'Crushed it!',
-    good: 'I survived!',
-    close: 'That was close!',
-    barely: 'Phew! Made it!',
-    failed: 'This one got me...',
-    challenge: 'Can you beat this?',
-  },
-  he: {
-    perfect: '!אלוף המילים',
-    great: '!מחצתי את זה',
-    good: '!שרדתי',
-    close: '!זה היה צמוד',
-    barely: '!פיו! הצלחתי',
-    failed: '...הפעם נכשלתי',
-    challenge: '?יכול/ה לעשות יותר טוב',
-  },
-  sv: {
-    perfect: 'Ordmästare!',
-    great: 'Krossade det!',
-    good: 'Jag överlevde!',
-    close: 'Det var nära!',
-    barely: 'Puh! Klarade det!',
-    failed: 'Den fick mig...',
-    challenge: 'Kan du slå mig?',
-  },
-  ja: {
-    perfect: '言葉の達人!',
-    great: '完璧!',
-    good: '生き残った!',
-    close: 'ギリギリ!',
-    barely: 'ふぅ!セーフ!',
-    failed: 'やられた...',
-    challenge: '君も挑戦してみる?',
-  },
-  es: {
-    perfect: '!Mago de palabras',
-    great: '!Lo aplasté',
-    good: '!Sobreviví',
-    close: '!Estuvo cerca',
-    barely: '!Uf! Lo logré',
-    failed: 'Esta me ganó...',
-    challenge: '?Puedes superarme',
-  },
-};
-
-// Get performance message based on attempts
-function getPerformanceMessage(solved: boolean, attempts: number, locale: string): string {
-  const msgs = MESSAGES[locale] || MESSAGES.en;
-
-  if (!solved) return msgs.failed;
-  if (attempts <= 2) return msgs.perfect;
-  if (attempts <= 4) return msgs.great;
-  if (attempts <= 6) return msgs.good;
-  if (attempts <= 8) return msgs.close;
-  return msgs.barely;
-}
-
-// Get background gradient based on performance
-function getBgGradient(solved: boolean, attempts: number): string {
-  if (!solved) return 'linear-gradient(135deg, #374151 0%, #1f2937 100%)'; // Gray for failed
-  if (attempts <= 2) return 'linear-gradient(135deg, #FFE135 0%, #FFA500 100%)'; // Gold for perfect
-  if (attempts <= 4) return 'linear-gradient(135deg, #10B981 0%, #059669 100%)'; // Green for great
-  if (attempts <= 6) return 'linear-gradient(135deg, #00D9FF 0%, #6366f1 100%)'; // Cyan-purple for good
-  if (attempts <= 8) return 'linear-gradient(135deg, #F59E0B 0%, #D97706 100%)'; // Amber for close
-  return 'linear-gradient(135deg, #EF4444 0%, #DC2626 100%)'; // Red for barely
-}
-
-// Get accent color based on performance
 function getAccentColor(solved: boolean, attempts: number): string {
-  if (!solved) return COLORS.red;
-  if (attempts <= 2) return COLORS.yellow;
-  if (attempts <= 4) return COLORS.green;
-  if (attempts <= 6) return COLORS.cyan;
-  if (attempts <= 8) return COLORS.orange;
-  return COLORS.pink;
-}
-
-// Decode emoji grid from URL parameter
-function decodeEmojiGrid(encoded: string | null): string[] {
-  if (!encoded) return [];
-  try {
-    return decodeURIComponent(encoded).split('|');
-  } catch {
-    return [];
-  }
+  if (!solved) return '#ef4444';
+  if (attempts <= 2) return '#fbbf24';
+  if (attempts <= 4) return '#22c55e';
+  if (attempts <= 6) return '#06b6d4';
+  if (attempts <= 8) return '#f97316';
+  return '#ec4899';
 }
 
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
 
-    // Extract query parameters
     const solved = searchParams.get('solved') === 'true';
     const attempts = parseInt(searchParams.get('attempts') || '0');
-    const streak = parseInt(searchParams.get('streak') || '0');
-    const puzzleNumber = parseInt(searchParams.get('puzzleNumber') || '0');
     const displayName = searchParams.get('displayName') || 'Player';
     const avatarEmoji = searchParams.get('avatarEmoji') || '🎯';
-    const emojiGrid = decodeEmojiGrid(searchParams.get('emojiGrid'));
     const locale = searchParams.get('locale') || 'en';
 
-    // Check if RTL language
     const isRTL = locale === 'he';
-
-    // Get messages for locale
-    const messages = MESSAGES[locale] || MESSAGES.en;
-    const performanceMsg = getPerformanceMessage(solved, attempts, locale);
-    const bgGradient = getBgGradient(solved, attempts);
-    const accentColor = getAccentColor(solved, attempts);
+    const challenge = CHALLENGE[locale] || CHALLENGE.en;
+    const accent = getAccentColor(solved, attempts);
 
     return new ImageResponse(
       (
@@ -168,243 +49,81 @@ export async function GET(request: NextRequest) {
             flexDirection: 'column',
             alignItems: 'center',
             justifyContent: 'center',
-            background: bgGradient,
-            fontFamily: 'system-ui, sans-serif',
-            position: 'relative',
+            background: '#0f0f14',
+            fontFamily: 'system-ui, -apple-system, sans-serif',
           }}
         >
-          {/* Header with logo */}
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '12px',
-              marginBottom: '16px',
-            }}
-          >
-            <div
-              style={{
-                fontSize: '36px',
-                fontWeight: 900,
-                color: '#000',
-                background: '#fff',
-                padding: '10px 20px',
-                borderRadius: '12px',
-                border: '4px solid #000',
-                boxShadow: '4px 4px 0px #000',
-              }}
-            >
-              🎯 LexiClash Word Hunt
-            </div>
-          </div>
-
-          {/* Puzzle Number */}
-          <div
-            style={{
-              fontSize: '24px',
-              fontWeight: 700,
-              color: '#000',
-              marginBottom: '20px',
-              opacity: 0.8,
-            }}
-          >
-            #{puzzleNumber}
-          </div>
-
-          {/* Main Card */}
+          {/* Main card */}
           <div
             style={{
               display: 'flex',
               flexDirection: 'column',
               alignItems: 'center',
-              background: '#fff',
-              padding: '32px 48px',
-              borderRadius: '24px',
-              border: '6px solid #000',
-              boxShadow: '10px 10px 0px #000',
-              marginBottom: '20px',
-              maxWidth: '800px',
+              background: '#1a1a24',
+              padding: '48px 80px',
+              border: `6px solid ${accent}`,
+              boxShadow: `12px 12px 0px ${accent}`,
             }}
           >
-            {/* Performance Title */}
+            {/* Brand */}
             <div
               style={{
                 display: 'flex',
                 alignItems: 'center',
-                marginBottom: '16px',
-                direction: isRTL ? 'rtl' : 'ltr',
+                marginBottom: '32px',
               }}
             >
-              <span
-                style={{
-                  fontSize: '40px',
-                  fontWeight: 900,
-                  color: accentColor,
-                  textShadow: '2px 2px 0px rgba(0,0,0,0.2)',
-                }}
-              >
-                {solved ? '✨' : '😅'} {performanceMsg} {solved ? '✨' : ''}
-              </span>
+              <span style={{ fontSize: '24px', fontWeight: 900, color: '#fff', letterSpacing: '2px' }}>LEXICLASH</span>
             </div>
 
-            {/* Player info */}
+            {/* Player */}
             <div
               style={{
                 display: 'flex',
                 alignItems: 'center',
-                gap: '12px',
-                marginBottom: '20px',
+                gap: '20px',
+                marginBottom: '32px',
               }}
             >
-              <span style={{ fontSize: '48px' }}>{avatarEmoji}</span>
-              <span
-                style={{
-                  fontSize: '32px',
-                  fontWeight: 800,
-                  color: '#000',
-                }}
-              >
-                {displayName}
-              </span>
+              <span style={{ fontSize: '56px' }}>{avatarEmoji}</span>
+              <span style={{ fontSize: '48px', fontWeight: 900, color: '#fff', letterSpacing: '-1px' }}>{displayName}</span>
             </div>
 
-            {/* Attempts Display */}
+            {/* Score */}
             <div
               style={{
                 display: 'flex',
                 alignItems: 'baseline',
-                marginBottom: '20px',
+                gap: '8px',
               }}
             >
               <span
                 style={{
-                  fontSize: '96px',
+                  fontSize: '180px',
                   fontWeight: 900,
-                  color: solved ? COLORS.green : COLORS.red,
+                  color: accent,
                   lineHeight: 1,
+                  letterSpacing: '-10px',
                 }}
               >
                 {solved ? attempts : 'X'}
               </span>
-              <span
-                style={{
-                  fontSize: '48px',
-                  fontWeight: 700,
-                  color: '#666',
-                  marginLeft: '8px',
-                }}
-              >
-                /10
-              </span>
+              <span style={{ fontSize: '72px', fontWeight: 900, color: '#4a4a5a', letterSpacing: '-2px' }}>/10</span>
             </div>
-
-            {/* Emoji Grid (if available) */}
-            {emojiGrid.length > 0 && (
-              <div
-                style={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'center',
-                  gap: '4px',
-                  marginBottom: '16px',
-                  padding: '12px 20px',
-                  background: '#f5f5f5',
-                  borderRadius: '12px',
-                  border: '3px solid #e5e5e5',
-                }}
-              >
-                {emojiGrid.slice(0, 6).map((row, i) => (
-                  <div
-                    key={i}
-                    style={{
-                      fontSize: '24px',
-                      letterSpacing: '2px',
-                      display: 'flex',
-                    }}
-                  >
-                    {row}
-                  </div>
-                ))}
-                {emojiGrid.length > 6 && (
-                  <div style={{ fontSize: '14px', color: '#999', marginTop: '4px' }}>
-                    +{emojiGrid.length - 6} more
-                  </div>
-                )}
-              </div>
-            )}
-
-            {/* Streak badge (if > 1) */}
-            {streak > 1 && (
-              <div
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '8px',
-                  background: 'linear-gradient(135deg, #FF6B35 0%, #FF1493 100%)',
-                  padding: '10px 24px',
-                  borderRadius: '50px',
-                  border: '3px solid #000',
-                  boxShadow: '4px 4px 0px #000',
-                  marginBottom: '16px',
-                }}
-              >
-                <span style={{ fontSize: '28px' }}>🔥</span>
-                <span
-                  style={{
-                    fontSize: '24px',
-                    fontWeight: 800,
-                    color: '#fff',
-                  }}
-                >
-                  {streak} {locale === 'he' ? 'ימים ברצף' : locale === 'sv' ? 'dagars streak' : locale === 'ja' ? '日連続' : locale === 'es' ? 'días seguidos' : 'Day Streak'}
-                </span>
-                <span style={{ fontSize: '28px' }}>🔥</span>
-              </div>
-            )}
           </div>
 
-          {/* Challenge CTA */}
+          {/* Bottom CTA */}
           <div
             style={{
               display: 'flex',
               alignItems: 'center',
-              background: COLORS.yellow,
-              padding: '14px 32px',
-              borderRadius: '12px',
-              border: '4px solid #000',
-              boxShadow: '6px 6px 0px #000',
+              marginTop: '32px',
+              padding: '16px 40px',
+              background: accent,
               direction: isRTL ? 'rtl' : 'ltr',
             }}
           >
-            <span
-              style={{
-                fontSize: '28px',
-                fontWeight: 900,
-                color: '#000',
-              }}
-            >
-              {messages.challenge} 👀
-            </span>
-          </div>
-
-          {/* URL watermark */}
-          <div
-            style={{
-              display: 'flex',
-              position: 'absolute',
-              bottom: '20px',
-              right: '30px',
-            }}
-          >
-            <span
-              style={{
-                fontSize: '18px',
-                fontWeight: 600,
-                color: 'rgba(0,0,0,0.5)',
-              }}
-            >
-              lexiclash.live
-            </span>
+            <span style={{ fontSize: '28px', fontWeight: 900, color: '#000', letterSpacing: '2px' }}>{challenge}</span>
           </div>
         </div>
       ),
