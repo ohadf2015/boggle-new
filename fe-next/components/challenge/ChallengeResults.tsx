@@ -10,6 +10,7 @@ import { useTheme } from '@/utils/ThemeContext';
 import { cn } from '@/lib/utils';
 import { getChallengeUrl, generateChallengeShareMessage, type ScoreChallenge } from '@/utils/challenges';
 import type { SinglePlayerResultsData } from '@/components/singleplayer/SinglePlayerView';
+import ConfettiRetrigger from '@/components/results/ConfettiRetrigger';
 
 interface ChallengeResultsProps {
   results: SinglePlayerResultsData;
@@ -132,6 +133,12 @@ const ChallengeResults: React.FC<ChallengeResultsProps> = ({
 
           {/* Result Header */}
           <div className="relative text-center mb-6">
+            {/* Confetti retrigger button for winners */}
+            {beatCreator && (
+              <div className="absolute top-0 end-0">
+                <ConfettiRetrigger variant="default" compact />
+              </div>
+            )}
             <motion.div
               initial={{ scale: 0, rotate: -180 }}
               animate={{ scale: 1, rotate: 0 }}

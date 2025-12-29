@@ -8,7 +8,9 @@ import AutoHideHeader from '@/components/AutoHideHeader';
 import DailyWordHuntSurvival from './DailyWordHuntSurvival';
 import DailyWordHuntResults from './DailyWordHuntResults';
 import DailyLeaderboard from './DailyLeaderboard';
+import GuestNameEditor from './GuestNameEditor';
 import { DailyChallengeTutorial } from './DailyChallengeTutorial';
+import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useMobileLandscape } from '@/hooks/useMobileLandscape';
 import {
@@ -22,6 +24,7 @@ import {
   saveWordHuntResult,
   getDailyStreak,
   parseChallengeParam,
+  clearWordHuntResultForRetry,
   type WordHuntResult,
   type StoredWordHuntResult,
 } from '@/utils/dailyChallenge';
@@ -46,6 +49,7 @@ interface ChallengeData {
 
 const DailyChallenge: React.FC = () => {
   const { t, language, setLanguage } = useLanguage();
+  const { isAuthenticated } = useAuth();
   const searchParams = useSearchParams();
 
   // Get current language flag
@@ -230,6 +234,21 @@ const DailyChallenge: React.FC = () => {
     window.location.href = `/${language}`;
   }, [language]);
 
+  // Handle retry challenge (paid with coins)
+  const handleRetryChallenge = useCallback(() => {
+    // Clear the stored result for today
+    const cleared = clearWordHuntResultForRetry(language as Language);
+    if (!cleared) {
+      console.error('Failed to clear Word Hunt result for retry');
+      return;
+    }
+
+    // Reset state for fresh start
+    setStoredResult(null);
+    setGameResult(null);
+    setPhase('ready');
+  }, [language]);
+
   // Hide header completely in landscape mode during gameplay (not just auto-hide)
   const showHeader = !(phase === 'playing' && isLandscape);
 
@@ -265,6 +284,7 @@ const DailyChallenge: React.FC = () => {
             language={language as Language}
             currentFlag={getCurrentFlag(language as Language)}
             challengeData={challengeData}
+            isAuthenticated={isAuthenticated}
             onLanguageChange={(lang) => setLanguage(lang)}
             onStart={handleStartGame}
             onBack={handleBack}
@@ -293,6 +313,7 @@ const DailyChallenge: React.FC = () => {
             countdown={countdown}
             isNewCompletion={phase === 'completed'}
             onBack={handleBack}
+            onRetry={handleRetryChallenge}
           />
         )}
       </AnimatePresence>
@@ -328,6 +349,7 @@ interface DailyReadyScreenProps {
   language: Language;
   currentFlag: string;
   challengeData: ChallengeData | null;
+  isAuthenticated: boolean;
   onLanguageChange: (lang: Language) => void;
   onStart: () => void;
   onBack: () => void;
@@ -342,6 +364,7 @@ const DailyReadyScreen: React.FC<DailyReadyScreenProps> = ({
   language,
   currentFlag,
   challengeData,
+  isAuthenticated,
   onLanguageChange,
   onStart,
   onBack,
@@ -509,6 +532,17 @@ const DailyReadyScreen: React.FC<DailyReadyScreenProps> = ({
             {formattedDate}
           </p>
         </motion.div>
+
+        {/* Guest Name Editor - Show for unauthenticated users */}
+        {!isAuthenticated && (
+          <motion.div
+            initial={{ y: 20, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 0.15 }}
+          >
+            <GuestNameEditor t={t} compact />
+          </motion.div>
+        )}
 
         {/* Simplified Game Info */}
         <motion.div

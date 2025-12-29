@@ -137,18 +137,18 @@ const LandingView: React.FC = () => {
       <Header />
 
       {/* Main content */}
-      <main className="max-w-6xl mx-auto px-2 xs:px-4 sm:px-6 py-2 sm:py-4 overflow-x-hidden">
+      <main className="max-w-6xl lg:max-w-7xl mx-auto px-2 xs:px-4 sm:px-6 lg:px-8 xl:px-12 py-2 sm:py-4 lg:py-8 xl:py-12 overflow-x-hidden">
         {/* Hero section - compact */}
         <motion.div
           initial={{ opacity: 0, y: 15 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3 }}
-          className="text-center mb-2 sm:mb-3"
+          className="text-center mb-2 sm:mb-3 lg:mb-6 xl:mb-8"
         >
-          <h1 className="text-xl sm:text-2xl md:text-3xl font-black uppercase tracking-tight text-neo-black dark:text-neo-white mb-0.5 sm:mb-1">
+          <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-black uppercase tracking-tight text-neo-black dark:text-neo-white mb-0.5 sm:mb-1 lg:mb-2">
             {t('landing.chooseMode') || 'Choose Your Mode'}
           </h1>
-          <p className="text-sm sm:text-base font-medium text-neo-black/80 dark:text-neo-white/85">
+          <p className="text-sm sm:text-base lg:text-lg xl:text-xl font-medium text-neo-black/80 dark:text-neo-white/85">
             {t('landing.subtitleSimple') || 'Practice solo or challenge friends'}
           </p>
         </motion.div>
@@ -158,7 +158,7 @@ const LandingView: React.FC = () => {
           initial={{ opacity: 0, y: 15 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3, delay: 0.05 }}
-          className="max-w-3xl mx-auto mb-2 sm:mb-3"
+          className="max-w-3xl lg:max-w-4xl xl:max-w-5xl mx-auto mb-2 sm:mb-3 lg:mb-6 xl:mb-8"
         >
           <DailyChallengeBanner />
         </motion.div>
@@ -168,7 +168,7 @@ const LandingView: React.FC = () => {
           initial={{ opacity: 0, y: 15 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3, delay: 0.1 }}
-          className="grid grid-cols-1 md:grid-cols-2 gap-2 sm:gap-3 max-w-3xl mx-auto"
+          className="grid grid-cols-1 md:grid-cols-2 gap-2 sm:gap-3 lg:gap-6 xl:gap-8 max-w-3xl lg:max-w-4xl xl:max-w-5xl mx-auto"
         >
           {/* Multiplayer Card */}
           <ModeCard
@@ -210,23 +210,23 @@ const LandingView: React.FC = () => {
           initial={{ opacity: 0, y: 15 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3, delay: 0.15 }}
-          className="flex justify-center mt-2 sm:mt-3"
+          className="flex justify-center mt-2 sm:mt-3 lg:mt-8 xl:mt-10"
         >
           <Link
             href={`/${language}/rules`}
             className="
-              inline-flex items-center gap-1.5 sm:gap-2
-              px-3 sm:px-4 py-1.5 sm:py-2
+              inline-flex items-center gap-1.5 sm:gap-2 lg:gap-3
+              px-3 sm:px-4 lg:px-6 xl:px-8 py-1.5 sm:py-2 lg:py-3 xl:py-4
               bg-neo-yellow text-neo-black
-              font-bold text-sm sm:text-base
-              border-2 border-neo-black
-              rounded-neo shadow-hard
+              font-bold text-sm sm:text-base lg:text-lg xl:text-xl
+              border-2 lg:border-3 border-neo-black
+              rounded-neo shadow-hard lg:shadow-hard-lg
               hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-hard-lg
               active:translate-x-[1px] active:translate-y-[1px] active:shadow-none
               transition-all duration-100
             "
           >
-            <CircleHelp className="w-4 h-4 sm:w-5 sm:h-5" />
+            <CircleHelp className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6 xl:w-7 xl:h-7" />
             {t('joinView.howToPlay') || 'How to Play?'}
           </Link>
         </motion.div>

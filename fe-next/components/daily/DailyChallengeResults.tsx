@@ -28,6 +28,7 @@ import {
   type GuestDailyPlayer,
 } from '@/utils/dailyChallenge';
 import DailyLeaderboard from './DailyLeaderboard';
+import ConfettiRetrigger from '@/components/results/ConfettiRetrigger';
 import { useAuth } from '@/contexts/AuthContext';
 import {
   generateShareImage,
@@ -70,7 +71,57 @@ const DailyChallengeResults: React.FC<DailyChallengeResultsProps> = ({
   const [shareImage, setShareImage] = useState<ShareImageResult | null>(null);
   const [isGeneratingImage, setIsGeneratingImage] = useState(false);
   const [showImagePreview, setShowImagePreview] = useState(false);
+  const [currentUserRank, setCurrentUserRank] = useState<number | null>(null);
+  const [showFullShareText, setShowFullShareText] = useState(false);
   const { profile, isAuthenticated } = useAuth();
+
+  // Confetti colors for each rank (matching Top3Leaderboard)
+  const RANK_CONFETTI_COLORS: Record<number, string[]> = {
+    1: ['#ffd700', '#ffed4a', '#f59e0b', '#fbbf24'], // Gold
+    2: ['#c0c0c0', '#94a3b8', '#e2e8f0', '#cbd5e1'], // Silver
+    3: ['#cd7f32', '#ea580c', '#f97316', '#fb923c'], // Bronze/Orange
+  };
+
+  // Fire confetti burst for a specific rank (top 3 celebration)
+  const fireRankConfetti = useCallback((rank: number): void => {
+    const count = Math.floor(100 * (1.2 - rank * 0.15)); // 1st = 100, 2nd = 85, 3rd = 70
+    const colors = RANK_CONFETTI_COLORS[rank] || RANK_CONFETTI_COLORS[1];
+
+    const defaults = {
+      origin: { y: 0.6 },
+      zIndex: 1000,
+      colors,
+    };
+
+    confetti({
+      ...defaults,
+      particleCount: Math.floor(count * 0.35),
+      spread: 26,
+      startVelocity: 55,
+    });
+    confetti({
+      ...defaults,
+      particleCount: Math.floor(count * 0.25),
+      spread: 60,
+    });
+    confetti({
+      ...defaults,
+      particleCount: Math.floor(count * 0.4),
+      spread: 100,
+      decay: 0.91,
+      scalar: 0.9,
+    });
+  }, []);
+
+  // Handle rank change from leaderboard and fire top 3 confetti
+  const handleCurrentUserRankChange = useCallback((rank: number | null) => {
+    setCurrentUserRank(rank);
+    // Fire rank-specific confetti for top 3 on new completion
+    if (isNewCompletion && rank !== null && rank <= 3) {
+      // Delay to let initial confetti finish
+      setTimeout(() => fireRankConfetti(rank), 2500);
+    }
+  }, [isNewCompletion, fireRankConfetti]);
 
   // Get guest fingerprint and player info on mount
   useEffect(() => {
@@ -299,20 +350,29 @@ const DailyChallengeResults: React.FC<DailyChallengeResultsProps> = ({
       </motion.div>
 
       {/* Main content */}
-      <div className="max-w-md w-full text-center space-y-6 py-8">
+      <div className="max-w-md w-full text-center space-y-4 py-6">
         {/* Completion badge */}
         <motion.div
           initial={{ scale: 0 }}
           animate={{ scale: 1 }}
           transition={{ type: 'spring', delay: 0.1 }}
+          className="flex items-center justify-center gap-3"
         >
           {isNewCompletion ? (
-            <div className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-neo-lime to-neo-cyan rounded-neo border-3 border-neo-black shadow-hard">
-              <Trophy className="w-5 h-5 text-neo-black" />
-              <span className="font-black text-neo-black uppercase">
-                {t('daily.completed')}
-              </span>
-            </div>
+            <>
+              <div className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-neo-lime to-neo-cyan rounded-neo border-3 border-neo-black shadow-hard">
+                <Trophy className="w-5 h-5 text-neo-black" />
+                <span className="font-black text-neo-black uppercase">
+                  {t('daily.completed')}
+                </span>
+              </div>
+              {/* Confetti retrigger button */}
+              <ConfettiRetrigger
+                variant={currentUserRank && currentUserRank <= 3 ? 'rank' : 'default'}
+                rank={currentUserRank || undefined}
+                compact
+              />
+            </>
           ) : (
             <div className="inline-flex items-center gap-2 px-4 py-2 bg-gray-200 dark:bg-gray-700 rounded-neo border-3 border-neo-black dark:border-gray-600">
               <Target className="w-5 h-5" />
@@ -363,49 +423,65 @@ const DailyChallengeResults: React.FC<DailyChallengeResultsProps> = ({
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.4 }}
-          className="grid grid-cols-3 gap-3"
+          className="grid grid-cols-3 gap-2"
         >
-          <div className="bg-white text-neo-black dark:bg-neo-navy-light dark:text-white rounded-neo border-3 border-neo-black dark:border-white/20 p-3 shadow-hard-sm">
-            <BookOpen className="w-5 h-5 mx-auto mb-1 text-cyan-600 dark:text-neo-cyan" />
-            <div className="text-xl font-black text-neo-black dark:text-white">
+          <div className="bg-white text-neo-black dark:bg-neo-navy-light dark:text-white rounded-neo border-2 border-neo-black dark:border-white/20 p-2 shadow-hard-sm">
+            <BookOpen className="w-4 h-4 mx-auto mb-0.5 text-cyan-600 dark:text-neo-cyan" />
+            <div className="text-lg font-black text-neo-black dark:text-white">
               {result.wordCount}
             </div>
-            <div className="text-xs text-gray-600 dark:text-gray-300">
+            <div className="text-[10px] text-gray-600 dark:text-gray-300">
               {t('common.words')}
             </div>
           </div>
 
-          <div className="bg-white text-neo-black dark:bg-neo-navy-light dark:text-white rounded-neo border-3 border-neo-black dark:border-white/20 p-3 shadow-hard-sm">
-            <Flame className="w-5 h-5 mx-auto mb-1 text-neo-orange" />
-            <div className="text-xl font-black text-neo-black dark:text-white">
+          <div className="bg-white text-neo-black dark:bg-neo-navy-light dark:text-white rounded-neo border-2 border-neo-black dark:border-white/20 p-2 shadow-hard-sm">
+            <Flame className="w-4 h-4 mx-auto mb-0.5 text-neo-orange" />
+            <div className="text-lg font-black text-neo-black dark:text-white">
               {streak?.currentStreak ?? 0}
             </div>
-            <div className="text-xs text-gray-600 dark:text-gray-300">
+            <div className="text-[10px] text-gray-600 dark:text-gray-300">
               {t('daily.streak')}
             </div>
           </div>
 
-          <div className="bg-white text-neo-black dark:bg-neo-navy-light dark:text-white rounded-neo border-3 border-neo-black dark:border-white/20 p-3 shadow-hard-sm">
-            <Clock className="w-5 h-5 mx-auto mb-1 text-neo-purple" />
-            <div className="text-xl font-black text-neo-black dark:text-white">
-              {Math.floor(result.timeSeconds / 60)}<span className="text-sm font-bold text-gray-500">m</span> {(result.timeSeconds % 60).toString().padStart(2, '0')}<span className="text-sm font-bold text-gray-500">s</span>
+          <div className="bg-white text-neo-black dark:bg-neo-navy-light dark:text-white rounded-neo border-2 border-neo-black dark:border-white/20 p-2 shadow-hard-sm">
+            <Clock className="w-4 h-4 mx-auto mb-0.5 text-neo-purple" />
+            <div className="text-lg font-black text-neo-black dark:text-white">
+              {Math.floor(result.timeSeconds / 60)}<span className="text-xs font-bold text-gray-500">m</span> {(result.timeSeconds % 60).toString().padStart(2, '0')}<span className="text-xs font-bold text-gray-500">s</span>
             </div>
-            <div className="text-xs text-gray-600 dark:text-gray-300">
+            <div className="text-[10px] text-gray-600 dark:text-gray-300">
               {t('results.time')}
             </div>
           </div>
         </motion.div>
 
-        {/* Shareable result preview */}
+        {/* Shareable result preview - truncated with ellipsis */}
         <motion.div
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.5 }}
-          className="bg-gray-900 dark:bg-black rounded-neo border-3 border-gray-700 p-4 text-left"
+          className="bg-gray-900 dark:bg-black rounded-neo border-2 border-gray-700 p-3 text-left"
         >
-          <pre className="text-white text-sm font-mono whitespace-pre-wrap leading-relaxed">
+          <pre className={`text-white text-xs font-mono whitespace-pre-wrap leading-relaxed ${!showFullShareText ? 'line-clamp-3' : ''}`}>
             {shareText}
           </pre>
+          {!showFullShareText && shareText.split('\n').length > 3 && (
+            <button
+              onClick={() => setShowFullShareText(true)}
+              className="text-xs text-neo-cyan hover:text-neo-lime mt-1 font-medium"
+            >
+              {t('common.showMore') || '... show more'}
+            </button>
+          )}
+          {showFullShareText && (
+            <button
+              onClick={() => setShowFullShareText(false)}
+              className="text-xs text-gray-400 hover:text-gray-300 mt-1 font-medium"
+            >
+              {t('common.showLess') || 'show less'}
+            </button>
+          )}
         </motion.div>
 
         {/* Share buttons */}
@@ -413,12 +489,12 @@ const DailyChallengeResults: React.FC<DailyChallengeResultsProps> = ({
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.6 }}
-          className="space-y-3"
+          className="space-y-2"
         >
           {/* Main share button */}
           <Button
             onClick={handleNativeShare}
-            className="w-full py-4 text-lg font-black uppercase bg-gradient-to-r from-neo-yellow to-neo-orange text-neo-black border-4 border-neo-black rounded-neo shadow-hard hover:shadow-hard-lg hover:-translate-y-1 transition-all"
+            className="w-full py-3 text-base font-black uppercase bg-gradient-to-r from-neo-yellow to-neo-orange text-neo-black border-3 border-neo-black rounded-neo shadow-hard hover:shadow-hard-lg hover:-translate-y-1 transition-all"
           >
             <Share2 className="mr-2 w-5 h-5" />
             {t('daily.shareScore')}
@@ -487,14 +563,14 @@ const DailyChallengeResults: React.FC<DailyChallengeResultsProps> = ({
             transition={{ delay: 0.7 }}
             className="text-left"
           >
-            <h3 className="text-sm font-bold text-gray-600 dark:text-gray-300 uppercase mb-2">
+            <h3 className="text-xs font-bold text-gray-600 dark:text-gray-300 uppercase mb-1.5">
               {t('common.wordsFound')} ({words.length})
             </h3>
-            <div className="flex flex-wrap gap-1">
+            <div className="flex flex-wrap gap-0.5">
               {words.map((word, i) => (
                 <span
                   key={i}
-                  className={`px-2 py-1 text-xs font-bold rounded border-2 border-neo-black ${
+                  className={`px-1.5 py-0.5 text-[10px] font-bold rounded border border-neo-black ${
                     word === longestWord
                       ? 'bg-neo-yellow text-neo-black'
                       : 'bg-gray-100 dark:bg-slate-700 text-gray-800 dark:text-gray-200'
@@ -512,9 +588,9 @@ const DailyChallengeResults: React.FC<DailyChallengeResultsProps> = ({
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.8 }}
-          className="pt-4 border-t border-gray-200 dark:border-gray-700"
+          className="pt-3 border-t border-gray-200 dark:border-gray-700"
         >
-          <p className="text-sm text-gray-600 dark:text-gray-300">
+          <p className="text-xs text-gray-600 dark:text-gray-300">
             {t('daily.nextPuzzleIn')} <span className="font-bold text-neo-cyan">{countdown}</span>
           </p>
         </motion.div>
@@ -524,7 +600,7 @@ const DailyChallengeResults: React.FC<DailyChallengeResultsProps> = ({
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.9 }}
-          className="mt-6"
+          className="mt-4"
         >
           <DailyLeaderboard
             key={leaderboardKey}
@@ -532,8 +608,10 @@ const DailyChallengeResults: React.FC<DailyChallengeResultsProps> = ({
             language={result.language}
             currentPlayerId={isAuthenticated && profile ? profile.id : null}
             currentGuestFingerprint={!isAuthenticated ? guestFingerprint : null}
+            onCurrentUserRankChange={handleCurrentUserRankChange}
             maxVisible={10}
             t={t}
+            gameType="puzzle"
           />
         </motion.div>
       </div>

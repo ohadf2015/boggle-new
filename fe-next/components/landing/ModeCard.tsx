@@ -78,7 +78,7 @@ const ModeCard: React.FC<ModeCardProps> = ({
           // Neo-Brutalist card base
           'rounded-neo-lg border-3 border-neo-black',
           'shadow-hard-lg',
-          'p-3 sm:p-4',
+          'p-3 sm:p-4 lg:p-6 xl:p-8',
           'cursor-pointer',
           'relative overflow-hidden',
           // Colors
@@ -101,18 +101,18 @@ const ModeCard: React.FC<ModeCardProps> = ({
         whileTap={{ scale: 0.99 }}
       >
         {/* Header with icon and arrow */}
-        <div className="flex items-start justify-between mb-2">
+        <div className="flex items-start justify-between mb-2 lg:mb-4">
           {/* Icon */}
           <div
             className={cn(
-              'w-9 h-9 sm:w-10 sm:h-10',
-              'rounded-neo border-2 border-neo-black',
-              'shadow-hard-sm',
+              'w-9 h-9 sm:w-10 sm:h-10 lg:w-14 lg:h-14 xl:w-16 xl:h-16',
+              'rounded-neo border-2 lg:border-3 border-neo-black',
+              'shadow-hard-sm lg:shadow-hard',
               'flex items-center justify-center',
               styles.iconBg
             )}
           >
-            <span className={cn('text-lg sm:text-xl', styles.iconText)}>
+            <span className={cn('text-lg sm:text-xl lg:text-2xl xl:text-3xl', styles.iconText)}>
               {icon}
             </span>
           </div>
@@ -120,44 +120,44 @@ const ModeCard: React.FC<ModeCardProps> = ({
           {/* Arrow indicator */}
           <div
             className={cn(
-              'w-7 h-7 sm:w-8 sm:h-8',
-              'rounded-full border-2 border-neo-black',
+              'w-7 h-7 sm:w-8 sm:h-8 lg:w-10 lg:h-10 xl:w-12 xl:h-12',
+              'rounded-full border-2 lg:border-3 border-neo-black',
               'flex items-center justify-center',
               'transition-transform duration-200 ease-out',
               isRTL ? 'group-hover:-translate-x-1' : 'group-hover:translate-x-1',
               styles.arrow
             )}
           >
-            <ArrowIcon className="text-sm sm:text-base" />
+            <ArrowIcon className="text-sm sm:text-base lg:text-lg xl:text-xl" />
           </div>
         </div>
 
         {/* Title */}
-        <h2 className="text-lg sm:text-xl font-black uppercase tracking-tight text-neo-black mb-0.5">
+        <h2 className="text-lg sm:text-xl lg:text-2xl xl:text-3xl font-black uppercase tracking-tight text-neo-black mb-0.5 lg:mb-1 xl:mb-2">
           {title}
         </h2>
 
         {/* Description */}
-        <p className="text-xs sm:text-sm font-medium text-neo-black mb-2">
+        <p className="text-xs sm:text-sm lg:text-base xl:text-lg font-medium text-neo-black mb-2 lg:mb-4">
           {description}
         </p>
 
         {/* Live Badge - shows open rooms and players when available */}
         {liveBadge && (liveBadge.openRooms > 0 || liveBadge.totalPlayers > 0) && (
-          <div className="flex flex-wrap gap-1 mb-2">
+          <div className="flex flex-wrap gap-1 lg:gap-2 mb-2 lg:mb-4">
             {liveBadge.openRooms > 0 && (
-              <span className="inline-flex items-center gap-1 px-2 py-1 bg-neo-lime/90 text-neo-black text-xs font-bold rounded-neo border-2 border-neo-black shadow-hard-sm">
-                <LayoutGrid className="w-3 h-3" />
+              <span className="inline-flex items-center gap-1 lg:gap-2 px-2 lg:px-3 py-1 lg:py-1.5 bg-neo-lime/90 text-neo-black text-xs lg:text-sm font-bold rounded-neo border-2 border-neo-black shadow-hard-sm">
+                <LayoutGrid className="w-3 h-3 lg:w-4 lg:h-4" />
                 {liveBadge.openRooms} {liveBadge.roomsLabel}
               </span>
             )}
             {liveBadge.totalPlayers > 0 && (
-              <span className="inline-flex items-center gap-1 px-2 py-1 bg-neo-lime/90 text-neo-black text-xs font-bold rounded-neo border-2 border-neo-black shadow-hard-sm">
-                <span className="relative flex h-1.5 w-1.5">
+              <span className="inline-flex items-center gap-1 lg:gap-2 px-2 lg:px-3 py-1 lg:py-1.5 bg-neo-lime/90 text-neo-black text-xs lg:text-sm font-bold rounded-neo border-2 border-neo-black shadow-hard-sm">
+                <span className="relative flex h-1.5 w-1.5 lg:h-2 lg:w-2">
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-neo-black text-neo-white opacity-75" />
-                  <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-neo-black text-neo-white" />
+                  <span className="relative inline-flex rounded-full h-1.5 w-1.5 lg:h-2 lg:w-2 bg-neo-black text-neo-white" />
                 </span>
-                <Users className="w-3 h-3" />
+                <Users className="w-3 h-3 lg:w-4 lg:h-4" />
                 {liveBadge.totalPlayers} {liveBadge.playersLabel}
               </span>
             )}
@@ -165,7 +165,7 @@ const ModeCard: React.FC<ModeCardProps> = ({
         )}
 
         {/* Features as icon row with tooltips */}
-        <div className="flex gap-1">
+        <div className="flex gap-1 lg:gap-2">
           {features.map((feature, index) => (
             <div
               key={index}
@@ -173,10 +173,10 @@ const ModeCard: React.FC<ModeCardProps> = ({
             >
               <div
                 className={cn(
-                  'w-6 h-6 sm:w-7 sm:h-7',
-                  'rounded-neo border-2 border-neo-black/30',
+                  'w-6 h-6 sm:w-7 sm:h-7 lg:w-10 lg:h-10 xl:w-12 xl:h-12',
+                  'rounded-neo border-2 lg:border-3 border-neo-black/30',
                   'flex items-center justify-center',
-                  'text-xs sm:text-sm',
+                  'text-xs sm:text-sm lg:text-base xl:text-lg',
                   styles.badgeBg,
                   styles.badgeText
                 )}
@@ -184,7 +184,7 @@ const ModeCard: React.FC<ModeCardProps> = ({
                 {feature.icon}
               </div>
               {/* Tooltip */}
-              <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1 px-1.5 py-0.5 text-[10px] font-medium text-neo-white bg-neo-black rounded whitespace-nowrap opacity-0 group-hover/tooltip:opacity-100 transition-opacity pointer-events-none z-10">
+              <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1 lg:mb-2 px-1.5 lg:px-2 py-0.5 lg:py-1 text-[10px] lg:text-xs font-medium text-neo-white bg-neo-black rounded whitespace-nowrap opacity-0 group-hover/tooltip:opacity-100 transition-opacity pointer-events-none z-10">
                 {feature.label}
               </span>
             </div>

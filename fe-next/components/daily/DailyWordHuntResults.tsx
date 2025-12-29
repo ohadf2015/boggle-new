@@ -2,7 +2,7 @@
 
 import React, { useState, useCallback, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Share2, Trophy, Target, X, TrendingUp, ArrowLeft, Copy, Check, Send, Coins } from 'lucide-react';
+import { Share2, Trophy, Target, X, TrendingUp, ArrowLeft, Copy, Check, Send, Coins, RotateCcw } from 'lucide-react';
 
 // X/Twitter icon (no lucide equivalent)
 const XTwitterIcon = ({ className }: { className?: string }) => (
@@ -36,11 +36,13 @@ import {
 } from '@/utils/dailyChallenge';
 import DailyChallengeSignupModal from '@/components/auth/DailyChallengeSignupModal';
 import StreakMilestoneCelebration from './StreakMilestoneCelebration';
+import ConfettiRetrigger from '@/components/results/ConfettiRetrigger';
 import DailyLeaderboard from './DailyLeaderboard';
 import { feedbackToEmoji, type LetterFeedback } from '@/utils/wordHuntFeedback';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { awardDailyCoins, spendCoins, canAfford, getCoins, COIN_COSTS } from '@/utils/coinManager';
+import { applyHebrewFinalLetters } from '@/shared/utils/wordNormalization';
 import type { Language } from '@/types';
 
 interface WordHuntStats {
@@ -72,6 +74,7 @@ interface DailyWordHuntResultsProps {
   countdown: string;
   isNewCompletion: boolean;
   onBack: () => void;
+  onRetry: () => void;
 }
 
 // Language options for the "Try Another Language" section
@@ -111,9 +114,9 @@ const TryAnotherLanguage: React.FC<{ currentLanguage: Language }> = ({ currentLa
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.9 }}
-      className="mt-6 pt-4 border-t border-gray-200 dark:border-gray-700"
+      className="mt-4 pt-3 border-t border-gray-200 dark:border-gray-700"
     >
-      <h3 className="text-sm font-bold text-gray-600 dark:text-gray-300 uppercase mb-3 flex items-center gap-2">
+      <h3 className="text-xs font-bold text-gray-600 dark:text-gray-300 uppercase mb-2 flex items-center gap-1.5">
         🌍 {t('wordHunt.results.tryAnotherLanguage')}
       </h3>
       <div className="flex flex-wrap justify-center gap-2">
@@ -146,6 +149,7 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
   countdown,
   isNewCompletion,
   onBack,
+  onRetry,
 }) => {
   const { t } = useLanguage();
   const [copied, setCopied] = useState(false);
@@ -163,6 +167,7 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
   const [showSignupModal, setShowSignupModal] = useState(false);
   const [signupTrigger, setSignupTrigger] = useState<ConversionTrigger | null>(null);
   const [leaderboardKey, setLeaderboardKey] = useState(0);
+  const [showFullShareText, setShowFullShareText] = useState(false);
   const { profile, isAuthenticated } = useAuth();
 
   // Check for streak milestone
@@ -339,6 +344,56 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
     }
   }, [isNewCompletion, result.solved, result.attemptsUsed]);
 
+  // Confetti colors for each rank (matching Top3Leaderboard)
+  const RANK_CONFETTI_COLORS: Record<number, string[]> = {
+    1: ['#ffd700', '#ffed4a', '#f59e0b', '#fbbf24'], // Gold
+    2: ['#c0c0c0', '#94a3b8', '#e2e8f0', '#cbd5e1'], // Silver
+    3: ['#cd7f32', '#ea580c', '#f97316', '#fb923c'], // Bronze/Orange
+  };
+
+  // Fire confetti burst for a specific rank (top 3 celebration)
+  const fireRankConfetti = useCallback((rank: number): void => {
+    const count = Math.floor(100 * (1.2 - rank * 0.15)); // 1st = 100, 2nd = 85, 3rd = 70
+    const colors = RANK_CONFETTI_COLORS[rank] || RANK_CONFETTI_COLORS[1];
+
+    const defaults = {
+      origin: { y: 0.6 },
+      zIndex: 1000,
+      colors,
+    };
+
+    confetti({
+      ...defaults,
+      particleCount: Math.floor(count * 0.35),
+      spread: 26,
+      startVelocity: 55,
+    });
+    confetti({
+      ...defaults,
+      particleCount: Math.floor(count * 0.25),
+      spread: 60,
+    });
+    confetti({
+      ...defaults,
+      particleCount: Math.floor(count * 0.4),
+      spread: 100,
+      decay: 0.91,
+      scalar: 0.9,
+    });
+  }, []);
+
+  // Fire top 3 celebration confetti when stats load and player is in top 3
+  useEffect(() => {
+    if (isNewCompletion && stats?.yourStats?.solved && stats.yourStats.rank !== undefined && stats.yourStats.rank <= 3) {
+      // Delay to let initial confetti finish, then fire rank-specific celebration
+      const timer = setTimeout(() => {
+        fireRankConfetti(stats.yourStats!.rank!);
+      }, 2800);
+      return () => clearTimeout(timer);
+    }
+    return undefined;
+  }, [isNewCompletion, stats?.yourStats?.solved, stats?.yourStats?.rank, fireRankConfetti]);
+
   // Show streak milestone celebration for new completions
   useEffect(() => {
     if (isNewCompletion && milestoneMessage) {
@@ -466,6 +521,25 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
     }
   }, [puzzleDate, language]);
 
+  // Handle retry challenge (costs coins)
+  const handleRetryChallenge = useCallback(() => {
+    const cost = COIN_COSTS.DAILY_RETRY;
+    if (!canAfford(cost)) {
+      return; // Not enough coins
+    }
+
+    const spent = spendCoins(cost, 'Daily Challenge Retry', {
+      puzzleDate,
+      language,
+      puzzleNumber: String(puzzleNumber),
+    });
+
+    if (spent) {
+      setCurrentCoins(getCoins());
+      onRetry();
+    }
+  }, [puzzleDate, language, puzzleNumber, onRetry]);
+
   return (
     <motion.div
       key="word-hunt-results"
@@ -488,20 +562,31 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
       </motion.div>
 
       {/* Main content */}
-      <div className="max-w-md w-full text-center space-y-6 py-8">
+      <div className="max-w-md w-full text-center space-y-4 py-6">
         {/* Completion badge */}
         <motion.div
           initial={{ scale: 0 }}
           animate={{ scale: 1 }}
           transition={{ type: 'spring', delay: 0.1 }}
+          className="flex items-center justify-center gap-3"
         >
           {result.solved ? (
-            <div className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-green-400 to-emerald-500 rounded-neo border-3 border-neo-black shadow-hard">
-              <Trophy className="w-5 h-5 text-white" />
-              <span className="font-black text-white uppercase">
-                {t('wordHunt.victory')}
-              </span>
-            </div>
+            <>
+              <div className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-green-400 to-emerald-500 rounded-neo border-3 border-neo-black shadow-hard">
+                <Trophy className="w-5 h-5 text-white" />
+                <span className="font-black text-white uppercase">
+                  {t('wordHunt.victory')}
+                </span>
+              </div>
+              {/* Confetti retrigger button for victory */}
+              {isNewCompletion && (
+                <ConfettiRetrigger
+                  variant={stats?.yourStats?.rank && stats.yourStats.rank <= 3 ? 'rank' : 'victory'}
+                  rank={stats?.yourStats?.rank}
+                  compact
+                />
+              )}
+            </>
           ) : (
             <div className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-gray-400 to-gray-500 rounded-neo border-3 border-neo-black shadow-hard">
               <X className="w-5 h-5 text-white" />
@@ -533,18 +618,18 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
               </div>
 
               {/* Show target word for successful players */}
-              <div className="mt-3 space-y-2">
+              <div className="mt-2 space-y-1">
                 <div className="text-sm text-gray-600 dark:text-gray-400">
                   {t('wordHunt.results.targetWord')}:
                 </div>
                 <div className="text-2xl font-black text-neo-yellow tracking-wider">
-                  {result.targetWord.toUpperCase()}
+                  {language === 'he' ? applyHebrewFinalLetters(result.targetWord) : result.targetWord.toUpperCase()}
                 </div>
               </div>
 
               {/* Show coins earned (net tokens) for successful players */}
               {result.clueTokensEarned !== undefined && result.clueTokensSpent !== undefined && (
-                <div className="mt-2 flex items-center justify-center gap-2 px-4 py-2 bg-yellow-100 dark:bg-yellow-900/30 rounded-neo border-2 border-neo-black">
+                <div className="mt-2 flex items-center justify-center gap-2 px-3 py-1.5 bg-yellow-100 dark:bg-yellow-900/30 rounded-neo border-2 border-neo-black">
                   <span className="text-2xl">🪙</span>
                   <div className="text-sm">
                     <span className="font-black text-xl">{result.clueTokensEarned - result.clueTokensSpent}</span>
@@ -559,14 +644,14 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
                   initial={{ scale: 0.8, opacity: 0 }}
                   animate={{ scale: 1, opacity: 1 }}
                   transition={{ delay: 0.5, type: 'spring' }}
-                  className="mt-3 px-4 py-3 bg-gradient-to-r from-neo-yellow to-amber-400 rounded-neo border-3 border-neo-black shadow-hard"
+                  className="mt-2 px-3 py-2 bg-gradient-to-r from-neo-yellow to-amber-400 rounded-neo border-2 border-neo-black shadow-hard-sm"
                 >
-                  <div className="flex items-center justify-center gap-2 mb-1">
-                    <Coins className="w-5 h-5 text-neo-black" />
-                    <span className="font-black text-xl text-neo-black">+{coinReward.awarded}</span>
-                    <span className="text-sm font-bold text-neo-black/70">{t('reveal.coins') || 'Coins'}</span>
+                  <div className="flex items-center justify-center gap-1.5 mb-0.5">
+                    <Coins className="w-4 h-4 text-neo-black" />
+                    <span className="font-black text-lg text-neo-black">+{coinReward.awarded}</span>
+                    <span className="text-xs font-bold text-neo-black/70">{t('reveal.coins') || 'Coins'}</span>
                   </div>
-                  <div className="flex items-center justify-center gap-3 text-xs text-neo-black/70 font-medium">
+                  <div className="flex items-center justify-center gap-2 text-[10px] text-neo-black/70 font-medium">
                     {coinReward.breakdown.base > 0 && (
                       <span>{t('reveal.base') || 'Base'}: +{coinReward.breakdown.base}</span>
                     )}
@@ -577,7 +662,7 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
                       <span>🔥 {t('reveal.streak') || 'Streak'}: +{coinReward.breakdown.streak}</span>
                     )}
                   </div>
-                  <p className="text-xs text-neo-black/60 mt-1">
+                  <p className="text-[10px] text-neo-black/60 mt-0.5">
                     {t('reveal.usedForReveals') || 'Use coins to reveal words in single player games!'}
                   </p>
                 </motion.div>
@@ -618,7 +703,7 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
                       {t('wordHunt.results.theTargetWordWas') || 'The target word was:'}
                     </div>
                     <div className="text-3xl font-black text-neo-yellow tracking-wider">
-                      {result.targetWord.toUpperCase()}
+                      {language === 'he' ? applyHebrewFinalLetters(result.targetWord) : result.targetWord.toUpperCase()}
                     </div>
                   </div>
                 ) : (
@@ -661,7 +746,7 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
               transition={{ type: 'spring', delay: 0.25 }}
-              className="mt-3 inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-orange-400 to-red-500 rounded-neo border-3 border-neo-black shadow-hard"
+              className="mt-2 inline-flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-orange-400 to-red-500 rounded-neo border-2 border-neo-black shadow-hard-sm"
             >
               <span className="text-2xl">🔥</span>
               <span className="font-black text-white">
@@ -679,7 +764,7 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
               initial={{ scale: 0, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               transition={{ type: 'spring', delay: 0.3 }}
-              className="mt-3 inline-flex flex-col items-center gap-1 px-4 py-3 bg-gradient-to-r from-purple-500 to-indigo-600 rounded-neo border-3 border-neo-black shadow-hard"
+              className="mt-2 inline-flex flex-col items-center gap-0.5 px-3 py-2 bg-gradient-to-r from-purple-500 to-indigo-600 rounded-neo border-2 border-neo-black shadow-hard-sm"
             >
               <div className="flex items-center gap-2">
                 <span className="text-xl">{rarestWord.emoji}</span>
@@ -694,14 +779,14 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
 
         {/* Ranking badges */}
         {stats?.yourStats && stats.yourStats.solved && (
-          <div className="space-y-3">
+          <div className="space-y-2">
             {/* Rank position */}
             {stats.yourStats.rank !== undefined && (
               <motion.div
                 initial={{ scale: 0, rotate: -10 }}
                 animate={{ scale: 1, rotate: 0 }}
                 transition={{ type: 'spring', delay: 0.3 }}
-                className="inline-block px-6 py-3 bg-gradient-to-r from-neo-orange to-neo-yellow rounded-neo border-3 border-neo-black shadow-hard"
+                className="inline-block px-4 py-2 bg-gradient-to-r from-neo-orange to-neo-yellow rounded-neo border-2 border-neo-black shadow-hard-sm"
               >
                 <div className="flex items-center gap-2">
                   <Trophy className="w-5 h-5 text-neo-black" />
@@ -718,7 +803,7 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
                 initial={{ scale: 0, rotate: -10 }}
                 animate={{ scale: 1, rotate: 0 }}
                 transition={{ type: 'spring', delay: 0.35 }}
-                className="inline-block px-6 py-3 bg-gradient-to-r from-neo-purple to-neo-blue rounded-neo border-3 border-neo-black shadow-hard"
+                className="inline-block px-4 py-2 bg-gradient-to-r from-neo-purple to-neo-blue rounded-neo border-2 border-neo-black shadow-hard-sm"
               >
                 <div className="flex items-center gap-2">
                   <TrendingUp className="w-5 h-5 text-white" />
@@ -741,7 +826,7 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.4 }}
-          className="space-y-4"
+          className="space-y-3"
         >
           {/* Shareable result preview - Enhanced UI */}
           <div className={cn(
@@ -790,20 +875,39 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
               <span className="text-lg">{result.solved ? '✨' : '💪'}</span>
             </div>
 
-            {/* Share text content */}
-            <div className="p-4">
-              <pre className="text-white text-sm font-mono whitespace-pre-wrap leading-relaxed break-words overflow-hidden max-w-full">
+            {/* Share text content - truncated with ellipsis */}
+            <div className="p-3">
+              <pre className={cn(
+                "text-white text-xs font-mono whitespace-pre-wrap leading-relaxed break-words overflow-hidden max-w-full",
+                !showFullShareText && "line-clamp-3"
+              )}>
                 {shareText}
               </pre>
+              {!showFullShareText && shareText.split('\n').length > 3 && (
+                <button
+                  onClick={() => setShowFullShareText(true)}
+                  className="text-xs text-emerald-400 hover:text-emerald-300 mt-1 font-medium"
+                >
+                  {t('common.showMore') || '... show more'}
+                </button>
+              )}
+              {showFullShareText && (
+                <button
+                  onClick={() => setShowFullShareText(false)}
+                  className="text-xs text-gray-400 hover:text-gray-300 mt-1 font-medium"
+                >
+                  {t('common.showLess') || 'show less'}
+                </button>
+              )}
             </div>
           </div>
 
           {/* Share buttons */}
-          <div className="space-y-3">
+          <div className="space-y-2">
             <Button
               onClick={handleNativeShare}
               className={cn(
-                "w-full py-4 text-lg font-black uppercase border-4 border-neo-black rounded-neo shadow-hard hover:shadow-hard-lg hover:-translate-y-1 transition-all",
+                "w-full py-3 text-base font-black uppercase border-3 border-neo-black rounded-neo shadow-hard hover:shadow-hard-lg hover:-translate-y-1 transition-all",
                 result.solved
                   ? "bg-gradient-to-r from-green-400 to-emerald-500 text-white"
                   : "bg-gradient-to-r from-neo-cyan to-neo-blue text-white"
@@ -868,23 +972,23 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.5 }}
-          className="space-y-2"
+          className="space-y-1.5"
         >
-          <h3 className="text-sm font-bold text-gray-600 dark:text-gray-300 uppercase">
+          <h3 className="text-xs font-bold text-gray-600 dark:text-gray-300 uppercase">
             {t('wordHunt.title')} - {t('common.attempts')}
           </h3>
-          <div className="space-y-1">
+          <div className="space-y-0.5">
             {result.attempts.map((attempt, idx) => (
-              <div key={idx} className="flex items-center justify-center gap-2">
-                <span className="text-xs text-gray-500 dark:text-gray-400 w-6">
+              <div key={idx} className="flex items-center justify-center gap-1.5">
+                <span className="text-[10px] text-gray-500 dark:text-gray-400 w-5">
                   {idx + 1}.
                 </span>
-                <div className="flex gap-1">
+                <div className="flex gap-0.5">
                   {attempt.feedback.map((letterFb, letterIdx) => (
                     <div
                       key={letterIdx}
                       className={cn(
-                        "w-10 h-10 flex items-center justify-center font-bold text-white rounded border-2 border-neo-black text-lg",
+                        "w-7 h-7 flex items-center justify-center font-bold text-white rounded border border-neo-black text-sm",
                         letterFb.feedback === 'green' && "bg-green-500",
                         letterFb.feedback === 'yellow' && "bg-yellow-500",
                         letterFb.feedback === 'gray' && "bg-gray-400"
@@ -922,7 +1026,7 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
                 <div className="text-2xl font-black text-blue-600 dark:text-blue-400">
                   {stats.totalPlayers}
                 </div>
-                <div className="text-xs text-gray-600 dark:text-gray-400">
+                <div className="text-[10px] text-gray-600 dark:text-gray-400">
                   {t('wordHunt.stats.totalPlayers')}
                 </div>
               </motion.div>
@@ -930,13 +1034,13 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
                 initial={{ scale: 0.8, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
                 transition={{ delay: 0.7 }}
-                className="bg-green-50 dark:bg-green-900/20 rounded-lg p-2 border-2 border-green-200 dark:border-green-800"
+                className="bg-green-50 dark:bg-green-900/20 rounded-lg p-1.5 border border-green-200 dark:border-green-800"
               >
-                <div className="text-lg mb-1">✅</div>
-                <div className="text-2xl font-black text-green-600 dark:text-green-400">
+                <div className="text-sm mb-0.5">✅</div>
+                <div className="text-lg font-black text-green-600 dark:text-green-400">
                   {stats.solveRate}%
                 </div>
-                <div className="text-xs text-gray-600 dark:text-gray-400">
+                <div className="text-[10px] text-gray-600 dark:text-gray-400">
                   {t('wordHunt.stats.solveRate')}
                 </div>
               </motion.div>
@@ -944,21 +1048,21 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
                 initial={{ scale: 0.8, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
                 transition={{ delay: 0.8 }}
-                className="bg-purple-50 dark:bg-purple-900/20 rounded-lg p-2 border-2 border-purple-200 dark:border-purple-800"
+                className="bg-purple-50 dark:bg-purple-900/20 rounded-lg p-1.5 border border-purple-200 dark:border-purple-800"
               >
-                <div className="text-lg mb-1">🎯</div>
-                <div className="text-2xl font-black text-purple-600 dark:text-purple-400">
+                <div className="text-sm mb-0.5">🎯</div>
+                <div className="text-lg font-black text-purple-600 dark:text-purple-400">
                   {stats.avgAttemptsSolved?.toFixed(1) ?? 'N/A'}
                 </div>
-                <div className="text-xs text-gray-600 dark:text-gray-400">
+                <div className="text-[10px] text-gray-600 dark:text-gray-400">
                   {t('wordHunt.stats.avgAttempts')}
                 </div>
               </motion.div>
             </div>
 
             {/* Attempt distribution histogram */}
-            <div className="space-y-1">
-              <div className="text-xs font-bold text-gray-600 dark:text-gray-300 uppercase mb-2">
+            <div className="space-y-0.5">
+              <div className="text-[10px] font-bold text-gray-600 dark:text-gray-300 uppercase mb-1">
                 📈 {t('wordHunt.stats.distribution')}
               </div>
               {[...Array(10)].map((_, i) => {
@@ -974,21 +1078,21 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
                     initial={{ x: -20, opacity: 0 }}
                     animate={{ x: 0, opacity: 1 }}
                     transition={{ delay: 0.5 + i * 0.05 }}
-                    className="flex items-center gap-2"
+                    className="flex items-center gap-1.5"
                   >
                     <span className={cn(
-                      "text-xs font-bold w-6",
+                      "text-[10px] font-bold w-4",
                       isYourAttempt ? "text-neo-yellow" : "text-gray-600 dark:text-gray-400"
                     )}>
                       {attemptNum}
                     </span>
-                    <div className="flex-1 h-6 bg-gray-200 dark:bg-gray-700 rounded-sm overflow-hidden">
+                    <div className="flex-1 h-4 bg-gray-200 dark:bg-gray-700 rounded-sm overflow-hidden">
                       <motion.div
                         initial={{ width: 0 }}
                         animate={{ width: `${percentage}%` }}
                         transition={{ duration: 0.5, delay: 0.5 + i * 0.05 }}
                         className={cn(
-                          "h-full flex items-center justify-end px-2 text-xs font-bold text-white",
+                          "h-full flex items-center justify-end px-1 text-[10px] font-bold text-white",
                           isYourAttempt
                             ? "bg-gradient-to-r from-neo-yellow to-neo-orange"
                             : "bg-gradient-to-r from-green-500 to-emerald-500"
@@ -998,7 +1102,7 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
                       </motion.div>
                     </div>
                     {isYourAttempt && (
-                      <span className="text-xs font-bold text-neo-yellow">← YOU</span>
+                      <span className="text-[10px] font-bold text-neo-yellow">YOU</span>
                     )}
                   </motion.div>
                 );
@@ -1075,7 +1179,7 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.85 }}
-          className="mt-6"
+          className="mt-4"
         >
           <DailyLeaderboard
             key={leaderboardKey}
@@ -1094,14 +1198,58 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.9 }}
-          className="pt-4 border-t border-gray-200 dark:border-gray-700"
+          className="pt-3 border-t border-gray-200 dark:border-gray-700"
         >
-          <p className="text-sm text-gray-600 dark:text-gray-300">
+          <p className="text-xs text-gray-600 dark:text-gray-300">
             {t('daily.nextPuzzleIn')} <span className="font-bold text-neo-cyan">{countdown}</span>
           </p>
-          <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+          <p className="text-[10px] text-gray-500 dark:text-gray-400 mt-0.5">
             {t('wordHunt.playAgainTomorrow')}
           </p>
+        </motion.div>
+
+        {/* Retry Challenge Section */}
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.95 }}
+          className="pt-4 border-t border-gray-200 dark:border-gray-700"
+        >
+          <div className="space-y-2">
+            <p className="text-sm font-bold text-gray-700 dark:text-gray-300 flex items-center justify-center gap-2">
+              <RotateCcw className="w-4 h-4" />
+              {t('wordHunt.results.wantToRetry') || "Want another try?"}
+            </p>
+            <Button
+              onClick={handleRetryChallenge}
+              disabled={!canAfford(COIN_COSTS.DAILY_RETRY)}
+              className={cn(
+                "px-6 py-3 font-bold border-3 border-neo-black rounded-neo shadow-hard transition-all",
+                canAfford(COIN_COSTS.DAILY_RETRY)
+                  ? "bg-gradient-to-r from-neo-orange to-neo-yellow text-neo-black hover:-translate-y-0.5 hover:shadow-hard-lg"
+                  : "bg-gray-300 text-gray-600 cursor-not-allowed"
+              )}
+            >
+              <RotateCcw className="w-4 h-4 mr-2" />
+              {t('wordHunt.results.retryChallenge') || 'Retry Challenge'}
+              <span className="ml-2 px-2 py-0.5 bg-neo-black/20 text-xs rounded-full font-black flex items-center gap-1">
+                <Coins className="w-3 h-3" />
+                {COIN_COSTS.DAILY_RETRY}
+              </span>
+            </Button>
+            <div className="text-xs text-gray-500 dark:text-gray-400">
+              {t('wordHunt.results.yourCoins') || 'Your coins:'}{' '}
+              <span className="font-bold text-neo-yellow">{currentCoins}</span>
+              {!canAfford(COIN_COSTS.DAILY_RETRY) && (
+                <span className="text-red-500 ml-2">
+                  ({t('wordHunt.results.needMoreCoins')?.replace('{amount}', String(COIN_COSTS.DAILY_RETRY - currentCoins)) || `need ${COIN_COSTS.DAILY_RETRY - currentCoins} more`})
+                </span>
+              )}
+            </div>
+            <p className="text-[10px] text-gray-500 dark:text-gray-400">
+              {t('wordHunt.results.retryExplanation') || 'Full reset - start fresh with new attempts'}
+            </p>
+          </div>
         </motion.div>
 
         {/* Try Another Language Section */}

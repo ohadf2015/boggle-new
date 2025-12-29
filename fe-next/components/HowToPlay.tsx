@@ -540,7 +540,7 @@ const HowToPlay: React.FC<HowToPlayProps> = ({ onClose }) => {
           disabled={currentStep === 0}
           className="bg-neo-cream text-sm sm:text-base px-2 sm:px-4"
         >
-          <ChevronLeft className={`${isRTL ? 'ml-1 sm:ml-2 rotate-180' : 'mr-1 sm:mr-2'}`} />
+          <ChevronLeft className="me-1 sm:me-2 rtl:rotate-180" />
           <span className="hidden xs:inline">{t('common.back')}</span>
         </Button>
 
@@ -556,7 +556,7 @@ const HowToPlay: React.FC<HowToPlayProps> = ({ onClose }) => {
           >
             <span className="hidden xs:inline">{t('common.understood')}</span>
             <span className="xs:hidden">OK</span>
-            <Check className={`${isRTL ? 'mr-1 sm:mr-2' : 'ml-1 sm:ml-2'}`} />
+            <Check className="ms-1 sm:ms-2" />
           </Button>
         ) : (
           <Button
@@ -566,7 +566,7 @@ const HowToPlay: React.FC<HowToPlayProps> = ({ onClose }) => {
           >
             <span className="hidden xs:inline">{t('common.next') || 'Next'}</span>
             <span className="xs:hidden">{t('common.next') || 'Next'}</span>
-            <ChevronRight className={`${isRTL ? 'mr-1 sm:mr-2 rotate-180' : 'ml-1 sm:ml-2'}`} />
+            <ChevronRight className="ms-1 sm:ms-2 rtl:rotate-180" />
           </Button>
         )}
       </div>

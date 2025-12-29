@@ -142,10 +142,13 @@ const ja = {
     "help": "ヘルプ",
     "pause": "一時停止",
     "resume": "再開",
+    "save": "保存",
+    "edit": "編集",
     "retry": "再試行",
     "newGame": "新しいゲーム",
     "join": "参加",
     "showLess": "表示を減らす",
+    "showMore": "もっと見る",
     "or": "または",
     "closeMenu": "メニューを閉じる",
     "openMenu": "メニューを開く",
@@ -823,6 +826,8 @@ const ja = {
     "exitRoom": "ルームを退出",
     "exitWarning": "本当に退出しますか？留まって新しいゲームの開始を待つことができます。",
     "playAgain": "もう一度プレイ",
+    "celebrate": "お祝い",
+    "celebrateAgain": "もう一度お祝い",
     "finalScores": "最終スコア",
     "returnToRoom": "アクティブルームに戻る",
     "cancelAutoReturn": "自動復帰をキャンセル",
@@ -2245,7 +2250,11 @@ const ja = {
     "maxAttempts": "最大試行回数",
     "huntDescription": "色分けされたフィードバックで隠された単語を探そう！",
     "shareImage": "画像として共有",
-    "download": "ダウンロード"
+    "download": "ダウンロード",
+    "playingAs": "プレイヤー名",
+    "guestPlayer": "ゲストプレイヤー",
+    "enterName": "名前を入力",
+    "characters": "文字"
   },
   "wordHunt": {
     "title": "ワードハント",
@@ -2367,7 +2376,11 @@ const ja = {
       "theTargetWordWas": "正解の単語は:",
       "revealTargetWord": "正解を表示",
       "yourCoins": "あなたのコイン:",
-      "notEnoughCoins": "コインが足りません"
+      "notEnoughCoins": "コインが足りません",
+      "wantToRetry": "もう一度挑戦しますか？",
+      "retryChallenge": "再挑戦",
+      "needMoreCoins": "あと{amount}必要",
+      "retryExplanation": "完全リセット - 新しい試行で最初からやり直し"
     },
     "shareCTA": {
       "canYouSolve": "解けますか？",

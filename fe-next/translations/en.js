@@ -144,9 +144,12 @@ const en = {
     "help": "Help",
     "pause": "Pause",
     "resume": "Resume",
+    "save": "Save",
+    "edit": "Edit",
     "newGame": "New Game",
     "join": "Join",
     "showLess": "Show less",
+    "showMore": "Show more",
     "or": "or",
     "closeMenu": "Close menu",
     "openMenu": "Open menu",
@@ -830,6 +833,8 @@ const en = {
     "exitRoom": "Exit Room",
     "exitWarning": "Are you sure you want to leave? You can stay and wait for a new game to start.",
     "playAgain": "Play Again",
+    "celebrate": "Celebrate",
+    "celebrateAgain": "Celebrate again",
     "finalScores": "Final Scores",
     "returnToRoom": "Return to Active Room",
     "cancelAutoReturn": "Cancel Auto Return",
@@ -2252,7 +2257,11 @@ const en = {
     "maxAttempts": "Max Attempts",
     "huntDescription": "Hunt for the hidden word using color-coded feedback!",
     "shareImage": "Share as Image",
-    "download": "Download"
+    "download": "Download",
+    "playingAs": "Playing as",
+    "guestPlayer": "Guest Player",
+    "enterName": "Enter your name",
+    "characters": "characters"
   },
   "wordHunt": {
     "title": "Word Hunt",
@@ -2374,7 +2383,11 @@ const en = {
       "theTargetWordWas": "The target word was:",
       "revealTargetWord": "Reveal Target Word",
       "yourCoins": "Your coins:",
-      "notEnoughCoins": "not enough coins"
+      "notEnoughCoins": "not enough coins",
+      "wantToRetry": "Want another try?",
+      "retryChallenge": "Retry Challenge",
+      "needMoreCoins": "need {amount} more",
+      "retryExplanation": "Full reset - start fresh with new attempts"
     },
     "shareCTA": {
       "canYouSolve": "Can you solve it?",

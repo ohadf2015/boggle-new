@@ -142,10 +142,13 @@ const es = {
     "help": "Ayuda",
     "pause": "Pausar",
     "resume": "Reanudar",
+    "save": "Guardar",
+    "edit": "Editar",
     "retry": "Reintentar",
     "newGame": "Nuevo Juego",
     "join": "Unirse",
     "showLess": "Mostrar menos",
+    "showMore": "Mostrar más",
     "or": "o",
     "closeMenu": "Cerrar menú",
     "openMenu": "Abrir menú",
@@ -821,6 +824,8 @@ const es = {
     "exitRoom": "Salir de la Sala",
     "exitWarning": "¿Seguro que quieres irte? Puedes quedarte y esperar un nuevo juego.",
     "playAgain": "Jugar de Nuevo",
+    "celebrate": "Celebrar",
+    "celebrateAgain": "Celebrar de nuevo",
     "finalScores": "Puntuaciones Finales",
     "returnToRoom": "Volver a la Sala Activa",
     "cancelAutoReturn": "Cancelar Auto Retorno",
@@ -2243,7 +2248,11 @@ const es = {
     "maxAttempts": "Intentos Máximos",
     "huntDescription": "¡Caza la palabra oculta usando retroalimentación de colores!",
     "shareImage": "Compartir como imagen",
-    "download": "Descargar"
+    "download": "Descargar",
+    "playingAs": "Jugando como",
+    "guestPlayer": "Jugador invitado",
+    "enterName": "Ingresa tu nombre",
+    "characters": "caracteres"
   },
   "wordHunt": {
     "title": "Caza de Palabras",
@@ -2365,7 +2374,11 @@ const es = {
       "theTargetWordWas": "La palabra objetivo era:",
       "revealTargetWord": "Revelar palabra objetivo",
       "yourCoins": "Tus monedas:",
-      "notEnoughCoins": "no tienes suficientes monedas"
+      "notEnoughCoins": "no tienes suficientes monedas",
+      "wantToRetry": "¿Quieres intentarlo de nuevo?",
+      "retryChallenge": "Reintentar desafío",
+      "needMoreCoins": "necesitas {amount} más",
+      "retryExplanation": "Reinicio completo - empieza de nuevo con nuevos intentos"
     },
     "shareCTA": {
       "canYouSolve": "¿Puedes resolverlo?",

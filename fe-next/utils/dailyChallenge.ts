@@ -416,12 +416,11 @@ export function generateDailyPuzzle(
   if (preSelectedWord) {
     targetWord = preSelectedWord.toUpperCase();
   } else {
-    // Deterministic fallback
+    // Deterministic fallback - use words of varying lengths (3-8 letters)
     const wordList = TARGET_WORD_LISTS[language] || TARGET_WORD_LISTS['en'];
-    const fourLetterWords = wordList.filter(word => word.length === 4);
 
     // Shuffle word list using seeded random (Fisher-Yates)
-    const shuffled = [...fourLetterWords];
+    const shuffled = [...wordList];
     for (let i = shuffled.length - 1; i > 0; i--) {
       const j = Math.floor(random() * (i + 1));
       [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
@@ -1321,6 +1320,30 @@ export function saveWordHuntResult(result: WordHuntResult): DailyStreak {
 }
 
 /**
+ * Clear today's Word Hunt result to allow retry
+ * Used when player pays coins to retry the daily challenge
+ * Returns true if successfully cleared
+ */
+export function clearWordHuntResultForRetry(language: Language): boolean {
+  if (typeof window === 'undefined') return false;
+
+  const today = getDailyChallengeDate();
+  const key = `${WORD_HUNT_STORAGE_KEY}_${language}_${today}`;
+
+  try {
+    localStorage.removeItem(key);
+
+    // Also clear the coin award flag so they can earn coins again
+    const awardKey = `lexiclash_daily_coin_award_${today}_${language}`;
+    localStorage.removeItem(awardKey);
+
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+/**
  * Get all stored Word Hunt results (for history)
  */
 export function getAllWordHuntResults(language: Language): StoredWordHuntResult[] {
@@ -1634,6 +1657,39 @@ export async function getGuestDailyPlayer(): Promise<GuestDailyPlayer> {
   return fallback;
 }
 
+/**
+ * Update guest daily player info (for name editing)
+ * Allows guests to customize their display name
+ */
+export function updateGuestDailyPlayer(updates: Partial<GuestDailyPlayer>): GuestDailyPlayer | null {
+  if (typeof window === 'undefined') {
+    return null;
+  }
+
+  const stored = localStorage.getItem(GUEST_DAILY_PLAYER_KEY);
+  let current: GuestDailyPlayer = {
+    displayName: 'Guest',
+    avatarEmoji: '🎯',
+    avatarColor: '#6366f1',
+  };
+
+  if (stored) {
+    try {
+      current = JSON.parse(stored);
+    } catch {
+      // Use default
+    }
+  }
+
+  const updated: GuestDailyPlayer = {
+    ...current,
+    ...updates,
+  };
+
+  localStorage.setItem(GUEST_DAILY_PLAYER_KEY, JSON.stringify(updated));
+  return updated;
+}
+
 // ==========================================
 // Browser Fingerprint (for guest tracking)
 // ==========================================
@@ -1873,12 +1929,11 @@ export function selectDailyTargetWord(
   const seed = hashString(seedString);
   const random = mulberry32(seed);
 
-  // Get word list for this language and filter to only 4-letter words
+  // Get word list for this language - includes words of varying lengths (3-8 letters)
   const wordList = TARGET_WORD_LISTS[language] || TARGET_WORD_LISTS['en'];
-  const fourLetterWords = wordList.filter(word => word.length === 4);
 
   // Shuffle word list using seeded random (Fisher-Yates)
-  const shuffled = [...fourLetterWords];
+  const shuffled = [...wordList];
   for (let i = shuffled.length - 1; i > 0; i--) {
     const j = Math.floor(random() * (i + 1));
     [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];

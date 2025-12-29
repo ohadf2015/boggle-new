@@ -142,10 +142,13 @@ const he = {
     "help": "עזרה",
     "pause": "השהה",
     "resume": "המשך",
+    "save": "שמור",
+    "edit": "ערוך",
     "retry": "נסה שוב",
     "newGame": "משחק חדש",
     "join": "הצטרף",
     "showLess": "הצג פחות",
+    "showMore": "הצג עוד",
     "or": "או",
     "closeMenu": "סגור תפריט",
     "openMenu": "פתח תפריט",
@@ -825,6 +828,8 @@ const he = {
     "exitRoom": "יציאה מהחדר",
     "exitWarning": "האם אתה בטוח שברצונך לעזוב? אתה יכול להישאר ולחכות להתחלת משחק חדש.",
     "playAgain": "שחק שוב",
+    "celebrate": "חגיגה",
+    "celebrateAgain": "חגגו שוב",
     "finalScores": "תוצאות סופיות",
     "returnToRoom": "חזור לחדר הפעיל",
     "cancelAutoReturn": "בטל מעבר אוטומטי",
@@ -2247,7 +2252,11 @@ const he = {
     "maxAttempts": "ניסיונות מקסימליים",
     "huntDescription": "חפשו את המילה המוסתרת בעזרת משוב צבעוני!",
     "shareImage": "שתף כתמונה",
-    "download": "הורד"
+    "download": "הורד",
+    "playingAs": "משחק בתור",
+    "guestPlayer": "שחקן אורח",
+    "enterName": "הכנס את שמך",
+    "characters": "תווים"
   },
   "wordHunt": {
     "title": "ציד מילים",
@@ -2369,7 +2378,11 @@ const he = {
       "theTargetWordWas": "מילת היעד הייתה:",
       "revealTargetWord": "חשוף מילת יעד",
       "yourCoins": "המטבעות שלך:",
-      "notEnoughCoins": "אין מספיק מטבעות"
+      "notEnoughCoins": "אין מספיק מטבעות",
+      "wantToRetry": "רוצים לנסות שוב?",
+      "retryChallenge": "נסה שוב",
+      "needMoreCoins": "חסרים {amount}",
+      "retryExplanation": "איפוס מלא - התחלה חדשה"
     },
     "shareCTA": {
       "canYouSolve": "תצליחו לפתור?",

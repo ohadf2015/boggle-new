@@ -22,6 +22,7 @@ export const COIN_EARNING = {
 export const COIN_COSTS = {
   REVEAL_5_PLUS: 60,        // Cost to reveal a 5+ letter word (balances with daily earnings)
   REVEAL_TARGET_WORD: 250,  // Cost to reveal the target word in daily challenge when failed
+  DAILY_RETRY: 500,         // Cost to retry daily challenge (full reset, more expensive than reveal)
 } as const;
 
 // Coin earning constants for other game modes

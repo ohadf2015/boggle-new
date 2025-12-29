@@ -50,6 +50,8 @@ interface DailyLeaderboardProps {
   currentPlayerId?: string | null;
   currentGuestFingerprint?: string | null;
   onParticipantCountChange?: (count: number) => void;
+  /** Callback when current user's rank is determined (1-based rank, null if not found) */
+  onCurrentUserRankChange?: (rank: number | null) => void;
   compact?: boolean;
   maxVisible?: number;
   t: (key: string) => string;
@@ -169,6 +171,7 @@ const DailyLeaderboard: React.FC<DailyLeaderboardProps> = ({
   currentPlayerId,
   currentGuestFingerprint,
   onParticipantCountChange,
+  onCurrentUserRankChange,
   compact = false,
   maxVisible = 10,
   t,
@@ -235,6 +238,13 @@ const DailyLeaderboard: React.FC<DailyLeaderboardProps> = ({
   // Find current user's position
   const currentUserIndex = participants.findIndex(isCurrentUser);
   const currentUserData = currentUserIndex >= 0 ? participants[currentUserIndex] : null;
+
+  // Report current user's rank to parent component
+  useEffect(() => {
+    if (onCurrentUserRankChange) {
+      onCurrentUserRankChange(currentUserData?.rank_position ?? null);
+    }
+  }, [currentUserData?.rank_position, onCurrentUserRankChange]);
 
   // Generate shareable link with OG image
   const handleShareRank = useCallback(async () => {

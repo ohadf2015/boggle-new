@@ -603,7 +603,7 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
       )}
     >
       {/* Top bar */}
-      <div className="flex items-center justify-between mb-2 px-2">
+      <div className="flex items-center justify-between mb-1 px-2">
         <Button
           variant="ghost"
           size="sm"
@@ -619,7 +619,7 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
       </div>
 
       {/* Life bar + Clue tokens */}
-      <div className="flex items-center gap-3 mb-2">
+      <div className="flex items-center gap-2 mb-1">
         {/* Life bar */}
         <motion.div
           className={cn(
@@ -743,10 +743,10 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
         <motion.div
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
-          className="mb-1.5 mx-1"
+          className="mb-1 mx-1"
         >
           {/* Black boxes for target word OR Letter Feedback Overlay */}
-          <div className="flex justify-center flex-wrap gap-1.5 sm:gap-2 px-2">
+          <div className="flex justify-center flex-wrap gap-1 sm:gap-1.5 px-2">
             <AnimatePresence mode="wait">
               {showFeedbackOverlay && latestAttemptFeedback ? (
                 // Show colored letter feedback when overlay is active
@@ -756,7 +756,7 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0, scale: 0.9 }}
                   transition={{ duration: 0.3 }}
-                  className="flex justify-center flex-wrap gap-1.5 sm:gap-2"
+                  className="flex justify-center flex-wrap gap-1 sm:gap-1.5"
                 >
                   {latestAttemptFeedback.map((letterFb, idx) => {
                     const wordLength = latestAttemptFeedback.length;
@@ -800,7 +800,7 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0, scale: 0.9 }}
                   transition={{ duration: 0.3 }}
-                  className="flex justify-center flex-wrap gap-1.5 sm:gap-2"
+                  className="flex justify-center flex-wrap gap-1 sm:gap-1.5"
                 >
                   {(() => {
                     // Parse hint to understand revealed letters
@@ -858,7 +858,7 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -10 }}
                 transition={{ duration: 0.2, delay: 0.3 }}
-                className="flex items-center justify-center gap-3 mt-2 text-[10px] sm:text-xs"
+                className="flex items-center justify-center gap-2 mt-1 text-[10px] sm:text-xs"
               >
                 <span className="flex items-center gap-1">
                   <span className="w-3 h-3 sm:w-4 sm:h-4 bg-green-500 rounded border border-green-700"></span>
@@ -878,7 +878,7 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
 
           {/* Hint level indicator below boxes - hide when showing feedback */}
           {!showFeedbackOverlay && (
-            <div className="flex items-center justify-center gap-2 mt-2">
+            <div className="flex items-center justify-center gap-1 mt-1">
               <motion.div
                 animate={hintUnlockAnimation ? { rotate: [0, -15, 15, 0], scale: [1, 1.3, 1] } : {}}
                 transition={{ duration: 0.5 }}
@@ -925,7 +925,7 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              className="mb-1.5 px-2 flex items-center gap-2"
+              className="mb-1 px-2 flex items-center gap-2"
             >
               <span className="text-[10px] sm:text-xs text-gray-500 whitespace-nowrap">
                 {t('wordHunt.survival.nextHint') || 'Next'} Lvl {nextHint.level}:
@@ -949,7 +949,7 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              className="text-center text-[10px] sm:text-xs text-green-600 dark:text-green-400 mb-1.5 font-bold"
+              className="text-center text-[10px] sm:text-xs text-green-600 dark:text-green-400 mb-1 font-bold"
             >
               ✅ {t('wordHunt.survival.allHintsUnlocked') || 'All hints unlocked!'}
             </motion.div>
@@ -960,12 +960,12 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
 
       {/* Category and example (if unlocked) */}
       {showCategory && (
-        <div className="text-xs bg-purple-50 dark:bg-purple-900/20 border border-purple-300 rounded p-2 mb-2">
+        <div className="text-[11px] bg-purple-50 dark:bg-purple-900/20 border border-purple-300 rounded px-2 py-1 mb-1">
           <span className="font-bold">{t('wordHunt.survival.category')?.replace('{category}', category) || `Category: ${category}`}</span>
         </div>
       )}
       {showExample && (
-        <div className="text-xs bg-green-50 dark:bg-green-900/20 border border-green-300 rounded p-2 mb-2">
+        <div className="text-[11px] bg-green-50 dark:bg-green-900/20 border border-green-300 rounded px-2 py-1 mb-1">
           <span className="font-bold">{t('wordHunt.survival.exampleSentence') || 'Example:'}</span> {exampleSentence.replace(new RegExp(targetWord, 'gi'), '____')}
         </div>
       )}
@@ -974,7 +974,7 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
       {/* Prominent Attempts Counter */}
       <motion.div
         className={cn(
-          "flex items-center justify-between gap-2 sm:gap-3 px-3 sm:px-4 py-1.5 sm:py-2 rounded-neo border-2 sm:border-3 mb-1.5 mx-2",
+          "flex items-center justify-between gap-2 sm:gap-3 px-2 sm:px-3 py-1 sm:py-1.5 rounded-neo border-2 mb-1 mx-2",
           MAX_ATTEMPTS - attempts.length <= 2
             ? "bg-red-100 dark:bg-red-900/30 border-red-500"
             : MAX_ATTEMPTS - attempts.length <= 4
@@ -1029,7 +1029,7 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
       </motion.div>
 
       {/* Feedback - fixed height container to prevent layout shift */}
-      <div className="h-6 flex items-center justify-center mb-1">
+      <div className="h-5 flex items-center justify-center">
         <AnimatePresence mode="wait">
           {currentFeedback && (
             <motion.div

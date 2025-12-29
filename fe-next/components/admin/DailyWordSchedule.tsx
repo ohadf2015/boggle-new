@@ -745,7 +745,7 @@ export const DailyWordSchedule: React.FC = () => {
             className="p-1 hover:bg-gray-200 dark:hover:bg-gray-600 rounded"
             title="Previous week"
           >
-            <ChevronLeft className="w-5 h-5" />
+            <ChevronLeft className="w-5 h-5 rtl:rotate-180" />
           </button>
           <span className="font-bold text-sm">
             {dateRange.start} - {dateRange.end}
@@ -756,7 +756,7 @@ export const DailyWordSchedule: React.FC = () => {
             title="Next week"
             disabled={dateOffset >= 0}
           >
-            <ChevronRight className={cn("w-5 h-5", dateOffset >= 0 && "opacity-30")} />
+            <ChevronRight className={cn("w-5 h-5 rtl:rotate-180", dateOffset >= 0 && "opacity-30")} />
           </button>
           {dateOffset !== 0 && (
             <button

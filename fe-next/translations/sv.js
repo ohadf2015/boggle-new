@@ -142,10 +142,13 @@ const sv = {
     "help": "Hjälp",
     "pause": "Pausa",
     "resume": "Fortsätt",
+    "save": "Spara",
+    "edit": "Redigera",
     "retry": "Försök igen",
     "newGame": "Nytt spel",
     "join": "Gå med",
     "showLess": "Visa mindre",
+    "showMore": "Visa mer",
     "or": "eller",
     "closeMenu": "Stäng meny",
     "openMenu": "Öppna meny",
@@ -824,6 +827,8 @@ const sv = {
     "exitRoom": "Lämna rum",
     "exitWarning": "Är du säker på att du vill lämna? Du kan stanna kvar och vänta på att ett nytt spel startar.",
     "playAgain": "Spela igen",
+    "celebrate": "Fira",
+    "celebrateAgain": "Fira igen",
     "finalScores": "Slutresultat",
     "returnToRoom": "Återvänd till aktivt rum",
     "cancelAutoReturn": "Avbryt automatisk retur",
@@ -2246,7 +2251,11 @@ const sv = {
     "maxAttempts": "Max Försök",
     "huntDescription": "Jaga det dolda ordet med färgkodad feedback!",
     "shareImage": "Dela som bild",
-    "download": "Ladda ner"
+    "download": "Ladda ner",
+    "playingAs": "Spelar som",
+    "guestPlayer": "Gästspelare",
+    "enterName": "Ange ditt namn",
+    "characters": "tecken"
   },
   "wordHunt": {
     "title": "Ordjakt",
@@ -2368,7 +2377,11 @@ const sv = {
       "theTargetWordWas": "Målordet var:",
       "revealTargetWord": "Avslöja målord",
       "yourCoins": "Dina mynt:",
-      "notEnoughCoins": "inte tillräckligt med mynt"
+      "notEnoughCoins": "inte tillräckligt med mynt",
+      "wantToRetry": "Vill du försöka igen?",
+      "retryChallenge": "Försök igen",
+      "needMoreCoins": "behöver {amount} till",
+      "retryExplanation": "Full återställning - börja om med nya försök"
     },
     "shareCTA": {
       "canYouSolve": "Kan du lösa det?",

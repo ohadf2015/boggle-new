@@ -646,7 +646,7 @@ const FriendRow: React.FC<FriendRowProps> = ({
         </button>
       )}
 
-      {!compact && <ChevronRight className={cn('w-4 h-4', isDark ? 'text-gray-500' : 'text-gray-400')} />}
+      {!compact && <ChevronRight className={cn('w-4 h-4 rtl:rotate-180', isDark ? 'text-gray-500' : 'text-gray-400')} />}
     </motion.div>
   );
 };

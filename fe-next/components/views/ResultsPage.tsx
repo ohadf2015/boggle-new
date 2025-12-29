@@ -23,6 +23,7 @@ import { useMobileLandscape } from '@/hooks/useMobileLandscape';
 // Dynamic imports for heavy components (loaded after initial render)
 const ResultsPlayerCard = dynamic(() => import('@/components/results/ResultsPlayerCard'), { ssr: false });
 const ResultsWinnerBanner = dynamic(() => import('@/components/results/ResultsWinnerBanner'), { ssr: false });
+const ConfettiRetrigger = dynamic(() => import('@/components/results/ConfettiRetrigger'), { ssr: false });
 const ConsolidatedPlayerCard = dynamic(() => import('@/components/results/ConsolidatedPlayerCard'), { ssr: false });
 const Top3Leaderboard = dynamic(() => import('@/components/results/Top3Leaderboard'), { ssr: false });
 const AuthModal = dynamic(() => import('@/components/auth/AuthModal'), { ssr: false });
@@ -744,7 +745,21 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
         {/* Header Section - Centered */}
         <div className="max-w-4xl mx-auto">
           {/* Celebration Banner (shows current player if in top 3) */}
-          {bannerPlayer && <ResultsWinnerBanner winner={bannerPlayer} isCurrentUserWinner={isCurrentUserInBanner} rank={bannerRank} />}
+          {bannerPlayer && (
+            <div className="relative">
+              <ResultsWinnerBanner winner={bannerPlayer} isCurrentUserWinner={isCurrentUserInBanner} rank={bannerRank} />
+              {/* Confetti retrigger button for winners and top 3 */}
+              {isCurrentUserInBanner && bannerRank <= 3 && (
+                <div className="absolute top-2 end-2">
+                  <ConfettiRetrigger
+                    variant="rank"
+                    rank={bannerRank}
+                    compact
+                  />
+                </div>
+              )}
+            </div>
+          )}
 
           {/* Consolidated Player Card - Your Performance (always shows current player) */}
           {currentPlayerData && currentPlayerRank > 0 && (

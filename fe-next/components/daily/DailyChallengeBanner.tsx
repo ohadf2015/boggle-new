@@ -91,7 +91,7 @@ const DailyChallengeBanner: React.FC<DailyChallengeBannerProps> = ({
           "hover:shadow-hard-lg hover:translate-x-[-2px] hover:translate-y-[-2px]",
           "active:translate-x-[1px] active:translate-y-[1px] active:shadow-hard-pressed",
           "bg-gradient-to-r from-neo-orange via-neo-yellow to-neo-pink",
-          compact ? "p-2" : "p-2.5 sm:p-3",
+          compact ? "p-2" : "p-2.5 sm:p-3 lg:p-5 xl:p-6",
           className
         )}
         whileHover={{ scale: 1.005 }}
@@ -111,45 +111,45 @@ const DailyChallengeBanner: React.FC<DailyChallengeBannerProps> = ({
           />
         )}
 
-        <div className="relative flex items-center gap-2 sm:gap-3">
+        <div className="relative flex items-center gap-2 sm:gap-3 lg:gap-4 xl:gap-5">
           {/* Icon */}
           <div className={cn(
-            "flex items-center justify-center rounded-full border-2 border-neo-black",
+            "flex items-center justify-center rounded-full border-2 lg:border-3 border-neo-black",
             "bg-neo-black/10",
-            compact ? "w-8 h-8" : "w-9 h-9 sm:w-10 sm:h-10"
+            compact ? "w-8 h-8" : "w-9 h-9 sm:w-10 sm:h-10 lg:w-14 lg:h-14 xl:w-16 xl:h-16"
           )}>
             <Target className={cn(
               "text-neo-black",
-              compact ? "w-4 h-4" : "w-4 h-4 sm:w-5 sm:h-5"
+              compact ? "w-4 h-4" : "w-4 h-4 sm:w-5 sm:h-5 lg:w-7 lg:h-7 xl:w-8 xl:h-8"
             )} />
           </div>
 
           {/* Content */}
           <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap">
+            <div className="flex items-center gap-1.5 sm:gap-2 lg:gap-3 flex-wrap">
               <h3 className={cn(
                 "font-black uppercase text-neo-black leading-tight",
-                compact ? "text-xs" : "text-sm sm:text-base"
+                compact ? "text-xs" : "text-sm sm:text-base lg:text-xl xl:text-2xl"
               )}>
                 {t('daily.badge') || 'Daily Challenge'}
               </h3>
               <span className={cn(
                 "font-black text-neo-black/80",
-                compact ? "text-xs" : "text-sm sm:text-base"
+                compact ? "text-xs" : "text-sm sm:text-base lg:text-xl xl:text-2xl"
               )}>
                 #{puzzleNumber}
               </span>
               {streak > 0 && (
-                <span className="flex items-center gap-0.5 px-1.5 py-0.5 bg-neo-black/20 rounded-full">
-                  <Flame className="w-3 h-3 text-neo-orange" />
-                  <span className="text-xs font-bold text-neo-black">
+                <span className="flex items-center gap-0.5 lg:gap-1 px-1.5 lg:px-2.5 py-0.5 lg:py-1 bg-neo-black/20 rounded-full">
+                  <Flame className="w-3 h-3 lg:w-5 lg:h-5 text-neo-orange" />
+                  <span className="text-xs lg:text-sm xl:text-base font-bold text-neo-black">
                     {streak}
                   </span>
                 </span>
               )}
             </div>
-            <div className="flex items-center gap-1.5 text-xs text-neo-black/80 font-medium">
-              <Clock className="w-3 h-3" />
+            <div className="flex items-center gap-1.5 lg:gap-2 text-xs lg:text-sm xl:text-base text-neo-black/80 font-medium lg:mt-1">
+              <Clock className="w-3 h-3 lg:w-4 lg:h-4" />
               <span>
                 {hasPlayed
                   ? `${t('daily.nextPuzzleIn') || 'Next'}: ${countdown}`
@@ -165,25 +165,25 @@ const DailyChallengeBanner: React.FC<DailyChallengeBannerProps> = ({
               <motion.div
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }}
-                className="flex items-center justify-center w-8 h-8 sm:w-9 sm:h-9 bg-neo-lime rounded-full border-2 border-neo-black"
+                className="flex items-center justify-center w-8 h-8 sm:w-9 sm:h-9 lg:w-12 lg:h-12 xl:w-14 xl:h-14 bg-neo-lime rounded-full border-2 lg:border-3 border-neo-black"
               >
-                <Check className="w-4 h-4 sm:w-5 sm:h-5 text-neo-black" strokeWidth={3} />
+                <Check className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6 xl:w-8 xl:h-8 text-neo-black" strokeWidth={3} />
               </motion.div>
             ) : (
               <motion.div
-                className="flex items-center justify-center w-8 h-8 sm:w-9 sm:h-9 bg-neo-black rounded-full"
+                className="flex items-center justify-center w-8 h-8 sm:w-9 sm:h-9 lg:w-12 lg:h-12 xl:w-14 xl:h-14 bg-neo-black rounded-full"
                 animate={{ x: [0, 2, 0] }}
                 transition={{ duration: 1, repeat: Infinity, repeatDelay: 2 }}
               >
-                <Play className="w-4 h-4 sm:w-5 sm:h-5 text-neo-yellow" fill="currentColor" />
+                <Play className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6 xl:w-8 xl:h-8 text-neo-yellow" fill="currentColor" />
               </motion.div>
             )}
           </div>
 
           {/* Arrow indicator */}
           <ChevronRight className={cn(
-            "w-4 h-4 text-neo-black/60 transition-transform",
-            "group-hover:translate-x-1 group-hover:text-neo-black"
+            "w-4 h-4 lg:w-6 lg:h-6 xl:w-8 xl:h-8 text-neo-black/60 transition-transform rtl:rotate-180",
+            "group-hover:translate-x-1 rtl:group-hover:-translate-x-1 group-hover:text-neo-black"
           )} />
         </div>
 

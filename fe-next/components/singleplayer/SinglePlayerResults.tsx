@@ -10,6 +10,7 @@ import PlayerInsights from '@/components/results/PlayerInsights';
 import PlayerArchetypeBadge from '@/components/results/PlayerArchetypeBadge';
 import { WordPointsGroup, InvalidWordsSection } from '@/components/results/WordPointsGroup';
 import ResultsWinnerBanner from '@/components/results/ResultsWinnerBanner';
+import ConfettiRetrigger from '@/components/results/ConfettiRetrigger';
 import Top3Leaderboard, { type LeaderboardParticipant } from '@/components/results/Top3Leaderboard';
 import { AchievementBadge } from '@/components/AchievementBadge';
 import WordFeedbackModal from '@/components/voting/WordFeedbackModal';
@@ -103,15 +104,28 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
   // Celebration effect on mount - top 3 in solo-bots mode, or winner/high score
   const shouldShowConfetti = (mode === 'solo-bots' && playerRank >= 1 && playerRank <= 3) || isWinner || results.isNewHighScore;
 
+  // Confetti colors for each rank (matching Top3Leaderboard)
+  const RANK_CONFETTI_COLORS: Record<number, string[]> = {
+    1: ['#ffd700', '#ffed4a', '#f59e0b', '#fbbf24'], // Gold
+    2: ['#c0c0c0', '#94a3b8', '#e2e8f0', '#cbd5e1'], // Silver
+    3: ['#cd7f32', '#ea580c', '#f97316', '#fb923c'], // Bronze/Orange
+  };
+
   useEffect(() => {
     if (shouldShowConfetti) {
+      // Use rank-specific colors for top 3 in solo-bots mode
+      const colors = (mode === 'solo-bots' && playerRank >= 1 && playerRank <= 3)
+        ? RANK_CONFETTI_COLORS[playerRank]
+        : ['#ffd700', '#ff6b6b', '#4ecdc4', '#45b7d1', '#a855f7']; // Default celebration colors
+
       confetti({
         particleCount: 100,
         spread: 70,
-        origin: { y: 0.6 }
+        origin: { y: 0.6 },
+        colors,
       });
     }
-  }, [shouldShowConfetti]);
+  }, [shouldShowConfetti, mode, playerRank]);
 
   // Update guest stats for single player games (only for unauthenticated users)
   useEffect(() => {
@@ -508,34 +522,46 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
       className="max-w-lg mx-auto space-y-3 px-2"
     >
       {/* Unified Victory/Results Banner - using shared component */}
-      <ResultsWinnerBanner
-        winner={{
-          username: t('common.you') || 'You',
-          score: results.playerScore,
-        }}
-        isCurrentUserWinner={true}
-        rank={mode === 'solo-bots' ? playerRank : 1}
-        variant={
-          mode === 'practice' ? 'completion' :
-          mode === 'challenge' && results.isNewHighScore ? (results.isNewAllTimeBest ? 'newRecord' : 'highScore') :
-          mode === 'challenge' ? 'completion' :
-          'ranking'
-        }
-        customMessage={
-          mode === 'solo-bots' && isWinner ? (t('singlePlayer.victory') || 'Victory!') :
-          mode === 'solo-bots' && playerRank <= 3 ? undefined :
-          mode === 'solo-bots' ? (t('singlePlayer.gameOver') || 'Game Over') :
-          mode === 'practice' ? (t('singlePlayer.practiceComplete') || 'Practice Complete!') :
-          undefined
-        }
-        customAnnouncement={
-          mode === 'solo-bots' ? `#${playerRank} ${t('results.of') || 'of'} ${allParticipants.length}` :
-          mode === 'challenge' && results.previousHighScore && results.previousHighScore > results.playerScore
-            ? (t('challenge.shortOf') || '{diff} points short of your record').replace('{diff}', String(results.previousHighScore - results.playerScore))
-            : undefined
-        }
-        showConfetti={shouldShowConfetti}
-      />
+      <div className="relative">
+        <ResultsWinnerBanner
+          winner={{
+            username: t('common.you') || 'You',
+            score: results.playerScore,
+          }}
+          isCurrentUserWinner={true}
+          rank={mode === 'solo-bots' ? playerRank : 1}
+          variant={
+            mode === 'practice' ? 'completion' :
+            mode === 'challenge' && results.isNewHighScore ? (results.isNewAllTimeBest ? 'newRecord' : 'highScore') :
+            mode === 'challenge' ? 'completion' :
+            'ranking'
+          }
+          customMessage={
+            mode === 'solo-bots' && isWinner ? (t('singlePlayer.victory') || 'Victory!') :
+            mode === 'solo-bots' && playerRank <= 3 ? undefined :
+            mode === 'solo-bots' ? (t('singlePlayer.gameOver') || 'Game Over') :
+            mode === 'practice' ? (t('singlePlayer.practiceComplete') || 'Practice Complete!') :
+            undefined
+          }
+          customAnnouncement={
+            mode === 'solo-bots' ? `#${playerRank} ${t('results.of') || 'of'} ${allParticipants.length}` :
+            mode === 'challenge' && results.previousHighScore && results.previousHighScore > results.playerScore
+              ? (t('challenge.shortOf') || '{diff} points short of your record').replace('{diff}', String(results.previousHighScore - results.playerScore))
+              : undefined
+          }
+          showConfetti={shouldShowConfetti}
+        />
+        {/* Confetti retrigger button for celebrations */}
+        {shouldShowConfetti && (
+          <div className="absolute top-2 end-2">
+            <ConfettiRetrigger
+              variant={mode === 'solo-bots' && playerRank <= 3 ? 'rank' : 'default'}
+              rank={mode === 'solo-bots' ? playerRank : undefined}
+              compact
+            />
+          </div>
+        )}
+      </div>
 
       {/* Consolidated Performance Card - Similar to multiplayer */}
       <motion.div
